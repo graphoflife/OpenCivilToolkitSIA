@@ -1,5 +1,5 @@
 ---
-erzeugt: 0ed4c95a734f
+erzeugt: 5eff9a407e9e
 art: formel
 tags: [formel]
 ---
@@ -22,17 +22,21 @@ $$
 
 ## Gebraucht von
 
+- [[Plastischer Biegewiderstand mit β]]
 - [[Widerstand in der Richtung der Einwirkung]]
 
 ## Im Code
 
-- [[opencivil.nachweis.qa_stahl#StahlBiegungQA|StahlBiegungQA._plastisch]]
+- [[opencivil.nachweis.qa_stahl#probe|probe]]
+- [[opencivil.nachweis.qa_verbund_kennzahlen#KennzahlenVerbundQA|KennzahlenVerbundQA._biegung]]
 - [[opencivil.nachweis.schiefe_biegung#SchiefeBiegung|SchiefeBiegung._protokoll_bruchzustand]]
 
 ## Themen
 
 - [[Schiefe Biegung]]
 - [[Stahlquerschnitt]]
+- [[Kennzahlen]]
+- [[Verbundquerschnitt]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

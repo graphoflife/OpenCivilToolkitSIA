@@ -1,5 +1,5 @@
 ---
-erzeugt: ad87b22604ec
+erzeugt: 55d1da9e476d
 art: formel
 tags: [formel]
 normstelle: "SIA 263:2013, 4.1.1, (1); 4.1.3"
@@ -8,14 +8,14 @@ normstelle: "SIA 263:2013, 4.1.1, (1); 4.1.3"
 > SIA 263:2013, 4.1.1, (1); 4.1.3
 
 $$
-f_{yd} = \frac{f_y}{\gamma_{M1}}
+f_{yd} = \frac{f_{y}}{\gamma_{M1}}
 $$
 
 ## Grössen
 
 | Zeichen | Bedeutung | Einheit | Woher |
 | --- | --- | --- | --- |
-| $f_y$ | Streckgrenze | N/mm² | Vorgabe |
+| $f_{y}$ | Streckgrenze | N/mm² | Vorgabe |
 | $\gamma_{M1}$ | Widerstandsbeiwert für Festigkeits- und Stabilitätsnachweise | – | Vorgabe |
 
 ## Beispiel
@@ -23,7 +23,7 @@ $$
 Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
-f_{yd} = \frac{f_y}{\gamma_{M1}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2}}{1.05} = 338\,\mathrm{N}/\mathrm{mm}^{2}
+f_{yd,\text{S355}} = \frac{f_{y,\text{S355}}}{\gamma_{M1,\text{S355}}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2}}{1.05} = 338\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 ## Im Code

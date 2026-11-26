@@ -1,5 +1,5 @@
 ---
-erzeugt: b9f6e4087e4f
+erzeugt: 274720b65c75
 art: modul
 tags: [modul]
 ---
@@ -245,6 +245,7 @@ Giesst aus den Vorlagen ein Material mit eigenem Namensraum.
 - [[opencivil.nachweis.handrechnung]]
 - [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.qa_holz_werte]]
+- [[opencivil.nachweis.qa_verbund_werte]]
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.nachweis.richtungsnachweise]]
 - [[opencivil.nachweis.spannungsbegrenzung]]
@@ -272,6 +273,8 @@ Giesst aus den Vorlagen ein Material mit eigenem Namensraum.
 - [[opencivil.stabwerk.rechnung]]
 - [[opencivil.stabwerk.stabquerschnitt]]
 - [[opencivil.stahlbau.querschnitt]]
+- [[opencivil.verbund.querschnitt]]
+- [[opencivil.verbund.widerstand]]
 - [[opencivil.web.api]]
 - [[opencivil.web.werkstoffkurven]]
 - [[opencivil.web.zeichengeometrie]]

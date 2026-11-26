@@ -1,5 +1,5 @@
 ---
-erzeugt: 60ab72f2749d
+erzeugt: c7505b77cead
 art: modul
 tags: [modul]
 ---
@@ -473,7 +473,7 @@ d null, ohne Beton beides null.
 - [[opencivil.pfahl.quer]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.bewehrungselemente]]
+- [[opencivil.querschnitt.plastisch]]
 - [[opencivil.querschnitt.spannglieder]]
 - [[opencivil.querschnitt.widerstandsflaeche]]
 - [[opencivil.spannungsanalyse.schnitt]]
-- [[opencivil.stahlbau.widerstand]]

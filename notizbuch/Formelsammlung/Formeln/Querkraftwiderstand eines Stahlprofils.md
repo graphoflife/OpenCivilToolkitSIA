@@ -1,5 +1,5 @@
 ---
-erzeugt: c13a06d34731
+erzeugt: 697442628f85
 art: formel
 tags: [formel]
 normstelle: "SIA 263:2013, 5.1.4.1, (41)"
@@ -15,7 +15,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.nachweis.qa_stahl_kennzahlen#KennzahlenStahlQA|KennzahlenStahlQA._schub]]
+- [[opencivil.nachweis.qa_stahl_kennzahlen#querkraft|querkraft]]
 
 ## Themen
 

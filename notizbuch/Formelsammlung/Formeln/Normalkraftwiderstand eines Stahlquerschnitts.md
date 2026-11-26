@@ -1,5 +1,5 @@
 ---
-erzeugt: dedd00278d8f
+erzeugt: c9f4dcc7b7b7
 art: formel
 tags: [formel]
 normstelle: ["SIA 263:2013, 5.1.2.1, (38)", "SIA 263:2013, 5.3.2, (55); 4.5.3"]
@@ -10,14 +10,14 @@ normstelle: ["SIA 263:2013, 5.1.2.1, (38)", "SIA 263:2013, 5.3.2, (55); 4.5.3"]
 *In der Herleitung: «Zugwiderstand, am gezeichneten Querschnitt»*
 
 $$
-N_{Rd}^{+} = \frac{f_y \cdot A}{\gamma_{M1}}
+N_{Rd}^{+} = \frac{f_{y} \cdot A}{\gamma_{M1}}
 $$
 
 ## Grössen
 
 | Zeichen | Bedeutung | Einheit | Woher |
 | --- | --- | --- | --- |
-| $f_y$ | Streckgrenze | N/mm² | Vorgabe |
+| $f_{y}$ | Streckgrenze | N/mm² | Vorgabe |
 | $A$ | Fläche aus Baustahl | mm² | Zwischenwert |
 | $\gamma_{M1}$ | Widerstandsbeiwert für Festigkeits- und Stabilitätsnachweise | – | Vorgabe |
 
@@ -26,7 +26,7 @@ $$
 Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
-N_{Rd}^{+} = \frac{f_y \cdot A}{\gamma_{M1}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 15604\,\mathrm{mm}^{2}}{1.05} = 5275.5\,\mathrm{kN}
+N_{Rd}^{+} = \frac{f_{y,\text{S355}} \cdot A}{\gamma_{M1,\text{S355}}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 15604\,\mathrm{mm}^{2}}{1.05} = 5275.5\,\mathrm{kN}
 $$
 
 ## Gebraucht von

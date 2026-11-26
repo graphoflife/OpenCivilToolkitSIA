@@ -1,5 +1,5 @@
 ---
-erzeugt: 03d784f18c40
+erzeugt: 507862453708
 art: modul
 tags: [modul]
 ---
@@ -134,6 +134,7 @@ Eine Formel der Vorlagen, in den Einheiten der Profile: Flaechen in cm², Moment
 - [[opencivil.nachweis.qa_stahl_stabilitaet]]
 - [[opencivil.stahlbau.stabilitaet]]
 - [[opencivil.stahlprofile.tabelle]]
+- [[opencivil.verbund.querschnitt]]
 
 ## Formeln aus diesem Modul
 

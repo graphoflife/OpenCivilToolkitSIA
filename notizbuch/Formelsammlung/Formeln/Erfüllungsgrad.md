@@ -1,5 +1,5 @@
 ---
-erzeugt: aee6564928eb
+erzeugt: 4b89a31701c2
 art: formel
 tags: [formel]
 ---
@@ -14,7 +14,7 @@ $$
 
 | Zeichen | Bedeutung | Einheit | Woher |
 | --- | --- | --- | --- |
-| $M_{Rd}$ | Biegewiderstand dort | kNm | [[Widerstand bei festgehaltenem N_Ed]], [[Widerstand in der Richtung der Einwirkung]], Zwischenwert |
+| $M_{Rd}$ | Biegewiderstand dort | kNm | [[Widerstand bei festgehaltenem N_Ed]], [[Widerstand in der Richtung der Einwirkung]], Zwischenwert, [[Plastischer Biegewiderstand mit β]] |
 | $M_{Ed}$ | – | kNm | Zwischenwert |
 
 ## Beispiel
@@ -57,6 +57,7 @@ $$
 - [[Knicken und Kippen]]
 - [[Holzquerschnitt]]
 - [[Knicken und Kippen eines Holzstabs]]
+- [[Verbundquerschnitt]]
 - [[Durchstanzen]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->

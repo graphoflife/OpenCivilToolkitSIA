@@ -1,5 +1,5 @@
 ---
-erzeugt: 174a73f5d26a
+erzeugt: 53ed39f906be
 art: modul
 tags: [modul]
 ---
@@ -17,8 +17,8 @@ N/mm² ([[opencivil.stahlbau.widerstand#rechnen|rechnen]]). Die Herleitung schre
 
 * grosse Querkraft mindert die Bleche, in denen sie steht ([[opencivil.stahlbau.widerstand#abmindern|abmindern]]);
 * der plastische Zustand bei `N_Ed` in der Richtung des Moments
-  ([[opencivil.stahlbau.widerstand#plastisch|plastisch]]) und der elastische, wenn (54) gerade aufgeht -- aus
-  beiden die Klasse jedes Blechs;
+  ([[opencivil.querschnitt.plastisch#Starrplastisch.zustand|zustand]]) und der
+  elastische, wenn (54) gerade aufgeht -- aus beiden die Klasse jedes Blechs;
 * der Widerstand nach der Klasse, als Faktor auf das Moment: plastisch in den
   Klassen 1 und 2, elastisch nach (54) in Klasse 3, am wirksamen Querschnitt
   nach (60) in Klasse 4.
@@ -175,32 +175,6 @@ def abmindern(stahl: Stahlquerschnitt, querkraefte: Sequence[Querkraft]) -> Abge
 Der Querschnitt ohne das, was die Querkraft je Richtung nimmt -- siehe
 Dateikopf. Steht sie in beiden Richtungen im selben Blech -- im
 Rundrohr --, nimmt sie zusammen hoechstens das ganze.
-
-### Plastisch
-
-```python
-@dataclass(frozen=True)
-class Plastisch
-```
-
-Der plastische Zustand an einer Nulllinie: was die Spannungsbloecke
-tragen, in N und N·mm um den Bezugspunkt.
-
-- `linie: Linie`
-- `N: float`
-- `M_y: float`
-- `M_z: float`
-
-### plastisch
-
-```python
-def plastisch(stahl: Stahlquerschnitt, f: Sequence[float], N: float, M_y: float, M_z: float, bezug: Punkt, neigung: Optional[float]) -> Optional[Plastisch]
-```
-
-Der plastische Zustand bei `N`, dessen Moment in die Richtung von
-`(M_y, M_z)` zeigt -- mit fester Zugrichtung `neigung`, wo sie
-feststeht ([[opencivil.querschnitt.biegung#Biegung.neigung|neigung]]).
-`None`, wo `N` jenseits der reinen Zug- oder Druckkraft liegt.
 
 ### Glied
 
@@ -372,7 +346,7 @@ Was ein Lastfall am Querschnitt ergibt -- siehe Dateikopf. Kraefte in N, Momente
 - `zustaende: List[Blechzustand]`
 - `freie: List[Teil]` – Die frei gezeichneten Flaechen, die gedrueckt sind.
 - `klasse: int`
-- `plastisch: Optional[Plastisch] = None`
+- `plastisch: Optional[Zustand] = None`
 - `faktor_54: Optional[float] = None`
 - `wirksam: Optional[Wirksame] = None`
 - `glieder: List[Glied] = field(default_factory=list)` – Die Momente von (54) oder (60), nach der Klasse.
@@ -435,10 +409,9 @@ gedrueckte freie Flaechen hoechstens 3.
 
 ## Braucht
 
-- [[opencivil.core.suche]]
 - [[opencivil.querschnitt.biegung]]
 - [[opencivil.querschnitt.geometrie]]
-- [[opencivil.querschnitt.interaktion]]
+- [[opencivil.querschnitt.plastisch]]
 - [[opencivil.querschnitt.zugseite]]
 - [[opencivil.stahlbau.querschnitt]]
 - [[opencivil.stahlbau.schub]]
@@ -448,4 +421,6 @@ gedrueckte freie Flaechen hoechstens 3.
 - [[opencivil.nachweis.qa_stahl]]
 - [[opencivil.nachweis.qa_stahl_stabilitaet]]
 - [[opencivil.nachweis.qa_stahl_werte]]
+- [[opencivil.nachweis.qa_verbund]]
 - [[opencivil.stahlbau.stabilitaet]]
+- [[opencivil.verbund.widerstand]]

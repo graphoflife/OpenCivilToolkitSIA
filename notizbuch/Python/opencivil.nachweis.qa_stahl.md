@@ -1,5 +1,5 @@
 ---
-erzeugt: 5d7444108506
+erzeugt: f81efc595b61
 art: modul
 tags: [modul]
 ---
@@ -52,21 +52,25 @@ def _bezuege(analyse: Querschnittsanalyse, stahl: Stahlquerschnitt, kennzahlen: 
 
 Schwerpunkt, Kennwerte der Staehle und die Querkraftwiderstaende der Kennzahlen.
 
-### _querkraefte
+### querkraefte
 
 ```python
-def _querkraefte(e: Eingaben, stahl: Stahlquerschnitt, kennzahlen: KennzahlenStahlQA, analyse: Querschnittsanalyse, fall: Lastfall) -> List[wd.Querkraft]
+def querkraefte(e: Eingaben, stahl: Stahlquerschnitt, kennzahlen: KennzahlenStahlQA, analyse: Querschnittsanalyse, fall: Lastfall) -> List[wd.Querkraft]
 ```
 
-Die Querkraefte des Lastfalls mit ihren Widerstaenden, in N -- wie sie zaehlen.
+Die Querkraefte des Lastfalls mit ihren Widerstaenden, in N -- wie sie
+zaehlen. `kennzahlen` traegt `V_Rd` je Richtung -- auch die des
+Verbunds ([[opencivil.nachweis.qa_verbund_kennzahlen]]).
 
-### _einwirkung
+### einwirkung
 
 ```python
-def _einwirkung(p: Protokoll, analyse: Querschnittsanalyse, fall: Lastfall) -> None
+def einwirkung(p: Protokoll, analyse: Querschnittsanalyse, fall: Lastfall, *, torsion: str=OHNE_TORSION) -> None
 ```
 
-Die Einwirkung als Tabelle -- je Groesse, die zaehlt, eine Zeile; einachsig ohne M_z und V_y.
+Die Einwirkung als Tabelle -- je Groesse, die zaehlt, eine Zeile;
+einachsig ohne M_z und V_y. Mit `T_Ed` der Satz `torsion`, warum es
+nicht nachgewiesen wird.
 
 ### StahlBiegungQA
 
@@ -94,14 +98,6 @@ def _rechnen(self, e: Eingaben, sw: Stahlwerte, bezug: Tuple[float, float], fall
 
 Der Lastfall am Querschnitt -- `None` ohne Normalkraft und Moment.
 
-#### StahlBiegungQA._querkraft
-
-```python
-def _querkraft(self, p: Protokoll, werte: Zwischenwerte, x: wd.Fall) -> None
-```
-
-Was eine grosse Querkraft den Blechen nimmt, in denen sie steht.
-
 #### StahlBiegungQA._wirksam
 
 ```python
@@ -126,6 +122,43 @@ def _linear(self, p: Protokoll, werte: Zwischenwerte, x: wd.Fall, N_Ed: Wert, M_
 
 (54) in Klasse 3, (60) in Klasse 4 -- als Widerstaende geschrieben, mit `λ`.
 
+### minderung
+
+```python
+def minderung(p: Protokoll, werte: Zwischenwerte, kraefte: Sequence[wd.Querkraft], abgemindert: wd.Abgemindert, stahl: Stahlquerschnitt, *, referenz: str) -> None
+```
+
+Was grosse Querkraft den Blechen nimmt, in denen sie steht -- im Stahl wie im Verbund.
+
+### krafttabelle
+
+```python
+def krafttabelle(p: Protokoll, werte: Zwischenwerte, bloecke: Sequence[Block], namen: Sequence[str], linie: Linie, *, titel: str) -> None
+```
+
+Die Nulllinie und je Teil und Zone die Kraft mit Angriffspunkt, dazu
+ihre Summe `N` -- der Anfang der Probe eines plastischen Zustands, im
+Stahl wie im Verbund. `namen` je Teil, auf den ein Block zeigt.
+
+### momentsummen
+
+```python
+def momentsummen(bloecke: Sequence[Block], bezug: Tuple[float, float]) -> Dict[str, float]
+```
+
+Je Achse das Moment der Bloecke um `bezug`, in Nm: `M_y = -Σ F (z - z_S)`.
+
+### probe
+
+```python
+def probe(p: Protokoll, werte: Zwischenwerte, bloecke: Sequence[Block], namen: Sequence[str], bezug: Tuple[float, float], biegung: Biegung, pl: Zustand, *, titel: str, referenz: str, symbol: str='M_{Rd}') -> Wert
+```
+
+Die Probe eines plastischen Zustands -- im Stahl wie im Verbund: die
+Nulllinie, je Teil und Zone die Kraft mit Angriffspunkt, die Summen
+`N`, `M_y` und `M_z`. Zurueck kommt der Widerstand `symbol` in
+der Richtung der Einwirkung, einachsig `M_y`.
+
 ### glied_text
 
 ```python
@@ -148,6 +181,7 @@ Die Querkraft eines Stahlquerschnitts, je Lastfall -- siehe Dateikopf.
 - `THEMA = 'Stahlquerschnitt'`
 - `LANGNAME = 'Querkraft'`
 - `ART = 'V'`
+- `REFERENZ = schub.REFERENZ_SCHUB`
 
 #### StahlQuerkraftQA.pruefe
 
@@ -162,6 +196,7 @@ def pruefe(self, e: Eingaben, p: Protokoll)
 - `OHNE_TORSION = 'Torsion weist das Werkzeug beim Stahlquerschnitt nicht nach: SIA 263…` – Warum Torsion nicht nachgewiesen wird -- siehe Dateikopf.
 - `OHNE_PROFIL = 'Querkraft tragen nur Profile – der Querschnitt hat keines.'` – Warum ohne Profil keine Querkraft getragen wird.
 - `LINEAR = 'Lineares Zusammenwirken im Stahlquerschnitt'` – Der Name von (54) und (60) in der Formelsammlung: als Ansatz dieselbe Gleichung.
+- `MOMENT_UM = {'y': '-\\sum F_i \\cdot (z_i - z_S)', 'z': '-\\sum F_i \\cdot (y_i -…` – Wie die Probe das Moment um eine Achse schreibt.
 
 ## Braucht
 
@@ -174,6 +209,8 @@ def pruefe(self, e: Eingaben, p: Protokoll)
 - [[opencivil.nachweis.qa_stahl_kennzahlen]]
 - [[opencivil.nachweis.qa_stahl_werte]]
 - [[opencivil.querschnitt.analyse]]
+- [[opencivil.querschnitt.biegung]]
+- [[opencivil.querschnitt.plastisch]]
 - [[opencivil.querschnitt.zugseite]]
 - [[opencivil.stahlbau.querschnitt]]
 - [[opencivil.stahlbau.schub]]
@@ -182,6 +219,8 @@ def pruefe(self, e: Eingaben, p: Protokoll)
 ## Gebraucht von
 
 - [[opencivil.nachweis.qa_stahl_stabilitaet]]
+- [[opencivil.nachweis.qa_verbund]]
+- [[opencivil.nachweis.qa_verbund_kennzahlen]]
 - [[opencivil.projekt.aufbau.querschnittsanalyse]]
 
 ## Formeln aus diesem Modul
@@ -189,10 +228,10 @@ def pruefe(self, e: Eingaben, p: Protokoll)
 - [[Biegewiderstand bis zum ersten Fliessen]] · `StahlBiegungQA._wirksam`
 - [[Erfüllungsgrad bei fester Normalkraft und fester Richtung]] · `StahlBiegungQA._ansatz`
 - [[Lineares Zusammenwirken im Stahlquerschnitt]] · `StahlBiegungQA._ansatz`
-- [[Minderung durch grosse Querkraft]] · `StahlBiegungQA._querkraft`
-- [[Probe – Moment um y]] · `StahlBiegungQA._plastisch`
-- [[Probe – Moment um z]] · `StahlBiegungQA._plastisch`
-- [[Probe – Normalkraft]] · `StahlBiegungQA._plastisch`
+- [[Minderung durch grosse Querkraft]] · `minderung`
+- [[Probe – Moment um y]] · `probe`
+- [[Probe – Moment um z]] · `probe`
+- [[Probe – Normalkraft]] · `krafttabelle`
 - [[Widerstand in der Richtung der Einwirkung]] · `StahlBiegungQA._linear`
-- [[Widerstand in der Richtung der Einwirkung]] · `StahlBiegungQA._plastisch`
+- [[Widerstand in der Richtung der Einwirkung]] · `probe`
 - [[Widerstandsmoment bis zur weitesten Faser]] · `StahlBiegungQA._wirksam`

@@ -1,5 +1,5 @@
 ---
-erzeugt: 210cab0b8448
+erzeugt: 22ed4b171fc6
 art: formel
 tags: [formel]
 normstelle: "SIA 263:2013, 5.1.3, (40)"
@@ -10,14 +10,14 @@ normstelle: "SIA 263:2013, 5.1.3, (40)"
 *In der Herleitung: «Plastischer Widerstand in Klasse 1»*
 
 $$
-M_{y,Rd}^{+} = \frac{f_y \cdot W_{pl}}{\gamma_{M1}}
+M_{y,Rd}^{+} = \frac{f_{y} \cdot W_{pl}}{\gamma_{M1}}
 $$
 
 ## Grössen
 
 | Zeichen | Bedeutung | Einheit | Woher |
 | --- | --- | --- | --- |
-| $f_y$ | Streckgrenze | N/mm² | Vorgabe |
+| $f_{y}$ | Streckgrenze | N/mm² | Vorgabe |
 | $W_{pl}$ | Plastisches Widerstandsmoment | cm³ | Zwischenwert |
 | $\gamma_{M1}$ | Widerstandsbeiwert für Festigkeits- und Stabilitätsnachweise | – | Vorgabe |
 
@@ -26,7 +26,7 @@ $$
 Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
-M_{y,Rd}^{+} = \frac{f_y \cdot W_{pl}}{\gamma_{M1}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 3513.8\,\mathrm{cm}^{3}}{1.05} = 1188\,\mathrm{kNm}
+M_{y,Rd}^{+} = \frac{f_{y,\text{S355}} \cdot W_{pl}}{\gamma_{M1,\text{S355}}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 3513.8\,\mathrm{cm}^{3}}{1.05} = 1188\,\mathrm{kNm}
 $$
 
 ## Gebraucht von

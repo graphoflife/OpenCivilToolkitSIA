@@ -1,11 +1,11 @@
 ---
-erzeugt: 198cf767c8b6
+erzeugt: 4f4b5eb54ab3
 art: formel
 tags: [formel]
-normstelle: "SIA 263:2013, 5.1.1.2; 5.1.8"
+normstelle: ["SIA 263:2013, 5.1.1.2; 5.1.8", "SIA 264:2014, 5.1.2.1; 4.1.3"]
 ---
-> [!info] Normstelle
-> SIA 263:2013, 5.1.1.2; 5.1.8
+> [!info] Normstellen
+> SIA 263:2013, 5.1.1.2; 5.1.8 · SIA 264:2014, 5.1.2.1; 4.1.3
 
 *In der Herleitung: «Widerstand in der Richtung der Einwirkung»*
 
@@ -51,7 +51,7 @@ $$
 - [[opencivil.nachweis.qa_holz#HolzBiegungQA|HolzBiegungQA._ein_fall]]
 - [[opencivil.nachweis.qa_holz_stabilitaet#HolzStabilitaetQA._urteil|HolzStabilitaetQA._urteil]]
 - [[opencivil.nachweis.qa_stahl#StahlBiegungQA._linear|StahlBiegungQA._linear]]
-- [[opencivil.nachweis.qa_stahl#StahlBiegungQA|StahlBiegungQA._plastisch]]
+- [[opencivil.nachweis.qa_stahl#probe|probe]]
 - [[opencivil.nachweis.qa_stahl_stabilitaet#StahlStabilitaetQA._urteil|StahlStabilitaetQA._urteil]]
 - [[opencivil.nachweis.schiefe_biegung#SchiefeBiegung|SchiefeBiegung._ein_fall]]
 
@@ -62,6 +62,7 @@ $$
 - [[Knicken und Kippen]]
 - [[Holzquerschnitt]]
 - [[Knicken und Kippen eines Holzstabs]]
+- [[Verbundquerschnitt]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

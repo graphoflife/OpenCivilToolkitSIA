@@ -7,6 +7,46 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-26 · Verbund nach SIA 264, Querschnitt
+
+Aus dem Plan vom 2026-11-25, Schritt 14a: die Tragsicherheit eines
+gezeichneten Querschnitts aus Baustahl und Beton nach SIA 264:2014, 5.1
+und 5.2 – plastischer Biegewiderstand, Querkraft und ihr Zusammenwirken.
+
+**Vorher und nachher.** Vorher sagte ein Querschnitt aus Baustahl und
+Beton nur grau, dass das Werkzeug ihn nach SIA 264 noch nicht nachweist.
+Nachher hat er die Kachel «Tragsicherheit». Ein IPE 300 aus S355 unter
+einer Platte 1500 × 120 mm aus C30/37 trägt plastisch 426.5 kNm, die
+Nulllinie 71.4 mm unter der Oberkante, in der Platte; mit M_Ed = 300 kNm
+ist α = 1.42.
+
+**Plastisch, mit voller Verdübelung.** Baustahl und Betonstahl fliessen
+ganz, der Beton trägt nur gedrückt, mit 0.85·f_cd über die ganze
+Druckzone (5.1.2.1, 4.3.2.1). Die Rechenart des Betons gilt hier nicht;
+die Kachel sagt es an ihrer Stelle. Die Rechnung ist dieselbe wie beim
+Stahl: Stahl und Verbund teilen sich die starr-plastische Rechnung, neu in
+`opencivil/querschnitt/plastisch.py`, je Gruppe mit ihrer Zug- und
+Druckfestigkeit; der Beton hat eine Zugfestigkeit von null.
+
+**Die Klasse** misst jedes Blech an der plastischen Nulllinie des
+Lastfalls. Plastisch rechnet der Verbund nur in den Klassen 1 und 2;
+darüber steht der Fall grau, denn elastisch nach 5.1.2.4 rechnet das
+Werkzeug ihn noch nicht. Deckt Beton im I-Profil den Flansch innen, gelten
+die Grenzen der Tabelle 3, deckt er den Steg beidseits, 5.2.1.3 – die
+Tabelle der Bleche nennt dann diese Stelle. Mit S420 und S460 mindert β
+nach Figur 1, und gezogener Betonstahl muss in Klasse B oder C sein
+(5.1.2.3). Die Querkraft trägt der Stahl allein, wie im Stahl, und über
+der Hälfte von V_Rd mindert sie die Bleche, in denen sie steht (4.3.2.2).
+
+**Was nicht in der Norm steht**, steht im [[TODO]] und in der Herleitung.
+Verdübelung, Verbundstützen und Blechverbunddecken folgen als Schritte
+14b bis 14d.
+
+**Formelsammlung.** Vier neue Seiten mit Theorie und das Thema
+«Verbundquerschnitt». Das Prüfprojekt hat dafür einen Verbundträger aus
+S460 und damit einen zweiten Baustahl: die Beispiele der Stahlformeln
+nennen jetzt den Stahl, etwa f_yd,S355.
+
 ## 2026-11-26 · Holz nach SIA 265
 
 Aus dem Plan vom 2026-11-25, Schritt 13: die Nachweise eines gezeichneten

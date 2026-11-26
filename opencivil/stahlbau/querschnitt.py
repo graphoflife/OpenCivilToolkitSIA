@@ -12,16 +12,19 @@ ohne Rechenwerk und ohne Herleitung, in mm und N/mm²:
   Zustand jedes Blechs, plastisch ``α`` und elastisch ``ψ``, je an einer
   Nulllinie (:class:`Linie`), und daraus seine Klasse
   (:mod:`opencivil.stahlbau.klasse`);
-* die plastische Nulllinie bei einer Normalkraft und die Kraefte, die ihre
-  Spannungsbloecke tragen, die elastischen Werte und den wirksamen
-  Querschnitt der Klasse 4.
+* den Querschnitt starr-plastisch, je Gruppe ``±f``
+  (:meth:`Stahlquerschnitt.starr`) -- gerechnet wird in
+  :mod:`opencivil.querschnitt.plastisch` --, die elastischen Werte und den
+  wirksamen Querschnitt der Klasse 4.
 
 Was ein Lastfall daraus macht, steht in :mod:`opencivil.stahlbau.widerstand`.
 
 DIE TEILE:
 Ein Polygon zaehlt in seiner Gruppe mit +1 und in der seines Elternteils mit
--1: so nimmt eine Aussparung den Stahl darum weg, und ein Polygon aus anderem
-Stahl ersetzt ihn dort. Mit einem Gewicht dazwischen faellt ein Teil eines
+-1 (:func:`~opencivil.querschnitt.plastisch.stuecke`): so nimmt eine
+Aussparung den Stahl darum weg, und ein Polygon aus anderem Stahl ersetzt ihn
+dort. Ein Polygon aus anderem Werkstoff -- im Verbund der Beton -- ist fuer
+den Stahl eine Aussparung. Mit einem Gewicht dazwischen faellt ein Teil eines
 Blechs nur anteilig weg: so mindert die Querkraft den Steg
 (:meth:`Stahlquerschnitt.mit`). Die Dicke eines Profils ist die seines dicksten
 Blechs, die einer frei gezeichneten Flaeche ihre kleinste Breite -- die ihrer
@@ -58,14 +61,13 @@ from __future__ import annotations
 import copy
 import math
 from dataclasses import dataclass
-from functools import cached_property
 from typing import Callable, Dict, List, Optional, Sequence, Tuple
 
-from opencivil.core.suche import illinois
-from opencivil.material.basis import Baustoff
+from opencivil.material.basis import Baustoff, Baustoffart
 from opencivil.querschnitt import geometrie as geo
 from opencivil.querschnitt.analyse import Flaechenteil
 from opencivil.querschnitt.geometrie import Punkt
+from opencivil.querschnitt.plastisch import Linie, Starrplastisch, Stueck, stuecke
 from opencivil.querschnitt.zugseite import Zugseite
 from opencivil.stahlbau import klasse as kl
 from opencivil.stahlprofile.bleche import Blech, Halterung, bleche
@@ -75,28 +77,6 @@ DICK_AB = 40.0
 
 #: Wie nah an einer Nulllinie ein Punkt auf ihr liegt, in mm.
 TOLERANZ = 1e-3
-
-
-@dataclass(frozen=True)
-class Linie:
-    """
-    Eine Nulllinie ``n·p = v``, in mm: gezogen, wo ``n·p > v``, gedrueckt, wo
-    ``n·p < v`` -- ``n`` zeigt zur gezogenen Seite. Mit ``n = (0, 0)`` liegt
-    sie ausserhalb des Querschnitts: dann ist alles gedrueckt
-    (:data:`DRUCK`) oder alles gezogen (:data:`ZUG`).
-    """
-
-    n: Tuple[float, float]
-    v: float
-
-    def d(self, p: Punkt) -> float:
-        """Wie weit ``p`` auf der gezogenen Seite liegt -- negativ, wo es gedrueckt ist."""
-        return self.n[0] * p[0] + self.n[1] * p[1] - self.v
-
-
-#: Gleichmaessiger Druck und gleichmaessiger Zug -- ohne Nulllinie im Querschnitt.
-DRUCK = Linie((0.0, 0.0), 1.0)
-ZUG = Linie((0.0, 0.0), -1.0)
 
 
 def normale(seite: Zugseite) -> Tuple[float, float]:
@@ -139,25 +119,6 @@ class Teil:
 
 
 @dataclass(frozen=True)
-class Stueck:
-    """
-    Ein Polygon mit Gewicht in einer Gruppe -- siehe Dateikopf. ``teil`` ist
-    der Index des Teils, zu dem es zaehlt -- bei einer Aussparung der des
-    Teils darum --, ``was`` sagt, wofuer ein Streifen weggenommen ist.
-    """
-
-    gruppe: int
-    gewicht: float
-    punkte: Tuple[Punkt, ...]
-    teil: int
-    was: str = ""
-
-    @cached_property
-    def werte(self) -> geo.Flaechenwerte:
-        return geo.flaechenwerte(self.punkte)
-
-
-@dataclass(frozen=True)
 class Blechzustand:
     """
     Wie ein Blech unter einer Beanspruchung gedrueckt ist und in welche Klasse
@@ -176,6 +137,12 @@ class Blechzustand:
     klasse: int
     frei_plastisch: bool = False
     """Ob der freie Rand plastisch der staerker gedrueckte ist -- fuer die Grenzen mit ``α``."""
+
+    tabelle: str = ""
+    """
+    Wo die Grenzen stehen, wenn nicht in der Tabelle der Halterung -- beim
+    kammerbetonierten Blech im Verbund (:mod:`opencivil.verbund.querschnitt`).
+    """
 
     @property
     def name(self) -> str:
@@ -230,19 +197,6 @@ class Elastisch:
         in N·mm, und die Gruppe, in der sie liegt: ``min f_g I/z_g``.
         """
         return min((f[g] * self.I / z, g) for g, z in enumerate(self.abstaende) if z > 0.0)
-
-
-@dataclass(frozen=True)
-class Block:
-    """Die Kraft einer Zone eines Teils an einer plastischen Nulllinie, in N, und wo sie angreift, in mm."""
-
-    teil: int
-    was: str
-    zone: str
-    """«Zug» oder «Druck»."""
-
-    F: float
-    punkt: Punkt
 
 
 def kleinste_breite(punkte: Sequence[Punkt]) -> float:
@@ -311,7 +265,7 @@ class Stahlquerschnitt:
         gruppe_von: Dict[int, int] = {}
         teil_von: Dict[int, int] = {}
         for i, f in enumerate(flaechen):
-            if f.stoff is None:
+            if f.stoff is None or f.stoff.art is not Baustoffart.BAUSTAHL:
                 continue
             teil_von[i] = len(self.teile)
             platten = tuple(bleche(f.profil)) if f.profil is not None else ()
@@ -324,15 +278,7 @@ class Stahlquerschnitt:
                         for k, e in enumerate(eltern) if e == i)
             self.teile.append(Teil(f, gruppe_von[i], dicke,
                                    geo.flaechenwerte(f.punkte).A - innen, platten))
-        for i, f in enumerate(flaechen):
-            eigene = gruppe_von.get(i)
-            fremde = gruppe_von.get(eltern[i]) if eltern[i] is not None else None
-            if eigene == fremde:
-                continue
-            if eigene is not None:
-                self.stuecke.append(Stueck(eigene, 1.0, tuple(f.punkte), teil_von[i]))
-            if fremde is not None:
-                self.stuecke.append(Stueck(fremde, -1.0, tuple(f.punkte), teil_von[eltern[i]]))
+        self.stuecke = stuecke([f.punkte for f in flaechen], eltern, gruppe_von, teil_von)
 
     def mit(self, zusatz: Sequence[Stueck]) -> "Stahlquerschnitt":
         """
@@ -368,73 +314,9 @@ class Stahlquerschnitt:
 
     # -- Plastisch -----------------------------------------------------------------
 
-    def zugkraft(self, f: Sequence[float]) -> float:
-        """Was der Querschnitt ganz gezogen traegt, in N -- ganz gedrueckt dasselbe mit Minus."""
-        return sum(s.gewicht * f[s.gruppe] * s.werte.A for s in self.stuecke)
-
-    def kraefte(self, linie: Linie, f: Sequence[float],
-                bezug: Punkt) -> Tuple[float, float, float]:
-        """
-        Was die Spannungsbloecke an der Nulllinie tragen -- je Gruppe ``f``
-        gezogen und ``-f`` gedrueckt --, als ``(N, M_y, M_z)`` in N und N·mm um
-        ``bezug``: ``M_y = -∫σ (z - z_b) dA`` zieht unten, ``M_z = -∫σ (y - y_b) dA``
-        links.
-        """
-        N = s_y = s_z = 0.0
-        for s in self.stuecke:
-            a, y, z = geo.jenseits(s.punkte, linie.n, linie.v)
-            w = s.werte
-            k = s.gewicht * f[s.gruppe]
-            N += k * (2.0 * a - w.A)
-            s_y += k * (2.0 * y - w.A * w.y_S)
-            s_z += k * (2.0 * z - w.A * w.z_S)
-        return N, -(s_z - bezug[1] * N), -(s_y - bezug[0] * N)
-
-    def bloecke(self, linie: Linie, f: Sequence[float]) -> List["Block"]:
-        """
-        Je Teil -- und je weggenommenem Streifen -- die Kraft seiner gezogenen
-        und seiner gedrueckten Zone an der Nulllinie, mit Angriffspunkt: die
-        Probe zu :meth:`kraefte`, Teil fuer Teil.
-        """
-        summen: Dict[Tuple[int, str], List[float]] = {}
-        for s in self.stuecke:
-            a, y, z = geo.jenseits(s.punkte, linie.n, linie.v)
-            w = s.werte
-            k = s.gewicht * f[s.gruppe]
-            summe = summen.setdefault((s.teil, s.was), [0.0] * 6)
-            for i, x in enumerate((a, y, z, w.A - a, w.A * w.y_S - y, w.A * w.z_S - z)):
-                summe[i] += (k if i < 3 else -k) * x
-        bloecke = []
-        for (teil, was), (F_z, y_z, z_z, F_d, y_d, z_d) in summen.items():
-            for zone, F, y, z in (("Zug", F_z, y_z, z_z), ("Druck", F_d, y_d, z_d)):
-                if abs(F) > 1e-9:
-                    bloecke.append(Block(teil, was, zone, F, (y / F, z / F)))
-        return bloecke
-
-    def nulllinie(self, n: Tuple[float, float], f: Sequence[float],
-                  N: float = 0.0) -> Optional[float]:
-        """
-        Die plastische Nulllinie ``n·p = v`` bei der Normalkraft ``N`` in N:
-        so viel mehr Kraft gezogen als gedrueckt -- je Gruppe mit ``f``.
-        ``None``, wo ``N`` jenseits der reinen Zug- oder Druckkraft liegt.
-        Gesucht mit Illinois, bis sie auf 1e-9 mm genau liegt.
-        """
-        werte = [_auf(n, p) for s in self.stuecke for p in s.punkte]
-        unten, oben = min(werte), max(werte)
-        zug = self.zugkraft(f)
-        fa, fb = zug - N, -zug - N
-        if fa < 0.0 or fb > 0.0:
-            return None
-        if fa == 0.0 or fb == 0.0:
-            return unten if fa == 0.0 else oben
-
-        def abweichung(v: float) -> Tuple[float, float]:
-            gezogen = sum(s.gewicht * f[s.gruppe] * (2.0 * geo.jenseits(s.punkte, n, v)[0]
-                                                    - s.werte.A) for s in self.stuecke)
-            return gezogen - N, v
-
-        return illinois(abweichung, unten, fa, oben, fb, schranke_x=1e-9,
-                        schranke_f=1e-12 * zug)
+    def starr(self, f: Sequence[float]) -> Starrplastisch:
+        """Der Querschnitt starr-plastisch: je Gruppe ``f`` gezogen und ``-f`` gedrueckt."""
+        return Starrplastisch(tuple(self.stuecke), tuple(f), tuple(f))
 
     def plastisch(self, n: Tuple[float, float], v: float) -> List[float]:
         """
@@ -466,16 +348,19 @@ class Stahlquerschnitt:
 
     # -- Klassen -------------------------------------------------------------------
 
-    def zustaende(self, pl: Linie, el: Linie, eps: Sequence[float]) -> List[Blechzustand]:
+    def zustaende(self, pl: Linie, el: Optional[Linie],
+                  eps: Sequence[float]) -> List[Blechzustand]:
         """
         Jedes Blech jedes Profils, plastisch an der Nulllinie ``pl``,
-        elastisch an ``el`` -- mit ``ε`` je Gruppe.
+        elastisch an ``el`` -- mit ``ε`` je Gruppe. Ohne ``el`` gilt keine
+        Grenze der Klasse 3: so fragt der Verbund nur, ob ein Blech die
+        Klasse 1 oder 2 haelt (:mod:`opencivil.verbund.querschnitt`).
         """
         zustaende = []
         for teil in self.profile:
             for blech in teil.bleche:
                 alpha, frei_pl = _plastisch_gedrueckt(blech, pl)
-                psi, frei = _elastisch_gedrueckt(blech, el)
+                psi, frei = _elastisch_gedrueckt(blech, el) if el is not None else (None, False)
                 grenzen = kl.grenzen(blech.halterung, eps[teil.gruppe], alpha, psi,
                                      frei_pl=frei_pl, frei_el=frei)
                 zustaende.append(Blechzustand(teil, blech, alpha, psi, frei, grenzen,
@@ -483,10 +368,11 @@ class Stahlquerschnitt:
                                               frei_plastisch=frei_pl))
         return zustaende
 
-    def freie_gedrueckt(self, pl: Linie, el: Linie) -> List[Teil]:
+    def freie_gedrueckt(self, pl: Linie, el: Optional[Linie]) -> List[Teil]:
         """Die freien Flaechen, die plastisch oder elastisch gedrueckt sind -- siehe Dateikopf."""
+        linien = (pl,) if el is None else (pl, el)
         return [t for t in self.freie
-                if min(min(pl.d(p), el.d(p)) for p in t.flaeche.punkte) < -TOLERANZ]
+                if min(l.d(p) for l in linien for p in t.flaeche.punkte) < -TOLERANZ]
 
     # -- Klasse 4 ------------------------------------------------------------------
 

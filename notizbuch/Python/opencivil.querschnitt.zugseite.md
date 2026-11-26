@@ -1,5 +1,5 @@
 ---
-erzeugt: 17a174ff55c6
+erzeugt: 051e317c0de0
 art: modul
 tags: [modul]
 ---
@@ -171,6 +171,7 @@ die waagrechte Nulllinie einer einachsigen Rechnung es braucht.
 - [[opencivil.nachweis.qa_stahl]]
 - [[opencivil.nachweis.qa_stahl_kennzahlen]]
 - [[opencivil.nachweis.qa_stahl_stabilitaet]]
+- [[opencivil.nachweis.qa_verbund_kennzahlen]]
 - [[opencivil.nachweis.querkraft]]
 - [[opencivil.nachweis.querkraft_buegel]]
 - [[opencivil.nachweis.querkraft_ohne_buegel]]
@@ -195,4 +196,5 @@ die waagrechte Nulllinie einer einachsigen Rechnung es braucht.
 - [[opencivil.stahlbau.querschnitt]]
 - [[opencivil.stahlbau.stabilitaet]]
 - [[opencivil.stahlbau.widerstand]]
+- [[opencivil.verbund.widerstand]]
 - [[opencivil.web.api]]

@@ -41,7 +41,7 @@ WAS FEHLT -- GRAU IN DER HERLEITUNG:
 
 from __future__ import annotations
 
-from typing import Dict, Sequence
+from typing import Callable, Dict, Sequence
 
 from opencivil.core.berechnung import Eingabebezug, Eingaben, Kennzahlprozedur
 from opencivil.core.einheiten import CM3, EINHEITSLOS, KN, KNM, MIO_MM4, Groesse
@@ -53,12 +53,13 @@ from opencivil.nachweis.qa_stahl_werte import (
     breiten, klassen, stoffbezuege,
 )
 from opencivil.querschnitt.analyse import Querschnittsanalyse
+from opencivil.querschnitt.plastisch import DRUCK, Linie
 from opencivil.querschnitt.zugseite import Zugseite
 from opencivil.stabwerk.stabquerschnitt import keine_hauptachsen
 from opencivil.stahlbau import klasse as kl
 from opencivil.stahlbau import schub
 from opencivil.stahlbau.querschnitt import (
-    DRUCK, Blechzustand, Elastisch, Linie, Stahlquerschnitt, Teil, normale,
+    Blechzustand, Elastisch, Stahlquerschnitt, Teil, normale,
 )
 from opencivil.stahlprofile.bleche import Halterung
 
@@ -278,7 +279,7 @@ class KennzahlenStahlQA(Kennzahlprozedur):
         p.titel(f"Biegung, {seite.beschriftung}", ebene=3)
         n = normale(seite)
         quer = "z" if seite.um_y else "y"
-        v_pl = self.stahl.nulllinie(n, sw.f)
+        v_pl = self.stahl.starr(sw.f).nulllinie(n)
         brutto = self.stahl.elastisch(n)
         p.wert(werte.laenge(f"{quer}_pl_{seite.value}", rf"{quer}_{{pl}}",
                             v_pl * (n[0] + n[1]) * 1e-3, "Lage der plastischen Nulllinie"),
@@ -343,46 +344,58 @@ class KennzahlenStahlQA(Kennzahlprozedur):
     # -- Querkraft ----------------------------------------------------------------------
 
     def _schub(self, p: Protokoll, sw: Stahlwerte, ergebnis: Dict[str, Groesse]) -> None:
-        p.titel("Querkraft", ebene=3)
-        p.erklaerung(
-            "Je Profil allein, ohne Normalkraft und Biegung: kein Blech ist gedrückt, der "
-            "Querschnitt rechnet plastisch. Beim I und beim U prüft (42), ob der Steg beulen "
-            "kann; tut er es, trägt er nach (13). Die Wände eines Rechteckrohrs tragen je "
-            "nach (13). Zusammen tragen die Profile die Summe; frei gezeichnete Flächen "
-            "tragen nichts.")
-        p.ansatz("V_{Rd} = " + sw.bruch(r"\tau_y\, A_v"), titel="Querkraftwiderstand",
-                 referenz=schub.REFERENZ_SCHUB, name="Querkraftwiderstand eines Stahlprofils")
-        p.ansatz(r"\frac{h - t_f}{t_w} \le \sqrt{\frac{4 E}{f_y}}",
-                 titel="Beim I und beim U beult der Steg nicht, solange", referenz=schub.REFERENZ_42,
-                 name="Steg ohne Schubbeulen")
-        p.ansatz("V_{Rd} = " + sw.bruch(r"0.9 \sqrt{\tau_{cr}\, \tau_y}\, b\, t") + r" \le "
-                 + sw.bruch(r"\tau_y\, b\, t") + r" \qquad \tau_{cr} = k_\tau\, 0.9\, E "
-                 r"\left(\frac{t}{b}\right)^2 \qquad k_\tau = 5.34",
-                 titel="Schubbeulen des Blechs, ohne Quersteifen", referenz=schub.REFERENZ_BEULEN)
-        for r in self.richtungen:
-            zeilen = []
-            summe = 0.0
-            for t in self.stahl.profile:
-                g = t.gruppe
-                s = schub.widerstand(t.flaeche.profil, t.netto, r, f_y=sw.zahl(g, "f_y"),
-                                     tau_y=sw.zahl(g, "tau_y"), E=sw.zahl(g, "E_a"))
-                V = s.V_Rd(sw.gamma(g)) * 1e-3
-                summe += V
-                teile = []
-                if s.steg is not None:
-                    zeichen = r"\le" if s.steg[0] <= s.steg[1] else ">"
-                    teile.append(rf"{fest(s.steg[0], 1)} {zeichen} {fest(s.steg[1], 1)}")
-                if s.beulen is not None:
-                    teile.append(rf"\tau_{{cr}} = {fest(s.beulen.tau_cr, 0)}")
-                pruefung = r"\quad ".join(teile) or "–"
-                zeilen.append([t.name, Mathe(s.formel), Mathe(fest(s.flaeche, 0)),
-                               Mathe(pruefung), Mathe(fest(s.tau, 0)), s.herkunft,
-                               Mathe(fest(V, 1))])
-            p.tabelle(
-                kopf=["Profil", Mathe(r"A_v\ \text{oder}\ b\, t"), Mathe(r"[\mathrm{mm}^2]"),
-                      Mathe(r"\text{Beulen}"), Mathe(r"\tau\ [\mathrm{N}/\mathrm{mm}^2]"),
-                      "Stelle", Mathe(r"V_{Rd}\ [\mathrm{kN}]")],
-                zeilen=zeilen, titel=f"Querkraft in {r}: je Profil", ausrichtung="llrrrlr")
-            p.wert(self._belegen(ergebnis, f"V_{r}_Rd", summe * 1e3),
-                   titel=f"Querkraftwiderstand in {r}, alle Profile zusammen",
-                   referenz=schub.REFERENZ_SCHUB)
+        querkraft(p, sw, self.stahl, self.richtungen,
+                  lambda r, V: self._belegen(ergebnis, f"V_{r}_Rd", V))
+
+
+def querkraft(p: Protokoll, sw: Stahlwerte, stahl: Stahlquerschnitt, richtungen: Sequence[str],
+              belegen: Callable[[str, float], Wert]) -> None:
+    """
+    Der Querkraftwiderstand der Profile je Richtung, mit seinen Tabellen --
+    im Stahl wie im Verbund, wo der Stahl die Querkraft allein traegt.
+    ``belegen`` nimmt je Richtung die Summe in N und gibt den Wert der
+    Kennzahl zurueck.
+    """
+    p.titel("Querkraft", ebene=3)
+    p.erklaerung(
+        "Je Profil allein, ohne Normalkraft und Biegung: kein Blech ist gedrückt, der "
+        "Querschnitt rechnet plastisch. Beim I und beim U prüft (42), ob der Steg beulen "
+        "kann; tut er es, trägt er nach (13). Die Wände eines Rechteckrohrs tragen je "
+        "nach (13). Zusammen tragen die Profile die Summe; frei gezeichnete Flächen "
+        "tragen nichts.")
+    p.ansatz("V_{Rd} = " + sw.bruch(r"\tau_y\, A_v"), titel="Querkraftwiderstand",
+             referenz=schub.REFERENZ_SCHUB, name="Querkraftwiderstand eines Stahlprofils")
+    p.ansatz(r"\frac{h - t_f}{t_w} \le \sqrt{\frac{4 E}{f_y}}",
+             titel="Beim I und beim U beult der Steg nicht, solange", referenz=schub.REFERENZ_42,
+             name="Steg ohne Schubbeulen")
+    p.ansatz("V_{Rd} = " + sw.bruch(r"0.9 \sqrt{\tau_{cr}\, \tau_y}\, b\, t") + r" \le "
+             + sw.bruch(r"\tau_y\, b\, t") + r" \qquad \tau_{cr} = k_\tau\, 0.9\, E "
+             r"\left(\frac{t}{b}\right)^2 \qquad k_\tau = 5.34",
+             titel="Schubbeulen des Blechs, ohne Quersteifen", referenz=schub.REFERENZ_BEULEN)
+    for r in richtungen:
+        zeilen = []
+        summe = 0.0
+        for t in stahl.profile:
+            g = t.gruppe
+            s = schub.widerstand(t.flaeche.profil, t.netto, r, f_y=sw.zahl(g, "f_y"),
+                                 tau_y=sw.zahl(g, "tau_y"), E=sw.zahl(g, "E_a"))
+            V = s.V_Rd(sw.gamma(g)) * 1e-3
+            summe += V
+            teile = []
+            if s.steg is not None:
+                zeichen = r"\le" if s.steg[0] <= s.steg[1] else ">"
+                teile.append(rf"{fest(s.steg[0], 1)} {zeichen} {fest(s.steg[1], 1)}")
+            if s.beulen is not None:
+                teile.append(rf"\tau_{{cr}} = {fest(s.beulen.tau_cr, 0)}")
+            pruefung = r"\quad ".join(teile) or "–"
+            zeilen.append([t.name, Mathe(s.formel), Mathe(fest(s.flaeche, 0)),
+                           Mathe(pruefung), Mathe(fest(s.tau, 0)), s.herkunft,
+                           Mathe(fest(V, 1))])
+        p.tabelle(
+            kopf=["Profil", Mathe(r"A_v\ \text{oder}\ b\, t"), Mathe(r"[\mathrm{mm}^2]"),
+                  Mathe(r"\text{Beulen}"), Mathe(r"\tau\ [\mathrm{N}/\mathrm{mm}^2]"),
+                  "Stelle", Mathe(r"V_{Rd}\ [\mathrm{kN}]")],
+            zeilen=zeilen, titel=f"Querkraft in {r}: je Profil", ausrichtung="llrrrlr")
+        p.wert(belegen(r, summe * 1e3),
+               titel=f"Querkraftwiderstand in {r}, alle Profile zusammen",
+               referenz=schub.REFERENZ_SCHUB)

@@ -1,5 +1,5 @@
 ---
-erzeugt: a0230492b494
+erzeugt: 0b2101111654
 art: modul
 tags: [modul]
 ---
@@ -469,6 +469,7 @@ Das Urteil eines Teils: sein Grad, sein Name, Ausgang und Begruendung.
 - [[opencivil.nachweis.qa_holz_stabilitaet]]
 - [[opencivil.nachweis.qa_stahl]]
 - [[opencivil.nachweis.qa_stahl_stabilitaet]]
+- [[opencivil.nachweis.qa_verbund]]
 - [[opencivil.nachweis.querkraft]]
 - [[opencivil.nachweis.querkraft_buegel]]
 - [[opencivil.nachweis.querkraft_ohne_buegel]]

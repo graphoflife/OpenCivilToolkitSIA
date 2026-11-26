@@ -1,5 +1,5 @@
 ---
-erzeugt: 562bbd05a2e6
+erzeugt: ac1f067a8a7d
 art: modul
 tags: [modul]
 ---
@@ -71,6 +71,7 @@ alldem die Formelsammlung und diese Seiten.
 - [[opencivil.stabwerk3d]] – was ein Stabwerk im Raum braucht.
 - [[opencivil.stahlbau]] – Stahlquerschnitte nach SIA 263:2013.
 - [[opencivil.stahlprofile]] – die Stahlprofile: ihre Formen, welche es gibt, wie eines im Querschnitt liegt.
+- [[opencivil.verbund]] – Verbundbau nach SIA 264:2014.
 - [[opencivil.web]] – die Oberflaeche, von der Seite des Rechenkerns.
 
 ## Braucht

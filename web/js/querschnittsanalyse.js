@@ -69,6 +69,19 @@ const HILFE = {
     ],
     formel: 'α_eff = Widerstand / Einwirkung ≥ 1',
   },
+  tragsicherheitVerbund: {
+    zeilen: [
+      ['Klasse', 'je Blech jedes Profils aus c/t an der plastischen Nulllinie des Lastfalls; über Klasse 2 rechnet der Verbund noch nicht'],
+      ['Kammerbeton', 'deckt Beton im I-Profil den Flansch innen oder den Steg beidseits, gelten die Grenzen der Tabelle 3 und von 5.2.1.3'],
+      ['M-N', 'plastisch, mit voller Verdübelung: der Beton mit 0.85 · f_cd und nur auf Druck; die Nulllinie dreht, bis M_Rd in Richtung M_Ed zeigt'],
+      ['β', 'Baustahl S420 und S460: M_pl,Rd mal β, wenn x_p/h über 0.15 liegt (Figur 1)'],
+      ['Betonstahl', 'zieht ihn ein Moment, rechnet es plastisch nur mit Klasse B oder C (5.1.2.3)'],
+      ['V', 'der Stahl allein, je Richtung gegen V_Rd der Profile; über der Hälfte von V_Rd tragen die Bleche, in denen sie steht, für M-N nur noch 1 − (V/V_Rd)²'],
+      ['T', 'nicht nachgewiesen'],
+      ['Werte', 'je Material nach Wahl, oben in diesem Fenster'],
+    ],
+    formel: 'α_eff = Widerstand / Einwirkung ≥ 1',
+  },
   tragsicherheitHolz: {
     zeilen: [
       ['σ', 'linear am Bruttoquerschnitt: N/A, je Achse M/W an der weitesten Faser'],
@@ -187,6 +200,16 @@ function ausHolz(analyse) {
   return bauweiseVon(analyse.kennung) === 'holz';
 }
 
+/** Ob der Querschnitt im Verbund ist -- das sagt der Kern (`bauweiseVon`). */
+function imVerbund(analyse) {
+  return bauweiseVon(analyse.kennung) === 'verbund';
+}
+
+/** Was im Verbund unter den Werten je Material steht: der Beton rechnet immer gleich. */
+const VERBUND_RECHNET = 'Im Verbund rechnet der Querschnitt plastisch: der Beton mit 0.85 · f_cd '
+  + 'über die ganze Druckzone und ohne Zug, Baustahl und Betonstahl mit ihrer Fliessgrenze '
+  + '(SIA 264, 5.1.2.1). Eine Rechenart des Betons gibt es darum hier nicht.';
+
 /** Was beim Holz an der Stelle der Rechenwahl steht: es rechnet immer gleich. */
 const HOLZ_RECHNET = 'Das Holz rechnet linear, mit den Bemessungswerten der Norm und dem η_w der '
   + 'Feuchteklasse – ein stossartiger Fall dazu mit η_t.';
@@ -234,13 +257,17 @@ function querschnittGruppe(analyse) {
  * beim Beton dazu seine Rechenart -- dieselben Zeilen wie die Rechenwahl
  * jedes Moduls (`werkstoffzeilen`), ohne Kriechzahl: der Bruch rechnet ohne
  * Kriechen. Duktilität und sprödes Versagen rechnen am selben Querschnitt.
+ * Im Verbund rechnet der Beton immer plastisch: dort steht statt seiner
+ * Rechenart, wie (`VERBUND_RECHNET`).
  */
 function rechenwahl(analyse) {
+  const verbund = imVerbund(analyse);
   return el('div.rechenwahl', {}, [
     el('span.rechenwahl-titel', { text: 'Rechenwahl' }),
     werkstoffzeilen(analyse, (veraenderer) => eintragAendern(analyse.kennung, veraenderer), {
-      ...werkstoffeVon(analyse.kennung), klasse: 'querschnittsanalyse',
+      ...werkstoffeVon(analyse.kennung), klasse: 'querschnittsanalyse', mitRechenart: !verbund,
     }),
+    verbund ? el('p.qa-erlaeuterung', { text: VERBUND_RECHNET }) : null,
   ]);
 }
 
@@ -287,7 +314,8 @@ function schubwandAngaben(analyse) {
 /**
  * Tragsicherheit: womit gerechnet wird und die Lastfälle -- beim Stahlbeton
  * dazu, was Querkraft und Torsion brauchen (`schubwandAngaben`). Das Holz
- * hat keine Wahl, wie es rechnet; dort steht, wie.
+ * hat keine Wahl, wie es rechnet; dort steht, wie. Stahl und Verbund wählen
+ * die Werte je Material.
  */
 function lastfallAngaben(analyse) {
   const aendern = (veraenderer) => eintragAendern(analyse.kennung, veraenderer);
@@ -584,6 +612,14 @@ const TRAGSICHERHEIT_STAHL = {
 };
 
 /**
+ * Dieselbe Kachel für einen Querschnitt im Verbund, nach SIA 264: auch
+ * ohne Schubwände -- die Querkraft trägt der Stahl allein (4.3.2.2).
+ */
+const TRAGSICHERHEIT_VERBUND = {
+  ...TRAGSICHERHEIT, hilfe: HILFE.tragsicherheitVerbund, inhalt: lastfallAngaben,
+};
+
+/**
  * Knicken und Kippen eines Stabs mit dem gezeichneten Querschnitt, nach
  * SIA 263. Der Kachel fehlt etwas, solange einem Fall eine Kurve fehlt.
  */
@@ -640,6 +676,7 @@ const FEUCHTEKLASSE = {
 /** Die Nachweise je Bauweise, wo sie nicht die des Stahlbetons sind. */
 const EIGENE_NACHWEISE = {
   stahl: [TRAGSICHERHEIT_STAHL, STABILITAET],
+  verbund: [TRAGSICHERHEIT_VERBUND],
   holz: [FEUCHTEKLASSE, TRAGSICHERHEIT_HOLZ, STABILITAET_HOLZ],
 };
 
@@ -720,11 +757,11 @@ const ORT = {
 /**
  * Die Kacheln der Analyse. Die Nachweise sind die des Stahlbetons, beim
  * Stahl die Tragsicherheit und Knicken und Kippen nach SIA 263, beim Holz
- * dazu davor die Feuchteklasse, nach SIA 265 (`bauweiseVon`). Ein
- * Querschnitt im Verbund hat noch keine, statt ihrer steht grau, warum
- * (`ohneNachweiseVon`) -- ebenso einer aus mehreren Hölzern. Die
- * Spannung-Dehnung-Analysen hat jeder ausser dem Verbund
- * (`ohneAnalysenVon`). Was in den Kacheln eingestellt ist, bleibt.
+ * dazu davor die Feuchteklasse, nach SIA 265, im Verbund die
+ * Tragsicherheit nach SIA 264 (`bauweiseVon`). Ein Querschnitt aus
+ * mehreren Hölzern hat keine, statt ihrer steht grau, warum
+ * (`ohneNachweiseVon`). Die Spannung-Dehnung-Analysen hat jeder ausser dem
+ * Verbund (`ohneAnalysenVon`). Was in den Kacheln eingestellt ist, bleibt.
  */
 function kapitel(analyse) {
   const gruppe = (titel, ohne, kacheln) => (ohne ? { titel, hinweis: ohne, kapitel: [] }

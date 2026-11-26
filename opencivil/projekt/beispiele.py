@@ -161,6 +161,7 @@ def jeder_nachweis() -> Projekt:
     p.beton("C30/37")
     p.stahl("B500B")
     p.baustahl("S355")
+    p.baustahl("S460")
     p.spannstahl("Y1860")
     p.holz("GL24h")
     decke = p.platte("Decke", h=300, x=[18, 12], x_zulage=[12, 0], y=[12, 12],
@@ -282,12 +283,13 @@ def jeder_nachweis() -> Projekt:
     # Anforderung; eine Stütze, einachsig, mit charakteristischen Werten,
     # normaler Anforderung und Knicken -- so steht jede Wahl einmal da.
     # Dazu ein Träger mit Spanngliedern, je eines in jedem Gesetz, einer
-    # aus Stahl und einer aus Holz.
+    # aus Stahl, einer aus Holz und einer im Verbund.
     p.querschnittsanalysen.append(_kastentraeger(p.freie_kennung("a")))
     p.querschnittsanalysen.append(_stuetze(p.freie_kennung("a")))
     p.querschnittsanalysen.append(_spannbeton(p.freie_kennung("a")))
     p.querschnittsanalysen.append(_stahltraeger(p.freie_kennung("a")))
     p.querschnittsanalysen.append(_holztraeger(p.freie_kennung("a")))
+    p.querschnittsanalysen.append(_verbundtraeger(p.freie_kennung("a")))
 
     # Zwei Balkensysteme: eines, das alles einmal braucht, und eines, das
     # sich nicht rechnen lässt -- dazu ein Rahmen im Raum. Dazu jede Lage
@@ -813,4 +815,32 @@ def _holztraeger(kennung: str) -> QuerschnittsanalyseEintrag:
     a.stabilitaetsfall("Stütze", N_Ed=-300.0, M_y_Ed=10.0, L_K_y=4.0, L_K_z=4.0, L_D=4.0)
     a.stabilitaetsfall("Druck", N_Ed=-300.0, L_K_y=4.0, L_K_z=4.0, L_D=0.0)
     a.stabilitaetsfall("Träger", M_y_Ed=40.0, L_K_y=0.0, L_K_z=0.0, L_D=12.0, stossartig=True)
+    return a
+
+
+def _verbundtraeger(kennung: str) -> QuerschnittsanalyseEintrag:
+    """
+    Ein HEA 300 aus S460 unter einer Platte 1500 × 120 mm aus C30/37, Beton
+    auch zwischen den Flanschen, Betonstahl B500B in der Platte, zweiachsig
+    (SIA 264:2014). Der Kammerbeton hebt die gedrückten Flansche nach
+    Tabelle 3 in die Klasse 2 und den Steg nach 5.2.1.3; S460 mindert mit β.
+
+    Im Feld plastisch und schief, die Nulllinie im Profil; an der Stütze
+    negativ, der Betonstahl gezogen, mit einer Querkraft über der Hälfte von
+    V_Rd, die dem Steg nimmt, und mit Torsion, die nur ein Hinweis ist; mit
+    viel Druck reicht die Druckzone über 0.4 h, wo Figur 1 endet; reiner Zug,
+    reiner Druck und eine Druckkraft jenseits des Widerstands.
+    """
+    a = QuerschnittsanalyseEintrag(kennung=kennung, name="Verbundträger")
+    a.polygon([(-150, 0), (150, 0), (150, 290), (750, 290), (750, 410), (-750, 410),
+               (-750, 290), (-150, 290)], material="b1")
+    a.profil(0, 145, "HEA 300", stahl="st2")
+    a.stablinie([-700, 370], [700, 370], art="teilung", durchmesser=12, teilung=150,
+                stahl="s1")
+    a.lastfall("Feld", M_y_Ed=600.0, M_z_Ed=40.0, V_z_Ed=150.0)
+    a.lastfall("Stütze", M_y_Ed=-300.0, V_z_Ed=500.0, T_Ed=2.0)
+    a.lastfall("Druck mit Biegung", N_Ed=-4000.0, M_y_Ed=300.0)
+    a.lastfall("Zug", N_Ed=1000.0)
+    a.lastfall("Druck", N_Ed=-5000.0)
+    a.lastfall("Zu viel Druck", N_Ed=-20000.0, M_y_Ed=10.0)
     return a

@@ -1,5 +1,5 @@
 ---
-erzeugt: b40f1ca43f5d
+erzeugt: 15b7d6299798
 art: formel
 tags: [formel]
 normstelle: "SIA 263:2013, 4.5.1.4"
@@ -10,14 +10,14 @@ normstelle: "SIA 263:2013, 4.5.1.4"
 *In der Herleitung: «Knicklast um y»*
 
 $$
-N_{cr,y} = \frac{\pi^2 \cdot E_a \cdot I_y}{L_{K,y}^2}
+N_{cr,y} = \frac{\pi^2 \cdot E_{a} \cdot I_y}{L_{K,y}^2}
 $$
 
 ## Grössen
 
 | Zeichen | Bedeutung | Einheit | Woher |
 | --- | --- | --- | --- |
-| $E_a$ | Elastizitätsmodul des Baustahls | N/mm² | Vorgabe |
+| $E_{a}$ | Elastizitätsmodul des Baustahls | N/mm² | Vorgabe |
 | $I_y$ | Trägheitsmoment um y | ·10⁶ mm⁴ | Zwischenwert |
 | $L_{K,y}$ | Knicklänge | mm | Zwischenwert |
 
@@ -26,7 +26,7 @@ $$
 Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
-N_{cr,y} = \frac{\pi^2 \cdot E_a \cdot I_y}{L_{K,y}^2} = \frac{\pi^2 \cdot 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 921.2\,\cdot 10^{6}\,\mathrm{mm}^{4}}{\left(6000\,\mathrm{mm}\right)^2} = 53037\,\mathrm{kN}
+N_{cr,y} = \frac{\pi^2 \cdot E_{a,\text{S355}} \cdot I_y}{L_{K,y}^2} = \frac{\pi^2 \cdot 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 921.2\,\cdot 10^{6}\,\mathrm{mm}^{4}}{\left(6000\,\mathrm{mm}\right)^2} = 53037\,\mathrm{kN}
 $$
 
 ## Gebraucht von

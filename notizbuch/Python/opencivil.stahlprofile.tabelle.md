@@ -1,5 +1,5 @@
 ---
-erzeugt: 0f95a4355411
+erzeugt: ece257b630ee
 art: modul
 tags: [modul]
 ---
@@ -137,4 +137,5 @@ Das Profil dieses Namens -- ein unbekannter ist ein `KeyError`, der es sagt.
 - [[opencivil.stahlbau.stabilitaet]]
 - [[opencivil.stahlprofile.bleche]]
 - [[opencivil.stahlprofile.lage]]
+- [[opencivil.verbund.querschnitt]]
 - [[opencivil.web.api]]

@@ -549,11 +549,13 @@ function rechenartStellungen(klasse) {
  * Materialien des Bauteils -- `null`, solange der Kern sie nicht kennt, dann
  * sagt `wartet` warum; leer sagt es `leer`. Eine Wahl schreibt nur die
  * Materialien, die das Bauteil jetzt hat: die eines ausgewechselten fällt
- * dabei weg und kehrt mit ihm nicht still zurück.
+ * dabei weg und kehrt mit ihm nicht still zurück. `mitRechenart: false`
+ * lässt die Rechenart des Betons weg, wo er immer gleich rechnet -- im
+ * Verbund plastisch.
  */
 export function werkstoffzeilen(ziel, aendern, {
   materialien, klasse, wartet = 'Der Kern sucht die Materialien …',
-  leer = 'Noch kein Material im Querschnitt.',
+  leer = 'Noch kein Material im Querschnitt.', mitRechenart = true,
 }) {
   // «Je Material», nicht «Werte»: unter dem Beton steht auch seine
   // Rechenart, unter dem Holz nur, wie es rechnet.
@@ -570,7 +572,7 @@ export function werkstoffzeilen(ziel, aendern, {
   });
   // Im Schalter die kurzen Namen, die langen in den Titeln seiner Stellungen.
   const kurz = (l) => (l || []).map((e) => ({ wert: e.wert, beschriftung: e.kurz, titel: e.beschriftung }));
-  const arten = rechenartStellungen(klasse);
+  const arten = mitRechenart ? rechenartStellungen(klasse) : [];
   const hoelzer = 'vorgabe' in feldangabe(klasse, 'holzrechnungen')
     ? kurz(katalog('rechenwahl', 'holzrechnungen')) : [];
   const zeile = (kennung) => {

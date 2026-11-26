@@ -7,8 +7,9 @@ die :class:`~opencivil.querschnitt.analyse.Querschnittsanalyse` und ihre
 Nachweise: Biegung und Normalkraft, Querkraft und Torsion, Duktilitaet,
 sproedes Versagen, die Zwaengungen, die Stahlspannungen und das Knicken
 (:func:`bauen`) -- dazu die Kennzahlen. Ein Querschnitt aus Stahl hat seine
-eigenen (:func:`_stahl`), einer aus Holz auch (:func:`_holz`). Eine leere
-oder fehlerhafte Zeichnung wird kein Bauteil, nur ein Hinweis.
+eigenen (:func:`_stahl`), einer im Verbund (:func:`_verbund`) und einer aus
+Holz auch (:func:`_holz`). Eine leere oder fehlerhafte Zeichnung wird kein
+Bauteil, nur ein Hinweis.
 """
 
 from __future__ import annotations
@@ -32,6 +33,9 @@ from opencivil.nachweis.qa_kennzahlen import KennzahlenQA
 from opencivil.nachweis.qa_stahl import OHNE_TORSION, StahlBiegungQA, StahlQuerkraftQA
 from opencivil.nachweis.qa_stahl_kennzahlen import KennzahlenStahlQA
 from opencivil.nachweis.qa_stahl_stabilitaet import StahlStabilitaetQA
+from opencivil.nachweis.qa_verbund import OHNE_TORSION as OHNE_TORSION_VERBUND
+from opencivil.nachweis.qa_verbund import VerbundBiegungQA, VerbundQuerkraftQA
+from opencivil.nachweis.qa_verbund_kennzahlen import KennzahlenVerbundQA
 from opencivil.nachweis.qa_knicken import KnickenQA, QAKnickfall
 from opencivil.nachweis.richtungsnachweise import DuktilitaetQA, SproedesVersagenQA
 from opencivil.nachweis.schiefe_biegung import SchiefeBiegung
@@ -64,12 +68,12 @@ def bauen(art: "Bauteilart", eintrag: QuerschnittsanalyseEintrag,
     Knicken, sobald ein Fall eingeschaltet ist.
 
     Das alles beim Stahlbeton. Ein Querschnitt aus Stahl rechnet nach SIA 263
-    (:func:`_stahl`), einer aus Holz nach SIA 265 (:func:`_holz`). Einer im
-    Verbund (:mod:`~opencivil.querschnitt.bauweise`) rechnet bisher nur seine
-    Werte -- Flaeche, Schwerpunkt, Traegheitsmomente --, ebenso einer aus
-    mehreren Hoelzern; seine Zusammenfassung sagt, dass die Nachweise fehlen
-    (:func:`ohne_nachweise`). Seine Spannung-Dehnung-Analysen rechnet er
-    trotzdem, ausser im Verbund (:func:`ohne_analysen`).
+    (:func:`_stahl`), einer im Verbund nach SIA 264 (:func:`_verbund`), einer
+    aus Holz nach SIA 265 (:func:`_holz`). Einer aus mehreren Hoelzern
+    rechnet bisher nur seine Werte -- Flaeche, Schwerpunkt,
+    Traegheitsmomente --; seine Zusammenfassung sagt, dass die Nachweise
+    fehlen (:func:`ohne_nachweise`). Seine Spannung-Dehnung-Analysen rechnet
+    er trotzdem. Der Verbund hat noch keine (:func:`ohne_analysen`).
 
     Ist noch nichts gezeichnet (:attr:`QuerschnittsanalyseEintrag.leer`), gibt
     es nichts zu rechnen und kein Bauteil -- aber auch keinen Fehler, der das
@@ -92,6 +96,8 @@ def bauen(art: "Bauteilart", eintrag: QuerschnittsanalyseEintrag,
         teil.weitere_ziele += [d.id for d in (*analyse.d_brutto.values(), analyse.d_torsion)]
     if analyse.bauweise is Bauweise.STAHL:
         return _stahl(eintrag, analyse, teil, aufbau)
+    if analyse.bauweise is Bauweise.VERBUND:
+        return _verbund(eintrag, analyse, teil, aufbau)
     fehlt = ohne_nachweise(analyse.bauweise, ((s.art, s.name) for s in analyse.baustoffe))
     if fehlt:
         aufbau.ohne_nachweis(teil, ort_von(eintrag), fehlt)
@@ -184,6 +190,33 @@ def _stahl(eintrag: QuerschnittsanalyseEintrag, analyse: Querschnittsanalyse, te
     return teil
 
 
+def _verbund(eintrag: QuerschnittsanalyseEintrag, analyse: Querschnittsanalyse, teil: Bauteil,
+             aufbau: Aufbau) -> Bauteil:
+    """
+    Ein Querschnitt aus Baustahl und Beton nach SIA 264
+    (:mod:`~opencivil.nachweis.qa_verbund`): je Lastfall Biegung und
+    Normalkraft, plastisch, und Querkraft, sobald einer sie hat -- die traegt
+    der Stahl allein. Beide lesen den Widerstand gegen Querkraft aus den
+    Kennzahlen. Torsion weist er nicht nach; ein Lastfall mit ``T_Ed`` sagt
+    es. Verduebelung, Knicken und Kippen fehlen noch, ebenso die
+    Spannung-Dehnung-Analysen (:func:`ohne_analysen`).
+    """
+    kennzahlen = KennzahlenVerbundQA(analyse)
+    lastfaelle = _lastfaelle(eintrag)
+    if lastfaelle:
+        aufbau.eintragen(teil, "qa_verbund", eintrag.kennung,
+                         VerbundBiegungQA(analyse, lastfaelle, kennzahlen))
+    if any(l.V_z or analyse.biegung.querkraft_y(l.V_y) for l in lastfaelle):
+        aufbau.eintragen(teil, "qa_verbund_schub", eintrag.kennung,
+                         VerbundQuerkraftQA(analyse, lastfaelle, kennzahlen))
+    mit_torsion = [l.name for l in lastfaelle if l.T]
+    if mit_torsion:
+        aufbau.warnen(teil.raum,
+                      f"{ort_von(eintrag)}, {', '.join(mit_torsion)}: {OHNE_TORSION_VERBUND}")
+    _kennzahlen(kennzahlen, teil, aufbau)
+    return teil
+
+
 def _holz(eintrag: QuerschnittsanalyseEintrag, analyse: Querschnittsanalyse, teil: Bauteil,
           aufbau: Aufbau) -> Bauteil:
     """
@@ -228,27 +261,22 @@ def _kennzahlen(kennzahlen: Kennzahlprozedur, teil: Bauteil, aufbau: Aufbau) -> 
 
 def ohne_nachweise(bauweise: Bauweise, stoffe: Iterable[Tuple[Baustoffart, str]]) -> str:
     """
-    Warum ein Querschnitt dieser Bauweise keinen Nachweis hat -- leer beim
-    Stahlbeton, beim Stahl und beim Holz aus einem einzigen Holz (beide seit
-    2026-11-26). ``stoffe``: Art und Name jedes Baustoffs, wie fuer
-    :func:`~opencivil.querschnitt.bauweise.bauweise`. Mehrere Hoelzer
-    braeuchten einen nach ihren Steifigkeiten gewichteten Querschnitt; den
-    rechnet das Werkzeug nicht (nach Vorgabe, nicht nachgeschlagen). Ein
-    Satzteil ohne Punkt, fuer die Zusammenfassung
+    Warum ein Querschnitt dieser Bauweise keinen Nachweis hat -- leer bei
+    jeder Bauweise (Stahl, Holz und Verbund seit 2026-11-26) ausser beim
+    Holz aus mehreren Hoelzern: es braeuchte einen nach ihren Steifigkeiten
+    gewichteten Querschnitt, den das Werkzeug nicht rechnet (nach Vorgabe,
+    nicht nachgeschlagen). ``stoffe``: Art und Name jedes Baustoffs, wie fuer
+    :func:`~opencivil.querschnitt.bauweise.bauweise`. Ein Satzteil ohne
+    Punkt, fuer die Zusammenfassung
     (:meth:`~opencivil.projekt.aufbau.kern.Aufbau.ohne_nachweis`) und fuer die
     Zeichnung (:func:`~opencivil.web.zeichengeometrie.geometrie`).
     """
-    if bauweise in (Bauweise.STAHLBETON, Bauweise.STAHL):
+    hoelzer = list(dict.fromkeys(name for _, name in stoffe))
+    if bauweise is not Bauweise.HOLZ or len(hoelzer) < 2:
         return ""
-    if bauweise is Bauweise.HOLZ:
-        hoelzer = list(dict.fromkeys(name for _, name in stoffe))
-        if len(hoelzer) < 2:
-            return ""
-        return (f"einen {bauweise.querschnitt} aus mehreren Hölzern "
-                f"({', '.join(f'«{h}»' for h in hoelzer)}) weist das Werkzeug nach "
-                f"{bauweise.norm} noch nicht nach")
-    return (f"einen {bauweise.querschnitt} weist das Werkzeug nach {bauweise.norm} noch "
-            f"nicht nach")
+    return (f"einen {bauweise.querschnitt} aus mehreren Hölzern "
+            f"({', '.join(f'«{h}»' for h in hoelzer)}) weist das Werkzeug nach "
+            f"{bauweise.norm} noch nicht nach")
 
 
 def ohne_diagramm(bauweise: Bauweise, stoffe: Iterable[Tuple[Baustoffart, str]]) -> str:
@@ -272,9 +300,10 @@ def ohne_analysen(bauweise: Bauweise) -> str:
     """
     Warum ein Querschnitt dieser Bauweise keine Spannung-Dehnung-Analyse hat
     -- leer, wo er eine hat. Ein Satz mit Punkt, fuer die Zeichnung
-    (:func:`~opencivil.web.zeichengeometrie.geometrie`). Der Verbund wartet
-    auf seine Nachweise: sein Riss braucht den ideellen Querschnitt, mit
-    ``E_a/E_cm`` gewichtet, und die Werte der Analyse sind ungewichtet.
+    (:func:`~opencivil.web.zeichengeometrie.geometrie`). Der Verbund rechnet
+    seine Nachweise plastisch; seine Linien braeuchten den Riss am ideellen
+    Querschnitt, mit ``E_a/E_cm`` gewichtet, und die Werte der Analyse sind
+    ungewichtet.
     """
     if bauweise is not Bauweise.VERBUND:
         return ""

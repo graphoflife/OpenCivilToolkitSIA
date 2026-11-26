@@ -1,11 +1,11 @@
 ---
-erzeugt: 96b45d480d8e
+erzeugt: 5affbfbd69ef
 art: formel
 tags: [formel]
-normstelle: "SIA 263:2013, 5.1.5.1, (43); 5.1.7; 5.2.7; 5.3.6.1"
+normstelle: ["SIA 263:2013, 5.1.5.1, (43); 5.1.7; 5.2.7; 5.3.6.1", "SIA 264:2014, 4.3.2.2; SIA 263:2013, 5.1.5.1, (43)"]
 ---
-> [!info] Normstelle
-> SIA 263:2013, 5.1.5.1, (43); 5.1.7; 5.2.7; 5.3.6.1
+> [!info] Normstellen
+> SIA 263:2013, 5.1.5.1, (43); 5.1.7; 5.2.7; 5.3.6.1 · SIA 264:2014, 4.3.2.2; SIA 263:2013, 5.1.5.1, (43)
 
 *In der Herleitung: «Querkraft in z über der Hälfte von V\_Rd: was die Bleche, in denen sie steht, für Normalkraft und Biegung verlieren»*
 
@@ -30,11 +30,12 @@ $$
 
 ## Im Code
 
-- [[opencivil.nachweis.qa_stahl#StahlBiegungQA._querkraft|StahlBiegungQA._querkraft]]
+- [[opencivil.nachweis.qa_stahl#minderung|minderung]]
 
 ## Themen
 
 - [[Stahlquerschnitt]]
+- [[Verbundquerschnitt]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

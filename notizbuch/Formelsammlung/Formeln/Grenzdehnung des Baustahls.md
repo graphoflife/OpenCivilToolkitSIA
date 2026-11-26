@@ -1,5 +1,5 @@
 ---
-erzeugt: e2e0af30ab0b
+erzeugt: c6a6c464dc42
 art: formel
 tags: [formel]
 normstelle: "SIA 263:2013, 3.2.2.4; als Grenzdehnung nach Vorgabe"
@@ -8,21 +8,21 @@ normstelle: "SIA 263:2013, 3.2.2.4; als Grenzdehnung nach Vorgabe"
 > SIA 263:2013, 3.2.2.4; als Grenzdehnung nach Vorgabe
 
 $$
-\varepsilon_{ud} = 15 \cdot \varepsilon_y
+\varepsilon_{ud} = 15 \cdot \varepsilon_{y}
 $$
 
 ## Grössen
 
 | Zeichen | Bedeutung | Einheit | Woher |
 | --- | --- | --- | --- |
-| $\varepsilon_y$ | Fliessdehnung des Baustahls | ‰ | [[Fliessdehnung]] |
+| $\varepsilon_{y}$ | Fliessdehnung des Baustahls | ‰ | [[Fliessdehnung]] |
 
 ## Beispiel
 
 Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
-\varepsilon_{ud} = 15 \cdot \varepsilon_y = 15 \cdot 1.69\,\text{‰} = 25.4\,\text{‰}
+\varepsilon_{ud,\text{S355}} = 15 \cdot \varepsilon_{y,\text{S355}} = 15 \cdot 1.69\,\text{‰} = 25.4\,\text{‰}
 $$
 
 ## Im Code

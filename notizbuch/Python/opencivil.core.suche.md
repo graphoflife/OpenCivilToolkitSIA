@@ -1,5 +1,5 @@
 ---
-erzeugt: 5cacb58d0f2f
+erzeugt: ae8cb715ef5d
 art: modul
 tags: [modul]
 ---
@@ -221,7 +221,6 @@ gefundenen Ebene: dort ist das Fenster in wenigen Schritten eng.
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.nachweis.resistenzlinie]]
 - [[opencivil.querschnitt.interaktion]]
+- [[opencivil.querschnitt.plastisch]]
 - [[opencivil.spannungsanalyse.linie]]
 - [[opencivil.spannungsanalyse.schnitt]]
-- [[opencivil.stahlbau.querschnitt]]
-- [[opencivil.stahlbau.widerstand]]

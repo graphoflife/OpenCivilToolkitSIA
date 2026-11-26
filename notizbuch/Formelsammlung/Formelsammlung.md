@@ -1,5 +1,5 @@
 ---
-erzeugt: 95dc7129df37
+erzeugt: b5423325606d
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -20,7 +20,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Querschnitt]] · 4
 - [[Biegung und Normalkraft]] · 26
 - [[Verformung]] · 9
-- [[Kennzahlen]] · 41
+- [[Kennzahlen]] · 47
 - [[Querkraft]] · 16
 - [[Duktilität]] · 9
 - [[Zwängung auf Normalkraft]] · 13
@@ -42,6 +42,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Knicken und Kippen]] · 31
 - [[Holzquerschnitt]] · 28
 - [[Knicken und Kippen eines Holzstabs]] · 19
+- [[Verbundquerschnitt]] · 9
 
 **Balkensysteme**
 
@@ -83,6 +84,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Abgeminderte Bettung am Terrain]]
 - [[Abgeminderter Biegewiderstand um die schwache Achse]] · $M_{z,red,Rd}$
 - [[Abgeminderter Kippwiderstand im Stab]] · $M_{y,red,Rd}$
+- [[Abminderungsbeiwert β nach Figur 1]] · $\beta$
 - [[Abminderungsfaktor beim Knicken und Kippen]] · $\chi_{K,y}$
 - [[Abstand des Grundwassers unter der Sohle]] · $T$
 - [[Abstand zum Momentennullpunkt]] · $r_{sx}$
@@ -210,6 +212,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Exponent β der Interaktion]] · $\beta$
 - [[Feder am Pfahlfuss]] · $K_b$
 - [[Feder am Pfahlmantel]]
+- [[Festigkeiten im Verbundquerschnitt]]
 - [[Fiktiver Durchmesser einer verschmierten Linie]] · $\varnothing_{fikt}$
 - [[Fläche der Längsbewehrung]] · $A_s$
 - [[Fläche des Pfahlquerschnitts]] · $A_b$
@@ -351,6 +354,8 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Nulllinie des gerissenen Querschnitts]] · $x$
 - [[Parabel-Rechteck-Beziehung des Betons]]
 - [[Plastischer Biegewiderstand eines Stahlquerschnitts]] · $M_{y,Rd}^{+}$
+- [[Plastischer Biegewiderstand mit β]] · $M_{y,Rd}^{+}$
+- [[Plastischer Normalkraftwiderstand im Verbund]]
 - [[Plattenrotation]] · $\psi_x$
 - [[Platz für die Durchstanzbewehrung]] · $h_{frei}$
 - [[Pressung eines Flächenlagers]]
@@ -512,7 +517,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 ## Normstelle fehlt noch
 
-140 von 429 Formeln haben im Code keine Normstelle – meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle – von dort kommt sie in Bericht und Notizbuch.
+140 von 433 Formeln haben im Code keine Normstelle – meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle – von dort kommt sie in Bericht und Notizbuch.
 
 - [[Achsen eines Stabs im Raum]] · [[opencivil.stabwerk3d.herleitung|_ansaetze]]
 - [[Äquivalenter E-Modul eines Stabs]] · [[opencivil.spannungsanalyse.modul#ModulProzedur|ModulProzedur._schreiben]]
@@ -547,7 +552,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Eigengewicht eines Stabs]] · [[opencivil.stabwerk.rechnung#_gewicht_je_meter|_gewicht_je_meter]]
 - [[Einwirkung im normierten Diagramm]] · [[opencivil.nachweis.biegung_normalkraft#BiegungNormalkraft._protokoll_naechster|BiegungNormalkraft._protokoll_naechster]]
 - [[Erfüllungsgrad]] · [[opencivil.core.nachweis#Vergleich.zeile|Vergleich.zeile]]
-- [[Erfüllungsgrad bei fester Normalkraft und fester Richtung]] · [[opencivil.nachweis.qa_holz#HolzBiegungQA.pruefe|HolzBiegungQA.pruefe]], [[opencivil.nachweis.qa_holz_stabilitaet#HolzStabilitaetQA.pruefe|HolzStabilitaetQA.pruefe]], [[opencivil.nachweis.qa_stahl#StahlBiegungQA|StahlBiegungQA._ansatz]], [[opencivil.nachweis.qa_stahl_stabilitaet#StahlStabilitaetQA.pruefe|StahlStabilitaetQA.pruefe]], [[opencivil.nachweis.schiefe_biegung#SchiefeBiegung|SchiefeBiegung._protokoll_ansatz]]
+- [[Erfüllungsgrad bei fester Normalkraft und fester Richtung]] · [[opencivil.nachweis.qa_holz#HolzBiegungQA.pruefe|HolzBiegungQA.pruefe]], [[opencivil.nachweis.qa_holz_stabilitaet#HolzStabilitaetQA.pruefe|HolzStabilitaetQA.pruefe]], [[opencivil.nachweis.qa_stahl#StahlBiegungQA|StahlBiegungQA._ansatz]], [[opencivil.nachweis.qa_stahl_stabilitaet#StahlStabilitaetQA.pruefe|StahlStabilitaetQA.pruefe]], [[opencivil.nachweis.qa_verbund#VerbundBiegungQA|VerbundBiegungQA._ansatz]], [[opencivil.nachweis.schiefe_biegung#SchiefeBiegung|SchiefeBiegung._protokoll_ansatz]]
 - [[Fiktiver Durchmesser einer verschmierten Linie]] · [[opencivil.nachweis.stabgrenzen#_protokoll_fiktiv|_protokoll_fiktiv]]
 - [[Fläche der Längsbewehrung]] · [[opencivil.pfahl.innen#InnererWiderstand|InnererWiderstand._bohrpfahl]]
 - [[Fläche eines Doppel-T-Querschnitts]] · [[opencivil.stabwerk.querschnitte]]
@@ -602,9 +607,9 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Nulllinie auf halber Höhe]] · [[opencivil.nachweis.handrechnung#Handrechnung._halbe_hoehe|Handrechnung._halbe_hoehe]]
 - [[Nulllinie des gerissenen Querschnitts]] · [[opencivil.nachweis.mindestbewehrung#ZwaengungBiegung.protokoll_lage|ZwaengungBiegung.protokoll_lage]]
 - [[Platz für die Durchstanzbewehrung]] · [[opencivil.durchstanzen.mit_bewehrung#nachweisen|nachweisen]]
-- [[Probe – Moment um y]] · [[opencivil.nachweis.qa_stahl#StahlBiegungQA|StahlBiegungQA._plastisch]], [[opencivil.nachweis.schiefe_biegung#SchiefeBiegung|SchiefeBiegung._protokoll_bruchzustand]]
-- [[Probe – Moment um z]] · [[opencivil.nachweis.qa_stahl#StahlBiegungQA|StahlBiegungQA._plastisch]], [[opencivil.nachweis.schiefe_biegung#SchiefeBiegung|SchiefeBiegung._protokoll_bruchzustand]]
-- [[Probe – Normalkraft]] · [[opencivil.nachweis.qa_stahl#StahlBiegungQA|StahlBiegungQA._plastisch]], [[opencivil.nachweis.schiefe_biegung#SchiefeBiegung|SchiefeBiegung._protokoll_bruchzustand]]
+- [[Probe – Moment um y]] · [[opencivil.nachweis.qa_stahl#probe|probe]], [[opencivil.nachweis.qa_verbund_kennzahlen#KennzahlenVerbundQA|KennzahlenVerbundQA._biegung]], [[opencivil.nachweis.schiefe_biegung#SchiefeBiegung|SchiefeBiegung._protokoll_bruchzustand]]
+- [[Probe – Moment um z]] · [[opencivil.nachweis.qa_stahl#probe|probe]], [[opencivil.nachweis.schiefe_biegung#SchiefeBiegung|SchiefeBiegung._protokoll_bruchzustand]]
+- [[Probe – Normalkraft]] · [[opencivil.nachweis.qa_stahl#krafttabelle|krafttabelle]], [[opencivil.nachweis.schiefe_biegung#SchiefeBiegung|SchiefeBiegung._protokoll_bruchzustand]]
 - [[Querkraft über die Federn der Wände]] · [[opencivil.nachweis.schubwandnachweis#Schubwandnachweis|Schubwandnachweis._protokoll_ansatz]]
 - [[Querschnitt der Wendel]] · [[opencivil.pfahl.innen_quer#InnererQuerwiderstand._fachwerk|InnererQuerwiderstand._fachwerk]]
 - [[Radius des Bewehrungskreises]] · [[opencivil.pfahl.innen#InnererWiderstand|InnererWiderstand._bohrpfahl]]

@@ -1,5 +1,5 @@
 ---
-erzeugt: 179fb59a202a
+erzeugt: c96df1f8ffb5
 art: modul
 tags: [modul]
 ---
@@ -311,6 +311,7 @@ So viele Nachkommastellen, wie ein Mass hat -- 8.75 bleibt 8.75, bis drei.
 - [[opencivil.erdbeben.ersatzkraft]]
 - [[opencivil.nachweis.qa_holz_werte]]
 - [[opencivil.nachweis.qa_stahl_kennzahlen]]
+- [[opencivil.nachweis.qa_verbund_kennzahlen]]
 - [[opencivil.projekt.aufbau.balkensystem]]
 - [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.balkensystem3d]]

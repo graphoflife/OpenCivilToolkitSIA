@@ -28,7 +28,7 @@
 \date{\today}
 \begin{document}
 \maketitle
-915 Berechnungen ausgeführt, 1382 Werte bestimmt.
+926 Berechnungen ausgeführt, 1416 Werte bestimmt.
 
 \section{Herleitung}
 \subsection{Plattenanalyse: Decke}
@@ -8176,7 +8176,7 @@ Profil 1 (IPE 600) & S355 & $19.0$ & $355$ & $205$ & $0.814$ & $15604$ \\
 \subsubsection{Normalkraft}
 \noindent\textbf{Zugwiderstand, am gezeichneten Querschnitt} \hfill \normref{SIA 263:2013, 5.1.2.1, (38)}
 \begin{equation*}
-N_{Rd}^{+} = \frac{f_y \cdot A}{\gamma_{M1}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 15604\,\mathrm{mm}^{2}}{1.05} = 5275.5\,\mathrm{kN}
+N_{Rd}^{+} = \frac{f_{y,\text{S355}} \cdot A}{\gamma_{M1,\text{S355}}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 15604\,\mathrm{mm}^{2}}{1.05} = 5275.5\,\mathrm{kN}
 \end{equation*}
 \noindent\textbf{Bleche bei Druck}
 \begin{longtable}{llrrrrr}
@@ -8211,7 +8211,7 @@ Profil 1: Steg & $581.0$ & $1.00$ & $4.000$ & $1.048$ & $0.859$ & $581.0$ & $499
 \hinweis{Annahme}{Der wirksame Querschnitt entsteht in einem Schritt aus den Spannungen des Bruttoquerschnitts; je Blech fällt ein Streifen der gedrückten Zone weg, beim einseitig gehaltenen am freien Ende – nach Vorgabe, nicht nachgeschlagen.}
 \noindent\textbf{Druckwiderstand in Klasse 4, am wirksamen Querschnitt} \hfill \normref{SIA 263:2013, 5.3.2, (55); 4.5.3}
 \begin{equation*}
-N_{Rd}^{-} = -\frac{f_y \cdot A_{eff}}{\gamma_{M1}} = -\frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 14621\,\mathrm{mm}^{2}}{1.05} = -4943.2\,\mathrm{kN}
+N_{Rd}^{-} = -\frac{f_{y,\text{S355}} \cdot A_{eff}}{\gamma_{M1,\text{S355}}} = -\frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 14621\,\mathrm{mm}^{2}}{1.05} = -4943.2\,\mathrm{kN}
 \end{equation*}
 \subsubsection{Biegung, Zug unten}
 \noindent\textbf{Plastische Nulllinie bei N = 0: so viel Kraft gezogen wie gedrückt}
@@ -8237,7 +8237,7 @@ Profil 1: Steg & 5a & $514.0/12.0 = 42.8$ & $0.50$ & $-1.00$ & $58.6 / 67.5 / 10
 \end{equation*}
 \noindent\textbf{Plastischer Widerstand in Klasse 1} \hfill \normref{SIA 263:2013, 5.1.3, (40)}
 \begin{equation*}
-M_{y,Rd}^{+} = \frac{f_y \cdot W_{pl}}{\gamma_{M1}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 3513.8\,\mathrm{cm}^{3}}{1.05} = 1188\,\mathrm{kNm}
+M_{y,Rd}^{+} = \frac{f_{y,\text{S355}} \cdot W_{pl}}{\gamma_{M1,\text{S355}}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 3513.8\,\mathrm{cm}^{3}}{1.05} = 1188\,\mathrm{kNm}
 \end{equation*}
 \subsubsection{Biegung, Zug oben}
 \noindent\textbf{Plastische Nulllinie bei N = 0: so viel Kraft gezogen wie gedrückt}
@@ -8263,7 +8263,7 @@ Profil 1: Steg & 5a & $514.0/12.0 = 42.8$ & $0.50$ & $-1.00$ & $58.6 / 67.5 / 10
 \end{equation*}
 \noindent\textbf{Plastischer Widerstand in Klasse 1} \hfill \normref{SIA 263:2013, 5.1.3, (40)}
 \begin{equation*}
-M_{y,Rd}^{-} = -\frac{f_y \cdot W_{pl}}{\gamma_{M1}} = -\frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 3513.8\,\mathrm{cm}^{3}}{1.05} = -1188\,\mathrm{kNm}
+M_{y,Rd}^{-} = -\frac{f_{y,\text{S355}} \cdot W_{pl}}{\gamma_{M1,\text{S355}}} = -\frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 3513.8\,\mathrm{cm}^{3}}{1.05} = -1188\,\mathrm{kNm}
 \end{equation*}
 \subsubsection{Biegung, Zug links}
 \noindent\textbf{Plastische Nulllinie bei N = 0: so viel Kraft gezogen wie gedrückt}
@@ -8289,7 +8289,7 @@ Profil 1: Steg & 5a & $514.0/12.0 = 42.8$ & $0.00$ & $–$ & $– / – / –$ &
 \end{equation*}
 \noindent\textbf{Plastischer Widerstand in Klasse 1} \hfill \normref{SIA 263:2013, 5.1.3, (40)}
 \begin{equation*}
-M_{z,Rd}^{+} = \frac{f_y \cdot W_{pl}}{\gamma_{M1}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 485.7\,\mathrm{cm}^{3}}{1.05} = 164.2\,\mathrm{kNm}
+M_{z,Rd}^{+} = \frac{f_{y,\text{S355}} \cdot W_{pl}}{\gamma_{M1,\text{S355}}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 485.7\,\mathrm{cm}^{3}}{1.05} = 164.2\,\mathrm{kNm}
 \end{equation*}
 \subsubsection{Biegung, Zug rechts}
 \noindent\textbf{Plastische Nulllinie bei N = 0: so viel Kraft gezogen wie gedrückt}
@@ -8315,7 +8315,7 @@ Profil 1: Steg & 5a & $514.0/12.0 = 42.8$ & $0.00$ & $–$ & $– / – / –$ &
 \end{equation*}
 \noindent\textbf{Plastischer Widerstand in Klasse 1} \hfill \normref{SIA 263:2013, 5.1.3, (40)}
 \begin{equation*}
-M_{z,Rd}^{-} = -\frac{f_y \cdot W_{pl}}{\gamma_{M1}} = -\frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 485.7\,\mathrm{cm}^{3}}{1.05} = -164.2\,\mathrm{kNm}
+M_{z,Rd}^{-} = -\frac{f_{y,\text{S355}} \cdot W_{pl}}{\gamma_{M1,\text{S355}}} = -\frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 485.7\,\mathrm{cm}^{3}}{1.05} = -164.2\,\mathrm{kNm}
 \end{equation*}
 \subsubsection{Querkraft}
 \noindent\textbf{Querkraftwiderstand} \hfill \normref{SIA 263:2013, 5.1.4.1, (41)}
@@ -8542,7 +8542,7 @@ W_{eff} = \frac{I_{eff}}{z} = \frac{921.2\,\cdot 10^{6}\,\mathrm{mm}^{4}}{300\,\
 \end{equation*}
 \noindent\textbf{Widerstand, Zug unten} \hfill \normref{SIA 263:2013, 5.3.5, (60); 4.5.3}
 \begin{equation*}
-M_{y,Rd}^{+} = \frac{f_y \cdot W_{eff}}{\gamma_{M1}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 3070.7\,\mathrm{cm}^{3}}{1.05} = 1038.2\,\mathrm{kNm}
+M_{y,Rd}^{+} = \frac{f_{y,\text{S355}} \cdot W_{eff}}{\gamma_{M1,\text{S355}}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 3070.7\,\mathrm{cm}^{3}}{1.05} = 1038.2\,\mathrm{kNm}
 \end{equation*}
 \noindent\textbf{Wie weit das Moment wachsen darf} \hfill \normref{SIA 263:2013, 5.3.5, (60); 4.5.3}
 \begin{equation*}
@@ -8697,23 +8697,23 @@ Widerstände in Klasse 1: plastisch.
 
 \noindent\textbf{Druckwiderstand des Querschnitts} \hfill \normref{SIA 263:2013, 5.1.2.1, (38)}
 \begin{equation*}
-N_{Rd} = \frac{f_y \cdot A}{\gamma_{M1}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 15604\,\mathrm{mm}^{2}}{1.05} = 5275.5\,\mathrm{kN}
+N_{Rd} = \frac{f_{y,\text{S355}} \cdot A}{\gamma_{M1,\text{S355}}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 15604\,\mathrm{mm}^{2}}{1.05} = 5275.5\,\mathrm{kN}
 \end{equation*}
 \noindent\textbf{Biegewiderstand, Zug unten} \hfill \normref{SIA 263:2013, 5.1.3, (40)}
 \begin{equation*}
-M_{y,Rd}^{+} = \frac{f_y \cdot W_{pl}}{\gamma_{M1}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 3513.8\,\mathrm{cm}^{3}}{1.05} = 1188\,\mathrm{kNm}
+M_{y,Rd}^{+} = \frac{f_{y,\text{S355}} \cdot W_{pl}}{\gamma_{M1,\text{S355}}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 3513.8\,\mathrm{cm}^{3}}{1.05} = 1188\,\mathrm{kNm}
 \end{equation*}
 \noindent\textbf{Biegewiderstand, Zug links} \hfill \normref{SIA 263:2013, 5.1.3, (40)}
 \begin{equation*}
-M_{z,Rd}^{+} = \frac{f_y \cdot W_{pl}}{\gamma_{M1}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 485.7\,\mathrm{cm}^{3}}{1.05} = 164.2\,\mathrm{kNm}
+M_{z,Rd}^{+} = \frac{f_{y,\text{S355}} \cdot W_{pl}}{\gamma_{M1,\text{S355}}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 485.7\,\mathrm{cm}^{3}}{1.05} = 164.2\,\mathrm{kNm}
 \end{equation*}
 \noindent\textbf{Knicklast um y} \hfill \normref{SIA 263:2013, 4.5.1.4}
 \begin{equation*}
-N_{cr,y} = \frac{\pi^2 \cdot E_a \cdot I_y}{L_{K,y}^2} = \frac{\pi^2 \cdot 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 921.2\,\cdot 10^{6}\,\mathrm{mm}^{4}}{\left(6000\,\mathrm{mm}\right)^2} = 53037\,\mathrm{kN}
+N_{cr,y} = \frac{\pi^2 \cdot E_{a,\text{S355}} \cdot I_y}{L_{K,y}^2} = \frac{\pi^2 \cdot 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 921.2\,\cdot 10^{6}\,\mathrm{mm}^{4}}{\left(6000\,\mathrm{mm}\right)^2} = 53037\,\mathrm{kN}
 \end{equation*}
 \noindent\textbf{Schlankheit um y} \hfill \normref{SIA 263:2013, 4.5.1.4}
 \begin{equation*}
-\bar{\lambda}_{K,y} = \sqrt{\frac{f_y \cdot A}{N_{cr,y}}} = \sqrt{\frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 15604\,\mathrm{mm}^{2}}{53037\,\mathrm{kN}}} = 0.323
+\bar{\lambda}_{K,y} = \sqrt{\frac{f_{y,\text{S355}} \cdot A}{N_{cr,y}}} = \sqrt{\frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 15604\,\mathrm{mm}^{2}}{53037\,\mathrm{kN}}} = 0.323
 \end{equation*}
 \noindent\textbf{Kurve a: schmales Walzprofil, (h − t\_f)/b = 2.64 > 1.2, um die starke Achse} \hfill \normref{SIA 263:2013, 4.5.1.5; 4.5.1.6; Figur 7; Tabelle 8}
 \begin{equation*}
@@ -8741,11 +8741,11 @@ N_{K,y,Rd} = \chi_{K,y} \cdot N_{Rd} = 0.972 \cdot 5275.5\,\mathrm{kN} = 5127.9\
 \end{equation*}
 \noindent\textbf{Knicklast um z} \hfill \normref{SIA 263:2013, 4.5.1.4}
 \begin{equation*}
-N_{cr,z} = \frac{\pi^2 \cdot E_a \cdot I_z}{L_{K,z}^2} = \frac{\pi^2 \cdot 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 33.9\,\cdot 10^{6}\,\mathrm{mm}^{4}}{\left(3000\,\mathrm{mm}\right)^2} = 7801.1\,\mathrm{kN}
+N_{cr,z} = \frac{\pi^2 \cdot E_{a,\text{S355}} \cdot I_z}{L_{K,z}^2} = \frac{\pi^2 \cdot 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 33.9\,\cdot 10^{6}\,\mathrm{mm}^{4}}{\left(3000\,\mathrm{mm}\right)^2} = 7801.1\,\mathrm{kN}
 \end{equation*}
 \noindent\textbf{Schlankheit um z} \hfill \normref{SIA 263:2013, 4.5.1.4}
 \begin{equation*}
-\bar{\lambda}_{K,z} = \sqrt{\frac{f_y \cdot A}{N_{cr,z}}} = \sqrt{\frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 15604\,\mathrm{mm}^{2}}{7801.1\,\mathrm{kN}}} = 0.843
+\bar{\lambda}_{K,z} = \sqrt{\frac{f_{y,\text{S355}} \cdot A}{N_{cr,z}}} = \sqrt{\frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 15604\,\mathrm{mm}^{2}}{7801.1\,\mathrm{kN}}} = 0.843
 \end{equation*}
 \noindent\textbf{Kurve b: schmales Walzprofil, (h − t\_f)/b = 2.64 > 1.2, um die schwache Achse} \hfill \normref{SIA 263:2013, 4.5.1.5; 4.5.1.6; Figur 7; Tabelle 8}
 \begin{equation*}
@@ -8803,14 +8803,14 @@ W_{el} = 3070.7\,\mathrm{cm}^{3}
 \noindent\textbf{Saint-Venant-Anteil, mit K = I\_T} \hfill \normref{SIA 263:2013, Anhang B.4, (92)}
 \begin{equation*}
 \begin{aligned}
-  \sigma_{Dv} &= \frac{\eta \cdot \pi}{L_{D} \cdot W_{el}} \cdot \sqrt{G_a \cdot I_T \cdot E_a \cdot I_z} \\
+  \sigma_{Dv} &= \frac{\eta \cdot \pi}{L_{D} \cdot W_{el}} \cdot \sqrt{G_{a,\text{S355}} \cdot I_T \cdot E_{a,\text{S355}} \cdot I_z} \\
   &= \frac{1.75 \cdot \pi}{3000\,\mathrm{mm} \cdot 3070.7\,\mathrm{cm}^{3}} \cdot \sqrt{81000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 1.6\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 33.9\,\cdot 10^{6}\,\mathrm{mm}^{4}} \\
   &= 581.7\,\mathrm{N}/\mathrm{mm}^{2}
 \end{aligned}
 \end{equation*}
 \noindent\textbf{Wölbanteil: Knickspannung des Druckgurts nach Euler} \hfill \normref{SIA 263:2013, Anhang B.5, (93)}
 \begin{equation*}
-\sigma_{Dw} = \frac{\pi^2 \cdot E_a}{\left(L_{K} / i_{g}\right)^2} = \frac{\pi^2 \cdot 210000\,\mathrm{N}/\mathrm{mm}^{2}}{\left(2267.8\,\mathrm{mm} / 56.4\,\mathrm{mm}\right)^2} = 1282\,\mathrm{N}/\mathrm{mm}^{2}
+\sigma_{Dw} = \frac{\pi^2 \cdot E_{a,\text{S355}}}{\left(L_{K} / i_{g}\right)^2} = \frac{\pi^2 \cdot 210000\,\mathrm{N}/\mathrm{mm}^{2}}{\left(2267.8\,\mathrm{mm} / 56.4\,\mathrm{mm}\right)^2} = 1282\,\mathrm{N}/\mathrm{mm}^{2}
 \end{equation*}
 \noindent\textbf{Ideelle Kippspannung} \hfill \normref{SIA 263:2013, Anhang B.3, (91)}
 \begin{equation*}
@@ -8822,7 +8822,7 @@ M_{cr} = W_{el} \cdot \sigma_{cr,D} = 3070.7\,\mathrm{cm}^{3} \cdot 1407.8\,\mat
 \end{equation*}
 \noindent\textbf{Schlankheit beim Kippen, W nach der Klasse} \hfill \normref{SIA 263:2013, 4.5.2.2, (9); 4.5.2.3, (10)}
 \begin{equation*}
-\bar{\lambda}_{D} = \sqrt{\frac{W_{pl} \cdot f_y}{M_{cr}}} = \sqrt{\frac{3513.8\,\mathrm{cm}^{3} \cdot 355\,\mathrm{N}/\mathrm{mm}^{2}}{4323.1\,\mathrm{kNm}}} = 0.537
+\bar{\lambda}_{D} = \sqrt{\frac{W_{pl} \cdot f_{y,\text{S355}}}{M_{cr}}} = \sqrt{\frac{3513.8\,\mathrm{cm}^{3} \cdot 355\,\mathrm{N}/\mathrm{mm}^{2}}{4323.1\,\mathrm{kNm}}} = 0.537
 \end{equation*}
 \noindent\textbf{Imperfektionsbeiwert eines Walzprofils} \hfill \normref{SIA 263:2013, 4.5.2.2, (9); 4.5.2.3, (10)}
 \begin{equation*}
@@ -8952,7 +8952,7 @@ Widerstände in Klasse 3: elastisch (5.2.9).
 
 \noindent\textbf{Druckwiderstand des Querschnitts} \hfill \normref{SIA 263:2013, 5.1.2.1, (38)}
 \begin{equation*}
-N_{Rd} = \frac{f_y \cdot A}{\gamma_{M1}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 15604\,\mathrm{mm}^{2}}{1.05} = 5275.5\,\mathrm{kN}
+N_{Rd} = \frac{f_{y,\text{S355}} \cdot A}{\gamma_{M1,\text{S355}}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 15604\,\mathrm{mm}^{2}}{1.05} = 5275.5\,\mathrm{kN}
 \end{equation*}
 \noindent\textbf{Widerstandsmoment, Zug unten}
 \begin{equation*}
@@ -8960,15 +8960,15 @@ W_{el} = \frac{I_y}{z} = \frac{921.2\,\cdot 10^{6}\,\mathrm{mm}^{4}}{300\,\mathr
 \end{equation*}
 \noindent\textbf{Biegewiderstand, Zug unten} \hfill \normref{SIA 263:2013, 5.2.6, (54); 5.2.2; 5.2.3, (52)}
 \begin{equation*}
-M_{y,Rd}^{+} = \frac{f_y \cdot W_{el}}{\gamma_{M1}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 3070.7\,\mathrm{cm}^{3}}{1.05} = 1038.2\,\mathrm{kNm}
+M_{y,Rd}^{+} = \frac{f_{y,\text{S355}} \cdot W_{el}}{\gamma_{M1,\text{S355}}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 3070.7\,\mathrm{cm}^{3}}{1.05} = 1038.2\,\mathrm{kNm}
 \end{equation*}
 \noindent\textbf{Knicklast um y} \hfill \normref{SIA 263:2013, 4.5.1.4}
 \begin{equation*}
-N_{cr,y} = \frac{\pi^2 \cdot E_a \cdot I_y}{L_{K,y}^2} = \frac{\pi^2 \cdot 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 921.2\,\cdot 10^{6}\,\mathrm{mm}^{4}}{\left(6000\,\mathrm{mm}\right)^2} = 53037\,\mathrm{kN}
+N_{cr,y} = \frac{\pi^2 \cdot E_{a,\text{S355}} \cdot I_y}{L_{K,y}^2} = \frac{\pi^2 \cdot 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 921.2\,\cdot 10^{6}\,\mathrm{mm}^{4}}{\left(6000\,\mathrm{mm}\right)^2} = 53037\,\mathrm{kN}
 \end{equation*}
 \noindent\textbf{Schlankheit um y} \hfill \normref{SIA 263:2013, 4.5.1.4}
 \begin{equation*}
-\bar{\lambda}_{K,y} = \sqrt{\frac{f_y \cdot A}{N_{cr,y}}} = \sqrt{\frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 15604\,\mathrm{mm}^{2}}{53037\,\mathrm{kN}}} = 0.323
+\bar{\lambda}_{K,y} = \sqrt{\frac{f_{y,\text{S355}} \cdot A}{N_{cr,y}}} = \sqrt{\frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 15604\,\mathrm{mm}^{2}}{53037\,\mathrm{kN}}} = 0.323
 \end{equation*}
 \noindent\textbf{Kurve a: schmales Walzprofil, (h − t\_f)/b = 2.64 > 1.2, um die starke Achse} \hfill \normref{SIA 263:2013, 4.5.1.5; 4.5.1.6; Figur 7; Tabelle 8}
 \begin{equation*}
@@ -8996,11 +8996,11 @@ N_{K,y,Rd} = \chi_{K,y} \cdot N_{Rd} = 0.972 \cdot 5275.5\,\mathrm{kN} = 5127.9\
 \end{equation*}
 \noindent\textbf{Knicklast um z} \hfill \normref{SIA 263:2013, 4.5.1.4}
 \begin{equation*}
-N_{cr,z} = \frac{\pi^2 \cdot E_a \cdot I_z}{L_{K,z}^2} = \frac{\pi^2 \cdot 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 33.9\,\cdot 10^{6}\,\mathrm{mm}^{4}}{\left(1500\,\mathrm{mm}\right)^2} = 31204.2\,\mathrm{kN}
+N_{cr,z} = \frac{\pi^2 \cdot E_{a,\text{S355}} \cdot I_z}{L_{K,z}^2} = \frac{\pi^2 \cdot 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 33.9\,\cdot 10^{6}\,\mathrm{mm}^{4}}{\left(1500\,\mathrm{mm}\right)^2} = 31204.2\,\mathrm{kN}
 \end{equation*}
 \noindent\textbf{Schlankheit um z} \hfill \normref{SIA 263:2013, 4.5.1.4}
 \begin{equation*}
-\bar{\lambda}_{K,z} = \sqrt{\frac{f_y \cdot A}{N_{cr,z}}} = \sqrt{\frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 15604\,\mathrm{mm}^{2}}{31204.2\,\mathrm{kN}}} = 0.421
+\bar{\lambda}_{K,z} = \sqrt{\frac{f_{y,\text{S355}} \cdot A}{N_{cr,z}}} = \sqrt{\frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 15604\,\mathrm{mm}^{2}}{31204.2\,\mathrm{kN}}} = 0.421
 \end{equation*}
 \noindent\textbf{Kurve b: schmales Walzprofil, (h − t\_f)/b = 2.64 > 1.2, um die schwache Achse} \hfill \normref{SIA 263:2013, 4.5.1.5; 4.5.1.6; Figur 7; Tabelle 8}
 \begin{equation*}
@@ -9054,14 +9054,14 @@ L_{K} = \frac{L_{D}}{\sqrt{\eta}} = \frac{1500\,\mathrm{mm}}{\sqrt{1}} = 1500\,\
 \noindent\textbf{Saint-Venant-Anteil, mit K = I\_T} \hfill \normref{SIA 263:2013, Anhang B.4, (92)}
 \begin{equation*}
 \begin{aligned}
-  \sigma_{Dv} &= \frac{\eta \cdot \pi}{L_{D} \cdot W_{el}} \cdot \sqrt{G_a \cdot I_T \cdot E_a \cdot I_z} \\
+  \sigma_{Dv} &= \frac{\eta \cdot \pi}{L_{D} \cdot W_{el}} \cdot \sqrt{G_{a,\text{S355}} \cdot I_T \cdot E_{a,\text{S355}} \cdot I_z} \\
   &= \frac{1 \cdot \pi}{1500\,\mathrm{mm} \cdot 3070.7\,\mathrm{cm}^{3}} \cdot \sqrt{81000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 1.6\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 33.9\,\cdot 10^{6}\,\mathrm{mm}^{4}} \\
   &= 664.8\,\mathrm{N}/\mathrm{mm}^{2}
 \end{aligned}
 \end{equation*}
 \noindent\textbf{Wölbanteil: Knickspannung des Druckgurts nach Euler} \hfill \normref{SIA 263:2013, Anhang B.5, (93)}
 \begin{equation*}
-\sigma_{Dw} = \frac{\pi^2 \cdot E_a}{\left(L_{K} / i_{g}\right)^2} = \frac{\pi^2 \cdot 210000\,\mathrm{N}/\mathrm{mm}^{2}}{\left(1500\,\mathrm{mm} / 56.4\,\mathrm{mm}\right)^2} = 2930.4\,\mathrm{N}/\mathrm{mm}^{2}
+\sigma_{Dw} = \frac{\pi^2 \cdot E_{a,\text{S355}}}{\left(L_{K} / i_{g}\right)^2} = \frac{\pi^2 \cdot 210000\,\mathrm{N}/\mathrm{mm}^{2}}{\left(1500\,\mathrm{mm} / 56.4\,\mathrm{mm}\right)^2} = 2930.4\,\mathrm{N}/\mathrm{mm}^{2}
 \end{equation*}
 \noindent\textbf{Ideelle Kippspannung} \hfill \normref{SIA 263:2013, Anhang B.3, (91)}
 \begin{equation*}
@@ -9073,7 +9073,7 @@ M_{cr} = W_{el} \cdot \sigma_{cr,D} = 3070.7\,\mathrm{cm}^{3} \cdot 3004.8\,\mat
 \end{equation*}
 \noindent\textbf{Schlankheit beim Kippen, W nach der Klasse} \hfill \normref{SIA 263:2013, 4.5.2.2, (9); 4.5.2.3, (10)}
 \begin{equation*}
-\bar{\lambda}_{D} = \sqrt{\frac{W_{el} \cdot f_y}{M_{cr}}} = \sqrt{\frac{3070.7\,\mathrm{cm}^{3} \cdot 355\,\mathrm{N}/\mathrm{mm}^{2}}{9227\,\mathrm{kNm}}} = 0.344
+\bar{\lambda}_{D} = \sqrt{\frac{W_{el} \cdot f_{y,\text{S355}}}{M_{cr}}} = \sqrt{\frac{3070.7\,\mathrm{cm}^{3} \cdot 355\,\mathrm{N}/\mathrm{mm}^{2}}{9227\,\mathrm{kNm}}} = 0.344
 \end{equation*}
 \noindent\textbf{Imperfektionsbeiwert eines Walzprofils} \hfill \normref{SIA 263:2013, 4.5.2.2, (9); 4.5.2.3, (10)}
 \begin{equation*}
@@ -9172,7 +9172,7 @@ Profil 1: Steg & $581.0$ & $1.00$ & $4.000$ & $1.048$ & $0.859$ & $581.0$ & $499
 \hinweis{Annahme}{Der wirksame Querschnitt entsteht in einem Schritt aus den Spannungen des Bruttoquerschnitts; je Blech fällt ein Streifen der gedrückten Zone weg, beim einseitig gehaltenen am freien Ende – nach Vorgabe, nicht nachgeschlagen.}
 \noindent\textbf{Druckwiderstand des Querschnitts} \hfill \normref{SIA 263:2013, 5.3.2, (55); 4.5.3}
 \begin{equation*}
-N_{Rd} = \frac{f_y \cdot A_{eff}}{\gamma_{M1}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 14621\,\mathrm{mm}^{2}}{1.05} = 4943.2\,\mathrm{kN}
+N_{Rd} = \frac{f_{y,\text{S355}} \cdot A_{eff}}{\gamma_{M1,\text{S355}}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 14621\,\mathrm{mm}^{2}}{1.05} = 4943.2\,\mathrm{kN}
 \end{equation*}
 \noindent\textbf{Widerstandsmoment, Zug unten}
 \begin{equation*}
@@ -9180,7 +9180,7 @@ W_{eff} = \frac{I_{eff}}{z} = \frac{921.2\,\cdot 10^{6}\,\mathrm{mm}^{4}}{300\,\
 \end{equation*}
 \noindent\textbf{Biegewiderstand, Zug unten} \hfill \normref{SIA 263:2013, 5.3.5, (60); 4.5.3}
 \begin{equation*}
-M_{y,Rd}^{+} = \frac{f_y \cdot W_{eff}}{\gamma_{M1}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 3070.7\,\mathrm{cm}^{3}}{1.05} = 1038.2\,\mathrm{kNm}
+M_{y,Rd}^{+} = \frac{f_{y,\text{S355}} \cdot W_{eff}}{\gamma_{M1,\text{S355}}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 3070.7\,\mathrm{cm}^{3}}{1.05} = 1038.2\,\mathrm{kNm}
 \end{equation*}
 \noindent\textbf{Widerstandsmoment, Zug links}
 \begin{equation*}
@@ -9188,15 +9188,19 @@ W_{eff} = \frac{I_{eff}}{z} = \frac{33.9\,\cdot 10^{6}\,\mathrm{mm}^{4}}{110\,\m
 \end{equation*}
 \noindent\textbf{Biegewiderstand, Zug links} \hfill \normref{SIA 263:2013, 5.3.5, (60); 4.5.3}
 \begin{equation*}
-M_{z,Rd}^{+} = \frac{f_y \cdot W_{eff}}{\gamma_{M1}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 308\,\mathrm{cm}^{3}}{1.05} = 104.1\,\mathrm{kNm}
+M_{z,Rd}^{+} = \frac{f_{y,\text{S355}} \cdot W_{eff}}{\gamma_{M1,\text{S355}}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 308\,\mathrm{cm}^{3}}{1.05} = 104.1\,\mathrm{kNm}
 \end{equation*}
 \noindent\textbf{Knicklast um y, am ganzen Querschnitt} \hfill \normref{SIA 263:2013, 4.5.1.4}
 \begin{equation*}
-N_{cr,y} = \frac{\pi^2 \cdot E_a \cdot I_y}{L_{K,y}^2} = \frac{\pi^2 \cdot 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 921.2\,\cdot 10^{6}\,\mathrm{mm}^{4}}{\left(3000\,\mathrm{mm}\right)^2} = 212147.9\,\mathrm{kN}
+\begin{aligned}
+  N_{cr,y} &= \frac{\pi^2 \cdot E_{a,\text{S355}} \cdot I_y}{L_{K,y}^2} \\
+  &= \frac{\pi^2 \cdot 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 921.2\,\cdot 10^{6}\,\mathrm{mm}^{4}}{\left(3000\,\mathrm{mm}\right)^2} \\
+  &= 212147.9\,\mathrm{kN}
+\end{aligned}
 \end{equation*}
 \noindent\textbf{Schlankheit um y} \hfill \normref{SIA 263:2013, 4.5.1.3; 5.3.8}
 \begin{equation*}
-\bar{\lambda}_{K,y} = \sqrt{\frac{f_y \cdot A_{eff}}{N_{cr,y}}} = \sqrt{\frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 14621\,\mathrm{mm}^{2}}{212147.9\,\mathrm{kN}}} = 0.156
+\bar{\lambda}_{K,y} = \sqrt{\frac{f_{y,\text{S355}} \cdot A_{eff}}{N_{cr,y}}} = \sqrt{\frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 14621\,\mathrm{mm}^{2}}{212147.9\,\mathrm{kN}}} = 0.156
 \end{equation*}
 \noindent\textbf{Kurve a: schmales Walzprofil, (h − t\_f)/b = 2.64 > 1.2, um die starke Achse} \hfill \normref{SIA 263:2013, 4.5.1.5; 4.5.1.6; Figur 7; Tabelle 8}
 \begin{equation*}
@@ -9224,11 +9228,11 @@ N_{K,y,Rd} = \chi_{K,y} \cdot N_{Rd} = 1 \cdot 4943.2\,\mathrm{kN} = 4943.2\,\ma
 \end{equation*}
 \noindent\textbf{Knicklast um z, am ganzen Querschnitt} \hfill \normref{SIA 263:2013, 4.5.1.4}
 \begin{equation*}
-N_{cr,z} = \frac{\pi^2 \cdot E_a \cdot I_z}{L_{K,z}^2} = \frac{\pi^2 \cdot 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 33.9\,\cdot 10^{6}\,\mathrm{mm}^{4}}{\left(1500\,\mathrm{mm}\right)^2} = 31204.2\,\mathrm{kN}
+N_{cr,z} = \frac{\pi^2 \cdot E_{a,\text{S355}} \cdot I_z}{L_{K,z}^2} = \frac{\pi^2 \cdot 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 33.9\,\cdot 10^{6}\,\mathrm{mm}^{4}}{\left(1500\,\mathrm{mm}\right)^2} = 31204.2\,\mathrm{kN}
 \end{equation*}
 \noindent\textbf{Schlankheit um z} \hfill \normref{SIA 263:2013, 4.5.1.3; 5.3.8}
 \begin{equation*}
-\bar{\lambda}_{K,z} = \sqrt{\frac{f_y \cdot A_{eff}}{N_{cr,z}}} = \sqrt{\frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 14621\,\mathrm{mm}^{2}}{31204.2\,\mathrm{kN}}} = 0.408
+\bar{\lambda}_{K,z} = \sqrt{\frac{f_{y,\text{S355}} \cdot A_{eff}}{N_{cr,z}}} = \sqrt{\frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 14621\,\mathrm{mm}^{2}}{31204.2\,\mathrm{kN}}} = 0.408
 \end{equation*}
 \noindent\textbf{Kurve b: schmales Walzprofil, (h − t\_f)/b = 2.64 > 1.2, um die schwache Achse} \hfill \normref{SIA 263:2013, 4.5.1.5; 4.5.1.6; Figur 7; Tabelle 8}
 \begin{equation*}
@@ -9289,7 +9293,7 @@ W_{el} = 3070.7\,\mathrm{cm}^{3}
 \end{equation*}
 \noindent\textbf{Wölbanteil: Knickspannung des Druckgurts nach Euler} \hfill \normref{SIA 263:2013, Anhang B.5, (93)}
 \begin{equation*}
-\sigma_{Dw} = \frac{\pi^2 \cdot E_a}{\left(L_{K} / i_{g}\right)^2} = \frac{\pi^2 \cdot 210000\,\mathrm{N}/\mathrm{mm}^{2}}{\left(1500\,\mathrm{mm} / 56.4\,\mathrm{mm}\right)^2} = 2930.4\,\mathrm{N}/\mathrm{mm}^{2}
+\sigma_{Dw} = \frac{\pi^2 \cdot E_{a,\text{S355}}}{\left(L_{K} / i_{g}\right)^2} = \frac{\pi^2 \cdot 210000\,\mathrm{N}/\mathrm{mm}^{2}}{\left(1500\,\mathrm{mm} / 56.4\,\mathrm{mm}\right)^2} = 2930.4\,\mathrm{N}/\mathrm{mm}^{2}
 \end{equation*}
 \noindent\textbf{Ideelle Kippspannung} \hfill \normref{SIA 263:2013, Anhang B.3, (91)}
 \begin{equation*}
@@ -9301,7 +9305,7 @@ M_{cr} = W_{el} \cdot \sigma_{cr,D} = 3070.7\,\mathrm{cm}^{3} \cdot 2930.4\,\mat
 \end{equation*}
 \noindent\textbf{Schlankheit beim Kippen, W nach der Klasse} \hfill \normref{SIA 263:2013, 4.5.2.2, (9); 4.5.2.3, (10)}
 \begin{equation*}
-\bar{\lambda}_{D} = \sqrt{\frac{W_{eff} \cdot f_y}{M_{cr}}} = \sqrt{\frac{3070.7\,\mathrm{cm}^{3} \cdot 355\,\mathrm{N}/\mathrm{mm}^{2}}{8998.3\,\mathrm{kNm}}} = 0.348
+\bar{\lambda}_{D} = \sqrt{\frac{W_{eff} \cdot f_{y,\text{S355}}}{M_{cr}}} = \sqrt{\frac{3070.7\,\mathrm{cm}^{3} \cdot 355\,\mathrm{N}/\mathrm{mm}^{2}}{8998.3\,\mathrm{kNm}}} = 0.348
 \end{equation*}
 \noindent\textbf{Imperfektionsbeiwert eines Walzprofils} \hfill \normref{SIA 263:2013, 4.5.2.2, (9); 4.5.2.3, (10)}
 \begin{equation*}
@@ -9407,15 +9411,15 @@ Profil 1: Steg & $581.0$ & $1.00$ & $4.000$ & $1.048$ & $0.859$ & $581.0$ & $499
 \hinweis{Annahme}{Der wirksame Querschnitt entsteht in einem Schritt aus den Spannungen des Bruttoquerschnitts; je Blech fällt ein Streifen der gedrückten Zone weg, beim einseitig gehaltenen am freien Ende – nach Vorgabe, nicht nachgeschlagen.}
 \noindent\textbf{Druckwiderstand des Querschnitts} \hfill \normref{SIA 263:2013, 5.3.2, (55); 4.5.3}
 \begin{equation*}
-N_{Rd} = \frac{f_y \cdot A_{eff}}{\gamma_{M1}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 14621\,\mathrm{mm}^{2}}{1.05} = 4943.2\,\mathrm{kN}
+N_{Rd} = \frac{f_{y,\text{S355}} \cdot A_{eff}}{\gamma_{M1,\text{S355}}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 14621\,\mathrm{mm}^{2}}{1.05} = 4943.2\,\mathrm{kN}
 \end{equation*}
 \noindent\textbf{Knicklast um y, am ganzen Querschnitt} \hfill \normref{SIA 263:2013, 4.5.1.4}
 \begin{equation*}
-N_{cr,y} = \frac{\pi^2 \cdot E_a \cdot I_y}{L_{K,y}^2} = \frac{\pi^2 \cdot 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 921.2\,\cdot 10^{6}\,\mathrm{mm}^{4}}{\left(6000\,\mathrm{mm}\right)^2} = 53037\,\mathrm{kN}
+N_{cr,y} = \frac{\pi^2 \cdot E_{a,\text{S355}} \cdot I_y}{L_{K,y}^2} = \frac{\pi^2 \cdot 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 921.2\,\cdot 10^{6}\,\mathrm{mm}^{4}}{\left(6000\,\mathrm{mm}\right)^2} = 53037\,\mathrm{kN}
 \end{equation*}
 \noindent\textbf{Schlankheit um y} \hfill \normref{SIA 263:2013, 4.5.1.3; 5.3.8}
 \begin{equation*}
-\bar{\lambda}_{K,y} = \sqrt{\frac{f_y \cdot A_{eff}}{N_{cr,y}}} = \sqrt{\frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 14621\,\mathrm{mm}^{2}}{53037\,\mathrm{kN}}} = 0.313
+\bar{\lambda}_{K,y} = \sqrt{\frac{f_{y,\text{S355}} \cdot A_{eff}}{N_{cr,y}}} = \sqrt{\frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 14621\,\mathrm{mm}^{2}}{53037\,\mathrm{kN}}} = 0.313
 \end{equation*}
 \noindent\textbf{Kurve a: schmales Walzprofil, (h − t\_f)/b = 2.64 > 1.2, um die starke Achse} \hfill \normref{SIA 263:2013, 4.5.1.5; 4.5.1.6; Figur 7; Tabelle 8}
 \begin{equation*}
@@ -9443,11 +9447,11 @@ N_{K,y,Rd} = \chi_{K,y} \cdot N_{Rd} = 0.974 \cdot 4943.2\,\mathrm{kN} = 4817.1\
 \end{equation*}
 \noindent\textbf{Knicklast um z, am ganzen Querschnitt} \hfill \normref{SIA 263:2013, 4.5.1.4}
 \begin{equation*}
-N_{cr,z} = \frac{\pi^2 \cdot E_a \cdot I_z}{L_{K,z}^2} = \frac{\pi^2 \cdot 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 33.9\,\cdot 10^{6}\,\mathrm{mm}^{4}}{\left(1500\,\mathrm{mm}\right)^2} = 31204.2\,\mathrm{kN}
+N_{cr,z} = \frac{\pi^2 \cdot E_{a,\text{S355}} \cdot I_z}{L_{K,z}^2} = \frac{\pi^2 \cdot 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 33.9\,\cdot 10^{6}\,\mathrm{mm}^{4}}{\left(1500\,\mathrm{mm}\right)^2} = 31204.2\,\mathrm{kN}
 \end{equation*}
 \noindent\textbf{Schlankheit um z} \hfill \normref{SIA 263:2013, 4.5.1.3; 5.3.8}
 \begin{equation*}
-\bar{\lambda}_{K,z} = \sqrt{\frac{f_y \cdot A_{eff}}{N_{cr,z}}} = \sqrt{\frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 14621\,\mathrm{mm}^{2}}{31204.2\,\mathrm{kN}}} = 0.408
+\bar{\lambda}_{K,z} = \sqrt{\frac{f_{y,\text{S355}} \cdot A_{eff}}{N_{cr,z}}} = \sqrt{\frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 14621\,\mathrm{mm}^{2}}{31204.2\,\mathrm{kN}}} = 0.408
 \end{equation*}
 \noindent\textbf{Kurve b: schmales Walzprofil, (h − t\_f)/b = 2.64 > 1.2, um die schwache Achse} \hfill \normref{SIA 263:2013, 4.5.1.5; 4.5.1.6; Figur 7; Tabelle 8}
 \begin{equation*}
@@ -9518,19 +9522,19 @@ Widerstände in Klasse 2: plastisch.
 
 \noindent\textbf{Druckwiderstand des Querschnitts} \hfill \normref{SIA 263:2013, 5.1.2.1, (38)}
 \begin{equation*}
-N_{Rd} = \frac{f_y \cdot A}{\gamma_{M1}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 15604\,\mathrm{mm}^{2}}{1.05} = 5275.5\,\mathrm{kN}
+N_{Rd} = \frac{f_{y,\text{S355}} \cdot A}{\gamma_{M1,\text{S355}}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 15604\,\mathrm{mm}^{2}}{1.05} = 5275.5\,\mathrm{kN}
 \end{equation*}
 \noindent\textbf{Biegewiderstand, Zug unten} \hfill \normref{SIA 263:2013, 5.1.3, (40)}
 \begin{equation*}
-M_{y,Rd}^{+} = \frac{f_y \cdot W_{pl}}{\gamma_{M1}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 3513.8\,\mathrm{cm}^{3}}{1.05} = 1188\,\mathrm{kNm}
+M_{y,Rd}^{+} = \frac{f_{y,\text{S355}} \cdot W_{pl}}{\gamma_{M1,\text{S355}}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 3513.8\,\mathrm{cm}^{3}}{1.05} = 1188\,\mathrm{kNm}
 \end{equation*}
 \noindent\textbf{Knicklast um y} \hfill \normref{SIA 263:2013, 4.5.1.4}
 \begin{equation*}
-N_{cr,y} = \frac{\pi^2 \cdot E_a \cdot I_y}{L_{K,y}^2} = \frac{\pi^2 \cdot 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 921.2\,\cdot 10^{6}\,\mathrm{mm}^{4}}{\left(6000\,\mathrm{mm}\right)^2} = 53037\,\mathrm{kN}
+N_{cr,y} = \frac{\pi^2 \cdot E_{a,\text{S355}} \cdot I_y}{L_{K,y}^2} = \frac{\pi^2 \cdot 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 921.2\,\cdot 10^{6}\,\mathrm{mm}^{4}}{\left(6000\,\mathrm{mm}\right)^2} = 53037\,\mathrm{kN}
 \end{equation*}
 \noindent\textbf{Schlankheit um y} \hfill \normref{SIA 263:2013, 4.5.1.4}
 \begin{equation*}
-\bar{\lambda}_{K,y} = \sqrt{\frac{f_y \cdot A}{N_{cr,y}}} = \sqrt{\frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 15604\,\mathrm{mm}^{2}}{53037\,\mathrm{kN}}} = 0.323
+\bar{\lambda}_{K,y} = \sqrt{\frac{f_{y,\text{S355}} \cdot A}{N_{cr,y}}} = \sqrt{\frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 15604\,\mathrm{mm}^{2}}{53037\,\mathrm{kN}}} = 0.323
 \end{equation*}
 \noindent\textbf{Kurve a: schmales Walzprofil, (h − t\_f)/b = 2.64 > 1.2, um die starke Achse} \hfill \normref{SIA 263:2013, 4.5.1.5; 4.5.1.6; Figur 7; Tabelle 8}
 \begin{equation*}
@@ -9581,35 +9585,728 @@ M_{Rd} = \lambda \cdot M_{Ed} = 3.128 \cdot 300\,\mathrm{kNm} = 938.3\,\mathrm{k
 \subsection{Baustahl: S355}
 \noindent\textbf{Streckgrenze} \hfill \normref{SIA 263:2013, 3.2.2.3, Tabelle 1}
 \begin{equation*}
-f_y = 355\,\mathrm{N}/\mathrm{mm}^{2}
+f_{y,\text{S355}} = 355\,\mathrm{N}/\mathrm{mm}^{2}
 \end{equation*}
 \noindent\textbf{Streckgrenze für 40 mm < t ≤ 100 mm} \hfill \normref{SIA 263:2013, 3.2.2.3, Tabelle 1}
 \begin{equation*}
-f_y^{t>40} = 335\,\mathrm{N}/\mathrm{mm}^{2}
+f_{y,\text{S355}}^{t>40} = 335\,\mathrm{N}/\mathrm{mm}^{2}
 \end{equation*}
 \noindent\textbf{Fliessschubspannung} \hfill \normref{SIA 263:2013, 3.2.2.3, Tabelle 1}
 \begin{equation*}
-\tau_y = 205\,\mathrm{N}/\mathrm{mm}^{2}
+\tau_{y,\text{S355}} = 205\,\mathrm{N}/\mathrm{mm}^{2}
 \end{equation*}
 \noindent\textbf{Fliessschubspannung für 40 mm < t ≤ 100 mm} \hfill \normref{SIA 263:2013, 3.2.2.3, Tabelle 1}
 \begin{equation*}
-\tau_y^{t>40} = 193\,\mathrm{N}/\mathrm{mm}^{2}
+\tau_{y,\text{S355}}^{t>40} = 193\,\mathrm{N}/\mathrm{mm}^{2}
 \end{equation*}
 \noindent\textbf{Widerstandsbeiwert für Festigkeits- und Stabilitätsnachweise} \hfill \normref{SIA 263:2013, 4.1.3}
 \begin{equation*}
-\gamma_{M1} = 1.05
+\gamma_{M1,\text{S355}} = 1.05
 \end{equation*}
 \noindent\textbf{Elastizitätsmodul des Baustahls} \hfill \normref{SIA 263:2013, 3.2.2.1}
 \begin{equation*}
-E_a = 210000\,\mathrm{N}/\mathrm{mm}^{2}
+E_{a,\text{S355}} = 210000\,\mathrm{N}/\mathrm{mm}^{2}
 \end{equation*}
 \noindent\textbf{Schubmodul des Baustahls} \hfill \normref{SIA 263:2013, 3.2.2.1}
 \begin{equation*}
-G_a = 81000\,\mathrm{N}/\mathrm{mm}^{2}
+G_{a,\text{S355}} = 81000\,\mathrm{N}/\mathrm{mm}^{2}
 \end{equation*}
 \noindent\textbf{Dichte des Baustahls} \hfill \normref{SIA 263:2013, 3.2.2.1}
 \begin{equation*}
-\rho_a = 7850\,\mathrm{kg}/\mathrm{m}^{3}
+\rho_{a,\text{S355}} = 7850\,\mathrm{kg}/\mathrm{m}^{3}
+\end{equation*}
+\subsection{Querschnittsanalyse: Verbundträger}
+\noindent\textbf{Fläche und Schwerpunkt eines Polygons (Satz von Gauss)}
+\begin{equation*}
+A = \frac{1}{2} \sum_i c_i \qquad y_S = \frac{1}{6A} \sum_i (y_i + y_{i+1})\, c_i \qquad z_S = \frac{1}{6A} \sum_i (z_i + z_{i+1})\, c_i \qquad c_i = y_i\, z_{i+1} - y_{i+1}\, z_i
+\end{equation*}
+\noindent\textbf{Trägheitsmomente eines Polygons, bezogen auf den Schwerpunkt}
+\begin{equation*}
+I_y = \frac{1}{12} \sum_i (z_i^2 + z_i z_{i+1} + z_{i+1}^2)\, c_i - A\, z_S^2\qquad I_z = \frac{1}{12} \sum_i (y_i^2 + y_i y_{i+1} + y_{i+1}^2)\, c_i - A\, y_S^2
+\end{equation*}
+\noindent\textbf{Polygone des Querschnitts}
+\begin{longtable}{lllrrrr}
+\hline
+Polygon & Material & liegt in & Ecken & $\pm A\ [\mathrm{mm}^2]$ & $y_S\ [\mathrm{mm}]$ & $z_S\ [\mathrm{mm}]$ \\
+\hline
+\endhead
+Polygon 1 & C30/37 & – & $8$ & $267000$ & $0.0$ & $283.2$ \\
+Profil 1 (HEA 300) & S460 & Polygon 1 & $60$ & $0$ & $0.0$ & $145.0$ \\
+\hline
+\end{longtable}
+\noindent\textbf{Fläche des Bruttoquerschnitts}
+\begin{equation*}
+A = 267000\,\mathrm{mm}^{2}
+\end{equation*}
+\noindent\textbf{Schwerpunkt, y}
+\begin{equation*}
+y_S = 0\,\mathrm{mm}
+\end{equation*}
+\noindent\textbf{Schwerpunkt, z}
+\begin{equation*}
+z_S = 283.2\,\mathrm{mm}
+\end{equation*}
+\noindent\textbf{Trägheitsmoment um y}
+\begin{equation*}
+I_y = 3290.6\,\cdot 10^{6}\,\mathrm{mm}^{4}
+\end{equation*}
+\noindent\textbf{Trägheitsmoment um z}
+\begin{equation*}
+I_z = 34402.5\,\cdot 10^{6}\,\mathrm{mm}^{4}
+\end{equation*}
+\noindent\textbf{Deviationsmoment}
+\begin{equation*}
+I_{yz} = 0\,\cdot 10^{6}\,\mathrm{mm}^{4}
+\end{equation*}
+\noindent\textbf{Teilung einer Stablinie: gleiche Felder, auf die Länge gerundet}
+\begin{equation*}
+s = \frac{L}{m} \qquad m = \mathrm{runde}\left(\frac{L}{s_{gewählt}}\right)
+\end{equation*}
+\noindent\textbf{Bewehrung}
+\begin{longtable}{lllrr}
+\hline
+Element & $\text{Lage}\ [\mathrm{mm}]$ & Bewehrung & Stahl & $A_s\ [\mathrm{mm}^2]$ \\
+\hline
+\endhead
+Linie 1 & $(-700;\ 370) \rightarrow (700;\ 370)$ & $10 \varnothing 12\ @\ 155.6\ (\text{gewählt } 150)$ & B500B & $1131$ \\
+\hline
+\end{longtable}
+\noindent\textbf{Stahlfläche der Bewehrung}
+\begin{equation*}
+A_{s,tot} = 1131\,\mathrm{mm}^{2}
+\end{equation*}
+\subsection{Kennzahlen}
+\hinweis{Annahme}{Gerechnet mit voller Verdübelung, wie 5.1.2.1 es annimmt: Stahl und Beton tragen zusammen, ohne Schlupf. Ob die Dübel dafür reichen, prüft das Werkzeug noch nicht.}
+\subsubsection{Festigkeiten}
+\noindent\textbf{Festigkeiten im plastischen Zustand – der Beton nur gedrückt} \hfill \normref{SIA 264:2014, 4.1.3, (1); 4.1.5; 4.3.2.1; 5.1.2.1}
+\begin{equation*}
+f_{yd} = \frac{f_y}{\gamma_a} \qquad 0.85\, f_{cd} = 0.85\, \frac{\eta_{fc}\, f_{ck}}{\gamma_c},\ \eta_{fc} = 1 \qquad f_{sd} = \frac{f_{sk}}{\gamma_s}
+\end{equation*}
+\noindent\textbf{Festigkeiten je Werkstoff}
+\begin{longtable}{llrrrr}
+\hline
+Werkstoff & Art & $f_k\ [\mathrm{N}/\mathrm{mm}^2]$ & $\gamma$ & $\text{gezogen}\ [\mathrm{N}/\mathrm{mm}^2]$ & $\text{gedrückt}\ [\mathrm{N}/\mathrm{mm}^2]$ \\
+\hline
+\endhead
+S460 & Baustahl & $460$ & $1.05$ & $438.1$ & $438.1$ \\
+C30/37 & Beton & $30$ & $1.50$ & $0.0$ & $17.0$ \\
+B500B & Betonstahl & $500$ & $1.15$ & $434.8$ & $434.8$ \\
+\hline
+\end{longtable}
+f\_k ist f\_y in der Dicke der Gruppe, f\_ck oder f\_sk; γ ist γ\_a = γ\_M1 des Baustahls, γ\_c oder γ\_s.
+
+\subsubsection{Normalkraft}
+Der Beton trägt keinen Zug; die Fläche des Betons ist ohne das, was Stahl und Stäbe in ihm einnehmen.
+
+\noindent\textbf{Zugwiderstand: je Werkstoff}
+\begin{longtable}{lrrr}
+\hline
+Werkstoff & $A\ [\mathrm{mm}^2]$ & $f\ [\mathrm{N}/\mathrm{mm}^2]$ & $f\, A\ [\mathrm{kN}]$ \\
+\hline
+\endhead
+S460 & $11259$ & $438.1$ & $4932.6$ \\
+C30/37 & $254610$ & $0.0$ & $0.0$ \\
+B500B & $1131$ & $434.8$ & $491.7$ \\
+\hline
+\end{longtable}
+\noindent\textbf{Zugwiderstand, zusammen} \hfill \normref{SIA 264:2014, 4.3.2.1; 5.1.2.1}
+\begin{equation*}
+N_{pl,Rd}^{+} = 5424.4\,\mathrm{kN}
+\end{equation*}
+\noindent\textbf{Bleche bei Druck}
+\begin{longtable}{llrrrr}
+\hline
+Blech & Grenzen nach & $c/t$ & $\alpha$ & $\text{Grenzen}\ 1 / 2$ & Klasse \\
+\hline
+\endhead
+Profil 1: Flansch oben, links & SIA 264, Tabelle 3 & $118.8/14.0 = 8.5$ & $1.00$ & $6.4 / 10.0$ & 2 \\
+Profil 1: Flansch oben, rechts & SIA 264, Tabelle 3 & $118.8/14.0 = 8.5$ & $1.00$ & $6.4 / 10.0$ & 2 \\
+Profil 1: Flansch unten, links & SIA 264, Tabelle 3 & $118.8/14.0 = 8.5$ & $1.00$ & $6.4 / 10.0$ & 2 \\
+Profil 1: Flansch unten, rechts & SIA 264, Tabelle 3 & $118.8/14.0 = 8.5$ & $1.00$ & $6.4 / 10.0$ & 2 \\
+Profil 1: Steg & SIA 264, 5.2.1.3 & $208.0/8.5 = 24.5$ & $1.00$ & $23.6 / 30.0$ & 2 \\
+\hline
+\end{longtable}
+\noindent\textbf{Plastischer Normalkraftwiderstand, Teil für Teil} \hfill \normref{SIA 264:2014, 5.3.2.4, (14)}
+\begin{equation*}
+N_{pl,Rd} = A_a\, f_{yd} + A_c\, 0.85\, f_{cd} + A_s\, f_{sd}
+\end{equation*}
+\noindent\textbf{Druckwiderstand in Klasse 2: je Werkstoff}
+\begin{longtable}{lrrr}
+\hline
+Werkstoff & $A\ [\mathrm{mm}^2]$ & $f\ [\mathrm{N}/\mathrm{mm}^2]$ & $f\, A\ [\mathrm{kN}]$ \\
+\hline
+\endhead
+S460 & $11259$ & $438.1$ & $4932.6$ \\
+C30/37 & $254610$ & $17.0$ & $4328.4$ \\
+B500B & $1131$ & $434.8$ & $491.7$ \\
+\hline
+\end{longtable}
+\noindent\textbf{Druckwiderstand in Klasse 2, zusammen} \hfill \normref{SIA 264:2014, 5.3.2.4, (14)}
+\begin{equation*}
+N_{pl,Rd}^{-} = -9752.7\,\mathrm{kN}
+\end{equation*}
+\subsubsection{Biegung, Zug unten}
+\noindent\textbf{Plastische Nulllinie bei N = 0: so viel Kraft gezogen wie gedrückt}
+\begin{equation*}
+z_{pl} = 284.7\,\mathrm{mm}
+\end{equation*}
+\noindent\textbf{Bleche bei Biegung, Zug unten}
+\begin{longtable}{llrrrr}
+\hline
+Blech & Grenzen nach & $c/t$ & $\alpha$ & $\text{Grenzen}\ 1 / 2$ & Klasse \\
+\hline
+\endhead
+Profil 1: Flansch oben, links & SIA 263, Tabelle 5b & $118.8/14.0 = 8.5$ & $0.00$ & $– / –$ & 1 \\
+Profil 1: Flansch oben, rechts & SIA 263, Tabelle 5b & $118.8/14.0 = 8.5$ & $0.00$ & $– / –$ & 1 \\
+Profil 1: Flansch unten, links & SIA 263, Tabelle 5b & $118.8/14.0 = 8.5$ & $0.00$ & $– / –$ & 1 \\
+Profil 1: Flansch unten, rechts & SIA 263, Tabelle 5b & $118.8/14.0 = 8.5$ & $0.00$ & $– / –$ & 1 \\
+Profil 1: Steg & SIA 263, Tabelle 5a & $208.0/8.5 = 24.5$ & $0.00$ & $– / –$ & 1 \\
+\hline
+\end{longtable}
+Nulllinie: Zugrichtung n = (0.000; -1.000), -90.0° gegen die y-Achse; gezogen ist, wo n\_y y + n\_z z > -284.7 mm.
+
+\noindent\textbf{Kräfte im plastischen Zustand, Zug unten}
+\begin{longtable}{llrrr}
+\hline
+Teil & Zone & $F\ [\mathrm{kN}]$ & $y\ [\mathrm{mm}]$ & $z\ [\mathrm{mm}]$ \\
+\hline
+\endhead
+Profil 1 (HEA 300) & Zug & $4232.6$ & $0.0$ & $121.5$ \\
+Profil 1 (HEA 300) & Druck & $-700.1$ & $0.0$ & $287.3$ \\
+Polygon 1 & Druck & $-3040.8$ & $0.0$ & $349.9$ \\
+Linie 1 & Druck & $-491.7$ & $0.0$ & $370.0$ \\
+\hline
+\end{longtable}
+\noindent\textbf{Probe: Normalkraft}
+\begin{equation*}
+N_{Rd} = \sum F_i = 0\,\mathrm{kN}
+\end{equation*}
+\noindent\textbf{Probe: Moment um y}
+\begin{equation*}
+M_{y,pl,Rd} = -\sum F_i \cdot (z_i - z_S) = 932.9\,\mathrm{kNm}
+\end{equation*}
+\noindent\textbf{Abminderung für S420 und S460, x\_p/h über 0.15} \hfill \normref{SIA 264:2014, 5.1.2.2, Figur 1}
+\begin{equation*}
+\beta = 1 - 0.15 \cdot \frac{x_p / h - 0.15}{0.4 - 0.15} = 1 - 0.15 \cdot \frac{125.3\,\mathrm{mm} / 410\,\mathrm{mm} - 0.15}{0.4 - 0.15} = 0.907
+\end{equation*}
+\noindent\textbf{Plastischer Momentenwiderstand, mit β gemindert} \hfill \normref{SIA 264:2014, 5.1.2.2, Figur 1}
+\begin{equation*}
+M_{y,Rd}^{+} = \beta \cdot M_{y,pl,Rd} = 0.907 \cdot 932.9\,\mathrm{kNm} = 845.8\,\mathrm{kNm}
+\end{equation*}
+\subsubsection{Biegung, Zug oben}
+\noindent\textbf{Plastische Nulllinie bei N = 0: so viel Kraft gezogen wie gedrückt}
+\begin{equation*}
+z_{pl} = 132.7\,\mathrm{mm}
+\end{equation*}
+\noindent\textbf{Bleche bei Biegung, Zug oben}
+\begin{longtable}{llrrrr}
+\hline
+Blech & Grenzen nach & $c/t$ & $\alpha$ & $\text{Grenzen}\ 1 / 2$ & Klasse \\
+\hline
+\endhead
+Profil 1: Flansch oben, links & SIA 263, Tabelle 5b & $118.8/14.0 = 8.5$ & $0.00$ & $– / –$ & 1 \\
+Profil 1: Flansch oben, rechts & SIA 263, Tabelle 5b & $118.8/14.0 = 8.5$ & $0.00$ & $– / –$ & 1 \\
+Profil 1: Flansch unten, links & SIA 264, Tabelle 3 & $118.8/14.0 = 8.5$ & $1.00$ & $6.4 / 10.0$ & 2 \\
+Profil 1: Flansch unten, rechts & SIA 264, Tabelle 3 & $118.8/14.0 = 8.5$ & $1.00$ & $6.4 / 10.0$ & 2 \\
+Profil 1: Steg & SIA 263, Tabelle 5a & $208.0/8.5 = 24.5$ & $0.44$ & $58.3 / 67.3$ & 1 \\
+\hline
+\end{longtable}
+Nulllinie: Zugrichtung n = (0.000; 1.000), 90.0° gegen die y-Achse; gezogen ist, wo n\_y y + n\_z z > 132.7 mm.
+
+\noindent\textbf{Kräfte im plastischen Zustand, Zug oben}
+\begin{longtable}{llrrr}
+\hline
+Teil & Zone & $F\ [\mathrm{kN}]$ & $y\ [\mathrm{mm}]$ & $z\ [\mathrm{mm}]$ \\
+\hline
+\endhead
+Profil 1 (HEA 300) & Zug & $2512.0$ & $0.0$ & $265.6$ \\
+Profil 1 (HEA 300) & Druck & $-2420.7$ & $0.0$ & $19.9$ \\
+Polygon 1 & Druck & $-583.0$ & $0.0$ & $73.9$ \\
+Linie 1 & Zug & $491.7$ & $0.0$ & $370.0$ \\
+\hline
+\end{longtable}
+\noindent\textbf{Probe: Normalkraft}
+\begin{equation*}
+N_{Rd} = \sum F_i = 0\,\mathrm{kN}
+\end{equation*}
+\noindent\textbf{Probe: Moment um y}
+\begin{equation*}
+M_{y,pl,Rd} = -\sum F_i \cdot (z_i - z_S) = -757.9\,\mathrm{kNm}
+\end{equation*}
+\noindent\textbf{Abminderung für S420 und S460, x\_p/h über 0.15} \hfill \normref{SIA 264:2014, 5.1.2.2, Figur 1}
+\begin{equation*}
+\beta = 1 - 0.15 \cdot \frac{x_p / h - 0.15}{0.4 - 0.15} = 1 - 0.15 \cdot \frac{132.7\,\mathrm{mm} / 410\,\mathrm{mm} - 0.15}{0.4 - 0.15} = 0.896
+\end{equation*}
+\noindent\textbf{Plastischer Momentenwiderstand, mit β gemindert} \hfill \normref{SIA 264:2014, 5.1.2.2, Figur 1}
+\begin{equation*}
+M_{y,Rd}^{-} = \beta \cdot M_{y,pl,Rd} = 0.896 \cdot \left(-757.9\,\mathrm{kNm}\right) = -678.9\,\mathrm{kNm}
+\end{equation*}
+\subsubsection{Biegung, Zug links}
+\noindent\textbf{Plastische Nulllinie bei N = 0: so viel Kraft gezogen wie gedrückt}
+\begin{equation*}
+y_{pl} = 30.2\,\mathrm{mm}
+\end{equation*}
+\noindent\textbf{Bleche bei Biegung, Zug links}
+\begin{longtable}{llrrrr}
+\hline
+Blech & Grenzen nach & $c/t$ & $\alpha$ & $\text{Grenzen}\ 1 / 2$ & Klasse \\
+\hline
+\endhead
+Profil 1: Flansch oben, links & SIA 263, Tabelle 5b & $118.8/14.0 = 8.5$ & $0.00$ & $– / –$ & 1 \\
+Profil 1: Flansch oben, rechts & SIA 264, Tabelle 3 & $118.8/14.0 = 8.5$ & $1.00$ & $6.4 / 10.0$ & 2 \\
+Profil 1: Flansch unten, links & SIA 263, Tabelle 5b & $118.8/14.0 = 8.5$ & $0.00$ & $– / –$ & 1 \\
+Profil 1: Flansch unten, rechts & SIA 264, Tabelle 3 & $118.8/14.0 = 8.5$ & $1.00$ & $6.4 / 10.0$ & 2 \\
+Profil 1: Steg & SIA 263, Tabelle 5a & $208.0/8.5 = 24.5$ & $0.00$ & $– / –$ & 1 \\
+\hline
+\end{longtable}
+\hinweis{Hinweis}{x\_p/h liegt über 0.4, wo Figur 1 endet: dort rechnet das Werkzeug den Biegewiderstand nicht (nach Vorgabe, nicht nachgeschlagen). Der Widerstand steht darum auf null.}
+\noindent\textbf{Momentenwiderstand} \hfill \normref{SIA 264:2014, 5.1.2.1; 4.1.3}
+\begin{equation*}
+M_{z,Rd}^{+} = 0\,\mathrm{kNm}
+\end{equation*}
+\subsubsection{Biegung, Zug rechts}
+\noindent\textbf{Plastische Nulllinie bei N = 0: so viel Kraft gezogen wie gedrückt}
+\begin{equation*}
+y_{pl} = -30.2\,\mathrm{mm}
+\end{equation*}
+\noindent\textbf{Bleche bei Biegung, Zug rechts}
+\begin{longtable}{llrrrr}
+\hline
+Blech & Grenzen nach & $c/t$ & $\alpha$ & $\text{Grenzen}\ 1 / 2$ & Klasse \\
+\hline
+\endhead
+Profil 1: Flansch oben, links & SIA 264, Tabelle 3 & $118.8/14.0 = 8.5$ & $1.00$ & $6.4 / 10.0$ & 2 \\
+Profil 1: Flansch oben, rechts & SIA 263, Tabelle 5b & $118.8/14.0 = 8.5$ & $0.00$ & $– / –$ & 1 \\
+Profil 1: Flansch unten, links & SIA 264, Tabelle 3 & $118.8/14.0 = 8.5$ & $1.00$ & $6.4 / 10.0$ & 2 \\
+Profil 1: Flansch unten, rechts & SIA 263, Tabelle 5b & $118.8/14.0 = 8.5$ & $0.00$ & $– / –$ & 1 \\
+Profil 1: Steg & SIA 263, Tabelle 5a & $208.0/8.5 = 24.5$ & $0.00$ & $– / –$ & 1 \\
+\hline
+\end{longtable}
+\hinweis{Hinweis}{x\_p/h liegt über 0.4, wo Figur 1 endet: dort rechnet das Werkzeug den Biegewiderstand nicht (nach Vorgabe, nicht nachgeschlagen). Der Widerstand steht darum auf null.}
+\noindent\textbf{Momentenwiderstand} \hfill \normref{SIA 264:2014, 5.1.2.1; 4.1.3}
+\begin{equation*}
+M_{z,Rd}^{-} = 0\,\mathrm{kNm}
+\end{equation*}
+\subsubsection{Querkraft}
+\noindent\textbf{Querkraftwiderstand} \hfill \normref{SIA 263:2013, 5.1.4.1, (41)}
+\begin{equation*}
+V_{Rd} = \frac{\tau_y\, A_v}{\gamma_{M1}}
+\end{equation*}
+\noindent\textbf{Beim I und beim U beult der Steg nicht, solange} \hfill \normref{SIA 263:2013, 5.1.4.2, (42)}
+\begin{equation*}
+\frac{h - t_f}{t_w} \le \sqrt{\frac{4 E}{f_y}}
+\end{equation*}
+\noindent\textbf{Schubbeulen des Blechs, ohne Quersteifen} \hfill \normref{SIA 263:2013, 4.5.4.1, (13); Figur 8}
+\begin{equation*}
+V_{Rd} = \frac{0.9 \sqrt{\tau_{cr}\, \tau_y}\, b\, t}{\gamma_{M1}} \le \frac{\tau_y\, b\, t}{\gamma_{M1}} \qquad \tau_{cr} = k_\tau\, 0.9\, E \left(\frac{t}{b}\right)^2 \qquad k_\tau = 5.34
+\end{equation*}
+\noindent\textbf{Querkraft in z: je Profil}
+\begin{longtable}{llrrrlr}
+\hline
+Profil & $A_v\ \text{oder}\ b\, t$ & $[\mathrm{mm}^2]$ & $\text{Beulen}$ & $\tau\ [\mathrm{N}/\mathrm{mm}^2]$ & Stelle & $V_{Rd}\ [\mathrm{kN}]$ \\
+\hline
+\endhead
+Profil 1 (HEA 300) & $11259 - 2 \cdot 300 \cdot 14 + (8.5 + 2 \cdot 27) \cdot 14$ & $3734$ & $32.5 \le 42.7$ & $265$ & SIA 263:2013, 5.1.4.1, (41a) & $942.5$ \\
+\hline
+\end{longtable}
+\noindent\textbf{Querkraftwiderstand in z, alle Profile zusammen} \hfill \normref{SIA 263:2013, 5.1.4.1, (41)}
+\begin{equation*}
+V_{z,Rd} = 942.5\,\mathrm{kN}
+\end{equation*}
+\noindent\textbf{Querkraft in y: je Profil}
+\begin{longtable}{llrrrlr}
+\hline
+Profil & $A_v\ \text{oder}\ b\, t$ & $[\mathrm{mm}^2]$ & $\text{Beulen}$ & $\tau\ [\mathrm{N}/\mathrm{mm}^2]$ & Stelle & $V_{Rd}\ [\mathrm{kN}]$ \\
+\hline
+\endhead
+Profil 1 (HEA 300) & $2 \cdot 300 \cdot 14$ & $8400$ & $–$ & $265$ & nach Vorgabe, nicht nachgeschlagen & $2120.0$ \\
+\hline
+\end{longtable}
+\noindent\textbf{Querkraftwiderstand in y, alle Profile zusammen} \hfill \normref{SIA 263:2013, 5.1.4.1, (41)}
+\begin{equation*}
+V_{y,Rd} = 2120\,\mathrm{kN}
+\end{equation*}
+\subsection{Biegung und Normalkraft}
+\hinweis{Annahme}{Gerechnet mit voller Verdübelung, wie 5.1.2.1 es annimmt: Stahl und Beton tragen zusammen, ohne Schlupf. Ob die Dübel dafür reichen, prüft das Werkzeug noch nicht.}
+\hinweis{Annahme}{Die Klasse an der plastischen Nulllinie des Lastfalls – nach Vorgabe, nicht nachgeschlagen: die Norm sagt nicht, bei welcher Laststufe α gilt.}
+Festigkeiten wie in den Kennzahlen: S460 438.1 N/mm², C30/37 gedrückt 17.0 N/mm², B500B 434.8 N/mm².
+
+\noindent\textbf{Erfüllungsgrad bei fester Normalkraft und fester Richtung}
+\begin{equation*}
+\alpha_{eff} = \frac{M_{Rd}}{M_{Ed}} \qquad M = \sqrt{M_y^2 + M_z^2}
+\end{equation*}
+\subsubsection{Feld}
+\noindent\textbf{Einwirkung}
+\begin{longtable}{lrl}
+\hline
+Einwirkung & Wert &  \\
+\hline
+\endhead
+N\_Ed & $0.0$ & kN \\
+M\_y,Ed & $600.0$ & kNm \\
+M\_z,Ed & $40.0$ & kNm \\
+V\_z,Ed & $150.0$ & kN \\
+V\_y,Ed & $0.0$ & kN \\
+\hline
+\end{longtable}
+Querkraft in z: 150 kN ≤ 0.5 · 942.5 kN – sie mindert nichts.
+
+\noindent\textbf{Bleche im Lastfall}
+\begin{longtable}{llrrrr}
+\hline
+Blech & Grenzen nach & $c/t$ & $\alpha$ & $\text{Grenzen}\ 1 / 2$ & Klasse \\
+\hline
+\endhead
+Profil 1: Flansch oben, links & SIA 263, Tabelle 5b & $118.8/14.0 = 8.5$ & $0.00$ & $– / –$ & 1 \\
+Profil 1: Flansch oben, rechts & SIA 263, Tabelle 5b & $118.8/14.0 = 8.5$ & $0.62$ & $10.4 / 11.5$ & 1 \\
+Profil 1: Flansch unten, links & SIA 263, Tabelle 5b & $118.8/14.0 = 8.5$ & $0.00$ & $– / –$ & 1 \\
+Profil 1: Flansch unten, rechts & SIA 263, Tabelle 5b & $118.8/14.0 = 8.5$ & $0.00$ & $– / –$ & 1 \\
+Profil 1: Steg & SIA 263, Tabelle 5a & $208.0/8.5 = 24.5$ & $0.00$ & $– / –$ & 1 \\
+\hline
+\end{longtable}
+\noindent\textbf{Querschnittsklasse} \hfill \normref{SIA 264:2014, 4.2.2.1, Tabellen 2 und 3; 5.2.1.3; SIA 263:2013, Tabellen 5a und 5b}
+\begin{equation*}
+\mathrm{QK} = 1
+\end{equation*}
+Nulllinie: Zugrichtung n = (-0.020; -1.000), -91.1° gegen die y-Achse; gezogen ist, wo n\_y y + n\_z z > -284.5 mm.
+
+\noindent\textbf{Kräfte im plastischen Zustand – je Teil und Zone}
+\begin{longtable}{llrrr}
+\hline
+Teil & Zone & $F\ [\mathrm{kN}]$ & $y\ [\mathrm{mm}]$ & $z\ [\mathrm{mm}]$ \\
+\hline
+\endhead
+Profil 1 (HEA 300) & Zug & $4213.3$ & $-4.7$ & $120.8$ \\
+Profil 1 (HEA 300) & Druck & $-719.3$ & $27.4$ & $287.0$ \\
+Polygon 1 & Druck & $-3002.3$ & $7.6$ & $350.6$ \\
+Linie 1 & Druck & $-491.7$ & $0.0$ & $370.0$ \\
+\hline
+\end{longtable}
+\noindent\textbf{Probe: Normalkraft}
+\begin{equation*}
+N_{Rd} = \sum F_i = 0\,\mathrm{kN}
+\end{equation*}
+\noindent\textbf{Probe: Moment um y}
+\begin{equation*}
+M_{y,Rd} = -\sum F_i \cdot (z_i - z_S) = 932.2\,\mathrm{kNm}
+\end{equation*}
+\noindent\textbf{Probe: Moment um z}
+\begin{equation*}
+M_{z,Rd} = -\sum F_i \cdot (y_i - y_S) = 62.1\,\mathrm{kNm}
+\end{equation*}
+\noindent\textbf{Widerstand in der Richtung der Einwirkung} \hfill \normref{SIA 264:2014, 5.1.2.1; 4.1.3}
+\begin{equation*}
+M_{pl,Rd} = \sqrt{M_{y,Rd}^{2} + M_{z,Rd}^{2}} = \sqrt{\left(932.2\,\mathrm{kNm}\right)^{2} + \left(62.1\,\mathrm{kNm}\right)^{2}} = 934.2\,\mathrm{kNm}
+\end{equation*}
+\noindent\textbf{Abminderung für S420 und S460, x\_p/h über 0.15} \hfill \normref{SIA 264:2014, 5.1.2.2, Figur 1}
+\begin{equation*}
+\beta = 1 - 0.15 \cdot \frac{x_p / h - 0.15}{0.4 - 0.15} = 1 - 0.15 \cdot \frac{140.4\,\mathrm{mm} / 427.9\,\mathrm{mm} - 0.15}{0.4 - 0.15} = 0.893
+\end{equation*}
+\noindent\textbf{Plastischer Momentenwiderstand, mit β gemindert} \hfill \normref{SIA 264:2014, 5.1.2.2, Figur 1}
+\begin{equation*}
+M_{Rd} = \beta \cdot M_{pl,Rd} = 0.893 \cdot 934.2\,\mathrm{kNm} = 834.4\,\mathrm{kNm}
+\end{equation*}
+\noindent\textbf{Erfüllungsgrad}
+\begin{equation*}
+\alpha_{eff,\text{Feld}} = \frac{M_{Rd}}{M_{Ed}} = \frac{834.4\,\mathrm{kNm}}{601.3\,\mathrm{kNm}} = 1.39 \quad \Rightarrow \quad \text{erfüllt}
+\end{equation*}
+\subsubsection{Stütze}
+\noindent\textbf{Einwirkung}
+\begin{longtable}{lrl}
+\hline
+Einwirkung & Wert &  \\
+\hline
+\endhead
+N\_Ed & $0.0$ & kN \\
+M\_y,Ed & $-300.0$ & kNm \\
+M\_z,Ed & $0.0$ & kNm \\
+V\_z,Ed & $500.0$ & kN \\
+V\_y,Ed & $0.0$ & kN \\
+T\_Ed & $2.0$ & kNm \\
+\hline
+\end{longtable}
+\hinweis{Hinweis}{Torsion weist das Werkzeug beim Verbundquerschnitt nicht nach (nach Vorgabe, nicht nachgeschlagen).}
+\noindent\textbf{Querkraft in z über der Hälfte von V\_Rd: was die Bleche, in denen sie steht, für Normalkraft und Biegung verlieren} \hfill \normref{SIA 264:2014, 4.3.2.2; SIA 263:2013, 5.1.5.1, (43)}
+\begin{equation*}
+\rho_{z} = \left(\frac{V_{z,Ed}}{V_{z,Rd}}\right)^2 = \left(\frac{500\,\mathrm{kN}}{942.5\,\mathrm{kN}}\right)^2 = 0.281
+\end{equation*}
+Gemindert: Profil 1: Steg. Ein Teil eines Blechs zählt mit 1 − ρ; in den Tabellen steht, was die Querkraft nimmt, mit negativer Kraft.
+
+\hinweis{Annahme}{Dieselbe Minderung für jedes Profil und jede Richtung, auch für die Normalkraft, und in den Klassen 3 und 4 statt der Vergleichsspannung – nach Vorgabe, nicht nachgeschlagen.}
+\noindent\textbf{Bleche im Lastfall}
+\begin{longtable}{llrrrr}
+\hline
+Blech & Grenzen nach & $c/t$ & $\alpha$ & $\text{Grenzen}\ 1 / 2$ & Klasse \\
+\hline
+\endhead
+Profil 1: Flansch oben, links & SIA 263, Tabelle 5b & $118.8/14.0 = 8.5$ & $0.00$ & $– / –$ & 1 \\
+Profil 1: Flansch oben, rechts & SIA 263, Tabelle 5b & $118.8/14.0 = 8.5$ & $0.00$ & $– / –$ & 1 \\
+Profil 1: Flansch unten, links & SIA 264, Tabelle 3 & $118.8/14.0 = 8.5$ & $1.00$ & $6.4 / 10.0$ & 2 \\
+Profil 1: Flansch unten, rechts & SIA 264, Tabelle 3 & $118.8/14.0 = 8.5$ & $1.00$ & $6.4 / 10.0$ & 2 \\
+Profil 1: Steg & SIA 263, Tabelle 5a & $208.0/8.5 = 24.5$ & $0.43$ & $60.0 / 69.1$ & 1 \\
+\hline
+\end{longtable}
+\noindent\textbf{Querschnittsklasse – massgebend Profil 1: Flansch unten, links} \hfill \normref{SIA 264:2014, 4.2.2.1, Tabellen 2 und 3; 5.2.1.3; SIA 263:2013, Tabellen 5a und 5b}
+\begin{equation*}
+\mathrm{QK} = 2
+\end{equation*}
+Nulllinie: Zugrichtung n = (-0.000; 1.000), 90.0° gegen die y-Achse; gezogen ist, wo n\_y y + n\_z z > 130.2 mm.
+
+\noindent\textbf{Kräfte im plastischen Zustand – je Teil und Zone}
+\begin{longtable}{llrrr}
+\hline
+Teil & Zone & $F\ [\mathrm{kN}]$ & $y\ [\mathrm{mm}]$ & $z\ [\mathrm{mm}]$ \\
+\hline
+\endhead
+Profil 1 (HEA 300) & Zug & $2521.3$ & $0.0$ & $265.1$ \\
+Profil 1 (HEA 300) & Druck & $-2411.4$ & $0.0$ & $19.4$ \\
+Profil 1 (HEA 300), Steg, Querkraft in z & Zug & $-152.8$ & $0.0$ & $203.1$ \\
+Profil 1 (HEA 300), Steg, Querkraft in z & Druck & $121.8$ & $0.0$ & $72.1$ \\
+Polygon 1 & Druck & $-570.7$ & $0.0$ & $72.6$ \\
+Linie 1 & Zug & $491.7$ & $0.0$ & $370.0$ \\
+\hline
+\end{longtable}
+\noindent\textbf{Probe: Normalkraft}
+\begin{equation*}
+N_{Rd} = \sum F_i = 0\,\mathrm{kN}
+\end{equation*}
+\noindent\textbf{Probe: Moment um y}
+\begin{equation*}
+M_{y,Rd} = -\sum F_i \cdot (z_i - z_S) = -739.7\,\mathrm{kNm}
+\end{equation*}
+\noindent\textbf{Probe: Moment um z}
+\begin{equation*}
+M_{z,Rd} = -\sum F_i \cdot (y_i - y_S) = 0\,\mathrm{kNm}
+\end{equation*}
+\noindent\textbf{Widerstand in der Richtung der Einwirkung} \hfill \normref{SIA 264:2014, 5.1.2.1; 4.1.3}
+\begin{equation*}
+M_{pl,Rd} = \sqrt{M_{y,Rd}^{2} + M_{z,Rd}^{2}} = \sqrt{\left(-739.7\,\mathrm{kNm}\right)^{2} + \left(0\,\mathrm{kNm}\right)^{2}} = 739.7\,\mathrm{kNm}
+\end{equation*}
+\noindent\textbf{Abminderung für S420 und S460, x\_p/h über 0.15} \hfill \normref{SIA 264:2014, 5.1.2.2, Figur 1}
+\begin{equation*}
+\beta = 1 - 0.15 \cdot \frac{x_p / h - 0.15}{0.4 - 0.15} = 1 - 0.15 \cdot \frac{130.2\,\mathrm{mm} / 410\,\mathrm{mm} - 0.15}{0.4 - 0.15} = 0.899
+\end{equation*}
+\noindent\textbf{Plastischer Momentenwiderstand, mit β gemindert} \hfill \normref{SIA 264:2014, 5.1.2.2, Figur 1}
+\begin{equation*}
+M_{Rd} = \beta \cdot M_{pl,Rd} = 0.899 \cdot 739.7\,\mathrm{kNm} = 665.3\,\mathrm{kNm}
+\end{equation*}
+\noindent\textbf{Erfüllungsgrad}
+\begin{equation*}
+\alpha_{eff,\text{Stütze}} = \frac{M_{Rd}}{M_{Ed}} = \frac{665.3\,\mathrm{kNm}}{300\,\mathrm{kNm}} = 2.22 \quad \Rightarrow \quad \text{erfüllt}
+\end{equation*}
+\subsubsection{Druck mit Biegung}
+\noindent\textbf{Einwirkung}
+\begin{longtable}{lrl}
+\hline
+Einwirkung & Wert &  \\
+\hline
+\endhead
+N\_Ed & $-4000.0$ & kN \\
+M\_y,Ed & $300.0$ & kNm \\
+M\_z,Ed & $0.0$ & kNm \\
+V\_z,Ed & $0.0$ & kN \\
+V\_y,Ed & $0.0$ & kN \\
+\hline
+\end{longtable}
+\noindent\textbf{Bleche im Lastfall}
+\begin{longtable}{llrrrr}
+\hline
+Blech & Grenzen nach & $c/t$ & $\alpha$ & $\text{Grenzen}\ 1 / 2$ & Klasse \\
+\hline
+\endhead
+Profil 1: Flansch oben, links & SIA 264, Tabelle 3 & $118.8/14.0 = 8.5$ & $1.00$ & $6.4 / 10.0$ & 2 \\
+Profil 1: Flansch oben, rechts & SIA 264, Tabelle 3 & $118.8/14.0 = 8.5$ & $1.00$ & $6.4 / 10.0$ & 2 \\
+Profil 1: Flansch unten, links & SIA 263, Tabelle 5b & $118.8/14.0 = 8.5$ & $0.00$ & $– / –$ & 1 \\
+Profil 1: Flansch unten, rechts & SIA 263, Tabelle 5b & $118.8/14.0 = 8.5$ & $0.00$ & $– / –$ & 1 \\
+Profil 1: Steg & SIA 263, Tabelle 5a & $208.0/8.5 = 24.5$ & $0.43$ & $59.6 / 68.7$ & 1 \\
+\hline
+\end{longtable}
+\hinweis{Hinweis}{x\_p/h liegt über 0.4, wo Figur 1 endet: dort rechnet das Werkzeug den Biegewiderstand nicht (nach Vorgabe, nicht nachgeschlagen).}
+\subsubsection{Zug}
+\noindent\textbf{Einwirkung}
+\begin{longtable}{lrl}
+\hline
+Einwirkung & Wert &  \\
+\hline
+\endhead
+N\_Ed & $1000.0$ & kN \\
+M\_y,Ed & $0.0$ & kNm \\
+M\_z,Ed & $0.0$ & kNm \\
+V\_z,Ed & $0.0$ & kN \\
+V\_y,Ed & $0.0$ & kN \\
+\hline
+\end{longtable}
+\noindent\textbf{Bleche im Lastfall}
+\begin{longtable}{llrrrr}
+\hline
+Blech & Grenzen nach & $c/t$ & $\alpha$ & $\text{Grenzen}\ 1 / 2$ & Klasse \\
+\hline
+\endhead
+Profil 1: Flansch oben, links & SIA 263, Tabelle 5b & $118.8/14.0 = 8.5$ & $0.00$ & $– / –$ & 1 \\
+Profil 1: Flansch oben, rechts & SIA 263, Tabelle 5b & $118.8/14.0 = 8.5$ & $0.00$ & $– / –$ & 1 \\
+Profil 1: Flansch unten, links & SIA 263, Tabelle 5b & $118.8/14.0 = 8.5$ & $0.00$ & $– / –$ & 1 \\
+Profil 1: Flansch unten, rechts & SIA 263, Tabelle 5b & $118.8/14.0 = 8.5$ & $0.00$ & $– / –$ & 1 \\
+Profil 1: Steg & SIA 263, Tabelle 5a & $208.0/8.5 = 24.5$ & $0.00$ & $– / –$ & 1 \\
+\hline
+\end{longtable}
+\noindent\textbf{Querschnittsklasse} \hfill \normref{SIA 264:2014, 4.2.2.1, Tabellen 2 und 3; 5.2.1.3; SIA 263:2013, Tabellen 5a und 5b}
+\begin{equation*}
+\mathrm{QK} = 1
+\end{equation*}
+\noindent\textbf{Zugwiderstand, Σ f A je Werkstoff} \hfill \normref{SIA 264:2014, 4.3.2.1; 5.1.2.1}
+\begin{equation*}
+N_{pl,Rd}^{+} = 5424.4\,\mathrm{kN}
+\end{equation*}
+\noindent\textbf{Erfüllungsgrad}
+\begin{equation*}
+\alpha_{eff,\text{Zug}} = \frac{N_{pl,Rd}^{+}}{N_{Ed}} = \frac{5424.4\,\mathrm{kN}}{1000\,\mathrm{kN}} = 5.42 \quad \Rightarrow \quad \text{erfüllt}
+\end{equation*}
+\subsubsection{Druck}
+\noindent\textbf{Einwirkung}
+\begin{longtable}{lrl}
+\hline
+Einwirkung & Wert &  \\
+\hline
+\endhead
+N\_Ed & $-5000.0$ & kN \\
+M\_y,Ed & $0.0$ & kNm \\
+M\_z,Ed & $0.0$ & kNm \\
+V\_z,Ed & $0.0$ & kN \\
+V\_y,Ed & $0.0$ & kN \\
+\hline
+\end{longtable}
+\noindent\textbf{Bleche im Lastfall}
+\begin{longtable}{llrrrr}
+\hline
+Blech & Grenzen nach & $c/t$ & $\alpha$ & $\text{Grenzen}\ 1 / 2$ & Klasse \\
+\hline
+\endhead
+Profil 1: Flansch oben, links & SIA 264, Tabelle 3 & $118.8/14.0 = 8.5$ & $1.00$ & $6.4 / 10.0$ & 2 \\
+Profil 1: Flansch oben, rechts & SIA 264, Tabelle 3 & $118.8/14.0 = 8.5$ & $1.00$ & $6.4 / 10.0$ & 2 \\
+Profil 1: Flansch unten, links & SIA 264, Tabelle 3 & $118.8/14.0 = 8.5$ & $1.00$ & $6.4 / 10.0$ & 2 \\
+Profil 1: Flansch unten, rechts & SIA 264, Tabelle 3 & $118.8/14.0 = 8.5$ & $1.00$ & $6.4 / 10.0$ & 2 \\
+Profil 1: Steg & SIA 264, 5.2.1.3 & $208.0/8.5 = 24.5$ & $1.00$ & $23.6 / 30.0$ & 2 \\
+\hline
+\end{longtable}
+\noindent\textbf{Querschnittsklasse – massgebend Profil 1: Flansch oben, links} \hfill \normref{SIA 264:2014, 4.2.2.1, Tabellen 2 und 3; 5.2.1.3; SIA 263:2013, Tabellen 5a und 5b}
+\begin{equation*}
+\mathrm{QK} = 2
+\end{equation*}
+\noindent\textbf{Druckwiderstand, Σ f A je Werkstoff} \hfill \normref{SIA 264:2014, 5.3.2.4, (14)}
+\begin{equation*}
+N_{pl,Rd}^{-} = -9752.7\,\mathrm{kN}
+\end{equation*}
+\noindent\textbf{Erfüllungsgrad}
+\begin{equation*}
+\alpha_{eff,\text{Druck}} = \frac{N_{pl,Rd}^{-}}{N_{Ed}} = \frac{-9752.7\,\mathrm{kN}}{-5000\,\mathrm{kN}} = 1.95 \quad \Rightarrow \quad \text{erfüllt}
+\end{equation*}
+\subsubsection{Zu viel Druck}
+\noindent\textbf{Einwirkung}
+\begin{longtable}{lrl}
+\hline
+Einwirkung & Wert &  \\
+\hline
+\endhead
+N\_Ed & $-20000.0$ & kN \\
+M\_y,Ed & $10.0$ & kNm \\
+M\_z,Ed & $0.0$ & kNm \\
+V\_z,Ed & $0.0$ & kN \\
+V\_y,Ed & $0.0$ & kN \\
+\hline
+\end{longtable}
+Die Normalkraft liegt jenseits dessen, was der Querschnitt ganz gezogen oder ganz gedrückt aufnimmt – es gibt keinen Zustand mit diesem N.
+
+\noindent\textbf{Druckwiderstand, Σ f A je Werkstoff} \hfill \normref{SIA 264:2014, 5.3.2.4, (14)}
+\begin{equation*}
+N_{pl,Rd}^{-} = -9752.7\,\mathrm{kN}
+\end{equation*}
+\noindent\textbf{Erfüllungsgrad}
+\begin{equation*}
+\alpha_{eff,\text{Zu viel Druck}} = \frac{N_{pl,Rd}^{-}}{N_{Ed}} = \frac{-9752.7\,\mathrm{kN}}{-20000\,\mathrm{kN}} = 0.49 \quad \Rightarrow \quad \text{NICHT erfüllt}
+\end{equation*}
+\subsection{Querkraft}
+\subsubsection{Feld}
+\noindent\textbf{Querkraft in z}
+\begin{equation*}
+V_{z,Ed} = 150\,\mathrm{kN} \quad \le \quad V_{z,Rd} = 942.5\,\mathrm{kN}
+\end{equation*}
+\noindent\textbf{Erfüllungsgrad}
+\begin{equation*}
+\alpha_{V,\text{Feld}} = \frac{V_{z,Rd}}{V_{z,Ed}} = \frac{942.5\,\mathrm{kN}}{150\,\mathrm{kN}} = 6.28 \quad \Rightarrow \quad \text{erfüllt}
+\end{equation*}
+\subsubsection{Stütze}
+\noindent\textbf{Querkraft in z}
+\begin{equation*}
+V_{z,Ed} = 500\,\mathrm{kN} \quad \le \quad V_{z,Rd} = 942.5\,\mathrm{kN}
+\end{equation*}
+\noindent\textbf{Erfüllungsgrad}
+\begin{equation*}
+\alpha_{V,\text{Stütze}} = \frac{V_{z,Rd}}{V_{z,Ed}} = \frac{942.5\,\mathrm{kN}}{500\,\mathrm{kN}} = 1.88 \quad \Rightarrow \quad \text{erfüllt}
+\end{equation*}
+\subsubsection{Druck mit Biegung}
+Keine Einwirkung → kein Nachweis.
+
+\subsubsection{Zug}
+Keine Einwirkung → kein Nachweis.
+
+\subsubsection{Druck}
+Keine Einwirkung → kein Nachweis.
+
+\subsubsection{Zu viel Druck}
+Keine Einwirkung → kein Nachweis.
+
+\subsection{Torsionsträgheitsmoment}
+\hinweis{Annahme}{I\_T nach St. Venant am Bruttoquerschnitt, ungerissen und ohne Bewehrung, numerisch aus der Spannungsfunktion von Prandtl (nach Vorgabe, nicht nachgeschlagen).}
+\noindent\textbf{Spannungsfunktion von Prandtl; am Rand des Hohlraums k ist φ = φ\_k}
+\begin{equation*}
+\nabla^2 \phi = -2 \qquad \phi = 0 \ \text{am Rand} \qquad \oint_k \frac{\partial \phi}{\partial n}\, ds = -2\, A_k
+\end{equation*}
+\noindent\textbf{Torsionsträgheitsmoment aus der Spannungsfunktion}
+\begin{equation*}
+I_T = 2 \int_A \phi\, dA + 2 \sum_k \phi_k\, A_k
+\end{equation*}
+\noindent\textbf{Die beiden Gitter}
+\begin{longtable}{lrrrr}
+\hline
+Gitter & Zellen & mit Material & $A_k\ [\mathrm{mm}^2]$ & $I_T\ [10^6\,\mathrm{mm}^4]$ \\
+\hline
+\endhead
+grob & $62 \times 22$ & $596$ & – & $2955.7$ \\
+fein & $124 \times 44$ & $2384$ & – & $2888.1$ \\
+\hline
+\end{longtable}
+\noindent\textbf{Torsionsträgheitsmoment, nach Richardson aus beiden Gittern}
+\begin{equation*}
+\begin{aligned}
+  I_T &= \frac{4 \cdot I_{T,fein} - I_{T,grob}}{3} \\
+  &= \frac{4 \cdot 2888.1\,\cdot 10^{6}\,\mathrm{mm}^{4} - 2955.7\,\cdot 10^{6}\,\mathrm{mm}^{4}}{3} \\
+  &= 2865.6\,\cdot 10^{6}\,\mathrm{mm}^{4}
+\end{aligned}
+\end{equation*}
+\subsection{Baustahl: S460}
+\noindent\textbf{Streckgrenze} \hfill \normref{SIA 263:2013, 3.2.2.3, Tabelle 1}
+\begin{equation*}
+f_{y,\text{S460}} = 460\,\mathrm{N}/\mathrm{mm}^{2}
+\end{equation*}
+\noindent\textbf{Streckgrenze für 40 mm < t ≤ 100 mm} \hfill \normref{SIA 263:2013, 3.2.2.3, Tabelle 1}
+\begin{equation*}
+f_{y,\text{S460}}^{t>40} = 430\,\mathrm{N}/\mathrm{mm}^{2}
+\end{equation*}
+\noindent\textbf{Fliessschubspannung} \hfill \normref{SIA 263:2013, 3.2.2.3, Tabelle 1}
+\begin{equation*}
+\tau_{y,\text{S460}} = 265\,\mathrm{N}/\mathrm{mm}^{2}
+\end{equation*}
+\noindent\textbf{Fliessschubspannung für 40 mm < t ≤ 100 mm} \hfill \normref{SIA 263:2013, 3.2.2.3, Tabelle 1}
+\begin{equation*}
+\tau_{y,\text{S460}}^{t>40} = 248\,\mathrm{N}/\mathrm{mm}^{2}
+\end{equation*}
+\noindent\textbf{Widerstandsbeiwert für Festigkeits- und Stabilitätsnachweise} \hfill \normref{SIA 263:2013, 4.1.3}
+\begin{equation*}
+\gamma_{M1,\text{S460}} = 1.05
+\end{equation*}
+\noindent\textbf{Elastizitätsmodul des Baustahls} \hfill \normref{SIA 263:2013, 3.2.2.1}
+\begin{equation*}
+E_{a,\text{S460}} = 210000\,\mathrm{N}/\mathrm{mm}^{2}
 \end{equation*}
 \subsection{Querschnittsanalyse: Holzträger}
 \noindent\textbf{Fläche und Schwerpunkt eines Polygons (Satz von Gauss)}
@@ -17056,27 +17753,31 @@ g_{k,\text{Q5,C30/37}} = \rho_{sb} \cdot g \cdot A_{\text{Q5}} = 2500\,\mathrm{k
 \end{equation*}
 \noindent\textbf{Dehnsteifigkeit, «Rohr» aus S355}
 \begin{equation*}
-EA_{\text{Q3,S355}} = E_a \cdot A_{\text{Q3}} = 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 4973\,\mathrm{mm}^{2} = 1044\,\mathrm{MN}
+EA_{\text{Q3,S355}} = E_{a,\text{S355}} \cdot A_{\text{Q3}} = 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 4973\,\mathrm{mm}^{2} = 1044\,\mathrm{MN}
 \end{equation*}
 \noindent\textbf{Biegesteifigkeit, «Rohr» aus S355}
 \begin{equation*}
-EI_{\text{Q3,S355}} = E_a \cdot I_{y,\text{Q3}} = 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 15.64\,\cdot 10^{6}\,\mathrm{mm}^{4} = 3284\,\mathrm{kNm}^{2}
+EI_{\text{Q3,S355}} = E_{a,\text{S355}} \cdot I_{y,\text{Q3}} = 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 15.64\,\cdot 10^{6}\,\mathrm{mm}^{4} = 3284\,\mathrm{kNm}^{2}
 \end{equation*}
 \noindent\textbf{Eigengewicht, «Rohr» aus S355}
 \begin{equation*}
-g_{k,\text{Q3,S355}} = \rho_a \cdot g \cdot A_{\text{Q3}} = 7850\,\mathrm{kg}/\mathrm{m}^{3} \cdot 10\,\mathrm{m}/\mathrm{s}^{2} \cdot 4973\,\mathrm{mm}^{2} = 0.39\,\mathrm{kN}/\mathrm{m}
+g_{k,\text{Q3,S355}} = \rho_{a,\text{S355}} \cdot g \cdot A_{\text{Q3}} = 7850\,\mathrm{kg}/\mathrm{m}^{3} \cdot 10\,\mathrm{m}/\mathrm{s}^{2} \cdot 4973\,\mathrm{mm}^{2} = 0.39\,\mathrm{kN}/\mathrm{m}
 \end{equation*}
 \noindent\textbf{Dehnsteifigkeit, «Träger» aus S355}
 \begin{equation*}
-EA_{\text{Q11,S355}} = E_a \cdot A_{\text{Q11}} = 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 149.08\,\mathrm{cm}^{2} = 3131\,\mathrm{MN}
+EA_{\text{Q11,S355}} = E_{a,\text{S355}} \cdot A_{\text{Q11}} = 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 149.08\,\mathrm{cm}^{2} = 3131\,\mathrm{MN}
 \end{equation*}
 \noindent\textbf{Biegesteifigkeit, «Träger» aus S355}
 \begin{equation*}
-EI_{\text{Q11,S355}} = E_a \cdot I_{y,\text{Q11}} = 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 25165.66\,\mathrm{cm}^{4} = 52848\,\mathrm{kNm}^{2}
+EI_{\text{Q11,S355}} = E_{a,\text{S355}} \cdot I_{y,\text{Q11}} = 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 25165.66\,\mathrm{cm}^{4} = 52848\,\mathrm{kNm}^{2}
 \end{equation*}
 \noindent\textbf{Eigengewicht, «Träger» aus S355}
 \begin{equation*}
-g_{k,\text{Q11,S355}} = \rho_a \cdot g \cdot A_{\text{Q11}} = 7850\,\mathrm{kg}/\mathrm{m}^{3} \cdot 10\,\mathrm{m}/\mathrm{s}^{2} \cdot 149.08\,\mathrm{cm}^{2} = 1.17\,\mathrm{kN}/\mathrm{m}
+\begin{aligned}
+  g_{k,\text{Q11,S355}} &= \rho_{a,\text{S355}} \cdot g \cdot A_{\text{Q11}} \\
+  &= 7850\,\mathrm{kg}/\mathrm{m}^{3} \cdot 10\,\mathrm{m}/\mathrm{s}^{2} \cdot 149.08\,\mathrm{cm}^{2} \\
+  &= 1.17\,\mathrm{kN}/\mathrm{m}
+\end{aligned}
 \end{equation*}
 \noindent\textbf{E-Modul, «Fundamentbeton» (von Hand)}
 \begin{equation*}
@@ -17112,15 +17813,15 @@ E_{\text{Fundamentbeton}} = 15000\,\mathrm{N}/\mathrm{mm}^{2}
 \end{equation*}
 \noindent\textbf{Dehnsteifigkeit, «Hohlprofil» aus S355}
 \begin{equation*}
-EA_{\text{Q4,S355}} = E_a \cdot A_{\text{Q4}} = 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 11875\,\mathrm{mm}^{2} = 2494\,\mathrm{MN}
+EA_{\text{Q4,S355}} = E_{a,\text{S355}} \cdot A_{\text{Q4}} = 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 11875\,\mathrm{mm}^{2} = 2494\,\mathrm{MN}
 \end{equation*}
 \noindent\textbf{Biegesteifigkeit, «Hohlprofil» aus S355}
 \begin{equation*}
-EI_{\text{Q4,S355}} = E_a \cdot I_{y,\text{Q4}} = 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 146.71\,\cdot 10^{6}\,\mathrm{mm}^{4} = 30810\,\mathrm{kNm}^{2}
+EI_{\text{Q4,S355}} = E_{a,\text{S355}} \cdot I_{y,\text{Q4}} = 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 146.71\,\cdot 10^{6}\,\mathrm{mm}^{4} = 30810\,\mathrm{kNm}^{2}
 \end{equation*}
 \noindent\textbf{Eigengewicht, «Hohlprofil» aus S355}
 \begin{equation*}
-g_{k,\text{Q4,S355}} = \rho_a \cdot g \cdot A_{\text{Q4}} = 7850\,\mathrm{kg}/\mathrm{m}^{3} \cdot 10\,\mathrm{m}/\mathrm{s}^{2} \cdot 11875\,\mathrm{mm}^{2} = 0.93\,\mathrm{kN}/\mathrm{m}
+g_{k,\text{Q4,S355}} = \rho_{a,\text{S355}} \cdot g \cdot A_{\text{Q4}} = 7850\,\mathrm{kg}/\mathrm{m}^{3} \cdot 10\,\mathrm{m}/\mathrm{s}^{2} \cdot 11875\,\mathrm{mm}^{2} = 0.93\,\mathrm{kN}/\mathrm{m}
 \end{equation*}
 \noindent\textbf{E-Modul, «Kasten» (E\_eq)}
 \begin{equation*}
@@ -17762,23 +18463,27 @@ g_{k,\text{Q1,C30/37}} = \rho_{sb} \cdot g \cdot A_{\text{Q1}} = 2500\,\mathrm{k
 \end{equation*}
 \noindent\textbf{Dehnsteifigkeit, «Stütze» aus S355}
 \begin{equation*}
-EA_{\text{Q2,S355}} = E_a \cdot A_{\text{Q2}} = 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 149.08\,\mathrm{cm}^{2} = 3131\,\mathrm{MN}
+EA_{\text{Q2,S355}} = E_{a,\text{S355}} \cdot A_{\text{Q2}} = 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 149.08\,\mathrm{cm}^{2} = 3131\,\mathrm{MN}
 \end{equation*}
 \noindent\textbf{Biegesteifigkeit um y, «Stütze» aus S355}
 \begin{equation*}
-EI_{y,\text{Q2,S355}} = E_a \cdot I_{y,\text{Q2}} = 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 25165.66\,\mathrm{cm}^{4} = 52848\,\mathrm{kNm}^{2}
+EI_{y,\text{Q2,S355}} = E_{a,\text{S355}} \cdot I_{y,\text{Q2}} = 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 25165.66\,\mathrm{cm}^{4} = 52848\,\mathrm{kNm}^{2}
 \end{equation*}
 \noindent\textbf{Biegesteifigkeit um z, «Stütze» aus S355}
 \begin{equation*}
-EI_{z,\text{Q2,S355}} = E_a \cdot I_{z,\text{Q2}} = 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 8562.83\,\mathrm{cm}^{4} = 17982\,\mathrm{kNm}^{2}
+EI_{z,\text{Q2,S355}} = E_{a,\text{S355}} \cdot I_{z,\text{Q2}} = 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 8562.83\,\mathrm{cm}^{4} = 17982\,\mathrm{kNm}^{2}
 \end{equation*}
 \noindent\textbf{Torsionssteifigkeit, «Stütze» aus S355}
 \begin{equation*}
-GI_{T,\text{Q2,S355}} = G_a \cdot I_{T,\text{Q2}} = 81000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 185.05\,\mathrm{cm}^{4} = 150\,\mathrm{kNm}^{2}
+GI_{T,\text{Q2,S355}} = G_{a,\text{S355}} \cdot I_{T,\text{Q2}} = 81000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 185.05\,\mathrm{cm}^{4} = 150\,\mathrm{kNm}^{2}
 \end{equation*}
 \noindent\textbf{Eigengewicht, «Stütze» aus S355}
 \begin{equation*}
-g_{k,\text{Q2,S355}} = \rho_a \cdot g \cdot A_{\text{Q2}} = 7850\,\mathrm{kg}/\mathrm{m}^{3} \cdot 10\,\mathrm{m}/\mathrm{s}^{2} \cdot 149.08\,\mathrm{cm}^{2} = 1.17\,\mathrm{kN}/\mathrm{m}
+\begin{aligned}
+  g_{k,\text{Q2,S355}} &= \rho_{a,\text{S355}} \cdot g \cdot A_{\text{Q2}} \\
+  &= 7850\,\mathrm{kg}/\mathrm{m}^{3} \cdot 10\,\mathrm{m}/\mathrm{s}^{2} \cdot 149.08\,\mathrm{cm}^{2} \\
+  &= 1.17\,\mathrm{kN}/\mathrm{m}
+\end{aligned}
 \end{equation*}
 \noindent\textbf{E-Modul, «Brettschichtholz» (von Hand)}
 \begin{equation*}
@@ -19859,6 +20564,8 @@ Jedes Teil rechnet mit der Fliessgrenze seiner Dicke: ein Profil mit der seines 
 
 Je Profil allein, ohne Normalkraft und Biegung: kein Blech ist gedrückt, der Querschnitt rechnet plastisch. Beim I und beim U prüft (42), ob der Steg beulen kann; tut er es, trägt er nach (13). Die Wände eines Rechteckrohrs tragen je nach (13). Zusammen tragen die Profile die Summe; frei gezeichnete Flächen tragen nichts.
 
+Was der Verbundquerschnitt aufnimmt, ohne Bezug auf einen Lastfall: die Widerstände gegen Zug, Druck und Biegung, plastisch nach SIA 264, und mit Profilen gegen Querkraft – die trägt der Stahl allein (4.3.2.2). Knicken, Kippen und die Verdübelung gehören dem Träger und sind hier nicht dabei.
+
 Was die Platte in x aufnimmt, ohne Bezug auf eine Einwirkung: die Eckwerte der Handrechnung mit Bemessungswerten und der Querkraftwiderstand ohne Normalkraft. Wo eine Seite massgebend ist, gilt das Kleinere beider Seiten.
 
 Mit Bügeln trägt das Fachwerk; gesucht wird ganzgradig zwischen α\_min und α\_max die Neigung mit dem grössten Widerstand. Ohne Normalkraft bleiben die Grenzen, wie sie eingegeben sind.
@@ -19877,7 +20584,7 @@ Was der Holzquerschnitt aufnimmt, ohne Bezug auf einen Lastfall: je Beanspruchun
 \end{equation*}
 \noindent\textbf{Zugwiderstand, am gezeichneten Querschnitt} \hfill \normref{SIA 263:2013, 5.1.2.1, (38)}
 \begin{equation*}
-N_{Rd}^{+} = \frac{f_y \cdot A}{\gamma_{M1}}
+N_{Rd}^{+} = \frac{f_{y} \cdot A}{\gamma_{M1}}
 \end{equation*}
 \noindent\textbf{Mitwirkende Breite, b zwischen den theoretischen Scheibenschnittlinien} \hfill \normref{SIA 263:2013, 4.5.3.2, (11); 4.5.3.3}
 \begin{equation*}
@@ -19885,7 +20592,7 @@ N_{Rd}^{+} = \frac{f_y \cdot A}{\gamma_{M1}}
 \end{equation*}
 \noindent\textbf{Plastischer Widerstand in Klasse 1} \hfill \normref{SIA 263:2013, 5.1.3, (40)}
 \begin{equation*}
-M_{y,Rd}^{+} = \frac{f_y \cdot W_{pl}}{\gamma_{M1}}
+M_{y,Rd}^{+} = \frac{f_{y} \cdot W_{pl}}{\gamma_{M1}}
 \end{equation*}
 \noindent\textbf{Querkraftwiderstand} \hfill \normref{SIA 263:2013, 5.1.4.1, (41)}
 \begin{equation*}
@@ -19898,6 +20605,22 @@ V_{Rd} = \frac{\tau_y\, A_v}{\gamma_{M1}}
 \noindent\textbf{Schubbeulen des Blechs, ohne Quersteifen} \hfill \normref{SIA 263:2013, 4.5.4.1, (13); Figur 8}
 \begin{equation*}
 V_{Rd} = \frac{0.9 \sqrt{\tau_{cr}\, \tau_y}\, b\, t}{\gamma_{M1}} \le \frac{\tau_y\, b\, t}{\gamma_{M1}} \qquad \tau_{cr} = k_\tau\, 0.9\, E \left(\frac{t}{b}\right)^2 \qquad k_\tau = 5.34
+\end{equation*}
+\noindent\textbf{Festigkeiten im plastischen Zustand – der Beton nur gedrückt} \hfill \normref{SIA 264:2014, 4.1.3, (1); 4.1.5; 4.3.2.1; 5.1.2.1}
+\begin{equation*}
+f_{yd} = \frac{f_y}{\gamma_a} \qquad 0.85\, f_{cd} = 0.85\, \frac{\eta_{fc}\, f_{ck}}{\gamma_c},\ \eta_{fc} = 1 \qquad f_{sd} = \frac{f_{sk}}{\gamma_s}
+\end{equation*}
+\noindent\textbf{Plastischer Normalkraftwiderstand, Teil für Teil} \hfill \normref{SIA 264:2014, 5.3.2.4, (14)}
+\begin{equation*}
+N_{pl,Rd} = A_a\, f_{yd} + A_c\, 0.85\, f_{cd} + A_s\, f_{sd}
+\end{equation*}
+\noindent\textbf{Abminderung für S420 und S460, x\_p/h über 0.15} \hfill \normref{SIA 264:2014, 5.1.2.2, Figur 1}
+\begin{equation*}
+\beta = 1 - 0.15 \cdot \frac{x_p / h - 0.15}{0.4 - 0.15}
+\end{equation*}
+\noindent\textbf{Plastischer Momentenwiderstand, mit β gemindert} \hfill \normref{SIA 264:2014, 5.1.2.2, Figur 1}
+\begin{equation*}
+M_{y,Rd}^{+} = \beta \cdot M_{y,pl,Rd}
 \end{equation*}
 \noindent\textbf{Zugwiderstand bei M\_Ed = 0}
 \begin{equation*}
@@ -19966,18 +20689,18 @@ W_{eff} = \frac{I_{eff}}{z}
 \end{equation*}
 \noindent\textbf{Widerstand, Zug unten} \hfill \normref{SIA 263:2013, 5.3.5, (60); 4.5.3}
 \begin{equation*}
-M_{y,Rd}^{+} = \frac{f_y \cdot W_{eff}}{\gamma_{M1}}
+M_{y,Rd}^{+} = \frac{f_{y} \cdot W_{eff}}{\gamma_{M1}}
 \end{equation*}
 \subsection{Knicken und Kippen}
 Der Stab hat den gezeichneten Querschnitt. Je Fall zuerst die Klasse bei N\_Ed und den Momenten 1. Ordnung, dann die Widerstände nach ihr: plastisch in den Klassen 1 und 2, elastisch in Klasse 3, am wirksamen Querschnitt in Klasse 4. Je Achse das Knicken nach der Knickspannungskurve, um die starke Achse das Kippen, dann das Zusammenwirken. Die Normalkraft bleibt, die Momente wachsen, bis die Gleichung aufgeht.
 
 \noindent\textbf{Knicklast um y} \hfill \normref{SIA 263:2013, 4.5.1.4}
 \begin{equation*}
-N_{cr,y} = \frac{\pi^2 \cdot E_a \cdot I_y}{L_{K,y}^2}
+N_{cr,y} = \frac{\pi^2 \cdot E_{a} \cdot I_y}{L_{K,y}^2}
 \end{equation*}
 \noindent\textbf{Schlankheit um y} \hfill \normref{SIA 263:2013, 4.5.1.4}
 \begin{equation*}
-\bar{\lambda}_{K,y} = \sqrt{\frac{f_y \cdot A}{N_{cr,y}}}
+\bar{\lambda}_{K,y} = \sqrt{\frac{f_{y} \cdot A}{N_{cr,y}}}
 \end{equation*}
 \noindent\textbf{Beiwert um y} \hfill \normref{SIA 263:2013, 4.5.1.3, (7); 4.5.1.4, (8); Tabelle 8}
 \begin{equation*}
@@ -20005,11 +20728,11 @@ L_{K} = \frac{L_{D}}{\sqrt{\eta}}
 \end{equation*}
 \noindent\textbf{Saint-Venant-Anteil, mit K = I\_T} \hfill \normref{SIA 263:2013, Anhang B.4, (92)}
 \begin{equation*}
-\sigma_{Dv} = \frac{\eta \cdot \pi}{L_{D} \cdot W_{el}} \cdot \sqrt{G_a \cdot I_T \cdot E_a \cdot I_z}
+\sigma_{Dv} = \frac{\eta \cdot \pi}{L_{D} \cdot W_{el}} \cdot \sqrt{G_{a} \cdot I_T \cdot E_{a} \cdot I_z}
 \end{equation*}
 \noindent\textbf{Wölbanteil: Knickspannung des Druckgurts nach Euler} \hfill \normref{SIA 263:2013, Anhang B.5, (93)}
 \begin{equation*}
-\sigma_{Dw} = \frac{\pi^2 \cdot E_a}{\left(L_{K} / i_{g}\right)^2}
+\sigma_{Dw} = \frac{\pi^2 \cdot E_{a}}{\left(L_{K} / i_{g}\right)^2}
 \end{equation*}
 \noindent\textbf{Ideelle Kippspannung} \hfill \normref{SIA 263:2013, Anhang B.3, (91)}
 \begin{equation*}
@@ -20021,7 +20744,7 @@ M_{cr} = W_{el} \cdot \sigma_{cr,D}
 \end{equation*}
 \noindent\textbf{Schlankheit beim Kippen, W nach der Klasse} \hfill \normref{SIA 263:2013, 4.5.2.2, (9); 4.5.2.3, (10)}
 \begin{equation*}
-\bar{\lambda}_{D} = \sqrt{\frac{W_{pl} \cdot f_y}{M_{cr}}}
+\bar{\lambda}_{D} = \sqrt{\frac{W_{pl} \cdot f_{y}}{M_{cr}}}
 \end{equation*}
 \noindent\textbf{Beiwert beim Kippen} \hfill \normref{SIA 263:2013, 4.5.2.2, (9); 4.5.2.3, (10)}
 \begin{equation*}
@@ -20063,6 +20786,9 @@ M_{z,red,Rd} = M_{z,Rd}^{+} \cdot \left(1 - \frac{|N_{Ed}|}{N_{K,Rd,min}}\right)
 \begin{equation*}
 w_{0,y} = \frac{L_{K,y}}{k_{y}}
 \end{equation*}
+\subsection{Verbundquerschnitt}
+Je Lastfall der plastische Zustand bei N\_Ed, dessen Moment in die Richtung der Einwirkung zeigt: Baustahl und Betonstahl ganz gezogen oder ganz gedrückt, der Beton nur gedrückt, mit 0.85 f\_cd über die ganze Druckzone. Er gilt, wenn jedes Blech an seiner Nulllinie in Klasse 1 oder 2 liegt und gezogener Betonstahl in der Duktilitätsklasse B oder C ist. Grosse Querkraft mindert die Bleche, in denen sie steht, wie im Stahl. Die Normalkraft bleibt, das Moment wächst in seiner Richtung, bis der Widerstand erreicht ist.
+
 \subsection{Holzquerschnitt}
 Holz rechnet linear (SIA 265, 4.1.2): die Spannungen sind elastisch, am Bruttoquerschnitt. Was die Nachweise der Lastfälle, die Kennzahlen und der Stab daraus lesen, steht hier einmal.
 
@@ -21839,6 +22565,58 @@ Querkraftwiderstand in y & $V_{y,Rd}$ & $61.4\,\mathrm{kN}$ \\
 Torsionswiderstand & $T_{Rd}$ & $3.8\,\mathrm{kNm}$ \\
 \hline
 \end{longtable}
+\subsection{Verbundträger}
+\noindent\textbf{Angaben zum Querschnitt}
+\begin{equation*}
+\text{C30/37, S460} \qquad A = 267000\,\mathrm{mm}^2 \qquad y_S = 0.0\,\mathrm{mm} \qquad z_S = 283.2\,\mathrm{mm}
+\end{equation*}
+\noindent\textbf{Bewehrung und Schubwände}
+\begin{longtable}{lll}
+\hline
+Element & Bewehrung & Stahl \\
+\hline
+\endhead
+Linie 1 & $10 \varnothing 12$ & B500B \\
+\hline
+\end{longtable}
+\begin{xltabular}{\linewidth}{>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}Xrrr}
+\hline
+Nachweis & Bezeichnung & Widerstand & Einwirkung & $\alpha_{eff}$ \\
+\hline
+\endhead
+Biegung und Normalkraft & Feld & $M_{Rd} = 834.4\,\mathrm{kNm}$ & $M_{Ed} = 601.3\,\mathrm{kNm}$ & $1.39$ \\
+Biegung und Normalkraft & Stütze & $M_{Rd} = 665.3\,\mathrm{kNm}$ & $M_{Ed} = 300.0\,\mathrm{kNm}$ & $2.22$ \\
+Biegung und Normalkraft & Druck mit Biegung & – & – & $0.00$ \\
+Biegung und Normalkraft & Zug & $N_{pl,Rd}^{+} = 5424.4\,\mathrm{kN}$ & $N_{Ed} = 1000.0\,\mathrm{kN}$ & $5.42$ \\
+Biegung und Normalkraft & Druck & $N_{pl,Rd}^{-} = -9752.7\,\mathrm{kN}$ & $N_{Ed} = -5000.0\,\mathrm{kN}$ & $1.95$ \\
+Biegung und Normalkraft & Zu viel Druck & $N_{pl,Rd}^{-} = -9752.7\,\mathrm{kN}$ & $N_{Ed} = -20000.0\,\mathrm{kN}$ & $0.49$ \\
+Querkraft & Feld & $V_{z,Rd} = 942.5\,\mathrm{kN}$ & $V_{z,Ed} = 150.0\,\mathrm{kN}$ & $6.28$ \\
+Querkraft & Stütze & $V_{z,Rd} = 942.5\,\mathrm{kN}$ & $V_{z,Ed} = 500.0\,\mathrm{kN}$ & $1.88$ \\
+Querkraft & Druck mit Biegung & – & – & $\infty$ \\
+Querkraft & Zug & – & – & $\infty$ \\
+Querkraft & Druck & – & – & $\infty$ \\
+Querkraft & Zu viel Druck & – & – & $\infty$ \\
+\hline
+\end{xltabular}
+\hinweis{Hinweis}{Biegung und Normalkraft – Druck mit Biegung: x\_p/h liegt über 0.4, wo Figur 1 endet: dort rechnet das Werkzeug den Biegewiderstand nicht (nach Vorgabe, nicht nachgeschlagen).}
+\hinweis{Hinweis}{Querkraft – Druck mit Biegung, Querkraft – Zug, Querkraft – Druck, Querkraft – Zu viel Druck: Keine Einwirkung → kein Nachweis.}
+\hinweis{Warnung}{Biegung und Normalkraft – Zu viel Druck: nicht erfüllt. N\_Ed jenseits der reinen Normalkraft.}
+\noindent\textbf{Kennzahlen}
+\begin{longtable}{llr}
+\hline
+Kennzahl & Zeichen & Wert \\
+\hline
+\endhead
+Zugwiderstand & $N_{pl,Rd}^{+}$ & $5424.4\,\mathrm{kN}$ \\
+Druckwiderstand & $N_{pl,Rd}^{-}$ & $-9752.7\,\mathrm{kN}$ \\
+Momentenwiderstand, Zug unten & $M_{y,Rd}^{+}$ & $845.8\,\mathrm{kNm}$ \\
+Momentenwiderstand, Zug oben & $M_{y,Rd}^{-}$ & $-678.9\,\mathrm{kNm}$ \\
+Momentenwiderstand, Zug links & $M_{z,Rd}^{+}$ & $0\,\mathrm{kNm}$ \\
+Momentenwiderstand, Zug rechts & $M_{z,Rd}^{-}$ & $0\,\mathrm{kNm}$ \\
+Querkraftwiderstand in z & $V_{z,Rd}$ & $942.5\,\mathrm{kN}$ \\
+Querkraftwiderstand in y & $V_{y,Rd}$ & $2120\,\mathrm{kN}$ \\
+\hline
+\end{longtable}
 \subsection{Winkelwand}
 Kein Nachweis geführt.
 
@@ -22548,6 +23326,7 @@ Mindestens ein Nachweis ist nicht erfüllt.
 
 \hinweis{Warnung}{Platte 'Ohne x': ohne x-Bewehrung kein Verformungsnachweis.}
 \hinweis{Warnung}{Querschnittsanalyse 'Stahlträger', Feld: Torsion weist das Werkzeug beim Stahlquerschnitt nicht nach: SIA 263 nennt in 5.1 bis 5.3 keinen Torsionswiderstand des Querschnitts (nach Vorgabe, nicht nachgeschlagen).}
+\hinweis{Warnung}{Querschnittsanalyse 'Verbundträger', Stütze: Torsion weist das Werkzeug beim Verbundquerschnitt nicht nach (nach Vorgabe, nicht nachgeschlagen).}
 \hinweis{Warnung}{Setzung 'Ohne Schicht': noch keine Schicht – unter «Schichten» eine anlegen → kein Nachweis.}
 \hinweis{Warnung}{Pfahl 'Mikropfahl, Versuch': die Schichten reichen nicht bis unter den Fuss → keine Steifigkeit.}
 \hinweis{Warnung}{Erdbeben 'Wand ohne Querschnitt': noch keine Querschnittsanalyse gewählt («Wand 1») → kein Nachweis.}
@@ -22780,14 +23559,20 @@ Biegesteifigkeit um z, Kasten, C30/37 & $EI_{z,\text{Q5}}$ & $755604$ & kNm² & 
 Torsionssteifigkeit, Kasten, C30/37 & $GI_{T,\text{Q5}}$ & $384911$ & kNm² & berechnet \\
 Eigengewicht je Meter, Kasten, C30/37 & $g_{k,\text{Q5}}$ & $8.25$ & kN/m & berechnet \\
 Erdbeschleunigung & $g$ & $10$ & m/s² & Vorgabe \\
-Elastizitätsmodul des Baustahls & $E_a$ & $210000$ & N/mm² & Vorgabe \\
-Schubmodul des Baustahls & $G_a$ & $81000$ & N/mm² & Vorgabe \\
-Streckgrenze & $f_y$ & $355$ & N/mm² & Vorgabe \\
-Streckgrenze für 40 mm < t ≤ 100 mm & $f_y^{t>40}$ & $335$ & N/mm² & Vorgabe \\
-Widerstandsbeiwert für Festigkeits- und Stabilitätsnachweise & $\gamma_{M1}$ & $1.05$ &  & Vorgabe \\
-Dichte des Baustahls & $\rho_a$ & $7850$ & kg/m³ & Vorgabe \\
-Fliessschubspannung & $\tau_y$ & $205$ & N/mm² & Vorgabe \\
-Fliessschubspannung für 40 mm < t ≤ 100 mm & $\tau_y^{t>40}$ & $193$ & N/mm² & Vorgabe \\
+Elastizitätsmodul des Baustahls & $E_{a,\text{S355}}$ & $210000$ & N/mm² & Vorgabe \\
+Schubmodul des Baustahls & $G_{a,\text{S355}}$ & $81000$ & N/mm² & Vorgabe \\
+Streckgrenze & $f_{y,\text{S355}}$ & $355$ & N/mm² & Vorgabe \\
+Streckgrenze für 40 mm < t ≤ 100 mm & $f_{y,\text{S355}}^{t>40}$ & $335$ & N/mm² & Vorgabe \\
+Widerstandsbeiwert für Festigkeits- und Stabilitätsnachweise & $\gamma_{M1,\text{S355}}$ & $1.05$ &  & Vorgabe \\
+Dichte des Baustahls & $\rho_{a,\text{S355}}$ & $7850$ & kg/m³ & Vorgabe \\
+Fliessschubspannung & $\tau_{y,\text{S355}}$ & $205$ & N/mm² & Vorgabe \\
+Fliessschubspannung für 40 mm < t ≤ 100 mm & $\tau_{y,\text{S355}}^{t>40}$ & $193$ & N/mm² & Vorgabe \\
+Elastizitätsmodul des Baustahls & $E_{a,\text{S460}}$ & $210000$ & N/mm² & Vorgabe \\
+Streckgrenze & $f_{y,\text{S460}}$ & $460$ & N/mm² & Vorgabe \\
+Streckgrenze für 40 mm < t ≤ 100 mm & $f_{y,\text{S460}}^{t>40}$ & $430$ & N/mm² & Vorgabe \\
+Widerstandsbeiwert für Festigkeits- und Stabilitätsnachweise & $\gamma_{M1,\text{S460}}$ & $1.05$ &  & Vorgabe \\
+Fliessschubspannung & $\tau_{y,\text{S460}}$ & $265$ & N/mm² & Vorgabe \\
+Fliessschubspannung für 40 mm < t ≤ 100 mm & $\tau_{y,\text{S460}}^{t>40}$ & $248$ & N/mm² & Vorgabe \\
 Bemessungswert des Elastizitätsmoduls & $E_{cd}$ & $28016$ & N/mm² & berechnet \\
 Mittelwert des Elastizitätsmoduls & $E_{cm}$ & $33620$ & N/mm² & berechnet \\
 Mittelwert des Schubmoduls & $G_{cm}$ & $14008$ & N/mm² & berechnet \\
@@ -23845,6 +24630,30 @@ Erfüllungsgrad Schub und Torsion – Feld & $\alpha_{V,\text{Feld}}$ & $1.25$ &
 Erfüllungsgrad Schub und Torsion – Stoss & $\alpha_{V,\text{Stoss}}$ & $2.66$ &  & berechnet \\
 Schwerpunkt, y & $y_S$ & $80$ & mm & berechnet \\
 Schwerpunkt, z & $z_S$ & $200$ & mm & berechnet \\
+Fläche des Bruttoquerschnitts & $A$ & $267000$ & mm² & berechnet \\
+Stahlfläche der Bewehrung & $A_{s,tot}$ & $1131$ & mm² & berechnet \\
+Torsionsträgheitsmoment nach St. Venant & $I_T$ & $2865.6$ & ·10⁶ mm⁴ & berechnet \\
+Trägheitsmoment um y & $I_y$ & $3290.6$ & ·10⁶ mm⁴ & berechnet \\
+Deviationsmoment & $I_{yz}$ & $0$ & ·10⁶ mm⁴ & berechnet \\
+Trägheitsmoment um z & $I_z$ & $34402.5$ & ·10⁶ mm⁴ & berechnet \\
+Plastischer Momentenwiderstand bei N = 0, Zug links & $M_{z,Rd}^{+}$ & $0$ & kNm & berechnet \\
+Plastischer Momentenwiderstand bei N = 0, Zug oben & $M_{y,Rd}^{-}$ & $-678.9$ & kNm & berechnet \\
+Plastischer Momentenwiderstand bei N = 0, Zug rechts & $M_{z,Rd}^{-}$ & $0$ & kNm & berechnet \\
+Plastischer Momentenwiderstand bei N = 0, Zug unten & $M_{y,Rd}^{+}$ & $845.8$ & kNm & berechnet \\
+Druckwiderstand des Verbundquerschnitts, ohne Knicken & $N_{pl,Rd}^{-}$ & $-9752.7$ & kN & berechnet \\
+Zugwiderstand des Verbundquerschnitts & $N_{pl,Rd}^{+}$ & $5424.4$ & kN & berechnet \\
+Querkraftwiderstand in y, Stahl allein & $V_{y,Rd}$ & $2120$ & kN & berechnet \\
+Querkraftwiderstand in z, Stahl allein & $V_{z,Rd}$ & $942.5$ & kN & berechnet \\
+Erfüllungsgrad Querkraft – Feld & $\alpha_{V,\text{Feld}}$ & $6.28$ &  & berechnet \\
+Erfüllungsgrad Querkraft – Stütze & $\alpha_{V,\text{Stütze}}$ & $1.88$ &  & berechnet \\
+Erfüllungsgrad Biegung und Normalkraft – Druck & $\alpha_{eff,\text{Druck}}$ & $1.95$ &  & berechnet \\
+Erfüllungsgrad Biegung und Normalkraft – Druck mit Biegung & $\alpha_{eff,\text{Druck mit Biegung}}$ & $0.00$ &  & berechnet \\
+Erfüllungsgrad Biegung und Normalkraft – Feld & $\alpha_{eff,\text{Feld}}$ & $1.39$ &  & berechnet \\
+Erfüllungsgrad Biegung und Normalkraft – Stütze & $\alpha_{eff,\text{Stütze}}$ & $2.22$ &  & berechnet \\
+Erfüllungsgrad Biegung und Normalkraft – Zu viel Druck & $\alpha_{eff,\text{Zu viel Druck}}$ & $0.49$ &  & berechnet \\
+Erfüllungsgrad Biegung und Normalkraft – Zug & $\alpha_{eff,\text{Zug}}$ & $5.42$ &  & berechnet \\
+Schwerpunkt, y & $y_S$ & $0$ & mm & berechnet \\
+Schwerpunkt, z & $z_S$ & $283.2$ & mm & berechnet \\
 Fläche des Bruttoquerschnitts & $A$ & $1437500$ & mm² & berechnet \\
 Stahlfläche der Bewehrung & $A_{s,tot}$ & $0$ & mm² & berechnet \\
 Trägheitsmoment um y & $I_y$ & $421209.8$ & ·10⁶ mm⁴ & berechnet \\

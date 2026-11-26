@@ -1,5 +1,5 @@
 ---
-erzeugt: 2b4e7f817900
+erzeugt: db209420becf
 art: modul
 tags: [modul]
 ---
@@ -163,6 +163,7 @@ Die mitwirkenden Breiten der Bleche in Klasse 4, als Tabelle mit ihren Formeln.
 - [[opencivil.nachweis.qa_stahl]]
 - [[opencivil.nachweis.qa_stahl_kennzahlen]]
 - [[opencivil.nachweis.qa_stahl_stabilitaet]]
+- [[opencivil.nachweis.qa_verbund_werte]]
 
 ## Formeln aus diesem Modul
 

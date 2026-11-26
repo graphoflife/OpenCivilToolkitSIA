@@ -1,5 +1,5 @@
 ---
-erzeugt: 79595a037acd
+erzeugt: 5140d2fd3286
 art: modul
 tags: [modul]
 ---
@@ -703,6 +703,7 @@ der Wahl ([[opencivil.querschnitt.gesetzwahl#Rechenwahl|Rechenwahl.modul]]), ohn
 - [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.qa_knicken]]
 - [[opencivil.nachweis.qa_stahl_werte]]
+- [[opencivil.nachweis.qa_verbund_werte]]
 - [[opencivil.nachweis.querschnittsloeser]]
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.nachweis.resistenzlinie]]

@@ -1,5 +1,5 @@
 ---
-erzeugt: 755b4a31e4b5
+erzeugt: e347b95c44b6
 art: modul
 tags: [modul]
 ---
@@ -294,3 +294,4 @@ Eine Stablinie der Beschreibung mit ihren aufgeloesten Staeben `linie`
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.spannglieder]]
 - [[opencivil.spannungsanalyse.schnitt]]
+- [[opencivil.verbund.querschnitt]]

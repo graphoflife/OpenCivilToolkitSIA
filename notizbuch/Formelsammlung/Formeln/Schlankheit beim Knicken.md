@@ -1,5 +1,5 @@
 ---
-erzeugt: ed252bb3c79c
+erzeugt: 6c83e05e883b
 art: formel
 tags: [formel]
 normstelle: ["SIA 263:2013, 4.5.1.4", "SIA 263:2013, 4.5.1.3; 5.3.8"]
@@ -10,14 +10,14 @@ normstelle: ["SIA 263:2013, 4.5.1.4", "SIA 263:2013, 4.5.1.3; 5.3.8"]
 *In der Herleitung: «Schlankheit um y»*
 
 $$
-\bar{\lambda}_{K,y} = \sqrt{\frac{f_y \cdot A}{N_{cr,y}}}
+\bar{\lambda}_{K,y} = \sqrt{\frac{f_{y} \cdot A}{N_{cr,y}}}
 $$
 
 ## Grössen
 
 | Zeichen | Bedeutung | Einheit | Woher |
 | --- | --- | --- | --- |
-| $f_y$ | Streckgrenze | N/mm² | Vorgabe |
+| $f_{y}$ | Streckgrenze | N/mm² | Vorgabe |
 | $A$ | Fläche des Bruttoquerschnitts | mm² | Zwischenwert |
 | $N_{cr,y}$ | Ideale Knicklast | kN | [[Knicklast nach Euler]] |
 
@@ -26,7 +26,7 @@ $$
 Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
-\bar{\lambda}_{K,y} = \sqrt{\frac{f_y \cdot A}{N_{cr,y}}} = \sqrt{\frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 15604\,\mathrm{mm}^{2}}{53037\,\mathrm{kN}}} = 0.323
+\bar{\lambda}_{K,y} = \sqrt{\frac{f_{y,\text{S355}} \cdot A}{N_{cr,y}}} = \sqrt{\frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 15604\,\mathrm{mm}^{2}}{53037\,\mathrm{kN}}} = 0.323
 $$
 
 ## Gebraucht von

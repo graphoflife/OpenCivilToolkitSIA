@@ -51,6 +51,8 @@ from opencivil.nachweis.qa_stahl_werte import (
     ELASTISCH, ROHR_KLASSE_4, WIDERSTANDSMOMENT, Stahlwerte, breiten, klassen, stoffbezuege,
 )
 from opencivil.querschnitt.analyse import Lastfall, Querschnittsanalyse
+from opencivil.querschnitt.biegung import Biegung
+from opencivil.querschnitt.plastisch import Block, Linie, Zustand
 from opencivil.querschnitt.zugseite import Zugseite
 from opencivil.stahlbau import schub
 from opencivil.stahlbau import widerstand as wd
@@ -81,15 +83,24 @@ def _bezuege(analyse: Querschnittsanalyse, stahl: Stahlquerschnitt,
                for r in kennzahlen.richtungen])
 
 
-def _querkraefte(e: Eingaben, stahl: Stahlquerschnitt, kennzahlen: KennzahlenStahlQA,
-                 analyse: Querschnittsanalyse, fall: Lastfall) -> List[wd.Querkraft]:
-    """Die Querkraefte des Lastfalls mit ihren Widerstaenden, in N -- wie sie zaehlen."""
+def querkraefte(e: Eingaben, stahl: Stahlquerschnitt, kennzahlen: KennzahlenStahlQA,
+                analyse: Querschnittsanalyse, fall: Lastfall) -> List[wd.Querkraft]:
+    """
+    Die Querkraefte des Lastfalls mit ihren Widerstaenden, in N -- wie sie
+    zaehlen. ``kennzahlen`` traegt ``V_Rd`` je Richtung -- auch die des
+    Verbunds (:mod:`opencivil.nachweis.qa_verbund_kennzahlen`).
+    """
     V_Rd = {r: e.g(f"V_{r}_Rd").si for r in kennzahlen.richtungen}
     return wd.querkraefte(stahl, analyse.biegung.querkraft_y(fall.V_y), fall.V_z, V_Rd)
 
 
-def _einwirkung(p: Protokoll, analyse: Querschnittsanalyse, fall: Lastfall) -> None:
-    """Die Einwirkung als Tabelle -- je Groesse, die zaehlt, eine Zeile; einachsig ohne M_z und V_y."""
+def einwirkung(p: Protokoll, analyse: Querschnittsanalyse, fall: Lastfall, *,
+               torsion: str = OHNE_TORSION) -> None:
+    """
+    Die Einwirkung als Tabelle -- je Groesse, die zaehlt, eine Zeile;
+    einachsig ohne M_z und V_y. Mit ``T_Ed`` der Satz ``torsion``, warum es
+    nicht nachgewiesen wird.
+    """
     biegung = analyse.biegung
     zeilen = [["N_Ed", Mathe(fest(fall.N / 1e3, 1)), "kN"]]
     zeilen += [[f"M_{a},Ed", Mathe(fest(m / 1e3, 1)), "kNm"]
@@ -102,7 +113,7 @@ def _einwirkung(p: Protokoll, analyse: Querschnittsanalyse, fall: Lastfall) -> N
     p.tabelle(kopf=["Einwirkung", "Wert", ""], zeilen=zeilen, titel="Einwirkung",
               ausrichtung="lrl")
     if fall.T:
-        p.hinweis(OHNE_TORSION)
+        p.hinweis(torsion)
 
 
 class StahlBiegungQA(Nachweis):
@@ -148,8 +159,8 @@ class StahlBiegungQA(Nachweis):
         M_y, M_z = self.analyse.biegung.wirkt(fall.M_y, fall.M_z)
         if fall.N == 0.0 and self.analyse.biegung.betrag(M_y, M_z) * 1e3 <= wd.KEIN_MOMENT:
             return None
-        querkraefte = _querkraefte(e, self.stahl, self.kennzahlen, self.analyse, fall)
-        return wd.rechnen(self.stahl, sw.f, sw.eps, fall.N, M_y * 1e3, M_z * 1e3, querkraefte,
+        kraefte = querkraefte(e, self.stahl, self.kennzahlen, self.analyse, fall)
+        return wd.rechnen(self.stahl, sw.f, sw.eps, fall.N, M_y * 1e3, M_z * 1e3, kraefte,
                           bezug, self.analyse.biegung)
 
     def _ansatz(self, p: Protokoll, klassen_: set) -> None:
@@ -179,11 +190,12 @@ class StahlBiegungQA(Nachweis):
         werte = Zwischenwerte(f"{self.id}.{fall.kennung}")
         d_grad = self.d_ausnutzung[fall.name]
         p.titel(fall.name, ebene=3)
-        _einwirkung(p, self.analyse, fall)
+        einwirkung(p, self.analyse, fall)
         if x is None:
             p.text(OHNE_EINWIRKUNG)
             return self.urteil(d_grad, fall.name, UNBESCHRAENKT, OHNE_EINWIRKUNG)
-        self._querkraft(p, werte, x)
+        minderung(p, werte, x.querkraefte, x.abgemindert, self.stahl,
+                  referenz=wd.REFERENZ_QUERKRAFT)
         _, wer = klassen(p, x.zustaende, x.freie, "Bleche im Lastfall")
         p.wert(werte.zahl("klasse", r"\mathrm{QK}", float(x.klasse), stellen=0),
                titel=f"Querschnittsklasse – massgebend {wer}" if wer else "Querschnittsklasse",
@@ -201,35 +213,6 @@ class StahlBiegungQA(Nachweis):
         if x.klasse == 4:
             self._wirksam(p, werte, sw, x, bezug)
         return self._linear(p, werte, x, N_Ed, M_Ed, d_grad, fall)
-
-    # -- Querkraft -------------------------------------------------------------------
-
-    def _querkraft(self, p: Protokoll, werte: Zwischenwerte, x: wd.Fall) -> None:
-        """Was eine grosse Querkraft den Blechen nimmt, in denen sie steht."""
-        for q in x.querkraefte:
-            if q.V_Ed == 0.0:
-                continue
-            kurz = "V" if q.resultierend else f"V_{q.richtung}"
-            V_Ed = werte.kraft(f"{kurz}_Ed", q.symbol("Ed"), abs(q.V_Ed), "Querkraft, Betrag")
-            V_Rd = werte.kraft(f"{kurz}_Rd", q.symbol("Rd"), q.V_Rd, "Querkraftwiderstand")
-            if q.gewicht == 0.0:
-                p.text(f"{q.name.capitalize()}: {V_Ed.formatiert()} kN ≤ 0.5 · "
-                       f"{V_Rd.formatiert()} kN – sie mindert nichts.")
-                continue
-            p.formel(werte.zahl(f"rho_{kurz}", rf"\rho_{{{q.richtung}}}" if not q.resultierend
-                                else r"\rho", q.gewicht),
-                     r"\left(\frac{@V}{@R}\right)^2", {"V": V_Ed, "R": V_Rd},
-                     titel=f"{q.name.capitalize()} über der Hälfte von V_Rd: was die Bleche, in "
-                           f"denen sie steht, für Normalkraft und Biegung verlieren",
-                     referenz=wd.REFERENZ_QUERKRAFT, name="Minderung durch grosse Querkraft")
-        if x.abgemindert.weg:
-            namen = sorted({f"{self.stahl.teile[i].flaeche.name}: {blech}"
-                            for i, blech in x.abgemindert.weg})
-            p.text("Gemindert: " + ", ".join(namen) + ". Ein Teil eines Blechs zählt mit "
-                   "1 − ρ; in den Tabellen steht, was die Querkraft nimmt, mit negativer Kraft.")
-            p.annahme("Dieselbe Minderung für jedes Profil und jede Richtung, auch für die "
-                      "Normalkraft, und in den Klassen 3 und 4 statt der Vergleichsspannung – "
-                      "nach Vorgabe, nicht nachgeschlagen.")
 
     # -- Reine Normalkraft ---------------------------------------------------------------
 
@@ -274,41 +257,10 @@ class StahlBiegungQA(Nachweis):
             "einer geraden Nulllinie – ein Spannungszustand im Gleichgewicht, der nirgends f_y "
             "überschreitet. Gesucht ist die Nulllinie mit N = N_Ed, deren Moment in die Richtung "
             "der Einwirkung zeigt; nachgewiesen wird ihre Probe.")
-        n, v_l = pl.linie.n, pl.linie.v
-        p.text(f"Nulllinie: Zugrichtung n = ({n[0]:.3f}; {n[1]:.3f}), "
-               f"{math.degrees(math.atan2(n[1], n[0])):.1f}° gegen die y-Achse; gezogen ist, wo "
-               f"n_y y + n_z z > {v_l:.1f} mm.")
-        bloecke = x.abgemindert.stahl.bloecke(pl.linie, sw.f)
-        teile = self.stahl.teile
-        p.tabelle(
-            kopf=["Teil", "Zone", Mathe(r"F\ [\mathrm{kN}]"), Mathe(r"y\ [\mathrm{mm}]"),
-                  Mathe(r"z\ [\mathrm{mm}]")],
-            zeilen=[[f"{teile[b.teil].name}{', ' + b.was if b.was else ''}", b.zone,
-                     Mathe(fest(b.F / 1e3, 1)), Mathe(fest(b.punkt[0], 1)),
-                     Mathe(fest(b.punkt[1], 1))] for b in bloecke],
-            titel="Kräfte im plastischen Zustand – je Teil und Zone, mit f_y je Baustahl",
-            ausrichtung="llrrr")
-        p.formel(werte.kraft("N_int", "N_{Rd}", sum(b.F for b in bloecke)), r"\sum F_i", {},
-                 titel="Probe: Normalkraft")
-        y_S, z_S = bezug
-        summen = {"y": -sum(b.F * (b.punkt[1] - z_S) for b in bloecke) / 1e3,
-                  "z": -sum(b.F * (b.punkt[0] - y_S) for b in bloecke) / 1e3}
-        biegung = self.analyse.biegung
-        probe = {}
-        for achse, M in biegung.momente(summen["y"], summen["z"]):
-            quer = "z" if achse == "y" else "y"
-            probe[achse] = werte.moment(f"M_{achse}_int", f"M_{{{achse},Rd}}", M)
-            p.formel(probe[achse], rf"-\sum F_i \cdot ({quer}_i - {quer}_S)", {},
-                     titel=f"Probe: Moment um {achse}")
-        M_Rd = werte.moment("M_Rd", "M_{Rd}", biegung.betrag(pl.M_y, pl.M_z) / 1e3)
-        if biegung.einachsig:
-            if abs(pl.M_z) > 1e-3 * max(abs(pl.M_y), 1.0):
-                p.text(f"Einachsig: nachgewiesen wird M_y. Das M_z = {pl.M_z / 1e6:.1f} kNm, das "
-                       f"der unsymmetrische Querschnitt dabei weckt, wird übergangen.")
-        else:
-            p.formel(M_Rd, r"\sqrt{@My^{2} + @Mz^{2}}", {"My": probe["y"], "Mz": probe["z"]},
-                     titel="Widerstand in der Richtung der Einwirkung",
-                     referenz=wd.REFERENZ_PLASTISCH)
+        M_Rd = probe(p, werte, x.abgemindert.stahl.starr(sw.f).bloecke(pl.linie),
+                     [t.name for t in self.stahl.teile], bezug, self.analyse.biegung, pl,
+                     titel="Kräfte im plastischen Zustand – je Teil und Zone, mit f_y je "
+                           "Baustahl", referenz=wd.REFERENZ_PLASTISCH)
         v = Vergleich(M_Ed, M_Rd)
         v.zeile(p, d_grad)
         return self.urteil(d_grad, fall.name, v,
@@ -400,6 +352,93 @@ class StahlBiegungQA(Nachweis):
                            f"bei N_Ed = {x.N / 1e3:.1f} kN.")
 
 
+def minderung(p: Protokoll, werte: Zwischenwerte, kraefte: Sequence[wd.Querkraft],
+              abgemindert: wd.Abgemindert, stahl: Stahlquerschnitt, *, referenz: str) -> None:
+    """Was grosse Querkraft den Blechen nimmt, in denen sie steht -- im Stahl wie im Verbund."""
+    for q in kraefte:
+        if q.V_Ed == 0.0:
+            continue
+        kurz = "V" if q.resultierend else f"V_{q.richtung}"
+        V_Ed = werte.kraft(f"{kurz}_Ed", q.symbol("Ed"), abs(q.V_Ed), "Querkraft, Betrag")
+        V_Rd = werte.kraft(f"{kurz}_Rd", q.symbol("Rd"), q.V_Rd, "Querkraftwiderstand")
+        if q.gewicht == 0.0:
+            p.text(f"{q.name.capitalize()}: {V_Ed.formatiert()} kN ≤ 0.5 · "
+                   f"{V_Rd.formatiert()} kN – sie mindert nichts.")
+            continue
+        p.formel(werte.zahl(f"rho_{kurz}", rf"\rho_{{{q.richtung}}}" if not q.resultierend
+                            else r"\rho", q.gewicht),
+                 r"\left(\frac{@V}{@R}\right)^2", {"V": V_Ed, "R": V_Rd},
+                 titel=f"{q.name.capitalize()} über der Hälfte von V_Rd: was die Bleche, in "
+                       f"denen sie steht, für Normalkraft und Biegung verlieren",
+                 referenz=referenz, name="Minderung durch grosse Querkraft")
+    if abgemindert.weg:
+        namen = sorted({f"{stahl.teile[i].flaeche.name}: {blech}" for i, blech in abgemindert.weg})
+        p.text("Gemindert: " + ", ".join(namen) + ". Ein Teil eines Blechs zählt mit "
+               "1 − ρ; in den Tabellen steht, was die Querkraft nimmt, mit negativer Kraft.")
+        p.annahme("Dieselbe Minderung für jedes Profil und jede Richtung, auch für die "
+                  "Normalkraft, und in den Klassen 3 und 4 statt der Vergleichsspannung – "
+                  "nach Vorgabe, nicht nachgeschlagen.")
+
+
+def krafttabelle(p: Protokoll, werte: Zwischenwerte, bloecke: Sequence[Block],
+                 namen: Sequence[str], linie: Linie, *, titel: str) -> None:
+    """
+    Die Nulllinie und je Teil und Zone die Kraft mit Angriffspunkt, dazu
+    ihre Summe ``N`` -- der Anfang der Probe eines plastischen Zustands, im
+    Stahl wie im Verbund. ``namen`` je Teil, auf den ein Block zeigt.
+    """
+    n, v_l = linie.n, linie.v
+    p.text(f"Nulllinie: Zugrichtung n = ({n[0]:.3f}; {n[1]:.3f}), "
+           f"{math.degrees(math.atan2(n[1], n[0])):.1f}° gegen die y-Achse; gezogen ist, wo "
+           f"n_y y + n_z z > {v_l:.1f} mm.")
+    p.tabelle(
+        kopf=["Teil", "Zone", Mathe(r"F\ [\mathrm{kN}]"), Mathe(r"y\ [\mathrm{mm}]"),
+              Mathe(r"z\ [\mathrm{mm}]")],
+        zeilen=[[f"{namen[b.teil]}{', ' + b.was if b.was else ''}", b.zone,
+                 Mathe(fest(b.F / 1e3, 1)), Mathe(fest(b.punkt[0], 1)),
+                 Mathe(fest(b.punkt[1], 1))] for b in bloecke],
+        titel=titel, ausrichtung="llrrr")
+    p.formel(werte.kraft("N_int", "N_{Rd}", sum(b.F for b in bloecke)), r"\sum F_i", {},
+             titel="Probe: Normalkraft")
+
+
+def momentsummen(bloecke: Sequence[Block], bezug: Tuple[float, float]) -> Dict[str, float]:
+    """Je Achse das Moment der Bloecke um ``bezug``, in Nm: ``M_y = -Σ F (z - z_S)``."""
+    y_S, z_S = bezug
+    return {"y": -sum(b.F * (b.punkt[1] - z_S) for b in bloecke) / 1e3,
+            "z": -sum(b.F * (b.punkt[0] - y_S) for b in bloecke) / 1e3}
+
+
+#: Wie die Probe das Moment um eine Achse schreibt.
+MOMENT_UM = {"y": r"-\sum F_i \cdot (z_i - z_S)", "z": r"-\sum F_i \cdot (y_i - y_S)"}
+
+
+def probe(p: Protokoll, werte: Zwischenwerte, bloecke: Sequence[Block], namen: Sequence[str],
+          bezug: Tuple[float, float], biegung: Biegung, pl: Zustand, *, titel: str,
+          referenz: str, symbol: str = "M_{Rd}") -> Wert:
+    """
+    Die Probe eines plastischen Zustands -- im Stahl wie im Verbund: die
+    Nulllinie, je Teil und Zone die Kraft mit Angriffspunkt, die Summen
+    ``N``, ``M_y`` und ``M_z``. Zurueck kommt der Widerstand ``symbol`` in
+    der Richtung der Einwirkung, einachsig ``M_y``.
+    """
+    krafttabelle(p, werte, bloecke, namen, pl.linie, titel=titel)
+    summen = momentsummen(bloecke, bezug)
+    momente = {}
+    for achse, M in biegung.momente(summen["y"], summen["z"]):
+        momente[achse] = werte.moment(f"M_{achse}_int", f"M_{{{achse},Rd}}", M)
+        p.formel(momente[achse], MOMENT_UM[achse], {}, titel=f"Probe: Moment um {achse}")
+    M_Rd = werte.moment("M_Rd", symbol, biegung.betrag(pl.M_y, pl.M_z) / 1e3)
+    if biegung.einachsig:
+        if abs(pl.M_z) > 1e-3 * max(abs(pl.M_y), 1.0):
+            p.text(f"Einachsig: nachgewiesen wird M_y. Das M_z = {pl.M_z / 1e6:.1f} kNm, das "
+                   f"der unsymmetrische Querschnitt dabei weckt, wird übergangen.")
+    else:
+        p.formel(M_Rd, r"\sqrt{@My^{2} + @Mz^{2}}", {"My": momente["y"], "Mz": momente["z"]},
+                 titel="Widerstand in der Richtung der Einwirkung", referenz=referenz)
+    return M_Rd
+
+
 def glied_text(g: wd.Glied, faktor: float, mit_lambda: bool) -> str:
     """
     Ein Glied von (54) oder (60) -- und von (62) und (63) im Stab
@@ -424,6 +463,7 @@ class StahlQuerkraftQA(Nachweis):
     THEMA = "Stahlquerschnitt"
     LANGNAME = "Querkraft"
     ART = "V"
+    REFERENZ = schub.REFERENZ_SCHUB
 
     def __init__(self, analyse: Querschnittsanalyse, lastfaelle: Sequence[Lastfall],
                  kennzahlen: KennzahlenStahlQA) -> None:
@@ -435,11 +475,11 @@ class StahlQuerkraftQA(Nachweis):
         self.d_ausnutzung: Dict[str, WertDef] = {
             f.name: grad_def(f"{basis}.{f.kennung}.erfuellungsgrad",
                              rf"\alpha_{{V,{als_text(f.name)}}}",
-                             f"Erfüllungsgrad Querkraft – {f.name}", schub.REFERENZ_SCHUB)
+                             f"Erfüllungsgrad Querkraft – {f.name}", self.REFERENZ)
             for f in self.lastfaelle}
         super().__init__(basis, ausgaben=list(self.d_ausnutzung.values()),
                          bezuege=_bezuege(analyse, self.stahl, kennzahlen),
-                         titel=f"Querkraft – {analyse.name}", referenz=schub.REFERENZ_SCHUB,
+                         titel=f"Querkraft – {analyse.name}", referenz=self.REFERENZ,
                          abschnitt=analyse.abschnitt)
 
     def pruefe(self, e: Eingaben, p: Protokoll):
@@ -459,18 +499,18 @@ class StahlQuerkraftQA(Nachweis):
         if V_y == 0.0 and fall.V_z == 0.0:
             p.text(OHNE_EINWIRKUNG)
             return self.urteil(d_grad, fall.name, UNBESCHRAENKT, OHNE_EINWIRKUNG)
-        querkraefte = _querkraefte(e, self.stahl, self.kennzahlen, self.analyse, fall)
-        if not querkraefte:
+        kraefte = querkraefte(e, self.stahl, self.kennzahlen, self.analyse, fall)
+        if not kraefte:
             p.hinweis(OHNE_PROFIL)
             return self.urteil(d_grad, fall.name, NICHT_FUEHRBAR, OHNE_PROFIL)
-        if querkraefte[0].resultierend:
-            p.formel(werte.kraft("V_Ed", "V_{Ed}", querkraefte[0].V_Ed),
+        if kraefte[0].resultierend:
+            p.formel(werte.kraft("V_Ed", "V_{Ed}", kraefte[0].V_Ed),
                      r"\sqrt{@Vy^{2} + @Vz^{2}}",
                      {"Vy": werte.kraft("V_y_Ed", "V_{y,Ed}", V_y),
                       "Vz": werte.kraft("V_z_Ed", "V_{z,Ed}", fall.V_z)},
                      titel="Resultierende Querkraft im Rundrohr")
         massgebend: Optional[Vergleich] = None
-        for q in (q for q in querkraefte if q.V_Ed != 0.0):
+        for q in (q for q in kraefte if q.V_Ed != 0.0):
             kurz = "V" if q.resultierend else f"V_{q.richtung}"
             v = Vergleich(werte.kraft(f"{kurz}_Ed_betrag", q.symbol("Ed"), abs(q.V_Ed)),
                           werte.kraft(f"{kurz}_Rd", q.symbol("Rd"), q.V_Rd))

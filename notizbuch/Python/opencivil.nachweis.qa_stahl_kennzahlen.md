@@ -1,5 +1,5 @@
 ---
-erzeugt: d15bd64c6c66
+erzeugt: a5739ad4424b
 art: modul
 tags: [modul]
 ---
@@ -108,6 +108,17 @@ def _elastisch(self, p: Protokoll, sw: Stahlwerte, werte: Zwischenwerte, ergebni
 Bis die erste Faser fliesst: je Gruppe `W = I/z` bis zu ihrer
 weitesten Faser, massgebend das kleinste `f_y W/γ_M1`.
 
+### querkraft
+
+```python
+def querkraft(p: Protokoll, sw: Stahlwerte, stahl: Stahlquerschnitt, richtungen: Sequence[str], belegen: Callable[[str, float], Wert]) -> None
+```
+
+Der Querkraftwiderstand der Profile je Richtung, mit seinen Tabellen --
+im Stahl wie im Verbund, wo der Stahl die Querkraft allein traegt.
+`belegen` nimmt je Richtung die Summe in N und gibt den Wert der
+Kennzahl zurueck.
+
 
 ## Konstanten
 
@@ -128,6 +139,7 @@ weitesten Faser, massgebend das kleinste `f_y W/γ_M1`.
 - [[opencivil.core.wert]]
 - [[opencivil.nachweis.qa_stahl_werte]]
 - [[opencivil.querschnitt.analyse]]
+- [[opencivil.querschnitt.plastisch]]
 - [[opencivil.querschnitt.zugseite]]
 - [[opencivil.stabwerk.stabquerschnitt]]
 - [[opencivil.stahlbau.klasse]]
@@ -139,6 +151,7 @@ weitesten Faser, massgebend das kleinste `f_y W/γ_M1`.
 
 - [[opencivil.nachweis.qa_stahl]]
 - [[opencivil.nachweis.qa_stahl_stabilitaet]]
+- [[opencivil.nachweis.qa_verbund_kennzahlen]]
 - [[opencivil.projekt.aufbau.querschnittsanalyse]]
 
 ## Formeln aus diesem Modul
@@ -146,6 +159,6 @@ weitesten Faser, massgebend das kleinste `f_y W/γ_M1`.
 - [[Beiwert ε der Grenzschlankheiten]] · `KennzahlenStahlQA._teile`
 - [[Normalkraftwiderstand eines Stahlquerschnitts]] · `KennzahlenStahlQA._summe`
 - [[Plastischer Biegewiderstand eines Stahlquerschnitts]] · `KennzahlenStahlQA._summe`
-- [[Querkraftwiderstand eines Stahlprofils]] · `KennzahlenStahlQA._schub`
-- [[Schubbeulen des Blechs, ohne Quersteifen]] · `KennzahlenStahlQA._schub`
-- [[Steg ohne Schubbeulen]] · `KennzahlenStahlQA._schub`
+- [[Querkraftwiderstand eines Stahlprofils]] · `querkraft`
+- [[Schubbeulen des Blechs, ohne Quersteifen]] · `querkraft`
+- [[Steg ohne Schubbeulen]] · `querkraft`

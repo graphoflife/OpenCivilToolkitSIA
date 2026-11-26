@@ -1,5 +1,5 @@
 ---
-erzeugt: 108ed713e76f
+erzeugt: 95194aaaa073
 art: modul
 tags: [modul]
 ---
@@ -158,3 +158,4 @@ hoechstens 1 -- siehe Dateikopf.
 - [[opencivil.nachweis.qa_stahl_kennzahlen]]
 - [[opencivil.nachweis.qa_stahl_werte]]
 - [[opencivil.stahlbau.querschnitt]]
+- [[opencivil.verbund.querschnitt]]

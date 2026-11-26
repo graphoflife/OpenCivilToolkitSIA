@@ -1,5 +1,5 @@
 ---
-erzeugt: 65bce9203a62
+erzeugt: 87bfab3900a1
 art: formel
 tags: [formel]
 normstelle: "SIA 263:2013, Anhang B.5, (93)"
@@ -10,14 +10,14 @@ normstelle: "SIA 263:2013, Anhang B.5, (93)"
 *In der Herleitung: «Wölbanteil: Knickspannung des Druckgurts nach Euler»*
 
 $$
-\sigma_{Dw} = \frac{\pi^2 \cdot E_a}{\left(L_{K} / i_{g}\right)^2}
+\sigma_{Dw} = \frac{\pi^2 \cdot E_{a}}{\left(L_{K} / i_{g}\right)^2}
 $$
 
 ## Grössen
 
 | Zeichen | Bedeutung | Einheit | Woher |
 | --- | --- | --- | --- |
-| $E_a$ | Elastizitätsmodul des Baustahls | N/mm² | Vorgabe |
+| $E_{a}$ | Elastizitätsmodul des Baustahls | N/mm² | Vorgabe |
 | $L_{K}$ | Reduzierte Kipplänge | mm | [[Reduzierte Kipplänge]] |
 | $i_{g}$ | Trägheitsradius des Druckgurts | mm | [[Trägheitsradius]] |
 
@@ -26,7 +26,7 @@ $$
 Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
-\sigma_{Dw} = \frac{\pi^2 \cdot E_a}{\left(L_{K} / i_{g}\right)^2} = \frac{\pi^2 \cdot 210000\,\mathrm{N}/\mathrm{mm}^{2}}{\left(2267.8\,\mathrm{mm} / 56.4\,\mathrm{mm}\right)^2} = 1282\,\mathrm{N}/\mathrm{mm}^{2}
+\sigma_{Dw} = \frac{\pi^2 \cdot E_{a,\text{S355}}}{\left(L_{K} / i_{g}\right)^2} = \frac{\pi^2 \cdot 210000\,\mathrm{N}/\mathrm{mm}^{2}}{\left(2267.8\,\mathrm{mm} / 56.4\,\mathrm{mm}\right)^2} = 1282\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 ## Gebraucht von

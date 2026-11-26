@@ -1,5 +1,5 @@
 ---
-erzeugt: 66f52698d475
+erzeugt: 935b3ba80c4b
 art: modul
 tags: [modul]
 ---
@@ -268,6 +268,23 @@ nach (10). Unter 600 mm Hoehe mit k_h.
 
 Dazu ein Stab: Druck und Biegung mit Knicken und Kippen nach (37), Druck
 allein nach (29), stossartig Biegung allein nach (38), mit k_m \< 1.
+
+### _verbundtraeger
+
+```python
+def _verbundtraeger(kennung: str) -> QuerschnittsanalyseEintrag
+```
+
+Ein HEA 300 aus S460 unter einer Platte 1500 × 120 mm aus C30/37, Beton
+auch zwischen den Flanschen, Betonstahl B500B in der Platte, zweiachsig
+(SIA 264:2014). Der Kammerbeton hebt die gedrückten Flansche nach
+Tabelle 3 in die Klasse 2 und den Steg nach 5.2.1.3; S460 mindert mit β.
+
+Im Feld plastisch und schief, die Nulllinie im Profil; an der Stütze
+negativ, der Betonstahl gezogen, mit einer Querkraft über der Hälfte von
+V_Rd, die dem Steg nimmt, und mit Torsion, die nur ein Hinweis ist; mit
+viel Druck reicht die Druckzone über 0.4 h, wo Figur 1 endet; reiner Zug,
+reiner Druck und eine Druckkraft jenseits des Widerstands.
 
 
 ## Braucht

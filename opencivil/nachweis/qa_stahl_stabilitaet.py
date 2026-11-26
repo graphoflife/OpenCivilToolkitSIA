@@ -271,7 +271,7 @@ class _Herleitung:
             return
         n = normale(seite)
         if x.klasse <= 2:
-            W_pl = stahl.plastisch(n, stahl.nulllinie(n, sw.f))[0]
+            W_pl = stahl.plastisch(n, stahl.starr(sw.f).nulllinie(n))[0]
             self.W[seite] = werte.wert(f"W_pl_{kurz}", r"W_{pl}", Groesse.aus_si(W_pl * 1e-9, CM3),
                                        beschreibung="Plastisches Widerstandsmoment")
             vorlage, eingaben = sw.formel(0, "@X")

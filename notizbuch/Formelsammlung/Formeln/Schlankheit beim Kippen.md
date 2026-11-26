@@ -1,5 +1,5 @@
 ---
-erzeugt: 9fad604ec07d
+erzeugt: 7c928f514b6a
 art: formel
 tags: [formel]
 normstelle: "SIA 263:2013, 4.5.2.2, (9); 4.5.2.3, (10)"
@@ -10,7 +10,7 @@ normstelle: "SIA 263:2013, 4.5.2.2, (9); 4.5.2.3, (10)"
 *In der Herleitung: «Schlankheit beim Kippen, W nach der Klasse»*
 
 $$
-\bar{\lambda}_{D} = \sqrt{\frac{W_{pl} \cdot f_y}{M_{cr}}}
+\bar{\lambda}_{D} = \sqrt{\frac{W_{pl} \cdot f_{y}}{M_{cr}}}
 $$
 
 ## Grössen
@@ -18,7 +18,7 @@ $$
 | Zeichen | Bedeutung | Einheit | Woher |
 | --- | --- | --- | --- |
 | $W_{pl}$ | Plastisches Widerstandsmoment | cm³ | Zwischenwert |
-| $f_y$ | Streckgrenze | N/mm² | Vorgabe |
+| $f_{y}$ | Streckgrenze | N/mm² | Vorgabe |
 | $M_{cr}$ | Ideelles Kippmoment | kNm | [[Ideelles Kippmoment]] |
 
 ## Beispiel
@@ -26,7 +26,7 @@ $$
 Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
-\bar{\lambda}_{D} = \sqrt{\frac{W_{pl} \cdot f_y}{M_{cr}}} = \sqrt{\frac{3513.8\,\mathrm{cm}^{3} \cdot 355\,\mathrm{N}/\mathrm{mm}^{2}}{4323.1\,\mathrm{kNm}}} = 0.537
+\bar{\lambda}_{D} = \sqrt{\frac{W_{pl} \cdot f_{y,\text{S355}}}{M_{cr}}} = \sqrt{\frac{3513.8\,\mathrm{cm}^{3} \cdot 355\,\mathrm{N}/\mathrm{mm}^{2}}{4323.1\,\mathrm{kNm}}} = 0.537
 $$
 
 ## Gebraucht von

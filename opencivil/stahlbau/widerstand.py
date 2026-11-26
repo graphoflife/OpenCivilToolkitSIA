@@ -10,8 +10,8 @@ N/mm² (:func:`rechnen`). Die Herleitung schreibt
 
 * grosse Querkraft mindert die Bleche, in denen sie steht (:func:`abmindern`);
 * der plastische Zustand bei ``N_Ed`` in der Richtung des Moments
-  (:func:`plastisch`) und der elastische, wenn (54) gerade aufgeht -- aus
-  beiden die Klasse jedes Blechs;
+  (:meth:`~opencivil.querschnitt.plastisch.Starrplastisch.zustand`) und der
+  elastische, wenn (54) gerade aufgeht -- aus beiden die Klasse jedes Blechs;
 * der Widerstand nach der Klasse, als Faktor auf das Moment: plastisch in den
   Klassen 1 und 2, elastisch nach (54) in Klasse 3, am wirksamen Querschnitt
   nach (60) in Klasse 4.
@@ -77,15 +77,13 @@ import math
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Sequence, Tuple
 
-from opencivil.core.suche import winkel_suchen
 from opencivil.querschnitt.biegung import Biegung
 from opencivil.querschnitt.geometrie import Punkt
-from opencivil.querschnitt.interaktion import WINKEL_SCHRANKE
-from opencivil.querschnitt.interaktion import Querschnitt as Faserquerschnitt
+from opencivil.querschnitt.plastisch import DRUCK, ZUG, Linie, Stueck, Zustand
 from opencivil.querschnitt.zugseite import Zugseite
 from opencivil.stahlbau import schub
 from opencivil.stahlbau.querschnitt import (
-    DRUCK, ZUG, Blechzustand, Linie, Stahlquerschnitt, Stueck, Teil, Wirksam, normale,
+    Blechzustand, Stahlquerschnitt, Teil, Wirksam, normale,
 )
 
 REFERENZ_PLASTISCH = "SIA 263:2013, 5.1.1.2; 5.1.8"
@@ -193,51 +191,6 @@ def abmindern(stahl: Stahlquerschnitt, querkraefte: Sequence[Querkraft]) -> Abge
                        {k: min(1.0, v) for k, v in weg.items()})
 
 
-# -- Plastisch -------------------------------------------------------------------
-
-
-@dataclass(frozen=True)
-class Plastisch:
-    """
-    Der plastische Zustand an einer Nulllinie: was die Spannungsbloecke
-    tragen, in N und N·mm um den Bezugspunkt.
-    """
-
-    linie: Linie
-    N: float
-    M_y: float
-    M_z: float
-
-
-def plastisch(stahl: Stahlquerschnitt, f: Sequence[float], N: float, M_y: float, M_z: float,
-              bezug: Punkt, neigung: Optional[float]) -> Optional[Plastisch]:
-    """
-    Der plastische Zustand bei ``N``, dessen Moment in die Richtung von
-    ``(M_y, M_z)`` zeigt -- mit fester Zugrichtung ``neigung``, wo sie
-    feststeht (:meth:`~opencivil.querschnitt.biegung.Biegung.neigung`).
-    ``None``, wo ``N`` jenseits der reinen Zug- oder Druckkraft liegt.
-    """
-    if abs(N) > stahl.zugkraft(f):
-        return None
-
-    def bei(n: Tuple[float, float]) -> Plastisch:
-        linie = Linie(n, stahl.nulllinie(n, f, N))
-        return Plastisch(linie, *stahl.kraefte(linie, f, bezug))
-
-    if neigung is not None:
-        return bei((float(round(math.cos(neigung))), float(round(math.sin(neigung)))))
-    ziel = math.atan2(M_z, M_y)
-
-    def abweichung(winkel: float) -> Tuple[float, Plastisch]:
-        zustand = bei((math.cos(winkel), math.sin(winkel)))
-        if zustand.M_y == 0.0 and zustand.M_z == 0.0:
-            return 0.0, zustand
-        return math.remainder(math.atan2(zustand.M_z, zustand.M_y) - ziel, 2.0 * math.pi), zustand
-
-    return winkel_suchen(abweichung, Faserquerschnitt.neigung_fuer(M_y, M_z),
-                         schranke=WINKEL_SCHRANKE)
-
-
 # -- Das lineare Zusammenwirken: (54) und (60) -------------------------------------
 
 
@@ -324,7 +277,7 @@ class Widerstaende:
 
 def elastische(stahl: Stahlquerschnitt, f: Sequence[float]) -> Widerstaende:
     """Die Widerstaende von (54): ``f_y A`` und je Achse ``f_y W_el`` bis zur weitesten Faser."""
-    zug = stahl.zugkraft(f)
+    zug = stahl.starr(f).zugkraft
     um_y = stahl.elastisch((0.0, 1.0)).moment(f)[0]
     um_z = stahl.elastisch((1.0, 0.0)).moment(f)[0]
     w = stahl.werte()
@@ -339,14 +292,14 @@ def plastische(stahl: Stahlquerschnitt, f: Sequence[float]) -> Widerstaende:
     je Zugseite ``f_y W_pl`` bei ``N = 0`` -- fuer das Zusammenwirken im Stab
     (:mod:`opencivil.stahlbau.stabilitaet`).
     """
-    zug = stahl.zugkraft(f)
+    starr = stahl.starr(f)
     momente = {}
     for seite in Zugseite:
         n = normale(seite)
-        W_pl = stahl.plastisch(n, stahl.nulllinie(n, f))
+        W_pl = stahl.plastisch(n, starr.nulllinie(n))
         momente[seite] = sum(f_g * w for f_g, w in zip(f, W_pl))
     w = stahl.werte()
-    return Widerstaende(zug, zug, momente, (w.y_S, w.z_S), (w.y_S, w.z_S))
+    return Widerstaende(starr.zugkraft, starr.zugkraft, momente, (w.y_S, w.z_S), (w.y_S, w.z_S))
 
 
 @dataclass(frozen=True)
@@ -390,7 +343,7 @@ def wirksame(ab: Abgemindert, f: Sequence[float], eps: Sequence[float],
             continue
         n = normale(seite)
         el = stahl.elastisch(n)
-        zustaende = stahl.zustaende(Linie(n, stahl.nulllinie(n, f)), el.linie, eps)
+        zustaende = stahl.zustaende(Linie(n, stahl.starr(f).nulllinie(n)), el.linie, eps)
         gebogen = stahl.wirksamer(zustaende, el.linie, eps, ab.rest)
         if gebogen is None:
             return None
@@ -399,7 +352,7 @@ def wirksame(ab: Abgemindert, f: Sequence[float], eps: Sequence[float],
         momente[seite], g = e.moment(f)
         biegung[seite] = Gebogen(breiten, e.I, e.abstaende[g], g)
     brutto, w = stahl.werte(), netto.werte()
-    return Wirksame(Widerstaende(stahl.zugkraft(f), netto.zugkraft(f), momente,
+    return Wirksame(Widerstaende(stahl.starr(f).zugkraft, netto.starr(f).zugkraft, momente,
                                  (brutto.y_S, brutto.z_S), (w.y_S, w.z_S)),
                     druck, w.A, biegung)
 
@@ -444,7 +397,7 @@ class Fall:
     """Die frei gezeichneten Flaechen, die gedrueckt sind."""
 
     klasse: int
-    plastisch: Optional[Plastisch] = None
+    plastisch: Optional[Zustand] = None
     faktor_54: Optional[float] = None
     wirksam: Optional[Wirksame] = None
     glieder: List[Glied] = field(default_factory=list)
@@ -495,7 +448,7 @@ def rechnen(stahl: Stahlquerschnitt, f: Sequence[float], eps: Sequence[float], N
         fall.alpha = 1.0 / fall.n if N != 0.0 else math.inf
         return fall
 
-    pl = plastisch(ab.stahl, f, N, M_y, M_z, bezug, biegung.neigung(M_y))
+    pl = ab.stahl.starr(f).zustand(N, M_y, M_z, bezug, biegung.neigung(M_y))
     glieder = el.glieder(N, M_y, M_z, bezug, biegung.einachsig)
     faktor = skala(el.n(N), glieder)
     linie_el = spannungslinie(ab.stahl, N, M_y, M_z, bezug, biegung.einachsig,

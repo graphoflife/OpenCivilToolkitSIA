@@ -15,6 +15,7 @@ from opencivil.bericht.markdown import als_markdown
 from opencivil.projekt import Projekt, QuerschnittsanalyseEintrag
 from opencivil.projekt.lesen import ProjektFehler
 from opencivil.querschnitt import geometrie as geo
+from opencivil.querschnitt.bauweise import Bauweise
 from opencivil.querschnitt.vorlagen import kreispunkte
 from opencivil.stahlprofile import lage
 from opencivil.stahlprofile.tabelle import PROFILE
@@ -163,9 +164,8 @@ class TestAnalyse(unittest.TestCase):
         p = projekt()
         kern = [list(q) for q in kreispunkte((0.0, 0.0), 100.0, 48)]
         a = analyse(p, (0, 0, "ROR 219.1 x 8", {}), polygone=[(kern, "b1")])
-        self.assertEqual(p.rechnen().aufbau.teile[a.kennung].ohne_nachweis,
-                         "einen Verbundquerschnitt weist das Werkzeug nach SIA 264:2014 noch "
-                         "nicht nach")
+        teil = p.rechnen().aufbau.teile[a.kennung]
+        self.assertEqual((teil.objekt.bauweise, teil.ohne_nachweis), (Bauweise.VERBUND, ""))
 
     def test_im_bericht_mit_lage_und_umriss(self):
         p = projekt()

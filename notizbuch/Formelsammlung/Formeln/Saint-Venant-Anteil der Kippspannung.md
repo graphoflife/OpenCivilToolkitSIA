@@ -1,5 +1,5 @@
 ---
-erzeugt: 2c8d4e03ca1a
+erzeugt: 41c69e515fc5
 art: formel
 tags: [formel]
 normstelle: "SIA 263:2013, Anhang B.4, (92)"
@@ -10,7 +10,7 @@ normstelle: "SIA 263:2013, Anhang B.4, (92)"
 *In der Herleitung: «Saint-Venant-Anteil, mit K = I\_T»*
 
 $$
-\sigma_{Dv} = \frac{\eta \cdot \pi}{L_{D} \cdot W_{el}} \cdot \sqrt{G_a \cdot I_T \cdot E_a \cdot I_z}
+\sigma_{Dv} = \frac{\eta \cdot \pi}{L_{D} \cdot W_{el}} \cdot \sqrt{G_{a} \cdot I_T \cdot E_{a} \cdot I_z}
 $$
 
 ## Grössen
@@ -20,9 +20,9 @@ $$
 | $\eta$ | Beiwert der Momentenverteilung beim Kippen | – | [[Beiwert η der Momentenverteilung beim Kippen]] |
 | $L_{D}$ | Kipplänge | mm | Zwischenwert |
 | $W_{el}$ | Elastisches Widerstandsmoment, ganzer Querschnitt | cm³ | Zwischenwert, [[Widerstandsmoment bis zur weitesten Faser]] |
-| $G_a$ | Schubmodul des Baustahls | N/mm² | Vorgabe |
+| $G_{a}$ | Schubmodul des Baustahls | N/mm² | Vorgabe |
 | $I_T$ | Torsionsträgheitsmoment nach St. Venant | ·10⁶ mm⁴ | [[Torsionsträgheitsmoment, nach Richardson aus beiden Gittern]] |
-| $E_a$ | Elastizitätsmodul des Baustahls | N/mm² | Vorgabe |
+| $E_{a}$ | Elastizitätsmodul des Baustahls | N/mm² | Vorgabe |
 | $I_z$ | Trägheitsmoment um z | ·10⁶ mm⁴ | Zwischenwert |
 
 ## Beispiel
@@ -31,7 +31,7 @@ Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
 \begin{aligned}
-  \sigma_{Dv} &= \frac{\eta \cdot \pi}{L_{D} \cdot W_{el}} \cdot \sqrt{G_a \cdot I_T \cdot E_a \cdot I_z} \\
+  \sigma_{Dv} &= \frac{\eta \cdot \pi}{L_{D} \cdot W_{el}} \cdot \sqrt{G_{a,\text{S355}} \cdot I_T \cdot E_{a,\text{S355}} \cdot I_z} \\
   &= \frac{1.75 \cdot \pi}{3000\,\mathrm{mm} \cdot 3070.7\,\mathrm{cm}^{3}} \cdot \sqrt{81000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 1.6\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 33.9\,\cdot 10^{6}\,\mathrm{mm}^{4}} \\
   &= 581.7\,\mathrm{N}/\mathrm{mm}^{2}
 \end{aligned}

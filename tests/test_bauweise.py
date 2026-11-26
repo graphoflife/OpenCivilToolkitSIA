@@ -191,12 +191,13 @@ class TestAnalyse(unittest.TestCase):
         self.assertEqual(b["ohne_diagramm"], "")
         self.assertIsNotNone(b["interaktion"])
 
-    def test_verbund_ohne_nachweis(self):
+    def test_verbund_hat_nachweise(self):
+        """Seit 2026-11-26 nach SIA 264 -- vorher sagte er grau, dass er keine hat."""
         p = projekt()
         a = analyse(p, "Verbund", (RECHTECK, "b1"), (BLECH, "st1"), staebe=[(100, 50)])
-        self.assertEqual(p.rechnen().aufbau.teile[a.kennung].ohne_nachweis,
-                         "einen Verbundquerschnitt weist das Werkzeug nach SIA 264:2014 noch "
-                         "nicht nach")
+        teil = p.rechnen().aufbau.teile[a.kennung]
+        self.assertEqual(teil.ohne_nachweis, "")
+        self.assertEqual([feld for feld, _, _ in teil.nachweise], ["qa_verbund"])
 
     def test_eine_mischung_rechnet_nicht(self):
         p = projekt()

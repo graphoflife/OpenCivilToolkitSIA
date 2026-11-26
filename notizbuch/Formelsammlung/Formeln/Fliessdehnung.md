@@ -1,5 +1,5 @@
 ---
-erzeugt: 608d0ddf370b
+erzeugt: 5e68ce25ee12
 art: formel
 tags: [formel]
 normstelle: ["SIA 262:2025, 4.2.2.2, Figur 16", "SIA 262:2025, 4.3.3.2.2, (38)", "SIA 263:2013, 3.2.2.4", "SIA 262:2025, 4.2.3.3, Figur 17"]
@@ -16,7 +16,7 @@ $$
 *In der Herleitung: «Fliessdehnung des Baustahls»*
 
 $$
-\varepsilon_y = \frac{f_y}{E_a}
+\varepsilon_{y} = \frac{f_{y}}{E_{a}}
 $$
 
 *In der Herleitung: «Fliessdehnung von Drähten und Stäben (Bemessungswert)»*
@@ -43,8 +43,8 @@ $$
 | --- | --- | --- | --- |
 | $f_{yd}$ | Bemessungswert der Fliessgrenze | N/mm² | [[Bemessungswert der Fliessgrenze]] |
 | $E_s$ | Elastizitätsmodul des Betonstahls | N/mm² | Vorgabe |
-| $f_y$ | Streckgrenze | N/mm² | Vorgabe |
-| $E_a$ | Elastizitätsmodul des Baustahls | N/mm² | Vorgabe |
+| $f_{y}$ | Streckgrenze | N/mm² | Vorgabe |
+| $E_{a}$ | Elastizitätsmodul des Baustahls | N/mm² | Vorgabe |
 | $f_{pd}$ | Bemessungswert der Fliessgrenze | N/mm² | [[Bemessungswert der Fliessgrenze]] |
 | $E_p$ | Elastizitätsmodul von Drähten und Stäben | N/mm² | Vorgabe |
 | $E_p^{\mathrm{Litze}}$ | Elastizitätsmodul von Litzen | N/mm² | Vorgabe |
@@ -61,7 +61,7 @@ $$
 Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
-\varepsilon_y = \frac{f_y}{E_a} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2}}{210000\,\mathrm{N}/\mathrm{mm}^{2}} = 1.69\,\text{‰}
+\varepsilon_{y,\text{S355}} = \frac{f_{y,\text{S355}}}{E_{a,\text{S355}}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2}}{210000\,\mathrm{N}/\mathrm{mm}^{2}} = 1.69\,\text{‰}
 $$
 
 Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:

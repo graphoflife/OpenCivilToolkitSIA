@@ -1,10 +1,10 @@
 ---
-erzeugt: dce10e340f31
+erzeugt: 8da9f8f0ab1c
 art: thema
 tags: [thema]
 ---
 > [!abstract] Platte
-> 41 Formeln, in der Folge, in der gerechnet wird.
+> 47 Formeln, in der Folge, in der gerechnet wird.
 
 ## Was die Rechnung dazu sagt
 
@@ -25,6 +25,8 @@ Jedes Teil rechnet mit der Fliessgrenze seiner Dicke: ein Profil mit der seines 
 Je Profil allein, ohne Normalkraft und Biegung: kein Blech ist gedrückt, der Querschnitt rechnet plastisch. Beim I und beim U prüft (42), ob der Steg beulen kann; tut er es, trägt er nach (13). Die Wände eines Rechteckrohrs tragen je nach (13). Zusammen tragen die Profile die Summe; frei gezeichnete Flächen tragen nichts.
 
 Was der Holzquerschnitt aufnimmt, ohne Bezug auf einen Lastfall: je Beanspruchung allein, linear, mit den Bemessungswerten der Tabellen und η\_w der Feuchteklasse – ohne stossartige Einwirkung. Knicken und Kippen gehören dem Stab und sind hier nicht dabei.
+
+Was der Verbundquerschnitt aufnimmt, ohne Bezug auf einen Lastfall: die Widerstände gegen Zug, Druck und Biegung, plastisch nach SIA 264, und mit Profilen gegen Querkraft – die trägt der Stahl allein (4.3.2.2). Knicken, Kippen und die Verdübelung gehören dem Träger und sind hier nicht dabei.
 
 ## Formeln
 
@@ -69,6 +71,12 @@ Was der Holzquerschnitt aufnimmt, ohne Bezug auf einen Lastfall: je Beanspruchun
 39. [[Biegewiderstand eines Holzquerschnitts]]
 40. [[Querkraftwiderstand eines Holzquerschnitts]]
 41. [[Torsionswiderstand eines Rechtecks aus Holz]]
+42. [[Festigkeiten im Verbundquerschnitt]]
+43. [[Plastischer Normalkraftwiderstand im Verbund]]
+44. [[Probe – Normalkraft]]
+45. [[Probe – Moment um y]]
+46. [[Abminderungsbeiwert β nach Figur 1]]
+47. [[Plastischer Biegewiderstand mit β]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

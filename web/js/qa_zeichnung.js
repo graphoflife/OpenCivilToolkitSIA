@@ -205,9 +205,9 @@ export function bauweiseVon(kennung) {
 }
 
 /**
- * Warum der Querschnitt keinen Nachweis hat -- er ist aus Holz oder im
- * Verbund: «Einen Holzquerschnitt weist das Werkzeug …». Leer beim
- * Stahlbeton und beim Stahl.
+ * Warum der Querschnitt keinen Nachweis hat -- er ist aus mehreren
+ * Hölzern: «einen Holzquerschnitt aus mehreren Hölzern …». Leer bei allen
+ * anderen.
  */
 export function ohneNachweiseVon(kennung) {
   return bauweisenangabe(kennung, 'ohne_nachweise');

@@ -1,5 +1,5 @@
 ---
-erzeugt: b5afa0494827
+erzeugt: 9a26f8935525
 art: formel
 tags: [formel]
 ---
@@ -26,13 +26,14 @@ $$
 
 ## Im Code
 
-- [[opencivil.nachweis.qa_stahl#StahlBiegungQA|StahlBiegungQA._plastisch]]
+- [[opencivil.nachweis.qa_stahl#probe|probe]]
 - [[opencivil.nachweis.schiefe_biegung#SchiefeBiegung|SchiefeBiegung._protokoll_bruchzustand]]
 
 ## Themen
 
 - [[Schiefe Biegung]]
 - [[Stahlquerschnitt]]
+- [[Verbundquerschnitt]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

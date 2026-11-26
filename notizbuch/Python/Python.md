@@ -1,5 +1,5 @@
 ---
-erzeugt: a90be5c66ba6
+erzeugt: ad30b78f4699
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -113,6 +113,9 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.nachweis.qa_stahl_kennzahlen]] – was ein gezeichneter Stahlquerschnitt aufnimmt, ohne Einwirkung.
     - [[opencivil.nachweis.qa_stahl_stabilitaet]] – Knicken und Kippen eines Stahlstabs nach SIA 263:2013.
     - [[opencivil.nachweis.qa_stahl_werte]] – was Kennzahlen und Nachweise eines Stahlquerschnitts teilen.
+    - [[opencivil.nachweis.qa_verbund]] – die Lastfaelle eines Verbundquerschnitts nach SIA 264:2014.
+    - [[opencivil.nachweis.qa_verbund_kennzahlen]] – was ein Verbundquerschnitt aufnimmt, ohne Einwirkung.
+    - [[opencivil.nachweis.qa_verbund_werte]] – was Kennzahlen und Nachweise im Verbund teilen.
     - [[opencivil.nachweis.querkraft]] – Querkraftnachweis, was beide Ansaetze teilen.
     - [[opencivil.nachweis.querkraft_buegel]] – Querkraft mit Querkraftbewehrung.
     - [[opencivil.nachweis.querkraft_ohne_buegel]] – Querkraft ohne Querkraftbewehrung.
@@ -197,6 +200,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.querschnitt.gesetzwahl]] – womit ein Querschnitt rechnet.
     - [[opencivil.querschnitt.interaktion]] – Bruchzustand gezeichneter Querschnitte, auch schief.
     - [[opencivil.querschnitt.lagenaufbau]] – wo die Bewehrung einer Platte liegt.
+    - [[opencivil.querschnitt.plastisch]] – Spannungsbloecke an einer geraden Nulllinie, starr-plastisch.
     - [[opencivil.querschnitt.platte]] – Stahlbeton-Plattenquerschnitt.
     - [[opencivil.querschnitt.randzone]] – der Beton nahe am Rand eines gezeichneten Querschnitts.
     - [[opencivil.querschnitt.schubwaende]] – Querkraft und Torsion auf Schubwaende verteilt.
@@ -245,6 +249,9 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.stahlprofile.formen]] – die Formen der Stahlprofile, mit ihren Formeln.
     - [[opencivil.stahlprofile.lage]] – ein Stahlprofil im gezeichneten Querschnitt.
     - [[opencivil.stahlprofile.tabelle]] – welche Stahlprofile es gibt, mit ihren Massen.
+- [[opencivil.verbund]] – Verbundbau nach SIA 264:2014.
+    - [[opencivil.verbund.querschnitt]] – ein gezeichneter Querschnitt aus Baustahl und Beton.
+    - [[opencivil.verbund.widerstand]] – was ein Verbundquerschnitt in einem Lastfall aufnimmt.
 - [[opencivil.web]] – die Oberflaeche, von der Seite des Rechenkerns.
     - [[opencivil.web.anzeige]] – Zahlen und Zeilen, wie die Oberflaeche sie zeigt.
     - [[opencivil.web.api]] – Uebersetzung der Rechenergebnisse nach JSON.

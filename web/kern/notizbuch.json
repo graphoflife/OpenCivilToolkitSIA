@@ -247,6 +247,12 @@
       "bereich": "Querschnittsanalyse"
     },
     {
+      "name": "Verbundquerschnitt",
+      "pfad": "Formelsammlung/Themen/Verbundquerschnitt.md",
+      "art": "thema",
+      "bereich": "Querschnittsanalyse"
+    },
+    {
       "name": "Streifenmethode",
       "pfad": "Formelsammlung/Themen/Streifenmethode.md",
       "art": "thema",
@@ -293,6 +299,18 @@
       ],
       "themen": [
         "Knicken und Kippen"
+      ]
+    },
+    {
+      "name": "Abminderungsbeiwert β nach Figur 1",
+      "pfad": "Formelsammlung/Formeln/Abminderungsbeiwert β nach Figur 1.md",
+      "art": "formel",
+      "zeichen": [
+        "\\beta"
+      ],
+      "themen": [
+        "Kennzahlen",
+        "Verbundquerschnitt"
       ]
     },
     {
@@ -1606,6 +1624,7 @@
         "Knicken und Kippen",
         "Holzquerschnitt",
         "Knicken und Kippen eines Holzstabs",
+        "Verbundquerschnitt",
         "Durchstanzen"
       ]
     },
@@ -1619,7 +1638,8 @@
         "Stahlquerschnitt",
         "Knicken und Kippen",
         "Holzquerschnitt",
-        "Knicken und Kippen eines Holzstabs"
+        "Knicken und Kippen eines Holzstabs",
+        "Verbundquerschnitt"
       ]
     },
     {
@@ -1691,6 +1711,15 @@
       "zeichen": [],
       "themen": [
         "Pfahlsteifigkeit"
+      ]
+    },
+    {
+      "name": "Festigkeiten im Verbundquerschnitt",
+      "pfad": "Formelsammlung/Formeln/Festigkeiten im Verbundquerschnitt.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Kennzahlen"
       ]
     },
     {
@@ -2087,9 +2116,10 @@
       "art": "formel",
       "zeichen": [
         "\\varepsilon_{yd}",
-        "\\varepsilon_y",
+        "\\varepsilon_{y}",
         "\\varepsilon_{pd}",
-        "\\varepsilon_{pd}^{\\mathrm{Litze}}"
+        "\\varepsilon_{pd}^{\\mathrm{Litze}}",
+        "\\varepsilon_y"
       ],
       "themen": [
         "Betonstahl",
@@ -2963,7 +2993,8 @@
         "\\rho_{z}"
       ],
       "themen": [
-        "Stahlquerschnitt"
+        "Stahlquerschnitt",
+        "Verbundquerschnitt"
       ]
     },
     {
@@ -3246,6 +3277,27 @@
       ]
     },
     {
+      "name": "Plastischer Biegewiderstand mit β",
+      "pfad": "Formelsammlung/Formeln/Plastischer Biegewiderstand mit β.md",
+      "art": "formel",
+      "zeichen": [
+        "M_{y,Rd}^{+}"
+      ],
+      "themen": [
+        "Kennzahlen",
+        "Verbundquerschnitt"
+      ]
+    },
+    {
+      "name": "Plastischer Normalkraftwiderstand im Verbund",
+      "pfad": "Formelsammlung/Formeln/Plastischer Normalkraftwiderstand im Verbund.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Kennzahlen"
+      ]
+    },
+    {
       "name": "Plattenrotation",
       "pfad": "Formelsammlung/Formeln/Plattenrotation.md",
       "art": "formel",
@@ -3285,7 +3337,9 @@
       ],
       "themen": [
         "Schiefe Biegung",
-        "Stahlquerschnitt"
+        "Stahlquerschnitt",
+        "Kennzahlen",
+        "Verbundquerschnitt"
       ]
     },
     {
@@ -3297,7 +3351,8 @@
       ],
       "themen": [
         "Schiefe Biegung",
-        "Stahlquerschnitt"
+        "Stahlquerschnitt",
+        "Verbundquerschnitt"
       ]
     },
     {
@@ -3309,7 +3364,9 @@
       ],
       "themen": [
         "Schiefe Biegung",
-        "Stahlquerschnitt"
+        "Stahlquerschnitt",
+        "Kennzahlen",
+        "Verbundquerschnitt"
       ]
     },
     {
@@ -4713,7 +4770,8 @@
         "Stahlquerschnitt",
         "Knicken und Kippen",
         "Holzquerschnitt",
-        "Knicken und Kippen eines Holzstabs"
+        "Knicken und Kippen eines Holzstabs",
+        "Verbundquerschnitt"
       ]
     },
     {
@@ -7261,15 +7319,18 @@
       "kurz": "die Lastfaelle eines Stahlquerschnitts nach SIA 263:2013.",
       "stichworte": [
         "_bezuege",
-        "_querkraefte",
-        "_einwirkung",
+        "querkraefte",
+        "einwirkung",
         "StahlBiegungQA",
         "StahlBiegungQA.pruefe",
         "StahlBiegungQA._rechnen",
-        "StahlBiegungQA._querkraft",
         "StahlBiegungQA._wirksam",
         "StahlBiegungQA._seiten",
         "StahlBiegungQA._linear",
+        "minderung",
+        "krafttabelle",
+        "momentsummen",
+        "probe",
         "glied_text",
         "StahlQuerkraftQA",
         "StahlQuerkraftQA.pruefe"
@@ -7287,7 +7348,8 @@
         "KennzahlenStahlQA.rechne",
         "KennzahlenStahlQA._summe",
         "KennzahlenStahlQA._klasse",
-        "KennzahlenStahlQA._elastisch"
+        "KennzahlenStahlQA._elastisch",
+        "querkraft"
       ]
     },
     {
@@ -7333,6 +7395,56 @@
         "Stahlwerte.bruch",
         "klassen",
         "breiten"
+      ]
+    },
+    {
+      "name": "opencivil.nachweis.qa_verbund",
+      "pfad": "Python/opencivil.nachweis.qa_verbund.md",
+      "art": "modul",
+      "kurz": "die Lastfaelle eines Verbundquerschnitts nach SIA 264:2014.",
+      "stichworte": [
+        "_bezuege",
+        "VerbundBiegungQA",
+        "VerbundBiegungQA.pruefe",
+        "VerbundBiegungQA._rechnen",
+        "VerbundBiegungQA._normalkraft",
+        "VerbundQuerkraftQA"
+      ]
+    },
+    {
+      "name": "opencivil.nachweis.qa_verbund_kennzahlen",
+      "pfad": "Python/opencivil.nachweis.qa_verbund_kennzahlen.md",
+      "art": "modul",
+      "kurz": "was ein Verbundquerschnitt aufnimmt, ohne Einwirkung.",
+      "stichworte": [
+        "_achse",
+        "verbund_von",
+        "KennzahlenVerbundQA",
+        "KennzahlenVerbundQA.rechne",
+        "KennzahlenVerbundQA._summe"
+      ]
+    },
+    {
+      "name": "opencivil.nachweis.qa_verbund_werte",
+      "pfad": "Python/opencivil.nachweis.qa_verbund_werte.md",
+      "art": "modul",
+      "kurz": "was Kennzahlen und Nachweise im Verbund teilen.",
+      "stichworte": [
+        "stoffbezuege",
+        "Verbundwerte",
+        "Verbundwerte.zahl",
+        "Verbundwerte.gamma",
+        "Verbundwerte.kennwert",
+        "Verbundwerte.festigkeiten",
+        "Verbundwerte.zug",
+        "Verbundwerte.druck",
+        "Verbundwerte.eps",
+        "Verbundwerte.hochfest",
+        "Verbundwerte.kurz",
+        "festigkeiten",
+        "klassen",
+        "klasse_text",
+        "beta"
       ]
     },
     {
@@ -8304,6 +8416,7 @@
         "bauen",
         "_lastfaelle",
         "_stahl",
+        "_verbund",
         "_holz",
         "_stossartig",
         "_kennzahlen",
@@ -8397,7 +8510,8 @@
         "_raumrahmen",
         "_spannbeton",
         "_stahltraeger",
-        "_holztraeger"
+        "_holztraeger",
+        "_verbundtraeger"
       ]
     },
     {
@@ -9244,6 +9358,28 @@
         "Lagenaufbau",
         "Lagenaufbau.rechne",
         "Lagenaufbau._kennzahlen"
+      ]
+    },
+    {
+      "name": "opencivil.querschnitt.plastisch",
+      "pfad": "Python/opencivil.querschnitt.plastisch.md",
+      "art": "modul",
+      "kurz": "Spannungsbloecke an einer geraden Nulllinie, starr-plastisch.",
+      "stichworte": [
+        "Linie",
+        "Linie.d",
+        "Stueck",
+        "Stueck.werte",
+        "Block",
+        "Zustand",
+        "stuecke",
+        "Starrplastisch",
+        "Starrplastisch.zugkraft",
+        "Starrplastisch.druckkraft",
+        "Starrplastisch.kraefte",
+        "Starrplastisch.bloecke",
+        "Starrplastisch.nulllinie",
+        "Starrplastisch.zustand"
       ]
     },
     {
@@ -10205,16 +10341,12 @@
       "art": "modul",
       "kurz": "ein gezeichneter Querschnitt aus Baustahl.",
       "stichworte": [
-        "Linie",
-        "Linie.d",
         "normale",
         "Gruppe",
         "Gruppe.name",
         "Gruppe.kennwert",
         "Teil",
         "Teil.name",
-        "Stueck",
-        "Stueck.werte",
         "Blechzustand",
         "Blechzustand.name",
         "Blechzustand.schlankheit",
@@ -10223,7 +10355,6 @@
         "Elastisch",
         "Elastisch.linie",
         "Elastisch.moment",
-        "Block",
         "kleinste_breite",
         "_huelle",
         "_null",
@@ -10235,10 +10366,7 @@
         "Stahlquerschnitt.freie",
         "Stahlquerschnitt.flaechen",
         "Stahlquerschnitt.werte",
-        "Stahlquerschnitt.zugkraft",
-        "Stahlquerschnitt.kraefte",
-        "Stahlquerschnitt.bloecke",
-        "Stahlquerschnitt.nulllinie",
+        "Stahlquerschnitt.starr",
         "Stahlquerschnitt.plastisch",
         "Stahlquerschnitt.elastisch",
         "Stahlquerschnitt.zustaende",
@@ -10342,8 +10470,6 @@
         "Abgemindert",
         "Abgemindert.rest",
         "abmindern",
-        "Plastisch",
-        "plastisch",
         "Glied",
         "Glied.widerstand",
         "Glied.anteil",
@@ -10442,6 +10568,53 @@
         "_benannt",
         "reihe",
         "profil"
+      ]
+    },
+    {
+      "name": "opencivil.verbund",
+      "pfad": "Python/opencivil.verbund.md",
+      "art": "modul",
+      "kurz": "Verbundbau nach SIA 264:2014.",
+      "stichworte": []
+    },
+    {
+      "name": "opencivil.verbund.querschnitt",
+      "pfad": "Python/opencivil.verbund.querschnitt.md",
+      "art": "modul",
+      "kurz": "ein gezeichneter Querschnitt aus Baustahl und Beton.",
+      "stichworte": [
+        "stahlflaechen",
+        "Verbundquerschnitt",
+        "Verbundquerschnitt.art",
+        "Verbundquerschnitt.gruppen_der",
+        "Verbundquerschnitt.stuecke",
+        "Verbundquerschnitt.starr",
+        "Verbundquerschnitt.flaechen_je_gruppe",
+        "Verbundquerschnitt.hoehe",
+        "Verbundquerschnitt.druckzone_beton",
+        "Verbundquerschnitt.zustaende",
+        "Verbundquerschnitt.freie_gedrueckt",
+        "Verbundquerschnitt.kammerbetoniert"
+      ]
+    },
+    {
+      "name": "opencivil.verbund.widerstand",
+      "pfad": "Python/opencivil.verbund.widerstand.md",
+      "art": "modul",
+      "kurz": "was ein Verbundquerschnitt in einem Lastfall aufnimmt.",
+      "stichworte": [
+        "duktil_text",
+        "Beta",
+        "Beta.verhaeltnis",
+        "Beta.beta",
+        "Fall",
+        "Fall.ohne_moment",
+        "Fall.faktor_beta",
+        "_fall",
+        "sproede_gezogen",
+        "_bewerten",
+        "rechnen",
+        "biegewiderstand"
       ]
     },
     {

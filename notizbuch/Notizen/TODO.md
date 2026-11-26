@@ -1468,6 +1468,50 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
 
       Vorschlag: so lassen. Entscheid des Benutzers.
 
+- [ ] **Verbundquerschnitt, nach Vorgabe eingebaut** (`opencivil/verbund/`,
+      `opencivil/nachweis/qa_verbund.py`, `qa_verbund_kennzahlen.py`,
+      `qa_verbund_werte.py`, seit 2026-11-26). Jede Annahme steht auch in
+      der Herleitung.
+      - Gerechnet mit voller Verdübelung (5.1.2.1), bis die Verdübelung
+        kommt (Schritt 14b).
+      - Ein Stab ist ein Quadrat seiner Fläche, eine verschmierte Linie ein
+        Rechteck; beide verdrängen den Beton, in dem sie liegen.
+      - Die Klasse an der plastischen Nulllinie des Lastfalls. Nur die
+        Klassen 1 und 2 rechnen; darüber steht der Fall grau («über 2»),
+        denn elastisch nach 5.1.2.4 und 5.1.2.5 rechnet das Werkzeug noch
+        nicht.
+      - Kammerbeton: erkannt an fünf Punkten einen Millimeter neben dem
+        Blech – beim Flansch innen bis 0.4 b von der Mitte des Stegs, wie
+        im Bild der Tabelle 3 mit b_c/b ≥ 0.8, beim Steg auf beiden Seiten.
+        Breiterer Beton zählt mit. Der Steg rechnet nach 5.2.1.3 mit 42ε,
+        der kleinsten Grenze der Klasse 3 (bei reinem Druck), als Grenze
+        der Klasse 2 – auf der sicheren Seite, weil ψ elastisch nicht
+        gerechnet wird. Die Verbindung von Steg und Kammerbeton (5.2.1.2)
+        nimmt es an; dass die Dübel einen Druckflansch nach 4.2.2.3 in die
+        Klasse 1 heben, prüft es nicht.
+      - 5.1.2.3 für jedes Moment, das Betonstahl zieht, nicht nur über der
+        Stütze: ist er nicht in der Duktilitätsklasse B oder C, steht der
+        Fall grau.
+      - β (5.1.2.2) für jeden Baustahl mit f_y ≥ 420 N/mm²; x_p senkrecht
+        zur Nulllinie ab dem gedrücktesten Punkt des Betons, h quer zu ihr
+        über den ganzen Querschnitt – auch bei schiefer Biegung und bei
+        negativem Moment, wo der Kammerbeton gedrückt ist. Über
+        x_p/h = 0.4, wo Figur 1 endet, steht der Fall grau. Beim HEA 300
+        aus S460 unter einer Platte 1500 × 120 mm ist darum die Biegung
+        um z grau: die Druckzone reicht über 0.4 der Breite.
+      - Der Beton mit 0.85·f_cd überall, auch im gefüllten Rohr: 1.0 nach
+        5.3.2.5 kommt mit den Verbundstützen. γ_a ist γ_M1 des Baustahls.
+      - Ein Rohr im Verbund mit den Grenzen der SIA 263 statt der
+        Tabelle 6 (kommt mit den Verbundstützen).
+      - Die Querkraft trägt der Stahl allein; einen Anteil des Betons nach
+        5.2.2.2 rechnet das Werkzeug nicht.
+      - Torsion nicht nachgewiesen; ein Hinweis nennt den Lastfall.
+      - Nicht geprüft: f_ck zwischen 20 und 50 N/mm² (3.5.1).
+      - Für den Verbund keine Spannung-Dehnung-Analysen und kein
+        Interaktionsdiagramm.
+
+      Vorschlag: so lassen. Entscheid des Benutzers.
+
 - [ ] **Holz: C16 unter Zug – zu entscheiden** (`opencivil/material/holz.py`,
       `zugglied_grund`, seit 2026-11-26). SIA 265 lässt C16 nicht als
       Zugglied zu (Tabelle 6, Fussnote 2). Heute steht das als Hinweis in
@@ -1760,10 +1804,14 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
 
 - [ ] **Querschnittsanalyse, nächste Schritte:** Stahl (SIA 263) und Holz
       (SIA 265) haben seit 2026-11-26 ihre Nachweise, mit Knicken und
-      Kippen. Der Verbund bekommt seine Analysen und Nachweise mit Schritt
-      14 (Plan vom 2026-11-25): sein Riss braucht den ideellen Querschnitt.
-      Ein E_eq im Balkensystem gibt es bis dahin nur beim Stahlbeton. Dazu
-      weitere Nachweise (Wände ohne Bügel).
+      Kippen, der Verbund (SIA 264) die Tragsicherheit des Querschnitts.
+      Beim Verbund fehlen noch die Verdübelung (6.1, Schritt 14b), die
+      Verbundstützen mit Knicken (5.3, 14c), die Blechverbunddecken (5.4,
+      14d), das Kippen (5.1.2.6), der elastische Widerstand der Klasse 3
+      (5.1.2.4, 5.1.2.5) und die Spannung-Dehnung-Analysen: sein Riss
+      braucht den ideellen Querschnitt. Ein E_eq im Balkensystem gibt es
+      bis dahin nur beim Stahlbeton. Dazu weitere Nachweise (Wände ohne
+      Bügel).
 - [ ] **Baustahl: die Wärmedehnzahl** α_T = 10·10⁻⁶/°C (SIA 263:2013,
       3.2.2.2) fehlt -- es gibt keine Temperatur als Einheit, und keine
       Rechnung braucht sie. Kommt mit der ersten, die sie braucht.
