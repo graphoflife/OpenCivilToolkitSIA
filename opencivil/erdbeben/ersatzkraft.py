@@ -21,6 +21,8 @@ DAS VERFAHREN, je Richtung::
     S_d  = (31) bis (34)
     F_d  = S_d * Summe W_i                            (41)
     F_di = z_i * W_i / Summe z_j * W_j * F_d          (42)
+    V_i  = Summe_(j >= i) F_dj                        unter dem Geschoss i
+    M_i  = Summe_(j >= i) F_dj * (z_j - z_(i-1))      ebenda; M_1 = M_0 am Fuss
 
 Die Waende einer Richtung stehen als ein Kragarm da, eingespannt am Fuss und
 so hoch wie das Gebaeude; das Gewicht eines Geschosses wirkt waagrecht auf
@@ -30,7 +32,8 @@ traegt von Querkraft und Moment am Fuss ihren Anteil an EI.
 DIE WAND IM GRUNDRISS:
 Ihr Querschnitt kommt aus einer Querschnittsanalyse, gezeichnet in y und z.
 Bei 0 Grad liegt y in x des Gebaeudes: eine Kraft in x biegt sie um z, mit
-I_z, eine in y mit I_y. Bei 90 Grad ist es umgekehrt (:meth:`Wandlage.traegheit`).
+I_z, eine in y mit I_y. Bei 90 Grad ist es umgekehrt (:meth:`Wandlage.traegheit`),
+und im Bild liegt sie um 90 Grad gedreht (:meth:`Wandlage.im_grundriss`).
 
 NACH VORGABE, NICHT NACHGESCHLAGEN (auch in TODO):
 - die Verteilung auf die Waende nach ihrer Biegesteifigkeit;
@@ -235,6 +238,10 @@ class Wandlage(Wahl):
         """Welches Traegheitsmoment eine Kraft in ``richtung`` biegt: ``I_z`` oder ``I_y``."""
         um_z = (self is Wandlage.NULL) == (richtung == "x")
         return "I_z" if um_z else "I_y"
+
+    def im_grundriss(self, y: float, z: float) -> Tuple[float, float]:
+        """Wo der Punkt (y, z) der Querschnittsanalyse im Grundriss liegt, als (x, y)."""
+        return (y, z) if self is Wandlage.NULL else (-z, y)
 
 
 class Schwingzeit(Wahl):
@@ -464,6 +471,17 @@ class Wandanteil:
 def querkraefte(kraefte: Sequence[float]) -> Tuple[float, ...]:
     """Je Geschoss, von unten, die Querkraft unter ihm: die Kraefte von dort bis oben."""
     return tuple(sum(kraefte[i:]) for i in range(len(kraefte)))
+
+
+def momente(kraefte: Sequence[float], z: Sequence[float]) -> Tuple[float, ...]:
+    """
+    Je Geschoss, von unten, das Moment unter ihm, auf der Hoehe der Decke
+    darunter: die Kraefte von dort bis oben, je mal ihr Abstand. Am Fuss ist
+    es das Kippmoment M_0 -- der Kragarm ist dort eingespannt.
+    """
+    unten = (0.0, *z[:-1])
+    return tuple(sum(F * (zj - unten[i]) for F, zj in zip(kraefte[i:], z[i:]))
+                 for i in range(len(kraefte)))
 
 
 @dataclass(frozen=True)
@@ -825,19 +843,21 @@ class Lauf:
                  name="Ersatzkraft eines Geschosses")
         nenner = sum(zi * Wi for zi, Wi in zip(z, W))
         kraefte = [zi * Wi / nenner * F_d.groesse.si for zi, Wi in zip(z, W)]
-        V = querkraefte(kraefte)
+        V, M_unter = querkraefte(kraefte), momente(kraefte, z)
         p.tabelle(
             kopf=[GESCHOSS, Mathe(r"z\ [\mathrm{m}]"), Mathe(r"W\ [\mathrm{kN}]"),
                   Mathe(r"z \cdot W\ [\mathrm{kNm}]"), Mathe(r"F_{d,i}\ [\mathrm{kN}]"),
-                  Mathe(r"V\ [\mathrm{kN}]")],
+                  Mathe(r"V\ [\mathrm{kN}]"), Mathe(r"M\ [\mathrm{kNm}]")],
             zeilen=[[f"{i}: {g.name}", Mathe(fest(z[i - 1], 2)), Mathe(fest(W[i - 1] / 1e3, 0)),
                      Mathe(fest(z[i - 1] * W[i - 1] / 1e3, 0)),
-                     Mathe(fest(kraefte[i - 1] / 1e3, 1)), Mathe(fest(V[i - 1] / 1e3, 1))]
+                     Mathe(fest(kraefte[i - 1] / 1e3, 1)), Mathe(fest(V[i - 1] / 1e3, 1)),
+                     Mathe(fest(M_unter[i - 1] / 1e3, 0))]
                     for i, g in enumerate(self.gebaeude.geschosse, start=1)],
-            titel=f"Kräfte je Geschoss in {r} – V: die Querkraft unter dem Geschoss",
-            ausrichtung="lrrrrr")
-        M_0 = werte.wert(f"M_0_{r}", f"M_{{0,{r}}}",
-                         Groesse.aus_si(sum(F * zi for F, zi in zip(kraefte, z)), KNM), 0,
+            titel=f"Kräfte je Geschoss in {r} – V und M: Querkraft und Moment unter dem "
+                  f"Geschoss, auf der Höhe der Decke darunter",
+            ausrichtung="lrrrrrr")
+        # Am Fuss ist das Moment unter dem untersten Geschoss das Kippmoment.
+        M_0 = werte.wert(f"M_0_{r}", f"M_{{0,{r}}}", Groesse.aus_si(M_unter[0], KNM), 0,
                          f"Kippmoment am Fuss in {r}")
         p.formel(M_0, r"\sum_i F_{d,i} \cdot z_i", {}, titel=f"Kippmoment am Fuss in {r}",
                  referenz="", name="Kippmoment am Fuss")

@@ -3152,14 +3152,14 @@ $$
 F_{d,i} = \frac{z_i \cdot W_i}{\sum_j z_j \cdot W_j} \cdot F_d
 $$
 
-**Kräfte je Geschoss in x – V: die Querkraft unter dem Geschoss**
+**Kräfte je Geschoss in x – V und M: Querkraft und Moment unter dem Geschoss, auf der Höhe der Decke darunter**
 
-| Geschoss | $z\ [\mathrm{m}]$ | $W\ [\mathrm{kN}]$ | $z \cdot W\ [\mathrm{kNm}]$ | $F_{d,i}\ [\mathrm{kN}]$ | $V\ [\mathrm{kN}]$ |
-| :--- | ---: | ---: | ---: | ---: | ---: |
-| 1: EG | $3.00$ | $2740$ | $8220$ | $221.5$ | $1975.9$ |
-| 2: 1. OG | $6.00$ | $2740$ | $16440$ | $443.0$ | $1754.3$ |
-| 3: 2. OG | $9.00$ | $2740$ | $24660$ | $664.6$ | $1311.3$ |
-| 4: Dach | $12.00$ | $2000$ | $24000$ | $646.8$ | $646.8$ |
+| Geschoss | $z\ [\mathrm{m}]$ | $W\ [\mathrm{kN}]$ | $z \cdot W\ [\mathrm{kNm}]$ | $F_{d,i}\ [\mathrm{kN}]$ | $V\ [\mathrm{kN}]$ | $M\ [\mathrm{kNm}]$ |
+| :--- | ---: | ---: | ---: | ---: | ---: | ---: |
+| 1: EG | $3.00$ | $2740$ | $8220$ | $221.5$ | $1975.9$ | $17065$ |
+| 2: 1. OG | $6.00$ | $2740$ | $16440$ | $443.0$ | $1754.3$ | $11137$ |
+| 3: 2. OG | $9.00$ | $2740$ | $24660$ | $664.6$ | $1311.3$ | $5874$ |
+| 4: Dach | $12.00$ | $2000$ | $24000$ | $646.8$ | $646.8$ | $1940$ |
 
 **Kippmoment am Fuss in x**
 
@@ -3239,14 +3239,14 @@ $$
 F_{d,i} = \frac{z_i \cdot W_i}{\sum_j z_j \cdot W_j} \cdot F_d
 $$
 
-**Kräfte je Geschoss in y – V: die Querkraft unter dem Geschoss**
+**Kräfte je Geschoss in y – V und M: Querkraft und Moment unter dem Geschoss, auf der Höhe der Decke darunter**
 
-| Geschoss | $z\ [\mathrm{m}]$ | $W\ [\mathrm{kN}]$ | $z \cdot W\ [\mathrm{kNm}]$ | $F_{d,i}\ [\mathrm{kN}]$ | $V\ [\mathrm{kN}]$ |
-| :--- | ---: | ---: | ---: | ---: | ---: |
-| 1: EG | $3.00$ | $2740$ | $8220$ | $221.5$ | $1975.9$ |
-| 2: 1. OG | $6.00$ | $2740$ | $16440$ | $443.0$ | $1754.3$ |
-| 3: 2. OG | $9.00$ | $2740$ | $24660$ | $664.6$ | $1311.3$ |
-| 4: Dach | $12.00$ | $2000$ | $24000$ | $646.8$ | $646.8$ |
+| Geschoss | $z\ [\mathrm{m}]$ | $W\ [\mathrm{kN}]$ | $z \cdot W\ [\mathrm{kNm}]$ | $F_{d,i}\ [\mathrm{kN}]$ | $V\ [\mathrm{kN}]$ | $M\ [\mathrm{kNm}]$ |
+| :--- | ---: | ---: | ---: | ---: | ---: | ---: |
+| 1: EG | $3.00$ | $2740$ | $8220$ | $221.5$ | $1975.9$ | $17065$ |
+| 2: 1. OG | $6.00$ | $2740$ | $16440$ | $443.0$ | $1754.3$ | $11137$ |
+| 3: 2. OG | $9.00$ | $2740$ | $24660$ | $664.6$ | $1311.3$ | $5874$ |
+| 4: Dach | $12.00$ | $2000$ | $24000$ | $646.8$ | $646.8$ | $1940$ |
 
 **Kippmoment am Fuss in y**
 

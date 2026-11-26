@@ -5166,6 +5166,7 @@
         "Wandlage.beschriftung",
         "Wandlage.erklaerung",
         "Wandlage.traegheit",
+        "Wandlage.im_grundriss",
         "Schwingzeit",
         "Schwingzeit.beschriftung",
         "Schwingzeit.erklaerung",
@@ -5178,6 +5179,7 @@
         "Gebaeude.abschnitt",
         "Wandanteil",
         "querkraefte",
+        "momente",
         "Richtungsbefund",
         "Erdbebenbefund",
         "Erdbebenbefund.zulaessig",
@@ -8719,7 +8721,7 @@
         "_faecherpaar",
         "_interaktion",
         "_tiefe",
-        "_zeichnung",
+        "zeichnung",
         "_halbebene",
         "_gerade_im_rahmen",
         "_bruch",
@@ -8786,6 +8788,8 @@
       "kurz": "was die Oberflaeche von einem Gebaeude im Erdbeben zeichnet.",
       "stichworte": [
         "ansicht",
+        "_grundriss",
+        "_verlaufslegende",
         "_richtung",
         "_legende"
       ]

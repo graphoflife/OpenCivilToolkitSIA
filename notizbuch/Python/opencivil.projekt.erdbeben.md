@@ -1,5 +1,5 @@
 ---
-erzeugt: feee3580f44a
+erzeugt: 22c99db1b645
 art: modul
 tags: [modul]
 ---
@@ -138,3 +138,4 @@ oder `"90"`.
 - [[opencivil.projekt.aufbau.erdbeben]]
 - [[opencivil.projekt.projekt]]
 - [[opencivil.web.api]]
+- [[opencivil.web.erdbebendaten]]

@@ -1,5 +1,5 @@
 ---
-erzeugt: cfb1b04bcf7c
+erzeugt: 8c2e55245598
 art: modul
 tags: [modul]
 ---
@@ -514,6 +514,7 @@ Leser sieht alle Zweige und erkennt, welcher gegriffen hat.
 - [[opencivil.stabwerk3d.herleitung]]
 - [[opencivil.web.anzeige]]
 - [[opencivil.web.durchstanzdaten]]
+- [[opencivil.web.erdbebendaten]]
 - [[opencivil.web.grundbruchdaten]]
 - [[opencivil.web.pfahldaten]]
 - [[opencivil.web.setzungsdaten]]

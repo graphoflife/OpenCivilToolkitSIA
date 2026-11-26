@@ -1,5 +1,5 @@
 ---
-erzeugt: 0458780c4f2a
+erzeugt: 83d7e6cd8a95
 art: modul
 tags: [modul]
 ---
@@ -288,16 +288,18 @@ def _tiefe(eltern: Sequence[Optional[int]], i: int) -> int
 
 Wie oft ein Polygon in einem anderen liegt -- Eltern werden zuerst gezeichnet.
 
-### _zeichnung
+### zeichnung
 
 ```python
-def _zeichnung(bauteil) -> dict
+def zeichnung(bauteil) -> dict
 ```
 
 Was im Schnitt zu sehen ist, in mm -- die Stäbe der Linien schon
 aufgeloest. Je Polygon die Art seines Baustoffs (`material`, ohne eine
 Aussparung) und dessen Name, je Stab und Linie Name und Stahl: daraus
-das Bild «Querschnitt» seine Farben und seine Legende.
+das Bild «Querschnitt» seine Farben und seine Legende. Auch die Wände
+eines Gebäudes im Erdbeben zeichnen sich daraus
+([[opencivil.web.erdbebendaten]]).
 
 ### _halbebene
 
@@ -383,3 +385,4 @@ warum, sagt [[opencivil.web.diagrammdaten#_ohne_schub|_ohne_schub]].
 
 - [[opencivil.web.api]]
 - [[opencivil.web.dienst]]
+- [[opencivil.web.erdbebendaten]]

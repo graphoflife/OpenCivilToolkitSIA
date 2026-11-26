@@ -7,6 +7,35 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-26 · Erdbeben: Bild «Wände, Querkraft und Moment»
+
+Vom Benutzer gewünscht (2026-11-25): je Geschoss der Kern, dazu V und M
+über die Höhe.
+
+- Vorher zeigte das Erdbeben unter «Diagramme» nur die Ansicht mit den
+  Kräften je Geschoss und die Querkraft als Zahl daneben; das Moment gab es
+  nur am Fuss (M_0). Nachher steht darunter ein zweites Bild in derselben
+  Höhe: links je Geschoss die Wände im Grundriss, daneben je Richtung die
+  Querkraft V als Treppe und das Moment M des Kragarms, im Beispiel des
+  Wohnhauses unten 1976 kN und 17 065 kNm, unter dem Dach 647 kN und
+  1940 kNm (= 647 kN · 3 m). Die Tabelle «Kräfte je Geschoss» der
+  Herleitung hat dafür die Spalte M.
+- M unter einem Geschoss rechnet `ersatzkraft.momente`, neben
+  `querkraefte`: die Kräfte darüber, je mal ihr Abstand zur Decke darunter.
+  Das Kippmoment M_0 ist jetzt dessen erster Wert, nicht mehr eine eigene
+  Summe – eine Regel, eine Stelle; der Test prüft beides.
+- Die Wände haben keinen Ort im Grundriss (entschieden im Plan vom
+  2026-11-25): sie stehen nebeneinander, alle im selben Massstab, in jedem
+  Geschoss gleich, denn sie gehen über die ganze Höhe. Gedreht nach ihrer
+  Lage: bei 90° liegt y der Analyse in y des Gebäudes
+  (`Wandlage.im_grundriss`, neben `traegheit`, wo dieselbe Regel für die
+  Steifigkeit steht). Ihr Umriss kommt aus derselben Zeichnung wie das Bild
+  «Querschnitt» ihrer Analyse (`diagrammdaten.zeichnung`, vorher
+  `_zeichnung`), in derselben Farbe.
+- Beide Richtungen stehen je Grösse im selben Massstab, wie die Pfeile der
+  Ansicht. Ohne Gewicht zeigt das Bild nur die Wände; ohne Wand mit
+  Querschnitt und ohne Kräfte fehlt es.
+
 ## 2026-11-26 · Pfahl: Bild «Querschnitt»
 
 Vom Benutzer gewünscht (2026-11-25).
@@ -46,7 +75,7 @@ Vom Benutzer gewünscht (2026-11-25).
   Bruchzustand und Schubfluss zeichnen S jetzt so.
 - Der Kern schickt dazu je Polygon die Art und den Namen seines Baustoffs,
   je Stab und verschmierte Linie Namen und Stahl
-  (`diagrammdaten._zeichnung`). Eine Fläche aus Holz oder Baustahl
+  (`diagrammdaten.zeichnung`). Eine Fläche aus Holz oder Baustahl
   (Schritt 11) bekommt ihre Farbe dann über die Klasse `cad-<art>`;
   Profile und Spannglieder kommen mit den Schritten 9 und 11 ins Bild.
 

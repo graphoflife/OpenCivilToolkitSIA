@@ -17166,12 +17166,12 @@ $$
 F_{d,i} = \frac{z_i \cdot W_i}{\sum_j z_j \cdot W_j} \cdot F_d
 $$
 
-**Kräfte je Geschoss in x – V: die Querkraft unter dem Geschoss**
+**Kräfte je Geschoss in x – V und M: Querkraft und Moment unter dem Geschoss, auf der Höhe der Decke darunter**
 
-| Geschoss | $z\ [\mathrm{m}]$ | $W\ [\mathrm{kN}]$ | $z \cdot W\ [\mathrm{kNm}]$ | $F_{d,i}\ [\mathrm{kN}]$ | $V\ [\mathrm{kN}]$ |
-| :--- | ---: | ---: | ---: | ---: | ---: |
-| 1: Halle | $5.00$ | $2800$ | $14000$ | $801.8$ | $2348.0$ |
-| 2: Dach | $9.00$ | $3000$ | $27000$ | $1546.2$ | $1546.2$ |
+| Geschoss | $z\ [\mathrm{m}]$ | $W\ [\mathrm{kN}]$ | $z \cdot W\ [\mathrm{kNm}]$ | $F_{d,i}\ [\mathrm{kN}]$ | $V\ [\mathrm{kN}]$ | $M\ [\mathrm{kNm}]$ |
+| :--- | ---: | ---: | ---: | ---: | ---: | ---: |
+| 1: Halle | $5.00$ | $2800$ | $14000$ | $801.8$ | $2348.0$ | $17925$ |
+| 2: Dach | $9.00$ | $3000$ | $27000$ | $1546.2$ | $1546.2$ | $6185$ |
 
 **Kippmoment am Fuss in x**
 
@@ -17235,12 +17235,12 @@ $$
 F_{d,i} = \frac{z_i \cdot W_i}{\sum_j z_j \cdot W_j} \cdot F_d
 $$
 
-**Kräfte je Geschoss in y – V: die Querkraft unter dem Geschoss**
+**Kräfte je Geschoss in y – V und M: Querkraft und Moment unter dem Geschoss, auf der Höhe der Decke darunter**
 
-| Geschoss | $z\ [\mathrm{m}]$ | $W\ [\mathrm{kN}]$ | $z \cdot W\ [\mathrm{kNm}]$ | $F_{d,i}\ [\mathrm{kN}]$ | $V\ [\mathrm{kN}]$ |
-| :--- | ---: | ---: | ---: | ---: | ---: |
-| 1: Halle | $5.00$ | $2800$ | $14000$ | $280.6$ | $821.7$ |
-| 2: Dach | $9.00$ | $3000$ | $27000$ | $541.1$ | $541.1$ |
+| Geschoss | $z\ [\mathrm{m}]$ | $W\ [\mathrm{kN}]$ | $z \cdot W\ [\mathrm{kNm}]$ | $F_{d,i}\ [\mathrm{kN}]$ | $V\ [\mathrm{kN}]$ | $M\ [\mathrm{kNm}]$ |
+| :--- | ---: | ---: | ---: | ---: | ---: | ---: |
+| 1: Halle | $5.00$ | $2800$ | $14000$ | $280.6$ | $821.7$ | $6273$ |
+| 2: Dach | $9.00$ | $3000$ | $27000$ | $541.1$ | $541.1$ | $2164$ |
 
 **Kippmoment am Fuss in y**
 
@@ -17661,18 +17661,18 @@ $$
 F_{d,i} = \frac{z_i \cdot W_i}{\sum_j z_j \cdot W_j} \cdot F_d
 $$
 
-**Kräfte je Geschoss in x – V: die Querkraft unter dem Geschoss**
+**Kräfte je Geschoss in x – V und M: Querkraft und Moment unter dem Geschoss, auf der Höhe der Decke darunter**
 
-| Geschoss | $z\ [\mathrm{m}]$ | $W\ [\mathrm{kN}]$ | $z \cdot W\ [\mathrm{kNm}]$ | $F_{d,i}\ [\mathrm{kN}]$ | $V\ [\mathrm{kN}]$ |
-| :--- | ---: | ---: | ---: | ---: | ---: |
-| 1: 1. OG | $3.00$ | $660$ | $1980$ | $9.0$ | $325.3$ |
-| 2: 2. OG | $6.00$ | $660$ | $3960$ | $18.1$ | $316.2$ |
-| 3: 3. OG | $9.00$ | $660$ | $5940$ | $27.1$ | $298.2$ |
-| 4: 4. OG | $12.00$ | $660$ | $7920$ | $36.1$ | $271.1$ |
-| 5: 5. OG | $15.00$ | $660$ | $9900$ | $45.2$ | $234.9$ |
-| 6: 6. OG | $18.00$ | $660$ | $11880$ | $54.2$ | $189.7$ |
-| 7: 7. OG | $21.00$ | $660$ | $13860$ | $63.2$ | $135.5$ |
-| 8: 8. OG | $24.00$ | $660$ | $15840$ | $72.3$ | $72.3$ |
+| Geschoss | $z\ [\mathrm{m}]$ | $W\ [\mathrm{kN}]$ | $z \cdot W\ [\mathrm{kNm}]$ | $F_{d,i}\ [\mathrm{kN}]$ | $V\ [\mathrm{kN}]$ | $M\ [\mathrm{kNm}]$ |
+| :--- | ---: | ---: | ---: | ---: | ---: | ---: |
+| 1: 1. OG | $3.00$ | $660$ | $1980$ | $9.0$ | $325.3$ | $5530$ |
+| 2: 2. OG | $6.00$ | $660$ | $3960$ | $18.1$ | $316.2$ | $4554$ |
+| 3: 3. OG | $9.00$ | $660$ | $5940$ | $27.1$ | $298.2$ | $3605$ |
+| 4: 4. OG | $12.00$ | $660$ | $7920$ | $36.1$ | $271.1$ | $2711$ |
+| 5: 5. OG | $15.00$ | $660$ | $9900$ | $45.2$ | $234.9$ | $1897$ |
+| 6: 6. OG | $18.00$ | $660$ | $11880$ | $54.2$ | $189.7$ | $1193$ |
+| 7: 7. OG | $21.00$ | $660$ | $13860$ | $63.2$ | $135.5$ | $623$ |
+| 8: 8. OG | $24.00$ | $660$ | $15840$ | $72.3$ | $72.3$ | $217$ |
 
 **Kippmoment am Fuss in x**
 
@@ -17758,18 +17758,18 @@ $$
 F_{d,i} = \frac{z_i \cdot W_i}{\sum_j z_j \cdot W_j} \cdot F_d
 $$
 
-**Kräfte je Geschoss in y – V: die Querkraft unter dem Geschoss**
+**Kräfte je Geschoss in y – V und M: Querkraft und Moment unter dem Geschoss, auf der Höhe der Decke darunter**
 
-| Geschoss | $z\ [\mathrm{m}]$ | $W\ [\mathrm{kN}]$ | $z \cdot W\ [\mathrm{kNm}]$ | $F_{d,i}\ [\mathrm{kN}]$ | $V\ [\mathrm{kN}]$ |
-| :--- | ---: | ---: | ---: | ---: | ---: |
-| 1: 1. OG | $3.00$ | $660$ | $1980$ | $2.8$ | $99.1$ |
-| 2: 2. OG | $6.00$ | $660$ | $3960$ | $5.5$ | $96.3$ |
-| 3: 3. OG | $9.00$ | $660$ | $5940$ | $8.3$ | $90.8$ |
-| 4: 4. OG | $12.00$ | $660$ | $7920$ | $11.0$ | $82.6$ |
-| 5: 5. OG | $15.00$ | $660$ | $9900$ | $13.8$ | $71.5$ |
-| 6: 6. OG | $18.00$ | $660$ | $11880$ | $16.5$ | $57.8$ |
-| 7: 7. OG | $21.00$ | $660$ | $13860$ | $19.3$ | $41.3$ |
-| 8: 8. OG | $24.00$ | $660$ | $15840$ | $22.0$ | $22.0$ |
+| Geschoss | $z\ [\mathrm{m}]$ | $W\ [\mathrm{kN}]$ | $z \cdot W\ [\mathrm{kNm}]$ | $F_{d,i}\ [\mathrm{kN}]$ | $V\ [\mathrm{kN}]$ | $M\ [\mathrm{kNm}]$ |
+| :--- | ---: | ---: | ---: | ---: | ---: | ---: |
+| 1: 1. OG | $3.00$ | $660$ | $1980$ | $2.8$ | $99.1$ | $1684$ |
+| 2: 2. OG | $6.00$ | $660$ | $3960$ | $5.5$ | $96.3$ | $1387$ |
+| 3: 3. OG | $9.00$ | $660$ | $5940$ | $8.3$ | $90.8$ | $1098$ |
+| 4: 4. OG | $12.00$ | $660$ | $7920$ | $11.0$ | $82.6$ | $826$ |
+| 5: 5. OG | $15.00$ | $660$ | $9900$ | $13.8$ | $71.5$ | $578$ |
+| 6: 6. OG | $18.00$ | $660$ | $11880$ | $16.5$ | $57.8$ | $363$ |
+| 7: 7. OG | $21.00$ | $660$ | $13860$ | $19.3$ | $41.3$ | $190$ |
+| 8: 8. OG | $24.00$ | $660$ | $15840$ | $22.0$ | $22.0$ | $66$ |
 
 **Kippmoment am Fuss in y**
 

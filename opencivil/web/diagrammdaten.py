@@ -700,7 +700,7 @@ def analyse(aufbau: Aufbau, loesung: Loesung, kennung: str,
         "name": bauteil.name,
         "einachsig": einachsig,
         "laengszug": biegung is not None and biegung.laengszug is not None,
-        "zeichnung": _zeichnung(bauteil),
+        "zeichnung": zeichnung(bauteil),
         "interaktion": _interaktion(q, einachsig, *schnitt) if q is not None else None,
         "faelle": faelle,
     }
@@ -742,12 +742,14 @@ def _tiefe(eltern: Sequence[Optional[int]], i: int) -> int:
     return t
 
 
-def _zeichnung(bauteil) -> dict:
+def zeichnung(bauteil) -> dict:
     """
     Was im Schnitt zu sehen ist, in mm -- die Stäbe der Linien schon
     aufgeloest. Je Polygon die Art seines Baustoffs (``material``, ohne eine
     Aussparung) und dessen Name, je Stab und Linie Name und Stahl: daraus
-    das Bild «Querschnitt» seine Farben und seine Legende.
+    das Bild «Querschnitt» seine Farben und seine Legende. Auch die Wände
+    eines Gebäudes im Erdbeben zeichnen sich daraus
+    (:mod:`opencivil.web.erdbebendaten`).
     """
     return {
         "polygone": [

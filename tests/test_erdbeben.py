@@ -3,7 +3,8 @@ Das Ersatzkraftverfahren nach SIA 261:2020, 16.5.2 (opencivil.erdbeben.ersatzkra
 
 Ein Haus von Hand nachgerechnet -- vier Geschosse auf zwei Wänden: die
 Auslenkung des Dachs, T_1 (40), S_d (33), F_d (41), die Kräfte je Geschoss
-(42), das Kippmoment, die Anteile der Wände und dasselbe mit q = 1.0
+(42), Querkraft und Moment unter jedem Geschoss, das Kippmoment, die Anteile
+der Wände und dasselbe mit q = 1.0
 (16.5.1.9). Dann, wann das Verfahren gilt (16.5.2.1), T_1 von Hand, was einem
 Gebäude fehlt, die Prüfungen der Eingabe und was die Oberfläche sieht.
 """
@@ -14,7 +15,8 @@ import unittest
 from opencivil.bericht.zusammenfassung import angaben, nachweistabelle, zusammenfassen
 from opencivil.core.nachweis import OHNE_EINWIRKUNG
 from opencivil.erdbeben.ersatzkraft import (
-    NICHT_GERECHNET, NICHT_ZULAESSIG, REGELMAESSIGKEIT, Wandlage, duktile_waende,
+    NICHT_GERECHNET, NICHT_ZULAESSIG, REGELMAESSIGKEIT, Wandlage, duktile_waende, momente,
+    querkraefte,
 )
 from opencivil.projekt import ErdbebenEintrag, Projekt, ProjektFehler, QuerschnittsanalyseEintrag
 from opencivil.web import dienst
@@ -112,6 +114,19 @@ class TestVonHand(unittest.TestCase):
             self.assertAlmostEqual(F, soll, delta=1e-6)
         self.assertAlmostEqual(self.x.M_0, sum(F * z for F, z in zip(self.x.kraefte, self.z)),
                                delta=1e-3)
+
+    def test_querkraft_und_moment_unter_jedem_geschoss(self):
+        """
+        Zwei Kräfte, 10 kN auf 3 m und 20 kN auf 6 m: unten V = 30 kN und
+        M = 10·3 + 20·6 = 150 kNm, im oberen Geschoss V = 20 kN und
+        M = 20·(6 − 3) = 60 kNm. Am Fuss des Hauses ist M das Kippmoment.
+        """
+        self.assertEqual(querkraefte([10.0, 20.0]), (30.0, 20.0))
+        self.assertEqual(momente([10.0, 20.0], [3.0, 6.0]), (150.0, 60.0))
+        M = momente(self.x.kraefte, self.z)
+        self.assertAlmostEqual(M[0], self.x.M_0, delta=1e-6)
+        self.assertAlmostEqual(M[-1], self.x.kraefte[-1] * 3.0, delta=1e-6)
+        self.assertEqual(list(M), sorted(M, reverse=True))
 
     def test_abheben_und_kippen_mit_q_eins(self):
         """16.5.1.9: q = 1.0 -- im Ast (33) ist S_d umgekehrt proportional zu q."""
@@ -422,6 +437,8 @@ class TestWasDieOberflaecheSieht(unittest.TestCase):
         x = d["richtungen"][0]
         self.assertAlmostEqual(sum(x["kraefte"]), x["F_d"], places=6)
         self.assertAlmostEqual(x["querkraefte"][0], x["F_d"], places=6)
+        self.assertAlmostEqual(x["momente"][0], x["M_0"], places=6)
+        self.assertEqual(len(x["momente"]), 4)
         self.assertEqual([w["name"] for w in x["waende"]], ["Wände in x", "Wände in y"])
         self.assertEqual(d["waende"], [None, None])
         self.assertTrue(d["zulaessig"])
@@ -430,6 +447,29 @@ class TestWasDieOberflaecheSieht(unittest.TestCase):
         self.assertTrue(zeilen[0].startswith("Richtung x: T_{1,x} = 0.356"))
         self.assertIn("– erfüllt", zeilen[0])
         self.assertIn("mit q = 1.0 für Abheben und Kippen (16.5.1.9)", zeilen[1])
+
+    def test_die_waende_im_grundriss(self):
+        """
+        Um ihren Schwerpunkt, in mm: die Wand in x liegt wie gezeichnet, die
+        in y um 90° gedreht -- dieselbe Analyse, lang in y des Gebäudes.
+        """
+        d = self.antwort.daten["zeichendaten"][self.haus.kennung]
+        in_x, in_y = d["grundrisse"]
+
+        def ausdehnung(wand):
+            punkte = [p for poly in wand["polygone"] for p in poly["punkte"]]
+            return tuple(round(max(p[k] for p in punkte) - min(p[k] for p in punkte))
+                         for k in (0, 1))
+
+        self.assertEqual((in_x["nummer"], in_x["lage"], in_y["lage"]), (1, "0°", "90°"))
+        self.assertEqual(ausdehnung(in_y), tuple(reversed(ausdehnung(in_x))))
+        self.assertGreater(*ausdehnung(in_x))
+        self.assertEqual(in_x["polygone"][0]["material"], "beton")
+        self.assertEqual(Wandlage.NEUNZIG.im_grundriss(1.0, 0.0), (0.0, 1.0))
+        zeilen = ["".join(z.get("text") or z["mathe"] for z in zeile)
+                  for zeile in d["verlaufslegende"]]
+        self.assertIn("1 «Wände in x» (2×, 0°), 2 «Wände in y» (2×, 90°).", zeilen[0])
+        self.assertTrue(zeilen[1].endswith("M am Fuss ist M_0."))
 
     def test_eine_wand_ohne_analyse_sagt_es_an_ihr(self):
         p = Projekt(name="Probe")

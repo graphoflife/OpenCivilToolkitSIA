@@ -13,10 +13,14 @@
  * der Kern daraus macht -- Kräfte, Querkräfte, die Anteile der Wände --, aus
  * der Lösung (opencivil/web/erdbebendaten.py). Gerechnet wird hier nur, wo
  * etwas im Bild steht.
+ *
+ * Dazu in derselben Höhe die Wände je Geschoss mit Querkraft und Moment
+ * (eb_verlauf.js).
  */
 
 import { karte } from './bausteine.js';
 import { el, svgEl } from './dom.js';
+import { verlaufKarte } from './eb_verlauf.js';
 import {
   BREITE, legende, linie, pfeil, schraffur, text, textzeile, zahl,
 } from './gb_skizze.js';
@@ -95,9 +99,11 @@ function ansicht(h, { z, m, hoch }, r, x0, breite, k, titel) {
   return teile;
 }
 
-/** Die Ansichten nebeneinander -- je Richtung, die der Kern gerechnet hat, sonst das Gebäude allein. */
-function bild(h, d) {
-  const a = aufriss(h.geschosse);
+/**
+ * Die Ansichten nebeneinander -- je Richtung, die der Kern gerechnet hat,
+ * sonst das Gebäude allein. `a` ist der Aufriss.
+ */
+function bild(h, d, a) {
   const richtungen = d?.richtungen?.length ? d.richtungen : [null];
   const groesste = Math.max(1e-9, ...richtungen.flatMap((r) => r?.kraefte || []));
   const k = PFEIL / groesste;
@@ -145,18 +151,22 @@ function meldungen(d) {
   }))) : null;
 }
 
-/** Die Karte eines Gebäudes im Reiter «Diagramme». Das Panel darum baut bericht.js. */
+/**
+ * Die Karten eines Gebäudes im Reiter «Diagramme»: die Ersatzkräfte, dann
+ * Wände, Querkraft und Moment. Das Panel darum baut bericht.js.
+ */
 export function erdbebenKarten(kennung) {
   const h = eintragVon(kennung);
   if (!h) return [];
   const roh = zustand.loesung?.zeichendaten?.[kennung];
   // Eine Antwort zu anderen Geschossen gilt nicht mehr -- bis die neue da ist.
   const d = roh && (roh.richtungen.every((r) => r.kraefte.length === h.geschosse.length)) ? roh : null;
-  const abbild = bild(h, d);
+  const a = aufriss(h.geschosse);
+  const abbild = bild(h, d, a);
   return [karte('Ersatzkräfte', [
     el('div.gb-bildhuelle', {}, [abbild]),
     wandtabelle(d),
     meldungen(d),
     legende(d ? d.legende : [textzeile('Noch nicht gerechnet.')]),
-  ].filter(Boolean), { bild: abbild, klasse: 'ist-breit' })];
+  ].filter(Boolean), { bild: abbild, klasse: 'ist-breit' }), verlaufKarte(h, d, a)].filter(Boolean);
 }

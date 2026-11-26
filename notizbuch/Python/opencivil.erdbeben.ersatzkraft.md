@@ -1,5 +1,5 @@
 ---
-erzeugt: 8361b16ac951
+erzeugt: 8336c85812de
 art: modul
 tags: [modul]
 ---
@@ -29,6 +29,8 @@ T_1  = 2 * sqrt(u)                                (40), u in m, T_1 in s
 S_d  = (31) bis (34)
 F_d  = S_d * Summe W_i                            (41)
 F_di = z_i * W_i / Summe z_j * W_j * F_d          (42)
+V_i  = Summe_(j >= i) F_dj                        unter dem Geschoss i
+M_i  = Summe_(j >= i) F_dj * (z_j - z_(i-1))      ebenda; M_1 = M_0 am Fuss
 ```
 
 Die Waende einer Richtung stehen als ein Kragarm da, eingespannt am Fuss und
@@ -41,7 +43,8 @@ traegt von Querkraft und Moment am Fuss ihren Anteil an EI.
 
 Ihr Querschnitt kommt aus einer Querschnittsanalyse, gezeichnet in y und z.
 Bei 0 Grad liegt y in x des Gebaeudes: eine Kraft in x biegt sie um z, mit
-I_z, eine in y mit I_y. Bei 90 Grad ist es umgekehrt ([[opencivil.erdbeben.ersatzkraft#Wandlage.traegheit|Wandlage.traegheit]]).
+I_z, eine in y mit I_y. Bei 90 Grad ist es umgekehrt ([[opencivil.erdbeben.ersatzkraft#Wandlage.traegheit|Wandlage.traegheit]]),
+und im Bild liegt sie um 90 Grad gedreht ([[opencivil.erdbeben.ersatzkraft#Wandlage.im_grundriss|Wandlage.im_grundriss]]).
 
 
 ## NACH VORGABE, NICHT NACHGESCHLAGEN (auch in TODO)
@@ -210,6 +213,14 @@ def traegheit(self, richtung: str) -> str
 
 Welches Traegheitsmoment eine Kraft in `richtung` biegt: `I_z` oder `I_y`.
 
+#### Wandlage.im_grundriss
+
+```python
+def im_grundriss(self, y: float, z: float) -> Tuple[float, float]
+```
+
+Wo der Punkt (y, z) der Querschnittsanalyse im Grundriss liegt, als (x, y).
+
 ### Schwingzeit
 
 ```python
@@ -365,6 +376,16 @@ def querkraefte(kraefte: Sequence[float]) -> Tuple[float, ...]
 ```
 
 Je Geschoss, von unten, die Querkraft unter ihm: die Kraefte von dort bis oben.
+
+### momente
+
+```python
+def momente(kraefte: Sequence[float], z: Sequence[float]) -> Tuple[float, ...]
+```
+
+Je Geschoss, von unten, das Moment unter ihm, auf der Hoehe der Decke
+darunter: die Kraefte von dort bis oben, je mal ihr Abstand. Am Fuss ist
+es das Kippmoment M_0 -- der Kragarm ist dort eingespannt.
 
 ### Richtungsbefund
 
