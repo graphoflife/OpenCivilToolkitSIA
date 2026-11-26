@@ -1,5 +1,5 @@
 ---
-erzeugt: ad30b78f4699
+erzeugt: ad061c5d61e0
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -250,6 +250,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.stahlprofile.lage]] – ein Stahlprofil im gezeichneten Querschnitt.
     - [[opencivil.stahlprofile.tabelle]] – welche Stahlprofile es gibt, mit ihren Massen.
 - [[opencivil.verbund]] – Verbundbau nach SIA 264:2014.
+    - [[opencivil.verbund.duebel]] – Kopfbolzenduebel nach SIA 264:2014, 6.1.
     - [[opencivil.verbund.querschnitt]] – ein gezeichneter Querschnitt aus Baustahl und Beton.
     - [[opencivil.verbund.widerstand]] – was ein Verbundquerschnitt in einem Lastfall aufnimmt.
 - [[opencivil.web]] – die Oberflaeche, von der Seite des Rechenkerns.

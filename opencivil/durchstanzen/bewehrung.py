@@ -57,9 +57,9 @@ from typing import TYPE_CHECKING, Callable, List, Optional, Sequence, Tuple
 from opencivil.durchstanzen import produkte
 from opencivil.durchstanzen.schnitt import (
     Bogen, Halbebene, Kandidat, Nachweisschnitt, Punkt, Schatten, Strecke, Stuetzenflaeche,
-    Stueck, konvexe_huelle, kandidaten_stuetze, nachweisschnitt,
+    Stueck, kandidaten_stuetze, nachweisschnitt,
 )
-from opencivil.querschnitt.geometrie import abstand_strecke_polygon
+from opencivil.querschnitt.geometrie import abstand_strecke_polygon, konvexe_huelle
 
 if TYPE_CHECKING:
     from opencivil.durchstanzen.pruefung import Leistenpruefung

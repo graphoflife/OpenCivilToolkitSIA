@@ -1,5 +1,5 @@
 ---
-erzeugt: 935b3ba80c4b
+erzeugt: f8c54e4f15b7
 art: modul
 tags: [modul]
 ---
@@ -286,6 +286,19 @@ V_Rd, die dem Steg nimmt, und mit Torsion, die nur ein Hinweis ist; mit
 viel Druck reicht die Druckzone über 0.4 h, wo Figur 1 endet; reiner Zug,
 reiner Druck und eine Druckkraft jenseits des Widerstands.
 
+### _verbundduebel
+
+```python
+def _verbundduebel(kennung: str) -> QuerschnittsanalyseEintrag
+```
+
+Ein IPE 400 aus S355 unter einer Platte 2000 × 150 mm aus C30/37 mit
+Betonstahl B500B, einachsig, mit Kopfbolzendübeln ⌀19 × 125 mm (SIA
+264:2014, 6.1). Im Feld teilverdübelt, (29) gehalten -- mit zu wenig
+Dübeln nicht; an der Stütze verlangt das negative Moment volle
+Verdübelung; ohne Zahl der Dübel und ohne L_e grau; L_e über 25 m
+verlangt volle Verdübelung; ohne Moment prüft er die Dübel nicht.
+
 
 ## Braucht
 
@@ -302,6 +315,7 @@ reiner Druck und eine Druckkraft jenseits des Widerstands.
 - [[opencivil.projekt.staebe]]
 - [[opencivil.querschnitt.geometrie]]
 - [[opencivil.querschnitt.gesetzwahl]]
+- [[opencivil.verbund.duebel]]
 
 ## Gebraucht von
 

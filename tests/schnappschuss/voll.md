@@ -1,6 +1,6 @@
 # Voll
 
-926 Berechnungen ausgeführt, 1416 Werte bestimmt.
+931 Berechnungen ausgeführt, 1451 Werte bestimmt.
 
 ## Herleitung
 
@@ -12784,7 +12784,7 @@ $$
 
 ### Kennzahlen
 
-> **Annahme:** Gerechnet mit voller Verdübelung, wie 5.1.2.1 es annimmt: Stahl und Beton tragen zusammen, ohne Schlupf. Ob die Dübel dafür reichen, prüft das Werkzeug noch nicht.
+> **Annahme:** Gerechnet mit voller Verdübelung, wie 5.1.2.1 es annimmt: Stahl und Beton tragen zusammen, ohne Schlupf.
 
 #### Festigkeiten
 
@@ -13056,7 +13056,7 @@ $$
 
 ### Biegung und Normalkraft
 
-> **Annahme:** Gerechnet mit voller Verdübelung, wie 5.1.2.1 es annimmt: Stahl und Beton tragen zusammen, ohne Schlupf. Ob die Dübel dafür reichen, prüft das Werkzeug noch nicht.
+> **Annahme:** Verdübelung voll angenommen, wie 5.1.2.1 es tut: Stahl und Beton tragen zusammen, ohne Schlupf. Die Dübel prüft das Werkzeug, wo in der Kachel «Verdübelung» Kopfbolzendübel gewählt sind.
 
 > **Annahme:** Die Klasse an der plastischen Nulllinie des Lastfalls – nach Vorgabe, nicht nachgeschlagen: die Norm sagt nicht, bei welcher Laststufe α gilt.
 
@@ -13492,6 +13492,1060 @@ $$
 
 $$
 E_{a,\text{S460}} = 210000\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+### Querschnittsanalyse: Verbundträger mit Dübeln
+
+**Fläche und Schwerpunkt eines Polygons (Satz von Gauss)**
+
+$$
+A = \frac{1}{2} \sum_i c_i \qquad y_S = \frac{1}{6A} \sum_i (y_i + y_{i+1})\, c_i \qquad z_S = \frac{1}{6A} \sum_i (z_i + z_{i+1})\, c_i \qquad c_i = y_i\, z_{i+1} - y_{i+1}\, z_i
+$$
+
+**Trägheitsmomente eines Polygons, bezogen auf den Schwerpunkt**
+
+$$
+I_y = \frac{1}{12} \sum_i (z_i^2 + z_i z_{i+1} + z_{i+1}^2)\, c_i - A\, z_S^2\qquad I_z = \frac{1}{12} \sum_i (y_i^2 + y_i y_{i+1} + y_{i+1}^2)\, c_i - A\, y_S^2
+$$
+
+**Polygone des Querschnitts**
+
+| Polygon | Material | liegt in | Ecken | $\pm A\ [\mathrm{mm}^2]$ | $y_S\ [\mathrm{mm}]$ | $z_S\ [\mathrm{mm}]$ |
+| :--- | :--- | :--- | ---: | ---: | ---: | ---: |
+| Polygon 1 | C30/37 | – | $4$ | $300000$ | $0.0$ | $475.0$ |
+| Profil 1 (IPE 400) | S355 | – | $60$ | $8450$ | $0.0$ | $200.0$ |
+
+**Fläche des Bruttoquerschnitts**
+
+$$
+A = 308450\,\mathrm{mm}^{2}
+$$
+
+**Schwerpunkt, y**
+
+$$
+y_S = 0\,\mathrm{mm}
+$$
+
+**Schwerpunkt, z**
+
+$$
+z_S = 467.5\,\mathrm{mm}
+$$
+
+**Trägheitsmoment um y**
+
+$$
+I_y = 1415.5\,\cdot 10^{6}\,\mathrm{mm}^{4}
+$$
+
+**Trägheitsmoment um z**
+
+$$
+I_z = 100013.2\,\cdot 10^{6}\,\mathrm{mm}^{4}
+$$
+
+**Deviationsmoment**
+
+$$
+I_{yz} = 0\,\cdot 10^{6}\,\mathrm{mm}^{4}
+$$
+
+**Teilung einer Stablinie: gleiche Felder, auf die Länge gerundet**
+
+$$
+s = \frac{L}{m} \qquad m = \mathrm{runde}\left(\frac{L}{s_{gewählt}}\right)
+$$
+
+**Bewehrung**
+
+| Element | $\text{Lage}\ [\mathrm{mm}]$ | Bewehrung | Stahl | $A_s\ [\mathrm{mm}^2]$ |
+| :--- | :--- | :--- | ---: | ---: |
+| Linie 1 | $(-950;\ 510) \rightarrow (950;\ 510)$ | $7 \varnothing 10\ @\ 316.7\ (\text{gewählt } 300)$ | B500B | $550$ |
+
+**Stahlfläche der Bewehrung**
+
+$$
+A_{s,tot} = 550\,\mathrm{mm}^{2}
+$$
+
+### Kennzahlen
+
+> **Annahme:** Gerechnet mit voller Verdübelung, wie 5.1.2.1 es annimmt: Stahl und Beton tragen zusammen, ohne Schlupf. Was die Dübel eines Lastfalls erlauben, rechnet sein Nachweis.
+
+#### Festigkeiten
+
+**Festigkeiten im plastischen Zustand – der Beton nur gedrückt** *(SIA 264:2014, 4.1.3, (1); 4.1.5; 4.3.2.1; 5.1.2.1)*
+
+$$
+f_{yd} = \frac{f_y}{\gamma_a} \qquad 0.85\, f_{cd} = 0.85\, \frac{\eta_{fc}\, f_{ck}}{\gamma_c},\ \eta_{fc} = 1 \qquad f_{sd} = \frac{f_{sk}}{\gamma_s}
+$$
+
+**Festigkeiten je Werkstoff**
+
+| Werkstoff | Art | $f_k\ [\mathrm{N}/\mathrm{mm}^2]$ | $\gamma$ | $\text{gezogen}\ [\mathrm{N}/\mathrm{mm}^2]$ | $\text{gedrückt}\ [\mathrm{N}/\mathrm{mm}^2]$ |
+| :--- | :--- | ---: | ---: | ---: | ---: |
+| S355 | Baustahl | $355$ | $1.05$ | $338.1$ | $338.1$ |
+| C30/37 | Beton | $30$ | $1.50$ | $0.0$ | $17.0$ |
+| B500B | Betonstahl | $500$ | $1.15$ | $434.8$ | $434.8$ |
+
+f\_k ist f\_y in der Dicke der Gruppe, f\_ck oder f\_sk; γ ist γ\_a = γ\_M1 des Baustahls, γ\_c oder γ\_s.
+
+#### Normalkraft
+
+Der Beton trägt keinen Zug; die Fläche des Betons ist ohne das, was Stahl und Stäbe in ihm einnehmen.
+
+**Zugwiderstand: je Werkstoff**
+
+| Werkstoff | $A\ [\mathrm{mm}^2]$ | $f\ [\mathrm{N}/\mathrm{mm}^2]$ | $f\, A\ [\mathrm{kN}]$ |
+| :--- | ---: | ---: | ---: |
+| S355 | $8450$ | $338.1$ | $2857.0$ |
+| C30/37 | $299450$ | $0.0$ | $0.0$ |
+| B500B | $550$ | $434.8$ | $239.0$ |
+
+**Zugwiderstand, zusammen** *(SIA 264:2014, 4.3.2.1; 5.1.2.1)*
+
+$$
+N_{pl,Rd}^{+} = 3096.1\,\mathrm{kN}
+$$
+
+**Bleche bei Druck**
+
+| Blech | Grenzen nach | $c/t$ | $\alpha$ | $\text{Grenzen}\ 1 / 2$ | Klasse |
+| :--- | :--- | ---: | ---: | ---: | ---: |
+| Profil 1: Flansch oben, links | SIA 263, Tabelle 5b | $64.7/13.5 = 4.8$ | $1.00$ | $7.3 / 8.1$ | 1 |
+| Profil 1: Flansch oben, rechts | SIA 263, Tabelle 5b | $64.7/13.5 = 4.8$ | $1.00$ | $7.3 / 8.1$ | 1 |
+| Profil 1: Flansch unten, links | SIA 263, Tabelle 5b | $64.7/13.5 = 4.8$ | $1.00$ | $7.3 / 8.1$ | 1 |
+| Profil 1: Flansch unten, rechts | SIA 263, Tabelle 5b | $64.7/13.5 = 4.8$ | $1.00$ | $7.3 / 8.1$ | 1 |
+| Profil 1: Steg | SIA 263, Tabelle 5a | $331.0/8.6 = 38.5$ | $1.00$ | $26.8 / 30.9$ | über 2 |
+
+> **Hinweis:** Ein Blech liegt über Klasse 2: plastisch darf der Verbundquerschnitt so nicht rechnen, und elastisch nach 5.1.2.4 und 5.1.2.5 rechnet ihn das Werkzeug noch nicht. Massgebend: Profil 1: Steg. Der Widerstand steht darum auf null.
+
+**Druckwiderstand** *(SIA 264:2014, 5.3.2.4, (14))*
+
+$$
+N_{pl,Rd}^{-} = 0\,\mathrm{kN}
+$$
+
+#### Biegung, Zug unten
+
+**Plastische Nulllinie bei N = 0: so viel Kraft gezogen wie gedrückt**
+
+$$
+z_{pl} = 472.7\,\mathrm{mm}
+$$
+
+**Bleche bei Biegung, Zug unten**
+
+| Blech | Grenzen nach | $c/t$ | $\alpha$ | $\text{Grenzen}\ 1 / 2$ | Klasse |
+| :--- | :--- | ---: | ---: | ---: | ---: |
+| Profil 1: Flansch oben, links | SIA 263, Tabelle 5b | $64.7/13.5 = 4.8$ | $0.00$ | $– / –$ | 1 |
+| Profil 1: Flansch oben, rechts | SIA 263, Tabelle 5b | $64.7/13.5 = 4.8$ | $0.00$ | $– / –$ | 1 |
+| Profil 1: Flansch unten, links | SIA 263, Tabelle 5b | $64.7/13.5 = 4.8$ | $0.00$ | $– / –$ | 1 |
+| Profil 1: Flansch unten, rechts | SIA 263, Tabelle 5b | $64.7/13.5 = 4.8$ | $0.00$ | $– / –$ | 1 |
+| Profil 1: Steg | SIA 263, Tabelle 5a | $331.0/8.6 = 38.5$ | $0.00$ | $– / –$ | 1 |
+
+Nulllinie: Zugrichtung n = (0.000; -1.000), -90.0° gegen die y-Achse; gezogen ist, wo n\_y y + n\_z z \> -472.7 mm.
+
+**Kräfte im plastischen Zustand, Zug unten**
+
+| Teil | Zone | $F\ [\mathrm{kN}]$ | $y\ [\mathrm{mm}]$ | $z\ [\mathrm{mm}]$ |
+| :--- | :--- | ---: | ---: | ---: |
+| Profil 1 (IPE 400) | Zug | $2857.0$ | $0.0$ | $200.0$ |
+| Polygon 1 | Druck | $-2618.0$ | $0.0$ | $511.4$ |
+| Linie 1 | Druck | $-239.0$ | $0.0$ | $510.0$ |
+
+**Probe: Normalkraft**
+
+$$
+N_{Rd} = \sum F_i = 0\,\mathrm{kN}
+$$
+
+**Probe: Moment um y**
+
+$$
+M_{y,pl,Rd} = -\sum F_i \cdot (z_i - z_S) = 889.3\,\mathrm{kNm}
+$$
+
+**Plastischer Momentenwiderstand, Zug unten** *(SIA 264:2014, 5.1.2.1; 4.1.3)*
+
+$$
+M_{y,Rd}^{+} = 889.3\,\mathrm{kNm}
+$$
+
+#### Biegung, Zug oben
+
+**Plastische Nulllinie bei N = 0: so viel Kraft gezogen wie gedrückt**
+
+$$
+z_{pl} = 241.1\,\mathrm{mm}
+$$
+
+**Bleche bei Biegung, Zug oben**
+
+| Blech | Grenzen nach | $c/t$ | $\alpha$ | $\text{Grenzen}\ 1 / 2$ | Klasse |
+| :--- | :--- | ---: | ---: | ---: | ---: |
+| Profil 1: Flansch oben, links | SIA 263, Tabelle 5b | $64.7/13.5 = 4.8$ | $0.00$ | $– / –$ | 1 |
+| Profil 1: Flansch oben, rechts | SIA 263, Tabelle 5b | $64.7/13.5 = 4.8$ | $0.00$ | $– / –$ | 1 |
+| Profil 1: Flansch unten, links | SIA 263, Tabelle 5b | $64.7/13.5 = 4.8$ | $1.00$ | $7.3 / 8.1$ | 1 |
+| Profil 1: Flansch unten, rechts | SIA 263, Tabelle 5b | $64.7/13.5 = 4.8$ | $1.00$ | $7.3 / 8.1$ | 1 |
+| Profil 1: Steg | SIA 263, Tabelle 5a | $331.0/8.6 = 38.5$ | $0.62$ | $45.3 / 52.1$ | 1 |
+
+Nulllinie: Zugrichtung n = (0.000; 1.000), 90.0° gegen die y-Achse; gezogen ist, wo n\_y y + n\_z z \> 241.1 mm.
+
+**Kräfte im plastischen Zustand, Zug oben**
+
+| Teil | Zone | $F\ [\mathrm{kN}]$ | $y\ [\mathrm{mm}]$ | $z\ [\mathrm{mm}]$ |
+| :--- | :--- | ---: | ---: | ---: |
+| Profil 1 (IPE 400) | Zug | $1309.0$ | $0.0$ | $367.0$ |
+| Profil 1 (IPE 400) | Druck | $-1548.0$ | $0.0$ | $58.8$ |
+| Linie 1 | Zug | $239.0$ | $0.0$ | $510.0$ |
+
+**Probe: Normalkraft**
+
+$$
+N_{Rd} = \sum F_i = 0\,\mathrm{kN}
+$$
+
+**Probe: Moment um y**
+
+$$
+M_{y,pl,Rd} = -\sum F_i \cdot (z_i - z_S) = -511.4\,\mathrm{kNm}
+$$
+
+**Plastischer Momentenwiderstand, Zug oben** *(SIA 264:2014, 5.1.2.1; 4.1.3)*
+
+$$
+M_{y,Rd}^{-} = -511.4\,\mathrm{kNm}
+$$
+
+#### Querkraft
+
+**Querkraftwiderstand** *(SIA 263:2013, 5.1.4.1, (41))*
+
+$$
+V_{Rd} = \frac{\tau_y\, A_v}{\gamma_{M1}}
+$$
+
+**Beim I und beim U beult der Steg nicht, solange** *(SIA 263:2013, 5.1.4.2, (42))*
+
+$$
+\frac{h - t_f}{t_w} \le \sqrt{\frac{4 E}{f_y}}
+$$
+
+**Schubbeulen des Blechs, ohne Quersteifen** *(SIA 263:2013, 4.5.4.1, (13); Figur 8)*
+
+$$
+V_{Rd} = \frac{0.9 \sqrt{\tau_{cr}\, \tau_y}\, b\, t}{\gamma_{M1}} \le \frac{\tau_y\, b\, t}{\gamma_{M1}} \qquad \tau_{cr} = k_\tau\, 0.9\, E \left(\frac{t}{b}\right)^2 \qquad k_\tau = 5.34
+$$
+
+**Querkraft in z: je Profil**
+
+| Profil | $A_v\ \text{oder}\ b\, t$ | $[\mathrm{mm}^2]$ | $\text{Beulen}$ | $\tau\ [\mathrm{N}/\mathrm{mm}^2]$ | Stelle | $V_{Rd}\ [\mathrm{kN}]$ |
+| :--- | :--- | ---: | ---: | ---: | :--- | ---: |
+| Profil 1 (IPE 400) | $8450 - 2 \cdot 180 \cdot 13.5 + (8.6 + 2 \cdot 21) \cdot 13.5$ | $4273$ | $44.9 \le 48.6$ | $205$ | SIA 263:2013, 5.1.4.1, (41a) | $834.3$ |
+
+**Querkraftwiderstand in z, alle Profile zusammen** *(SIA 263:2013, 5.1.4.1, (41))*
+
+$$
+V_{z,Rd} = 834.3\,\mathrm{kN}
+$$
+
+#### Kopfbolzendübel
+
+Kopfbolzendübel ⌀19 mm, h\_D = 125 mm – mindestens 4 d = 76 mm: verformungsfähig (SIA 264:2014, 6.1.1.3).
+
+**Widerstandsbeiwert, auch mit charakteristischen Werten** *(SIA 264:2014, 6.1.2.1)*
+
+$$
+\gamma_v = 1.25
+$$
+
+**Betonstauchung, C30/37** *(SIA 264:2014, 6.1.2.1, (30))*
+
+$$
+\begin{aligned}
+  P_{Rd,c} &= \frac{0.29 \cdot d^{2}}{\gamma_v} \cdot \sqrt{f_{ck} \cdot E_{cm}} \\
+  &= \frac{0.29 \cdot \left(19\,\mathrm{mm}\right)^{2}}{1.25} \cdot \sqrt{30\,\mathrm{N}/\mathrm{mm}^{2} \cdot 33620\,\mathrm{N}/\mathrm{mm}^{2}} \\
+  &= 84.1\,\mathrm{kN}
+\end{aligned}
+$$
+
+**Versagen des Dübels** *(SIA 264:2014, 6.1.2.1, (31))*
+
+$$
+P_{Rd,s} = \frac{0.8 \cdot f_u}{\gamma_v} \cdot \frac{\pi \cdot d^{2}}{4} = \frac{0.8 \cdot 450\,\mathrm{N}/\mathrm{mm}^{2}}{1.25} \cdot \frac{\pi \cdot \left(19\,\mathrm{mm}\right)^{2}}{4} = 81.7\,\mathrm{kN}
+$$
+
+**Schubwiderstand eines Kopfbolzendübels** *(SIA 264:2014, 6.1.2.1, (30) und (31))*
+
+$$
+P_{Rd} = \min\left(P_{Rd,c};\ P_{Rd,s}\right) = \min\left(84.1\,\mathrm{kN};\ 81.7\,\mathrm{kN}\right) = 81.7\,\mathrm{kN}
+$$
+
+### Biegung und Normalkraft
+
+> **Annahme:** Bis zum Momentennullpunkt tragen die N Dübel eines Lastfalls N · P\_Rd. Ist das weniger als die Kraft, die Beton und Betonstahl ausserhalb der Profile bei voller Verdübelung zusammen haben, rechnet der Fall mit Teilverdübelung (6.1.1.6): sie tragen dann nur N · P\_Rd, und Stahl und Beton haben je ihre eigene Nulllinie. Am Momentennullpunkt trägt der Beton nichts (nach Vorgabe, nicht nachgeschlagen).
+
+> **Annahme:** Die Klasse an der plastischen Nulllinie des Lastfalls – nach Vorgabe, nicht nachgeschlagen: die Norm sagt nicht, bei welcher Laststufe α gilt.
+
+Festigkeiten wie in den Kennzahlen: S355 338.1 N/mm², C30/37 gedrückt 17.0 N/mm², B500B 434.8 N/mm².
+
+**Erfüllungsgrad bei fester Normalkraft und fester Richtung**
+
+$$
+\alpha_{eff} = \frac{M_{Rd}}{M_{Ed}} \qquad M = \sqrt{M_y^2 + M_z^2}
+$$
+
+#### Feld
+
+**Einwirkung**
+
+| Einwirkung | Wert |  |
+| :--- | ---: | :--- |
+| N\_Ed | $0.0$ | kN |
+| M\_y,Ed | $500.0$ | kNm |
+| V\_z,Ed | $100.0$ | kN |
+
+Querkraft in z: 100 kN ≤ 0.5 · 834.3 kN – sie mindert nichts.
+
+**Bleche im Lastfall, mit Teilverdübelung**
+
+| Blech | Grenzen nach | $c/t$ | $\alpha$ | $\text{Grenzen}\ 1 / 2$ | Klasse |
+| :--- | :--- | ---: | ---: | ---: | ---: |
+| Profil 1: Flansch oben, links | SIA 263, Tabelle 5b | $64.7/13.5 = 4.8$ | $0.00$ | $– / –$ | 1 |
+| Profil 1: Flansch oben, rechts | SIA 263, Tabelle 5b | $64.7/13.5 = 4.8$ | $0.00$ | $– / –$ | 1 |
+| Profil 1: Flansch unten, links | SIA 263, Tabelle 5b | $64.7/13.5 = 4.8$ | $0.00$ | $– / –$ | 1 |
+| Profil 1: Flansch unten, rechts | SIA 263, Tabelle 5b | $64.7/13.5 = 4.8$ | $0.00$ | $– / –$ | 1 |
+| Profil 1: Steg | SIA 263, Tabelle 5a | $331.0/8.6 = 38.5$ | $0.00$ | $– / –$ | 1 |
+
+**Querschnittsklasse** *(SIA 264:2014, 4.2.2.1, Tabellen 2 und 3; 5.2.1.3; SIA 263:2013, Tabellen 5a und 5b)*
+
+$$
+\mathrm{QK} = 1
+$$
+
+Nulllinie: Zugrichtung n = (0.000; -1.000), -90.0° gegen die y-Achse; gezogen ist, wo n\_y y + n\_z z \> -472.7 mm.
+
+**Kräfte im plastischen Zustand – je Teil und Zone, volle Verdübelung**
+
+| Teil | Zone | $F\ [\mathrm{kN}]$ | $y\ [\mathrm{mm}]$ | $z\ [\mathrm{mm}]$ |
+| :--- | :--- | ---: | ---: | ---: |
+| Profil 1 (IPE 400) | Zug | $2857.0$ | $0.0$ | $200.0$ |
+| Polygon 1 | Druck | $-2618.0$ | $0.0$ | $511.4$ |
+| Linie 1 | Druck | $-239.0$ | $0.0$ | $510.0$ |
+
+**Probe: Normalkraft**
+
+$$
+N_{Rd} = \sum F_i = 0\,\mathrm{kN}
+$$
+
+**Probe: Moment um y**
+
+$$
+M_{y,Rd} = -\sum F_i \cdot (z_i - z_S) = 889.3\,\mathrm{kNm}
+$$
+
+##### Verdübelung
+
+**Beton und Betonstahl ausserhalb der Profile bei voller Verdübelung, zusammen gedrückt**
+
+$$
+N_{c,f} = \left|\sum F_{i}\right|_{\mathrm{Beton,\ Betonstahl}} = 2857\,\mathrm{kN}
+$$
+
+**Dübel bis zum Momentennullpunkt, wie angegeben**
+
+$$
+N = 25
+$$
+
+**Dübel für volle Verdübelung** *(SIA 264:2014, 6.1.1.6, (29))*
+
+$$
+N_f = \frac{N_{c,f}}{P_{Rd}} = \frac{2857\,\mathrm{kN}}{81.7\,\mathrm{kN}} = 34.99
+$$
+
+**Verdübelungsgrad** *(SIA 264:2014, 6.1.1.6, (29))*
+
+$$
+\eta = \frac{N}{N_f} = \frac{25}{34.99} = 0.715
+$$
+
+**Kleinster Verdübelungsgrad, Profil doppelsymmetrisch** *(SIA 264:2014, 6.1.1.6, (29))*
+
+$$
+\begin{aligned}
+  \eta_{min} &= \max\left(1 - \frac{355\ \mathrm{N}/\mathrm{mm}^{2}}{f_y} \cdot \left(0.75 - 0.03 \cdot L_e\right);\ 0.4\right) \\
+  &= \max\left(1 - \frac{355\ \mathrm{N}/\mathrm{mm}^{2}}{355\,\mathrm{N}/\mathrm{mm}^{2}} \cdot \left(0.75 - 0.03 \cdot 12\right);\ 0.4\right) \\
+  &= 0.61 \quad \left(L_e\ \text{in}\ \mathrm{m}\right)
+\end{aligned}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,\eta,\text{Feld}} = \frac{\eta}{\eta_{min}} = \frac{0.715}{0.61} = 1.17 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+##### Teilverdübelung
+
+**Was die Dübel tragen – weniger als N\_c,f** *(SIA 264:2014, 6.1.1.6; 5.1.2.1)*
+
+$$
+F_D = N \cdot P_{Rd} = 25 \cdot 81.7\,\mathrm{kN} = 2041.4\,\mathrm{kN}
+$$
+
+Beton und Betonstahl ausserhalb der Profile tragen zusammen nur diese Kraft, der Baustahl den Rest von N\_Ed; jeder Teil hat seine eigene Nulllinie, beide mit derselben Zugrichtung.
+
+Nulllinien, beide mit Zugrichtung n = (0.000; -1.000), -90.0° gegen die y-Achse: ausserhalb der Profile gezogen, wo n\_y y + n\_z z \> -496.7 mm; in den Profilen gezogen, wo n\_y y + n\_z z \> -393.3 mm.
+
+**Kräfte mit Teilverdübelung – je Teil und Zone**
+
+| Teil | Zone | $F\ [\mathrm{kN}]$ | $y\ [\mathrm{mm}]$ | $z\ [\mathrm{mm}]$ |
+| :--- | :--- | ---: | ---: | ---: |
+| Profil 1 (IPE 400) | Zug | $2449.2$ | $0.0$ | $167.3$ |
+| Profil 1 (IPE 400) | Druck | $-407.8$ | $0.0$ | $396.6$ |
+| Polygon 1 | Druck | $-1802.4$ | $0.0$ | $523.4$ |
+| Linie 1 | Druck | $-239.0$ | $0.0$ | $510.0$ |
+
+**Probe: Normalkraft**
+
+$$
+N_{Rd} = \sum F_i = 0\,\mathrm{kN}
+$$
+
+**Probe: Moment um y**
+
+$$
+M_{y,Rd} = -\sum F_i \cdot (z_i - z_S) = 817.4\,\mathrm{kNm}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,\text{Feld}} = \frac{M_{Rd}}{M_{Ed}} = \frac{817.4\,\mathrm{kNm}}{500\,\mathrm{kNm}} = 1.63 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+#### Feld, zu wenig Dübel
+
+**Einwirkung**
+
+| Einwirkung | Wert |  |
+| :--- | ---: | :--- |
+| N\_Ed | $0.0$ | kN |
+| M\_y,Ed | $500.0$ | kNm |
+| V\_z,Ed | $0.0$ | kN |
+
+**Bleche im Lastfall, mit Teilverdübelung**
+
+| Blech | Grenzen nach | $c/t$ | $\alpha$ | $\text{Grenzen}\ 1 / 2$ | Klasse |
+| :--- | :--- | ---: | ---: | ---: | ---: |
+| Profil 1: Flansch oben, links | SIA 263, Tabelle 5b | $64.7/13.5 = 4.8$ | $1.00$ | $7.3 / 8.1$ | 1 |
+| Profil 1: Flansch oben, rechts | SIA 263, Tabelle 5b | $64.7/13.5 = 4.8$ | $1.00$ | $7.3 / 8.1$ | 1 |
+| Profil 1: Flansch unten, links | SIA 263, Tabelle 5b | $64.7/13.5 = 4.8$ | $0.00$ | $– / –$ | 1 |
+| Profil 1: Flansch unten, rechts | SIA 263, Tabelle 5b | $64.7/13.5 = 4.8$ | $0.00$ | $– / –$ | 1 |
+| Profil 1: Steg | SIA 263, Tabelle 5a | $331.0/8.6 = 38.5$ | $0.00$ | $– / –$ | 1 |
+
+**Querschnittsklasse** *(SIA 264:2014, 4.2.2.1, Tabellen 2 und 3; 5.2.1.3; SIA 263:2013, Tabellen 5a und 5b)*
+
+$$
+\mathrm{QK} = 1
+$$
+
+Nulllinie: Zugrichtung n = (0.000; -1.000), -90.0° gegen die y-Achse; gezogen ist, wo n\_y y + n\_z z \> -472.7 mm.
+
+**Kräfte im plastischen Zustand – je Teil und Zone, volle Verdübelung**
+
+| Teil | Zone | $F\ [\mathrm{kN}]$ | $y\ [\mathrm{mm}]$ | $z\ [\mathrm{mm}]$ |
+| :--- | :--- | ---: | ---: | ---: |
+| Profil 1 (IPE 400) | Zug | $2857.0$ | $0.0$ | $200.0$ |
+| Polygon 1 | Druck | $-2618.0$ | $0.0$ | $511.4$ |
+| Linie 1 | Druck | $-239.0$ | $0.0$ | $510.0$ |
+
+**Probe: Normalkraft**
+
+$$
+N_{Rd} = \sum F_i = 0\,\mathrm{kN}
+$$
+
+**Probe: Moment um y**
+
+$$
+M_{y,Rd} = -\sum F_i \cdot (z_i - z_S) = 889.3\,\mathrm{kNm}
+$$
+
+##### Verdübelung
+
+**Beton und Betonstahl ausserhalb der Profile bei voller Verdübelung, zusammen gedrückt**
+
+$$
+N_{c,f} = \left|\sum F_{i}\right|_{\mathrm{Beton,\ Betonstahl}} = 2857\,\mathrm{kN}
+$$
+
+**Dübel bis zum Momentennullpunkt, wie angegeben**
+
+$$
+N = 15
+$$
+
+**Dübel für volle Verdübelung** *(SIA 264:2014, 6.1.1.6, (29))*
+
+$$
+N_f = \frac{N_{c,f}}{P_{Rd}} = \frac{2857\,\mathrm{kN}}{81.7\,\mathrm{kN}} = 34.99
+$$
+
+**Verdübelungsgrad** *(SIA 264:2014, 6.1.1.6, (29))*
+
+$$
+\eta = \frac{N}{N_f} = \frac{15}{34.99} = 0.429
+$$
+
+**Kleinster Verdübelungsgrad, Profil doppelsymmetrisch** *(SIA 264:2014, 6.1.1.6, (29))*
+
+$$
+\begin{aligned}
+  \eta_{min} &= \max\left(1 - \frac{355\ \mathrm{N}/\mathrm{mm}^{2}}{f_y} \cdot \left(0.75 - 0.03 \cdot L_e\right);\ 0.4\right) \\
+  &= \max\left(1 - \frac{355\ \mathrm{N}/\mathrm{mm}^{2}}{355\,\mathrm{N}/\mathrm{mm}^{2}} \cdot \left(0.75 - 0.03 \cdot 12\right);\ 0.4\right) \\
+  &= 0.61 \quad \left(L_e\ \text{in}\ \mathrm{m}\right)
+\end{aligned}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,\eta,\text{Feld, zu wenig Dübel}} = \frac{\eta}{\eta_{min}} = \frac{0.429}{0.61} = 0.70 \quad \Rightarrow \quad \text{NICHT erfüllt}
+$$
+
+##### Teilverdübelung
+
+**Was die Dübel tragen – weniger als N\_c,f** *(SIA 264:2014, 6.1.1.6; 5.1.2.1)*
+
+$$
+F_D = N \cdot P_{Rd} = 15 \cdot 81.7\,\mathrm{kN} = 1224.8\,\mathrm{kN}
+$$
+
+Beton und Betonstahl ausserhalb der Profile tragen zusammen nur diese Kraft, der Baustahl den Rest von N\_Ed; jeder Teil hat seine eigene Nulllinie, beide mit derselben Zugrichtung.
+
+Nulllinien, beide mit Zugrichtung n = (0.000; -1.000), -90.0° gegen die y-Achse: ausserhalb der Profile gezogen, wo n\_y y + n\_z z \> -511.5 mm; in den Profilen gezogen, wo n\_y y + n\_z z \> -386.6 mm.
+
+**Kräfte mit Teilverdübelung – je Teil und Zone**
+
+| Teil | Zone | $F\ [\mathrm{kN}]$ | $y\ [\mathrm{mm}]$ | $z\ [\mathrm{mm}]$ |
+| :--- | :--- | ---: | ---: | ---: |
+| Profil 1 (IPE 400) | Zug | $2040.9$ | $0.0$ | $122.7$ |
+| Profil 1 (IPE 400) | Druck | $-816.1$ | $0.0$ | $393.3$ |
+| Polygon 1 | Druck | $-1305.9$ | $0.0$ | $530.8$ |
+| Linie 1 | Zug | $160.0$ | $0.0$ | $508.5$ |
+| Linie 1 | Druck | $-79.0$ | $0.0$ | $513.0$ |
+
+**Probe: Normalkraft**
+
+$$
+N_{Rd} = \sum F_i = 0\,\mathrm{kN}
+$$
+
+**Probe: Moment um y**
+
+$$
+M_{y,Rd} = -\sum F_i \cdot (z_i - z_S) = 722.8\,\mathrm{kNm}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,\text{Feld, zu wenig Dübel}} = \frac{M_{Rd}}{M_{Ed}} = \frac{722.8\,\mathrm{kNm}}{500\,\mathrm{kNm}} = 1.45 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+#### Stütze
+
+**Einwirkung**
+
+| Einwirkung | Wert |  |
+| :--- | ---: | :--- |
+| N\_Ed | $0.0$ | kN |
+| M\_y,Ed | $-300.0$ | kNm |
+| V\_z,Ed | $200.0$ | kN |
+
+Querkraft in z: 200 kN ≤ 0.5 · 834.3 kN – sie mindert nichts.
+
+**Bleche im Lastfall**
+
+| Blech | Grenzen nach | $c/t$ | $\alpha$ | $\text{Grenzen}\ 1 / 2$ | Klasse |
+| :--- | :--- | ---: | ---: | ---: | ---: |
+| Profil 1: Flansch oben, links | SIA 263, Tabelle 5b | $64.7/13.5 = 4.8$ | $0.00$ | $– / –$ | 1 |
+| Profil 1: Flansch oben, rechts | SIA 263, Tabelle 5b | $64.7/13.5 = 4.8$ | $0.00$ | $– / –$ | 1 |
+| Profil 1: Flansch unten, links | SIA 263, Tabelle 5b | $64.7/13.5 = 4.8$ | $1.00$ | $7.3 / 8.1$ | 1 |
+| Profil 1: Flansch unten, rechts | SIA 263, Tabelle 5b | $64.7/13.5 = 4.8$ | $1.00$ | $7.3 / 8.1$ | 1 |
+| Profil 1: Steg | SIA 263, Tabelle 5a | $331.0/8.6 = 38.5$ | $0.62$ | $45.3 / 52.1$ | 1 |
+
+**Querschnittsklasse** *(SIA 264:2014, 4.2.2.1, Tabellen 2 und 3; 5.2.1.3; SIA 263:2013, Tabellen 5a und 5b)*
+
+$$
+\mathrm{QK} = 1
+$$
+
+Nulllinie: Zugrichtung n = (0.000; 1.000), 90.0° gegen die y-Achse; gezogen ist, wo n\_y y + n\_z z \> 241.1 mm.
+
+**Kräfte im plastischen Zustand – je Teil und Zone, volle Verdübelung**
+
+| Teil | Zone | $F\ [\mathrm{kN}]$ | $y\ [\mathrm{mm}]$ | $z\ [\mathrm{mm}]$ |
+| :--- | :--- | ---: | ---: | ---: |
+| Profil 1 (IPE 400) | Zug | $1309.0$ | $0.0$ | $367.0$ |
+| Profil 1 (IPE 400) | Druck | $-1548.0$ | $0.0$ | $58.8$ |
+| Linie 1 | Zug | $239.0$ | $0.0$ | $510.0$ |
+
+**Probe: Normalkraft**
+
+$$
+N_{Rd} = \sum F_i = 0\,\mathrm{kN}
+$$
+
+**Probe: Moment um y**
+
+$$
+M_{y,Rd} = -\sum F_i \cdot (z_i - z_S) = -511.4\,\mathrm{kNm}
+$$
+
+##### Verdübelung
+
+**Beton und Betonstahl ausserhalb der Profile bei voller Verdübelung, zusammen gezogen**
+
+$$
+N_{c,f} = \left|\sum F_{i}\right|_{\mathrm{Beton,\ Betonstahl}} = 239\,\mathrm{kN}
+$$
+
+**Dübel bis zum Momentennullpunkt, wie angegeben**
+
+$$
+N = 12
+$$
+
+**Dübel für volle Verdübelung** *(SIA 264:2014, 6.1.1.6, (29))*
+
+$$
+N_f = \frac{N_{c,f}}{P_{Rd}} = \frac{239\,\mathrm{kN}}{81.7\,\mathrm{kN}} = 2.93
+$$
+
+**Verdübelungsgrad** *(SIA 264:2014, 6.1.1.6, (29))*
+
+$$
+\eta = \frac{N}{N_f} = \frac{12}{2.93} = 4.099
+$$
+
+Im Bereich negativer Momente lässt 6.1.1.6 keine Teilverdübelung zu: verlangt ist volle Verdübelung. Das Werkzeug sieht ihn, wo Beton und Betonstahl ausserhalb der Profile zusammen gezogen sind oder das Moment die Seite des Betons zieht (nach Vorgabe, nicht nachgeschlagen).
+
+**Volle Verdübelung verlangt** *(SIA 264:2014, 6.1.1.6)*
+
+$$
+\eta_{min} = 1
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,\eta,\text{Stütze}} = \frac{\eta}{\eta_{min}} = \frac{4.099}{1} = 4.10 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,\text{Stütze}} = \frac{M_{pl,Rd}}{M_{Ed}} = \frac{511.4\,\mathrm{kNm}}{300\,\mathrm{kNm}} = 1.70 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+#### Ohne Zahl
+
+**Einwirkung**
+
+| Einwirkung | Wert |  |
+| :--- | ---: | :--- |
+| N\_Ed | $0.0$ | kN |
+| M\_y,Ed | $400.0$ | kNm |
+| V\_z,Ed | $0.0$ | kN |
+
+**Bleche im Lastfall**
+
+| Blech | Grenzen nach | $c/t$ | $\alpha$ | $\text{Grenzen}\ 1 / 2$ | Klasse |
+| :--- | :--- | ---: | ---: | ---: | ---: |
+| Profil 1: Flansch oben, links | SIA 263, Tabelle 5b | $64.7/13.5 = 4.8$ | $0.00$ | $– / –$ | 1 |
+| Profil 1: Flansch oben, rechts | SIA 263, Tabelle 5b | $64.7/13.5 = 4.8$ | $0.00$ | $– / –$ | 1 |
+| Profil 1: Flansch unten, links | SIA 263, Tabelle 5b | $64.7/13.5 = 4.8$ | $0.00$ | $– / –$ | 1 |
+| Profil 1: Flansch unten, rechts | SIA 263, Tabelle 5b | $64.7/13.5 = 4.8$ | $0.00$ | $– / –$ | 1 |
+| Profil 1: Steg | SIA 263, Tabelle 5a | $331.0/8.6 = 38.5$ | $0.00$ | $– / –$ | 1 |
+
+**Querschnittsklasse** *(SIA 264:2014, 4.2.2.1, Tabellen 2 und 3; 5.2.1.3; SIA 263:2013, Tabellen 5a und 5b)*
+
+$$
+\mathrm{QK} = 1
+$$
+
+Nulllinie: Zugrichtung n = (0.000; -1.000), -90.0° gegen die y-Achse; gezogen ist, wo n\_y y + n\_z z \> -472.7 mm.
+
+**Kräfte im plastischen Zustand – je Teil und Zone, volle Verdübelung**
+
+| Teil | Zone | $F\ [\mathrm{kN}]$ | $y\ [\mathrm{mm}]$ | $z\ [\mathrm{mm}]$ |
+| :--- | :--- | ---: | ---: | ---: |
+| Profil 1 (IPE 400) | Zug | $2857.0$ | $0.0$ | $200.0$ |
+| Polygon 1 | Druck | $-2618.0$ | $0.0$ | $511.4$ |
+| Linie 1 | Druck | $-239.0$ | $0.0$ | $510.0$ |
+
+**Probe: Normalkraft**
+
+$$
+N_{Rd} = \sum F_i = 0\,\mathrm{kN}
+$$
+
+**Probe: Moment um y**
+
+$$
+M_{y,Rd} = -\sum F_i \cdot (z_i - z_S) = 889.3\,\mathrm{kNm}
+$$
+
+##### Verdübelung
+
+**Beton und Betonstahl ausserhalb der Profile bei voller Verdübelung, zusammen gedrückt**
+
+$$
+N_{c,f} = \left|\sum F_{i}\right|_{\mathrm{Beton,\ Betonstahl}} = 2857\,\mathrm{kN}
+$$
+
+> **Hinweis:** Für diesen Lastfall fehlt noch die Zahl der Dübel bis zum Momentennullpunkt – Biegung und Normalkraft rechnen mit voller Verdübelung.
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,\text{Ohne Zahl}} = \frac{M_{pl,Rd}}{M_{Ed}} = \frac{889.3\,\mathrm{kNm}}{400\,\mathrm{kNm}} = 2.22 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+#### Ohne L\_e
+
+**Einwirkung**
+
+| Einwirkung | Wert |  |
+| :--- | ---: | :--- |
+| N\_Ed | $0.0$ | kN |
+| M\_y,Ed | $400.0$ | kNm |
+| V\_z,Ed | $0.0$ | kN |
+
+**Bleche im Lastfall, mit Teilverdübelung**
+
+| Blech | Grenzen nach | $c/t$ | $\alpha$ | $\text{Grenzen}\ 1 / 2$ | Klasse |
+| :--- | :--- | ---: | ---: | ---: | ---: |
+| Profil 1: Flansch oben, links | SIA 263, Tabelle 5b | $64.7/13.5 = 4.8$ | $0.00$ | $– / –$ | 1 |
+| Profil 1: Flansch oben, rechts | SIA 263, Tabelle 5b | $64.7/13.5 = 4.8$ | $0.00$ | $– / –$ | 1 |
+| Profil 1: Flansch unten, links | SIA 263, Tabelle 5b | $64.7/13.5 = 4.8$ | $0.00$ | $– / –$ | 1 |
+| Profil 1: Flansch unten, rechts | SIA 263, Tabelle 5b | $64.7/13.5 = 4.8$ | $0.00$ | $– / –$ | 1 |
+| Profil 1: Steg | SIA 263, Tabelle 5a | $331.0/8.6 = 38.5$ | $0.00$ | $– / –$ | 1 |
+
+**Querschnittsklasse** *(SIA 264:2014, 4.2.2.1, Tabellen 2 und 3; 5.2.1.3; SIA 263:2013, Tabellen 5a und 5b)*
+
+$$
+\mathrm{QK} = 1
+$$
+
+Nulllinie: Zugrichtung n = (0.000; -1.000), -90.0° gegen die y-Achse; gezogen ist, wo n\_y y + n\_z z \> -472.7 mm.
+
+**Kräfte im plastischen Zustand – je Teil und Zone, volle Verdübelung**
+
+| Teil | Zone | $F\ [\mathrm{kN}]$ | $y\ [\mathrm{mm}]$ | $z\ [\mathrm{mm}]$ |
+| :--- | :--- | ---: | ---: | ---: |
+| Profil 1 (IPE 400) | Zug | $2857.0$ | $0.0$ | $200.0$ |
+| Polygon 1 | Druck | $-2618.0$ | $0.0$ | $511.4$ |
+| Linie 1 | Druck | $-239.0$ | $0.0$ | $510.0$ |
+
+**Probe: Normalkraft**
+
+$$
+N_{Rd} = \sum F_i = 0\,\mathrm{kN}
+$$
+
+**Probe: Moment um y**
+
+$$
+M_{y,Rd} = -\sum F_i \cdot (z_i - z_S) = 889.3\,\mathrm{kNm}
+$$
+
+##### Verdübelung
+
+**Beton und Betonstahl ausserhalb der Profile bei voller Verdübelung, zusammen gedrückt**
+
+$$
+N_{c,f} = \left|\sum F_{i}\right|_{\mathrm{Beton,\ Betonstahl}} = 2857\,\mathrm{kN}
+$$
+
+**Dübel bis zum Momentennullpunkt, wie angegeben**
+
+$$
+N = 30
+$$
+
+**Dübel für volle Verdübelung** *(SIA 264:2014, 6.1.1.6, (29))*
+
+$$
+N_f = \frac{N_{c,f}}{P_{Rd}} = \frac{2857\,\mathrm{kN}}{81.7\,\mathrm{kN}} = 34.99
+$$
+
+**Verdübelungsgrad** *(SIA 264:2014, 6.1.1.6, (29))*
+
+$$
+\eta = \frac{N}{N_f} = \frac{30}{34.99} = 0.857
+$$
+
+> **Hinweis:** Für (29) fehlt diesem Lastfall noch L\_e, der Abstand der Momentennullpunkte.
+
+##### Teilverdübelung
+
+**Was die Dübel tragen – weniger als N\_c,f** *(SIA 264:2014, 6.1.1.6; 5.1.2.1)*
+
+$$
+F_D = N \cdot P_{Rd} = 30 \cdot 81.7\,\mathrm{kN} = 2449.7\,\mathrm{kN}
+$$
+
+Beton und Betonstahl ausserhalb der Profile tragen zusammen nur diese Kraft, der Baustahl den Rest von N\_Ed; jeder Teil hat seine eigene Nulllinie, beide mit derselben Zugrichtung.
+
+Nulllinien, beide mit Zugrichtung n = (0.000; -1.000), -90.0° gegen die y-Achse: ausserhalb der Profile gezogen, wo n\_y y + n\_z z \> -484.7 mm; in den Profilen gezogen, wo n\_y y + n\_z z \> -396.7 mm.
+
+**Kräfte mit Teilverdübelung – je Teil und Zone**
+
+| Teil | Zone | $F\ [\mathrm{kN}]$ | $y\ [\mathrm{mm}]$ | $z\ [\mathrm{mm}]$ |
+| :--- | :--- | ---: | ---: | ---: |
+| Profil 1 (IPE 400) | Zug | $2653.4$ | $0.0$ | $184.8$ |
+| Profil 1 (IPE 400) | Druck | $-203.7$ | $0.0$ | $398.3$ |
+| Polygon 1 | Druck | $-2210.7$ | $0.0$ | $517.4$ |
+| Linie 1 | Druck | $-239.0$ | $0.0$ | $510.0$ |
+
+**Probe: Normalkraft**
+
+$$
+N_{Rd} = \sum F_i = 0\,\mathrm{kN}
+$$
+
+**Probe: Moment um y**
+
+$$
+M_{y,Rd} = -\sum F_i \cdot (z_i - z_S) = 856.5\,\mathrm{kNm}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,\text{Ohne L\_e}} = \frac{M_{Rd}}{M_{Ed}} = \frac{856.5\,\mathrm{kNm}}{400\,\mathrm{kNm}} = 2.14 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+#### Weit gespannt
+
+**Einwirkung**
+
+| Einwirkung | Wert |  |
+| :--- | ---: | :--- |
+| N\_Ed | $0.0$ | kN |
+| M\_y,Ed | $400.0$ | kNm |
+| V\_z,Ed | $0.0$ | kN |
+
+**Bleche im Lastfall**
+
+| Blech | Grenzen nach | $c/t$ | $\alpha$ | $\text{Grenzen}\ 1 / 2$ | Klasse |
+| :--- | :--- | ---: | ---: | ---: | ---: |
+| Profil 1: Flansch oben, links | SIA 263, Tabelle 5b | $64.7/13.5 = 4.8$ | $0.00$ | $– / –$ | 1 |
+| Profil 1: Flansch oben, rechts | SIA 263, Tabelle 5b | $64.7/13.5 = 4.8$ | $0.00$ | $– / –$ | 1 |
+| Profil 1: Flansch unten, links | SIA 263, Tabelle 5b | $64.7/13.5 = 4.8$ | $0.00$ | $– / –$ | 1 |
+| Profil 1: Flansch unten, rechts | SIA 263, Tabelle 5b | $64.7/13.5 = 4.8$ | $0.00$ | $– / –$ | 1 |
+| Profil 1: Steg | SIA 263, Tabelle 5a | $331.0/8.6 = 38.5$ | $0.00$ | $– / –$ | 1 |
+
+**Querschnittsklasse** *(SIA 264:2014, 4.2.2.1, Tabellen 2 und 3; 5.2.1.3; SIA 263:2013, Tabellen 5a und 5b)*
+
+$$
+\mathrm{QK} = 1
+$$
+
+Nulllinie: Zugrichtung n = (0.000; -1.000), -90.0° gegen die y-Achse; gezogen ist, wo n\_y y + n\_z z \> -472.7 mm.
+
+**Kräfte im plastischen Zustand – je Teil und Zone, volle Verdübelung**
+
+| Teil | Zone | $F\ [\mathrm{kN}]$ | $y\ [\mathrm{mm}]$ | $z\ [\mathrm{mm}]$ |
+| :--- | :--- | ---: | ---: | ---: |
+| Profil 1 (IPE 400) | Zug | $2857.0$ | $0.0$ | $200.0$ |
+| Polygon 1 | Druck | $-2618.0$ | $0.0$ | $511.4$ |
+| Linie 1 | Druck | $-239.0$ | $0.0$ | $510.0$ |
+
+**Probe: Normalkraft**
+
+$$
+N_{Rd} = \sum F_i = 0\,\mathrm{kN}
+$$
+
+**Probe: Moment um y**
+
+$$
+M_{y,Rd} = -\sum F_i \cdot (z_i - z_S) = 889.3\,\mathrm{kNm}
+$$
+
+##### Verdübelung
+
+**Beton und Betonstahl ausserhalb der Profile bei voller Verdübelung, zusammen gedrückt**
+
+$$
+N_{c,f} = \left|\sum F_{i}\right|_{\mathrm{Beton,\ Betonstahl}} = 2857\,\mathrm{kN}
+$$
+
+**Dübel bis zum Momentennullpunkt, wie angegeben**
+
+$$
+N = 40
+$$
+
+**Dübel für volle Verdübelung** *(SIA 264:2014, 6.1.1.6, (29))*
+
+$$
+N_f = \frac{N_{c,f}}{P_{Rd}} = \frac{2857\,\mathrm{kN}}{81.7\,\mathrm{kN}} = 34.99
+$$
+
+**Verdübelungsgrad** *(SIA 264:2014, 6.1.1.6, (29))*
+
+$$
+\eta = \frac{N}{N_f} = \frac{40}{34.99} = 1.143
+$$
+
+**L\_e über 25 m: volle Verdübelung verlangt** *(SIA 264:2014, 6.1.1.6, (29))*
+
+$$
+\eta_{min} = 1
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,\eta,\text{Weit gespannt}} = \frac{\eta}{\eta_{min}} = \frac{1.143}{1} = 1.14 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,\text{Weit gespannt}} = \frac{M_{pl,Rd}}{M_{Ed}} = \frac{889.3\,\mathrm{kNm}}{400\,\mathrm{kNm}} = 2.22 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+#### Zug
+
+**Einwirkung**
+
+| Einwirkung | Wert |  |
+| :--- | ---: | :--- |
+| N\_Ed | $500.0$ | kN |
+| M\_y,Ed | $0.0$ | kNm |
+| V\_z,Ed | $0.0$ | kN |
+
+**Bleche im Lastfall**
+
+| Blech | Grenzen nach | $c/t$ | $\alpha$ | $\text{Grenzen}\ 1 / 2$ | Klasse |
+| :--- | :--- | ---: | ---: | ---: | ---: |
+| Profil 1: Flansch oben, links | SIA 263, Tabelle 5b | $64.7/13.5 = 4.8$ | $0.00$ | $– / –$ | 1 |
+| Profil 1: Flansch oben, rechts | SIA 263, Tabelle 5b | $64.7/13.5 = 4.8$ | $0.00$ | $– / –$ | 1 |
+| Profil 1: Flansch unten, links | SIA 263, Tabelle 5b | $64.7/13.5 = 4.8$ | $0.00$ | $– / –$ | 1 |
+| Profil 1: Flansch unten, rechts | SIA 263, Tabelle 5b | $64.7/13.5 = 4.8$ | $0.00$ | $– / –$ | 1 |
+| Profil 1: Steg | SIA 263, Tabelle 5a | $331.0/8.6 = 38.5$ | $0.00$ | $– / –$ | 1 |
+
+**Querschnittsklasse** *(SIA 264:2014, 4.2.2.1, Tabellen 2 und 3; 5.2.1.3; SIA 263:2013, Tabellen 5a und 5b)*
+
+$$
+\mathrm{QK} = 1
+$$
+
+Ohne Moment prüft das Werkzeug die Dübel nicht: (29) gilt dem Längsschub aus Biegung bis zum Momentennullpunkt (nach Vorgabe, nicht nachgeschlagen).
+
+**Zugwiderstand, Σ f A je Werkstoff** *(SIA 264:2014, 4.3.2.1; 5.1.2.1)*
+
+$$
+N_{pl,Rd}^{+} = 3096.1\,\mathrm{kN}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,\text{Zug}} = \frac{N_{pl,Rd}^{+}}{N_{Ed}} = \frac{3096.1\,\mathrm{kN}}{500\,\mathrm{kN}} = 6.19 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+### Querkraft
+
+#### Feld
+
+**Querkraft in z**
+
+$$
+V_{z,Ed} = 100\,\mathrm{kN} \quad \le \quad V_{z,Rd} = 834.3\,\mathrm{kN}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{V,\text{Feld}} = \frac{V_{z,Rd}}{V_{z,Ed}} = \frac{834.3\,\mathrm{kN}}{100\,\mathrm{kN}} = 8.34 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+#### Feld, zu wenig Dübel
+
+Keine Einwirkung → kein Nachweis.
+
+#### Stütze
+
+**Querkraft in z**
+
+$$
+V_{z,Ed} = 200\,\mathrm{kN} \quad \le \quad V_{z,Rd} = 834.3\,\mathrm{kN}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{V,\text{Stütze}} = \frac{V_{z,Rd}}{V_{z,Ed}} = \frac{834.3\,\mathrm{kN}}{200\,\mathrm{kN}} = 4.17 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+#### Ohne Zahl
+
+Keine Einwirkung → kein Nachweis.
+
+#### Ohne L\_e
+
+Keine Einwirkung → kein Nachweis.
+
+#### Weit gespannt
+
+Keine Einwirkung → kein Nachweis.
+
+#### Zug
+
+Keine Einwirkung → kein Nachweis.
+
+### Torsionsträgheitsmoment
+
+> **Annahme:** I\_T nach St. Venant am Bruttoquerschnitt, ungerissen und ohne Bewehrung, numerisch aus der Spannungsfunktion von Prandtl (nach Vorgabe, nicht nachgeschlagen).
+
+**Spannungsfunktion von Prandtl; am Rand des Hohlraums k ist φ = φ\_k**
+
+$$
+\nabla^2 \phi = -2 \qquad \phi = 0 \ \text{am Rand} \qquad \oint_k \frac{\partial \phi}{\partial n}\, ds = -2\, A_k
+$$
+
+**Torsionsträgheitsmoment aus der Spannungsfunktion**
+
+$$
+I_T = 2 \int_A \phi\, dA + 2 \sum_k \phi_k\, A_k
+$$
+
+**Die beiden Gitter**
+
+| Gitter | Zellen | mit Material | $A_k\ [\mathrm{mm}^2]$ | $I_T\ [10^6\,\mathrm{mm}^4]$ |
+| :--- | ---: | ---: | ---: | ---: |
+| grob | $66 \times 22$ | $460$ | – | $2325.5$ |
+| fein | $132 \times 44$ | $1840$ | – | $2230.6$ |
+
+**Torsionsträgheitsmoment, nach Richardson aus beiden Gittern**
+
+$$
+\begin{aligned}
+  I_T &= \frac{4 \cdot I_{T,fein} - I_{T,grob}}{3} \\
+  &= \frac{4 \cdot 2230.6\,\cdot 10^{6}\,\mathrm{mm}^{4} - 2325.5\,\cdot 10^{6}\,\mathrm{mm}^{4}}{3} \\
+  &= 2198.9\,\cdot 10^{6}\,\mathrm{mm}^{4}
+\end{aligned}
 $$
 
 ### Querschnittsanalyse: Holzträger
@@ -27167,7 +28221,7 @@ Jedes Teil rechnet mit der Fliessgrenze seiner Dicke: ein Profil mit der seines 
 
 Je Profil allein, ohne Normalkraft und Biegung: kein Blech ist gedrückt, der Querschnitt rechnet plastisch. Beim I und beim U prüft (42), ob der Steg beulen kann; tut er es, trägt er nach (13). Die Wände eines Rechteckrohrs tragen je nach (13). Zusammen tragen die Profile die Summe; frei gezeichnete Flächen tragen nichts.
 
-Was der Verbundquerschnitt aufnimmt, ohne Bezug auf einen Lastfall: die Widerstände gegen Zug, Druck und Biegung, plastisch nach SIA 264, und mit Profilen gegen Querkraft – die trägt der Stahl allein (4.3.2.2). Knicken, Kippen und die Verdübelung gehören dem Träger und sind hier nicht dabei.
+Was der Verbundquerschnitt aufnimmt, ohne Bezug auf einen Lastfall: die Widerstände gegen Zug, Druck und Biegung, plastisch nach SIA 264, und mit Profilen gegen Querkraft – die trägt der Stahl allein (4.3.2.2). Mit Kopfbolzendübeln dazu, was einer trägt. Knicken und Kippen gehören dem Träger und sind hier nicht dabei.
 
 Was die Platte in x aufnimmt, ohne Bezug auf eine Einwirkung: die Eckwerte der Handrechnung mit Bemessungswerten und der Querkraftwiderstand ohne Normalkraft. Wo eine Seite massgebend ist, gilt das Kleinere beider Seiten.
 
@@ -27245,6 +28299,24 @@ $$
 
 $$
 M_{y,Rd}^{+} = \beta \cdot M_{y,pl,Rd}
+$$
+
+**Betonstauchung, C30/37** *(SIA 264:2014, 6.1.2.1, (30))*
+
+$$
+P_{Rd,c} = \frac{0.29 \cdot d^{2}}{\gamma_v} \cdot \sqrt{f_{ck} \cdot E_{cm}}
+$$
+
+**Versagen des Dübels** *(SIA 264:2014, 6.1.2.1, (31))*
+
+$$
+P_{Rd,s} = \frac{0.8 \cdot f_u}{\gamma_v} \cdot \frac{\pi \cdot d^{2}}{4}
+$$
+
+**Schubwiderstand eines Kopfbolzendübels** *(SIA 264:2014, 6.1.2.1, (30) und (31))*
+
+$$
+P_{Rd} = \min\left(P_{Rd,c};\ P_{Rd,s}\right)
 $$
 
 **Zugwiderstand bei M\_Ed = 0**
@@ -27492,6 +28564,36 @@ $$
 ### Verbundquerschnitt
 
 Je Lastfall der plastische Zustand bei N\_Ed, dessen Moment in die Richtung der Einwirkung zeigt: Baustahl und Betonstahl ganz gezogen oder ganz gedrückt, der Beton nur gedrückt, mit 0.85 f\_cd über die ganze Druckzone. Er gilt, wenn jedes Blech an seiner Nulllinie in Klasse 1 oder 2 liegt und gezogener Betonstahl in der Duktilitätsklasse B oder C ist. Grosse Querkraft mindert die Bleche, in denen sie steht, wie im Stahl. Die Normalkraft bleibt, das Moment wächst in seiner Richtung, bis der Widerstand erreicht ist.
+
+**Beton und Betonstahl ausserhalb der Profile bei voller Verdübelung, zusammen gedrückt**
+
+$$
+N_{c,f} = \left|\sum F_{i}\right|_{\mathrm{Beton,\ Betonstahl}}
+$$
+
+**Dübel für volle Verdübelung** *(SIA 264:2014, 6.1.1.6, (29))*
+
+$$
+N_f = \frac{N_{c,f}}{P_{Rd}}
+$$
+
+**Verdübelungsgrad** *(SIA 264:2014, 6.1.1.6, (29))*
+
+$$
+\eta = \frac{N}{N_f}
+$$
+
+**Kleinster Verdübelungsgrad, Profil doppelsymmetrisch** *(SIA 264:2014, 6.1.1.6, (29))*
+
+$$
+\eta_{min} = \max\left(1 - \frac{355\ \mathrm{N}/\mathrm{mm}^{2}}{f_y} \cdot \left(0.75 - 0.03 \cdot L_e\right);\ 0.4\right) \quad \left(L_e\ \text{in}\ \mathrm{m}\right)
+$$
+
+**Was die Dübel tragen – weniger als N\_c,f** *(SIA 264:2014, 6.1.1.6; 5.1.2.1)*
+
+$$
+F_D = N \cdot P_{Rd}
+$$
 
 ### Holzquerschnitt
 
@@ -29794,6 +30896,62 @@ $$
 | Querkraftwiderstand in z | $V_{z,Rd}$ | $942.5\,\mathrm{kN}$ |
 | Querkraftwiderstand in y | $V_{y,Rd}$ | $2120\,\mathrm{kN}$ |
 
+### Verbundträger mit Dübeln
+
+**Angaben zum Querschnitt**
+
+$$
+\text{C30/37, S355} \qquad A = 308450\,\mathrm{mm}^2 \qquad y_S = 0.0\,\mathrm{mm} \qquad z_S = 467.5\,\mathrm{mm}
+$$
+
+**Bewehrung und Schubwände**
+
+| Element | Bewehrung | Stahl |
+| :--- | :--- | :--- |
+| Linie 1 | $7 \varnothing 10$ | B500B |
+
+| Nachweis | Bezeichnung | Widerstand | Einwirkung | $\alpha_{eff}$ |
+| :--- | :--- | ---: | ---: | ---: |
+| Biegung und Normalkraft | Feld | $M_{Rd} = 817.4\,\mathrm{kNm}$ | $M_{Ed} = 500.0\,\mathrm{kNm}$ | $1.63$ |
+| Verdübelung | Feld | $\eta = 0.715$ | $\eta_{min} = 0.610$ | $1.17$ |
+| Biegung und Normalkraft | Feld, zu wenig Dübel | $M_{Rd} = 722.8\,\mathrm{kNm}$ | $M_{Ed} = 500.0\,\mathrm{kNm}$ | $1.45$ |
+| Verdübelung | Feld, zu wenig Dübel | $\eta = 0.429$ | $\eta_{min} = 0.610$ | $0.70$ |
+| Biegung und Normalkraft | Stütze | $M_{pl,Rd} = 511.4\,\mathrm{kNm}$ | $M_{Ed} = 300.0\,\mathrm{kNm}$ | $1.70$ |
+| Verdübelung | Stütze | $\eta = 4.099$ | $\eta_{min} = 1.000$ | $4.10$ |
+| Biegung und Normalkraft | Ohne Zahl | $M_{pl,Rd} = 889.3\,\mathrm{kNm}$ | $M_{Ed} = 400.0\,\mathrm{kNm}$ | $2.22$ |
+| Verdübelung | Ohne Zahl | – | – | $0.00$ |
+| Biegung und Normalkraft | Ohne L\_e | $M_{Rd} = 856.5\,\mathrm{kNm}$ | $M_{Ed} = 400.0\,\mathrm{kNm}$ | $2.14$ |
+| Verdübelung | Ohne L\_e | – | – | $0.00$ |
+| Biegung und Normalkraft | Weit gespannt | $M_{pl,Rd} = 889.3\,\mathrm{kNm}$ | $M_{Ed} = 400.0\,\mathrm{kNm}$ | $2.22$ |
+| Verdübelung | Weit gespannt | $\eta = 1.143$ | $\eta_{min} = 1.000$ | $1.14$ |
+| Biegung und Normalkraft | Zug | $N_{pl,Rd}^{+} = 3096.1\,\mathrm{kN}$ | $N_{Ed} = 500.0\,\mathrm{kN}$ | $6.19$ |
+| Querkraft | Feld | $V_{z,Rd} = 834.3\,\mathrm{kN}$ | $V_{z,Ed} = 100.0\,\mathrm{kN}$ | $8.34$ |
+| Querkraft | Feld, zu wenig Dübel | – | – | $\infty$ |
+| Querkraft | Stütze | $V_{z,Rd} = 834.3\,\mathrm{kN}$ | $V_{z,Ed} = 200.0\,\mathrm{kN}$ | $4.17$ |
+| Querkraft | Ohne Zahl | – | – | $\infty$ |
+| Querkraft | Ohne L\_e | – | – | $\infty$ |
+| Querkraft | Weit gespannt | – | – | $\infty$ |
+| Querkraft | Zug | – | – | $\infty$ |
+
+> **Hinweis:** Verdübelung – Ohne Zahl: Für diesen Lastfall fehlt noch die Zahl der Dübel bis zum Momentennullpunkt – Biegung und Normalkraft rechnen mit voller Verdübelung.
+
+> **Hinweis:** Verdübelung – Ohne L\_e: Für (29) fehlt diesem Lastfall noch L\_e, der Abstand der Momentennullpunkte.
+
+> **Hinweis:** Querkraft – Feld, zu wenig Dübel, Querkraft – Ohne Zahl, Querkraft – Ohne L\_e, Querkraft – Weit gespannt, Querkraft – Zug: Keine Einwirkung → kein Nachweis.
+
+> **Warnung:** Verdübelung – Feld, zu wenig Dübel: nicht erfüllt. η = 0.43, verlangt 0.61.
+
+**Kennzahlen**
+
+| Kennzahl | Zeichen | Wert |
+| :--- | :--- | ---: |
+| Zugwiderstand | $N_{pl,Rd}^{+}$ | $3096.1\,\mathrm{kN}$ |
+| Druckwiderstand | $N_{pl,Rd}^{-}$ | $0\,\mathrm{kN}$ |
+| Momentenwiderstand, Zug unten | $M_{y,Rd}^{+}$ | $889.3\,\mathrm{kNm}$ |
+| Momentenwiderstand, Zug oben | $M_{y,Rd}^{-}$ | $-511.4\,\mathrm{kNm}$ |
+| Querkraftwiderstand in z | $V_{z,Rd}$ | $834.3\,\mathrm{kN}$ |
+| Dübelwiderstand | $P_{Rd}$ | $81.7\,\mathrm{kN}$ |
+
 ### Winkelwand
 
 Kein Nachweis geführt.
@@ -31754,6 +32912,35 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Erfüllungsgrad Biegung und Normalkraft – Zug | $\alpha_{eff,\text{Zug}}$ | $5.42$ |  | berechnet |
 | Schwerpunkt, y | $y_S$ | $0$ | mm | berechnet |
 | Schwerpunkt, z | $z_S$ | $283.2$ | mm | berechnet |
+| Fläche des Bruttoquerschnitts | $A$ | $308450$ | mm² | berechnet |
+| Stahlfläche der Bewehrung | $A_{s,tot}$ | $550$ | mm² | berechnet |
+| Torsionsträgheitsmoment nach St. Venant | $I_T$ | $2198.9$ | ·10⁶ mm⁴ | berechnet |
+| Trägheitsmoment um y | $I_y$ | $1415.5$ | ·10⁶ mm⁴ | berechnet |
+| Deviationsmoment | $I_{yz}$ | $0$ | ·10⁶ mm⁴ | berechnet |
+| Trägheitsmoment um z | $I_z$ | $100013.2$ | ·10⁶ mm⁴ | berechnet |
+| Plastischer Momentenwiderstand bei N = 0, Zug oben | $M_{y,Rd}^{-}$ | $-511.4$ | kNm | berechnet |
+| Plastischer Momentenwiderstand bei N = 0, Zug unten | $M_{y,Rd}^{+}$ | $889.3$ | kNm | berechnet |
+| Druckwiderstand des Verbundquerschnitts, ohne Knicken | $N_{pl,Rd}^{-}$ | $0$ | kN | berechnet |
+| Zugwiderstand des Verbundquerschnitts | $N_{pl,Rd}^{+}$ | $3096.1$ | kN | berechnet |
+| Schubwiderstand eines Kopfbolzendübels | $P_{Rd}$ | $81.7$ | kN | berechnet |
+| Querkraftwiderstand in z, Stahl allein | $V_{z,Rd}$ | $834.3$ | kN | berechnet |
+| Erfüllungsgrad Querkraft – Feld | $\alpha_{V,\text{Feld}}$ | $8.34$ |  | berechnet |
+| Erfüllungsgrad Querkraft – Stütze | $\alpha_{V,\text{Stütze}}$ | $4.17$ |  | berechnet |
+| Erfüllungsgrad Biegung und Normalkraft – Feld | $\alpha_{eff,\text{Feld}}$ | $1.63$ |  | berechnet |
+| Erfüllungsgrad Verdübelung – Feld | $\alpha_{eff,\eta,\text{Feld}}$ | $1.17$ |  | berechnet |
+| Erfüllungsgrad Biegung und Normalkraft – Feld, zu wenig Dübel | $\alpha_{eff,\text{Feld, zu wenig Dübel}}$ | $1.45$ |  | berechnet |
+| Erfüllungsgrad Verdübelung – Feld, zu wenig Dübel | $\alpha_{eff,\eta,\text{Feld, zu wenig Dübel}}$ | $0.70$ |  | berechnet |
+| Erfüllungsgrad Biegung und Normalkraft – Ohne L\_e | $\alpha_{eff,\text{Ohne L\_e}}$ | $2.14$ |  | berechnet |
+| Erfüllungsgrad Verdübelung – Ohne L\_e | $\alpha_{eff,\eta,\text{Ohne L\_e}}$ | $0.00$ |  | berechnet |
+| Erfüllungsgrad Biegung und Normalkraft – Ohne Zahl | $\alpha_{eff,\text{Ohne Zahl}}$ | $2.22$ |  | berechnet |
+| Erfüllungsgrad Verdübelung – Ohne Zahl | $\alpha_{eff,\eta,\text{Ohne Zahl}}$ | $0.00$ |  | berechnet |
+| Erfüllungsgrad Biegung und Normalkraft – Stütze | $\alpha_{eff,\text{Stütze}}$ | $1.70$ |  | berechnet |
+| Erfüllungsgrad Verdübelung – Stütze | $\alpha_{eff,\eta,\text{Stütze}}$ | $4.10$ |  | berechnet |
+| Erfüllungsgrad Biegung und Normalkraft – Weit gespannt | $\alpha_{eff,\text{Weit gespannt}}$ | $2.22$ |  | berechnet |
+| Erfüllungsgrad Verdübelung – Weit gespannt | $\alpha_{eff,\eta,\text{Weit gespannt}}$ | $1.14$ |  | berechnet |
+| Erfüllungsgrad Biegung und Normalkraft – Zug | $\alpha_{eff,\text{Zug}}$ | $6.19$ |  | berechnet |
+| Schwerpunkt, y | $y_S$ | $0$ | mm | berechnet |
+| Schwerpunkt, z | $z_S$ | $467.5$ | mm | berechnet |
 | Fläche des Bruttoquerschnitts | $A$ | $1437500$ | mm² | berechnet |
 | Stahlfläche der Bewehrung | $A_{s,tot}$ | $0$ | mm² | berechnet |
 | Trägheitsmoment um y | $I_y$ | $421209.8$ | ·10⁶ mm⁴ | berechnet |

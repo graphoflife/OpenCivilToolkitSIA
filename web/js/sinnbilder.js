@@ -664,6 +664,25 @@ const ZEICHEN = {
     pfade: ['M3 13q2.25-1.8 4.5 0t4.5 0t4.5 0t4.5 0', 'M3 18q2.25-1.8 4.5 0t4.5 0t4.5 0t4.5 0'],
     flaechen: ['M7 7h10v7H7z'],
   },
+  // Die Verdübelung im Verbund: auf der Kachel Platte und Träger in der
+  // Ansicht, dazwischen die Kopfbolzendübel. Je Stellung der Querschnitt mit
+  // seiner Dehnung daneben: voll verdübelt eine Gerade über Beton und Stahl;
+  // mit Dübeln springt sie an der Fuge (gestrichelt, der Schlupf), und Beton
+  // und Stahl haben je ihre Nulllinie.
+  verduebelung: {
+    pfade: ['M2 3.5h20v7H2z', 'M6 10.5V6.5 M4.8 6.5h2.4', 'M12 10.5V6.5 M10.8 6.5h2.4',
+      'M18 10.5V6.5 M16.8 6.5h2.4', 'M2 13v5.5 M22 13v5.5'],
+    flaechen: ['M2 10.5h20V13H2z', 'M2 18.5h20V21H2z'],
+  },
+  'verduebelung-voll': {
+    pfade: ['M2 3.5h9v5H2z', 'M3.5 9.3h6 M6.5 9.3v10.4 M3.5 19.7h6', 'M16.5 3.5v16.2',
+      'M19.5 3.5L13.5 19.7'],
+  },
+  'verduebelung-kopfbolzen': {
+    pfade: ['M2 3.5h9v5H2z', 'M3.5 9.3h6 M6.5 9.3v10.4 M3.5 19.7h6', 'M6.5 8.5V5.8 M5.3 5.8h2.4',
+      'M16.5 3.5v16.2', 'M19.5 3.5L15 8.9', 'M19 8.9L13.5 19.7'],
+    strich: ['M15 8.9h4'],
+  },
 };
 
 /**

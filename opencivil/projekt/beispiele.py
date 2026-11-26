@@ -31,6 +31,7 @@ from opencivil.projekt.skript import VORLAGE
 from opencivil.projekt.staebe import MATERIAL_DES_QUERSCHNITTS
 from opencivil.querschnitt.geometrie import Linienart
 from opencivil.querschnitt.gesetzwahl import Rechenart, Werkstoffsatz
+from opencivil.verbund.duebel import Verduebelung
 
 
 def beispiel() -> Projekt:
@@ -283,13 +284,14 @@ def jeder_nachweis() -> Projekt:
     # Anforderung; eine Stütze, einachsig, mit charakteristischen Werten,
     # normaler Anforderung und Knicken -- so steht jede Wahl einmal da.
     # Dazu ein Träger mit Spanngliedern, je eines in jedem Gesetz, einer
-    # aus Stahl, einer aus Holz und einer im Verbund.
+    # aus Stahl, einer aus Holz und zwei im Verbund, einer mit Dübeln.
     p.querschnittsanalysen.append(_kastentraeger(p.freie_kennung("a")))
     p.querschnittsanalysen.append(_stuetze(p.freie_kennung("a")))
     p.querschnittsanalysen.append(_spannbeton(p.freie_kennung("a")))
     p.querschnittsanalysen.append(_stahltraeger(p.freie_kennung("a")))
     p.querschnittsanalysen.append(_holztraeger(p.freie_kennung("a")))
     p.querschnittsanalysen.append(_verbundtraeger(p.freie_kennung("a")))
+    p.querschnittsanalysen.append(_verbundduebel(p.freie_kennung("a")))
 
     # Zwei Balkensysteme: eines, das alles einmal braucht, und eines, das
     # sich nicht rechnen lässt -- dazu ein Rahmen im Raum. Dazu jede Lage
@@ -843,4 +845,31 @@ def _verbundtraeger(kennung: str) -> QuerschnittsanalyseEintrag:
     a.lastfall("Zug", N_Ed=1000.0)
     a.lastfall("Druck", N_Ed=-5000.0)
     a.lastfall("Zu viel Druck", N_Ed=-20000.0, M_y_Ed=10.0)
+    return a
+
+
+def _verbundduebel(kennung: str) -> QuerschnittsanalyseEintrag:
+    """
+    Ein IPE 400 aus S355 unter einer Platte 2000 × 150 mm aus C30/37 mit
+    Betonstahl B500B, einachsig, mit Kopfbolzendübeln ⌀19 × 125 mm (SIA
+    264:2014, 6.1). Im Feld teilverdübelt, (29) gehalten -- mit zu wenig
+    Dübeln nicht; an der Stütze verlangt das negative Moment volle
+    Verdübelung; ohne Zahl der Dübel und ohne L_e grau; L_e über 25 m
+    verlangt volle Verdübelung; ohne Moment prüft er die Dübel nicht.
+    """
+    a = QuerschnittsanalyseEintrag(kennung=kennung, name="Verbundträger mit Dübeln")
+    a.einachsig = True
+    a.polygon([(-1000, 400), (1000, 400), (1000, 550), (-1000, 550)], material="b1")
+    a.profil(0, 200, "IPE 400", stahl="st1")
+    a.stablinie([-950, 510], [950, 510], art="teilung", durchmesser=10, teilung=300,
+                stahl="s1")
+    a.verduebelung = Verduebelung.KOPFBOLZEN
+    a.duebel_h = 125.0
+    a.lastfall("Feld", M_y_Ed=500.0, V_z_Ed=100.0, duebelzahl=25, L_e=12.0)
+    a.lastfall("Feld, zu wenig Dübel", M_y_Ed=500.0, duebelzahl=15, L_e=12.0)
+    a.lastfall("Stütze", M_y_Ed=-300.0, V_z_Ed=200.0, duebelzahl=12)
+    a.lastfall("Ohne Zahl", M_y_Ed=400.0)
+    a.lastfall("Ohne L_e", M_y_Ed=400.0, duebelzahl=30)
+    a.lastfall("Weit gespannt", M_y_Ed=400.0, duebelzahl=40, L_e=30.0)
+    a.lastfall("Zug", N_Ed=500.0, duebelzahl=10)
     return a

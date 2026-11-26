@@ -182,7 +182,7 @@ def bereich(vorgabe: Any = dataclasses.MISSING, *, heisst: str,
             einheit: Optional[Einheit] = None, ueber: Optional[float] = None,
             ab: Optional[float] = None, bis: Optional[float] = None,
             unter: Optional[float] = None, bis_feld: Optional[str] = None,
-            quer_zu: Optional[Tuple[str, float]] = None,
+            bis_faktor: float = 1.0, quer_zu: Optional[Tuple[str, float]] = None,
             fabrik: Optional[Callable[[], Any]] = None) -> Any:
     """
     Ein Feld, dessen Zahl in einem :class:`Bereich` liegen muss -- eine
@@ -191,7 +191,7 @@ def bereich(vorgabe: Any = dataclasses.MISSING, *, heisst: str,
     aus ``fabrik``.
     """
     metadata = {"bereich": Bereich(heisst, einheit, ueber=ueber, ab=ab, bis=bis, unter=unter,
-                                   bis_feld=bis_feld, quer_zu=quer_zu)}
+                                   bis_feld=bis_feld, bis_faktor=bis_faktor, quer_zu=quer_zu)}
     if fabrik is not None:
         return dataclasses.field(default_factory=fabrik, metadata=metadata)
     return dataclasses.field(default=vorgabe, metadata=metadata)
@@ -220,7 +220,9 @@ def feldangaben(cls: type) -> Dict[str, Dict[str, Any]]:
 
     Begrenzt ein Feld ein anderes (:attr:`Bereich.bis_feld`), steht das an
     beiden, mit dem Namen des anderen Feldes und dem Satz, den das Feld
-    sagt: ``bis_feld`` bei α_min, ``ab_feld`` bei α_max. Ebenso ``quer_zu``
+    sagt: ``bis_feld`` bei α_min, ``ab_feld`` bei α_max -- mit ``faktor``,
+    wo die Grenze ein Vielfaches des anderen ist (:attr:`Bereich.bis_faktor`,
+    beim anderen Feld sein Kehrwert). Ebenso ``quer_zu``
     an beiden Feldern, mit dem kleinsten Abstand als Linien in Grad
     (:attr:`Bereich.quer_zu`, ``mindestens``). Die Zahl des anderen Feldes
     kennt erst die Maske.
@@ -243,7 +245,8 @@ def feldangaben(cls: type) -> Dict[str, Dict[str, Any]]:
     for f in dataclasses.fields(cls):
         b = bereiche.get(f.name)
         angabe = b.angabe() if b is not None else {}
-        if typen.get(f.name) is int:
+        art, innen = _art(typen.get(f.name))
+        if (innen if art == "optional" else typen.get(f.name)) is int:
             angabe["ganz"] = True
         if "stoffe" in f.metadata:
             angabe["stoffe"] = list(f.metadata["stoffe"])
@@ -256,8 +259,12 @@ def feldangaben(cls: type) -> Dict[str, Dict[str, Any]]:
     for name, b in bereiche.items():
         if b.bis_feld is not None:
             hier, dort = b.gegen(bereiche[b.bis_feld])
-            angaben.setdefault(name, {})["bis_feld"] = {"feld": b.bis_feld, "satz": hier}
-            angaben.setdefault(b.bis_feld, {})["ab_feld"] = {"feld": name, "satz": dort}
+            oben = {"feld": b.bis_feld, "satz": hier}
+            unten = {"feld": name, "satz": dort}
+            if b.bis_faktor != 1.0:
+                oben["faktor"], unten["faktor"] = b.bis_faktor, 1.0 / b.bis_faktor
+            angaben.setdefault(name, {})["bis_feld"] = oben
+            angaben.setdefault(b.bis_feld, {})["ab_feld"] = unten
         if b.quer_zu is not None:
             feld, mindestens = b.quer_zu
             hier, dort = b.quer(bereiche[feld])

@@ -1489,6 +1489,17 @@
       ]
     },
     {
+      "name": "Dübel für volle Verdübelung",
+      "pfad": "Formelsammlung/Formeln/Dübel für volle Verdübelung.md",
+      "art": "formel",
+      "zeichen": [
+        "N_f"
+      ],
+      "themen": [
+        "Verbundquerschnitt"
+      ]
+    },
+    {
       "name": "Durchmesser des flächengleichen Kreises",
       "pfad": "Formelsammlung/Formeln/Durchmesser des flächengleichen Kreises.md",
       "art": "formel",
@@ -2626,6 +2637,17 @@
       ]
     },
     {
+      "name": "Kleinster Verdübelungsgrad",
+      "pfad": "Formelsammlung/Formeln/Kleinster Verdübelungsgrad.md",
+      "art": "formel",
+      "zeichen": [
+        "\\eta_{min}"
+      ],
+      "themen": [
+        "Verbundquerschnitt"
+      ]
+    },
+    {
       "name": "Knickbeiwert des Holzes",
       "pfad": "Formelsammlung/Formeln/Knickbeiwert des Holzes.md",
       "art": "formel",
@@ -2716,6 +2738,17 @@
       "zeichen": [],
       "themen": [
         "Querkraft und Torsion"
+      ]
+    },
+    {
+      "name": "Kraft im Beton bei voller Verdübelung",
+      "pfad": "Formelsammlung/Formeln/Kraft im Beton bei voller Verdübelung.md",
+      "art": "formel",
+      "zeichen": [
+        "N_{c,f}"
+      ],
+      "themen": [
+        "Verbundquerschnitt"
       ]
     },
     {
@@ -3943,6 +3976,39 @@
       ]
     },
     {
+      "name": "Schubwiderstand eines Kopfbolzendübels",
+      "pfad": "Formelsammlung/Formeln/Schubwiderstand eines Kopfbolzendübels.md",
+      "art": "formel",
+      "zeichen": [
+        "P_{Rd}"
+      ],
+      "themen": [
+        "Kennzahlen"
+      ]
+    },
+    {
+      "name": "Schubwiderstand eines Kopfbolzendübels – Betonstauchung",
+      "pfad": "Formelsammlung/Formeln/Schubwiderstand eines Kopfbolzendübels – Betonstauchung.md",
+      "art": "formel",
+      "zeichen": [
+        "P_{Rd,c}"
+      ],
+      "themen": [
+        "Kennzahlen"
+      ]
+    },
+    {
+      "name": "Schubwiderstand eines Kopfbolzendübels – Versagen des Dübels",
+      "pfad": "Formelsammlung/Formeln/Schubwiderstand eines Kopfbolzendübels – Versagen des Dübels.md",
+      "art": "formel",
+      "zeichen": [
+        "P_{Rd,s}"
+      ],
+      "themen": [
+        "Kennzahlen"
+      ]
+    },
+    {
       "name": "Schubwiderstand neben Torsion im Holz",
       "pfad": "Formelsammlung/Formeln/Schubwiderstand neben Torsion im Holz.md",
       "art": "formel",
@@ -4593,6 +4659,17 @@
       ]
     },
     {
+      "name": "Verdübelungsgrad",
+      "pfad": "Formelsammlung/Formeln/Verdübelungsgrad.md",
+      "art": "formel",
+      "zeichen": [
+        "\\eta"
+      ],
+      "themen": [
+        "Verbundquerschnitt"
+      ]
+    },
+    {
       "name": "Vergrösserungsfaktor der Durchbiegung",
       "pfad": "Formelsammlung/Formeln/Vergrösserungsfaktor der Durchbiegung.md",
       "art": "formel",
@@ -4632,6 +4709,17 @@
       ],
       "themen": [
         "Querschnittsanalyse"
+      ]
+    },
+    {
+      "name": "Was die Dübel tragen",
+      "pfad": "Formelsammlung/Formeln/Was die Dübel tragen.md",
+      "art": "formel",
+      "zeichen": [
+        "F_D"
+      ],
+      "themen": [
+        "Verbundquerschnitt"
       ]
     },
     {
@@ -6260,7 +6348,6 @@
         "Stuetzenflaeche.grenzen",
         "rundum",
         "_normale",
-        "konvexe_huelle",
         "_polygon",
         "Kandidat",
         "kandidaten_stuetze",
@@ -7408,6 +7495,9 @@
         "VerbundBiegungQA.pruefe",
         "VerbundBiegungQA._rechnen",
         "VerbundBiegungQA._normalkraft",
+        "VerbundBiegungQA._verduebelung",
+        "VerbundBiegungQA._verlangt",
+        "VerbundBiegungQA._teilverduebelt",
         "VerbundQuerkraftQA"
       ]
     },
@@ -7421,6 +7511,7 @@
         "verbund_von",
         "KennzahlenVerbundQA",
         "KennzahlenVerbundQA.rechne",
+        "KennzahlenVerbundQA._duebel",
         "KennzahlenVerbundQA._summe"
       ]
     },
@@ -8511,7 +8602,8 @@
         "_spannbeton",
         "_stahltraeger",
         "_holztraeger",
-        "_verbundtraeger"
+        "_verbundtraeger",
+        "_verbundduebel"
       ]
     },
     {
@@ -9036,6 +9128,7 @@
       "art": "modul",
       "kurz": "der gezeichnete Querschnitt als Bauteil im Rechenwerk.",
       "stichworte": [
+        "_zehntel",
         "werkstoff",
         "gesetz_protokollieren",
         "Lastfall",
@@ -9211,6 +9304,9 @@
         "polygon_pruefen",
         "schnitt_mit_gerade",
         "jenseits",
+        "abgeschnitten",
+        "konvexe_huelle",
+        "in_huelle",
         "Beziehung",
         "_ganz_in",
         "beziehung",
@@ -9372,14 +9468,20 @@
         "Stueck.werte",
         "Block",
         "Zustand",
+        "Zustand.linien",
+        "Plastisch",
+        "Plastisch.linien",
         "stuecke",
+        "in_richtung",
         "Starrplastisch",
         "Starrplastisch.zugkraft",
         "Starrplastisch.druckkraft",
         "Starrplastisch.kraefte",
         "Starrplastisch.bloecke",
         "Starrplastisch.nulllinie",
-        "Starrplastisch.zustand"
+        "Starrplastisch.zustand",
+        "Starrplastisch.traegt",
+        "Starrplastisch.bei"
       ]
     },
     {
@@ -10578,6 +10680,24 @@
       "stichworte": []
     },
     {
+      "name": "opencivil.verbund.duebel",
+      "pfad": "Python/opencivil.verbund.duebel.md",
+      "art": "modul",
+      "kurz": "Kopfbolzenduebel nach SIA 264:2014, 6.1.",
+      "stichworte": [
+        "Verduebelung",
+        "Verduebelung.beschriftung",
+        "Verduebelung.erklaerung",
+        "Kopfbolzen",
+        "Kopfbolzen.f_u_wirksam",
+        "Kopfbolzen.betonstauchung",
+        "Kopfbolzen.schaft",
+        "Abschnitt",
+        "negativ",
+        "eta_min"
+      ]
+    },
+    {
       "name": "opencivil.verbund.querschnitt",
       "pfad": "Python/opencivil.verbund.querschnitt.md",
       "art": "modul",
@@ -10589,6 +10709,10 @@
         "Verbundquerschnitt.gruppen_der",
         "Verbundquerschnitt.stuecke",
         "Verbundquerschnitt.starr",
+        "Verbundquerschnitt.fuge",
+        "Verbundquerschnitt.getrennt",
+        "Verbundquerschnitt.doppelsymmetrisch",
+        "Verbundquerschnitt.zum_beton",
         "Verbundquerschnitt.flaechen_je_gruppe",
         "Verbundquerschnitt.hoehe",
         "Verbundquerschnitt.druckzone_beton",
@@ -10607,9 +10731,15 @@
         "Beta",
         "Beta.verhaeltnis",
         "Beta.beta",
+        "Teilzustand",
+        "Teilzustand.linien",
+        "teilverduebelt",
         "Fall",
         "Fall.ohne_moment",
         "Fall.faktor_beta",
+        "Fall.teilverduebelt",
+        "Fall.widerstand",
+        "Fall.linie_beton",
         "_fall",
         "sproede_gezogen",
         "_bewerten",

@@ -128,9 +128,10 @@ export function naechsteStufe(wert, richtung, { stufen, schritt = 1 } = {}) {
  * Warum der Kern eine Zahl abwiese -- leer, wenn er sie nimmt. `angabe` sind
  * die Grenzen ihres Feldes aus dem Katalog (`feldangabe`): «Teilung muss
  * grösser als null sein». Begrenzt sie ein anderes Feld desselben Eintrags
- * (`bis_feld`, `ab_feld`: α_min nicht über α_max; `quer_zu`: zwei
- * Richtungen mindestens 5° auseinander, als Linien), steht dessen Zahl in
- * `neben`, dem Eintrag.
+ * (`bis_feld`, `ab_feld`: α_min nicht über α_max, mit `faktor` ein
+ * Vielfaches -- der Durchmesser eines Dübels höchstens ein Viertel seiner
+ * Länge; `quer_zu`: zwei Richtungen mindestens 5° auseinander, als Linien),
+ * steht dessen Zahl in `neben`, dem Eintrag.
  */
 export function grenzeVerletzt(angabe, zahl, neben = {}) {
   if (angabe.ganz && !Number.isInteger(zahl)) return 'Nur ganze Zahlen';
@@ -140,13 +141,24 @@ export function grenzeVerletzt(angabe, zahl, neben = {}) {
   const draussen = (ueber !== undefined && !(zahl > ueber)) || (ab !== undefined && !(zahl >= ab))
     || (bis !== undefined && !(zahl <= bis)) || (unter !== undefined && !(zahl < unter));
   if (draussen) return `${angabe.heisst} ${angabe.verlangt}`;
-  // Ein leeres Nachbarfeld begrenzt nichts -- wie im Kern (Bereich.grund_gegen):
-  // «zahl > null» hiesse in JavaScript «zahl > 0».
+  const oben = grenzeNeben(hoch, neben);
+  const unten = grenzeNeben(tief, neben);
+  if (oben !== undefined && zahl > oben) return hoch.satz;
+  if (unten !== undefined && zahl < unten) return tief.satz;
   const da = (feld) => neben[feld] !== undefined && neben[feld] !== null;
-  if (hoch && da(hoch.feld) && zahl > neben[hoch.feld]) return hoch.satz;
-  if (tief && da(tief.feld) && zahl < neben[tief.feld]) return tief.satz;
   if (quer && da(quer.feld) && linienabstand(zahl, neben[quer.feld]) < quer.mindestens) return quer.satz;
   return '';
+}
+
+/**
+ * Die Grenze, die ein anderes Feld setzt (`bis_feld`, `ab_feld`): seine Zahl,
+ * mal `faktor`, wo es einen gibt. Ein leeres Nachbarfeld begrenzt nichts --
+ * wie im Kern (Bereich.grund_gegen): «zahl > null» hiesse in JavaScript
+ * «zahl > 0».
+ */
+function grenzeNeben(grenze, neben) {
+  const zahl = grenze ? neben[grenze.feld] : undefined;
+  return zahl === undefined || zahl === null ? undefined : zahl * (grenze.faktor ?? 1);
 }
 
 /** Wie weit zwei Winkel in Grad als Linien auseinander liegen, 0° bis 90° -- 180° weiter ist dieselbe. */
@@ -198,10 +210,10 @@ export function zahlfeld({
 }) {
   const unten = engste(Math.max,
     min ?? angabe.ab ?? (angabe.ueber === undefined ? undefined : angabe.ueber + schritt),
-    angabe.ab_feld && neben[angabe.ab_feld.feld]);
+    grenzeNeben(angabe.ab_feld, neben));
   const oben = engste(Math.min,
     max ?? angabe.bis ?? (angabe.unter === undefined ? undefined : angabe.unter - schritt),
-    angabe.bis_feld && neben[angabe.bis_feld.feld]);
+    grenzeNeben(angabe.bis_feld, neben));
   const uebernehmen = (neu, getippt = String(neu)) => {
     const grund = neu === null ? '' : grenzeVerletzt(angabe, neu, neben);
     if (!grund) {

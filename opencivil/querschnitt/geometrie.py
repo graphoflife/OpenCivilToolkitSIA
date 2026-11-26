@@ -333,10 +333,28 @@ def jenseits(punkte: Sequence[Punkt], normale: Tuple[float, float],
     liegt. So teilt die plastische Nulllinie eines Stahlquerschnitts
     (:mod:`opencivil.stahlbau.querschnitt`) jedes Polygon in Zug und Druck.
 
-    Abgeschnitten wird Kante fuer Kante an der Geraden (Sutherland-Hodgman).
-    Das gilt auch fuer ein Polygon, das nicht konvex ist: zerfaellt der Teil
-    in Stuecke, verbinden sie Kanten auf der Geraden, die hin und zurueck
-    laufen und sich in den Summen aufheben.
+    Abgeschnitten wird wie in :func:`abgeschnitten`.
+    """
+    A = s_z = s_y = 0.0
+    for (y1, z1), (y2, z2) in _kanten(abgeschnitten(punkte, normale, v)):
+        c = y1 * z2 - y2 * z1
+        A += c
+        s_z += (y1 + y2) * c
+        s_y += (z1 + z2) * c
+    # Wie bei flaechenwerte: das Vorzeichen der Flaeche sagt den Umlaufsinn.
+    vorzeichen = 1.0 if flaeche(punkte) > 0.0 else -1.0
+    return vorzeichen * A / 2.0, vorzeichen * s_z / 6.0, vorzeichen * s_y / 6.0
+
+
+def abgeschnitten(punkte: Sequence[Punkt], normale: Tuple[float, float],
+                  v: float) -> List[Punkt]:
+    """
+    Der Teil des Polygons mit ``n·p ≥ v``, als Polygon im selben Umlaufsinn
+    -- leer, wo nichts davon liegt. Abgeschnitten wird Kante fuer Kante an
+    der Geraden (Sutherland-Hodgman). Das gilt auch fuer ein Polygon, das
+    nicht konvex ist: zerfaellt der Teil in Stuecke, verbinden sie Kanten auf
+    der Geraden, die hin und zurueck laufen und sich in Flaeche und
+    statischen Momenten aufheben.
     """
     n_y, n_z = normale
     teil: List[Punkt] = []
@@ -348,15 +366,40 @@ def jenseits(punkte: Sequence[Punkt], normale: Tuple[float, float],
         if (va >= 0.0) != (vb >= 0.0):
             anteil = va / (va - vb)
             teil.append((a[0] + anteil * (b[0] - a[0]), a[1] + anteil * (b[1] - a[1])))
-    A = s_z = s_y = 0.0
-    for (y1, z1), (y2, z2) in _kanten(teil):
-        c = y1 * z2 - y2 * z1
-        A += c
-        s_z += (y1 + y2) * c
-        s_y += (z1 + z2) * c
-    # Wie bei flaechenwerte: das Vorzeichen der Flaeche sagt den Umlaufsinn.
-    vorzeichen = 1.0 if flaeche(punkte) > 0.0 else -1.0
-    return vorzeichen * A / 2.0, vorzeichen * s_z / 6.0, vorzeichen * s_y / 6.0
+    return teil
+
+
+def konvexe_huelle(punkte: Sequence[Punkt]) -> Tuple[Punkt, ...]:
+    """Die konvexe Hülle gegen den Uhrzeigersinn -- bei weniger als drei Ecken die Punkte selbst."""
+    p = sorted(set(punkte))
+    if len(p) <= 2:
+        return tuple(p)
+    unten: List[Punkt] = []
+    for q in p:
+        while len(unten) >= 2 and _kreuz(unten[-2], unten[-1], q) <= 1e-15:
+            unten.pop()
+        unten.append(q)
+    oben: List[Punkt] = []
+    for q in reversed(p):
+        while len(oben) >= 2 and _kreuz(oben[-2], oben[-1], q) <= 1e-15:
+            oben.pop()
+        oben.append(q)
+    return tuple(unten[:-1] + oben[:-1])
+
+
+def in_huelle(punkte: Sequence[Punkt], huelle: Sequence[Punkt]) -> List[Punkt]:
+    """
+    Der Teil des Polygons in der konvexen ``huelle`` (gegen den
+    Uhrzeigersinn, :func:`konvexe_huelle`) -- je Seite der Huelle
+    :func:`abgeschnitten`; leer, wo nichts darin liegt.
+    """
+    teil = list(punkte)
+    for a, b in _kanten(huelle):
+        if not teil:
+            break
+        innen = (a[1] - b[1], b[0] - a[0])
+        teil = abgeschnitten(teil, innen, innen[0] * a[0] + innen[1] * a[1])
+    return teil
 
 
 # ===========================================================================

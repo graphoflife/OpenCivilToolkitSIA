@@ -1,5 +1,5 @@
 ---
-erzeugt: dc557a8e6032
+erzeugt: 6796528671cd
 art: modul
 tags: [modul]
 ---
@@ -20,7 +20,10 @@ in mm und N/mm²:
   gezogenen und `-druck` auf der gedrueckten Seite ([[opencivil.querschnitt.plastisch#Starrplastisch|Starrplastisch]]):
   die Kraefte, je Teil die Bloecke mit ihrem Angriffspunkt, die Nulllinie bei
   einer Normalkraft und der Zustand, dessen Moment in die Richtung einer
-  Einwirkung zeigt.
+  Einwirkung zeigt;
+* die Suche dieser Richtung ([[opencivil.querschnitt.plastisch#in_richtung|in_richtung]]) -- fuer einen Zustand mit
+  einer Nulllinie wie fuer einen mit zweien, je Teil eine, beim Verbund mit
+  Teilverduebelung ([[opencivil.verbund.widerstand]]).
 
 Beim Baustahl sind `zug` und `druck` gleich, beim Beton im Verbund ist
 `zug` null. Wie weit ein Querschnitt so rechnen darf, sagen die Normen;
@@ -112,6 +115,36 @@ Der Zustand an einer Nulllinie: was die Bloecke tragen, in N und N·mm um den Be
 - `M_y: float`
 - `M_z: float`
 
+#### Zustand.linien
+
+```python
+@property
+def linien(self) -> Tuple[Tuple[str, Linie], ...]
+```
+
+Die Nulllinie -- ohne Teil, sie gilt im ganzen Querschnitt.
+
+### Plastisch
+
+```python
+class Plastisch(Protocol)
+```
+
+Was die Probe eines plastischen Zustands von ihm liest: seine Momente und
+seine Nulllinien, je mit dem Teil, in dem sie liegt -- ein
+[[opencivil.querschnitt.plastisch#Zustand|Zustand]] hat eine, einer mit Teilverduebelung zwei
+([[opencivil.verbund.widerstand#Teilzustand|Teilzustand]]).
+
+- `M_y: float`
+- `M_z: float`
+
+#### Plastisch.linien
+
+```python
+@property
+def linien(self) -> Tuple[Tuple[str, Linie], ...]
+```
+
 ### stuecke
 
 ```python
@@ -124,6 +157,18 @@ Werkstoff darum weg, und ein Polygon aus anderem ersetzt ihn dort. Ein
 Polygon ohne Gruppe in `gruppe_von` zaehlt nicht mit: fuer diese
 Gruppen ist es eine Aussparung. `teil_von` sagt je Polygon mit
 Gruppe, zu welchem Teil es gehoert.
+
+### in_richtung
+
+```python
+def in_richtung(bei: Callable[[Tuple[float, float]], Z], M_y: float, M_z: float, neigung: Optional[float]) -> Z
+```
+
+Der Zustand `bei(n)`, dessen Moment in die Richtung von `(M_y, M_z)`
+zeigt -- `n` ist die Zugrichtung der Nulllinie. Mit fester Zugrichtung
+`neigung`, wo sie feststeht
+([[opencivil.querschnitt.biegung#Biegung.neigung|neigung]]); sonst gesucht wie
+beim Stahlbeton ([[opencivil.core.suche#winkel_suchen|winkel_suchen]]).
 
 ### Starrplastisch
 
@@ -196,14 +241,30 @@ Der Zustand bei `N`, dessen Moment in die Richtung von
 `(M_y, M_z)` zeigt -- mit fester Zugrichtung `neigung`, wo sie
 feststeht ([[opencivil.querschnitt.biegung#Biegung.neigung|neigung]]).
 `None`, wo `N` jenseits der reinen Zug- oder Druckkraft liegt.
-Gesucht wird die Neigung der Nulllinie wie beim Stahlbeton
-([[opencivil.core.suche#winkel_suchen|winkel_suchen]]).
+Die Neigung der Nulllinie sucht [[opencivil.querschnitt.plastisch#in_richtung|in_richtung]].
+
+#### Starrplastisch.traegt
+
+```python
+def traegt(self, N: float) -> bool
+```
+
+Ob `N` zwischen der reinen Druck- und der reinen Zugkraft liegt.
+
+#### Starrplastisch.bei
+
+```python
+def bei(self, n: Tuple[float, float], N: float, bezug: Punkt) -> Zustand
+```
+
+Der Zustand bei `N` an der Nulllinie mit der Zugrichtung `n`.
 
 
 ## Konstanten
 
 - `DRUCK = Linie((0.0, 0.0), 1.0)` – Gleichmaessiger Druck und gleichmaessiger Zug -- ohne Nulllinie im Querschnitt.
 - `ZUG = Linie((0.0, 0.0), -1.0)`
+- `Z = TypeVar('Z')` – Ein Zustand mit seinen Momenten `M_y` und `M_z` -- mit einer Nulllinie oder mit zweien.
 
 ## Braucht
 
@@ -215,6 +276,7 @@ Gesucht wird die Neigung der Nulllinie wie beim Stahlbeton
 
 - [[opencivil.nachweis.qa_stahl]]
 - [[opencivil.nachweis.qa_stahl_kennzahlen]]
+- [[opencivil.nachweis.qa_verbund]]
 - [[opencivil.nachweis.qa_verbund_kennzahlen]]
 - [[opencivil.stahlbau.querschnitt]]
 - [[opencivil.stahlbau.widerstand]]

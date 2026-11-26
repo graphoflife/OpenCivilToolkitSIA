@@ -1,5 +1,5 @@
 ---
-erzeugt: 8c550f27d839
+erzeugt: 6540b4a41a3c
 art: modul
 tags: [modul]
 ---
@@ -481,6 +481,7 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - [[opencivil.nachweis.qa_stahl]]
 - [[opencivil.nachweis.qa_stahl_kennzahlen]]
 - [[opencivil.nachweis.qa_stahl_stabilitaet]]
+- [[opencivil.nachweis.qa_verbund]]
 - [[opencivil.nachweis.qa_verbund_kennzahlen]]
 - [[opencivil.nachweis.querkraft]]
 - [[opencivil.nachweis.querkraft_buegel]]

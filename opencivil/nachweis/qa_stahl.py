@@ -52,7 +52,7 @@ from opencivil.nachweis.qa_stahl_werte import (
 )
 from opencivil.querschnitt.analyse import Lastfall, Querschnittsanalyse
 from opencivil.querschnitt.biegung import Biegung
-from opencivil.querschnitt.plastisch import Block, Linie, Zustand
+from opencivil.querschnitt.plastisch import Block, Linie, Plastisch
 from opencivil.querschnitt.zugseite import Zugseite
 from opencivil.stahlbau import schub
 from opencivil.stahlbau import widerstand as wd
@@ -381,16 +381,23 @@ def minderung(p: Protokoll, werte: Zwischenwerte, kraefte: Sequence[wd.Querkraft
 
 
 def krafttabelle(p: Protokoll, werte: Zwischenwerte, bloecke: Sequence[Block],
-                 namen: Sequence[str], linie: Linie, *, titel: str) -> None:
+                 namen: Sequence[str], linien: Sequence[Tuple[str, Linie]], *,
+                 titel: str) -> None:
     """
     Die Nulllinie und je Teil und Zone die Kraft mit Angriffspunkt, dazu
     ihre Summe ``N`` -- der Anfang der Probe eines plastischen Zustands, im
-    Stahl wie im Verbund. ``namen`` je Teil, auf den ein Block zeigt.
+    Stahl wie im Verbund. ``namen`` je Teil, auf den ein Block zeigt;
+    ``linien`` je Nulllinie, wo sie liegt -- im Verbund mit
+    Teilverduebelung zwei, mit derselben Zugrichtung.
     """
-    n, v_l = linie.n, linie.v
-    p.text(f"Nulllinie: Zugrichtung n = ({n[0]:.3f}; {n[1]:.3f}), "
-           f"{math.degrees(math.atan2(n[1], n[0])):.1f}° gegen die y-Achse; gezogen ist, wo "
-           f"n_y y + n_z z > {v_l:.1f} mm.")
+    n = linien[0][1].n
+    richtung = (f"Zugrichtung n = ({n[0]:.3f}; {n[1]:.3f}), "
+                f"{math.degrees(math.atan2(n[1], n[0])):.1f}° gegen die y-Achse")
+    if len(linien) == 1:
+        p.text(f"Nulllinie: {richtung}; gezogen ist, wo n_y y + n_z z > {linien[0][1].v:.1f} mm.")
+    else:
+        p.text(f"Nulllinien, beide mit {richtung}: " + "; ".join(
+            f"{wo} gezogen, wo n_y y + n_z z > {l.v:.1f} mm" for wo, l in linien) + ".")
     p.tabelle(
         kopf=["Teil", "Zone", Mathe(r"F\ [\mathrm{kN}]"), Mathe(r"y\ [\mathrm{mm}]"),
               Mathe(r"z\ [\mathrm{mm}]")],
@@ -414,7 +421,7 @@ MOMENT_UM = {"y": r"-\sum F_i \cdot (z_i - z_S)", "z": r"-\sum F_i \cdot (y_i - 
 
 
 def probe(p: Protokoll, werte: Zwischenwerte, bloecke: Sequence[Block], namen: Sequence[str],
-          bezug: Tuple[float, float], biegung: Biegung, pl: Zustand, *, titel: str,
+          bezug: Tuple[float, float], biegung: Biegung, pl: Plastisch, *, titel: str,
           referenz: str, symbol: str = "M_{Rd}") -> Wert:
     """
     Die Probe eines plastischen Zustands -- im Stahl wie im Verbund: die
@@ -422,7 +429,7 @@ def probe(p: Protokoll, werte: Zwischenwerte, bloecke: Sequence[Block], namen: S
     ``N``, ``M_y`` und ``M_z``. Zurueck kommt der Widerstand ``symbol`` in
     der Richtung der Einwirkung, einachsig ``M_y``.
     """
-    krafttabelle(p, werte, bloecke, namen, pl.linie, titel=titel)
+    krafttabelle(p, werte, bloecke, namen, pl.linien, titel=titel)
     summen = momentsummen(bloecke, bezug)
     momente = {}
     for achse, M in biegung.momente(summen["y"], summen["z"]):

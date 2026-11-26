@@ -51,7 +51,9 @@ import math
 from dataclasses import dataclass, field
 from typing import Callable, Iterator, List, Optional, Sequence, Tuple, Union
 
-from opencivil.querschnitt.geometrie import TOLERANZ, abstand_zur_strecke, flaeche
+from opencivil.querschnitt.geometrie import (
+    TOLERANZ, abstand_zur_strecke, flaeche, konvexe_huelle,
+)
 
 Punkt = Tuple[float, float]
 
@@ -231,28 +233,6 @@ def _normale(p: Punkt, q: Punkt) -> Punkt:
     dx, dy = q[0] - p[0], q[1] - p[1]
     L = math.hypot(dx, dy)
     return (dy / L, -dx / L)
-
-
-def konvexe_huelle(punkte: Sequence[Punkt]) -> Tuple[Punkt, ...]:
-    """Die konvexe Hülle gegen den Uhrzeigersinn -- bei weniger als drei Ecken die Punkte selbst."""
-    p = sorted(set(punkte))
-    if len(p) <= 2:
-        return tuple(p)
-
-    def kreuz(o: Punkt, a: Punkt, b: Punkt) -> float:
-        return (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0])
-
-    unten: List[Punkt] = []
-    for q in p:
-        while len(unten) >= 2 and kreuz(unten[-2], unten[-1], q) <= 1e-15:
-            unten.pop()
-        unten.append(q)
-    oben: List[Punkt] = []
-    for q in reversed(p):
-        while len(oben) >= 2 and kreuz(oben[-2], oben[-1], q) <= 1e-15:
-            oben.pop()
-        oben.append(q)
-    return tuple(unten[:-1] + oben[:-1])
 
 
 def _polygon(stuecke: Sequence[Stueck], schritte: int = 16) -> List[Punkt]:

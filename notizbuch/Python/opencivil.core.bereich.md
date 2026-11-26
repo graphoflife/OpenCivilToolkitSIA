@@ -1,5 +1,5 @@
 ---
-erzeugt: ddc88e563d2a
+erzeugt: 2c98ab8ca3cc
 art: modul
 tags: [modul]
 ---
@@ -43,6 +43,7 @@ Wo eine Zahl liegen muss -- jede Grenze darf fehlen, `ueber` und
 - `bis: Optional[float] = None`
 - `unter: Optional[float] = None`
 - `bis_feld: Optional[str] = None` – Ein Feld desselben Eintrags, dessen Zahl diese nicht uebersteigen darf: α_min nicht ueber α_max. Die Regel steht so einmal, beim kleineren Feld. Die Maske weist sie an beiden Feldern ab ([[opencivil.projekt.lesen#feldangaben|feldangaben]]), die Pruefung vor dem Rechnen haelt eine Datei damit auf -- mit denselben Worten ([[opencivil.core.bereich#Bereich.gegen|gegen]]).
+- `bis_faktor: float = 1.0` – Das Wievielfache der Zahl von [[opencivil.core.bereich#Bereich|bis_feld]] diese hoechstens ist: der Durchmesser eines Kopfbolzenduebels ein Viertel seiner Laenge. Sonst eins.
 - `quer_zu: Optional[Tuple[str, float]] = None` – Ein Feld desselben Eintrags mit einem Winkel in Grad, und um wie viel Grad dieser hier mindestens von ihm abweicht -- als Linie: 180° weiter ist dieselbe. Die zwei Richtungen einer Deckenplatte etwa liegen mindestens 5° auseinander, sonst trügen sie kaum anders als eine. Wie bei [[opencivil.core.bereich#Bereich|bis_feld]] steht die Regel einmal, an einem der beiden Felder, und die Maske weist sie an beiden ab ([[opencivil.core.bereich#Bereich.quer|quer]]).
 
 #### Bereich.grund
@@ -70,7 +71,8 @@ def gegen(self, anderer: Bereich) -> Tuple[str, str]
 
 Was [[opencivil.core.bereich#Bereich|bis_feld]] verlangt, an diesem Feld und am anderen
 (`anderer`): «α_min darf nicht grösser sein als α_max», «α_max darf
-nicht kleiner sein als α_min».
+nicht kleiner sein als α_min» -- mit einem Faktor «… als 0.25 · Länge
+h_D», «… als 4 · Durchmesser d».
 
 #### Bereich.grund_gegen
 

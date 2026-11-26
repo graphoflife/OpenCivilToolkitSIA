@@ -1,5 +1,5 @@
 ---
-erzeugt: f81efc595b61
+erzeugt: 81f97f695cee
 art: modul
 tags: [modul]
 ---
@@ -133,12 +133,14 @@ Was grosse Querkraft den Blechen nimmt, in denen sie steht -- im Stahl wie im Ve
 ### krafttabelle
 
 ```python
-def krafttabelle(p: Protokoll, werte: Zwischenwerte, bloecke: Sequence[Block], namen: Sequence[str], linie: Linie, *, titel: str) -> None
+def krafttabelle(p: Protokoll, werte: Zwischenwerte, bloecke: Sequence[Block], namen: Sequence[str], linien: Sequence[Tuple[str, Linie]], *, titel: str) -> None
 ```
 
 Die Nulllinie und je Teil und Zone die Kraft mit Angriffspunkt, dazu
 ihre Summe `N` -- der Anfang der Probe eines plastischen Zustands, im
-Stahl wie im Verbund. `namen` je Teil, auf den ein Block zeigt.
+Stahl wie im Verbund. `namen` je Teil, auf den ein Block zeigt;
+`linien` je Nulllinie, wo sie liegt -- im Verbund mit
+Teilverduebelung zwei, mit derselben Zugrichtung.
 
 ### momentsummen
 
@@ -151,7 +153,7 @@ Je Achse das Moment der Bloecke um `bezug`, in Nm: `M_y = -Σ F (z - z_S)`.
 ### probe
 
 ```python
-def probe(p: Protokoll, werte: Zwischenwerte, bloecke: Sequence[Block], namen: Sequence[str], bezug: Tuple[float, float], biegung: Biegung, pl: Zustand, *, titel: str, referenz: str, symbol: str='M_{Rd}') -> Wert
+def probe(p: Protokoll, werte: Zwischenwerte, bloecke: Sequence[Block], namen: Sequence[str], bezug: Tuple[float, float], biegung: Biegung, pl: Plastisch, *, titel: str, referenz: str, symbol: str='M_{Rd}') -> Wert
 ```
 
 Die Probe eines plastischen Zustands -- im Stahl wie im Verbund: die

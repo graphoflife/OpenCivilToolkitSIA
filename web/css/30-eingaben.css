@@ -417,6 +417,17 @@ dialog.dialogfenster .fenster-kopf { top: 0; }
   grid-row: 3; grid-column: 2 / -2;
   display: grid; grid-template-columns: minmax(0, 1fr); gap: 3px 4px;
 }
+/* Im Verbund mit Kopfbolzendübeln, unter den Schnittgrössen: die Zahl der
+   Dübel bis zum Momentennullpunkt und L_e -- je mit ihrem Wort davor, eng
+   umbrechend wie die Zeile der Neigung. */
+/* Je Zeile Name, Zahl und Einheit -- die Zahlen bündig untereinander; wird
+   es eng, bricht der Name um, nicht die Zeile. */
+.qa-duebelzeile {
+  display: grid; grid-template-columns: minmax(0, max-content) var(--zahlbreite-knapp) auto;
+  align-items: center; gap: 3px 6px; font-size: 11.5px;
+}
+.qa-duebelzeile .postenname { color: var(--schrift-matt); }
+.qa-duebelzeile .einheit { font-size: 11px; color: var(--schrift-zart); }
 /* Im Lastfall ist der Schalter nur ein Beiwerk -- er darf der Zeile nicht die
    Breite nehmen, die die Zahlen brauchen. */
 .fallzeile .schalter-haken .schalter-halb { width: 18px; font-size: 11px; }

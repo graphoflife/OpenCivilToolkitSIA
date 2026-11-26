@@ -13,7 +13,10 @@ in mm und N/mm²:
   gezogenen und ``-druck`` auf der gedrueckten Seite (:class:`Starrplastisch`):
   die Kraefte, je Teil die Bloecke mit ihrem Angriffspunkt, die Nulllinie bei
   einer Normalkraft und der Zustand, dessen Moment in die Richtung einer
-  Einwirkung zeigt.
+  Einwirkung zeigt;
+* die Suche dieser Richtung (:func:`in_richtung`) -- fuer einen Zustand mit
+  einer Nulllinie wie fuer einen mit zweien, je Teil eine, beim Verbund mit
+  Teilverduebelung (:mod:`opencivil.verbund.widerstand`).
 
 Beim Baustahl sind ``zug`` und ``druck`` gleich, beim Beton im Verbund ist
 ``zug`` null. Wie weit ein Querschnitt so rechnen darf, sagen die Normen;
@@ -29,7 +32,7 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass
 from functools import cached_property
-from typing import Dict, List, Mapping, Optional, Sequence, Tuple
+from typing import Callable, Dict, List, Mapping, Optional, Protocol, Sequence, Tuple, TypeVar
 
 from opencivil.core.suche import illinois, winkel_suchen
 from opencivil.querschnitt import geometrie as geo
@@ -103,6 +106,26 @@ class Zustand:
     M_y: float
     M_z: float
 
+    @property
+    def linien(self) -> Tuple[Tuple[str, Linie], ...]:
+        """Die Nulllinie -- ohne Teil, sie gilt im ganzen Querschnitt."""
+        return (("", self.linie),)
+
+
+class Plastisch(Protocol):
+    """
+    Was die Probe eines plastischen Zustands von ihm liest: seine Momente und
+    seine Nulllinien, je mit dem Teil, in dem sie liegt -- ein
+    :class:`Zustand` hat eine, einer mit Teilverduebelung zwei
+    (:class:`~opencivil.verbund.widerstand.Teilzustand`).
+    """
+
+    M_y: float
+    M_z: float
+
+    @property
+    def linien(self) -> Tuple[Tuple[str, Linie], ...]: ...
+
 
 def stuecke(punkte: Sequence[Sequence[Punkt]], eltern: Sequence[Optional[int]],
             gruppe_von: Mapping[int, int], teil_von: Mapping[int, int]) -> List[Stueck]:
@@ -129,6 +152,34 @@ def stuecke(punkte: Sequence[Sequence[Punkt]], eltern: Sequence[Optional[int]],
 
 def _auf(n: Tuple[float, float], p: Punkt) -> float:
     return n[0] * p[0] + n[1] * p[1]
+
+
+#: Ein Zustand mit seinen Momenten ``M_y`` und ``M_z`` -- mit einer Nulllinie oder mit zweien.
+Z = TypeVar("Z")
+
+
+def in_richtung(bei: Callable[[Tuple[float, float]], Z], M_y: float, M_z: float,
+                neigung: Optional[float]) -> Z:
+    """
+    Der Zustand ``bei(n)``, dessen Moment in die Richtung von ``(M_y, M_z)``
+    zeigt -- ``n`` ist die Zugrichtung der Nulllinie. Mit fester Zugrichtung
+    ``neigung``, wo sie feststeht
+    (:meth:`~opencivil.querschnitt.biegung.Biegung.neigung`); sonst gesucht wie
+    beim Stahlbeton (:func:`~opencivil.core.suche.winkel_suchen`).
+    """
+    if neigung is not None:
+        return bei((float(round(math.cos(neigung))), float(round(math.sin(neigung)))))
+    ziel = math.atan2(M_z, M_y)
+
+    def abweichung(winkel: float) -> Tuple[float, Z]:
+        zustand = bei((math.cos(winkel), math.sin(winkel)))
+        if zustand.M_y == 0.0 and zustand.M_z == 0.0:
+            return 0.0, zustand
+        return math.remainder(math.atan2(zustand.M_z, zustand.M_y) - ziel,
+                              2.0 * math.pi), zustand
+
+    return winkel_suchen(abweichung, Faserquerschnitt.neigung_fuer(M_y, M_z),
+                         schranke=WINKEL_SCHRANKE)
 
 
 @dataclass(frozen=True)
@@ -219,26 +270,17 @@ class Starrplastisch:
         ``(M_y, M_z)`` zeigt -- mit fester Zugrichtung ``neigung``, wo sie
         feststeht (:meth:`~opencivil.querschnitt.biegung.Biegung.neigung`).
         ``None``, wo ``N`` jenseits der reinen Zug- oder Druckkraft liegt.
-        Gesucht wird die Neigung der Nulllinie wie beim Stahlbeton
-        (:func:`~opencivil.core.suche.winkel_suchen`).
+        Die Neigung der Nulllinie sucht :func:`in_richtung`.
         """
-        if N > self.zugkraft or N < -self.druckkraft:
+        if not self.traegt(N):
             return None
+        return in_richtung(lambda n: self.bei(n, N, bezug), M_y, M_z, neigung)
 
-        def bei(n: Tuple[float, float]) -> Zustand:
-            linie = Linie(n, self.nulllinie(n, N))
-            return Zustand(linie, *self.kraefte(linie, bezug))
+    def traegt(self, N: float) -> bool:
+        """Ob ``N`` zwischen der reinen Druck- und der reinen Zugkraft liegt."""
+        return -self.druckkraft <= N <= self.zugkraft
 
-        if neigung is not None:
-            return bei((float(round(math.cos(neigung))), float(round(math.sin(neigung)))))
-        ziel = math.atan2(M_z, M_y)
-
-        def abweichung(winkel: float) -> Tuple[float, Zustand]:
-            zustand = bei((math.cos(winkel), math.sin(winkel)))
-            if zustand.M_y == 0.0 and zustand.M_z == 0.0:
-                return 0.0, zustand
-            return math.remainder(math.atan2(zustand.M_z, zustand.M_y) - ziel,
-                                  2.0 * math.pi), zustand
-
-        return winkel_suchen(abweichung, Faserquerschnitt.neigung_fuer(M_y, M_z),
-                             schranke=WINKEL_SCHRANKE)
+    def bei(self, n: Tuple[float, float], N: float, bezug: Punkt) -> Zustand:
+        """Der Zustand bei ``N`` an der Nulllinie mit der Zugrichtung ``n``."""
+        linie = Linie(n, self.nulllinie(n, N))
+        return Zustand(linie, *self.kraefte(linie, bezug))

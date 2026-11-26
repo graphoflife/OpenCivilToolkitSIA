@@ -1,10 +1,10 @@
 ---
-erzeugt: 8da9f8f0ab1c
+erzeugt: 1958f262b352
 art: thema
 tags: [thema]
 ---
 > [!abstract] Platte
-> 47 Formeln, in der Folge, in der gerechnet wird.
+> 50 Formeln, in der Folge, in der gerechnet wird.
 
 ## Was die Rechnung dazu sagt
 
@@ -26,7 +26,7 @@ Je Profil allein, ohne Normalkraft und Biegung: kein Blech ist gedrückt, der Qu
 
 Was der Holzquerschnitt aufnimmt, ohne Bezug auf einen Lastfall: je Beanspruchung allein, linear, mit den Bemessungswerten der Tabellen und η\_w der Feuchteklasse – ohne stossartige Einwirkung. Knicken und Kippen gehören dem Stab und sind hier nicht dabei.
 
-Was der Verbundquerschnitt aufnimmt, ohne Bezug auf einen Lastfall: die Widerstände gegen Zug, Druck und Biegung, plastisch nach SIA 264, und mit Profilen gegen Querkraft – die trägt der Stahl allein (4.3.2.2). Knicken, Kippen und die Verdübelung gehören dem Träger und sind hier nicht dabei.
+Was der Verbundquerschnitt aufnimmt, ohne Bezug auf einen Lastfall: die Widerstände gegen Zug, Druck und Biegung, plastisch nach SIA 264, und mit Profilen gegen Querkraft – die trägt der Stahl allein (4.3.2.2). Mit Kopfbolzendübeln dazu, was einer trägt. Knicken und Kippen gehören dem Träger und sind hier nicht dabei.
 
 ## Formeln
 
@@ -77,6 +77,9 @@ Was der Verbundquerschnitt aufnimmt, ohne Bezug auf einen Lastfall: die Widerst�
 45. [[Probe – Moment um y]]
 46. [[Abminderungsbeiwert β nach Figur 1]]
 47. [[Plastischer Biegewiderstand mit β]]
+48. [[Schubwiderstand eines Kopfbolzendübels – Betonstauchung]]
+49. [[Schubwiderstand eines Kopfbolzendübels – Versagen des Dübels]]
+50. [[Schubwiderstand eines Kopfbolzendübels]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

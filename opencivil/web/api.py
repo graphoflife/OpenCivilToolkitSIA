@@ -71,6 +71,7 @@ from opencivil.stahlbau.stabilitaet import Knickkurve
 from opencivil.stahlprofile import lage as profillage
 from opencivil.stahlprofile.tabelle import PROFILREIHEN
 from opencivil.stabwerk3d.rechnung import Balkensystem3d
+from opencivil.verbund.duebel import Verduebelung
 from opencivil.geotechnik import fundament, setzung
 from opencivil.geotechnik.setzung import Steifigkeit
 from opencivil.geotechnik.verhalten import Verhalten
@@ -354,6 +355,10 @@ def katalog() -> dict:
             # Stahlquerschnitts: die des Profils oder eine gewaehlte.
             "knickkurven": [{"wert": k.value, "beschriftung": k.beschriftung,
                              "titel": k.erklaerung} for k in Knickkurve],
+            # Beim Verbund: Stahl und Beton voll verduebelt angenommen, oder
+            # mit Kopfbolzenduebeln gerechnet.
+            "verduebelungen": [{"wert": v.value, "beschriftung": v.beschriftung,
+                                "titel": v.erklaerung} for v in Verduebelung],
             # Beim Holz: die Feuchteklassen, je wo das Holz so feucht ist und
             # ihr η_w, und je Fall die Dauer der Einwirkung, mit ihrem η_t.
             "feuchteklassen": [{"wert": k.value, "beschriftung": k.beschriftung,

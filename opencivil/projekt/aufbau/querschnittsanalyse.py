@@ -45,6 +45,7 @@ from opencivil.querschnitt.bauweise import Bauweise
 from opencivil.querschnitt.biegung import EINACHSIG, SCHIEF
 from opencivil.querschnitt.geometrie import GeometrieFehler
 from opencivil.querschnitt.spannglieder import Spannglied, aus_glied
+from opencivil.verbund import duebel as vd
 
 from opencivil.projekt.aufbau.kern import (
     Aufbau, Bauteil, knickfall, material, spannungsfaelle, spannungsnachweise, stoffe_von,
@@ -197,15 +198,23 @@ def _verbund(eintrag: QuerschnittsanalyseEintrag, analyse: Querschnittsanalyse, 
     (:mod:`~opencivil.nachweis.qa_verbund`): je Lastfall Biegung und
     Normalkraft, plastisch, und Querkraft, sobald einer sie hat -- die traegt
     der Stahl allein. Beide lesen den Widerstand gegen Querkraft aus den
-    Kennzahlen. Torsion weist er nicht nach; ein Lastfall mit ``T_Ed`` sagt
-    es. Verduebelung, Knicken und Kippen fehlen noch, ebenso die
+    Kennzahlen. Mit Kopfbolzenduebeln steht ihr ``P_Rd`` in den Kennzahlen,
+    und je Lastfall die Verduebelung bei Biegung und Normalkraft, mit seiner
+    Zahl der Duebel. Torsion weist er nicht nach; ein Lastfall mit ``T_Ed``
+    sagt es. Knicken und Kippen fehlen noch, ebenso die
     Spannung-Dehnung-Analysen (:func:`ohne_analysen`).
     """
-    kennzahlen = KennzahlenVerbundQA(analyse)
+    duebel = None
+    abschnitte: Dict[str, vd.Abschnitt] = {}
+    if eintrag.verduebelung is vd.Verduebelung.KOPFBOLZEN:
+        duebel = vd.Kopfbolzen(eintrag.duebel_d, eintrag.duebel_h, eintrag.duebel_f_u)
+        abschnitte = {l.name: vd.Abschnitt(l.duebelzahl, l.L_e)
+                      for l in eintrag.lastfaelle if l.aktiv}
+    kennzahlen = KennzahlenVerbundQA(analyse, duebel)
     lastfaelle = _lastfaelle(eintrag)
     if lastfaelle:
         aufbau.eintragen(teil, "qa_verbund", eintrag.kennung,
-                         VerbundBiegungQA(analyse, lastfaelle, kennzahlen))
+                         VerbundBiegungQA(analyse, lastfaelle, kennzahlen, abschnitte))
     if any(l.V_z or analyse.biegung.querkraft_y(l.V_y) for l in lastfaelle):
         aufbau.eintragen(teil, "qa_verbund_schub", eintrag.kennung,
                          VerbundQuerkraftQA(analyse, lastfaelle, kennzahlen))

@@ -1,5 +1,5 @@
 ---
-erzeugt: a688770b6fc8
+erzeugt: 1dea5deccffb
 art: modul
 tags: [modul]
 ---
@@ -258,6 +258,7 @@ Je Querschnitt eines Systems, wo A und I stehen -- und je Paar aus Querschnitt u
 - [[opencivil.stahlbau.stabilitaet]]
 - [[opencivil.stahlprofile.lage]]
 - [[opencivil.stahlprofile.tabelle]]
+- [[opencivil.verbund.duebel]]
 - [[opencivil.web.anzeige]]
 - [[opencivil.web.balkendaten]]
 - [[opencivil.web.diagrammdaten]]

@@ -1,5 +1,5 @@
 ---
-erzeugt: 360ff3fb0db0
+erzeugt: a060feb8a87f
 art: modul
 tags: [modul]
 ---
@@ -196,6 +196,8 @@ Ein Lastfall der Querschnittsanalyse -- kN und kNm, Vorzeichen siehe oben.
 - `V_z_Ed: float = bereich(0.0, heisst='Querkraft V_z,Ed', einheit=KN)`
 - `T_Ed: float = bereich(0.0, heisst='Torsion T_Ed', einheit=KNM)`
 - `stossartig: bool = False` – Nur beim Holz: ob die Einwirkung stossartig ist -- dann vergroessert η_t = 1.4 seine Bemessungswerte (SIA 265:2012, 2.2.6). Stahlbeton und Stahl kennen das nicht; ihr Lastfall rechnet ohne.
+- `duebelzahl: Optional[int] = bereich(None, heisst='Dübel bis zum Momentennullpunkt', ab=0)` – Nur im Verbund mit Kopfbolzenduebeln: wie viele Duebel zwischen diesem Schnitt und dem naechsten Momentennullpunkt sitzen -- `N` in (29), SIA 264:2014. Leer: noch keine Zahl.
+- `L_e: Optional[float] = bereich(None, heisst='Länge L_e', einheit=M, ueber=0.0)` – Nur im Verbund mit Kopfbolzenduebeln: der Abstand der Momentennullpunkte in m, fuer (29). Leer: noch keiner.
 - `aktiv: bool = True`
 
 ### QAGebrauchsfallEintrag
@@ -353,6 +355,10 @@ Was er mit der Platte gleich angibt, steht in der Grundlage
 - `knickkurve_y: Knickkurve = Knickkurve.PROFIL`
 - `knickkurve_z: Knickkurve = Knickkurve.PROFIL` – Die Knickspannungskurven um y und um z: die, die Figur 7 dem Profil zuweist -- nur fuer einen Querschnitt aus einem einzigen Profil -- oder eine gewaehlte. Sie gelten fuer alle Faelle: die Kurve gehoert zum Querschnitt, nicht zum Fall.
 - `feuchteklasse: Feuchteklasse = Feuchteklasse.EINS` – Beim Holz: wie feucht es im Bauwerk ist (SIA 265:2012, 3.2.1.2) -- einmal fuer die ganze Analyse. Ihr η_w mindert jeden Nachweis; die Spannung-Dehnung-Analysen rechnen ohne (nach Vorgabe, nicht nachgeschlagen).
+- `verduebelung: vd.Verduebelung = vd.Verduebelung.VOLL` – Im Verbund: ob Stahl und Beton voll verduebelt angenommen sind oder mit Kopfbolzenduebeln gerechnet wird ([[opencivil.verbund.duebel]]) -- der Duebel einmal fuer die ganze Analyse, seine Zahl je Lastfall.
+- `duebel_d: float = bereich(19.0, heisst='Durchmesser d', einheit=MM, ab=vd.D_AB, bis=vd.…` – Der Schaftdurchmesser der Kopfbolzenduebel in mm -- hoechstens ein Viertel ihrer Laenge.
+- `duebel_h: float = bereich(100.0, heisst='Länge h_D', einheit=MM, ueber=0.0)`
+- `duebel_f_u: float = bereich(vd.F_U_VORGABE, heisst='Zugfestigkeit f_u', einheit=N_PRO_MM2…` – Ueber 500 N/mm² zaehlt sie in (31) mit 500 -- die Zahl bleibt, wie eingegeben.
 - `spannungsfaelle: List[QASpannungsfallEintrag] = field(default_factory=list)` – Die Spannung-Dehnung-Analysen -- kein Nachweis, ein Blick in den Querschnitt.
 
 #### QuerschnittsanalyseEintrag.materialien
@@ -592,6 +598,7 @@ Feldmoment; das Rechteck gibt es als Vorlage im Zeichenfenster.
 - [[opencivil.stahlbau.stabilitaet]]
 - [[opencivil.stahlprofile.lage]]
 - [[opencivil.stahlprofile.tabelle]]
+- [[opencivil.verbund.duebel]]
 
 ## Gebraucht von
 

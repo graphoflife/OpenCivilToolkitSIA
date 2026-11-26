@@ -1,5 +1,5 @@
 ---
-erzeugt: 0bf99e4b306a
+erzeugt: 9956f2a66466
 art: modul
 tags: [modul]
 ---
@@ -37,6 +37,14 @@ Tabellen der Herleitung bleiben in Millimetern; fuer die Nachweise wird
 einmal in Meter umgerechnet ([[opencivil.querschnitt.analyse#Querschnittsanalyse.geometrie|Querschnittsanalyse.geometrie]]).
 
 ## Inhalt
+
+### _zehntel
+
+```python
+def _zehntel(x: float) -> str
+```
+
+Eine Zahl auf eine Stelle -- mit `+ 0.0`: ein Profil um die Mitte hat sonst y_S = -0.0.
 
 ### werkstoff
 

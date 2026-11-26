@@ -11,7 +11,10 @@
  * Ein Querschnitt aus Stahl hat dazu Knicken und Kippen nach SIA 263: je
  * Achse die Knickspannungskurve und die Fälle eines Stabs mit diesem
  * Querschnitt. Einer aus Holz rechnet nach SIA 265: davor die
- * Feuchteklasse, je Fall dazu, ob die Einwirkung stossartig ist.
+ * Feuchteklasse, je Fall dazu, ob die Einwirkung stossartig ist. Einer im
+ * Verbund rechnet nach SIA 264: davor die Verdübelung, mit
+ * Kopfbolzendübeln je Lastfall dazu, wie viele bis zum Momentennullpunkt
+ * sitzen.
  *
  * Wie bei der Platte steht oben, was der Querschnitt *ist*, und in den
  * Fenstern, was von ihm *verlangt* wird. Gerechnet wird nichts: jede Zeile
@@ -73,7 +76,8 @@ const HILFE = {
     zeilen: [
       ['Klasse', 'je Blech jedes Profils aus c/t an der plastischen Nulllinie des Lastfalls; über Klasse 2 rechnet der Verbund noch nicht'],
       ['Kammerbeton', 'deckt Beton im I-Profil den Flansch innen oder den Steg beidseits, gelten die Grenzen der Tabelle 3 und von 5.2.1.3'],
-      ['M-N', 'plastisch, mit voller Verdübelung: der Beton mit 0.85 · f_cd und nur auf Druck; die Nulllinie dreht, bis M_Rd in Richtung M_Ed zeigt'],
+      ['M-N', 'plastisch: der Beton mit 0.85 · f_cd und nur auf Druck; die Nulllinie dreht, bis M_Rd in Richtung M_Ed zeigt'],
+      ['Dübel', 'mit Kopfbolzendübeln je Lastfall: η = N · P_Rd / |N_c,f| gegen η_min (29); reichen sie nicht für die volle Verdübelung, rechnet M-N mit Teilverdübelung (6.1.1.6)'],
       ['β', 'Baustahl S420 und S460: M_pl,Rd mal β, wenn x_p/h über 0.15 liegt (Figur 1)'],
       ['Betonstahl', 'zieht ihn ein Moment, rechnet es plastisch nur mit Klasse B oder C (5.1.2.3)'],
       ['V', 'der Stahl allein, je Richtung gegen V_Rd der Profile; über der Hälfte von V_Rd tragen die Bleche, in denen sie steht, für M-N nur noch 1 − (V/V_Rd)²'],
@@ -101,6 +105,17 @@ const HILFE = {
       ['α_eff', 'N_Ed bleibt, die Momente wachsen, bis die Gleichung aufgeht'],
     ],
     formel: 'σ_c,0,d / (k_c · f_c,0,d) + σ_m,d / (k_m · f_m,d) ≤ 1   (37)',
+  },
+  verduebelung: {
+    zeilen: [
+      ['voll', 'Stahl und Beton tragen zusammen, ohne Schlupf (5.1.2.1); ob Dübel dafür reichen, prüft das Werkzeug dann nicht'],
+      ['P_Rd', 'je Kopfbolzendübel der kleinere aus Betonstauchung (30) und Versagen des Dübels (31), mit γ_v = 1.25'],
+      ['N', 'je Lastfall: die Dübel zwischen seinem Schnitt und dem nächsten Momentennullpunkt'],
+      ['η', 'N · P_Rd gegen die Kraft im Beton bei voller Verdübelung: η = N / N_f'],
+      ['η_min', 'positives Moment und ein doppelsymmetrisches Profil: (29) mit L_e, dem Abstand der Momentennullpunkte; sonst 1 – negativ ist ein Moment, das die Seite des Betons zieht'],
+      ['teilweise', 'unter der vollen Verdübelung trägt der Beton nur N · P_Rd: Beton und Stahl je mit ihrer Nulllinie (6.1.1.6)'],
+    ],
+    formel: 'P_Rd = min(0.29 · d² · √(f_ck · E_cm); 0.8 · f_u · π · d²/4) / γ_v',
   },
   feuchteklasse: {
     zeilen: [
@@ -227,6 +242,36 @@ function dauerSchalter(fall, aendern) {
     setzen: (wert) => aendern((x) => { x.stossartig = wert; }),
     titel: 'Dauer der Einwirkung – stossartig hebt die Bemessungswerte des Holzes',
   });
+}
+
+/** Ob im Verbund mit Kopfbolzendübeln gerechnet wird -- sonst gilt die Verdübelung als voll. */
+function mitDuebeln(analyse) {
+  return imVerbund(analyse) && analyse.verduebelung === 'kopfbolzen';
+}
+
+/**
+ * Im Verbund mit Kopfbolzendübeln, je Lastfall: wie viele Dübel zwischen
+ * seinem Schnitt und dem nächsten Momentennullpunkt sitzen -- N in (29) --
+ * und wie weit die Momentennullpunkte auseinander liegen, L_e. Leer,
+ * solange nichts angegeben ist: dann sagt der Nachweis grau, was fehlt --
+ * nur wo er es braucht, ohne Moment etwa nicht.
+ */
+function duebelzeile(fall, aendern) {
+  const zahl = (feld, titel) => zahlfeld({
+    wert: fall[feld], leer: null, titel,
+    angabe: feldangabe('qalastfall', feld),
+    beiAenderung: (v) => aendern((x) => { x[feld] = v; }),
+  });
+  return el('div.qa-duebelzeile', {}, [
+    el('span.postenname', { text: 'Dübel bis zum Momentennullpunkt' }),
+    zahl('duebelzahl', 'Kopfbolzendübel zwischen diesem Schnitt und dem nächsten '
+      + 'Momentennullpunkt – N in (29)'),
+    el('span'),
+    el('span.postenname', {}, ['Abstand der Momentennullpunkte ', span('L_e')]),
+    zahl('L_e', 'Abstand der Momentennullpunkte – im positiven Moment bestimmt er den kleinsten '
+      + 'Verdübelungsgrad (29)'),
+    el('span.einheit', { text: feldangabe('qalastfall', 'L_e').einheit }),
+  ]);
 }
 
 // ===========================================================================
@@ -378,7 +423,8 @@ function lastfallZeile(analyse, index) {
   return fallzeile({
     fall, aendern, was: 'Lastfall', nameTitel: 'Bezeichnung des Lastfalls',
     liste: { kennung: analyse.kennung, pfad: 'lastfaelle', index },
-    unten: ausHolz(analyse) ? [dauerSchalter(fall, aendern)] : null,
+    unten: (ausHolz(analyse) && [dauerSchalter(fall, aendern)])
+      || (mitDuebeln(analyse) && [duebelzeile(fall, aendern)]) || null,
     zahlen: spalten(analyse).map((s) => zahlfeld({
       // Eine Last, die man leert, ist keine Last.
       wert: fall[s.feld], schritt: s.schritt, titel: s.titel, leer: 0,
@@ -673,10 +719,73 @@ const FEUCHTEKLASSE = {
   stand: (a) => ({ an: true, text: feuchteVon(a)?.stand || '' }),
 };
 
+/** Die gewählte Verdübelung aus dem Katalog: Beschriftung und was sie heisst. */
+function verduebelungVon(analyse) {
+  return katalog('querschnittsanalyse', 'verduebelungen')
+    .find((v) => v.wert === analyse.verduebelung);
+}
+
+/** Die Masse und der Stahl eines Kopfbolzendübels: Feld, Beschriftung, Titel. */
+const DUEBELFELDER = [
+  ['duebel_d', ['Durchmesser ', span('d')], 1, 'Durchmesser des Schafts'],
+  ['duebel_h', ['Länge ', span('h_D')], 5, 'Länge des Dübels, aufgeschweisst, mit dem Kopf'],
+  ['duebel_f_u', ['Zugfestigkeit ', span('f_u')], 10,
+    'Zugfestigkeit des Dübelstahls – Vorgabe nach SIA 263, Tabelle 3'],
+];
+
+/**
+ * Der Kopfbolzendübel der Analyse, je Feld mit den Grenzen des Kerns --
+ * dort steht auch, dass d höchstens ein Viertel von h_D ist. Darunter, wo
+ * die Zahl der Dübel hingehört: sie gilt je Lastfall.
+ */
+function duebelAngaben(analyse) {
+  const aendern = (veraenderer) => eintragAendern(analyse.kennung, veraenderer);
+  return el('div.unterkapitel', {}, [
+    el('div.unterkapitel-kopf', {}, [el('span', { text: 'Kopfbolzendübel' })]),
+    ...DUEBELFELDER.map(([schluessel, beschriftung, schritt, titel]) => {
+      const angabe = feldangabe('querschnittsanalyse', schluessel);
+      return feld(beschriftung, zahlfeld({
+        wert: analyse[schluessel], schritt, angabe, neben: analyse, titel,
+        beiAenderung: (v) => aendern((a) => { a[schluessel] = v; }),
+      }), angabe.einheit, titel);
+    }),
+    el('p.qa-erlaeuterung', {
+      text: 'Wie viele Dübel bis zum Momentennullpunkt sitzen und wie weit die '
+        + 'Momentennullpunkte auseinander liegen, steht je Lastfall in der Tragsicherheit.',
+    }),
+  ]);
+}
+
+/**
+ * Wie Stahl und Beton verbunden sind -- einmal für die Analyse: voll
+ * angenommen, wie 5.1.2.1, oder mit Kopfbolzendübeln. Je Stellung ein Bild,
+ * die Dehnung über dem Querschnitt; darunter, was die gewählte heisst.
+ */
+const VERDUEBELUNG = {
+  schluessel: 'verduebelung',
+  name: 'Ver\u00addübelung', titel: 'Verdübelung nach SIA 264',
+  hilfe: HILFE.verduebelung,
+  inhalt: (analyse) => [
+    wahlBlock('Verdübelung', wahlSchalter({
+      werte: mitBild(katalog('querschnittsanalyse', 'verduebelungen'), 'verduebelung'),
+      gewaehlt: analyse.verduebelung,
+      setzen: (wert) => eintragAendern(analyse.kennung, (a) => { a.verduebelung = wert; }),
+      titel: 'Stahl und Beton voll verdübelt angenommen oder mit Kopfbolzendübeln gerechnet',
+    })),
+    el('p.qa-erlaeuterung', { text: verduebelungVon(analyse)?.titel || '' }),
+    mitDuebeln(analyse) ? duebelAngaben(analyse) : null,
+  ],
+  stand: (a) => ({
+    an: true,
+    text: mitDuebeln(a) ? `Kopfbolzen ⌀${a.duebel_d} × ${a.duebel_h} mm`
+      : verduebelungVon(a)?.beschriftung || '',
+  }),
+};
+
 /** Die Nachweise je Bauweise, wo sie nicht die des Stahlbetons sind. */
 const EIGENE_NACHWEISE = {
   stahl: [TRAGSICHERHEIT_STAHL, STABILITAET],
-  verbund: [TRAGSICHERHEIT_VERBUND],
+  verbund: [VERDUEBELUNG, TRAGSICHERHEIT_VERBUND],
   holz: [FEUCHTEKLASSE, TRAGSICHERHEIT_HOLZ, STABILITAET_HOLZ],
 };
 
@@ -758,7 +867,7 @@ const ORT = {
  * Die Kacheln der Analyse. Die Nachweise sind die des Stahlbetons, beim
  * Stahl die Tragsicherheit und Knicken und Kippen nach SIA 263, beim Holz
  * dazu davor die Feuchteklasse, nach SIA 265, im Verbund die
- * Tragsicherheit nach SIA 264 (`bauweiseVon`). Ein Querschnitt aus
+ * Verdübelung und die Tragsicherheit nach SIA 264 (`bauweiseVon`). Ein Querschnitt aus
  * mehreren Hölzern hat keine, statt ihrer steht grau, warum
  * (`ohneNachweiseVon`). Die Spannung-Dehnung-Analysen hat jeder ausser dem
  * Verbund (`ohneAnalysenVon`). Was in den Kacheln eingestellt ist, bleibt.

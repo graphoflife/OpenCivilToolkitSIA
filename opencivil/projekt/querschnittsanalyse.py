@@ -53,7 +53,7 @@ from opencivil.projekt.eintraege import (
     kleinste_neigung, spannungsfallnamen,
 )
 from opencivil.projekt.fallnamen import Fallnamen
-from opencivil.core.einheiten import KN, KNM, MM, MM2
+from opencivil.core.einheiten import KN, KNM, MM, MM2, N_PRO_MM2, M
 from opencivil.material.holz import Feuchteklasse
 from opencivil.projekt.lesen import (
     ProjektFehler, bereich, einer_von, je_material, materialfeld, ort_von, stoffe_des_felds, teil,
@@ -65,6 +65,7 @@ from opencivil.projekt.stabilitaet import QAStabilitaetEintrag
 from opencivil.stahlbau.stabilitaet import Knickkurve, Stabfall
 from opencivil.stahlprofile import lage as profillage
 from opencivil.stahlprofile import tabelle as profiltabelle
+from opencivil.verbund import duebel as vd
 
 #: Schnitte eines Buegels durch eine Schubwand: so viele Schenkel kreuzen sie.
 SCHNITTE = range(1, 9)
@@ -251,6 +252,19 @@ class QALastfallEintrag(Beschreibung):
     Nur beim Holz: ob die Einwirkung stossartig ist -- dann vergroessert
     η_t = 1.4 seine Bemessungswerte (SIA 265:2012, 2.2.6). Stahlbeton und
     Stahl kennen das nicht; ihr Lastfall rechnet ohne.
+    """
+
+    duebelzahl: Optional[int] = bereich(None, heisst="Dübel bis zum Momentennullpunkt", ab=0)
+    """
+    Nur im Verbund mit Kopfbolzenduebeln: wie viele Duebel zwischen diesem
+    Schnitt und dem naechsten Momentennullpunkt sitzen -- ``N`` in (29),
+    SIA 264:2014. Leer: noch keine Zahl.
+    """
+
+    L_e: Optional[float] = bereich(None, heisst="Länge L_e", einheit=M, ueber=0.0)
+    """
+    Nur im Verbund mit Kopfbolzenduebeln: der Abstand der Momentennullpunkte
+    in m, fuer (29). Leer: noch keiner.
     """
 
     aktiv: bool = True
@@ -490,6 +504,22 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben, JeMaterial):
     Spannung-Dehnung-Analysen rechnen ohne (nach Vorgabe, nicht
     nachgeschlagen).
     """
+
+    verduebelung: vd.Verduebelung = vd.Verduebelung.VOLL
+    """
+    Im Verbund: ob Stahl und Beton voll verduebelt angenommen sind oder mit
+    Kopfbolzenduebeln gerechnet wird (:mod:`opencivil.verbund.duebel`) --
+    der Duebel einmal fuer die ganze Analyse, seine Zahl je Lastfall.
+    """
+
+    duebel_d: float = bereich(19.0, heisst="Durchmesser d", einheit=MM, ab=vd.D_AB, bis=vd.D_BIS,
+                              bis_feld="duebel_h", bis_faktor=1.0 / vd.LAENGE_IN_D)
+    """Der Schaftdurchmesser der Kopfbolzenduebel in mm -- hoechstens ein Viertel ihrer Laenge."""
+
+    duebel_h: float = bereich(100.0, heisst="Länge h_D", einheit=MM, ueber=0.0)
+    duebel_f_u: float = bereich(vd.F_U_VORGABE, heisst="Zugfestigkeit f_u", einheit=N_PRO_MM2,
+                                ueber=0.0)
+    """Ueber 500 N/mm² zaehlt sie in (31) mit 500 -- die Zahl bleibt, wie eingegeben."""
 
     spannungsfaelle: List[QASpannungsfallEintrag] = field(default_factory=list)
     """Die Spannung-Dehnung-Analysen -- kein Nachweis, ein Blick in den Querschnitt."""

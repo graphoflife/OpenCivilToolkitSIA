@@ -1472,8 +1472,8 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       `opencivil/nachweis/qa_verbund.py`, `qa_verbund_kennzahlen.py`,
       `qa_verbund_werte.py`, seit 2026-11-26). Jede Annahme steht auch in
       der Herleitung.
-      - Gerechnet mit voller Verdübelung (5.1.2.1), bis die Verdübelung
-        kommt (Schritt 14b).
+      - Voll verdübelt angenommen (5.1.2.1), wo die Kachel «Verdübelung»
+        nicht Kopfbolzendübel wählt; mit Dübeln siehe den nächsten Punkt.
       - Ein Stab ist ein Quadrat seiner Fläche, eine verschmierte Linie ein
         Rechteck; beide verdrängen den Beton, in dem sie liegen.
       - Die Klasse an der plastischen Nulllinie des Lastfalls. Nur die
@@ -1511,6 +1511,43 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
         Interaktionsdiagramm.
 
       Vorschlag: so lassen. Entscheid des Benutzers.
+
+- [ ] **Verdübelung, nach Vorgabe eingebaut** (`opencivil/verbund/duebel.py`,
+      `opencivil/verbund/querschnitt.py`, `opencivil/nachweis/qa_verbund.py`,
+      seit 2026-11-27). Jede Annahme steht auch in der Herleitung.
+      - Die N Dübel zwischen dem Schnitt und dem Momentennullpunkt tragen
+        die Kraft, die Beton und Betonstahl ausserhalb der Profile im
+        Schnitt zusammen haben; am Momentennullpunkt ist sie null, auch mit
+        einer Normalkraft. 6.1.1.2 verlangt, die Normalkräfte zwischen den
+        kritischen Schnitten zu berücksichtigen.
+      - Kammerbeton zählt zum Stahl: Beton und Betonstahl in der konvexen
+        Hülle eines Profils hängen am Steg (5.2.1.2), nicht an den Dübeln.
+        Eine Platte, die nur auf dem Profil aufliegt, zählt ganz zum Beton.
+      - Den Bereich negativer Momente erkennt das Werkzeug am Querschnitt:
+        Beton und Betonstahl ausserhalb der Profile sind bei voller
+        Verdübelung zusammen gezogen, oder die plastische Nulllinie zieht
+        die Seite, auf der der Beton liegt. Dort verlangt es volle
+        Verdübelung (6.1.1.6).
+      - (29) nur für ein einziges Profil mit zwei Symmetrieachsen, erkannt
+        an seiner Form (I-Profil, Rohr); sonst verlangt das Werkzeug η ≥ 1.
+      - (30) mit dem schwächsten Beton des Querschnitts.
+      - γ_v = 1.25 auch, wo die Tragsicherheit charakteristisch rechnet.
+      - Mit Teilverdübelung gelten die Klassen an der Nulllinie des
+        Baustahls, 5.1.2.3 und β an der des Betons.
+      - Ohne Moment prüft das Werkzeug die Dübel nicht.
+
+      Vorschlag: so lassen. Entscheid des Benutzers.
+
+- [ ] **Verdübelung, noch nicht nachgewiesen** (seit 2026-11-27):
+      - die konstruktive Durchbildung (SIA 264, 7.1);
+      - der Längsschub in der Platte mit ihrer Querbewehrung (5.1.4,
+        (4) bis (12));
+      - Dübel unter Zug (6.1.2.2) und das Abheben der Platte (6.1.1.5);
+      - die Abminderung im Profilblech (6.1.3, (32) und (33)) – kommt mit
+        den Blechverbunddecken (Schritt 14d);
+      - wie die Dübel bis zum Momentennullpunkt verteilt sind: gleichmässig
+        nur unter den Bedingungen von 6.1.2.3; das Werkzeug fragt nur ihre
+        Zahl.
 
 - [ ] **Holz: C16 unter Zug – zu entscheiden** (`opencivil/material/holz.py`,
       `zugglied_grund`, seit 2026-11-26). SIA 265 lässt C16 nicht als
@@ -1805,9 +1842,9 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
 - [ ] **Querschnittsanalyse, nächste Schritte:** Stahl (SIA 263) und Holz
       (SIA 265) haben seit 2026-11-26 ihre Nachweise, mit Knicken und
       Kippen, der Verbund (SIA 264) die Tragsicherheit des Querschnitts.
-      Beim Verbund fehlen noch die Verdübelung (6.1, Schritt 14b), die
-      Verbundstützen mit Knicken (5.3, 14c), die Blechverbunddecken (5.4,
-      14d), das Kippen (5.1.2.6), der elastische Widerstand der Klasse 3
+      Seit 2026-11-27 auch die Verdübelung (6.1). Beim Verbund fehlen noch
+      die Verbundstützen mit Knicken (5.3, 14c), die Blechverbunddecken
+      (5.4, 14d), das Kippen (5.1.2.6), der elastische Widerstand der Klasse 3
       (5.1.2.4, 5.1.2.5) und die Spannung-Dehnung-Analysen: sein Riss
       braucht den ideellen Querschnitt. Ein E_eq im Balkensystem gibt es
       bis dahin nur beim Stahlbeton. Dazu weitere Nachweise (Wände ohne

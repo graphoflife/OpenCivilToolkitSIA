@@ -1,5 +1,5 @@
 ---
-erzeugt: b5423325606d
+erzeugt: 19dc63d1c67e
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -20,7 +20,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Querschnitt]] · 4
 - [[Biegung und Normalkraft]] · 26
 - [[Verformung]] · 9
-- [[Kennzahlen]] · 47
+- [[Kennzahlen]] · 50
 - [[Querkraft]] · 16
 - [[Duktilität]] · 9
 - [[Zwängung auf Normalkraft]] · 13
@@ -42,7 +42,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Knicken und Kippen]] · 31
 - [[Holzquerschnitt]] · 28
 - [[Knicken und Kippen eines Holzstabs]] · 19
-- [[Verbundquerschnitt]] · 9
+- [[Verbundquerschnitt]] · 14
 
 **Balkensysteme**
 
@@ -193,6 +193,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Druckwiderstand eines Holzquerschnitts]] · $N_{Rd}^{-}$
 - [[Druckzonenhöhe aus dem Kräftegleichgewicht]] · $x^{+}$
 - [[Druckzonenhöhe im Stützstreifen]] · $x_x$
+- [[Dübel für volle Verdübelung]] · $N_f$
 - [[Durchmesser des flächengleichen Kreises]] · $b$
 - [[Durchstanzbewehrung an der Fliessgrenze]] · $V_{Rd,v}$
 - [[Durchstanzwiderstand ohne Durchstanzbewehrung]] · $V_{Rd,c}$
@@ -295,6 +296,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Kippspannung eines Rechtecks aus Holz]] · $\sigma_{m,crit}$
 - [[Kippwiderstand]] · $M_{D,Rd}$
 - [[Kleinerer Widerstand beider Seiten]] · $V_{Rd,max}$
+- [[Kleinster Verdübelungsgrad]] · $\eta_{min}$
 - [[Knickbeiwert des Holzes]] · $k_{c,y}$
 - [[Knicken eines Holzstabs unter Druck]]
 - [[Knicken und Biegung eines Holzstabs]]
@@ -304,6 +306,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Kohäsion für örtliches Abscheren]] · $c^{*}$
 - [[Kopplung am Pfahlkopf]] · $K_{HM}$
 - [[Kraft einer Wand – ihr Schubfluss über ihre Länge]]
+- [[Kraft im Beton bei voller Verdübelung]] · $N_{c,f}$
 - [[Kräfte mal Hebelarm um die halbe Höhe]] · $M_{Rd}(N_{Rd}^{+})$
 - [[Kräftegleichgewicht]] · $N_{Rd}^{+}$
 - [[Kräftegleichgewicht bei M_Ed = 0]]
@@ -416,6 +419,9 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Schubspannung aus Querkraft nach Jourawski]]
 - [[Schubspannung aus Torsion im Holz]] · $\tau_{tor,d}$
 - [[Schubspannung aus zwei Querkräften]] · $\tau_d$
+- [[Schubwiderstand eines Kopfbolzendübels]] · $P_{Rd}$
+- [[Schubwiderstand eines Kopfbolzendübels – Betonstauchung]] · $P_{Rd,c}$
+- [[Schubwiderstand eines Kopfbolzendübels – Versagen des Dübels]] · $P_{Rd,s}$
 - [[Schubwiderstand neben Torsion im Holz]] · $\tau_{Rd}$
 - [[Schwerpunkt der zusammengefassten Lage]] · $z_{2,x}$
 - [[Schwerpunkt eines T-Querschnitts]] · $z_{S}$
@@ -475,10 +481,12 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Umfang des Pfahls]] · $U$
 - [[Ungewollte Ausmitte]] · $e_{0d}$
 - [[Ungewollte Ausmitte – allgemein]]
+- [[Verdübelungsgrad]] · $\eta$
 - [[Vergrösserungsfaktor der Durchbiegung]] · $\omega_w$
 - [[Versatz – Moment der Querkraftanteile um den Schwerpunkt]] · $\Delta T$
 - [[Verschmierte Stahlfläche aus Stäben]]
 - [[Vordehnung eines Spannglieds]] · $\varepsilon_{p,1}$
+- [[Was die Dübel tragen]] · $F_D$
 - [[Was die Zellen tragen]] · $T_{Zellen}$
 - [[Wertigkeit im gerissenen Zustand]] · $n$
 - [[Widerstand bei festgehaltenem M_Ed]] · $N_{Rd}^{+}(M_{Ed} = 0)$
@@ -517,7 +525,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 ## Normstelle fehlt noch
 
-140 von 433 Formeln haben im Code keine Normstelle – meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle – von dort kommt sie in Bericht und Notizbuch.
+141 von 441 Formeln haben im Code keine Normstelle – meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle – von dort kommt sie in Bericht und Notizbuch.
 
 - [[Achsen eines Stabs im Raum]] · [[opencivil.stabwerk3d.herleitung|_ansaetze]]
 - [[Äquivalenter E-Modul eines Stabs]] · [[opencivil.spannungsanalyse.modul#ModulProzedur|ModulProzedur._schreiben]]
@@ -593,6 +601,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Hilfsgrösse der Nulllinie]] · [[opencivil.nachweis.mindestbewehrung#ZwaengungBiegung.protokoll_lage|ZwaengungBiegung.protokoll_lage]]
 - [[Höhe der Distanzhalter]] · [[opencivil.querschnitt.lagenaufbau#Lagenaufbau._kennzahlen|Lagenaufbau._kennzahlen]]
 - [[Innerer Hebelarm]] · [[opencivil.nachweis.mindestbewehrung#ZwaengungBiegung.protokoll_lage|ZwaengungBiegung.protokoll_lage]]
+- [[Kraft im Beton bei voller Verdübelung]] · [[opencivil.nachweis.qa_verbund#VerbundBiegungQA._verduebelung|VerbundBiegungQA._verduebelung]]
 - [[Kräfte mal Hebelarm um die halbe Höhe]] · [[opencivil.nachweis.handrechnung#Handrechnung._groesste_zugkraft|Handrechnung._groesste_zugkraft]]
 - [[Kräftegleichgewicht]] · [[opencivil.nachweis.handrechnung#Handrechnung._halbe_hoehe|Handrechnung._halbe_hoehe]]
 - [[Kreis im Knoten eines I-Profils]] · [[opencivil.stahlprofile.formen]]

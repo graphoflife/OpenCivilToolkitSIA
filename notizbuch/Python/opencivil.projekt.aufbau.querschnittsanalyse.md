@@ -1,5 +1,5 @@
 ---
-erzeugt: 633bd791c389
+erzeugt: 6d41cb3fcfe9
 art: modul
 tags: [modul]
 ---
@@ -83,8 +83,10 @@ Ein Querschnitt aus Baustahl und Beton nach SIA 264
 ([[opencivil.nachweis.qa_verbund|qa_verbund]]): je Lastfall Biegung und
 Normalkraft, plastisch, und Querkraft, sobald einer sie hat -- die traegt
 der Stahl allein. Beide lesen den Widerstand gegen Querkraft aus den
-Kennzahlen. Torsion weist er nicht nach; ein Lastfall mit `T_Ed` sagt
-es. Verduebelung, Knicken und Kippen fehlen noch, ebenso die
+Kennzahlen. Mit Kopfbolzenduebeln steht ihr `P_Rd` in den Kennzahlen,
+und je Lastfall die Verduebelung bei Biegung und Normalkraft, mit seiner
+Zahl der Duebel. Torsion weist er nicht nach; ein Lastfall mit `T_Ed`
+sagt es. Knicken und Kippen fehlen noch, ebenso die
 Spannung-Dehnung-Analysen ([[opencivil.projekt.aufbau.querschnittsanalyse#ohne_analysen|ohne_analysen]]).
 
 ### _holz
@@ -227,6 +229,7 @@ Staeben gibt.
 - [[opencivil.querschnitt.biegung]]
 - [[opencivil.querschnitt.geometrie]]
 - [[opencivil.querschnitt.spannglieder]]
+- [[opencivil.verbund.duebel]]
 
 ## Gebraucht von
 

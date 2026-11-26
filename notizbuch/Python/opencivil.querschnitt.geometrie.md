@@ -1,5 +1,5 @@
 ---
-erzeugt: 678a6018ec02
+erzeugt: 52106a3e58ae
 art: modul
 tags: [modul]
 ---
@@ -239,10 +239,38 @@ Momente um den Ursprung, `(A, ∫y dA, ∫z dA)` -- null, wo nichts davon
 liegt. So teilt die plastische Nulllinie eines Stahlquerschnitts
 ([[opencivil.stahlbau.querschnitt]]) jedes Polygon in Zug und Druck.
 
-Abgeschnitten wird Kante fuer Kante an der Geraden (Sutherland-Hodgman).
-Das gilt auch fuer ein Polygon, das nicht konvex ist: zerfaellt der Teil
-in Stuecke, verbinden sie Kanten auf der Geraden, die hin und zurueck
-laufen und sich in den Summen aufheben.
+Abgeschnitten wird wie in [[opencivil.querschnitt.geometrie#abgeschnitten|abgeschnitten]].
+
+### abgeschnitten
+
+```python
+def abgeschnitten(punkte: Sequence[Punkt], normale: Tuple[float, float], v: float) -> List[Punkt]
+```
+
+Der Teil des Polygons mit `n·p ≥ v`, als Polygon im selben Umlaufsinn
+-- leer, wo nichts davon liegt. Abgeschnitten wird Kante fuer Kante an
+der Geraden (Sutherland-Hodgman). Das gilt auch fuer ein Polygon, das
+nicht konvex ist: zerfaellt der Teil in Stuecke, verbinden sie Kanten auf
+der Geraden, die hin und zurueck laufen und sich in Flaeche und
+statischen Momenten aufheben.
+
+### konvexe_huelle
+
+```python
+def konvexe_huelle(punkte: Sequence[Punkt]) -> Tuple[Punkt, ...]
+```
+
+Die konvexe Hülle gegen den Uhrzeigersinn -- bei weniger als drei Ecken die Punkte selbst.
+
+### in_huelle
+
+```python
+def in_huelle(punkte: Sequence[Punkt], huelle: Sequence[Punkt]) -> List[Punkt]
+```
+
+Der Teil des Polygons in der konvexen `huelle` (gegen den
+Uhrzeigersinn, [[opencivil.querschnitt.geometrie#konvexe_huelle|konvexe_huelle]]) -- je Seite der Huelle
+[[opencivil.querschnitt.geometrie#abgeschnitten|abgeschnitten]]; leer, wo nichts darin liegt.
 
 ### Beziehung
 
@@ -551,6 +579,7 @@ Ueberdeckung, oder wenn die Linie dabei keine Laenge behielte.
 - [[opencivil.bewehrungssuche.buegel]]
 - [[opencivil.bewehrungssuche.laengs]]
 - [[opencivil.durchstanzen.bewehrung]]
+- [[opencivil.durchstanzen.mit_bewehrung]]
 - [[opencivil.durchstanzen.schnitt]]
 - [[opencivil.holzbau.querschnitt]]
 - [[opencivil.nachweis.qa_gebrauch]]

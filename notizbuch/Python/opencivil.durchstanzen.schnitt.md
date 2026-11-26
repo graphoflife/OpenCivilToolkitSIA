@@ -1,5 +1,5 @@
 ---
-erzeugt: ae81ef7fda83
+erzeugt: acf48feee2cf
 art: modul
 tags: [modul]
 ---
@@ -214,14 +214,6 @@ def _normale(p: Punkt, q: Punkt) -> Punkt
 ```
 
 Die Normale der Seite `p → q` nach aussen, für ein Polygon gegen den Uhrzeigersinn.
-
-### konvexe_huelle
-
-```python
-def konvexe_huelle(punkte: Sequence[Punkt]) -> Tuple[Punkt, ...]
-```
-
-Die konvexe Hülle gegen den Uhrzeigersinn -- bei weniger als drei Ecken die Punkte selbst.
 
 ### _polygon
 

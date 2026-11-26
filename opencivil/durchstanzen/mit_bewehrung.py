@@ -66,8 +66,9 @@ from opencivil.durchstanzen.pruefung import (
 )
 from opencivil.durchstanzen.schnitt import (
     ECKENBEREICH, Punkt, Schatten, Stueck, Stuetzenflaeche, kandidaten_stuetze,
-    konvexe_huelle, nachweisschnitt, schatten_am_schnitt,
+    nachweisschnitt, schatten_am_schnitt,
 )
+from opencivil.querschnitt.geometrie import konvexe_huelle
 
 if TYPE_CHECKING:
     from opencivil.durchstanzen.nachweis import Durchstanzen

@@ -10,7 +10,13 @@ Zeichnung brauchen, ohne Rechenwerk und ohne Herleitung, in mm und N/mm²:
 * je Beton und je Betonstahl eine Gruppe dazu (:attr:`Verbundquerschnitt.gruppen`);
 * den Querschnitt starr-plastisch (:meth:`Verbundquerschnitt.starr`), je
   Gruppe mit der Festigkeit, die die Nachweise waehlen
-  (:mod:`opencivil.querschnitt.plastisch`);
+  (:mod:`opencivil.querschnitt.plastisch`) -- und in den zwei Teilen, die
+  nur die Duebel verbinden (:meth:`Verbundquerschnitt.getrennt`, siehe
+  unten);
+* ob der Baustahl ein doppelsymmetrisches Profil ist -- fuer (29)
+  (:attr:`Verbundquerschnitt.doppelsymmetrisch`) --, und auf welcher Seite
+  des Baustahls der Beton liegt: zieht ein Moment diese Seite, liegt es im
+  Bereich negativer Momente (:attr:`Verbundquerschnitt.zum_beton`);
 * was 5.1.2.2 fuer ``β`` misst: die Hoehe quer zur Nulllinie und wie weit der
   gedrueckte Beton von ihr reicht;
 * die Klasse jedes Blechs an einer plastischen Nulllinie
@@ -24,6 +30,17 @@ Flaeche um seine Mitte, eine verschmierte Linie ein Rechteck ihrer Flaeche
 ueber ihre Laenge; beide verdraengen den Beton, in dem sie liegen, wie im
 Stahlbeton. Liegt die Nulllinie in einem Stab, verteilt sich seine Kraft so
 ueber das Quadrat -- nach Vorgabe, nicht nachgeschlagen.
+
+WAS DIE DUEBEL VERBINDEN:
+Die Kopfbolzenduebel sitzen in der Fuge zwischen dem Beton und dem Profil.
+Auf der einen Seite liegen Beton und Betonstahl ausserhalb der Profile --
+die Platte --, auf der anderen der Baustahl mit dem Beton und den Staeben in
+seiner konvexen Huelle: Kammerbeton zaehlt zum Stahl, denn er ist mit dem
+Steg verbunden (5.2.1.2), nicht ueber die Duebel der Fuge (nach Vorgabe,
+nicht nachgeschlagen). Was in der Huelle liegt, schneidet das Werkzeug aus
+jedem Stueck aus (:func:`~opencivil.querschnitt.geometrie.in_huelle`): mit
+umgekehrtem Gewicht auf der Seite des Betons, mit seinem eigenen auf der
+des Stahls, dort mit dem Zusatz «in der Kammer» (:attr:`Verbundquerschnitt.fuge`).
 
 DIE KLASSEN (4.2.2.1, Tabellen 2 und 3):
 Gefragt wird nur, ob jedes Blech die Klasse 1 oder 2 haelt: plastisch
@@ -58,6 +75,7 @@ from __future__ import annotations
 
 import dataclasses
 import math
+from functools import cached_property
 from typing import Dict, List, Optional, Sequence, Tuple
 
 from opencivil.material.basis import Baustoff, Baustoffart
@@ -70,7 +88,7 @@ from opencivil.stahlbau import klasse as kl
 from opencivil.stahlbau.querschnitt import Blechzustand, Gruppe, Stahlquerschnitt, Teil
 from opencivil.stahlprofile import tabelle
 from opencivil.stahlprofile.bleche import Blech, Halterung
-from opencivil.stahlprofile.formen import I_PROFIL
+from opencivil.stahlprofile.formen import I_PROFIL, RECHTECKROHR_KALT, RUNDROHR
 
 #: Was der Kammerbeton je Blech erlaubt: die Grenzen ``c/t`` der Klassen 1 und 2, durch
 #: ``ε``, und woher sie kommen -- siehe Dateikopf.
@@ -83,6 +101,16 @@ BREITE_BETON = 0.8
 #: Wie weit neben dem Flansch und an wie vielen Stellen geprueft wird, ob Beton ihn deckt.
 NEBEN = 1.0
 STELLEN = 5
+
+#: Die Formen, deren Profile zwei Symmetrieachsen haben.
+DOPPELSYMMETRISCH = (I_PROFIL, RECHTECKROHR_KALT, RUNDROHR)
+
+#: Wie ein Stueck heisst, das in der Huelle eines Profils liegt -- siehe Dateikopf.
+IN_DER_KAMMER = "in der Kammer"
+
+#: Wie weit die Schwerpunkte von Baustahl und Beton mindestens auseinander liegen, in mm,
+#: damit der Beton eine Seite hat.
+SEITE_AB = 1.0
 
 
 def _quadrat(mitte: Punkt, seite: float) -> Tuple[Punkt, ...]:
@@ -164,6 +192,77 @@ class Verbundquerschnitt:
               stahl: Optional[Stahlquerschnitt] = None) -> Starrplastisch:
         """Der Querschnitt starr-plastisch, je Gruppe mit ``zug`` und ``druck``."""
         return Starrplastisch(self.stuecke(stahl), tuple(zug), tuple(druck))
+
+    @cached_property
+    def fuge(self) -> Tuple[Tuple[Stueck, ...], Tuple[Stueck, ...]]:
+        """
+        Beton und Betonstahl je auf ihrer Seite der Fuge (siehe Dateikopf):
+        ausserhalb der Profile -- mit dem, was in ihrer Huelle liegt,
+        abgezogen --, und in der Huelle eines Profils.
+        """
+        huellen = [geo.konvexe_huelle(t.flaeche.punkte) for t in self.stahl.teile]
+        aussen: List[Stueck] = []
+        kammer: List[Stueck] = []
+        for s in self.weitere:
+            aussen.append(s)
+            for huelle in huellen:
+                innen = tuple(geo.in_huelle(s.punkte, huelle))
+                # Eine Platte, die nur auf dem Profil aufliegt, beruehrt die
+                # Huelle: was bleibt, hat keine Flaeche.
+                if abs(geo.flaeche(innen)) > geo.TOLERANZ:
+                    aussen.append(dataclasses.replace(s, gewicht=-s.gewicht, punkte=innen))
+                    kammer.append(dataclasses.replace(s, punkte=innen, was=IN_DER_KAMMER))
+        return tuple(aussen), tuple(kammer)
+
+    def getrennt(self, zug: Sequence[float], druck: Sequence[float],
+                 stahl: Optional[Stahlquerschnitt] = None) -> Tuple[Starrplastisch,
+                                                                    Starrplastisch]:
+        """
+        Der Querschnitt starr-plastisch in den zwei Teilen, die nur die Duebel
+        verbinden (:attr:`fuge`): Beton und Betonstahl ausserhalb der Profile,
+        und der Baustahl -- mit ``stahl``, wo die Querkraft ihm einen Teil
+        genommen hat -- mit dem Kammerbeton. Je Gruppe mit ``zug`` und
+        ``druck``.
+        """
+        aussen, kammer = self.fuge
+        return (Starrplastisch(aussen, tuple(zug), tuple(druck)),
+                Starrplastisch((*(stahl or self.stahl).stuecke, *kammer), tuple(zug),
+                               tuple(druck)))
+
+    @property
+    def doppelsymmetrisch(self) -> bool:
+        """
+        Ob der Baustahl ein einziges Profil mit zwei Symmetrieachsen ist: ein
+        I-Profil oder ein Rohr. Ein frei gezeichneter Baustahl zaehlt nicht,
+        auch wo er symmetrisch ist -- das Werkzeug prueft es nicht.
+        """
+        teile = self.stahl.teile
+        return (len(teile) == 1 and teile[0].flaeche.profil is not None
+                and tabelle.profil(teile[0].flaeche.profil.name).form in DOPPELSYMMETRISCH)
+
+    @cached_property
+    def zum_beton(self) -> Optional[Tuple[float, float]]:
+        """
+        Ueber die Fuge (:attr:`fuge`): vom Schwerpunkt des Stahls mit dem
+        Kammerbeton zu dem von Beton und Betonstahl ausserhalb der Profile,
+        in mm, je nach Flaeche. ``None``, wo ausserhalb nichts liegt oder die
+        Schwerpunkte keinen Millimeter auseinander -- dort hat der Beton keine
+        Seite.
+        """
+        aussen, kammer = self.fuge
+
+        def schwerpunkt(stuecke: Sequence[Stueck]) -> Optional[Punkt]:
+            A = sum(s.gewicht * s.werte.A for s in stuecke)
+            if A <= 0.0:
+                return None
+            return (sum(s.gewicht * s.werte.A * s.werte.y_S for s in stuecke) / A,
+                    sum(s.gewicht * s.werte.A * s.werte.z_S for s in stuecke) / A)
+
+        beton, stahl = schwerpunkt(aussen), schwerpunkt((*self.stahl.stuecke, *kammer))
+        if beton is None or stahl is None:
+            return None
+        weg = (beton[0] - stahl[0], beton[1] - stahl[1])
+        return weg if math.hypot(*weg) > SEITE_AB else None
 
     def flaechen_je_gruppe(self) -> List[float]:
         """Je Gruppe ihre Flaeche in mm² -- beim Beton ohne, was Stahl und Staebe verdraengen."""

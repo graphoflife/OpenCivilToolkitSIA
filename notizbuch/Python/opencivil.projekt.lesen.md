@@ -1,5 +1,5 @@
 ---
-erzeugt: 7ecab90646bb
+erzeugt: 0b05324b4aa9
 art: modul
 tags: [modul]
 ---
@@ -182,7 +182,7 @@ Was ein Material im Feld `feld` ([[opencivil.projekt.lesen#je_material|je_materi
 ### bereich
 
 ```python
-def bereich(vorgabe: Any=dataclasses.MISSING, *, heisst: str, einheit: Optional[Einheit]=None, ueber: Optional[float]=None, ab: Optional[float]=None, bis: Optional[float]=None, unter: Optional[float]=None, bis_feld: Optional[str]=None, quer_zu: Optional[Tuple[str, float]]=None, fabrik: Optional[Callable[[], Any]]=None) -> Any
+def bereich(vorgabe: Any=dataclasses.MISSING, *, heisst: str, einheit: Optional[Einheit]=None, ueber: Optional[float]=None, ab: Optional[float]=None, bis: Optional[float]=None, unter: Optional[float]=None, bis_feld: Optional[str]=None, bis_faktor: float=1.0, quer_zu: Optional[Tuple[str, float]]=None, fabrik: Optional[Callable[[], Any]]=None) -> Any
 ```
 
 Ein Feld, dessen Zahl in einem [[opencivil.core.bereich#Bereich|Bereich]] liegen muss -- eine
@@ -217,7 +217,9 @@ Wahllisten des Katalogs, mit Beschriftung.
 
 Begrenzt ein Feld ein anderes ([[opencivil.core.bereich#Bereich|Bereich.bis_feld]]), steht das an
 beiden, mit dem Namen des anderen Feldes und dem Satz, den das Feld
-sagt: `bis_feld` bei α_min, `ab_feld` bei α_max. Ebenso `quer_zu`
+sagt: `bis_feld` bei α_min, `ab_feld` bei α_max -- mit `faktor`,
+wo die Grenze ein Vielfaches des anderen ist ([[opencivil.core.bereich#Bereich|Bereich.bis_faktor]],
+beim anderen Feld sein Kehrwert). Ebenso `quer_zu`
 an beiden Feldern, mit dem kleinsten Abstand als Linien in Grad
 ([[opencivil.core.bereich#Bereich|Bereich.quer_zu]], `mindestens`). Die Zahl des anderen Feldes
 kennt erst die Maske.

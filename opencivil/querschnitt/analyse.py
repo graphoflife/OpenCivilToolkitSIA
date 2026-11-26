@@ -74,6 +74,11 @@ KENNWERTE = {
 }
 
 
+def _zehntel(x: float) -> str:
+    """Eine Zahl auf eine Stelle -- mit ``+ 0.0``: ein Profil um die Mitte hat sonst y_S = -0.0."""
+    return f"{round(x, 1) + 0.0:.1f}"
+
+
 def werkstoff(stoff: Baustoff, wert: Callable[[str], float], wahl: Rechenwahl, *,
               ungerissen: bool = False) -> Werkstoff:
     """
@@ -634,8 +639,7 @@ class Querschnittsanalyse(Rechenobjekt):
                 self.flaechen[self.eltern[i]].name if self.eltern[i] is not None else "–",
                 Mathe(f"{len(f.punkte)}"),
                 Mathe(f"{self._gewicht(i) * w.A:.0f}"),
-                # + 0.0: ein Profil um die Mitte hat sonst y_S = -0.0.
-                Mathe(f"{round(w.y_S, 1) + 0.0:.1f}"), Mathe(f"{round(w.z_S, 1) + 0.0:.1f}"),
+                Mathe(_zehntel(w.y_S)), Mathe(_zehntel(w.z_S)),
             ])
         p.tabelle(
             kopf=["Polygon", "Material", "liegt in", "Ecken",
@@ -753,7 +757,8 @@ class Querschnittsanalyse(Rechenobjekt):
         stoffe = sorted({f.stoff.name for f in self.flaechen if f.stoff is not None})
         b = self.brutto
         latex = (rf"{als_text(', '.join(stoffe))} \qquad A = {b.A:.0f}\,\mathrm{{mm}}^2"
-                 rf" \qquad y_S = {b.y_S:.1f}\,\mathrm{{mm}} \qquad z_S = {b.z_S:.1f}\,\mathrm{{mm}}")
+                 rf" \qquad y_S = {_zehntel(b.y_S)}\,\mathrm{{mm}} \qquad "
+                 rf"z_S = {_zehntel(b.z_S)}\,\mathrm{{mm}}")
         kopf = GleichungBlock(latex=latex, titel="Angaben zum Querschnitt")
         zeilen = [[g.name, g.kurzmenge, g.stahl.name]
                   for g in (*self.bewehrungselemente, *self.spannglieder)]

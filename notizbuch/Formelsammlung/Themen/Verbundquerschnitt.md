@@ -1,10 +1,10 @@
 ---
-erzeugt: 3e9bcbc2e8bf
+erzeugt: 94c2b8373807
 art: thema
 tags: [thema]
 ---
 > [!abstract] Querschnittsanalyse
-> 9 Formeln, in der Folge, in der gerechnet wird.
+> 14 Formeln, in der Folge, in der gerechnet wird.
 
 ## Was die Rechnung dazu sagt
 
@@ -21,6 +21,11 @@ Je Lastfall der plastische Zustand bei N\_Ed, dessen Moment in die Richtung der 
 7. [[Plastischer Biegewiderstand mit β]]
 8. [[Erfüllungsgrad]]
 9. [[Minderung durch grosse Querkraft]]
+10. [[Kraft im Beton bei voller Verdübelung]]
+11. [[Dübel für volle Verdübelung]]
+12. [[Verdübelungsgrad]]
+13. [[Kleinster Verdübelungsgrad]]
+14. [[Was die Dübel tragen]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 
@@ -29,9 +34,14 @@ Je Lastfall der plastische Zustand bei N\_Ed, dessen Moment in die Richtung der 
 Wie ein Querschnitt aus Baustahl und Beton einen Lastfall trägt, nach
 SIA 264:2014. Der Reihe nach:
 
-1. **Verdübelung.** Gerechnet wird mit voller Verdübelung: Stahl und Beton
-   gleiten nicht gegeneinander. Ob die Dübel dafür reichen, prüft das
-   Werkzeug noch nicht.
+1. **Verdübelung.** Voll angenommen gleiten Stahl und Beton nicht
+   gegeneinander, und das Werkzeug prüft keine Dübel. Mit Kopfbolzendübeln
+   trägt jeder den [[Schubwiderstand eines Kopfbolzendübels]], und je
+   Lastfall vergleicht der [[Verdübelungsgrad]] die Dübel bis zum
+   Momentennullpunkt mit den [[Dübel für volle Verdübelung]] – gegen den
+   [[Kleinster Verdübelungsgrad|kleinsten Verdübelungsgrad]]. Reichen sie
+   nicht für die volle Verdübelung, trägt der Beton nur
+   [[Was die Dübel tragen]].
 2. **Querkraft.** Sie gehört dem Stahl allein. Ist sie grösser als die
    Hälfte ihres Widerstands, mindert sie die Bleche, in denen sie steht,
    wie im Stahl: [[Minderung durch grosse Querkraft]].

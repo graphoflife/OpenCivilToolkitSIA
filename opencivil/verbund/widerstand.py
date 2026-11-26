@@ -19,7 +19,23 @@ Herleitung schreiben :mod:`opencivil.nachweis.qa_verbund` und
 * ob er gilt: jedes Blech in Klasse 1 oder 2 (4.2.2, Tabelle 2), und wo
   ein Moment Betonstahl zieht, dieser in der Duktilitaetsklasse B oder C
   (5.1.2.3); sonst steht grau, warum nicht (:attr:`Fall.grund`);
-* ``β`` nach 5.1.2.2, wo ein Baustahl S420 oder S460 ist.
+* ``β`` nach 5.1.2.2, wo ein Baustahl S420 oder S460 ist;
+* mit Duebeln, die weniger tragen, als der gedrueckte Beton bei voller
+  Verduebelung braucht, der Zustand mit Teilverduebelung (6.1.1.6) -- siehe
+  unten. Ob sie dafuer reichen (29), prueft der Nachweis
+  (:mod:`opencivil.nachweis.qa_verbund`), mit :mod:`opencivil.verbund.duebel`.
+
+TEILVERDUEBELUNG (6.1.1.6) -- nach der Theorie der teilweisen Verduebelung:
+Beton und Betonstahl ausserhalb der Profile tragen zusammen nur die Kraft
+der Duebel, ``-N·P_Rd``, der Stahl mit dem Kammerbeton den Rest von ``N``
+(:meth:`~opencivil.verbund.querschnitt.Verbundquerschnitt.getrennt`). Jeder
+Teil hat seine eigene plastische Nulllinie, beide mit derselben
+Zugrichtung: beide Teile kruemmen sich gleich, und zwischen ihnen gleitet
+die Fuge. Gesucht wird die Zugrichtung wie bei einer Nulllinie
+(:func:`~opencivil.querschnitt.plastisch.in_richtung`).
+Die Klassen gelten an der Nulllinie des Baustahls, 5.1.2.3 und ``β`` an der
+des Betons (nach Vorgabe, nicht nachgeschlagen: die Norm nennt ``β`` fuer
+den Zustand mit einer Nulllinie).
 
 DER MASSSTAB:
 Wie beim Stahl (:mod:`opencivil.stahlbau.widerstand`): ``N`` bleibt, das
@@ -45,13 +61,15 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass, field
-from typing import List, Optional, Sequence, Tuple
+from typing import List, Optional, Sequence, Tuple, Union
 
 from opencivil.material.basis import Baustoffart
 from opencivil.material.betonstahl import duktilitaetsklasse
 from opencivil.querschnitt.biegung import Biegung
 from opencivil.querschnitt.geometrie import Punkt
-from opencivil.querschnitt.plastisch import DRUCK, ZUG, Linie, Starrplastisch, Zustand
+from opencivil.querschnitt.plastisch import (
+    DRUCK, ZUG, Linie, Starrplastisch, Zustand, in_richtung,
+)
 from opencivil.querschnitt.zugseite import Zugseite
 from opencivil.stahlbau import widerstand as wd
 from opencivil.stahlbau.querschnitt import Blechzustand, Teil, normale
@@ -77,6 +95,9 @@ UEBER_KLASSE_2 = ("Ein Blech liegt über Klasse 2: plastisch darf der Verbundque
                   "noch nicht.")
 UEBER_FIGUR_1 = ("x_p/h liegt über 0.4, wo Figur 1 endet: dort rechnet das Werkzeug den "
                  "Biegewiderstand nicht (nach Vorgabe, nicht nachgeschlagen).")
+OHNE_TEILZUSTAND = ("Mit nur N · P_Rd im Beton trägt der Baustahl N_Ed nicht: die Normalkraft "
+                    "müsste schon am Momentennullpunkt im Beton stecken, und das rechnet das "
+                    "Werkzeug nicht (nach Vorgabe, nicht nachgeschlagen).")
 
 
 def duktil_text(namen: Sequence[str]) -> str:
@@ -109,6 +130,50 @@ class Beta:
         return None
 
 
+@dataclass(frozen=True)
+class Teilzustand:
+    """
+    Der plastische Zustand mit Teilverduebelung, in N und N·mm um den
+    Bezugspunkt: je Teil eine Nulllinie, beide mit derselben Zugrichtung
+    (siehe Dateikopf).
+    """
+
+    beton: Linie
+    """Die Nulllinie in Beton und Betonstahl ausserhalb der Profile."""
+
+    stahl: Linie
+    """Die Nulllinie im Stahl, mit dem Kammerbeton."""
+
+    N: float
+    M_y: float
+    M_z: float
+
+    @property
+    def linien(self) -> Tuple[Tuple[str, Linie], ...]:
+        """Die Nulllinien, je mit dem Teil, in dem sie liegt."""
+        return (("ausserhalb der Profile", self.beton), ("in den Profilen", self.stahl))
+
+
+def teilverduebelt(beton: Starrplastisch, stahl: Starrplastisch, N: float, N_beton: float,
+                   M_y: float, M_z: float, bezug: Punkt,
+                   neigung: Optional[float]) -> Optional[Teilzustand]:
+    """
+    Der Zustand, in dem Beton und Betonstahl ausserhalb der Profile zusammen
+    ``N_beton`` tragen und der Stahl mit dem Kammerbeton den Rest von ``N``,
+    mit dem Moment in der Richtung von ``(M_y, M_z)`` -- ``None``, wo ein
+    Teil das Seine nicht traegt.
+    """
+    if not (beton.traegt(N_beton) and stahl.traegt(N - N_beton)):
+        return None
+
+    def bei(n: Tuple[float, float]) -> Teilzustand:
+        b = beton.bei(n, N_beton, bezug)
+        s = stahl.bei(n, N - N_beton, bezug)
+        return Teilzustand(b.linie, s.linie, b.N + s.N, b.M_y + s.M_y, b.M_z + s.M_z)
+
+    return in_richtung(bei, M_y, M_z, neigung)
+
+
 @dataclass
 class Fall:
     """Was ein Lastfall am Verbundquerschnitt ergibt -- siehe Dateikopf. In N und N·mm."""
@@ -139,6 +204,22 @@ class Fall:
     sproede: List[str] = field(default_factory=list)
     """Die Namen der gezogenen Betonstaehle, die nicht in Klasse B oder C sind (5.1.2.3)."""
 
+    N_c: Optional[float] = None
+    """
+    Was Beton und Betonstahl ausserhalb der Profile zusammen im plastischen
+    Zustand bei voller Verduebelung tragen, in N -- negativ gedrueckt; nur
+    mit diesem Zustand.
+    """
+
+    duebel: Optional[float] = None
+    """
+    Was die Duebel bis zum Momentennullpunkt tragen, ``N·P_Rd`` in N --
+    ``None``: volle Verduebelung.
+    """
+
+    teil: Optional[Teilzustand] = None
+    """Der Zustand mit Teilverduebelung, wo er gilt (:attr:`teilverduebelt`)."""
+
     grund: str = ""
     """Warum der Fall grau bleibt -- leer, wo er rechnet."""
 
@@ -153,6 +234,25 @@ class Fall:
     @property
     def faktor_beta(self) -> float:
         return self.beta.beta if self.beta is not None and self.beta.beta is not None else 1.0
+
+    @property
+    def teilverduebelt(self) -> bool:
+        """
+        Ob die Duebel weniger tragen, als Beton und Betonstahl ausserhalb der
+        Profile bei voller Verduebelung zusammen gedrueckt haben.
+        """
+        return (self.duebel is not None and self.N_c is not None and self.N_c < 0.0
+                and self.duebel < -self.N_c)
+
+    @property
+    def widerstand(self) -> Union[Zustand, Teilzustand]:
+        """Der Zustand, dessen Moment der Widerstand ist: mit Teilverduebelung, wo sie gilt."""
+        return self.teil if self.teil is not None else self.plastisch
+
+    @property
+    def linie_beton(self) -> Linie:
+        """Die Nulllinie, an der der Beton gedrueckt ist und der Betonstahl gezogen."""
+        return self.teil.beton if self.teil is not None else self.plastisch.linie
 
 
 def _fall(verbund: Verbundquerschnitt, ab: wd.Abgemindert, starr: Starrplastisch,
@@ -180,7 +280,7 @@ def sproede_gezogen(verbund: Verbundquerschnitt, linie: Linie) -> List[str]:
 
 def _bewerten(fall: Fall, verbund: Verbundquerschnitt, hochfest: bool) -> None:
     """5.1.2.3 und ``β`` an einem plastischen Zustand mit Moment -- siehe Dateikopf."""
-    linie = fall.plastisch.linie
+    linie = fall.linie_beton
     fall.sproede = sproede_gezogen(verbund, linie)
     if fall.sproede and not fall.grund:
         fall.grund = duktil_text(fall.sproede)
@@ -195,13 +295,15 @@ def _bewerten(fall: Fall, verbund: Verbundquerschnitt, hochfest: bool) -> None:
 def rechnen(verbund: Verbundquerschnitt, zug: Sequence[float], druck: Sequence[float],
             eps: Sequence[float], N: float, M_y: float, M_z: float,
             querkraefte: Sequence[wd.Querkraft], bezug: Punkt, biegung: Biegung,
-            hochfest: bool) -> Fall:
+            hochfest: bool, duebel: Optional[float] = None) -> Fall:
     """
     Ein Lastfall am Verbundquerschnitt -- siehe Dateikopf. ``zug`` und
     ``druck`` je Gruppe die Festigkeiten, ``eps`` je Gruppe des Stahls sein
     ``ε``; ``M_y`` und ``M_z``, wie sie zaehlen
     (:meth:`~opencivil.querschnitt.biegung.Biegung.wirkt`); ``hochfest``, ob
-    ein Baustahl S420 oder S460 ist.
+    ein Baustahl S420 oder S460 ist; ``duebel``, was die Duebel bis zum
+    Momentennullpunkt tragen, in N -- ``None``: volle Verduebelung, wie
+    5.1.2.1 sie annimmt.
     """
     ab = wd.abmindern(verbund.stahl, querkraefte)
     starr = verbund.starr(zug, druck, ab.stahl)
@@ -213,16 +315,26 @@ def rechnen(verbund: Verbundquerschnitt, zug: Sequence[float], druck: Sequence[f
         if not fall.grund:
             fall.alpha = N_Rd / N if N != 0.0 else math.inf
         return fall
-    pl = starr.zustand(N, M_y, M_z, bezug, biegung.neigung(M_y))
+    neigung = biegung.neigung(M_y)
+    pl = starr.zustand(N, M_y, M_z, bezug, neigung)
     if pl is None:
         fall = _fall(verbund, ab, starr, eps, N, M_y, M_z, moment, querkraefte, gleichmaessig)
         fall.grund, fall.alpha_N = "", N_Rd / N
         return fall
-    fall = _fall(verbund, ab, starr, eps, N, M_y, M_z, moment, querkraefte, pl.linie)
-    fall.plastisch = pl
+    beton, baustahl = verbund.getrennt(zug, druck, ab.stahl)
+    N_c = beton.kraefte(pl.linie, bezug)[0]
+    teil = None
+    if duebel is not None and N_c < 0.0 and duebel < -N_c:
+        teil = teilverduebelt(beton, baustahl, N, -duebel, M_y, M_z, bezug, neigung)
+    fall = _fall(verbund, ab, starr, eps, N, M_y, M_z, moment, querkraefte,
+                 teil.stahl if teil is not None else pl.linie)
+    fall.plastisch, fall.N_c, fall.duebel, fall.teil = pl, N_c, duebel, teil
+    if fall.teilverduebelt and teil is None and not fall.grund:
+        fall.grund = OHNE_TEILZUSTAND
     _bewerten(fall, verbund, hochfest)
     if not fall.grund:
-        fall.alpha = fall.faktor_beta * biegung.betrag(pl.M_y, pl.M_z) / moment
+        z = fall.widerstand
+        fall.alpha = fall.faktor_beta * biegung.betrag(z.M_y, z.M_z) / moment
     return fall
 
 

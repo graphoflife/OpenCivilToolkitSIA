@@ -1,5 +1,5 @@
 ---
-erzeugt: 8705210e987e
+erzeugt: f3685b052d2e
 art: modul
 tags: [modul]
 ---
@@ -14,5 +14,6 @@ die Nachweise in [[opencivil.nachweis]].
 
 ## Module
 
+- [[opencivil.verbund.duebel]] – Kopfbolzenduebel nach SIA 264:2014, 6.1.
 - [[opencivil.verbund.querschnitt]] – ein gezeichneter Querschnitt aus Baustahl und Beton.
 - [[opencivil.verbund.widerstand]] – was ein Verbundquerschnitt in einem Lastfall aufnimmt.

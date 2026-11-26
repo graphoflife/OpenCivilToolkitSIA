@@ -1,5 +1,5 @@
 ---
-erzeugt: 1354837687f4
+erzeugt: fc83c284e313
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 3.1.2.3.3, (10)"
@@ -37,6 +37,7 @@ $$
 - [[Dehnsteifigkeit]]
 - [[Dehnsteifigkeit des Pfahls]]
 - [[Mittelwert des Schubmoduls]]
+- [[Schubwiderstand eines Kopfbolzendübels – Betonstauchung]]
 - [[Wertigkeit im gerissenen Zustand]]
 - [[Wirksamer Elastizitätsmodul]]
 

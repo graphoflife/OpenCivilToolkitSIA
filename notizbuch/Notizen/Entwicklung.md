@@ -7,6 +7,51 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-27 · Verbund nach SIA 264, Verdübelung
+
+Aus dem Plan vom 2026-11-25, Schritt 14b: Kopfbolzendübel nach SIA
+264:2014, 6.1 – ihr Schubwiderstand, der Verdübelungsgrad und die
+Teilverdübelung.
+
+**Vorher und nachher.** Vorher rechnete ein Verbundquerschnitt immer mit
+voller Verdübelung, und die Herleitung sagte, dass das Werkzeug die Dübel
+nicht prüft. Nachher hat er die Kachel «Verdübelung» mit dem Schalter
+[voll angenommen | Kopfbolzendübel]. Mit Dübeln stehen dort ihr
+Durchmesser, ihre Länge und f_u, und je Lastfall die Zahl N der Dübel bis
+zum Momentennullpunkt und der Abstand L_e der Momentennullpunkte. Ein
+IPE 400 aus S355 unter einer Platte 2000 × 150 mm aus C30/37, mit
+Kopfbolzen ⌀19 × 125 mm: ein Dübel trägt 81.7 kN, volle Verdübelung
+bräuchte 35 Dübel. Mit 25 ist η = 0.71, verlangt sind bei L_e = 12 m
+0.61 – erfüllt, und der Biegewiderstand sinkt von 889.3 auf 817.4 kNm.
+Mit 15 Dübeln ist η = 0.43: rot, nicht erfüllt.
+
+**Die Dübel tragen nur den Beton ausserhalb der Profile.** Beton zwischen
+den Flanschen eines Profils hängt am Steg (5.2.1.2), nicht an den Dübeln.
+Das Werkzeug schneidet ihn an der konvexen Hülle des Profils ab und zählt
+ihn zum Stahl, mit dem Betonstahl darin. Ohne das sah es über der Stütze
+eines Profils mit Kammerbeton fast keine Kraft in der Fuge: der gedrückte
+Kammerbeton hob den gezogenen Betonstahl der Platte beinahe auf.
+
+**Wo volle Verdübelung verlangt ist.** Im Bereich negativer Momente lässt
+6.1.1.6 keine Teilverdübelung zu, und (29) gilt nur für doppelsymmetrische
+Profile. Ob ein Moment negativ ist, sagt im gezeichneten Querschnitt sein
+Vorzeichen nicht – die Platte kann oben oder unten liegen. Das Werkzeug
+sieht es daran, dass Beton und Betonstahl ausserhalb der Profile zusammen
+gezogen sind oder das Moment die Seite des Betons zieht. Über der Stütze
+des Beispiels verlangt es darum η ≥ 1; mit 12 Dübeln ist η = 4.10.
+
+**Unfertig ist kein Fehler.** Fehlt einem Lastfall die Zahl der Dübel,
+rechnet er mit voller Verdübelung und sagt grau, was fehlt; fehlt nur
+L_e, rechnet er die Teilverdübelung und sagt grau, dass (29) L_e braucht.
+Ohne Moment prüft er keine Dübel. Was nach Vorgabe eingebaut ist und was
+noch fehlt – Durchbildung, Längsschub in der Platte, Zug in den Dübeln –,
+steht im [[TODO]].
+
+**Formelsammlung.** Acht neue Seiten mit Theorie, verlinkt im Thema
+«Verbundquerschnitt». Das Prüfprojekt hat dafür den «Verbundträger mit
+Dübeln» mit sieben Lastfällen. Nebenbei: die Angaben zum Querschnitt
+schreiben y_S = 0.0 mm statt −0.0 mm.
+
 ## 2026-11-26 · Verbund nach SIA 264, Querschnitt
 
 Aus dem Plan vom 2026-11-25, Schritt 14a: die Tragsicherheit eines

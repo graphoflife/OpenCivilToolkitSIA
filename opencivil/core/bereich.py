@@ -52,6 +52,12 @@ class Bereich:
     Rechnen haelt eine Datei damit auf -- mit denselben Worten (:meth:`gegen`).
     """
 
+    bis_faktor: float = 1.0
+    """
+    Das Wievielfache der Zahl von :attr:`bis_feld` diese hoechstens ist: der
+    Durchmesser eines Kopfbolzenduebels ein Viertel seiner Laenge. Sonst eins.
+    """
+
     quer_zu: Optional[Tuple[str, float]] = None
     """
     Ein Feld desselben Eintrags mit einem Winkel in Grad, und um wie viel
@@ -85,10 +91,15 @@ class Bereich:
         """
         Was :attr:`bis_feld` verlangt, an diesem Feld und am anderen
         (``anderer``): «α_min darf nicht grösser sein als α_max», «α_max darf
-        nicht kleiner sein als α_min».
+        nicht kleiner sein als α_min» -- mit einem Faktor «… als 0.25 · Länge
+        h_D», «… als 4 · Durchmesser d».
         """
-        return (f"{self.heisst} darf nicht grösser sein als {anderer.heisst}",
-                f"{anderer.heisst} darf nicht kleiner sein als {self.heisst}")
+        if self.bis_faktor == 1.0:
+            return (f"{self.heisst} darf nicht grösser sein als {anderer.heisst}",
+                    f"{anderer.heisst} darf nicht kleiner sein als {self.heisst}")
+        return (f"{self.heisst} darf nicht grösser sein als {self.bis_faktor:g} · {anderer.heisst}",
+                f"{anderer.heisst} darf nicht kleiner sein als "
+                f"{1.0 / self.bis_faktor:g} · {self.heisst}")
 
     def grund_gegen(self, wert: Optional[float], anderer: Bereich,
                     grenze: Optional[float]) -> str:
@@ -96,7 +107,7 @@ class Bereich:
         Was :attr:`bis_feld` verletzt -- die Zahl ueber der des anderen
         Feldes --, als Satz mit Punkt; leer, wenn nichts.
         """
-        if wert is not None and grenze is not None and wert > grenze:
+        if wert is not None and grenze is not None and wert > self.bis_faktor * grenze:
             return (f"{self.gegen(anderer)[0]}, angegeben sind "
                     f"{self.zahl(wert)} und {anderer.zahl(grenze)}.")
         return ""

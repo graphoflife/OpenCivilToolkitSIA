@@ -1,5 +1,5 @@
 ---
-erzeugt: fc1d27ff3d81
+erzeugt: 2d799582dca4
 art: modul
 tags: [modul]
 ---
@@ -17,7 +17,13 @@ Zeichnung brauchen, ohne Rechenwerk und ohne Herleitung, in mm und N/mm²:
 * je Beton und je Betonstahl eine Gruppe dazu ([[opencivil.verbund.querschnitt#Verbundquerschnitt|Verbundquerschnitt.gruppen]]);
 * den Querschnitt starr-plastisch ([[opencivil.verbund.querschnitt#Verbundquerschnitt.starr|Verbundquerschnitt.starr]]), je
   Gruppe mit der Festigkeit, die die Nachweise waehlen
-  ([[opencivil.querschnitt.plastisch]]);
+  ([[opencivil.querschnitt.plastisch]]) -- und in den zwei Teilen, die
+  nur die Duebel verbinden ([[opencivil.verbund.querschnitt#Verbundquerschnitt.getrennt|Verbundquerschnitt.getrennt]], siehe
+  unten);
+* ob der Baustahl ein doppelsymmetrisches Profil ist -- fuer (29)
+  ([[opencivil.verbund.querschnitt#Verbundquerschnitt.doppelsymmetrisch|Verbundquerschnitt.doppelsymmetrisch]]) --, und auf welcher Seite
+  des Baustahls der Beton liegt: zieht ein Moment diese Seite, liegt es im
+  Bereich negativer Momente ([[opencivil.verbund.querschnitt#Verbundquerschnitt.zum_beton|Verbundquerschnitt.zum_beton]]);
 * was 5.1.2.2 fuer `β` misst: die Hoehe quer zur Nulllinie und wie weit der
   gedrueckte Beton von ihr reicht;
 * die Klasse jedes Blechs an einer plastischen Nulllinie
@@ -33,6 +39,19 @@ Flaeche um seine Mitte, eine verschmierte Linie ein Rechteck ihrer Flaeche
 ueber ihre Laenge; beide verdraengen den Beton, in dem sie liegen, wie im
 Stahlbeton. Liegt die Nulllinie in einem Stab, verteilt sich seine Kraft so
 ueber das Quadrat -- nach Vorgabe, nicht nachgeschlagen.
+
+
+## WAS DIE DUEBEL VERBINDEN
+
+Die Kopfbolzenduebel sitzen in der Fuge zwischen dem Beton und dem Profil.
+Auf der einen Seite liegen Beton und Betonstahl ausserhalb der Profile --
+die Platte --, auf der anderen der Baustahl mit dem Beton und den Staeben in
+seiner konvexen Huelle: Kammerbeton zaehlt zum Stahl, denn er ist mit dem
+Steg verbunden (5.2.1.2), nicht ueber die Duebel der Fuge (nach Vorgabe,
+nicht nachgeschlagen). Was in der Huelle liegt, schneidet das Werkzeug aus
+jedem Stueck aus ([[opencivil.querschnitt.geometrie#in_huelle|in_huelle]]): mit
+umgekehrtem Gewicht auf der Seite des Betons, mit seinem eigenen auf der
+des Stahls, dort mit dem Zusatz «in der Kammer» ([[opencivil.verbund.querschnitt#Verbundquerschnitt.fuge|Verbundquerschnitt.fuge]]).
 
 
 ## DIE KLASSEN (4.2.2.1, Tabellen 2 und 3)
@@ -113,6 +132,53 @@ def starr(self, zug: Sequence[float], druck: Sequence[float], stahl: Optional[St
 
 Der Querschnitt starr-plastisch, je Gruppe mit `zug` und `druck`.
 
+#### Verbundquerschnitt.fuge
+
+```python
+@cached_property
+def fuge(self) -> Tuple[Tuple[Stueck, ...], Tuple[Stueck, ...]]
+```
+
+Beton und Betonstahl je auf ihrer Seite der Fuge (siehe Dateikopf):
+ausserhalb der Profile -- mit dem, was in ihrer Huelle liegt,
+abgezogen --, und in der Huelle eines Profils.
+
+#### Verbundquerschnitt.getrennt
+
+```python
+def getrennt(self, zug: Sequence[float], druck: Sequence[float], stahl: Optional[Stahlquerschnitt]=None) -> Tuple[Starrplastisch, Starrplastisch]
+```
+
+Der Querschnitt starr-plastisch in den zwei Teilen, die nur die Duebel
+verbinden ([[opencivil.verbund.querschnitt#Verbundquerschnitt.fuge|fuge]]): Beton und Betonstahl ausserhalb der Profile,
+und der Baustahl -- mit `stahl`, wo die Querkraft ihm einen Teil
+genommen hat -- mit dem Kammerbeton. Je Gruppe mit `zug` und
+`druck`.
+
+#### Verbundquerschnitt.doppelsymmetrisch
+
+```python
+@property
+def doppelsymmetrisch(self) -> bool
+```
+
+Ob der Baustahl ein einziges Profil mit zwei Symmetrieachsen ist: ein
+I-Profil oder ein Rohr. Ein frei gezeichneter Baustahl zaehlt nicht,
+auch wo er symmetrisch ist -- das Werkzeug prueft es nicht.
+
+#### Verbundquerschnitt.zum_beton
+
+```python
+@cached_property
+def zum_beton(self) -> Optional[Tuple[float, float]]
+```
+
+Ueber die Fuge ([[opencivil.verbund.querschnitt#Verbundquerschnitt.fuge|fuge]]): vom Schwerpunkt des Stahls mit dem
+Kammerbeton zu dem von Beton und Betonstahl ausserhalb der Profile,
+in mm, je nach Flaeche. `None`, wo ausserhalb nichts liegt oder die
+Schwerpunkte keinen Millimeter auseinander -- dort hat der Beton keine
+Seite.
+
 #### Verbundquerschnitt.flaechen_je_gruppe
 
 ```python
@@ -172,6 +238,9 @@ Ob Beton im I-Profil den Flansch innen, den Steg beidseits deckt -- siehe Dateik
 - `BREITE_BETON = 0.8` – Wie breit der Beton nach dem Bild der Tabelle 3 mindestens ist: `b_c/b`.
 - `NEBEN = 1.0` – Wie weit neben dem Flansch und an wie vielen Stellen geprueft wird, ob Beton ihn deckt.
 - `STELLEN = 5`
+- `DOPPELSYMMETRISCH = (I_PROFIL, RECHTECKROHR_KALT, RUNDROHR)` – Die Formen, deren Profile zwei Symmetrieachsen haben.
+- `IN_DER_KAMMER = 'in der Kammer'` – Wie ein Stueck heisst, das in der Huelle eines Profils liegt -- siehe Dateikopf.
+- `SEITE_AB = 1.0` – Wie weit die Schwerpunkte von Baustahl und Beton mindestens auseinander liegen, in mm, damit der Beton eine Seite hat.
 
 ## Braucht
 

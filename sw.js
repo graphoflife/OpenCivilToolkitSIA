@@ -46,7 +46,7 @@ const VORRAT = {
   "dateien": [
     "web/css/10-grundlage.css?v=30da920ef6f8",
     "web/css/20-seite.css?v=19d8f278cf18",
-    "web/css/30-eingaben.css?v=d59c4dc1bd5d",
+    "web/css/30-eingaben.css?v=4df9340d1a13",
     "web/css/40-bericht.css?v=516a6b56cf3a",
     "web/css/50-schmal.css?v=231ea1be6ff4",
     "web/css/60-zeichenfenster.css?v=d430e20c38fd",
@@ -87,7 +87,7 @@ const VORRAT = {
     "web/js/dk_grundriss.js?v=3377f145094a",
     "web/js/dk_schnitt.js?v=1cc553f65830",
     "web/js/dk_zeichnung.js?v=618ccb6403bb",
-    "web/js/dom.js?v=1ef2298a4b8e",
+    "web/js/dom.js?v=ad34f5100d4b",
     "web/js/ds_ansicht.js?v=126bc2761415",
     "web/js/ds_grundriss.js?v=4f1f43cfdf19",
     "web/js/ds_zeichnung.js?v=232bf46b0015",
@@ -134,16 +134,16 @@ const VORRAT = {
     "web/js/qa_uebersicht.js?v=73ae3989fa1b",
     "web/js/qa_vorlagen.js?v=d617741b20c0",
     "web/js/qa_zeichnung.js?v=cb9933c6959b",
-    "web/js/querschnittsanalyse.js?v=1a8d60e48507",
+    "web/js/querschnittsanalyse.js?v=8c0377a2899f",
     "web/js/setzung.js?v=21db1c68db33",
-    "web/js/sinnbilder.js?v=5fd50f07b33c",
+    "web/js/sinnbilder.js?v=3e27e0239aa9",
     "web/js/spannungsbild.js?v=5bf6ce4eb080",
     "web/js/sz_zeichnung.js?v=8ce828560c47",
     "web/js/variablen.js?v=7d43b6f38cd9",
     "web/js/zeichnen.js?v=da6e8eec5dc8",
     "web/js/zustand.js?v=3385a39c0f84",
-    "web/kern/notizbuch.json?v=cd460be8e21a",
-    "web/kern/quellen.json?v=2a3a9f353160"
+    "web/kern/notizbuch.json?v=fcb95f343463",
+    "web/kern/quellen.json?v=7d92e632ecf5"
   ],
   "fremd": {
     "web/vendor/jetbrains-mono/": {
