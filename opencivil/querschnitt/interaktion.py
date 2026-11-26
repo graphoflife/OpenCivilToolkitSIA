@@ -146,6 +146,14 @@ class Werkstoff:
     verdraengbar: bool = False
     """Ob ein Stab ihn an seiner Stelle ersetzt -- beim Beton ja."""
 
+    grenzname: str = ""
+    """
+    Wie seine Dehnungsgrenze heisst, wo er nur an einer Stelle liegt -- ein
+    Spannglied hat seinen eigenen Werkstoff
+    (:mod:`opencivil.querschnitt.spannglieder`) und heisst wie das Glied.
+    Leer: «Beton C30/37, Rand oben», «Stahl B500B, äusserste Lage unten».
+    """
+
 
 @dataclass(frozen=True)
 class Teil:
@@ -452,6 +460,8 @@ class Querschnitt:
         beton: Optional[Tuple[float, float]] = None
         for w, vs in sorted(lagen.items()):
             stoff = self.werkstoffe[w]
+            if not (math.isfinite(stoff.eps_min) or math.isfinite(stoff.eps_max)):
+                continue  # ein Spannglied ohne Verbund: seine Kraft haengt an keiner Dehnung
             ist_beton = stoff.c_punkt is not None
             art = f"Beton {stoff.name}" if ist_beton else f"Stahl {stoff.name}"
             v_min, v_max = min(vs), max(vs)
@@ -462,8 +472,8 @@ class Querschnitt:
                 seite = seiten[1] if gross else seiten[0]
                 grenzen.append(Dehnungsgrenze(
                     arm=v, eps_min=stoff.eps_min, eps_max=stoff.eps_max,
-                    name=f"{art}, Rand {seite}" if ist_beton
-                    else f"{art}, äusserste Lage {seite}"))
+                    name=stoff.grenzname or (f"{art}, Rand {seite}" if ist_beton
+                                             else f"{art}, äusserste Lage {seite}")))
             if ist_beton:
                 eps_c1d, eps_c2d = stoff.c_punkt
                 anteil = anteil_punkt_c(eps_c1d, eps_c2d)

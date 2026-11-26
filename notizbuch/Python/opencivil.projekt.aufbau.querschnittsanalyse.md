@@ -1,5 +1,5 @@
 ---
-erzeugt: 4a3eaa279688
+erzeugt: fea355e890b6
 art: modul
 tags: [modul]
 ---
@@ -59,10 +59,32 @@ def _analyse(eintrag: QuerschnittsanalyseEintrag, baustoffe: Mapping[str, Bausto
 Aus der Beschreibung das Bauteil. Laesst sich die Zeichnung nicht
 rechnen, ein [[opencivil.querschnitt.geometrie#GeometrieFehler|GeometrieFehler]] mit dem ersten Grund.
 
+### _glied
+
+```python
+def _glied(g: Mapping, stahl: Baustoff, wo: str) -> Spannglied
+```
+
+Ein Spannglied mit seinem Spannstahl -- und dem Erzeugnis, das sein
+Durchmesser in der Sorte waehlt. Nennt Tabelle 7 keines, fehlt die Wahl
+noch ([[opencivil.projekt.aufbau.querschnittsanalyse#erzeugnis_grund|erzeugnis_grund]]).
+
+### erzeugnis_grund
+
+```python
+def erzeugnis_grund(name: str, sorte: str, durchmesser: float) -> str
+```
+
+Warum ein Spannglied noch kein Erzeugnis hat -- die eine Stelle fuer den
+Aufbau und das Zeichenfenster ([[opencivil.web.zeichengeometrie]]). Es
+fehlt nur eine Wahl, etwa nach dem Wechsel zu einer Sorte, die es nur in
+Staeben gibt.
+
 
 ## Braucht
 
 - [[opencivil.material.basis]]
+- [[opencivil.material.spannstahl]]
 - [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.qa_kennzahlen]]
 - [[opencivil.nachweis.qa_knicken]]
@@ -76,7 +98,9 @@ rechnen, ein [[opencivil.querschnitt.geometrie#GeometrieFehler|GeometrieFehler]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.biegung]]
 - [[opencivil.querschnitt.geometrie]]
+- [[opencivil.querschnitt.spannglieder]]
 
 ## Gebraucht von
 
 - [[opencivil.projekt.aufbau]]
+- [[opencivil.web.zeichengeometrie]]

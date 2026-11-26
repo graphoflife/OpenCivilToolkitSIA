@@ -137,6 +137,18 @@ SPANNSTAHLSORTEN: Dict[str, Spannstahlsorte] = {
 ERSTER_SPANNSTAHL = "Y1860"
 
 
+def erzeugnis(sorte: str, durchmesser: float) -> Optional[Erzeugnis]:
+    """
+    Das Erzeugnis der Sorte mit diesem Durchmesser -- ``None``, wenn Tabelle 7
+    es fuer die Sorte nicht nennt. Je Sorte hat jedes einen eigenen
+    Durchmesser; daran waehlt ein Spannglied seines.
+    """
+    s = SPANNSTAHLSORTEN.get(sorte)
+    if s is None:
+        return None
+    return next((e for e in s.erzeugnisse if abs(e.durchmesser - durchmesser) < 1e-9), None)
+
+
 def spannstahlsorten_zum_anlegen() -> List[str]:
     """Die Sorten in der Reihenfolge, in der neue angelegt werden -- wie in Tabelle 10."""
     return [ERSTER_SPANNSTAHL] + [s for s in SPANNSTAHLSORTEN if s != ERSTER_SPANNSTAHL]

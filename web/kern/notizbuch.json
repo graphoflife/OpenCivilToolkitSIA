@@ -151,6 +151,12 @@
       "bereich": "Baustoffe"
     },
     {
+      "name": "Spannstahl",
+      "pfad": "Formelsammlung/Themen/Spannstahl.md",
+      "art": "thema",
+      "bereich": "Baustoffe"
+    },
+    {
       "name": "Querkraft",
       "pfad": "Formelsammlung/Themen/Querkraft.md",
       "art": "thema",
@@ -577,10 +583,12 @@
       "pfad": "Formelsammlung/Formeln/Bemessungswert der Fliessgrenze.md",
       "art": "formel",
       "zeichen": [
-        "f_{yd}"
+        "f_{yd}",
+        "f_{pd}"
       ],
       "themen": [
-        "Betonstahl"
+        "Betonstahl",
+        "Spannstahl"
       ]
     },
     {
@@ -1779,12 +1787,15 @@
       "art": "formel",
       "zeichen": [
         "\\varepsilon_{yd}",
-        "\\varepsilon_y"
+        "\\varepsilon_y",
+        "\\varepsilon_{pd}",
+        "\\varepsilon_{pd}^{\\mathrm{Litze}}"
       ],
       "themen": [
         "Betonstahl",
         "Kennzahlen",
         "Baustahl",
+        "Spannstahl",
         "Stahlspannung aus Rissbreite",
         "Spannung-Dehnung-Analyse"
       ]
@@ -1988,6 +1999,18 @@
       ],
       "themen": [
         "Erdbeben"
+      ]
+    },
+    {
+      "name": "Grenzen der Spannung im Spannstahl",
+      "pfad": "Formelsammlung/Formeln/Grenzen der Spannung im Spannstahl.md",
+      "art": "formel",
+      "zeichen": [
+        "\\sigma_{p,max}",
+        "\\sigma_{p,min}"
+      ],
+      "themen": [
+        "Querschnittsanalyse"
       ]
     },
     {
@@ -2499,6 +2522,19 @@
       ]
     },
     {
+      "name": "Moment aus der Vorspannung",
+      "pfad": "Formelsammlung/Formeln/Moment aus der Vorspannung.md",
+      "art": "formel",
+      "zeichen": [
+        "M_{p,y}"
+      ],
+      "themen": [
+        "Sprödes Versagen je Richtung",
+        "Zwängung auf Biegung",
+        "Spannung-Dehnung-Analyse"
+      ]
+    },
+    {
       "name": "Moment der Bewehrung bei zulässiger Stahlspannung",
       "pfad": "Formelsammlung/Formeln/Moment der Bewehrung bei zulässiger Stahlspannung.md",
       "art": "formel",
@@ -2596,6 +2632,19 @@
       ],
       "themen": [
         "Querkraft"
+      ]
+    },
+    {
+      "name": "Normalkraft aus der Vorspannung",
+      "pfad": "Formelsammlung/Formeln/Normalkraft aus der Vorspannung.md",
+      "art": "formel",
+      "zeichen": [
+        "N_p"
+      ],
+      "themen": [
+        "Sprödes Versagen je Richtung",
+        "Zwängung auf Biegung",
+        "Spannung-Dehnung-Analyse"
       ]
     },
     {
@@ -2861,6 +2910,17 @@
       ]
     },
     {
+      "name": "Querschnitt eines Spannglieds",
+      "pfad": "Formelsammlung/Formeln/Querschnitt eines Spannglieds.md",
+      "art": "formel",
+      "zeichen": [
+        "A_{p,1}"
+      ],
+      "themen": [
+        "Querschnittsanalyse"
+      ]
+    },
+    {
       "name": "Radius des Bewehrungskreises",
       "pfad": "Formelsammlung/Formeln/Radius des Bewehrungskreises.md",
       "art": "formel",
@@ -2993,6 +3053,18 @@
         "Sprödes Versagen",
         "Zwängung auf Biegung",
         "Sprödes Versagen je Richtung"
+      ]
+    },
+    {
+      "name": "Rissmoment des ungerissenen, vorgespannten Querschnitts",
+      "pfad": "Formelsammlung/Formeln/Rissmoment des ungerissenen, vorgespannten Querschnitts.md",
+      "art": "formel",
+      "zeichen": [
+        "M_{Riss}"
+      ],
+      "themen": [
+        "Sprödes Versagen je Richtung",
+        "Zwängung auf Biegung"
       ]
     },
     {
@@ -3168,6 +3240,28 @@
       ]
     },
     {
+      "name": "Spannglied im Querschnitt",
+      "pfad": "Formelsammlung/Formeln/Spannglied im Querschnitt.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Schiefe Biegung",
+        "Zwängung auf Biegung",
+        "Stahlspannung aus Rissbreite"
+      ]
+    },
+    {
+      "name": "Spannkraft eines Spannglieds",
+      "pfad": "Formelsammlung/Formeln/Spannkraft eines Spannglieds.md",
+      "art": "formel",
+      "zeichen": [
+        "P_{\\infty,1}"
+      ],
+      "themen": [
+        "Querschnittsanalyse"
+      ]
+    },
+    {
       "name": "Spannung aus dem Moment an der Ecke, die zuerst reisst",
       "pfad": "Formelsammlung/Formeln/Spannung aus dem Moment an der Ecke, die zuerst reisst.md",
       "art": "formel",
@@ -3176,6 +3270,31 @@
       ],
       "themen": [
         "Spannung-Dehnung-Analyse"
+      ]
+    },
+    {
+      "name": "Spannung aus der Vorspannung an der Ecke",
+      "pfad": "Formelsammlung/Formeln/Spannung aus der Vorspannung an der Ecke.md",
+      "art": "formel",
+      "zeichen": [
+        "\\sigma_p"
+      ],
+      "themen": [
+        "Sprödes Versagen je Richtung",
+        "Zwängung auf Biegung",
+        "Spannung-Dehnung-Analyse"
+      ]
+    },
+    {
+      "name": "Spannung im Spannglied nach Vorgabe",
+      "pfad": "Formelsammlung/Formeln/Spannung im Spannglied nach Vorgabe.md",
+      "art": "formel",
+      "zeichen": [
+        "\\sigma_{p0,1}",
+        "\\sigma_{p\\infty,1}"
+      ],
+      "themen": [
+        "Querschnittsanalyse"
       ]
     },
     {
@@ -3591,6 +3710,17 @@
       ]
     },
     {
+      "name": "Vordehnung eines Spannglieds",
+      "pfad": "Formelsammlung/Formeln/Vordehnung eines Spannglieds.md",
+      "art": "formel",
+      "zeichen": [
+        "\\varepsilon_{p,1}"
+      ],
+      "themen": [
+        "Querschnittsanalyse"
+      ]
+    },
+    {
       "name": "Was die Zellen tragen",
       "pfad": "Formelsammlung/Formeln/Was die Zellen tragen.md",
       "art": "formel",
@@ -3931,7 +4061,8 @@
       ],
       "themen": [
         "Stahlspannung aus Rissbreite",
-        "Zwängung auf Normalkraft"
+        "Zwängung auf Normalkraft",
+        "Zwängung auf Biegung"
       ]
     },
     {
@@ -4168,6 +4299,7 @@
         "Eingaben.hat",
         "Eingaben.g",
         "Eingaben.si_nach_id",
+        "Eingaben.nach_id",
         "Eingaben.groessen",
         "Eingaben.teilmenge",
         "Ausfuehrung",
@@ -5645,6 +5777,7 @@
         "Erzeugnis.modul",
         "Erzeugnis.bezeichnung",
         "Spannstahlsorte",
+        "erzeugnis",
         "spannstahlsorten_zum_anlegen",
         "spannstahl"
       ]
@@ -6024,6 +6157,7 @@
         "AnalyseStellen.protokoll_verfahren",
         "AnalyseStellen.protokoll_einwirkung",
         "AnalyseStellen.protokoll_ebene",
+        "glieder_im_gleichgewicht",
         "_tabelle_gezogen",
         "betonflaechen",
         "RissnormalkraftQA",
@@ -6158,6 +6292,7 @@
         "Faserloeser.kruemmung",
         "Faserloeser.loese",
         "Faserloeser._von_vorn",
+        "Faserloeser._null_im_gleichgewicht",
         "Faserloeser._probenschranken",
         "Faserloeser._mit_probe",
         "Faserloeser._suchen",
@@ -6268,11 +6403,19 @@
         "rissmoment_wert",
         "protokoll_rissmoment_rechteck",
         "Ecke",
+        "Druckglied",
+        "Vorspannung",
+        "Vorspannung.N",
+        "Vorspannung.M_y",
+        "Vorspannung.M_z",
+        "Vorspannung.ids",
         "Bruttoquerschnitt",
         "Bruttoquerschnitt.ausdehnung",
         "Bruttoquerschnitt.einheitsspannung",
+        "Bruttoquerschnitt.vorspannung_an",
         "rissbezuege",
         "bruttoquerschnitt",
+        "_vorspannung",
         "bruttoquerschnitt_rechteck",
         "Rissmoment",
         "rissmoment",
@@ -6281,6 +6424,8 @@
         "protokoll_spannung_ungerissen",
         "protokoll_ecke",
         "protokoll_widerstandsmoment",
+        "protokoll_vorspannung",
+        "_summe",
         "protokoll_rissmoment",
         "_w_vorlage"
       ]
@@ -6380,6 +6525,7 @@
         "Grenzen",
         "Grenzen.gruppe",
         "Grenzen.sigma",
+        "Grenzen.gezogen",
         "Grenzen.strengste",
         "nach_stahl",
         "je_stahl",
@@ -6970,6 +7116,7 @@
         "Grund",
         "materialgrund",
         "ueberschreibungen_setzen",
+        "baustoff_im_werk",
         "stoffe_von",
         "spannungsfaelle",
         "spannungsnachweise",
@@ -7008,7 +7155,9 @@
       "stichworte": [
         "bauen",
         "_in_si",
-        "_analyse"
+        "_analyse",
+        "_glied",
+        "erzeugnis_grund"
       ]
     },
     {
@@ -7089,7 +7238,8 @@
         "charakteristisch",
         "_alles_einmal",
         "_beweglich",
-        "_raumrahmen"
+        "_raumrahmen",
+        "_spannbeton"
       ]
     },
     {
@@ -7478,6 +7628,7 @@
         "QuerschnittsanalyseEintrag._kennung",
         "QuerschnittsanalyseEintrag.polygon",
         "QuerschnittsanalyseEintrag.stab",
+        "QuerschnittsanalyseEintrag.spannglied",
         "QuerschnittsanalyseEintrag.stablinie",
         "QuerschnittsanalyseEintrag.schubwand",
         "QuerschnittsanalyseEintrag.hilfslinie",
@@ -7510,6 +7661,15 @@
       "stichworte": [
         "SkriptEintrag",
         "SkriptEintrag.neu"
+      ]
+    },
+    {
+      "name": "opencivil.projekt.spannglieder",
+      "pfad": "Python/opencivil.projekt.spannglieder.md",
+      "art": "modul",
+      "kurz": "ein Spannglied, wie die Oberflaeche es beschreibt.",
+      "stichworte": [
+        "SpanngliedEintrag"
       ]
     },
     {
@@ -7595,14 +7755,17 @@
         "Querschnittsanalyse.zugseiten",
         "Querschnittsanalyse.abschnitt",
         "Querschnittsanalyse.baustoffe",
+        "Querschnittsanalyse.baustoffe_mit_werkstoff",
         "Querschnittsanalyse.aufbau_protokollieren",
         "Querschnittsanalyse.torsion_protokollieren",
         "Querschnittsanalyse.angaben",
         "Querschnittsanalyse.werkstoffbezuege",
+        "Querschnittsanalyse.stoff_von_werkstoff",
         "Querschnittsanalyse.kennwert",
         "Querschnittsanalyse.werkstoffe",
         "Querschnittsanalyse.querschnitt",
         "Querschnittsanalyse.werkstoffe_protokollieren",
+        "Querschnittsanalyse.gliedgesetze_protokollieren",
         "Querschnittsanalyse.grundbezuege",
         "Querschnittsanalyse.interaktion",
         "Querschnittsanalyse.geometrie",
@@ -7774,6 +7937,8 @@
         "Werkstoffsatz.beton_zeichen",
         "Werkstoffsatz.betonkennwerte",
         "Werkstoffsatz.stahlkennwerte",
+        "Werkstoffsatz.spannstahl",
+        "Werkstoffsatz.spannstahlkennwerte",
         "Rechenart",
         "Rechenart.beschriftung",
         "Rechenart.kurz",
@@ -7801,6 +7966,7 @@
         "Rechenwahl.art_von",
         "Rechenwahl.art",
         "Rechenwahl.betonkennwerte",
+        "Rechenwahl.kennwerte",
         "Rechenwahl.index",
         "Rechenwahl.beschriftung",
         "Rechenwahl.gleiche_linie",
@@ -7962,6 +8128,54 @@
         "widerstand",
         "Laengszug",
         "laengszug"
+      ]
+    },
+    {
+      "name": "opencivil.querschnitt.spannglieder",
+      "pfad": "Python/opencivil.querschnitt.spannglieder.md",
+      "art": "modul",
+      "kurz": "Spannglieder im gezeichneten Querschnitt.",
+      "stichworte": [
+        "Spannwirkung",
+        "Spannwirkung.beschriftung",
+        "Spannwirkung.kurz",
+        "Spannwirkung.erklaerung",
+        "Verbund",
+        "Verbund.beschriftung",
+        "Verbund.kurz",
+        "Verbund.erklaerung",
+        "vorspannung",
+        "grenze_nach_spannen",
+        "grenzen_verletzt",
+        "flaechendurchmesser",
+        "VorgedehnterSpannstahl",
+        "VorgedehnterSpannstahl.abzug",
+        "VorgedehnterSpannstahl.eps_yd",
+        "VorgedehnterSpannstahl.eps_ud",
+        "VorgedehnterSpannstahl.formel",
+        "VorgedehnterSpannstahl.latex",
+        "Restfestigkeit",
+        "Restfestigkeit.abzug",
+        "Restfestigkeit.latex",
+        "FesteSpannung",
+        "FesteSpannung.formel",
+        "FesteSpannung.protokoll",
+        "Spannglied",
+        "Spannglied.punkte",
+        "Spannglied.lage",
+        "Spannglied.menge",
+        "Spannglied.kurzmenge",
+        "Spannglied.rissdurchmesser",
+        "Spannglied.durchmesser",
+        "Spannglied.als_bewehrung",
+        "aus_glied",
+        "Spannglieder",
+        "Spannglieder.gliedbezuege",
+        "Spannglieder.spannkraefte",
+        "Spannglieder.werkstoffe",
+        "Spannglieder.gesetze_protokollieren",
+        "Spannglieder.rechne",
+        "Spannglieder._glied"
       ]
     },
     {
@@ -8189,6 +8403,7 @@
         "Paar.ebenen",
         "Paar.I_c",
         "Paar.A_c",
+        "Paar.vorgespannt",
         "Paar.rissmoment_bei",
         "Paar.rissnormalkraft_bei",
         "Paar.tiefe",
@@ -8280,13 +8495,15 @@
         "Bruttoriss.rissnormalkraft_bei",
         "Bruttoriss.I_c",
         "Bruttoriss.A_c",
+        "Bruttoriss.vorgespannt",
         "Bruttoriss.herleitung_bruttoquerschnitt",
         "Bruttoriss.herleitung_dicke_unter_zug",
         "Bruttoriss.herleitung_riss",
         "Bruttoriss._herleitung_rissmoment",
         "Bruttoriss._herleitung_rissnormalkraft",
         "Bruttoriss.herleitung_traegheit",
-        "Bruttoriss.herleitung_flaeche"
+        "Bruttoriss.herleitung_flaeche",
+        "_Abzug"
       ]
     },
     {
@@ -8769,7 +8986,6 @@
         "loesung_dict",
         "kennzahltabellen",
         "zusammenfassungen",
-        "geometrie",
         "zuordnung",
         "_werte",
         "_systemzuordnung"
@@ -9071,6 +9287,17 @@
       "stichworte": [
         "_balkensystem",
         "zeichendaten"
+      ]
+    },
+    {
+      "name": "opencivil.web.zeichengeometrie",
+      "pfad": "Python/opencivil.web.zeichengeometrie.md",
+      "art": "modul",
+      "kurz": "die Zeichnung einer Querschnittsanalyse, wie der Kern sie sieht.",
+      "stichworte": [
+        "geometrie",
+        "_Glieder",
+        "_spannglieder"
       ]
     },
     {

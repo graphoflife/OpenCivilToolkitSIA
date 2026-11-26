@@ -1,5 +1,5 @@
 ---
-erzeugt: e643284cf244
+erzeugt: 3a0cef067e1f
 art: modul
 tags: [modul]
 ---
@@ -276,7 +276,8 @@ def _bruch(q, bauteil, punkt) -> dict
 ```
 
 Der Bruchzustand im Schnitt: die Nulllinie, die gedrueckte Flaeche je
-Polygon und die Dehnung jedes Stabs -- in mm und ‰.
+Polygon und die Dehnung jedes Stabs und Spannglieds -- in mm und ‰, beim
+Glied die des Betons an seiner Stelle.
 
 Gedrueckt ist die Seite kleiner v: die Kruemmung zeigt nie gegen die
 Zugrichtung. Ohne Kruemmung ist alles gedrueckt oder nichts.

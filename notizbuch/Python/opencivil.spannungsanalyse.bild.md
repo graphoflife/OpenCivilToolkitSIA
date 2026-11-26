@@ -1,5 +1,5 @@
 ---
-erzeugt: 8ab3ab4fa347
+erzeugt: 6e340a7fa8e7
 art: modul
 tags: [modul]
 ---
@@ -128,6 +128,7 @@ Eine verletzte Grenze im Hinweis: «Stahl der 1. Lage bei 47.3 ‰, gilt bis 45.
 - [[opencivil.nachweis.querschnittsloeser]]
 - [[opencivil.querschnitt.fasern]]
 - [[opencivil.querschnitt.gesetzwahl]]
+- [[opencivil.querschnitt.spannglieder]]
 - [[opencivil.querschnitt.werkstoffgesetz]]
 - [[opencivil.spannungsanalyse.linie]]
 

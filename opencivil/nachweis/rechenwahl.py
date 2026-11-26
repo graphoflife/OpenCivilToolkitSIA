@@ -352,20 +352,19 @@ def protokoll_gesetze_nach_wahl(p: Protokoll, e: Eingaben, analyse: Querschnitts
     """
     phi = Zwischenwerte(basis).zahl("phi", r"\varphi", wahl.kriechzahl, stellen=2)
     werkstoffe, index = analyse.werkstoffe(e.si_nach_id(), wahl)
-    for stoff in analyse.baustoffe:
+    for stoff in analyse.baustoffe_mit_werkstoff:
         unter = f"{basis}.{kennung_aus(stoff.id)}"
+        werte = {rolle: e[stoff.eingabename(name)]
+                 for rolle, name in wahl.kennwerte(stoff).items()}
         if stoff.art is Baustoffart.BETON:
-            werte = {rolle: e[stoff.eingabename(name)]
-                     for rolle, name in wahl.betonkennwerte(stoff).items()}
             if wahl.art_von(stoff).mit_kriechzahl:
                 protokoll_wirksamer_modul(p, werte["E_c"], phi, unter,
                                           titel=f"Wirksamer Elastizitätsmodul {stoff.name}")
             werte["E_c"] = wirksamer_modul_wert(werte["E_c"], wahl.kriechzahl, unter)
-        else:
-            werte = {rolle: e[stoff.eingabename(name)]
-                     for rolle, name in wahl.satz(stoff).stahlkennwerte.items()}
         werkstoffe[index(stoff)].gesetz.protokoll(p, werte, titel=f"{titel}, {stoff.name}",
                                                   basis=unter)
+    analyse.gliedgesetze_protokollieren(p, e, werkstoffe, wahl, basis=basis,
+                                        titel=lambda g: f"{titel}, {g.name}")
 
 
 def gesetze(wahl: Rechenwahl, w: Betonkennwerte, *, ungerissen: bool = False) -> Gesetze:

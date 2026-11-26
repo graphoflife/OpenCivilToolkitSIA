@@ -46,7 +46,7 @@ from opencivil.projekt.eintraege import (
 from opencivil.geotechnik.fundament import Fundament
 from opencivil.geotechnik.setzung import Setzungsfundament
 from opencivil.pfahl.pfahl import Pfahl
-from opencivil.projekt.lesen import ProjektFehler, als_groesse, anhalten
+from opencivil.projekt.lesen import ProjektFehler, als_groesse, anhalten, ort_von
 from opencivil.stabwerk.rechnung import Balkensystem
 from opencivil.stabwerk3d.rechnung import Balkensystem3d
 from opencivil.decke.werk import Deckensystem
@@ -540,7 +540,7 @@ def materialgrund(kennung: str, gefunden: Optional[Tuple[str, str]], art: str) -
     Namen: den kennt das Projekt nicht mehr, und die Kennung steht nirgends,
     wo der Benutzer sie saehe -- bis 2026-11-19 hiess es «das Material 'b9'».
     Die Regel fuer :func:`material` und fuer die Meldungen an der Zeichnung
-    (:func:`opencivil.web.api.geometrie`).
+    (:func:`opencivil.web.zeichengeometrie.geometrie`).
     """
     if gefunden is None:
         return Grund("das gewählte Material gibt es nicht mehr – eines wählen" if kennung
@@ -558,11 +558,31 @@ def ueberschreibungen_setzen(projekt: "Projekt", werk: Rechenwerk,
     """
     for eintrag in projekt.materialien:
         baustoff = aufbau.baustoffe.get(eintrag.kennung)
-        if baustoff is None:
-            continue
-        for kurzname, zahl in eintrag.ueberschreibungen.items():
-            definition = baustoff.definition(kurzname)
-            werk.setze(definition.id, Groesse(zahl, definition.einheit))
+        if baustoff is not None:
+            _ueberschreiben(werk, eintrag, baustoff)
+
+
+def _ueberschreiben(werk: Rechenwerk, eintrag: MaterialEintrag, baustoff: Baustoff) -> None:
+    for kurzname, zahl in eintrag.ueberschreibungen.items():
+        definition = baustoff.definition(kurzname)
+        werk.setze(definition.id, Groesse(zahl, definition.einheit))
+
+
+def baustoff_im_werk(eintrag: MaterialEintrag, werk: Rechenwerk) -> Optional[Baustoff]:
+    """
+    Ein Material als Baustoff in ``werk``, mit Abweichungen und
+    Ueberschreibungen, wie das Projekt es rechnet -- ohne das Projekt zu
+    bauen. ``None``, wenn es nicht rechnet: was ihm fehlt, sagt es selbst.
+    Fuer das Zeichenfenster, das zu einem Spannglied schon beim Zeichnen
+    seine Spannkraft nennt (:mod:`opencivil.web.zeichengeometrie`).
+    """
+    try:
+        baustoff = baustoff_bauen(eintrag, "", ort_von(eintrag))
+    except ProjektFehler:
+        return None
+    baustoff.ins_rechenwerk(werk)
+    _ueberschreiben(werk, eintrag, baustoff)
+    return baustoff
 
 
 def stoffe_von(aufbau: Aufbau, baustoffe: Iterable[Baustoff]) -> Dict[str, Baustoff]:

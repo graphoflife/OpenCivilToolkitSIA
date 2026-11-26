@@ -1,5 +1,5 @@
 ---
-erzeugt: ab6c2162c9c5
+erzeugt: e6cb06d44c95
 art: modul
 tags: [modul]
 ---
@@ -639,6 +639,7 @@ Oberflaeche und alle Berichte gehen.
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.lagenaufbau]]
 - [[opencivil.querschnitt.platte]]
+- [[opencivil.querschnitt.spannglieder]]
 - [[opencivil.querschnitt.werkstoffgesetz]]
 - [[opencivil.spannungsanalyse.analysen]]
 - [[opencivil.spannungsanalyse.herleitung]]
@@ -653,3 +654,4 @@ Oberflaeche und alle Berichte gehen.
 - [[opencivil.stabwerk3d.herleitung]]
 - [[opencivil.stabwerk3d.rechnung]]
 - [[opencivil.web.api]]
+- [[opencivil.web.zeichengeometrie]]

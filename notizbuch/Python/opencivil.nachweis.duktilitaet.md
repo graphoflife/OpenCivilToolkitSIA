@@ -1,5 +1,5 @@
 ---
-erzeugt: 36c47b9dc2f5
+erzeugt: 059d7319732e
 art: modul
 tags: [modul]
 ---
@@ -87,7 +87,9 @@ def hindernis(staehle: Sequence[Baustoff], f_ck: float) -> str
 
 Was an den Baustoffen die Bedingung ausschliesst, als Begruendung --
 leer, wenn nichts. Ein Stahl ohne Klasse, ein eigener, schliesst nichts
-aus: seine Klasse kennt nur, wer ihn angelegt hat.
+aus: seine Klasse kennt nur, wer ihn angelegt hat. Spannstahl in der
+Zugzone schliesst sie aus: die Regel nennt Betonstahl der Klassen B und
+C (4.1.4.2.5).
 
 ### protokoll_bedingung
 

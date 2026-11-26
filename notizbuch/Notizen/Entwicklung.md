@@ -7,6 +7,66 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-26 · Spannglieder in der Querschnittsanalyse
+
+Aus dem Plan vom 2026-11-25, Schritt 9, zweiter Teil: neben «Bewehrung»
+setzt ein Werkzeug «Spannstahl» Spannglieder in den Querschnitt, und jede
+Rechnung über die Fasern nimmt sie mit – Tragsicherheit, Gebrauch, Knicken,
+Kennzahlen und die Spannung-Dehnung-Analysen.
+
+- Vorher kannte ein gezeichneter Querschnitt nur Betonstahl. Nachher setzt
+  ein Klick ein Glied, und an ihm steht alles, wie beim Stab: der
+  Spannstahl, das Erzeugnis (je Art eine Zeile mit den Durchmessern aus
+  Tabelle 7), die Anzahl, die Wirkung [Vordehnung | schlaff] mit Bild,
+  σ_p0 und σ_p∞ (leer gilt die Vorgabe, ihre Zahl steht grau im Feld) und
+  der Verbund [mit | ohne]. Gezeichnet wird ein Kreis mit der Fläche des
+  Glieds; die Liste unter dem Fenster nennt P∞, das Bild des Querschnitts
+  und das Bruchbild zeigen die Glieder.
+- Das Beispiel von Hand (`tests/test_spannglieder.py`): Rechteck
+  300 × 600 mm aus C30/37 ohne Betonstahl, vier Litzen Y1860 ⌀15.7 bei
+  d = 500 mm, gerechnet mit dem Spannungsblock. A_p = 600 mm²,
+  σ_p∞ = 0.85 · 0.70 · 1860 = 1106.7 N/mm², ε_p = 5.68 ‰, P∞ = 664 kN.
+  M_Rd mit Vordehnung 359.3 kNm, schlaff 83.0 kNm, ohne Verbund 295.3 kNm,
+  schlaff ohne Verbund null. Das Rissmoment steigt mit der Vorspannung von
+  47.5 auf 246.7 kNm.
+- Drei Gesetze (`opencivil/querschnitt/spannglieder.py`): mit Vordehnung
+  und Verbund das Gesetz der Figur 17, um ε_p verschoben (4.1.5.1.5);
+  schlaff mit Restfestigkeit dasselbe, um σ_p∞ gesenkt (4.1.5.5.2); ohne
+  Verbund die feste Spannung σ_p∞ (4.1.5.1.6), schlaff null. Jedes Glied
+  bekommt im Faserlöser einen eigenen Werkstoff; seine Dehnungsgrenze heisst
+  wie das Glied.
+- Die Werte eines Glieds leitet eine Prozedur `Spannglieder` her, und die
+  Nachweise lesen sie aus dem Rechenwerk. Das Zeichenfenster bekommt
+  dieselben Zahlen: die Antwort zur Zeichnung steht jetzt in
+  `opencivil/web/zeichengeometrie.py` (aus `api.py` gezogen, das sonst an
+  tausend Zeilen gekommen wäre) und rechnet die Prozedur in einem kleinen
+  Rechenwerk. Ein fehlendes Erzeugnis ist grau; σ_p0 über Gleichung (22)
+  oder σ_p∞ unter 0.45·f_pk (4.1.5.2.3) ist rot, gerechnet wird trotzdem.
+- Die Nachweise: die Duktilität führt mit Spannstahl in der Zugzone keinen
+  Nachweis über x/d (4.1.4.2.5). Sprödes Versagen, Zwängung auf Biegung
+  und die Spannung-Dehnung-Analysen nehmen das Rissmoment mit der
+  Vorspannung (4.3.1.2; 4.4.3.2.4); es reisst die Ecke, an der am wenigsten
+  Druck aufzuheben ist. Die Zwängung auf Normalkraft zählt die Glieder noch
+  nicht, ein Hinweis sagt es. Die Stahlspannungen im Gebrauch gelten nur
+  dem Betonstahl; ohne ihn steht «Ohne Betonstahl → kein Nachweis.» –
+  vorher «Ohne Bewehrung …», auch bei der Platte.
+- Ohne Last ist ein vorgespannter Querschnitt nicht spannungslos: der
+  Faserlöser nimmt die Ebene null nur noch, wenn sie im Gleichgewicht ist,
+  und die Linien der Spannung-Dehnung-Analysen beginnen bei der Krümmung,
+  die die Vorspannung allein weckt.
+- Das Prüfprojekt «Jeder Nachweis» hat eine dritte Analyse, «Spannbeton»,
+  mit je einem Glied in jedem Gesetz; daraus stammen die neuen Seiten der
+  Formelsammlung, eine je Grösse.
+- Nebenbei im Zeichenfenster: ein leeres Nachbarfeld begrenzte ein Feld wie
+  eine Null – mit leerem σ_p0 wies σ_p∞ jede Zahl ab. `grenzeVerletzt`
+  (`web/js/dom.js`) überspringt es jetzt.
+- Gespeicherte Analysen bekommen beim Öffnen eine leere Liste
+  `spannglieder`.
+- Offen ([[TODO]]): die Vorgabe bei Y1100 und Y1030, die schon über
+  Gleichung (22) liegt; die Vordehnung ohne die Stauchung des Betons; die
+  Zwängung auf Normalkraft; der Spannungszuwachs nach 4.4.2.3.10; die
+  Neigung β_p (Schritt 9c) und das Hüllrohr nach Gleichung (44).
+
 ## 2026-11-26 · Spannstahl als Material
 
 Aus dem Plan vom 2026-11-25, Schritt 9, erster Teil: unter «Materialien»

@@ -1,5 +1,5 @@
 ---
-erzeugt: 65ccfad0f530
+erzeugt: ba03320a109f
 art: modul
 tags: [modul]
 ---
@@ -92,6 +92,16 @@ def gruppe(self, i: int) -> Grenzgruppe
 ```python
 def sigma(self, i: int) -> float
 ```
+
+#### Grenzen.gezogen
+
+```python
+def gezogen(self, eps_s: Sequence[float]) -> List[int]
+```
+
+Die gezogenen Stellen, die eine Grenze haben. Die Dehnungen einer
+Ebene nennen danach noch die Spannglieder (sie folgen dem
+Betonstahl); fuer sie gilt keine dieser Grenzen.
 
 #### Grenzen.strengste
 

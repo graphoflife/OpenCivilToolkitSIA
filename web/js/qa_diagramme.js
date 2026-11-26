@@ -220,8 +220,9 @@ function aussenmasse(gruppe, zeichnung, bild) {
 
 /**
  * Der Querschnitt, wie gezeichnet -- auch ohne Lastfall: die Flächen in der
- * Farbe ihres Baustoffs, Aussparungen gestrichelt, Stäbe und verschmierte
- * Linien, unten und links die Aussenmasse dessen, was Material hat, und der
+ * Farbe ihres Baustoffs, Aussparungen gestrichelt, Stäbe, verschmierte
+ * Linien und Spannglieder -- diese so gross wie ihre Fläche --, unten und
+ * links die Aussenmasse dessen, was Material hat, und der
  * Schwerpunkt S mit den Achsen y und z, um die die Momente drehen. Die
  * Masse in mm.
  */
@@ -269,6 +270,12 @@ function querschnittbild(z) {
       cx: x.toFixed(1), cy: y.toFixed(1), r: Math.max(2.4, (m * s.d) / 2).toFixed(1), class: 'cad-stab',
     }), [`${s.name}: ⌀${s.d} ${s.stahl}`]));
   }
+  for (const s of z.spannglieder) {
+    const [x, y] = bild([s.y, s.z]);
+    g.append(mitTitel(svgEl('circle', {
+      cx: x.toFixed(1), cy: y.toFixed(1), r: Math.max(2.4, (m * s.d) / 2).toFixed(1), class: 'cad-spannglied',
+    }), [`${s.name}: ${s.stahl}`]));
+  }
   aussenmasse(g, z, bild);
   schwerpunktZeichnen(g, z, bild);
   svg.append(g);
@@ -285,6 +292,8 @@ function querschnittbild(z) {
       ...einmal(z.staebe.map((s) => s.stahl)).map((stahl) => [probe('cad-stab', 'stab'), `Stäbe ${stahl}`]),
       ...einmal(z.flaechenlinien.map((l) => l.stahl))
         .map((stahl) => [probe('cad-linie-flaeche', 'linie'), `verschmiert ${stahl}`]),
+      ...einmal(z.spannglieder.map((s) => s.stahl))
+        .map((stahl) => [probe('cad-spannglied', 'stab'), `Spannglieder ${stahl}`]),
       `S: y = ${zahlText(yS)} mm, z = ${zahlText(zS)} mm · Masse in mm`,
     ]),
   ]);
@@ -292,7 +301,9 @@ function querschnittbild(z) {
 
 /**
  * Der Bruchzustand im Schnitt: Druckzone getönt, Nulllinie gestrichelt, die
- * Stäbe nach dem Vorzeichen ihrer Dehnung gefärbt.
+ * Stäbe nach dem Vorzeichen ihrer Dehnung gefärbt. Ein Spannglied steht in
+ * seiner eigenen Farbe: gezogen ist es fast immer, auch wo der Beton an
+ * seiner Stelle gestaucht ist -- sein Titel nennt die Dehnung des Betons.
  */
 function bruchbild(daten, fall) {
   const z = daten.zeichnung;
@@ -336,6 +347,11 @@ function bruchbild(daten, fall) {
     kreis.append(t);
     g.append(kreis);
   }
+  for (const s of b.spannglieder) {
+    const [x, y] = bild([s.y, s.z]);
+    g.append(mitTitel(svgEl('circle', { cx: x, cy: y, r: Math.max(2.6, (m * s.d) / 2), class: 'cad-spannglied' }),
+      [`ε = ${s.eps.toFixed(2)} ‰ – die Dehnung des Betons an seiner Stelle`]));
+  }
   schwerpunktZeichnen(g, z, bild);
   svg.append(g);
   return el('div.diagramm-huelle', {}, [
@@ -344,6 +360,7 @@ function bruchbild(daten, fall) {
       [flaeche(DRUCK), `Druckzone, x = ${b.x.toFixed(1)} mm`],
       [punkt(ZUG), 'Stab gezogen'],
       [punkt(DRUCK, { hohl: true }), 'Stab gedrückt'],
+      b.spannglieder.length ? [probe('cad-spannglied', 'stab'), 'Spannglied'] : null,
       b.d > 0 ? `d = ${b.d.toFixed(1)} mm` : null,
     ]),
   ]);

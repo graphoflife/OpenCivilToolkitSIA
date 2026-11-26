@@ -1,5 +1,5 @@
 ---
-erzeugt: 25bb34a4a35d
+erzeugt: c5a178bae5cf
 art: modul
 tags: [modul]
 ---
@@ -40,6 +40,20 @@ fuer die rissaktive Dicke unter Zug gab es vier Regeln.
 Ihre Breite `b` ist ein Streifen, keine Abmessung des Bauteils: in ihrer
 Ebene ist die Platte unbegrenzt. Unter Zug reisst sie darum ueber ihre Dicke,
 `t = h`, auch bei einem Streifen, der schmaler ist als die Platte dick.
+
+
+## DIE VORSPANNUNG
+
+Spannglieder mit Vordehnung druecken den Beton schon ohne Last, je mit
+ihrer Kraft nach allen Verlusten an ihrer Stelle ([[opencivil.nachweis.rissgroessen#Vorspannung|Vorspannung]]).
+Am Bruttoquerschnitt ist das eine Normalkraft und ein Moment, und ihre
+Spannung an jeder Ecke kommt zu der aus der Einwirkung: der gezogene Rand
+reisst spaeter, der andere frueher. So rechnen alle, die den Riss des
+gezeichneten Querschnitts brauchen -- das sproede Versagen (4.3.1.2 laesst
+die Vorspannung zu), die Zwaengung auf Biegung, deren Stahlspannung
+ebenfalls mit ihr gerechnet ist, und die Spannung-Dehnung-Analysen
+(4.4.3.2.4). Schlaff angesetzte Glieder zaehlen nicht: ihre Vorspannung
+steht in den Lastfaellen.
 
 Die Uebertragung der Regeln der Platte auf den gezeichneten Querschnitt
 geschieht nach Vorgabe: SIA 262:2025, 4.4.1.3 nimmt die kleinste Abmessung
@@ -141,6 +155,66 @@ Eine Ecke des Betons, vom Schwerpunkt aus in m -- und ihr Beton.
 - `stoff: Any`
 - `f_ctm: float`
 
+### Druckglied
+
+```python
+@dataclass(frozen=True)
+class Druckglied
+```
+
+Ein Spannglied mit Vordehnung: seine Kraft drueckt den Beton an seiner Stelle.
+
+- `name: str`
+- `P: float` – Die Spannkraft nach allen Verlusten, N.
+- `P_id: str`
+- `y: float`
+- `z: float` – Seine Lage vom Schwerpunkt aus, m.
+
+### Vorspannung
+
+```python
+@dataclass(frozen=True)
+class Vorspannung
+```
+
+Was die Spannglieder mit Vordehnung am Bruttoquerschnitt wecken -- siehe
+Dateikopf: Normalkraft und Momente ihrer Kraefte, als Druck an ihrer
+Stelle, in SI, Zug positiv, die Momente wie eine Einwirkung.
+
+- `glieder: Tuple[Druckglied, ...]`
+- `A: float`
+- `A_id: str`
+
+#### Vorspannung.N
+
+```python
+@property
+def N(self) -> float
+```
+
+#### Vorspannung.M_y
+
+```python
+@property
+def M_y(self) -> float
+```
+
+#### Vorspannung.M_z
+
+```python
+@property
+def M_z(self) -> float
+```
+
+#### Vorspannung.ids
+
+```python
+@property
+def ids(self) -> Tuple[str, ...]
+```
+
+Was ihre Herleitung liest ([[opencivil.nachweis.rissgroessen#protokoll_vorspannung|protokoll_vorspannung]]): Flaeche und Spannkraefte.
+
 ### Bruttoquerschnitt
 
 ```python
@@ -149,13 +223,15 @@ class Bruttoquerschnitt
 ```
 
 Der ungerissene Bruttoquerschnitt ohne Stahl: Traegheitsmomente um den
-Schwerpunkt und die Ecken des Betons -- in SI.
+Schwerpunkt und die Ecken des Betons -- in SI. Dazu die Vorspannung, wo
+ein Spannglied mit Vordehnung den Beton drueckt.
 
 - `I_y: float`
 - `I_z: float`
 - `I_yz: float`
 - `ecken: Tuple[Ecke, ...]`
 - `biegung: Biegung = SCHIEF` – Ob die Nulllinie kippt oder waagrecht bleibt -- wie die Analyse rechnet.
+- `vorspannung: Optional[Vorspannung] = None`
 
 #### Bruttoquerschnitt.ausdehnung
 
@@ -176,13 +252,24 @@ einem Moment von eins in dieser Richtung die Einheitsspannung.
 Einachsig bleibt die Nulllinie parallel zur Achse der Biegung, ohne
 `I_yz`.
 
+#### Bruttoquerschnitt.vorspannung_an
+
+```python
+def vorspannung_an(self, ecke: Ecke) -> float
+```
+
+Die Spannung, die die Vorspannung an der Ecke weckt, Zug positiv --
+null ohne sie. Einachsig zaehlt ihr Moment um z nicht, wie bei jeder
+Einwirkung.
+
 ### rissbezuege
 
 ```python
 def rissbezuege(analyse: Querschnittsanalyse) -> List[Eingabebezug]
 ```
 
-Was der Bruttoquerschnitt liest, ueber die Grundbezuege hinaus: die Traegheitsmomente.
+Was der Bruttoquerschnitt liest, ueber die Grundbezuege hinaus: die
+Traegheitsmomente und die Flaeche -- an ihr misst sich die Vorspannung.
 
 ### bruttoquerschnitt
 
@@ -194,6 +281,14 @@ Der Bruttoquerschnitt eines gezeichneten Querschnitts. `wert` liefert
 zu einer Wert-ID die Zahl in SI -- aus den Eingaben eines Nachweises mit
 [[opencivil.nachweis.rissgroessen#rissbezuege|rissbezuege]] ([[opencivil.core.berechnung#Eingaben.si_nach_id|si_nach_id]])
 oder aus einer Loesung.
+
+### _vorspannung
+
+```python
+def _vorspannung(analyse: Querschnittsanalyse, wert: Callable[[str], float], y_S: float, z_S: float) -> Optional[Vorspannung]
+```
+
+Die Vorspannung der Analyse -- `None` ohne Glied mit Vordehnung.
 
 ### bruttoquerschnitt_rechteck
 
@@ -220,6 +315,7 @@ Das Rissmoment in einer Richtung -- und woraus es entsteht.
 - `k_t: float`
 - `f_ct_eff: float`
 - `M_Riss: float` – in Nm.
+- `sigma_p: float = 0.0` – Die Spannung aus der Vorspannung an der Ecke, Pa -- null ohne sie.
 
 ### rissmoment
 
@@ -229,8 +325,10 @@ def rissmoment(q: Bruttoquerschnitt, M_y: float, M_z: float) -> Rissmoment
 
 Das Rissmoment in der Richtung `(M_y, M_z)` -- einem Moment von eins:
 das Moment unter reiner Biegung, bei dem `f_ct,eff` zum ersten Mal
-irgendwo erreicht wird. Bei mehreren Betonen reisst zuerst die Ecke mit
-der groessten Spannung, gemessen an ihrer Zugfestigkeit.
+irgendwo erreicht wird. Es reisst die Ecke, die dafuer das kleinste
+Moment braucht: bei mehreren Betonen die mit der groessten Spannung,
+gemessen an ihrer Zugfestigkeit, mit Vorspannung die, an der ihr Druck
+am wenigsten aufzuheben ist.
 
 ### Rissnormalkraft
 
@@ -245,6 +343,7 @@ Die Rissnormalkraft bei einem Moment -- und woraus sie entsteht.
 - `sigma_M: float` – Die Spannung, die das Moment allein an ihr weckt, Pa.
 - `f_ct_eff: float`
 - `N_Riss: float` – in N.
+- `sigma_p: float = 0.0` – Die Spannung aus der Vorspannung an der Ecke, Pa -- null ohne sie.
 
 ### rissnormalkraft
 
@@ -254,9 +353,10 @@ def rissnormalkraft(q: Bruttoquerschnitt, M_y: float, M_z: float, *, k_t: float,
 
 Die Zugkraft, bei der der ungerissene Bruttoquerschnitt beim Moment
 `(M_y, M_z)` -- in Nm, nicht von eins -- zum ersten Mal irgendwo
-`f_ct,eff = k_t·f_ctm` erreicht: `N_Riss = (f_ct,eff - σ_M)·A` an der
-Ecke, an der das am wenigsten Zug braucht. `k_t` gilt fuer die
-rissaktive Dicke unter Zug ([[opencivil.nachweis.rissgroessen#rissaktive_dicke|rissaktive_dicke]]).
+`f_ct,eff = k_t·f_ctm` erreicht: `N_Riss = (f_ct,eff - σ_p - σ_M)·A`
+an der Ecke, an der das am wenigsten Zug braucht, mit der Spannung
+`σ_p` aus der Vorspannung. `k_t` gilt fuer die rissaktive Dicke unter
+Zug ([[opencivil.nachweis.rissgroessen#rissaktive_dicke|rissaktive_dicke]]).
 
 ### protokoll_spannung_ungerissen
 
@@ -283,6 +383,24 @@ def protokoll_widerstandsmoment(p: Protokoll, werte: Zwischenwerte, q: Bruttoque
 `W = 1/σ` an der Ecke bei einem Moment von eins in der Richtung
 `(M_y, M_z)`, um y -- einachsig `I_y/v`, sonst mit `I_yz`.
 
+### protokoll_vorspannung
+
+```python
+def protokoll_vorspannung(p: Protokoll, werte: Zwischenwerte, q: Bruttoquerschnitt, ecke: Ecke, ein: Callable[[str], Wert]) -> Optional[Wert]
+```
+
+Die Spannung `σ_p`, die die Vorspannung an der Ecke weckt, hergeleitet
+-- `None` ohne sie. `ein` liefert zu einer Wert-ID den Wert: die
+Spannkraefte und die Flaeche.
+
+### _summe
+
+```python
+def _summe(teile: List[str]) -> str
+```
+
+Eine Summe in einer Vorlage -- geklammert, sobald es mehr als ein Glied ist.
+
 ### protokoll_rissmoment
 
 ```python
@@ -306,6 +424,7 @@ def _w_vorlage(M_y: float, M_z: float) -> str
 - `MOMENTENTEILER = 3.0` – Teiler der Hoehe in Biegerichtung im Beiwert: unter Biegung zaehlt bei Platten und Rechtecken ein Drittel der Hoehe, unter Zug die kleinste Abmessung des gezogenen Teils, bei der Platte also die ganze Dicke. SIA 262:2025, 4.4.1.3.
 - `REFERENZ_BEIWERT = 'SIA 262:2025, 4.4.1.3, (100)'` – Woher `k_t` und `f_ct,eff` kommen -- fuer jeden Nachweis dieselbe Stelle.
 - `REFERENZ_ZUGFESTIGKEIT = 'SIA 262:2025, 4.4.1.3, (99)'`
+- `REFERENZ_VORSPANNUNG = 'SIA 262:2025, 4.3.1.2; 4.4.3.2.4'` – Warum die Vorspannung den Riss verschiebt: die Rissbeanspruchung darf sie beruecksichtigen, und unter Gebrauchslast zaehlt eine vorhandene Druckspannung.
 - `DICKENGRENZE = 0.5` – Groesste rissaktive Dicke unter Zug, in m -- wo die Begrenzung eingeschaltet ist: massige Bauteile, je gezogenem Rand 250 mm (SIA 262:2025, 4.4.2.3.7).
 
 ## Braucht
@@ -330,8 +449,12 @@ def _w_vorlage(M_y: float, M_z: float) -> str
 ## Formeln aus diesem Modul
 
 - [[Beiwert für die Dicke]] · `protokoll_zugfestigkeit`
+- [[Moment aus der Vorspannung]] · `protokoll_vorspannung`
+- [[Normalkraft aus der Vorspannung]] · `protokoll_vorspannung`
 - [[Rissmoment des ungerissenen Querschnitts]] · `protokoll_rissmoment`
 - [[Rissmoment des ungerissenen Querschnitts]] · `protokoll_rissmoment_rechteck`
+- [[Rissmoment des ungerissenen, vorgespannten Querschnitts]] · `protokoll_rissmoment`
+- [[Spannung aus der Vorspannung an der Ecke]] · `protokoll_vorspannung`
 - [[Spannung im ungerissenen Querschnitt]] · `protokoll_spannung_ungerissen`
 - [[Widerstandsmoment zum gezogensten Betonpunkt]] · `protokoll_widerstandsmoment`
 - [[Wirksame Zugfestigkeit]] · `protokoll_zugfestigkeit`

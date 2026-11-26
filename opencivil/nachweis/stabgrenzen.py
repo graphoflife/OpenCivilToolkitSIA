@@ -98,11 +98,17 @@ class Stabangabe:
 
 def stabangaben(analyse: Querschnittsanalyse, q: Querschnitt,
                 herkunft: Sequence[Bewehrungselement]) -> List[Stabangabe]:
-    """Je Bewehrung des Querschnitts ihre Angaben -- in derselben Reihenfolge wie dort."""
+    """
+    Je Bewehrung aus Betonstahl ihre Angaben -- in derselben Reihenfolge wie
+    im Querschnitt. Die Spannglieder fehlen: ihnen gelten diese Grenzen
+    nicht. Sie stehen dort zuletzt
+    (:meth:`~opencivil.querschnitt.analyse.Querschnittsanalyse.geometrie`),
+    so bleibt jede Stelle die ihres Stabs.
+    """
     return [Stabangabe(element=element, lage=b.lage, flaeche=b.flaeche,
                        beton=analyse.beton_an((b.lage[0] * 1e3, b.lage[1] * 1e3)),
                        durchmesser=element.rissdurchmesser * 1e-3)
-            for b, element in zip(q.bewehrung, herkunft)]
+            for b, element in zip(q.bewehrung, herkunft) if not element.vorgespannt]
 
 
 def _gruppieren(staebe: Sequence[Stabangabe], schluessel: Callable[[Stabangabe], tuple],

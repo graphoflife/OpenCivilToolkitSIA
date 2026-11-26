@@ -1,5 +1,5 @@
 ---
-erzeugt: 9920b5184d24
+erzeugt: f870bfe945a4
 art: formel
 tags: [formel]
 ---
@@ -86,6 +86,7 @@ $$
 
 - [[Rissmoment bei der Normalkraft]]
 - [[Rissmoment des ungerissenen Querschnitts]]
+- [[Rissmoment des ungerissenen, vorgespannten Querschnitts]]
 - [[Spannung aus dem Moment an der Ecke, die zuerst reisst]]
 
 ## Im Code

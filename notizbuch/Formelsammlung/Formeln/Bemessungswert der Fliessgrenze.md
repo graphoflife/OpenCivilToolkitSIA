@@ -1,14 +1,22 @@
 ---
-erzeugt: d5e879129d8a
+erzeugt: 5a86dcdeffed
 art: formel
 tags: [formel]
-normstelle: "SIA 262:2025, 2.4.2.5, (4)"
+normstelle: ["SIA 262:2025, 2.4.2.5, (4)", "SIA 262:2025, 2.4.2.5, (5); 4.2.3.1, Tabelle 10"]
 ---
-> [!info] Normstelle
-> SIA 262:2025, 2.4.2.5, (4)
+> [!info] Normstellen
+> SIA 262:2025, 2.4.2.5, (4) · SIA 262:2025, 2.4.2.5, (5); 4.2.3.1, Tabelle 10
+
+*In der Herleitung: «Bemessungswert der Fliessgrenze»*
 
 $$
 f_{yd} = \frac{f_{yk}}{\gamma_s}
+$$
+
+*In der Herleitung: «Bemessungswert der Fliessgrenze»*
+
+$$
+f_{pd} = \frac{f_{p0.1k}}{\gamma_s}
 $$
 
 ## Grössen
@@ -17,6 +25,7 @@ $$
 | --- | --- | --- | --- |
 | $f_{yk}$ | Charakteristische Fliessgrenze | N/mm² | Vorgabe |
 | $\gamma_s$ | Teilsicherheitsbeiwert für Betonstahl | – | Vorgabe |
+| $f_{p0.1k}$ | Fliessgrenze (0.1-%-Dehngrenze) | N/mm² | Vorgabe |
 
 ## Beispiel
 
@@ -24,6 +33,12 @@ Mit den Zahlen aus dem Beispielprojekt:
 
 $$
 f_{yd} = \frac{f_{yk}}{\gamma_s} = \frac{500\,\mathrm{N}/\mathrm{mm}^{2}}{1.15} = 435\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
+
+$$
+f_{pd} = \frac{f_{p0.1k}}{\gamma_s} = \frac{1600\,\mathrm{N}/\mathrm{mm}^{2}}{1.15} = 1391\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 ## Gebraucht von
@@ -45,10 +60,12 @@ $$
 ## Im Code
 
 - [[opencivil.material.betonstahl]]
+- [[opencivil.material.spannstahl]]
 
 ## Themen
 
 - [[Betonstahl]]
+- [[Spannstahl]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

@@ -1,6 +1,6 @@
 # Voll
 
-870 Berechnungen ausgeführt, 1234 Werte bestimmt.
+889 Berechnungen ausgeführt, 1295 Werte bestimmt.
 
 ## Herleitung
 
@@ -8792,6 +8792,1593 @@ $$
 
 $$
 N_{Rd}^{-} = -5497.4\,\mathrm{kN}
+$$
+
+### Querschnittsanalyse: Spannbeton
+
+**Fläche und Schwerpunkt eines Polygons (Satz von Gauss)**
+
+$$
+A = \frac{1}{2} \sum_i c_i \qquad y_S = \frac{1}{6A} \sum_i (y_i + y_{i+1})\, c_i \qquad z_S = \frac{1}{6A} \sum_i (z_i + z_{i+1})\, c_i \qquad c_i = y_i\, z_{i+1} - y_{i+1}\, z_i
+$$
+
+**Trägheitsmomente eines Polygons, bezogen auf den Schwerpunkt**
+
+$$
+I_y = \frac{1}{12} \sum_i (z_i^2 + z_i z_{i+1} + z_{i+1}^2)\, c_i - A\, z_S^2\qquad I_z = \frac{1}{12} \sum_i (y_i^2 + y_i y_{i+1} + y_{i+1}^2)\, c_i - A\, y_S^2
+$$
+
+**Polygone des Querschnitts**
+
+| Polygon | Material | liegt in | Ecken | $\pm A\ [\mathrm{mm}^2]$ | $y_S\ [\mathrm{mm}]$ | $z_S\ [\mathrm{mm}]$ |
+| :--- | :--- | :--- | ---: | ---: | ---: | ---: |
+| Polygon 1 | C30/37 | – | $4$ | $320000$ | $200.0$ | $400.0$ |
+
+**Fläche des Bruttoquerschnitts**
+
+$$
+A = 320000\,\mathrm{mm}^{2}
+$$
+
+**Schwerpunkt, y**
+
+$$
+y_S = 200\,\mathrm{mm}
+$$
+
+**Schwerpunkt, z**
+
+$$
+z_S = 400\,\mathrm{mm}
+$$
+
+**Trägheitsmoment um y**
+
+$$
+I_y = 17066.7\,\cdot 10^{6}\,\mathrm{mm}^{4}
+$$
+
+**Trägheitsmoment um z**
+
+$$
+I_z = 4266.7\,\cdot 10^{6}\,\mathrm{mm}^{4}
+$$
+
+**Deviationsmoment**
+
+$$
+I_{yz} = 0\,\cdot 10^{6}\,\mathrm{mm}^{4}
+$$
+
+**Teilung einer Stablinie: gleiche Felder, auf die Länge gerundet**
+
+$$
+s = \frac{L}{m} \qquad m = \mathrm{runde}\left(\frac{L}{s_{gewählt}}\right)
+$$
+
+**Bewehrung**
+
+| Element | $\text{Lage}\ [\mathrm{mm}]$ | Bewehrung | Stahl | $A_s\ [\mathrm{mm}^2]$ |
+| :--- | :--- | :--- | ---: | ---: |
+| Linie 1 | $(50;\ 50) \rightarrow (350;\ 50)$ | $4 \varnothing 14\ @\ 100.0$ | B500B | $616$ |
+| Linie 2 | $(50;\ 750) \rightarrow (350;\ 750)$ | $3 \varnothing 12\ @\ 150.0$ | B500B | $339$ |
+
+**Stahlfläche der Bewehrung**
+
+$$
+A_{s,tot} = 955\,\mathrm{mm}^{2}
+$$
+
+**Querschnitt, Vordehnung und Spannkraft eines Glieds aus n Drähten, Litzen oder Stäben** *(SIA 262:2025, 3.3.2.2, Tabelle 7; SIA 262:2025, 4.1.5.1.5)*
+
+$$
+A_p = n \cdot a_p \qquad \varepsilon_p = \frac{\sigma_{p\infty}}{E_p} \qquad P_\infty = A_p \cdot \sigma_{p\infty}
+$$
+
+**Spannungen nach Vorgabe, wo keine eingegeben ist** *(nach Vorgabe, nicht nachgeschlagen)*
+
+$$
+\sigma_{p0} = 0.70 \cdot f_{pk} \qquad \sigma_{p\infty} = 0.85 \cdot \sigma_{p0}
+$$
+
+> **Annahme:** Spannglied 1, Spannglied 3: Spannung nach Vorgabe – die Verluste hängen am Bauwerk (SIA 262:2025, 4.1.5.3), die Vorgabe ersetzt ihre Rechnung nicht.
+
+> **Annahme:** Die Vordehnung ist σ\_p∞/E\_p: die Stauchung des Betons beim Vorspannen fällt weg (nach Vorgabe, nicht nachgeschlagen).
+
+**Grenzen der Spannung nach dem Spannen und nach allen Verlusten** *(SIA 262:2025, 4.1.5.2.2, (22); SIA 262:2025, 4.1.5.2.3)*
+
+$$
+\sigma_{p0} \le \min\left(0.75 \cdot f_{pk};\ 0.85 \cdot f_{p0.1k}\right) \qquad \sigma_{p\infty} \ge 0.45 \cdot f_{pk}
+$$
+
+**Spannglied 1: 4 × Litze ⌀15.7 aus Y1860** *(SIA 262:2025, 3.3.2.2, Tabelle 7)*
+
+$$
+A_{p,1} = n \cdot a_p = 4 \cdot 150\,\mathrm{mm}^{2} = 600\,\mathrm{mm}^{2}
+$$
+
+**Spannglied 1: nach dem Spannen, nach Vorgabe** *(nach Vorgabe, nicht nachgeschlagen)*
+
+$$
+\sigma_{p0,1} = 0.70 \cdot f_{pk} = 0.70 \cdot 1860\,\mathrm{N}/\mathrm{mm}^{2} = 1302\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Spannglied 1: nach allen Verlusten, nach Vorgabe** *(nach Vorgabe, nicht nachgeschlagen)*
+
+$$
+\sigma_{p\infty,1} = 0.85 \cdot \sigma_{p0,1} = 0.85 \cdot 1302\,\mathrm{N}/\mathrm{mm}^{2} = 1107\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Spannglied 1: Grenze nach dem Spannen** *(SIA 262:2025, 4.1.5.2.2, (22))*
+
+$$
+\begin{aligned}
+  \sigma_{p,max} &= \min\left(0.75 \cdot f_{pk};\ 0.85 \cdot f_{p0.1k}\right) \\
+  &= \min\left(0.75 \cdot 1860\,\mathrm{N}/\mathrm{mm}^{2};\ 0.85 \cdot 1600\,\mathrm{N}/\mathrm{mm}^{2}\right) \\
+  &= 1360\,\mathrm{N}/\mathrm{mm}^{2} \quad \ge \quad \sigma_{p0,1} = 1302\,\mathrm{N}/\mathrm{mm}^{2}
+\end{aligned}
+$$
+
+**Spannglied 1: Mindestspannung nach allen Verlusten** *(SIA 262:2025, 4.1.5.2.3)*
+
+$$
+\sigma_{p,min} = 0.45 \cdot f_{pk} = 0.45 \cdot 1860\,\mathrm{N}/\mathrm{mm}^{2} = 837\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{p\infty,1} = 1107\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Spannglied 1: Vordehnung, mit dem Modul der Litzen** *(SIA 262:2025, 4.1.5.1.5)*
+
+$$
+\varepsilon_{p,1} = \frac{\sigma_{p\infty,1}}{E_p^{\mathrm{Litze}}} = \frac{1107\,\mathrm{N}/\mathrm{mm}^{2}}{195000\,\mathrm{N}/\mathrm{mm}^{2}} = 5.68\,\text{‰}
+$$
+
+**Spannglied 1: Spannkraft nach allen Verlusten**
+
+$$
+P_{\infty,1} = A_{p,1} \cdot \sigma_{p\infty,1} = 600\,\mathrm{mm}^{2} \cdot 1107\,\mathrm{N}/\mathrm{mm}^{2} = 664\,\mathrm{kN}
+$$
+
+**Spannglied 2: 2 × Litze ⌀15.3 aus Y1860** *(SIA 262:2025, 3.3.2.2, Tabelle 7)*
+
+$$
+A_{p,2} = n \cdot a_p = 2 \cdot 140\,\mathrm{mm}^{2} = 280\,\mathrm{mm}^{2}
+$$
+
+**Spannglied 2: nach dem Spannen, eingegeben**
+
+$$
+\sigma_{p0,2} = 1350\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Spannglied 2: nach allen Verlusten, eingegeben** *(SIA 262:2025, 4.1.5.3)*
+
+$$
+\sigma_{p\infty,2} = 1100\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Spannglied 2: Grenze nach dem Spannen** *(SIA 262:2025, 4.1.5.2.2, (22))*
+
+$$
+\begin{aligned}
+  \sigma_{p,max} &= \min\left(0.75 \cdot f_{pk};\ 0.85 \cdot f_{p0.1k}\right) \\
+  &= \min\left(0.75 \cdot 1860\,\mathrm{N}/\mathrm{mm}^{2};\ 0.85 \cdot 1600\,\mathrm{N}/\mathrm{mm}^{2}\right) \\
+  &= 1360\,\mathrm{N}/\mathrm{mm}^{2} \quad \ge \quad \sigma_{p0,2} = 1350\,\mathrm{N}/\mathrm{mm}^{2}
+\end{aligned}
+$$
+
+**Spannglied 2: Mindestspannung nach allen Verlusten** *(SIA 262:2025, 4.1.5.2.3)*
+
+$$
+\sigma_{p,min} = 0.45 \cdot f_{pk} = 0.45 \cdot 1860\,\mathrm{N}/\mathrm{mm}^{2} = 837\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{p\infty,2} = 1100\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Spannglied 2: Vordehnung, mit dem Modul der Litzen** *(SIA 262:2025, 4.1.5.1.5)*
+
+$$
+\varepsilon_{p,2} = \frac{\sigma_{p\infty,2}}{E_p^{\mathrm{Litze}}} = \frac{1100\,\mathrm{N}/\mathrm{mm}^{2}}{195000\,\mathrm{N}/\mathrm{mm}^{2}} = 5.64\,\text{‰}
+$$
+
+**Spannglied 2: Spannkraft nach allen Verlusten**
+
+$$
+P_{\infty,2} = A_{p,2} \cdot \sigma_{p\infty,2} = 280\,\mathrm{mm}^{2} \cdot 1100\,\mathrm{N}/\mathrm{mm}^{2} = 308\,\mathrm{kN}
+$$
+
+**Spannglied 3: 2 × Litze ⌀12.9 aus Y1860** *(SIA 262:2025, 3.3.2.2, Tabelle 7)*
+
+$$
+A_{p,3} = n \cdot a_p = 2 \cdot 100\,\mathrm{mm}^{2} = 200\,\mathrm{mm}^{2}
+$$
+
+**Spannglied 3: nach dem Spannen, nach Vorgabe** *(nach Vorgabe, nicht nachgeschlagen)*
+
+$$
+\sigma_{p0,3} = 0.70 \cdot f_{pk} = 0.70 \cdot 1860\,\mathrm{N}/\mathrm{mm}^{2} = 1302\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Spannglied 3: nach allen Verlusten, nach Vorgabe** *(nach Vorgabe, nicht nachgeschlagen)*
+
+$$
+\sigma_{p\infty,3} = 0.85 \cdot \sigma_{p0,3} = 0.85 \cdot 1302\,\mathrm{N}/\mathrm{mm}^{2} = 1107\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Spannglied 3: Grenze nach dem Spannen** *(SIA 262:2025, 4.1.5.2.2, (22))*
+
+$$
+\begin{aligned}
+  \sigma_{p,max} &= \min\left(0.75 \cdot f_{pk};\ 0.85 \cdot f_{p0.1k}\right) \\
+  &= \min\left(0.75 \cdot 1860\,\mathrm{N}/\mathrm{mm}^{2};\ 0.85 \cdot 1600\,\mathrm{N}/\mathrm{mm}^{2}\right) \\
+  &= 1360\,\mathrm{N}/\mathrm{mm}^{2} \quad \ge \quad \sigma_{p0,3} = 1302\,\mathrm{N}/\mathrm{mm}^{2}
+\end{aligned}
+$$
+
+**Spannglied 3: Mindestspannung nach allen Verlusten** *(SIA 262:2025, 4.1.5.2.3)*
+
+$$
+\sigma_{p,min} = 0.45 \cdot f_{pk} = 0.45 \cdot 1860\,\mathrm{N}/\mathrm{mm}^{2} = 837\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{p\infty,3} = 1107\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Spannglied 3: Vordehnung, mit dem Modul der Litzen** *(SIA 262:2025, 4.1.5.1.5)*
+
+$$
+\varepsilon_{p,3} = \frac{\sigma_{p\infty,3}}{E_p^{\mathrm{Litze}}} = \frac{1107\,\mathrm{N}/\mathrm{mm}^{2}}{195000\,\mathrm{N}/\mathrm{mm}^{2}} = 5.68\,\text{‰}
+$$
+
+**Spannglied 3: Spannkraft nach allen Verlusten**
+
+$$
+P_{\infty,3} = A_{p,3} \cdot \sigma_{p\infty,3} = 200\,\mathrm{mm}^{2} \cdot 1107\,\mathrm{N}/\mathrm{mm}^{2} = 221.3\,\mathrm{kN}
+$$
+
+**Spannglieder**
+
+| Glied | $\text{Lage}\ [\mathrm{mm}]$ | Spannstahl | $A_p\ [\mathrm{mm}^2]$ | $\sigma_{p\infty}\ [\mathrm{N/mm^2}]$ | $\varepsilon_p\ [\text{‰}]$ | $P_\infty\ [\mathrm{kN}]$ | Wirkung | Verbund |
+| :--- | :--- | :--- | ---: | ---: | ---: | ---: | :--- | :--- |
+| Spannglied 1 | $(200;\ 120)$ | 4 × Litze ⌀15.7, Y1860 | $600$ | $1107$ | $5.68$ | $664.0$ | mit Vordehnung | mit Verbund |
+| Spannglied 2 | $(120;\ 160)$ | 2 × Litze ⌀15.3, Y1860 | $280$ | $1100$ | $5.64$ | $308.0$ | mit Vordehnung | ohne Verbund |
+| Spannglied 3 | $(280;\ 160)$ | 2 × Litze ⌀12.9, Y1860 | $200$ | $1107$ | $5.68$ | $221.3$ | schlaff mit Restfestigkeit | mit Verbund |
+
+**Dehnungsebene und innere Kräfte** *(SIA 262:2025, 4.3.2.3)*
+
+$$
+\varepsilon(y, z) = \varepsilon_0 + \kappa \cdot v \qquad v = n_y (y - y_S) + n_z (z - z_S) \qquad N = \int_A \sigma\,\mathrm{d}A \qquad M_y = -\int_A \sigma\,(z - z_S)\,\mathrm{d}A \qquad M_z = -\int_A \sigma\,(y - y_S)\,\mathrm{d}A
+$$
+
+**Erfüllungsgrad bei fester Normalkraft und fester Richtung**
+
+$$
+\alpha_{eff} = \frac{M_{Rd}}{M_{Ed}} \qquad M = \sqrt{M_y^2 + M_z^2}
+$$
+
+**Werkstoffgesetz C30/37, Bemessungswerte: Beiwert der Parabel** *(SIA 262:2025, 4.2.1.6, (27); Untergrenze 1 nach Vorgabe)*
+
+$$
+k_{\sigma} = \max\left(1;\ \frac{E_{cm}}{400 \cdot f_{cd}}\right) = \max\left(1;\ \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{400 \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}}\right) = 4.2
+$$
+
+**Werkstoffgesetz C30/37, Bemessungswerte: Beton, Parabel-Rechteck** *(SIA 262:2025, 4.2.1.5, Figur 12; 4.2.1.6, (27))*
+
+$$
+\sigma_c(\varepsilon_c) = \begin{cases} -f_{cd} \cdot \dfrac{k_\sigma\,\eta - \eta^2}{1 + (k_\sigma - 2)\,\eta} & 0 \le |\varepsilon_c| \le \varepsilon_{c1d},\ \eta = \dfrac{|\varepsilon_c|}{\varepsilon_{c1d}} \\[2ex] -f_{cd} & \varepsilon_{c1d} < |\varepsilon_c| \le \varepsilon_{c2d} \\[1ex] 0 & |\varepsilon_c| > \varepsilon_{c2d} \quad (\text{jenseits der Bruchstauchung}) \\[1ex] 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen}) \end{cases}
+$$
+
+**Werkstoffgesetz C30/37, Bemessungswerte: Werte des Betons**
+
+$$
+f_{cd} = 20\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{c1d} = 2\,\text{‰} \quad \varepsilon_{c2d} = 3.5\,\text{‰}
+$$
+
+**Werkstoffgesetz B500B, Bemessungswerte: Stahl, bilinear** *(SIA 262:2025, 4.2.2.2, Figur 16; 4.2.2.5)*
+
+$$
+\sigma_s(\varepsilon_s) = \begin{cases} \min(E_s\,\varepsilon_s;\ f_{yd}) & 0 \le \varepsilon_s \le \varepsilon_{ud} \\[1ex] \max(E_s\,\varepsilon_s;\ -f_{yd}^{-}) & -\varepsilon_{ud} \le \varepsilon_s < 0 \\[1ex] 0 & |\varepsilon_s| > \varepsilon_{ud} \quad (\text{jenseits der Bruchdehnung}) \end{cases}
+$$
+
+**Werkstoffgesetz B500B, Bemessungswerte: Werte des Stahls**
+
+$$
+f_{yd} = 435\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{yd}^{-} = 435\,\mathrm{N}/\mathrm{mm}^{2} \quad E_s = 200000\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{ud} = 4.5\,\%
+$$
+
+**Werkstoffgesetz Spannglied 1, Bemessungswerte: mit Vordehnung** *(SIA 262:2025, 4.1.5.1.5; SIA 262:2025, 4.1.5.5.1; 4.2.3.3, Figur 17)*
+
+$$
+\sigma_p(\varepsilon) = \begin{cases} \min\left(E_p\,(\varepsilon + \varepsilon_p);\ f_{pd}\right) & -\varepsilon_p < \varepsilon \le \varepsilon_{ud} - \varepsilon_p \\[1ex] 0 & \varepsilon \le -\varepsilon_p \quad (\text{entspannt}) \\[1ex] 0 & \varepsilon > \varepsilon_{ud} - \varepsilon_p \quad (\text{jenseits der Bruchdehnung}) \end{cases}
+$$
+
+**Werkstoffgesetz Spannglied 1, Bemessungswerte: Werte des Spannglieds**
+
+$$
+f_{pd} = 1391\,\mathrm{N}/\mathrm{mm}^{2} \quad E_p^{\mathrm{Litze}} = 195000\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{ud} = 2\,\% \quad \varepsilon_{p,1} = 5.68\,\text{‰}
+$$
+
+**Werkstoffgesetz Spannglied 2, Bemessungswerte: ohne Verbund** *(SIA 262:2025, 4.1.5.1.6)*
+
+$$
+\sigma_p(\varepsilon) = \sigma_{p\infty}
+$$
+
+**Werkstoffgesetz Spannglied 2, Bemessungswerte: Werte des Spannglieds**
+
+$$
+\sigma_{p\infty,2} = 1100\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Werkstoffgesetz Spannglied 3, Bemessungswerte: schlaff mit Restfestigkeit** *(SIA 262:2025, 4.1.5.5.2; SIA 262:2025, 4.1.5.1.5; 4.2.3.3, Figur 17)*
+
+$$
+\sigma_p(\varepsilon) = \begin{cases} \min\left(E_p\,(\varepsilon + \varepsilon_p);\ f_{pd}\right) - \sigma_{p\infty} & -\varepsilon_p < \varepsilon \le \varepsilon_{ud} - \varepsilon_p \\[1ex] -\sigma_{p\infty} & \varepsilon \le -\varepsilon_p \quad (\text{entspannt}) \\[1ex] -\sigma_{p\infty} & \varepsilon > \varepsilon_{ud} - \varepsilon_p \quad (\text{jenseits der Bruchdehnung}) \end{cases}
+$$
+
+**Werkstoffgesetz Spannglied 3, Bemessungswerte: Werte des Spannglieds**
+
+$$
+f_{pd} = 1391\,\mathrm{N}/\mathrm{mm}^{2} \quad E_p^{\mathrm{Litze}} = 195000\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{ud} = 2\,\% \quad \varepsilon_{p,3} = 5.68\,\text{‰} \quad \sigma_{p\infty,3} = 1107\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Reine Normalkraft**
+
+| Grenze | Wert |
+| :--- | ---: |
+| reiner Zug, gleichmässig | $N_{Rd}^{+} = 1614.9\,\mathrm{kN}$ |
+| reiner Druck, gleichmässig | $N_{Rd}^{-} = -6081.3\,\mathrm{kN}$ |
+
+#### Feld
+
+**Einwirkung**
+
+| Einwirkung | Wert |  |
+| :--- | ---: | :--- |
+| N\_Ed | $0.0$ | kN |
+| M\_y,Ed | $600.0$ | kNm |
+| M\_z,Ed | $0.0$ | kNm |
+
+Bruchzustand: Zugrichtung n = (0.174; -0.985), -80.0° gegen die y-Achse. Die Nulllinie steht senkrecht zur Zugrichtung, 199.5 mm auf der Druckseite des Schwerpunkts.
+
+**Dehnungsebene**
+
+| $\varepsilon_0\ [\text{‰}]$ | $\kappa\ [\mathrm{1/m}]$ |
+| ---: | ---: |
+| $3.045$ | $0.01527$ |
+
+**Kräfte im Bruchzustand – Beton als Resultierende, Bewehrung je Element**
+
+| Teil | $F\ [\mathrm{kN}]$ | $y\ [\mathrm{mm}]$ | $z\ [\mathrm{mm}]$ | $\varepsilon\ [\text{‰}]$ | $\sigma\ [\mathrm{N/mm^2}]$ |
+| :--- | ---: | ---: | ---: | ---: | ---: |
+| C30/37 | $-1334.7$ | $185.9$ | $713.2$ | – | – |
+| Linie 1 | $267.7$ | $200.0$ | $50.0$ | $7.91 \ldots 8.71$ | $435$ |
+| Linie 2 | $-132.7$ | $190.9$ | $750.0$ | $-2.62 \ldots -1.82$ | $-435 \ldots -364$ |
+| Spannglied 1 | $834.8$ | $200.0$ | $120.0$ | $7.25$ | $1391$ |
+| Spannglied 2 | $308.0$ | $120.0$ | $160.0$ | $6.44$ | $1100$ |
+| Spannglied 3 | $56.9$ | $280.0$ | $160.0$ | $6.87$ | $285$ |
+
+Bei einem Spannglied ist ε die Dehnung des Betons an seiner Stelle: mit Verbund ist der Stahl um seine Vordehnung ε\_p mehr gedehnt, ohne Verbund hängt seine Spannung nicht an ε.
+
+**Probe: Normalkraft**
+
+$$
+N_{Rd} = \sum F_i = 0\,\mathrm{kN}
+$$
+
+**Probe: Moment um y**
+
+$$
+M_{y,Rd} = -\sum F_i \cdot (z_i - z_S) = 879.5\,\mathrm{kNm}
+$$
+
+**Probe: Moment um z**
+
+$$
+M_{z,Rd} = -\sum F_i \cdot (y_i - y_S) = 0\,\mathrm{kNm}
+$$
+
+**Widerstand in der Richtung der Einwirkung**
+
+$$
+M_{Rd} = \sqrt{M_{y,Rd}^{2} + M_{z,Rd}^{2}} = \sqrt{\left(879.5\,\mathrm{kNm}\right)^{2} + \left(0\,\mathrm{kNm}\right)^{2}} = 879.5\,\mathrm{kNm}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,\text{Feld}} = \frac{M_{Rd}}{M_{Ed}} = \frac{879.5\,\mathrm{kNm}}{600\,\mathrm{kNm}} = 1.47 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+**Bedingung** *(SIA 262:2025, 4.1.4.2.5)*
+
+$$
+\frac{x}{d} \le k \cdot \frac{435\,\mathrm{N/mm^2}}{f_{yd}}
+$$
+
+#### Zug unten
+
+Spannstahl Y1860 in der Zugzone – die Regel gilt für Betonstahl der Klassen B und C → kein Nachweis über x/d. Umlagern nur mit einem Nachweis des Verformungsvermögens (SIA 262:2025, 4.1.4.2.6).
+
+#### Zug oben
+
+**Grenze der bezogenen Druckzonenhöhe** *(SIA 262:2025, 4.1.4.2.5)*
+
+$$
+\left(x/d\right)_{max} = k \cdot \frac{435\,\mathrm{N/mm^2}}{f_{yd}} = 0.35 \cdot \frac{435\,\mathrm{N/mm^2}}{435\,\mathrm{N}/\mathrm{mm}^{2}} = 0.35
+$$
+
+**Bezogene Druckzonenhöhe bei reiner Biegung**
+
+$$
+x/d = \frac{x}{d} = \frac{166.9\,\mathrm{mm}}{772.5\,\mathrm{mm}} = 0.216 \quad \le \quad \left(x/d\right)_{max} = 0.35
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,x/d,\text{Zug oben}} = \frac{\left(x/d\right)_{max}}{x/d} = \frac{0.35}{0.216} = 1.62 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+#### Zug links
+
+Spannstahl Y1860 in der Zugzone – die Regel gilt für Betonstahl der Klassen B und C → kein Nachweis über x/d. Umlagern nur mit einem Nachweis des Verformungsvermögens (SIA 262:2025, 4.1.4.2.6).
+
+#### Zug rechts
+
+**Grenze der bezogenen Druckzonenhöhe** *(SIA 262:2025, 4.1.4.2.5)*
+
+$$
+\left(x/d\right)_{max} = k \cdot \frac{435\,\mathrm{N/mm^2}}{f_{yd}} = 0.35 \cdot \frac{435\,\mathrm{N/mm^2}}{435\,\mathrm{N}/\mathrm{mm}^{2}} = 0.35
+$$
+
+**Bezogene Druckzonenhöhe bei reiner Biegung**
+
+$$
+x/d = \frac{x}{d} = \frac{216.2\,\mathrm{mm}}{439.6\,\mathrm{mm}} = 0.492 \quad > \quad \left(x/d\right)_{max} = 0.35
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,x/d,\text{Zug rechts}} = \frac{\left(x/d\right)_{max}}{x/d} = \frac{0.35}{0.492} = 0.71 \quad \Rightarrow \quad \text{NICHT erfüllt}
+$$
+
+Massgebend: Zug unten (kleinster Erfüllungsgrad).
+
+**Spannung im ungerissenen Querschnitt**
+
+$$
+\sigma(y, z) = -\frac{M_y\,(I_z z' - I_{yz} y') + M_z\,(I_y y' - I_{yz} z')}{I_y I_z - I_{yz}^2}\qquad y' = y - y_S,\ z' = z - z_S
+$$
+
+**Sprödes Versagen** *(SIA 262:2025, 4.3.1.2)*
+
+$$
+M_{Rd}(N = 0) \ge M_{Riss} = f_{ct,eff} \cdot W
+$$
+
+#### Zug unten
+
+Gezogenster Betonpunkt: y = 400 mm, z = 0 mm (C30/37).
+
+**Beiwert für die Höhe in Biegerichtung** *(SIA 262:2025, 4.4.1.3, (100))*
+
+$$
+k_t = \frac{1}{1 + 0.5 \cdot h/3} = \frac{1}{1 + 0.5 \cdot 0.8/3} = 0.882 \quad \left(h\ \text{in}\ \mathrm{m}\right)
+$$
+
+**Wirksame Zugfestigkeit** *(SIA 262:2025, 4.4.1.3, (99))*
+
+$$
+f_{ct,eff} = k_t \cdot f_{ctm} = 0.882 \cdot 2.9\,\mathrm{N}/\mathrm{mm}^{2} = 2.56\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Widerstandsmoment zum gezogensten Betonpunkt**
+
+$$
+\begin{aligned}
+  W &= \frac{I_y \cdot I_z - I_{yz}^{2}}{I_{yz} \cdot y' - I_z \cdot z'} \\
+  &= \frac{17066.7\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 4266.7\,\cdot 10^{6}\,\mathrm{mm}^{4} - \left(0\,\cdot 10^{6}\,\mathrm{mm}^{4}\right)^{2}}{0\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 200\,\mathrm{mm} - 4266.7\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot \left(-400\,\mathrm{mm}\right)} \\
+  &= 42.67\,\cdot 10^{6}\,\mathrm{mm}^{3}
+\end{aligned}
+$$
+
+**Normalkraft aus der Vorspannung** *(SIA 262:2025, 4.3.1.2; 4.4.3.2.4)*
+
+$$
+N_p = -\left(P_{\infty,1} + P_{\infty,2}\right) = -\left(664\,\mathrm{kN} + 308\,\mathrm{kN}\right) = -972\,\mathrm{kN}
+$$
+
+**Moment aus der Vorspannung um y** *(SIA 262:2025, 4.3.1.2; 4.4.3.2.4)*
+
+$$
+\begin{aligned}
+  M_{p,y} &= \left(P_{\infty,1} \cdot z'_{p,1} + P_{\infty,2} \cdot z'_{p,2}\right) \\
+  &= \left(664\,\mathrm{kN} \cdot \left(-280\,\mathrm{mm}\right) + 308\,\mathrm{kN} \cdot \left(-240\,\mathrm{mm}\right)\right) \\
+  &= -259.8\,\mathrm{kNm}
+\end{aligned}
+$$
+
+**Moment aus der Vorspannung um z** *(SIA 262:2025, 4.3.1.2; 4.4.3.2.4)*
+
+$$
+\begin{aligned}
+  M_{p,z} &= \left(P_{\infty,1} \cdot y'_{p,1} + P_{\infty,2} \cdot y'_{p,2}\right) \\
+  &= \left(664\,\mathrm{kN} \cdot 0\,\mathrm{mm} + 308\,\mathrm{kN} \cdot \left(-80\,\mathrm{mm}\right)\right) \\
+  &= -24.6\,\mathrm{kNm}
+\end{aligned}
+$$
+
+**Spannung aus der Vorspannung an der Ecke** *(SIA 262:2025, 4.3.1.2; 4.4.3.2.4)*
+
+$$
+\begin{aligned}
+  \sigma_p &= \frac{N_p}{A} - \frac{M_{p,y}\,(I_z \cdot z' - I_{yz} \cdot y') + M_{p,z}\,(I_y \cdot y' - I_{yz} \cdot z')}{I_y \cdot I_z - I_{yz}^{2}} \\
+  &= \frac{-972\,\mathrm{kN}}{320000\,\mathrm{mm}^{2}} - \frac{-259.8\,\mathrm{kNm}\,(4266.7\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot \left(-400\,\mathrm{mm}\right) - 0\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 200\,\mathrm{mm}) + \left(-24.6\,\mathrm{kNm}\right)\,(17066.7\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 200\,\mathrm{mm} - 0\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot \left(-400\,\mathrm{mm}\right))}{17066.7\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 4266.7\,\cdot 10^{6}\,\mathrm{mm}^{4} - \left(0\,\cdot 10^{6}\,\mathrm{mm}^{4}\right)^{2}} \\
+  &= -7.97\,\mathrm{N}/\mathrm{mm}^{2}
+\end{aligned}
+$$
+
+**Rissmoment des ungerissenen, vorgespannten Querschnitts** *(SIA 262:2025, 4.3.1.2)*
+
+$$
+\begin{aligned}
+  M_{Riss} &= \left(f_{ct,eff} - \sigma_p\right) \cdot W \\
+  &= \left(2.56\,\mathrm{N}/\mathrm{mm}^{2} - \left(-7.97\,\mathrm{N}/\mathrm{mm}^{2}\right)\right) \cdot 42.67\,\cdot 10^{6}\,\mathrm{mm}^{3} \\
+  &= 449.3\,\mathrm{kNm}
+\end{aligned}
+$$
+
+**Biegewiderstand bei N = 0 in dieser Richtung**
+
+$$
+M_{Rd} = 879.5\,\mathrm{kNm}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,Riss,\text{Zug unten}} = \frac{M_{Rd}}{M_{Riss}} = \frac{879.5\,\mathrm{kNm}}{449.3\,\mathrm{kNm}} = 1.96 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+#### Zug oben
+
+Gezogenster Betonpunkt: y = 400 mm, z = 800 mm (C30/37).
+
+**Beiwert für die Höhe in Biegerichtung** *(SIA 262:2025, 4.4.1.3, (100))*
+
+$$
+k_t = \frac{1}{1 + 0.5 \cdot h/3} = \frac{1}{1 + 0.5 \cdot 0.8/3} = 0.882 \quad \left(h\ \text{in}\ \mathrm{m}\right)
+$$
+
+**Wirksame Zugfestigkeit** *(SIA 262:2025, 4.4.1.3, (99))*
+
+$$
+f_{ct,eff} = k_t \cdot f_{ctm} = 0.882 \cdot 2.9\,\mathrm{N}/\mathrm{mm}^{2} = 2.56\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Widerstandsmoment zum gezogensten Betonpunkt**
+
+$$
+\begin{aligned}
+  W &= \frac{I_y \cdot I_z - I_{yz}^{2}}{I_z \cdot z' - I_{yz} \cdot y'} \\
+  &= \frac{17066.7\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 4266.7\,\cdot 10^{6}\,\mathrm{mm}^{4} - \left(0\,\cdot 10^{6}\,\mathrm{mm}^{4}\right)^{2}}{4266.7\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 400\,\mathrm{mm} - 0\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 200\,\mathrm{mm}} \\
+  &= 42.67\,\cdot 10^{6}\,\mathrm{mm}^{3}
+\end{aligned}
+$$
+
+**Normalkraft aus der Vorspannung** *(SIA 262:2025, 4.3.1.2; 4.4.3.2.4)*
+
+$$
+N_p = -\left(P_{\infty,1} + P_{\infty,2}\right) = -\left(664\,\mathrm{kN} + 308\,\mathrm{kN}\right) = -972\,\mathrm{kN}
+$$
+
+**Moment aus der Vorspannung um y** *(SIA 262:2025, 4.3.1.2; 4.4.3.2.4)*
+
+$$
+\begin{aligned}
+  M_{p,y} &= \left(P_{\infty,1} \cdot z'_{p,1} + P_{\infty,2} \cdot z'_{p,2}\right) \\
+  &= \left(664\,\mathrm{kN} \cdot \left(-280\,\mathrm{mm}\right) + 308\,\mathrm{kN} \cdot \left(-240\,\mathrm{mm}\right)\right) \\
+  &= -259.8\,\mathrm{kNm}
+\end{aligned}
+$$
+
+**Moment aus der Vorspannung um z** *(SIA 262:2025, 4.3.1.2; 4.4.3.2.4)*
+
+$$
+\begin{aligned}
+  M_{p,z} &= \left(P_{\infty,1} \cdot y'_{p,1} + P_{\infty,2} \cdot y'_{p,2}\right) \\
+  &= \left(664\,\mathrm{kN} \cdot 0\,\mathrm{mm} + 308\,\mathrm{kN} \cdot \left(-80\,\mathrm{mm}\right)\right) \\
+  &= -24.6\,\mathrm{kNm}
+\end{aligned}
+$$
+
+**Spannung aus der Vorspannung an der Ecke** *(SIA 262:2025, 4.3.1.2; 4.4.3.2.4)*
+
+$$
+\begin{aligned}
+  \sigma_p &= \frac{N_p}{A} - \frac{M_{p,y}\,(I_z \cdot z' - I_{yz} \cdot y') + M_{p,z}\,(I_y \cdot y' - I_{yz} \cdot z')}{I_y \cdot I_z - I_{yz}^{2}} \\
+  &= \frac{-972\,\mathrm{kN}}{320000\,\mathrm{mm}^{2}} - \frac{-259.8\,\mathrm{kNm}\,(4266.7\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 400\,\mathrm{mm} - 0\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 200\,\mathrm{mm}) + \left(-24.6\,\mathrm{kNm}\right)\,(17066.7\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 200\,\mathrm{mm} - 0\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 400\,\mathrm{mm})}{17066.7\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 4266.7\,\cdot 10^{6}\,\mathrm{mm}^{4} - \left(0\,\cdot 10^{6}\,\mathrm{mm}^{4}\right)^{2}} \\
+  &= 4.21\,\mathrm{N}/\mathrm{mm}^{2}
+\end{aligned}
+$$
+
+**Rissmoment des ungerissenen, vorgespannten Querschnitts** *(SIA 262:2025, 4.3.1.2)*
+
+$$
+\begin{aligned}
+  M_{Riss} &= \left(f_{ct,eff} - \sigma_p\right) \cdot W \\
+  &= \left(2.56\,\mathrm{N}/\mathrm{mm}^{2} - 4.21\,\mathrm{N}/\mathrm{mm}^{2}\right) \cdot 42.67\,\cdot 10^{6}\,\mathrm{mm}^{3} \\
+  &= -70.3\,\mathrm{kNm}
+\end{aligned}
+$$
+
+**Biegewiderstand bei N = 0 in dieser Richtung**
+
+$$
+M_{Rd} = 175.2\,\mathrm{kNm}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,Riss,\text{Zug oben}} = \frac{M_{Rd}}{M_{Riss}} = \frac{175.2\,\mathrm{kNm}}{-70.3\,\mathrm{kNm}} = \infty \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+#### Zug links
+
+Gezogenster Betonpunkt: y = 0 mm, z = 800 mm (C30/37).
+
+**Beiwert für die Höhe in Biegerichtung** *(SIA 262:2025, 4.4.1.3, (100))*
+
+$$
+k_t = \frac{1}{1 + 0.5 \cdot h/3} = \frac{1}{1 + 0.5 \cdot 0.4/3} = 0.938 \quad \left(h\ \text{in}\ \mathrm{m}\right)
+$$
+
+**Wirksame Zugfestigkeit** *(SIA 262:2025, 4.4.1.3, (99))*
+
+$$
+f_{ct,eff} = k_t \cdot f_{ctm} = 0.938 \cdot 2.9\,\mathrm{N}/\mathrm{mm}^{2} = 2.72\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Widerstandsmoment zum gezogensten Betonpunkt**
+
+$$
+\begin{aligned}
+  W &= \frac{I_y \cdot I_z - I_{yz}^{2}}{I_{yz} \cdot z' - I_y \cdot y'} \\
+  &= \frac{17066.7\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 4266.7\,\cdot 10^{6}\,\mathrm{mm}^{4} - \left(0\,\cdot 10^{6}\,\mathrm{mm}^{4}\right)^{2}}{0\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 400\,\mathrm{mm} - 17066.7\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot \left(-200\,\mathrm{mm}\right)} \\
+  &= 21.33\,\cdot 10^{6}\,\mathrm{mm}^{3}
+\end{aligned}
+$$
+
+**Normalkraft aus der Vorspannung** *(SIA 262:2025, 4.3.1.2; 4.4.3.2.4)*
+
+$$
+N_p = -\left(P_{\infty,1} + P_{\infty,2}\right) = -\left(664\,\mathrm{kN} + 308\,\mathrm{kN}\right) = -972\,\mathrm{kN}
+$$
+
+**Moment aus der Vorspannung um y** *(SIA 262:2025, 4.3.1.2; 4.4.3.2.4)*
+
+$$
+\begin{aligned}
+  M_{p,y} &= \left(P_{\infty,1} \cdot z'_{p,1} + P_{\infty,2} \cdot z'_{p,2}\right) \\
+  &= \left(664\,\mathrm{kN} \cdot \left(-280\,\mathrm{mm}\right) + 308\,\mathrm{kN} \cdot \left(-240\,\mathrm{mm}\right)\right) \\
+  &= -259.8\,\mathrm{kNm}
+\end{aligned}
+$$
+
+**Moment aus der Vorspannung um z** *(SIA 262:2025, 4.3.1.2; 4.4.3.2.4)*
+
+$$
+\begin{aligned}
+  M_{p,z} &= \left(P_{\infty,1} \cdot y'_{p,1} + P_{\infty,2} \cdot y'_{p,2}\right) \\
+  &= \left(664\,\mathrm{kN} \cdot 0\,\mathrm{mm} + 308\,\mathrm{kN} \cdot \left(-80\,\mathrm{mm}\right)\right) \\
+  &= -24.6\,\mathrm{kNm}
+\end{aligned}
+$$
+
+**Spannung aus der Vorspannung an der Ecke** *(SIA 262:2025, 4.3.1.2; 4.4.3.2.4)*
+
+$$
+\begin{aligned}
+  \sigma_p &= \frac{N_p}{A} - \frac{M_{p,y}\,(I_z \cdot z' - I_{yz} \cdot y') + M_{p,z}\,(I_y \cdot y' - I_{yz} \cdot z')}{I_y \cdot I_z - I_{yz}^{2}} \\
+  &= \frac{-972\,\mathrm{kN}}{320000\,\mathrm{mm}^{2}} - \frac{-259.8\,\mathrm{kNm}\,(4266.7\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 400\,\mathrm{mm} - 0\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot \left(-200\,\mathrm{mm}\right)) + \left(-24.6\,\mathrm{kNm}\right)\,(17066.7\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot \left(-200\,\mathrm{mm}\right) - 0\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 400\,\mathrm{mm})}{17066.7\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 4266.7\,\cdot 10^{6}\,\mathrm{mm}^{4} - \left(0\,\cdot 10^{6}\,\mathrm{mm}^{4}\right)^{2}} \\
+  &= 1.9\,\mathrm{N}/\mathrm{mm}^{2}
+\end{aligned}
+$$
+
+**Rissmoment des ungerissenen, vorgespannten Querschnitts** *(SIA 262:2025, 4.3.1.2)*
+
+$$
+\begin{aligned}
+  M_{Riss} &= \left(f_{ct,eff} - \sigma_p\right) \cdot W \\
+  &= \left(2.72\,\mathrm{N}/\mathrm{mm}^{2} - 1.9\,\mathrm{N}/\mathrm{mm}^{2}\right) \cdot 21.33\,\cdot 10^{6}\,\mathrm{mm}^{3} \\
+  &= 17.5\,\mathrm{kNm}
+\end{aligned}
+$$
+
+**Biegewiderstand bei N = 0 in dieser Richtung**
+
+$$
+M_{Rd} = 203.1\,\mathrm{kNm}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,Riss,\text{Zug links}} = \frac{M_{Rd}}{M_{Riss}} = \frac{203.1\,\mathrm{kNm}}{17.5\,\mathrm{kNm}} = 11.59 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+#### Zug rechts
+
+Gezogenster Betonpunkt: y = 400 mm, z = 800 mm (C30/37).
+
+**Beiwert für die Höhe in Biegerichtung** *(SIA 262:2025, 4.4.1.3, (100))*
+
+$$
+k_t = \frac{1}{1 + 0.5 \cdot h/3} = \frac{1}{1 + 0.5 \cdot 0.4/3} = 0.938 \quad \left(h\ \text{in}\ \mathrm{m}\right)
+$$
+
+**Wirksame Zugfestigkeit** *(SIA 262:2025, 4.4.1.3, (99))*
+
+$$
+f_{ct,eff} = k_t \cdot f_{ctm} = 0.938 \cdot 2.9\,\mathrm{N}/\mathrm{mm}^{2} = 2.72\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Widerstandsmoment zum gezogensten Betonpunkt**
+
+$$
+\begin{aligned}
+  W &= \frac{I_y \cdot I_z - I_{yz}^{2}}{I_y \cdot y' - I_{yz} \cdot z'} \\
+  &= \frac{17066.7\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 4266.7\,\cdot 10^{6}\,\mathrm{mm}^{4} - \left(0\,\cdot 10^{6}\,\mathrm{mm}^{4}\right)^{2}}{17066.7\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 200\,\mathrm{mm} - 0\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 400\,\mathrm{mm}} \\
+  &= 21.33\,\cdot 10^{6}\,\mathrm{mm}^{3}
+\end{aligned}
+$$
+
+**Normalkraft aus der Vorspannung** *(SIA 262:2025, 4.3.1.2; 4.4.3.2.4)*
+
+$$
+N_p = -\left(P_{\infty,1} + P_{\infty,2}\right) = -\left(664\,\mathrm{kN} + 308\,\mathrm{kN}\right) = -972\,\mathrm{kN}
+$$
+
+**Moment aus der Vorspannung um y** *(SIA 262:2025, 4.3.1.2; 4.4.3.2.4)*
+
+$$
+\begin{aligned}
+  M_{p,y} &= \left(P_{\infty,1} \cdot z'_{p,1} + P_{\infty,2} \cdot z'_{p,2}\right) \\
+  &= \left(664\,\mathrm{kN} \cdot \left(-280\,\mathrm{mm}\right) + 308\,\mathrm{kN} \cdot \left(-240\,\mathrm{mm}\right)\right) \\
+  &= -259.8\,\mathrm{kNm}
+\end{aligned}
+$$
+
+**Moment aus der Vorspannung um z** *(SIA 262:2025, 4.3.1.2; 4.4.3.2.4)*
+
+$$
+\begin{aligned}
+  M_{p,z} &= \left(P_{\infty,1} \cdot y'_{p,1} + P_{\infty,2} \cdot y'_{p,2}\right) \\
+  &= \left(664\,\mathrm{kN} \cdot 0\,\mathrm{mm} + 308\,\mathrm{kN} \cdot \left(-80\,\mathrm{mm}\right)\right) \\
+  &= -24.6\,\mathrm{kNm}
+\end{aligned}
+$$
+
+**Spannung aus der Vorspannung an der Ecke** *(SIA 262:2025, 4.3.1.2; 4.4.3.2.4)*
+
+$$
+\begin{aligned}
+  \sigma_p &= \frac{N_p}{A} - \frac{M_{p,y}\,(I_z \cdot z' - I_{yz} \cdot y') + M_{p,z}\,(I_y \cdot y' - I_{yz} \cdot z')}{I_y \cdot I_z - I_{yz}^{2}} \\
+  &= \frac{-972\,\mathrm{kN}}{320000\,\mathrm{mm}^{2}} - \frac{-259.8\,\mathrm{kNm}\,(4266.7\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 400\,\mathrm{mm} - 0\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 200\,\mathrm{mm}) + \left(-24.6\,\mathrm{kNm}\right)\,(17066.7\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 200\,\mathrm{mm} - 0\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 400\,\mathrm{mm})}{17066.7\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 4266.7\,\cdot 10^{6}\,\mathrm{mm}^{4} - \left(0\,\cdot 10^{6}\,\mathrm{mm}^{4}\right)^{2}} \\
+  &= 4.21\,\mathrm{N}/\mathrm{mm}^{2}
+\end{aligned}
+$$
+
+**Rissmoment des ungerissenen, vorgespannten Querschnitts** *(SIA 262:2025, 4.3.1.2)*
+
+$$
+\begin{aligned}
+  M_{Riss} &= \left(f_{ct,eff} - \sigma_p\right) \cdot W \\
+  &= \left(2.72\,\mathrm{N}/\mathrm{mm}^{2} - 4.21\,\mathrm{N}/\mathrm{mm}^{2}\right) \cdot 21.33\,\cdot 10^{6}\,\mathrm{mm}^{3} \\
+  &= -31.8\,\mathrm{kNm}
+\end{aligned}
+$$
+
+**Biegewiderstand bei N = 0 in dieser Richtung**
+
+$$
+M_{Rd} = 159.2\,\mathrm{kNm}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,Riss,\text{Zug rechts}} = \frac{M_{Rd}}{M_{Riss}} = \frac{159.2\,\mathrm{kNm}}{-31.8\,\mathrm{kNm}} = \infty \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+Massgebend: Zug unten (kleinster Erfüllungsgrad).
+
+### Zwängung auf Biegung
+
+**Zwängung auf Biegung, je Stab** *(SIA 262:2025, 4.4.2.3.4, Tabelle 17)*
+
+$$
+\max_i \frac{\sigma_{s,i}(M_{s,adm})}{\sigma_{s,adm,i}} = 1\qquad M_{s,adm} \ge M_{Riss}
+$$
+
+**Spannung im ungerissenen Querschnitt**
+
+$$
+\sigma(y, z) = -\frac{M_y\,(I_z z' - I_{yz} y') + M_z\,(I_y y' - I_{yz} z')}{I_y I_z - I_{yz}^2}\qquad y' = y - y_S,\ z' = z - z_S
+$$
+
+**Rechenwahl**
+
+$$
+\varphi = 0 \qquad \text{charakteristisch}\ f_{ck},\ f_{yk} \qquad \text{Präzise ohne Vereinfachung}
+$$
+
+**Wirksamer Elastizitätsmodul C30/37** *(SIA 262:2025, 3.1.2.6.1, (12))*
+
+$$
+E_{c,eff} = \frac{E_{cm}}{1 + \varphi} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 0} = 33620\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Werkstoffgesetze im gerissenen Zustand, C30/37: Beiwert der Parabel** *(SIA 262:2025, 4.2.1.6, (27); Untergrenze 1 nach Vorgabe)*
+
+$$
+k_{\sigma} = \max\left(1;\ \frac{E_{c,eff}}{400 \cdot f_{ck}}\right) = \max\left(1;\ \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{400 \cdot 30\,\mathrm{N}/\mathrm{mm}^{2}}\right) = 2.8
+$$
+
+**Werkstoffgesetze im gerissenen Zustand, C30/37: Beton, Parabel-Rechteck** *(SIA 262:2025, 4.2.1.5, Figur 12; 4.2.1.6, (27))*
+
+$$
+\sigma_c(\varepsilon_c) = \begin{cases} -f_{ck} \cdot \dfrac{k_\sigma\,\eta - \eta^2}{1 + (k_\sigma - 2)\,\eta} & 0 \le |\varepsilon_c| \le \varepsilon_{c1d},\ \eta = \dfrac{|\varepsilon_c|}{\varepsilon_{c1d}} \\[2ex] -f_{ck} & \varepsilon_{c1d} < |\varepsilon_c| \le \varepsilon_{c2d} \\[1ex] 0 & |\varepsilon_c| > \varepsilon_{c2d} \quad (\text{jenseits der Bruchstauchung}) \\[1ex] 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen}) \end{cases}
+$$
+
+**Werkstoffgesetze im gerissenen Zustand, C30/37: Werte des Betons**
+
+$$
+f_{ck} = 30\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{c1d} = 2\,\text{‰} \quad \varepsilon_{c2d} = 3.5\,\text{‰}
+$$
+
+**Werkstoffgesetze im gerissenen Zustand, B500B: Stahl, bilinear** *(SIA 262:2025, 4.2.2.2, Figur 16; 4.2.2.5)*
+
+$$
+\sigma_s(\varepsilon_s) = \begin{cases} \min(E_s\,\varepsilon_s;\ f_{yk}) & 0 \le \varepsilon_s \le \varepsilon_{ud} \\[1ex] \max(E_s\,\varepsilon_s;\ -f_{yk}^{-}) & -\varepsilon_{ud} \le \varepsilon_s < 0 \\[1ex] 0 & |\varepsilon_s| > \varepsilon_{ud} \quad (\text{jenseits der Bruchdehnung}) \end{cases}
+$$
+
+**Werkstoffgesetze im gerissenen Zustand, B500B: Werte des Stahls**
+
+$$
+f_{yk} = 500\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{yk}^{-} = 500\,\mathrm{N}/\mathrm{mm}^{2} \quad E_s = 200000\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{ud} = 4.5\,\%
+$$
+
+**Werkstoffgesetze im gerissenen Zustand, Spannglied 1: mit Vordehnung** *(SIA 262:2025, 4.1.5.1.5; SIA 262:2025, 4.1.5.5.1; 4.2.3.3, Figur 17)*
+
+$$
+\sigma_p(\varepsilon) = \begin{cases} \min\left(E_p\,(\varepsilon + \varepsilon_p);\ f_{p0.1k}\right) & -\varepsilon_p < \varepsilon \le \varepsilon_{ud} - \varepsilon_p \\[1ex] 0 & \varepsilon \le -\varepsilon_p \quad (\text{entspannt}) \\[1ex] 0 & \varepsilon > \varepsilon_{ud} - \varepsilon_p \quad (\text{jenseits der Bruchdehnung}) \end{cases}
+$$
+
+**Werkstoffgesetze im gerissenen Zustand, Spannglied 1: Werte des Spannglieds**
+
+$$
+f_{p0.1k} = 1600\,\mathrm{N}/\mathrm{mm}^{2} \quad E_p^{\mathrm{Litze}} = 195000\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{ud} = 2\,\% \quad \varepsilon_{p,1} = 5.68\,\text{‰}
+$$
+
+**Werkstoffgesetze im gerissenen Zustand, Spannglied 2: ohne Verbund** *(SIA 262:2025, 4.1.5.1.6)*
+
+$$
+\sigma_p(\varepsilon) = \sigma_{p\infty}
+$$
+
+**Werkstoffgesetze im gerissenen Zustand, Spannglied 2: Werte des Spannglieds**
+
+$$
+\sigma_{p\infty,2} = 1100\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Werkstoffgesetze im gerissenen Zustand, Spannglied 3: schlaff mit Restfestigkeit** *(SIA 262:2025, 4.1.5.5.2; SIA 262:2025, 4.1.5.1.5; 4.2.3.3, Figur 17)*
+
+$$
+\sigma_p(\varepsilon) = \begin{cases} \min\left(E_p\,(\varepsilon + \varepsilon_p);\ f_{p0.1k}\right) - \sigma_{p\infty} & -\varepsilon_p < \varepsilon \le \varepsilon_{ud} - \varepsilon_p \\[1ex] -\sigma_{p\infty} & \varepsilon \le -\varepsilon_p \quad (\text{entspannt}) \\[1ex] -\sigma_{p\infty} & \varepsilon > \varepsilon_{ud} - \varepsilon_p \quad (\text{jenseits der Bruchdehnung}) \end{cases}
+$$
+
+**Werkstoffgesetze im gerissenen Zustand, Spannglied 3: Werte des Spannglieds**
+
+$$
+f_{p0.1k} = 1600\,\mathrm{N}/\mathrm{mm}^{2} \quad E_p^{\mathrm{Litze}} = 195000\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{ud} = 2\,\% \quad \varepsilon_{p,3} = 5.68\,\text{‰} \quad \sigma_{p\infty,3} = 1107\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+> **Hinweis:** Spannglied 1, Spannglied 2, Spannglied 3: im Gleichgewicht mit ihrer Kraft gerechnet. Wie weit ihre Spannung dabei zunimmt, prüft das Werkzeug noch nicht – mitzählen darf der Spannstahl, solange sein Zuwachs unter der zulässigen Stahlspannung und σ\_p unter f\_pd bleibt (SIA 262:2025, 4.4.2.3.10).
+
+**Zulässige Stahlspannung (normale Anforderung)** *(SIA 262:2025, Tabelle 17)*
+
+$$
+\sigma_{s,adm} = f_{yk} = 500\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Dehnungsebene und innere Kräfte** *(SIA 262:2025, 4.3.2.3)*
+
+$$
+\varepsilon(y, z) = \varepsilon_0 + \kappa \cdot v \qquad v = n_y (y - y_S) + n_z (z - z_S) \qquad N = \int_A \sigma\,\mathrm{d}A \qquad M_y = -\int_A \sigma\,(z - z_S)\,\mathrm{d}A \qquad M_z = -\int_A \sigma\,(y - y_S)\,\mathrm{d}A
+$$
+
+#### Zug unten
+
+Gezogenster Betonpunkt: y = 400 mm, z = 0 mm (C30/37).
+
+**Beiwert für die Höhe in Biegerichtung** *(SIA 262:2025, 4.4.1.3, (100))*
+
+$$
+k_t = \frac{1}{1 + 0.5 \cdot h/3} = \frac{1}{1 + 0.5 \cdot 0.8/3} = 0.882 \quad \left(h\ \text{in}\ \mathrm{m}\right)
+$$
+
+**Wirksame Zugfestigkeit** *(SIA 262:2025, 4.4.1.3, (99))*
+
+$$
+f_{ct,eff} = k_t \cdot f_{ctm} = 0.882 \cdot 2.9\,\mathrm{N}/\mathrm{mm}^{2} = 2.56\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Widerstandsmoment zum gezogensten Betonpunkt**
+
+$$
+\begin{aligned}
+  W &= \frac{I_y \cdot I_z - I_{yz}^{2}}{I_{yz} \cdot y' - I_z \cdot z'} \\
+  &= \frac{17066.7\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 4266.7\,\cdot 10^{6}\,\mathrm{mm}^{4} - \left(0\,\cdot 10^{6}\,\mathrm{mm}^{4}\right)^{2}}{0\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 200\,\mathrm{mm} - 4266.7\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot \left(-400\,\mathrm{mm}\right)} \\
+  &= 42.67\,\cdot 10^{6}\,\mathrm{mm}^{3}
+\end{aligned}
+$$
+
+**Normalkraft aus der Vorspannung** *(SIA 262:2025, 4.3.1.2; 4.4.3.2.4)*
+
+$$
+N_p = -\left(P_{\infty,1} + P_{\infty,2}\right) = -\left(664\,\mathrm{kN} + 308\,\mathrm{kN}\right) = -972\,\mathrm{kN}
+$$
+
+**Moment aus der Vorspannung um y** *(SIA 262:2025, 4.3.1.2; 4.4.3.2.4)*
+
+$$
+\begin{aligned}
+  M_{p,y} &= \left(P_{\infty,1} \cdot z'_{p,1} + P_{\infty,2} \cdot z'_{p,2}\right) \\
+  &= \left(664\,\mathrm{kN} \cdot \left(-280\,\mathrm{mm}\right) + 308\,\mathrm{kN} \cdot \left(-240\,\mathrm{mm}\right)\right) \\
+  &= -259.8\,\mathrm{kNm}
+\end{aligned}
+$$
+
+**Moment aus der Vorspannung um z** *(SIA 262:2025, 4.3.1.2; 4.4.3.2.4)*
+
+$$
+\begin{aligned}
+  M_{p,z} &= \left(P_{\infty,1} \cdot y'_{p,1} + P_{\infty,2} \cdot y'_{p,2}\right) \\
+  &= \left(664\,\mathrm{kN} \cdot 0\,\mathrm{mm} + 308\,\mathrm{kN} \cdot \left(-80\,\mathrm{mm}\right)\right) \\
+  &= -24.6\,\mathrm{kNm}
+\end{aligned}
+$$
+
+**Spannung aus der Vorspannung an der Ecke** *(SIA 262:2025, 4.3.1.2; 4.4.3.2.4)*
+
+$$
+\begin{aligned}
+  \sigma_p &= \frac{N_p}{A} - \frac{M_{p,y}\,(I_z \cdot z' - I_{yz} \cdot y') + M_{p,z}\,(I_y \cdot y' - I_{yz} \cdot z')}{I_y \cdot I_z - I_{yz}^{2}} \\
+  &= \frac{-972\,\mathrm{kN}}{320000\,\mathrm{mm}^{2}} - \frac{-259.8\,\mathrm{kNm}\,(4266.7\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot \left(-400\,\mathrm{mm}\right) - 0\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 200\,\mathrm{mm}) + \left(-24.6\,\mathrm{kNm}\right)\,(17066.7\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 200\,\mathrm{mm} - 0\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot \left(-400\,\mathrm{mm}\right))}{17066.7\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 4266.7\,\cdot 10^{6}\,\mathrm{mm}^{4} - \left(0\,\cdot 10^{6}\,\mathrm{mm}^{4}\right)^{2}} \\
+  &= -7.97\,\mathrm{N}/\mathrm{mm}^{2}
+\end{aligned}
+$$
+
+**Rissmoment des ungerissenen, vorgespannten Querschnitts** *(SIA 262:2025, 4.4.2.3.4, Tabelle 17)*
+
+$$
+\begin{aligned}
+  M_{Riss} &= \left(f_{ct,eff} - \sigma_p\right) \cdot W \\
+  &= \left(2.56\,\mathrm{N}/\mathrm{mm}^{2} - \left(-7.97\,\mathrm{N}/\mathrm{mm}^{2}\right)\right) \cdot 42.67\,\cdot 10^{6}\,\mathrm{mm}^{3} \\
+  &= 449.3\,\mathrm{kNm}
+\end{aligned}
+$$
+
+**Moment, bei dem der erste gezogene Stab σ\_s,adm erreicht**
+
+$$
+M_{s,adm} = 949.2\,\mathrm{kNm}
+$$
+
+**Gefundene Dehnungsebene: Zugrichtung, Dehnung im Schwerpunkt, Krümmung**
+
+$$
+\psi = -83.2^\circ \qquad \varepsilon_0 = 0.7634\,\text{‰} \qquad \kappa = 0.00479\,\mathrm{m}^{-1}
+$$
+
+**Probe: die Ebene erzeugt die Einwirkung**
+
+$$
+N_{int} = 0\,\mathrm{kN} \;\checkmark \qquad M_{y,int} = 949.2\,\mathrm{kNm} \;\checkmark \qquad M_{z,int} = 0\,\mathrm{kNm} \;\checkmark
+$$
+
+**An der Grenze: Linie 1 (y = 350 mm, z = 50 mm)**
+
+$$
+\sigma_s = 500\,\mathrm{N}/\mathrm{mm}^{2} = \sigma_{s,adm} = 500\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Zwängung auf Biegung**
+
+$$
+M_{s,adm} = 949.2\,\mathrm{kNm} \quad \ge \quad M_{Riss} = 449.3\,\mathrm{kNm}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,ZB,\text{Zug unten}} = \frac{M_{s,adm}}{M_{Riss}} = \frac{949.2\,\mathrm{kNm}}{449.3\,\mathrm{kNm}} = 2.11 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+#### Zug oben
+
+Gezogenster Betonpunkt: y = 400 mm, z = 800 mm (C30/37).
+
+**Beiwert für die Höhe in Biegerichtung** *(SIA 262:2025, 4.4.1.3, (100))*
+
+$$
+k_t = \frac{1}{1 + 0.5 \cdot h/3} = \frac{1}{1 + 0.5 \cdot 0.8/3} = 0.882 \quad \left(h\ \text{in}\ \mathrm{m}\right)
+$$
+
+**Wirksame Zugfestigkeit** *(SIA 262:2025, 4.4.1.3, (99))*
+
+$$
+f_{ct,eff} = k_t \cdot f_{ctm} = 0.882 \cdot 2.9\,\mathrm{N}/\mathrm{mm}^{2} = 2.56\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Widerstandsmoment zum gezogensten Betonpunkt**
+
+$$
+\begin{aligned}
+  W &= \frac{I_y \cdot I_z - I_{yz}^{2}}{I_z \cdot z' - I_{yz} \cdot y'} \\
+  &= \frac{17066.7\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 4266.7\,\cdot 10^{6}\,\mathrm{mm}^{4} - \left(0\,\cdot 10^{6}\,\mathrm{mm}^{4}\right)^{2}}{4266.7\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 400\,\mathrm{mm} - 0\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 200\,\mathrm{mm}} \\
+  &= 42.67\,\cdot 10^{6}\,\mathrm{mm}^{3}
+\end{aligned}
+$$
+
+**Normalkraft aus der Vorspannung** *(SIA 262:2025, 4.3.1.2; 4.4.3.2.4)*
+
+$$
+N_p = -\left(P_{\infty,1} + P_{\infty,2}\right) = -\left(664\,\mathrm{kN} + 308\,\mathrm{kN}\right) = -972\,\mathrm{kN}
+$$
+
+**Moment aus der Vorspannung um y** *(SIA 262:2025, 4.3.1.2; 4.4.3.2.4)*
+
+$$
+\begin{aligned}
+  M_{p,y} &= \left(P_{\infty,1} \cdot z'_{p,1} + P_{\infty,2} \cdot z'_{p,2}\right) \\
+  &= \left(664\,\mathrm{kN} \cdot \left(-280\,\mathrm{mm}\right) + 308\,\mathrm{kN} \cdot \left(-240\,\mathrm{mm}\right)\right) \\
+  &= -259.8\,\mathrm{kNm}
+\end{aligned}
+$$
+
+**Moment aus der Vorspannung um z** *(SIA 262:2025, 4.3.1.2; 4.4.3.2.4)*
+
+$$
+\begin{aligned}
+  M_{p,z} &= \left(P_{\infty,1} \cdot y'_{p,1} + P_{\infty,2} \cdot y'_{p,2}\right) \\
+  &= \left(664\,\mathrm{kN} \cdot 0\,\mathrm{mm} + 308\,\mathrm{kN} \cdot \left(-80\,\mathrm{mm}\right)\right) \\
+  &= -24.6\,\mathrm{kNm}
+\end{aligned}
+$$
+
+**Spannung aus der Vorspannung an der Ecke** *(SIA 262:2025, 4.3.1.2; 4.4.3.2.4)*
+
+$$
+\begin{aligned}
+  \sigma_p &= \frac{N_p}{A} - \frac{M_{p,y}\,(I_z \cdot z' - I_{yz} \cdot y') + M_{p,z}\,(I_y \cdot y' - I_{yz} \cdot z')}{I_y \cdot I_z - I_{yz}^{2}} \\
+  &= \frac{-972\,\mathrm{kN}}{320000\,\mathrm{mm}^{2}} - \frac{-259.8\,\mathrm{kNm}\,(4266.7\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 400\,\mathrm{mm} - 0\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 200\,\mathrm{mm}) + \left(-24.6\,\mathrm{kNm}\right)\,(17066.7\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 200\,\mathrm{mm} - 0\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 400\,\mathrm{mm})}{17066.7\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 4266.7\,\cdot 10^{6}\,\mathrm{mm}^{4} - \left(0\,\cdot 10^{6}\,\mathrm{mm}^{4}\right)^{2}} \\
+  &= 4.21\,\mathrm{N}/\mathrm{mm}^{2}
+\end{aligned}
+$$
+
+**Rissmoment des ungerissenen, vorgespannten Querschnitts** *(SIA 262:2025, 4.4.2.3.4, Tabelle 17)*
+
+$$
+\begin{aligned}
+  M_{Riss} &= \left(f_{ct,eff} - \sigma_p\right) \cdot W \\
+  &= \left(2.56\,\mathrm{N}/\mathrm{mm}^{2} - 4.21\,\mathrm{N}/\mathrm{mm}^{2}\right) \cdot 42.67\,\cdot 10^{6}\,\mathrm{mm}^{3} \\
+  &= -70.3\,\mathrm{kNm}
+\end{aligned}
+$$
+
+**Moment, bei dem der erste gezogene Stab σ\_s,adm erreicht**
+
+$$
+M_{s,adm} = -947.5\,\mathrm{kNm}
+$$
+
+**Gefundene Dehnungsebene: Zugrichtung, Dehnung im Schwerpunkt, Krümmung**
+
+$$
+\psi = -83.2^\circ \qquad \varepsilon_0 = 0.7592\,\text{‰} \qquad \kappa = 0.00477\,\mathrm{m}^{-1}
+$$
+
+**Probe: die Ebene erzeugt die Einwirkung**
+
+$$
+N_{int} = 0\,\mathrm{kN} \;\checkmark \qquad M_{y,int} = 947.5\,\mathrm{kNm} \;\checkmark \qquad M_{z,int} = 0\,\mathrm{kNm} \;\checkmark
+$$
+
+**An der Grenze: Linie 1 (y = 350 mm, z = 50 mm)**
+
+$$
+\sigma_s = 500\,\mathrm{N}/\mathrm{mm}^{2} = \sigma_{s,adm} = 500\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Zwängung auf Biegung**
+
+$$
+M_{s,adm} = -947.5\,\mathrm{kNm} \quad \ge \quad M_{Riss} = -70.3\,\mathrm{kNm}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,ZB,\text{Zug oben}} = \frac{M_{s,adm}}{M_{Riss}} = \frac{-947.5\,\mathrm{kNm}}{-70.3\,\mathrm{kNm}} = 13.47 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+#### Zug links
+
+Gezogenster Betonpunkt: y = 0 mm, z = 800 mm (C30/37).
+
+**Beiwert für die Höhe in Biegerichtung** *(SIA 262:2025, 4.4.1.3, (100))*
+
+$$
+k_t = \frac{1}{1 + 0.5 \cdot h/3} = \frac{1}{1 + 0.5 \cdot 0.4/3} = 0.938 \quad \left(h\ \text{in}\ \mathrm{m}\right)
+$$
+
+**Wirksame Zugfestigkeit** *(SIA 262:2025, 4.4.1.3, (99))*
+
+$$
+f_{ct,eff} = k_t \cdot f_{ctm} = 0.938 \cdot 2.9\,\mathrm{N}/\mathrm{mm}^{2} = 2.72\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Widerstandsmoment zum gezogensten Betonpunkt**
+
+$$
+\begin{aligned}
+  W &= \frac{I_y \cdot I_z - I_{yz}^{2}}{I_{yz} \cdot z' - I_y \cdot y'} \\
+  &= \frac{17066.7\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 4266.7\,\cdot 10^{6}\,\mathrm{mm}^{4} - \left(0\,\cdot 10^{6}\,\mathrm{mm}^{4}\right)^{2}}{0\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 400\,\mathrm{mm} - 17066.7\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot \left(-200\,\mathrm{mm}\right)} \\
+  &= 21.33\,\cdot 10^{6}\,\mathrm{mm}^{3}
+\end{aligned}
+$$
+
+**Normalkraft aus der Vorspannung** *(SIA 262:2025, 4.3.1.2; 4.4.3.2.4)*
+
+$$
+N_p = -\left(P_{\infty,1} + P_{\infty,2}\right) = -\left(664\,\mathrm{kN} + 308\,\mathrm{kN}\right) = -972\,\mathrm{kN}
+$$
+
+**Moment aus der Vorspannung um y** *(SIA 262:2025, 4.3.1.2; 4.4.3.2.4)*
+
+$$
+\begin{aligned}
+  M_{p,y} &= \left(P_{\infty,1} \cdot z'_{p,1} + P_{\infty,2} \cdot z'_{p,2}\right) \\
+  &= \left(664\,\mathrm{kN} \cdot \left(-280\,\mathrm{mm}\right) + 308\,\mathrm{kN} \cdot \left(-240\,\mathrm{mm}\right)\right) \\
+  &= -259.8\,\mathrm{kNm}
+\end{aligned}
+$$
+
+**Moment aus der Vorspannung um z** *(SIA 262:2025, 4.3.1.2; 4.4.3.2.4)*
+
+$$
+\begin{aligned}
+  M_{p,z} &= \left(P_{\infty,1} \cdot y'_{p,1} + P_{\infty,2} \cdot y'_{p,2}\right) \\
+  &= \left(664\,\mathrm{kN} \cdot 0\,\mathrm{mm} + 308\,\mathrm{kN} \cdot \left(-80\,\mathrm{mm}\right)\right) \\
+  &= -24.6\,\mathrm{kNm}
+\end{aligned}
+$$
+
+**Spannung aus der Vorspannung an der Ecke** *(SIA 262:2025, 4.3.1.2; 4.4.3.2.4)*
+
+$$
+\begin{aligned}
+  \sigma_p &= \frac{N_p}{A} - \frac{M_{p,y}\,(I_z \cdot z' - I_{yz} \cdot y') + M_{p,z}\,(I_y \cdot y' - I_{yz} \cdot z')}{I_y \cdot I_z - I_{yz}^{2}} \\
+  &= \frac{-972\,\mathrm{kN}}{320000\,\mathrm{mm}^{2}} - \frac{-259.8\,\mathrm{kNm}\,(4266.7\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 400\,\mathrm{mm} - 0\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot \left(-200\,\mathrm{mm}\right)) + \left(-24.6\,\mathrm{kNm}\right)\,(17066.7\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot \left(-200\,\mathrm{mm}\right) - 0\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 400\,\mathrm{mm})}{17066.7\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 4266.7\,\cdot 10^{6}\,\mathrm{mm}^{4} - \left(0\,\cdot 10^{6}\,\mathrm{mm}^{4}\right)^{2}} \\
+  &= 1.9\,\mathrm{N}/\mathrm{mm}^{2}
+\end{aligned}
+$$
+
+**Rissmoment des ungerissenen, vorgespannten Querschnitts** *(SIA 262:2025, 4.4.2.3.4, Tabelle 17)*
+
+$$
+\begin{aligned}
+  M_{Riss} &= \left(f_{ct,eff} - \sigma_p\right) \cdot W \\
+  &= \left(2.72\,\mathrm{N}/\mathrm{mm}^{2} - 1.9\,\mathrm{N}/\mathrm{mm}^{2}\right) \cdot 21.33\,\cdot 10^{6}\,\mathrm{mm}^{3} \\
+  &= 17.5\,\mathrm{kNm}
+\end{aligned}
+$$
+
+**Moment, bei dem der erste gezogene Stab σ\_s,adm erreicht**
+
+$$
+M_{s,adm} = 209.3\,\mathrm{kNm}
+$$
+
+**Gefundene Dehnungsebene: Zugrichtung, Dehnung im Schwerpunkt, Krümmung**
+
+$$
+\psi = -15.9^\circ \qquad \varepsilon_0 = 1.0193\,\text{‰} \qquad \kappa = -0.00936\,\mathrm{m}^{-1}
+$$
+
+**Probe: die Ebene erzeugt die Einwirkung**
+
+$$
+N_{int} = 0\,\mathrm{kN} \;\checkmark \qquad M_{y,int} = 0\,\mathrm{kNm} \;\checkmark \qquad M_{z,int} = 209.3\,\mathrm{kNm} \;\checkmark
+$$
+
+**An der Grenze: Linie 2 (y = 50 mm, z = 750 mm)**
+
+$$
+\sigma_s = 500\,\mathrm{N}/\mathrm{mm}^{2} = \sigma_{s,adm} = 500\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Zwängung auf Biegung**
+
+$$
+M_{s,adm} = 209.3\,\mathrm{kNm} \quad \ge \quad M_{Riss} = 17.5\,\mathrm{kNm}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,ZB,\text{Zug links}} = \frac{M_{s,adm}}{M_{Riss}} = \frac{209.3\,\mathrm{kNm}}{17.5\,\mathrm{kNm}} = 11.95 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+#### Zug rechts
+
+Gezogenster Betonpunkt: y = 400 mm, z = 800 mm (C30/37).
+
+**Beiwert für die Höhe in Biegerichtung** *(SIA 262:2025, 4.4.1.3, (100))*
+
+$$
+k_t = \frac{1}{1 + 0.5 \cdot h/3} = \frac{1}{1 + 0.5 \cdot 0.4/3} = 0.938 \quad \left(h\ \text{in}\ \mathrm{m}\right)
+$$
+
+**Wirksame Zugfestigkeit** *(SIA 262:2025, 4.4.1.3, (99))*
+
+$$
+f_{ct,eff} = k_t \cdot f_{ctm} = 0.938 \cdot 2.9\,\mathrm{N}/\mathrm{mm}^{2} = 2.72\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Widerstandsmoment zum gezogensten Betonpunkt**
+
+$$
+\begin{aligned}
+  W &= \frac{I_y \cdot I_z - I_{yz}^{2}}{I_y \cdot y' - I_{yz} \cdot z'} \\
+  &= \frac{17066.7\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 4266.7\,\cdot 10^{6}\,\mathrm{mm}^{4} - \left(0\,\cdot 10^{6}\,\mathrm{mm}^{4}\right)^{2}}{17066.7\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 200\,\mathrm{mm} - 0\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 400\,\mathrm{mm}} \\
+  &= 21.33\,\cdot 10^{6}\,\mathrm{mm}^{3}
+\end{aligned}
+$$
+
+**Normalkraft aus der Vorspannung** *(SIA 262:2025, 4.3.1.2; 4.4.3.2.4)*
+
+$$
+N_p = -\left(P_{\infty,1} + P_{\infty,2}\right) = -\left(664\,\mathrm{kN} + 308\,\mathrm{kN}\right) = -972\,\mathrm{kN}
+$$
+
+**Moment aus der Vorspannung um y** *(SIA 262:2025, 4.3.1.2; 4.4.3.2.4)*
+
+$$
+\begin{aligned}
+  M_{p,y} &= \left(P_{\infty,1} \cdot z'_{p,1} + P_{\infty,2} \cdot z'_{p,2}\right) \\
+  &= \left(664\,\mathrm{kN} \cdot \left(-280\,\mathrm{mm}\right) + 308\,\mathrm{kN} \cdot \left(-240\,\mathrm{mm}\right)\right) \\
+  &= -259.8\,\mathrm{kNm}
+\end{aligned}
+$$
+
+**Moment aus der Vorspannung um z** *(SIA 262:2025, 4.3.1.2; 4.4.3.2.4)*
+
+$$
+\begin{aligned}
+  M_{p,z} &= \left(P_{\infty,1} \cdot y'_{p,1} + P_{\infty,2} \cdot y'_{p,2}\right) \\
+  &= \left(664\,\mathrm{kN} \cdot 0\,\mathrm{mm} + 308\,\mathrm{kN} \cdot \left(-80\,\mathrm{mm}\right)\right) \\
+  &= -24.6\,\mathrm{kNm}
+\end{aligned}
+$$
+
+**Spannung aus der Vorspannung an der Ecke** *(SIA 262:2025, 4.3.1.2; 4.4.3.2.4)*
+
+$$
+\begin{aligned}
+  \sigma_p &= \frac{N_p}{A} - \frac{M_{p,y}\,(I_z \cdot z' - I_{yz} \cdot y') + M_{p,z}\,(I_y \cdot y' - I_{yz} \cdot z')}{I_y \cdot I_z - I_{yz}^{2}} \\
+  &= \frac{-972\,\mathrm{kN}}{320000\,\mathrm{mm}^{2}} - \frac{-259.8\,\mathrm{kNm}\,(4266.7\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 400\,\mathrm{mm} - 0\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 200\,\mathrm{mm}) + \left(-24.6\,\mathrm{kNm}\right)\,(17066.7\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 200\,\mathrm{mm} - 0\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 400\,\mathrm{mm})}{17066.7\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 4266.7\,\cdot 10^{6}\,\mathrm{mm}^{4} - \left(0\,\cdot 10^{6}\,\mathrm{mm}^{4}\right)^{2}} \\
+  &= 4.21\,\mathrm{N}/\mathrm{mm}^{2}
+\end{aligned}
+$$
+
+**Rissmoment des ungerissenen, vorgespannten Querschnitts** *(SIA 262:2025, 4.4.2.3.4, Tabelle 17)*
+
+$$
+\begin{aligned}
+  M_{Riss} &= \left(f_{ct,eff} - \sigma_p\right) \cdot W \\
+  &= \left(2.72\,\mathrm{N}/\mathrm{mm}^{2} - 4.21\,\mathrm{N}/\mathrm{mm}^{2}\right) \cdot 21.33\,\cdot 10^{6}\,\mathrm{mm}^{3} \\
+  &= -31.8\,\mathrm{kNm}
+\end{aligned}
+$$
+
+**Moment, bei dem der erste gezogene Stab σ\_s,adm erreicht**
+
+$$
+M_{s,adm} = -207.6\,\mathrm{kNm}
+$$
+
+**Gefundene Dehnungsebene: Zugrichtung, Dehnung im Schwerpunkt, Krümmung**
+
+$$
+\psi = 163.9^\circ \qquad \varepsilon_0 = 0.9816\,\text{‰} \qquad \kappa = 0.00908\,\mathrm{m}^{-1}
+$$
+
+**Probe: die Ebene erzeugt die Einwirkung**
+
+$$
+N_{int} = 0\,\mathrm{kN} \;\checkmark \qquad M_{y,int} = 0\,\mathrm{kNm} \;\checkmark \qquad M_{z,int} = 207.6\,\mathrm{kNm} \;\checkmark
+$$
+
+**An der Grenze: Linie 2 (y = 50 mm, z = 750 mm)**
+
+$$
+\sigma_s = 500\,\mathrm{N}/\mathrm{mm}^{2} = \sigma_{s,adm} = 500\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Zwängung auf Biegung**
+
+$$
+M_{s,adm} = -207.6\,\mathrm{kNm} \quad \ge \quad M_{Riss} = -31.8\,\mathrm{kNm}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,ZB,\text{Zug rechts}} = \frac{M_{s,adm}}{M_{Riss}} = \frac{-207.6\,\mathrm{kNm}}{-31.8\,\mathrm{kNm}} = 6.54 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+Massgebend: Zug unten (kleinster Erfüllungsgrad).
+
+### Stahlspannung unter quasi-ständiger Einwirkung
+
+**Rechenwahl**
+
+$$
+\varphi = 0 \qquad \text{charakteristisch}\ f_{ck},\ f_{yk} \qquad \text{Präzise ohne Vereinfachung}
+$$
+
+**Zulässige Stahlspannung (normale Anforderung)** *(SIA 262:2025, Tabelle 17)*
+
+$$
+\sigma_{s,adm} = f_{yk} = 500\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+#### Welche Werte angesetzt werden
+
+**Wirksamer Elastizitätsmodul C30/37** *(SIA 262:2025, 3.1.2.6.1, (12))*
+
+$$
+E_{c,eff} = \frac{E_{cm}}{1 + \varphi} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 0} = 33620\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Werkstoffgesetze im Gebrauchszustand, C30/37: Beiwert der Parabel** *(SIA 262:2025, 4.2.1.6, (27); Untergrenze 1 nach Vorgabe)*
+
+$$
+k_{\sigma} = \max\left(1;\ \frac{E_{c,eff}}{400 \cdot f_{ck}}\right) = \max\left(1;\ \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{400 \cdot 30\,\mathrm{N}/\mathrm{mm}^{2}}\right) = 2.8
+$$
+
+**Werkstoffgesetze im Gebrauchszustand, C30/37: Beton, Parabel-Rechteck** *(SIA 262:2025, 4.2.1.5, Figur 12; 4.2.1.6, (27))*
+
+$$
+\sigma_c(\varepsilon_c) = \begin{cases} -f_{ck} \cdot \dfrac{k_\sigma\,\eta - \eta^2}{1 + (k_\sigma - 2)\,\eta} & 0 \le |\varepsilon_c| \le \varepsilon_{c1d},\ \eta = \dfrac{|\varepsilon_c|}{\varepsilon_{c1d}} \\[2ex] -f_{ck} & \varepsilon_{c1d} < |\varepsilon_c| \le \varepsilon_{c2d} \\[1ex] 0 & |\varepsilon_c| > \varepsilon_{c2d} \quad (\text{jenseits der Bruchstauchung}) \\[1ex] 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen}) \end{cases}
+$$
+
+**Werkstoffgesetze im Gebrauchszustand, C30/37: Werte des Betons**
+
+$$
+f_{ck} = 30\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{c1d} = 2\,\text{‰} \quad \varepsilon_{c2d} = 3.5\,\text{‰}
+$$
+
+**Werkstoffgesetze im Gebrauchszustand, B500B: Stahl, bilinear** *(SIA 262:2025, 4.2.2.2, Figur 16; 4.2.2.5)*
+
+$$
+\sigma_s(\varepsilon_s) = \begin{cases} \min(E_s\,\varepsilon_s;\ f_{yk}) & 0 \le \varepsilon_s \le \varepsilon_{ud} \\[1ex] \max(E_s\,\varepsilon_s;\ -f_{yk}^{-}) & -\varepsilon_{ud} \le \varepsilon_s < 0 \\[1ex] 0 & |\varepsilon_s| > \varepsilon_{ud} \quad (\text{jenseits der Bruchdehnung}) \end{cases}
+$$
+
+**Werkstoffgesetze im Gebrauchszustand, B500B: Werte des Stahls**
+
+$$
+f_{yk} = 500\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{yk}^{-} = 500\,\mathrm{N}/\mathrm{mm}^{2} \quad E_s = 200000\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{ud} = 4.5\,\%
+$$
+
+**Werkstoffgesetze im Gebrauchszustand, Spannglied 1: mit Vordehnung** *(SIA 262:2025, 4.1.5.1.5; SIA 262:2025, 4.1.5.5.1; 4.2.3.3, Figur 17)*
+
+$$
+\sigma_p(\varepsilon) = \begin{cases} \min\left(E_p\,(\varepsilon + \varepsilon_p);\ f_{p0.1k}\right) & -\varepsilon_p < \varepsilon \le \varepsilon_{ud} - \varepsilon_p \\[1ex] 0 & \varepsilon \le -\varepsilon_p \quad (\text{entspannt}) \\[1ex] 0 & \varepsilon > \varepsilon_{ud} - \varepsilon_p \quad (\text{jenseits der Bruchdehnung}) \end{cases}
+$$
+
+**Werkstoffgesetze im Gebrauchszustand, Spannglied 1: Werte des Spannglieds**
+
+$$
+f_{p0.1k} = 1600\,\mathrm{N}/\mathrm{mm}^{2} \quad E_p^{\mathrm{Litze}} = 195000\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{ud} = 2\,\% \quad \varepsilon_{p,1} = 5.68\,\text{‰}
+$$
+
+**Werkstoffgesetze im Gebrauchszustand, Spannglied 2: ohne Verbund** *(SIA 262:2025, 4.1.5.1.6)*
+
+$$
+\sigma_p(\varepsilon) = \sigma_{p\infty}
+$$
+
+**Werkstoffgesetze im Gebrauchszustand, Spannglied 2: Werte des Spannglieds**
+
+$$
+\sigma_{p\infty,2} = 1100\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Werkstoffgesetze im Gebrauchszustand, Spannglied 3: schlaff mit Restfestigkeit** *(SIA 262:2025, 4.1.5.5.2; SIA 262:2025, 4.1.5.1.5; 4.2.3.3, Figur 17)*
+
+$$
+\sigma_p(\varepsilon) = \begin{cases} \min\left(E_p\,(\varepsilon + \varepsilon_p);\ f_{p0.1k}\right) - \sigma_{p\infty} & -\varepsilon_p < \varepsilon \le \varepsilon_{ud} - \varepsilon_p \\[1ex] -\sigma_{p\infty} & \varepsilon \le -\varepsilon_p \quad (\text{entspannt}) \\[1ex] -\sigma_{p\infty} & \varepsilon > \varepsilon_{ud} - \varepsilon_p \quad (\text{jenseits der Bruchdehnung}) \end{cases}
+$$
+
+**Werkstoffgesetze im Gebrauchszustand, Spannglied 3: Werte des Spannglieds**
+
+$$
+f_{p0.1k} = 1600\,\mathrm{N}/\mathrm{mm}^{2} \quad E_p^{\mathrm{Litze}} = 195000\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{ud} = 2\,\% \quad \varepsilon_{p,3} = 5.68\,\text{‰} \quad \sigma_{p\infty,3} = 1107\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+#### Wie die Dehnungsebene gefunden wird
+
+**Dehnungsebene und innere Kräfte** *(SIA 262:2025, 4.3.2.3)*
+
+$$
+\varepsilon(y, z) = \varepsilon_0 + \kappa \cdot v \qquad v = n_y (y - y_S) + n_z (z - z_S) \qquad N = \int_A \sigma\,\mathrm{d}A \qquad M_y = -\int_A \sigma\,(z - z_S)\,\mathrm{d}A \qquad M_z = -\int_A \sigma\,(y - y_S)\,\mathrm{d}A
+$$
+
+> **Hinweis:** Spannglied 1, Spannglied 2, Spannglied 3: im Gleichgewicht mit ihrer Kraft gerechnet. Wie weit ihre Spannung dabei zunimmt, prüft das Werkzeug noch nicht – mitzählen darf der Spannstahl, solange sein Zuwachs unter der zulässigen Stahlspannung und σ\_p unter f\_pd bleibt (SIA 262:2025, 4.4.2.3.10).
+
+#### Quasi-ständiger Lastfall – Dauer
+
+**Einwirkung**
+
+$$
+N_{Ed,\text{quasi-ständig}} = 0.0\ \mathrm{kN} \qquad M_{y,Ed,\text{quasi-ständig}} = 550.0\ \mathrm{kNm} \qquad M_{z,Ed,\text{quasi-ständig}} = 0.0\ \mathrm{kNm}
+$$
+
+**Gefundene Dehnungsebene: Zugrichtung, Dehnung im Schwerpunkt, Krümmung**
+
+$$
+\psi = -69.6^\circ \qquad \varepsilon_0 = -0.0069\,\text{‰} \qquad \kappa = 0.00088\,\mathrm{m}^{-1}
+$$
+
+**Probe: die Ebene erzeugt die Einwirkung**
+
+$$
+N_{int} = 0\,\mathrm{kN} \;\checkmark \qquad M_{y,int} = 550\,\mathrm{kNm} \;\checkmark \qquad M_{z,int} = 0\,\mathrm{kNm} \;\checkmark
+$$
+
+**Gezogene Bewehrung, je Element der ungünstigste Stab**
+
+| Element | $\varepsilon_s\ [‰]$ | $\sigma_s\ [\mathrm{N/mm^2}]$ | $\sigma_{s,adm}\ [\mathrm{N/mm^2}]$ |
+| :--- | ---: | ---: | ---: |
+| Linie 1 | $0.327$ | $65$ | $500$ |
+
+Massgebend: Linie 1 (y = 350 mm, z = 50 mm).
+
+**Grösste Zugspannung in der Bewehrung**
+
+$$
+\sigma_s = 65\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 500\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,\sigma,w,\text{Dauer}} = \frac{\sigma_{s,adm}}{\sigma_s} = \frac{500\,\mathrm{N}/\mathrm{mm}^{2}}{65\,\mathrm{N}/\mathrm{mm}^{2}} = 7.66 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+### Kennzahlen
+
+**Bewehrungsmass je Kubikmeter Beton, ohne Bügel**
+
+$$
+\mu_s = \frac{A_{s,tot} \cdot 7850\,\mathrm{kg}/\mathrm{m}^{3}}{A} = \frac{955\,\mathrm{mm}^{2} \cdot 7850\,\mathrm{kg}/\mathrm{m}^{3}}{320000\,\mathrm{mm}^{2}} = 23\,\mathrm{kg}/\mathrm{m}^{3}
+$$
+
+#### Biegung und Normalkraft
+
+**Momentenwiderstand bei N\_Ed = 0, Zug unten**
+
+$$
+M_{y,Rd}^{+}(N_{Ed} = 0) = 879.5\,\mathrm{kNm}
+$$
+
+**Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug unten**
+
+$$
+\left(x/d\right)_{y}^{+} = \frac{x}{d} = \frac{229.2\,\mathrm{mm}}{717.7\,\mathrm{mm}} = 0.319
+$$
+
+**Momentenwiderstand bei N\_Ed = 0, Zug oben**
+
+$$
+M_{y,Rd}^{-}(N_{Ed} = 0) = -175.2\,\mathrm{kNm}
+$$
+
+**Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug oben**
+
+$$
+\left(x/d\right)_{y}^{-} = \frac{x}{d} = \frac{166.9\,\mathrm{mm}}{772.5\,\mathrm{mm}} = 0.216
+$$
+
+**Momentenwiderstand bei N\_Ed = 0, Zug links**
+
+$$
+M_{z,Rd}^{+}(N_{Ed} = 0) = 203.1\,\mathrm{kNm}
+$$
+
+**Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug links**
+
+$$
+\left(x/d\right)_{z}^{+} = \frac{x}{d} = \frac{206.4\,\mathrm{mm}}{383.8\,\mathrm{mm}} = 0.538
+$$
+
+**Momentenwiderstand bei N\_Ed = 0, Zug rechts**
+
+$$
+M_{z,Rd}^{-}(N_{Ed} = 0) = -159.2\,\mathrm{kNm}
+$$
+
+**Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug rechts**
+
+$$
+\left(x/d\right)_{z}^{-} = \frac{x}{d} = \frac{216.2\,\mathrm{mm}}{439.6\,\mathrm{mm}} = 0.492
+$$
+
+**Reiner Zug, gleichmässig gedehnt**
+
+$$
+N_{Rd}^{+} = 1614.9\,\mathrm{kN}
+$$
+
+**Reiner Druck, gleichmässig gedehnt**
+
+$$
+N_{Rd}^{-} = -6081.3\,\mathrm{kN}
+$$
+
+### Spannstahl: Y1860
+
+**Zugfestigkeit** *(SIA 262:2025, 3.3.2.2, Tabelle 7)*
+
+$$
+f_{pk} = 1860\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Fliessgrenze (0.1-%-Dehngrenze)** *(SIA 262:2025, 3.3.2.2, Tabelle 7)*
+
+$$
+f_{p0.1k} = 1600\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Teilsicherheitsbeiwert für Spannstahl** *(SIA 262:2025, 2.4.2.6)*
+
+$$
+\gamma_s = 1.15
+$$
+
+**Bemessungswert der Fliessgrenze** *(SIA 262:2025, 2.4.2.5, (5); 4.2.3.1, Tabelle 10)*
+
+$$
+f_{pd} = \frac{f_{p0.1k}}{\gamma_s} = \frac{1600\,\mathrm{N}/\mathrm{mm}^{2}}{1.15} = 1391\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Elastizitätsmodul von Drähten und Stäben** *(SIA 262:2025, 3.3.2.4.1)*
+
+$$
+E_p = 200000\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Elastizitätsmodul von Litzen** *(SIA 262:2025, 3.3.2.4.2)*
+
+$$
+E_p^{\mathrm{Litze}} = 195000\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Bemessungswert der Bruchdehnung** *(SIA 262:2025, 4.2.3.1, Tabelle 10; 4.2.3.6)*
+
+$$
+\varepsilon_{ud} = 2\,\%
 $$
 
 ### Querschnittsanalyse: Winkelwand
@@ -21016,6 +22603,18 @@ $$
 \max_i \frac{\sigma_{s,i}(M_{s,adm})}{\sigma_{s,adm,i}} = 1\qquad M_{s,adm} \ge M_{Riss}
 $$
 
+**Werkstoffgesetze im gerissenen Zustand, Spannglied 1: mit Vordehnung** *(SIA 262:2025, 4.1.5.1.5; SIA 262:2025, 4.1.5.5.1; 4.2.3.3, Figur 17)*
+
+$$
+\sigma_p(\varepsilon) = \begin{cases} \min\left(E_p\,(\varepsilon + \varepsilon_p);\ f_{p0.1k}\right) & -\varepsilon_p < \varepsilon \le \varepsilon_{ud} - \varepsilon_p \\[1ex] 0 & \varepsilon \le -\varepsilon_p \quad (\text{entspannt}) \\[1ex] 0 & \varepsilon > \varepsilon_{ud} - \varepsilon_p \quad (\text{jenseits der Bruchdehnung}) \end{cases}
+$$
+
+**Werkstoffgesetze im gerissenen Zustand, Spannglied 3: schlaff mit Restfestigkeit** *(SIA 262:2025, 4.1.5.5.2; SIA 262:2025, 4.1.5.1.5; 4.2.3.3, Figur 17)*
+
+$$
+\sigma_p(\varepsilon) = \begin{cases} \min\left(E_p\,(\varepsilon + \varepsilon_p);\ f_{p0.1k}\right) - \sigma_{p\infty} & -\varepsilon_p < \varepsilon \le \varepsilon_{ud} - \varepsilon_p \\[1ex] -\sigma_{p\infty} & \varepsilon \le -\varepsilon_p \quad (\text{entspannt}) \\[1ex] -\sigma_{p\infty} & \varepsilon > \varepsilon_{ud} - \varepsilon_p \quad (\text{jenseits der Bruchdehnung}) \end{cases}
+$$
+
 ### Stahlspannung aus Rissbreite
 
 Unter quasi-ständiger Einwirkung begrenzt die Stahlspannung die Rissbreite – dieselbe Grenze wie bei der Zwängung, nur dass die Spannung hier aus den Lasten kommt und nicht aus einer aufgezwungenen Verformung. Gerechnet wird am gerissenen Querschnitt: der Beton nimmt keinen Zug auf (SIA 262:2025, 4.1.4.1.4). Die Bewehrung wirkt auf Zug und auf Druck – nur in der Handrechnung zählt die gedrückte nicht. Gemessen wird an der am stärksten gezogenen Lage.
@@ -21216,6 +22815,8 @@ $$
 
 Der Querschnitt ist gezeichnet: Polygone, jedes mit seinem Material. Liegt ein Polygon ganz in einem anderen, ersetzt es dieses dort – eine Aussparung nimmt die Fläche weg. y zeigt nach rechts, z nach oben; alle Masse in Millimetern.
 
+Die Zugkraft im Spannstahl zählt zum Widerstand des Querschnitts; die Lastfälle stehen darum ohne Vorspannung da. Mit Verbund dehnt sich ein Glied mit dem Beton an seiner Stelle und trägt dazu seine Vordehnung: bei der Dehnung null des Querschnitts schon σ\_p∞. Ohne Verbund wirkt die Kraft nach allen Verlusten, ohne Zuwachs. Schlaff angesetzt – wenn die Vorspannung schon als Einwirkung in den Lastfällen steht – trägt ein Glied nur, was über σ\_p∞ hinausgeht.
+
 Für ein beliebiges Polygon gibt es keine Formel für I\_T. Gerechnet wird mit der Spannungsfunktion φ von Prandtl, auf einem Gitter: seine Linien laufen durch jede waagrechte und lotrechte Kante, je Zelle gibt es einen Wert, und eine schräge Kante wird zwischen zwei Zellmitten genau geschnitten. Am Rand eines Hohlraums ist φ fest, und hinaus fliesst so viel, wie der Hohlraum Fläche hat. Der Fehler fällt mit dem Quadrat der Zellgrösse; ein zweites Gitter, jede Zelle halbiert, hebt ihn heraus.
 
 **Fläche und Schwerpunkt eines Polygons (Satz von Gauss)**
@@ -21246,6 +22847,66 @@ $$
 
 $$
 \frac{A_{sw}}{s} = \frac{n \cdot \pi\, \varnothing^2 / 4}{s}
+$$
+
+**Querschnitt, Vordehnung und Spannkraft eines Glieds aus n Drähten, Litzen oder Stäben** *(SIA 262:2025, 3.3.2.2, Tabelle 7; SIA 262:2025, 4.1.5.1.5)*
+
+$$
+A_p = n \cdot a_p \qquad \varepsilon_p = \frac{\sigma_{p\infty}}{E_p} \qquad P_\infty = A_p \cdot \sigma_{p\infty}
+$$
+
+**Spannungen nach Vorgabe, wo keine eingegeben ist** *(nach Vorgabe, nicht nachgeschlagen)*
+
+$$
+\sigma_{p0} = 0.70 \cdot f_{pk} \qquad \sigma_{p\infty} = 0.85 \cdot \sigma_{p0}
+$$
+
+**Grenzen der Spannung nach dem Spannen und nach allen Verlusten** *(SIA 262:2025, 4.1.5.2.2, (22); SIA 262:2025, 4.1.5.2.3)*
+
+$$
+\sigma_{p0} \le \min\left(0.75 \cdot f_{pk};\ 0.85 \cdot f_{p0.1k}\right) \qquad \sigma_{p\infty} \ge 0.45 \cdot f_{pk}
+$$
+
+**Spannglied 1: 4 × Litze ⌀15.7 aus Y1860** *(SIA 262:2025, 3.3.2.2, Tabelle 7)*
+
+$$
+A_{p,1} = n \cdot a_p
+$$
+
+**Spannglied 1: nach dem Spannen, nach Vorgabe** *(nach Vorgabe, nicht nachgeschlagen)*
+
+$$
+\sigma_{p0,1} = 0.70 \cdot f_{pk}
+$$
+
+**Spannglied 1: nach allen Verlusten, nach Vorgabe** *(nach Vorgabe, nicht nachgeschlagen)*
+
+$$
+\sigma_{p\infty,1} = 0.85 \cdot \sigma_{p0,1}
+$$
+
+**Spannglied 1: Grenze nach dem Spannen** *(SIA 262:2025, 4.1.5.2.2, (22))*
+
+$$
+\sigma_{p,max} = \min\left(0.75 \cdot f_{pk};\ 0.85 \cdot f_{p0.1k}\right)
+$$
+
+**Spannglied 1: Mindestspannung nach allen Verlusten** *(SIA 262:2025, 4.1.5.2.3)*
+
+$$
+\sigma_{p,min} = 0.45 \cdot f_{pk}
+$$
+
+**Spannglied 1: Vordehnung, mit dem Modul der Litzen** *(SIA 262:2025, 4.1.5.1.5)*
+
+$$
+\varepsilon_{p,1} = \frac{\sigma_{p\infty,1}}{E_p^{\mathrm{Litze}}}
+$$
+
+**Spannglied 1: Spannkraft nach allen Verlusten**
+
+$$
+P_{\infty,1} = A_{p,1} \cdot \sigma_{p\infty,1}
 $$
 
 **Spannungsfunktion von Prandtl; am Rand des Hohlraums k ist φ = φ\_k**
@@ -21348,6 +23009,32 @@ $$
 M_{Rd} = \sqrt{M_{y,Rd}^{2} + M_{z,Rd}^{2}}
 $$
 
+**Werkstoffgesetz Spannglied 1, Bemessungswerte: mit Vordehnung** *(SIA 262:2025, 4.1.5.1.5; SIA 262:2025, 4.1.5.5.1; 4.2.3.3, Figur 17)*
+
+$$
+\sigma_p(\varepsilon) = \begin{cases} \min\left(E_p\,(\varepsilon + \varepsilon_p);\ f_{pd}\right) & -\varepsilon_p < \varepsilon \le \varepsilon_{ud} - \varepsilon_p \\[1ex] 0 & \varepsilon \le -\varepsilon_p \quad (\text{entspannt}) \\[1ex] 0 & \varepsilon > \varepsilon_{ud} - \varepsilon_p \quad (\text{jenseits der Bruchdehnung}) \end{cases}
+$$
+
+**Werkstoffgesetz Spannglied 2, Bemessungswerte: ohne Verbund** *(SIA 262:2025, 4.1.5.1.6)*
+
+$$
+\sigma_p(\varepsilon) = \sigma_{p\infty}
+$$
+
+**Werkstoffgesetz Spannglied 3, Bemessungswerte: schlaff mit Restfestigkeit** *(SIA 262:2025, 4.1.5.5.2; SIA 262:2025, 4.1.5.1.5; 4.2.3.3, Figur 17)*
+
+$$
+\sigma_p(\varepsilon) = \begin{cases} \min\left(E_p\,(\varepsilon + \varepsilon_p);\ f_{pd}\right) - \sigma_{p\infty} & -\varepsilon_p < \varepsilon \le \varepsilon_{ud} - \varepsilon_p \\[1ex] -\sigma_{p\infty} & \varepsilon \le -\varepsilon_p \quad (\text{entspannt}) \\[1ex] -\sigma_{p\infty} & \varepsilon > \varepsilon_{ud} - \varepsilon_p \quad (\text{jenseits der Bruchdehnung}) \end{cases}
+$$
+
+### Spannstahl
+
+**Bemessungswert der Fliessgrenze** *(SIA 262:2025, 2.4.2.5, (5); 4.2.3.1, Tabelle 10)*
+
+$$
+f_{pd} = \frac{f_{p0.1k}}{\gamma_s}
+$$
+
 ### Duktilität je Richtung
 
 Ein Querschnitt kann Schnittgrössen umlagern, wenn die Bewehrung fliesst, bevor der Beton bricht – dann ist die Druckzone klein. Gemessen wird das an x/d bei reiner Biegung: x ist der Abstand der Nulllinie vom gedrücktesten Betonpunkt, d der des Schwerpunkts der Zugbewehrung, beide senkrecht zur Nulllinie. Zur Zugbewehrung zählen die gedehnten Stäbe auf der gezogenen Seite des Schwerpunkts; liegen dort verschiedene Stähle, gilt die Grenze des festesten.
@@ -21361,6 +23048,8 @@ $$
 ### Sprödes Versagen je Richtung
 
 Ein zu schwach bewehrter Querschnitt reisst und versagt im selben Augenblick. Darum muss der bewehrte Querschnitt mehr tragen als der unbewehrte im Augenblick des Risses: M\_Rd bei N = 0 mindestens das Rissmoment. Das Rissmoment gehört dem ungerissenen Bruttoquerschnitt; bei unsymmetrischer Form mit dem Deviationsmoment.
+
+Die Spannglieder mit Vordehnung drücken den Beton schon ohne Last, je mit ihrer Kraft nach allen Verlusten an ihrer Stelle: am Bruttoquerschnitt eine Normalkraft und ein Moment. Ihre Spannung an der Ecke, die reisst, kommt zu der aus der Einwirkung.
 
 **Spannung im ungerissenen Querschnitt**
 
@@ -21402,6 +23091,30 @@ $$
 
 $$
 W = \frac{I_y \cdot I_z - I_{yz}^{2}}{I_y \cdot y' - I_{yz} \cdot z'}
+$$
+
+**Normalkraft aus der Vorspannung** *(SIA 262:2025, 4.3.1.2; 4.4.3.2.4)*
+
+$$
+N_p = -\left(P_{\infty,1} + P_{\infty,2}\right)
+$$
+
+**Moment aus der Vorspannung um y** *(SIA 262:2025, 4.3.1.2; 4.4.3.2.4)*
+
+$$
+M_{p,y} = \left(P_{\infty,1} \cdot z'_{p,1} + P_{\infty,2} \cdot z'_{p,2}\right)
+$$
+
+**Spannung aus der Vorspannung an der Ecke** *(SIA 262:2025, 4.3.1.2; 4.4.3.2.4)*
+
+$$
+\sigma_p = \frac{N_p}{A} - \frac{M_{p,y}\,(I_z \cdot z' - I_{yz} \cdot y') + M_{p,z}\,(I_y \cdot y' - I_{yz} \cdot z')}{I_y \cdot I_z - I_{yz}^{2}}
+$$
+
+**Rissmoment des ungerissenen, vorgespannten Querschnitts** *(SIA 262:2025, 4.3.1.2)*
+
+$$
+M_{Riss} = \left(f_{ct,eff} - \sigma_p\right) \cdot W
 $$
 
 ### Durchstanzen
@@ -23346,6 +25059,52 @@ $$
 | Bezogene Druckzonenhöhe, Zug unten | $\left(x/d\right)_{y}^{+}$ | $0.139$ |
 | Bezogene Druckzonenhöhe, Zug oben | $\left(x/d\right)_{y}^{-}$ | $0.139$ |
 
+### Spannbeton
+
+**Angaben zum Querschnitt**
+
+$$
+\text{C30/37} \qquad A = 320000\,\mathrm{mm}^2 \qquad y_S = 200.0\,\mathrm{mm} \qquad z_S = 400.0\,\mathrm{mm}
+$$
+
+**Bewehrung und Schubwände**
+
+| Element | Bewehrung | Stahl |
+| :--- | :--- | :--- |
+| Linie 1 | $4 \varnothing 14$ | B500B |
+| Linie 2 | $3 \varnothing 12$ | B500B |
+| Spannglied 1 | $4 \times \text{Litze}\ \varnothing 15.7$ | Y1860 |
+| Spannglied 2 | $2 \times \text{Litze}\ \varnothing 15.3$ | Y1860 |
+| Spannglied 3 | $2 \times \text{Litze}\ \varnothing 12.9$ | Y1860 |
+
+| Nachweis | Bezeichnung | Widerstand | Einwirkung | $\alpha_{eff}$ |
+| :--- | :--- | ---: | ---: | ---: |
+| Biegung und Normalkraft | Feld | $M_{Rd} = 879.5\,\mathrm{kNm}$ | $M_{Ed} = 600.0\,\mathrm{kNm}$ | $1.47$ |
+| Duktilität | Zug unten | – | – | $0.00$ |
+| Sprödes Versagen | Zug unten | $M_{Rd} = 879.5\,\mathrm{kNm}$ | $M_{Riss} = 449.3\,\mathrm{kNm}$ | $1.96$ |
+| Risse: Zwängung Biegung | Zug unten | $M_{s,adm} = 949.2\,\mathrm{kNm}$ | $M_{Riss} = 449.3\,\mathrm{kNm}$ | $2.11$ |
+| Risse: Quasi-ständige Lastfälle | Dauer | $\sigma_{s,adm} = 500\,\mathrm{N}/\mathrm{mm}^{2}$ | $\sigma_s = 65\,\mathrm{N}/\mathrm{mm}^{2}$ | $7.66$ |
+
+> **Hinweis:** Duktilität – Zug unten: Spannstahl Y1860 in der Zugzone – die Regel gilt für Betonstahl der Klassen B und C → kein Nachweis über x/d. Umlagern nur mit einem Nachweis des Verformungsvermögens (SIA 262:2025, 4.1.4.2.6).
+
+> **Hinweis:** Risse: Zwängung Normalkraft – ganzer Querschnitt: nicht erfüllt (α\_eff = 0.62), ausgeschaltet. N\_s,adm = 477.5 kN \< N\_Riss = 773.3 kN.
+
+**Kennzahlen**
+
+| Kennzahl | Zeichen | Wert |
+| :--- | :--- | ---: |
+| Bewehrungsmass | $\mu_s$ | $23\,\mathrm{kg}/\mathrm{m}^{3}$ |
+| Momentenwiderstand, Zug unten | $M_{y,Rd}^{+}(N_{Ed} = 0)$ | $879.5\,\mathrm{kNm}$ |
+| Momentenwiderstand, Zug oben | $M_{y,Rd}^{-}(N_{Ed} = 0)$ | $-175.2\,\mathrm{kNm}$ |
+| Momentenwiderstand, Zug links | $M_{z,Rd}^{+}(N_{Ed} = 0)$ | $203.1\,\mathrm{kNm}$ |
+| Momentenwiderstand, Zug rechts | $M_{z,Rd}^{-}(N_{Ed} = 0)$ | $-159.2\,\mathrm{kNm}$ |
+| Zugwiderstand | $N_{Rd}^{+}$ | $1614.9\,\mathrm{kN}$ |
+| Druckwiderstand | $N_{Rd}^{-}$ | $-6081.3\,\mathrm{kN}$ |
+| Bezogene Druckzonenhöhe, Zug unten | $\left(x/d\right)_{y}^{+}$ | $0.319$ |
+| Bezogene Druckzonenhöhe, Zug oben | $\left(x/d\right)_{y}^{-}$ | $0.216$ |
+| Bezogene Druckzonenhöhe, Zug links | $\left(x/d\right)_{z}^{+}$ | $0.538$ |
+| Bezogene Druckzonenhöhe, Zug rechts | $\left(x/d\right)_{z}^{-}$ | $0.492$ |
+
 ### Winkelwand
 
 Kein Nachweis geführt.
@@ -25138,6 +26897,58 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Erfüllungsgrad Zwängung auf Biegung – Zug unten | $\alpha_{eff,ZB,\text{Zug unten}}$ | $5.23$ |  | berechnet |
 | Schwerpunkt, y | $y_S$ | $200$ | mm | berechnet |
 | Schwerpunkt, z | $z_S$ | $200$ | mm | berechnet |
+| Fläche des Bruttoquerschnitts | $A$ | $320000$ | mm² | berechnet |
+| Stahlfläche der Bewehrung | $A_{s,tot}$ | $955$ | mm² | berechnet |
+| Trägheitsmoment um y | $I_y$ | $17066.7$ | ·10⁶ mm⁴ | berechnet |
+| Deviationsmoment | $I_{yz}$ | $0$ | ·10⁶ mm⁴ | berechnet |
+| Trägheitsmoment um z | $I_z$ | $4266.7$ | ·10⁶ mm⁴ | berechnet |
+| Querschnitt des Spannstahls, Spannglied 1 | $A_{p,1}$ | $600$ | mm² | berechnet |
+| Spannkraft nach allen Verlusten, Spannglied 1 | $P_{\infty,1}$ | $664$ | kN | berechnet |
+| Vordehnung, Spannglied 1 | $\varepsilon_{p,1}$ | $5.68$ | ‰ | berechnet |
+| Spannung nach dem Spannen, Spannglied 1 | $\sigma_{p0,1}$ | $1302$ | N/mm² | berechnet |
+| Spannung nach allen Verlusten, Spannglied 1 | $\sigma_{p\infty,1}$ | $1107$ | N/mm² | berechnet |
+| Querschnitt des Spannstahls, Spannglied 2 | $A_{p,2}$ | $280$ | mm² | berechnet |
+| Spannkraft nach allen Verlusten, Spannglied 2 | $P_{\infty,2}$ | $308$ | kN | berechnet |
+| Vordehnung, Spannglied 2 | $\varepsilon_{p,2}$ | $5.64$ | ‰ | berechnet |
+| Spannung nach dem Spannen, Spannglied 2 | $\sigma_{p0,2}$ | $1350$ | N/mm² | berechnet |
+| Spannung nach allen Verlusten, Spannglied 2 | $\sigma_{p\infty,2}$ | $1100$ | N/mm² | berechnet |
+| Querschnitt des Spannstahls, Spannglied 3 | $A_{p,3}$ | $200$ | mm² | berechnet |
+| Spannkraft nach allen Verlusten, Spannglied 3 | $P_{\infty,3}$ | $221.3$ | kN | berechnet |
+| Vordehnung, Spannglied 3 | $\varepsilon_{p,3}$ | $5.68$ | ‰ | berechnet |
+| Spannung nach dem Spannen, Spannglied 3 | $\sigma_{p0,3}$ | $1302$ | N/mm² | berechnet |
+| Spannung nach allen Verlusten, Spannglied 3 | $\sigma_{p\infty,3}$ | $1107$ | N/mm² | berechnet |
+| Grösste Neigung der Druckdiagonalen | $\alpha_{max}$ | $45$ | ° | Vorgabe |
+| Kleinste Neigung der Druckdiagonalen | $\alpha_{min}$ | $30$ | ° | Vorgabe |
+| Abminderung der Betondruckfestigkeit in der Druckdiagonalen | $k_c$ | $0.55$ |  | Vorgabe |
+| Momentenwiderstand bei N\_Ed = 0, Zug links | $M_{z,Rd}^{+}(N_{Ed} = 0)$ | $203.1$ | kNm | berechnet |
+| Momentenwiderstand bei N\_Ed = 0, Zug oben | $M_{y,Rd}^{-}(N_{Ed} = 0)$ | $-175.2$ | kNm | berechnet |
+| Momentenwiderstand bei N\_Ed = 0, Zug rechts | $M_{z,Rd}^{-}(N_{Ed} = 0)$ | $-159.2$ | kNm | berechnet |
+| Momentenwiderstand bei N\_Ed = 0, Zug unten | $M_{y,Rd}^{+}(N_{Ed} = 0)$ | $879.5$ | kNm | berechnet |
+| Druckwiderstand bei gleichmässiger Dehnung | $N_{Rd}^{-}$ | $-6081.3$ | kN | berechnet |
+| Zugwiderstand bei gleichmässiger Dehnung | $N_{Rd}^{+}$ | $1614.9$ | kN | berechnet |
+| Bewehrungsmass je Kubikmeter Beton | $\mu_s$ | $23$ | kg/m³ | berechnet |
+| Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug links | $\left(x/d\right)_{z}^{+}$ | $0.538$ |  | berechnet |
+| Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug oben | $\left(x/d\right)_{y}^{-}$ | $0.216$ |  | berechnet |
+| Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug rechts | $\left(x/d\right)_{z}^{-}$ | $0.492$ |  | berechnet |
+| Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug unten | $\left(x/d\right)_{y}^{+}$ | $0.319$ |  | berechnet |
+| Erfüllungsgrad Duktilität – Zug links | $\alpha_{eff,x/d,\text{Zug links}}$ | $0.00$ |  | berechnet |
+| Erfüllungsgrad Duktilität – Zug oben | $\alpha_{eff,x/d,\text{Zug oben}}$ | $1.62$ |  | berechnet |
+| Erfüllungsgrad Duktilität – Zug rechts | $\alpha_{eff,x/d,\text{Zug rechts}}$ | $0.71$ |  | berechnet |
+| Erfüllungsgrad Duktilität – Zug unten | $\alpha_{eff,x/d,\text{Zug unten}}$ | $0.00$ |  | berechnet |
+| Erfüllungsgrad Biegung und Normalkraft – Feld | $\alpha_{eff,\text{Feld}}$ | $1.47$ |  | berechnet |
+| Grösste aufnehmbare Druckkraft | $N_{Rd}^{-}$ | $-6081.3$ | kN | berechnet |
+| Grösste aufnehmbare Zugkraft | $N_{Rd}^{+}$ | $1614.9$ | kN | berechnet |
+| Erfüllungsgrad Rissnormalkraft – ganzer Querschnitt | $\alpha_{eff,NR}$ | $0.62$ |  | berechnet |
+| Erfüllungsgrad Stahlspannung aus Rissbreite – Dauer | $\alpha_{eff,\sigma,w,\text{Dauer}}$ | $7.66$ |  | berechnet |
+| Erfüllungsgrad Stahlspannung aus Rissbreite – Feld (60 %) | $\alpha_{eff,\sigma,w,\text{Feld (60 \%)}}$ | $9952.95$ |  | berechnet |
+| Erfüllungsgrad sprödes Versagen – Zug links | $\alpha_{eff,Riss,\text{Zug links}}$ | $11.59$ |  | berechnet |
+| Erfüllungsgrad sprödes Versagen – Zug unten | $\alpha_{eff,Riss,\text{Zug unten}}$ | $1.96$ |  | berechnet |
+| Erfüllungsgrad Zwängung auf Biegung – Zug links | $\alpha_{eff,ZB,\text{Zug links}}$ | $11.95$ |  | berechnet |
+| Erfüllungsgrad Zwängung auf Biegung – Zug oben | $\alpha_{eff,ZB,\text{Zug oben}}$ | $13.47$ |  | berechnet |
+| Erfüllungsgrad Zwängung auf Biegung – Zug rechts | $\alpha_{eff,ZB,\text{Zug rechts}}$ | $6.54$ |  | berechnet |
+| Erfüllungsgrad Zwängung auf Biegung – Zug unten | $\alpha_{eff,ZB,\text{Zug unten}}$ | $2.11$ |  | berechnet |
+| Schwerpunkt, y | $y_S$ | $200$ | mm | berechnet |
+| Schwerpunkt, z | $z_S$ | $400$ | mm | berechnet |
 | Fläche des Bruttoquerschnitts | $A$ | $1437500$ | mm² | berechnet |
 | Stahlfläche der Bewehrung | $A_{s,tot}$ | $0$ | mm² | berechnet |
 | Trägheitsmoment um y | $I_y$ | $421209.8$ | ·10⁶ mm⁴ | berechnet |
@@ -25187,3 +26998,10 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Pressung aus Erstbelastung | $q_E$ | $80$ | kN/m² | Vorgabe |
 | Pressung aus Wiederbelastung | $q_W$ | $20$ | kN/m² | Vorgabe |
 | Zulässige Setzung, je Bauwerk festzulegen | $s_{zul}$ | $120$ | mm | Vorgabe |
+| Elastizitätsmodul von Drähten und Stäben | $E_p$ | $200000$ | N/mm² | Vorgabe |
+| Elastizitätsmodul von Litzen | $E_p^{\mathrm{Litze}}$ | $195000$ | N/mm² | Vorgabe |
+| Bemessungswert der Bruchdehnung | $\varepsilon_{ud}$ | $2$ | % | Vorgabe |
+| Fliessgrenze (0.1-%-Dehngrenze) | $f_{p0.1k}$ | $1600$ | N/mm² | Vorgabe |
+| Bemessungswert der Fliessgrenze | $f_{pd}$ | $1391$ | N/mm² | berechnet |
+| Zugfestigkeit | $f_{pk}$ | $1860$ | N/mm² | Vorgabe |
+| Teilsicherheitsbeiwert für Spannstahl | $\gamma_s$ | $1.15$ |  | Vorgabe |

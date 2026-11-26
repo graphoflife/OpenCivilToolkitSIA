@@ -1,13 +1,22 @@
 ---
-erzeugt: 5556c39c7c69
+erzeugt: a0d595f142b5
 art: formel
 tags: [formel]
+normstelle: "SIA 262:2025, 4.3.1.2; 4.4.3.2.4"
 ---
-> [!warning] Normstelle fehlt noch
-> Sie kommt vom Benutzer und wird im Code eingetragen – von dort steht sie im Bericht und hier.
+> [!info] Normstelle
+> SIA 262:2025, 4.3.1.2; 4.4.3.2.4
+
+*In der Herleitung: «Rissmoment bei der Normalkraft»*
 
 $$
 M_{Riss}(N) = \left(f_{ct,eff} - \frac{N}{A}\right) \cdot W
+$$
+
+*In der Herleitung: «Rissmoment bei der Normalkraft»*
+
+$$
+M_{Riss}(N) = \left(f_{ct,eff} - \sigma_p - \frac{N}{A}\right) \cdot W
 $$
 
 ## Grössen
@@ -18,6 +27,7 @@ $$
 | $N$ | – | kN | Zwischenwert |
 | $A$ | Fläche des Bruttoquerschnitts | mm² | [[Fläche eines Rechtecks]], Zwischenwert |
 | $W$ | – | ·10⁶ mm³ | [[Widerstandsmoment zum gezogenen Rand]], [[Widerstandsmoment zum gezogensten Betonpunkt]] |
+| $\sigma_p$ | aus der Vorspannung, an der Ecke | N/mm² | [[Spannung aus der Vorspannung an der Ecke]] |
 
 ## Beispiel
 
@@ -28,6 +38,16 @@ $$
   M_{Riss}(N) &= \left(f_{ct,eff} - \frac{N}{A}\right) \cdot W \\
   &= \left(2.76\,\mathrm{N}/\mathrm{mm}^{2} - \frac{-300\,\mathrm{kN}}{300000\,\mathrm{mm}^{2}}\right) \cdot 15\,\cdot 10^{6}\,\mathrm{mm}^{3} \\
   &= 56.4\,\mathrm{kNm}
+\end{aligned}
+$$
+
+Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
+
+$$
+\begin{aligned}
+  M_{Riss}(N) &= \left(f_{ct,eff} - \sigma_p - \frac{N}{A}\right) \cdot W \\
+  &= \left(2.56\,\mathrm{N}/\mathrm{mm}^{2} - \left(-7.97\,\mathrm{N}/\mathrm{mm}^{2}\right) - \frac{0\,\mathrm{kN}}{320000\,\mathrm{mm}^{2}}\right) \cdot 42.67\,\cdot 10^{6}\,\mathrm{mm}^{3} \\
+  &= 449.3\,\mathrm{kNm}
 \end{aligned}
 $$
 

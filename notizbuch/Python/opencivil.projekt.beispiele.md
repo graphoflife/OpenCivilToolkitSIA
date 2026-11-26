@@ -1,5 +1,5 @@
 ---
-erzeugt: 5b97769e29c6
+erzeugt: a5c0e43b40d9
 art: modul
 tags: [modul]
 ---
@@ -217,6 +217,21 @@ Querschnitte nach Vorlage, als Profil, von Hand, aus einer Platte mit
 E_eq und aus einer Querschnittsanalyse, deren I_T sie dafür rechnet --
 beide mit dem Material gemäss Querschnitt --, ein eigenes Material mit
 G; Lasten in jeder Richtung, Torsion, projiziert, an Knoten.
+
+### _spannbeton
+
+```python
+def _spannbeton(kennung: str) -> QuerschnittsanalyseEintrag
+```
+
+Ein Träger 400 × 800 mm mit Betonstahl oben und unten und drei
+Spanngliedern aus Y1860, je eines in jedem Gesetz: vier Litzen mit
+Vordehnung und Verbund, die Spannungen nach Vorgabe; zwei ohne Verbund,
+die Spannungen eingegeben; zwei schlaff mit Restfestigkeit. Die
+Duktilität sieht Spannstahl in der Zugzone, sprödes Versagen und
+Zwängung messen am Rissmoment mit Vorspannung, die Stahlspannung gilt
+dem Betonstahl, und die Linie beginnt bei der Krümmung, die die
+Vorspannung allein weckt.
 
 
 ## Braucht

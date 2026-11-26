@@ -105,6 +105,14 @@ class Grenzen:
     def sigma(self, i: int) -> float:
         return self.gruppe(i).sigma
 
+    def gezogen(self, eps_s: Sequence[float]) -> List[int]:
+        """
+        Die gezogenen Stellen, die eine Grenze haben. Die Dehnungen einer
+        Ebene nennen danach noch die Spannglieder (sie folgen dem
+        Betonstahl); fuer sie gilt keine dieser Grenzen.
+        """
+        return [i for i, eps in enumerate(eps_s[:len(self.je_stelle)]) if eps > 0.0]
+
     @property
     def strengste(self) -> int:
         """Die Stelle mit der kleinsten Grenze -- sie steht da, wo keine gezogen ist."""

@@ -1,5 +1,5 @@
 ---
-erzeugt: 66e26732a5c0
+erzeugt: beabdb0b0c82
 art: modul
 tags: [modul]
 ---
@@ -96,6 +96,7 @@ geschieht erst beim Aufbau, ueber die [[opencivil.core.einheiten#Groesse|Groesse
 - [[opencivil.projekt.querschnittsanalyse]] – ein gezeichneter Querschnitt, wie die Oberflaeche ihn beschreibt.
 - [[opencivil.projekt.setzung]] – eine Setzungsberechnung, wie die Oberflaeche sie beschreibt.
 - [[opencivil.projekt.skript]] – ein Python-Skript der App «Python», wie es
+- [[opencivil.projekt.spannglieder]] – ein Spannglied, wie die Oberflaeche es beschreibt.
 - [[opencivil.projekt.staebe]] – der Baukasten eines Stabwerks, eben und im Raum.
 
 ## Braucht

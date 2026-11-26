@@ -1,5 +1,5 @@
 ---
-erzeugt: 6c47398bc720
+erzeugt: 90756b74aafd
 art: modul
 tags: [modul]
 ---
@@ -154,22 +154,6 @@ im Bericht stehen. Hier werden sie nur abgebildet; die Oberflaeche faerbt
 ein, was `erfuellt` sagt, und haengt die Begruendung als Tooltip an die
 Zeile.
 
-### geometrie
-
-```python
-def geometrie(eintrag, projekt) -> dict
-```
-
-Die Zeichnung einer Querschnittsanalyse, wie der Kern sie sieht -- in mm.
-
-Geprueft von [[opencivil.querschnitt.analyse#Zeichnung|Zeichnung]], denselben
-Pruefungen, die das Bauteil vor dem Rechnen macht; hier aber alle
-Meldungen auf einmal statt nur der ersten. Die Wahl der Materialien kommt
-dazu, nach derselben Regel wie beim Bauen ([[opencivil.projekt.aufbau.kern#materialgrund|materialgrund]]) -- das
-kann nur das Projekt wissen. Ebenso ein Verweis auf einen Knoten, den es
-nicht gibt. `fehler` sagt je Meldung, ob etwas nicht stimmt oder nur
-fehlt: ein geloeschter Stahl ist zu ersetzen, kein Widerspruch.
-
 ### zuordnung
 
 ```python
@@ -246,10 +230,10 @@ Je Querschnitt eines Systems, wo A und I stehen -- und je Paar aus Querschnitt u
 - [[opencivil.projekt.projekt]]
 - [[opencivil.projekt.querschnittsanalyse]]
 - [[opencivil.projekt.setzung]]
-- [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.geometrie]]
 - [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.platte]]
+- [[opencivil.querschnitt.spannglieder]]
 - [[opencivil.querschnitt.vorlagen]]
 - [[opencivil.querschnitt.zugseite]]
 - [[opencivil.spannungsanalyse]]

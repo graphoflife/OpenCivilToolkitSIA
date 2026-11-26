@@ -46,6 +46,7 @@ from opencivil.core.wert import Wert, WertDef
 from opencivil.querschnitt.analyse import Lastfall, Querschnittsanalyse
 from opencivil.querschnitt.bewehrungselemente import Bewehrungselement
 from opencivil.querschnitt.interaktion import Bruchpunkt, Kraftanteil, Querschnitt
+from opencivil.querschnitt.spannglieder import DEHNUNG_AM_GLIED
 
 #: Ab welchem Moment ein Lastfall als Biegung gilt, in Nm. Darunter ist es
 #: reine Normalkraft -- eine Richtung des Moments gibt es dann nicht.
@@ -346,6 +347,8 @@ class SchiefeBiegung(Nachweis):
                   Mathe(r"\sigma\ [\mathrm{N/mm^2}]")],
             zeilen=zeilen, ausrichtung="lrrrrr",
             titel="Kräfte im Bruchzustand – Beton als Resultierende, Bewehrung je Element")
+        if self.analyse.spannglieder:
+            p.text(DEHNUNG_AM_GLIED)
         y_S, z_S = q.bezug
         p.formel(werte.kraft("N_int", "N_{Rd}", sum(a.N for a in anteile)), r"\sum F_i", {},
                  titel="Probe: Normalkraft")

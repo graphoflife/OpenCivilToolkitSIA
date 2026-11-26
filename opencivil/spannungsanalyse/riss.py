@@ -48,9 +48,9 @@ from opencivil.core.einheiten import MIO_MM3, MIO_MM4, Groesse
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.nachweis.querschnittsloeser import Faserloeser
 from opencivil.nachweis.rissgroessen import (
-    MOMENTENTEILER, Bruttoquerschnitt, Rissmoment, Rissnormalkraft, beiwert_dicke,
-    protokoll_ecke, protokoll_spannung_ungerissen, protokoll_widerstandsmoment,
-    protokoll_zugfestigkeit, rissnormalkraft,
+    MOMENTENTEILER, REFERENZ_VORSPANNUNG, Bruttoquerschnitt, Rissmoment, Rissnormalkraft,
+    beiwert_dicke, protokoll_ecke, protokoll_spannung_ungerissen, protokoll_vorspannung,
+    protokoll_widerstandsmoment, protokoll_zugfestigkeit, rissnormalkraft,
 )
 from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl
 from opencivil.querschnitt.zugseite import Zugseite
@@ -160,6 +160,11 @@ class Bruttoriss:
         """Dasselbe fuer die Normalkraft: ``A``."""
         return self.A
 
+    @property
+    def vorgespannt(self) -> bool:
+        """Ob Spannglieder mit Vordehnung den Beton druecken -- sie verschieben den Riss."""
+        return self.brutto.vorspannung is not None
+
     # -- Was nur das Paar weiss --------------------------------------------------
 
     def herleitung_bruttoquerschnitt(self, p: Protokoll, w: Zwischenwerte,
@@ -223,10 +228,12 @@ class Bruttoriss:
             p, w, k_t=self.riss.k_t, f_ct_eff=self.riss.f_ct_eff, h=h,
             f_ctm=ein(ecke.stoff.id_von("f_ctm")), teiler=MOMENTENTEILER,
             titel="Beiwert für die Tiefe in Biegerichtung")
+        vorspannung = _Abzug(protokoll_vorspannung(p, w, self.brutto, ecke, ein))
         p.formel(w.moment("M_Riss_N", "M_{Riss}(N)", linie.riss),
-                 r"\left(@f - \frac{@N}{@A}\right) \cdot @W",
-                 {"f": f_ct_eff, "N": w.kraft("N", "N", linie.fest), "A": A, "W": W},
-                 titel="Rissmoment bei der Normalkraft")
+                 rf"\left(@f{vorspannung.vorlage} - \frac{{@N}}{{@A}}\right) \cdot @W",
+                 {"f": f_ct_eff, "N": w.kraft("N", "N", linie.fest), "A": A, "W": W,
+                  **vorspannung.werte},
+                 titel="Rissmoment bei der Normalkraft", referenz=vorspannung.referenz)
 
     def _herleitung_rissnormalkraft(self, p: Protokoll, w: Zwischenwerte, linie: "Linie",
                                     ein: Callable[[str], "Wert"], h: "Wert", A: "Wert",
@@ -246,13 +253,19 @@ class Bruttoriss:
             titel="Beiwert für die rissaktive Dicke")
         N_Riss = w.kraft("N_Riss_M", "N_{Riss}(M)", linie.riss)
         M_wert = w.moment("M", "M", M)
+        vorspannung = _Abzug(protokoll_vorspannung(p, w, self.brutto, zug.ecke, ein))
         if self.einachsig:
-            rand = v if M >= 0.0 else w.laenge(
+            # Es reisst der Rand, den M zieht -- mit Vorspannung auch der
+            # andere, wenn sie ihn schon zieht. Ohne Moment zaehlt der Rand nicht.
+            gezogen = zug.sigma_M > 0.0 if M != 0.0 else True
+            rand = v if (M >= 0.0) == gezogen else w.laenge(
                 "v_d", "v_d", self.gerissen.oben,
                 "Abstand des gedrückten Rands vom Schwerpunkt, negativ")
-            p.formel(N_Riss, r"\left(@f - \frac{@M \cdot @v}{@I}\right) \cdot @A",
-                     {"f": f_ct_eff, "M": M_wert, "v": rand, "I": I, "A": A},
-                     titel="Rissnormalkraft beim Moment")
+            p.formel(N_Riss,
+                     rf"\left(@f{vorspannung.vorlage} - \frac{{@M \cdot @v}}{{@I}}\right) \cdot @A",
+                     {"f": f_ct_eff, "M": M_wert, "v": rand, "I": I, "A": A,
+                      **vorspannung.werte},
+                     titel="Rissnormalkraft beim Moment", referenz=vorspannung.referenz)
             return
         sigma = w.spannung("sigma_M", r"\sigma_M", zug.sigma_M, "aus dem Moment allein", stellen=2)
         if M != 0.0 and zug.sigma_M > 0.0:
@@ -267,8 +280,9 @@ class Bruttoriss:
                      titel="Spannung aus dem Moment an der Ecke, die zuerst reisst")
         else:
             p.wert(sigma, titel="Spannung aus dem Moment an der Ecke, die zuerst reisst")
-        p.formel(N_Riss, r"\left(@f - @sigma\right) \cdot @A",
-                 {"f": f_ct_eff, "sigma": sigma, "A": A}, titel="Rissnormalkraft beim Moment")
+        p.formel(N_Riss, rf"\left(@f{vorspannung.vorlage} - @sigma\right) \cdot @A",
+                 {"f": f_ct_eff, "sigma": sigma, "A": A, **vorspannung.werte},
+                 titel="Rissnormalkraft beim Moment", referenz=vorspannung.referenz)
 
     # -- Der reine Betonquerschnitt des Moduls ------------------------------------
 
@@ -301,3 +315,12 @@ class Bruttoriss:
         p.erklaerung(f"Der reine Betonquerschnitt ist der Bruttoquerschnitt: A_c = {A.symbol}.")
         p.wert(bezug, titel="Reiner Betonquerschnitt")
         return bezug
+
+
+class _Abzug:
+    """Was die Vorspannung in eine Rissbedingung schreibt -- ohne sie nichts."""
+
+    def __init__(self, sigma_p: Optional["Wert"]) -> None:
+        self.vorlage = "" if sigma_p is None else " - @sp"
+        self.werte = {} if sigma_p is None else {"sp": sigma_p}
+        self.referenz = None if sigma_p is None else REFERENZ_VORSPANNUNG

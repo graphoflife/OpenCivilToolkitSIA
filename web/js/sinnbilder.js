@@ -348,6 +348,11 @@ const ZEICHEN = {
     pfade: ['M12 3.5v3.5 M12 17v3.5 M3.5 12H7 M17 12h3.5'],
     voll: [[12, 12, 3]],
   },
+  // Ein Spannglied im Schnitt: das Hüllrohr mit seinen Litzen.
+  'cad-spannglied': {
+    kreise: [[12, 12, 7.5]],
+    voll: [[12, 9.2, 2], [9.6, 13.6, 2], [14.4, 13.6, 2]],
+  },
   // Eine Wand als Band, gestrichelt ihre Achse -- wie in der Zeichnung.
   'cad-schubwand': {
     pfade: ['M3 7.5h18v9H3z'],
@@ -581,6 +586,18 @@ const ZEICHEN = {
   'linie-endeisen': {
     pfade: ['M4 12h16', 'M4 8v8'],
     voll: [[9.33, 12, 1.6], [14.67, 12, 1.6], [20, 12, 2.3]],
+  },
+  // Wie ein Spannglied zählt, als Spannung über der Dehnung des Betons an
+  // seiner Stelle: mit Vordehnung trägt es schon bei null, der volle Punkt;
+  // schlaff beginnt es bei null und bleibt um σ_p∞ tiefer -- gestrichelt,
+  // was es mit Vordehnung trüge.
+  'wirkung-vordehnung': {
+    pfade: [ACHSEN, 'M4 11.5L8.5 6H20'],
+    voll: [[4, 11.5, 1.8]],
+  },
+  'wirkung-restfestigkeit': {
+    pfade: [ACHSEN, 'M4 20L8.5 14.5H20'],
+    strich: ['M8.5 6H20'],
   },
   // Der Querschnitt mit seiner Druckzone, voll: über einer waagrechten
   // Nulllinie, wenn er nur um y gebogen wird, sonst über einer schiefen.

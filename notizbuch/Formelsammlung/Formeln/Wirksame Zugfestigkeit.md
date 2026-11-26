@@ -1,5 +1,5 @@
 ---
-erzeugt: 53211fe0a1be
+erzeugt: 07f29d0f2b21
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.4.1.3, (99)"
@@ -32,6 +32,7 @@ $$
 - [[Risskraft des ganzen Querschnitts]]
 - [[Rissmoment bei der Normalkraft]]
 - [[Rissmoment des ungerissenen Querschnitts]]
+- [[Rissmoment des ungerissenen, vorgespannten Querschnitts]]
 - [[Rissnormalkraft beim Moment]]
 
 ## Im Code

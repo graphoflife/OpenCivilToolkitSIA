@@ -634,6 +634,8 @@ def zeichnung(bauteil) -> dict:
         "flaechenlinien": [{"von": list(g.von), "bis": list(g.bis), "name": g.name,
                             "stahl": g.stahl.name}
                            for g in bauteil.bewehrungselemente if g.verschmiert],
+        "spannglieder": [{"y": g.von[0], "z": g.von[1], "d": g.durchmesser, "name": g.name,
+                          "stahl": g.stahl.name} for g in bauteil.spannglieder],
         "schwerpunkt": [bauteil.brutto.y_S, bauteil.brutto.z_S],
     }
 
@@ -676,7 +678,8 @@ def _gerade_im_rahmen(stuetz: Punkt, richtung: Punkt,
 def _bruch(q, bauteil, punkt) -> dict:
     """
     Der Bruchzustand im Schnitt: die Nulllinie, die gedrueckte Flaeche je
-    Polygon und die Dehnung jedes Stabs -- in mm und ‰.
+    Polygon und die Dehnung jedes Stabs und Spannglieds -- in mm und ‰, beim
+    Glied die des Betons an seiner Stelle.
 
     Gedrueckt ist die Seite kleiner v: die Kruemmung zeigt nie gegen die
     Zugrichtung. Ohne Kruemmung ist alles gedrueckt oder nichts.
@@ -709,6 +712,10 @@ def _bruch(q, bauteil, punkt) -> dict:
             {"y": p[0], "z": p[1], "d": g.durchmesser,
              "eps": zahl(q.dehnung(punkt, (si(p[0], MM), si(p[1], MM))), PROMILLE)}
             for g in bauteil.bewehrungselemente for p in g.punkte],
+        "spannglieder": [
+            {"y": g.von[0], "z": g.von[1], "d": g.durchmesser,
+             "eps": zahl(q.dehnung(punkt, (si(g.von[0], MM), si(g.von[1], MM))), PROMILLE)}
+            for g in bauteil.spannglieder],
         "x": zahl(x, MM),
         "d": zahl(d, MM),
         "neigung": math.degrees(punkt.psi),

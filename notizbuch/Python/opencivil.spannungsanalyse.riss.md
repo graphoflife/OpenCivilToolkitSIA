@@ -1,5 +1,5 @@
 ---
-erzeugt: 974571889f1c
+erzeugt: 2ad8394298aa
 art: modul
 tags: [modul]
 ---
@@ -189,6 +189,15 @@ def A_c(self) -> float
 
 Dasselbe fuer die Normalkraft: `A`.
 
+#### Bruttoriss.vorgespannt
+
+```python
+@property
+def vorgespannt(self) -> bool
+```
+
+Ob Spannglieder mit Vordehnung den Beton druecken -- sie verschieben den Riss.
+
 #### Bruttoriss.herleitung_bruttoquerschnitt
 
 ```python
@@ -246,6 +255,14 @@ def herleitung_flaeche(self, p: Protokoll, w: Zwischenwerte, A: 'Wert') -> 'Wert
 ```
 
 Der reine Betonquerschnitt des Moduls ueber der Normalkraft: der Bruttoquerschnitt.
+
+### _Abzug
+
+```python
+class _Abzug
+```
+
+Was die Vorspannung in eine Rissbedingung schreibt -- ohne sie nichts.
 
 
 ## Braucht

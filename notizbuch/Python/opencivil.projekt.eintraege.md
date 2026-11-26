@@ -1,5 +1,5 @@
 ---
-erzeugt: ae902a960953
+erzeugt: 338f2ed76ce7
 art: modul
 tags: [modul]
 ---
@@ -647,4 +647,5 @@ Eine zu pruefende Schnittgroessenkombination.
 - [[opencivil.projekt.querschnittsanalyse]]
 - [[opencivil.projekt.setzung]]
 - [[opencivil.projekt.skript]]
+- [[opencivil.projekt.spannglieder]]
 - [[opencivil.projekt.staebe]]

@@ -1,5 +1,5 @@
 ---
-erzeugt: 2157a7f0ed15
+erzeugt: 231ba6bc7203
 art: modul
 tags: [modul]
 ---
@@ -33,3 +33,4 @@ Browser laedt, samt dem Notizbuch.
 - [[opencivil.web.umschlag]] – wie eine Antwort an die Oberfläche verpackt wird.
 - [[opencivil.web.werkstoffkurven]] – die Spannung-Dehnung-Linie je Material, als JSON.
 - [[opencivil.web.zeichendaten]] – was die Oberflaeche je Bauteil zeichnet, nach seiner Art.
+- [[opencivil.web.zeichengeometrie]] – die Zeichnung einer Querschnittsanalyse, wie der Kern sie sieht.

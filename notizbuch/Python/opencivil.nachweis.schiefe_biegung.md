@@ -1,5 +1,5 @@
 ---
-erzeugt: 5be4723f7a6c
+erzeugt: 6a0f951d800b
 art: modul
 tags: [modul]
 ---
@@ -128,6 +128,7 @@ Die Einwirkung, wie nachgewiesen: mit der Laengszugkraft, wo sie zaehlt.
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.bewehrungselemente]]
 - [[opencivil.querschnitt.interaktion]]
+- [[opencivil.querschnitt.spannglieder]]
 
 ## Gebraucht von
 

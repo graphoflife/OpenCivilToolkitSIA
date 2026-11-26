@@ -1,5 +1,5 @@
 ---
-erzeugt: 44593bb58725
+erzeugt: 64edc2dd8f2f
 art: modul
 tags: [modul]
 ---
@@ -199,6 +199,27 @@ def stahlkennwerte(self) -> Dict[str, str]
 ```
 
 Dasselbe fuer ein Stahlgesetz.
+
+#### Werkstoffsatz.spannstahl
+
+```python
+@property
+def spannstahl(self) -> str
+```
+
+Kurzname der Fliessgrenze des Spannstahls -- dort beginnt sein Plateau:
+`f_pd` oder `f_p01k` (SIA 262:2025, Figur 17).
+
+#### Werkstoffsatz.spannstahlkennwerte
+
+```python
+@property
+def spannstahlkennwerte(self) -> Dict[str, str]
+```
+
+Dasselbe fuer das Gesetz des Spannstahls, mit dem Modul der Draehte und
+Staebe -- ein Spannglied aus Litzen nimmt seinen eigenen
+([[opencivil.querschnitt.spannglieder]]).
 
 ### Rechenart
 
@@ -480,6 +501,16 @@ def betonkennwerte(self, beton) -> Dict[str, str]
 
 Die Kennwerte des Betongesetzes ([[opencivil.querschnitt.gesetzwahl#Werkstoffsatz.betonkennwerte|Werkstoffsatz.betonkennwerte]]) dieses Betons, mit dem Modul der Wahl.
 
+#### Rechenwahl.kennwerte
+
+```python
+def kennwerte(self, stoff) -> Dict[str, str]
+```
+
+Je Rolle des Gesetzes eines Baustoffs der Kurzname seines Kennwerts --
+nach der Art des Baustoffs, die eine Stelle dafuer: Beton
+([[opencivil.querschnitt.gesetzwahl#Rechenwahl.betonkennwerte|betonkennwerte]]), Betonstahl, Spannstahl.
+
 #### Rechenwahl.index
 
 ```python
@@ -552,6 +583,7 @@ der Wahl ([[opencivil.querschnitt.gesetzwahl#Rechenwahl|Rechenwahl.modul]]), ohn
 ## Braucht
 
 - [[opencivil.core.wahl]]
+- [[opencivil.material.basis]]
 - [[opencivil.querschnitt.werkstoffgesetz]]
 
 ## Gebraucht von

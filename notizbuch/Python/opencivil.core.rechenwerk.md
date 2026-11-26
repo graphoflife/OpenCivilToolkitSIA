@@ -1,5 +1,5 @@
 ---
-erzeugt: 2029961f9f13
+erzeugt: e235340105e2
 art: modul
 tags: [modul]
 ---
@@ -471,3 +471,4 @@ def abschliessen(self) -> Loesung
 - [[opencivil.web.setzungsdaten]]
 - [[opencivil.web.werkstoffkurven]]
 - [[opencivil.web.zeichendaten]]
+- [[opencivil.web.zeichengeometrie]]

@@ -6,7 +6,8 @@
  *   Meldungen          was der Kern an der Zeichnung beanstandet
  *   Querschnitt        A, y_S, z_S und I_y, I_z, I_yz, brutto
  *   Elemente           je Art eine Gruppe, je Element eine Zeile -- jede
- *                      klappt auf und zu, zu Beginn zu
+ *                      klappt auf und zu, zu Beginn zu; ein Spannglied mit
+ *                      seiner Spannkraft P∞, vom Kern
  *
  * Meldungen, Gruppen und Zeilen baut cad_app.js, wie im Balkensystem und in
  * der Decke; ein Klick wählt das Element im Fenster. Jede Zahl steht so in
@@ -19,6 +20,7 @@ import {
 } from './cad_app.js';
 import { el } from './dom.js';
 import { span } from './mathe.js';
+import { gliedText } from './qa_spannglied.js';
 import { elementname, linienText, stoffname } from './qa_zeichnung.js';
 
 /** Die Werte des Bruttoquerschnitts in zwei Spalten, die Ziffern untereinander. */
@@ -48,6 +50,7 @@ export function uebersicht(a) {
   };
   const linieninfo = new Map((g?.linien || []).map((x) => [x.kennung, x]));
   const wandinfo = new Map((g?.waende || []).map((x) => [x.kennung, x]));
+  const gliedinfo = new Map((g?.spannglieder || []).map((x) => [x.kennung, x]));
   const zeile = listenzeilen(a);
   const element = (kennung, was, wert = '') => zeile({ kennung, name: elementname(a, kennung), was, wert });
   return [
@@ -58,6 +61,11 @@ export function uebersicht(a) {
         f.material ? stoffname(f.material) : 'nimmt Fläche weg', `${f.knoten.length} Ecken`))],
       ['Stäbe', z.staebe.map((s) => element(s.kennung,
         `⌀${zahlText(s.durchmesser)} ${stoffname(s.stahl)}`, lage(s.knoten)))],
+      ['Spannglieder', z.spannglieder.map((s) => {
+        const w = gliedinfo.get(s.kennung)?.werte;
+        return element(s.kennung, `${gliedText(s)} ${stoffname(s.stahl)}`,
+          w ? `P∞ ${zahlText(w.P_inf, 0)} kN` : lage(s.knoten));
+      })],
       ['Bewehrung', z.stablinien.map((l) => {
         const info = linieninfo.get(l.kennung);
         return element(l.kennung, linienText(l, info) || '–', info?.punkte ? `A_s ${zahlText(info.flaeche, 0)} mm²` : '');

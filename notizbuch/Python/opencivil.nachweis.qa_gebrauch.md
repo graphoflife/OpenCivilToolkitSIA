@@ -1,5 +1,5 @@
 ---
-erzeugt: b27b7a46ba7c
+erzeugt: f26f698c5a1f
 art: modul
 tags: [modul]
 ---
@@ -186,6 +186,16 @@ def protokoll_einwirkung(self, p: Protokoll, fall: Lastfall, index: str) -> None
 def protokoll_ebene(self, p: Protokoll, werte: Zwischenwerte, zustand: _Analysezustand, grenzen: Grenzen, erg: Fallergebnis) -> None
 ```
 
+### glieder_im_gleichgewicht
+
+```python
+def glieder_im_gleichgewicht(p: Protokoll, analyse: Querschnittsanalyse) -> None
+```
+
+Was eine Stahlspannung ueber die Spannglieder sagt: sie tragen im
+Gleichgewicht mit, geprueft wird nur der Betonstahl -- grau, denn es
+fehlt etwas, nichts ist falsch.
+
 ### _tabelle_gezogen
 
 ```python
@@ -264,6 +274,7 @@ findet, liegt jenseits der Grenze: der Stahl fliesst dort laengst.
 ## Konstanten
 
 - `GRENZ_SCHRANKE = 1e-07` – Wann das Moment der Zwaengung auf Biegung gefunden ist: wie nahe der erste gezogene Stab seiner Grenze kommen muss, als Teil von ihr.
+- `REFERENZ_SPANNSTAHL = 'SIA 262:2025, 4.4.2.3.10'` – Wo die Norm den Spannstahl in der Rissbreite mitzaehlen laesst: sein Spannungszuwachs gegen die zulaessige Stahlspannung, seine Spannung gegen f_pd.
 - `RANDZONE = 'Massiges Bauteil: es wirkt nur der Beton bis 250 mm vom Rand mit, un…` – Was die Begrenzung fuer massige Bauteile aendert -- im Bericht.
 
 ## Braucht

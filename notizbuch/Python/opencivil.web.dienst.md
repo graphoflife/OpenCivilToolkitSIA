@@ -1,5 +1,5 @@
 ---
-erzeugt: 8aad329dcbc5
+erzeugt: c6e733774360
 art: modul
 tags: [modul]
 ---
@@ -448,6 +448,7 @@ entspricht dem, was der Server ueber HTTP melden wuerde.
 - [[opencivil.web.speicher]]
 - [[opencivil.web.umschlag]]
 - [[opencivil.web.zeichendaten]]
+- [[opencivil.web.zeichengeometrie]]
 
 ## Gebraucht von
 

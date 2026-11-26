@@ -32,6 +32,18 @@ Ihre Breite ``b`` ist ein Streifen, keine Abmessung des Bauteils: in ihrer
 Ebene ist die Platte unbegrenzt. Unter Zug reisst sie darum ueber ihre Dicke,
 ``t = h``, auch bei einem Streifen, der schmaler ist als die Platte dick.
 
+DIE VORSPANNUNG:
+Spannglieder mit Vordehnung druecken den Beton schon ohne Last, je mit
+ihrer Kraft nach allen Verlusten an ihrer Stelle (:class:`Vorspannung`).
+Am Bruttoquerschnitt ist das eine Normalkraft und ein Moment, und ihre
+Spannung an jeder Ecke kommt zu der aus der Einwirkung: der gezogene Rand
+reisst spaeter, der andere frueher. So rechnen alle, die den Riss des
+gezeichneten Querschnitts brauchen -- das sproede Versagen (4.3.1.2 laesst
+die Vorspannung zu), die Zwaengung auf Biegung, deren Stahlspannung
+ebenfalls mit ihr gerechnet ist, und die Spannung-Dehnung-Analysen
+(4.4.3.2.4). Schlaff angesetzte Glieder zaehlen nicht: ihre Vorspannung
+steht in den Lastfaellen.
+
 Die Uebertragung der Regeln der Platte auf den gezeichneten Querschnitt
 geschieht nach Vorgabe: SIA 262:2025, 4.4.1.3 nimmt die kleinste Abmessung
 des Zuggurts und legt ``h/3`` nur fuer Platten und Rechtecke unter Biegung
@@ -42,7 +54,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from typing import Any, Callable, List, Tuple
+from typing import Any, Callable, List, Optional, Tuple
 
 from opencivil.core.berechnung import Eingabebezug, Eingaben
 from opencivil.core.einheiten import M, MIO_MM3, MIO_MM4, Groesse
@@ -60,6 +72,11 @@ MOMENTENTEILER = 3.0
 #: Woher ``k_t`` und ``f_ct,eff`` kommen -- fuer jeden Nachweis dieselbe Stelle.
 REFERENZ_BEIWERT = "SIA 262:2025, 4.4.1.3, (100)"
 REFERENZ_ZUGFESTIGKEIT = "SIA 262:2025, 4.4.1.3, (99)"
+
+#: Warum die Vorspannung den Riss verschiebt: die Rissbeanspruchung darf sie
+#: beruecksichtigen, und unter Gebrauchslast zaehlt eine vorhandene
+#: Druckspannung.
+REFERENZ_VORSPANNUNG = "SIA 262:2025, 4.3.1.2; 4.4.3.2.4"
 
 #: Groesste rissaktive Dicke unter Zug, in m -- wo die Begrenzung eingeschaltet
 #: ist: massige Bauteile, je gezogenem Rand 250 mm (SIA 262:2025, 4.4.2.3.7).
@@ -181,10 +198,56 @@ class Ecke:
 
 
 @dataclass(frozen=True)
+class Druckglied:
+    """Ein Spannglied mit Vordehnung: seine Kraft drueckt den Beton an seiner Stelle."""
+
+    name: str
+    P: float
+    """Die Spannkraft nach allen Verlusten, N."""
+
+    P_id: str
+    y: float
+    z: float
+    """Seine Lage vom Schwerpunkt aus, m."""
+
+
+@dataclass(frozen=True)
+class Vorspannung:
+    """
+    Was die Spannglieder mit Vordehnung am Bruttoquerschnitt wecken -- siehe
+    Dateikopf: Normalkraft und Momente ihrer Kraefte, als Druck an ihrer
+    Stelle, in SI, Zug positiv, die Momente wie eine Einwirkung.
+    """
+
+    glieder: Tuple[Druckglied, ...]
+    A: float
+    A_id: str
+
+    @property
+    def N(self) -> float:
+        return -sum(g.P for g in self.glieder)
+
+    @property
+    def M_y(self) -> float:
+        # M_y = -Σ F·z' mit der Kraft F = -P, die das Glied auf den Beton gibt.
+        return sum(g.P * g.z for g in self.glieder)
+
+    @property
+    def M_z(self) -> float:
+        return sum(g.P * g.y for g in self.glieder)
+
+    @property
+    def ids(self) -> Tuple[str, ...]:
+        """Was ihre Herleitung liest (:func:`protokoll_vorspannung`): Flaeche und Spannkraefte."""
+        return (self.A_id,) + tuple(g.P_id for g in self.glieder)
+
+
+@dataclass(frozen=True)
 class Bruttoquerschnitt:
     """
     Der ungerissene Bruttoquerschnitt ohne Stahl: Traegheitsmomente um den
-    Schwerpunkt und die Ecken des Betons -- in SI.
+    Schwerpunkt und die Ecken des Betons -- in SI. Dazu die Vorspannung, wo
+    ein Spannglied mit Vordehnung den Beton drueckt.
     """
 
     I_y: float
@@ -193,6 +256,8 @@ class Bruttoquerschnitt:
     ecken: Tuple[Ecke, ...]
     biegung: Biegung = SCHIEF
     """Ob die Nulllinie kippt oder waagrecht bleibt -- wie die Analyse rechnet."""
+
+    vorspannung: Optional[Vorspannung] = None
 
     def ausdehnung(self, um_y: bool) -> Tuple[float, float]:
         """Die Hoehe in Biegerichtung und die Breite quer dazu, in m -- aus der Zeichnung."""
@@ -213,10 +278,24 @@ class Bruttoquerschnitt:
         return -(M_y * (self.I_z * ecke.z - self.I_yz * ecke.y)
                  + M_z * (self.I_y * ecke.y - self.I_yz * ecke.z)) / nenner
 
+    def vorspannung_an(self, ecke: Ecke) -> float:
+        """
+        Die Spannung, die die Vorspannung an der Ecke weckt, Zug positiv --
+        null ohne sie. Einachsig zaehlt ihr Moment um z nicht, wie bei jeder
+        Einwirkung.
+        """
+        v = self.vorspannung
+        if v is None:
+            return 0.0
+        return v.N / v.A + self.einheitsspannung(ecke, *self.biegung.wirkt(v.M_y, v.M_z))
+
 
 def rissbezuege(analyse: Querschnittsanalyse) -> List[Eingabebezug]:
-    """Was der Bruttoquerschnitt liest, ueber die Grundbezuege hinaus: die Traegheitsmomente."""
-    return [Eingabebezug(k, analyse.id_von(k)) for k in ("I_y", "I_z", "I_yz")]
+    """
+    Was der Bruttoquerschnitt liest, ueber die Grundbezuege hinaus: die
+    Traegheitsmomente und die Flaeche -- an ihr misst sich die Vorspannung.
+    """
+    return [Eingabebezug(k, analyse.id_von(k)) for k in ("I_y", "I_z", "I_yz", "A")]
 
 
 def bruttoquerschnitt(analyse: Querschnittsanalyse,
@@ -234,7 +313,21 @@ def bruttoquerschnitt(analyse: Querschnittsanalyse,
         ecken=tuple(Ecke(y=p[0] * 1e-3 - y_S, z=p[1] * 1e-3 - z_S, punkt=p, stoff=stoff,
                          f_ctm=abs(wert(stoff.id_von("f_ctm"))))
                     for p, stoff in analyse.beton_ecken),
-        biegung=analyse.biegung)
+        biegung=analyse.biegung, vorspannung=_vorspannung(analyse, wert, y_S, z_S))
+
+
+def _vorspannung(analyse: Querschnittsanalyse, wert: Callable[[str], float],
+                 y_S: float, z_S: float) -> Optional[Vorspannung]:
+    """Die Vorspannung der Analyse -- ``None`` ohne Glied mit Vordehnung."""
+    kraefte = analyse.glieder.spannkraefte() if analyse.glieder is not None else []
+    if not kraefte:
+        return None
+    A_id = analyse.id_von("A")
+    return Vorspannung(
+        glieder=tuple(Druckglied(name=g.name, P=wert(P_id), P_id=P_id,
+                                 y=g.von[0] * 1e-3 - y_S, z=g.von[1] * 1e-3 - z_S)
+                      for g, P_id in kraefte),
+        A=wert(A_id), A_id=A_id)
 
 
 def bruttoquerschnitt_rechteck(*, h: float, b: float, stoff: Any,
@@ -268,23 +361,29 @@ class Rissmoment:
     M_Riss: float
     """in Nm."""
 
+    sigma_p: float = 0.0
+    """Die Spannung aus der Vorspannung an der Ecke, Pa -- null ohne sie."""
+
 
 def rissmoment(q: Bruttoquerschnitt, M_y: float, M_z: float) -> Rissmoment:
     """
     Das Rissmoment in der Richtung ``(M_y, M_z)`` -- einem Moment von eins:
     das Moment unter reiner Biegung, bei dem ``f_ct,eff`` zum ersten Mal
-    irgendwo erreicht wird. Bei mehreren Betonen reisst zuerst die Ecke mit
-    der groessten Spannung, gemessen an ihrer Zugfestigkeit.
+    irgendwo erreicht wird. Es reisst die Ecke, die dafuer das kleinste
+    Moment braucht: bei mehreren Betonen die mit der groessten Spannung,
+    gemessen an ihrer Zugfestigkeit, mit Vorspannung die, an der ihr Druck
+    am wenigsten aufzuheben ist.
     """
     hoehe, _ = q.ausdehnung(M_y != 0.0)
     k_t = beiwert_dicke(rissaktive_dicke(h=hoehe, zug=False))
     gezogen = [(ecke, q.einheitsspannung(ecke, M_y, M_z)) for ecke in q.ecken]
-    ecke, sigma = max((es for es in gezogen if es[1] > 0.0),
-                      key=lambda es: es[1] / es[0].f_ctm)
+    ecke, sigma = min((es for es in gezogen if es[1] > 0.0),
+                      key=lambda es: (k_t * es[0].f_ctm - q.vorspannung_an(es[0])) / es[1])
     W = 1.0 / sigma
     f_ct_eff = k_t * ecke.f_ctm
+    sigma_p = q.vorspannung_an(ecke)
     return Rissmoment(ecke=ecke, W=W, hoehe=hoehe, k_t=k_t, f_ct_eff=f_ct_eff,
-                      M_Riss=f_ct_eff * W)
+                      M_Riss=(f_ct_eff - sigma_p) * W, sigma_p=sigma_p)
 
 
 @dataclass(frozen=True)
@@ -301,23 +400,30 @@ class Rissnormalkraft:
     N_Riss: float
     """in N."""
 
+    sigma_p: float = 0.0
+    """Die Spannung aus der Vorspannung an der Ecke, Pa -- null ohne sie."""
+
 
 def rissnormalkraft(q: Bruttoquerschnitt, M_y: float, M_z: float, *,
                     k_t: float, A: float) -> Rissnormalkraft:
     """
     Die Zugkraft, bei der der ungerissene Bruttoquerschnitt beim Moment
     ``(M_y, M_z)`` -- in Nm, nicht von eins -- zum ersten Mal irgendwo
-    ``f_ct,eff = k_t·f_ctm`` erreicht: ``N_Riss = (f_ct,eff - σ_M)·A`` an der
-    Ecke, an der das am wenigsten Zug braucht. ``k_t`` gilt fuer die
-    rissaktive Dicke unter Zug (:func:`rissaktive_dicke`).
+    ``f_ct,eff = k_t·f_ctm`` erreicht: ``N_Riss = (f_ct,eff - σ_p - σ_M)·A``
+    an der Ecke, an der das am wenigsten Zug braucht, mit der Spannung
+    ``σ_p`` aus der Vorspannung. ``k_t`` gilt fuer die rissaktive Dicke unter
+    Zug (:func:`rissaktive_dicke`).
     """
-    def an(ecke: Ecke) -> Tuple[float, Ecke, float, float]:
+    def an(ecke: Ecke) -> Tuple[float, Ecke, float, float, float]:
         sigma = q.einheitsspannung(ecke, M_y, M_z)
         f_ct_eff = k_t * ecke.f_ctm
-        return (f_ct_eff - sigma) * A, ecke, sigma, f_ct_eff
+        sigma_p = q.vorspannung_an(ecke)
+        return (f_ct_eff - sigma_p - sigma) * A, ecke, sigma, f_ct_eff, sigma_p
 
-    N_Riss, ecke, sigma, f_ct_eff = min((an(ecke) for ecke in q.ecken), key=lambda t: t[0])
-    return Rissnormalkraft(ecke=ecke, sigma_M=sigma, f_ct_eff=f_ct_eff, N_Riss=N_Riss)
+    N_Riss, ecke, sigma, f_ct_eff, sigma_p = min((an(ecke) for ecke in q.ecken),
+                                                 key=lambda t: t[0])
+    return Rissnormalkraft(ecke=ecke, sigma_M=sigma, f_ct_eff=f_ct_eff, N_Riss=N_Riss,
+                           sigma_p=sigma_p)
 
 
 def protokoll_spannung_ungerissen(p: Protokoll, biegung: Biegung) -> None:
@@ -362,6 +468,66 @@ def protokoll_widerstandsmoment(p: Protokoll, werte: Zwischenwerte, q: Bruttoque
     return W
 
 
+def protokoll_vorspannung(p: Protokoll, werte: Zwischenwerte, q: Bruttoquerschnitt,
+                          ecke: Ecke, ein: Callable[[str], Wert]) -> Optional[Wert]:
+    """
+    Die Spannung ``σ_p``, die die Vorspannung an der Ecke weckt, hergeleitet
+    -- ``None`` ohne sie. ``ein`` liefert zu einer Wert-ID den Wert: die
+    Spannkraefte und die Flaeche.
+    """
+    v = q.vorspannung
+    if v is None:
+        return None
+    p.erklaerung(
+        "Die Spannglieder mit Vordehnung drücken den Beton schon ohne Last, je mit "
+        "ihrer Kraft nach allen Verlusten an ihrer Stelle: am Bruttoquerschnitt eine "
+        "Normalkraft und ein Moment. Ihre Spannung an der Ecke, die reisst, kommt zu der "
+        "aus der Einwirkung.")
+    mehrere = len(v.glieder) > 1
+    kraefte = {f"P{i}": ein(g.P_id) for i, g in enumerate(v.glieder)}
+    N_p = werte.kraft("N_p", "N_p", v.N, "Normalkraft aus der Vorspannung, Druck negativ")
+    p.formel(N_p, "-" + _summe([f"@P{i}" for i in range(len(v.glieder))]), kraefte,
+             titel="Normalkraft aus der Vorspannung", referenz=REFERENZ_VORSPANNUNG)
+    momente = {}
+    for achse, M in q.biegung.momente(v.M_y, v.M_z):
+        quer = "z" if achse == "y" else "y"
+        abstaende = {f"a{i}": werte.laenge(
+            f"{quer}_p{i + 1}", rf"{quer}'_{{p{f',{i + 1}' if mehrere else ''}}}",
+            getattr(g, quer), f"Lage von {g.name}, vom Schwerpunkt aus")
+            for i, g in enumerate(v.glieder)}
+        momente[achse] = werte.moment(f"M_p_{achse}", f"M_{{p,{achse}}}", M,
+                                      f"Moment aus der Vorspannung um {achse}")
+        p.formel(momente[achse],
+                 _summe([rf"@P{i} \cdot @a{i}" for i in range(len(v.glieder))]),
+                 {**kraefte, **abstaende}, titel=f"Moment aus der Vorspannung um {achse}",
+                 referenz=REFERENZ_VORSPANNUNG, name="Moment aus der Vorspannung")
+    sigma_p = werte.spannung("sigma_p", r"\sigma_p", q.vorspannung_an(ecke),
+                             "aus der Vorspannung, an der Ecke", stellen=2)
+    traeg = lambda kurz, symbol, si, was: werte.wert(kurz, symbol, Groesse.aus_si(si, MIO_MM4), 1,
+                                                     f"{was} des Bruttoquerschnitts")
+    teile = {"N": N_p, "A": ein(v.A_id), "Iy": traeg("Iy", "I_y", q.I_y, "Trägheitsmoment um y"),
+             "z": werte.laenge("z", "z'", ecke.z, "Lage der Ecke, vom Schwerpunkt aus")}
+    titel = "Spannung aus der Vorspannung an der Ecke"
+    if q.biegung.einachsig:
+        p.formel(sigma_p, r"\frac{@N}{@A} - \frac{@My \cdot @z}{@Iy}",
+                 {**teile, "My": momente["y"]}, titel=titel, referenz=REFERENZ_VORSPANNUNG)
+        return sigma_p
+    p.formel(sigma_p,
+             r"\frac{@N}{@A} - \frac{@My\,(@Iz \cdot @z - @Iyz \cdot @y)"
+             r" + @Mz\,(@Iy \cdot @y - @Iyz \cdot @z)}{@Iy \cdot @Iz - @Iyz^{2}}",
+             {**teile, "My": momente["y"], "Mz": momente["z"],
+              "Iz": traeg("Iz", "I_z", q.I_z, "Trägheitsmoment um z"),
+              "Iyz": traeg("Iyz", "I_{yz}", q.I_yz, "Deviationsmoment"),
+              "y": werte.laenge("y", "y'", ecke.y, "Lage der Ecke, vom Schwerpunkt aus")},
+             titel=titel, referenz=REFERENZ_VORSPANNUNG)
+    return sigma_p
+
+
+def _summe(teile: List[str]) -> str:
+    """Eine Summe in einer Vorlage -- geklammert, sobald es mehr als ein Glied ist."""
+    return teile[0] if len(teile) == 1 else r"\left(" + " + ".join(teile) + r"\right)"
+
+
 def protokoll_rissmoment(p: Protokoll, e: Eingaben, analyse: Querschnittsanalyse,
                          werte: Zwischenwerte, q: Bruttoquerschnitt, riss: Rissmoment,
                          M_y: float, M_z: float, *, referenz: str) -> Wert:
@@ -378,8 +544,15 @@ def protokoll_rissmoment(p: Protokoll, e: Eingaben, analyse: Querschnittsanalyse
         titel="Beiwert für die Höhe in Biegerichtung")
     W = protokoll_widerstandsmoment(p, werte, q, ecke, riss.W, M_y, M_z)
     M_Riss = werte.moment("M_Riss", "M_{Riss}", riss.M_Riss)
-    p.formel(M_Riss, r"@f \cdot @W", {"f": f_ct_eff, "W": W},
-             titel="Rissmoment des ungerissenen Querschnitts", referenz=referenz)
+    sigma_p = protokoll_vorspannung(p, werte, q, ecke, e.nach_id())
+    if sigma_p is None:
+        p.formel(M_Riss, r"@f \cdot @W", {"f": f_ct_eff, "W": W},
+                 titel="Rissmoment des ungerissenen Querschnitts", referenz=referenz)
+    else:
+        p.formel(M_Riss, r"\left(@f - @sp\right) \cdot @W",
+                 {"f": f_ct_eff, "sp": sigma_p, "W": W},
+                 titel="Rissmoment des ungerissenen, vorgespannten Querschnitts",
+                 referenz=referenz)
     return M_Riss
 
 

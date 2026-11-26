@@ -1,5 +1,5 @@
 ---
-erzeugt: abf3c3c9b4cc
+erzeugt: 7c5d636940a8
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -170,6 +170,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.projekt.querschnittsanalyse]] – ein gezeichneter Querschnitt, wie die Oberflaeche ihn beschreibt.
     - [[opencivil.projekt.setzung]] – eine Setzungsberechnung, wie die Oberflaeche sie beschreibt.
     - [[opencivil.projekt.skript]] – ein Python-Skript der App «Python», wie es
+    - [[opencivil.projekt.spannglieder]] – ein Spannglied, wie die Oberflaeche es beschreibt.
     - [[opencivil.projekt.staebe]] – der Baukasten eines Stabwerks, eben und im Raum.
 - [[opencivil.querschnitt]] – die Querschnitte: die Platte und der gezeichnete.
     - [[opencivil.querschnitt.analyse]] – der gezeichnete Querschnitt als Bauteil im Rechenwerk.
@@ -184,6 +185,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.querschnitt.platte]] – Stahlbeton-Plattenquerschnitt.
     - [[opencivil.querschnitt.randzone]] – der Beton nahe am Rand eines gezeichneten Querschnitts.
     - [[opencivil.querschnitt.schubwaende]] – Querkraft und Torsion auf Schubwaende verteilt.
+    - [[opencivil.querschnitt.spannglieder]] – Spannglieder im gezeichneten Querschnitt.
     - [[opencivil.querschnitt.torsion]] – das Torsionstraegheitsmoment eines gezeichneten Querschnitts.
     - [[opencivil.querschnitt.vorlagen]] – Querschnitte zum Anfangen.
     - [[opencivil.querschnitt.werkstoffgesetz]] – Spannungs-Dehnungs-Beziehungen.
@@ -238,3 +240,4 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.web.umschlag]] – wie eine Antwort an die Oberfläche verpackt wird.
     - [[opencivil.web.werkstoffkurven]] – die Spannung-Dehnung-Linie je Material, als JSON.
     - [[opencivil.web.zeichendaten]] – was die Oberflaeche je Bauteil zeichnet, nach seiner Art.
+    - [[opencivil.web.zeichengeometrie]] – die Zeichnung einer Querschnittsanalyse, wie der Kern sie sieht.

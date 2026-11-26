@@ -15,6 +15,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, Dict, Mapping
 
 from opencivil.material.basis import Baustoff
+from opencivil.material.spannstahl import erzeugnis
 from opencivil.projekt.lesen import ProjektFehler, als_groesse, ort_von
 from opencivil.projekt.querschnittsanalyse import QuerschnittsanalyseEintrag
 from opencivil.nachweis.qa_gebrauch import AnalyseStellen, RissnormalkraftQA, ZwaengungBiegungQA
@@ -26,6 +27,7 @@ from opencivil.nachweis.schubwandnachweis import Schubwandnachweis, schub_belast
 from opencivil.querschnitt.analyse import Flaechenteil, Lastfall, Querschnittsanalyse
 from opencivil.querschnitt.biegung import EINACHSIG, SCHIEF
 from opencivil.querschnitt.geometrie import GeometrieFehler
+from opencivil.querschnitt.spannglieder import Spannglied, aus_glied
 
 from opencivil.projekt.aufbau.kern import (
     Aufbau, Bauteil, knickfall, material, spannungsfaelle, spannungsnachweise, stoffe_von,
@@ -153,6 +155,8 @@ def _analyse(eintrag: QuerschnittsanalyseEintrag, baustoffe: Mapping[str, Bausto
     waende = [{**w, "stahl": stoff(w["stahl"], w["name"], "betonstahl")
                if w["durchmesser"] > 0 else None}
               for w in elemente.waende]
+    glieder = [_glied(g, stoff(g["stahl"], g["name"], "spannstahl"), wo)
+               for g in elemente.spannglieder]
     # Jeder Baustoff bekommt seine Wahl, auch wer keine eigene hat: so steht
     # die Vorgabe nur an der Beschreibung.
     wahl = eintrag.wahl({k: baustoffe[k] for k in eintrag.materialien() if k in baustoffe})
@@ -160,4 +164,29 @@ def _analyse(eintrag: QuerschnittsanalyseEintrag, baustoffe: Mapping[str, Bausto
         name=eintrag.name, praefix=praefix,
         flaechen=flaechen, staebe=staebe, linien=linien, waende=waende,
         alpha_min=eintrag.alpha_min, alpha_max=eintrag.alpha_max, k_c=eintrag.k_c,
-        wahl=wahl, biegung=EINACHSIG if eintrag.einachsig else SCHIEF)
+        wahl=wahl, biegung=EINACHSIG if eintrag.einachsig else SCHIEF, spannglieder=glieder)
+
+
+def _glied(g: Mapping, stahl: Baustoff, wo: str) -> Spannglied:
+    """
+    Ein Spannglied mit seinem Spannstahl -- und dem Erzeugnis, das sein
+    Durchmesser in der Sorte waehlt. Nennt Tabelle 7 keines, fehlt die Wahl
+    noch (:func:`erzeugnis_grund`).
+    """
+    gefunden = erzeugnis(stahl.sorte, g["durchmesser"])
+    if gefunden is None:
+        raise ProjektFehler(f"{g['name']}: {erzeugnis_grund(stahl.name, stahl.sorte, g['durchmesser'])}.",
+                            wo=wo)
+    return aus_glied({**g, "stahl": stahl}, gefunden)
+
+
+def erzeugnis_grund(name: str, sorte: str, durchmesser: float) -> str:
+    """
+    Warum ein Spannglied noch kein Erzeugnis hat -- die eine Stelle fuer den
+    Aufbau und das Zeichenfenster (:mod:`opencivil.web.zeichengeometrie`). Es
+    fehlt nur eine Wahl, etwa nach dem Wechsel zu einer Sorte, die es nur in
+    Staeben gibt.
+    """
+    nennt = f" (Sorte {sorte})" if sorte and sorte != name else ""
+    return (f"{name}{nennt} gibt es nicht mit ⌀{durchmesser:g} mm (Tabelle 7) – "
+            f"einen Durchmesser wählen")

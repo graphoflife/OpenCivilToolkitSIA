@@ -1,5 +1,5 @@
 ---
-erzeugt: 2ba3d1630d60
+erzeugt: b6636dafc11b
 art: modul
 tags: [modul]
 ---
@@ -98,7 +98,11 @@ Wie er in einem Satz heisst: Element und Lage, in mm.
 def stabangaben(analyse: Querschnittsanalyse, q: Querschnitt, herkunft: Sequence[Bewehrungselement]) -> List[Stabangabe]
 ```
 
-Je Bewehrung des Querschnitts ihre Angaben -- in derselben Reihenfolge wie dort.
+Je Bewehrung aus Betonstahl ihre Angaben -- in derselben Reihenfolge wie
+im Querschnitt. Die Spannglieder fehlen: ihnen gelten diese Grenzen
+nicht. Sie stehen dort zuletzt
+([[opencivil.querschnitt.analyse#Querschnittsanalyse.geometrie|geometrie]]),
+so bleibt jede Stelle die ihres Stabs.
 
 ### _gruppieren
 

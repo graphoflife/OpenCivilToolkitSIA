@@ -259,6 +259,9 @@ class Paar(Protocol):
     @property
     def A_c(self) -> float: ...
 
+    @property
+    def vorgespannt(self) -> bool: ...
+
     def rissmoment_bei(self, N: float) -> float: ...
 
     def rissnormalkraft_bei(self, M: float) -> float: ...
@@ -529,8 +532,10 @@ def moment_kruemmung(paar: Paar, *, N: float) -> Linie:
             "der Querschnitt ungerissen, und reisst er, trägt er das Rissmoment "
             "nicht. Bei N = 0 prüft genau das der Nachweis gegen sprödes Versagen.")
     elif linie.riss <= 0.0:
-        linie.hinweisen("Schon die Zugkraft allein reisst den Querschnitt auf: die "
-                        "ganze Linie gilt gerissen.")
+        linie.hinweisen(("Schon die Vorspannung, mit der Normalkraft, reisst den Querschnitt "
+                         "auf" if paar.vorgespannt else
+                         "Schon die Zugkraft allein reisst den Querschnitt auf")
+                        + ": die ganze Linie gilt gerissen.")
     return linie
 
 
@@ -565,6 +570,8 @@ def normalkraft_dehnung(paar: Paar, *, M: float) -> Linie:
             "der Querschnitt ungerissen, und reisst er, trägt er die Rissnormalkraft "
             "nicht.")
     elif linie.riss <= 0.0:
-        linie.hinweisen("Schon das Moment allein reisst den Querschnitt auf: die "
-                        "ganze Linie gilt gerissen.")
+        linie.hinweisen(("Schon die Vorspannung, mit dem Moment, reisst den Querschnitt auf"
+                         if paar.vorgespannt else
+                         "Schon das Moment allein reisst den Querschnitt auf")
+                        + ": die ganze Linie gilt gerissen.")
     return linie

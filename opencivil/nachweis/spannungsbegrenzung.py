@@ -639,7 +639,7 @@ class Spannungsbegrenzung(Teilnachweis):
         erg = Fallergebnis(fall=fall)
         stellen = zustand.stellen
         if not stellen:
-            erg.begruendung = "Ohne Bewehrung gibt es keine Stahlspannung."
+            erg.begruendung = "Ohne Betonstahl → kein Nachweis."
             return erg
         erg.ebene = ebene = self.ort.ebene(zustand, fall)
         # Nur gezogene Bewehrung: eine gedrueckte Stelle hat keine

@@ -40,7 +40,9 @@ from opencivil.projekt.mappe import projekt_aus_datei
 from opencivil.projekt.staebe import MitStaeben
 from opencivil.querschnitt import vorlagen
 from opencivil.querschnitt.widerstandsflaeche import GROESSEN
-from opencivil.web import api, balkendaten, deckendaten, diagrammdaten, speicher
+from opencivil.web import (
+    api, balkendaten, deckendaten, diagrammdaten, speicher, zeichengeometrie,
+)
 from opencivil.web.umschlag import endlich, fehlerdaten, umschlag
 from opencivil.web.zeichendaten import ZEICHENDATEN
 
@@ -418,7 +420,8 @@ def geometrie(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     Schnell genug fuer jede Aenderung: gerechnet wird nur Geometrie.
     """
     projekt = _projekt(rumpf)
-    return api.geometrie(projekt.querschnittsanalyse(str(rumpf.get("kennung") or "")), projekt)
+    return zeichengeometrie.geometrie(
+        projekt.querschnittsanalyse(str(rumpf.get("kennung") or "")), projekt)
 
 
 def analysediagramme(rumpf: Mapping[str, Any]) -> Dict[str, Any]:

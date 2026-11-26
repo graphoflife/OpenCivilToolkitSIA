@@ -1,5 +1,5 @@
 ---
-erzeugt: e4317d8935e6
+erzeugt: f12c5d6be597
 art: modul
 tags: [modul]
 ---
@@ -488,7 +488,7 @@ noch nicht gewaehltes fehlt nur. Das geloeschte nennt der Satz nicht beim
 Namen: den kennt das Projekt nicht mehr, und die Kennung steht nirgends,
 wo der Benutzer sie saehe -- bis 2026-11-19 hiess es «das Material 'b9'».
 Die Regel fuer [[opencivil.projekt.aufbau.kern#material|material]] und fuer die Meldungen an der Zeichnung
-([[opencivil.web.api#geometrie|opencivil.web.api.geometrie]]).
+([[opencivil.web.zeichengeometrie#geometrie|opencivil.web.zeichengeometrie.geometrie]]).
 
 ### ueberschreibungen_setzen
 
@@ -498,6 +498,18 @@ def ueberschreibungen_setzen(projekt: 'Projekt', werk: Rechenwerk, aufbau: Aufba
 
 Die von Hand ueberschriebenen Kennwerte -- dass es sie gibt, prueft
 `baustoff_bauen`. Ein Material, das nicht rechnet, hat keine.
+
+### baustoff_im_werk
+
+```python
+def baustoff_im_werk(eintrag: MaterialEintrag, werk: Rechenwerk) -> Optional[Baustoff]
+```
+
+Ein Material als Baustoff in `werk`, mit Abweichungen und
+Ueberschreibungen, wie das Projekt es rechnet -- ohne das Projekt zu
+bauen. `None`, wenn es nicht rechnet: was ihm fehlt, sagt es selbst.
+Fuer das Zeichenfenster, das zu einem Spannglied schon beim Zeichnen
+seine Spannkraft nennt ([[opencivil.web.zeichengeometrie]]).
 
 ### stoffe_von
 
@@ -625,3 +637,4 @@ Feldes; `mehr` fuer die Analyse.
 - [[opencivil.projekt.aufbau.setzung]]
 - [[opencivil.web.api]]
 - [[opencivil.web.erdbebendaten]]
+- [[opencivil.web.zeichengeometrie]]

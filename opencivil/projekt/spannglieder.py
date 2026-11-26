@@ -1,0 +1,69 @@
+"""
+opencivil/projekt/spannglieder.py -- ein Spannglied, wie die Oberflaeche es beschreibt.
+
+VERANTWORTUNG:
+Der :class:`SpanngliedEintrag` einer Querschnittsanalyse
+(:class:`~opencivil.projekt.querschnittsanalyse.QuerschnittsanalyseEintrag`):
+an einem Knoten, aus einem Spannstahl des Projekts, mit allem, was es
+ausmacht -- Erzeugnis und Anzahl, Wirkung, Spannungen, Verbund. Alles
+steht am Glied selbst, wie Durchmesser und Material beim Stab (Benutzer,
+2026-11-25). Was daraus folgt, rechnet
+:mod:`opencivil.querschnitt.spannglieder`.
+
+DAS ERZEUGNIS:
+Keine freie Zahl: der Durchmesser waehlt einen Draht, eine Litze oder
+einen Stab, den Tabelle 7 fuer die Sorte des Spannstahls nennt, und die
+Flaeche kommt aus der Tabelle. Passt der Durchmesser nicht zur Sorte --
+etwa nach dem Wechsel von Y1860 zu Y1030, das es nur in Staeben gibt --,
+fehlt die Wahl noch: das Glied rechnet nicht und sagt es grau.
+
+DIE SPANNUNGEN:
+Leer gelassen, gilt die Vorgabe (:func:`~opencivil.querschnitt.spannglieder.vorspannung`):
+``sigma_p0 = 0.70 f_pk``, ``sigma_pinf = 0.85 sigma_p0``. Die Zahlen des
+Benutzers werden nie umgedeutet; was die Norm begrenzt, sagt ein roter
+Hinweis am Glied, gerechnet wird trotzdem mit ihnen.
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Optional
+
+from opencivil.core.einheiten import MM, N_PRO_MM2
+from opencivil.projekt.eintraege import Beschreibung
+from opencivil.projekt.lesen import bereich
+from opencivil.querschnitt.spannglieder import Spannwirkung, Verbund
+
+#: Womit ein neues Glied beginnt: eine Litze 15.7 mm -- die verbreitetste, die
+#: Tabelle 7 fuer Y1860 nennt.
+DURCHMESSER = 15.7
+
+
+@dataclass
+class SpanngliedEintrag(Beschreibung):
+    """Ein Spannglied an einem Knoten -- siehe Dateikopf."""
+
+    IM_ORT = "Spannglied"
+
+    kennung: str = ""
+    knoten: str = ""
+    stahl: str = ""
+    """Kennung des Spannstahls."""
+
+    durchmesser: float = bereich(DURCHMESSER, heisst="Durchmesser", einheit=MM, ueber=0.0)
+    """Welches Erzeugnis der Sorte -- an seinem Durchmesser erkannt (Tabelle 7)."""
+
+    anzahl: int = bereich(1, heisst="Anzahl", ab=1)
+    """Wie viele Draehte, Litzen oder Staebe das Glied hat."""
+
+    wirkung: Spannwirkung = Spannwirkung.VORDEHNUNG
+    """Mit Vordehnung im Widerstand -- oder schlaff, weil die Vorspannung schon als Einwirkung zaehlt."""
+
+    sigma_p0: Optional[float] = bereich(None, heisst="σ_p0", einheit=N_PRO_MM2, ueber=0.0)
+    """Die Spannung nach dem Spannen in N/mm² -- leer: 0.70 f_pk."""
+
+    sigma_pinf: Optional[float] = bereich(None, heisst="σ_p∞", einheit=N_PRO_MM2, ueber=0.0,
+                                          bis_feld="sigma_p0")
+    """Die Spannung nach allen Verlusten in N/mm² -- leer: 0.85 sigma_p0."""
+
+    verbund: Verbund = Verbund.MIT

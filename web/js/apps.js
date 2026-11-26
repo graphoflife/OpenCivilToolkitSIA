@@ -261,7 +261,7 @@ function umriss(analyse) {
   const ecken = new Set(analyse.flaechen.flatMap((f) => f.knoten));
   const punkte = (analyse.knoten || []).filter((k) => ecken.has(k.kennung)).map((k) => [k.y, k.z]);
   if (!punkte.length) {
-    const bewehrt = ['staebe', 'stablinien', 'schubwaende'].some((liste) => analyse[liste]?.length);
+    const bewehrt = ['staebe', 'stablinien', 'spannglieder', 'schubwaende'].some((liste) => analyse[liste]?.length);
     return bewehrt ? 'ohne Polygon' : 'leer';
   }
   const spanne = (i) => Math.max(...punkte.map((p) => p[i])) - Math.min(...punkte.map((p) => p[i]));

@@ -1,10 +1,10 @@
 ---
-erzeugt: 3a876d67ffb2
+erzeugt: c4aa2ecb747e
 art: thema
 tags: [thema]
 ---
 > [!abstract] Platte
-> 23 Formeln, in der Folge, in der gerechnet wird.
+> 26 Formeln, in der Folge, in der gerechnet wird.
 
 ## Was die Rechnung dazu sagt
 
@@ -67,6 +67,9 @@ Der reine Betonquerschnitt ist der Bruttoquerschnitt, um die Achse der Biegung: 
 21. [[Rissaktive Dicke des gezeichneten Querschnitts]]
 22. [[Spannung aus dem Moment an der Ecke, die zuerst reisst]]
 23. [[Grösste Dehnung im Schwerpunkt]]
+24. [[Normalkraft aus der Vorspannung]]
+25. [[Moment aus der Vorspannung]]
+26. [[Spannung aus der Vorspannung an der Ecke]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

@@ -51,6 +51,7 @@ from opencivil.querschnitt.schubwaende import Wand
 from opencivil.querschnitt.schubwaende import zellen as zellen_finden
 from opencivil.querschnitt.fasern import FASERN
 from opencivil.querschnitt.gesetzwahl import Rechenwahl, betongesetz
+from opencivil.querschnitt.spannglieder import Spannglied, Spannglieder
 from opencivil.querschnitt.torsion import torsion
 from opencivil.querschnitt.werkstoffgesetz import Gesetz, Stahlgesetz
 from opencivil.querschnitt.zugseite import Zugseite
@@ -62,6 +63,7 @@ from opencivil.querschnitt.zugseite import Zugseite
 KENNWERTE = {
     Baustoffart.BETON: ("f_ck", "f_cd", "eps_c1d", "eps_c2d", "f_ctm", "E_cm", "E_cd"),
     Baustoffart.BETONSTAHL: ("f_yk", "f_yd", "f_yk_druck", "f_yd_druck", "E_s", "eps_ud"),
+    Baustoffart.SPANNSTAHL: ("f_pk", "f_p01k", "f_pd", "E_p", "E_p_litze", "eps_ud"),
 }
 
 
@@ -106,8 +108,8 @@ def gesetz_protokollieren(p: Protokoll, e: Eingaben, stoff: Baustoff, gesetz: Ge
     :meth:`~opencivil.material.basis.Baustoff.eingabename`.
     """
     satz = wahl.satz(stoff)
-    kennwerte = wahl.betonkennwerte(stoff) if stoff.art is Baustoffart.BETON else satz.stahlkennwerte
-    gesetz.protokoll(p, {rolle: e[stoff.eingabename(name)] for rolle, name in kennwerte.items()},
+    gesetz.protokoll(p, {rolle: e[stoff.eingabename(name)]
+                         for rolle, name in wahl.kennwerte(stoff).items()},
                      titel=f"Werkstoffgesetz {stoff.name}, {satz.beschriftung}",
                      basis=f"{basis}.{kennung_aus(stoff.id)}")
 
@@ -198,11 +200,13 @@ class Zeichnung:
     :meth:`QuerschnittsanalyseEintrag.elemente` vergibt -- benannt wird hier
     nichts. ``polygone`` tragen ``punkte`` und ``traegt`` (ohne Material ist
     es eine Aussparung), ``staebe`` ``lage`` und ``durchmesser``, ``linien``
-    und ``waende`` die Felder der Beschreibung.
+    und ``waende`` die Felder der Beschreibung, ``spannglieder`` wie die
+    Staebe, mit dem Durchmesser ihrer Flaeche.
     """
 
     def __init__(self, *, polygone: Sequence[Mapping], staebe: Sequence[Mapping],
-                 linien: Sequence[Mapping], waende: Sequence[Mapping]) -> None:
+                 linien: Sequence[Mapping], waende: Sequence[Mapping],
+                 spannglieder: Sequence[Mapping] = ()) -> None:
         self.punkte = [tuple(tuple(p) for p in f["punkte"]) for f in polygone]
         self.traegt = [bool(f["traegt"]) for f in polygone]
         self.namen = [f["name"] for f in polygone]
@@ -214,9 +218,10 @@ class Zeichnung:
         self.brutto: Optional[geo.Flaechenwerte] = None
         # Noch nichts gezeichnet: so beginnt jede Analyse, und es fehlt nichts,
         # was eine Meldung wert waere (QuerschnittsanalyseEintrag.leer).
-        self._leer = not (polygone or staebe or linien or waende)
+        self._leer = not (polygone or staebe or linien or waende or spannglieder)
         self._polygone_pruefen()
         self.staebe = [self._stab(s) for s in staebe]
+        self.spannglieder = [self._stab(s, "Ein Spannglied muss") for s in spannglieder]
         self.linien = [self._linie(l) for l in linien]
         self.waende = [self._wand(w) for w in waende]
         self.zellen = self._zellen(waende) if all(self.waende) else []
@@ -274,7 +279,7 @@ class Zeichnung:
 
     # -- Bewehrung ----------------------------------------------------------------------
 
-    def _stab(self, s: Mapping) -> bool:
+    def _stab(self, s: Mapping, wer: str = "Bewehrung muss") -> bool:
         name, kennung = s["name"], s["kennung"]
         lage, durchmesser = tuple(s["lage"]), s["durchmesser"]
         if durchmesser <= 0:
@@ -284,7 +289,7 @@ class Zeichnung:
             return False
         if not self._im_beton(lage, durchmesser):
             self._melden(f"{name} (y = {lage[0]:g}, z = {lage[1]:g} mm) liegt nicht ganz "
-                         f"im Beton. Bewehrung muss im Beton liegen.", kennung)
+                         f"im Beton. {wer} im Beton liegen.", kennung)
             return False
         return True
 
@@ -398,11 +403,13 @@ class Querschnittsanalyse(Rechenobjekt):
         waende: Sequence[Mapping],
         alpha_min: int, alpha_max: int, k_c: float,
         wahl: Rechenwahl, biegung: Biegung = SCHIEF,
+        spannglieder: Sequence[Spannglied] = (),
     ) -> None:
         """
         ``staebe``, ``linien`` und ``waende`` wie bei :class:`Zeichnung`, je
         mit ``name``, ``kennung`` und dem Stahl als :class:`Baustoff` (eine
-        Wand ohne Buegel: ``None``).
+        Wand ohne Buegel: ``None``); die Spannglieder fertig
+        (:func:`~opencivil.querschnitt.spannglieder.aus_glied`).
         """
         self.name = name
         self.id = praefix
@@ -429,7 +436,9 @@ class Querschnittsanalyse(Rechenobjekt):
         self.zeichnung = Zeichnung(
             polygone=[{"punkte": f.punkte, "traegt": f.stoff is not None,
                        "name": f.name, "kennung": f.kennung} for f in self.flaechen],
-            staebe=staebe, linien=linien, waende=waende)
+            staebe=staebe, linien=linien, waende=waende,
+            spannglieder=[{"name": g.name, "kennung": g.kennung, "lage": g.von,
+                           "durchmesser": g.durchmesser} for g in spannglieder])
         if not self.zeichnung.gueltig:
             erste = self.zeichnung.meldungen[0]
             raise GeometrieFehler(erste.text, erste.elemente)
@@ -438,6 +447,14 @@ class Querschnittsanalyse(Rechenobjekt):
         self.bewehrungselemente: List[Bewehrungselement] = (
             [aus_stab(s) for s in staebe]
             + [aus_linie(l, linie) for l, linie in zip(linien, self.zeichnung.linien)])
+        self.spannglieder: Tuple[Spannglied, ...] = tuple(spannglieder)
+        """
+        Die Spannglieder, fuer sich: was nur dem Betonstahl gilt, fragt die
+        Bewehrungselemente. Im Querschnitt kommen sie nach ihnen
+        (:meth:`geometrie`), je mit eigenem Werkstoff (:meth:`werkstoffe`).
+        """
+        self.glieder: Optional[Spannglieder] = None
+        """Ihre Werte und ihre Herleitung -- ``None`` ohne Spannglied."""
         self.waende: List[Wandangabe] = self._waende(waende)
         self._aufbauen(alpha_min, alpha_max, k_c)
 
@@ -500,6 +517,9 @@ class Querschnittsanalyse(Rechenobjekt):
         self.berechnungen.append(Herleitungsteil(
             self.torsion_protokollieren, id=f"{self.id}.torsion", ausgaben=[self.d_torsion],
             titel="Torsion", abschnitt=abschnitt))
+        if self.spannglieder:
+            self.glieder = Spannglieder(self.spannglieder, basis=self.id, abschnitt=abschnitt)
+            self.berechnungen.append(self.glieder)
 
         gruppe = "Schubwände"
         for kurzname, symbol, einheit, groesse, beschreibung, stellen, referenz in (
@@ -517,14 +537,27 @@ class Querschnittsanalyse(Rechenobjekt):
 
     @property
     def baustoffe(self) -> List[Baustoff]:
-        """Jeder Baustoff, den die Analyse benutzt: erst die der Flaechen, dann die Staehle."""
+        """
+        Jeder Baustoff, den die Analyse benutzt: erst die der Flaechen, dann
+        die Staehle, zuletzt der Spannstahl.
+        """
         gesehen: Dict[str, Baustoff] = {}
         for stoff in ([f.stoff for f in self.flaechen]
                       + [g.stahl for g in self.bewehrungselemente]
-                      + [w.stahl for w in self.waende]):
+                      + [w.stahl for w in self.waende]
+                      + [g.stahl for g in self.spannglieder]):
             if stoff is not None:
                 gesehen.setdefault(stoff.id, stoff)
         return list(gesehen.values())
+
+    @property
+    def baustoffe_mit_werkstoff(self) -> List[Baustoff]:
+        """
+        Die Baustoffe mit je einem Werkstoff im Querschnitt -- alle ausser dem
+        Spannstahl: jedes Spannglied hat seinen eigenen, nach diesen
+        (:meth:`werkstoffe`).
+        """
+        return [s for s in self.baustoffe if s.art is not Baustoffart.SPANNSTAHL]
 
     # -- Herleitung des Querschnitts -------------------------------------------
 
@@ -623,7 +656,8 @@ class Querschnittsanalyse(Rechenobjekt):
 
     def _bewehrung_protokollieren(self, p: Protokoll) -> float:
         if not self.bewehrungselemente:
-            p.text("Keine Bewehrung gezeichnet.")
+            p.text("Kein Betonstahl gezeichnet." if self.spannglieder
+                   else "Keine Bewehrung gezeichnet.")
             return 0.0
         p.ansatz(r"s = \frac{L}{m} \qquad m = \mathrm{runde}\left(\frac{L}{s_{gewählt}}\right)",
                  titel="Teilung einer Stablinie: gleiche Felder, auf die Länge gerundet")
@@ -665,7 +699,8 @@ class Querschnittsanalyse(Rechenobjekt):
         latex = (rf"{als_text(', '.join(betone))} \qquad A = {b.A:.0f}\,\mathrm{{mm}}^2"
                  rf" \qquad y_S = {b.y_S:.1f}\,\mathrm{{mm}} \qquad z_S = {b.z_S:.1f}\,\mathrm{{mm}}")
         kopf = GleichungBlock(latex=latex, titel="Angaben zum Querschnitt")
-        zeilen = [[g.name, g.kurzmenge, g.stahl.name] for g in self.bewehrungselemente]
+        zeilen = [[g.name, g.kurzmenge, g.stahl.name]
+                  for g in (*self.bewehrungselemente, *self.spannglieder)]
         for w in self.waende:
             zeilen.append([w.name, Mathe(
                 rf"b_w = {w.dicke:g},\ {w.schnitte} \times \varnothing {w.durchmesser:g}"
@@ -681,6 +716,14 @@ class Querschnittsanalyse(Rechenobjekt):
         """Die Kennwerte jedes Baustoffs der Analyse, als Eingaben der Nachweise."""
         return [stoff.bezug(k) for stoff in self.baustoffe for k in KENNWERTE[stoff.art]]
 
+    def stoff_von_werkstoff(self, w: int) -> Baustoff:
+        """
+        Der Baustoff hinter einem Werkstoff des Querschnitts (:meth:`werkstoffe`)
+        -- bei dem eines Spannglieds sein Spannstahl.
+        """
+        stoffe = self.baustoffe_mit_werkstoff
+        return stoffe[w] if w < len(stoffe) else self.spannglieder[w - len(stoffe)].stahl
+
     def kennwert(self, e: Eingaben, stoff: Baustoff, kennwert: str) -> float:
         return e.g(stoff.eingabename(kennwert)).si
 
@@ -688,16 +731,20 @@ class Querschnittsanalyse(Rechenobjekt):
                    ungerissen: bool = False,
                    ) -> Tuple[List[Werkstoff], Callable[[Baustoff], int]]:
         """
-        Die Werkstoffe des Querschnitts, je Baustoff einer (:func:`werkstoff`).
+        Die Werkstoffe des Querschnitts, je Baustoff einer (:func:`werkstoff`),
+        danach je Spannglied seiner
+        (:meth:`~opencivil.querschnitt.spannglieder.Spannglieder.werkstoffe`).
         ``wert`` liefert zu einer Wert-ID die Zahl in SI; ``wahl`` ist die
         Rechenwahl: im Bruchzustand die der Analyse (:attr:`wahl`), fuer
         Spannungen und Knicken die des Kapitels.
         """
         liste: List[Werkstoff] = []
         index: Dict[str, int] = {}
-        for stoff in self.baustoffe:
+        for stoff in self.baustoffe_mit_werkstoff:
             liste.append(werkstoff(stoff, wert, wahl, ungerissen=ungerissen))
             index[stoff.id] = len(liste) - 1
+        if self.glieder is not None:
+            liste += self.glieder.werkstoffe(wert, wahl)
         return liste, (lambda stoff: index[stoff.id])
 
     def querschnitt(self, wert: Callable[[str], float], wahl: Rechenwahl, *,
@@ -725,15 +772,31 @@ class Querschnittsanalyse(Rechenobjekt):
         Parabel haengt hier an ``E_cm``.
         """
         werkstoffe, index = self.werkstoffe(e.si_nach_id(), self.wahl)
-        for stoff in self.baustoffe:
+        for stoff in self.baustoffe_mit_werkstoff:
             gesetz_protokollieren(p, e, stoff, werkstoffe[index(stoff)].gesetz,
                                   self.wahl, basis)
+        self.gliedgesetze_protokollieren(
+            p, e, werkstoffe, self.wahl, basis=basis,
+            titel=lambda g: f"Werkstoffgesetz {g.name}, {self.wahl.satz(g.stahl).beschriftung}")
+
+    def gliedgesetze_protokollieren(self, p: Protokoll, e: Eingaben,
+                                    werkstoffe: Sequence[Werkstoff], wahl: Rechenwahl, *,
+                                    titel: Callable[[Spannglied], str], basis: str) -> None:
+        """Die Gesetze der Spannglieder -- ``werkstoffe`` die von :meth:`werkstoffe`."""
+        if self.glieder is not None:
+            self.glieder.gesetze_protokollieren(
+                p, e, wahl, werkstoffe[len(self.baustoffe_mit_werkstoff):], titel=titel,
+                basis=basis)
 
     def grundbezuege(self) -> List[Eingabebezug]:
-        """Was jeder Nachweis der Analyse liest: den Schwerpunkt und die Werkstoffe."""
+        """
+        Was jeder Nachweis der Analyse liest: den Schwerpunkt, die Werkstoffe
+        und die Spannung und Vordehnung jedes Spannglieds.
+        """
         return ([Eingabebezug("y_S", self.id_von("y_S")),
                  Eingabebezug("z_S", self.id_von("z_S"))]
-                + self.werkstoffbezuege())
+                + self.werkstoffbezuege()
+                + (self.glieder.gliedbezuege() if self.glieder is not None else []))
 
     def interaktion(self, e: Eingaben) -> Tuple[Querschnitt, List[Bewehrungselement]]:
         """
@@ -759,7 +822,10 @@ class Querschnittsanalyse(Rechenobjekt):
         """
         Polygone und Bewehrung in Metern, mit den Werkstoffen als Index --
         dazu je Bewehrung das Element, aus dem sie stammt: sein Name steht in
-        der Probe, sein Durchmesser bestimmt die Rissbreite.
+        der Probe, sein Durchmesser bestimmt die Rissbreite. Die Spannglieder
+        kommen zuletzt, je mit ihrem eigenen Werkstoff, der nach denen der
+        Baustoffe steht (:meth:`werkstoffe`): so bleibt jede Stelle des
+        Betonstahls dort, wo sie ohne Spannglied waere.
         """
         mm = MM.faktor   # was in mm steht, in m
         teile = [Teil(punkte=tuple((y * mm, z * mm) for y, z in f.punkte),
@@ -773,8 +839,10 @@ class Querschnittsanalyse(Rechenobjekt):
 
         bewehrung: List[Bewehrung] = []
         herkunft: List[Bewehrungselement] = []
-        for g in self.bewehrungselemente:
-            stuecke = g.als_bewehrung(index_von(g.stahl), verdraengt)
+        erstes_glied = len(self.baustoffe_mit_werkstoff)
+        for g, stahl in ([(g, index_von(g.stahl)) for g in self.bewehrungselemente]
+                         + [(g, erstes_glied + i) for i, g in enumerate(self.spannglieder)]):
+            stuecke = g.als_bewehrung(stahl, verdraengt)
             bewehrung += stuecke
             herkunft += [g] * len(stuecke)
         return teile, bewehrung, herkunft

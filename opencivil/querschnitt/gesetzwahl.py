@@ -55,6 +55,7 @@ from dataclasses import dataclass
 from typing import Any, Dict, FrozenSet, Mapping, Sequence, Tuple
 
 from opencivil.core.wahl import Wahl
+from opencivil.material.basis import Baustoffart
 from opencivil.querschnitt.werkstoffgesetz import (
     BLOCKANTEIL, Betongesetz, BetonUngerissen, Gesetz, Spannungsblock,
 )
@@ -151,6 +152,23 @@ class Werkstoffsatz(Wahl):
         """Dasselbe fuer ein Stahlgesetz."""
         return {"f_s": self.stahl, "f_s_druck": self.stahl_druck, "E_s": "E_s",
                 "eps_ud": "eps_ud"}
+
+    @property
+    def spannstahl(self) -> str:
+        """
+        Kurzname der Fliessgrenze des Spannstahls -- dort beginnt sein Plateau:
+        ``f_pd`` oder ``f_p01k`` (SIA 262:2025, Figur 17).
+        """
+        return "f_pd" if self is Werkstoffsatz.BEMESSUNG else "f_p01k"
+
+    @property
+    def spannstahlkennwerte(self) -> Dict[str, str]:
+        """
+        Dasselbe fuer das Gesetz des Spannstahls, mit dem Modul der Draehte und
+        Staebe -- ein Spannglied aus Litzen nimmt seinen eigenen
+        (:mod:`opencivil.querschnitt.spannglieder`).
+        """
+        return {"f_p": self.spannstahl, "E_p": "E_p", "eps_ud": "eps_ud"}
 
 
 class Rechenart(Wahl):
@@ -376,6 +394,18 @@ class Rechenwahl:
     def betonkennwerte(self, beton) -> Dict[str, str]:
         """Die Kennwerte des Betongesetzes (:attr:`Werkstoffsatz.betonkennwerte`) dieses Betons, mit dem Modul der Wahl."""
         return {**self.satz(beton).betonkennwerte, "E_c": self.modul}
+
+    def kennwerte(self, stoff) -> Dict[str, str]:
+        """
+        Je Rolle des Gesetzes eines Baustoffs der Kurzname seines Kennwerts --
+        nach der Art des Baustoffs, die eine Stelle dafuer: Beton
+        (:meth:`betonkennwerte`), Betonstahl, Spannstahl.
+        """
+        if stoff.art is Baustoffart.BETON:
+            return self.betonkennwerte(stoff)
+        satz = self.satz(stoff)
+        return satz.spannstahlkennwerte if stoff.art is Baustoffart.SPANNSTAHL \
+            else satz.stahlkennwerte
 
     @property
     def index(self) -> str:

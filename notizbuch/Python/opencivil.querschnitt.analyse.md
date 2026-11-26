@@ -1,5 +1,5 @@
 ---
-erzeugt: c498c974a500
+erzeugt: e3e48687e40c
 art: modul
 tags: [modul]
 ---
@@ -177,7 +177,8 @@ Jedes Element ist ein Woerterbuch mit `name` und `kennung`, wie sie
 [[opencivil.querschnitt.analyse#Zeichnung|QuerschnittsanalyseEintrag.elemente]] vergibt -- benannt wird hier
 nichts. `polygone` tragen `punkte` und `traegt` (ohne Material ist
 es eine Aussparung), `staebe` `lage` und `durchmesser`, `linien`
-und `waende` die Felder der Beschreibung.
+und `waende` die Felder der Beschreibung, `spannglieder` wie die
+Staebe, mit dem Durchmesser ihrer Flaeche.
 
 #### Zeichnung.gueltig
 
@@ -276,7 +277,19 @@ def abschnitt(self) -> Abschnitt
 def baustoffe(self) -> List[Baustoff]
 ```
 
-Jeder Baustoff, den die Analyse benutzt: erst die der Flaechen, dann die Staehle.
+Jeder Baustoff, den die Analyse benutzt: erst die der Flaechen, dann
+die Staehle, zuletzt der Spannstahl.
+
+#### Querschnittsanalyse.baustoffe_mit_werkstoff
+
+```python
+@property
+def baustoffe_mit_werkstoff(self) -> List[Baustoff]
+```
+
+Die Baustoffe mit je einem Werkstoff im Querschnitt -- alle ausser dem
+Spannstahl: jedes Spannglied hat seinen eigenen, nach diesen
+([[opencivil.querschnitt.analyse#Querschnittsanalyse.werkstoffe|werkstoffe]]).
 
 #### Querschnittsanalyse.aufbau_protokollieren
 
@@ -308,6 +321,15 @@ def werkstoffbezuege(self) -> List[Eingabebezug]
 
 Die Kennwerte jedes Baustoffs der Analyse, als Eingaben der Nachweise.
 
+#### Querschnittsanalyse.stoff_von_werkstoff
+
+```python
+def stoff_von_werkstoff(self, w: int) -> Baustoff
+```
+
+Der Baustoff hinter einem Werkstoff des Querschnitts ([[opencivil.querschnitt.analyse#Querschnittsanalyse.werkstoffe|werkstoffe]])
+-- bei dem eines Spannglieds sein Spannstahl.
+
 #### Querschnittsanalyse.kennwert
 
 ```python
@@ -320,7 +342,9 @@ def kennwert(self, e: Eingaben, stoff: Baustoff, kennwert: str) -> float
 def werkstoffe(self, wert: Callable[[str], float], wahl: Rechenwahl, *, ungerissen: bool=False) -> Tuple[List[Werkstoff], Callable[[Baustoff], int]]
 ```
 
-Die Werkstoffe des Querschnitts, je Baustoff einer ([[opencivil.querschnitt.analyse#werkstoff|werkstoff]]).
+Die Werkstoffe des Querschnitts, je Baustoff einer ([[opencivil.querschnitt.analyse#werkstoff|werkstoff]]),
+danach je Spannglied seiner
+([[opencivil.querschnitt.spannglieder#Spannglieder.werkstoffe|werkstoffe]]).
 `wert` liefert zu einer Wert-ID die Zahl in SI; `wahl` ist die
 Rechenwahl: im Bruchzustand die der Analyse ([[opencivil.querschnitt.analyse#Querschnittsanalyse|wahl]]), fuer
 Spannungen und Knicken die des Kapitels.
@@ -347,13 +371,22 @@ Die Gesetze, mit denen gerechnet wird, je Material mit seiner Wahl --
 jedes schreibt sich selbst, mit den Werten darin. Ohne Kriechen: die
 Parabel haengt hier an `E_cm`.
 
+#### Querschnittsanalyse.gliedgesetze_protokollieren
+
+```python
+def gliedgesetze_protokollieren(self, p: Protokoll, e: Eingaben, werkstoffe: Sequence[Werkstoff], wahl: Rechenwahl, *, titel: Callable[[Spannglied], str], basis: str) -> None
+```
+
+Die Gesetze der Spannglieder -- `werkstoffe` die von [[opencivil.querschnitt.analyse#Querschnittsanalyse.werkstoffe|werkstoffe]].
+
 #### Querschnittsanalyse.grundbezuege
 
 ```python
 def grundbezuege(self) -> List[Eingabebezug]
 ```
 
-Was jeder Nachweis der Analyse liest: den Schwerpunkt und die Werkstoffe.
+Was jeder Nachweis der Analyse liest: den Schwerpunkt, die Werkstoffe
+und die Spannung und Vordehnung jedes Spannglieds.
 
 #### Querschnittsanalyse.interaktion
 
@@ -373,7 +406,10 @@ def geometrie(self, index_von: Callable[[Baustoff], int]) -> Tuple[List[Teil], L
 
 Polygone und Bewehrung in Metern, mit den Werkstoffen als Index --
 dazu je Bewehrung das Element, aus dem sie stammt: sein Name steht in
-der Probe, sein Durchmesser bestimmt die Rissbreite.
+der Probe, sein Durchmesser bestimmt die Rissbreite. Die Spannglieder
+kommen zuletzt, je mit ihrem eigenen Werkstoff, der nach denen der
+Baustoffe steht ([[opencivil.querschnitt.analyse#Querschnittsanalyse.werkstoffe|werkstoffe]]): so bleibt jede Stelle des
+Betonstahls dort, wo sie ohne Spannglied waere.
 
 #### Querschnittsanalyse.schubwaende
 
@@ -441,6 +477,7 @@ Jede Ecke eines Polygons mit Material -- fuer das Rissmoment, in mm.
 - [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.interaktion]]
 - [[opencivil.querschnitt.schubwaende]]
+- [[opencivil.querschnitt.spannglieder]]
 - [[opencivil.querschnitt.torsion]]
 - [[opencivil.querschnitt.werkstoffgesetz]]
 - [[opencivil.querschnitt.zugseite]]
@@ -461,7 +498,7 @@ Jede Ecke eines Polygons mit Material -- fuer das Rissmoment, in mm.
 - [[opencivil.pfahl.quer]]
 - [[opencivil.projekt.aufbau.querschnittsanalyse]]
 - [[opencivil.spannungsanalyse.schnitt]]
-- [[opencivil.web.api]]
+- [[opencivil.web.zeichengeometrie]]
 
 ## Formeln aus diesem Modul
 

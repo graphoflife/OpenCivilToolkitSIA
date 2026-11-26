@@ -1,11 +1,11 @@
 ---
-erzeugt: 44c171a3aba0
+erzeugt: 51a1aa22d394
 art: formel
 tags: [formel]
-normstelle: ["SIA 262:2025, 4.2.2.2, Figur 16", "SIA 262:2025, 4.3.3.2.2, (38)", "SIA 263:2013, 3.2.2.4"]
+normstelle: ["SIA 262:2025, 4.2.2.2, Figur 16", "SIA 262:2025, 4.3.3.2.2, (38)", "SIA 263:2013, 3.2.2.4", "SIA 262:2025, 4.2.3.3, Figur 17"]
 ---
 > [!info] Normstellen
-> SIA 262:2025, 4.2.2.2, Figur 16 · SIA 262:2025, 4.3.3.2.2, (38) · SIA 263:2013, 3.2.2.4
+> SIA 262:2025, 4.2.2.2, Figur 16 · SIA 262:2025, 4.3.3.2.2, (38) · SIA 263:2013, 3.2.2.4 · SIA 262:2025, 4.2.3.3, Figur 17
 
 *In der Herleitung: «Fliessdehnung (Bemessungswert)»*
 
@@ -17,6 +17,18 @@ $$
 
 $$
 \varepsilon_y = \frac{f_y}{E_a}
+$$
+
+*In der Herleitung: «Fliessdehnung von Drähten und Stäben (Bemessungswert)»*
+
+$$
+\varepsilon_{pd} = \frac{f_{pd}}{E_p}
+$$
+
+*In der Herleitung: «Fliessdehnung von Litzen (Bemessungswert)»*
+
+$$
+\varepsilon_{pd}^{\mathrm{Litze}} = \frac{f_{pd}}{E_p^{\mathrm{Litze}}}
 $$
 
 *In der Herleitung: «Grösste Zugdehnung in der Bewehrung»*
@@ -33,6 +45,9 @@ $$
 | $E_s$ | Elastizitätsmodul des Betonstahls | N/mm² | Vorgabe |
 | $f_y$ | Streckgrenze | N/mm² | Vorgabe |
 | $E_a$ | Elastizitätsmodul des Baustahls | N/mm² | Vorgabe |
+| $f_{pd}$ | Bemessungswert der Fliessgrenze | N/mm² | [[Bemessungswert der Fliessgrenze]] |
+| $E_p$ | Elastizitätsmodul von Drähten und Stäben | N/mm² | Vorgabe |
+| $E_p^{\mathrm{Litze}}$ | Elastizitätsmodul von Litzen | N/mm² | Vorgabe |
 | $f_{yk}$ | Charakteristische Fliessgrenze | N/mm² | Vorgabe |
 
 ## Beispiel
@@ -52,6 +67,18 @@ $$
 Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
+\varepsilon_{pd} = \frac{f_{pd}}{E_p} = \frac{1391\,\mathrm{N}/\mathrm{mm}^{2}}{200000\,\mathrm{N}/\mathrm{mm}^{2}} = 0.696\,\%
+$$
+
+Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
+
+$$
+\varepsilon_{pd}^{\mathrm{Litze}} = \frac{f_{pd}}{E_p^{\mathrm{Litze}}} = \frac{1391\,\mathrm{N}/\mathrm{mm}^{2}}{195000\,\mathrm{N}/\mathrm{mm}^{2}} = 0.713\,\%
+$$
+
+Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
+
+$$
 \varepsilon_y = \frac{f_{yk}}{E_s} = \frac{500\,\mathrm{N}/\mathrm{mm}^{2}}{200000\,\mathrm{N}/\mathrm{mm}^{2}} = 2.5\,\text{‰} \quad < \quad \varepsilon_{s,x} = 3.47\,\text{‰}
 $$
 
@@ -64,6 +91,7 @@ $$
 
 - [[opencivil.material.baustahl]]
 - [[opencivil.material.betonstahl]]
+- [[opencivil.material.spannstahl]]
 - [[opencivil.nachweis.kennzahlen#Plattenkennzahlen|Plattenkennzahlen._ohne_buegel]]
 - [[opencivil.nachweis.spannungsbegrenzung#Spannungsbegrenzung._protokoll_fliessen|Spannungsbegrenzung._protokoll_fliessen]]
 - [[opencivil.spannungsanalyse.herleitung#herleitung|herleitung]]
@@ -73,6 +101,7 @@ $$
 - [[Betonstahl]]
 - [[Kennzahlen]]
 - [[Baustahl]]
+- [[Spannstahl]]
 - [[Stahlspannung aus Rissbreite]]
 - [[Spannung-Dehnung-Analyse]]
 

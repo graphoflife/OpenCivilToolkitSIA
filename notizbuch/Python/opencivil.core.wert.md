@@ -1,5 +1,5 @@
 ---
-erzeugt: bcdb68b35f8b
+erzeugt: 0db9b1255df0
 art: modul
 tags: [modul]
 ---
@@ -358,6 +358,7 @@ def beschreibung(self) -> str
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.lagenaufbau]]
 - [[opencivil.querschnitt.platte]]
+- [[opencivil.querschnitt.spannglieder]]
 - [[opencivil.querschnitt.werkstoffgesetz]]
 - [[opencivil.spannungsanalyse.herleitung]]
 - [[opencivil.spannungsanalyse.linie]]

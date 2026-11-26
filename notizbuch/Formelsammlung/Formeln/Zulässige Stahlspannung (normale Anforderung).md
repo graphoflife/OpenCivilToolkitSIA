@@ -1,5 +1,5 @@
 ---
-erzeugt: 727c74049575
+erzeugt: 4d03f5174d90
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, Tabelle 17"
@@ -38,6 +38,7 @@ $$
 
 - [[Stahlspannung aus Rissbreite]]
 - [[Zwängung auf Normalkraft]]
+- [[Zwängung auf Biegung]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

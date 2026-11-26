@@ -1,5 +1,5 @@
 ---
-erzeugt: 33c3629bb8b5
+erzeugt: 17ec6e79277f
 art: modul
 tags: [modul]
 ---
@@ -507,6 +507,7 @@ Leser sieht alle Zweige und erkennt, welcher gegriffen hat.
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.bewehrungselemente]]
 - [[opencivil.querschnitt.lagenaufbau]]
+- [[opencivil.querschnitt.spannglieder]]
 - [[opencivil.querschnitt.werkstoffgesetz]]
 - [[opencivil.spannungsanalyse.herleitung]]
 - [[opencivil.stabwerk.herleitung]]

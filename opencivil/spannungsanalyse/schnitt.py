@@ -134,10 +134,10 @@ def _loeser(q: Querschnitt, psi: float, herkunft: Sequence[Bewehrungselement],
     """
     r = q.richtung(psi)
     oben, unten = r.beton
-    gruppen: Dict[tuple, List[Tuple[Stab, str]]] = {}
+    gruppen: Dict[tuple, List[Tuple[Stab, Bewehrungselement]]] = {}
     for b, stab, element in zip(q.bewehrung, r.fasern.staebe, herkunft):
         schluessel = (round(stab.arm, 9), b.werkstoff, b.verdraengt, stab.dicke)
-        gruppen.setdefault(schluessel, []).append((stab, element.name))
+        gruppen.setdefault(schluessel, []).append((stab, element))
     staebe: List[Stab] = []
     lagen: List[Stahllage] = []
     for nummer, (schluessel, liste) in enumerate(sorted(gruppen.items(), key=lambda kv: kv[0][0]),
@@ -148,10 +148,12 @@ def _loeser(q: Querschnitt, psi: float, herkunft: Sequence[Bewehrungselement],
         staebe.append(Stab(arm=erster.arm, flaeche=flaeche, gesetz=erster.gesetz,
                            verdraengt=erster.verdraengt, quer=quer, dicke=erster.dicke))
         werkstoff = schluessel[1]
+        # Ein Glied hat seinen eigenen Werkstoff: eine Lage ist ganz Glied oder gar nicht.
         lagen.append(Stahllage(
             a_s=flaeche, z=erster.arm - oben, stahl=staehle[werkstoff],
             sorte=namen[werkstoff], nummer=nummer,
-            text=", ".join(dict.fromkeys(name for _, name in liste))))
+            text=", ".join(dict.fromkeys(e.name for _, e in liste)),
+            vorgespannt=liste[0][1].vorgespannt))
     betone = {i: w for i, w in enumerate(q.werkstoffe) if w.c_punkt is not None}
     return Faserloeser(
         querschnitt=Faserquerschnitt(r.fasern.gruppen, staebe), grenzen=r.grenzen,
@@ -480,7 +482,8 @@ def schnittpaar(analyse: Querschnittsanalyse, seite: Zugseite, wert: Callable[[s
     ids = {"E_cm": stoff.id_von("E_cm"), "f_c": stoff.id_von(wahl.satz(stoff).beton),
            "eps_c1d": stoff.id_von("eps_c1d"), "eps_c2d": stoff.id_von("eps_c2d"),
            "A": analyse.id_von("A"), "I": analyse.id_von("I_y" if seite.um_y else "I_z"),
-           **{s.id_von("f_ctm"): s.id_von("f_ctm") for _, s in analyse.beton_ecken}}
+           **{s.id_von("f_ctm"): s.id_von("f_ctm") for _, s in analyse.beton_ecken},
+           **{i: i for i in (brutto.vorspannung.ids if brutto.vorspannung else ())}}
     quer = [p[0 if seite.um_y else 1] for p, _ in analyse.beton_ecken]
     breite = (max(quer) - min(quer)) * 1e-3
     t_zug = rissaktive_dicke(h=gerissen.loeser.h, b=breite, zug=True)

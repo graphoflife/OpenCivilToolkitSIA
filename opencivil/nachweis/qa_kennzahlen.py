@@ -152,11 +152,12 @@ class KennzahlenQA(Kennzahlprozedur):
         """
         Ob auf der gezogenen Seite des Schwerpunkts Bewehrung liegt -- an der
         Zeichnung entschieden, damit feststeht, welche Kennzahlen es gibt. Eine
-        verschmierte Linie zaehlt mit ihren Enden.
+        verschmierte Linie zaehlt mit ihren Enden, ein Spannglied wie ein Stab.
         """
         b = self.analyse.brutto
         n = (math.cos(seite.psi), math.sin(seite.psi))
-        punkte = [p for g in self.analyse.bewehrungselemente for p in (g.punkte or (g.von, g.bis))]
+        punkte = [p for g in (*self.analyse.bewehrungselemente, *self.analyse.spannglieder)
+                  for p in (g.punkte or (g.von, g.bis))]
         return any((p[0] - b.y_S) * n[0] + (p[1] - b.z_S) * n[1] > 0.0 for p in punkte)
 
     # -- Rechnen ------------------------------------------------------------

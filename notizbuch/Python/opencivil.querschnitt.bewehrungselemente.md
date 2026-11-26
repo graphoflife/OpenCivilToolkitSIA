@@ -1,5 +1,5 @@
 ---
-erzeugt: d3feee06e3f4
+erzeugt: 755b4a31e4b5
 art: modul
 tags: [modul]
 ---
@@ -43,6 +43,7 @@ Ein Bewehrungselement der Zeichnung -- siehe Dateikopf.
 - `bis: Punkt`
 - `flaeche: float` – Die ganze Stahlflaeche des Elements in mm².
 - `verschmiert: ClassVar[bool] = False` – Ob der Stahl ueber eine Linie verteilt ist statt in Staeben.
+- `vorgespannt: ClassVar[bool] = False` – Ob es ein Spannglied ist ([[opencivil.querschnitt.spannglieder]]) -- was nur dem Betonstahl gilt, etwa die Rissbreite, laesst es aus.
 
 #### Bewehrungselement.punkte
 
@@ -291,4 +292,5 @@ Eine Stablinie der Beschreibung mit ihren aufgeloesten Staeben `linie`
 - [[opencivil.nachweis.schiefe_biegung]]
 - [[opencivil.nachweis.stabgrenzen]]
 - [[opencivil.querschnitt.analyse]]
+- [[opencivil.querschnitt.spannglieder]]
 - [[opencivil.spannungsanalyse.schnitt]]

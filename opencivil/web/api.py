@@ -48,17 +48,14 @@ from opencivil.projekt.durchstanzen import DurchstanzEintrag
 from opencivil.decke.schnitt import BALKENGROESSEN
 from opencivil.projekt.decke import DIAGRAMMGROESSEN as DECKENGROESSEN
 from opencivil.projekt.decke import VORSILBEN as DECKENVORSILBEN
-from opencivil.projekt.aufbau.kern import kennwertbereich, materialgrund
+from opencivil.projekt.aufbau.kern import kennwertbereich
 from opencivil.projekt.lesen import eintragsklassen, feldangaben, katalogname, wahl_von
 from opencivil.projekt.projekt import APPLISTEN, Projekt
 from opencivil.projekt.querschnittsanalyse import SCHNITTE
-from opencivil.querschnitt.analyse import Zeichnung
 from opencivil.querschnitt.platte import BREITE_Y_MM
+from opencivil.querschnitt.spannglieder import VORGABE_SPANNUNG, Spannwirkung, Verbund
 from opencivil.querschnitt.zugseite import UM_Y, Zugseite
-from opencivil.querschnitt.geometrie import (
-    VERSCHMIERT, Linienart, aequivalenter_durchmesser, buegelgehalt, linie_in_ueberdeckung,
-    linienflaeche, stab_in_ueberdeckung, ueberdeckungspolygon,
-)
+from opencivil.querschnitt.geometrie import VERSCHMIERT, Linienart
 from opencivil.querschnitt.vorlagen import RANDABSTAND, VORLAGEN
 from opencivil.querschnitt.gesetzwahl import Werkstoffsatz
 from opencivil.nachweis.rechenwahl import RECHENARTEN
@@ -327,6 +324,15 @@ def katalog() -> dict:
                 for v in VORLAGEN
             ],
             "randabstand": RANDABSTAND.als_dict(),
+            # Die Schalter eines Spannglieds und was seine leeren Spannungen
+            # heissen -- die Vorgabe steht in opencivil.querschnitt.spannglieder.
+            "spannglied": {
+                "wirkungen": [{"wert": w.value, "beschriftung": w.beschriftung, "kurz": w.kurz,
+                               "titel": w.erklaerung} for w in Spannwirkung],
+                "verbunde": [{"wert": v.value, "beschriftung": v.beschriftung, "kurz": v.kurz,
+                              "titel": v.erklaerung} for v in Verbund],
+                "vorgaben": dict(VORGABE_SPANNUNG),
+            },
         },
         # Die Wahlmoeglichkeiten der Balkensysteme, eben und im Raum -- mit
         # Beschriftung und Einheit, aus der Beschreibung, die mit ihnen rechnet.
@@ -689,119 +695,6 @@ def zusammenfassungen(loesung: Loesung, aufbau: Aufbau) -> dict:
             ],
         }
     return ergebnis
-
-
-def geometrie(eintrag, projekt) -> dict:
-    """
-    Die Zeichnung einer Querschnittsanalyse, wie der Kern sie sieht -- in mm.
-
-    Geprueft von :class:`~opencivil.querschnitt.analyse.Zeichnung`, denselben
-    Pruefungen, die das Bauteil vor dem Rechnen macht; hier aber alle
-    Meldungen auf einmal statt nur der ersten. Die Wahl der Materialien kommt
-    dazu, nach derselben Regel wie beim Bauen (:func:`materialgrund`) -- das
-    kann nur das Projekt wissen. Ebenso ein Verweis auf einen Knoten, den es
-    nicht gibt. ``fehler`` sagt je Meldung, ob etwas nicht stimmt oder nur
-    fehlt: ein geloeschter Stahl ist zu ersetzen, kein Widerspruch.
-    """
-    stoffe = {m.kennung: (m.art, m.anzeigename) for m in projekt.materialien}
-    elemente = eintrag.elemente()
-    vorab: List[dict] = [{**m, "fehler": True} for m in elemente.fehler]
-
-    def stoff_pruefen(e: dict, feld: str, art: str) -> None:
-        gefunden = stoffe.get(e[feld])
-        grund = materialgrund(e[feld], gefunden, art)
-        if grund:
-            vorab.append({"text": f"{e['name']}: {grund.text}.", "elemente": [e["kennung"]],
-                          "fehler": grund.falsch})
-
-    for f in elemente.polygone:
-        if f["material"]:  # ohne Material eine Aussparung
-            stoff_pruefen(f, "material", "beton")
-    for e in (*elemente.staebe, *elemente.linien, *elemente.waende):
-        stoff_pruefen(e, "stahl", "betonstahl")
-    z = Zeichnung(
-        polygone=[{**f, "traegt": bool(f["material"])} for f in elemente.polygone],
-        staebe=elemente.staebe, linien=elemente.linien, waende=elemente.waende)
-    # Die Ueberdeckung, eine Hilfe beim Zeichnen: je Polygon das gerueckte,
-    # je Stab und Stablinie, wo sie in ihr laegen -- fuer den Knopf
-    # «Überdeckung beachten». Ohne Ueberdeckung jeweils nichts.
-    punkte = [f["punkte"] for f in elemente.polygone]
-    traegt = [bool(f["material"]) for f in elemente.polygone]
-    c = [f["ueberdeckung"] for f in elemente.polygone]
-
-    def als_punkt(p):
-        return None if p is None else list(p)
-
-    def als_liste(punkte):
-        return None if punkte is None else [list(p) for p in punkte]
-
-    def linie_ueberdeckt(l):
-        # Verschmiert mit der Flaeche von Hand: Staebe mit 150 mm Teilung;
-        # aus ⌀ und Teilung: dieser ⌀ (Benutzer, 2026-10-24).
-        if l["art"] == Linienart.FLAECHE and l["verschmiert"] != "staebe":
-            def radius(laenge):
-                return aequivalenter_durchmesser(l["flaeche"], laenge) / 2.0
-        else:
-            def radius(_laenge):
-                return l["durchmesser"] / 2.0
-        return als_liste(linie_in_ueberdeckung(l["von"], l["bis"], radius, punkte, traegt, c))
-
-    linien = []
-    for l, linie in zip(elemente.linien, z.linien):
-        kopf = {"element": l["name"], "kennung": l["kennung"]}
-        if linie is None:
-            linien.append({**kopf, "punkte": [], "teilung": None,
-                           "felder": 0, "flaeche": 0.0, "je_meter": 0.0, "laenge": 0.0,
-                           "ueberdeckt": None})
-            continue
-        flaeche = linienflaeche(l, linie.laenge, len(linie.punkte))
-        linien.append({
-            **kopf,
-            "punkte": [list(p) for p in linie.punkte],
-            "teilung": linie.teilung,
-            "gewaehlt": l["teilung"] if l["art"] == "teilung" else None,
-            "felder": linie.felder,
-            "flaeche": flaeche,
-            "je_meter": flaeche / linie.laenge * 1000.0,
-            "laenge": linie.laenge,
-            "ueberdeckt": linie_ueberdeckt(l),
-        })
-    b = z.brutto
-    return {
-        "gueltig": z.gueltig and not vorab,
-        "meldungen": vorab + [{"text": m.text, "elemente": list(m.elemente),
-                               "fehler": m.fehler} for m in z.meldungen],
-        "polygone": [
-            {"element": f["name"], "kennung": f["kennung"],
-             "eltern": (z.eltern[i] if z.eltern is not None else None),
-             "aussparung": not z.traegt[i],
-             "ueberdeckung": (als_liste(ueberdeckungspolygon(f["punkte"], c[i], traegt[i]))
-                              if c[i] > 0.0 else None)}
-            for i, f in enumerate(elemente.polygone)],
-        "brutto": None if b is None else {
-            "A": b.A, "y_S": b.y_S, "z_S": b.z_S, "I_y": b.I_y, "I_z": b.I_z,
-            "I_yz": b.I_yz},
-        "staebe": [{"element": s["name"], "kennung": s["kennung"], "im_beton": gut,
-                    "ueberdeckt": als_punkt(stab_in_ueberdeckung(
-                        s["lage"], s["durchmesser"] / 2.0, punkte, traegt, c))}
-                   for s, gut in zip(elemente.staebe, z.staebe)],
-        "linien": linien,
-        "waende": [
-            {"element": w["name"], "kennung": w["kennung"], "gut": gut,
-             "laenge": math.dist(w["von"], w["bis"]),
-             # In mm²/m, wie die Liste ihn zeigt.
-             "a_sw_s": buegelgehalt(w["schnitte"], w["durchmesser"], w["teilung"]) * 1000.0}
-            for w, gut in zip(elemente.waende, z.waende)],
-        "zellen": [{"punkte": [list(p) for p in ecken], "flaeche": flaeche}
-                   for ecken, flaeche in z.zellen],
-        "hilfslinien": [{"element": h["name"], "kennung": h["kennung"]}
-                        for h in elemente.hilfslinien],
-        # Die Materialien, auf die die Zeichnung zeigt -- fuer die Werte je
-        # Material jeder Rechenwahl der Analyse und eines Balkensystems, das
-        # einen Querschnitt aus ihr nimmt. Bis 2026-10-18 zaehlte die
-        # Oberflaeche sie ein zweites Mal.
-        "materialien": eintrag.materialien(),
-    }
 
 
 def zuordnung(aufbau: Aufbau) -> dict:

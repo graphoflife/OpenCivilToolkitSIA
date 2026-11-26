@@ -1,5 +1,5 @@
 ---
-erzeugt: 87d8a3c1ec04
+erzeugt: 0adf06dde865
 art: modul
 tags: [modul]
 ---
@@ -248,6 +248,13 @@ def I_c(self) -> float
 ```python
 @property
 def A_c(self) -> float
+```
+
+#### Paar.vorgespannt
+
+```python
+@property
+def vorgespannt(self) -> bool
 ```
 
 #### Paar.rissmoment_bei

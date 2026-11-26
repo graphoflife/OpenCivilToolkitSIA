@@ -166,6 +166,9 @@ class Stahllage:
     teile: Tuple["Stahllage", ...] = ()
     """Woraus sie zusammengefasst ist (:func:`je_seite`) -- fuer die Herleitung ihres Schwerpunkts."""
 
+    vorgespannt: bool = False
+    """Ob die Lage ein Spannglied ist -- ihr Stahl ist anders gedehnt als der Beton dort."""
+
 
 def gemeinsamer_index(teile: Sequence[Stahllage]) -> str:
     """
@@ -575,7 +578,9 @@ class Faserloeser:
         # Ohne Einwirkung ist die Ebene exakt null. Die Bisektion faende sie
         # nur bis auf ihre Schranken -- ein Rest von 1e-11, der als
         # Stahlspannung von einem Pascal einen Erfuellungsgrad von 3e8 ergab.
-        if N_Ed == 0.0 and M_Ed == 0.0:
+        # Nicht mit einem vorgedehnten Spannglied: es zieht schon bei der
+        # Dehnung null, und der Querschnitt verformt sich ohne Last.
+        if N_Ed == 0.0 and M_Ed == 0.0 and self._null_im_gleichgewicht:
             return self._ergebnis(0.0, 0.0)
 
         def moment(chi: float) -> Optional[float]:
@@ -608,6 +613,12 @@ class Faserloeser:
         if eps_m is None:
             return self._ergebnis(0.0, 0.0, konvergiert=False)
         return self._mit_probe(eps_m, chi, N_Ed, M_Ed)
+
+    @cached_property
+    def _null_im_gleichgewicht(self) -> bool:
+        """Ob die Ebene null ohne Last im Gleichgewicht ist -- nicht mit einer Vordehnung."""
+        null = self.kraefte(0.0, 0.0)
+        return null.N == 0.0 and null.M == 0.0
 
     @cached_property
     def _probenschranken(self) -> Tuple[float, float]:

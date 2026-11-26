@@ -3,7 +3,8 @@ opencivil/projekt/querschnittsanalyse.py -- ein gezeichneter Querschnitt, wie di
 
 VERANTWORTUNG:
 Der :class:`QuerschnittsanalyseEintrag`: Knoten, Polygone mit Material, Staebe
-und Stablinien, Schubwaende, Hilfslinien, die Wahl der Werkstoffgesetze, die
+und Stablinien, Spannglieder (:mod:`opencivil.projekt.spannglieder`),
+Schubwaende, Hilfslinien, die Wahl der Werkstoffgesetze, die
 Lastfaelle und die Schalter der Nachweise -- als eine speicherbare
 Datenklasse, wie die Platte in :mod:`opencivil.projekt.platte`. Dazu die
 Vorlage einer frischen Analyse und ein Baukasten, der ohne Oberflaeche
@@ -14,7 +15,8 @@ Die Elemente tragen keine eigenen Koordinaten, sie verweisen auf Knoten --
 ein Polygon auf seine Ecken, ein Stab auf seine Lage, eine Linie auf Anfang
 und Ende. Wer einen Knoten verschiebt, verschiebt alles, was an ihm haengt.
 Jedes Element hat eine Kennung, die nie wiederkommt (:mod:`opencivil.projekt.netz`):
-K fuer Knoten, F fuer Flaechen, S fuer Staebe, L fuer alle Linien.
+K fuer Knoten, F fuer Flaechen, S fuer Staebe, P fuer Spannglieder, L fuer
+alle Linien.
 
 KOORDINATEN UND EINHEITEN:
 y nach rechts, z nach oben, alles in Millimetern -- so, wie gezeichnet und
@@ -53,6 +55,7 @@ from opencivil.projekt.lesen import (
     ProjektFehler, bereich, einer_von, je_material, ort_von, teil,
 )
 from opencivil.projekt.netz import Netz, neue_kennung
+from opencivil.projekt.spannglieder import SpanngliedEintrag
 
 #: Schnitte eines Buegels durch eine Schubwand: so viele Schenkel kreuzen sie.
 SCHNITTE = range(1, 9)
@@ -329,6 +332,9 @@ class Elemente:
     waende: List[dict]
     """Je Schubwand die Felder der Beschreibung, ``von`` und ``bis`` als Punkte."""
 
+    spannglieder: List[dict] = field(default_factory=list)
+    """Je Spannglied die Felder der Beschreibung, ``lage`` als Punkt."""
+
     hilfslinien: List[dict] = field(default_factory=list)
     """Je Hilfslinie ``von`` und ``bis`` -- gerechnet wird mit ihnen nichts."""
 
@@ -356,6 +362,7 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben, JeMaterial):
     flaechen: List[FlaecheEintrag] = field(default_factory=list)
     staebe: List[StabEintrag] = field(default_factory=list)
     stablinien: List[StablinieEintrag] = field(default_factory=list)
+    spannglieder: List[SpanngliedEintrag] = field(default_factory=list)
     schubwaende: List[SchubwandEintrag] = field(default_factory=list)
     hilfslinien: List[HilfslinieEintrag] = field(default_factory=list)
     werkstoffsaetze: Dict[str, Werkstoffsatz] = je_material(Werkstoffsatz.BEMESSUNG)
@@ -422,7 +429,8 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben, JeMaterial):
         for kennung in ([f.material for f in self.flaechen]
                         + [s.stahl for s in self.staebe]
                         + [l.stahl for l in self.stablinien]
-                        + [w.stahl for w in self.schubwaende]):
+                        + [w.stahl for w in self.schubwaende]
+                        + [g.stahl for g in self.spannglieder]):
             if kennung and kennung not in gesehen:
                 gesehen.append(kennung)
         return gesehen
@@ -431,11 +439,13 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben, JeMaterial):
     def leer(self) -> bool:
         """
         Ob noch nichts gezeichnet ist, was traegt: keine Flaeche, kein Stab,
-        keine Stablinie, keine Schubwand. Knoten und Hilfslinien allein sind
-        Bauhilfen. So beginnt eine neue Analyse (Benutzer, 2026-10-19), und
-        so gibt es nichts zu rechnen -- aber auch keinen Fehler.
+        keine Stablinie, kein Spannglied, keine Schubwand. Knoten und
+        Hilfslinien allein sind Bauhilfen. So beginnt eine neue Analyse
+        (Benutzer, 2026-10-19), und so gibt es nichts zu rechnen -- aber auch
+        keinen Fehler.
         """
-        return not (self.flaechen or self.staebe or self.stablinien or self.schubwaende)
+        return not (self.flaechen or self.staebe or self.stablinien or self.spannglieder
+                    or self.schubwaende)
 
     def elemente(self) -> Elemente:
         """Die Elemente mit Name und Kennung, Koordinaten in mm -- siehe :class:`Elemente`."""
@@ -473,7 +483,7 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben, JeMaterial):
                     return None
             return [lage[v] for v in verweise]
 
-        polygone, staebe, linien, waende, hilfslinien = [], [], [], [], []
+        polygone, staebe, linien, waende, hilfslinien, glieder = [], [], [], [], [], []
         # Je Element sein Wort und seine Nummer, wie in Meldungen ueber seine
         # Felder (``IM_ORT``); ein Polygon ohne Material ist eine Aussparung.
         for i, f in enumerate(self.flaechen, start=1):
@@ -488,6 +498,14 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben, JeMaterial):
             if ort is not None:
                 staebe.append(benannt(name, s.kennung, lage=ort[0],
                                       durchmesser=s.durchmesser, stahl=s.stahl))
+        for i, g in enumerate(self.spannglieder, start=1):
+            name = f"{g.IM_ORT} {i}"
+            ort = orte(name, g.kennung, g.knoten)
+            if ort is not None:
+                glieder.append(benannt(
+                    name, g.kennung, lage=ort[0], stahl=g.stahl, durchmesser=g.durchmesser,
+                    anzahl=g.anzahl, wirkung=g.wirkung, sigma_p0=g.sigma_p0,
+                    sigma_pinf=g.sigma_pinf, verbund=g.verbund))
         for i, l in enumerate(self.stablinien, start=1):
             name = f"{l.IM_ORT} {i}"
             ende = orte(name, l.kennung, l.von, l.bis)
@@ -511,7 +529,7 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben, JeMaterial):
             if ende is not None:
                 hilfslinien.append(benannt(name, h.kennung, von=ende[0], bis=ende[1]))
         return Elemente(polygone=polygone, staebe=staebe, linien=linien, waende=waende,
-                        hilfslinien=hilfslinien, fehler=fehler)
+                        spannglieder=glieder, hilfslinien=hilfslinien, fehler=fehler)
 
     # -- Zeichnen ohne Oberflaeche -------------------------------------------
 
@@ -528,7 +546,7 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben, JeMaterial):
 
     def _kennung(self, vorsilbe: str) -> str:
         """Die naechste Kennung -- alle Linien zaehlen gemeinsam, ob Bewehrung, Wand oder Hilfslinie."""
-        listen = {"F": [self.flaechen], "S": [self.staebe],
+        listen = {"F": [self.flaechen], "S": [self.staebe], "P": [self.spannglieder],
                   "L": [self.stablinien, self.schubwaende, self.hilfslinien]}[vorsilbe]
         return neue_kennung(self, vorsilbe, (e.kennung for liste in listen for e in liste))
 
@@ -547,6 +565,14 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben, JeMaterial):
             {"kennung": self._kennung("S"), "knoten": self._knoten(self.netz(), (y, z)),
              **felder}, f"{ort_von(self)}, staebe")
         self.staebe.append(eintrag)
+        return eintrag
+
+    def spannglied(self, y: float, z: float, **felder: Any) -> SpanngliedEintrag:
+        """Ein Spannglied bei ``(y, z)``; die Felder wie :class:`SpanngliedEintrag`."""
+        eintrag = SpanngliedEintrag.aus_dict(
+            {"kennung": self._kennung("P"), "knoten": self._knoten(self.netz(), (y, z)),
+             **felder}, f"{ort_von(self)}, spannglieder")
+        self.spannglieder.append(eintrag)
         return eintrag
 
     def stablinie(self, von: Ort, bis: Ort, **felder: Any) -> StablinieEintrag:

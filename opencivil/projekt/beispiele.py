@@ -160,6 +160,7 @@ def jeder_nachweis() -> Projekt:
     p.beton("C30/37")
     p.stahl("B500B")
     p.baustahl("S355")
+    p.spannstahl("Y1860")
     decke = p.platte("Decke", h=300, x=[18, 12], x_zulage=[12, 0], y=[12, 12],
                      rissanforderung="erhoeht", duktilitaet=True, sproede=True,
                      zwaengung=True, zwaengung_begrenzt=True,
@@ -272,14 +273,16 @@ def jeder_nachweis() -> Projekt:
     gemischt.spannungsfall("Gemischt", art="moment_kruemmung",
                            werkstoffsaetze={gemischt.beton: Werkstoffsatz.CHARAKTERISTISCH})
 
-    # Zwei gezeichnete Querschnitte. Ein Kastenträger mit Aussparung,
+    # Drei gezeichnete Querschnitte. Ein Kastenträger mit Aussparung,
     # Bewehrung in allen drei Arten, vier Schubwänden als Zelle, Torsion,
     # schiefer Biegung und Längszugkraft, gerechnet mit dem
     # Spannungsblock, dazu jeder Gebrauchsnachweis bei erhöhter
     # Anforderung; eine Stütze, einachsig, mit charakteristischen Werten,
     # normaler Anforderung und Knicken -- so steht jede Wahl einmal da.
+    # Dazu ein Träger mit Spanngliedern, je eines in jedem Gesetz.
     p.querschnittsanalysen.append(_kastentraeger(p.freie_kennung("a")))
     p.querschnittsanalysen.append(_stuetze(p.freie_kennung("a")))
+    p.querschnittsanalysen.append(_spannbeton(p.freie_kennung("a")))
 
     # Zwei Balkensysteme: eines, das alles einmal braucht, und eines, das
     # sich nicht rechnen lässt -- dazu ein Rahmen im Raum. Dazu jede Lage
@@ -715,4 +718,30 @@ def _stuetze(kennung: str) -> QuerschnittsanalyseEintrag:
     a.knickfall("Stütze", N_Ed=-1500.0, M_Ed_1=30.0, laenge=4.0)
     a.knickfall("Seitlich", N_Ed=-1200.0, M_Ed_1=10.0, laenge=5.0, knicklaenge=3.5,
                 richtung="links")
+    return a
+
+
+def _spannbeton(kennung: str) -> QuerschnittsanalyseEintrag:
+    """
+    Ein Träger 400 × 800 mm mit Betonstahl oben und unten und drei
+    Spanngliedern aus Y1860, je eines in jedem Gesetz: vier Litzen mit
+    Vordehnung und Verbund, die Spannungen nach Vorgabe; zwei ohne Verbund,
+    die Spannungen eingegeben; zwei schlaff mit Restfestigkeit. Die
+    Duktilität sieht Spannstahl in der Zugzone, sprödes Versagen und
+    Zwängung messen am Rissmoment mit Vorspannung, die Stahlspannung gilt
+    dem Betonstahl, und die Linie beginnt bei der Krümmung, die die
+    Vorspannung allein weckt.
+    """
+    a = QuerschnittsanalyseEintrag(kennung=kennung, name="Spannbeton", duktilitaet=True,
+                                   sproede=True, zwaengung_biegung=True)
+    a.polygon([[0, 0], [400, 0], [400, 800], [0, 800]], material="b1")
+    a.stablinie([50, 50], [350, 50], art="anzahl", durchmesser=14, anzahl=4, stahl="s1")
+    a.stablinie([50, 750], [350, 750], art="anzahl", durchmesser=12, anzahl=3, stahl="s1")
+    a.spannglied(200, 120, stahl="sp1", durchmesser=15.7, anzahl=4)
+    a.spannglied(120, 160, stahl="sp1", durchmesser=15.3, anzahl=2, verbund="ohne",
+                 sigma_p0=1350.0, sigma_pinf=1100.0)
+    a.spannglied(280, 160, stahl="sp1", durchmesser=12.9, anzahl=2, wirkung="restfestigkeit")
+    a.lastfall("Feld", M_y_Ed=600.0)
+    a.quasistaendig.lastfall("Dauer", M_y_Ed=550.0)
+    a.spannungsfall("Biegung", art="moment_kruemmung")
     return a

@@ -1,5 +1,5 @@
 ---
-erzeugt: f4aa1b818fff
+erzeugt: 87febae7283d
 art: modul
 tags: [modul]
 ---
@@ -146,6 +146,16 @@ Eine Sorte: f_pk und f_p0.1k in N/mm², dazu ihre Erzeugnisse aus Tabelle 7.
 - `f_p01k: float`
 - `erzeugnisse: Tuple[Erzeugnis, ...]`
 
+### erzeugnis
+
+```python
+def erzeugnis(sorte: str, durchmesser: float) -> Optional[Erzeugnis]
+```
+
+Das Erzeugnis der Sorte mit diesem Durchmesser -- `None`, wenn Tabelle 7
+es fuer die Sorte nicht nennt. Je Sorte hat jedes einen eigenen
+Durchmesser; daran waehlt ein Spannglied seines.
+
 ### spannstahlsorten_zum_anlegen
 
 ```python
@@ -184,5 +194,13 @@ Erzeugt einen Spannstahl aus der Sortentabelle.
 ## Gebraucht von
 
 - [[opencivil.material.arten]]
+- [[opencivil.projekt.aufbau.querschnittsanalyse]]
+- [[opencivil.querschnitt.spannglieder]]
 - [[opencivil.web.api]]
 - [[opencivil.web.werkstoffkurven]]
+- [[opencivil.web.zeichengeometrie]]
+
+## Formeln aus diesem Modul
+
+- [[Bemessungswert der Fliessgrenze]]
+- [[Fliessdehnung]]

@@ -1,14 +1,16 @@
 ---
-erzeugt: 41ecba5bf0db
+erzeugt: ec064a3baeb7
 art: thema
 tags: [thema]
 ---
 > [!abstract] Querschnittsanalyse
-> 7 Formeln, in der Folge, in der gerechnet wird.
+> 11 Formeln, in der Folge, in der gerechnet wird.
 
 ## Was die Rechnung dazu sagt
 
 Ein zu schwach bewehrter Querschnitt reisst und versagt im selben Augenblick. Darum muss der bewehrte Querschnitt mehr tragen als der unbewehrte im Augenblick des Risses: M\_Rd bei N = 0 mindestens das Rissmoment. Das Rissmoment gehört dem ungerissenen Bruttoquerschnitt; bei unsymmetrischer Form mit dem Deviationsmoment.
+
+Die Spannglieder mit Vordehnung drücken den Beton schon ohne Last, je mit ihrer Kraft nach allen Verlusten an ihrer Stelle: am Bruttoquerschnitt eine Normalkraft und ein Moment. Ihre Spannung an der Ecke, die reisst, kommt zu der aus der Einwirkung.
 
 ## Formeln
 
@@ -19,6 +21,10 @@ Ein zu schwach bewehrter Querschnitt reisst und versagt im selben Augenblick. Da
 5. [[Widerstandsmoment zum gezogensten Betonpunkt]]
 6. [[Rissmoment des ungerissenen Querschnitts]]
 7. [[Erfüllungsgrad]]
+8. [[Normalkraft aus der Vorspannung]]
+9. [[Moment aus der Vorspannung]]
+10. [[Spannung aus der Vorspannung an der Ecke]]
+11. [[Rissmoment des ungerissenen, vorgespannten Querschnitts]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

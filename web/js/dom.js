@@ -140,9 +140,12 @@ export function grenzeVerletzt(angabe, zahl, neben = {}) {
   const draussen = (ueber !== undefined && !(zahl > ueber)) || (ab !== undefined && !(zahl >= ab))
     || (bis !== undefined && !(zahl <= bis)) || (unter !== undefined && !(zahl < unter));
   if (draussen) return `${angabe.heisst} ${angabe.verlangt}`;
-  if (hoch && zahl > neben[hoch.feld]) return hoch.satz;
-  if (tief && zahl < neben[tief.feld]) return tief.satz;
-  if (quer && linienabstand(zahl, neben[quer.feld]) < quer.mindestens) return quer.satz;
+  // Ein leeres Nachbarfeld begrenzt nichts -- wie im Kern (Bereich.grund_gegen):
+  // «zahl > null» hiesse in JavaScript «zahl > 0».
+  const da = (feld) => neben[feld] !== undefined && neben[feld] !== null;
+  if (hoch && da(hoch.feld) && zahl > neben[hoch.feld]) return hoch.satz;
+  if (tief && da(tief.feld) && zahl < neben[tief.feld]) return tief.satz;
+  if (quer && da(quer.feld) && linienabstand(zahl, neben[quer.feld]) < quer.mindestens) return quer.satz;
   return '';
 }
 

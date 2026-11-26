@@ -1,10 +1,10 @@
 ---
-erzeugt: a8c3e85dd3d9
+erzeugt: 2ea79e511c70
 art: thema
 tags: [thema]
 ---
 > [!abstract] Platte
-> 23 Formeln, in der Folge, in der gerechnet wird.
+> 29 Formeln, in der Folge, in der gerechnet wird.
 
 ## Was die Rechnung dazu sagt
 
@@ -47,6 +47,12 @@ Gesucht wird die Ebene, die N, M\_y und M\_z zugleich trägt. Zu einer festen Zu
 21. [[Fiktiver Durchmesser einer verschmierten Linie]]
 22. [[Dehnungsebene und innere Kräfte]]
 23. [[Widerstandsmoment zum gezogensten Betonpunkt]]
+24. [[Spannglied im Querschnitt]]
+25. [[Zulässige Stahlspannung (normale Anforderung)]]
+26. [[Normalkraft aus der Vorspannung]]
+27. [[Moment aus der Vorspannung]]
+28. [[Spannung aus der Vorspannung an der Ecke]]
+29. [[Rissmoment des ungerissenen, vorgespannten Querschnitts]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

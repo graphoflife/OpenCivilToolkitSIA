@@ -1,5 +1,5 @@
 ---
-erzeugt: 4b335c5f891e
+erzeugt: 2590de9c7851
 art: modul
 tags: [modul]
 ---
@@ -105,6 +105,7 @@ Ein Werkstoff, wie die Interaktion ihn braucht: Gesetz und Grenzen.
 - `eps_max: float` – Groesste zulaessige Dehnung; `inf` beim Beton, der im Zug nichts traegt.
 - `c_punkt: Optional[Tuple[float, float]] = None` – `(eps_c1d, eps_c2d)` beim Beton: die Regel fuer den ganz gedrueckten Querschnitt. Sonst nichts.
 - `verdraengbar: bool = False` – Ob ein Stab ihn an seiner Stelle ersetzt -- beim Beton ja.
+- `grenzname: str = ''` – Wie seine Dehnungsgrenze heisst, wo er nur an einer Stelle liegt -- ein Spannglied hat seinen eigenen Werkstoff ([[opencivil.querschnitt.spannglieder]]) und heisst wie das Glied. Leer: «Beton C30/37, Rand oben», «Stahl B500B, äusserste Lage unten».
 
 ### Teil
 
@@ -471,5 +472,6 @@ d null, ohne Beton beides null.
 - [[opencivil.pfahl.quer]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.bewehrungselemente]]
+- [[opencivil.querschnitt.spannglieder]]
 - [[opencivil.querschnitt.widerstandsflaeche]]
 - [[opencivil.spannungsanalyse.schnitt]]

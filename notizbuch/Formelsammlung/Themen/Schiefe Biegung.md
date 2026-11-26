@@ -1,10 +1,10 @@
 ---
-erzeugt: 20eba93dc89d
+erzeugt: 7b6331c80eb7
 art: thema
 tags: [thema]
 ---
 > [!abstract] Querschnittsanalyse
-> 11 Formeln, in der Folge, in der gerechnet wird.
+> 12 Formeln, in der Folge, in der gerechnet wird.
 
 ## Was die Rechnung dazu sagt
 
@@ -25,6 +25,7 @@ Der Bruchzustand: jede Dehnungsebene, bei der ein Werkstoff an seiner Grenze ste
 9. [[Widerstand in der Richtung der Einwirkung]]
 10. [[Erfüllungsgrad]]
 11. [[Spannungsblock des Betons]]
+12. [[Spannglied im Querschnitt]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

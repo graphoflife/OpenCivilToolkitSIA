@@ -56,6 +56,7 @@ class TestFormelsammlung(unittest.TestCase):
         self.assertEqual(art["Beton"], "beton")
         self.assertEqual(art["Betonstahl"], "betonstahl")
         self.assertEqual(art["Baustahl"], "baustahl")
+        self.assertEqual(art["Spannstahl"], "spannstahl")
         for name in ("Querschnitt", "Biegung und Normalkraft", "Querkraft", "Knicken",
                      "Spannung-Dehnung-Analyse"):
             with self.subTest(thema=name):
@@ -78,7 +79,8 @@ class TestFormelsammlung(unittest.TestCase):
             with self.subTest(thema=name):
                 self.assertEqual(art[name], "pfahl")
         self.assertEqual({t.art for t in self.alle},
-                         {"beton", "betonstahl", "baustahl", "querschnitt", "querschnittsanalyse",
+                         {"beton", "betonstahl", "baustahl", "spannstahl", "querschnitt",
+                          "querschnittsanalyse",
                           "balkensystem", "decke", "durchstanzen", "grundbruch", "setzung", "pfahl",
                           "erdbeben"})
 

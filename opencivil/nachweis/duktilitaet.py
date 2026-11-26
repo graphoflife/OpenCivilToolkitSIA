@@ -64,7 +64,7 @@ from opencivil.core.einheiten import EINHEITSLOS, Groesse
 from opencivil.core.latex import angabe, vergleich
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert, WertDef
-from opencivil.material.basis import Baustoff
+from opencivil.material.basis import Baustoff, Baustoffart
 from opencivil.material.betonstahl import duktilitaetsklasse
 from opencivil.querschnitt.werkstoffgesetz import BLOCKANTEIL
 from opencivil.querschnitt.lagenaufbau import lage_aus_posten, protokoll_lage
@@ -105,10 +105,17 @@ def hindernis(staehle: Sequence[Baustoff], f_ck: float) -> str:
     """
     Was an den Baustoffen die Bedingung ausschliesst, als Begruendung --
     leer, wenn nichts. Ein Stahl ohne Klasse, ein eigener, schliesst nichts
-    aus: seine Klasse kennt nur, wer ihn angelegt hat.
+    aus: seine Klasse kennt nur, wer ihn angelegt hat. Spannstahl in der
+    Zugzone schliesst sie aus: die Regel nennt Betonstahl der Klassen B und
+    C (4.1.4.2.5).
     """
+    spannstahl = list(dict.fromkeys(s.name for s in staehle
+                                    if s.art is Baustoffart.SPANNSTAHL))
     if f_ck > HOECHSTE_FESTIGKEIT * (1.0 + 1e-9):
         grund = f"Beton mit f_ck = {f_ck / 1e6:g} N/mm² über C50/60"
+    elif spannstahl:
+        grund = (f"Spannstahl {', '.join(spannstahl)} in der Zugzone – die Regel gilt "
+                 f"für Betonstahl der Klassen B und C")
     else:
         klasse_a = [s.name for s in staehle if duktilitaetsklasse(s.sorte) == "A"]
         if not klasse_a:

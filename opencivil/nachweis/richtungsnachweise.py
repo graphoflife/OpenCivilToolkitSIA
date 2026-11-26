@@ -133,8 +133,7 @@ class DuktilitaetQA(Richtungsnachweis):
             x, d = q.druckzone(punkt)
             if d <= 0.0:
                 return None
-            # Die Werkstoffe der Interaktion stehen in der Reihenfolge der Baustoffe.
-            staehle = [self.analyse.baustoffe[w]
+            staehle = [self.analyse.stoff_von_werkstoff(w)
                        for w in sorted({s.werkstoff for _, s in q.zugbewehrung(punkt)})]
             grund = duktilitaet.hindernis(staehle, f_ck)
             if grund:

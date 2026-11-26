@@ -55,6 +55,12 @@ class Bewehrungselement(ABC):
     verschmiert: ClassVar[bool] = False
     """Ob der Stahl ueber eine Linie verteilt ist statt in Staeben."""
 
+    vorgespannt: ClassVar[bool] = False
+    """
+    Ob es ein Spannglied ist (:mod:`opencivil.querschnitt.spannglieder`) --
+    was nur dem Betonstahl gilt, etwa die Rissbreite, laesst es aus.
+    """
+
     @property
     def punkte(self) -> Tuple[Punkt, ...]:
         """Die Stabmitten -- verschmiert keine."""

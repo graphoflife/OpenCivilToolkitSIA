@@ -204,6 +204,7 @@ class AnalyseStellen(Stahlspannungsort):
         protokoll_dehnungsebene(p)
         p.erklaerung(verfahren_der_ebene(zustand.querschnitt, self.analyse.biegung))
         p.erklaerung(VERFEHLTE_EBENE)
+        glieder_im_gleichgewicht(p, self.analyse)
 
     def protokoll_einwirkung(self, p: Protokoll, fall: Lastfall, index: str) -> None:
         teile = [rf"N_{{Ed,{index}}} = {fest(fall.N / 1e3, 1)}\ \mathrm{{kN}}"] + [
@@ -221,6 +222,29 @@ class AnalyseStellen(Stahlspannungsort):
         p.text(f"Massgebend: {zustand.staebe[erg.stelle].ort}.")
 
 
+#: Wo die Norm den Spannstahl in der Rissbreite mitzaehlen laesst: sein
+#: Spannungszuwachs gegen die zulaessige Stahlspannung, seine Spannung
+#: gegen f_pd.
+REFERENZ_SPANNSTAHL = "SIA 262:2025, 4.4.2.3.10"
+
+
+def _namen(analyse: Querschnittsanalyse) -> str:
+    return ", ".join(g.name for g in analyse.spannglieder)
+
+
+def glieder_im_gleichgewicht(p: Protokoll, analyse: Querschnittsanalyse) -> None:
+    """
+    Was eine Stahlspannung ueber die Spannglieder sagt: sie tragen im
+    Gleichgewicht mit, geprueft wird nur der Betonstahl -- grau, denn es
+    fehlt etwas, nichts ist falsch.
+    """
+    if analyse.spannglieder:
+        p.hinweis(f"{_namen(analyse)}: im Gleichgewicht mit ihrer Kraft gerechnet. Wie weit "
+                  f"ihre Spannung dabei zunimmt, prüft das Werkzeug noch nicht – mitzählen "
+                  f"darf der Spannstahl, solange sein Zuwachs unter der zulässigen "
+                  f"Stahlspannung und σ_p unter f_pd bleibt ({REFERENZ_SPANNSTAHL}).")
+
+
 def _tabelle_gezogen(p: Protokoll, staebe: Sequence[Stabangabe], grenzen: Grenzen,
                      ebene: Gebrauchsebene) -> None:
     """
@@ -229,9 +253,7 @@ def _tabelle_gezogen(p: Protokoll, staebe: Sequence[Stabangabe], grenzen: Grenze
     am naechsten kommt.
     """
     je_element: Dict[str, int] = {}
-    for i, eps in enumerate(ebene.eps_s):
-        if eps <= 0.0:
-            continue
+    for i in grenzen.gezogen(ebene.eps_s):
         kennung = staebe[i].element.kennung
         bisher = je_element.get(kennung)
         if bisher is None or (ebene.sigma_s[i] / grenzen.sigma(i)
@@ -315,13 +337,17 @@ class RissnormalkraftQA(Normalzwang):
             "rissaktive Dicke t ist die kleinere Abmessung des umschreibenden "
             "Rechtecks. Die Norm nimmt die kleinste Abmessung des gezogenen Teils: "
             "bei einem Rechteck dasselbe, bei anderen Formen ist es eine Annahme.")
+        if a.spannglieder:
+            p.hinweis(f"{_namen(a)}: hier nicht mitgezählt – N_Riss gilt ohne Vorspannung, "
+                      f"N_s,adm nur mit dem Betonstahl. Den Spannstahl mitzuzählen liesse "
+                      f"{REFERENZ_SPANNSTAHL} zu; das Werkzeug tut es noch nicht.")
         N_Riss = self._risskraft(p, e, werte)
 
         q, herkunft, _ = a.querschnitt(e.si_nach_id(), VORGABE)
         staebe = stabangaben(a, q, herkunft)
         if not staebe:
-            p.text("Ohne Bewehrung → kein Nachweis.")
-            return self._ergebnis(NICHT_FUEHRBAR, "Ohne Bewehrung → kein Nachweis.")
+            p.text("Ohne Betonstahl → kein Nachweis.")
+            return self._ergebnis(NICHT_FUEHRBAR, "Ohne Betonstahl → kein Nachweis.")
         grenzen = grenzen_aus_rissbreite(a, e, staebe, self.anforderung)
         protokoll_rissbreitengrenzen(p, e, a, staebe, grenzen, self.anforderung, self.id)
         mehrere = len(grenzen.gruppen) > 1
@@ -488,7 +514,7 @@ class ZwaengungBiegungQA(Biegezwang, Richtungsnachweis):
             if not ebene.konvergiert:
                 return 1.0, (M, ebene, -1)
             anteile = [(ebene.sigma_s[i] / grenzen.sigma(i), i)
-                       for i, eps in enumerate(ebene.eps_s) if eps > 0.0]
+                       for i in grenzen.gezogen(ebene.eps_s)]
             anteil, i = max(anteile) if anteile else (0.0, -1)
             return anteil - 1.0, (M, ebene, i)
 
@@ -540,3 +566,4 @@ class ZwaengungBiegungQA(Biegezwang, Richtungsnachweis):
         protokoll_gesetze_nach_wahl(p, e, self.analyse, self.wahl, self.id,
                           titel="Werkstoffgesetze im gerissenen Zustand")
         p.erklaerung(GRENZE_JE_STAB)
+        glieder_im_gleichgewicht(p, self.analyse)

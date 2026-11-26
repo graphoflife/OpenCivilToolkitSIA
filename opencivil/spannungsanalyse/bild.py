@@ -17,6 +17,7 @@ from typing import Dict, List, Optional
 from opencivil.nachweis.querschnittsloeser import Faserloeser
 from opencivil.querschnitt.fasern import Dehnungsgrenze
 from opencivil.querschnitt.gesetzwahl import Rechenarten
+from opencivil.querschnitt.spannglieder import DEHNUNG_AM_GLIED
 from opencivil.querschnitt.werkstoffgesetz import RUNDUNG
 from opencivil.spannungsanalyse.linie import Dehnungsebene, Ebenensuche
 
@@ -124,13 +125,17 @@ def _bild(ebene: Dehnungsebene) -> Querschnittsbild:
 
     bild = Querschnittsbild(eps_m=eps_m, chi=chi, N=ebene.N, M=ebene.M, h=loeser.h,
                             neigung=ebene.neigung, beton=beton, stahl=stahl)
+    saetze = []
     if ebene.neigung != 0.0:
         winkel = f"{math.degrees(ebene.neigung):.1f}".replace("-", "−")
-        bild.hinweis = (
+        saetze.append(
             f"Die Nulllinie ist um {winkel}° gegen die Achse "
             f"der Biegung gedreht, im Gegenuhrzeigersinn positiv: so bleibt kein Moment "
             f"um die andere Achse. Das Bild zeigt den Schnitt senkrecht zu ihr, "
             f"Krümmung und Tiefe gelten in dieser Richtung.")
+    if any(lage.vorgespannt for lage in loeser.lagen):
+        saetze.append(DEHNUNG_AM_GLIED)
+    bild.hinweis = " ".join(saetze)
     return bild
 
 
@@ -180,10 +185,10 @@ def aus_dehnungen(loeser: Faserloeser, *,
     for grenze, eps in loeser.grenzen.verletzt(eps_m, chi, toleranz=RUNDUNG):
         verletzt.setdefault(grenze.name, _ueberschritten(grenze, eps))
     if verletzt:
-        bild.hinweis = (
+        bild.hinweis = " ".join(filter(None, (
             f"Die Ebene liegt ausserhalb dessen, wofür die Werkstoffgesetze "
             f"gelten: {'; '.join(verletzt.values())}. Jenseits davon geben sie "
-            f"null zurück, und die Spannungen unten sind keine Aussage mehr.")
+            f"null zurück, und die Spannungen unten sind keine Aussage mehr.", bild.hinweis)))
     return bild
 
 

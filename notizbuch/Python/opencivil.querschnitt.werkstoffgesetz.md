@@ -1,5 +1,5 @@
 ---
-erzeugt: d1a579755399
+erzeugt: 0c3a363ae8cc
 art: modul
 tags: [modul]
 ---
@@ -576,6 +576,7 @@ Ergebnis unendlich, was die Auswertung sauber ueberspringt.
 - [[opencivil.querschnitt.fasern]]
 - [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.interaktion]]
+- [[opencivil.querschnitt.spannglieder]]
 - [[opencivil.spannungsanalyse.bild]]
 - [[opencivil.spannungsanalyse.herleitung]]
 - [[opencivil.spannungsanalyse.linie]]
@@ -589,4 +590,5 @@ Ergebnis unendlich, was die Auswertung sauber ueberspringt.
 - [[Betonstahl nur auf Zug]] · `Gesetz.protokoll`
 - [[Bilineare Beziehung des Betonstahls]] · `Gesetz.protokoll`
 - [[Parabel-Rechteck-Beziehung des Betons]] · `Gesetz.protokoll`
+- [[Spannglied im Querschnitt]] · `Gesetz.protokoll`
 - [[Spannungsblock des Betons]] · `Gesetz.protokoll`

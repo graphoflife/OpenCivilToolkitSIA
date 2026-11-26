@@ -1,5 +1,5 @@
 ---
-erzeugt: a7fcf741ebae
+erzeugt: 61652b3b7789
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -12,6 +12,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Beton]] · 8
 - [[Betonstahl]] · 3
 - [[Baustahl]] · 3
+- [[Spannstahl]] · 2
 
 **Platte**
 
@@ -23,19 +24,19 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Duktilität]] · 9
 - [[Zwängung auf Normalkraft]] · 13
 - [[Sprödes Versagen]] · 4
-- [[Zwängung auf Biegung]] · 23
-- [[Stahlspannung aus Rissbreite]] · 13
+- [[Zwängung auf Biegung]] · 29
+- [[Stahlspannung aus Rissbreite]] · 14
 - [[Stahlspannung gegen Fliessen]] · 7
 - [[Knicken]] · 14
-- [[Spannung-Dehnung-Analyse]] · 23
+- [[Spannung-Dehnung-Analyse]] · 26
 
 **Querschnittsanalyse**
 
-- [[Querschnittsanalyse]] · 8
-- [[Schiefe Biegung]] · 11
+- [[Querschnittsanalyse]] · 13
+- [[Schiefe Biegung]] · 12
 - [[Querkraft und Torsion]] · 7
 - [[Duktilität je Richtung]] · 4
-- [[Sprödes Versagen je Richtung]] · 7
+- [[Sprödes Versagen je Richtung]] · 11
 
 **Balkensysteme**
 
@@ -234,6 +235,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Grenzdehnungen am Ende der Linie]]
 - [[Grenze der bezogenen Druckzonenhöhe]] · $\left(x/d\right)_{max}$
 - [[Grenze der Grundschwingzeit]] · $T_{1,max}$
+- [[Grenzen der Spannung im Spannstahl]] · $\sigma_{p,max}$
 - [[Grenzwert der Durchbiegung]] · $w_{max}$
 - [[Grösste Dehnung auf halber Höhe]] · $\varepsilon_{m,u}$
 - [[Grösste Dehnung im Schwerpunkt]] · $\varepsilon_{m,u}$
@@ -281,6 +283,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Mittelwert des Schubmoduls]] · $G_{cm}$
 - [[Mittlere statische Höhe der beiden Lagen der Zugbewehrung]] · $d$
 - [[Mittleres Moment im Stützstreifen]] · $m_{sd,x}$
+- [[Moment aus der Vorspannung]] · $M_{p,y}$
 - [[Moment der Bewehrung bei zulässiger Stahlspannung]]
 - [[Momentengleichgewicht um die halbe Höhe]] · $M_{Rd}^{+}$
 - [[Momentenwiderstand bei reiner Biegung]] · $M_{Rd}(N_{Ed}=0)^{+}$
@@ -290,6 +293,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Nachweisschnitt um die Wandecke – je 1.5·d_v entlang der Wände]] · $u_0$
 - [[Neigung der Last]] · $\delta_R$
 - [[Nominelle Dehnung der Zugbewehrung]] · $\varepsilon_v$
+- [[Normalkraft aus der Vorspannung]] · $N_p$
 - [[Normalkraft mit der Längszugkraft aus der Querkraft]] · $N_V$
 - [[Nulllinie auf halber Höhe]] · $x^{+}$
 - [[Nulllinie des gerissenen Querschnitts]] · $x$
@@ -314,6 +318,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Querkraftwiderstand ohne Querkraftbewehrung]] · $V_{Rd}^{+}(M_{Ed} = M_{Rd}^{+})$
 - [[Querschnitt der Wendel]] · $A_{sw}$
 - [[Querschnitt eines Bügelschenkels]] · $A_{\varnothing,V}$
+- [[Querschnitt eines Spannglieds]] · $A_{p,1}$
 - [[Radius des Bewehrungskreises]] · $r_s$
 - [[Raumlast im Gleitkörper]] · $\gamma_G$
 - [[Raumlast unter Auftrieb]] · $\gamma'$
@@ -326,6 +331,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Risskraft des ganzen Querschnitts]] · $N_{Riss}$
 - [[Rissmoment bei der Normalkraft]] · $M_{Riss}(N)$
 - [[Rissmoment des ungerissenen Querschnitts]] · $M_{Riss}$
+- [[Rissmoment des ungerissenen, vorgespannten Querschnitts]] · $M_{Riss}$
 - [[Rissnormalkraft beim Moment]] · $N_{Riss}(M)$
 - [[Schiefstellung]] · $\alpha_i$
 - [[Schnittgrössen aus der Spannungsverteilung]]
@@ -342,7 +348,11 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Sohlneigungsfaktor b_c]] · $b_c$
 - [[Sohlneigungsfaktor b_q]] · $b_q$
 - [[Sohlneigungsfaktor b_γ]] · $b_{\gamma}$
+- [[Spannglied im Querschnitt]]
+- [[Spannkraft eines Spannglieds]] · $P_{\infty,1}$
 - [[Spannung aus dem Moment an der Ecke, die zuerst reisst]] · $\sigma_M$
+- [[Spannung aus der Vorspannung an der Ecke]] · $\sigma_p$
+- [[Spannung im Spannglied nach Vorgabe]] · $\sigma_{p0,1}$
 - [[Spannung im ungerissenen Querschnitt]]
 - [[Spannung in der Durchstanzbewehrung]] · $\sigma_{sd}$
 - [[Spannungsblock des Betons]]
@@ -381,6 +391,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Vergrösserungsfaktor der Durchbiegung]] · $\omega_w$
 - [[Versatz – Moment der Querkraftanteile um den Schwerpunkt]] · $\Delta T$
 - [[Verschmierte Stahlfläche aus Stäben]]
+- [[Vordehnung eines Spannglieds]] · $\varepsilon_{p,1}$
 - [[Was die Zellen tragen]] · $T_{Zellen}$
 - [[Wertigkeit im gerissenen Zustand]] · $n$
 - [[Widerstand bei festgehaltenem M_Ed]] · $N_{Rd}^{+}(M_{Ed} = 0)$
@@ -415,7 +426,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 ## Normstelle fehlt noch
 
-129 von 338 Formeln haben im Code keine Normstelle – meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle – von dort kommt sie in Bericht und Notizbuch.
+128 von 348 Formeln haben im Code keine Normstelle – meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle – von dort kommt sie in Bericht und Notizbuch.
 
 - [[Achsen eines Stabs im Raum]] · [[opencivil.stabwerk3d.herleitung|_ansaetze]]
 - [[Äquivalenter E-Modul eines Stabs]] · [[opencivil.spannungsanalyse.modul#ModulProzedur|ModulProzedur._schreiben]]
@@ -510,7 +521,6 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Querschnitt der Wendel]] · [[opencivil.pfahl.innen_quer#InnererQuerwiderstand._fachwerk|InnererQuerwiderstand._fachwerk]]
 - [[Radius des Bewehrungskreises]] · [[opencivil.pfahl.innen#InnererWiderstand|InnererWiderstand._bohrpfahl]]
 - [[Raumlast unter Auftrieb]] · [[opencivil.geotechnik.fundament|_gamma_auftrieb]]
-- [[Rissmoment bei der Normalkraft]] · [[opencivil.spannungsanalyse.riss#Bruttoriss._herleitung_rissmoment|Bruttoriss._herleitung_rissmoment]]
 - [[Rissnormalkraft beim Moment]] · [[opencivil.spannungsanalyse.riss#Bruttoriss._herleitung_rissnormalkraft|Bruttoriss._herleitung_rissnormalkraft]]
 - [[Schnittgrössen eines Stabs im Raum]] · [[opencivil.stabwerk3d.herleitung|_ansaetze]]
 - [[Schnittgrössen längs eines Stabs]] · [[opencivil.stabwerk.herleitung|_ansaetze]]

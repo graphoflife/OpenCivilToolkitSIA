@@ -152,7 +152,7 @@
 }
 .cad-ruhe .cad-fang { display: inline-flex; align-items: center; gap: 5px; }
 /* Das Raster: seine Stufen als Schalter, in einer eigenen Zeile. */
-.cad-wahl.cad-rasterwahl .schalter-halb { padding: 2px 5px; }
+.cad-wahl.cad-rasterwahl .schalter-halb, .cad-wahl.ist-eng .schalter-halb { padding: 2px 5px; }
 
 /* Die Punkteingabe: Modus, zwei Felder, die Hilfen R Y Z ∥ ⊥ M. */
 .cad-modus { align-self: flex-start; }
@@ -297,6 +297,8 @@
 .cad-linie { fill: none; stroke: var(--mat-stahl-linie); stroke-width: 1; stroke-dasharray: 3 3; }
 .cad-linie-flaeche { fill: none; stroke: var(--mat-stahl-linie); stroke-opacity: .75; stroke-width: 4; stroke-linecap: round; }
 .cad-stab { fill: var(--mat-stahl); stroke: var(--mat-stahl-linie); stroke-width: .8; }
+/* Ein Spannglied: so gross wie seine Fläche, in der Farbe des Spannstahls. */
+.cad-spannglied { fill: var(--mat-spannstahl); stroke: var(--mat-spannstahl-linie); stroke-width: 1.2; }
 .cad-geist { opacity: .45; }
 .cad-beschriftung {
   font-size: 11px; fill: var(--schrift-matt);
@@ -312,7 +314,7 @@
 
 .ist-fehler.cad-beton, .ist-fehler.cad-loch, .ist-fehler.cad-wand, .ist-fehler.cad-wandachse,
 .ist-fehler.cad-linie, .ist-fehler.cad-linie-flaeche { stroke: var(--schlecht); stroke-opacity: 1; stroke-width: 2.4; }
-.ist-fehler.cad-stab { fill: var(--schlecht); stroke: var(--schlecht); }
+.ist-fehler.cad-stab, .ist-fehler.cad-spannglied { fill: var(--schlecht); stroke: var(--schlecht); }
 .ist-fehler.cad-linientext { fill: var(--schlecht); }
 
 /* Gewählt kräftig blau, unter dem Zeiger blass. Eine gewählte Ecke voll,

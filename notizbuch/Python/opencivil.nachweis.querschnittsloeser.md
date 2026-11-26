@@ -1,5 +1,5 @@
 ---
-erzeugt: ee6346af49c5
+erzeugt: b46e971ab631
 art: modul
 tags: [modul]
 ---
@@ -117,6 +117,7 @@ wird sie an einer Stelle,
 - `text: str = ''` – Wie die Lage in Tabellen heisst -- «2. Lage Grundbewehrung».
 - `index: str = ''` – Ihr Index in den Symbolen -- `1,x,g` ([[opencivil.querschnitt.lagenaufbau#Postenbezug|index]]), die zusammengefasste Lage den ihrer Teile, `1,x` ([[opencivil.nachweis.querschnittsloeser#gemeinsamer_index|gemeinsamer_index]]).
 - `teile: Tuple['Stahllage', ...] = ()` – Woraus sie zusammengefasst ist ([[opencivil.nachweis.querschnittsloeser#je_seite|je_seite]]) -- fuer die Herleitung ihres Schwerpunkts.
+- `vorgespannt: bool = False` – Ob die Lage ein Spannglied ist -- ihr Stahl ist anders gedehnt als der Beton dort.
 
 ### gemeinsamer_index
 
@@ -381,6 +382,15 @@ Aeussere Suche ueber `chi`: zu jedem `chi` wird `eps_m` so
 bestimmt, dass die Normalkraft stimmt, und das uebrig bleibende Moment
 gegen `M_Ed` gehalten. `M(chi)` waechst monoton -- mehr Kruemmung
 heisst mehr Moment --, solange der Querschnitt nicht versagt.
+
+#### Faserloeser._null_im_gleichgewicht
+
+```python
+@cached_property
+def _null_im_gleichgewicht(self) -> bool
+```
+
+Ob die Ebene null ohne Last im Gleichgewicht ist -- nicht mit einer Vordehnung.
 
 #### Faserloeser._probenschranken
 

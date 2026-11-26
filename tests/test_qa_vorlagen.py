@@ -9,7 +9,7 @@ import unittest
 
 from opencivil.projekt import Projekt, QuerschnittsanalyseEintrag
 from opencivil.querschnitt import vorlagen
-from opencivil.web import api, dienst
+from opencivil.web import api, dienst, zeichengeometrie
 from tests.test_querschnittsanalyse import balken, projekt, urteile
 
 
@@ -43,7 +43,7 @@ class TestVorlagen(unittest.TestCase):
         for v in vorlagen.VORLAGEN:
             with self.subTest(vorlage=v.name):
                 p, a, _ = self.eingesetzt(v.schluessel)
-                g = api.geometrie(a, p)
+                g = zeichengeometrie.geometrie(a, p)
                 self.assertTrue(g["gueltig"], g["meldungen"])
                 self.assertAlmostEqual(g["brutto"]["A"], self.FLAECHEN[v.schluessel], delta=0.5)
 
@@ -234,7 +234,7 @@ class TestVerschmierteStaebe(unittest.TestCase):
     def test_die_zeichnung_zeigt_dieselbe(self):
         """Die graue Zahl im Fenster: die Fläche, mit der gerechnet wird."""
         p = self.projekt(laenge=1000.0)
-        linie = api.geometrie(p.querschnittsanalysen[0], p)["linien"][-1]
+        linie = zeichengeometrie.geometrie(p.querschnittsanalysen[0], p)["linien"][-1]
         self.assertAlmostEqual(linie["flaeche"], self.flaeche(p))
 
     def test_die_flaeche_von_hand_bleibt(self):

@@ -1,10 +1,10 @@
 ---
-erzeugt: e7be818cb654
+erzeugt: 4bd0c7ff62b8
 art: thema
 tags: [thema]
 ---
 > [!abstract] Platte
-> 13 Formeln, in der Folge, in der gerechnet wird.
+> 14 Formeln, in der Folge, in der gerechnet wird.
 
 ## Was die Rechnung dazu sagt
 
@@ -59,6 +59,7 @@ Einachsig bleibt die Nulllinie waagrecht, und M\_z zählt nicht – wie in der T
 11. [[Spannungsblock des Betons]]
 12. [[Betonstahl nur auf Zug]]
 13. [[Fiktiver Durchmesser einer verschmierten Linie]]
+14. [[Spannglied im Querschnitt]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

@@ -9,6 +9,7 @@
  *   Bewehrung    eine Linie mit Stäben (nach Anzahl, Teilung oder verschmiert)
  *                oder ein einzelner Stab -- wie, sagt der Schalter in ihrem
  *                Fenster
+ *   Spannstahl   ein Spannglied je Klick (qa_spannglied.js)
  *   Schubwand    eine Linie mit Dicke und Bügeln
  *   Hilfslinie   eine Linie, die nicht mitrechnet
  *   Hilfspunkt   ein Knoten ohne Element, zum Fangen
@@ -43,6 +44,9 @@ import { cadZeile } from './cad_palette.js';
 import {
   abstand, eckeSchluessel, knotenname,
 } from './cad_modell.js';
+import {
+  SPANNGLIED, SPANNSTAHL, gliedFelder, gliedInfo, gliedText, gliedVorgabe, vorgabePruefen,
+} from './qa_spannglied.js';
 import { vorlageOeffnen } from './qa_vorlagen.js';
 import { sinnbild } from './sinnbilder.js';
 import {
@@ -69,6 +73,7 @@ import {
 const ARTEN = [
   { liste: 'flaechen', klasse: 'flaeche', form: 'flaeche', vorsilbe: 'F', rang: 4 },
   { liste: 'staebe', klasse: 'stab', form: 'punkt', vorsilbe: 'S', rang: 1 },
+  SPANNGLIED,
   {
     liste: 'stablinien', klasse: 'stablinie', form: 'linie', vorsilbe: 'L', rang: 0, teilbar: false,
     umkehren: (e) => { [e.starteisen, e.endeisen] = [e.endeisen, e.starteisen]; },
@@ -96,6 +101,7 @@ const WERKZEUGE = [
   { name: 'bewehrung', text: 'Bewehrung', zeichen: 'cad-bewehrung', taste: 'b',
     form: (a) => (a.qa.vorgaben.bewehrung === 'punkt' ? 'knoten' : 'linie'),
     titel: 'Bewehrung: eine Linie mit Stäben oder einzelne Stäbe' },
+  SPANNSTAHL,
   { name: 'schubwand', text: 'Schubwand', zeichen: 'cad-schubwand', taste: 'w', form: 'linie',
     titel: 'Schubwand: eine Wand mit Bügeln, für Querkraft und Torsion' },
   { name: 'hilfspunkt', text: 'Hilfspunkt', zeichen: 'cad-hilfspunkt', taste: 'k', form: 'knoten',
@@ -167,6 +173,7 @@ function vorgabenNeu() {
     schubwaende: mit('schubwaende', { stahl: stahl?.kennung || '' }),
     hilfslinien: mit('hilfslinien'),
     flaechen: mit('flaechen', { material: beton?.kennung || '' }),
+    spannglieder: gliedVorgabe(),
   };
 }
 
@@ -187,6 +194,7 @@ function vorgaben(a) {
   if (v.flaechen.material && !gibt('beton', v.flaechen.material)) {
     v.flaechen.material = erstes('beton') || v.flaechen.material;
   }
+  vorgabePruefen(v.spannglieder);
   return v;
 }
 
@@ -224,13 +232,14 @@ function adapter(kennung) {
     },
     trefferradius: (a, art, e) => {
       if (art.liste === 'staebe' || art.liste === 'stablinien') return (e.durchmesser || 0) / 2;
+      if (art.liste === 'spannglieder') return gliedDurchmesser(a, e) / 2;
       return 0;
     },
     umriss: () => umriss(eintragVon(kennung)),
     fragen: () => api.geometrie(zustand.projekt, kennung),
     nehmen: (a, antwort) => {
-      a.qa.namen = new Map([antwort.polygone, antwort.staebe, antwort.linien, antwort.waende, antwort.hilfslinien]
-        .flatMap((liste) => (liste || []).map((x) => [x.kennung, x.element])));
+      a.qa.namen = new Map([antwort.polygone, antwort.staebe, antwort.spannglieder, antwort.linien,
+        antwort.waende, antwort.hilfslinien].flatMap((liste) => (liste || []).map((x) => [x.kennung, x.element])));
       return antwort;
     },
     beantwortet: () => { if (zustand.fenster) mitteAendern(); },
@@ -261,6 +270,7 @@ function neuText(qa, werkzeug) {
   if (werkzeug === 'bewehrung') {
     return v.bewehrung === 'punkt' ? `Stab ⌀${zahlText(v.staebe.durchmesser)}` : 'Linienbewehrung';
   }
+  if (werkzeug === 'spannstahl') return `Spannglied ${gliedText(v.spannglieder)}`;
   return WERKZEUGE.find((w) => w.name === werkzeug)?.text || '';
 }
 
@@ -268,11 +278,13 @@ function neuText(qa, werkzeug) {
 // Anlegen -- nach den Vorgaben im schwebenden Fenster
 // ===========================================================================
 
-/** Ein Stab der Bewehrung -- ein Hilfspunkt ist der Knoten selbst und legt nichts an. */
+/** Ein Stab der Bewehrung oder ein Spannglied -- ein Hilfspunkt ist der Knoten selbst und legt nichts an. */
 function punktAnlegen(a, z, knoten, werkzeug) {
-  if (werkzeug !== 'bewehrung') return null;
-  const kennung = a.modell.naechsteKennung(z, 'S');
-  z.staebe.push({ ...structuredClone(vorgaben(a).staebe), kennung, knoten });
+  const liste = { bewehrung: 'staebe', spannstahl: 'spannglieder' }[werkzeug];
+  if (!liste) return null;
+  const art = ARTEN.find((x) => x.liste === liste);
+  const kennung = a.modell.naechsteKennung(z, art.vorsilbe);
+  z[art.liste].push({ ...structuredClone(vorgaben(a)[art.liste]), kennung, knoten });
   return kennung;
 }
 
@@ -297,6 +309,15 @@ function umriss(analyse) {
 // ===========================================================================
 // Zeichnen
 // ===========================================================================
+
+/**
+ * Wie gross ein Spannglied sich zeichnet -- ein Kreis mit seiner Fläche, vom
+ * Kern; solange er sie nicht kennt, sein Nenndurchmesser. Auch eine ältere
+ * Antwort taugt dafür: es ist nur das Bild.
+ */
+function gliedDurchmesser(a, e) {
+  return a.adapter.kern.antwort?.spannglieder?.find((x) => x.kennung === e.kennung)?.durchmesser ?? e.durchmesser;
+}
 
 /** Ein Stab: ein Kreis in seinem Durchmesser, aber nie kleiner als ein Punkt. */
 function stabKreis(a, p, durchmesser, klasse) {
@@ -443,6 +464,13 @@ function zeichnen(a, g) {
     const p = ort(s.knoten);
     if (p) g.append(mitTitel(stabKreis(a, p, s.durchmesser, klassen(s.kennung, 'cad-stab')), texte(s.kennung)));
   }
+  for (const s of z.spannglieder) {
+    const p = ort(s.knoten);
+    if (p) {
+      g.append(mitTitel(stabKreis(a, p, gliedDurchmesser(a, s), klassen(s.kennung, 'cad-spannglied')),
+        texte(s.kennung)));
+    }
+  }
 
   const masse = masseZeichnen(a, z, ort);
   if (masse) g.append(masse);
@@ -491,8 +519,10 @@ function masseZeichnen(a, z, ort) {
 }
 
 function punktVorschau(a, g, p, werkzeug) {
-  if (werkzeug !== 'bewehrung') return;
-  g.append(stabKreis(a, p, a.qa.vorgaben.staebe.durchmesser, 'cad-stab cad-geist'));
+  if (werkzeug === 'bewehrung') g.append(stabKreis(a, p, a.qa.vorgaben.staebe.durchmesser, 'cad-stab cad-geist'));
+  if (werkzeug === 'spannstahl') {
+    g.append(stabKreis(a, p, a.qa.vorgaben.spannglieder.durchmesser, 'cad-spannglied cad-geist'));
+  }
 }
 
 function linienVorschau(a, g, p, q, werkzeug) {
@@ -512,9 +542,11 @@ function linienVorschau(a, g, p, q, werkzeug) {
  * Projekt, bei der Vorgabe in die Ansicht (`zugleich` und `vorgabe` in
  * cad_app.js). `info` ist, was der Kern zu einer gewählten Linie weiss: ihre
  * Stahlfläche steht grau unter den Stäben, aus denen sie kommt -- gerechnet
- * wird sie dort, nicht hier. Die Grenzen jeder Zahl kommen aus dem Kern.
+ * wird sie dort, nicht hier; ebenso zu einem Spannglied. Die Grenzen jeder
+ * Zahl kommen aus dem Kern.
  */
 function felderVon(liste, wert, setzen, info = null) {
+  if (liste === 'spannglieder') return gliedFelder(wert, setzen, info);
   const durchmesser = katalog('durchmesser');
   const zahl = (feld, titel, optionen = {}) => zahlfeldMitVar({
     wert: wert(feld), titel, schritt: 1, angabe: feldangabe(klasseVon(liste), feld), ...optionen,
@@ -643,6 +675,7 @@ function neuEigenschaften(a, werkzeug) {
   const inhalt = {
     polygon: () => felder('flaechen'),
     bewehrung: () => [formWahl(a), ...felder(v.bewehrung === 'punkt' ? 'staebe' : 'stablinien')],
+    spannstahl: () => felder('spannglieder'),
     schubwand: () => felder('schubwaende'),
     hilfspunkt: () => [hinweis('Ein Knoten ohne Element: daran fängt der Zeiger.')],
     hilfslinie: () => [hinweis('Rechnet nicht mit. Gewählt und geschlossen, werden '
@@ -671,16 +704,19 @@ function elementEigenschaften(a, z, kennungen, liste) {
     };
   }
   const [e] = gewaehlt;
-  const info = frischeAntwort(a)?.linien?.find((x) => x.kennung === e.kennung);
+  const geo = frischeAntwort(a);
+  const info = [...(geo?.linien || []), ...(geo?.spannglieder || [])].find((x) => x.kennung === e.kennung);
   return {
-    titel: `${elementname(a, e.kennung)} · ${artText(liste, e.material)}`,
+    titel: `${elementname(a, e.kennung)} · ${artText(liste, e.material, e)}`,
     inhalt: [...felderVon(liste, wert, setzen, info), ...infozeilen(a, z, liste, e)].filter(Boolean),
   };
 }
 
-function artText(liste, material) {
+/** Was ein Element ist, für den Titel des Fensters -- ein einzelnes Spannglied mit seinem Erzeugnis. */
+function artText(liste, material, e = null) {
   return {
     staebe: 'Punktbewehrung', stablinien: 'Linienbewehrung', schubwaende: 'Schubwand', hilfslinien: 'Hilfslinie',
+    spannglieder: e ? gliedText(e) : 'Spannglied',
     flaechen: material === VAR ? 'Flächen' : (material ? stoffname(material) : 'Aussparung'),
   }[liste];
 }
@@ -706,6 +742,7 @@ function infozeilen(a, z, liste, e) {
   return [
     LINIENLISTEN.includes(liste) ? laengenzeile(a, z, e) : null,
     ...zeilen.map((t) => el('p.cad-info', { text: t })),
+    ...(liste === 'spannglieder' ? gliedInfo(e, geo?.spannglieder?.find((x) => x.kennung === e.kennung)) : []),
     ...meldungszeilen(a, [e.kennung]),
     e.ueberdeckung > 0 && polygon && !polygon.ueberdeckung
       ? el('p.cad-meldung', { text: 'Die Überdeckung ist zu gross: vom Polygon bleibt nichts übrig.' }) : null,
@@ -758,13 +795,13 @@ function ueberdeckungBeachten(a, bewehrung) {
     melden('Die Zeichnung wird noch geprüft – gleich noch einmal.');
     return;
   }
-  const ziele = new Map([...geo.staebe, ...geo.linien].map((x) => [x.kennung, x.ueberdeckt]));
+  const ziele = new Map([...geo.staebe, ...geo.spannglieder, ...geo.linien].map((x) => [x.kennung, x.ueberdeckt]));
   const lagen = a.modell.lagen(eintragVon(a.qa.kennung));
   const schritte = [];
   for (const { art, e } of bewehrung) {
     const ziel = ziele.get(e.kennung);
     if (!ziel) continue;
-    const enden = art.liste === 'staebe' ? [[e.kennung, e.knoten, ziel]]
+    const enden = art.form === 'punkt' ? [[e.kennung, e.knoten, ziel]]
       : [[eckeSchluessel(e.kennung, 0), e.von, ziel[0]], [eckeSchluessel(e.kennung, 1), e.bis, ziel[1]]];
     for (const [schluessel, knoten, p] of enden) {
       const q = lagen.get(knoten);
@@ -789,7 +826,7 @@ function aktionen(a) {
   // Bewehrung gewählt, und ein Polygon hat eine Überdeckung: sie beachten.
   const verzeichnis = a.modell.verzeichnis(z);
   const bewehrung = [...a.auswahl].map((k) => verzeichnis.get(k))
-    .filter((x) => x && (x.art?.liste === 'staebe' || x.art?.liste === 'stablinien'));
+    .filter((x) => x && ['staebe', 'spannglieder', 'stablinien'].includes(x.art?.liste));
   if (bewehrung.length && z.flaechen.some((f) => f.ueberdeckung > 0)) {
     liste.push({
       zeichen: '⇲', text: 'Überdeckung beachten',

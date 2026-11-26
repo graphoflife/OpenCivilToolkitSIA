@@ -1,5 +1,5 @@
 ---
-erzeugt: 2188d60ec238
+erzeugt: 715fef6b512d
 art: modul
 tags: [modul]
 ---
@@ -95,7 +95,7 @@ def _bewehrt(self, seite: Zugseite) -> bool
 
 Ob auf der gezogenen Seite des Schwerpunkts Bewehrung liegt -- an der
 Zeichnung entschieden, damit feststeht, welche Kennzahlen es gibt. Eine
-verschmierte Linie zaehlt mit ihren Enden.
+verschmierte Linie zaehlt mit ihren Enden, ein Spannglied wie ein Stab.
 
 #### KennzahlenQA.rechne
 

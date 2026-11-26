@@ -152,6 +152,10 @@ class Eingaben(Mapping[str, Wert]):
         nach_id = {w.id: w.groesse.si for w in self._werte.values()}
         return nach_id.__getitem__
 
+    def nach_id(self) -> Callable[[str], Wert]:
+        """Eine Eingabe nach ihrer Wert-ID -- fuer eine Herleitung, die wie aus einer Loesung liest."""
+        return {w.id: w for w in self._werte.values()}.__getitem__
+
     def groessen(self) -> Dict[str, Groesse]:
         """Alle Eingaben als ``name -> Groesse``, passend fuer ``funktion(**...)``."""
         return {name: wert.groesse for name, wert in self._werte.items()}

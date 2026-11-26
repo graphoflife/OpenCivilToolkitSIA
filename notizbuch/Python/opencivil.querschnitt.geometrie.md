@@ -1,5 +1,5 @@
 ---
-erzeugt: 4ab8034e06e0
+erzeugt: d8d6dda92c92
 art: modul
 tags: [modul]
 ---
@@ -549,3 +549,4 @@ Ueberdeckung, oder wenn die Linie dabei keine Laenge behielte.
 - [[opencivil.querschnitt.randzone]]
 - [[opencivil.querschnitt.torsion]]
 - [[opencivil.web.api]]
+- [[opencivil.web.zeichengeometrie]]

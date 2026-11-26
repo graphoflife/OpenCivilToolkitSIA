@@ -1,5 +1,5 @@
 ---
-erzeugt: 63e90b0226e7
+erzeugt: a320e860d961
 art: modul
 tags: [modul]
 ---
@@ -133,6 +133,14 @@ Die Zahl einer Eingabe in SI, nach ihrer Wert-ID -- fuer, wer seine
 Werte nach ID liest: die Stahllagen der Platte, die Werkstoffe des
 gezeichneten Querschnitts. So lesen sie aus einer Loesung wie aus den
 Eingaben eines Nachweises.
+
+#### Eingaben.nach_id
+
+```python
+def nach_id(self) -> Callable[[str], Wert]
+```
+
+Eine Eingabe nach ihrer Wert-ID -- fuer eine Herleitung, die wie aus einer Loesung liest.
 
 #### Eingaben.groessen
 
@@ -495,6 +503,7 @@ Die Kennzahl `kurz` mit dem Wert `si` in SI-Basis -- auch in `ergebnis`.
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.lagenaufbau]]
 - [[opencivil.querschnitt.platte]]
+- [[opencivil.querschnitt.spannglieder]]
 - [[opencivil.spannungsanalyse.modul]]
 - [[opencivil.stabwerk.rechnung]]
 - [[opencivil.stabwerk.stabquerschnitt]]

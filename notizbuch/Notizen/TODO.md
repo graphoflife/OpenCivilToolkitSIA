@@ -787,8 +787,8 @@ noch einmal: die Grundlage der Apps mit Zeichenfenster, die
       Querschnittsanalyse und M–χ oder N–ε sind seit 2026-10-25 behoben):
       Die Beschreibung einer Stablinie fragen vor dem Bauen noch die Prüfung
       der Zeichnung, `geometrie.linienflaeche` und die Liste unter der
-      Zeichnung (`api.geometrie`) je nach Art ab -- dort ist der Stahl noch
-      eine Kennung, kein Baustoff.
+      Zeichnung (`zeichengeometrie.geometrie`) je nach Art ab -- dort ist
+      der Stahl noch eine Kennung, kein Baustoff.
 - [ ] **Die Oberfläche wiederholt Kern-Wissen, neu dazugekommen** (zum
       Punkt «Keine Rechnung und keine Norm in der Oberfläche» unten):
       `bs_zeichnung.js` kopiert die Lastrichtungen aus dem Kern; Einheiten
@@ -1295,6 +1295,33 @@ Norm dazu sagt.
 
 Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
 
+- [ ] **Spannglieder: die Vorgabe der Spannung bei Y1100 und Y1030 – zu
+      entscheiden** (`opencivil/querschnitt/spannglieder.py`, `vorspannung`,
+      seit 2026-11-26). Leer gilt σ_p0 = 0.70·f_pk und σ_p∞ = 0.85·σ_p0, so
+      gewählt vom Benutzer am 2026-11-25, nach Vorgabe, nicht nachgeschlagen:
+      die Verluste hängen am Bauwerk (SIA 262:2025, 4.1.5.3). Bei den Stäben
+      Y1100 und Y1030 liegt schon die Vorgabe über der Grenze nach Gleichung
+      (22): 770 über 765 und 721 über 705.5 N/mm²; dort steht sie rot am
+      Glied. Bei allen anderen Sorten hält sie, bei Y1570 knapp (1099 unter
+      1105). Empfehlung: Vorgabe = min(0.70·f_pk; Grenze nach Gleichung (22)).
+- [ ] **Spannglieder: Vordehnung ohne die Stauchung des Betons.** Eingebaut:
+      ε_p = σ_p∞/E_p. Die Stauchung, die die Vorspannung im Beton an der
+      Stelle des Glieds weckt, fehlt; ohne Last trägt ein Glied darum etwas
+      weniger als σ_p∞ – im Rechteck 300 × 600 mm des Tests 1055 statt
+      1107 N/mm². Bestätigen oder die Stauchung dazunehmen.
+- [ ] **Spannglieder: Duktilität.** Mit Spannstahl in der Zugzone führt die
+      Duktilität keinen Nachweis über x/d: 4.1.4.2.5 nennt Betonstahl der
+      Klassen B und C, und der Nachweis sagt es grau. Umlagern ginge nur mit
+      einem Nachweis des Verformungsvermögens (4.1.4.2.6). Bestätigen.
+- [ ] **Spannglieder: Zwängung auf Normalkraft.** N_Riss gilt ohne
+      Vorspannung, N_s,adm nur mit dem Betonstahl; ein Hinweis sagt es. Den
+      Spannstahl mitzuzählen liesse 4.4.2.3.10 zu. Sprödes Versagen und
+      Zwängung auf Biegung zählen die Vorspannung im Rissmoment schon mit
+      (4.3.1.2; 4.4.3.2.4). Entscheiden, ob die Normalkraft nachzieht.
+- [ ] **Spannglieder: Spannungszuwachs im Gebrauch (4.4.2.3.10) ungeprüft.**
+      Die Stahlspannungen im Gebrauch begrenzen nur den Betonstahl; ohne ihn
+      steht «Ohne Betonstahl → kein Nachweis.».
+
 - [ ] **C-Punkt bei beliebiger Form.** Eingebaut: ganz gedrückt darf der
       Beton am Punkt im Abstand `(1 − ε_c1d/ε_c2d)·h` vom gedrücktesten Rand
       nicht über `ε_c1d` gestaucht werden, mit `h` als Ausdehnung des Betons
@@ -1499,6 +1526,10 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       Rechteckrohre (RRW) -- die Tabelle des Benutzers hat sie nicht, und
       eine andere Quelle braucht seine Erlaubnis. Dazu für die Nachweise nach
       SIA 263: W_el, W_pl, A_v, I_w; die Tabelle hat Formeln dafür.
+
+- [ ] **Spannglieder, nächste Schritte:** die Neigung β_p und ihr Anteil
+      an der Querkraft (Plan vom 2026-11-25, Schritt 9c); das Hüllrohr Ø_H
+      und die Minderung der Stegbreite nach Gleichung (44) (4.3.3.3.5).
 
 - [ ] **Durchstanzen, nächste Schritte:** Stahlpilze an Rand und Ecke
       (der Katalog hat nur ganze Pilze); Durchstanzbewehrung an Wandende und

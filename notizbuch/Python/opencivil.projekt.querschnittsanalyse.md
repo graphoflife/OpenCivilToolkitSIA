@@ -1,5 +1,5 @@
 ---
-erzeugt: 8607f5d96315
+erzeugt: a5f80e72c6ff
 art: modul
 tags: [modul]
 ---
@@ -10,7 +10,8 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Der [[opencivil.projekt.querschnittsanalyse#QuerschnittsanalyseEintrag|QuerschnittsanalyseEintrag]]: Knoten, Polygone mit Material, Staebe
-und Stablinien, Schubwaende, Hilfslinien, die Wahl der Werkstoffgesetze, die
+und Stablinien, Spannglieder ([[opencivil.projekt.spannglieder]]),
+Schubwaende, Hilfslinien, die Wahl der Werkstoffgesetze, die
 Lastfaelle und die Schalter der Nachweise -- als eine speicherbare
 Datenklasse, wie die Platte in [[opencivil.projekt.platte]]. Dazu die
 Vorlage einer frischen Analyse und ein Baukasten, der ohne Oberflaeche
@@ -23,7 +24,8 @@ Die Elemente tragen keine eigenen Koordinaten, sie verweisen auf Knoten --
 ein Polygon auf seine Ecken, ein Stab auf seine Lage, eine Linie auf Anfang
 und Ende. Wer einen Knoten verschiebt, verschiebt alles, was an ihm haengt.
 Jedes Element hat eine Kennung, die nie wiederkommt ([[opencivil.projekt.netz]]):
-K fuer Knoten, F fuer Flaechen, S fuer Staebe, L fuer alle Linien.
+K fuer Knoten, F fuer Flaechen, S fuer Staebe, P fuer Spannglieder, L fuer
+alle Linien.
 
 
 ## KOORDINATEN UND EINHEITEN
@@ -288,6 +290,7 @@ Elemente danach heissen weiter so wie vorher.
 - `staebe: List[dict]` – Je Stab `lage`, `durchmesser` und `stahl`.
 - `linien: List[dict]` – Je Stablinie die Felder der Beschreibung, `von` und `bis` als Punkte.
 - `waende: List[dict]` – Je Schubwand die Felder der Beschreibung, `von` und `bis` als Punkte.
+- `spannglieder: List[dict] = field(default_factory=list)` – Je Spannglied die Felder der Beschreibung, `lage` als Punkt.
 - `hilfslinien: List[dict] = field(default_factory=list)` – Je Hilfslinie `von` und `bis` -- gerechnet wird mit ihnen nichts.
 - `fehler: List[dict] = field(default_factory=list)` – Was sich nicht aufloesen liess: `text` und `elemente` (Kennungen), wie eine Meldung.
 
@@ -308,6 +311,7 @@ Was er mit der Platte gleich angibt, steht in der Grundlage
 - `flaechen: List[FlaecheEintrag] = field(default_factory=list)`
 - `staebe: List[StabEintrag] = field(default_factory=list)`
 - `stablinien: List[StablinieEintrag] = field(default_factory=list)`
+- `spannglieder: List[SpanngliedEintrag] = field(default_factory=list)`
 - `schubwaende: List[SchubwandEintrag] = field(default_factory=list)`
 - `hilfslinien: List[HilfslinieEintrag] = field(default_factory=list)`
 - `werkstoffsaetze: Dict[str, Werkstoffsatz] = je_material(Werkstoffsatz.BEMESSUNG)` – Je Material die Werte der Tragsicherheit: Bemessungs- oder charakteristische -- das legt fest, wo die Plateaus liegen (`f_cd` oder `f_ck`, `f_yd` oder `f_yk`). Duktilitaet und sproedes Versagen rechnen am selben Querschnitt.
@@ -342,9 +346,10 @@ def leer(self) -> bool
 ```
 
 Ob noch nichts gezeichnet ist, was traegt: keine Flaeche, kein Stab,
-keine Stablinie, keine Schubwand. Knoten und Hilfslinien allein sind
-Bauhilfen. So beginnt eine neue Analyse (Benutzer, 2026-10-19), und
-so gibt es nichts zu rechnen -- aber auch keinen Fehler.
+keine Stablinie, kein Spannglied, keine Schubwand. Knoten und
+Hilfslinien allein sind Bauhilfen. So beginnt eine neue Analyse
+(Benutzer, 2026-10-19), und so gibt es nichts zu rechnen -- aber auch
+keinen Fehler.
 
 #### QuerschnittsanalyseEintrag.elemente
 
@@ -393,6 +398,14 @@ def stab(self, y: float, z: float, **felder: Any) -> StabEintrag
 ```
 
 Ein einzelner Stab bei `(y, z)` -- `durchmesser`, `stahl`.
+
+#### QuerschnittsanalyseEintrag.spannglied
+
+```python
+def spannglied(self, y: float, z: float, **felder: Any) -> SpanngliedEintrag
+```
+
+Ein Spannglied bei `(y, z)`; die Felder wie [[opencivil.projekt.spannglieder#SpanngliedEintrag|SpanngliedEintrag]].
 
 #### QuerschnittsanalyseEintrag.stablinie
 
@@ -500,6 +513,7 @@ Feldmoment; das Rechteck gibt es als Vorlage im Zeichenfenster.
 - [[opencivil.projekt.fallnamen]]
 - [[opencivil.projekt.lesen]]
 - [[opencivil.projekt.netz]]
+- [[opencivil.projekt.spannglieder]]
 - [[opencivil.querschnitt.geometrie]]
 - [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.vorlagen]]
