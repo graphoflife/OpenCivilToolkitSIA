@@ -7,9 +7,11 @@ gerechnet, in zwei Schritten:
 
 1. **Elastisch**, mit den Lagern als Punkten: die Lagerkräfte eines statisch
    unbestimmten Streifens folgen aus der Biegelinie -- mit den Elementen des
-   Stabwerks (:mod:`opencivil.stabwerk.stab`), Knoten an den Enden, den
-   Lagern und wo die Steifigkeit wechselt. Zwischen den Knoten ist die
-   Hermite-Biegelinie die genaue Lösung; die Lagerkräfte stimmen exakt.
+   Stabwerks (:mod:`opencivil.stabwerk.stab`), Knoten an den Lagern und wo
+   die Steifigkeit wechselt. Zwischen den Knoten ist die Hermite-Biegelinie
+   die genaue Lösung; die Lagerkräfte stimmen exakt. Über das erste und das
+   letzte Lager hinaus ragt der Streifen frei: dort ist er statisch
+   bestimmt, und seine Last geht als Kraft und Moment an das Lager.
 2. **Statik**: mit diesen Lagerkräften laufen Querkraft und Moment vom
    Anfang des Streifens bis zu seinem Ende, gerechnet wie in einem ebenen
    Stab des Stabwerks, starr (:func:`statik`). Ein Flächenlager -- ein
@@ -42,6 +44,15 @@ from opencivil.stabwerk.verlauf import EbenesIntervall, ebener_verlauf
 
 #: Was in m als dieselbe Stelle gilt.
 GLEICH = 1e-9
+
+#: Ein Wechsel der Steifigkeit näher als so viel an einem anderen Knoten gilt
+#: dort, in m. Als eigenes Element zwischen freien Knoten wäre ein so kurzes
+#: Stück fast starr: sein Pivot fiele unter die Schranke der Zerlegung
+#: (:data:`~opencivil.stabwerk.matrix.SCHRANKE`), und sie hielte den Knoten
+#: still fest wie ein Lager, das es nicht gibt -- bei 1 mm zwischen zwei
+#: Wechseln schon. So schmal wirkt ein Wechsel auf die Lagerkräfte kaum;
+#: die 1 cm sind nach Vorgabe, nicht nachgeschlagen.
+WECHSEL = 1e-2
 
 
 @dataclass(frozen=True)
@@ -114,15 +125,25 @@ class Balken:
 
     def __init__(self, L: float, abschnitte: Sequence[Tuple[float, float, float]],
                  halte: Sequence[Halt]) -> None:
-        """``abschnitte``: ``(von, bis, EI)`` in m und Nm², lückenlos von 0 bis ``L``."""
+        """
+        ``abschnitte``: ``(von, bis, EI)`` in m und Nm², lückenlos von 0 bis
+        ``L``. Knoten stehen an den Lagern und dazwischen, wo die Steifigkeit
+        wechselt (:data:`WECHSEL`) -- nicht an den freien Enden: bis
+        2026-11-26 war jedes ein Element, und eines von einem Mikrometer, ein
+        Lager knapp neben dem Rand der Platte, hielt die Zerlegung still fest.
+        Die Probe des Gleichgewichts hielt dann die ganze Decke an.
+        """
         self.L = L
         self.halte = list(halte)
-        stellen = [0.0, L] + [h.s for h in halte] + [g for a, b, _ in abschnitte for g in (a, b)]
         self.knoten: List[float] = []
-        for s in sorted(min(max(s, 0.0), L) for s in stellen):
+        for s in sorted(min(max(h.s, 0.0), L) for h in halte) or [0.0, L]:
             if not self.knoten or s - self.knoten[-1] > GLEICH:
                 self.knoten.append(s)
-        self.knoten[-1] = L
+        erstes, letztes = self.knoten[0], self.knoten[-1]
+        for (_, g, links), (_, _, rechts) in zip(abschnitte, abschnitte[1:]):
+            if links != rechts and erstes < g < letztes and all(abs(g - k) > WECHSEL for k in self.knoten):
+                self.knoten.append(g)
+        self.knoten.sort()
         self.elemente: List[Tuple[int, float]] = []
         for i, (a, b) in enumerate(zip(self.knoten, self.knoten[1:])):
             mitte = 0.5 * (a + b)
@@ -173,21 +194,30 @@ class Balken:
             raise ValueError("Der Träger ist beweglich.")
         stablasten = [st.Strecke(l.a, l.b, py_a=-l.p_a, py_b=-l.p_b) if isinstance(l, Streckenlast)
                       else st.Punkt(l.a, Py=-l.P, M=l.C) for l in lasten]
-        f_elemente = []
+        # Die freien Enden: ihre Last als Kraft und Moment am ersten und am
+        # letzten Lager. Eine Einzellast auf dem letzten gehört dem Ende.
+        knotenlast = [0.0] * (2 * len(self.knoten))
+        for k, von, bis, ende in ((0, 0.0, self.knoten[0], False),
+                                  (len(self.knoten) - 1, self.knoten[-1], self.L, True)):
+            F, C = _resultante(st.aufteilen(stablasten, von, bis, ende=ende), self.knoten[k] - von)
+            knotenlast[2 * k] += F
+            knotenlast[2 * k + 1] += C
         f = [0.0] * len(self._nummer)
-        letztes = len(self.elemente) - 1
+        for g, w in enumerate(knotenlast):
+            if g in self._nummer:
+                f[self._nummer[g]] += w
+        f_elemente = []
         for i, _ in self.elemente:
             a, b = self.knoten[i], self.knoten[i + 1]
-            teil = st.aufteilen(stablasten, a, b, ende=i == letztes)
-            voll = st.knotenlasten(b - a, teil)
+            voll = st.knotenlasten(b - a, st.aufteilen(stablasten, a, b, ende=False))
             fe = [voll[1], voll[2], voll[4], voll[5]]
             f_elemente.append(fe)
             for p, g in enumerate(range(2 * i, 2 * i + 4)):
                 if g in self._nummer:
                     f[self._nummer[g]] += fe[p]
-        x = self._zerlegung.loese(f)
+        x = self._zerlegung.loese(f) if self._nummer else []
         d = [x[self._nummer[g]] if g in self._nummer else 0.0 for g in range(2 * len(self.knoten))]
-        r = [0.0] * (2 * len(self.knoten))
+        r = [-w for w in knotenlast]
         for (i, EI), fe in zip(self.elemente, f_elemente):
             k = self._steifigkeit(i, EI)
             de = d[2 * i:2 * i + 4]
@@ -198,6 +228,23 @@ class Balken:
             k = self.knoten_bei(h.s)
             heraus.append((r[2 * k] if h.vertikal else 0.0, r[2 * k + 1] if h.eingespannt else 0.0))
         return heraus
+
+
+def _resultante(lasten: Sequence[st.Teillast], x0: float) -> Tuple[float, float]:
+    """
+    Kraft quer und Moment um ``x0`` -- im Gegenuhrzeigersinn, in den Achsen
+    eines ebenen Stabs -- der Lasten eines freien Endes.
+    """
+    F = C = 0.0
+    for l in lasten:
+        if isinstance(l, st.Punkt):
+            F += l.Py
+            C += l.M + (l.a - x0) * l.Py
+            continue
+        lang, c, zu = l.b - l.a, l.a - x0, l.py_b - l.py_a
+        F += 0.5 * (l.py_a + l.py_b) * lang
+        C += lang * (l.py_a * (lang / 2.0 + c) + zu * (lang / 3.0 + c / 2.0) + 0.5 * (l.m_a + l.m_b))
+    return F, C
 
 
 # ===========================================================================

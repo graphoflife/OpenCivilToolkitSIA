@@ -40,7 +40,7 @@
     "opencivil/decke/richtungen.py": "9ecf7e7576a3",
     "opencivil/decke/schnitt.py": "ea31479774ce",
     "opencivil/decke/streifen.py": "ded0be961cb5",
-    "opencivil/decke/traeger.py": "d2b1ddb749bb",
+    "opencivil/decke/traeger.py": "58c2a7ed03fb",
     "opencivil/decke/werk.py": "3708d6f93f05",
     "opencivil/durchstanzen/__init__.py": "3c09fb438d11",
     "opencivil/durchstanzen/bewehrung.py": "2ebf527002f3",

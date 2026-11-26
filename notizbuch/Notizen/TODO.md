@@ -68,7 +68,10 @@ Kräften je Geschoss und Wand, ohne Verbindung ins Balkensystem.
       Metern Rand, ein Rand quer dazu zählt mit; aneinanderstossende
       gemeinsam -- seit 2026-11-26, `decke/richtungen.py`);
       Streifen in zwei Richtungen, die nicht rechtwinklig aufeinander stehen;
-      die Linienlast als Band von 1 mm, die Einzellast über 1 × 1 m verteilt.
+      die Linienlast als Band von 1 mm, die Einzellast über 1 × 1 m verteilt;
+      ein Wechsel der Steifigkeit eines Streifens, näher als 1 cm an einem
+      Lager oder einem anderen Wechsel, gilt dort (seit 2026-11-26,
+      `decke/traeger.py`, `WECHSEL`).
       Die Norm sagt zu keinem etwas (geprüft am 2026-11-14): nach der
       statischen Methode gilt jede Aufteilung, die im Gleichgewicht ist
       (SIA 262:2025, 4.1.4.2.2), wenn das Verformungsvermögen gesichert ist

@@ -4837,6 +4837,7 @@
         "Balken.knoten_bei",
         "Balken._steifigkeit",
         "Balken.lagerkraefte",
+        "_resultante",
         "statik",
         "wert"
       ]

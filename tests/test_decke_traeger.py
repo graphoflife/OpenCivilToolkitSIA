@@ -49,6 +49,34 @@ class TestElastisch(unittest.TestCase):
         self.assertAlmostEqual(F[0][0], 5e3)
         self.assertAlmostEqual(F[0][1], 10e3)
 
+    def test_kragarm_links(self):
+        """Das Lager rechts, die Last links: das Moment dreht im Uhrzeigersinn."""
+        F = balken(2.0, Halt(2.0, True, True)).lagerkraefte([Einzellast(0.0, 5e3), Streckenlast(0.0, 2.0, q, q)])
+        self.assertAlmostEqual(F[0][0], 5e3 + 2.0 * q)
+        self.assertAlmostEqual(F[0][1], -(5e3 * 2.0 + q * 2.0 * 1.0))
+
+    def test_ein_lager_knapp_neben_dem_ende(self):
+        """
+        Ein Lager 1 µm neben dem Ende -- eine Wand knapp schief zum Streifen:
+        das freie Ende geht als Kraft und Moment an das Lager. Bis 2026-11-26
+        war es ein Element, die Zerlegung hielt seinen Knoten still fest, und
+        es fehlten 48 N.
+        """
+        F = [f for f, _ in balken(6.0, Halt(1e-6, True, False), Halt(6.0, True, False)).lagerkraefte(
+            [Streckenlast(0.0, 6.0, q, q)])]
+        self.assertAlmostEqual(sum(F), 6.0 * q, places=6)
+        self.assertAlmostEqual(F[1], q * 6.0 * (3.0 - 1e-6) / (6.0 - 1e-6), places=6)
+
+    def test_zwei_wechsel_der_steifigkeit_knapp_beieinander(self):
+        """
+        1 mm dreifach steifer im ersten Feld zählt nicht (:data:`WECHSEL`): wie
+        überall gleich steif. Bis 2026-11-26 fehlten 5.5 kN von 15 kN.
+        """
+        abschnitte = [(0.0, 2.0, EI), (2.0, 2.001, 3.0 * EI), (2.001, 6.0, EI)]
+        F = [f for f, _ in balken(6.0, *(Halt(s, True, False) for s in (0.0, 4.0, 6.0)),
+                                  abschnitte=abschnitte).lagerkraefte([Streckenlast(0.0, 6.0, 2.5e3, 2.5e3)])]
+        self.assertEqual([round(f, 6) for f in F], [4062.5, 10312.5, 625.0])
+
     def test_beweglich(self):
         self.assertFalse(balken(4.0, Halt(1.0, True, False)).stabil)
         self.assertFalse(balken(4.0, Halt(1.0, False, True), Halt(3.0, False, True)).stabil)

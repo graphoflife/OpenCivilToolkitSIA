@@ -7,6 +7,29 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-26 · Decke: ein Streifen knapp neben seinem Lager
+
+Beim Prüfen der Richtungen gefunden, ein Fehler von früher.
+
+- Vorher hielt die ganze Decke an mit «Der Träger steht nicht im
+  Gleichgewicht», wenn ein Streifen nur ganz wenig über sein erstes oder
+  letztes Lager ragte. Zwei Beispiele: ein Rechteck, dessen eine Ecke bei
+  x = 6.00001 statt 6 m liegt, oder eine um 30° gedrehte Platte mit
+  Koordinaten, auf 0.1 mm gerundet. Es fehlten 48 N oder 5.5 kN.
+- Der Grund: jedes freie Ende war ein eigenes Element des Balkens, auch
+  eines von einem Mikrometer. So kurz ist es fast starr; die Zerlegung
+  hielt seinen Knoten darum still fest, wie ein Lager, das es nicht gibt,
+  und die Lagerkräfte stimmten nicht mehr. Ebenso zwei Wechsel der
+  Steifigkeit 1 mm nebeneinander.
+- Nachher ist ein freies Ende statisch bestimmt: seine Last geht als Kraft
+  und Moment an das erste oder letzte Lager (`traeger._resultante`). Ein
+  Wechsel der Steifigkeit näher als 1 cm an einem Lager oder einem anderen
+  Wechsel gilt dort (`WECHSEL`, nach Vorgabe, im TODO). Beide Beispiele
+  rechnen, und die Lager tragen die ganze Last.
+- Im vollen Beispiel des Berichts ändert sich nur eine Rundung: das
+  grösste Moment von U2 liegt genau bei 2.475 m und steht nun als 2.48
+  statt 2.47.
+
 ## 2026-11-26 · Decke: Richtungen von selbst
 
 Aus dem Plan vom 2026-11-25: jede Platte wählt ihre zwei Richtungen selbst,

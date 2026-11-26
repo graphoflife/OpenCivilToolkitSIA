@@ -271,6 +271,32 @@ class TestSchief(Rechnung):
         self.assertAlmostEqual(w.myu_oben, 0.0)
 
 
+class TestKnappDaneben(Rechnung):
+    """
+    Ränder, die knapp schief zu den Streifen liegen: eine Ecke 0.01 mm
+    daneben, eine gedrehte Platte mit Ecken auf 0.1 mm. Bis 2026-11-26 hielt
+    das die ganze Decke an: «Der Träger steht nicht im Gleichgewicht».
+    """
+
+    def gerechnet_mit(self, ecken, richtungen=(0.0, math.pi / 2.0)):
+        return self.gerechnet(Decke(platten=[Platte("P", tuple(ecken), 0.2, E, WICHTE, richtungen)],
+                                    linienlager=waende(ecken, 0, 1, 2, 3),
+                                    lastfaelle=[Lastfall("q", [Flaechenlast("q", q, platte="P")])]))
+
+    def test_eine_ecke_knapp_daneben(self):
+        for x in (6.00001, 6.001):
+            with self.subTest(x=x):
+                e = self.gerechnet_mit([(0, 0), (6, 0), (x, 4), (0, 4)])
+                self.assertAlmostEqual(e.faelle[0].lagerkraft, e.faelle[0].summe, delta=1e-6 * e.faelle[0].summe)
+
+    def test_gedreht_mit_gerundeten_ecken(self):
+        phi = math.radians(30.0)
+        c, s = math.cos(phi), math.sin(phi)
+        ecken = [(round(c * x - s * y, 4), round(s * x + c * y, 4)) for x, y in rechteck(0, 0, 6, 4)]
+        e = self.gerechnet_mit(ecken, (phi, phi + math.pi / 2.0))
+        self.assertAlmostEqual(e.faelle[0].lagerkraft, e.faelle[0].summe, delta=1e-6 * e.faelle[0].summe)
+
+
 class TestEinachsig(Rechnung):
     """Platte 4 × 2 m zwischen zwei Wänden bei x = 0 und x = 4."""
 

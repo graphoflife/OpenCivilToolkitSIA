@@ -1,5 +1,5 @@
 ---
-erzeugt: 70d4e41787b6
+erzeugt: dc982d875b8f
 art: modul
 tags: [modul]
 ---
@@ -14,9 +14,11 @@ gerechnet, in zwei Schritten:
 
 1. **Elastisch**, mit den Lagern als Punkten: die Lagerkräfte eines statisch
    unbestimmten Streifens folgen aus der Biegelinie -- mit den Elementen des
-   Stabwerks ([[opencivil.stabwerk.stab]]), Knoten an den Enden, den
-   Lagern und wo die Steifigkeit wechselt. Zwischen den Knoten ist die
-   Hermite-Biegelinie die genaue Lösung; die Lagerkräfte stimmen exakt.
+   Stabwerks ([[opencivil.stabwerk.stab]]), Knoten an den Lagern und wo
+   die Steifigkeit wechselt. Zwischen den Knoten ist die Hermite-Biegelinie
+   die genaue Lösung; die Lagerkräfte stimmen exakt. Über das erste und das
+   letzte Lager hinaus ragt der Streifen frei: dort ist er statisch
+   bestimmt, und seine Last geht als Kraft und Moment an das Lager.
 2. **Statik**: mit diesen Lagerkräften laufen Querkraft und Moment vom
    Anfang des Streifens bis zu seinem Ende, gerechnet wie in einem ebenen
    Stab des Stabwerks, starr ([[opencivil.decke.traeger#statik|statik]]). Ein Flächenlager -- ein
@@ -161,6 +163,15 @@ Je Lager die Kraft nach oben `F` und das Moment `C` im
 Gegenuhrzeigersinn, die es auf den Träger ausübt -- elastisch, mit
 den Lagern als Punkten.
 
+### _resultante
+
+```python
+def _resultante(lasten: Sequence[st.Teillast], x0: float) -> Tuple[float, float]
+```
+
+Kraft quer und Moment um `x0` -- im Gegenuhrzeigersinn, in den Achsen
+eines ebenen Stabs -- der Lasten eines freien Endes.
+
 ### statik
 
 ```python
@@ -191,6 +202,7 @@ def wert(teile: Sequence[EbenesIntervall], groesse: str, s: float, links: bool=F
 ## Konstanten
 
 - `GLEICH = 1e-09` – Was in m als dieselbe Stelle gilt.
+- `WECHSEL = 0.01` – Ein Wechsel der Steifigkeit näher als so viel an einem anderen Knoten gilt dort, in m. Als eigenes Element zwischen freien Knoten wäre ein so kurzes Stück fast starr: sein Pivot fiele unter die Schranke der Zerlegung ([[opencivil.stabwerk.matrix#Konstanten|SCHRANKE]]), und sie hielte den Knoten still fest wie ein Lager, das es nicht gibt -- bei 1 mm zwischen zwei Wechseln schon. So schmal wirkt ein Wechsel auf die Lagerkräfte kaum; die 1 cm sind nach Vorgabe, nicht nachgeschlagen.
 
 ## Braucht
 

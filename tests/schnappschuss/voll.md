@@ -19995,7 +19995,7 @@ $$
 | y21 … y32 | $0.250$ | $5.50$ | $71.6$ | L1 32.2 · U4 39.4 | $0.0$ | – | $39.9$ | $2.47$ |
 | U4 | $1.000$ | $9.00$ | $286.5$ | U1 52.5 · U2 181.5 · U3 52.5 | $-60.1$ | $4.50$ | $47.9$ | $2.04$ |
 | U1 | $1.000$ | $5.50$ | $175.5$ | L1 60.5 · S1 115.0 | $0.0$ | – | $74.9$ | $2.47$ |
-| U2 | $1.000$ | $5.50$ | $376.3$ | L1 100.0 · S2 276.4 | $0.0$ | – | $123.7$ | $2.47$ |
+| U2 | $1.000$ | $5.50$ | $376.3$ | L1 100.0 · S2 276.4 | $0.0$ | – | $123.7$ | $2.48$ |
 | U3 | $1.000$ | $5.50$ | $175.5$ | L1 60.5 · S3 115.0 | $0.0$ | – | $74.9$ | $2.47$ |
 
 Q ist die Last auf dem Träger, mit dem, was tiefere Träger in ihn geben. s misst längs der Richtung φ des Trägers, s = x · cos φ + y · sin φ: in x ist s = x, in y ist s = y. Nebeneinander liegende Träger, die dasselbe tragen, stehen in einer Zeile.
@@ -20016,7 +20016,7 @@ Längs eines Linienlagers gibt jeder Träger seine Kraft gleichmässig über das
 | Grösse | kleinst | Ort | grösst | Ort |
 | ---: | ---: | ---: | ---: | ---: |
 | $m_x$ | $-60.1\ \mathrm{kNm/m}$ | (4.50, 5.00) | $47.9\ \mathrm{kNm/m}$ | (2.04, 5.00) |
-| $m_y$ | $0.0\ \mathrm{kNm/m}$ | – | $123.7\ \mathrm{kNm/m}$ | (4.50, 2.47) |
+| $m_y$ | $0.0\ \mathrm{kNm/m}$ | – | $123.7\ \mathrm{kNm/m}$ | (4.50, 2.48) |
 | $m_{xy}$ | $0.0\ \mathrm{kNm/m}$ | – | $0.0\ \mathrm{kNm/m}$ | – |
 | $v_x$ | $-88.0\ \mathrm{kN/m}$ | (4.00, 5.00) | $88.0\ \mathrm{kN/m}$ | (5.00, 5.00) |
 | $v_y$ | $-81.8\ \mathrm{kN/m}$ | (4.50, 4.50) | $100.0\ \mathrm{kN/m}$ | (4.50, 0.00) |
@@ -20029,7 +20029,7 @@ Gesucht am Schwerpunkt jeder Zelle der Bilder und an den Stellen, an denen ein T
 | Widerstand | Seite | erforderlich | Ort |
 | ---: | ---: | ---: | ---: |
 | $m_{xu}$ | unten, in x | $47.9\ \mathrm{kNm/m}$ | (2.04, 5.00) |
-| $m_{yu}$ | unten, in y | $123.7\ \mathrm{kNm/m}$ | (4.50, 2.47) |
+| $m_{yu}$ | unten, in y | $123.7\ \mathrm{kNm/m}$ | (4.50, 2.48) |
 | $m'_{xu}$ | oben, in x | $60.1\ \mathrm{kNm/m}$ | (4.50, 5.00) |
 | $m'_{yu}$ | oben, in y | $0.0\ \mathrm{kNm/m}$ | – |
 
