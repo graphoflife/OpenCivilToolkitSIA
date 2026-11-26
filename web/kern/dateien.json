@@ -26,7 +26,7 @@
     "opencivil/core/rechenobjekt.py": "776bd02c7876",
     "opencivil/core/rechenwerk.py": "dd0b317afa2c",
     "opencivil/core/suche.py": "4c028717991f",
-    "opencivil/core/vorgaben.py": "d82ac6d7d0a7",
+    "opencivil/core/vorgaben.py": "1c0f717b2673",
     "opencivil/core/wahl.py": "008cf530557e",
     "opencivil/core/wert.py": "e57d148c8aed",
     "opencivil/decke/__init__.py": "5192cc8877a1",

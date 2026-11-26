@@ -170,6 +170,113 @@ const ZEICHEN = {
     kreise: [[12, 12, 3]],
   },
 
+  // -- Die Kacheln der Eingaben: Durchstanzen, Grundbruch, Setzung, Pfahl,
+  //    Erdbeben. Was die Gruppe beschreibt, im Schnitt oder von oben. ------
+
+  // Die Stütze von oben, gestrichelt um sie herum der Nachweisschnitt.
+  stuetze: {
+    flaechen: ['M9.5 9.5h5v5h-5z'],
+    strich: ['M4.5 8.5a4 4 0 0 1 4-4h7a4 4 0 0 1 4 4v7a4 4 0 0 1-4 4h-7a4 4 0 0 1-4-4z'],
+  },
+  // Die Biegebewehrung von oben: Stäbe in beiden Richtungen.
+  biegebewehrung: {
+    pfade: ['M3 7h18 M3 12h18 M3 17h18', 'M7 3v18 M12 3v18 M17 3v18'],
+  },
+  // Die Platte dreht sich um die Stütze: gestrichelt, wo sie unverformt läge.
+  rotation: {
+    pfade: ['M10 12.5L2.5 15.5 M14 12.5l7.5 3', 'M10 12.5v9 M14 12.5v9'],
+    strich: ['M2.5 12.5h19'],
+  },
+  // Die Auflagerkraft: eine Kraft auf die Platte über der Stütze.
+  einwirkung: {
+    pfade: ['M3 10.5h18v4H3z', 'M10 14.5v7 M14 14.5v7', 'M12 2.5v5.5 M10.3 6.3 12 8l1.7-1.7'],
+  },
+  // Der Boden: Körner unter dem Gelände.
+  boden: {
+    pfade: ['M3 6h18'],
+    kreise: [[6.5, 10.5, 1.6], [12, 10, 1.1], [17.5, 11, 1.8], [8.8, 15.8, 1.3],
+      [14.6, 16, 1.6], [19.2, 18.6, 1], [4.6, 19.2, 1.1], [11.2, 20.2, 0.9]],
+  },
+  // Ein Fundament im Schnitt: die Stütze darauf, das Gelände daneben.
+  fundament: {
+    pfade: ['M10.5 3v8.5 M13.5 3v8.5', 'M5 11.5h14v5H5z', 'M2.5 8h8 M13.5 8h8'],
+  },
+  // Das Gelände, das abfällt, und tiefer der Spiegel des Grundwassers.
+  gelaende: {
+    pfade: ['M2.5 6.5h8l11 5', 'M6 13.8h3l-1.5 2.6z', 'M6.3 19.6h2.4 M6.9 21.2h1.2'],
+    strich: ['M2.5 17.5h19'],
+  },
+  // Der Spiegel des Grundwassers: das Dreieck über der Linie.
+  grundwasser: {
+    pfade: ['M8 5.5h8l-4 6z', 'M2.5 12.5h19', 'M6 16h12 M8.5 19.5h7'],
+  },
+  // Ein Fundament, das in seiner Sohle gleitet: die Kraft T, darunter die Fuge.
+  sohlreibung: {
+    pfade: ['M8 6h11v7H8z', 'M2.5 13h19', 'M3.5 16l2.5-3 M8 16l2.5-3 M12.5 16l2.5-3 M17 16l2.5-3',
+      'M2 9.5h5 M5.3 7.8 7 9.5l-1.7 1.7'],
+  },
+  // Die Pressung in der Sohle: der Boden drückt von unten gegen das Fundament.
+  pressung: {
+    pfade: ['M4 4.5h16v5H4z', 'M4 18.5h16', 'M7 18.5v-7 M5.6 12.9 7 11.5l1.4 1.4',
+      'M12 18.5v-7 M10.6 12.9 12 11.5l1.4 1.4', 'M17 18.5v-7 M15.6 12.9 17 11.5l1.4 1.4'],
+  },
+  // Schichten übereinander: Sand, Silt, Kies.
+  schichten: {
+    pfade: ['M2.5 3.5h19 M2.5 9.5h19 M2.5 15.5h19 M2.5 21.5h19',
+      'M4.5 14l3-3 M10 14l3-3 M15.5 14l3-3'],
+    voll: [[6, 6.5, 0.8], [10, 6.5, 0.8], [14, 6.5, 0.8], [18, 6.5, 0.8]],
+    kreise: [[6.5, 18.5, 1.4], [12, 18.5, 1.4], [17.5, 18.5, 1.4]],
+  },
+  // Der Pfahl im Schnitt: der Kreis, darin die Längsstäbe.
+  pfahlquerschnitt: {
+    kreise: [[12, 12, 9]],
+    voll: [[18, 12, 1.2], [16.2, 16.2, 1.2], [12, 18, 1.2], [7.8, 16.2, 1.2], [6, 12, 1.2],
+      [7.8, 7.8, 1.2], [12, 6, 1.2], [16.2, 7.8, 1.2]],
+  },
+  // Der äussere Widerstand: der Boden trägt den Pfahl am Mantel und am Fuss.
+  widerstand: {
+    pfade: ['M10 3h4v15h-4z', 'M2.5 5.5h7.5 M14 5.5h7.5', 'M6.5 16V9 M5.1 10.4 6.5 9l1.4 1.4',
+      'M17.5 16V9 M16.1 10.4 17.5 9l1.4 1.4', 'M12 22.5v-3 M10.6 20.9 12 19.5l1.4 1.4'],
+  },
+  // Der Fuss des Pfahls: der Boden drückt von unten gegen ihn.
+  pfahlfuss: {
+    pfade: ['M9 2.5V13h6V2.5', 'M9 21.5V16 M7.6 17.4 9 16l1.4 1.4',
+      'M12 21.5V16 M10.6 17.4 12 16l1.4 1.4', 'M15 21.5V16 M13.6 17.4 15 16l1.4 1.4'],
+  },
+  // Eine Kraft quer auf den Kopf des Pfahls.
+  querlast: {
+    pfade: ['M10.5 4h3v17.5h-3z', 'M2.5 10h8 M13.5 10h8', 'M2.5 6h6 M6.9 4.4 8.5 6l-1.6 1.6'],
+  },
+  // Der Standort: eine Marke auf der Karte.
+  standort: {
+    pfade: ['M12 21.5s6.5-6.4 6.5-11.5a6.5 6.5 0 0 0-13 0c0 5.1 6.5 11.5 6.5 11.5z'],
+    kreise: [[12, 10, 2.3]],
+  },
+  // Kraft über Verschiebung: elastisch, dann plastisch -- gestrichelt, wie
+  // weit es elastisch ginge.
+  verhaltensbeiwert: {
+    pfade: [ACHSEN, 'M4 20l5-9h11'],
+    strich: ['M9 11l4-7'],
+  },
+  // Eine Schwingung über eine Periode, darunter ihre Dauer T.
+  schwingzeit: {
+    pfade: ['M3 11C5.5 3 9.5 3 12 11s6.5 8 9 0', 'M3 20.5h18 M3 19v3 M21 19v3'],
+  },
+  // Ein Gebäude in der Ansicht, gestrichelt seine Symmetrieachse.
+  regelmaessigkeit: {
+    pfade: ['M5 21V6h14v15', 'M5 11h14 M5 16h14', 'M2.5 21h19'],
+    strich: ['M12 2.5v20'],
+  },
+  // Die Geschosse: Decken übereinander, von unten gezählt.
+  geschosse: {
+    pfade: ['M4 4.5h16 M4 10h16 M4 15.5h16', 'M6 4.5V21 M18 4.5V21', 'M2.5 21h19'],
+  },
+  // Wände im Grundriss, gestrichelt der Umriss des Geschosses.
+  waende: {
+    strich: ['M3 3h18v18H3z'],
+    flaechen: ['M5 5h10v2.5H5z', 'M16.5 9H19v10h-2.5z', 'M5 14.5h2.5V19H5z'],
+  },
+
   // -- Die Knöpfe des Balkensystems -------------------------------------------
 
   // Ein Walzprofil im Schnitt.

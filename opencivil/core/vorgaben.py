@@ -3,13 +3,14 @@ opencivil/core/vorgaben.py -- die Zahlen, die ein Nachweis aus seiner Beschreibu
 
 VERANTWORTUNG:
 Je Nachweis eine Tafel seiner Vorgaben, in Gruppen (:class:`Gruppe`): was die
-Herleitung in ihren Kästen zeigt und die Maske in ihren Karten -- dieselben
+Herleitung in ihren Kästen zeigt und die Maske in ihren Kacheln -- dieselben
 Felder in derselben Folge, mit demselben Zeichen (:class:`Feld`). Eine Gruppe
 kann sich nach Wahlen der Beschreibung richten (``nach``): drainiert liest
 der Grundbruch anderes als undrainiert. Die Rechnung fragt sie mit ihren
 eigenen Wahlen (:meth:`Gruppe.fuer`), der Katalog schreibt sie für jede
 Stellung aus (:meth:`Gruppe.als_dict`), und die Maske nimmt die zu ihrem
-Eintrag (``eingabekarten`` in ``web/js/bausteine.js``).
+Eintrag (``eingabegruppen`` in ``web/js/bausteine.js``), je Gruppe eine
+Kachel (``gruppenkapitel`` in ``web/js/kapitel.js``).
 
 Bis 2026-11-20 schrieben die Masken von Durchstanzen, Grundbruch, Setzung und
 Pfahl die Tafeln von Hand ab: ein neues Feld des Kerns erschien dort nie, und
@@ -112,7 +113,7 @@ class Feld:
 
 @dataclass(frozen=True)
 class Gruppe:
-    """Ein Kasten der Herleitung, eine Karte der Maske."""
+    """Ein Kasten der Herleitung, eine Kachel der Maske."""
 
     titel: str
     felder: Callable[..., Sequence[Feld]]

@@ -29,11 +29,11 @@ import { balkensystemEditor, balkensystemFenster } from './balkensystem.js';
 import {
   deckeEditor, deckeFenster, deckenKarten, deckenZusammenfassung,
 } from './decke.js';
-import { durchstanzEditor } from './durchstanzen.js';
-import { grundbruchEditor } from './grundbruch.js';
-import { setzungEditor } from './setzung.js';
-import { pfahlEditor } from './pfahl.js';
-import { erdbebenEditor } from './erdbeben.js';
+import { durchstanzEditor, durchstanzFenster, stellenmass } from './durchstanzen.js';
+import { grundbruchEditor, grundbruchFenster } from './grundbruch.js';
+import { setzungEditor, setzungFenster } from './setzung.js';
+import { pfahlEditor, pfahlFenster } from './pfahl.js';
+import { erdbebenEditor, erdbebenFenster } from './erdbeben.js';
 import { skriptZeichnen } from './python.js';
 import { variablenZeichnen } from './variablen.js';
 import { plattenkarten } from './platte_bilder.js';
@@ -330,10 +330,10 @@ const DECKE = bauteil('decke', {
  * nach der Vorlage des Katalogs für ihre Lage und Form: «⌀{D} mm».
  */
 const DURCHSTANZEN = bauteil('durchstanzen', {
-  kurztext: (d) => katalog('durchstanzen', 'lagen').find((l) => l.wert === d.lage)
-    .kurz[d.form].replace(/\{(\w+)\}/g, (_, k) => d[k]),
+  kurztext: stellenmass,
   editor: durchstanzEditor,
   karten: durchstanzKarten,
+  fenster: durchstanzFenster,
 });
 
 /** Ein Fundament mit den Vorgaben des Kerns und einer Kombination -- ohne Material. */
@@ -341,6 +341,7 @@ const GRUNDBRUCH = bauteil('grundbruch', {
   kurztext: (g) => `${g.b}×${g.L} m`,
   editor: grundbruchEditor,
   karten: situationKarten,
+  fenster: grundbruchFenster,
 });
 
 /** Ein Fundament ohne Pressung, mit einer Schicht aus dem Kern -- ohne Material. */
@@ -348,6 +349,7 @@ const SETZUNG = bauteil('setzung', {
   kurztext: (s) => `${s.B}×${s.L} m`,
   editor: setzungEditor,
   karten: setzungKarten,
+  fenster: setzungFenster,
 });
 
 /**
@@ -360,6 +362,7 @@ const PFAHL = bauteil('pfahl', {
   kurztext: (t) => `⌀${t.D} mm, ${t.L} m`,
   editor: pfahlEditor,
   karten: pfahlKarten,
+  fenster: pfahlFenster,
 });
 
 /**
@@ -372,6 +375,7 @@ const ERDBEBEN = bauteil('erdbeben', {
     + `${h.waende.length} ${h.waende.length === 1 ? 'Wand' : 'Wände'}`,
   editor: erdbebenEditor,
   karten: erdbebenKarten,
+  fenster: erdbebenFenster,
 });
 
 /**

@@ -3,39 +3,52 @@
  *
  * Von oben nach unten:
  *
- *     Setzung Situation   Bezeichnung; Fundament, Pressung in der Sohle und
- *                         Nachweis je als Karte; Beschreibung
- *     Schichten           von der Sohle an nach unten: Dicke, M_E und M'_E
+ *     Setzung    Bezeichnung und Beschreibung
+ *     Eingaben   je eine Kachel mit Sinnbild und dem Wichtigsten
+ *                (Benutzer, 2026-11-25), ein Klick öffnet ihr Fenster:
+ *                Fundament, Pressung in der Sohle, die Schichten von der
+ *                Sohle an nach unten -- Dicke, M_E und M'_E --, Nachweis
  *
  * Gerechnet wird nichts: die Setzung steht rechts in der Zusammenfassung und
  * im Bild der Situation unter «Diagramme». Einheiten und Grenzen kommen aus
  * dem Katalog (`katalog.felder`), wie beim Grundbruch -- und ebenso die
- * Karten und die Spalten der Schichten mit Feldern, Zeichen und Hinweisen:
+ * Kacheln und die Spalten der Schichten mit Feldern, Zeichen und Hinweisen:
  * die Gruppen der Herleitung (`katalog.vorgaben`,
  * opencivil/geotechnik/setzung.py). Bis 2026-11-20 standen sie hier ein
  * zweites Mal.
  */
 
 import {
-  bezeichnung, eingabekarten, erklaerung, feld, mitBild, panel, vorgabefelder, vorgabetitel,
+  beschreibung, bezeichnung, eingabegruppen, feld, mitBild, panel, vorgabefelder, vorgabetitel,
   wahlSchalter,
 } from './bausteine.js';
 import { el, zahlfeld } from './dom.js';
 import { anfuegenKnopf, fallkopf, fallzeile } from './faelle.js';
+import {
+  gruppenkapitel, kapitelFenster, kapitelPanel, zeilenstand,
+} from './kapitel.js';
 import { ausVorlage, eintragAendern, feldangabe, katalog } from './zustand.js';
 
 const HILFE = {
-  situation: {
+  fundament: {
     zeilen: [
       ['B, L', 'die Seiten der Lastfläche'],
-      ['q_W', 'Pressung aus Wiederbelastung: bis zu der Spannung, die der Boden schon '
-        + 'getragen hat – etwa bis zum Gewicht des Aushubs'],
-      ['q_E', 'Pressung aus Erstbelastung: was darüber hinausgeht'],
       ['starr', 'gerechnet im Punkt K, 0.13 L und 0.13 B von einer Ecke (Bild 8.15): die '
         + 'mittlere Setzung'],
       ['schlaff', 'gerechnet unter der Mitte: die grösste Setzung (Kap. 8.10)'],
-      ['Δz_max', 'jede Schicht wird in gleich dicke Teilschichten geteilt, höchstens so dick'],
+    ],
+  },
+  pressung: {
+    zeilen: [
+      ['q_W', 'Pressung aus Wiederbelastung: bis zu der Spannung, die der Boden schon '
+        + 'getragen hat – etwa bis zum Gewicht des Aushubs'],
+      ['q_E', 'Pressung aus Erstbelastung: was darüber hinausgeht'],
+    ],
+  },
+  nachweis: {
+    zeilen: [
       ['s_zul', 'je Bauwerk festzulegen, eine allgemeine Zahl gibt es nicht (SIA 267:2013, 8.5.4.1; Kap. 8.12)'],
+      ['Δz_max', 'jede Schicht wird in gleich dicke Teilschichten geteilt, höchstens so dick'],
     ],
     formel: 's ≤ s_zul',
   },
@@ -50,38 +63,10 @@ const HILFE = {
   },
 };
 
-function situationPanel(s) {
+function kopfPanel(s) {
   const aendern = (veraenderer) => eintragAendern(s.kennung, veraenderer);
-  return panel({
-    schluessel: 'setzung/Situation', titel: 'Setzung Situation',
-    zusatz: erklaerung(HILFE.situation.zeilen, HILFE.situation.formel),
-  }, [
-    el('div.unterkapitel', {}, [
-      bezeichnung(s, aendern),
-    ]),
-    ...eingabekarten('setzung', s, aendern, {
-      dazu: {
-        Fundament: {
-          nach: [feld('Steifigkeit', wahlSchalter({
-            werte: mitBild(katalog('setzung', 'steifigkeiten').map((x) => ({
-              wert: x.wert, beschriftung: x.wert, titel: x.beschriftung,
-            })), 'setzung'),
-            gewaehlt: s.steifigkeit,
-            setzen: (w) => aendern((x) => { x.steifigkeit = w; }),
-            titel: 'Starr: im Punkt K, die mittlere Setzung – schlaff: unter der Mitte, die grösste',
-          }), '')],
-        },
-      },
-    }),
-    el('div.unterkapitel', {}, [
-      el('div.beschreibung', {}, [
-        el('label', { text: 'Beschreibung' }),
-        el('textarea', {
-          rows: 2, value: s.beschreibung || '',
-          on: { change: (e) => aendern((x) => { x.beschreibung = e.target.value; }) },
-        }),
-      ]),
-    ]),
+  return panel({ schluessel: 'setzung/Situation', titel: 'Setzung' }, [
+    el('div.unterkapitel', {}, [bezeichnung(s, aendern), beschreibung(s, aendern)]),
   ]);
 }
 
@@ -100,25 +85,60 @@ function schichtZeile(s, i) {
   });
 }
 
-function schichtenPanel(s) {
-  return panel({
-    schluessel: 'setzung/Schichten', titel: 'Schichten',
-    zusatz: erklaerung(HILFE.schichten.zeilen, HILFE.schichten.formel),
-  }, [
-    el('div.unterkapitel', {}, [
-      // Je Spalte ein Feld der Vorgaben: sein Zeichen und die Einheit des Kerns, «M'_E [MN/m²]».
-      s.schichten.length
-        ? fallkopf(vorgabefelder('schicht', s.schichten[0])
-          .map((f) => [f.zeichen, feldangabe('schicht', f.feld).einheit]))
-        : el('div.leer', { text: 'Ohne Schicht keine Setzung.' }),
-      ...s.schichten.map((_, i) => schichtZeile(s, i)),
-      anfuegenKnopf('Schicht', (name) => eintragAendern(s.kennung, (x) => {
-        x.schichten.push(ausVorlage('schicht', { name: name(x.schichten) }));
-      })),
-    ]),
-  ]);
+/** Die Schichten: je eine Zeile, von der Sohle an nach unten. */
+const SCHICHTEN = {
+  schluessel: 'schichten',
+  name: 'Schichten', titel: 'Schichten',
+  hilfe: HILFE.schichten,
+  inhalt: (s) => [el('div.unterkapitel', {}, [
+    // Je Spalte ein Feld der Vorgaben: sein Zeichen und die Einheit des Kerns, «M'_E [MN/m²]».
+    s.schichten.length
+      ? fallkopf(vorgabefelder('schicht', s.schichten[0])
+        .map((f) => [f.zeichen, feldangabe('schicht', f.feld).einheit]))
+      : el('div.leer', { text: 'Ohne Schicht keine Setzung.' }),
+    ...s.schichten.map((_, i) => schichtZeile(s, i)),
+    anfuegenKnopf('Schicht', (name) => eintragAendern(s.kennung, (x) => {
+      x.schichten.push(ausVorlage('schicht', { name: name(x.schichten) }));
+    })),
+  ])],
+  stand: (s) => zeilenstand(s.schichten, 'Schicht', 'Schichten', 'keine Schicht'),
+};
+
+/** Die Kacheln: je Gruppe der Vorgaben eine, die Schichten vor dem Nachweis. */
+function kapitel(s) {
+  const aendern = (veraenderer) => eintragAendern(s.kennung, veraenderer);
+  const vorgaben = eingabegruppen('setzung', s, aendern);
+  const steifigkeit = katalog('setzung', 'steifigkeiten');
+  const kacheln = [
+    gruppenkapitel(vorgaben, 'Fundament', {
+      zeichen: 'fundament', werte: ['B', 'L'], hilfe: HILFE.fundament,
+      nach: [feld('Steifigkeit', wahlSchalter({
+        werte: mitBild(steifigkeit.map((x) => ({
+          wert: x.wert, beschriftung: x.wert, titel: x.beschriftung,
+        })), 'setzung'),
+        gewaehlt: s.steifigkeit,
+        setzen: (w) => aendern((x) => { x.steifigkeit = w; }),
+        titel: 'Starr: im Punkt K, die mittlere Setzung – schlaff: unter der Mitte, die grösste',
+      }), '')],
+    }),
+    gruppenkapitel(vorgaben, 'Pressung in der Sohle', {
+      zeichen: 'pressung', werte: ['q_W', 'q_E'], hilfe: HILFE.pressung,
+    }),
+    SCHICHTEN,
+    gruppenkapitel(vorgaben, 'Nachweis', {
+      zeichen: 'setzung', werte: ['s_zul'], hilfe: HILFE.nachweis,
+    }),
+  ];
+  vorgaben.vollstaendig();
+  return [{ titel: '', kapitel: kacheln.filter(Boolean) }];
 }
 
 export function setzungEditor(s) {
-  return [situationPanel(s), schichtenPanel(s)];
+  return [kopfPanel(s),
+    kapitelPanel(s, kapitel(s), { schluessel: 'setzung/Kapitel', titel: 'Eingaben' })];
+}
+
+/** Das offene Fenster einer Setzung -- oder null. */
+export function setzungFenster(s, schluessel) {
+  return kapitelFenster(s, kapitel(s), schluessel);
 }

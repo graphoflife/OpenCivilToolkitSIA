@@ -3,17 +3,18 @@
  *
  * Von oben nach unten:
  *
- *     Pfahl Situation   Bezeichnung; Bohr- oder Mikropfahl; je Gruppe der
- *                       Vorgaben eine Karte: Masse, Grundwasser, äusserer
- *                       Widerstand, Fuss, Querschnitt, Querlast; Beschreibung
- *     Schichten         vom Terrain an nach unten, je eine Karte: Dicke,
- *                       Raumlast, drainiert oder undrainiert, die
- *                       Mantelreibung gerechnet oder eingegeben, der
- *                       Verformungsmodul
- *     Einwirkungen      die Kombinationen: N_Ed am Kopf, Druck positiv,
- *                       H_Ed und -- am frei drehbaren Kopf -- M_Ed
+ *     Pfahl      Bezeichnung, Bohr- oder Mikropfahl, Beschreibung
+ *     Eingaben   je eine Kachel mit Sinnbild und dem Wichtigsten
+ *                (Benutzer, 2026-11-25), ein Klick öffnet ihr Fenster: je
+ *                Gruppe der Vorgaben eine -- Masse, Querschnitt,
+ *                Grundwasser, äusserer Widerstand, Fuss, Querlast --, dazu
+ *                die Schichten vom Terrain an nach unten, je eine Karte
+ *                (Dicke, Raumlast, drainiert oder undrainiert, die
+ *                Mantelreibung gerechnet oder eingegeben, der
+ *                Verformungsmodul), und die Einwirkungen: N_Ed am Kopf,
+ *                Druck positiv, H_Ed und -- am frei drehbaren Kopf -- M_Ed
  *
- * Karten, Felder, Zeichen und Hinweise kommen aus dem Kern, wie beim
+ * Kacheln, Felder, Zeichen und Hinweise kommen aus dem Kern, wie beim
  * Grundbruch (`katalog.vorgaben`, opencivil/pfahl/pfahl.py): nur die Felder,
  * die er mit den gewählten Stellungen liest, beim Umrechnungsfaktor η_a mit
  * dem Grenzwert seiner Grundlage. Hier stehen nur die Schalter und die
@@ -26,36 +27,61 @@
  */
 
 import {
-  bezeichnung, eingabekarten, eingabezeilen, erklaerung, feld, karte, materialliste, mitBild,
-  namensfeld,
-  panel, verhaltenSchalter, wahlBlock, wahlSchalter,
+  beschreibung, bezeichnung, eingabegruppen, eingabezeilen, feld, fehlendesMaterial, karte,
+  materialliste, mitBild, namensfeld, panel, verhaltenSchalter, wahlBlock, wahlSchalter,
 } from './bausteine.js';
 import { el, zahlfeld } from './dom.js';
 import { anfuegenKnopf, fallkopf, fallzeile } from './faelle.js';
+import {
+  gruppenkapitel, kapitelFenster, kapitelPanel, zeilenstand,
+} from './kapitel.js';
 import {
   ausVorlage, eintragAendern, feldangabe, katalog,
 } from './zustand.js';
 
 const HILFE = {
-  situation: {
+  pfahl: {
     zeilen: [
       ['Tiefen', 'ab Oberkante Terrain nach unten: der Kopf in t_K, der Fuss in t_K + L, das Grundwasser in t_w'],
       ['D', 'beim Bohrpfahl verrohrt aussen an der Verrohrung, unverrohrt der des Bohrwerkzeugs (SIA 267:2013, 9.5.2.4.7); beim Mikropfahl der des Verpresskörpers'],
-      ['η_a', 'Umrechnungsfaktor des äusseren Widerstands, höchstens 0.7 aus einer Berechnung, 0.9 aus Erfahrung oder einem dynamischen Versuch, 1.0 aus einem statischen Versuch (SIA 267:2013, 9.5.2.2.5); kleiner, wo die Zuverlässigkeit nicht hoch ist (9.5.2.2.6)'],
-      ['γ_M,a', '1.3 auf Druck, 1.6 auf Zug (SIA 267:2013, 9.5.2.2.4) – fest, keine Eingabe'],
+    ],
+  },
+  querschnitt: {
+    zeilen: [
       ['η_i', 'Umrechnungsfaktor des inneren Widerstands, in der Regel höchstens 0.8, mit verlässlicher Prüfung der Integrität bis 0.9 (SIA 267:2013, 9.5.2.4.4, 9.5.2.4.9)'],
       ['Mikropfahl', 'es trägt nur das Tragglied aus Stahl, aussen um die Abrostung Δt verkleinert'],
+      ['M im Pfahl', 'in jeder Tiefe |M| ≤ η_i·M_Rd(N/η_i), mit der Normalkraft dort; im Bohrpfahl um die Längszugkraft aus der Querkraft vermindert, F_tVd = |V|·cot α (SIA 262:2025, 4.3.3.4.11)'],
+      ['V im Pfahl', 'Bohrpfahl: Fachwerk mit z = 0.9·d, die Wendel zu 70 % von Bügeln (SIA 262:2025, 4.3.3.4.4), α 30° bis 45°, unter Zug ab 40°; Mikropfahl: A_v·f_yd/√3 mit A_v = 2·A/π (SIA 263:2013, 5.1.4.1) – beides mal η_i'],
+    ],
+    formel: 'R_i,d = η_i·R_mat,d',
+  },
+  grundwasser: {
+    zeilen: [
+      ['t_w', 'ab Oberkante Terrain bis zum höchsten Grundwasserspiegel; darunter zählt in den Schichten γ − γ_w'],
+    ],
+  },
+  aussen: {
+    zeilen: [
+      ['η_a', 'Umrechnungsfaktor des äusseren Widerstands, höchstens 0.7 aus einer Berechnung, 0.9 aus Erfahrung oder einem dynamischen Versuch, 1.0 aus einem statischen Versuch (SIA 267:2013, 9.5.2.2.5); kleiner, wo die Zuverlässigkeit nicht hoch ist (9.5.2.2.6)'],
+      ['γ_M,a', '1.3 auf Druck, 1.6 auf Zug (SIA 267:2013, 9.5.2.2.4) – fest, keine Eingabe'],
+    ],
+    formel: 'R_a,d = η_a·(R_b,k + R_s,k)/γ_M,a',
+  },
+  fuss: {
+    zeilen: [
       ['Fuss', 'drainiert (c·N_c + σ\'_v·N_q)·X mit X aus Bild 12.4, undrainiert s_u·N_c mit N_c ≤ 9 aus Bild 12.5 (Kap. 12.5); örtliches Abscheren mit 2/3 von φ\'_k und c\'_k (Kap. 9.2.7)'],
+    ],
+  },
+  querlast: {
+    zeilen: [
       ['Kopf', 'frei drehbar: ein Moment am Kopf ist Einwirkung; eingespannt, etwa in einer steifen Pfahlkopfplatte: der Kopf dreht sich nicht, das Moment dort ist Reaktion'],
       ['t_red', 'bis in diese Tiefe unter Terrain wächst die Bettung quer linear von null an – die Norm verlangt nur, sie nahe der Oberfläche abzumindern (SIA 267:2013, 9.5.4.5)'],
       ['R_tr,k', 'Widerstand quer: der kleinste Bruch – der ganze Pfahl gedreht oder verschoben, oder ein Gelenk, wo das Moment den Biegewiderstand erreicht (SIA 267:2013, 9.4.4.2.2); der Biegewiderstand mit f_ck und f_yk, mal η_i'],
       ['η_a,tr', 'Umrechnungsfaktor quer: R_tr,k wird immer gerechnet, also höchstens 0.7 (SIA 267:2013, 9.5.2.3.2, 9.5.2.2.5)'],
       ['γ_M,a quer', '1.4, der kleinste Wert der Norm (SIA 267:2013, 9.5.2.3.1, (49)) – fest, keine Eingabe'],
       ['Bettung', 'in keiner Tiefe darf die Bettungskraft der Verläufe den Erdwiderstand p_E,d = η_a,tr·p_E,k/1.4 übersteigen (SIA 267:2013, 9.5.4.5)'],
-      ['M im Pfahl', 'in jeder Tiefe |M| ≤ η_i·M_Rd(N/η_i), mit der Normalkraft dort; im Bohrpfahl um die Längszugkraft aus der Querkraft vermindert, F_tVd = |V|·cot α (SIA 262:2025, 4.3.3.4.11)'],
-      ['V im Pfahl', 'Bohrpfahl: Fachwerk mit z = 0.9·d, die Wendel zu 70 % von Bügeln (SIA 262:2025, 4.3.3.4.4), α 30° bis 45°, unter Zug ab 40°; Mikropfahl: A_v·f_yd/√3 mit A_v = 2·A/π (SIA 263:2013, 5.1.4.1) – beides mal η_i'],
     ],
-    formel: 'R_a,d = η_a·(R_b,k + R_s,k)/γ_M,a;  R_i,d = η_i·R_mat,d;  R_tr,d = η_a,tr·R_tr,k/γ_M,a',
+    formel: 'R_tr,d = η_a,tr·R_tr,k/γ_M,a',
   },
   schichten: {
     zeilen: [
@@ -98,61 +124,19 @@ function ausVersuch(t) {
   return katalog('pfahl', 'grundlagen').find((g) => g.wert === t.grundlage)?.versuch;
 }
 
-/** Was die Karten der Vorgaben dazu brauchen, je bei ihrer Gruppe: Schalter und Materialien. */
-function situationDazu(t) {
-  const setzen = (schluessel) => (w) => aenderer(t)((x) => { x[schluessel] = w; });
-  // Die Wahl eines Materials: eine Auswahlliste, wie beim Durchstanzen.
-  const material = (schluessel, art, text) => feld(text, materialliste({
-    art, gewaehlt: t[schluessel], titel: text, setzen: setzen(schluessel),
-  }), '');
-  return {
-    'Äusserer Widerstand': {
-      vor: [wahlBlock('Grundlage', schalter(t.grundlage, 'grundlagen', setzen('grundlage'),
-        'Worauf R_a,k beruht – danach richtet sich, wie gross η_a höchstens ist'))],
-    },
-    // Aus einem Versuch trägt der Fuss mit: der Versuch hat den ganzen Pfahl belastet.
-    Fuss: ausVersuch(t) ? {} : {
-      vor: [wahlBlock('Spitzendruck', schalter(t.spitze, 'spitzen', setzen('spitze'),
-        'Ob und wie der Fuss trägt'))],
-      nach: t.spitze === 'rechnen'
-        ? [feld('Abscheren', schalter(t.abscheren, 'abscheren', setzen('abscheren'),
-          'Wie der Boden am Fuss bricht, wenn er drainiert trägt'), '')]
-        : [],
-    },
-    Querschnitt: {
-      vor: t.art === 'bohrpfahl'
-        ? [material('beton', 'beton', 'Beton'), material('stahl', 'betonstahl', 'Längsbewehrung')]
-        : [material('stahl', 'betonstahl', 'Stahl'),
-          feld('Tragglied', schalter(t.tragglied, 'tragglieder', setzen('tragglied'),
-            'Ein Stahlrohr oder ein Vollstab', 'tragglied'), '')],
-    },
-    Querlast: {
-      vor: [feld('Kopf', schalter(t.kopf, 'koepfe', setzen('kopf'),
-        'Wie der Pfahlkopf gehalten ist', 'kopf'), '')],
-    },
-  };
+/** Das Wort einer Stellung, wie der Katalog es nennt: «gerechnet», «frei drehbar». */
+function wortVon(liste, wert) {
+  return katalog('pfahl', liste).find((w) => w.wert === wert)?.beschriftung || '';
 }
 
-function situationPanel(t) {
+function kopfPanel(t) {
   const aendern = aenderer(t);
-  return panel({
-    schluessel: 'pfahl/Situation', titel: 'Pfahl Situation',
-    zusatz: erklaerung(HILFE.situation.zeilen, HILFE.situation.formel),
-  }, [
+  return panel({ schluessel: 'pfahl/Situation', titel: 'Pfahl' }, [
     el('div.unterkapitel', {}, [
       bezeichnung(t, aendern),
       feld('Pfahl', schalter(t.art, 'arten', (w) => aendern((x) => { x.art = w; }),
         'Bohrpfahl aus Stahlbeton oder Mikropfahl mit einem Tragglied aus Stahl'), ''),
-    ]),
-    ...eingabekarten('pfahl', t, aendern, { dazu: situationDazu(t) }),
-    el('div.unterkapitel', {}, [
-      el('div.beschreibung', {}, [
-        el('label', { text: 'Beschreibung' }),
-        el('textarea', {
-          rows: 2, value: t.beschreibung || '',
-          on: { change: (e) => aendern((x) => { x.beschreibung = e.target.value; }) },
-        }),
-      ]),
+      beschreibung(t, aendern),
     ]),
   ]);
 }
@@ -188,11 +172,12 @@ function schichtKarte(t, i) {
   ], { zusatz: weg });
 }
 
-function schichtenPanel(t) {
-  return panel({
-    schluessel: 'pfahl/Schichten', titel: 'Schichten',
-    zusatz: erklaerung(HILFE.schichten.zeilen, HILFE.schichten.formel),
-  }, [
+/** Die Schichten: je eine Karte, vom Terrain an nach unten. */
+const SCHICHTEN = {
+  schluessel: 'schichten',
+  name: 'Schichten', titel: 'Schichten',
+  hilfe: HILFE.schichten,
+  inhalt: (t) => [
     ausVersuch(t) ? el('div.leer', { text: 'R_a,k kommt aus dem Versuch: die Schichten gehen nicht in den äusseren Widerstand ein.' }) : null,
     t.schichten.length ? null : el('div.leer', { text: 'Ohne Schicht lässt sich R_a,k nicht rechnen.' }),
     ...t.schichten.map((_, i) => schichtKarte(t, i)),
@@ -201,8 +186,9 @@ function schichtenPanel(t) {
         x.schichten.push(ausVorlage('pfahlschicht', { name: name(x.schichten) }));
       })),
     ]),
-  ].filter(Boolean));
-}
+  ].filter(Boolean),
+  stand: (t) => zeilenstand(t.schichten, 'Schicht', 'Schichten', 'keine Schicht'),
+};
 
 /** Die Kräfte am Kopf: N_Ed und H_Ed, M_Ed nur am frei drehbaren Kopf -- sonst ist es Reaktion. */
 function kraefte(t) {
@@ -228,24 +214,87 @@ function kombinationZeile(t, i) {
   });
 }
 
-function einwirkungenPanel(t) {
-  return panel({
-    schluessel: 'pfahl/Einwirkungen', titel: 'Einwirkungen',
-    zusatz: erklaerung(HILFE.einwirkungen.zeilen, HILFE.einwirkungen.formel),
-  }, [
-    el('div.unterkapitel', {}, [
-      t.kombinationen.length
-        ? fallkopf(kraefte(t).map(([schluessel]) => [schluessel.replace('_Ed', '_{Ed}'),
-          feldangabe('pfahlkombination', schluessel).einheit]))
-        : el('div.leer', { text: 'Ohne Kombination kein Nachweis.' }),
-      ...t.kombinationen.map((_, i) => kombinationZeile(t, i)),
-      anfuegenKnopf('Kombination', (name) => eintragAendern(t.kennung, (x) => {
-        x.kombinationen.push(ausVorlage('pfahlkombination', { name: name(x.kombinationen) }));
-      })),
-    ]),
-  ]);
+/** Die Kombinationen: je eine Zeile, darunter der Knopf für eine weitere. */
+const EINWIRKUNGEN = {
+  schluessel: 'kombinationen',
+  name: 'Einwirkungen', titel: 'Einwirkungen',
+  hilfe: HILFE.einwirkungen,
+  inhalt: (t) => [el('div.unterkapitel', {}, [
+    t.kombinationen.length
+      ? fallkopf(kraefte(t).map(([schluessel]) => [schluessel.replace('_Ed', '_{Ed}'),
+        feldangabe('pfahlkombination', schluessel).einheit]))
+      : el('div.leer', { text: 'Ohne Kombination kein Nachweis.' }),
+    ...t.kombinationen.map((_, i) => kombinationZeile(t, i)),
+    anfuegenKnopf('Kombination', (name) => eintragAendern(t.kennung, (x) => {
+      x.kombinationen.push(ausVorlage('pfahlkombination', { name: name(x.kombinationen) }));
+    })),
+  ])],
+  stand: (t) => zeilenstand(t.kombinationen, 'Kombination', 'Kombinationen', 'keine Kombination'),
+};
+
+/**
+ * Die Kacheln: je Gruppe der Vorgaben eine, mit den Schaltern und
+ * Materialien, nach denen sie fragt, dazu Schichten und Einwirkungen. Aus
+ * einem Versuch trägt der Fuss mit -- der Versuch hat den ganzen Pfahl
+ * belastet --, und er hat keine Kachel.
+ */
+function kapitel(t) {
+  const aendern = aenderer(t);
+  const vorgaben = eingabegruppen('pfahl', t, aendern);
+  const setzen = (schluessel) => (w) => aendern((x) => { x[schluessel] = w; });
+  // Die Wahl eines Materials: eine Auswahlliste, wie beim Durchstanzen.
+  const material = (schluessel, art, text) => feld(text, materialliste({
+    art, gewaehlt: t[schluessel], titel: text, setzen: setzen(schluessel),
+  }), '');
+  const bohrpfahl = t.art === 'bohrpfahl';
+  const kacheln = [
+    gruppenkapitel(vorgaben, 'Pfahl', { zeichen: 'pfahl', werte: ['D', 'L'], hilfe: HILFE.pfahl }),
+    gruppenkapitel(vorgaben, 'Querschnitt', {
+      zeichen: 'pfahlquerschnitt', werte: ['n', 'phi_l', 'd_a', 't_r'], hilfe: HILFE.querschnitt,
+      vor: bohrpfahl
+        ? [material('beton', 'beton', 'Beton'), material('stahl', 'betonstahl', 'Längsbewehrung')]
+        : [material('stahl', 'betonstahl', 'Stahl'),
+          feld('Tragglied', schalter(t.tragglied, 'tragglieder', setzen('tragglied'),
+            'Ein Stahlrohr oder ein Vollstab', 'tragglied'), '')],
+      fehlt: (bohrpfahl ? fehlendesMaterial('beton', t.beton) : '')
+        || fehlendesMaterial('betonstahl', t.stahl),
+    }),
+    SCHICHTEN,
+    gruppenkapitel(vorgaben, 'Grundwasser', {
+      zeichen: 'grundwasser', werte: ['t_w'], hilfe: HILFE.grundwasser,
+    }),
+    gruppenkapitel(vorgaben, 'Äusserer Widerstand', {
+      zeichen: 'widerstand', wort: wortVon('grundlagen', t.grundlage), werte: ['eta_a'],
+      hilfe: HILFE.aussen,
+      vor: [wahlBlock('Grundlage', schalter(t.grundlage, 'grundlagen', setzen('grundlage'),
+        'Worauf R_a,k beruht – danach richtet sich, wie gross η_a höchstens ist'))],
+    }),
+    gruppenkapitel(vorgaben, 'Fuss', ausVersuch(t) ? { zeichen: 'pfahlfuss' } : {
+      zeichen: 'pfahlfuss', wort: wortVon('spitzen', t.spitze), werte: ['q_b'], hilfe: HILFE.fuss,
+      vor: [wahlBlock('Spitzendruck', schalter(t.spitze, 'spitzen', setzen('spitze'),
+        'Ob und wie der Fuss trägt'))],
+      nach: t.spitze === 'rechnen'
+        ? [feld('Abscheren', schalter(t.abscheren, 'abscheren', setzen('abscheren'),
+          'Wie der Boden am Fuss bricht, wenn er drainiert trägt'), '')]
+        : [],
+    }),
+    gruppenkapitel(vorgaben, 'Querlast', {
+      zeichen: 'querlast', wort: wortVon('koepfe', t.kopf), hilfe: HILFE.querlast,
+      vor: [feld('Kopf', schalter(t.kopf, 'koepfe', setzen('kopf'),
+        'Wie der Pfahlkopf gehalten ist', 'kopf'), '')],
+    }),
+    EINWIRKUNGEN,
+  ];
+  vorgaben.vollstaendig();
+  return [{ titel: '', kapitel: kacheln.filter(Boolean) }];
 }
 
 export function pfahlEditor(t) {
-  return [situationPanel(t), schichtenPanel(t), einwirkungenPanel(t)];
+  return [kopfPanel(t),
+    kapitelPanel(t, kapitel(t), { schluessel: 'pfahl/Kapitel', titel: 'Eingaben' })];
+}
+
+/** Das offene Fenster eines Pfahls -- oder null. */
+export function pfahlFenster(t, schluessel) {
+  return kapitelFenster(t, kapitel(t), schluessel);
 }

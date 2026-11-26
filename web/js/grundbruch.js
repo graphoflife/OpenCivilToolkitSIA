@@ -3,11 +3,13 @@
  *
  * Von oben nach unten:
  *
- *     Grundbruch Situation   Bezeichnung; Boden – drainiert oder undrainiert –,
- *                            Fundament, Gelände und Grundwasser, drainiert
- *                            die Sohlreibung, je als Karte; Beschreibung
- *     Einwirkungen           die Kombinationen: N_Ed normal zur Sohle, T_Ed
- *                            in ihrer Richtung, je mit Schalter
+ *     Grundbruch   Bezeichnung und Beschreibung
+ *     Eingaben     je eine Kachel mit Sinnbild und dem Wichtigsten
+ *                  (Benutzer, 2026-11-25), ein Klick öffnet ihr Fenster:
+ *                  Boden – drainiert oder undrainiert –, Fundament,
+ *                  Gelände und Grundwasser, drainiert die Sohlreibung,
+ *                  die Einwirkungen: N_Ed normal zur Sohle, T_Ed in ihrer
+ *                  Richtung, je Kombination mit Schalter
  *
  * Gerechnet wird nichts: φ_eff, c_eff und γ' – undrainiert s_u,d – unter den
  * Feldern des Bodens kommen aus der Lösung, die Widerstände rechts ebenso.
@@ -19,34 +21,53 @@
  * EINHEITEN UND GRENZEN kommen aus dem Katalog (`katalog.felder`): in
  * welcher Einheit der Kern eine Zahl meint, steht an ihrem Feld im Kern und
  * nur dort. Bis 2026-10-18 stand sie auch hier -- wich sie ab, galt eine
- * Zahl still um 10³ anders, als die Maske sagte. Die Karten mit ihren
+ * Zahl still um 10³ anders, als die Maske sagte. Die Kacheln mit ihren
  * Feldern, Zeichen und Hinweisen sind die Gruppen der Herleitung
  * (`katalog.vorgaben`, opencivil/geotechnik/fundament.py); bis 2026-11-20
  * standen sie hier ein zweites Mal.
  */
 
 import {
-  bezeichnung, eingabekarten, erklaerung, feld, panel, verhaltenSchalter,
+  beschreibung, bezeichnung, eingabegruppen, feld, panel, verhaltenSchalter,
 } from './bausteine.js';
 import { el, zahlfeld } from './dom.js';
 import { anfuegenKnopf, fallkopf, fallzeile } from './faelle.js';
+import {
+  gruppenkapitel, kapitelFenster, kapitelPanel, zeilenstand,
+} from './kapitel.js';
 import { span } from './mathe.js';
 import { ausVorlage, eintragAendern, feldangabe, zustand } from './zustand.js';
 
 const HILFE = {
-  situation: {
+  boden: {
     zeilen: [
       ['φ_eff', 'arctan(tan φ_k / γ_φ) nach SIA 267:2013, 5.3.2.1; γ_φ nach 5.3.2.2, Tabelle 1'],
       ['c_eff', 'c_k / γ_c – die Kohäsion nur, wo sie dauerhaft wirkt (SIA 267:2013, 8.5.1.6)'],
       ['s_u,d', 's_u,k / γ_cu, undrainiert; γ_cu nach SIA 267:2013, 5.3.2.2, Tabelle 1'],
       ['Feinkörnig', 'kurzzeitig undrainiert, langfristig drainiert: je ein Grundbruch für beide (SIA 267:2013, 8.5.1.5, 8.5.1.6)'],
       ['γ', 'eine Raumlast über und unter dem Wasser; das Buch nimmt unter ihm die gesättigte (Kap. 1.4), mit der feuchten wird γ\' etwas kleiner, auf der sicheren Seite'],
-      ['t, t₁', 'ab Oberkante Terrain: bis zur Sohle, bis zum höchsten Grundwasserspiegel'],
-      ['α', 'Neigung der Sohle, positiv, wenn sie in Richtung von T ansteigt (Bild 9.2.15)'],
-      ['β', 'Neigung des Geländes, positiv, wenn es auf der Seite von T abfällt'],
-      ['b, L', 'b ist die kürzere Seite; ein Streifenfundament ist ein sehr langes. Eine Ausmitte rechnet das Werkzeug nicht: bei ausmittiger Last die wirksamen Masse b − 2e und L − 2e eingeben (Kap. 9.2.11; SIA 267:2013, Figur 4)'],
     ],
     formel: "γ' = γ − γ_w",
+  },
+  fundament: {
+    zeilen: [
+      ['b, L', 'b ist die kürzere Seite; ein Streifenfundament ist ein sehr langes. Eine Ausmitte rechnet das Werkzeug nicht: bei ausmittiger Last die wirksamen Masse b − 2e und L − 2e eingeben (Kap. 9.2.11; SIA 267:2013, Figur 4)'],
+      ['t', 'ab Oberkante Terrain bis zur Sohle'],
+      ['α', 'Neigung der Sohle, positiv, wenn sie in Richtung von T ansteigt (Bild 9.2.15)'],
+    ],
+  },
+  gelaende: {
+    zeilen: [
+      ['t₁', 'ab Oberkante Terrain bis zum höchsten Grundwasserspiegel'],
+      ['β', 'Neigung des Geländes, positiv, wenn es auf der Seite von T abfällt'],
+    ],
+  },
+  sohlreibung: {
+    zeilen: [
+      ['δ_k', 'k_δ · φ_k, höchstens 35° (SIA 267:2013, 8.4.1.1)'],
+      ['undrainiert', 'gleitet das Fundament im Boden: T_Rd = b · L · s_u,d, Gl. (32) – ohne Sohlreibung'],
+    ],
+    formel: 'tan δ_d = tan δ_k / γ_φ',
   },
   einwirkungen: {
     zeilen: [
@@ -79,35 +100,10 @@ function bemessungswerte(g) {
   ]);
 }
 
-function situationPanel(g) {
+function kopfPanel(g) {
   const aendern = (veraenderer) => eintragAendern(g.kennung, veraenderer);
-  return panel({
-    schluessel: 'grundbruch/Situation', titel: 'Grundbruch Situation',
-    zusatz: erklaerung(HILFE.situation.zeilen, HILFE.situation.formel),
-  }, [
-    el('div.unterkapitel', {}, [
-      bezeichnung(g, aendern),
-    ]),
-    // Welche Felder das Verhalten liest, sagt der Kern (Benutzer, 2026-11-19:
-    // was nicht gilt, steht nicht da) -- bis dahin hiess φ = 0 undrainiert.
-    ...eingabekarten('grundbruch', g, aendern, {
-      dazu: {
-        Boden: {
-          vor: [feld('Verhalten', verhaltenSchalter(g.verhalten,
-            (w) => aendern((x) => { x.verhalten = w; })), '')],
-          nach: [bemessungswerte(g)],
-        },
-      },
-    }),
-    el('div.unterkapitel', {}, [
-      el('div.beschreibung', {}, [
-        el('label', { text: 'Beschreibung' }),
-        el('textarea', {
-          rows: 2, value: g.beschreibung || '',
-          on: { change: (e) => aendern((x) => { x.beschreibung = e.target.value; }) },
-        }),
-      ]),
-    ]),
+  return panel({ schluessel: 'grundbruch/Situation', titel: 'Grundbruch' }, [
+    el('div.unterkapitel', {}, [bezeichnung(g, aendern), beschreibung(g, aendern)]),
   ]);
 }
 
@@ -128,24 +124,61 @@ function kombinationZeile(g, i) {
   });
 }
 
-function einwirkungenPanel(g) {
-  return panel({
-    schluessel: 'grundbruch/Einwirkungen', titel: 'Einwirkungen',
-    zusatz: erklaerung(HILFE.einwirkungen.zeilen, HILFE.einwirkungen.formel),
-  }, [
-    el('div.unterkapitel', {}, [
-      g.kombinationen.length
-        ? fallkopf([['N_{Ed}', 'N_Ed'], ['T_{Ed}', 'T_Ed']].map(
-          ([zeichen, s]) => [zeichen, feldangabe('grundbruchkombination', s).einheit]))
-        : el('div.leer', { text: 'Ohne Kombination kein Nachweis.' }),
-      ...g.kombinationen.map((_, i) => kombinationZeile(g, i)),
-      anfuegenKnopf('Kombination', (name) => eintragAendern(g.kennung, (x) => {
-        x.kombinationen.push(ausVorlage('grundbruchkombination', { name: name(x.kombinationen) }));
-      })),
-    ]),
-  ]);
+/** Die Kombinationen: je eine Zeile, darunter der Knopf für eine weitere. */
+const EINWIRKUNGEN = {
+  schluessel: 'kombinationen',
+  name: 'Einwirkungen', titel: 'Einwirkungen',
+  hilfe: HILFE.einwirkungen,
+  inhalt: (g) => [el('div.unterkapitel', {}, [
+    g.kombinationen.length
+      ? fallkopf([['N_{Ed}', 'N_Ed'], ['T_{Ed}', 'T_Ed']].map(
+        ([zeichen, s]) => [zeichen, feldangabe('grundbruchkombination', s).einheit]))
+      : el('div.leer', { text: 'Ohne Kombination kein Nachweis.' }),
+    ...g.kombinationen.map((_, i) => kombinationZeile(g, i)),
+    anfuegenKnopf('Kombination', (name) => eintragAendern(g.kennung, (x) => {
+      x.kombinationen.push(ausVorlage('grundbruchkombination', { name: name(x.kombinationen) }));
+    })),
+  ])],
+  stand: (g) => zeilenstand(g.kombinationen, 'Kombination', 'Kombinationen', 'keine Kombination'),
+};
+
+/**
+ * Die Kacheln: je Gruppe der Vorgaben eine, dazu die Einwirkungen. Welche
+ * Felder das Verhalten liest, sagt der Kern (Benutzer, 2026-11-19: was
+ * nicht gilt, steht nicht da) -- bis dahin hiess φ = 0 undrainiert.
+ * Undrainiert hat die Sohlreibung nichts zu zeigen und keine Kachel.
+ */
+function kapitel(g) {
+  const aendern = (veraenderer) => eintragAendern(g.kennung, veraenderer);
+  const vorgaben = eingabegruppen('grundbruch', g, aendern);
+  const kacheln = [
+    gruppenkapitel(vorgaben, 'Boden', {
+      zeichen: 'boden', werte: ['phi_k', 'c_k', 's_u'], hilfe: HILFE.boden,
+      vor: [feld('Verhalten', verhaltenSchalter(g.verhalten,
+        (w) => aendern((x) => { x.verhalten = w; })), '')],
+      nach: [bemessungswerte(g)],
+    }),
+    gruppenkapitel(vorgaben, 'Fundament', {
+      zeichen: 'fundament', werte: ['b', 'L'], hilfe: HILFE.fundament,
+    }),
+    gruppenkapitel(vorgaben, 'Gelände und Grundwasser', {
+      zeichen: 'gelaende', werte: ['t1', 'beta'], hilfe: HILFE.gelaende,
+    }),
+    gruppenkapitel(vorgaben, 'Sohlreibung', {
+      zeichen: 'sohlreibung', werte: ['delta_faktor'], hilfe: HILFE.sohlreibung,
+    }),
+    EINWIRKUNGEN,
+  ];
+  vorgaben.vollstaendig();
+  return [{ titel: '', kapitel: kacheln.filter(Boolean) }];
 }
 
 export function grundbruchEditor(g) {
-  return [situationPanel(g), einwirkungenPanel(g)];
+  return [kopfPanel(g),
+    kapitelPanel(g, kapitel(g), { schluessel: 'grundbruch/Kapitel', titel: 'Eingaben' })];
+}
+
+/** Das offene Fenster eines Grundbruchs -- oder null. */
+export function grundbruchFenster(g, schluessel) {
+  return kapitelFenster(g, kapitel(g), schluessel);
 }

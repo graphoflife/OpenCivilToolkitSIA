@@ -7,6 +7,46 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-26 · Kacheln für Durchstanzen, Grundbruch, Setzung, Pfähle und Erdbeben
+
+Vom Benutzer gewünscht (2026-11-25).
+
+- Vorher hatten diese fünf Apps eine lange Spalte mit allen Karten
+  untereinander. Nachher steht oben ein Kopf mit Bezeichnung, der Wahl der
+  Art (Decke oder Bodenplatte, die Art des Pfahls) und der Beschreibung,
+  darunter die Kacheln «Eingaben» wie bei Platte und Querschnittsanalyse:
+  je Kachel ein Bild, der Name und das Wichtigste, etwa «Boden – φ_k =
+  30°, c_k = 0 kN/m²». Ein Klick öffnet ihr Fenster mit genau diesen
+  Feldern.
+  - Durchstanzen: Gestützte Fläche, Platte, Biegebewehrung,
+    Plattenrotation, Einwirkung. Der Grundriss bleibt offen über den
+    Kacheln.
+  - Grundbruch: Boden, Fundament, Gelände und Grundwasser, Sohlreibung,
+    Einwirkungen.
+  - Setzung: Fundament, Pressung in der Sohle, Schichten, Nachweis.
+  - Pfahl: Pfahl, Querschnitt, Schichten, Grundwasser, Äusserer
+    Widerstand, Fuss, Querlast, Einwirkungen.
+  - Erdbeben: Standort und Bauwerk, Verhaltensbeiwert, Grundschwingzeit,
+    Regelmässigkeit, Geschosse, Wände.
+- Je Gruppe der Vorgaben des Kerns eine Kachel (`gruppenkapitel` in
+  `kapitel.js`): Felder, Zeichen und Einheiten kommen weiter aus dem Kern,
+  und `vollstaendig()` meldet eine Gruppe, die keine Kachel hat. Eine
+  Gruppe, die in der gewählten Stellung kein Feld hat, gibt keine Kachel:
+  undrainiert die Sohlreibung; am Pfahl der Fuss, wenn der äussere
+  Widerstand aus einem Versuch kommt – der Versuch hat den Fuss schon
+  mitbelastet.
+- Was fehlt, steht grau auf der Kachel: «kein Beton», «keine
+  Kombination», «keine Schicht», bei den Wänden der Grund der ersten, die
+  nicht rechnet.
+- Abweichung vom Plan: Bild und Kurzstand einer Kachel stehen in der
+  Maske, nicht an der `Gruppe` des Kerns. Sie sagen nichts über die
+  Rechnung; die Felder, die der Kurzstand zeigt, nennt die Maske mit ihren
+  Kurznamen, Zeichen und Einheit holt sie vom Kern.
+- Die Beschreibung ist ein Baustein für alle Apps (`beschreibung` in
+  `bausteine.js`); `eingabekarten` ist weg. 21 neue Bilder stehen in
+  `sinnbilder.js` unter «Die Kacheln der Eingaben».
+- Keine Zahl einer Rechnung ändert sich; der Bericht bleibt gleich.
+
 ## 2026-11-26 · Platte: Betonstahl einmal oben, A_s je Lage; Kennzahlen mit Auge und Kopierknöpfen
 
 Vom Benutzer gewünscht (2026-11-25).

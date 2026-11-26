@@ -19,7 +19,8 @@
  */
 
 import {
-  bezeichnung, erklaerung, feld, karte, klappgruppe, panel, tabelle, wahlBlock, wahlSchalter,
+  beschreibung, bezeichnung, erklaerung, feld, karte, klappgruppe, panel, tabelle, wahlBlock,
+  wahlSchalter,
 } from './bausteine.js';
 import { zahlText } from './cad_ansicht.js';
 import { listengruppen, listenzeilen, meldungsliste } from './cad_app.js';
@@ -136,15 +137,7 @@ function deckeGruppe(decke) {
   }, [
     bezeichnung(decke, aendern, erklaerung(HILFE.decke.zeilen, HILFE.decke.formel)),
     zeichenbereich(decke, liste),
-    el('div.unterkapitel', {}, [
-      el('div.beschreibung', {}, [
-        el('label', { text: 'Beschreibung' }),
-        el('textarea', {
-          rows: 2, value: decke.beschreibung || '',
-          on: { change: (e) => aendern((d) => { d.beschreibung = e.target.value; }) },
-        }),
-      ]),
-    ]),
+    el('div.unterkapitel', {}, [beschreibung(decke, aendern)]),
   ]);
 }
 

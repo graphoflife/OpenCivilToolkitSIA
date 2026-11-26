@@ -24,7 +24,8 @@
 
 import { formelText } from './achsen.js';
 import {
-  bauteilliste, bezeichnung, erklaerung, feld, materialliste, namensfeld, panel, wahlBlock, wahlSchalter,
+  bauteilliste, beschreibung, bezeichnung, erklaerung, feld, materialliste, namensfeld, panel,
+  wahlBlock, wahlSchalter,
 } from './bausteine.js';
 import {
   knotenlastart, lagertext, lastart, lastrichtung, materialname, systemart, systemkatalog, systemliste,
@@ -125,13 +126,7 @@ function systemGruppe(system) {
     zeichenbereich(system, uebersicht),
     el('div.unterkapitel', {}, [
       el('details.bs-vorzeichen-huelle', {}, [el('summary', { text: 'Vorzeichen' }), t.vorzeichenbild()]),
-      el('div.beschreibung', {}, [
-        el('label', { text: 'Beschreibung' }),
-        el('textarea', {
-          rows: 2, value: system.beschreibung || '',
-          on: { change: (e) => aendern((s) => { s.beschreibung = e.target.value; }) },
-        }),
-      ]),
+      beschreibung(system, aendern),
     ]),
   ]);
 }

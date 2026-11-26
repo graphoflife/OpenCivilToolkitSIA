@@ -14,7 +14,7 @@
  */
 
 import {
-  bezeichnung, feld, panel, wahlSchalter, zweiSchalter,
+  beschreibung, bezeichnung, feld, panel, wahlSchalter, zweiSchalter,
 } from './bausteine.js';
 import { auswahl, el, zahlfeld } from './dom.js';
 import { span } from './mathe.js';
@@ -286,15 +286,7 @@ export function plattenEditor(querschnitt) {
         // Vergrösserungsfaktors steht im Fenster der Verformung.
         // Freier Text, der in keine Rechnung eingeht. Ohne ein solches Feld
         // landen solche Sätze im Namen der Platte.
-        el('div.beschreibung', {}, [
-          el('label', { text: 'Beschreibung' }),
-          el('textarea', {
-            rows: 3, value: querschnitt.beschreibung || '',
-            on: {
-              change: (e) => aendern((q) => { q.beschreibung = e.target.value; }),
-            },
-          }),
-        ]),
+        beschreibung(querschnitt, aendern, { zeilen: 3 }),
       ]),
     ]),
 

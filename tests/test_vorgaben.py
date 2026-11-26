@@ -27,7 +27,7 @@ def herleitung(rechnung):
 
 
 def maske(klasse, eintrag, gelesen=None):
-    """Was die Maske eines Eintrags zeigt, wie `eingabekarten` es auswählt: Karte und Feld."""
+    """Was die Maske eines Eintrags zeigt, wie `eingabegruppen` es auswählt: Gruppe und Feld."""
     return [(g["titel"], f["feld"]) for g in katalog()["vorgaben"][klasse]
             for f in g["felder"]["|".join(str(eintrag[n]) for n in g["nach"])]
             if gelesen is None or f["feld"] in gelesen]

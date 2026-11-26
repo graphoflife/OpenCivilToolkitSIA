@@ -23,11 +23,17 @@
  *   stand(e)     die kleine Zeile des Knopfs: {an, text}
  *
  * `e` ist der Eintrag des Bauteils, wie er im Projekt steht.
+ *
+ * Wo die Eingaben eines Bauteils selbst Kacheln sind -- Durchstanzen,
+ * Grundbruch, Setzung, Pfahl, Erdbeben (Benutzer, 2026-11-25) --, wird
+ * jede Gruppe der Vorgaben des Kerns ein Kapitel (`gruppenkapitel`): ihr
+ * Titel, ihre Felder, auf der Kachel klein ihre wichtigsten Werte.
  */
 
-import { erklaerung, panel } from './bausteine.js';
+import { erklaerung, karte, panel } from './bausteine.js';
 import { el } from './dom.js';
 import { fenster, fensterOeffnen } from './fenster.js';
+import { span } from './mathe.js';
 import { sinnbild } from './sinnbilder.js';
 
 /** «1 Einwirkung», «3 Einwirkungen». */
@@ -86,6 +92,43 @@ function mitIndex(text) {
   return text.split(/_(\w+)/).map((teil, i) => (i % 2 ? el('sub', { text: teil }) : teil));
 }
 
+/**
+ * Eine Gruppe der Vorgaben als Kapitel. `vorgaben` sind die Gruppen des
+ * Eintrags (`eingabegruppen` in bausteine.js), `titel` die Gruppe. Auf der
+ * Kachel stehen ihr Sinnbild `zeichen`, ihr Titel -- oder `name`, wo ein
+ * Wort einen weichen Trennstrich braucht -- und klein darunter `wort` und
+ * die Werte der Felder `werte`, soweit sie gelten: «φ_k = 30°, c_k = 0
+ * kN/m²». Das Fenster heisst wie die Gruppe oder `fenster` und zeigt `vor`,
+ * ihre Zeilen und `nach`. `fehlt` sagt grau auf der Kachel, was ihr noch
+ * fehlt, etwa «kein Beton».
+ *
+ * Eine Gruppe, die nach den Wahlen nichts zu zeigen hat, wird keine Kachel
+ * (null) -- etwa die Sohlreibung im undrainierten Boden.
+ */
+export function gruppenkapitel(vorgaben, titel, {
+  zeichen, name = titel, fenster: fenstertitel = titel, wort = '', werte = [], vor = [],
+  nach = [], hilfe = null, fehlt = '',
+}) {
+  const zeilen = [...vor, ...vorgaben.zeilen(titel), ...nach].filter(Boolean);
+  if (!zeilen.length) return null;
+  const teile = [wort, ...vorgaben.werte(titel, werte).map(kachelwert)].filter(Boolean);
+  return {
+    schluessel: zeichen,
+    name,
+    titel: fenstertitel,
+    hilfe,
+    inhalt: () => [karte('', zeilen)],
+    stand: () => standOhne({ an: true, text: teile.flatMap((t, i) => (i ? [', ', t] : [t])) }, fehlt),
+  };
+}
+
+/** Ein Wert auf einer Kachel: «φ_k = 30°» -- er bricht nicht um, nur zwischen zweien. */
+function kachelwert({ zeichen, wert, einheit }) {
+  return el('span.kachel-wert', {}, [
+    span(`${zeichen} = ${wert}`), einheit === '°' || !einheit ? einheit : ` ${einheit}`,
+  ]);
+}
+
 function kachel(eintrag, kapitel) {
   const { an, text } = kapitel.stand(eintrag);
   return el('button.kachel', {
@@ -95,17 +138,18 @@ function kachel(eintrag, kapitel) {
   }, [
     sinnbild(kapitel.schluessel),
     el('span.kachel-name', {}, mitIndex(kapitel.name)),
-    el('span.kachel-stand', { text }),
+    el('span.kachel-stand', {}, Array.isArray(text) ? text : [text]),
   ]);
 }
 
 /**
  * Das Panel der Knöpfe: je Gruppe `{titel, kapitel}` eine Überschrift und
- * ihre Knöpfe. `schluessel` merkt sich, ob das Panel zugeklappt ist.
+ * ihre Knöpfe -- ohne Titel ohne Überschrift. `schluessel` merkt sich, ob
+ * das Panel zugeklappt ist.
  */
 export function kapitelPanel(eintrag, gruppen, { schluessel, titel }) {
   return panel({ schluessel, titel }, gruppen.flatMap((g) => [
-    el('div.kachel-gruppe', { text: g.titel }),
+    g.titel ? el('div.kachel-gruppe', { text: g.titel }) : null,
     el('div.kacheln', {}, g.kapitel.map((k) => kachel(eintrag, k))),
   ]));
 }

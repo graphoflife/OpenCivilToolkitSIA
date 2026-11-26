@@ -409,7 +409,9 @@ empfohlenen Reihenfolge, 3 und 4 nach den kleinen.
         (2026-11-20): `stelle.VORGABEN`; die Maske verteilt die Gruppen auf
         ihre Tafeln (`eingabegruppen`) und meldet eine, die keinen Platz hat.
         `MASSE` und `ROTATION` sind weg, a_x heisst überall «vom linken
-        (Platten)rand». Damit erledigt.
+        (Platten)rand». Damit erledigt. Seit 2026-11-26 wird jede Gruppe
+        eine Kachel (`gruppenkapitel` in `kapitel.js`); `eingabekarten` ist
+        weg.
       - Bilder tippen Einheiten: `GROESSEN` in `pf_verlauf.js` spiegelt
         `VERLAEUFE` samt Grenzschlüsseln (eine umbenannte Grösse
         verschwindet still), `platte_bilder.js` rund 35 Einheiten, die

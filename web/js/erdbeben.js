@@ -3,12 +3,14 @@
  *
  * Von oben nach unten:
  *
- *     Erdbeben Gebäude    Bezeichnung; Standort und Bauwerk, Verhaltensbeiwert,
- *                         Grundschwingzeit und Regelmässigkeit je als Karte;
- *                         Beschreibung
- *     Geschosse           von unten nach oben: Höhe, G_k, Q_k und ψ₂
- *     Wände               je eine oder mehrere gleiche: Querschnittsanalyse,
- *                         Lage im Grundriss, Anzahl und η_EI
+ *     Gebäude    Bezeichnung und Beschreibung
+ *     Eingaben   je eine Kachel mit Sinnbild und dem Wichtigsten
+ *                (Benutzer, 2026-11-25), ein Klick öffnet ihr Fenster:
+ *                Standort und Bauwerk, Verhaltensbeiwert, Grundschwingzeit,
+ *                Regelmässigkeit, die Geschosse von unten nach oben --
+ *                Höhe, G_k, Q_k und ψ₂ -- und die Wände, je eine oder
+ *                mehrere gleiche: Querschnittsanalyse, Lage im Grundriss,
+ *                Anzahl und η_EI
  *
  * Gerechnet wird nichts: die Kräfte stehen rechts in der Zusammenfassung und
  * im Bild unter «Diagramme». Felder, Zeichen, Einheiten und Grenzen kommen
@@ -20,28 +22,37 @@
  */
 
 import {
-  bauteilliste, bezeichnung, eingabekarten, erklaerung, karte, mitBild, panel,
+  bauteilliste, beschreibung, bezeichnung, eingabegruppen, karte, mitBild, panel,
   vorgabefelder, vorgabetitel, wahlBlock, wahlSchalter,
 } from './bausteine.js';
 import { el, zahlfeld } from './dom.js';
 import { anfuegenKnopf, fallkopf, fallzeile } from './faelle.js';
 import {
+  gruppenkapitel, kapitelFenster, kapitelPanel, standOhne, zeilenstand,
+} from './kapitel.js';
+import {
   ausVorlage, eintragAendern, feldangabe, istSandbox, katalog, zustand,
 } from './zustand.js';
 
 const HILFE = {
-  gebaeude: {
+  standort: {
     zeilen: [
       ['Zone', 'die Erdbebenzone des Standorts – sie gibt a_gd (16.2.1)'],
       ['Baugrund', 'die Klasse A bis E – sie gibt S, T_B, T_C und T_D (Tabelle 24); für F '
         + 'braucht es eine Standortstudie'],
       ['BWK', 'die Bauwerksklasse I bis III – sie gibt γ_f (Tabelle 25)'],
-      ['q', 'der Verhaltensbeiwert je Richtung: wie duktil das Tragwerk ist'],
-      ['T₁', 'aus der Auslenkung der Wände (40) oder von Hand'],
-      ['regelmässig', 'nur dann gilt das Ersatzkraftverfahren (16.5.2.1), sonst das '
-        + 'Antwortspektrenverfahren (16.5.3.1)'],
     ],
     formel: 'F_d = S_d(T₁)·ΣW',
+  },
+  verhalten: {
+    zeilen: [['q', 'der Verhaltensbeiwert je Richtung: wie duktil das Tragwerk ist']],
+  },
+  schwingzeit: {
+    zeilen: [['T₁', 'aus der Auslenkung der Wände (40) oder von Hand']],
+  },
+  regelmaessigkeit: {
+    zeilen: [['regelmässig', 'nur dann gilt das Ersatzkraftverfahren (16.5.2.1), sonst das '
+      + 'Antwortspektrenverfahren (16.5.3.1)']],
   },
   geschosse: {
     zeilen: [
@@ -83,40 +94,59 @@ function regelmaessigkeit(h, aendern, r) {
   ]);
 }
 
-function gebaeudePanel(h) {
+function kopfPanel(h) {
   const aendern = (veraenderer) => eintragAendern(h.kennung, veraenderer);
-  return panel({
-    schluessel: 'erdbeben/Gebäude', titel: 'Erdbeben Gebäude',
-    zusatz: erklaerung(HILFE.gebaeude.zeilen, HILFE.gebaeude.formel),
-  }, [
-    el('div.unterkapitel', {}, [bezeichnung(h, aendern)]),
-    karte('Standort und Bauwerk', [
+  return panel({ schluessel: 'erdbeben/Gebäude', titel: 'Gebäude' }, [
+    el('div.unterkapitel', {}, [bezeichnung(h, aendern), beschreibung(h, aendern)]),
+  ]);
+}
+
+/** Das Wort einer Stellung, wie der Katalog es nennt: «Z2», «aus den Wänden». */
+function wortVon(liste, wert) {
+  return katalog('erdbeben', liste).find((w) => w.wert === wert)?.beschriftung || '';
+}
+
+/** Zone, Baugrund und Bauwerksklasse: je ein Schalter. */
+const STANDORT = {
+  schluessel: 'standort',
+  name: 'Standort und Bauwerk', titel: 'Standort und Bauwerk',
+  hilfe: HILFE.standort,
+  inhalt: (h) => {
+    const aendern = (veraenderer) => eintragAendern(h.kennung, veraenderer);
+    return [karte('', [
       wahlBlock('Erdbebenzone', wahl(h, aendern, 'zonen', 'zone', 'Die Zone des Standorts')),
       wahlBlock('Baugrundklasse', wahl(h, aendern, 'baugrund', 'baugrund',
         'Die Klasse des Baugrunds unter dem Gebäude')),
       wahlBlock('Bauwerksklasse', wahl(h, aendern, 'bauwerksklassen', 'bauwerksklasse',
         'Wie wichtig das Gebäude nach einem Beben ist')),
-    ]),
-    ...eingabekarten('erdbeben', h, aendern, {
-      dazu: {
-        Grundschwingzeit: {
-          vor: [wahl(h, aendern, 'schwingzeiten', 'schwingzeit', 'Woher die Grundschwingzeit T₁ kommt')],
-        },
-      },
-    }),
-    karte('Regelmässigkeit', katalog('erdbeben', 'regelmaessigkeit')
-      .map((r) => regelmaessigkeit(h, aendern, r))),
-    el('div.unterkapitel', {}, [
-      el('div.beschreibung', {}, [
-        el('label', { text: 'Beschreibung' }),
-        el('textarea', {
-          rows: 2, value: h.beschreibung || '',
-          on: { change: (e) => aendern((x) => { x.beschreibung = e.target.value; }) },
-        }),
-      ]),
-    ]),
-  ]);
-}
+    ])];
+  },
+  stand: (h) => ({
+    an: true,
+    text: `Zone ${wortVon('zonen', h.zone)}, Baugrund ${wortVon('baugrund', h.baugrund)}, `
+      + `BWK ${wortVon('bauwerksklassen', h.bauwerksklasse)}`,
+  }),
+};
+
+/**
+ * Grund- und Aufriss, je ja oder nein. Ist einer nicht regelmässig, gilt
+ * das Ersatzkraftverfahren nicht: die Kachel sagt es grau.
+ */
+const REGELMAESSIGKEIT = {
+  schluessel: 'regelmaessigkeit',
+  name: 'Regel\u00admässigkeit', titel: 'Regelmässigkeit',
+  hilfe: HILFE.regelmaessigkeit,
+  inhalt: (h) => {
+    const aendern = (veraenderer) => eintragAendern(h.kennung, veraenderer);
+    return [karte('', katalog('erdbeben', 'regelmaessigkeit')
+      .map((r) => regelmaessigkeit(h, aendern, r)))];
+  },
+  stand: (h) => {
+    const nicht = katalog('erdbeben', 'regelmaessigkeit').find((r) => !h[r.feld]);
+    return nicht ? { an: false, text: `${nicht.beschriftung}: nein` }
+      : { an: true, text: 'regelmässig' };
+  },
+};
 
 /** Die Zahlen einer Zeile, je ein Feld der Vorgaben von `klasse`. */
 function zahlen(klasse, teil, aendern) {
@@ -143,32 +173,44 @@ function geschossZeile(h, i) {
   });
 }
 
-function geschossePanel(h) {
-  return panel({
-    schluessel: 'erdbeben/Geschosse', titel: 'Geschosse',
-    zusatz: erklaerung(HILFE.geschosse.zeilen, HILFE.geschosse.formel),
-  }, [
-    el('div.unterkapitel', {}, [
-      h.geschosse.length
-        ? [el('div.eb-folge', { text: 'Von unten nach oben, ab der Einspannung' }),
-          fallkopf(koepfe('geschoss', h.geschosse[0]))]
-        : el('div.leer', { text: 'Noch kein Geschoss – ohne Geschoss keine Ersatzkraft.' }),
-      ...h.geschosse.map((_, i) => geschossZeile(h, i)),
-      anfuegenKnopf('Geschoss', (name) => eintragAendern(h.kennung, (x) => {
-        x.geschosse.push(ausVorlage('geschoss', { name: name(x.geschosse) }));
-      })),
-    ].flat()),
-  ]);
-}
+/** Die Geschosse: je eine Zeile, von unten nach oben. */
+const GESCHOSSE = {
+  schluessel: 'geschosse',
+  name: 'Geschosse', titel: 'Geschosse',
+  hilfe: HILFE.geschosse,
+  inhalt: (h) => [el('div.unterkapitel', {}, [
+    h.geschosse.length
+      ? [el('div.eb-folge', { text: 'Von unten nach oben, ab der Einspannung' }),
+        fallkopf(koepfe('geschoss', h.geschosse[0]))]
+      : el('div.leer', { text: 'Noch kein Geschoss – ohne Geschoss keine Ersatzkraft.' }),
+    ...h.geschosse.map((_, i) => geschossZeile(h, i)),
+    anfuegenKnopf('Geschoss', (name) => eintragAendern(h.kennung, (x) => {
+      x.geschosse.push(ausVorlage('geschoss', { name: name(x.geschosse) }));
+    })),
+  ].flat())],
+  stand: (h) => zeilenstand(h.geschosse, 'Geschoss', 'Geschosse', 'kein Geschoss'),
+};
 
 /**
  * Was der Kern zu einer Wand sagt -- nur, wenn es zu ihrer jetzigen
  * Querschnittsanalyse gehört: nach einer anderen Wahl gilt es nicht mehr.
  */
-function wandmeldung(h, i) {
+function wandbefund(h, i) {
   const m = zustand.loesung?.zeichendaten?.[h.kennung]?.waende?.[i];
-  if (!m || m.analyse !== h.waende[i].analyse) return null;
+  return m && m.analyse === h.waende[i].analyse ? m : null;
+}
+
+/** Die Meldung an der Wand: rot, was falsch ist, grau, was nur fehlt. */
+function wandmeldung(h, i) {
+  const m = wandbefund(h, i);
+  if (!m) return null;
   return el('div.qa-meldung', { text: `${m.grund[0].toUpperCase()}${m.grund.slice(1)}.`, class: m.fehler ? '' : 'ist-hinweis' });
+}
+
+/** Dieselbe Meldung kurz für die Kachel: «Wand 2: …» -- oder nichts. */
+function wandmeldungstext(h, i) {
+  const m = wandbefund(h, i);
+  return m ? `${h.waende[i].name}: ${m.grund}` : '';
 }
 
 function wandZeile(h, i) {
@@ -197,23 +239,59 @@ function wandZeile(h, i) {
   });
 }
 
-function waendePanel(h) {
-  return panel({
-    schluessel: 'erdbeben/Wände', titel: 'Wände',
-    zusatz: erklaerung(HILFE.waende.zeilen, HILFE.waende.formel),
-  }, [
-    el('div.unterkapitel', {}, [
-      h.waende.length
-        ? fallkopf(koepfe('tragwand', h.waende[0]), { spalten: 4 })
-        : el('div.leer', { text: 'Noch keine Wand – ohne Wand gilt nur T₁ von Hand, und die Kräfte bleiben ohne Verteilung.' }),
-      ...h.waende.map((_, i) => wandZeile(h, i)),
-      anfuegenKnopf('Wand', (name) => eintragAendern(h.kennung, (x) => {
-        x.waende.push(ausVorlage('tragwand', { name: name(x.waende) }));
-      })),
-    ]),
-  ]);
+/**
+ * Die Wände: je eine Zeile mit ihrer Querschnittsanalyse. Was der Kern zu
+ * einer Wand sagt, steht an ihr -- und das erste davon grau auf der Kachel.
+ */
+const WAENDE = {
+  schluessel: 'waende',
+  name: 'Wände', titel: 'Wände',
+  hilfe: HILFE.waende,
+  inhalt: (h) => [el('div.unterkapitel', {}, [
+    h.waende.length
+      ? fallkopf(koepfe('tragwand', h.waende[0]), { spalten: 4 })
+      : el('div.leer', { text: 'Noch keine Wand – ohne Wand gilt nur T₁ von Hand, und die Kräfte bleiben ohne Verteilung.' }),
+    ...h.waende.map((_, i) => wandZeile(h, i)),
+    anfuegenKnopf('Wand', (name) => eintragAendern(h.kennung, (x) => {
+      x.waende.push(ausVorlage('tragwand', { name: name(x.waende) }));
+    })),
+  ])],
+  stand: (h) => {
+    const meldung = h.waende.map((_, i) => wandmeldungstext(h, i)).find(Boolean);
+    return standOhne(zeilenstand(h.waende, 'Wand', 'Wände', 'keine Wand'), meldung);
+  },
+};
+
+/** Die Kacheln: Standort, je Gruppe der Vorgaben eine, Regelmässigkeit, Geschosse, Wände. */
+function kapitel(h) {
+  const aendern = (veraenderer) => eintragAendern(h.kennung, veraenderer);
+  const vorgaben = eingabegruppen('erdbeben', h, aendern);
+  const kacheln = [
+    STANDORT,
+    gruppenkapitel(vorgaben, 'Verhaltensbeiwert', {
+      zeichen: 'verhaltensbeiwert', name: 'Verhaltens\u00adbeiwert', werte: ['q_x', 'q_y'],
+      hilfe: HILFE.verhalten,
+    }),
+    gruppenkapitel(vorgaben, 'Grundschwingzeit', {
+      zeichen: 'schwingzeit', name: 'Grund\u00adschwingzeit',
+      wort: h.schwingzeit === 'hand' ? '' : wortVon('schwingzeiten', h.schwingzeit),
+      werte: ['T1_x', 'T1_y'], hilfe: HILFE.schwingzeit,
+      vor: [wahl(h, aendern, 'schwingzeiten', 'schwingzeit', 'Woher die Grundschwingzeit T₁ kommt')],
+    }),
+    REGELMAESSIGKEIT,
+    GESCHOSSE,
+    WAENDE,
+  ];
+  vorgaben.vollstaendig();
+  return [{ titel: '', kapitel: kacheln.filter(Boolean) }];
 }
 
 export function erdbebenEditor(h) {
-  return [gebaeudePanel(h), geschossePanel(h), waendePanel(h)];
+  return [kopfPanel(h),
+    kapitelPanel(h, kapitel(h), { schluessel: 'erdbeben/Kapitel', titel: 'Eingaben' })];
+}
+
+/** Das offene Fenster eines Gebäudes -- oder null. */
+export function erdbebenFenster(h, schluessel) {
+  return kapitelFenster(h, kapitel(h), schluessel);
 }

@@ -3,19 +3,23 @@
  *
  * Von oben nach unten:
  *
- *     Durchstanzstelle   Bezeichnung; Decke oder Bodenplatte; Lage der
- *                        gestützten Fläche, Form und Masse, Randabstände
- *     Grundriss          das Zeichenfenster: Aussparungen (ds_zeichnung.js)
- *     Platte             Dicke, Überdeckung, Grösstkorn, Beton und Stahl
- *     Biegebewehrung     ⌀ und Abstand je Richtung, welche Lage aussen liegt
- *     Plattenrotation    Näherungsstufe; Spannweiten oder r_s und m_sd
- *     Einwirkung         V_d, die Flächenlast im Schnitt, k_e
+ *     Durchstanzstelle   Bezeichnung; Decke oder Bodenplatte; Beschreibung
+ *     Grundriss          das Zeichenfenster: Aussparungen (ds_zeichnung.js),
+ *                        offen über den Kacheln
+ *     Eingaben           je eine Kachel mit Sinnbild und dem Wichtigsten
+ *                        (Benutzer, 2026-11-25), ein Klick öffnet ihr
+ *                        Fenster:
+ *       Gestützte Fläche   Lage, Form und Masse, Randabstände
+ *       Platte             Dicke, Überdeckung, Grösstkorn, Beton und Stahl
+ *       Biegebewehrung     ⌀ und Abstand je Richtung, welche Lage aussen liegt
+ *       Plattenrotation    Näherungsstufe; Spannweiten oder r_s und m_sd
+ *       Einwirkung         V_d, die Flächenlast im Schnitt, k_e
  *
  * Gerechnet wird nichts: Nachweisschnitt, Rotation und Widerstand stehen
  * rechts in der Zusammenfassung, der Grundriss unter «Diagramme». Die Felder
  * mit Zeichen und Hinweisen kommen aus dem Kern, je Gruppe der Herleitung
  * (`katalog.vorgaben`, opencivil/durchstanzen/stelle.py); hier steht nur,
- * auf welcher Tafel eine Gruppe steht. Einheiten und Grenzen kommen aus dem
+ * auf welcher Kachel eine Gruppe steht. Einheiten und Grenzen kommen aus dem
  * Katalog (`katalog.felder.durchstanz`), die Stellungen der Schalter ebenso
  * (`katalog.durchstanzen`) -- und mit ihnen, welche Felder der Kern je
  * Stellung liest: die Maske zeigt genau die. Bis 2026-11-20 standen die
@@ -23,18 +27,23 @@
  */
 
 import {
-  bezeichnung, eingabegruppen, erklaerung, feld, karte, materialliste, mitBild, panel, wahlBlock,
-  wahlSchalter,
+  beschreibung, bezeichnung, eingabegruppen, erklaerung, feld, fehlendesMaterial, karte,
+  materialliste, mitBild, panel, wahlBlock, wahlSchalter,
 } from './bausteine.js';
 import { el } from './dom.js';
 import { zeichenbereich } from './ds_zeichnung.js';
+import { gruppenkapitel, kapitelFenster, kapitelPanel } from './kapitel.js';
 import { eintragAendern, katalog } from './zustand.js';
 
 const HILFE = {
-  stelle: {
+  platte: {
     zeilen: [
       ['Decke', 'die Zugbewehrung liegt über der Stütze oben'],
       ['Bodenplatte', 'die Bodenpressung drückt von unten: die Zugbewehrung liegt unten'],
+    ],
+  },
+  stelle: {
+    zeilen: [
       ['Rand, Ecke', 'der Plattenrand liegt unten, an der Ecke auch links; a ist der Abstand '
         + 'von der Stütze zum Rand'],
       ['Wandende', 'die Wand läuft nach rechts weiter; gezählt werden 1.5·d_v entlang der Wand'],
@@ -80,6 +89,14 @@ const EXZENTRIZITAET = 'Exzentrizität der Auflagerkraft';
 /** Die Lage der Stelle, wie der Katalog sie beschreibt. */
 function lageVon(d) {
   return katalog('durchstanzen', 'lagen').find((l) => l.wert === d.lage);
+}
+
+/**
+ * Die Masse der gestützten Fläche nach der Vorlage des Katalogs für ihre
+ * Lage und Form: «300×300 mm», «⌀400 mm» -- in der Liste und auf der Kachel.
+ */
+export function stellenmass(d) {
+  return lageVon(d).kurz[d.form].replace(/\{(\w+)\}/g, (_, k) => d[k]);
 }
 
 /**
@@ -133,11 +150,10 @@ function materialfeld(d, schluessel, art, text) {
   }), '');
 }
 
-function stellePanel(d, vorgaben) {
-  const lage = lageVon(d);
+function kopfPanel(d) {
   return panel({
     schluessel: 'durchstanzen/Stelle', titel: 'Durchstanzstelle',
-    zusatz: erklaerung(HILFE.stelle.zeilen, HILFE.stelle.formel),
+    zusatz: erklaerung(HILFE.platte.zeilen),
   }, [
     el('div.unterkapitel', {}, [
       bezeichnung(d, aenderer(d)),
@@ -146,12 +162,7 @@ function stellePanel(d, vorgaben) {
       umgeschaltet === d.kennung ? el('p.hinweis', {
         text: katalog('durchstanzen', 'plattenarten').find((w) => w.wert === d.plattenart).umgeschaltet,
       }) : null,
-    ]),
-    wahlBlock('Lage', schalter(d, 'lage', 'lagen', 'Wo die gestützte Fläche in der Platte liegt', 'lage')),
-    karte(lage.titel, [
-      lage.hat_form ? feld('Form', schalter(d, 'form', 'formen', 'Die Form der Stütze im Grundriss',
-        'stuetzenform'), '') : null,
-      ...vorgaben.zeilen('Gestützte Fläche'),
+      beschreibung(d, aenderer(d)),
     ]),
   ]);
 }
@@ -164,67 +175,69 @@ function grundrissPanel(d) {
   }, [zeichenbereich(d)]);
 }
 
-function plattenPanel(d, vorgaben) {
-  return panel({ schluessel: 'durchstanzen/Platte', titel: 'Platte' }, [
-    karte('', [
-      ...vorgaben.zeilen('Platte'),
-      materialfeld(d, 'beton', 'beton', 'Beton'),
-      materialfeld(d, 'stahl', 'betonstahl', 'Betonstahl'),
-    ]),
-  ]);
+/** Das Wort einer Stellung, wie der Katalog es nennt: «Näherungsstufe 2». */
+function wortVon(liste, wert) {
+  return katalog('durchstanzen', liste).find((w) => w.wert === wert)?.beschriftung || '';
 }
 
-function bewehrungPanel(d, vorgaben) {
-  return panel({
-    schluessel: 'durchstanzen/Bewehrung',
-    titel: d.plattenart === 'bodenplatte' ? 'Biegebewehrung unten' : 'Biegebewehrung oben',
-    zusatz: erklaerung(HILFE.bewehrung.zeilen, HILFE.bewehrung.formel),
-  }, [
-    karte('', [...vorgaben.zeilen('Biegebewehrung'), feld('Aussen liegt', wahlSchalter({
-      werte: [{ wert: 'x', beschriftung: 'x' }, { wert: 'y', beschriftung: 'y' }],
-      gewaehlt: d.aussen,
-      setzen: (w) => aenderer(d)((x) => { x.aussen = w; }),
-      titel: 'Welche Lage näher am Rand liegt',
-    }), '')]),
-  ]);
-}
-
-function rotationPanel(d, vorgaben) {
-  return panel({
-    schluessel: 'durchstanzen/Rotation', titel: 'Plattenrotation',
-    zusatz: erklaerung(HILFE.rotation.zeilen, HILFE.rotation.formel),
-  }, [
-    wahlBlock('Näherungsstufe', schalter(d, 'stufe', 'stufen', 'SIA 262:2025, 4.3.6.4.2')),
-    karte('', vorgaben.zeilen('Plattenrotation')),
-  ]);
-}
-
-function einwirkungPanel(d, vorgaben) {
+/**
+ * Die Kacheln: je Gruppe der Vorgaben eine; welche Felder sie zeigt, sagt
+ * der Kern. Die Exzentrizität steht im Fenster der Einwirkung, unter k_e,
+ * das nach ihr fragt -- eine eigene Kachel erschiene hinter dem Fenster.
+ */
+function kapitel(d) {
+  const aendern = aenderer(d);
+  const vorgaben = eingabegruppen('durchstanz', d, aendern, { gelesen: gelesen(d) });
+  const lage = lageVon(d);
   const exzentrizitaet = vorgaben.zeilen(EXZENTRIZITAET);
-  return panel({
-    schluessel: 'durchstanzen/Einwirkung', titel: 'Einwirkung',
-    zusatz: erklaerung(HILFE.einwirkung.zeilen, HILFE.einwirkung.formel),
-  }, [
-    karte('', vorgaben.zeilen('Einwirkung')),
-    wahlBlock('k_e', schalter(d, 'ke', 'ke', 'SIA 262:2025, 4.3.6.2.4 und 4.3.6.2.5')),
-    exzentrizitaet.length ? karte(EXZENTRIZITAET, exzentrizitaet) : null,
-    el('div.unterkapitel', {}, [
-      el('div.beschreibung', {}, [
-        el('label', { text: 'Beschreibung' }),
-        el('textarea', {
-          rows: 2, value: d.beschreibung || '',
-          on: { change: (e) => aenderer(d)((x) => { x.beschreibung = e.target.value; }) },
-        }),
-      ]),
-    ]),
-  ]);
+  const kacheln = [
+    gruppenkapitel(vorgaben, 'Gestützte Fläche', {
+      zeichen: 'stuetze', wort: `${lage.beschriftung} ${stellenmass(d)}`, hilfe: HILFE.stelle,
+      vor: [
+        wahlBlock('Lage', schalter(d, 'lage', 'lagen', 'Wo die gestützte Fläche in der Platte liegt', 'lage')),
+        lage.hat_form ? feld('Form', schalter(d, 'form', 'formen', 'Die Form der Stütze im Grundriss',
+          'stuetzenform'), '') : null,
+      ],
+    }),
+    gruppenkapitel(vorgaben, 'Platte', {
+      zeichen: 'platte', werte: ['h'],
+      nach: [materialfeld(d, 'beton', 'beton', 'Beton'),
+        materialfeld(d, 'stahl', 'betonstahl', 'Betonstahl')],
+      fehlt: fehlendesMaterial('beton', d.beton) || fehlendesMaterial('betonstahl', d.stahl),
+    }),
+    gruppenkapitel(vorgaben, 'Biegebewehrung', {
+      zeichen: 'biegebewehrung', name: 'Biege\u00adbewehrung', hilfe: HILFE.bewehrung,
+      fenster: d.plattenart === 'bodenplatte' ? 'Biegebewehrung unten' : 'Biegebewehrung oben',
+      // Umbruch nur nach dem Komma: «x ⌀16@150,» und «y ⌀16@150» bleiben je beisammen.
+      wort: `x\u00a0⌀${d.phi_x}@${d.s_x}, y\u00a0⌀${d.phi_y}@${d.s_y}`,
+      nach: [feld('Aussen liegt', wahlSchalter({
+        werte: [{ wert: 'x', beschriftung: 'x' }, { wert: 'y', beschriftung: 'y' }],
+        gewaehlt: d.aussen,
+        setzen: (w) => aendern((x) => { x.aussen = w; }),
+        titel: 'Welche Lage näher am Rand liegt',
+      }), '')],
+    }),
+    gruppenkapitel(vorgaben, 'Plattenrotation', {
+      zeichen: 'rotation', name: 'Platten\u00adrotation', wort: wortVon('stufen', d.stufe),
+      hilfe: HILFE.rotation,
+      vor: [wahlBlock('Näherungsstufe', schalter(d, 'stufe', 'stufen', 'SIA 262:2025, 4.3.6.4.2'))],
+    }),
+    gruppenkapitel(vorgaben, 'Einwirkung', {
+      zeichen: 'einwirkung', werte: ['V_d'], hilfe: HILFE.einwirkung,
+      nach: [wahlBlock('k_e', schalter(d, 'ke', 'ke', 'SIA 262:2025, 4.3.6.2.4 und 4.3.6.2.5')),
+        exzentrizitaet.length ? karte(EXZENTRIZITAET, exzentrizitaet) : null],
+    }),
+  ];
+  vorgaben.vollstaendig();
+  return [{ titel: '', kapitel: kacheln.filter(Boolean) }];
 }
 
 export function durchstanzEditor(d) {
-  // Je Gruppe der Vorgaben eine Tafel; welche Felder sie zeigt, sagt der Kern.
-  const vorgaben = eingabegruppen('durchstanz', d, aenderer(d), { gelesen: gelesen(d) });
-  const tafeln = [stellePanel(d, vorgaben), grundrissPanel(d), plattenPanel(d, vorgaben),
-    bewehrungPanel(d, vorgaben), rotationPanel(d, vorgaben), einwirkungPanel(d, vorgaben)];
-  vorgaben.vollstaendig();
-  return tafeln;
+  return [kopfPanel(d), grundrissPanel(d),
+    kapitelPanel(d, kapitel(d), { schluessel: 'durchstanzen/Kapitel', titel: 'Eingaben' })];
+}
+
+/** Das offene Fenster einer Durchstanzstelle -- oder null. */
+export function durchstanzFenster(d, schluessel) {
+  return kapitelFenster(d, kapitel(d), schluessel);
 }

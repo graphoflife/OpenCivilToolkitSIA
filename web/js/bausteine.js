@@ -124,6 +124,31 @@ export function bezeichnung(eintrag, aendern, hilfe) {
 }
 
 /**
+ * Die Beschreibung eines Eintrags: freier Text, der in keine Rechnung
+ * eingeht. `zeilen` hoch; `stil` für die Stelle, an der sie steht.
+ */
+export function beschreibung(eintrag, aendern, { zeilen = 2, stil = {} } = {}) {
+  return el('div.beschreibung', { style: stil }, [
+    el('label', { text: 'Beschreibung' }),
+    el('textarea', {
+      rows: zeilen, value: eintrag.beschreibung || '',
+      on: { change: (e) => aendern((x) => { x.beschreibung = e.target.value; }) },
+    }),
+  ]);
+}
+
+/**
+ * Was der Kachel fehlt, wenn ein Eintrag ein Material der Art `art` wählen
+ * muss: «kein Beton», solange es das gewählte im Projekt nicht gibt -- sonst
+ * nichts. Dieselbe Frage wie die Materialliste, wenn sie «– Beton wählen –»
+ * zeigt.
+ */
+export function fehlendesMaterial(art, gewaehlt) {
+  return materialien(art).some((m) => m.kennung === gewaehlt)
+    ? '' : `kein ${katalog('materialarten', art, 'titel')}`;
+}
+
+/**
  * Was das Namensfeld der Sandbox anders macht: es ist gesperrt, und sein
  * Titel sagt warum -- sie heisst immer so (Benutzer, 2026-11-20), und eine
  * Kopie bekommt einen eigenen Namen.
@@ -282,50 +307,57 @@ export function feld(beschriftung, eingabe, einheit, titel) {
 }
 
 /**
- * Die Karten einer Maske aus den Vorgaben des Kerns (`katalog.vorgaben`,
- * opencivil/core/vorgaben.py): je Gruppe der Herleitung eine Karte mit
- * ihrem Titel, je Feld eine Zeile -- die kurze Beschriftung mit dem
- * Zeichen, darüber im Titel die Beschreibung, der Hinweis und die
- * Normstelle. Welche Felder eine Gruppe hat, richtet sich nach den Wahlen
- * des Eintrags, die sie nennt; `gelesen`, wo es eine solche Menge gibt,
- * lässt nur die Felder stehen, die der Nachweis liest. `klasse` ist der
- * Name der Klasse im Katalog, `aendern(veraenderer)` schreibt.
+ * Die Zeilen einer Maske aus den Vorgaben des Kerns (`katalog.vorgaben`,
+ * opencivil/core/vorgaben.py), eine nach der anderen -- für einen Eintrag,
+ * der schon seine Karte hat, etwa eine Schicht des Pfahls: je Feld eine
+ * Zeile, die kurze Beschriftung mit dem Zeichen, darüber im Titel die
+ * Beschreibung, der Hinweis und die Normstelle. Welche Felder eine Gruppe
+ * hat, richtet sich nach den Wahlen des Eintrags, die sie nennt. `klasse`
+ * ist der Name der Klasse im Katalog, `aendern(veraenderer)` schreibt.
  *
- * `dazu` setzt Teile der Maske vor oder hinter die Felder einer Gruppe,
- * unter ihrem Titel: `{ Boden: { vor: [...], nach: [...] } }`. Einen Titel,
- * den es nicht gibt, meldet es, statt die Teile still zu verlieren. Eine
- * Gruppe ohne Felder und ohne Teile fällt weg.
- */
-export function eingabekarten(klasse, eintrag, aendern, { gelesen = null, dazu = {} } = {}) {
-  return vorgabeteile(klasse, eintrag, aendern, { gelesen, dazu })
-    .map(({ titel, inhalt }) => (inhalt.length ? karte(titel, inhalt) : null)).filter(Boolean);
-}
-
-/**
- * Dieselben Teile ohne Karten, eine Zeile nach der anderen -- für einen
- * Eintrag, der schon seine Karte hat, etwa eine Schicht des Pfahls. Die
- * Gruppen sagen dann nur, wohin `dazu` seine Teile setzt.
+ * Die Gruppen sagen hier nur, wohin `dazu` Teile der Maske setzt, vor oder
+ * hinter ihre Felder: `{ Festigkeit: { vor: [...], nach: [...] } }`. Einen
+ * Titel, den es nicht gibt, meldet es, statt die Teile still zu verlieren.
  */
 export function eingabezeilen(klasse, eintrag, aendern, { dazu = {} } = {}) {
-  return vorgabeteile(klasse, eintrag, aendern, { dazu }).flatMap((g) => g.inhalt);
+  const gruppen = katalog('vorgaben', klasse);
+  for (const titel of Object.keys(dazu)) {
+    if (!gruppen.some((g) => g.titel === titel)) throw keineGruppe(klasse, titel);
+  }
+  return gruppen.flatMap((g) => {
+    const { vor = [], nach = [] } = dazu[g.titel] || {};
+    return [...vor, ...gruppenzeilen(klasse, eintrag, g, aendern, null), ...nach];
+  }).filter(Boolean);
 }
 
 /**
- * Die Gruppen der Vorgaben einzeln, für eine Maske, die sie auf mehrere
- * Tafeln verteilt, wie das Durchstanzen: `zeilen(titel)` gibt die Zeilen
- * einer Gruppe, `vollstaendig()` meldet jede, nach der die Maske nicht
- * fragte -- eine neue Gruppe des Kerns fehlte dort sonst still. `gelesen`
- * wie bei `eingabekarten`.
+ * Die Gruppen der Vorgaben einzeln, für eine Maske, die sie auf ihre
+ * Kacheln verteilt (`gruppenkapitel` in kapitel.js): `zeilen(titel)` gibt
+ * die Zeilen einer Gruppe, `werte(titel, felder)` die Werte der Felder
+ * `felder` daraus für ihre Kachel, `vollstaendig()` meldet jede Gruppe,
+ * nach der die Maske nicht fragte -- eine neue Gruppe des Kerns fehlte
+ * sonst still. `gelesen`, wo es eine solche Menge gibt, lässt nur die
+ * Felder stehen, die der Nachweis liest.
  */
 export function eingabegruppen(klasse, eintrag, aendern, { gelesen = null } = {}) {
   const gruppen = new Map(katalog('vorgaben', klasse).map((g) => [g.titel, g]));
   const gefragt = new Set();
+  const gruppe = (titel) => {
+    if (!gruppen.has(titel)) throw keineGruppe(klasse, titel);
+    gefragt.add(titel);
+    return gruppen.get(titel);
+  };
   return {
-    zeilen(titel) {
-      if (!gruppen.has(titel)) throw keineGruppe(klasse, titel);
-      gefragt.add(titel);
-      return gruppenzeilen(klasse, eintrag, gruppen.get(titel), aendern, gelesen);
-    },
+    zeilen: (titel) => gruppenzeilen(klasse, eintrag, gruppe(titel), aendern, gelesen),
+    /**
+     * Je Feld aus `felder`, das gilt und gelesen wird, sein Zeichen, der
+     * Wert des Eintrags und die Einheit des Kerns -- in der Folge der Gruppe.
+     */
+    werte: (titel, felder) => felderDer(gruppe(titel), eintrag)
+      .filter((f) => felder.includes(f.feld) && (!gelesen || gelesen.has(f.feld)))
+      .map((f) => ({
+        zeichen: f.zeichen, wert: eintrag[f.feld], einheit: feldangabe(klasse, f.feld).einheit || '',
+      })),
     vollstaendig() {
       const fehlt = [...gruppen.keys()].filter((titel) => !gefragt.has(titel));
       if (fehlt.length) {
@@ -333,22 +365,6 @@ export function eingabegruppen(klasse, eintrag, aendern, { gelesen = null } = {}
       }
     },
   };
-}
-
-/** Je Gruppe der Vorgaben ihr Titel und ihre Teile -- siehe `eingabekarten`. */
-function vorgabeteile(klasse, eintrag, aendern, { gelesen = null, dazu = {} }) {
-  const gruppen = katalog('vorgaben', klasse);
-  for (const titel of Object.keys(dazu)) {
-    if (!gruppen.some((g) => g.titel === titel)) throw keineGruppe(klasse, titel);
-  }
-  return gruppen.map((g) => {
-    const { vor = [], nach = [] } = dazu[g.titel] || {};
-    return {
-      titel: g.titel,
-      inhalt: [...vor, ...gruppenzeilen(klasse, eintrag, g, aendern, gelesen), ...nach]
-        .filter(Boolean),
-    };
-  });
 }
 
 function keineGruppe(klasse, titel) {
