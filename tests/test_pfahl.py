@@ -388,6 +388,34 @@ class TestWasDieOberflaecheSieht(unittest.TestCase):
         t.schicht("Kies", d=20.0)
         s = dienst.rechnen({"projekt": p.als_dict()})["zeichendaten"]["t1"]
         self.assertEqual((s["stuecke"], s["q_b"]), ([], None))
+        # Den Querschnitt gibt es auch ohne Kombination: er braucht keinen Nachweis.
+        self.assertEqual(s["querschnitt"]["art"], "bohrpfahl")
+
+    def test_querschnitt_des_bohrpfahls_wie_im_nachweis(self):
+        """r_s im Bild ist das r_s des Nachweises -- dieselbe Funktion, in mm."""
+        p = Projekt.beispiel()
+        _, _, _, innen = rechnen(p)
+        q = dienst.rechnen({"projekt": p.als_dict()})["zeichendaten"]["t1"]["querschnitt"]
+        self.assertEqual((q["art"], q["n"]), ("bohrpfahl", round(innen.masse.n)))
+        self.assertAlmostEqual(q["r_s"], innen.masse.r_s * 1e3, places=6)
+        self.assertAlmostEqual(q["r_s"], q["D"] / 2 - q["c"] - q["phi_w"] - q["phi_l"] / 2,
+                               places=6)
+        self.assertTrue(all(z for z in q["legende"]))
+
+    def test_querschnitt_des_mikropfahls(self):
+        """Rohr 88.9 × 8, Δt = 1 mm: gezeichnet das Rohr, gestrichelt 86.9 mm wie im Nachweis."""
+        p, t = projekt(art="mikropfahl", D=200.0, grundlage="statisch", d_a=88.9, t_r=8.0,
+                       dt=1.0)
+        t.schicht("Kies", d=20.0)
+        q = dienst.rechnen({"projekt": p.als_dict()})["zeichendaten"]["t1"]["querschnitt"]
+        self.assertEqual((q["art"], q["D"], q["t"], q["dt"]), ("mikropfahl", 200.0, 8.0, 1.0))
+        self.assertAlmostEqual(q["d_a"], 88.9, places=6)
+        self.assertAlmostEqual(q["d_rest"], 86.9, places=6)
+        stab, s = projekt(art="mikropfahl", D=150.0, grundlage="statisch", tragglied="stab",
+                          d_a=40.0, dt=2.0)
+        s.schicht("Kies", d=20.0)
+        q = dienst.rechnen({"projekt": stab.als_dict()})["zeichendaten"]["t1"]["querschnitt"]
+        self.assertEqual((q["t"], q["d_rest"]), (None, 36.0))
 
     def test_zusammenfassung(self):
         p = Projekt.beispiel()

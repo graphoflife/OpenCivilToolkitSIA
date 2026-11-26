@@ -7,6 +7,27 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-26 · Pfahl: Bild «Querschnitt»
+
+Vom Benutzer gewünscht (2026-11-25).
+
+- Vorher zeigte ein Pfahl unter «Diagramme» die Situation und die Verläufe;
+  wie er im Schnitt aussieht, stand nur in Zahlen. Nachher steht zwischen
+  beiden das Bild «Querschnitt», massstäblich und auch ohne Kombination.
+  Beim Bohrpfahl der Betonkreis D, die Wendel, die n Längsstäbe und der
+  Radius ihrer Mitten, im Beispiel «r_s = 355 mm» längs des Pfeils, dazu
+  Überdeckung und Ganghöhe. Beim Mikropfahl der Verpresskörper und das
+  Tragglied, Rohr oder Vollstab; mit einer Abrostung gestrichelt der
+  Durchmesser, mit dem der Nachweis rechnet, etwa «gerechnet mit d_a =
+  106.3 mm» bei 114.3 mm und Δt = 4 mm.
+- r_s und der Durchmesser nach der Abrostung kommen aus denselben zwei
+  Funktionen wie im Nachweis (`innen.bewehrungsradius`,
+  `innen.nach_abrostung`): Bild und Rechnung können nicht auseinanderlaufen.
+  Die Masse schickt `pfahldaten.querschnitt` in mm; gezeichnet wird in
+  `pf_querschnitt.js` mit den Helfern der Grundbau-Skizzen.
+- Die Legende sagt beim Mikropfahl wie die Herleitung, dass nur das
+  Tragglied trägt; die Abrostung nennt sie nur, wo es eine gibt.
+
 ## 2026-11-26 · Querschnittsanalyse: Bild «Querschnitt» zuerst unter den Diagrammen
 
 Vom Benutzer gewünscht (2026-11-25).

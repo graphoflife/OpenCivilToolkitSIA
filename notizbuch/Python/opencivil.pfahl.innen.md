@@ -1,5 +1,5 @@
 ---
-erzeugt: b743f10c4e33
+erzeugt: c7ca63632d1a
 art: modul
 tags: [modul]
 ---
@@ -58,6 +58,25 @@ def kreis(durchmesser: float) -> Tuple[Punkt, ...]
 
 Ein Kreis um den Ursprung als Vieleck derselben Fläche, in m: die Ecken
 liegen etwas ausserhalb des Kreises, damit A = π · d²/4 genau bleibt.
+
+### bewehrungsradius
+
+```python
+def bewehrungsradius(D: float, c: float, phi_w: float, phi_l: float) -> float
+```
+
+Der Radius des Kreises, auf dem die Mitten der Laengsstaebe liegen, in m:
+innen an der Wendel, die um c vom Rand liegt. Fuer den Nachweis und das
+Bild des Querschnitts ([[opencivil.web.pfahldaten]]).
+
+### nach_abrostung
+
+```python
+def nach_abrostung(d_a: float, dt: float) -> float
+```
+
+Der Aussendurchmesser des Tragglieds nach der Abrostung Δt rundum, in m
+(SIA 267:2013, 9.5.2.4.8) -- fuer den Nachweis und das Bild.
 
 ### Masse
 

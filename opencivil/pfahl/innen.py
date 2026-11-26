@@ -69,6 +69,23 @@ def kreis(durchmesser: float) -> Tuple[Punkt, ...]:
                  for y, z in kreispunkte((0.0, 0.0), r / MM.faktor))
 
 
+def bewehrungsradius(D: float, c: float, phi_w: float, phi_l: float) -> float:
+    """
+    Der Radius des Kreises, auf dem die Mitten der Laengsstaebe liegen, in m:
+    innen an der Wendel, die um c vom Rand liegt. Fuer den Nachweis und das
+    Bild des Querschnitts (:mod:`opencivil.web.pfahldaten`).
+    """
+    return D / 2.0 - c - phi_w - phi_l / 2.0
+
+
+def nach_abrostung(d_a: float, dt: float) -> float:
+    """
+    Der Aussendurchmesser des Tragglieds nach der Abrostung Δt rundum, in m
+    (SIA 267:2013, 9.5.2.4.8) -- fuer den Nachweis und das Bild.
+    """
+    return d_a - 2.0 * dt
+
+
 @dataclass(frozen=True)
 class Masse:
     """Was der Querschnitt aus den Eingaben braucht, in m -- je Pfahlart ein Teil davon."""
@@ -203,8 +220,9 @@ class InnererWiderstand(Achsnachweis):
         p.formel(A_s, r"@n \cdot \frac{\pi \cdot @phi^{2}}{4}", {"n": n, "phi": phi_l},
                  titel="Fläche der Längsbewehrung", referenz="",
                  name="Fläche der Längsbewehrung")
-        r_s = werte.laenge("r_s", "r_s", D.groesse.si / 2.0 - c.groesse.si - phi_w.groesse.si
-                           - phi_l.groesse.si / 2.0, "Radius des Bewehrungskreises")
+        r_s = werte.laenge("r_s", "r_s", bewehrungsradius(D.groesse.si, c.groesse.si,
+                                                         phi_w.groesse.si, phi_l.groesse.si),
+                           "Radius des Bewehrungskreises")
         p.formel(r_s, r"\frac{@D}{2} - @c - @phi_w - \frac{@phi_l}{2}",
                  {"D": D, "c": c, "phi_w": phi_w, "phi_l": phi_l},
                  titel="Radius des Kreises, auf dem die Längsstäbe liegen", referenz="",
@@ -217,7 +235,7 @@ class InnererWiderstand(Achsnachweis):
     def _mikropfahl(self, e: Eingaben, p: Protokoll,
                     werte: Zwischenwerte) -> Tuple[Masse, Wert, Optional[Wert]]:
         d_a, dt = e["d_a"], e["dt"]
-        d_aussen = d_a.groesse.si - 2.0 * dt.groesse.si
+        d_aussen = nach_abrostung(d_a.groesse.si, dt.groesse.si)
         p.text("Es trägt nur das Tragglied aus Stahl, aussen um die Abrostung Δt "
                "verkleinert (SIA 267:2013, 9.5.2.4.8; 9.6.1.5.2).")
         if self.pfahl.tragglied is Tragglied.ROHR:

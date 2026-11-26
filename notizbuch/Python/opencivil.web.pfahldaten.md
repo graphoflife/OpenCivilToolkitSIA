@@ -1,5 +1,5 @@
 ---
-erzeugt: ab348515844b
+erzeugt: 53f10cdff803
 art: modul
 tags: [modul]
 ---
@@ -16,6 +16,10 @@ sie gerechnet hat, mit ihren Grössen ([[opencivil.web.pfahldaten#Konstanten|SIT
 Nachweise auf Druck und auf Zug, quer je Kombination, und der Fall, der
 entscheidet. Masse, Schichten und Grundwasser liest die Oberflaeche aus dem
 Eintrag.
+
+Dazu das Bild des Querschnitts ([[opencivil.web.pfahldaten#querschnitt|querschnitt]]), auch ohne
+Kombination: seine Masse in mm, mit r_s und dem Durchmesser nach der
+Abrostung aus denselben Funktionen wie im Nachweis.
 
 Und je Kombination die Verläufe über die Tiefe, wie die Steifigkeit sie
 gerechnet hat ([[opencivil.web.pfahldaten#verlaeufe|verlaeufe]]), mit dem Satz, der unter ihnen steht --
@@ -36,6 +40,17 @@ def situation(aufbau: Aufbau, kennung: str, loesung: Loesung) -> Dict[str, Any]
 
 Was die Zeichnung eines Pfahls braucht. Ohne Kombination gibt es keinen
 Nachweis und keinen Befund -- dann zeichnet sie nur den Pfahl im Boden.
+
+### querschnitt
+
+```python
+def querschnitt(pfahl: Pfahl) -> Dict[str, Any]
+```
+
+Was das Bild des Querschnitts braucht, in mm: beim Bohrpfahl
+Durchmesser, Laengsstaebe, Wendel und der Radius r_s ihrer Mitten, beim
+Mikropfahl Verpresskoerper und Tragglied -- `t` `None` beim
+Vollstab -- mit dem Durchmesser nach der Abrostung. Dazu die Legende.
 
 ### _befund
 
@@ -94,6 +109,7 @@ Mantel und Fuss, die Bemessungswerte, quer je Kombination, der entscheidende Fal
 - [[opencivil.pfahl.aussen]]
 - [[opencivil.pfahl.innen]]
 - [[opencivil.pfahl.innen_quer]]
+- [[opencivil.pfahl.pfahl]]
 - [[opencivil.pfahl.quer]]
 - [[opencivil.pfahl.steifigkeit]]
 - [[opencivil.projekt]]

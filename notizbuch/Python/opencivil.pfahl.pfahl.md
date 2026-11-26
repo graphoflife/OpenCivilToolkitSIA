@@ -1,5 +1,5 @@
 ---
-erzeugt: 4fded7764834
+erzeugt: e3715e9bef2b
 art: modul
 tags: [modul]
 ---
@@ -476,3 +476,4 @@ Angabe aus allen. Die Schichten heissen zusammen «Schicht».
 - [[opencivil.projekt.aufbau.pfahl]]
 - [[opencivil.projekt.pfahl]]
 - [[opencivil.web.api]]
+- [[opencivil.web.pfahldaten]]

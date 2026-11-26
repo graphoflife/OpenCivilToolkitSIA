@@ -24,6 +24,7 @@ import { el, svgEl } from './dom.js';
 import {
   BREITE, legende, linie, mass, pfeil, text, textzeile, wasserzeichen, zahl,
 } from './gb_skizze.js';
+import { querschnittKarte } from './pf_querschnitt.js';
 import { verlaufKarten } from './pf_verlauf.js';
 import { eintragVon, feldangabe, zustand } from './zustand.js';
 
@@ -185,9 +186,9 @@ function legendeVon(t, d) {
 }
 
 /**
- * Die Karten eines Pfahls im Reiter «Diagramme»: die Situation, dann je
- * Kombination die Verläufe über die Tiefe (pf_verlauf.js). Das Panel darum
- * baut bericht.js.
+ * Die Karten eines Pfahls im Reiter «Diagramme»: die Situation, der
+ * Querschnitt (pf_querschnitt.js), dann je Kombination die Verläufe über
+ * die Tiefe (pf_verlauf.js). Das Panel darum baut bericht.js.
  */
 export function pfahlKarten(kennung) {
   const t = eintragVon(kennung);
@@ -197,5 +198,6 @@ export function pfahlKarten(kennung) {
   return [karte('Situation', [
     el('div.gb-bildhuelle', {}, [bild]),
     legendeVon(t, d),
-  ], { bild, klasse: 'ist-breit' }), ...verlaufKarten(d)];
+  ], { bild, klasse: 'ist-breit' }), querschnittKarte(d?.querschnitt), ...verlaufKarten(d)]
+    .filter(Boolean);
 }

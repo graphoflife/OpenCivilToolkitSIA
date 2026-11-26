@@ -6529,6 +6529,8 @@
       "kurz": "der innere Widerstand eines Pfahls: sein Querschnitt.",
       "stichworte": [
         "kreis",
+        "bewehrungsradius",
+        "nach_abrostung",
         "Masse",
         "querschnitt",
         "biegewiderstand",
@@ -8805,6 +8807,7 @@
       "kurz": "was die Oberflaeche von einem Pfahl zeichnet.",
       "stichworte": [
         "situation",
+        "querschnitt",
         "_befund",
         "verlaeufe",
         "_verlauf",
