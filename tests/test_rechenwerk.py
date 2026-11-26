@@ -158,7 +158,8 @@ class TestLatexEinsetzen(unittest.TestCase):
 
     def test_negative_werte_werden_nach_einem_rechenzeichen_geklammert(self):
         eingaben = {"M": WertDef("m", "M", KNM).belegen(Groesse(-120, KNM))}
-        for vorlage in (r"2 \cdot @M", r"5 - @M", r"5 + @M"):
+        # Auch nach einer Winkelfunktion: sin(-5°), nicht sin -5°.
+        for vorlage in (r"2 \cdot @M", r"5 - @M", r"5 + @M", r"\sin @M", r"\cot @M"):
             with self.subTest(vorlage=vorlage):
                 self.assertIn(r"\left(", einsetzen_numerisch(vorlage, eingaben))
         # Am Anfang eines Ausdrucks waere die Klammer nur Unruhe.

@@ -426,6 +426,9 @@ function schubbild(daten, fall) {
     svg,
     legende([
       'Pfeile: Schubfluss q in kN/m, in seiner Richtung',
+      // Was geneigte Spannglieder selbst tragen -- die Wände tragen den Rest.
+      s.V_p == null ? null
+        : `Geneigte Spannglieder: V_p = ${s.V_p.toFixed(1)} kN – die Wände tragen V_z − V_p`,
       // Je Wand ihre ganze Kraft gegen ihren Widerstand, nicht je Meter.
       ...s.waende.map((w) => el('span', {
         style: { color: w.erfuellt ? 'inherit' : 'var(--schlecht)' },

@@ -505,7 +505,7 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben, JeMaterial):
                 glieder.append(benannt(
                     name, g.kennung, lage=ort[0], stahl=g.stahl, durchmesser=g.durchmesser,
                     anzahl=g.anzahl, wirkung=g.wirkung, sigma_p0=g.sigma_p0,
-                    sigma_pinf=g.sigma_pinf, verbund=g.verbund))
+                    sigma_pinf=g.sigma_pinf, verbund=g.verbund, neigung=g.neigung))
         for i, l in enumerate(self.stablinien, start=1):
             name = f"{l.IM_ORT} {i}"
             ende = orte(name, l.kennung, l.von, l.bis)

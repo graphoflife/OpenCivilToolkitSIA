@@ -22,6 +22,12 @@ Leer gelassen, gilt die Vorgabe (:func:`~opencivil.querschnitt.spannglieder.vors
 ``sigma_p0 = 0.70 f_pk``, ``sigma_pinf = 0.85 sigma_p0``. Die Zahlen des
 Benutzers werden nie umgedeutet; was die Norm begrenzt, sagt ein roter
 Hinweis am Glied, gerechnet wird trotzdem mit ihnen.
+
+DIE NEIGUNG:
+``beta_p`` in Grad, positiv, wo die lotrechte Kraft des Glieds wie ein
+positives ``V_z`` wirkt; sie zaehlt nur mit Vordehnung. Was daraus folgt,
+steht im Kopf von :mod:`opencivil.querschnitt.spannglieder`; dort auch,
+warum sie hoechstens ``GRENZE_NEIGUNG`` steil sein darf.
 """
 
 from __future__ import annotations
@@ -29,10 +35,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Optional
 
-from opencivil.core.einheiten import MM, N_PRO_MM2
+from opencivil.core.einheiten import GRAD, MM, N_PRO_MM2
 from opencivil.projekt.eintraege import Beschreibung
 from opencivil.projekt.lesen import bereich
-from opencivil.querschnitt.spannglieder import Spannwirkung, Verbund
+from opencivil.querschnitt.spannglieder import GRENZE_NEIGUNG, Spannwirkung, Verbund
 
 #: Womit ein neues Glied beginnt: eine Litze 15.7 mm -- die verbreitetste, die
 #: Tabelle 7 fuer Y1860 nennt.
@@ -67,3 +73,7 @@ class SpanngliedEintrag(Beschreibung):
     """Die Spannung nach allen Verlusten in N/mm² -- leer: 0.85 sigma_p0."""
 
     verbund: Verbund = Verbund.MIT
+
+    neigung: float = bereich(0.0, heisst="β_p", einheit=GRAD, ab=-GRENZE_NEIGUNG,
+                             bis=GRENZE_NEIGUNG)
+    """Die Neigung gegen die Stabachse in Grad -- siehe Dateikopf."""

@@ -105,8 +105,9 @@ def platzhalter_namen(vorlage: str) -> list[str]:
 
 
 #: Nach diesen Zeichen braucht eine negative Zahl eine Klammer: ``a - (-5)``,
-#: ``a \\cdot (-5)``. Am Anfang eines Ausdrucks nicht: ``-300 - (-1484.6)``.
-_RECHENZEICHEN = ("+", "-", r"\cdot", r"\times", "/")
+#: ``a \\cdot (-5)`` -- und nach einer Winkelfunktion, ``\\sin(-5°)``. Am
+#: Anfang eines Ausdrucks nicht: ``-300 - (-1484.6)``.
+_RECHENZEICHEN = ("+", "-", r"\cdot", r"\times", "/", r"\sin", r"\cos", r"\tan", r"\cot")
 
 
 def _ersetzen(vorlage: str, ersatz) -> str:

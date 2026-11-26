@@ -1,14 +1,16 @@
 ---
-erzeugt: 9f389c7127e0
+erzeugt: 7633f88bf21b
 art: thema
 tags: [thema]
 ---
 > [!abstract] Querschnittsanalyse
-> 7 Formeln, in der Folge, in der gerechnet wird.
+> 12 Formeln, in der Folge, in der gerechnet wird.
 
 ## Was die Rechnung dazu sagt
 
 Jede Schubwand trägt eine Kraft entlang ihrer Achse; ihre Länge ist der Hebelarm des Fachwerks. Verteilt wird elastisch: der Querschnitt verschiebt sich, und jede Wand wehrt sich wie eine Feder mit der Steifigkeit b\_w·l. Das Moment dieser Querkraftanteile um den Schwerpunkt ist der Versatz ΔT; den Rest der Torsion tragen die geschlossenen Zellen als Umlauf-Schubfluss nach Bredt, mehrzellig mit gleicher Verdrillung aller Zellen. Ohne Zelle trägt die Torsion über dieselben Federn mit Drehung. Die Wandkräfte ergeben so immer V\_y, V\_z und um den Schwerpunkt T. Eine gezeichnete Wand ist dort geteilt, wo eine andere auf ihr endet oder sie kreuzt (Wand 1.1, Wand 1.2 …): jede trägt so überall denselben Fluss und wird für sich nachgewiesen, mit ihrer ganzen Kraft, nicht je Meter – bei einer Zelle die Kraft aus der Querkraft und die aus der Torsion zusammen. In der Zusammenfassung steht die massgebende Wand.
+
+Ein geneigtes Spannglied trägt mit seiner lotrechten Kraft F·sin β\_p einen Teil der Querkraft V\_z; ist β\_p positiv, wirkt sie wie ein positives V\_z. Wirkt sie in einem Lastfall wie dessen V\_z, trägt sie es mit, mit der Kraft nach allen Verlusten P∞; wirkt sie entgegen, kommt sie dazu, mit der grössten Kraft im Glied P\_max. Die Wände tragen den Rest, und in der Torsion fehlt ihnen das Moment der lotrechten Kräfte um den Schwerpunkt. Gleichung (50) schreibt den mitgetragenen Teil dem Widerstand zu; hier mindert er die Kraft der Wände – an der Grenze dasselbe, und nur so verteilt er sich auf mehrere Wände.
 
 ## Formeln
 
@@ -19,6 +21,11 @@ Jede Schubwand trägt eine Kraft entlang ihrer Achse; ihre Länge ist der Hebela
 5. [[Versatz – Moment der Querkraftanteile um den Schwerpunkt]]
 6. [[Was die Zellen tragen]]
 7. [[Erfüllungsgrad]]
+8. [[Lotrechte Kraft der geneigten Spannglieder]]
+9. [[Grösste Kraft eines geneigten Spannglieds]]
+10. [[Querkraft der Wände neben geneigten Spanngliedern]]
+11. [[Torsion aus der lotrechten Kraft der Spannglieder]]
+12. [[Torsion der Wände neben geneigten Spanngliedern]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 
@@ -45,7 +52,12 @@ Eine gezeichnete Wand ist dort geteilt, wo eine andere auf ihr endet oder
 sie kreuzt; jedes Teil ist eine eigene Schubwand, «Wand 1.1», «Wand 1.2».
 Jede bekommt so ihre
 [[Kraft einer Wand – ihr Schubfluss über ihre Länge|ganze Kraft]]
-und wird gegen ihren [[Widerstand einer Wand (Fachwerk, ihre Länge l als Hebelarm)|Fachwerkwiderstand]] nachgewiesen -- beides
+und wird gegen ihren [[Widerstand einer Wand (Fachwerk, ihre Länge l als Hebelarm)|Fachwerkwiderstand]] nachgewiesen – beides
 für die ganze Wand, nicht je Meter (seit 2026-11-18). In der Zusammenfassung
 steht die massgebende. Federmodell, Bredt-Verteilung und die Längszugkraft in der
 Wandmitte sind nach Vorgabe eingebaut, nicht nachgeschlagen.
+
+Geneigte Spannglieder tragen einen Teil der Querkraft selbst (siehe
+[[Lotrechte Kraft der geneigten Spannglieder]]); die Wände tragen den Rest,
+[[Querkraft der Wände neben geneigten Spanngliedern|in der Querkraft]] wie
+[[Torsion der Wände neben geneigten Spanngliedern|in der Torsion]].

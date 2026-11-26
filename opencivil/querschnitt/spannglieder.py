@@ -36,6 +36,22 @@ Rechnung nicht. Die Vordehnung ist ``sigma_pinf/E_p`` mit dem Modul des
 Erzeugnisses: die Stauchung des Betons beim Vorspannen faellt weg -- nach
 Vorgabe, nicht nachgeschlagen.
 
+DIE NEIGUNG:
+Ein Glied mit Vordehnung darf gegen die Stabachse geneigt sein, um
+``beta_p`` in der lotrechten Ebene (Figur 18). Seine lotrechte Kraft
+``F · sin beta_p`` zaehlt in der Querkraft (:func:`lotrecht`):
+``beta_p > 0`` heisst, sie wirkt wie ein positives ``V_z``. Wirkt sie in
+einem Lastfall wie dessen ``V_z``, traegt sie es mit, mit ``F = P_inf``
+(:func:`guenstig`; 4.3.3.4.8, Gleichung (50)); wirkt sie entgegen, kommt
+sie dazu, mit der groessten Kraft im Glied (4.3.3.4.9) -- was der
+Nachweis der Schubwaende rechnet
+(:mod:`opencivil.nachweis.schubwandnachweis`). Schlaff zaehlt die Neigung
+nicht: dort steht die Vorspannung schon samt ihr in den Lastfaellen
+(Benutzer, 2026-11-25). Im Biegewiderstand und im Gebrauch zaehlt ein
+geneigtes Glied, als laege es laengs: ``cos beta_p`` ist bis
+:data:`GRENZE_NEIGUNG` mindestens 0.94 -- nach Vorgabe, nicht
+nachgeschlagen.
+
 DIE GRENZEN:
 Nach dem Spannen ``sigma_p0 <= min(0.75 f_pk; 0.85 f_p0.1k)`` (4.1.5.2.2,
 Gleichung (22)), nach allen Verlusten ``sigma_pinf >= 0.45 f_pk``
@@ -73,6 +89,8 @@ REFERENZ_EINWIRKUNG = "SIA 262:2025, 4.1.5.5.2"
 REFERENZ_NACH_SPANNEN = "SIA 262:2025, 4.1.5.2.2, (22)"
 REFERENZ_NACH_VERLUSTEN = "SIA 262:2025, 4.1.5.2.3"
 REFERENZ_VERLUSTE = "SIA 262:2025, 4.1.5.3"
+REFERENZ_GUENSTIG = "SIA 262:2025, 4.3.3.4.8, (50)"
+REFERENZ_UNGUENSTIG = "SIA 262:2025, 4.3.3.4.9"
 NACH_VORGABE = "nach Vorgabe, nicht nachgeschlagen"
 
 #: ``sigma_p0 = 0.70 f_pk``, wo nichts eingegeben ist -- nach Vorgabe, nicht
@@ -97,8 +115,24 @@ GRENZE_F_P01K = 0.85
 #: 4.1.5.2.3: nach allen Verlusten mindestens ``0.45 f_pk``.
 MINDESTENS_F_PK = 0.45
 
+#: Wie steil ein Glied hoechstens liegt, in Grad, nach oben wie nach unten:
+#: bis dahin zaehlt es im Biegewiderstand laengs, ``cos 20° = 0.94`` -- nach
+#: Vorgabe, nicht nachgeschlagen.
+GRENZE_NEIGUNG = 20.0
+
 #: Die Kennwerte des Spannstahls, die die Herleitung der Glieder liest.
 KENNWERTE = ("f_pk", "f_p01k", "E_p", "E_p_litze")
+
+#: Was das Feld der Neigung im Zeichenfenster sagt: als Titel, in einer
+#: Zeile darunter -- und an seiner Stelle, wo sie nicht zaehlt.
+NEIGUNG_ERKLAERT = {
+    "titel": f"Neigung gegen die Stabachse in Grad, höchstens {GRENZE_NEIGUNG:.0f}° – positiv, "
+             "wo die lotrechte Kraft des Glieds wie ein positives V_z wirkt: dann trägt sie "
+             f"es mit ({REFERENZ_GUENSTIG}); wirkt sie entgegen, vergrössert sie die Kraft "
+             f"der Wände ({REFERENZ_UNGUENSTIG}).",
+    "hinweis": "β_p > 0: die lotrechte Kraft des Glieds wirkt wie ein positives V_z.",
+    "ohne": "Schlaff zählt die Neigung nicht: sie steht mit der Vorspannung in den Lastfällen.",
+}
 
 #: Was eine Tabelle oder ein Bild sagt, das die Dehnung eines Glieds zeigt:
 #: es ist die des Betons an seiner Stelle, nicht die des Stahls.
@@ -135,6 +169,11 @@ class Spannwirkung(Wahl):
         return {Spannwirkung.VORDEHNUNG: "Vordehnung", Spannwirkung.RESTFESTIGKEIT: "schlaff"}[self]
 
     @property
+    def mit_neigung(self) -> bool:
+        """Ob die Neigung zaehlt -- nur mit Vordehnung, siehe Dateikopf."""
+        return self is Spannwirkung.VORDEHNUNG
+
+    @property
     def erklaerung(self) -> str:
         return {
             Spannwirkung.VORDEHNUNG:
@@ -142,8 +181,9 @@ class Spannwirkung(Wahl):
                 "eine Last wirkt – die Lastfälle ohne Vorspannung eingeben "
                 f"({REFERENZ_WIDERSTAND}).",
             Spannwirkung.RESTFESTIGKEIT:
-                "Die Vorspannung steht schon als Einwirkung in den Lastfällen: das Glied "
-                f"trägt nur noch, was über σ_p∞ hinausgeht ({REFERENZ_EINWIRKUNG}).",
+                "Die Vorspannung steht schon als Einwirkung in den Lastfällen, samt dem, "
+                "was ihre Neigung zur Querkraft beiträgt: das Glied trägt nur noch, was "
+                f"über σ_p∞ hinausgeht ({REFERENZ_EINWIRKUNG}).",
         }[self]
 
 
@@ -210,6 +250,24 @@ def grenzen_verletzt(p0: float, pinf: float, f_pk: float, f_p01k: float) -> List
         saetze.append(f"σ_p∞ = {pinf:.0f} N/mm² liegt unter 0.45·f_pk = "
                       f"{MINDESTENS_F_PK * f_pk:.0f} N/mm² (SIA 262:2025, 4.1.5.2.3)")
     return saetze
+
+
+def geneigt(g: "Spannglied") -> bool:
+    """Ob ein Glied mit seiner Neigung in der Querkraft zaehlt -- siehe Dateikopf."""
+    return g.wirkung.mit_neigung and g.neigung != 0.0
+
+
+def lotrecht(kraft: float, neigung: float) -> float:
+    """Die lotrechte Kraft eines Glieds, das ``kraft`` traegt und um ``neigung`` Grad geneigt ist."""
+    return kraft * math.sin(math.radians(neigung))
+
+
+def guenstig(neigung: float, V_z: float) -> bool:
+    """
+    Ob die lotrechte Kraft eines Glieds die Querkraft ``V_z`` mittraegt:
+    beide gleich gerichtet. Ohne ``V_z`` kommt sie dazu -- unguenstig.
+    """
+    return lotrecht(1.0, neigung) * V_z > 0.0
 
 
 def flaechendurchmesser(flaeche: float) -> float:
@@ -365,6 +423,8 @@ class Spannglied(Bewehrungselement):
     verbund: Verbund
     sigma_p0: Optional[float]
     sigma_pinf: Optional[float]
+    neigung: float
+    """``beta_p`` in Grad, siehe Dateikopf."""
 
     vorgespannt: ClassVar[bool] = True
 
@@ -412,7 +472,7 @@ def aus_glied(g: Mapping, erzeugnis: Erzeugnis) -> Spannglied:
         name=g["name"], kennung=g["kennung"], stahl=g["stahl"], von=lage, bis=lage,
         flaeche=g["anzahl"] * erzeugnis.flaeche, erzeugnis=erzeugnis, anzahl=int(g["anzahl"]),
         wirkung=Spannwirkung(g["wirkung"]), verbund=Verbund(g["verbund"]),
-        sigma_p0=g["sigma_p0"], sigma_pinf=g["sigma_pinf"])
+        sigma_p0=g["sigma_p0"], sigma_pinf=g["sigma_pinf"], neigung=g["neigung"])
 
 
 # ===========================================================================
@@ -432,10 +492,9 @@ class Spannglieder(Prozedur):
     def __init__(self, glieder: Sequence[Spannglied], *, basis: str,
                  abschnitt: Abschnitt) -> None:
         self.glieder = tuple(glieder)
-        mehrere = len(self.glieder) > 1
         self.d: Dict[str, Dict[str, WertDef]] = {}
-        for nummer, g in enumerate(self.glieder, start=1):
-            index = f",{nummer}" if mehrere else ""
+        for g in self.glieder:
+            index = self.index(g)
 
             def d(kurz: str, symbol: str, einheit, beschreibung: str, stellen: int = 0,
                   referenz: str = "", g=g) -> WertDef:
@@ -461,12 +520,21 @@ class Spannglieder(Prozedur):
             bezuege=[s.bezug(k) for s in stoffe for k in KENNWERTE],
             titel="Spannglieder", abschnitt=abschnitt)
 
+    def index(self, g: Spannglied) -> str:
+        """Was an den Symbolen eines Glieds unten steht: «,2» -- bei nur einem nichts."""
+        return f",{self.glieder.index(g) + 1}" if len(self.glieder) > 1 else ""
+
     # -- Fuer die Nachweise -------------------------------------------------------
 
-    def gliedbezuege(self) -> List[Eingabebezug]:
-        """Was ein Nachweis von jedem Glied liest: ``sigma_pinf``, ``eps_p`` und ``P_inf``."""
+    def gliedbezuege(self, kurze: Sequence[str] = ("sigma_pinf", "eps_p", "P_inf"),
+                     glieder: Optional[Sequence[Spannglied]] = None) -> List[Eingabebezug]:
+        """
+        Was ein Nachweis von den Gliedern liest, als ``{kurz}__{kennung}`` --
+        jeder ``sigma_pinf``, ``eps_p`` und ``P_inf`` von allen; wer mehr
+        braucht, nennt die Werte und die Glieder.
+        """
         return [Eingabebezug(f"{kurz}__{g.kennung}", self.d[g.kennung][kurz].id)
-                for g in self.glieder for kurz in ("sigma_pinf", "eps_p", "P_inf")]
+                for g in (self.glieder if glieder is None else glieder) for kurz in kurze]
 
     def spannkraefte(self) -> List[Tuple[Spannglied, str]]:
         """
@@ -545,18 +613,29 @@ class Spannglieder(Prozedur):
                       "ersetzt ihre Rechnung nicht.")
         p.annahme("Die Vordehnung ist σ_p∞/E_p: die Stauchung des Betons beim Vorspannen "
                   f"fällt weg ({NACH_VORGABE}).")
+        if any(geneigt(g) for g in self.glieder):
+            p.annahme("Geneigt zählt ein Glied im Biegewiderstand und im Gebrauch, als läge "
+                      f"es längs: cos β_p ≈ 1, bis {GRENZE_NEIGUNG:.0f}° mindestens "
+                      f"{math.cos(math.radians(GRENZE_NEIGUNG)):.2f} ({NACH_VORGABE}). Seine "
+                      "lotrechte Kraft nimmt der Nachweis der Querkraft mit "
+                      f"({REFERENZ_GUENSTIG}; {REFERENZ_UNGUENSTIG}).")
         p.ansatz(r"\sigma_{p0} \le \min\left(0.75 \cdot f_{pk};\ 0.85 \cdot f_{p0.1k}\right)"
                  r" \qquad \sigma_{p\infty} \ge 0.45 \cdot f_{pk}",
                  titel="Grenzen der Spannung nach dem Spannen und nach allen Verlusten",
                  referenz=f"{REFERENZ_NACH_SPANNEN}; {REFERENZ_NACH_VERLUSTEN}", name=GRENZEN)
         ergebnis: Dict[str, Groesse] = {}
         zeilen = [self._glied(e, p, g, ergebnis) for g in self.glieder]
-        p.tabelle(
-            kopf=["Glied", Mathe(r"\text{Lage}\ [\mathrm{mm}]"), "Spannstahl",
-                  Mathe(r"A_p\ [\mathrm{mm}^2]"), Mathe(r"\sigma_{p\infty}\ [\mathrm{N/mm^2}]"),
-                  Mathe(r"\varepsilon_p\ [\text{‰}]"), Mathe(r"P_\infty\ [\mathrm{kN}]"),
-                  "Wirkung", "Verbund"],
-            zeilen=zeilen, titel="Spannglieder", ausrichtung="lllrrrrll")
+        kopf = ["Glied", Mathe(r"\text{Lage}\ [\mathrm{mm}]"), "Spannstahl",
+                Mathe(r"A_p\ [\mathrm{mm}^2]"), Mathe(r"\sigma_{p\infty}\ [\mathrm{N/mm^2}]"),
+                Mathe(r"\varepsilon_p\ [\text{‰}]"), Mathe(r"P_\infty\ [\mathrm{kN}]"),
+                "Wirkung", "Verbund"]
+        if any(geneigt(g) for g in self.glieder):
+            # Die Neigung nur, wo eine zaehlt -- schlaff steht ein Strich.
+            kopf.append(Mathe(r"\beta_p\ [{}^{\circ}]"))
+            for g, zeile in zip(self.glieder, zeilen):
+                zeile.append(Mathe(fest(g.neigung, 1)) if g.wirkung.mit_neigung else "–")
+        p.tabelle(kopf=kopf, zeilen=zeilen, titel="Spannglieder",
+                  ausrichtung="lllrrrrll" + "r" * (len(kopf) - 9))
         return ergebnis
 
     def _glied(self, e: Eingaben, p: Protokoll, g: Spannglied,

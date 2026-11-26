@@ -28,7 +28,7 @@
 \date{\today}
 \begin{document}
 \maketitle
-889 Berechnungen ausgeführt, 1295 Werte bestimmt.
+890 Berechnungen ausgeführt, 1301 Werte bestimmt.
 
 \section{Herleitung}
 \subsection{Plattenanalyse: Decke}
@@ -6634,6 +6634,22 @@ Linie 2 & $(50;\ 750) \rightarrow (350;\ 750)$ & $3 \varnothing 12\ @\ 150.0$ & 
 \begin{equation*}
 A_{s,tot} = 955\,\mathrm{mm}^{2}
 \end{equation*}
+\noindent\textbf{Bügelquerschnitt je Länge einer Schubwand (n Schnitte)}
+\begin{equation*}
+\frac{A_{sw}}{s} = \frac{n \cdot \pi\, \varnothing^2 / 4}{s}
+\end{equation*}
+\noindent\textbf{Schubwände}
+\begin{longtable}{llrrlr}
+\hline
+Wand & $\text{Achse}\ [\mathrm{mm}]$ & $l\ [\mathrm{mm}]$ & $b_w\ [\mathrm{mm}]$ & Bügel & $A_{sw}/s\ [\mathrm{mm}^2/\mathrm{m}]$ \\
+\hline
+\endhead
+Wand 1 & $(50;\ 50) \rightarrow (350;\ 50)$ & $300$ & $100$ & $1 \times \varnothing 10\ @\ 150$ & $524$ \\
+Wand 2 & $(350;\ 50) \rightarrow (350;\ 750)$ & $700$ & $100$ & $1 \times \varnothing 10\ @\ 150$ & $524$ \\
+Wand 3 & $(350;\ 750) \rightarrow (50;\ 750)$ & $300$ & $100$ & $1 \times \varnothing 10\ @\ 150$ & $524$ \\
+Wand 4 & $(50;\ 750) \rightarrow (50;\ 50)$ & $700$ & $100$ & $1 \times \varnothing 10\ @\ 150$ & $524$ \\
+\hline
+\end{longtable}
 \noindent\textbf{Querschnitt, Vordehnung und Spannkraft eines Glieds aus n Drähten, Litzen oder Stäben} \hfill \normref{SIA 262:2025, 3.3.2.2, Tabelle 7; SIA 262:2025, 4.1.5.1.5}
 \begin{equation*}
 A_p = n \cdot a_p \qquad \varepsilon_p = \frac{\sigma_{p\infty}}{E_p} \qquad P_\infty = A_p \cdot \sigma_{p\infty}
@@ -6644,6 +6660,7 @@ A_p = n \cdot a_p \qquad \varepsilon_p = \frac{\sigma_{p\infty}}{E_p} \qquad P_\
 \end{equation*}
 \hinweis{Annahme}{Spannglied 1, Spannglied 3: Spannung nach Vorgabe – die Verluste hängen am Bauwerk (SIA 262:2025, 4.1.5.3), die Vorgabe ersetzt ihre Rechnung nicht.}
 \hinweis{Annahme}{Die Vordehnung ist σ\_p∞/E\_p: die Stauchung des Betons beim Vorspannen fällt weg (nach Vorgabe, nicht nachgeschlagen).}
+\hinweis{Annahme}{Geneigt zählt ein Glied im Biegewiderstand und im Gebrauch, als läge es längs: cos β\_p ≈ 1, bis 20° mindestens 0.94 (nach Vorgabe, nicht nachgeschlagen). Seine lotrechte Kraft nimmt der Nachweis der Querkraft mit (SIA 262:2025, 4.3.3.4.8, (50); SIA 262:2025, 4.3.3.4.9).}
 \noindent\textbf{Grenzen der Spannung nach dem Spannen und nach allen Verlusten} \hfill \normref{SIA 262:2025, 4.1.5.2.2, (22); SIA 262:2025, 4.1.5.2.3}
 \begin{equation*}
 \sigma_{p0} \le \min\left(0.75 \cdot f_{pk};\ 0.85 \cdot f_{p0.1k}\right) \qquad \sigma_{p\infty} \ge 0.45 \cdot f_{pk}
@@ -6745,14 +6762,14 @@ A_{p,3} = n \cdot a_p = 2 \cdot 100\,\mathrm{mm}^{2} = 200\,\mathrm{mm}^{2}
 P_{\infty,3} = A_{p,3} \cdot \sigma_{p\infty,3} = 200\,\mathrm{mm}^{2} \cdot 1107\,\mathrm{N}/\mathrm{mm}^{2} = 221.3\,\mathrm{kN}
 \end{equation*}
 \noindent\textbf{Spannglieder}
-\begin{longtable}{lllrrrrll}
+\begin{longtable}{lllrrrrllr}
 \hline
-Glied & $\text{Lage}\ [\mathrm{mm}]$ & Spannstahl & $A_p\ [\mathrm{mm}^2]$ & $\sigma_{p\infty}\ [\mathrm{N/mm^2}]$ & $\varepsilon_p\ [\text{‰}]$ & $P_\infty\ [\mathrm{kN}]$ & Wirkung & Verbund \\
+Glied & $\text{Lage}\ [\mathrm{mm}]$ & Spannstahl & $A_p\ [\mathrm{mm}^2]$ & $\sigma_{p\infty}\ [\mathrm{N/mm^2}]$ & $\varepsilon_p\ [\text{‰}]$ & $P_\infty\ [\mathrm{kN}]$ & Wirkung & Verbund & $\beta_p\ [{}^{\circ}]$ \\
 \hline
 \endhead
-Spannglied 1 & $(200;\ 120)$ & 4 × Litze ⌀15.7, Y1860 & $600$ & $1107$ & $5.68$ & $664.0$ & mit Vordehnung & mit Verbund \\
-Spannglied 2 & $(120;\ 160)$ & 2 × Litze ⌀15.3, Y1860 & $280$ & $1100$ & $5.64$ & $308.0$ & mit Vordehnung & ohne Verbund \\
-Spannglied 3 & $(280;\ 160)$ & 2 × Litze ⌀12.9, Y1860 & $200$ & $1107$ & $5.68$ & $221.3$ & schlaff mit Restfestigkeit & mit Verbund \\
+Spannglied 1 & $(200;\ 120)$ & 4 × Litze ⌀15.7, Y1860 & $600$ & $1107$ & $5.68$ & $664.0$ & mit Vordehnung & mit Verbund & $5.0$ \\
+Spannglied 2 & $(120;\ 160)$ & 2 × Litze ⌀15.3, Y1860 & $280$ & $1100$ & $5.64$ & $308.0$ & mit Vordehnung & ohne Verbund & $-4.0$ \\
+Spannglied 3 & $(280;\ 160)$ & 2 × Litze ⌀12.9, Y1860 & $200$ & $1107$ & $5.68$ & $221.3$ & schlaff mit Restfestigkeit & mit Verbund & – \\
 \hline
 \end{longtable}
 \noindent\textbf{Dehnungsebene und innere Kräfte} \hfill \normref{SIA 262:2025, 4.3.2.3}
@@ -6875,6 +6892,204 @@ M_{Rd} = \sqrt{M_{y,Rd}^{2} + M_{z,Rd}^{2}} = \sqrt{\left(879.5\,\mathrm{kNm}\ri
 \noindent\textbf{Erfüllungsgrad}
 \begin{equation*}
 \alpha_{eff,\text{Feld}} = \frac{M_{Rd}}{M_{Ed}} = \frac{879.5\,\mathrm{kNm}}{600\,\mathrm{kNm}} = 1.47 \quad \Rightarrow \quad \text{erfüllt}
+\end{equation*}
+\subsubsection{Auflager}
+\noindent\textbf{Einwirkung}
+\begin{longtable}{lrl}
+\hline
+Einwirkung & Wert &  \\
+\hline
+\endhead
+N\_Ed & $0.0$ & kN \\
+M\_y,Ed & $150.0$ & kNm \\
+M\_z,Ed & $0.0$ & kNm \\
+\hline
+\end{longtable}
+Bruchzustand: Zugrichtung n = (0.174; -0.985), -80.0° gegen die y-Achse. Die Nulllinie steht senkrecht zur Zugrichtung, 199.5 mm auf der Druckseite des Schwerpunkts.
+
+\noindent\textbf{Dehnungsebene}
+\begin{longtable}{rr}
+\hline
+$\varepsilon_0\ [\text{‰}]$ & $\kappa\ [\mathrm{1/m}]$ \\
+\hline
+\endhead
+$3.045$ & $0.01527$ \\
+\hline
+\end{longtable}
+\noindent\textbf{Kräfte im Bruchzustand – Beton als Resultierende, Bewehrung je Element}
+\begin{longtable}{lrrrrr}
+\hline
+Teil & $F\ [\mathrm{kN}]$ & $y\ [\mathrm{mm}]$ & $z\ [\mathrm{mm}]$ & $\varepsilon\ [\text{‰}]$ & $\sigma\ [\mathrm{N/mm^2}]$ \\
+\hline
+\endhead
+C30/37 & $-1334.7$ & $185.9$ & $713.2$ & – & – \\
+Linie 1 & $267.7$ & $200.0$ & $50.0$ & $7.91 \ldots 8.71$ & $435$ \\
+Linie 2 & $-132.7$ & $190.9$ & $750.0$ & $-2.62 \ldots -1.82$ & $-435 \ldots -364$ \\
+Spannglied 1 & $834.8$ & $200.0$ & $120.0$ & $7.25$ & $1391$ \\
+Spannglied 2 & $308.0$ & $120.0$ & $160.0$ & $6.44$ & $1100$ \\
+Spannglied 3 & $56.9$ & $280.0$ & $160.0$ & $6.87$ & $285$ \\
+\hline
+\end{longtable}
+Bei einem Spannglied ist ε die Dehnung des Betons an seiner Stelle: mit Verbund ist der Stahl um seine Vordehnung ε\_p mehr gedehnt, ohne Verbund hängt seine Spannung nicht an ε.
+
+\noindent\textbf{Probe: Normalkraft}
+\begin{equation*}
+N_{Rd} = \sum F_i = 0\,\mathrm{kN}
+\end{equation*}
+\noindent\textbf{Probe: Moment um y}
+\begin{equation*}
+M_{y,Rd} = -\sum F_i \cdot (z_i - z_S) = 879.5\,\mathrm{kNm}
+\end{equation*}
+\noindent\textbf{Probe: Moment um z}
+\begin{equation*}
+M_{z,Rd} = -\sum F_i \cdot (y_i - y_S) = 0\,\mathrm{kNm}
+\end{equation*}
+\noindent\textbf{Widerstand in der Richtung der Einwirkung}
+\begin{equation*}
+M_{Rd} = \sqrt{M_{y,Rd}^{2} + M_{z,Rd}^{2}} = \sqrt{\left(879.5\,\mathrm{kNm}\right)^{2} + \left(0\,\mathrm{kNm}\right)^{2}} = 879.5\,\mathrm{kNm}
+\end{equation*}
+\noindent\textbf{Erfüllungsgrad}
+\begin{equation*}
+\alpha_{eff,\text{Auflager}} = \frac{M_{Rd}}{M_{Ed}} = \frac{879.5\,\mathrm{kNm}}{150\,\mathrm{kNm}} = 5.86 \quad \Rightarrow \quad \text{erfüllt}
+\end{equation*}
+\noindent\textbf{Querkraft über die Federn der Wände}
+\begin{equation*}
+k_i = b_{w,i} \cdot l_i \qquad \sum_i k_i\, e_i e_i^T\, u = V \qquad V_i = k_i\, e_i \cdot u \qquad \Delta T = \sum_i V_i\, r_i
+\end{equation*}
+\noindent\textbf{Torsion in den Zellen (Bredt, mehrzellig)} \hfill \normref{SIA 262:2025, 4.3.5.2, (55), Figur 20}
+\begin{equation*}
+T - \Delta T = \sum_k 2 A_k\, q_k \qquad \oint_k \frac{q}{b_w}\, \mathrm{d}s = 2 A_k\, \theta
+\end{equation*}
+\noindent\textbf{Kraft einer Wand: ihr Schubfluss über ihre Länge} \hfill \normref{SIA 262:2025, 4.3.5.2, (55); 4.3.5.5}
+\begin{equation*}
+V_{Ed} = |q| \cdot l
+\end{equation*}
+\noindent\textbf{Widerstand einer Wand (Fachwerk, ihre Länge l als Hebelarm)} \hfill \normref{SIA 262:2025, 4.3.3.4.3, (45); 4.3.3.4.6, (47)}
+\begin{equation*}
+V_{Rd,s} = \frac{A_{sw}}{s}\, l\, f_{yd} \cot\alpha \qquad V_{Rd,c} = b_w\, l\, k_c\, f_{cd} \sin\alpha \cos\alpha \qquad V_{Rd} = \max_\alpha \min(V_{Rd,s};\ V_{Rd,c})
+\end{equation*}
+\noindent\textbf{Druckfeld}
+\begin{longtable}{lr}
+\hline
+Grenze & Wert \\
+\hline
+\endhead
+$\alpha_{min}$ & $30{}^{\circ}$ \\
+$\alpha_{max}$ & $45{}^{\circ}$ \\
+$k_c$ & $0.55$ \\
+\hline
+\end{longtable}
+\noindent\textbf{Schubwände und ihre Steifigkeit}
+\begin{longtable}{lrrrrl}
+\hline
+Wand & $l\ [\mathrm{mm}]$ & $b_w\ [\mathrm{mm}]$ & $k = b_w l\ [\mathrm{mm}^2]$ & $A_{sw}/s\ [\mathrm{mm^2/m}]$ & Zelle \\
+\hline
+\endhead
+Wand 1 & $300$ & $100$ & $30000$ & $524$ & 1 \\
+Wand 2 & $700$ & $100$ & $70000$ & $524$ & 1 \\
+Wand 3 & $300$ & $100$ & $30000$ & $524$ & 1 \\
+Wand 4 & $700$ & $100$ & $70000$ & $524$ & 1 \\
+\hline
+\end{longtable}
+\subsubsection{Geneigte Spannglieder}
+\noindent\textbf{Lotrechte Kraft der Glieder, und welche Kraft im Glied zählt} \hfill \normref{SIA 262:2025, 4.3.3.4.8, (50); SIA 262:2025, 4.3.3.4.9}
+\begin{equation*}
+V_p = \sum_i F_i \cdot \sin\beta_{p,i} \qquad F_i = P_{\infty,i}\ \text{wo sie}\ V_{z,Ed}\ \text{mitträgt} \qquad F_i = P_{max,i}\ \text{wo sie entgegen wirkt}
+\end{equation*}
+\noindent\textbf{Die grösste Kraft im Glied: mit Verbund bis zur Fliessgrenze, ohne Verbund die nach dem Spannen} \hfill \normref{SIA 262:2025, 4.3.3.4.9; nach Vorgabe, nicht nachgeschlagen}
+\begin{equation*}
+P_{max} = A_p \cdot f_{pd}\ \text{mit Verbund} \qquad P_{max} = A_p \cdot \sigma_{p0}\ \text{ohne Verbund}
+\end{equation*}
+\noindent\textbf{Was die Wände tragen: die Last ohne die lotrechte Kraft der Glieder} \hfill \normref{SIA 262:2025, 4.3.3.4.8, (50); SIA 262:2025, 4.3.3.4.9; nach Vorgabe, nicht nachgeschlagen}
+\begin{equation*}
+V_{z,w} = V_{z,Ed} - V_p \qquad T_w = T_{Ed} - \sum_i F_i \cdot \sin\beta_{p,i} \cdot (y_i - y_S)
+\end{equation*}
+\noindent\textbf{Spannglied 1: mit Verbund bis zur Fliessgrenze} \hfill \normref{SIA 262:2025, 4.3.3.4.9; nach Vorgabe, nicht nachgeschlagen}
+\begin{equation*}
+P_{max,1} = A_{p,1} \cdot f_{pd} = 600\,\mathrm{mm}^{2} \cdot 1391\,\mathrm{N}/\mathrm{mm}^{2} = 834.8\,\mathrm{kN}
+\end{equation*}
+\noindent\textbf{Spannglied 2: ohne Verbund die Kraft nach dem Spannen} \hfill \normref{SIA 262:2025, 4.3.3.4.9; nach Vorgabe, nicht nachgeschlagen}
+\begin{equation*}
+P_{max,2} = A_{p,2} \cdot \sigma_{p0,2} = 280\,\mathrm{mm}^{2} \cdot 1350\,\mathrm{N}/\mathrm{mm}^{2} = 378\,\mathrm{kN}
+\end{equation*}
+\noindent\textbf{Geneigte Spannglieder}
+\begin{longtable}{lrrrrl}
+\hline
+Glied & $\beta_p\ [{}^{\circ}]$ & $y - y_S\ [\mathrm{mm}]$ & $P_\infty\ [\mathrm{kN}]$ & $P_{max}\ [\mathrm{kN}]$ & Verbund \\
+\hline
+\endhead
+Spannglied 1 & $5.0$ & $0$ & $664.0$ & $834.8$ & mit Verbund \\
+Spannglied 2 & $-4.0$ & $-80$ & $308.0$ & $378.0$ & ohne Verbund \\
+\hline
+\end{longtable}
+\subsubsection{Auflager}
+\noindent\textbf{Einwirkung}
+\begin{longtable}{lrl}
+\hline
+Einwirkung & Wert &  \\
+\hline
+\endhead
+V\_y,Ed & $0.0$ & kN \\
+V\_z,Ed & $450.0$ & kN \\
+T\_Ed & $0.0$ & kNm \\
+\hline
+\end{longtable}
+Spannglied 1: trägt V\_z mit → P∞; Spannglied 2: wirkt V\_z entgegen → P\_max.
+
+\noindent\textbf{Lotrechte Kraft der geneigten Spannglieder} \hfill \normref{SIA 262:2025, 4.3.3.4.8, (50); SIA 262:2025, 4.3.3.4.9}
+\begin{equation*}
+\begin{aligned}
+  V_p &= P_{\infty,1} \cdot \sin \beta_{p,1} + P_{max,2} \cdot \sin \beta_{p,2} \\
+  &= 664\,\mathrm{kN} \cdot \sin 5{}^{\circ} + 378\,\mathrm{kN} \cdot \sin \left(-4{}^{\circ}\right) \\
+  &= 31.5\,\mathrm{kN}
+\end{aligned}
+\end{equation*}
+\noindent\textbf{Was die Wände von V\_z tragen}
+\begin{equation*}
+V_{z,w} = V_{z,Ed} - V_p = 450\,\mathrm{kN} - 31.5\,\mathrm{kN} = 418.5\,\mathrm{kN}
+\end{equation*}
+\noindent\textbf{Ihr Moment um den Schwerpunkt}
+\begin{equation*}
+T_p = P_{max,2} \cdot \sin \beta_{p,2} \cdot e_{p,2} = 378\,\mathrm{kN} \cdot \sin \left(-4{}^{\circ}\right) \cdot \left(-80\,\mathrm{mm}\right) = 2.1\,\mathrm{kNm}
+\end{equation*}
+\noindent\textbf{Was die Wände von T tragen}
+\begin{equation*}
+T_w = T_{Ed} - T_p = 0\,\mathrm{kNm} - 2.1\,\mathrm{kNm} = -2.1\,\mathrm{kNm}
+\end{equation*}
+\noindent\textbf{Versatz: Moment der Querkraftanteile um den Schwerpunkt}
+\begin{equation*}
+\Delta T = \sum_i V_i \cdot r_i = 0\,\mathrm{kNm}
+\end{equation*}
+\noindent\textbf{Was die Zellen tragen}
+\begin{equation*}
+T_{Zellen} = T_w - \Delta T = -2.1\,\mathrm{kNm} - 0\,\mathrm{kNm} = -2.1\,\mathrm{kNm}
+\end{equation*}
+\noindent\textbf{Umlauf-Schubfluss der Zellen (Bredt)}
+\begin{longtable}{lrr}
+\hline
+Zelle & $A_k\ [\mathrm{mm}^2]$ & $q_k\ [\mathrm{kN/m}]$ \\
+\hline
+\endhead
+Zelle 1 & $210000$ & $-5.0$ \\
+\hline
+\end{longtable}
+\noindent\textbf{Je Wand: Kraft der Feder, ganze Kraft, Widerstand}
+\begin{longtable}{lrrrrrrr}
+\hline
+Wand & $V_i\ [\mathrm{kN}]$ & $V_{Ed}\ [\mathrm{kN}]$ & $\alpha\ [{}^{\circ}]$ & $V_{Rd,s}\ [\mathrm{kN}]$ & $V_{Rd,c}\ [\mathrm{kN}]$ & $V_{Rd}\ [\mathrm{kN}]$ & $\alpha_{eff}$ \\
+\hline
+\endhead
+Wand 1 & $0.0$ & $1.5$ & $30$ & $118.3$ & $142.9$ & $118.3$ & $78.51$ \\
+Wand 2 & $209.2$ & $205.7$ & $30$ & $276.0$ & $333.4$ & $276.0$ & $1.34$ \\
+Wand 3 & $0.0$ & $1.5$ & $30$ & $118.3$ & $142.9$ & $118.3$ & $78.51$ \\
+Wand 4 & $-209.2$ & $212.8$ & $30$ & $276.0$ & $333.4$ & $276.0$ & $1.30$ \\
+\hline
+\end{longtable}
+Massgebend: Wand 4.
+
+\noindent\textbf{Erfüllungsgrad}
+\begin{equation*}
+\alpha_{eff,V,\text{Auflager}} = \frac{V_{Rd}}{V_{Ed}} = \frac{276\,\mathrm{kN}}{212.8\,\mathrm{kN}} = 1.30 \quad \Rightarrow \quad \text{erfüllt}
 \end{equation*}
 \noindent\textbf{Bedingung} \hfill \normref{SIA 262:2025, 4.1.4.2.5}
 \begin{equation*}
@@ -7705,6 +7920,55 @@ N_{Rd}^{+} = 1614.9\,\mathrm{kN}
 \noindent\textbf{Reiner Druck, gleichmässig gedehnt}
 \begin{equation*}
 N_{Rd}^{-} = -6081.3\,\mathrm{kN}
+\end{equation*}
+\subsubsection{Querkraft und Torsion der Schubwände}
+\noindent\textbf{Querkraftwiderstand in z: je Wand}
+\begin{longtable}{lrrrr}
+\hline
+Wand & $V_1\ [\mathrm{kN}\ \text{je}\ \mathrm{kN}]$ & $\alpha\ [{}^{\circ}]$ & $V_{Rd}\ [\mathrm{kN}]$ & $V_{Rd}/V_1\ [\mathrm{kN}]$ \\
+\hline
+\endhead
+Wand 1 & $0.000$ & $30$ & $118.3$ & $\infty$ \\
+Wand 2 & $0.500$ & $30$ & $276.0$ & $552.0$ \\
+Wand 3 & $0.000$ & $30$ & $118.3$ & $\infty$ \\
+Wand 4 & $0.500$ & $30$ & $276.0$ & $552.0$ \\
+\hline
+\end{longtable}
+\noindent\textbf{Querkraftwiderstand in z, allein – massgebend Wand 2} \hfill \normref{SIA 262:2025, 4.3.3.4.3, (45); 4.3.3.4.6, (47)}
+\begin{equation*}
+V_{z,Rd} = 552\,\mathrm{kN}
+\end{equation*}
+\noindent\textbf{Querkraftwiderstand in y: je Wand}
+\begin{longtable}{lrrrr}
+\hline
+Wand & $V_1\ [\mathrm{kN}\ \text{je}\ \mathrm{kN}]$ & $\alpha\ [{}^{\circ}]$ & $V_{Rd}\ [\mathrm{kN}]$ & $V_{Rd}/V_1\ [\mathrm{kN}]$ \\
+\hline
+\endhead
+Wand 1 & $0.500$ & $30$ & $118.3$ & $236.6$ \\
+Wand 2 & $0.000$ & $30$ & $276.0$ & $\infty$ \\
+Wand 3 & $0.500$ & $30$ & $118.3$ & $236.6$ \\
+Wand 4 & $0.000$ & $30$ & $276.0$ & $\infty$ \\
+\hline
+\end{longtable}
+\noindent\textbf{Querkraftwiderstand in y, allein – massgebend Wand 1} \hfill \normref{SIA 262:2025, 4.3.3.4.3, (45); 4.3.3.4.6, (47)}
+\begin{equation*}
+V_{y,Rd} = 236.6\,\mathrm{kN}
+\end{equation*}
+\noindent\textbf{Torsionswiderstand: je Wand}
+\begin{longtable}{lrrrr}
+\hline
+Wand & $V_1\ [\mathrm{kN}\ \text{je}\ \mathrm{kNm}]$ & $\alpha\ [{}^{\circ}]$ & $V_{Rd}\ [\mathrm{kN}]$ & $V_{Rd}/V_1\ [\mathrm{kNm}]$ \\
+\hline
+\endhead
+Wand 1 & $0.714$ & $30$ & $118.3$ & $165.6$ \\
+Wand 2 & $1.667$ & $30$ & $276.0$ & $165.6$ \\
+Wand 3 & $0.714$ & $30$ & $118.3$ & $165.6$ \\
+Wand 4 & $1.667$ & $30$ & $276.0$ & $165.6$ \\
+\hline
+\end{longtable}
+\noindent\textbf{Torsionswiderstand, allein – massgebend Wand 1} \hfill \normref{SIA 262:2025, 4.3.5.2, (55); 4.3.5.5; 4.3.3.4.3, (45); 4.3.3.4.6, (47)}
+\begin{equation*}
+T_{Rd} = 165.6\,\mathrm{kNm}
 \end{equation*}
 \subsection{Spannstahl: Y1860}
 \noindent\textbf{Zugfestigkeit} \hfill \normref{SIA 262:2025, 3.3.2.2, Tabelle 7}
@@ -17156,6 +17420,8 @@ I_T = \frac{4 \cdot I_{T,fein} - I_{T,grob}}{3}
 \subsection{Querkraft und Torsion}
 Jede Schubwand trägt eine Kraft entlang ihrer Achse; ihre Länge ist der Hebelarm des Fachwerks. Verteilt wird elastisch: der Querschnitt verschiebt sich, und jede Wand wehrt sich wie eine Feder mit der Steifigkeit b\_w·l. Das Moment dieser Querkraftanteile um den Schwerpunkt ist der Versatz ΔT; den Rest der Torsion tragen die geschlossenen Zellen als Umlauf-Schubfluss nach Bredt, mehrzellig mit gleicher Verdrillung aller Zellen. Ohne Zelle trägt die Torsion über dieselben Federn mit Drehung. Die Wandkräfte ergeben so immer V\_y, V\_z und um den Schwerpunkt T. Eine gezeichnete Wand ist dort geteilt, wo eine andere auf ihr endet oder sie kreuzt (Wand 1.1, Wand 1.2 …): jede trägt so überall denselben Fluss und wird für sich nachgewiesen, mit ihrer ganzen Kraft, nicht je Meter – bei einer Zelle die Kraft aus der Querkraft und die aus der Torsion zusammen. In der Zusammenfassung steht die massgebende Wand.
 
+Ein geneigtes Spannglied trägt mit seiner lotrechten Kraft F·sin β\_p einen Teil der Querkraft V\_z; ist β\_p positiv, wirkt sie wie ein positives V\_z. Wirkt sie in einem Lastfall wie dessen V\_z, trägt sie es mit, mit der Kraft nach allen Verlusten P∞; wirkt sie entgegen, kommt sie dazu, mit der grössten Kraft im Glied P\_max. Die Wände tragen den Rest, und in der Torsion fehlt ihnen das Moment der lotrechten Kräfte um den Schwerpunkt. Gleichung (50) schreibt den mitgetragenen Teil dem Widerstand zu; hier mindert er die Kraft der Wände – an der Grenze dasselbe, und nur so verteilt er sich auf mehrere Wände.
+
 \noindent\textbf{Querkraft über die Federn der Wände}
 \begin{equation*}
 k_i = b_{w,i} \cdot l_i \qquad \sum_i k_i\, e_i e_i^T\, u = V \qquad V_i = k_i\, e_i \cdot u \qquad \Delta T = \sum_i V_i\, r_i
@@ -17179,6 +17445,38 @@ V_{Rd,s} = \frac{A_{sw}}{s}\, l\, f_{yd} \cot\alpha \qquad V_{Rd,c} = b_w\, l\, 
 \noindent\textbf{Was die Zellen tragen}
 \begin{equation*}
 T_{Zellen} = T_{Ed} - \Delta T
+\end{equation*}
+\noindent\textbf{Lotrechte Kraft der Glieder, und welche Kraft im Glied zählt} \hfill \normref{SIA 262:2025, 4.3.3.4.8, (50); SIA 262:2025, 4.3.3.4.9}
+\begin{equation*}
+V_p = \sum_i F_i \cdot \sin\beta_{p,i} \qquad F_i = P_{\infty,i}\ \text{wo sie}\ V_{z,Ed}\ \text{mitträgt} \qquad F_i = P_{max,i}\ \text{wo sie entgegen wirkt}
+\end{equation*}
+\noindent\textbf{Die grösste Kraft im Glied: mit Verbund bis zur Fliessgrenze, ohne Verbund die nach dem Spannen} \hfill \normref{SIA 262:2025, 4.3.3.4.9; nach Vorgabe, nicht nachgeschlagen}
+\begin{equation*}
+P_{max} = A_p \cdot f_{pd}\ \text{mit Verbund} \qquad P_{max} = A_p \cdot \sigma_{p0}\ \text{ohne Verbund}
+\end{equation*}
+\noindent\textbf{Was die Wände tragen: die Last ohne die lotrechte Kraft der Glieder} \hfill \normref{SIA 262:2025, 4.3.3.4.8, (50); SIA 262:2025, 4.3.3.4.9; nach Vorgabe, nicht nachgeschlagen}
+\begin{equation*}
+V_{z,w} = V_{z,Ed} - V_p \qquad T_w = T_{Ed} - \sum_i F_i \cdot \sin\beta_{p,i} \cdot (y_i - y_S)
+\end{equation*}
+\noindent\textbf{Spannglied 1: mit Verbund bis zur Fliessgrenze} \hfill \normref{SIA 262:2025, 4.3.3.4.9; nach Vorgabe, nicht nachgeschlagen}
+\begin{equation*}
+P_{max,1} = A_{p,1} \cdot f_{pd}
+\end{equation*}
+\noindent\textbf{Lotrechte Kraft der geneigten Spannglieder} \hfill \normref{SIA 262:2025, 4.3.3.4.8, (50); SIA 262:2025, 4.3.3.4.9}
+\begin{equation*}
+V_p = P_{\infty,1} \cdot \sin \beta_{p,1} + P_{max,2} \cdot \sin \beta_{p,2}
+\end{equation*}
+\noindent\textbf{Was die Wände von V\_z tragen}
+\begin{equation*}
+V_{z,w} = V_{z,Ed} - V_p
+\end{equation*}
+\noindent\textbf{Ihr Moment um den Schwerpunkt}
+\begin{equation*}
+T_p = P_{max,2} \cdot \sin \beta_{p,2} \cdot e_{p,2}
+\end{equation*}
+\noindent\textbf{Was die Wände von T tragen}
+\begin{equation*}
+T_w = T_{Ed} - T_p
 \end{equation*}
 \subsection{Schiefe Biegung}
 Der Querschnitt bleibt eben (Bernoulli). Die Dehnung hängt nur vom Abstand v in Zugrichtung n ab, gemessen ab dem Schwerpunkt; die Nulllinie steht senkrecht zu n und darf schräg liegen. Zu jeder Dehnungsebene ergeben sich N, M\_y und M\_z durch Integration über die Fläche – als Summe über Streifen quer zu n, deren Grenzen auf jede Polygonecke fallen, und Stab für Stab.
@@ -18811,6 +19109,10 @@ Linie 2 & $3 \varnothing 12$ & B500B \\
 Spannglied 1 & $4 \times \text{Litze}\ \varnothing 15.7$ & Y1860 \\
 Spannglied 2 & $2 \times \text{Litze}\ \varnothing 15.3$ & Y1860 \\
 Spannglied 3 & $2 \times \text{Litze}\ \varnothing 12.9$ & Y1860 \\
+Wand 1 & $b_w = 100,\ 1 \times \varnothing 10\ @\ 150$ & B500B \\
+Wand 2 & $b_w = 100,\ 1 \times \varnothing 10\ @\ 150$ & B500B \\
+Wand 3 & $b_w = 100,\ 1 \times \varnothing 10\ @\ 150$ & B500B \\
+Wand 4 & $b_w = 100,\ 1 \times \varnothing 10\ @\ 150$ & B500B \\
 \hline
 \end{longtable}
 \begin{xltabular}{\linewidth}{>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}Xrrr}
@@ -18819,6 +19121,8 @@ Nachweis & Bezeichnung & Widerstand & Einwirkung & $\alpha_{eff}$ \\
 \hline
 \endhead
 Biegung und Normalkraft & Feld & $M_{Rd} = 879.5\,\mathrm{kNm}$ & $M_{Ed} = 600.0\,\mathrm{kNm}$ & $1.47$ \\
+Biegung und Normalkraft & Auflager & $M_{Rd} = 879.5\,\mathrm{kNm}$ & $M_{Ed} = 150.0\,\mathrm{kNm}$ & $5.86$ \\
+Querkraft und Torsion & Auflager & $V_{Rd} = 276.0\,\mathrm{kN}$ & $V_{Ed} = 212.8\,\mathrm{kN}$ & $1.30$ \\
 Duktilität & Zug unten & – & – & $0.00$ \\
 Sprödes Versagen & Zug unten & $M_{Rd} = 879.5\,\mathrm{kNm}$ & $M_{Riss} = 449.3\,\mathrm{kNm}$ & $1.96$ \\
 Risse: Zwängung Biegung & Zug unten & $M_{s,adm} = 949.2\,\mathrm{kNm}$ & $M_{Riss} = 449.3\,\mathrm{kNm}$ & $2.11$ \\
@@ -18844,6 +19148,9 @@ Bezogene Druckzonenhöhe, Zug unten & $\left(x/d\right)_{y}^{+}$ & $0.319$ \\
 Bezogene Druckzonenhöhe, Zug oben & $\left(x/d\right)_{y}^{-}$ & $0.216$ \\
 Bezogene Druckzonenhöhe, Zug links & $\left(x/d\right)_{z}^{+}$ & $0.538$ \\
 Bezogene Druckzonenhöhe, Zug rechts & $\left(x/d\right)_{z}^{-}$ & $0.492$ \\
+Querkraftwiderstand in z & $V_{z,Rd}$ & $552\,\mathrm{kN}$ \\
+Querkraftwiderstand in y & $V_{y,Rd}$ & $236.6\,\mathrm{kN}$ \\
+Torsionswiderstand & $T_{Rd}$ & $165.6\,\mathrm{kNm}$ \\
 \hline
 \end{longtable}
 \subsection{Winkelwand}
@@ -20746,6 +21053,9 @@ Momentenwiderstand bei N\_Ed = 0, Zug rechts & $M_{z,Rd}^{-}(N_{Ed} = 0)$ & $-15
 Momentenwiderstand bei N\_Ed = 0, Zug unten & $M_{y,Rd}^{+}(N_{Ed} = 0)$ & $879.5$ & kNm & berechnet \\
 Druckwiderstand bei gleichmässiger Dehnung & $N_{Rd}^{-}$ & $-6081.3$ & kN & berechnet \\
 Zugwiderstand bei gleichmässiger Dehnung & $N_{Rd}^{+}$ & $1614.9$ & kN & berechnet \\
+Torsionswiderstand der Schubwände, allein & $T_{Rd}$ & $165.6$ & kNm & berechnet \\
+Querkraftwiderstand in y der Schubwände, allein & $V_{y,Rd}$ & $236.6$ & kN & berechnet \\
+Querkraftwiderstand in z der Schubwände, allein & $V_{z,Rd}$ & $552$ & kN & berechnet \\
 Bewehrungsmass je Kubikmeter Beton & $\mu_s$ & $23$ & kg/m³ & berechnet \\
 Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug links & $\left(x/d\right)_{z}^{+}$ & $0.538$ &  & berechnet \\
 Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug oben & $\left(x/d\right)_{y}^{-}$ & $0.216$ &  & berechnet \\
@@ -20755,14 +21065,17 @@ Erfüllungsgrad Duktilität – Zug links & $\alpha_{eff,x/d,\text{Zug links}}$ 
 Erfüllungsgrad Duktilität – Zug oben & $\alpha_{eff,x/d,\text{Zug oben}}$ & $1.62$ &  & berechnet \\
 Erfüllungsgrad Duktilität – Zug rechts & $\alpha_{eff,x/d,\text{Zug rechts}}$ & $0.71$ &  & berechnet \\
 Erfüllungsgrad Duktilität – Zug unten & $\alpha_{eff,x/d,\text{Zug unten}}$ & $0.00$ &  & berechnet \\
+Erfüllungsgrad Biegung und Normalkraft – Auflager & $\alpha_{eff,\text{Auflager}}$ & $5.86$ &  & berechnet \\
 Erfüllungsgrad Biegung und Normalkraft – Feld & $\alpha_{eff,\text{Feld}}$ & $1.47$ &  & berechnet \\
 Grösste aufnehmbare Druckkraft & $N_{Rd}^{-}$ & $-6081.3$ & kN & berechnet \\
 Grösste aufnehmbare Zugkraft & $N_{Rd}^{+}$ & $1614.9$ & kN & berechnet \\
 Erfüllungsgrad Rissnormalkraft – ganzer Querschnitt & $\alpha_{eff,NR}$ & $0.62$ &  & berechnet \\
+Erfüllungsgrad Stahlspannung aus Rissbreite – Auflager (60 \%) & $\alpha_{eff,\sigma,w,\text{Auflager (60 \%)}}$ & $49.03$ &  & berechnet \\
 Erfüllungsgrad Stahlspannung aus Rissbreite – Dauer & $\alpha_{eff,\sigma,w,\text{Dauer}}$ & $7.66$ &  & berechnet \\
 Erfüllungsgrad Stahlspannung aus Rissbreite – Feld (60 \%) & $\alpha_{eff,\sigma,w,\text{Feld (60 \%)}}$ & $9952.95$ &  & berechnet \\
 Erfüllungsgrad sprödes Versagen – Zug links & $\alpha_{eff,Riss,\text{Zug links}}$ & $11.59$ &  & berechnet \\
 Erfüllungsgrad sprödes Versagen – Zug unten & $\alpha_{eff,Riss,\text{Zug unten}}$ & $1.96$ &  & berechnet \\
+Erfüllungsgrad Querkraft und Torsion – Auflager & $\alpha_{eff,V,\text{Auflager}}$ & $1.30$ &  & berechnet \\
 Erfüllungsgrad Zwängung auf Biegung – Zug links & $\alpha_{eff,ZB,\text{Zug links}}$ & $11.95$ &  & berechnet \\
 Erfüllungsgrad Zwängung auf Biegung – Zug oben & $\alpha_{eff,ZB,\text{Zug oben}}$ & $13.47$ &  & berechnet \\
 Erfüllungsgrad Zwängung auf Biegung – Zug rechts & $\alpha_{eff,ZB,\text{Zug rechts}}$ & $6.54$ &  & berechnet \\

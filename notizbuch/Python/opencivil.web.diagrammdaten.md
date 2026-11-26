@@ -1,5 +1,5 @@
 ---
-erzeugt: 3a0cef067e1f
+erzeugt: 097a7a691a92
 art: modul
 tags: [modul]
 ---
@@ -304,7 +304,8 @@ Je Schubwand, wie der Nachweis sie sieht -- an ihren Knoten geteilt
 Dicke in mm, ihr Fluss mit Vorzeichen entlang der Achse in kN/m und ihre
 ganze Kraft gegen ihren Widerstand in kN, bei der Neigung, die der
 Nachweis gewaehlt hat. Ohne Verteilung (keine Wand, keine Last) nichts;
-warum, sagt [[opencivil.web.diagrammdaten#_ohne_schub|_ohne_schub]].
+warum, sagt [[opencivil.web.diagrammdaten#_ohne_schub|_ohne_schub]]. `V_p` ist, was geneigte Spannglieder
+von `V_z` tragen, in kN -- ohne sie `None`.
 
 
 ## Konstanten

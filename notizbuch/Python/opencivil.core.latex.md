@@ -1,5 +1,5 @@
 ---
-erzeugt: 17ec6e79277f
+erzeugt: 1ec4aef0fb94
 art: modul
 tags: [modul]
 ---
@@ -441,7 +441,7 @@ Leser sieht alle Zweige und erkennt, welcher gegriffen hat.
 - `PLATZHALTER = re.compile('@\\{([A-Za-z_][A-Za-z0-9_]*)\\}|@([A-Za-z_][A-Za-z0-9_]*)…` – `@name` oder `@{name}` -- auch der Formelbaum liest damit.
 - `_SONDERZEICHEN = {'\\': '\\textbackslash{}', '&': '\\&', '%': '\\%', '$': '\\$', '#': …`
 - `_NAME_IM_INDEX = re.compile(',\\\\text\\{[^{}]*\\}')` – Ein Name im Index: `\alpha_{eff,x,\text{Feld}}`, `f_{cd,\text{C30/37}}`.
-- `_RECHENZEICHEN = ('+', '-', '\\cdot', '\\times', '/')` – Nach diesen Zeichen braucht eine negative Zahl eine Klammer: `a - (-5)`, `a \\cdot (-5)`. Am Anfang eines Ausdrucks nicht: `-300 - (-1484.6)`.
+- `_RECHENZEICHEN = ('+', '-', '\\cdot', '\\times', '/', '\\sin', '\\cos', '\\tan', '\\co…` – Nach diesen Zeichen braucht eine negative Zahl eine Klammer: `a - (-5)`, `a \\cdot (-5)` -- und nach einer Winkelfunktion, `\\sin(-5°)`. Am Anfang eines Ausdrucks nicht: `-300 - (-1484.6)`.
 - `ZEILENBREITE = 60.0` – Wie breit eine Formel gesetzt hoechstens sein darf, damit sie auf einer Zeile steht -- in Zeichen, wie [[opencivil.core.latex#sichtbare_breite|sichtbare_breite]] sie zaehlt. Etwa das, was auf einer A4-Seite und in der rechten Tafel noch Platz hat.
 - `_OHNE_BREITE = {'left', 'right', 'mathrm', 'text', 'operatorname', 'mathbf', 'mathit…` – Befehle ohne eigene Breite: Formatierung, oder ihr Argument steht fuer sie.
 - `_WOERTER = {'min', 'max', 'sin', 'cos', 'tan', 'cot', 'log', 'ln', 'exp', 'lim',…` – Operatoren, die mit ihren Buchstaben dastehen.

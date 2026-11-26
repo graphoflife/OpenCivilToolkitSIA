@@ -1,5 +1,5 @@
 ---
-erzeugt: a5c0e43b40d9
+erzeugt: f397958e2312
 art: modul
 tags: [modul]
 ---
@@ -231,7 +231,10 @@ die Spannungen eingegeben; zwei schlaff mit Restfestigkeit. Die
 Duktilität sieht Spannstahl in der Zugzone, sprödes Versagen und
 Zwängung messen am Rissmoment mit Vorspannung, die Stahlspannung gilt
 dem Betonstahl, und die Linie beginnt bei der Krümmung, die die
-Vorspannung allein weckt.
+Vorspannung allein weckt. Am Auflager trägt das erste Glied, um 5°
+geneigt, die Querkraft mit; das zweite, um -4° geneigt und neben dem
+Schwerpunkt, wirkt ihr entgegen und dreht den Kasten der Schubwände; das
+schlaffe zählt seine Neigung nicht.
 
 
 ## Braucht

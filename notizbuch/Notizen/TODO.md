@@ -1321,6 +1321,24 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
 - [ ] **Spannglieder: Spannungszuwachs im Gebrauch (4.4.2.3.10) ungeprüft.**
       Die Stahlspannungen im Gebrauch begrenzen nur den Betonstahl; ohne ihn
       steht «Ohne Betonstahl → kein Nachweis.».
+- [ ] **Geneigte Spannglieder: die grösste Kraft bei ungünstiger Neigung.**
+      4.3.3.4.9 verlangt dann die grösste Kraft im Spannstahl, ohne zu
+      sagen, welche.
+      Eingebaut (`opencivil/nachweis/schubwandnachweis.py`, seit
+      2026-11-26): mit Verbund A_p mal die Fliessgrenze des Wertesatzes
+      (f_pd), ohne Verbund A_p·σ_p0. Bei vier Litzen ⌀15.7 aus Y1860 834.8
+      statt 664 kN. Bestätigen – oder etwa P0 = A_p·σ_p0 für alle.
+- [ ] **Geneigte Spannglieder: der Anteil mindert die Einwirkung.** Gl. (50)
+      legt P∞·sin β_p zum Widerstand; das Werkzeug zieht ihn von V_z ab,
+      bevor die Kraft auf die Wände verteilt wird: nur so findet er bei
+      mehreren Wänden seinen Platz. An der Grenze gleich, der Erfüllungsgrad
+      aber V_Rd/(V_Ed − V_p) statt (V_Rd + V_p)/V_Ed – bei 300 kN, 57.9 kN
+      und V_Rd = 394.3 kN 1.63 statt 1.51. Bestätigen.
+- [ ] **Geneigte Spannglieder: längs, und höchstens 20°.** Im Biegewiderstand
+      und im Gebrauch zählt ein geneigtes Glied, als läge es längs
+      (cos β_p ≈ 1, bei 20° 0.94); das Feld lässt darum höchstens ±20° zu.
+      Das Moment der lotrechten Kraft um den Schwerpunkt geht in die Torsion
+      der Wände. Nur die Neigung in der lotrechten Ebene, für V_z. Bestätigen.
 
 - [ ] **C-Punkt bei beliebiger Form.** Eingebaut: ganz gedrückt darf der
       Beton am Punkt im Abstand `(1 − ε_c1d/ε_c2d)·h` vom gedrücktesten Rand
@@ -1527,9 +1545,10 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       eine andere Quelle braucht seine Erlaubnis. Dazu für die Nachweise nach
       SIA 263: W_el, W_pl, A_v, I_w; die Tabelle hat Formeln dafür.
 
-- [ ] **Spannglieder, nächste Schritte:** die Neigung β_p und ihr Anteil
-      an der Querkraft (Plan vom 2026-11-25, Schritt 9c); das Hüllrohr Ø_H
-      und die Minderung der Stegbreite nach Gleichung (44) (4.3.3.3.5).
+- [ ] **Spannglieder, nächste Schritte:** das Hüllrohr Ø_H und die Minderung
+      der Stegbreite nach Gleichung (44) (4.3.3.3.5); eine Neigung in der
+      waagrechten Ebene, für V_y. Die Neigung in der lotrechten steht seit
+      2026-11-26.
 
 - [ ] **Durchstanzen, nächste Schritte:** Stahlpilze an Rand und Ecke
       (der Katalog hat nur ganze Pilze); Durchstanzbewehrung an Wandende und

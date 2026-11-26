@@ -7,6 +7,48 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-26 · Geneigte Spannglieder in der Querkraft
+
+Aus dem Plan vom 2026-11-25, Schritt 9c: ein Spannglied mit Vordehnung hat
+eine Neigung β_p, und ihr lotrechter Anteil zählt in der Querkraft.
+
+**Vorher und nachher.** Rechteck 300 × 600 mm, eine Schubwand in der
+Mitte, V_z = 300 kN, vier Litzen ⌀15.7 aus Y1860 mit P∞ = 664 kN. Vorher
+trug die Wand 300 kN, ob das Glied geneigt war oder nicht. Nachher, um 5°
+geneigt: das Glied trägt 664 · sin 5° = 57.9 kN, die Wand 242.1 kN. Um −5°
+geneigt wirkt es entgegen, mit seiner grössten Kraft: 300 + 834.8 · sin 5°
+= 372.8 kN.
+
+**Das Vorzeichen.** β_p > 0 heisst: die lotrechte Kraft wirkt wie ein
+positives V_z. Gleich gerichtet wie das V_z eines Lastfalls trägt sie mit
+P∞ mit (Gl. 50), entgegen mit der grössten Kraft im Glied (4.3.3.4.9) –
+dasselbe Glied je Lastfall verschieden, wenn die Querkraft das Vorzeichen
+wechselt. Ein Glied neben dem Schwerpunkt dreht dazu: das Moment seiner
+lotrechten Kraft fehlt den Wänden in der Torsion.
+
+**Warum die Einwirkung gemindert wird.** Gl. (50) legt den Anteil zum
+Widerstand. Bei mehreren Wänden weiss aber keine, wie viel davon ihr
+gehört; zieht man ihn von V_z ab, bevor verteilt wird, findet er seinen
+Platz von selbst. An der Grenze dasselbe; der Erfüllungsgrad ist
+V_Rd/(V_Ed − V_p). Im TODO zum Bestätigen, ebenso die grösste Kraft
+(mit Verbund A_p·f_pd, ohne A_p·σ_p0) und die Grenze von ±20°, bis zu der
+ein Glied im Biegewiderstand als längs gilt.
+
+**Schlaff zählt die Neigung nicht** (Benutzer, 2026-11-25): dort steht die
+Vorspannung samt Neigung schon in den Lastfällen. Das Zeichenfenster zeigt
+das Feld β_p darum nur mit Vordehnung und sagt sonst in einer Zeile,
+warum es fehlt; die Zahl bleibt am Glied für den Weg zurück.
+
+**Was sonst dazukam.** Eine negative Zahl hinter einer Winkelfunktion steht
+in der Herleitung in Klammern, «sin(−5°)» statt «sin −5°» – die Regel in
+`opencivil/core/latex.py` gilt für jede Formel. Das Bild des Schubflusses
+nennt den Anteil der Glieder, die Liste im Zeichenfenster ihre lotrechte
+Kraft. Der Träger «Spannbeton» des Prüfprojekts hat einen Kasten aus
+Schubwänden und einen Lastfall «Auflager»: ein Glied trägt mit, eines wirkt
+entgegen und dreht, das schlaffe zählt nicht – zusammen V_p = 31.5 kN.
+
+---
+
 ## 2026-11-26 · Spannglieder in der Querschnittsanalyse
 
 Aus dem Plan vom 2026-11-25, Schritt 9, zweiter Teil: neben «Bewehrung»

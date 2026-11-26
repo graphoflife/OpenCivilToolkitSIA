@@ -746,7 +746,8 @@ def _schubfluss(schub: Schubbefund, fall) -> Optional[dict]:
     Dicke in mm, ihr Fluss mit Vorzeichen entlang der Achse in kN/m und ihre
     ganze Kraft gegen ihren Widerstand in kN, bei der Neigung, die der
     Nachweis gewaehlt hat. Ohne Verteilung (keine Wand, keine Last) nichts;
-    warum, sagt :func:`_ohne_schub`.
+    warum, sagt :func:`_ohne_schub`. ``V_p`` ist, was geneigte Spannglieder
+    von ``V_z`` tragen, in kN -- ohne sie ``None``.
     """
     v = schub.verteilungen.get(fall.name)
     if v is None:
@@ -760,4 +761,6 @@ def _schubfluss(schub: Schubbefund, fall) -> Optional[dict]:
                "grad_text": grad_als_text(vergleich.grad, vergleich.erfuellt)}
               for w, q, r, vergleich in zip(schub.waende, v.fluss, schub.widerstaende[fall.name],
                                             schub.vergleiche[fall.name])]
-    return {"waende": waende, "zellen": [zahl(q_k, KN_PRO_M) for q_k in v.zellenfluss]}
+    V_p = schub.glieder.get(fall.name)
+    return {"waende": waende, "zellen": [zahl(q_k, KN_PRO_M) for q_k in v.zellenfluss],
+            "V_p": None if V_p is None else zahl(V_p, KN)}

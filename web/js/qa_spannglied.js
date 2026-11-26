@@ -20,6 +20,10 @@
  * mit seiner Fläche. Ein leeres Feld der Spannung zeigt grau die Zahl der
  * Vorgabe, sobald der Kern sie kennt; vorher, was die Vorgabe ist
  * («0.70·f_pk», aus dem Katalog).
+ *
+ * Die Neigung β_p zählt nur mit Vordehnung: welche Wirkung sie zulässt und
+ * was ihr Feld sagt, steht im Katalog. Schlaff steht an ihrer Stelle ein
+ * Satz, warum sie fehlt -- die Zahl bleibt am Glied, für den Weg zurück.
  */
 
 import { VAR, materialliste, mitBild, mitVar, wahlSchalter } from './bausteine.js';
@@ -143,6 +147,21 @@ export function gliedFelder(wert, setzen, info = null) {
     spannung('sigma_p0', 'Spannung nach dem Spannen'),
     spannung('sigma_pinf', 'Spannung nach allen Verlusten'),
     schalterzeile('Verbund', schalter('verbund', sp.verbunde, 'Ob das Glied mit dem Beton verbunden ist')),
+    ...neigungZeilen(wert, setzen, sp),
+  ];
+}
+
+/** Das Feld der Neigung mit seinem Satz darunter -- oder, wo sie nicht zählt, warum. */
+function neigungZeilen(wert, setzen, sp) {
+  const wirkung = wert('wirkung');
+  const zaehlt = wirkung === VAR || sp.wirkungen.some((w) => w.wert === wirkung && w.neigung);
+  if (!zaehlt) return [el('p.cad-hinweis-klein', { text: sp.neigung.ohne })];
+  const angabe = feldangabe('spannglied', 'neigung');
+  return [
+    cadZeile(angabe.heisst, zahlfeldMitVar({
+      wert: wert('neigung'), titel: sp.neigung.titel, schritt: 1, angabe, beiAenderung: setzen('neigung'),
+    }), angabe.einheit),
+    el('p.cad-hinweis-klein', { text: sp.neigung.hinweis }),
   ];
 }
 
@@ -154,5 +173,8 @@ export function gliedInfo(e, info) {
   return [
     `${w.erzeugnis} · A_p = ${zahlText(w.A_p, 0)} mm²`,
     `σ_p∞ = ${zahlText(w.sigma_pinf, 0)} N/mm²${vordehnung} · P∞ = ${zahlText(w.P_inf, 0)} kN`,
-  ].map((t) => el('p.cad-info', { text: t }));
+    // Nur geneigt mit Vordehnung: was es von einem gleich gerichteten V_z trägt.
+    w.V_p === undefined ? null
+      : `β_p = ${zahlText(e.neigung, 1)}° · lotrecht P∞·sin β_p = ${zahlText(w.V_p, 1)} kN`,
+  ].filter(Boolean).map((t) => el('p.cad-info', { text: t }));
 }

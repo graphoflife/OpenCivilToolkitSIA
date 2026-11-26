@@ -1,5 +1,5 @@
 ---
-erzeugt: 74864e61c8d1
+erzeugt: 60ea516ad9a1
 art: modul
 tags: [modul]
 ---
@@ -34,6 +34,14 @@ Leer gelassen, gilt die Vorgabe ([[opencivil.querschnitt.spannglieder#vorspannun
 Benutzers werden nie umgedeutet; was die Norm begrenzt, sagt ein roter
 Hinweis am Glied, gerechnet wird trotzdem mit ihnen.
 
+
+## DIE NEIGUNG
+
+`beta_p` in Grad, positiv, wo die lotrechte Kraft des Glieds wie ein
+positives `V_z` wirkt; sie zaehlt nur mit Vordehnung. Was daraus folgt,
+steht im Kopf von [[opencivil.querschnitt.spannglieder]]; dort auch,
+warum sie hoechstens `GRENZE_NEIGUNG` steil sein darf.
+
 ## Inhalt
 
 ### SpanngliedEintrag
@@ -55,6 +63,7 @@ Ein Spannglied an einem Knoten -- siehe Dateikopf.
 - `sigma_p0: Optional[float] = bereich(None, heisst='σ_p0', einheit=N_PRO_MM2, ueber=0.0)` – Die Spannung nach dem Spannen in N/mm² -- leer: 0.70 f_pk.
 - `sigma_pinf: Optional[float] = bereich(None, heisst='σ_p∞', einheit=N_PRO_MM2, ueber=0.0, bis_feld='…` – Die Spannung nach allen Verlusten in N/mm² -- leer: 0.85 sigma_p0.
 - `verbund: Verbund = Verbund.MIT`
+- `neigung: float = bereich(0.0, heisst='β_p', einheit=GRAD, ab=-GRENZE_NEIGUNG, bis=GREN…` – Die Neigung gegen die Stabachse in Grad -- siehe Dateikopf.
 
 
 ## Konstanten

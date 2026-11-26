@@ -1,5 +1,5 @@
 ---
-erzeugt: 5a86dcdeffed
+erzeugt: 1e64a35645d9
 art: formel
 tags: [formel]
 normstelle: ["SIA 262:2025, 2.4.2.5, (4)", "SIA 262:2025, 2.4.2.5, (5); 4.2.3.1, Tabelle 10"]
@@ -49,6 +49,7 @@ $$
 - [[Durchstanzbewehrung an der Fliessgrenze]]
 - [[Fliessdehnung]]
 - [[Grenze der bezogenen Druckzonenhöhe]]
+- [[Grösste Kraft eines geneigten Spannglieds]]
 - [[Nominelle Dehnung der Zugbewehrung]]
 - [[Plattenrotation]]
 - [[Querkraftwiderstand des Tragglieds]]

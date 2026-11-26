@@ -53,7 +53,9 @@ from opencivil.projekt.lesen import eintragsklassen, feldangaben, katalogname, w
 from opencivil.projekt.projekt import APPLISTEN, Projekt
 from opencivil.projekt.querschnittsanalyse import SCHNITTE
 from opencivil.querschnitt.platte import BREITE_Y_MM
-from opencivil.querschnitt.spannglieder import VORGABE_SPANNUNG, Spannwirkung, Verbund
+from opencivil.querschnitt.spannglieder import (
+    NEIGUNG_ERKLAERT, VORGABE_SPANNUNG, Spannwirkung, Verbund,
+)
 from opencivil.querschnitt.zugseite import UM_Y, Zugseite
 from opencivil.querschnitt.geometrie import VERSCHMIERT, Linienart
 from opencivil.querschnitt.vorlagen import RANDABSTAND, VORLAGEN
@@ -324,14 +326,18 @@ def katalog() -> dict:
                 for v in VORLAGEN
             ],
             "randabstand": RANDABSTAND.als_dict(),
-            # Die Schalter eines Spannglieds und was seine leeren Spannungen
-            # heissen -- die Vorgabe steht in opencivil.querschnitt.spannglieder.
+            # Die Schalter eines Spannglieds, was seine leeren Spannungen
+            # heissen und was seine Neigung -- die Regeln stehen in
+            # opencivil.querschnitt.spannglieder. Je Wirkung, ob die Neigung
+            # zaehlt: sonst steht an ihrem Feld, warum nicht.
             "spannglied": {
                 "wirkungen": [{"wert": w.value, "beschriftung": w.beschriftung, "kurz": w.kurz,
-                               "titel": w.erklaerung} for w in Spannwirkung],
+                               "titel": w.erklaerung, "neigung": w.mit_neigung}
+                              for w in Spannwirkung],
                 "verbunde": [{"wert": v.value, "beschriftung": v.beschriftung, "kurz": v.kurz,
                               "titel": v.erklaerung} for v in Verbund],
                 "vorgaben": dict(VORGABE_SPANNUNG),
+                "neigung": dict(NEIGUNG_ERKLAERT),
             },
         },
         # Die Wahlmoeglichkeiten der Balkensysteme, eben und im Raum -- mit

@@ -730,18 +730,27 @@ def _spannbeton(kennung: str) -> QuerschnittsanalyseEintrag:
     Duktilität sieht Spannstahl in der Zugzone, sprödes Versagen und
     Zwängung messen am Rissmoment mit Vorspannung, die Stahlspannung gilt
     dem Betonstahl, und die Linie beginnt bei der Krümmung, die die
-    Vorspannung allein weckt.
+    Vorspannung allein weckt. Am Auflager trägt das erste Glied, um 5°
+    geneigt, die Querkraft mit; das zweite, um -4° geneigt und neben dem
+    Schwerpunkt, wirkt ihr entgegen und dreht den Kasten der Schubwände; das
+    schlaffe zählt seine Neigung nicht.
     """
     a = QuerschnittsanalyseEintrag(kennung=kennung, name="Spannbeton", duktilitaet=True,
                                    sproede=True, zwaengung_biegung=True)
     a.polygon([[0, 0], [400, 0], [400, 800], [0, 800]], material="b1")
     a.stablinie([50, 50], [350, 50], art="anzahl", durchmesser=14, anzahl=4, stahl="s1")
     a.stablinie([50, 750], [350, 750], art="anzahl", durchmesser=12, anzahl=3, stahl="s1")
-    a.spannglied(200, 120, stahl="sp1", durchmesser=15.7, anzahl=4)
+    a.spannglied(200, 120, stahl="sp1", durchmesser=15.7, anzahl=4, neigung=5.0)
     a.spannglied(120, 160, stahl="sp1", durchmesser=15.3, anzahl=2, verbund="ohne",
-                 sigma_p0=1350.0, sigma_pinf=1100.0)
-    a.spannglied(280, 160, stahl="sp1", durchmesser=12.9, anzahl=2, wirkung="restfestigkeit")
+                 sigma_p0=1350.0, sigma_pinf=1100.0, neigung=-4.0)
+    a.spannglied(280, 160, stahl="sp1", durchmesser=12.9, anzahl=2, wirkung="restfestigkeit",
+                 neigung=3.0)
+    ecken = [[50, 50], [350, 50], [350, 750], [50, 750]]
+    for von, bis in zip(ecken, ecken[1:] + ecken[:1]):
+        a.schubwand(von, bis, dicke=100.0, durchmesser=10.0, teilung=150.0, schnitte=1,
+                    stahl="s1")
     a.lastfall("Feld", M_y_Ed=600.0)
+    a.lastfall("Auflager", M_y_Ed=150.0, V_z_Ed=450.0)
     a.quasistaendig.lastfall("Dauer", M_y_Ed=550.0)
     a.spannungsfall("Biegung", art="moment_kruemmung")
     return a

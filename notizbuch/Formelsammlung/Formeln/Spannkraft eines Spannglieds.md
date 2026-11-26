@@ -1,5 +1,5 @@
 ---
-erzeugt: cfb25778120c
+erzeugt: 9af343d6c260
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 3.3.2.2, Tabelle 7; SIA 262:2025, 4.1.5.1.5"
@@ -36,6 +36,7 @@ $$
 
 ## Gebraucht von
 
+- [[Lotrechte Kraft der geneigten Spannglieder]]
 - [[Moment aus der Vorspannung]]
 - [[Normalkraft aus der Vorspannung]]
 

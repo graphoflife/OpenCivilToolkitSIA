@@ -1,5 +1,5 @@
 ---
-erzeugt: 5f4dbd93b906
+erzeugt: fe3ccb4c8309
 art: modul
 tags: [modul]
 ---
@@ -52,6 +52,24 @@ Erzeugnisses: die Stauchung des Betons beim Vorspannen faellt weg -- nach
 Vorgabe, nicht nachgeschlagen.
 
 
+## DIE NEIGUNG
+
+Ein Glied mit Vordehnung darf gegen die Stabachse geneigt sein, um
+`beta_p` in der lotrechten Ebene (Figur 18). Seine lotrechte Kraft
+`F · sin beta_p` zaehlt in der Querkraft ([[opencivil.querschnitt.spannglieder#lotrecht|lotrecht]]):
+`beta_p > 0` heisst, sie wirkt wie ein positives `V_z`. Wirkt sie in
+einem Lastfall wie dessen `V_z`, traegt sie es mit, mit `F = P_inf`
+([[opencivil.querschnitt.spannglieder#guenstig|guenstig]]; 4.3.3.4.8, Gleichung (50)); wirkt sie entgegen, kommt
+sie dazu, mit der groessten Kraft im Glied (4.3.3.4.9) -- was der
+Nachweis der Schubwaende rechnet
+([[opencivil.nachweis.schubwandnachweis]]). Schlaff zaehlt die Neigung
+nicht: dort steht die Vorspannung schon samt ihr in den Lastfaellen
+(Benutzer, 2026-11-25). Im Biegewiderstand und im Gebrauch zaehlt ein
+geneigtes Glied, als laege es laengs: `cos beta_p` ist bis
+[[opencivil.querschnitt.spannglieder#Konstanten|GRENZE_NEIGUNG]] mindestens 0.94 -- nach Vorgabe, nicht
+nachgeschlagen.
+
+
 ## DIE GRENZEN
 
 Nach dem Spannen `sigma_p0 <= min(0.75 f_pk; 0.85 f_p0.1k)` (4.1.5.2.2,
@@ -93,6 +111,15 @@ def kurz(self) -> str
 ```
 
 Im Schalter des Zeichenfensters, wo der Platz knapp ist.
+
+#### Spannwirkung.mit_neigung
+
+```python
+@property
+def mit_neigung(self) -> bool
+```
+
+Ob die Neigung zaehlt -- nur mit Vordehnung, siehe Dateikopf.
 
 #### Spannwirkung.erklaerung
 
@@ -161,6 +188,31 @@ def grenzen_verletzt(p0: float, pinf: float, f_pk: float, f_p01k: float) -> List
 
 Was an den Spannungen eines Glieds nicht stimmt, je ein Satz ohne Punkt
 -- alles in N/mm². Leer, wenn alles stimmt.
+
+### geneigt
+
+```python
+def geneigt(g: 'Spannglied') -> bool
+```
+
+Ob ein Glied mit seiner Neigung in der Querkraft zaehlt -- siehe Dateikopf.
+
+### lotrecht
+
+```python
+def lotrecht(kraft: float, neigung: float) -> float
+```
+
+Die lotrechte Kraft eines Glieds, das `kraft` traegt und um `neigung` Grad geneigt ist.
+
+### guenstig
+
+```python
+def guenstig(neigung: float, V_z: float) -> bool
+```
+
+Ob die lotrechte Kraft eines Glieds die Querkraft `V_z` mittraegt:
+beide gleich gerichtet. Ohne `V_z` kommt sie dazu -- unguenstig.
 
 ### flaechendurchmesser
 
@@ -303,6 +355,7 @@ Spannungen stehen, wie eingegeben, in N/mm²; `None` heisst Vorgabe.
 - `verbund: Verbund`
 - `sigma_p0: Optional[float]`
 - `sigma_pinf: Optional[float]`
+- `neigung: float` – `beta_p` in Grad, siehe Dateikopf.
 - `vorgespannt: ClassVar[bool] = True`
 
 #### Spannglied.punkte
@@ -380,13 +433,23 @@ ihrer Herleitung -- und daraus je Glied sein Werkstoff im Querschnitt
 ([[opencivil.querschnitt.spannglieder#Spannglieder.werkstoffe|werkstoffe]]). Die Nachweise lesen die Werte ueber
 [[opencivil.querschnitt.spannglieder#Spannglieder.gliedbezuege|gliedbezuege]], damit jede Spannkraft rueckverfolgbar bleibt.
 
+#### Spannglieder.index
+
+```python
+def index(self, g: Spannglied) -> str
+```
+
+Was an den Symbolen eines Glieds unten steht: «,2» -- bei nur einem nichts.
+
 #### Spannglieder.gliedbezuege
 
 ```python
-def gliedbezuege(self) -> List[Eingabebezug]
+def gliedbezuege(self, kurze: Sequence[str]=('sigma_pinf', 'eps_p', 'P_inf'), glieder: Optional[Sequence[Spannglied]]=None) -> List[Eingabebezug]
 ```
 
-Was ein Nachweis von jedem Glied liest: `sigma_pinf`, `eps_p` und `P_inf`.
+Was ein Nachweis von den Gliedern liest, als `{kurz}__{kennung}` --
+jeder `sigma_pinf`, `eps_p` und `P_inf` von allen; wer mehr
+braucht, nennt die Werte und die Glieder.
 
 #### Spannglieder.spannkraefte
 
@@ -442,6 +505,8 @@ Die Werte eines Glieds, hergeleitet -- und seine Zeile der Tabelle.
 - `REFERENZ_NACH_SPANNEN = 'SIA 262:2025, 4.1.5.2.2, (22)'`
 - `REFERENZ_NACH_VERLUSTEN = 'SIA 262:2025, 4.1.5.2.3'`
 - `REFERENZ_VERLUSTE = 'SIA 262:2025, 4.1.5.3'`
+- `REFERENZ_GUENSTIG = 'SIA 262:2025, 4.3.3.4.8, (50)'`
+- `REFERENZ_UNGUENSTIG = 'SIA 262:2025, 4.3.3.4.9'`
 - `NACH_VORGABE = 'nach Vorgabe, nicht nachgeschlagen'`
 - `ANTEIL_SPANNEN = 0.7` – `sigma_p0 = 0.70 f_pk`, wo nichts eingegeben ist -- nach Vorgabe, nicht nachgeschlagen (Benutzer, 2026-11-25).
 - `ANTEIL_NACH_VERLUSTEN = 0.85` – `sigma_pinf = 0.85 sigma_p0`, wo nichts eingegeben ist -- nach Vorgabe, nicht nachgeschlagen (Benutzer, 2026-11-25).
@@ -449,7 +514,9 @@ Die Werte eines Glieds, hergeleitet -- und seine Zeile der Tabelle.
 - `GRENZE_F_PK = 0.75` – Gleichung (22): `sigma_p0 <= min(0.75 f_pk; 0.85 f_p0.1k)`.
 - `GRENZE_F_P01K = 0.85`
 - `MINDESTENS_F_PK = 0.45` – 4.1.5.2.3: nach allen Verlusten mindestens `0.45 f_pk`.
+- `GRENZE_NEIGUNG = 20.0` – Wie steil ein Glied hoechstens liegt, in Grad, nach oben wie nach unten: bis dahin zaehlt es im Biegewiderstand laengs, `cos 20° = 0.94` -- nach Vorgabe, nicht nachgeschlagen.
 - `KENNWERTE = ('f_pk', 'f_p01k', 'E_p', 'E_p_litze')` – Die Kennwerte des Spannstahls, die die Herleitung der Glieder liest.
+- `NEIGUNG_ERKLAERT = {'titel': f'Neigung gegen die Stabachse in Grad, höchstens {GRENZE_NE…` – Was das Feld der Neigung im Zeichenfenster sagt: als Titel, in einer Zeile darunter -- und an seiner Stelle, wo sie nicht zaehlt.
 - `DEHNUNG_AM_GLIED = 'Bei einem Spannglied ist ε die Dehnung des Betons an seiner Stelle: …` – Was eine Tabelle oder ein Bild sagt, das die Dehnung eines Glieds zeigt: es ist die des Betons an seiner Stelle, nicht die des Stahls.
 - `FLAECHE = 'Querschnitt eines Spannglieds'` – Die Seiten im Notizbuch, je Groesse eine: Querschnitt, Spannungen nach Vorgabe, Vordehnung und Kraft eines Glieds, die Grenzen seiner Spannung, sein Gesetz im Querschnitt -- dieses eine fuer alle drei Arten.
 - `NACH_VORGABE_GESPANNT = 'Spannung im Spannglied nach Vorgabe'`
@@ -474,6 +541,7 @@ Die Werte eines Glieds, hergeleitet -- und seine Zeile der Tabelle.
 ## Gebraucht von
 
 - [[opencivil.nachweis.schiefe_biegung]]
+- [[opencivil.nachweis.schubwandnachweis]]
 - [[opencivil.projekt.aufbau.querschnittsanalyse]]
 - [[opencivil.projekt.spannglieder]]
 - [[opencivil.querschnitt.analyse]]

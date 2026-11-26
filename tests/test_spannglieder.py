@@ -21,6 +21,12 @@ Im Bruch, mit dem Spannungsblock (f_cd = 20 N/mm², f_pd = 1600/1.15):
 Und das Rissmoment, mit der Vorspannung am gezogenen Rand:
 
     M_Riss = (k_t · f_ctm + P∞/A + P∞ · e / W) · W     k_t = 1/(1 + 0.5 · 0.2)
+
+Geneigt, mit einer Schubwand in der Mitte, die V_z = 300 kN ganz nimmt:
+
+    β_p = +5°, trägt mit         300 − P∞ · sin 5°                = 242.13 kN
+    β_p = −5°, mit Verbund       300 + A_p · f_pd · sin 5°        = 372.76 kN
+    β_p = −5°, ohne Verbund      300 + A_p · σ_p0 · sin 5°        = 368.09 kN
 """
 
 import math
@@ -36,10 +42,11 @@ from opencivil.querschnitt.biegung import EINACHSIG
 from opencivil.querschnitt.spannglieder import (
     ANTEIL_NACH_VERLUSTEN, ANTEIL_SPANNEN, FesteSpannung, Restfestigkeit,
     VorgedehnterSpannstahl, flaechendurchmesser, grenze_nach_spannen, grenzen_verletzt,
-    vorspannung,
+    guenstig, lotrecht, vorspannung,
 )
 from opencivil.querschnitt.werkstoffgesetz import Spannstahlgesetz
 from opencivil.web import api, dienst
+from tests import unfertig
 
 F_PD = 1600e6 / 1.15
 SIGMA_PINF = 0.85 * 0.70 * 1860e6
@@ -292,6 +299,93 @@ class TestNachweise(unittest.TestCase):
                 self.assertIn(erwartet, begruendungen[0])
 
 
+SIN_5 = math.sin(math.radians(5.0))
+P_INF = A_P * SIGMA_PINF
+
+
+def geneigt(neigung, V_z=300.0, T=0.0, *, wirkung="vordehnung", verbund="mit",
+            kasten=False, lage=(150.0, 100.0)) -> Projekt:
+    """
+    Das Beispiel mit geneigtem Glied am Auflager: eine Schubwand in der
+    Mitte -- oder, mit ``kasten``, vier auf der Bügelachse, eine Zelle.
+    """
+    p = projekt(wirkung=wirkung, verbund=verbund)
+    a = p.querschnittsanalysen[0]
+    a.spannglieder.clear()
+    a.spannglied(*lage, stahl="sp1", durchmesser=15.7, anzahl=4, wirkung=wirkung,
+                 verbund=verbund, neigung=neigung)
+    a.lastfaelle.clear()
+    a.lastfall("Auflager", V_z_Ed=V_z, T_Ed=T)
+    if kasten:
+        ecken = [[50, 50], [250, 50], [250, 550], [50, 550]]
+        for von, bis in zip(ecken, ecken[1:] + ecken[:1]):
+            a.schubwand(von, bis, dicke=80.0, durchmesser=10.0, teilung=150.0, schnitte=1,
+                        stahl="s1")
+    else:
+        a.schubwand([150, 50], [150, 550], dicke=300.0, durchmesser=10.0, teilung=150.0,
+                    schnitte=2, stahl="s1")
+    return p
+
+
+class TestNeigung(unittest.TestCase):
+    """Die lotrechte Kraft eines geneigten Glieds in der Querkraft -- von Hand."""
+
+    def wandkraft(self, p: Projekt) -> float:
+        """Die Kraft der massgebenden Wand, in N."""
+        return urteil(p.rechnen(), "V+T", "Auflager").einwirkung.groesse.si
+
+    def test_regeln(self):
+        self.assertAlmostEqual(lotrecht(100.0, 30.0), 50.0)
+        self.assertTrue(guenstig(5.0, 300.0))
+        self.assertFalse(guenstig(-5.0, 300.0))
+        self.assertTrue(guenstig(-5.0, -300.0))
+        # Ohne V_z kommt die lotrechte Kraft dazu.
+        self.assertFalse(guenstig(5.0, 0.0))
+
+    def test_gleich_gerichtet_traegt_es_mit_p_unendlich(self):
+        """SIA 262:2025, Gl. (50): 300 − 664.02 · sin 5° = 242.13 kN."""
+        self.assertAlmostEqual(self.wandkraft(geneigt(5.0)), 300e3 - P_INF * SIN_5, delta=1.0)
+
+    def test_entgegen_mit_verbund_bis_zur_fliessgrenze(self):
+        self.assertAlmostEqual(self.wandkraft(geneigt(-5.0)), 300e3 + A_P * F_PD * SIN_5,
+                               delta=1.0)
+
+    def test_entgegen_ohne_verbund_mit_der_kraft_nach_dem_spannen(self):
+        self.assertAlmostEqual(self.wandkraft(geneigt(-5.0, verbund="ohne")),
+                               300e3 + A_P * 0.70 * 1860e6 * SIN_5, delta=1.0)
+
+    def test_dreht_die_querkraft_so_wirkt_dasselbe_glied_entgegen(self):
+        self.assertAlmostEqual(self.wandkraft(geneigt(5.0, V_z=-300.0)),
+                               300e3 + A_P * F_PD * SIN_5, delta=1.0)
+
+    def test_schlaff_zaehlt_die_neigung_nicht(self):
+        p = geneigt(5.0, wirkung="restfestigkeit")
+        self.assertAlmostEqual(self.wandkraft(p), 300e3, delta=1.0)
+        self.assertNotIn("V_p", urteil(p.rechnen(), "V+T", "Auflager").begruendung)
+
+    def test_neben_dem_schwerpunkt_dreht_es_den_kasten(self):
+        """
+        Bei y = 100 mm, 50 mm links vom Schwerpunkt: T_w = T − V_p · (−50 mm).
+        Der rechte Steg trägt die Hälfte von V_z,w und den Umlauffluss
+        T_w / (2 · A_k) über seine 500 mm, A_k = 200 · 500 mm².
+        """
+        V_p = P_INF * SIN_5
+        T_w = 20e3 + V_p * 0.05
+        steg = (300e3 - V_p) / 2.0 + T_w / (2.0 * 0.1) * 0.5
+        self.assertAlmostEqual(self.wandkraft(geneigt(5.0, T=20.0, kasten=True, lage=(100.0, 100.0))),
+                               steg, delta=1.0)
+
+    def test_herleitung_und_urteil_nennen_den_anteil(self):
+        u = urteil(geneigt(5.0).rechnen(), "V+T", "Auflager")
+        self.assertIn(f"V_p = {P_INF * SIN_5 / 1e3:.1f} kN", u.begruendung)
+
+    def test_zu_steil_haelt_die_analyse_an_und_sagt_warum(self):
+        """Das Feld weist es schon ab (Katalog); kommt es doch an, rechnet die Analyse nicht."""
+        self.assertEqual(unfertig.grund(geneigt(25.0), "a1"),
+                         "Spannglied 1: β_p muss mindestens -20° und höchstens 20° sein, "
+                         "angegeben ist 25°")
+
+
 class TestZeichnung(unittest.TestCase):
     """Was das Zeichenfenster zu den Gliedern bekommt -- aus derselben Herleitung."""
 
@@ -303,7 +397,7 @@ class TestZeichnung(unittest.TestCase):
         p.spannstahl("Y1860")
         p.spannstahl("Y1030")
         a = p.analyse("Balken", beton="b1", stahl="s1")
-        a.spannglied(150.0, 100.0, stahl="sp1", durchmesser=15.7, anzahl=4)
+        a.spannglied(150.0, 100.0, stahl="sp1", durchmesser=15.7, anzahl=4, neigung=5.0)
         a.spannglied(100.0, 100.0, stahl="sp2", durchmesser=15.7)
         a.spannglied(200.0, 100.0, stahl="sp1", durchmesser=12.9, anzahl=2,
                      sigma_p0=1450.0, sigma_pinf=800.0)
@@ -322,6 +416,9 @@ class TestZeichnung(unittest.TestCase):
         self.assertAlmostEqual(g["werte"]["P_inf"], 664.02)
         self.assertAlmostEqual(g["werte"]["eps_p"], 1106.7 / 195.0)
         self.assertAlmostEqual(g["durchmesser"], flaechendurchmesser(600.0))
+        # Geneigt: was es von einem gleich gerichteten V_z trägt -- ungeneigt nichts.
+        self.assertAlmostEqual(g["werte"]["V_p"], 664.02 * SIN_5)
+        self.assertNotIn("V_p", self.glieder["P3"]["werte"])
 
     def test_ein_fehlendes_erzeugnis_ist_grau(self):
         """Y1030 gibt es nur in Stäben: es fehlt eine Wahl, gezeichnet wird mit ⌀15.7."""
@@ -365,8 +462,10 @@ class TestEintrag(unittest.TestCase):
 
     def test_der_katalog(self):
         sp = api.katalog()["querschnittsanalyse"]["spannglied"]
-        self.assertEqual([(w["wert"], w["kurz"]) for w in sp["wirkungen"]],
-                         [("vordehnung", "Vordehnung"), ("restfestigkeit", "schlaff")])
+        self.assertEqual([(w["wert"], w["kurz"], w["neigung"]) for w in sp["wirkungen"]],
+                         [("vordehnung", "Vordehnung", True),
+                          ("restfestigkeit", "schlaff", False)])
+        self.assertEqual(set(sp["neigung"]), {"titel", "hinweis", "ohne"})
         self.assertEqual([(v["wert"], v["kurz"]) for v in sp["verbunde"]],
                          [("mit", "mit"), ("ohne", "ohne")])
         self.assertEqual(sp["vorgaben"], {"sigma_p0": f"{ANTEIL_SPANNEN:.2f}·f_pk",

@@ -1,5 +1,5 @@
 ---
-erzeugt: 61652b3b7789
+erzeugt: 4de95e28fa8b
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -34,7 +34,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 - [[Querschnittsanalyse]] · 13
 - [[Schiefe Biegung]] · 12
-- [[Querkraft und Torsion]] · 7
+- [[Querkraft und Torsion]] · 12
 - [[Duktilität je Richtung]] · 4
 - [[Sprödes Versagen je Richtung]] · 11
 
@@ -239,6 +239,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Grenzwert der Durchbiegung]] · $w_{max}$
 - [[Grösste Dehnung auf halber Höhe]] · $\varepsilon_{m,u}$
 - [[Grösste Dehnung im Schwerpunkt]] · $\varepsilon_{m,u}$
+- [[Grösste Kraft eines geneigten Spannglieds]] · $P_{max,1}$
 - [[Grösste Krümmung]] · $\chi_{u}$
 - [[Grundbruchwiderstand]] · $N_{Rd}$
 - [[Grundschwingzeit]] · $T_{1,x}$
@@ -272,6 +273,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Lastneigungsfaktor i_γ]] · $i_{\gamma}$
 - [[Lastverteilelement]]
 - [[Linearisierte Fliessbedingung]]
+- [[Lotrechte Kraft der geneigten Spannglieder]] · $V_p$
 - [[Mantelreibung drainiert]]
 - [[Mantelreibung undrainiert]]
 - [[Mantelwiderstand]] · $R_{s,k}$
@@ -309,6 +311,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Querbruch durch Verschieben]]
 - [[Querfeder des eingespannten Pfahlkopfs]] · $K_{HH}$
 - [[Querfeder des frei drehbaren Pfahlkopfs]] · $k_h$
+- [[Querkraft der Wände neben geneigten Spanngliedern]] · $V_{z,w}$
 - [[Querkraft für die Durchstanzbewehrung]] · $V_{d,s}$
 - [[Querkraft über die Federn der Wände]]
 - [[Querkraftwiderstand des Pfahls]] · $V_{Rd}$
@@ -372,6 +375,8 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Tiefe des Gleitkörpers]] · $H_{Gl}$
 - [[Tiefenfaktor d_c]] · $d_c$
 - [[Tiefenfaktor d_q]] · $d_q$
+- [[Torsion aus der lotrechten Kraft der Spannglieder]] · $T_p$
+- [[Torsion der Wände neben geneigten Spanngliedern]] · $T_w$
 - [[Torsion in den Zellen (Bredt, mehrzellig)]]
 - [[Torsionssteifigkeit]] · $GI_{T}$
 - [[Torsionsträgheitsmoment aus der Spannungsfunktion]]
@@ -426,7 +431,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 ## Normstelle fehlt noch
 
-128 von 348 Formeln haben im Code keine Normstelle – meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle – von dort kommt sie in Bericht und Notizbuch.
+130 von 353 Formeln haben im Code keine Normstelle – meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle – von dort kommt sie in Bericht und Notizbuch.
 
 - [[Achsen eines Stabs im Raum]] · [[opencivil.stabwerk3d.herleitung|_ansaetze]]
 - [[Äquivalenter E-Modul eines Stabs]] · [[opencivil.spannungsanalyse.modul#ModulProzedur|ModulProzedur._schreiben]]
@@ -538,6 +543,8 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Steifigkeitsmatrix eines Stabs]] · [[opencivil.stabwerk.herleitung|_ansaetze]], [[opencivil.stabwerk3d.herleitung|_ansaetze]]
 - [[Teilung einer Stablinie – gleiche Felder, auf die Länge gerundet]] · [[opencivil.querschnitt.analyse#Querschnittsanalyse|Querschnittsanalyse._bewehrung_protokollieren]]
 - [[Teilung in y aus der Stabzahl]] · [[opencivil.nachweis.querkraft_buegel#QuerkraftMitBuegeln.protokoll_teilung_y|QuerkraftMitBuegeln.protokoll_teilung_y]]
+- [[Torsion aus der lotrechten Kraft der Spannglieder]] · [[opencivil.nachweis.schubwandnachweis#Schubwandnachweis._ohne_glieder|Schubwandnachweis._ohne_glieder]]
+- [[Torsion der Wände neben geneigten Spanngliedern]] · [[opencivil.nachweis.schubwandnachweis#Schubwandnachweis._ohne_glieder|Schubwandnachweis._ohne_glieder]]
 - [[Torsionssteifigkeit]] · [[opencivil.stabwerk.rechnung#_modul_mal_kennwert|_modul_mal_kennwert]]
 - [[Torsionsträgheitsmoment aus der Spannungsfunktion]] · [[opencivil.querschnitt.analyse#Querschnittsanalyse.torsion_protokollieren|Querschnittsanalyse.torsion_protokollieren]]
 - [[Torsionsträgheitsmoment eines I-Profils]] · [[opencivil.stabwerk.profilformen]]

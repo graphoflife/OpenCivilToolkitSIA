@@ -33,7 +33,9 @@ from opencivil.querschnitt.geometrie import (
     Linienart, aequivalenter_durchmesser, buegelgehalt, linie_in_ueberdeckung, linienflaeche,
     stab_in_ueberdeckung, ueberdeckungspolygon,
 )
-from opencivil.querschnitt.spannglieder import Spannglied, Spannglieder, aus_glied, grenzen_verletzt
+from opencivil.querschnitt.spannglieder import (
+    Spannglied, Spannglieder, aus_glied, geneigt, grenzen_verletzt, lotrecht,
+)
 
 
 def geometrie(eintrag, projekt) -> dict:
@@ -237,4 +239,7 @@ def _spannglieder(roh: Sequence[Mapping], projekt) -> _Glieder:
                     for satz in grenzen_verletzt(je["sigma_p0"], je["sigma_pinf"],
                                                  kennwert(g, "f_pk"), kennwert(g, "f_p01k"))]
         werte[kennung] = {**je, "erzeugnis": g.erzeugnis.bezeichnung(g.stahl.sorte)}
+        if geneigt(g):
+            # Was es von einem gleich gerichteten V_z traegt (Gleichung (50)).
+            werte[kennung]["V_p"] = lotrecht(je["P_inf"], g.neigung)
     return _Glieder(glieder, werte, fehlt, grenzen)

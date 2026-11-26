@@ -2047,6 +2047,17 @@
       ]
     },
     {
+      "name": "Grösste Kraft eines geneigten Spannglieds",
+      "pfad": "Formelsammlung/Formeln/Grösste Kraft eines geneigten Spannglieds.md",
+      "art": "formel",
+      "zeichen": [
+        "P_{max,1}"
+      ],
+      "themen": [
+        "Querkraft und Torsion"
+      ]
+    },
+    {
       "name": "Grösste Krümmung",
       "pfad": "Formelsammlung/Formeln/Grösste Krümmung.md",
       "art": "formel",
@@ -2401,6 +2412,17 @@
       "zeichen": [],
       "themen": [
         "Streifenmethode"
+      ]
+    },
+    {
+      "name": "Lotrechte Kraft der geneigten Spannglieder",
+      "pfad": "Formelsammlung/Formeln/Lotrechte Kraft der geneigten Spannglieder.md",
+      "art": "formel",
+      "zeichen": [
+        "V_p"
+      ],
+      "themen": [
+        "Querkraft und Torsion"
       ]
     },
     {
@@ -2808,6 +2830,17 @@
       ],
       "themen": [
         "Pfahlsteifigkeit"
+      ]
+    },
+    {
+      "name": "Querkraft der Wände neben geneigten Spanngliedern",
+      "pfad": "Formelsammlung/Formeln/Querkraft der Wände neben geneigten Spanngliedern.md",
+      "art": "formel",
+      "zeichen": [
+        "V_{z,w}"
+      ],
+      "themen": [
+        "Querkraft und Torsion"
       ]
     },
     {
@@ -3508,6 +3541,28 @@
       ],
       "themen": [
         "Grundbruch"
+      ]
+    },
+    {
+      "name": "Torsion aus der lotrechten Kraft der Spannglieder",
+      "pfad": "Formelsammlung/Formeln/Torsion aus der lotrechten Kraft der Spannglieder.md",
+      "art": "formel",
+      "zeichen": [
+        "T_p"
+      ],
+      "themen": [
+        "Querkraft und Torsion"
+      ]
+    },
+    {
+      "name": "Torsion der Wände neben geneigten Spanngliedern",
+      "pfad": "Formelsammlung/Formeln/Torsion der Wände neben geneigten Spanngliedern.md",
+      "art": "formel",
+      "zeichen": [
+        "T_w"
+      ],
+      "themen": [
+        "Querkraft und Torsion"
       ]
     },
     {
@@ -6453,8 +6508,13 @@
         "schub_belastet",
         "Schubbefund",
         "Schubbefund.waende",
+        "GeneigtesGlied",
+        "GeneigtesGlied.kraft",
+        "GeneigtesGlied.lotrecht",
         "Schubwandnachweis",
-        "Schubwandnachweis.pruefe"
+        "Schubwandnachweis.pruefe",
+        "Schubwandnachweis._protokoll_glieder",
+        "Schubwandnachweis._ohne_glieder"
       ]
     },
     {
@@ -8139,6 +8199,7 @@
         "Spannwirkung",
         "Spannwirkung.beschriftung",
         "Spannwirkung.kurz",
+        "Spannwirkung.mit_neigung",
         "Spannwirkung.erklaerung",
         "Verbund",
         "Verbund.beschriftung",
@@ -8147,6 +8208,9 @@
         "vorspannung",
         "grenze_nach_spannen",
         "grenzen_verletzt",
+        "geneigt",
+        "lotrecht",
+        "guenstig",
         "flaechendurchmesser",
         "VorgedehnterSpannstahl",
         "VorgedehnterSpannstahl.abzug",
@@ -8170,6 +8234,7 @@
         "Spannglied.als_bewehrung",
         "aus_glied",
         "Spannglieder",
+        "Spannglieder.index",
         "Spannglieder.gliedbezuege",
         "Spannglieder.spannkraefte",
         "Spannglieder.werkstoffe",

@@ -1,5 +1,5 @@
 ---
-erzeugt: 5f875566f9b5
+erzeugt: b0431e11e556
 art: modul
 tags: [modul]
 ---
@@ -27,6 +27,24 @@ Jede Schubwand fuer sich, mit ihrer ganzen Kraft, nicht je Meter (Benutzer,
 ([[opencivil.querschnitt.schubwaende#wandkraefte|wandkraefte]],
 [[opencivil.querschnitt.schubwaende#widerstand|widerstand]]). Massgebend ist die
 schwaechste Wand; nur sie steht in der Zusammenfassung.
+
+
+## GENEIGTE SPANNGLIEDER
+
+Ein geneigtes Glied mit Vordehnung traegt mit seiner lotrechten Kraft
+`F · sin beta_p` einen Teil von `V_z`
+([[opencivil.querschnitt.spannglieder]]). Die Waende tragen den Rest:
+`V_z - Σ F_i sin beta_p,i`, und in der Torsion fehlt ihnen das Moment
+dieser Kraefte um den Schwerpunkt. Jede Wand vergleicht diesen Rest mit
+ihrem Widerstand. Gleichung (50) schreibt den mitgetragenen Teil dem
+Widerstand zu; an der Grenze ist das dasselbe, und nur so verteilt er sich
+auf mehrere Waende -- nach Vorgabe, nicht nachgeschlagen. `F` ist
+`P_inf`, wo die lotrechte Kraft wie `V_z` wirkt (4.3.3.4.8); wirkt sie
+entgegen, die groesste Kraft im Glied (4.3.3.4.9): mit Verbund `A_p`
+mal die Fliessgrenze seines Wertesatzes -- so weit kann es im Bruch
+tragen --, ohne Verbund `A_p · sigma_p0`, die Kraft nach dem Spannen.
+Welche Kraft die groesste ist, sagt die Norm nicht: nach Vorgabe, nicht
+nachgeschlagen.
 
 ## Inhalt
 
@@ -58,6 +76,7 @@ war er belastet, sagt `ohne` warum.
 - `widerstaende: Dict[str, List[Buegelpunkt]] = field(default_factory=dict)`
 - `vergleiche: Dict[str, List[Vergleich]] = field(default_factory=dict)` – Je Wand ihre Kraft gegen ihren Widerstand, beide fuer die ganze Wand.
 - `ohne: Dict[str, str] = field(default_factory=dict)` – Je belasteter Lastfall ohne Verteilung der Grund -- es gibt keine Wand, oder die Waende tragen nicht. Derselbe Satz wie im Urteil.
+- `glieder: Dict[str, float] = field(default_factory=dict)` – Je Lastfall, was die geneigten Spannglieder von `V_z` tragen, in N -- ohne sie leer.
 
 #### Schubbefund.waende
 
@@ -65,6 +84,37 @@ war er belastet, sagt `ohne` warum.
 @property
 def waende(self) -> Tuple[sw.Wand, ...]
 ```
+
+### GeneigtesGlied
+
+```python
+@dataclass(frozen=True)
+class GeneigtesGlied
+```
+
+Ein geneigtes Glied, wie der Nachweis es liest: seine zwei Kraefte, seine Neigung, sein Hebel.
+
+- `glied: Spannglied`
+- `P_inf: Wert`
+- `P_max: Wert`
+- `beta: Wert`
+- `hebel: Wert` – `y - y_S`: wie weit es neben dem Schwerpunkt liegt.
+
+#### GeneigtesGlied.kraft
+
+```python
+def kraft(self, V_z: float) -> Wert
+```
+
+`P_inf`, wo es `V_z` mittraegt -- sonst `P_max`.
+
+#### GeneigtesGlied.lotrecht
+
+```python
+def lotrecht(self, V_z: float) -> float
+```
+
+Seine lotrechte Kraft im Lastfall mit `V_z`, in N.
 
 ### Schubwandnachweis
 
@@ -83,9 +133,32 @@ Querkraft und Torsion, je Lastfall auf die Schubwaende verteilt.
 def pruefe(self, e: Eingaben, p: Protokoll)
 ```
 
+#### Schubwandnachweis._protokoll_glieder
+
+```python
+def _protokoll_glieder(self, p: Protokoll, e: Eingaben, bezug) -> List[GeneigtesGlied]
+```
+
+Die Regel, und je geneigtes Glied seine grösste Kraft -- ohne Glied nichts.
+
+#### Schubwandnachweis._ohne_glieder
+
+```python
+def _ohne_glieder(self, p: Protokoll, werte: Zwischenwerte, befund: Schubbefund, fall: Lastfall, geneigte: Sequence[GeneigtesGlied]) -> Tuple[Wert, Wert]
+```
+
+`V_z` und `T`, die die Waende tragen: ohne die lotrechte Kraft der
+geneigten Glieder und ihr Moment um den Schwerpunkt.
+
 
 ## Konstanten
 
+- `GROESSTE_KRAFT = 'Grösste Kraft eines geneigten Spannglieds'` – Die Seiten im Notizbuch, je Groesse eine.
+- `LOTRECHT = 'Lotrechte Kraft der geneigten Spannglieder'`
+- `QUERKRAFT_DER_WAENDE = 'Querkraft der Wände neben geneigten Spanngliedern'`
+- `MOMENT_DER_GLIEDER = 'Torsion aus der lotrechten Kraft der Spannglieder'`
+- `TORSION_DER_WAENDE = 'Torsion der Wände neben geneigten Spanngliedern'`
+- `REFERENZ_GLIEDER = f'{REFERENZ_GUENSTIG}; {REFERENZ_UNGUENSTIG}'` – Wo die lotrechte Kraft der Glieder steht: mittragend und entgegen.
 - `OHNE_SCHUB = 'Keine Querkraft und keine Torsion → kein Schubfluss.'` – Warum ein Lastfall ohne Querkraft und Torsion keinen Schubfluss hat -- das Diagramm zeigt den Satz an Stelle des Bildes.
 
 ## Braucht
@@ -100,6 +173,7 @@ def pruefe(self, e: Eingaben, p: Protokoll)
 - [[opencivil.querschnitt.biegung]]
 - [[opencivil.querschnitt.fachwerk]]
 - [[opencivil.querschnitt.schubwaende]]
+- [[opencivil.querschnitt.spannglieder]]
 
 ## Gebraucht von
 
@@ -108,8 +182,15 @@ def pruefe(self, e: Eingaben, p: Protokoll)
 
 ## Formeln aus diesem Modul
 
+- [[Grösste Kraft eines geneigten Spannglieds]] · `Schubwandnachweis._protokoll_glieder`
 - [[Kraft einer Wand – ihr Schubfluss über ihre Länge]] · `Schubwandnachweis._protokoll_ansatz`
+- [[Lotrechte Kraft der geneigten Spannglieder]] · `Schubwandnachweis._ohne_glieder`
+- [[Lotrechte Kraft der geneigten Spannglieder]] · `Schubwandnachweis._protokoll_glieder`
+- [[Querkraft der Wände neben geneigten Spanngliedern]] · `Schubwandnachweis._ohne_glieder`
+- [[Querkraft der Wände neben geneigten Spanngliedern]] · `Schubwandnachweis._protokoll_glieder`
 - [[Querkraft über die Federn der Wände]] · `Schubwandnachweis._protokoll_ansatz`
+- [[Torsion aus der lotrechten Kraft der Spannglieder]] · `Schubwandnachweis._ohne_glieder`
+- [[Torsion der Wände neben geneigten Spanngliedern]] · `Schubwandnachweis._ohne_glieder`
 - [[Torsion in den Zellen (Bredt, mehrzellig)]] · `Schubwandnachweis._protokoll_ansatz`
 - [[Versatz – Moment der Querkraftanteile um den Schwerpunkt]] · `Schubwandnachweis._ein_fall`
 - [[Was die Zellen tragen]] · `Schubwandnachweis._ein_fall`

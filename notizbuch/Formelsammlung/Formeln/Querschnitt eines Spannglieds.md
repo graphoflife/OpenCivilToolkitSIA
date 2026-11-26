@@ -1,5 +1,5 @@
 ---
-erzeugt: 72e2c8175f20
+erzeugt: d7da5468b6c8
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 3.3.2.2, Tabelle 7"
@@ -30,6 +30,7 @@ $$
 
 ## Gebraucht von
 
+- [[Grösste Kraft eines geneigten Spannglieds]]
 - [[Spannkraft eines Spannglieds]]
 
 ## Im Code
