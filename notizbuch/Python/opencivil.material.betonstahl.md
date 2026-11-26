@@ -1,5 +1,5 @@
 ---
-erzeugt: 66b4bafd6233
+erzeugt: 265905ecc5d0
 art: modul
 tags: [modul]
 ---
@@ -87,6 +87,7 @@ Erzeugt einen frei definierten Betonstahl ohne Sortentabelle.
 - `STAHLSORTEN = {'B500A': Stahlsorte(f_yk=500.0, f_yk_druck=500.0, eps_uk=2.5, eps_ud…` – Betonstahlsorten nach SIA 262:2025, Tabelle 5 (f_yk, eps_uk) und Tabelle 9 (eps_ud). Am 2026-11-14 gegen die gedruckten Tabellen geprueft: B500A, B500B, B500C und B700B stimmen. «Stahl II» steht in keiner Tabelle von SIA 262:2025; woher er stammt, ist offen (TODO im Notizbuch).
 - `ERSTER_STAHL = 'B500B'` – Womit ein neuer Betonstahl anfängt, wenn man in der Oberfläche einen anlegt: B500B, danach die übrigen der Reihe nach (Benutzer, 2026-10-15).
 - `STAHLDICHTE = 7850.0` – Die Dichte von Betonstahl in kg/m³ -- die Vorgabe seines Kennwerts `rho_s` und die Zahl des Bewehrungsmasses.
+- `BUEGELDURCHMESSER = (8, 10, 12, 14, 16, 18, 20, 22, 26)` – Die Durchmesser, aus denen Bügel gebogen werden, in mm: Bügel dicker als ⌀26 biegt niemand. Aus ihnen wählen die Bügelsuche der Platte und die Bügel als Durchstanzbewehrung ([[opencivil.durchstanzen.systeme]]).
 - `STAHL_VORLAGEN = (KennwertVorlage(kurzname='f_yk', symbol='f_{yk}', einheit=N_PRO_MM2,…`
 
 ## Braucht
@@ -96,7 +97,9 @@ Erzeugt einen frei definierten Betonstahl ohne Sortentabelle.
 
 ## Gebraucht von
 
+- [[opencivil.bewehrungssuche.buegel]]
 - [[opencivil.durchstanzen.stelle]]
+- [[opencivil.durchstanzen.systeme]]
 - [[opencivil.material.arten]]
 - [[opencivil.material.baustahl]]
 - [[opencivil.mcp.werkzeuge]]

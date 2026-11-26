@@ -1,5 +1,5 @@
 ---
-erzeugt: cd3838af6b35
+erzeugt: 06d7b38f9c94
 art: modul
 tags: [modul]
 ---
@@ -34,3 +34,4 @@ tags: [modul]
 - [[opencivil.durchstanzen.pruefung]] – was der Durchstanznachweis rechnet, ohne Herleitung.
 - [[opencivil.durchstanzen.schnitt]] – der Nachweisschnitt um die gestützte Fläche.
 - [[opencivil.durchstanzen.stelle]] – die Durchstanzstelle: Platte, gestützte Fläche, Bewehrung, Last.
+- [[opencivil.durchstanzen.systeme]] – woraus die Durchstanzbewehrung besteht.

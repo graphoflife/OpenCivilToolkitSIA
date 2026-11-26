@@ -7,6 +7,36 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-26 · Durchstanzen: Bügel und die Leiste im Bild
+
+Aus dem Plan vom 2026-11-25, Schritt 8: die Durchstanzbewehrung hat eine
+eigene Kachel mit der Wahl des Systems, [ancoPLUS | Bügel], und unter
+«Diagramme» steht neben dem Grundriss eine Leiste in der Ansicht.
+
+- Vorher gab es nur ancoPLUS, und c_v stand in der Kachel «Platte». Nachher
+  wählt die Kachel «Durchstanzbewehrung» das System; c_v steht dort und
+  heisst nach System und Platte «Ankerköpfe von unten» oder «Bügel von oben».
+- Beispiel, Innenstütze 400 × 400 mm, h = 280 mm, C30/37, V_d = 800 kN: mit
+  ancoPLUS 16 × DX4-0215, Anker ⌀10 bei 85/140/140/175 mm; mit Bügeln
+  16 Linien zu 4 Schenkeln ⌀8 bei 85/145/175/175 mm, 220 mm hoch. Beide
+  erfüllen alle vier Nachweise. Bei 1000 kN hält ancoPLUS um einen
+  ZEUS-Pilz, mit dem Faktor seines Gutachtens bis 3·k_r; die Bügel nicht:
+  für sie gilt in (70) die 2 der Norm (4.3.6.5.9), und der Hinweis sagt es.
+- Die Regeln je System stehen in `opencivil/durchstanzen/systeme.py`: welche
+  Durchmesser, wie hoch, welche Abstände, k_sys, der Stahl und die Wörter
+  der Herleitung. Die Bemessung (`bewehrung.bemessen`) und der Nachweis
+  laufen über das gewählte System; die Anordnung um die Stütze ist für alle
+  dieselbe. Was bei den Bügeln nach Vorgabe gewählt ist, steht im TODO.
+- Das Bild (`web/js/ds_ansicht.js`): die Leiste mit den meisten Elementen,
+  längs geschnitten und massstäblich -- Platte, Zugbewehrung, Stütze (bei
+  der Bodenplatte oben), ein Pilz, die Anker mit Köpfen oder die Bügel mit
+  ihren Biegungen; hinterlegt der Bereich 0.35·d_v bis d_v, in dem sie
+  zählen; bemasst die Abstände, c_v, h_A, c und h. Alle Masse kommen aus
+  dem Kern (`durchstanzdaten._ansicht`), die Lagen der Zugbewehrung aus dem
+  Befund des Nachweises.
+- HALFEN HDB fehlt noch: die Unterlage von Leviat hole ich erst nach deinem
+  Ja.
+
 ## 2026-11-26 · Baustahl: Gesetz und Bild
 
 Aus dem Plan vom 2026-11-25, Schritt 7: der Baustahl hat eine

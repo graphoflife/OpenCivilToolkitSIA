@@ -1,5 +1,5 @@
 ---
-erzeugt: f3f29c2a5e99
+erzeugt: dd6c0c899248
 art: modul
 tags: [modul]
 ---
@@ -78,7 +78,8 @@ Eine Durchstanzstelle -- siehe Dateikopf.
 - `stahl: str = ''` – Kennung des Betonstahls der Biegebewehrung.
 - `h: float = bereich(280.0, heisst='Plattendicke h', einheit=MM, ueber=0.0)`
 - `c: float = bereich(30.0, heisst='Überdeckung c_nom', einheit=MM, ab=0.0)` – Die Überdeckung auf der Zugseite: oben bei der Decke, unten bei der Bodenplatte.
-- `c_v: float = bereich(30.0, heisst='Abstand der Ankerköpfe c_v', einheit=MM, ab=0.0)` – Der Abstand der Verankerung der Durchstanzbewehrung -- der Köpfe der Anker -- von der Oberfläche der Druckseite (SIA 262:2025, Figur 26).
+- `c_v: float = bereich(30.0, heisst='Abstand der Verankerung c_v', einheit=MM, ab=0.…` – Der Abstand der Verankerung der Durchstanzbewehrung -- der Köpfe der Anker, der Biegung der Bügel -- von der Oberfläche der Druckseite (SIA 262:2025, Figur 26).
+- `system: Durchstanzsystem = Durchstanzsystem.ANCOPLUS` – Woraus die Durchstanzbewehrung besteht, wo es eine braucht: ancoPLUS oder Bügel.
 - `D_max: float = bereich(32.0, heisst='Grösstkorn D_max', einheit=MM, ueber=0.0)`
 - `phi_x: float = bereich(16.0, heisst='Stabdurchmesser ⌀_x', einheit=MM, ueber=0.0)`
 - `s_x: float = bereich(150.0, heisst='Stababstand s_x', einheit=MM, ueber=0.0)`
@@ -148,6 +149,7 @@ Eine Aussparung aus ihren Ecken `[x, y]` in mm.
 - [[opencivil.core.einheiten]]
 - [[opencivil.durchstanzen.flaeche]]
 - [[opencivil.durchstanzen.stelle]]
+- [[opencivil.durchstanzen.systeme]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.lesen]]
 - [[opencivil.projekt.netz]]

@@ -13,13 +13,15 @@ Felder selbst, mit Zeichen und Beschreibung, stehen in :data:`VORGABEN`: die
 Herleitung zeigt ihre Gruppen als Kästen, die Maske verteilt sie auf ihre
 Tafeln.
 
-DER STAHL DER ANKER:
-Die Durchstanzbewehrung hat ihren eigenen Stahl, den des Produkts
-(:data:`.produkte.STAHL`): in (67) und (69) gilt dessen Fliessgrenze
+DER STAHL DER DURCHSTANZBEWEHRUNG:
+Die Durchstanzbewehrung hat ihren eigenen Stahl, den ihres Systems
+(:attr:`.systeme.System.STAHL`): in (67) und (69) gilt dessen Fliessgrenze
 (SIA 262:2025, 4.3.6.5.4). Er steht als Baustoff neben der Stelle, mit dem
-Index «sw» an seinen Zeichen; alle Stellen teilen ihn. Bis 2026-11-14
-rechneten die Anker mit dem Stahl der Biegebewehrung -- mit B700B um 40 %
-zu günstig.
+Index «sw» an seinen Zeichen; alle Stellen mit demselben System teilen ihn.
+Bis 2026-11-14 rechneten die Anker mit dem Stahl der Biegebewehrung -- mit
+B700B um 40 % zu günstig. Welches System die Stelle nimmt, ancoPLUS oder
+Bügel, wählt der Benutzer (:class:`.systeme.Durchstanzsystem`); was c_v
+heisst, richtet sich danach.
 
 DECKE UND BODENPLATTE:
 Bei einer Decke liegt die Zugbewehrung über der Stütze oben, bei einer
@@ -44,15 +46,15 @@ from opencivil.core.rechenobjekt import Rechenobjekt
 from opencivil.core.vorgaben import Feld, Gruppe
 from opencivil.core.wahl import Wahl
 from opencivil.core.wert import WertDef
-from opencivil.durchstanzen import produkte
 from opencivil.durchstanzen.flaeche import GestuetzteFlaeche
 from opencivil.durchstanzen.schnitt import Punkt
+from opencivil.durchstanzen.systeme import Durchstanzsystem
 from opencivil.material.basis import Baustoff
 from opencivil.material.betonstahl import betonstahl
 from opencivil.querschnitt.platte import Richtung
 
-#: Der Namensraum des Stahls der Anker -- einer für alle Stellen.
-ANKERSTAHL = "produkt.ancoplus"
+#: Der Namensraum des Stahls der Durchstanzbewehrung -- einer je System, für alle Stellen.
+ANKERSTAHL = "produkt.{}"
 
 #: Was der Nachweis an jeder Stelle liest -- vor den Massen der gestützten Fläche und danach.
 VOR_DEN_MASSEN = ("h", "c", "c_v", "D_max", "phi_x", "s_x", "phi_y", "s_y")
@@ -82,7 +84,7 @@ class Plattenart(Wahl):
 
     @property
     def druckseite(self) -> str:
-        """Die andere Seite -- von ihr aus misst c_v die Verankerung der Anker."""
+        """Die andere Seite -- von ihr aus misst c_v die Verankerung der Durchstanzbewehrung."""
         return "unten" if self is Plattenart.DECKE else "oben"
 
     @property
@@ -162,17 +164,24 @@ def eingaben_fuer(flaeche: GestuetzteFlaeche, stufe: Naeherungsstufe, ke: KeArt)
 
 
 def _platte(plattenart: Plattenart) -> Tuple[Feld, ...]:
-    """Was c und c_v meinen, hängt an der Art: bei der Bodenplatte zieht die Unterseite."""
+    """Was c meint, hängt an der Art: bei der Bodenplatte zieht die Unterseite."""
     return (
         Feld("h", "h", MM, "Plattendicke", 0, schritt=10),
         Feld("c", "c_{nom}", MM, f"Überdeckung der Zugbewehrung {plattenart.zugseite}", 0,
              beschriftung=f"Überdeckung {plattenart.zugseite}", schritt=5),
+        Feld("D_max", "D_{max}", MM, "Grösstkorndurchmesser", 0, beschriftung="Grösstkorn"),
+    )
+
+
+def _durchstanzbewehrung(plattenart: Plattenart, system: Durchstanzsystem) -> Tuple[Feld, ...]:
+    """c_v misst von der Druckseite bis zur Verankerung -- den Köpfen der Anker, den Bügeln."""
+    regeln = system.regeln
+    return (
         Feld("c_v", "c_v", MM, "Abstand der Verankerung der Durchstanzbewehrung von der "
              f"Druckseite, {plattenart.druckseite}", 0,
-             beschriftung=f"Ankerköpfe von {plattenart.druckseite}", schritt=5,
-             hinweis="gemessen ab ihrer Oberfläche (SIA 262:2025, Figur 26); über d_v/6 "
-                     "tragen die Anker 30 % weniger (5.5.3.11)"),
-        Feld("D_max", "D_{max}", MM, "Grösstkorndurchmesser", 0, beschriftung="Grösstkorn"),
+             beschriftung=f"{regeln.VERANKERUNG} von {plattenart.druckseite}", schritt=5,
+             hinweis=f"gemessen ab ihrer Oberfläche (SIA 262:2025, Figur 26); über d_v/6 "
+                     f"tragen die {regeln.ELEMENT} 30 % weniger (5.5.3.11)"),
     )
 
 
@@ -230,6 +239,7 @@ VORGABEN = (
         Feld("e_y", "e_y", MM, "Exzentrizität der Auflagerkraft in y", 0, beschriftung="in y",
              schritt=10),
     )),
+    Gruppe("Durchstanzbewehrung", _durchstanzbewehrung, nach=("plattenart", "system")),
 )
 
 
@@ -247,6 +257,9 @@ class Durchstanzstelle(Rechenobjekt):
     name: str
     praefix: str
     plattenart: Plattenart
+    system: Durchstanzsystem
+    """Woraus die Durchstanzbewehrung besteht, wo es eine braucht."""
+
     beton: Baustoff
     stahl: Baustoff
     """Der Stahl der Biegebewehrung."""
@@ -258,7 +271,8 @@ class Durchstanzstelle(Rechenobjekt):
     c_v: Groesse
     """
     Der Abstand der Verankerung der Durchstanzbewehrung von der Oberfläche
-    der Druckseite (SIA 262:2025, Figur 26) -- bei ancoPLUS bis zu den Köpfen.
+    der Druckseite (SIA 262:2025, Figur 26) -- bei ancoPLUS bis zu den Köpfen,
+    bei Bügeln bis zu ihrer Biegung um die Bewehrung.
     """
 
     D_max: Groesse
@@ -311,13 +325,14 @@ class Durchstanzstelle(Rechenobjekt):
     def __post_init__(self) -> None:
         self.id = self.praefix
         self.aussparungen = tuple(tuple(map(tuple, a)) for a in self.aussparungen)
-        self.anker = betonstahl(produkte.STAHL, name=f"ancoPLUS, {produkte.STAHL}",
-                                praefix=ANKERSTAHL, symbol_index="sw")
+        regeln = self.system.regeln
+        self.anker = betonstahl(regeln.STAHL, name=f"{regeln.NAME}, {regeln.STAHL}",
+                                praefix=ANKERSTAHL.format(self.system.value), symbol_index="sw")
         self._aufbauen()
 
     @property
     def baustoffe(self) -> Tuple[Baustoff, ...]:
-        """Der Stahl der Anker -- Beton und Biegebewehrung meldet das Projekt an."""
+        """Der Stahl der Durchstanzbewehrung -- Beton und Biegebewehrung meldet das Projekt an."""
         return (self.anker,)
 
     @property

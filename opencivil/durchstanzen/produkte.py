@@ -5,8 +5,8 @@ VERANTWORTUNG:
 Die Produkte, aus denen die Bemessung wählt, mit ihren Regeln -- Typen,
 Durchmesser, Höhen, Abstände, der Faktor des Gutachtens -- und woher jede
 Zahl stammt. Gerechnet wird hier nichts, was über ein Produkt hinausgeht:
-die Anordnung um die Stütze steht in :mod:`.bewehrung`, der Nachweis in
-:mod:`.nachweis`.
+welches System die Stelle nimmt, sagt :mod:`.systeme`, die Anordnung um die
+Stütze steht in :mod:`.bewehrung`, der Nachweis in :mod:`.nachweis`.
 
 ANCOPLUS (AncoTech AG):
 Doppelkopfanker aus B500B auf einer Montageleiste, je Leiste 2 bis 9 Anker
@@ -41,13 +41,17 @@ QUELLE_ZEUS = "AncoTech, Preisliste ZEUS 12.2018"
 
 
 @dataclass(frozen=True)
-class Ankertyp:
-    """Ein Durchmesser von ancoPLUS: Kennbuchstabe, ⌀ und die lieferbaren Höhen h_A."""
+class Element:
+    """
+    Ein Durchmesser eines Systems der Durchstanzbewehrung (:mod:`.systeme`):
+    ⌀, die lieferbaren Höhen h_A und bei ancoPLUS der Kennbuchstabe. Ein
+    Bügel hat jede Höhe und keinen Buchstaben.
+    """
 
-    buchstabe: str
     durchmesser: float
-    h_min: float
-    h_max: float
+    h_min: float = 0.0
+    h_max: float = math.inf
+    buchstabe: str = ""
 
     @property
     def flaeche(self) -> float:
@@ -58,15 +62,15 @@ class Ankertyp:
 #: Die Typen von ancoPLUS mit ihren Höhen h_A (Preisliste ancoPLUS, S. 6).
 #: Bei 22, 25 und 28 mm nennt die Liste mehrere Buchstaben und für 25/28 auch
 #: 26/30 mm; genommen ist der erste Buchstabe und der kleinere Durchmesser.
-ANKERTYPEN: Tuple[Ankertyp, ...] = (
-    Ankertyp("X", 0.010, 0.125, 0.295),
-    Ankertyp("A", 0.012, 0.125, 0.315),
-    Ankertyp("B", 0.014, 0.125, 0.405),
-    Ankertyp("C", 0.016, 0.195, 0.405),
-    Ankertyp("G", 0.020, 0.215, 0.455),
-    Ankertyp("J", 0.022, 0.295, 0.455),
-    Ankertyp("O", 0.025, 0.345, 0.455),
-    Ankertyp("T", 0.028, 0.345, 0.455),
+ANKERTYPEN: Tuple[Element, ...] = (
+    Element(0.010, 0.125, 0.295, "X"),
+    Element(0.012, 0.125, 0.315, "A"),
+    Element(0.014, 0.125, 0.405, "B"),
+    Element(0.016, 0.195, 0.405, "C"),
+    Element(0.020, 0.215, 0.455, "G"),
+    Element(0.022, 0.295, 0.455, "J"),
+    Element(0.025, 0.345, 0.455, "O"),
+    Element(0.028, 0.345, 0.455, "T"),
 )
 
 #: So viele Anker trägt eine Leiste -- nur ganze Elemente sind lieferbar.
@@ -157,7 +161,7 @@ def abstaende(d: float, anzahl: int) -> Tuple[float, ...]:
     return tuple(folge)
 
 
-def typname(typ: Ankertyp, anzahl: int, h_A: float) -> str:
+def typname(typ: Element, anzahl: int, h_A: float) -> str:
     """«DA3-0215»: ungleiche Abstände, Typ, Anker je Leiste, Höhe h_A in mm."""
     return f"D{typ.buchstabe}{anzahl}-{round(h_A * 1e3):04d}"
 

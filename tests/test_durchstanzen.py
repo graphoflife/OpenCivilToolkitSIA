@@ -26,6 +26,7 @@ from opencivil.durchstanzen.schnitt import (
     Schatten, Stuetzenflaeche, kandidaten_stuetze, nachweisschnitt, schatten_am_schnitt,
 )
 from opencivil.durchstanzen.stelle import KeArt, Naeherungsstufe, eingaben_fuer
+from opencivil.durchstanzen.systeme import Durchstanzsystem
 from opencivil.querschnitt.geometrie import abstand_strecke_polygon
 from opencivil.projekt import DurchstanzEintrag, Projekt, ProjektFehler
 from opencivil.web import dienst
@@ -328,7 +329,8 @@ class TestLeistenAnAussparungen(unittest.TestCase):
         """Verschieden lange Leisten sind verschiedene Typen: «… + 1 × … DX2-0215»."""
         typ = produkte.ANKERTYPEN[0]
         leisten = (Leiste((0, 0), (1, 0), 3), Leiste((0, 0), (0, 1), 3), Leiste((0, 0), (-1, 0), 2))
-        v = Vorschlag(typ, 0.215, (0.085, 0.14, 0.14), leisten, 2, None)
+        v = Vorschlag(Durchstanzsystem.ANCOPLUS.regeln, typ, 0.215, (0.085, 0.14, 0.14),
+                      leisten, 2, None)
         self.assertEqual(v.name, "2 × ancoPLUS DX3-0215 + 1 × ancoPLUS DX2-0215")
 
 
@@ -411,7 +413,8 @@ class TestAnordnung(unittest.TestCase):
             def __init__(self, vorschlag):
                 self.vorschlag = vorschlag
 
-        v = bemessen(d=d, d_v=d_v, d_v_out=d - 0.030, h_A=0.215,
+        v = bemessen(system=Durchstanzsystem.ANCOPLUS.regeln,
+                     d=d, d_v=d_v, d_v_out=d - 0.030, h_A=0.215,
                      r_2_zu=lambda r: kandidaten_stuetze(rund, r, 1e9)[0].stuecke,
                      umriss=rund.umriss(), raender=(), aussparungen=(), schatten=(),
                      achse=(0.0, 0.0), ueberdeckung=0.030, pruefen=Reicht).vorschlag

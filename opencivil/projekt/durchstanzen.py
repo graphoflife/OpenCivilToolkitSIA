@@ -30,6 +30,7 @@ from typing import List, Sequence
 from opencivil.core.einheiten import KN, KN_PRO_M2, KNM_PRO_M, M, MM
 from opencivil.durchstanzen.flaeche import Lage, Stuetzenform
 from opencivil.durchstanzen.stelle import KeArt, Naeherungsstufe, Plattenart
+from opencivil.durchstanzen.systeme import Durchstanzsystem
 from opencivil.projekt.eintraege import BauteilEintrag, Beschreibung
 from opencivil.projekt.lesen import bereich
 from opencivil.projekt.netz import Netz, neue_kennung
@@ -77,11 +78,15 @@ class DurchstanzEintrag(BauteilEintrag):
     c: float = bereich(30.0, heisst="Überdeckung c_nom", einheit=MM, ab=0.0)
     """Die Überdeckung auf der Zugseite: oben bei der Decke, unten bei der Bodenplatte."""
 
-    c_v: float = bereich(30.0, heisst="Abstand der Ankerköpfe c_v", einheit=MM, ab=0.0)
+    c_v: float = bereich(30.0, heisst="Abstand der Verankerung c_v", einheit=MM, ab=0.0)
     """
-    Der Abstand der Verankerung der Durchstanzbewehrung -- der Köpfe der Anker
-    -- von der Oberfläche der Druckseite (SIA 262:2025, Figur 26).
+    Der Abstand der Verankerung der Durchstanzbewehrung -- der Köpfe der Anker,
+    der Biegung der Bügel -- von der Oberfläche der Druckseite (SIA 262:2025,
+    Figur 26).
     """
+
+    system: Durchstanzsystem = Durchstanzsystem.ANCOPLUS
+    """Woraus die Durchstanzbewehrung besteht, wo es eine braucht: ancoPLUS oder Bügel."""
 
     D_max: float = bereich(32.0, heisst="Grösstkorn D_max", einheit=MM, ueber=0.0)
 

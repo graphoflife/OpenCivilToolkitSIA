@@ -21,7 +21,7 @@ EIGENSTAENDIG NUTZBAR::
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, List, Mapping, Optional
+from typing import Dict, List, Mapping, Optional, Tuple
 
 from opencivil.core.einheiten import EINHEITSLOS, KG_PRO_M3, N_PRO_MM2, PROZENT, Groesse
 from opencivil.material.basis import Baustoff, Baustoffart, KennwertVorlage, erzeuge
@@ -89,6 +89,11 @@ def stahlsorten_zum_anlegen() -> List[str]:
 #: Die Dichte von Betonstahl in kg/m³ -- die Vorgabe seines Kennwerts
 #: ``rho_s`` und die Zahl des Bewehrungsmasses.
 STAHLDICHTE = 7850.0
+
+#: Die Durchmesser, aus denen Bügel gebogen werden, in mm: Bügel dicker als
+#: ⌀26 biegt niemand. Aus ihnen wählen die Bügelsuche der Platte und die
+#: Bügel als Durchstanzbewehrung (:mod:`opencivil.durchstanzen.systeme`).
+BUEGELDURCHMESSER: Tuple[float, ...] = (8, 10, 12, 14, 16, 18, 20, 22, 26)
 
 STAHL_VORLAGEN: tuple[KennwertVorlage, ...] = (
     # -- Eingaben aus der Sortentabelle ------------------------------------

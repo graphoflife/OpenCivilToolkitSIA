@@ -1,5 +1,5 @@
 ---
-erzeugt: 02440178bef8
+erzeugt: bcdb68b35f8b
 art: modul
 tags: [modul]
 ---
@@ -369,3 +369,4 @@ def beschreibung(self) -> str
 - [[opencivil.stabwerk.stabquerschnitt]]
 - [[opencivil.web.api]]
 - [[opencivil.web.diagrammdaten]]
+- [[opencivil.web.durchstanzdaten]]

@@ -1,5 +1,5 @@
 ---
-erzeugt: 7d391f23041c
+erzeugt: 8facd511d5af
 art: modul
 tags: [modul]
 ---
@@ -56,14 +56,11 @@ def buegel_uebernehmen(projekt, kennung: str, loesung: Buegelloesung) -> None
 Die gefundenen Buegel in die Platte schreiben.
 
 
-## Konstanten
-
-- `BUEGELDURCHMESSER = (8, 10, 12, 14, 16, 18, 20, 22, 26)` – Buegel dicker als ⌀26 biegt niemand -- die Buegelsuche bleibt darunter.
-
 ## Braucht
 
 - [[opencivil.bewehrungssuche.bewertung]]
 - [[opencivil.bewehrungssuche.laengs]]
+- [[opencivil.material.betonstahl]]
 - [[opencivil.querschnitt.geometrie]]
 
 ## Gebraucht von

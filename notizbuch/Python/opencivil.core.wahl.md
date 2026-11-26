@@ -1,5 +1,5 @@
 ---
-erzeugt: fe94957d207c
+erzeugt: c8d97f851ef6
 art: modul
 tags: [modul]
 ---
@@ -35,6 +35,7 @@ Eine Wahl: das Mitglied ist sein Text.
 - [[opencivil.decke.modell]]
 - [[opencivil.durchstanzen.flaeche]]
 - [[opencivil.durchstanzen.stelle]]
+- [[opencivil.durchstanzen.systeme]]
 - [[opencivil.erdbeben.ersatzkraft]]
 - [[opencivil.geotechnik.setzung]]
 - [[opencivil.geotechnik.verhalten]]

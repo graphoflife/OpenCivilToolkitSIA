@@ -101,6 +101,7 @@ class TestSinnbilder(unittest.TestCase):
             "rechenart": rechenwahl["rechenarten"],
             "lage": k["durchstanzen"]["lagen"],
             "stuetzenform": k["durchstanzen"]["formen"],
+            "system": k["durchstanzen"]["systeme"],
             "kopf": k["pfahl"]["koepfe"],
             "tragglied": k["pfahl"]["tragglieder"],
             "setzung": k["setzung"]["steifigkeiten"],

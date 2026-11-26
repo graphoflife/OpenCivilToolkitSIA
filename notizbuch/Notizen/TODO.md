@@ -1112,6 +1112,21 @@ Norm dazu sagt.
       (bei d = 404 mm 267 statt 300 mm). Heute steht nur ein Hinweis in der
       Herleitung. Empfehlung: auf Tabelle 21 begrenzen, ausser das Gutachten
       deckt die Abstände (4.3.6.5.6).
+- [ ] **Durchstanzbewehrung: die Regeln der Bügel (2026-11-26).** Nach der
+      Norm: mindestens zwei Reihen zwischen 0.35·d_v und d_v, s_0 kleiner
+      als s_1, s_1 und ⌀ höchstens nach Tabelle 21 (5.5.3.8, 5.5.3.12), beim
+      zweiten Schenkel höchstens 1.5·d_v auseinander (5.5.3.9), in (70) die
+      2 der Norm (4.3.6.5.9). Nach Vorgabe, nicht nachgeschlagen: der erste
+      Schenkel 0.35·d_v vom Rand, auf 5 mm aufgerundet; der zweite bei d_v,
+      abgerundet, höchstens s_1 weiter; danach s_1; ⌀8 bis ⌀26 (die Liste
+      der Bügelsuche) bis zur Grenze der Tabelle 21, aus B500B; zwei bis neun
+      Reihen; die Höhe h − c − c_v. Offen: c misst bis zur Biegebewehrung --
+      umfasst ein Bügel sie, liegt er um seinen Durchmesser näher an der
+      Oberfläche. Die Höhe geht in keinen Widerstand ein, nur in Text und
+      Bild.
+- [ ] **Durchstanzbewehrung HALFEN HDB.** Gewünscht am 2026-11-25. Wartet
+      auf dein Ja, die Unterlage von Leviat zu holen (Datei und Quelle nenne
+      ich vorher).
 - [ ] **Durchstanzbewehrung an Aussparungen.** Eingebaut: eine Leiste hält
       zur Aussparung die Überdeckung c_nom, wie zum Plattenrand (nach Vorgabe,
       nicht nachgeschlagen), und im Schatten einer Aussparung nach Figur 23d
@@ -1480,7 +1495,8 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
 
 - [ ] **Durchstanzen, nächste Schritte:** Stahlpilze an Rand und Ecke
       (der Katalog hat nur ganze Pilze); Durchstanzbewehrung an Wandende und
-      Wandecke; weitere Produkte (DURA-Körbe und S-Elemente, HDB, FIDECA);
+      Wandecke; weitere Produkte (DURA-Körbe und S-Elemente, HDB, FIDECA --
+      Bügel gibt es seit 2026-11-26);
       Sicherung gegen Totaleinsturz (4.3.6.7).
 
 - [ ] **Balkensysteme, nächste Schritte:** Umhüllende der Kombinationen,

@@ -15,10 +15,8 @@ from typing import Optional, Sequence
 
 from opencivil.bewehrungssuche.bewertung import arbeitskopie, bewerte, vorab_pruefen
 from opencivil.bewehrungssuche.laengs import TEILUNGEN, teilungen_der_suche
+from opencivil.material.betonstahl import BUEGELDURCHMESSER
 from opencivil.querschnitt.geometrie import Linienart
-
-#: Buegel dicker als ⌀26 biegt niemand -- die Buegelsuche bleibt darunter.
-BUEGELDURCHMESSER: Tuple[float, ...] = (8, 10, 12, 14, 16, 18, 20, 22, 26)
 
 
 # ===========================================================================

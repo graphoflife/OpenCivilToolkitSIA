@@ -19,6 +19,7 @@
 
 import { karte } from './bausteine.js';
 import { el, svgEl } from './dom.js';
+import { ansichtKarte } from './ds_ansicht.js';
 import { BREITE, legende, linie, text } from './gb_skizze.js';
 import { zustand } from './zustand.js';
 
@@ -160,11 +161,15 @@ function grundrissBild(s) {
   return svg;
 }
 
-/** Die Karte einer Durchstanzstelle im Reiter «Diagramme». Das Panel darum baut bericht.js. */
+/**
+ * Die Karten einer Durchstanzstelle im Reiter «Diagramme»: der Grundriss und,
+ * wo es sie braucht, die Durchstanzbewehrung in der Ansicht (ds_ansicht.js).
+ * Das Panel darum baut bericht.js.
+ */
 export function durchstanzKarten(kennung) {
   const s = zustand.loesung?.zeichendaten?.[kennung];
   if (!s) return [karte('Grundriss', [el('p.karte-hinweis', { text: 'Noch nicht gerechnet.' })])];
   const bild = grundrissBild(s);
   return [karte('Grundriss', [el('div.gb-bildhuelle', {}, [bild]), legende(s.legende)],
-    { bild, klasse: 'ist-breit' })];
+    { bild, klasse: 'ist-breit' }), ansichtKarte(s.ansicht)].filter(Boolean);
 }

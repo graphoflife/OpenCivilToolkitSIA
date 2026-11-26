@@ -1,5 +1,5 @@
 ---
-erzeugt: f29401d43e8c
+erzeugt: 0a7f03f9c382
 art: modul
 tags: [modul]
 ---
@@ -17,6 +17,11 @@ Stegen und dem Schnitt um ihn, je für sich. Dazu die Legende unter dem Bild
 ([[opencivil.web.anzeige]]): die Schnitte mit ihren Zahlen und das Urteil.
 Gezeichnet wird in der Oberflaeche, gerechnet nichts: die Linien kommen aus
 dem Befund des Nachweises ([[opencivil.durchstanzen.nachweis]]).
+
+Wo es Durchstanzbewehrung braucht, auch eine Leiste in der Ansicht
+([[opencivil.web.durchstanzdaten#_ansicht|_ansicht]]): längs geschnitten, mit Platte, Zugbewehrung, Stütze und
+Pilz, den Elementen und dem Bereich, in dem sie zählen -- in mm, x ab dem
+Rand der gestützten Fläche, z ab der Druckseite.
 
 Für den Katalog die Wahlen der Maske ([[opencivil.web.durchstanzdaten#wahlen|wahlen]]): je Stellung ihre
 Beschriftung, und welche Felder der Nachweis mit ihr liest -- die festen, die
@@ -45,6 +50,29 @@ def situation(aufbau: Aufbau, kennung: str, loesung: Loesung) -> Optional[Dict[s
 ```
 
 Was der Grundriss einer Stelle braucht -- `None`, wenn ihr Nachweis nicht gelaufen ist.
+
+### _ansicht
+
+```python
+def _ansicht(befund: Durchstanzbefund, stelle: Durchstanzstelle, werte: Dict[str, Wert]) -> Dict[str, Any]
+```
+
+Eine Leiste in der Ansicht, längs geschnitten: die mit den meisten
+Elementen, unter ihnen die, die am ehesten nach rechts läuft. Die Stütze
+steht, wo die Linie der Leiste ihren Rand trifft -- mit einem Stahlpilz
+vor dem Rand der gestützten Fläche --, ihre Achse, wo die Linie ihr am
+nächsten kommt. Eine Lage der Zugbewehrung läuft «längs», wenn sie eher
+in Richtung der Leiste liegt; die andere steht im Bild als Punkte.
+
+### _bis_zum_umriss
+
+```python
+def _bis_zum_umriss(p: Punkt, r: Punkt, umriss: Sequence[Punkt]) -> float
+```
+
+Wie weit der Strahl von `p` in Richtung `r` läuft, bis er den Umriss
+trifft -- null, wenn `p` auf ihm liegt oder der Strahl ihn verfehlt. Nur
+fürs Bild.
 
 ### _linien
 
@@ -78,11 +106,15 @@ Eine Kraft der Legende: kN mit einer Stelle.
 - [[opencivil.core.einheiten]]
 - [[opencivil.core.latex]]
 - [[opencivil.core.rechenwerk]]
+- [[opencivil.core.wert]]
+- [[opencivil.durchstanzen.bewehrung]]
 - [[opencivil.durchstanzen.flaeche]]
 - [[opencivil.durchstanzen.nachweis]]
 - [[opencivil.durchstanzen.schnitt]]
 - [[opencivil.durchstanzen.stelle]]
+- [[opencivil.durchstanzen.systeme]]
 - [[opencivil.projekt]]
+- [[opencivil.querschnitt.platte]]
 - [[opencivil.web.anzeige]]
 
 ## Gebraucht von

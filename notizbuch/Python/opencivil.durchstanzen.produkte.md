@@ -1,5 +1,5 @@
 ---
-erzeugt: e428ddfbd6c0
+erzeugt: 7b111d1e32fe
 art: modul
 tags: [modul]
 ---
@@ -12,8 +12,8 @@ tags: [modul]
 Die Produkte, aus denen die Bemessung wählt, mit ihren Regeln -- Typen,
 Durchmesser, Höhen, Abstände, der Faktor des Gutachtens -- und woher jede
 Zahl stammt. Gerechnet wird hier nichts, was über ein Produkt hinausgeht:
-die Anordnung um die Stütze steht in [[opencivil.durchstanzen.bewehrung|.bewehrung]], der Nachweis in
-[[opencivil.durchstanzen.nachweis|.nachweis]].
+welches System die Stelle nimmt, sagt [[opencivil.durchstanzen.systeme|.systeme]], die Anordnung um die
+Stütze steht in [[opencivil.durchstanzen.bewehrung|.bewehrung]], der Nachweis in [[opencivil.durchstanzen.nachweis|.nachweis]].
 
 
 ## ANCOPLUS (AncoTech AG)
@@ -42,21 +42,23 @@ SI-Basis, Längen in m.
 
 ## Inhalt
 
-### Ankertyp
+### Element
 
 ```python
 @dataclass(frozen=True)
-class Ankertyp
+class Element
 ```
 
-Ein Durchmesser von ancoPLUS: Kennbuchstabe, ⌀ und die lieferbaren Höhen h_A.
+Ein Durchmesser eines Systems der Durchstanzbewehrung ([[opencivil.durchstanzen.systeme|.systeme]]):
+⌀, die lieferbaren Höhen h_A und bei ancoPLUS der Kennbuchstabe. Ein
+Bügel hat jede Höhe und keinen Buchstaben.
 
-- `buchstabe: str`
 - `durchmesser: float`
-- `h_min: float`
-- `h_max: float`
+- `h_min: float = 0.0`
+- `h_max: float = math.inf`
+- `buchstabe: str = ''`
 
-#### Ankertyp.flaeche
+#### Element.flaeche
 
 ```python
 @property
@@ -105,7 +107,7 @@ der erste vom Rand zum ersten Anker, dann von Anker zu Anker.
 ### typname
 
 ```python
-def typname(typ: Ankertyp, anzahl: int, h_A: float) -> str
+def typname(typ: Element, anzahl: int, h_A: float) -> str
 ```
 
 «DA3-0215»: ungleiche Abstände, Typ, Anker je Leiste, Höhe h_A in mm.
@@ -157,7 +159,7 @@ umschliessen die gestützte Fläche ausserhalb des Pilzes
 
 - `QUELLE_ANCOPLUS = 'AncoTech, Gutachten Muttoni / Fernández Ruiz 2007 (07-A05-R1c) und P…` – Woher die Regeln von ancoPLUS stammen -- so steht es in der Herleitung.
 - `QUELLE_ZEUS = 'AncoTech, Preisliste ZEUS 12.2018'`
-- `ANKERTYPEN = (Ankertyp('X', 0.01, 0.125, 0.295), Ankertyp('A', 0.012, 0.125, 0.315…` – Die Typen von ancoPLUS mit ihren Höhen h_A (Preisliste ancoPLUS, S. 6). Bei 22, 25 und 28 mm nennt die Liste mehrere Buchstaben und für 25/28 auch 26/30 mm; genommen ist der erste Buchstabe und der kleinere Durchmesser.
+- `ANKERTYPEN = (Element(0.01, 0.125, 0.295, 'X'), Element(0.012, 0.125, 0.315, 'A'),…` – Die Typen von ancoPLUS mit ihren Höhen h_A (Preisliste ancoPLUS, S. 6). Bei 22, 25 und 28 mm nennt die Liste mehrere Buchstaben und für 25/28 auch 26/30 mm; genommen ist der erste Buchstabe und der kleinere Durchmesser.
 - `ANKER_JE_LEISTE = range(2, 10)` – So viele Anker trägt eine Leiste -- nur ganze Elemente sind lieferbar.
 - `ABSTAND_ERSTER = 0.375` – Die Abstände der Typen «D…», in Vielfachen von d (siehe Dateikopf): vom Rand der Stütze zum ersten Anker, bis zum dritten, danach.
 - `ABSTAND_BIS_DRITTER = 0.6`
@@ -180,4 +182,4 @@ umschliessen die gestützte Fläche ausserhalb des Pilzes
 - [[opencivil.durchstanzen.bewehrung]]
 - [[opencivil.durchstanzen.mit_bewehrung]]
 - [[opencivil.durchstanzen.pruefung]]
-- [[opencivil.durchstanzen.stelle]]
+- [[opencivil.durchstanzen.systeme]]

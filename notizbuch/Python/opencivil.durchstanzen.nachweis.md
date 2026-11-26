@@ -1,5 +1,5 @@
 ---
-erzeugt: b6e423833b51
+erzeugt: 1cb441c67925
 art: modul
 tags: [modul]
 ---
@@ -91,6 +91,20 @@ Die Plattenrotation in einer Richtung: r_s, m_sd/m_Rd und ψ.
 - `m_Rd: Optional[float]`
 - `psi: float`
 
+### Biegelage
+
+```python
+@dataclass(frozen=True)
+class Biegelage
+```
+
+Eine Lage der Zugbewehrung über der Stütze, wie gerechnet -- fürs Bild der Leiste.
+
+- `richtung: Richtung`
+- `tiefe: float` – Wie weit ihre Mitte unter der Oberfläche der Zugseite liegt: h − d in ihrer Richtung.
+- `durchmesser: float`
+- `abstand: float`
+
 ### Durchstanzbefund
 
 ```python
@@ -111,6 +125,7 @@ braucht; jedes mit seinen eigenen Zahlen.
 - `umriss: Tuple[Punkt, ...]`
 - `aussparungen: Tuple[Tuple[Punkt, ...], ...]`
 - `raender: Tuple[Tuple[Punkt, float], ...]` – Je Plattenrand ein Punkt auf ihm und die Richtung, in die die Platte liegt (rad).
+- `lagen: Tuple[Biegelage, ...] = ()` – Die beiden Lagen der Zugbewehrung, die äussere zuerst.
 - `leisten: Optional[Leistenpruefung] = None` – Die vorgeschlagene Durchstanzbewehrung mit ihren Nachweisen (4.3.6.5.1).
 - `pilz: Optional[Pilzbefund] = None` – Der gewählte Stahlpilz; mit `leisten` stehen die Leisten um ihn.
 

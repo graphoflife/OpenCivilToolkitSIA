@@ -1,5 +1,5 @@
 ---
-erzeugt: c64100b65260
+erzeugt: f70b2d7fa247
 art: modul
 tags: [modul]
 ---
@@ -9,8 +9,9 @@ tags: [modul]
 
 ## VERANTWORTUNG
 
-Was der Durchstanznachweis tut, wenn der Beton allein nicht reicht: das
-kleinste ancoPLUS suchen ([[opencivil.durchstanzen.bewehrung#bemessen|.bewehrung.bemessen]]) und mit ihm die drei
+Was der Durchstanznachweis tut, wenn der Beton allein nicht reicht: die
+kleinste Bewehrung des gewählten Systems suchen -- ancoPLUS oder Bügel
+([[opencivil.durchstanzen.systeme|.systeme]], [[opencivil.durchstanzen.bewehrung#bemessen|.bewehrung.bemessen]]) -- und mit ihr die drei
 Nachweise nach SIA 262:2025, 4.3.6.5.1, schreiben -- den ersten geteilt in
 den Beitrag der Bewehrung (66), (68), (69) und das Verformungsvermögen (67),
 dazu die erste Betondruckdiagonale (70) und ausserhalb der Bewehrung
@@ -18,12 +19,12 @@ dazu die erste Betondruckdiagonale (70) und ausserhalb der Bewehrung
 [[opencivil.durchstanzen.pruefung|.pruefung]]; die Suche fragt die Prüfung, die Herleitung schreibt
 dieselben Zahlen.
 
-Die Anker haben ihren eigenen Stahl, B500B ([[opencivil.durchstanzen.stelle#Durchstanzstelle|.stelle.Durchstanzstelle.anker]]):
+Die Elemente haben ihren eigenen Stahl, B500B ([[opencivil.durchstanzen.stelle#Durchstanzstelle|.stelle.Durchstanzstelle.anker]]):
 in (67) und (69) gilt seine Fliessgrenze, nicht die der Biegebewehrung
-(4.3.6.5.4). Liegen ihre Köpfe auf der Druckseite tiefer als d_v/6, tragen
-(68) und (70) 30 % weniger (5.5.3.11). k_sys ist der Faktor aus dem
-Gutachten des Produkts anstelle der 2 in (70), wie 4.3.6.5.9 es zulässt
-([[opencivil.durchstanzen.produkte#k_sys|.produkte.k_sys]]).
+(4.3.6.5.4). Liegt ihre Verankerung auf der Druckseite tiefer als d_v/6,
+tragen (68) und (70) 30 % weniger (5.5.3.11). k_sys ist der Faktor des
+Systems anstelle der 2 in (70) ([[opencivil.durchstanzen.systeme#System.k_sys|.systeme.System.k_sys]]): bei ancoPLUS
+aus dem Gutachten, wie 4.3.6.5.9 es zulässt, bei Bügeln die 2 selbst.
 
 
 ## IM ÄUSSEREN SCHNITT
@@ -137,11 +138,11 @@ die Urteile, die Leisten und der Pilz, so weit es sie gibt.
 ### _verankerung_schreiben
 
 ```python
-def _verankerung_schreiben(p: Protokoll, c_v: float, d_v: float, eta: float) -> str
+def _verankerung_schreiben(p: Protokoll, c_v: float, d_v: float, eta: float, system: System) -> str
 ```
 
-Ob die Anker auf der Druckseite genügend verankert sind (5.5.3.11) -- und
-was dann vor (68) und (70) steht: nichts, oder der Faktor 0.7.
+Ob die Elemente auf der Druckseite genügend verankert sind (5.5.3.11) --
+und was dann vor (68) und (70) steht: nichts, oder der Faktor 0.7.
 
 ### _tabelle_21_pruefen
 
@@ -159,7 +160,7 @@ nach 4.3.6.5.6 deckt, ist offen; die Prüfung hält es darum nicht fest.
 def _suchen(n: 'Durchstanzen', werte: _Werte, ort: Ort) -> Optional[Leistenpruefung]
 ```
 
-Das kleinste ancoPLUS für diesen Ort, mit seiner Prüfung -- siehe [[opencivil.durchstanzen.bewehrung#bemessen|.bewehrung.bemessen]].
+Die kleinste Bewehrung des Systems für diesen Ort, mit ihrer Prüfung -- siehe [[opencivil.durchstanzen.bewehrung#bemessen|.bewehrung.bemessen]].
 
 ### _leisten_schreiben
 
@@ -223,6 +224,7 @@ Schritten wie um die Stütze, ohne Leisten oder mit Leisten um ihn.
 - [[opencivil.durchstanzen.produkte]]
 - [[opencivil.durchstanzen.pruefung]]
 - [[opencivil.durchstanzen.schnitt]]
+- [[opencivil.durchstanzen.systeme]]
 
 ## Gebraucht von
 

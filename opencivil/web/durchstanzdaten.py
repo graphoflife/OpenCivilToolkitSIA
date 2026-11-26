@@ -11,6 +11,11 @@ Stegen und dem Schnitt um ihn, je für sich. Dazu die Legende unter dem Bild
 Gezeichnet wird in der Oberflaeche, gerechnet nichts: die Linien kommen aus
 dem Befund des Nachweises (:mod:`opencivil.durchstanzen.nachweis`).
 
+Wo es Durchstanzbewehrung braucht, auch eine Leiste in der Ansicht
+(:func:`_ansicht`): längs geschnitten, mit Platte, Zugbewehrung, Stütze und
+Pilz, den Elementen und dem Bereich, in dem sie zählen -- in mm, x ab dem
+Rand der gestützten Fläche, z ab der Druckseite.
+
 Für den Katalog die Wahlen der Maske (:func:`wahlen`): je Stellung ihre
 Beschriftung, und welche Felder der Nachweis mit ihr liest -- die festen, die
 Masse je Lage und Form, die Felder je Näherungsstufe und Lage, die von k_e.
@@ -20,17 +25,22 @@ Die Maske zeigt die Vereinigung, so baut sie die Regel nicht nach
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Sequence
 
 from opencivil.core.einheiten import EINHEITSLOS, KN, MM, Groesse
 from opencivil.core.latex import Mathe
 from opencivil.core.rechenwerk import Loesung
+from opencivil.core.wert import Wert
+from opencivil.durchstanzen.bewehrung import BEREICH_VON
 from opencivil.durchstanzen.flaeche import Lage, Stuetzenform
 from opencivil.durchstanzen.nachweis import Durchstanzbefund
-from opencivil.durchstanzen.schnitt import Nachweisschnitt
+from opencivil.durchstanzen.schnitt import Nachweisschnitt, Punkt
 from opencivil.durchstanzen.stelle import (
-    NACH_DEN_MASSEN, VOR_DEN_MASSEN, KeArt, Naeherungsstufe, Plattenart, wirksame_stufe,
+    NACH_DEN_MASSEN, VOR_DEN_MASSEN, Durchstanzstelle, KeArt, Naeherungsstufe, Plattenart,
+    wirksame_stufe,
 )
+from opencivil.durchstanzen.systeme import Durchstanzsystem
+from opencivil.querschnitt.platte import Richtung
 from opencivil.projekt import Aufbau
 from opencivil.web.anzeige import masszahl, punkte, urteil, zahl, zahlformel, zeile
 
@@ -65,6 +75,7 @@ def wahlen() -> Dict[str, Any]:
         "lagen": [lage(l) for l in Lage],
         "formen": stellungen(Stuetzenform),
         "stufen": stellungen(Naeherungsstufe),
+        "systeme": stellungen(Durchstanzsystem),
         "ke": [{"wert": k.value, "beschriftung": k.beschriftung, "eingaben": list(k.eingaben)}
                for k in KeArt],
     }
@@ -98,8 +109,76 @@ def situation(aufbau: Aufbau, kennung: str, loesung: Loesung) -> Optional[Dict[s
             "stege": [punkte(steg, MM) for steg in pilz.pilz.stege()],
             "schnitt": _linien(pilz.pruefung.schnitt),
         },
+        "ansicht": None if leisten is None else _ansicht(befund, nachweis.stelle, loesung.werte),
         "legende": _legende(befund, urteile),
     }
+
+
+def _ansicht(befund: Durchstanzbefund, stelle: Durchstanzstelle,
+             werte: Dict[str, Wert]) -> Dict[str, Any]:
+    """
+    Eine Leiste in der Ansicht, längs geschnitten: die mit den meisten
+    Elementen, unter ihnen die, die am ehesten nach rechts läuft. Die Stütze
+    steht, wo die Linie der Leiste ihren Rand trifft -- mit einem Stahlpilz
+    vor dem Rand der gestützten Fläche --, ihre Achse, wo die Linie ihr am
+    nächsten kommt. Eine Lage der Zugbewehrung läuft «längs», wenn sie eher
+    in Richtung der Leiste liegt; die andere steht im Bild als Punkte.
+    """
+    b = befund.leisten
+    v, system = b.vorschlag, b.vorschlag.system
+    leiste = max(v.leisten, key=lambda l: (len(l.anker(v.radien)), l.richtung[0]))
+    radien = v.radien[:len(leiste.anker(v.radien))]
+    (wx, wy), (ux, uy) = leiste.wurzel, leiste.richtung
+    eingabe = {n: zahl(werte[stelle.id_von(n)].groesse.si, MM) for n in ("h", "c", "c_v")}
+    nach_x = abs(ux) >= abs(uy)
+    d_v = b.innen.d_v
+    zeilen = [
+        zeile(f"Die {system.LEISTE} mit den meisten {system.ELEMENTEN}, längs geschnitten, "
+              f"massstäblich bis auf die {system.ENDEN}: {system.ELEMENT} ",
+              Mathe(rf"\varnothing {Groesse.aus_si(v.typ.durchmesser, MM).formatiert(0)}"),
+              f" aus {system.STAHL}, ", zahlformel("h_A", v.h_A, MM, 0), "."),
+        zeile("Hinterlegt, wo sie zählen: von ", zahlformel(rf"{BEREICH_VON:g} \cdot d_v",
+                                                            BEREICH_VON * d_v, MM, 0),
+              " bis ", zahlformel("d_v", d_v, MM, 0),
+              f" vom Rand der gestützten Fläche – {v.anrechenbar} je {system.LEISTE} "
+              f"(Gleichung (68))."),
+    ]
+    if befund.pilz is not None:
+        zeilen.append(zeile(f"Links der Stahlpilz {befund.pilz.pilz.name}: an ihm setzen die "
+                            f"{system.LEISTEN} an."))
+    return {
+        "form": system.FORM, "druckseite": stelle.plattenart.druckseite,
+        **eingabe,
+        "h_A": zahl(v.h_A, MM), "durchmesser": zahl(v.typ.durchmesser, MM),
+        "radien": [zahl(r, MM) for r in radien],
+        "zaehlt": [zahl(BEREICH_VON * d_v, MM), zahl(d_v, MM)],
+        "lagen": [{"tiefe": zahl(l.tiefe, MM), "durchmesser": zahl(l.durchmesser, MM),
+                   "abstand": zahl(l.abstand, MM), "laengs": (l.richtung is Richtung.X) == nach_x}
+                  for l in befund.lagen],
+        "stuetze": {"rand": zahl(-_bis_zum_umriss((wx, wy), (-ux, -uy), befund.umriss), MM),
+                    "achse": zahl(-(wx * ux + wy * uy), MM)},
+        "pilz": None if befund.pilz is None else {"hoehe": zahl(befund.pilz.pilz.h, MM)},
+        "legende": zeilen,
+    }
+
+
+def _bis_zum_umriss(p: Punkt, r: Punkt, umriss: Sequence[Punkt]) -> float:
+    """
+    Wie weit der Strahl von ``p`` in Richtung ``r`` läuft, bis er den Umriss
+    trifft -- null, wenn ``p`` auf ihm liegt oder der Strahl ihn verfehlt. Nur
+    fürs Bild.
+    """
+    treffer = []
+    for (ax, ay), (bx, by) in zip(umriss, (*umriss[1:], umriss[0])):
+        ex, ey = bx - ax, by - ay
+        nenner = r[0] * ey - r[1] * ex
+        if abs(nenner) < 1e-12:
+            continue
+        t = ((ax - p[0]) * ey - (ay - p[1]) * ex) / nenner
+        s = ((ax - p[0]) * r[1] - (ay - p[1]) * r[0]) / nenner
+        if t >= -1e-9 and -1e-9 <= s <= 1.0 + 1e-9:
+            treffer.append(max(t, 0.0))
+    return min(treffer, default=0.0)
 
 
 def _linien(schnitt: Nachweisschnitt) -> list:
@@ -147,13 +226,12 @@ def _legende(befund: Durchstanzbefund, urteile) -> List[list]:
         v = b.vorschlag
         abstaende = r"\,/\,".join(Groesse.aus_si(x, MM).formatiert(0) for x in v.abstaende)
         zeilen += [
-            zeile(f"Durchstanzbewehrung: {v.name}, Anker ",
-                  Mathe(rf"\varnothing {Groesse.aus_si(v.typ.durchmesser, MM).formatiert(0)}"),
-                  " im Abstand ", Mathe(rf"{abstaende}\,\mathrm{{mm}}"),
+            zeile(f"Durchstanzbewehrung: {v.name} im Abstand ", Mathe(rf"{abstaende}\,\mathrm{{mm}}"),
                   f" vom Rand {'des Pilzes' if pilz is not None else 'der Stütze'}."),
             zeile("Äusserer Schnitt (orange) im Abstand ",
                   zahlformel(r"0.5 \cdot d_{v,out}", b.aussen.d_v / 2, MM, 0),
-                  " um die äussersten Anker: ", zahlformel("u_{out}", b.aussen.u, MM, 0), ", ",
+                  f" um die äussersten {v.system.ELEMENT}: ", zahlformel("u_{out}", b.aussen.u, MM, 0),
+                  ", ",
                   Mathe(f"V_{{d,out}} = {_kraft(b.aussen.V_d_red)}"), ", ",
                   Mathe(f"V_{{Rd,c,out}} = {_kraft(b.V_Rd_c_aussen)}"), "."),
             zeile(Mathe(f"V_{{Rd,s}} = {_kraft(b.V_Rd_s)}"), ", ",

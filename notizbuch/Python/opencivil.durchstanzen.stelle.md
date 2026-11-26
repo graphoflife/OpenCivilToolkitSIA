@@ -1,5 +1,5 @@
 ---
-erzeugt: 8b8fc2a54d0f
+erzeugt: d9dd780a6444
 art: modul
 tags: [modul]
 ---
@@ -21,14 +21,16 @@ Herleitung zeigt ihre Gruppen als Kästen, die Maske verteilt sie auf ihre
 Tafeln.
 
 
-## DER STAHL DER ANKER
+## DER STAHL DER DURCHSTANZBEWEHRUNG
 
-Die Durchstanzbewehrung hat ihren eigenen Stahl, den des Produkts
-([[opencivil.durchstanzen.produkte#Konstanten|.produkte.STAHL]]): in (67) und (69) gilt dessen Fliessgrenze
+Die Durchstanzbewehrung hat ihren eigenen Stahl, den ihres Systems
+([[opencivil.durchstanzen.systeme#System|.systeme.System.STAHL]]): in (67) und (69) gilt dessen Fliessgrenze
 (SIA 262:2025, 4.3.6.5.4). Er steht als Baustoff neben der Stelle, mit dem
-Index «sw» an seinen Zeichen; alle Stellen teilen ihn. Bis 2026-11-14
-rechneten die Anker mit dem Stahl der Biegebewehrung -- mit B700B um 40 %
-zu günstig.
+Index «sw» an seinen Zeichen; alle Stellen mit demselben System teilen ihn.
+Bis 2026-11-14 rechneten die Anker mit dem Stahl der Biegebewehrung -- mit
+B700B um 40 % zu günstig. Welches System die Stelle nimmt, ancoPLUS oder
+Bügel, wählt der Benutzer ([[opencivil.durchstanzen.systeme#Durchstanzsystem|.systeme.Durchstanzsystem]]); was c_v
+heisst, richtet sich danach.
 
 
 ## DECKE UND BODENPLATTE
@@ -89,7 +91,7 @@ Wo die Zugbewehrung über der gestützten Fläche liegt.
 def druckseite(self) -> str
 ```
 
-Die andere Seite -- von ihr aus misst c_v die Verankerung der Anker.
+Die andere Seite -- von ihr aus misst c_v die Verankerung der Durchstanzbewehrung.
 
 #### Plattenart.umgeschaltet
 
@@ -190,7 +192,15 @@ was die wirksame Stufe liest und was k_e liest -- je ohne Doppel.
 def _platte(plattenart: Plattenart) -> Tuple[Feld, ...]
 ```
 
-Was c und c_v meinen, hängt an der Art: bei der Bodenplatte zieht die Unterseite.
+Was c meint, hängt an der Art: bei der Bodenplatte zieht die Unterseite.
+
+### _durchstanzbewehrung
+
+```python
+def _durchstanzbewehrung(plattenart: Plattenart, system: Durchstanzsystem) -> Tuple[Feld, ...]
+```
+
+c_v misst von der Druckseite bis zur Verankerung -- den Köpfen der Anker, den Bügeln.
 
 ### _einwirkung
 
@@ -216,11 +226,12 @@ b_x, eine Innenstütze keinen Randabstand.
 - `name: str`
 - `praefix: str`
 - `plattenart: Plattenart`
+- `system: Durchstanzsystem` – Woraus die Durchstanzbewehrung besteht, wo es eine braucht.
 - `beton: Baustoff`
 - `stahl: Baustoff` – Der Stahl der Biegebewehrung.
 - `h: Groesse`
 - `c: Groesse` – Die Überdeckung auf der Zugseite.
-- `c_v: Groesse` – Der Abstand der Verankerung der Durchstanzbewehrung von der Oberfläche der Druckseite (SIA 262:2025, Figur 26) -- bei ancoPLUS bis zu den Köpfen.
+- `c_v: Groesse` – Der Abstand der Verankerung der Durchstanzbewehrung von der Oberfläche der Druckseite (SIA 262:2025, Figur 26) -- bei ancoPLUS bis zu den Köpfen, bei Bügeln bis zu ihrer Biegung um die Bewehrung.
 - `D_max: Groesse`
 - `phi_x: Groesse`
 - `s_x: Groesse`
@@ -258,7 +269,7 @@ b_x, eine Innenstütze keinen Randabstand.
 def baustoffe(self) -> Tuple[Baustoff, ...]
 ```
 
-Der Stahl der Anker -- Beton und Biegebewehrung meldet das Projekt an.
+Der Stahl der Durchstanzbewehrung -- Beton und Biegebewehrung meldet das Projekt an.
 
 #### Durchstanzstelle.abschnitt
 
@@ -278,7 +289,7 @@ Die Kurznamen, die der Nachweis liest -- siehe [[opencivil.durchstanzen.stelle#e
 
 ## Konstanten
 
-- `ANKERSTAHL = 'produkt.ancoplus'` – Der Namensraum des Stahls der Anker -- einer für alle Stellen.
+- `ANKERSTAHL = 'produkt.{}'` – Der Namensraum des Stahls der Durchstanzbewehrung -- einer je System, für alle Stellen.
 - `VOR_DEN_MASSEN = ('h', 'c', 'c_v', 'D_max', 'phi_x', 's_x', 'phi_y', 's_y')` – Was der Nachweis an jeder Stelle liest -- vor den Massen der gestützten Fläche und danach.
 - `NACH_DEN_MASSEN = ('V_d', 'q_d')`
 - `VORGABEN = (Gruppe('Platte', _platte, nach=('plattenart',)), Gruppe('Biegebewehr…` – Die Vorgaben des Durchstanzens, je Kasten der Herleitung und Gruppe der Maske ([[opencivil.core.vorgaben]]). Welche davon eine Stelle liest, sagt [[opencivil.durchstanzen.stelle#eingaben_fuer|eingaben_fuer]]: die Masse ihrer Lage und Form, die Felder ihrer Näherungsstufe, die Exzentrizität für Stufe 2 oder k_e.
@@ -293,8 +304,8 @@ Die Kurznamen, die der Nachweis liest -- siehe [[opencivil.durchstanzen.stelle#e
 - [[opencivil.core.wahl]]
 - [[opencivil.core.wert]]
 - [[opencivil.durchstanzen.flaeche]]
-- [[opencivil.durchstanzen.produkte]]
 - [[opencivil.durchstanzen.schnitt]]
+- [[opencivil.durchstanzen.systeme]]
 - [[opencivil.material.basis]]
 - [[opencivil.material.betonstahl]]
 - [[opencivil.querschnitt.platte]]

@@ -14,9 +14,11 @@
  *       Biegebewehrung     ⌀ und Abstand je Richtung, welche Lage aussen liegt
  *       Plattenrotation    Näherungsstufe; Spannweiten oder r_s und m_sd
  *       Einwirkung         V_d, die Flächenlast im Schnitt, k_e
+ *       Durchstanzbewehrung  das System -- ancoPLUS oder Bügel -- und c_v;
+ *                        bemessen wird sie vom Werkzeug
  *
  * Gerechnet wird nichts: Nachweisschnitt, Rotation und Widerstand stehen
- * rechts in der Zusammenfassung, der Grundriss unter «Diagramme». Die Felder
+ * rechts in der Zusammenfassung, Grundriss und Leiste unter «Diagramme». Die Felder
  * mit Zeichen und Hinweisen kommen aus dem Kern, je Gruppe der Herleitung
  * (`katalog.vorgaben`, opencivil/durchstanzen/stelle.py); hier steht nur,
  * auf welcher Kachel eine Gruppe steht. Einheiten und Grenzen kommen aus dem
@@ -80,6 +82,16 @@ const HILFE = {
       ['e', 'wie weit die Auflagerkraft neben der Stützenachse angreift'],
     ],
     formel: 'V_Rd,c = k_r · τ_cd · d_v · u',
+  },
+  durchstanzbewehrung: {
+    zeilen: [
+      ['ancoPLUS', 'Doppelkopfanker auf Leisten; Typen, Höhen und Abstände nach dem Hersteller'],
+      ['Bügel', 'senkrechte Bügel um die Biegebewehrung; Durchmesser und Abstände nach Tabelle 21'],
+      ['c_v', 'von der Oberfläche der Druckseite bis zum Kopf des Ankers oder zur Biegung des Bügels'],
+      ['Bemessung', 'Durchmesser, Anzahl und Abstände wählt das Werkzeug selbst, wo es '
+        + 'Durchstanzbewehrung braucht'],
+    ],
+    formel: 'V_Rd,s = ΣA_sw · k_e · σ_sd ≥ V_d − V_Rd,c',
   },
 };
 
@@ -226,6 +238,12 @@ function kapitel(d) {
       zeichen: 'einwirkung', werte: ['V_d'], hilfe: HILFE.einwirkung,
       nach: [wahlBlock('k_e', schalter(d, 'ke', 'ke', 'SIA 262:2025, 4.3.6.2.4 und 4.3.6.2.5')),
         exzentrizitaet.length ? karte(EXZENTRIZITAET, exzentrizitaet) : null],
+    }),
+    gruppenkapitel(vorgaben, 'Durchstanzbewehrung', {
+      zeichen: 'durchstanzbewehrung', name: 'Durchstanz\u00adbewehrung',
+      wort: wortVon('systeme', d.system), hilfe: HILFE.durchstanzbewehrung,
+      vor: [wahlBlock('System', schalter(d, 'system', 'systeme',
+        'Woraus die Durchstanzbewehrung besteht, wo es eine braucht', 'system'))],
     }),
   ];
   vorgaben.vollstaendig();

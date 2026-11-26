@@ -1,5 +1,5 @@
 ---
-erzeugt: d687f5d4ad30
+erzeugt: 6d1feb8f572c
 art: modul
 tags: [modul]
 ---
@@ -11,9 +11,10 @@ tags: [modul]
 
 Die Leisten um die gestützte Fläche und ihre Anker ([[opencivil.durchstanzen.bewehrung#leisten_anordnen|leisten_anordnen]]),
 der äussere Nachweisschnitt um die äussersten Anker ([[opencivil.durchstanzen.bewehrung#aeussere_kandidaten|aeussere_kandidaten]],
-Figur 26) und die Suche nach dem kleinsten ancoPLUS, das alle Bedingungen
-erfüllt ([[opencivil.durchstanzen.bewehrung#bemessen|bemessen]]). Hier steht keine Herleitung: der Nachweis
-([[opencivil.durchstanzen.nachweis|.nachweis]]) schreibt sie für die Bewehrung, die hier gefunden wird.
+Figur 26) und die Suche nach der kleinsten Bewehrung des gewählten Systems
+([[opencivil.durchstanzen.systeme|.systeme]]), die alle Bedingungen erfüllt ([[opencivil.durchstanzen.bewehrung#bemessen|bemessen]]). Hier
+steht keine Herleitung: der Nachweis ([[opencivil.durchstanzen.nachweis|.nachweis]]) schreibt sie für die
+Bewehrung, die hier gefunden wird.
 
 
 ## DIE ANORDNUNG
@@ -24,8 +25,9 @@ die gestützte Fläche; entlang dieser Linie stehen zwei Leisten höchstens
 e_max = 1.5·d_v auseinander (SIA 262:2025, 5.5.3.9), als Sehne gemessen. Auf
 jeder geraden Seite steht an beiden Enden eine Leiste und dazwischen
 gleichmässig so viele wie nötig, auf den Rundungen ebenso. Das ist der
-Grundriss der Herstellerunterlagen; die Abstände der Anker sind die des
-Produkts ([[opencivil.durchstanzen.produkte|.produkte]]) -- nach Vorgabe, nicht nachgeschlagen.
+Grundriss der Herstellerunterlagen, für Bügel ebenso; die Abstände der
+Elemente sind die des Systems ([[opencivil.durchstanzen.systeme|.systeme]]). Wo hier «Anker» steht, ist
+jedes Element gemeint, auch ein Bügelschenkel.
 
 
 ## AN RÄNDERN UND AUSSPARUNGEN ([[opencivil.durchstanzen.bewehrung#setzen|setzen]])
@@ -126,11 +128,12 @@ Die Kandidaten des äusseren Schnitts (Figur 26) -- siehe Dateikopf.
 class Vorschlag
 ```
 
-Eine Durchstanzbewehrung: Typ, Höhe, Abstände, die Leisten und der
-äussere Schnitt um sie. Ob sie reicht, sagt ihre Prüfung
+Eine Durchstanzbewehrung: System, Element, Höhe, Abstände, die Leisten und
+der äussere Schnitt um sie. Ob sie reicht, sagt ihre Prüfung
 ([[opencivil.durchstanzen.pruefung#Leistenpruefung|Leistenpruefung]]).
 
-- `typ: produkte.Ankertyp`
+- `system: 'System'`
+- `typ: produkte.Element`
 - `h_A: float`
 - `abstaende: Tuple[float, ...]`
 - `leisten: Tuple[Leiste, ...]`
@@ -171,7 +174,7 @@ Je Länge der Leisten -- Anker je Leiste -- wie viele es sind; die längsten zue
 def name(self) -> str
 ```
 
-«12 × ancoPLUS DA3-0215», mit gekürzten Leisten «… + 2 × ancoPLUS DA2-0215».
+Wie das System ihn nennt: «12 × ancoPLUS DA3-0215», «12 × 3 Bügelschenkel ⌀10».
 
 ### anrechenbar
 
@@ -184,22 +187,22 @@ Die Anker zwischen 0.35·d_v und d_v vom Rand der gestützten Fläche (Gleichung
 ### mindestens
 
 ```python
-def mindestens(radien: Sequence[float], d_v: float) -> int
+def mindestens(radien: Sequence[float], d_v: float, kuerzeste: int) -> int
 ```
 
 So viele Anker muss eine Leiste behalten: bis zum letzten angerechneten,
-und wenigstens so viele, wie die kürzeste lieferbare Leiste hat.
+und wenigstens so viele, wie die kürzeste Leiste des Systems hat.
 
 ### bemessen
 
 ```python
-def bemessen(*, d: float, d_v: float, d_v_out: float, h_A: float, r_2_zu: Callable[[float], Sequence[Stueck]], umriss: Sequence[Punkt], raender: Sequence[Halbebene], aussparungen: Sequence[Sequence[Punkt]], schatten: Sequence[Schatten], achse: Punkt, ueberdeckung: float, pruefen: Callable[[Vorschlag], 'Leistenpruefung']) -> Optional['Leistenpruefung']
+def bemessen(*, system: 'System', d: float, d_v: float, d_v_out: float, h_A: float, r_2_zu: Callable[[float], Sequence[Stueck]], umriss: Sequence[Punkt], raender: Sequence[Halbebene], aussparungen: Sequence[Sequence[Punkt]], schatten: Sequence[Schatten], achse: Punkt, ueberdeckung: float, pruefen: Callable[[Vorschlag], 'Leistenpruefung']) -> Optional['Leistenpruefung']
 ```
 
-Das kleinste ancoPLUS, das reicht, mit seiner Prüfung: der kleinste
-Durchmesser, mit dem die Bewehrung trägt (66, 67), und dazu die kleinste
-Zahl Anker je Leiste, mit der der äussere Schnitt hält. Erst wenn kein
-Durchmesser trägt, stehen die Leisten dichter ([[opencivil.durchstanzen.bewehrung#Konstanten|DICHTEN]]).
+Die kleinste Bewehrung des Systems, die reicht, mit ihrer Prüfung: der
+kleinste Durchmesser, mit dem die Bewehrung trägt (66, 67), und dazu die
+kleinste Zahl Anker je Leiste, mit der der äussere Schnitt hält. Erst wenn
+kein Durchmesser trägt, stehen die Leisten dichter ([[opencivil.durchstanzen.bewehrung#Konstanten|DICHTEN]]).
 `pruefen` rechnet die Prüfung eines Vorschlags ([[opencivil.durchstanzen.mit_bewehrung|.mit_bewehrung]]);
 `r_2_zu(r)` gibt den geschlossenen Schnitt im Abstand r um die gestützte
 Fläche; `schatten` sind die Schatten der Aussparungen am inneren Schnitt
@@ -207,8 +210,8 @@ Fläche; `schatten` sind die Schatten der Aussparungen am inneren Schnitt
 
 Reicht nichts, kommt der stärkste Versuch zurück -- die dichtesten Leisten
 mit dem grössten Durchmesser und neun Ankern --, und seine Prüfung sagt,
-was fehlt. `None` nur, wo es kein ancoPLUS gibt: die Platte ist zu dünn,
-keine Höhe ist lieferbar, oder keine Leiste findet Platz.
+was fehlt. `None` nur, wo das System nichts bietet: die Platte ist zu
+dünn, keine Höhe ist lieferbar, oder keine Leiste findet Platz.
 
 
 ## Konstanten
@@ -222,9 +225,12 @@ keine Höhe ist lieferbar, oder keine Leiste findet Platz.
 - [[opencivil.durchstanzen.produkte]]
 - [[opencivil.durchstanzen.pruefung]]
 - [[opencivil.durchstanzen.schnitt]]
+- [[opencivil.durchstanzen.systeme]]
 - [[opencivil.querschnitt.geometrie]]
 
 ## Gebraucht von
 
 - [[opencivil.durchstanzen.mit_bewehrung]]
 - [[opencivil.durchstanzen.pruefung]]
+- [[opencivil.durchstanzen.systeme]]
+- [[opencivil.web.durchstanzdaten]]

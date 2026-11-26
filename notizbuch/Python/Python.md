@@ -1,5 +1,5 @@
 ---
-erzeugt: bbcdbd9d2d5b
+erzeugt: c2612e625568
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -57,6 +57,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.durchstanzen.pruefung]] – was der Durchstanznachweis rechnet, ohne Herleitung.
     - [[opencivil.durchstanzen.schnitt]] – der Nachweisschnitt um die gestützte Fläche.
     - [[opencivil.durchstanzen.stelle]] – die Durchstanzstelle: Platte, gestützte Fläche, Bewehrung, Last.
+    - [[opencivil.durchstanzen.systeme]] – woraus die Durchstanzbewehrung besteht.
 - [[opencivil.erdbeben]] – Erdbeben nach SIA 261:2020, Kapitel 16.
     - [[opencivil.erdbeben.ersatzkraft]] – das Ersatzkraftverfahren nach SIA 261:2020, 16.5.2.
   - [[opencivil.ergebnis]] – ein gerechnetes Projekt, wie man es ohne Oberflaeche braucht.

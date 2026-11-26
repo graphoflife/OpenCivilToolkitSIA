@@ -56,7 +56,7 @@ def bauen(art: "Bauteilart", eintrag: DurchstanzEintrag, aufbau: Aufbau) -> Baut
     wo = ort_von(eintrag)
     stelle = Durchstanzstelle(
         name=eintrag.name, praefix=f"{art.raum}.{eintrag.kennung}",
-        plattenart=eintrag.plattenart,
+        plattenart=eintrag.plattenart, system=eintrag.system,
         beton=material(aufbau.baustoffe, eintrag.beton, "beton", wo, "Beton"),
         stahl=material(aufbau.baustoffe, eintrag.stahl, "betonstahl", wo, "Betonstahl"),
         h=g("h"), c=g("c"), c_v=g("c_v"), D_max=g("D_max"),

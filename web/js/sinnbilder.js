@@ -191,6 +191,22 @@ const ZEICHEN = {
   einwirkung: {
     pfade: ['M3 10.5h18v4H3z', 'M10 14.5v7 M14 14.5v7', 'M12 2.5v5.5 M10.3 6.3 12 8l1.7-1.7'],
   },
+  // Die Platte im Schnitt über der Stütze, daneben zwei Anker mit ihren Köpfen.
+  durchstanzbewehrung: {
+    pfade: ['M2 4.5h20v9.5H2z', 'M12 7v4.5 M10.4 7h3.2 M10.4 11.5h3.2',
+      'M17.5 7v4.5 M15.9 7h3.2 M15.9 11.5h3.2'],
+    flaechen: ['M3 14h5v7.5H3z'],
+  },
+  // Woraus die Durchstanzbewehrung besteht: Doppelkopfanker, oder ein Bügel
+  // um vier Stäbe der Biegebewehrung, im Schnitt.
+  'system-ancoplus': {
+    pfade: ['M8 6v12 M16 6v12'],
+    flaechen: ['M5 4h6v2.2H5z M5 17.8h6V20H5z M13 4h6v2.2h-6z M13 17.8h6V20h-6z'],
+  },
+  'system-buegel': {
+    pfade: ['M8.5 4h7a2.5 2.5 0 0 1 2.5 2.5v11a2.5 2.5 0 0 1-2.5 2.5h-7A2.5 2.5 0 0 1 6 17.5v-11A2.5 2.5 0 0 1 8.5 4z'],
+    voll: [[9, 7, 1.5], [15, 7, 1.5], [9, 17, 1.5], [15, 17, 1.5]],
+  },
   // Der Boden: Körner unter dem Gelände.
   boden: {
     pfade: ['M3 6h18'],

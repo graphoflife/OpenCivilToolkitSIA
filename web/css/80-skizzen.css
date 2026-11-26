@@ -385,3 +385,18 @@
 .ds-steg { fill: none; stroke: #495057; stroke-width: 4; stroke-linecap: square; }
 .ds-pilzschnitt { fill: none; stroke: var(--system); stroke-width: 1.8; stroke-linejoin: round; }
 .ds-pilzschnitt-nicht { fill: none; stroke: var(--system); stroke-width: 1.1; stroke-dasharray: 5 4; opacity: .7; }
+
+/* Die Durchstanzbewehrung in der Ansicht (ds_ansicht.js): Platte und Stütze
+   aus Beton ohne Fuge, die Zugbewehrung in der Farbe des Stahls, die
+   Elemente dunkel; hinterlegt, wo sie zählen. */
+.ds-beton { fill: #e9ecef; stroke: none; }
+.ds-kante { fill: none; stroke: var(--schrift); stroke-width: 1.6; }
+.ds-bruch { fill: none; stroke: var(--schrift); stroke-width: 1; stroke-linejoin: round; }
+.ds-achslinie { fill: none; stroke: var(--schrift-matt); stroke-width: 1; stroke-dasharray: 10 3 2 3; }
+.ds-pilz { fill: #868e96; stroke: #495057; stroke-width: 1.2; }
+.ds-zone { fill: var(--system); fill-opacity: .1; stroke: none; }
+.ds-biegestab { fill: none; stroke: var(--mat-stahl-linie); }
+.ds-biegepunkt { fill: var(--mat-stahl-linie); stroke: none; }
+.ds-element { fill: none; stroke: var(--schrift); }
+.ds-kopf { fill: var(--schrift); stroke: none; }
+.ds-buegel { fill: none; stroke: var(--schrift); stroke-linejoin: round; }

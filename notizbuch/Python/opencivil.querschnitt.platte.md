@@ -1,5 +1,5 @@
 ---
-erzeugt: 4e3b1d5c95ce
+erzeugt: 0766059f6663
 art: modul
 tags: [modul]
 ---
@@ -470,6 +470,7 @@ Rechnung sehen statt nur die Zahl.
 - [[opencivil.spannungsanalyse.platte]]
 - [[opencivil.web.api]]
 - [[opencivil.web.diagrammdaten]]
+- [[opencivil.web.durchstanzdaten]]
 
 ## Formeln aus diesem Modul
 

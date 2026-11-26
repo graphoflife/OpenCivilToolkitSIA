@@ -2,8 +2,9 @@
 opencivil/durchstanzen/mit_bewehrung.py -- der Nachweis mit Durchstanzbewehrung und Stahlpilz.
 
 VERANTWORTUNG:
-Was der Durchstanznachweis tut, wenn der Beton allein nicht reicht: das
-kleinste ancoPLUS suchen (:func:`.bewehrung.bemessen`) und mit ihm die drei
+Was der Durchstanznachweis tut, wenn der Beton allein nicht reicht: die
+kleinste Bewehrung des gewählten Systems suchen -- ancoPLUS oder Bügel
+(:mod:`.systeme`, :func:`.bewehrung.bemessen`) -- und mit ihr die drei
 Nachweise nach SIA 262:2025, 4.3.6.5.1, schreiben -- den ersten geteilt in
 den Beitrag der Bewehrung (66), (68), (69) und das Verformungsvermögen (67),
 dazu die erste Betondruckdiagonale (70) und ausserhalb der Bewehrung
@@ -11,12 +12,12 @@ dazu die erste Betondruckdiagonale (70) und ausserhalb der Bewehrung
 :mod:`.pruefung`; die Suche fragt die Prüfung, die Herleitung schreibt
 dieselben Zahlen.
 
-Die Anker haben ihren eigenen Stahl, B500B (:attr:`.stelle.Durchstanzstelle.anker`):
+Die Elemente haben ihren eigenen Stahl, B500B (:attr:`.stelle.Durchstanzstelle.anker`):
 in (67) und (69) gilt seine Fliessgrenze, nicht die der Biegebewehrung
-(4.3.6.5.4). Liegen ihre Köpfe auf der Druckseite tiefer als d_v/6, tragen
-(68) und (70) 30 % weniger (5.5.3.11). k_sys ist der Faktor aus dem
-Gutachten des Produkts anstelle der 2 in (70), wie 4.3.6.5.9 es zulässt
-(:func:`.produkte.k_sys`).
+(4.3.6.5.4). Liegt ihre Verankerung auf der Druckseite tiefer als d_v/6,
+tragen (68) und (70) 30 % weniger (5.5.3.11). k_sys ist der Faktor des
+Systems anstelle der 2 in (70) (:meth:`.systeme.System.k_sys`): bei ancoPLUS
+aus dem Gutachten, wie 4.3.6.5.9 es zulässt, bei Bügeln die 2 selbst.
 
 IM ÄUSSEREN SCHNITT:
 d_v,out reicht von der Zugbewehrung bis zur Verankerung der Anker auf der
@@ -58,6 +59,7 @@ from opencivil.durchstanzen import herleitung, produkte
 from opencivil.durchstanzen.bewehrung import Vorschlag, bemessen
 from opencivil.durchstanzen.herleitung import Index
 from opencivil.durchstanzen.produkte import Stahlpilz
+from opencivil.durchstanzen.systeme import System
 from opencivil.durchstanzen.pruefung import (
     C_V_GRENZE, C_V_MINDERUNG, Leistenpruefung, Pilzbefund, Schnittpruefung, druckdiagonale,
     minderung, spannung, tabelle_21,
@@ -158,14 +160,15 @@ def nachweisen(n: "Durchstanzen", e: Eingaben, p: Protokoll, w: Zwischenwerte, g
     die Urteile, die Leisten und der Pilz, so weit es sie gibt.
     """
     s = n.stelle
+    system = s.system.regeln
     p.titel("Durchstanzbewehrung", ebene=3)
     c_v = e.g("c_v").si
     h_frei = w.laenge("h_frei", r"h_{frei}", e.g("h").si - e.g("c").si - c_v)
     p.formel(h_frei, "@h - @c - @c_v", {"h": e["h"], "c": e["c"], "c_v": e["c_v"]},
-             titel="Platz für die Anker zwischen den Überdeckungen",
+             titel=f"Platz für die {system.ELEMENT} zwischen den Überdeckungen",
              name="Platz für die Durchstanzbewehrung")
-    h_A = w.laenge("h_A", "h_A", produkte.ankerhoehe(e.g("h").si, e.g("c").si, c_v))
-    p.wert(h_A, titel="Höhe der Anker: auf eine lieferbare Höhe abgerundet, die auf 5 mm endet")
+    h_A = w.laenge("h_A", "h_A", system.hoehe(e.g("h").si, e.g("c").si, c_v))
+    p.wert(h_A, titel=system.hoehentext)
     werte = _Werte(e, g, e[s.anker.eingabename("f_yd")], e[s.anker.eingabename("E_s")],
                    e[s.beton.eingabename("f_ctm")], c_v, h_A,
                    w.laenge("d_v_out", r"d_{v,out}", g.d.groesse.si - c_v))
@@ -181,9 +184,8 @@ def nachweisen(n: "Durchstanzen", e: Eingaben, p: Protokoll, w: Zwischenwerte, g
         if leisten.diagonale_haelt:
             return urteile, leisten, None
     else:
-        p.hinweis("Für diese Platte gibt es kein ancoPLUS: sie ist zu dünn (d < 160 mm), "
-                  "keine lieferbare Höhe passt, oder keine Leiste findet Platz.")
-        urteile = n.nicht_fuehrbar("Kein ancoPLUS passt in diese Platte.")
+        p.hinweis(system.warum_keines)
+        urteile = n.nicht_fuehrbar(system.KEINES)
     if not f.stahlpilz:
         p.hinweis("Stahlpilze sind im Katalog nur für Innenstützen. Eine grössere Stütze, eine "
                   "dickere Platte oder ein besserer Beton.")
@@ -196,19 +198,20 @@ def nachweisen(n: "Durchstanzen", e: Eingaben, p: Protokoll, w: Zwischenwerte, g
     return _mit_pilz(n, p, w, werte, *gewaehlt)
 
 
-def _verankerung_schreiben(p: Protokoll, c_v: float, d_v: float, eta: float) -> str:
+def _verankerung_schreiben(p: Protokoll, c_v: float, d_v: float, eta: float,
+                           system: System) -> str:
     """
-    Ob die Anker auf der Druckseite genügend verankert sind (5.5.3.11) -- und
-    was dann vor (68) und (70) steht: nichts, oder der Faktor 0.7.
+    Ob die Elemente auf der Druckseite genügend verankert sind (5.5.3.11) --
+    und was dann vor (68) und (70) steht: nichts, oder der Faktor 0.7.
     """
     grenze = f"d_v/6 = {C_V_GRENZE * d_v * 1e3:.0f} mm"
     if eta >= 1.0:
-        p.text(f"c_v = {c_v * 1e3:.0f} mm ≤ {grenze}: die Anker sind auf der Druckseite "
-               f"genügend verankert (SIA 262:2025, 5.5.3.11).")
+        p.text(f"c_v = {c_v * 1e3:.0f} mm ≤ {grenze}: die {system.ELEMENT} sind auf der "
+               f"Druckseite genügend verankert (SIA 262:2025, 5.5.3.11).")
         return ""
-    p.hinweis(f"c_v = {c_v * 1e3:.0f} mm > {grenze}: die Verankerung der Anker liegt auf der "
-              f"Druckseite zu tief, (68) und (70) tragen 30 % weniger (SIA 262:2025, 5.5.3.11). "
-              f"Die Köpfe höher setzen, wenn die Überdeckung es zulässt.")
+    p.hinweis(f"c_v = {c_v * 1e3:.0f} mm > {grenze}: die Verankerung der {system.ELEMENT} liegt "
+              f"auf der Druckseite zu tief, (68) und (70) tragen 30 % weniger (SIA 262:2025, "
+              f"5.5.3.11). Die {system.VERANKERUNG} höher setzen, wenn die Überdeckung es zulässt.")
     return rf"{C_V_MINDERUNG:g} \cdot "
 
 
@@ -236,9 +239,10 @@ def _tabelle_21_pruefen(p: Protokoll, d: float, vorschlag: Vorschlag) -> None:
 
 
 def _suchen(n: "Durchstanzen", werte: _Werte, ort: Ort) -> Optional[Leistenpruefung]:
-    """Das kleinste ancoPLUS für diesen Ort, mit seiner Prüfung -- siehe :func:`.bewehrung.bemessen`."""
+    """Die kleinste Bewehrung des Systems für diesen Ort, mit ihrer Prüfung -- siehe :func:`.bewehrung.bemessen`."""
     s, g, e = n.stelle, werte.g, werte.e
-    k_sys = produkte.k_sys(werte.c_v, g.d.groesse.si, ort.ausnahme)
+    system = s.system.regeln
+    k_sys = system.k_sys(werte.c_v, g.d.groesse.si, ort.ausnahme)
     eta = minderung(werte.c_v, ort.pruefung.d_v)
 
     def pruefen(vorschlag: Vorschlag) -> Leistenpruefung:
@@ -252,7 +256,7 @@ def _suchen(n: "Durchstanzen", werte: _Werte, ort: Ort) -> Optional[Leistenpruef
             f_yd=werte.f_yd.groesse.si, k_sys=k_sys, eta=eta)
 
     return bemessen(
-        d=g.d.groesse.si, d_v=ort.pruefung.d_v, d_v_out=werte.d_v_out.groesse.si,
+        system=system, d=g.d.groesse.si, d_v=ort.pruefung.d_v, d_v_out=werte.d_v_out.groesse.si,
         h_A=werte.h_A.groesse.si, r_2_zu=ort.r_zu, umriss=ort.umriss,
         raender=s.flaeche.raender(g.masse), aussparungen=s.aussparungen, schatten=ort.schatten,
         achse=s.flaeche.achse(g.masse),
@@ -264,31 +268,23 @@ def _leisten_schreiben(n: "Durchstanzen", p: Protokoll, w: Zwischenwerte, werte:
     """Die Nachweise mit diesen Leisten (4.3.6.5.1), wie die Prüfung sie gerechnet hat."""
     e, g, k = werte.e, werte.g, ort.vorsilbe
     vorschlag = pruefung.vorschlag
-    typ = vorschlag.typ
-    p.erklaerung(
-        f"Vorgeschlagen wird ancoPLUS von AncoTech{ort.zusatz and ' ' + ort.zusatz}: "
-        f"{vorschlag.name} – Anker ⌀{typ.durchmesser * 1e3:.0f} aus {produkte.STAHL} mit "
-        f"h_A = {werte.h_A.formatiert()} mm, vom Rand der gestützten Fläche "
-        f"{' / '.join(f'{a * 1e3:.0f}' for a in vorschlag.abstaende)} mm. Die Abstände sind die "
-        f"der Typen «D» nach dem Gutachten des Herstellers: 0.375·d zum ersten Anker, bis zum "
-        f"dritten 0.60·d, danach 0.75·d ({produkte.QUELLE_ANCOPLUS}, nach Vorgabe, nicht "
-        f"nachgeschlagen). Zwei Leisten stehen beim zweiten Anker höchstens 1.5·d_v "
-        f"auseinander (5.5.3.9).")
+    system, typ = vorschlag.system, vorschlag.typ
+    p.erklaerung(system.regeln(vorschlag, werte.h_A.formatiert(), ort.zusatz))
     _tabelle_21_pruefen(p, g.d.groesse.si, vorschlag)
     if ort.schatten or len(vorschlag.gruppen) > 1:
         p.erklaerung(
-            "Keine Leiste läuft über den Plattenrand oder durch eine Aussparung, auch nicht "
-            "zwischen zwei Ankern; zu beiden hält sie die Überdeckung c_nom, sonst endet sie mit "
-            "dem Anker davor. Im Schatten einer Aussparung zählt der Nachweisschnitt nicht "
-            "(Figur 23d) – dort liegt auch keine Leiste: Bewehrung, die diesen Teil quert, "
-            "trüge nichts zur gestützten Fläche.")
+            f"Keine Leiste läuft über den Plattenrand oder durch eine Aussparung, auch nicht "
+            f"zwischen zwei {system.ELEMENTEN}; zu beiden hält sie die Überdeckung c_nom, sonst "
+            f"endet sie mit dem {system.ELEMENT} davor. Im Schatten einer Aussparung zählt der "
+            f"Nachweisschnitt nicht (Figur 23d) – dort liegt auch keine Leiste: Bewehrung, die "
+            f"diesen Teil quert, trüge nichts zur gestützten Fläche.")
     if not pruefung.reicht:
-        p.hinweis("Kein ancoPLUS erfüllt alle Bedingungen; gerechnet ist der stärkste Versuch.")
+        p.hinweis(system.KEINES_REICHT)
 
     # -- Bewehrung (66), (68), (69) ---------------------------------------
-    gemindert = _verankerung_schreiben(p, werte.c_v, ort.pruefung.d_v, pruefung.eta)
-    p.erklaerung(f"Die Anker sind aus {produkte.STAHL}: in (67) und (69) gilt ihre Fliessgrenze, "
-                 f"nicht die der Biegebewehrung (4.3.6.5.4).")
+    gemindert = _verankerung_schreiben(p, werte.c_v, ort.pruefung.d_v, pruefung.eta, system)
+    p.erklaerung(f"Die {system.ELEMENT} sind aus {system.STAHL}: in (67) und (69) gilt ihre "
+                 f"Fliessgrenze, nicht die der Biegebewehrung (4.3.6.5.4).")
     phi = w.laenge(f"{k}phi_sw", r"\varnothing_{sw}", typ.durchmesser, stellen=0)
     sigma = w.wert(f"{k}sigma_sd", r"\sigma_{sd}", Groesse.aus_si(pruefung.sigma_sd, N_PRO_MM2), 0,
                    "Spannung in der Durchstanzbewehrung")
@@ -300,8 +296,8 @@ def _leisten_schreiben(n: "Durchstanzen", p: Protokoll, w: Zwischenwerte, werte:
              name="Spannung in der Durchstanzbewehrung")
     leisten = w.zahl(f"{k}n_L", "n_L", len(vorschlag.leisten), stellen=0)
     im_bereich = w.zahl(f"{k}n_A", "n_A", vorschlag.anrechenbar, stellen=0)
-    p.erklaerung(f"Angerechnet werden die Anker zwischen 0.35·d_v und d_v vom Rand der "
-                 f"gestützten Fläche: {vorschlag.anrechenbar} je Leiste.")
+    p.erklaerung(f"Angerechnet werden die {system.ELEMENT} zwischen 0.35·d_v und d_v vom Rand "
+                 f"der gestützten Fläche: {vorschlag.anrechenbar} je Leiste.")
     A_sw = w.wert(f"{k}A_sw", r"\sum A_{sw}", Groesse.aus_si(pruefung.A_sw, MM2), 0,
                   "Anrechenbare Durchstanzbewehrung")
     p.formel(A_sw, r"@n_L \cdot @n_A \cdot \frac{\pi \cdot @phi^{2}}{4}",
@@ -338,14 +334,8 @@ def _leisten_schreiben(n: "Durchstanzen", p: Protokoll, w: Zwischenwerte, werte:
     # -- Betondruckdiagonale (70) ------------------------------------------
     d = g.d.groesse.si
     k_sys = w.zahl(f"{k}k_sys", r"k_{sys}", pruefung.k_sys, stellen=2)
-    p.erklaerung(
-        "Mehr als 2·k_r und 3.5 in Gleichung (70) lässt 4.3.6.5.9 nur für Systeme zu, deren "
-        "gleichwertige Sicherheit Versuche zeigen. Das Gutachten von ancoPLUS lässt für "
-        "Innenstützen und Wandenden 3·k_r zu, wenn die Köpfe auf der Druckseite höchstens "
-        "d/10 tief liegen; bei d/6 gilt wieder 2·k_r, dazwischen linear. Für Rand- und "
-        "Eckstützen bleibt es bei 2·k_r. Die Obergrenze bleibt 3.5.")
-    p.wert(k_sys, titel=f"Faktor des Produkts: c_v = {werte.c_v * 1e3:.0f} mm, d/10 = {d * 1e2:.0f} mm, "
-                        f"d/6 = {d * 1e3 / 6:.0f} mm")
+    p.erklaerung(system.k_sys_text)
+    p.wert(k_sys, titel=system.k_sys_titel(werte.c_v, d))
     V_Rd_max = w.kraft(f"{k}V_Rd_max", r"V_{Rd,max}", pruefung.V_Rd_max,
                        "Widerstand der ersten Betondruckdiagonale")
     p.formel(V_Rd_max, rf"{gemindert}\min\left[@k_sys \cdot @k_r;\ {produkte.GRENZE:g}\right] "
@@ -367,17 +357,18 @@ def _leisten_schreiben(n: "Durchstanzen", p: Protokoll, w: Zwischenwerte, werte:
     ix = Index("out", k)
     p.titel(f"Ausserhalb der Durchstanzbewehrung{ort.zusatz and ' ' + ort.zusatz}", ebene=3)
     p.formel(werte.d_v_out, "@d - @c_v", {"d": g.d, "c_v": e["c_v"]},
-             titel="Wirksame statische Höhe bis zur Verankerung der Anker",
+             titel=f"Wirksame statische Höhe bis zur Verankerung der {system.ELEMENT}",
              referenz="SIA 262:2025, 4.3.6.5.10, Figur 26",
              name="Wirksame statische Höhe im äusseren Nachweisschnitt")
-    p.erklaerung("Der äussere Schnitt läuft im Abstand 0.5·d_v,out um die äussersten Anker.")
+    p.erklaerung(f"Der äussere Schnitt läuft im Abstand 0.5·d_v,out um die äussersten "
+                 f"{system.ELEMENT}.")
     u_0 = herleitung.rand(p, w, aussen.auswertung, ix=ix,
                           titel="Äusserer Nachweisschnitt, soweit er in der Platte liegt",
                           referenz="SIA 262:2025, 4.3.6.5.10, Figur 26")
     u_red = herleitung.abzuege(
         p, w, aussen.auswertung, u_0, ix=ix,
-        ecken_text="Von einer Geraden zwischen zwei äussersten Ankern zählen höchstens "
-                   "1.5·d_v,out von jedem Ende (Figur 26).",
+        ecken_text=f"Von einer Geraden zwischen zwei äussersten {system.ELEMENTEN} zählen "
+                   f"höchstens 1.5·d_v,out von jedem Ende (Figur 26).",
         ecken_referenz="SIA 262:2025, 4.3.6.5.10, Figur 26")
     k_e = herleitung.k_e(p, w, aussen, ix=ix, an_der_stuetze=g.k_e)
     u = herleitung.wirksam(p, w, k_e, u_red, ix=ix,
@@ -462,7 +453,7 @@ def _pilz_suchen(n: "Durchstanzen", werte: _Werte
     k_r, tau, d = g.k_r.groesse.si, g.tau_cd.groesse.si, g.d.groesse.si
     hoehe = e.g("h").si - produkte.PILZ_OBEN - produkte.PILZ_UNTEN
     weite = max(max(abs(x), abs(y)) for x, y in g.umriss)
-    k_sys = produkte.k_sys(werte.c_v, d, True)
+    k_sys = n.stelle.system.regeln.k_sys(werte.c_v, d, True)
     d_v = d - produkte.PILZ_UNTEN
     for pilz in produkte.STAHLPILZE:
         if pilz.h > hoehe + 1e-9 or pilz.s / 2.0 < weite + produkte.PILZ_UEBERSTAND - 1e-9:
@@ -536,7 +527,8 @@ def _mit_pilz(n: "Durchstanzen", p: Protokoll, w: Zwischenwerte, werte: _Werte,
         return [n.urteil(n.d_aussen, "ausserhalb des Stahlpilzes", v,
                          f"{pilz.name}: V_d,P = {V_d.formatiert()} kN ≤ "
                          f"V_Rd,c,P = {V_Rd_c.formatiert()} kN.")], None, befund
-    p.erklaerung("Um den Pilz reicht der Beton allein nicht: dazu kommen Leisten, bündig an "
-                 "den Pilz, mit den Nachweisen der Durchstanzbewehrung (4.3.6.5.1).")
+    p.erklaerung(f"Um den Pilz reicht der Beton allein nicht: dazu kommen "
+                 f"{n.stelle.system.regeln.LEISTEN}, bündig an den Pilz, mit den Nachweisen der "
+                 f"Durchstanzbewehrung (4.3.6.5.1).")
     ort = _pilzort(n, werte, befund, d_v, k_e, u, V_d, V_Rd_c)
     return _leisten_schreiben(n, p, w, werte, ort, leisten), leisten, befund

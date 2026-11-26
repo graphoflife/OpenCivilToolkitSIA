@@ -116,6 +116,18 @@ class Rotation:
 
 
 @dataclass(frozen=True)
+class Biegelage:
+    """Eine Lage der Zugbewehrung über der Stütze, wie gerechnet -- fürs Bild der Leiste."""
+
+    richtung: Richtung
+    tiefe: float
+    """Wie weit ihre Mitte unter der Oberfläche der Zugseite liegt: h − d in ihrer Richtung."""
+
+    durchmesser: float
+    abstand: float
+
+
+@dataclass(frozen=True)
 class Durchstanzbefund:
     """
     Was der Nachweis gefunden hat -- für die Zusammenfassung und das Bild.
@@ -135,6 +147,9 @@ class Durchstanzbefund:
     aussparungen: Tuple[Tuple[Punkt, ...], ...]
     raender: Tuple[Tuple[Punkt, float], ...]
     """Je Plattenrand ein Punkt auf ihm und die Richtung, in die die Platte liegt (rad)."""
+
+    lagen: Tuple[Biegelage, ...] = ()
+    """Die beiden Lagen der Zugbewehrung, die äussere zuerst."""
 
     leisten: Optional[Leistenpruefung] = None
     """Die vorgeschlagene Durchstanzbewehrung mit ihren Nachweisen (4.3.6.5.1)."""
@@ -240,7 +255,9 @@ class Durchstanzen(Nachweis):
             k_r=k_r.groesse.si, V_Rd_c=V_Rd_c.groesse.si, umriss=umriss,
             aussparungen=tuple(s.aussparungen),
             raender=tuple(((h.c * h.n[0], h.c * h.n[1]), math.atan2(-h.n[1], -h.n[0]))
-                          for h in f.raender(masse)))
+                          for h in f.raender(masse)),
+            lagen=tuple(Biegelage(r, e.g("h").si - hoehen[r].groesse.si, e.g(f"phi_{r.value}").si,
+                                  e.g(f"s_{r.value}").si) for r in (s.aussen, s.aussen.gegenrichtung)))
         if e.g("V_d").si == 0.0:
             # Ohne Stützenkraft ist nichts durchzustanzen -- bis 2026-11-19 stand
             # eine frische Stelle als «erfüllt, ∞» in der Zusammenfassung.
