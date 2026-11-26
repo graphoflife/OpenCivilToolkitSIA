@@ -7,6 +7,32 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-26 · Platte: Betonstahl einmal oben, A_s je Lage; Kennzahlen mit Auge und Kopierknöpfen
+
+Vom Benutzer gewünscht (2026-11-25).
+
+- Angaben zur Platte: Vorher stand «Beton C30/37, h = 300 mm, b_x =
+  1000 mm» darüber, und jede Zeile der Bewehrung nannte «B500B». Nachher
+  steht «Beton C30/37, Betonstahl B500B, h = 300 mm, b_x = 1000 mm». Die
+  Platte hat einen Betonstahl für alle Lagen und die Bügel; hält der
+  Rechenkern verschiedene, nennt die Zeile alle.
+- Die Spalte «Stahl» heisst jetzt «A_s [mm²]»: der Querschnitt der Lage
+  über die Breite ihres Streifens – b_x für eine Lage in x, b_y für eine
+  in y –, Grund und Zulage zusammen, aus dem Lagenaufbau. Im
+  Beispiel steht die 1. Lage als «Ø12@150 | 754», die 2. als «Ø18@150 +
+  Ø12@150 | 2450». Die Bügel haben dort einen Strich; ihr Querschnitt
+  steht in der Herleitung.
+- Kennzahlen: Vorher eine Liste ohne Knöpfe. Nachher eine Tabelle wie die
+  der Nachweise: je Zeile ein Auge, das genau diesen Wert in der Herleitung
+  zeigt, darunter Word | TeX | MD. Der Kern schickt die Tabelle fertig
+  (`api.kennzahltabellen`, dieselbe wie im Bericht), je Zeile mit ihrem
+  Wert als Ziel; ein Bauteil ohne Kennzahlen fehlt darin.
+- In der Oberfläche teilen sich Nachweise und Kennzahlen `augenblock` und
+  `augentabelle` (bericht.js), die CSS-Klasse heisst `augen-tabelle`. Nur
+  eine Zeile mit Urteil bekommt die Farbe von erfüllt oder nicht.
+- Der Bericht ändert sich in diesen zwei Tabellen; keine Zahl einer
+  Rechnung ändert sich.
+
 ## 2026-11-26 · Durchstanzen gegen das Skript geprüft: m_sd aus der ganzen Auflagerkraft
 
 Vom Benutzer gewünscht (2026-11-25): das Durchstanzen gegen das Skript

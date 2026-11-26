@@ -146,15 +146,15 @@ table.gitter td:first-child, table.gitter th:first-child { text-align: left; }
    macht der Browser eine Tabelle nie; `min-width: max-content` braucht es
    dafür nicht (und machte sie in Chrome fünfmal so breit). Ist die Tafel
    schmaler, rollt die Hülle. */
-.nachweis-tabelle {
+.augen-tabelle {
   width: var(--tabellenbreite);
   border-collapse: collapse; font-size: 12.5px;
 }
-.nachweis-tabelle .zeile { display: block; white-space: nowrap; }
-.nachweis-tabelle .links { text-align: left; }
+.augen-tabelle .zeile { display: block; white-space: nowrap; }
+.augen-tabelle .links { text-align: left; }
 /* Das Auge je Zeile: genau dieser Nachweis in der Herleitung. Blass, bis
    man darüberfährt -- ein Weg, keine Aussage. */
-.nachweis-tabelle td.auge-zelle { width: 1%; padding: 0 4px; }
+.augen-tabelle td.auge-zelle { width: 1%; padding: 0 4px; }
 .auge {
   display: inline-flex; align-items: center; justify-content: center;
   width: 26px; height: 26px; padding: 0; border: 0; border-radius: 6px;
@@ -172,24 +172,24 @@ table.gitter td:first-child, table.gitter th:first-child { text-align: left; }
   display: flex; gap: 2px;
   text-transform: none; letter-spacing: 0; font-weight: 400;
 }
-.nachweis-tabelle th {
+.augen-tabelle th {
   font-size: 11px; text-transform: uppercase; letter-spacing: .4px;
   color: var(--schrift-matt); text-align: right; padding: 5px 8px;
   border-bottom: 2px solid var(--rand-stark);
 }
-.nachweis-tabelle th:first-child { text-align: left; }
-.nachweis-tabelle td { padding: 6px 8px; border-bottom: 1px solid var(--rand); text-align: right; }
-.nachweis-tabelle td:first-child { text-align: left; font-weight: 500; }
-.nachweis-tabelle td.zahl { font-variant-numeric: tabular-nums; }
-.nachweis-tabelle tr.ist-gut td:first-child      { box-shadow: inset 4px 0 0 var(--gut); }
-.nachweis-tabelle tr.ist-schlecht td:first-child { box-shadow: inset 4px 0 0 var(--schlecht); }
+.augen-tabelle th:first-child { text-align: left; }
+.augen-tabelle td { padding: 6px 8px; border-bottom: 1px solid var(--rand); text-align: right; }
+.augen-tabelle td:first-child { text-align: left; font-weight: 500; }
+.augen-tabelle td.zahl { font-variant-numeric: tabular-nums; }
+.augen-tabelle tr.ist-gut td:first-child      { box-shadow: inset 4px 0 0 var(--gut); }
+.augen-tabelle tr.ist-schlecht td:first-child { box-shadow: inset 4px 0 0 var(--schlecht); }
 
 /* Der Erfüllungsgrad trägt das Urteil allein -- die Spalte daneben, die
    „erfüllt" ausschrieb, sagte dasselbe ein zweites Mal. Hinterlegt wird
    deshalb genau diese Zelle und nicht mehr die ganze Zeile. */
-.nachweis-tabelle td.grad { font-weight: 700; font-size: 13.5px; }
-.nachweis-tabelle .ist-gut      td.grad { background: var(--gut-hell);      color: var(--gut); }
-.nachweis-tabelle .ist-schlecht td.grad { background: var(--schlecht-hell); color: var(--schlecht); }
+.augen-tabelle td.grad { font-weight: 700; font-size: 13.5px; }
+.augen-tabelle .ist-gut      td.grad { background: var(--gut-hell);      color: var(--gut); }
+.augen-tabelle .ist-schlecht td.grad { background: var(--schlecht-hell); color: var(--schlecht); }
 
 .luecke { padding: 9px 12px; margin-bottom: 6px; border-radius: var(--radius);
           border: 1px solid var(--warn); border-left-width: 4px; background: var(--warn-hell); }
@@ -287,7 +287,7 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
 
 /* KaTeX vom Versalsatz ausnehmen. text-transform macht aus dem kleinen Alpha
    des Erfüllungsgrads sonst ein grosses -- und damit ein anderes Zeichen. */
-.nachweis-tabelle th .katex { text-transform: none; }
+.augen-tabelle th .katex { text-transform: none; }
 
 .kurvenschalter { display: inline-flex; align-items: center; gap: 6px; }
 
@@ -340,20 +340,6 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
 .kurvenhinweis {
   margin-left: auto; font-size: 11.5px; color: var(--schrift-zart);
 }
-
-/* ---------------------------------------------------- Kennzahlen je Platte -- */
-
-/* Die Kennzahlen einer Platte stehen in ihrer eigenen Karte; die rahmt sie. */
-/* Die Kennzahlen einer Platte: je eine Zeile -- Beschriftung, Zeichen,
-   Wert --, die Werte bündig rechts, damit sich die Zahlen vergleichen lassen. */
-.kennzahlen {
-  display: grid; grid-template-columns: minmax(0, 1fr) auto auto;
-  gap: 3px 14px; align-items: baseline; max-width: 560px;
-}
-.kennzahl { display: contents; font-size: 12.5px; }
-.kennzahl-name { color: var(--schrift-matt); font-size: 12.5px; }
-.kennzahl-zeichen { font-size: 12.5px; }
-.kennzahl-wert { font-weight: 600; font-size: 12.5px; text-align: right; white-space: nowrap; }
 
 
 /* «Automatische Bewehrung» -- im eigenen Fenster. Die Modi stehen

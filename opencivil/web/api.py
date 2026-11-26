@@ -23,7 +23,8 @@ from opencivil.core.einheiten import MM
 from opencivil.bericht.formelsammlung import formelname, in_sammlung
 from opencivil.bericht.markdown import block_markdown
 from opencivil.bericht.zusammenfassung import (
-    GRAD_SPALTE, STAPEL_SPALTEN, angaben, hinweise, kennzahlen, nachweistabelle,
+    GRAD_SPALTE, STAPEL_SPALTEN, angaben, hinweise, kennzahlen, kennzahlentabelle,
+    nachweistabelle,
     stiller_hinweis, zusammenfassen,
 )
 from opencivil.core.kurzform import kurzform
@@ -576,15 +577,7 @@ def loesung_dict(loesung: Loesung, aufbau: Optional[Aufbau] = None, *,
         # (zeichendaten.py). Die Verlaeufe eines Balkensystems holt eine
         # eigene Anfrage (dienst.balkensystem_verlauf).
         ergebnis["zeichendaten"] = endlich(zeichendaten(aufbau, loesung))
-        # Je Bauteil seine Kennzahlen -- auch ohne Lastfall, darum nicht in
-        # der Zusammenfassung, die es nur mit Urteilen gibt. Welche es hat,
-        # sagt das Bauteil selbst; die meisten haben keine.
-        ergebnis["kennzahlen"] = {
-            kennung: [{"beschriftung": k.beschriftung, "symbol": wert.symbol,
-                       "text": k.text(wert), "einheit": wert_dict(wert)["einheit"],
-                       "erklaerung": k.erklaerung, "id": wert.id}
-                      for k, wert in kennzahlen(aufbau, kennung, loesung)]
-            for kennung in aufbau.teile}
+        ergebnis["kennzahlen"] = kennzahltabellen(aufbau, loesung)
         # Je Hinweis der Namensraum seines Eintrags: die Oberflaeche grenzt
         # ihn ein wie alles andere (kern.Warnung).
         ergebnis["warnungen"] = [w._asdict() for w in aufbau.warnungen]
@@ -598,6 +591,31 @@ def loesung_dict(loesung: Loesung, aufbau: Optional[Aufbau] = None, *,
         ergebnis["unfertige"] = {liste: {} for liste in ergebnis["zuordnung"]}
         for kennung, u in aufbau.unfertige.items():
             ergebnis["unfertige"][u.liste][kennung] = {"name": u.name, "grund": u.grund}
+    return ergebnis
+
+
+def kennzahltabellen(aufbau: Aufbau, loesung: Loesung) -> dict:
+    """
+    Je Bauteil mit Kennzahlen ihre Tabelle -- dieselbe wie im Bericht
+    (:func:`~opencivil.bericht.zusammenfassung.kennzahlentabelle`), mit LaTeX
+    und Markdown fuer die Kopierknoepfe. Je Zeile dazu ihr Wert als Ziel des
+    Auges, wie bei den Nachweisen, und ihre Erklaerung als Tooltip
+    (Benutzer, 2026-11-25). Auch ohne Lastfall, darum nicht in der
+    Zusammenfassung, die es nur mit Urteilen gibt. Welche Kennzahlen ein
+    Bauteil hat, sagt es selbst; die meisten haben keine.
+    """
+    ergebnis: Dict[str, Any] = {}
+    for kennung in aufbau.teile:
+        zeilen = kennzahlen(aufbau, kennung, loesung)
+        if not zeilen:
+            continue
+        tabelle = kennzahlentabelle(zeilen)
+        ergebnis[kennung] = {
+            **_tabelle_dict(tabelle),
+            "zeilen": [{"zellen": [zelle_dict(c) for c in zellen], "ziel": wert.id,
+                        "bezeichnung": k.beschriftung, "erklaerung": k.erklaerung}
+                       for (k, wert), zellen in zip(zeilen, tabelle.zeilen)],
+        }
     return ergebnis
 
 

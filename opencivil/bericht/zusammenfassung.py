@@ -28,7 +28,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Sequence, Tuple
 
 from opencivil.core.nachweis import NachweisUrteil
-from opencivil.core.einheiten import MM, Groesse
+from opencivil.core.einheiten import MM, MM2, Groesse
 from opencivil.core.latex import Mathe, Zelle, als_text
 from opencivil.core.protokoll import GleichungBlock, TabellenBlock
 from opencivil.core.rechenwerk import Loesung
@@ -340,12 +340,21 @@ def kennzahlentabelle(zeilen: Sequence[Tuple[Kennzahl, Wert]]) -> TabellenBlock:
 
 def plattenangaben(qs: Plattenquerschnitt) -> GleichungBlock:
     """
-    Beton, Dicke und betrachtete Breite -- eine Zeile ueber der Tabelle.
+    Beton, Betonstahl, Dicke und betrachtete Breite -- eine Zeile ueber der
+    Tabelle.
 
-    Die Breite in y steht nur da, wenn sie von der eingegebenen abweicht.
-    Sonst waere es bei jeder Platte dieselbe Zahl zweimal.
+    Der Betonstahl steht hier einmal, nicht in jeder Zeile der Bewehrung
+    (Benutzer, 2026-11-25): eine Platte hat einen fuer alle Lagen und die
+    Buegel (:class:`~opencivil.projekt.platte.PlattenEintrag`). Haelt der
+    Rechenkern verschiedene, nennt die Zeile alle. Die Breite in y steht nur
+    da, wenn sie von der eingegebenen abweicht. Sonst waere es bei jeder
+    Platte dieselbe Zahl zweimal.
     """
-    latex = (rf"{als_text('Beton ' + qs.beton.name)} \qquad "
+    buegel = qs.querkraftbewehrung if qs.hat_buegel else None
+    stahle = dict.fromkeys([lage.stahl.name for lage in qs.lagen if lage.stahl]
+                           + ([buegel.stahl.name] if buegel and buegel.stahl else []))
+    stahl = rf"{als_text('Betonstahl ' + ', '.join(stahle))} \qquad " if stahle else ""
+    latex = (rf"{als_text('Beton ' + qs.beton.name)} \qquad {stahl}"
              rf"h = {qs.h.als_latex(0, MM)} \qquad "
              rf"b_x = {qs.b.als_latex(0, MM)}")
     if abs(qs.b.si - BREITE_Y_MM / 1000.0) > 1e-9:
@@ -362,16 +371,29 @@ def bewehrungsuebersicht(qs: Plattenquerschnitt, werte: Dict[str, Wert]) -> Tabe
     nebeneinander hat, soll nicht umdenken müssen.
 
     Grundbewehrung und Zulage stehen in einer Zeile, getrennt durch ``+`` --
-    die Lage ist eine Lage, auch wenn sie aus zwei Posten besteht. Zuletzt
+    die Lage ist eine Lage, auch wenn sie aus zwei Posten besteht. Daneben
+    ihr Querschnitt A_s ueber die Breite ihres Streifens, b_x fuer eine Lage
+    in x, b_y fuer eine in y, Grund und Zulage zusammen, aus dem
+    Lagenaufbau; den Stahl nennt :func:`plattenangaben` einmal darueber
+    (Benutzer, 2026-11-25 -- bis dahin stand er in jeder Zeile). Zuletzt
     die Höhe ihrer Stabachse über der Unterkante, ``h - z`` aus dem
     Lagenaufbau (Benutzer, 2026-10-16); liegen Grund und Zulage verschieden
     hoch, beide, getrennt durch ``/``.
     """
     strich = "–"
     tiefen: Dict[int, List[float]] = {}
+    flaechen: Dict[int, float] = {}
     for q in qs.posten:
         if q.z_def.id in werte:
             tiefen.setdefault(q.lage.nummer, []).append(werte[q.z_def.id].groesse.si)
+        if q.as_def.id in werte:
+            flaechen[q.lage.nummer] = (flaechen.get(q.lage.nummer, 0.0)
+                                       + werte[q.as_def.id].groesse.si)
+
+    def flaeche(nummer: int) -> Zelle:
+        if nummer not in flaechen:
+            return strich
+        return Mathe(Groesse.aus_si(flaechen[nummer], MM2).formatiert(0))
 
     def hoehe(nummer: int) -> Zelle:
         zahlen = [Groesse.aus_si(qs.h.si - z, MM).formatiert(1) for z in tiefen.get(nummer, [])]
@@ -395,7 +417,7 @@ def bewehrungsuebersicht(qs: Plattenquerschnitt, werte: Dict[str, Wert]) -> Tabe
             f"{lage.nummer}. Lage",
             lage.richtung.value,
             Mathe(" + ".join(vorhanden)) if vorhanden else strich,
-            lage.stahl.name if (vorhanden and lage.stahl) else strich,
+            flaeche(lage.nummer) if vorhanden else strich,
             hoehe(lage.nummer) if vorhanden else strich,
         ])
     zeilen.append(["Überdeckung unten", strich,
@@ -407,7 +429,8 @@ def bewehrungsuebersicht(qs: Plattenquerschnitt, werte: Dict[str, Wert]) -> Tabe
         b = qs.querkraftbewehrung
         # Kurzform wie bei den Lagen: Durchmesser und die beiden Teilungen,
         # sonst nichts. Der Bügelquerschnitt steht in der Herleitung, wo er
-        # auch hergeleitet wird -- in einer Übersicht ist er nur Ballast.
+        # auch hergeleitet wird -- in einer Übersicht ist er nur Ballast;
+        # seine Spalte A_s bleibt darum leer (Benutzer, 2026-11-25).
         menge_y = (b.abstand_y.formatiert(0) if b.ueber_abstand_y
                    else rf"{b.anzahl_y:g}\,\text{{Stk}}")
         zeilen.append([
@@ -415,13 +438,14 @@ def bewehrungsuebersicht(qs: Plattenquerschnitt, werte: Dict[str, Wert]) -> Tabe
             "x/y",
             Mathe(rf"\varnothing {b.durchmesser.formatiert(0)}"
                   rf"@{b.abstand_x.formatiert(0)}@{menge_y}"),
-            b.stahl.name if b.stahl else strich,
+            strich,
             strich,
         ])
 
     return TabellenBlock(
-        kopf=["Lage", "Richtung", "Bewehrung", "Stahl", "Höhe ab UK [mm]"],
+        kopf=["Lage", "Richtung", "Bewehrung", Mathe(r"A_s\ [\mathrm{mm}^2]"),
+              "Höhe ab UK [mm]"],
         zeilen=zeilen,
         titel="Bewehrung von oben nach unten",
-        ausrichtung="llllr",
+        ausrichtung="lllrr",
     )

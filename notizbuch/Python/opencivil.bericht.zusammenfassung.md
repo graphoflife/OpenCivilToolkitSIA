@@ -1,5 +1,5 @@
 ---
-erzeugt: be9a71b9c2ff
+erzeugt: e4d4d0135fed
 art: modul
 tags: [modul]
 ---
@@ -209,10 +209,15 @@ Die Kennzahlen als Tabelle des Berichts: Beschriftung, Zeichen, Wert.
 def plattenangaben(qs: Plattenquerschnitt) -> GleichungBlock
 ```
 
-Beton, Dicke und betrachtete Breite -- eine Zeile ueber der Tabelle.
+Beton, Betonstahl, Dicke und betrachtete Breite -- eine Zeile ueber der
+Tabelle.
 
-Die Breite in y steht nur da, wenn sie von der eingegebenen abweicht.
-Sonst waere es bei jeder Platte dieselbe Zahl zweimal.
+Der Betonstahl steht hier einmal, nicht in jeder Zeile der Bewehrung
+(Benutzer, 2026-11-25): eine Platte hat einen fuer alle Lagen und die
+Buegel ([[opencivil.projekt.platte|PlattenEintrag]]). Haelt der
+Rechenkern verschiedene, nennt die Zeile alle. Die Breite in y steht nur
+da, wenn sie von der eingegebenen abweicht. Sonst waere es bei jeder
+Platte dieselbe Zahl zweimal.
 
 ### bewehrungsuebersicht
 
@@ -227,7 +232,11 @@ Von oben nach unten gelesen: obere Überdeckung, 4. bis 1. Lage, untere
 nebeneinander hat, soll nicht umdenken müssen.
 
 Grundbewehrung und Zulage stehen in einer Zeile, getrennt durch `+` --
-die Lage ist eine Lage, auch wenn sie aus zwei Posten besteht. Zuletzt
+die Lage ist eine Lage, auch wenn sie aus zwei Posten besteht. Daneben
+ihr Querschnitt A_s ueber die Breite ihres Streifens, b_x fuer eine Lage
+in x, b_y fuer eine in y, Grund und Zulage zusammen, aus dem
+Lagenaufbau; den Stahl nennt [[opencivil.bericht.zusammenfassung#plattenangaben|plattenangaben]] einmal darueber
+(Benutzer, 2026-11-25 -- bis dahin stand er in jeder Zeile). Zuletzt
 die Höhe ihrer Stabachse über der Unterkante, `h - z` aus dem
 Lagenaufbau (Benutzer, 2026-10-16); liegen Grund und Zulage verschieden
 hoch, beide, getrennt durch `/`.

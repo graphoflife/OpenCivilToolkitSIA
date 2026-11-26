@@ -128,7 +128,7 @@ class TestImmer(unittest.TestCase):
         platte.kombinationen = []
         platte.verformung.faelle = []
         antwort = dienst.rechnen({"projekt": projekt.als_dict()})
-        namen = [k["beschriftung"] for k in antwort["kennzahlen"]["q1"]]
+        namen = [z["bezeichnung"] for z in antwort["kennzahlen"]["q1"]["zeilen"]]
         self.assertEqual(namen, [
             "Bewehrungsmass", "Höhe der Distanzhalter",
             "Vergrösserungsfaktor, Zug unten", "Vergrösserungsfaktor, Zug oben",
@@ -137,8 +137,39 @@ class TestImmer(unittest.TestCase):
             "Bezogene Druckzonenhöhe, Zug unten", "Bezogene Druckzonenhöhe, Zug oben",
             "Querkraftwiderstand ohne Bügel, grösster",
             "Querkraftwiderstand ohne Bügel, kleinster bei elastischer Bewehrung"])
-        faktor = next(k for k in antwort["kennzahlen"]["q1"] if k["symbol"] == r"\omega_w")
-        self.assertEqual(faktor["text"], "4.00")
+        faktor = next(z for z in antwort["kennzahlen"]["q1"]["zeilen"]
+                      if z["zellen"][1] == {"mathe": r"\omega_w"})
+        self.assertEqual(faktor["zellen"][2], {"mathe": "4.00"})
+
+    def test_als_tabelle_mit_auge_und_kopierknoepfen(self):
+        """
+        Die Kennzahlen kommen als Tabelle wie die Nachweise (Benutzer,
+        2026-11-25): LaTeX und Markdown für Word, TeX und MD, je Zeile ihr
+        Wert als Ziel des Auges -- und die Rückverfolgung findet ihn.
+        """
+        projekt = Projekt.beispiel()
+        antwort = dienst.rechnen({"projekt": projekt.als_dict()})
+        tabelle = antwort["kennzahlen"]["q1"]
+        self.assertTrue(tabelle["latex"].startswith(r"\begin{tabular}"))
+        self.assertIn("Bewehrungsmass", tabelle["markdown"])
+        self.assertEqual([z["text"] for z in tabelle["kopf"]], ["Kennzahl", "Zeichen", "Wert"])
+        zeile = tabelle["zeilen"][0]
+        self.assertEqual(zeile["bezeichnung"], "Bewehrungsmass")
+        self.assertEqual(len(zeile["zellen"]), 3)
+        self.assertTrue(zeile["erklaerung"])
+        verfolgt = dienst.rechnen({"projekt": projekt.als_dict(), "ziele": [zeile["ziel"]]})
+        self.assertIn(zeile["ziel"], verfolgt["werte"])
+
+    def test_ohne_kennzahlen_keine_tabelle(self):
+        """
+        Ein Bauteil ohne Kennzahlen fehlt in der Antwort, statt leer
+        dazustehen: im Beispiel haben Platte, Analysen und Pfahl welche, das
+        Balkensystem und der Grundbruch nicht.
+        """
+        projekt = Projekt.beispiel()
+        antwort = dienst.rechnen({"projekt": projekt.als_dict()})
+        self.assertEqual(set(antwort["kennzahlen"]), {"q1", "a1", "a2", "t1"})
+        self.assertTrue(all(t["zeilen"] for t in antwort["kennzahlen"].values()))
 
     def test_ohne_x_bewehrung_nur_was_es_gibt(self):
         projekt = Projekt(name="Probe")

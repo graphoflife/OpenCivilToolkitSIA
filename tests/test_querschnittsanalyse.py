@@ -441,7 +441,7 @@ class TestKennzahlen(unittest.TestCase):
 
     def test_im_dienst(self):
         d = dienst.bearbeite("rechnen", {"projekt": projekt().als_dict()}).daten
-        namen = [k["beschriftung"] for k in d["kennzahlen"]["a1"]]
+        namen = [z["bezeichnung"] for z in d["kennzahlen"]["a1"]["zeilen"]]
         self.assertEqual(namen[:3], ["Bewehrungsmass", "Momentenwiderstand, Zug unten",
                                      "Momentenwiderstand, Zug oben"])
 

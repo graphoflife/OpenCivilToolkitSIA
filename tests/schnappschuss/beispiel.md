@@ -4884,18 +4884,18 @@ $$
 **Angaben zur Platte**
 
 $$
-\text{Beton C30/37} \qquad h = 300\,\mathrm{mm} \qquad b_x = 1000\,\mathrm{mm}
+\text{Beton C30/37} \qquad \text{Betonstahl B500B} \qquad h = 300\,\mathrm{mm} \qquad b_x = 1000\,\mathrm{mm}
 $$
 
 **Bewehrung von oben nach unten**
 
-| Lage | Richtung | Bewehrung | Stahl | Höhe ab UK [mm] |
-| :--- | :--- | :--- | :--- | ---: |
+| Lage | Richtung | Bewehrung | $A_s\ [\mathrm{mm}^2]$ | Höhe ab UK [mm] |
+| :--- | :--- | :--- | ---: | ---: |
 | Überdeckung oben | – | $30\,\mathrm{mm}$ | – | – |
-| 4. Lage | y | $\varnothing 12@150$ | B500B | $264$ |
-| 3. Lage | x | $\varnothing 12@150$ | B500B | $252$ |
-| 2. Lage | x | $\varnothing 18@150 + \varnothing 12@150$ | B500B | $51 / 54$ |
-| 1. Lage | y | $\varnothing 12@150$ | B500B | $36$ |
+| 4. Lage | y | $\varnothing 12@150$ | $754$ | $264$ |
+| 3. Lage | x | $\varnothing 12@150$ | $754$ | $252$ |
+| 2. Lage | x | $\varnothing 18@150 + \varnothing 12@150$ | $2450$ | $51 / 54$ |
+| 1. Lage | y | $\varnothing 12@150$ | $754$ | $36$ |
 | Überdeckung unten | – | $30\,\mathrm{mm}$ | – | – |
 
 | Nachweis | Bezeichnung | Widerstand | Einwirkung | $\alpha_{eff}$ |

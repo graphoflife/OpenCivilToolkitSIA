@@ -1,5 +1,5 @@
 ---
-erzeugt: d49447a52908
+erzeugt: c1cf3ac67610
 art: modul
 tags: [modul]
 ---
@@ -117,6 +117,20 @@ Vollstaendige Abbildung eines Rechenlaufs. `spannungsanalysen` sind die
 Zeichendaten der Analysen, wo der Aufrufer sie schon hat -- aus dem
 Zwischenspeicher ([[opencivil.web.dienst#rechnen|opencivil.web.dienst.rechnen]]); sonst werden sie
 hier gerechnet.
+
+### kennzahltabellen
+
+```python
+def kennzahltabellen(aufbau: Aufbau, loesung: Loesung) -> dict
+```
+
+Je Bauteil mit Kennzahlen ihre Tabelle -- dieselbe wie im Bericht
+([[opencivil.bericht.zusammenfassung#kennzahlentabelle|kennzahlentabelle]]), mit LaTeX
+und Markdown fuer die Kopierknoepfe. Je Zeile dazu ihr Wert als Ziel des
+Auges, wie bei den Nachweisen, und ihre Erklaerung als Tooltip
+(Benutzer, 2026-11-25). Auch ohne Lastfall, darum nicht in der
+Zusammenfassung, die es nur mit Urteilen gibt. Welche Kennzahlen ein
+Bauteil hat, sagt es selbst; die meisten haben keine.
 
 ### zusammenfassungen
 

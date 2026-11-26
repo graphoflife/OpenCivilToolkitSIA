@@ -21,7 +21,7 @@
 
 import { bildDer, karte, panel, titelDer, unfertigHinweis } from './bausteine.js';
 import { el, ersetzen, leerzustand, svgEl } from './dom.js';
-import { setzen, span } from './mathe.js';
+import { setzen } from './mathe.js';
 import { formelnLeiste, werkzeugleiste } from './kopierleiste.js';
 import { adresse, seiteVorhanden } from './notizbuch.js';
 import { kurveZeichnen } from './diagramm.js';
@@ -411,7 +411,7 @@ function nachweiskarten(kennung, tabelle, loesung, verfolgen) {
   // Zeilen und LaTeX kommen fertig aus dem Kern. Sie hier ein zweites Mal
   // zusammenzustellen hiesse, dieselbe Tabelle zweimal zu pflegen -- einmal
   // fürs Auge, einmal für den Kopierknopf.
-  const kennzahlen = kennzahlenliste(kennung, loesung);
+  const kennzahlen = loesung.kennzahlen?.[kennung];
   return [
     // Was das Bauteil ist und wie es bewehrt ist, steht über der Tabelle --
     // als gewöhnliche Gleichung und gewöhnliche Tabelle, mit denselben
@@ -424,15 +424,7 @@ function nachweiskarten(kennung, tabelle, loesung, verfolgen) {
       ? karte(tabelle.bewehrung.titel, [tabellenBlock({ ...tabelle.bewehrung, titel: '' })])
       : null,
     karte('Nachweise', tabelle
-      ? [el('div.tabelle-block', {}, [
-        el('div.tabelle-huelle', {}, [nachweistabelle(tabelle, verfolgen)]),
-        werkzeugleiste({
-          latex: tabelle.latex,
-          markdown: tabelle.markdown,
-          kopf: tabelle.kopf,
-          zeilen: tabelle.zeilen.map((z) => z.zellen),
-        }),
-      ]),
+      ? [augenblock(tabelle, verfolgen, 'Spezifischen Nachweis zeigen'),
       // Ein Widerstand von null erklärt sich nicht von selbst. Der Grund
       // steht deshalb unter der Tabelle und nicht bloss im Tooltip, nach
       // Grund gebündelt -- die Sätze kommen fertig aus dem Kern, derselbe
@@ -447,12 +439,36 @@ function nachweiskarten(kennung, tabelle, loesung, verfolgen) {
         text: loesung.ohne_nachweis?.[kennung] ? `Kein Nachweis: ${loesung.ohne_nachweis[kennung]}.`
           : 'Kein Nachweis gerechnet.',
       })]),
-    kennzahlen ? karte('Kennzahlen', [kennzahlen]) : null,
+    // Die Kennzahlen wie die Nachweise: je Zeile ein Auge auf ihre
+    // Herleitung, darunter Word, TeX und MD (Benutzer, 2026-11-25).
+    kennzahlen
+      ? karte('Kennzahlen', [augenblock(kennzahlen, verfolgen, 'Herleitung dieses Werts zeigen')])
+      : null,
   ];
 }
 
 /**
- * Die Nachweistabelle der Oberfläche: keine Zelle mit mehr als zwei Zeilen.
+ * Eine Tabelle mit einem Auge je Zeile und den Kopierknöpfen darunter: die
+ * Nachweise eines Bauteils und seine Kennzahlen. Zeilen, LaTeX und Markdown
+ * kommen fertig aus dem Kern. Sie hier ein zweites Mal zusammenzustellen
+ * hiesse, dieselbe Tabelle zweimal zu pflegen -- einmal fürs Auge, einmal
+ * für den Kopierknopf.
+ */
+function augenblock(tabelle, verfolgen, augenTitel) {
+  return el('div.tabelle-block', {}, [
+    el('div.tabelle-huelle', {}, [augentabelle(tabelle, verfolgen, augenTitel)]),
+    werkzeugleiste({
+      latex: tabelle.latex,
+      markdown: tabelle.markdown,
+      kopf: tabelle.kopf,
+      zeilen: tabelle.zeilen.map((z) => z.zellen),
+    }),
+  ]);
+}
+
+/**
+ * Die Tabelle der Nachweise oder der Kennzahlen: keine Zelle mit mehr als
+ * zwei Zeilen.
  *
  * Widerstand und Einwirkung stehen übereinander in einer Zelle -- welche
  * Spalten das sind, sagt der Kern (`stapel_spalten`); der Bericht und der
@@ -461,9 +477,11 @@ function nachweiskarten(kennung, tabelle, loesung, verfolgen) {
  * Tabelle ist darum nie schmaler als dieser Inhalt; ist die Tafel schmaler,
  * rollt die Hülle.
  *
- * Zuletzt je Zeile ein Auge: genau dieser Nachweis in der Herleitung.
+ * Zuletzt je Zeile ein Auge: genau dieser Nachweis oder dieser Wert in der
+ * Herleitung. Nur eine Zeile mit Urteil (`erfuellt`) bekommt die Farbe von
+ * erfüllt oder nicht; eine Kennzahl hat keines.
  */
-function nachweistabelle(tabelle, verfolgen) {
+function augentabelle(tabelle, verfolgen, augenTitel) {
   const [oben, unten] = tabelle.stapel_spalten || [];
   const zelle = (inhalte, art, i) => {
     // Links oder rechts sagt der Kern -- dieselbe Ausrichtung, die auch das
@@ -484,17 +502,21 @@ function nachweistabelle(tabelle, verfolgen) {
   });
 
   const auge = (zeile) => el('td.auge-zelle', {}, [el('button.auge', {
-    title: 'Spezifischen Nachweis zeigen',
-    'aria-label': `Spezifischen Nachweis zeigen: ${zeile.bezeichnung}`,
+    title: augenTitel,
+    'aria-label': `${augenTitel}: ${zeile.bezeichnung}`,
     class: zustand.verfolgung?.ziel === zeile.ziel ? 'ist-an' : '',
     on: { click: () => verfolgen(zeile.ziel, zeile.bezeichnung) },
   }, [augenbild()])]);
 
-  return el('table.nachweis-tabelle', {}, [
+  const urteil = (zeile) => {
+    if (zeile.erfuellt === undefined) return '';
+    return zeile.erfuellt ? 'ist-gut' : 'ist-schlecht';
+  };
+  return el('table.augen-tabelle', {}, [
     el('thead', {}, [el('tr', {}, [...reihe(tabelle.kopf, 'th'), el('th')])]),
     el('tbody', {}, tabelle.zeilen.map((zeile) => el('tr', {
-      class: zeile.erfuellt ? 'ist-gut' : 'ist-schlecht',
-      title: zeile.begruendung || '',
+      class: urteil(zeile),
+      title: zeile.begruendung || zeile.erklaerung || '',
     }, [...reihe(zeile.zellen, 'td'), zeile.ziel ? auge(zeile) : el('td')]))),
   ]);
 }
@@ -530,26 +552,6 @@ function zeilenVon(zelle) {
   }
   if (!beste || beste.breite > 0.75 * zelle.text.length) return [zelle];
   return beste.zeilen.map((text) => ({ text }));
-}
-
-/**
- * Die Kennzahlen einer Platte unter der Tabelle: Bewehrungsmass,
- * Distanzhalter, die Vergrösserungsfaktoren ω_w und ω_w′, die Eckwerte der
- * Handrechnung und der Querkraftwiderstand bei N_Ed = 0 -- auch ohne
- * Lastfall (Benutzer, 2026-10-16).
- *
- * Liste, Beschriftung und Zahl kommen fertig aus dem Kern
- * (`zusammenfassung.kennzahlen`) -- dieselben wie im Bericht. Hier wird
- * nichts gerechnet und nichts gerundet.
- */
-function kennzahlenliste(kennung, loesung) {
-  const zeilen = loesung.kennzahlen?.[kennung] || [];
-  if (!zeilen.length) return null;
-  return el('div.kennzahlen', {}, zeilen.map((k) => el('div.kennzahl', { title: k.erklaerung }, [
-    el('span.kennzahl-name', {}, [k.beschriftung]),
-    el('span.kennzahl-zeichen', {}, [span(k.symbol)]),
-    el('span.kennzahl-wert', { text: k.einheit ? `${k.text} ${k.einheit}` : k.text }),
-  ])));
 }
 
 /**

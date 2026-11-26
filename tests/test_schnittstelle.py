@@ -474,6 +474,8 @@ class TestAngabengruppen(unittest.TestCase):
         tabelle = antwort.daten["zusammenfassungen"]["q1"]
 
         self.assertIn("C30/37", tabelle["angaben"]["latex"])
+        # Der Betonstahl steht einmal hier, nicht in jeder Lage (Benutzer, 2026-11-25).
+        self.assertIn("Betonstahl B500B", tabelle["angaben"]["latex"])
         self.assertIn("h = 300", tabelle["angaben"]["latex"])
         self.assertIn("b_x = 1000", tabelle["angaben"]["latex"])
         # b_y steht nur da, wenn es von b_x abweicht.
@@ -488,10 +490,15 @@ class TestAngabengruppen(unittest.TestCase):
             "Überdeckung oben", "4. Lage", "3. Lage",
             "2. Lage", "1. Lage", "Überdeckung unten",
         ])
-        # Durchmesser, Teilung und Stahl stehen in derselben Zeile.
+        # Durchmesser und Teilung, daneben A_s über b_x: π · 12²/4 · 1000/150 = 754 mm².
         erste_lage = bewehrung["zeilen"][4]
         self.assertIn(r"\varnothing 12@150", erste_lage[2]["mathe"])
-        self.assertEqual(erste_lage[3], {"text": "B500B"})
+        self.assertEqual(bewehrung["kopf"][3], {"mathe": r"A_s\ [\mathrm{mm}^2]"})
+        self.assertEqual(erste_lage[3], {"mathe": "754"})
+        # Grund und Zulage zusammen: Ø18@150 und Ø12@150 in der 2. Lage, 1696 + 754 mm².
+        zweite_lage = bewehrung["zeilen"][3]
+        self.assertIn("+", zweite_lage[2]["mathe"])
+        self.assertEqual(zweite_lage[3], {"mathe": "2450"})
 
     def test_eine_leere_lage_steht_ohne_bewehrung_da(self):
         """Eine nicht definierte Lage darf keinen Stahl ausweisen."""
@@ -592,9 +599,10 @@ class TestQuerkraftbewehrungInDerAusgabe(unittest.TestCase):
         self.assertEqual(letzte[0], {"text": "Querkraftbewehrung"})
         # Kurzform wie bei den Lagen: Durchmesser und die beiden Teilungen.
         self.assertEqual(letzte[2], {"mathe": r"\varnothing 10@200@200"})
-        self.assertEqual(letzte[3], {"text": "B500B"})
         # Der Bügelquerschnitt steht in der Herleitung, wo er hergeleitet
-        # wird -- in einer Übersicht ist er nur Ballast.
+        # wird -- in einer Übersicht ist er nur Ballast; seine Spalte A_s
+        # bleibt leer (Benutzer, 2026-11-25).
+        self.assertEqual(letzte[3], {"text": "–"})
         self.assertNotIn(r"A_{\varnothing,V}", letzte[2]["mathe"])
 
     def test_jede_lage_mit_ihrer_hoehe_ab_unterkante(self):
