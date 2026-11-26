@@ -1,5 +1,5 @@
 ---
-erzeugt: 64edc2dd8f2f
+erzeugt: 98f5638596e8
 art: modul
 tags: [modul]
 ---
@@ -199,6 +199,25 @@ def stahlkennwerte(self) -> Dict[str, str]
 ```
 
 Dasselbe fuer ein Stahlgesetz.
+
+#### Werkstoffsatz.baustahl
+
+```python
+@property
+def baustahl(self) -> str
+```
+
+Kurzname der Streckgrenze des Baustahls -- dort beginnt sein Plateau:
+`f_yd = f_y/γ_M1` oder `f_y` (SIA 263:2013, 4.1.1).
+
+#### Werkstoffsatz.baustahlkennwerte
+
+```python
+@property
+def baustahlkennwerte(self) -> Dict[str, str]
+```
+
+Dasselbe fuer das Gesetz des Baustahls, in Zug und Druck dieselbe Streckgrenze.
 
 #### Werkstoffsatz.spannstahl
 
@@ -509,7 +528,9 @@ def kennwerte(self, stoff) -> Dict[str, str]
 
 Je Rolle des Gesetzes eines Baustoffs der Kurzname seines Kennwerts --
 nach der Art des Baustoffs, die eine Stelle dafuer: Beton
-([[opencivil.querschnitt.gesetzwahl#Rechenwahl.betonkennwerte|betonkennwerte]]), Betonstahl, Spannstahl.
+([[opencivil.querschnitt.gesetzwahl#Rechenwahl.betonkennwerte|betonkennwerte]]), Betonstahl, Spannstahl, Baustahl und Holz.
+Das Holz kennt keinen Wertesatz: SIA 265:2012 nennt nur
+Bemessungswerte ([[opencivil.querschnitt.gesetzwahl#Konstanten|HOLZKENNWERTE]]).
 
 #### Rechenwahl.index
 
@@ -578,6 +599,7 @@ der Wahl ([[opencivil.querschnitt.gesetzwahl#Rechenwahl|Rechenwahl.modul]]), ohn
 
 ## Konstanten
 
+- `HOLZKENNWERTE = {'f_t': 'f_t_0_d', 'f_c': 'f_c_0_d', 'E': 'E_0_mean', 'eps_cu': 'eps_…` – Je Rolle der Gesetze des Holzes der Kurzname seines Kennwerts -- die Bemessungswerte in Faserrichtung und der mittlere Modul (SIA 265:2012, Tabellen 6 und 7), dazu die Grenzstauchung des elastisch-plastischen ([[opencivil.querschnitt.werkstoffgesetz#HolzPlastisch|HolzPlastisch]]).
 - `REFERENZ_KRIECHEN = 'SIA 262:2025, 3.1.2.6.1, (12)'` – Die Kriechdehnung ist `phi` mal die elastische; zusammen `(1 + phi)` mal, und daraus folgt der wirksame Modul.
 
 ## Braucht

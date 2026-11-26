@@ -1,5 +1,5 @@
 ---
-erzeugt: 37d714bcfa27
+erzeugt: f39747c6d5e9
 art: modul
 tags: [modul]
 ---
@@ -212,6 +212,8 @@ def paar(self, M: float, wert: Callable[[str], float], wahl: Rechenwahl) -> Tupl
 ```
 
 Das Paar zur Zugseite von `M`, wie sie heisst -- ohne Paar warum.
+Eines gibt es bisher nur beim Stahlbeton: das Paar rechnet mit Riss
+und Beton ([[opencivil.spannungsanalyse.schnitt#schnittpaar|schnittpaar]]).
 
 ### ModulAusPlatte
 
@@ -333,6 +335,7 @@ def rechne(self, e: Eingaben, p: Protokoll) -> dict
 - [[opencivil.core.wert]]
 - [[opencivil.material.basis]]
 - [[opencivil.nachweis.rechenwahl]]
+- [[opencivil.querschnitt.bauweise]]
 - [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.platte]]
 - [[opencivil.querschnitt.zugseite]]

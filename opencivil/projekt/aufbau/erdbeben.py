@@ -20,6 +20,7 @@ from opencivil.erdbeben.ersatzkraft import (
 from opencivil.material.basis import Baustoffart
 from opencivil.projekt.erdbeben import ErdbebenEintrag, TragwandEintrag
 from opencivil.projekt.lesen import als_groesse, ort_von
+from opencivil.querschnitt.bauweise import Bauweise
 
 from opencivil.projekt.aufbau.kern import Aufbau, Bauteil, Grund
 
@@ -77,9 +78,10 @@ def wandquerschnitt(wand: TragwandEintrag, aufbau: Aufbau) -> Union[Wandquerschn
     Was eine Wand aus ihrer Querschnittsanalyse nimmt -- oder warum sie
     nichts nehmen kann, klein beginnend: noch keine gewaehlt, eine, die es
     nicht mehr gibt oder die nicht rechnet, oder eine mit mehr als einem
-    Beton -- E_cm gilt nur fuer einen. Alles das fehlt nur, nichts ist
-    falsch: eine Analyse, die rechnet, hat ein Polygon, und jedes ist aus
-    Beton (:mod:`opencivil.projekt.aufbau.querschnittsanalyse`).
+    Beton -- E_cm gilt nur fuer einen. Das fehlt nur. Falsch ist eine
+    Analyse aus Holz, Stahl oder im Verbund
+    (:mod:`~opencivil.querschnitt.bauweise`): die Steifigkeit einer Wand
+    nimmt E_cm, sie ist aus Stahlbeton -- und hat damit einen Beton.
     """
     if not wand.analyse:
         return Grund("noch keine Querschnittsanalyse gewählt")
@@ -89,6 +91,10 @@ def wandquerschnitt(wand: TragwandEintrag, aufbau: Aufbau) -> Union[Wandquerschn
         if unfertig is None:
             return Grund("die gewählte Querschnittsanalyse gibt es nicht mehr – eine andere wählen")
         return Grund(f"die Querschnittsanalyse «{unfertig.name}» rechnet nicht ({unfertig.grund})")
+    if analyse.bauweise is not Bauweise.STAHLBETON:
+        return Grund(f"die Querschnittsanalyse «{analyse.name}» ist ein "
+                     f"{analyse.bauweise.querschnitt} – eine Wand rechnet das Werkzeug nur aus "
+                     f"Stahlbeton", falsch=True)
     betone = list({f.stoff.id: f.stoff for f in analyse.flaechen
                    if f.stoff is not None and f.stoff.art is Baustoffart.BETON}.values())
     if len(betone) > 1:

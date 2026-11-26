@@ -29,7 +29,7 @@ import {
   analysenKapitel, mitKopf, nachweisKapitel, werkstoffzeilen,
 } from './nachweise.js';
 import { uebersicht } from './qa_uebersicht.js';
-import { werkstoffeVon, zeichenbereich } from './qa_zeichnung.js';
+import { ohneNachweiseVon, werkstoffeVon, zeichenbereich } from './qa_zeichnung.js';
 import {
   ausVorlage, eintragAendern, feldangabe, katalog,
 } from './zustand.js';
@@ -437,7 +437,14 @@ const ORT = {
   },
 };
 
-function kapitel() {
+/**
+ * Die Kacheln der Analyse -- die des Stahlbetons. Ein Querschnitt aus Holz,
+ * Stahl oder im Verbund hat noch keine; statt ihrer steht grau, warum
+ * (`ohneNachweiseVon`). Was in ihnen eingestellt ist, bleibt.
+ */
+function kapitel(analyse) {
+  const ohne = ohneNachweiseVon(analyse.kennung);
+  if (ohne) return [{ hinweis: ohne, kapitel: [] }];
   return [
     { titel: 'Nachweise', kapitel: [TRAGSICHERHEIT, ...nachweisKapitel(ORT)] },
     { titel: 'Spannung-Dehnung-Analysen', kapitel: analysenKapitel(ORT) },
@@ -448,12 +455,12 @@ function kapitel() {
 export function analyseEditor(analyse) {
   return [
     querschnittGruppe(analyse),
-    kapitelPanel(analyse, kapitel(),
+    kapitelPanel(analyse, kapitel(analyse),
       { schluessel: 'analyse/Kapitel', titel: 'Nachweise und Analysen' }),
   ];
 }
 
 /** Das offene Fenster einer Querschnittsanalyse -- oder null. */
 export function analyseFenster(analyse, schluessel) {
-  return kapitelFenster(analyse, kapitel(), schluessel);
+  return kapitelFenster(analyse, kapitel(analyse), schluessel);
 }

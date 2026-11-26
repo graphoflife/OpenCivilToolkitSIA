@@ -15,7 +15,9 @@ DIE ZEICHNUNG WIRD HIER GEPRUEFT:
 Kreuzt sich ein Polygon, ueberlappen sich zwei, liegt ein Stab nicht ganz im
 Beton oder eine Wand ausserhalb -- dann entsteht kein Bauteil, sondern ein
 :class:`~opencivil.querschnitt.geometrie.GeometrieFehler` mit dem Element,
-das nicht stimmt. Erst hier und nicht beim Oeffnen der Datei: eine Analyse
+das nicht stimmt. Ebenso, wenn die Baustoffe zusammen keine Bauweise sind
+(:mod:`~opencivil.querschnitt.bauweise`): ein Polygon ist aus Beton,
+Baustahl oder Holz, Bewehrung liegt nur im Beton. Erst hier und nicht beim Oeffnen der Datei: eine Analyse
 mit einem verunglueckten Polygon soll sich oeffnen und korrigieren lassen.
 
 KOORDINATEN UND EINHEITEN:
@@ -42,6 +44,7 @@ from opencivil.core.rechenobjekt import Rechenobjekt
 from opencivil.core.wert import WertDef, kennung_aus
 from opencivil.material.basis import Baustoff, Baustoffart
 from opencivil.querschnitt import geometrie as geo
+from opencivil.querschnitt.bauweise import BEWEHRT, Bauweise, Mischung, bauweise
 from opencivil.querschnitt.bewehrungselemente import Bewehrungselement, aus_linie, aus_stab
 from opencivil.querschnitt.biegung import SCHIEF, Biegung
 from opencivil.querschnitt.geometrie import GeometrieFehler, Linienart, Punkt
@@ -53,7 +56,7 @@ from opencivil.querschnitt.fasern import FASERN
 from opencivil.querschnitt.gesetzwahl import Rechenwahl, betongesetz
 from opencivil.querschnitt.spannglieder import Spannglied, Spannglieder
 from opencivil.querschnitt.torsion import torsion
-from opencivil.querschnitt.werkstoffgesetz import Gesetz, Stahlgesetz
+from opencivil.querschnitt.werkstoffgesetz import Baustahlgesetz, Gesetz, Holzgesetz, Stahlgesetz
 from opencivil.querschnitt.zugseite import Zugseite
 
 #: Die Kennwerte, die die Nachweise eines Werkstoffs lesen -- je Art alle, die
@@ -64,6 +67,8 @@ KENNWERTE = {
     Baustoffart.BETON: ("f_ck", "f_cd", "eps_c1d", "eps_c2d", "f_ctm", "E_cm", "E_cd"),
     Baustoffart.BETONSTAHL: ("f_yk", "f_yd", "f_yk_druck", "f_yd_druck", "E_s", "eps_ud"),
     Baustoffart.SPANNSTAHL: ("f_pk", "f_p01k", "f_pd", "E_p", "E_p_litze", "eps_ud"),
+    Baustoffart.BAUSTAHL: ("f_y", "f_yd", "E_a", "eps_ud"),
+    Baustoffart.HOLZ: ("f_t_0_d", "f_c_0_d", "E_0_mean", "eps_cu"),
 }
 
 
@@ -79,10 +84,14 @@ def werkstoff(stoff: Baustoff, wert: Callable[[str], float], wahl: Rechenwahl, *
     Parabel also aus ``E_cm/(1+phi)`` -- oder, ``ungerissen``, linear in
     Druck und Zug mit demselben Modul, aus derselben Stelle; gedrueckt bis
     ``-eps_c2d`` samt Punkt C, verdraengt von den Staeben. Betonstahl: bilinear,
-    ``±eps_ud``. Der Wertesatz bestimmt, wo die Plateaus liegen
-    (``f_cd`` oder ``f_ck``, ``f_yd`` oder ``f_yk``); Moduln und
+    ``±eps_ud``. Baustahl: elastisch-plastisch, in Zug und Druck gleich,
+    ``±eps_ud``. Holz: linear bis zum Bruch, in Faserrichtung. Der Wertesatz
+    bestimmt, wo die Plateaus liegen (``f_cd`` oder ``f_ck``, ``f_yd`` oder
+    ``f_yk``, beim Baustahl ``f_yd`` oder ``f_y``); Moduln und
     Dehnungsgrenzen bleiben
-    (:class:`~opencivil.querschnitt.gesetzwahl.Werkstoffsatz`).
+    (:class:`~opencivil.querschnitt.gesetzwahl.Werkstoffsatz`). Das Holz hat
+    keinen: SIA 265:2012 nennt nur Bemessungswerte. Welche Kennwerte ein
+    Gesetz nimmt, sagt :meth:`~opencivil.querschnitt.gesetzwahl.Rechenwahl.kennwerte`.
 
     Bis 2026-10-16 baute die Spannung-Dehnung-Analyse ihre Werkstoffe
     selbst, und der Bruchzustand nahm den Beiwert der Parabel aus ``E_cd``.
@@ -95,6 +104,13 @@ def werkstoff(stoff: Baustoff, wert: Callable[[str], float], wahl: Rechenwahl, *
                              eps_c1d=eps_c1d, eps_c2d=eps_c2d, ungerissen=ungerissen)
         return Werkstoff(stoff.name, gesetz, -eps_c2d, math.inf,
                          c_punkt=(eps_c1d, eps_c2d), verdraengbar=True)
+    k = wahl.kennwerte(stoff)
+    if stoff.art is Baustoffart.BAUSTAHL:
+        gesetz = Baustahlgesetz.gleich(E_a=w(k["E_s"]), f_yd=w(k["f_s"]), eps_ud=w(k["eps_ud"]))
+        return Werkstoff(stoff.name, gesetz, -gesetz.eps_ud, gesetz.eps_ud)
+    if stoff.art is Baustoffart.HOLZ:
+        gesetz = Holzgesetz(E=w(k["E"]), f_t=w(k["f_t"]), f_c=w(k["f_c"]))
+        return Werkstoff(stoff.name, gesetz, -gesetz.eps_c, gesetz.eps_t)
     gesetz = Stahlgesetz(E_s=w("E_s"), f_yd=w(satz.stahl),
                          f_yd_druck=w(satz.stahl_druck), eps_ud=w("eps_ud"))
     return Werkstoff(stoff.name, gesetz, -gesetz.eps_ud, gesetz.eps_ud)
@@ -198,10 +214,12 @@ class Zeichnung:
 
     Jedes Element ist ein Woerterbuch mit ``name`` und ``kennung``, wie sie
     :meth:`QuerschnittsanalyseEintrag.elemente` vergibt -- benannt wird hier
-    nichts. ``polygone`` tragen ``punkte`` und ``traegt`` (ohne Material ist
-    es eine Aussparung), ``staebe`` ``lage`` und ``durchmesser``, ``linien``
-    und ``waende`` die Felder der Beschreibung, ``spannglieder`` wie die
-    Staebe, mit dem Durchmesser ihrer Flaeche.
+    nichts. ``polygone`` tragen ``punkte``, ``traegt`` (ohne Material ist
+    es eine Aussparung) und ``beton``: ob Bewehrung in ihm liegen darf
+    (:data:`~opencivil.querschnitt.bauweise.BEWEHRT`). ``staebe`` ``lage``
+    und ``durchmesser``, ``linien`` und ``waende`` die Felder der
+    Beschreibung, ``spannglieder`` wie die Staebe, mit dem Durchmesser ihrer
+    Flaeche.
     """
 
     def __init__(self, *, polygone: Sequence[Mapping], staebe: Sequence[Mapping],
@@ -209,6 +227,7 @@ class Zeichnung:
                  spannglieder: Sequence[Mapping] = ()) -> None:
         self.punkte = [tuple(tuple(p) for p in f["punkte"]) for f in polygone]
         self.traegt = [bool(f["traegt"]) for f in polygone]
+        self.beton = [bool(f["beton"]) for f in polygone]
         self.namen = [f["name"] for f in polygone]
         self.kennungen = [f["kennung"] for f in polygone]
         # Die Geometrie nennt ein Polygon beim Namen; gemeldet wird die Kennung.
@@ -272,7 +291,7 @@ class Zeichnung:
         return float(self.traegt[i]) - float(fremd)
 
     def _im_beton(self, p: Punkt, durchmesser: float) -> bool:
-        return geo.stab_liegt_in(p, durchmesser / 2.0, self.punkte, self.traegt)
+        return geo.stab_liegt_in(p, durchmesser / 2.0, self.punkte, self.beton)
 
     def innerstes(self, p: Punkt) -> Optional[int]:
         return geo.innerstes(p, self.punkte)
@@ -322,7 +341,7 @@ class Zeichnung:
         if self.eltern is None:
             return linie
         if art is Linienart.FLAECHE:
-            if not geo.strecke_liegt_in(linie.von, linie.bis, self.punkte, self.traegt):
+            if not geo.strecke_liegt_in(linie.von, linie.bis, self.punkte, self.beton):
                 self._melden(f"{name} liegt nicht ganz im Beton.", kennung)
             return linie
         for k, p in enumerate(linie.punkte, start=1):
@@ -348,7 +367,7 @@ class Zeichnung:
             self._melden(f"{name}: die Bügelteilung muss grösser als null sein.", kennung)
             gut = False
         if self.eltern is not None and not geo.strecke_liegt_in(
-                von, bis, self.punkte, self.traegt):
+                von, bis, self.punkte, self.beton):
             self._melden(f"{name} liegt nicht ganz im Beton. Eine Schubwand wird von "
                          f"Gurt zu Gurt im Beton gezeichnet.", kennung)
             gut = False
@@ -435,6 +454,7 @@ class Querschnittsanalyse(Rechenobjekt):
 
         self.zeichnung = Zeichnung(
             polygone=[{"punkte": f.punkte, "traegt": f.stoff is not None,
+                       "beton": f.stoff is not None and f.stoff.art is BEWEHRT,
                        "name": f.name, "kennung": f.kennung} for f in self.flaechen],
             staebe=staebe, linien=linien, waende=waende,
             spannglieder=[{"name": g.name, "kennung": g.kennung, "lage": g.von,
@@ -456,6 +476,15 @@ class Querschnittsanalyse(Rechenobjekt):
         self.glieder: Optional[Spannglieder] = None
         """Ihre Werte und ihre Herleitung -- ``None`` ohne Spannglied."""
         self.waende: List[Wandangabe] = self._waende(waende)
+        try:
+            self.bauweise: Bauweise = bauweise((s.art, s.name) for s in self.baustoffe)
+            """
+            Woraus der Querschnitt besteht (:mod:`~opencivil.querschnitt.bauweise`)
+            -- danach richten sich seine Nachweise. Eine gueltige Zeichnung hat
+            ein Polygon mit Material, also immer eine.
+            """
+        except Mischung as mischung:
+            raise GeometrieFehler(str(mischung)) from None
         self._aufbauen(alpha_min, alpha_max, k_c)
 
     # -- Aus der Zeichnung --------------------------------------------------------------

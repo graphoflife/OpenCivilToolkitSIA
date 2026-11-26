@@ -87,6 +87,35 @@ function klasseVon(liste) {
   return ARTEN.find((x) => x.liste === liste).klasse;
 }
 
+/**
+ * Die Arten von Material, die ein Feld einer Liste nimmt -- vom Kern
+ * (`materialfeld`): eine Fläche Beton, Baustahl oder Holz, ein Stab Betonstahl.
+ */
+function stoffeVon(liste, feld) {
+  return feldangabe(klasseVon(liste), feld).stoffe;
+}
+
+/** Ob es das Material `kennung` von einer der `arten` gibt. */
+function gibt(arten, kennung) {
+  return arten.some((art) => materialien(art).some((m) => m.kennung === kennung));
+}
+
+/** Das erste Material der ersten der `arten`, von der es eines gibt -- oder undefined. */
+function erstes(arten) {
+  return arten.map((art) => materialien(art)[0]?.kennung).find(Boolean);
+}
+
+/**
+ * Wie ein Polygon aussieht: in der Farbe seines Materials, ohne eines als
+ * Aussparung. Eines, das es nicht gibt oder das nicht passt, wie Beton --
+ * seine Meldung sagt, was fehlt.
+ */
+function flaechenklasse(material) {
+  if (!material) return 'cad-loch';
+  const art = eintragVon(material)?.art;
+  return stoffeVon('flaechen', 'material').includes(art) ? `cad-${art}` : 'cad-beton';
+}
+
 /** Die Listen, deren Elemente Linien sind -- sie haben Anfang und Ende. */
 const LINIENLISTEN = ARTEN.filter((x) => x.form === 'linie').map((x) => x.liste);
 
@@ -97,7 +126,7 @@ const LINIENLISTEN = ARTEN.filter((x) => x.form === 'linie').map((x) => x.liste)
  */
 const WERKZEUGE = [
   { name: 'polygon', text: 'Polygon', zeichen: 'cad-polygon', taste: 'p', form: 'polygon',
-    titel: 'Polygon: eine Fläche aus Beton oder eine Aussparung' },
+    titel: 'Polygon: eine Fläche aus Beton, Baustahl oder Holz – oder eine Aussparung' },
   { name: 'bewehrung', text: 'Bewehrung', zeichen: 'cad-bewehrung', taste: 'b',
     form: (a) => (a.qa.vorgaben.bewehrung === 'punkt' ? 'knoten' : 'linie'),
     titel: 'Bewehrung: eine Linie mit Stäben oder einzelne Stäbe' },
@@ -154,6 +183,17 @@ export function werkstoffeVon(kennung) {
   };
 }
 
+/**
+ * Warum der Querschnitt keinen Nachweis hat -- er ist aus Holz, Stahl oder
+ * im Verbund: «Einen Holzquerschnitt weist das Werkzeug …». Leer beim
+ * Stahlbeton. Aus der letzten Antwort des Kerns, auch einer älteren: sonst
+ * sprängen die Kacheln bei jeder Änderung um, bis die neue da ist.
+ */
+export function ohneNachweiseVon(kennung) {
+  const a = fensterVon(kennung);
+  return (frischeAntwort(a) || a.adapter.kern.antwort)?.ohne_nachweise || '';
+}
+
 // ===========================================================================
 // Der Adapter
 // ===========================================================================
@@ -163,36 +203,35 @@ export function werkstoffeVon(kennung) {
  * als Linie oder als Punkt zeichnet. Ansichtssache, nicht Teil des Projekts.
  */
 function vorgabenNeu() {
-  const beton = zustand.projekt.materialien.find((m) => m.art === 'beton');
-  const stahl = zustand.projekt.materialien.find((m) => m.art === 'betonstahl');
   const mit = (liste, felder = {}) => ausVorlage(klasseVon(liste), felder);
+  const stahl = (liste) => mit(liste, { stahl: erstes(stoffeVon(liste, 'stahl')) || '' });
   return {
     bewehrung: 'linie',
-    staebe: mit('staebe', { stahl: stahl?.kennung || '' }),
-    stablinien: mit('stablinien', { stahl: stahl?.kennung || '' }),
-    schubwaende: mit('schubwaende', { stahl: stahl?.kennung || '' }),
+    staebe: stahl('staebe'),
+    stablinien: stahl('stablinien'),
+    schubwaende: stahl('schubwaende'),
     hilfslinien: mit('hilfslinien'),
-    flaechen: mit('flaechen', { material: beton?.kennung || '' }),
+    flaechen: mit('flaechen', { material: erstes(stoffeVon('flaechen', 'material')) || '' }),
     spannglieder: gliedVorgabe(),
   };
 }
 
 /**
  * Die Vorgaben, geprüft gegen das Projekt: einem Material, das es nicht
- * mehr gibt, folgt das erste seiner Art -- wie in einem neuen Fenster. Bis
- * 2026-11-19 blieb ein gelöschter Stahl in der Vorgabe, und jeder neue Stab
- * verwies ins Leere. Gibt es keinen Beton, bleibt der alte Verweis stehen:
- * ohne Material wäre das Polygon still eine Aussparung.
+ * mehr gibt, folgt das erste, das das Feld nimmt -- wie in einem neuen
+ * Fenster. Bis 2026-11-19 blieb ein gelöschter Stahl in der Vorgabe, und
+ * jeder neue Stab verwies ins Leere. Gibt es keines, bleibt der alte
+ * Verweis stehen: ohne Material wäre das Polygon still eine Aussparung.
  */
 function vorgaben(a) {
   const v = a.qa.vorgaben;
-  const gibt = (art, kennung) => materialien(art).some((m) => m.kennung === kennung);
-  const erstes = (art) => materialien(art)[0]?.kennung;
   for (const liste of ['staebe', 'stablinien', 'schubwaende']) {
-    if (!gibt('betonstahl', v[liste].stahl)) v[liste].stahl = erstes('betonstahl') || '';
+    const arten = stoffeVon(liste, 'stahl');
+    if (!gibt(arten, v[liste].stahl)) v[liste].stahl = erstes(arten) || '';
   }
-  if (v.flaechen.material && !gibt('beton', v.flaechen.material)) {
-    v.flaechen.material = erstes('beton') || v.flaechen.material;
+  const arten = stoffeVon('flaechen', 'material');
+  if (v.flaechen.material && !gibt(arten, v.flaechen.material)) {
+    v.flaechen.material = erstes(arten) || v.flaechen.material;
   }
   vorgabePruefen(v.spannglieder);
   return v;
@@ -240,13 +279,16 @@ function adapter(kennung) {
     nehmen: (a, antwort) => {
       a.qa.namen = new Map([antwort.polygone, antwort.staebe, antwort.spannglieder, antwort.linien,
         antwort.waende, antwort.hilfslinien].flatMap((liste) => (liste || []).map((x) => [x.kennung, x.element])));
+      // Aus Holz statt Beton: die Analyse zeigt andere Kacheln (`ohneNachweiseVon`).
+      a.qa.andereKacheln = antwort.ohne_nachweise !== (a.adapter.kern.antwort?.ohne_nachweise ?? '');
       return antwort;
     },
-    beantwortet: () => { if (zustand.fenster) mitteAendern(); },
+    beantwortet: (a) => { if (zustand.fenster || a.qa.andereKacheln) mitteAendern(); },
     eigenschaften,
     neuEigenschaften,
     aktionen,
-    vorlageOeffnen,
+    // Woraus die Vorlage ist und wie ihre Flächen aussehen, sagt die Zeichnung.
+    vorlageOeffnen: (a) => vorlageOeffnen(a, vorgaben(a), flaechenklasse),
   };
 }
 
@@ -403,7 +445,7 @@ function zeichnen(a, g) {
     const punkte = f.knoten.map(ort);
     if (punkte.length < 2 || punkte.some((p) => !p)) continue;
     g.append(mitTitel(svgEl('path', {
-      d: pfad(a.v, punkte), class: klassen(f.kennung, f.material ? 'cad-beton' : 'cad-loch'),
+      d: pfad(a.v, punkte), class: klassen(f.kennung, flaechenklasse(f.material)),
     }), texte(f.kennung)));
   }
 
@@ -553,7 +595,7 @@ function felderVon(liste, wert, setzen, info = null) {
     beiAenderung: setzen(feld),
   });
   const stahl = () => cadZeile('Stahl', materialliste({
-    art: 'betonstahl', gewaehlt: wert('stahl'), setzen: setzen('stahl'),
+    art: stoffeVon(liste, 'stahl'), gewaehlt: wert('stahl'), setzen: setzen('stahl'),
   }));
   // Dahinter ein Bild, was die Wahl meint -- etwa der Stab am Anfang der Linie.
   const haken = (beschriftung, feld, bild = null, bildtitel = '') => el('div.cad-zeile', {}, [
@@ -633,7 +675,7 @@ function felderVon(liste, wert, setzen, info = null) {
   if (liste === 'flaechen') {
     return [
       cadZeile('Material', materialliste({
-        art: 'beton', gewaehlt: wert('material'), setzen: setzen('material'),
+        art: stoffeVon('flaechen', 'material'), gewaehlt: wert('material'), setzen: setzen('material'),
         zusatz: [{ wert: '', beschriftung: 'Aussparung' }],
       })),
       cadZeile('c', zahl('ueberdeckung', 'Überdeckung c: das Polygon erscheint so weit nach innen gerückt '

@@ -289,12 +289,21 @@ function einzeilig(knoten) {
   return knoten instanceof HTMLInputElement && ['text', 'number', 'search'].includes(knoten.type);
 }
 
+/**
+ * Eine Liste zum Wählen. Werte mit `gruppe` stehen unter deren Namen, je
+ * eine Gruppe für die, die aufeinander folgen -- etwa die Materialien einer
+ * Fläche nach ihrer Art; die ohne Gruppe davor oder danach.
+ */
 export function auswahl({ werte, gewaehlt, beiAenderung, titel }) {
-  return el('select', {
-    title: titel,
-    on: { change: (e) => beiAenderung(e.target.value) },
-  }, werte.map(({ wert, beschriftung }) =>
-    el('option', { value: wert, text: beschriftung, selected: wert === gewaehlt })));
+  const option = ({ wert, beschriftung }) => el('option', { value: wert, text: beschriftung, selected: wert === gewaehlt });
+  const kinder = [];
+  for (const w of werte) {
+    const letzte = kinder.at(-1);
+    if (!w.gruppe) kinder.push(option(w));
+    else if (letzte?.tagName === 'OPTGROUP' && letzte.label === w.gruppe) letzte.append(option(w));
+    else kinder.push(el('optgroup', { label: w.gruppe }, [option(w)]));
+  }
+  return el('select', { title: titel, on: { change: (e) => beiAenderung(e.target.value) } }, kinder);
 }
 
 /** Kurze Rückmeldung am unteren Bildschirmrand. */
@@ -309,7 +318,7 @@ export function leerzustand(...zeilen) {
   return el('div.leer', {}, zeilen.map((z) => el('p', { text: z })));
 }
 
-/** «A und I», «A, I_y, I_z und I_T» -- Namen in einem Satz. */
-export function undListe(namen) {
-  return namen.length > 1 ? `${namen.slice(0, -1).join(', ')} und ${namen.at(-1)}` : namen.join('');
+/** «A und I», «A, I_y, I_z und I_T» -- Namen in einem Satz; mit `bindewort` «Beton, Baustahl oder Holz». */
+export function undListe(namen, bindewort = 'und') {
+  return namen.length > 1 ? `${namen.slice(0, -1).join(', ')} ${bindewort} ${namen.at(-1)}` : namen.join('');
 }

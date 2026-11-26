@@ -24,7 +24,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import (
     TYPE_CHECKING, Any, Callable, Dict, Iterable, List, Mapping, NamedTuple, Optional, Sequence,
-    Tuple,
+    Tuple, Union,
 )
 
 from opencivil.core.bereich import Bereich
@@ -496,11 +496,13 @@ def baustoff_bauen(eintrag: MaterialEintrag, symbol_index: str, wo: str) -> Baus
     )
 
 
-def material(baustoffe: Mapping[str, Baustoff], kennung: str, art: str, wo: str,
-             feld: str) -> Baustoff:
+def material(baustoffe: Mapping[str, Baustoff], kennung: str, art: Union[str, Sequence[str]],
+             wo: str, feld: str) -> Baustoff:
     """
     Das Material, das ``feld`` des Bauteils ``wo`` waehlt: es muss es geben,
-    und es muss von dieser Art sein. Ohne Angabe gilt nicht «das erste im
+    und es muss von dieser Art sein -- oder von einer dieser Arten, etwa bei
+    der Flaeche einer Querschnittsanalyse (:func:`~opencivil.projekt.lesen.materialfeld`).
+    Ohne Angabe gilt nicht «das erste im
     Projekt» -- bis 2026-10-16 bekamen Buegel und Staebe ohne Stahl still den
     ersten. ``feld`` heisst wie in der Oberflaeche: was nicht stimmt, steht
     am Bauteil (:meth:`Aufbau.unfertig`), dort genuegt das Feld.
@@ -531,11 +533,13 @@ class Grund(NamedTuple):
     falsch: bool = False
 
 
-def materialgrund(kennung: str, gefunden: Optional[Tuple[str, str]], art: str) -> Optional[Grund]:
+def materialgrund(kennung: str, gefunden: Optional[Tuple[str, str]],
+                  art: Union[str, Sequence[str]]) -> Optional[Grund]:
     """
     Was an der Wahl eines Materials nicht stimmt, ohne Ort -- ``None``, wenn
     sie stimmt. ``gefunden`` sind Art und Name des gewaehlten, ``None``, wenn
-    es das nicht gibt. Falsch ist nur die falsche Art; ein geloeschtes oder
+    es das nicht gibt; ``art`` eine Art oder mehrere, die passen. Falsch ist
+    nur die falsche Art -- «ist kein Beton, Baustahl oder Holz»; ein geloeschtes oder
     noch nicht gewaehltes fehlt nur. Das geloeschte nennt der Satz nicht beim
     Namen: den kennt das Projekt nicht mehr, und die Kennung steht nirgends,
     wo der Benutzer sie saehe -- bis 2026-11-19 hiess es «das Material 'b9'».
@@ -545,8 +549,11 @@ def materialgrund(kennung: str, gefunden: Optional[Tuple[str, str]], art: str) -
     if gefunden is None:
         return Grund("das gewählte Material gibt es nicht mehr – eines wählen" if kennung
                      else "noch kein Material gewählt")
-    if gefunden[0] != art:
-        return Grund(f"«{gefunden[1]}» ist kein {Baustoffart(art).beschriftung}", falsch=True)
+    arten = (art,) if isinstance(art, str) else tuple(art)
+    if gefunden[0] not in arten:
+        namen = [Baustoffart(a).beschriftung for a in arten]
+        liste = " oder ".join(filter(None, (", ".join(namen[:-1]), namen[-1])))
+        return Grund(f"«{gefunden[1]}» ist kein {liste}", falsch=True)
     return None
 
 

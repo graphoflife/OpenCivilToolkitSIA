@@ -1,5 +1,5 @@
 ---
-erzeugt: e3e48687e40c
+erzeugt: 6635d3c40ae1
 art: modul
 tags: [modul]
 ---
@@ -24,7 +24,9 @@ das Rechenwerk, damit jede rueckverfolgbar bleibt.
 Kreuzt sich ein Polygon, ueberlappen sich zwei, liegt ein Stab nicht ganz im
 Beton oder eine Wand ausserhalb -- dann entsteht kein Bauteil, sondern ein
 [[opencivil.querschnitt.geometrie#GeometrieFehler|GeometrieFehler]] mit dem Element,
-das nicht stimmt. Erst hier und nicht beim Oeffnen der Datei: eine Analyse
+das nicht stimmt. Ebenso, wenn die Baustoffe zusammen keine Bauweise sind
+([[opencivil.querschnitt.bauweise|bauweise]]): ein Polygon ist aus Beton,
+Baustahl oder Holz, Bewehrung liegt nur im Beton. Erst hier und nicht beim Oeffnen der Datei: eine Analyse
 mit einem verunglueckten Polygon soll sich oeffnen und korrigieren lassen.
 
 
@@ -51,10 +53,14 @@ Beton: das Gesetz seiner Rechenart, gebaut wie bei der Platte
 Parabel also aus `E_cm/(1+phi)` -- oder, `ungerissen`, linear in
 Druck und Zug mit demselben Modul, aus derselben Stelle; gedrueckt bis
 `-eps_c2d` samt Punkt C, verdraengt von den Staeben. Betonstahl: bilinear,
-`±eps_ud`. Der Wertesatz bestimmt, wo die Plateaus liegen
-(`f_cd` oder `f_ck`, `f_yd` oder `f_yk`); Moduln und
+`±eps_ud`. Baustahl: elastisch-plastisch, in Zug und Druck gleich,
+`±eps_ud`. Holz: linear bis zum Bruch, in Faserrichtung. Der Wertesatz
+bestimmt, wo die Plateaus liegen (`f_cd` oder `f_ck`, `f_yd` oder
+`f_yk`, beim Baustahl `f_yd` oder `f_y`); Moduln und
 Dehnungsgrenzen bleiben
-([[opencivil.querschnitt.gesetzwahl#Werkstoffsatz|Werkstoffsatz]]).
+([[opencivil.querschnitt.gesetzwahl#Werkstoffsatz|Werkstoffsatz]]). Das Holz hat
+keinen: SIA 265:2012 nennt nur Bemessungswerte. Welche Kennwerte ein
+Gesetz nimmt, sagt [[opencivil.querschnitt.gesetzwahl#Rechenwahl.kennwerte|kennwerte]].
 
 Bis 2026-10-16 baute die Spannung-Dehnung-Analyse ihre Werkstoffe
 selbst, und der Bruchzustand nahm den Beiwert der Parabel aus `E_cd`.
@@ -175,10 +181,12 @@ gerechnet wird nur, was ganz stimmt. Dieselben Pruefungen an einer Stelle.
 
 Jedes Element ist ein Woerterbuch mit `name` und `kennung`, wie sie
 [[opencivil.querschnitt.analyse#Zeichnung|QuerschnittsanalyseEintrag.elemente]] vergibt -- benannt wird hier
-nichts. `polygone` tragen `punkte` und `traegt` (ohne Material ist
-es eine Aussparung), `staebe` `lage` und `durchmesser`, `linien`
-und `waende` die Felder der Beschreibung, `spannglieder` wie die
-Staebe, mit dem Durchmesser ihrer Flaeche.
+nichts. `polygone` tragen `punkte`, `traegt` (ohne Material ist
+es eine Aussparung) und `beton`: ob Bewehrung in ihm liegen darf
+([[opencivil.querschnitt.bauweise#Konstanten|BEWEHRT]]). `staebe` `lage`
+und `durchmesser`, `linien` und `waende` die Felder der
+Beschreibung, `spannglieder` wie die Staebe, mit dem Durchmesser ihrer
+Flaeche.
 
 #### Zeichnung.gueltig
 
@@ -469,6 +477,7 @@ Jede Ecke eines Polygons mit Material -- fuer das Rissmoment, in mm.
 - [[opencivil.core.rechenobjekt]]
 - [[opencivil.core.wert]]
 - [[opencivil.material.basis]]
+- [[opencivil.querschnitt.bauweise]]
 - [[opencivil.querschnitt.bewehrungselemente]]
 - [[opencivil.querschnitt.biegung]]
 - [[opencivil.querschnitt.fachwerk]]

@@ -66,8 +66,8 @@
   --beton:        #7b8794;
   --stahl:        #b8622a;
   /* Die Materialien im gezeichneten Querschnitt (Benutzer, 2026-10-24):
-     je eine helle Fläche und eine kräftigere Linie derselben Farbe. Baustahl
-     gibt es noch nicht -- seine Farbe steht schon fest. */
+     je eine helle Fläche und eine kräftigere Linie derselben Farbe. Holz
+     und Baustahl als Fläche seit 2026-11-26. */
   --mat-beton:          #d5ebd1;
   --mat-beton-linie:    #5e9b62;
   --mat-stahl:          #f2a5a5;
@@ -78,6 +78,8 @@
   --mat-baustahl-linie: #4b7db5;
   --mat-spannstahl:       #e6c8ef;
   --mat-spannstahl-linie: #8e44ad;
+  --mat-holz:           #f0dcb8;
+  --mat-holz-linie:     #9c6b30;
   --platte:       var(--blau);
   --analyse:      #0d9488;
   --system:       #7048e8;

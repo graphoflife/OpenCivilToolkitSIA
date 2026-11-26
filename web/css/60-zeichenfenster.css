@@ -283,6 +283,8 @@
 .cad-achsenpfeil { stroke: var(--schrift-matt); stroke-width: 1.4; }
 .cad-achsenkreuz .cad-achstext { fill: var(--schrift-matt); }
 .cad-beton { fill: var(--mat-beton); stroke: var(--mat-beton-linie); stroke-width: 1.3; }
+.cad-baustahl { fill: var(--mat-baustahl); stroke: var(--mat-baustahl-linie); stroke-width: 1.3; }
+.cad-holz { fill: var(--mat-holz); stroke: var(--mat-holz-linie); stroke-width: 1.3; }
 .cad-loch { fill: #fff; stroke: var(--mat-beton-linie); stroke-width: 1.3; stroke-dasharray: 6 3; }
 .cad-zelle { stroke: none; }
 .cad-schraffurstrich { stroke: var(--mat-wand-linie); stroke-opacity: .5; stroke-width: 1.2; }
@@ -312,7 +314,8 @@
 .cad-schwerpunkttext { font-size: 11px; font-weight: 700; fill: var(--schrift); }
 .cad-knotenpunkte circle { fill: #fff; stroke: var(--schrift-matt); stroke-width: 1; }
 
-.ist-fehler.cad-beton, .ist-fehler.cad-loch, .ist-fehler.cad-wand, .ist-fehler.cad-wandachse,
+.ist-fehler.cad-beton, .ist-fehler.cad-baustahl, .ist-fehler.cad-holz, .ist-fehler.cad-loch,
+.ist-fehler.cad-wand, .ist-fehler.cad-wandachse,
 .ist-fehler.cad-linie, .ist-fehler.cad-linie-flaeche { stroke: var(--schlecht); stroke-opacity: 1; stroke-width: 2.4; }
 .ist-fehler.cad-stab, .ist-fehler.cad-spannglied { fill: var(--schlecht); stroke: var(--schlecht); }
 .ist-fehler.cad-linientext { fill: var(--schlecht); }

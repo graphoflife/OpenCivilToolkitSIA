@@ -9,6 +9,9 @@ Feldern der Datenklassen. Was ein Feld annehmen darf, steht an ihm selbst:
   oder eine Wahl (:class:`~opencivil.core.wahl.Wahl`), deren Mitglieder es
   annimmt;
 * eine Teilmenge davon (:func:`einer_von`) -- die Werte, die es gibt;
+* bei der Kennung eines Materials die Arten, die es nehmen darf
+  (:func:`materialfeld`) -- geprueft erst beim Aufbau, denn welches Material
+  welche Art hat, weiss nur das Projekt;
 * ein Text ohne Vorgabe ist Pflicht und darf nicht leer sein -- ausser einem
   Namen: ohne ihn haelt erst das Rechnen sein Bauteil an
   (:func:`inhalt_pruefen`);
@@ -121,6 +124,24 @@ def einer_von(moeglich: Iterable[Any], vorgabe: Any = dataclasses.MISSING) -> An
     return dataclasses.field(default=vorgabe, metadata={"wahl": tuple(moeglich)})
 
 
+def materialfeld(*arten: str) -> Any:
+    """
+    Ein Feld mit der Kennung eines Materials des Projekts, leer, solange
+    keines gewaehlt ist -- und die Arten, die es nehmen darf: die eine Stelle
+    dafuer. Der Aufbau prueft die Wahl damit
+    (:func:`~opencivil.projekt.aufbau.kern.material`), die Zeichnung ebenso,
+    und die Maske bietet nur diese Arten an (:func:`feldangaben`,
+    ``stoffe``). Seit 2026-11-26 nimmt eine Flaeche der Querschnittsanalyse
+    Beton, Baustahl oder Holz; bis dahin stand «beton» an drei Stellen fest.
+    """
+    return dataclasses.field(default="", metadata={"stoffe": tuple(arten)})
+
+
+def stoffe_des_felds(cls: type, feld: str) -> Tuple[str, ...]:
+    """Die Arten von Material, die das Feld ``feld`` nimmt (:func:`materialfeld`)."""
+    return next(f for f in dataclasses.fields(cls) if f.name == feld).metadata["stoffe"]
+
+
 def teil(fabrik: Callable[[], Any], *, heisst: str) -> Any:
     """
     Ein Feld, das einen ganzen Eintrag haelt -- die Grundbewehrung einer Lage,
@@ -204,6 +225,9 @@ def feldangaben(cls: type) -> Dict[str, Dict[str, Any]]:
     (:attr:`Bereich.quer_zu`, ``mindestens``). Die Zahl des anderen Feldes
     kennt erst die Maske.
 
+    Nimmt ein Feld ein Material (:func:`materialfeld`), steht dort, welche
+    Arten: ``stoffe``.
+
     Haelt ein Feld je Material eine Wahl (:func:`je_material`), steht dort,
     was ein Material ohne eigene waehlt: ``vorgabe`` -- und ist die Wahl
     begrenzt, was sie annehmen kann, in ihrer Folge: ``wahl``. Danach
@@ -221,6 +245,8 @@ def feldangaben(cls: type) -> Dict[str, Dict[str, Any]]:
         angabe = b.angabe() if b is not None else {}
         if typen.get(f.name) is int:
             angabe["ganz"] = True
+        if "stoffe" in f.metadata:
+            angabe["stoffe"] = list(f.metadata["stoffe"])
         if "je_material" in f.metadata:
             angabe["vorgabe"] = f.metadata["je_material"]
             if "wahl" in f.metadata:
@@ -251,8 +277,9 @@ def feldtypen(cls: type) -> Dict[str, Dict[str, Any]]:
     ``ganz``, ``text``, ``ja/nein``, ``wahl`` (mit ``wahl``: was sie annehmen
     kann, :func:`wahl_von`), ``eintrag`` (mit ``klasse``: ihr Name im Katalog,
     :func:`katalogname`), ``liste`` oder ``zuordnung`` (mit ``von``: was darin
-    steht). ``leer``, wo statt eines Wertes auch keiner stehen darf. Einheit
-    und Grenzen sagt :func:`feldangaben`.
+    steht). ``leer``, wo statt eines Wertes auch keiner stehen darf;
+    ``stoffe`` bei der Kennung eines Materials, welche Arten das Feld nimmt
+    (:func:`materialfeld`). Einheit und Grenzen sagt :func:`feldangaben`.
     """
     typen = _typen(cls)
     return {f.name: _feldtyp(typen[f.name], f) for f in dataclasses.fields(cls)}
@@ -268,6 +295,8 @@ def _feldtyp(typ: Any, f: dataclasses.Field) -> Dict[str, Any]:
         return {"art": "eintrag", "klasse": katalogname(innen)}
     if _ist_wahl(innen):
         return {"art": "wahl", "wahl": [m.value for m in f.metadata.get("wahl") or innen]}
+    if "stoffe" in f.metadata:
+        return {"art": "text", "stoffe": list(f.metadata["stoffe"])}
     return {"art": _BLAETTER.get(innen, "wert")}
 
 

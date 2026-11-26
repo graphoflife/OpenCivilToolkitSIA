@@ -35,7 +35,7 @@ class TestVorlagen(unittest.TestCase):
         a = p.querschnittsanalysen[0]
         for liste in ("knoten", "flaechen", "staebe", "stablinien", "schubwaende"):
             setattr(a, liste, [])
-        neu = a.vorlage_einsetzen(schluessel, beton="b1", stahl="s1", **wahl)
+        neu = a.vorlage_einsetzen(schluessel, material="b1", stahl="s1", **wahl)
         return p, a, neu
 
     def test_jede_ist_gueltig_und_hat_ihre_flaeche(self):
@@ -70,7 +70,7 @@ class TestVorlagen(unittest.TestCase):
     def test_kommt_dazu_und_teilt_knoten(self):
         """Ein zweites Rechteck rechts daneben hängt an den zwei gemeinsamen Ecken."""
         a = balken()
-        neu = a.vorlage_einsetzen("rechteck", beton="b1", stahl="s1", bewehrung=False,
+        neu = a.vorlage_einsetzen("rechteck", material="b1", stahl="s1", bewehrung=False,
                                   schubwaende=False, ursprung=(300.0, 0.0))
         self.assertEqual(neu, ["F2"])
         self.assertEqual(len(a.flaechen), 2)
@@ -132,7 +132,7 @@ class TestVorlagen(unittest.TestCase):
     def test_einsetzen_ueber_den_dienst(self):
         p = projekt()
         d = dienst.bearbeite("vorlage_einsetzen", {
-            "projekt": p.als_dict(), "kennung": "a1", "beton": "b1", "stahl": "s1",
+            "projekt": p.als_dict(), "kennung": "a1", "material": "b1", "stahl": "s1",
             "wahl": {"art": "kreis", "masse": {"D": 400}}, "ursprung": [400, 0]}).daten
         self.assertEqual(d["neu"][0], "F2")
         self.assertEqual(len(d["neu"]), 9)

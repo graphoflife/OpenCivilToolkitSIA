@@ -16,8 +16,11 @@ from typing import TYPE_CHECKING, Any, Dict, Mapping
 
 from opencivil.material.basis import Baustoff
 from opencivil.material.spannstahl import erzeugnis
-from opencivil.projekt.lesen import ProjektFehler, als_groesse, ort_von
-from opencivil.projekt.querschnittsanalyse import QuerschnittsanalyseEintrag
+from opencivil.projekt.lesen import ProjektFehler, als_groesse, ort_von, stoffe_des_felds
+from opencivil.projekt.querschnittsanalyse import (
+    FlaecheEintrag, QuerschnittsanalyseEintrag, SchubwandEintrag, StabEintrag, StablinieEintrag,
+)
+from opencivil.projekt.spannglieder import SpanngliedEintrag
 from opencivil.nachweis.qa_gebrauch import AnalyseStellen, RissnormalkraftQA, ZwaengungBiegungQA
 from opencivil.nachweis.qa_kennzahlen import KennzahlenQA
 from opencivil.nachweis.qa_knicken import KnickenQA, QAKnickfall
@@ -25,6 +28,7 @@ from opencivil.nachweis.richtungsnachweise import DuktilitaetQA, SproedesVersage
 from opencivil.nachweis.schiefe_biegung import SchiefeBiegung
 from opencivil.nachweis.schubwandnachweis import Schubwandnachweis, schub_belastet
 from opencivil.querschnitt.analyse import Flaechenteil, Lastfall, Querschnittsanalyse
+from opencivil.querschnitt.bauweise import Bauweise
 from opencivil.querschnitt.biegung import EINACHSIG, SCHIEF
 from opencivil.querschnitt.geometrie import GeometrieFehler
 from opencivil.querschnitt.spannglieder import Spannglied, aus_glied
@@ -50,6 +54,11 @@ def bauen(art: "Bauteilart", eintrag: QuerschnittsanalyseEintrag,
     (:func:`~opencivil.projekt.aufbau.kern.spannungsnachweise`), und das
     Knicken, sobald ein Fall eingeschaltet ist.
 
+    Das alles beim Stahlbeton. Ein Querschnitt aus Stahl, Holz oder im
+    Verbund (:mod:`~opencivil.querschnitt.bauweise`) rechnet bisher nur seine
+    Werte -- Flaeche, Schwerpunkt, Traegheitsmomente --, und seine
+    Zusammenfassung sagt, dass die Nachweise fehlen (:func:`ohne_nachweise`).
+
     Ist noch nichts gezeichnet (:attr:`QuerschnittsanalyseEintrag.leer`), gibt
     es nichts zu rechnen und kein Bauteil -- aber auch keinen Fehler, der das
     ganze Projekt aufhielte: so beginnt jede neue Analyse (Benutzer,
@@ -65,6 +74,14 @@ def bauen(art: "Bauteilart", eintrag: QuerschnittsanalyseEintrag,
         raise ProjektFehler(str(fehler), wo=ort_von(eintrag)) from None
     analyse.ins_rechenwerk(aufbau.werk)
     teil = Bauteil(eintrag, art, analyse)
+    fehlt = ohne_nachweise(analyse.bauweise)
+    if fehlt:
+        # Die Werte des Querschnitts rechnet jede Bauweise -- der Bericht
+        # zeigt sie, ein Stab im Balkensystem nimmt sie --, die Nachweise
+        # bisher nur der Stahlbeton.
+        teil.weitere_ziele += [d.id for d in (*analyse.d_brutto.values(), analyse.d_torsion)]
+        aufbau.ohne_nachweis(teil, ort_von(eintrag), fehlt)
+        return teil
     stoffe = stoffe_von(aufbau, analyse.baustoffe)
 
     # Die Lastfaelle in SI, aus der Einheit ihrer Felder: N, M_y ... aus
@@ -120,6 +137,19 @@ def bauen(art: "Bauteilart", eintrag: QuerschnittsanalyseEintrag,
     return teil
 
 
+def ohne_nachweise(bauweise: Bauweise) -> str:
+    """
+    Warum ein Querschnitt dieser Bauweise keinen Nachweis hat -- leer beim
+    Stahlbeton. Ein Satzteil ohne Punkt, fuer die Zusammenfassung
+    (:meth:`~opencivil.projekt.aufbau.kern.Aufbau.ohne_nachweis`) und fuer die
+    Zeichnung (:func:`~opencivil.web.zeichengeometrie.geometrie`).
+    """
+    if bauweise is Bauweise.STAHLBETON:
+        return ""
+    return (f"einen {bauweise.querschnitt} weist das Werkzeug nach {bauweise.norm} noch "
+            f"nicht nach")
+
+
 def _in_si(fall: Any, *groessen: str) -> Dict[str, float]:
     """
     Je Groesse ``N``, ``M_y`` ... die Zahl ihres Feldes ``N_Ed``, ``M_y_Ed``
@@ -136,8 +166,10 @@ def _analyse(eintrag: QuerschnittsanalyseEintrag, baustoffe: Mapping[str, Bausto
     """
     wo = ort_von(eintrag)
 
-    def stoff(kennung: str, was: str, art: str) -> Baustoff:
-        return material(baustoffe, kennung, art, wo, was)
+    def stoff(element: Mapping, feld: str, klasse: type) -> Baustoff:
+        """Das Material im Feld ``feld`` eines Elements -- von einer Art, die das Feld nimmt."""
+        return material(baustoffe, element[feld], stoffe_des_felds(klasse, feld), wo,
+                        element["name"])
 
     elemente = eintrag.elemente()
     if elemente.fehler:
@@ -145,17 +177,13 @@ def _analyse(eintrag: QuerschnittsanalyseEintrag, baustoffe: Mapping[str, Bausto
         # wegzulassen hiesse, mit einem anderen Querschnitt zu rechnen.
         raise GeometrieFehler(elemente.fehler[0]["text"])
     flaechen = [Flaechenteil(name=f["name"], kennung=f["kennung"], punkte=f["punkte"],
-                             stoff=stoff(f["material"], f["name"], "beton")
-                             if f["material"] else None)
+                             stoff=stoff(f, "material", FlaecheEintrag) if f["material"] else None)
                 for f in elemente.polygone]
-    staebe = [{**s, "stahl": stoff(s["stahl"], s["name"], "betonstahl")}
-              for s in elemente.staebe]
-    linien = [{**l, "stahl": stoff(l["stahl"], l["name"], "betonstahl")}
-              for l in elemente.linien]
-    waende = [{**w, "stahl": stoff(w["stahl"], w["name"], "betonstahl")
-               if w["durchmesser"] > 0 else None}
+    staebe = [{**s, "stahl": stoff(s, "stahl", StabEintrag)} for s in elemente.staebe]
+    linien = [{**l, "stahl": stoff(l, "stahl", StablinieEintrag)} for l in elemente.linien]
+    waende = [{**w, "stahl": stoff(w, "stahl", SchubwandEintrag) if w["durchmesser"] > 0 else None}
               for w in elemente.waende]
-    glieder = [_glied(g, stoff(g["stahl"], g["name"], "spannstahl"), wo)
+    glieder = [_glied(g, stoff(g, "stahl", SpanngliedEintrag), wo)
                for g in elemente.spannglieder]
     # Jeder Baustoff bekommt seine Wahl, auch wer keine eigene hat: so steht
     # die Vorgabe nur an der Beschreibung.

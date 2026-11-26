@@ -52,6 +52,7 @@ from opencivil.projekt.aufbau.kern import kennwertbereich
 from opencivil.projekt.lesen import eintragsklassen, feldangaben, katalogname, wahl_von
 from opencivil.projekt.projekt import APPLISTEN, Projekt
 from opencivil.projekt.querschnittsanalyse import SCHNITTE
+from opencivil.querschnitt.bauweise import BEWEHRT
 from opencivil.querschnitt.platte import BREITE_Y_MM
 from opencivil.querschnitt.spannglieder import (
     NEIGUNG_ERKLAERT, VORGABE_SPANNUNG, Spannwirkung, Verbund,
@@ -327,6 +328,8 @@ def katalog() -> dict:
                 for v in VORLAGEN
             ],
             "randabstand": RANDABSTAND.als_dict(),
+            # Worin Bewehrung liegt: eine Vorlage aus anderem kommt ohne.
+            "bewehrt": BEWEHRT.value,
             # Die Schalter eines Spannglieds, was seine leeren Spannungen
             # heissen und was seine Neigung -- die Regeln stehen in
             # opencivil.querschnitt.spannglieder. Je Wirkung, ob die Neigung

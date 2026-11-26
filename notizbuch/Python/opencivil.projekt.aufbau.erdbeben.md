@@ -1,5 +1,5 @@
 ---
-erzeugt: 232b83a916b0
+erzeugt: f87fbf727d85
 art: modul
 tags: [modul]
 ---
@@ -39,9 +39,10 @@ def wandquerschnitt(wand: TragwandEintrag, aufbau: Aufbau) -> Union[Wandquerschn
 Was eine Wand aus ihrer Querschnittsanalyse nimmt -- oder warum sie
 nichts nehmen kann, klein beginnend: noch keine gewaehlt, eine, die es
 nicht mehr gibt oder die nicht rechnet, oder eine mit mehr als einem
-Beton -- E_cm gilt nur fuer einen. Alles das fehlt nur, nichts ist
-falsch: eine Analyse, die rechnet, hat ein Polygon, und jedes ist aus
-Beton ([[opencivil.projekt.aufbau.querschnittsanalyse]]).
+Beton -- E_cm gilt nur fuer einen. Das fehlt nur. Falsch ist eine
+Analyse aus Holz, Stahl oder im Verbund
+([[opencivil.querschnitt.bauweise|bauweise]]): die Steifigkeit einer Wand
+nimmt E_cm, sie ist aus Stahlbeton -- und hat damit einen Beton.
 
 
 ## Braucht
@@ -52,6 +53,7 @@ Beton ([[opencivil.projekt.aufbau.querschnittsanalyse]]).
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.erdbeben]]
 - [[opencivil.projekt.lesen]]
+- [[opencivil.querschnitt.bauweise]]
 
 ## Gebraucht von
 

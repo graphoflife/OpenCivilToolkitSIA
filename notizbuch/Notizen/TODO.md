@@ -1575,11 +1575,13 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       Schnittgrössen eines Stabs als Einwirkung einer Platte oder
       Querschnittsanalyse.
 
-- [ ] **Querschnittsanalyse, nächste Schritte** (je ein eigener Plan):
-      Baustahl (Verbundquerschnitt, Stahlwände mit eigenem G; in der
-      Zeichnung pastellblau, `--mat-baustahl` -- die Sortentabelle steht
-      seit 2026-11-15, das Gesetz seit 2026-11-26), Holz (wie spröd Zug und Druck sind, legen wir
-      vorher fest), weitere Nachweise (Wände ohne Bügel).
+- [ ] **Querschnittsanalyse, nächste Schritte:** Flächen aus Holz und
+      Baustahl gibt es seit 2026-11-26, mit ihren Querschnittswerten, aber
+      ohne Nachweis (Plan vom 2026-11-25: die Spannung-Dehnung-Analysen je
+      Bauweise in Schritt 11b, die Profile in 11c, die Nachweise nach
+      SIA 263, 265 und 264 in den Schritten 12 bis 14). Ein E_eq im
+      Balkensystem gibt es bis dahin nur beim Stahlbeton. Dazu weitere
+      Nachweise (Wände ohne Bügel).
 - [ ] **Baustahl: die Wärmedehnzahl** α_T = 10·10⁻⁶/°C (SIA 263:2013,
       3.2.2.2) fehlt -- es gibt keine Temperatur als Einheit, und keine
       Rechnung braucht sie. Kommt mit der ersten, die sie braucht.

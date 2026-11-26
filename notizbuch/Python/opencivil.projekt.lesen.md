@@ -1,5 +1,5 @@
 ---
-erzeugt: 6edf1170b1ce
+erzeugt: f1ea144fff1a
 art: modul
 tags: [modul]
 ---
@@ -16,6 +16,9 @@ Feldern der Datenklassen. Was ein Feld annehmen darf, steht an ihm selbst:
   oder eine Wahl ([[opencivil.core.wahl#Wahl|Wahl]]), deren Mitglieder es
   annimmt;
 * eine Teilmenge davon ([[opencivil.projekt.lesen#einer_von|einer_von]]) -- die Werte, die es gibt;
+* bei der Kennung eines Materials die Arten, die es nehmen darf
+  ([[opencivil.projekt.lesen#materialfeld|materialfeld]]) -- geprueft erst beim Aufbau, denn welches Material
+  welche Art hat, weiss nur das Projekt;
 * ein Text ohne Vorgabe ist Pflicht und darf nicht leer sein -- ausser einem
   Namen: ohne ihn haelt erst das Rechnen sein Bauteil an
   ([[opencivil.projekt.lesen#inhalt_pruefen|inhalt_pruefen]]);
@@ -113,6 +116,28 @@ def einer_von(moeglich: Iterable[Any], vorgabe: Any=dataclasses.MISSING) -> Any
 
 Ein Feld, das nur einen dieser Werte annimmt -- die Pruefung kennt sie von hier.
 
+### materialfeld
+
+```python
+def materialfeld(*arten: str) -> Any
+```
+
+Ein Feld mit der Kennung eines Materials des Projekts, leer, solange
+keines gewaehlt ist -- und die Arten, die es nehmen darf: die eine Stelle
+dafuer. Der Aufbau prueft die Wahl damit
+([[opencivil.projekt.aufbau.kern#material|material]]), die Zeichnung ebenso,
+und die Maske bietet nur diese Arten an ([[opencivil.projekt.lesen#feldangaben|feldangaben]],
+`stoffe`). Seit 2026-11-26 nimmt eine Flaeche der Querschnittsanalyse
+Beton, Baustahl oder Holz; bis dahin stand «beton» an drei Stellen fest.
+
+### stoffe_des_felds
+
+```python
+def stoffe_des_felds(cls: type, feld: str) -> Tuple[str, ...]
+```
+
+Die Arten von Material, die das Feld `feld` nimmt ([[opencivil.projekt.lesen#materialfeld|materialfeld]]).
+
 ### teil
 
 ```python
@@ -197,6 +222,9 @@ an beiden Feldern, mit dem kleinsten Abstand als Linien in Grad
 ([[opencivil.core.bereich#Bereich|Bereich.quer_zu]], `mindestens`). Die Zahl des anderen Feldes
 kennt erst die Maske.
 
+Nimmt ein Feld ein Material ([[opencivil.projekt.lesen#materialfeld|materialfeld]]), steht dort, welche
+Arten: `stoffe`.
+
 Haelt ein Feld je Material eine Wahl ([[opencivil.projekt.lesen#je_material|je_material]]), steht dort,
 was ein Material ohne eigene waehlt: `vorgabe` -- und ist die Wahl
 begrenzt, was sie annehmen kann, in ihrer Folge: `wahl`. Danach
@@ -217,8 +245,9 @@ schreibt, den MCP-Zugang ([[opencivil.mcp]]). `art` ist `zahl`,
 `ganz`, `text`, `ja/nein`, `wahl` (mit `wahl`: was sie annehmen
 kann, [[opencivil.projekt.lesen#wahl_von|wahl_von]]), `eintrag` (mit `klasse`: ihr Name im Katalog,
 [[opencivil.projekt.lesen#katalogname|katalogname]]), `liste` oder `zuordnung` (mit `von`: was darin
-steht). `leer`, wo statt eines Wertes auch keiner stehen darf. Einheit
-und Grenzen sagt [[opencivil.projekt.lesen#feldangaben|feldangaben]].
+steht). `leer`, wo statt eines Wertes auch keiner stehen darf;
+`stoffe` bei der Kennung eines Materials, welche Arten das Feld nimmt
+([[opencivil.projekt.lesen#materialfeld|materialfeld]]). Einheit und Grenzen sagt [[opencivil.projekt.lesen#feldangaben|feldangaben]].
 
 ### _bereiche
 
@@ -537,3 +566,4 @@ Ein Wert, wie er in einer Meldung steht -- ein Text in Anfuehrungszeichen.
 - [[opencivil.projekt.staebe]]
 - [[opencivil.web.api]]
 - [[opencivil.web.systemkatalog]]
+- [[opencivil.web.zeichengeometrie]]

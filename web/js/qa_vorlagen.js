@@ -16,11 +16,13 @@
  */
 
 import { api } from './api.js';
-import { hakenSchalter } from './bausteine.js';
+import { hakenSchalter, materialliste } from './bausteine.js';
 import { pfad } from './cad_ansicht.js';
 import { schalterzeile } from './cad_palette.js';
 import { el, grenzeVerletzt, melden, svgEl, zahlfeld } from './dom.js';
-import { katalog, zustand } from './zustand.js';
+import {
+  eintragVon, feldangabe, katalog, zustand,
+} from './zustand.js';
 
 /** Die Vorlagen, wie der Kern sie kennt. */
 function vorlagen() {
@@ -83,9 +85,10 @@ function masslinie(g, m, nach) {
 
 /**
  * Die Teile einer Vorlage als kleines Bild, `breite` × `hoehe` px -- mit
- * Masslinien, wenn `masse`, sonst als Bildchen für ihren Knopf.
+ * Masslinien, wenn `masse`, sonst als Bildchen für ihren Knopf. Die
+ * Flächen haben die Klasse `flaeche`: die ihres Materials.
  */
-function skizze(teile, breite, hoehe, { masse = true } = {}) {
+function skizze(teile, breite, hoehe, { masse = true, flaeche = 'cad-beton' } = {}) {
   const bild = svgEl('svg', {
     viewBox: `0 0 ${breite} ${hoehe}`, width: breite, height: hoehe, class: 'cad-skizze',
   });
@@ -102,7 +105,7 @@ function skizze(teile, breite, hoehe, { masse = true } = {}) {
   const nach = (p) => [ox + s * p[0], oy - s * p[1]];
   const g = svgEl('g');
   for (const p of teile.polygone) {
-    g.append(svgEl('path', { d: pfad(v, p.punkte), class: p.aussparung ? 'cad-loch' : 'cad-beton' }));
+    g.append(svgEl('path', { d: pfad(v, p.punkte), class: p.aussparung ? 'cad-loch' : flaeche }));
   }
   for (const w of teile.schubwaende) {
     g.append(svgEl('path', {
@@ -170,8 +173,13 @@ function massZeile(mass, wert, setzen) {
   return zeile(mass.heisst, feld, mass.angabe.einheit || '');
 }
 
-/** Öffnet das Fenster der Vorlagen -- oder schliesst es, wenn es schon offen ist. */
-export function vorlageOeffnen(a) {
+/**
+ * Öffnet das Fenster der Vorlagen -- oder schliesst es, wenn es schon offen
+ * ist. `vorgaben` sind die der Zeichnung, geprüft gegen das Projekt: aus
+ * ihrem Material sind die Flächen, aus ihrem Stahl die Bewehrung. Wie eine
+ * Fläche aussieht, sagt `flaechenklasse(material)`.
+ */
+export function vorlageOeffnen(a, vorgaben, flaechenklasse) {
   if (a.dialog) {
     a.dialog.schliessen();
     return;
@@ -184,14 +192,22 @@ export function vorlageOeffnen(a) {
   };
   a.dialog = { schliessen };
   a.teile.flaeche.append(knoten);
-  vorlageZeichnen(a, knoten);
+  vorlageZeichnen(a, knoten, vorgaben, flaechenklasse);
 }
 
-function vorlageZeichnen(a, knoten) {
+function vorlageZeichnen(a, knoten, vorgaben, flaechenklasse) {
   const w = wahlVon(a);
   const v = vorlagen().find((x) => x.schluessel === w.art) || vorlagen()[0];
   w.art = v.schluessel;
-  const neu = () => vorlageZeichnen(a, knoten);
+  const neu = () => vorlageZeichnen(a, knoten, vorgaben, flaechenklasse);
+  // Bewehrung und Schubwände liegen nur im Beton (Benutzer, 2026-11-25):
+  // aus Holz oder Baustahl kommt die Vorlage ohne, und ihre Schalter warten,
+  // bis das Material wieder Beton ist.
+  const { material } = vorgaben.flaechen;
+  const bewehrt = eintragVon(material)?.art === katalog('querschnittsanalyse', 'bewehrt');
+  const anfrage = () => structuredClone({
+    ...w, bewehrung: bewehrt && w.bewehrung, schubwaende: bewehrt && w.schubwaende,
+  });
 
   const bild = el('div.cad-vorlagenskizze');
   const meldung = el('p.cad-meldung', { hidden: true });
@@ -202,7 +218,9 @@ function vorlageZeichnen(a, knoten) {
         const teile = a.qa.vorlagenteile;
         if (!teile) return;
         a.dialog?.schliessen();
-        a.starten(einsetzenBefehl(v.name, structuredClone(w), teile));
+        a.starten(einsetzenBefehl(v.name, anfrage(), teile, {
+          material, stahl: vorgaben.stablinien.stahl,
+        }));
       },
     },
   });
@@ -213,7 +231,7 @@ function vorlageZeichnen(a, knoten) {
     const nr = (a.qa.vorlagenfrage || 0) + 1;
     a.qa.vorlagenfrage = nr;
     bild.classList.add('ist-alt');
-    api.vorlage(w).then((antwort) => {
+    api.vorlage(anfrage()).then((antwort) => {
       if (a.qa.vorlagenfrage !== nr) return;
       meldung.hidden = !antwort.fehler;
       meldung.textContent = antwort.fehler || '';
@@ -221,7 +239,7 @@ function vorlageZeichnen(a, knoten) {
       a.qa.vorlagenteile = antwort.teile;
       if (antwort.teile) {
         bild.classList.remove('ist-alt');
-        bild.replaceChildren(skizze(antwort.teile, 276, 140));
+        bild.replaceChildren(skizze(antwort.teile, 276, 140, { flaeche: flaechenklasse(material) }));
       }
     }).catch((fehler) => melden(fehler.message, true));
   };
@@ -241,9 +259,19 @@ function vorlageZeichnen(a, knoten) {
     bild,
     ...v.masse.map((m) => massZeile(m, w.masse[m.schluessel] ?? m.vorgabe,
       (x) => { w.masse[m.schluessel] = x; holen(); })),
-    massZeile(randabstand(), w.randabstand, (x) => { w.randabstand = x; holen(); }),
-    mitOhne('Bewehrung', w.bewehrung, (x) => { w.bewehrung = x; holen(); }),
-    waende ? mitOhne('Schubwände', w.schubwaende, (x) => { w.schubwaende = x; holen(); }) : null,
+    zeile('Material', materialliste({
+      art: feldangabe('flaeche', 'material').stoffe, gewaehlt: material,
+      titel: 'Woraus die Flächen der Vorlage sind – so auch das nächste Polygon',
+      setzen: (x) => { vorgaben.flaechen.material = x; neu(); },
+    })),
+    ...(bewehrt ? [
+      massZeile(randabstand(), w.randabstand, (x) => { w.randabstand = x; holen(); }),
+      mitOhne('Bewehrung', w.bewehrung, (x) => { w.bewehrung = x; holen(); }),
+      waende ? mitOhne('Schubwände', w.schubwaende, (x) => { w.schubwaende = x; holen(); }) : null,
+    ] : [el('p.hinweis', {
+      text: `${waende ? 'Bewehrung und Schubwände liegen' : 'Bewehrung liegt'} nur im Beton – `
+        + 'die Vorlage kommt ohne.',
+    })]),
     meldung,
     el('div.cad-dialog-fuss', {}, [einsetzen]),
   );
@@ -254,21 +282,10 @@ function vorlageZeichnen(a, knoten) {
 // Einsetzen
 // ===========================================================================
 
-/** Ein Beton und ein Stahl für die Vorlage -- die eingestellten, wenn es welche sind. */
-function stoffe(a) {
-  const v = a.qa.vorgaben;
-  const von = (art, kennung) => zustand.projekt.materialien.find((m) => m.art === art
-    && (!kennung || m.kennung === kennung))?.kennung || '';
-  return {
-    beton: von('beton', v.flaechen.material) || von('beton'),
-    stahl: von('betonstahl', v.stablinien.stahl) || von('betonstahl'),
-  };
-}
-
-async function einsetzen(a, wahl, ursprung) {
+/** Setzt die Vorlage ein -- ihre Flächen aus `stoffe.material`, ihre Bewehrung aus `stoffe.stahl`. */
+async function einsetzen(a, wahl, ursprung, { material, stahl }) {
   try {
-    const { beton, stahl } = stoffe(a);
-    const antwort = await api.vorlageEinsetzen(zustand.projekt, a.qa.kennung, wahl, ursprung, beton, stahl);
+    const antwort = await api.vorlageEinsetzen(zustand.projekt, a.qa.kennung, wahl, ursprung, material, stahl);
     a.aendern((z) => { Object.assign(z, antwort.elemente); }, { auswahl: () => antwort.neu });
   } catch (fehler) {
     melden(fehler.message, true);
@@ -276,13 +293,13 @@ async function einsetzen(a, wahl, ursprung) {
 }
 
 /** Der Befehl nach «Einsetzen»: ein Punkt für die Ecke unten links. */
-function einsetzenBefehl(name, wahl, teile) {
+function einsetzenBefehl(name, wahl, teile, stoffe) {
   return {
     name: 'vorlage',
     frage: () => `${name}: Einsetzpunkt`,
     hinweis: 'Die Ecke unten links kommt an den Punkt · Enter ohne Zahlen: Ursprung',
     punkt(a, erg) {
-      einsetzen(a, wahl, erg.p);
+      einsetzen(a, wahl, erg.p, stoffe);
       a.ende();
     },
     vorschau(a, g) {
@@ -297,7 +314,7 @@ function einsetzenBefehl(name, wahl, teile) {
       }
     },
     enter(a) {
-      einsetzen(a, wahl, [0, 0]);
+      einsetzen(a, wahl, [0, 0], stoffe);
       return false;
     },
     zurueck: () => false,

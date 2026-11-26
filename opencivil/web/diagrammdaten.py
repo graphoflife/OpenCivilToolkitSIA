@@ -534,8 +534,13 @@ def analyse(aufbau: Aufbau, loesung: Loesung, kennung: str,
 
     Die Einwirkung steht so da, wie nachgewiesen: mit der Laengszugkraft aus
     Querkraft und Torsion, wo sie zugeschaltet ist.
+
+    Ein Querschnitt ohne Nachweise -- aus Holz etwa -- hat weder die Flaeche
+    noch Lastfaelle; ``ohne_nachweis`` sagt in einem Satz, warum. Beim
+    Stahlbeton ist er leer.
     """
     bauteil = aufbau.querschnittsanalysen[kennung]
+    ohne = aufbau.teile[kennung].ohne_nachweis
     biegung = aufbau.feld("qa_biegung").get(kennung)
     schub = aufbau.feld("qa_schub").get(kennung)
     # Ohne Befund lief der Nachweis nicht -- etwa, weil ein Baustoff fehlt.
@@ -573,6 +578,7 @@ def analyse(aufbau: Aufbau, loesung: Loesung, kennung: str,
         "zeichnung": zeichnung(bauteil),
         "interaktion": _interaktion(q, einachsig, *schnitt) if q is not None else None,
         "faelle": faelle,
+        "ohne_nachweis": f"Kein Interaktionsdiagramm: {ohne}." if ohne else "",
     }
 
 

@@ -197,10 +197,13 @@ export const api = {
    * `wahl` = {art, masse, randabstand, bewehrung, schubwaende}.
    */
   vorlage: (wahl) => ruf('vorlage', { wahl }),
-  /** Setzt eine Vorlage ein; zurück kommen die Elementlisten der Analyse und was neu ist. */
-  vorlageEinsetzen: (projekt, kennung, wahl, ursprung, beton, stahl) =>
+  /**
+   * Setzt eine Vorlage ein, ihre Flächen aus `material`, ihre Bewehrung aus
+   * `stahl`; zurück kommen die Elementlisten der Analyse und was neu ist.
+   */
+  vorlageEinsetzen: (projekt, kennung, wahl, ursprung, material, stahl) =>
     ruf('vorlage_einsetzen', {
-      projekt, kennung, wahl, ursprung, beton, stahl,
+      projekt, kennung, wahl, ursprung, material, stahl,
     }),
   /**
    * Ein Balkensystem: ohne `fall` die Übersicht -- Meldungen, Knoten ohne

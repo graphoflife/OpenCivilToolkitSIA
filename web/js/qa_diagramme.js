@@ -19,6 +19,9 @@
  *                   jedes Stabs -- gezogen kupfer, gedrückt blau;
  *   Schubfluss      je Schubwand ein Pfeil, so lang wie ihr Fluss.
  *
+ * Ein Querschnitt ohne Nachweise -- aus Holz etwa -- zeigt nur sich und
+ * den Satz des Kerns, warum es nicht mehr gibt.
+ *
  * Die Daten kommen aus einer eigenen Anfrage (`analysediagramme`): die
  * Fläche braucht Bruchzustände, die kein Nachweis braucht, und soll nicht
  * jede Rechnung verlangsamen. Gefragt wird erst, wenn die Rechnung zur
@@ -630,6 +633,7 @@ export function analyseKarten(kennung) {
   const umriss = querschnittbild(daten.zeichnung);
   const querschnitt = karte('Querschnitt', [umriss],
     { bild: umriss.querySelector('svg'), klasse: veraltet ? 'ist-veraltet' : '' });
+  if (daten.ohne_nachweis) return [querschnitt, karte(null, [leerzustand(daten.ohne_nachweis)])];
   const interaktion = interaktionskarte(kennung, daten, veraltet);
   if (!daten.faelle.length) {
     return [querschnitt, interaktion, karte('Lastfall', [leerzustand('Kein Lastfall.')])];

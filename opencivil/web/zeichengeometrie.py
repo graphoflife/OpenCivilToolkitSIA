@@ -20,15 +20,21 @@ N/mm², die Vordehnung in Promille, Kraefte in kN.
 from __future__ import annotations
 
 import math
-from typing import Dict, List, Mapping, NamedTuple, Optional, Sequence
+from typing import Dict, List, Mapping, NamedTuple, Optional, Sequence, Tuple
 
 from opencivil.core.protokoll import Abschnitt
 from opencivil.core.rechenwerk import Rechenwerk
 from opencivil.material.basis import Baustoff, Baustoffart
 from opencivil.material.spannstahl import erzeugnis
 from opencivil.projekt.aufbau.kern import baustoff_im_werk, materialgrund
-from opencivil.projekt.aufbau.querschnittsanalyse import erzeugnis_grund
+from opencivil.projekt.aufbau.querschnittsanalyse import erzeugnis_grund, ohne_nachweise
+from opencivil.projekt.lesen import stoffe_des_felds
+from opencivil.projekt.querschnittsanalyse import (
+    FlaecheEintrag, SchubwandEintrag, StabEintrag, StablinieEintrag,
+)
+from opencivil.projekt.spannglieder import SpanngliedEintrag
 from opencivil.querschnitt.analyse import Zeichnung
+from opencivil.querschnitt.bauweise import BEWEHRT, Mischung, bauweise
 from opencivil.querschnitt.geometrie import (
     Linienart, aequivalenter_durchmesser, buegelgehalt, linie_in_ueberdeckung, linienflaeche,
     stab_in_ueberdeckung, ueberdeckungspolygon,
@@ -49,7 +55,13 @@ def geometrie(eintrag, projekt) -> dict:
     kann nur das Projekt wissen. Ebenso ein Verweis auf einen Knoten, den es
     nicht gibt, und ein Spannglied, dessen Durchmesser es in seiner Sorte
     nicht gibt. ``fehler`` sagt je Meldung, ob etwas nicht stimmt oder nur
-    fehlt: ein geloeschter Stahl ist zu ersetzen, kein Widerspruch.
+    fehlt: ein geloeschter Stahl ist zu ersetzen, kein Widerspruch. Sind die
+    Materialien zusammen keine Bauweise (:func:`bauweise`), sagt es eine
+    Meldung ohne Element, grau.
+
+    ``ohne_nachweise`` ist der Satz, warum ein Querschnitt dieser Bauweise
+    keinen Nachweis hat -- leer beim Stahlbeton und ohne Bauweise. Danach
+    zeigt die Analyse ihre Kacheln (:func:`ohne_nachweise`).
 
     ``gueltig`` heisst: die Zeichnung rechnet. Eine Spannung ueber der
     Grenze der Norm steht rot am Glied, haelt die Rechnung aber nicht an --
@@ -58,36 +70,54 @@ def geometrie(eintrag, projekt) -> dict:
     stoffe = {m.kennung: (m.art, m.anzeigename) for m in projekt.materialien}
     elemente = eintrag.elemente()
     vorab: List[dict] = [{**m, "fehler": True} for m in elemente.fehler]
+    passend: List[Tuple[str, str]] = []
 
-    def stoff_pruefen(e: dict, feld: str, art: str) -> None:
+    def stoff_pruefen(e: dict, feld: str, klasse: type) -> None:
         gefunden = stoffe.get(e[feld])
-        grund = materialgrund(e[feld], gefunden, art)
+        grund = materialgrund(e[feld], gefunden, stoffe_des_felds(klasse, feld))
         if grund:
             vorab.append({"text": f"{e['name']}: {grund.text}.", "elemente": [e["kennung"]],
                           "fehler": grund.falsch})
+        else:
+            passend.append(gefunden)
 
     for f in elemente.polygone:
         if f["material"]:  # ohne Material eine Aussparung
-            stoff_pruefen(f, "material", "beton")
-    for e in (*elemente.staebe, *elemente.linien, *elemente.waende):
-        stoff_pruefen(e, "stahl", "betonstahl")
-    for g in elemente.spannglieder:
-        stoff_pruefen(g, "stahl", "spannstahl")
+            stoff_pruefen(f, "material", FlaecheEintrag)
+    for klasse, liste in ((StabEintrag, elemente.staebe), (StablinieEintrag, elemente.linien),
+                          (SchubwandEintrag, elemente.waende),
+                          (SpanngliedEintrag, elemente.spannglieder)):
+        for e in liste:
+            stoff_pruefen(e, "stahl", klasse)
+    try:
+        art = bauweise(passend)
+    except Mischung as mischung:
+        art = None
+        vorab.append({"text": str(mischung), "elemente": [], "fehler": False})
     glieder = _spannglieder(elemente.spannglieder, projekt)
     vorab.extend(glieder.fehlt)
     # Ohne Erzeugnis zeichnet sich ein Glied in seinem Nenndurchmesser.
     gross = {g["kennung"]: (glieder.gebaut[g["kennung"]].durchmesser
                             if g["kennung"] in glieder.gebaut else g["durchmesser"])
              for g in elemente.spannglieder}
+    # Bewehrung liegt nur im Beton -- nicht in Holz, nicht in Baustahl, nicht
+    # in einer Aussparung. Ein Material, das fehlt oder nicht passt, meldet
+    # sich selbst; bis es ersetzt ist, gilt seine Flaeche als Beton -- sonst
+    # kaeme zu seiner Meldung eine an jedem Stab in ihr.
+    fremd = set(stoffe_des_felds(FlaecheEintrag, "material")) - {BEWEHRT.value}
+    beton = [bool(f["material"]) and stoffe.get(f["material"], ("",))[0] not in fremd
+             for f in elemente.polygone]
     z = Zeichnung(
-        polygone=[{**f, "traegt": bool(f["material"])} for f in elemente.polygone],
+        polygone=[{**f, "traegt": bool(f["material"]), "beton": b}
+                  for f, b in zip(elemente.polygone, beton)],
         staebe=elemente.staebe, linien=elemente.linien, waende=elemente.waende,
         spannglieder=[{**g, "durchmesser": gross[g["kennung"]]} for g in elemente.spannglieder])
     # Die Ueberdeckung, eine Hilfe beim Zeichnen: je Polygon das gerueckte,
     # je Stab, Stablinie und Spannglied, wo sie in ihr laegen -- fuer den
-    # Knopf «Überdeckung beachten». Ohne Ueberdeckung jeweils nichts.
+    # Knopf «Überdeckung beachten». Ohne Ueberdeckung jeweils nichts. Fuer die
+    # Bewehrung ist jede Flaeche ohne Beton wie eine Aussparung: von ihrem
+    # Rand haelt sie Abstand, etwa im Verbund vom Stahlprofil.
     punkte = [f["punkte"] for f in elemente.polygone]
-    traegt = [bool(f["material"]) for f in elemente.polygone]
     c = [f["ueberdeckung"] for f in elemente.polygone]
 
     def als_punkt(p):
@@ -97,7 +127,7 @@ def geometrie(eintrag, projekt) -> dict:
         return None if punkte is None else [list(p) for p in punkte]
 
     def punkt_ueberdeckt(lage, durchmesser):
-        return als_punkt(stab_in_ueberdeckung(lage, durchmesser / 2.0, punkte, traegt, c))
+        return als_punkt(stab_in_ueberdeckung(lage, durchmesser / 2.0, punkte, beton, c))
 
     def linie_ueberdeckt(l):
         # Verschmiert mit der Flaeche von Hand: Staebe mit 150 mm Teilung;
@@ -108,7 +138,7 @@ def geometrie(eintrag, projekt) -> dict:
         else:
             def radius(_laenge):
                 return l["durchmesser"] / 2.0
-        return als_liste(linie_in_ueberdeckung(l["von"], l["bis"], radius, punkte, traegt, c))
+        return als_liste(linie_in_ueberdeckung(l["von"], l["bis"], radius, punkte, beton, c))
 
     linien = []
     for l, linie in zip(elemente.linien, z.linien):
@@ -139,7 +169,7 @@ def geometrie(eintrag, projekt) -> dict:
             {"element": f["name"], "kennung": f["kennung"],
              "eltern": (z.eltern[i] if z.eltern is not None else None),
              "aussparung": not z.traegt[i],
-             "ueberdeckung": (als_liste(ueberdeckungspolygon(f["punkte"], c[i], traegt[i]))
+             "ueberdeckung": (als_liste(ueberdeckungspolygon(f["punkte"], c[i], beton[i]))
                               if c[i] > 0.0 else None)}
             for i, f in enumerate(elemente.polygone)],
         "brutto": None if b is None else {
@@ -173,7 +203,13 @@ def geometrie(eintrag, projekt) -> dict:
         # einen Querschnitt aus ihr nimmt. Bis 2026-10-18 zaehlte die
         # Oberflaeche sie ein zweites Mal.
         "materialien": eintrag.materialien(),
+        "ohne_nachweise": _als_satz(ohne_nachweise(art)) if art is not None else "",
     }
+
+
+def _als_satz(teil: str) -> str:
+    """Ein Satzteil als Satz: gross beginnend, mit Punkt -- leer bleibt leer."""
+    return f"{teil[0].upper()}{teil[1:]}." if teil else ""
 
 
 class _Glieder(NamedTuple):

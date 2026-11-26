@@ -25,6 +25,7 @@ from opencivil.core.protokoll import Abschnitt, Protokoll, Zwischenwerte
 from opencivil.core.wert import Quelle, WertDef
 from opencivil.material.basis import mit_index
 from opencivil.nachweis.rechenwahl import betonbezuege, lagenbezuege
+from opencivil.querschnitt.bauweise import Bauweise
 from opencivil.querschnitt.gesetzwahl import Rechenwahl
 from opencivil.querschnitt.platte import Richtung
 from opencivil.querschnitt.zugseite import Zugseite
@@ -277,8 +278,17 @@ class ModulAusAnalyse:
 
     def paar(self, M: float, wert: Callable[[str], float],
              wahl: Rechenwahl) -> Tuple[Optional[Paar], str, str]:
-        """Das Paar zur Zugseite von ``M``, wie sie heisst -- ohne Paar warum."""
+        """
+        Das Paar zur Zugseite von ``M``, wie sie heisst -- ohne Paar warum.
+        Eines gibt es bisher nur beim Stahlbeton: das Paar rechnet mit Riss
+        und Beton (:func:`~opencivil.spannungsanalyse.schnitt.schnittpaar`).
+        """
         seite = Zugseite.aus_moment(M)
+        bauweise = self.analyse.bauweise
+        if bauweise is not Bauweise.STAHLBETON:
+            return None, seite.beschriftung, (
+                f"das gibt es bisher nur für einen {Bauweise.STAHLBETON.querschnitt}, und "
+                f"«{self.analyse.name}» ist ein {bauweise.querschnitt}.")
         paar = schnittpaar(self.analyse, seite, wert, wahl)
         grund = "" if paar else f"der Querschnitt hat keine Bewehrung – {OHNE_BEWEHRUNG}"
         return paar, seite.beschriftung, grund

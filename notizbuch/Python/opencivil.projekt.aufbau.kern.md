@@ -1,5 +1,5 @@
 ---
-erzeugt: f12c5d6be597
+erzeugt: 9a5e970ebacb
 art: modul
 tags: [modul]
 ---
@@ -444,11 +444,13 @@ def baustoff_bauen(eintrag: MaterialEintrag, symbol_index: str, wo: str) -> Baus
 ### material
 
 ```python
-def material(baustoffe: Mapping[str, Baustoff], kennung: str, art: str, wo: str, feld: str) -> Baustoff
+def material(baustoffe: Mapping[str, Baustoff], kennung: str, art: Union[str, Sequence[str]], wo: str, feld: str) -> Baustoff
 ```
 
 Das Material, das `feld` des Bauteils `wo` waehlt: es muss es geben,
-und es muss von dieser Art sein. Ohne Angabe gilt nicht «das erste im
+und es muss von dieser Art sein -- oder von einer dieser Arten, etwa bei
+der Flaeche einer Querschnittsanalyse ([[opencivil.projekt.lesen#materialfeld|materialfeld]]).
+Ohne Angabe gilt nicht «das erste im
 Projekt» -- bis 2026-10-16 bekamen Buegel und Staebe ohne Stahl still den
 ersten. `feld` heisst wie in der Oberflaeche: was nicht stimmt, steht
 am Bauteil ([[opencivil.projekt.aufbau.kern#Aufbau.unfertig|Aufbau.unfertig]]), dort genuegt das Feld.
@@ -478,12 +480,13 @@ sie anhaelt (Benutzer, 2026-11-19).
 ### materialgrund
 
 ```python
-def materialgrund(kennung: str, gefunden: Optional[Tuple[str, str]], art: str) -> Optional[Grund]
+def materialgrund(kennung: str, gefunden: Optional[Tuple[str, str]], art: Union[str, Sequence[str]]) -> Optional[Grund]
 ```
 
 Was an der Wahl eines Materials nicht stimmt, ohne Ort -- `None`, wenn
 sie stimmt. `gefunden` sind Art und Name des gewaehlten, `None`, wenn
-es das nicht gibt. Falsch ist nur die falsche Art; ein geloeschtes oder
+es das nicht gibt; `art` eine Art oder mehrere, die passen. Falsch ist
+nur die falsche Art -- «ist kein Beton, Baustahl oder Holz»; ein geloeschtes oder
 noch nicht gewaehltes fehlt nur. Das geloeschte nennt der Satz nicht beim
 Namen: den kennt das Projekt nicht mehr, und die Kennung steht nirgends,
 wo der Benutzer sie saehe -- bis 2026-11-19 hiess es «das Material 'b9'».

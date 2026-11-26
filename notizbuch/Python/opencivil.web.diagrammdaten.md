@@ -1,5 +1,5 @@
 ---
-erzeugt: 097a7a691a92
+erzeugt: 02311cdf6499
 art: modul
 tags: [modul]
 ---
@@ -201,6 +201,10 @@ demselben Querschnitt.
 
 Die Einwirkung steht so da, wie nachgewiesen: mit der Laengszugkraft aus
 Querkraft und Torsion, wo sie zugeschaltet ist.
+
+Ein Querschnitt ohne Nachweise -- aus Holz etwa -- hat weder die Flaeche
+noch Lastfaelle; `ohne_nachweis` sagt in einem Satz, warum. Beim
+Stahlbeton ist er leer.
 
 ### _als_kn
 

@@ -52,7 +52,7 @@ from opencivil.projekt.eintraege import (
 from opencivil.projekt.fallnamen import Fallnamen
 from opencivil.core.einheiten import KN, KNM, MM, MM2
 from opencivil.projekt.lesen import (
-    ProjektFehler, bereich, einer_von, je_material, ort_von, teil,
+    ProjektFehler, bereich, einer_von, je_material, materialfeld, ort_von, teil,
 )
 from opencivil.projekt.netz import Netz, neue_kennung
 from opencivil.projekt.spannglieder import SpanngliedEintrag
@@ -101,8 +101,12 @@ class FlaecheEintrag(Beschreibung):
     knoten: List[str] = field(default_factory=list)
     """Die Ecken als Knoten, der Reihe nach; die erste wird am Ende nicht wiederholt."""
 
-    material: str = ""
-    """Kennung des Materials; leer heisst Aussparung."""
+    material: str = materialfeld("beton", "baustahl", "holz")
+    """
+    Kennung des Materials -- Beton, Baustahl oder Holz; leer heisst
+    Aussparung. Woraus die Flaechen sind, bestimmt die Bauweise der Analyse
+    (:mod:`~opencivil.querschnitt.bauweise`).
+    """
 
     ueberdeckung: float = bereich(0.0, heisst="Überdeckung c", einheit=MM, ab=0.0)
     """
@@ -127,7 +131,7 @@ class StabEintrag(Beschreibung):
     kennung: str = ""
     knoten: str = ""
     durchmesser: float = bereich(16.0, heisst="Durchmesser", einheit=MM, ueber=0.0)
-    stahl: str = ""
+    stahl: str = materialfeld("betonstahl")
 
 
 @dataclass
@@ -172,7 +176,7 @@ class StablinieEintrag(Beschreibung):
 
     starteisen: bool = True
     endeisen: bool = True
-    stahl: str = ""
+    stahl: str = materialfeld("betonstahl")
 
 
 @dataclass
@@ -202,7 +206,7 @@ class SchubwandEintrag(Beschreibung):
     schnitte: int = einer_von(SCHNITTE, 2)
     """Wie viele Buegelschenkel die Wand kreuzen, 1 bis 8."""
 
-    stahl: str = ""
+    stahl: str = materialfeld("betonstahl")
 
 
 @dataclass
@@ -605,7 +609,7 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben, JeMaterial):
         """Wo ein Knoten liegt, in mm -- ``None``, wenn es ihn nicht gibt."""
         return self.netz().lage(kennung)
 
-    def vorlage_einsetzen(self, schluessel: str, *, beton: str, stahl: str,
+    def vorlage_einsetzen(self, schluessel: str, *, material: str, stahl: str,
                           masse: Optional[Mapping[str, float]] = None,
                           randabstand: float = vorlagen.RANDABSTAND.vorgabe,
                           bewehrung: bool = True,
@@ -619,6 +623,9 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben, JeMaterial):
         Millionstel Millimeter wie im Zeichenfenster, damit die Summe keinen
         Rundungsrest behaelt. Gibt die Kennungen der neuen Elemente zurueck.
         Passen die Masse nicht zueinander, ein ``ValueError`` mit dem Grund.
+        ``material`` ist das der Flaechen -- Beton, Baustahl oder Holz --,
+        ``stahl`` der der Bewehrung; bis 2026-11-26 hiess ``material``
+        ``beton``.
         """
         teile = vorlagen.vorlage(schluessel).bauen(masse, randabstand, bewehrung, schubwaende)
         dy, dz = float(ursprung[0]), float(ursprung[1])
@@ -629,7 +636,7 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben, JeMaterial):
         neu: List[str] = []
         for f in teile.polygone:
             neu.append(self.polygon([an(p) for p in f["punkte"]],
-                                    material="" if f["aussparung"] else beton).kennung)
+                                    material="" if f["aussparung"] else material).kennung)
         for s in teile.staebe:
             neu.append(self.stab(*an(s["lage"]), durchmesser=s["durchmesser"], stahl=stahl).kennung)
         for l in teile.stablinien:

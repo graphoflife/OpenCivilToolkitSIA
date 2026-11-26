@@ -10,7 +10,7 @@
  */
 
 import {
-  auswahl, el, melden, zahlfeld,
+  auswahl, el, melden, undListe, zahlfeld,
 } from './dom.js';
 import { span } from './mathe.js';
 import { sinnbild } from './sinnbilder.js';
@@ -46,14 +46,22 @@ export function mitVar(werte, gewaehlt) {
  * («Aussparung»). Bis 2026-11-19 stand diese Liste fünfmal da, jede mit
  * einem anderen Teil davon: der Pfahl zeigte bei einem gelöschten Beton
  * still den ersten, die Decke bei zwei verschiedenen «– Beton wählen –».
+ *
+ * `art` ist eine Art oder eine Liste von Arten, wie das Feld sie nimmt --
+ * eine Fläche Beton, Baustahl oder Holz (Benutzer, 2026-11-25): dann steht
+ * jedes Material unter seiner Art.
  */
 export function materialliste({
   art, gewaehlt, setzen, titel = '', zusatz = [],
 }) {
-  const stoffe = materialien(art);
-  const werte = [...stoffe.map((m) => ({ wert: m.kennung, beschriftung: m.name || m.sorte })), ...zusatz];
-  const name = katalog('materialarten', art, 'titel');
-  const fehlt = stoffe.length ? `– ${name} wählen –` : `– noch kein ${name} im Projekt –`;
+  const arten = [].concat(art);
+  const namen = arten.map((a) => katalog('materialarten', a, 'titel'));
+  const stoffe = arten.flatMap((a, i) => materialien(a).map((m) => ({
+    wert: m.kennung, beschriftung: m.name || m.sorte, gruppe: arten.length > 1 ? namen[i] : '',
+  })));
+  const werte = [...stoffe, ...zusatz];
+  const name = arten.length > 1 ? 'Material' : namen[0];
+  const fehlt = stoffe.length ? `– ${name} wählen –` : `– noch kein ${undListe(namen, 'oder')} im Projekt –`;
   return auswahl({
     werte: gewaehlt === VAR || werte.some((x) => x.wert === gewaehlt) ? mitVar(werte, gewaehlt)
       : [{ wert: gewaehlt, beschriftung: fehlt }, ...werte],

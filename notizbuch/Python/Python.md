@@ -1,5 +1,5 @@
 ---
-erzeugt: ff840756e341
+erzeugt: 86d6eab39c1d
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -175,6 +175,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.projekt.staebe]] – der Baukasten eines Stabwerks, eben und im Raum.
 - [[opencivil.querschnitt]] – die Querschnitte: die Platte und der gezeichnete.
     - [[opencivil.querschnitt.analyse]] – der gezeichnete Querschnitt als Bauteil im Rechenwerk.
+    - [[opencivil.querschnitt.bauweise]] – woraus ein gezeichneter Querschnitt besteht.
     - [[opencivil.querschnitt.bewehrungselemente]] – die gezeichnete Bewehrung, je nach Art.
     - [[opencivil.querschnitt.biegung]] – wie ein gezeichneter Querschnitt biegt.
     - [[opencivil.querschnitt.fachwerk]] – das Fachwerk mit veraenderlicher Neigung.

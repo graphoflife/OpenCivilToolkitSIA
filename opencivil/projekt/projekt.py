@@ -411,7 +411,7 @@ class Projekt(Beschreibung):
         """
         eintrag = QuerschnittsanalyseEintrag.neu(
             kennung=self.freie_kennung(ANALYSE.vorsilbe), name=name)
-        eintrag.vorlage_einsetzen("rechteck", beton=self._einziges("beton", beton),
+        eintrag.vorlage_einsetzen("rechteck", material=self._einziges("beton", beton),
                                   stahl=self._einziges("betonstahl", stahl), schubwaende=False)
         eintrag = lesen(QuerschnittsanalyseEintrag, felder, f"Querschnittsanalyse '{name}'",
                         eintrag)

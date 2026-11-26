@@ -650,7 +650,7 @@ def vorlage_einsetzen(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
         raise DienstFehler(400, "Der Einsetzpunkt muss zwei Zahlen haben.") from None
     try:
         neu = eintrag.vorlage_einsetzen(
-            _vorlage(rumpf).schluessel, beton=str(rumpf.get("beton") or ""),
+            _vorlage(rumpf).schluessel, material=str(rumpf.get("material") or ""),
             stahl=str(rumpf.get("stahl") or ""), ursprung=ursprung, **_vorlagenwahl(rumpf))
     except ValueError as fehler:
         raise DienstFehler(400, str(fehler)) from None

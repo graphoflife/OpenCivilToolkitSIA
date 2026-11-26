@@ -144,13 +144,15 @@ function kachel(eintrag, kapitel) {
 
 /**
  * Das Panel der Knöpfe: je Gruppe `{titel, kapitel}` eine Überschrift und
- * ihre Knöpfe -- ohne Titel ohne Überschrift. `schluessel` merkt sich, ob
- * das Panel zugeklappt ist.
+ * ihre Knöpfe -- ohne Titel ohne Überschrift. Hat eine Gruppe `hinweis`,
+ * steht statt der Knöpfe grau, warum es keine gibt. `schluessel` merkt
+ * sich, ob das Panel zugeklappt ist.
  */
 export function kapitelPanel(eintrag, gruppen, { schluessel, titel }) {
   return panel({ schluessel, titel }, gruppen.flatMap((g) => [
     g.titel ? el('div.kachel-gruppe', { text: g.titel }) : null,
-    el('div.kacheln', {}, g.kapitel.map((k) => kachel(eintrag, k))),
+    g.hinweis ? el('p.hinweis', { text: g.hinweis })
+      : el('div.kacheln', {}, g.kapitel.map((k) => kachel(eintrag, k))),
   ]));
 }
 

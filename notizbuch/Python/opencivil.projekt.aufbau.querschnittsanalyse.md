@@ -1,5 +1,5 @@
 ---
-erzeugt: fea355e890b6
+erzeugt: d4dc63bc3730
 art: modul
 tags: [modul]
 ---
@@ -34,12 +34,28 @@ Stahlspannungen, sobald es Lastfaelle gibt
 ([[opencivil.projekt.aufbau.kern#spannungsnachweise|spannungsnachweise]]), und das
 Knicken, sobald ein Fall eingeschaltet ist.
 
+Das alles beim Stahlbeton. Ein Querschnitt aus Stahl, Holz oder im
+Verbund ([[opencivil.querschnitt.bauweise|bauweise]]) rechnet bisher nur seine
+Werte -- Flaeche, Schwerpunkt, Traegheitsmomente --, und seine
+Zusammenfassung sagt, dass die Nachweise fehlen ([[opencivil.projekt.aufbau.querschnittsanalyse#ohne_nachweise|ohne_nachweise]]).
+
 Ist noch nichts gezeichnet ([[opencivil.projekt.querschnittsanalyse#QuerschnittsanalyseEintrag.leer|QuerschnittsanalyseEintrag.leer]]), gibt
 es nichts zu rechnen und kein Bauteil -- aber auch keinen Fehler, der das
 ganze Projekt aufhielte: so beginnt jede neue Analyse (Benutzer,
 2026-10-19). Ebenso eine Zeichnung, die sich noch nicht rechnen laesst,
 etwa Bewehrung ohne Polygon darum: die Zeichnung sagt, was nicht
 stimmt, und der Rest rechnet weiter ([[opencivil.projekt.aufbau.kern#Aufbau.unfertig|Aufbau.unfertig]]).
+
+### ohne_nachweise
+
+```python
+def ohne_nachweise(bauweise: Bauweise) -> str
+```
+
+Warum ein Querschnitt dieser Bauweise keinen Nachweis hat -- leer beim
+Stahlbeton. Ein Satzteil ohne Punkt, fuer die Zusammenfassung
+([[opencivil.projekt.aufbau.kern#Aufbau.ohne_nachweis|ohne_nachweis]]) und fuer die
+Zeichnung ([[opencivil.web.zeichengeometrie#geometrie|geometrie]]).
 
 ### _in_si
 
@@ -95,7 +111,9 @@ Staeben gibt.
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.lesen]]
 - [[opencivil.projekt.querschnittsanalyse]]
+- [[opencivil.projekt.spannglieder]]
 - [[opencivil.querschnitt.analyse]]
+- [[opencivil.querschnitt.bauweise]]
 - [[opencivil.querschnitt.biegung]]
 - [[opencivil.querschnitt.geometrie]]
 - [[opencivil.querschnitt.spannglieder]]

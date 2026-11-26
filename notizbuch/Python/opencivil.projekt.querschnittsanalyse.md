@@ -1,5 +1,5 @@
 ---
-erzeugt: a5f80e72c6ff
+erzeugt: f3482529be56
 art: modul
 tags: [modul]
 ---
@@ -84,7 +84,7 @@ Ein Polygon des Querschnitts. Ohne Material ist es eine Aussparung.
 - `IM_ORT = 'Polygon'` – In der Zeichnung heisst eines ohne Material «Aussparung» ([[opencivil.projekt.querschnittsanalyse#QuerschnittsanalyseEintrag.elemente|QuerschnittsanalyseEintrag.elemente]]).
 - `kennung: str = ''`
 - `knoten: List[str] = field(default_factory=list)` – Die Ecken als Knoten, der Reihe nach; die erste wird am Ende nicht wiederholt.
-- `material: str = ''` – Kennung des Materials; leer heisst Aussparung.
+- `material: str = materialfeld('beton', 'baustahl', 'holz')` – Kennung des Materials -- Beton, Baustahl oder Holz; leer heisst Aussparung. Woraus die Flaechen sind, bestimmt die Bauweise der Analyse ([[opencivil.querschnitt.bauweise|bauweise]]).
 - `ueberdeckung: float = bereich(0.0, heisst='Überdeckung c', einheit=MM, ab=0.0)` – Die Ueberdeckung der Bewehrung in mm, eine Hilfe beim Zeichnen: ueber null zeigt das Zeichenfenster das Polygon so weit nach innen gerueckt -- bei einer Aussparung nach aussen -- und «Überdeckung beachten» schiebt Bewehrung hinein ([[opencivil.querschnitt.geometrie#stab_in_ueberdeckung|stab_in_ueberdeckung]]). Gerechnet wird mit ihr nicht.
 
 #### FlaecheEintrag.ist_aussparung
@@ -107,7 +107,7 @@ Ein einzelner Bewehrungsstab, an einem Knoten.
 - `kennung: str = ''`
 - `knoten: str = ''`
 - `durchmesser: float = bereich(16.0, heisst='Durchmesser', einheit=MM, ueber=0.0)`
-- `stahl: str = ''`
+- `stahl: str = materialfeld('betonstahl')`
 
 ### StablinieEintrag
 
@@ -134,7 +134,7 @@ zurueck, findet seine Zahl noch vor. Welche gilt, sagt `art`.
 - `teilung: float = bereich(150.0, heisst='Teilung', einheit=MM, ueber=0.0)` – Bei Art «Teilung» der Wunschabstand in mm -- gerundet auf einen, der aufgeht; bei verschmierten Staeben ihr Abstand, wie er ist.
 - `starteisen: bool = True`
 - `endeisen: bool = True`
-- `stahl: str = ''`
+- `stahl: str = materialfeld('betonstahl')`
 
 ### SchubwandEintrag
 
@@ -157,7 +157,7 @@ im Schnitt ist sie nicht zu sehen.
 - `durchmesser: float = bereich(10.0, heisst='Bügeldurchmesser', einheit=MM, ab=0.0)` – Null: ohne Buegel.
 - `teilung: float = bereich(150.0, heisst='Bügelteilung', einheit=MM, ueber=0.0)` – In Laengsrichtung.
 - `schnitte: int = einer_von(SCHNITTE, 2)` – Wie viele Buegelschenkel die Wand kreuzen, 1 bis 8.
-- `stahl: str = ''`
+- `stahl: str = materialfeld('betonstahl')`
 
 ### HilfslinieEintrag
 
@@ -442,7 +442,7 @@ Wo ein Knoten liegt, in mm -- `None`, wenn es ihn nicht gibt.
 #### QuerschnittsanalyseEintrag.vorlage_einsetzen
 
 ```python
-def vorlage_einsetzen(self, schluessel: str, *, beton: str, stahl: str, masse: Optional[Mapping[str, float]]=None, randabstand: float=vorlagen.RANDABSTAND.vorgabe, bewehrung: bool=True, schubwaende: bool=True, ursprung: Tuple[float, float]=(0.0, 0.0)) -> List[str]
+def vorlage_einsetzen(self, schluessel: str, *, material: str, stahl: str, masse: Optional[Mapping[str, float]]=None, randabstand: float=vorlagen.RANDABSTAND.vorgabe, bewehrung: bool=True, schubwaende: bool=True, ursprung: Tuple[float, float]=(0.0, 0.0)) -> List[str]
 ```
 
 Setzt eine Vorlage ein ([[opencivil.querschnitt.vorlagen]]) -- dazu,
@@ -452,6 +452,9 @@ ist, wohin ihre Ecke unten links kommt; die Lagen auf einen
 Millionstel Millimeter wie im Zeichenfenster, damit die Summe keinen
 Rundungsrest behaelt. Gibt die Kennungen der neuen Elemente zurueck.
 Passen die Masse nicht zueinander, ein `ValueError` mit dem Grund.
+`material` ist das der Flaechen -- Beton, Baustahl oder Holz --,
+`stahl` der der Bewehrung; bis 2026-11-26 hiess `material`
+`beton`.
 
 #### QuerschnittsanalyseEintrag.fallnamen
 
@@ -527,3 +530,4 @@ Feldmoment; das Rechteck gibt es als Vorlage im Zeichenfenster.
 - [[opencivil.projekt.beispiele]]
 - [[opencivil.projekt.projekt]]
 - [[opencivil.web.api]]
+- [[opencivil.web.zeichengeometrie]]

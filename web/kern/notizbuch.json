@@ -7271,6 +7271,7 @@
       "kurz": "ein gezeichneter Querschnitt wird Rechnung.",
       "stichworte": [
         "bauen",
+        "ohne_nachweise",
         "_in_si",
         "_analyse",
         "_glied",
@@ -7529,6 +7530,8 @@
         "ProjektFehler.grund_bei",
         "anhalten",
         "einer_von",
+        "materialfeld",
+        "stoffe_des_felds",
         "teil",
         "_im_ort",
         "je_material",
@@ -7897,6 +7900,19 @@
       ]
     },
     {
+      "name": "opencivil.querschnitt.bauweise",
+      "pfad": "Python/opencivil.querschnitt.bauweise.md",
+      "art": "modul",
+      "kurz": "woraus ein gezeichneter Querschnitt besteht.",
+      "stichworte": [
+        "Bauweise",
+        "Bauweise.querschnitt",
+        "Bauweise.norm",
+        "Mischung",
+        "bauweise"
+      ]
+    },
+    {
       "name": "opencivil.querschnitt.bewehrungselemente",
       "pfad": "Python/opencivil.querschnitt.bewehrungselemente.md",
       "art": "modul",
@@ -8057,6 +8073,8 @@
         "Werkstoffsatz.beton_zeichen",
         "Werkstoffsatz.betonkennwerte",
         "Werkstoffsatz.stahlkennwerte",
+        "Werkstoffsatz.baustahl",
+        "Werkstoffsatz.baustahlkennwerte",
         "Werkstoffsatz.spannstahl",
         "Werkstoffsatz.spannstahlkennwerte",
         "Rechenart",
@@ -9430,6 +9448,7 @@
       "kurz": "die Zeichnung einer Querschnittsanalyse, wie der Kern sie sieht.",
       "stichworte": [
         "geometrie",
+        "_als_satz",
         "_Glieder",
         "_spannglieder"
       ]

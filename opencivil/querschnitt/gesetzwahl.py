@@ -154,6 +154,19 @@ class Werkstoffsatz(Wahl):
                 "eps_ud": "eps_ud"}
 
     @property
+    def baustahl(self) -> str:
+        """
+        Kurzname der Streckgrenze des Baustahls -- dort beginnt sein Plateau:
+        ``f_yd = f_y/γ_M1`` oder ``f_y`` (SIA 263:2013, 4.1.1).
+        """
+        return "f_yd" if self is Werkstoffsatz.BEMESSUNG else "f_y"
+
+    @property
+    def baustahlkennwerte(self) -> Dict[str, str]:
+        """Dasselbe fuer das Gesetz des Baustahls, in Zug und Druck dieselbe Streckgrenze."""
+        return {"f_s": self.baustahl, "E_s": "E_a", "eps_ud": "eps_ud"}
+
+    @property
     def spannstahl(self) -> str:
         """
         Kurzname der Fliessgrenze des Spannstahls -- dort beginnt sein Plateau:
@@ -169,6 +182,13 @@ class Werkstoffsatz(Wahl):
         (:mod:`opencivil.querschnitt.spannglieder`).
         """
         return {"f_p": self.spannstahl, "E_p": "E_p", "eps_ud": "eps_ud"}
+
+
+#: Je Rolle der Gesetze des Holzes der Kurzname seines Kennwerts -- die
+#: Bemessungswerte in Faserrichtung und der mittlere Modul (SIA 265:2012,
+#: Tabellen 6 und 7), dazu die Grenzstauchung des elastisch-plastischen
+#: (:class:`~opencivil.querschnitt.werkstoffgesetz.HolzPlastisch`).
+HOLZKENNWERTE = {"f_t": "f_t_0_d", "f_c": "f_c_0_d", "E": "E_0_mean", "eps_cu": "eps_cu"}
 
 
 class Rechenart(Wahl):
@@ -399,13 +419,18 @@ class Rechenwahl:
         """
         Je Rolle des Gesetzes eines Baustoffs der Kurzname seines Kennwerts --
         nach der Art des Baustoffs, die eine Stelle dafuer: Beton
-        (:meth:`betonkennwerte`), Betonstahl, Spannstahl.
+        (:meth:`betonkennwerte`), Betonstahl, Spannstahl, Baustahl und Holz.
+        Das Holz kennt keinen Wertesatz: SIA 265:2012 nennt nur
+        Bemessungswerte (:data:`HOLZKENNWERTE`).
         """
         if stoff.art is Baustoffart.BETON:
             return self.betonkennwerte(stoff)
+        if stoff.art is Baustoffart.HOLZ:
+            return HOLZKENNWERTE
         satz = self.satz(stoff)
-        return satz.spannstahlkennwerte if stoff.art is Baustoffart.SPANNSTAHL \
-            else satz.stahlkennwerte
+        return {Baustoffart.SPANNSTAHL: satz.spannstahlkennwerte,
+                Baustoffart.BAUSTAHL: satz.baustahlkennwerte,
+                Baustoffart.BETONSTAHL: satz.stahlkennwerte}[stoff.art]
 
     @property
     def index(self) -> str:

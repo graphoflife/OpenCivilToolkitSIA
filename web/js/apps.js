@@ -46,7 +46,7 @@ import { setzungKarten } from './sz_zeichnung.js';
 import { pfahlKarten } from './pf_zeichnung.js';
 import { erdbebenKarten } from './eb_zeichnung.js';
 import {
-  ansichtVergessen, eintragVon, freieKennung, istSandbox, katalog, kopieName, naechsterName,
+  ansichtVergessen, eintragVon, feldangabe, freieKennung, istSandbox, katalog, kopieName, naechsterName,
   projektAendern, waehlen, zustand,
 } from './zustand.js';
 
@@ -61,7 +61,8 @@ import {
  * und die Materialien des Projekts -- je Feld das erste seiner Art, wie der
  * Kern sagt (`katalog.erste_materialien`); nach derselben Regel baut er die
  * Sandbox. `braucht` nennt die Arten, ohne die es nicht geht: die, die der
- * Eintrag nimmt, oder die, ohne die sich nichts zeichnen lässt. Die Vorlage
+ * Eintrag nimmt, oder die, ohne die sich nichts zeichnen lässt -- eine
+ * Liste von Arten darin heisst: eine davon. Die Vorlage
  * stand einmal hier, zwanzig Felder der Platte, die von Hand mit den
  * Vorgaben in opencivil/projekt/platte.py gleichgehalten werden mussten; als
  * sich die Vorgaben änderten, brachten neue Platten Nachweise eingeschaltet
@@ -71,10 +72,11 @@ import {
  */
 function nachVorlage(a, braucht = Object.values(katalog('erste_materialien', a.liste))) {
   const erstes = (art) => zustand.projekt.materialien.find((m) => m.art === art);
-  const fehlen = [...new Set(braucht)].filter((art) => !erstes(art));
+  const titel = (art) => katalog('materialarten', art, 'titel');
+  const fehlen = [...new Set(braucht.map((x) => [].concat(x)).filter((arten) => !arten.some(erstes))
+    .map((arten) => undListe(arten.map(titel), 'oder')))];
   if (fehlen.length) {
-    melden(`Zuerst ${undListe(fehlen.map((art) => katalog('materialarten', art, 'titel')))} anlegen.`,
-      true);
+    melden(`Zuerst ${undListe(fehlen)} anlegen.`, true);
     return;
   }
   const kennung = freieKennung(a.vorsilbe);
@@ -181,8 +183,9 @@ function entfernen(liste, eintrag) {
  * Nachweise führt, was die Zusammenfassung statt der Tabelle zeigt
  * (`uebersicht(kennung)`). Fehlt eines davon, meldet sich das beim Laden.
  * Ein Bauteil geht nur weg, wenn kein Balkensystem mehr seinen Querschnitt
- * nimmt. `braucht` sagt, welche Materialien «+» verlangt -- ohne Angabe die,
- * die ein neuer Eintrag nimmt (`nachVorlage`). `leer(e)` sagt, ob sein
+ * nimmt. `braucht()` sagt, welche Materialien «+» verlangt -- ohne Angabe die,
+ * die ein neuer Eintrag nimmt (`nachVorlage`); gefragt beim Klick, wenn der
+ * Katalog da ist. `leer(e)` sagt, ob sein
  * Editor selbst zeigt, dass noch nichts da ist (`mitHinweis`).
  */
 function bauteil(name, {
@@ -198,7 +201,7 @@ function bauteil(name, {
     vorsilbe: a.vorsilbe,
     gruppen: (p) => [{
       titel: a.titel, leer: a.leer, eintraege: p[a.liste] || [],
-      plus: { titel: `${a.einzahl} hinzufügen`, tun: () => nachVorlage(zeile, braucht) },
+      plus: { titel: `${a.einzahl} hinzufügen`, tun: () => nachVorlage(zeile, braucht?.()) },
     }],
     name: (e) => e.name,
     kurztext,
@@ -277,13 +280,14 @@ const PLATTE = bauteil('querschnitt', {
 
 /**
  * Leer, aus dem Kern (Benutzer, 2026-10-19): gezeichnet wird danach, das
- * Rechteck gibt es als Vorlage im Zeichenfenster. Beton und Betonstahl
- * braucht es erst zum Zeichnen -- verlangt werden sie schon hier, sonst
- * stünde man vor einem Fenster, in dem nichts geht.
+ * Rechteck gibt es als Vorlage im Zeichenfenster. Ein Material für die
+ * Flächen -- Beton, Baustahl oder Holz -- braucht es erst zum Zeichnen;
+ * verlangt wird es schon hier, sonst stünde man vor einem Fenster, in dem
+ * nichts geht. Bis 2026-11-26 verlangte die Analyse Beton und Betonstahl.
  */
 const ANALYSE = bauteil('querschnittsanalyse', {
   kurztext: umriss,
-  braucht: ['beton', 'betonstahl'],
+  braucht: () => [feldangabe('flaeche', 'material').stoffe],
   editor: analyseEditor,
   leer: nichtsGezeichnet,
   karten: (kennung, eintrag, loesung) => [
@@ -317,7 +321,7 @@ const SYSTEM3D = balkensystem('balkensystem3d');
  */
 const DECKE = bauteil('decke', {
   kurztext: (d) => `${d.platten.length} ${d.platten.length === 1 ? 'Platte' : 'Platten'}`,
-  braucht: ['beton'],
+  braucht: () => ['beton'],
   editor: deckeEditor,
   karten: deckenKarten,
   uebersicht: deckenZusammenfassung,

@@ -37,7 +37,7 @@ from typing import Optional
 
 from opencivil.core.einheiten import GRAD, MM, N_PRO_MM2
 from opencivil.projekt.eintraege import Beschreibung
-from opencivil.projekt.lesen import bereich
+from opencivil.projekt.lesen import bereich, materialfeld
 from opencivil.querschnitt.spannglieder import GRENZE_NEIGUNG, Spannwirkung, Verbund
 
 #: Womit ein neues Glied beginnt: eine Litze 15.7 mm -- die verbreitetste, die
@@ -53,7 +53,7 @@ class SpanngliedEintrag(Beschreibung):
 
     kennung: str = ""
     knoten: str = ""
-    stahl: str = ""
+    stahl: str = materialfeld("spannstahl")
     """Kennung des Spannstahls."""
 
     durchmesser: float = bereich(DURCHMESSER, heisst="Durchmesser", einheit=MM, ueber=0.0)

@@ -21,7 +21,7 @@ def balken() -> QuerschnittsanalyseEintrag:
     jetzt leer.
     """
     a = QuerschnittsanalyseEintrag.neu("a1", "Balken")
-    a.vorlage_einsetzen("rechteck", beton="b1", stahl="s1", schubwaende=False)
+    a.vorlage_einsetzen("rechteck", material="b1", stahl="s1", schubwaende=False)
     a.lastfall("Tragsicherheit 1", M_y_Ed=100.0)
     return a
 

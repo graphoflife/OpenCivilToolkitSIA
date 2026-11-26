@@ -1,5 +1,5 @@
 ---
-erzeugt: a58d23b46f73
+erzeugt: 25aa2554f5fe
 art: modul
 tags: [modul]
 ---
@@ -42,11 +42,25 @@ dazu, nach derselben Regel wie beim Bauen ([[opencivil.projekt.aufbau.kern#mater
 kann nur das Projekt wissen. Ebenso ein Verweis auf einen Knoten, den es
 nicht gibt, und ein Spannglied, dessen Durchmesser es in seiner Sorte
 nicht gibt. `fehler` sagt je Meldung, ob etwas nicht stimmt oder nur
-fehlt: ein geloeschter Stahl ist zu ersetzen, kein Widerspruch.
+fehlt: ein geloeschter Stahl ist zu ersetzen, kein Widerspruch. Sind die
+Materialien zusammen keine Bauweise ([[opencivil.querschnitt.bauweise#bauweise|bauweise]]), sagt es eine
+Meldung ohne Element, grau.
+
+`ohne_nachweise` ist der Satz, warum ein Querschnitt dieser Bauweise
+keinen Nachweis hat -- leer beim Stahlbeton und ohne Bauweise. Danach
+zeigt die Analyse ihre Kacheln ([[opencivil.projekt.aufbau.querschnittsanalyse#ohne_nachweise|ohne_nachweise]]).
 
 `gueltig` heisst: die Zeichnung rechnet. Eine Spannung ueber der
 Grenze der Norm steht rot am Glied, haelt die Rechnung aber nicht an --
 gerechnet wird mit den Zahlen des Benutzers.
+
+### _als_satz
+
+```python
+def _als_satz(teil: str) -> str
+```
+
+Ein Satzteil als Satz: gross beginnend, mit Punkt -- leer bleibt leer.
 
 ### _Glieder
 
@@ -84,7 +98,11 @@ selbst nicht rechnet, sagt es in seinem Fenster.
 - [[opencivil.material.spannstahl]]
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.aufbau.querschnittsanalyse]]
+- [[opencivil.projekt.lesen]]
+- [[opencivil.projekt.querschnittsanalyse]]
+- [[opencivil.projekt.spannglieder]]
 - [[opencivil.querschnitt.analyse]]
+- [[opencivil.querschnitt.bauweise]]
 - [[opencivil.querschnitt.geometrie]]
 - [[opencivil.querschnitt.spannglieder]]
 

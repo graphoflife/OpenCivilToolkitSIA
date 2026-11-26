@@ -1,5 +1,5 @@
 ---
-erzeugt: 60ea516ad9a1
+erzeugt: 4057c2179d71
 art: modul
 tags: [modul]
 ---
@@ -56,7 +56,7 @@ Ein Spannglied an einem Knoten -- siehe Dateikopf.
 - `IM_ORT = 'Spannglied'`
 - `kennung: str = ''`
 - `knoten: str = ''`
-- `stahl: str = ''` – Kennung des Spannstahls.
+- `stahl: str = materialfeld('spannstahl')` – Kennung des Spannstahls.
 - `durchmesser: float = bereich(DURCHMESSER, heisst='Durchmesser', einheit=MM, ueber=0.0)` – Welches Erzeugnis der Sorte -- an seinem Durchmesser erkannt (Tabelle 7).
 - `anzahl: int = bereich(1, heisst='Anzahl', ab=1)` – Wie viele Draehte, Litzen oder Staebe das Glied hat.
 - `wirkung: Spannwirkung = Spannwirkung.VORDEHNUNG` – Mit Vordehnung im Widerstand -- oder schlaff, weil die Vorspannung schon als Einwirkung zaehlt.
@@ -79,4 +79,6 @@ Ein Spannglied an einem Knoten -- siehe Dateikopf.
 
 ## Gebraucht von
 
+- [[opencivil.projekt.aufbau.querschnittsanalyse]]
 - [[opencivil.projekt.querschnittsanalyse]]
+- [[opencivil.web.zeichengeometrie]]

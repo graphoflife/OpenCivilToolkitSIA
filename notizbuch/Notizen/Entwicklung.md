@@ -7,6 +7,50 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-26 · Flächen aus Holz und Baustahl, die Bauweise
+
+Aus dem Plan vom 2026-11-25, Schritt 11a: eine Fläche der
+Querschnittsanalyse ist aus Beton, Baustahl oder Holz. Die Liste des
+Materials gliedert sie nach Art; die Zeichnung färbt Holz hellbraun und
+Baustahl hellblau.
+
+**Woraus der Querschnitt ist, sagt der Kern** (`querschnitt/bauweise.py`),
+nach der Tabelle des Benutzers: Beton mit oder ohne Betonstahl und
+Spannstahl ist Stahlbeton, nur Baustahl Stahl, Baustahl mit Beton Verbund,
+nur Holz Holz. Eine andere Mischung rechnet nicht und sagt grau, mit den
+Namen: «Einen Querschnitt aus Beton («C30/37») und Holz («C24») rechnet das
+Werkzeug nicht.»
+
+**Vorher und nachher.** Ein Rechteck 200 × 400 mm aus C24: vorher liess
+die Liste nur Beton zu. Nachher rechnet es A = 80 000 mm² und
+I_y = 1 066.67 · 10⁶ mm⁴, ein Stab im Balkensystem nimmt sie mit
+E_0,mean, und statt der Kacheln des Stahlbetons steht grau: «Einen
+Holzquerschnitt weist das Werkzeug nach SIA 265:2012 noch nicht nach.» Die
+Nachweise kommen mit den Schritten 12 bis 14, die Spannung-Dehnung-Analysen
+für jede Bauweise mit 11b; was in den Kacheln eingestellt ist, bleibt.
+Unter «Diagramme» steht das Bild des Querschnitts in der Farbe des Holzes,
+und statt «Kein Interaktionsdiagramm.» sagt derselbe Satz, warum es keines
+gibt.
+
+**Bewehrung liegt nur im Beton** – Stab, Linie, Schubwand und Spannglied
+(`BEWEHRT`). Ein Stab im Holz ist rot, wie einer neben dem Querschnitt. Für
+die Hilfe «Überdeckung beachten» ist eine Fläche aus Baustahl wie eine
+Aussparung: hat sie eine Überdeckung, hält die Bewehrung so viel Abstand
+von ihr – im Verbund vom Blech. Eine Vorlage aus Holz oder Baustahl kommt
+ohne Bewehrung; ihr Fenster zeigt neu das Material, aus dem sie ist.
+
+**Welche Arten ein Feld nimmt, steht an ihm** (`materialfeld`): der Aufbau,
+die Prüfung der Zeichnung, die Liste der Oberfläche und der Zugang für
+Claude lesen es dort. Bis heute stand «beton» an drei Stellen fest.
+
+**Was andere Bauteile nehmen.** Ein E_eq gibt es bisher nur beim
+Stahlbeton – es kommt aus dem gerissenen Querschnitt; bei einem aus Holz
+sagt es der Querschnitt im Balkensystem. Eine Wand des Erdbebens rechnet
+mit E_cm und ist aus Stahlbeton; eine aus Holz ist rot.
+
+Eine neue Analyse verlangt ein Material für ihre Flächen, nicht mehr Beton
+und Betonstahl: «Zuerst Beton, Baustahl oder Holz anlegen.»
+
 ## 2026-11-26 · Holz als Material
 
 Aus dem Plan vom 2026-11-25, Schritt 10: unter «Materialien» gibt es Holz
