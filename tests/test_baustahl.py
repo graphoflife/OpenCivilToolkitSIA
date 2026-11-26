@@ -7,9 +7,14 @@ from opencivil.core.einheiten import EINHEITSLOS, KG_PRO_M3, N_PRO_MM2, PROMILLE
 from opencivil.core.rechenwerk import Rechenwerk
 from opencivil.material.arten import MATERIALARTEN
 from opencivil.material.basis import Baustoffart
-from opencivil.material.baustahl import BAUSTAHLSORTEN, baustahl, baustahlsorten_zum_anlegen
+from opencivil.material.baustahl import (
+    BAUSTAHLSORTEN, DUKTILITAET, baustahl, baustahlsorten_zum_anlegen,
+)
 from opencivil.projekt.lesen import ProjektFehler
 from opencivil.projekt.projekt import Projekt
+from opencivil.querschnitt.werkstoffgesetz import Baustahlgesetz
+from opencivil.web import dienst
+from opencivil.web.diagrammdaten import KURVEN
 from tests.unfertig import meldung
 
 
@@ -89,6 +94,56 @@ class TestKennwerte(unittest.TestCase):
     def test_unbekannte_sorte(self):
         with self.assertRaises(ValueError):
             baustahl("S500")
+
+
+class TestGesetz(unittest.TestCase):
+    """Die Spannung-Dehnung-Linie: f_yd nach SIA 263:2013, 4.1.1; die Grenzdehnung nach Vorgabe."""
+
+    def setUp(self):
+        self.w = werte(baustahl("S355"), "f_yd", "eps_ud")
+
+    def test_bemessungswert(self):
+        """f_yd = f_y / gamma_M1 = 355 / 1.05 = 338.1 N/mm²."""
+        self.assertAlmostEqual(self.w["f_yd"].in_einheit(N_PRO_MM2), 355 / 1.05)
+
+    def test_grenzdehnung(self):
+        """15 Fliessdehnungen (3.2.2.4): 15 · 355/210000 = 25.4 ‰."""
+        self.assertEqual(DUKTILITAET, 15)
+        self.assertAlmostEqual(self.w["eps_ud"].in_einheit(PROMILLE), 15 * 355 / 210000 * 1000)
+
+    def test_eigene_streckgrenze_zieht_mit(self):
+        w = werte(baustahl("S355", abweichungen={"f_y": Groesse(300, N_PRO_MM2)}), "f_yd", "eps_ud")
+        self.assertAlmostEqual(w["f_yd"].in_einheit(N_PRO_MM2), 300 / 1.05)
+        self.assertAlmostEqual(w["eps_ud"].in_einheit(PROMILLE), 15 * 300 / 210000 * 1000)
+
+    def test_elastisch_ideal_plastisch(self):
+        """In Zug und Druck gleich; jenseits der Grenzdehnung traegt er nichts."""
+        g = Baustahlgesetz.gleich(E_a=210e9, f_yd=338e6, eps_ud=0.025)
+        self.assertAlmostEqual(g.spannung(0.001), 210e6)
+        self.assertAlmostEqual(g.spannung(-0.001), -210e6)
+        self.assertEqual(g.spannung(0.02), 338e6)
+        self.assertEqual(g.spannung(-0.02), -338e6)
+        self.assertEqual(g.spannung(0.03), 0.0)
+        self.assertEqual(g.spannung(-0.03), 0.0)
+
+    def test_das_bild(self):
+        """Vorher fehlte das Bild: dem Baustahl fehlten die Kennwerte des Betonstahls."""
+        p = Projekt(name="Stahl")
+        p.baustahl("S355")
+        antwort = dienst.bearbeite("rechnen", {"projekt": p.als_dict()})
+        self.assertEqual(antwort.status, 200)
+        kurve = antwort.daten["werkstoffgesetze"]["st1"]
+        self.assertEqual((kurve["titel"], kurve["name"], kurve["art"]),
+                         ("Baustahl – elastisch-plastisch", "S355", "baustahl"))
+        self.assertEqual(kurve["referenz"], Baustahlgesetz.REFERENZ)
+        ecken = [(round(q["eps"], 2), round(q["sigma"], 1)) for q in kurve["punkte"]]
+        self.assertEqual(ecken, [(-25.36, -338.1), (-1.61, -338.1), (0.0, 0.0),
+                                 (1.61, 338.1), (25.36, 338.1)])
+        self.assertEqual([m["text"] for m in kurve["marken"]], ["ε_yd", "ε_ud"])
+
+    def test_jede_art_hat_ihre_linie(self):
+        """Eine neue Materialart ohne Linie fiele beim Rechnen auf -- hier schon vorher."""
+        self.assertEqual(set(KURVEN), set(Baustoffart))
 
 
 class TestImProjekt(unittest.TestCase):

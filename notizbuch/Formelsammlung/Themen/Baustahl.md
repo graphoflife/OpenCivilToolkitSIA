@@ -1,14 +1,16 @@
 ---
-erzeugt: d6b857f3b858
+erzeugt: e45f475960c6
 art: thema
 tags: [thema]
 ---
 > [!abstract] Baustoffe
-> 1 Formel, in der Folge, in der gerechnet wird.
+> 3 Formeln, in der Folge, in der gerechnet wird.
 
 ## Formeln
 
 1. [[Fliessdehnung]]
+2. [[Bemessungswert der Streckgrenze]]
+3. [[Grenzdehnung des Baustahls]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

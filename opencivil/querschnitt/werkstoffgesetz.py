@@ -10,7 +10,9 @@ Parabel-Rechteck-Beziehung (SIA 262:2025, 4.2.1.5 mit Figur 12, 4.2.1.6,
 4.1.4.1.4). Bis 2026-11-25 gab es dazu den Beton linear ohne Zug, fuer die
 gestrichene Rechenart «elastisch» (:mod:`opencivil.querschnitt.gesetzwahl`).
 Betonstahl: bilinear, auf Zug und Druck getrennt begrenzt
-(:class:`Stahlgesetz`, 4.2.2.2 mit Figur 16), oder nur auf Zug.
+(:class:`Stahlgesetz`, 4.2.2.2 mit Figur 16), oder nur auf Zug. Baustahl:
+elastisch -- ideal plastisch, in Zug und Druck gleich
+(:class:`Baustahlgesetz`, SIA 263:2013), mit einer Grenzdehnung nach Vorgabe.
 
 Bis 2026-10-16 rechneten Funktionen im Loeser, und gedruckt wurden Klassen
 mit Platzhaltern oder Formeln von Hand. Jenseits von eps_c2d und beim
@@ -432,6 +434,40 @@ class StahlNurZug(Stahlgesetz):
             rf" \min(E_s\,\varepsilon_s;\ {zug}) & 0 < \varepsilon_s \le \varepsilon_{{ud}} \\[1ex]"
             r" 0 & \varepsilon_s \le 0 \quad (\text{gedrückt: weggelassen})"
             r" \\[1ex] 0 & \varepsilon_s > \varepsilon_{ud} \quad (\text{jenseits der Bruchdehnung})"
+            r" \end{cases}"
+        )
+
+
+@dataclass(frozen=True)
+class Baustahlgesetz(Stahlgesetz):
+    """
+    Baustahl, elastisch -- ideal plastisch und in Zug und Druck gleich: mit
+    ``E_a`` bis zur Streckgrenze, dann waagrecht bis zur Grenzdehnung. SIA
+    263:2013 nennt die Kennwerte (3.2.2.1, Tabelle 1) und den Bemessungswert
+    (4.1.1), keine Linie; die Grenzdehnung ist nach Vorgabe, nicht
+    nachgeschlagen (:data:`~opencivil.material.baustahl.DUKTILITAET`).
+    """
+
+    NAME = "Elastisch-plastische Beziehung des Baustahls"
+    WORT = "Baustahl, elastisch-plastisch"
+    REFERENZ = "SIA 263:2013, 3.2.2.1; 4.1.1 – die Grenzdehnung nach Vorgabe"
+    ROLLEN = ("f_s", "E_s", "eps_ud")
+
+    @classmethod
+    def gleich(cls, E_a: float, f_yd: float, eps_ud: float) -> "Baustahlgesetz":
+        """In Zug und Druck dieselbe Streckgrenze ``f_yd`` (in N/m^2)."""
+        return cls(E_s=E_a, f_yd=f_yd, f_yd_druck=f_yd, eps_ud=eps_ud)
+
+    def formel(self, werte: Werte) -> str:
+        return self.latex(werte["f_s"].symbol)
+
+    def latex(self, zug: str = "f_{yd}", druck: str = "") -> str:
+        """Als Formel -- ``zug`` ist das Zeichen der Streckgrenze, auf Druck dieselbe."""
+        return (
+            r"\sigma_a(\varepsilon_a) = \begin{cases}"
+            rf" \operatorname{{sgn}}(\varepsilon_a) \cdot \min(E_a\,|\varepsilon_a|;\ {zug})"
+            r" & |\varepsilon_a| \le \varepsilon_{ud} \\[1ex]"
+            r" 0 & |\varepsilon_a| > \varepsilon_{ud} \quad (\text{jenseits der Grenzdehnung})"
             r" \end{cases}"
         )
 

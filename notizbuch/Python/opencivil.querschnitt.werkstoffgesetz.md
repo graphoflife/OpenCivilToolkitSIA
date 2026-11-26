@@ -1,5 +1,5 @@
 ---
-erzeugt: e5dd1062d81f
+erzeugt: fcbb6effa120
 art: modul
 tags: [modul]
 ---
@@ -17,7 +17,9 @@ Parabel-Rechteck-Beziehung (SIA 262:2025, 4.2.1.5 mit Figur 12, 4.2.1.6,
 4.1.4.1.4). Bis 2026-11-25 gab es dazu den Beton linear ohne Zug, fuer die
 gestrichene Rechenart «elastisch» ([[opencivil.querschnitt.gesetzwahl]]).
 Betonstahl: bilinear, auf Zug und Druck getrennt begrenzt
-([[opencivil.querschnitt.werkstoffgesetz#Stahlgesetz|Stahlgesetz]], 4.2.2.2 mit Figur 16), oder nur auf Zug.
+([[opencivil.querschnitt.werkstoffgesetz#Stahlgesetz|Stahlgesetz]], 4.2.2.2 mit Figur 16), oder nur auf Zug. Baustahl:
+elastisch -- ideal plastisch, in Zug und Druck gleich
+([[opencivil.querschnitt.werkstoffgesetz#Baustahlgesetz|Baustahlgesetz]], SIA 263:2013), mit einer Grenzdehnung nach Vorgabe.
 
 Bis 2026-10-16 rechneten Funktionen im Loeser, und gedruckt wurden Klassen
 mit Platzhaltern oder Formeln von Hand. Jenseits von eps_c2d und beim
@@ -352,6 +354,47 @@ def latex(self, zug: str='f_{yd}', druck: str='') -> str
 ```
 
 Als Formel -- `zug` ist das Zeichen des Plateaus; ein Druckplateau gibt es nicht.
+
+### Baustahlgesetz
+
+```python
+@dataclass(frozen=True)
+class Baustahlgesetz(Stahlgesetz)
+```
+
+Baustahl, elastisch -- ideal plastisch und in Zug und Druck gleich: mit
+`E_a` bis zur Streckgrenze, dann waagrecht bis zur Grenzdehnung. SIA
+263:2013 nennt die Kennwerte (3.2.2.1, Tabelle 1) und den Bemessungswert
+(4.1.1), keine Linie; die Grenzdehnung ist nach Vorgabe, nicht
+nachgeschlagen ([[opencivil.material.baustahl#Konstanten|DUKTILITAET]]).
+
+- `NAME = 'Elastisch-plastische Beziehung des Baustahls'`
+- `WORT = 'Baustahl, elastisch-plastisch'`
+- `REFERENZ = 'SIA 263:2013, 3.2.2.1; 4.1.1 – die Grenzdehnung nach Vorgabe'`
+- `ROLLEN = ('f_s', 'E_s', 'eps_ud')`
+
+#### Baustahlgesetz.gleich
+
+```python
+@classmethod
+def gleich(cls, E_a: float, f_yd: float, eps_ud: float) -> 'Baustahlgesetz'
+```
+
+In Zug und Druck dieselbe Streckgrenze `f_yd` (in N/m^2).
+
+#### Baustahlgesetz.formel
+
+```python
+def formel(self, werte: Werte) -> str
+```
+
+#### Baustahlgesetz.latex
+
+```python
+def latex(self, zug: str='f_{yd}', druck: str='') -> str
+```
+
+Als Formel -- `zug` ist das Zeichen der Streckgrenze, auf Druck dieselbe.
 
 ### _stahlfunktion
 

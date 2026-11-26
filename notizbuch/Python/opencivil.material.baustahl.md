@@ -1,5 +1,5 @@
 ---
-erzeugt: 4323151ea7c9
+erzeugt: 16a4f0d66125
 art: modul
 tags: [modul]
 ---
@@ -29,6 +29,17 @@ Dichte, Elastizitaetsmodul, Schubmodul und Querdehnungszahl stehen in
 3.2.2.1, die Widerstandsbeiwerte in 4.1.3. Die Waermedehnzahl (3.2.2.2) fehlt
 noch: das Werkzeug kennt keine Temperatur als Einheit, und keine Rechnung
 braucht sie.
+
+
+## DAS GESETZ
+
+Fuer die Spannung-Dehnung-Linie ([[opencivil.querschnitt.werkstoffgesetz#Baustahlgesetz|Baustahlgesetz]])
+kommen der Bemessungswert der Streckgrenze `f_yd = f_y / gamma_M1` (4.1.1,
+Gleichung (1), mit 4.1.3) und eine Grenzdehnung dazu. Die Norm nennt keine
+Linie und keine Grenzdehnung; nach Vorgabe, nicht nachgeschlagen, endet sie
+bei [[opencivil.material.baustahl#Konstanten|DUKTILITAET]] mal der Fliessdehnung -- so viel verlangt 3.2.2.4
+mindestens, wo plastisch gerechnet wird, und die Sorten der Tabelle 1
+erfuellen es.
 
 
 ## EIGENSTAENDIG NUTZBAR
@@ -87,6 +98,7 @@ Erzeugt einen Baustahl aus der Sortentabelle.
 - `BAUSTAHLSORTEN = {'S235': Baustahlsorte(235.0, 135.0, 360.0, 215.0, 124.0, 340.0), 'S2…` – Baustahlsorten nach SIA 263:2013, Tabelle 1.
 - `ERSTER_BAUSTAHL = 'S235'` – Womit ein neuer Baustahl anfaengt: die Folge der Tabelle.
 - `DICK = 'für 40 mm < t ≤ 100 mm'` – Was ueber 40 mm Dicke gilt, steht unter demselben Zeichen mit `t>40` oben.
+- `DUKTILITAET = 15.0` – Wie viele Fliessdehnungen weit die Linie reicht: das Verhaeltnis von Bruch- zu Fliessdehnung, das SIA 263:2013, 3.2.2.4 fuer die plastischen Verfahren mindestens verlangt -- als Grenzdehnung nach Vorgabe, nicht nachgeschlagen.
 - `BAUSTAHL_VORLAGEN = (_tabellenwert('f_y', 'f_y', 'Streckgrenze'), _tabellenwert('tau_y', …`
 
 ## Braucht
@@ -101,4 +113,6 @@ Erzeugt einen Baustahl aus der Sortentabelle.
 
 ## Formeln aus diesem Modul
 
+- [[Bemessungswert der Streckgrenze]]
 - [[Fliessdehnung]]
+- [[Grenzdehnung des Baustahls]]

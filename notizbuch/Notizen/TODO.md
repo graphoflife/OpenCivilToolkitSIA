@@ -955,6 +955,13 @@ Diese Punkte sind **nicht** entschieden. Eingebaut ist je eine Annahme; wo die
 Prüfung vom 2026-11-14 den Bereich schon erreicht hat, steht dabei, was die
 Norm dazu sagt.
 
+- [ ] **Baustahl, Grenzdehnung nach Vorgabe**
+      (`opencivil/material/baustahl.py`, `DUKTILITAET`). Die Linie des
+      Baustahls endet bei ε_ud = 15·ε_y, für S355 bei 25.4 ‰. SIA 263:2013
+      nennt keine Grenzdehnung; 15 ist das kleinste Verhältnis von Bruch-
+      zu Fliessdehnung, das 3.2.2.4 für die plastischen Verfahren verlangt.
+      Bestätigen oder eine andere Zahl nennen. Wirkt erst, wenn die
+      Querschnittsanalyse Baustahl rechnet.
 - [ ] **Erdbeben, nach Vorgabe eingebaut** (`opencivil/erdbeben/ersatzkraft.py`).
       Jede Wand trägt nach ihrem Anteil an der Biegesteifigkeit; verformt
       werden die Wände nur durch Biegung, weder durch Schub noch im
@@ -1482,9 +1489,9 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       Querschnittsanalyse.
 
 - [ ] **Querschnittsanalyse, nächste Schritte** (je ein eigener Plan):
-      Baustahl (Gesetz, Verbundquerschnitt, Stahlwände mit eigenem G; in
-      der Zeichnung pastellblau, `--mat-baustahl` -- die Sortentabelle
-      steht seit 2026-11-15), Holz (wie spröd Zug und Druck sind, legen wir
+      Baustahl (Verbundquerschnitt, Stahlwände mit eigenem G; in der
+      Zeichnung pastellblau, `--mat-baustahl` -- die Sortentabelle steht
+      seit 2026-11-15, das Gesetz seit 2026-11-26), Holz (wie spröd Zug und Druck sind, legen wir
       vorher fest), weitere Nachweise (Wände ohne Bügel).
 - [ ] **Baustahl: die Wärmedehnzahl** α_T = 10·10⁻⁶/°C (SIA 263:2013,
       3.2.2.2) fehlt -- es gibt keine Temperatur als Einheit, und keine

@@ -1,5 +1,5 @@
 ---
-erzeugt: 4de9e1760192
+erzeugt: 44c171a3aba0
 art: formel
 tags: [formel]
 normstelle: ["SIA 262:2025, 4.2.2.2, Figur 16", "SIA 262:2025, 4.3.3.2.2, (38)", "SIA 263:2013, 3.2.2.4"]
@@ -58,6 +58,7 @@ $$
 ## Gebraucht von
 
 - [[Beiwert für den Querkraftwiderstand]]
+- [[Grenzdehnung des Baustahls]]
 
 ## Im Code
 
@@ -97,8 +98,9 @@ Beim Betonstahl wird sie an vier Stellen gebraucht:
   beim Biegewiderstand: daraus der kleinste Querkraftwiderstand ohne Bügel,
   solange die Bewehrung elastisch bleibt.
 
-Beim Baustahl ist sie bisher nur Kennwert, aus Streckgrenze und $E_a$: für
-S355 1.69 ‰. Brauchen wird sie, wer plastisch rechnet: SIA 263:2013,
-3.2.2.4 lässt das zu, wenn die Bruchdehnung über 15 % liegt und mindestens
-15-mal so gross ist wie die Fliessdehnung und die Zugfestigkeit mindestens
-das 1.1-Fache der Streckgrenze -- die Sorten der Tabelle 1 erfüllen das.
+Beim Baustahl ist sie Kennwert, aus Streckgrenze und $E_a$: für S355
+1.69 ‰. Plastisch rechnen darf nach SIA 263:2013, 3.2.2.4, wessen
+Bruchdehnung über 15 % liegt und mindestens 15-mal so gross ist wie die
+Fliessdehnung, und wessen Zugfestigkeit mindestens das 1.1-Fache der
+Streckgrenze ist -- die Sorten der Tabelle 1 erfüllen das. Das 15-Fache ist
+darum die [[Grenzdehnung des Baustahls]].

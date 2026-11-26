@@ -119,6 +119,11 @@ Kopie der Datei mit der Endung `.mjs`.
   Textschicht: die Gegenprobe für das Durchstanzen (Benutzer, 2026-11-25).
   Wo es von der Norm 2025 abweicht, gilt die Norm. Auch aus ihm kein Satz
   wörtlich.
+- Für den Stahlbau SIA 263:2013, `SIA 263_2013 Stahlbau.pdf`, im selben
+  Ordner (seit 2026-11-26 im Gebrauch). Ein Scan mit einer Textschicht aus
+  der Zeichenerkennung: `pdftotext` findet die Stelle, aber Zahlen und
+  Zeichen stimmen dort nicht immer («suIe < 15» statt ε_u/ε_y ≥ 15) –
+  jede Zahl am Seitenbild prüfen. Die gedruckte Seitenzahl ist die des PDF.
 - **Keine Normtexte in der Software** (Benutzer, 2026-11-13 und 2026-11-14):
   kein Satz aus einer Norm oder dem Buch wörtlich in Code, Oberfläche,
   Bericht, Tests oder Notizbuch, auch nicht als Zitat. Den Inhalt in eigenen

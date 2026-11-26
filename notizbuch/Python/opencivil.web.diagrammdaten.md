@@ -1,5 +1,5 @@
 ---
-erzeugt: 83d7e6cd8a95
+erzeugt: cbda25240c79
 art: modul
 tags: [modul]
 ---
@@ -144,10 +144,15 @@ eine zweite, nachgebaute Fassung.
 Vorzeichen wie im ganzen Werkzeug: Zug positiv. Der Beton liegt damit im
 dritten Quadranten, der Stahl spannt sich ueber beide.
 
+Welche Kurve ein Material hat, sagt seine Art ([[opencivil.web.diagrammdaten#Konstanten|KURVEN]]); fehlt ein
+Kennwert in der Loesung, hat es noch keine. Bis 2026-11-26 galt alles,
+was nicht Beton war, als Betonstahl, und ein Baustahl fiel still weg,
+weil ihm dessen Kennwerte fehlten.
+
 ### _betonkurve
 
 ```python
-def _betonkurve(stoff, wert, schritte: int=80) -> Optional[dict]
+def _betonkurve(wert, schritte: int=80) -> Optional[dict]
 ```
 
 Parabel-Rechteck-Beziehung, von null bis zur Bruchdehnung -- mit
@@ -171,13 +176,28 @@ der Parabel: man sieht, was man aufgibt, wenn man von Hand rechnet.
 ### _stahlkurve
 
 ```python
-def _stahlkurve(stoff, wert) -> Optional[dict]
+def _stahlkurve(wert) -> Optional[dict]
 ```
 
-Bilineare Beziehung ohne Verfestigung.
+Betonstahl: bilinear, auf Zug und Druck getrennt begrenzt.
 
-Fuenf Eckpunkte genuegen -- dazwischen ist sie gerade, und mehr Punkte
-wuerden nur vortaeuschen, dass etwas gekruemmt waere.
+### _baustahlkurve
+
+```python
+def _baustahlkurve(wert) -> Optional[dict]
+```
+
+Baustahl: elastisch -- ideal plastisch, in Zug und Druck gleich, mit `f_yd = f_y / gamma_M1`.
+
+### _knickkurve
+
+```python
+def _knickkurve(gesetz: Stahlgesetz, titel: str) -> dict
+```
+
+Eine Linie ohne Verfestigung, aus ihrem Gesetz. Fuenf Eckpunkte genuegen
+-- dazwischen ist sie gerade, und mehr Punkte wuerden nur vortaeuschen,
+dass etwas gekruemmt waere.
 
 ### _knickpunkte
 
@@ -365,12 +385,14 @@ warum, sagt [[opencivil.web.diagrammdaten#_ohne_schub|_ohne_schub]].
 - `_LINIENGROESSEN = {spannungsanalyse.Analyseart.MOMENT_KRUEMMUNG: (Anzeigegroesse('M', K…` – Was eine Linie zeigt, je Art ihrer Linie: die laufende Kraft, die festgehaltene und die Verformung. Massstab und Beschriftung an einer Stelle -- bis 2026-10-18 skalierte der Kern hier, und spannungsbild.js schrieb Zeichen und Einheiten ein zweites Mal daneben (LINIEN, MODULE).
 - `_MODUL = Anzeigegroesse('E_eq', N_PRO_MM2, 'E_{eq}', 0)` – Der aequivalente Modul, ueber der laufenden Kraft.
 - `_RANDDEHNUNG = Anzeigegroesse('ε', PROMILLE, '\\varepsilon', 2)` – Die Randdehnungen beim Bruch.
+- `KURVEN = {Baustoffart.BETON: _betonkurve, Baustoffart.BETONSTAHL: _stahlkurve,…` – Je Materialart ihre Spannung-Dehnung-Linie, aus den Kennwerten einer Loesung -- wo es eines gibt, ein Gesetz des Querschnitts.
 
 ## Braucht
 
 - [[opencivil.core.einheiten]]
 - [[opencivil.core.rechenwerk]]
 - [[opencivil.core.wert]]
+- [[opencivil.material.basis]]
 - [[opencivil.nachweis.resistenzlinie]]
 - [[opencivil.nachweis.schubwandnachweis]]
 - [[opencivil.projekt]]

@@ -7,6 +7,28 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-26 · Baustahl: Gesetz und Bild
+
+Aus dem Plan vom 2026-11-25, Schritt 7: der Baustahl hat eine
+Spannung-Dehnung-Linie, elastisch -- ideal plastisch, in Zug und Druck
+gleich (`Baustahlgesetz` in `opencivil/querschnitt/werkstoffgesetz.py`).
+
+- Vorher zeigte «Diagramme → Werkstoffe» für einen Baustahl nichts. Die
+  Stelle kannte nur Beton und «sonst Betonstahl»; dem Baustahl fehlten
+  dessen Kennwerte, und der Fehler wurde still übergangen.
+- Nachher, für S355: f_yd = 355/1.05 = 338 N/mm² (SIA 263:2013, 4.1.1
+  mit γ_M1 nach 4.1.3), ε_yd = 1.61 ‰, die Linie endet bei ε_ud = 25.4 ‰.
+  Beide Werte stehen auch unter den Kennwerten des Materials.
+- Die Grenzdehnung ist nach Vorgabe, nicht nachgeschlagen (im TODO): die
+  Norm nennt keine. Gewählt sind 15 Fliessdehnungen -- so viel verlangt
+  3.2.2.4 mindestens für die plastischen Verfahren, gegen das Seitenbild
+  geprüft.
+- Welche Linie ein Material hat, sagt jetzt seine Art an einer Stelle
+  (`KURVEN` in `opencivil/web/diagrammdaten.py`); ein Test verlangt eine
+  Linie für jede Art. Spannstahl und Holz kommen dort dazu.
+- Noch rechnet keine Querschnittsanalyse mit Baustahl; das Gesetz wartet
+  auf Schritt 11.
+
 ## 2026-11-26 · Decke: Bänder von selbst
 
 Aus dem Plan vom 2026-11-25: bei automatischer Aufteilung legt die

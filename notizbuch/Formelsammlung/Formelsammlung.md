@@ -1,5 +1,5 @@
 ---
-erzeugt: 3648c2812edd
+erzeugt: a7fcf741ebae
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -11,7 +11,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 - [[Beton]] · 8
 - [[Betonstahl]] · 3
-- [[Baustahl]] · 1
+- [[Baustahl]] · 3
 
 **Platte**
 
@@ -110,6 +110,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Bemessungswert der Kohäsion]] · $c_{eff}$
 - [[Bemessungswert der Querkraft im Nachweisschnitt]] · $V_{d,red}$
 - [[Bemessungswert der Schubspannungsgrenze]] · $\tau_{cd}$
+- [[Bemessungswert der Streckgrenze]] · $f_{yd}$
 - [[Bemessungswert der undrainierten Scherfestigkeit]] · $s_{u,d}$
 - [[Bemessungswert des äusseren Widerstands]] · $R_{a,d}$
 - [[Bemessungswert des Elastizitätsmoduls]] · $E_{cd}$
@@ -229,6 +230,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Gleichmässiger Druck, ohne Bewehrung]] · $N_{Rd}^{-}$
 - [[Gleichungssystem der Steifigkeitsmethode]]
 - [[Gleitwiderstand]] · $T_{Rd}$
+- [[Grenzdehnung des Baustahls]] · $\varepsilon_{ud}$
 - [[Grenzdehnungen am Ende der Linie]]
 - [[Grenze der bezogenen Druckzonenhöhe]] · $\left(x/d\right)_{max}$
 - [[Grenze der Grundschwingzeit]] · $T_{1,max}$
@@ -413,7 +415,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 ## Normstelle fehlt noch
 
-129 von 336 Formeln haben im Code keine Normstelle – meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle – von dort kommt sie in Bericht und Notizbuch.
+129 von 338 Formeln haben im Code keine Normstelle – meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle – von dort kommt sie in Bericht und Notizbuch.
 
 - [[Achsen eines Stabs im Raum]] · [[opencivil.stabwerk3d.herleitung|_ansaetze]]
 - [[Äquivalenter E-Modul eines Stabs]] · [[opencivil.spannungsanalyse.modul#ModulProzedur|ModulProzedur._schreiben]]

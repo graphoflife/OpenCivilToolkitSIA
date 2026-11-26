@@ -19,6 +19,15 @@ Dichte, Elastizitaetsmodul, Schubmodul und Querdehnungszahl stehen in
 noch: das Werkzeug kennt keine Temperatur als Einheit, und keine Rechnung
 braucht sie.
 
+DAS GESETZ:
+Fuer die Spannung-Dehnung-Linie (:class:`~opencivil.querschnitt.werkstoffgesetz.Baustahlgesetz`)
+kommen der Bemessungswert der Streckgrenze ``f_yd = f_y / gamma_M1`` (4.1.1,
+Gleichung (1), mit 4.1.3) und eine Grenzdehnung dazu. Die Norm nennt keine
+Linie und keine Grenzdehnung; nach Vorgabe, nicht nachgeschlagen, endet sie
+bei :data:`DUKTILITAET` mal der Fliessdehnung -- so viel verlangt 3.2.2.4
+mindestens, wo plastisch gerechnet wird, und die Sorten der Tabelle 1
+erfuellen es.
+
 EIGENSTAENDIG NUTZBAR::
 
     from opencivil.core.rechenwerk import Rechenwerk
@@ -83,6 +92,12 @@ def _tabellenwert(kurzname: str, symbol: str, beschreibung: str) -> KennwertVorl
 
 #: Was ueber 40 mm Dicke gilt, steht unter demselben Zeichen mit ``t>40`` oben.
 DICK = "für 40 mm < t ≤ 100 mm"
+
+#: Wie viele Fliessdehnungen weit die Linie reicht: das Verhaeltnis von
+#: Bruch- zu Fliessdehnung, das SIA 263:2013, 3.2.2.4 fuer die plastischen
+#: Verfahren mindestens verlangt -- als Grenzdehnung nach Vorgabe, nicht
+#: nachgeschlagen.
+DUKTILITAET = 15.0
 
 BAUSTAHL_VORLAGEN: tuple[KennwertVorlage, ...] = (
     # -- Eingaben aus der Sortentabelle ------------------------------------
@@ -156,6 +171,31 @@ BAUSTAHL_VORLAGEN: tuple[KennwertVorlage, ...] = (
         eingaben=("f_y", "E_a"),
         vorlage_latex=r"\frac{@f_y}{@E_a}",
         funktion=lambda f_y, E_a: f_y / E_a,
+    ),
+    KennwertVorlage(
+        kurzname="f_yd",
+        symbol="f_{yd}",
+        einheit=N_PRO_MM2,
+        beschreibung="Bemessungswert der Streckgrenze",
+        referenz="SIA 263:2013, 4.1.1, (1); 4.1.3",
+        stellen=0,
+        eingaben=("f_y", "gamma_M1"),
+        vorlage_latex=r"\frac{@f_y}{@gamma_M1}",
+        funktion=lambda f_y, gamma_M1: f_y / gamma_M1,
+    ),
+    KennwertVorlage(
+        kurzname="eps_ud",
+        symbol=r"\varepsilon_{ud}",
+        einheit=PROMILLE,
+        beschreibung="Grenzdehnung des Baustahls",
+        referenz="SIA 263:2013, 3.2.2.4; als Grenzdehnung nach Vorgabe",
+        stellen=1,
+        eingaben=("eps_y",),
+        vorlage_latex=rf"{DUKTILITAET:g} \cdot @eps_y",
+        funktion=lambda eps_y: DUKTILITAET * eps_y,
+        begruendung=("Nach Vorgabe, nicht nachgeschlagen: die Norm nennt keine Grenzdehnung. "
+                     f"Die Linie endet bei {DUKTILITAET:g} Fliessdehnungen – so weit dehnen sich "
+                     "die Sorten der Tabelle 1 nach 3.2.2.4 mindestens."),
     ),
 )
 

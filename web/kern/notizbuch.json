@@ -628,6 +628,17 @@
       ]
     },
     {
+      "name": "Bemessungswert der Streckgrenze",
+      "pfad": "Formelsammlung/Formeln/Bemessungswert der Streckgrenze.md",
+      "art": "formel",
+      "zeichen": [
+        "f_{yd}"
+      ],
+      "themen": [
+        "Baustahl"
+      ]
+    },
+    {
       "name": "Bemessungswert der undrainierten Scherfestigkeit",
       "pfad": "Formelsammlung/Formeln/Bemessungswert der undrainierten Scherfestigkeit.md",
       "art": "formel",
@@ -1934,6 +1945,17 @@
       ],
       "themen": [
         "Gleiten"
+      ]
+    },
+    {
+      "name": "Grenzdehnung des Baustahls",
+      "pfad": "Formelsammlung/Formeln/Grenzdehnung des Baustahls.md",
+      "art": "formel",
+      "zeichen": [
+        "\\varepsilon_{ud}"
+      ],
+      "themen": [
+        "Baustahl"
       ]
     },
     {
@@ -7956,6 +7978,10 @@
         "StahlNurZug.aus",
         "StahlNurZug.formel",
         "StahlNurZug.latex",
+        "Baustahlgesetz",
+        "Baustahlgesetz.gleich",
+        "Baustahlgesetz.formel",
+        "Baustahlgesetz.latex",
         "_stahlfunktion",
         "BetonUngerissen",
         "BetonUngerissen.formel",
@@ -8768,6 +8794,8 @@
         "_betonkurve",
         "_spannungsblock",
         "_stahlkurve",
+        "_baustahlkurve",
+        "_knickkurve",
         "_knickpunkte",
         "_knicken",
         "_linienzug",
