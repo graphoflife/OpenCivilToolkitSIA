@@ -1,5 +1,5 @@
 ---
-erzeugt: b07d96bccd1c
+erzeugt: ce283809f493
 art: modul
 tags: [modul]
 ---
@@ -16,6 +16,9 @@ Nulllinie ([[opencivil.spannungsanalyse.schnitt#KippendeNulllinie|KippendeNullli
 schreibt als die Platte. Bis 2026-10-17 stand es in
 `opencivil/querschnitt/schnittanalyse.py` -- im Querschnitt, aber auf der
 Analyse gebaut, die es ihrerseits erst in einer Funktion laden konnte.
+Ebenen und Zerlegung teilt er mit dem Querschnitt ohne Beton, der nicht
+reisst ([[opencivil.spannungsanalyse.schnitt#AmSchnitt|AmSchnitt]], [[opencivil.spannungsanalyse.schnitt#Zerlegung|Zerlegung]];
+[[opencivil.spannungsanalyse.rissfrei|rissfrei]]).
 
 
 ## JE ZUGSEITE
@@ -37,6 +40,8 @@ rechnet immer so.
 Momente beziehen sich auf ihn, wie in den Lastfaellen. «Oben» heisst der
 Rand gegenueber der Zugseite, «unten» der auf ihr: bei Zug links ist oben
 der rechte Rand. Kippt die Nulllinie, gelten oben und unten senkrecht zu ihr.
+Die Raender sind die der Flaechen, aus welchem Material auch immer
+([[opencivil.querschnitt.interaktion#Richtung|umriss]]).
 
 
 ## WOMIT GERECHNET WIRD
@@ -65,10 +70,11 @@ Abmessung `min(h; b)`, die Regel der Platte, uebertragen.
 Bezogen auf den Bruttoquerschnitt: `I` um die Achse der Biegung bzw.
 `A`. Kippt die Nulllinie, kippt sie auch beim reinen Betonquerschnitt,
 mit dem der Modul sich vergleicht: unter reiner Biegung kruemmt er sich wie
-einer mit `I_y - I_yz²/I_z` (um y). Sonst zeigte ein ungerissener L schon
-seiner Form wegen weniger als `E_c,eff` -- am L oben 0.79·E_cm statt 1.07.
-So vom Benutzer bestaetigt am 2026-10-17. Bei der Platte sind es `b·h³/12`
-und `b·h`.
+einer mit `I_y - I_yz²/I_z` (um y,
+[[opencivil.nachweis.rissgroessen#Bruttoquerschnitt.traegheit|traegheit]]). Sonst
+zeigte ein ungerissener L schon seiner Form wegen weniger als `E_c,eff` --
+am L oben 0.79·E_cm statt 1.07. So vom Benutzer bestaetigt am 2026-10-17.
+Bei der Platte sind es `b·h³/12` und `b·h`.
 
 
 ## EINHEITEN
@@ -77,15 +83,17 @@ SI-Basis wie im ganzen Querschnittsmodul.
 
 ## Inhalt
 
-### _betonspannung
+### _flaechenspannung
 
 ```python
-def _betonspannung(r, gesetze: Mapping[int, Callable[[float], float]]) -> Callable[[float, float], float]
+def _flaechenspannung(r: Richtung, werkstoffe: Sequence[Werkstoff]) -> Callable[[float, float], float]
 ```
 
-Die Spannung des Betons an einer Stelle, fuer das Bild: in jedem Streifen
-der Beton mit der groessten Breite dort. Liegen zwei Betone in derselben
-Tiefe, zeigt das Bild den, der dort ueberwiegt.
+Die Spannung der Flaeche an einer Stelle, fuer das Bild: in jedem Streifen
+der Werkstoff mit der groessten Breite dort -- beim Stahlbeton der Beton.
+Liegen zwei in derselben Tiefe, zeigt das Bild den, der dort ueberwiegt.
+Bis 2026-11-26 nur der Beton: ein Querschnitt aus Holz oder Baustahl
+hatte keine Spannung zu zeigen.
 
 ### _loeser
 
@@ -100,13 +108,13 @@ Ihr Arm entlang der Nulllinie ist der Schwerpunkt ihrer Flaechen: mit ihm
 stimmt das Moment um die andere Achse, nach dem die kippende Nulllinie
 sucht. Bis 2026-10-17 fiel er weg, und die Suche fand an einem L Ebenen
 mit einem Moment um die andere Achse. `suche` sagt, wie der Loeser
-sucht ([[opencivil.spannungsanalyse.schnitt#_Zerlegung.in_richtung|_Zerlegung.in_richtung]]).
+sucht ([[opencivil.spannungsanalyse.schnitt#Zerlegung.in_richtung|Zerlegung.in_richtung]]).
 
-### _Zerlegung
+### Zerlegung
 
 ```python
 @dataclass(frozen=True)
-class _Zerlegung
+class Zerlegung
 ```
 
 Ein Zustand des gezeichneten Querschnitts -- in jeder Zugrichtung zu haben.
@@ -116,7 +124,7 @@ Ein Zustand des gezeichneten Querschnitts -- in jeder Zugrichtung zu haben.
 - `staehle: Mapping[int, Stahlgesetz]`
 - `namen: Mapping[int, str]`
 
-#### _Zerlegung.in_richtung
+#### Zerlegung.in_richtung
 
 ```python
 def in_richtung(self, psi: float, *, suche: Suche=SUCHE_DER_ANALYSEN) -> FesteNulllinie
@@ -247,11 +255,51 @@ Woran das Moment um die andere Achse gemessen wird: das groessere von M
 und N mit einem Hebel von einem Meter, wie unter Gebrauchslast -- so gilt
 eine Schranke fuer jede Stelle einer Linie.
 
+### AmSchnitt
+
+```python
+class AmSchnitt
+```
+
+Was jedes Paar eines gezeichneten Querschnitts hat, ob er reisst oder
+nicht: wie ein Zustand seine Ebenen findet -- «einachsig» mit fester
+Nulllinie, sonst kippend --, wo seine Mitteldehnung gilt und wie die
+Herleitung sie am Ende nennt. Das Paar gibt `brutto` mit der Wahl der
+Biegung und `seite`.
+
+- `brutto: Bruttoquerschnitt`
+- `seite: Zugseite`
+- `bezugsort = 'im Schwerpunkt'` – Wo die Mitteldehnung gilt -- dort greift N an.
+
+#### AmSchnitt.zustand
+
+```python
+def zustand(self, zerlegung: Zerlegung, loeser: Faserloeser) -> Ebenensuche
+```
+
+Wie ein Zustand seine Ebenen findet: kippend, «einachsig» mit fester Nulllinie.
+
+#### AmSchnitt.herleitung_dehnung_am_ende
+
+```python
+def herleitung_dehnung_am_ende(self, p: Protokoll, w: Zwischenwerte, bruch: Grenzzustand, oben: 'Wert', unten: 'Wert', h: 'Wert') -> None
+```
+
+Die Dehnung im Schwerpunkt am Ende -- dort greift N an; `h` senkrecht zur Nulllinie.
+
+### zerlegung
+
+```python
+def zerlegung(q: Querschnitt, herkunft: Sequence[Bewehrungselement], staehle: Mapping[int, Stahlgesetz]) -> Zerlegung
+```
+
+Ein Zustand aus dem, was [[opencivil.querschnitt.analyse#Querschnittsanalyse.querschnitt|querschnitt]] gibt.
+
 ### Schnittpaar
 
 ```python
 @dataclass(frozen=True)
-class Schnittpaar(Bruttoriss)
+class Schnittpaar(AmSchnitt, Bruttoriss)
 ```
 
 Die beiden Loeser eines gezeichneten Querschnitts in einer Zugrichtung --
@@ -265,7 +313,7 @@ Herleitung braucht.
 - `seite: Zugseite`
 - `wahl: Rechenwahl`
 - `querschnitt: Querschnitt` – Der gerissene Querschnitt im Bruchzustand -- derselbe, aus dem `gerissen` stammt.
-- `zerlegungen: Tuple[_Zerlegung, _Zerlegung]` – Gerissen und ungerissen, in jeder Richtung -- fuer die kippende Nulllinie.
+- `zerlegungen: Tuple[Zerlegung, Zerlegung]` – Gerissen und ungerissen, in jeder Richtung -- fuer die kippende Nulllinie.
 - `A: float` – Flaeche des Bruttoquerschnitts, m².
 - `brutto: Bruttoquerschnitt`
 - `riss: Rissmoment` – Das Rissmoment unter reiner Biegung, ohne Normalkraft -- und die Ecke, die zuerst reisst.
@@ -276,7 +324,6 @@ Herleitung braucht.
 - `ids: Mapping[str, str] = field(default_factory=dict)` – Kurzname -> Wert-ID der Eingaben, fuer die Herleitung: der Beton der Ecke, die zuerst reisst, und A, I -- dazu die Zugfestigkeit jedes Betons unter ihrer eigenen ID, denn welche Ecke unter Zug zuerst reisst, haengt am Moment.
 - `ZUR_ANDEREN_ACHSE = 'Das Moment um die andere Achse, das ein unsymmetrischer Querschnitt …`
 - `DICKE_UNTER_ZUG = 'die kleinere Abmessung des Betons'`
-- `bezugsort = 'im Schwerpunkt'` – Wo die Mitteldehnung gilt -- dort greift N an.
 
 #### Schnittpaar.ebenen
 
@@ -284,7 +331,7 @@ Herleitung braucht.
 def ebenen(self) -> Zustaende
 ```
 
-Die Ebenen beider Zustaende: kippend, «einachsig» mit fester Nulllinie.
+Die Ebenen beider Zustaende ([[opencivil.spannungsanalyse.schnitt#AmSchnitt.zustand|AmSchnitt.zustand]]).
 
 #### Schnittpaar.tiefe
 
@@ -309,14 +356,6 @@ def herleitung_dicke_unter_zug(self, p: Protokoll, w: Zwischenwerte, h: 'Wert') 
 ```
 
 Die kleinere Abmessung des Betons, `min(h; b)`.
-
-#### Schnittpaar.herleitung_dehnung_am_ende
-
-```python
-def herleitung_dehnung_am_ende(self, p: Protokoll, w: Zwischenwerte, bruch: Grenzzustand, oben: 'Wert', unten: 'Wert', h: 'Wert') -> None
-```
-
-Die Dehnung im Schwerpunkt am Ende -- dort greift N an; `h` senkrecht zur Nulllinie.
 
 ### schnittpaar
 
@@ -358,8 +397,9 @@ aus einer Loesung.
 - [[opencivil.spannungsanalyse]]
 - [[opencivil.spannungsanalyse.analysen]]
 - [[opencivil.spannungsanalyse.modul]]
+- [[opencivil.spannungsanalyse.rissfrei]]
 
 ## Formeln aus diesem Modul
 
-- [[Grösste Dehnung im Schwerpunkt]] · `Schnittpaar.herleitung_dehnung_am_ende`
+- [[Grösste Dehnung im Schwerpunkt]] · `AmSchnitt.herleitung_dehnung_am_ende`
 - [[Rissaktive Dicke des gezeichneten Querschnitts]] · `Schnittpaar.herleitung_dicke_unter_zug`

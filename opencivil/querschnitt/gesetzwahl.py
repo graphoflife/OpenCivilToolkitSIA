@@ -2,10 +2,12 @@
 opencivil/querschnitt/gesetzwahl.py -- womit ein Querschnitt rechnet.
 
 VERANTWORTUNG:
-Die Wahl der Werkstoffgesetze: der Wertesatz (:class:`Werkstoffsatz`) und die
-Rechenart (:class:`Rechenart`), mit der Kriechzahl zusammen eine
-:class:`Rechenwahl` -- und die eine Stelle, die daraus den Beton baut
-(:func:`betongesetz`), mit dem wirksamen Modul (:func:`wirksamer_modul`).
+Die Wahl der Werkstoffgesetze: der Wertesatz (:class:`Werkstoffsatz`), die
+Rechenart des Betons (:class:`Rechenart`) und die des Holzes
+(:class:`Holzrechnung`), mit der Kriechzahl zusammen eine
+:class:`Rechenwahl` -- und die Stellen, die daraus die Gesetze bauen: den
+Beton (:func:`betongesetz`), mit dem wirksamen Modul (:func:`wirksamer_modul`),
+und das Holz (:func:`holzgesetz`).
 Das gehoert dem Querschnitt: die Platte, der gezeichnete Querschnitt und die
 Spannung-Dehnung-Analyse fragen hier, ohne dafuer einen Nachweis zu laden.
 Was ein Nachweis-Kapitel davon anbietet, steht bei den Nachweisen
@@ -57,7 +59,7 @@ from typing import Any, Dict, FrozenSet, Mapping, Sequence, Tuple
 from opencivil.core.wahl import Wahl
 from opencivil.material.basis import Baustoffart
 from opencivil.querschnitt.werkstoffgesetz import (
-    BLOCKANTEIL, Betongesetz, BetonUngerissen, Gesetz, Spannungsblock,
+    BLOCKANTEIL, Betongesetz, BetonUngerissen, Gesetz, Holzgesetz, HolzPlastisch, Spannungsblock,
 )
 
 
@@ -174,6 +176,16 @@ class Werkstoffsatz(Wahl):
         """
         return "f_pd" if self is Werkstoffsatz.BEMESSUNG else "f_p01k"
 
+    def festigkeit(self, art: Baustoffart) -> str:
+        """
+        Der Kurzname der Festigkeit, deren Plateau dieser Satz waehlt, je Art
+        des Baustoffs -- ``f_cd`` oder ``f_ck`` beim Beton, ``f_yd`` oder
+        ``f_y`` beim Baustahl. Das Holz hat keinen Satz (:data:`HOLZKENNWERTE`);
+        fuer den Titel des Schalters (:mod:`opencivil.web.api`, ``satztitel``).
+        """
+        return {Baustoffart.BETON: self.beton, Baustoffart.BETONSTAHL: self.stahl,
+                Baustoffart.SPANNSTAHL: self.spannstahl, Baustoffart.BAUSTAHL: self.baustahl}[art]
+
     @property
     def spannstahlkennwerte(self) -> Dict[str, str]:
         """
@@ -189,6 +201,30 @@ class Werkstoffsatz(Wahl):
 #: Tabellen 6 und 7), dazu die Grenzstauchung des elastisch-plastischen
 #: (:class:`~opencivil.querschnitt.werkstoffgesetz.HolzPlastisch`).
 HOLZKENNWERTE = {"f_t": "f_t_0_d", "f_c": "f_c_0_d", "E": "E_0_mean", "eps_cu": "eps_cu"}
+
+
+class Holzrechnung(Wahl):
+    """
+    Wie das Holz rechnet: linear bis zum Bruch (SIA 265:2012, 3.1.2.1) oder
+    auf Druck elastisch-plastisch (3.1.2.2). Eine Wahl nur in den
+    Spannung-Dehnung-Analysen (Benutzer, 2026-11-25): die Nachweise rechnen
+    linear (4.1.2). Die Grenzstauchung des plastischen ist nach Vorgabe,
+    nicht nachgeschlagen (:data:`~opencivil.material.holz.STAUCHBARKEIT`).
+    """
+
+    LINEAR = "linear"
+    PLASTISCH = "plastisch"
+
+    @property
+    def beschriftung(self) -> str:
+        return {Holzrechnung.LINEAR: "Linear bis zum Bruch",
+                Holzrechnung.PLASTISCH: "Auf Druck elastisch-plastisch"}[self]
+
+    @property
+    def kurz(self) -> str:
+        """Fuer schmale Zeilen -- im Schalter unter dem Holz."""
+        return {Holzrechnung.LINEAR: "linear",
+                Holzrechnung.PLASTISCH: "elastisch-plastisch"}[self]
 
 
 class Rechenart(Wahl):
@@ -371,10 +407,18 @@ class Rechenarten(JeBaustoff):
 
 
 @dataclass(frozen=True)
+class Holzrechnungen(JeBaustoff):
+    """Je Holz, wie es rechnet (:class:`Holzrechnung`) -- ohne Wahl linear."""
+
+    vorgabe: Holzrechnung = Holzrechnung.LINEAR
+
+
+@dataclass(frozen=True)
 class Rechenwahl:
     """
     Was ein Kapitel waehlt: Kriechzahl, je Baustoff den Wertesatz und je
-    Beton die Rechenart. Die Rechenart je Beton seit 2026-11-25 (Benutzer:
+    Beton die Rechenart, in den Spannung-Dehnung-Analysen dazu je Holz, wie
+    es rechnet. Die Rechenart je Beton seit 2026-11-25 (Benutzer:
     unter dem Beton, in jedem Modul); bis dahin galt in einem Kapitel eine
     fuer alle Betone, und nur die Tragsicherheit der Querschnittsanalyse
     waehlte je Beton -- mit einer eigenen Wahl fuer jeden Baustoff.
@@ -383,6 +427,7 @@ class Rechenwahl:
     kriechzahl: float = 0.0
     saetze: Wertesaetze = Wertesaetze()
     arten: Rechenarten = Rechenarten()
+    holz: Holzrechnungen = Holzrechnungen()
     modul: str = "E_cm"
     """
     Der Kurzname des Elastizitaetsmoduls, an dem der Beton haengt: ``E_cm``,
@@ -397,6 +442,10 @@ class Rechenwahl:
     def art_von(self, beton) -> Rechenart:
         """Die Rechenart eines Betons (:meth:`JeBaustoff.von`)."""
         return self.arten.von(beton)
+
+    def holz_von(self, holz) -> Holzrechnung:
+        """Wie ein Holz rechnet (:meth:`JeBaustoff.von`)."""
+        return self.holz.von(holz)
 
     @property
     def art(self) -> Rechenart:
@@ -450,13 +499,15 @@ class Rechenwahl:
 
     def gleiche_linie(self, andere: "Rechenwahl") -> bool:
         """
-        Ob ``andere`` dieselbe Resistenzlinie ergibt: dieselben Rechenarten und
-        dieselben Wertesaetze, dazu Kriechzahl und Modul, wo ein Gesetz am Modul
-        haengt (:attr:`Rechenarten.mit_kriechzahl`). Bis 2026-11-20 eine freie
-        Funktion der M-N-Interaktion, die den Modul nicht verglich: eine
-        Parabel mit ``E_cd`` haette die Linie einer mit ``E_cm`` bekommen.
+        Ob ``andere`` dieselbe Resistenzlinie ergibt: dieselben Rechenarten,
+        Wertesaetze und Gesetze des Holzes, dazu Kriechzahl und Modul, wo ein
+        Gesetz am Modul haengt (:attr:`Rechenarten.mit_kriechzahl`). Bis
+        2026-11-20 eine freie Funktion der M-N-Interaktion, die den Modul
+        nicht verglich: eine Parabel mit ``E_cd`` haette die Linie einer mit
+        ``E_cm`` bekommen.
         """
         return (self.arten == andere.arten and self.saetze == andere.saetze
+                and self.holz == andere.holz
                 and (not self.arten.mit_kriechzahl
                      or (self.kriechzahl, self.modul) == (andere.kriechzahl, andere.modul)))
 
@@ -471,6 +522,29 @@ def arten_text(wahl: Rechenwahl, betone: Sequence = ()) -> str:
     if art is not None:
         return art.beschriftung
     return ", ".join(f"{b.name} {wahl.art_von(b).kurz}" for b in betone)
+
+
+def holz_text(wahl: Rechenwahl, hoelzer: Sequence) -> str:
+    """
+    Wie die ``hoelzer`` rechnen, in Worten -- wie :func:`arten_text`: alle
+    gleich «Linear bis zum Bruch», sonst je Holz mit seinem Namen; ohne Holz
+    nichts.
+    """
+    gewaehlt = {wahl.holz_von(h) for h in hoelzer}
+    if len(gewaehlt) == 1:
+        return next(iter(gewaehlt)).beschriftung
+    return ", ".join(f"{h.name} {wahl.holz_von(h).kurz}" for h in hoelzer)
+
+
+def holzgesetz(rechnung: Holzrechnung, *, E: float, f_t: float, f_c: float,
+               eps_cu: float) -> Holzgesetz:
+    """
+    Das Gesetz eines Holzes, wie es rechnet -- die eine Stelle, die zwischen
+    linear und elastisch-plastisch waehlt. Werte in SI, positiv.
+    """
+    if rechnung is Holzrechnung.PLASTISCH:
+        return HolzPlastisch(E=E, f_t=f_t, f_c=f_c, eps_cu=eps_cu)
+    return Holzgesetz(E=E, f_t=f_t, f_c=f_c)
 
 
 #: Die Kriechdehnung ist ``phi`` mal die elastische; zusammen ``(1 + phi)``

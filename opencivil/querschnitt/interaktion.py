@@ -154,6 +154,13 @@ class Werkstoff:
     Leer: «Beton C30/37, Rand oben», «Stahl B500B, äusserste Lage unten».
     """
 
+    wort: str = "Stahl"
+    """
+    Was er ist, vor seinem Namen in der Dehnungsgrenze: «Beton», «Holz»,
+    «Baustahl» -- ein Stab bleibt «Stahl». Bis 2026-11-26 hiess jeder
+    Werkstoff ausser dem Beton «Stahl», auch eine Flaeche aus Holz.
+    """
+
 
 @dataclass(frozen=True)
 class Teil:
@@ -282,6 +289,22 @@ class Richtung:
 
     staebe_v: Tuple[float, ...]
     """Je Bewehrung ihr v."""
+
+    umriss: Tuple[float, float] = (0.0, 0.0)
+    """
+    Kleinstes und groesstes v der Flaechen, aus welchem Werkstoff auch immer
+    -- ueber diese Tiefe laeuft das Bild einer Spannung-Dehnung-Analyse. Beim
+    Stahlbeton dasselbe wie :attr:`beton`.
+    """
+
+    fliessgrenzen: Tuple[Dehnungsgrenze, ...] = ()
+    """
+    Wo eine Flaeche zu fliessen beginnt: je Werkstoff, dessen Gesetz fliesst
+    (:attr:`~opencivil.querschnitt.werkstoffgesetz.Gesetz.fliessbereich`),
+    an seinen aeussersten Punkten -- dort erreicht eine ebene Dehnung jede
+    Schwelle zuerst. Beim Stahlbeton keine: der Beton fliesst nicht, und den
+    Stahl der Lagen fragt der Fliessbeginn nur auf Zug.
+    """
 
     def momente(self, N: float, M: float, M_quer: float) -> Tuple[float, float]:
         """
@@ -430,19 +453,26 @@ class Querschnitt:
                                verdraengt=verdraengt, quer=u, dicke=band))
             staebe_v.append(v)
 
-        grenzen, beton = self._grenzen(v_von, n)
+        grenzen, beton, fliessen = self._grenzen(v_von, n)
+        umriss = [v_von(p) for teil in self.teile if teil.werkstoff is not None
+                  for p in teil.punkte]
         return Richtung(
             psi=psi, n=n, t=t, fasern=Faserquerschnitt(gruppen, staebe),
             grenzen=Dehnungsgrenzen(grenzen), gruppen_werkstoff=tuple(gruppen_werkstoff),
-            beton=beton, staebe_v=tuple(staebe_v))
+            beton=beton, staebe_v=tuple(staebe_v),
+            umriss=(min(umriss), max(umriss)) if umriss else (0.0, 0.0),
+            fliessgrenzen=tuple(fliessen))
 
     def _grenzen(self, v_von, n: Punkt) -> Tuple[List[Dehnungsgrenze],
-                                                 Optional[Tuple[float, float]]]:
+                                                 Optional[Tuple[float, float]],
+                                                 List[Dehnungsgrenze]]:
         """
         Die Dehnungsgrenzen fuer diese Neigung: je Werkstoff an seinen
         aeussersten Punkten, beim Beton dazu die C-Punkte -- jede mit ihrem
         Namen und der Seite, auf der sie liegt. Die Seite grosser v ist die,
-        auf die die Zugrichtung ``n`` zeigt.
+        auf die die Zugrichtung ``n`` zeigt. Eine Flaeche nennt ihren Rand,
+        ein Stab seine Lage. Dazu dieselben Stellen einer Flaeche, deren
+        Gesetz fliesst, mit seinem elastischen Bereich (:attr:`Richtung.fliessgrenzen`).
         """
         if abs(n[1]) >= abs(n[0]):
             seiten = ("oben", "unten") if n[1] < 0 else ("unten", "oben")
@@ -452,28 +482,34 @@ class Querschnitt:
         for teil in self.teile:
             if teil.werkstoff is not None:
                 lagen.setdefault(teil.werkstoff, []).extend(v_von(p) for p in teil.punkte)
+        flaechen = set(lagen)
         for s in self.bewehrung:
             lagen.setdefault(s.werkstoff, []).extend(
                 v_von(p) for p in (s.grenzpunkte or (s.lage,)))
 
         grenzen: List[Dehnungsgrenze] = []
+        fliessen: List[Dehnungsgrenze] = []
         beton: Optional[Tuple[float, float]] = None
         for w, vs in sorted(lagen.items()):
             stoff = self.werkstoffe[w]
             if not (math.isfinite(stoff.eps_min) or math.isfinite(stoff.eps_max)):
                 continue  # ein Spannglied ohne Verbund: seine Kraft haengt an keiner Dehnung
             ist_beton = stoff.c_punkt is not None
-            art = f"Beton {stoff.name}" if ist_beton else f"Stahl {stoff.name}"
+            art = f"{stoff.wort} {stoff.name}"
+            bereich = stoff.gesetz.fliessbereich if w in flaechen else None
             v_min, v_max = min(vs), max(vs)
             for v in {v_min, v_max}:
                 # Liegt der Werkstoff an einer einzigen Stelle -- eine Lage
                 # nur unten --, sagt ihre Lage zum Bezugspunkt die Seite.
                 gross = v > v_min if v_min < v_max else v > 0.0
                 seite = seiten[1] if gross else seiten[0]
+                name = stoff.grenzname or (f"{art}, Rand {seite}" if w in flaechen
+                                           else f"{art}, äusserste Lage {seite}")
                 grenzen.append(Dehnungsgrenze(
-                    arm=v, eps_min=stoff.eps_min, eps_max=stoff.eps_max,
-                    name=stoff.grenzname or (f"{art}, Rand {seite}" if ist_beton
-                                             else f"{art}, äusserste Lage {seite}")))
+                    arm=v, eps_min=stoff.eps_min, eps_max=stoff.eps_max, name=name))
+                if bereich is not None:
+                    fliessen.append(Dehnungsgrenze(arm=v, eps_min=bereich[0],
+                                                   eps_max=bereich[1], name=name))
             if ist_beton:
                 eps_c1d, eps_c2d = stoff.c_punkt
                 anteil = anteil_punkt_c(eps_c1d, eps_c2d)
@@ -492,7 +528,7 @@ class Querschnitt:
                 grenzen.append(Dehnungsgrenze(arm=v, eps_min=-math.inf,
                                               eps_max=EPS_ZUG_OHNE_GRENZE,
                                               name="Rand ohne Bewehrung"))
-        return grenzen, beton
+        return grenzen, beton, fliessen
 
     # -- Der Faecher ----------------------------------------------------------
 

@@ -243,7 +243,8 @@ class Gesetze:
         """
         k = self.kennwerte
         werkstoffe = [Werkstoff(k.name, self.beton, -k.eps_c2d, math.inf,
-                                c_punkt=(k.eps_c1d, k.eps_c2d), verdraengbar=self.verdraengt)]
+                                c_punkt=(k.eps_c1d, k.eps_c2d), verdraengbar=self.verdraengt,
+                                wort="Beton")]
         je_stahl: Dict[Tuple[str, Stahlgesetz], int] = {}
         bewehrung = []
         for l in self.lagen(lagen):
@@ -274,7 +275,7 @@ class Gesetze:
         r = self.querschnitt(h=h, b=b, lagen=lagen).richtung(Zugseite.UNTEN.psi)
         oben, unten = r.beton
         return Faserloeser(querschnitt=r.fasern, grenzen=r.grenzen, oben=oben, unten=unten,
-                           lagen=self.lagen(lagen), beton=lambda arm, eps: self.beton(eps),
+                           lagen=self.lagen(lagen), flaeche=lambda arm, eps: self.beton(eps),
                            suche=suche)
 
 

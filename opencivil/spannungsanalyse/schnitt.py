@@ -9,6 +9,9 @@ Nulllinie (:class:`KippendeNulllinie`) und was seine Herleitung anders
 schreibt als die Platte. Bis 2026-10-17 stand es in
 ``opencivil/querschnitt/schnittanalyse.py`` -- im Querschnitt, aber auf der
 Analyse gebaut, die es ihrerseits erst in einer Funktion laden konnte.
+Ebenen und Zerlegung teilt er mit dem Querschnitt ohne Beton, der nicht
+reisst (:class:`AmSchnitt`, :class:`Zerlegung`;
+:mod:`~opencivil.spannungsanalyse.rissfrei`).
 
 JE ZUGSEITE:
 Eine Analyse waehlt die Seite, die ein positives Moment zieht: unten, oben,
@@ -28,6 +31,8 @@ rechnet immer so.
 Momente beziehen sich auf ihn, wie in den Lastfaellen. «Oben» heisst der
 Rand gegenueber der Zugseite, «unten» der auf ihr: bei Zug links ist oben
 der rechte Rand. Kippt die Nulllinie, gelten oben und unten senkrecht zu ihr.
+Die Raender sind die der Flaechen, aus welchem Material auch immer
+(:attr:`~opencivil.querschnitt.interaktion.Richtung.umriss`).
 
 WOMIT GERECHNET WIRD:
 Je Analyse eine Rechenwahl wie bei der Platte -- Kriechzahl, je Werkstoff
@@ -50,10 +55,11 @@ DER AEQUIVALENTE MODUL:
 Bezogen auf den Bruttoquerschnitt: ``I`` um die Achse der Biegung bzw.
 ``A``. Kippt die Nulllinie, kippt sie auch beim reinen Betonquerschnitt,
 mit dem der Modul sich vergleicht: unter reiner Biegung kruemmt er sich wie
-einer mit ``I_y - I_yz²/I_z`` (um y). Sonst zeigte ein ungerissener L schon
-seiner Form wegen weniger als ``E_c,eff`` -- am L oben 0.79·E_cm statt 1.07.
-So vom Benutzer bestaetigt am 2026-10-17. Bei der Platte sind es ``b·h³/12``
-und ``b·h``.
+einer mit ``I_y - I_yz²/I_z`` (um y,
+:meth:`~opencivil.nachweis.rissgroessen.Bruttoquerschnitt.traegheit`). Sonst
+zeigte ein ungerissener L schon seiner Form wegen weniger als ``E_c,eff`` --
+am L oben 0.79·E_cm statt 1.07. So vom Benutzer bestaetigt am 2026-10-17.
+Bei der Platte sind es ``b·h³/12`` und ``b·h``.
 
 EINHEITEN:
 SI-Basis wie im ganzen Querschnittsmodul.
@@ -79,11 +85,11 @@ from opencivil.querschnitt.analyse import Querschnittsanalyse
 from opencivil.querschnitt.bewehrungselemente import Bewehrungselement
 from opencivil.querschnitt.fasern import Faserquerschnitt, Stab
 from opencivil.querschnitt.gesetzwahl import Rechenwahl
-from opencivil.querschnitt.interaktion import Querschnitt
+from opencivil.querschnitt.interaktion import Querschnitt, Richtung, Werkstoff
 from opencivil.querschnitt.werkstoffgesetz import Stahlgesetz
 from opencivil.querschnitt.zugseite import Zugseite
 from opencivil.spannungsanalyse.linie import (
-    SUCHE_DER_ANALYSEN, Dehnungsebene, FesteNulllinie, Grenzzustand, Zustaende,
+    SUCHE_DER_ANALYSEN, Dehnungsebene, Ebenensuche, FesteNulllinie, Grenzzustand, Zustaende,
 )
 from opencivil.spannungsanalyse.riss import Bruttoriss
 
@@ -96,17 +102,18 @@ if TYPE_CHECKING:
 # ===========================================================================
 
 
-def _betonspannung(r, gesetze: Mapping[int, Callable[[float], float]]
-                   ) -> Callable[[float, float], float]:
+def _flaechenspannung(r: Richtung, werkstoffe: Sequence[Werkstoff]
+                      ) -> Callable[[float, float], float]:
     """
-    Die Spannung des Betons an einer Stelle, fuer das Bild: in jedem Streifen
-    der Beton mit der groessten Breite dort. Liegen zwei Betone in derselben
-    Tiefe, zeigt das Bild den, der dort ueberwiegt.
+    Die Spannung der Flaeche an einer Stelle, fuer das Bild: in jedem Streifen
+    der Werkstoff mit der groessten Breite dort -- beim Stahlbeton der Beton.
+    Liegen zwei in derselben Tiefe, zeigt das Bild den, der dort ueberwiegt.
+    Bis 2026-11-26 nur der Beton: ein Querschnitt aus Holz oder Baustahl
+    hatte keine Spannung zu zeigen.
     """
+    gesetze = [w.gesetz for w in werkstoffe]
     streifen: Dict[float, Tuple[float, float, int]] = {}
     for gruppe, w in zip(r.fasern.gruppen, r.gruppen_werkstoff):
-        if w not in gesetze:
-            continue
         for arm, flaeche, dicke in zip(gruppe.arme, gruppe.flaechen, gruppe.dicken):
             da = streifen.get(arm)
             if da is None or flaeche > da[1]:
@@ -130,10 +137,10 @@ def _loeser(q: Querschnitt, psi: float, herkunft: Sequence[Bewehrungselement],
     stimmt das Moment um die andere Achse, nach dem die kippende Nulllinie
     sucht. Bis 2026-10-17 fiel er weg, und die Suche fand an einem L Ebenen
     mit einem Moment um die andere Achse. ``suche`` sagt, wie der Loeser
-    sucht (:meth:`_Zerlegung.in_richtung`).
+    sucht (:meth:`Zerlegung.in_richtung`).
     """
     r = q.richtung(psi)
-    oben, unten = r.beton
+    oben, unten = r.umriss
     gruppen: Dict[tuple, List[Tuple[Stab, Bewehrungselement]]] = {}
     for b, stab, element in zip(q.bewehrung, r.fasern.staebe, herkunft):
         schluessel = (round(stab.arm, 9), b.werkstoff, b.verdraengt, stab.dicke)
@@ -154,15 +161,14 @@ def _loeser(q: Querschnitt, psi: float, herkunft: Sequence[Bewehrungselement],
             sorte=namen[werkstoff], nummer=nummer,
             text=", ".join(dict.fromkeys(e.name for _, e in liste)),
             vorgespannt=liste[0][1].vorgespannt))
-    betone = {i: w for i, w in enumerate(q.werkstoffe) if w.c_punkt is not None}
     return Faserloeser(
         querschnitt=Faserquerschnitt(r.fasern.gruppen, staebe), grenzen=r.grenzen,
-        oben=oben, unten=unten, lagen=lagen,
-        beton=_betonspannung(r, {i: w.gesetz for i, w in betone.items()}), suche=suche)
+        oben=oben, unten=unten, lagen=lagen, flaeche=_flaechenspannung(r, q.werkstoffe),
+        fliessgrenzen=r.fliessgrenzen, suche=suche)
 
 
 @dataclass(frozen=True)
-class _Zerlegung:
+class Zerlegung:
     """Ein Zustand des gezeichneten Querschnitts -- in jeder Zugrichtung zu haben."""
 
     querschnitt: Querschnitt
@@ -236,7 +242,7 @@ class KippendeNulllinie:
     ihr Ende hinaus.
     """
 
-    def __init__(self, zerlegung: _Zerlegung, seite: Zugseite) -> None:
+    def __init__(self, zerlegung: Zerlegung, seite: Zugseite) -> None:
         self._zerlegung = zerlegung
         self._psi0 = seite.psi
         self._psi = seite.psi
@@ -360,8 +366,47 @@ def _massstab(ebene: Dehnungsebene) -> float:
 # ===========================================================================
 
 
+class AmSchnitt:
+    """
+    Was jedes Paar eines gezeichneten Querschnitts hat, ob er reisst oder
+    nicht: wie ein Zustand seine Ebenen findet -- «einachsig» mit fester
+    Nulllinie, sonst kippend --, wo seine Mitteldehnung gilt und wie die
+    Herleitung sie am Ende nennt. Das Paar gibt ``brutto`` mit der Wahl der
+    Biegung und ``seite``.
+    """
+
+    brutto: Bruttoquerschnitt
+    seite: Zugseite
+
+    #: Wo die Mitteldehnung gilt -- dort greift N an.
+    bezugsort = "im Schwerpunkt"
+
+    def zustand(self, zerlegung: Zerlegung, loeser: Faserloeser) -> Ebenensuche:
+        """Wie ein Zustand seine Ebenen findet: kippend, «einachsig» mit fester Nulllinie."""
+        if self.brutto.biegung.einachsig:
+            return FesteNulllinie(loeser)
+        return KippendeNulllinie(zerlegung, self.seite)
+
+    def herleitung_dehnung_am_ende(self, p: Protokoll, w: Zwischenwerte, bruch: Grenzzustand,
+                                   oben: "Wert", unten: "Wert", h: "Wert") -> None:
+        """Die Dehnung im Schwerpunkt am Ende -- dort greift N an; ``h`` senkrecht zur Nulllinie."""
+        p.formel(w.dehnung("eps_mu", r"\varepsilon_{m,u}", bruch.verformung),
+                 r"@eps_oben + \left(@eps_unten - @eps_oben\right) \cdot \frac{@v}{@h}",
+                 {"eps_oben": oben, "eps_unten": unten,
+                  "v": w.laenge("v_o", "v_o", -bruch.ebene.loeser.oben,
+                                "Abstand des oberen Rands vom Schwerpunkt"),
+                  "h": h},
+                 titel="Grösste Dehnung im Schwerpunkt")
+
+
+def zerlegung(q: Querschnitt, herkunft: Sequence[Bewehrungselement],
+              staehle: Mapping[int, Stahlgesetz]) -> Zerlegung:
+    """Ein Zustand aus dem, was :meth:`~opencivil.querschnitt.analyse.Querschnittsanalyse.querschnitt` gibt."""
+    return Zerlegung(q, tuple(herkunft), staehle, {i: w.name for i, w in enumerate(q.werkstoffe)})
+
+
 @dataclass(frozen=True)
-class Schnittpaar(Bruttoriss):
+class Schnittpaar(AmSchnitt, Bruttoriss):
     """
     Die beiden Loeser eines gezeichneten Querschnitts in einer Zugrichtung --
     gerissen und ungerissen, wie das :class:`~opencivil.spannungsanalyse.Loeserpaar`
@@ -378,7 +423,7 @@ class Schnittpaar(Bruttoriss):
     querschnitt: Querschnitt
     """Der gerissene Querschnitt im Bruchzustand -- derselbe, aus dem ``gerissen`` stammt."""
 
-    zerlegungen: Tuple[_Zerlegung, _Zerlegung]
+    zerlegungen: Tuple[Zerlegung, Zerlegung]
     """Gerissen und ungerissen, in jeder Richtung -- fuer die kippende Nulllinie."""
 
     A: float
@@ -414,16 +459,12 @@ class Schnittpaar(Bruttoriss):
     DICKE_UNTER_ZUG = "die kleinere Abmessung des Betons"
 
     def ebenen(self) -> Zustaende:
-        """Die Ebenen beider Zustaende: kippend, «einachsig» mit fester Nulllinie."""
-        if self.einachsig:
-            return Zustaende(FesteNulllinie(self.gerissen), FesteNulllinie(self.ungerissen))
-        gerissen, ungerissen = (KippendeNulllinie(z, self.seite) for z in self.zerlegungen)
-        return Zustaende(gerissen, ungerissen)
+        """Die Ebenen beider Zustaende (:meth:`AmSchnitt.zustand`)."""
+        gerissen, ungerissen = self.zerlegungen
+        return Zustaende(self.zustand(gerissen, self.gerissen),
+                         self.zustand(ungerissen, self.ungerissen))
 
     # -- Was die Herleitung nur vom gezeichneten Querschnitt weiss -----------
-
-    #: Wo die Mitteldehnung gilt -- dort greift N an.
-    bezugsort = "im Schwerpunkt"
 
     def tiefe(self, w: Zwischenwerte, ein: Callable[[str], "Wert"]) -> "Wert":
         """Die Ausdehnung des Betons in Zugrichtung -- aus der Zeichnung, kein Wert des Rechenwerks."""
@@ -445,17 +486,6 @@ class Schnittpaar(Bruttoriss):
                  name="Rissaktive Dicke des gezeichneten Querschnitts")
         return t
 
-    def herleitung_dehnung_am_ende(self, p: Protokoll, w: Zwischenwerte, bruch: Grenzzustand,
-                                   oben: "Wert", unten: "Wert", h: "Wert") -> None:
-        """Die Dehnung im Schwerpunkt am Ende -- dort greift N an; ``h`` senkrecht zur Nulllinie."""
-        p.formel(w.dehnung("eps_mu", r"\varepsilon_{m,u}", bruch.verformung),
-                 r"@eps_oben + \left(@eps_unten - @eps_oben\right) \cdot \frac{@v}{@h}",
-                 {"eps_oben": oben, "eps_unten": unten,
-                  "v": w.laenge("v_o", "v_o", -bruch.ebene.loeser.oben,
-                                "Abstand des oberen Rands vom Schwerpunkt"),
-                  "h": h},
-                 titel="Grösste Dehnung im Schwerpunkt")
-
 
 def schnittpaar(analyse: Querschnittsanalyse, seite: Zugseite, wert: Callable[[str], float],
                 wahl: Rechenwahl) -> Optional[Schnittpaar]:
@@ -466,11 +496,8 @@ def schnittpaar(analyse: Querschnittsanalyse, seite: Zugseite, wert: Callable[[s
     """
     if not analyse.bewehrungselemente:
         return None
-    zerlegungen = []
-    for ungerissen in (False, True):
-        q, herkunft, staehle = analyse.querschnitt(wert, wahl, ungerissen=ungerissen)
-        zerlegungen.append(_Zerlegung(q, tuple(herkunft), staehle,
-                                      {i: w.name for i, w in enumerate(q.werkstoffe)}))
+    zerlegungen = [zerlegung(*analyse.querschnitt(wert, wahl, ungerissen=ungerissen))
+                   for ungerissen in (False, True)]
     gerissen, ungerissen = (z.in_richtung(seite.psi) for z in zerlegungen)
     q = zerlegungen[0].querschnitt
 

@@ -259,6 +259,19 @@ class Bruttoquerschnitt:
 
     vorspannung: Optional[Vorspannung] = None
 
+    def traegheit(self, um_y: bool) -> float:
+        """
+        Wie stark sich der Querschnitt unter reiner Biegung um eine Achse
+        kruemmt, als Traegheitsmoment, m⁴: «einachsig» ``I`` um diese Achse.
+        Kippt die Nulllinie, kruemmt er sich senkrecht zur Achse staerker,
+        als ``I`` allein sagt -- wie einer mit ``I - I_yz²/I_quer``. Sonst
+        zeigte ein ungerissener unsymmetrischer Querschnitt schon seiner Form
+        wegen einen kleineren Modul. Der aequivalente Modul jeder
+        Spannung-Dehnung-Analyse misst sich daran, mit Beton wie ohne.
+        """
+        I, quer = (self.I_y, self.I_z) if um_y else (self.I_z, self.I_y)
+        return I if self.biegung.einachsig else I - self.I_yz ** 2 / quer
+
     def ausdehnung(self, um_y: bool) -> Tuple[float, float]:
         """Die Hoehe in Biegerichtung und die Breite quer dazu, in m -- aus der Zeichnung."""
         breite_y = (max(e.punkt[0] for e in self.ecken) - min(e.punkt[0] for e in self.ecken)) * 1e-3
@@ -436,6 +449,25 @@ def protokoll_spannung_ungerissen(p: Protokoll, biegung: Biegung) -> None:
              r"M_z\,(I_y y' - I_{yz} z')}{I_y I_z - I_{yz}^2}"
              r"\qquad y' = y - y_S,\ z' = z - z_S",
              titel="Spannung im ungerissenen Querschnitt")
+
+
+def protokoll_traegheit(p: Protokoll, werte: Zwischenwerte, q: Bruttoquerschnitt, um_y: bool,
+                        I: Wert, *, name: str, symbol: str, titel: str) -> Wert:
+    """
+    :meth:`Bruttoquerschnitt.traegheit` in die Herleitung, unter ``name`` und
+    ``symbol``: einachsig ``I`` selbst, gekippt ``I - I_yz²/I_quer``.
+    """
+    bezug = werte.wert(name, symbol, Groesse.aus_si(q.traegheit(um_y), MIO_MM4), stellen=1)
+    if q.biegung.einachsig:
+        p.wert(bezug, titel=titel)
+        return bezug
+    quer = werte.wert("I_quer", "I_z" if um_y else "I_y",
+                      Groesse.aus_si(q.I_z if um_y else q.I_y, MIO_MM4), stellen=1)
+    p.formel(bezug, r"@I - \frac{@Iyz^{2}}{@quer}",
+             {"I": I, "Iyz": werte.wert("Iyz", "I_{yz}", Groesse.aus_si(q.I_yz, MIO_MM4), 1),
+              "quer": quer},
+             titel=f"{titel}, Nulllinie gekippt")
+    return bezug
 
 
 def protokoll_ecke(p: Protokoll, ecke: Ecke) -> None:

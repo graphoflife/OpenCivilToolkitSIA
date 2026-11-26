@@ -30,7 +30,6 @@ from opencivil.nachweis.resistenzlinie import Handlinie
 from opencivil.nachweis.schubwandnachweis import OHNE_SCHUB, Schubbefund, schub_belastet
 from opencivil.projekt import Aufbau
 from opencivil.querschnitt import widerstandsflaeche
-from opencivil.querschnitt.gesetzwahl import arten_text
 from opencivil.querschnitt.platte import Richtung
 from opencivil.web.anzeige import Anzeigegroesse, si, zahl
 
@@ -238,9 +237,9 @@ def _bild_dict(bild) -> dict:
         "N": zahl(bild.N, KN), "M": zahl(bild.M, KNM),
         "h": zahl(bild.h, MM),
         "nulllinie": zahl(bild.nulllinie, MM),
-        "beton": [{"z": zahl(f.z, MM), "eps": zahl(f.eps, PROMILLE),
-                   "sigma": zahl(f.sigma, N_PRO_MM2)}
-                  for f in bild.beton],
+        "flaeche": [{"z": zahl(f.z, MM), "eps": zahl(f.eps, PROMILLE),
+                     "sigma": zahl(f.sigma, N_PRO_MM2)}
+                    for f in bild.flaeche],
         "stahl": [{"z": zahl(s.z, MM), "eps": zahl(s.eps, PROMILLE),
                    "sigma": zahl(s.sigma, N_PRO_MM2), "nummer": s.nummer, "name": s.name,
                    "a_s": zahl(s.a_s, MM2), "kraft": zahl(s.kraft, KN)}
@@ -269,13 +268,17 @@ def _analyse_dict(analyse) -> dict:
     if not analyse.moeglich:
         return {**kopf, "moeglich": False, "hinweis": analyse.hinweis}
     paar = analyse.paar
-    # Wo die Mitteldehnung gilt -- an der Achse der N-eps-Linie.
+    # Wo die Mitteldehnung gilt -- an der Achse der N-eps-Linie --, und
+    # woraus die Flaeche ist: «Druck im Holz».
     kopf["bezugsort"] = paar.bezugsort
+    kopf["werkstoff"] = paar.flaeche
     # Womit gerechnet wurde, beim Bild angeschrieben -- und wie ein Widerstand
     # darum heisst: Rd, Rk oder gemischt R sagt der Kern, nicht die Oberflaeche.
+    # Ohne Beton kriecht nichts, und beim Baustahl gibt es keine Rechenart.
     wahl = paar.wahl
-    kopf["wahl"] = {"phi": wahl.kriechzahl, "werte": wahl.saetze.beschriftung,
-                    "rechenart": arten_text(wahl, paar.betone), "index": wahl.index}
+    kopf["wahl"] = {"phi": wahl.kriechzahl if paar.mit_kriechzahl else None,
+                    "werte": wahl.saetze.beschriftung, "rechenart": paar.rechenart,
+                    "index": wahl.index}
     if isinstance(analyse.kurve, spannungsanalyse.Modullinie):
         return {**kopf, "moeglich": True, "kurve": _modul_dict(analyse.kurve)}
     if analyse.kurve is not None:
@@ -346,6 +349,8 @@ def _linie_dict(linie) -> dict:
                    "eps_unten": _RANDDEHNUNG.zahl(bruch.eps_unten),
                    "massgebend": bruch.massgebend}),
         "tragfaehig": linie.tragfaehig,
+        # Ob sie bis zum Ende traegt -- ungerissen endend traegt er den Riss nicht.
+        "am_bruch": linie.am_bruch,
         "hinweis": linie.hinweis,
     }
 
@@ -353,27 +358,31 @@ def _linie_dict(linie) -> dict:
 def _modul_dict(modul) -> dict:
     """
     Der aequivalente E-Modul in Zeichengroessen: die laufende Kraft in kNm
-    bzw. kN, der Modul in N/mm², dazu E_cm, an dem er sich misst -- und
-    sein Vielfaches von E_cm, wo er angeschrieben wird: je Punkt daneben, an
-    den Ecken mit ihm (``{"wert", "vielfaches"}``). Gerechnet ist alles im
-    Kern (:class:`~opencivil.spannungsanalyse.Modullinie`); bis 2026-10-18
-    teilte die Oberflaeche selbst durch E_cm.
+    bzw. kN, der Modul in N/mm², dazu der Modul, an dem er sich misst
+    (``bezug``: beim Stahlbeton E_cm, sonst der des Materials) -- und sein
+    Vielfaches davon, wo er angeschrieben wird: je Punkt daneben, an den
+    Ecken mit ihm (``{"wert", "vielfaches"}``). Gerechnet ist alles im Kern
+    (:class:`~opencivil.spannungsanalyse.Modullinie`); bis 2026-10-18 teilte
+    die Oberflaeche selbst durch E_cm.
     """
     linie = modul.linie
     kraft, fest, _ = _LINIENGROESSEN[linie.art.linie]
     E = _MODUL.zahl
+    bezug = modul.bezug
 
     def vielfaches(x: Optional[float]) -> Optional[float]:
-        return None if x is None else x / modul.E_cm
+        return None if x is None else x / bezug.E
 
     def angeschrieben(x: Optional[float]) -> Optional[dict]:
-        """Ein Modul an einer Ecke, mit seinem Vielfachen von E_cm."""
+        """Ein Modul an einer Ecke, mit seinem Vielfachen des Bezugs."""
         return None if x is None else {"wert": E(x), "vielfaches": vielfaches(x)}
 
     sprung = linie.sprung
     return {
         "groessen": {"kraft": kraft.als_dict(), "fest": fest.als_dict(), "modul": _MODUL.als_dict()},
-        "fest": fest.zahl(linie.fest), "riss": kraft.zahl(linie.riss), "E_cm": E(modul.E_cm),
+        "fest": fest.zahl(linie.fest), "riss": kraft.zahl(linie.riss),
+        "bezug": {"zeichen": bezug.zeichen, "text": bezug.text, "wert": E(bezug.E),
+                  "hinweis": bezug.hinweis},
         "punkte": [{"kraft": kraft.zahl(p.kraft), "modul": E(p.modul),
                     "vielfaches": vielfaches(p.modul), "gerissen": p.gerissen,
                     "modul_I": E(p.modul_I), "modul_II": E(p.modul_II)}
@@ -390,6 +399,7 @@ def _modul_dict(modul) -> dict:
                   {"kraft": kraft.zahl(linie.bruch.kraft), "modul": angeschrieben(modul.ende),
                    "massgebend": linie.bruch.massgebend}),
         "tragfaehig": linie.tragfaehig,
+        "am_bruch": linie.am_bruch,
         "hinweis": linie.hinweis,
     }
 

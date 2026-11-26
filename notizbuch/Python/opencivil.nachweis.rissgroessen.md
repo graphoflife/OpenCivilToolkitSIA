@@ -1,5 +1,5 @@
 ---
-erzeugt: c5a178bae5cf
+erzeugt: 3758999c985b
 art: modul
 tags: [modul]
 ---
@@ -233,6 +233,20 @@ ein Spannglied mit Vordehnung den Beton drueckt.
 - `biegung: Biegung = SCHIEF` – Ob die Nulllinie kippt oder waagrecht bleibt -- wie die Analyse rechnet.
 - `vorspannung: Optional[Vorspannung] = None`
 
+#### Bruttoquerschnitt.traegheit
+
+```python
+def traegheit(self, um_y: bool) -> float
+```
+
+Wie stark sich der Querschnitt unter reiner Biegung um eine Achse
+kruemmt, als Traegheitsmoment, m⁴: «einachsig» `I` um diese Achse.
+Kippt die Nulllinie, kruemmt er sich senkrecht zur Achse staerker,
+als `I` allein sagt -- wie einer mit `I - I_yz²/I_quer`. Sonst
+zeigte ein ungerissener unsymmetrischer Querschnitt schon seiner Form
+wegen einen kleineren Modul. Der aequivalente Modul jeder
+Spannung-Dehnung-Analyse misst sich daran, mit Beton wie ohne.
+
 #### Bruttoquerschnitt.ausdehnung
 
 ```python
@@ -366,6 +380,15 @@ def protokoll_spannung_ungerissen(p: Protokoll, biegung: Biegung) -> None
 
 Wie der ungerissene Querschnitt Spannung traegt -- der Ansatz des Rissmoments.
 
+### protokoll_traegheit
+
+```python
+def protokoll_traegheit(p: Protokoll, werte: Zwischenwerte, q: Bruttoquerschnitt, um_y: bool, I: Wert, *, name: str, symbol: str, titel: str) -> Wert
+```
+
+[[opencivil.nachweis.rissgroessen#Bruttoquerschnitt.traegheit|Bruttoquerschnitt.traegheit]] in die Herleitung, unter `name` und
+`symbol`: einachsig `I` selbst, gekippt `I - I_yz²/I_quer`.
+
 ### protokoll_ecke
 
 ```python
@@ -444,6 +467,7 @@ def _w_vorlage(M_y: float, M_z: float) -> str
 - [[opencivil.nachweis.sproedes_versagen]]
 - [[opencivil.spannungsanalyse.platte]]
 - [[opencivil.spannungsanalyse.riss]]
+- [[opencivil.spannungsanalyse.rissfrei]]
 - [[opencivil.spannungsanalyse.schnitt]]
 
 ## Formeln aus diesem Modul

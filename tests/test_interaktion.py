@@ -30,7 +30,7 @@ BETON = Betongesetz(f_cd=20e6, eps_c1d=0.002, eps_c2d=0.003, k_sigma=2.0)
 STAHL = Stahlgesetz(E_s=200e9, f_yd=435e6, f_yd_druck=435e6, eps_ud=0.045)
 WERKSTOFFE = [
     Werkstoff("Beton", BETON, -0.003, math.inf, c_punkt=(0.002, 0.003),
-              verdraengbar=True),
+              verdraengbar=True, wort="Beton"),
     Werkstoff("Stahl", STAHL, -0.045, 0.045),
 ]
 
@@ -258,7 +258,7 @@ class TestSpannungsblock(unittest.TestCase):
         block = Spannungsblock(f_cd=20e6, eps_c2d=0.003)
         werkstoffe = [
             Werkstoff("Beton", block, -0.003, math.inf, c_punkt=(0.002, 0.003),
-                      verdraengbar=True),
+                      verdraengbar=True, wort="Beton"),
             Werkstoff("Stahl", STAHL, -0.045, 0.045),
         ]
         # Ein Kasten mit Loch und Stäben im Beton: Fasern und verdrängtes

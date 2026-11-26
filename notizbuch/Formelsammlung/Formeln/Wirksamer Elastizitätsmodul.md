@@ -1,5 +1,5 @@
 ---
-erzeugt: 6c3ed128ff0e
+erzeugt: f3fb3afc4c14
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 3.1.2.6.1, (12)"
@@ -29,7 +29,7 @@ $$
 ## Im Code
 
 - [[opencivil.nachweis.querschnittsloeser#protokoll_wirksamer_modul|protokoll_wirksamer_modul]]
-- [[opencivil.spannungsanalyse.herleitung#herleitung|herleitung]]
+- [[opencivil.spannungsanalyse.riss#Bruttoriss.herleitung_gesetze|Bruttoriss.herleitung_gesetze]]
 
 ## Themen
 

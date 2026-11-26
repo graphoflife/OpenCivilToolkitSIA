@@ -156,6 +156,18 @@ class Gesetz:
 
     funktion: Funktion = field(init=False, repr=False, compare=False)
 
+    @property
+    def fliessbereich(self) -> Optional[Tuple[float, float]]:
+        """
+        Zwischen welchen Dehnungen das Gesetz elastisch bleibt -- jenseits
+        fliesst es: beim Stahl ``±f/E``, beim Holz, das auf Druck plastisch
+        rechnet, ``-f_c/E`` bis ohne Grenze. ``None`` bei einem Gesetz, das
+        nicht fliesst: der Beton ist von Anfang an nichtlinear, das lineare
+        Holz bricht. Danach fragt der Fliessbeginn einer Linie an den Flaechen
+        eines Querschnitts (:attr:`~opencivil.querschnitt.interaktion.Richtung.fliessgrenzen`).
+        """
+        return None
+
     def spannung(self, eps: float) -> float:
         """Spannung in N/m^2 zur Dehnung ``eps``. Zug positiv."""
         return self.funktion(eps)
@@ -385,6 +397,11 @@ class Stahlgesetz(Gesetz):
     def eps_yd(self) -> float:
         return self.f_yd / self.E_s
 
+    @property
+    def fliessbereich(self) -> Tuple[float, float]:
+        """Elastisch bis zu den Plateaus, auf Zug und auf Druck."""
+        return -self.f_yd_druck / self.E_s, self.eps_yd
+
     def formel(self, werte: Werte) -> str:
         return self.latex(werte["f_s"].symbol, werte["f_s_druck"].symbol)
 
@@ -576,6 +593,11 @@ class Holzgesetz(Gesetz):
         """Wo es auf Druck die Festigkeit erreicht, positiv."""
         return self.f_c / self.E
 
+    @property
+    def grenzstauchung(self) -> float:
+        """Bis wohin es auf Druck traegt, positiv: linear bis zur Festigkeit, ``eps_c``."""
+        return self.eps_c
+
     def formel(self, werte: Werte) -> str:
         return self.latex(werte["f_t"].symbol, werte["f_c"].symbol, werte["E"].symbol)
 
@@ -604,6 +626,16 @@ class HolzPlastisch(Holzgesetz):
 
     eps_cu: float
     """Grenzstauchung, positiv."""
+
+    @property
+    def grenzstauchung(self) -> float:
+        """Bis wohin es auf Druck traegt: bis zur Grenzstauchung ``eps_cu``."""
+        return self.eps_cu
+
+    @property
+    def fliessbereich(self) -> Tuple[float, float]:
+        """Elastisch bis zur Festigkeit auf Druck; auf Zug bricht es, ohne zu fliessen."""
+        return -self.eps_c, math.inf
 
     def __post_init__(self) -> None:
         E, f_c = self.E, self.f_c

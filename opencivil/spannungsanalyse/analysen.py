@@ -4,7 +4,9 @@ opencivil/spannungsanalyse/analysen.py -- die Analysen eines Projekts.
 VERANTWORTUNG:
 Je Bauteil -- Platte oder gezeichneter Querschnitt -- und je Fall die eine
 Frage, mit dem Paar seiner Richtung und seiner Wahl, dazu die Herleitung
-jeder Linie (:func:`analysen`).
+jeder Linie (:func:`analysen`). Ein gezeichneter Querschnitt aus Stahlbeton
+reisst (:func:`~opencivil.spannungsanalyse.schnitt.schnittpaar`), einer aus
+Stahl oder Holz nicht (:func:`~opencivil.spannungsanalyse.rissfrei.rissfreies_paar`).
 """
 
 from __future__ import annotations
@@ -15,6 +17,9 @@ from typing import (
 )
 
 from opencivil.core.protokoll import Protokoll, StillesProtokoll
+from opencivil.querschnitt.analyse import Querschnittsanalyse
+from opencivil.querschnitt.bauweise import Bauweise
+from opencivil.querschnitt.gesetzwahl import Rechenwahl
 from opencivil.querschnitt.zugseite import Zugseite
 from opencivil.spannungsanalyse.art import Analyseart
 from opencivil.spannungsanalyse.bild import (
@@ -24,6 +29,7 @@ from opencivil.spannungsanalyse.herleitung import herleitung
 from opencivil.spannungsanalyse.linie import Linie, Paar, moment_kruemmung, normalkraft_dehnung
 from opencivil.spannungsanalyse.modul import Modullinie, aequivalenter_modul
 from opencivil.spannungsanalyse.platte import loeserpaar
+from opencivil.spannungsanalyse.rissfrei import rissfreies_paar
 from opencivil.spannungsanalyse.schnitt import schnittpaar
 
 if TYPE_CHECKING:
@@ -98,7 +104,7 @@ def auswerten(fall, art: Analyseart, paar: Paar) -> Tuple[
         return aus_schnittgroessen(paar.ebenen().gerissen, N=si["N_Ed"],
                                    M=si["M_Ed"], arten=paar.wahl.arten), None
     if art.modul:
-        return None, aequivalenter_modul(linie, I_c=paar.I_c, A_c=paar.A_c, E_cm=paar.E_cm)
+        return None, aequivalenter_modul(linie, paar.modulbezug)
     return None, linie
 
 
@@ -117,6 +123,18 @@ class _Bauteilart:
     ohne_bewehrung: Callable[[Any], str]
 
 
+def _paar_am_schnitt(analyse: Querschnittsanalyse, seite: Zugseite,
+                     wert: Callable[[str], float], wahl: Rechenwahl) -> Optional[Paar]:
+    """
+    Das Paar eines gezeichneten Querschnitts: mit Beton reisst er, aus Stahl
+    oder Holz nicht. Einen Verbundquerschnitt meldet der Aufbau gar nicht erst
+    an (:func:`~opencivil.projekt.aufbau.querschnittsanalyse.ohne_analysen`).
+    """
+    if analyse.bauweise is Bauweise.STAHLBETON:
+        return schnittpaar(analyse, seite, wert, wahl)
+    return rissfreies_paar(analyse, seite, wert, wahl)
+
+
 #: Die Platte je Tragrichtung, der gezeichnete Querschnitt je Zugseite.
 _BAUTEILARTEN = (
     _Bauteilart(
@@ -127,7 +145,7 @@ _BAUTEILARTEN = (
             f"In {richtung.beschriftung} liegt keine Bewehrung – ohne sie gibt es "
             f"keinen Querschnitt zum Auswerten.")),
     _Bauteilart(
-        teile=lambda aufbau: aufbau.querschnittsanalysen, paar=schnittpaar,
+        teile=lambda aufbau: aufbau.querschnittsanalysen, paar=_paar_am_schnitt,
         richtung_text=lambda seite: seite.beschriftung,
         raender=lambda seite: seite.raender,
         ohne_bewehrung=lambda seite: (

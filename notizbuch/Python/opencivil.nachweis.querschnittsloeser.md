@@ -1,5 +1,5 @@
 ---
-erzeugt: b46e971ab631
+erzeugt: 071357bb866a
 art: modul
 tags: [modul]
 ---
@@ -265,8 +265,10 @@ Dehnungsgrenzen, innerhalb derer jedes Gesetz gilt -- mehr braucht die
 Suche nicht. Dazu, was Bilder und Linien vom Querschnitt wissen muessen:
 die Arme der Raender `oben` und `unten` -- oben ist gedrueckt, wenn
 ein positives Moment wirkt --, die Lagen mit ihrem Stahl, eine je Stab
-der Fasern, und die Spannung des Betons an einer Stelle
-(`beton(arm, eps)`). Wo die Gesetze gelten, sagen allein die Grenzen,
+der Fasern, die Spannung der Flaeche an einer Stelle
+(`flaeche(arm, eps)`) -- beim Stahlbeton die des Betons -- und wo eine
+Flaeche zu fliessen beginnt (`fliessgrenzen`, beim Stahlbeton keine:
+dort fliesst eine Lage). Wo die Gesetze gelten, sagen allein die Grenzen,
 jede mit ihrem Namen: bis 2026-10-18 trug der Loeser dazu `eps_druck`
 und `eps_zug`, ein zweites, groberes Fenster an beiden Raendern, und das
 Bild aus Randdehnungen meldete danach Ebenen als ungueltig, die es nicht
@@ -495,6 +497,7 @@ mit ihrer Probe, die auch verfehlt sein kann ([[opencivil.nachweis.querschnittsl
 - [[opencivil.spannungsanalyse.linie]]
 - [[opencivil.spannungsanalyse.platte]]
 - [[opencivil.spannungsanalyse.riss]]
+- [[opencivil.spannungsanalyse.rissfrei]]
 - [[opencivil.spannungsanalyse.schnitt]]
 
 ## Formeln aus diesem Modul

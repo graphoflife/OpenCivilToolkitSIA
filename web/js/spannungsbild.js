@@ -113,7 +113,7 @@ function verlauf(daten, x, y, punkte, hol) {
 }
 
 /**
- * Die Zahlen, nach denen man fragt: der Beton zuoberst und zuunterst, jede
+ * Die Zahlen, nach denen man fragt: die Fläche zuoberst und zuunterst, jede
  * Stahllage. Neben den Punkt, auf die Seite seines Vorzeichens. Stehen zwei zu
  * nah -- zwei Lagen wenige Millimeter übereinander --, rückt eine weg, und ein
  * Strich zeigt, wohin sie gehört.
@@ -146,14 +146,15 @@ function anschreiben(daten, x, feld, zettel, stellen) {
 /**
  * Ein Feld des Diagramms: Dehnung oder Spannung über die Höhe, mit den
  * Bewehrungslagen darin. `links` sagt, ob es die Höhenachse trägt -- das
- * rechte Feld teilt sie, ohne sie ein zweites Mal anzuschreiben.
+ * rechte Feld teilt sie, ohne sie ein zweites Mal anzuschreiben. `werkstoff`
+ * ist das Wort des Kerns für die Fläche: «Beton», «Holz», «Baustahl».
  */
 function hoehenfeld(bild, {
-  breite, rand, titel, hol, stahlHol, stellen, einheit, links, raender,
+  breite, rand, titel, hol, stahlHol, stellen, einheit, links, raender, werkstoff,
 }) {
   // Um null herum aufgespannt: eine Spannungsverteilung ohne sichtbare
   // Nulllinie sagt nicht, wo Druck aufhört und Zug anfängt.
-  const werte = [...bild.beton.map(hol), ...bild.stahl.map(stahlHol)];
+  const werte = [...bild.flaeche.map(hol), ...bild.stahl.map(stahlHol)];
   const grenze = Math.max(1e-9, ...werte.map(Math.abs)) * SPIELRAUM;
   const bereich = [-grenze, grenze];
   const { svg, daten, x, y, feld } = achsenkreuz({
@@ -169,7 +170,7 @@ function hoehenfeld(bild, {
       titel: links ? `z [mm]  (ab Rand ${raender[0]})` : null,
     },
   });
-  verlauf(daten, x, y, bild.beton, hol);
+  verlauf(daten, x, y, bild.flaeche, hol);
 
   if (bild.nulllinie !== null && bild.nulllinie !== undefined) {
     daten.append(svgEl('line', {
@@ -195,18 +196,18 @@ function hoehenfeld(bild, {
       + `F = ${lage.kraft.toFixed(1)} kN`));
   }
 
-  // Der Beton am Rand: zuoberst knapp unter, zuunterst knapp über der Kante.
-  const betonfarbe = (w) => (w < 0 ? DRUCK : w > 0 ? ZUG : VERGLEICH);
-  const kopf = bild.beton[0];
-  const fuss = bild.beton[bild.beton.length - 1];
+  // Die Fläche am Rand: zuoberst knapp unter, zuunterst knapp über der Kante.
+  const randfarbe = (w) => (w < 0 ? DRUCK : w > 0 ? ZUG : VERGLEICH);
+  const kopf = bild.flaeche[0];
+  const fuss = bild.flaeche[bild.flaeche.length - 1];
   for (const [p, wo] of [[kopf, raender[0]], [fuss, raender[1]]]) {
     daten.append(mitTitel(svgEl('circle', {
-      cx: x(hol(p)), cy: y(p.z), r: 3.5, fill: betonfarbe(hol(p)), stroke: '#fff', 'stroke-width': 1.2,
-    }), `Beton am Rand ${wo}: ${zahl(hol(p), stellen)} ${einheit}`));
+      cx: x(hol(p)), cy: y(p.z), r: 3.5, fill: randfarbe(hol(p)), stroke: '#fff', 'stroke-width': 1.2,
+    }), `${werkstoff} am Rand ${wo}: ${zahl(hol(p), stellen)} ${einheit}`));
   }
   anschreiben(daten, x, feld, [
-    { wert: hol(kopf), punkt: y(0), soll: y(0) + 12, farbe: betonfarbe(hol(kopf)) },
-    { wert: hol(fuss), punkt: y(bild.h), soll: y(bild.h) - 4, farbe: betonfarbe(hol(fuss)) },
+    { wert: hol(kopf), punkt: y(0), soll: y(0) + 12, farbe: randfarbe(hol(kopf)) },
+    { wert: hol(fuss), punkt: y(bild.h), soll: y(bild.h) - 4, farbe: randfarbe(hol(fuss)) },
     ...bild.stahl.map((lage) => ({
       wert: stahlHol(lage), punkt: y(lage.z), soll: y(lage.z) + 4, farbe: STAHL,
     })),
@@ -219,21 +220,23 @@ function hoehenfeld(bild, {
  * rechts die Spannung, beide an derselben Höhenachse (Benutzer, 2026-10-16).
  * Zwei Felder statt zweier Achsen in einem: die Einheiten sind verschieden,
  * und übereinander gezeichnet läse man die eine Kurve an der Achse der
- * anderen.
+ * anderen. Die Legende nennt den Werkstoff der Fläche -- «Druck im Holz» --
+ * und die Bewehrungslagen nur, wo es welche gibt.
  */
-function verteilungsbild(bild, raender) {
+function verteilungsbild(bild, raender, werkstoff) {
   const svg = svgEl('svg', {
     class: 'mn', xmlns: NR, viewBox: `0 0 ${BREITE} ${HOEHE}`, role: 'img',
     'aria-label': 'Dehnung und Spannung über die Höhe',
   });
   svg.append(
     hoehenfeld(bild, {
-      breite: TEILUNG_FELDER, rand: { ...RAND, rechts: 16 }, links: true, raender,
+      breite: TEILUNG_FELDER, rand: { ...RAND, rechts: 16 }, links: true, raender, werkstoff,
       titel: 'Dehnung ε [‰]', einheit: '‰', stellen: 2,
       hol: (p) => p.eps, stahlHol: (s) => s.eps,
     }),
     hoehenfeld(bild, {
       breite: BREITE - TEILUNG_FELDER, rand: { ...RAND, links: 16 }, links: false, raender,
+      werkstoff,
       titel: 'Spannung σ [N/mm²]', einheit: 'N/mm²', stellen: 1,
       hol: (p) => p.sigma, stahlHol: (s) => s.sigma,
     }),
@@ -241,9 +244,9 @@ function verteilungsbild(bild, raender) {
   return el('div.diagramm-huelle', {}, [
     svg,
     legende([
-      [flaeche(DRUCK), 'Druck im Beton'],
-      [flaeche(ZUG), 'Zug im Beton'],
-      [punkt(STAHL), 'Bewehrungslage'],
+      [flaeche(DRUCK), `Druck im ${werkstoff}`],
+      [flaeche(ZUG), `Zug im ${werkstoff}`],
+      ...(bild.stahl.length ? [[punkt(STAHL), 'Bewehrungslage']] : []),
       [strich(NULLLINIE, { muster: '6 4', breite: 1.6 }), 'Nulllinie'],
     ]),
   ]);
@@ -369,16 +372,30 @@ function zug(daten, punkte, px, py, { farbe, breite, muster = null }) {
   }));
 }
 
-/** Die Legende unter jeder Linie: was durchgezogen und was gestrichelt ist, und die Ecken. */
-function linienlegende(K, kennwert) {
+/**
+ * Die Legende unter jeder Linie: was durchgezogen und was gestrichelt ist, und
+ * die Ecken, die im Bild stehen. Ohne Beton reisst der Querschnitt nicht --
+ * der Kern schickt dann keine Risskraft (`riss` ist null) --: es gibt nur die
+ * eine Linie, und ihr Ende ist die Grenzdehnung einer Faser. Bis 2026-11-26
+ * nannte die Legende Riss und Fliessbeginn auch, wo die Linie keine hatte.
+ */
+function linienlegende(k, kennwert, werkstoff) {
+  const K = k.groessen.kraft.zeichen;
+  const riss = k.riss !== null;
   return legende([
-    [strich(LINIE), 'Querschnitt: ungerissen bis zum Riss, darüber gerissen (ohne Zugversteifung)'],
-    [strich(VERGLEICH, { muster: '6 4', breite: 1.4 }), 'ungerissen (I), bis zum Riss'],
-    [strich(VERGLEICH, { muster: '2 3', breite: 1.4 }), 'immer gerissen, ohne f_ct (II)'],
-    [punkt(ZUG, { hohl: true }), 'Riss'],
-    [punkt(STAHL, { hohl: true }), `${K}_y: Fliessbeginn`],
-    [punkt(LINIE, { hohl: true }), `${K}_${kennwert}: Ende der Linie, der Widerstand – wie in der `
-      + 'Tragsicherheit, wenn sie gleich wählt'],
+    [strich(LINIE), riss
+      ? 'Querschnitt: ungerissen bis zum Riss, darüber gerissen (ohne Zugversteifung)'
+      : `Querschnitt aus ${werkstoff} – ohne Beton reisst er nicht`],
+    ...(riss ? [
+      [strich(VERGLEICH, { muster: '6 4', breite: 1.4 }), 'ungerissen (I), bis zum Riss'],
+      [strich(VERGLEICH, { muster: '2 3', breite: 1.4 }), 'immer gerissen, ohne f_ct (II)'],
+    ] : []),
+    ...(k.sprung ? [[punkt(ZUG, { hohl: true }), 'Riss']] : []),
+    ...(k.fliessen ? [[punkt(STAHL, { hohl: true }), `${K}_y: Fliessbeginn`]] : []),
+    [punkt(LINIE, { hohl: true }), riss
+      ? `${K}_${kennwert}: Ende der Linie, der Widerstand – wie in der Tragsicherheit, `
+        + 'wenn sie gleich wählt'
+      : `${K}_${kennwert}: Ende der Linie – eine Faser erreicht ihre Grenzdehnung`],
   ]);
 }
 
@@ -386,7 +403,8 @@ function linienlegende(K, kennwert) {
  * Eine Linie: ungerissen bis zum Riss, dort waagrecht nach rechts -- der
  * Querschnitt reisst, bei derselben Kraft verformt er sich mehr --, darüber
  * gerissen bis zum Bruch. Gestrichelt die beiden Zustände je für sich. An
- * den Ecken Riss, Fliessbeginn und Ende, je mit Kraft und Verformung.
+ * den Ecken Riss, Fliessbeginn und Ende, je mit Kraft und Verformung. Ohne
+ * Beton die eine Linie bis zum Bruch, ohne Riss und ohne Gestricheltes.
  */
 function linienbild(fall) {
   const k = fall.kurve;
@@ -419,11 +437,12 @@ function linienbild(fall) {
   const ecken = [];
   // Das Ende zuerst: es steht am Rand, und die anderen weichen ihm aus.
   // Endet die Linie ungerissen, trägt der Querschnitt den Riss nicht; dann
-  // gilt dort ihre letzte Verformung, nicht die gerissene des Bruchs.
+  // gilt dort ihre letzte Verformung, nicht die gerissene des Bruchs. Ob
+  // sie bis zum Bruch reicht, sagt der Kern (`am_bruch`).
   if (ende && k.bruch) {
     ecken.push({
       px: x(ende.verformung), py: y(ende.kraft), farbe: LINIE,
-      zeilen: ende.gerissen
+      zeilen: k.am_bruch
         ? [`${K.zeichen}_{${kennwert}} = ${f(k.bruch.kraft)}`,
           `${mitIndex(V, 'u')} = ${v(k.bruch.verformung)}`, k.bruch.massgebend]
         : [`${K.zeichen}_{${kennwert}} = ${f(k.bruch.kraft)}`,
@@ -452,7 +471,7 @@ function linienbild(fall) {
     });
   }
   eckenAnschreiben(daten, feld, ecken);
-  return el('div.diagramm-huelle', {}, [svg, linienlegende(K.zeichen, kennwert)]);
+  return el('div.diagramm-huelle', {}, [svg, linienlegende(k, kennwert, fall.werkstoff)]);
 }
 
 /**
@@ -460,8 +479,9 @@ function linienbild(fall) {
  * waagrecht, beim Riss senkrecht hinunter -- bei derselben Kraft ein anderer
  * Modul --, darüber gerissen bis zum Bruch. Gestrichelt die beiden Zustände
  * je für sich, der ungerissene nur bis zum Riss. An jeder Ecke der Modul und
- * sein Vielfaches von E_cm: am Anfang, vor und nach dem Riss, beim
- * Fliessbeginn und am Ende.
+ * sein Vielfaches des Bezugs, den der Kern nennt (`kurve.bezug`: beim
+ * Stahlbeton E_cm, sonst der Modul des Materials): am Anfang, vor und nach
+ * dem Riss, beim Fliessbeginn und am Ende.
  */
 function modulbild(fall) {
   const k = fall.kurve;
@@ -486,9 +506,9 @@ function modulbild(fall) {
   zug(daten, k.punkte, kraft, modul((p) => p.modul), { farbe: LINIE, breite: 2.4 });
 
   const f = (wert) => mitEinheit(wert, 1, K.einheit);
-  // Ein Modul mit seinem Vielfachen von E_cm, beides aus dem Kern: an den
+  // Ein Modul mit seinem Vielfachen des Bezugs, beides aus dem Kern: an den
   // Ecken `{wert, vielfaches}`, je Punkt die beiden nebeneinander.
-  const e = (m) => `${zahl(m.wert, 0)} ${M.einheit} = ${m.vielfaches.toFixed(2)}·E_{cm}`;
+  const e = (m) => `${zahl(m.wert, 0)} ${M.einheit} = ${m.vielfaches.toFixed(2)}·${k.bezug.zeichen}`;
   const amPunkt = (p) => ({ wert: p.modul, vielfaches: p.vielfaches });
   const kennwert = fall.wahl?.index || 'Rd';
   const gueltig = k.punkte.filter((p) => p.modul !== null && p.modul !== undefined);
@@ -499,7 +519,7 @@ function modulbild(fall) {
   if (ende && k.bruch) {
     ecken.push({
       px: x(ende.kraft), py: y(ende.modul), farbe: LINIE,
-      zeilen: ende.gerissen
+      zeilen: k.am_bruch
         ? [`${K.zeichen}_{${kennwert}} = ${f(k.bruch.kraft)}`, `E_{eq} = ${e(amPunkt(ende))}`,
           k.bruch.massgebend]
         : [`${K.zeichen}_{${kennwert}} = ${f(k.bruch.kraft)}`, `E_{eq} = ${e(amPunkt(ende))}`],
@@ -526,22 +546,19 @@ function modulbild(fall) {
     });
   }
   // Der Anfang: ungerissen der Modul ohne laufende Kraft, gerissen der des
-  // ersten Punkts.
+  // ersten Punkts. Grau nur, wo er reissen wird: ohne Riss ist er die Linie.
   if (anfang && anfang !== ende) {
     ecken.push({
-      px: x(anfang.kraft), py: y(anfang.modul), farbe: anfang.gerissen ? LINIE : VERGLEICH,
+      px: x(anfang.kraft), py: y(anfang.modul),
+      farbe: anfang.gerissen || k.riss === null ? LINIE : VERGLEICH,
       zeilen: [`${K.zeichen} = ${f(anfang.kraft)}`, `E_{eq} = ${e(amPunkt(anfang))}`],
     });
   }
   eckenAnschreiben(daten, feld, ecken);
   return el('div.diagramm-huelle', {}, [
     svg,
-    linienlegende(K.zeichen, kennwert),
-    el('p.karte-hinweis', {
-      text: 'E_eq: der E-Modul, den der reine Betonquerschnitt – ungerissen, ohne Stahl, '
-        + 'elastisch – bräuchte, um sich gleich stark zu verformen; gezählt ab dem Zustand '
-        + 'ohne laufende Kraft.',
-    }),
+    linienlegende(k, kennwert, fall.werkstoff),
+    el('p.karte-hinweis', { text: k.bezug.hinweis }),
   ]);
 }
 
@@ -555,13 +572,16 @@ function zahlenzeile(eintraege) {
     el('span', {}, [el('b', {}, [span(`${latex} =`)]), ` ${wert}`])));
 }
 
-/** Womit gerechnet wurde: Kriechzahl, Werte (wie der Kern sie nennt), Rechenart. */
+/**
+ * Womit gerechnet wurde: Kriechzahl, Werte und Rechenart, wie der Kern sie
+ * nennt. Ohne Beton kriecht nichts (`phi` ist null), und Baustahl hat keine
+ * Rechenart (leer): dann fehlen sie.
+ */
 function wahlzeile(wahl) {
   if (!wahl) return null;
-  return el('div.sd-wahl-text', {}, [
-    span('\\varphi'),
-    ` = ${wahl.phi.toFixed(2)} · ${wahl.werte} · ${wahl.rechenart}`,
-  ]);
+  const teile = [wahl.werte, wahl.rechenart].filter(Boolean).join(' · ');
+  return el('div.sd-wahl-text', {}, wahl.phi === null ? [teile]
+    : [span('\\varphi'), ` = ${wahl.phi.toFixed(2)} · ${teile}`]);
 }
 
 /**
@@ -578,20 +598,20 @@ function inhalt(fall) {
     const kennwert = fall.wahl?.index || 'Rd';
     const kraft = (wert) => mitEinheit(wert, 1, Kg.einheit);
     const modul = (m) => (m === null || m === undefined ? '–'
-      : `${mitEinheit(m.wert, 0, M.einheit)} = ${m.vielfaches.toFixed(2)}·E_cm`);
+      : `${mitEinheit(m.wert, 0, M.einheit)} = ${m.vielfaches.toFixed(2)}·${k.bezug.text}`);
     const bild = k.punkte.length ? modulbild(fall) : null;
     const teile = [
       wahlzeile(fall.wahl),
       zahlenzeile([
         [F.zeichen, mitEinheit(k.fest, 1, F.einheit)],
-        [`${K}_{Riss}`, kraft(k.riss)],
+        ...(k.riss === null ? [] : [[`${K}_{Riss}`, kraft(k.riss)]]),
         ...(k.sprung ? [['E_{eq,I}', modul(k.sprung.vor)], ['E_{eq,II}', modul(k.sprung.nach)]]
           : []),
         ...(k.fliessen ? [[`${K}_{y}`, kraft(k.fliessen.kraft)],
           ['E_{eq,y}', modul(k.fliessen.modul)]] : []),
         ...(k.bruch ? [[`${K}_{${kennwert}}`, kraft(k.bruch.kraft)],
           ['E_{eq,u}', modul(k.bruch.modul)]] : []),
-        ['E_{cm}', mitEinheit(k.E_cm, 0, M.einheit)],
+        [k.bezug.zeichen, mitEinheit(k.bezug.wert, 0, M.einheit)],
       ]),
       bild,
       k.hinweis ? el('p.hinweis', { text: k.hinweis }) : null,
@@ -610,7 +630,7 @@ function inhalt(fall) {
       wahlzeile(fall.wahl),
       zahlenzeile([
         [F.zeichen, mitEinheit(k.fest, 1, F.einheit)],
-        [`${K}_{Riss}`, kraft(k.riss)],
+        ...(k.riss === null ? [] : [[`${K}_{Riss}`, kraft(k.riss)]]),
         ...(k.fliessen ? [[`${K}_{y}`, kraft(k.fliessen.kraft)]] : []),
         ...(k.bruch ? [[`${K}_{${kennwert}}`, kraft(k.bruch.kraft)],
           [mitIndex(V, 'u', true), mitEinheit(k.bruch.verformung, V.stellen, V.einheit)]]
@@ -624,7 +644,7 @@ function inhalt(fall) {
 
   const b = fall.bild;
   if (!b.konvergiert) return { teile: [wahlzeile(fall.wahl), el('p.hinweis', { text: b.hinweis })] };
-  const bild = verteilungsbild(b, fall.raender);
+  const bild = verteilungsbild(b, fall.raender, fall.werkstoff);
   const teile = [
     wahlzeile(fall.wahl),
     zahlenzeile([

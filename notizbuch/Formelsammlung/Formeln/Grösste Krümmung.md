@@ -1,5 +1,5 @@
 ---
-erzeugt: 1662781ad6e1
+erzeugt: d075b8b30da3
 art: formel
 tags: [formel]
 ---
@@ -27,7 +27,7 @@ $$
 | $h$ | Plattendicke | mm | Vorgabe, Zwischenwert |
 | $\varepsilon_{links}$ | – | ‰ | Zwischenwert |
 | $\varepsilon_{rechts}$ | – | ‰ | Zwischenwert |
-| $h_{\vartheta}$ | Tiefe des Betons senkrecht zur Nulllinie | mm | Zwischenwert |
+| $h_{\vartheta}$ | Tiefe des Querschnitts senkrecht zur Nulllinie | mm | Zwischenwert |
 | $\vartheta$ | – | ° | Zwischenwert |
 
 ## Beispiel

@@ -1,5 +1,5 @@
 ---
-erzeugt: 02311cdf6499
+erzeugt: 1db862ab0a29
 art: modul
 tags: [modul]
 ---
@@ -124,11 +124,12 @@ def _modul_dict(modul) -> dict
 ```
 
 Der aequivalente E-Modul in Zeichengroessen: die laufende Kraft in kNm
-bzw. kN, der Modul in N/mm², dazu E_cm, an dem er sich misst -- und
-sein Vielfaches von E_cm, wo er angeschrieben wird: je Punkt daneben, an
-den Ecken mit ihm (`{"wert", "vielfaches"}`). Gerechnet ist alles im
-Kern ([[opencivil.spannungsanalyse.modul#Modullinie|Modullinie]]); bis 2026-10-18
-teilte die Oberflaeche selbst durch E_cm.
+bzw. kN, der Modul in N/mm², dazu der Modul, an dem er sich misst
+(`bezug`: beim Stahlbeton E_cm, sonst der des Materials) -- und sein
+Vielfaches davon, wo er angeschrieben wird: je Punkt daneben, an den
+Ecken mit ihm (`{"wert", "vielfaches"}`). Gerechnet ist alles im Kern
+([[opencivil.spannungsanalyse.modul#Modullinie|Modullinie]]); bis 2026-10-18 teilte
+die Oberflaeche selbst durch E_cm.
 
 ### _knickpunkte
 
@@ -331,7 +332,6 @@ von `V_z` tragen, in kN -- ohne sie `None`.
 - [[opencivil.nachweis.resistenzlinie]]
 - [[opencivil.nachweis.schubwandnachweis]]
 - [[opencivil.projekt]]
-- [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.platte]]
 - [[opencivil.querschnitt.widerstandsflaeche]]
 - [[opencivil.spannungsanalyse]]

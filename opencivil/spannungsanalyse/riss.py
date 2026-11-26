@@ -3,7 +3,11 @@ opencivil/spannungsanalyse/riss.py -- wo eine Linie reisst.
 
 VERANTWORTUNG:
 Der Riss einer Linie -- fuer die Platte und den gezeichneten Querschnitt
-dieselbe Rechnung und dieselbe Herleitung (:class:`Bruttoriss`). Gerechnet
+dieselbe Rechnung und dieselbe Herleitung (:class:`Bruttoriss`), und was ein
+Paar aus Stahlbeton sonst in die Herleitung schreibt: den wirksamen Modul,
+die Gesetze des Betons, die Fliessdehnungen und die Grenzdehnungen
+(:meth:`Bruttoriss.herleitung_gesetze`) -- bis 2026-11-26 stand das in
+:mod:`opencivil.spannungsanalyse.herleitung`, fuer jedes Paar. Gerechnet
 wird am ungerissenen Bruttoquerschnitt, ohne Stahl, wie beim sproeden
 Versagen (:mod:`opencivil.nachweis.rissgroessen`)::
 
@@ -42,18 +46,26 @@ SI-Basis wie im ganzen Querschnittsmodul.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Callable, Optional, Tuple
+from typing import TYPE_CHECKING, Any, Callable, Mapping, Optional, Tuple
 
-from opencivil.core.einheiten import MIO_MM3, MIO_MM4, Groesse
+from opencivil.core.einheiten import MIO_MM3, Groesse
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
+from opencivil.core.wert import kennung_aus
+from opencivil.material.basis import mit_index
+from opencivil.material.betonstahl import FLIESSDEHNUNG
 from opencivil.nachweis.querschnittsloeser import Faserloeser
 from opencivil.nachweis.rissgroessen import (
     MOMENTENTEILER, REFERENZ_VORSPANNUNG, Bruttoquerschnitt, Rissmoment, Rissnormalkraft,
-    beiwert_dicke, protokoll_ecke, protokoll_spannung_ungerissen, protokoll_vorspannung,
-    protokoll_widerstandsmoment, protokoll_zugfestigkeit, rissnormalkraft,
+    beiwert_dicke, protokoll_ecke, protokoll_spannung_ungerissen, protokoll_traegheit,
+    protokoll_vorspannung, protokoll_widerstandsmoment, protokoll_zugfestigkeit, rissnormalkraft,
 )
-from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl
+from opencivil.querschnitt.gesetzwahl import (
+    REFERENZ_KRIECHEN, Rechenart, Rechenwahl, Werkstoffsatz, arten_text, betongesetz,
+    wirksamer_modul,
+)
+from opencivil.querschnitt.werkstoffgesetz import BetonUngerissen
 from opencivil.querschnitt.zugseite import Zugseite
+from opencivil.spannungsanalyse.linie import Modulbezug
 
 if TYPE_CHECKING:
     from opencivil.core.wert import Wert
@@ -69,8 +81,10 @@ class Bruttoriss:
     Das Paar gibt den Bruttoquerschnitt (``brutto``) mit seinem Rissmoment
     unter reiner Biegung (``riss``), seine Flaeche ``A``, die rissaktive
     Dicke unter Zug (``t_zug``), die Zugseite (``seite``), den gerissenen
-    Loeser (``gerissen``) und seine Wahl (``wahl``) -- und zwei Stuecke
-    Herleitung, die nur es kennt: :meth:`herleitung_bruttoquerschnitt` und
+    Loeser (``gerissen``), seine Wahl (``wahl``), den Modul ``E_cm`` des
+    Betons, die Staehle seiner Lagen (``staehle``) und die Wert-IDs der
+    Herleitung (``ids``) -- und Stuecke Herleitung, die nur es kennt:
+    :meth:`tiefe`, :meth:`herleitung_bruttoquerschnitt` und
     :meth:`herleitung_dicke_unter_zug`.
     """
 
@@ -81,6 +95,15 @@ class Bruttoriss:
     seite: Zugseite
     gerissen: Faserloeser
     wahl: Rechenwahl
+    E_cm: float
+    staehle: Tuple[Any, ...]
+    ids: Mapping[str, str]
+
+    #: Woraus die Flaeche ist, fuer das Bild.
+    flaeche = "Beton"
+
+    #: Was eine Linie sagt, die bis zum Bruch nicht fliesst.
+    OHNE_FLIESSEN = "Bis zum Bruch fliesst kein Stahl: der Beton versagt zuerst."
 
     #: Was die Erklaerung der festen Nulllinie ueber das Moment um die andere
     #: Achse sagt -- beim gezeichneten Querschnitt ist «einachsig» eine Wahl;
@@ -104,6 +127,37 @@ class Bruttoriss:
     def betone(self) -> Tuple[Any, ...]:
         """Die Betone des Querschnitts, jeder einmal -- aus den Ecken des Bruttoquerschnitts."""
         return tuple({e.stoff.id: e.stoff for e in self.brutto.ecken}.values())
+
+    @property
+    def rechenart(self) -> str:
+        """Die Rechenart je Beton in Worten (:func:`~opencivil.querschnitt.gesetzwahl.arten_text`)."""
+        return arten_text(self.wahl, self.betone)
+
+    #: In den Analysen rechnet der ungerissene Teil immer mit ``E_cm/(1+phi)``:
+    #: die Kriechzahl wirkt bei jeder Rechenart.
+    mit_kriechzahl = True
+
+    @property
+    def beschriftung(self) -> str:
+        """Die Wahl in Worten, mit der Rechenart je Beton (:meth:`~opencivil.querschnitt.gesetzwahl.Rechenwahl.beschriftung`)."""
+        return self.wahl.beschriftung(self.betone)
+
+    @property
+    def modulbezug(self) -> Modulbezug:
+        """
+        Der reine Betonquerschnitt, ungerissen und ohne Stahl, mit ``E_cm``:
+        der Bruttoquerschnitt (:meth:`~opencivil.nachweis.rissgroessen.Bruttoquerschnitt.traegheit`).
+        """
+        return Modulbezug(
+            I=self.brutto.traegheit(self.seite.um_y), A=self.A, E=self.E_cm,
+            zeichen="E_{cm}", text="E_cm",
+            erklaerung=("Der äquivalente E-Modul ist der Modul, den ein reiner "
+                        "Betonquerschnitt bräuchte – ungerissen, ohne Stahl, elastisch –, um "
+                        "sich unter der laufenden Kraft gleich stark zu verformen wie der "
+                        "bewehrte Querschnitt."),
+            hinweis=("E_eq: der E-Modul, den der reine Betonquerschnitt – ungerissen, ohne "
+                     "Stahl, elastisch – bräuchte, um sich gleich stark zu verformen; gezählt "
+                     "ab dem Zustand ohne laufende Kraft."))
 
     @property
     def einachsig(self) -> bool:
@@ -144,28 +198,15 @@ class Bruttoriss:
         return self.rissnormalkraft(M).N_Riss
 
     @property
-    def I_c(self) -> float:
-        """
-        Der reine Betonquerschnitt fuer den aequivalenten Modul: ``I`` -- kippt
-        die Nulllinie, ``I - I_yz²/I_quer``
-        (:mod:`opencivil.spannungsanalyse.schnitt`, «Der aequivalente Modul»).
-        """
-        if self.einachsig:
-            return self.I
-        b = self.brutto
-        return self.I - b.I_yz ** 2 / (b.I_z if self.seite.um_y else b.I_y)
-
-    @property
-    def A_c(self) -> float:
-        """Dasselbe fuer die Normalkraft: ``A``."""
-        return self.A
-
-    @property
     def vorgespannt(self) -> bool:
         """Ob Spannglieder mit Vordehnung den Beton druecken -- sie verschieben den Riss."""
         return self.brutto.vorspannung is not None
 
     # -- Was nur das Paar weiss --------------------------------------------------
+
+    def tiefe(self, w: Zwischenwerte, ein: Callable[[str], "Wert"]) -> "Wert":
+        """Die Tiefe ``h``, ueber die die Linie laeuft -- wie das Paar sie misst."""
+        raise NotImplementedError
 
     def herleitung_bruttoquerschnitt(self, p: Protokoll, w: Zwischenwerte,
                                      ein: Callable[[str], "Wert"],
@@ -178,6 +219,95 @@ class Bruttoriss:
         raise NotImplementedError
 
     # -- Die Herleitung ----------------------------------------------------------
+
+    def herleitung_gesetze(self, p: Protokoll, w: Zwischenwerte, linie: "Linie",
+                           ein: Callable[[str], "Wert"], werte: Mapping[str, "Wert"]
+                           ) -> Tuple["Wert", "Wert", "Wert"]:
+        """
+        Was ein Paar aus Stahlbeton vor dem Ende der Linie schreibt: den
+        wirksamen Modul, den Beton ungerissen und gerissen, wie die Loeser ihn
+        rechnen -- aus derselben Stelle
+        (:func:`~opencivil.querschnitt.gesetzwahl.betongesetz`) --, den Riss
+        (:meth:`herleitung_riss`), die Fliessdehnung jedes Stahls und die
+        Grenzdehnungen. Zurueck die Tiefe und ``A``, ``I`` des
+        Bruttoquerschnitts.
+        """
+        wahl = self.wahl
+        phi = w.zahl("phi", r"\varphi", wahl.kriechzahl, stellen=2)
+        E_c_eff = w.spannung("E_c_eff", "E_{c,eff}",
+                             wirksamer_modul(ein("E_cm").groesse.si, wahl.kriechzahl))
+        p.formel(E_c_eff, r"\frac{@E_cm}{1 + @phi}", {"E_cm": ein("E_cm"), "phi": phi},
+                 titel="Wirksamer Elastizitätsmodul", referenz=REFERENZ_KRIECHEN)
+
+        p.erklaerung(
+            "Ungerissen (Zustand I) trägt der Beton Druck und Zug, linear mit E_c,eff "
+            "– bis zum Riss: wo der Querschnitt reisst, sagt die Rissbedingung am "
+            "Bruttoquerschnitt, und nur dort zählt die Zugfestigkeit. Darüber gilt "
+            "der ungerissene Zustand nicht mehr, auch nicht zum Vergleich. Gerissen "
+            "(Zustand II) trägt der Beton keinen Zug, und im Druck gilt das Gesetz der "
+            "gewählten Rechenart.")
+        beton = {"f_c": ein("f_c"), "E_c": E_c_eff, "eps_c1d": ein("eps_c1d"),
+                 "eps_c2d": ein("eps_c2d")}
+        BetonUngerissen(E_c=E_c_eff.groesse.si).protokoll(p, beton, titel="Ungerissen (Zustand I)")
+        betongesetz(wahl, self.art, f_c=beton["f_c"].groesse.si, E_c=ein("E_cm").groesse.si,
+                    eps_c1d=beton["eps_c1d"].groesse.si, eps_c2d=beton["eps_c2d"].groesse.si
+                    ).protokoll(p, beton, titel="Gerissen (Zustand II)", basis=w.basis)
+        if wahl.arten.einheitlich is None:
+            p.text("Die Betone rechnen je mit ihrer Rechenart; gezeigt ist das Gesetz "
+                   "des Betons, der zuerst reisst.")
+        if self.art.mit_block:
+            p.erklaerung(
+                "Der Spannungsblock ist ein Modell für den Bruch: unter "
+                "(1 − 0.85)·ε_c2d trägt der Beton darin nichts. Über dem Riss ist die "
+                "Linie mit ihm darum weicher als der Querschnitt; ihr Ende ist der "
+                "Widerstand der 0.85·x-Vereinfachung. Ein Modul hängt an ihm nicht: "
+                "die Kriechzahl wirkt nur auf den ungerissenen Teil.")
+        else:
+            p.erklaerung(
+                "Unter 1 rechnet die Parabel k_σ nicht: dort hätte ihr Nenner im "
+                "ansteigenden Ast eine Nullstelle. So weit kommt es mit dem kriechweichen "
+                "Modul und charakteristischen Werten; mit k_σ = 1 ist der Beton bis f_c "
+                "bei ε_c1d linear.")
+        satz = wahl.saetze.einheitlich
+        if satz is Werkstoffsatz.CHARAKTERISTISCH:
+            p.text("Mit charakteristischen Werten: f_ck statt f_cd, f_yk statt f_yd.")
+        elif satz is None:
+            p.text("Mit gemischten Werten: jeder Baustoff rechnet mit seinem Wertesatz, wie "
+                   "gewählt. Ein Widerstand heisst darum weder Rd noch Rk, sondern schlicht R.")
+
+        h = self.tiefe(w, ein)
+        A, I = self.herleitung_riss(p, w, linie, ein, h)
+
+        p.erklaerung(
+            "Der Fliessbeginn ist der Punkt, an dem die am stärksten gezogene Lage die "
+            "Fliessdehnung erreicht. Danach wächst die Kraft nur noch wenig: die "
+            "Druckzone wird kleiner, der Hebelarm grösser, und der Beton füllt sein "
+            "Gesetz, bis eine Grenzdehnung erreicht ist. Im Bild heisst die Kraft beim "
+            "Fliessbeginn M_y bzw. N_y, am Ende M_Rd bzw. N_Rd – mit "
+            "charakteristischen Werten Rk statt Rd. Das Ende ist der Widerstand der "
+            "Tragsicherheit, wenn sie dieselbe Rechenwahl trifft.")
+        # Je Stahl seine Fliessdehnung -- unten und oben duerfen verschiedene liegen.
+        for stahl in self.staehle:
+            f_s, E_s = werte[stahl.id_von(wahl.satz(stahl).stahl)], werte[stahl.id_von("E_s")]
+            name, symbol = (("eps_y", r"\varepsilon_{y}") if len(self.staehle) == 1 else
+                            (f"eps_y_{kennung_aus(stahl.id)}",
+                             mit_index(r"\varepsilon_{y}", stahl.symbol_index)))
+            p.formel(w.dehnung(name, symbol, f_s.groesse.si / E_s.groesse.si),
+                     r"\frac{@f_s}{@E_s}", {"f_s": f_s, "E_s": E_s},
+                     titel="Dehnung bei Fliessbeginn", name=FLIESSDEHNUNG)
+        p.erklaerung(
+            "Den gerissenen Teil rechnet die Linie über die Verformung, nicht über die "
+            "Kraft: zu jeder Krümmung (bei der N-ε-Linie: zu jeder Dehnung) wird die "
+            "Ebene gesucht, die die festgehaltene Grösse trägt. Sie endet bei der "
+            "grössten Verformung, zu der es noch ein Gleichgewicht gibt – dort ist die "
+            "erste Grenzdehnung erreicht. Es sind dieselben Grenzen wie im "
+            "Dehnungsfächer der genauen M-N-Linie.")
+        p.ansatz(r"\varepsilon_{c,Rand} \ge -\varepsilon_{c2d} \qquad "
+                 r"-\varepsilon_{ud} \le \varepsilon_{s,i} \le \varepsilon_{ud} \qquad "
+                 r"\varepsilon\left(z_C\right) \ge -\varepsilon_{c1d}, \quad "
+                 r"z_C = h \cdot \left(1 - \frac{\varepsilon_{c1d}}{\varepsilon_{c2d}}\right)",
+                 titel="Grenzdehnungen am Ende der Linie")
+        return h, A, I
 
     def herleitung_riss(self, p: Protokoll, w: Zwischenwerte, linie: "Linie",
                         ein: Callable[[str], "Wert"], h: "Wert") -> Tuple["Wert", "Wert"]:
@@ -288,26 +418,18 @@ class Bruttoriss:
 
     def herleitung_traegheit(self, p: Protokoll, w: Zwischenwerte, I: "Wert") -> "Wert":
         """Der reine Betonquerschnitt des Moduls ueber dem Moment: der Bruttoquerschnitt."""
-        bezug = w.wert("I_c", "I_c", Groesse.aus_si(self.I_c, MIO_MM4), stellen=1)
         if self.einachsig:
             p.erklaerung(f"Der reine Betonquerschnitt ist der Bruttoquerschnitt, um die "
                          f"Achse der Biegung: I_c = {I.symbol.replace('_', '')}.")
-            p.wert(bezug, titel="Reiner Betonquerschnitt")
-            return bezug
-        b = self.brutto
-        quer = w.wert("I_quer", "I_z" if self.seite.um_y else "I_y",
-                      Groesse.aus_si(b.I_z if self.seite.um_y else b.I_y, MIO_MM4), stellen=1)
-        p.erklaerung(
-            "Der reine Betonquerschnitt ist der Bruttoquerschnitt. Unter reiner Biegung "
-            "kippt auch seine Nulllinie, und senkrecht zur Achse der Biegung krümmt er "
-            "sich darum stärker, als I allein sagt: wie ein Querschnitt mit I_c. Sonst "
-            "zeigte ein ungerissener unsymmetrischer Querschnitt schon seiner Form wegen "
-            "einen kleineren Modul.")
-        p.formel(bezug, r"@I - \frac{@Iyz^{2}}{@quer}",
-                 {"I": I, "Iyz": w.wert("Iyz", "I_{yz}", Groesse.aus_si(b.I_yz, MIO_MM4), 1),
-                  "quer": quer},
-                 titel="Reiner Betonquerschnitt, Nulllinie gekippt")
-        return bezug
+        else:
+            p.erklaerung(
+                "Der reine Betonquerschnitt ist der Bruttoquerschnitt. Unter reiner Biegung "
+                "kippt auch seine Nulllinie, und senkrecht zur Achse der Biegung krümmt er "
+                "sich darum stärker, als I allein sagt: wie ein Querschnitt mit I_c. Sonst "
+                "zeigte ein ungerissener unsymmetrischer Querschnitt schon seiner Form wegen "
+                "einen kleineren Modul.")
+        return protokoll_traegheit(p, w, self.brutto, self.seite.um_y, I, name="I_c",
+                                   symbol="I_c", titel="Reiner Betonquerschnitt")
 
     def herleitung_flaeche(self, p: Protokoll, w: Zwischenwerte, A: "Wert") -> "Wert":
         """Der reine Betonquerschnitt des Moduls ueber der Normalkraft: der Bruttoquerschnitt."""

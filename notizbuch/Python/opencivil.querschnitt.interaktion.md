@@ -1,5 +1,5 @@
 ---
-erzeugt: 2590de9c7851
+erzeugt: 8c1568b027d0
 art: modul
 tags: [modul]
 ---
@@ -106,6 +106,7 @@ Ein Werkstoff, wie die Interaktion ihn braucht: Gesetz und Grenzen.
 - `c_punkt: Optional[Tuple[float, float]] = None` – `(eps_c1d, eps_c2d)` beim Beton: die Regel fuer den ganz gedrueckten Querschnitt. Sonst nichts.
 - `verdraengbar: bool = False` – Ob ein Stab ihn an seiner Stelle ersetzt -- beim Beton ja.
 - `grenzname: str = ''` – Wie seine Dehnungsgrenze heisst, wo er nur an einer Stelle liegt -- ein Spannglied hat seinen eigenen Werkstoff ([[opencivil.querschnitt.spannglieder]]) und heisst wie das Glied. Leer: «Beton C30/37, Rand oben», «Stahl B500B, äusserste Lage unten».
+- `wort: str = 'Stahl'` – Was er ist, vor seinem Namen in der Dehnungsgrenze: «Beton», «Holz», «Baustahl» -- ein Stab bleibt «Stahl». Bis 2026-11-26 hiess jeder Werkstoff ausser dem Beton «Stahl», auch eine Flaeche aus Holz.
 
 ### Teil
 
@@ -213,6 +214,8 @@ Der Querschnitt fuer eine Neigung ψ der Zugrichtung, fertig zum Integrieren.
 - `gruppen_werkstoff: Tuple[int, ...]` – Je Fasergruppe ihr Werkstoff -- fuer die Aufschluesselung.
 - `beton: Optional[Tuple[float, float]]` – Kleinstes und groesstes v des Betons -- fuer x und d.
 - `staebe_v: Tuple[float, ...]` – Je Bewehrung ihr v.
+- `umriss: Tuple[float, float] = (0.0, 0.0)` – Kleinstes und groesstes v der Flaechen, aus welchem Werkstoff auch immer -- ueber diese Tiefe laeuft das Bild einer Spannung-Dehnung-Analyse. Beim Stahlbeton dasselbe wie [[opencivil.querschnitt.interaktion#Richtung|beton]].
+- `fliessgrenzen: Tuple[Dehnungsgrenze, ...] = ()` – Wo eine Flaeche zu fliessen beginnt: je Werkstoff, dessen Gesetz fliesst ([[opencivil.querschnitt.werkstoffgesetz#Gesetz.fliessbereich|fliessbereich]]), an seinen aeussersten Punkten -- dort erreicht eine ebene Dehnung jede Schwelle zuerst. Beim Stahlbeton keine: der Beton fliesst nicht, und den Stahl der Lagen fragt der Fliessbeginn nur auf Zug.
 
 #### Richtung.momente
 
@@ -257,13 +260,15 @@ Fasern und Grenzen fuer diese Neigung -- gerechnet einmal je ψ.
 #### Querschnitt._grenzen
 
 ```python
-def _grenzen(self, v_von, n: Punkt) -> Tuple[List[Dehnungsgrenze], Optional[Tuple[float, float]]]
+def _grenzen(self, v_von, n: Punkt) -> Tuple[List[Dehnungsgrenze], Optional[Tuple[float, float]], List[Dehnungsgrenze]]
 ```
 
 Die Dehnungsgrenzen fuer diese Neigung: je Werkstoff an seinen
 aeussersten Punkten, beim Beton dazu die C-Punkte -- jede mit ihrem
 Namen und der Seite, auf der sie liegt. Die Seite grosser v ist die,
-auf die die Zugrichtung `n` zeigt.
+auf die die Zugrichtung `n` zeigt. Eine Flaeche nennt ihren Rand,
+ein Stab seine Lage. Dazu dieselben Stellen einer Flaeche, deren
+Gesetz fliesst, mit seinem elastischen Bereich ([[opencivil.querschnitt.interaktion#Richtung|Richtung.fliessgrenzen]]).
 
 #### Querschnitt._knicke
 

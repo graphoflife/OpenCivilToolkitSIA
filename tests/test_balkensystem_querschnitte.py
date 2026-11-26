@@ -294,8 +294,7 @@ class TestEeq(unittest.TestCase):
         analyse = e.aufbau.querschnittsanalysen["a1"]
         paar = schnittpaar(analyse, Zugseite.UNTEN, lambda kid: werte[kid].groesse.si,
                            q.eq.wahl(stoffe_von(e.aufbau, analyse.baustoffe)))
-        return aequivalenter_modul(moment_kruemmung(paar, N=N), I_c=paar.I_c, A_c=paar.A_c,
-                                   E_cm=paar.E_cm)
+        return aequivalenter_modul(moment_kruemmung(paar, N=N), paar.modulbezug)
 
     def test_ungerissen_wie_der_anfang_der_linie(self):
         p, q = self.projekt(M=0.0)
@@ -381,8 +380,7 @@ class TestEeqPlatte(unittest.TestCase):
         platte = e.aufbau.querschnitte["q1"]
         paar = loeserpaar(platte, Richtung.X, lambda kid: werte[kid].groesse.si,
                           q.eq.wahl(stoffe_von(e.aufbau, platte.baustoffe)))
-        return aequivalenter_modul(moment_kruemmung(paar, N=0.0), I_c=paar.I_c, A_c=paar.A_c,
-                                   E_cm=paar.E_cm)
+        return aequivalenter_modul(moment_kruemmung(paar, N=0.0), paar.modulbezug)
 
     def test_ungerissen_wie_der_anfang_der_linie(self):
         p, q = self.projekt(M=20.0)

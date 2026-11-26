@@ -53,10 +53,10 @@ from opencivil.querschnitt.fachwerk import REFERENZ_ALPHA_MAX, REFERENZ_ALPHA_MI
 from opencivil.querschnitt.schubwaende import Wand
 from opencivil.querschnitt.schubwaende import zellen as zellen_finden
 from opencivil.querschnitt.fasern import FASERN
-from opencivil.querschnitt.gesetzwahl import Rechenwahl, betongesetz
+from opencivil.querschnitt.gesetzwahl import Rechenwahl, betongesetz, holzgesetz
 from opencivil.querschnitt.spannglieder import Spannglied, Spannglieder
 from opencivil.querschnitt.torsion import torsion
-from opencivil.querschnitt.werkstoffgesetz import Baustahlgesetz, Gesetz, Holzgesetz, Stahlgesetz
+from opencivil.querschnitt.werkstoffgesetz import Baustahlgesetz, Gesetz, Stahlgesetz
 from opencivil.querschnitt.zugseite import Zugseite
 
 #: Die Kennwerte, die die Nachweise eines Werkstoffs lesen -- je Art alle, die
@@ -85,13 +85,16 @@ def werkstoff(stoff: Baustoff, wert: Callable[[str], float], wahl: Rechenwahl, *
     Druck und Zug mit demselben Modul, aus derselben Stelle; gedrueckt bis
     ``-eps_c2d`` samt Punkt C, verdraengt von den Staeben. Betonstahl: bilinear,
     ``±eps_ud``. Baustahl: elastisch-plastisch, in Zug und Druck gleich,
-    ``±eps_ud``. Holz: linear bis zum Bruch, in Faserrichtung. Der Wertesatz
+    ``±eps_ud``. Holz: in Faserrichtung linear bis zum Bruch oder, wie die
+    Wahl es sagt, auf Druck elastisch-plastisch bis ``-eps_cu``
+    (:func:`~opencivil.querschnitt.gesetzwahl.holzgesetz`). Der Wertesatz
     bestimmt, wo die Plateaus liegen (``f_cd`` oder ``f_ck``, ``f_yd`` oder
     ``f_yk``, beim Baustahl ``f_yd`` oder ``f_y``); Moduln und
     Dehnungsgrenzen bleiben
     (:class:`~opencivil.querschnitt.gesetzwahl.Werkstoffsatz`). Das Holz hat
     keinen: SIA 265:2012 nennt nur Bemessungswerte. Welche Kennwerte ein
     Gesetz nimmt, sagt :meth:`~opencivil.querschnitt.gesetzwahl.Rechenwahl.kennwerte`.
+    Jeder Werkstoff traegt das Wort seiner Art, fuer die Namen seiner Grenzen.
 
     Bis 2026-10-16 baute die Spannung-Dehnung-Analyse ihre Werkstoffe
     selbst, und der Bruchzustand nahm den Beiwert der Parabel aus ``E_cd``.
@@ -103,14 +106,17 @@ def werkstoff(stoff: Baustoff, wert: Callable[[str], float], wahl: Rechenwahl, *
         gesetz = betongesetz(wahl, wahl.art_von(stoff), f_c=w(satz.beton), E_c=w(wahl.modul),
                              eps_c1d=eps_c1d, eps_c2d=eps_c2d, ungerissen=ungerissen)
         return Werkstoff(stoff.name, gesetz, -eps_c2d, math.inf,
-                         c_punkt=(eps_c1d, eps_c2d), verdraengbar=True)
+                         c_punkt=(eps_c1d, eps_c2d), verdraengbar=True, wort=stoff.art.beschriftung)
     k = wahl.kennwerte(stoff)
     if stoff.art is Baustoffart.BAUSTAHL:
         gesetz = Baustahlgesetz.gleich(E_a=w(k["E_s"]), f_yd=w(k["f_s"]), eps_ud=w(k["eps_ud"]))
-        return Werkstoff(stoff.name, gesetz, -gesetz.eps_ud, gesetz.eps_ud)
+        return Werkstoff(stoff.name, gesetz, -gesetz.eps_ud, gesetz.eps_ud,
+                         wort=stoff.art.beschriftung)
     if stoff.art is Baustoffart.HOLZ:
-        gesetz = Holzgesetz(E=w(k["E"]), f_t=w(k["f_t"]), f_c=w(k["f_c"]))
-        return Werkstoff(stoff.name, gesetz, -gesetz.eps_c, gesetz.eps_t)
+        gesetz = holzgesetz(wahl.holz_von(stoff), E=w(k["E"]), f_t=w(k["f_t"]), f_c=w(k["f_c"]),
+                            eps_cu=w(k["eps_cu"]))
+        return Werkstoff(stoff.name, gesetz, -gesetz.grenzstauchung, gesetz.eps_t,
+                         wort=stoff.art.beschriftung)
     gesetz = Stahlgesetz(E_s=w("E_s"), f_yd=w(satz.stahl),
                          f_yd_druck=w(satz.stahl_druck), eps_ud=w("eps_ud"))
     return Werkstoff(stoff.name, gesetz, -gesetz.eps_ud, gesetz.eps_ud)

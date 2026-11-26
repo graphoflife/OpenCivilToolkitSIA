@@ -1,5 +1,5 @@
 ---
-erzeugt: 0adf06dde865
+erzeugt: 03cabd758143
 art: modul
 tags: [modul]
 ---
@@ -15,7 +15,10 @@ muss ([[opencivil.spannungsanalyse.linie#Paar|Paar]]). Die Platte bietet es je T
 ([[opencivil.spannungsanalyse.platte#Loeserpaar|Loeserpaar]]), der gezeichnete
 Querschnitt je Zugseite
 ([[opencivil.spannungsanalyse.schnitt#Schnittpaar|Schnittpaar]]); bis 2026-10-17
-hiess es an den Funktionen dafuer `paar: Any`.
+hiess es an den Funktionen dafuer `paar: Any`. Ein Querschnitt ohne Beton
+-- aus Stahl oder Holz -- reisst nicht: sein Paar hat einen Zustand, und
+seine Linie laeuft ganz ueber die Verformung
+([[opencivil.spannungsanalyse.rissfrei#RissfreiesPaar|RissfreiesPaar]], seit 2026-11-26).
 
 
 ## DIE EBENEN
@@ -99,7 +102,7 @@ Die Kruemmung senkrecht zur Achse der Biegung -- ueber sie laeuft die M-χ-Linie
 def eps_oben(self) -> float
 ```
 
-Die Dehnung am oberen Rand des Betons, dem gedrueckten bei positivem Moment.
+Die Dehnung am oberen Rand der Flaeche, dem gedrueckten bei positivem Moment.
 
 #### Dehnungsebene.eps_unten
 
@@ -115,7 +118,11 @@ def eps_unten(self) -> float
 def fliesst(self) -> bool
 ```
 
-Ob eine Lage die Fliessdehnung erreicht -- jede die ihres eigenen Stahls.
+Ob der Querschnitt fliesst: eine Lage, die auf Zug die Fliessdehnung
+ihres eigenen Stahls erreicht -- so beim Stahlbeton --, oder eine
+Flaeche, die ihren elastischen Bereich verlaesst, Baustahl auf Zug
+und Druck, Holz auf Druck
+([[opencivil.querschnitt.interaktion#Richtung|fliessgrenzen]]).
 
 #### Dehnungsebene.massgebend
 
@@ -203,6 +210,30 @@ Die beiden Zustaende eines Paars, je mit seiner Ebenensuche.
 - `gerissen: Ebenensuche`
 - `ungerissen: Ebenensuche`
 
+### Modulbezug
+
+```python
+@dataclass(frozen=True)
+class Modulbezug
+```
+
+Woran sich der aequivalente Modul misst: `I` um die Achse der Biegung
+und `A` eines Querschnitts, dazu der Modul `E`, mit dem er sich
+elastisch verformte -- beim Stahlbeton der reine Betonquerschnitt mit
+`E_cm`, ohne Beton der Querschnitt selbst mit dem Modul seines
+Werkstoffs. Dazu, wie das Zeichen von `E` heisst -- als Formel und als
+Text -- und was der Bezug ist: fuer die Herleitung (`erklaerung`) und
+unter dem Bild (`hinweis`). Seit 2026-11-26; bis dahin hiess er immer
+`E_cm` und der reine Betonquerschnitt.
+
+- `I: float` – m⁴.
+- `A: float` – m².
+- `E: float` – Pa.
+- `zeichen: str` – Das Zeichen als Formel: `E_{cm}`.
+- `text: str` – Dasselbe als Text: «E_cm».
+- `erklaerung: str` – Was der Bezug ist -- der erste Satz, mit dem die Herleitung den Modul erklaert.
+- `hinweis: str` – Dasselbe unter dem Bild einer Linie des Moduls.
+
 ### Paar
 
 ```python
@@ -210,21 +241,65 @@ class Paar(Protocol)
 ```
 
 Die beiden Loeser eines Querschnitts, gerissen und ungerissen, und was die
-Fragen und ihre Herleitung sonst von ihm wissen muessen. Den Riss und den
-reinen Betonquerschnitt rechnen und schreiben beide Paare gleich
-([[opencivil.spannungsanalyse.riss#Bruttoriss|Bruttoriss]]); was nur die Art
-des Bauteils weiss -- die Tiefe, die Dehnung am Ende --, schreibt das Paar
-selbst in die Herleitung.
+Fragen und ihre Herleitung sonst von ihm wissen muessen. Ein Querschnitt
+mit Beton reisst: den Riss, die Gesetze und den reinen Betonquerschnitt
+rechnen und schreiben Platte und gezeichneter Querschnitt gleich
+([[opencivil.spannungsanalyse.riss#Bruttoriss|Bruttoriss]]). Einer ohne Beton
+reisst nicht, seine beiden Loeser sind derselbe, und Riss gibt es keinen
+(`None`, [[opencivil.spannungsanalyse.rissfrei#RissfreiesPaar|RissfreiesPaar]]).
+Was nur die Art des Bauteils weiss -- die Tiefe, die Dehnung am Ende --,
+schreibt das Paar selbst in die Herleitung.
 
 - `gerissen: Faserloeser`
 - `ungerissen: Faserloeser` – Die beiden Loeser in der Richtung des Paars -- fuer das Bild aus Randdehnungen.
-- `wahl: Rechenwahl` – Womit gerechnet wird -- Kriechzahl, Wertesatz, Rechenart.
-- `art: Rechenart` – Die Rechenart des Betons, dessen Gesetze die Herleitung zeigt -- bei mehreren Betonen die der Ecke, die zuerst reisst.
-- `betone: Tuple[Any, ...]` – Die Betone des Querschnitts, jeder einmal -- fuer die Rechenart je Beton in Worten.
+- `wahl: Rechenwahl` – Womit gerechnet wird -- Kriechzahl, Wertesatz, Rechenart, Gesetz des Holzes.
 - `ids: Mapping[str, str]` – Kurzname -> Wert-ID der Eingaben, fuer die Herleitung.
-- `staehle: Tuple[Any, ...]` – Die Staehle der Bewehrung, jeder einmal -- fuer die Fliessdehnung.
-- `E_cm: float` – Der Modul des Betons -- daran misst sich der aequivalente Modul.
 - `bezugsort: str` – Wo die Mitteldehnung gilt -- dort greift N an.
+- `flaeche: str` – Woraus die Flaeche ist, fuer das Bild: «Beton», «Holz», «Baustahl».
+- `OHNE_FLIESSEN: str` – Was eine Linie sagt, die bis zu ihrem Ende nicht fliesst.
+
+#### Paar.rechenart
+
+```python
+@property
+def rechenart(self) -> str
+```
+
+Wie die Werkstoffe rechnen, in Worten -- leer, wo es nichts zu waehlen gibt, beim Stahl.
+
+#### Paar.mit_kriechzahl
+
+```python
+@property
+def mit_kriechzahl(self) -> bool
+```
+
+Ob die Kriechzahl wirkt -- nur am Beton.
+
+#### Paar.beschriftung
+
+```python
+@property
+def beschriftung(self) -> str
+```
+
+Die ganze Wahl in Worten, fuer Herleitungen: Rechenart, Kriechzahl, Wertesatz.
+
+#### Paar.modulbezug
+
+```python
+@property
+def modulbezug(self) -> Modulbezug
+```
+
+Woran sich der aequivalente Modul misst.
+
+#### Paar.vorgespannt
+
+```python
+@property
+def vorgespannt(self) -> bool
+```
 
 #### Paar.ebenen
 
@@ -236,50 +311,28 @@ Wie die beiden Zustaende ihre Ebenen finden -- fuer jede Linie und
 jedes Bild neu: eine Suche, die bei der zuletzt gefundenen Neigung
 anfaengt, hinge sonst an dem, was vorher gerechnet wurde.
 
-#### Paar.I_c
-
-```python
-@property
-def I_c(self) -> float
-```
-
-#### Paar.A_c
-
-```python
-@property
-def A_c(self) -> float
-```
-
-#### Paar.vorgespannt
-
-```python
-@property
-def vorgespannt(self) -> bool
-```
-
 #### Paar.rissmoment_bei
 
 ```python
-def rissmoment_bei(self, N: float) -> float
+def rissmoment_bei(self, N: float) -> Optional[float]
 ```
 
 #### Paar.rissnormalkraft_bei
 
 ```python
-def rissnormalkraft_bei(self, M: float) -> float
+def rissnormalkraft_bei(self, M: float) -> Optional[float]
 ```
 
-#### Paar.tiefe
+#### Paar.herleitung_gesetze
 
 ```python
-def tiefe(self, w: 'Zwischenwerte', ein: Callable[[str], 'Wert']) -> 'Wert'
+def herleitung_gesetze(self, p: 'Protokoll', w: 'Zwischenwerte', linie: 'Linie', ein: Callable[[str], 'Wert'], werte: Mapping[str, 'Wert']) -> Tuple['Wert', 'Wert', 'Wert']
 ```
 
-#### Paar.herleitung_riss
-
-```python
-def herleitung_riss(self, p: 'Protokoll', w: 'Zwischenwerte', linie: 'Linie', ein: Callable[[str], 'Wert'], h: 'Wert') -> Tuple['Wert', 'Wert']
-```
+Was die Herleitung vor dem Ende der Linie schreibt: die Gesetze, den
+Riss, wo es einen gibt, die Fliessdehnungen und die Grenzdehnungen.
+Zurueck die Tiefe `h`, ueber die die Linie laeuft, und `A`, `I`
+des Querschnitts, an dem sich der Modul misst.
 
 #### Paar.herleitung_dehnung_am_ende
 
@@ -311,10 +364,10 @@ die dort gilt -- `chi` bzw. `eps_m` --, und beide Zustaende zum
 Vergleich.
 
 - `kraft: float`
-- `verformung: float` – Was gilt: ungerissen bis zum Riss, darueber gerissen.
+- `verformung: float` – Was gilt: ungerissen bis zum Riss, darueber gerissen -- ohne Riss der eine Zustand.
 - `gerissen: bool`
-- `verformung_I: Optional[float]` – Ungerissen -- `None` ueber dem Riss, wo der Beton dafuer Zug ohne Grenze braeuchte, und wo der Zustand keine Loesung hat.
-- `verformung_II: Optional[float]` – Gerissen, ohne Zugfestigkeit des Betons.
+- `verformung_I: Optional[float]` – Ungerissen -- `None` ueber dem Riss, wo der Beton dafuer Zug ohne Grenze braeuchte, und wo der Zustand keine Loesung hat. Ohne Riss immer `None`: es gibt nichts zu vergleichen.
+- `verformung_II: Optional[float]` – Gerissen, ohne Zugfestigkeit des Betons -- ohne Riss `None`.
 
 ### Eckpunkt
 
@@ -354,7 +407,7 @@ festgehaltenem Moment -- welche, sagt [[opencivil.spannungsanalyse.linie#Linie|a
 
 - `art: Analyseart`
 - `fest: float` – Was festgehalten wird: `N` in N oder `M` in Nm.
-- `riss: float` – Die Kraft, bei der der Querschnitt reisst: `M_Riss(N)` oder `N_Riss(M)`.
+- `riss: Optional[float]` – Die Kraft, bei der der Querschnitt reisst: `M_Riss(N)` oder `N_Riss(M)` -- `None` bei einem, der nicht reisst, ohne Beton.
 - `punkte: List[Linienpunkt] = field(default_factory=list)`
 - `bruch: Optional[Grenzzustand] = None`
 - `fliessen: Optional[Eckpunkt] = None` – Wo der Stahl der am staerksten gezogenen Lage zu fliessen beginnt.
@@ -374,6 +427,17 @@ Einen Satz vor die bisherigen Hinweise stellen.
 @property
 def tragfaehig(self) -> bool
 ```
+
+#### Linie.am_bruch
+
+```python
+@property
+def am_bruch(self) -> bool
+```
+
+Ob ihr letzter Punkt das Ende ist, bis zu dem der Querschnitt traegt:
+gerissen -- oder ohne Riss immer. Endet sie ungerissen, traegt er den
+Riss nicht, und dort gilt ihre letzte Verformung.
 
 #### Linie.sprung
 
@@ -415,12 +479,13 @@ Wo `gut` endet, zwischen `unten` (gut) und `oben` -- durch Halbieren.
 ### _linie
 
 ```python
-def _linie(paar: Paar, weg: _Weg, art: Analyseart, fest: float, riss: float) -> Linie
+def _linie(paar: Paar, weg: _Weg, art: Analyseart, fest: float, riss: Optional[float]) -> Linie
 ```
 
 Die Linie von null bis zum Bruch: ungerissen bis `riss`, dort der
 Sprung, darueber gerissen -- ueber die Verformung gerechnet, mit dem
-Fliessbeginn als Punkt der Linie.
+Fliessbeginn als Punkt der Linie. Ohne Riss (`None`) laeuft sie ganz
+ueber die Verformung, in dem einen Zustand, den der Querschnitt hat.
 
 ### moment_kruemmung
 
@@ -470,4 +535,5 @@ auf halber Hoehe, beim gezeichneten Querschnitt im Schwerpunkt.
 - [[opencivil.spannungsanalyse.modul]]
 - [[opencivil.spannungsanalyse.platte]]
 - [[opencivil.spannungsanalyse.riss]]
+- [[opencivil.spannungsanalyse.rissfrei]]
 - [[opencivil.spannungsanalyse.schnitt]]

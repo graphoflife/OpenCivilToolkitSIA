@@ -1,5 +1,5 @@
 ---
-erzeugt: 6635d3c40ae1
+erzeugt: 91e1671c1672
 art: modul
 tags: [modul]
 ---
@@ -54,13 +54,16 @@ Parabel also aus `E_cm/(1+phi)` -- oder, `ungerissen`, linear in
 Druck und Zug mit demselben Modul, aus derselben Stelle; gedrueckt bis
 `-eps_c2d` samt Punkt C, verdraengt von den Staeben. Betonstahl: bilinear,
 `±eps_ud`. Baustahl: elastisch-plastisch, in Zug und Druck gleich,
-`±eps_ud`. Holz: linear bis zum Bruch, in Faserrichtung. Der Wertesatz
+`±eps_ud`. Holz: in Faserrichtung linear bis zum Bruch oder, wie die
+Wahl es sagt, auf Druck elastisch-plastisch bis `-eps_cu`
+([[opencivil.querschnitt.gesetzwahl#holzgesetz|holzgesetz]]). Der Wertesatz
 bestimmt, wo die Plateaus liegen (`f_cd` oder `f_ck`, `f_yd` oder
 `f_yk`, beim Baustahl `f_yd` oder `f_y`); Moduln und
 Dehnungsgrenzen bleiben
 ([[opencivil.querschnitt.gesetzwahl#Werkstoffsatz|Werkstoffsatz]]). Das Holz hat
 keinen: SIA 265:2012 nennt nur Bemessungswerte. Welche Kennwerte ein
 Gesetz nimmt, sagt [[opencivil.querschnitt.gesetzwahl#Rechenwahl.kennwerte|kennwerte]].
+Jeder Werkstoff traegt das Wort seiner Art, fuer die Namen seiner Grenzen.
 
 Bis 2026-10-16 baute die Spannung-Dehnung-Analyse ihre Werkstoffe
 selbst, und der Bruchzustand nahm den Beiwert der Parabel aus `E_cd`.
@@ -506,6 +509,8 @@ Jede Ecke eines Polygons mit Material -- fuer das Rissmoment, in mm.
 - [[opencivil.pfahl.innen_quer]]
 - [[opencivil.pfahl.quer]]
 - [[opencivil.projekt.aufbau.querschnittsanalyse]]
+- [[opencivil.spannungsanalyse.analysen]]
+- [[opencivil.spannungsanalyse.rissfrei]]
 - [[opencivil.spannungsanalyse.schnitt]]
 - [[opencivil.web.zeichengeometrie]]
 

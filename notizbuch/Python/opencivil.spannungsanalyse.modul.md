@@ -1,5 +1,5 @@
 ---
-erzeugt: f39747c6d5e9
+erzeugt: c6b7da7c3001
 art: modul
 tags: [modul]
 ---
@@ -11,7 +11,9 @@ tags: [modul]
 
 Die letzten zwei Fragen: eine Linie, umgerechnet in den Modul, den ein
 reiner, ungerissener, elastischer Betonquerschnitt braeuchte, um sich gleich
-stark zu kruemmen oder zu dehnen ([[opencivil.spannungsanalyse.modul#Modullinie|Modullinie]]). Und derselbe Modul
+stark zu kruemmen oder zu dehnen ([[opencivil.spannungsanalyse.modul#Modullinie|Modullinie]]) -- bei einem
+Querschnitt ohne Beton derselbe Querschnitt, linear-elastisch
+([[opencivil.spannungsanalyse.linie#Modulbezug|Modulbezug]]). Und derselbe Modul
 an einer Stelle der Linie, fuer die Staebe eines Balkensystems
 ([[opencivil.spannungsanalyse.modul#modul_bei|modul_bei]], [[opencivil.spannungsanalyse.modul#Modulfrage|Modulfrage]]): dort geht er in die Rechnung ein,
 darum rechnet ihn das Rechenwerk, nicht die Auswertung danach. Gefragt wird
@@ -55,6 +57,10 @@ E_eq = M / (I_c · (chi - chi_0))       I_c = b·h³/12
 E_eq = N / (A_c · (eps_m - eps_0))     A_c = b·h
 ```
 
+Ohne Beton misst er sich am Querschnitt selbst, mit `I` und `A`
+([[opencivil.spannungsanalyse.linie#Modulbezug|Modulbezug]]): bis zum Fliessbeginn ist er dort der Modul des
+Werkstoffs.
+
 Gezaehlt wird ab dem Zustand ohne laufende Kraft -- `chi_0` bei M = 0
 unter der festen Normalkraft, `eps_0` bei N = 0 unter dem festen
 Moment --, nach Vorgabe (2026-10-11); SIA 262:2025 kennt keinen solchen
@@ -72,10 +78,18 @@ N-eps-Linie daneben.
 
 - `art: Analyseart`
 - `linie: Linie` – Die M-chi- oder N-eps-Linie, aus der umgerechnet wird.
-- `bezug: float` – `I_c` in m⁴ bzw. `A_c` in m² -- der reine Betonquerschnitt.
+- `bezug: Modulbezug` – Woran er sich misst: `I` bzw. `A` -- und `E` zum Vergleich, `E_eq/E` ist der Faktor, um den man `E` abmindert: beim Stahlbeton `E_cm`, sonst der Modul des Materials.
 - `null: float` – Die Verformung ohne laufende Kraft: `chi_0` bzw. `eps_0`.
-- `E_cm: float` – Zum Vergleich: `E_eq/E_cm` ist der Faktor, um den man E_cm abmindert.
 - `punkte: List[Modulpunkt] = field(default_factory=list)`
+
+#### Modullinie.querschnitt
+
+```python
+@property
+def querschnitt(self) -> float
+```
+
+`I` in m⁴ ueber dem Moment, `A` in m² ueber der Normalkraft.
 
 #### Modullinie.modul
 
@@ -83,7 +97,7 @@ N-eps-Linie daneben.
 def modul(self, kraft: float, verformung: float) -> Optional[float]
 ```
 
-`Kraft / (Bezug · (Verformung − null))` -- `None`, wo das nichts sagt.
+`Kraft / (Querschnitt · (Verformung − null))` -- `None`, wo das nichts sagt.
 
 #### Modullinie.ungerissen
 
@@ -122,13 +136,13 @@ Der Modul am Ende der Linie -- beim Bruch, oder ungerissen, wenn sie es bleibt.
 ### aequivalenter_modul
 
 ```python
-def aequivalenter_modul(linie: Linie, *, I_c: float, A_c: float, E_cm: float) -> Modullinie
+def aequivalenter_modul(linie: Linie, bezug: Modulbezug) -> Modullinie
 ```
 
 Die M-chi- oder N-eps-Linie als Linie des aequivalenten Moduls -- siehe
 [[opencivil.spannungsanalyse.modul#Modullinie|Modullinie]]. Beide Vergleichszustaende zaehlen ab ihrer eigenen
-Verformung ohne laufende Kraft. `I_c` und `A_c` sind der reine
-Betonquerschnitt, an dem sich der Modul misst.
+Verformung ohne laufende Kraft. `bezug` ist der Querschnitt, an dem
+sich der Modul misst -- beim Stahlbeton der reine Betonquerschnitt.
 
 ### Modulstelle
 

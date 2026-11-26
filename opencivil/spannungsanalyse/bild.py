@@ -22,8 +22,8 @@ from opencivil.querschnitt.werkstoffgesetz import RUNDUNG
 from opencivil.spannungsanalyse.linie import Dehnungsebene, Ebenensuche
 
 #: Punkte ueber die Hoehe, mit denen Dehnung und Spannung gezeichnet werden.
-#: Die Betonspannung hat am Nulldurchgang einen Knick; 41 Punkte zeigen ihn,
-#: ohne dass die Kurve eckig wird.
+#: Die Spannung des Betons hat am Nulldurchgang einen Knick; 41 Punkte zeigen
+#: ihn, ohne dass die Kurve eckig wird.
 STUETZSTELLEN = 41
 
 
@@ -77,12 +77,14 @@ class Querschnittsbild:
     """Das Moment um die Achse der Biegung."""
 
     h: float = 0.0
-    """Die Tiefe des Betons, ueber die das Bild laeuft -- senkrecht zur Nulllinie, in m."""
+    """Die Tiefe der Flaeche, ueber die das Bild laeuft -- senkrecht zur Nulllinie, in m."""
 
     neigung: float = 0.0
     """Wie weit die Nulllinie gegen die Achse der Biegung gedreht ist, rad."""
 
-    beton: List[Faserpunkt] = field(default_factory=list)
+    flaeche: List[Faserpunkt] = field(default_factory=list)
+    """Die Flaeche ueber die Hoehe -- beim Stahlbeton der Beton, sonst Holz oder Baustahl."""
+
     stahl: List[Stahlpunkt] = field(default_factory=list)
     konvergiert: bool = True
     hinweis: str = ""
@@ -96,9 +98,9 @@ class Querschnittsbild:
         gibt es keine Nulllinie, und eine hinzurechnen hiesse, eine Zahl zu
         zeigen, die es nicht gibt.
         """
-        if not self.beton or abs(self.chi) < 1e-12:
+        if not self.flaeche or abs(self.chi) < 1e-12:
             return None
-        oben, unten = self.beton[0], self.beton[-1]
+        oben, unten = self.flaeche[0], self.flaeche[-1]
         if (oben.eps > 0.0) == (unten.eps > 0.0):
             return None
         return oben.z - oben.eps / self.chi
@@ -109,11 +111,11 @@ def _bild(ebene: Dehnungsebene) -> Querschnittsbild:
     loeser, eps_m, chi = ebene.loeser, ebene.eps_m, ebene.chi
     oben = loeser.oben
 
-    beton = []
+    flaeche = []
     for i in range(STUETZSTELLEN):
         z = loeser.h * i / (STUETZSTELLEN - 1)    # von oben nach unten
         eps = eps_m + chi * (z + oben)
-        beton.append(Faserpunkt(z=z, eps=eps, sigma=loeser.betonspannung(z + oben, eps)))
+        flaeche.append(Faserpunkt(z=z, eps=eps, sigma=loeser.flaechenspannung(z + oben, eps)))
 
     stahl = []
     for lage, stab in zip(loeser.lagen, loeser.querschnitt.staebe):
@@ -124,7 +126,7 @@ def _bild(ebene: Dehnungsebene) -> Querschnittsbild:
                                 kraft=sigma * lage.a_s, name=lage.text))
 
     bild = Querschnittsbild(eps_m=eps_m, chi=chi, N=ebene.N, M=ebene.M, h=loeser.h,
-                            neigung=ebene.neigung, beton=beton, stahl=stahl)
+                            neigung=ebene.neigung, flaeche=flaeche, stahl=stahl)
     saetze = []
     if ebene.neigung != 0.0:
         winkel = f"{math.degrees(ebene.neigung):.1f}".replace("-", "−")

@@ -36,6 +36,7 @@ from opencivil.core.rechenwerk import Loesung
 from opencivil.core.wert import Wert
 from opencivil.decke.modell import Aufteilung
 from opencivil.material.arten import MATERIALARTEN
+from opencivil.material.basis import Baustoffart
 from opencivil.material.beton import BETONSORTEN
 from opencivil.material.betonstahl import STAHLSORTEN
 from opencivil.material.spannstahl import Erzeugnis
@@ -60,7 +61,7 @@ from opencivil.querschnitt.spannglieder import (
 from opencivil.querschnitt.zugseite import UM_Y, Zugseite
 from opencivil.querschnitt.geometrie import VERSCHMIERT, Linienart
 from opencivil.querschnitt.vorlagen import RANDABSTAND, VORLAGEN
-from opencivil.querschnitt.gesetzwahl import Werkstoffsatz
+from opencivil.querschnitt.gesetzwahl import Holzrechnung, Werkstoffsatz
 from opencivil.nachweis.rechenwahl import RECHENARTEN
 from opencivil.spannungsanalyse import Analyseart
 from opencivil.stabwerk.rechnung import Balkensystem
@@ -124,6 +125,24 @@ def _rechenarten(arten) -> list:
     """Die Rechenarten mit Beschriftung -- und ob die Kriechzahl bei ihnen wirkt."""
     return [{"wert": a.value, "beschriftung": a.beschriftung, "kurz": a.kurz,
              "mit_kriechzahl": a.mit_kriechzahl} for a in arten]
+
+
+def _satztitel() -> Dict[str, str]:
+    """
+    Je Art mit Wertesatz der Titel seines Schalters, mit den Zeichen ihrer
+    Festigkeit: «Bemessungswert f_cd oder charakteristischer f_ck». Das Holz
+    steht nicht da -- es hat keinen Satz, und so hat es keinen Schalter. Bis
+    2026-11-26 standen zwei Titel in der Oberflaeche, und jeder Stahl hiess
+    «f_yd oder f_yk», auch der Baustahl und der Spannstahl.
+    """
+    titel = {}
+    for name, art in MATERIALARTEN.items():
+        if art.art is Baustoffart.HOLZ:
+            continue
+        zeichen = {v.kurzname: v.symbol.replace("{", "").replace("}", "") for v in art.vorlagen}
+        d, k = (zeichen[satz.festigkeit(art.art)] for satz in Werkstoffsatz)
+        titel[name] = f"Bemessungswert {d} oder charakteristischer {k}"
+    return titel
 
 
 # ===========================================================================
@@ -363,12 +382,15 @@ def katalog() -> dict:
             "breite_y": BREITE_Y_MM,
         },
         # Was ein Nachweis-Kapitel und eine Analyse waehlen: je Material den
-        # Wertesatz, je Beton die Rechenart. Welche Arten ein Kapitel
-        # anbietet, sagt sein Feld (`felder`, `wahl`); hier stehen sie alle
-        # mit Namen und Bild.
+        # Wertesatz, je Beton die Rechenart, in einer Analyse je Holz, wie es
+        # rechnet. Welche Arten ein Kapitel anbietet, sagt sein Feld
+        # (`felder`, `wahl`); hier stehen sie alle mit Namen und Bild.
         "rechenwahl": {
             "werkstoffsaetze": _WERKSTOFFSAETZE,
+            "satztitel": _satztitel(),
             "rechenarten": _rechenarten(RECHENARTEN),
+            "holzrechnungen": [{"wert": h.value, "beschriftung": h.beschriftung, "kurz": h.kurz}
+                               for h in Holzrechnung],
         },
         # `fliessnachweis` sagt, ob diese Anforderung den Nachweis gegen
         # das Fliessen unter haeufiger Einwirkung ueberhaupt verlangt -- bei

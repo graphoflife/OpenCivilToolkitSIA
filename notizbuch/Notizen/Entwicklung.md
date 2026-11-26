@@ -7,6 +7,64 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-26 · Spannung-Dehnung-Analysen für Holz und Stahl
+
+Aus dem Plan vom 2026-11-25, Schritt 11b: ein Querschnitt aus Holz oder
+aus Baustahl hat die sechs Spannung-Dehnung-Analysen wie einer aus
+Stahlbeton. Seine Nachweise stehen weiter grau, darunter die Kacheln der
+Analysen. Der Verbund wartet auf Schritt 14: sein Riss braucht den
+ideellen Querschnitt, mit E_a/E_cm gewichtet; bis dahin sagt es ein grauer
+Satz an der Stelle der Kacheln.
+
+**Ohne Beton reisst er nicht** (`spannungsanalyse/rissfrei.py`). Ein
+solcher Querschnitt hat einen Zustand: seine Linie läuft ohne Sprung und
+ohne die gestrichelten Zustände I und II von null bis dorthin, wo eine
+Faser ihre Grenzdehnung erreicht. Faserintegral und Suche der Ebene sind
+dieselben wie beim Stahlbeton; was beide am gezeichneten Querschnitt
+gemeinsam haben – die feste oder kippende Nulllinie, die Dehnung am Ende –,
+steht einmal (`AmSchnitt` in `schnitt.py`).
+
+**Vorher und nachher.** Ein Rechteck 200 × 400 mm aus C24: vorher stand
+statt aller Kacheln ein grauer Satz. Nachher ist die M-χ-Linie ohne
+Normalkraft eine Gerade bis 8 · W = 42.7 kNm, wo der gezogene Rand bricht.
+Mit N = −300 kN und «elastisch-plastisch» fliesst der gedrückte Rand bei
+44.0 kNm, und die Linie trägt weiter bis 59.4 kNm – von Hand nachgerechnet
+im Test. Aus S355 fliesst er bei f_yd · W = 1803 kNm und endet bei der
+Grenzdehnung kurz vor M_pl = 2705 kNm.
+
+**Holz: linear oder auf Druck elastisch-plastisch.** Unter dem Holz steht
+nur dieser Schalter, und nur in den Analysen (SIA 265:2012, 3.1.2.2); die
+Nachweise rechnen linear (4.1.2). Einen Wertesatz hat das Holz nicht: die
+Norm nennt Bemessungswerte, und so sagt es auch die Herleitung.
+
+**Der äquivalente Modul misst sich am Modul des Materials:** E_0,mean beim
+Holz, E_a beim Baustahl, beim Stahlbeton weiter E_cm. Solange keine Faser
+fliesst, ist er dieser Modul – bis auf 0.03 %: das Faserintegral liest
+jeden Streifen in seiner Mitte, und so fehlt I der Anteil 1/n² (10 997
+statt 11 000 N/mm²). Hat der Querschnitt zwei Sorten derselben Art, gilt
+der Modul der grössten Fläche (nach Vorgabe, im TODO).
+
+**Wo eine Fläche fliesst, sagt ihr Gesetz** (`Gesetz.fliessbereich`):
+der Baustahl bei ±f/E, das Holz plastisch bei −f_c,0,d/E. Die Grenzen
+heissen nach dem Material: «Holz C24, Rand unten» – bis heute hiess jede
+Fläche ausser dem Beton «Stahl». Das Bild über die Höhe läuft über die
+Flächen jedes Werkstoffs, nicht mehr nur über den Beton.
+
+**Oberfläche.** Die Legende sagt «Druck im Holz» und «Querschnitt aus
+Baustahl – ohne Beton reisst er nicht», und sie nennt nur, was im Bild
+steht: Riss und Fliessbeginn nur, wo die Linie einen hat, die
+Bewehrungslage nur mit Bewehrung. Über dem Bild fehlt φ, wo nichts kriecht.
+Den Titel des Schalters unter einem Material schreibt der Kern: beim
+Baustahl «f_yd oder f_y», beim Spannstahl «f_pd oder f_p0.1k» – bis heute
+hiess jeder Stahl «f_yd oder f_yk». Die Zeilen je Material haben die Farbe
+ihrer Art, und ihre Überschrift heisst «Je Material» statt «Werte je
+Material»: unter dem Holz steht kein Wert, sondern wie es rechnet.
+
+**Was offen bleibt.** Ein E_eq im Balkensystem gibt es weiter nur beim
+Stahlbeton. Die Linie des Holzes endet beim Bruch der Zugfaser; der
+Nachweis der Biegung nach SIA 265 rechnet mit f_m,d und gäbe beim Rechteck
+oben 14 · W = 74.7 kNm statt 42.7 – zu entscheiden mit Schritt 13 (TODO).
+
 ## 2026-11-26 · Flächen aus Holz und Baustahl, die Bauweise
 
 Aus dem Plan vom 2026-11-25, Schritt 11a: eine Fläche der

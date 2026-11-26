@@ -27,7 +27,9 @@ from opencivil.core.rechenwerk import Rechenwerk
 from opencivil.material.basis import Baustoff, Baustoffart
 from opencivil.material.spannstahl import erzeugnis
 from opencivil.projekt.aufbau.kern import baustoff_im_werk, materialgrund
-from opencivil.projekt.aufbau.querschnittsanalyse import erzeugnis_grund, ohne_nachweise
+from opencivil.projekt.aufbau.querschnittsanalyse import (
+    erzeugnis_grund, ohne_analysen, ohne_nachweise,
+)
 from opencivil.projekt.lesen import stoffe_des_felds
 from opencivil.projekt.querschnittsanalyse import (
     FlaecheEintrag, SchubwandEintrag, StabEintrag, StablinieEintrag,
@@ -60,8 +62,10 @@ def geometrie(eintrag, projekt) -> dict:
     Meldung ohne Element, grau.
 
     ``ohne_nachweise`` ist der Satz, warum ein Querschnitt dieser Bauweise
-    keinen Nachweis hat -- leer beim Stahlbeton und ohne Bauweise. Danach
-    zeigt die Analyse ihre Kacheln (:func:`ohne_nachweise`).
+    keinen Nachweis hat -- leer beim Stahlbeton und ohne Bauweise --,
+    ``ohne_analysen`` derselbe fuer die Spannung-Dehnung-Analysen, leer
+    ausser im Verbund. Danach zeigt die Analyse ihre Kacheln
+    (:func:`ohne_nachweise`, :func:`ohne_analysen`).
 
     ``gueltig`` heisst: die Zeichnung rechnet. Eine Spannung ueber der
     Grenze der Norm steht rot am Glied, haelt die Rechnung aber nicht an --
@@ -204,6 +208,7 @@ def geometrie(eintrag, projekt) -> dict:
         # Oberflaeche sie ein zweites Mal.
         "materialien": eintrag.materialien(),
         "ohne_nachweise": _als_satz(ohne_nachweise(art)) if art is not None else "",
+        "ohne_analysen": ohne_analysen(art) if art is not None else "",
     }
 
 

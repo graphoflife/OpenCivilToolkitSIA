@@ -80,7 +80,7 @@ from typing import Callable, Dict, Optional, Sequence, Tuple
 
 from opencivil.core.protokoll import Zwischenwerte
 from opencivil.core.suche import HALBIEREN, Suche, eingrenzen
-from opencivil.querschnitt.fasern import FASERN, Dehnungsgrenzen, Faserquerschnitt
+from opencivil.querschnitt.fasern import FASERN, Dehnungsgrenze, Dehnungsgrenzen, Faserquerschnitt
 from opencivil.querschnitt.gesetzwahl import REFERENZ_KRIECHEN, wirksamer_modul
 from opencivil.querschnitt.lagenaufbau import schwerpunkt
 from opencivil.querschnitt.werkstoffgesetz import Stahlgesetz
@@ -407,8 +407,10 @@ class Faserloeser:
     Suche nicht. Dazu, was Bilder und Linien vom Querschnitt wissen muessen:
     die Arme der Raender ``oben`` und ``unten`` -- oben ist gedrueckt, wenn
     ein positives Moment wirkt --, die Lagen mit ihrem Stahl, eine je Stab
-    der Fasern, und die Spannung des Betons an einer Stelle
-    (``beton(arm, eps)``). Wo die Gesetze gelten, sagen allein die Grenzen,
+    der Fasern, die Spannung der Flaeche an einer Stelle
+    (``flaeche(arm, eps)``) -- beim Stahlbeton die des Betons -- und wo eine
+    Flaeche zu fliessen beginnt (``fliessgrenzen``, beim Stahlbeton keine:
+    dort fliesst eine Lage). Wo die Gesetze gelten, sagen allein die Grenzen,
     jede mit ihrem Namen: bis 2026-10-18 trug der Loeser dazu ``eps_druck``
     und ``eps_zug``, ein zweites, groberes Fenster an beiden Raendern, und das
     Bild aus Randdehnungen meldete danach Ebenen als ungueltig, die es nicht
@@ -444,7 +446,8 @@ class Faserloeser:
 
     def __init__(self, *, querschnitt: Faserquerschnitt, grenzen: Dehnungsgrenzen,
                  oben: float = 0.0, unten: float = 0.0, lagen: Sequence[Stahllage] = (),
-                 beton: Optional[Callable[[float, float], float]] = None,
+                 flaeche: Optional[Callable[[float, float], float]] = None,
+                 fliessgrenzen: Sequence[Dehnungsgrenze] = (),
                  suche: Suche = HALBIEREN) -> None:
         self.suche = suche if suche.auch_bei_sprung or not querschnitt.springt else HALBIEREN
         """Wie er sucht -- wo ein Gesetz springt, halbierend, siehe oben. Die
@@ -459,7 +462,8 @@ class Faserloeser:
         self.unten = unten
         self.h = unten - oben
         self.lagen = list(lagen)
-        self.betonspannung = beton
+        self.flaechenspannung = flaeche
+        self.fliessgrenzen = tuple(fliessgrenzen)
         #: Die inneren Kraefte einer Dehnungsebene -- der Beton ueber Fasern,
         #: der Stahl Lage fuer Lage, siehe :meth:`Faserquerschnitt.kraefte`.
         #: Unmittelbar gebunden statt durch eine Methode gereicht: die

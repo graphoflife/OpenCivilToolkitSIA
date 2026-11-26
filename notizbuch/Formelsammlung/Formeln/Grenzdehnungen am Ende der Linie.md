@@ -1,5 +1,5 @@
 ---
-erzeugt: ee4d9467691a
+erzeugt: 5de91c61de15
 art: formel
 tags: [formel]
 ---
@@ -12,7 +12,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.spannungsanalyse.herleitung#herleitung|herleitung]]
+- [[opencivil.spannungsanalyse.riss#Bruttoriss.herleitung_gesetze|Bruttoriss.herleitung_gesetze]]
 
 ## Themen
 

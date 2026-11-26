@@ -1,5 +1,5 @@
 ---
-erzeugt: 6446881fef8e
+erzeugt: b832c3adc6c9
 art: modul
 tags: [modul]
 ---
@@ -111,7 +111,8 @@ Erzeugt einen frei definierten Betonstahl ohne Sortentabelle.
 - [[opencivil.projekt.projekt]]
 - [[opencivil.querschnitt.lagenaufbau]]
 - [[opencivil.querschnitt.platte]]
-- [[opencivil.spannungsanalyse.herleitung]]
+- [[opencivil.spannungsanalyse.riss]]
+- [[opencivil.spannungsanalyse.rissfrei]]
 - [[opencivil.web.api]]
 
 ## Formeln aus diesem Modul

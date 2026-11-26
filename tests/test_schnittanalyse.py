@@ -175,8 +175,9 @@ class TestDerRiss(unittest.TestCase):
                                    k_t * self.f_ctm * b * h - 6.0 * abs(M) / h, delta=1e-3)
 
     def test_aequivalenter_modul_am_bruttoquerschnitt(self):
-        self.assertAlmostEqual(self.paar.I_c, 0.3 * 0.5 ** 3 / 12.0, places=12)
-        self.assertAlmostEqual(self.paar.A_c, 0.3 * 0.5, places=12)
+        bezug = self.paar.modulbezug
+        self.assertAlmostEqual(bezug.I, 0.3 * 0.5 ** 3 / 12.0, places=12)
+        self.assertAlmostEqual(bezug.A, 0.3 * 0.5, places=12)
 
 
 class TestKippendeNulllinie(unittest.TestCase):
@@ -259,12 +260,10 @@ class TestKippendeNulllinie(unittest.TestCase):
         Rechteckquerschnitt zeigt -- E_c,eff und etwas für den Stahl.
         """
         b = self.unten.brutto
-        self.assertAlmostEqual(self.unten.I_c, b.I_y - b.I_yz ** 2 / b.I_z, delta=1e-15)
-        kippend = sa.aequivalenter_modul(self.linie, I_c=self.unten.I_c, A_c=self.unten.A_c,
-                                         E_cm=self.unten.E_cm)
+        self.assertAlmostEqual(self.unten.modulbezug.I, b.I_y - b.I_yz ** 2 / b.I_z, delta=1e-15)
+        kippend = sa.aequivalenter_modul(self.linie, self.unten.modulbezug)
         fest = sa.aequivalenter_modul(sa.moment_kruemmung(self.einachsig, N=0.0),
-                                      I_c=self.einachsig.I_c, A_c=self.einachsig.A_c,
-                                      E_cm=self.einachsig.E_cm)
+                                      self.einachsig.modulbezug)
         self.assertAlmostEqual(kippend.ungerissen / fest.ungerissen, 1.0, delta=0.01)
 
 

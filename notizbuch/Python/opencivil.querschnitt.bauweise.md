@@ -1,5 +1,5 @@
 ---
-erzeugt: 4509f5ca57a0
+erzeugt: 1af1f3a78f79
 art: modul
 tags: [modul]
 ---
@@ -101,6 +101,7 @@ nicht.»
 - [[opencivil.projekt.aufbau.erdbeben]]
 - [[opencivil.projekt.aufbau.querschnittsanalyse]]
 - [[opencivil.querschnitt.analyse]]
+- [[opencivil.spannungsanalyse.analysen]]
 - [[opencivil.spannungsanalyse.modul]]
 - [[opencivil.web.api]]
 - [[opencivil.web.zeichengeometrie]]

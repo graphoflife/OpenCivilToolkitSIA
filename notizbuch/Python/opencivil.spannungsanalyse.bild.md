@@ -1,5 +1,5 @@
 ---
-erzeugt: 6e340a7fa8e7
+erzeugt: 915c737eec57
 art: modul
 tags: [modul]
 ---
@@ -56,9 +56,9 @@ Dehnungsebene, Spannungen und die daraus entstehenden Schnittgroessen.
 - `chi: float` – Dehnung am Arm null und Kruemmung senkrecht zur Nulllinie.
 - `N: float`
 - `M: float` – Das Moment um die Achse der Biegung.
-- `h: float = 0.0` – Die Tiefe des Betons, ueber die das Bild laeuft -- senkrecht zur Nulllinie, in m.
+- `h: float = 0.0` – Die Tiefe der Flaeche, ueber die das Bild laeuft -- senkrecht zur Nulllinie, in m.
 - `neigung: float = 0.0` – Wie weit die Nulllinie gegen die Achse der Biegung gedreht ist, rad.
-- `beton: List[Faserpunkt] = field(default_factory=list)`
+- `flaeche: List[Faserpunkt] = field(default_factory=list)` – Die Flaeche ueber die Hoehe -- beim Stahlbeton der Beton, sonst Holz oder Baustahl.
 - `stahl: List[Stahlpunkt] = field(default_factory=list)`
 - `konvergiert: bool = True`
 - `hinweis: str = ''`
@@ -121,7 +121,7 @@ Eine verletzte Grenze im Hinweis: «Stahl der 1. Lage bei 47.3 ‰, gilt bis 45.
 
 ## Konstanten
 
-- `STUETZSTELLEN = 41` – Punkte ueber die Hoehe, mit denen Dehnung und Spannung gezeichnet werden. Die Betonspannung hat am Nulldurchgang einen Knick; 41 Punkte zeigen ihn, ohne dass die Kurve eckig wird.
+- `STUETZSTELLEN = 41` – Punkte ueber die Hoehe, mit denen Dehnung und Spannung gezeichnet werden. Die Spannung des Betons hat am Nulldurchgang einen Knick; 41 Punkte zeigen ihn, ohne dass die Kurve eckig wird.
 
 ## Braucht
 

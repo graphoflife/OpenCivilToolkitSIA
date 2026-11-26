@@ -1,5 +1,5 @@
 ---
-erzeugt: d4dc63bc3730
+erzeugt: 4d2a89d32a63
 art: modul
 tags: [modul]
 ---
@@ -38,6 +38,8 @@ Das alles beim Stahlbeton. Ein Querschnitt aus Stahl, Holz oder im
 Verbund ([[opencivil.querschnitt.bauweise|bauweise]]) rechnet bisher nur seine
 Werte -- Flaeche, Schwerpunkt, Traegheitsmomente --, und seine
 Zusammenfassung sagt, dass die Nachweise fehlen ([[opencivil.projekt.aufbau.querschnittsanalyse#ohne_nachweise|ohne_nachweise]]).
+Seine Spannung-Dehnung-Analysen rechnet er trotzdem, ausser im Verbund
+([[opencivil.projekt.aufbau.querschnittsanalyse#ohne_analysen|ohne_analysen]]).
 
 Ist noch nichts gezeichnet ([[opencivil.projekt.querschnittsanalyse#QuerschnittsanalyseEintrag.leer|QuerschnittsanalyseEintrag.leer]]), gibt
 es nichts zu rechnen und kein Bauteil -- aber auch keinen Fehler, der das
@@ -56,6 +58,18 @@ Warum ein Querschnitt dieser Bauweise keinen Nachweis hat -- leer beim
 Stahlbeton. Ein Satzteil ohne Punkt, fuer die Zusammenfassung
 ([[opencivil.projekt.aufbau.kern#Aufbau.ohne_nachweis|ohne_nachweis]]) und fuer die
 Zeichnung ([[opencivil.web.zeichengeometrie#geometrie|geometrie]]).
+
+### ohne_analysen
+
+```python
+def ohne_analysen(bauweise: Bauweise) -> str
+```
+
+Warum ein Querschnitt dieser Bauweise keine Spannung-Dehnung-Analyse hat
+-- leer, wo er eine hat. Ein Satz mit Punkt, fuer die Zeichnung
+([[opencivil.web.zeichengeometrie#geometrie|geometrie]]). Der Verbund wartet
+auf seine Nachweise: sein Riss braucht den ideellen Querschnitt, mit
+`E_a/E_cm` gewichtet, und die Werte der Analyse sind ungewichtet.
 
 ### _in_si
 

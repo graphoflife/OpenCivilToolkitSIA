@@ -1,5 +1,5 @@
 ---
-erzeugt: ae5a7b04b2ae
+erzeugt: 95e97ebb6861
 art: modul
 tags: [modul]
 ---
@@ -118,6 +118,20 @@ mit blanken SI-Zahlen --, es heisst wie seine Seite im Notizbuch
 - `WERTTITEL: ClassVar[str] = 'Werte des Betons'` – Was die Zeile mit den Werten heisst.
 - `mittel: ClassVar[Optional[Callable[[float, float], float]]] = None`
 - `funktion: Funktion = field(init=False, repr=False, compare=False)`
+
+#### Gesetz.fliessbereich
+
+```python
+@property
+def fliessbereich(self) -> Optional[Tuple[float, float]]
+```
+
+Zwischen welchen Dehnungen das Gesetz elastisch bleibt -- jenseits
+fliesst es: beim Stahl `±f/E`, beim Holz, das auf Druck plastisch
+rechnet, `-f_c/E` bis ohne Grenze. `None` bei einem Gesetz, das
+nicht fliesst: der Beton ist von Anfang an nichtlinear, das lineare
+Holz bricht. Danach fragt der Fliessbeginn einer Linie an den Flaechen
+eines Querschnitts ([[opencivil.querschnitt.interaktion#Richtung|fliessgrenzen]]).
 
 #### Gesetz.spannung
 
@@ -305,6 +319,15 @@ haben. Den Stahl, der gedrueckt nichts traegt, rechnet [[opencivil.querschnitt.w
 def eps_yd(self) -> float
 ```
 
+#### Stahlgesetz.fliessbereich
+
+```python
+@property
+def fliessbereich(self) -> Tuple[float, float]
+```
+
+Elastisch bis zu den Plateaus, auf Zug und auf Druck.
+
 #### Stahlgesetz.formel
 
 ```python
@@ -487,6 +510,15 @@ def eps_c(self) -> float
 
 Wo es auf Druck die Festigkeit erreicht, positiv.
 
+#### Holzgesetz.grenzstauchung
+
+```python
+@property
+def grenzstauchung(self) -> float
+```
+
+Bis wohin es auf Druck traegt, positiv: linear bis zur Festigkeit, `eps_c`.
+
 #### Holzgesetz.formel
 
 ```python
@@ -518,6 +550,24 @@ nachgeschlagen ([[opencivil.material.holz#Konstanten|STAUCHBARKEIT]]).
 - `REFERENZ = 'SIA 265:2012, 3.1.2.2 – die Grenzstauchung nach Vorgabe'`
 - `ROLLEN = ('f_t', 'f_c', 'E', 'eps_cu')`
 - `eps_cu: float` – Grenzstauchung, positiv.
+
+#### HolzPlastisch.grenzstauchung
+
+```python
+@property
+def grenzstauchung(self) -> float
+```
+
+Bis wohin es auf Druck traegt: bis zur Grenzstauchung `eps_cu`.
+
+#### HolzPlastisch.fliessbereich
+
+```python
+@property
+def fliessbereich(self) -> Tuple[float, float]
+```
+
+Elastisch bis zur Festigkeit auf Druck; auf Zug bricht es, ohne zu fliessen.
 
 #### HolzPlastisch.formel
 
@@ -664,8 +714,9 @@ Ergebnis unendlich, was die Auswertung sauber ueberspringt.
 - [[opencivil.querschnitt.interaktion]]
 - [[opencivil.querschnitt.spannglieder]]
 - [[opencivil.spannungsanalyse.bild]]
-- [[opencivil.spannungsanalyse.herleitung]]
 - [[opencivil.spannungsanalyse.linie]]
+- [[opencivil.spannungsanalyse.riss]]
+- [[opencivil.spannungsanalyse.rissfrei]]
 - [[opencivil.spannungsanalyse.schnitt]]
 - [[opencivil.web.werkstoffkurven]]
 

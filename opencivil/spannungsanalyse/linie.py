@@ -8,7 +8,10 @@ muss (:class:`Paar`). Die Platte bietet es je Tragrichtung
 (:class:`~opencivil.spannungsanalyse.platte.Loeserpaar`), der gezeichnete
 Querschnitt je Zugseite
 (:class:`~opencivil.spannungsanalyse.schnitt.Schnittpaar`); bis 2026-10-17
-hiess es an den Funktionen dafuer ``paar: Any``.
+hiess es an den Funktionen dafuer ``paar: Any``. Ein Querschnitt ohne Beton
+-- aus Stahl oder Holz -- reisst nicht: sein Paar hat einen Zustand, und
+seine Linie laeuft ganz ueber die Verformung
+(:class:`~opencivil.spannungsanalyse.rissfrei.RissfreiesPaar`, seit 2026-11-26).
 
 DIE EBENEN:
 Jede Linie fragt einen Zustand des Paars nach Ebenen: zu N und M, zu einer
@@ -27,13 +30,13 @@ import math
 from dataclasses import dataclass, field
 from functools import cached_property
 from typing import (
-    TYPE_CHECKING, Any, Callable, List, Mapping, NamedTuple, Optional, Protocol, Tuple,
+    TYPE_CHECKING, Callable, List, Mapping, NamedTuple, Optional, Protocol, Tuple,
 )
 
 from opencivil.core.suche import ILLINOIS_VON_VORN
 from opencivil.nachweis.querschnittsloeser import Faserloeser
 from opencivil.querschnitt.werkstoffgesetz import BLOCKANTEIL
-from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl
+from opencivil.querschnitt.gesetzwahl import Rechenwahl
 from opencivil.spannungsanalyse.art import Analyseart
 
 if TYPE_CHECKING:
@@ -123,7 +126,7 @@ class Dehnungsebene:
 
     @property
     def eps_oben(self) -> float:
-        """Die Dehnung am oberen Rand des Betons, dem gedrueckten bei positivem Moment."""
+        """Die Dehnung am oberen Rand der Flaeche, dem gedrueckten bei positivem Moment."""
         return self.eps_m + self.chi * self.loeser.oben
 
     @property
@@ -132,10 +135,18 @@ class Dehnungsebene:
 
     @property
     def fliesst(self) -> bool:
-        """Ob eine Lage die Fliessdehnung erreicht -- jede die ihres eigenen Stahls."""
-        oben = self.loeser.oben
-        return any(self.eps_m + self.chi * (l.z + oben) >= l.stahl.eps_yd
-                   for l in self.loeser.lagen)
+        """
+        Ob der Querschnitt fliesst: eine Lage, die auf Zug die Fliessdehnung
+        ihres eigenen Stahls erreicht -- so beim Stahlbeton --, oder eine
+        Flaeche, die ihren elastischen Bereich verlaesst, Baustahl auf Zug
+        und Druck, Holz auf Druck
+        (:attr:`~opencivil.querschnitt.interaktion.Richtung.fliessgrenzen`).
+        """
+        loeser, eps_m, chi = self.loeser, self.eps_m, self.chi
+        oben = loeser.oben
+        return (any(eps_m + chi * (l.z + oben) >= l.stahl.eps_yd for l in loeser.lagen)
+                or any(not g.eps_min < eps_m + chi * g.arm < g.eps_max
+                       for g in loeser.fliessgrenzen))
 
     @property
     def massgebend(self) -> str:
@@ -208,14 +219,52 @@ class Zustaende(NamedTuple):
 # ===========================================================================
 
 
+@dataclass(frozen=True)
+class Modulbezug:
+    """
+    Woran sich der aequivalente Modul misst: ``I`` um die Achse der Biegung
+    und ``A`` eines Querschnitts, dazu der Modul ``E``, mit dem er sich
+    elastisch verformte -- beim Stahlbeton der reine Betonquerschnitt mit
+    ``E_cm``, ohne Beton der Querschnitt selbst mit dem Modul seines
+    Werkstoffs. Dazu, wie das Zeichen von ``E`` heisst -- als Formel und als
+    Text -- und was der Bezug ist: fuer die Herleitung (``erklaerung``) und
+    unter dem Bild (``hinweis``). Seit 2026-11-26; bis dahin hiess er immer
+    ``E_cm`` und der reine Betonquerschnitt.
+    """
+
+    I: float
+    """m⁴."""
+
+    A: float
+    """m²."""
+
+    E: float
+    """Pa."""
+
+    zeichen: str
+    """Das Zeichen als Formel: ``E_{cm}``."""
+
+    text: str
+    """Dasselbe als Text: «E_cm»."""
+
+    erklaerung: str
+    """Was der Bezug ist -- der erste Satz, mit dem die Herleitung den Modul erklaert."""
+
+    hinweis: str
+    """Dasselbe unter dem Bild einer Linie des Moduls."""
+
+
 class Paar(Protocol):
     """
     Die beiden Loeser eines Querschnitts, gerissen und ungerissen, und was die
-    Fragen und ihre Herleitung sonst von ihm wissen muessen. Den Riss und den
-    reinen Betonquerschnitt rechnen und schreiben beide Paare gleich
-    (:class:`~opencivil.spannungsanalyse.riss.Bruttoriss`); was nur die Art
-    des Bauteils weiss -- die Tiefe, die Dehnung am Ende --, schreibt das Paar
-    selbst in die Herleitung.
+    Fragen und ihre Herleitung sonst von ihm wissen muessen. Ein Querschnitt
+    mit Beton reisst: den Riss, die Gesetze und den reinen Betonquerschnitt
+    rechnen und schreiben Platte und gezeichneter Querschnitt gleich
+    (:class:`~opencivil.spannungsanalyse.riss.Bruttoriss`). Einer ohne Beton
+    reisst nicht, seine beiden Loeser sind derselbe, und Riss gibt es keinen
+    (``None``, :class:`~opencivil.spannungsanalyse.rissfrei.RissfreiesPaar`).
+    Was nur die Art des Bauteils weiss -- die Tiefe, die Dehnung am Ende --,
+    schreibt das Paar selbst in die Herleitung.
     """
 
     gerissen: Faserloeser
@@ -223,28 +272,38 @@ class Paar(Protocol):
     """Die beiden Loeser in der Richtung des Paars -- fuer das Bild aus Randdehnungen."""
 
     wahl: Rechenwahl
-    """Womit gerechnet wird -- Kriechzahl, Wertesatz, Rechenart."""
-
-    art: Rechenart
-    """
-    Die Rechenart des Betons, dessen Gesetze die Herleitung zeigt -- bei
-    mehreren Betonen die der Ecke, die zuerst reisst.
-    """
-
-    betone: Tuple[Any, ...]
-    """Die Betone des Querschnitts, jeder einmal -- fuer die Rechenart je Beton in Worten."""
+    """Womit gerechnet wird -- Kriechzahl, Wertesatz, Rechenart, Gesetz des Holzes."""
 
     ids: Mapping[str, str]
     """Kurzname -> Wert-ID der Eingaben, fuer die Herleitung."""
 
-    staehle: Tuple[Any, ...]
-    """Die Staehle der Bewehrung, jeder einmal -- fuer die Fliessdehnung."""
-
-    E_cm: float
-    """Der Modul des Betons -- daran misst sich der aequivalente Modul."""
-
     bezugsort: str
     """Wo die Mitteldehnung gilt -- dort greift N an."""
+
+    flaeche: str
+    """Woraus die Flaeche ist, fuer das Bild: «Beton», «Holz», «Baustahl»."""
+
+    OHNE_FLIESSEN: str
+    """Was eine Linie sagt, die bis zu ihrem Ende nicht fliesst."""
+
+    @property
+    def rechenart(self) -> str:
+        """Wie die Werkstoffe rechnen, in Worten -- leer, wo es nichts zu waehlen gibt, beim Stahl."""
+
+    @property
+    def mit_kriechzahl(self) -> bool:
+        """Ob die Kriechzahl wirkt -- nur am Beton."""
+
+    @property
+    def beschriftung(self) -> str:
+        """Die ganze Wahl in Worten, fuer Herleitungen: Rechenart, Kriechzahl, Wertesatz."""
+
+    @property
+    def modulbezug(self) -> Modulbezug:
+        """Woran sich der aequivalente Modul misst."""
+
+    @property
+    def vorgespannt(self) -> bool: ...
 
     def ebenen(self) -> Zustaende:
         """
@@ -253,23 +312,19 @@ class Paar(Protocol):
         anfaengt, hinge sonst an dem, was vorher gerechnet wurde.
         """
 
-    @property
-    def I_c(self) -> float: ...
+    def rissmoment_bei(self, N: float) -> Optional[float]: ...
 
-    @property
-    def A_c(self) -> float: ...
+    def rissnormalkraft_bei(self, M: float) -> Optional[float]: ...
 
-    @property
-    def vorgespannt(self) -> bool: ...
-
-    def rissmoment_bei(self, N: float) -> float: ...
-
-    def rissnormalkraft_bei(self, M: float) -> float: ...
-
-    def tiefe(self, w: "Zwischenwerte", ein: Callable[[str], "Wert"]) -> "Wert": ...
-
-    def herleitung_riss(self, p: "Protokoll", w: "Zwischenwerte", linie: "Linie",
-                        ein: Callable[[str], "Wert"], h: "Wert") -> Tuple["Wert", "Wert"]: ...
+    def herleitung_gesetze(self, p: "Protokoll", w: "Zwischenwerte", linie: "Linie",
+                           ein: Callable[[str], "Wert"], werte: Mapping[str, "Wert"]
+                           ) -> Tuple["Wert", "Wert", "Wert"]:
+        """
+        Was die Herleitung vor dem Ende der Linie schreibt: die Gesetze, den
+        Riss, wo es einen gibt, die Fliessdehnungen und die Grenzdehnungen.
+        Zurueck die Tiefe ``h``, ueber die die Linie laeuft, und ``A``, ``I``
+        des Querschnitts, an dem sich der Modul misst.
+        """
 
     def herleitung_dehnung_am_ende(self, p: "Protokoll", w: "Zwischenwerte",
                                    bruch: "Grenzzustand", oben: "Wert", unten: "Wert",
@@ -295,17 +350,18 @@ class Linienpunkt:
 
     kraft: float
     verformung: float
-    """Was gilt: ungerissen bis zum Riss, darueber gerissen."""
+    """Was gilt: ungerissen bis zum Riss, darueber gerissen -- ohne Riss der eine Zustand."""
 
     gerissen: bool
     verformung_I: Optional[float]
     """
     Ungerissen -- ``None`` ueber dem Riss, wo der Beton dafuer Zug ohne
-    Grenze braeuchte, und wo der Zustand keine Loesung hat.
+    Grenze braeuchte, und wo der Zustand keine Loesung hat. Ohne Riss immer
+    ``None``: es gibt nichts zu vergleichen.
     """
 
     verformung_II: Optional[float]
-    """Gerissen, ohne Zugfestigkeit des Betons."""
+    """Gerissen, ohne Zugfestigkeit des Betons -- ohne Riss ``None``."""
 
 
 @dataclass(frozen=True)
@@ -338,8 +394,11 @@ class Linie:
     fest: float
     """Was festgehalten wird: ``N`` in N oder ``M`` in Nm."""
 
-    riss: float
-    """Die Kraft, bei der der Querschnitt reisst: ``M_Riss(N)`` oder ``N_Riss(M)``."""
+    riss: Optional[float]
+    """
+    Die Kraft, bei der der Querschnitt reisst: ``M_Riss(N)`` oder
+    ``N_Riss(M)`` -- ``None`` bei einem, der nicht reisst, ohne Beton.
+    """
 
     punkte: List[Linienpunkt] = field(default_factory=list)
     bruch: Optional[Grenzzustand] = None
@@ -355,6 +414,15 @@ class Linie:
     @property
     def tragfaehig(self) -> bool:
         return self.bruch is not None and self.bruch.kraft > 0.0
+
+    @property
+    def am_bruch(self) -> bool:
+        """
+        Ob ihr letzter Punkt das Ende ist, bis zu dem der Querschnitt traegt:
+        gerissen -- oder ohne Riss immer. Endet sie ungerissen, traegt er den
+        Riss nicht, und dort gilt ihre letzte Verformung.
+        """
+        return bool(self.punkte) and (self.punkte[-1].gerissen or self.riss is None)
 
     @property
     def sprung(self) -> Optional[Tuple[Linienpunkt, Linienpunkt]]:
@@ -400,11 +468,12 @@ def _grenze(gut: Callable[[float], bool], unten: float, oben: float) -> float:
 
 
 def _linie(paar: Paar, weg: _Weg, art: Analyseart, fest: float,
-           riss: float) -> Linie:
+           riss: Optional[float]) -> Linie:
     """
     Die Linie von null bis zum Bruch: ungerissen bis ``riss``, dort der
     Sprung, darueber gerissen -- ueber die Verformung gerechnet, mit dem
-    Fliessbeginn als Punkt der Linie.
+    Fliessbeginn als Punkt der Linie. Ohne Riss (``None``) laeuft sie ganz
+    ueber die Verformung, in dem einen Zustand, den der Querschnitt hat.
     """
     linie = Linie(art=art, fest=fest, riss=riss)
     start = weg.verformung_II(0.0)
@@ -440,7 +509,7 @@ def _linie(paar: Paar, weg: _Weg, art: Analyseart, fest: float,
                                           verformung_I=v_I, verformung_II=weg.verformung_II(kraft)))
         return punkte
 
-    if riss >= kraft_u:
+    if riss is not None and riss >= kraft_u:
         # Ungerissen bis zum Bruch: reisst er, traegt er den Riss nicht.
         linie.punkte = kraftpunkte(kraft_u)
         return linie
@@ -449,8 +518,9 @@ def _linie(paar: Paar, weg: _Weg, art: Analyseart, fest: float,
         e = weg.ebene(verformung)
         return e is not None and e.fliesst
 
+    reisst = riss is not None and riss > 0.0
     anfang, risskraft = start, None
-    if riss > 0.0:
+    if reisst:
         linie.punkte = kraftpunkte(riss)
         nach_riss = weg.verformung_II(riss)
         if nach_riss is not None:
@@ -475,14 +545,20 @@ def _linie(paar: Paar, weg: _Weg, art: Analyseart, fest: float,
                       for i in range(KURVENPUNKTE - vorher + 1)])
     else:
         stellen = [anfang + (ende - anfang) * i / KURVENPUNKTE for i in range(KURVENPUNKTE + 1)]
-        if fliesst(anfang) and riss > 0.0:
+        if fliesst(anfang) and reisst:
             linie.hinweisen("Der Stahl fliesst schon, wenn der Querschnitt reisst.")
+        elif fliesst(anfang) and riss is None:
+            linie.hinweisen("Schon unter der festgehaltenen Kraft allein fliesst der Querschnitt.")
         elif not fliesst(ende):
-            linie.hinweisen("Bis zum Bruch fliesst kein Stahl: der Beton versagt zuerst.")
+            linie.hinweisen(paar.OHNE_FLIESSEN)
 
     for verformung in stellen:
         e = weg.ebene(verformung)
         if e is None:
+            continue
+        if riss is None:
+            linie.punkte.append(Linienpunkt(kraft=weg.kraft(e), verformung=verformung,
+                                            gerissen=False, verformung_I=None, verformung_II=None))
             continue
         # Der erste Punkt nach dem Sprung: zu seiner Kraft wurde die
         # Verformung gesucht, also traegt er sie -- genau, nicht bis auf die
@@ -494,7 +570,7 @@ def _linie(paar: Paar, weg: _Weg, art: Analyseart, fest: float,
             kraft=kraft, verformung=verformung, gerissen=True,
             verformung_I=weg.verformung_I(kraft) if kraft <= riss else None,
             verformung_II=verformung))
-    if paar.wahl.arten.mit_block:
+    if riss is not None and paar.wahl.arten.mit_block:
         linie.hinweisen(
             f"Mit der {BLOCKANTEIL}·x-Vereinfachung trägt der Beton unter "
             f"{1.0 - BLOCKANTEIL:.2f}·ε_c2d nichts: über dem Riss ist die Linie "
@@ -526,12 +602,12 @@ def moment_kruemmung(paar: Paar, *, N: float) -> Linie:
         linie.hinweis = (
             "Schon ohne Moment gibt es keine Gleichgewichtslage – die "
             "Normalkraft allein übersteigt, was der Querschnitt aufnimmt.")
-    elif linie.riss >= linie.bruch.kraft:
+    elif linie.riss is not None and linie.riss >= linie.bruch.kraft:
         linie.hinweisen(
             "Das Rissmoment liegt über dem Biegewiderstand: bis zum Bruch bleibt "
             "der Querschnitt ungerissen, und reisst er, trägt er das Rissmoment "
             "nicht. Bei N = 0 prüft genau das der Nachweis gegen sprödes Versagen.")
-    elif linie.riss <= 0.0:
+    elif linie.riss is not None and linie.riss <= 0.0:
         linie.hinweisen(("Schon die Vorspannung, mit der Normalkraft, reisst den Querschnitt "
                          "auf" if paar.vorgespannt else
                          "Schon die Zugkraft allein reisst den Querschnitt auf")
@@ -564,12 +640,12 @@ def normalkraft_dehnung(paar: Paar, *, M: float) -> Linie:
         linie.hinweis = (
             "Schon ohne Normalkraft gibt es keine Gleichgewichtslage – das "
             "Moment allein übersteigt, was der Querschnitt aufnimmt.")
-    elif linie.riss >= linie.bruch.kraft:
+    elif linie.riss is not None and linie.riss >= linie.bruch.kraft:
         linie.hinweisen(
             "Die Rissnormalkraft liegt über dem Zugwiderstand: bis zum Bruch bleibt "
             "der Querschnitt ungerissen, und reisst er, trägt er die Rissnormalkraft "
             "nicht.")
-    elif linie.riss <= 0.0:
+    elif linie.riss is not None and linie.riss <= 0.0:
         linie.hinweisen(("Schon die Vorspannung, mit dem Moment, reisst den Querschnitt auf"
                          if paar.vorgespannt else
                          "Schon das Moment allein reisst den Querschnitt auf")

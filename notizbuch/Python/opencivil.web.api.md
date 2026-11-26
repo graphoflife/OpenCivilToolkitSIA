@@ -1,5 +1,5 @@
 ---
-erzeugt: 8a03dce9f956
+erzeugt: 6f1f5fe7bfcf
 art: modul
 tags: [modul]
 ---
@@ -28,6 +28,18 @@ def _rechenarten(arten) -> list
 ```
 
 Die Rechenarten mit Beschriftung -- und ob die Kriechzahl bei ihnen wirkt.
+
+### _satztitel
+
+```python
+def _satztitel() -> Dict[str, str]
+```
+
+Je Art mit Wertesatz der Titel seines Schalters, mit den Zeichen ihrer
+Festigkeit: «Bemessungswert f_cd oder charakteristischer f_ck». Das Holz
+steht nicht da -- es hat keinen Satz, und so hat es keinen Schalter. Bis
+2026-11-26 standen zwei Titel in der Oberflaeche, und jeder Stahl hiess
+«f_yd oder f_yk», auch der Baustahl und der Spannstahl.
 
 ### _vorlage
 
@@ -209,6 +221,7 @@ Je Querschnitt eines Systems, wo A und I stehen -- und je Paar aus Querschnitt u
 - [[opencivil.geotechnik.setzung]]
 - [[opencivil.geotechnik.verhalten]]
 - [[opencivil.material.arten]]
+- [[opencivil.material.basis]]
 - [[opencivil.material.beton]]
 - [[opencivil.material.betonstahl]]
 - [[opencivil.material.spannstahl]]

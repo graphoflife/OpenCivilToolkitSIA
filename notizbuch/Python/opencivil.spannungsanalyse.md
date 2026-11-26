@@ -1,5 +1,5 @@
 ---
-erzeugt: d219fb3b817e
+erzeugt: 1e0306335fc0
 art: modul
 tags: [modul]
 ---
@@ -141,6 +141,7 @@ gezeichneten Querschnitts stand im Querschnitt, auf diesem Modul gebaut.
 - [[opencivil.spannungsanalyse.modul]] – der aequivalente E-Modul.
 - [[opencivil.spannungsanalyse.platte]] – das Paar einer Platte.
 - [[opencivil.spannungsanalyse.riss]] – wo eine Linie reisst.
+- [[opencivil.spannungsanalyse.rissfrei]] – das Paar eines Querschnitts, der nicht reisst.
 - [[opencivil.spannungsanalyse.schnitt]] – das Paar eines gezeichneten Querschnitts.
 
 ## Braucht

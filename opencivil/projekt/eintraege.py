@@ -35,7 +35,7 @@ from opencivil.projekt.lesen import (
     unbekanntes_feld, vorgabe_je_material, wahl_aus_text,
 )
 from opencivil.querschnitt.gesetzwahl import (
-    Rechenart, Rechenarten, Rechenwahl, Werkstoffsatz, Wertesaetze,
+    Holzrechnung, Holzrechnungen, Rechenart, Rechenarten, Rechenwahl, Werkstoffsatz, Wertesaetze,
 )
 from opencivil.nachweis.rechenwahl import (
     FASERARTEN, RECHENARTEN, VERFORMUNGSARTEN,
@@ -420,13 +420,15 @@ class JeMaterial:
     Was je Material waehlt (:func:`~opencivil.projekt.lesen.je_material`):
     im Feld ``werkstoffsaetze`` je Kennung eines Materials sein Wertesatz
     (Benutzer, 2026-11-20), im Feld ``rechenarten`` je Beton seine
-    Rechenart (Benutzer, 2026-11-25). Ein Material ohne eigene Wahl rechnet
-    mit der Vorgabe des Feldes -- die Stahlspannungen etwa charakteristisch
-    und praezise. Fuer die Rechnung wird daraus die Wahl an einem Bauteil
-    (:meth:`wahl`), mit der ``kriechzahl`` des Eintrags. Bis 2026-11-20
-    waehlte nur die Querschnittsanalyse je Material, jedes andere Kapitel
-    einen Wertesatz fuer alle; bis 2026-11-25 galt ausser in ihrer
-    Tragsicherheit eine Rechenart fuer alle Betone.
+    Rechenart (Benutzer, 2026-11-25), und wo es das Feld ``holzrechnungen``
+    gibt -- in den Spannung-Dehnung-Analysen --, je Holz, ob es auf Druck
+    elastisch-plastisch rechnet (Benutzer, 2026-11-25). Ein Material ohne
+    eigene Wahl rechnet mit der Vorgabe des Feldes -- die Stahlspannungen
+    etwa charakteristisch und praezise. Fuer die Rechnung wird daraus die
+    Wahl an einem Bauteil (:meth:`wahl`), mit der ``kriechzahl`` des
+    Eintrags. Bis 2026-11-20 waehlte nur die Querschnittsanalyse je
+    Material, jedes andere Kapitel einen Wertesatz fuer alle; bis 2026-11-25
+    galt ausser in ihrer Tragsicherheit eine Rechenart fuer alle Betone.
     """
 
     def von(self, feld: str, material: str) -> Any:
@@ -437,15 +439,20 @@ class JeMaterial:
         """
         Womit an einem Bauteil aus diesen Baustoffen gerechnet wird --
         ``stoffe`` nach ihrer Kennung im Projekt: je Baustoff sein Wertesatz,
-        je Beton seine Rechenart; ein Stahl hat keine.
+        je Beton seine Rechenart; ein Stahl hat keine. Das Holz hat keinen
+        Wertesatz -- SIA 265:2012 nennt nur Bemessungswerte
+        (:data:`~opencivil.querschnitt.gesetzwahl.HOLZKENNWERTE`) --, und
+        ohne das Feld ``holzrechnungen`` rechnet es linear.
         """
-        def je(art, feld: str, welche: Mapping[str, Baustoff]):
-            return art.je({b.id: self.von(feld, kennung) for kennung, b in welche.items()},
-                          vorgabe_je_material(type(self), feld))
-        betone = {k: b for k, b in stoffe.items() if b.art is Baustoffart.BETON}
+        def je(art, feld: str, *arten: Baustoffart):
+            return art.je({b.id: self.von(feld, kennung) for kennung, b in stoffe.items()
+                           if b.art in arten}, vorgabe_je_material(type(self), feld))
+        mit_satz = tuple(a for a in Baustoffart if a is not Baustoffart.HOLZ)
         return Rechenwahl(kriechzahl=self.kriechzahl,
-                          saetze=je(Wertesaetze, "werkstoffsaetze", stoffe),
-                          arten=je(Rechenarten, "rechenarten", betone))
+                          saetze=je(Wertesaetze, "werkstoffsaetze", *mit_satz),
+                          arten=je(Rechenarten, "rechenarten", Baustoffart.BETON),
+                          holz=(je(Holzrechnungen, "holzrechnungen", Baustoffart.HOLZ)
+                                if hasattr(self, "holzrechnungen") else Holzrechnungen()))
 
 
 @dataclass
@@ -459,7 +466,8 @@ class SpannungsfallEintrag(Beschreibung, JeMaterial):
     als Momenten-Kruemmungs- oder als Normalkraft-Dehnungs-Linie.
 
     Womit gerechnet wird, waehlt jede Analyse fuer sich: die Kriechzahl, je
-    Material den Wertesatz und je Beton die Rechenart (:class:`JeMaterial`,
+    Material den Wertesatz, je Beton die Rechenart und je Holz, wie es
+    rechnet (:class:`JeMaterial`,
     :class:`~opencivil.querschnitt.gesetzwahl.Rechenwahl`).
     """
 
@@ -491,6 +499,10 @@ class SpannungsfallEintrag(Beschreibung, JeMaterial):
     """Je Beton ``block`` oder ``parabel`` -- siehe
     :class:`~opencivil.querschnitt.gesetzwahl.Rechenart`. Die Handrechnung gibt
     es hier nicht (:data:`~opencivil.nachweis.rechenwahl.FASERARTEN`)."""
+
+    holzrechnungen: Dict[str, Holzrechnung] = je_material(Holzrechnung.LINEAR)
+    """Je Holz ``linear`` oder ``plastisch`` -- siehe
+    :class:`~opencivil.querschnitt.gesetzwahl.Holzrechnung`."""
 
     aktiv: bool = True
 

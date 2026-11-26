@@ -538,11 +538,14 @@ function rechenartStellungen(klasse) {
  * (Benutzer: die Darstellung der Querschnittsanalyse überall), seit
  * 2026-11-25 auch die Rechenart je Beton (Benutzer: unter dem Beton, in
  * jedem Modul). Bietet das Kapitel nur eine Art an, wie die Verformung
- * beim Knicken, steht kein Schalter.
+ * beim Knicken, steht kein Schalter. Das Holz hat keinen Wertesatz -- nur
+ * Bemessungswerte, darum kein Titel im Katalog (`satztitel`) --, in einer
+ * Analyse aber den Schalter, wie es rechnet: linear oder auf Druck
+ * elastisch-plastisch (seit 2026-11-26).
  *
- * `ziel` hält `werkstoffsaetze` und `rechenarten`, je Kennung eines
- * Materials seine Wahl; was eines ohne eigene wählt, sagt der Kern
- * (`feldangabe(klasse, …).vorgabe`). `materialien` sind die Kennungen der
+ * `ziel` hält `werkstoffsaetze`, `rechenarten` und `holzrechnungen`, je
+ * Kennung eines Materials seine Wahl; was eines ohne eigene wählt, sagt der
+ * Kern (`feldangabe(klasse, …).vorgabe`) -- und ob die Klasse die Wahl hat. `materialien` sind die Kennungen der
  * Materialien des Bauteils -- `null`, solange der Kern sie nicht kennt, dann
  * sagt `wartet` warum; leer sagt es `leer`. Eine Wahl schreibt nur die
  * Materialien, die das Bauteil jetzt hat: die eines ausgewechselten fällt
@@ -552,7 +555,9 @@ export function werkstoffzeilen(ziel, aendern, {
   materialien, klasse, wartet = 'Der Kern sucht die Materialien …',
   leer = 'Noch kein Material im Querschnitt.',
 }) {
-  const kopf = el('span.spaltenkopf', { text: 'Werte je Material' });
+  // «Je Material», nicht «Werte»: unter dem Beton steht auch seine
+  // Rechenart, unter dem Holz nur, wie es rechnet.
+  const kopf = el('span.spaltenkopf', { text: 'Je Material' });
   if (materialien === null) return el('div.werkstoffzeilen', {}, [kopf, el('div.leer', { text: wartet })]);
   if (!materialien.length) return el('div.werkstoffzeilen', {}, [kopf, el('div.leer', { text: leer })]);
 
@@ -566,24 +571,31 @@ export function werkstoffzeilen(ziel, aendern, {
   // Im Schalter die kurzen Namen, die langen in den Titeln seiner Stellungen.
   const kurz = (l) => (l || []).map((e) => ({ wert: e.wert, beschriftung: e.kurz, titel: e.beschriftung }));
   const arten = rechenartStellungen(klasse);
+  const hoelzer = 'vorgabe' in feldangabe(klasse, 'holzrechnungen')
+    ? kurz(katalog('rechenwahl', 'holzrechnungen')) : [];
   const zeile = (kennung) => {
     const material = eintragVon(kennung);
     if (!material) return null;
-    const beton = material.art === 'beton';
-    return el('div.werkstoffzeile', { class: beton ? 'ist-beton' : 'ist-stahl' }, [
+    const satz = katalog('rechenwahl', 'satztitel')?.[material.art];
+    return el('div.werkstoffzeile', { class: `ist-${material.art}` }, [
       el('span.werkstoffname', { text: material.name || material.sorte }),
-      wahlSchalter({
+      satz ? wahlSchalter({
         werte: kurz(katalog('rechenwahl', 'werkstoffsaetze')),
         gewaehlt: gewaehlt('werkstoffsaetze', kennung),
-        titel: beton ? 'Bemessungswert f_cd oder charakteristischer f_ck'
-          : 'Bemessungswert f_yd oder charakteristischer f_yk',
+        titel: satz,
         setzen: (v) => setzen('werkstoffsaetze', kennung, v),
-      }),
-      beton && arten.length > 1 ? wahlSchalter({
+      }) : null,
+      material.art === 'beton' && arten.length > 1 ? wahlSchalter({
         werte: arten,
         gewaehlt: gewaehlt('rechenarten', kennung),
         titel: 'Wie der Beton gerechnet wird',
         setzen: (v) => setzen('rechenarten', kennung, v),
+      }) : null,
+      material.art === 'holz' && hoelzer.length ? wahlSchalter({
+        werte: hoelzer,
+        gewaehlt: gewaehlt('holzrechnungen', kennung),
+        titel: 'Wie das Holz rechnet – immer mit Bemessungswerten',
+        setzen: (v) => setzen('holzrechnungen', kennung, v),
       }) : null,
     ]);
   };
@@ -600,13 +612,15 @@ export function werkstoffzeilen(ziel, aendern, {
  * Wirkt φ bei keiner gewählten Art, steht das Feld blass da -- es bleibt
  * aber stehen, damit die Zahl nicht verloren geht, wenn man die Art wieder
  * wechselt. `phiImmer`: in den Analysen rechnet der ungerissene Teil immer
- * mit E_cm/(1+φ), dort wirkt φ bei jeder Art.
+ * mit E_cm/(1+φ), dort wirkt φ bei jeder Art. Ohne Beton kriecht nichts:
+ * dann steht statt des Feldes `null` (seit 2026-11-26, Holz und Stahl).
  */
 function rechenwahlFelder(ziel, aendern, { phiImmer = false, werkstoffe }) {
   const { klasse, materialien } = werkstoffe;
   const alle = katalog('rechenwahl', 'rechenarten') || [];
   const vorgabe = feldangabe(klasse, 'rechenarten').vorgabe;
   const betone = (materialien || []).filter((k) => eintragVon(k)?.art === 'beton');
+  if (materialien?.length && !betone.length) return [null, werkstoffzeilen(ziel, aendern, werkstoffe)];
   const wirkt = betone.some((k) => alle.find((a) => a.wert === (ziel.rechenarten?.[k] ?? vorgabe))
     ?.mit_kriechzahl);
   const phi = mitKopf(kriechzahlName('rechenwahl'), zahlfeld({
@@ -688,7 +702,8 @@ function spannungsZeile(eintrag, index, ort) {
   return fallzeile({
     fall: k, aendern, was: 'Analyse', nameTitel: 'Bezeichnung der Analyse',
     liste: { kennung: eintrag.kennung, pfad: 'spannungsfaelle', index },
-    zahlen: [...spalten, phi, ort.richtung(k, (wert) => aendern((x) => { x.richtung = wert; }))],
+    zahlen: [...spalten, phi, ort.richtung(k, (wert) => aendern((x) => { x.richtung = wert; }))]
+      .filter(Boolean),
     unten: [werte],
     entfernenTitel: 'Analyse entfernen',
     entfernen: () => eintragAendern(eintrag.kennung, (e) => { e.spannungsfaelle.splice(index, 1); }),

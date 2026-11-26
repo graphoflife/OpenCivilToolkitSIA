@@ -1,5 +1,5 @@
 ---
-erzeugt: 433895654887
+erzeugt: a97576ae1dd8
 art: modul
 tags: [modul]
 ---
@@ -11,7 +11,9 @@ tags: [modul]
 
 Je Bauteil -- Platte oder gezeichneter Querschnitt -- und je Fall die eine
 Frage, mit dem Paar seiner Richtung und seiner Wahl, dazu die Herleitung
-jeder Linie ([[opencivil.spannungsanalyse.analysen#analysen|analysen]]).
+jeder Linie ([[opencivil.spannungsanalyse.analysen#analysen|analysen]]). Ein gezeichneter Querschnitt aus Stahlbeton
+reisst ([[opencivil.spannungsanalyse.schnitt#schnittpaar|schnittpaar]]), einer aus
+Stahl oder Holz nicht ([[opencivil.spannungsanalyse.rissfrei#rissfreies_paar|rissfreies_paar]]).
 
 ## Inhalt
 
@@ -71,6 +73,16 @@ die Raender des Bildes heissen und was dasteht, wo es kein Paar gibt.
 - `raender: Callable[[Any], Tuple[str, str]]`
 - `ohne_bewehrung: Callable[[Any], str]`
 
+### _paar_am_schnitt
+
+```python
+def _paar_am_schnitt(analyse: Querschnittsanalyse, seite: Zugseite, wert: Callable[[str], float], wahl: Rechenwahl) -> Optional[Paar]
+```
+
+Das Paar eines gezeichneten Querschnitts: mit Beton reisst er, aus Stahl
+oder Holz nicht. Einen Verbundquerschnitt meldet der Aufbau gar nicht erst
+an ([[opencivil.projekt.aufbau.querschnittsanalyse#ohne_analysen|ohne_analysen]]).
+
 ### analysen
 
 ```python
@@ -103,6 +115,9 @@ einem Import in dieser Funktion.
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.rechenwerk]]
 - [[opencivil.projekt]]
+- [[opencivil.querschnitt.analyse]]
+- [[opencivil.querschnitt.bauweise]]
+- [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.zugseite]]
 - [[opencivil.spannungsanalyse.art]]
 - [[opencivil.spannungsanalyse.bild]]
@@ -110,6 +125,7 @@ einem Import in dieser Funktion.
 - [[opencivil.spannungsanalyse.linie]]
 - [[opencivil.spannungsanalyse.modul]]
 - [[opencivil.spannungsanalyse.platte]]
+- [[opencivil.spannungsanalyse.rissfrei]]
 - [[opencivil.spannungsanalyse.schnitt]]
 
 ## Gebraucht von

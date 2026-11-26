@@ -184,14 +184,30 @@ export function werkstoffeVon(kennung) {
 }
 
 /**
+ * Was der Kern zuletzt über die Bauweise sagte: ein Satz der letzten Antwort,
+ * auch einer älteren -- sonst sprängen die Kacheln bei jeder Änderung um,
+ * bis die neue da ist.
+ */
+function bauweisensatz(kennung, schluessel) {
+  const a = fensterVon(kennung);
+  return (frischeAntwort(a) || a.adapter.kern.antwort)?.[schluessel] || '';
+}
+
+/**
  * Warum der Querschnitt keinen Nachweis hat -- er ist aus Holz, Stahl oder
  * im Verbund: «Einen Holzquerschnitt weist das Werkzeug …». Leer beim
- * Stahlbeton. Aus der letzten Antwort des Kerns, auch einer älteren: sonst
- * sprängen die Kacheln bei jeder Änderung um, bis die neue da ist.
+ * Stahlbeton.
  */
 export function ohneNachweiseVon(kennung) {
-  const a = fensterVon(kennung);
-  return (frischeAntwort(a) || a.adapter.kern.antwort)?.ohne_nachweise || '';
+  return bauweisensatz(kennung, 'ohne_nachweise');
+}
+
+/**
+ * Warum der Querschnitt keine Spannung-Dehnung-Analyse hat -- im Verbund:
+ * «Einen Verbundquerschnitt rechnen …». Leer bei allen anderen.
+ */
+export function ohneAnalysenVon(kennung) {
+  return bauweisensatz(kennung, 'ohne_analysen');
 }
 
 // ===========================================================================
@@ -279,8 +295,11 @@ function adapter(kennung) {
     nehmen: (a, antwort) => {
       a.qa.namen = new Map([antwort.polygone, antwort.staebe, antwort.spannglieder, antwort.linien,
         antwort.waende, antwort.hilfslinien].flatMap((liste) => (liste || []).map((x) => [x.kennung, x.element])));
-      // Aus Holz statt Beton: die Analyse zeigt andere Kacheln (`ohneNachweiseVon`).
-      a.qa.andereKacheln = antwort.ohne_nachweise !== (a.adapter.kern.antwort?.ohne_nachweise ?? '');
+      // Aus Holz statt Beton: die Analyse zeigt andere Kacheln (`ohneNachweiseVon`,
+      // `ohneAnalysenVon`).
+      const vorher = a.adapter.kern.antwort;
+      a.qa.andereKacheln = ['ohne_nachweise', 'ohne_analysen']
+        .some((s) => antwort[s] !== (vorher?.[s] ?? ''));
       return antwort;
     },
     beantwortet: (a) => { if (zustand.fenster || a.qa.andereKacheln) mitteAendern(); },

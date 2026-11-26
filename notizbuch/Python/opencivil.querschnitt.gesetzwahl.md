@@ -1,5 +1,5 @@
 ---
-erzeugt: 98f5638596e8
+erzeugt: 412f662cbc91
 art: modul
 tags: [modul]
 ---
@@ -9,10 +9,12 @@ tags: [modul]
 
 ## VERANTWORTUNG
 
-Die Wahl der Werkstoffgesetze: der Wertesatz ([[opencivil.querschnitt.gesetzwahl#Werkstoffsatz|Werkstoffsatz]]) und die
-Rechenart ([[opencivil.querschnitt.gesetzwahl#Rechenart|Rechenart]]), mit der Kriechzahl zusammen eine
-[[opencivil.querschnitt.gesetzwahl#Rechenwahl|Rechenwahl]] -- und die eine Stelle, die daraus den Beton baut
-([[opencivil.querschnitt.gesetzwahl#betongesetz|betongesetz]]), mit dem wirksamen Modul ([[opencivil.querschnitt.gesetzwahl#wirksamer_modul|wirksamer_modul]]).
+Die Wahl der Werkstoffgesetze: der Wertesatz ([[opencivil.querschnitt.gesetzwahl#Werkstoffsatz|Werkstoffsatz]]), die
+Rechenart des Betons ([[opencivil.querschnitt.gesetzwahl#Rechenart|Rechenart]]) und die des Holzes
+([[opencivil.querschnitt.gesetzwahl#Holzrechnung|Holzrechnung]]), mit der Kriechzahl zusammen eine
+[[opencivil.querschnitt.gesetzwahl#Rechenwahl|Rechenwahl]] -- und die Stellen, die daraus die Gesetze bauen: den
+Beton ([[opencivil.querschnitt.gesetzwahl#betongesetz|betongesetz]]), mit dem wirksamen Modul ([[opencivil.querschnitt.gesetzwahl#wirksamer_modul|wirksamer_modul]]),
+und das Holz ([[opencivil.querschnitt.gesetzwahl#holzgesetz|holzgesetz]]).
 Das gehoert dem Querschnitt: die Platte, der gezeichnete Querschnitt und die
 Spannung-Dehnung-Analyse fragen hier, ohne dafuer einen Nachweis zu laden.
 Was ein Nachweis-Kapitel davon anbietet, steht bei den Nachweisen
@@ -229,6 +231,17 @@ def spannstahl(self) -> str
 Kurzname der Fliessgrenze des Spannstahls -- dort beginnt sein Plateau:
 `f_pd` oder `f_p01k` (SIA 262:2025, Figur 17).
 
+#### Werkstoffsatz.festigkeit
+
+```python
+def festigkeit(self, art: Baustoffart) -> str
+```
+
+Der Kurzname der Festigkeit, deren Plateau dieser Satz waehlt, je Art
+des Baustoffs -- `f_cd` oder `f_ck` beim Beton, `f_yd` oder
+`f_y` beim Baustahl. Das Holz hat keinen Satz ([[opencivil.querschnitt.gesetzwahl#Konstanten|HOLZKENNWERTE]]);
+fuer den Titel des Schalters ([[opencivil.web.api]], `satztitel`).
+
 #### Werkstoffsatz.spannstahlkennwerte
 
 ```python
@@ -239,6 +252,37 @@ def spannstahlkennwerte(self) -> Dict[str, str]
 Dasselbe fuer das Gesetz des Spannstahls, mit dem Modul der Draehte und
 Staebe -- ein Spannglied aus Litzen nimmt seinen eigenen
 ([[opencivil.querschnitt.spannglieder]]).
+
+### Holzrechnung
+
+```python
+class Holzrechnung(Wahl)
+```
+
+Wie das Holz rechnet: linear bis zum Bruch (SIA 265:2012, 3.1.2.1) oder
+auf Druck elastisch-plastisch (3.1.2.2). Eine Wahl nur in den
+Spannung-Dehnung-Analysen (Benutzer, 2026-11-25): die Nachweise rechnen
+linear (4.1.2). Die Grenzstauchung des plastischen ist nach Vorgabe,
+nicht nachgeschlagen ([[opencivil.material.holz#Konstanten|STAUCHBARKEIT]]).
+
+- `LINEAR = 'linear'`
+- `PLASTISCH = 'plastisch'`
+
+#### Holzrechnung.beschriftung
+
+```python
+@property
+def beschriftung(self) -> str
+```
+
+#### Holzrechnung.kurz
+
+```python
+@property
+def kurz(self) -> str
+```
+
+Fuer schmale Zeilen -- im Schalter unter dem Holz.
 
 ### Rechenart
 
@@ -466,6 +510,17 @@ Was dasteht, wenn die Suche ihre Ebene verfehlt
 ([[opencivil.querschnitt.gesetzwahl#Rechenart.ohne_ebene|Rechenart.ohne_ebene]]): rechnet ein Beton als Block, der Rat,
 praezise zu rechnen.
 
+### Holzrechnungen
+
+```python
+@dataclass(frozen=True)
+class Holzrechnungen(JeBaustoff)
+```
+
+Je Holz, wie es rechnet ([[opencivil.querschnitt.gesetzwahl#Holzrechnung|Holzrechnung]]) -- ohne Wahl linear.
+
+- `vorgabe: Holzrechnung = Holzrechnung.LINEAR`
+
 ### Rechenwahl
 
 ```python
@@ -474,7 +529,8 @@ class Rechenwahl
 ```
 
 Was ein Kapitel waehlt: Kriechzahl, je Baustoff den Wertesatz und je
-Beton die Rechenart. Die Rechenart je Beton seit 2026-11-25 (Benutzer:
+Beton die Rechenart, in den Spannung-Dehnung-Analysen dazu je Holz, wie
+es rechnet. Die Rechenart je Beton seit 2026-11-25 (Benutzer:
 unter dem Beton, in jedem Modul); bis dahin galt in einem Kapitel eine
 fuer alle Betone, und nur die Tragsicherheit der Querschnittsanalyse
 waehlte je Beton -- mit einer eigenen Wahl fuer jeden Baustoff.
@@ -482,6 +538,7 @@ waehlte je Beton -- mit einer eigenen Wahl fuer jeden Baustoff.
 - `kriechzahl: float = 0.0`
 - `saetze: Wertesaetze = Wertesaetze()`
 - `arten: Rechenarten = Rechenarten()`
+- `holz: Holzrechnungen = Holzrechnungen()`
 - `modul: str = 'E_cm'` – Der Kurzname des Elastizitaetsmoduls, an dem der Beton haengt: `E_cm`, bei der Verformung des Knickens `E_cd` (SIA 262:2025, 4.2.1.17). Keine Wahl des Benutzers -- das Kapitel setzt ihn.
 
 #### Rechenwahl.satz
@@ -499,6 +556,14 @@ def art_von(self, beton) -> Rechenart
 ```
 
 Die Rechenart eines Betons ([[opencivil.querschnitt.gesetzwahl#JeBaustoff.von|JeBaustoff.von]]).
+
+#### Rechenwahl.holz_von
+
+```python
+def holz_von(self, holz) -> Holzrechnung
+```
+
+Wie ein Holz rechnet ([[opencivil.querschnitt.gesetzwahl#JeBaustoff.von|JeBaustoff.von]]).
 
 #### Rechenwahl.art
 
@@ -557,11 +622,12 @@ mit dem Namen ihres Betons da ([[opencivil.querschnitt.gesetzwahl#arten_text|art
 def gleiche_linie(self, andere: 'Rechenwahl') -> bool
 ```
 
-Ob `andere` dieselbe Resistenzlinie ergibt: dieselben Rechenarten und
-dieselben Wertesaetze, dazu Kriechzahl und Modul, wo ein Gesetz am Modul
-haengt ([[opencivil.querschnitt.gesetzwahl#Rechenarten.mit_kriechzahl|Rechenarten.mit_kriechzahl]]). Bis 2026-11-20 eine freie
-Funktion der M-N-Interaktion, die den Modul nicht verglich: eine
-Parabel mit `E_cd` haette die Linie einer mit `E_cm` bekommen.
+Ob `andere` dieselbe Resistenzlinie ergibt: dieselben Rechenarten,
+Wertesaetze und Gesetze des Holzes, dazu Kriechzahl und Modul, wo ein
+Gesetz am Modul haengt ([[opencivil.querschnitt.gesetzwahl#Rechenarten.mit_kriechzahl|Rechenarten.mit_kriechzahl]]). Bis
+2026-11-20 eine freie Funktion der M-N-Interaktion, die den Modul
+nicht verglich: eine Parabel mit `E_cd` haette die Linie einer mit
+`E_cm` bekommen.
 
 ### arten_text
 
@@ -572,6 +638,25 @@ def arten_text(wahl: Rechenwahl, betone: Sequence=()) -> str
 Die Rechenarten einer Wahl in Worten: eine fuer alle ihr Name, «Präzise
 ohne Vereinfachung»; sonst je Beton aus `betone` mit seinem Namen,
 «C30/37 präzise, C50/60 0.85·x».
+
+### holz_text
+
+```python
+def holz_text(wahl: Rechenwahl, hoelzer: Sequence) -> str
+```
+
+Wie die `hoelzer` rechnen, in Worten -- wie [[opencivil.querschnitt.gesetzwahl#arten_text|arten_text]]: alle
+gleich «Linear bis zum Bruch», sonst je Holz mit seinem Namen; ohne Holz
+nichts.
+
+### holzgesetz
+
+```python
+def holzgesetz(rechnung: Holzrechnung, *, E: float, f_t: float, f_c: float, eps_cu: float) -> Holzgesetz
+```
+
+Das Gesetz eines Holzes, wie es rechnet -- die eine Stelle, die zwischen
+linear und elastisch-plastisch waehlt. Werte in SI, positiv.
 
 ### wirksamer_modul
 
@@ -629,12 +714,12 @@ der Wahl ([[opencivil.querschnitt.gesetzwahl#Rechenwahl|Rechenwahl.modul]]), ohn
 - [[opencivil.projekt.querschnittsanalyse]]
 - [[opencivil.projekt.staebe]]
 - [[opencivil.querschnitt.analyse]]
+- [[opencivil.spannungsanalyse.analysen]]
 - [[opencivil.spannungsanalyse.bild]]
-- [[opencivil.spannungsanalyse.herleitung]]
 - [[opencivil.spannungsanalyse.linie]]
 - [[opencivil.spannungsanalyse.modul]]
 - [[opencivil.spannungsanalyse.platte]]
 - [[opencivil.spannungsanalyse.riss]]
+- [[opencivil.spannungsanalyse.rissfrei]]
 - [[opencivil.spannungsanalyse.schnitt]]
 - [[opencivil.web.api]]
-- [[opencivil.web.diagrammdaten]]

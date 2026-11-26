@@ -1,5 +1,5 @@
 ---
-erzeugt: 51a1aa22d394
+erzeugt: 608d0ddf370b
 art: formel
 tags: [formel]
 normstelle: ["SIA 262:2025, 4.2.2.2, Figur 16", "SIA 262:2025, 4.3.3.2.2, (38)", "SIA 263:2013, 3.2.2.4", "SIA 262:2025, 4.2.3.3, Figur 17"]
@@ -94,7 +94,7 @@ $$
 - [[opencivil.material.spannstahl]]
 - [[opencivil.nachweis.kennzahlen#Plattenkennzahlen|Plattenkennzahlen._ohne_buegel]]
 - [[opencivil.nachweis.spannungsbegrenzung#Spannungsbegrenzung._protokoll_fliessen|Spannungsbegrenzung._protokoll_fliessen]]
-- [[opencivil.spannungsanalyse.herleitung#herleitung|herleitung]]
+- [[opencivil.spannungsanalyse.riss#Bruttoriss.herleitung_gesetze|Bruttoriss.herleitung_gesetze]]
 
 ## Themen
 

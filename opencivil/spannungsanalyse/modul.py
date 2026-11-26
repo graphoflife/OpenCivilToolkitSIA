@@ -4,7 +4,9 @@ opencivil/spannungsanalyse/modul.py -- der aequivalente E-Modul.
 VERANTWORTUNG:
 Die letzten zwei Fragen: eine Linie, umgerechnet in den Modul, den ein
 reiner, ungerissener, elastischer Betonquerschnitt braeuchte, um sich gleich
-stark zu kruemmen oder zu dehnen (:class:`Modullinie`). Und derselbe Modul
+stark zu kruemmen oder zu dehnen (:class:`Modullinie`) -- bei einem
+Querschnitt ohne Beton derselbe Querschnitt, linear-elastisch
+(:class:`Modulbezug`). Und derselbe Modul
 an einer Stelle der Linie, fuer die Staebe eines Balkensystems
 (:func:`modul_bei`, :class:`Modulfrage`): dort geht er in die Rechnung ein,
 darum rechnet ihn das Rechenwerk, nicht die Auswertung danach. Gefragt wird
@@ -30,7 +32,7 @@ from opencivil.querschnitt.gesetzwahl import Rechenwahl
 from opencivil.querschnitt.platte import Richtung
 from opencivil.querschnitt.zugseite import Zugseite
 from opencivil.spannungsanalyse.art import Analyseart
-from opencivil.spannungsanalyse.linie import Linie, Paar
+from opencivil.spannungsanalyse.linie import Linie, Modulbezug, Paar
 from opencivil.spannungsanalyse.platte import loeserpaar
 from opencivil.spannungsanalyse.schnitt import schnittpaar
 
@@ -74,6 +76,10 @@ class Modullinie:
         E_eq = M / (I_c · (chi - chi_0))       I_c = b·h³/12
         E_eq = N / (A_c · (eps_m - eps_0))     A_c = b·h
 
+    Ohne Beton misst er sich am Querschnitt selbst, mit ``I`` und ``A``
+    (:class:`Modulbezug`): bis zum Fliessbeginn ist er dort der Modul des
+    Werkstoffs.
+
     Gezaehlt wird ab dem Zustand ohne laufende Kraft -- ``chi_0`` bei M = 0
     unter der festen Normalkraft, ``eps_0`` bei N = 0 unter dem festen
     Moment --, nach Vorgabe (2026-10-11); SIA 262:2025 kennt keinen solchen
@@ -94,23 +100,29 @@ class Modullinie:
     linie: Linie
     """Die M-chi- oder N-eps-Linie, aus der umgerechnet wird."""
 
-    bezug: float
-    """``I_c`` in m⁴ bzw. ``A_c`` in m² -- der reine Betonquerschnitt."""
+    bezug: Modulbezug
+    """
+    Woran er sich misst: ``I`` bzw. ``A`` -- und ``E`` zum Vergleich,
+    ``E_eq/E`` ist der Faktor, um den man ``E`` abmindert: beim Stahlbeton
+    ``E_cm``, sonst der Modul des Materials.
+    """
 
     null: float
     """Die Verformung ohne laufende Kraft: ``chi_0`` bzw. ``eps_0``."""
 
-    E_cm: float
-    """Zum Vergleich: ``E_eq/E_cm`` ist der Faktor, um den man E_cm abmindert."""
-
     punkte: List[Modulpunkt] = field(default_factory=list)
 
+    @property
+    def querschnitt(self) -> float:
+        """``I`` in m⁴ ueber dem Moment, ``A`` in m² ueber der Normalkraft."""
+        return self.bezug.I if self.art.ueber_moment else self.bezug.A
+
     def modul(self, kraft: float, verformung: float) -> Optional[float]:
-        """``Kraft / (Bezug · (Verformung − null))`` -- ``None``, wo das nichts sagt."""
+        """``Kraft / (Querschnitt · (Verformung − null))`` -- ``None``, wo das nichts sagt."""
         aenderung = verformung - self.null
         if kraft == 0.0 or aenderung == 0.0:
             return None
-        return kraft / (self.bezug * aenderung)
+        return kraft / (self.querschnitt * aenderung)
 
     @property
     def ungerissen(self) -> Optional[float]:
@@ -135,18 +147,16 @@ class Modullinie:
         return next((p.modul for p in reversed(self.punkte) if p.modul is not None), None)
 
 
-def aequivalenter_modul(linie: Linie, *, I_c: float, A_c: float, E_cm: float) -> Modullinie:
+def aequivalenter_modul(linie: Linie, bezug: Modulbezug) -> Modullinie:
     """
     Die M-chi- oder N-eps-Linie als Linie des aequivalenten Moduls -- siehe
     :class:`Modullinie`. Beide Vergleichszustaende zaehlen ab ihrer eigenen
-    Verformung ohne laufende Kraft. ``I_c`` und ``A_c`` sind der reine
-    Betonquerschnitt, an dem sich der Modul misst.
+    Verformung ohne laufende Kraft. ``bezug`` ist der Querschnitt, an dem
+    sich der Modul misst -- beim Stahlbeton der reine Betonquerschnitt.
     """
-    momente = linie.art.ueber_moment
-    art = Analyseart.MOMENT_EMODUL if momente else Analyseart.NORMALKRAFT_EMODUL
-    bezug = I_c if momente else A_c
+    art = Analyseart.MOMENT_EMODUL if linie.art.ueber_moment else Analyseart.NORMALKRAFT_EMODUL
     if not linie.punkte:
-        return Modullinie(art, linie, bezug, 0.0, E_cm)
+        return Modullinie(art, linie, bezug, 0.0)
 
     # Der erste Punkt ist der Zustand ohne laufende Kraft -- ungerissen bei
     # null, oder gerissen bis auf die Schranke des Loesers.
@@ -155,13 +165,14 @@ def aequivalenter_modul(linie: Linie, *, I_c: float, A_c: float, E_cm: float) ->
     ohne = abs(erster.kraft) <= NULLKRAFT * massstab
     null, null_I, null_II = ((erster.verformung, erster.verformung_I, erster.verformung_II)
                              if ohne else (0.0, 0.0, 0.0))
-    modul = Modullinie(art, linie, bezug, null, E_cm)
+    modul = Modullinie(art, linie, bezug, null)
+    querschnitt = modul.querschnitt
 
     def geteilt(kraft: float, verformung: Optional[float],
                 ab: Optional[float]) -> Optional[float]:
         if verformung is None or ab is None or kraft == 0.0 or verformung == ab:
             return None
-        return kraft / (bezug * (verformung - ab))
+        return kraft / (querschnitt * (verformung - ab))
 
     for p in (linie.punkte[1:] if ohne else linie.punkte):
         modul.punkte.append(Modulpunkt(
@@ -235,13 +246,14 @@ def modul_bei(paar: Paar, *, N: float, M: float) -> Tuple[Optional[Modulstelle],
     if ebene is None:
         return None, ("bei diesem Moment gibt es keine Gleichgewichtslage – es "
                       "übersteigt den Biegewiderstand bei dieser Normalkraft.")
+    bezug = paar.modulbezug
     linie = Modullinie(Analyseart.MOMENT_EMODUL, Linie(Analyseart.MOMENT_KRUEMMUNG, N, riss),
-                       paar.I_c, null.kruemmung, paar.E_cm)
+                       bezug, null.kruemmung)
     modul = linie.modul(M, ebene.kruemmung)
     if modul is None:
         return None, "unter diesem Moment krümmt sich der Querschnitt nicht."
     return Modulstelle(N=N, M=M, riss=riss, gerissen=ist_gerissen, chi_0=null.kruemmung,
-                       chi=ebene.kruemmung, I_c=paar.I_c, modul=modul), ""
+                       chi=ebene.kruemmung, I_c=bezug.I, modul=modul), ""
 
 
 @dataclass(frozen=True)
@@ -393,11 +405,11 @@ class ModulProzedur(Prozedur):
         paar, seite, grund = self.frage.quelle.paar(M, e.si_nach_id(), self.frage.wahl)
         befund = (Modulbefund(None, grund) if paar is None
                   else Modulbefund(*modul_bei(paar, N=N, M=abs(M))))
-        self._schreiben(p, seite, befund, paar.betone if paar is not None else ())
+        self._schreiben(p, seite, befund, paar.beschriftung if paar is not None
+                        else self.frage.wahl.beschriftung())
         return Ausfuehrung({}, befund=befund)
 
-    def _schreiben(self, p: Protokoll, seite: str, befund: Modulbefund,
-                   betone: Tuple[Any, ...]) -> None:
+    def _schreiben(self, p: Protokoll, seite: str, befund: Modulbefund, wahl: str) -> None:
         p.erklaerung(
             "Der äquivalente E-Modul eines Stabs: der Modul, den ein reiner, "
             "ungerissener Betonquerschnitt bräuchte, um sich unter dem Moment gleich "
@@ -405,7 +417,7 @@ class ModulProzedur(Prozedur):
             "M–E_eq der Spannung-Dehnung-Analyse: ungerissen bis zum Rissmoment, "
             "darüber gerissen, gezählt ab der Krümmung ohne Moment. Er gilt für EA "
             "und EI jedes Stabs mit diesem Querschnitt und seinem Material.")
-        p.text(f"{self.frage.quelle.text}, {seite}, {self.frage.wahl.beschriftung(betone)}.")
+        p.text(f"{self.frage.quelle.text}, {seite}, {wahl}.")
         s = befund.stelle
         if s is None:
             p.text(f"Kein E_eq: {befund.grund}")

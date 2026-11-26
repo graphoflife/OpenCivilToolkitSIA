@@ -967,14 +967,25 @@ Norm dazu sagt.
       Baustahls endet bei ε_ud = 15·ε_y, für S355 bei 25.4 ‰. SIA 263:2013
       nennt keine Grenzdehnung; 15 ist das kleinste Verhältnis von Bruch-
       zu Fliessdehnung, das 3.2.2.4 für die plastischen Verfahren verlangt.
-      Bestätigen oder eine andere Zahl nennen. Wirkt erst, wenn die
-      Querschnittsanalyse Baustahl rechnet.
+      Bestätigen oder eine andere Zahl nennen. Wirkt seit 2026-11-26 in den
+      Spannung-Dehnung-Analysen: dort endet die Linie eines Stahlquerschnitts.
 - [ ] **Holz, Grenzstauchung nach Vorgabe** (`opencivil/material/holz.py`,
       `STAUCHBARKEIT`, seit 2026-11-26). Elastisch-plastisch geht der Druck
       bis ε_cu = 3·ε_c,0,d, bei C24 bis 3.27 ‰. SIA 265:2012, 3.1.2.2 lässt
       das Fliessen zu, wo ein Bauteil plastisch stauchen kann, und nennt
-      keine Grenze. Bestätigen oder eine andere Zahl nennen. Wirkt erst, wenn
-      die Querschnittsanalyse Holz rechnet.
+      keine Grenze. Bestätigen oder eine andere Zahl nennen. Wirkt seit
+      2026-11-26 in den Spannung-Dehnung-Analysen, wo das Holz
+      «elastisch-plastisch» rechnet.
+- [ ] **Holz: wo die Linie der Biegung endet – zu entscheiden**
+      (`opencivil/spannungsanalyse/rissfrei.py`, seit 2026-11-26). Das
+      Gesetz des Holzes bricht auf Zug bei f_t,0,d; so endet die M-χ-Linie,
+      wo der gezogene Rand f_t,0,d erreicht – beim Rechteck 200 × 400 mm aus
+      C24 bei 8 · W = 42.7 kNm. Der Nachweis der Biegung nach SIA 265 rechnet
+      mit f_m,d und gäbe 14 · W = 74.7 kNm. Ein Gesetz kann nicht beides:
+      mit f_m,d trüge der reine Zug zu viel. Empfehlung: mit Schritt 13 das
+      Ende der Linie nach dem Zusammenwirken von Zug und Biegung, wie es der
+      Nachweis der Norm verlangt (die Ziffer dann nachschlagen); bis dahin
+      sagt die Legende nur, dass eine Faser ihre Grenzdehnung erreicht.
 - [ ] **Erdbeben, nach Vorgabe eingebaut** (`opencivil/erdbeben/ersatzkraft.py`).
       Jede Wand trägt nach ihrem Anteil an der Biegesteifigkeit; verformt
       werden die Wände nur durch Biegung, weder durch Schub noch im
@@ -1301,6 +1312,12 @@ Norm dazu sagt.
 
 Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
 
+- [ ] **Der Bezug des äquivalenten Moduls ohne Beton**
+      (`opencivil/spannungsanalyse/rissfrei.py`, seit 2026-11-26). Hat ein
+      Querschnitt aus Holz oder Baustahl zwei Sorten derselben Art, misst
+      sich E_eq am Modul der grössten Fläche. Bestätigen oder einen anderen
+      Bezug nennen, etwa den nach Fläche gemittelten.
+
 - [ ] **Spannglieder: die Vorgabe der Spannung bei Y1100 und Y1030 – zu
       entscheiden** (`opencivil/querschnitt/spannglieder.py`, `vorspannung`,
       seit 2026-11-26). Leer gilt σ_p0 = 0.70·f_pk und σ_p∞ = 0.85·σ_p0, so
@@ -1576,12 +1593,13 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       Querschnittsanalyse.
 
 - [ ] **Querschnittsanalyse, nächste Schritte:** Flächen aus Holz und
-      Baustahl gibt es seit 2026-11-26, mit ihren Querschnittswerten, aber
-      ohne Nachweis (Plan vom 2026-11-25: die Spannung-Dehnung-Analysen je
-      Bauweise in Schritt 11b, die Profile in 11c, die Nachweise nach
-      SIA 263, 265 und 264 in den Schritten 12 bis 14). Ein E_eq im
-      Balkensystem gibt es bis dahin nur beim Stahlbeton. Dazu weitere
-      Nachweise (Wände ohne Bügel).
+      Baustahl gibt es seit 2026-11-26, mit ihren Querschnittswerten und
+      ihren Spannung-Dehnung-Analysen, aber ohne Nachweis (Plan vom
+      2026-11-25: die Profile in Schritt 11c, die Nachweise nach SIA 263,
+      265 und 264 in den Schritten 12 bis 14). Der Verbund bekommt seine
+      Analysen mit Schritt 14: sein Riss braucht den ideellen Querschnitt.
+      Ein E_eq im Balkensystem gibt es bis dahin nur beim Stahlbeton. Dazu
+      weitere Nachweise (Wände ohne Bügel).
 - [ ] **Baustahl: die Wärmedehnzahl** α_T = 10·10⁻⁶/°C (SIA 263:2013,
       3.2.2.2) fehlt -- es gibt keine Temperatur als Einheit, und keine
       Rechnung braucht sie. Kommt mit der ersten, die sie braucht.

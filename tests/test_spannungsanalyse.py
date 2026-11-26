@@ -123,7 +123,7 @@ class TestDieDreiPassenZueinander(unittest.TestCase):
         hin = sa.aus_schnittgroessen(self.suche, N=-300e3, M=140e3, arten=PRAEZISE)
         zurueck = sa.aus_dehnungen(
             self.gerissen,
-            eps_oben=hin.beton[0].eps, eps_unten=hin.beton[-1].eps)
+            eps_oben=hin.flaeche[0].eps, eps_unten=hin.flaeche[-1].eps)
         self.assertAlmostEqual(zurueck.eps_m, hin.eps_m, places=9)
         self.assertAlmostEqual(zurueck.chi, hin.chi, places=9)
         self.assertAlmostEqual(zurueck.N / 1e3, hin.N / 1e3, places=3)
@@ -135,7 +135,7 @@ class TestDieDreiPassenZueinander(unittest.TestCase):
         gedreht, stünde das Bild kopf und passte nicht zum Nachweis daneben.
         """
         bild = sa.aus_schnittgroessen(self.suche, N=0.0, M=150e3, arten=PRAEZISE)
-        oben, unten = bild.beton[0], bild.beton[-1]
+        oben, unten = bild.flaeche[0], bild.flaeche[-1]
         self.assertEqual(oben.z, 0.0)
         self.assertGreater(unten.z, oben.z)
         # Positives Moment: unten gezogen, oben gedrückt.
@@ -148,7 +148,7 @@ class TestDieDreiPassenZueinander(unittest.TestCase):
 
     def test_der_beton_traegt_keinen_zug(self):
         bild = sa.aus_schnittgroessen(self.suche, N=0.0, M=150e3, arten=PRAEZISE)
-        gezogen = [f for f in bild.beton if f.eps > 0]
+        gezogen = [f for f in bild.flaeche if f.eps > 0]
         self.assertTrue(gezogen)
         self.assertTrue(all(f.sigma == 0.0 for f in gezogen))
 
@@ -338,7 +338,7 @@ class TestMomentenKruemmung(unittest.TestCase):
             bild = sa.aus_schnittgroessen(self.paar.ebenen().ungerissen, N=N,
                                           M=self.paar.rissmoment_bei(N),
                                           arten=self.paar.wahl.arten)
-            return bild.beton[-1].sigma
+            return bild.flaeche[-1].sigma
         ohne = randspannung(0.0)
         for N in (-200e3, 100e3):
             with self.subTest(N=N / 1e3):
@@ -688,11 +688,9 @@ class TestAequivalenterModul(unittest.TestCase):
         b, h = cls.paar.b, cls.paar.h
         cls.b, cls.h = b, h
         cls.biegung = sa.aequivalenter_modul(sa.moment_kruemmung(cls.paar, N=0.0),
-                                             I_c=cls.paar.I_c, A_c=cls.paar.A_c,
-                                             E_cm=cls.paar.E_cm)
+                                             cls.paar.modulbezug)
         cls.zug = sa.aequivalenter_modul(sa.normalkraft_dehnung(cls.paar, M=0.0),
-                                         I_c=cls.paar.I_c, A_c=cls.paar.A_c,
-                                         E_cm=cls.paar.E_cm)
+                                         cls.paar.modulbezug)
 
     def ideell(self):
         """Der ungerissene Querschnitt mit Stahl: Fläche, Schwerpunkt, Flächenmoment."""
@@ -727,7 +725,7 @@ class TestAequivalenterModul(unittest.TestCase):
         for modul in (self.biegung, self.zug):
             for p in modul.punkte[1:]:
                 vor = [q for q in modul.linie.punkte if q.kraft == p.kraft and q.gerissen == p.gerissen][0]
-                self.assertAlmostEqual(p.modul * modul.bezug * (vor.verformung - modul.null),
+                self.assertAlmostEqual(p.modul * modul.querschnitt * (vor.verformung - modul.null),
                                        p.kraft, delta=1e-6 * max(1.0, abs(p.kraft)))
 
     def test_der_riss_und_was_danach_kommt(self):
@@ -745,8 +743,7 @@ class TestAequivalenterModul(unittest.TestCase):
         -- der Querschnitt ist linear -- und nahe null kein Ausreisser.
         """
         druck = sa.aequivalenter_modul(sa.moment_kruemmung(self.paar, N=-300e3),
-                                       I_c=self.paar.I_c, A_c=self.paar.A_c,
-                                       E_cm=self.paar.E_cm)
+                                       self.paar.modulbezug)
         self.assertNotEqual(druck.null, 0.0)
         ungerissen = [p.modul for p in druck.punkte if not p.gerissen]
         self.assertAlmostEqual(min(ungerissen) / self.biegung.ungerissen, 1.0, delta=1e-6)
@@ -768,7 +765,8 @@ class TestAequivalenterModul(unittest.TestCase):
         self.assertEqual(biegung["titel"], "Äquivalenter E-Modul über dem Moment")
         self.assertAlmostEqual(kurve["sprung"]["vor"]["wert"], 35903, delta=1)
         self.assertAlmostEqual(kurve["sprung"]["nach"]["wert"], 8925, delta=1)
-        self.assertAlmostEqual(kurve["E_cm"], 33620, delta=1)
+        self.assertEqual((kurve["bezug"]["zeichen"], kurve["bezug"]["text"]), ("E_{cm}", "E_cm"))
+        self.assertAlmostEqual(kurve["bezug"]["wert"], 33620, delta=1)
         # Das Vielfache von E_cm rechnet der Kern, nicht die Oberfläche (2026-10-18).
         self.assertAlmostEqual(kurve["sprung"]["nach"]["vielfaches"], 8925 / 33620, delta=1e-4)
         self.assertEqual(kurve["groessen"]["modul"]["einheit"], "N/mm²")

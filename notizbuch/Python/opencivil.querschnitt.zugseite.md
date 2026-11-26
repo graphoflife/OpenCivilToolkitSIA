@@ -1,5 +1,5 @@
 ---
-erzeugt: aee0be2b9f5c
+erzeugt: ce0d3b2ed412
 art: modul
 tags: [modul]
 ---
@@ -187,5 +187,6 @@ die waagrechte Nulllinie einer einachsigen Rechnung es braucht.
 - [[opencivil.spannungsanalyse.modul]]
 - [[opencivil.spannungsanalyse.platte]]
 - [[opencivil.spannungsanalyse.riss]]
+- [[opencivil.spannungsanalyse.rissfrei]]
 - [[opencivil.spannungsanalyse.schnitt]]
 - [[opencivil.web.api]]

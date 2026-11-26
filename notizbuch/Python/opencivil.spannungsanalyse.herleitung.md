@@ -1,5 +1,5 @@
 ---
-erzeugt: 158861c14bae
+erzeugt: 2ab59404358c
 art: modul
 tags: [modul]
 ---
@@ -29,11 +29,13 @@ nennt die Raender bei z = 0 und z = h, wie die Analyse sie nennt
 links heisst die Randdehnung bei z = 0 «rechts», nicht «oben».
 
 `paar` ist das Loeserpaar einer Platte oder eines gezeichneten
-Querschnitts. Den Riss und den reinen Betonquerschnitt schreiben beide
-gleich ([[opencivil.spannungsanalyse.riss#Bruttoriss|Bruttoriss]]); was nur
-die Art des Bauteils weiss -- die Tiefe und die Dehnung am Ende --,
-schreibt es selbst (`tiefe`, `herleitung_dehnung_am_ende`). Der Rest
-ist derselbe Text.
+Querschnitts. Was vor dem Ende der Linie steht -- die Gesetze, den Riss,
+das Fliessen, die Grenzdehnungen --, schreibt das Paar
+(`herleitung_gesetze`): mit Beton alle gleich
+([[opencivil.spannungsanalyse.riss#Bruttoriss|Bruttoriss]]), ohne Beton ohne
+Riss ([[opencivil.spannungsanalyse.rissfrei#RissfreiesPaar|RissfreiesPaar]]).
+Was nur die Art des Bauteils weiss -- die Dehnung am Ende, der Bezug des
+Moduls --, schreibt es ebenso selbst. Der Rest ist derselbe Text.
 
 ### _herleitung_modul
 
@@ -41,10 +43,11 @@ ist derselbe Text.
 def _herleitung_modul(p: Protokoll, w: Zwischenwerte, modul: Modullinie, paar: Paar, A: 'Wert', I: 'Wert') -> None
 ```
 
-Der aequivalente Modul: der reine Betonquerschnitt, die Formel und der
-Modul an den Ecken der Linie -- jede Zeile mit Kraft und Verformung, also
-von Hand nachzurechnen. Der reine Betonquerschnitt ist der
-Bruttoquerschnitt des Risses, mit seinem `A` und `I`.
+Der aequivalente Modul: sein Bezug, die Formel und der Modul an den Ecken
+der Linie -- jede Zeile mit Kraft und Verformung, also von Hand
+nachzurechnen. Beim Stahlbeton ist der Bezug der reine Betonquerschnitt,
+der Bruttoquerschnitt des Risses mit seinem `A` und `I`; ohne Beton
+der Querschnitt selbst ([[opencivil.spannungsanalyse.linie#Paar.modulbezug|modulbezug]]).
 
 
 ## Konstanten
@@ -57,10 +60,6 @@ Bruttoquerschnitt des Risses, mit seinem `A` und `I`.
 - [[opencivil.core.latex]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wert]]
-- [[opencivil.material.basis]]
-- [[opencivil.material.betonstahl]]
-- [[opencivil.querschnitt.gesetzwahl]]
-- [[opencivil.querschnitt.werkstoffgesetz]]
 - [[opencivil.spannungsanalyse.linie]]
 - [[opencivil.spannungsanalyse.modul]]
 
@@ -73,7 +72,4 @@ Bruttoquerschnitt des Risses, mit seinem `A` und `I`.
 
 - [[Äquivalenter E-Modul über dem Moment]] · `_herleitung_modul`
 - [[Äquivalenter E-Modul über der Normalkraft]] · `_herleitung_modul`
-- [[Fliessdehnung]] · `herleitung`
-- [[Grenzdehnungen am Ende der Linie]] · `herleitung`
 - [[Grösste Krümmung]] · `herleitung`
-- [[Wirksamer Elastizitätsmodul]] · `herleitung`

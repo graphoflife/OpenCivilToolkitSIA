@@ -1,5 +1,5 @@
 ---
-erzeugt: 86d6eab39c1d
+erzeugt: de5bcfd5c6ee
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -202,6 +202,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.spannungsanalyse.modul]] – der aequivalente E-Modul.
     - [[opencivil.spannungsanalyse.platte]] – das Paar einer Platte.
     - [[opencivil.spannungsanalyse.riss]] – wo eine Linie reisst.
+    - [[opencivil.spannungsanalyse.rissfrei]] – das Paar eines Querschnitts, der nicht reisst.
     - [[opencivil.spannungsanalyse.schnitt]] – das Paar eines gezeichneten Querschnitts.
 - [[opencivil.stabwerk]] – Stabwerke nach der Steifigkeitsmethode, eben und im Raum.
     - [[opencivil.stabwerk.art]] – eben oder im Raum: was die beiden Balkensysteme unterscheidet.

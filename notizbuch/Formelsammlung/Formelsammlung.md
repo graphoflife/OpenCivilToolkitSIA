@@ -1,5 +1,5 @@
 ---
-erzeugt: 5b562236ff62
+erzeugt: e3c7bb670c74
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -502,9 +502,9 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Flächenträgheitsmoment eines U-Profils mit parallelen Flanschen um y]] · [[opencivil.stabwerk.profilformen]]
 - [[Flächenträgheitsmoment eines U-Profils mit parallelen Flanschen um z]] · [[opencivil.stabwerk.profilformen]]
 - [[Gleichungssystem der Steifigkeitsmethode]] · [[opencivil.stabwerk.herleitung|_ansaetze]], [[opencivil.stabwerk3d.herleitung|_ansaetze]]
-- [[Grenzdehnungen am Ende der Linie]] · [[opencivil.spannungsanalyse.herleitung#herleitung|herleitung]]
+- [[Grenzdehnungen am Ende der Linie]] · [[opencivil.spannungsanalyse.riss#Bruttoriss.herleitung_gesetze|Bruttoriss.herleitung_gesetze]]
 - [[Grösste Dehnung auf halber Höhe]] · [[opencivil.spannungsanalyse.platte#Loeserpaar.herleitung_dehnung_am_ende|Loeserpaar.herleitung_dehnung_am_ende]]
-- [[Grösste Dehnung im Schwerpunkt]] · [[opencivil.spannungsanalyse.schnitt#Schnittpaar.herleitung_dehnung_am_ende|Schnittpaar.herleitung_dehnung_am_ende]]
+- [[Grösste Dehnung im Schwerpunkt]] · [[opencivil.spannungsanalyse.schnitt#AmSchnitt.herleitung_dehnung_am_ende|AmSchnitt.herleitung_dehnung_am_ende]]
 - [[Grösste Krümmung]] · [[opencivil.spannungsanalyse.herleitung#herleitung|herleitung]]
 - [[Hebel des Moments am Pfahlkopf]] · [[opencivil.pfahl.quer#AeussererQuerwiderstand|AeussererQuerwiderstand._querkraft]]
 - [[Hilfsgrösse der Nulllinie]] · [[opencivil.nachweis.mindestbewehrung#ZwaengungBiegung.protokoll_lage|ZwaengungBiegung.protokoll_lage]]

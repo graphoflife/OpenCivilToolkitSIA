@@ -1,5 +1,5 @@
 ---
-erzeugt: 2ad8394298aa
+erzeugt: e1709b9a6399
 art: modul
 tags: [modul]
 ---
@@ -10,7 +10,11 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Der Riss einer Linie -- fuer die Platte und den gezeichneten Querschnitt
-dieselbe Rechnung und dieselbe Herleitung ([[opencivil.spannungsanalyse.riss#Bruttoriss|Bruttoriss]]). Gerechnet
+dieselbe Rechnung und dieselbe Herleitung ([[opencivil.spannungsanalyse.riss#Bruttoriss|Bruttoriss]]), und was ein
+Paar aus Stahlbeton sonst in die Herleitung schreibt: den wirksamen Modul,
+die Gesetze des Betons, die Fliessdehnungen und die Grenzdehnungen
+([[opencivil.spannungsanalyse.riss#Bruttoriss.herleitung_gesetze|Bruttoriss.herleitung_gesetze]]) -- bis 2026-11-26 stand das in
+[[opencivil.spannungsanalyse.herleitung]], fuer jedes Paar. Gerechnet
 wird am ungerissenen Bruttoquerschnitt, ohne Stahl, wie beim sproeden
 Versagen ([[opencivil.nachweis.rissgroessen]]):
 
@@ -67,8 +71,10 @@ Querschnitt.
 Das Paar gibt den Bruttoquerschnitt (`brutto`) mit seinem Rissmoment
 unter reiner Biegung (`riss`), seine Flaeche `A`, die rissaktive
 Dicke unter Zug (`t_zug`), die Zugseite (`seite`), den gerissenen
-Loeser (`gerissen`) und seine Wahl (`wahl`) -- und zwei Stuecke
-Herleitung, die nur es kennt: [[opencivil.spannungsanalyse.riss#Bruttoriss.herleitung_bruttoquerschnitt|herleitung_bruttoquerschnitt]] und
+Loeser (`gerissen`), seine Wahl (`wahl`), den Modul `E_cm` des
+Betons, die Staehle seiner Lagen (`staehle`) und die Wert-IDs der
+Herleitung (`ids`) -- und Stuecke Herleitung, die nur es kennt:
+[[opencivil.spannungsanalyse.riss#Bruttoriss.tiefe|tiefe]], [[opencivil.spannungsanalyse.riss#Bruttoriss.herleitung_bruttoquerschnitt|herleitung_bruttoquerschnitt]] und
 [[opencivil.spannungsanalyse.riss#Bruttoriss.herleitung_dicke_unter_zug|herleitung_dicke_unter_zug]].
 
 - `brutto: Bruttoquerschnitt`
@@ -78,8 +84,14 @@ Herleitung, die nur es kennt: [[opencivil.spannungsanalyse.riss#Bruttoriss.herle
 - `seite: Zugseite`
 - `gerissen: Faserloeser`
 - `wahl: Rechenwahl`
+- `E_cm: float`
+- `staehle: Tuple[Any, ...]`
+- `ids: Mapping[str, str]`
+- `flaeche = 'Beton'` – Woraus die Flaeche ist, fuer das Bild.
+- `OHNE_FLIESSEN = 'Bis zum Bruch fliesst kein Stahl: der Beton versagt zuerst.'` – Was eine Linie sagt, die bis zum Bruch nicht fliesst.
 - `ZUR_ANDEREN_ACHSE = ''` – Was die Erklaerung der festen Nulllinie ueber das Moment um die andere Achse sagt -- beim gezeichneten Querschnitt ist «einachsig» eine Wahl; an der Platte, einem Rechteck, entsteht keines.
 - `DICKE_UNTER_ZUG = ''` – Welche Dicke unter Zug reisst, in Worten.
+- `mit_kriechzahl = True` – In den Analysen rechnet der ungerissene Teil immer mit `E_cm/(1+phi)`: die Kriechzahl wirkt bei jeder Rechenart.
 
 #### Bruttoriss.art
 
@@ -99,6 +111,34 @@ def betone(self) -> Tuple[Any, ...]
 ```
 
 Die Betone des Querschnitts, jeder einmal -- aus den Ecken des Bruttoquerschnitts.
+
+#### Bruttoriss.rechenart
+
+```python
+@property
+def rechenart(self) -> str
+```
+
+Die Rechenart je Beton in Worten ([[opencivil.querschnitt.gesetzwahl#arten_text|arten_text]]).
+
+#### Bruttoriss.beschriftung
+
+```python
+@property
+def beschriftung(self) -> str
+```
+
+Die Wahl in Worten, mit der Rechenart je Beton ([[opencivil.querschnitt.gesetzwahl#Rechenwahl.beschriftung|beschriftung]]).
+
+#### Bruttoriss.modulbezug
+
+```python
+@property
+def modulbezug(self) -> Modulbezug
+```
+
+Der reine Betonquerschnitt, ungerissen und ohne Stahl, mit `E_cm`:
+der Bruttoquerschnitt ([[opencivil.nachweis.rissgroessen#Bruttoquerschnitt.traegheit|traegheit]]).
 
 #### Bruttoriss.einachsig
 
@@ -169,26 +209,6 @@ def rissnormalkraft_bei(self, M: float) -> float
 
 `N_Riss(M) = (f_ct,eff,t - σ_M)·A` in N -- ein Moment senkt sie, gleich in welche Richtung.
 
-#### Bruttoriss.I_c
-
-```python
-@property
-def I_c(self) -> float
-```
-
-Der reine Betonquerschnitt fuer den aequivalenten Modul: `I` -- kippt
-die Nulllinie, `I - I_yz²/I_quer`
-([[opencivil.spannungsanalyse.schnitt]], «Der aequivalente Modul»).
-
-#### Bruttoriss.A_c
-
-```python
-@property
-def A_c(self) -> float
-```
-
-Dasselbe fuer die Normalkraft: `A`.
-
 #### Bruttoriss.vorgespannt
 
 ```python
@@ -197,6 +217,14 @@ def vorgespannt(self) -> bool
 ```
 
 Ob Spannglieder mit Vordehnung den Beton druecken -- sie verschieben den Riss.
+
+#### Bruttoriss.tiefe
+
+```python
+def tiefe(self, w: Zwischenwerte, ein: Callable[[str], 'Wert']) -> 'Wert'
+```
+
+Die Tiefe `h`, ueber die die Linie laeuft -- wie das Paar sie misst.
 
 #### Bruttoriss.herleitung_bruttoquerschnitt
 
@@ -213,6 +241,20 @@ def herleitung_dicke_unter_zug(self, p: Protokoll, w: Zwischenwerte, h: 'Wert') 
 ```
 
 Die rissaktive Dicke unter Zug, `t` -- wie das Paar sie misst.
+
+#### Bruttoriss.herleitung_gesetze
+
+```python
+def herleitung_gesetze(self, p: Protokoll, w: Zwischenwerte, linie: 'Linie', ein: Callable[[str], 'Wert'], werte: Mapping[str, 'Wert']) -> Tuple['Wert', 'Wert', 'Wert']
+```
+
+Was ein Paar aus Stahlbeton vor dem Ende der Linie schreibt: den
+wirksamen Modul, den Beton ungerissen und gerissen, wie die Loeser ihn
+rechnen -- aus derselben Stelle
+([[opencivil.querschnitt.gesetzwahl#betongesetz|betongesetz]]) --, den Riss
+([[opencivil.spannungsanalyse.riss#Bruttoriss.herleitung_riss|herleitung_riss]]), die Fliessdehnung jedes Stahls und die
+Grenzdehnungen. Zurueck die Tiefe und `A`, `I` des
+Bruttoquerschnitts.
 
 #### Bruttoriss.herleitung_riss
 
@@ -270,9 +312,12 @@ Was die Vorspannung in eine Rissbedingung schreibt -- ohne sie nichts.
 - [[opencivil.core.einheiten]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wert]]
+- [[opencivil.material.basis]]
+- [[opencivil.material.betonstahl]]
 - [[opencivil.nachweis.querschnittsloeser]]
 - [[opencivil.nachweis.rissgroessen]]
 - [[opencivil.querschnitt.gesetzwahl]]
+- [[opencivil.querschnitt.werkstoffgesetz]]
 - [[opencivil.querschnitt.zugseite]]
 - [[opencivil.spannungsanalyse.linie]]
 
@@ -283,7 +328,10 @@ Was die Vorspannung in eine Rissbedingung schreibt -- ohne sie nichts.
 
 ## Formeln aus diesem Modul
 
+- [[Fliessdehnung]] · `Bruttoriss.herleitung_gesetze`
+- [[Grenzdehnungen am Ende der Linie]] · `Bruttoriss.herleitung_gesetze`
 - [[Rissmoment bei der Normalkraft]] · `Bruttoriss._herleitung_rissmoment`
 - [[Rissnormalkraft beim Moment]] · `Bruttoriss._herleitung_rissnormalkraft`
 - [[Spannung aus dem Moment an der Ecke, die zuerst reisst]] · `Bruttoriss._herleitung_rissnormalkraft`
 - [[Widerstandsmoment zum gezogenen Rand]] · `Bruttoriss.herleitung_riss`
+- [[Wirksamer Elastizitätsmodul]] · `Bruttoriss.herleitung_gesetze`

@@ -58,6 +58,8 @@ def bauen(art: "Bauteilart", eintrag: QuerschnittsanalyseEintrag,
     Verbund (:mod:`~opencivil.querschnitt.bauweise`) rechnet bisher nur seine
     Werte -- Flaeche, Schwerpunkt, Traegheitsmomente --, und seine
     Zusammenfassung sagt, dass die Nachweise fehlen (:func:`ohne_nachweise`).
+    Seine Spannung-Dehnung-Analysen rechnet er trotzdem, ausser im Verbund
+    (:func:`ohne_analysen`).
 
     Ist noch nichts gezeichnet (:attr:`QuerschnittsanalyseEintrag.leer`), gibt
     es nichts zu rechnen und kein Bauteil -- aber auch keinen Fehler, der das
@@ -81,6 +83,8 @@ def bauen(art: "Bauteilart", eintrag: QuerschnittsanalyseEintrag,
         # bisher nur der Stahlbeton.
         teil.weitere_ziele += [d.id for d in (*analyse.d_brutto.values(), analyse.d_torsion)]
         aufbau.ohne_nachweis(teil, ort_von(eintrag), fehlt)
+        if not ohne_analysen(analyse.bauweise):
+            spannungsfaelle(eintrag, stoffe_von(aufbau, analyse.baustoffe), aufbau)
         return teil
     stoffe = stoffe_von(aufbau, analyse.baustoffe)
 
@@ -148,6 +152,19 @@ def ohne_nachweise(bauweise: Bauweise) -> str:
         return ""
     return (f"einen {bauweise.querschnitt} weist das Werkzeug nach {bauweise.norm} noch "
             f"nicht nach")
+
+
+def ohne_analysen(bauweise: Bauweise) -> str:
+    """
+    Warum ein Querschnitt dieser Bauweise keine Spannung-Dehnung-Analyse hat
+    -- leer, wo er eine hat. Ein Satz mit Punkt, fuer die Zeichnung
+    (:func:`~opencivil.web.zeichengeometrie.geometrie`). Der Verbund wartet
+    auf seine Nachweise: sein Riss braucht den ideellen Querschnitt, mit
+    ``E_a/E_cm`` gewichtet, und die Werte der Analyse sind ungewichtet.
+    """
+    if bauweise is not Bauweise.VERBUND:
+        return ""
+    return f"Einen {bauweise.querschnitt} rechnen die Spannung-Dehnung-Analysen noch nicht."
 
 
 def _in_si(fall: Any, *groessen: str) -> Dict[str, float]:

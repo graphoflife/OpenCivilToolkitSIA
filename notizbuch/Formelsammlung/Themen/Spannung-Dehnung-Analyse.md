@@ -1,5 +1,5 @@
 ---
-erzeugt: c4aa2ecb747e
+erzeugt: 8fd6d2dad0cb
 art: thema
 tags: [thema]
 ---
@@ -8,7 +8,7 @@ tags: [thema]
 
 ## Was die Rechnung dazu sagt
 
-Eine Spannung-Dehnung-Analyse hält nichts gegen etwas: sie zeigt, was der Querschnitt tut. Gerechnet wird mit dem Faserintegral der Nachweise und mit der Kriechzahl, dem Wertesatz und der Rechenart, die die Analyse wählt.
+Eine Spannung-Dehnung-Analyse hält nichts gegen etwas: sie zeigt, was der Querschnitt tut. Gerechnet wird mit dem Faserintegral der Nachweise und mit den Werkstoffgesetzen, die die Analyse wählt.
 
 Ungerissen (Zustand I) trägt der Beton Druck und Zug, linear mit E\_c,eff – bis zum Riss: wo der Querschnitt reisst, sagt die Rissbedingung am Bruttoquerschnitt, und nur dort zählt die Zugfestigkeit. Darüber gilt der ungerissene Zustand nicht mehr, auch nicht zum Vergleich. Gerissen (Zustand II) trägt der Beton keinen Zug, und im Druck gilt das Gesetz der gewählten Rechenart.
 
@@ -34,7 +34,7 @@ Der reine Betonquerschnitt ist der Bruttoquerschnitt: A\_c = A.
 
 Unter reiner Biegung kippt die Nulllinie, bis kein Moment um die andere Achse bleibt. Am ungerissenen Bruttoquerschnitt hängt die Spannung dann auch vom Deviationsmoment I\_yz ab, und es reisst die Ecke zuerst, die ihre Zugfestigkeit zuerst erreicht – bei einem unsymmetrischen Querschnitt eine Ecke, nicht der ganze Rand.
 
-Am Ende ist die Nulllinie um ϑ gegen die Achse der Biegung gedreht, im Gegenuhrzeigersinn positiv: so bleibt kein Moment um die andere Achse. Die Randdehnungen gelten senkrecht zu ihr, über die Tiefe h\_ϑ des Betons in dieser Richtung.
+Am Ende ist die Nulllinie um ϑ gegen die Achse der Biegung gedreht, im Gegenuhrzeigersinn positiv: so bleibt kein Moment um die andere Achse. Die Randdehnungen gelten senkrecht zu ihr, über die Tiefe h\_ϑ des Querschnitts in dieser Richtung.
 
 Dieselbe Rissbedingung, nach der Normalkraft aufgelöst. Unter Zug gilt k\_t für die rissaktive Dicke t, die kleinere Abmessung des Betons – nicht für h/3 wie beim Rissmoment. Ein negatives Moment zieht den anderen Rand: dann gilt dessen Abstand.
 

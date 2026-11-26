@@ -29,7 +29,9 @@ import {
   analysenKapitel, mitKopf, nachweisKapitel, werkstoffzeilen,
 } from './nachweise.js';
 import { uebersicht } from './qa_uebersicht.js';
-import { ohneNachweiseVon, werkstoffeVon, zeichenbereich } from './qa_zeichnung.js';
+import {
+  ohneAnalysenVon, ohneNachweiseVon, werkstoffeVon, zeichenbereich,
+} from './qa_zeichnung.js';
 import {
   ausVorlage, eintragAendern, feldangabe, katalog,
 } from './zustand.js';
@@ -438,16 +440,20 @@ const ORT = {
 };
 
 /**
- * Die Kacheln der Analyse -- die des Stahlbetons. Ein Querschnitt aus Holz,
- * Stahl oder im Verbund hat noch keine; statt ihrer steht grau, warum
- * (`ohneNachweiseVon`). Was in ihnen eingestellt ist, bleibt.
+ * Die Kacheln der Analyse. Die Nachweise sind die des Stahlbetons: ein
+ * Querschnitt aus Holz, Stahl oder im Verbund hat noch keine, statt ihrer
+ * steht grau, warum (`ohneNachweiseVon`). Die Spannung-Dehnung-Analysen hat
+ * jeder ausser dem Verbund (`ohneAnalysenVon`). Was in den Kacheln
+ * eingestellt ist, bleibt.
  */
 function kapitel(analyse) {
-  const ohne = ohneNachweiseVon(analyse.kennung);
-  if (ohne) return [{ hinweis: ohne, kapitel: [] }];
+  const gruppe = (titel, ohne, kacheln) => (ohne ? { titel, hinweis: ohne, kapitel: [] }
+    : { titel, kapitel: kacheln() });
   return [
-    { titel: 'Nachweise', kapitel: [TRAGSICHERHEIT, ...nachweisKapitel(ORT)] },
-    { titel: 'Spannung-Dehnung-Analysen', kapitel: analysenKapitel(ORT) },
+    gruppe('Nachweise', ohneNachweiseVon(analyse.kennung),
+      () => [TRAGSICHERHEIT, ...nachweisKapitel(ORT)]),
+    gruppe('Spannung-Dehnung-Analysen', ohneAnalysenVon(analyse.kennung),
+      () => analysenKapitel(ORT)),
   ];
 }
 

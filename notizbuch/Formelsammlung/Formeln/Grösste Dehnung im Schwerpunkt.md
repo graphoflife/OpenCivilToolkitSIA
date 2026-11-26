@@ -1,5 +1,5 @@
 ---
-erzeugt: a7e4726f5b6d
+erzeugt: 7d179cae056f
 art: formel
 tags: [formel]
 ---
@@ -17,7 +17,7 @@ $$
 | $\varepsilon_{oben}$ | – | ‰ | Zwischenwert |
 | $\varepsilon_{unten}$ | – | ‰ | Zwischenwert |
 | $v_o$ | Abstand des oberen Rands vom Schwerpunkt | mm | Zwischenwert |
-| $h_{\vartheta}$ | Tiefe des Betons senkrecht zur Nulllinie | mm | Zwischenwert |
+| $h_{\vartheta}$ | Tiefe des Querschnitts senkrecht zur Nulllinie | mm | Zwischenwert |
 
 ## Beispiel
 
@@ -33,7 +33,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.spannungsanalyse.schnitt#Schnittpaar.herleitung_dehnung_am_ende|Schnittpaar.herleitung_dehnung_am_ende]]
+- [[opencivil.spannungsanalyse.schnitt#AmSchnitt.herleitung_dehnung_am_ende|AmSchnitt.herleitung_dehnung_am_ende]]
 
 ## Themen
 
