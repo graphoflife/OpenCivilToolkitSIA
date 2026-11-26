@@ -111,7 +111,8 @@ _DECKENGROESSEN = {
 }
 _AUFTEILUNGEN = {
     Aufteilung.AUTOMATISCH: ("automatisch", "Je Stelle nach ihren Lagern: zum nahen Rand, sonst mehr "
-                                            "in die kürzere Spannweite (Folie 31)"),
+                                            "in die kürzere Spannweite (Folie 31) – mit Bändern durch "
+                                            "die Stützen und an offenen Rändern"),
     Aufteilung.FEST: ("fest", "Überall derselbe Anteil in Richtung 1 – ausser in den Zonen"),
 }
 

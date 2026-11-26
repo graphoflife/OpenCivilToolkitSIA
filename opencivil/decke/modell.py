@@ -34,6 +34,9 @@ STREIFENBREITE = 0.25
 #: Die Seiten der Fläche, über die eine Einzellast verteilt wird, in m -- ein Vorschlag.
 VERTEILBREITE = 1.0
 
+#: Wie breit die Bänder sind, die die Rechnung selbst legt, in m -- ein Vorschlag.
+BANDBREITE = 1.0
+
 
 class Aufteilung(Wahl):
     """Wie die Last ausserhalb der gezeichneten Zonen auf die beiden Richtungen geht."""
@@ -115,7 +118,11 @@ class Unterzug:
     a: Punkt
     b: Punkt
     breite: float
-    stufe: int = 1
+    stufe: float = 1
+    """Ganz, ab 1 -- nur die Bänder liegen darunter (:data:`~opencivil.decke.baender.STUFE_RAND`)."""
+
+    von_selbst: bool = False
+    """Ein Band, das die Rechnung selbst legt (:mod:`~opencivil.decke.baender`) -- kein Eintrag im Projekt."""
 
 
 @dataclass(frozen=True)
@@ -207,3 +214,6 @@ class Decke:
     aufteilung: Aufteilung = Aufteilung.AUTOMATISCH
     anteil: float = 0.5
     """Bei fester Aufteilung: der Anteil in Richtung 1."""
+
+    bandbreite: float = BANDBREITE
+    """Nur bei automatischer Aufteilung: dann legt die Rechnung Bänder so breit (:mod:`~opencivil.decke.baender`)."""

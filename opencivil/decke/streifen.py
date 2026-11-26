@@ -256,7 +256,7 @@ class Streifen:
     richtung: Richtung
     von: float
     bis: float
-    stufe: int = 0
+    stufe: float = 0
     unterzug: Optional[Unterzug] = None
     gebiet: Tuple[Punkt, ...] = ()
     traeger: List[Traeger] = field(default_factory=list)
@@ -336,6 +336,19 @@ def richtungen_der_platte(p: Platte) -> Tuple[Richtung, Richtung]:
     return richtung(p.richtungen[0]), richtung(p.richtungen[1])
 
 
+def nach_richtungen(platten: Sequence[Platte]) -> List[Tuple[Tuple[Richtung, Richtung], List[Platte]]]:
+    """Die Platten nach ihren zwei Richtungen: je Paar die Platten, die in beiden parallel tragen, in ihrer Folge."""
+    heraus: List[Tuple[Tuple[Richtung, Richtung], List[Platte]]] = []
+    for p in platten:
+        r1, r2 = richtungen_der_platte(p)
+        gruppe = next((g for (q1, q2), g in heraus if q1.parallel(r1) and q2.parallel(r2)), None)
+        if gruppe is None:
+            heraus.append(((r1, r2), [p]))
+        else:
+            gruppe.append(p)
+    return heraus
+
+
 def stuetzenbereich(stuetze: Stuetze, unterzuege: Sequence[Unterzug]) -> List[Punkt]:
     """
     Die Fläche ``lx × ly``, über die die Stütze trägt. Ohne Angabe ein
@@ -364,15 +377,8 @@ def zerlegen(decke: Decke) -> Zerlegung:
     if any(m.haelt_an for m in meldungen):
         return Zerlegung([], [], [], {}, {}, meldungen)
     stuecke = {p.name: geo.dreiecke(p.ecken) for p in decke.platten}
-    gruppen: List[Gruppe] = []
-    for p in decke.platten:
-        r1, r2 = richtungen_der_platte(p)
-        gruppe = next((g for g in gruppen if g.richtungen[0].parallel(r1) and g.richtungen[1].parallel(r2)), None)
-        if gruppe is None:
-            gruppe = Gruppe((r1, r2), [], [])
-            gruppen.append(gruppe)
-        gruppe.platten.append(p)
-        gruppe.stuecke.extend(stuecke[p.name])
+    gruppen = [Gruppe(paar, platten, [d for p in platten for d in stuecke[p.name]])
+               for paar, platten in nach_richtungen(decke.platten)]
     richtungen: List[Richtung] = []
     for g in gruppen:
         for r in g.richtungen:
@@ -406,6 +412,20 @@ def zerlegen(decke: Decke) -> Zerlegung:
                           and u.von - TEILUNG <= s.von and s.bis <= u.bis + TEILUNG] for s in feld}
     return Zerlegung(richtungen, feld + sorted(unterzuege, key=lambda u: u.stufe), gruppen, bereiche,
                      parallele, meldungen)
+
+
+def traeger_eines_unterzugs(u: Unterzug, decke: Decke,
+                            stuecke: Dict[str, List[List[Punkt]]]) -> List[Traeger]:
+    """
+    Die Träger, die ``u`` in ``decke`` wäre, mit den Lagern, die
+    :func:`zerlegen` ihnen gäbe -- für die Bänder, die sich ihre Lager
+    suchen (:mod:`~opencivil.decke.baender`). ``u`` gehört nicht zu
+    ``decke``; ``stuecke`` sind ihre Platten in Dreiecken.
+    """
+    alle = [*decke.unterzuege, u]
+    bereiche = {s.name: stuetzenbereich(s, alle) for s in decke.stuetzen}
+    return _traeger(_unterzug(u), decke.platten, decke, [_unterzug(x) for x in decke.unterzuege],
+                    bereiche, stuecke)
 
 
 def _unterzug(u: Unterzug) -> Streifen:
@@ -620,7 +640,7 @@ def pruefen(decke: Decke) -> List[Meldung]:
     namen = list(stuecke)
     for i, a in enumerate(namen):
         for b in namen[i + 1:]:
-            if _ueberlappen(stuecke[a], stuecke[b]):
+            if ueberlappen(stuecke[a], stuecke[b]):
                 heraus.append(Meldung(f"Die Platten «{a}» und «{b}» überlappen sich.", (a, b)))
     for w in decke.linienlager:
         if math.hypot(w.b[0] - w.a[0], w.b[1] - w.a[1]) <= geo.TOLERANZ:
@@ -634,7 +654,7 @@ def pruefen(decke: Decke) -> List[Meldung]:
     gueltig = [u for u in decke.unterzuege if _lang(u)]
     for i, a in enumerate(gueltig):
         for b in gueltig[i + 1:]:
-            if richtung_der_strecke(a.a, a.b).parallel(richtung_der_strecke(b.a, b.b)) and _ueberlappen(
+            if richtung_der_strecke(a.a, a.b).parallel(richtung_der_strecke(b.a, b.b)) and ueberlappen(
                     [geo.rechteck(a.a, a.b, a.breite)], [geo.rechteck(b.a, b.b, b.breite)]):
                 heraus.append(Meldung(f"Die Unterzüge «{a.name}» und «{b.name}» liegen parallel "
                                       "übereinander.", (a.name, b.name)))
@@ -647,12 +667,12 @@ def pruefen(decke: Decke) -> List[Meldung]:
     namen = list(zonen)
     for i, a in enumerate(namen):
         for b in namen[i + 1:]:
-            if _ueberlappen(zonen[a], zonen[b]):
+            if ueberlappen(zonen[a], zonen[b]):
                 heraus.append(Meldung(f"Die Zonen «{a}» und «{b}» überlappen sich.", (a, b)))
     return heraus
 
 
-def _ueberlappen(a: Sequence[Sequence[Punkt]], b: Sequence[Sequence[Punkt]]) -> bool:
+def ueberlappen(a: Sequence[Sequence[Punkt]], b: Sequence[Sequence[Punkt]]) -> bool:
     """Ob sich zwei Flächen aus konvexen Stücken mehr als berühren."""
     for p in a:
         for q in b:

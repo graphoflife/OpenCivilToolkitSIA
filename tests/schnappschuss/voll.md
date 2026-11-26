@@ -19942,7 +19942,7 @@ Die Richtungen der Platte «P1» wählt die Rechnung selbst, entlang der Ränder
 
 Je Richtung sind die Streifen höchstens 0.25 m breit; geteilt wird an jeder Ecke einer Platte, jedem Rand eines Unterzugs und Stützenbereichs und jedem Ende eines Linienlagers.
 
-Gerechnet wird von unten nach oben: zuerst die Feldstreifen, dann die Unterzüge, jeder nach denen tieferer Stufe: U4 (Stufe 1), U1 (Stufe 2), U2 (Stufe 2), U3 (Stufe 2). Was ein Träger an Lagerkraft abgibt, ist die Last dessen, auf dem er liegt.
+Gerechnet wird von unten nach oben: zuerst die Feldstreifen, dann die Unterzüge, jeder Träger nach denen tieferer Stufe: U4 (Stufe 1), U1 (Stufe 2), U2 (Stufe 2), U3 (Stufe 2). Was ein Träger an Lagerkraft abgibt, ist die Last dessen, auf dem er liegt.
 
 Aufteilung fest: 30 % der Last in Richtung 1, 70 % in Richtung 2.
 

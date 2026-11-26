@@ -51,7 +51,7 @@ const VORRAT = {
     "web/css/50-schmal.css?v=231ea1be6ff4",
     "web/css/60-zeichenfenster.css?v=ed182bf87a7b",
     "web/css/70-notizbuch.css?v=5c29ff90c1e1",
-    "web/css/80-skizzen.css?v=1dfbedf941a5",
+    "web/css/80-skizzen.css?v=77e8e025bff2",
     "web/css/90-python.css?v=bec24d055c16",
     "web/js/ablage.js?v=84cbb1c2e67e",
     "web/js/achsen.js?v=aced8f358043",
@@ -80,11 +80,11 @@ const VORRAT = {
     "web/js/cad_palette.js?v=093d67d4548d",
     "web/js/cad_raum.js?v=2ef16c41d520",
     "web/js/cad_verlauf.js?v=7603b772b8be",
-    "web/js/decke.js?v=e190d0cece32",
+    "web/js/decke.js?v=d55278024d1b",
     "web/js/diagramm.js?v=2b56ba98c6b5",
     "web/js/dk_eigenschaften.js?v=537cc9c36d69",
     "web/js/dk_ergebnis.js?v=05988feaa2cb",
-    "web/js/dk_grundriss.js?v=975ead783fc0",
+    "web/js/dk_grundriss.js?v=3377f145094a",
     "web/js/dk_schnitt.js?v=1cc553f65830",
     "web/js/dk_zeichnung.js?v=618ccb6403bb",
     "web/js/dom.js?v=231ab358008e",
@@ -138,8 +138,8 @@ const VORRAT = {
     "web/js/variablen.js?v=7d43b6f38cd9",
     "web/js/zeichnen.js?v=da6e8eec5dc8",
     "web/js/zustand.js?v=04a6b50b3e76",
-    "web/kern/notizbuch.json?v=9e0ce2ddd98b",
-    "web/kern/quellen.json?v=612718aa966a"
+    "web/kern/notizbuch.json?v=bb9bc2ad2689",
+    "web/kern/quellen.json?v=61d87434b91a"
   ],
   "fremd": {
     "web/vendor/jetbrains-mono/": {

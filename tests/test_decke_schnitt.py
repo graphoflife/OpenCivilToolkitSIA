@@ -140,7 +140,9 @@ class TestVerlauf(unittest.TestCase):
     def test_lager_und_unterzug(self):
         """
         Durch die zwei Felder: die Wände an beiden Enden, die Stütze im
-        zweiten Feld und das Band des Unterzugs über der gemeinsamen Kante.
+        zweiten Feld, die Fläche des Unterzugs über der gemeinsamen Kante --
+        und die zwei Bänder über der Stütze: B1 längs, vom Unterzug bis zur
+        Wand rechts, B2 quer.
         """
         p = Projekt(name="Decke")
         beton = p.beton("C30/37")
@@ -157,7 +159,9 @@ class TestVerlauf(unittest.TestCase):
         self.assertEqual(s["stuecke"], [[0.0, 8.0]])
         self.assertEqual([(l["u"], l["art"], l["name"]) for l in s["lager"]],
                          [(0.0, "linienlager", "L4"), (6.0, "stuetze", "S1"), (8.0, "linienlager", "L2")])
-        self.assertEqual(s["unterzuege"], [{"von": 3.75, "bis": 4.25, "name": "U1"}])
+        self.assertEqual(s["unterzuege"], [{"von": 3.75, "bis": 8.0, "name": "B1"},
+                                           {"von": 5.5, "bis": 6.5, "name": "B2"},
+                                           {"von": 3.75, "bis": 4.25, "name": "U1"}])
 
     def test_nie_auf_dem_rand_eines_unterzugs(self):
         """

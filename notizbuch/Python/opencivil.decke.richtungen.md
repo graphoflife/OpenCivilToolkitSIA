@@ -1,5 +1,5 @@
 ---
-erzeugt: cba56c755f7e
+erzeugt: 6a8268ac9a67
 art: modul
 tags: [modul]
 ---
@@ -75,6 +75,14 @@ def _gruppen(platten: Sequence[Platte]) -> List[List[int]]
 
 Die Platten, die aneinanderstossen, je in einer Gruppe -- als Stellen in `platten`, in ihrer Folge.
 
+### kanten
+
+```python
+def kanten(p: Platte) -> List[Kante]
+```
+
+Die Ränder der Platte im Gegenuhrzeigersinn -- innen liegt links.
+
 ### _abstand
 
 ```python
@@ -96,4 +104,5 @@ Wie weit zwei Winkel auseinander liegen, über 90° gefaltet -- −45° und 45°
 
 ## Gebraucht von
 
+- [[opencivil.decke.baender]]
 - [[opencivil.decke.rechnung]]

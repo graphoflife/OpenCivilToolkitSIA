@@ -1,5 +1,5 @@
 ---
-erzeugt: 9e2367fc0da1
+erzeugt: 63db69d22814
 art: modul
 tags: [modul]
 ---
@@ -184,6 +184,17 @@ Parameter `(u, k)` mit `a + u·(b − a) = p + k·(q − p)` -- `None`,
 wenn sie parallel sind. Ob der Schnitt auf den Strecken liegt, sagen
 `u` und `k` in `[0, 1]`.
 
+### deckung
+
+```python
+def deckung(k: Tuple[Punkt, Punkt], m: Tuple[Punkt, Punkt], nah: float) -> Optional[Tuple[float, float]]
+```
+
+Welches Stück der Strecke `k` die Strecke `m` deckt, wenn beide auf
+einer Geraden liegen -- bis `nah` daneben --, in m ab dem Anfang von
+`k`. `None`, wenn sie sich nur kreuzen, an einer Ecke treffen oder
+das Stück nicht länger als `nah` ist.
+
 ### rechteck
 
 ```python
@@ -216,6 +227,7 @@ Intervalle, die sich berühren oder überlappen, zu einem.
 ## Gebraucht von
 
 - [[opencivil.decke.aufteilung]]
+- [[opencivil.decke.baender]]
 - [[opencivil.decke.feld]]
 - [[opencivil.decke.herleitung]]
 - [[opencivil.decke.lasten]]

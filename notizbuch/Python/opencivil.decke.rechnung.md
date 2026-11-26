@@ -1,5 +1,5 @@
 ---
-erzeugt: 08f617a408be
+erzeugt: 0e0424ea5391
 art: modul
 tags: [modul]
 ---
@@ -10,7 +10,8 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Die ganze Rechnung einer Decke: die Richtungen, wo eine Platte sie selbst
-wählt ([[opencivil.decke.richtungen|richtungen]]), zerlegen
+wählt ([[opencivil.decke.richtungen|richtungen]]), die Bänder, die sie bei
+automatischer Aufteilung selbst legt ([[opencivil.decke.baender|baender]]), zerlegen
 ([[opencivil.decke.streifen|streifen]]), die Last aufteilen ([[opencivil.decke.aufteilung|aufteilung]]), je Lastfall auf die
 Streifen legen ([[opencivil.decke.lasten|lasten]]), und dann je Lastfall und
 Kombination die Träger rechnen -- von unten nach oben:
@@ -184,7 +185,7 @@ Was die Lager weniger tragen, als auf den Trägern liegt -- null bis auf Rundung
 class Ergebnis
 ```
 
-- `decke: Decke` – Wie sie gerechnet ist -- mit den Richtungen, die ihre Platten selbst wählten.
+- `decke: Decke` – Wie sie gerechnet ist -- mit den Richtungen, die ihre Platten selbst wählten, und den Bändern, die sie selbst legte.
 - `zerlegung: Zerlegung`
 - `aufteilungen: Optional[Aufteilungen]`
 - `faelle: List[Fallergebnis]`
@@ -216,7 +217,8 @@ def rechnen(decke: Decke) -> Ergebnis
 ```
 
 Die Decke nach der Streifenmethode, je Lastfall und Kombination -- vorher
-wählt jede Platte mit `von_selbst` ihre Richtungen ([[opencivil.decke.richtungen#festgelegt|festgelegt]]).
+wählt jede Platte mit `von_selbst` ihre Richtungen ([[opencivil.decke.richtungen#festgelegt|festgelegt]]),
+und dann legt die Decke ihre Bänder ([[opencivil.decke.baender#gelegt|gelegt]]).
 
 ### fall
 
@@ -308,6 +310,7 @@ Wo die Resultierende einer Streckenlast liegt, ab ihrem Anfang.
 ## Braucht
 
 - [[opencivil.decke.aufteilung]]
+- [[opencivil.decke.baender]]
 - [[opencivil.decke.geometrie]]
 - [[opencivil.decke.lasten]]
 - [[opencivil.decke.modell]]

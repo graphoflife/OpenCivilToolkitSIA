@@ -7,6 +7,45 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-26 · Decke: Bänder von selbst
+
+Aus dem Plan vom 2026-11-25: bei automatischer Aufteilung legt die
+Rechnung selbst Bänder -- versteckte Unterzüge, so breit wie das neue Feld
+«Breite der Bänder» der Decke, Vorgabe 1 m (`opencivil/decke/baender.py`).
+
+- Vorher, ein Feld 6 × 5 m auf Wänden unten, rechts und links, oben frei:
+  alles spannte 6 m in x, und die untere Wand trug 0 kN. Nachher liegt
+  innen am freien Rand ein Band von Wand zu Wand; die Streifen in y liegen
+  auf ihm, und die untere Wand trägt 90 von 300 kN.
+- Vorher, eine Flachdecke 8 × 8 m auf vier Eckstützen: 86 % der Last
+  fielen aus. Nachher liegen vier Bänder innen an den Rändern, von Stütze
+  zu Stütze, und jede Stütze trägt 160 kN, ein Viertel.
+- Wo: durch jede Stütze in den zwei Richtungen ihrer Platte, über weitere
+  Stützen hinweg bis zur nächsten Wand oder zum nächsten Unterzug quer
+  dazu -- steht die Stütze am Rand, rückt das Band nach innen, bis es ganz
+  in der Platte liegt; und innen an jedem offenen Rand -- frei, an einem
+  Loch, an einer Platte mit anderen Richtungen --, beidseits bis zum
+  nächsten Lager.
+- Abweichungen vom Plan, damit die Rechnung nicht schlechter trägt als
+  ohne Band:
+  - Ein Band am Rand nur, wo die Streifen quer zum Rand schon ein Lager
+    haben. Eine Platte 4 × 2 m zwischen zwei Wänden bekäme sonst oben und
+    unten ein Band, und die zwei nähmen ihr die ganze Last ab.
+  - Nie als Kragarm: ein Band liegt auf zwei Lagern oder mehr, die die
+    Höhe halten. Auf einer eingespannten Wand trägt die Platte selbst.
+  - Die Bänder liegen unter jedem Unterzug des Benutzers: ein Band liegt
+    auf einem Unterzug, nie trägt es einen. Vorher hätte ein Band über
+    einer Stütze (Stufe 2) einen Unterzug der Stufe 1 getragen.
+  - Nie längs über einer Wand: dort endet das Band, wo die Wand beginnt.
+    In «Jede Wahl» liefe das Band über S1 sonst 3 m auf der Wand L4.
+- Die Herleitung nennt die Bänder in einer eigenen Tabelle «Bänder, von
+  der Rechnung gelegt», mit der Regel; im Grundriss stehen sie fein
+  gestrichelt. Was an einer Stelle bleibt, wie über Eck auf zwei Wänden,
+  sagt weiter die Meldung, wie bisher.
+- Lage, Breite und Rang der Bänder sind nach Vorgabe, nicht nachgeschlagen
+  (im TODO): die Norm lässt jede Aufteilung zu, die im Gleichgewicht ist
+  (SIA 262:2025, 4.1.4.2.2).
+
 ## 2026-11-26 · Decke: ein Streifen knapp neben seinem Lager
 
 Beim Prüfen der Richtungen gefunden, ein Fehler von früher.

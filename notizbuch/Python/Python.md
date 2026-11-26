@@ -1,5 +1,5 @@
 ---
-erzeugt: 1e90442ba1f7
+erzeugt: bbcdbd9d2d5b
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -35,6 +35,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.core.wert]] – Benannte Werte im Rechenmodell.
 - [[opencivil.decke]] – Stahlbetondecken nach der Streifenmethode.
     - [[opencivil.decke.aufteilung]] – welcher Teil der Last in welche Richtung geht.
+    - [[opencivil.decke.baender]] – die Bänder, die eine Decke selbst legt.
     - [[opencivil.decke.feld]] – die Schnittkräfte der Platte an einer Stelle.
     - [[opencivil.decke.geometrie]] – Vielecke in der Ebene der Decke.
     - [[opencivil.decke.herleitung]] – wie eine Decke ihre Rechnung aufschreibt.

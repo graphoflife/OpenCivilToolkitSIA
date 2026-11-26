@@ -1,5 +1,5 @@
 ---
-erzeugt: d192f6761219
+erzeugt: 8c605c22e20f
 art: modul
 tags: [modul]
 ---
@@ -38,6 +38,7 @@ Nur die Standardbibliothek: das Werkzeug rechnet auch im Browser.
 ## Module
 
 - [[opencivil.decke.aufteilung]] – welcher Teil der Last in welche Richtung geht.
+- [[opencivil.decke.baender]] – die Bänder, die eine Decke selbst legt.
 - [[opencivil.decke.feld]] – die Schnittkräfte der Platte an einer Stelle.
 - [[opencivil.decke.geometrie]] – Vielecke in der Ebene der Decke.
 - [[opencivil.decke.herleitung]] – wie eine Decke ihre Rechnung aufschreibt.

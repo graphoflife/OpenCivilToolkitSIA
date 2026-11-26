@@ -71,7 +71,16 @@ Kräften je Geschoss und Wand, ohne Verbindung ins Balkensystem.
       die Linienlast als Band von 1 mm, die Einzellast über 1 × 1 m verteilt;
       ein Wechsel der Steifigkeit eines Streifens, näher als 1 cm an einem
       Lager oder einem anderen Wechsel, gilt dort (seit 2026-11-26,
-      `decke/traeger.py`, `WECHSEL`).
+      `decke/traeger.py`, `WECHSEL`); die Bänder, die die Rechnung bei
+      automatischer Aufteilung legt (seit 2026-11-26, `decke/baender.py`):
+      durch jede Stütze in den Richtungen ihrer Platte, von Lager zu Lager,
+      an einer Stütze am Rand ganz in der Platte,
+      und innen an offenen Rändern, nur wo die Streifen quer dazu schon ein
+      Lager haben; 1 m breit, als Vorgabe im Feld der Decke; auf zwei
+      Lagern oder mehr, nie als Kragarm; nie längs über einer Wand; unter
+      jedem Unterzug des Benutzers, die am Rand unter denen über Stützen;
+      ein Rand bis 1e-3 rad neben einer Richtung der Platte legt das Band
+      in diese Richtung.
       Die Norm sagt zu keinem etwas (geprüft am 2026-11-14): nach der
       statischen Methode gilt jede Aufteilung, die im Gleichgewicht ist
       (SIA 262:2025, 4.1.4.2.2), wenn das Verformungsvermögen gesichert ist

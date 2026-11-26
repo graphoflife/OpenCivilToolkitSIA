@@ -1,5 +1,5 @@
 ---
-erzeugt: 83d0a27ad041
+erzeugt: f7e5b29d5726
 art: modul
 tags: [modul]
 ---
@@ -66,6 +66,14 @@ def _last(last: Last) -> list
 ```
 
 Name, Ort und Wert einer Last für die Tabelle.
+
+### _stufe
+
+```python
+def _stufe(u: Unterzug) -> str
+```
+
+Die Stufe eines Unterzugs -- ein Band sagt stattdessen, wo es liegt.
 
 ### _faelle
 
@@ -171,6 +179,7 @@ Je Stütze und Einzellast, was ihr Bereich zusätzlich braucht.
 - `ANNAHME = 'Streifenmethode (Stahlbeton II, 7.2 Platten, Folien 27 bis 39): jede…` – Was die Streifenmethode annimmt.
 - `AUTOMATISCH = f'Automatisch, nach Folie 31 verallgemeinert: je Zelle zweier Feldstr…` – Die automatische Aufteilung in Worten -- die Regel steht in [[opencivil.decke.aufteilung|aufteilung]].
 - `VON_SELBST = 'Die Richtungen {platten} wählt die Rechnung selbst, entlang der Ränd…` – Wie eine Platte ihre Richtungen selbst wählt -- die Regel steht in [[opencivil.decke.richtungen|richtungen]].
+- `BAENDER = 'Die Bänder legt die Rechnung selbst, weil sie automatisch aufteilt: …` – Wo die Rechnung Bänder legt -- die Regel steht in [[opencivil.decke.baender|baender]].
 - `MITTE = '\\alpha_{\\mathrm{kurz}} = \\min\\left(1;\\ \\frac{1}{2} + \\frac{1}…` – Der Anteil in die kürzere Spannweite fern der Lager ([[opencivil.decke.aufteilung#in_der_mitte|in_der_mitte]]).
 - `STREIFEN_IN_XY = '\\begin{aligned} & m = \\frac{M}{b} \\qquad m_x = m \\cdot \\cos^2\\…` – Vom Streifen zur Platte -- die Transformation der Folie 14, rückwärts gelesen ([[opencivil.decke.feld|feld]]).
 - `FLAECHENLAGER = 'p_{\\mathrm{Lager}} = \\frac{R}{l}'` – Ein Flächenlager drückt gleichmässig über seine Breite (Folie 33).
@@ -185,6 +194,7 @@ Je Stütze und Einzellast, was ihr Bereich zusätzlich braucht.
 - [[opencivil.core.latex]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.decke.aufteilung]]
+- [[opencivil.decke.baender]]
 - [[opencivil.decke.feld]]
 - [[opencivil.decke.geometrie]]
 - [[opencivil.decke.modell]]

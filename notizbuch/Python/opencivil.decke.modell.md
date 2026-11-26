@@ -1,5 +1,5 @@
 ---
-erzeugt: 7282cf5ca7f7
+erzeugt: 142af413eba6
 art: modul
 tags: [modul]
 ---
@@ -110,7 +110,8 @@ Stützen und Unterzügen höherer Stufe.
 - `a: Punkt`
 - `b: Punkt`
 - `breite: float`
-- `stufe: int = 1`
+- `stufe: float = 1` – Ganz, ab 1 -- nur die Bänder liegen darunter ([[opencivil.decke.baender|STUFE_RAND]]).
+- `von_selbst: bool = False` – Ein Band, das die Rechnung selbst legt ([[opencivil.decke.baender|baender]]) -- kein Eintrag im Projekt.
 
 ### Zone
 
@@ -230,12 +231,14 @@ class Decke
 - `streifenbreite: float = STREIFENBREITE`
 - `aufteilung: Aufteilung = Aufteilung.AUTOMATISCH`
 - `anteil: float = 0.5` – Bei fester Aufteilung: der Anteil in Richtung 1.
+- `bandbreite: float = BANDBREITE` – Nur bei automatischer Aufteilung: dann legt die Rechnung Bänder so breit ([[opencivil.decke.baender|baender]]).
 
 
 ## Konstanten
 
 - `STREIFENBREITE = 0.25` – Die Breite eines Streifens höchstens, in m -- ein Vorschlag.
 - `VERTEILBREITE = 1.0` – Die Seiten der Fläche, über die eine Einzellast verteilt wird, in m -- ein Vorschlag.
+- `BANDBREITE = 1.0` – Wie breit die Bänder sind, die die Rechnung selbst legt, in m -- ein Vorschlag.
 
 ## Braucht
 
@@ -245,6 +248,7 @@ class Decke
 ## Gebraucht von
 
 - [[opencivil.decke.aufteilung]]
+- [[opencivil.decke.baender]]
 - [[opencivil.decke.feld]]
 - [[opencivil.decke.herleitung]]
 - [[opencivil.decke.lasten]]

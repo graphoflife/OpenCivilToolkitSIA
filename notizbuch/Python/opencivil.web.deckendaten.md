@@ -1,5 +1,5 @@
 ---
-erzeugt: 846e556ec7b2
+erzeugt: 84b275be52b9
 art: modul
 tags: [modul]
 ---
@@ -51,7 +51,9 @@ wählt, die zwei in Grad gegen x; wenn die Decke in Streifen zerfiel,
 dazu `richtungen`, `anteile`
 (Vieleck und Anteil in Richtung 1, in % -- `None`, wo keine Richtung
 trägt), `grenzen` (je Grenze
-zweier Streifen eine Strecke), `unterzuege`, `stuetzenbereiche` und
+zweier Streifen eine Strecke), `unterzuege` -- die des Benutzers --,
+`baender` -- die die Rechnung selbst legte, mit `achse`, `art` und
+`breite` in m --, `stuetzenbereiche` und
 `faelle`: je Lastfall und Kombination `name`, die Last `summe`,
 was davon `daneben` liegt und `nicht_getragen` wird, und was die
 `lager` tragen, in kN, auch `je_lager` ([[opencivil.web.deckendaten#_je_lager|_je_lager]]) -- und
@@ -154,6 +156,7 @@ in der Platte -- in einem L zwei, wo die Grenze die Ecke quert.
 
 - [[opencivil.core.einheiten]]
 - [[opencivil.core.rechenwerk]]
+- [[opencivil.decke.baender]]
 - [[opencivil.decke.feld]]
 - [[opencivil.decke.geometrie]]
 - [[opencivil.decke.modell]]

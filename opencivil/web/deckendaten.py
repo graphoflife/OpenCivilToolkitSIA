@@ -31,6 +31,7 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple
 from opencivil.core.einheiten import KN, KN_PRO_M, KNM, KNM_PRO_M
 from opencivil.core.rechenwerk import Loesung
 from opencivil.decke import feld, schnitt
+from opencivil.decke.baender import art
 from opencivil.decke import geometrie as geo
 from opencivil.decke.geometrie import Punkt
 from opencivil.decke.modell import Aufteilung, Linienlager
@@ -66,7 +67,9 @@ def uebersicht(befund: Optional[Deckenbefund]) -> Dict[str, Any]:
     dazu ``richtungen``, ``anteile``
     (Vieleck und Anteil in Richtung 1, in % -- ``None``, wo keine Richtung
     trägt), ``grenzen`` (je Grenze
-    zweier Streifen eine Strecke), ``unterzuege``, ``stuetzenbereiche`` und
+    zweier Streifen eine Strecke), ``unterzuege`` -- die des Benutzers --,
+    ``baender`` -- die die Rechnung selbst legte, mit ``achse``, ``art`` und
+    ``breite`` in m --, ``stuetzenbereiche`` und
     ``faelle``: je Lastfall und Kombination ``name``, die Last ``summe``,
     was davon ``daneben`` liegt und ``nicht_getragen`` wird, und was die
     ``lager`` tragen, in kN, auch ``je_lager`` (:func:`_je_lager`) -- und
@@ -93,7 +96,11 @@ def uebersicht(befund: Optional[Deckenbefund]) -> Dict[str, Any]:
         "anteile": [{"ecken": _punkte(ecken), "anteil": None if wert is None else round(100.0 * wert, 6)}
                     for ecken, wert in _anteile(e)],
         "grenzen": _grenzen(e),
-        "unterzuege": [{"name": u.name, "ecken": _punkte(u.gebiet)} for u in z.unterzuege],
+        "unterzuege": [{"name": u.name, "ecken": _punkte(u.gebiet)} for u in z.unterzuege
+                       if not u.unterzug.von_selbst],
+        "baender": [{"name": u.name, "ecken": _punkte(u.gebiet), "achse": _punkte([u.unterzug.a, u.unterzug.b]),
+                     "art": art(u.unterzug), "breite": round(u.unterzug.breite, STELLEN)}
+                    for u in z.unterzuege if u.unterzug.von_selbst],
         "stuetzenbereiche": [{"name": name, "ecken": _punkte(ecken)}
                              for name, ecken in z.stuetzenbereiche.items()],
         "faelle": [{"name": f.name, "summe": zahl(f.summe, KN), "daneben": zahl(f.daneben, KN),

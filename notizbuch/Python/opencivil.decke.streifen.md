@@ -1,5 +1,5 @@
 ---
-erzeugt: ffc931a27622
+erzeugt: 5dd04af5b62a
 art: modul
 tags: [modul]
 ---
@@ -222,7 +222,7 @@ sein Gebiet -- das Rechteck, das er belegt.
 - `richtung: Richtung`
 - `von: float`
 - `bis: float`
-- `stufe: int = 0`
+- `stufe: float = 0`
 - `unterzug: Optional[Unterzug] = None`
 - `gebiet: Tuple[Punkt, ...] = ()`
 - `traeger: List[Traeger] = field(default_factory=list)`
@@ -321,6 +321,14 @@ def traeger(self) -> List[Traeger]
 def richtungen_der_platte(p: Platte) -> Tuple[Richtung, Richtung]
 ```
 
+### nach_richtungen
+
+```python
+def nach_richtungen(platten: Sequence[Platte]) -> List[Tuple[Tuple[Richtung, Richtung], List[Platte]]]
+```
+
+Die Platten nach ihren zwei Richtungen: je Paar die Platten, die in beiden parallel tragen, in ihrer Folge.
+
 ### stuetzenbereich
 
 ```python
@@ -340,6 +348,17 @@ def zerlegen(decke: Decke) -> Zerlegung
 ```
 
 Die Streifen, ihre Träger und deren Lager -- oder, was dem im Weg steht.
+
+### traeger_eines_unterzugs
+
+```python
+def traeger_eines_unterzugs(u: Unterzug, decke: Decke, stuecke: Dict[str, List[List[Punkt]]]) -> List[Traeger]
+```
+
+Die Träger, die `u` in `decke` wäre, mit den Lagern, die
+[[opencivil.decke.streifen#zerlegen|zerlegen]] ihnen gäbe -- für die Bänder, die sich ihre Lager
+suchen ([[opencivil.decke.baender|baender]]). `u` gehört nicht zu
+`decke`; `stuecke` sind ihre Platten in Dreiecken.
 
 ### _feldstreifen
 
@@ -412,10 +431,10 @@ das hier ein zweites Mal, mit anderen Sätzen, und griff nie. Ebenso,
 dass die zwei Richtungen einer Platte mindestens 5° auseinander liegen:
 bis 2026-11-26 hielt das erst hier die Rechnung an.
 
-### _ueberlappen
+### ueberlappen
 
 ```python
-def _ueberlappen(a: Sequence[Sequence[Punkt]], b: Sequence[Sequence[Punkt]]) -> bool
+def ueberlappen(a: Sequence[Sequence[Punkt]], b: Sequence[Sequence[Punkt]]) -> bool
 ```
 
 Ob sich zwei Flächen aus konvexen Stücken mehr als berühren.
@@ -439,6 +458,7 @@ Ob sich zwei Flächen aus konvexen Stücken mehr als berühren.
 ## Gebraucht von
 
 - [[opencivil.decke.aufteilung]]
+- [[opencivil.decke.baender]]
 - [[opencivil.decke.feld]]
 - [[opencivil.decke.herleitung]]
 - [[opencivil.decke.lasten]]

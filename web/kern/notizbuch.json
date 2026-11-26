@@ -4587,6 +4587,32 @@
       ]
     },
     {
+      "name": "opencivil.decke.baender",
+      "pfad": "Python/opencivil.decke.baender.md",
+      "art": "modul",
+      "kurz": "die Bänder, die eine Decke selbst legt.",
+      "stichworte": [
+        "gelegt",
+        "art",
+        "offene_raender",
+        "_ueber_stuetze",
+        "_in_der_platte",
+        "_am_rand",
+        "_bis_zum_lager",
+        "_waende_laengs",
+        "_quer_gehalten",
+        "_gepruft",
+        "_lager",
+        "_ueber_platten",
+        "_richtungen_bei",
+        "_ueberdeckt",
+        "_band",
+        "_namen",
+        "_auf",
+        "_laengs_zu"
+      ]
+    },
+    {
       "name": "opencivil.decke.feld",
       "pfad": "Python/opencivil.decke.feld.md",
       "art": "modul",
@@ -4637,6 +4663,7 @@
         "strecke_im_vieleck",
         "schnittstellen",
         "kreuzung",
+        "deckung",
         "rechteck",
         "achsrechteck",
         "vereinigt"
@@ -4651,6 +4678,7 @@
         "schreiben",
         "_lasten",
         "_last",
+        "_stufe",
         "_faelle",
         "_ansaetze",
         "_fall",
@@ -4749,6 +4777,7 @@
         "raender",
         "gemeinsam",
         "_gruppen",
+        "kanten",
         "_abstand"
       ]
     },
@@ -4805,8 +4834,10 @@
         "Zerlegung.unterzuege",
         "Zerlegung.traeger",
         "richtungen_der_platte",
+        "nach_richtungen",
         "stuetzenbereich",
         "zerlegen",
+        "traeger_eines_unterzugs",
         "_feldstreifen",
         "_traeger",
         "_abschnitte",
@@ -4814,7 +4845,7 @@
         "pressung",
         "_an_derselben_stelle",
         "pruefen",
-        "_ueberlappen"
+        "ueberlappen"
       ]
     },
     {

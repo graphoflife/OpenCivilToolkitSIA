@@ -50,7 +50,7 @@ from opencivil.core.einheiten import GRAD, KN, KN_PRO_M, KN_PRO_M2, M, MM, PROZE
 from opencivil.decke.feld import GROESSEN
 from opencivil.decke.geometrie import Punkt
 from opencivil.decke.schnitt import BALKENGROESSEN
-from opencivil.decke.modell import VERTEILBREITE, Aufteilung
+from opencivil.decke.modell import BANDBREITE, VERTEILBREITE, Aufteilung
 from opencivil.projekt.eintraege import BauteilEintrag, Beschreibung
 from opencivil.projekt.faelle import LastfallEintrag, LastkombinationEintrag, MitFaellen, kennung_von
 from opencivil.projekt.lesen import ProjektFehler, bereich, einer_von, lesen
@@ -306,6 +306,9 @@ class DeckeEintrag(MitFaellen, BauteilEintrag):
     aufteilung: Aufteilung = Aufteilung.AUTOMATISCH
     anteil: float = bereich(50.0, heisst="Anteil in Richtung 1", einheit=PROZENT, ab=0.0, bis=100.0)
     """Nur bei fester Aufteilung."""
+
+    bandbreite: float = bereich(BANDBREITE, heisst="Breite der Bänder", einheit=M, ueber=0.0)
+    """Nur bei automatischer Aufteilung (:mod:`~opencivil.decke.baender`)."""
 
     beschreibung: str = ""
     """Freier Text -- geht in keine Rechnung ein."""

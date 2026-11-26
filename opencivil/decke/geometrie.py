@@ -344,6 +344,25 @@ def kreuzung(a: Punkt, b: Punkt, p: Punkt, q: Punkt) -> Optional[Tuple[float, fl
     return (w[0] * e[1] - w[1] * e[0]) / nenner, (w[0] * d[1] - w[1] * d[0]) / nenner
 
 
+def deckung(k: Tuple[Punkt, Punkt], m: Tuple[Punkt, Punkt], nah: float) -> Optional[Tuple[float, float]]:
+    """
+    Welches Stück der Strecke ``k`` die Strecke ``m`` deckt, wenn beide auf
+    einer Geraden liegen -- bis ``nah`` daneben --, in m ab dem Anfang von
+    ``k``. ``None``, wenn sie sich nur kreuzen, an einer Ecke treffen oder
+    das Stück nicht länger als ``nah`` ist.
+    """
+    (a, b), (c, d) = k, m
+    laenge = math.dist(a, b)
+    if laenge <= nah:
+        return None
+    n = ((b[0] - a[0]) / laenge, (b[1] - a[1]) / laenge)
+    if any(abs((p[0] - a[0]) * n[1] - (p[1] - a[1]) * n[0]) > nah for p in (c, d)):
+        return None
+    s, t = sorted((p[0] - a[0]) * n[0] + (p[1] - a[1]) * n[1] for p in (c, d))
+    von, bis = max(0.0, s), min(laenge, t)
+    return (von, bis) if bis - von > nah else None
+
+
 def rechteck(a: Punkt, b: Punkt, breite_: float) -> List[Punkt]:
     """Das Rechteck um die Strecke ``a → b``, je ``breite_/2`` zu beiden Seiten -- im Gegenuhrzeigersinn."""
     dx, dy = b[0] - a[0], b[1] - a[1]

@@ -1,5 +1,5 @@
 ---
-erzeugt: 0e29ecb8cb5d
+erzeugt: 922087579338
 art: modul
 tags: [modul]
 ---
@@ -306,6 +306,7 @@ stimmt, steht in ihren Meldungen, und die anderen Bauteile rechnen weiter.
 - `streifenbreite: float = bereich(0.25, heisst='Streifenbreite', einheit=M, ueber=0.0)`
 - `aufteilung: Aufteilung = Aufteilung.AUTOMATISCH`
 - `anteil: float = bereich(50.0, heisst='Anteil in Richtung 1', einheit=PROZENT, ab=0.0,…` – Nur bei fester Aufteilung.
+- `bandbreite: float = bereich(BANDBREITE, heisst='Breite der Bänder', einheit=M, ueber=0.0)` – Nur bei automatischer Aufteilung ([[opencivil.decke.baender|baender]]).
 - `beschreibung: str = ''` – Freier Text -- geht in keine Rechnung ein.
 
 #### DeckeEintrag.materialien

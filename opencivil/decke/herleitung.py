@@ -39,7 +39,8 @@ from opencivil.core.protokoll import Protokoll
 from opencivil.decke import feld
 from opencivil.decke import geometrie as geo
 from opencivil.decke.aufteilung import GANZ_AB
-from opencivil.decke.modell import Aufteilung, Decke, Flaechenlast, Last, Linienlast, Punktlast
+from opencivil.decke.baender import art
+from opencivil.decke.modell import Aufteilung, Decke, Flaechenlast, Last, Linienlast, Punktlast, Unterzug
 from opencivil.decke.rechnung import Ergebnis, Fallergebnis, lagerverlauf, spitzen
 from opencivil.decke.streifen import Streifen, Traeger, Zerlegung, richtungen_der_platte
 from opencivil.stabwerk.verlauf import extremwerte
@@ -73,6 +74,16 @@ VON_SELBST = (
     "parallel zu den meisten Metern Rand – ein Rand quer dazu zählt mit, denn Richtung 2 steht "
     "rechtwinklig darauf. Platten, die aneinanderstossen, bekommen dieselben Richtungen, damit "
     "die Streifen über die Fuge laufen (nach Vorgabe; die Norm lässt jede Aufteilung zu, die im "
+    "Gleichgewicht ist, SIA 262:2025, 4.1.4.2.2).")
+
+#: Wo die Rechnung Bänder legt -- die Regel steht in :mod:`~opencivil.decke.baender`.
+BAENDER = (
+    "Die Bänder legt die Rechnung selbst, weil sie automatisch aufteilt: durch jede Stütze in den "
+    "Richtungen der Platte, von Lager zu Lager, und innen an jedem offenen Rand – einem freien "
+    "Rand, einem Lochrand, einer Fuge zu einer Platte mit anderen Richtungen –, wo die Streifen "
+    "quer dazu schon ein Lager haben. Jedes Band liegt auf mindestens zwei Lagern; ein Unterzug "
+    "oder eine Wand längs ersetzt es. Ein Band liegt auf den Unterzügen, die es kreuzt, und ein "
+    "Band am Rand auf einem über Stützen (nach Vorgabe; die Norm lässt jede Aufteilung zu, die im "
     "Gleichgewicht ist, SIA 262:2025, 4.1.4.2.2).")
 
 #: Der Anteil in die kürzere Spannweite fern der Lager (:func:`~opencivil.decke.aufteilung.in_der_mitte`).
@@ -192,10 +203,17 @@ def _lager(p: Protokoll, decke: Decke, e: Optional[Ergebnis]) -> None:
                            masse, "von Hand" if s.lx is not None else "von selbst"])
         p.tabelle(["Stütze", "Ort", Mathe(r"b_x \times b_y\ [\mathrm{mm}]"),
                    Mathe(r"l_x \times l_y\ [\mathrm{m}]"), "Stützenbereich"], zeilen, titel="Stützen")
-    if decke.unterzuege:
+    eigene = [u for u in decke.unterzuege if not u.von_selbst]
+    if eigene:
         p.tabelle(["Unterzug", "von", "bis", Mathe(r"b\ [\mathrm{m}]"), "Stufe"],
-                  [[u.name, _ort(u.a), _ort(u.b), Mathe(fest(u.breite, 2)), str(u.stufe)]
-                   for u in decke.unterzuege], titel="Versteckte Unterzüge")
+                  [[u.name, _ort(u.a), _ort(u.b), Mathe(fest(u.breite, 2)), f"{u.stufe:g}"]
+                   for u in eigene], titel="Versteckte Unterzüge")
+    baender = [u for u in decke.unterzuege if u.von_selbst]
+    if baender:
+        p.tabelle(["Band", "von", "bis", Mathe(r"b\ [\mathrm{m}]"), "wo"],
+                  [[u.name, _ort(u.a), _ort(u.b), Mathe(fest(u.breite, 2)), art(u)] for u in baender],
+                  titel="Bänder, von der Rechnung gelegt")
+        p.text(BAENDER)
 
 
 def _lasten(p: Protokoll, decke: Decke) -> None:
@@ -246,10 +264,17 @@ def _streifen(p: Protokoll, e: Ergebnis) -> None:
            "geteilt wird an jeder Ecke einer Platte, jedem Rand eines Unterzugs und Stützenbereichs "
            "und jedem Ende eines Linienlagers.")
     if z.unterzuege:
-        reihe = [f"{u.name} (Stufe {u.stufe})" for u in sorted(z.unterzuege, key=lambda s: s.stufe)]
-        p.text("Gerechnet wird von unten nach oben: zuerst die Feldstreifen, dann die Unterzüge, "
-               "jeder nach denen tieferer Stufe: " + ", ".join(reihe) + ". Was ein Träger an "
+        reihe = [f"{u.name} ({_stufe(u.unterzug)})" for u in sorted(z.unterzuege, key=lambda s: s.stufe)]
+        was = " und ".join(x for x, da in (("die Bänder", True), ("die Unterzüge", False))
+                           if any(u.unterzug.von_selbst is da for u in z.unterzuege))
+        p.text(f"Gerechnet wird von unten nach oben: zuerst die Feldstreifen, dann {was}, jeder "
+               "Träger nach denen tieferer Stufe: " + ", ".join(reihe) + ". Was ein Träger an "
                "Lagerkraft abgibt, ist die Last dessen, auf dem er liegt.")
+
+
+def _stufe(u: Unterzug) -> str:
+    """Die Stufe eines Unterzugs -- ein Band sagt stattdessen, wo es liegt."""
+    return f"Band {art(u)}" if u.von_selbst else f"Stufe {u.stufe:g}"
 
 
 def _aufteilung(p: Protokoll, decke: Decke) -> None:

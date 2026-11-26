@@ -98,7 +98,7 @@ def modell_von(eintrag: DeckeEintrag) -> Tuple[Decke, List[Meldung]]:
                               for lf in eintrag.lastfaelle],
                   kombinationen=[Kombination(name, je_fall) for name, je_fall in faktoren],
                   streifenbreite=eintrag.si("streifenbreite"), aufteilung=eintrag.aufteilung,
-                  anteil=eintrag.si("anteil"))
+                  anteil=eintrag.si("anteil"), bandbreite=eintrag.si("bandbreite"))
     return decke, meldungen
 
 

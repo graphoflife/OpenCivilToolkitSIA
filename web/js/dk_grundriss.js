@@ -105,6 +105,16 @@ function schwerpunkt(punkte) {
 }
 
 /**
+ * Wo der Name eines Unterzugs oder Bands steht, im Bild: bei einem Viertel
+ * seiner Achse ``[a, b]`` -- in der Mitte stünde er oft auf dem der Platte
+ * oder dem eines kreuzenden Bands, am Ende auf dem einer Stütze.
+ */
+function viertel(v, [a, b]) {
+  const [p, q] = [a, b].map((x) => nachBild(v, x));
+  return [p[0] + (q[0] - p[0]) / 4 + 6, p[1] + (q[1] - p[1]) / 4 - 6];
+}
+
+/**
  * Wo die Beschriftung eines Umrisses steht: in seinem Schwerpunkt -- liegt
  * der draussen, wie in manchem L, im grössten Eckdreieck, dessen
  * Schwerpunkt drin liegt.
@@ -292,9 +302,13 @@ export function grundriss(v, decke, daten, {
     if (band) traeger.append(svgEl('path', { d: pfad(v, band), class: 'dk-unterzug-band' }));
     traeger.append(mitTitel(svgEl('path', { d: pfad(v, punkte, false), class: klasse('dk-unterzug', u.kennung) }),
       [`Unterzug ${u.kennung}: b = ${zahlText(u.breite, 2)} m, Stufe ${u.stufe}`, ...texte(u.kennung)]));
-    // Bei einem Viertel: in der Mitte stünde der Name oft auf dem der Platte, am Ende auf dem einer Stütze.
-    const [p, q] = punkte.map((x) => nachBild(v, x));
-    namen.append(text([p[0] + (q[0] - p[0]) / 4 + 6, p[1] + (q[1] - p[1]) / 4 - 6], u.kennung, 'dk-name ist-klein'));
+    namen.append(text(viertel(v, punkte), u.kennung, 'dk-name ist-klein'));
+  }
+  // Die Bänder, die die Rechnung selbst legte: fein gestrichelt, ohne Eintrag im Projekt.
+  for (const b of daten?.gerechnet ? daten.baender : []) {
+    traeger.append(mitTitel(svgEl('path', { d: pfad(v, b.ecken), class: 'dk-band' }),
+      [`Band ${b.name} ${b.art}: b = ${zahlText(b.breite, 2)} m – von der Rechnung gelegt`]));
+    namen.append(text(viertel(v, b.achse), b.name, 'dk-name ist-klein ist-band'));
   }
 
   const lager = svgEl('g');

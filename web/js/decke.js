@@ -56,13 +56,14 @@ const HILFE = {
       ['automatisch', 'je Stelle die Richtung, die Lager hat – trägt keine, fällt die Last dort aus; tragen beide, nahe einem Rand (ein Viertel der kürzeren Spannweite) zu ihm, in den Ecken je zur Hälfte, sonst mehr in die kürzere Spannweite – je ungleicher die Spannweiten, desto mehr; Folie 31, verallgemeinert nach Vorgabe'],
       ['fest', 'überall derselbe Anteil in Richtung 1'],
       ['Zonen', 'gehen beidem vor: dort gilt ihr Anteil – zu zeichnen im Fenster mit «Zone»'],
+      ['Bänder', 'nur bei «automatisch»: die Rechnung legt sie selbst – durch jede Stütze, von Lager zu Lager, und an freien Rändern und Lochrändern, wo die Streifen quer dazu schon ein Lager haben. Ein Band liegt auf zwei Lagern oder mehr; ein eigener Unterzug oder eine Wand längs ersetzt es. Im Grundriss fein gestrichelt, nach Vorgabe'],
     ],
     formel: 'q₁ = α · q   q₂ = (1 − α) · q',
   },
   ergebnisse: {
     zeilen: [
       ['Fall', 'ein Lastfall oder eine Kombination – gerechnet wird jeder Fall'],
-      ['Wo', 'über die ganze Platte, längs eines Schnitts oder in einem Unterzug – längs wie an einem Balken, positive Werte unten, die Stelle s ab seinem Anfang. Ein Schnitt zeigt die Lager, die er kreuzt, und die Unterzüge als Band'],
+      ['Wo', 'über die ganze Platte, längs eines Schnitts oder in einem Unterzug – längs wie an einem Balken, positive Werte unten, die Stelle s ab seinem Anfang. Ein Schnitt zeigt die Lager, die er kreuzt, und die Unterzüge und Bänder, durch die er läuft, als Fläche'],
       ['M, V', 'Moment und Querkraft eines Unterzugs über seine ganze Breite, in kNm und kN – wie er als Träger gerechnet ist, auf seinen Lagern'],
       ['m_x, m_y', 'die Momente je Meter in x und y, positiv mit Zug unten – bei schiefen Streifen aus m_η umgerechnet'],
       ['m_xy', 'das Drillmoment je Meter: nur, wo ein Streifen schief zu x und y trägt'],
@@ -177,7 +178,15 @@ function streifenInhalt(decke) {
       wert: decke.anteil, schritt: 10, angabe: feldangabe('decke', 'anteil'),
       titel: 'Dieser Anteil der Last geht in Richtung 1, der Rest in Richtung 2',
       beiAenderung: (w) => aendern((d) => { d.anteil = w; }),
-    }), feldangabe('decke', 'anteil').einheit) : null,
+    }), feldangabe('decke', 'anteil').einheit) : feld(feldangabe('decke', 'bandbreite').heisst, zahlfeld({
+      wert: decke.bandbreite, schritt: 0.25, angabe: feldangabe('decke', 'bandbreite'),
+      titel: 'So breit sind die Bänder, die die Rechnung an offenen Rändern und über Stützen legt',
+      beiAenderung: (w) => aendern((d) => { d.bandbreite = w; }),
+    }), feldangabe('decke', 'bandbreite').einheit),
+    decke.aufteilung === 'fest' ? null : el('p.karte-hinweis', {
+      text: 'Bänder legt die Rechnung selbst: durch jede Stütze und an freien Rändern und Lochrändern – '
+        + 'fein gestrichelt im Grundriss.',
+    }),
     el('p.karte-hinweis', { text: 'In einer Zone gilt ihr eigener Anteil – gezeichnet im Fenster mit «Zone».' }),
   ].filter(Boolean);
 }
@@ -230,7 +239,8 @@ const KAPITEL = [
         stand: (d) => ({
           an: true,
           text: `${zahlText(d.streifenbreite, 2)} m · ${d.aufteilung === 'fest' ? anteilText(d.anteil)
-            : AUFTEILUNGEN().find((x) => x.wert === d.aufteilung)?.beschriftung || d.aufteilung}`,
+            : `${AUFTEILUNGEN().find((x) => x.wert === d.aufteilung)?.beschriftung || d.aufteilung} · `
+              + `Bänder ${zahlText(d.bandbreite, 2)} m`}`,
         }),
       },
     ],
