@@ -1,5 +1,5 @@
 ---
-erzeugt: 2dbd81474d3a
+erzeugt: ddc88e563d2a
 art: modul
 tags: [modul]
 ---
@@ -43,6 +43,7 @@ Wo eine Zahl liegen muss -- jede Grenze darf fehlen, `ueber` und
 - `bis: Optional[float] = None`
 - `unter: Optional[float] = None`
 - `bis_feld: Optional[str] = None` – Ein Feld desselben Eintrags, dessen Zahl diese nicht uebersteigen darf: α_min nicht ueber α_max. Die Regel steht so einmal, beim kleineren Feld. Die Maske weist sie an beiden Feldern ab ([[opencivil.projekt.lesen#feldangaben|feldangaben]]), die Pruefung vor dem Rechnen haelt eine Datei damit auf -- mit denselben Worten ([[opencivil.core.bereich#Bereich.gegen|gegen]]).
+- `quer_zu: Optional[Tuple[str, float]] = None` – Ein Feld desselben Eintrags mit einem Winkel in Grad, und um wie viel Grad dieser hier mindestens von ihm abweicht -- als Linie: 180° weiter ist dieselbe. Die zwei Richtungen einer Deckenplatte etwa liegen mindestens 5° auseinander, sonst trügen sie kaum anders als eine. Wie bei [[opencivil.core.bereich#Bereich|bis_feld]] steht die Regel einmal, an einem der beiden Felder, und die Maske weist sie an beiden ab ([[opencivil.core.bereich#Bereich.quer|quer]]).
 
 #### Bereich.grund
 
@@ -79,6 +80,26 @@ def grund_gegen(self, wert: Optional[float], anderer: Bereich, grenze: Optional[
 
 Was [[opencivil.core.bereich#Bereich|bis_feld]] verletzt -- die Zahl ueber der des anderen
 Feldes --, als Satz mit Punkt; leer, wenn nichts.
+
+#### Bereich.quer
+
+```python
+def quer(self, anderer: Bereich) -> Tuple[str, str]
+```
+
+Was [[opencivil.core.bereich#Bereich|quer_zu]] verlangt, an diesem Feld und am anderen
+(`anderer`): «Richtung 2 muss um mindestens 5° von Richtung 1
+abweichen – 0° und 180° sind dieselbe Linie», und umgekehrt.
+
+#### Bereich.grund_quer
+
+```python
+def grund_quer(self, wert: Optional[float], anderer: Bereich, winkel: Optional[float]) -> str
+```
+
+Was [[opencivil.core.bereich#Bereich|quer_zu]] verletzt -- `wert` als Linie zu nahe an
+`winkel`, dem Winkel des anderen Feldes --, als Satz mit Punkt;
+leer, wenn nichts.
 
 #### Bereich.zahl
 

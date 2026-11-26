@@ -19902,6 +19902,8 @@ $$
 
 Das Eigengewicht je m² ist ρ · g · h, mit der Dichte des Stahlbetons und g = 10 m/s².
 
+Die Richtungen der Platte «P1» wählt die Rechnung selbst, entlang der Ränder: Richtung 1 läuft parallel zu den meisten Metern Rand – ein Rand quer dazu zählt mit, denn Richtung 2 steht rechtwinklig darauf. Platten, die aneinanderstossen, bekommen dieselben Richtungen, damit die Streifen über die Fuge laufen (nach Vorgabe; die Norm lässt jede Aufteilung zu, die im Gleichgewicht ist, SIA 262:2025, 4.1.4.2.2).
+
 **Linienlager**
 
 | Linienlager | von | bis | $L\ [\mathrm{m}]$ | vertikal | eingespannt |
@@ -20058,6 +20060,8 @@ $$
 | P3 | $12.00$ | $200$ | C30/37 | $33620$ | $5.00$ | $0.0,\ 71.6$ |
 
 Das Eigengewicht je m² ist ρ · g · h, mit der Dichte des Stahlbetons und g = 10 m/s².
+
+Die Richtungen der Platten «P1», «P2» wählt die Rechnung selbst, entlang der Ränder: Richtung 1 läuft parallel zu den meisten Metern Rand – ein Rand quer dazu zählt mit, denn Richtung 2 steht rechtwinklig darauf. Platten, die aneinanderstossen, bekommen dieselben Richtungen, damit die Streifen über die Fuge laufen (nach Vorgabe; die Norm lässt jede Aufteilung zu, die im Gleichgewicht ist, SIA 262:2025, 4.1.4.2.2).
 
 **Linienlager**
 

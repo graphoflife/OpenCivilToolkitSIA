@@ -2,8 +2,9 @@
 opencivil/decke/rechnung.py -- die Streifenmethode, Fall für Fall.
 
 VERANTWORTUNG:
-Die ganze Rechnung einer Decke: zerlegen (:mod:`~opencivil.decke.streifen`),
-die Last aufteilen (:mod:`~opencivil.decke.aufteilung`), je Lastfall auf die
+Die ganze Rechnung einer Decke: die Richtungen, wo eine Platte sie selbst
+wählt (:mod:`~opencivil.decke.richtungen`), zerlegen
+(:mod:`~opencivil.decke.streifen`), die Last aufteilen (:mod:`~opencivil.decke.aufteilung`), je Lastfall auf die
 Streifen legen (:mod:`~opencivil.decke.lasten`), und dann je Lastfall und
 Kombination die Träger rechnen -- von unten nach oben:
 
@@ -38,6 +39,7 @@ from opencivil.decke.aufteilung import Aufteilungen, aufteilen
 from opencivil.decke.geometrie import Punkt
 from opencivil.decke.lasten import Belastung, belasten, kn, kombiniert
 from opencivil.decke.modell import Decke, Linienlager
+from opencivil.decke.richtungen import festgelegt
 from opencivil.decke.streifen import (
     LINIENLAGER, STUETZE, UNTERZUG, Auflager, Streifen, Traeger, Warum, Zerlegung, pressung, zerlegen,
 )
@@ -168,6 +170,8 @@ class Fallergebnis:
 @dataclass
 class Ergebnis:
     decke: Decke
+    """Wie sie gerechnet ist -- mit den Richtungen, die ihre Platten selbst wählten."""
+
     zerlegung: Zerlegung
     aufteilungen: Optional[Aufteilungen]
     faelle: List[Fallergebnis]
@@ -208,7 +212,11 @@ class Ergebnis:
 
 
 def rechnen(decke: Decke) -> Ergebnis:
-    """Die Decke nach der Streifenmethode, je Lastfall und Kombination."""
+    """
+    Die Decke nach der Streifenmethode, je Lastfall und Kombination -- vorher
+    wählt jede Platte mit ``von_selbst`` ihre Richtungen (:func:`festgelegt`).
+    """
+    decke = festgelegt(decke)
     zerlegung = zerlegen(decke)
     meldungen = list(zerlegung.meldungen)
     # Ohne Streifen ist nichts zu rechnen: noch keine Platte, oder es gäbe zu viele.

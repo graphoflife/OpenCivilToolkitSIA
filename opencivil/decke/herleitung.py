@@ -67,6 +67,14 @@ AUTOMATISCH = (
     "doppelt (nach Vorgabe; die Norm lässt jede Aufteilung zu, die im Gleichgewicht ist, "
     "SIA 262:2025, 4.1.4.2.2).")
 
+#: Wie eine Platte ihre Richtungen selbst wählt -- die Regel steht in :mod:`~opencivil.decke.richtungen`.
+VON_SELBST = (
+    "Die Richtungen {platten} wählt die Rechnung selbst, entlang der Ränder: Richtung 1 läuft "
+    "parallel zu den meisten Metern Rand – ein Rand quer dazu zählt mit, denn Richtung 2 steht "
+    "rechtwinklig darauf. Platten, die aneinanderstossen, bekommen dieselben Richtungen, damit "
+    "die Streifen über die Fuge laufen (nach Vorgabe; die Norm lässt jede Aufteilung zu, die im "
+    "Gleichgewicht ist, SIA 262:2025, 4.1.4.2.2).")
+
 #: Der Anteil in die kürzere Spannweite fern der Lager (:func:`~opencivil.decke.aufteilung.in_der_mitte`).
 MITTE = (r"\alpha_{\mathrm{kurz}} = \min\left(1;\ \frac{1}{2} + \frac{1}{2} \cdot "
          r"\frac{l_{\mathrm{lang}} / l_{\mathrm{kurz}} - 1}{" + fest(GANZ_AB, 1) + r" - 1}\right)")
@@ -156,6 +164,10 @@ def _platten(p: Protokoll, system: "Deckensystem", decke: Decke) -> None:
                    Mathe(r"\varphi_1,\ \varphi_2\ [°]")], zeilen, titel="Platten")
         p.text("Das Eigengewicht je m² ist ρ · g · h, mit der Dichte des Stahlbetons und "
                "g = 10 m/s².")
+    selbst = [f"«{platte.name}»" for platte in decke.platten if platte.von_selbst]
+    if selbst:
+        p.text(VON_SELBST.format(platten=(f"der Platte {selbst[0]}" if len(selbst) == 1
+                                          else f"der Platten {', '.join(selbst)}")))
 
 
 def _lager(p: Protokoll, decke: Decke, e: Optional[Ergebnis]) -> None:

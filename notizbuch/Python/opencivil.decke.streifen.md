@@ -1,5 +1,5 @@
 ---
-erzeugt: c0df48bfa7b1
+erzeugt: ffc931a27622
 art: modul
 tags: [modul]
 ---
@@ -408,7 +408,9 @@ Nur, was kein Feld sagen kann: wie die Teile liegen und zueinander
 stehen, und der Elastizitätsmodul, der vom Beton kommt. Wo eine Zahl
 liegen muss -- eine Dicke, eine Breite, ein Anteil --, prüft ihr Feld
 vor dem Rechnen ([[opencivil.projekt.decke]]). Bis 2026-11-20 stand
-das hier ein zweites Mal, mit anderen Sätzen, und griff nie.
+das hier ein zweites Mal, mit anderen Sätzen, und griff nie. Ebenso,
+dass die zwei Richtungen einer Platte mindestens 5° auseinander liegen:
+bis 2026-11-26 hielt das erst hier die Rechnung an.
 
 ### _ueberlappen
 

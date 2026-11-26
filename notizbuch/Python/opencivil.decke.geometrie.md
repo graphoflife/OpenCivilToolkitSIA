@@ -1,5 +1,5 @@
 ---
-erzeugt: 63393864b236
+erzeugt: 9e2367fc0da1
 art: modul
 tags: [modul]
 ---
@@ -221,6 +221,7 @@ Intervalle, die sich berühren oder überlappen, zu einem.
 - [[opencivil.decke.lasten]]
 - [[opencivil.decke.modell]]
 - [[opencivil.decke.rechnung]]
+- [[opencivil.decke.richtungen]]
 - [[opencivil.decke.schnitt]]
 - [[opencivil.decke.streifen]]
 - [[opencivil.projekt.aufbau.decke]]

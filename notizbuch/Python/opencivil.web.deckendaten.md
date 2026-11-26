@@ -1,5 +1,5 @@
 ---
-erzeugt: 5ec822f7e3b8
+erzeugt: 846e556ec7b2
 art: modul
 tags: [modul]
 ---
@@ -46,7 +46,9 @@ def uebersicht(befund: Optional[Deckenbefund]) -> Dict[str, Any]
 ```
 
 `gerechnet` und `meldungen` (`{text, elemente, fehler}`) immer;
-wenn die Decke in Streifen zerfiel, dazu `richtungen`, `anteile`
+wenn sie rechnete, `von_selbst`: je Platte, die ihre Richtungen selbst
+wählt, die zwei in Grad gegen x; wenn die Decke in Streifen zerfiel,
+dazu `richtungen`, `anteile`
 (Vieleck und Anteil in Richtung 1, in % -- `None`, wo keine Richtung
 trägt), `grenzen` (je Grenze
 zweier Streifen eine Strecke), `unterzuege`, `stuetzenbereiche` und

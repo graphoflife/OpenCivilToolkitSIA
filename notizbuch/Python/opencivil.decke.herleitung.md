@@ -1,5 +1,5 @@
 ---
-erzeugt: d3033bf1d622
+erzeugt: 83d0a27ad041
 art: modul
 tags: [modul]
 ---
@@ -170,6 +170,7 @@ Je Stütze und Einzellast, was ihr Bereich zusätzlich braucht.
 
 - `ANNAHME = 'Streifenmethode (Stahlbeton II, 7.2 Platten, Folien 27 bis 39): jede…` – Was die Streifenmethode annimmt.
 - `AUTOMATISCH = f'Automatisch, nach Folie 31 verallgemeinert: je Zelle zweier Feldstr…` – Die automatische Aufteilung in Worten -- die Regel steht in [[opencivil.decke.aufteilung|aufteilung]].
+- `VON_SELBST = 'Die Richtungen {platten} wählt die Rechnung selbst, entlang der Ränd…` – Wie eine Platte ihre Richtungen selbst wählt -- die Regel steht in [[opencivil.decke.richtungen|richtungen]].
 - `MITTE = '\\alpha_{\\mathrm{kurz}} = \\min\\left(1;\\ \\frac{1}{2} + \\frac{1}…` – Der Anteil in die kürzere Spannweite fern der Lager ([[opencivil.decke.aufteilung#in_der_mitte|in_der_mitte]]).
 - `STREIFEN_IN_XY = '\\begin{aligned} & m = \\frac{M}{b} \\qquad m_x = m \\cdot \\cos^2\\…` – Vom Streifen zur Platte -- die Transformation der Folie 14, rückwärts gelesen ([[opencivil.decke.feld|feld]]).
 - `FLAECHENLAGER = 'p_{\\mathrm{Lager}} = \\frac{R}{l}'` – Ein Flächenlager drückt gleichmässig über seine Breite (Folie 33).

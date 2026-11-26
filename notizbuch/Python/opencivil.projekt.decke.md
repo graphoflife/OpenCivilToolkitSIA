@@ -1,5 +1,5 @@
 ---
-erzeugt: 535c22485814
+erzeugt: 0e29ecb8cb5d
 art: modul
 tags: [modul]
 ---
@@ -92,15 +92,32 @@ class DeckenplatteEintrag(Beschreibung)
 
 Eine Platte: ihr Umriss, ihre Dicke und ihr Beton -- E_cm und die Dichte
 des Stahlbetons von ihm, wie bei einem Stab des Balkensystems -- und die
-zwei Richtungen, in denen ihre Streifen tragen.
+zwei Richtungen, in denen ihre Streifen tragen: von selbst entlang ihrer
+Ränder ([[opencivil.decke.richtungen]]) oder von Hand. Von Hand liegen
+sie mindestens 5° auseinander, sonst trügen sie kaum anders als eine --
+das weist schon das Feld ab.
 
 - `kennung: str = ''`
 - `knoten: List[str] = field(default_factory=list)`
 - `h: float = bereich(240.0, heisst='Dicke h', einheit=MM, ueber=0.0)`
 - `beton: str = ''` – Die Kennung des Betons im Projekt (`b1`).
-- `richtung_1: float = bereich(0.0, heisst='Richtung 1', einheit=GRAD, ab=-180.0, bis=180.0)`
-- `richtung_2: float = bereich(90.0, heisst='Richtung 2', einheit=GRAD, ab=-180.0, bis=180.0)`
+- `richtungen_von_hand: bool = False`
+- `richtung_1: float = bereich(0.0, heisst='Richtung 1', einheit=GRAD, ab=-180.0, bis=180.0)` – Nur mit `richtungen_von_hand`, wie `richtung_2`.
+- `richtung_2: float = bereich(90.0, heisst='Richtung 2', einheit=GRAD, ab=-180.0, bis=180.0…`
 - `lasten: List[PlattenlastEintrag] = field(default_factory=list)`
+
+#### DeckenplatteEintrag.ergaenzt
+
+```python
+@classmethod
+def ergaenzt(cls, roh: Mapping[str, Any], basis: Optional[DeckenplatteEintrag]) -> Mapping[str, Any]
+```
+
+`roh` mit `richtungen_von_hand`, wo es fehlt, aber ein Winkel
+dasteht -- in einer Datei von vor dem 2026-11-26 stehen beide: mit
+0° und 90°, der Vorgabe von damals, wählt die Platte ihre Richtungen
+nun selbst, mit anderen Winkeln bleiben es die des Benutzers. Ebenso,
+wer ohne Maske schreibt: wer einen anderen Winkel angibt, meint ihn.
 
 ### LinienlagerEintrag
 

@@ -337,7 +337,8 @@ def _decken(p: Projekt) -> None:
     el.stuetze((6, 7), b_x=400, b_y=250, bereich_von_hand=True, l_x=1.2, l_y=0.8)
     el.zone([(0, 0), (2, 0), (2, 4), (0, 4)], anteil=100.0)
     schief = [(9.0, 0.0), (13.0, 0.0), (14.0, 3.0), (10.0, 3.0)]
-    el.platte(schief, beton=beton, h=200, richtung_1=0.0, richtung_2=math.degrees(math.atan2(3.0, 1.0)))
+    el.platte(schief, beton=beton, h=200, richtungen_von_hand=True, richtung_1=0.0,
+              richtung_2=math.degrees(math.atan2(3.0, 1.0)))
     for a, b in zip(schief, schief[1:] + schief[:1]):
         el.lager(a, b)
     gzt = el.standardfaelle()

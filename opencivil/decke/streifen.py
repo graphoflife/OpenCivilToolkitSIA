@@ -595,7 +595,9 @@ def pruefen(decke: Decke) -> List[Meldung]:
     stehen, und der Elastizitätsmodul, der vom Beton kommt. Wo eine Zahl
     liegen muss -- eine Dicke, eine Breite, ein Anteil --, prüft ihr Feld
     vor dem Rechnen (:mod:`opencivil.projekt.decke`). Bis 2026-11-20 stand
-    das hier ein zweites Mal, mit anderen Sätzen, und griff nie.
+    das hier ein zweites Mal, mit anderen Sätzen, und griff nie. Ebenso,
+    dass die zwei Richtungen einer Platte mindestens 5° auseinander liegen:
+    bis 2026-11-26 hielt das erst hier die Rechnung an.
     """
     heraus: List[Meldung] = []
     if not decke.platten:
@@ -615,10 +617,6 @@ def pruefen(decke: Decke) -> List[Meldung]:
             continue
         if not p.E > 0.0:
             heraus.append(Meldung(f"Der Beton der Platte «{p.name}» braucht einen Elastizitätsmodul.", (p.name,)))
-        r1, r2 = richtungen_der_platte(p)
-        if abs(math.sin(r1.winkel - r2.winkel)) < math.sin(math.radians(5.0)):
-            heraus.append(Meldung(f"Die zwei Richtungen der Platte «{p.name}» liegen weniger als 5° "
-                                  "auseinander – sie tragen dann kaum anders als eine.", (p.name,)))
     namen = list(stuecke)
     for i, a in enumerate(namen):
         for b in namen[i + 1:]:

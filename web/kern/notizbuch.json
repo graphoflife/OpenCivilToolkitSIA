@@ -4183,6 +4183,8 @@
         "Bereich.verlangt",
         "Bereich.gegen",
         "Bereich.grund_gegen",
+        "Bereich.quer",
+        "Bereich.grund_quer",
         "Bereich.zahl",
         "Bereich.angabe"
       ]
@@ -4734,6 +4736,20 @@
         "_gehalten",
         "spitzen",
         "_schwerpunkt"
+      ]
+    },
+    {
+      "name": "opencivil.decke.richtungen",
+      "pfad": "Python/opencivil.decke.richtungen.md",
+      "art": "modul",
+      "kurz": "die zwei Richtungen, die eine Platte selbst wählt.",
+      "stichworte": [
+        "festgelegt",
+        "entlang",
+        "raender",
+        "gemeinsam",
+        "_gruppen",
+        "_abstand"
       ]
     },
     {
@@ -6964,6 +6980,7 @@
         "DeckenknotenEintrag",
         "PlattenlastEintrag",
         "DeckenplatteEintrag",
+        "DeckenplatteEintrag.ergaenzt",
         "LinienlagerEintrag",
         "StuetzeEintrag",
         "UnterzugEintrag",

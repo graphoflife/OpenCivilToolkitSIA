@@ -25,6 +25,7 @@ der auch der Bericht sie holt -- laengs eines Schnitts ueber
 
 from __future__ import annotations
 
+import math
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 from opencivil.core.einheiten import KN, KN_PRO_M, KNM, KNM_PRO_M
@@ -60,7 +61,9 @@ def _punkte(ecken: Sequence[Tuple[float, float]]) -> List[List[float]]:
 def uebersicht(befund: Optional[Deckenbefund]) -> Dict[str, Any]:
     """
     ``gerechnet`` und ``meldungen`` (``{text, elemente, fehler}``) immer;
-    wenn die Decke in Streifen zerfiel, dazu ``richtungen``, ``anteile``
+    wenn sie rechnete, ``von_selbst``: je Platte, die ihre Richtungen selbst
+    wählt, die zwei in Grad gegen x; wenn die Decke in Streifen zerfiel,
+    dazu ``richtungen``, ``anteile``
     (Vieleck und Anteil in Richtung 1, in % -- ``None``, wo keine Richtung
     trägt), ``grenzen`` (je Grenze
     zweier Streifen eine Strecke), ``unterzuege``, ``stuetzenbereiche`` und
@@ -75,12 +78,17 @@ def uebersicht(befund: Optional[Deckenbefund]) -> Dict[str, Any]:
         return {"gerechnet": False, "meldungen": []}
     meldungen = _meldungen(befund.meldungen)
     e = befund.ergebnis
-    if e is None or e.aufteilungen is None:
+    if e is None:
         return {"gerechnet": False, "meldungen": meldungen}
+    von_selbst = {p.name: [round(math.degrees(w), 6) for w in p.richtungen]
+                  for p in e.decke.platten if p.von_selbst}
+    if e.aufteilungen is None:
+        return {"gerechnet": False, "meldungen": meldungen, "von_selbst": von_selbst}
     z = e.zerlegung
     return {
         "gerechnet": True,
         "meldungen": meldungen,
+        "von_selbst": von_selbst,
         "richtungen": [{"name": r.name, "streifen": len(z.feldstreifen(r))} for r in z.richtungen],
         "anteile": [{"ecken": _punkte(ecken), "anteil": None if wert is None else round(100.0 * wert, 6)}
                     for ecken, wert in _anteile(e)],

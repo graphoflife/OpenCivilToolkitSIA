@@ -60,7 +60,8 @@ def modell_von(eintrag: DeckeEintrag) -> Tuple[Decke, List[Meldung]]:
             return None
         return tuple(lagen[k] for k in knoten)
 
-    platten = [Platte(p.kennung, ecken, p.si("h"), 0.0, 0.0, (p.si("richtung_1"), p.si("richtung_2")))
+    platten = [Platte(p.kennung, ecken, p.si("h"), 0.0, 0.0, (p.si("richtung_1"), p.si("richtung_2")),
+                      von_selbst=not p.richtungen_von_hand)
                for p in eintrag.platten if (ecken := orte(p, p.knoten)) is not None]
     linienlager = [Linienlager(l.kennung, *ab, vertikal=l.vertikal, eingespannt=l.eingespannt)
                    for l in eintrag.linienlager if (ab := orte(l, (l.von, l.bis))) is not None]

@@ -63,7 +63,7 @@ import enum
 import functools
 import math
 import typing
-from typing import Any, Callable, Dict, Iterable, List, Mapping, Optional
+from typing import Any, Callable, Dict, Iterable, List, Mapping, Optional, Tuple
 
 from opencivil.core.bereich import Bereich
 from opencivil.core.einheiten import EINHEITSLOS, Einheit, Groesse
@@ -161,6 +161,7 @@ def bereich(vorgabe: Any = dataclasses.MISSING, *, heisst: str,
             einheit: Optional[Einheit] = None, ueber: Optional[float] = None,
             ab: Optional[float] = None, bis: Optional[float] = None,
             unter: Optional[float] = None, bis_feld: Optional[str] = None,
+            quer_zu: Optional[Tuple[str, float]] = None,
             fabrik: Optional[Callable[[], Any]] = None) -> Any:
     """
     Ein Feld, dessen Zahl in einem :class:`Bereich` liegen muss -- eine
@@ -169,7 +170,7 @@ def bereich(vorgabe: Any = dataclasses.MISSING, *, heisst: str,
     aus ``fabrik``.
     """
     metadata = {"bereich": Bereich(heisst, einheit, ueber=ueber, ab=ab, bis=bis, unter=unter,
-                                   bis_feld=bis_feld)}
+                                   bis_feld=bis_feld, quer_zu=quer_zu)}
     if fabrik is not None:
         return dataclasses.field(default_factory=fabrik, metadata=metadata)
     return dataclasses.field(default=vorgabe, metadata=metadata)
@@ -198,8 +199,10 @@ def feldangaben(cls: type) -> Dict[str, Dict[str, Any]]:
 
     Begrenzt ein Feld ein anderes (:attr:`Bereich.bis_feld`), steht das an
     beiden, mit dem Namen des anderen Feldes und dem Satz, den das Feld
-    sagt: ``bis_feld`` bei α_min, ``ab_feld`` bei α_max. Die Zahl des anderen
-    Feldes kennt erst die Maske.
+    sagt: ``bis_feld`` bei α_min, ``ab_feld`` bei α_max. Ebenso ``quer_zu``
+    an beiden Feldern, mit dem kleinsten Abstand als Linien in Grad
+    (:attr:`Bereich.quer_zu`, ``mindestens``). Die Zahl des anderen Feldes
+    kennt erst die Maske.
 
     Haelt ein Feld je Material eine Wahl (:func:`je_material`), steht dort,
     was ein Material ohne eigene waehlt: ``vorgabe`` -- und ist die Wahl
@@ -229,6 +232,11 @@ def feldangaben(cls: type) -> Dict[str, Dict[str, Any]]:
             hier, dort = b.gegen(bereiche[b.bis_feld])
             angaben.setdefault(name, {})["bis_feld"] = {"feld": b.bis_feld, "satz": hier}
             angaben.setdefault(b.bis_feld, {})["ab_feld"] = {"feld": name, "satz": dort}
+        if b.quer_zu is not None:
+            feld, mindestens = b.quer_zu
+            hier, dort = b.quer(bereiche[feld])
+            angaben.setdefault(name, {})["quer_zu"] = {"feld": feld, "mindestens": mindestens, "satz": hier}
+            angaben.setdefault(feld, {})["quer_zu"] = {"feld": name, "mindestens": mindestens, "satz": dort}
     return angaben
 
 
@@ -334,6 +342,11 @@ def lesen(cls: type, roh: Any, wo: str, basis: Any = None) -> Any:
 
     Aus Python darf ``roh`` auch schon ein Eintrag der Klasse sein, etwa ein
     Stichwort der Fassade: er bleibt, wie er ist, und wird ganz geprueft.
+
+    Kennt eine Klasse ein Feld, das in ``roh`` fehlt, aber aus dem folgt,
+    was dasteht -- eine Datei von frueher kennt es noch nicht --, ergaenzt
+    sie es vorher selbst: ``cls.ergaenzt(roh, basis)``, etwa
+    :meth:`~opencivil.projekt.decke.DeckenplatteEintrag.ergaenzt`.
     """
     if isinstance(roh, cls):
         felder_pruefen(roh, wo)
@@ -341,6 +354,9 @@ def lesen(cls: type, roh: Any, wo: str, basis: Any = None) -> Any:
     if not isinstance(roh, Mapping):
         raise ProjektFehler(f"hier gehört ein Eintrag mit Feldern hin, "
                             f"nicht {_zeigen(roh)}.", wo=wo)
+    ergaenzt = getattr(cls, "ergaenzt", None)
+    if ergaenzt is not None:
+        roh = ergaenzt(roh, basis)
     felder = {f.name: f for f in dataclasses.fields(cls) if f.init}
     for schluessel in roh:
         if schluessel not in felder:
@@ -559,7 +575,7 @@ def inhalt_pruefen(eintrag: Any, wo: str, ohne: Iterable[str] = ()) -> None:
     Prueft, was erst das Rechnen braucht -- nach der Form, vor jedem Rechnen:
     jede Zahl gegen ihren Bereich (:func:`bereich`) -- eine Liste davon mit
     mindestens einer --, jeden Eintrag darin ebenso, jede gegen das Feld,
-    das sie begrenzt (:attr:`Bereich.bis_feld`),
+    das sie begrenzt (:attr:`Bereich.bis_feld`, :attr:`Bereich.quer_zu`),
     und danach die Namen seiner Faelle (``fallnamen()``) und die Regeln des
     Eintrags ueber mehrere Felder, ``regeln(wo)``. Die Form ist da schon geprueft: ein Eintrag steht, wo
     einer hingehoert, eine Zahl, wo eine Zahl hingehoert. Die Felder in
@@ -589,6 +605,9 @@ def inhalt_pruefen(eintrag: Any, wo: str, ohne: Iterable[str] = ()) -> None:
         if bereich_ is not None and bereich_.bis_feld is not None:
             anhalten(bereich_.grund_gegen(wert, _bereiche(type(eintrag))[bereich_.bis_feld],
                                           getattr(eintrag, bereich_.bis_feld)), wo)
+        if bereich_ is not None and bereich_.quer_zu is not None:
+            feld = bereich_.quer_zu[0]
+            anhalten(bereich_.grund_quer(wert, _bereiche(type(eintrag))[feld], getattr(eintrag, feld)), wo)
     for liste in eintrag.fallnamen():
         liste.pruefen(wo)
     eintrag.regeln(wo)

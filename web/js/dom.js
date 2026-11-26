@@ -128,18 +128,28 @@ export function naechsteStufe(wert, richtung, { stufen, schritt = 1 } = {}) {
  * Warum der Kern eine Zahl abwiese -- leer, wenn er sie nimmt. `angabe` sind
  * die Grenzen ihres Feldes aus dem Katalog (`feldangabe`): «Teilung muss
  * grösser als null sein». Begrenzt sie ein anderes Feld desselben Eintrags
- * (`bis_feld`, `ab_feld`: α_min nicht über α_max), steht dessen Zahl in
+ * (`bis_feld`, `ab_feld`: α_min nicht über α_max; `quer_zu`: zwei
+ * Richtungen mindestens 5° auseinander, als Linien), steht dessen Zahl in
  * `neben`, dem Eintrag.
  */
 export function grenzeVerletzt(angabe, zahl, neben = {}) {
   if (angabe.ganz && !Number.isInteger(zahl)) return 'Nur ganze Zahlen';
-  const { ueber, ab, bis, unter, bis_feld: hoch, ab_feld: tief } = angabe;
+  const {
+    ueber, ab, bis, unter, bis_feld: hoch, ab_feld: tief, quer_zu: quer,
+  } = angabe;
   const draussen = (ueber !== undefined && !(zahl > ueber)) || (ab !== undefined && !(zahl >= ab))
     || (bis !== undefined && !(zahl <= bis)) || (unter !== undefined && !(zahl < unter));
   if (draussen) return `${angabe.heisst} ${angabe.verlangt}`;
   if (hoch && zahl > neben[hoch.feld]) return hoch.satz;
   if (tief && zahl < neben[tief.feld]) return tief.satz;
+  if (quer && linienabstand(zahl, neben[quer.feld]) < quer.mindestens) return quer.satz;
   return '';
+}
+
+/** Wie weit zwei Winkel in Grad als Linien auseinander liegen, 0° bis 90° -- 180° weiter ist dieselbe. */
+function linienabstand(a, b) {
+  const d = Math.abs(a - b) % 180;
+  return Math.min(d, 180 - d);
 }
 
 /** Die engste der Grenzen, die es gibt -- `wahl` ist Math.max für unten, Math.min für oben. */

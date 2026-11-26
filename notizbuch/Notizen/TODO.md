@@ -64,6 +64,9 @@ Kräften je Geschoss und Wand, ohne Verbindung ins Balkensystem.
       «innerhalb 1 % je zur Hälfte, sonst ganz»); die Grösse des
       Stützenbereichs, wenn sie fehlt (ein Quadrat, so breit wie die Stütze
       oder der breiteste Unterzug über ihr -- Folie 39 lässt sie offen);
+      die Richtungen, die eine Platte selbst wählt (parallel zu den meisten
+      Metern Rand, ein Rand quer dazu zählt mit; aneinanderstossende
+      gemeinsam -- seit 2026-11-26, `decke/richtungen.py`);
       Streifen in zwei Richtungen, die nicht rechtwinklig aufeinander stehen;
       die Linienlast als Band von 1 mm, die Einzellast über 1 × 1 m verteilt.
       Die Norm sagt zu keinem etwas (geprüft am 2026-11-14): nach der

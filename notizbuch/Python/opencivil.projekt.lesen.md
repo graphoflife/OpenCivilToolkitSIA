@@ -1,5 +1,5 @@
 ---
-erzeugt: 78c8ece145a7
+erzeugt: 936e817b47f6
 art: modul
 tags: [modul]
 ---
@@ -157,7 +157,7 @@ Was ein Material im Feld `feld` ([[opencivil.projekt.lesen#je_material|je_materi
 ### bereich
 
 ```python
-def bereich(vorgabe: Any=dataclasses.MISSING, *, heisst: str, einheit: Optional[Einheit]=None, ueber: Optional[float]=None, ab: Optional[float]=None, bis: Optional[float]=None, unter: Optional[float]=None, bis_feld: Optional[str]=None, fabrik: Optional[Callable[[], Any]]=None) -> Any
+def bereich(vorgabe: Any=dataclasses.MISSING, *, heisst: str, einheit: Optional[Einheit]=None, ueber: Optional[float]=None, ab: Optional[float]=None, bis: Optional[float]=None, unter: Optional[float]=None, bis_feld: Optional[str]=None, quer_zu: Optional[Tuple[str, float]]=None, fabrik: Optional[Callable[[], Any]]=None) -> Any
 ```
 
 Ein Feld, dessen Zahl in einem [[opencivil.core.bereich#Bereich|Bereich]] liegen muss -- eine
@@ -192,8 +192,10 @@ Wahllisten des Katalogs, mit Beschriftung.
 
 Begrenzt ein Feld ein anderes ([[opencivil.core.bereich#Bereich|Bereich.bis_feld]]), steht das an
 beiden, mit dem Namen des anderen Feldes und dem Satz, den das Feld
-sagt: `bis_feld` bei α_min, `ab_feld` bei α_max. Die Zahl des anderen
-Feldes kennt erst die Maske.
+sagt: `bis_feld` bei α_min, `ab_feld` bei α_max. Ebenso `quer_zu`
+an beiden Feldern, mit dem kleinsten Abstand als Linien in Grad
+([[opencivil.core.bereich#Bereich|Bereich.quer_zu]], `mindestens`). Die Zahl des anderen Feldes
+kennt erst die Maske.
 
 Haelt ein Feld je Material eine Wahl ([[opencivil.projekt.lesen#je_material|je_material]]), steht dort,
 was ein Material ohne eigene waehlt: `vorgabe` -- und ist die Wahl
@@ -272,6 +274,11 @@ gelesene Eintrag ist danach geprueft ([[opencivil.projekt.lesen#felder_pruefen|f
 
 Aus Python darf `roh` auch schon ein Eintrag der Klasse sein, etwa ein
 Stichwort der Fassade: er bleibt, wie er ist, und wird ganz geprueft.
+
+Kennt eine Klasse ein Feld, das in `roh` fehlt, aber aus dem folgt,
+was dasteht -- eine Datei von frueher kennt es noch nicht --, ergaenzt
+sie es vorher selbst: `cls.ergaenzt(roh, basis)`, etwa
+[[opencivil.projekt.decke#DeckenplatteEintrag.ergaenzt|ergaenzt]].
 
 ### _wert_lesen
 
@@ -375,7 +382,7 @@ def inhalt_pruefen(eintrag: Any, wo: str, ohne: Iterable[str]=()) -> None
 Prueft, was erst das Rechnen braucht -- nach der Form, vor jedem Rechnen:
 jede Zahl gegen ihren Bereich ([[opencivil.projekt.lesen#bereich|bereich]]) -- eine Liste davon mit
 mindestens einer --, jeden Eintrag darin ebenso, jede gegen das Feld,
-das sie begrenzt ([[opencivil.core.bereich#Bereich|Bereich.bis_feld]]),
+das sie begrenzt ([[opencivil.core.bereich#Bereich|Bereich.bis_feld]], [[opencivil.core.bereich#Bereich|Bereich.quer_zu]]),
 und danach die Namen seiner Faelle (`fallnamen()`) und die Regeln des
 Eintrags ueber mehrere Felder, `regeln(wo)`. Die Form ist da schon geprueft: ein Eintrag steht, wo
 einer hingehoert, eine Zahl, wo eine Zahl hingehoert. Die Felder in

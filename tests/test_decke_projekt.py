@@ -12,6 +12,8 @@ from opencivil.decke.feld import GROESSEN
 from opencivil.decke.modell import Flaechenlast, Linienlast, Punktlast
 from opencivil.projekt import BalkensystemEintrag, DeckeEintrag, Projekt, ProjektFehler, beispiele
 from opencivil.projekt.aufbau.decke import modell_von
+from opencivil.projekt.decke import DeckenplatteEintrag
+from opencivil.projekt.lesen import feldangaben
 from opencivil.web import dienst
 from tests.unfertig import meldung
 
@@ -138,6 +140,68 @@ class TestModell(unittest.TestCase):
         decke, meldungen = modell_von(d)
         self.assertEqual([p.name for p in decke.platten], ["P1"])
         self.assertEqual([m.elemente for m in meldungen], [("P2",)])
+
+
+class TestRichtungen(unittest.TestCase):
+    """
+    Je Platte ein Schalter: die zwei Richtungen wählt die Rechnung entlang
+    der Ränder, oder der Benutzer gibt sie von Hand (Benutzer, 2026-11-25).
+    """
+
+    def test_eine_neue_platte_waehlt_selbst(self):
+        d = zwei_felder().decken[0]
+        self.assertEqual([p.richtungen_von_hand for p in d.platten], [False, False])
+        decke, _ = modell_von(d)
+        self.assertEqual([p.von_selbst for p in decke.platten], [True, True])
+
+    def test_eine_datei_von_frueher(self):
+        """
+        0° und 90° waren bis 2026-11-26 nur die Vorgabe: eine solche Platte
+        wählt nun selbst. Andere Winkel bleiben die des Benutzers, von Hand.
+        """
+        roh = zwei_felder().als_dict()
+        platten = roh["decken"][0]["platten"]
+        for platte in platten:
+            del platte["richtungen_von_hand"]
+        platten[1].update(richtung_1=30.0, richtung_2=120.0)
+        d = Projekt.aus_dict(roh).decken[0]
+        self.assertEqual([p.richtungen_von_hand for p in d.platten], [False, True])
+        self.assertEqual((d.platten[1].richtung_1, d.platten[1].richtung_2), (30.0, 120.0))
+
+    def test_wer_einen_winkel_angibt_meint_ihn(self):
+        """Auch ohne Maske, etwa in einem Skript: ein Winkel ausser 0° und 90° heisst von Hand."""
+        p = zwei_felder()
+        d = p.decken[0]
+        beton = d.platten[0].beton
+        schief = d.platte([(0, 3), (4, 3), (2, 5)], beton=beton, richtung_1=30.0, richtung_2=120.0)
+        ohne = d.platte([(4, 3), (8, 3), (6, 5)], beton=beton, h=250)
+        self.assertEqual((schief.richtungen_von_hand, ohne.richtungen_von_hand), (True, False))
+
+    def test_zwei_richtungen_zu_nahe(self):
+        """
+        Weniger als 5° auseinander -- auch über 180° hinweg -- weist schon das
+        Feld ab, an beiden Feldern; vor dem Rechnen hält es die Decke an, mit
+        denselben Worten. Bis 2026-11-26 hielt erst die Rechnung an.
+        """
+        angaben = feldangaben(DeckenplatteEintrag)
+        satz = "Richtung 2 muss um mindestens 5° von Richtung 1 abweichen – 0° und 180° sind dieselbe Linie"
+        self.assertEqual(angaben["richtung_2"]["quer_zu"], {"feld": "richtung_1", "mindestens": 5.0, "satz": satz})
+        self.assertEqual(angaben["richtung_1"]["quer_zu"]["feld"], "richtung_2")
+        self.assertTrue(angaben["richtung_1"]["quer_zu"]["satz"].startswith(
+            "Richtung 1 muss um mindestens 5° von Richtung 2 abweichen"))
+        p = zwei_felder()
+        platte = p.decken[0].platten[0]
+        platte.richtungen_von_hand, platte.richtung_1, platte.richtung_2 = True, 0.0, 178.0
+        self.assertIn(f"{satz}; angegeben sind 178° und 0°.", meldung(p))
+        platte.richtung_2 = 175.0
+        self.assertEqual(p.aufbauen().unfertige, {})
+
+    def test_die_zeichnung_nennt_die_richtungen_von_selbst(self):
+        """Nur die der Platten, die selbst wählen -- in Grad, für das Fenster der Platte."""
+        p = zwei_felder()
+        platte = p.decken[0].platten[1]
+        platte.richtungen_von_hand, platte.richtung_1, platte.richtung_2 = True, 30.0, 120.0
+        self.assertEqual(zeichnung(p).daten["uebersicht"]["von_selbst"], {"P1": [0.0, 90.0]})
 
 
 class TestLasten(unittest.TestCase):

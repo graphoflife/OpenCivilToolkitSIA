@@ -44,7 +44,7 @@ Umgerechnet wird beim Bauen.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, List, Sequence, Tuple, Union
+from typing import Any, List, Mapping, Optional, Sequence, Tuple, Union
 
 from opencivil.core.einheiten import GRAD, KN, KN_PRO_M, KN_PRO_M2, M, MM, PROZENT
 from opencivil.decke.feld import GROESSEN
@@ -94,7 +94,10 @@ class DeckenplatteEintrag(Beschreibung):
     """
     Eine Platte: ihr Umriss, ihre Dicke und ihr Beton -- E_cm und die Dichte
     des Stahlbetons von ihm, wie bei einem Stab des Balkensystems -- und die
-    zwei Richtungen, in denen ihre Streifen tragen.
+    zwei Richtungen, in denen ihre Streifen tragen: von selbst entlang ihrer
+    Ränder (:mod:`opencivil.decke.richtungen`) oder von Hand. Von Hand liegen
+    sie mindestens 5° auseinander, sonst trügen sie kaum anders als eine --
+    das weist schon das Feld ab.
     """
 
     kennung: str = ""
@@ -103,9 +106,28 @@ class DeckenplatteEintrag(Beschreibung):
     beton: str = ""
     """Die Kennung des Betons im Projekt (``b1``)."""
 
+    richtungen_von_hand: bool = False
     richtung_1: float = bereich(0.0, heisst="Richtung 1", einheit=GRAD, ab=-180.0, bis=180.0)
-    richtung_2: float = bereich(90.0, heisst="Richtung 2", einheit=GRAD, ab=-180.0, bis=180.0)
+    """Nur mit ``richtungen_von_hand``, wie ``richtung_2``."""
+
+    richtung_2: float = bereich(90.0, heisst="Richtung 2", einheit=GRAD, ab=-180.0, bis=180.0,
+                                quer_zu=("richtung_1", 5.0))
     lasten: List[PlattenlastEintrag] = field(default_factory=list)
+
+    @classmethod
+    def ergaenzt(cls, roh: Mapping[str, Any], basis: Optional[DeckenplatteEintrag]) -> Mapping[str, Any]:
+        """
+        ``roh`` mit ``richtungen_von_hand``, wo es fehlt, aber ein Winkel
+        dasteht -- in einer Datei von vor dem 2026-11-26 stehen beide: mit
+        0° und 90°, der Vorgabe von damals, wählt die Platte ihre Richtungen
+        nun selbst, mit anderen Winkeln bleiben es die des Benutzers. Ebenso,
+        wer ohne Maske schreibt: wer einen anderen Winkel angibt, meint ihn.
+        """
+        if "richtungen_von_hand" in roh or not {"richtung_1", "richtung_2"} & set(roh):
+            return roh
+        vorbild = basis if basis is not None else cls()
+        winkel = (roh.get("richtung_1", vorbild.richtung_1), roh.get("richtung_2", vorbild.richtung_2))
+        return {**roh, "richtungen_von_hand": winkel != (0.0, 90.0)}
 
 
 @dataclass

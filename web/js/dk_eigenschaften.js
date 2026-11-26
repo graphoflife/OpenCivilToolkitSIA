@@ -19,10 +19,12 @@
  */
 
 import {
-  gemeinsam, materialliste, mitVar, wahlBlock, wahlSchalter,
+  VAR, gemeinsam, materialliste, mitVar, wahlBlock, wahlSchalter,
 } from './bausteine.js';
+import { zahlText } from './cad_ansicht.js';
 import {
-  auswahlEigenschaften, jaNein, laengenzeile, lagefelder, meldungszeilen, vorgabe, zahlfeldMitVar, zugleich,
+  auswahlEigenschaften, frischeAntwort, jaNein, laengenzeile, lagefelder, meldungszeilen, vorgabe, zahlfeldMitVar,
+  zugleich,
 } from './cad_app.js';
 import { cadZeile, schalterzeile } from './cad_palette.js';
 import { el } from './dom.js';
@@ -61,13 +63,37 @@ export function vorgabeBeton(a) {
 /**
  * Ein Zahlenfeld mit Beschriftung und der Einheit des Kerns. `klasse` ist
  * der Name der Einträge im Katalog (`deckenplatte`), `wert(feld)` das
- * Gemeinsame der gewählten, `setzen(feld)` schreibt.
+ * Gemeinsame der gewählten, `setzen(feld)` schreibt. `neben` hält die
+ * Zahlen der Felder, gegen die dieses prüft (`grenzeVerletzt` in dom.js).
  */
-function feldzeile(klasse, feld, beschriftung, wert, setzen, { schritt = 1, titel } = {}) {
+function feldzeile(klasse, feld, beschriftung, wert, setzen, { schritt = 1, titel, neben } = {}) {
   const angabe = feldangabe(klasse, feld);
   return cadZeile(beschriftung, zahlfeldMitVar({
-    wert: wert(feld), schritt, angabe, titel, beiAenderung: setzen(feld),
+    wert: wert(feld), schritt, angabe, titel, neben, beiAenderung: setzen(feld),
   }), angabe.einheit || '');
+}
+
+/**
+ * Die Richtungen der Rechnung, je gewählte Platte (`von_selbst` ihrer
+ * Antwort, in Grad) -- null, solange sie nicht da sind. Ohne Platte,
+ * für die nächste, die das Werkzeug zeichnet: gar keine.
+ */
+function richtungenVonSelbst(a, platten) {
+  const von = frischeAntwort(a)?.von_selbst || {};
+  return platten.map((p) => von[p.kennung] || null);
+}
+
+/** Was die Rechnung als Richtungen wählt, unter dem Schalter «automatisch». */
+function gewaehlteRichtungen(richtungen) {
+  const hinweis = (text) => el('p.cad-hinweis-klein', { text });
+  if (!richtungen) return hinweis('Die Rechnung legt sie entlang der Ränder der Platte.');
+  if (richtungen.includes(null)) {
+    return hinweis('Entlang der Ränder – die Richtungen stehen da, sobald die Decke rechnet.');
+  }
+  const gemeinsame = gemeinsam(richtungen.map((r) => JSON.stringify(r)));
+  if (gemeinsame === VAR) return hinweis('Je Platte entlang ihrer Ränder – sie unterscheiden sich.');
+  const [r1, r2] = JSON.parse(gemeinsame);
+  return hinweis(`Entlang der Ränder: Richtung 1 ${zahlText(r1, 1)}°, Richtung 2 ${zahlText(r2, 1)}°.`);
 }
 
 /**
@@ -75,19 +101,38 @@ function feldzeile(klasse, feld, beschriftung, wert, setzen, { schritt = 1, tite
  * Teile; `wert` und `setzen` wie bei `feldzeile`.
  */
 const FELDER = {
-  platten: (wert, setzen) => [
-    feldzeile('deckenplatte', 'h', 'Dicke h', wert, setzen, { schritt: 10 }),
-    cadZeile('Beton', materialliste({
-      art: 'beton', gewaehlt: wert('beton'), setzen: setzen('beton'),
-      titel: 'E_cm und das Gewicht der Platte kommen von ihm',
-    })),
-    feldzeile('deckenplatte', 'richtung_1', 'Richtung 1', wert, setzen, {
-      schritt: 15, titel: 'In diese Richtung tragen die Streifen der Richtung 1 – in Grad gegen x',
-    }),
-    feldzeile('deckenplatte', 'richtung_2', 'Richtung 2', wert, setzen, {
-      schritt: 15, titel: 'Die zweite Richtung der Streifen – in Grad gegen x, nicht gleich der ersten',
-    }),
-  ],
+  // `richtungen`: was die Rechnung je gewählte Platte als Richtungen wählt (`richtungenVonSelbst`).
+  platten: (wert, setzen, richtungen = null) => {
+    const vonHand = wert('richtungen_von_hand');
+    const neben = { richtung_1: wert('richtung_1'), richtung_2: wert('richtung_2') };
+    return [
+      feldzeile('deckenplatte', 'h', 'Dicke h', wert, setzen, { schritt: 10 }),
+      cadZeile('Beton', materialliste({
+        art: 'beton', gewaehlt: wert('beton'), setzen: setzen('beton'),
+        titel: 'E_cm und das Gewicht der Platte kommen von ihm',
+      })),
+      wahlBlock('Richtungen', wahlSchalter({
+        werte: mitVar([
+          {
+            wert: false, beschriftung: 'automatisch',
+            titel: 'Entlang der Ränder – Platten, die aneinanderstossen, gleich, damit die Streifen über die Fuge laufen',
+          },
+          { wert: true, beschriftung: 'von Hand', titel: 'Richtung 1 und 2 in Grad gegen x' },
+        ], vonHand),
+        gewaehlt: vonHand, setzen: setzen('richtungen_von_hand'),
+        titel: 'In diesen zwei Richtungen tragen die Streifen der Platte',
+      })),
+      ...(vonHand === true ? [
+        feldzeile('deckenplatte', 'richtung_1', 'Richtung 1', wert, setzen, {
+          schritt: 15, neben, titel: 'In diese Richtung tragen die Streifen der Richtung 1 – in Grad gegen x',
+        }),
+        feldzeile('deckenplatte', 'richtung_2', 'Richtung 2', wert, setzen, {
+          schritt: 15, neben, titel: 'Die zweite Richtung der Streifen – in Grad gegen x, mindestens 5° neben der ersten',
+        }),
+      ] : []),
+      ...(vonHand === false ? [gewaehlteRichtungen(richtungen)] : []),
+    ];
+  },
   linienlager: (wert, setzen) => [
     schalterzeile('vertikal', jaNein(wert('vertikal'), setzen('vertikal'),
       'Hält die Platte in der Höhe – eine Wand, ein Träger')),
@@ -286,16 +331,30 @@ function plattenlastFelder(a, platten) {
   }), angabe.einheit)];
 }
 
+/**
+ * Wer eine Platte auf «von Hand» stellt, beginnt mit den Richtungen, die
+ * die Rechnung gewählt hatte -- so ändert der Schalter allein nichts.
+ */
+function vonHandAb(a) {
+  const von = frischeAntwort(a)?.von_selbst || {};
+  return (e, feld) => {
+    if (feld === 'richtungen_von_hand' && e.richtungen_von_hand && von[e.kennung]) {
+      [e.richtung_1, e.richtung_2] = von[e.kennung];
+    }
+  };
+}
+
 function teilEigenschaften(a, z, kennungen, liste) {
-  const { gewaehlt, wert, setzen } = zugleich(a, z, liste, kennungen);
+  const platten = liste === 'platten';
+  const { gewaehlt, wert, setzen } = zugleich(a, z, liste, kennungen, platten ? vonHandAb(a) : undefined);
   // Ändert man den Lastfall einer Last, zeigt das Fenster danach dessen Lasten -- sonst verschwände sie.
   const inhalt = [
     ...(LASTLISTEN.includes(liste) ? [lastfallZeile(z, wert('lastfall'), (w) => {
       setzen('lastfall')(w);
       lastfallWaehlen(a, a.dk, w);
     }, 'Zu welchem Lastfall die Lasten gehören')] : []),
-    ...FELDER[liste](wert, setzen),
-    ...(liste === 'platten' ? plattenlastFelder(a, gewaehlt) : []),
+    ...FELDER[liste](wert, setzen, platten ? richtungenVonSelbst(a, gewaehlt) : undefined),
+    ...(platten ? plattenlastFelder(a, gewaehlt) : []),
   ];
   const art = a.adapter.arten.find((x) => x.liste === liste);
   if (gewaehlt.length === 1 && art.form === 'linie') inhalt.push(laengenzeile(a, z, gewaehlt[0]));

@@ -96,11 +96,18 @@ function liste(a) {
     const m = eintragVon(k);
     return m ? (m.name || m.sorte) : 'kein Beton';
   };
+  // Von selbst die Richtungen der letzten Antwort -- auch einer alten, wie das Bild darunter.
+  const vonSelbst = a.adapter.kern.antwort?.von_selbst || {};
+  const richtungen = (p) => {
+    const [r1, r2] = p.richtungen_von_hand ? [p.richtung_1, p.richtung_2] : vonSelbst[p.kennung] || [];
+    const winkel = r1 === undefined ? '' : ` ${zahlText(r1, 1)}°, ${zahlText(r2, 1)}°`;
+    return `Richtungen${winkel}${p.richtungen_von_hand ? ' von Hand' : ' automatisch'}`;
+  };
   const halt = (l) => [l.vertikal ? 'vertikal' : '', l.eingespannt ? 'eingespannt' : ''].filter(Boolean).join(', ')
     || 'hält nichts';
   const gruppen = [
     ['Platten', z.platten.map((p) => zeile(p.kennung, `${zahlText(p.h, 0)} mm`,
-      `${beton(p.beton)} · ${p.knoten.length} Ecken · Richtungen ${zahlText(p.richtung_1, 1)}°, ${zahlText(p.richtung_2, 1)}°`))],
+      `${beton(p.beton)} · ${p.knoten.length} Ecken · ${richtungen(p)}`))],
     ['Linienlager', z.linienlager.map((l) => zeile(l.kennung, `${l.von} → ${l.bis}`, halt(l)))],
     ['Stützen', z.stuetzen.map((s) => zeile(s.kennung, `an ${s.knoten}`,
       `${zahlText(s.b_x, 0)} × ${zahlText(s.b_y, 0)} mm${s.bereich_von_hand ? ` · Bereich ${zahlText(s.l_x, 2)} × ${zahlText(s.l_y, 2)} m` : ''}`))],

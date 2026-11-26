@@ -21,6 +21,7 @@ eigenen Mindestwerten -- 1 in der Querschnittsanalyse, 0 im Balkensystem.
 from __future__ import annotations
 
 import dataclasses
+import math
 from typing import Any, Dict, Optional, Tuple
 
 from opencivil.core.einheiten import Einheit
@@ -49,6 +50,16 @@ class Bereich:
     Die Maske weist sie an beiden Feldern ab
     (:func:`~opencivil.projekt.lesen.feldangaben`), die Pruefung vor dem
     Rechnen haelt eine Datei damit auf -- mit denselben Worten (:meth:`gegen`).
+    """
+
+    quer_zu: Optional[Tuple[str, float]] = None
+    """
+    Ein Feld desselben Eintrags mit einem Winkel in Grad, und um wie viel
+    Grad dieser hier mindestens von ihm abweicht -- als Linie: 180° weiter
+    ist dieselbe. Die zwei Richtungen einer Deckenplatte etwa liegen
+    mindestens 5° auseinander, sonst trügen sie kaum anders als eine. Wie
+    bei :attr:`bis_feld` steht die Regel einmal, an einem der beiden
+    Felder, und die Maske weist sie an beiden ab (:meth:`quer`).
     """
 
     def grund(self, wert: float) -> str:
@@ -89,6 +100,29 @@ class Bereich:
             return (f"{self.gegen(anderer)[0]}, angegeben sind "
                     f"{self.zahl(wert)} und {anderer.zahl(grenze)}.")
         return ""
+
+    def quer(self, anderer: Bereich) -> Tuple[str, str]:
+        """
+        Was :attr:`quer_zu` verlangt, an diesem Feld und am anderen
+        (``anderer``): «Richtung 2 muss um mindestens 5° von Richtung 1
+        abweichen – 0° und 180° sind dieselbe Linie», und umgekehrt.
+        """
+        mindestens = self.zahl(self.quer_zu[1])
+        return tuple(f"{a.heisst} muss um mindestens {mindestens} von {b.heisst} abweichen "
+                     "– 0° und 180° sind dieselbe Linie" for a, b in ((self, anderer), (anderer, self)))
+
+    def grund_quer(self, wert: Optional[float], anderer: Bereich, winkel: Optional[float]) -> str:
+        """
+        Was :attr:`quer_zu` verletzt -- ``wert`` als Linie zu nahe an
+        ``winkel``, dem Winkel des anderen Feldes --, als Satz mit Punkt;
+        leer, wenn nichts.
+        """
+        if wert is None or winkel is None:
+            return ""
+        abstand = math.fmod(abs(wert - winkel), 180.0)
+        if min(abstand, 180.0 - abstand) >= self.quer_zu[1]:
+            return ""
+        return f"{self.quer(anderer)[0]}; angegeben sind {self.zahl(wert)} und {anderer.zahl(winkel)}."
 
     def zahl(self, wert: float) -> str:
         """Eine Zahl mit der Einheit: «300 mm», «30°», «0.9»."""

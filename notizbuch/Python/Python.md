@@ -1,5 +1,5 @@
 ---
-erzeugt: c20d9def522b
+erzeugt: 1e90442ba1f7
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -41,6 +41,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.decke.lasten]] – die Lasten eines Lastfalls auf den Streifen.
     - [[opencivil.decke.modell]] – was gerechnet wird: die Decke in SI.
     - [[opencivil.decke.rechnung]] – die Streifenmethode, Fall für Fall.
+    - [[opencivil.decke.richtungen]] – die zwei Richtungen, die eine Platte selbst wählt.
     - [[opencivil.decke.schnitt]] – die Schnittkräfte längs eines Schnitts.
     - [[opencivil.decke.streifen]] – die Decke in Streifen zerlegt.
     - [[opencivil.decke.traeger]] – ein Streifen als Durchlaufträger.

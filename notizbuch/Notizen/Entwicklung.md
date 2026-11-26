@@ -7,6 +7,41 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-26 · Decke: Richtungen von selbst
+
+Aus dem Plan vom 2026-11-25: jede Platte wählt ihre zwei Richtungen selbst,
+entlang ihrer Ränder, mit einem Schalter je Platte [automatisch | von Hand].
+
+- Vorher hatte jede Platte 0° und 90°, bis der Benutzer andere Winkel
+  tippte. Eine um 30° gedrehte Platte trug damit in x und y, schief zu
+  allen Rändern. Nachher trägt sie von selbst in 30° und 120°, und das
+  Fenster der Platte sagt unter «automatisch»: «Entlang der Ränder:
+  Richtung 1 30°, Richtung 2 120°.»
+- Die Regel (`opencivil/decke/richtungen.py`): Richtung 1 läuft parallel
+  zu den meisten Metern Rand, ein Rand quer dazu zählt mit. Platten, die
+  aneinanderstossen, wählen gemeinsam, damit die Streifen über die Fuge
+  laufen; die Fuge selbst zählt nicht. Eine Platte von Hand ändert nichts
+  an denen daneben -- sonst änderte der Schalter an einer Platte still
+  die Rechnung der anderen.
+- Abweichung vom Plan: geplant war der nach Länge gewichtete Mittelwert
+  der Randrichtungen. Ein Trapez, unten 6 m, oben 4 m, 5 m hoch, läge
+  damit auf −4.9°, schief zu jedem Rand; nach den meisten Metern trägt es
+  in x und y.
+- «von Hand» beginnt mit den Richtungen, die die Rechnung gewählt hatte:
+  der Schalter allein ändert nichts.
+- Zwei Richtungen von Hand, weniger als 5° auseinander -- auch 0° und 178°
+  --, weist schon das Feld ab, mit demselben Satz wie die Prüfung vor dem
+  Rechnen (`Bereich.quer_zu`). Bis heute hielt erst die Zerlegung die
+  Rechnung an.
+- Dateien von früher: eine Platte ohne den Schalter und mit 0° und 90° --
+  der alten Vorgabe -- wählt nun selbst; mit anderen Winkeln bleiben sie
+  von Hand (`DeckenplatteEintrag.ergaenzt`, aus `lesen` gerufen). Ebenso
+  ohne Maske: wer einen anderen Winkel angibt, meint ihn.
+- Die Herleitung sagt nach der Tabelle der Platten, welche ihre Richtungen
+  selbst wählen und nach welcher Regel. Keine Zahl der Beispiele ändert
+  sich: ihre Platten liegen in x und y, die schiefe in «Jede Wahl» bleibt
+  von Hand.
+
 ## 2026-11-26 · Decke: «trägt nicht», und warum
 
 Aus dem Plan vom 2026-11-25: was auch mit Bändern nicht trägt, sagt die

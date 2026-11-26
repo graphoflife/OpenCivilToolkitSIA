@@ -9,7 +9,7 @@ import math
 import unittest
 
 from opencivil.core.latex import Mathe
-from opencivil.core.protokoll import GleichungBlock, HinweisBlock, TabellenBlock, TitelBlock
+from opencivil.core.protokoll import GleichungBlock, HinweisBlock, TabellenBlock, TextBlock, TitelBlock
 from opencivil.decke.feld import GROESSEN
 from opencivil.decke.herleitung import SCHNITTKRAEFTE
 from opencivil.decke.streifen import richtung
@@ -138,6 +138,14 @@ class TestJedeWahl(unittest.TestCase):
         self.assertTrue(hinweis.startswith("Die Platte «P3» trägt schief zu x und y: "), hinweis)
         self.assertIn("(SIA 262:2025, 4.3.2.6)", hinweis)
         self.assertIn("(4.3.2.5)", hinweis)
+
+    def test_die_richtungen_von_selbst(self):
+        """P1 und P2 wählen ihre Richtungen selbst, P3 hat sie von Hand: die Herleitung sagt es, mit der Regel."""
+        (text,) = [b.text for b in self.loesung.protokoll.alle_bloecke()
+                   if isinstance(b, TextBlock) and "wählt die Rechnung selbst" in b.text]
+        self.assertTrue(text.startswith("Die Richtungen der Platten «P1», «P2» wählt die Rechnung selbst, "
+                                        "entlang der Ränder: "), text)
+        self.assertIn("nach Vorgabe", text)
 
     def test_schief_ist_weder_x_noch_y(self):
         """Auch 180° ist x -- und zwei rechtwinklige Richtungen, gegen x gedreht, sind schief."""

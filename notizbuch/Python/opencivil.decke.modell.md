@@ -1,5 +1,5 @@
 ---
-erzeugt: 5f13a7dd9761
+erzeugt: 7282cf5ca7f7
 art: modul
 tags: [modul]
 ---
@@ -55,6 +55,7 @@ class Platte
 - `E: float` – Elastizitätsmodul in N/m² -- er zählt nur, wo Platten verschieden steif sind.
 - `wichte: float` – Gewicht je Volumen in N/m³, für das Eigengewicht.
 - `richtungen: Tuple[float, float] = (0.0, math.pi / 2.0)` – Richtung 1 und 2 der Lastabtragung, rad gegen die x-Achse.
+- `von_selbst: bool = False` – Ob die Platte ihre Richtungen selbst wählt, entlang ihrer Ränder ([[opencivil.decke.richtungen|richtungen]]) -- dann gilt `richtungen` erst, wenn die Rechnung sie gewählt hat ([[opencivil.decke.rechnung#Ergebnis|decke]]).
 
 ### Linienlager
 
@@ -248,6 +249,7 @@ class Decke
 - [[opencivil.decke.herleitung]]
 - [[opencivil.decke.lasten]]
 - [[opencivil.decke.rechnung]]
+- [[opencivil.decke.richtungen]]
 - [[opencivil.decke.schnitt]]
 - [[opencivil.decke.streifen]]
 - [[opencivil.decke.werk]]

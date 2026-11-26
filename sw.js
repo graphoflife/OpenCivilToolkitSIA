@@ -80,14 +80,14 @@ const VORRAT = {
     "web/js/cad_palette.js?v=093d67d4548d",
     "web/js/cad_raum.js?v=2ef16c41d520",
     "web/js/cad_verlauf.js?v=7603b772b8be",
-    "web/js/decke.js?v=61840cfa17b5",
+    "web/js/decke.js?v=e190d0cece32",
     "web/js/diagramm.js?v=2b56ba98c6b5",
-    "web/js/dk_eigenschaften.js?v=7bcd9ef19de8",
+    "web/js/dk_eigenschaften.js?v=537cc9c36d69",
     "web/js/dk_ergebnis.js?v=05988feaa2cb",
     "web/js/dk_grundriss.js?v=975ead783fc0",
     "web/js/dk_schnitt.js?v=1cc553f65830",
     "web/js/dk_zeichnung.js?v=618ccb6403bb",
-    "web/js/dom.js?v=77e2ae9b8099",
+    "web/js/dom.js?v=231ab358008e",
     "web/js/ds_grundriss.js?v=a6eb3f49f942",
     "web/js/ds_zeichnung.js?v=232bf46b0015",
     "web/js/durchstanzen.js?v=ec3a00d25de7",
@@ -138,8 +138,8 @@ const VORRAT = {
     "web/js/variablen.js?v=7d43b6f38cd9",
     "web/js/zeichnen.js?v=da6e8eec5dc8",
     "web/js/zustand.js?v=04a6b50b3e76",
-    "web/kern/notizbuch.json?v=95b22095dc18",
-    "web/kern/quellen.json?v=865e25ae20ba"
+    "web/kern/notizbuch.json?v=f605390121a4",
+    "web/kern/quellen.json?v=e8faf0039c16"
   ],
   "fremd": {
     "web/vendor/jetbrains-mono/": {

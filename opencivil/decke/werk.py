@@ -47,7 +47,8 @@ STREIFENMETHODE = "Streifenmethode"
 class Deckenbefund:
     """
     Was die Streifenmethode im Lauf fand: die Decke, wie sie gerechnet wurde
-    -- mit E und Gewicht jeder Platte --, die Meldungen und das Ergebnis.
+    -- mit E und Gewicht jeder Platte und den Richtungen, die sie selbst
+    wählt --, die Meldungen und das Ergebnis.
     """
 
     gerechnet: Decke
@@ -143,7 +144,7 @@ class Deckensystem(Rechenobjekt):
             platten.append(platte)
         gerechnet = replace(self.decke, platten=platten)
         ergebnis = None if any(m.haelt_an for m in self.meldungen) else rechnen(gerechnet)
-        befund = Deckenbefund(gerechnet, self.meldungen + (ergebnis.meldungen if ergebnis else []),
-                              ergebnis)
+        befund = Deckenbefund(ergebnis.decke if ergebnis else gerechnet,
+                              self.meldungen + (ergebnis.meldungen if ergebnis else []), ergebnis)
         herleitung.schreiben(p, self, befund)
         return Ausfuehrung({}, befund=befund)

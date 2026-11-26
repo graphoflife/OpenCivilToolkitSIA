@@ -61,6 +61,13 @@ class Platte:
     richtungen: Tuple[float, float] = (0.0, math.pi / 2.0)
     """Richtung 1 und 2 der Lastabtragung, rad gegen die x-Achse."""
 
+    von_selbst: bool = False
+    """
+    Ob die Platte ihre Richtungen selbst wählt, entlang ihrer Ränder
+    (:mod:`~opencivil.decke.richtungen`) -- dann gilt ``richtungen`` erst,
+    wenn die Rechnung sie gewählt hat (:attr:`~opencivil.decke.rechnung.Ergebnis.decke`).
+    """
+
 
 @dataclass(frozen=True)
 class Linienlager:

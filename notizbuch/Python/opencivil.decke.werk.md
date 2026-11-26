@@ -1,5 +1,5 @@
 ---
-erzeugt: 04f286d80fb4
+erzeugt: 42e8be9dedaa
 art: modul
 tags: [modul]
 ---
@@ -42,7 +42,8 @@ class Deckenbefund
 ```
 
 Was die Streifenmethode im Lauf fand: die Decke, wie sie gerechnet wurde
--- mit E und Gewicht jeder Platte --, die Meldungen und das Ergebnis.
+-- mit E und Gewicht jeder Platte und den Richtungen, die sie selbst
+wählt --, die Meldungen und das Ergebnis.
 
 - `gerechnet: Decke`
 - `meldungen: List[Meldung]` – Die der Beschreibung und die der Rechnung, in dieser Reihenfolge.

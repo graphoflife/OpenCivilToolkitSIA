@@ -9,6 +9,8 @@ Wie die Decke ihre Last von selbst aufteilt -- wo Folie 31 nichts sagt.
   statt «je zur Hälfte», und eine graue Meldung an der Platte sagt je
   Richtung, warum; gibt die feste Aufteilung oder eine Zone Last in eine
   Richtung, die nicht trägt, sagt sie wer und wie viel.
+* Richtungen von selbst: entlang der meisten Meter Rand, Platten, die
+  aneinanderstossen, gleich (Benutzer, 2026-11-25).
 """
 
 import math
@@ -19,6 +21,7 @@ from opencivil.decke.aufteilung import GANZ_AB, in_der_mitte
 from opencivil.decke.feld import an_stelle
 from opencivil.decke.modell import Aufteilung, Decke, Flaechenlast, Lastfall, Platte, Zone
 from opencivil.decke.rechnung import rechnen
+from opencivil.decke.richtungen import festgelegt
 from tests.test_decke_rechnung import E, WICHTE, Rechnung, q, rechteck, waende
 
 
@@ -119,6 +122,71 @@ class TestWoLastAusfaellt(Rechnung):
         e, f = self.gerechnet_ohne_probe(ecken, waende(ecken, 1, 3))
         self.assertEqual(self.ausfall(e), [])
         self.assertAlmostEqual(f.nicht_getragen, 0.0)
+
+
+def gedreht(ecken, grad):
+    c, s = math.cos(math.radians(grad)), math.sin(math.radians(grad))
+    return tuple((c * x - s * y, s * x + c * y) for x, y in ecken)
+
+
+#: B stösst rechts an A, 6 × 4 m: ein Parallelogramm, dessen lange Ränder 8 m unter 30° laufen.
+A = rechteck(0, 0, 6, 4)
+B = ((6.0, 0.0), (6.0 + 8.0 * math.cos(math.radians(30)), 4.0),
+     (6.0 + 8.0 * math.cos(math.radians(30)), 8.0), (6.0, 4.0))
+
+
+class TestRichtungenVonSelbst(Rechnung):
+    """Platten, die ihre zwei Richtungen selbst wählen -- Richtung 1 über −45° bis 45°."""
+
+    def platte(self, name, ecken, von_selbst=True, grad=(0.0, 90.0)):
+        return Platte(name, tuple(ecken), 0.2, E, WICHTE, tuple(math.radians(g) for g in grad),
+                      von_selbst=von_selbst)
+
+    def gewaehlt(self, *platten):
+        """Die Richtungen jeder Platte in Grad, nachdem die Decke sie gewählt hat."""
+        return [[round(math.degrees(w), 6) for w in p.richtungen]
+                for p in festgelegt(Decke(platten=list(platten))).platten]
+
+    def test_ein_gedrehtes_rechteck(self):
+        for grad, erwartet in ((0, [0, 90]), (30, [30, 120]), (45, [45, 135]), (60, [-30, 60]),
+                               (120, [30, 120])):
+            with self.subTest(grad=grad):
+                self.assertEqual(self.gewaehlt(self.platte("P", gedreht(rechteck(0, 0, 6, 4), grad))),
+                                 [erwartet])
+
+    def test_ein_trapez_folgt_den_meisten_metern(self):
+        """
+        Unten 6 m, oben 4 m, 5 m hoch: drei Ränder in x und y, einer schief.
+        Der Mittelwert aller Ränder gäbe −4.9°, schief zu jedem Rand.
+        """
+        self.assertEqual(self.gewaehlt(self.platte("T", [(0, 0), (6, 0), (6, 5), (2, 5)])), [[0, 90]])
+
+    def test_aneinander_dieselben(self):
+        """
+        Für sich trüge B in 30° und 120°. Mit A liegen 20 m Rand in x und y
+        gegen 16 m unter 30° -- die Fuge zählt nicht --, und beide tragen in
+        x und y: so laufen die Streifen über die Fuge.
+        """
+        self.assertEqual(self.gewaehlt(self.platte("B", B)), [[30, 120]])
+        self.assertEqual(self.gewaehlt(self.platte("A", A), self.platte("B", B)), [[0, 90], [0, 90]])
+
+    def test_von_hand_bleibt_und_aendert_nichts_daneben(self):
+        self.assertEqual(self.gewaehlt(self.platte("A", A), self.platte("B", B, False, (20.0, 110.0))),
+                         [[0, 90], [20, 110]])
+
+    def test_eine_ecke_ist_keine_fuge(self):
+        """B, nur an der Ecke (6, 0) an A gehängt, wählt für sich."""
+        b = tuple((x, y - 4.0) for x, y in B)
+        self.assertEqual(self.gewaehlt(self.platte("A", A), self.platte("B", b)), [[0, 90], [30, 120]])
+
+    def test_die_rechnung_waehlt_vor_dem_zerlegen(self):
+        """Das Ergebnis trägt die gewählten Richtungen; die Streifen laufen in ihnen."""
+        ecken = gedreht(rechteck(0, 0, 6, 4), 30)
+        e = rechnen(Decke(platten=[self.platte("P", ecken)], linienlager=waende(ecken, 0, 1, 2, 3),
+                          lastfaelle=[Lastfall("q", [Flaechenlast("q", q, platte="P")])]))
+        self.assertEqual([round(math.degrees(w), 6) for w in e.decke.platten[0].richtungen], [30, 120])
+        self.assertEqual([r.name for r in e.zerlegung.richtungen], ["30°", "120°"])
+        self.assertAlmostEqual(e.faelle[0].fehlbetrag, 0.0, delta=1e-6 * e.faelle[0].summe)
 
 
 if __name__ == "__main__":
