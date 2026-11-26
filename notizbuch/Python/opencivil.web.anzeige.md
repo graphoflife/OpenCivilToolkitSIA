@@ -1,5 +1,5 @@
 ---
-erzeugt: 2c4138c42de9
+erzeugt: 8e065328ee30
 art: modul
 tags: [modul]
 ---
@@ -145,3 +145,4 @@ nicht auf, steht sein Gegenteil da; `grad` der Erfuellungsgrad in LaTeX.
 - [[opencivil.web.grundbruchdaten]]
 - [[opencivil.web.pfahldaten]]
 - [[opencivil.web.setzungsdaten]]
+- [[opencivil.web.werkstoffkurven]]

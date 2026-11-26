@@ -1,5 +1,5 @@
 ---
-erzeugt: c1cf3ac67610
+erzeugt: 6c47398bc720
 art: modul
 tags: [modul]
 ---
@@ -85,6 +85,14 @@ def obergrenzen(projekt) -> Dict[str, str]
 Je Platte die Obergrenze der automatischen Bewehrung, fertig als Text --
 «4712 mm²/m» oder «keine». Die Oberflaeche zeigt sie neben den Eingaben,
 ohne selbst zu rechnen.
+
+### _erzeugnis_dict
+
+```python
+def _erzeugnis_dict(erzeugnis: Erzeugnis, sorte: str) -> dict
+```
+
+Ein Erzeugnis einer Sorte: Art, ⌀ in mm, Fläche in mm², Bezeichnung und der Modul, der gilt.
 
 ### wert_dict
 
@@ -219,6 +227,7 @@ Je Querschnitt eines Systems, wo A und I stehen -- und je Paar aus Querschnitt u
 - [[opencivil.material.arten]]
 - [[opencivil.material.beton]]
 - [[opencivil.material.betonstahl]]
+- [[opencivil.material.spannstahl]]
 - [[opencivil.nachweis.biegung_normalkraft]]
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.nachweis.rissanforderung]]
@@ -252,6 +261,7 @@ Je Querschnitt eines Systems, wo A und I stehen -- und je Paar aus Querschnitt u
 - [[opencivil.web.durchstanzdaten]]
 - [[opencivil.web.systemkatalog]]
 - [[opencivil.web.umschlag]]
+- [[opencivil.web.werkstoffkurven]]
 - [[opencivil.web.zeichendaten]]
 
 ## Gebraucht von

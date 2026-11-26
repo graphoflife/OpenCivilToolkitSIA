@@ -62,7 +62,7 @@ const VORRAT = {
     "web/js/balkensystem.js?v=30c228bd56d0",
     "web/js/baum.js?v=97b983cbbf34",
     "web/js/bausteine.js?v=34823e329474",
-    "web/js/bericht.js?v=2f883492f346",
+    "web/js/bericht.js?v=a812e0b6385b",
     "web/js/bewehrungssuche.js?v=2582eafd0f54",
     "web/js/bs_diagramme.js?v=b94694de6703",
     "web/js/bs_eigenschaften.js?v=a234c29f8f4d",
@@ -111,8 +111,8 @@ const VORRAT = {
     "web/js/lagen.js?v=d1de89b1b40b",
     "web/js/lastfaelle.js?v=68c0629d7657",
     "web/js/markdown.js?v=95b8ac3d60df",
-    "web/js/material.js?v=2b0b6df5094e",
-    "web/js/materialwahl.js?v=e65fae366d80",
+    "web/js/material.js?v=93590e1b9f12",
+    "web/js/materialwahl.js?v=b0fbaa7461f6",
     "web/js/mathe.js?v=f218656b8dbb",
     "web/js/nachweise.js?v=c39295348e07",
     "web/js/notizbuch.js?v=5079698154ff",
@@ -139,8 +139,8 @@ const VORRAT = {
     "web/js/variablen.js?v=7d43b6f38cd9",
     "web/js/zeichnen.js?v=da6e8eec5dc8",
     "web/js/zustand.js?v=04a6b50b3e76",
-    "web/kern/notizbuch.json?v=bce998b36110",
-    "web/kern/quellen.json?v=23cc52c6596f"
+    "web/kern/notizbuch.json?v=074cdff06ec3",
+    "web/kern/quellen.json?v=8e8b93fcc07d"
   ],
   "fremd": {
     "web/vendor/jetbrains-mono/": {

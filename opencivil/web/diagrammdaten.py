@@ -3,8 +3,9 @@ opencivil/web/diagrammdaten.py -- was die Oberflaeche zeichnet, als JSON.
 
 VERANTWORTUNG:
 Die Punktfolgen der Diagramme: M-N-Interaktionslinien samt Knickpunkten,
-Werkstoffgesetze, Querkraft ueber Moment und ueber Neigung, die Bilder der
-Spannung-Dehnung-Analyse. Aus :mod:`opencivil.web.api` herausgeloest, das
+Querkraft ueber Moment und ueber Neigung, die Bilder der Spannung-Dehnung-
+Analyse. Die Werkstoffgesetze stehen seit 2026-11-26 fuer sich
+(:mod:`opencivil.web.werkstoffkurven`). Aus :mod:`opencivil.web.api` herausgeloest, das
 damit nur noch Katalog, Mitschrift, Loesung und Zusammenfassung abbildet.
 
 Wie dort wird hier nichts nachgerechnet, was der Kern schon weiss: die Kurven
@@ -25,10 +26,6 @@ from opencivil.core.einheiten import (
     GRAD, KN, KNM, KN_PRO_M, MM, MM2, N_PRO_MM2, PRO_M, PROMILLE,
 )
 from opencivil.core.rechenwerk import Loesung
-from opencivil.material.basis import Baustoffart
-from opencivil.querschnitt.werkstoffgesetz import (
-    BLOCKANTEIL, Baustahlgesetz, Betongesetz, Spannungsblock, Stahlgesetz,
-)
 from opencivil.nachweis.resistenzlinie import Handlinie
 from opencivil.nachweis.schubwandnachweis import OHNE_SCHUB, Schubbefund, schub_belastet
 from opencivil.projekt import Aufbau
@@ -395,149 +392,6 @@ def _modul_dict(modul) -> dict:
         "tragfaehig": linie.tragfaehig,
         "hinweis": linie.hinweis,
     }
-
-
-def werkstoffgesetze(aufbau: Aufbau, loesung: Loesung) -> dict:
-    """
-    Punktfolgen der Spannungs-Dehnungs-Beziehungen, je Material.
-
-    Gerechnet wird mit denselben Gesetzen wie im Nachweis -- die Kurve zeigt
-    also genau das, was der Querschnittsintegration zugrunde liegt, und nicht
-    eine zweite, nachgebaute Fassung.
-
-    Vorzeichen wie im ganzen Werkzeug: Zug positiv. Der Beton liegt damit im
-    dritten Quadranten, der Stahl spannt sich ueber beide.
-
-    Welche Kurve ein Material hat, sagt seine Art (:data:`KURVEN`); fehlt ein
-    Kennwert in der Loesung, hat es noch keine. Bis 2026-11-26 galt alles,
-    was nicht Beton war, als Betonstahl, und ein Baustahl fiel still weg,
-    weil ihm dessen Kennwerte fehlten.
-    """
-    ergebnis: Dict[str, dict] = {}
-
-    for kennung, stoff in aufbau.baustoffe.items():
-        def wert(kurzname: str) -> Optional[float]:
-            eintrag = loesung.werte.get(stoff.definitionen[kurzname].id)
-            return eintrag.groesse.si if eintrag else None
-
-        eintrag = KURVEN[stoff.art](wert)
-        if eintrag:
-            eintrag["name"] = stoff.name
-            eintrag["art"] = stoff.art.value
-            ergebnis[kennung] = eintrag
-    return ergebnis
-
-
-def _betonkurve(wert, schritte: int = 80) -> Optional[dict]:
-    """
-    Parabel-Rechteck-Beziehung, von null bis zur Bruchdehnung -- mit
-    Bemessungswerten, ohne Kriechen, gebaut wie in jeder Rechnung: der
-    Beiwert aus ``E_cm`` (:meth:`Betongesetz.mit_modul`).
-    """
-    from opencivil.querschnitt.werkstoffgesetz import Betongesetz
-
-    f_cd, eps_c1d = wert("f_cd"), wert("eps_c1d")
-    eps_c2d, E_cm = wert("eps_c2d"), wert("E_cm")
-    if None in (f_cd, eps_c1d, eps_c2d, E_cm):
-        return None
-
-    gesetz = Betongesetz.mit_modul(f_c=abs(f_cd), E_c=abs(E_cm), eps_c1d=abs(eps_c1d),
-                                   eps_c2d=abs(eps_c2d))
-    punkte = []
-    for i in range(schritte + 1):
-        eps = -abs(eps_c2d) * i / schritte
-        punkte.append({"eps": zahl(eps, PROMILLE), "sigma": zahl(gesetz.spannung(eps), N_PRO_MM2)})
-
-    return {
-        "punkte": punkte,
-        "x_titel": "ε [‰]",
-        "y_titel": "σ [N/mm²]",
-        "titel": "Beton – Parabel-Rechteck-Beziehung",
-        "referenz": Betongesetz.REFERENZ,
-        "marken": [
-            {"eps": zahl(-abs(eps_c1d), PROMILLE), "sigma": zahl(-abs(f_cd), N_PRO_MM2),
-             "text": "ε_c1d"},
-            {"eps": zahl(-abs(eps_c2d), PROMILLE), "sigma": zahl(-abs(f_cd), N_PRO_MM2),
-             "text": "ε_c2d"},
-        ],
-        "vereinfacht": _spannungsblock(abs(f_cd), abs(eps_c2d)),
-    }
-
-
-def _spannungsblock(f_cd: float, eps_c2d: float) -> dict:
-    """
-    Der vereinfachte, rechteckige Spannungsverlauf.
-
-    Unterhalb von ``(1 - 0.85) * eps_c2d`` wird keine Spannung angesetzt,
-    darueber durchgehend ``f_cd``. Das ist dieselbe Vereinfachung, die auch der
-    Handrechnung zugrunde liegt -- dort als Druckzone der Hoehe ``0.85 x``.
-    Beide Bilder gehoeren zusammen, und genau deshalb steht die Stufe hier neben
-    der Parabel: man sieht, was man aufgibt, wenn man von Hand rechnet.
-    """
-    block = Spannungsblock(f_cd=f_cd, eps_c2d=eps_c2d)
-    ecken = [
-        (0.0, 0.0),
-        (-block.eps_knick, 0.0),
-        (-block.eps_knick, -block.f_cd),
-        (-eps_c2d, -block.f_cd),
-    ]
-    return {
-        "punkte": [{"eps": zahl(e, PROMILLE), "sigma": zahl(s, N_PRO_MM2)} for e, s in ecken],
-        "titel": "vereinfacht (Spannungsblock)",
-        "beschreibung": (
-            f"σ = 0 bis {1 - BLOCKANTEIL:.2f}·ε_c2d, darüber f_cd. "
-            f"Entspricht der Druckzone {BLOCKANTEIL}·x der Handrechnung."
-        ),
-    }
-
-
-def _stahlkurve(wert) -> Optional[dict]:
-    """Betonstahl: bilinear, auf Zug und Druck getrennt begrenzt."""
-    E_s, f_yd = wert("E_s"), wert("f_yd")
-    f_yd_druck, eps_ud = wert("f_yd_druck"), wert("eps_ud")
-    if None in (E_s, f_yd, f_yd_druck, eps_ud):
-        return None
-    return _knickkurve(Stahlgesetz(E_s=E_s, f_yd=f_yd, f_yd_druck=abs(f_yd_druck), eps_ud=abs(eps_ud)),
-                       "Betonstahl – bilineare Beziehung")
-
-
-def _baustahlkurve(wert) -> Optional[dict]:
-    """Baustahl: elastisch -- ideal plastisch, in Zug und Druck gleich, mit ``f_yd = f_y / gamma_M1``."""
-    E_a, f_yd, eps_ud = wert("E_a"), wert("f_yd"), wert("eps_ud")
-    if None in (E_a, f_yd, eps_ud):
-        return None
-    return _knickkurve(Baustahlgesetz.gleich(E_a, f_yd, eps_ud), "Baustahl – elastisch-plastisch")
-
-
-def _knickkurve(gesetz: Stahlgesetz, titel: str) -> dict:
-    """
-    Eine Linie ohne Verfestigung, aus ihrem Gesetz. Fuenf Eckpunkte genuegen
-    -- dazwischen ist sie gerade, und mehr Punkte wuerden nur vortaeuschen,
-    dass etwas gekruemmt waere.
-    """
-    f, f_druck, eps_ud = gesetz.f_yd, gesetz.f_yd_druck, gesetz.eps_ud
-    eps_yd = gesetz.eps_yd
-    ecken = [(-eps_ud, -f_druck), (-f_druck / gesetz.E_s, -f_druck), (0.0, 0.0), (eps_yd, f), (eps_ud, f)]
-    return {
-        "punkte": [{"eps": zahl(e, PROMILLE), "sigma": zahl(s, N_PRO_MM2)} for e, s in ecken],
-        "x_titel": "ε [‰]",
-        "y_titel": "σ [N/mm²]",
-        "titel": titel,
-        "referenz": gesetz.REFERENZ,
-        "marken": [
-            {"eps": zahl(eps_yd, PROMILLE), "sigma": zahl(f, N_PRO_MM2), "text": "ε_yd"},
-            {"eps": zahl(eps_ud, PROMILLE), "sigma": zahl(f, N_PRO_MM2), "text": "ε_ud"},
-        ],
-    }
-
-
-#: Je Materialart ihre Spannung-Dehnung-Linie, aus den Kennwerten einer
-#: Loesung -- wo es eines gibt, ein Gesetz des Querschnitts.
-KURVEN: Dict[Baustoffart, Callable[[Callable[[str], Optional[float]]], Optional[dict]]] = {
-    Baustoffart.BETON: _betonkurve,
-    Baustoffart.BETONSTAHL: _stahlkurve,
-    Baustoffart.BAUSTAHL: _baustahlkurve,
-}
 
 
 def _knickpunkte(aufbau, nachweis, loesung) -> list:

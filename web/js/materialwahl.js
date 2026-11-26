@@ -7,7 +7,8 @@
  *                          ist -- nichts daran lässt sich ändern, auch die
  *                          Sorte nicht
  *     eigenes Material     nimmt eine Sorte als Vorlage, heisst BE1, BE2 ...
- *                          (Betonstahl S1 ..., Baustahl ST1 ...) und seine
+ *                          (Betonstahl S1 ..., Baustahl ST1 ..., Spannstahl
+ *                          SP1 ...) und seine
  *                          Kennwerte sind änderbar; eine Sorte trägt es nicht
  *
  * Wie eine Art heisst, womit Kennungen und Namen eigener Materialien
@@ -64,7 +65,7 @@ export function materialKopieren(material) {
   melden(`«${name}» angelegt, eine Kopie von ${material.name || material.sorte}.`);
 }
 
-/** Öffnet das Fenster für ein neues Material dieser Art: 'beton', 'betonstahl' oder 'baustahl'. */
+/** Öffnet das Fenster für ein neues Material dieser Art: 'beton', 'betonstahl', 'baustahl' … */
 export function materialAnlegen(art) {
   const { titel, grundlage, anlegen: sorten } = artVon(art);
   const vergeben = new Set(zustand.projekt.materialien.map((m) => m.name || m.sorte));

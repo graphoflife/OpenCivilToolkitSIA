@@ -1,5 +1,5 @@
 ---
-erzeugt: cbda25240c79
+erzeugt: e643284cf244
 art: modul
 tags: [modul]
 ---
@@ -10,8 +10,9 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Die Punktfolgen der Diagramme: M-N-Interaktionslinien samt Knickpunkten,
-Werkstoffgesetze, Querkraft ueber Moment und ueber Neigung, die Bilder der
-Spannung-Dehnung-Analyse. Aus [[opencivil.web.api]] herausgeloest, das
+Querkraft ueber Moment und ueber Neigung, die Bilder der Spannung-Dehnung-
+Analyse. Die Werkstoffgesetze stehen seit 2026-11-26 fuer sich
+([[opencivil.web.werkstoffkurven]]). Aus [[opencivil.web.api]] herausgeloest, das
 damit nur noch Katalog, Mitschrift, Loesung und Zusammenfassung abbildet.
 
 Wie dort wird hier nichts nachgerechnet, was der Kern schon weiss: die Kurven
@@ -128,76 +129,6 @@ sein Vielfaches von E_cm, wo er angeschrieben wird: je Punkt daneben, an
 den Ecken mit ihm (`{"wert", "vielfaches"}`). Gerechnet ist alles im
 Kern ([[opencivil.spannungsanalyse.modul#Modullinie|Modullinie]]); bis 2026-10-18
 teilte die Oberflaeche selbst durch E_cm.
-
-### werkstoffgesetze
-
-```python
-def werkstoffgesetze(aufbau: Aufbau, loesung: Loesung) -> dict
-```
-
-Punktfolgen der Spannungs-Dehnungs-Beziehungen, je Material.
-
-Gerechnet wird mit denselben Gesetzen wie im Nachweis -- die Kurve zeigt
-also genau das, was der Querschnittsintegration zugrunde liegt, und nicht
-eine zweite, nachgebaute Fassung.
-
-Vorzeichen wie im ganzen Werkzeug: Zug positiv. Der Beton liegt damit im
-dritten Quadranten, der Stahl spannt sich ueber beide.
-
-Welche Kurve ein Material hat, sagt seine Art ([[opencivil.web.diagrammdaten#Konstanten|KURVEN]]); fehlt ein
-Kennwert in der Loesung, hat es noch keine. Bis 2026-11-26 galt alles,
-was nicht Beton war, als Betonstahl, und ein Baustahl fiel still weg,
-weil ihm dessen Kennwerte fehlten.
-
-### _betonkurve
-
-```python
-def _betonkurve(wert, schritte: int=80) -> Optional[dict]
-```
-
-Parabel-Rechteck-Beziehung, von null bis zur Bruchdehnung -- mit
-Bemessungswerten, ohne Kriechen, gebaut wie in jeder Rechnung: der
-Beiwert aus `E_cm` ([[opencivil.querschnitt.werkstoffgesetz#Betongesetz.mit_modul|Betongesetz.mit_modul]]).
-
-### _spannungsblock
-
-```python
-def _spannungsblock(f_cd: float, eps_c2d: float) -> dict
-```
-
-Der vereinfachte, rechteckige Spannungsverlauf.
-
-Unterhalb von `(1 - 0.85) * eps_c2d` wird keine Spannung angesetzt,
-darueber durchgehend `f_cd`. Das ist dieselbe Vereinfachung, die auch der
-Handrechnung zugrunde liegt -- dort als Druckzone der Hoehe `0.85 x`.
-Beide Bilder gehoeren zusammen, und genau deshalb steht die Stufe hier neben
-der Parabel: man sieht, was man aufgibt, wenn man von Hand rechnet.
-
-### _stahlkurve
-
-```python
-def _stahlkurve(wert) -> Optional[dict]
-```
-
-Betonstahl: bilinear, auf Zug und Druck getrennt begrenzt.
-
-### _baustahlkurve
-
-```python
-def _baustahlkurve(wert) -> Optional[dict]
-```
-
-Baustahl: elastisch -- ideal plastisch, in Zug und Druck gleich, mit `f_yd = f_y / gamma_M1`.
-
-### _knickkurve
-
-```python
-def _knickkurve(gesetz: Stahlgesetz, titel: str) -> dict
-```
-
-Eine Linie ohne Verfestigung, aus ihrem Gesetz. Fuenf Eckpunkte genuegen
--- dazwischen ist sie gerade, und mehr Punkte wuerden nur vortaeuschen,
-dass etwas gekruemmt waere.
 
 ### _knickpunkte
 
@@ -385,20 +316,17 @@ warum, sagt [[opencivil.web.diagrammdaten#_ohne_schub|_ohne_schub]].
 - `_LINIENGROESSEN = {spannungsanalyse.Analyseart.MOMENT_KRUEMMUNG: (Anzeigegroesse('M', K…` – Was eine Linie zeigt, je Art ihrer Linie: die laufende Kraft, die festgehaltene und die Verformung. Massstab und Beschriftung an einer Stelle -- bis 2026-10-18 skalierte der Kern hier, und spannungsbild.js schrieb Zeichen und Einheiten ein zweites Mal daneben (LINIEN, MODULE).
 - `_MODUL = Anzeigegroesse('E_eq', N_PRO_MM2, 'E_{eq}', 0)` – Der aequivalente Modul, ueber der laufenden Kraft.
 - `_RANDDEHNUNG = Anzeigegroesse('ε', PROMILLE, '\\varepsilon', 2)` – Die Randdehnungen beim Bruch.
-- `KURVEN = {Baustoffart.BETON: _betonkurve, Baustoffart.BETONSTAHL: _stahlkurve,…` – Je Materialart ihre Spannung-Dehnung-Linie, aus den Kennwerten einer Loesung -- wo es eines gibt, ein Gesetz des Querschnitts.
 
 ## Braucht
 
 - [[opencivil.core.einheiten]]
 - [[opencivil.core.rechenwerk]]
 - [[opencivil.core.wert]]
-- [[opencivil.material.basis]]
 - [[opencivil.nachweis.resistenzlinie]]
 - [[opencivil.nachweis.schubwandnachweis]]
 - [[opencivil.projekt]]
 - [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.platte]]
-- [[opencivil.querschnitt.werkstoffgesetz]]
 - [[opencivil.querschnitt.widerstandsflaeche]]
 - [[opencivil.spannungsanalyse]]
 - [[opencivil.web.anzeige]]

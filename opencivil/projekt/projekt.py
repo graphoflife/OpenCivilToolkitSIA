@@ -227,7 +227,7 @@ class Projekt(Beschreibung):
                 and (kennung in e.materialien() or kennung in e.bezuege())]
 
     def eigener_name(self, art: str) -> str:
-        """Der erste freie Name eines eigenen Materials: BE1, BE2 ..., S1 ... oder ST1 ..."""
+        """Der erste freie Name eines eigenen Materials: BE1, BE2 ..., S1 ..., ST1 ... oder SP1 ..."""
         vorsilbe = MATERIALARTEN[art].eigene
         vergeben = {m.anzeigename for m in self.materialien}
         i = 1
@@ -255,6 +255,10 @@ class Projekt(Beschreibung):
         """Eine Baustahlsorte nach SIA 263 -- Kennung ``st1``, ``st2`` ..."""
         return self._normsorte("baustahl", sorte)
 
+    def spannstahl(self, sorte: str = "Y1860") -> MaterialEintrag:
+        """Eine Spannstahlsorte nach SIA 262 -- Kennung ``sp1``, ``sp2`` ..."""
+        return self._normsorte("spannstahl", sorte)
+
     def eigener_beton(self, vorlage: str = "C30/37") -> MaterialEintrag:
         """
         Ein eigener Beton, ``BE1``, ``BE2`` ... -- mit den Kennwerten der Sorte
@@ -270,6 +274,10 @@ class Projekt(Beschreibung):
     def eigener_baustahl(self, vorlage: str = "S235") -> MaterialEintrag:
         """Ein eigener Baustahl, ``ST1``, ``ST2`` ... -- siehe :meth:`eigener_beton`."""
         return self._eigenes("baustahl", vorlage)
+
+    def eigener_spannstahl(self, vorlage: str = "Y1860") -> MaterialEintrag:
+        """Ein eigener Spannstahl, ``SP1``, ``SP2`` ... -- siehe :meth:`eigener_beton`."""
+        return self._eigenes("spannstahl", vorlage)
 
     def material_anlegen(self, art: str, sorte: str, *, eigen: bool = False) -> MaterialEintrag:
         """

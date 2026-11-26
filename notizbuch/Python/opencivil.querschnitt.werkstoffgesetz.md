@@ -1,5 +1,5 @@
 ---
-erzeugt: fcbb6effa120
+erzeugt: d1a579755399
 art: modul
 tags: [modul]
 ---
@@ -20,6 +20,8 @@ Betonstahl: bilinear, auf Zug und Druck getrennt begrenzt
 ([[opencivil.querschnitt.werkstoffgesetz#Stahlgesetz|Stahlgesetz]], 4.2.2.2 mit Figur 16), oder nur auf Zug. Baustahl:
 elastisch -- ideal plastisch, in Zug und Druck gleich
 ([[opencivil.querschnitt.werkstoffgesetz#Baustahlgesetz|Baustahlgesetz]], SIA 263:2013), mit einer Grenzdehnung nach Vorgabe.
+Spannstahl: elastisch -- ideal plastisch, nur auf Zug
+([[opencivil.querschnitt.werkstoffgesetz#Spannstahlgesetz|Spannstahlgesetz]], 4.2.3.3 mit Figur 17).
 
 Bis 2026-10-16 rechneten Funktionen im Loeser, und gedruckt wurden Klassen
 mit Platzhaltern oder Formeln von Hand. Jenseits von eps_c2d und beim
@@ -396,6 +398,55 @@ def latex(self, zug: str='f_{yd}', druck: str='') -> str
 
 Als Formel -- `zug` ist das Zeichen der Streckgrenze, auf Druck dieselbe.
 
+### Spannstahlgesetz
+
+```python
+@dataclass(frozen=True)
+class Spannstahlgesetz(Gesetz)
+```
+
+Spannstahl nach SIA 262:2025, Figur 17: mit `E_p` bis zur Fliessgrenze,
+dann waagrecht bis `eps_ud` -- ohne die Verfestigung, die 4.2.3.6
+zuliesse, ideal plastisch wie 4.2.3.5. Die Figur zeigt nur den Zug
+(4.2.3.3); gedrueckt traegt der Spannstahl hier nichts -- nach Vorgabe,
+nicht nachgeschlagen. Ein vorgespanntes Glied kommt dort nie hin: seine
+Vordehnung ist groesser als jede Stauchung des Betons.
+
+`E_p` ist der Modul des Erzeugnisses: 200 GPa fuer Draehte und Staebe,
+195 GPa fuer Litzen (3.3.2.4).
+
+- `NAME = 'Bilineare Beziehung des Spannstahls'`
+- `WORT = 'Spannstahl, bilinear'`
+- `REFERENZ = 'SIA 262:2025, 4.2.3.3, Figur 17; 4.2.3.5'`
+- `ROLLEN = ('f_p', 'E_p', 'eps_ud')`
+- `WERTTITEL = 'Werte des Spannstahls'`
+- `E_p: float` – Elastizitaetsmodul in N/m^2.
+- `f_pd: float` – Fliessgrenze in N/m^2 -- je nach Werkstoffsatz `f_pd` oder `f_p0.1k`.
+- `eps_ud: float` – Bruchdehnung, positiv.
+
+#### Spannstahlgesetz.eps_pd
+
+```python
+@property
+def eps_pd(self) -> float
+```
+
+Wo das Fliessen beginnt.
+
+#### Spannstahlgesetz.formel
+
+```python
+def formel(self, werte: Werte) -> str
+```
+
+#### Spannstahlgesetz.latex
+
+```python
+def latex(self, zug: str='f_{pd}') -> str
+```
+
+Als Formel -- `zug` ist das Zeichen der Fliessgrenze.
+
 ### _stahlfunktion
 
 ```python
@@ -529,7 +580,7 @@ Ergebnis unendlich, was die Auswertung sauber ueberspringt.
 - [[opencivil.spannungsanalyse.herleitung]]
 - [[opencivil.spannungsanalyse.linie]]
 - [[opencivil.spannungsanalyse.schnitt]]
-- [[opencivil.web.diagrammdaten]]
+- [[opencivil.web.werkstoffkurven]]
 
 ## Formeln aus diesem Modul
 

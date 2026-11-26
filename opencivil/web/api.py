@@ -38,6 +38,7 @@ from opencivil.decke.modell import Aufteilung
 from opencivil.material.arten import MATERIALARTEN
 from opencivil.material.beton import BETONSORTEN
 from opencivil.material.betonstahl import STAHLSORTEN
+from opencivil.material.spannstahl import Erzeugnis
 from opencivil.nachweis.biegung_normalkraft import Erfuellungsart
 from opencivil.nachweis.rissanforderung import Rissanforderung
 from opencivil.projekt import BAUTEILE, Aufbau
@@ -79,7 +80,9 @@ from opencivil.pfahl import pfahl
 from opencivil.pfahl.boden import Mantel
 from opencivil.pfahl.pfahl import Abscheren, Grundlage, Kopf, Pfahlart, Spitze, Tragglied
 from opencivil.projekt.pfahl import PfahlEintrag, PfahlschichtEintrag
-from opencivil.web import balkendaten, diagrammdaten, durchstanzdaten, systemkatalog
+from opencivil.web import (
+    balkendaten, diagrammdaten, durchstanzdaten, systemkatalog, werkstoffkurven,
+)
 from opencivil.web.anzeige import zelle_dict
 from opencivil.web.umschlag import endlich
 from opencivil.web.zeichendaten import zeichendaten
@@ -200,11 +203,15 @@ def katalog() -> dict:
         # Je Materialart, in ihrer Folge: wie sie heisst, in welcher
         # Reihenfolge das Fenster «Neues Material» die Sorten anbietet,
         # womit Kennungen und Namen eigener Materialien beginnen, worauf die
-        # Kennwerte stehen -- und die Kennwerte selbst.
+        # Kennwerte stehen -- die Kennwerte selbst und, wo es sie gibt, die
+        # Erzeugnisse je Sorte.
         "materialarten": {
             name: {"titel": a.titel, "kennung": a.kennung, "eigene": a.eigene,
                    "grundlage": a.grundlage, "anlegen": list(a.anlegen),
-                   "kennwerte": [_vorlage_dict(v) for v in a.vorlagen]}
+                   "kennwerte": [_vorlage_dict(v) for v in a.vorlagen],
+                   "erzeugnisse": {sorte: [_erzeugnis_dict(e, sorte) for e in liste]
+                                   for sorte, liste in a.erzeugnisse.items()},
+                   "erzeugnisquelle": a.erzeugnisquelle}
             for name, a in MATERIALARTEN.items()
         },
         "erfuellungsarten": [
@@ -382,6 +389,13 @@ def obergrenzen(projekt) -> Dict[str, str]:
         return f"{grenze:.0f} mm²/m" if math.isfinite(grenze) else "keine"
 
     return {q.kennung: text(q.automatik_grenze.je_meter) for q in projekt.querschnitte}
+
+
+def _erzeugnis_dict(erzeugnis: Erzeugnis, sorte: str) -> dict:
+    """Ein Erzeugnis einer Sorte: Art, ⌀ in mm, Fläche in mm², Bezeichnung und der Modul, der gilt."""
+    return {"art": erzeugnis.art.value, "beschriftung": erzeugnis.art.beschriftung,
+            "durchmesser": erzeugnis.durchmesser, "flaeche": erzeugnis.flaeche,
+            "bezeichnung": erzeugnis.bezeichnung(sorte), "modul": erzeugnis.modul}
 
 
 def _vorlage_dict(vorlage) -> dict:
@@ -567,7 +581,7 @@ def loesung_dict(loesung: Loesung, aufbau: Optional[Aufbau] = None, *,
     }
     if aufbau is not None:
         ergebnis["linien"] = diagrammdaten.linien(aufbau, loesung)
-        ergebnis["werkstoffgesetze"] = diagrammdaten.werkstoffgesetze(aufbau, loesung)
+        ergebnis["werkstoffgesetze"] = werkstoffkurven.werkstoffgesetze(aufbau, loesung)
         ergebnis["querkraftkurven"] = diagrammdaten.querkraftkurven(aufbau, loesung)
         ergebnis["neigungskurven"] = diagrammdaten.neigungskurven(aufbau, loesung)
         ergebnis["spannungsanalysen"] = (

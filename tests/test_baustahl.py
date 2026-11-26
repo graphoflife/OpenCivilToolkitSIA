@@ -14,7 +14,7 @@ from opencivil.projekt.lesen import ProjektFehler
 from opencivil.projekt.projekt import Projekt
 from opencivil.querschnitt.werkstoffgesetz import Baustahlgesetz
 from opencivil.web import dienst
-from opencivil.web.diagrammdaten import KURVEN
+from opencivil.web.werkstoffkurven import KURVEN
 from tests.unfertig import meldung
 
 

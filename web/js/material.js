@@ -4,7 +4,7 @@
  * NORMSORTE ODER EIGENES MATERIAL:
  * Eine Normsorte nach SIA ist gesperrt -- kein Feld lässt sich anfassen, auch
  * die Sorte nicht. Wer abweichen will, legt ein eigenes Material an
- * (materialwahl.js): es heisst BE1, S1 oder ST1 und ist änderbar. So kann keine
+ * (materialwahl.js): es heisst BE1, S1, ST1 oder SP1 und ist änderbar. So kann keine
  * abgewandelte Festigkeit unter einer Normbezeichnung im Bericht landen.
  *
  * Angezeigt wird immer der Wert aus der letzten Lösung, nie ein in der
@@ -100,6 +100,27 @@ function kennwertZeile(material, vorlage) {
   ]);
 }
 
+/**
+ * Die Erzeugnisse der Sorte, wo die Art welche hat -- beim Spannstahl Drähte,
+ * Litzen und Stäbe: woraus ein Spannglied sein kann, mit der Fläche aus der
+ * Tabelle. Ein eigenes Material hat die seiner Vorlage.
+ */
+function erzeugnisPanel(material) {
+  const art = katalog('materialarten', material.art);
+  const liste = art.erzeugnisse?.[material.sorte];
+  if (!liste?.length) return null;
+  const kopf = ['Erzeugnis', '⌀ [mm]', 'A_p [mm²]', 'Bezeichnung'];
+  return panel({ schluessel: 'material/Erzeugnisse', titel: 'Erzeugnisse', zusatz: art.erzeugnisquelle }, [
+    el('table.gitter', {}, [
+      el('thead', {}, [el('tr', {}, kopf.map((k) => el('th', { text: k })))]),
+      el('tbody', {}, liste.map((e) => el('tr', {}, [
+        el('td', { text: e.beschriftung }), el('td', { text: e.durchmesser.toFixed(1) }),
+        el('td', { text: String(e.flaeche) }), el('td', { text: e.bezeichnung }),
+      ]))),
+    ]),
+  ]);
+}
+
 export function materialEditor(material) {
   const vorlagen = katalog('materialarten', material.art, 'kennwerte');
   const gesperrt = !material.eigenstaendig;
@@ -157,6 +178,8 @@ export function materialEditor(material) {
         })
         : (gesperrt ? 'gesperrt' : ''),
     }, vorlagen.filter((v) => v.berechnet).map((v) => kennwertZeile(material, v))),
+
+    erzeugnisPanel(material),
   ];
 }
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: 67e7e91bacbe
+erzeugt: e4317d8935e6
 art: modul
 tags: [modul]
 ---
@@ -323,7 +323,7 @@ def materialziele(self) -> List[str]
 ```
 
 Saemtliche Kennwerte aller Materialien -- in der Folge der Arten,
-Beton zuerst, dann Betonstahl und Baustahl.
+Beton zuerst, dann die Staehle ([[opencivil.material.arten#Konstanten|MATERIALARTEN]]).
 
 Gehoert zum Regellauf: ein Material, das noch keine Platte verwendet,
 waere sonst nie Ziel und bliebe ungerechnet -- im Editor staenden dann

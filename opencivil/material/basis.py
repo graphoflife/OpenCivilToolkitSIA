@@ -81,6 +81,7 @@ class Baustoffart(Wahl):
     BETON = "beton"
     BETONSTAHL = "betonstahl"
     BAUSTAHL = "baustahl"
+    SPANNSTAHL = "spannstahl"
 
     @property
     def beschriftung(self) -> str:
@@ -88,6 +89,7 @@ class Baustoffart(Wahl):
             Baustoffart.BETON: "Beton",
             Baustoffart.BETONSTAHL: "Betonstahl",
             Baustoffart.BAUSTAHL: "Baustahl",
+            Baustoffart.SPANNSTAHL: "Spannstahl",
         }[self]
 
 

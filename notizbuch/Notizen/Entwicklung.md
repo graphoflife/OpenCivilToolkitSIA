@@ -7,6 +7,32 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-26 · Spannstahl als Material
+
+Aus dem Plan vom 2026-11-25, Schritt 9, erster Teil: unter «Materialien»
+gibt es neben Beton, Betonstahl und Baustahl den Spannstahl.
+
+- Vorher: kein Spannstahl. Nachher: «Spannstahl hinzufügen» bietet Y1860,
+  Y1770, Y1670, Y1570, Y1230, Y1100, Y1050 und Y1030 an, in der Folge der
+  Tabelle 10; Normsorten heissen sp1 …, eigene SP1 ….
+- Kennwerte: f_pk und f_p0.1k aus Tabelle 7, E_p = 200 GPa für Drähte und
+  Stäbe und 195 GPa für Litzen (3.3.2.4), γ_s = 1.15, ε_ud = 2 %
+  (Tabelle 10), f_pd = f_p0.1k/γ_s nach Gleichung (5) -- ungerundet, für
+  Y1860 1391 statt der 1390 der Tabelle, wie f_yd beim Betonstahl.
+- Die Erzeugnisse je Sorte stehen im Material unter «Erzeugnisse»: Drähte,
+  Litzen und Stäbe mit Durchmesser, Fläche und Bezeichnung, etwa Litze
+  15.7 mm, 150 mm², Y1860S7-15.7. Daraus wählt ein Spannglied, der zweite
+  Teil des Schritts; die Fläche kommt aus der Tabelle, nicht aus π·d²/4.
+- Das Bild: Figur 17, nur Zug, ideal plastisch (4.2.3.5) -- für Y1860 bis
+  1391 N/mm² bei 6.96 ‰, dann waagrecht bis 20 ‰. Gezeichnet mit dem Modul
+  der Drähte und Stäbe; wo eine Sorte auch Litzen hat, sagt ein Hinweis,
+  dass sie flacher ansteigen und ab 7.13 ‰ fliessen. Gedrückt trägt der
+  Spannstahl nichts, nach Vorgabe (TODO).
+- Die Linien der Materialien stehen jetzt in `opencivil/web/werkstoffkurven.py`
+  statt in `diagrammdaten.py`, das sonst an tausend Zeilen gekommen wäre.
+  Die Liste der Bereiche im Notizbuch (`formelseiten.BEREICHE`) nimmt die
+  Materialarten aus `material/arten.py`, statt sie von Hand zu nennen.
+
 ## 2026-11-26 · Durchstanzen: Bügel und die Leiste im Bild
 
 Aus dem Plan vom 2026-11-25, Schritt 8: die Durchstanzbewehrung hat eine

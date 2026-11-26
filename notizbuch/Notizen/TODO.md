@@ -955,6 +955,13 @@ Diese Punkte sind **nicht** entschieden. Eingebaut ist je eine Annahme; wo die
 Prüfung vom 2026-11-14 den Bereich schon erreicht hat, steht dabei, was die
 Norm dazu sagt.
 
+- [ ] **Spannstahl gedrückt** (`opencivil/querschnitt/werkstoffgesetz.py`,
+      `Spannstahlgesetz`, seit 2026-11-26). Figur 17 der SIA 262:2025
+      idealisiert nur den Zug (4.2.3.3); nach Vorgabe, nicht nachgeschlagen,
+      trägt der Spannstahl gedrückt nichts. Ein vorgespanntes Glied kommt
+      nie dorthin -- seine Vordehnung ist grösser als jede Stauchung des
+      Betons --, ein schlaffes ohne Vorspannung schon. Bestätigen oder sagen,
+      ob er gedrückt wie der Betonstahl tragen soll.
 - [ ] **Baustahl, Grenzdehnung nach Vorgabe**
       (`opencivil/material/baustahl.py`, `DUKTILITAET`). Die Linie des
       Baustahls endet bei ε_ud = 15·ε_y, für S355 bei 25.4 ‰. SIA 263:2013

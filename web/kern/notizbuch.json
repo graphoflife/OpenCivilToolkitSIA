@@ -5554,7 +5554,7 @@
       "name": "opencivil.material",
       "pfad": "Python/opencivil.material.md",
       "art": "modul",
-      "kurz": "die Baustoffe: Beton, Betonstahl und Baustahl.",
+      "kurz": "die Baustoffe: Beton, Betonstahl, Baustahl und Spannstahl.",
       "stichworte": []
     },
     {
@@ -5628,6 +5628,25 @@
         "stahlsorten_zum_anlegen",
         "betonstahl",
         "betonstahl_frei"
+      ]
+    },
+    {
+      "name": "opencivil.material.spannstahl",
+      "pfad": "Python/opencivil.material.spannstahl.md",
+      "art": "modul",
+      "kurz": "Spannstahl nach SIA 262:2025.",
+      "stichworte": [
+        "Erzeugnisart",
+        "Erzeugnisart.beschriftung",
+        "Erzeugnisart.mehrzahl",
+        "Erzeugnisart.kuerzel",
+        "Erzeugnisart.modul",
+        "Erzeugnis",
+        "Erzeugnis.modul",
+        "Erzeugnis.bezeichnung",
+        "Spannstahlsorte",
+        "spannstahlsorten_zum_anlegen",
+        "spannstahl"
       ]
     },
     {
@@ -7389,9 +7408,11 @@
         "Projekt.beton",
         "Projekt.stahl",
         "Projekt.baustahl",
+        "Projekt.spannstahl",
         "Projekt.eigener_beton",
         "Projekt.eigener_stahl",
         "Projekt.eigener_baustahl",
+        "Projekt.eigener_spannstahl",
         "Projekt.material_anlegen",
         "Projekt._normsorte",
         "Projekt.platte",
@@ -8030,6 +8051,10 @@
         "Baustahlgesetz.gleich",
         "Baustahlgesetz.formel",
         "Baustahlgesetz.latex",
+        "Spannstahlgesetz",
+        "Spannstahlgesetz.eps_pd",
+        "Spannstahlgesetz.formel",
+        "Spannstahlgesetz.latex",
         "_stahlfunktion",
         "BetonUngerissen",
         "BetonUngerissen.formel",
@@ -8737,6 +8762,7 @@
         "_vorgaben",
         "katalog",
         "obergrenzen",
+        "_erzeugnis_dict",
         "wert_dict",
         "protokoll_liste",
         "kurzform_liste",
@@ -8838,12 +8864,6 @@
         "liniengroessen",
         "_linie_dict",
         "_modul_dict",
-        "werkstoffgesetze",
-        "_betonkurve",
-        "_spannungsblock",
-        "_stahlkurve",
-        "_baustahlkurve",
-        "_knickkurve",
         "_knickpunkte",
         "_knicken",
         "_linienzug",
@@ -9026,6 +9046,21 @@
         "nach_json",
         "fehlerdaten",
         "umschlag"
+      ]
+    },
+    {
+      "name": "opencivil.web.werkstoffkurven",
+      "pfad": "Python/opencivil.web.werkstoffkurven.md",
+      "art": "modul",
+      "kurz": "die Spannung-Dehnung-Linie je Material, als JSON.",
+      "stichworte": [
+        "werkstoffgesetze",
+        "_betonkurve",
+        "_spannungsblock",
+        "_stahlkurve",
+        "_baustahlkurve",
+        "_knickkurve",
+        "_spannstahlkurve"
       ]
     },
     {

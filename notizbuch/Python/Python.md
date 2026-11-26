@@ -1,5 +1,5 @@
 ---
-erzeugt: c2612e625568
+erzeugt: abf3c3c9b4cc
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -73,12 +73,13 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.konsole.pakete]] – welche Fremdpakete ein Skript einbinden kann.
     - [[opencivil.konsole.sitzung]] – eine Python-Sitzung für die App «Python».
     - [[opencivil.konsole.zeichnen]] – Diagramme aus der App «Python», ohne matplotlib.
-- [[opencivil.material]] – die Baustoffe: Beton, Betonstahl und Baustahl.
+- [[opencivil.material]] – die Baustoffe: Beton, Betonstahl, Baustahl und Spannstahl.
     - [[opencivil.material.arten]] – die Materialarten des Projekts, je eine Zeile.
     - [[opencivil.material.basis]] – Gemeinsames Geruest fuer Baustoffe.
     - [[opencivil.material.baustahl]] – Baustahl nach SIA 263:2013.
     - [[opencivil.material.beton]] – Beton nach SIA 262:2025.
     - [[opencivil.material.betonstahl]] – Betonstahl nach SIA 262:2025.
+    - [[opencivil.material.spannstahl]] – Spannstahl nach SIA 262:2025.
 - [[opencivil.mcp]] – das Werkzeug fuer eine KI, ueber das Model Context Protocol.
     - [[opencivil.mcp.__main__]] – startet den Server: `python3 -m opencivil.mcp`.
     - [[opencivil.mcp.ausgabe]] – was die Werkzeuge als Text zurueckgeben.
@@ -235,4 +236,5 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.web.systemkatalog]] – was die Oberflaeche an einem Balkensystem waehlen laesst.
     - [[opencivil.web.uebersetzt]] – das Uebersetzte fuer den naechsten Start.
     - [[opencivil.web.umschlag]] – wie eine Antwort an die Oberfläche verpackt wird.
+    - [[opencivil.web.werkstoffkurven]] – die Spannung-Dehnung-Linie je Material, als JSON.
     - [[opencivil.web.zeichendaten]] – was die Oberflaeche je Bauteil zeichnet, nach seiner Art.

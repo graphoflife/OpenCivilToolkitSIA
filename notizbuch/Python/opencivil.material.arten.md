@@ -1,5 +1,5 @@
 ---
-erzeugt: 2aa4a1ad0f01
+erzeugt: 11268a13a353
 art: modul
 tags: [modul]
 ---
@@ -32,9 +32,11 @@ class Materialart
 - `vorlagen: Tuple[KennwertVorlage, ...]`
 - `bauen: Callable[..., Baustoff]` – Wie [[opencivil.material.beton#beton|beton]]: Sorte, dann Name, Praefix, Abweichungen.
 - `anlegen: Tuple[str, ...]` – Die Sorten in der Folge, in der das Fenster «Neues Material» sie anbietet.
-- `kennung: str` – Womit die Kennung beginnt: b1, s1, st1.
-- `eigene: str` – Womit der Name eines eigenen Materials beginnt: BE1, S1, ST1 (Benutzer, 2026-10-16).
+- `kennung: str` – Womit die Kennung beginnt: b1, s1, st1, sp1.
+- `eigene: str` – Womit der Name eines eigenen Materials beginnt: BE1, S1, ST1 (Benutzer, 2026-10-16), SP1 beim Spannstahl.
 - `grundlage: str` – Worauf die Kennwerte einer Normsorte stehen -- so steht es in der Oberflaeche.
+- `erzeugnisse: Mapping[str, Tuple[Erzeugnis, ...]] = field(default_factory=dict)` – Je Sorte, in welchen Erzeugnissen es sie gibt -- beim Spannstahl Draehte, Litzen und Staebe nach Tabelle 7; die anderen Arten haben keine Liste.
+- `erzeugnisquelle: str = ''` – Wo die Erzeugnisse stehen.
 
 #### Materialart.titel
 
@@ -54,11 +56,13 @@ def titel(self) -> str
 - [[opencivil.material.baustahl]]
 - [[opencivil.material.beton]]
 - [[opencivil.material.betonstahl]]
+- [[opencivil.material.spannstahl]]
 
 ## Gebraucht von
 
 - [[opencivil.mcp.ausgabe]]
 - [[opencivil.mcp.werkzeuge]]
+- [[opencivil.notizbuch.formelseiten]]
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.projekt]]

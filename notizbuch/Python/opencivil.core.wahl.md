@@ -1,5 +1,5 @@
 ---
-erzeugt: c8d97f851ef6
+erzeugt: bd5d0d820f9b
 art: modul
 tags: [modul]
 ---
@@ -40,6 +40,7 @@ Eine Wahl: das Mitglied ist sein Text.
 - [[opencivil.geotechnik.setzung]]
 - [[opencivil.geotechnik.verhalten]]
 - [[opencivil.material.basis]]
+- [[opencivil.material.spannstahl]]
 - [[opencivil.nachweis.biegung_normalkraft]]
 - [[opencivil.nachweis.rissanforderung]]
 - [[opencivil.pfahl.boden]]

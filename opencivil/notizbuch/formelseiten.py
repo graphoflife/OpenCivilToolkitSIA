@@ -32,6 +32,7 @@ from opencivil.bericht.markdown import absatz_markdown, formel_in_zelle, text_ma
 from opencivil.core.latex import ohne_namen_im_index
 from opencivil.core.protokoll import GleichungBlock
 from opencivil.core.wert import Quelle, Wert
+from opencivil.material.arten import MATERIALARTEN
 from opencivil.notizbuch.namen import sortierschluessel
 from opencivil.notizbuch.tresor import Seite
 from opencivil.projekt.aufbau import BAUTEILE
@@ -43,7 +44,7 @@ UEBERSICHT = "Formelsammlung/Formelsammlung.md"
 #: Wie die Uebersicht die Themen gruppiert -- nach dem Bestandteil, zu dem
 #: sie gehoeren (``Thema.art`` der Formelsammlung: der Anfang des
 #: Namensraums). Die Bauteile nennen ihren Abschnitt im Steckbrief.
-BEREICHE = {"beton": "Baustoffe", "betonstahl": "Baustoffe", "baustahl": "Baustoffe",
+BEREICHE = {**{art: "Baustoffe" for art in MATERIALARTEN},
             **{art.raum: art.bereich for art in BAUTEILE}}
 
 #: Woher ein Wert kommt, den keine Formel der Sammlung geschrieben hat.

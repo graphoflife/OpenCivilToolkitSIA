@@ -1,5 +1,5 @@
 ---
-erzeugt: 5327f991fbed
+erzeugt: 2157a7f0ed15
 art: modul
 tags: [modul]
 ---
@@ -31,4 +31,5 @@ Browser laedt, samt dem Notizbuch.
 - [[opencivil.web.systemkatalog]] – was die Oberflaeche an einem Balkensystem waehlen laesst.
 - [[opencivil.web.uebersetzt]] – das Uebersetzte fuer den naechsten Start.
 - [[opencivil.web.umschlag]] – wie eine Antwort an die Oberfläche verpackt wird.
+- [[opencivil.web.werkstoffkurven]] – die Spannung-Dehnung-Linie je Material, als JSON.
 - [[opencivil.web.zeichendaten]] – was die Oberflaeche je Bauteil zeichnet, nach seiner Art.

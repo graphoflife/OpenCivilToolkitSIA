@@ -571,6 +571,7 @@ function diagrammgruppen(loesung) {
       });
       return karte(`${gesetz.titel} – ${gesetz.name}`, [
         gesetz.referenz ? el('p.karte-hinweis', { text: gesetz.referenz }) : null, bild,
+        gesetz.hinweis ? el('p.karte-hinweis', { text: gesetz.hinweis }) : null,
       ], { bild });
     });
   if (gesetzkarten.length) {

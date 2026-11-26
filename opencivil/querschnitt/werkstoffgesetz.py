@@ -13,6 +13,8 @@ Betonstahl: bilinear, auf Zug und Druck getrennt begrenzt
 (:class:`Stahlgesetz`, 4.2.2.2 mit Figur 16), oder nur auf Zug. Baustahl:
 elastisch -- ideal plastisch, in Zug und Druck gleich
 (:class:`Baustahlgesetz`, SIA 263:2013), mit einer Grenzdehnung nach Vorgabe.
+Spannstahl: elastisch -- ideal plastisch, nur auf Zug
+(:class:`Spannstahlgesetz`, 4.2.3.3 mit Figur 17).
 
 Bis 2026-10-16 rechneten Funktionen im Loeser, und gedruckt wurden Klassen
 mit Platzhaltern oder Formeln von Hand. Jenseits von eps_c2d und beim
@@ -468,6 +470,63 @@ class Baustahlgesetz(Stahlgesetz):
             rf" \operatorname{{sgn}}(\varepsilon_a) \cdot \min(E_a\,|\varepsilon_a|;\ {zug})"
             r" & |\varepsilon_a| \le \varepsilon_{ud} \\[1ex]"
             r" 0 & |\varepsilon_a| > \varepsilon_{ud} \quad (\text{jenseits der Grenzdehnung})"
+            r" \end{cases}"
+        )
+
+
+@dataclass(frozen=True)
+class Spannstahlgesetz(Gesetz):
+    """
+    Spannstahl nach SIA 262:2025, Figur 17: mit ``E_p`` bis zur Fliessgrenze,
+    dann waagrecht bis ``eps_ud`` -- ohne die Verfestigung, die 4.2.3.6
+    zuliesse, ideal plastisch wie 4.2.3.5. Die Figur zeigt nur den Zug
+    (4.2.3.3); gedrueckt traegt der Spannstahl hier nichts -- nach Vorgabe,
+    nicht nachgeschlagen. Ein vorgespanntes Glied kommt dort nie hin: seine
+    Vordehnung ist groesser als jede Stauchung des Betons.
+
+    ``E_p`` ist der Modul des Erzeugnisses: 200 GPa fuer Draehte und Staebe,
+    195 GPa fuer Litzen (3.3.2.4).
+    """
+
+    NAME = "Bilineare Beziehung des Spannstahls"
+    WORT = "Spannstahl, bilinear"
+    REFERENZ = "SIA 262:2025, 4.2.3.3, Figur 17; 4.2.3.5"
+    ROLLEN = ("f_p", "E_p", "eps_ud")
+    WERTTITEL = "Werte des Spannstahls"
+
+    E_p: float
+    """Elastizitaetsmodul in N/m^2."""
+
+    f_pd: float
+    """Fliessgrenze in N/m^2 -- je nach Werkstoffsatz ``f_pd`` oder ``f_p0.1k``."""
+
+    eps_ud: float
+    """Bruchdehnung, positiv."""
+
+    def __post_init__(self) -> None:
+        E_p, f, grenze = self.E_p, self.f_pd, self.eps_ud + RUNDUNG
+
+        def sigma_zug(eps: float) -> float:
+            if eps <= 0.0 or eps > grenze:
+                return 0.0
+            return min(eps * E_p, f)
+        _gebaut(self, sigma_zug)
+
+    @property
+    def eps_pd(self) -> float:
+        """Wo das Fliessen beginnt."""
+        return self.f_pd / self.E_p
+
+    def formel(self, werte: Werte) -> str:
+        return self.latex(werte["f_p"].symbol)
+
+    def latex(self, zug: str = "f_{pd}") -> str:
+        """Als Formel -- ``zug`` ist das Zeichen der Fliessgrenze."""
+        return (
+            r"\sigma_p(\varepsilon_p) = \begin{cases}"
+            rf" \min(E_p\,\varepsilon_p;\ {zug}) & 0 < \varepsilon_p \le \varepsilon_{{ud}} \\[1ex]"
+            r" 0 & \varepsilon_p \le 0 \quad (\text{gedrückt: trägt nicht})"
+            r" \\[1ex] 0 & \varepsilon_p > \varepsilon_{ud} \quad (\text{jenseits der Bruchdehnung})"
             r" \end{cases}"
         )
 

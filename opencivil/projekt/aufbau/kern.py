@@ -351,7 +351,7 @@ class Aufbau:
     def materialziele(self) -> List[str]:
         """
         Saemtliche Kennwerte aller Materialien -- in der Folge der Arten,
-        Beton zuerst, dann Betonstahl und Baustahl.
+        Beton zuerst, dann die Staehle (:data:`~opencivil.material.arten.MATERIALARTEN`).
 
         Gehoert zum Regellauf: ein Material, das noch keine Platte verwendet,
         waere sonst nie Ziel und bliebe ungerechnet -- im Editor staenden dann

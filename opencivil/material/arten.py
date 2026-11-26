@@ -14,7 +14,7 @@ und eine vergessene fiele erst beim Anlegen auf.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, Mapping, Tuple
 
 from opencivil.material.basis import Baustoff, Baustoffart, KennwertVorlage
@@ -24,6 +24,10 @@ from opencivil.material.baustahl import (
 from opencivil.material.beton import BETON_VORLAGEN, BETONSORTEN, beton, betonsorten_zum_anlegen
 from opencivil.material.betonstahl import (
     STAHL_VORLAGEN, STAHLSORTEN, betonstahl, stahlsorten_zum_anlegen,
+)
+from opencivil.material.spannstahl import (
+    SPANNSTAHL_VORLAGEN, SPANNSTAHLSORTEN, TABELLE_7, Erzeugnis, spannstahl,
+    spannstahlsorten_zum_anlegen,
 )
 
 
@@ -39,13 +43,25 @@ class Materialart:
     """Die Sorten in der Folge, in der das Fenster «Neues Material» sie anbietet."""
 
     kennung: str
-    """Womit die Kennung beginnt: b1, s1, st1."""
+    """Womit die Kennung beginnt: b1, s1, st1, sp1."""
 
     eigene: str
-    """Womit der Name eines eigenen Materials beginnt: BE1, S1, ST1 (Benutzer, 2026-10-16)."""
+    """
+    Womit der Name eines eigenen Materials beginnt: BE1, S1, ST1 (Benutzer,
+    2026-10-16), SP1 beim Spannstahl.
+    """
 
     grundlage: str
     """Worauf die Kennwerte einer Normsorte stehen -- so steht es in der Oberflaeche."""
+
+    erzeugnisse: Mapping[str, Tuple[Erzeugnis, ...]] = field(default_factory=dict)
+    """
+    Je Sorte, in welchen Erzeugnissen es sie gibt -- beim Spannstahl Draehte,
+    Litzen und Staebe nach Tabelle 7; die anderen Arten haben keine Liste.
+    """
+
+    erzeugnisquelle: str = ""
+    """Wo die Erzeugnisse stehen."""
 
     @property
     def titel(self) -> str:
@@ -62,5 +78,10 @@ MATERIALARTEN: Dict[str, Materialart] = {a.art.value: a for a in (
     Materialart(Baustoffart.BAUSTAHL, BAUSTAHLSORTEN, BAUSTAHL_VORLAGEN, baustahl,
                 tuple(baustahlsorten_zum_anlegen()), kennung="st", eigene="ST",
                 grundlage="Kennwerte nach SIA 263:2013"),
+    Materialart(Baustoffart.SPANNSTAHL, SPANNSTAHLSORTEN, SPANNSTAHL_VORLAGEN, spannstahl,
+                tuple(spannstahlsorten_zum_anlegen()), kennung="sp", eigene="SP",
+                grundlage="Kennwerte nach SIA 262:2025",
+                erzeugnisse={s: v.erzeugnisse for s, v in SPANNSTAHLSORTEN.items()},
+                erzeugnisquelle=TABELLE_7),
 )}
 
