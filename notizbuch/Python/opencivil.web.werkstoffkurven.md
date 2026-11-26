@@ -1,5 +1,5 @@
 ---
-erzeugt: ddcc9eec4584
+erzeugt: 1ec142ee8185
 art: modul
 tags: [modul]
 ---
@@ -41,7 +41,9 @@ was nicht Beton war, als Betonstahl, und ein Baustahl fiel still weg,
 weil ihm dessen Kennwerte fehlten.
 
 Ausser Punkten und Marken kann eine Kurve einen `hinweis` tragen: was
-das Bild nicht zeigt -- beim Spannstahl der flachere Anstieg der Litzen.
+das Bild nicht zeigt -- beim Spannstahl der flachere Anstieg der Litzen --,
+und eine `zweite` Linie, die ein Schalter zeigt: beim Beton den
+Spannungsblock, beim Holz den Druck elastisch-plastisch.
 
 ### _betonkurve
 
@@ -102,6 +104,16 @@ def _spannstahlkurve(wert, sorte: str) -> Optional[dict]
 Spannstahl: Figur 17, nur auf Zug -- mit dem Modul der Draehte und
 Staebe. Hat die Sorte auch Litzen (Tabelle 7), sagt der Hinweis, dass
 sie flacher ansteigen (195 statt 200 GPa) und wo sie zu fliessen beginnen.
+
+### _holzkurve
+
+```python
+def _holzkurve(wert, sorte: str) -> Optional[dict]
+```
+
+Holz: linear bis zum Bruch, auf Zug wie auf Druck (SIA 265:2012,
+3.1.2.1) -- und als zweite Linie der Druck elastisch-plastisch (3.1.2.2),
+bis zur Grenzstauchung nach Vorgabe.
 
 
 ## Konstanten

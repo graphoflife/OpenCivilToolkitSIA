@@ -14,7 +14,9 @@ Betonstahl: bilinear, auf Zug und Druck getrennt begrenzt
 elastisch -- ideal plastisch, in Zug und Druck gleich
 (:class:`Baustahlgesetz`, SIA 263:2013), mit einer Grenzdehnung nach Vorgabe.
 Spannstahl: elastisch -- ideal plastisch, nur auf Zug
-(:class:`Spannstahlgesetz`, 4.2.3.3 mit Figur 17).
+(:class:`Spannstahlgesetz`, 4.2.3.3 mit Figur 17). Holz: linear bis zum
+Bruch (:class:`Holzgesetz`, SIA 265:2012, 3.1.2.1), oder auf Druck
+elastisch-plastisch (:class:`HolzPlastisch`, 3.1.2.2).
 
 Bis 2026-10-16 rechneten Funktionen im Loeser, und gedruckt wurden Klassen
 mit Platzhaltern oder Formeln von Hand. Jenseits von eps_c2d und beim
@@ -528,6 +530,105 @@ class Spannstahlgesetz(Gesetz):
             r" 0 & \varepsilon_p \le 0 \quad (\text{gedrückt: trägt nicht})"
             r" \\[1ex] 0 & \varepsilon_p > \varepsilon_{ud} \quad (\text{jenseits der Bruchdehnung})"
             r" \end{cases}"
+        )
+
+
+@dataclass(frozen=True)
+class Holzgesetz(Gesetz):
+    """
+    Holz nach SIA 265:2012, 3.1.2.1: linear bis zum Bruch -- auf Zug bis
+    ``f_t``, auf Druck bis ``f_c``, beides in Faserrichtung; jenseits traegt
+    es nichts mehr. Die Werte sind Bemessungswerte der Tabellen 6 und 7.
+    """
+
+    NAME = "Lineare Beziehung des Holzes"
+    WORT = "Holz, linear"
+    REFERENZ = "SIA 265:2012, 3.1.2.1"
+    ROLLEN = ("f_t", "f_c", "E")
+    WERTTITEL = "Werte des Holzes"
+
+    E: float
+    """Elastizitaetsmodul in Faserrichtung, in N/m^2."""
+
+    f_t: float
+    """Zugfestigkeit in Faserrichtung, in N/m^2, positiv."""
+
+    f_c: float
+    """Druckfestigkeit in Faserrichtung, in N/m^2, positiv."""
+
+    def __post_init__(self) -> None:
+        E = self.E
+        zug, druck = self.eps_t + RUNDUNG, -(self.eps_c + RUNDUNG)
+
+        def sigma(eps: float) -> float:
+            if eps > zug or eps < druck:
+                return 0.0
+            return E * eps
+        _gebaut(self, sigma)
+
+    @property
+    def eps_t(self) -> float:
+        """Wo es auf Zug bricht."""
+        return self.f_t / self.E
+
+    @property
+    def eps_c(self) -> float:
+        """Wo es auf Druck die Festigkeit erreicht, positiv."""
+        return self.f_c / self.E
+
+    def formel(self, werte: Werte) -> str:
+        return self.latex(werte["f_t"].symbol, werte["f_c"].symbol, werte["E"].symbol)
+
+    def latex(self, f_t: str = "f_{t,0,d}", f_c: str = "f_{c,0,d}", E: str = "E_{0,mean}") -> str:
+        """Als Formel, mit den Zeichen der Festigkeiten und des Moduls."""
+        return (
+            r"\sigma(\varepsilon) = \begin{cases}"
+            rf" {E}\,\varepsilon & -\frac{{{f_c}}}{{{E}}} \le \varepsilon \le \frac{{{f_t}}}{{{E}}}"
+            r" \\[1ex] 0 & \text{sonst (gebrochen)} \end{cases}"
+        )
+
+
+@dataclass(frozen=True)
+class HolzPlastisch(Holzgesetz):
+    """
+    Holz, auf Druck elastisch-plastisch (SIA 265:2012, 3.1.2.2): bei ``f_c``
+    waagrecht weiter bis ``eps_cu``; auf Zug linear bis zum Bruch wie
+    :class:`Holzgesetz`. Die Grenzstauchung ist nach Vorgabe, nicht
+    nachgeschlagen (:data:`~opencivil.material.holz.STAUCHBARKEIT`).
+    """
+
+    NAME = "Elastisch-plastische Beziehung des Holzes"
+    WORT = "Holz, auf Druck elastisch-plastisch"
+    REFERENZ = "SIA 265:2012, 3.1.2.2 – die Grenzstauchung nach Vorgabe"
+    ROLLEN = ("f_t", "f_c", "E", "eps_cu")
+
+    eps_cu: float
+    """Grenzstauchung, positiv."""
+
+    def __post_init__(self) -> None:
+        E, f_c = self.E, self.f_c
+        zug, fliessen = self.eps_t + RUNDUNG, -self.eps_c
+        grenze = -(self.eps_cu + RUNDUNG)
+
+        def sigma(eps: float) -> float:
+            if eps > zug or eps < grenze:
+                return 0.0
+            if eps < fliessen:
+                return -f_c
+            return E * eps
+        _gebaut(self, sigma)
+
+    def formel(self, werte: Werte) -> str:
+        return self.latex(werte["f_t"].symbol, werte["f_c"].symbol, werte["E"].symbol,
+                          werte["eps_cu"].symbol)
+
+    def latex(self, f_t: str = "f_{t,0,d}", f_c: str = "f_{c,0,d}", E: str = "E_{0,mean}",
+              eps_cu: str = r"\varepsilon_{cu}") -> str:
+        """Als Formel -- wie :meth:`Holzgesetz.latex`, mit der Grenzstauchung."""
+        return (
+            r"\sigma(\varepsilon) = \begin{cases}"
+            rf" \max({E}\,\varepsilon;\ -{f_c}) & -{eps_cu} \le \varepsilon \le \frac{{{f_t}}}{{{E}}}"
+            r" \\[1ex] 0 & \text{sonst (gebrochen)} \end{cases}"
         )
 
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: ecd940931c2e
+erzeugt: ef5c6b329f92
 art: modul
 tags: [modul]
 ---
@@ -370,6 +370,14 @@ def baustahl(self, stahl: Any) -> Any
 ```
 
 Das Material des Systems aus einem Baustahl des Projekts -- siehe [[opencivil.projekt.staebe#MitStaeben.beton|beton]].
+
+#### MitStaeben.holz
+
+```python
+def holz(self, holz: Any) -> Any
+```
+
+Das Material des Systems aus einem Holz des Projekts -- siehe [[opencivil.projekt.staebe#MitStaeben.beton|beton]].
 
 #### MitStaeben.eigenes_material
 

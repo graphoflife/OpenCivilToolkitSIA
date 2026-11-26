@@ -1,5 +1,5 @@
 ---
-erzeugt: 247cb1c9ba91
+erzeugt: f01557d3add6
 art: modul
 tags: [modul]
 ---
@@ -148,7 +148,8 @@ der Platten ihn nimmt.
 def eigener_name(self, art: str) -> str
 ```
 
-Der erste freie Name eines eigenen Materials: BE1, BE2 ..., S1 ..., ST1 ... oder SP1 ...
+Der erste freie Name eines eigenen Materials: BE1, BE2 ..., S1 ..., ST1 ..., SP1 ...
+oder H1 ...
 
 #### Projekt.beton
 
@@ -181,6 +182,14 @@ def spannstahl(self, sorte: str='Y1860') -> MaterialEintrag
 ```
 
 Eine Spannstahlsorte nach SIA 262 -- Kennung `sp1`, `sp2` ...
+
+#### Projekt.holz
+
+```python
+def holz(self, sorte: str='C24') -> MaterialEintrag
+```
+
+Eine Holzsorte nach SIA 265 -- Kennung `h1`, `h2` ...
 
 #### Projekt.eigener_beton
 
@@ -215,6 +224,14 @@ def eigener_spannstahl(self, vorlage: str='Y1860') -> MaterialEintrag
 ```
 
 Ein eigener Spannstahl, `SP1`, `SP2` ... -- siehe [[opencivil.projekt.projekt#Projekt.eigener_beton|eigener_beton]].
+
+#### Projekt.eigenes_holz
+
+```python
+def eigenes_holz(self, vorlage: str='C24') -> MaterialEintrag
+```
+
+Ein eigenes Holz, `H1`, `H2` ... -- siehe [[opencivil.projekt.projekt#Projekt.eigener_beton|eigener_beton]].
 
 #### Projekt.material_anlegen
 

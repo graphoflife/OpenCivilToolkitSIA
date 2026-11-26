@@ -72,7 +72,7 @@ export function lastVon(z, kennung) {
 }
 
 /**
- * Wie ein Material des Systems heisst: ein Beton oder Baustahl wie im
+ * Wie ein Material des Systems heisst: ein Beton, Baustahl oder Holz wie im
  * Projekt, ein eigenes mit seinem Namen.
  */
 export function materialname(m) {

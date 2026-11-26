@@ -1,5 +1,5 @@
 """
-opencivil/material -- die Baustoffe: Beton, Betonstahl, Baustahl und Spannstahl.
+opencivil/material -- die Baustoffe: Beton, Betonstahl, Baustahl, Spannstahl und Holz.
 
 Jeder Kennwert einer Sorte ist ein Wert im Rechenwerk -- aus der
 Sortentabelle vorgegeben oder aus anderen gerechnet --, und damit ueberall

@@ -5,7 +5,7 @@ VERANTWORTUNG:
 Aus einem :class:`~opencivil.projekt.balkensystem.BalkensystemEintrag` das
 Stabwerk in SI mit seinen Meldungen (:func:`modell_von`) und daraus die
 Rechnung mit aufgeloesten Materialien und Querschnitten (:func:`bauen`). Ein
-Material ist ein Beton oder Baustahl des Projekts oder ein eigenes. Die Art eines
+Material ist ein Beton, Baustahl oder Holz des Projekts oder ein eigenes. Die Art eines
 Querschnitts wird hier aufgeloest, einmal: je Art eine Klasse
 (:mod:`~opencivil.stabwerk.stabquerschnitt`). Ein Querschnitt kann eine
 Platte oder eine Querschnittsanalyse des Projekts nehmen; die muessen dann
@@ -30,7 +30,8 @@ from dataclasses import dataclass, field, replace
 from typing import TYPE_CHECKING, Any, Callable, Dict, List, Mapping, Optional, Sequence, Tuple
 
 from opencivil.core.einheiten import Groesse
-from opencivil.material.basis import Baustoff, Baustoffart
+from opencivil.material.arten import MATERIALARTEN
+from opencivil.material.basis import Baustoff
 from opencivil.projekt.balkensystem import (
     EINHEIT_DER_LAST, BalkensystemEintrag, Knotenlastart, Profilachse, StabmaterialEintrag,
 )
@@ -392,7 +393,7 @@ def _paare(eintrag: Any, modell: Modell, aufbau: Aufbau, kennwerte: Sequence[Mat
 def _stabmaterial(m: StabmaterialEintrag, aufbau: Aufbau,
                   kennwerte: Sequence[Materialkennwert]) -> Tuple[Optional[Stabmaterial], Optional[Grund]]:
     """
-    Ein Material des Systems, aufgeloest: ein Beton oder Baustahl des
+    Ein Material des Systems, aufgeloest: ein Beton, Baustahl oder Holz des
     Projekts oder ein eigenes mit den ``kennwerte`` von Hand. Traegt es
     nicht, ist es ``None``, und der zweite Teil sagt warum -- klein
     beginnend, er folgt auf ein «aber». Ob es den Stoff gibt und ob er von
@@ -422,7 +423,7 @@ def _stabmaterialname(m: StabmaterialEintrag, aufbau: Aufbau) -> str:
     if m.art == "eigen":
         return f"das Material «{m.name or m.kennung}»"
     stoff = aufbau.baustoffe.get(m.stoff)
-    return f"«{stoff.name}»" if stoff is not None else f"einen {Baustoffart(m.art).beschriftung} des Projekts"
+    return f"«{stoff.name}»" if stoff is not None else f"{MATERIALARTEN[m.art].einen} des Projekts"
 
 
 def _material_des_querschnitts(q: StabquerschnittBasis,

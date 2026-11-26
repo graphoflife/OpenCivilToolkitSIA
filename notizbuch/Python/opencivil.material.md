@@ -1,10 +1,10 @@
 ---
-erzeugt: 80e1e2355b24
+erzeugt: 28e7d89c6a4a
 art: modul
 tags: [modul]
 ---
 > [!abstract] opencivil/material/__init__.py
-> die Baustoffe: Beton, Betonstahl, Baustahl und Spannstahl.
+> die Baustoffe: Beton, Betonstahl, Baustahl, Spannstahl und Holz.
 > Paket [[opencivil]] · [Quelltext](../../opencivil/material/__init__.py)
 
 Jeder Kennwert einer Sorte ist ein Wert im Rechenwerk -- aus der
@@ -18,4 +18,5 @@ gleich zu ueberschreiben ([[opencivil.material.basis]]).
 - [[opencivil.material.baustahl]] – Baustahl nach SIA 263:2013.
 - [[opencivil.material.beton]] – Beton nach SIA 262:2025.
 - [[opencivil.material.betonstahl]] – Betonstahl nach SIA 262:2025.
+- [[opencivil.material.holz]] – Holz nach SIA 265:2012.
 - [[opencivil.material.spannstahl]] – Spannstahl nach SIA 262:2025.

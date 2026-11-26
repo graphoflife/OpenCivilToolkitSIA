@@ -22,7 +22,8 @@ from opencivil.material.basis import Baustoffart
 from opencivil.material.spannstahl import SPANNSTAHLSORTEN, Erzeugnisart
 from opencivil.projekt import Aufbau
 from opencivil.querschnitt.werkstoffgesetz import (
-    BLOCKANTEIL, Baustahlgesetz, Betongesetz, Spannstahlgesetz, Spannungsblock, Stahlgesetz,
+    BLOCKANTEIL, Baustahlgesetz, Betongesetz, Holzgesetz, HolzPlastisch, Spannstahlgesetz,
+    Spannungsblock, Stahlgesetz,
 )
 from opencivil.web.anzeige import zahl
 
@@ -44,7 +45,9 @@ def werkstoffgesetze(aufbau: Aufbau, loesung: Loesung) -> dict:
     weil ihm dessen Kennwerte fehlten.
 
     Ausser Punkten und Marken kann eine Kurve einen ``hinweis`` tragen: was
-    das Bild nicht zeigt -- beim Spannstahl der flachere Anstieg der Litzen.
+    das Bild nicht zeigt -- beim Spannstahl der flachere Anstieg der Litzen --,
+    und eine ``zweite`` Linie, die ein Schalter zeigt: beim Beton den
+    Spannungsblock, beim Holz den Druck elastisch-plastisch.
     """
     ergebnis: Dict[str, dict] = {}
 
@@ -91,7 +94,7 @@ def _betonkurve(wert, sorte: str, schritte: int = 80) -> Optional[dict]:
             {"eps": zahl(-abs(eps_c2d), PROMILLE), "sigma": zahl(-abs(f_cd), N_PRO_MM2),
              "text": "ε_c2d"},
         ],
-        "vereinfacht": _spannungsblock(abs(f_cd), abs(eps_c2d)),
+        "zweite": _spannungsblock(abs(f_cd), abs(eps_c2d)),
     }
 
 
@@ -192,6 +195,42 @@ def _spannstahlkurve(wert, sorte: str) -> Optional[dict]:
     }
 
 
+def _holzkurve(wert, sorte: str) -> Optional[dict]:
+    """
+    Holz: linear bis zum Bruch, auf Zug wie auf Druck (SIA 265:2012,
+    3.1.2.1) -- und als zweite Linie der Druck elastisch-plastisch (3.1.2.2),
+    bis zur Grenzstauchung nach Vorgabe.
+    """
+    E, f_t, f_c, eps_cu = wert("E_0_mean"), wert("f_t_0_d"), wert("f_c_0_d"), wert("eps_cu")
+    if None in (E, f_t, f_c, eps_cu):
+        return None
+    linear = Holzgesetz(E=E, f_t=f_t, f_c=f_c)
+    plastisch = HolzPlastisch(E=E, f_t=f_t, f_c=f_c, eps_cu=eps_cu)
+
+    def linie(ecken):
+        return [{"eps": zahl(e, PROMILLE), "sigma": zahl(s, N_PRO_MM2)} for e, s in ecken]
+
+    return {
+        "punkte": linie([(-linear.eps_c, -f_c), (0.0, 0.0), (linear.eps_t, f_t)]),
+        "x_titel": "ε [‰]",
+        "y_titel": "σ [N/mm²]",
+        "titel": "Holz – linear bis zum Bruch",
+        "referenz": linear.REFERENZ,
+        "marken": [
+            {"eps": zahl(linear.eps_t, PROMILLE), "sigma": zahl(f_t, N_PRO_MM2), "text": "ε_t,0,d"},
+            {"eps": zahl(-linear.eps_c, PROMILLE), "sigma": zahl(-f_c, N_PRO_MM2), "text": "ε_c,0,d"},
+        ],
+        "zweite": {
+            "punkte": linie([(-plastisch.eps_cu, -f_c), (-plastisch.eps_c, -f_c), (0.0, 0.0),
+                             (plastisch.eps_t, f_t)]),
+            "titel": "auf Druck elastisch-plastisch",
+            "beschreibung": (f"Wo das Bauteil plastisch stauchen kann ({plastisch.REFERENZ}): "
+                             f"bei f_c,0,d waagrecht bis ε_cu = "
+                             f"{zahl(plastisch.eps_cu, PROMILLE):.2f} ‰."),
+        },
+    }
+
+
 #: Je Materialart ihre Spannung-Dehnung-Linie, aus den Kennwerten einer
 #: Loesung -- wo es eines gibt, ein Gesetz des Querschnitts -- und der Sorte:
 #: beim Spannstahl sagt sie, ob es Litzen gibt.
@@ -200,4 +239,5 @@ KURVEN: Dict[Baustoffart, Callable[[Callable[[str], Optional[float]], str], Opti
     Baustoffart.BETONSTAHL: _stahlkurve,
     Baustoffart.BAUSTAHL: _baustahlkurve,
     Baustoffart.SPANNSTAHL: _spannstahlkurve,
+    Baustoffart.HOLZ: _holzkurve,
 }

@@ -566,8 +566,8 @@ function diagrammgruppen(loesung) {
     .filter(([kennung, gesetz]) => imRaum(raum, `${gesetz.art}.${kennung}`))
     .map(([, gesetz]) => {
       const bild = kurveZeichnen(gesetz, {
-        zeigeVereinfacht: zustand.zeigeVereinfacht,
-        beiUmschalten: (an) => aendern({ zeigeVereinfacht: an }),
+        zeigeZweite: zustand.zeigeZweite,
+        beiUmschalten: (an) => aendern({ zeigeZweite: an }),
       });
       return karte(`${gesetz.titel} – ${gesetz.name}`, [
         gesetz.referenz ? el('p.karte-hinweis', { text: gesetz.referenz }) : null, bild,

@@ -148,7 +148,7 @@ class Profilachse(Wahl):
         """Der Kurzname des Traegheitsmoments der Profilform, das dann ``I`` ist."""
         return f"I_{self.value}"
 
-#: Was ein Material des Systems ist: ein Beton oder Baustahl des Projekts --
+#: Was ein Material des Systems ist: ein Beton, Baustahl oder Holz des Projekts --
 #: E und Dichte von ihm, nicht zu aendern -- oder ein eigenes mit E und
 #: Dichte von Hand (Benutzer, 2026-10-24; Baustahl seit 2026-11-15).
 #: Betonstahl ist keines: aus ihm ist kein Stab. Welche Arten des Projekts
@@ -275,7 +275,7 @@ class KnotenlastEintrag(Beschreibung):
 @dataclass
 class StabmaterialEintrag(Beschreibung):
     """
-    Ein Material der Staebe (Benutzer, 2026-10-24): ein Beton oder Baustahl
+    Ein Material der Staebe (Benutzer, 2026-10-24): ein Beton, Baustahl oder Holz
     des Projekts (``stoff``) -- E und Dichte von ihm, siehe
     :data:`~opencivil.stabwerk.rechnung.STABKENNWERTE` -- oder ein eigenes
     mit ``E`` und ``rho`` von Hand.
@@ -286,10 +286,11 @@ class StabmaterialEintrag(Beschreibung):
     kennung: str = ""
     art: str = einer_von(STABMATERIALARTEN, "beton")
     stoff: str = ""
-    """Die Kennung des Betons oder Baustahls im Projekt (``b1``, ``st1``) -- nicht bei ``eigen``."""
+    """Die Kennung des Betons, Baustahls oder Holzes im Projekt (``b1``, ``st1``, ``h1``) --
+    nicht bei ``eigen``."""
 
     name: str = ""
-    """Wie ein eigenes heisst; ein Beton oder Baustahl heisst wie im Projekt."""
+    """Wie ein eigenes heisst; ein Beton, Baustahl oder Holz heisst wie im Projekt."""
 
     E: float = bereich(EIGENES_MATERIAL["E"], heisst="E-Modul E", einheit=N_PRO_MM2, ueber=0.0)
     """N/mm² -- nur bei ``eigen``; zu Beginn E_cm des ersten Betons (:data:`EIGENES_MATERIAL`)."""

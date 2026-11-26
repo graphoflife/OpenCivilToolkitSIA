@@ -67,14 +67,14 @@ export function materialKopieren(material) {
 
 /** Öffnet das Fenster für ein neues Material dieser Art: 'beton', 'betonstahl', 'baustahl' … */
 export function materialAnlegen(art) {
-  const { titel, grundlage, anlegen: sorten } = artVon(art);
+  const { neu, eigen, grundlage, anlegen: sorten } = artVon(art);
   const vergeben = new Set(zustand.projekt.materialien.map((m) => m.name || m.sorte));
   const frei = sorten.filter((s) => !vergeben.has(s));
   let norm = frei[0];
   let vorlage = sorten[0];
 
   dialogFenster({
-    titel: `Neuer ${titel}`,
+    titel: neu,
     zeichen: 'material',
     zusatz: 'Normsorte nach SIA oder eigenes Material',
     klasse: '.materialwahl',
@@ -98,7 +98,7 @@ export function materialAnlegen(art) {
       ] : [el('p.materialwahl-text', {
         text: 'Alle Normsorten stehen schon im Projekt – jede braucht es nur einmal.',
       })]),
-      karte(`Eigener ${titel}`, [
+      karte(eigen, [
         el('p.materialwahl-text', {
           text: `Die Kennwerte einer Sorte als Vorlage, danach frei änderbar. Das Material `
             + `heisst ${eigenerName(art)} und trägt keine Sorte.`,

@@ -140,7 +140,7 @@ const SCHRITT = { E: 1000, rho: 50, G: 1000 };
 
 /**
  * Die Materialien der Stäbe als Tabelle (Benutzer, 2026-10-24): je Zeile
- * ein Beton oder Baustahl des Projekts -- seine Kennwerte gesperrt,
+ * ein Beton, Baustahl oder Holz des Projekts -- seine Kennwerte gesperrt,
  * gerechnet vom Kern -- oder ein eigenes mit Kennwerten von Hand: E und ρ,
  * im Raum dazu G. Betonstahl steht nicht zur Wahl: aus ihm ist kein Stab.
  * Daneben, welche Linien es nehmen.
@@ -204,7 +204,7 @@ function materialienInhalt(system) {
     }));
   });
   const kopf = [['Material'], ['Art'], ...spalten.map((k) => [k.zeichen, angabe(k.kurz).einheit]), ['trägt'], ['']];
-  const fehlt = (stoffart) => `Im Projekt gibt es keinen ${titel(stoffart)} – anlegen in der App «Materialien»`;
+  const fehlt = (stoffart) => `Im Projekt gibt es ${katalog('materialarten', stoffart, 'keinen')} – anlegen in der App «Materialien»`;
   return [
     system.stabmaterialien.length ? el('div.tabelle-huelle', {}, [el('table.bs-materialien', {}, [
       el('thead', {}, [el('tr', {}, kopf.map(([text, einheit]) => el('th', {}, [

@@ -26,7 +26,7 @@ nach Vorlage, von Hand, aus einer Platte oder aus einer
 Querschnittsanalyse.
 
 MATERIALIEN:
-Ein Material der Staebe (:class:`Stabmaterial`) ist ein Beton oder Baustahl
+Ein Material der Staebe (:class:`Stabmaterial`) ist ein Beton, Baustahl oder Holz
 des Projekts oder ein eigenes mit E und Dichte von Hand (Benutzer,
 2026-10-24). Ein Stab
 kann auch das Material seines Querschnitts nehmen, den Beton einer Platte
@@ -95,17 +95,23 @@ class Materialkennwert:
 
 
 #: Beim Beton ``E_cm`` -- die Analyse rechnet in der Regel ungerissen
-#: (SIA 262:2025, 4.1.4.1.3), mit dem Mittelwert --, beim Baustahl ``E_a``.
+#: (SIA 262:2025, 4.1.4.1.3), mit dem Mittelwert --, beim Baustahl ``E_a``,
+#: beim Holz der Mittelwert in Faserrichtung (SIA 265:2012, 2.1.5).
 E_MODUL = Materialkennwert("E", "E", N_PRO_MM2, "E-Modul",
-                           {Baustoffart.BETON: "E_cm", Baustoffart.BAUSTAHL: "E_a"})
+                           {Baustoffart.BETON: "E_cm", Baustoffart.BAUSTAHL: "E_a",
+                            Baustoffart.HOLZ: "E_0_mean"})
 
-#: Fuer das Eigengewicht: beim Beton die Dichte des Stahlbetons (Benutzer, 2026-10-23).
+#: Fuer das Eigengewicht: beim Beton die Dichte des Stahlbetons (Benutzer,
+#: 2026-10-23), beim Holz die aus der mittleren Raumlast nach SIA 261.
 DICHTE = Materialkennwert("rho", r"\rho", KG_PRO_M3, "Dichte",
-                          {Baustoffart.BETON: "rho_sb", Baustoffart.BAUSTAHL: "rho_a"})
+                          {Baustoffart.BETON: "rho_sb", Baustoffart.BAUSTAHL: "rho_a",
+                           Baustoffart.HOLZ: "rho_mean"})
 
-#: Fuer die Torsion, nur im Raum: ``G_cm`` des Betons, ``G_a`` des Baustahls.
+#: Fuer die Torsion, nur im Raum: ``G_cm`` des Betons, ``G_a`` des Baustahls,
+#: der Mittelwert ``G_mean`` des Holzes.
 SCHUBMODUL = Materialkennwert("G", "G", N_PRO_MM2, "Schubmodul",
-                              {Baustoffart.BETON: "G_cm", Baustoffart.BAUSTAHL: "G_a"})
+                              {Baustoffart.BETON: "G_cm", Baustoffart.BAUSTAHL: "G_a",
+                               Baustoffart.HOLZ: "G_mean"})
 
 
 def stoffkennwerte(kennwerte: Sequence[Materialkennwert]) -> Dict[Baustoffart, Dict[str, str]]:
@@ -150,7 +156,7 @@ DEHNSTEIFIGKEIT = Steifigkeitsformel("EA", MN, "Dehnsteifigkeit", "E", "A")
 @dataclass(frozen=True)
 class Stabmaterial:
     """
-    Ein Material der Staebe, aufgeloest: ein Beton oder Baustahl -- seine
+    Ein Material der Staebe, aufgeloest: ein Beton, Baustahl oder Holz -- seine
     Kennwerte von ihm -- oder ein eigenes mit Kennwerten von Hand.
     """
 
@@ -159,7 +165,7 @@ class Stabmaterial:
 
     name: str
     stoff: Optional[Baustoff] = None
-    """Der Beton oder Baustahl -- ``None`` bei einem eigenen Material."""
+    """Der Beton, Baustahl oder das Holz -- ``None`` bei einem eigenen Material."""
 
     werte: Mapping[str, float] = field(default_factory=dict)
     """Von Hand, je :class:`Materialkennwert` in seiner Einheit -- nur ohne ``stoff``."""

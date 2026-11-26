@@ -74,8 +74,11 @@ export const zustand = {
    * `diagrammSicht` in bericht.js. Null: das erste.
    */
   diagrammWahl: null,
-  /** Ob im Betondiagramm der vereinfachte Spannungsblock mitgezeichnet wird. */
-  zeigeVereinfacht: true,
+  /**
+   * Ob ein Werkstoffgesetz seine zweite Linie mitzeichnet: beim Beton den
+   * Spannungsblock, beim Holz den Druck elastisch-plastisch.
+   */
+  zeigeZweite: true,
   rechnetGerade: false,
   /**
    * Warum die letzte Eingabe sich nicht rechnen liess -- oder null. Die

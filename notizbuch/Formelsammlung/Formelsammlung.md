@@ -1,5 +1,5 @@
 ---
-erzeugt: 4de95e28fa8b
+erzeugt: 5b562236ff62
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -13,6 +13,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Betonstahl]] · 3
 - [[Baustahl]] · 3
 - [[Spannstahl]] · 2
+- [[Holz]] · 3
 
 **Platte**
 
@@ -152,6 +153,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Bügelquerschnitt je Länge einer Schubwand (n Schnitte)]]
 - [[Dehnsteifigkeit]] · $EA_{\text{Q1}}$
 - [[Dehnsteifigkeit des Pfahls]] · $EA$
+- [[Dehnung beim Zugbruch in Faserrichtung]] · $\varepsilon_{t,0,d}$
 - [[Dehnung der Zugbewehrung]] · $\varepsilon_s^{+}$
 - [[Dehnungsebene und innere Kräfte]]
 - [[Dekompressionsmoment]] · $m_{Dd}$
@@ -236,6 +238,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Grenze der bezogenen Druckzonenhöhe]] · $\left(x/d\right)_{max}$
 - [[Grenze der Grundschwingzeit]] · $T_{1,max}$
 - [[Grenzen der Spannung im Spannstahl]] · $\sigma_{p,max}$
+- [[Grenzstauchung des Holzes, elastisch-plastisch]] · $\varepsilon_{cu}$
 - [[Grenzwert der Durchbiegung]] · $w_{max}$
 - [[Grösste Dehnung auf halber Höhe]] · $\varepsilon_{m,u}$
 - [[Grösste Dehnung im Schwerpunkt]] · $\varepsilon_{m,u}$
@@ -368,6 +371,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Statische Höhe der äusseren Lage]] · $d_x$
 - [[Statische Höhe der inneren Lage]] · $d_y$
 - [[Statische Höhe des Kreisquerschnitts]] · $d$
+- [[Stauchung an der Druckgrenze in Faserrichtung]] · $\varepsilon_{c,0,d}$
 - [[Stegbreite des Kreisquerschnitts]] · $b_w$
 - [[Steifigkeitsmatrix eines Stabs]]
 - [[Teilung einer Stablinie – gleiche Felder, auf die Länge gerundet]]
@@ -431,7 +435,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 ## Normstelle fehlt noch
 
-130 von 353 Formeln haben im Code keine Normstelle – meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle – von dort kommt sie in Bericht und Notizbuch.
+130 von 356 Formeln haben im Code keine Normstelle – meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle – von dort kommt sie in Bericht und Notizbuch.
 
 - [[Achsen eines Stabs im Raum]] · [[opencivil.stabwerk3d.herleitung|_ansaetze]]
 - [[Äquivalenter E-Modul eines Stabs]] · [[opencivil.spannungsanalyse.modul#ModulProzedur|ModulProzedur._schreiben]]

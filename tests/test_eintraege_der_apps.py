@@ -66,8 +66,9 @@ class TestAnlegen(unittest.TestCase):
         self.assertEqual(projekt.material_anlegen("baustahl", "S355").name, "S355")
         eigen = projekt.material_anlegen("beton", "C30/37", eigen=True)
         self.assertEqual((eigen.name, eigen.sorte, eigen.eigenstaendig), ("BE1", "C30/37", True))
-        with self.assertRaisesRegex(ProjektFehler, "Eine Materialart 'holz' gibt es nicht"):
-            projekt.material_anlegen("holz", "C24")
+        self.assertEqual(projekt.material_anlegen("holz", "GL24h").kennung, "h1")
+        with self.assertRaisesRegex(ProjektFehler, "Eine Materialart 'mauerwerk' gibt es nicht"):
+            projekt.material_anlegen("mauerwerk", "MB")
 
 
 class TestKopieren(unittest.TestCase):

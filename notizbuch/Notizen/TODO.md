@@ -969,6 +969,12 @@ Norm dazu sagt.
       zu Fliessdehnung, das 3.2.2.4 für die plastischen Verfahren verlangt.
       Bestätigen oder eine andere Zahl nennen. Wirkt erst, wenn die
       Querschnittsanalyse Baustahl rechnet.
+- [ ] **Holz, Grenzstauchung nach Vorgabe** (`opencivil/material/holz.py`,
+      `STAUCHBARKEIT`, seit 2026-11-26). Elastisch-plastisch geht der Druck
+      bis ε_cu = 3·ε_c,0,d, bei C24 bis 3.27 ‰. SIA 265:2012, 3.1.2.2 lässt
+      das Fliessen zu, wo ein Bauteil plastisch stauchen kann, und nennt
+      keine Grenze. Bestätigen oder eine andere Zahl nennen. Wirkt erst, wenn
+      die Querschnittsanalyse Holz rechnet.
 - [ ] **Erdbeben, nach Vorgabe eingebaut** (`opencivil/erdbeben/ersatzkraft.py`).
       Jede Wand trägt nach ihrem Anteil an der Biegesteifigkeit; verformt
       werden die Wände nur durch Biegung, weder durch Schub noch im
@@ -1544,6 +1550,14 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       Rechteckrohre (RRW) -- die Tabelle des Benutzers hat sie nicht, und
       eine andere Quelle braucht seine Erlaubnis. Dazu für die Nachweise nach
       SIA 263: W_el, W_pl, A_v, I_w; die Tabelle hat Formeln dafür.
+
+- [ ] **Holz, mit den Nachweisen nach SIA 265:** die Feuchteklasse (η_w,
+      Tabelle 4) und «stossartig» (η_t = 1.4, 2.2.6); der höhere Querdruck
+      mit Vorholz oder am Endauflager, samt den Klammerwerten der Tabellen 6
+      und 7; dass C16 für Zugglieder nicht zugelassen ist; k_h nach
+      Gleichung (5); die 5%-Fraktile der Steifigkeit für Knicken und Kippen
+      (2/3, 5/6 und 0.85 der Mittelwerte); die Kriechzahlen (Tabelle 5).
+      Holzwerkstoffe nach SIA 265/1 kennt das Werkzeug nicht.
 
 - [ ] **Spannglieder, nächste Schritte:** das Hüllrohr Ø_H und die Minderung
       der Stegbreite nach Gleichung (44) (4.3.3.3.5); eine Neigung in der

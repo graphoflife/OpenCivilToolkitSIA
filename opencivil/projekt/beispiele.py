@@ -161,6 +161,7 @@ def jeder_nachweis() -> Projekt:
     p.stahl("B500B")
     p.baustahl("S355")
     p.spannstahl("Y1860")
+    p.holz("GL24h")
     decke = p.platte("Decke", h=300, x=[18, 12], x_zulage=[12, 0], y=[12, 12],
                      rissanforderung="erhoeht", duktilitaet=True, sproede=True,
                      zwaengung=True, zwaengung_begrenzt=True,

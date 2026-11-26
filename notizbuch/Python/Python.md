@@ -1,5 +1,5 @@
 ---
-erzeugt: 7c5d636940a8
+erzeugt: ff840756e341
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -73,12 +73,13 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.konsole.pakete]] – welche Fremdpakete ein Skript einbinden kann.
     - [[opencivil.konsole.sitzung]] – eine Python-Sitzung für die App «Python».
     - [[opencivil.konsole.zeichnen]] – Diagramme aus der App «Python», ohne matplotlib.
-- [[opencivil.material]] – die Baustoffe: Beton, Betonstahl, Baustahl und Spannstahl.
+- [[opencivil.material]] – die Baustoffe: Beton, Betonstahl, Baustahl, Spannstahl und Holz.
     - [[opencivil.material.arten]] – die Materialarten des Projekts, je eine Zeile.
     - [[opencivil.material.basis]] – Gemeinsames Geruest fuer Baustoffe.
     - [[opencivil.material.baustahl]] – Baustahl nach SIA 263:2013.
     - [[opencivil.material.beton]] – Beton nach SIA 262:2025.
     - [[opencivil.material.betonstahl]] – Betonstahl nach SIA 262:2025.
+    - [[opencivil.material.holz]] – Holz nach SIA 265:2012.
     - [[opencivil.material.spannstahl]] – Spannstahl nach SIA 262:2025.
 - [[opencivil.mcp]] – das Werkzeug fuer eine KI, ueber das Model Context Protocol.
     - [[opencivil.mcp.__main__]] – startet den Server: `python3 -m opencivil.mcp`.

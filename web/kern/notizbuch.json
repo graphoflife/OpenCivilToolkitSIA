@@ -157,6 +157,12 @@
       "bereich": "Baustoffe"
     },
     {
+      "name": "Holz",
+      "pfad": "Formelsammlung/Themen/Holz.md",
+      "art": "thema",
+      "bereich": "Baustoffe"
+    },
+    {
       "name": "Querkraft",
       "pfad": "Formelsammlung/Themen/Querkraft.md",
       "art": "thema",
@@ -1075,6 +1081,17 @@
       ],
       "themen": [
         "Pfahlsteifigkeit"
+      ]
+    },
+    {
+      "name": "Dehnung beim Zugbruch in Faserrichtung",
+      "pfad": "Formelsammlung/Formeln/Dehnung beim Zugbruch in Faserrichtung.md",
+      "art": "formel",
+      "zeichen": [
+        "\\varepsilon_{t,0,d}"
+      ],
+      "themen": [
+        "Holz"
       ]
     },
     {
@@ -2011,6 +2028,17 @@
       ],
       "themen": [
         "Querschnittsanalyse"
+      ]
+    },
+    {
+      "name": "Grenzstauchung des Holzes, elastisch-plastisch",
+      "pfad": "Formelsammlung/Formeln/Grenzstauchung des Holzes, elastisch-plastisch.md",
+      "art": "formel",
+      "zeichen": [
+        "\\varepsilon_{cu}"
+      ],
+      "themen": [
+        "Holz"
       ]
     },
     {
@@ -3467,6 +3495,17 @@
       ],
       "themen": [
         "Innerer Pfahlwiderstand quer"
+      ]
+    },
+    {
+      "name": "Stauchung an der Druckgrenze in Faserrichtung",
+      "pfad": "Formelsammlung/Formeln/Stauchung an der Druckgrenze in Faserrichtung.md",
+      "art": "formel",
+      "zeichen": [
+        "\\varepsilon_{c,0,d}"
+      ],
+      "themen": [
+        "Holz"
       ]
     },
     {
@@ -5741,7 +5780,7 @@
       "name": "opencivil.material",
       "pfad": "Python/opencivil.material.md",
       "art": "modul",
-      "kurz": "die Baustoffe: Beton, Betonstahl, Baustahl und Spannstahl.",
+      "kurz": "die Baustoffe: Beton, Betonstahl, Baustahl, Spannstahl und Holz.",
       "stichworte": []
     },
     {
@@ -5751,7 +5790,11 @@
       "kurz": "die Materialarten des Projekts, je eine Zeile.",
       "stichworte": [
         "Materialart",
-        "Materialart.titel"
+        "Materialart.titel",
+        "Materialart.neu",
+        "Materialart.eigen",
+        "Materialart.einen",
+        "Materialart.keinen"
       ]
     },
     {
@@ -5815,6 +5858,20 @@
         "stahlsorten_zum_anlegen",
         "betonstahl",
         "betonstahl_frei"
+      ]
+    },
+    {
+      "name": "opencivil.material.holz",
+      "pfad": "Python/opencivil.material.holz.md",
+      "art": "modul",
+      "kurz": "Holz nach SIA 265:2012.",
+      "stichworte": [
+        "Holzart",
+        "Holzart.gamma_M_eta_M",
+        "Holzart.dichte",
+        "Holzsorte",
+        "holzsorten_zum_anlegen",
+        "holz"
       ]
     },
     {
@@ -7619,10 +7676,12 @@
         "Projekt.stahl",
         "Projekt.baustahl",
         "Projekt.spannstahl",
+        "Projekt.holz",
         "Projekt.eigener_beton",
         "Projekt.eigener_stahl",
         "Projekt.eigener_baustahl",
         "Projekt.eigener_spannstahl",
+        "Projekt.eigenes_holz",
         "Projekt.material_anlegen",
         "Projekt._normsorte",
         "Projekt.platte",
@@ -7766,6 +7825,7 @@
         "MitStaeben.lager_an",
         "MitStaeben.beton",
         "MitStaeben.baustahl",
+        "MitStaeben.holz",
         "MitStaeben.eigenes_material",
         "MitStaeben.querschnitt",
         "MitStaeben.stahlprofil",
@@ -8334,6 +8394,14 @@
         "Spannstahlgesetz.eps_pd",
         "Spannstahlgesetz.formel",
         "Spannstahlgesetz.latex",
+        "Holzgesetz",
+        "Holzgesetz.eps_t",
+        "Holzgesetz.eps_c",
+        "Holzgesetz.formel",
+        "Holzgesetz.latex",
+        "HolzPlastisch",
+        "HolzPlastisch.formel",
+        "HolzPlastisch.latex",
         "_stahlfunktion",
         "BetonUngerissen",
         "BetonUngerissen.formel",
@@ -9341,7 +9409,8 @@
         "_stahlkurve",
         "_baustahlkurve",
         "_knickkurve",
-        "_spannstahlkurve"
+        "_spannstahlkurve",
+        "_holzkurve"
       ]
     },
     {

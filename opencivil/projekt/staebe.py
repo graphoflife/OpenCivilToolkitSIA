@@ -449,6 +449,10 @@ class MitStaeben:
         """Das Material des Systems aus einem Baustahl des Projekts -- siehe :meth:`beton`."""
         return self._aus_projekt("baustahl", stahl)
 
+    def holz(self, holz: Any) -> Any:
+        """Das Material des Systems aus einem Holz des Projekts -- siehe :meth:`beton`."""
+        return self._aus_projekt("holz", holz)
+
     def _aus_projekt(self, art: str, stoff: Any) -> Any:
         kennung = kennung_von(stoff)
         passend = [m for m in self.stabmaterialien if m.art == art and m.stoff in (kennung, "")]

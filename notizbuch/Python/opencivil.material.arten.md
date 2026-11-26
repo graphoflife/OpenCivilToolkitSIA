@@ -1,5 +1,5 @@
 ---
-erzeugt: 11268a13a353
+erzeugt: 0b75fcbd85fc
 art: modul
 tags: [modul]
 ---
@@ -32,11 +32,12 @@ class Materialart
 - `vorlagen: Tuple[KennwertVorlage, ...]`
 - `bauen: Callable[..., Baustoff]` – Wie [[opencivil.material.beton#beton|beton]]: Sorte, dann Name, Praefix, Abweichungen.
 - `anlegen: Tuple[str, ...]` – Die Sorten in der Folge, in der das Fenster «Neues Material» sie anbietet.
-- `kennung: str` – Womit die Kennung beginnt: b1, s1, st1, sp1.
-- `eigene: str` – Womit der Name eines eigenen Materials beginnt: BE1, S1, ST1 (Benutzer, 2026-10-16), SP1 beim Spannstahl.
+- `kennung: str` – Womit die Kennung beginnt: b1, s1, st1, sp1, h1.
+- `eigene: str` – Womit der Name eines eigenen Materials beginnt: BE1, S1, ST1 (Benutzer, 2026-10-16), SP1 beim Spannstahl, H1 beim Holz.
 - `grundlage: str` – Worauf die Kennwerte einer Normsorte stehen -- so steht es in der Oberflaeche.
 - `erzeugnisse: Mapping[str, Tuple[Erzeugnis, ...]] = field(default_factory=dict)` – Je Sorte, in welchen Erzeugnissen es sie gibt -- beim Spannstahl Draehte, Litzen und Staebe nach Tabelle 7; die anderen Arten haben keine Liste.
 - `erzeugnisquelle: str = ''` – Wo die Erzeugnisse stehen.
+- `saechlich: bool = False` – Ob die Art «das» heisst: «Neues Holz», «ein Holz» -- die anderen sind maennlich. Bis 2026-11-26 stand «Neuer» und «einen» fest im Text.
 
 #### Materialart.titel
 
@@ -44,6 +45,42 @@ class Materialart
 @property
 def titel(self) -> str
 ```
+
+#### Materialart.neu
+
+```python
+@property
+def neu(self) -> str
+```
+
+«Neuer Beton», «Neues Holz».
+
+#### Materialart.eigen
+
+```python
+@property
+def eigen(self) -> str
+```
+
+«Eigener Beton», «Eigenes Holz».
+
+#### Materialart.einen
+
+```python
+@property
+def einen(self) -> str
+```
+
+Im Akkusativ: «einen Beton», «ein Holz».
+
+#### Materialart.keinen
+
+```python
+@property
+def keinen(self) -> str
+```
+
+Im Akkusativ: «keinen Beton», «kein Holz».
 
 
 ## Konstanten
@@ -56,6 +93,7 @@ def titel(self) -> str
 - [[opencivil.material.baustahl]]
 - [[opencivil.material.beton]]
 - [[opencivil.material.betonstahl]]
+- [[opencivil.material.holz]]
 - [[opencivil.material.spannstahl]]
 
 ## Gebraucht von
@@ -63,6 +101,7 @@ def titel(self) -> str
 - [[opencivil.mcp.ausgabe]]
 - [[opencivil.mcp.werkzeuge]]
 - [[opencivil.notizbuch.formelseiten]]
+- [[opencivil.projekt.aufbau.balkensystem]]
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.projekt]]

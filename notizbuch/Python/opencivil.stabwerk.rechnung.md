@@ -1,5 +1,5 @@
 ---
-erzeugt: 000bb8b4d892
+erzeugt: d9063a0f9298
 art: modul
 tags: [modul]
 ---
@@ -39,7 +39,7 @@ Querschnittsanalyse.
 
 ## MATERIALIEN
 
-Ein Material der Staebe ([[opencivil.stabwerk.rechnung#Stabmaterial|Stabmaterial]]) ist ein Beton oder Baustahl
+Ein Material der Staebe ([[opencivil.stabwerk.rechnung#Stabmaterial|Stabmaterial]]) ist ein Beton, Baustahl oder Holz
 des Projekts oder ein eigenes mit E und Dichte von Hand (Benutzer,
 2026-10-24). Ein Stab
 kann auch das Material seines Querschnitts nehmen, den Beton einer Platte
@@ -123,12 +123,12 @@ Stabs im Rechenkern, `beschreibung` auch die Formel.
 class Stabmaterial
 ```
 
-Ein Material der Staebe, aufgeloest: ein Beton oder Baustahl -- seine
+Ein Material der Staebe, aufgeloest: ein Beton, Baustahl oder Holz -- seine
 Kennwerte von ihm -- oder ein eigenes mit Kennwerten von Hand.
 
 - `kennung: str` – Im System, `M1` -- bei einem Stab mit dem Material seines Querschnitts dessen Zeichen.
 - `name: str`
-- `stoff: Optional[Baustoff] = None` – Der Beton oder Baustahl -- `None` bei einem eigenen Material.
+- `stoff: Optional[Baustoff] = None` – Der Beton, Baustahl oder das Holz -- `None` bei einem eigenen Material.
 - `werte: Mapping[str, float] = field(default_factory=dict)` – Von Hand, je [[opencivil.stabwerk.rechnung#Materialkennwert|Materialkennwert]] in seiner Einheit -- nur ohne `stoff`.
 - `vom_querschnitt: bool = False` – Das Material des Querschnitts: dann gilt dessen E_eq, wenn er eines hat.
 
@@ -385,9 +385,9 @@ Modul mal Kennwert ([[opencivil.stabwerk.rechnung#Steifigkeitsformel|Steifigkeit
 
 ## Konstanten
 
-- `E_MODUL = Materialkennwert('E', 'E', N_PRO_MM2, 'E-Modul', {Baustoffart.BETON: …` – Beim Beton `E_cm` -- die Analyse rechnet in der Regel ungerissen (SIA 262:2025, 4.1.4.1.3), mit dem Mittelwert --, beim Baustahl `E_a`.
-- `DICHTE = Materialkennwert('rho', '\\rho', KG_PRO_M3, 'Dichte', {Baustoffart.BE…` – Fuer das Eigengewicht: beim Beton die Dichte des Stahlbetons (Benutzer, 2026-10-23).
-- `SCHUBMODUL = Materialkennwert('G', 'G', N_PRO_MM2, 'Schubmodul', {Baustoffart.BETO…` – Fuer die Torsion, nur im Raum: `G_cm` des Betons, `G_a` des Baustahls.
+- `E_MODUL = Materialkennwert('E', 'E', N_PRO_MM2, 'E-Modul', {Baustoffart.BETON: …` – Beim Beton `E_cm` -- die Analyse rechnet in der Regel ungerissen (SIA 262:2025, 4.1.4.1.3), mit dem Mittelwert --, beim Baustahl `E_a`, beim Holz der Mittelwert in Faserrichtung (SIA 265:2012, 2.1.5).
+- `DICHTE = Materialkennwert('rho', '\\rho', KG_PRO_M3, 'Dichte', {Baustoffart.BE…` – Fuer das Eigengewicht: beim Beton die Dichte des Stahlbetons (Benutzer, 2026-10-23), beim Holz die aus der mittleren Raumlast nach SIA 261.
+- `SCHUBMODUL = Materialkennwert('G', 'G', N_PRO_MM2, 'Schubmodul', {Baustoffart.BETO…` – Fuer die Torsion, nur im Raum: `G_cm` des Betons, `G_a` des Baustahls, der Mittelwert `G_mean` des Holzes.
 - `STABKENNWERTE = stoffkennwerte((E_MODUL, DICHTE))` – Welche Kennwerte eines Baustoffs ein Stab in der Ebene aus ihm nimmt.
 - `ERDBESCHLEUNIGUNG = Groesse(10.0, M_PRO_S2)` – Die Erdbeschleunigung des Eigengewichts -- 10 m/s² nach Vorgabe des Benutzers (2026-10-23): so wiegt Stahlbeton 25 kN/m³.
 - `QUERSCHNITTE = 'Stabquerschnitte'` – Die Themen der Formelsammlung: was am Querschnitt haengt, und die Rechnung.

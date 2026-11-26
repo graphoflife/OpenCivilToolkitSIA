@@ -1,5 +1,5 @@
 ---
-erzeugt: 0809b8ce809d
+erzeugt: fbf810c765c9
 art: modul
 tags: [modul]
 ---
@@ -58,7 +58,7 @@ alldem die Formelsammlung und diese Seiten.
 - [[opencivil.ergebnis]] – ein gerechnetes Projekt, wie man es ohne Oberflaeche braucht.
 - [[opencivil.geotechnik]] – Nachweise im Baugrund.
 - [[opencivil.konsole]] – Python im Browser, für die App «Python».
-- [[opencivil.material]] – die Baustoffe: Beton, Betonstahl, Baustahl und Spannstahl.
+- [[opencivil.material]] – die Baustoffe: Beton, Betonstahl, Baustahl, Spannstahl und Holz.
 - [[opencivil.mcp]] – das Werkzeug fuer eine KI, ueber das Model Context Protocol.
 - [[opencivil.nachweis]] – die Nachweise der Platte und des gezeichneten Querschnitts.
 - [[opencivil.notizbuch]] – das Notizbuch: Formelsammlung und Python-Doku als Markdown.

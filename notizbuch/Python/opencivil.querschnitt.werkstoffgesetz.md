@@ -1,5 +1,5 @@
 ---
-erzeugt: 0c3a363ae8cc
+erzeugt: ae5a7b04b2ae
 art: modul
 tags: [modul]
 ---
@@ -21,7 +21,9 @@ Betonstahl: bilinear, auf Zug und Druck getrennt begrenzt
 elastisch -- ideal plastisch, in Zug und Druck gleich
 ([[opencivil.querschnitt.werkstoffgesetz#Baustahlgesetz|Baustahlgesetz]], SIA 263:2013), mit einer Grenzdehnung nach Vorgabe.
 Spannstahl: elastisch -- ideal plastisch, nur auf Zug
-([[opencivil.querschnitt.werkstoffgesetz#Spannstahlgesetz|Spannstahlgesetz]], 4.2.3.3 mit Figur 17).
+([[opencivil.querschnitt.werkstoffgesetz#Spannstahlgesetz|Spannstahlgesetz]], 4.2.3.3 mit Figur 17). Holz: linear bis zum
+Bruch ([[opencivil.querschnitt.werkstoffgesetz#Holzgesetz|Holzgesetz]], SIA 265:2012, 3.1.2.1), oder auf Druck
+elastisch-plastisch ([[opencivil.querschnitt.werkstoffgesetz#HolzPlastisch|HolzPlastisch]], 3.1.2.2).
 
 Bis 2026-10-16 rechneten Funktionen im Loeser, und gedruckt wurden Klassen
 mit Platzhaltern oder Formeln von Hand. Jenseits von eps_c2d und beim
@@ -446,6 +448,90 @@ def latex(self, zug: str='f_{pd}') -> str
 ```
 
 Als Formel -- `zug` ist das Zeichen der Fliessgrenze.
+
+### Holzgesetz
+
+```python
+@dataclass(frozen=True)
+class Holzgesetz(Gesetz)
+```
+
+Holz nach SIA 265:2012, 3.1.2.1: linear bis zum Bruch -- auf Zug bis
+`f_t`, auf Druck bis `f_c`, beides in Faserrichtung; jenseits traegt
+es nichts mehr. Die Werte sind Bemessungswerte der Tabellen 6 und 7.
+
+- `NAME = 'Lineare Beziehung des Holzes'`
+- `WORT = 'Holz, linear'`
+- `REFERENZ = 'SIA 265:2012, 3.1.2.1'`
+- `ROLLEN = ('f_t', 'f_c', 'E')`
+- `WERTTITEL = 'Werte des Holzes'`
+- `E: float` – Elastizitaetsmodul in Faserrichtung, in N/m^2.
+- `f_t: float` – Zugfestigkeit in Faserrichtung, in N/m^2, positiv.
+- `f_c: float` – Druckfestigkeit in Faserrichtung, in N/m^2, positiv.
+
+#### Holzgesetz.eps_t
+
+```python
+@property
+def eps_t(self) -> float
+```
+
+Wo es auf Zug bricht.
+
+#### Holzgesetz.eps_c
+
+```python
+@property
+def eps_c(self) -> float
+```
+
+Wo es auf Druck die Festigkeit erreicht, positiv.
+
+#### Holzgesetz.formel
+
+```python
+def formel(self, werte: Werte) -> str
+```
+
+#### Holzgesetz.latex
+
+```python
+def latex(self, f_t: str='f_{t,0,d}', f_c: str='f_{c,0,d}', E: str='E_{0,mean}') -> str
+```
+
+Als Formel, mit den Zeichen der Festigkeiten und des Moduls.
+
+### HolzPlastisch
+
+```python
+@dataclass(frozen=True)
+class HolzPlastisch(Holzgesetz)
+```
+
+Holz, auf Druck elastisch-plastisch (SIA 265:2012, 3.1.2.2): bei `f_c`
+waagrecht weiter bis `eps_cu`; auf Zug linear bis zum Bruch wie
+[[opencivil.querschnitt.werkstoffgesetz#Holzgesetz|Holzgesetz]]. Die Grenzstauchung ist nach Vorgabe, nicht
+nachgeschlagen ([[opencivil.material.holz#Konstanten|STAUCHBARKEIT]]).
+
+- `NAME = 'Elastisch-plastische Beziehung des Holzes'`
+- `WORT = 'Holz, auf Druck elastisch-plastisch'`
+- `REFERENZ = 'SIA 265:2012, 3.1.2.2 – die Grenzstauchung nach Vorgabe'`
+- `ROLLEN = ('f_t', 'f_c', 'E', 'eps_cu')`
+- `eps_cu: float` – Grenzstauchung, positiv.
+
+#### HolzPlastisch.formel
+
+```python
+def formel(self, werte: Werte) -> str
+```
+
+#### HolzPlastisch.latex
+
+```python
+def latex(self, f_t: str='f_{t,0,d}', f_c: str='f_{c,0,d}', E: str='E_{0,mean}', eps_cu: str='\\varepsilon_{cu}') -> str
+```
+
+Als Formel -- wie [[opencivil.querschnitt.werkstoffgesetz#Holzgesetz.latex|Holzgesetz.latex]], mit der Grenzstauchung.
 
 ### _stahlfunktion
 

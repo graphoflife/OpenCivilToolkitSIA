@@ -2,8 +2,9 @@
  * diagramm.js -- die Kurve eines Werkstoffgesetzes und die Hilfe, Beschriftungen
  * zu entzerren.
  *
- * Zeichnet die σ-ε-Linie, die der Rechenkern liefert -- wo es einen gibt, mit
- * dem vereinfachten Verlauf daneben. Die Bilder einer Platte -- Querschnitt,
+ * Zeichnet die σ-ε-Linie, die der Rechenkern liefert -- wo es eine gibt, mit
+ * einer zweiten Linie daneben: beim Beton dem Spannungsblock, beim Holz dem
+ * Druck elastisch-plastisch. Die Bilder einer Platte -- Querschnitt,
  * M-N-Interaktionsdiagramm, M-V- und Neigungskurven -- stehen in
  * platte_bilder.js; bis 2026-11-10 standen sie hier, in einer Datei von fast
  * tausend Zeilen.
@@ -15,7 +16,7 @@ import { achsenkreuz, legende, NR, strich } from './achsen.js';
 import { hakenSchalter } from './bausteine.js';
 import { el, svgEl } from './dom.js';
 
-/** Farbe des vereinfachten Verlaufs -- grün, wie verlangt. */
+/** Farbe der zweiten Linie -- grün, wie für den Spannungsblock verlangt. */
 const GRUEN = '#16794a';
 
 /**
@@ -64,12 +65,15 @@ export function beschriftungenEntzerren(zettel, abstand, oben, unten) {
  * Quadranten, der Stahl spannt sich über beide. Die Achsen laufen deshalb
  * durch den Nullpunkt.
  */
-export function kurveZeichnen(gesetz, { zeigeVereinfacht = true, beiUmschalten } = {}) {
+export function kurveZeichnen(gesetz, { zeigeZweite = true, beiUmschalten } = {}) {
   const punkte = gesetz.punkte || [];
   if (!punkte.length) return el('div.leer', { text: 'Keine Kurve vorhanden.' });
 
-  const eps = punkte.map((p) => p.eps);
-  const sig = punkte.map((p) => p.sigma);
+  // Die zweite Linie gehört ins Bild, wenn sie gezeigt wird: beim Holz reicht
+  // sie weiter als die erste, bis ε_cu.
+  const zweite = (gesetz.zweite && zeigeZweite) ? gesetz.zweite.punkte : [];
+  const eps = [...punkte, ...zweite].map((p) => p.eps);
+  const sig = [...punkte, ...zweite].map((p) => p.sigma);
   // Der Nullpunkt gehört immer ins Bild, sonst hängt die Kurve im Nichts.
   const spanne = (werte, luft = 0.08) => {
     const min = Math.min(0, ...werte);
@@ -88,22 +92,22 @@ export function kurveZeichnen(gesetz, { zeigeVereinfacht = true, beiUmschalten }
     y: { bereich: spanne(sig), teilung: { ziel: 6 }, null: true, titel: gesetz.y_titel },
   });
 
+  // Die zweite Linie, wenn der Kern eine liefert und sie gezeigt wird -- unter
+  // der Kurve: beim Holz deckt sie sich bis f_c,0,d mit ihr.
+  if (zweite.length) {
+    daten.append(svgEl('polyline', {
+      points: zweite.map((p) => `${x(p.eps).toFixed(2)},${y(p.sigma).toFixed(2)}`).join(' '),
+      fill: 'none', stroke: GRUEN, 'stroke-width': 2,
+      'stroke-linejoin': 'miter', 'stroke-linecap': 'butt',
+    }));
+  }
+
   // Kurve
   daten.append(svgEl('polyline', {
     points: punkte.map((p) => `${x(p.eps).toFixed(2)},${y(p.sigma).toFixed(2)}`).join(' '),
     fill: 'none', stroke: '#1f6feb', 'stroke-width': 2.2,
     'stroke-linejoin': 'round', 'stroke-linecap': 'round',
   }));
-
-  // Vereinfachter Verlauf (Spannungsblock), sofern der Kern einen liefert.
-  if (gesetz.vereinfacht && zeigeVereinfacht) {
-    daten.append(svgEl('polyline', {
-      points: gesetz.vereinfacht.punkte
-        .map((p) => `${x(p.eps).toFixed(2)},${y(p.sigma).toFixed(2)}`).join(' '),
-      fill: 'none', stroke: GRUEN, 'stroke-width': 2,
-      'stroke-linejoin': 'miter', 'stroke-linecap': 'butt',
-    }));
-  }
 
   // Marken für die Grenzdehnungen
   for (const marke of gesetz.marken || []) {
@@ -123,16 +127,16 @@ export function kurveZeichnen(gesetz, { zeigeVereinfacht = true, beiUmschalten }
     daten.append(t);
   }
 
-  if (!gesetz.vereinfacht) return el('div.diagramm-huelle', {}, [svg]);
+  if (!gesetz.zweite) return el('div.diagramm-huelle', {}, [svg]);
 
   // Ein Schalter, kein Haken (Benutzer, 2026-11-19) -- und darum kein
   // «label» um ihn: ein Klick auf den Text löste ihn sonst aus.
   const schalter = el('span.kurvenschalter', {
-    title: gesetz.vereinfacht.beschreibung || '',
+    title: gesetz.zweite.beschreibung || '',
   }, [
-    hakenSchalter(zeigeVereinfacht, (an) => beiUmschalten?.(an), gesetz.vereinfacht.titel),
+    hakenSchalter(zeigeZweite, (an) => beiUmschalten?.(an), gesetz.zweite.titel),
     strich(GRUEN, { breite: 2 }),
-    el('span', { text: gesetz.vereinfacht.titel }),
+    el('span', { text: gesetz.zweite.titel }),
   ]);
 
   return el('div.diagramm-huelle', {}, [
@@ -140,9 +144,9 @@ export function kurveZeichnen(gesetz, { zeigeVereinfacht = true, beiUmschalten }
     legende([
       [strich('#1f6feb'), gesetz.titel],
       schalter,
-      zeigeVereinfacht && gesetz.vereinfacht.beschreibung
+      zeigeZweite && gesetz.zweite.beschreibung
         ? el('span', {
-          text: gesetz.vereinfacht.beschreibung,
+          text: gesetz.zweite.beschreibung,
           style: { color: 'var(--schrift-zart)' },
         })
         : null,

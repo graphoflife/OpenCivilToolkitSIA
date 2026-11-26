@@ -7,6 +7,38 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-26 · Holz als Material
+
+Aus dem Plan vom 2026-11-25, Schritt 10: unter «Materialien» gibt es Holz
+nach SIA 265:2012 – Vollholz C16, C24, C30 und D30 (Tabelle 6),
+Brettschichtholz GL24k bis GL36h (Tabelle 7). Ein neues Holz beginnt bei
+C24, der Sorte, die Tabelle 6 hervorhebt; Kennungen h1 …, eigene H1 ….
+
+**Bemessungswerte aus der Tabelle, nicht gerechnet.** Die Norm nennt sie
+selbst, für Feuchteklasse 1 und ohne stossartige Einwirkung; der Beiwert
+γ_M/η_M (Tabelle 1) steckt darin und steht nur zur Auskunft dabei.
+Gerechnet aus f_m,k kämen sie nicht heraus, denn die Tabellen runden: D30
+hätte 17.6 statt 17 N/mm². Was erst ein Nachweis braucht – Feuchteklasse,
+«stossartig», Querdruck mit Vorholz, k_h –, kommt mit den Nachweisen
+(Schritt 13) und steht im TODO.
+
+**Die Dichte für das Eigengewicht** ist nicht die Rohdichte der Tabellen
+(das 5%-Fraktil, für Verbindungen), sondern die mittlere Raumlast nach
+SIA 261:2020, Tabelle 28: Nadelholz 5, Laubholz 7.5 kN/m³, mit g = 10 m/s²
+500 und 750 kg/m³. So nimmt sie auch ein Stab im Balkensystem, mit
+E_0,mean und im Raum G_mean.
+
+**Das Gesetz** ist linear bis zum Bruch, auf Zug wie auf Druck. Das Bild
+im Material zeigt als zweite Linie den Druck elastisch-plastisch
+(3.1.2.2), bis 3·ε_c,0,d – nach Vorgabe, im TODO. Die zweite Linie war
+bis heute der Spannungsblock des Betons und hiess im Code «vereinfacht»;
+sie heisst jetzt «zweite», denn beim Holz ist sie keine Vereinfachung.
+
+**«Neues Holz», nicht «Neuer Holz».** Wie ein Satz eine Art nennt, steht
+neu im Register (`saechlich`): das Fenster heisst «Neues Holz», die Karte
+«Eigenes Holz», das Balkensystem sagt «kein Holz» und «ein Holz des
+Projekts». Bis heute stand «Neuer», «Eigener» und «keinen» fest im Text.
+
 ## 2026-11-26 · Geneigte Spannglieder in der Querkraft
 
 Aus dem Plan vom 2026-11-25, Schritt 9c: ein Spannglied mit Vordehnung hat
