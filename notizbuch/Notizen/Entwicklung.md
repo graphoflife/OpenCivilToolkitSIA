@@ -7,6 +7,33 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-26 · Durchstanzen gegen das Skript geprüft: m_sd aus der ganzen Auflagerkraft
+
+Vom Benutzer gewünscht (2026-11-25): das Durchstanzen gegen das Skript
+«Stahlbeton II, 7.4 Platten» (Kaufmann, FS 2026) prüfen, besonders welches
+V_d in m_sd gilt – mit oder ohne Abzug der Last im Nachweisschnitt.
+
+- Die Formeln des Moduls stimmen mit SIA 262:2025, 4.3.6 überein:
+  Nachweisschnitt, k_e, Abzug im Schnitt, (58) bis (61), b_sr, (62) bis
+  (65), r_s am Rand in Stufe 3, (66) bis (70) und der äussere Schnitt.
+- Offen war, welches V_d in (62) bis (65) gilt. Die Norm sagt es nicht
+  ausdrücklich; der Abzug nach 4.3.6.2.6 ist erlaubt, nicht verlangt. Das
+  Skript verknüpft m_sd mit der Stützenreaktion (Folie 28). Entscheid des
+  Benutzers (2026-11-26): m_sd kommt aus der ganzen Auflagerkraft. Den
+  Abzug behält die Querkraft im Nachweis, in (66), (67) und am äusseren
+  Schnitt.
+  - Vorher, Bodenplatte mit Stütze 400 × 400 mm, h = 600 mm, V_d =
+    2000 kN, Bodenpressung 150 kN/m², Stufe 2: m_sd = 234.9 kNm/m und
+    V_Rd,c = 1995 kN. Nachher: m_sd = 250.0 kNm/m und V_Rd,c = 1906 kN
+    (−4.4 %).
+  - Bei einer Decke ändert sich V_Rd,c um weniger als 1 %. In Stufe 1 und 3
+    ändert sich nichts.
+- Das Skript weicht an zwei Stellen von der Norm 2025 ab; das Werkzeug
+  folgt der Norm (siehe [[TODO]]): k_g nach (37) und f_ctm in (69).
+- Neu steht in jeder Herleitung grau, dass Einzellasten über 0.2·V_d nahe
+  am Nachweisschnitt nicht geprüft sind (4.3.6.2.3). Ohne Einwirkung fehlt
+  der Satz.
+
 ## 2026-11-25 · Die Rechenart je Beton, in jedem Modul
 
 Vom Benutzer gewünscht (2026-11-25): Die Rechenart soll überall unter dem

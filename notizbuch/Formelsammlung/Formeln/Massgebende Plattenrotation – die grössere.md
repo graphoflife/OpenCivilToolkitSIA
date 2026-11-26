@@ -1,5 +1,5 @@
 ---
-erzeugt: 74eff9526403
+erzeugt: 30bbe5b71578
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.6.4.1"
@@ -25,7 +25,7 @@ $$
 Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
-\psi = \max\left[\psi_x;\ \psi_y\right] = \max\left[0.0166;\ 0.0186\right] = 0.0186
+\psi = \max\left[\psi_x;\ \psi_y\right] = \max\left[0.0168;\ 0.0187\right] = 0.0187
 $$
 
 ## Gebraucht von

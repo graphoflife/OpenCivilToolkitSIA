@@ -9184,13 +9184,13 @@ $$
 **Mittleres Moment im Stützstreifen in x** *(SIA 262:2025, 4.3.6.4.7, (62))*
 
 $$
-m_{sd,x} = V_{d,red} \cdot \left(\frac{1}{8} + \frac{e_{u,x}}{2 \cdot b_s}\right) = 894.5\,\mathrm{kN} \cdot \left(\frac{1}{8} + \frac{0\,\mathrm{mm}}{2 \cdot 2310\,\mathrm{mm}}\right) = 111.8\,\mathrm{kNm}/\mathrm{m}
+m_{sd,x} = V_d \cdot \left(\frac{1}{8} + \frac{e_{u,x}}{2 \cdot b_s}\right) = 900\,\mathrm{kN} \cdot \left(\frac{1}{8} + \frac{0\,\mathrm{mm}}{2 \cdot 2310\,\mathrm{mm}}\right) = 112.5\,\mathrm{kNm}/\mathrm{m}
 $$
 
 **Mittleres Moment im Stützstreifen in y** *(SIA 262:2025, 4.3.6.4.7, (62))*
 
 $$
-m_{sd,y} = V_{d,red} \cdot \left(\frac{1}{8} + \frac{e_{u,y}}{2 \cdot b_s}\right) = 894.5\,\mathrm{kN} \cdot \left(\frac{1}{8} + \frac{0\,\mathrm{mm}}{2 \cdot 2310\,\mathrm{mm}}\right) = 111.8\,\mathrm{kNm}/\mathrm{m}
+m_{sd,y} = V_d \cdot \left(\frac{1}{8} + \frac{e_{u,y}}{2 \cdot b_s}\right) = 900\,\mathrm{kN} \cdot \left(\frac{1}{8} + \frac{0\,\mathrm{mm}}{2 \cdot 2310\,\mathrm{mm}}\right) = 112.5\,\mathrm{kNm}/\mathrm{m}
 $$
 
 **Plattenrotation in x** *(SIA 262:2025, 4.3.6.4.1, (60))*
@@ -9198,8 +9198,8 @@ $$
 $$
 \begin{aligned}
   \psi_x &= 1.5 \cdot \frac{r_{sx}}{d} \cdot \frac{f_{yd}}{E_s} \cdot \left(\frac{m_{sd,x}}{m_{Rd,x}}\right)^{3/2} \\
-  &= 1.5 \cdot \frac{1540\,\mathrm{mm}}{234\,\mathrm{mm}} \cdot \frac{435\,\mathrm{N}/\mathrm{mm}^{2}}{200000\,\mathrm{N}/\mathrm{mm}^{2}} \cdot \left(\frac{111.8\,\mathrm{kNm}/\mathrm{m}}{132.5\,\mathrm{kNm}/\mathrm{m}}\right)^{3/2} \\
-  &= 0.0166
+  &= 1.5 \cdot \frac{1540\,\mathrm{mm}}{234\,\mathrm{mm}} \cdot \frac{435\,\mathrm{N}/\mathrm{mm}^{2}}{200000\,\mathrm{N}/\mathrm{mm}^{2}} \cdot \left(\frac{112.5\,\mathrm{kNm}/\mathrm{m}}{132.5\,\mathrm{kNm}/\mathrm{m}}\right)^{3/2} \\
+  &= 0.0168
 \end{aligned}
 $$
 
@@ -9208,15 +9208,15 @@ $$
 $$
 \begin{aligned}
   \psi_y &= 1.5 \cdot \frac{r_{sy}}{d} \cdot \frac{f_{yd}}{E_s} \cdot \left(\frac{m_{sd,y}}{m_{Rd,y}}\right)^{3/2} \\
-  &= 1.5 \cdot \frac{1540\,\mathrm{mm}}{234\,\mathrm{mm}} \cdot \frac{435\,\mathrm{N}/\mathrm{mm}^{2}}{200000\,\mathrm{N}/\mathrm{mm}^{2}} \cdot \left(\frac{111.8\,\mathrm{kNm}/\mathrm{m}}{123.2\,\mathrm{kNm}/\mathrm{m}}\right)^{3/2} \\
-  &= 0.0186
+  &= 1.5 \cdot \frac{1540\,\mathrm{mm}}{234\,\mathrm{mm}} \cdot \frac{435\,\mathrm{N}/\mathrm{mm}^{2}}{200000\,\mathrm{N}/\mathrm{mm}^{2}} \cdot \left(\frac{112.5\,\mathrm{kNm}/\mathrm{m}}{123.2\,\mathrm{kNm}/\mathrm{m}}\right)^{3/2} \\
+  &= 0.0187
 \end{aligned}
 $$
 
 **Massgebende Plattenrotation: die grössere** *(SIA 262:2025, 4.3.6.4.1)*
 
 $$
-\psi = \max\left[\psi_x;\ \psi_y\right] = \max\left[0.0166;\ 0.0186\right] = 0.0186
+\psi = \max\left[\psi_x;\ \psi_y\right] = \max\left[0.0168;\ 0.0187\right] = 0.0187
 $$
 
 #### Durchstanzwiderstand
@@ -9236,8 +9236,8 @@ $$
 $$
 \begin{aligned}
   k_r &= \min\left[2;\ \frac{1}{0.45 + 0.18 \cdot \psi \cdot d \cdot k_g}\right] \\
-  &= \min\left[2;\ \frac{1}{0.45 + 0.18 \cdot 0.0186 \cdot 234 \cdot 1.2}\right] \\
-  &= 0.721 \quad \left(d\ \text{in}\ \mathrm{mm}\right)
+  &= \min\left[2;\ \frac{1}{0.45 + 0.18 \cdot 0.0187 \cdot 234 \cdot 1.2}\right] \\
+  &= 0.716 \quad \left(d\ \text{in}\ \mathrm{mm}\right)
 \end{aligned}
 $$
 
@@ -9246,21 +9246,23 @@ $$
 $$
 \begin{aligned}
   V_{Rd,c} &= k_r \cdot \tau_{cd} \cdot d_v \cdot u \\
-  &= 0.721 \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 234\,\mathrm{mm} \cdot 2102\,\mathrm{mm} \\
-  &= 388.2\,\mathrm{kN}
+  &= 0.716 \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 234\,\mathrm{mm} \cdot 2102\,\mathrm{mm} \\
+  &= 385.8\,\mathrm{kN}
 \end{aligned}
 $$
+
+> **Hinweis:** Nicht geprüft: Einzellasten über 0.2·V\_d, die näher als 3·d\_v am Nachweisschnitt angreifen, verteilen die Querkraft im Schnitt ungleichmässig; das Werkzeug kennt solche Lasten nicht (4.3.6.2.3).
 
 **Querkraft gegen Durchstanzwiderstand**
 
 $$
-V_{d,red} = 894.5\,\mathrm{kN} \quad > \quad V_{Rd,c} = 388.2\,\mathrm{kN}
+V_{d,red} = 894.5\,\mathrm{kN} \quad > \quad V_{Rd,c} = 385.8\,\mathrm{kN}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,DS} = \frac{V_{Rd,c}}{V_{d,red}} = \frac{388.2\,\mathrm{kN}}{894.5\,\mathrm{kN}} = 0.43 \quad \Rightarrow \quad \text{NICHT erfüllt}
+\alpha_{eff,DS} = \frac{V_{Rd,c}}{V_{d,red}} = \frac{385.8\,\mathrm{kN}}{894.5\,\mathrm{kN}} = 0.43 \quad \Rightarrow \quad \text{NICHT erfüllt}
 $$
 
 #### Durchstanzbewehrung
@@ -9284,7 +9286,7 @@ c\_v = 30 mm ≤ d\_v/6 = 39 mm: die Anker sind auf der Druckseite genügend ver
 $$
 \begin{aligned}
   \sigma_{sd} &= \min\left[\frac{E_{s,\text{sw}} \cdot \psi}{6} \cdot \left(1 + \frac{f_{ctm}}{f_{yd,\text{sw}}} \cdot \frac{d}{\varnothing_{sw}}\right);\ f_{yd,\text{sw}}\right] \\
-  &= \min\left[\frac{200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 0.0186}{6} \cdot \left(1 + \frac{2.9\,\mathrm{N}/\mathrm{mm}^{2}}{435\,\mathrm{N}/\mathrm{mm}^{2}} \cdot \frac{234\,\mathrm{mm}}{10\,\mathrm{mm}}\right);\ 435\,\mathrm{N}/\mathrm{mm}^{2}\right] \\
+  &= \min\left[\frac{200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 0.0187}{6} \cdot \left(1 + \frac{2.9\,\mathrm{N}/\mathrm{mm}^{2}}{435\,\mathrm{N}/\mathrm{mm}^{2}} \cdot \frac{234\,\mathrm{mm}}{10\,\mathrm{mm}}\right);\ 435\,\mathrm{N}/\mathrm{mm}^{2}\right] \\
   &= 435\,\mathrm{N}/\mathrm{mm}^{2}
 \end{aligned}
 $$
@@ -9304,19 +9306,19 @@ $$
 **Querkraft für die Durchstanzbewehrung** *(SIA 262:2025, 4.3.6.5.2, (66))*
 
 $$
-V_{d,s} = V_{d,red} - V_{Rd,c} = 894.5\,\mathrm{kN} - 388.2\,\mathrm{kN} = 506.3\,\mathrm{kN}
+V_{d,s} = V_{d,red} - V_{Rd,c} = 894.5\,\mathrm{kN} - 385.8\,\mathrm{kN} = 508.7\,\mathrm{kN}
 $$
 
 **Querkraft für die Bewehrung gegen ihren Beitrag**
 
 $$
-V_{d,s} = 506.3\,\mathrm{kN} \quad \le \quad V_{Rd,s} = 983.5\,\mathrm{kN}
+V_{d,s} = 508.7\,\mathrm{kN} \quad \le \quad V_{Rd,s} = 983.5\,\mathrm{kN}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,DS,s} = \frac{V_{Rd,s}}{V_{d,s}} = \frac{983.5\,\mathrm{kN}}{506.3\,\mathrm{kN}} = 1.94 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,DS,s} = \frac{V_{Rd,s}}{V_{d,s}} = \frac{983.5\,\mathrm{kN}}{508.7\,\mathrm{kN}} = 1.93 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 **Die halbe Querkraft** *(SIA 262:2025, 4.3.6.5.3, (67))*
@@ -9354,21 +9356,21 @@ $$
 $$
 \begin{aligned}
   V_{Rd,max} &= \min\left[k_{sys} \cdot k_r;\ 3.5\right] \cdot \tau_{cd} \cdot d_v \cdot u \\
-  &= \min\left[2.58 \cdot 0.721;\ 3.5\right] \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 234\,\mathrm{mm} \cdot 2102\,\mathrm{mm} \\
-  &= 1000.4\,\mathrm{kN}
+  &= \min\left[2.58 \cdot 0.716;\ 3.5\right] \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 234\,\mathrm{mm} \cdot 2102\,\mathrm{mm} \\
+  &= 994.2\,\mathrm{kN}
 \end{aligned}
 $$
 
 **Querkraft gegen die erste Betondruckdiagonale**
 
 $$
-V_{d,red} = 894.5\,\mathrm{kN} \quad \le \quad V_{Rd,max} = 1000.4\,\mathrm{kN}
+V_{d,red} = 894.5\,\mathrm{kN} \quad \le \quad V_{Rd,max} = 994.2\,\mathrm{kN}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,DS,max} = \frac{V_{Rd,max}}{V_{d,red}} = \frac{1000.4\,\mathrm{kN}}{894.5\,\mathrm{kN}} = 1.12 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,DS,max} = \frac{V_{Rd,max}}{V_{d,red}} = \frac{994.2\,\mathrm{kN}}{894.5\,\mathrm{kN}} = 1.11 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 #### Ausserhalb der Durchstanzbewehrung
@@ -9420,21 +9422,21 @@ $$
 $$
 \begin{aligned}
   V_{Rd,c,out} &= k_r \cdot \tau_{cd} \cdot d_{v,out} \cdot u_{out} \\
-  &= 0.721 \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 204\,\mathrm{mm} \cdot 5957\,\mathrm{mm} \\
-  &= 959.3\,\mathrm{kN}
+  &= 0.716 \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 204\,\mathrm{mm} \cdot 5957\,\mathrm{mm} \\
+  &= 953.4\,\mathrm{kN}
 \end{aligned}
 $$
 
 **Querkraft gegen den Widerstand ausserhalb der Bewehrung**
 
 $$
-V_{d,out} = 852.5\,\mathrm{kN} \quad \le \quad V_{Rd,c,out} = 959.3\,\mathrm{kN}
+V_{d,out} = 852.5\,\mathrm{kN} \quad \le \quad V_{Rd,c,out} = 953.4\,\mathrm{kN}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,DS,out} = \frac{V_{Rd,c,out}}{V_{d,out}} = \frac{959.3\,\mathrm{kN}}{852.5\,\mathrm{kN}} = 1.13 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,DS,out} = \frac{V_{Rd,c,out}}{V_{d,out}} = \frac{953.4\,\mathrm{kN}}{852.5\,\mathrm{kN}} = 1.12 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 ### Betonstahl: ancoPLUS, B500B
@@ -9694,13 +9696,13 @@ $$
 **Mittleres Moment im Stützstreifen in x** *(SIA 262:2025, 4.3.6.4.7, (62))*
 
 $$
-m_{sd,x} = V_{d,red} \cdot \left(\frac{1}{8} + \frac{e_{u,x}}{2 \cdot b_s}\right) = 1000\,\mathrm{kN} \cdot \left(\frac{1}{8} + \frac{0\,\mathrm{mm}}{2 \cdot 2310\,\mathrm{mm}}\right) = 125\,\mathrm{kNm}/\mathrm{m}
+m_{sd,x} = V_d \cdot \left(\frac{1}{8} + \frac{e_{u,x}}{2 \cdot b_s}\right) = 1000\,\mathrm{kN} \cdot \left(\frac{1}{8} + \frac{0\,\mathrm{mm}}{2 \cdot 2310\,\mathrm{mm}}\right) = 125\,\mathrm{kNm}/\mathrm{m}
 $$
 
 **Mittleres Moment im Stützstreifen in y** *(SIA 262:2025, 4.3.6.4.7, (62))*
 
 $$
-m_{sd,y} = V_{d,red} \cdot \left(\frac{1}{8} + \frac{e_{u,y}}{2 \cdot b_s}\right) = 1000\,\mathrm{kN} \cdot \left(\frac{1}{8} + \frac{0\,\mathrm{mm}}{2 \cdot 2310\,\mathrm{mm}}\right) = 125\,\mathrm{kNm}/\mathrm{m}
+m_{sd,y} = V_d \cdot \left(\frac{1}{8} + \frac{e_{u,y}}{2 \cdot b_s}\right) = 1000\,\mathrm{kN} \cdot \left(\frac{1}{8} + \frac{0\,\mathrm{mm}}{2 \cdot 2310\,\mathrm{mm}}\right) = 125\,\mathrm{kNm}/\mathrm{m}
 $$
 
 **Plattenrotation in x** *(SIA 262:2025, 4.3.6.4.1, (60))*
@@ -9762,6 +9764,8 @@ $$
   &= 345.7\,\mathrm{kN}
 \end{aligned}
 $$
+
+> **Hinweis:** Nicht geprüft: Einzellasten über 0.2·V\_d, die näher als 3·d\_v am Nachweisschnitt angreifen, verteilen die Querkraft im Schnitt ungleichmässig; das Werkzeug kennt solche Lasten nicht (4.3.6.2.3).
 
 **Querkraft gegen Durchstanzwiderstand**
 
@@ -10417,9 +10421,9 @@ $$
 
 $$
 \begin{aligned}
-  m_{sd,x} &= \max\left[V_{d,red} \cdot \left(\frac{1}{8} + \frac{e_{u,x}}{2 \cdot b_s}\right);\ 0.25 \cdot V_{d,red}\right] \\
-  &= \max\left[494.9\,\mathrm{kN} \cdot \left(\frac{1}{8} + \frac{0\,\mathrm{mm}}{2 \cdot 2310\,\mathrm{mm}}\right);\ 0.25 \cdot 494.9\,\mathrm{kN}\right] \\
-  &= 123.7\,\mathrm{kNm}/\mathrm{m}
+  m_{sd,x} &= \max\left[V_d \cdot \left(\frac{1}{8} + \frac{e_{u,x}}{2 \cdot b_s}\right);\ 0.25 \cdot V_d\right] \\
+  &= \max\left[500\,\mathrm{kN} \cdot \left(\frac{1}{8} + \frac{0\,\mathrm{mm}}{2 \cdot 2310\,\mathrm{mm}}\right);\ 0.25 \cdot 500\,\mathrm{kN}\right] \\
+  &= 125\,\mathrm{kNm}/\mathrm{m}
 \end{aligned}
 $$
 
@@ -10438,7 +10442,7 @@ $$
 **Mittleres Moment im Stützstreifen in y** *(SIA 262:2025, 4.3.6.4.7, (64))*
 
 $$
-m_{sd,y} = V_{d,red} \cdot \left(\frac{1}{8} + \frac{e_{u,y}}{b_{s,y}}\right) = 494.9\,\mathrm{kN} \cdot \left(\frac{1}{8} + \frac{1\,\mathrm{mm}}{1550\,\mathrm{mm}}\right) = 62.2\,\mathrm{kNm}/\mathrm{m}
+m_{sd,y} = V_d \cdot \left(\frac{1}{8} + \frac{e_{u,y}}{b_{s,y}}\right) = 500\,\mathrm{kN} \cdot \left(\frac{1}{8} + \frac{1\,\mathrm{mm}}{1550\,\mathrm{mm}}\right) = 62.8\,\mathrm{kNm}/\mathrm{m}
 $$
 
 **Plattenrotation in x** *(SIA 262:2025, 4.3.6.4.1, (60))*
@@ -10446,8 +10450,8 @@ $$
 $$
 \begin{aligned}
   \psi_x &= 1.5 \cdot \frac{r_{sx}}{d} \cdot \frac{f_{yd}}{E_s} \cdot \left(\frac{m_{sd,x}}{m_{Rd,x}}\right)^{3/2} \\
-  &= 1.5 \cdot \frac{1540\,\mathrm{mm}}{254\,\mathrm{mm}} \cdot \frac{435\,\mathrm{N}/\mathrm{mm}^{2}}{200000\,\mathrm{N}/\mathrm{mm}^{2}} \cdot \left(\frac{123.7\,\mathrm{kNm}/\mathrm{m}}{144.2\,\mathrm{kNm}/\mathrm{m}}\right)^{3/2} \\
-  &= 0.0157
+  &= 1.5 \cdot \frac{1540\,\mathrm{mm}}{254\,\mathrm{mm}} \cdot \frac{435\,\mathrm{N}/\mathrm{mm}^{2}}{200000\,\mathrm{N}/\mathrm{mm}^{2}} \cdot \left(\frac{125\,\mathrm{kNm}/\mathrm{m}}{144.2\,\mathrm{kNm}/\mathrm{m}}\right)^{3/2} \\
+  &= 0.016
 \end{aligned}
 $$
 
@@ -10456,15 +10460,15 @@ $$
 $$
 \begin{aligned}
   \psi_y &= 1.5 \cdot \frac{r_{sy}}{d} \cdot \frac{f_{yd}}{E_s} \cdot \left(\frac{m_{sd,y}}{m_{Rd,y}}\right)^{3/2} \\
-  &= 1.5 \cdot \frac{1540\,\mathrm{mm}}{254\,\mathrm{mm}} \cdot \frac{435\,\mathrm{N}/\mathrm{mm}^{2}}{200000\,\mathrm{N}/\mathrm{mm}^{2}} \cdot \left(\frac{62.2\,\mathrm{kNm}/\mathrm{m}}{134.9\,\mathrm{kNm}/\mathrm{m}}\right)^{3/2} \\
-  &= 0.0062
+  &= 1.5 \cdot \frac{1540\,\mathrm{mm}}{254\,\mathrm{mm}} \cdot \frac{435\,\mathrm{N}/\mathrm{mm}^{2}}{200000\,\mathrm{N}/\mathrm{mm}^{2}} \cdot \left(\frac{62.8\,\mathrm{kNm}/\mathrm{m}}{134.9\,\mathrm{kNm}/\mathrm{m}}\right)^{3/2} \\
+  &= 0.0063
 \end{aligned}
 $$
 
 **Massgebende Plattenrotation: die grössere** *(SIA 262:2025, 4.3.6.4.1)*
 
 $$
-\psi = \max\left[\psi_x;\ \psi_y\right] = \max\left[0.0157;\ 0.0062\right] = 0.0157
+\psi = \max\left[\psi_x;\ \psi_y\right] = \max\left[0.016;\ 0.0063\right] = 0.016
 $$
 
 #### Durchstanzwiderstand
@@ -10484,8 +10488,8 @@ $$
 $$
 \begin{aligned}
   k_r &= \min\left[2;\ \frac{1}{0.45 + 0.18 \cdot \psi \cdot d \cdot k_g}\right] \\
-  &= \min\left[2;\ \frac{1}{0.45 + 0.18 \cdot 0.0157 \cdot 254 \cdot 1.2}\right] \\
-  &= 0.762 \quad \left(d\ \text{in}\ \mathrm{mm}\right)
+  &= \min\left[2;\ \frac{1}{0.45 + 0.18 \cdot 0.016 \cdot 254 \cdot 1.2}\right] \\
+  &= 0.754 \quad \left(d\ \text{in}\ \mathrm{mm}\right)
 \end{aligned}
 $$
 
@@ -10494,21 +10498,23 @@ $$
 $$
 \begin{aligned}
   V_{Rd,c} &= k_r \cdot \tau_{cd} \cdot d_v \cdot u \\
-  &= 0.762 \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 254\,\mathrm{mm} \cdot 1754\,\mathrm{mm} \\
-  &= 371.8\,\mathrm{kN}
+  &= 0.754 \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 254\,\mathrm{mm} \cdot 1754\,\mathrm{mm} \\
+  &= 368.1\,\mathrm{kN}
 \end{aligned}
 $$
+
+> **Hinweis:** Nicht geprüft: Einzellasten über 0.2·V\_d, die näher als 3·d\_v am Nachweisschnitt angreifen, verteilen die Querkraft im Schnitt ungleichmässig; das Werkzeug kennt solche Lasten nicht (4.3.6.2.3).
 
 **Querkraft gegen Durchstanzwiderstand**
 
 $$
-V_{d,red} = 494.9\,\mathrm{kN} \quad > \quad V_{Rd,c} = 371.8\,\mathrm{kN}
+V_{d,red} = 494.9\,\mathrm{kN} \quad > \quad V_{Rd,c} = 368.1\,\mathrm{kN}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,DS} = \frac{V_{Rd,c}}{V_{d,red}} = \frac{371.8\,\mathrm{kN}}{494.9\,\mathrm{kN}} = 0.75 \quad \Rightarrow \quad \text{NICHT erfüllt}
+\alpha_{eff,DS} = \frac{V_{Rd,c}}{V_{d,red}} = \frac{368.1\,\mathrm{kN}}{494.9\,\mathrm{kN}} = 0.74 \quad \Rightarrow \quad \text{NICHT erfüllt}
 $$
 
 #### Durchstanzbewehrung
@@ -10532,7 +10538,7 @@ c\_v = 30 mm ≤ d\_v/6 = 42 mm: die Anker sind auf der Druckseite genügend ver
 $$
 \begin{aligned}
   \sigma_{sd} &= \min\left[\frac{E_{s,\text{sw}} \cdot \psi}{6} \cdot \left(1 + \frac{f_{ctm}}{f_{yd,\text{sw}}} \cdot \frac{d}{\varnothing_{sw}}\right);\ f_{yd,\text{sw}}\right] \\
-  &= \min\left[\frac{200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 0.0157}{6} \cdot \left(1 + \frac{2.9\,\mathrm{N}/\mathrm{mm}^{2}}{435\,\mathrm{N}/\mathrm{mm}^{2}} \cdot \frac{254\,\mathrm{mm}}{10\,\mathrm{mm}}\right);\ 435\,\mathrm{N}/\mathrm{mm}^{2}\right] \\
+  &= \min\left[\frac{200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 0.016}{6} \cdot \left(1 + \frac{2.9\,\mathrm{N}/\mathrm{mm}^{2}}{435\,\mathrm{N}/\mathrm{mm}^{2}} \cdot \frac{254\,\mathrm{mm}}{10\,\mathrm{mm}}\right);\ 435\,\mathrm{N}/\mathrm{mm}^{2}\right] \\
   &= 435\,\mathrm{N}/\mathrm{mm}^{2}
 \end{aligned}
 $$
@@ -10552,19 +10558,19 @@ $$
 **Querkraft für die Durchstanzbewehrung** *(SIA 262:2025, 4.3.6.5.2, (66))*
 
 $$
-V_{d,s} = V_{d,red} - V_{Rd,c} = 494.9\,\mathrm{kN} - 371.8\,\mathrm{kN} = 123.1\,\mathrm{kN}
+V_{d,s} = V_{d,red} - V_{Rd,c} = 494.9\,\mathrm{kN} - 368.1\,\mathrm{kN} = 126.8\,\mathrm{kN}
 $$
 
 **Querkraft für die Bewehrung gegen ihren Beitrag**
 
 $$
-V_{d,s} = 123.1\,\mathrm{kN} \quad \le \quad V_{Rd,s} = 341\,\mathrm{kN}
+V_{d,s} = 126.8\,\mathrm{kN} \quad \le \quad V_{Rd,s} = 341\,\mathrm{kN}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,DS,s} = \frac{V_{Rd,s}}{V_{d,s}} = \frac{341\,\mathrm{kN}}{123.1\,\mathrm{kN}} = 2.77 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,DS,s} = \frac{V_{Rd,s}}{V_{d,s}} = \frac{341\,\mathrm{kN}}{126.8\,\mathrm{kN}} = 2.69 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 **Die halbe Querkraft** *(SIA 262:2025, 4.3.6.5.3, (67))*
@@ -10602,21 +10608,21 @@ $$
 $$
 \begin{aligned}
   V_{Rd,max} &= \min\left[k_{sys} \cdot k_r;\ 3.5\right] \cdot \tau_{cd} \cdot d_v \cdot u \\
-  &= \min\left[2 \cdot 0.762;\ 3.5\right] \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 254\,\mathrm{mm} \cdot 1754\,\mathrm{mm} \\
-  &= 743.7\,\mathrm{kN}
+  &= \min\left[2 \cdot 0.754;\ 3.5\right] \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 254\,\mathrm{mm} \cdot 1754\,\mathrm{mm} \\
+  &= 736.2\,\mathrm{kN}
 \end{aligned}
 $$
 
 **Querkraft gegen die erste Betondruckdiagonale**
 
 $$
-V_{d,red} = 494.9\,\mathrm{kN} \quad \le \quad V_{Rd,max} = 743.7\,\mathrm{kN}
+V_{d,red} = 494.9\,\mathrm{kN} \quad \le \quad V_{Rd,max} = 736.2\,\mathrm{kN}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,DS,max} = \frac{V_{Rd,max}}{V_{d,red}} = \frac{743.7\,\mathrm{kN}}{494.9\,\mathrm{kN}} = 1.50 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,DS,max} = \frac{V_{Rd,max}}{V_{d,red}} = \frac{736.2\,\mathrm{kN}}{494.9\,\mathrm{kN}} = 1.49 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 #### Ausserhalb der Durchstanzbewehrung
@@ -10692,21 +10698,21 @@ $$
 $$
 \begin{aligned}
   V_{Rd,c,out} &= k_r \cdot \tau_{cd} \cdot d_{v,out} \cdot u_{out} \\
-  &= 0.762 \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 224\,\mathrm{mm} \cdot 2837\,\mathrm{mm} \\
-  &= 530.5\,\mathrm{kN}
+  &= 0.754 \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 224\,\mathrm{mm} \cdot 2837\,\mathrm{mm} \\
+  &= 525.1\,\mathrm{kN}
 \end{aligned}
 $$
 
 **Querkraft gegen den Widerstand ausserhalb der Bewehrung**
 
 $$
-V_{d,out} = 478.1\,\mathrm{kN} \quad \le \quad V_{Rd,c,out} = 530.5\,\mathrm{kN}
+V_{d,out} = 478.1\,\mathrm{kN} \quad \le \quad V_{Rd,c,out} = 525.1\,\mathrm{kN}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,DS,out} = \frac{V_{Rd,c,out}}{V_{d,out}} = \frac{530.5\,\mathrm{kN}}{478.1\,\mathrm{kN}} = 1.11 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,DS,out} = \frac{V_{Rd,c,out}}{V_{d,out}} = \frac{525.1\,\mathrm{kN}}{478.1\,\mathrm{kN}} = 1.10 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 ### Durchstanzen: Eckstütze
@@ -10969,7 +10975,7 @@ $$
 
 $$
 \begin{aligned}
-  m_{sd,x} &= \max\left[V_{d,red} \cdot \left(\frac{1}{8} + \frac{e_{u,x}}{b_{s,x}}\right);\ 0.5 \cdot V_{d,red}\right] \\
+  m_{sd,x} &= \max\left[V_d \cdot \left(\frac{1}{8} + \frac{e_{u,x}}{b_{s,x}}\right);\ 0.5 \cdot V_d\right] \\
   &= \max\left[80\,\mathrm{kN} \cdot \left(\frac{1}{8} + \frac{155\,\mathrm{mm}}{600\,\mathrm{mm}}\right);\ 0.5 \cdot 80\,\mathrm{kN}\right] \\
   &= 40\,\mathrm{kNm}/\mathrm{m}
 \end{aligned}
@@ -10995,7 +11001,7 @@ $$
 
 $$
 \begin{aligned}
-  m_{sd,y} &= \max\left[V_{d,red} \cdot \left(\frac{1}{8} + \frac{e_{u,y}}{b_{s,y}}\right);\ 0.5 \cdot V_{d,red}\right] \\
+  m_{sd,y} &= \max\left[V_d \cdot \left(\frac{1}{8} + \frac{e_{u,y}}{b_{s,y}}\right);\ 0.5 \cdot V_d\right] \\
   &= \max\left[80\,\mathrm{kN} \cdot \left(\frac{1}{8} + \frac{155\,\mathrm{mm}}{600\,\mathrm{mm}}\right);\ 0.5 \cdot 80\,\mathrm{kN}\right] \\
   &= 40\,\mathrm{kNm}/\mathrm{m}
 \end{aligned}
@@ -11054,6 +11060,8 @@ $$
 $$
 V_{Rd,c} = k_r \cdot \tau_{cd} \cdot d_v \cdot u = 1.537 \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 234\,\mathrm{mm} \cdot 509\,\mathrm{mm} = 200.7\,\mathrm{kN}
 $$
+
+> **Hinweis:** Nicht geprüft: Einzellasten über 0.2·V\_d, die näher als 3·d\_v am Nachweisschnitt angreifen, verteilen die Querkraft im Schnitt ungleichmässig; das Werkzeug kennt solche Lasten nicht (4.3.6.2.3).
 
 **Querkraft gegen Durchstanzwiderstand**
 
@@ -11348,6 +11356,8 @@ $$
 $$
 V_{Rd,c} = k_r \cdot \tau_{cd} \cdot d_v \cdot u = 1.77 \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 234\,\mathrm{mm} \cdot 887\,\mathrm{mm} = 402.6\,\mathrm{kN}
 $$
+
+> **Hinweis:** Nicht geprüft: Einzellasten über 0.2·V\_d, die näher als 3·d\_v am Nachweisschnitt angreifen, verteilen die Querkraft im Schnitt ungleichmässig; das Werkzeug kennt solche Lasten nicht (4.3.6.2.3).
 
 **Querkraft gegen Durchstanzwiderstand**
 
@@ -11646,6 +11656,8 @@ $$
   &= 920.8\,\mathrm{kN}
 \end{aligned}
 $$
+
+> **Hinweis:** Nicht geprüft: Einzellasten über 0.2·V\_d, die näher als 3·d\_v am Nachweisschnitt angreifen, verteilen die Querkraft im Schnitt ungleichmässig; das Werkzeug kennt solche Lasten nicht (4.3.6.2.3).
 
 **Querkraft gegen Durchstanzwiderstand**
 
@@ -12043,6 +12055,8 @@ $$
 V_{Rd,c} = k_r \cdot \tau_{cd} \cdot d_v \cdot u = 0.652 \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 234\,\mathrm{mm} \cdot 990\,\mathrm{mm} = 165.3\,\mathrm{kN}
 $$
 
+> **Hinweis:** Nicht geprüft: Einzellasten über 0.2·V\_d, die näher als 3·d\_v am Nachweisschnitt angreifen, verteilen die Querkraft im Schnitt ungleichmässig; das Werkzeug kennt solche Lasten nicht (4.3.6.2.3).
+
 **Querkraft gegen Durchstanzwiderstand**
 
 $$
@@ -12260,6 +12274,8 @@ $$
 $$
 V_{Rd,c} = k_r \cdot \tau_{cd} \cdot d_v \cdot u = 0.652 \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 234\,\mathrm{mm} \cdot 664\,\mathrm{mm} = 111\,\mathrm{kN}
 $$
+
+> **Hinweis:** Nicht geprüft: Einzellasten über 0.2·V\_d, die näher als 3·d\_v am Nachweisschnitt angreifen, verteilen die Querkraft im Schnitt ungleichmässig; das Werkzeug kennt solche Lasten nicht (4.3.6.2.3).
 
 **Querkraft gegen Durchstanzwiderstand**
 
@@ -21386,6 +21402,8 @@ Die festen Werte für k\_e gelten nur für Flachdecken mit regelmässigem Stütz
 
 Näherungsstufe 2: die mittleren Momente im Stützstreifen nach den Gleichungen (62) bis (65).
 
+m\_sd kommt aus der ganzen Auflagerkraft V\_d: Die Momente im Stützstreifen entstehen aus der ganzen Stützenkraft, wie im Modell des Skripts «Stahlbeton II, 7.4 Platten» (Folie 28). Die Last innerhalb des Nachweisschnitts zieht nur die Querkraft im Nachweis ab (4.3.6.2.6).
+
 Vorgeschlagen wird ancoPLUS von AncoTech: 16 × ancoPLUS DX5-0215 – Anker ⌀10 aus B500B mit h\_A = 215 mm, vom Rand der gestützten Fläche 85 / 140 / 140 / 175 / 175 mm. Die Abstände sind die der Typen «D» nach dem Gutachten des Herstellers: 0.375·d zum ersten Anker, bis zum dritten 0.60·d, danach 0.75·d (AncoTech, Gutachten Muttoni / Fernández Ruiz 2007 (07-A05-R1c) und Preisliste ancoPLUS, nach Vorgabe, nicht nachgeschlagen). Zwei Leisten stehen beim zweiten Anker höchstens 1.5·d\_v auseinander (5.5.3.9).
 
 Die Anker sind aus B500B: in (67) und (69) gilt ihre Fliessgrenze, nicht die der Biegebewehrung (4.3.6.5.4).
@@ -21519,7 +21537,7 @@ $$
 **Mittleres Moment im Stützstreifen in x** *(SIA 262:2025, 4.3.6.4.7, (62))*
 
 $$
-m_{sd,x} = V_{d,red} \cdot \left(\frac{1}{8} + \frac{e_{u,x}}{2 \cdot b_s}\right)
+m_{sd,x} = V_d \cdot \left(\frac{1}{8} + \frac{e_{u,x}}{2 \cdot b_s}\right)
 $$
 
 **Plattenrotation in x** *(SIA 262:2025, 4.3.6.4.1, (60))*
@@ -21633,7 +21651,7 @@ $$
 **Mittleres Moment im Stützstreifen in x** *(SIA 262:2025, 4.3.6.4.7, (63))*
 
 $$
-m_{sd,x} = \max\left[V_{d,red} \cdot \left(\frac{1}{8} + \frac{e_{u,x}}{2 \cdot b_s}\right);\ 0.25 \cdot V_{d,red}\right]
+m_{sd,x} = \max\left[V_d \cdot \left(\frac{1}{8} + \frac{e_{u,x}}{2 \cdot b_s}\right);\ 0.25 \cdot V_d\right]
 $$
 
 **Grenze der Breite des Stützstreifens in y am Plattenrand: zwischen den Linien unter 45° von den inneren Ecken der Stütze** *(SIA 262:2025, 4.3.6.4.6, Figur 25)*
@@ -21651,7 +21669,7 @@ $$
 **Mittleres Moment im Stützstreifen in y** *(SIA 262:2025, 4.3.6.4.7, (64))*
 
 $$
-m_{sd,y} = V_{d,red} \cdot \left(\frac{1}{8} + \frac{e_{u,y}}{b_{s,y}}\right)
+m_{sd,y} = V_d \cdot \left(\frac{1}{8} + \frac{e_{u,y}}{b_{s,y}}\right)
 $$
 
 **Breite des Randstreifens in x: innen die halbe, aussen bis zum zweiten Plattenrand** *(SIA 262:2025, 4.3.6.4.6, Figur 25)*
@@ -21663,7 +21681,7 @@ $$
 **Mittleres Moment im Stützstreifen in x** *(SIA 262:2025, 4.3.6.4.7, (65))*
 
 $$
-m_{sd,x} = \max\left[V_{d,red} \cdot \left(\frac{1}{8} + \frac{e_{u,x}}{b_{s,x}}\right);\ 0.5 \cdot V_{d,red}\right]
+m_{sd,x} = \max\left[V_d \cdot \left(\frac{1}{8} + \frac{e_{u,x}}{b_{s,x}}\right);\ 0.5 \cdot V_d\right]
 $$
 
 **Abstand zum Momentennullpunkt in y: am Plattenrand mindestens 2/3 · b\_sr** *(SIA 262:2025, 4.3.6.4.8)*
@@ -23349,23 +23367,23 @@ $$
 | Wirksame statische Höhe | $d_v$ | $234$ | mm |
 | Nachweisschnitt, wirksam | $u$ | $2102$ | mm |
 | Momentenübertragung | $k_e$ | $0.900$ | – |
-| Plattenrotation | $\psi$ | $0.0186$ | – |
-| Beiwert | $k_r$ | $0.721$ | – |
+| Plattenrotation | $\psi$ | $0.0187$ | – |
+| Beiwert | $k_r$ | $0.716$ | – |
 | Querkraft im Schnitt | $V_d$ | $894.5$ | kN |
-| Widerstand ohne Durchstanzbewehrung | $V_{Rd,c}$ | $388.2$ | kN |
+| Widerstand ohne Durchstanzbewehrung | $V_{Rd,c}$ | $385.8$ | kN |
 | Durchstanzbewehrung |  | 16 × ancoPLUS DX5-0215 |  |
 | Abstände ab Stütze | $s$ | $85 / 140 / 140 / 175 / 175$ | mm |
 | Beitrag der Bewehrung | $V_{Rd,s}$ | $983.5$ | kN |
-| Erste Betondruckdiagonale | $V_{Rd,max}$ | $1000.4$ | kN |
+| Erste Betondruckdiagonale | $V_{Rd,max}$ | $994.2$ | kN |
 | Querkraft ausserhalb | $V_{d,out}$ | $852.5$ | kN |
-| Widerstand ausserhalb | $V_{Rd,c,out}$ | $959.3$ | kN |
+| Widerstand ausserhalb | $V_{Rd,c,out}$ | $953.4$ | kN |
 
 | Nachweis | Bezeichnung | Widerstand | Einwirkung | $\alpha_{eff}$ |
 | :--- | :--- | ---: | ---: | ---: |
-| Durchstanzen | mit Durchstanzbewehrung | $V_{Rd,s} = 983.5\,\mathrm{kN}$ | $V_{d,s} = 506.3\,\mathrm{kN}$ | $1.94$ |
+| Durchstanzen | mit Durchstanzbewehrung | $V_{Rd,s} = 983.5\,\mathrm{kN}$ | $V_{d,s} = 508.7\,\mathrm{kN}$ | $1.93$ |
 | Durchstanzen | Verformungsvermögen | $V_{Rd,v} = 983.5\,\mathrm{kN}$ | $V_d / 2 = 447.3\,\mathrm{kN}$ | $2.20$ |
-| Durchstanzen | Betondruckdiagonale | $V_{Rd,max} = 1000.4\,\mathrm{kN}$ | $V_{d,red} = 894.5\,\mathrm{kN}$ | $1.12$ |
-| Durchstanzen | ausserhalb der Durchstanzbewehrung | $V_{Rd,c,out} = 959.3\,\mathrm{kN}$ | $V_{d,out} = 852.5\,\mathrm{kN}$ | $1.13$ |
+| Durchstanzen | Betondruckdiagonale | $V_{Rd,max} = 994.2\,\mathrm{kN}$ | $V_{d,red} = 894.5\,\mathrm{kN}$ | $1.11$ |
+| Durchstanzen | ausserhalb der Durchstanzbewehrung | $V_{Rd,c,out} = 953.4\,\mathrm{kN}$ | $V_{d,out} = 852.5\,\mathrm{kN}$ | $1.12$ |
 
 ### Mit Stahlpilz
 
@@ -23418,23 +23436,23 @@ $$
 | Wirksame statische Höhe | $d_v$ | $254$ | mm |
 | Nachweisschnitt, wirksam | $u$ | $1754$ | mm |
 | Momentenübertragung | $k_e$ | $0.999$ | – |
-| Plattenrotation | $\psi$ | $0.0157$ | – |
-| Beiwert | $k_r$ | $0.762$ | – |
+| Plattenrotation | $\psi$ | $0.0160$ | – |
+| Beiwert | $k_r$ | $0.754$ | – |
 | Querkraft im Schnitt | $V_d$ | $494.9$ | kN |
-| Widerstand ohne Durchstanzbewehrung | $V_{Rd,c}$ | $371.8$ | kN |
+| Widerstand ohne Durchstanzbewehrung | $V_{Rd,c}$ | $368.1$ | kN |
 | Durchstanzbewehrung |  | 5 × ancoPLUS DX4-0235 |  |
 | Abstände ab Stütze | $s$ | $95 / 150 / 150 / 190$ | mm |
 | Beitrag der Bewehrung | $V_{Rd,s}$ | $341.0$ | kN |
-| Erste Betondruckdiagonale | $V_{Rd,max}$ | $743.7$ | kN |
+| Erste Betondruckdiagonale | $V_{Rd,max}$ | $736.2$ | kN |
 | Querkraft ausserhalb | $V_{d,out}$ | $478.1$ | kN |
-| Widerstand ausserhalb | $V_{Rd,c,out}$ | $530.5$ | kN |
+| Widerstand ausserhalb | $V_{Rd,c,out}$ | $525.1$ | kN |
 
 | Nachweis | Bezeichnung | Widerstand | Einwirkung | $\alpha_{eff}$ |
 | :--- | :--- | ---: | ---: | ---: |
-| Durchstanzen | mit Durchstanzbewehrung | $V_{Rd,s} = 341.0\,\mathrm{kN}$ | $V_{d,s} = 123.1\,\mathrm{kN}$ | $2.77$ |
+| Durchstanzen | mit Durchstanzbewehrung | $V_{Rd,s} = 341.0\,\mathrm{kN}$ | $V_{d,s} = 126.8\,\mathrm{kN}$ | $2.69$ |
 | Durchstanzen | Verformungsvermögen | $V_{Rd,v} = 341.0\,\mathrm{kN}$ | $V_d / 2 = 247.5\,\mathrm{kN}$ | $1.38$ |
-| Durchstanzen | Betondruckdiagonale | $V_{Rd,max} = 743.7\,\mathrm{kN}$ | $V_{d,red} = 494.9\,\mathrm{kN}$ | $1.50$ |
-| Durchstanzen | ausserhalb der Durchstanzbewehrung | $V_{Rd,c,out} = 530.5\,\mathrm{kN}$ | $V_{d,out} = 478.1\,\mathrm{kN}$ | $1.11$ |
+| Durchstanzen | Betondruckdiagonale | $V_{Rd,max} = 736.2\,\mathrm{kN}$ | $V_{d,red} = 494.9\,\mathrm{kN}$ | $1.49$ |
+| Durchstanzen | ausserhalb der Durchstanzbewehrung | $V_{Rd,c,out} = 525.1\,\mathrm{kN}$ | $V_{d,out} = 478.1\,\mathrm{kN}$ | $1.10$ |
 
 ### Eckstütze
 
@@ -24219,9 +24237,9 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Plattendicke | $h$ | $280$ | mm | Vorgabe |
 | Spannweite in x | $l_x$ | $7$ | m | Vorgabe |
 | Spannweite in y | $l_y$ | $7$ | m | Vorgabe |
-| Erfüllungsgrad ausserhalb der Durchstanzbewehrung oder des Stahlpilzes | $\alpha_{eff,DS,out}$ | $1.13$ |  | berechnet |
-| Erfüllungsgrad erste Betondruckdiagonale | $\alpha_{eff,DS,max}$ | $1.12$ |  | berechnet |
-| Erfüllungsgrad der Durchstanzbewehrung | $\alpha_{eff,DS,s}$ | $1.94$ |  | berechnet |
+| Erfüllungsgrad ausserhalb der Durchstanzbewehrung oder des Stahlpilzes | $\alpha_{eff,DS,out}$ | $1.12$ |  | berechnet |
+| Erfüllungsgrad erste Betondruckdiagonale | $\alpha_{eff,DS,max}$ | $1.11$ |  | berechnet |
+| Erfüllungsgrad der Durchstanzbewehrung | $\alpha_{eff,DS,s}$ | $1.93$ |  | berechnet |
 | Erfüllungsgrad Durchstanzen ohne Durchstanzbewehrung | $\alpha_{eff,DS}$ | $0.43$ |  | berechnet |
 | Erfüllungsgrad Verformungsvermögen | $\alpha_{eff,DS,v}$ | $2.20$ |  | berechnet |
 | Stabdurchmesser in x | $\varnothing_x$ | $16$ | mm | Vorgabe |
@@ -24261,10 +24279,10 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Plattendicke | $h$ | $300$ | mm | Vorgabe |
 | Spannweite in x | $l_x$ | $7$ | m | Vorgabe |
 | Spannweite in y | $l_y$ | $7$ | m | Vorgabe |
-| Erfüllungsgrad ausserhalb der Durchstanzbewehrung oder des Stahlpilzes | $\alpha_{eff,DS,out}$ | $1.11$ |  | berechnet |
-| Erfüllungsgrad erste Betondruckdiagonale | $\alpha_{eff,DS,max}$ | $1.50$ |  | berechnet |
-| Erfüllungsgrad der Durchstanzbewehrung | $\alpha_{eff,DS,s}$ | $2.77$ |  | berechnet |
-| Erfüllungsgrad Durchstanzen ohne Durchstanzbewehrung | $\alpha_{eff,DS}$ | $0.75$ |  | berechnet |
+| Erfüllungsgrad ausserhalb der Durchstanzbewehrung oder des Stahlpilzes | $\alpha_{eff,DS,out}$ | $1.10$ |  | berechnet |
+| Erfüllungsgrad erste Betondruckdiagonale | $\alpha_{eff,DS,max}$ | $1.49$ |  | berechnet |
+| Erfüllungsgrad der Durchstanzbewehrung | $\alpha_{eff,DS,s}$ | $2.69$ |  | berechnet |
+| Erfüllungsgrad Durchstanzen ohne Durchstanzbewehrung | $\alpha_{eff,DS}$ | $0.74$ |  | berechnet |
 | Erfüllungsgrad Verformungsvermögen | $\alpha_{eff,DS,v}$ | $1.38$ |  | berechnet |
 | Stabdurchmesser in x | $\varnothing_x$ | $16$ | mm | Vorgabe |
 | Stabdurchmesser in y | $\varnothing_y$ | $16$ | mm | Vorgabe |

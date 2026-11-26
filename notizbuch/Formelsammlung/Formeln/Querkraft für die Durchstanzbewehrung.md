@@ -1,5 +1,5 @@
 ---
-erzeugt: 610ba90b7181
+erzeugt: efa8fce0b8ac
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.6.5.2, (66)"
@@ -23,7 +23,7 @@ $$
 Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
-V_{d,s} = V_{d,red} - V_{Rd,c} = 894.5\,\mathrm{kN} - 388.2\,\mathrm{kN} = 506.3\,\mathrm{kN}
+V_{d,s} = V_{d,red} - V_{Rd,c} = 894.5\,\mathrm{kN} - 385.8\,\mathrm{kN} = 508.7\,\mathrm{kN}
 $$
 
 ## Im Code

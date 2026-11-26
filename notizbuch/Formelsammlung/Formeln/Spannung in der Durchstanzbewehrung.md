@@ -1,5 +1,5 @@
 ---
-erzeugt: 55f0a69a7a6b
+erzeugt: 321d7592080d
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.6.5.4, (69)"
@@ -29,7 +29,7 @@ Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 $$
 \begin{aligned}
   \sigma_{sd} &= \min\left[\frac{E_{s,\text{sw}} \cdot \psi}{6} \cdot \left(1 + \frac{f_{ctm}}{f_{yd,\text{sw}}} \cdot \frac{d}{\varnothing_{sw}}\right);\ f_{yd,\text{sw}}\right] \\
-  &= \min\left[\frac{200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 0.0186}{6} \cdot \left(1 + \frac{2.9\,\mathrm{N}/\mathrm{mm}^{2}}{435\,\mathrm{N}/\mathrm{mm}^{2}} \cdot \frac{234\,\mathrm{mm}}{10\,\mathrm{mm}}\right);\ 435\,\mathrm{N}/\mathrm{mm}^{2}\right] \\
+  &= \min\left[\frac{200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 0.0187}{6} \cdot \left(1 + \frac{2.9\,\mathrm{N}/\mathrm{mm}^{2}}{435\,\mathrm{N}/\mathrm{mm}^{2}} \cdot \frac{234\,\mathrm{mm}}{10\,\mathrm{mm}}\right);\ 435\,\mathrm{N}/\mathrm{mm}^{2}\right] \\
   &= 435\,\mathrm{N}/\mathrm{mm}^{2}
 \end{aligned}
 $$

@@ -42,6 +42,18 @@ nur bis zu ihm, ``b_x/2 + a_x`` für den Streifen in y, höchstens ebenso viel.
 Bis 2026-11-14 lag er an der Ecke symmetrisch um die Achse, bis zu 50 %
 breiter, als Figur 25 ihn zeigt.
 
+DIE KRAFT IN m_sd (Benutzer, 2026-11-26):
+Die Gleichungen (62) bis (65) rechnen mit der ganzen Auflagerkraft ``V_d``,
+ohne die Last innerhalb des Nachweisschnitts abzuziehen. Die Norm sagt nicht
+ausdruecklich, welches V_d dort gilt; der Abzug nach 4.3.6.2.6 ist erlaubt,
+nicht verlangt. Das Skript «Stahlbeton II, 7.4 Platten» (Kaufmann, FS 2026,
+Folie 28) verknuepft m_sd mit der Stuetzenreaktion: die Momente im
+Stuetzstreifen entstehen aus der ganzen Stuetzenkraft. Das liegt auf der
+sicheren Seite. Den Abzug behaelt die Querkraft im Nachweis, in (66) und
+(67) und am aeusseren Schnitt. Bis 2026-11-25 kam m_sd aus V_d,red -- bei
+einer Bodenplatte mit 150 kN/m² Bodenpressung bis 7 % zu viel Widerstand,
+bei einer Decke unter 1 %.
+
 EINHEITEN:
 SI-Basis; wo die Norm in mm rechnet (59), sagt es die Herleitung.
 """
@@ -84,6 +96,12 @@ R_S = 0.22
 #: Unter dieser Plattenrotation fehlt Verformungsvermögen, wenn keine
 #: Durchstanzbewehrung nach (67) liegt (SIA 262:2025, 4.3.6.1.2).
 ROTATION_MINDEST = 0.020
+
+#: Was der Nachweis nicht prueft, weil er die Lasten um die Stuetze nicht
+#: kennt (SIA 262:2025, 4.3.6.2.3, vierter Fall).
+EINZELLASTEN = ("Nicht geprüft: Einzellasten über 0.2·V_d, die näher als 3·d_v am "
+                "Nachweisschnitt angreifen, verteilen die Querkraft im Schnitt "
+                "ungleichmässig; das Werkzeug kennt solche Lasten nicht (4.3.6.2.3).")
 
 
 @dataclass(frozen=True)
@@ -208,7 +226,7 @@ class Durchstanzen(Nachweis):
         V_d = herleitung.querkraft(p, w, e, innen, ix=STUETZE,
                                    titel_last=f"{s.plattenart.last} innerhalb des Nachweisschnitts",
                                    titel="Bemessungswert der Querkraft im Nachweisschnitt")
-        rotationen, psi = self._rotation(e, p, w, d, hoehen, V_d,
+        rotationen, psi = self._rotation(e, p, w, d, hoehen,
                                          exzentrizitaet(resultierende, a), masse)
         k_r = self._k_r(e, p, w, psi, d)
         tau = e[s.beton.eingabename("tau_cd")]
@@ -229,6 +247,7 @@ class Durchstanzen(Nachweis):
             p.text(OHNE_EINWIRKUNG)
             return Ausfuehrung({}, [self.urteil(self.d_ohne, "ohne Durchstanzbewehrung",
                                                 UNBESCHRAENKT, OHNE_EINWIRKUNG)], befund)
+        p.hinweis(EINZELLASTEN)
         v = Vergleich(V_d, V_Rd_c)
         v.bedingung(p, "Querkraft gegen Durchstanzwiderstand")
         v.zeile(p, self.d_ohne)
@@ -336,7 +355,7 @@ class Durchstanzen(Nachweis):
     # -- Plattenrotation ----------------------------------------------------
 
     def _rotation(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, d: Wert,
-                  hoehen: Dict[Richtung, Wert], V_d: Wert, e_u: Tuple[float, float],
+                  hoehen: Dict[Richtung, Wert], e_u: Tuple[float, float],
                   masse: Dict[str, float]) -> Tuple[Tuple[Rotation, ...], Wert]:
         """ψ je Richtung und die massgebende -- die grössere (4.3.6.4.1)."""
         s = self.stelle
@@ -372,7 +391,7 @@ class Durchstanzen(Nachweis):
             for r in (Richtung.X, Richtung.Y):
                 m_Rd[r] = self._m_Rd(e, p, w, r, hoehen[r])
             if stufe is Naeherungsstufe.ZWEI:
-                m_sd = self._m_sd(e, p, w, r_s, V_d, e_u, masse)
+                m_sd = self._m_sd(e, p, w, r_s, e_u, masse)
             else:
                 m_sd = {Richtung.X: e["m_sdx"], Richtung.Y: e["m_sdy"]}
         faktor = stufe.faktor
@@ -436,10 +455,14 @@ class Durchstanzen(Nachweis):
         return m
 
     def _m_sd(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, r_s: Dict[Richtung, Wert],
-              V_d: Wert, e_u: Tuple[float, float],
+              e_u: Tuple[float, float],
               masse: Dict[str, float]) -> Dict[Richtung, Optional[Wert]]:
-        """Die mittleren Momente im Stützstreifen in Näherungsstufe 2 (4.3.6.4.7)."""
+        """
+        Die mittleren Momente im Stützstreifen in Näherungsstufe 2 (4.3.6.4.7),
+        aus der ganzen Auflagerkraft -- siehe Dateikopf.
+        """
         s = self.stelle
+        V_d = e["V_d"]
         l_min = min(e.g("l_x").si, e.g("l_y").si)
         frei = 1.5 * math.sqrt(r_s[Richtung.X].groesse.si * r_s[Richtung.Y].groesse.si)
         b_s = w.laenge("b_s", "b_s", min(frei, l_min), "Breite des Stützstreifens", stellen=0)
@@ -452,6 +475,12 @@ class Durchstanzen(Nachweis):
             p.text("l_min ist hier die kleinere der beiden eingegebenen Spannweiten, je die "
                    "grössere der angrenzenden. Ist ein angrenzendes Feld kürzer, gilt seine "
                    "Spannweite, und b_s wird kleiner (4.3.6.4.6).")
+        if e.g("q_d").si > 0.0:
+            p.erklaerung("m_sd kommt aus der ganzen Auflagerkraft V_d: Die Momente im "
+                         "Stützstreifen entstehen aus der ganzen Stützenkraft, wie im Modell "
+                         "des Skripts «Stahlbeton II, 7.4 Platten» (Folie 28). Die Last "
+                         "innerhalb des Nachweisschnitts zieht nur die Querkraft im Nachweis "
+                         "ab (4.3.6.2.6).")
         V = V_d.groesse.si
         ergebnis: Dict[Richtung, Optional[Wert]] = {}
         for r, e_i in ((Richtung.X, e_u[0]), (Richtung.Y, e_u[1])):

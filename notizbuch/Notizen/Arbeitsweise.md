@@ -114,6 +114,11 @@ Kopie der Datei mit der Endung `.mjs`.
   Eine Normstelle dort nachschlagen, nie eine erfinden. Die beiden SIA-PDFs
   sind Scans: Seiten als Bild lesen, die gedruckte Seitenzahl ist die des
   PDF. Das Buch hat eine Textschicht (`pdftotext`).
+- Dazu das Skript «Stahlbeton II, 7.4 Platten» (Kaufmann, ETH Zürich,
+  FS 2026), `stahlbeton_ii_7_4_platten_fs2026_autographie.pdf`, mit
+  Textschicht: die Gegenprobe für das Durchstanzen (Benutzer, 2026-11-25).
+  Wo es von der Norm 2025 abweicht, gilt die Norm. Auch aus ihm kein Satz
+  wörtlich.
 - **Keine Normtexte in der Software** (Benutzer, 2026-11-13 und 2026-11-14):
   kein Satz aus einer Norm oder dem Buch wörtlich in Code, Oberfläche,
   Bericht, Tests oder Notizbuch, auch nicht als Zitat. Den Inhalt in eigenen

@@ -479,6 +479,35 @@ class TestFormenUndLagen(unittest.TestCase):
         self.assertIn("Bodenpressung innerhalb des Nachweisschnitts", texte(loesung))
         self.assertIn("Überdeckung der Zugbewehrung unten", texte(loesung))
 
+    def test_stufe_2_m_sd_aus_der_ganzen_auflagerkraft(self):
+        """
+        (62) bis (65) mit V_d ohne Abzug (Benutzer, 2026-11-26): an der
+        Innenstütze ohne Exzentrizität m_sd = V_d/8 = 150 kNm/m, nicht
+        V_d,red/8. Die Bodenpressung im Schnitt zieht nur die Querkraft im
+        Nachweis ab.
+        """
+        _, loesung, befund, urteil = rechnen(projekt(
+            plattenart="bodenplatte", stufe="2", h=600, c=50, phi_x=20, s_x=150,
+            phi_y=20, s_y=150, V_d=1200.0, q_d=150.0))
+        self.assertLess(befund.innen.V_d_red, 1150e3)
+        for r in befund.rotationen:
+            self.assertAlmostEqual(r.m_sd, 1200e3 / 8.0, places=3)
+        self.assertIn("m_sd kommt aus der ganzen Auflagerkraft", texte(loesung))
+        self.assertEqual(urteil.begruendung,
+                         f"V_d = {befund.innen.V_d_red / 1e3:.1f} kN ≤ "
+                         f"V_Rd,c = {befund.V_Rd_c / 1e3:.1f} kN.")
+
+    def test_ohne_flaechenlast_kein_satz_zum_abzug(self):
+        """Ohne q_d ist V_d,red = V_d: der Satz zur ganzen Auflagerkraft fehlt."""
+        loesung = rechnen(projekt(stufe="2", V_d=500.0))[1]
+        self.assertNotIn("m_sd kommt aus der ganzen Auflagerkraft", texte(loesung))
+
+    def test_einzellasten_sind_nicht_geprueft(self):
+        """4.3.6.2.3: grau, dass Einzellasten nahe am Schnitt nicht geprüft sind -- ohne Last nicht."""
+        self.assertIn("Nicht geprüft: Einzellasten über 0.2·V_d",
+                      texte(rechnen(projekt(V_d=500.0))[1]))
+        self.assertNotIn("Einzellasten", texte(rechnen(projekt(V_d=0.0))[1]))
+
     def test_wand_rechnet_in_stufe_2_wie_in_stufe_1(self):
         """Für Wände nennt 4.3.6.4.7 keine Momente: ψ wie in Stufe 1, und e fragt niemand."""
         zwei = rechnen(projekt(lage="wandende", stufe="2", V_d=300.0))

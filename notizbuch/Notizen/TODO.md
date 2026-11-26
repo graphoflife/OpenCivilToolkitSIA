@@ -1024,6 +1024,22 @@ Norm dazu sagt.
       (9.6.1.2.3) und das Knicken (9.5.1.1, nur ein Hinweis). Negative
       Mantelreibung und Gruppenwirkung (9.4.3.1, 9.4.4.1.7) fehlen ganz.
 
+- [x] **Durchstanzen gegen das Skript geprüft (2026-11-26).** Jede Formel
+      des Moduls gegen das Skript «Stahlbeton II, 7.4 Platten» (Kaufmann,
+      FS 2026) und SIA 262:2025, 4.3.6 gelegt. Offen war nur, welches V_d in
+      m_sd (62) bis (65) gilt: jetzt die ganze Auflagerkraft, wie im Modell
+      des Skripts (Folie 28; Entscheid des Benutzers, 2026-11-26). Das Skript
+      weicht an zwei Stellen von der Norm 2025 ab, das Werkzeug folgt der
+      Norm: k_g nach (37) mit der Untergrenze 1.2 und D_max · (60/f_ck)²
+      über 60 MPa (Skript: ohne Untergrenze, mit dem Exponenten 4 des neuen
+      Eurocode 2); in (69) f_ctm, das die Norm als Bemessungswert der
+      Verbundspannung bezeichnet (Skript: f_bd wie SIA 262:2013). Nicht
+      abgebildet: Vorspannung (m_Dd, 4.3.6.4.3) und Leitungen (Figur 23e).
+- [ ] **Durchstanzen, Einzellasten nahe am Nachweisschnitt (4.3.6.2.3).**
+      Greifen Einzellasten über 0.2·V_d näher als 3·d_v am Schnitt an, ist
+      die ungleichmässige Querkraft zu berücksichtigen. Das Werkzeug kennt
+      solche Lasten nicht; jede Herleitung sagt es grau (Benutzer,
+      2026-11-26). Offen: eine Eingabe dafür, falls gewünscht.
 - [ ] **Durchstanzen, Begrenzung auf 1.5·d_v (Figur 23a bis c).** Eingebaut:
       eine gerade Strecke des Nachweisschnitts zählt 1.5·d_v von jeder Ecke
       der gestützten Fläche und entlang einer Wand von ihrem Ende her; eine

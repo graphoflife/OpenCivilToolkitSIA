@@ -1,5 +1,5 @@
 ---
-erzeugt: f14cff27ed29
+erzeugt: b6e423833b51
 art: modul
 tags: [modul]
 ---
@@ -56,6 +56,18 @@ Rand ab: die halbe Breite `min[b_s; b_sr]/2` innen, zum zweiten Rand hin
 nur bis zu ihm, `b_x/2 + a_x` für den Streifen in y, höchstens ebenso viel.
 Bis 2026-11-14 lag er an der Ecke symmetrisch um die Achse, bis zu 50 %
 breiter, als Figur 25 ihn zeigt.
+
+DIE KRAFT IN m_sd (Benutzer, 2026-11-26):
+Die Gleichungen (62) bis (65) rechnen mit der ganzen Auflagerkraft `V_d`,
+ohne die Last innerhalb des Nachweisschnitts abzuziehen. Die Norm sagt nicht
+ausdruecklich, welches V_d dort gilt; der Abzug nach 4.3.6.2.6 ist erlaubt,
+nicht verlangt. Das Skript «Stahlbeton II, 7.4 Platten» (Kaufmann, FS 2026,
+Folie 28) verknuepft m_sd mit der Stuetzenreaktion: die Momente im
+Stuetzstreifen entstehen aus der ganzen Stuetzenkraft. Das liegt auf der
+sicheren Seite. Den Abzug behaelt die Querkraft im Nachweis, in (66) und
+(67) und am aeusseren Schnitt. Bis 2026-11-25 kam m_sd aus V_d,red -- bei
+einer Bodenplatte mit 150 kN/m² Bodenpressung bis 7 % zu viel Widerstand,
+bei einer Decke unter 1 %.
 
 
 ## EINHEITEN
@@ -171,7 +183,7 @@ an jedem Schnitt -- um die Stütze, um die äussersten Anker und um den Pilz.
 #### Durchstanzen._rotation
 
 ```python
-def _rotation(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, d: Wert, hoehen: Dict[Richtung, Wert], V_d: Wert, e_u: Tuple[float, float], masse: Dict[str, float]) -> Tuple[Tuple[Rotation, ...], Wert]
+def _rotation(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, d: Wert, hoehen: Dict[Richtung, Wert], e_u: Tuple[float, float], masse: Dict[str, float]) -> Tuple[Tuple[Rotation, ...], Wert]
 ```
 
 ψ je Richtung und die massgebende -- die grössere (4.3.6.4.1).
@@ -187,10 +199,11 @@ Der Biegewiderstand je Meter im Stützstreifen, aus dem Kräftegleichgewicht (Sp
 #### Durchstanzen._m_sd
 
 ```python
-def _m_sd(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, r_s: Dict[Richtung, Wert], V_d: Wert, e_u: Tuple[float, float], masse: Dict[str, float]) -> Dict[Richtung, Optional[Wert]]
+def _m_sd(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, r_s: Dict[Richtung, Wert], e_u: Tuple[float, float], masse: Dict[str, float]) -> Dict[Richtung, Optional[Wert]]
 ```
 
-Die mittleren Momente im Stützstreifen in Näherungsstufe 2 (4.3.6.4.7).
+Die mittleren Momente im Stützstreifen in Näherungsstufe 2 (4.3.6.4.7),
+aus der ganzen Auflagerkraft -- siehe Dateikopf.
 
 #### Durchstanzen._b_sr
 
@@ -248,6 +261,7 @@ Stahlpilz und Durchstanzbewehrung dazu, was sie sind und was sie tragen.
 - `K_R_GRENZE = 2.0` – Obere Grenze von k_r (SIA 262:2025, Gleichung (59)).
 - `R_S = 0.22` – `r_s = R_S · l` in den Näherungsstufen 1 und 2 (SIA 262:2025, 4.3.6.4.4).
 - `ROTATION_MINDEST = 0.02` – Unter dieser Plattenrotation fehlt Verformungsvermögen, wenn keine Durchstanzbewehrung nach (67) liegt (SIA 262:2025, 4.3.6.1.2).
+- `EINZELLASTEN = 'Nicht geprüft: Einzellasten über 0.2·V_d, die näher als 3·d_v am Nac…` – Was der Nachweis nicht prueft, weil er die Lasten um die Stuetze nicht kennt (SIA 262:2025, 4.3.6.2.3, vierter Fall).
 
 ## Braucht
 

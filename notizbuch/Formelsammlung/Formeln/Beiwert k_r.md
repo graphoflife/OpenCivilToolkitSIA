@@ -1,5 +1,5 @@
 ---
-erzeugt: 9218fc062ef2
+erzeugt: a8aa4a2e535a
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.6.3.2, (59)"
@@ -28,8 +28,8 @@ Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 $$
 \begin{aligned}
   k_r &= \min\left[2;\ \frac{1}{0.45 + 0.18 \cdot \psi \cdot d \cdot k_g}\right] \\
-  &= \min\left[2;\ \frac{1}{0.45 + 0.18 \cdot 0.0186 \cdot 234 \cdot 1.2}\right] \\
-  &= 0.721 \quad \left(d\ \text{in}\ \mathrm{mm}\right)
+  &= \min\left[2;\ \frac{1}{0.45 + 0.18 \cdot 0.0187 \cdot 234 \cdot 1.2}\right] \\
+  &= 0.716 \quad \left(d\ \text{in}\ \mathrm{mm}\right)
 \end{aligned}
 $$
 

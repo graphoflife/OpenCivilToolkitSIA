@@ -1,5 +1,5 @@
 ---
-erzeugt: 32f3cdcccb0b
+erzeugt: 53bde295c8f5
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.6.4.1, (60)"
@@ -43,8 +43,8 @@ Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 $$
 \begin{aligned}
   \psi_x &= 1.5 \cdot \frac{r_{sx}}{d} \cdot \frac{f_{yd}}{E_s} \cdot \left(\frac{m_{sd,x}}{m_{Rd,x}}\right)^{3/2} \\
-  &= 1.5 \cdot \frac{1540\,\mathrm{mm}}{234\,\mathrm{mm}} \cdot \frac{435\,\mathrm{N}/\mathrm{mm}^{2}}{200000\,\mathrm{N}/\mathrm{mm}^{2}} \cdot \left(\frac{111.8\,\mathrm{kNm}/\mathrm{m}}{132.5\,\mathrm{kNm}/\mathrm{m}}\right)^{3/2} \\
-  &= 0.0166
+  &= 1.5 \cdot \frac{1540\,\mathrm{mm}}{234\,\mathrm{mm}} \cdot \frac{435\,\mathrm{N}/\mathrm{mm}^{2}}{200000\,\mathrm{N}/\mathrm{mm}^{2}} \cdot \left(\frac{112.5\,\mathrm{kNm}/\mathrm{m}}{132.5\,\mathrm{kNm}/\mathrm{m}}\right)^{3/2} \\
+  &= 0.0168
 \end{aligned}
 $$
 

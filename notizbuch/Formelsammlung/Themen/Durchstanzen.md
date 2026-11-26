@@ -1,5 +1,5 @@
 ---
-erzeugt: 0b710c8ca1ec
+erzeugt: 619fe0a4b017
 art: thema
 tags: [thema]
 ---
@@ -13,6 +13,8 @@ Innenstütze einer Decke. Die Querkraft fliesst im Bereich der gestützten Fläc
 Die festen Werte für k\_e gelten nur für Flachdecken mit regelmässigem Stützenraster und ähnlich langen Feldern, deren Stützen biegesteif an die Platte anschliessen, aber keine Horizontalkräfte abtragen.
 
 Näherungsstufe 2: die mittleren Momente im Stützstreifen nach den Gleichungen (62) bis (65).
+
+m\_sd kommt aus der ganzen Auflagerkraft V\_d: Die Momente im Stützstreifen entstehen aus der ganzen Stützenkraft, wie im Modell des Skripts «Stahlbeton II, 7.4 Platten» (Folie 28). Die Last innerhalb des Nachweisschnitts zieht nur die Querkraft im Nachweis ab (4.3.6.2.6).
 
 Vorgeschlagen wird ancoPLUS von AncoTech: 16 × ancoPLUS DX5-0215 – Anker ⌀10 aus B500B mit h\_A = 215 mm, vom Rand der gestützten Fläche 85 / 140 / 140 / 175 / 175 mm. Die Abstände sind die der Typen «D» nach dem Gutachten des Herstellers: 0.375·d zum ersten Anker, bis zum dritten 0.60·d, danach 0.75·d (AncoTech, Gutachten Muttoni / Fernández Ruiz 2007 (07-A05-R1c) und Preisliste ancoPLUS, nach Vorgabe, nicht nachgeschlagen). Zwei Leisten stehen beim zweiten Anker höchstens 1.5·d\_v auseinander (5.5.3.9).
 
