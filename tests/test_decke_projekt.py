@@ -275,7 +275,7 @@ class TestZeichnung(unittest.TestCase):
         p = zwei_felder()
         p.decken[0].platte([(10, 0), (12, 0), (12, 2), (10, 2)], beton="b1", h=200)
         meldungen = zeichnung(p).daten["uebersicht"]["meldungen"]
-        ohne = [m for m in meldungen if "trägt keine der beiden Richtungen" in m["text"]]
+        ohne = [m for m in meldungen if "trägt keine Richtung" in m["text"]]
         self.assertEqual([m["elemente"] for m in ohne], [["P3"]])
 
     def test_der_beton_einer_platte_steht_an_der_platte(self):

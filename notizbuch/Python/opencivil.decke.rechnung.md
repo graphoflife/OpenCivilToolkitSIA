@@ -1,5 +1,5 @@
 ---
-erzeugt: 4330a5f90d95
+erzeugt: cac6e1686a55
 art: modul
 tags: [modul]
 ---
@@ -123,8 +123,10 @@ Was in einem Fall ausfaellt, weil Streifen nicht tragen: der ganze Satz
 in `text` -- «… 80 kN fallen aus.» --, dazu `grund` ohne die Kraft
 und die Kraft `F` in N. Ueber die Faelle gesammelt
 ([[opencivil.decke.rechnung#Ergebnis.fallmeldungen|Ergebnis.fallmeldungen]]), steht der Grund einmal und die Kraft
-je Fall dahinter.
+je Fall dahinter. Grau: es fehlt ein Lager oder ein Unterzug, und der
+Rest rechnet (Benutzer, 2026-11-19).
 
+- `fehler: bool = False`
 - `grund: str = ''`
 - `F: float = 0.0`
 
@@ -295,14 +297,6 @@ def _schwerpunkt(l: Streckenlast) -> float
 ```
 
 Wo die Resultierende einer Streckenlast liegt, ab ihrem Anfang.
-
-### _warum
-
-```python
-def _warum(traeger: Traeger) -> Tuple[str, str]
-```
-
-Warum ein Träger nicht trägt -- von einem gesagt und von mehreren.
 
 
 ## Konstanten

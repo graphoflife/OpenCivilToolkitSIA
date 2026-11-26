@@ -20101,7 +20101,7 @@ Kombination «GZT»: 1.35 · «Eigengewicht» + 1.35 · «Auflast» + 1.5 · «N
 
 Je Richtung sind die Streifen höchstens 0.50 m breit; geteilt wird an jeder Ecke einer Platte, jedem Rand eines Unterzugs und Stützenbereichs und jedem Ende eines Linienlagers.
 
-Automatisch, nach Folie 31 verallgemeinert: je Zelle zweier Feldstreifen trägt die Richtung, die Lager hat. Tragen beide, geht die Last zum nahen Rand, wenn sie näher als ein Viertel der kürzeren Spannweite an einem Lager liegt, nahe zweier Ränder je zur Hälfte. Sonst geht sie mehr in die kürzere Spannweite: bei gleichen je zur Hälfte, ab dem Verhältnis 1.5 ganz, dazwischen geradlinig. Ein Kragarm zählt doppelt (nach Vorgabe; die Norm lässt jede Aufteilung zu, die im Gleichgewicht ist, SIA 262:2025, 4.1.4.2.2).
+Automatisch, nach Folie 31 verallgemeinert: je Zelle zweier Feldstreifen trägt die Richtung, die Lager hat; trägt keine, fällt die Last dort aus. Tragen beide, geht die Last zum nahen Rand, wenn sie näher als ein Viertel der kürzeren Spannweite an einem Lager liegt, nahe zweier Ränder je zur Hälfte. Sonst geht sie mehr in die kürzere Spannweite: bei gleichen je zur Hälfte, ab dem Verhältnis 1.5 ganz, dazwischen geradlinig. Ein Kragarm zählt doppelt (nach Vorgabe; die Norm lässt jede Aufteilung zu, die im Gleichgewicht ist, SIA 262:2025, 4.1.4.2.2).
 
 **Fern der Lager, in die kürzere Spannweite**
 

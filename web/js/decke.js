@@ -53,7 +53,7 @@ const HILFE = {
   streifen: {
     zeilen: [
       ['Breite', 'höchstens so breit; geteilt wird zudem an jeder Ecke, jedem Rand eines Unterzugs und Stützenbereichs und jedem Ende eines Linienlagers'],
-      ['automatisch', 'je Stelle die Richtung, die Lager hat; tragen beide, nahe einem Rand (ein Viertel der kürzeren Spannweite) zu ihm, in den Ecken je zur Hälfte, sonst mehr in die kürzere Spannweite – je ungleicher die Spannweiten, desto mehr; Folie 31, verallgemeinert nach Vorgabe'],
+      ['automatisch', 'je Stelle die Richtung, die Lager hat – trägt keine, fällt die Last dort aus; tragen beide, nahe einem Rand (ein Viertel der kürzeren Spannweite) zu ihm, in den Ecken je zur Hälfte, sonst mehr in die kürzere Spannweite – je ungleicher die Spannweiten, desto mehr; Folie 31, verallgemeinert nach Vorgabe'],
       ['fest', 'überall derselbe Anteil in Richtung 1'],
       ['Zonen', 'gehen beidem vor: dort gilt ihr Anteil – zu zeichnen im Fenster mit «Zone»'],
     ],
@@ -120,7 +120,7 @@ function liste(a) {
     ]],
   ];
   return [
-    a.dk.unterlage === 'aufteilung' ? legende() : null,
+    a.dk.unterlage === 'aufteilung' ? legende(a.adapter.kern.antwort) : null,
     meldungsliste(a),
     ...listengruppen(a, gruppen),
   ];
@@ -300,7 +300,7 @@ export function deckenKarten(kennung) {
   return [
     karte('Lastaufteilung', [
       ...meldungszeilen(daten),
-      el('div.gb-bildhuelle', {}, [aufteilung]), legende(),
+      el('div.gb-bildhuelle', {}, [aufteilung]), legende(daten),
     ], { bild: aufteilung, klasse: 'ist-breit' }),
     karte('Streifen', [
       el('div.gb-bildhuelle', {}, [streifen]),

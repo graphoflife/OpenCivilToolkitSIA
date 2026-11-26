@@ -1,5 +1,5 @@
 ---
-erzeugt: 3cb614c6742b
+erzeugt: d587ead02a45
 art: modul
 tags: [modul]
 ---
@@ -26,7 +26,9 @@ die Last darauf.
    kreuzen:
 
    * Trägt nur eine Richtung -- der Streifen der anderen ist beweglich --,
-     geht alles in sie.
+     geht alles in sie. Trägt keine, geht die Last trotzdem je zur Hälfte
+     in die Streifen: dort fällt sie aus, die Probe zählt sie als nicht
+     getragen, und das Bild zeigt die Stelle als «trägt nicht».
    * `b` ist die kleinere Spannweite der beiden Felder, in denen die
      Zelle liegt; eine Kragplatte zählt doppelt so lang.
    * Liegt die Zelle in einer Richtung höchstens `b/4` vor einem Lager,
@@ -46,6 +48,17 @@ Verallgemeinerung -- nach Vorgabe. Die Norm schreibt keine vor: nach der
 statischen Methode gilt jede, die im Gleichgewicht ist (SIA 262:2025,
 4.1.4.2.2).
 ```
+
+
+## WO LAST AUSFÄLLT
+
+Je Zelle, ob ihre Last auf einen Träger kommt, der nicht trägt: weil keine
+Richtung trägt -- dann fehlt ein Lager oder ein Unterzug --, oder weil die
+feste Aufteilung oder eine Zone Last in eine Richtung gibt, die nicht
+trägt. Je Platte und Ursache steht das in einer grauen Meldung an der
+Platte, mit der Fläche: es fehlt etwas, und der Rest rechnet (Benutzer,
+2026-11-19). Eine Zone gilt dafür in den Zellen, deren Schwerpunkt in ihr
+liegt.
 
 
 ## FLÄCHEN MIT ANTEIL
@@ -69,6 +82,32 @@ Ein konvexes Vieleck (Gegenuhrzeigersinn) und der Faktor, mit dem die Last darau
 - `ecken: Tuple[Punkt, ...]`
 - `faktor: float`
 
+### Zelle
+
+```python
+@dataclass(frozen=True)
+class Zelle
+```
+
+Wo sich der Streifen `i` der Richtung 1 und der Streifen `j` der
+Richtung 2 kreuzen: ihre Stücke in den Platten der Gruppe, deren
+Schwerpunkt und wo er auf den Trägern beider Richtungen liegt.
+
+- `i: int`
+- `j: int`
+- `teile: Tuple[Tuple[Punkt, ...], ...]`
+- `mitte: Punkt`
+- `lage_1: Lage`
+- `lage_2: Lage`
+
+#### Zelle.flaeche_in
+
+```python
+def flaeche_in(self, platte: Platte) -> float
+```
+
+Wie viel von ihr in der Platte liegt -- jedes Stück liegt in einer, sein Schwerpunkt also auch.
+
 ### Aufteilungen
 
 ```python
@@ -79,7 +118,7 @@ class Aufteilungen
 Je `(Feldstreifen, Gruppe)` die Flächen mit Anteil -- und je Zelle, was automatisch entschieden wurde.
 
 - `flaechen: Dict[Tuple[str, int], List[Anteil]]`
-- `zellen: List[Tuple[Tuple[Punkt, ...], float]]` – Fürs Bild, was automatisch entschieden wurde: Vieleck und Anteil in Richtung 1 -- je Streifen der Richtung 1 die Zellen gleichen Anteils zusammengelegt, wie die Last sie bekommt, geschnitten mit der Platte.
+- `zellen: List[Bildzelle]` – Fürs Bild, was automatisch entschieden wurde: Vieleck und Anteil in Richtung 1 -- `None`, wo keine Richtung trägt --, je Streifen der Richtung 1 die Zellen gleichen Anteils zusammengelegt, wie die Last sie bekommt, geschnitten mit der Platte.
 - `meldungen: List[Meldung]`
 
 ### aufteilen
@@ -96,34 +135,60 @@ def _ganz(s: Streifen, gruppe: Gruppe) -> List[Punkt]
 
 Das Band des Streifens, so lang, dass es die Gruppe ganz deckt.
 
+### _zellen
+
+```python
+def _zellen(zerlegung: Zerlegung, gruppe: Gruppe, streifen1: Sequence[Streifen], streifen2: Sequence[Streifen]) -> List[Zelle]
+```
+
+Die Zellen, die in den Platten der Gruppe liegen, je mit der Lage ihres Schwerpunkts.
+
 ### _automatisch
 
 ```python
-def _automatisch(zerlegung: Zerlegung, gruppe: Gruppe, streifen1: Sequence[Streifen], streifen2: Sequence[Streifen])
+def _automatisch(gruppe: Gruppe, streifen1: Sequence[Streifen], streifen2: Sequence[Streifen], zellen: Sequence[Zelle]) -> Tuple[Dict[Tuple[str, int], List[Anteil]], List[Bildzelle]]
 ```
 
-Die Zellen der Gruppe, je mit ihrem Anteil in Richtung 1 -- und daraus je
-Streifen die Flächen, Zellen gleichen Anteils längs des Streifens
-zusammengelegt. Fürs Bild dieselben Flächen der Richtung 1, geschnitten
-mit der Platte. Dazu je Platte, an wie vielen Zellen keine Richtung trägt.
+Je Streifen die Flächen nach dem Anteil jeder Zelle, Zellen gleichen
+Anteils längs des Streifens zusammengelegt. Fürs Bild dieselben Flächen
+der Richtung 1, geschnitten mit der Platte -- ohne Anteil, wo keine
+Richtung trägt.
+
+### _ausfall
+
+```python
+def _ausfall(decke: Decke, gruppe: Gruppe, zellen: Sequence[Zelle]) -> List[Meldung]
+```
+
+Je Platte und Ursache, wo Last ausfällt, eine graue Meldung an ihr: wo
+keine Richtung trägt, je Richtung warum; wo die feste Aufteilung oder
+eine Zone Last in eine Richtung gibt, die nicht trägt, wer und wie viel.
+
+### _wo
+
+```python
+def _wo(je_richtung: Dict[str, List[str]]) -> str
+```
+
+«in x liegt sie nur auf «W3», …; in y liegt sie auf nichts» -- gleiche Gründe einmal, «in x und y».
 
 ### _zusammengelegt
 
 ```python
-def _zusammengelegt(band: Sequence[Punkt], quer: Sequence[Streifen], folge: Sequence[Tuple[int, float]]) -> List[Anteil]
+def _zusammengelegt(band: Sequence[Punkt], quer: Sequence[Streifen], folge: Sequence[Tuple[int, Optional[float]]]) -> List[Bildzelle]
 ```
 
 Die Zellen längs eines Streifens, die nebeneinanderliegenden mit gleichem
 Anteil zu einer: das Band, geschnitten mit den Streifen quer von der
-ersten bis zur letzten.
+ersten bis zur letzten -- je Vieleck und Anteil.
 
 ### _anteil_bei
 
 ```python
-def _anteil_bei(zerlegung: Zerlegung, p: Punkt, a: Tuple[Streifen, Richtung], b: Tuple[Streifen, Richtung]) -> Optional[float]
+def _anteil_bei(la: Lage, lb: Lage) -> Optional[float]
 ```
 
-Der Anteil in Richtung 1 an der Stelle `p` -- `None`, wenn keine Richtung trägt.
+Der Anteil in Richtung 1, wo eine Stelle in `la` und `lb` liegt -- `None`, wenn keine Richtung trägt.
 
 ### in_der_mitte
 
@@ -151,9 +216,11 @@ Feldstreifen.
 
 - `UEBERSTAND = 1.0` – So viel länger als die Gruppe reicht ein Anteil, der einen ganzen Streifen deckt, in m.
 - `GANZ_AB = 1.5` – Ab diesem Verhältnis der Spannweiten geht die Mitte eines Felds ganz in die kürzere Richtung.
+- `Bildzelle = Tuple[Tuple[Punkt, ...], Optional[float]]` – Fürs Bild ein Vieleck und sein Anteil in Richtung 1 -- `None`, wo keine Richtung trägt.
 
 ## Braucht
 
+- [[opencivil.core.latex]]
 - [[opencivil.decke.geometrie]]
 - [[opencivil.decke.modell]]
 - [[opencivil.decke.streifen]]

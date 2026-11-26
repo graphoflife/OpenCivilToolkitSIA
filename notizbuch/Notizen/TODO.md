@@ -51,7 +51,9 @@ Kräften je Geschoss und Wand, ohne Verbindung ins Balkensystem.
 - [ ] Decken: ein Klick auf «40 Streifen tragen nicht …» wählt nichts aus --
       Streifen sind keine Teile der Zeichnung. Die Platten darunter wären
       die Wahl; dafür müsste der Kern wissen, auf welcher Platte ein Träger
-      liegt. Gefunden bei der Durchsicht vom 2026-11-19.
+      liegt. Gefunden bei der Durchsicht vom 2026-11-19. Seit 2026-11-26
+      steht daneben an jeder Platte, wo bei ihr Last ausfällt und warum --
+      ein Klick darauf wählt sie; die Meldung je Fall wählt weiter nichts.
 - [ ] Zeichenfenster: während eines Befehls heissen P und S «parallel»
       und «senkrecht», nicht Platte und Stütze. Erst Esc, dann die Taste.
 - [ ] Decken, nach Vorgabe (`opencivil/decke/`): die automatische

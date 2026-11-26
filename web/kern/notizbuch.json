@@ -4569,10 +4569,15 @@
       "kurz": "welcher Teil der Last in welche Richtung geht.",
       "stichworte": [
         "Anteil",
+        "Zelle",
+        "Zelle.flaeche_in",
         "Aufteilungen",
         "aufteilen",
         "_ganz",
+        "_zellen",
         "_automatisch",
+        "_ausfall",
+        "_wo",
         "_zusammengelegt",
         "_anteil_bei",
         "in_der_mitte",
@@ -4728,8 +4733,7 @@
         "lagerverlauf",
         "_gehalten",
         "spitzen",
-        "_schwerpunkt",
-        "_warum"
+        "_schwerpunkt"
       ]
     },
     {
@@ -4767,10 +4771,12 @@
         "Auflager",
         "Auflager.bereich",
         "Lage",
+        "Warum",
         "Traeger",
         "Traeger.L",
         "Traeger.balken",
         "Traeger.lage",
+        "Traeger.warum_nicht",
         "Streifen",
         "Streifen.breite",
         "Streifen.mitte",

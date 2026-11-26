@@ -48,22 +48,31 @@ const STUETZE_MINDESTENS = 7;
 /** Der Abstand der Schraffur an einem eingespannten Rand, in px. */
 const SCHRAFFUR = 7;
 
-/** Die Farbe eines Anteils in Richtung 1, in %: orange bei 100, gelb bei 0, dazwischen gemischt. */
+/**
+ * Die Farbe eines Anteils in Richtung 1, in %: orange bei 100, gelb bei 0,
+ * dazwischen gemischt -- grau ohne Anteil, wo keine Richtung trägt.
+ */
 function mischung(anteil) {
+  if (anteil == null) return 'var(--schrift-zart)';
   const s = Math.max(0, Math.min(100, anteil));
   return `color-mix(in srgb, var(--richtung-x) ${s.toFixed(1)}%, var(--richtung-y))`;
 }
 
 const anteilFarbe = (anteil) => `fill: ${mischung(anteil)}`;
 
-/** Was die Farben der Aufteilung heissen -- unter der Zeichnung und unter ihrem Bild. */
-export function legende() {
+/**
+ * Was die Farben der Aufteilung heissen -- unter der Zeichnung und unter
+ * ihrem Bild. «trägt nicht» nur, wo die Antwort `daten` eine solche Stelle hat.
+ */
+export function legende(daten) {
   const eintrag = (anteil, text) => el('span.dk-legende-eintrag', {}, [
     el('span.dk-legende-farbe', { style: { background: mischung(anteil) } }), text,
   ]);
+  const traegtNicht = daten?.gerechnet && daten.anteile.some((f) => f.anteil == null);
   return el('div.dk-legende', {}, [
     eintrag(100, 'ganz in Richtung 1'), eintrag(50, 'je zur Hälfte'), eintrag(0, 'ganz in Richtung 2'),
-  ]);
+    traegtNicht ? eintrag(null, 'trägt nicht – es fehlt ein Lager') : null,
+  ].filter(Boolean));
 }
 
 /** «70 / 30 %»: der Anteil in Richtung 1 und der Rest in Richtung 2. */
@@ -151,7 +160,8 @@ function unterlage(v, daten, was) {
   if (was === 'aufteilung') {
     for (const f of daten.anteile) {
       g.append(mitTitel(svgEl('path', { d: pfad(v, f.ecken), class: 'dk-anteil', style: anteilFarbe(f.anteil) }),
-        [`Richtung 1 / 2: ${anteilText(f.anteil)}`]));
+        [f.anteil == null ? 'Hier trägt keine Richtung – es fehlt ein Lager oder ein Unterzug.'
+          : `Richtung 1 / 2: ${anteilText(f.anteil)}`]));
     }
   } else if (was === 'streifen') {
     for (const s of daten.grenzen) {

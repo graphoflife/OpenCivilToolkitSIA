@@ -45,7 +45,7 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass, field
 from functools import cached_property
-from typing import Dict, List, Optional, Sequence, Tuple
+from typing import Dict, List, NamedTuple, Optional, Sequence, Tuple
 
 from opencivil.decke import geometrie as geo
 from opencivil.decke.geometrie import Punkt
@@ -162,6 +162,24 @@ class Lage:
     abstand: float
     """Bis zum nächsten Lager, das die Höhe hält -- null in seiner Fläche."""
 
+    warum: Optional["Warum"] = None
+    """Warum ihr Träger nicht trägt -- ``None``, wenn er trägt."""
+
+
+class Warum(NamedTuple):
+    """
+    Warum Streifen nicht tragen, in drei Wendungen: von einem gesagt, von
+    mehreren und von der Platte, in der sie liegen, nach «in x».
+    """
+
+    einer: str
+    mehrere: str
+    platte: str
+
+
+#: Wo an einer Stelle kein Träger ist.
+AUF_NICHTS = Warum("er liegt auf nichts.", "sie liegen auf nichts.", "liegt sie auf nichts")
+
 
 @dataclass
 class Traeger:
@@ -194,7 +212,7 @@ class Traeger:
         """Spannweite und Abstand zum Lager an der Stelle ``s`` (m ab dem Anfang)."""
         hoehe = [a for a in self.auflager if a.vertikal]
         if not self.balken.stabil or not hoehe:
-            return Lage(False, math.inf, math.inf)
+            return Lage(False, math.inf, math.inf, self.warum_nicht())
         abstand = min(max(a.bereich[0] - s, s - a.bereich[1], 0.0) for a in hoehe)
         # Je Stelle, was dort ist: «h» hält die Höhe, «d» nur die Drehung, «e» ist ein freies Ende.
         stellen = [(a.s, "h" if a.vertikal else "d") for a in self.auflager] + [(0.0, "e"), (self.L, "e")]
@@ -211,6 +229,19 @@ class Traeger:
         else:
             weite = math.inf
         return Lage(True, weite if weite > 1e-9 else math.inf, abstand)
+
+    def warum_nicht(self) -> Warum:
+        """Warum er nicht trägt: er liegt auf nichts, nichts hält ihn in der Höhe, oder nichts seine Drehung."""
+        hoehe = [a for a in self.auflager if a.vertikal]
+        if not self.auflager:
+            return AUF_NICHTS
+        if not hoehe:
+            return Warum("nichts hält ihn in der Höhe.", "nichts hält sie in der Höhe.",
+                         "hält sie nichts in der Höhe")
+        lager = f"«{hoehe[0].name}»"
+        return Warum(f"er liegt nur auf {lager}, und nichts hält seine Drehung.",
+                     f"sie liegen nur auf {lager}, und nichts hält ihre Drehung.",
+                     f"liegt sie nur auf {lager}, und nichts hält ihre Drehung")
 
 
 @dataclass

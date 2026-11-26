@@ -60,11 +60,12 @@ ANNAHME = (
 #: Die automatische Aufteilung in Worten -- die Regel steht in :mod:`~opencivil.decke.aufteilung`.
 AUTOMATISCH = (
     "Automatisch, nach Folie 31 verallgemeinert: je Zelle zweier Feldstreifen trägt die Richtung, "
-    "die Lager hat. Tragen beide, geht die Last zum nahen Rand, wenn sie näher als ein Viertel der "
-    "kürzeren Spannweite an einem Lager liegt, nahe zweier Ränder je zur Hälfte. Sonst geht sie "
-    "mehr in die kürzere Spannweite: bei gleichen je zur Hälfte, ab dem Verhältnis "
-    f"{fest(GANZ_AB, 1)} ganz, dazwischen geradlinig. Ein Kragarm zählt doppelt (nach Vorgabe; "
-    "die Norm lässt jede Aufteilung zu, die im Gleichgewicht ist, SIA 262:2025, 4.1.4.2.2).")
+    "die Lager hat; trägt keine, fällt die Last dort aus. Tragen beide, geht die Last zum nahen "
+    "Rand, wenn sie näher als ein Viertel der kürzeren Spannweite an einem Lager liegt, nahe zweier "
+    "Ränder je zur Hälfte. Sonst geht sie mehr in die kürzere Spannweite: bei gleichen je zur "
+    f"Hälfte, ab dem Verhältnis {fest(GANZ_AB, 1)} ganz, dazwischen geradlinig. Ein Kragarm zählt "
+    "doppelt (nach Vorgabe; die Norm lässt jede Aufteilung zu, die im Gleichgewicht ist, "
+    "SIA 262:2025, 4.1.4.2.2).")
 
 #: Der Anteil in die kürzere Spannweite fern der Lager (:func:`~opencivil.decke.aufteilung.in_der_mitte`).
 MITTE = (r"\alpha_{\mathrm{kurz}} = \min\left(1;\ \frac{1}{2} + \frac{1}{2} \cdot "

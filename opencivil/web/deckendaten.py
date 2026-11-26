@@ -61,7 +61,8 @@ def uebersicht(befund: Optional[Deckenbefund]) -> Dict[str, Any]:
     """
     ``gerechnet`` und ``meldungen`` (``{text, elemente, fehler}``) immer;
     wenn die Decke in Streifen zerfiel, dazu ``richtungen``, ``anteile``
-    (Vieleck und Anteil in Richtung 1, in %), ``grenzen`` (je Grenze
+    (Vieleck und Anteil in Richtung 1, in % -- ``None``, wo keine Richtung
+    trägt), ``grenzen`` (je Grenze
     zweier Streifen eine Strecke), ``unterzuege``, ``stuetzenbereiche`` und
     ``faelle``: je Lastfall und Kombination ``name``, die Last ``summe``,
     was davon ``daneben`` liegt und ``nicht_getragen`` wird, und was die
@@ -81,7 +82,7 @@ def uebersicht(befund: Optional[Deckenbefund]) -> Dict[str, Any]:
         "gerechnet": True,
         "meldungen": meldungen,
         "richtungen": [{"name": r.name, "streifen": len(z.feldstreifen(r))} for r in z.richtungen],
-        "anteile": [{"ecken": _punkte(ecken), "anteil": round(100.0 * wert, 6)}
+        "anteile": [{"ecken": _punkte(ecken), "anteil": None if wert is None else round(100.0 * wert, 6)}
                     for ecken, wert in _anteile(e)],
         "grenzen": _grenzen(e),
         "unterzuege": [{"name": u.name, "ecken": _punkte(u.gebiet)} for u in z.unterzuege],
@@ -209,7 +210,7 @@ def _meldungen(meldungen: Sequence[Meldung]) -> List[Dict[str, Any]]:
     return [m.als_dict() for m in meldungen]
 
 
-def _anteile(e: Ergebnis) -> List[Tuple[Sequence[Tuple[float, float]], float]]:
+def _anteile(e: Ergebnis) -> List[Tuple[Sequence[Tuple[float, float]], Optional[float]]]:
     """Automatisch die Zellen der Aufteilung, fest jede Platte mit dem Anteil der Decke."""
     if e.decke.aufteilung is Aufteilung.FEST:
         return [(p.ecken, e.decke.anteil) for p in e.decke.platten]

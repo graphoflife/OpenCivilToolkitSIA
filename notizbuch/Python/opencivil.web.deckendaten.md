@@ -1,5 +1,5 @@
 ---
-erzeugt: 3bce7abd8414
+erzeugt: 5ec822f7e3b8
 art: modul
 tags: [modul]
 ---
@@ -47,7 +47,8 @@ def uebersicht(befund: Optional[Deckenbefund]) -> Dict[str, Any]
 
 `gerechnet` und `meldungen` (`{text, elemente, fehler}`) immer;
 wenn die Decke in Streifen zerfiel, dazu `richtungen`, `anteile`
-(Vieleck und Anteil in Richtung 1, in %), `grenzen` (je Grenze
+(Vieleck und Anteil in Richtung 1, in % -- `None`, wo keine Richtung
+trägt), `grenzen` (je Grenze
 zweier Streifen eine Strecke), `unterzuege`, `stuetzenbereiche` und
 `faelle`: je Lastfall und Kombination `name`, die Last `summe`,
 was davon `daneben` liegt und `nicht_getragen` wird, und was die
@@ -127,7 +128,7 @@ Der groesste und der kleinste Wert einer Groesse unter den Proben, je mit Ort.
 ### _anteile
 
 ```python
-def _anteile(e: Ergebnis) -> List[Tuple[Sequence[Tuple[float, float]], float]]
+def _anteile(e: Ergebnis) -> List[Tuple[Sequence[Tuple[float, float]], Optional[float]]]
 ```
 
 Automatisch die Zellen der Aufteilung, fest jede Platte mit dem Anteil der Decke.

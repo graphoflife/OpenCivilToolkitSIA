@@ -39,7 +39,7 @@ from opencivil.decke.geometrie import Punkt
 from opencivil.decke.lasten import Belastung, belasten, kn, kombiniert
 from opencivil.decke.modell import Decke, Linienlager
 from opencivil.decke.streifen import (
-    LINIENLAGER, STUETZE, UNTERZUG, Auflager, Streifen, Traeger, Zerlegung, pressung, zerlegen,
+    LINIENLAGER, STUETZE, UNTERZUG, Auflager, Streifen, Traeger, Warum, Zerlegung, pressung, zerlegen,
 )
 from opencivil.decke.traeger import GLEICH, Einzellast, Streckenlast, Teillast, statik, wert
 from opencivil.stabwerk.system import Meldung
@@ -119,9 +119,11 @@ class Ausfall(Meldung):
     in ``text`` -- «… 80 kN fallen aus.» --, dazu ``grund`` ohne die Kraft
     und die Kraft ``F`` in N. Ueber die Faelle gesammelt
     (:meth:`Ergebnis.fallmeldungen`), steht der Grund einmal und die Kraft
-    je Fall dahinter.
+    je Fall dahinter. Grau: es fehlt ein Lager oder ein Unterzug, und der
+    Rest rechnet (Benutzer, 2026-11-19).
     """
 
+    fehler: bool = False
     grund: str = ""
     F: float = 0.0
 
@@ -235,7 +237,7 @@ def fall(name: str, belastung: Belastung, zerlegung: Zerlegung) -> Fallergebnis:
     """
     heraus = Fallergebnis(name, belastung.summe, belastung.daneben, meldungen=list(belastung.meldungen))
     uebertragen: Dict[str, List[Teillast]] = {}
-    ausfall: Dict[Tuple[str, str], List[Tuple[str, float]]] = {}
+    ausfall: Dict[Warum, List[Tuple[str, float]]] = {}
     ohne_platte: List[str] = []
     for streifen in sorted(zerlegung.streifen, key=lambda s: s.stufe):
         lasten = belastung.je_streifen.get(streifen.name, []) + uebertragen.get(streifen.name, [])
@@ -251,7 +253,7 @@ def fall(name: str, belastung: Belastung, zerlegung: Zerlegung) -> Fallergebnis:
                 continue
             if not traeger.balken.stabil:
                 heraus.nicht_getragen += gesamt
-                ausfall.setdefault(_warum(traeger), []).append((traeger.name, gesamt))
+                ausfall.setdefault(traeger.warum_nicht(), []).append((traeger.name, gesamt))
                 continue
             kraefte = [Lagerkraft(a, F, C) for a, (F, C) in
                        zip(traeger.auflager, traeger.balken.lagerkraefte(lokal))]
@@ -263,10 +265,10 @@ def fall(name: str, belastung: Belastung, zerlegung: Zerlegung) -> Fallergebnis:
         wer = (f"Auf «{ohne_platte[0]}» liegt Last, aber er liegt" if len(ohne_platte) == 1
                else f"Auf {len(ohne_platte)} Streifen liegt Last, aber sie liegen")
         heraus.meldungen.append(Meldung(f"{wer} auf keiner Platte.", tuple(ohne_platte)))
-    for (einer, mehrere), traeger in ausfall.items():
+    for warum, traeger in ausfall.items():
         namen = tuple(n for n, _ in traeger)
-        grund = (f"Der Streifen «{namen[0]}» trägt nicht – {einer}" if len(namen) == 1
-                 else f"{len(namen)} Streifen tragen nicht – {mehrere}")
+        grund = (f"Der Streifen «{namen[0]}» trägt nicht – {warum.einer}" if len(namen) == 1
+                 else f"{len(namen)} Streifen tragen nicht – {warum.mehrere}")
         F = sum(F for _, F in traeger)
         heraus.meldungen.append(Ausfall(f"{grund} {kn(F)} kN fallen aus.", namen, grund=grund, F=F))
     return heraus
@@ -408,13 +410,3 @@ def _schwerpunkt(l: Streckenlast) -> float:
         return 0.5 * L
     return L * (l.p_a + 2.0 * l.p_b) / (3.0 * (l.p_a + l.p_b))
 
-
-def _warum(traeger: Traeger) -> Tuple[str, str]:
-    """Warum ein Träger nicht trägt -- von einem gesagt und von mehreren."""
-    hoehe = [a for a in traeger.auflager if a.vertikal]
-    if not traeger.auflager:
-        return "er liegt auf nichts.", "sie liegen auf nichts."
-    if not hoehe:
-        return "nichts hält ihn in der Höhe.", "nichts hält sie in der Höhe."
-    return (f"er liegt nur auf «{hoehe[0].name}», und nichts hält seine Drehung.",
-            f"sie liegen nur auf «{hoehe[0].name}», und nichts hält ihre Drehung.")

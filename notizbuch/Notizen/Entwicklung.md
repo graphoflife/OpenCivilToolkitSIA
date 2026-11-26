@@ -7,6 +7,36 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-26 · Decke: «trägt nicht», und warum
+
+Aus dem Plan vom 2026-11-25: was auch mit Bändern nicht trägt, sagt die
+Decke grau am Ort, und der Rest rechnet.
+
+- Vorher zeigte die Lastaufteilung eine Platte nur auf zwei Wänden über
+  Eck als «je zur Hälfte», und rot stand «Platte P1: an 480 Stellen trägt
+  keine der beiden Richtungen – dort fehlt ein Lager oder ein Unterzug.»
+  Nachher ist sie grau, die Legende sagt «trägt nicht – es fehlt ein
+  Lager», und grau an der Platte: «Platte P1: auf 30.00 m² trägt keine
+  Richtung – in x liegt sie nur auf «L2», und nichts hält ihre Drehung; in
+  y liegt sie nur auf «L1», und nichts hält ihre Drehung. Dort fällt die
+  Last aus; es fehlt ein Lager oder ein Unterzug.» Fläche statt Zahl der
+  Zellen: die sagt dem Benutzer etwas.
+- Fest und Zonen bleiben, wie eingegeben. Gibt eine davon Last in eine
+  Richtung, die nicht trägt, sagt es die Meldung: «auf 8.00 m² gibt die
+  feste Aufteilung 70 % der Last in y, aber in y liegt sie auf nichts –
+  dieser Teil fällt aus.» Eine Zone gilt dafür in den Zellen, deren
+  Schwerpunkt in ihr liegt -- wie die automatische Aufteilung je Zelle
+  entscheidet.
+- Die Last solcher Stellen geht weiter je zur Hälfte in die Streifen und
+  fällt dort aus; die Probe zählt sie als nicht getragen, wie bisher.
+- Auch «… Streifen tragen nicht – … fallen aus.» je Fall ist jetzt grau:
+  es fehlt ein Lager, nichts ist falsch (Arbeitsweise, 2026-11-19).
+- Warum ein Träger nicht trägt, steht einmal, in `Traeger.warum_nicht`
+  (vorher `rechnung._warum`), in drei Wendungen: für einen Streifen, für
+  mehrere und für die Platte. Die Aufteilung rechnet dafür zuerst alle
+  Zellen mit der Lage ihres Schwerpunkts (`Zelle`), in beiden Arten der
+  Aufteilung.
+
 ## 2026-11-26 · Decke: die Mitte eines Felds teilt fliessend
 
 Vom Benutzer entschieden (2026-11-25), der erste Teil des Lastabtrags von

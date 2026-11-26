@@ -1,5 +1,5 @@
 ---
-erzeugt: bbc5873d8d10
+erzeugt: c0df48bfa7b1
 art: modul
 tags: [modul]
 ---
@@ -145,6 +145,20 @@ Wo eine Stelle auf ihrem Träger liegt -- für die Aufteilung der Last.
 - `traegt: bool`
 - `spannweite: float` – Die Spannweite des Felds, in dem sie liegt; bei einer Kragplatte das Doppelte ihrer Länge.
 - `abstand: float` – Bis zum nächsten Lager, das die Höhe hält -- null in seiner Fläche.
+- `warum: Optional['Warum'] = None` – Warum ihr Träger nicht trägt -- `None`, wenn er trägt.
+
+### Warum
+
+```python
+class Warum(NamedTuple)
+```
+
+Warum Streifen nicht tragen, in drei Wendungen: von einem gesagt, von
+mehreren und von der Platte, in der sie liegen, nach «in x».
+
+- `einer: str`
+- `mehrere: str`
+- `platte: str`
 
 ### Traeger
 
@@ -184,6 +198,14 @@ def lage(self, s: float) -> Lage
 ```
 
 Spannweite und Abstand zum Lager an der Stelle `s` (m ab dem Anfang).
+
+#### Traeger.warum_nicht
+
+```python
+def warum_nicht(self) -> Warum
+```
+
+Warum er nicht trägt: er liegt auf nichts, nichts hält ihn in der Höhe, oder nichts seine Drehung.
 
 ### Streifen
 
@@ -403,6 +425,7 @@ Ob sich zwei Flächen aus konvexen Stücken mehr als berühren.
 - `RAND = 0.0001` – So weit über sein Ende hinaus sucht ein Träger seine Lager, in m.
 - `STREIFEN_HOECHSTENS = 4000` – Mehr Streifen rechnet die Decke nicht -- sonst warten Benutzer und Browser zu lange.
 - `PARALLEL = 1e-06` – Unter diesem Winkel gelten zwei Richtungen als parallel, in rad.
+- `AUF_NICHTS = Warum('er liegt auf nichts.', 'sie liegen auf nichts.', 'liegt sie au…` – Wo an einer Stelle kein Träger ist.
 
 ## Braucht
 
