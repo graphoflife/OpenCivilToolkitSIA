@@ -1,5 +1,5 @@
 ---
-erzeugt: 8a6772af4842
+erzeugt: 33d9906e3c01
 art: modul
 tags: [modul]
 ---
@@ -247,6 +247,11 @@ im Feld plastisch, schief, mit einer Querkraft über der Hälfte von V_Rd,
 die dem Steg nimmt, und mit Torsion, die nur ein Hinweis ist; mit mehr
 Druck nach (54), mit noch mehr am wirksamen Querschnitt nach (60), und
 reiner Druck nach (55).
+
+Dazu Knicken und Kippen, wieder jede Klasse: im Feld nach (50) und (51),
+mit Kippen unter einem dreieckigen Moment; mit Druck in Klasse 3; am
+wirksamen Querschnitt nach (62) und (63); reiner Druck nach 5.3.8; und
+seitlich gehalten nur (50).
 
 
 ## Braucht

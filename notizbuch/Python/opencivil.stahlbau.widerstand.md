@@ -1,5 +1,5 @@
 ---
-erzeugt: e89267b0fdea
+erzeugt: 174a73f5d26a
 art: modul
 tags: [modul]
 ---
@@ -297,6 +297,16 @@ def elastische(stahl: Stahlquerschnitt, f: Sequence[float]) -> Widerstaende
 
 Die Widerstaende von (54): `f_y A` und je Achse `f_y W_el` bis zur weitesten Faser.
 
+### plastische
+
+```python
+def plastische(stahl: Stahlquerschnitt, f: Sequence[float]) -> Widerstaende
+```
+
+Die Widerstaende der Klassen 1 und 2, je Achse fuer sich: `f_y A` und
+je Zugseite `f_y W_pl` bei `N = 0` -- fuer das Zusammenwirken im Stab
+([[opencivil.stahlbau.stabilitaet]]).
+
 ### Gebogen
 
 ```python
@@ -420,6 +430,7 @@ gedrueckte freie Flaechen hoechstens 3.
 - `REFERENZ_55 = 'SIA 263:2013, 5.3.2, (55)'`
 - `REFERENZ_QUERKRAFT = 'SIA 263:2013, 5.1.5.1, (43); 5.1.7; 5.2.7; 5.3.6.1'`
 - `HALBE_QUERKRAFT = 0.5` – Ab welchem Anteil an `V_Rd` die Querkraft die Bleche mindert, in denen sie steht (5.1.5.1).
+- `ROHR_KLASSE_4 = 'Ein Rundrohr der Klasse 4 rechnet das Werkzeug nicht – SIA 263 nennt…` – Warum ein Rundrohr der Klasse 4 nicht gerechnet wird ([[opencivil.stahlbau.widerstand#Fall.rohr_klasse_4|Fall.rohr_klasse_4]]).
 - `KEIN_MOMENT = 0.001` – Ab welchem Moment ein Lastfall als Biegung gilt, in N·mm -- wie beim Stahlbeton ([[opencivil.nachweis.schiefe_biegung#Konstanten|KEIN_MOMENT]], dort in Nm).
 
 ## Braucht
@@ -435,3 +446,6 @@ gedrueckte freie Flaechen hoechstens 3.
 ## Gebraucht von
 
 - [[opencivil.nachweis.qa_stahl]]
+- [[opencivil.nachweis.qa_stahl_stabilitaet]]
+- [[opencivil.nachweis.qa_stahl_werte]]
+- [[opencivil.stahlbau.stabilitaet]]

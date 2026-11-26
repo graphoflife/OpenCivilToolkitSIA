@@ -1,11 +1,11 @@
 ---
-erzeugt: 36332ef1f31c
+erzeugt: b3d1a22adf63
 art: formel
 tags: [formel]
-normstelle: "SIA 263:2013, 5.3.5, (60); 4.5.3"
+normstelle: ["SIA 263:2013, 5.3.5, (60); 4.5.3", "SIA 263:2013, 5.2.6, (54); 5.2.2; 5.2.3, (52)"]
 ---
-> [!info] Normstelle
-> SIA 263:2013, 5.3.5, (60); 4.5.3
+> [!info] Normstellen
+> SIA 263:2013, 5.3.5, (60); 4.5.3 · SIA 263:2013, 5.2.6, (54); 5.2.2; 5.2.3, (52)
 
 *In der Herleitung: «Widerstand, Zug unten»*
 
@@ -29,13 +29,19 @@ $$
 M_{y,Rd}^{+} = \frac{f_y \cdot W_{eff}}{\gamma_{M1}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 3070.7\,\mathrm{cm}^{3}}{1.05} = 1038.2\,\mathrm{kNm}
 $$
 
+## Gebraucht von
+
+- [[Kippwiderstand]]
+
 ## Im Code
 
 - [[opencivil.nachweis.qa_stahl#StahlBiegungQA._wirksam|StahlBiegungQA._wirksam]]
+- [[opencivil.nachweis.qa_stahl_stabilitaet#_Herleitung._biegung|_Herleitung._biegung]]
 
 ## Themen
 
 - [[Stahlquerschnitt]]
+- [[Knicken und Kippen]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

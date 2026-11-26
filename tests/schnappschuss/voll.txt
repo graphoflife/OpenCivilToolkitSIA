@@ -2,7 +2,7 @@
 Voll
 ====================================================================================================
 
-900 Berechnungen ausgeführt, 1335 Werte bestimmt.
+901 Berechnungen ausgeführt, 1340 Werte bestimmt.
 
 ====================================================================================================
 Herleitung
@@ -7259,6 +7259,757 @@ Die beiden Gitter
 Torsionsträgheitsmoment, nach Richardson aus beiden Gittern
     I_T = \frac{4 \cdot I_{T,fein} - I_{T,grob}}{3} = \frac{4 \cdot 1.7\,\cdot 10^{6}\,\mathrm{mm}^{4} - 1.7\,\cdot 10^{6}\,\mathrm{mm}^{4}}{3} = 1.6\,\cdot 10^{6}\,\mathrm{mm}^{4}
 
+Knicken und Kippen
+------------------
+
+Erfüllungsgrad bei fester Normalkraft und fester Richtung
+    \alpha_{eff} = \frac{M_{Rd}}{M_{Ed}} \qquad M = \sqrt{M_y^2 + M_z^2}
+
+Der Querschnitt ist ein IPE 600: daraus kommen die Knickspannungskurven, die nicht gewählt sind, und
+der Druckgurt.
+
+Feld
+----
+
+Einwirkung 1. Ordnung, ohne Imperfektionen; eine Länge null heisst gehalten
+    Einwirkung und Stab     Wert
+    -------------------  -------  ---
+    N_Ed                 -1000.0  kN
+    M_y,Ed                 300.0  kNm
+    ψ_y                     0.00
+    M_z,Ed                  20.0  kNm
+    ψ_z                     1.00
+    L_K,y                   6.00  m
+    L_K,z                   3.00  m
+    L_D                     3.00  m
+
+Bleche im Fall
+    Blech                            Tabelle                                 c/t  \alpha   \psi  \text{Grenzen}\ 1 / 2 / 3  Klasse
+    -------------------------------  ------------------------  -----------------  ------  -----  -------------------------  ------
+    Profil 1: Flansch oben, links    5b                          80.0/19.0 = 4.2    0.88   0.59           8.8 / 9.8 / 13.5       1
+    Profil 1: Flansch oben, rechts   5b, freier Rand gedrückt    80.0/19.0 = 4.2    1.00   0.76           7.3 / 8.1 / 11.5       1
+    Profil 1: Flansch unten, links   5b                          80.0/19.0 = 4.2    0.00      –                  – / – / –       1
+    Profil 1: Flansch unten, rechts  5b, freier Rand gedrückt    80.0/19.0 = 4.2    0.58  -4.63         12.7 / 14.1 / 23.1       1
+    Profil 1: Steg                   5a                        514.0/12.0 = 42.8    0.63  -0.38         45.1 / 51.9 / 62.6       1
+
+Querschnittsklasse   [SIA 263:2013, 4.3.1.3; Tabellen 5a und 5b]
+    \mathrm{QK} = 1
+
+Widerstände in Klasse 1: plastisch.
+
+Druckwiderstand des Querschnitts   [SIA 263:2013, 5.1.2.1, (38)]
+    N_{Rd} = \frac{f_y \cdot A}{\gamma_{M1}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 15604\,\mathrm{mm}^{2}}{1.05} = 5275.5\,\mathrm{kN}
+
+Biegewiderstand, Zug unten   [SIA 263:2013, 5.1.3, (40)]
+    M_{y,Rd}^{+} = \frac{f_y \cdot W_{pl}}{\gamma_{M1}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 3513.8\,\mathrm{cm}^{3}}{1.05} = 1188\,\mathrm{kNm}
+
+Biegewiderstand, Zug links   [SIA 263:2013, 5.1.3, (40)]
+    M_{z,Rd}^{+} = \frac{f_y \cdot W_{pl}}{\gamma_{M1}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 485.7\,\mathrm{cm}^{3}}{1.05} = 164.2\,\mathrm{kNm}
+
+Knicklast um y   [SIA 263:2013, 4.5.1.4]
+    N_{cr,y} = \frac{\pi^2 \cdot E_a \cdot I_y}{L_{K,y}^2} = \frac{\pi^2 \cdot 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 921.2\,\cdot 10^{6}\,\mathrm{mm}^{4}}{\left(6000\,\mathrm{mm}\right)^2} = 53037\,\mathrm{kN}
+
+Schlankheit um y   [SIA 263:2013, 4.5.1.4]
+    \bar{\lambda}_{K,y} = \sqrt{\frac{f_y \cdot A}{N_{cr,y}}} = \sqrt{\frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 15604\,\mathrm{mm}^{2}}{53037\,\mathrm{kN}}} = 0.323
+
+Kurve a: schmales Walzprofil, (h − t_f)/b = 2.64 > 1.2, um die starke Achse   [SIA 263:2013, 4.5.1.5; 4.5.1.6; Figur 7; Tabelle 8]
+    \alpha_{K,y} = 0.21
+
+Beiwert um y   [SIA 263:2013, 4.5.1.3, (7); 4.5.1.4, (8); Tabelle 8]
+    \begin{aligned}
+      \Phi_{K,y} &= 0.5 \cdot \left(1 + \alpha_{K,y} \cdot \left(\bar{\lambda}_{K,y} - 0.2\right) + \bar{\lambda}_{K,y}^2\right) \\
+      &= 0.5 \cdot \left(1 + 0.21 \cdot \left(0.323 - 0.2\right) + 0.323^2\right) \\
+      &= 0.565
+    \end{aligned}
+
+Abminderung um y   [SIA 263:2013, 4.5.1.3, (7); 4.5.1.4, (8); Tabelle 8]
+    \begin{aligned}
+      \chi_{K,y} &= \min\left(1;\ \frac{1}{\Phi_{K,y} + \sqrt{\Phi_{K,y}^2 - \bar{\lambda}_{K,y}^2}}\right) \\
+      &= \min\left(1;\ \frac{1}{0.565 + \sqrt{0.565^2 - 0.323^2}}\right) \\
+      &= 0.972
+    \end{aligned}
+
+Knickwiderstand um y   [SIA 263:2013, 4.5.1.3, (7); 4.5.1.4, (8); Tabelle 8]
+    N_{K,y,Rd} = \chi_{K,y} \cdot N_{Rd} = 0.972 \cdot 5275.5\,\mathrm{kN} = 5127.9\,\mathrm{kN}
+
+Knicklast um z   [SIA 263:2013, 4.5.1.4]
+    N_{cr,z} = \frac{\pi^2 \cdot E_a \cdot I_z}{L_{K,z}^2} = \frac{\pi^2 \cdot 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 33.9\,\cdot 10^{6}\,\mathrm{mm}^{4}}{\left(3000\,\mathrm{mm}\right)^2} = 7801.1\,\mathrm{kN}
+
+Schlankheit um z   [SIA 263:2013, 4.5.1.4]
+    \bar{\lambda}_{K,z} = \sqrt{\frac{f_y \cdot A}{N_{cr,z}}} = \sqrt{\frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 15604\,\mathrm{mm}^{2}}{7801.1\,\mathrm{kN}}} = 0.843
+
+Kurve b: schmales Walzprofil, (h − t_f)/b = 2.64 > 1.2, um die schwache Achse   [SIA 263:2013, 4.5.1.5; 4.5.1.6; Figur 7; Tabelle 8]
+    \alpha_{K,z} = 0.34
+
+Beiwert um z   [SIA 263:2013, 4.5.1.3, (7); 4.5.1.4, (8); Tabelle 8]
+    \begin{aligned}
+      \Phi_{K,z} &= 0.5 \cdot \left(1 + \alpha_{K,z} \cdot \left(\bar{\lambda}_{K,z} - 0.2\right) + \bar{\lambda}_{K,z}^2\right) \\
+      &= 0.5 \cdot \left(1 + 0.34 \cdot \left(0.843 - 0.2\right) + 0.843^2\right) \\
+      &= 0.964
+    \end{aligned}
+
+Abminderung um z   [SIA 263:2013, 4.5.1.3, (7); 4.5.1.4, (8); Tabelle 8]
+    \begin{aligned}
+      \chi_{K,z} &= \min\left(1;\ \frac{1}{\Phi_{K,z} + \sqrt{\Phi_{K,z}^2 - \bar{\lambda}_{K,z}^2}}\right) \\
+      &= \min\left(1;\ \frac{1}{0.964 + \sqrt{0.964^2 - 0.843^2}}\right) \\
+      &= 0.698
+    \end{aligned}
+
+Knickwiderstand um z   [SIA 263:2013, 4.5.1.3, (7); 4.5.1.4, (8); Tabelle 8]
+    N_{K,z,Rd} = \chi_{K,z} \cdot N_{Rd} = 0.698 \cdot 5275.5\,\mathrm{kN} = 3681.2\,\mathrm{kN}
+
+Kippen um die starke Achse y, Kipplänge L_D = 3.00 m. Anhang B rechnet mit Gabellagern an den Enden
+des Felds und einer Last in der Stabachse.
+
+Beiwert der Momentenverteilung   [SIA 263:2013, Anhang B.6, (94); Figur 41]
+    \eta = 1.75 - 1.05 \cdot \psi + 0.3 \cdot \psi^2 = 1.75 - 1.05 \cdot 0 + 0.3 \cdot 0^2 = 1.75
+
+Druckgurt: der Flansch 220 × 19.0 mm und ein Drittel der gedrückten Höhe des Stegs, 93.7 × 12.0 mm.
+[*] Annahme: Der Druckgurt ohne Ausrundungen, die gedrückte Steghöhe die Hälfte der Höhe zwischen
+den Flanschen – nach Vorgabe, nicht nachgeschlagen.
+
+Fläche des Druckgurts   [SIA 263:2013, Anhang B.5, (93); Figur 40]
+    A_{g} = 5304\,\mathrm{mm}^{2}
+
+Trägheitsmoment des Druckgurts, quer zum Flansch   [SIA 263:2013, Anhang B.5, (93); Figur 40]
+    I_{g} = 16.9\,\cdot 10^{6}\,\mathrm{mm}^{4}
+
+Trägheitsradius des Druckgurts   [SIA 263:2013, Anhang B.5, (93); Figur 40]
+    i_{g} = \sqrt{\frac{I_{g}}{A_{g}}} = \sqrt{\frac{16.9\,\cdot 10^{6}\,\mathrm{mm}^{4}}{5304\,\mathrm{mm}^{2}}} = 56.4\,\mathrm{mm}
+
+Reduzierte Kipplänge   [SIA 263:2013, Anhang B.5, (93)]
+    L_{K} = \frac{L_{D}}{\sqrt{\eta}} = \frac{3000\,\mathrm{mm}}{\sqrt{1.75}} = 2267.8\,\mathrm{mm}
+
+Elastisches Widerstandsmoment um y, ganzer Querschnitt
+    W_{el} = 3070.7\,\mathrm{cm}^{3}
+
+Saint-Venant-Anteil, mit K = I_T   [SIA 263:2013, Anhang B.4, (92)]
+    \begin{aligned}
+      \sigma_{Dv} &= \frac{\eta \cdot \pi}{L_{D} \cdot W_{el}} \cdot \sqrt{G_a \cdot I_T \cdot E_a \cdot I_z} \\
+      &= \frac{1.75 \cdot \pi}{3000\,\mathrm{mm} \cdot 3070.7\,\mathrm{cm}^{3}} \cdot \sqrt{81000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 1.6\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 33.9\,\cdot 10^{6}\,\mathrm{mm}^{4}} \\
+      &= 581.7\,\mathrm{N}/\mathrm{mm}^{2}
+    \end{aligned}
+
+Wölbanteil: Knickspannung des Druckgurts nach Euler   [SIA 263:2013, Anhang B.5, (93)]
+    \sigma_{Dw} = \frac{\pi^2 \cdot E_a}{\left(L_{K} / i_{g}\right)^2} = \frac{\pi^2 \cdot 210000\,\mathrm{N}/\mathrm{mm}^{2}}{\left(2267.8\,\mathrm{mm} / 56.4\,\mathrm{mm}\right)^2} = 1282\,\mathrm{N}/\mathrm{mm}^{2}
+
+Ideelle Kippspannung   [SIA 263:2013, Anhang B.3, (91)]
+    \sigma_{cr,D} = \sqrt{\sigma_{Dv}^2 + \sigma_{Dw}^2} = \sqrt{\left(581.7\,\mathrm{N}/\mathrm{mm}^{2}\right)^2 + \left(1282\,\mathrm{N}/\mathrm{mm}^{2}\right)^2} = 1407.8\,\mathrm{N}/\mathrm{mm}^{2}
+
+Ideelles Kippmoment   [SIA 263:2013, Anhang B.1, (90)]
+    M_{cr} = W_{el} \cdot \sigma_{cr,D} = 3070.7\,\mathrm{cm}^{3} \cdot 1407.8\,\mathrm{N}/\mathrm{mm}^{2} = 4323.1\,\mathrm{kNm}
+
+Schlankheit beim Kippen, W nach der Klasse   [SIA 263:2013, 4.5.2.2, (9); 4.5.2.3, (10)]
+    \bar{\lambda}_{D} = \sqrt{\frac{W_{pl} \cdot f_y}{M_{cr}}} = \sqrt{\frac{3513.8\,\mathrm{cm}^{3} \cdot 355\,\mathrm{N}/\mathrm{mm}^{2}}{4323.1\,\mathrm{kNm}}} = 0.537
+
+Imperfektionsbeiwert eines Walzprofils   [SIA 263:2013, 4.5.2.2, (9); 4.5.2.3, (10)]
+    \alpha_{D} = 0.21
+
+Beiwert beim Kippen   [SIA 263:2013, 4.5.2.2, (9); 4.5.2.3, (10)]
+    \begin{aligned}
+      \Phi_{D} &= 0.5 \cdot \left(1 + \alpha_{D} \cdot \left(\bar{\lambda}_{D} - 0.4\right) + \bar{\lambda}_{D}^2\right) \\
+      &= 0.5 \cdot \left(1 + 0.21 \cdot \left(0.537 - 0.4\right) + 0.537^2\right) \\
+      &= 0.659
+    \end{aligned}
+
+Abminderung beim Kippen   [SIA 263:2013, 4.5.2.2, (9); 4.5.2.3, (10)]
+    \begin{aligned}
+      \chi_{D} &= \min\left(1;\ \frac{1}{\Phi_{D} + \sqrt{\Phi_{D}^2 - \bar{\lambda}_{D}^2}}\right) \\
+      &= \min\left(1;\ \frac{1}{0.659 + \sqrt{0.659^2 - 0.537^2}}\right) \\
+      &= 0.962
+    \end{aligned}
+
+Kippwiderstand   [SIA 263:2013, 4.5.2.2, (9); 4.5.2.3, (10)]
+    M_{D,Rd} = \chi_{D} \cdot M_{y,Rd}^{+} = 0.962 \cdot 1188\,\mathrm{kNm} = 1142.5\,\mathrm{kNm}
+
+Zweiachsige Biegung: für (51) mit η = 1 – σ_cr,D = 804.5 N/mm², λ̄_D = 0.711, χ_D = 0.894.
+
+Kippwiderstand für konstantes Moment   [SIA 263:2013, 5.1.10.2, (51); 5.1.10.4]
+    M_{D,Rd,min} = 1061.8\,\mathrm{kNm}
+
+Druck und zweiachsige Biegung im Stab – N_K,Rd das kleinere, M_Rd um die starke Achse M_D,Rd   [SIA 263:2013, 5.1.10.1, (50); 5.2.9]
+    \frac{N_{Ed}}{N_{K,Rd}} + \frac{\omega_y}{1 - N_{Ed}/N_{cr,y}} \cdot \frac{M_{y,Ed}}{M_{y,Rd}} + \frac{\omega_z}{1 - N_{Ed}/N_{cr,z}} \cdot \frac{M_{z,Ed}}{M_{z,Rd}} \le 1
+
+Beiwert der Momentenverteilung um y   [SIA 263:2013, 5.1.9.1; 5.1.10.3]
+    \omega_{y} = \max\left(0.4;\ 0.6 + 0.4 \cdot \psi_{y}\right) = \max\left(0.4;\ 0.6 + 0.4 \cdot 0\right) = 0.6
+
+Beiwert der Momentenverteilung um z   [SIA 263:2013, 5.1.9.1; 5.1.10.3]
+    \omega_{z} = \max\left(0.4;\ 0.6 + 0.4 \cdot \psi_{z}\right) = \max\left(0.4;\ 0.6 + 0.4 \cdot 1\right) = 1
+
+(50): wie weit die Momente wachsen dürfen   [SIA 263:2013, 5.1.10.1, (50); 5.2.9]
+    \frac{1000.0}{3681.2} + 0.60 \cdot \frac{1}{0.981} \cdot \frac{\lambda \cdot 300.0}{1142.5} + 1.00 \cdot \frac{1}{0.872} \cdot \frac{\lambda \cdot 20.0}{164.2} = 1 \quad\Rightarrow\quad \lambda = 2.426
+[i] Hinweis: Mit ω < 1 gilt (50) im Stab; den Querschnitt am Stabende mit dem grössten Moment weist
+die Tragsicherheit nach – dafür einen Lastfall mit N_Ed und diesem Moment anlegen.
+
+Doppelsymmetrisches I, Knicken aus der Ebene und Kippen nicht verhindert – y die starke Achse des Profils   [SIA 263:2013, 5.1.10.2, (51); 5.1.10.4]
+    \left(\frac{\omega_y M_{y,Ed}}{M_{y,red,Rd}}\right)^{\beta} + \left(\frac{\omega_z M_{z,Ed}}{M_{z,red,Rd}}\right)^{\beta} \le 1
+
+Exponent der Interaktion   [SIA 263:2013, 5.1.10.2, (51); 5.1.10.4]
+    \begin{aligned}
+      \beta &= \max\left(1;\ 0.4 + \frac{|N_{Ed}|}{N_{Rd}} + \frac{b}{h - t_f}\right) \\
+      &= \max\left(1;\ 0.4 + \frac{1000\,\mathrm{kN}}{5275.5\,\mathrm{kN}} + \frac{220\,\mathrm{mm}}{600\,\mathrm{mm} - 19\,\mathrm{mm}}\right) \\
+      &= 1
+    \end{aligned}
+
+Abgeminderter Widerstand um die starke Achse y   [SIA 263:2013, 5.1.10.2, (51); 5.1.10.4]
+    \begin{aligned}
+      M_{y,red,Rd} &= \min\left(M_{D,Rd,min} \cdot \left(1 - \frac{|N_{Ed}|}{N_{K,Rd,min}}\right) \cdot \left(1 - \frac{|N_{Ed}|}{N_{cr,y}}\right);\ \omega_{y} \cdot M_{D,Rd}\right) \\
+      &= \min\left(1061.8\,\mathrm{kNm} \cdot \left(1 - \frac{1000\,\mathrm{kN}}{3681.2\,\mathrm{kN}}\right) \cdot \left(1 - \frac{1000\,\mathrm{kN}}{53037\,\mathrm{kN}}\right);\ 0.6 \cdot 1142.5\,\mathrm{kNm}\right) \\
+      &= 685.5\,\mathrm{kNm}
+    \end{aligned}
+
+Abgeminderter Widerstand um die schwache Achse z   [SIA 263:2013, 5.1.10.2, (51); 5.1.10.4]
+    \begin{aligned}
+      M_{z,red,Rd} &= M_{z,Rd}^{+} \cdot \left(1 - \frac{|N_{Ed}|}{N_{K,Rd,min}}\right) \cdot \left(1 - \frac{|N_{Ed}|}{N_{cr,z}}\right) \\
+      &= 164.2\,\mathrm{kNm} \cdot \left(1 - \frac{1000\,\mathrm{kN}}{3681.2\,\mathrm{kN}}\right) \cdot \left(1 - \frac{1000\,\mathrm{kN}}{7801.1\,\mathrm{kN}}\right) \\
+      &= 104.3\,\mathrm{kNm}
+    \end{aligned}
+
+(51): wie weit die Momente wachsen dürfen – es gilt die günstigere von (50) und (51)   [SIA 263:2013, 5.1.10.2, (51); 5.1.10.4]
+    \left(\lambda \cdot 0.263\right)^{1.000} + \left(\lambda \cdot 0.192\right)^{1.000} = 1 \quad\Rightarrow\quad \lambda = 2.201
+
+Kippen allein nach (9): M_Ed ≤ M_D,Rd   [SIA 263:2013, 4.5.2.2, (9); 4.5.2.3, (10)]
+    \lambda \cdot 300.0 = 1142.5 \quad\Rightarrow\quad \lambda = 3.808
+
+Widerstand in der Richtung der Einwirkung
+    M_{Rd} = \lambda \cdot M_{Ed} = 2.426 \cdot 300.7\,\mathrm{kNm} = 729.3\,\mathrm{kNm}
+
+Erfüllungsgrad
+    \alpha_{eff,\text{Feld}} = \frac{M_{Rd}}{M_{Ed}} = \frac{729.3\,\mathrm{kNm}}{300.7\,\mathrm{kNm}} = 2.43 \quad \Rightarrow \quad \text{erfüllt}
+
+Druck mit Biegung
+-----------------
+
+Einwirkung 1. Ordnung, ohne Imperfektionen; eine Länge null heisst gehalten
+    Einwirkung und Stab     Wert
+    -------------------  -------  ---
+    N_Ed                 -3000.0  kN
+    M_y,Ed                 100.0  kNm
+    ψ_y                     1.00
+    M_z,Ed                   0.0  kNm
+    L_K,y                   6.00  m
+    L_K,z                   1.50  m
+    L_D                     1.50  m
+
+Bleche im Fall
+    Blech                            Tabelle                c/t  \alpha  \psi  \text{Grenzen}\ 1 / 2 / 3  Klasse
+    -------------------------------  -------  -----------------  ------  ----  -------------------------  ------
+    Profil 1: Flansch oben, links    5b         80.0/19.0 = 4.2    1.00  1.00           7.3 / 8.1 / 11.4       1
+    Profil 1: Flansch oben, rechts   5b         80.0/19.0 = 4.2    1.00  1.00           7.3 / 8.1 / 11.4       1
+    Profil 1: Flansch unten, links   5b         80.0/19.0 = 4.2    0.00  1.00               – / – / 11.4       1
+    Profil 1: Flansch unten, rechts  5b         80.0/19.0 = 4.2    0.00  1.00               – / – / 11.4       1
+    Profil 1: Steg                   5a       514.0/12.0 = 42.8    1.00  0.21         26.8 / 30.9 / 46.2       3
+
+Querschnittsklasse – massgebend Profil 1: Steg   [SIA 263:2013, 4.3.1.3; Tabellen 5a und 5b]
+    \mathrm{QK} = 3
+
+Widerstände in Klasse 3: elastisch (5.2.9).
+
+Druckwiderstand des Querschnitts   [SIA 263:2013, 5.1.2.1, (38)]
+    N_{Rd} = \frac{f_y \cdot A}{\gamma_{M1}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 15604\,\mathrm{mm}^{2}}{1.05} = 5275.5\,\mathrm{kN}
+
+Widerstandsmoment, Zug unten
+    W_{el} = \frac{I_y}{z} = \frac{921.2\,\cdot 10^{6}\,\mathrm{mm}^{4}}{300\,\mathrm{mm}} = 3070.7\,\mathrm{cm}^{3}
+
+Biegewiderstand, Zug unten   [SIA 263:2013, 5.2.6, (54); 5.2.2; 5.2.3, (52)]
+    M_{y,Rd}^{+} = \frac{f_y \cdot W_{el}}{\gamma_{M1}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 3070.7\,\mathrm{cm}^{3}}{1.05} = 1038.2\,\mathrm{kNm}
+
+Knicklast um y   [SIA 263:2013, 4.5.1.4]
+    N_{cr,y} = \frac{\pi^2 \cdot E_a \cdot I_y}{L_{K,y}^2} = \frac{\pi^2 \cdot 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 921.2\,\cdot 10^{6}\,\mathrm{mm}^{4}}{\left(6000\,\mathrm{mm}\right)^2} = 53037\,\mathrm{kN}
+
+Schlankheit um y   [SIA 263:2013, 4.5.1.4]
+    \bar{\lambda}_{K,y} = \sqrt{\frac{f_y \cdot A}{N_{cr,y}}} = \sqrt{\frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 15604\,\mathrm{mm}^{2}}{53037\,\mathrm{kN}}} = 0.323
+
+Kurve a: schmales Walzprofil, (h − t_f)/b = 2.64 > 1.2, um die starke Achse   [SIA 263:2013, 4.5.1.5; 4.5.1.6; Figur 7; Tabelle 8]
+    \alpha_{K,y} = 0.21
+
+Beiwert um y   [SIA 263:2013, 4.5.1.3, (7); 4.5.1.4, (8); Tabelle 8]
+    \begin{aligned}
+      \Phi_{K,y} &= 0.5 \cdot \left(1 + \alpha_{K,y} \cdot \left(\bar{\lambda}_{K,y} - 0.2\right) + \bar{\lambda}_{K,y}^2\right) \\
+      &= 0.5 \cdot \left(1 + 0.21 \cdot \left(0.323 - 0.2\right) + 0.323^2\right) \\
+      &= 0.565
+    \end{aligned}
+
+Abminderung um y   [SIA 263:2013, 4.5.1.3, (7); 4.5.1.4, (8); Tabelle 8]
+    \begin{aligned}
+      \chi_{K,y} &= \min\left(1;\ \frac{1}{\Phi_{K,y} + \sqrt{\Phi_{K,y}^2 - \bar{\lambda}_{K,y}^2}}\right) \\
+      &= \min\left(1;\ \frac{1}{0.565 + \sqrt{0.565^2 - 0.323^2}}\right) \\
+      &= 0.972
+    \end{aligned}
+
+Knickwiderstand um y   [SIA 263:2013, 4.5.1.3, (7); 4.5.1.4, (8); Tabelle 8]
+    N_{K,y,Rd} = \chi_{K,y} \cdot N_{Rd} = 0.972 \cdot 5275.5\,\mathrm{kN} = 5127.9\,\mathrm{kN}
+
+Knicklast um z   [SIA 263:2013, 4.5.1.4]
+    N_{cr,z} = \frac{\pi^2 \cdot E_a \cdot I_z}{L_{K,z}^2} = \frac{\pi^2 \cdot 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 33.9\,\cdot 10^{6}\,\mathrm{mm}^{4}}{\left(1500\,\mathrm{mm}\right)^2} = 31204.2\,\mathrm{kN}
+
+Schlankheit um z   [SIA 263:2013, 4.5.1.4]
+    \bar{\lambda}_{K,z} = \sqrt{\frac{f_y \cdot A}{N_{cr,z}}} = \sqrt{\frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 15604\,\mathrm{mm}^{2}}{31204.2\,\mathrm{kN}}} = 0.421
+
+Kurve b: schmales Walzprofil, (h − t_f)/b = 2.64 > 1.2, um die schwache Achse   [SIA 263:2013, 4.5.1.5; 4.5.1.6; Figur 7; Tabelle 8]
+    \alpha_{K,z} = 0.34
+
+Beiwert um z   [SIA 263:2013, 4.5.1.3, (7); 4.5.1.4, (8); Tabelle 8]
+    \begin{aligned}
+      \Phi_{K,z} &= 0.5 \cdot \left(1 + \alpha_{K,z} \cdot \left(\bar{\lambda}_{K,z} - 0.2\right) + \bar{\lambda}_{K,z}^2\right) \\
+      &= 0.5 \cdot \left(1 + 0.34 \cdot \left(0.421 - 0.2\right) + 0.421^2\right) \\
+      &= 0.626
+    \end{aligned}
+
+Abminderung um z   [SIA 263:2013, 4.5.1.3, (7); 4.5.1.4, (8); Tabelle 8]
+    \begin{aligned}
+      \chi_{K,z} &= \min\left(1;\ \frac{1}{\Phi_{K,z} + \sqrt{\Phi_{K,z}^2 - \bar{\lambda}_{K,z}^2}}\right) \\
+      &= \min\left(1;\ \frac{1}{0.626 + \sqrt{0.626^2 - 0.421^2}}\right) \\
+      &= 0.918
+    \end{aligned}
+
+Knickwiderstand um z   [SIA 263:2013, 4.5.1.3, (7); 4.5.1.4, (8); Tabelle 8]
+    N_{K,z,Rd} = \chi_{K,z} \cdot N_{Rd} = 0.918 \cdot 5275.5\,\mathrm{kN} = 4840.4\,\mathrm{kN}
+
+Kippen um die starke Achse y, Kipplänge L_D = 1.50 m. Anhang B rechnet mit Gabellagern an den Enden
+des Felds und einer Last in der Stabachse.
+
+Beiwert der Momentenverteilung   [SIA 263:2013, Anhang B.6, (94); Figur 41]
+    \eta = 1.75 - 1.05 \cdot \psi + 0.3 \cdot \psi^2 = 1.75 - 1.05 \cdot 1 + 0.3 \cdot 1^2 = 1
+
+Druckgurt: der Flansch 220 × 19.0 mm und ein Drittel der gedrückten Höhe des Stegs, 93.7 × 12.0 mm.
+[*] Annahme: Der Druckgurt ohne Ausrundungen, die gedrückte Steghöhe die Hälfte der Höhe zwischen
+den Flanschen – nach Vorgabe, nicht nachgeschlagen.
+
+Fläche des Druckgurts   [SIA 263:2013, Anhang B.5, (93); Figur 40]
+    A_{g} = 5304\,\mathrm{mm}^{2}
+
+Trägheitsmoment des Druckgurts, quer zum Flansch   [SIA 263:2013, Anhang B.5, (93); Figur 40]
+    I_{g} = 16.9\,\cdot 10^{6}\,\mathrm{mm}^{4}
+
+Trägheitsradius des Druckgurts   [SIA 263:2013, Anhang B.5, (93); Figur 40]
+    i_{g} = \sqrt{\frac{I_{g}}{A_{g}}} = \sqrt{\frac{16.9\,\cdot 10^{6}\,\mathrm{mm}^{4}}{5304\,\mathrm{mm}^{2}}} = 56.4\,\mathrm{mm}
+
+Reduzierte Kipplänge   [SIA 263:2013, Anhang B.5, (93)]
+    L_{K} = \frac{L_{D}}{\sqrt{\eta}} = \frac{1500\,\mathrm{mm}}{\sqrt{1}} = 1500\,\mathrm{mm}
+
+Saint-Venant-Anteil, mit K = I_T   [SIA 263:2013, Anhang B.4, (92)]
+    \begin{aligned}
+      \sigma_{Dv} &= \frac{\eta \cdot \pi}{L_{D} \cdot W_{el}} \cdot \sqrt{G_a \cdot I_T \cdot E_a \cdot I_z} \\
+      &= \frac{1 \cdot \pi}{1500\,\mathrm{mm} \cdot 3070.7\,\mathrm{cm}^{3}} \cdot \sqrt{81000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 1.6\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 33.9\,\cdot 10^{6}\,\mathrm{mm}^{4}} \\
+      &= 664.8\,\mathrm{N}/\mathrm{mm}^{2}
+    \end{aligned}
+
+Wölbanteil: Knickspannung des Druckgurts nach Euler   [SIA 263:2013, Anhang B.5, (93)]
+    \sigma_{Dw} = \frac{\pi^2 \cdot E_a}{\left(L_{K} / i_{g}\right)^2} = \frac{\pi^2 \cdot 210000\,\mathrm{N}/\mathrm{mm}^{2}}{\left(1500\,\mathrm{mm} / 56.4\,\mathrm{mm}\right)^2} = 2930.4\,\mathrm{N}/\mathrm{mm}^{2}
+
+Ideelle Kippspannung   [SIA 263:2013, Anhang B.3, (91)]
+    \sigma_{cr,D} = \sqrt{\sigma_{Dv}^2 + \sigma_{Dw}^2} = \sqrt{\left(664.8\,\mathrm{N}/\mathrm{mm}^{2}\right)^2 + \left(2930.4\,\mathrm{N}/\mathrm{mm}^{2}\right)^2} = 3004.8\,\mathrm{N}/\mathrm{mm}^{2}
+
+Ideelles Kippmoment   [SIA 263:2013, Anhang B.1, (90)]
+    M_{cr} = W_{el} \cdot \sigma_{cr,D} = 3070.7\,\mathrm{cm}^{3} \cdot 3004.8\,\mathrm{N}/\mathrm{mm}^{2} = 9227\,\mathrm{kNm}
+
+Schlankheit beim Kippen, W nach der Klasse   [SIA 263:2013, 4.5.2.2, (9); 4.5.2.3, (10)]
+    \bar{\lambda}_{D} = \sqrt{\frac{W_{el} \cdot f_y}{M_{cr}}} = \sqrt{\frac{3070.7\,\mathrm{cm}^{3} \cdot 355\,\mathrm{N}/\mathrm{mm}^{2}}{9227\,\mathrm{kNm}}} = 0.344
+
+Imperfektionsbeiwert eines Walzprofils   [SIA 263:2013, 4.5.2.2, (9); 4.5.2.3, (10)]
+    \alpha_{D} = 0.21
+
+Beiwert beim Kippen   [SIA 263:2013, 4.5.2.2, (9); 4.5.2.3, (10)]
+    \begin{aligned}
+      \Phi_{D} &= 0.5 \cdot \left(1 + \alpha_{D} \cdot \left(\bar{\lambda}_{D} - 0.4\right) + \bar{\lambda}_{D}^2\right) \\
+      &= 0.5 \cdot \left(1 + 0.21 \cdot \left(0.344 - 0.4\right) + 0.344^2\right) \\
+      &= 0.553
+    \end{aligned}
+
+Abminderung beim Kippen   [SIA 263:2013, 4.5.2.2, (9); 4.5.2.3, (10)]
+    \chi_{D} = \min\left(1;\ \frac{1}{\Phi_{D} + \sqrt{\Phi_{D}^2 - \bar{\lambda}_{D}^2}}\right) = \min\left(1;\ \frac{1}{0.553 + \sqrt{0.553^2 - 0.344^2}}\right) = 1
+
+Kippwiderstand   [SIA 263:2013, 4.5.2.2, (9); 4.5.2.3, (10)]
+    M_{D,Rd} = \chi_{D} \cdot M_{y,Rd}^{+} = 1 \cdot 1038.2\,\mathrm{kNm} = 1038.2\,\mathrm{kNm}
+
+Druck und zweiachsige Biegung im Stab – N_K,Rd das kleinere, M_Rd um die starke Achse M_D,Rd   [SIA 263:2013, 5.1.10.1, (50); 5.2.9]
+    \frac{N_{Ed}}{N_{K,Rd}} + \frac{\omega_y}{1 - N_{Ed}/N_{cr,y}} \cdot \frac{M_{y,Ed}}{M_{y,Rd}} + \frac{\omega_z}{1 - N_{Ed}/N_{cr,z}} \cdot \frac{M_{z,Ed}}{M_{z,Rd}} \le 1
+
+Klasse 3: (50) mit den elastischen Widerständen (5.2.9).
+
+Beiwert der Momentenverteilung um y   [SIA 263:2013, 5.1.9.1; 5.1.10.3]
+    \omega_{y} = \max\left(0.4;\ 0.6 + 0.4 \cdot \psi_{y}\right) = \max\left(0.4;\ 0.6 + 0.4 \cdot 1\right) = 1
+
+(50): wie weit die Momente wachsen dürfen   [SIA 263:2013, 5.1.10.1, (50); 5.2.9]
+    \frac{3000.0}{4840.4} + 1.00 \cdot \frac{1}{0.943} \cdot \frac{\lambda \cdot 100.0}{1038.2} = 1 \quad\Rightarrow\quad \lambda = 3.724
+
+Kippen allein nach (9): M_Ed ≤ M_D,Rd   [SIA 263:2013, 4.5.2.2, (9); 4.5.2.3, (10)]
+    \lambda \cdot 100.0 = 1038.2 \quad\Rightarrow\quad \lambda = 10.382
+
+Widerstand in der Richtung der Einwirkung
+    M_{Rd} = \lambda \cdot M_{Ed} = 3.724 \cdot 100\,\mathrm{kNm} = 372.4\,\mathrm{kNm}
+
+Erfüllungsgrad
+    \alpha_{eff,\text{Druck mit Biegung}} = \frac{M_{Rd}}{M_{Ed}} = \frac{372.4\,\mathrm{kNm}}{100\,\mathrm{kNm}} = 3.72 \quad \Rightarrow \quad \text{erfüllt}
+
+Beulen
+------
+
+Einwirkung 1. Ordnung, ohne Imperfektionen; eine Länge null heisst gehalten
+    Einwirkung und Stab     Wert
+    -------------------  -------  ---
+    N_Ed                 -3500.0  kN
+    M_y,Ed                  30.0  kNm
+    ψ_y                     1.00
+    M_z,Ed                   0.0  kNm
+    L_K,y                   3.00  m
+    L_K,z                   1.50  m
+    L_D                     1.50  m
+
+Bleche im Fall
+    Blech                            Tabelle                c/t  \alpha  \psi  \text{Grenzen}\ 1 / 2 / 3  Klasse
+    -------------------------------  -------  -----------------  ------  ----  -------------------------  ------
+    Profil 1: Flansch oben, links    5b         80.0/19.0 = 4.2    1.00  1.00           7.3 / 8.1 / 11.4       1
+    Profil 1: Flansch oben, rechts   5b         80.0/19.0 = 4.2    1.00  1.00           7.3 / 8.1 / 11.4       1
+    Profil 1: Flansch unten, links   5b         80.0/19.0 = 4.2    0.00  1.00               – / – / 11.4       1
+    Profil 1: Flansch unten, rechts  5b         80.0/19.0 = 4.2    0.00  1.00               – / – / 11.4       1
+    Profil 1: Steg                   5a       514.0/12.0 = 42.8    1.00  0.39         26.8 / 30.9 / 42.7       4
+
+Querschnittsklasse – massgebend Profil 1: Steg   [SIA 263:2013, 4.3.1.3; Tabellen 5a und 5b]
+    \mathrm{QK} = 4
+
+Widerstände in Klasse 4: am wirksamen Querschnitt.
+
+Mitwirkende Breite, b zwischen den theoretischen Scheibenschnittlinien   [SIA 263:2013, 4.5.3.2, (11); 4.5.3.3]
+    \bar{\lambda}_p = \frac{b/t}{28.4\, \varepsilon \sqrt{k}} \qquad \rho = \frac{0.9}{\bar{\lambda}_p} \le 1 \qquad b_{eff} = \rho\, b_c
+
+Mitwirkende Breiten bei Druck
+    Blech           b\ [\mathrm{mm}]  \psi      k  \bar{\lambda}_p   \rho  b_c\ [\mathrm{mm}]  b_{eff}\ [\mathrm{mm}]
+    --------------  ----------------  ----  -----  ---------------  -----  ------------------  ----------------------
+    Profil 1: Steg             581.0  1.00  4.000            1.048  0.859               581.0                   499.1
+[*] Annahme: Der wirksame Querschnitt entsteht in einem Schritt aus den Spannungen des
+Bruttoquerschnitts; je Blech fällt ein Streifen der gedrückten Zone weg, beim einseitig gehaltenen
+am freien Ende – nach Vorgabe, nicht nachgeschlagen.
+
+Druckwiderstand des Querschnitts   [SIA 263:2013, 5.3.2, (55); 4.5.3]
+    N_{Rd} = \frac{f_y \cdot A_{eff}}{\gamma_{M1}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 14621\,\mathrm{mm}^{2}}{1.05} = 4943.2\,\mathrm{kN}
+
+Widerstandsmoment, Zug unten
+    W_{eff} = \frac{I_{eff}}{z} = \frac{921.2\,\cdot 10^{6}\,\mathrm{mm}^{4}}{300\,\mathrm{mm}} = 3070.7\,\mathrm{cm}^{3}
+
+Biegewiderstand, Zug unten   [SIA 263:2013, 5.3.5, (60); 4.5.3]
+    M_{y,Rd}^{+} = \frac{f_y \cdot W_{eff}}{\gamma_{M1}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 3070.7\,\mathrm{cm}^{3}}{1.05} = 1038.2\,\mathrm{kNm}
+
+Widerstandsmoment, Zug links
+    W_{eff} = \frac{I_{eff}}{z} = \frac{33.9\,\cdot 10^{6}\,\mathrm{mm}^{4}}{110\,\mathrm{mm}} = 308\,\mathrm{cm}^{3}
+
+Biegewiderstand, Zug links   [SIA 263:2013, 5.3.5, (60); 4.5.3]
+    M_{z,Rd}^{+} = \frac{f_y \cdot W_{eff}}{\gamma_{M1}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 308\,\mathrm{cm}^{3}}{1.05} = 104.1\,\mathrm{kNm}
+
+Knicklast um y, am ganzen Querschnitt   [SIA 263:2013, 4.5.1.4]
+    N_{cr,y} = \frac{\pi^2 \cdot E_a \cdot I_y}{L_{K,y}^2} = \frac{\pi^2 \cdot 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 921.2\,\cdot 10^{6}\,\mathrm{mm}^{4}}{\left(3000\,\mathrm{mm}\right)^2} = 212147.9\,\mathrm{kN}
+
+Schlankheit um y   [SIA 263:2013, 4.5.1.3; 5.3.8]
+    \bar{\lambda}_{K,y} = \sqrt{\frac{f_y \cdot A_{eff}}{N_{cr,y}}} = \sqrt{\frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 14621\,\mathrm{mm}^{2}}{212147.9\,\mathrm{kN}}} = 0.156
+
+Kurve a: schmales Walzprofil, (h − t_f)/b = 2.64 > 1.2, um die starke Achse   [SIA 263:2013, 4.5.1.5; 4.5.1.6; Figur 7; Tabelle 8]
+    \alpha_{K,y} = 0.21
+
+Beiwert um y   [SIA 263:2013, 4.5.1.3, (7); 4.5.1.4, (8); Tabelle 8]
+    \begin{aligned}
+      \Phi_{K,y} &= 0.5 \cdot \left(1 + \alpha_{K,y} \cdot \left(\bar{\lambda}_{K,y} - 0.2\right) + \bar{\lambda}_{K,y}^2\right) \\
+      &= 0.5 \cdot \left(1 + 0.21 \cdot \left(0.156 - 0.2\right) + 0.156^2\right) \\
+      &= 0.508
+    \end{aligned}
+
+Abminderung um y   [SIA 263:2013, 4.5.1.3, (7); 4.5.1.4, (8); Tabelle 8]
+    \begin{aligned}
+      \chi_{K,y} &= \min\left(1;\ \frac{1}{\Phi_{K,y} + \sqrt{\Phi_{K,y}^2 - \bar{\lambda}_{K,y}^2}}\right) \\
+      &= \min\left(1;\ \frac{1}{0.508 + \sqrt{0.508^2 - 0.156^2}}\right) \\
+      &= 1
+    \end{aligned}
+
+Knickwiderstand um y   [SIA 263:2013, 4.5.1.3, (7); 4.5.1.4, (8); Tabelle 8]
+    N_{K,y,Rd} = \chi_{K,y} \cdot N_{Rd} = 1 \cdot 4943.2\,\mathrm{kN} = 4943.2\,\mathrm{kN}
+
+Knicklast um z, am ganzen Querschnitt   [SIA 263:2013, 4.5.1.4]
+    N_{cr,z} = \frac{\pi^2 \cdot E_a \cdot I_z}{L_{K,z}^2} = \frac{\pi^2 \cdot 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 33.9\,\cdot 10^{6}\,\mathrm{mm}^{4}}{\left(1500\,\mathrm{mm}\right)^2} = 31204.2\,\mathrm{kN}
+
+Schlankheit um z   [SIA 263:2013, 4.5.1.3; 5.3.8]
+    \bar{\lambda}_{K,z} = \sqrt{\frac{f_y \cdot A_{eff}}{N_{cr,z}}} = \sqrt{\frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 14621\,\mathrm{mm}^{2}}{31204.2\,\mathrm{kN}}} = 0.408
+
+Kurve b: schmales Walzprofil, (h − t_f)/b = 2.64 > 1.2, um die schwache Achse   [SIA 263:2013, 4.5.1.5; 4.5.1.6; Figur 7; Tabelle 8]
+    \alpha_{K,z} = 0.34
+
+Beiwert um z   [SIA 263:2013, 4.5.1.3, (7); 4.5.1.4, (8); Tabelle 8]
+    \begin{aligned}
+      \Phi_{K,z} &= 0.5 \cdot \left(1 + \alpha_{K,z} \cdot \left(\bar{\lambda}_{K,z} - 0.2\right) + \bar{\lambda}_{K,z}^2\right) \\
+      &= 0.5 \cdot \left(1 + 0.34 \cdot \left(0.408 - 0.2\right) + 0.408^2\right) \\
+      &= 0.619
+    \end{aligned}
+
+Abminderung um z   [SIA 263:2013, 4.5.1.3, (7); 4.5.1.4, (8); Tabelle 8]
+    \begin{aligned}
+      \chi_{K,z} &= \min\left(1;\ \frac{1}{\Phi_{K,z} + \sqrt{\Phi_{K,z}^2 - \bar{\lambda}_{K,z}^2}}\right) \\
+      &= \min\left(1;\ \frac{1}{0.619 + \sqrt{0.619^2 - 0.408^2}}\right) \\
+      &= 0.923
+    \end{aligned}
+
+Knickwiderstand um z   [SIA 263:2013, 4.5.1.3, (7); 4.5.1.4, (8); Tabelle 8]
+    N_{K,z,Rd} = \chi_{K,z} \cdot N_{Rd} = 0.923 \cdot 4943.2\,\mathrm{kN} = 4562.4\,\mathrm{kN}
+
+Kippen um die starke Achse y, Kipplänge L_D = 1.50 m. Anhang B rechnet mit Gabellagern an den Enden
+des Felds und einer Last in der Stabachse.
+
+Beiwert der Momentenverteilung   [SIA 263:2013, Anhang B.6, (94); Figur 41]
+    \eta = 1.75 - 1.05 \cdot \psi + 0.3 \cdot \psi^2 = 1.75 - 1.05 \cdot 1 + 0.3 \cdot 1^2 = 1
+
+Druckgurt: der Flansch 220 × 19.0 mm und ein Drittel der gedrückten Höhe des Stegs, 93.7 × 12.0 mm.
+[*] Annahme: Der Druckgurt ohne Ausrundungen, die gedrückte Steghöhe die Hälfte der Höhe zwischen
+den Flanschen – nach Vorgabe, nicht nachgeschlagen.
+
+Fläche des Druckgurts   [SIA 263:2013, Anhang B.5, (93); Figur 40]
+    A_{g} = 5304\,\mathrm{mm}^{2}
+
+Trägheitsmoment des Druckgurts, quer zum Flansch   [SIA 263:2013, Anhang B.5, (93); Figur 40]
+    I_{g} = 16.9\,\cdot 10^{6}\,\mathrm{mm}^{4}
+
+Trägheitsradius des Druckgurts   [SIA 263:2013, Anhang B.5, (93); Figur 40]
+    i_{g} = \sqrt{\frac{I_{g}}{A_{g}}} = \sqrt{\frac{16.9\,\cdot 10^{6}\,\mathrm{mm}^{4}}{5304\,\mathrm{mm}^{2}}} = 56.4\,\mathrm{mm}
+
+Reduzierte Kipplänge   [SIA 263:2013, Anhang B.5, (93)]
+    L_{K} = \frac{L_{D}}{\sqrt{\eta}} = \frac{1500\,\mathrm{mm}}{\sqrt{1}} = 1500\,\mathrm{mm}
+
+Elastisches Widerstandsmoment um y, ganzer Querschnitt
+    W_{el} = 3070.7\,\mathrm{cm}^{3}
+
+Ohne den Anteil nach Saint-Venant: der Querschnitt erfüllt Klasse 3 nicht   [SIA 263:2013, Anhang B.4]
+    \sigma_{Dv} = 0\,\mathrm{N}/\mathrm{mm}^{2}
+
+Wölbanteil: Knickspannung des Druckgurts nach Euler   [SIA 263:2013, Anhang B.5, (93)]
+    \sigma_{Dw} = \frac{\pi^2 \cdot E_a}{\left(L_{K} / i_{g}\right)^2} = \frac{\pi^2 \cdot 210000\,\mathrm{N}/\mathrm{mm}^{2}}{\left(1500\,\mathrm{mm} / 56.4\,\mathrm{mm}\right)^2} = 2930.4\,\mathrm{N}/\mathrm{mm}^{2}
+
+Ideelle Kippspannung   [SIA 263:2013, Anhang B.3, (91)]
+    \sigma_{cr,D} = \sqrt{\sigma_{Dv}^2 + \sigma_{Dw}^2} = \sqrt{\left(0\,\mathrm{N}/\mathrm{mm}^{2}\right)^2 + \left(2930.4\,\mathrm{N}/\mathrm{mm}^{2}\right)^2} = 2930.4\,\mathrm{N}/\mathrm{mm}^{2}
+
+Ideelles Kippmoment   [SIA 263:2013, Anhang B.1, (90)]
+    M_{cr} = W_{el} \cdot \sigma_{cr,D} = 3070.7\,\mathrm{cm}^{3} \cdot 2930.4\,\mathrm{N}/\mathrm{mm}^{2} = 8998.3\,\mathrm{kNm}
+
+Schlankheit beim Kippen, W nach der Klasse   [SIA 263:2013, 4.5.2.2, (9); 4.5.2.3, (10)]
+    \bar{\lambda}_{D} = \sqrt{\frac{W_{eff} \cdot f_y}{M_{cr}}} = \sqrt{\frac{3070.7\,\mathrm{cm}^{3} \cdot 355\,\mathrm{N}/\mathrm{mm}^{2}}{8998.3\,\mathrm{kNm}}} = 0.348
+
+Imperfektionsbeiwert eines Walzprofils   [SIA 263:2013, 4.5.2.2, (9); 4.5.2.3, (10)]
+    \alpha_{D} = 0.21
+
+Beiwert beim Kippen   [SIA 263:2013, 4.5.2.2, (9); 4.5.2.3, (10)]
+    \begin{aligned}
+      \Phi_{D} &= 0.5 \cdot \left(1 + \alpha_{D} \cdot \left(\bar{\lambda}_{D} - 0.4\right) + \bar{\lambda}_{D}^2\right) \\
+      &= 0.5 \cdot \left(1 + 0.21 \cdot \left(0.348 - 0.4\right) + 0.348^2\right) \\
+      &= 0.555
+    \end{aligned}
+
+Abminderung beim Kippen   [SIA 263:2013, 4.5.2.2, (9); 4.5.2.3, (10)]
+    \chi_{D} = \min\left(1;\ \frac{1}{\Phi_{D} + \sqrt{\Phi_{D}^2 - \bar{\lambda}_{D}^2}}\right) = \min\left(1;\ \frac{1}{0.555 + \sqrt{0.555^2 - 0.348^2}}\right) = 1
+
+Kippwiderstand   [SIA 263:2013, 4.5.2.2, (9); 4.5.2.3, (10)]
+    M_{D,Rd} = \chi_{D} \cdot M_{y,Rd}^{+} = 1 \cdot 1038.2\,\mathrm{kNm} = 1038.2\,\mathrm{kNm}
+[*] Annahme: In Klasse 4 zählt der ganze Druckgurt, obwohl Anhang B.5 nur die mitwirkenden Teile
+zulässt: ohne die übrigen wäre sein Trägheitsradius grösser – eine Vereinfachung auf der sicheren
+Seite.
+
+Klasse 4, (62) – in (63) steht der Faktor beim Glied um z   [SIA 263:2013, 5.3.9, (62), (63); 4.2.3.2, Figur 3]
+    \frac{N_{Ed}}{A_{eff}} + \frac{1}{1 - N_{Ed}/N_{cr,y}} \cdot \frac{M_{y,Ed} + N_{Ed}\,(e_{z} + w_{0,y})}{W_{y,eff}} + \frac{M_{z,Ed} + N_{Ed}\,(e_{y} + w_{0,z})}{W_{z,eff}} \le \frac{f_y}{\gamma_{M1}}
+
+Ersatzimperfektion um y, Kurve a, Spalte EE   [SIA 263:2013, 4.2.3.2, Figur 3]
+    w_{0,y} = \frac{L_{K,y}}{k_{y}} = \frac{3000\,\mathrm{mm}}{300} = 10\,\mathrm{mm}
+
+Ersatzimperfektion um z, Kurve b, Spalte EE   [SIA 263:2013, 4.2.3.2, Figur 3]
+    w_{0,z} = \frac{L_{K,z}}{k_{z}} = \frac{1500\,\mathrm{mm}}{250} = 6\,\mathrm{mm}
+[*] Annahme: Die Stablänge in Figur 3 ist die Knicklänge; χ_D mindert in (62) und (63) den
+Widerstand um die starke Achse – nach Vorgabe, nicht nachgeschlagen.
+
+(62), Widerstand um y mal 1 − N_Ed/N_cr,y: wie weit die Momente wachsen dürfen   [SIA 263:2013, 5.3.9, (62), (63); 4.2.3.2, Figur 3]
+    \frac{3500.0}{4943.2} + \frac{|\lambda \cdot 30.0 + 35.0|}{1021.1} + \frac{|21.0|}{104.1} = 1 \quad\Rightarrow\quad \lambda = 1.906
+
+(63), Widerstand um z mal 1 − N_Ed/N_cr,z: wie weit die Momente wachsen dürfen   [SIA 263:2013, 5.3.9, (62), (63); 4.2.3.2, Figur 3]
+    \frac{3500.0}{4943.2} + \frac{|\lambda \cdot 30.0 + 35.0|}{1038.2} + \frac{|21.0|}{92.4} = 1 \quad\Rightarrow\quad \lambda = 1.075
+
+Kippen allein nach (9): M_Ed ≤ M_D,Rd   [SIA 263:2013, 4.5.2.2, (9); 4.5.2.3, (10)]
+    \lambda \cdot 30.0 = 1038.2 \quad\Rightarrow\quad \lambda = 34.607
+
+Widerstand in der Richtung der Einwirkung
+    M_{Rd} = \lambda \cdot M_{Ed} = 1.075 \cdot 30\,\mathrm{kNm} = 32.3\,\mathrm{kNm}
+
+Erfüllungsgrad
+    \alpha_{eff,\text{Beulen}} = \frac{M_{Rd}}{M_{Ed}} = \frac{32.3\,\mathrm{kNm}}{30\,\mathrm{kNm}} = 1.08 \quad \Rightarrow \quad \text{erfüllt}
+
+Druck
+-----
+
+Einwirkung 1. Ordnung, ohne Imperfektionen; eine Länge null heisst gehalten
+    Einwirkung und Stab     Wert
+    -------------------  -------  ---
+    N_Ed                 -3000.0  kN
+    M_y,Ed                   0.0  kNm
+    M_z,Ed                   0.0  kNm
+    L_K,y                   6.00  m
+    L_K,z                   1.50  m
+    L_D                     1.50  m
+
+Bleche im Fall
+    Blech                            Tabelle                c/t  \alpha  \psi  \text{Grenzen}\ 1 / 2 / 3  Klasse
+    -------------------------------  -------  -----------------  ------  ----  -------------------------  ------
+    Profil 1: Flansch oben, links    5b         80.0/19.0 = 4.2    1.00  1.00           7.3 / 8.1 / 11.4       1
+    Profil 1: Flansch oben, rechts   5b         80.0/19.0 = 4.2    1.00  1.00           7.3 / 8.1 / 11.4       1
+    Profil 1: Flansch unten, links   5b         80.0/19.0 = 4.2    1.00  1.00           7.3 / 8.1 / 11.4       1
+    Profil 1: Flansch unten, rechts  5b         80.0/19.0 = 4.2    1.00  1.00           7.3 / 8.1 / 11.4       1
+    Profil 1: Steg                   5a       514.0/12.0 = 42.8    1.00  1.00         26.8 / 30.9 / 34.2       4
+
+Querschnittsklasse – massgebend Profil 1: Steg   [SIA 263:2013, 4.3.1.3; Tabellen 5a und 5b]
+    \mathrm{QK} = 4
+
+Widerstände in Klasse 4: am wirksamen Querschnitt.
+
+Mitwirkende Breite, b zwischen den theoretischen Scheibenschnittlinien   [SIA 263:2013, 4.5.3.2, (11); 4.5.3.3]
+    \bar{\lambda}_p = \frac{b/t}{28.4\, \varepsilon \sqrt{k}} \qquad \rho = \frac{0.9}{\bar{\lambda}_p} \le 1 \qquad b_{eff} = \rho\, b_c
+
+Mitwirkende Breiten bei Druck
+    Blech           b\ [\mathrm{mm}]  \psi      k  \bar{\lambda}_p   \rho  b_c\ [\mathrm{mm}]  b_{eff}\ [\mathrm{mm}]
+    --------------  ----------------  ----  -----  ---------------  -----  ------------------  ----------------------
+    Profil 1: Steg             581.0  1.00  4.000            1.048  0.859               581.0                   499.1
+[*] Annahme: Der wirksame Querschnitt entsteht in einem Schritt aus den Spannungen des
+Bruttoquerschnitts; je Blech fällt ein Streifen der gedrückten Zone weg, beim einseitig gehaltenen
+am freien Ende – nach Vorgabe, nicht nachgeschlagen.
+
+Druckwiderstand des Querschnitts   [SIA 263:2013, 5.3.2, (55); 4.5.3]
+    N_{Rd} = \frac{f_y \cdot A_{eff}}{\gamma_{M1}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 14621\,\mathrm{mm}^{2}}{1.05} = 4943.2\,\mathrm{kN}
+
+Knicklast um y, am ganzen Querschnitt   [SIA 263:2013, 4.5.1.4]
+    N_{cr,y} = \frac{\pi^2 \cdot E_a \cdot I_y}{L_{K,y}^2} = \frac{\pi^2 \cdot 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 921.2\,\cdot 10^{6}\,\mathrm{mm}^{4}}{\left(6000\,\mathrm{mm}\right)^2} = 53037\,\mathrm{kN}
+
+Schlankheit um y   [SIA 263:2013, 4.5.1.3; 5.3.8]
+    \bar{\lambda}_{K,y} = \sqrt{\frac{f_y \cdot A_{eff}}{N_{cr,y}}} = \sqrt{\frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 14621\,\mathrm{mm}^{2}}{53037\,\mathrm{kN}}} = 0.313
+
+Kurve a: schmales Walzprofil, (h − t_f)/b = 2.64 > 1.2, um die starke Achse   [SIA 263:2013, 4.5.1.5; 4.5.1.6; Figur 7; Tabelle 8]
+    \alpha_{K,y} = 0.21
+
+Beiwert um y   [SIA 263:2013, 4.5.1.3, (7); 4.5.1.4, (8); Tabelle 8]
+    \begin{aligned}
+      \Phi_{K,y} &= 0.5 \cdot \left(1 + \alpha_{K,y} \cdot \left(\bar{\lambda}_{K,y} - 0.2\right) + \bar{\lambda}_{K,y}^2\right) \\
+      &= 0.5 \cdot \left(1 + 0.21 \cdot \left(0.313 - 0.2\right) + 0.313^2\right) \\
+      &= 0.561
+    \end{aligned}
+
+Abminderung um y   [SIA 263:2013, 4.5.1.3, (7); 4.5.1.4, (8); Tabelle 8]
+    \begin{aligned}
+      \chi_{K,y} &= \min\left(1;\ \frac{1}{\Phi_{K,y} + \sqrt{\Phi_{K,y}^2 - \bar{\lambda}_{K,y}^2}}\right) \\
+      &= \min\left(1;\ \frac{1}{0.561 + \sqrt{0.561^2 - 0.313^2}}\right) \\
+      &= 0.974
+    \end{aligned}
+
+Knickwiderstand um y   [SIA 263:2013, 4.5.1.3, (7); 4.5.1.4, (8); Tabelle 8]
+    N_{K,y,Rd} = \chi_{K,y} \cdot N_{Rd} = 0.974 \cdot 4943.2\,\mathrm{kN} = 4817.1\,\mathrm{kN}
+
+Knicklast um z, am ganzen Querschnitt   [SIA 263:2013, 4.5.1.4]
+    N_{cr,z} = \frac{\pi^2 \cdot E_a \cdot I_z}{L_{K,z}^2} = \frac{\pi^2 \cdot 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 33.9\,\cdot 10^{6}\,\mathrm{mm}^{4}}{\left(1500\,\mathrm{mm}\right)^2} = 31204.2\,\mathrm{kN}
+
+Schlankheit um z   [SIA 263:2013, 4.5.1.3; 5.3.8]
+    \bar{\lambda}_{K,z} = \sqrt{\frac{f_y \cdot A_{eff}}{N_{cr,z}}} = \sqrt{\frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 14621\,\mathrm{mm}^{2}}{31204.2\,\mathrm{kN}}} = 0.408
+
+Kurve b: schmales Walzprofil, (h − t_f)/b = 2.64 > 1.2, um die schwache Achse   [SIA 263:2013, 4.5.1.5; 4.5.1.6; Figur 7; Tabelle 8]
+    \alpha_{K,z} = 0.34
+
+Beiwert um z   [SIA 263:2013, 4.5.1.3, (7); 4.5.1.4, (8); Tabelle 8]
+    \begin{aligned}
+      \Phi_{K,z} &= 0.5 \cdot \left(1 + \alpha_{K,z} \cdot \left(\bar{\lambda}_{K,z} - 0.2\right) + \bar{\lambda}_{K,z}^2\right) \\
+      &= 0.5 \cdot \left(1 + 0.34 \cdot \left(0.408 - 0.2\right) + 0.408^2\right) \\
+      &= 0.619
+    \end{aligned}
+
+Abminderung um z   [SIA 263:2013, 4.5.1.3, (7); 4.5.1.4, (8); Tabelle 8]
+    \begin{aligned}
+      \chi_{K,z} &= \min\left(1;\ \frac{1}{\Phi_{K,z} + \sqrt{\Phi_{K,z}^2 - \bar{\lambda}_{K,z}^2}}\right) \\
+      &= \min\left(1;\ \frac{1}{0.619 + \sqrt{0.619^2 - 0.408^2}}\right) \\
+      &= 0.923
+    \end{aligned}
+
+Knickwiderstand um z   [SIA 263:2013, 4.5.1.3, (7); 4.5.1.4, (8); Tabelle 8]
+    N_{K,z,Rd} = \chi_{K,z} \cdot N_{Rd} = 0.923 \cdot 4943.2\,\mathrm{kN} = 4562.4\,\mathrm{kN}
+
+Der kleinere Knickwiderstand   [SIA 263:2013, 4.5.1.3, (7); 4.5.1.4, (8); Tabelle 8]
+    N_{K,Rd} = -4562.4\,\mathrm{kN}
+
+Erfüllungsgrad
+    \alpha_{eff,\text{Druck}} = \frac{N_{K,Rd}}{N_{Ed}} = \frac{-4562.4\,\mathrm{kN}}{-3000\,\mathrm{kN}} = 1.52 \quad \Rightarrow \quad \text{erfüllt}
+
+Gehalten
+--------
+
+Einwirkung 1. Ordnung, ohne Imperfektionen; eine Länge null heisst gehalten
+    Einwirkung und Stab     Wert
+    -------------------  -------  ---
+    N_Ed                 -1000.0  kN
+    M_y,Ed                 300.0  kNm
+    ψ_y                     1.00
+    M_z,Ed                   0.0  kNm
+    L_K,y                   6.00  m
+    L_K,z                   0.00  m
+    L_D                     0.00  m
+
+Bleche im Fall
+    Blech                            Tabelle                c/t  \alpha   \psi  \text{Grenzen}\ 1 / 2 / 3  Klasse
+    -------------------------------  -------  -----------------  ------  -----  -------------------------  ------
+    Profil 1: Flansch oben, links    5b         80.0/19.0 = 4.2    1.00   1.00           7.3 / 8.1 / 11.4       1
+    Profil 1: Flansch oben, rechts   5b         80.0/19.0 = 4.2    1.00   1.00           7.3 / 8.1 / 11.4       1
+    Profil 1: Flansch unten, links   5b         80.0/19.0 = 4.2    0.00      –                  – / – / –       1
+    Profil 1: Flansch unten, rechts  5b         80.0/19.0 = 4.2    0.00      –                  – / – / –       1
+    Profil 1: Steg                   5a       514.0/12.0 = 42.8    0.74  -0.57         37.4 / 43.1 / 71.0       2
+
+Querschnittsklasse – massgebend Profil 1: Steg   [SIA 263:2013, 4.3.1.3; Tabellen 5a und 5b]
+    \mathrm{QK} = 2
+
+Widerstände in Klasse 2: plastisch.
+
+Druckwiderstand des Querschnitts   [SIA 263:2013, 5.1.2.1, (38)]
+    N_{Rd} = \frac{f_y \cdot A}{\gamma_{M1}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 15604\,\mathrm{mm}^{2}}{1.05} = 5275.5\,\mathrm{kN}
+
+Biegewiderstand, Zug unten   [SIA 263:2013, 5.1.3, (40)]
+    M_{y,Rd}^{+} = \frac{f_y \cdot W_{pl}}{\gamma_{M1}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 3513.8\,\mathrm{cm}^{3}}{1.05} = 1188\,\mathrm{kNm}
+
+Knicklast um y   [SIA 263:2013, 4.5.1.4]
+    N_{cr,y} = \frac{\pi^2 \cdot E_a \cdot I_y}{L_{K,y}^2} = \frac{\pi^2 \cdot 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 921.2\,\cdot 10^{6}\,\mathrm{mm}^{4}}{\left(6000\,\mathrm{mm}\right)^2} = 53037\,\mathrm{kN}
+
+Schlankheit um y   [SIA 263:2013, 4.5.1.4]
+    \bar{\lambda}_{K,y} = \sqrt{\frac{f_y \cdot A}{N_{cr,y}}} = \sqrt{\frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 15604\,\mathrm{mm}^{2}}{53037\,\mathrm{kN}}} = 0.323
+
+Kurve a: schmales Walzprofil, (h − t_f)/b = 2.64 > 1.2, um die starke Achse   [SIA 263:2013, 4.5.1.5; 4.5.1.6; Figur 7; Tabelle 8]
+    \alpha_{K,y} = 0.21
+
+Beiwert um y   [SIA 263:2013, 4.5.1.3, (7); 4.5.1.4, (8); Tabelle 8]
+    \begin{aligned}
+      \Phi_{K,y} &= 0.5 \cdot \left(1 + \alpha_{K,y} \cdot \left(\bar{\lambda}_{K,y} - 0.2\right) + \bar{\lambda}_{K,y}^2\right) \\
+      &= 0.5 \cdot \left(1 + 0.21 \cdot \left(0.323 - 0.2\right) + 0.323^2\right) \\
+      &= 0.565
+    \end{aligned}
+
+Abminderung um y   [SIA 263:2013, 4.5.1.3, (7); 4.5.1.4, (8); Tabelle 8]
+    \begin{aligned}
+      \chi_{K,y} &= \min\left(1;\ \frac{1}{\Phi_{K,y} + \sqrt{\Phi_{K,y}^2 - \bar{\lambda}_{K,y}^2}}\right) \\
+      &= \min\left(1;\ \frac{1}{0.565 + \sqrt{0.565^2 - 0.323^2}}\right) \\
+      &= 0.972
+    \end{aligned}
+
+Knickwiderstand um y   [SIA 263:2013, 4.5.1.3, (7); 4.5.1.4, (8); Tabelle 8]
+    N_{K,y,Rd} = \chi_{K,y} \cdot N_{Rd} = 0.972 \cdot 5275.5\,\mathrm{kN} = 5127.9\,\mathrm{kN}
+
+Um z: gehalten, L_K,z = 0 – kein Knicken um z.
+
+Druck und zweiachsige Biegung im Stab – N_K,Rd das kleinere, M_Rd um die starke Achse M_D,Rd   [SIA 263:2013, 5.1.10.1, (50); 5.2.9]
+    \frac{N_{Ed}}{N_{K,Rd}} + \frac{\omega_y}{1 - N_{Ed}/N_{cr,y}} \cdot \frac{M_{y,Ed}}{M_{y,Rd}} + \frac{\omega_z}{1 - N_{Ed}/N_{cr,z}} \cdot \frac{M_{z,Ed}}{M_{z,Rd}} \le 1
+
+Beiwert der Momentenverteilung um y   [SIA 263:2013, 5.1.9.1; 5.1.10.3]
+    \omega_{y} = \max\left(0.4;\ 0.6 + 0.4 \cdot \psi_{y}\right) = \max\left(0.4;\ 0.6 + 0.4 \cdot 1\right) = 1
+
+(50): wie weit die Momente wachsen dürfen   [SIA 263:2013, 5.1.10.1, (50); 5.2.9]
+    \frac{1000.0}{5127.9} + 1.00 \cdot \frac{1}{0.981} \cdot \frac{\lambda \cdot 300.0}{1188.0} = 1 \quad\Rightarrow\quad \lambda = 3.128
+
+Widerstand in der Richtung der Einwirkung
+    M_{Rd} = \lambda \cdot M_{Ed} = 3.128 \cdot 300\,\mathrm{kNm} = 938.3\,\mathrm{kNm}
+
+Erfüllungsgrad
+    \alpha_{eff,\text{Gehalten}} = \frac{M_{Rd}}{M_{Ed}} = \frac{938.3\,\mathrm{kNm}}{300\,\mathrm{kNm}} = 3.13 \quad \Rightarrow \quad \text{erfüllt}
+
 Baustahl: S355
 --------------
 
@@ -7280,11 +8031,11 @@ Widerstandsbeiwert für Festigkeits- und Stabilitätsnachweise   [SIA 263:2013, 
 Elastizitätsmodul des Baustahls   [SIA 263:2013, 3.2.2.1]
     E_a = 210000\,\mathrm{N}/\mathrm{mm}^{2}
 
-Dichte des Baustahls   [SIA 263:2013, 3.2.2.1]
-    \rho_a = 7850\,\mathrm{kg}/\mathrm{m}^{3}
-
 Schubmodul des Baustahls   [SIA 263:2013, 3.2.2.1]
     G_a = 81000\,\mathrm{N}/\mathrm{mm}^{2}
+
+Dichte des Baustahls   [SIA 263:2013, 3.2.2.1]
+    \rho_a = 7850\,\mathrm{kg}/\mathrm{m}^{3}
 
 Durchstanzen: Innenstütze
 -------------------------
@@ -15857,6 +16608,84 @@ Wirksames Widerstandsmoment, Zug unten
 Widerstand, Zug unten   [SIA 263:2013, 5.3.5, (60); 4.5.3]
     M_{y,Rd}^{+} = \frac{f_y \cdot W_{eff}}{\gamma_{M1}}
 
+Knicken und Kippen
+------------------
+
+Der Stab hat den gezeichneten Querschnitt. Je Fall zuerst die Klasse bei N_Ed und den Momenten 1.
+Ordnung, dann die Widerstände nach ihr: plastisch in den Klassen 1 und 2, elastisch in Klasse 3, am
+wirksamen Querschnitt in Klasse 4. Je Achse das Knicken nach der Knickspannungskurve, um die starke
+Achse das Kippen, dann das Zusammenwirken. Die Normalkraft bleibt, die Momente wachsen, bis die
+Gleichung aufgeht.
+
+Knicklast um y   [SIA 263:2013, 4.5.1.4]
+    N_{cr,y} = \frac{\pi^2 \cdot E_a \cdot I_y}{L_{K,y}^2}
+
+Schlankheit um y   [SIA 263:2013, 4.5.1.4]
+    \bar{\lambda}_{K,y} = \sqrt{\frac{f_y \cdot A}{N_{cr,y}}}
+
+Beiwert um y   [SIA 263:2013, 4.5.1.3, (7); 4.5.1.4, (8); Tabelle 8]
+    \Phi_{K,y} = 0.5 \cdot \left(1 + \alpha_{K,y} \cdot \left(\bar{\lambda}_{K,y} - 0.2\right) + \bar{\lambda}_{K,y}^2\right)
+
+Abminderung um y   [SIA 263:2013, 4.5.1.3, (7); 4.5.1.4, (8); Tabelle 8]
+    \chi_{K,y} = \min\left(1;\ \frac{1}{\Phi_{K,y} + \sqrt{\Phi_{K,y}^2 - \bar{\lambda}_{K,y}^2}}\right)
+
+Knickwiderstand um y   [SIA 263:2013, 4.5.1.3, (7); 4.5.1.4, (8); Tabelle 8]
+    N_{K,y,Rd} = \chi_{K,y} \cdot N_{Rd}
+
+Beiwert der Momentenverteilung   [SIA 263:2013, Anhang B.6, (94); Figur 41]
+    \eta = 1.75 - 1.05 \cdot \psi + 0.3 \cdot \psi^2
+
+Trägheitsradius des Druckgurts   [SIA 263:2013, Anhang B.5, (93); Figur 40]
+    i_{g} = \sqrt{\frac{I_{g}}{A_{g}}}
+
+Reduzierte Kipplänge   [SIA 263:2013, Anhang B.5, (93)]
+    L_{K} = \frac{L_{D}}{\sqrt{\eta}}
+
+Saint-Venant-Anteil, mit K = I_T   [SIA 263:2013, Anhang B.4, (92)]
+    \sigma_{Dv} = \frac{\eta \cdot \pi}{L_{D} \cdot W_{el}} \cdot \sqrt{G_a \cdot I_T \cdot E_a \cdot I_z}
+
+Wölbanteil: Knickspannung des Druckgurts nach Euler   [SIA 263:2013, Anhang B.5, (93)]
+    \sigma_{Dw} = \frac{\pi^2 \cdot E_a}{\left(L_{K} / i_{g}\right)^2}
+
+Ideelle Kippspannung   [SIA 263:2013, Anhang B.3, (91)]
+    \sigma_{cr,D} = \sqrt{\sigma_{Dv}^2 + \sigma_{Dw}^2}
+
+Ideelles Kippmoment   [SIA 263:2013, Anhang B.1, (90)]
+    M_{cr} = W_{el} \cdot \sigma_{cr,D}
+
+Schlankheit beim Kippen, W nach der Klasse   [SIA 263:2013, 4.5.2.2, (9); 4.5.2.3, (10)]
+    \bar{\lambda}_{D} = \sqrt{\frac{W_{pl} \cdot f_y}{M_{cr}}}
+
+Beiwert beim Kippen   [SIA 263:2013, 4.5.2.2, (9); 4.5.2.3, (10)]
+    \Phi_{D} = 0.5 \cdot \left(1 + \alpha_{D} \cdot \left(\bar{\lambda}_{D} - 0.4\right) + \bar{\lambda}_{D}^2\right)
+
+Kippwiderstand   [SIA 263:2013, 4.5.2.2, (9); 4.5.2.3, (10)]
+    M_{D,Rd} = \chi_{D} \cdot M_{y,Rd}^{+}
+
+Druck und zweiachsige Biegung im Stab – N_K,Rd das kleinere, M_Rd um die starke Achse M_D,Rd   [SIA 263:2013, 5.1.10.1, (50); 5.2.9]
+    \frac{N_{Ed}}{N_{K,Rd}} + \frac{\omega_y}{1 - N_{Ed}/N_{cr,y}} \cdot \frac{M_{y,Ed}}{M_{y,Rd}} + \frac{\omega_z}{1 - N_{Ed}/N_{cr,z}} \cdot \frac{M_{z,Ed}}{M_{z,Rd}} \le 1
+
+Beiwert der Momentenverteilung um y   [SIA 263:2013, 5.1.9.1; 5.1.10.3]
+    \omega_{y} = \max\left(0.4;\ 0.6 + 0.4 \cdot \psi_{y}\right)
+
+Doppelsymmetrisches I, Knicken aus der Ebene und Kippen nicht verhindert – y die starke Achse des Profils   [SIA 263:2013, 5.1.10.2, (51); 5.1.10.4]
+    \left(\frac{\omega_y M_{y,Ed}}{M_{y,red,Rd}}\right)^{\beta} + \left(\frac{\omega_z M_{z,Ed}}{M_{z,red,Rd}}\right)^{\beta} \le 1
+
+Exponent der Interaktion   [SIA 263:2013, 5.1.10.2, (51); 5.1.10.4]
+    \beta = \max\left(1;\ 0.4 + \frac{|N_{Ed}|}{N_{Rd}} + \frac{b}{h - t_f}\right)
+
+Abgeminderter Widerstand um die starke Achse y   [SIA 263:2013, 5.1.10.2, (51); 5.1.10.4]
+    M_{y,red,Rd} = \min\left(M_{D,Rd,min} \cdot \left(1 - \frac{|N_{Ed}|}{N_{K,Rd,min}}\right) \cdot \left(1 - \frac{|N_{Ed}|}{N_{cr,y}}\right);\ \omega_{y} \cdot M_{D,Rd}\right)
+
+Abgeminderter Widerstand um die schwache Achse z   [SIA 263:2013, 5.1.10.2, (51); 5.1.10.4]
+    M_{z,red,Rd} = M_{z,Rd}^{+} \cdot \left(1 - \frac{|N_{Ed}|}{N_{K,Rd,min}}\right) \cdot \left(1 - \frac{|N_{Ed}|}{N_{cr,z}}\right)
+
+Klasse 4, (62) – in (63) steht der Faktor beim Glied um z   [SIA 263:2013, 5.3.9, (62), (63); 4.2.3.2, Figur 3]
+    \frac{N_{Ed}}{A_{eff}} + \frac{1}{1 - N_{Ed}/N_{cr,y}} \cdot \frac{M_{y,Ed} + N_{Ed}\,(e_{z} + w_{0,y})}{W_{y,eff}} + \frac{M_{z,Ed} + N_{Ed}\,(e_{y} + w_{0,z})}{W_{z,eff}} \le \frac{f_y}{\gamma_{M1}}
+
+Ersatzimperfektion um y, Kurve a, Spalte EE   [SIA 263:2013, 4.2.3.2, Figur 3]
+    w_{0,y} = \frac{L_{K,y}}{k_{y}}
+
 Durchstanzen
 ------------
 
@@ -17223,6 +18052,11 @@ Angaben zum Querschnitt
     Querkraft                Druck mit Biegung                                  –                              –        \infty
     Querkraft                Beulen                                             –                              –        \infty
     Querkraft                Druck                                              –                              –        \infty
+    Knicken und Kippen       Feld                    M_{Rd} = 729.3\,\mathrm{kNm}   M_{Ed} = 300.7\,\mathrm{kNm}          2.43
+    Knicken und Kippen       Druck mit Biegung       M_{Rd} = 372.4\,\mathrm{kNm}   M_{Ed} = 100.0\,\mathrm{kNm}          3.72
+    Knicken und Kippen       Beulen                   M_{Rd} = 32.3\,\mathrm{kNm}    M_{Ed} = 30.0\,\mathrm{kNm}          1.08
+    Knicken und Kippen       Druck                N_{K,Rd} = -4562.4\,\mathrm{kN}  N_{Ed} = -3000.0\,\mathrm{kN}          1.52
+    Knicken und Kippen       Gehalten                M_{Rd} = 938.3\,\mathrm{kNm}   M_{Ed} = 300.0\,\mathrm{kNm}          3.13
 [i] Hinweis: Querkraft – Druck mit Biegung, Querkraft – Beulen, Querkraft – Druck: Keine Einwirkung
 → kein Nachweis.
 
@@ -19048,6 +19882,11 @@ Werte
     Querschnittsklasse bei Biegung, Zug oben                                                  \mathrm{QK}_{y}^{-}                                            1            berechnet
     Querschnittsklasse bei Biegung, Zug rechts                                                \mathrm{QK}_{z}^{-}                                            1            berechnet
     Querschnittsklasse bei Biegung, Zug unten                                                 \mathrm{QK}_{y}^{+}                                            1            berechnet
+    Erfüllungsgrad Knicken und Kippen – Beulen                                                \alpha_{eff,\text{Beulen}}                                  1.08            berechnet
+    Erfüllungsgrad Knicken und Kippen – Druck                                                 \alpha_{eff,\text{Druck}}                                   1.52            berechnet
+    Erfüllungsgrad Knicken und Kippen – Druck mit Biegung                                     \alpha_{eff,\text{Druck mit Biegung}}                       3.72            berechnet
+    Erfüllungsgrad Knicken und Kippen – Feld                                                  \alpha_{eff,\text{Feld}}                                    2.43            berechnet
+    Erfüllungsgrad Knicken und Kippen – Gehalten                                              \alpha_{eff,\text{Gehalten}}                                3.13            berechnet
     Erfüllungsgrad Biegung und Normalkraft – Beulen                                           \alpha_{eff,\text{Beulen}}                                  3.96            berechnet
     Erfüllungsgrad Biegung und Normalkraft – Druck                                            \alpha_{eff,\text{Druck}}                                   1.24            berechnet
     Erfüllungsgrad Biegung und Normalkraft – Druck mit Biegung                                \alpha_{eff,\text{Druck mit Biegung}}                       4.48            berechnet

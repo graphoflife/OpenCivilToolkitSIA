@@ -1,5 +1,5 @@
 ---
-erzeugt: cdfbbf5d1861
+erzeugt: 420e59318060
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -39,6 +39,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Duktilität je Richtung]] · 4
 - [[Sprödes Versagen je Richtung]] · 11
 - [[Stahlquerschnitt]] · 11
+- [[Knicken und Kippen]] · 31
 
 **Balkensysteme**
 
@@ -78,6 +79,9 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 ## Formeln von A bis Z
 
 - [[Abgeminderte Bettung am Terrain]]
+- [[Abgeminderter Biegewiderstand um die schwache Achse]] · $M_{z,red,Rd}$
+- [[Abgeminderter Kippwiderstand im Stab]] · $M_{y,red,Rd}$
+- [[Abminderungsfaktor beim Knicken und Kippen]] · $\chi_{K,y}$
 - [[Abstand des Grundwassers unter der Sohle]] · $T$
 - [[Abstand zum Momentennullpunkt]] · $r_{sx}$
 - [[Abstand zum Momentennullpunkt am Plattenrand]] · $r_{sy}$
@@ -104,6 +108,10 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Beiwert k_r]] · $k_r$
 - [[Beiwert zur Berücksichtigung der Festigkeitsminderung]] · $\eta_{fc}$
 - [[Beiwert ε der Grenzschlankheiten]]
+- [[Beiwert η der Momentenverteilung beim Kippen]] · $\eta$
+- [[Beiwert Φ beim Kippen]] · $\Phi_{D}$
+- [[Beiwert Φ beim Knicken]] · $\Phi_{K,y}$
+- [[Beiwert ω der Momentenverteilung]] · $\omega_{y}$
 - [[Bemessungsspektrum (31)]] · $S_{d,x}$
 - [[Bemessungsspektrum (32)]] · $S_{d,x}$
 - [[Bemessungsspektrum (33)]] · $S_{d,y}$
@@ -166,6 +174,9 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Dickster Stab der Lage]] · $\varnothing_{2,x}$
 - [[Drehfeder des Pfahlkopfs]] · $K_{MM}$
 - [[Drehung in die Achsen des Stabs]]
+- [[Druck und Biegung am wirksamen Querschnitt im Stab]]
+- [[Druck und zweiachsige Biegung im doppelsymmetrischen I-Stab]]
+- [[Druck und zweiachsige Biegung im Stab]]
 - [[Druckzonenhöhe aus dem Kräftegleichgewicht]] · $x^{+}$
 - [[Druckzonenhöhe im Stützstreifen]] · $x_x$
 - [[Durchmesser des flächengleichen Kreises]] · $b$
@@ -180,9 +191,11 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Erdwiderstand je Meter Pfahl]]
 - [[Erfüllungsgrad]] · $\alpha_{eff,x}$
 - [[Erfüllungsgrad bei fester Normalkraft und fester Richtung]]
+- [[Ersatzimperfektion des Stabs]] · $w_{0,y}$
 - [[Ersatzkraft]] · $F_{d,x}$
 - [[Ersatzkraft eines Geschosses]]
 - [[Erweiterte Tragfähigkeitsformel]]
+- [[Exponent β der Interaktion]] · $\beta$
 - [[Feder am Pfahlfuss]] · $K_b$
 - [[Feder am Pfahlmantel]]
 - [[Fiktiver Durchmesser einer verschmierten Linie]] · $\varnothing_{fikt}$
@@ -254,11 +267,16 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Hebelarm der inneren Kräfte]] · $z$
 - [[Hilfsgrösse der Nulllinie]] · $\rho$
 - [[Höhe der Distanzhalter]] · $h_{Dist}$
+- [[Ideelle Kippspannung]] · $\sigma_{cr,D}$
+- [[Ideelles Kippmoment]] · $M_{cr}$
 - [[Innerer Hebelarm]] · $z$
 - [[Innerer Widerstand des Pfahls]] · $R_{i,d}$
 - [[Iteration der Ausmitte 2. Ordnung]]
 - [[Kippmoment am Fuss]] · $M_{0,x}$
+- [[Kippwiderstand]] · $M_{D,Rd}$
 - [[Kleinerer Widerstand beider Seiten]] · $V_{Rd,max}$
+- [[Knicklast nach Euler]] · $N_{cr,y}$
+- [[Knickwiderstand]] · $N_{K,y,Rd}$
 - [[Kohäsion für örtliches Abscheren]] · $c^{*}$
 - [[Kopplung am Pfahlkopf]] · $K_{HM}$
 - [[Kraft einer Wand – ihr Schubfluss über ihre Länge]]
@@ -337,6 +355,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Radius des Bewehrungskreises]] · $r_s$
 - [[Raumlast im Gleitkörper]] · $\gamma_G$
 - [[Raumlast unter Auftrieb]] · $\gamma'$
+- [[Reduzierte Kipplänge]] · $L_{K}$
 - [[Reibungswinkel der Sohlfuge]] · $\delta_k$
 - [[Reibungswinkel für örtliches Abscheren]] · $\varphi^{*}$
 - [[Reichweite des Gleitkörpers]] · $L_{Gl}$
@@ -348,7 +367,10 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Rissmoment des ungerissenen Querschnitts]] · $M_{Riss}$
 - [[Rissmoment des ungerissenen, vorgespannten Querschnitts]] · $M_{Riss}$
 - [[Rissnormalkraft beim Moment]] · $N_{Riss}(M)$
+- [[Saint-Venant-Anteil der Kippspannung]] · $\sigma_{Dv}$
 - [[Schiefstellung]] · $\alpha_i$
+- [[Schlankheit beim Kippen]] · $\bar{\lambda}_{D}$
+- [[Schlankheit beim Knicken]] · $\bar{\lambda}_{K,y}$
 - [[Schnittgrössen aus der Spannungsverteilung]]
 - [[Schnittgrössen eines Stabs im Raum]]
 - [[Schnittgrössen längs eines Stabs]]
@@ -404,6 +426,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Tragfähigkeitsfaktor N_γ]] · $N_{\gamma}$
 - [[Tragfähigkeitsformel undrainiert]]
 - [[Trägheitsmomente eines Polygons, bezogen auf den Schwerpunkt]]
+- [[Trägheitsradius des Druckgurts]] · $i_{g}$
 - [[Überlagerung auf Höhe der Sohle]] · $\sigma_{v,0}$
 - [[Umfang des Pfahls]] · $U$
 - [[Ungewollte Ausmitte]] · $e_{0d}$
@@ -439,6 +462,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Wirksame Zugfestigkeit]] · $f_{ct,eff}$
 - [[Wirksamer Elastizitätsmodul]] · $E_{c,eff}$
 - [[Wirksamer Umfang des Nachweisschnitts]] · $u$
+- [[Wölbanteil der Kippspannung]] · $\sigma_{Dw}$
 - [[Zerlegung eines Stabs im Raum]]
 - [[Zulässige Dehnung]] · $\varepsilon_{s,adm}$
 - [[Zulässige Stahlspannung]] · $\sigma_{s,adm}$
@@ -447,7 +471,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 ## Normstelle fehlt noch
 
-130 von 367 Formeln haben im Code keine Normstelle – meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle – von dort kommt sie in Bericht und Notizbuch.
+130 von 390 Formeln haben im Code keine Normstelle – meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle – von dort kommt sie in Bericht und Notizbuch.
 
 - [[Achsen eines Stabs im Raum]] · [[opencivil.stabwerk3d.herleitung|_ansaetze]]
 - [[Äquivalenter E-Modul eines Stabs]] · [[opencivil.spannungsanalyse.modul#ModulProzedur|ModulProzedur._schreiben]]
@@ -481,7 +505,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Eigengewicht eines Stabs]] · [[opencivil.stabwerk.rechnung#_gewicht_je_meter|_gewicht_je_meter]]
 - [[Einwirkung im normierten Diagramm]] · [[opencivil.nachweis.biegung_normalkraft#BiegungNormalkraft._protokoll_naechster|BiegungNormalkraft._protokoll_naechster]]
 - [[Erfüllungsgrad]] · [[opencivil.core.nachweis#Vergleich.zeile|Vergleich.zeile]]
-- [[Erfüllungsgrad bei fester Normalkraft und fester Richtung]] · [[opencivil.nachweis.qa_stahl#StahlBiegungQA|StahlBiegungQA._ansatz]], [[opencivil.nachweis.schiefe_biegung#SchiefeBiegung|SchiefeBiegung._protokoll_ansatz]]
+- [[Erfüllungsgrad bei fester Normalkraft und fester Richtung]] · [[opencivil.nachweis.qa_stahl#StahlBiegungQA|StahlBiegungQA._ansatz]], [[opencivil.nachweis.qa_stahl_stabilitaet#StahlStabilitaetQA.pruefe|StahlStabilitaetQA.pruefe]], [[opencivil.nachweis.schiefe_biegung#SchiefeBiegung|SchiefeBiegung._protokoll_ansatz]]
 - [[Fiktiver Durchmesser einer verschmierten Linie]] · [[opencivil.nachweis.stabgrenzen#_protokoll_fiktiv|_protokoll_fiktiv]]
 - [[Fläche der Längsbewehrung]] · [[opencivil.pfahl.innen#InnererWiderstand|InnererWiderstand._bohrpfahl]]
 - [[Fläche eines Doppel-T-Querschnitts]] · [[opencivil.stabwerk.querschnitte]]
@@ -574,7 +598,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Widerstand bei festgehaltenem M_Ed]] · [[opencivil.nachweis.resistenzlinie#Handlinie.protokoll_treffer|Handlinie.protokoll_treffer]]
 - [[Widerstand bei festgehaltenem N_Ed]] · [[opencivil.nachweis.resistenzlinie#Handlinie.protokoll_treffer|Handlinie.protokoll_treffer]]
 - [[Widerstand im normierten Diagramm]] · [[opencivil.nachweis.biegung_normalkraft#BiegungNormalkraft._protokoll_naechster|BiegungNormalkraft._protokoll_naechster]]
-- [[Widerstandsmoment bis zur weitesten Faser]] · [[opencivil.nachweis.qa_stahl#StahlBiegungQA._wirksam|StahlBiegungQA._wirksam]]
+- [[Widerstandsmoment bis zur weitesten Faser]] · [[opencivil.nachweis.qa_stahl#StahlBiegungQA._wirksam|StahlBiegungQA._wirksam]], [[opencivil.nachweis.qa_stahl_stabilitaet#_Herleitung._biegung|_Herleitung._biegung]]
 - [[Widerstandsmoment zum gezogenen Rand]] · [[opencivil.spannungsanalyse.riss#Bruttoriss.herleitung_riss|Bruttoriss.herleitung_riss]]
 - [[Widerstandsmoment zum gezogensten Betonpunkt]] · [[opencivil.nachweis.rissgroessen#protokoll_widerstandsmoment|protokoll_widerstandsmoment]]
 - [[Zerlegung eines Stabs im Raum]] · [[opencivil.stabwerk3d.herleitung|_ansaetze]]

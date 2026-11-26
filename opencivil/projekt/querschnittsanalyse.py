@@ -6,7 +6,8 @@ Der :class:`QuerschnittsanalyseEintrag`: Knoten, Polygone mit Material,
 Stahlprofile (:mod:`opencivil.projekt.profile`), Staebe und Stablinien,
 Spannglieder (:mod:`opencivil.projekt.spannglieder`), Schubwaende,
 Hilfslinien, die Wahl der Werkstoffgesetze, die
-Lastfaelle und die Schalter der Nachweise -- als eine speicherbare
+Lastfaelle, die Faelle von Knicken und Kippen beim Stahl
+(:mod:`opencivil.projekt.stabilitaet`) und die Schalter der Nachweise -- als eine speicherbare
 Datenklasse, wie die Platte in :mod:`opencivil.projekt.platte`. Dazu die
 Vorlage einer frischen Analyse und ein Baukasten, der ohne Oberflaeche
 zeichnet (:meth:`QuerschnittsanalyseEintrag.polygon` und folgende).
@@ -58,6 +59,8 @@ from opencivil.projekt.lesen import (
 from opencivil.projekt.netz import Netz, neue_kennung
 from opencivil.projekt.profile import ProfilEintrag
 from opencivil.projekt.spannglieder import SpanngliedEintrag
+from opencivil.projekt.stabilitaet import QAStabilitaetEintrag
+from opencivil.stahlbau.stabilitaet import Knickkurve, Stabfall
 from opencivil.stahlprofile import lage as profillage
 from opencivil.stahlprofile import tabelle as profiltabelle
 
@@ -459,6 +462,18 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben, JeMaterial):
     knickfaelle: List[QAKnickEintrag] = field(default_factory=list)
     """Knicknachweise, je in einer Richtung; leer heisst: keiner."""
 
+    stabilitaetsfaelle: List[QAStabilitaetEintrag] = field(default_factory=list)
+    """Knicken und Kippen eines Stabs aus Stahl (SIA 263); leer heisst: keiner."""
+
+    knickkurve_y: Knickkurve = Knickkurve.PROFIL
+    knickkurve_z: Knickkurve = Knickkurve.PROFIL
+    """
+    Die Knickspannungskurven um y und um z: die, die Figur 7 dem Profil
+    zuweist -- nur fuer einen Querschnitt aus einem einzigen Profil -- oder
+    eine gewaehlte. Sie gelten fuer alle Faelle: die Kurve gehoert zum
+    Querschnitt, nicht zum Fall.
+    """
+
     spannungsfaelle: List[QASpannungsfallEintrag] = field(default_factory=list)
     """Die Spannung-Dehnung-Analysen -- kein Nachweis, ein Blick in den Querschnitt."""
 
@@ -730,6 +745,7 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben, JeMaterial):
             self.quasistaendig.namensliste("quasistaendig", self.lastfaelle, "quasi-ständige"),
             spannungsfallnamen(self.spannungsfaelle),
             Fallnamen.aus("knickfaelle", "Knicknachweis", self.knickfaelle),
+            Fallnamen.aus("stabilitaetsfaelle", "Stabilitätsnachweis", self.stabilitaetsfaelle),
         ]
 
     def lastfall(self, name: str, **werte: float) -> QALastfallEintrag:
@@ -748,6 +764,26 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben, JeMaterial):
              "knicklaenge": laenge if knicklaenge is None else knicklaenge,
              "richtung": richtung}, f"{ort_von(self)}, knickfaelle")
         self.knickfaelle.append(eintrag)
+        return eintrag
+
+    @property
+    def knickkurven(self) -> Dict[str, Knickkurve]:
+        """Die Wahl der Knickspannungskurven, je Achse."""
+        return {"y": self.knickkurve_y, "z": self.knickkurve_z}
+
+    def stabfaelle(self) -> List[Stabfall]:
+        """Die eingeschalteten Faelle von Knicken und Kippen, in SI."""
+        return [f.stabfall() for f in self.stabilitaetsfaelle if f.aktiv]
+
+    def stabilitaetsfall(self, name: str, **werte: float) -> QAStabilitaetEintrag:
+        """
+        Ein Fall von Knicken und Kippen -- N_Ed in kN (Druck negativ), die
+        Momente in kNm, die Laengen in m; die Felder wie
+        :class:`QAStabilitaetEintrag`.
+        """
+        eintrag = QAStabilitaetEintrag.aus_dict({"name": name, **werte},
+                                                f"{ort_von(self)}, stabilitaetsfaelle")
+        self.stabilitaetsfaelle.append(eintrag)
         return eintrag
 
     def spannungsfall(self, name: str, *, art: str = "schnittgroessen",

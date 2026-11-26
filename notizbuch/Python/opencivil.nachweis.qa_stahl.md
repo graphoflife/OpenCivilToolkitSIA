@@ -1,5 +1,5 @@
 ---
-erzeugt: 82f4020bb177
+erzeugt: 5d7444108506
 art: modul
 tags: [modul]
 ---
@@ -126,14 +126,16 @@ def _linear(self, p: Protokoll, werte: Zwischenwerte, x: wd.Fall, N_Ed: Wert, M_
 
 (54) in Klasse 3, (60) in Klasse 4 -- als Widerstaende geschrieben, mit `λ`.
 
-### _glied
+### glied_text
 
 ```python
-def _glied(g: wd.Glied, faktor: float, mit_lambda: bool) -> str
+def glied_text(g: wd.Glied, faktor: float, mit_lambda: bool) -> str
 ```
 
-Ein Glied von (54) oder (60) als Bruch mit Zahlen -- ohne den Anteil mit
-`λ`, wo `mit_lambda` falsch ist; leer, wo nichts bleibt.
+Ein Glied von (54) oder (60) -- und von (62) und (63) im Stab
+([[opencivil.nachweis.qa_stahl_stabilitaet]]) -- als Bruch mit Zahlen:
+ohne den Anteil mit `λ`, wo `mit_lambda` falsch ist; leer, wo nichts
+bleibt.
 
 ### StahlQuerkraftQA
 
@@ -179,6 +181,7 @@ def pruefe(self, e: Eingaben, p: Protokoll)
 
 ## Gebraucht von
 
+- [[opencivil.nachweis.qa_stahl_stabilitaet]]
 - [[opencivil.projekt.aufbau.querschnittsanalyse]]
 
 ## Formeln aus diesem Modul

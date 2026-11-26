@@ -221,6 +221,19 @@ export function ohneAnalysenVon(kennung) {
   return bauweisenangabe(kennung, 'ohne_analysen');
 }
 
+/**
+ * Was der Kern zu den Knickspannungskurven sagt: `eigene` je Achse die des
+ * einzigen Profils, `{kurve, grund}` -- leer, wo der Querschnitt mehr ist
+ * als ein Profil --, `fehlen` als Satz, welche den Fällen von Knicken und
+ * Kippen fehlt, leer, wo keine fehlt.
+ */
+export function knickkurvenVon(kennung) {
+  return {
+    eigene: bauweisenangabe(kennung, 'knickkurven'),
+    fehlen: bauweisenangabe(kennung, 'knickkurven_fehlen'),
+  };
+}
+
 // ===========================================================================
 // Der Adapter
 // ===========================================================================
@@ -312,9 +325,10 @@ function adapter(kennung) {
       a.qa.namen = new Map([antwort.polygone, antwort.profile, antwort.staebe, antwort.spannglieder,
         antwort.linien, antwort.waende, antwort.hilfslinien].flatMap((liste) => (liste || []).map((x) => [x.kennung, x.element])));
       // Aus Holz oder Stahl statt Beton: die Analyse zeigt andere Kacheln
-      // (`bauweiseVon`, `ohneNachweiseVon`, `ohneAnalysenVon`).
+      // (`bauweiseVon`, `ohneNachweiseVon`, `ohneAnalysenVon`) -- und der
+      // Kachel «Knicken und Kippen» fehlt eine Kurve oder nicht mehr.
       const vorher = a.adapter.kern.antwort;
-      a.qa.andereKacheln = ['bauweise', 'ohne_nachweise', 'ohne_analysen']
+      a.qa.andereKacheln = ['bauweise', 'ohne_nachweise', 'ohne_analysen', 'knickkurven_fehlen']
         .some((s) => antwort[s] !== (vorher?.[s] ?? ''));
       return antwort;
     },

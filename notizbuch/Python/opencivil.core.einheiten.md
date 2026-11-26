@@ -1,5 +1,5 @@
 ---
-erzeugt: ac26d9a7a608
+erzeugt: 542c741834fa
 art: modul
 tags: [modul]
 ---
@@ -478,6 +478,7 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - [[opencivil.nachweis.qa_kennzahlen]]
 - [[opencivil.nachweis.qa_stahl]]
 - [[opencivil.nachweis.qa_stahl_kennzahlen]]
+- [[opencivil.nachweis.qa_stahl_stabilitaet]]
 - [[opencivil.nachweis.querkraft]]
 - [[opencivil.nachweis.querkraft_buegel]]
 - [[opencivil.nachweis.querkraft_ohne_buegel]]
@@ -511,6 +512,7 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - [[opencivil.projekt.querschnittsanalyse]]
 - [[opencivil.projekt.setzung]]
 - [[opencivil.projekt.spannglieder]]
+- [[opencivil.projekt.stabilitaet]]
 - [[opencivil.projekt.staebe]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.lagenaufbau]]

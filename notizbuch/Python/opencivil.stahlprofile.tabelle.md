@@ -1,5 +1,5 @@
 ---
-erzeugt: 8aa20e41efcf
+erzeugt: 0f95a4355411
 art: modul
 tags: [modul]
 ---
@@ -134,6 +134,7 @@ Das Profil dieses Namens -- ein unbekannter ist ein `KeyError`, der es sagt.
 - [[opencivil.projekt.querschnittsanalyse]]
 - [[opencivil.projekt.staebe]]
 - [[opencivil.stahlbau.schub]]
+- [[opencivil.stahlbau.stabilitaet]]
 - [[opencivil.stahlprofile.bleche]]
 - [[opencivil.stahlprofile.lage]]
 - [[opencivil.web.api]]

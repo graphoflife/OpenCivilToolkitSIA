@@ -1,5 +1,5 @@
 ---
-erzeugt: 7519d42f3360
+erzeugt: 1f8d0d6022fa
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -104,6 +104,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.nachweis.qa_knicken]] – Knicken am gezeichneten Querschnitt.
     - [[opencivil.nachweis.qa_stahl]] – die Lastfaelle eines Stahlquerschnitts nach SIA 263:2013.
     - [[opencivil.nachweis.qa_stahl_kennzahlen]] – was ein gezeichneter Stahlquerschnitt aufnimmt, ohne Einwirkung.
+    - [[opencivil.nachweis.qa_stahl_stabilitaet]] – Knicken und Kippen eines Stahlstabs nach SIA 263:2013.
     - [[opencivil.nachweis.qa_stahl_werte]] – was Kennzahlen und Nachweise eines Stahlquerschnitts teilen.
     - [[opencivil.nachweis.querkraft]] – Querkraftnachweis, was beide Ansaetze teilen.
     - [[opencivil.nachweis.querkraft_buegel]] – Querkraft mit Querkraftbewehrung.
@@ -176,6 +177,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.projekt.setzung]] – eine Setzungsberechnung, wie die Oberflaeche sie beschreibt.
     - [[opencivil.projekt.skript]] – ein Python-Skript der App «Python», wie es
     - [[opencivil.projekt.spannglieder]] – ein Spannglied, wie die Oberflaeche es beschreibt.
+    - [[opencivil.projekt.stabilitaet]] – ein Fall von Knicken und Kippen, wie die Oberflaeche ihn beschreibt.
     - [[opencivil.projekt.staebe]] – der Baukasten eines Stabwerks, eben und im Raum.
 - [[opencivil.querschnitt]] – die Querschnitte: die Platte und der gezeichnete.
     - [[opencivil.querschnitt.analyse]] – der gezeichnete Querschnitt als Bauteil im Rechenwerk.
@@ -229,6 +231,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.stahlbau.klasse]] – die Querschnittsklasse nach SIA 263:2013.
     - [[opencivil.stahlbau.querschnitt]] – ein gezeichneter Querschnitt aus Baustahl.
     - [[opencivil.stahlbau.schub]] – der Querkraftwiderstand eines Stahlprofils nach SIA 263:2013.
+    - [[opencivil.stahlbau.stabilitaet]] – Knicken und Kippen eines Stabs aus Baustahl.
     - [[opencivil.stahlbau.widerstand]] – was ein Stahlquerschnitt in einem Lastfall aufnimmt.
 - [[opencivil.stahlprofile]] – die Stahlprofile: ihre Formen, welche es gibt, wie eines im Querschnitt liegt.
     - [[opencivil.stahlprofile.bleche]] – die Bleche eines Stahlprofils, fuer seine Querschnittsklasse.

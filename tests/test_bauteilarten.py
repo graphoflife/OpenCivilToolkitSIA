@@ -108,6 +108,7 @@ class TestSinnbilder(unittest.TestCase):
             "wandlage": k["erdbeben"]["lagen"],
             "linie": k["querschnittsanalyse"]["linienarten"],
             "wirkung": k["querschnittsanalyse"]["spannglied"]["wirkungen"],
+            "knickkurve": k["querschnittsanalyse"]["knickkurven"],
             # Grund und Zulage, je in den unteren und den oberen Lagen (platte.js).
             "zulage": [{"wert": f"{seite}-{gunst}"} for seite in ("unten", "oben")
                        for gunst in ("unguenstig", "guenstig")],

@@ -27,6 +27,7 @@ from opencivil.nachweis.qa_gebrauch import AnalyseStellen, RissnormalkraftQA, Zw
 from opencivil.nachweis.qa_kennzahlen import KennzahlenQA
 from opencivil.nachweis.qa_stahl import OHNE_TORSION, StahlBiegungQA, StahlQuerkraftQA
 from opencivil.nachweis.qa_stahl_kennzahlen import KennzahlenStahlQA
+from opencivil.nachweis.qa_stahl_stabilitaet import StahlStabilitaetQA
 from opencivil.nachweis.qa_knicken import KnickenQA, QAKnickfall
 from opencivil.nachweis.richtungsnachweise import DuktilitaetQA, SproedesVersagenQA
 from opencivil.nachweis.schiefe_biegung import SchiefeBiegung
@@ -152,7 +153,9 @@ def _stahl(eintrag: QuerschnittsanalyseEintrag, analyse: Querschnittsanalyse, te
     Ein Querschnitt aus Stahl nach SIA 263 (:mod:`~opencivil.nachweis.qa_stahl`):
     je Lastfall Biegung und Normalkraft, Querkraft, sobald einer sie hat --
     beide lesen den Widerstand gegen Querkraft aus den Kennzahlen. Torsion
-    weist er nicht nach; ein Lastfall mit ``T_Ed`` sagt es. Die Kennzahlen
+    weist er nicht nach; ein Lastfall mit ``T_Ed`` sagt es. Knicken und
+    Kippen, sobald ein Fall eingeschaltet ist
+    (:mod:`~opencivil.nachweis.qa_stahl_stabilitaet`). Die Kennzahlen
     stehen in der Herleitung vor den Nachweisen, die aus ihnen lesen.
     """
     kennzahlen = KennzahlenStahlQA(analyse)
@@ -166,6 +169,10 @@ def _stahl(eintrag: QuerschnittsanalyseEintrag, analyse: Querschnittsanalyse, te
     mit_torsion = [l.name for l in lastfaelle if l.T]
     if mit_torsion:
         aufbau.warnen(teil.raum, f"{ort_von(eintrag)}, {', '.join(mit_torsion)}: {OHNE_TORSION}")
+    stabfaelle = eintrag.stabfaelle()
+    if stabfaelle:
+        aufbau.eintragen(teil, "qa_stahl_stabilitaet", eintrag.kennung,
+                         StahlStabilitaetQA(analyse, stabfaelle, eintrag.knickkurven))
     _kennzahlen(kennzahlen, teil, aufbau)
     spannungsfaelle(eintrag, stoffe_von(aufbau, analyse.baustoffe), aufbau)
     return teil

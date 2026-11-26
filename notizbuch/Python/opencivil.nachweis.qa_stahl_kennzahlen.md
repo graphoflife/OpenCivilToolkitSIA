@@ -1,5 +1,5 @@
 ---
-erzeugt: 6abd81a569a2
+erzeugt: d15bd64c6c66
 art: modul
 tags: [modul]
 ---
@@ -138,6 +138,7 @@ weitesten Faser, massgebend das kleinste `f_y W/γ_M1`.
 ## Gebraucht von
 
 - [[opencivil.nachweis.qa_stahl]]
+- [[opencivil.nachweis.qa_stahl_stabilitaet]]
 - [[opencivil.projekt.aufbau.querschnittsanalyse]]
 
 ## Formeln aus diesem Modul

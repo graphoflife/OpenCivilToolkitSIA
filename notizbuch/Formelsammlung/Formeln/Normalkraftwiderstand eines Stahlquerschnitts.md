@@ -1,5 +1,5 @@
 ---
-erzeugt: 9ca2c1194989
+erzeugt: dedd00278d8f
 art: formel
 tags: [formel]
 normstelle: ["SIA 263:2013, 5.1.2.1, (38)", "SIA 263:2013, 5.3.2, (55); 4.5.3"]
@@ -29,13 +29,20 @@ $$
 N_{Rd}^{+} = \frac{f_y \cdot A}{\gamma_{M1}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 15604\,\mathrm{mm}^{2}}{1.05} = 5275.5\,\mathrm{kN}
 $$
 
+## Gebraucht von
+
+- [[Exponent β der Interaktion]]
+- [[Knickwiderstand]]
+
 ## Im Code
 
 - [[opencivil.nachweis.qa_stahl_kennzahlen#KennzahlenStahlQA._summe|KennzahlenStahlQA._summe]]
+- [[opencivil.nachweis.qa_stahl_stabilitaet#_Herleitung.widerstaende|_Herleitung.widerstaende]]
 
 ## Themen
 
 - [[Kennzahlen]]
+- [[Knicken und Kippen]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

@@ -66,6 +66,7 @@ from opencivil.querschnitt.gesetzwahl import Holzrechnung, Werkstoffsatz
 from opencivil.nachweis.rechenwahl import RECHENARTEN
 from opencivil.spannungsanalyse import Analyseart
 from opencivil.stabwerk.rechnung import Balkensystem
+from opencivil.stahlbau.stabilitaet import Knickkurve
 from opencivil.stahlprofile import lage as profillage
 from opencivil.stahlprofile.tabelle import PROFILREIHEN
 from opencivil.stabwerk3d.rechnung import Balkensystem3d
@@ -348,6 +349,10 @@ def katalog() -> dict:
             # wie dann ihre Raender heissen: der gedrueckte, der gezogene.
             "zugseiten": [{"wert": z.value, "beschriftung": z.beschriftung,
                            "pfeil": z.pfeil, "raender": list(z.raender)} for z in Zugseite],
+            # Die Stellungen der Knickspannungskurve je Achse eines
+            # Stahlquerschnitts: die des Profils oder eine gewaehlte.
+            "knickkurven": [{"wert": k.value, "beschriftung": k.beschriftung,
+                             "titel": k.erklaerung} for k in Knickkurve],
             # Die Vorlage, die ein Stahlprofil einsetzt: ihr Knopf mit dem
             # Bild des ersten Profils und die Stellungen der Drehung.
             "profil": {

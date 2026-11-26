@@ -1,5 +1,5 @@
 ---
-erzeugt: c14f892db74e
+erzeugt: 3e25e9b50e89
 art: modul
 tags: [modul]
 ---
@@ -13,7 +13,8 @@ Der [[opencivil.projekt.querschnittsanalyse#QuerschnittsanalyseEintrag|Querschni
 Stahlprofile ([[opencivil.projekt.profile]]), Staebe und Stablinien,
 Spannglieder ([[opencivil.projekt.spannglieder]]), Schubwaende,
 Hilfslinien, die Wahl der Werkstoffgesetze, die
-Lastfaelle und die Schalter der Nachweise -- als eine speicherbare
+Lastfaelle, die Faelle von Knicken und Kippen beim Stahl
+([[opencivil.projekt.stabilitaet]]) und die Schalter der Nachweise -- als eine speicherbare
 Datenklasse, wie die Platte in [[opencivil.projekt.platte]]. Dazu die
 Vorlage einer frischen Analyse und ein Baukasten, der ohne Oberflaeche
 zeichnet ([[opencivil.projekt.querschnittsanalyse#QuerschnittsanalyseEintrag.polygon|QuerschnittsanalyseEintrag.polygon]] und folgende).
@@ -346,6 +347,9 @@ Was er mit der Platte gleich angibt, steht in der Grundlage
 - `quasistaendig: QAGebrauchsliste = teil(lambda: QAGebrauchsliste(anteil=QUASISTAENDIG_ANTEIL), heisst='S…` – Die quasi-staendigen Lastfaelle -- fuer die Rissbreite.
 - `haeufig: QAGebrauchsliste = teil(lambda: QAGebrauchsliste(anteil=HAEUFIG_ANTEIL), heisst='Fliesse…` – Die haeufigen Lastfaelle -- gegen das Fliessen, bei erhoehter und hoher Anforderung.
 - `knickfaelle: List[QAKnickEintrag] = field(default_factory=list)` – Knicknachweise, je in einer Richtung; leer heisst: keiner.
+- `stabilitaetsfaelle: List[QAStabilitaetEintrag] = field(default_factory=list)` – Knicken und Kippen eines Stabs aus Stahl (SIA 263); leer heisst: keiner.
+- `knickkurve_y: Knickkurve = Knickkurve.PROFIL`
+- `knickkurve_z: Knickkurve = Knickkurve.PROFIL` – Die Knickspannungskurven um y und um z: die, die Figur 7 dem Profil zuweist -- nur fuer einen Querschnitt aus einem einzigen Profil -- oder eine gewaehlte. Sie gelten fuer alle Faelle: die Kurve gehoert zum Querschnitt, nicht zum Fall.
 - `spannungsfaelle: List[QASpannungsfallEintrag] = field(default_factory=list)` – Die Spannung-Dehnung-Analysen -- kein Nachweis, ein Blick in den Querschnitt.
 
 #### QuerschnittsanalyseEintrag.materialien
@@ -511,6 +515,33 @@ def knickfall(self, name: str, *, N_Ed: float, M_Ed_1: float=0.0, laenge: float=
 
 Ein Knicknachweis -- N_Ed in kN (Druck negativ), Längen in m, die Zugseite.
 
+#### QuerschnittsanalyseEintrag.knickkurven
+
+```python
+@property
+def knickkurven(self) -> Dict[str, Knickkurve]
+```
+
+Die Wahl der Knickspannungskurven, je Achse.
+
+#### QuerschnittsanalyseEintrag.stabfaelle
+
+```python
+def stabfaelle(self) -> List[Stabfall]
+```
+
+Die eingeschalteten Faelle von Knicken und Kippen, in SI.
+
+#### QuerschnittsanalyseEintrag.stabilitaetsfall
+
+```python
+def stabilitaetsfall(self, name: str, **werte: float) -> QAStabilitaetEintrag
+```
+
+Ein Fall von Knicken und Kippen -- N_Ed in kN (Druck negativ), die
+Momente in kNm, die Laengen in m; die Felder wie
+[[opencivil.projekt.stabilitaet#QAStabilitaetEintrag|QAStabilitaetEintrag]].
+
 #### QuerschnittsanalyseEintrag.spannungsfall
 
 ```python
@@ -549,10 +580,12 @@ Feldmoment; das Rechteck gibt es als Vorlage im Zeichenfenster.
 - [[opencivil.projekt.netz]]
 - [[opencivil.projekt.profile]]
 - [[opencivil.projekt.spannglieder]]
+- [[opencivil.projekt.stabilitaet]]
 - [[opencivil.querschnitt.geometrie]]
 - [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.vorlagen]]
 - [[opencivil.querschnitt.zugseite]]
+- [[opencivil.stahlbau.stabilitaet]]
 - [[opencivil.stahlprofile.lage]]
 - [[opencivil.stahlprofile.tabelle]]
 

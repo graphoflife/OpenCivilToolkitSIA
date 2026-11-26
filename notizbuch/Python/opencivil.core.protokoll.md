@@ -1,5 +1,5 @@
 ---
-erzeugt: 16fe1755c3f2
+erzeugt: c7a9359ad032
 art: modul
 tags: [modul]
 ---
@@ -614,6 +614,7 @@ Oberflaeche und alle Berichte gehen.
 - [[opencivil.nachweis.qa_knicken]]
 - [[opencivil.nachweis.qa_stahl]]
 - [[opencivil.nachweis.qa_stahl_kennzahlen]]
+- [[opencivil.nachweis.qa_stahl_stabilitaet]]
 - [[opencivil.nachweis.qa_stahl_werte]]
 - [[opencivil.nachweis.querkraft]]
 - [[opencivil.nachweis.querkraft_buegel]]

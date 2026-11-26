@@ -229,6 +229,12 @@
       "bereich": "Querschnittsanalyse"
     },
     {
+      "name": "Knicken und Kippen",
+      "pfad": "Formelsammlung/Themen/Knicken und Kippen.md",
+      "art": "thema",
+      "bereich": "Querschnittsanalyse"
+    },
+    {
       "name": "Streifenmethode",
       "pfad": "Formelsammlung/Themen/Streifenmethode.md",
       "art": "thema",
@@ -253,6 +259,39 @@
       "zeichen": [],
       "themen": [
         "Pfahlsteifigkeit"
+      ]
+    },
+    {
+      "name": "Abgeminderter Biegewiderstand um die schwache Achse",
+      "pfad": "Formelsammlung/Formeln/Abgeminderter Biegewiderstand um die schwache Achse.md",
+      "art": "formel",
+      "zeichen": [
+        "M_{z,red,Rd}"
+      ],
+      "themen": [
+        "Knicken und Kippen"
+      ]
+    },
+    {
+      "name": "Abgeminderter Kippwiderstand im Stab",
+      "pfad": "Formelsammlung/Formeln/Abgeminderter Kippwiderstand im Stab.md",
+      "art": "formel",
+      "zeichen": [
+        "M_{y,red,Rd}"
+      ],
+      "themen": [
+        "Knicken und Kippen"
+      ]
+    },
+    {
+      "name": "Abminderungsfaktor beim Knicken und Kippen",
+      "pfad": "Formelsammlung/Formeln/Abminderungsfaktor beim Knicken und Kippen.md",
+      "art": "formel",
+      "zeichen": [
+        "\\chi_{K,y}"
+      ],
+      "themen": [
+        "Knicken und Kippen"
       ]
     },
     {
@@ -542,6 +581,50 @@
       "zeichen": [],
       "themen": [
         "Kennzahlen"
+      ]
+    },
+    {
+      "name": "Beiwert η der Momentenverteilung beim Kippen",
+      "pfad": "Formelsammlung/Formeln/Beiwert η der Momentenverteilung beim Kippen.md",
+      "art": "formel",
+      "zeichen": [
+        "\\eta"
+      ],
+      "themen": [
+        "Knicken und Kippen"
+      ]
+    },
+    {
+      "name": "Beiwert Φ beim Kippen",
+      "pfad": "Formelsammlung/Formeln/Beiwert Φ beim Kippen.md",
+      "art": "formel",
+      "zeichen": [
+        "\\Phi_{D}"
+      ],
+      "themen": [
+        "Knicken und Kippen"
+      ]
+    },
+    {
+      "name": "Beiwert Φ beim Knicken",
+      "pfad": "Formelsammlung/Formeln/Beiwert Φ beim Knicken.md",
+      "art": "formel",
+      "zeichen": [
+        "\\Phi_{K,y}"
+      ],
+      "themen": [
+        "Knicken und Kippen"
+      ]
+    },
+    {
+      "name": "Beiwert ω der Momentenverteilung",
+      "pfad": "Formelsammlung/Formeln/Beiwert ω der Momentenverteilung.md",
+      "art": "formel",
+      "zeichen": [
+        "\\omega_{y}"
+      ],
+      "themen": [
+        "Knicken und Kippen"
       ]
     },
     {
@@ -994,7 +1077,8 @@
         "M_{y,Rd}^{+}"
       ],
       "themen": [
-        "Stahlquerschnitt"
+        "Stahlquerschnitt",
+        "Knicken und Kippen"
       ]
     },
     {
@@ -1220,6 +1304,33 @@
       ]
     },
     {
+      "name": "Druck und Biegung am wirksamen Querschnitt im Stab",
+      "pfad": "Formelsammlung/Formeln/Druck und Biegung am wirksamen Querschnitt im Stab.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Knicken und Kippen"
+      ]
+    },
+    {
+      "name": "Druck und zweiachsige Biegung im doppelsymmetrischen I-Stab",
+      "pfad": "Formelsammlung/Formeln/Druck und zweiachsige Biegung im doppelsymmetrischen I-Stab.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Knicken und Kippen"
+      ]
+    },
+    {
+      "name": "Druck und zweiachsige Biegung im Stab",
+      "pfad": "Formelsammlung/Formeln/Druck und zweiachsige Biegung im Stab.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Knicken und Kippen"
+      ]
+    },
+    {
       "name": "Druckzonenhöhe aus dem Kräftegleichgewicht",
       "pfad": "Formelsammlung/Formeln/Druckzonenhöhe aus dem Kräftegleichgewicht.md",
       "art": "formel",
@@ -1376,6 +1487,7 @@
         "Duktilität je Richtung",
         "Sprödes Versagen je Richtung",
         "Stahlquerschnitt",
+        "Knicken und Kippen",
         "Durchstanzen"
       ]
     },
@@ -1386,7 +1498,19 @@
       "zeichen": [],
       "themen": [
         "Schiefe Biegung",
-        "Stahlquerschnitt"
+        "Stahlquerschnitt",
+        "Knicken und Kippen"
+      ]
+    },
+    {
+      "name": "Ersatzimperfektion des Stabs",
+      "pfad": "Formelsammlung/Formeln/Ersatzimperfektion des Stabs.md",
+      "art": "formel",
+      "zeichen": [
+        "w_{0,y}"
+      ],
+      "themen": [
+        "Knicken und Kippen"
       ]
     },
     {
@@ -1416,6 +1540,17 @@
       "zeichen": [],
       "themen": [
         "Grundbruch"
+      ]
+    },
+    {
+      "name": "Exponent β der Interaktion",
+      "pfad": "Formelsammlung/Formeln/Exponent β der Interaktion.md",
+      "art": "formel",
+      "zeichen": [
+        "\\beta"
+      ],
+      "themen": [
+        "Knicken und Kippen"
       ]
     },
     {
@@ -2202,6 +2337,28 @@
       ]
     },
     {
+      "name": "Ideelle Kippspannung",
+      "pfad": "Formelsammlung/Formeln/Ideelle Kippspannung.md",
+      "art": "formel",
+      "zeichen": [
+        "\\sigma_{cr,D}"
+      ],
+      "themen": [
+        "Knicken und Kippen"
+      ]
+    },
+    {
+      "name": "Ideelles Kippmoment",
+      "pfad": "Formelsammlung/Formeln/Ideelles Kippmoment.md",
+      "art": "formel",
+      "zeichen": [
+        "M_{cr}"
+      ],
+      "themen": [
+        "Knicken und Kippen"
+      ]
+    },
+    {
       "name": "Innerer Hebelarm",
       "pfad": "Formelsammlung/Formeln/Innerer Hebelarm.md",
       "art": "formel",
@@ -2244,6 +2401,17 @@
       ]
     },
     {
+      "name": "Kippwiderstand",
+      "pfad": "Formelsammlung/Formeln/Kippwiderstand.md",
+      "art": "formel",
+      "zeichen": [
+        "M_{D,Rd}"
+      ],
+      "themen": [
+        "Knicken und Kippen"
+      ]
+    },
+    {
       "name": "Kleinerer Widerstand beider Seiten",
       "pfad": "Formelsammlung/Formeln/Kleinerer Widerstand beider Seiten.md",
       "art": "formel",
@@ -2252,6 +2420,28 @@
       ],
       "themen": [
         "Kennzahlen"
+      ]
+    },
+    {
+      "name": "Knicklast nach Euler",
+      "pfad": "Formelsammlung/Formeln/Knicklast nach Euler.md",
+      "art": "formel",
+      "zeichen": [
+        "N_{cr,y}"
+      ],
+      "themen": [
+        "Knicken und Kippen"
+      ]
+    },
+    {
+      "name": "Knickwiderstand",
+      "pfad": "Formelsammlung/Formeln/Knickwiderstand.md",
+      "art": "formel",
+      "zeichen": [
+        "N_{K,y,Rd}"
+      ],
+      "themen": [
+        "Knicken und Kippen"
       ]
     },
     {
@@ -2626,7 +2816,8 @@
       "zeichen": [],
       "themen": [
         "Kennzahlen",
-        "Stahlquerschnitt"
+        "Stahlquerschnitt",
+        "Knicken und Kippen"
       ]
     },
     {
@@ -2774,7 +2965,8 @@
         "N_{Rd}^{+}"
       ],
       "themen": [
-        "Kennzahlen"
+        "Kennzahlen",
+        "Knicken und Kippen"
       ]
     },
     {
@@ -2824,7 +3016,8 @@
         "M_{y,Rd}^{+}"
       ],
       "themen": [
-        "Kennzahlen"
+        "Kennzahlen",
+        "Knicken und Kippen"
       ]
     },
     {
@@ -3107,6 +3300,17 @@
       ]
     },
     {
+      "name": "Reduzierte Kipplänge",
+      "pfad": "Formelsammlung/Formeln/Reduzierte Kipplänge.md",
+      "art": "formel",
+      "zeichen": [
+        "L_{K}"
+      ],
+      "themen": [
+        "Knicken und Kippen"
+      ]
+    },
+    {
       "name": "Reibungswinkel der Sohlfuge",
       "pfad": "Formelsammlung/Formeln/Reibungswinkel der Sohlfuge.md",
       "art": "formel",
@@ -3232,6 +3436,17 @@
       ]
     },
     {
+      "name": "Saint-Venant-Anteil der Kippspannung",
+      "pfad": "Formelsammlung/Formeln/Saint-Venant-Anteil der Kippspannung.md",
+      "art": "formel",
+      "zeichen": [
+        "\\sigma_{Dv}"
+      ],
+      "themen": [
+        "Knicken und Kippen"
+      ]
+    },
+    {
       "name": "Schiefstellung",
       "pfad": "Formelsammlung/Formeln/Schiefstellung.md",
       "art": "formel",
@@ -3240,6 +3455,28 @@
       ],
       "themen": [
         "Knicken"
+      ]
+    },
+    {
+      "name": "Schlankheit beim Kippen",
+      "pfad": "Formelsammlung/Formeln/Schlankheit beim Kippen.md",
+      "art": "formel",
+      "zeichen": [
+        "\\bar{\\lambda}_{D}"
+      ],
+      "themen": [
+        "Knicken und Kippen"
+      ]
+    },
+    {
+      "name": "Schlankheit beim Knicken",
+      "pfad": "Formelsammlung/Formeln/Schlankheit beim Knicken.md",
+      "art": "formel",
+      "zeichen": [
+        "\\bar{\\lambda}_{K,y}"
+      ],
+      "themen": [
+        "Knicken und Kippen"
       ]
     },
     {
@@ -3841,6 +4078,17 @@
       ]
     },
     {
+      "name": "Trägheitsradius des Druckgurts",
+      "pfad": "Formelsammlung/Formeln/Trägheitsradius des Druckgurts.md",
+      "art": "formel",
+      "zeichen": [
+        "i_{g}"
+      ],
+      "themen": [
+        "Knicken und Kippen"
+      ]
+    },
+    {
       "name": "Überlagerung auf Höhe der Sohle",
       "pfad": "Formelsammlung/Formeln/Überlagerung auf Höhe der Sohle.md",
       "art": "formel",
@@ -4057,7 +4305,8 @@
       ],
       "themen": [
         "Schiefe Biegung",
-        "Stahlquerschnitt"
+        "Stahlquerschnitt",
+        "Knicken und Kippen"
       ]
     },
     {
@@ -4068,7 +4317,8 @@
         "W_{eff}"
       ],
       "themen": [
-        "Stahlquerschnitt"
+        "Stahlquerschnitt",
+        "Knicken und Kippen"
       ]
     },
     {
@@ -4235,6 +4485,17 @@
       ],
       "themen": [
         "Durchstanzen"
+      ]
+    },
+    {
+      "name": "Wölbanteil der Kippspannung",
+      "pfad": "Formelsammlung/Formeln/Wölbanteil der Kippspannung.md",
+      "art": "formel",
+      "zeichen": [
+        "\\sigma_{Dw}"
+      ],
+      "themen": [
+        "Knicken und Kippen"
       ]
     },
     {
@@ -6445,7 +6706,7 @@
         "StahlBiegungQA._wirksam",
         "StahlBiegungQA._seiten",
         "StahlBiegungQA._linear",
-        "_glied",
+        "glied_text",
         "StahlQuerkraftQA",
         "StahlQuerkraftQA.pruefe"
       ]
@@ -6463,6 +6724,31 @@
         "KennzahlenStahlQA._summe",
         "KennzahlenStahlQA._klasse",
         "KennzahlenStahlQA._elastisch"
+      ]
+    },
+    {
+      "name": "opencivil.nachweis.qa_stahl_stabilitaet",
+      "pfad": "Python/opencivil.nachweis.qa_stahl_stabilitaet.md",
+      "art": "modul",
+      "kurz": "Knicken und Kippen eines Stahlstabs nach SIA 263:2013.",
+      "stichworte": [
+        "_seite_der",
+        "StahlStabilitaetQA",
+        "StahlStabilitaetQA.pruefe",
+        "StahlStabilitaetQA._urteil",
+        "_einwirkung",
+        "_Herleitung",
+        "_Herleitung.seiten",
+        "_Herleitung.widerstaende",
+        "_Herleitung._biegung",
+        "_Herleitung.knicken",
+        "_Herleitung.kippen",
+        "_Herleitung._druckgurt",
+        "_Herleitung._omega",
+        "_Herleitung.gleichung_50",
+        "_Herleitung.gleichung_51",
+        "_Herleitung.kippen_allein",
+        "_Herleitung.gleichungen_62"
       ]
     },
     {
@@ -7957,6 +8243,9 @@
         "QuerschnittsanalyseEintrag.fallnamen",
         "QuerschnittsanalyseEintrag.lastfall",
         "QuerschnittsanalyseEintrag.knickfall",
+        "QuerschnittsanalyseEintrag.knickkurven",
+        "QuerschnittsanalyseEintrag.stabfaelle",
+        "QuerschnittsanalyseEintrag.stabilitaetsfall",
         "QuerschnittsanalyseEintrag.spannungsfall",
         "QuerschnittsanalyseEintrag.neu"
       ]
@@ -7990,6 +8279,18 @@
       "kurz": "ein Spannglied, wie die Oberflaeche es beschreibt.",
       "stichworte": [
         "SpanngliedEintrag"
+      ]
+    },
+    {
+      "name": "opencivil.projekt.stabilitaet",
+      "pfad": "Python/opencivil.projekt.stabilitaet.md",
+      "art": "modul",
+      "kurz": "ein Fall von Knicken und Kippen, wie die Oberflaeche ihn beschreibt.",
+      "stichworte": [
+        "_psi",
+        "_laenge",
+        "QAStabilitaetEintrag",
+        "QAStabilitaetEintrag.stabfall"
       ]
     },
     {
@@ -9401,6 +9702,66 @@
       ]
     },
     {
+      "name": "opencivil.stahlbau.stabilitaet",
+      "pfad": "Python/opencivil.stahlbau.stabilitaet.md",
+      "art": "modul",
+      "kurz": "Knicken und Kippen eines Stabs aus Baustahl.",
+      "stichworte": [
+        "Knickkurve",
+        "Knickkurve.beschriftung",
+        "Knickkurve.erklaerung",
+        "abminderung",
+        "eta",
+        "omega",
+        "kurve",
+        "Druckgurt",
+        "Druckgurt.A",
+        "Druckgurt.I",
+        "Druckgurt.i",
+        "druckgurt",
+        "einzelprofil",
+        "starke_achse",
+        "kurven_des_profils",
+        "rechenkurven",
+        "fehlende_kurven",
+        "seite_von",
+        "quer",
+        "Stab",
+        "Stab.stark",
+        "Stab.A",
+        "Stab.i",
+        "Stab.kurve",
+        "Stabfall",
+        "Stabfall.kennung",
+        "Stabfall.psi",
+        "Stabfall.knicklaenge",
+        "Knicken",
+        "Knicken.gehalten",
+        "Knicken.rest",
+        "Kippen",
+        "Glied50",
+        "Glied50.m",
+        "Gleichung51",
+        "Gleichung51.alpha",
+        "Gleichung62",
+        "Ergebnis",
+        "Ergebnis.klasse",
+        "Ergebnis.mit_moment",
+        "Ergebnis.N_K_Rd",
+        "Ergebnis.n",
+        "Ergebnis.versatz",
+        "Ergebnis.mit_versatz",
+        "rechnen",
+        "_widerstaende",
+        "_M_Rd",
+        "_gleichung_50",
+        "_mit_51",
+        "_gleichung_51",
+        "_gleichungen_62",
+        "_faktor"
+      ]
+    },
+    {
       "name": "opencivil.stahlbau.widerstand",
       "pfad": "Python/opencivil.stahlbau.widerstand.md",
       "art": "modul",
@@ -9426,6 +9787,7 @@
         "Widerstaende.glieder",
         "Widerstaende.n",
         "elastische",
+        "plastische",
         "Gebogen",
         "Wirksame",
         "wirksame",
@@ -9874,6 +10236,7 @@
       "kurz": "die Zeichnung einer Querschnittsanalyse, wie der Kern sie sieht.",
       "stichworte": [
         "geometrie",
+        "_knickkurven",
         "_tiefen",
         "_profil",
         "_als_satz",

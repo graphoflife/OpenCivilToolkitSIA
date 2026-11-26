@@ -1,5 +1,5 @@
 ---
-erzeugt: f7b44d0388fb
+erzeugt: 79fa0220dcf1
 art: modul
 tags: [modul]
 ---
@@ -526,5 +526,7 @@ def _elastisch_gedrueckt(blech: Blech, linie: Linie) -> Tuple[Optional[float], b
 
 - [[opencivil.nachweis.qa_stahl]]
 - [[opencivil.nachweis.qa_stahl_kennzahlen]]
+- [[opencivil.nachweis.qa_stahl_stabilitaet]]
 - [[opencivil.nachweis.qa_stahl_werte]]
+- [[opencivil.stahlbau.stabilitaet]]
 - [[opencivil.stahlbau.widerstand]]

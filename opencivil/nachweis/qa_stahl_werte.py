@@ -32,18 +32,19 @@ from opencivil.core.protokoll import Protokoll
 from opencivil.core.wert import Wert
 from opencivil.querschnitt.gesetzwahl import Rechenwahl, Werkstoffsatz
 from opencivil.stahlbau import klasse as kl
+from opencivil.stahlbau import widerstand as wd
 from opencivil.stahlbau.querschnitt import Blechzustand, Stahlquerschnitt, Teil, Wirksam
 from opencivil.stahlprofile.bleche import Halterung
 
 #: Was Kennzahlen und Nachweise je Baustahl lesen.
 KENNWERTE = ("f_y", "f_y_dick", "tau_y", "tau_y_dick", "gamma_M1", "E_a")
 
-#: Was in jeder Dicke gilt -- die anderen Kennwerte haben einen Wert ueber 40 mm.
-_JEDE_DICKE = ("gamma_M1", "E_a")
+#: Was in jeder Dicke gilt -- die anderen Kennwerte haben einen Wert ueber 40 mm. ``G_a``
+#: liest nur das Kippen (:mod:`opencivil.nachweis.qa_stahl_stabilitaet`).
+_JEDE_DICKE = ("gamma_M1", "E_a", "G_a")
 
 #: Warum ein Rundrohr der Klasse 4 nichts traegt.
-ROHR_KLASSE_4 = ("Ein Rundrohr der Klasse 4 rechnet das Werkzeug nicht – SIA 263 nennt dafür "
-                 "keine mitwirkende Breite. Der Widerstand steht darum auf null.")
+ROHR_KLASSE_4 = f"{wd.ROHR_KLASSE_4} Der Widerstand steht darum auf null."
 
 SPANNUNG = Mathe(r"f_y\ [\mathrm{N}/\mathrm{mm}^2]")
 
@@ -51,6 +52,8 @@ SPANNUNG = Mathe(r"f_y\ [\mathrm{N}/\mathrm{mm}^2]")
 #: Formelsammlung, gleich in welcher Klasse.
 WIDERSTANDSMOMENT = "Widerstandsmoment bis zur weitesten Faser"
 ELASTISCH = "Biegewiderstand bis zum ersten Fliessen"
+NORMALKRAFT = "Normalkraftwiderstand eines Stahlquerschnitts"
+PLASTISCH = "Plastischer Biegewiderstand eines Stahlquerschnitts"
 
 
 def stoffbezuege(stahl: Stahlquerschnitt) -> List[Eingabebezug]:

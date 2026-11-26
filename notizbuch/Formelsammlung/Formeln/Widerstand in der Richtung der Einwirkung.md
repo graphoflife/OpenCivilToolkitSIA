@@ -1,5 +1,5 @@
 ---
-erzeugt: fb6ce0e7c647
+erzeugt: f7d7a2e3c97b
 art: formel
 tags: [formel]
 normstelle: "SIA 263:2013, 5.1.1.2; 5.1.8"
@@ -50,12 +50,14 @@ $$
 
 - [[opencivil.nachweis.qa_stahl#StahlBiegungQA._linear|StahlBiegungQA._linear]]
 - [[opencivil.nachweis.qa_stahl#StahlBiegungQA|StahlBiegungQA._plastisch]]
+- [[opencivil.nachweis.qa_stahl_stabilitaet#StahlStabilitaetQA._urteil|StahlStabilitaetQA._urteil]]
 - [[opencivil.nachweis.schiefe_biegung#SchiefeBiegung|SchiefeBiegung._ein_fall]]
 
 ## Themen
 
 - [[Schiefe Biegung]]
 - [[Stahlquerschnitt]]
+- [[Knicken und Kippen]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

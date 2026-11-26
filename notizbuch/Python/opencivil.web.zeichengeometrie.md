@@ -1,5 +1,5 @@
 ---
-erzeugt: 03cb4bcffaa4
+erzeugt: 362efdfc9e18
 art: modul
 tags: [modul]
 ---
@@ -53,10 +53,27 @@ Bauweise keinen Nachweis hat -- leer beim Stahlbeton, beim Stahl und ohne
 Bauweise --, `ohne_analysen` derselbe fuer die
 Spannung-Dehnung-Analysen, leer ausser im Verbund. Danach zeigt die
 Analyse ihre Kacheln ([[opencivil.projekt.aufbau.querschnittsanalyse#ohne_nachweise|ohne_nachweise]], [[opencivil.projekt.aufbau.querschnittsanalyse#ohne_analysen|ohne_analysen]]).
+`knickkurven` sagt je Achse die Knickspannungskurve, die Figur 7 dem
+einzigen Profil des Querschnitts zuweist, `knickkurven_fehlen`, welche
+einem Stabilitaetsnachweis fehlt ([[opencivil.web.zeichengeometrie#_knickkurven|_knickkurven]]).
 
 `gueltig` heisst: die Zeichnung rechnet. Eine Spannung ueber der
 Grenze der Norm steht rot am Glied, haelt die Rechnung aber nicht an --
 gerechnet wird mit den Zahlen des Benutzers.
+
+### _knickkurven
+
+```python
+def _knickkurven(eintrag, flaechen: Sequence[Mapping], brutto) -> Dict[str, Any]
+```
+
+`knickkurven`: je Achse die Knickspannungskurve des einzigen Profils,
+`kurve` und `grund` -- `None`, wo der Querschnitt nicht aus einem
+einzigen Profil besteht ([[opencivil.stahlbau.stabilitaet#einzelprofil|einzelprofil]]):
+dann waehlt der Benutzer sie. `knickkurven_fehlen`: der Satz, welche
+Kurve den Faellen von Knicken und Kippen dann fehlt -- derselbe wie im
+Fall ([[opencivil.stahlbau.stabilitaet#fehlende_kurven|fehlende_kurven]]), leer,
+wo keine fehlt.
 
 ### _tiefen
 
@@ -133,6 +150,7 @@ selbst nicht rechnet, sagt es in seinem Fenster.
 - [[opencivil.querschnitt.bauweise]]
 - [[opencivil.querschnitt.geometrie]]
 - [[opencivil.querschnitt.spannglieder]]
+- [[opencivil.stahlbau.stabilitaet]]
 - [[opencivil.stahlprofile.lage]]
 
 ## Gebraucht von

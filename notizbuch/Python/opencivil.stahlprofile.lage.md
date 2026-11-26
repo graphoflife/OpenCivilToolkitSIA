@@ -1,5 +1,5 @@
 ---
-erzeugt: 697edaa479d9
+erzeugt: 434b919b00ca
 art: modul
 tags: [modul]
 ---
@@ -183,6 +183,7 @@ Breite unten, Hoehe links, nach der Drehung. Beim Rundrohr nur `D`.
 - [[opencivil.projekt.querschnittsanalyse]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.stahlbau.schub]]
+- [[opencivil.stahlbau.stabilitaet]]
 - [[opencivil.stahlprofile.bleche]]
 - [[opencivil.web.api]]
 - [[opencivil.web.dienst]]

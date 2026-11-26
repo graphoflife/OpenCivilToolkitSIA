@@ -376,7 +376,7 @@ class StahlBiegungQA(Nachweis):
         N_Rd = w.N_zug if x.N >= 0.0 else w.N_druck
         faktor = x.alpha if x.alpha is not None else 0.0
         teile = [rf"\frac{{{fest(abs(x.N) / 1e3, 1)}}}{{{fest(N_Rd / 1e3, 1)}}}"] if x.N else []
-        teile += [t for t in (_glied(g, faktor, x.alpha is not None) for g in x.glieder) if t]
+        teile += [t for t in (glied_text(g, faktor, x.alpha is not None) for g in x.glieder) if t]
         links = " + ".join(teile)
         if x.alpha is None:
             p.gleichung(rf"\lambda = 0: \quad {links} = {fest(1.0 / x.alpha_N, 3)} > 1",
@@ -400,10 +400,12 @@ class StahlBiegungQA(Nachweis):
                            f"bei N_Ed = {x.N / 1e3:.1f} kN.")
 
 
-def _glied(g: wd.Glied, faktor: float, mit_lambda: bool) -> str:
+def glied_text(g: wd.Glied, faktor: float, mit_lambda: bool) -> str:
     """
-    Ein Glied von (54) oder (60) als Bruch mit Zahlen -- ohne den Anteil mit
-    ``λ``, wo ``mit_lambda`` falsch ist; leer, wo nichts bleibt.
+    Ein Glied von (54) oder (60) -- und von (62) und (63) im Stab
+    (:mod:`opencivil.nachweis.qa_stahl_stabilitaet`) -- als Bruch mit Zahlen:
+    ohne den Anteil mit ``λ``, wo ``mit_lambda`` falsch ist; leer, wo nichts
+    bleibt.
     """
     innen = rf"\lambda \cdot {fest(g.a / 1e6, 1)}" if mit_lambda and g.a != 0.0 else ""
     if abs(g.b) > 1e-6 * max(abs(g.a), 1.0):

@@ -8,6 +8,10 @@
  * die Angaben der Schubwände -- Duktilität und sprödes Versagen rechnen am
  * selben Querschnitt.
  *
+ * Ein Querschnitt aus Stahl hat dazu Knicken und Kippen nach SIA 263: je
+ * Achse die Knickspannungskurve und die Fälle eines Stabs mit diesem
+ * Querschnitt.
+ *
  * Wie bei der Platte steht oben, was der Querschnitt *ist*, und in den
  * Fenstern, was von ihm *verlangt* wird. Gerechnet wird nichts: jede Zeile
  * beschreibt eine Eingabe, die Zahlen dazu bildet der Kern.
@@ -19,18 +23,21 @@
  */
 
 import {
-  beschreibung, bezeichnung, erklaerung, feld, hakenSchalter, panel, wahlBlock, wahlSchalter,
+  beschreibung, bezeichnung, erklaerung, feld, hakenSchalter, mitBild, panel, wahlBlock,
+  wahlSchalter,
 } from './bausteine.js';
 import { el, svgEl, zahlfeld } from './dom.js';
 import { anfuegenKnopf, fallkopf, fallzeile } from './faelle.js';
-import { kapitelFenster, kapitelPanel, zeilenstand } from './kapitel.js';
+import {
+  kapitelFenster, kapitelPanel, standOhne, zeilenstand,
+} from './kapitel.js';
 import { span } from './mathe.js';
 import {
   analysenKapitel, mitKopf, nachweisKapitel, werkstoffzeilen,
 } from './nachweise.js';
 import { uebersicht } from './qa_uebersicht.js';
 import {
-  bauweiseVon, ohneAnalysenVon, ohneNachweiseVon, werkstoffeVon, zeichenbereich,
+  bauweiseVon, knickkurvenVon, ohneAnalysenVon, ohneNachweiseVon, werkstoffeVon, zeichenbereich,
 } from './qa_zeichnung.js';
 import {
   ausVorlage, eintragAendern, feldangabe, katalog,
@@ -60,6 +67,18 @@ const HILFE = {
       ['Werte', 'je Baustahl nach Wahl, oben in diesem Fenster'],
     ],
     formel: 'α_eff = Widerstand / Einwirkung ≥ 1',
+  },
+  stabilitaet: {
+    zeilen: [
+      ['Klasse', 'im Fall aus c/t wie in der Tragsicherheit, bei N_Ed und den Momenten 1. Ordnung'],
+      ['Knicken', 'je Achse χ_K aus der Schlankheit und der Kurve: N_K,Rd = χ_K · f_y · A / γ_M1 (7)'],
+      ['Kippen', 'um die starke Achse, wo ein Moment um sie wirkt: M_cr nach Anhang B, η aus ψ; M_D,Rd = χ_D · W · f_y / γ_M1 (9)'],
+      ['M-N', 'Klassen 1 bis 3 nach (50), ein I-Walzprofil auch nach (51) – es gilt die günstigere; Klasse 4 nach (62) und (63)'],
+      ['L = 0', 'gehalten: um diese Achse knickt der Stab nicht, oder er kippt nicht'],
+      ['ψ', 'Verhältnis der Endmomente, −1 bis 1: konstantes Moment 1; mit Querlast oder verschieblich ebenfalls 1'],
+      ['α_eff', 'N_Ed bleibt, die Momente wachsen, bis die Gleichung aufgeht'],
+    ],
+    formel: 'N_Ed / N_K,Rd + Σ ω · M_Ed / ((1 − N_Ed / N_cr) · M_Rd) ≤ 1   (50)',
   },
   duktilitaet: {
     zeilen: [
@@ -223,21 +242,7 @@ function lastfallAngaben(analyse) {
   return [
     rechenwahl(analyse),
     el('div.qa-kopfzeile', {}, [
-      // Je Stellung die Nulllinie im Bild, statt Häkchen und Satz (Benutzer,
-      // 2026-11-19); was sonst noch gilt, steht im Titel der Stellung.
-      el('div.qa-schalter', {}, [
-        wahlBlock('Biegung', wahlSchalter({
-          werte: [
-            { wert: true, beschriftung: 'einachsig', zeichen: 'biegung-einachsig',
-              titel: 'Nur um y: die Nulllinie bleibt waagrecht; M_z und V_y zählen nicht' },
-            { wert: false, beschriftung: 'zweiachsig', zeichen: 'biegung-zweiachsig',
-              titel: 'N, M_y und M_z gleichzeitig: die Nulllinie liegt schief' },
-          ],
-          gewaehlt: !!analyse.einachsig,
-          setzen: (wert) => aendern((a) => { a.einachsig = wert; }),
-          titel: 'Nur um y gebogen oder um beide Achsen',
-        })),
-      ]),
+      el('div.qa-schalter', {}, [biegungsWahl(analyse)]),
       vorzeichenbild(analyse.einachsig),
     ]),
     faelle.length ? lastfallKopf(analyse) : null,
@@ -247,6 +252,27 @@ function lastfallAngaben(analyse) {
     anfuegenKnopf('Lastfall', (name) => aendern((a) => a.lastfaelle.push(
       ausVorlage('qalastfall', { name: name(a.lastfaelle) })))),
   ];
+}
+
+/**
+ * Ob der Querschnitt nur um y gebogen wird oder um beide Achsen -- je
+ * Stellung die Nulllinie im Bild, statt Häkchen und Satz (Benutzer,
+ * 2026-11-19); was sonst noch gilt, steht im Titel der Stellung. Dieselbe
+ * Wahl in der Tragsicherheit und bei Knicken und Kippen: sie gehört der
+ * Analyse.
+ */
+function biegungsWahl(analyse) {
+  return wahlBlock('Biegung', wahlSchalter({
+    werte: [
+      { wert: true, beschriftung: 'einachsig', zeichen: 'biegung-einachsig',
+        titel: 'Nur um y: die Nulllinie bleibt waagrecht; M_z und V_y zählen nicht' },
+      { wert: false, beschriftung: 'zweiachsig', zeichen: 'biegung-zweiachsig',
+        titel: 'N, M_y und M_z gleichzeitig: die Nulllinie liegt schief' },
+    ],
+    gewaehlt: !!analyse.einachsig,
+    setzen: (wert) => eintragAendern(analyse.kennung, (a) => { a.einachsig = wert; }),
+    titel: 'Nur um y gebogen oder um beide Achsen',
+  }));
 }
 
 /** In welchen Richtungen Duktilität, sprödes Versagen und Zwängung auf Biegung geführt werden. */
@@ -280,6 +306,118 @@ function lastfallZeile(analyse, index) {
     entfernenTitel: 'Lastfall entfernen',
     entfernen: () => eintragAendern(analyse.kennung, (a) => {
       a.lastfaelle.splice(index, 1);
+    }),
+  });
+}
+
+// ===========================================================================
+// Knicken und Kippen eines Stabs aus Stahl
+// ===========================================================================
+
+/**
+ * Die Spalten eines Falls, in zwei Zeilen: oben die Druckkraft und die drei
+ * Längen, unten die Momente mit ihrem ψ -- einachsig ohne M_z und ψ_z. Eine
+ * Last, die man leert, ist keine Last; eine Länge oder ein ψ behält den
+ * bisherigen Wert, denn null heisst dort etwas: gehalten, ein dreieckiges
+ * Moment.
+ */
+const STABSPALTEN = [
+  { feld: 'N_Ed', kopf: ['N_{Ed}', 'kN'], schritt: 50, leer: 0, titel: 'Normalkraft in kN – Druck negativ' },
+  { feld: 'L_K_y', kopf: ['L_{K,y}', 'm'], schritt: 0.5, titel: 'Knicklänge um y in m – null: gehalten' },
+  { feld: 'L_K_z', kopf: ['L_{K,z}', 'm'], schritt: 0.5, titel: 'Knicklänge um z in m – null: gehalten' },
+  {
+    feld: 'L_D', kopf: ['L_D', 'm'], schritt: 0.5,
+    titel: 'Kipplänge in m: Abstand der Punkte, an denen der Druckgurt seitlich gehalten ist – null: gehalten',
+  },
+  {
+    feld: 'M_y_Ed', kopf: ['M_{y,Ed}', 'kNm'], schritt: 10, leer: 0,
+    titel: 'Grösstes Moment 1. Ordnung um y im Stab, in kNm – positiv: Zug unten',
+  },
+  {
+    feld: 'psi_y', kopf: [String.raw`\psi_y`], schritt: 0.25,
+    titel: 'Verhältnis der Endmomente um y, −1 bis 1 – konstantes Moment, Querlast oder verschieblich: 1',
+  },
+  {
+    feld: 'M_z_Ed', kopf: ['M_{z,Ed}', 'kNm'], schritt: 10, leer: 0, zweiachsig: true,
+    titel: 'Grösstes Moment 1. Ordnung um z im Stab, in kNm – positiv: Zug links',
+  },
+  {
+    feld: 'psi_z', kopf: [String.raw`\psi_z`], schritt: 0.25, zweiachsig: true,
+    titel: 'Verhältnis der Endmomente um z, −1 bis 1 – konstantes Moment, Querlast oder verschieblich: 1',
+  },
+];
+
+function stabspalten(analyse) {
+  return STABSPALTEN.filter((s) => !(analyse.einachsig && s.zweiachsig));
+}
+
+/**
+ * Knicken und Kippen: die Wahl der Biegung wie in der Tragsicherheit, je
+ * Achse die Knickspannungskurve, darunter die Fälle. Was einem Fall noch
+ * fehlt, sagt der Kern mit demselben Satz wie in der Herleitung
+ * (`knickkurvenVon`).
+ */
+function stabilitaetsAngaben(analyse) {
+  const aendern = (veraenderer) => eintragAendern(analyse.kennung, veraenderer);
+  const faelle = analyse.stabilitaetsfaelle || [];
+  const { eigene, fehlen } = knickkurvenVon(analyse.kennung);
+  return [
+    biegungsWahl(analyse),
+    ...['y', 'z'].map((achse) => kurvenwahl(analyse, achse, eigene)),
+    fehlen ? el('p.hinweis', { text: fehlen }) : null,
+    el('p.qa-erlaeuterung', { text: 'Gerechnet mit den Rechenwerten der Tragsicherheit.' }),
+    faelle.length
+      ? fallkopf(stabspalten(analyse).map((s) => s.kopf), { spalten: 4 }) : null,
+    ...(faelle.length
+      ? faelle.map((_, i) => stabilitaetsZeile(analyse, i))
+      : [el('div.leer', { text: 'Ohne Fall kein Nachweis.' })]),
+    anfuegenKnopf('Stabilitätsnachweis', (name) => aendern((a) => {
+      a.stabilitaetsfaelle = a.stabilitaetsfaelle || [];
+      a.stabilitaetsfaelle.push(ausVorlage('qastabilitaet', { name: name(a.stabilitaetsfaelle) }));
+    })),
+  ];
+}
+
+/**
+ * Die Knickspannungskurve um eine Achse: ein Schalter, je Stellung ihr
+ * Bild. Darunter klein, welche Kurve das Profil hat und warum -- oder dass
+ * es keines gibt, wo die Kurve aus ihm kommen soll.
+ */
+function kurvenwahl(analyse, achse, eigene) {
+  const feld = `knickkurve_${achse}`;
+  const gewaehlt = analyse[feld] || 'profil';
+  const block = wahlBlock(`Knickspannungskurve um ${achse}`, wahlSchalter({
+    werte: mitBild(katalog('querschnittsanalyse', 'knickkurven'), 'knickkurve'),
+    gewaehlt,
+    setzen: (wert) => eintragAendern(analyse.kennung, (a) => { a[feld] = wert; }),
+    titel: `Knickspannungskurve um ${achse} nach Figur 7: aus dem Profil oder gewählt`,
+  }));
+  if (gewaehlt === 'profil') {
+    const profil = eigene?.[achse];
+    block.append(el('p.qa-erlaeuterung', {
+      text: profil ? `Kurve ${profil.kurve}: ${profil.grund}`
+        : 'Ohne einzelnes Profil gibt Figur 7 keine Kurve.',
+    }));
+  }
+  return block;
+}
+
+function stabilitaetsZeile(analyse, index) {
+  const fall = analyse.stabilitaetsfaelle[index];
+  const aendern = (veraenderer) => eintragAendern(analyse.kennung,
+    (a) => veraenderer(a.stabilitaetsfaelle[index]));
+  return fallzeile({
+    fall, aendern, was: 'Stabilitätsnachweis', nameTitel: 'Bezeichnung des Falls',
+    liste: { kennung: analyse.kennung, pfad: 'stabilitaetsfaelle', index },
+    zahlen: stabspalten(analyse).map((s) => zahlfeld({
+      wert: fall[s.feld], schritt: s.schritt, titel: s.titel, leer: s.leer,
+      angabe: feldangabe('qastabilitaet', s.feld),
+      beiAenderung: (v) => aendern((x) => { x[s.feld] = v; }),
+    })),
+    spalten: 4,
+    entfernenTitel: 'Fall entfernen',
+    entfernen: () => eintragAendern(analyse.kennung, (a) => {
+      a.stabilitaetsfaelle.splice(index, 1);
     }),
   });
 }
@@ -382,6 +520,20 @@ const TRAGSICHERHEIT_STAHL = {
   ...TRAGSICHERHEIT, hilfe: HILFE.tragsicherheitStahl, inhalt: lastfallAngaben,
 };
 
+/**
+ * Knicken und Kippen eines Stabs mit dem gezeichneten Querschnitt, nach
+ * SIA 263. Der Kachel fehlt etwas, solange einem Fall eine Kurve fehlt.
+ */
+const STABILITAET = {
+  schluessel: 'stabilitaet',
+  name: 'Knicken und Kippen', titel: 'Knicken und Kippen nach SIA 263',
+  bezug: () => 'N negativ: Druck · eine Länge null heisst gehalten',
+  hilfe: HILFE.stabilitaet,
+  inhalt: stabilitaetsAngaben,
+  stand: (a) => standOhne(zeilenstand(a.stabilitaetsfaelle, 'Fall', 'Fälle', 'kein Fall'),
+    knickkurvenVon(a.kennung).fehlen ? 'Knickkurve fehlt' : ''),
+};
+
 /** Die Zugseiten einer Analyse aus dem Katalog -- und wie dann ihre Ränder heissen. */
 function zugseite(wert) {
   return katalog('querschnittsanalyse', 'zugseiten').find((z) => z.wert === wert);
@@ -458,7 +610,8 @@ const ORT = {
 
 /**
  * Die Kacheln der Analyse. Die Nachweise sind die des Stahlbetons, beim
- * Stahl nur die Tragsicherheit nach SIA 263 (`bauweiseVon`). Ein Querschnitt
+ * Stahl die Tragsicherheit und Knicken und Kippen nach SIA 263
+ * (`bauweiseVon`). Ein Querschnitt
  * aus Holz oder im Verbund hat noch keine, statt ihrer steht grau, warum
  * (`ohneNachweiseVon`). Die Spannung-Dehnung-Analysen hat jeder ausser dem
  * Verbund (`ohneAnalysenVon`). Was in den Kacheln eingestellt ist, bleibt.
@@ -468,7 +621,7 @@ function kapitel(analyse) {
     : { titel, kapitel: kacheln() });
   return [
     gruppe('Nachweise', ohneNachweiseVon(analyse.kennung),
-      () => (bauweiseVon(analyse.kennung) === 'stahl' ? [TRAGSICHERHEIT_STAHL]
+      () => (bauweiseVon(analyse.kennung) === 'stahl' ? [TRAGSICHERHEIT_STAHL, STABILITAET]
         : [TRAGSICHERHEIT, ...nachweisKapitel(ORT)])),
     gruppe('Spannung-Dehnung-Analysen', ohneAnalysenVon(analyse.kennung),
       () => analysenKapitel(ORT)),

@@ -1,5 +1,5 @@
 ---
-erzeugt: 42f66931fb86
+erzeugt: 33941bb80c71
 art: formel
 tags: [formel]
 ---
@@ -30,14 +30,18 @@ $$
 ## Gebraucht von
 
 - [[Biegewiderstand bis zum ersten Fliessen]]
+- [[Ideelles Kippmoment]]
+- [[Saint-Venant-Anteil der Kippspannung]]
 
 ## Im Code
 
 - [[opencivil.nachweis.qa_stahl#StahlBiegungQA._wirksam|StahlBiegungQA._wirksam]]
+- [[opencivil.nachweis.qa_stahl_stabilitaet#_Herleitung._biegung|_Herleitung._biegung]]
 
 ## Themen
 
 - [[Stahlquerschnitt]]
+- [[Knicken und Kippen]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

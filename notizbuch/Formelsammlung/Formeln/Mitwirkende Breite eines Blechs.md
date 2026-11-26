@@ -1,5 +1,5 @@
 ---
-erzeugt: 3dfe5fd8e6d9
+erzeugt: ae372e096663
 art: formel
 tags: [formel]
 normstelle: "SIA 263:2013, 4.5.3.2, (11); 4.5.3.3"
@@ -21,6 +21,7 @@ $$
 
 - [[Kennzahlen]]
 - [[Stahlquerschnitt]]
+- [[Knicken und Kippen]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

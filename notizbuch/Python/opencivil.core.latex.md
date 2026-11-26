@@ -1,5 +1,5 @@
 ---
-erzeugt: 182d61b706c4
+erzeugt: 5661abf2af53
 art: modul
 tags: [modul]
 ---
@@ -489,6 +489,7 @@ Leser sieht alle Zweige und erkennt, welcher gegriffen hat.
 - [[opencivil.nachweis.qa_kennzahlen]]
 - [[opencivil.nachweis.qa_stahl]]
 - [[opencivil.nachweis.qa_stahl_kennzahlen]]
+- [[opencivil.nachweis.qa_stahl_stabilitaet]]
 - [[opencivil.nachweis.qa_stahl_werte]]
 - [[opencivil.nachweis.querkraft]]
 - [[opencivil.nachweis.rechenwahl]]

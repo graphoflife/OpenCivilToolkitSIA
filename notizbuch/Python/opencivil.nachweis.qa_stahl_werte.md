@@ -1,5 +1,5 @@
 ---
-erzeugt: df6a7cddb452
+erzeugt: 42ce49539d20
 art: modul
 tags: [modul]
 ---
@@ -137,11 +137,13 @@ Die mitwirkenden Breiten der Bleche in Klasse 4, als Tabelle mit ihren Formeln.
 ## Konstanten
 
 - `KENNWERTE = ('f_y', 'f_y_dick', 'tau_y', 'tau_y_dick', 'gamma_M1', 'E_a')` – Was Kennzahlen und Nachweise je Baustahl lesen.
-- `_JEDE_DICKE = ('gamma_M1', 'E_a')` – Was in jeder Dicke gilt -- die anderen Kennwerte haben einen Wert ueber 40 mm.
-- `ROHR_KLASSE_4 = 'Ein Rundrohr der Klasse 4 rechnet das Werkzeug nicht – SIA 263 nennt…` – Warum ein Rundrohr der Klasse 4 nichts traegt.
+- `_JEDE_DICKE = ('gamma_M1', 'E_a', 'G_a')` – Was in jeder Dicke gilt -- die anderen Kennwerte haben einen Wert ueber 40 mm. `G_a` liest nur das Kippen ([[opencivil.nachweis.qa_stahl_stabilitaet]]).
+- `ROHR_KLASSE_4 = f'{wd.ROHR_KLASSE_4} Der Widerstand steht darum auf null.'` – Warum ein Rundrohr der Klasse 4 nichts traegt.
 - `SPANNUNG = Mathe('f_y\\ [\\mathrm{N}/\\mathrm{mm}^2]')`
 - `WIDERSTANDSMOMENT = 'Widerstandsmoment bis zur weitesten Faser'` – Namen der Formeln, die Kennzahlen und Nachweise beide schreiben: eine Formel, ein Name in der Formelsammlung, gleich in welcher Klasse.
 - `ELASTISCH = 'Biegewiderstand bis zum ersten Fliessen'`
+- `NORMALKRAFT = 'Normalkraftwiderstand eines Stahlquerschnitts'`
+- `PLASTISCH = 'Plastischer Biegewiderstand eines Stahlquerschnitts'`
 
 ## Braucht
 
@@ -152,12 +154,14 @@ Die mitwirkenden Breiten der Bleche in Klasse 4, als Tabelle mit ihren Formeln.
 - [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.stahlbau.klasse]]
 - [[opencivil.stahlbau.querschnitt]]
+- [[opencivil.stahlbau.widerstand]]
 - [[opencivil.stahlprofile.bleche]]
 
 ## Gebraucht von
 
 - [[opencivil.nachweis.qa_stahl]]
 - [[opencivil.nachweis.qa_stahl_kennzahlen]]
+- [[opencivil.nachweis.qa_stahl_stabilitaet]]
 
 ## Formeln aus diesem Modul
 

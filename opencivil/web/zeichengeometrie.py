@@ -21,7 +21,7 @@ N/mm², die Vordehnung in Promille, Kraefte in kN.
 from __future__ import annotations
 
 import math
-from typing import Dict, List, Mapping, NamedTuple, Optional, Sequence, Tuple
+from typing import Any, Dict, List, Mapping, NamedTuple, Optional, Sequence, Tuple
 
 from opencivil.core.protokoll import Abschnitt
 from opencivil.core.rechenwerk import Rechenwerk
@@ -46,6 +46,7 @@ from opencivil.querschnitt.geometrie import (
 from opencivil.querschnitt.spannglieder import (
     Spannglied, Spannglieder, aus_glied, geneigt, grenzen_verletzt, lotrecht,
 )
+from opencivil.stahlbau import stabilitaet
 
 
 def geometrie(eintrag, projekt) -> dict:
@@ -69,6 +70,9 @@ def geometrie(eintrag, projekt) -> dict:
     Bauweise --, ``ohne_analysen`` derselbe fuer die
     Spannung-Dehnung-Analysen, leer ausser im Verbund. Danach zeigt die
     Analyse ihre Kacheln (:func:`ohne_nachweise`, :func:`ohne_analysen`).
+    ``knickkurven`` sagt je Achse die Knickspannungskurve, die Figur 7 dem
+    einzigen Profil des Querschnitts zuweist, ``knickkurven_fehlen``, welche
+    einem Stabilitaetsnachweis fehlt (:func:`_knickkurven`).
 
     ``gueltig`` heisst: die Zeichnung rechnet. Eine Spannung ueber der
     Grenze der Norm steht rot am Glied, haelt die Rechnung aber nicht an --
@@ -219,6 +223,30 @@ def geometrie(eintrag, projekt) -> dict:
         "bauweise": art.value if art is not None else "",
         "ohne_nachweise": _als_satz(ohne_nachweise(art)) if art is not None else "",
         "ohne_analysen": ohne_analysen(art) if art is not None else "",
+        **_knickkurven(eintrag, flaechen, b),
+    }
+
+
+def _knickkurven(eintrag, flaechen: Sequence[Mapping], brutto) -> Dict[str, Any]:
+    """
+    ``knickkurven``: je Achse die Knickspannungskurve des einzigen Profils,
+    ``kurve`` und ``grund`` -- ``None``, wo der Querschnitt nicht aus einem
+    einzigen Profil besteht (:func:`~opencivil.stahlbau.stabilitaet.einzelprofil`):
+    dann waehlt der Benutzer sie. ``knickkurven_fehlen``: der Satz, welche
+    Kurve den Faellen von Knicken und Kippen dann fehlt -- derselbe wie im
+    Fall (:func:`~opencivil.stahlbau.stabilitaet.fehlende_kurven`), leer,
+    wo keine fehlt.
+    """
+    if brutto is None:
+        return {"knickkurven": None, "knickkurven_fehlen": ""}
+    profil = stabilitaet.einzelprofil((f["kennung"], f["profil"]) for f in flaechen)
+    I = {"y": brutto.I_y, "z": brutto.I_z}
+    eigene = stabilitaet.kurven_des_profils(profil, I) if profil is not None else None
+    kurven = stabilitaet.rechenkurven(eintrag.knickkurven, profil, I)
+    return {
+        "knickkurven": eigene and {a: {"kurve": k, "grund": grund}
+                                   for a, (k, grund) in eigene.items()},
+        "knickkurven_fehlen": stabilitaet.fehlende_kurven(kurven, eintrag.stabfaelle()),
     }
 
 

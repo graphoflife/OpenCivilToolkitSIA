@@ -1,5 +1,5 @@
 ---
-erzeugt: 43c5ff50e8bb
+erzeugt: 51dbdf85a280
 art: modul
 tags: [modul]
 ---
@@ -67,7 +67,9 @@ def _stahl(eintrag: QuerschnittsanalyseEintrag, analyse: Querschnittsanalyse, te
 Ein Querschnitt aus Stahl nach SIA 263 ([[opencivil.nachweis.qa_stahl|qa_stahl]]):
 je Lastfall Biegung und Normalkraft, Querkraft, sobald einer sie hat --
 beide lesen den Widerstand gegen Querkraft aus den Kennzahlen. Torsion
-weist er nicht nach; ein Lastfall mit `T_Ed` sagt es. Die Kennzahlen
+weist er nicht nach; ein Lastfall mit `T_Ed` sagt es. Knicken und
+Kippen, sobald ein Fall eingeschaltet ist
+([[opencivil.nachweis.qa_stahl_stabilitaet|qa_stahl_stabilitaet]]). Die Kennzahlen
 stehen in der Herleitung vor den Nachweisen, die aus ihnen lesen.
 
 ### _kennzahlen
@@ -163,6 +165,7 @@ Staeben gibt.
 - [[opencivil.nachweis.qa_knicken]]
 - [[opencivil.nachweis.qa_stahl]]
 - [[opencivil.nachweis.qa_stahl_kennzahlen]]
+- [[opencivil.nachweis.qa_stahl_stabilitaet]]
 - [[opencivil.nachweis.richtungsnachweise]]
 - [[opencivil.nachweis.schiefe_biegung]]
 - [[opencivil.nachweis.schubwandnachweis]]

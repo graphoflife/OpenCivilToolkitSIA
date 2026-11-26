@@ -1,5 +1,5 @@
 ---
-erzeugt: dcf729b2629a
+erzeugt: 7ecab90646bb
 art: modul
 tags: [modul]
 ---
@@ -564,6 +564,7 @@ Ein Wert, wie er in einer Meldung steht -- ein Text in Anfuehrungszeichen.
 - [[opencivil.projekt.querschnittsanalyse]]
 - [[opencivil.projekt.setzung]]
 - [[opencivil.projekt.spannglieder]]
+- [[opencivil.projekt.stabilitaet]]
 - [[opencivil.projekt.staebe]]
 - [[opencivil.web.api]]
 - [[opencivil.web.systemkatalog]]

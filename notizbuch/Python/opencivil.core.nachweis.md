@@ -1,5 +1,5 @@
 ---
-erzeugt: 6c538b1e152f
+erzeugt: 9ac84a0acea1
 art: modul
 tags: [modul]
 ---
@@ -466,6 +466,7 @@ Das Urteil eines Teils: sein Grad, sein Name, Ausgang und Begruendung.
 - [[opencivil.nachweis.mindestbewehrung]]
 - [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.qa_stahl]]
+- [[opencivil.nachweis.qa_stahl_stabilitaet]]
 - [[opencivil.nachweis.querkraft]]
 - [[opencivil.nachweis.querkraft_buegel]]
 - [[opencivil.nachweis.querkraft_ohne_buegel]]

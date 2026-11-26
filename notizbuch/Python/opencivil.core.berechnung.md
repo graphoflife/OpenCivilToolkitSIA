@@ -1,5 +1,5 @@
 ---
-erzeugt: d6ebc6b8e829
+erzeugt: dd14f86edc54
 art: modul
 tags: [modul]
 ---
@@ -481,6 +481,7 @@ Die Kennzahl `kurz` mit dem Wert `si` in SI-Basis -- auch in `ergebnis`.
 - [[opencivil.nachweis.qa_knicken]]
 - [[opencivil.nachweis.qa_stahl]]
 - [[opencivil.nachweis.qa_stahl_kennzahlen]]
+- [[opencivil.nachweis.qa_stahl_stabilitaet]]
 - [[opencivil.nachweis.qa_stahl_werte]]
 - [[opencivil.nachweis.querkraft]]
 - [[opencivil.nachweis.querkraft_buegel]]

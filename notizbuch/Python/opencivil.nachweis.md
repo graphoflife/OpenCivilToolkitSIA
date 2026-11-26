@@ -1,5 +1,5 @@
 ---
-erzeugt: 7e36bcaae2e5
+erzeugt: fd7d6ede47ea
 art: modul
 tags: [modul]
 ---
@@ -30,6 +30,7 @@ Kapitel waehlt, womit es rechnet.
 - [[opencivil.nachweis.qa_knicken]] – Knicken am gezeichneten Querschnitt.
 - [[opencivil.nachweis.qa_stahl]] – die Lastfaelle eines Stahlquerschnitts nach SIA 263:2013.
 - [[opencivil.nachweis.qa_stahl_kennzahlen]] – was ein gezeichneter Stahlquerschnitt aufnimmt, ohne Einwirkung.
+- [[opencivil.nachweis.qa_stahl_stabilitaet]] – Knicken und Kippen eines Stahlstabs nach SIA 263:2013.
 - [[opencivil.nachweis.qa_stahl_werte]] – was Kennzahlen und Nachweise eines Stahlquerschnitts teilen.
 - [[opencivil.nachweis.querkraft]] – Querkraftnachweis, was beide Ansaetze teilen.
 - [[opencivil.nachweis.querkraft_buegel]] – Querkraft mit Querkraftbewehrung.

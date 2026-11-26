@@ -1401,6 +1401,44 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
 
       Vorschlag: so lassen. Entscheid des Benutzers.
 
+- [ ] **Knicken und Kippen, nach Vorgabe eingebaut**
+      (`opencivil/stahlbau/stabilitaet.py`,
+      `opencivil/nachweis/qa_stahl_stabilitaet.py`, seit 2026-11-26). Jede
+      Annahme steht auch in der Herleitung.
+      - Das Rundrohr gilt als warmgefertigt, Kurve a – wie in den
+        Excel-Dateien. Für ein kaltgefertigtes wählt man c.
+      - Die Kurve gilt je Achse für alle Fälle der Analyse. Ohne einzelnes
+        Profil kennt das Werkzeug sie nicht; dann wählt man sie.
+      - Die Klasse im Fall bei N_Ed und den Momenten 1. Ordnung, nach
+        derselben Regel wie im Lastfall der Tragsicherheit.
+      - ψ gilt für ω (5.1.9.1) und für η (B.6). Mit Querlast oder
+        verschieblich ψ = 1: ω = 1 verlangt 5.1.10.3, η = 1 liegt auf der
+        sicheren Seite. Unter ψ = −0.5 bleibt η bei 2.35.
+      - Der Druckgurt ohne Ausrundungen, als gedrückter Steg die Hälfte der
+        Höhe zwischen den Flanschen (Biegung allein); im Rechteckrohr beide
+        Stege. In Klasse 4 der ganze Druckgurt, obwohl B.5 und 5.6.2.3 nur
+        die mitwirkenden Teile zulassen – auf der sicheren Seite.
+      - σ_Dv = 0, sobald der Fall in Klasse 4 ist (B.4), auch wo die
+        Klasse 4 aus dem Druck kommt – auf der sicheren Seite, bei einem
+        geschlossenen Rohr sehr.
+      - Rohre kippen mit α_D = 0.21 der Walzprofile.
+      - Mit mehreren Baustählen λ̄_K = √(Σ f_y A/N_cr).
+      - w_0 nach Figur 3 mit der Knicklänge als Stablänge; in Klasse 4
+        mindert χ_D in (62) und (63) den Widerstand um die starke Achse.
+      - (51) nur, wo L_D und die Knicklänge um die schwache Achse beide
+        über null sind; es gilt die günstigere von (50) und (51). Wo
+        gekippt wird, gilt (9) immer auch allein.
+      - Eine Schlankheit über 200 (4.5.1.7) ist nur ein Hinweis.
+      - Nicht gerechnet: Biegedrillknicken (4.5.1.2), die Vergrösserung ξ
+        (5.1.9.2), die kritischen Kipplängen der Tabelle 6, das Kippen
+        geschweisster I und frei gezeichneter Querschnitte, (51) für das
+        gewalzte Rechteckrohr – die Reihe RRW fehlt noch.
+      - Anders als die Excel-Datei «Stabilitätsnachweise»: sie vergrössert
+        in (50) mit N_K,Rd statt mit N_cr, etwas auf der sicheren Seite;
+        das Werkzeug folgt (50).
+
+      Vorschlag: so lassen. Entscheid des Benutzers.
+
 - [ ] **Der Bezug des äquivalenten Moduls ohne Beton**
       (`opencivil/spannungsanalyse/rissfrei.py`, seit 2026-11-26). Hat ein
       Querschnitt aus Holz oder Baustahl zwei Sorten derselben Art, misst

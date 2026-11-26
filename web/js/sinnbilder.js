@@ -20,6 +20,10 @@ import { svgEl } from './dom.js';
 
 const ACHSEN = 'M4 20h16 M4 20V4';
 
+// Was ein Stab ohne Imperfektion trüge, χ über λ̄ bis 2.5: eins bis λ̄ = 1,
+// dann nach Euler 1/λ̄² -- die Grenze, unter der jede Knickspannungskurve liegt.
+const EULER = 'M4 5L10.4 5L11.7 9.6L13 12.3L14.2 14.1L15.5 15.4L16.8 16.2L18.1 16.9L20 17.6';
+
 const ZEICHEN = {
   // M-N-Interaktionslinie: Achsen, die geschlossene Linie, ein Punkt darin.
   tragsicherheit: {
@@ -31,6 +35,12 @@ const ZEICHEN = {
   knicken: {
     pfade: ['M12 2v4 M10 4.2l2 1.8 2-1.8', 'M12 7c4 3.5 4 9.5 0 13', 'M8 21h8'],
     strich: ['M12 7v13'],
+  },
+  // Ein Stahlträger im Schnitt, der seitlich ausweicht und sich dabei
+  // verdreht -- gestrichelt, wo er stand: Knicken und Kippen.
+  stabilitaet: {
+    pfade: ['M13.6 4.1L21.2 6.8 M8.8 17.2L16.4 19.9 M17.4 5.4L12.6 18.6'],
+    strich: ['M4 5h8 M4 19h8 M8 5v14'],
   },
   // Querschnitt mit Druckzone oben und ihrer Höhe x daneben.
   duktilitaet: {
@@ -608,6 +618,33 @@ const ZEICHEN = {
   'biegung-zweiachsig': {
     pfade: ['M7 3h10v18H7z', 'M3 14L21 6'],
     flaechen: ['M7 3h10v4.78L7 12.22z'],
+  },
+  // Die Knickspannungskurve: aus dem Profil das I, dessen Form nach Figur 7
+  // die Kurve bestimmt; sonst χ über λ̄ nach (8), mit dem α_K der Kurve
+  // gerechnet, unter der Grenze ohne Imperfektion (gestrichelt). Je
+  // grösser α_K, desto tiefer die Kurve.
+  'knickkurve-profil': {
+    pfade: ['M5 4h14v3h-5.5v10H19v3H5v-3h5.5V7H5z'],
+  },
+  'knickkurve-a': {
+    pfade: [ACHSEN, 'M4 5L5.3 5L6.6 5.7L7.8 6.7L9.1 8.1L10.4 10L11.7 12.1L13 13.7L14.2 15L15.5 15.9'
+      + 'L16.8 16.7L18.1 17.2L19.4 17.6'],
+    strich: [EULER],
+  },
+  'knickkurve-b': {
+    pfade: [ACHSEN, 'M4 5L5.3 5L6.6 6.1L7.8 7.4L9.1 9.1L10.4 11L11.7 12.8L13 14.3L14.2 15.4L15.5 16.2'
+      + 'L16.8 16.9L18.1 17.4L19.4 17.7'],
+    strich: [EULER],
+  },
+  'knickkurve-c': {
+    pfade: [ACHSEN, 'M4 5L5.3 5L6.6 6.5L7.8 8.2L9.1 10.1L10.4 11.9L11.7 13.5L13 14.8L14.2 15.7'
+      + 'L15.5 16.5L16.8 17.1L18.1 17.5L19.4 17.9'],
+    strich: [EULER],
+  },
+  'knickkurve-d': {
+    pfade: [ACHSEN, 'M4 5L5.3 5L6.6 7.2L7.8 9.3L9.1 11.3L10.4 13L11.7 14.4L13 15.4L14.2 16.2'
+      + 'L15.5 16.9L16.8 17.4L18.1 17.7L19.4 18'],
+    strich: [EULER],
   },
 };
 

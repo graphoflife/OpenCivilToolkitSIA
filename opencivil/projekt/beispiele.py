@@ -766,6 +766,11 @@ def _stahltraeger(kennung: str) -> QuerschnittsanalyseEintrag:
     die dem Steg nimmt, und mit Torsion, die nur ein Hinweis ist; mit mehr
     Druck nach (54), mit noch mehr am wirksamen Querschnitt nach (60), und
     reiner Druck nach (55).
+
+    Dazu Knicken und Kippen, wieder jede Klasse: im Feld nach (50) und (51),
+    mit Kippen unter einem dreieckigen Moment; mit Druck in Klasse 3; am
+    wirksamen Querschnitt nach (62) und (63); reiner Druck nach 5.3.8; und
+    seitlich gehalten nur (50).
     """
     a = QuerschnittsanalyseEintrag(kennung=kennung, name="Stahlträger")
     a.profil(0, 0, "IPE 600", stahl="st1")
@@ -773,4 +778,11 @@ def _stahltraeger(kennung: str) -> QuerschnittsanalyseEintrag:
     a.lastfall("Druck mit Biegung", N_Ed=-3000.0, M_y_Ed=100.0)
     a.lastfall("Beulen", N_Ed=-4000.0, M_y_Ed=50.0)
     a.lastfall("Druck", N_Ed=-4000.0)
+    kurz = {"L_K_y": 6.0, "L_K_z": 1.5, "L_D": 1.5}
+    a.stabilitaetsfall("Feld", N_Ed=-1000.0, M_y_Ed=300.0, M_z_Ed=20.0, psi_y=0.0,
+                       L_K_y=6.0, L_K_z=3.0, L_D=3.0)
+    a.stabilitaetsfall("Druck mit Biegung", N_Ed=-3000.0, M_y_Ed=100.0, **kurz)
+    a.stabilitaetsfall("Beulen", N_Ed=-3500.0, M_y_Ed=30.0, **{**kurz, "L_K_y": 3.0})
+    a.stabilitaetsfall("Druck", N_Ed=-3000.0, **kurz)
+    a.stabilitaetsfall("Gehalten", N_Ed=-1000.0, M_y_Ed=300.0, L_K_y=6.0, L_K_z=0.0, L_D=0.0)
     return a

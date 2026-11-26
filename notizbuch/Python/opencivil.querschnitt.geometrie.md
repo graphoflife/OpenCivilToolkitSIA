@@ -1,5 +1,5 @@
 ---
-erzeugt: dc65d95702f6
+erzeugt: cb0ecab80cae
 art: modul
 tags: [modul]
 ---
@@ -566,6 +566,7 @@ Ueberdeckung, oder wenn die Linie dabei keine Laenge behielte.
 - [[opencivil.querschnitt.torsion]]
 - [[opencivil.stahlbau.querschnitt]]
 - [[opencivil.stahlbau.schub]]
+- [[opencivil.stahlbau.stabilitaet]]
 - [[opencivil.stahlbau.widerstand]]
 - [[opencivil.web.api]]
 - [[opencivil.web.zeichengeometrie]]

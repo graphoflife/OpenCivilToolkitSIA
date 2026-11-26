@@ -18,6 +18,7 @@ from opencivil.projekt.querschnittsanalyse import (
     FlaecheEintrag, HilfslinieEintrag, KnotenEintrag, QAGebrauchsfallEintrag, QAKnickEintrag,
     QALastfallEintrag, QASpannungsfallEintrag, SchubwandEintrag, StabEintrag, StablinieEintrag,
 )
+from opencivil.projekt.stabilitaet import QAStabilitaetEintrag
 from opencivil.querschnitt.geometrie import Linienart
 from opencivil.web import api, dienst
 from tests.unfertig import meldung
@@ -406,6 +407,7 @@ class TestNeuePlatteKommtAusDemKern(unittest.TestCase):
                 ("qaspannungsfall", QASpannungsfallEintrag, {"name": "Neu"}),
                 ("qagebrauchsfall", QAGebrauchsfallEintrag, {"name": "Neu"}),
                 ("qaknick", QAKnickEintrag, {"name": "Neu"}),
+                ("qastabilitaet", QAStabilitaetEintrag, {"name": "Neu"}),
                 ("knoten", KnotenEintrag, {}), ("flaeche", FlaecheEintrag, {}),
                 ("stab", StabEintrag, {}), ("stablinie", StablinieEintrag, {}),
                 ("schubwand", SchubwandEintrag, {}), ("hilfslinie", HilfslinieEintrag, {})):
@@ -435,7 +437,8 @@ class TestNeuePlatteKommtAusDemKern(unittest.TestCase):
         """
         zeilen = api.katalog()["vorlagen"]
         for art in ("kombination", "gebrauchsfall", "knick", "verformungsfall", "spannungsfall",
-                    "qalastfall", "qagebrauchsfall", "qaknick", "qaspannungsfall"):
+                    "qalastfall", "qagebrauchsfall", "qaknick", "qaspannungsfall",
+                    "qastabilitaet"):
             einwirkungen = {k: v for k, v in zeilen[art].items() if "_Ed" in k or k == "w"}
             with self.subTest(art=art):
                 self.assertTrue(einwirkungen)

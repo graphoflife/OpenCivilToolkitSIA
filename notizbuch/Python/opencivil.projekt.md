@@ -1,5 +1,5 @@
 ---
-erzeugt: 295921b3dc0e
+erzeugt: 6541d2330071
 art: modul
 tags: [modul]
 ---
@@ -98,6 +98,7 @@ geschieht erst beim Aufbau, ueber die [[opencivil.core.einheiten#Groesse|Groesse
 - [[opencivil.projekt.setzung]] – eine Setzungsberechnung, wie die Oberflaeche sie beschreibt.
 - [[opencivil.projekt.skript]] – ein Python-Skript der App «Python», wie es
 - [[opencivil.projekt.spannglieder]] – ein Spannglied, wie die Oberflaeche es beschreibt.
+- [[opencivil.projekt.stabilitaet]] – ein Fall von Knicken und Kippen, wie die Oberflaeche ihn beschreibt.
 - [[opencivil.projekt.staebe]] – der Baukasten eines Stabwerks, eben und im Raum.
 
 ## Braucht

@@ -133,17 +133,17 @@ const VORRAT = {
     "web/js/qa_spannglied.js?v=85e13c8d90f9",
     "web/js/qa_uebersicht.js?v=73ae3989fa1b",
     "web/js/qa_vorlagen.js?v=d617741b20c0",
-    "web/js/qa_zeichnung.js?v=4ddb54774256",
-    "web/js/querschnittsanalyse.js?v=af1c874e1159",
+    "web/js/qa_zeichnung.js?v=80b185d2121d",
+    "web/js/querschnittsanalyse.js?v=2774a7ff8e82",
     "web/js/setzung.js?v=21db1c68db33",
-    "web/js/sinnbilder.js?v=e84dba595fd8",
+    "web/js/sinnbilder.js?v=6d9f109560b9",
     "web/js/spannungsbild.js?v=5bf6ce4eb080",
     "web/js/sz_zeichnung.js?v=8ce828560c47",
     "web/js/variablen.js?v=7d43b6f38cd9",
     "web/js/zeichnen.js?v=da6e8eec5dc8",
     "web/js/zustand.js?v=3385a39c0f84",
-    "web/kern/notizbuch.json?v=c6ac7d1c3009",
-    "web/kern/quellen.json?v=3201a6327559"
+    "web/kern/notizbuch.json?v=a4b5d1993c4c",
+    "web/kern/quellen.json?v=1aae79b60c7b"
   ],
   "fremd": {
     "web/vendor/jetbrains-mono/": {

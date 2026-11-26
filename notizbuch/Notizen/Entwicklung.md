@@ -7,6 +7,54 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-26 · Knicken und Kippen eines Stahlstabs
+
+Aus dem Plan vom 2026-11-25, Schritte 12c und 12d: ein Stab mit dem
+gezeichneten Querschnitt, nach SIA 263:2013, 4.5, 5.1.10, 5.3.9 und
+Anhang B.
+
+**Vorher und nachher.** Vorher hatte ein Querschnitt aus Stahl nur die
+Kachel «Tragsicherheit». Nachher steht daneben «Knicken und Kippen». Ein
+HEM 180 aus S355 mit N_Ed = −1385 kN, M_y = −57 kNm, M_z = 7.53 kNm und
+3.63 m Knick- und Kipplänge hat dort α = 1.35, massgebend (51); die linke
+Seite von (51) ist 0.582, die Excel-Datei «Stabilitätsnachweise» des
+Benutzers sagt 0.583.
+
+**Ein Fall** hat die Druckkraft, die grössten Momente 1. Ordnung im Stab –
+so verlangen es (50) und (51) –, je Achse das Verhältnis ψ der Endmomente
+und drei Längen: L_K,y, L_K,z und L_D. Eine Länge null heisst gehalten; so
+bleibt jede Länge eine Zahl, und kein Schalter steht neben ihr. ψ gilt für
+ω und für η, dieselben Endmomente.
+
+**Die Knickspannungskurve gehört zum Querschnitt**, nicht zum Fall: je
+Achse eine Wahl an der Analyse, «aus dem Profil» oder a bis d, je mit dem
+Bild ihrer Kurve. Aus dem Profil heisst nach Figur 7 – beim HEB 300 b um y
+und c um z –, und das geht nur, wo der Querschnitt ein einziges Profil
+ist (`einzelprofil`, eine Regel für Rechnung und Zeichnung). Sonst fehlt
+die Kurve, und das steht grau auf der Kachel und im Fenster, mit demselben
+Satz wie im Fall: `fehlende_kurven` sagt es an einer Stelle, der Kern
+schickt es mit der Antwort zur Zeichnung.
+
+**Die Rechnung** (`stahlbau/stabilitaet.py`): die Klasse im Fall wie im
+Lastfall, die Widerstände nach ihr; je Achse N_cr, λ̄_K und χ_K; um die
+starke Achse M_cr nach Anhang B mit η aus ψ, λ̄_D und χ_D; dann (50), beim
+I-Walzprofil auch (51) – die günstigere gilt –, in Klasse 4 (62) und (63),
+und wo gekippt wird immer auch (9). Wie in der Tragsicherheit bleibt die
+Normalkraft, und die Momente wachsen, bis die Gleichung aufgeht.
+
+**Was nicht in der Norm steht oder vereinfacht ist**, steht im [[TODO]]
+und in der Herleitung. In Klasse 4 zählt der ganze Druckgurt, obwohl B.5
+nur die mitwirkenden Teile zulässt: ohne die übrigen wäre sein
+Trägheitsradius grösser, die Vereinfachung liegt also auf der sicheren
+Seite. Die Begriffe der Formeln folgen der Norm: ideelle Kippspannung,
+Saint-Venant- und Wölbanteil, reduzierte Kipplänge.
+
+**Oberfläche.** Die Kachel zeigt ein I, das seitlich ausweicht und sich
+verdreht. Im Fenster steht oben dieselbe Wahl «Biegung einachsig |
+zweiachsig» wie in der Tragsicherheit – sie gehört der Analyse –, dann die
+beiden Kurven, dann die Fälle in zwei Zeilen: oben N und die drei Längen,
+unten die Momente mit ihrem ψ. Einachsig fallen M_z und ψ_z weg.
+
 ## 2026-11-26 · Tragsicherheit des Stahlquerschnitts je Lastfall
 
 Aus dem Plan vom 2026-11-25, Schritt 12b: N, M_y, M_z, V_y, V_z und T eines

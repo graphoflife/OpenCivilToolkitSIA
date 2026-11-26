@@ -49,8 +49,8 @@ from opencivil.core.latex import Mathe, fest
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert
 from opencivil.nachweis.qa_stahl_werte import (
-    ELASTISCH, ROHR_KLASSE_4, SPANNUNG, WIDERSTANDSMOMENT, Stahlwerte, breiten, klassen,
-    stoffbezuege,
+    ELASTISCH, NORMALKRAFT, PLASTISCH, ROHR_KLASSE_4, SPANNUNG, WIDERSTANDSMOMENT, Stahlwerte,
+    breiten, klassen, stoffbezuege,
 )
 from opencivil.querschnitt.analyse import Querschnittsanalyse
 from opencivil.querschnitt.zugseite import Zugseite
@@ -219,8 +219,7 @@ class KennzahlenStahlQA(Kennzahlprozedur):
                  else werte.flaeche(name, symbol, groessen[0] * 1e-6, _BEDEUTUNG[symbol]))
             vorlage, eingaben = sw.formel(0, "@X")
             p.formel(wert, minus + vorlage, {**eingaben, "X": x}, titel=titel, referenz=referenz,
-                     name=("Plastischer Biegewiderstand eines Stahlquerschnitts" if moment
-                           else "Normalkraftwiderstand eines Stahlquerschnitts"))
+                     name=PLASTISCH if moment else NORMALKRAFT)
             return
         einheit, x_einheit = ((r"\mathrm{kNm}", r"\mathrm{cm}^3") if moment
                               else (r"\mathrm{kN}", r"\mathrm{mm}^2"))

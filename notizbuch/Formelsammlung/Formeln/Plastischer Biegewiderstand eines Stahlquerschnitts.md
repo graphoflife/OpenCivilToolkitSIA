@@ -1,5 +1,5 @@
 ---
-erzeugt: 10f2265d2bed
+erzeugt: 210cab0b8448
 art: formel
 tags: [formel]
 normstelle: "SIA 263:2013, 5.1.3, (40)"
@@ -29,13 +29,20 @@ $$
 M_{y,Rd}^{+} = \frac{f_y \cdot W_{pl}}{\gamma_{M1}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 3513.8\,\mathrm{cm}^{3}}{1.05} = 1188\,\mathrm{kNm}
 $$
 
+## Gebraucht von
+
+- [[Abgeminderter Biegewiderstand um die schwache Achse]]
+- [[Kippwiderstand]]
+
 ## Im Code
 
 - [[opencivil.nachweis.qa_stahl_kennzahlen#KennzahlenStahlQA._summe|KennzahlenStahlQA._summe]]
+- [[opencivil.nachweis.qa_stahl_stabilitaet#_Herleitung._biegung|_Herleitung._biegung]]
 
 ## Themen
 
 - [[Kennzahlen]]
+- [[Knicken und Kippen]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

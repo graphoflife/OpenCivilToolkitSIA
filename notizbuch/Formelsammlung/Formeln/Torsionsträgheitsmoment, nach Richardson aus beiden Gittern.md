@@ -1,5 +1,5 @@
 ---
-erzeugt: 5eb6e4e446e2
+erzeugt: 1ec351788d3e
 art: formel
 tags: [formel]
 ---
@@ -24,6 +24,10 @@ Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 $$
 I_T = \frac{4 \cdot I_{T,fein} - I_{T,grob}}{3} = \frac{4 \cdot 1.7\,\cdot 10^{6}\,\mathrm{mm}^{4} - 1.7\,\cdot 10^{6}\,\mathrm{mm}^{4}}{3} = 1.6\,\cdot 10^{6}\,\mathrm{mm}^{4}
 $$
+
+## Gebraucht von
+
+- [[Saint-Venant-Anteil der Kippspannung]]
 
 ## Im Code
 

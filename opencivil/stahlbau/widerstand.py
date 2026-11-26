@@ -97,6 +97,10 @@ REFERENZ_QUERKRAFT = "SIA 263:2013, 5.1.5.1, (43); 5.1.7; 5.2.7; 5.3.6.1"
 #: Ab welchem Anteil an ``V_Rd`` die Querkraft die Bleche mindert, in denen sie steht (5.1.5.1).
 HALBE_QUERKRAFT = 0.5
 
+#: Warum ein Rundrohr der Klasse 4 nicht gerechnet wird (:attr:`Fall.rohr_klasse_4`).
+ROHR_KLASSE_4 = ("Ein Rundrohr der Klasse 4 rechnet das Werkzeug nicht – SIA 263 nennt dafür "
+                 "keine mitwirkende Breite.")
+
 #: Ab welchem Moment ein Lastfall als Biegung gilt, in N·mm -- wie beim
 #: Stahlbeton (:data:`~opencivil.nachweis.schiefe_biegung.KEIN_MOMENT`, dort in Nm).
 KEIN_MOMENT = 1e-3
@@ -327,6 +331,22 @@ def elastische(stahl: Stahlquerschnitt, f: Sequence[float]) -> Widerstaende:
     return Widerstaende(zug, zug, {Zugseite.UNTEN: um_y, Zugseite.OBEN: um_y,
                                    Zugseite.LINKS: um_z, Zugseite.RECHTS: um_z},
                         (w.y_S, w.z_S), (w.y_S, w.z_S))
+
+
+def plastische(stahl: Stahlquerschnitt, f: Sequence[float]) -> Widerstaende:
+    """
+    Die Widerstaende der Klassen 1 und 2, je Achse fuer sich: ``f_y A`` und
+    je Zugseite ``f_y W_pl`` bei ``N = 0`` -- fuer das Zusammenwirken im Stab
+    (:mod:`opencivil.stahlbau.stabilitaet`).
+    """
+    zug = stahl.zugkraft(f)
+    momente = {}
+    for seite in Zugseite:
+        n = normale(seite)
+        W_pl = stahl.plastisch(n, stahl.nulllinie(n, f))
+        momente[seite] = sum(f_g * w for f_g, w in zip(f, W_pl))
+    w = stahl.werte()
+    return Widerstaende(zug, zug, momente, (w.y_S, w.z_S), (w.y_S, w.z_S))
 
 
 @dataclass(frozen=True)

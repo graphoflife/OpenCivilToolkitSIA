@@ -129,7 +129,8 @@ class Aufbau:
                       "spannung_riss", "spannung", "verformung", "knicken",
                       "qa_biegung", "qa_schub", "qa_duktilitaet", "qa_sproede",
                       "qa_rissnormalkraft", "qa_zwaengung_biegung", "qa_spannung_riss",
-                      "qa_spannung", "qa_knicken", "qa_stahl", "qa_stahl_schub", "durchstanzen", "grundbruch", "gleiten",
+                      "qa_spannung", "qa_knicken", "qa_stahl", "qa_stahl_schub",
+                      "qa_stahl_stabilitaet", "durchstanzen", "grundbruch", "gleiten",
                       "setzung", "pfahl_aussen", "pfahl_innen", "pfahl_quer",
                       "pfahl_innen_quer", "erdbeben")
 
