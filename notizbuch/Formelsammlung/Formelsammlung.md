@@ -1,5 +1,5 @@
 ---
-erzeugt: 420e59318060
+erzeugt: 95dc7129df37
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -20,7 +20,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Querschnitt]] · 4
 - [[Biegung und Normalkraft]] · 26
 - [[Verformung]] · 9
-- [[Kennzahlen]] · 35
+- [[Kennzahlen]] · 41
 - [[Querkraft]] · 16
 - [[Duktilität]] · 9
 - [[Zwängung auf Normalkraft]] · 13
@@ -40,6 +40,8 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Sprödes Versagen je Richtung]] · 11
 - [[Stahlquerschnitt]] · 11
 - [[Knicken und Kippen]] · 31
+- [[Holzquerschnitt]] · 28
+- [[Knicken und Kippen eines Holzstabs]] · 19
 
 **Balkensysteme**
 
@@ -100,6 +102,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Bedingung gegen sprödes Versagen]]
 - [[Beide Lagen fliessen auf Zug]] · $N_{Rd}^{+}$
 - [[Beitrag der Durchstanzbewehrung]] · $V_{Rd,s}$
+- [[Beiwert der Bemessungswerte des Holzes]] · $\eta$
 - [[Beiwert der Gesteinskörnung]] · $k_g$
 - [[Beiwert der Momentenübertragung]] · $k_e$
 - [[Beiwert der Parabel]] · $k_{\sigma}$
@@ -130,6 +133,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Bemessungswert des Reibungswinkels]] · $\varphi_{eff}$
 - [[Bemessungswert des Sohlreibungswinkels]] · $\delta_d$
 - [[Bemessungswert des Verformungsmoduls]]
+- [[Bemessungswerte des Holzes]]
 - [[Beton ungerissen, in Druck und Zug]]
 - [[Betonstahl nur auf Zug]]
 - [[Bettung eines Stabs]]
@@ -148,13 +152,19 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Biegebewehrung im Stützstreifen je Meter]] · $a_{s,x}$
 - [[Biegelinie eines Stabs]]
 - [[Biegelinie eines Stabs im Raum]]
+- [[Biegespannung im Holz]] · $\sigma_{m,y,d}$
 - [[Biegesteifigkeit]] · $EI_{\text{Q1}}$
 - [[Biegesteifigkeit der Wände]] · $EI_x$
 - [[Biegesteifigkeit des Pfahls]] · $EI$
 - [[Biegesteifigkeit um y]] · $EI_{y}$
 - [[Biegesteifigkeit um z]] · $EI_{z}$
 - [[Biegewiderstand bis zum ersten Fliessen]] · $M_{y,Rd}^{+}$
+- [[Biegewiderstand des Brettschichtholzes]] · $M_{y,Rd}$
+- [[Biegewiderstand eines Holzquerschnitts]] · $M_{z,Rd}$
 - [[Biegewiderstand im Stützstreifen]] · $m_{Rd,x}$
+- [[Biegung im Holz]]
+- [[Biegung und Druck im Holz]]
+- [[Biegung und Zug im Holz]]
 - [[Bilineare Beziehung des Betonstahls]]
 - [[Breite des Randstreifens an der Eckstütze]] · $b_{s,x}$
 - [[Breite des Stützstreifens]] · $b_s$
@@ -174,9 +184,11 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Dickster Stab der Lage]] · $\varnothing_{2,x}$
 - [[Drehfeder des Pfahlkopfs]] · $K_{MM}$
 - [[Drehung in die Achsen des Stabs]]
+- [[Druck im Holz, ohne Knicken]]
 - [[Druck und Biegung am wirksamen Querschnitt im Stab]]
 - [[Druck und zweiachsige Biegung im doppelsymmetrischen I-Stab]]
 - [[Druck und zweiachsige Biegung im Stab]]
+- [[Druckwiderstand eines Holzquerschnitts]] · $N_{Rd}^{-}$
 - [[Druckzonenhöhe aus dem Kräftegleichgewicht]] · $x^{+}$
 - [[Druckzonenhöhe im Stützstreifen]] · $x_x$
 - [[Durchmesser des flächengleichen Kreises]] · $b$
@@ -266,17 +278,26 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Hebel des Moments am Pfahlkopf]] · $e$
 - [[Hebelarm der inneren Kräfte]] · $z$
 - [[Hilfsgrösse der Nulllinie]] · $\rho$
+- [[Hilfswert beim Knicken von Holz]] · $k_y$
 - [[Höhe der Distanzhalter]] · $h_{Dist}$
+- [[Höhenbeiwert des Brettschichtholzes]] · $k_h$
 - [[Ideelle Kippspannung]] · $\sigma_{cr,D}$
 - [[Ideelles Kippmoment]] · $M_{cr}$
 - [[Innerer Hebelarm]] · $z$
 - [[Innerer Widerstand des Pfahls]] · $R_{i,d}$
 - [[Iteration der Ausmitte 2. Ordnung]]
+- [[Kippbeiwert des Holzes]] · $k_m$
+- [[Kippen eines Holzträgers]]
 - [[Kippmoment am Fuss]] · $M_{0,x}$
+- [[Kippspannung eines Rechtecks aus Holz]] · $\sigma_{m,crit}$
 - [[Kippwiderstand]] · $M_{D,Rd}$
 - [[Kleinerer Widerstand beider Seiten]] · $V_{Rd,max}$
+- [[Knickbeiwert des Holzes]] · $k_{c,y}$
+- [[Knicken eines Holzstabs unter Druck]]
+- [[Knicken und Biegung eines Holzstabs]]
 - [[Knicklast nach Euler]] · $N_{cr,y}$
 - [[Knickwiderstand]] · $N_{K,y,Rd}$
+- [[Knickwiderstand eines Holzstabs]] · $N_{K,z,Rd}$
 - [[Kohäsion für örtliches Abscheren]] · $c^{*}$
 - [[Kopplung am Pfahlkopf]] · $K_{HM}$
 - [[Kraft einer Wand – ihr Schubfluss über ihre Länge]]
@@ -325,6 +346,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Normalkraft aus der Vorspannung]] · $N_p$
 - [[Normalkraft mit der Längszugkraft aus der Querkraft]] · $N_V$
 - [[Normalkraftwiderstand eines Stahlquerschnitts]] · $N_{Rd}^{+}$
+- [[Normalspannung im Holz]] · $\sigma_{t,0,d}$
 - [[Nulllinie auf halber Höhe]] · $x^{+}$
 - [[Nulllinie des gerissenen Querschnitts]] · $x$
 - [[Parabel-Rechteck-Beziehung des Betons]]
@@ -345,6 +367,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Querkraft über die Federn der Wände]]
 - [[Querkraftwiderstand des Pfahls]] · $V_{Rd}$
 - [[Querkraftwiderstand des Tragglieds]] · $V_{Rd}$
+- [[Querkraftwiderstand eines Holzquerschnitts]] · $V_{z,Rd}$
 - [[Querkraftwiderstand eines Stahlprofils]]
 - [[Querkraftwiderstand mit Querkraftbewehrung]] · $V_{Rd,x}$
 - [[Querkraftwiderstand ohne Bügel bei M_Ed = 0]] · $V_{Rd}^{+}(M_{Ed} = 0)$
@@ -359,6 +382,8 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Reibungswinkel der Sohlfuge]] · $\delta_k$
 - [[Reibungswinkel für örtliches Abscheren]] · $\varphi^{*}$
 - [[Reichweite des Gleitkörpers]] · $L_{Gl}$
+- [[Relative Schlankheit beim Kippen von Holz]] · $\lambda_{rel,m}$
+- [[Relative Schlankheit beim Knicken von Holz]] · $\lambda_{rel,y}$
 - [[Rissaktive Dicke des gezeichneten Querschnitts]] · $t$
 - [[Rissaktive Plattendicke]] · $h_{eff}$
 - [[Risskraft der gezogenen Querschnittshälfte]] · $N_{Riss}$
@@ -371,11 +396,22 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Schiefstellung]] · $\alpha_i$
 - [[Schlankheit beim Kippen]] · $\bar{\lambda}_{D}$
 - [[Schlankheit beim Knicken]] · $\bar{\lambda}_{K,y}$
+- [[Schlankheit eines Holzstabs]] · $\lambda_y$
 - [[Schnittgrössen aus der Spannungsverteilung]]
 - [[Schnittgrössen eines Stabs im Raum]]
 - [[Schnittgrössen längs eines Stabs]]
 - [[Schnittkräfte eines Streifens in x und y]]
+- [[Schub aus Querkraft im Holz]]
+- [[Schub aus Querkraft und Torsion im Holz]]
+- [[Schub aus Torsion im Holz]]
 - [[Schubbeulen des Blechs, ohne Quersteifen]]
+- [[Schubfestigkeit des Holzes im Lastfall]] · $\eta f_{v,d}$
+- [[Schubfläche nach Jourawski]] · $A_{V,z}$
+- [[Schubspannung aus Querkraft im Holz]] · $\tau_{z,d}$
+- [[Schubspannung aus Querkraft nach Jourawski]]
+- [[Schubspannung aus Torsion im Holz]] · $\tau_{tor,d}$
+- [[Schubspannung aus zwei Querkräften]] · $\tau_d$
+- [[Schubwiderstand neben Torsion im Holz]] · $\tau_{Rd}$
 - [[Schwerpunkt der zusammengefassten Lage]] · $z_{2,x}$
 - [[Schwerpunkt eines T-Querschnitts]] · $z_{S}$
 - [[Schwerpunkt eines U-Profils mit geneigten Flanschen]] · $e_{y}$
@@ -415,18 +451,21 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Torsion aus der lotrechten Kraft der Spannglieder]] · $T_p$
 - [[Torsion der Wände neben geneigten Spanngliedern]] · $T_w$
 - [[Torsion in den Zellen (Bredt, mehrzellig)]]
+- [[Torsionsbeiwert des Rechtecks]] · $k_2$
 - [[Torsionssteifigkeit]] · $GI_{T}$
 - [[Torsionsträgheitsmoment aus der Spannungsfunktion]]
 - [[Torsionsträgheitsmoment eines I-Profils]] · $I_{T}$
 - [[Torsionsträgheitsmoment eines Rechtecks]] · $I_{T}$
 - [[Torsionsträgheitsmoment, nach Richardson aus beiden Gittern]] · $I_T$
+- [[Torsionswiderstand eines Rechtecks aus Holz]] · $T_{Rd}$
+- [[Torsionswiderstandsmoment des Rechtecks]] · $W_T$
 - [[Tragfähigkeitsfaktor des Pfahlfusses undrainiert]] · $N_c$
 - [[Tragfähigkeitsfaktor N_c]] · $N_c$
 - [[Tragfähigkeitsfaktor N_q]] · $N_q$
 - [[Tragfähigkeitsfaktor N_γ]] · $N_{\gamma}$
 - [[Tragfähigkeitsformel undrainiert]]
 - [[Trägheitsmomente eines Polygons, bezogen auf den Schwerpunkt]]
-- [[Trägheitsradius des Druckgurts]] · $i_{g}$
+- [[Trägheitsradius]] · $i_{g}$
 - [[Überlagerung auf Höhe der Sohle]] · $\sigma_{v,0}$
 - [[Umfang des Pfahls]] · $U$
 - [[Ungewollte Ausmitte]] · $e_{0d}$
@@ -464,6 +503,8 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Wirksamer Umfang des Nachweisschnitts]] · $u$
 - [[Wölbanteil der Kippspannung]] · $\sigma_{Dw}$
 - [[Zerlegung eines Stabs im Raum]]
+- [[Zug im Holz]]
+- [[Zugwiderstand eines Holzquerschnitts]] · $N_{Rd}^{+}$
 - [[Zulässige Dehnung]] · $\varepsilon_{s,adm}$
 - [[Zulässige Stahlspannung]] · $\sigma_{s,adm}$
 - [[Zulässige Stahlspannung (normale Anforderung)]] · $\sigma_{s,adm}$
@@ -471,7 +512,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 ## Normstelle fehlt noch
 
-130 von 390 Formeln haben im Code keine Normstelle – meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle – von dort kommt sie in Bericht und Notizbuch.
+140 von 429 Formeln haben im Code keine Normstelle – meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle – von dort kommt sie in Bericht und Notizbuch.
 
 - [[Achsen eines Stabs im Raum]] · [[opencivil.stabwerk3d.herleitung|_ansaetze]]
 - [[Äquivalenter E-Modul eines Stabs]] · [[opencivil.spannungsanalyse.modul#ModulProzedur|ModulProzedur._schreiben]]
@@ -490,6 +531,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Biegebewehrung im Stützstreifen je Meter]] · [[opencivil.durchstanzen.nachweis#Durchstanzen._m_Rd|Durchstanzen._m_Rd]]
 - [[Biegelinie eines Stabs]] · [[opencivil.stabwerk.herleitung|_ansaetze]]
 - [[Biegelinie eines Stabs im Raum]] · [[opencivil.stabwerk3d.herleitung|_ansaetze]]
+- [[Biegespannung im Holz]] · [[opencivil.nachweis.qa_holz#HolzBiegungQA._biegespannung|HolzBiegungQA._biegespannung]], [[opencivil.nachweis.qa_holz_stabilitaet#_Herleitung._biegespannung|_Herleitung._biegespannung]]
 - [[Biegesteifigkeit]] · [[opencivil.stabwerk.rechnung#_modul_mal_kennwert|_modul_mal_kennwert]]
 - [[Biegesteifigkeit des Pfahls]] · [[opencivil.pfahl.steifigkeit#Pfahlsteifigkeit._querschnitt|Pfahlsteifigkeit._querschnitt]]
 - [[Biegesteifigkeit um y]] · [[opencivil.stabwerk.rechnung#_modul_mal_kennwert|_modul_mal_kennwert]]
@@ -505,7 +547,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Eigengewicht eines Stabs]] · [[opencivil.stabwerk.rechnung#_gewicht_je_meter|_gewicht_je_meter]]
 - [[Einwirkung im normierten Diagramm]] · [[opencivil.nachweis.biegung_normalkraft#BiegungNormalkraft._protokoll_naechster|BiegungNormalkraft._protokoll_naechster]]
 - [[Erfüllungsgrad]] · [[opencivil.core.nachweis#Vergleich.zeile|Vergleich.zeile]]
-- [[Erfüllungsgrad bei fester Normalkraft und fester Richtung]] · [[opencivil.nachweis.qa_stahl#StahlBiegungQA|StahlBiegungQA._ansatz]], [[opencivil.nachweis.qa_stahl_stabilitaet#StahlStabilitaetQA.pruefe|StahlStabilitaetQA.pruefe]], [[opencivil.nachweis.schiefe_biegung#SchiefeBiegung|SchiefeBiegung._protokoll_ansatz]]
+- [[Erfüllungsgrad bei fester Normalkraft und fester Richtung]] · [[opencivil.nachweis.qa_holz#HolzBiegungQA.pruefe|HolzBiegungQA.pruefe]], [[opencivil.nachweis.qa_holz_stabilitaet#HolzStabilitaetQA.pruefe|HolzStabilitaetQA.pruefe]], [[opencivil.nachweis.qa_stahl#StahlBiegungQA|StahlBiegungQA._ansatz]], [[opencivil.nachweis.qa_stahl_stabilitaet#StahlStabilitaetQA.pruefe|StahlStabilitaetQA.pruefe]], [[opencivil.nachweis.schiefe_biegung#SchiefeBiegung|SchiefeBiegung._protokoll_ansatz]]
 - [[Fiktiver Durchmesser einer verschmierten Linie]] · [[opencivil.nachweis.stabgrenzen#_protokoll_fiktiv|_protokoll_fiktiv]]
 - [[Fläche der Längsbewehrung]] · [[opencivil.pfahl.innen#InnererWiderstand|InnererWiderstand._bohrpfahl]]
 - [[Fläche eines Doppel-T-Querschnitts]] · [[opencivil.stabwerk.querschnitte]]
@@ -556,6 +598,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Momentengleichgewicht um die halbe Höhe]] · [[opencivil.nachweis.handrechnung#Handrechnung._halbe_hoehe|Handrechnung._halbe_hoehe]]
 - [[Momentenwiderstand bei reiner Biegung]] · [[opencivil.nachweis.handrechnung#Handrechnung._bei_n_null|Handrechnung._bei_n_null]]
 - [[Normalkraft mit der Längszugkraft aus der Querkraft]] · [[opencivil.pfahl.innen_quer#InnererQuerwiderstand._biegung|InnererQuerwiderstand._biegung]]
+- [[Normalspannung im Holz]] · [[opencivil.nachweis.qa_holz#HolzBiegungQA._normalspannung|HolzBiegungQA._normalspannung]], [[opencivil.nachweis.qa_holz_stabilitaet#_Herleitung|_Herleitung.__init__]]
 - [[Nulllinie auf halber Höhe]] · [[opencivil.nachweis.handrechnung#Handrechnung._halbe_hoehe|Handrechnung._halbe_hoehe]]
 - [[Nulllinie des gerissenen Querschnitts]] · [[opencivil.nachweis.mindestbewehrung#ZwaengungBiegung.protokoll_lage|ZwaengungBiegung.protokoll_lage]]
 - [[Platz für die Durchstanzbewehrung]] · [[opencivil.durchstanzen.mit_bewehrung#nachweisen|nachweisen]]
@@ -569,6 +612,12 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Rissnormalkraft beim Moment]] · [[opencivil.spannungsanalyse.riss#Bruttoriss._herleitung_rissnormalkraft|Bruttoriss._herleitung_rissnormalkraft]]
 - [[Schnittgrössen eines Stabs im Raum]] · [[opencivil.stabwerk3d.herleitung|_ansaetze]]
 - [[Schnittgrössen längs eines Stabs]] · [[opencivil.stabwerk.herleitung|_ansaetze]]
+- [[Schubfläche nach Jourawski]] · [[opencivil.nachweis.qa_holz_werte#HolzwerteQA|HolzwerteQA._schub]]
+- [[Schubspannung aus Querkraft im Holz]] · [[opencivil.nachweis.qa_holz#HolzSchubQA._querkraft|HolzSchubQA._querkraft]]
+- [[Schubspannung aus Querkraft nach Jourawski]] · [[opencivil.nachweis.qa_holz_werte#HolzwerteQA|HolzwerteQA._schub]]
+- [[Schubspannung aus Torsion im Holz]] · [[opencivil.nachweis.qa_holz#HolzSchubQA|HolzSchubQA._torsion]]
+- [[Schubspannung aus zwei Querkräften]] · [[opencivil.nachweis.qa_holz#HolzSchubQA._querkraft|HolzSchubQA._querkraft]]
+- [[Schubwiderstand neben Torsion im Holz]] · [[opencivil.nachweis.qa_holz#HolzSchubQA|HolzSchubQA._ein_fall]]
 - [[Schwerpunkt der zusammengefassten Lage]] · [[opencivil.nachweis.handrechnung#Handrechnung._schwerpunkt|Handrechnung._schwerpunkt]], [[opencivil.querschnitt.lagenaufbau#protokoll_schwerpunkt|protokoll_schwerpunkt]]
 - [[Schwerpunkt eines T-Querschnitts]] · [[opencivil.stabwerk.querschnitte]]
 - [[Schwerpunkt eines U-Profils mit geneigten Flanschen]] · [[opencivil.stahlprofile.formen]]
@@ -585,11 +634,13 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Teilung in y aus der Stabzahl]] · [[opencivil.nachweis.querkraft_buegel#QuerkraftMitBuegeln.protokoll_teilung_y|QuerkraftMitBuegeln.protokoll_teilung_y]]
 - [[Torsion aus der lotrechten Kraft der Spannglieder]] · [[opencivil.nachweis.schubwandnachweis#Schubwandnachweis._ohne_glieder|Schubwandnachweis._ohne_glieder]]
 - [[Torsion der Wände neben geneigten Spanngliedern]] · [[opencivil.nachweis.schubwandnachweis#Schubwandnachweis._ohne_glieder|Schubwandnachweis._ohne_glieder]]
+- [[Torsionsbeiwert des Rechtecks]] · [[opencivil.nachweis.qa_holz_werte#HolzwerteQA|HolzwerteQA._torsion]]
 - [[Torsionssteifigkeit]] · [[opencivil.stabwerk.rechnung#_modul_mal_kennwert|_modul_mal_kennwert]]
 - [[Torsionsträgheitsmoment aus der Spannungsfunktion]] · [[opencivil.querschnitt.analyse#Querschnittsanalyse.torsion_protokollieren|Querschnittsanalyse.torsion_protokollieren]]
 - [[Torsionsträgheitsmoment eines I-Profils]] · [[opencivil.stahlprofile.formen]]
 - [[Torsionsträgheitsmoment eines Rechtecks]] · [[opencivil.stabwerk.querschnitte#_torsion|_torsion]]
 - [[Torsionsträgheitsmoment, nach Richardson aus beiden Gittern]] · [[opencivil.querschnitt.analyse#Querschnittsanalyse.torsion_protokollieren|Querschnittsanalyse.torsion_protokollieren]]
+- [[Torsionswiderstandsmoment des Rechtecks]] · [[opencivil.nachweis.qa_holz_werte#HolzwerteQA|HolzwerteQA._torsion]]
 - [[Trägheitsmomente eines Polygons, bezogen auf den Schwerpunkt]] · [[opencivil.querschnitt.analyse#Querschnittsanalyse.aufbau_protokollieren|Querschnittsanalyse.aufbau_protokollieren]]
 - [[Umfang des Pfahls]] · [[opencivil.pfahl.aussen#AeussererWiderstand._mantel|AeussererWiderstand._mantel]]
 - [[Versatz – Moment der Querkraftanteile um den Schwerpunkt]] · [[opencivil.nachweis.schubwandnachweis#Schubwandnachweis|Schubwandnachweis._ein_fall]]
@@ -598,7 +649,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Widerstand bei festgehaltenem M_Ed]] · [[opencivil.nachweis.resistenzlinie#Handlinie.protokoll_treffer|Handlinie.protokoll_treffer]]
 - [[Widerstand bei festgehaltenem N_Ed]] · [[opencivil.nachweis.resistenzlinie#Handlinie.protokoll_treffer|Handlinie.protokoll_treffer]]
 - [[Widerstand im normierten Diagramm]] · [[opencivil.nachweis.biegung_normalkraft#BiegungNormalkraft._protokoll_naechster|BiegungNormalkraft._protokoll_naechster]]
-- [[Widerstandsmoment bis zur weitesten Faser]] · [[opencivil.nachweis.qa_stahl#StahlBiegungQA._wirksam|StahlBiegungQA._wirksam]], [[opencivil.nachweis.qa_stahl_stabilitaet#_Herleitung._biegung|_Herleitung._biegung]]
+- [[Widerstandsmoment bis zur weitesten Faser]] · [[opencivil.nachweis.qa_holz_werte#HolzwerteQA|HolzwerteQA._biegung]], [[opencivil.nachweis.qa_stahl#StahlBiegungQA._wirksam|StahlBiegungQA._wirksam]], [[opencivil.nachweis.qa_stahl_stabilitaet#_Herleitung._biegung|_Herleitung._biegung]]
 - [[Widerstandsmoment zum gezogenen Rand]] · [[opencivil.spannungsanalyse.riss#Bruttoriss.herleitung_riss|Bruttoriss.herleitung_riss]]
 - [[Widerstandsmoment zum gezogensten Betonpunkt]] · [[opencivil.nachweis.rissgroessen#protokoll_widerstandsmoment|protokoll_widerstandsmoment]]
 - [[Zerlegung eines Stabs im Raum]] · [[opencivil.stabwerk3d.herleitung|_ansaetze]]

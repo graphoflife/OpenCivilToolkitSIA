@@ -36,13 +36,14 @@ BETON, BETONSTAHL, BAUSTAHL, SPANNSTAHL, HOLZ = (
 
 
 def projekt():
-    """Ein Projekt mit je einem Material jeder Art: b1, s1, st1, sp1, h1."""
+    """Je ein Material jeder Art: b1, s1, st1, sp1, h1 -- dazu ein zweites Holz, h2."""
     p = Projekt(name="Bauweisen")
     p.beton("C30/37")
     p.stahl("B500B")
     p.baustahl("S355")
     p.spannstahl("Y1860")
     p.holz("C24")
+    p.holz("GL24h")
     return p
 
 
@@ -130,28 +131,37 @@ class TestFelder(unittest.TestCase):
 
 class TestAnalyse(unittest.TestCase):
     """
-    Holz und Stahl rechnen ihre Querschnittswerte; Holz noch keinen Nachweis,
-    Stahl seinen Lastfall -- ohne Querkraft nur Biegung und Normalkraft.
+    Holz und Stahl rechnen ihre Querschnittswerte und ihren Lastfall -- ohne
+    Querkraft nur Biegung und Normalkraft. Seit 2026-11-26 auch das Holz;
+    eines aus mehreren Hoelzern noch nicht.
     """
 
-    def test_holz_ohne_nachweis_stahl_mit(self):
+    def test_holz_und_stahl_mit_nachweis(self):
         p = projekt()
         holz = analyse(p, "Holz", (RECHTECK, "h1"))
         stahl = analyse(p, "Stahl", (RECHTECK, "st1"))
         e = p.rechnen()
-        for a, text, felder in (
-                (holz, "einen Holzquerschnitt weist das Werkzeug nach SIA 265:2012 noch nicht nach",
-                 []),
-                (stahl, "", ["qa_stahl"])):
+        for a, felder in ((holz, ["qa_holz"]), (stahl, ["qa_stahl"])):
             with self.subTest(a=a.name):
                 teil = e.aufbau.teile[a.kennung]
                 self.assertEqual((teil.ohne_nachweis, [f for f, _, _ in teil.nachweise]),
-                                 (text, felder))
+                                 ("", felder))
                 self.assertAlmostEqual(e.wert(f"querschnittsanalyse.{a.kennung}.A").groesse.si, A)
                 self.assertAlmostEqual(e.wert(f"querschnittsanalyse.{a.kennung}.I_y").groesse.si,
                                        I_Y, delta=1e-12)
-        self.assertIn("Querschnittsanalyse 'Holz': einen Holzquerschnitt weist das Werkzeug nach "
-                      "SIA 265:2012 noch nicht nach → kein Nachweis.",
+        self.assertEqual([w.text for w in e.aufbau.warnungen if "noch nicht nach" in w.text], [])
+
+    def test_mehrere_hoelzer_ohne_nachweis(self):
+        """Zwei Hoelzer braeuchten einen gewichteten Querschnitt -- grau, mit ihren Namen."""
+        p = projekt()
+        a = analyse(p, "Zwei Hölzer", (RECHTECK, "h1"),
+                    ([[0, 400], [200, 400], [200, 600], [0, 600]], "h2"))
+        e = p.rechnen()
+        text = ("einen Holzquerschnitt aus mehreren Hölzern («C24», «GL24h») weist das Werkzeug "
+                "nach SIA 265:2012 noch nicht nach")
+        teil = e.aufbau.teile[a.kennung]
+        self.assertEqual((teil.ohne_nachweis, teil.nachweise), (text, []))
+        self.assertIn(f"Querschnittsanalyse 'Zwei Hölzer': {text} → kein Nachweis.",
                       [w.text for w in e.aufbau.warnungen])
 
     def test_die_diagramme_sagen_warum(self):
@@ -167,8 +177,9 @@ class TestAnalyse(unittest.TestCase):
             return antwort.daten["diagramme"]
 
         h = diagramme(holz)
-        self.assertEqual(h["ohne_diagramm"], "Kein Interaktionsdiagramm: einen Holzquerschnitt "
-                                             "weist das Werkzeug nach SIA 265:2012 noch nicht nach.")
+        self.assertEqual(h["ohne_diagramm"], "Kein Interaktionsdiagramm: für einen "
+                                             "Holzquerschnitt zeichnet das Werkzeug noch keines. "
+                                             "Seine Lastfälle weist es trotzdem nach.")
         self.assertEqual((h["interaktion"], h["faelle"]), (None, []))
         self.assertEqual([f["material"] for f in h["zeichnung"]["polygone"]], ["holz"])
         s = diagramme(stahl)
@@ -204,9 +215,12 @@ class TestZeichnung(unittest.TestCase):
 
     def test_der_satz_fuer_die_kacheln(self):
         p = projekt()
-        self.assertEqual(zeichnung(p, analyse(p, "Holz", (RECHTECK, "h1")))["ohne_nachweise"],
-                         "Einen Holzquerschnitt weist das Werkzeug nach SIA 265:2012 noch nicht "
-                         "nach.")
+        self.assertEqual(zeichnung(p, analyse(p, "Holz", (RECHTECK, "h1")))["ohne_nachweise"], "")
+        zwei = analyse(p, "Zwei Hölzer", (RECHTECK, "h1"),
+                       ([[0, 400], [200, 400], [200, 600], [0, 600]], "h2"))
+        self.assertEqual(zeichnung(p, zwei)["ohne_nachweise"],
+                         "Einen Holzquerschnitt aus mehreren Hölzern («C24», «GL24h») weist das "
+                         "Werkzeug nach SIA 265:2012 noch nicht nach.")
         self.assertEqual(zeichnung(p, analyse(p, "Stahlbeton", (RECHTECK, "b1"),
                                               staebe=[(100, 50)]))["ohne_nachweise"], "")
 

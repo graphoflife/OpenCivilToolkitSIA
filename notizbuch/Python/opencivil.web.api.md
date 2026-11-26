@@ -1,5 +1,5 @@
 ---
-erzeugt: 527a8950355d
+erzeugt: a688770b6fc8
 art: modul
 tags: [modul]
 ---
@@ -224,6 +224,7 @@ Je Querschnitt eines Systems, wo A und I stehen -- und je Paar aus Querschnitt u
 - [[opencivil.material.basis]]
 - [[opencivil.material.beton]]
 - [[opencivil.material.betonstahl]]
+- [[opencivil.material.holz]]
 - [[opencivil.material.spannstahl]]
 - [[opencivil.nachweis.biegung_normalkraft]]
 - [[opencivil.nachweis.rechenwahl]]

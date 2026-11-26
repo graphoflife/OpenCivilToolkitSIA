@@ -1,5 +1,5 @@
 ---
-erzeugt: 1f8d0d6022fa
+erzeugt: a90be5c66ba6
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -68,6 +68,9 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.geotechnik.setzung]] – die Setzung eines Flachfundaments auf geschichtetem Baugrund.
     - [[opencivil.geotechnik.tragfaehigkeit]] – die Tragfähigkeitsfaktoren N_q und N_c.
     - [[opencivil.geotechnik.verhalten]] – wie ein Boden traegt.
+- [[opencivil.holzbau]] – ein gezeichneter Querschnitt aus Holz nach SIA 265:2012.
+    - [[opencivil.holzbau.gleichungen]] – die Gleichungen von SIA 265:2012, 4.2, ohne Rechenwerk.
+    - [[opencivil.holzbau.querschnitt]] – ein gezeichneter Querschnitt aus Holz.
 - [[opencivil.konsole]] – Python im Browser, für die App «Python».
     - [[opencivil.konsole.dienst]] – die Konsole als Dienst für ihren Faden.
     - [[opencivil.konsole.pakete]] – welche Fremdpakete ein Skript einbinden kann.
@@ -100,6 +103,10 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.nachweis.linie]] – Geometrie einer geschlossenen M-N-Linie.
     - [[opencivil.nachweis.mindestbewehrung]] – Mindestbewehrung gegen breite Risse bei Zwang.
     - [[opencivil.nachweis.qa_gebrauch]] – Gebrauchsnachweise des gezeichneten Querschnitts.
+    - [[opencivil.nachweis.qa_holz]] – die Lastfaelle eines Holzquerschnitts nach SIA 265:2012.
+    - [[opencivil.nachweis.qa_holz_kennzahlen]] – was ein Holzquerschnitt aufnimmt, ohne Einwirkung.
+    - [[opencivil.nachweis.qa_holz_stabilitaet]] – Knicken und Kippen eines Holzstabs nach SIA 265:2012.
+    - [[opencivil.nachweis.qa_holz_werte]] – die Werte eines Holzquerschnitts, einmal fuer alle Nachweise.
     - [[opencivil.nachweis.qa_kennzahlen]] – was ein gezeichneter Querschnitt aufnimmt, ohne Einwirkung.
     - [[opencivil.nachweis.qa_knicken]] – Knicken am gezeichneten Querschnitt.
     - [[opencivil.nachweis.qa_stahl]] – die Lastfaelle eines Stahlquerschnitts nach SIA 263:2013.

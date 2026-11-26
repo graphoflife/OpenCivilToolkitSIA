@@ -1,5 +1,5 @@
 ---
-erzeugt: f7d7a2e3c97b
+erzeugt: 198cf767c8b6
 art: formel
 tags: [formel]
 normstelle: "SIA 263:2013, 5.1.1.2; 5.1.8"
@@ -48,6 +48,8 @@ $$
 
 ## Im Code
 
+- [[opencivil.nachweis.qa_holz#HolzBiegungQA|HolzBiegungQA._ein_fall]]
+- [[opencivil.nachweis.qa_holz_stabilitaet#HolzStabilitaetQA._urteil|HolzStabilitaetQA._urteil]]
 - [[opencivil.nachweis.qa_stahl#StahlBiegungQA._linear|StahlBiegungQA._linear]]
 - [[opencivil.nachweis.qa_stahl#StahlBiegungQA|StahlBiegungQA._plastisch]]
 - [[opencivil.nachweis.qa_stahl_stabilitaet#StahlStabilitaetQA._urteil|StahlStabilitaetQA._urteil]]
@@ -58,6 +60,8 @@ $$
 - [[Schiefe Biegung]]
 - [[Stahlquerschnitt]]
 - [[Knicken und Kippen]]
+- [[Holzquerschnitt]]
+- [[Knicken und Kippen eines Holzstabs]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 
@@ -65,5 +69,10 @@ $$
 
 Der Betrag des Momentenvektors der gefundenen Ebene. Weil die Ebene so
 gesucht ist, dass ihr Moment in dieselbe Richtung zeigt wie die Einwirkung,
-ist das der Widerstand in genau dieser Richtung -- und der Erfüllungsgrad das
+ist das der Widerstand in genau dieser Richtung – und der Erfüllungsgrad das
 Verhältnis der Beträge.
+
+Wo linear gerechnet wird – beim Holz, beim Stahl der Klassen 3 und 4 und
+beim Knicken und Kippen –, wachsen die Spannungen mit dem Moment. Dann ist
+der Widerstand das $\lambda$-fache der Einwirkung, mit dem $\lambda$, bei
+dem die Gleichung des Nachweises aufgeht.

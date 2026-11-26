@@ -16,6 +16,19 @@ stossartige Einwirkung (eta_w = eta_t = 1); aus der Biegefestigkeit
 gerechnet waeren sie nicht dieselben, denn die Tabellen runden. Am
 2026-11-26 gegen die gedruckten Tabellen geprueft.
 
+FUER KNICKEN UND KIPPEN:
+SIA 265:2012, Anhang B, Tabellen 43 und 44 nennt je Sorte die
+kennzeichnende Druckfestigkeit in Faserrichtung und das 5%-Fraktil des
+Elastizitaetsmoduls -- die relative Schlankheit (4.2.8.4, 4.2.9.3) rechnet
+mit ihnen. Am 2026-11-26 gegen das Seitenbild geprueft.
+
+DIE FEUCHTEKLASSE:
+Wie feucht das Holz im Bauwerk im Mittel ist, ordnet es einer von drei
+Klassen zu (3.2.1.2, Tabelle 3, :class:`Feuchteklasse`). Ihr Beiwert η_w
+(Tabelle 4) mindert die Bemessungswerte der Tabellen 6 und 7, die fuer
+Klasse 1 gelten -- eine Wahl des Bauteils, nicht des Materials. Ebenso η_t
+(2.2.6): 1.4 bei stossartiger Einwirkung, sonst 1.
+
 Der Elastizitaetsmodul in Faserrichtung gilt fuer Biegung, Zug und Druck
 zugleich: die Tabellen nennen ihn einmal als kennzeichnende Eigenschaft,
 einmal als Steifigkeit, mit derselben Zahl. Was sie sonst nennen, kommt mit
@@ -56,6 +69,7 @@ from enum import Enum
 from typing import Dict, List, Mapping, Optional
 
 from opencivil.core.einheiten import EINHEITSLOS, KG_PRO_M3, N_PRO_MM2, PROMILLE, Groesse
+from opencivil.core.wahl import Wahl
 from opencivil.material.basis import Baustoff, Baustoffart, KennwertVorlage, erzeuge
 
 #: Wo die Sortentabellen stehen -- jeder Wert aus ihnen nennt diese Stelle.
@@ -63,6 +77,27 @@ TABELLEN = "SIA 265:2012, 3.3.2, Tabelle 6; 3.4.2.2, Tabelle 7"
 
 #: Wo der Beiwert gamma_M/eta_M steht.
 TABELLE_1 = "SIA 265:2012, 2.2.5, Tabelle 1"
+
+#: Wo die Werte fuer Knicken und Kippen stehen.
+ANHANG_B = "SIA 265:2012, Anhang B, Tabellen 43 und 44"
+
+#: Wo die Feuchteklassen stehen -- und ihr Beiwert eta_w.
+TABELLE_3 = "SIA 265:2012, 3.2.1.2, Tabelle 3"
+TABELLE_4 = "SIA 265:2012, 3.2.1.3, Tabelle 4"
+
+#: Der Beiwert eta_t einer stossartigen Einwirkung -- sonst 1. Die Norm
+#: laesst ihn zu, sie verlangt ihn nicht: der Benutzer waehlt je Fall.
+ETA_T_STOSSARTIG = 1.4
+REFERENZ_ETA_T = "SIA 265:2012, 2.2.6"
+
+#: Was als stossartig gilt, in eigenen Worten nach 2.2.6.
+STOSSARTIG = "etwa Anprall, Erdbeben oder dynamische Lasten aus dem Strassenverkehr"
+
+#: Die Sorten, aus denen Tabelle 6 kein Zugglied zulaesst (Fussnote 2).
+OHNE_ZUGGLIED = frozenset({"C16"})
+
+#: Wo die Norm die Bemessungswerte der Tabellen mit eta_w und eta_t multipliziert.
+REFERENZ_ETA = "SIA 265:2012, 3.3.2; 3.4.2.2"
 
 #: Wo die mittleren Raumlasten stehen.
 RAUMLASTEN = "SIA 261:2020, Anhang A, Tabelle 28"
@@ -90,10 +125,56 @@ class Holzart(Enum):
         """kg/m³ -- die mittlere Raumlast nach SIA 261:2020, Tabelle 28, durch g = 10 m/s²."""
         return 750.0 if self is Holzart.LAUBHOLZ else 500.0
 
+    @property
+    def beta_c(self) -> float:
+        """Der Hilfswert der Geradheit beim Knicken -- SIA 265:2012, 4.2.8.3."""
+        return 0.1 if self is Holzart.BRETTSCHICHTHOLZ else 0.2
+
+
+class Feuchteklasse(Wahl):
+    """
+    Wie feucht das Holz im Bauwerk im Mittel ist -- SIA 265:2012, 3.2.1.2,
+    Tabelle 3, in eigenen Worten. Ihr Beiwert η_w mindert Festigkeit und
+    Steifigkeit gegenueber Klasse 1 (Tabelle 4); fuer Vollholz und
+    Brettschichtholz derselbe.
+    """
+
+    EINS = "1"
+    ZWEI = "2"
+    DREI = "3"
+
+    @property
+    def beschriftung(self) -> str:
+        return f"Klasse {self.value}"
+
+    @property
+    def erklaerung(self) -> str:
+        """Wo das Holz so feucht ist, in eigenen Worten."""
+        return {
+            Feuchteklasse.EINS: "Vor Regen und Wetter geschützt, etwa in einem Innenraum – im "
+                                "Mittel höchstens 12 % Holzfeuchte.",
+            Feuchteklasse.ZWEI: "Nur zum Teil geschützt oder dem Wetter ausgesetzt, etwa unter "
+                                "einem offenen Dach – im Mittel 12 bis 20 %.",
+            Feuchteklasse.DREI: "Nass: feucht oder im Wasser – im Mittel über 20 %.",
+        }[self]
+
+    @property
+    def eta_w(self) -> float:
+        """Der Beiwert des Tragwiderstands -- Tabelle 4."""
+        return {Feuchteklasse.EINS: 1.0, Feuchteklasse.ZWEI: 0.8, Feuchteklasse.DREI: 0.6}[self]
+
+    @property
+    def eta_w_steifigkeit(self) -> float:
+        """Der Beiwert der Steifigkeit -- Tabelle 4."""
+        return {Feuchteklasse.EINS: 1.0, Feuchteklasse.ZWEI: 0.9, Feuchteklasse.DREI: 0.75}[self]
+
 
 @dataclass(frozen=True)
 class Holzsorte:
-    """Eine Spalte von Tabelle 6 oder 7: N/mm², die Rohdichte in kg/m³."""
+    """
+    Eine Spalte von Tabelle 6 oder 7: N/mm², die Rohdichte in kg/m³ -- dazu
+    die ihrer Sorte aus Anhang B, Tabelle 43 oder 44.
+    """
 
     art: Holzart
     f_m_k: float
@@ -107,26 +188,41 @@ class Holzsorte:
     f_v_d: float
     E_90_mean: float
     G_mean: float
+    f_c_0_k: float
+    E_0_05: float
 
 
 _N, _L, _B = Holzart.NADELHOLZ, Holzart.LAUBHOLZ, Holzart.BRETTSCHICHTHOLZ
 
 #: Holzsorten nach SIA 265:2012, Tabelle 6 (Vollholz) und Tabelle 7
-#: (Brettschichtholz), in deren Folge.
+#: (Brettschichtholz), in deren Folge -- in der zweiten Zeile f_c,0,k und
+#: E_0,05 aus Anhang B, Tabelle 43 und 44.
 HOLZSORTEN: Dict[str, Holzsorte] = {
     #                 f_m,k  E_0,mean ρ_k  f_m,d f_t,0,d f_c,0,d f_t,90,d f_c,90,d f_v,d E_90  G
-    "C16": Holzsorte(_N, 16.0, 8000.0, 310.0, 9.5, 5.5, 9.5, 0.1, 1.5, 1.5, 270.0, 500.0),
-    "C24": Holzsorte(_N, 24.0, 11000.0, 350.0, 14.0, 8.0, 12.0, 0.1, 1.8, 1.5, 300.0, 500.0),
-    "C30": Holzsorte(_N, 30.0, 12000.0, 380.0, 17.5, 10.5, 13.5, 0.1, 2.0, 1.5, 300.0, 500.0),
-    "D30": Holzsorte(_L, 30.0, 10000.0, 530.0, 17.0, 10.0, 13.0, 0.2, 5.3, 2.0, 600.0, 1000.0),
-    "GL24k": Holzsorte(_B, 24.0, 11000.0, 350.0, 16.0, 10.0, 13.0, 0.15, 1.9, 1.8, 300.0, 500.0),
-    "GL24h": Holzsorte(_B, 24.0, 11000.0, 380.0, 16.0, 12.0, 14.5, 0.15, 1.9, 1.8, 300.0, 500.0),
-    "GL28k": Holzsorte(_B, 28.0, 12000.0, 380.0, 18.5, 12.0, 16.0, 0.15, 2.0, 1.8, 300.0, 500.0),
-    "GL28h": Holzsorte(_B, 28.0, 12000.0, 410.0, 18.5, 14.0, 17.0, 0.15, 2.0, 1.8, 300.0, 500.0),
-    "GL32k": Holzsorte(_B, 32.0, 13000.0, 410.0, 21.0, 14.0, 17.5, 0.15, 2.1, 1.8, 400.0, 600.0),
-    "GL32h": Holzsorte(_B, 32.0, 13000.0, 430.0, 21.0, 16.0, 19.0, 0.15, 2.1, 1.8, 400.0, 600.0),
-    "GL36k": Holzsorte(_B, 36.0, 14000.0, 430.0, 24.0, 16.0, 18.0, 0.15, 2.2, 1.8, 400.0, 600.0),
-    "GL36h": Holzsorte(_B, 36.0, 14000.0, 450.0, 24.0, 18.0, 20.5, 0.15, 2.2, 1.8, 400.0, 600.0),
+    "C16": Holzsorte(_N, 16.0, 8000.0, 310.0, 9.5, 5.5, 9.5, 0.1, 1.5, 1.5, 270.0, 500.0,
+                     17.0, 5300.0),
+    "C24": Holzsorte(_N, 24.0, 11000.0, 350.0, 14.0, 8.0, 12.0, 0.1, 1.8, 1.5, 300.0, 500.0,
+                     21.0, 7300.0),
+    "C30": Holzsorte(_N, 30.0, 12000.0, 380.0, 17.5, 10.5, 13.5, 0.1, 2.0, 1.5, 300.0, 500.0,
+                     23.0, 8000.0),
+    "D30": Holzsorte(_L, 30.0, 10000.0, 530.0, 17.0, 10.0, 13.0, 0.2, 5.3, 2.0, 600.0, 1000.0,
+                     23.0, 8300.0),
+    "GL24k": Holzsorte(_B, 24.0, 11000.0, 350.0, 16.0, 10.0, 13.0, 0.15, 1.9, 1.8, 300.0, 500.0,
+                       21.0, 9400.0),
+    "GL24h": Holzsorte(_B, 24.0, 11000.0, 380.0, 16.0, 12.0, 14.5, 0.15, 1.9, 1.8, 300.0, 500.0,
+                       24.0, 9400.0),
+    "GL28k": Holzsorte(_B, 28.0, 12000.0, 380.0, 18.5, 12.0, 16.0, 0.15, 2.0, 1.8, 300.0, 500.0,
+                       24.0, 10200.0),
+    "GL28h": Holzsorte(_B, 28.0, 12000.0, 410.0, 18.5, 14.0, 17.0, 0.15, 2.0, 1.8, 300.0, 500.0,
+                       26.5, 10200.0),
+    "GL32k": Holzsorte(_B, 32.0, 13000.0, 410.0, 21.0, 14.0, 17.5, 0.15, 2.1, 1.8, 400.0, 600.0,
+                       26.5, 11100.0),
+    "GL32h": Holzsorte(_B, 32.0, 13000.0, 430.0, 21.0, 16.0, 19.0, 0.15, 2.1, 1.8, 400.0, 600.0,
+                       29.0, 11100.0),
+    "GL36k": Holzsorte(_B, 36.0, 14000.0, 430.0, 24.0, 16.0, 18.0, 0.15, 2.2, 1.8, 400.0, 600.0,
+                       29.0, 11900.0),
+    "GL36h": Holzsorte(_B, 36.0, 14000.0, 450.0, 24.0, 18.0, 20.5, 0.15, 2.2, 1.8, 400.0, 600.0,
+                       31.0, 11900.0),
 }
 
 #: Womit ein neues Holz anfaengt: die Sorte, die Tabelle 6 hervorhebt.
@@ -134,7 +230,23 @@ ERSTES_HOLZ = "C24"
 
 #: Was aus der Spalte einer Sorte kommt, in N/mm² -- die Rohdichte steht extra.
 _SPALTEN = ("f_m_k", "E_0_mean", "f_m_d", "f_t_0_d", "f_c_0_d", "f_t_90_d", "f_c_90_d",
-            "f_v_d", "E_90_mean", "G_mean")
+            "f_v_d", "E_90_mean", "G_mean", "f_c_0_k", "E_0_05")
+
+
+def eta_t(stossartig: bool) -> float:
+    """Der Beiwert der Einwirkungsdauer: 1.4 bei stossartiger Einwirkung, sonst 1 (2.2.6)."""
+    return ETA_T_STOSSARTIG if stossartig else 1.0
+
+
+def zugglied_grund(stoff: Baustoff) -> str:
+    """
+    Warum dieses Holz kein Zugglied sein darf, als Satz -- leer, wo es darf
+    (:data:`OHNE_ZUGGLIED`).
+    """
+    if stoff.sorte not in OHNE_ZUGGLIED:
+        return ""
+    return (f"Ein Zugglied aus {stoff.sorte} lässt SIA 265 nicht zu (Tabelle 6, Fussnote 2): "
+            f"mit Zug ist «{stoff.name}» hier eines.")
 
 
 def holzsorten_zum_anlegen() -> List[str]:
@@ -165,6 +277,13 @@ HOLZ_VORLAGEN: tuple[KennwertVorlage, ...] = (
     _tabellenwert("E_90_mean", "E_{90,mean}", "Elastizitätsmodul quer zur Faser, Mittelwert",
                   stellen=0),
     _tabellenwert("G_mean", "G_{mean}", "Schubmodul, Mittelwert", stellen=0),
+    # -- Fuer Knicken und Kippen (Anhang B) ---------------------------------
+    KennwertVorlage(kurzname="f_c_0_k", symbol="f_{c,0,k}", einheit=N_PRO_MM2,
+                    beschreibung="Druckfestigkeit in Faserrichtung, kennzeichnend",
+                    referenz=ANHANG_B, stellen=1),
+    KennwertVorlage(kurzname="E_0_05", symbol="E_{0,05}", einheit=N_PRO_MM2,
+                    beschreibung="Elastizitätsmodul in Faserrichtung, 5%-Fraktil",
+                    referenz=ANHANG_B, stellen=0),
     # -- Je Holzart ---------------------------------------------------------
     KennwertVorlage(
         kurzname="gamma_M_eta_M",

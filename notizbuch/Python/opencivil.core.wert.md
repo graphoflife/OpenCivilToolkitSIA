@@ -1,5 +1,5 @@
 ---
-erzeugt: 025a3776e4ac
+erzeugt: f19a02121d46
 art: modul
 tags: [modul]
 ---
@@ -330,6 +330,10 @@ def beschreibung(self) -> str
 - [[opencivil.nachweis.lagennachweis]]
 - [[opencivil.nachweis.mindestbewehrung]]
 - [[opencivil.nachweis.qa_gebrauch]]
+- [[opencivil.nachweis.qa_holz]]
+- [[opencivil.nachweis.qa_holz_kennzahlen]]
+- [[opencivil.nachweis.qa_holz_stabilitaet]]
+- [[opencivil.nachweis.qa_holz_werte]]
 - [[opencivil.nachweis.qa_stahl]]
 - [[opencivil.nachweis.qa_stahl_kennzahlen]]
 - [[opencivil.nachweis.qa_stahl_stabilitaet]]

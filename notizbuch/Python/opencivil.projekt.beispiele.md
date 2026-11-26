@@ -1,5 +1,5 @@
 ---
-erzeugt: 33d9906e3c01
+erzeugt: 66f52698d475
 art: modul
 tags: [modul]
 ---
@@ -253,10 +253,27 @@ mit Kippen unter einem dreieckigen Moment; mit Druck in Klasse 3; am
 wirksamen Querschnitt nach (62) und (63); reiner Druck nach 5.3.8; und
 seitlich gehalten nur (50).
 
+### _holztraeger
+
+```python
+def _holztraeger(kennung: str) -> QuerschnittsanalyseEintrag
+```
+
+Ein Rechteck 160 × 400 mm aus GL24h in Feuchteklasse 2, zweiachsig, jede
+Gleichung von SIA 265:2012, 4.2 einmal: Zug mit Biegung nach (21) und
+Querkraft in beiden Richtungen mit Torsion nach (25); Druck mit Biegung
+nach (22) und Querkraft allein nach (23); stossartig Biegung allein nach
+(14) und Torsion allein nach (24); Zug allein nach (6), Druck allein
+nach (10). Unter 600 mm Hoehe mit k_h.
+
+Dazu ein Stab: Druck und Biegung mit Knicken und Kippen nach (37), Druck
+allein nach (29), stossartig Biegung allein nach (38), mit k_m \< 1.
+
 
 ## Braucht
 
 - [[opencivil.decke.schnitt]]
+- [[opencivil.material.holz]]
 - [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.balkensystem3d]]
 - [[opencivil.projekt.decke]]

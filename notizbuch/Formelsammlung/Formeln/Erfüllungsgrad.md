@@ -1,5 +1,5 @@
 ---
-erzeugt: e95901bff457
+erzeugt: aee6564928eb
 art: formel
 tags: [formel]
 ---
@@ -55,6 +55,8 @@ $$
 - [[Sprödes Versagen je Richtung]]
 - [[Stahlquerschnitt]]
 - [[Knicken und Kippen]]
+- [[Holzquerschnitt]]
+- [[Knicken und Kippen eines Holzstabs]]
 - [[Durchstanzen]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->

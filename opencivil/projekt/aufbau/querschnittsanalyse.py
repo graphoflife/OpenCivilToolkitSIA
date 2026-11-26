@@ -7,16 +7,16 @@ die :class:`~opencivil.querschnitt.analyse.Querschnittsanalyse` und ihre
 Nachweise: Biegung und Normalkraft, Querkraft und Torsion, Duktilitaet,
 sproedes Versagen, die Zwaengungen, die Stahlspannungen und das Knicken
 (:func:`bauen`) -- dazu die Kennzahlen. Ein Querschnitt aus Stahl hat seine
-eigenen (:func:`_stahl`). Eine leere oder fehlerhafte Zeichnung wird kein
-Bauteil, nur ein Hinweis.
+eigenen (:func:`_stahl`), einer aus Holz auch (:func:`_holz`). Eine leere
+oder fehlerhafte Zeichnung wird kein Bauteil, nur ein Hinweis.
 """
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Dict, List, Mapping
+from typing import TYPE_CHECKING, Any, Dict, Iterable, List, Mapping, Tuple
 
 from opencivil.core.berechnung import Kennzahlprozedur
-from opencivil.material.basis import Baustoff
+from opencivil.material.basis import Baustoff, Baustoffart
 from opencivil.material.spannstahl import erzeugnis
 from opencivil.projekt.lesen import ProjektFehler, als_groesse, ort_von, stoffe_des_felds
 from opencivil.projekt.querschnittsanalyse import (
@@ -24,6 +24,10 @@ from opencivil.projekt.querschnittsanalyse import (
 )
 from opencivil.projekt.spannglieder import SpanngliedEintrag
 from opencivil.nachweis.qa_gebrauch import AnalyseStellen, RissnormalkraftQA, ZwaengungBiegungQA
+from opencivil.nachweis.qa_holz import HolzBiegungQA, HolzSchubQA
+from opencivil.nachweis.qa_holz_kennzahlen import KennzahlenHolzQA
+from opencivil.nachweis.qa_holz_stabilitaet import HolzStabilitaetQA
+from opencivil.nachweis.qa_holz_werte import HolzwerteQA
 from opencivil.nachweis.qa_kennzahlen import KennzahlenQA
 from opencivil.nachweis.qa_stahl import OHNE_TORSION, StahlBiegungQA, StahlQuerkraftQA
 from opencivil.nachweis.qa_stahl_kennzahlen import KennzahlenStahlQA
@@ -60,12 +64,12 @@ def bauen(art: "Bauteilart", eintrag: QuerschnittsanalyseEintrag,
     Knicken, sobald ein Fall eingeschaltet ist.
 
     Das alles beim Stahlbeton. Ein Querschnitt aus Stahl rechnet nach SIA 263
-    (:func:`_stahl`). Einer aus Holz oder im Verbund
-    (:mod:`~opencivil.querschnitt.bauweise`) rechnet bisher nur seine Werte
-    -- Flaeche, Schwerpunkt, Traegheitsmomente --; seine Zusammenfassung
-    sagt, dass die Nachweise fehlen (:func:`ohne_nachweise`). Seine
-    Spannung-Dehnung-Analysen rechnet er trotzdem, ausser im Verbund
-    (:func:`ohne_analysen`).
+    (:func:`_stahl`), einer aus Holz nach SIA 265 (:func:`_holz`). Einer im
+    Verbund (:mod:`~opencivil.querschnitt.bauweise`) rechnet bisher nur seine
+    Werte -- Flaeche, Schwerpunkt, Traegheitsmomente --, ebenso einer aus
+    mehreren Hoelzern; seine Zusammenfassung sagt, dass die Nachweise fehlen
+    (:func:`ohne_nachweise`). Seine Spannung-Dehnung-Analysen rechnet er
+    trotzdem, ausser im Verbund (:func:`ohne_analysen`).
 
     Ist noch nichts gezeichnet (:attr:`QuerschnittsanalyseEintrag.leer`), gibt
     es nichts zu rechnen und kein Bauteil -- aber auch keinen Fehler, der das
@@ -88,12 +92,14 @@ def bauen(art: "Bauteilart", eintrag: QuerschnittsanalyseEintrag,
         teil.weitere_ziele += [d.id for d in (*analyse.d_brutto.values(), analyse.d_torsion)]
     if analyse.bauweise is Bauweise.STAHL:
         return _stahl(eintrag, analyse, teil, aufbau)
-    fehlt = ohne_nachweise(analyse.bauweise)
+    fehlt = ohne_nachweise(analyse.bauweise, ((s.art, s.name) for s in analyse.baustoffe))
     if fehlt:
         aufbau.ohne_nachweis(teil, ort_von(eintrag), fehlt)
         if not ohne_analysen(analyse.bauweise):
             spannungsfaelle(eintrag, stoffe_von(aufbau, analyse.baustoffe), aufbau)
         return teil
+    if analyse.bauweise is Bauweise.HOLZ:
+        return _holz(eintrag, analyse, teil, aufbau)
     stoffe = stoffe_von(aufbau, analyse.baustoffe)
     lastfaelle = _lastfaelle(eintrag)
 
@@ -178,6 +184,41 @@ def _stahl(eintrag: QuerschnittsanalyseEintrag, analyse: Querschnittsanalyse, te
     return teil
 
 
+def _holz(eintrag: QuerschnittsanalyseEintrag, analyse: Querschnittsanalyse, teil: Bauteil,
+          aufbau: Aufbau) -> Bauteil:
+    """
+    Ein Querschnitt aus einem einzigen Holz nach SIA 265: seine Werte fuer die
+    Feuchteklasse der Analyse (:mod:`~opencivil.nachweis.qa_holz_werte`), je
+    Lastfall Biegung und Normalkraft, Schub und Torsion, sobald einer sie hat
+    (:mod:`~opencivil.nachweis.qa_holz`), Knicken und Kippen, sobald ein Fall
+    eingeschaltet ist (:mod:`~opencivil.nachweis.qa_holz_stabilitaet`). Alle
+    lesen aus den Werten; «stossartig» gilt je Fall.
+    """
+    werte = HolzwerteQA(analyse, eintrag.feuchteklasse)
+    aufbau.werk.registriere(werte)
+    teil.weitere_ziele.append(werte.id)
+    lastfaelle = _lastfaelle(eintrag)
+    stoesse = _stossartig(eintrag.lastfaelle)
+    if lastfaelle:
+        aufbau.eintragen(teil, "qa_holz", eintrag.kennung,
+                         HolzBiegungQA(analyse, lastfaelle, werte, stoesse))
+    if any(l.V_z or analyse.biegung.querkraft_y(l.V_y) or l.T for l in lastfaelle):
+        aufbau.eintragen(teil, "qa_holz_schub", eintrag.kennung,
+                         HolzSchubQA(analyse, lastfaelle, werte, stoesse))
+    stabfaelle = eintrag.stabfaelle()
+    if stabfaelle:
+        aufbau.eintragen(teil, "qa_holz_stabilitaet", eintrag.kennung, HolzStabilitaetQA(
+            analyse, stabfaelle, werte, _stossartig(eintrag.stabilitaetsfaelle)))
+    _kennzahlen(KennzahlenHolzQA(analyse, werte), teil, aufbau)
+    spannungsfaelle(eintrag, stoffe_von(aufbau, analyse.baustoffe), aufbau)
+    return teil
+
+
+def _stossartig(faelle: Iterable[Any]) -> frozenset:
+    """Die Namen der eingeschalteten Faelle, die stossartig sind."""
+    return frozenset(f.name for f in faelle if f.aktiv and f.stossartig)
+
+
 def _kennzahlen(kennzahlen: Kennzahlprozedur, teil: Bauteil, aufbau: Aufbau) -> None:
     """Die Kennzahlen ins Rechenwerk und unter das Bauteil."""
     aufbau.werk.registriere(kennzahlen)
@@ -185,30 +226,42 @@ def _kennzahlen(kennzahlen: Kennzahlprozedur, teil: Bauteil, aufbau: Aufbau) -> 
     teil.kennzahlen += kennzahlen.kennzahlen
 
 
-def ohne_nachweise(bauweise: Bauweise) -> str:
+def ohne_nachweise(bauweise: Bauweise, stoffe: Iterable[Tuple[Baustoffart, str]]) -> str:
     """
     Warum ein Querschnitt dieser Bauweise keinen Nachweis hat -- leer beim
-    Stahlbeton und beim Stahl (seit 2026-11-26). Ein Satzteil ohne Punkt,
-    fuer die Zusammenfassung
+    Stahlbeton, beim Stahl und beim Holz aus einem einzigen Holz (beide seit
+    2026-11-26). ``stoffe``: Art und Name jedes Baustoffs, wie fuer
+    :func:`~opencivil.querschnitt.bauweise.bauweise`. Mehrere Hoelzer
+    braeuchten einen nach ihren Steifigkeiten gewichteten Querschnitt; den
+    rechnet das Werkzeug nicht (nach Vorgabe, nicht nachgeschlagen). Ein
+    Satzteil ohne Punkt, fuer die Zusammenfassung
     (:meth:`~opencivil.projekt.aufbau.kern.Aufbau.ohne_nachweis`) und fuer die
     Zeichnung (:func:`~opencivil.web.zeichengeometrie.geometrie`).
     """
     if bauweise in (Bauweise.STAHLBETON, Bauweise.STAHL):
         return ""
+    if bauweise is Bauweise.HOLZ:
+        hoelzer = list(dict.fromkeys(name for _, name in stoffe))
+        if len(hoelzer) < 2:
+            return ""
+        return (f"einen {bauweise.querschnitt} aus mehreren Hölzern "
+                f"({', '.join(f'«{h}»' for h in hoelzer)}) weist das Werkzeug nach "
+                f"{bauweise.norm} noch nicht nach")
     return (f"einen {bauweise.querschnitt} weist das Werkzeug nach {bauweise.norm} noch "
             f"nicht nach")
 
 
-def ohne_diagramm(bauweise: Bauweise) -> str:
+def ohne_diagramm(bauweise: Bauweise, stoffe: Iterable[Tuple[Baustoffart, str]]) -> str:
     """
     Warum ein Querschnitt dieser Bauweise kein Interaktionsdiagramm hat --
     leer beim Stahlbeton, dem einzigen mit einer Widerstandsflaeche. Ein
     Satz mit Punkt, fuer die Diagramme
-    (:func:`~opencivil.web.diagrammdaten.analyse_diagramme`).
+    (:func:`~opencivil.web.diagrammdaten.analyse_diagramme`); ``stoffe`` wie
+    bei :func:`ohne_nachweise`.
     """
     if bauweise is Bauweise.STAHLBETON:
         return ""
-    fehlt = ohne_nachweise(bauweise)
+    fehlt = ohne_nachweise(bauweise, stoffe)
     if fehlt:
         return f"Kein Interaktionsdiagramm: {fehlt}."
     return (f"Kein Interaktionsdiagramm: für einen {bauweise.querschnitt} zeichnet das Werkzeug "

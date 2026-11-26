@@ -221,7 +221,7 @@ def geometrie(eintrag, projekt) -> dict:
         # Oberflaeche sie ein zweites Mal.
         "materialien": eintrag.materialien(),
         "bauweise": art.value if art is not None else "",
-        "ohne_nachweise": _als_satz(ohne_nachweise(art)) if art is not None else "",
+        "ohne_nachweise": _als_satz(ohne_nachweise(art, passend)) if art is not None else "",
         "ohne_analysen": ohne_analysen(art) if art is not None else "",
         **_knickkurven(eintrag, flaechen, b),
     }

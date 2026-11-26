@@ -1,5 +1,5 @@
 ---
-erzeugt: 17ffcf9b9f5a
+erzeugt: a07a020183b7
 art: modul
 tags: [modul]
 ---
@@ -690,6 +690,7 @@ ist bei null kleiner als eins. Durch Halbieren, bis auf 1e-12 genau.
 
 ## Gebraucht von
 
+- [[opencivil.nachweis.qa_holz_stabilitaet]]
 - [[opencivil.nachweis.qa_stahl_stabilitaet]]
 - [[opencivil.projekt.querschnittsanalyse]]
 - [[opencivil.projekt.stabilitaet]]

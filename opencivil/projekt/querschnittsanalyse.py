@@ -6,8 +6,9 @@ Der :class:`QuerschnittsanalyseEintrag`: Knoten, Polygone mit Material,
 Stahlprofile (:mod:`opencivil.projekt.profile`), Staebe und Stablinien,
 Spannglieder (:mod:`opencivil.projekt.spannglieder`), Schubwaende,
 Hilfslinien, die Wahl der Werkstoffgesetze, die
-Lastfaelle, die Faelle von Knicken und Kippen beim Stahl
-(:mod:`opencivil.projekt.stabilitaet`) und die Schalter der Nachweise -- als eine speicherbare
+Lastfaelle, die Faelle von Knicken und Kippen bei Stahl und Holz
+(:mod:`opencivil.projekt.stabilitaet`), beim Holz seine Feuchteklasse und die
+Schalter der Nachweise -- als eine speicherbare
 Datenklasse, wie die Platte in :mod:`opencivil.projekt.platte`. Dazu die
 Vorlage einer frischen Analyse und ein Baukasten, der ohne Oberflaeche
 zeichnet (:meth:`QuerschnittsanalyseEintrag.polygon` und folgende).
@@ -53,6 +54,7 @@ from opencivil.projekt.eintraege import (
 )
 from opencivil.projekt.fallnamen import Fallnamen
 from opencivil.core.einheiten import KN, KNM, MM, MM2
+from opencivil.material.holz import Feuchteklasse
 from opencivil.projekt.lesen import (
     ProjektFehler, bereich, einer_von, je_material, materialfeld, ort_von, stoffe_des_felds, teil,
 )
@@ -244,6 +246,13 @@ class QALastfallEintrag(Beschreibung):
     V_y_Ed: float = bereich(0.0, heisst="Querkraft V_y,Ed", einheit=KN)
     V_z_Ed: float = bereich(0.0, heisst="Querkraft V_z,Ed", einheit=KN)
     T_Ed: float = bereich(0.0, heisst="Torsion T_Ed", einheit=KNM)
+    stossartig: bool = False
+    """
+    Nur beim Holz: ob die Einwirkung stossartig ist -- dann vergroessert
+    η_t = 1.4 seine Bemessungswerte (SIA 265:2012, 2.2.6). Stahlbeton und
+    Stahl kennen das nicht; ihr Lastfall rechnet ohne.
+    """
+
     aktiv: bool = True
 
 
@@ -463,7 +472,7 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben, JeMaterial):
     """Knicknachweise, je in einer Richtung; leer heisst: keiner."""
 
     stabilitaetsfaelle: List[QAStabilitaetEintrag] = field(default_factory=list)
-    """Knicken und Kippen eines Stabs aus Stahl (SIA 263); leer heisst: keiner."""
+    """Knicken und Kippen eines Stabs aus Stahl (SIA 263) oder Holz (SIA 265); leer: keiner."""
 
     knickkurve_y: Knickkurve = Knickkurve.PROFIL
     knickkurve_z: Knickkurve = Knickkurve.PROFIL
@@ -472,6 +481,14 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben, JeMaterial):
     zuweist -- nur fuer einen Querschnitt aus einem einzigen Profil -- oder
     eine gewaehlte. Sie gelten fuer alle Faelle: die Kurve gehoert zum
     Querschnitt, nicht zum Fall.
+    """
+
+    feuchteklasse: Feuchteklasse = Feuchteklasse.EINS
+    """
+    Beim Holz: wie feucht es im Bauwerk ist (SIA 265:2012, 3.2.1.2) -- einmal
+    fuer die ganze Analyse. Ihr η_w mindert jeden Nachweis; die
+    Spannung-Dehnung-Analysen rechnen ohne (nach Vorgabe, nicht
+    nachgeschlagen).
     """
 
     spannungsfaelle: List[QASpannungsfallEintrag] = field(default_factory=list)

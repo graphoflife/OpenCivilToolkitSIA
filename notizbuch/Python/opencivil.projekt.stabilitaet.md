@@ -1,5 +1,5 @@
 ---
-erzeugt: 3a5b77d700b8
+erzeugt: 42f4b99b5160
 art: modul
 tags: [modul]
 ---
@@ -9,21 +9,23 @@ tags: [modul]
 
 ## VERANTWORTUNG
 
-Der [[opencivil.projekt.stabilitaet#QAStabilitaetEintrag|QAStabilitaetEintrag]] einer Querschnittsanalyse aus Stahl
-([[opencivil.projekt.querschnittsanalyse#QuerschnittsanalyseEintrag|QuerschnittsanalyseEintrag]]):
+Der [[opencivil.projekt.stabilitaet#QAStabilitaetEintrag|QAStabilitaetEintrag]] einer Querschnittsanalyse aus Stahl oder
+Holz ([[opencivil.projekt.querschnittsanalyse#QuerschnittsanalyseEintrag|QuerschnittsanalyseEintrag]]):
 ein Stab mit dem gezeichneten Querschnitt, seine Druckkraft, die groessten
 Momente 1. Ordnung in ihm, je Achse das Verhaeltnis ψ seiner Endmomente und
-die Knick- und Kipplaengen. Gerechnet wird in
+die Knick- und Kipplaengen. Gerechnet wird beim Stahl in
 [[opencivil.stahlbau.stabilitaet]], die Herleitung schreibt
-[[opencivil.nachweis.qa_stahl_stabilitaet]].
+[[opencivil.nachweis.qa_stahl_stabilitaet]]; beim Holz beides
+[[opencivil.nachweis.qa_holz_stabilitaet]].
 
 EINE LAENGE NULL heisst gehalten: um diese Achse knickt der Stab nicht, oder
 er kippt nicht. So bleibt jede Laenge eine Zahl, und kein Schalter steht
 neben ihr.
 
-ψ gilt fuer `ω` (5.1.9.1) und fuer `η` beim Kippen (Anhang B.6) --
-dieselben Endmomente. Mit Querlast oder bei einem verschieblichen Stab
-gilt `ω = 1` (5.1.10.3): dann ist ψ eins.
+ψ gilt beim Stahl fuer `ω` (5.1.9.1) und fuer `η` beim Kippen
+(Anhang B.6) -- dieselben Endmomente. Mit Querlast oder bei einem
+verschieblichen Stab gilt `ω = 1` (5.1.10.3): dann ist ψ eins. Das Holz
+rechnet ohne ψ, dafuer mit «stossartig» (SIA 265:2012, 2.2.6).
 
 ## Inhalt
 
@@ -61,7 +63,8 @@ Ein Fall von Knicken und Kippen -- siehe Dateikopf. kN, kNm und m.
 - `psi_z: float = _psi('z')`
 - `L_K_y: float = _laenge('Knicklänge L_K,y')` – Fuer das Knicken um y.
 - `L_K_z: float = _laenge('Knicklänge L_K,z')`
-- `L_D: float = _laenge('Kipplänge L_D')` – Der Abstand der Punkte, an denen der Druckgurt seitlich gehalten ist.
+- `L_D: float = _laenge('Kipplänge L_D')` – Der Abstand der Punkte, an denen der Druckgurt seitlich gehalten ist -- beim Holz `a` in (41), der Abstand der seitlichen Halterungen.
+- `stossartig: bool = False` – Nur beim Holz: η_t = 1.4 bei stossartiger Einwirkung (SIA 265:2012, 2.2.6).
 - `aktiv: bool = True` – Ob der Fall gerechnet wird. Ausgeschaltet bleibt er stehen.
 
 #### QAStabilitaetEintrag.stabfall

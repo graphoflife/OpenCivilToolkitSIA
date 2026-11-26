@@ -1,5 +1,5 @@
 ---
-erzeugt: 7ed91aaa6da4
+erzeugt: 24624f832e4e
 art: modul
 tags: [modul]
 ---
@@ -176,6 +176,7 @@ def neigung(self, M_y: float) -> Optional[float]
 ## Gebraucht von
 
 - [[opencivil.nachweis.gebrauchsebene]]
+- [[opencivil.nachweis.qa_holz_stabilitaet]]
 - [[opencivil.nachweis.qa_kennzahlen]]
 - [[opencivil.nachweis.qa_stahl_stabilitaet]]
 - [[opencivil.nachweis.rissgroessen]]

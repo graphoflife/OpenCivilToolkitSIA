@@ -7,6 +7,47 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-26 · Holz nach SIA 265
+
+Aus dem Plan vom 2026-11-25, Schritt 13: die Nachweise eines gezeichneten
+Holzquerschnitts nach SIA 265:2012, 4.2, mit Knicken und Kippen.
+
+**Vorher und nachher.** Vorher sagte ein Querschnitt aus Holz nur, dass
+das Werkzeug ihn noch nicht nachweist. Nachher hat er drei Kacheln:
+«Feuchteklasse», «Tragsicherheit» und «Knicken und Kippen». Ein Träger
+160 × 400 mm aus GL24h in Feuchteklasse 2 mit M_y = 40 kNm hat α = 1.42
+nach (14); ist die Einwirkung stossartig, 1.99.
+
+**Linear, mit den Bemessungswerten der Tabellen.** Die Nachweise rechnen
+mit den elastischen Spannungen des gezeichneten Querschnitts – so verlangt
+es 4.1.2 –, die Spannung-Dehnung-Analysen weiter mit dem Gesetz des Holzes,
+auf Wunsch elastisch-plastisch im Druck. Die Tabellen 6 und 7 nennen
+Bemessungswerte für Feuchteklasse 1 und η_t = 1; jeder Nachweis
+multipliziert sie mit η = η_w·η_t (3.3.2, 3.4.2.2).
+
+**Die Feuchteklasse gilt einmal je Analyse**, in einer eigenen Kachel mit
+drei Bildern: ein geschlossenes Haus, ein Dach im Regen, Wasser. **«Stossartig»** ist ein
+Schalter am Lastfall und am Fall des Stabs, «normal | stossartig», denn
+η_t = 1.4 nach 2.2.6 gilt nur für Anprall, Erdbeben oder dynamische Lasten
+aus dem Strassenverkehr. Die Kennzahlen rechnen ohne.
+
+**Welche Gleichung**, sagt der Lastfall selbst: Zug (6), Druck (10),
+Biegung (14), Biegung mit Zug (21), mit Druck (22); Querkraft (23),
+Torsion (24), beide (25). Beim Stab je Achse (29), (37) oder (38), mit k_c
+nach (30) und (31) und k_m nach (39) bis (41). Wie beim Stahl bleibt die
+Normalkraft fest, und die Momente wachsen um λ, bis die Gleichung aufgeht;
+in (25) wachsen Querkraft und Torsion zusammen, λ·t + λ²·v² = 1.
+
+**Was nicht in der Norm steht**, steht im [[TODO]] und in der Herleitung:
+die weiteste Faser, die Lamellen parallel zu y für k_h, τ_d als
+Resultierende, Torsion und Kippen nur im Rechteck – sonst grau –, und dass
+mehrere Hölzer in einem Querschnitt keinen Nachweis haben.
+
+**Formelsammlung.** 40 neue Seiten mit Theorie, dazu die Themen
+«Holzquerschnitt» und «Knicken und Kippen eines Holzstabs». Der
+Trägheitsradius des Druckgurts beim Stahl und der des Holzquerschnitts
+sind dieselbe Formel und darum eine Seite, «Trägheitsradius».
+
 ## 2026-11-26 · Knicken und Kippen eines Stahlstabs
 
 Aus dem Plan vom 2026-11-25, Schritte 12c und 12d: ein Stab mit dem

@@ -1,10 +1,10 @@
 ---
-erzeugt: 109475d7d5a7
+erzeugt: dce10e340f31
 art: thema
 tags: [thema]
 ---
 > [!abstract] Platte
-> 35 Formeln, in der Folge, in der gerechnet wird.
+> 41 Formeln, in der Folge, in der gerechnet wird.
 
 ## Was die Rechnung dazu sagt
 
@@ -23,6 +23,8 @@ Was der Stahlquerschnitt aufnimmt, ohne Bezug auf einen Lastfall: die Querschnit
 Jedes Teil rechnet mit der Fliessgrenze seiner Dicke: ein Profil mit der seines dicksten Blechs, eine frei gezeichnete Fläche mit der ihrer kleinsten Breite. Über 40 mm gilt die rechte Spalte der Tabelle 1, auch über 100 mm, wo sie endet.
 
 Je Profil allein, ohne Normalkraft und Biegung: kein Blech ist gedrückt, der Querschnitt rechnet plastisch. Beim I und beim U prüft (42), ob der Steg beulen kann; tut er es, trägt er nach (13). Die Wände eines Rechteckrohrs tragen je nach (13). Zusammen tragen die Profile die Summe; frei gezeichnete Flächen tragen nichts.
+
+Was der Holzquerschnitt aufnimmt, ohne Bezug auf einen Lastfall: je Beanspruchung allein, linear, mit den Bemessungswerten der Tabellen und η\_w der Feuchteklasse – ohne stossartige Einwirkung. Knicken und Kippen gehören dem Stab und sind hier nicht dabei.
 
 ## Formeln
 
@@ -61,6 +63,12 @@ Je Profil allein, ohne Normalkraft und Biegung: kein Blech ist gedrückt, der Qu
 33. [[Querkraftwiderstand eines Stahlprofils]]
 34. [[Steg ohne Schubbeulen]]
 35. [[Schubbeulen des Blechs, ohne Quersteifen]]
+36. [[Zugwiderstand eines Holzquerschnitts]]
+37. [[Druckwiderstand eines Holzquerschnitts]]
+38. [[Biegewiderstand des Brettschichtholzes]]
+39. [[Biegewiderstand eines Holzquerschnitts]]
+40. [[Querkraftwiderstand eines Holzquerschnitts]]
+41. [[Torsionswiderstand eines Rechtecks aus Holz]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 
@@ -94,3 +102,11 @@ und 2 ([[Plastischer Biegewiderstand eines Stahlquerschnitts|f_y W_pl]]),
 sonst [[Biegewiderstand bis zum ersten Fliessen|bis zum ersten Fliessen]] –
 und je Richtung der
 [[Querkraftwiderstand eines Stahlprofils|Querkraftwiderstand]] der Profile.
+
+Beim Holzquerschnitt ebenso, mit $\eta_w$ der Feuchteklasse und ohne
+Stoss: der [[Zugwiderstand eines Holzquerschnitts|Zug-]] und der
+[[Druckwiderstand eines Holzquerschnitts|Druckwiderstand]] ohne Knicken, je
+Achse der [[Biegewiderstand eines Holzquerschnitts|Biegewiderstand]] ohne
+Kippen, je Richtung der
+[[Querkraftwiderstand eines Holzquerschnitts|Querkraftwiderstand]] und beim
+Rechteck der [[Torsionswiderstand eines Rechtecks aus Holz|Torsionswiderstand]].

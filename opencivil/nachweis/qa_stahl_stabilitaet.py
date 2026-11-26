@@ -468,7 +468,8 @@ class _Herleitung:
         p.wert(I_g, referenz=st.REFERENZ_DRUCKGURT)
         i_g = werte.laenge("i_g", "i_{g}", gurt.i * 1e-3, "Trägheitsradius des Druckgurts")
         p.formel(i_g, r"\sqrt{\frac{@I}{@A}}", {"I": I_g, "A": A_g},
-                 titel="Trägheitsradius des Druckgurts", referenz=st.REFERENZ_DRUCKGURT)
+                 titel="Trägheitsradius des Druckgurts", referenz=st.REFERENZ_DRUCKGURT,
+                 name="Trägheitsradius")
         return i_g
 
     # -- Zusammenwirken -------------------------------------------------------------

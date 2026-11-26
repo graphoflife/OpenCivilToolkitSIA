@@ -1,5 +1,5 @@
 ---
-erzeugt: 1505ea9e699d
+erzeugt: 6a3679b318ce
 art: modul
 tags: [modul]
 ---
@@ -512,6 +512,10 @@ Jede Ecke eines Polygons mit Material -- fuer das Rissmoment, in mm.
 ## Gebraucht von
 
 - [[opencivil.nachweis.qa_gebrauch]]
+- [[opencivil.nachweis.qa_holz]]
+- [[opencivil.nachweis.qa_holz_kennzahlen]]
+- [[opencivil.nachweis.qa_holz_stabilitaet]]
+- [[opencivil.nachweis.qa_holz_werte]]
 - [[opencivil.nachweis.qa_kennzahlen]]
 - [[opencivil.nachweis.qa_knicken]]
 - [[opencivil.nachweis.qa_stahl]]

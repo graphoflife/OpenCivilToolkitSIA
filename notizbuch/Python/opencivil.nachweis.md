@@ -1,5 +1,5 @@
 ---
-erzeugt: fd7d6ede47ea
+erzeugt: 2b842a343726
 art: modul
 tags: [modul]
 ---
@@ -26,6 +26,10 @@ Kapitel waehlt, womit es rechnet.
 - [[opencivil.nachweis.linie]] – Geometrie einer geschlossenen M-N-Linie.
 - [[opencivil.nachweis.mindestbewehrung]] – Mindestbewehrung gegen breite Risse bei Zwang.
 - [[opencivil.nachweis.qa_gebrauch]] – Gebrauchsnachweise des gezeichneten Querschnitts.
+- [[opencivil.nachweis.qa_holz]] – die Lastfaelle eines Holzquerschnitts nach SIA 265:2012.
+- [[opencivil.nachweis.qa_holz_kennzahlen]] – was ein Holzquerschnitt aufnimmt, ohne Einwirkung.
+- [[opencivil.nachweis.qa_holz_stabilitaet]] – Knicken und Kippen eines Holzstabs nach SIA 265:2012.
+- [[opencivil.nachweis.qa_holz_werte]] – die Werte eines Holzquerschnitts, einmal fuer alle Nachweise.
 - [[opencivil.nachweis.qa_kennzahlen]] – was ein gezeichneter Querschnitt aufnimmt, ohne Einwirkung.
 - [[opencivil.nachweis.qa_knicken]] – Knicken am gezeichneten Querschnitt.
 - [[opencivil.nachweis.qa_stahl]] – die Lastfaelle eines Stahlquerschnitts nach SIA 263:2013.

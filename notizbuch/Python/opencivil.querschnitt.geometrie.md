@@ -1,5 +1,5 @@
 ---
-erzeugt: cb0ecab80cae
+erzeugt: 818da878ddba
 art: modul
 tags: [modul]
 ---
@@ -552,6 +552,7 @@ Ueberdeckung, oder wenn die Linie dabei keine Laenge behielte.
 - [[opencivil.bewehrungssuche.laengs]]
 - [[opencivil.durchstanzen.bewehrung]]
 - [[opencivil.durchstanzen.schnitt]]
+- [[opencivil.holzbau.querschnitt]]
 - [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.stabgrenzen]]
 - [[opencivil.projekt.aufbau.durchstanzen]]

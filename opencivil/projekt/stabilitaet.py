@@ -2,21 +2,23 @@
 opencivil/projekt/stabilitaet.py -- ein Fall von Knicken und Kippen, wie die Oberflaeche ihn beschreibt.
 
 VERANTWORTUNG:
-Der :class:`QAStabilitaetEintrag` einer Querschnittsanalyse aus Stahl
-(:class:`~opencivil.projekt.querschnittsanalyse.QuerschnittsanalyseEintrag`):
+Der :class:`QAStabilitaetEintrag` einer Querschnittsanalyse aus Stahl oder
+Holz (:class:`~opencivil.projekt.querschnittsanalyse.QuerschnittsanalyseEintrag`):
 ein Stab mit dem gezeichneten Querschnitt, seine Druckkraft, die groessten
 Momente 1. Ordnung in ihm, je Achse das Verhaeltnis ψ seiner Endmomente und
-die Knick- und Kipplaengen. Gerechnet wird in
+die Knick- und Kipplaengen. Gerechnet wird beim Stahl in
 :mod:`opencivil.stahlbau.stabilitaet`, die Herleitung schreibt
-:mod:`opencivil.nachweis.qa_stahl_stabilitaet`.
+:mod:`opencivil.nachweis.qa_stahl_stabilitaet`; beim Holz beides
+:mod:`opencivil.nachweis.qa_holz_stabilitaet`.
 
 EINE LAENGE NULL heisst gehalten: um diese Achse knickt der Stab nicht, oder
 er kippt nicht. So bleibt jede Laenge eine Zahl, und kein Schalter steht
 neben ihr.
 
-ψ gilt fuer ``ω`` (5.1.9.1) und fuer ``η`` beim Kippen (Anhang B.6) --
-dieselben Endmomente. Mit Querlast oder bei einem verschieblichen Stab
-gilt ``ω = 1`` (5.1.10.3): dann ist ψ eins.
+ψ gilt beim Stahl fuer ``ω`` (5.1.9.1) und fuer ``η`` beim Kippen
+(Anhang B.6) -- dieselben Endmomente. Mit Querlast oder bei einem
+verschieblichen Stab gilt ``ω = 1`` (5.1.10.3): dann ist ψ eins. Das Holz
+rechnet ohne ψ, dafuer mit «stossartig» (SIA 265:2012, 2.2.6).
 """
 
 from __future__ import annotations
@@ -63,7 +65,13 @@ class QAStabilitaetEintrag(Beschreibung):
 
     L_K_z: float = _laenge("Knicklänge L_K,z")
     L_D: float = _laenge("Kipplänge L_D")
-    """Der Abstand der Punkte, an denen der Druckgurt seitlich gehalten ist."""
+    """
+    Der Abstand der Punkte, an denen der Druckgurt seitlich gehalten ist --
+    beim Holz ``a`` in (41), der Abstand der seitlichen Halterungen.
+    """
+
+    stossartig: bool = False
+    """Nur beim Holz: η_t = 1.4 bei stossartiger Einwirkung (SIA 265:2012, 2.2.6)."""
 
     aktiv: bool = True
     """Ob der Fall gerechnet wird. Ausgeschaltet bleibt er stehen."""

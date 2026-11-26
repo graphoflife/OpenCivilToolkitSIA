@@ -646,6 +646,24 @@ const ZEICHEN = {
       + 'L15.5 16.9L16.8 17.4L18.1 17.7L19.4 18'],
     strich: [EULER],
   },
+  // Die Feuchteklasse des Holzes: auf der Kachel ein Tropfen. Je Klasse, wo
+  // der Balken (voll) steht: im Haus; unter einem offenen Dach, der Regen
+  // von der Seite; halb im Wasser.
+  feuchteklasse: {
+    pfade: ['M12 3.5C10 7 6.5 10.5 6.5 14.5a5.5 5.5 0 0 0 11 0C17.5 10.5 14 7 12 3.5z'],
+  },
+  'feuchteklasse-1': {
+    pfade: ['M3 11L12 4l9 7', 'M5 9.5V20h14V9.5'],
+    flaechen: ['M8.5 14h7v4h-7z'],
+  },
+  'feuchteklasse-2': {
+    pfade: ['M2.5 9.5L11 4l8.5 5.5', 'M19.5 11.5l-2 3.5 M22.5 12.5l-2 3.5 M21 17.5l-2 3.5'],
+    flaechen: ['M4.5 12.5h9v4h-9z'],
+  },
+  'feuchteklasse-3': {
+    pfade: ['M3 13q2.25-1.8 4.5 0t4.5 0t4.5 0t4.5 0', 'M3 18q2.25-1.8 4.5 0t4.5 0t4.5 0t4.5 0'],
+    flaechen: ['M7 7h10v7H7z'],
+  },
 };
 
 /**

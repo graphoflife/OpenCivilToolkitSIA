@@ -1,5 +1,5 @@
 ---
-erzeugt: 51dbdf85a280
+erzeugt: 76be2dd79099
 art: modul
 tags: [modul]
 ---
@@ -14,8 +14,8 @@ die [[opencivil.querschnitt.analyse#Querschnittsanalyse|Querschnittsanalyse]] un
 Nachweise: Biegung und Normalkraft, Querkraft und Torsion, Duktilitaet,
 sproedes Versagen, die Zwaengungen, die Stahlspannungen und das Knicken
 ([[opencivil.projekt.aufbau.querschnittsanalyse#bauen|bauen]]) -- dazu die Kennzahlen. Ein Querschnitt aus Stahl hat seine
-eigenen ([[opencivil.projekt.aufbau.querschnittsanalyse#_stahl|_stahl]]). Eine leere oder fehlerhafte Zeichnung wird kein
-Bauteil, nur ein Hinweis.
+eigenen ([[opencivil.projekt.aufbau.querschnittsanalyse#_stahl|_stahl]]), einer aus Holz auch ([[opencivil.projekt.aufbau.querschnittsanalyse#_holz|_holz]]). Eine leere
+oder fehlerhafte Zeichnung wird kein Bauteil, nur ein Hinweis.
 
 ## Inhalt
 
@@ -36,12 +36,12 @@ Stahlspannungen, sobald es Lastfaelle gibt
 Knicken, sobald ein Fall eingeschaltet ist.
 
 Das alles beim Stahlbeton. Ein Querschnitt aus Stahl rechnet nach SIA 263
-([[opencivil.projekt.aufbau.querschnittsanalyse#_stahl|_stahl]]). Einer aus Holz oder im Verbund
-([[opencivil.querschnitt.bauweise|bauweise]]) rechnet bisher nur seine Werte
--- Flaeche, Schwerpunkt, Traegheitsmomente --; seine Zusammenfassung
-sagt, dass die Nachweise fehlen ([[opencivil.projekt.aufbau.querschnittsanalyse#ohne_nachweise|ohne_nachweise]]). Seine
-Spannung-Dehnung-Analysen rechnet er trotzdem, ausser im Verbund
-([[opencivil.projekt.aufbau.querschnittsanalyse#ohne_analysen|ohne_analysen]]).
+([[opencivil.projekt.aufbau.querschnittsanalyse#_stahl|_stahl]]), einer aus Holz nach SIA 265 ([[opencivil.projekt.aufbau.querschnittsanalyse#_holz|_holz]]). Einer im
+Verbund ([[opencivil.querschnitt.bauweise|bauweise]]) rechnet bisher nur seine
+Werte -- Flaeche, Schwerpunkt, Traegheitsmomente --, ebenso einer aus
+mehreren Hoelzern; seine Zusammenfassung sagt, dass die Nachweise fehlen
+([[opencivil.projekt.aufbau.querschnittsanalyse#ohne_nachweise|ohne_nachweise]]). Seine Spannung-Dehnung-Analysen rechnet er
+trotzdem, ausser im Verbund ([[opencivil.projekt.aufbau.querschnittsanalyse#ohne_analysen|ohne_analysen]]).
 
 Ist noch nichts gezeichnet ([[opencivil.projekt.querschnittsanalyse#QuerschnittsanalyseEintrag.leer|QuerschnittsanalyseEintrag.leer]]), gibt
 es nichts zu rechnen und kein Bauteil -- aber auch keinen Fehler, der das
@@ -72,6 +72,27 @@ Kippen, sobald ein Fall eingeschaltet ist
 ([[opencivil.nachweis.qa_stahl_stabilitaet|qa_stahl_stabilitaet]]). Die Kennzahlen
 stehen in der Herleitung vor den Nachweisen, die aus ihnen lesen.
 
+### _holz
+
+```python
+def _holz(eintrag: QuerschnittsanalyseEintrag, analyse: Querschnittsanalyse, teil: Bauteil, aufbau: Aufbau) -> Bauteil
+```
+
+Ein Querschnitt aus einem einzigen Holz nach SIA 265: seine Werte fuer die
+Feuchteklasse der Analyse ([[opencivil.nachweis.qa_holz_werte|qa_holz_werte]]), je
+Lastfall Biegung und Normalkraft, Schub und Torsion, sobald einer sie hat
+([[opencivil.nachweis.qa_holz|qa_holz]]), Knicken und Kippen, sobald ein Fall
+eingeschaltet ist ([[opencivil.nachweis.qa_holz_stabilitaet|qa_holz_stabilitaet]]). Alle
+lesen aus den Werten; «stossartig» gilt je Fall.
+
+### _stossartig
+
+```python
+def _stossartig(faelle: Iterable[Any]) -> frozenset
+```
+
+Die Namen der eingeschalteten Faelle, die stossartig sind.
+
 ### _kennzahlen
 
 ```python
@@ -83,25 +104,30 @@ Die Kennzahlen ins Rechenwerk und unter das Bauteil.
 ### ohne_nachweise
 
 ```python
-def ohne_nachweise(bauweise: Bauweise) -> str
+def ohne_nachweise(bauweise: Bauweise, stoffe: Iterable[Tuple[Baustoffart, str]]) -> str
 ```
 
 Warum ein Querschnitt dieser Bauweise keinen Nachweis hat -- leer beim
-Stahlbeton und beim Stahl (seit 2026-11-26). Ein Satzteil ohne Punkt,
-fuer die Zusammenfassung
+Stahlbeton, beim Stahl und beim Holz aus einem einzigen Holz (beide seit
+2026-11-26). `stoffe`: Art und Name jedes Baustoffs, wie fuer
+[[opencivil.querschnitt.bauweise#bauweise|bauweise]]. Mehrere Hoelzer
+braeuchten einen nach ihren Steifigkeiten gewichteten Querschnitt; den
+rechnet das Werkzeug nicht (nach Vorgabe, nicht nachgeschlagen). Ein
+Satzteil ohne Punkt, fuer die Zusammenfassung
 ([[opencivil.projekt.aufbau.kern#Aufbau.ohne_nachweis|ohne_nachweis]]) und fuer die
 Zeichnung ([[opencivil.web.zeichengeometrie#geometrie|geometrie]]).
 
 ### ohne_diagramm
 
 ```python
-def ohne_diagramm(bauweise: Bauweise) -> str
+def ohne_diagramm(bauweise: Bauweise, stoffe: Iterable[Tuple[Baustoffart, str]]) -> str
 ```
 
 Warum ein Querschnitt dieser Bauweise kein Interaktionsdiagramm hat --
 leer beim Stahlbeton, dem einzigen mit einer Widerstandsflaeche. Ein
 Satz mit Punkt, fuer die Diagramme
-([[opencivil.web.diagrammdaten|analyse_diagramme]]).
+([[opencivil.web.diagrammdaten|analyse_diagramme]]); `stoffe` wie
+bei [[opencivil.projekt.aufbau.querschnittsanalyse#ohne_nachweise|ohne_nachweise]].
 
 ### ohne_analysen
 
@@ -161,6 +187,10 @@ Staeben gibt.
 - [[opencivil.material.basis]]
 - [[opencivil.material.spannstahl]]
 - [[opencivil.nachweis.qa_gebrauch]]
+- [[opencivil.nachweis.qa_holz]]
+- [[opencivil.nachweis.qa_holz_kennzahlen]]
+- [[opencivil.nachweis.qa_holz_stabilitaet]]
+- [[opencivil.nachweis.qa_holz_werte]]
 - [[opencivil.nachweis.qa_kennzahlen]]
 - [[opencivil.nachweis.qa_knicken]]
 - [[opencivil.nachweis.qa_stahl]]

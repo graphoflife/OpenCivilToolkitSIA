@@ -1,5 +1,5 @@
 ---
-erzeugt: 07f7e6461f23
+erzeugt: b9f6e4087e4f
 art: modul
 tags: [modul]
 ---
@@ -244,6 +244,7 @@ Giesst aus den Vorlagen ein Material mit eigenem Namensraum.
 - [[opencivil.nachweis.duktilitaet]]
 - [[opencivil.nachweis.handrechnung]]
 - [[opencivil.nachweis.qa_gebrauch]]
+- [[opencivil.nachweis.qa_holz_werte]]
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.nachweis.richtungsnachweise]]
 - [[opencivil.nachweis.spannungsbegrenzung]]

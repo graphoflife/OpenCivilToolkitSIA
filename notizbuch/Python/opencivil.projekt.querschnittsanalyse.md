@@ -1,5 +1,5 @@
 ---
-erzeugt: 3e25e9b50e89
+erzeugt: 360ff3fb0db0
 art: modul
 tags: [modul]
 ---
@@ -13,8 +13,9 @@ Der [[opencivil.projekt.querschnittsanalyse#QuerschnittsanalyseEintrag|Querschni
 Stahlprofile ([[opencivil.projekt.profile]]), Staebe und Stablinien,
 Spannglieder ([[opencivil.projekt.spannglieder]]), Schubwaende,
 Hilfslinien, die Wahl der Werkstoffgesetze, die
-Lastfaelle, die Faelle von Knicken und Kippen beim Stahl
-([[opencivil.projekt.stabilitaet]]) und die Schalter der Nachweise -- als eine speicherbare
+Lastfaelle, die Faelle von Knicken und Kippen bei Stahl und Holz
+([[opencivil.projekt.stabilitaet]]), beim Holz seine Feuchteklasse und die
+Schalter der Nachweise -- als eine speicherbare
 Datenklasse, wie die Platte in [[opencivil.projekt.platte]]. Dazu die
 Vorlage einer frischen Analyse und ein Baukasten, der ohne Oberflaeche
 zeichnet ([[opencivil.projekt.querschnittsanalyse#QuerschnittsanalyseEintrag.polygon|QuerschnittsanalyseEintrag.polygon]] und folgende).
@@ -194,6 +195,7 @@ Ein Lastfall der Querschnittsanalyse -- kN und kNm, Vorzeichen siehe oben.
 - `V_y_Ed: float = bereich(0.0, heisst='Querkraft V_y,Ed', einheit=KN)`
 - `V_z_Ed: float = bereich(0.0, heisst='Querkraft V_z,Ed', einheit=KN)`
 - `T_Ed: float = bereich(0.0, heisst='Torsion T_Ed', einheit=KNM)`
+- `stossartig: bool = False` – Nur beim Holz: ob die Einwirkung stossartig ist -- dann vergroessert η_t = 1.4 seine Bemessungswerte (SIA 265:2012, 2.2.6). Stahlbeton und Stahl kennen das nicht; ihr Lastfall rechnet ohne.
 - `aktiv: bool = True`
 
 ### QAGebrauchsfallEintrag
@@ -347,9 +349,10 @@ Was er mit der Platte gleich angibt, steht in der Grundlage
 - `quasistaendig: QAGebrauchsliste = teil(lambda: QAGebrauchsliste(anteil=QUASISTAENDIG_ANTEIL), heisst='S…` – Die quasi-staendigen Lastfaelle -- fuer die Rissbreite.
 - `haeufig: QAGebrauchsliste = teil(lambda: QAGebrauchsliste(anteil=HAEUFIG_ANTEIL), heisst='Fliesse…` – Die haeufigen Lastfaelle -- gegen das Fliessen, bei erhoehter und hoher Anforderung.
 - `knickfaelle: List[QAKnickEintrag] = field(default_factory=list)` – Knicknachweise, je in einer Richtung; leer heisst: keiner.
-- `stabilitaetsfaelle: List[QAStabilitaetEintrag] = field(default_factory=list)` – Knicken und Kippen eines Stabs aus Stahl (SIA 263); leer heisst: keiner.
+- `stabilitaetsfaelle: List[QAStabilitaetEintrag] = field(default_factory=list)` – Knicken und Kippen eines Stabs aus Stahl (SIA 263) oder Holz (SIA 265); leer: keiner.
 - `knickkurve_y: Knickkurve = Knickkurve.PROFIL`
 - `knickkurve_z: Knickkurve = Knickkurve.PROFIL` – Die Knickspannungskurven um y und um z: die, die Figur 7 dem Profil zuweist -- nur fuer einen Querschnitt aus einem einzigen Profil -- oder eine gewaehlte. Sie gelten fuer alle Faelle: die Kurve gehoert zum Querschnitt, nicht zum Fall.
+- `feuchteklasse: Feuchteklasse = Feuchteklasse.EINS` – Beim Holz: wie feucht es im Bauwerk ist (SIA 265:2012, 3.2.1.2) -- einmal fuer die ganze Analyse. Ihr η_w mindert jeden Nachweis; die Spannung-Dehnung-Analysen rechnen ohne (nach Vorgabe, nicht nachgeschlagen).
 - `spannungsfaelle: List[QASpannungsfallEintrag] = field(default_factory=list)` – Die Spannung-Dehnung-Analysen -- kein Nachweis, ein Blick in den Querschnitt.
 
 #### QuerschnittsanalyseEintrag.materialien
@@ -573,6 +576,7 @@ Feldmoment; das Rechteck gibt es als Vorlage im Zeichenfenster.
 ## Braucht
 
 - [[opencivil.core.einheiten]]
+- [[opencivil.material.holz]]
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.fallnamen]]

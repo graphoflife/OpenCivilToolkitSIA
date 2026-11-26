@@ -21,7 +21,8 @@ aus Buche oder Eiche (Tabelle 6), Brettschichtholz aus Nadelholz GL24k bis
 GL36h (Tabelle 7). Die Norm nennt die Bemessungswerte selbst, für
 Feuchteklasse 1 und ohne stossartige Einwirkung; der Beiwert
 $\gamma_M/\eta_M$ – 1.7 für Vollholz, 1.5 für Brettschichtholz
-(Tabelle 1) – steckt schon darin. Aus $f_{m,k}$ gerechnet kämen sie nicht
+(Tabelle 1) – steckt schon darin. Die Nachweise passen sie mit $\eta_w$
+und $\eta_t$ dem Fall an, siehe [[Bemessungswerte des Holzes]]. Aus $f_{m,k}$ gerechnet kämen sie nicht
 genau heraus, denn die Tabellen runden: bei D30 gäbe 30/1.7 = 17.6 statt
 17 N/mm².
 

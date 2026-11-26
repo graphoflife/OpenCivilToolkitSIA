@@ -17,6 +17,7 @@ from __future__ import annotations
 import math
 
 from opencivil.decke.schnitt import BALKENGROESSEN
+from opencivil.material.holz import Feuchteklasse
 from opencivil.projekt.balkensystem import DIAGRAMMGROESSEN
 from opencivil.projekt.balkensystem3d import DIAGRAMMGROESSEN as DIAGRAMMGROESSEN3D
 from opencivil.projekt.decke import PLATTENGROESSEN
@@ -280,12 +281,13 @@ def jeder_nachweis() -> Projekt:
     # Spannungsblock, dazu jeder Gebrauchsnachweis bei erhöhter
     # Anforderung; eine Stütze, einachsig, mit charakteristischen Werten,
     # normaler Anforderung und Knicken -- so steht jede Wahl einmal da.
-    # Dazu ein Träger mit Spanngliedern, je eines in jedem Gesetz, und
-    # einer aus Stahl.
+    # Dazu ein Träger mit Spanngliedern, je eines in jedem Gesetz, einer
+    # aus Stahl und einer aus Holz.
     p.querschnittsanalysen.append(_kastentraeger(p.freie_kennung("a")))
     p.querschnittsanalysen.append(_stuetze(p.freie_kennung("a")))
     p.querschnittsanalysen.append(_spannbeton(p.freie_kennung("a")))
     p.querschnittsanalysen.append(_stahltraeger(p.freie_kennung("a")))
+    p.querschnittsanalysen.append(_holztraeger(p.freie_kennung("a")))
 
     # Zwei Balkensysteme: eines, das alles einmal braucht, und eines, das
     # sich nicht rechnen lässt -- dazu ein Rahmen im Raum. Dazu jede Lage
@@ -785,4 +787,30 @@ def _stahltraeger(kennung: str) -> QuerschnittsanalyseEintrag:
     a.stabilitaetsfall("Beulen", N_Ed=-3500.0, M_y_Ed=30.0, **{**kurz, "L_K_y": 3.0})
     a.stabilitaetsfall("Druck", N_Ed=-3000.0, **kurz)
     a.stabilitaetsfall("Gehalten", N_Ed=-1000.0, M_y_Ed=300.0, L_K_y=6.0, L_K_z=0.0, L_D=0.0)
+    return a
+
+
+def _holztraeger(kennung: str) -> QuerschnittsanalyseEintrag:
+    """
+    Ein Rechteck 160 × 400 mm aus GL24h in Feuchteklasse 2, zweiachsig, jede
+    Gleichung von SIA 265:2012, 4.2 einmal: Zug mit Biegung nach (21) und
+    Querkraft in beiden Richtungen mit Torsion nach (25); Druck mit Biegung
+    nach (22) und Querkraft allein nach (23); stossartig Biegung allein nach
+    (14) und Torsion allein nach (24); Zug allein nach (6), Druck allein
+    nach (10). Unter 600 mm Hoehe mit k_h.
+
+    Dazu ein Stab: Druck und Biegung mit Knicken und Kippen nach (37), Druck
+    allein nach (29), stossartig Biegung allein nach (38), mit k_m < 1.
+    """
+    a = QuerschnittsanalyseEintrag(kennung=kennung, name="Holzträger",
+                                   feuchteklasse=Feuchteklasse.ZWEI)
+    a.polygon([(0, 0), (160, 0), (160, 400), (0, 400)], material="h1")
+    a.lastfall("Feld", N_Ed=100.0, M_y_Ed=30.0, M_z_Ed=2.0, V_y_Ed=5.0, V_z_Ed=40.0, T_Ed=1.0)
+    a.lastfall("Druck mit Biegung", N_Ed=-300.0, M_y_Ed=20.0, V_z_Ed=30.0)
+    a.lastfall("Stoss", M_y_Ed=40.0, T_Ed=2.0, stossartig=True)
+    a.lastfall("Zug", N_Ed=200.0)
+    a.lastfall("Druck", N_Ed=-500.0)
+    a.stabilitaetsfall("Stütze", N_Ed=-300.0, M_y_Ed=10.0, L_K_y=4.0, L_K_z=4.0, L_D=4.0)
+    a.stabilitaetsfall("Druck", N_Ed=-300.0, L_K_y=4.0, L_K_z=4.0, L_D=0.0)
+    a.stabilitaetsfall("Träger", M_y_Ed=40.0, L_K_y=0.0, L_K_z=0.0, L_D=12.0, stossartig=True)
     return a

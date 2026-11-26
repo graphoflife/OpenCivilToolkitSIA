@@ -1,5 +1,5 @@
 ---
-erzeugt: 9b06b04039bb
+erzeugt: 562bbd05a2e6
 art: modul
 tags: [modul]
 ---
@@ -57,6 +57,7 @@ alldem die Formelsammlung und diese Seiten.
 - [[opencivil.erdbeben]] – Erdbeben nach SIA 261:2020, Kapitel 16.
 - [[opencivil.ergebnis]] – ein gerechnetes Projekt, wie man es ohne Oberflaeche braucht.
 - [[opencivil.geotechnik]] – Nachweise im Baugrund.
+- [[opencivil.holzbau]] – ein gezeichneter Querschnitt aus Holz nach SIA 265:2012.
 - [[opencivil.konsole]] – Python im Browser, für die App «Python».
 - [[opencivil.material]] – die Baustoffe: Beton, Betonstahl, Baustahl, Spannstahl und Holz.
 - [[opencivil.mcp]] – das Werkzeug fuer eine KI, ueber das Model Context Protocol.

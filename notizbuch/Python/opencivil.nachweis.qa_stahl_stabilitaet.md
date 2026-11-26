@@ -1,5 +1,5 @@
 ---
-erzeugt: 26df5f9a0c1f
+erzeugt: f64ab5308c6c
 art: modul
 tags: [modul]
 ---
@@ -213,7 +213,7 @@ def gleichungen_62(self) -> None
 - [[Saint-Venant-Anteil der Kippspannung]] · `_Herleitung.kippen`
 - [[Schlankheit beim Kippen]] · `_Herleitung.kippen`
 - [[Schlankheit beim Knicken]] · `_Herleitung.knicken`
-- [[Trägheitsradius des Druckgurts]] · `_Herleitung._druckgurt`
+- [[Trägheitsradius]] · `_Herleitung._druckgurt`
 - [[Widerstand in der Richtung der Einwirkung]] · `StahlStabilitaetQA._urteil`
 - [[Widerstandsmoment bis zur weitesten Faser]] · `_Herleitung._biegung`
 - [[Wölbanteil der Kippspannung]] · `_Herleitung.kippen`

@@ -589,7 +589,8 @@ def analyse(aufbau: Aufbau, loesung: Loesung, kennung: str,
         "zeichnung": zeichnung(bauteil),
         "interaktion": _interaktion(q, einachsig, *schnitt) if q is not None else None,
         "faelle": faelle,
-        "ohne_diagramm": ohne_diagramm(bauteil.bauweise),
+        "ohne_diagramm": ohne_diagramm(bauteil.bauweise,
+                                       [(s.art, s.name) for s in bauteil.baustoffe]),
     }
 
 

@@ -1005,11 +1005,11 @@ Norm dazu sagt.
       Gesetz des Holzes bricht auf Zug bei f_t,0,d; so endet die M-χ-Linie,
       wo der gezogene Rand f_t,0,d erreicht – beim Rechteck 200 × 400 mm aus
       C24 bei 8 · W = 42.7 kNm. Der Nachweis der Biegung nach SIA 265 rechnet
-      mit f_m,d und gäbe 14 · W = 74.7 kNm. Ein Gesetz kann nicht beides:
-      mit f_m,d trüge der reine Zug zu viel. Empfehlung: mit Schritt 13 das
-      Ende der Linie nach dem Zusammenwirken von Zug und Biegung, wie es der
-      Nachweis der Norm verlangt (die Ziffer dann nachschlagen); bis dahin
-      sagt die Legende nur, dass eine Faser ihre Grenzdehnung erreicht.
+      mit f_m,d und gibt seit Schritt 13 in der Kachel «Tragsicherheit»
+      14 · W = 74.7 kNm. Ein Gesetz kann nicht beides: mit f_m,d trüge der
+      reine Zug zu viel. Empfehlung: so lassen – die Linie zeigt das
+      Gesetz, die Tragsicherheit den Nachweis nach (14) und (21); die
+      Legende sagt, dass eine Faser ihre Grenzdehnung erreicht.
 - [ ] **Erdbeben, nach Vorgabe eingebaut** (`opencivil/erdbeben/ersatzkraft.py`).
       Jede Wand trägt nach ihrem Anteil an der Biegesteifigkeit; verformt
       werden die Wände nur durch Biegung, weder durch Schub noch im
@@ -1439,6 +1439,43 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
 
       Vorschlag: so lassen. Entscheid des Benutzers.
 
+- [ ] **Holzquerschnitt, nach Vorgabe eingebaut** (`opencivil/holzbau/`,
+      `opencivil/nachweis/qa_holz.py`, `qa_holz_stabilitaet.py`,
+      `qa_holz_werte.py`, seit 2026-11-26). Jede Annahme steht auch in der
+      Herleitung.
+      - Die Biegespannung je Achse an der weitesten Faser, M/W mit
+        W = I/e_max: beim Rechteck genau, bei einem T auf der sicheren
+        Seite.
+      - Brettschichtholz hat seine Lamellen parallel zu y: k_h nach (5)
+        gilt für die Biegung um y, mit der Höhe in z, und auch in (37) und
+        (38). Um z gilt es nicht.
+      - Den Systembeiwert k_sys (5.7.2.2) nimmt das Werkzeug nicht.
+      - Querkraft in y und in z: τ_d = √(τ_y² + τ_z²), als lägen beide
+        grössten Schubspannungen an derselben Stelle – auf der sicheren
+        Seite.
+      - Torsion nur im Rechteck mit Seiten parallel zu y und z, mit
+        W_T = k_2·h·b² nach Saint-Venant; Kippen nur im Rechteck, mit (41)
+        und der Kipplänge L_D als Abstand der seitlichen Halterungen. Bei
+        einem anderen Querschnitt steht der Fall grau.
+      - Die relative Schlankheit beim Knicken und Kippen mit f_c,0,k,
+        f_m,k und E_0,05 aus Anhang B, ohne η_w.
+      - Die Feuchteklasse gilt für die ganze Analyse; die
+        Spannung-Dehnung-Analysen rechnen ohne η_w.
+      - «Stossartig» gilt für den ganzen Fall: η_t = 1.4 vergrössert alle
+        Festigkeiten des Falls. Die Kennzahlen rechnen ohne.
+      - Ein Querschnitt aus mehreren Hölzern hat keinen Nachweis (grau):
+        er bräuchte einen nach den Steifigkeiten gewichteten Querschnitt.
+
+      Vorschlag: so lassen. Entscheid des Benutzers.
+
+- [ ] **Holz: C16 unter Zug – zu entscheiden** (`opencivil/material/holz.py`,
+      `zugglied_grund`, seit 2026-11-26). SIA 265 lässt C16 nicht als
+      Zugglied zu (Tabelle 6, Fussnote 2). Heute steht das als Hinweis in
+      der Herleitung, und der Nachweis rechnet weiter: ein Rechteck aus C16
+      unter Zug ist «erfüllt», wenn die Spannung reicht. Empfehlung: rot am
+      Lastfall, als nicht erfüllt, mit dem Grund – das ist falsch, nicht
+      bloss unfertig.
+
 - [ ] **Der Bezug des äquivalenten Moduls ohne Beton**
       (`opencivil/spannungsanalyse/rissfrei.py`, seit 2026-11-26). Hat ein
       Querschnitt aus Holz oder Baustahl zwei Sorten derselben Art, misst
@@ -1697,13 +1734,13 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       Querschnittsanalyse am Umriss, die Bleche für die Querschnittsklasse
       liefert jede Form (`stahlprofile/bleche.py`).
 
-- [ ] **Holz, mit den Nachweisen nach SIA 265:** die Feuchteklasse (η_w,
-      Tabelle 4) und «stossartig» (η_t = 1.4, 2.2.6); der höhere Querdruck
-      mit Vorholz oder am Endauflager, samt den Klammerwerten der Tabellen 6
-      und 7; dass C16 für Zugglieder nicht zugelassen ist; k_h nach
-      Gleichung (5); die 5%-Fraktile der Steifigkeit für Knicken und Kippen
-      (2/3, 5/6 und 0.85 der Mittelwerte); die Kriechzahlen (Tabelle 5).
-      Holzwerkstoffe nach SIA 265/1 kennt das Werkzeug nicht.
+- [ ] **Holz, was nach Schritt 13 fehlt:** der Querdruck f_c,90,d, mit
+      Vorholz oder am Endauflager samt den Klammerwerten der Tabellen 6 und
+      7 – er braucht ein Auflager, das die Querschnittsanalyse nicht kennt;
+      die Kriechzahlen (Tabelle 5); k_sys (5.7.2.2); ein Querschnitt aus
+      mehreren Hölzern; Torsion und Kippen ausser im Rechteck; Nachweise
+      für einen Holzstab im Balkensystem. Holzwerkstoffe nach SIA 265/1
+      kennt das Werkzeug nicht.
 
 - [ ] **Spannglieder, nächste Schritte:** das Hüllrohr Ø_H und die Minderung
       der Stegbreite nach Gleichung (44) (4.3.3.3.5); eine Neigung in der
@@ -1721,14 +1758,10 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       Schnittgrössen eines Stabs als Einwirkung einer Platte oder
       Querschnittsanalyse.
 
-- [ ] **Querschnittsanalyse, nächste Schritte:** Flächen aus Holz und
-      Baustahl und die Stahlprofile der Tabelle gibt es seit 2026-11-26,
-      mit ihren Querschnittswerten und ihren Spannung-Dehnung-Analysen, aber
-      ohne Nachweis (Plan vom 2026-11-25: die Nachweise nach SIA 263, 265
-      und 264 in den Schritten 12 bis 14). Der Stahl hat seit 2026-11-26
-      seine Kennzahlen -- Klassen und Widerstände --, die Lastfälle noch
-      nicht (Schritt 12b). Der Verbund bekommt seine
-      Analysen mit Schritt 14: sein Riss braucht den ideellen Querschnitt.
+- [ ] **Querschnittsanalyse, nächste Schritte:** Stahl (SIA 263) und Holz
+      (SIA 265) haben seit 2026-11-26 ihre Nachweise, mit Knicken und
+      Kippen. Der Verbund bekommt seine Analysen und Nachweise mit Schritt
+      14 (Plan vom 2026-11-25): sein Riss braucht den ideellen Querschnitt.
       Ein E_eq im Balkensystem gibt es bis dahin nur beim Stahlbeton. Dazu
       weitere Nachweise (Wände ohne Bügel).
 - [ ] **Baustahl: die Wärmedehnzahl** α_T = 10·10⁻⁶/°C (SIA 263:2013,

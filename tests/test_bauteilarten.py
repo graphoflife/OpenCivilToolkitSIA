@@ -109,6 +109,7 @@ class TestSinnbilder(unittest.TestCase):
             "linie": k["querschnittsanalyse"]["linienarten"],
             "wirkung": k["querschnittsanalyse"]["spannglied"]["wirkungen"],
             "knickkurve": k["querschnittsanalyse"]["knickkurven"],
+            "feuchteklasse": k["querschnittsanalyse"]["feuchteklassen"],
             # Grund und Zulage, je in den unteren und den oberen Lagen (platte.js).
             "zulage": [{"wert": f"{seite}-{gunst}"} for seite in ("unten", "oben")
                        for gunst in ("unguenstig", "guenstig")],

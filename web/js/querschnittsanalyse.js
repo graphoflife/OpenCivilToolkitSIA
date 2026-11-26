@@ -10,7 +10,8 @@
  *
  * Ein Querschnitt aus Stahl hat dazu Knicken und Kippen nach SIA 263: je
  * Achse die Knickspannungskurve und die Fälle eines Stabs mit diesem
- * Querschnitt.
+ * Querschnitt. Einer aus Holz rechnet nach SIA 265: davor die
+ * Feuchteklasse, je Fall dazu, ob die Einwirkung stossartig ist.
  *
  * Wie bei der Platte steht oben, was der Querschnitt *ist*, und in den
  * Fenstern, was von ihm *verlangt* wird. Gerechnet wird nichts: jede Zeile
@@ -67,6 +68,33 @@ const HILFE = {
       ['Werte', 'je Baustahl nach Wahl, oben in diesem Fenster'],
     ],
     formel: 'α_eff = Widerstand / Einwirkung ≥ 1',
+  },
+  tragsicherheitHolz: {
+    zeilen: [
+      ['σ', 'linear am Bruttoquerschnitt: N/A, je Achse M/W an der weitesten Faser'],
+      ['M-N', 'Zug (6), Druck (10), Biegung (14), Biegung mit Zug (21) oder mit Druck (22)'],
+      ['V+T', 'τ = V·S/(I·b) nach Jourawski; Torsion nur am Rechteck – (23), (24), (25)'],
+      ['k_h', 'Brettschichtholz unter 600 mm Höhe: f_m,d um y mal k_h (5)'],
+      ['η', 'η_w der Feuchteklasse, mal η_t = 1.4 in einem stossartigen Fall (2.2.6)'],
+    ],
+    formel: 'α_eff = Widerstand / Einwirkung ≥ 1',
+  },
+  stabilitaetHolz: {
+    zeilen: [
+      ['Knicken', 'je Achse k_c aus λ_rel = λ/π · √(f_c,0,k / E_0,05), (30) und (31)'],
+      ['Kippen', 'nur ein Rechteck, wo ein Moment um die starke Achse wirkt: k_m aus σ_m,crit (39) bis (41)'],
+      ['M-N', 'je Achse für sich: (29) mit Druck allein, (37) mit Druck und Biegung, (38) ohne Druck'],
+      ['L = 0', 'gehalten: um diese Achse knickt der Stab nicht, oder er kippt nicht'],
+      ['α_eff', 'N_Ed bleibt, die Momente wachsen, bis die Gleichung aufgeht'],
+    ],
+    formel: 'σ_c,0,d / (k_c · f_c,0,d) + σ_m,d / (k_m · f_m,d) ≤ 1   (37)',
+  },
+  feuchteklasse: {
+    zeilen: [
+      ['Klasse', 'wie feucht das Holz im Bauwerk im Mittel ist – SIA 265, Tabelle 3'],
+      ['η_w', 'mindert jeden Bemessungswert des Holzes: 1.0, 0.8, 0.6 – Tabelle 4'],
+      ['Analysen', 'die Spannung-Dehnung-Analysen rechnen ohne η_w'],
+    ],
   },
   stabilitaet: {
     zeilen: [
@@ -154,6 +182,30 @@ function spalten(analyse) {
   return SPALTEN.filter((s) => !(analyse.einachsig && s.zweiachsig));
 }
 
+/** Ob der Querschnitt aus Holz ist -- das sagt der Kern (`bauweiseVon`). */
+function ausHolz(analyse) {
+  return bauweiseVon(analyse.kennung) === 'holz';
+}
+
+/** Was beim Holz an der Stelle der Rechenwahl steht: es rechnet immer gleich. */
+const HOLZ_RECHNET = 'Das Holz rechnet linear, mit den Bemessungswerten der Norm und dem η_w der '
+  + 'Feuchteklasse – ein stossartiger Fall dazu mit η_t.';
+
+/**
+ * Beim Holz, je Fall: ob die Einwirkung stossartig ist -- dann hebt η_t
+ * seine Bemessungswerte. Die Stellungen und was sie heissen, kommen aus dem
+ * Kern. Er steht unter den Zahlen, über die ganze Breite: neben dem Namen
+ * hat nur eine Zahlenspalte Platz, und dort ragte er aus dem Fenster.
+ */
+function dauerSchalter(fall, aendern) {
+  return wahlSchalter({
+    werte: katalog('querschnittsanalyse', 'einwirkungsdauern'),
+    gewaehlt: !!fall.stossartig,
+    setzen: (wert) => aendern((x) => { x.stossartig = wert; }),
+    titel: 'Dauer der Einwirkung – stossartig hebt die Bemessungswerte des Holzes',
+  });
+}
+
 // ===========================================================================
 // Querschnitt
 // ===========================================================================
@@ -234,13 +286,14 @@ function schubwandAngaben(analyse) {
 
 /**
  * Tragsicherheit: womit gerechnet wird und die Lastfälle -- beim Stahlbeton
- * dazu, was Querkraft und Torsion brauchen (`schubwandAngaben`).
+ * dazu, was Querkraft und Torsion brauchen (`schubwandAngaben`). Das Holz
+ * hat keine Wahl, wie es rechnet; dort steht, wie.
  */
 function lastfallAngaben(analyse) {
   const aendern = (veraenderer) => eintragAendern(analyse.kennung, veraenderer);
   const faelle = analyse.lastfaelle;
   return [
-    rechenwahl(analyse),
+    ausHolz(analyse) ? el('p.qa-erlaeuterung', { text: HOLZ_RECHNET }) : rechenwahl(analyse),
     el('div.qa-kopfzeile', {}, [
       el('div.qa-schalter', {}, [biegungsWahl(analyse)]),
       vorzeichenbild(analyse.einachsig),
@@ -297,6 +350,7 @@ function lastfallZeile(analyse, index) {
   return fallzeile({
     fall, aendern, was: 'Lastfall', nameTitel: 'Bezeichnung des Lastfalls',
     liste: { kennung: analyse.kennung, pfad: 'lastfaelle', index },
+    unten: ausHolz(analyse) ? [dauerSchalter(fall, aendern)] : null,
     zahlen: spalten(analyse).map((s) => zahlfeld({
       // Eine Last, die man leert, ist keine Last.
       wert: fall[s.feld], schritt: s.schritt, titel: s.titel, leer: 0,
@@ -311,15 +365,15 @@ function lastfallZeile(analyse, index) {
 }
 
 // ===========================================================================
-// Knicken und Kippen eines Stabs aus Stahl
+// Knicken und Kippen eines Stabs aus Stahl oder Holz
 // ===========================================================================
 
 /**
  * Die Spalten eines Falls, in zwei Zeilen: oben die Druckkraft und die drei
- * Längen, unten die Momente mit ihrem ψ -- einachsig ohne M_z und ψ_z. Eine
- * Last, die man leert, ist keine Last; eine Länge oder ein ψ behält den
- * bisherigen Wert, denn null heisst dort etwas: gehalten, ein dreieckiges
- * Moment.
+ * Längen, unten die Momente mit ihrem ψ -- einachsig ohne M_z und ψ_z, beim
+ * Holz ohne ψ (`nurStahl`) und mit dem Titel `titelHolz`. Eine Last, die
+ * man leert, ist keine Last; eine Länge oder ein ψ behält den bisherigen
+ * Wert, denn null heisst dort etwas: gehalten, ein dreieckiges Moment.
  */
 const STABSPALTEN = [
   { feld: 'N_Ed', kopf: ['N_{Ed}', 'kN'], schritt: 50, leer: 0, titel: 'Normalkraft in kN – Druck negativ' },
@@ -328,13 +382,14 @@ const STABSPALTEN = [
   {
     feld: 'L_D', kopf: ['L_D', 'm'], schritt: 0.5,
     titel: 'Kipplänge in m: Abstand der Punkte, an denen der Druckgurt seitlich gehalten ist – null: gehalten',
+    titelHolz: 'Kipplänge in m: Abstand der seitlichen Halterungen – null: gehalten',
   },
   {
     feld: 'M_y_Ed', kopf: ['M_{y,Ed}', 'kNm'], schritt: 10, leer: 0,
     titel: 'Grösstes Moment 1. Ordnung um y im Stab, in kNm – positiv: Zug unten',
   },
   {
-    feld: 'psi_y', kopf: [String.raw`\psi_y`], schritt: 0.25,
+    feld: 'psi_y', kopf: [String.raw`\psi_y`], schritt: 0.25, nurStahl: true,
     titel: 'Verhältnis der Endmomente um y, −1 bis 1 – konstantes Moment, Querlast oder verschieblich: 1',
   },
   {
@@ -342,30 +397,37 @@ const STABSPALTEN = [
     titel: 'Grösstes Moment 1. Ordnung um z im Stab, in kNm – positiv: Zug links',
   },
   {
-    feld: 'psi_z', kopf: [String.raw`\psi_z`], schritt: 0.25, zweiachsig: true,
+    feld: 'psi_z', kopf: [String.raw`\psi_z`], schritt: 0.25, zweiachsig: true, nurStahl: true,
     titel: 'Verhältnis der Endmomente um z, −1 bis 1 – konstantes Moment, Querlast oder verschieblich: 1',
   },
 ];
 
 function stabspalten(analyse) {
-  return STABSPALTEN.filter((s) => !(analyse.einachsig && s.zweiachsig));
+  const holz = ausHolz(analyse);
+  return STABSPALTEN
+    .filter((s) => !(analyse.einachsig && s.zweiachsig) && !(holz && s.nurStahl))
+    .map((s) => (holz && s.titelHolz ? { ...s, titel: s.titelHolz } : s));
 }
 
 /**
- * Knicken und Kippen: die Wahl der Biegung wie in der Tragsicherheit, je
- * Achse die Knickspannungskurve, darunter die Fälle. Was einem Fall noch
- * fehlt, sagt der Kern mit demselben Satz wie in der Herleitung
- * (`knickkurvenVon`).
+ * Knicken und Kippen: die Wahl der Biegung wie in der Tragsicherheit, beim
+ * Stahl je Achse die Knickspannungskurve, darunter die Fälle. Was einem Fall
+ * noch fehlt, sagt der Kern mit demselben Satz wie in der Herleitung
+ * (`knickkurvenVon`). Das Holz knickt nach einer festen Kurve: dort steht
+ * statt der Kurven, wie es rechnet.
  */
 function stabilitaetsAngaben(analyse) {
   const aendern = (veraenderer) => eintragAendern(analyse.kennung, veraenderer);
   const faelle = analyse.stabilitaetsfaelle || [];
   const { eigene, fehlen } = knickkurvenVon(analyse.kennung);
+  const holz = ausHolz(analyse);
   return [
     biegungsWahl(analyse),
-    ...['y', 'z'].map((achse) => kurvenwahl(analyse, achse, eigene)),
-    fehlen ? el('p.hinweis', { text: fehlen }) : null,
-    el('p.qa-erlaeuterung', { text: 'Gerechnet mit den Rechenwerten der Tragsicherheit.' }),
+    ...(holz ? [] : ['y', 'z'].map((achse) => kurvenwahl(analyse, achse, eigene))),
+    fehlen && !holz ? el('p.hinweis', { text: fehlen }) : null,
+    el('p.qa-erlaeuterung', {
+      text: holz ? HOLZ_RECHNET : 'Gerechnet mit den Rechenwerten der Tragsicherheit.',
+    }),
     faelle.length
       ? fallkopf(stabspalten(analyse).map((s) => s.kopf), { spalten: 4 }) : null,
     ...(faelle.length
@@ -409,6 +471,7 @@ function stabilitaetsZeile(analyse, index) {
   return fallzeile({
     fall, aendern, was: 'Stabilitätsnachweis', nameTitel: 'Bezeichnung des Falls',
     liste: { kennung: analyse.kennung, pfad: 'stabilitaetsfaelle', index },
+    unten: ausHolz(analyse) ? [dauerSchalter(fall, aendern)] : null,
     zahlen: stabspalten(analyse).map((s) => zahlfeld({
       wert: fall[s.feld], schritt: s.schritt, titel: s.titel, leer: s.leer,
       angabe: feldangabe('qastabilitaet', s.feld),
@@ -534,6 +597,52 @@ const STABILITAET = {
     knickkurvenVon(a.kennung).fehlen ? 'Knickkurve fehlt' : ''),
 };
 
+/** Dieselben Kacheln für einen Querschnitt aus Holz, nach SIA 265. */
+const TRAGSICHERHEIT_HOLZ = { ...TRAGSICHERHEIT_STAHL, hilfe: HILFE.tragsicherheitHolz };
+
+const STABILITAET_HOLZ = {
+  ...STABILITAET, titel: 'Knicken und Kippen nach SIA 265', hilfe: HILFE.stabilitaetHolz,
+  stand: (a) => zeilenstand(a.stabilitaetsfaelle, 'Fall', 'Fälle', 'kein Fall'),
+};
+
+/** Die Feuchteklasse der Analyse -- oder die des Kerns, solange keine gewählt ist. */
+function feuchteklasse(analyse) {
+  return analyse.feuchteklasse ?? feldangabe('querschnittsanalyse', 'feuchteklasse').vorgabe;
+}
+
+/** Die gewählte Feuchteklasse aus dem Katalog: Beschriftung, was sie heisst, ihr Stand. */
+function feuchteVon(analyse) {
+  const gewaehlt = feuchteklasse(analyse);
+  return katalog('querschnittsanalyse', 'feuchteklassen').find((k) => k.wert === gewaehlt);
+}
+
+/**
+ * Wie feucht das Holz im Bauwerk ist -- einmal für die Analyse, je Klasse
+ * ein Bild, darunter, was die gewählte heisst. Ihr η_w mindert jeden
+ * Nachweis.
+ */
+const FEUCHTEKLASSE = {
+  schluessel: 'feuchteklasse',
+  name: 'Feuchte\u00adklasse', titel: 'Feuchteklasse nach SIA 265',
+  hilfe: HILFE.feuchteklasse,
+  inhalt: (analyse) => [
+    wahlBlock('Feuchteklasse', wahlSchalter({
+      werte: mitBild(katalog('querschnittsanalyse', 'feuchteklassen'), 'feuchteklasse'),
+      gewaehlt: feuchteklasse(analyse),
+      setzen: (wert) => eintragAendern(analyse.kennung, (a) => { a.feuchteklasse = wert; }),
+      titel: 'Wie feucht das Holz im Bauwerk im Mittel ist',
+    })),
+    el('p.qa-erlaeuterung', { text: feuchteVon(analyse)?.titel || '' }),
+  ],
+  stand: (a) => ({ an: true, text: feuchteVon(a)?.stand || '' }),
+};
+
+/** Die Nachweise je Bauweise, wo sie nicht die des Stahlbetons sind. */
+const EIGENE_NACHWEISE = {
+  stahl: [TRAGSICHERHEIT_STAHL, STABILITAET],
+  holz: [FEUCHTEKLASSE, TRAGSICHERHEIT_HOLZ, STABILITAET_HOLZ],
+};
+
 /** Die Zugseiten einer Analyse aus dem Katalog -- und wie dann ihre Ränder heissen. */
 function zugseite(wert) {
   return katalog('querschnittsanalyse', 'zugseiten').find((z) => z.wert === wert);
@@ -610,19 +719,20 @@ const ORT = {
 
 /**
  * Die Kacheln der Analyse. Die Nachweise sind die des Stahlbetons, beim
- * Stahl die Tragsicherheit und Knicken und Kippen nach SIA 263
- * (`bauweiseVon`). Ein Querschnitt
- * aus Holz oder im Verbund hat noch keine, statt ihrer steht grau, warum
- * (`ohneNachweiseVon`). Die Spannung-Dehnung-Analysen hat jeder ausser dem
- * Verbund (`ohneAnalysenVon`). Was in den Kacheln eingestellt ist, bleibt.
+ * Stahl die Tragsicherheit und Knicken und Kippen nach SIA 263, beim Holz
+ * dazu davor die Feuchteklasse, nach SIA 265 (`bauweiseVon`). Ein
+ * Querschnitt im Verbund hat noch keine, statt ihrer steht grau, warum
+ * (`ohneNachweiseVon`) -- ebenso einer aus mehreren Hölzern. Die
+ * Spannung-Dehnung-Analysen hat jeder ausser dem Verbund
+ * (`ohneAnalysenVon`). Was in den Kacheln eingestellt ist, bleibt.
  */
 function kapitel(analyse) {
   const gruppe = (titel, ohne, kacheln) => (ohne ? { titel, hinweis: ohne, kapitel: [] }
     : { titel, kapitel: kacheln() });
   return [
     gruppe('Nachweise', ohneNachweiseVon(analyse.kennung),
-      () => (bauweiseVon(analyse.kennung) === 'stahl' ? [TRAGSICHERHEIT_STAHL, STABILITAET]
-        : [TRAGSICHERHEIT, ...nachweisKapitel(ORT)])),
+      () => EIGENE_NACHWEISE[bauweiseVon(analyse.kennung)]
+        || [TRAGSICHERHEIT, ...nachweisKapitel(ORT)]),
     gruppe('Spannung-Dehnung-Analysen', ohneAnalysenVon(analyse.kennung),
       () => analysenKapitel(ORT)),
   ];

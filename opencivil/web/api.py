@@ -38,6 +38,7 @@ from opencivil.decke.modell import Aufteilung
 from opencivil.material.arten import MATERIALARTEN
 from opencivil.material.basis import Baustoffart
 from opencivil.material.beton import BETONSORTEN
+from opencivil.material.holz import REFERENZ_ETA_T, STOSSARTIG, TABELLE_4, Feuchteklasse, eta_t
 from opencivil.material.betonstahl import STAHLSORTEN
 from opencivil.material.spannstahl import Erzeugnis
 from opencivil.nachweis.biegung_normalkraft import Erfuellungsart
@@ -353,6 +354,18 @@ def katalog() -> dict:
             # Stahlquerschnitts: die des Profils oder eine gewaehlte.
             "knickkurven": [{"wert": k.value, "beschriftung": k.beschriftung,
                              "titel": k.erklaerung} for k in Knickkurve],
+            # Beim Holz: die Feuchteklassen, je wo das Holz so feucht ist und
+            # ihr η_w, und je Fall die Dauer der Einwirkung, mit ihrem η_t.
+            "feuchteklassen": [{"wert": k.value, "beschriftung": k.beschriftung,
+                                "titel": f"{k.erklaerung} η_w = {k.eta_w:g} ({TABELLE_4}).",
+                                "stand": f"{k.beschriftung}, η_w = {k.eta_w:g}"}
+                               for k in Feuchteklasse],
+            "einwirkungsdauern": [
+                {"wert": False, "beschriftung": "normal",
+                 "titel": f"η_t = {eta_t(False):g}: eine Einwirkung, die nicht stossartig ist"},
+                {"wert": True, "beschriftung": "stossartig",
+                 "titel": f"η_t = {eta_t(True):g}: stossartig, {STOSSARTIG} ({REFERENZ_ETA_T})"},
+            ],
             # Die Vorlage, die ein Stahlprofil einsetzt: ihr Knopf mit dem
             # Bild des ersten Profils und die Stellungen der Drehung.
             "profil": {

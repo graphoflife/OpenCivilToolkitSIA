@@ -1,5 +1,5 @@
 ---
-erzeugt: 5e60871609ad
+erzeugt: cedc47908f92
 art: thema
 tags: [thema]
 ---
@@ -21,7 +21,7 @@ Der Stab hat den gezeichneten Querschnitt. Je Fall zuerst die Klasse bei N\_Ed u
 7. [[Abminderungsfaktor beim Knicken und Kippen]]
 8. [[Knickwiderstand]]
 9. [[Beiwert η der Momentenverteilung beim Kippen]]
-10. [[Trägheitsradius des Druckgurts]]
+10. [[Trägheitsradius]]
 11. [[Reduzierte Kipplänge]]
 12. [[Saint-Venant-Anteil der Kippspannung]]
 13. [[Wölbanteil der Kippspannung]]

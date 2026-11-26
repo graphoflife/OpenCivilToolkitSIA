@@ -28,7 +28,7 @@
 \date{\today}
 \begin{document}
 \maketitle
-901 Berechnungen ausgeführt, 1340 Werte bestimmt.
+915 Berechnungen ausgeführt, 1382 Werte bestimmt.
 
 \section{Herleitung}
 \subsection{Plattenanalyse: Decke}
@@ -9611,6 +9611,785 @@ G_a = 81000\,\mathrm{N}/\mathrm{mm}^{2}
 \begin{equation*}
 \rho_a = 7850\,\mathrm{kg}/\mathrm{m}^{3}
 \end{equation*}
+\subsection{Querschnittsanalyse: Holzträger}
+\noindent\textbf{Fläche und Schwerpunkt eines Polygons (Satz von Gauss)}
+\begin{equation*}
+A = \frac{1}{2} \sum_i c_i \qquad y_S = \frac{1}{6A} \sum_i (y_i + y_{i+1})\, c_i \qquad z_S = \frac{1}{6A} \sum_i (z_i + z_{i+1})\, c_i \qquad c_i = y_i\, z_{i+1} - y_{i+1}\, z_i
+\end{equation*}
+\noindent\textbf{Trägheitsmomente eines Polygons, bezogen auf den Schwerpunkt}
+\begin{equation*}
+I_y = \frac{1}{12} \sum_i (z_i^2 + z_i z_{i+1} + z_{i+1}^2)\, c_i - A\, z_S^2\qquad I_z = \frac{1}{12} \sum_i (y_i^2 + y_i y_{i+1} + y_{i+1}^2)\, c_i - A\, y_S^2
+\end{equation*}
+\noindent\textbf{Polygone des Querschnitts}
+\begin{longtable}{lllrrrr}
+\hline
+Polygon & Material & liegt in & Ecken & $\pm A\ [\mathrm{mm}^2]$ & $y_S\ [\mathrm{mm}]$ & $z_S\ [\mathrm{mm}]$ \\
+\hline
+\endhead
+Polygon 1 & GL24h & – & $4$ & $64000$ & $80.0$ & $200.0$ \\
+\hline
+\end{longtable}
+\noindent\textbf{Fläche des Bruttoquerschnitts}
+\begin{equation*}
+A = 64000\,\mathrm{mm}^{2}
+\end{equation*}
+\noindent\textbf{Schwerpunkt, y}
+\begin{equation*}
+y_S = 80\,\mathrm{mm}
+\end{equation*}
+\noindent\textbf{Schwerpunkt, z}
+\begin{equation*}
+z_S = 200\,\mathrm{mm}
+\end{equation*}
+\noindent\textbf{Trägheitsmoment um y}
+\begin{equation*}
+I_y = 853.3\,\cdot 10^{6}\,\mathrm{mm}^{4}
+\end{equation*}
+\noindent\textbf{Trägheitsmoment um z}
+\begin{equation*}
+I_z = 136.5\,\cdot 10^{6}\,\mathrm{mm}^{4}
+\end{equation*}
+\noindent\textbf{Deviationsmoment}
+\begin{equation*}
+I_{yz} = 0\,\cdot 10^{6}\,\mathrm{mm}^{4}
+\end{equation*}
+Keine Bewehrung gezeichnet.
+
+\noindent\textbf{Stahlfläche der Bewehrung}
+\begin{equation*}
+A_{s,tot} = 0\,\mathrm{mm}^{2}
+\end{equation*}
+\subsection{Werte des Holzquerschnitts}
+\noindent\textbf{Feuchteklasse 2 (Tabelle 3): Nur zum Teil geschützt oder dem Wetter ausgesetzt, etwa unter einem offenen Dach – im Mittel 12 bis 20 \%.} \hfill \normref{SIA 265:2012, 3.2.1.3, Tabelle 4}
+\begin{equation*}
+\eta_w = 0.8
+\end{equation*}
+\hinweis{Annahme}{Die Biegespannung je Achse an der weitesten Faser, y und z als Hauptachsen – beim Rechteck M/W, bei einem anderen Querschnitt auf der sicheren Seite (nach Vorgabe, nicht nachgeschlagen).}
+\noindent\textbf{Widerstandsmoment um y}
+\begin{equation*}
+W_y = \frac{I_y}{e_z} = \frac{853.3\,\cdot 10^{6}\,\mathrm{mm}^{4}}{200\,\mathrm{mm}} = 4266.7\,\mathrm{cm}^{3}
+\end{equation*}
+\noindent\textbf{Widerstandsmoment um z}
+\begin{equation*}
+W_z = \frac{I_z}{e_y} = \frac{136.5\,\cdot 10^{6}\,\mathrm{mm}^{4}}{80\,\mathrm{mm}} = 1706.7\,\mathrm{cm}^{3}
+\end{equation*}
+\noindent\textbf{Höhenbeiwert unter 600 mm Höhe, für die Biegung um y} \hfill \normref{SIA 265:2012, 3.4.2.3, (5)}
+\begin{equation*}
+k_h = \min\left(\left(\frac{600\ \mathrm{mm}}{h}\right)^{0.1};\ 1.1\right) = \min\left(\left(\frac{600\ \mathrm{mm}}{400\,\mathrm{mm}}\right)^{0.1};\ 1.1\right) = 1.041
+\end{equation*}
+\hinweis{Annahme}{Die Lamellen liegen parallel zu y: k\_h gilt für die Biegung um y, mit der Höhe in z – nach Vorgabe, nicht nachgeschlagen. k\_sys nimmt das Werkzeug nicht.}
+\noindent\textbf{Schubspannung nach Jourawski – auf dem Schnitt quer zur Querkraft, auf dem S/b am grössten ist; S ist das statische Moment jenseits davon, b seine Breite}
+\begin{equation*}
+\tau = \frac{V \cdot S}{I \cdot b} = \frac{V}{A_V} \qquad A_V = \frac{I \cdot b}{S}
+\end{equation*}
+\noindent\textbf{Schubfläche für V\_z: der Schnitt bei z = 200.0 mm}
+\begin{equation*}
+A_{V,z} = \frac{I_y \cdot b_{V,z}}{S_{V,z}} = \frac{853.3\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 160\,\mathrm{mm}}{3200\,\mathrm{cm}^{3}} = 42667\,\mathrm{mm}^{2}
+\end{equation*}
+\noindent\textbf{Schubfläche für V\_y: der Schnitt bei y = 80.0 mm}
+\begin{equation*}
+A_{V,y} = \frac{I_z \cdot b_{V,y}}{S_{V,y}} = \frac{136.5\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot 400\,\mathrm{mm}}{1280\,\mathrm{cm}^{3}} = 42667\,\mathrm{mm}^{2}
+\end{equation*}
+\noindent\textbf{Torsionsbeiwert nach Saint-Venant: die grösste Schubspannung liegt in der Mitte der langen Seite}
+\begin{equation*}
+\begin{aligned}
+  k_2 &= \frac{1 - \frac{192}{\pi^5} \cdot \frac{b}{h} \sum_{n = 1, 3, 5, \ldots} \frac{1}{n^5} \tanh\frac{n \pi \cdot h}{2 \cdot b}}{3 \left(1 - \frac{8}{\pi^2} \sum_{n = 1, 3, 5, \ldots} \frac{1}{n^2 \cosh\frac{n \pi \cdot h}{2 \cdot b}}\right)} \\
+  &= \frac{1 - \frac{192}{\pi^5} \cdot \frac{160\,\mathrm{mm}}{400\,\mathrm{mm}} \sum_{n = 1, 3, 5, \ldots} \frac{1}{n^5} \tanh\frac{n \pi \cdot 400\,\mathrm{mm}}{2 \cdot 160\,\mathrm{mm}}}{3 \left(1 - \frac{8}{\pi^2} \sum_{n = 1, 3, 5, \ldots} \frac{1}{n^2 \cosh\frac{n \pi \cdot 400\,\mathrm{mm}}{2 \cdot 160\,\mathrm{mm}}}\right)} \\
+  &= 0.258
+\end{aligned}
+\end{equation*}
+\noindent\textbf{Torsionswiderstandsmoment: τ\_tor = T/W\_T}
+\begin{equation*}
+W_T = k_2 \cdot h \cdot b^2 = 0.258 \cdot 400\,\mathrm{mm} \cdot \left(160\,\mathrm{mm}\right)^2 = 2637.7\,\mathrm{cm}^{3}
+\end{equation*}
+\subsection{Biegung und Normalkraft}
+\noindent\textbf{Die Bemessungswerte der Tabellen 6 und 7 gelten für Feuchteklasse 1 und ohne stossartige Einwirkung} \hfill \normref{SIA 265:2012, 3.3.2; 3.4.2.2}
+\begin{equation*}
+f_d = \eta \cdot f_{d,\mathrm{Tab}} \qquad \eta = \eta_w \cdot \eta_t
+\end{equation*}
+\noindent\textbf{(6): Zug allein} \hfill \normref{SIA 265:2012, 4.2.1.1, (6)}
+\begin{equation*}
+\sigma_{t,0,d} \le f_{t,0,d}
+\end{equation*}
+\noindent\textbf{(10): Druck allein, ohne Knicken} \hfill \normref{SIA 265:2012, 4.2.2.1, (10)}
+\begin{equation*}
+\sigma_{c,0,d} \le f_{c,0,d}
+\end{equation*}
+\noindent\textbf{(14): Biegung, ohne Normalkraft} \hfill \normref{SIA 265:2012, 4.2.3.1, (14)}
+\begin{equation*}
+\frac{\sigma_{m,y,d}}{f_{m,y,d}} + \frac{\sigma_{m,z,d}}{f_{m,z,d}} \le 1
+\end{equation*}
+\noindent\textbf{(21): Biegung und Zug} \hfill \normref{SIA 265:2012, 4.2.4.1, (21)}
+\begin{equation*}
+\frac{\sigma_{t,0,d}}{f_{t,0,d}} + \frac{\sigma_{m,y,d}}{f_{m,y,d}} + \frac{\sigma_{m,z,d}}{f_{m,z,d}} \le 1
+\end{equation*}
+\noindent\textbf{(22): Biegung und Druck} \hfill \normref{SIA 265:2012, 4.2.4.2, (22)}
+\begin{equation*}
+\left(\frac{\sigma_{c,0,d}}{f_{c,0,d}}\right)^2 + \frac{\sigma_{m,y,d}}{f_{m,y,d}} + \frac{\sigma_{m,z,d}}{f_{m,z,d}} \le 1
+\end{equation*}
+\noindent\textbf{Erfüllungsgrad bei fester Normalkraft und fester Richtung}
+\begin{equation*}
+\alpha_{eff} = \frac{M_{Rd}}{M_{Ed}} \qquad M = \sqrt{M_y^2 + M_z^2}
+\end{equation*}
+\subsubsection{Feld}
+\noindent\textbf{Einwirkung}
+\begin{longtable}{lrl}
+\hline
+Einwirkung & Wert &  \\
+\hline
+\endhead
+N\_Ed & $100.0$ & kN \\
+M\_y,Ed & $30.0$ & kNm \\
+M\_z,Ed & $2.0$ & kNm \\
+\hline
+\end{longtable}
+\noindent\textbf{Zugspannung}
+\begin{equation*}
+\sigma_{t,0,d} = \frac{|N_{Ed}|}{A} = \frac{100\,\mathrm{kN}}{64000\,\mathrm{mm}^{2}} = 1.56\,\mathrm{N}/\mathrm{mm}^{2}
+\end{equation*}
+\noindent\textbf{Biegespannung um y, an der weitesten Faser}
+\begin{equation*}
+\sigma_{m,y,d} = \frac{|M_{y,Ed}|}{W_y} = \frac{30\,\mathrm{kNm}}{4266.7\,\mathrm{cm}^{3}} = 7.03\,\mathrm{N}/\mathrm{mm}^{2}
+\end{equation*}
+\noindent\textbf{Biegespannung um z, an der weitesten Faser}
+\begin{equation*}
+\sigma_{m,z,d} = \frac{|M_{z,Ed}|}{W_z} = \frac{2\,\mathrm{kNm}}{1706.7\,\mathrm{cm}^{3}} = 1.17\,\mathrm{N}/\mathrm{mm}^{2}
+\end{equation*}
+\noindent\textbf{(21): wie weit die Momente wachsen dürfen} \hfill \normref{SIA 265:2012, 4.2.4.1, (21)}
+\begin{equation*}
+\frac{1.56}{0.80 \cdot 12.0} + \lambda \cdot \frac{7.03}{0.80 \cdot 1.041 \cdot 16.0} + \lambda \cdot \frac{1.17}{0.80 \cdot 16.0} = 1 \quad\Rightarrow\quad \lambda = 1.352
+\end{equation*}
+\noindent\textbf{Widerstand in der Richtung der Einwirkung}
+\begin{equation*}
+M_{Rd} = \lambda \cdot M_{Ed} = 1.352 \cdot 30.1\,\mathrm{kNm} = 40.7\,\mathrm{kNm}
+\end{equation*}
+\noindent\textbf{Erfüllungsgrad}
+\begin{equation*}
+\alpha_{eff,\text{Feld}} = \frac{M_{Rd}}{M_{Ed}} = \frac{40.7\,\mathrm{kNm}}{30.1\,\mathrm{kNm}} = 1.35 \quad \Rightarrow \quad \text{erfüllt}
+\end{equation*}
+\subsubsection{Druck mit Biegung}
+\noindent\textbf{Einwirkung}
+\begin{longtable}{lrl}
+\hline
+Einwirkung & Wert &  \\
+\hline
+\endhead
+N\_Ed & $-300.0$ & kN \\
+M\_y,Ed & $20.0$ & kNm \\
+M\_z,Ed & $0.0$ & kNm \\
+\hline
+\end{longtable}
+\noindent\textbf{Druckspannung}
+\begin{equation*}
+\sigma_{c,0,d} = \frac{|N_{Ed}|}{A} = \frac{300\,\mathrm{kN}}{64000\,\mathrm{mm}^{2}} = 4.69\,\mathrm{N}/\mathrm{mm}^{2}
+\end{equation*}
+\noindent\textbf{Biegespannung um y, an der weitesten Faser}
+\begin{equation*}
+\sigma_{m,y,d} = \frac{|M_{y,Ed}|}{W_y} = \frac{20\,\mathrm{kNm}}{4266.7\,\mathrm{cm}^{3}} = 4.69\,\mathrm{N}/\mathrm{mm}^{2}
+\end{equation*}
+\noindent\textbf{(22): wie weit die Momente wachsen dürfen} \hfill \normref{SIA 265:2012, 4.2.4.2, (22)}
+\begin{equation*}
+\left(\frac{4.69}{0.80 \cdot 14.5}\right)^2 + \lambda \cdot \frac{4.69}{0.80 \cdot 1.041 \cdot 16.0} = 1 \quad\Rightarrow\quad \lambda = 2.379
+\end{equation*}
+\noindent\textbf{Widerstand in der Richtung der Einwirkung}
+\begin{equation*}
+M_{Rd} = \lambda \cdot M_{Ed} = 2.379 \cdot 20\,\mathrm{kNm} = 47.6\,\mathrm{kNm}
+\end{equation*}
+\noindent\textbf{Erfüllungsgrad}
+\begin{equation*}
+\alpha_{eff,\text{Druck mit Biegung}} = \frac{M_{Rd}}{M_{Ed}} = \frac{47.6\,\mathrm{kNm}}{20\,\mathrm{kNm}} = 2.38 \quad \Rightarrow \quad \text{erfüllt}
+\end{equation*}
+\subsubsection{Stoss}
+\noindent\textbf{Einwirkung}
+\begin{longtable}{lrl}
+\hline
+Einwirkung & Wert &  \\
+\hline
+\endhead
+N\_Ed & $0.0$ & kN \\
+M\_y,Ed & $40.0$ & kNm \\
+M\_z,Ed & $0.0$ & kNm \\
+\hline
+\end{longtable}
+\noindent\textbf{Stossartige Einwirkung: η\_t = 1.4 hebt die Bemessungswerte} \hfill \normref{SIA 265:2012, 2.2.6; SIA 265:2012, 3.3.2; 3.4.2.2}
+\begin{equation*}
+\eta = \eta_w \cdot \eta_t = 0.8 \cdot 1.4 = 1.12
+\end{equation*}
+\noindent\textbf{Biegespannung um y, an der weitesten Faser}
+\begin{equation*}
+\sigma_{m,y,d} = \frac{|M_{y,Ed}|}{W_y} = \frac{40\,\mathrm{kNm}}{4266.7\,\mathrm{cm}^{3}} = 9.38\,\mathrm{N}/\mathrm{mm}^{2}
+\end{equation*}
+\noindent\textbf{(14): wie weit die Momente wachsen dürfen} \hfill \normref{SIA 265:2012, 4.2.3.1, (14)}
+\begin{equation*}
+\lambda \cdot \frac{9.38}{1.12 \cdot 1.041 \cdot 16.0} = 1 \quad\Rightarrow\quad \lambda = 1.991
+\end{equation*}
+\noindent\textbf{Widerstand in der Richtung der Einwirkung}
+\begin{equation*}
+M_{Rd} = \lambda \cdot M_{Ed} = 1.991 \cdot 40\,\mathrm{kNm} = 79.6\,\mathrm{kNm}
+\end{equation*}
+\noindent\textbf{Erfüllungsgrad}
+\begin{equation*}
+\alpha_{eff,\text{Stoss}} = \frac{M_{Rd}}{M_{Ed}} = \frac{79.6\,\mathrm{kNm}}{40\,\mathrm{kNm}} = 1.99 \quad \Rightarrow \quad \text{erfüllt}
+\end{equation*}
+\subsubsection{Zug}
+\noindent\textbf{Einwirkung}
+\begin{longtable}{lrl}
+\hline
+Einwirkung & Wert &  \\
+\hline
+\endhead
+N\_Ed & $200.0$ & kN \\
+M\_y,Ed & $0.0$ & kNm \\
+M\_z,Ed & $0.0$ & kNm \\
+\hline
+\end{longtable}
+\noindent\textbf{Zugspannung}
+\begin{equation*}
+\sigma_{t,0,d} = \frac{|N_{Ed}|}{A} = \frac{200\,\mathrm{kN}}{64000\,\mathrm{mm}^{2}} = 3.12\,\mathrm{N}/\mathrm{mm}^{2}
+\end{equation*}
+\noindent\textbf{(6): Normalkraft allein} \hfill \normref{SIA 265:2012, 4.2.1.1, (6)}
+\begin{equation*}
+\frac{3.12}{0.80 \cdot 12.0} = 0.326 \le 1
+\end{equation*}
+\noindent\textbf{Zugwiderstand} \hfill \normref{SIA 265:2012, 4.2.1.1, (6)}
+\begin{equation*}
+N_{Rd}^{+} = \eta_w \cdot f_{t,0,d} \cdot A = 0.8 \cdot 12\,\mathrm{N}/\mathrm{mm}^{2} \cdot 64000\,\mathrm{mm}^{2} = 614.4\,\mathrm{kN}
+\end{equation*}
+\noindent\textbf{Erfüllungsgrad}
+\begin{equation*}
+\alpha_{eff,\text{Zug}} = \frac{N_{Rd}^{+}}{N_{Ed}} = \frac{614.4\,\mathrm{kN}}{200\,\mathrm{kN}} = 3.07 \quad \Rightarrow \quad \text{erfüllt}
+\end{equation*}
+\subsubsection{Druck}
+\noindent\textbf{Einwirkung}
+\begin{longtable}{lrl}
+\hline
+Einwirkung & Wert &  \\
+\hline
+\endhead
+N\_Ed & $-500.0$ & kN \\
+M\_y,Ed & $0.0$ & kNm \\
+M\_z,Ed & $0.0$ & kNm \\
+\hline
+\end{longtable}
+\noindent\textbf{Druckspannung}
+\begin{equation*}
+\sigma_{c,0,d} = \frac{|N_{Ed}|}{A} = \frac{500\,\mathrm{kN}}{64000\,\mathrm{mm}^{2}} = 7.81\,\mathrm{N}/\mathrm{mm}^{2}
+\end{equation*}
+\noindent\textbf{(10): Normalkraft allein} \hfill \normref{SIA 265:2012, 4.2.2.1, (10)}
+\begin{equation*}
+\frac{7.81}{0.80 \cdot 14.5} = 0.673 \le 1
+\end{equation*}
+\noindent\textbf{Druckwiderstand, ohne Knicken} \hfill \normref{SIA 265:2012, 4.2.2.1, (10)}
+\begin{equation*}
+N_{Rd}^{-} = -\eta_w \cdot f_{c,0,d} \cdot A = -0.8 \cdot 14.5\,\mathrm{N}/\mathrm{mm}^{2} \cdot 64000\,\mathrm{mm}^{2} = -742.4\,\mathrm{kN}
+\end{equation*}
+\noindent\textbf{Erfüllungsgrad}
+\begin{equation*}
+\alpha_{eff,\text{Druck}} = \frac{N_{Rd}^{-}}{N_{Ed}} = \frac{-742.4\,\mathrm{kN}}{-500\,\mathrm{kN}} = 1.48 \quad \Rightarrow \quad \text{erfüllt}
+\end{equation*}
+\subsection{Schub und Torsion}
+\noindent\textbf{Die Bemessungswerte der Tabellen 6 und 7 gelten für Feuchteklasse 1 und ohne stossartige Einwirkung} \hfill \normref{SIA 265:2012, 3.3.2; 3.4.2.2}
+\begin{equation*}
+f_d = \eta \cdot f_{d,\mathrm{Tab}} \qquad \eta = \eta_w \cdot \eta_t
+\end{equation*}
+\noindent\textbf{(23): Schub aus Querkraft} \hfill \normref{SIA 265:2012, 4.2.5.1, (23)}
+\begin{equation*}
+\tau_d \le f_{v,d}
+\end{equation*}
+\noindent\textbf{(24): Schub aus Torsion} \hfill \normref{SIA 265:2012, 4.2.5.2, (24)}
+\begin{equation*}
+\tau_{tor,d} \le f_{v,d}
+\end{equation*}
+\noindent\textbf{(25): Schub aus Querkraft und Torsion} \hfill \normref{SIA 265:2012, 4.2.5.3, (25)}
+\begin{equation*}
+\frac{\tau_{tor,d}}{f_{v,d}} + \left(\frac{\tau_d}{f_{v,d}}\right)^2 \le 1
+\end{equation*}
+\hinweis{Annahme}{Mit Querkraft in y und in z zählt τ\_d = √(τ\_y² + τ\_z²), als lägen die beiden grössten Schubspannungen an derselben Stelle – nach Vorgabe, nicht nachgeschlagen.}
+\subsubsection{Feld}
+\noindent\textbf{Einwirkung}
+\begin{longtable}{lrl}
+\hline
+Einwirkung & Wert &  \\
+\hline
+\endhead
+V\_z,Ed & $40.0$ & kN \\
+V\_y,Ed & $5.0$ & kN \\
+T\_Ed & $1.0$ & kNm \\
+\hline
+\end{longtable}
+\noindent\textbf{Schubfestigkeit, mit η} \hfill \normref{SIA 265:2012, 3.3.2; 3.4.2.2}
+\begin{equation*}
+\eta f_{v,d} = \eta_w \cdot f_{v,d} = 0.8 \cdot 1.8\,\mathrm{N}/\mathrm{mm}^{2} = 1.44\,\mathrm{N}/\mathrm{mm}^{2}
+\end{equation*}
+\noindent\textbf{Schubspannung aus V\_z, nach Jourawski}
+\begin{equation*}
+\tau_{z,d} = \frac{|V_{z,Ed}|}{A_{V,z}} = \frac{40\,\mathrm{kN}}{42667\,\mathrm{mm}^{2}} = 0.94\,\mathrm{N}/\mathrm{mm}^{2}
+\end{equation*}
+\noindent\textbf{Schubspannung aus V\_y, nach Jourawski}
+\begin{equation*}
+\tau_{y,d} = \frac{|V_{y,Ed}|}{A_{V,y}} = \frac{5\,\mathrm{kN}}{42667\,\mathrm{mm}^{2}} = 0.12\,\mathrm{N}/\mathrm{mm}^{2}
+\end{equation*}
+\noindent\textbf{Beide Querkräfte zusammen}
+\begin{equation*}
+\tau_d = \sqrt{\tau_{y,d}^2 + \tau_{z,d}^2} = \sqrt{\left(0.12\,\mathrm{N}/\mathrm{mm}^{2}\right)^2 + \left(0.94\,\mathrm{N}/\mathrm{mm}^{2}\right)^2} = 0.94\,\mathrm{N}/\mathrm{mm}^{2}
+\end{equation*}
+\noindent\textbf{Schubspannung aus Torsion, in der Mitte der langen Seite}
+\begin{equation*}
+\tau_{tor,d} = \frac{|T_{Ed}|}{W_T} = \frac{1\,\mathrm{kNm}}{2637.7\,\mathrm{cm}^{3}} = 0.38\,\mathrm{N}/\mathrm{mm}^{2}
+\end{equation*}
+\noindent\textbf{(25): wie weit Querkraft und Torsion zusammen wachsen dürfen} \hfill \normref{SIA 265:2012, 4.2.5.3, (25)}
+\begin{equation*}
+\lambda \cdot \frac{0.38}{1.44} + \lambda^2 \cdot \left(\frac{0.94}{1.44}\right)^2 = 1 \quad\Rightarrow\quad \lambda = 1.249
+\end{equation*}
+\noindent\textbf{So weit darf τ\_d wachsen, mit der Torsion zusammen}
+\begin{equation*}
+\tau_{Rd} = \lambda \cdot \tau_d = 1.249 \cdot 0.94\,\mathrm{N}/\mathrm{mm}^{2} = 1.18\,\mathrm{N}/\mathrm{mm}^{2}
+\end{equation*}
+\noindent\textbf{Erfüllungsgrad}
+\begin{equation*}
+\alpha_{V,\text{Feld}} = \frac{\tau_{Rd}}{\tau_d} = \frac{1.18\,\mathrm{N}/\mathrm{mm}^{2}}{0.94\,\mathrm{N}/\mathrm{mm}^{2}} = 1.25 \quad \Rightarrow \quad \text{erfüllt}
+\end{equation*}
+\subsubsection{Druck mit Biegung}
+\noindent\textbf{Einwirkung}
+\begin{longtable}{lrl}
+\hline
+Einwirkung & Wert &  \\
+\hline
+\endhead
+V\_z,Ed & $30.0$ & kN \\
+V\_y,Ed & $0.0$ & kN \\
+T\_Ed & $0.0$ & kNm \\
+\hline
+\end{longtable}
+\noindent\textbf{Schubfestigkeit, mit η} \hfill \normref{SIA 265:2012, 3.3.2; 3.4.2.2}
+\begin{equation*}
+\eta f_{v,d} = \eta_w \cdot f_{v,d} = 0.8 \cdot 1.8\,\mathrm{N}/\mathrm{mm}^{2} = 1.44\,\mathrm{N}/\mathrm{mm}^{2}
+\end{equation*}
+\noindent\textbf{Schubspannung aus V\_z, nach Jourawski}
+\begin{equation*}
+\tau_{z,d} = \frac{|V_{z,Ed}|}{A_{V,z}} = \frac{30\,\mathrm{kN}}{42667\,\mathrm{mm}^{2}} = 0.7\,\mathrm{N}/\mathrm{mm}^{2}
+\end{equation*}
+\noindent\textbf{(23): Schub aus Querkraft}
+\begin{equation*}
+\tau_{z,d} = 0.7\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \eta f_{v,d} = 1.44\,\mathrm{N}/\mathrm{mm}^{2}
+\end{equation*}
+\noindent\textbf{Erfüllungsgrad}
+\begin{equation*}
+\alpha_{V,\text{Druck mit Biegung}} = \frac{\eta f_{v,d}}{\tau_{z,d}} = \frac{1.44\,\mathrm{N}/\mathrm{mm}^{2}}{0.7\,\mathrm{N}/\mathrm{mm}^{2}} = 2.05 \quad \Rightarrow \quad \text{erfüllt}
+\end{equation*}
+\subsubsection{Stoss}
+\noindent\textbf{Einwirkung}
+\begin{longtable}{lrl}
+\hline
+Einwirkung & Wert &  \\
+\hline
+\endhead
+V\_z,Ed & $0.0$ & kN \\
+V\_y,Ed & $0.0$ & kN \\
+T\_Ed & $2.0$ & kNm \\
+\hline
+\end{longtable}
+\noindent\textbf{Stossartige Einwirkung: η\_t = 1.4 hebt die Bemessungswerte} \hfill \normref{SIA 265:2012, 2.2.6; SIA 265:2012, 3.3.2; 3.4.2.2}
+\begin{equation*}
+\eta = \eta_w \cdot \eta_t = 0.8 \cdot 1.4 = 1.12
+\end{equation*}
+\noindent\textbf{Schubfestigkeit, mit η} \hfill \normref{SIA 265:2012, 3.3.2; 3.4.2.2}
+\begin{equation*}
+\eta f_{v,d} = \eta \cdot f_{v,d} = 1.12 \cdot 1.8\,\mathrm{N}/\mathrm{mm}^{2} = 2.02\,\mathrm{N}/\mathrm{mm}^{2}
+\end{equation*}
+\noindent\textbf{Schubspannung aus Torsion, in der Mitte der langen Seite}
+\begin{equation*}
+\tau_{tor,d} = \frac{|T_{Ed}|}{W_T} = \frac{2\,\mathrm{kNm}}{2637.7\,\mathrm{cm}^{3}} = 0.76\,\mathrm{N}/\mathrm{mm}^{2}
+\end{equation*}
+\noindent\textbf{(24): Schub aus Torsion}
+\begin{equation*}
+\tau_{tor,d} = 0.76\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \eta f_{v,d} = 2.02\,\mathrm{N}/\mathrm{mm}^{2}
+\end{equation*}
+\noindent\textbf{Erfüllungsgrad}
+\begin{equation*}
+\alpha_{V,\text{Stoss}} = \frac{\eta f_{v,d}}{\tau_{tor,d}} = \frac{2.02\,\mathrm{N}/\mathrm{mm}^{2}}{0.76\,\mathrm{N}/\mathrm{mm}^{2}} = 2.66 \quad \Rightarrow \quad \text{erfüllt}
+\end{equation*}
+\subsubsection{Zug}
+\noindent\textbf{Einwirkung}
+\begin{longtable}{lrl}
+\hline
+Einwirkung & Wert &  \\
+\hline
+\endhead
+V\_z,Ed & $0.0$ & kN \\
+V\_y,Ed & $0.0$ & kN \\
+T\_Ed & $0.0$ & kNm \\
+\hline
+\end{longtable}
+Keine Einwirkung → kein Nachweis.
+
+\subsubsection{Druck}
+\noindent\textbf{Einwirkung}
+\begin{longtable}{lrl}
+\hline
+Einwirkung & Wert &  \\
+\hline
+\endhead
+V\_z,Ed & $0.0$ & kN \\
+V\_y,Ed & $0.0$ & kN \\
+T\_Ed & $0.0$ & kNm \\
+\hline
+\end{longtable}
+Keine Einwirkung → kein Nachweis.
+
+\subsection{Knicken und Kippen}
+\hinweis{Annahme}{Die relative Schlankheit beim Knicken und beim Kippen mit f\_c,0,k, f\_m,k und E\_0,05 aus Anhang B, ohne η\_w; beim Brettschichtholz mindert k\_h auch in (37) und (38) – nach Vorgabe, nicht nachgeschlagen.}
+\noindent\textbf{Die Bemessungswerte der Tabellen 6 und 7 gelten für Feuchteklasse 1 und ohne stossartige Einwirkung} \hfill \normref{SIA 265:2012, 3.3.2; 3.4.2.2}
+\begin{equation*}
+f_d = \eta \cdot f_{d,\mathrm{Tab}} \qquad \eta = \eta_w \cdot \eta_t
+\end{equation*}
+\noindent\textbf{(29): Knicken unter zentrischem Druck} \hfill \normref{SIA 265:2012, 4.2.8.1, (29)}
+\begin{equation*}
+\sigma_{c,0,d} \le k_c \cdot f_{c,0,d}
+\end{equation*}
+\noindent\textbf{(37): Knicken mit Biegung, je Achse} \hfill \normref{SIA 265:2012, 4.2.8.5, (37)}
+\begin{equation*}
+\frac{\sigma_{c,0,d}}{k_c \cdot f_{c,0,d}} + \frac{\sigma_{m,d}}{k_m \cdot f_{m,d}} \le 1
+\end{equation*}
+\noindent\textbf{(38): Kippen} \hfill \normref{SIA 265:2012, 4.2.9.1, (38)}
+\begin{equation*}
+\sigma_{m,d} \le k_m \cdot f_{m,d}
+\end{equation*}
+\noindent\textbf{Erfüllungsgrad bei fester Normalkraft und fester Richtung}
+\begin{equation*}
+\alpha_{eff} = \frac{M_{Rd}}{M_{Ed}} \qquad M = \sqrt{M_y^2 + M_z^2}
+\end{equation*}
+\subsubsection{Stütze}
+\noindent\textbf{Einwirkung und Stab – eine Länge null heisst gehalten}
+\begin{longtable}{lrl}
+\hline
+Einwirkung und Stab & Wert &  \\
+\hline
+\endhead
+N\_Ed & $-300.0$ & kN \\
+M\_y,Ed & $10.0$ & kNm \\
+M\_z,Ed & $0.0$ & kNm \\
+L\_K,y & $4.00$ & m \\
+L\_K,z & $4.00$ & m \\
+L\_D & $4.00$ & m \\
+\hline
+\end{longtable}
+\noindent\textbf{Druckspannung}
+\begin{equation*}
+\sigma_{c,0,d} = \frac{|N_{Ed}|}{A} = \frac{300\,\mathrm{kN}}{64000\,\mathrm{mm}^{2}} = 4.69\,\mathrm{N}/\mathrm{mm}^{2}
+\end{equation*}
+\paragraph{Um y}
+\noindent\textbf{Trägheitsradius um y}
+\begin{equation*}
+i_y = \sqrt{\frac{I_y}{A}} = \sqrt{\frac{853.3\,\cdot 10^{6}\,\mathrm{mm}^{4}}{64000\,\mathrm{mm}^{2}}} = 115.5\,\mathrm{mm}
+\end{equation*}
+\noindent\textbf{Schlankheit um y} \hfill \normref{SIA 265:2012, 4.2.8.4}
+\begin{equation*}
+\lambda_y = \frac{L_{K,y}}{i_y} = \frac{4000\,\mathrm{mm}}{115.5\,\mathrm{mm}} = 34.6
+\end{equation*}
+\noindent\textbf{Relative Schlankheit um y} \hfill \normref{SIA 265:2012, 4.2.8.4, (34); Anhang B}
+\begin{equation*}
+\lambda_{rel,y} = \frac{\lambda_y}{\pi} \cdot \sqrt{\frac{f_{c,0,k}}{E_{0,05}}} = \frac{34.6}{\pi} \cdot \sqrt{\frac{24\,\mathrm{N}/\mathrm{mm}^{2}}{9400\,\mathrm{N}/\mathrm{mm}^{2}}} = 0.557
+\end{equation*}
+\noindent\textbf{Hilfswert um y, β\_c für Brettschichtholz aus Nadelholz} \hfill \normref{SIA 265:2012, 4.2.8.2, (30) und (31); 4.2.8.3}
+\begin{equation*}
+\begin{aligned}
+  k_y &= 0.5 \cdot \left(1 + \beta_c \cdot \left(\lambda_{rel,y} - 0.3\right) + \lambda_{rel,y}^2\right) \\
+  &= 0.5 \cdot \left(1 + 0.1 \cdot \left(0.557 - 0.3\right) + 0.557^2\right) \\
+  &= 0.668
+\end{aligned}
+\end{equation*}
+\noindent\textbf{Knickbeiwert um y} \hfill \normref{SIA 265:2012, 4.2.8.2, (30) und (31); 4.2.8.3}
+\begin{equation*}
+k_{c,y} = \frac{1}{k_y + \sqrt{k_y^2 - \lambda_{rel,y}^2}} = \frac{1}{0.668 + \sqrt{0.668^2 - 0.557^2}} = 0.965
+\end{equation*}
+\noindent\textbf{Kippspannung des Rechtecks, Biegung um y} \hfill \normref{SIA 265:2012, 4.2.9.3, (40) und (41)}
+\begin{equation*}
+\sigma_{m,crit} = \frac{0.75 \cdot E_{0,05} \cdot b^2}{a \cdot h} = \frac{0.75 \cdot 9400\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(160\,\mathrm{mm}\right)^2}{4000\,\mathrm{mm} \cdot 400\,\mathrm{mm}} = 112.8\,\mathrm{N}/\mathrm{mm}^{2}
+\end{equation*}
+\noindent\textbf{Relative Schlankheit beim Kippen} \hfill \normref{SIA 265:2012, 4.2.9.3, (40) und (41)}
+\begin{equation*}
+\lambda_{rel,m} = \sqrt{\frac{f_{m,k}}{\sigma_{m,crit}}} = \sqrt{\frac{24\,\mathrm{N}/\mathrm{mm}^{2}}{112.8\,\mathrm{N}/\mathrm{mm}^{2}}} = 0.461
+\end{equation*}
+\noindent\textbf{λ\_rel,m nicht über 0.75: der Stab kippt nicht, k\_m = 1} \hfill \normref{SIA 265:2012, 4.2.9.2, (39)}
+\begin{equation*}
+k_m = 1
+\end{equation*}
+\noindent\textbf{Biegespannung um y, an der weitesten Faser}
+\begin{equation*}
+\sigma_{m,y,d} = \frac{|M_{y,Ed}|}{W_y} = \frac{10\,\mathrm{kNm}}{4266.7\,\mathrm{cm}^{3}} = 2.34\,\mathrm{N}/\mathrm{mm}^{2}
+\end{equation*}
+\noindent\textbf{(37) um y: wie weit die Momente wachsen dürfen} \hfill \normref{SIA 265:2012, 4.2.8.5, (37)}
+\begin{equation*}
+\frac{4.69}{0.965 \cdot 0.80 \cdot 14.5} + \lambda \cdot \frac{2.34}{1.000 \cdot 0.80 \cdot 1.041 \cdot 16.0} = 1 \quad\Rightarrow\quad \lambda = 3.305
+\end{equation*}
+\paragraph{Um z}
+\noindent\textbf{Trägheitsradius um z}
+\begin{equation*}
+i_z = \sqrt{\frac{I_z}{A}} = \sqrt{\frac{136.5\,\cdot 10^{6}\,\mathrm{mm}^{4}}{64000\,\mathrm{mm}^{2}}} = 46.2\,\mathrm{mm}
+\end{equation*}
+\noindent\textbf{Schlankheit um z} \hfill \normref{SIA 265:2012, 4.2.8.4}
+\begin{equation*}
+\lambda_z = \frac{L_{K,z}}{i_z} = \frac{4000\,\mathrm{mm}}{46.2\,\mathrm{mm}} = 86.6
+\end{equation*}
+\noindent\textbf{Relative Schlankheit um z} \hfill \normref{SIA 265:2012, 4.2.8.4, (34); Anhang B}
+\begin{equation*}
+\lambda_{rel,z} = \frac{\lambda_z}{\pi} \cdot \sqrt{\frac{f_{c,0,k}}{E_{0,05}}} = \frac{86.6}{\pi} \cdot \sqrt{\frac{24\,\mathrm{N}/\mathrm{mm}^{2}}{9400\,\mathrm{N}/\mathrm{mm}^{2}}} = 1.393
+\end{equation*}
+\noindent\textbf{Hilfswert um z, β\_c für Brettschichtholz aus Nadelholz} \hfill \normref{SIA 265:2012, 4.2.8.2, (30) und (31); 4.2.8.3}
+\begin{equation*}
+\begin{aligned}
+  k_z &= 0.5 \cdot \left(1 + \beta_c \cdot \left(\lambda_{rel,z} - 0.3\right) + \lambda_{rel,z}^2\right) \\
+  &= 0.5 \cdot \left(1 + 0.1 \cdot \left(1.393 - 0.3\right) + 1.393^2\right) \\
+  &= 1.525
+\end{aligned}
+\end{equation*}
+\noindent\textbf{Knickbeiwert um z} \hfill \normref{SIA 265:2012, 4.2.8.2, (30) und (31); 4.2.8.3}
+\begin{equation*}
+k_{c,z} = \frac{1}{k_z + \sqrt{k_z^2 - \lambda_{rel,z}^2}} = \frac{1}{1.525 + \sqrt{1.525^2 - 1.393^2}} = 0.466
+\end{equation*}
+\noindent\textbf{(29) um z: die Druckkraft allein} \hfill \normref{SIA 265:2012, 4.2.8.1, (29)}
+\begin{equation*}
+\frac{4.69}{0.466 \cdot 0.80 \cdot 14.5} = 0.867 \le 1
+\end{equation*}
+\noindent\textbf{Knickwiderstand um z} \hfill \normref{SIA 265:2012, 4.2.8.1, (29)}
+\begin{equation*}
+\begin{aligned}
+  N_{K,z,Rd} &= -k_{c,z} \cdot \eta_w \cdot f_{c,0,d} \cdot A \\
+  &= -0.466 \cdot 0.8 \cdot 14.5\,\mathrm{N}/\mathrm{mm}^{2} \cdot 64000\,\mathrm{mm}^{2} \\
+  &= -346.1\,\mathrm{kN}
+\end{aligned}
+\end{equation*}
+\noindent\textbf{Erfüllungsgrad}
+\begin{equation*}
+\alpha_{eff,\text{Stütze}} = \frac{N_{K,z,Rd}}{N_{Ed}} = \frac{-346.1\,\mathrm{kN}}{-300\,\mathrm{kN}} = 1.15 \quad \Rightarrow \quad \text{erfüllt}
+\end{equation*}
+\subsubsection{Druck}
+\noindent\textbf{Einwirkung und Stab – eine Länge null heisst gehalten}
+\begin{longtable}{lrl}
+\hline
+Einwirkung und Stab & Wert &  \\
+\hline
+\endhead
+N\_Ed & $-300.0$ & kN \\
+M\_y,Ed & $0.0$ & kNm \\
+M\_z,Ed & $0.0$ & kNm \\
+L\_K,y & $4.00$ & m \\
+L\_K,z & $4.00$ & m \\
+L\_D & $0.00$ & m \\
+\hline
+\end{longtable}
+\noindent\textbf{Druckspannung}
+\begin{equation*}
+\sigma_{c,0,d} = \frac{|N_{Ed}|}{A} = \frac{300\,\mathrm{kN}}{64000\,\mathrm{mm}^{2}} = 4.69\,\mathrm{N}/\mathrm{mm}^{2}
+\end{equation*}
+\paragraph{Um y}
+\noindent\textbf{Trägheitsradius um y}
+\begin{equation*}
+i_y = \sqrt{\frac{I_y}{A}} = \sqrt{\frac{853.3\,\cdot 10^{6}\,\mathrm{mm}^{4}}{64000\,\mathrm{mm}^{2}}} = 115.5\,\mathrm{mm}
+\end{equation*}
+\noindent\textbf{Schlankheit um y} \hfill \normref{SIA 265:2012, 4.2.8.4}
+\begin{equation*}
+\lambda_y = \frac{L_{K,y}}{i_y} = \frac{4000\,\mathrm{mm}}{115.5\,\mathrm{mm}} = 34.6
+\end{equation*}
+\noindent\textbf{Relative Schlankheit um y} \hfill \normref{SIA 265:2012, 4.2.8.4, (34); Anhang B}
+\begin{equation*}
+\lambda_{rel,y} = \frac{\lambda_y}{\pi} \cdot \sqrt{\frac{f_{c,0,k}}{E_{0,05}}} = \frac{34.6}{\pi} \cdot \sqrt{\frac{24\,\mathrm{N}/\mathrm{mm}^{2}}{9400\,\mathrm{N}/\mathrm{mm}^{2}}} = 0.557
+\end{equation*}
+\noindent\textbf{Hilfswert um y, β\_c für Brettschichtholz aus Nadelholz} \hfill \normref{SIA 265:2012, 4.2.8.2, (30) und (31); 4.2.8.3}
+\begin{equation*}
+\begin{aligned}
+  k_y &= 0.5 \cdot \left(1 + \beta_c \cdot \left(\lambda_{rel,y} - 0.3\right) + \lambda_{rel,y}^2\right) \\
+  &= 0.5 \cdot \left(1 + 0.1 \cdot \left(0.557 - 0.3\right) + 0.557^2\right) \\
+  &= 0.668
+\end{aligned}
+\end{equation*}
+\noindent\textbf{Knickbeiwert um y} \hfill \normref{SIA 265:2012, 4.2.8.2, (30) und (31); 4.2.8.3}
+\begin{equation*}
+k_{c,y} = \frac{1}{k_y + \sqrt{k_y^2 - \lambda_{rel,y}^2}} = \frac{1}{0.668 + \sqrt{0.668^2 - 0.557^2}} = 0.965
+\end{equation*}
+\noindent\textbf{(29) um y: die Druckkraft allein} \hfill \normref{SIA 265:2012, 4.2.8.1, (29)}
+\begin{equation*}
+\frac{4.69}{0.965 \cdot 0.80 \cdot 14.5} = 0.419 \le 1
+\end{equation*}
+\paragraph{Um z}
+\noindent\textbf{Trägheitsradius um z}
+\begin{equation*}
+i_z = \sqrt{\frac{I_z}{A}} = \sqrt{\frac{136.5\,\cdot 10^{6}\,\mathrm{mm}^{4}}{64000\,\mathrm{mm}^{2}}} = 46.2\,\mathrm{mm}
+\end{equation*}
+\noindent\textbf{Schlankheit um z} \hfill \normref{SIA 265:2012, 4.2.8.4}
+\begin{equation*}
+\lambda_z = \frac{L_{K,z}}{i_z} = \frac{4000\,\mathrm{mm}}{46.2\,\mathrm{mm}} = 86.6
+\end{equation*}
+\noindent\textbf{Relative Schlankheit um z} \hfill \normref{SIA 265:2012, 4.2.8.4, (34); Anhang B}
+\begin{equation*}
+\lambda_{rel,z} = \frac{\lambda_z}{\pi} \cdot \sqrt{\frac{f_{c,0,k}}{E_{0,05}}} = \frac{86.6}{\pi} \cdot \sqrt{\frac{24\,\mathrm{N}/\mathrm{mm}^{2}}{9400\,\mathrm{N}/\mathrm{mm}^{2}}} = 1.393
+\end{equation*}
+\noindent\textbf{Hilfswert um z, β\_c für Brettschichtholz aus Nadelholz} \hfill \normref{SIA 265:2012, 4.2.8.2, (30) und (31); 4.2.8.3}
+\begin{equation*}
+\begin{aligned}
+  k_z &= 0.5 \cdot \left(1 + \beta_c \cdot \left(\lambda_{rel,z} - 0.3\right) + \lambda_{rel,z}^2\right) \\
+  &= 0.5 \cdot \left(1 + 0.1 \cdot \left(1.393 - 0.3\right) + 1.393^2\right) \\
+  &= 1.525
+\end{aligned}
+\end{equation*}
+\noindent\textbf{Knickbeiwert um z} \hfill \normref{SIA 265:2012, 4.2.8.2, (30) und (31); 4.2.8.3}
+\begin{equation*}
+k_{c,z} = \frac{1}{k_z + \sqrt{k_z^2 - \lambda_{rel,z}^2}} = \frac{1}{1.525 + \sqrt{1.525^2 - 1.393^2}} = 0.466
+\end{equation*}
+\noindent\textbf{(29) um z: die Druckkraft allein} \hfill \normref{SIA 265:2012, 4.2.8.1, (29)}
+\begin{equation*}
+\frac{4.69}{0.466 \cdot 0.80 \cdot 14.5} = 0.867 \le 1
+\end{equation*}
+\noindent\textbf{Knickwiderstand um z} \hfill \normref{SIA 265:2012, 4.2.8.1, (29)}
+\begin{equation*}
+\begin{aligned}
+  N_{K,z,Rd} &= -k_{c,z} \cdot \eta_w \cdot f_{c,0,d} \cdot A \\
+  &= -0.466 \cdot 0.8 \cdot 14.5\,\mathrm{N}/\mathrm{mm}^{2} \cdot 64000\,\mathrm{mm}^{2} \\
+  &= -346.1\,\mathrm{kN}
+\end{aligned}
+\end{equation*}
+\noindent\textbf{Erfüllungsgrad}
+\begin{equation*}
+\alpha_{eff,\text{Druck}} = \frac{N_{K,z,Rd}}{N_{Ed}} = \frac{-346.1\,\mathrm{kN}}{-300\,\mathrm{kN}} = 1.15 \quad \Rightarrow \quad \text{erfüllt}
+\end{equation*}
+\subsubsection{Träger}
+\noindent\textbf{Einwirkung und Stab – eine Länge null heisst gehalten}
+\begin{longtable}{lrl}
+\hline
+Einwirkung und Stab & Wert &  \\
+\hline
+\endhead
+N\_Ed & $0.0$ & kN \\
+M\_y,Ed & $40.0$ & kNm \\
+M\_z,Ed & $0.0$ & kNm \\
+L\_K,y & $0.00$ & m \\
+L\_K,z & $0.00$ & m \\
+L\_D & $12.00$ & m \\
+\hline
+\end{longtable}
+\noindent\textbf{Stossartige Einwirkung: η\_t = 1.4 hebt die Bemessungswerte} \hfill \normref{SIA 265:2012, 2.2.6; SIA 265:2012, 3.3.2; 3.4.2.2}
+\begin{equation*}
+\eta = \eta_w \cdot \eta_t = 0.8 \cdot 1.4 = 1.12
+\end{equation*}
+\paragraph{Um y}
+\noindent\textbf{Kippspannung des Rechtecks, Biegung um y} \hfill \normref{SIA 265:2012, 4.2.9.3, (40) und (41)}
+\begin{equation*}
+\sigma_{m,crit} = \frac{0.75 \cdot E_{0,05} \cdot b^2}{a \cdot h} = \frac{0.75 \cdot 9400\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(160\,\mathrm{mm}\right)^2}{12000\,\mathrm{mm} \cdot 400\,\mathrm{mm}} = 37.6\,\mathrm{N}/\mathrm{mm}^{2}
+\end{equation*}
+\noindent\textbf{Relative Schlankheit beim Kippen} \hfill \normref{SIA 265:2012, 4.2.9.3, (40) und (41)}
+\begin{equation*}
+\lambda_{rel,m} = \sqrt{\frac{f_{m,k}}{\sigma_{m,crit}}} = \sqrt{\frac{24\,\mathrm{N}/\mathrm{mm}^{2}}{37.6\,\mathrm{N}/\mathrm{mm}^{2}}} = 0.799
+\end{equation*}
+\noindent\textbf{λ\_rel,m zwischen 0.75 und 1.4} \hfill \normref{SIA 265:2012, 4.2.9.2, (39)}
+\begin{equation*}
+k_m = 1.56 - 0.75 \cdot \lambda_{rel,m} = 1.56 - 0.75 \cdot 0.799 = 0.961
+\end{equation*}
+\noindent\textbf{Biegespannung um y, an der weitesten Faser}
+\begin{equation*}
+\sigma_{m,y,d} = \frac{|M_{y,Ed}|}{W_y} = \frac{40\,\mathrm{kNm}}{4266.7\,\mathrm{cm}^{3}} = 9.38\,\mathrm{N}/\mathrm{mm}^{2}
+\end{equation*}
+\noindent\textbf{(38) um y: wie weit die Momente wachsen dürfen} \hfill \normref{SIA 265:2012, 4.2.9.1, (38)}
+\begin{equation*}
+\lambda \cdot \frac{9.38}{0.961 \cdot 1.12 \cdot 1.041 \cdot 16.0} = 1 \quad\Rightarrow\quad \lambda = 1.913
+\end{equation*}
+\noindent\textbf{Widerstand in der Richtung der Einwirkung}
+\begin{equation*}
+M_{y,Rd} = \lambda \cdot M_{y,Ed} = 1.913 \cdot 40\,\mathrm{kNm} = 76.5\,\mathrm{kNm}
+\end{equation*}
+\noindent\textbf{Erfüllungsgrad}
+\begin{equation*}
+\alpha_{eff,\text{Träger}} = \frac{M_{y,Rd}}{M_{y,Ed}} = \frac{76.5\,\mathrm{kNm}}{40\,\mathrm{kNm}} = 1.91 \quad \Rightarrow \quad \text{erfüllt}
+\end{equation*}
+\subsection{Torsionsträgheitsmoment}
+\hinweis{Annahme}{I\_T nach St. Venant am Bruttoquerschnitt, ungerissen und ohne Bewehrung, numerisch aus der Spannungsfunktion von Prandtl (nach Vorgabe, nicht nachgeschlagen).}
+\noindent\textbf{Spannungsfunktion von Prandtl; am Rand des Hohlraums k ist φ = φ\_k}
+\begin{equation*}
+\nabla^2 \phi = -2 \qquad \phi = 0 \ \text{am Rand} \qquad \oint_k \frac{\partial \phi}{\partial n}\, ds = -2\, A_k
+\end{equation*}
+\noindent\textbf{Torsionsträgheitsmoment aus der Spannungsfunktion}
+\begin{equation*}
+I_T = 2 \int_A \phi\, dA + 2 \sum_k \phi_k\, A_k
+\end{equation*}
+\noindent\textbf{Die beiden Gitter}
+\begin{longtable}{lrrrr}
+\hline
+Gitter & Zellen & mit Material & $A_k\ [\mathrm{mm}^2]$ & $I_T\ [10^6\,\mathrm{mm}^4]$ \\
+\hline
+\endhead
+grob & $12 \times 30$ & $360$ & – & $415.3$ \\
+fein & $24 \times 60$ & $1440$ & – & $410.2$ \\
+\hline
+\end{longtable}
+\noindent\textbf{Torsionsträgheitsmoment, nach Richardson aus beiden Gittern}
+\begin{equation*}
+\begin{aligned}
+  I_T &= \frac{4 \cdot I_{T,fein} - I_{T,grob}}{3} \\
+  &= \frac{4 \cdot 410.2\,\cdot 10^{6}\,\mathrm{mm}^{4} - 415.3\,\cdot 10^{6}\,\mathrm{mm}^{4}}{3} \\
+  &= 408.6\,\cdot 10^{6}\,\mathrm{mm}^{4}
+\end{aligned}
+\end{equation*}
+\subsection{Kennzahlen}
+\subsubsection{Normalkraft}
+\noindent\textbf{Zugwiderstand} \hfill \normref{SIA 265:2012, 4.2.1.1, (6)}
+\begin{equation*}
+N_{Rd}^{+} = \eta_w \cdot f_{t,0,d} \cdot A = 0.8 \cdot 12\,\mathrm{N}/\mathrm{mm}^{2} \cdot 64000\,\mathrm{mm}^{2} = 614.4\,\mathrm{kN}
+\end{equation*}
+\noindent\textbf{Druckwiderstand, ohne Knicken} \hfill \normref{SIA 265:2012, 4.2.2.1, (10)}
+\begin{equation*}
+N_{Rd}^{-} = -\eta_w \cdot f_{c,0,d} \cdot A = -0.8 \cdot 14.5\,\mathrm{N}/\mathrm{mm}^{2} \cdot 64000\,\mathrm{mm}^{2} = -742.4\,\mathrm{kN}
+\end{equation*}
+\subsubsection{Biegung}
+\noindent\textbf{Biegewiderstand um y, mit dem Höhenbeiwert} \hfill \normref{SIA 265:2012, 4.2.3.1, (14)}
+\begin{equation*}
+M_{y,Rd} = \eta_w \cdot k_h \cdot f_{m,d} \cdot W_y = 0.8 \cdot 1.041 \cdot 16\,\mathrm{N}/\mathrm{mm}^{2} \cdot 4266.7\,\mathrm{cm}^{3} = 56.9\,\mathrm{kNm}
+\end{equation*}
+\noindent\textbf{Biegewiderstand um z} \hfill \normref{SIA 265:2012, 4.2.3.1, (14)}
+\begin{equation*}
+M_{z,Rd} = \eta_w \cdot f_{m,d} \cdot W_z = 0.8 \cdot 16\,\mathrm{N}/\mathrm{mm}^{2} \cdot 1706.7\,\mathrm{cm}^{3} = 21.8\,\mathrm{kNm}
+\end{equation*}
+\subsubsection{Schub}
+\noindent\textbf{Querkraftwiderstand in z} \hfill \normref{SIA 265:2012, 4.2.5.1, (23)}
+\begin{equation*}
+V_{z,Rd} = \eta_w \cdot f_{v,d} \cdot A_{V,z} = 0.8 \cdot 1.8\,\mathrm{N}/\mathrm{mm}^{2} \cdot 42667\,\mathrm{mm}^{2} = 61.4\,\mathrm{kN}
+\end{equation*}
+\noindent\textbf{Querkraftwiderstand in y} \hfill \normref{SIA 265:2012, 4.2.5.1, (23)}
+\begin{equation*}
+V_{y,Rd} = \eta_w \cdot f_{v,d} \cdot A_{V,y} = 0.8 \cdot 1.8\,\mathrm{N}/\mathrm{mm}^{2} \cdot 42667\,\mathrm{mm}^{2} = 61.4\,\mathrm{kN}
+\end{equation*}
+\noindent\textbf{Torsionswiderstand} \hfill \normref{SIA 265:2012, 4.2.5.2, (24)}
+\begin{equation*}
+T_{Rd} = \eta_w \cdot f_{v,d} \cdot W_T = 0.8 \cdot 1.8\,\mathrm{N}/\mathrm{mm}^{2} \cdot 2637.7\,\mathrm{cm}^{3} = 3.8\,\mathrm{kNm}
+\end{equation*}
+\subsection{Holz: GL24h}
+\noindent\textbf{Bemessungswert der Biegefestigkeit} \hfill \normref{SIA 265:2012, 3.3.2, Tabelle 6; 3.4.2.2, Tabelle 7}
+\begin{equation*}
+f_{m,d} = 16\,\mathrm{N}/\mathrm{mm}^{2}
+\end{equation*}
+\noindent\textbf{Bemessungswert der Zugfestigkeit in Faserrichtung} \hfill \normref{SIA 265:2012, 3.3.2, Tabelle 6; 3.4.2.2, Tabelle 7}
+\begin{equation*}
+f_{t,0,d} = 12\,\mathrm{N}/\mathrm{mm}^{2}
+\end{equation*}
+\noindent\textbf{Bemessungswert der Druckfestigkeit in Faserrichtung} \hfill \normref{SIA 265:2012, 3.3.2, Tabelle 6; 3.4.2.2, Tabelle 7}
+\begin{equation*}
+f_{c,0,d} = 14.5\,\mathrm{N}/\mathrm{mm}^{2}
+\end{equation*}
+\noindent\textbf{Bemessungswert der Schubfestigkeit} \hfill \normref{SIA 265:2012, 3.3.2, Tabelle 6; 3.4.2.2, Tabelle 7}
+\begin{equation*}
+f_{v,d} = 1.8\,\mathrm{N}/\mathrm{mm}^{2}
+\end{equation*}
+\noindent\textbf{Biegefestigkeit, kennzeichnend} \hfill \normref{SIA 265:2012, 3.3.2, Tabelle 6; 3.4.2.2, Tabelle 7}
+\begin{equation*}
+f_{m,k} = 24\,\mathrm{N}/\mathrm{mm}^{2}
+\end{equation*}
+\noindent\textbf{Druckfestigkeit in Faserrichtung, kennzeichnend} \hfill \normref{SIA 265:2012, Anhang B, Tabellen 43 und 44}
+\begin{equation*}
+f_{c,0,k} = 24\,\mathrm{N}/\mathrm{mm}^{2}
+\end{equation*}
+\noindent\textbf{Elastizitätsmodul in Faserrichtung, 5\%-Fraktil} \hfill \normref{SIA 265:2012, Anhang B, Tabellen 43 und 44}
+\begin{equation*}
+E_{0,05} = 9400\,\mathrm{N}/\mathrm{mm}^{2}
+\end{equation*}
 \subsection{Durchstanzen: Innenstütze}
 \noindent\textbf{Plattendicke}
 \begin{equation*}
@@ -19090,6 +19869,8 @@ Was der Querschnitt aufnimmt, ohne Bezug auf einen Lastfall: das Bewehrungsmass,
 
 Jede Last allein, ohne Normalkraft, auf die Schubwände verteilt wie im Nachweis. Die Verteilung ist linear: eine Wand mit dem Widerstand V\_Rd, auf die je Einheitslast die Kraft V₁ fällt, trägt V\_Rd/V₁. Massgebend ist die Wand, die zuerst ihren Widerstand erreicht.
 
+Was der Holzquerschnitt aufnimmt, ohne Bezug auf einen Lastfall: je Beanspruchung allein, linear, mit den Bemessungswerten der Tabellen und η\_w der Feuchteklasse – ohne stossartige Einwirkung. Knicken und Kippen gehören dem Stab und sind hier nicht dabei.
+
 \noindent\textbf{Beiwert der Grenzschlankheiten, f\_y in N/mm²} \hfill \normref{SIA 263:2013, Tabelle 5b}
 \begin{equation*}
 \varepsilon = \sqrt{\frac{235}{f_y}}
@@ -19141,6 +19922,22 @@ V_{Rd}^{+}(M_{Ed} = 0) = \tau_{cd} \cdot d_v^{+}
 \noindent\textbf{Bewehrungsmass je Kubikmeter Beton, ohne Bügel}
 \begin{equation*}
 \mu_s = \frac{A_{s,tot} \cdot 7850\,\mathrm{kg}/\mathrm{m}^{3}}{A}
+\end{equation*}
+\noindent\textbf{Biegewiderstand um y, mit dem Höhenbeiwert} \hfill \normref{SIA 265:2012, 4.2.3.1, (14)}
+\begin{equation*}
+M_{y,Rd} = \eta_w \cdot k_h \cdot f_{m,d} \cdot W_y
+\end{equation*}
+\noindent\textbf{Biegewiderstand um z} \hfill \normref{SIA 265:2012, 4.2.3.1, (14)}
+\begin{equation*}
+M_{z,Rd} = \eta_w \cdot f_{m,d} \cdot W_z
+\end{equation*}
+\noindent\textbf{Querkraftwiderstand in z} \hfill \normref{SIA 265:2012, 4.2.5.1, (23)}
+\begin{equation*}
+V_{z,Rd} = \eta_w \cdot f_{v,d} \cdot A_{V,z}
+\end{equation*}
+\noindent\textbf{Torsionswiderstand} \hfill \normref{SIA 265:2012, 4.2.5.2, (24)}
+\begin{equation*}
+T_{Rd} = \eta_w \cdot f_{v,d} \cdot W_T
 \end{equation*}
 \subsection{Stahlquerschnitt}
 Je Lastfall zuerst die Klasse: jedes Blech jedes Profils, plastisch an der Nulllinie, an der der Querschnitt bei N\_Ed versagt, elastisch an den Spannungen, bei denen (54) gerade aufgeht. Dann der Widerstand nach der Klasse – plastisch, elastisch nach (54) oder am wirksamen Querschnitt nach (60). Die Normalkraft bleibt, das Moment wächst in seiner Richtung, bis der Widerstand erreicht ist.
@@ -19265,6 +20062,156 @@ M_{z,red,Rd} = M_{z,Rd}^{+} \cdot \left(1 - \frac{|N_{Ed}|}{N_{K,Rd,min}}\right)
 \noindent\textbf{Ersatzimperfektion um y, Kurve a, Spalte EE} \hfill \normref{SIA 263:2013, 4.2.3.2, Figur 3}
 \begin{equation*}
 w_{0,y} = \frac{L_{K,y}}{k_{y}}
+\end{equation*}
+\subsection{Holzquerschnitt}
+Holz rechnet linear (SIA 265, 4.1.2): die Spannungen sind elastisch, am Bruttoquerschnitt. Was die Nachweise der Lastfälle, die Kennzahlen und der Stab daraus lesen, steht hier einmal.
+
+Je Lastfall die Spannungen am Bruttoquerschnitt, linear: aus der Normalkraft σ = N/A, aus jedem Moment σ\_m = M/W. Dann die Gleichung, die der Lastfall braucht. Die Normalkraft bleibt, die Momente wachsen um λ, bis die Gleichung aufgeht.
+
+Je Lastfall die Schubspannung aus Querkraft nach Jourawski, τ = V/A\_V, und aus Torsion am Rechteck, τ\_tor = T/W\_T. Dann die Gleichung, die der Lastfall braucht; mit beidem wachsen Querkraft und Torsion zusammen um λ.
+
+\noindent\textbf{Höhenbeiwert unter 600 mm Höhe, für die Biegung um y} \hfill \normref{SIA 265:2012, 3.4.2.3, (5)}
+\begin{equation*}
+k_h = \min\left(\left(\frac{600\ \mathrm{mm}}{h}\right)^{0.1};\ 1.1\right)
+\end{equation*}
+\noindent\textbf{Schubspannung nach Jourawski – auf dem Schnitt quer zur Querkraft, auf dem S/b am grössten ist; S ist das statische Moment jenseits davon, b seine Breite}
+\begin{equation*}
+\tau = \frac{V \cdot S}{I \cdot b} = \frac{V}{A_V} \qquad A_V = \frac{I \cdot b}{S}
+\end{equation*}
+\noindent\textbf{Schubfläche für V\_z: der Schnitt bei z}
+\begin{equation*}
+A_{V,z} = \frac{I_y \cdot b_{V,z}}{S_{V,z}}
+\end{equation*}
+\noindent\textbf{Torsionsbeiwert nach Saint-Venant: die grösste Schubspannung liegt in der Mitte der langen Seite}
+\begin{equation*}
+k_2 = \frac{1 - \frac{192}{\pi^5} \cdot \frac{b}{h} \sum_{n = 1, 3, 5, \ldots} \frac{1}{n^5} \tanh\frac{n \pi \cdot h}{2 \cdot b}}{3 \left(1 - \frac{8}{\pi^2} \sum_{n = 1, 3, 5, \ldots} \frac{1}{n^2 \cosh\frac{n \pi \cdot h}{2 \cdot b}}\right)}
+\end{equation*}
+\noindent\textbf{Torsionswiderstandsmoment: τ\_tor = T/W\_T}
+\begin{equation*}
+W_T = k_2 \cdot h \cdot b^2
+\end{equation*}
+\noindent\textbf{Die Bemessungswerte der Tabellen 6 und 7 gelten für Feuchteklasse 1 und ohne stossartige Einwirkung} \hfill \normref{SIA 265:2012, 3.3.2; 3.4.2.2}
+\begin{equation*}
+f_d = \eta \cdot f_{d,\mathrm{Tab}} \qquad \eta = \eta_w \cdot \eta_t
+\end{equation*}
+\noindent\textbf{(6): Zug allein} \hfill \normref{SIA 265:2012, 4.2.1.1, (6)}
+\begin{equation*}
+\sigma_{t,0,d} \le f_{t,0,d}
+\end{equation*}
+\noindent\textbf{(10): Druck allein, ohne Knicken} \hfill \normref{SIA 265:2012, 4.2.2.1, (10)}
+\begin{equation*}
+\sigma_{c,0,d} \le f_{c,0,d}
+\end{equation*}
+\noindent\textbf{(14): Biegung, ohne Normalkraft} \hfill \normref{SIA 265:2012, 4.2.3.1, (14)}
+\begin{equation*}
+\frac{\sigma_{m,y,d}}{f_{m,y,d}} + \frac{\sigma_{m,z,d}}{f_{m,z,d}} \le 1
+\end{equation*}
+\noindent\textbf{(21): Biegung und Zug} \hfill \normref{SIA 265:2012, 4.2.4.1, (21)}
+\begin{equation*}
+\frac{\sigma_{t,0,d}}{f_{t,0,d}} + \frac{\sigma_{m,y,d}}{f_{m,y,d}} + \frac{\sigma_{m,z,d}}{f_{m,z,d}} \le 1
+\end{equation*}
+\noindent\textbf{(22): Biegung und Druck} \hfill \normref{SIA 265:2012, 4.2.4.2, (22)}
+\begin{equation*}
+\left(\frac{\sigma_{c,0,d}}{f_{c,0,d}}\right)^2 + \frac{\sigma_{m,y,d}}{f_{m,y,d}} + \frac{\sigma_{m,z,d}}{f_{m,z,d}} \le 1
+\end{equation*}
+\noindent\textbf{Zugspannung}
+\begin{equation*}
+\sigma_{t,0,d} = \frac{|N_{Ed}|}{A}
+\end{equation*}
+\noindent\textbf{Biegespannung um y, an der weitesten Faser}
+\begin{equation*}
+\sigma_{m,y,d} = \frac{|M_{y,Ed}|}{W_y}
+\end{equation*}
+\noindent\textbf{Stossartige Einwirkung: η\_t die Bemessungswerte} \hfill \normref{SIA 265:2012, 2.2.6; SIA 265:2012, 3.3.2; 3.4.2.2}
+\begin{equation*}
+\eta = \eta_w \cdot \eta_t
+\end{equation*}
+\noindent\textbf{Zugwiderstand} \hfill \normref{SIA 265:2012, 4.2.1.1, (6)}
+\begin{equation*}
+N_{Rd}^{+} = \eta_w \cdot f_{t,0,d} \cdot A
+\end{equation*}
+\noindent\textbf{Druckwiderstand, ohne Knicken} \hfill \normref{SIA 265:2012, 4.2.2.1, (10)}
+\begin{equation*}
+N_{Rd}^{-} = -\eta_w \cdot f_{c,0,d} \cdot A
+\end{equation*}
+\noindent\textbf{(23): Schub aus Querkraft} \hfill \normref{SIA 265:2012, 4.2.5.1, (23)}
+\begin{equation*}
+\tau_d \le f_{v,d}
+\end{equation*}
+\noindent\textbf{(24): Schub aus Torsion} \hfill \normref{SIA 265:2012, 4.2.5.2, (24)}
+\begin{equation*}
+\tau_{tor,d} \le f_{v,d}
+\end{equation*}
+\noindent\textbf{(25): Schub aus Querkraft und Torsion} \hfill \normref{SIA 265:2012, 4.2.5.3, (25)}
+\begin{equation*}
+\frac{\tau_{tor,d}}{f_{v,d}} + \left(\frac{\tau_d}{f_{v,d}}\right)^2 \le 1
+\end{equation*}
+\noindent\textbf{Schubfestigkeit, mit η} \hfill \normref{SIA 265:2012, 3.3.2; 3.4.2.2}
+\begin{equation*}
+\eta f_{v,d} = \eta_w \cdot f_{v,d}
+\end{equation*}
+\noindent\textbf{Schubspannung aus V\_z, nach Jourawski}
+\begin{equation*}
+\tau_{z,d} = \frac{|V_{z,Ed}|}{A_{V,z}}
+\end{equation*}
+\noindent\textbf{Beide Querkräfte zusammen}
+\begin{equation*}
+\tau_d = \sqrt{\tau_{y,d}^2 + \tau_{z,d}^2}
+\end{equation*}
+\noindent\textbf{Schubspannung aus Torsion, in der Mitte der langen Seite}
+\begin{equation*}
+\tau_{tor,d} = \frac{|T_{Ed}|}{W_T}
+\end{equation*}
+\noindent\textbf{So weit darf τ\_d wachsen, mit der Torsion zusammen}
+\begin{equation*}
+\tau_{Rd} = \lambda \cdot \tau_d
+\end{equation*}
+\subsection{Knicken und Kippen eines Holzstabs}
+Der Stab hat den gezeichneten Querschnitt. Je Achse für sich: wo er gedrückt ist und eine Knicklänge hat, mindert k\_c die Druckfestigkeit; um die starke Achse, wo ein Moment über eine Kipplänge wirkt, mindert k\_m die Biegefestigkeit. Dann (37) mit Druck, (38) ohne. Die Normalkraft bleibt, die Momente wachsen um λ, bis die Gleichung aufgeht.
+
+\noindent\textbf{(29): Knicken unter zentrischem Druck} \hfill \normref{SIA 265:2012, 4.2.8.1, (29)}
+\begin{equation*}
+\sigma_{c,0,d} \le k_c \cdot f_{c,0,d}
+\end{equation*}
+\noindent\textbf{(37): Knicken mit Biegung, je Achse} \hfill \normref{SIA 265:2012, 4.2.8.5, (37)}
+\begin{equation*}
+\frac{\sigma_{c,0,d}}{k_c \cdot f_{c,0,d}} + \frac{\sigma_{m,d}}{k_m \cdot f_{m,d}} \le 1
+\end{equation*}
+\noindent\textbf{(38): Kippen} \hfill \normref{SIA 265:2012, 4.2.9.1, (38)}
+\begin{equation*}
+\sigma_{m,d} \le k_m \cdot f_{m,d}
+\end{equation*}
+\noindent\textbf{Schlankheit um y} \hfill \normref{SIA 265:2012, 4.2.8.4}
+\begin{equation*}
+\lambda_y = \frac{L_{K,y}}{i_y}
+\end{equation*}
+\noindent\textbf{Relative Schlankheit um y} \hfill \normref{SIA 265:2012, 4.2.8.4, (34); Anhang B}
+\begin{equation*}
+\lambda_{rel,y} = \frac{\lambda_y}{\pi} \cdot \sqrt{\frac{f_{c,0,k}}{E_{0,05}}}
+\end{equation*}
+\noindent\textbf{Hilfswert um y, β\_c für Brettschichtholz aus Nadelholz} \hfill \normref{SIA 265:2012, 4.2.8.2, (30) und (31); 4.2.8.3}
+\begin{equation*}
+k_y = 0.5 \cdot \left(1 + \beta_c \cdot \left(\lambda_{rel,y} - 0.3\right) + \lambda_{rel,y}^2\right)
+\end{equation*}
+\noindent\textbf{Knickbeiwert um y} \hfill \normref{SIA 265:2012, 4.2.8.2, (30) und (31); 4.2.8.3}
+\begin{equation*}
+k_{c,y} = \frac{1}{k_y + \sqrt{k_y^2 - \lambda_{rel,y}^2}}
+\end{equation*}
+\noindent\textbf{Kippspannung des Rechtecks, Biegung um y} \hfill \normref{SIA 265:2012, 4.2.9.3, (40) und (41)}
+\begin{equation*}
+\sigma_{m,crit} = \frac{0.75 \cdot E_{0,05} \cdot b^2}{a \cdot h}
+\end{equation*}
+\noindent\textbf{Relative Schlankheit beim Kippen} \hfill \normref{SIA 265:2012, 4.2.9.3, (40) und (41)}
+\begin{equation*}
+\lambda_{rel,m} = \sqrt{\frac{f_{m,k}}{\sigma_{m,crit}}}
+\end{equation*}
+\noindent\textbf{Knickwiderstand um z} \hfill \normref{SIA 265:2012, 4.2.8.1, (29)}
+\begin{equation*}
+N_{K,z,Rd} = -k_{c,z} \cdot \eta_w \cdot f_{c,0,d} \cdot A
+\end{equation*}
+\noindent\textbf{λ\_rel,m zwischen 0.75 und 1.4} \hfill \normref{SIA 265:2012, 4.2.9.2, (39)}
+\begin{equation*}
+k_m = 1.56 - 0.75 \cdot \lambda_{rel,m}
 \end{equation*}
 \subsection{Durchstanzen}
 Innenstütze einer Decke. Die Querkraft fliesst im Bereich der gestützten Fläche auf einen Kegel zu; ohne Durchstanzbewehrung trägt ihn der Beton allein. Wie viel, hängt davon ab, wie stark sich die Platte über der Stütze verdreht: je grösser die Rotation ψ, desto breiter der kritische Schubriss und desto kleiner k\_r.
@@ -20851,6 +21798,47 @@ Querkraftwiderstand in z & $V_{z,Rd}$ & $1636.8\,\mathrm{kN}$ \\
 Querkraftwiderstand in y & $V_{y,Rd}$ & $1632.2\,\mathrm{kN}$ \\
 \hline
 \end{longtable}
+\subsection{Holzträger}
+\noindent\textbf{Angaben zum Querschnitt}
+\begin{equation*}
+\text{GL24h} \qquad A = 64000\,\mathrm{mm}^2 \qquad y_S = 80.0\,\mathrm{mm} \qquad z_S = 200.0\,\mathrm{mm}
+\end{equation*}
+\begin{xltabular}{\linewidth}{>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}Xrrr}
+\hline
+Nachweis & Bezeichnung & Widerstand & Einwirkung & $\alpha_{eff}$ \\
+\hline
+\endhead
+Biegung und Normalkraft & Feld & $M_{Rd} = 40.7\,\mathrm{kNm}$ & $M_{Ed} = 30.1\,\mathrm{kNm}$ & $1.35$ \\
+Biegung und Normalkraft & Druck mit Biegung & $M_{Rd} = 47.6\,\mathrm{kNm}$ & $M_{Ed} = 20.0\,\mathrm{kNm}$ & $2.38$ \\
+Biegung und Normalkraft & Stoss & $M_{Rd} = 79.6\,\mathrm{kNm}$ & $M_{Ed} = 40.0\,\mathrm{kNm}$ & $1.99$ \\
+Biegung und Normalkraft & Zug & $N_{Rd}^{+} = 614.4\,\mathrm{kN}$ & $N_{Ed} = 200.0\,\mathrm{kN}$ & $3.07$ \\
+Biegung und Normalkraft & Druck & $N_{Rd}^{-} = -742.4\,\mathrm{kN}$ & $N_{Ed} = -500.0\,\mathrm{kN}$ & $1.48$ \\
+Schub und Torsion & Feld & $\tau_{Rd} = 1.18\,\mathrm{N}/\mathrm{mm}^{2}$ & $\tau_d = 0.94\,\mathrm{N}/\mathrm{mm}^{2}$ & $1.25$ \\
+Schub und Torsion & Druck mit Biegung & $\eta f_{v,d} = 1.44\,\mathrm{N}/\mathrm{mm}^{2}$ & $\tau_{z,d} = 0.70\,\mathrm{N}/\mathrm{mm}^{2}$ & $2.05$ \\
+Schub und Torsion & Stoss & $\eta f_{v,d} = 2.02\,\mathrm{N}/\mathrm{mm}^{2}$ & $\tau_{tor,d} = 0.76\,\mathrm{N}/\mathrm{mm}^{2}$ & $2.66$ \\
+Schub und Torsion & Zug & – & – & $\infty$ \\
+Schub und Torsion & Druck & – & – & $\infty$ \\
+Knicken und Kippen & Stütze & $N_{K,z,Rd} = -346.1\,\mathrm{kN}$ & $N_{Ed} = -300.0\,\mathrm{kN}$ & $1.15$ \\
+Knicken und Kippen & Druck & $N_{K,z,Rd} = -346.1\,\mathrm{kN}$ & $N_{Ed} = -300.0\,\mathrm{kN}$ & $1.15$ \\
+Knicken und Kippen & Träger & $M_{y,Rd} = 76.5\,\mathrm{kNm}$ & $M_{y,Ed} = 40.0\,\mathrm{kNm}$ & $1.91$ \\
+\hline
+\end{xltabular}
+\hinweis{Hinweis}{Schub und Torsion – Zug, Schub und Torsion – Druck: Keine Einwirkung → kein Nachweis.}
+\noindent\textbf{Kennzahlen}
+\begin{longtable}{llr}
+\hline
+Kennzahl & Zeichen & Wert \\
+\hline
+\endhead
+Zugwiderstand & $N_{Rd}^{+}$ & $614.4\,\mathrm{kN}$ \\
+Druckwiderstand & $N_{Rd}^{-}$ & $-742.4\,\mathrm{kN}$ \\
+Biegewiderstand um y & $M_{y,Rd}$ & $56.9\,\mathrm{kNm}$ \\
+Biegewiderstand um z & $M_{z,Rd}$ & $21.8\,\mathrm{kNm}$ \\
+Querkraftwiderstand in z & $V_{z,Rd}$ & $61.4\,\mathrm{kN}$ \\
+Querkraftwiderstand in y & $V_{y,Rd}$ & $61.4\,\mathrm{kN}$ \\
+Torsionswiderstand & $T_{Rd}$ & $3.8\,\mathrm{kNm}$ \\
+\hline
+\end{longtable}
 \subsection{Winkelwand}
 Kein Nachweis geführt.
 
@@ -22115,6 +23103,13 @@ Undrainierte Scherfestigkeit, charakteristisch & $s_{u,k}$ & $60$ & kPa & Vorgab
 Undrainierte Scherfestigkeit, Bemessungswert & $s_{u,d}$ & $40$ & kPa & berechnet \\
 Tiefe der Sohle unter Terrain & $t$ & $2$ & m & Vorgabe \\
 Tiefe des höchsten Grundwasserspiegels unter Terrain & $t_1$ & $0$ & m & Vorgabe \\
+Elastizitätsmodul in Faserrichtung, 5\%-Fraktil & $E_{0,05}$ & $9400$ & N/mm² & Vorgabe \\
+Bemessungswert der Druckfestigkeit in Faserrichtung & $f_{c,0,d}$ & $14.5$ & N/mm² & Vorgabe \\
+Druckfestigkeit in Faserrichtung, kennzeichnend & $f_{c,0,k}$ & $24$ & N/mm² & Vorgabe \\
+Bemessungswert der Biegefestigkeit & $f_{m,d}$ & $16$ & N/mm² & Vorgabe \\
+Biegefestigkeit, kennzeichnend & $f_{m,k}$ & $24$ & N/mm² & Vorgabe \\
+Bemessungswert der Zugfestigkeit in Faserrichtung & $f_{t,0,d}$ & $12$ & N/mm² & Vorgabe \\
+Bemessungswert der Schubfestigkeit & $f_{v,d}$ & $1.8$ & N/mm² & Vorgabe \\
 Durchmesser des Pfahls & $D$ & $900$ & mm & Vorgabe \\
 Verformungsmodul der Schicht 1, charakteristisch & $E_{s,k,1}$ & $8$ & MN/m² & Vorgabe \\
 Verformungsmodul der Schicht 2, charakteristisch & $E_{s,k,2}$ & $50$ & MN/m² & Vorgabe \\
@@ -22817,6 +23812,39 @@ Erfüllungsgrad Biegung und Normalkraft – Feld & $\alpha_{eff,\text{Feld}}$ & 
 Erfüllungsgrad Querkraft – Feld & $\alpha_{V,\text{Feld}}$ & $1.82$ &  & berechnet \\
 Schwerpunkt, y & $y_S$ & $0$ & mm & berechnet \\
 Schwerpunkt, z & $z_S$ & $0$ & mm & berechnet \\
+Fläche des Bruttoquerschnitts & $A$ & $64000$ & mm² & berechnet \\
+Stahlfläche der Bewehrung & $A_{s,tot}$ & $0$ & mm² & berechnet \\
+Torsionsträgheitsmoment nach St. Venant & $I_T$ & $408.6$ & ·10⁶ mm⁴ & berechnet \\
+Trägheitsmoment um y & $I_y$ & $853.3$ & ·10⁶ mm⁴ & berechnet \\
+Deviationsmoment & $I_{yz}$ & $0$ & ·10⁶ mm⁴ & berechnet \\
+Trägheitsmoment um z & $I_z$ & $136.5$ & ·10⁶ mm⁴ & berechnet \\
+Schubfläche für eine Querkraft in y & $A_{V,y}$ & $42667$ & mm² & berechnet \\
+Schubfläche für eine Querkraft in z & $A_{V,z}$ & $42667$ & mm² & berechnet \\
+Torsionswiderstandsmoment des Rechtecks & $W_T$ & $2637.7$ & cm³ & berechnet \\
+Widerstandsmoment um y, bis zur weitesten Faser & $W_y$ & $4266.7$ & cm³ & berechnet \\
+Widerstandsmoment um z, bis zur weitesten Faser & $W_z$ & $1706.7$ & cm³ & berechnet \\
+Beiwert der Holzfeuchte & $\eta_w$ & $0.8$ &  & berechnet \\
+Höhenbeiwert des Brettschichtholzes & $k_h$ & $1.041$ &  & berechnet \\
+Biegewiderstand um y & $M_{y,Rd}$ & $56.9$ & kNm & berechnet \\
+Biegewiderstand um z & $M_{z,Rd}$ & $21.8$ & kNm & berechnet \\
+Druckwiderstand des Querschnitts, ohne Knicken & $N_{Rd}^{-}$ & $-742.4$ & kN & berechnet \\
+Zugwiderstand des Querschnitts & $N_{Rd}^{+}$ & $614.4$ & kN & berechnet \\
+Torsionswiderstand, allein & $T_{Rd}$ & $3.8$ & kNm & berechnet \\
+Querkraftwiderstand in y, allein & $V_{y,Rd}$ & $61.4$ & kN & berechnet \\
+Querkraftwiderstand in z, allein & $V_{z,Rd}$ & $61.4$ & kN & berechnet \\
+Erfüllungsgrad Biegung und Normalkraft – Druck & $\alpha_{eff,\text{Druck}}$ & $1.48$ &  & berechnet \\
+Erfüllungsgrad Biegung und Normalkraft – Druck mit Biegung & $\alpha_{eff,\text{Druck mit Biegung}}$ & $2.38$ &  & berechnet \\
+Erfüllungsgrad Biegung und Normalkraft – Feld & $\alpha_{eff,\text{Feld}}$ & $1.35$ &  & berechnet \\
+Erfüllungsgrad Biegung und Normalkraft – Stoss & $\alpha_{eff,\text{Stoss}}$ & $1.99$ &  & berechnet \\
+Erfüllungsgrad Biegung und Normalkraft – Zug & $\alpha_{eff,\text{Zug}}$ & $3.07$ &  & berechnet \\
+Erfüllungsgrad Knicken und Kippen – Druck & $\alpha_{eff,\text{Druck}}$ & $1.15$ &  & berechnet \\
+Erfüllungsgrad Knicken und Kippen – Stütze & $\alpha_{eff,\text{Stütze}}$ & $1.15$ &  & berechnet \\
+Erfüllungsgrad Knicken und Kippen – Träger & $\alpha_{eff,\text{Träger}}$ & $1.91$ &  & berechnet \\
+Erfüllungsgrad Schub und Torsion – Druck mit Biegung & $\alpha_{V,\text{Druck mit Biegung}}$ & $2.05$ &  & berechnet \\
+Erfüllungsgrad Schub und Torsion – Feld & $\alpha_{V,\text{Feld}}$ & $1.25$ &  & berechnet \\
+Erfüllungsgrad Schub und Torsion – Stoss & $\alpha_{V,\text{Stoss}}$ & $2.66$ &  & berechnet \\
+Schwerpunkt, y & $y_S$ & $80$ & mm & berechnet \\
+Schwerpunkt, z & $z_S$ & $200$ & mm & berechnet \\
 Fläche des Bruttoquerschnitts & $A$ & $1437500$ & mm² & berechnet \\
 Stahlfläche der Bewehrung & $A_{s,tot}$ & $0$ & mm² & berechnet \\
 Trägheitsmoment um y & $I_y$ & $421209.8$ & ·10⁶ mm⁴ & berechnet \\

@@ -1,5 +1,5 @@
 ---
-erzeugt: 5661abf2af53
+erzeugt: 1b70ee6ad24d
 art: modul
 tags: [modul]
 ---
@@ -486,6 +486,8 @@ Leser sieht alle Zweige und erkennt, welcher gegriffen hat.
 - [[opencivil.nachweis.knicken]]
 - [[opencivil.nachweis.mindestbewehrung]]
 - [[opencivil.nachweis.qa_gebrauch]]
+- [[opencivil.nachweis.qa_holz]]
+- [[opencivil.nachweis.qa_holz_stabilitaet]]
 - [[opencivil.nachweis.qa_kennzahlen]]
 - [[opencivil.nachweis.qa_stahl]]
 - [[opencivil.nachweis.qa_stahl_kennzahlen]]

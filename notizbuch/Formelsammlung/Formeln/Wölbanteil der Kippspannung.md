@@ -1,5 +1,5 @@
 ---
-erzeugt: 263a97525bc2
+erzeugt: 65bce9203a62
 art: formel
 tags: [formel]
 normstelle: "SIA 263:2013, Anhang B.5, (93)"
@@ -19,7 +19,7 @@ $$
 | --- | --- | --- | --- |
 | $E_a$ | Elastizitätsmodul des Baustahls | N/mm² | Vorgabe |
 | $L_{K}$ | Reduzierte Kipplänge | mm | [[Reduzierte Kipplänge]] |
-| $i_{g}$ | Trägheitsradius des Druckgurts | mm | [[Trägheitsradius des Druckgurts]] |
+| $i_{g}$ | Trägheitsradius des Druckgurts | mm | [[Trägheitsradius]] |
 
 ## Beispiel
 
@@ -49,7 +49,7 @@ Der Teil der [[Ideelle Kippspannung|ideellen Kippspannung]], den der
 Druckgurt allein trägt, als wäre er ein Stab, der seitlich ausknickt:
 die Knickspannung nach Euler mit der
 [[Reduzierte Kipplänge|reduzierten Kipplänge]] und dem
-[[Trägheitsradius des Druckgurts]]. Er fällt mit dem Quadrat der
+[[Trägheitsradius|Trägheitsradius des Druckgurts]]. Er fällt mit dem Quadrat der
 Kipplänge, der [[Saint-Venant-Anteil der Kippspannung|Saint-Venant-Anteil]]
 nur mit ihr: in kurzen Feldern trägt vor allem der Druckgurt, in langen
 vor allem die Torsion.

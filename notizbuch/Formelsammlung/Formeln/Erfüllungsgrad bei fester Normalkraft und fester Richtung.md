@@ -1,5 +1,5 @@
 ---
-erzeugt: e85cb34a479a
+erzeugt: ab6ee2cfdbc5
 art: formel
 tags: [formel]
 ---
@@ -12,6 +12,8 @@ $$
 
 ## Im Code
 
+- [[opencivil.nachweis.qa_holz#HolzBiegungQA.pruefe|HolzBiegungQA.pruefe]]
+- [[opencivil.nachweis.qa_holz_stabilitaet#HolzStabilitaetQA.pruefe|HolzStabilitaetQA.pruefe]]
 - [[opencivil.nachweis.qa_stahl#StahlBiegungQA|StahlBiegungQA._ansatz]]
 - [[opencivil.nachweis.qa_stahl_stabilitaet#StahlStabilitaetQA.pruefe|StahlStabilitaetQA.pruefe]]
 - [[opencivil.nachweis.schiefe_biegung#SchiefeBiegung|SchiefeBiegung._protokoll_ansatz]]
@@ -21,6 +23,8 @@ $$
 - [[Schiefe Biegung]]
 - [[Stahlquerschnitt]]
 - [[Knicken und Kippen]]
+- [[Holzquerschnitt]]
+- [[Knicken und Kippen eines Holzstabs]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 
@@ -29,5 +33,5 @@ $$
 Unter schiefer Biegung ist das Moment ein Vektor $(M_y, M_z)$. Gemessen wird
 bei festgehaltener Normalkraft und festgehaltener Richtung: wie weit lässt
 sich das Moment in seiner eigenen Richtung steigern, bis der Querschnitt
-bricht? Der Erfüllungsgrad ist das Verhältnis der Beträge -- dieselbe Idee
+bricht? Der Erfüllungsgrad ist das Verhältnis der Beträge – dieselbe Idee
 wie bei der Platte bei festgehaltener Normalkraft, nur in der Ebene.

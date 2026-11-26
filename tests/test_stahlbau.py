@@ -43,6 +43,7 @@ import math
 import unittest
 
 from opencivil.bericht.markdown import als_markdown
+from opencivil.material.basis import Baustoffart
 from opencivil.projekt.aufbau.querschnittsanalyse import ohne_nachweise
 from opencivil.querschnitt import geometrie as geo
 from opencivil.querschnitt.bauweise import Bauweise
@@ -288,7 +289,7 @@ class TestKennzahlen(unittest.TestCase):
 
     def test_kein_satz_ohne_nachweise(self):
         """Seit 2026-11-26 weist der Stahl seine Lastfaelle nach."""
-        self.assertEqual(ohne_nachweise(Bauweise.STAHL), "")
+        self.assertEqual(ohne_nachweise(Bauweise.STAHL, [(Baustoffart.BAUSTAHL, "S355")]), "")
 
 
 if __name__ == "__main__":

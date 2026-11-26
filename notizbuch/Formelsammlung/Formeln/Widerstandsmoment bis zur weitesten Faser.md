@@ -1,5 +1,5 @@
 ---
-erzeugt: 33941bb80c71
+erzeugt: 1f7125c89e71
 art: formel
 tags: [formel]
 ---
@@ -29,12 +29,16 @@ $$
 
 ## Gebraucht von
 
+- [[Biegespannung im Holz]]
 - [[Biegewiderstand bis zum ersten Fliessen]]
+- [[Biegewiderstand des Brettschichtholzes]]
+- [[Biegewiderstand eines Holzquerschnitts]]
 - [[Ideelles Kippmoment]]
 - [[Saint-Venant-Anteil der Kippspannung]]
 
 ## Im Code
 
+- [[opencivil.nachweis.qa_holz_werte#HolzwerteQA|HolzwerteQA._biegung]]
 - [[opencivil.nachweis.qa_stahl#StahlBiegungQA._wirksam|StahlBiegungQA._wirksam]]
 - [[opencivil.nachweis.qa_stahl_stabilitaet#_Herleitung._biegung|_Herleitung._biegung]]
 
@@ -42,6 +46,7 @@ $$
 
 - [[Stahlquerschnitt]]
 - [[Knicken und Kippen]]
+- [[Holzquerschnitt]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 
@@ -58,3 +63,6 @@ verknüpft das Moment mit dieser grössten Spannung: $\sigma = M/W$.
 
 Mit mehreren Stählen zählt je Stahl seine weiteste Faser; massgebend ist
 die mit dem kleinsten $f_y/z$.
+
+Beim Holz gilt es am Bruttoquerschnitt, je Achse bis zur weiteren der
+beiden äussersten Fasern – beim Rechteck $W = b h^2/6$.
