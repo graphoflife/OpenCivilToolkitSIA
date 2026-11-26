@@ -7,7 +7,8 @@
  *   Querschnitt        A, y_S, z_S und I_y, I_z, I_yz, brutto
  *   Elemente           je Art eine Gruppe, je Element eine Zeile -- jede
  *                      klappt auf und zu, zu Beginn zu; ein Spannglied mit
- *                      seiner Spannkraft P∞, vom Kern
+ *                      seiner Spannkraft P∞, ein Stahlprofil, wie es liegt,
+ *                      beides vom Kern
  *
  * Meldungen, Gruppen und Zeilen baut cad_app.js, wie im Balkensystem und in
  * der Decke; ein Klick wählt das Element im Fenster. Jede Zahl steht so in
@@ -51,6 +52,7 @@ export function uebersicht(a) {
   const linieninfo = new Map((g?.linien || []).map((x) => [x.kennung, x]));
   const wandinfo = new Map((g?.waende || []).map((x) => [x.kennung, x]));
   const gliedinfo = new Map((g?.spannglieder || []).map((x) => [x.kennung, x]));
+  const profilinfo = new Map((g?.profile || []).map((x) => [x.kennung, x]));
   const zeile = listenzeilen(a);
   const element = (kennung, was, wert = '') => zeile({ kennung, name: elementname(a, kennung), was, wert });
   return [
@@ -59,6 +61,9 @@ export function uebersicht(a) {
     ...listengruppen(a, [
       ['Flächen', z.flaechen.map((f) => element(f.kennung,
         f.material ? stoffname(f.material) : 'nimmt Fläche weg', `${f.knoten.length} Ecken`))],
+      // «HEB 300, um 90° gedreht · S355» und rechts die Mitte.
+      ['Stahlprofile', z.profile.map((e) => element(e.kennung,
+        `${profilinfo.get(e.kennung)?.beschreibung || e.profil} · ${stoffname(e.stahl)}`, lage(e.knoten)))],
       ['Stäbe', z.staebe.map((s) => element(s.kennung,
         `⌀${zahlText(s.durchmesser)} ${stoffname(s.stahl)}`, lage(s.knoten)))],
       ['Spannglieder', z.spannglieder.map((s) => {

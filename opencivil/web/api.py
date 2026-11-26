@@ -52,6 +52,7 @@ from opencivil.projekt.decke import VORSILBEN as DECKENVORSILBEN
 from opencivil.projekt.aufbau.kern import kennwertbereich
 from opencivil.projekt.lesen import eintragsklassen, feldangaben, katalogname, wahl_von
 from opencivil.projekt.projekt import APPLISTEN, Projekt
+from opencivil.projekt.profile import ProfilEintrag
 from opencivil.projekt.querschnittsanalyse import SCHNITTE
 from opencivil.querschnitt.bauweise import BEWEHRT
 from opencivil.querschnitt.platte import BREITE_Y_MM
@@ -65,6 +66,8 @@ from opencivil.querschnitt.gesetzwahl import Holzrechnung, Werkstoffsatz
 from opencivil.nachweis.rechenwahl import RECHENARTEN
 from opencivil.spannungsanalyse import Analyseart
 from opencivil.stabwerk.rechnung import Balkensystem
+from opencivil.stahlprofile import lage as profillage
+from opencivil.stahlprofile.tabelle import PROFILREIHEN
 from opencivil.stabwerk3d.rechnung import Balkensystem3d
 from opencivil.geotechnik import fundament, setzung
 from opencivil.geotechnik.setzung import Steifigkeit
@@ -237,6 +240,14 @@ def katalog() -> dict:
         "erfuellungsarten": [
             {"wert": a.value, "beschriftung": a.beschriftung} for a in Erfuellungsart
         ],
+        # Die Stahlprofile, fuer Balkensystem und Querschnittsanalyse: je
+        # Reihe ihre Namen in der Folge der Tabelle -- die Masse kennt nur
+        # der Kern -- und die Skizze ihres mittleren Profils, das Bild im
+        # Schalter der Reihe. Bis 2026-11-26 im Katalog der Balkensysteme.
+        "profilreihen": [{"kurz": r.kurz, "beschreibung": r.beschreibung,
+                          "profile": [p.name for p in r.profile],
+                          "skizze": profillage.skizze(r.profile[len(r.profile) // 2].name).als_dict()}
+                         for r in PROFILREIHEN],
         # Je Klasse von Eintraegen, was der Kern ueber ihre Felder weiss --
         # Einheit, Grenzen, ob ganz -- und wie ein frischer Eintrag aussieht,
         # beides unter demselben Namen (:func:`klassen`). Die Oberflaeche
@@ -337,6 +348,15 @@ def katalog() -> dict:
             # wie dann ihre Raender heissen: der gedrueckte, der gezogene.
             "zugseiten": [{"wert": z.value, "beschriftung": z.beschriftung,
                            "pfeil": z.pfeil, "raender": list(z.raender)} for z in Zugseite],
+            # Die Vorlage, die ein Stahlprofil einsetzt: ihr Knopf mit dem
+            # Bild des ersten Profils und die Stellungen der Drehung.
+            "profil": {
+                "schluessel": profillage.VORLAGE, "name": "Stahlprofil",
+                "skizze": profillage.skizze(ProfilEintrag().profil).als_dict(),
+                "drehungen": [{"wert": d, "beschriftung": f"{d}°",
+                               "titel": f"Um {d}° gegen den Uhrzeigersinn gedreht"}
+                              for d in profillage.DREHUNGEN],
+            },
             # Die Vorlagen mit ihren Massen -- und je eine Skizze nach
             # Vorgabe fuer das Bildchen auf ihrem Knopf. Der Achsabstand der
             # Staebe ist ein Mass aller Vorlagen.

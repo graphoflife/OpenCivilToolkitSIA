@@ -416,23 +416,25 @@ export function jaNein(wert, setzen, titel) {
 }
 
 /**
- * Je Achse ein Feld für die Lage der gewählten Punkte -- Knoten oder Ecken,
- * je ihr Schlüssel der Auswahl: was sie gemeinsam haben, sonst «Var». Eine
- * getippte Lage gilt für alle, so stehen sie danach in einer Flucht; an
- * einer Ecke ändert sie nur die Ecke, was sonst dort liegt, bleibt.
+ * Je Achse ein Feld für die Lage der gewählten Punkte -- Knoten, Ecken oder
+ * Elemente, die ein Punkt sind, je ihr Schlüssel der Auswahl: was sie
+ * gemeinsam haben, sonst «Var». Eine getippte Lage gilt für alle, so stehen
+ * sie danach in einer Flucht; an einer Ecke ändert sie nur die Ecke, was
+ * sonst dort liegt, bleibt. `vorsatz` steht vor dem Namen der Achse: «Mitte y».
  */
-export function lagefelder(a, z, schluessel) {
+export function lagefelder(a, z, schluessel, vorsatz = '') {
   const lagen = a.modell.lagen(z);
   const verzeichnis = a.modell.verzeichnis(z);
   const punkte = schluessel.map((s) => {
     const { kennung, i } = auswahlTeil(s);
     const da = verzeichnis.get(kennung);
-    return [s, lagen.get(i === null ? kennung : da && a.modell.verweise(da.art, da.e)[i])];
+    const punkt = i === null && da?.art?.form === 'punkt' ? 0 : i;
+    return [s, lagen.get(punkt === null ? kennung : da && a.modell.verweise(da.art, da.e)[punkt])];
   }).filter(([, p]) => p);
   const setzen = (achse) => (w) => a.aendern((zz) => {
     for (const [s, p] of punkte) a.modell.verschieben(zz, new Set([s]), p.map((x, i) => (i === achse ? w - x : 0)));
   });
-  return a.adapter.achsen.map((name, achse) => cadZeile(name, zahlfeldMitVar({
+  return a.adapter.achsen.map((name, achse) => cadZeile(`${vorsatz}${name}`, zahlfeldMitVar({
     wert: gemeinsam(punkte.map(([, p]) => p[achse])), schritt: a.raster, beiAenderung: setzen(achse),
   }), a.einstellung.einheit));
 }

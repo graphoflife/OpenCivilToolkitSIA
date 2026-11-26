@@ -18,7 +18,7 @@ from opencivil.material.basis import Baustoff
 from opencivil.material.spannstahl import erzeugnis
 from opencivil.projekt.lesen import ProjektFehler, als_groesse, ort_von, stoffe_des_felds
 from opencivil.projekt.querschnittsanalyse import (
-    FlaecheEintrag, QuerschnittsanalyseEintrag, SchubwandEintrag, StabEintrag, StablinieEintrag,
+    QuerschnittsanalyseEintrag, SchubwandEintrag, StabEintrag, StablinieEintrag,
 )
 from opencivil.projekt.spannglieder import SpanngliedEintrag
 from opencivil.nachweis.qa_gebrauch import AnalyseStellen, RissnormalkraftQA, ZwaengungBiegungQA
@@ -193,9 +193,12 @@ def _analyse(eintrag: QuerschnittsanalyseEintrag, baustoffe: Mapping[str, Bausto
         # Ein Element ohne Lage laesst sich nicht rechnen -- und es still
         # wegzulassen hiesse, mit einem anderen Querschnitt zu rechnen.
         raise GeometrieFehler(elemente.fehler[0]["text"])
+    # Ein Profil ist eine Flaeche aus Baustahl, ein Rohr dazu sein Loch.
     flaechen = [Flaechenteil(name=f["name"], kennung=f["kennung"], punkte=f["punkte"],
-                             stoff=stoff(f, "material", FlaecheEintrag) if f["material"] else None)
-                for f in elemente.polygone]
+                             stoff=(None if f["aussparung"] else
+                                    material(baustoffe, f["material"], f["stoffe"], wo, f["name"])),
+                             herkunft=f["herkunft"])
+                for f in elemente.flaechen]
     staebe = [{**s, "stahl": stoff(s, "stahl", StabEintrag)} for s in elemente.staebe]
     linien = [{**l, "stahl": stoff(l, "stahl", StablinieEintrag)} for l in elemente.linien]
     waende = [{**w, "stahl": stoff(w, "stahl", SchubwandEintrag) if w["durchmesser"] > 0 else None}

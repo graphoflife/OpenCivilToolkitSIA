@@ -11,7 +11,7 @@ Welche Kennwerte, sagt das System: der ebene Rahmen braucht ``A`` und ``I``
 * nach Vorlage (:class:`NachVorlage`) -- die Formeln der Vorlage
   (:mod:`~opencivil.stabwerk.querschnitte`), die Masse als Vorgaben; ein
   Stahlprofil ebenso, mit den Massen aus der Tabelle
-  (:mod:`~opencivil.stabwerk.profilformen`). Das ``I`` des ebenen Rahmens
+  (:mod:`~opencivil.stahlprofile.formen`). Das ``I`` des ebenen Rahmens
   ist ihr ``I_y`` -- bei einem Profil, das sich um z biegt, ihr ``I_z``;
 * von Hand (:class:`VonHand`) -- die Kennwerte als Eingaben;
 * aus einer Platte (:class:`AusPlatte`) -- die Formeln des Rechtecks mit

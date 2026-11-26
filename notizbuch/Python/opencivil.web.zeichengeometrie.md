@@ -1,5 +1,5 @@
 ---
-erzeugt: fa471f16fd35
+erzeugt: fb61a0d6df7f
 art: modul
 tags: [modul]
 ---
@@ -12,9 +12,10 @@ tags: [modul]
 Was das Zeichenfenster einer Querschnittsanalyse vom Kern ueber ihre
 Zeichnung erfaehrt (Anfrage `geometrie`): jede Meldung am Element, das sie
 betrifft, die Staebe einer Linie mit ihrer tatsaechlichen Teilung, die
-Lage in der Ueberdeckung, der Schwerpunkt, die Zellen der Schubwaende und je
-Spannglied seine Werte. Gerechnet wird nur Geometrie -- und die Spannkraft,
-aus derselben Herleitung wie im Bericht. Schnell genug fuer jede Aenderung.
+Lage in der Ueberdeckung, der Schwerpunkt, die Zellen der Schubwaende, je
+Spannglied seine Werte und je Stahlprofil sein Umriss. Gerechnet wird nur
+Geometrie -- und die Spannkraft, aus derselben Herleitung wie im Bericht.
+Schnell genug fuer jede Aenderung.
 
 Bis 2026-11-26 stand das in [[opencivil.web.api]]; mit den Spanngliedern
 waere die Datei ueber tausend Zeilen gewachsen.
@@ -55,6 +56,30 @@ ausser im Verbund. Danach zeigt die Analyse ihre Kacheln
 `gueltig` heisst: die Zeichnung rechnet. Eine Spannung ueber der
 Grenze der Norm steht rot am Glied, haelt die Rechnung aber nicht an --
 gerechnet wird mit den Zahlen des Benutzers.
+
+### _tiefen
+
+```python
+def _tiefen(eltern: Optional[Sequence[Optional[int]]], kennungen: Sequence[str]) -> Dict[str, int]
+```
+
+Wie tief jedes Element verschachtelt ist, je Kennung -- 0 fuer eines, das
+in keinem liegt: so zeichnet das Fenster die aeusseren zuerst. Ein Profil
+zaehlt mit seinem Umriss, nicht mit seinem Loch. Ohne gueltige
+Verschachtelung alle 0.
+
+### _profil
+
+```python
+def _profil(p: Mapping, tiefe: int) -> dict
+```
+
+Ein Stahlprofil, wie das Fenster es zeichnet: seine Umrisse und die Mitte,
+zu der sie gehoeren -- haengt sie an einem Knoten, der eben verschoben
+wird, schiebt das Fenster das Bild mit, bis die naechste Antwort da ist.
+Dazu, was es ist, seine Flaeche aus dem Umriss, die Masse von aussen und
+die Punkte zum Fangen; ob Drehen und Spiegeln es aendern, sagt, ob das
+Fenster die Schalter dafuer zeigt.
 
 ### _als_satz
 
@@ -107,6 +132,7 @@ selbst nicht rechnet, sagt es in seinem Fenster.
 - [[opencivil.querschnitt.bauweise]]
 - [[opencivil.querschnitt.geometrie]]
 - [[opencivil.querschnitt.spannglieder]]
+- [[opencivil.stahlprofile.lage]]
 
 ## Gebraucht von
 

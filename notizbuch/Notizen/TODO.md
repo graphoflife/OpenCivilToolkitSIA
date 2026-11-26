@@ -22,6 +22,20 @@ Kräften je Geschoss und Wand, ohne Verbindung ins Balkensystem.
 ## Offen
 
 
+- [ ] **Stahlprofil in der Querschnittsanalyse: der Bezugspunkt – bitte
+      prüfen** (Schritt 11c, 2026-11-26). Ein Profil hängt an der Mitte
+      seines umschreibenden Rechtecks, nicht am Schwerpunkt, der beim U
+      daneben liegt; im Fenster heisst sie «Mitte y/z». Die Vorlage setzt
+      sie an den geklickten Punkt, die Vorlagen der Flächen dagegen ihre
+      Ecke unten links. Bestätigen oder einen anderen Punkt nennen, etwa den
+      Schwerpunkt oder die Mitte des Stegs.
+
+- [ ] **Balkensystem: «Biegung um y – stark | um z – schwach» auch beim
+      Rundrohr** (gesehen am 2026-11-26). Beim ROR und beim quadratischen
+      RRK sind beide Achsen gleich; der Schalter ändert dort nichts.
+      Empfehlung: ihn dort weglassen, wie die Drehung in der
+      Querschnittsanalyse (`drehbar` in `stahlprofile/lage.py`).
+
 - [ ] **Ein Fehler der Zeichnung steht zweimal da.** Liegt ein Stab der
       Querschnittsanalyse nicht ganz im Beton, steht über der Zeichnung
       «Nichts zu rechnen: Linie 3, 1. Stab … liegt nicht ganz im Beton.»
@@ -715,7 +729,7 @@ der grosse.
       die Aktionen der Auswahl nach `cad_auswahl.js` -- dann fällt der Haken
       `a.aktionen` weg --, die Bedienung im Raum in die Ansicht aus 4b, die
       Eingabe mit Maus und Tasten (rund 260 Zeilen) in eine eigene Datei.
-- [ ] **8. Klein.** `profilformen.py` schreibt `_flaeche`, `_iy`, `_iz`
+- [ ] **8. Klein.** `stahlprofile/formen.py` schreibt `_flaeche`, `_iy`, `_iz`
       und `_it` aus `querschnitte.py` ab, nur in cm, obwohl `_in_cm` genau
       das tut. (`nur_drehung` und `transponiert_mal` sind mit Punkt 1
       weggefallen.)
@@ -1566,7 +1580,10 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
 - [ ] **Stahlprofile, was fehlt:** L, INP, T, HEAA und die warmgefertigten
       Rechteckrohre (RRW) -- die Tabelle des Benutzers hat sie nicht, und
       eine andere Quelle braucht seine Erlaubnis. Dazu für die Nachweise nach
-      SIA 263: W_el, W_pl, A_v, I_w; die Tabelle hat Formeln dafür.
+      SIA 263: W_el, W_pl, A_v, I_w; die Tabelle hat Formeln dafür. Für die
+      Querschnittsklasse liefert jede Form ihre Bleche -- Flansch und Steg
+      mit c, t und ihrer Halterung -- erst mit Schritt 12, wenn ein Nachweis
+      sie braucht (Plan vom 2026-11-25; in Schritt 11c nicht gebaut).
 
 - [ ] **Holz, mit den Nachweisen nach SIA 265:** die Feuchteklasse (η_w,
       Tabelle 4) und «stossartig» (η_t = 1.4, 2.2.6); der höhere Querdruck
@@ -1593,10 +1610,10 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       Querschnittsanalyse.
 
 - [ ] **Querschnittsanalyse, nächste Schritte:** Flächen aus Holz und
-      Baustahl gibt es seit 2026-11-26, mit ihren Querschnittswerten und
-      ihren Spannung-Dehnung-Analysen, aber ohne Nachweis (Plan vom
-      2026-11-25: die Profile in Schritt 11c, die Nachweise nach SIA 263,
-      265 und 264 in den Schritten 12 bis 14). Der Verbund bekommt seine
+      Baustahl und die Stahlprofile der Tabelle gibt es seit 2026-11-26,
+      mit ihren Querschnittswerten und ihren Spannung-Dehnung-Analysen, aber
+      ohne Nachweis (Plan vom 2026-11-25: die Nachweise nach SIA 263, 265
+      und 264 in den Schritten 12 bis 14). Der Verbund bekommt seine
       Analysen mit Schritt 14: sein Riss braucht den ideellen Querschnitt.
       Ein E_eq im Balkensystem gibt es bis dahin nur beim Stahlbeton. Dazu
       weitere Nachweise (Wände ohne Bügel).

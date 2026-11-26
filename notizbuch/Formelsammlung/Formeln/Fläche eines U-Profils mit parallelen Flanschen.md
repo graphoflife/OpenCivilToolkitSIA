@@ -1,5 +1,5 @@
 ---
-erzeugt: a59828003335
+erzeugt: 924c9679f3d5
 art: formel
 tags: [formel]
 ---
@@ -40,7 +40,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.stabwerk.profilformen]]
+- [[opencivil.stahlprofile.formen]]
 
 ## Themen
 

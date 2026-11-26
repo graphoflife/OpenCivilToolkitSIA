@@ -8,7 +8,7 @@ import unittest
 from opencivil.core.einheiten import CM, CM2, CM4, MM2
 from opencivil.projekt import Projekt
 from opencivil.projekt.lesen import ProjektFehler
-from opencivil.stabwerk.profiltabelle import PROFILE, PROFILREIHEN, profil
+from opencivil.stahlprofile.tabelle import PROFILE, PROFILREIHEN, profil
 from tests.profilwerte import WERTE
 from tests.unfertig import meldung
 

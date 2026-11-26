@@ -38,6 +38,7 @@ import {
 } from './dom.js';
 import { fenster, fensterOeffnen } from './fenster.js';
 import { kapitelFenster, kapitelPanel, zeilenstand } from './kapitel.js';
+import { groessenListe, reihenSchalter } from './profilwahl.js';
 import { diagrammzeilen, lastenKapitel, lastfallWaehlen } from './lastfaelle.js';
 import { rechenwahlZeile } from './nachweise.js';
 import { plattenmaterialien } from './plattenkapitel.js';
@@ -234,12 +235,6 @@ function materialienInhalt(system) {
 // Querschnitte
 // ===========================================================================
 
-/** Die Reihe eines Profils -- «HEB 300» gehört zu HEB. */
-function reiheVon(art, profil) {
-  const reihen = systemkatalog(art, 'profilreihen');
-  return reihen.find((r) => r.profile.includes(profil)) || reihen[0];
-}
-
 /** Die Kennwerte eines Querschnitts in Worten: «A und I», im Raum «A, I_y, I_z und I_T». */
 const kennwertnamen = (art) => undListe(systemkatalog(art, 'kennwerte').map((k) => k.kurz));
 
@@ -431,23 +426,16 @@ function querschnittFenster(system, kennung) {
       }), m.angabe.einheit));
     }
   } else if (q.art === 'profil') {
-    // Die Reihe als Schalter, die Grösse als Liste mit dem Bild daneben --
-    // wie die Vorlage (Benutzer, 2026-10-24) -- und in der Ebene die Achse.
-    const reihen = systemkatalog(art, 'profilreihen');
-    const reihe = reiheVon(art, q.profil);
+    // Die Reihe als Schalter mit Bild, die Grösse als Liste mit dem Bild
+    // daneben -- wie die Vorlage (Benutzer, 2026-10-24) -- und in der Ebene
+    // die Achse. Dieselbe Wahl wie beim Profil einer Querschnittsanalyse
+    // (profilwahl.js); einen Namen, den die Tabelle nicht kennt, meldet der Kern.
     const achsen = systemkatalog(art, 'profilachsen');
+    const groessen = groessenListe(q.profil, setzen('profil'));
     zeilen.push(
-      wahlBlock('Reihe', wahlSchalter({
-        werte: reihen.map((r) => ({ wert: r.kurz, beschriftung: r.kurz, titel: r.beschreibung })),
-        gewaehlt: reihe.kurz, titel: 'Die Reihe der Stahlprofile',
-        setzen: (kurz) => setzen('profil')(reihen.find((r) => r.kurz === kurz).profile[0]),
-      })),
+      wahlBlock('Reihe', reihenSchalter(q.profil, setzen('profil'))),
       el('div.bs-qvorlage', {}, [
-        feld('Profil', auswahl({
-          werte: reihe.profile.map((name) => ({ wert: name, beschriftung: name })),
-          gewaehlt: q.profil, titel: `${reihe.beschreibung} – Masse nach der Tabelle`,
-          beiAenderung: setzen('profil'),
-        })),
+        groessen ? feld('Profil', groessen) : null,
         umrissBild(system, q, 120, 90),
       ]),
       // Wie geschrieben: die Achsen heissen y und z, nicht Y und Z.

@@ -58,6 +58,7 @@ from opencivil.querschnitt.spannglieder import Spannglied, Spannglieder
 from opencivil.querschnitt.torsion import torsion
 from opencivil.querschnitt.werkstoffgesetz import Baustahlgesetz, Gesetz, Stahlgesetz
 from opencivil.querschnitt.zugseite import Zugseite
+from opencivil.stahlprofile import lage as profillage
 
 #: Die Kennwerte, die die Nachweise eines Werkstoffs lesen -- je Art alle, die
 #: eine der Wahlen braucht. Das Rechenwerk rechnet sie ohnehin. Aus ``E_cm``
@@ -166,6 +167,8 @@ class Flaechenteil:
     kennung: str
     punkte: Tuple[Punkt, ...]
     stoff: Optional[Baustoff]
+    herkunft: str = ""
+    """Was es ist, wenn mehr als ein Polygon: beim Stahlprofil «HEB 300» -- so steht es im Bericht."""
 
 
 @dataclass(frozen=True)
@@ -602,6 +605,8 @@ class Querschnittsanalyse(Rechenobjekt):
             "Liegt ein Polygon ganz in einem anderen, ersetzt es dieses dort – "
             "eine Aussparung nimmt die Fläche weg. y zeigt nach rechts, z nach "
             "oben; alle Masse in Millimetern.")
+        if any(f.herkunft for f in self.flaechen):
+            p.erklaerung(profillage.IM_BERICHT)
         p.ansatz(
             r"A = \frac{1}{2} \sum_i c_i \qquad "
             r"y_S = \frac{1}{6A} \sum_i (y_i + y_{i+1})\, c_i \qquad "
@@ -618,12 +623,13 @@ class Querschnittsanalyse(Rechenobjekt):
         for i, f in enumerate(self.flaechen):
             w = geo.flaechenwerte(f.punkte)
             zeilen.append([
-                f.name,
+                f"{f.name} ({f.herkunft})" if f.herkunft else f.name,
                 f.stoff.name if f.stoff is not None else "–",
                 self.flaechen[self.eltern[i]].name if self.eltern[i] is not None else "–",
                 Mathe(f"{len(f.punkte)}"),
                 Mathe(f"{self._gewicht(i) * w.A:.0f}"),
-                Mathe(f"{w.y_S:.1f}"), Mathe(f"{w.z_S:.1f}"),
+                # + 0.0: ein Profil um die Mitte hat sonst y_S = -0.0.
+                Mathe(f"{round(w.y_S, 1) + 0.0:.1f}"), Mathe(f"{round(w.z_S, 1) + 0.0:.1f}"),
             ])
         p.tabelle(
             kopf=["Polygon", "Material", "liegt in", "Ecken",

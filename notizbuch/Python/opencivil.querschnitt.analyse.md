@@ -1,5 +1,5 @@
 ---
-erzeugt: 91e1671c1672
+erzeugt: 126a7f64d0fc
 art: modul
 tags: [modul]
 ---
@@ -118,6 +118,7 @@ Ein Polygon der Zeichnung -- Ecken in mm, ohne Material eine Aussparung.
 - `kennung: str`
 - `punkte: Tuple[Punkt, ...]`
 - `stoff: Optional[Baustoff]`
+- `herkunft: str = ''` – Was es ist, wenn mehr als ein Polygon: beim Stahlprofil «HEB 300» -- so steht es im Bericht.
 
 ### Wandangabe
 
@@ -493,6 +494,7 @@ Jede Ecke eines Polygons mit Material -- fuer das Rissmoment, in mm.
 - [[opencivil.querschnitt.torsion]]
 - [[opencivil.querschnitt.werkstoffgesetz]]
 - [[opencivil.querschnitt.zugseite]]
+- [[opencivil.stahlprofile.lage]]
 
 ## Gebraucht von
 

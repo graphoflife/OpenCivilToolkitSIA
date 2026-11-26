@@ -1,5 +1,5 @@
 ---
-erzeugt: bd9431937c5a
+erzeugt: 6377e072284e
 art: modul
 tags: [modul]
 ---
@@ -25,7 +25,7 @@ Rechteck, Kreis, Kreisring, Rechteckrohr, T-Querschnitt (Flansch oben),
 Doppel-T und Trapez. Jede ist symmetrisch zur senkrechten Achse `z`;
 `h` ist die Hoehe, entlang `z`, `b` die Breite, entlang `y`. Die
 Seiten der Formeln heissen wie bei den Stahlprofilen
-([[opencivil.stabwerk.profilformen]]) -- nur die von `I_y` ohne «um y»:
+([[opencivil.stahlprofile.formen]]) -- nur die von `I_y` ohne «um y»:
 so hiessen sie, bevor es `I_z` gab.
 
 Daneben: Kennwerte von Hand, der Streifen einer Platte (`b × h`, mit den
@@ -90,7 +90,7 @@ class Stabvorlage
 - `schluessel: str`
 - `name: str`
 - `masse: Tuple[Mass, ...]`
-- `formeln: Tuple[Kennformel, ...]` – In der Reihenfolge, in der gerechnet wird -- darunter `A`, `I_y`, `I_z` und `I_T`, bei einer Vorlage wie bei einem Stahlprofil ([[opencivil.stabwerk.profilformen]]).
+- `formeln: Tuple[Kennformel, ...]` – In der Reihenfolge, in der gerechnet wird -- darunter `A`, `I_y`, `I_z` und `I_T`, bei einer Vorlage wie bei einem Stahlprofil ([[opencivil.stahlprofile.formen]]).
 - `pruefung: Callable[[Masse], Optional[str]]`
 - `umriss: Callable[[Masse], List[List[Tuple[float, float]]]]` – Die Umrisse fuer das Bild, in mm -- der erste aussen, die weiteren Loecher.
 
@@ -163,7 +163,7 @@ def vorlage(schluessel: str) -> Stabvorlage
 
 - `EINS = Groesse(1.0, EINHEITSLOS)` – Eins ohne Einheit -- fuer `1 - x` mit Groessen.
 - `RECHTECKTORSION = '@s \\cdot \\left(@t\\right)^{3} \\cdot \\left(\\frac{1}{3} - 0.21 \\…` – Was ein Rechteck zum Torsionstraegheitsmoment beitraegt, mit der kuerzeren Seite `t` und der laengeren `s` -- die Naeherung von Roark (Dateikopf).
-- `ROHRTORSION = ('\\frac{\\left(@t\\right)^{3} \\cdot @p_m}{3} + \\frac{4 \\cdot \\le…` – Das Torsionstraegheitsmoment eines Rechteckrohrs: offen und geschlossen (Bredt), mit dem Umfang `p_m` und der umschlossenen Flaeche `A_m` der Mittellinie -- auch beim kaltgefertigten Rohr ([[opencivil.stabwerk.profilformen|profilformen]]).
+- `ROHRTORSION = ('\\frac{\\left(@t\\right)^{3} \\cdot @p_m}{3} + \\frac{4 \\cdot \\le…` – Das Torsionstraegheitsmoment eines Rechteckrohrs: offen und geschlossen (Bredt), mit dem Umfang `p_m` und der umschlossenen Flaeche `A_m` der Mittellinie -- auch beim kaltgefertigten Rohr ([[opencivil.stahlprofile.formen|formen]]).
 - `RECHTECK = Stabvorlage(schluessel='rechteck', name='Rechteck', masse=(Mass('b', …` – Rechteck: b breit, h hoch.
 - `KREIS = Stabvorlage(schluessel='kreis', name='Kreis', masse=(Mass('d', 'd', '…` – Kreis: Durchmesser d.
 - `KREISRING = Stabvorlage(schluessel='kreisring', name='Kreisring', masse=(Mass('D'…` – Kreisring: aussen D, Wand t.
@@ -182,9 +182,9 @@ def vorlage(schluessel: str) -> Stabvorlage
 ## Gebraucht von
 
 - [[opencivil.projekt.staebe]]
-- [[opencivil.stabwerk.profilformen]]
-- [[opencivil.stabwerk.profiltabelle]]
 - [[opencivil.stabwerk.stabquerschnitt]]
+- [[opencivil.stahlprofile.formen]]
+- [[opencivil.stahlprofile.tabelle]]
 - [[opencivil.web.systemkatalog]]
 
 ## Formeln aus diesem Modul

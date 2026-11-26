@@ -226,6 +226,12 @@ dialog.dialogfenster .fenster-kopf { top: 0; }
 }
 /* Eine Stellung mit Bild (`zeichen`), etwa die Rechenart: Spannung über Dehnung. */
 .schalter-halb > .sinnbild { width: 18px; height: 18px; flex: none; }
+/* Die Reihen der Stahlprofile, je mit dem Umriss ihres mittleren Profils
+   (profilwahl.js): das Bild über dem Namen, und sie brechen um -- auch in
+   einem Fenster, das rollt: dort drückte es den Schalter sonst auf seine
+   Mindesthöhe zusammen. */
+.schalter.ist-reihen { flex-wrap: wrap; flex-shrink: 0; }
+.schalter.ist-reihen .schalter-halb { flex-direction: column; gap: 1px; padding: 3px 4px 2px; font-size: 11px; }
 .schalter:hover:not(:disabled) .schalter-halb:not(.ist-an) { color: var(--schrift-matt); }
 /* Noch nichts zu wählen (`aus`), etwa «von Hand» ohne gerechneten Wert. */
 .schalter:disabled { opacity: .5; }

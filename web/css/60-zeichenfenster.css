@@ -183,12 +183,15 @@
 }
 
 /* Eigenschaften: Beschriftung, Eingabe, Einheit. */
-.cad-zeile { display: grid; grid-template-columns: 74px auto minmax(0, 1fr); gap: 5px; align-items: center; }
+/* Die Eingabe darf schmaler werden als ihr Inhalt: eine Liste mit langem
+   Text -- «noch kein Baustahl im Projekt» -- kürzt sich, statt das Fenster
+   breiter zu drücken, als es ist. */
+.cad-zeile { display: grid; grid-template-columns: 74px minmax(0, auto) minmax(0, 1fr); gap: 5px; align-items: center; }
 /* Eine Richtung des Lagers: nur ein Zeichen vor dem Schalter, eingerückt
    unter «Lager». */
 .cad-zeile.ist-richtung { grid-template-columns: 22px auto; padding-left: 8px; }
-.cad-palette .wahlblock { margin-bottom: 0; }
-.cad-palette .wahlblock-titel { font-size: 12px; color: var(--schrift-matt); }
+.cad-palette .wahlblock, .cad-dialog .wahlblock { margin-bottom: 0; }
+.cad-palette .wahlblock-titel, .cad-dialog .wahlblock-titel { font-size: 12px; color: var(--schrift-matt); }
 .cad-zeile > span:first-child {
   color: var(--schrift-matt); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
@@ -236,6 +239,9 @@
 }
 .cad-dialog-kopf { display: flex; align-items: center; justify-content: space-between; font-weight: 700; }
 .cad-dialog-fuss { display: flex; justify-content: flex-end; gap: 6px; }
+/* Zeilen, die sich zusammen neu bauen -- Drehung und Spiegeln eines
+   Profils --, im Fenster wie jede andere Zeile. */
+.cad-dialog-gruppe { display: contents; }
 .cad-vorlagen { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; }
 .cad-vorlagenknopf {
   display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 4px 2px 3px;
@@ -245,7 +251,7 @@
 }
 .cad-vorlagenknopf:hover { border-color: var(--blau); background: var(--blau-hell); }
 .cad-vorlagenknopf.ist-an { border-color: var(--blau); background: var(--blau-hell); color: var(--blau-tief); font-weight: 700; }
-.cad-dialog .cad-zeile { grid-template-columns: 112px auto minmax(0, 1fr); }
+.cad-dialog .cad-zeile { grid-template-columns: 112px minmax(0, auto) minmax(0, 1fr); }
 .cad-vorlagenskizze {
   display: flex; justify-content: center; min-height: 140px;
   border: 1px solid var(--rand); border-radius: 5px; background: #fff;

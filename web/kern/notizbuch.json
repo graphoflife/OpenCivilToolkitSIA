@@ -7661,6 +7661,15 @@
       ]
     },
     {
+      "name": "opencivil.projekt.profile",
+      "pfad": "Python/opencivil.projekt.profile.md",
+      "art": "modul",
+      "kurz": "ein Stahlprofil, wie die Oberflaeche es beschreibt.",
+      "stichworte": [
+        "ProfilEintrag"
+      ]
+    },
+    {
       "name": "opencivil.projekt.projekt",
       "pfad": "Python/opencivil.projekt.projekt.md",
       "art": "modul",
@@ -7744,6 +7753,7 @@
         "QAKnickEintrag",
         "QASpannungsfallEintrag",
         "Elemente",
+        "Elemente.flaechen",
         "QuerschnittsanalyseEintrag",
         "QuerschnittsanalyseEintrag.materialien",
         "QuerschnittsanalyseEintrag.leer",
@@ -7752,6 +7762,7 @@
         "QuerschnittsanalyseEintrag._knoten",
         "QuerschnittsanalyseEintrag._kennung",
         "QuerschnittsanalyseEintrag.polygon",
+        "QuerschnittsanalyseEintrag.profil",
         "QuerschnittsanalyseEintrag.stab",
         "QuerschnittsanalyseEintrag.spannglied",
         "QuerschnittsanalyseEintrag.stablinie",
@@ -8375,6 +8386,7 @@
         "Mass.als_dict",
         "Teile",
         "Teile.als_dict",
+        "masslinie",
         "kreispunkte",
         "rechteckpunkte",
         "t_punkte",
@@ -8827,37 +8839,6 @@
       ]
     },
     {
-      "name": "opencivil.stabwerk.profilformen",
-      "pfad": "Python/opencivil.stabwerk.profilformen.md",
-      "art": "modul",
-      "kurz": "die Formen der Stahlprofile, mit ihren Formeln.",
-      "stichworte": [
-        "_zwickel",
-        "_u_torsion",
-        "_rohr_traegheit",
-        "ausgerundet",
-        "_u_umriss",
-        "_in_cm"
-      ]
-    },
-    {
-      "name": "opencivil.stabwerk.profiltabelle",
-      "pfad": "Python/opencivil.stabwerk.profiltabelle.md",
-      "art": "modul",
-      "kurz": "welche Stahlprofile es gibt, mit ihren Massen.",
-      "stichworte": [
-        "Profil",
-        "Profil.form",
-        "Profilreihe",
-        "_z",
-        "_unp",
-        "_rrk",
-        "_benannt",
-        "reihe",
-        "profil"
-      ]
-    },
-    {
       "name": "opencivil.stabwerk.querschnitte",
       "pfad": "Python/opencivil.stabwerk.querschnitte.md",
       "art": "modul",
@@ -9140,6 +9121,60 @@
       ]
     },
     {
+      "name": "opencivil.stahlprofile",
+      "pfad": "Python/opencivil.stahlprofile.md",
+      "art": "modul",
+      "kurz": "die Stahlprofile: ihre Formen, welche es gibt, wie eines im Querschnitt liegt.",
+      "stichworte": []
+    },
+    {
+      "name": "opencivil.stahlprofile.formen",
+      "pfad": "Python/opencivil.stahlprofile.formen.md",
+      "art": "modul",
+      "kurz": "die Formen der Stahlprofile, mit ihren Formeln.",
+      "stichworte": [
+        "_zwickel",
+        "_u_torsion",
+        "_rohr_traegheit",
+        "ausgerundet",
+        "_u_umriss",
+        "_in_cm"
+      ]
+    },
+    {
+      "name": "opencivil.stahlprofile.lage",
+      "pfad": "Python/opencivil.stahlprofile.lage.md",
+      "art": "modul",
+      "kurz": "ein Stahlprofil im gezeichneten Querschnitt.",
+      "stichworte": [
+        "_lokal",
+        "umrisse",
+        "_gleich",
+        "drehbar",
+        "spiegelbar",
+        "beschreibung",
+        "fangpunkte",
+        "skizze"
+      ]
+    },
+    {
+      "name": "opencivil.stahlprofile.tabelle",
+      "pfad": "Python/opencivil.stahlprofile.tabelle.md",
+      "art": "modul",
+      "kurz": "welche Stahlprofile es gibt, mit ihren Massen.",
+      "stichworte": [
+        "Profil",
+        "Profil.form",
+        "Profilreihe",
+        "_z",
+        "_unp",
+        "_rrk",
+        "_benannt",
+        "reihe",
+        "profil"
+      ]
+    },
+    {
       "name": "opencivil.web",
       "pfad": "Python/opencivil.web.md",
       "art": "modul",
@@ -9331,6 +9366,7 @@
         "balkensystem_bearbeiten",
         "_vorlagenwahl",
         "vorlage",
+        "_profilskizze",
         "vorlage_einsetzen",
         "bearbeite",
         "bearbeite_json"
@@ -9497,6 +9533,8 @@
       "kurz": "die Zeichnung einer Querschnittsanalyse, wie der Kern sie sieht.",
       "stichworte": [
         "geometrie",
+        "_tiefen",
+        "_profil",
         "_als_satz",
         "_Glieder",
         "_spannglieder"

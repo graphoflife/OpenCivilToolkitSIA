@@ -10,6 +10,8 @@
  *                oder ein einzelner Stab -- wie, sagt der Schalter in ihrem
  *                Fenster
  *   Spannstahl   ein Spannglied je Klick (qa_spannglied.js)
+ *   (Profil)     ein Stahlprofil der Tabelle -- ohne Werkzeug: eingesetzt
+ *                wird es mit der Vorlage «Stahlprofil» (qa_profile.js)
  *   Schubwand    eine Linie mit Dicke und Bügeln
  *   Hilfslinie   eine Linie, die nicht mitrechnet
  *   Hilfspunkt   ein Knoten ohne Element, zum Fangen
@@ -38,12 +40,15 @@ import {
 } from './cad_ansicht.js';
 import {
   auswahlEigenschaften, cadApp, cadBereichMitListe, frischeAntwort, jaNein, kernfehler, laengenzeile,
-  meldungenJe, meldungszeilen, mitTitel, umrissVon, vorgabe, zahlfeldMitVar, zugleich,
+  lagefelder, meldungenJe, meldungszeilen, mitTitel, umrissVon, vorgabe, zahlfeldMitVar, zugleich,
 } from './cad_app.js';
 import { cadZeile } from './cad_palette.js';
 import {
   abstand, eckeSchluessel, knotenname,
 } from './cad_modell.js';
+import {
+  PROFIL, profilFang, profilFelder, profilInfo, profilPfad, profilUmriss,
+} from './qa_profile.js';
 import {
   SPANNGLIED, SPANNSTAHL, gliedFelder, gliedInfo, gliedText, gliedVorgabe, vorgabePruefen,
 } from './qa_spannglied.js';
@@ -80,6 +85,7 @@ const ARTEN = [
   },
   { liste: 'schubwaende', klasse: 'schubwand', form: 'linie', vorsilbe: 'L', rang: 2 },
   { liste: 'hilfslinien', klasse: 'hilfslinie', form: 'linie', vorsilbe: 'L', rang: 3 },
+  PROFIL,
 ];
 
 /** Unter welchem Namen der Katalog die Elemente einer Liste führt. */
@@ -277,12 +283,14 @@ function adapter(kennung) {
     zeichnen,
     punktVorschau,
     linienVorschau,
-    // Der Schwerpunkt und die Ecken der Überdeckung (Benutzer, 2026-10-23).
+    // Der Schwerpunkt und die Ecken der Überdeckung (Benutzer, 2026-10-23),
+    // dazu der Rahmen jedes Profils: so legt sich eine Platte auf den Flansch.
     fangpunkte: (a) => {
       const g = frischeAntwort(a);
       return [
         ...(g?.brutto ? [{ p: [g.brutto.y_S, g.brutto.z_S] }] : []),
         ...(g?.polygone || []).flatMap((x) => (x.ueberdeckung || []).map((p) => ({ p }))),
+        ...profilFang(a, eintragVon(kennung)),
       ];
     },
     trefferradius: (a, art, e) => {
@@ -290,11 +298,12 @@ function adapter(kennung) {
       if (art.liste === 'spannglieder') return gliedDurchmesser(a, e) / 2;
       return 0;
     },
-    umriss: () => umriss(eintragVon(kennung)),
+    punktUmriss: (a, art, e) => (art === PROFIL ? profilUmriss(a, e) : null),
+    umriss: (a) => umriss(a, eintragVon(kennung)),
     fragen: () => api.geometrie(zustand.projekt, kennung),
     nehmen: (a, antwort) => {
-      a.qa.namen = new Map([antwort.polygone, antwort.staebe, antwort.spannglieder, antwort.linien,
-        antwort.waende, antwort.hilfslinien].flatMap((liste) => (liste || []).map((x) => [x.kennung, x.element])));
+      a.qa.namen = new Map([antwort.polygone, antwort.profile, antwort.staebe, antwort.spannglieder,
+        antwort.linien, antwort.waende, antwort.hilfslinien].flatMap((liste) => (liste || []).map((x) => [x.kennung, x.element])));
       // Aus Holz statt Beton: die Analyse zeigt andere Kacheln (`ohneNachweiseVon`,
       // `ohneAnalysenVon`).
       const vorher = a.adapter.kern.antwort;
@@ -362,9 +371,10 @@ function flaecheAnlegen(a, z, knoten) {
   return kennung;
 }
 
-/** Was im Bild sein soll: alle Knoten -- sonst ein Meter im Quadrat. */
-function umriss(analyse) {
-  return umrissVon((analyse?.knoten || []).map((k) => [k.y, k.z]), [[0, 0], [1000, 1000]]);
+/** Was im Bild sein soll: alle Knoten und Profile -- sonst ein Meter im Quadrat. */
+function umriss(a, analyse) {
+  return umrissVon([...(analyse?.knoten || []).map((k) => [k.y, k.z]),
+    ...(analyse?.profile || []).flatMap((e) => profilUmriss(a, e)?.[0] || [])], [[0, 0], [1000, 1000]]);
 }
 
 // ===========================================================================
@@ -419,17 +429,6 @@ export function linienText(linie, info) {
   return `${n} ⌀${zahlText(linie.durchmesser)}${teilung ? ` @ ${teilung}` : ''}`;
 }
 
-/** Wie tief ein Polygon verschachtelt ist -- Eltern zuerst, damit Kinder darüber liegen. */
-function tiefe(polygone, i) {
-  let t = 0;
-  let j = polygone?.[i]?.eltern;
-  while (j !== null && j !== undefined && t < 50) {
-    t += 1;
-    j = polygone[j]?.eltern;
-  }
-  return t;
-}
-
 /**
  * Rot, was der Kern beanstandet, mit seinen Sätzen als Titel; was nur noch
  * fehlt -- ein Material, das zu wählen ist --, färbt nicht: die Meldung
@@ -453,19 +452,25 @@ function zeichnen(a, g) {
   defs.append(schraffur);
   g.append(defs);
 
-  // Flächen: die äusseren zuerst. Die Tiefe kommt vom Kern -- auch aus einer
-  // älteren Antwort, solange es gleich viele Polygone sind.
-  const tiefeVon = new Map();
-  if (roh?.polygone?.length === z.flaechen.length) {
-    roh.polygone.forEach((p, i) => tiefeVon.set(p.kennung, tiefe(roh.polygone, i)));
-  }
-  const flaechen = [...z.flaechen].sort((p, q) => (tiefeVon.get(p.kennung) || 0) - (tiefeVon.get(q.kennung) || 0));
-  for (const f of flaechen) {
-    const punkte = f.knoten.map(ort);
-    if (punkte.length < 2 || punkte.some((p) => !p)) continue;
-    g.append(mitTitel(svgEl('path', {
-      d: pfad(a.v, punkte), class: klassen(f.kennung, flaechenklasse(f.material)),
-    }), texte(f.kennung)));
+  // Flächen und Profile: die äusseren zuerst, damit die inneren darüber
+  // liegen. Wie tief jedes liegt, sagt der Kern -- auch eine ältere Antwort;
+  // was er noch nicht kennt, liegt zuunterst. Ein Profil ist aus Baustahl,
+  // sein Loch ausgespart; einen Namen, den die Tabelle nicht kennt, zeigt
+  // ein roter Punkt an seiner Mitte.
+  const tiefe = new Map([...(roh?.polygone || []), ...(roh?.profile || [])].map((x) => [x.kennung, x.tiefe]));
+  const flaechen = [
+    ...z.flaechen.map((f) => {
+      const punkte = f.knoten.map(ort);
+      const gibt = punkte.length >= 2 && punkte.every(Boolean);
+      return gibt && { kennung: f.kennung, d: pfad(a.v, punkte), klasse: flaechenklasse(f.material) };
+    }),
+    ...z.profile.map((e) => {
+      const d = profilPfad(a, e);
+      return d && { kennung: e.kennung, d, klasse: 'cad-baustahl', 'fill-rule': 'evenodd' };
+    }),
+  ].filter(Boolean).sort((p, q) => (tiefe.get(p.kennung) ?? 0) - (tiefe.get(q.kennung) ?? 0));
+  for (const { kennung, klasse, ...pfadwerte } of flaechen) {
+    g.append(mitTitel(svgEl('path', { ...pfadwerte, class: klassen(kennung, klasse) }), texte(kennung)));
   }
 
   // Die Überdeckung: das gerückte Polygon, gepunktet -- eine Hilfe zum
@@ -532,6 +537,12 @@ function zeichnen(a, g) {
         texte(s.kennung)));
     }
   }
+  for (const e of z.profile) {
+    const p = ort(e.knoten);
+    if (p && !profilUmriss(a, e)) {
+      g.append(mitTitel(stabKreis(a, p, 0, klassen(e.kennung, 'cad-baustahl')), texte(e.kennung)));
+    }
+  }
 
   const masse = masseZeichnen(a, z, ort);
   if (masse) g.append(masse);
@@ -547,9 +558,10 @@ function zeichnen(a, g) {
   }
 }
 
-/** Breite und Höhe dessen, was Material hat -- eine Masslinie unten, eine links. */
+/** Breite und Höhe dessen, was Material hat -- auch der Profile --: eine Masslinie unten, eine links. */
 function masseZeichnen(a, z, ort) {
-  const punkte = z.flaechen.filter((f) => f.material).flatMap((f) => f.knoten.map(ort)).filter(Boolean);
+  const punkte = [...z.flaechen.filter((f) => f.material).flatMap((f) => f.knoten.map(ort)),
+    ...z.profile.flatMap((e) => profilUmriss(a, e)?.[0] || [])].filter(Boolean);
   if (punkte.length < 2) return null;
   const ys = punkte.map((p) => p[0]);
   const zs = punkte.map((p) => p[1]);
@@ -608,6 +620,7 @@ function linienVorschau(a, g, p, q, werkzeug) {
  */
 function felderVon(liste, wert, setzen, info = null) {
   if (liste === 'spannglieder') return gliedFelder(wert, setzen, info);
+  if (liste === 'profile') return profilFelder(wert, setzen, info);
   const durchmesser = katalog('durchmesser');
   const zahl = (feld, titel, optionen = {}) => zahlfeldMitVar({
     wert: wert(feld), titel, schritt: 1, angabe: feldangabe(klasseVon(liste), feld), ...optionen,
@@ -758,18 +771,21 @@ function eigenschaften(a) {
  */
 function elementEigenschaften(a, z, kennungen, liste) {
   const { gewaehlt, wert, setzen } = zugleich(a, z, liste, kennungen);
+  // Ein Profil hängt mit seiner Mitte an einem Knoten: ihre Lage steht bei ihm.
+  const mitte = liste === 'profile' ? lagefelder(a, z, kennungen, 'Mitte ') : [];
   if (gewaehlt.length > 1) {
     return {
       titel: `${gewaehlt.length} × ${artText(liste, wert('material'))}`,
-      inhalt: felderVon(liste, wert, setzen).filter(Boolean),
+      inhalt: [...felderVon(liste, wert, setzen), ...mitte].filter(Boolean),
     };
   }
   const [e] = gewaehlt;
   const geo = frischeAntwort(a);
-  const info = [...(geo?.linien || []), ...(geo?.spannglieder || [])].find((x) => x.kennung === e.kennung);
+  const info = [...(geo?.linien || []), ...(geo?.spannglieder || []), ...(geo?.profile || [])]
+    .find((x) => x.kennung === e.kennung);
   return {
     titel: `${elementname(a, e.kennung)} · ${artText(liste, e.material, e)}`,
-    inhalt: [...felderVon(liste, wert, setzen, info), ...infozeilen(a, z, liste, e)].filter(Boolean),
+    inhalt: [...felderVon(liste, wert, setzen, info), ...mitte, ...infozeilen(a, z, liste, e)].filter(Boolean),
   };
 }
 
@@ -778,6 +794,7 @@ function artText(liste, material, e = null) {
   return {
     staebe: 'Punktbewehrung', stablinien: 'Linienbewehrung', schubwaende: 'Schubwand', hilfslinien: 'Hilfslinie',
     spannglieder: e ? gliedText(e) : 'Spannglied',
+    profile: e ? e.profil : 'Stahlprofil',
     flaechen: material === VAR ? 'Flächen' : (material ? stoffname(material) : 'Aussparung'),
   }[liste];
 }
@@ -804,6 +821,7 @@ function infozeilen(a, z, liste, e) {
     LINIENLISTEN.includes(liste) ? laengenzeile(a, z, e) : null,
     ...zeilen.map((t) => el('p.cad-info', { text: t })),
     ...(liste === 'spannglieder' ? gliedInfo(e, geo?.spannglieder?.find((x) => x.kennung === e.kennung)) : []),
+    ...(liste === 'profile' ? profilInfo(geo?.profile?.find((x) => x.kennung === e.kennung)) : []),
     ...meldungszeilen(a, [e.kennung]),
     e.ueberdeckung > 0 && polygon && !polygon.ueberdeckung
       ? el('p.cad-meldung', { text: 'Die Überdeckung ist zu gross: vom Polygon bleibt nichts übrig.' }) : null,

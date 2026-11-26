@@ -16,7 +16,7 @@ Rechteck, Kreis, Kreisring, Rechteckrohr, T-Querschnitt (Flansch oben),
 Doppel-T und Trapez. Jede ist symmetrisch zur senkrechten Achse ``z``;
 ``h`` ist die Hoehe, entlang ``z``, ``b`` die Breite, entlang ``y``. Die
 Seiten der Formeln heissen wie bei den Stahlprofilen
-(:mod:`opencivil.stabwerk.profilformen`) -- nur die von ``I_y`` ohne «um y»:
+(:mod:`opencivil.stahlprofile.formen`) -- nur die von ``I_y`` ohne «um y»:
 so hiessen sie, bevor es ``I_z`` gab.
 
 Daneben: Kennwerte von Hand, der Streifen einer Platte (``b × h``, mit den
@@ -86,7 +86,7 @@ class Stabvorlage:
     """
     In der Reihenfolge, in der gerechnet wird -- darunter ``A``, ``I_y``,
     ``I_z`` und ``I_T``, bei einer Vorlage wie bei einem Stahlprofil
-    (:mod:`opencivil.stabwerk.profilformen`).
+    (:mod:`opencivil.stahlprofile.formen`).
     """
 
     pruefung: Callable[[Masse], Optional[str]]
@@ -132,7 +132,7 @@ RECHTECKTORSION = (
 
 #: Das Torsionstraegheitsmoment eines Rechteckrohrs: offen und geschlossen
 #: (Bredt), mit dem Umfang ``p_m`` und der umschlossenen Flaeche ``A_m`` der
-#: Mittellinie -- auch beim kaltgefertigten Rohr (:mod:`~opencivil.stabwerk.profilformen`).
+#: Mittellinie -- auch beim kaltgefertigten Rohr (:mod:`~opencivil.stahlprofile.formen`).
 ROHRTORSION = (
     r"\frac{\left(@t\right)^{3} \cdot @p_m}{3} + \frac{4 \cdot \left(@A_m\right)^{2} \cdot @t}"
     r"{@p_m}",

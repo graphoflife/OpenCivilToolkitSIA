@@ -40,7 +40,7 @@ from opencivil.projekt.staebe import (
     MATERIAL_DES_QUERSCHNITTS, Querschnittsart, StabquerschnittBasis, aufgezaehlt,
 )
 from opencivil.spannungsanalyse.modul import ModulAusAnalyse, ModulAusPlatte, Modulfrage
-from opencivil.stabwerk.profiltabelle import PROFILE
+from opencivil.stahlprofile.tabelle import PROFILE
 from opencivil.stabwerk.rechnung import Balkensystem, Materialkennwert, Stabmaterial
 from opencivil.stabwerk.stabquerschnitt import (
     AusAnalyse, AusPlatte, NachVorlage, Stabquerschnitt, VonHand,

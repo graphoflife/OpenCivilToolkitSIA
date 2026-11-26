@@ -1,5 +1,5 @@
 ---
-erzeugt: 0855aca28c61
+erzeugt: f9cca44b7f24
 art: modul
 tags: [modul]
 ---
@@ -18,7 +18,7 @@ Welche Kennwerte, sagt das System: der ebene Rahmen braucht `A` und `I`
 * nach Vorlage ([[opencivil.stabwerk.stabquerschnitt#NachVorlage|NachVorlage]]) -- die Formeln der Vorlage
   ([[opencivil.stabwerk.querschnitte|querschnitte]]), die Masse als Vorgaben; ein
   Stahlprofil ebenso, mit den Massen aus der Tabelle
-  ([[opencivil.stabwerk.profilformen|profilformen]]). Das `I` des ebenen Rahmens
+  ([[opencivil.stahlprofile.formen|formen]]). Das `I` des ebenen Rahmens
   ist ihr `I_y` -- bei einem Profil, das sich um z biegt, ihr `I_z`;
 * von Hand ([[opencivil.stabwerk.stabquerschnitt#VonHand|VonHand]]) -- die Kennwerte als Eingaben;
 * aus einer Platte ([[opencivil.stabwerk.stabquerschnitt#AusPlatte|AusPlatte]]) -- die Formeln des Rechtecks mit

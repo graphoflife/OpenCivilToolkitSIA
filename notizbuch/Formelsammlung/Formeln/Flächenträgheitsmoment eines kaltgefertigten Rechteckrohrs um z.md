@@ -1,5 +1,5 @@
 ---
-erzeugt: 46bd6fe8bfcc
+erzeugt: b79d1085d2fa
 art: formel
 tags: [formel]
 ---
@@ -36,7 +36,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.stabwerk.profilformen#_rohr_traegheit|_rohr_traegheit]]
+- [[opencivil.stahlprofile.formen#_rohr_traegheit|_rohr_traegheit]]
 
 ## Themen
 

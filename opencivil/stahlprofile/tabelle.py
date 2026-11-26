@@ -1,10 +1,10 @@
 """
-opencivil/stabwerk/profiltabelle.py -- welche Stahlprofile es gibt, mit ihren Massen.
+opencivil/stahlprofile/tabelle.py -- welche Stahlprofile es gibt, mit ihren Massen.
 
 VERANTWORTUNG:
 Die Reihen der Walzprofile und Rohre und je Groesse ihre Masse in mm. Was
 daraus gerechnet wird, sagt die Form der Reihe
-(:mod:`opencivil.stabwerk.profilformen`); gesucht wird ein Profil nach seinem
+(:mod:`opencivil.stahlprofile.formen`); gesucht wird ein Profil nach seinem
 Namen (:func:`profil`).
 
 QUELLE:
@@ -26,7 +26,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Callable, Dict, List, Mapping, Tuple
 
-from opencivil.stabwerk.profilformen import (
+from opencivil.stahlprofile.formen import (
     I_PROFIL, RECHTECKROHR_KALT, RUNDROHR, U_GENEIGT, U_PARALLEL,
 )
 from opencivil.stabwerk.querschnitte import Stabvorlage

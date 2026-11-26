@@ -1,5 +1,5 @@
 ---
-erzeugt: 703c422bbb3f
+erzeugt: 7ca2bb69d292
 art: modul
 tags: [modul]
 ---
@@ -128,6 +128,14 @@ Was eine Vorlage baut -- in mm, der Ursprung unten links.
 def als_dict(self) -> dict
 ```
 
+### masslinie
+
+```python
+def masslinie(von: Punkt, bis: Punkt, name: str, wert: float, seite: str) -> dict
+```
+
+Eine Masslinie der Skizze, «b = 300», auf der `seite` neben dem Bauteil -- auch fuer ein Stahlprofil.
+
 ### kreispunkte
 
 ```python
@@ -215,7 +223,8 @@ Die Vorlage zu einem Schluessel -- `ValueError`, wenn es sie nicht gibt.
 
 - [[opencivil.pfahl.innen]]
 - [[opencivil.projekt.querschnittsanalyse]]
-- [[opencivil.stabwerk.profilformen]]
 - [[opencivil.stabwerk.querschnitte]]
+- [[opencivil.stahlprofile.formen]]
+- [[opencivil.stahlprofile.lage]]
 - [[opencivil.web.api]]
 - [[opencivil.web.dienst]]

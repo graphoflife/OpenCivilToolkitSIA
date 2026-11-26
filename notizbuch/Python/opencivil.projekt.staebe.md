@@ -1,5 +1,5 @@
 ---
-erzeugt: ef5c6b329f92
+erzeugt: f93790c79131
 art: modul
 tags: [modul]
 ---
@@ -156,7 +156,7 @@ abwies -- dreimal nachgebessert.
 - `vorlage: str = einer_von((v.schluessel for v in qs.VORLAGEN), qs.RECHTECK.schluessel)`
 - `masse: Dict[str, float] = field(default_factory=dict)` – Die Masse der Vorlage in mm -- was fehlt, gilt mit ihrer Vorgabe.
 - `kennwerte: Dict[str, float] = field(default_factory=dict)` – `A` in mm², Traegheitsmomente in 10⁶ mm⁴ -- welche, sagt [[opencivil.projekt.staebe#StabquerschnittBasis|KENNWERTE]].
-- `profil: str = 'IPE 300'` – Der Name des Stahlprofils ([[opencivil.stabwerk.profiltabelle]]). Kein Wahlfeld, damit die Meldung nicht alle 666 Profile aufzaehlt: einen unbekannten Namen meldet der Aufbau, wie eine Platte, die es nicht gibt.
+- `profil: str = 'IPE 300'` – Der Name des Stahlprofils ([[opencivil.stahlprofile.tabelle]]). Kein Wahlfeld, damit die Meldung nicht alle 666 Profile aufzaehlt: einen unbekannten Namen meldet der Aufbau, wie eine Platte, die es nicht gibt.
 - `platte: str = ''` – Die Kennung der Platte, aus der er kommt.
 - `analyse: str = ''` – Die Kennung der Querschnittsanalyse, aus der er kommt.
 - `e_modul: str = einer_von(E_MODULE, 'e0')` – Welches E ein Stab hat, der das Material dieses Querschnitts nimmt: `e0` -- E_cm seines Betons -- oder `e_eq`, wie `eq` sagt. Ein Material bringt nur einer aus einer Platte oder Analyse mit; bei einer Form wartet die Wahl, bis er zurueckschaltet.
@@ -506,9 +506,9 @@ Ob eine Last ihr Vorzeichen wechselt, wenn ihre Linie umgekehrt wird.
 - [[opencivil.projekt.netz]]
 - [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.stabwerk.modell]]
-- [[opencivil.stabwerk.profiltabelle]]
 - [[opencivil.stabwerk.querschnitte]]
 - [[opencivil.stabwerk.stabquerschnitt]]
+- [[opencivil.stahlprofile.tabelle]]
 
 ## Gebraucht von
 

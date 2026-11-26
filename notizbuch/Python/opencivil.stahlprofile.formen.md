@@ -1,11 +1,11 @@
 ---
-erzeugt: 0792435819fc
+erzeugt: 6dc29bf5b37c
 art: modul
 tags: [modul]
 ---
-> [!abstract] opencivil/stabwerk/profilformen.py
+> [!abstract] opencivil/stahlprofile/formen.py
 > die Formen der Stahlprofile, mit ihren Formeln.
-> Paket [[opencivil.stabwerk]] · [Quelltext](../../opencivil/stabwerk/profilformen.py)
+> Paket [[opencivil.stahlprofile]] · [Quelltext](../../opencivil/stahlprofile/formen.py)
 
 ## VERANTWORTUNG
 
@@ -13,7 +13,9 @@ Je Form eines Walzprofils oder Rohrs die Masse und die Formeln fuer `A`,
 `I_y`, `I_z` und `I_T` -- als Vorlage in Zeichen und als Rechnung, wie
 bei den Vorlagen der Stabquerschnitte ([[opencivil.stabwerk.querschnitte]]),
 deren [[opencivil.stabwerk.querschnitte#Stabvorlage|Stabvorlage]] sie sind. Welche Groessen es gibt, sagt die
-Profiltabelle ([[opencivil.stabwerk.profiltabelle]]).
+Profiltabelle ([[opencivil.stahlprofile.tabelle]]). Dazu je Form ihr
+Umriss: das Bild im Balkensystem, die Flaeche in der Querschnittsanalyse
+([[opencivil.stahlprofile.lage]]).
 
 
 ## DIE FORMEN
@@ -35,7 +37,7 @@ senkrechte. `e_y` ist der Abstand des Schwerpunkts vom Ruecken des U.
 nach Vorgabe, nicht nachgeschlagen
 Die Formeln der I- und UPE-Profile und der Rohre sind die der Tabelle des
 Benutzers («Festigkeitsnachweise I-Standardprofile Stahl», 2019-04-15), mit
-denselben gerundeten Beiwerten der Ausrundungen ([[opencivil.stabwerk.profilformen#Konstanten|ZWICKEL]]). Beim UNP
+denselben gerundeten Beiwerten der Ausrundungen ([[opencivil.stahlprofile.formen#Konstanten|ZWICKEL]]). Beim UNP
 hat die Tabelle nur Werte, keine Formeln: gerechnet wird mit geneigten
 Flanschen als Trapezen und den Ecken wie beim rechten Winkel. Das trifft
 die Werte der Tabelle auf 0.6 % (A, I_y) und 1.4 % (e_y, I_z); das I_T des
@@ -108,7 +110,8 @@ Eine Formel der Vorlagen, in den Einheiten der Profile: Flaechen in cm², Moment
 ## Konstanten
 
 - `ZWICKEL = (0.2146, 0.2234, 0.00755)` – Der Zwickel zwischen zwei Kanten im rechten Winkel und einem Viertelkreis mit Radius r, gerundet wie in der Tabelle: Flaeche 0.2146 r² (1 - π/4), Abstand des Schwerpunkts von jeder Kante 0.2234 r ((10 - 3π)/(12 - 3π)), Traegheitsmoment um den eigenen Schwerpunkt 0.00755 r⁴ (1/3 - π/16 - 1/(3(12 - 3π))) -- um beide Achsen dasselbe.
-- `BOGENECKEN = 6` – Je Viertelkreis eines Umrisses so viele Ecken -- fuer das Bild genug.
+- `BOGENECKEN = 12` – Je Viertelkreis eines Umrisses so viele Ecken. Die Querschnittsanalyse rechnet mit dem Umriss ([[opencivil.stahlprofile.lage|lage]]): mit 12 trifft er A und I der Tabelle bei den I- und UPE-Profilen auf 0.06 %, beim RRK auf 0.33 % -- mit 6, wie bis 2026-11-26 fuer das Bild, waren es 0.24 % und 1.3 %.
+- `ROHRECKEN = 96` – So viele Ecken hat der Umriss eines Rundrohrs -- doppelt so viele wie ein Kreis der Vorlagen ([[opencivil.querschnitt.vorlagen#Konstanten|KREISECKEN]]): A trifft dann die Tabelle auf 0.08 %, I auf 0.15 %.
 - `_RRK = 'kaltgefertigten Rechteckrohrs'`
 - `_I = 'I-Profils'`
 - `I_PROFIL = Stabvorlage(schluessel='i_profil', name='I-Profil', masse=(Mass('h', …` – I-Profil -- IPE, HEA, HEB, HEM: Steg und zwei gleiche Flansche, vier Ausrundungen r.
@@ -117,7 +120,7 @@ Eine Formel der Vorlagen, in den Einheiten der Profile: Flaechen in cm², Moment
 - `_UNP = 'U-Profils mit geneigten Flanschen'`
 - `U_GENEIGT = Stabvorlage(schluessel='u_geneigt', name='U-Profil mit geneigten Flan…` – U-Profil mit geneigten Flanschen -- UNP: die Flansche innen um `p` geneigt, `t_f` gilt im Abstand `c` vom Ruecken; am Steg die Ausrundung `r_1`, an der Spitze die Rundung `r_2`.
 - `RECHTECKROHR_KALT = Stabvorlage(schluessel='rechteckrohr_kalt', name='Rechteckrohr, kaltg…` – Rechteckrohr, kaltgefertigt -- RRK: Wand `t` ringsum, die Ecken aussen mit `r_o`, innen mit `r_i` gerundet; `h` steht senkrecht.
-- `RUNDROHR = Stabvorlage(schluessel='rundrohr', name='Rundrohr', masse=KREISRING.m…` – Rundrohr -- ROR: aussen `D`, Wand `t`; die Formeln und Seiten des Kreisrings, nur in cm² und cm⁴.
+- `RUNDROHR = Stabvorlage(schluessel='rundrohr', name='Rundrohr', masse=KREISRING.m…` – Rundrohr -- ROR: aussen `D`, Wand `t`; die Formeln und Seiten des Kreisrings, nur in cm² und cm⁴, der Umriss feiner ([[opencivil.stahlprofile.formen#Konstanten|ROHRECKEN]]).
 - `PROFILFORMEN = (I_PROFIL, U_PARALLEL, U_GENEIGT, RECHTECKROHR_KALT, RUNDROHR)`
 
 ## Braucht
@@ -128,7 +131,7 @@ Eine Formel der Vorlagen, in den Einheiten der Profile: Flaechen in cm², Moment
 
 ## Gebraucht von
 
-- [[opencivil.stabwerk.profiltabelle]]
+- [[opencivil.stahlprofile.tabelle]]
 
 ## Formeln aus diesem Modul
 

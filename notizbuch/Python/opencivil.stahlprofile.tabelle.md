@@ -1,18 +1,18 @@
 ---
-erzeugt: e6f6c2b8905b
+erzeugt: 09a9bf32f81c
 art: modul
 tags: [modul]
 ---
-> [!abstract] opencivil/stabwerk/profiltabelle.py
+> [!abstract] opencivil/stahlprofile/tabelle.py
 > welche Stahlprofile es gibt, mit ihren Massen.
-> Paket [[opencivil.stabwerk]] · [Quelltext](../../opencivil/stabwerk/profiltabelle.py)
+> Paket [[opencivil.stahlprofile]] · [Quelltext](../../opencivil/stahlprofile/tabelle.py)
 
 ## VERANTWORTUNG
 
 Die Reihen der Walzprofile und Rohre und je Groesse ihre Masse in mm. Was
 daraus gerechnet wird, sagt die Form der Reihe
-([[opencivil.stabwerk.profilformen]]); gesucht wird ein Profil nach seinem
-Namen ([[opencivil.stabwerk.profiltabelle#profil|profil]]).
+([[opencivil.stahlprofile.formen]]); gesucht wird ein Profil nach seinem
+Namen ([[opencivil.stahlprofile.tabelle#profil|profil]]).
 
 
 ## QUELLE
@@ -125,11 +125,13 @@ Das Profil dieses Namens -- ein unbekannter ist ein `KeyError`, der es sagt.
 
 ## Braucht
 
-- [[opencivil.stabwerk.profilformen]]
 - [[opencivil.stabwerk.querschnitte]]
+- [[opencivil.stahlprofile.formen]]
 
 ## Gebraucht von
 
 - [[opencivil.projekt.aufbau.balkensystem]]
+- [[opencivil.projekt.querschnittsanalyse]]
 - [[opencivil.projekt.staebe]]
-- [[opencivil.web.systemkatalog]]
+- [[opencivil.stahlprofile.lage]]
+- [[opencivil.web.api]]

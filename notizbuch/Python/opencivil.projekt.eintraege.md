@@ -1,5 +1,5 @@
 ---
-erzeugt: 6bf1f89b7b8a
+erzeugt: 7b491365ddbf
 art: modul
 tags: [modul]
 ---
@@ -650,6 +650,7 @@ Eine zu pruefende Schnittgroessenkombination.
 - [[opencivil.projekt.grundbruch]]
 - [[opencivil.projekt.pfahl]]
 - [[opencivil.projekt.platte]]
+- [[opencivil.projekt.profile]]
 - [[opencivil.projekt.projekt]]
 - [[opencivil.projekt.querschnittsanalyse]]
 - [[opencivil.projekt.setzung]]

@@ -281,7 +281,7 @@ Fertig und getestet (am 2026-11-21: 2145 Tests):
 | `stabwerk/system` | das ganze System: Unbekannte, Gelenke, Federn, Linienlager, Knoten auf Stäben, Kombinationen, Lagerkräfte, Gleichgewichtsprobe |
 | `stabwerk/verlauf` | N, V, M und Biegelinie längs der Stäbe als Polynome, mit Extremwerten |
 | `stabwerk/querschnitte` | die Querschnitte der Stäbe nach Vorlage, mit ihren Formeln |
-| `stabwerk/profilformen`, `profiltabelle` | die Stahlprofile: je Form (I, U, Rechteck- und Rundrohr) die Masse und die Formeln für A, I_y, I_z und I_T, und welche Grössen es gibt |
+| `stahlprofile/` | die Stahlprofile, für Balkensystem und Querschnittsanalyse: je Form (I, U, Rechteck- und Rundrohr) die Masse und die Formeln für A, I_y, I_z und I_T (`formen`), welche Grössen es gibt (`tabelle`), und wie ein Profil im gezeichneten Querschnitt liegt – sein Umriss aus Mitte, Drehung und Spiegeln (`lage`) |
 | `stabwerk/rechnung`, `herleitung` | das Balkensystem im Rechenwerk und wie es seine Rechnung aufschreibt |
 | `stabwerk3d/` | das Balkensystem im Raum: Vektoren (`raum`), die Beschreibung in SI (`modell`), der Stab als drei ebene (`stab`), das System mit sechs Unbekannten je Knoten (`system`), die Verläufe (`verlauf`), im Rechenwerk (`rechnung`) und wie es seine Rechnung aufschreibt (`herleitung`) |
 | `decke/` | eine Decke nach der Streifenmethode: die Beschreibung in SI (`modell`), die Streifen und ihre Träger (`streifen`), wie die Last auf die Richtungen und Streifen geht (`aufteilung`, `lasten`), jeder Streifen als Durchlaufträger (`traeger`), Fall für Fall von unten nach oben (`rechnung`), die Schnittkräfte der Platte an einer Stelle und wo Bilder und Bericht hinsehen (`feld`), im Rechenwerk (`werk`) und wie sie ihre Rechnung aufschreibt (`herleitung`) |

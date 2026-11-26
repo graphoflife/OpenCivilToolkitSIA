@@ -1,5 +1,5 @@
 ---
-erzeugt: 6f1f5fe7bfcf
+erzeugt: a941d7e0526f
 art: modul
 tags: [modul]
 ---
@@ -240,6 +240,7 @@ Je Querschnitt eines Systems, wo A und I stehen -- und je Paar aus Querschnitt u
 - [[opencivil.projekt.grundbruch]]
 - [[opencivil.projekt.lesen]]
 - [[opencivil.projekt.pfahl]]
+- [[opencivil.projekt.profile]]
 - [[opencivil.projekt.projekt]]
 - [[opencivil.projekt.querschnittsanalyse]]
 - [[opencivil.projekt.setzung]]
@@ -253,6 +254,8 @@ Je Querschnitt eines Systems, wo A und I stehen -- und je Paar aus Querschnitt u
 - [[opencivil.spannungsanalyse]]
 - [[opencivil.stabwerk.rechnung]]
 - [[opencivil.stabwerk3d.rechnung]]
+- [[opencivil.stahlprofile.lage]]
+- [[opencivil.stahlprofile.tabelle]]
 - [[opencivil.web.anzeige]]
 - [[opencivil.web.balkendaten]]
 - [[opencivil.web.diagrammdaten]]

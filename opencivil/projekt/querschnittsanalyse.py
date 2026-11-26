@@ -2,9 +2,10 @@
 opencivil/projekt/querschnittsanalyse.py -- ein gezeichneter Querschnitt, wie die Oberflaeche ihn beschreibt.
 
 VERANTWORTUNG:
-Der :class:`QuerschnittsanalyseEintrag`: Knoten, Polygone mit Material, Staebe
-und Stablinien, Spannglieder (:mod:`opencivil.projekt.spannglieder`),
-Schubwaende, Hilfslinien, die Wahl der Werkstoffgesetze, die
+Der :class:`QuerschnittsanalyseEintrag`: Knoten, Polygone mit Material,
+Stahlprofile (:mod:`opencivil.projekt.profile`), Staebe und Stablinien,
+Spannglieder (:mod:`opencivil.projekt.spannglieder`), Schubwaende,
+Hilfslinien, die Wahl der Werkstoffgesetze, die
 Lastfaelle und die Schalter der Nachweise -- als eine speicherbare
 Datenklasse, wie die Platte in :mod:`opencivil.projekt.platte`. Dazu die
 Vorlage einer frischen Analyse und ein Baukasten, der ohne Oberflaeche
@@ -12,11 +13,11 @@ zeichnet (:meth:`QuerschnittsanalyseEintrag.polygon` und folgende).
 
 KNOTEN:
 Die Elemente tragen keine eigenen Koordinaten, sie verweisen auf Knoten --
-ein Polygon auf seine Ecken, ein Stab auf seine Lage, eine Linie auf Anfang
-und Ende. Wer einen Knoten verschiebt, verschiebt alles, was an ihm haengt.
-Jedes Element hat eine Kennung, die nie wiederkommt (:mod:`opencivil.projekt.netz`):
-K fuer Knoten, F fuer Flaechen, S fuer Staebe, P fuer Spannglieder, L fuer
-alle Linien.
+ein Polygon auf seine Ecken, ein Stab auf seine Lage, ein Profil auf seine
+Mitte, eine Linie auf Anfang und Ende. Wer einen Knoten verschiebt,
+verschiebt alles, was an ihm haengt. Jedes Element hat eine Kennung, die nie
+wiederkommt (:mod:`opencivil.projekt.netz`): K fuer Knoten, F fuer Flaechen,
+R fuer Stahlprofile, S fuer Staebe, P fuer Spannglieder, L fuer alle Linien.
 
 KOORDINATEN UND EINHEITEN:
 y nach rechts, z nach oben, alles in Millimetern -- so, wie gezeichnet und
@@ -52,10 +53,13 @@ from opencivil.projekt.eintraege import (
 from opencivil.projekt.fallnamen import Fallnamen
 from opencivil.core.einheiten import KN, KNM, MM, MM2
 from opencivil.projekt.lesen import (
-    ProjektFehler, bereich, einer_von, je_material, materialfeld, ort_von, teil,
+    ProjektFehler, bereich, einer_von, je_material, materialfeld, ort_von, stoffe_des_felds, teil,
 )
 from opencivil.projekt.netz import Netz, neue_kennung
+from opencivil.projekt.profile import ProfilEintrag
 from opencivil.projekt.spannglieder import SpanngliedEintrag
+from opencivil.stahlprofile import lage as profillage
+from opencivil.stahlprofile import tabelle as profiltabelle
 
 #: Schnitte eines Buegels durch eine Schubwand: so viele Schenkel kreuzen sie.
 SCHNITTE = range(1, 9)
@@ -313,8 +317,8 @@ class Elemente:
     Die Elemente einer Analyse, so wie der Kern sie prueft und rechnet:
     Koordinaten in mm, und je Element ``name`` und ``kennung``.
 
-    Der Name zaehlt je Art ab 1 -- «Polygon 1», «Aussparung 2», «Stab 1»,
-    «Linie 1», «Wand 3» -- und steht so in Berichten und Meldungen. Die
+    Der Name zaehlt je Art ab 1 -- «Polygon 1», «Aussparung 2», «Profil 1»,
+    «Stab 1», «Linie 1», «Wand 3» -- und steht so in Berichten und Meldungen. Die
     Kennung ist die des Elements (``F1``, ``L4``); an ihr erkennt die
     Oberflaeche, welches gemeint ist. Die Namen werden hier vergeben und
     nirgends sonst -- vorher entstanden sie an fuenf Stellen.
@@ -342,8 +346,42 @@ class Elemente:
     hilfslinien: List[dict] = field(default_factory=list)
     """Je Hilfslinie ``von`` und ``bis`` -- gerechnet wird mit ihnen nichts."""
 
+    profile: List[dict] = field(default_factory=list)
+    """
+    Je Stahlprofil die Felder der Beschreibung, ``lage`` als Punkt -- die
+    Mitte --, dazu ``umrisse`` in der Zeichnung (der erste aussen, dann die
+    Loecher) und ``beschreibung``: «HEB 300, um 90° gedreht»
+    (:mod:`opencivil.stahlprofile.lage`).
+    """
+
     fehler: List[dict] = field(default_factory=list)
     """Was sich nicht aufloesen liess: ``text`` und ``elemente`` (Kennungen), wie eine Meldung."""
+
+    @property
+    def flaechen(self) -> List[dict]:
+        """
+        Jede Flaeche, wie Pruefung und Rechnung sie sehen: erst die Polygone,
+        in ihrer Folge, dann je Profil sein Umriss aus Baustahl und seine
+        Loecher als Aussparungen, «Profil 1, innen». Je Flaeche ``name``,
+        ``kennung`` (beim Profil auch die des Lochs), ``punkte``,
+        ``aussparung``, ``material``, ``stoffe`` -- die Arten von Material,
+        die das Element nimmt --, ``ueberdeckung`` (beim Profil null) und
+        ``herkunft``: beim Profil, was es ist. Ein Polygon ohne Material ist
+        eine Aussparung, ein Profil ohne Baustahl nicht: ihm fehlt die Wahl.
+        Die Rechnung kennt nur Flaechen; ein Profil ist eine wie jede.
+        """
+        flaeche, profil = (stoffe_des_felds(FlaecheEintrag, "material"),
+                           stoffe_des_felds(ProfilEintrag, "stahl"))
+        teile = [{**f, "aussparung": not f["material"], "stoffe": flaeche, "herkunft": ""}
+                 for f in self.polygone]
+        for p in self.profile:
+            aussen, *loecher = p["umrisse"]
+            teil = {"kennung": p["kennung"], "stoffe": profil, "ueberdeckung": 0.0}
+            teile.append({**teil, "name": p["name"], "punkte": tuple(aussen), "aussparung": False,
+                          "material": p["stahl"], "herkunft": p["beschreibung"]})
+            teile += [{**teil, "name": f"{p['name']}, innen", "punkte": tuple(loch),
+                       "aussparung": True, "material": "", "herkunft": ""} for loch in loecher]
+        return teile
 
 
 # ===========================================================================
@@ -364,6 +402,7 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben, JeMaterial):
 
     knoten: List[KnotenEintrag] = field(default_factory=list)
     flaechen: List[FlaecheEintrag] = field(default_factory=list)
+    profile: List[ProfilEintrag] = field(default_factory=list)
     staebe: List[StabEintrag] = field(default_factory=list)
     stablinien: List[StablinieEintrag] = field(default_factory=list)
     spannglieder: List[SpanngliedEintrag] = field(default_factory=list)
@@ -431,6 +470,7 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben, JeMaterial):
         """
         gesehen: List[str] = []
         for kennung in ([f.material for f in self.flaechen]
+                        + [p.stahl for p in self.profile]
                         + [s.stahl for s in self.staebe]
                         + [l.stahl for l in self.stablinien]
                         + [w.stahl for w in self.schubwaende]
@@ -442,14 +482,14 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben, JeMaterial):
     @property
     def leer(self) -> bool:
         """
-        Ob noch nichts gezeichnet ist, was traegt: keine Flaeche, kein Stab,
-        keine Stablinie, kein Spannglied, keine Schubwand. Knoten und
-        Hilfslinien allein sind Bauhilfen. So beginnt eine neue Analyse
+        Ob noch nichts gezeichnet ist, was traegt: keine Flaeche, kein Profil,
+        kein Stab, keine Stablinie, kein Spannglied, keine Schubwand. Knoten
+        und Hilfslinien allein sind Bauhilfen. So beginnt eine neue Analyse
         (Benutzer, 2026-10-19), und so gibt es nichts zu rechnen -- aber auch
         keinen Fehler.
         """
-        return not (self.flaechen or self.staebe or self.stablinien or self.spannglieder
-                    or self.schubwaende)
+        return not (self.flaechen or self.profile or self.staebe or self.stablinien
+                    or self.spannglieder or self.schubwaende)
 
     def elemente(self) -> Elemente:
         """Die Elemente mit Name und Kennung, Koordinaten in mm -- siehe :class:`Elemente`."""
@@ -487,7 +527,7 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben, JeMaterial):
                     return None
             return [lage[v] for v in verweise]
 
-        polygone, staebe, linien, waende, hilfslinien, glieder = [], [], [], [], [], []
+        polygone, staebe, linien, waende, hilfslinien, glieder, profile = [], [], [], [], [], [], []
         # Je Element sein Wort und seine Nummer, wie in Meldungen ueber seine
         # Felder (``IM_ORT``); ein Polygon ohne Material ist eine Aussparung.
         for i, f in enumerate(self.flaechen, start=1):
@@ -496,6 +536,21 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben, JeMaterial):
             if ecken is not None:
                 polygone.append(benannt(name, f.kennung, punkte=tuple(ecken),
                                         material=f.material, ueberdeckung=f.ueberdeckung))
+        for i, p in enumerate(self.profile, start=1):
+            name = f"{p.IM_ORT} {i}"
+            ort = orte(name, p.kennung, p.knoten)
+            if ort is None:
+                continue
+            try:
+                umrisse = profillage.umrisse(p.profil, ort[0], p.drehung, p.gespiegelt)
+            except KeyError:
+                fehler.append({"text": f"{name}: das Profil «{p.profil}» gibt es in der "
+                                       f"Tabelle nicht.", "elemente": [p.kennung or name]})
+                continue
+            profile.append(benannt(
+                name, p.kennung, lage=ort[0], profil=p.profil, stahl=p.stahl,
+                drehung=p.drehung, gespiegelt=p.gespiegelt, umrisse=umrisse,
+                beschreibung=profillage.beschreibung(p.profil, p.drehung, p.gespiegelt)))
         for i, s in enumerate(self.staebe, start=1):
             name = f"{s.IM_ORT} {i}"
             ort = orte(name, s.kennung, s.knoten)
@@ -533,7 +588,8 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben, JeMaterial):
             if ende is not None:
                 hilfslinien.append(benannt(name, h.kennung, von=ende[0], bis=ende[1]))
         return Elemente(polygone=polygone, staebe=staebe, linien=linien, waende=waende,
-                        spannglieder=glieder, hilfslinien=hilfslinien, fehler=fehler)
+                        spannglieder=glieder, hilfslinien=hilfslinien, profile=profile,
+                        fehler=fehler)
 
     # -- Zeichnen ohne Oberflaeche -------------------------------------------
 
@@ -550,7 +606,8 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben, JeMaterial):
 
     def _kennung(self, vorsilbe: str) -> str:
         """Die naechste Kennung -- alle Linien zaehlen gemeinsam, ob Bewehrung, Wand oder Hilfslinie."""
-        listen = {"F": [self.flaechen], "S": [self.staebe], "P": [self.spannglieder],
+        listen = {"F": [self.flaechen], "R": [self.profile], "S": [self.staebe],
+                  "P": [self.spannglieder],
                   "L": [self.stablinien, self.schubwaende, self.hilfslinien]}[vorsilbe]
         return neue_kennung(self, vorsilbe, (e.kennung for liste in listen for e in liste))
 
@@ -561,6 +618,22 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben, JeMaterial):
                                  knoten=[self._knoten(netz, p) for p in punkte],
                                  material=material)
         self.flaechen.append(eintrag)
+        return eintrag
+
+    def profil(self, y: float, z: float, profil: str, **felder: Any) -> ProfilEintrag:
+        """
+        Ein Stahlprofil der Tabelle, «HEB 300», die Mitte bei ``(y, z)``; die
+        Felder wie :class:`ProfilEintrag`. Einen Namen, den die Tabelle nicht
+        kennt, sagt ein :class:`ProjektFehler` -- wie im Balkensystem.
+        """
+        try:
+            profiltabelle.profil(profil)
+        except KeyError as fehler:
+            raise ProjektFehler(fehler.args[0]) from None
+        eintrag = ProfilEintrag.aus_dict(
+            {"kennung": self._kennung("R"), "knoten": self._knoten(self.netz(), (y, z)),
+             "profil": profil, **felder}, f"{ort_von(self)}, profile")
+        self.profile.append(eintrag)
         return eintrag
 
     def stab(self, y: float, z: float, **felder: Any) -> StabEintrag:

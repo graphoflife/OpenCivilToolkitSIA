@@ -1,5 +1,5 @@
 ---
-erzeugt: fbf810c765c9
+erzeugt: 4aa973b24d94
 art: modul
 tags: [modul]
 ---
@@ -68,6 +68,7 @@ alldem die Formelsammlung und diese Seiten.
 - [[opencivil.spannungsanalyse]] – den Querschnitt ansehen, ohne ihn nachzuweisen.
 - [[opencivil.stabwerk]] – Stabwerke nach der Steifigkeitsmethode, eben und im Raum.
 - [[opencivil.stabwerk3d]] – was ein Stabwerk im Raum braucht.
+- [[opencivil.stahlprofile]] – die Stahlprofile: ihre Formen, welche es gibt, wie eines im Querschnitt liegt.
 - [[opencivil.web]] – die Oberflaeche, von der Seite des Rechenkerns.
 
 ## Braucht

@@ -25,6 +25,11 @@
  *
  * Getroffen wird im Bild, in Bildpunkten -- im Raum trifft ein Klick, was
  * man an dieser Stelle sieht, vorne oder hinten.
+ *
+ * Ein Punkt kann eine Fläche haben -- ein Stahlprofil an seiner Mitte: den
+ * Umriss sagt der Adapter (`punktUmriss`). Dann trifft, wählt und zeigt er
+ * sich wie eine Fläche, ein Klick in sein Loch trifft ihn nicht; bewegt wird
+ * er wie ein Punkt, mit seinem Knoten.
  */
 
 import { nachBild, pfad } from './cad_ansicht.js';
@@ -52,6 +57,19 @@ export function istAnhang(a, schluessel) {
 export function ohneAnhaenge(a) {
   a.auswahl = new Set([...a.auswahl].filter((s) => !istAnhang(a, s)));
   return a.auswahl.size > 0;
+}
+
+/**
+ * Die Umrisse eines Punkts mit Fläche in der Zeichnung, der erste aussen,
+ * die weiteren Löcher -- sonst null: ein Stab ist ein Kreis (`trefferradius`).
+ */
+export function teileVon(a, art, e) {
+  return (art.form === 'punkt' && a.adapter.punktUmriss?.(a, art, e)) || null;
+}
+
+/** Dieselben im Bild, in Bildpunkten -- oder null. */
+function bildteile(a, art, e) {
+  return teileVon(a, art, e)?.map((teil) => teil.map((p) => nachBild(a.v, p))) || null;
 }
 
 /** Wo die Knoten im Bild liegen: Kennung -> [x, y] in Bildpunkten. */
@@ -113,14 +131,20 @@ export function treffer(a, bild) {
   for (const { art, e } of m.elemente(z)) {
     const orte = m.verweise(art, e).map((k) => lagen.get(k));
     if (orte.some((p) => !p) || !waehlbar(art, e)) continue;
-    if (art.form === 'punkt') {
+    const teile = bildteile(a, art, e);
+    if (art.form === 'punkt' && !teile) {
       const d = abstand(bild, orte[0]);
       if (d <= radius(art, e)) punkte.push({ kennung: e.kennung, d });
     } else if (art.form === 'linie') {
       const d = abstand(bild, aufStrecke(bild, orte[0], orte[1]).q);
       if (d <= radius(art, e)) linien.push({ kennung: e.kennung, d });
-    } else if (orte.length >= 3 && innen(bild, orte)) {
-      flaechen.push({ kennung: e.kennung, d: Math.abs(flaecheVon(orte)) });
+    } else {
+      // Eine Fläche, auch ein Punkt mit Fläche: getroffen, wo sie Fläche hat, nicht in ihrem Loch.
+      const [aussen, ...loecher] = teile || [orte];
+      if (aussen.length >= 3 && innen(bild, aussen) && !loecher.some((loch) => innen(bild, loch))) {
+        const netto = loecher.reduce((s, loch) => s - Math.abs(flaecheVon(loch)), Math.abs(flaecheVon(aussen)));
+        flaechen.push({ kennung: e.kennung, d: netto });
+      }
     }
   }
   const nach = (x, y) => x.d - y.d;
@@ -205,14 +229,18 @@ export function rahmenWaehlen(a, start, ende, dazu) {
   for (const { art, e } of m.elemente(z)) {
     const orte = m.verweise(art, e).map((k) => lagen.get(k));
     if (orte.some((x) => !x) || !(a.adapter.waehlbar?.(art, e) ?? true)) continue;
+    const teile = bildteile(a, art, e);
     let gewaehlt;
-    if (art.form === 'punkt') gewaehlt = streckeImRechteck(orte[0], orte[0], rechteck, true);
+    if (art.form === 'punkt' && !teile) gewaehlt = streckeImRechteck(orte[0], orte[0], rechteck, true);
     else if (art.form === 'linie') gewaehlt = streckeImRechteck(orte[0], orte[1], rechteck, ganz);
     else {
-      const kanten = orte.map((x, i) => [x, orte[(i + 1) % orte.length]]);
-      gewaehlt = ganz ? kanten.every(([s, t]) => streckeImRechteck(s, t, rechteck, true))
-        : kanten.some(([s, t]) => streckeImRechteck(s, t, rechteck, false))
-          || innen([rechteck[0], rechteck[1]], orte);
+      // Eine Fläche, auch ein Punkt mit Fläche: der Rand seines Lochs ist auch Rand.
+      const [aussen, ...loecher] = teile || [orte];
+      const kanten = (t) => t.map((x, i) => [x, t[(i + 1) % t.length]]);
+      const ecke = [rechteck[0], rechteck[1]];
+      gewaehlt = ganz ? kanten(aussen).every(([s, t]) => streckeImRechteck(s, t, rechteck, true))
+        : [aussen, ...loecher].some((t) => kanten(t).some(([s, q]) => streckeImRechteck(s, q, rechteck, false)))
+          || (innen(ecke, aussen) && !loecher.some((loch) => innen(ecke, loch)));
     }
     if (gewaehlt) {
       neu.add(e.kennung);
@@ -266,7 +294,10 @@ export function hervorheben(a, kennungen, klasse) {
       g.prepend(svgEl('path', { d: pfad(a.v, orte, art.form === 'flaeche'), class: 'cad-eigner' }));
       continue;
     }
-    if (art.form === 'punkt') {
+    const teile = teileVon(a, art, e);
+    if (teile) {
+      g.append(svgEl('path', { d: teile.map((teil) => pfad(a.v, teil)).join(' '), 'fill-rule': 'evenodd' }));
+    } else if (art.form === 'punkt') {
       const [x, y] = nachBild(a.v, orte[0]);
       const r = Math.max(5, (a.adapter.trefferradius?.(a, art, e) || 0) * a.v.massstab + 3);
       g.append(svgEl('circle', { cx: x, cy: y, r }));
@@ -287,7 +318,9 @@ function auswahlRahmen(a) {
   for (const k of z.knoten || []) if (a.auswahl.has(k.kennung)) punkte.push(m.lage(k));
   for (const x of m.ecken(z)) {
     const p = lagen.get(x.knoten);
-    if (p && (a.auswahl.has(x.e.kennung) || a.auswahl.has(x.schluessel))) punkte.push(p);
+    if (p && (a.auswahl.has(x.e.kennung) || a.auswahl.has(x.schluessel))) {
+      punkte.push(...(teileVon(a, x.art, x.e)?.[0] || [p]));
+    }
   }
   const bild = punkte.map((p) => nachBild(a.v, p));
   // Gewählte Anhänge liegen dort, wo die App sie zeichnet.

@@ -45,7 +45,7 @@ from opencivil.projekt.lesen import (
 )
 from opencivil.querschnitt.gesetzwahl import Rechenart, Werkstoffsatz
 from opencivil.projekt.netz import Netz, neue_kennung
-from opencivil.stabwerk import profiltabelle
+from opencivil.stahlprofile import tabelle
 from opencivil.stabwerk import querschnitte as qs
 from opencivil.stabwerk.modell import Lastart
 from opencivil.stabwerk.stabquerschnitt import Kennwert
@@ -187,7 +187,7 @@ class StabquerschnittBasis(Beschreibung):
 
     profil: str = "IPE 300"
     """
-    Der Name des Stahlprofils (:mod:`opencivil.stabwerk.profiltabelle`). Kein
+    Der Name des Stahlprofils (:mod:`opencivil.stahlprofile.tabelle`). Kein
     Wahlfeld, damit die Meldung nicht alle 666 Profile aufzaehlt: einen
     unbekannten Namen meldet der Aufbau, wie eine Platte, die es nicht gibt.
     """
@@ -489,7 +489,7 @@ class MitStaeben:
     def stahlprofil(self, name: str, profil: str, **felder: Any) -> Any:
         """Ein Stahlprofil aus der Tabelle, «HEB 300» -- Felder wie die Klasse der Querschnitte."""
         try:
-            profiltabelle.profil(profil)
+            tabelle.profil(profil)
         except KeyError as fehler:
             raise ProjektFehler(fehler.args[0]) from None
         eintrag = self._gelesen(self.QUERSCHNITT, {

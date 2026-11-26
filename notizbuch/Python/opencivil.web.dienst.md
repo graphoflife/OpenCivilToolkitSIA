@@ -1,5 +1,5 @@
 ---
-erzeugt: c6e733774360
+erzeugt: a35a3384ac5f
 art: modul
 tags: [modul]
 ---
@@ -379,7 +379,19 @@ def vorlage(rumpf: Mapping[str, Any]) -> Dict[str, Any]
 Die Teile einer Vorlage zu den eingestellten Massen -- fuer die Skizze,
 waehrend man tippt. Passen die Masse nicht zueinander, steht der Grund in
 `fehler` und es gibt keine Teile: das ist keine falsche Anfrage, nur
-eine unfertige Eingabe.
+eine unfertige Eingabe. Beim Stahlprofil das Profil ([[opencivil.web.dienst#_profilskizze|_profilskizze]]).
+
+### _profilskizze
+
+```python
+def _profilskizze(wahl: Mapping[str, Any]) -> Dict[str, Any]
+```
+
+Die Skizze eines Stahlprofils, gedreht und gespiegelt, mit seinen zwei
+Massen von aussen -- und ob Drehen und Spiegeln es aendern: sonst zeigt
+das Fenster die Schalter dafuer nicht. Eingesetzt wird es von der
+Oberflaeche, wie jedes Element eines Werkzeugs: es ist ein Eintrag an
+einem Knoten.
 
 ### vorlage_einsetzen
 
@@ -441,6 +453,7 @@ entspricht dem, was der Server ueber HTTP melden wuerde.
 - [[opencivil.projekt.staebe]]
 - [[opencivil.querschnitt.vorlagen]]
 - [[opencivil.querschnitt.widerstandsflaeche]]
+- [[opencivil.stahlprofile.lage]]
 - [[opencivil.web.api]]
 - [[opencivil.web.balkendaten]]
 - [[opencivil.web.deckendaten]]

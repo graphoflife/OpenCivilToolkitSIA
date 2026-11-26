@@ -21,7 +21,6 @@ from typing import Any, Dict
 from opencivil.projekt.balkensystem import EINHEIT_DER_LAST, HALT
 from opencivil.projekt.lesen import katalogname, wahl_von
 from opencivil.projekt.staebe import MATERIAL_DES_QUERSCHNITTS
-from opencivil.stabwerk import profiltabelle
 from opencivil.stabwerk.modell import Lastart
 from opencivil.stabwerk import querschnitte as stabquerschnitte
 from opencivil.stabwerk.rechnung import stoffkennwerte
@@ -97,11 +96,6 @@ def katalog(eintrag: type, rechnung: type, darstellung: Darstellung) -> Dict[str
                         for umriss in v.umriss(v.vorgaben())]}
             for v in stabquerschnitte.VORLAGEN
         ],
-        # Die Stahlprofile: je Reihe ihre Namen in der Folge der Tabelle
-        # -- die Masse kennt nur der Kern, das Bild kommt mit der Loesung.
-        "profilreihen": [{"kurz": r.kurz, "beschreibung": r.beschreibung,
-                          "profile": [p.name for p in r.profile]}
-                         for r in profiltabelle.PROFILREIHEN],
         # Um welche Achse sich ein Profil biegt -- nur in der Ebene; im Raum
         # dreht der Winkel β der Linie den Querschnitt.
         "profilachsen": ([{"wert": a.value, "beschriftung": a.kurz, "titel": a.beschriftung}

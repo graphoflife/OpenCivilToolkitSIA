@@ -133,7 +133,8 @@ class Teile:
         return asdict(self)
 
 
-def _mass(von: Punkt, bis: Punkt, name: str, wert: float, seite: str) -> dict:
+def masslinie(von: Punkt, bis: Punkt, name: str, wert: float, seite: str) -> dict:
+    """Eine Masslinie der Skizze, «b = 300», auf der ``seite`` neben dem Bauteil -- auch fuer ein Stahlprofil."""
     return {"von": von, "bis": bis, "text": f"{name} = {wert:g}", "seite": seite}
 
 
@@ -189,8 +190,8 @@ def _rechteck(m: Mapping[str, float], r: float) -> Teile:
         ],
         # Eine Wand ueber die ganze Breite: der Steg ist der Querschnitt.
         schubwaende=[{"von": (b / 2, r), "bis": (b / 2, h - r), "dicke": b}],
-        masslinien=[_mass((0.0, 0.0), (b, 0.0), "b", b, "unten"),
-                    _mass((0.0, 0.0), (0.0, h), "h", h, "links")],
+        masslinien=[masslinie((0.0, 0.0), (b, 0.0), "b", b, "unten"),
+                    masslinie((0.0, 0.0), (0.0, h), "h", h, "links")],
     )
 
 
@@ -213,10 +214,10 @@ def _tbalken(m: Mapping[str, float], r: float) -> Teile:
         ],
         # Der Steg bis in die Mitte des Flanschs.
         schubwaende=[{"von": (b / 2, r), "bis": (b / 2, h - hf / 2), "dicke": bw}],
-        masslinien=[_mass((0.0, h), (b, h), "b", b, "oben"),
-                    _mass((0.0, 0.0), (0.0, h), "h", h, "links"),
-                    _mass((y0, 0.0), (y0 + bw, 0.0), "b_w", bw, "unten"),
-                    _mass((b, h - hf), (b, h), "h_f", hf, "rechts")],
+        masslinien=[masslinie((0.0, h), (b, h), "b", b, "oben"),
+                    masslinie((0.0, 0.0), (0.0, h), "h", h, "links"),
+                    masslinie((y0, 0.0), (y0 + bw, 0.0), "b_w", bw, "unten"),
+                    masslinie((b, h - hf), (b, h), "h_f", hf, "rechts")],
     )
 
 
@@ -251,9 +252,9 @@ def _hohlkasten(m: Mapping[str, float], r: float) -> Teile:
             {"von": (b - halb, h - halb), "bis": (halb, h - halb), "dicke": t},
             {"von": (halb, h - halb), "bis": (halb, halb), "dicke": t},
         ],
-        masslinien=[_mass((0.0, 0.0), (b, 0.0), "b", b, "unten"),
-                    _mass((0.0, 0.0), (0.0, h), "h", h, "links"),
-                    _mass((b - t, h), (b, h), "t", t, "oben")],
+        masslinien=[masslinie((0.0, 0.0), (b, 0.0), "b", b, "unten"),
+                    masslinie((0.0, 0.0), (0.0, h), "h", h, "links"),
+                    masslinie((b - t, h), (b, h), "t", t, "oben")],
     )
 
 
@@ -272,7 +273,7 @@ def _kreis(m: Mapping[str, float], r: float) -> Teile:
         polygone=[{"punkte": kreispunkte(mitte, d / 2), "aussparung": False}],
         staebe=[{"lage": p, "durchmesser": 16.0}
                 for p in kreispunkte(mitte, d / 2 - r, int(m["n"]))],
-        masslinien=[_mass((0.0, 0.0), (d, 0.0), "D", d, "unten")],
+        masslinien=[masslinie((0.0, 0.0), (d, 0.0), "D", d, "unten")],
     )
 
 

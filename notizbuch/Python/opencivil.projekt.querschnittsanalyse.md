@@ -1,5 +1,5 @@
 ---
-erzeugt: f3482529be56
+erzeugt: 4e5a71c6dd37
 art: modul
 tags: [modul]
 ---
@@ -9,9 +9,10 @@ tags: [modul]
 
 ## VERANTWORTUNG
 
-Der [[opencivil.projekt.querschnittsanalyse#QuerschnittsanalyseEintrag|QuerschnittsanalyseEintrag]]: Knoten, Polygone mit Material, Staebe
-und Stablinien, Spannglieder ([[opencivil.projekt.spannglieder]]),
-Schubwaende, Hilfslinien, die Wahl der Werkstoffgesetze, die
+Der [[opencivil.projekt.querschnittsanalyse#QuerschnittsanalyseEintrag|QuerschnittsanalyseEintrag]]: Knoten, Polygone mit Material,
+Stahlprofile ([[opencivil.projekt.profile]]), Staebe und Stablinien,
+Spannglieder ([[opencivil.projekt.spannglieder]]), Schubwaende,
+Hilfslinien, die Wahl der Werkstoffgesetze, die
 Lastfaelle und die Schalter der Nachweise -- als eine speicherbare
 Datenklasse, wie die Platte in [[opencivil.projekt.platte]]. Dazu die
 Vorlage einer frischen Analyse und ein Baukasten, der ohne Oberflaeche
@@ -21,11 +22,11 @@ zeichnet ([[opencivil.projekt.querschnittsanalyse#QuerschnittsanalyseEintrag.pol
 ## KNOTEN
 
 Die Elemente tragen keine eigenen Koordinaten, sie verweisen auf Knoten --
-ein Polygon auf seine Ecken, ein Stab auf seine Lage, eine Linie auf Anfang
-und Ende. Wer einen Knoten verschiebt, verschiebt alles, was an ihm haengt.
-Jedes Element hat eine Kennung, die nie wiederkommt ([[opencivil.projekt.netz]]):
-K fuer Knoten, F fuer Flaechen, S fuer Staebe, P fuer Spannglieder, L fuer
-alle Linien.
+ein Polygon auf seine Ecken, ein Stab auf seine Lage, ein Profil auf seine
+Mitte, eine Linie auf Anfang und Ende. Wer einen Knoten verschiebt,
+verschiebt alles, was an ihm haengt. Jedes Element hat eine Kennung, die nie
+wiederkommt ([[opencivil.projekt.netz]]): K fuer Knoten, F fuer Flaechen,
+R fuer Stahlprofile, S fuer Staebe, P fuer Spannglieder, L fuer alle Linien.
 
 
 ## KOORDINATEN UND EINHEITEN
@@ -276,8 +277,8 @@ class Elemente
 Die Elemente einer Analyse, so wie der Kern sie prueft und rechnet:
 Koordinaten in mm, und je Element `name` und `kennung`.
 
-Der Name zaehlt je Art ab 1 -- «Polygon 1», «Aussparung 2», «Stab 1»,
-«Linie 1», «Wand 3» -- und steht so in Berichten und Meldungen. Die
+Der Name zaehlt je Art ab 1 -- «Polygon 1», «Aussparung 2», «Profil 1»,
+«Stab 1», «Linie 1», «Wand 3» -- und steht so in Berichten und Meldungen. Die
 Kennung ist die des Elements (`F1`, `L4`); an ihr erkennt die
 Oberflaeche, welches gemeint ist. Die Namen werden hier vergeben und
 nirgends sonst -- vorher entstanden sie an fuenf Stellen.
@@ -292,7 +293,25 @@ Elemente danach heissen weiter so wie vorher.
 - `waende: List[dict]` – Je Schubwand die Felder der Beschreibung, `von` und `bis` als Punkte.
 - `spannglieder: List[dict] = field(default_factory=list)` – Je Spannglied die Felder der Beschreibung, `lage` als Punkt.
 - `hilfslinien: List[dict] = field(default_factory=list)` – Je Hilfslinie `von` und `bis` -- gerechnet wird mit ihnen nichts.
+- `profile: List[dict] = field(default_factory=list)` – Je Stahlprofil die Felder der Beschreibung, `lage` als Punkt -- die Mitte --, dazu `umrisse` in der Zeichnung (der erste aussen, dann die Loecher) und `beschreibung`: «HEB 300, um 90° gedreht» ([[opencivil.stahlprofile.lage]]).
 - `fehler: List[dict] = field(default_factory=list)` – Was sich nicht aufloesen liess: `text` und `elemente` (Kennungen), wie eine Meldung.
+
+#### Elemente.flaechen
+
+```python
+@property
+def flaechen(self) -> List[dict]
+```
+
+Jede Flaeche, wie Pruefung und Rechnung sie sehen: erst die Polygone,
+in ihrer Folge, dann je Profil sein Umriss aus Baustahl und seine
+Loecher als Aussparungen, «Profil 1, innen». Je Flaeche `name`,
+`kennung` (beim Profil auch die des Lochs), `punkte`,
+`aussparung`, `material`, `stoffe` -- die Arten von Material,
+die das Element nimmt --, `ueberdeckung` (beim Profil null) und
+`herkunft`: beim Profil, was es ist. Ein Polygon ohne Material ist
+eine Aussparung, ein Profil ohne Baustahl nicht: ihm fehlt die Wahl.
+Die Rechnung kennt nur Flaechen; ein Profil ist eine wie jede.
 
 ### QuerschnittsanalyseEintrag
 
@@ -309,6 +328,7 @@ Was er mit der Platte gleich angibt, steht in der Grundlage
 - `STAMM = 'Querschnitt'`
 - `knoten: List[KnotenEintrag] = field(default_factory=list)`
 - `flaechen: List[FlaecheEintrag] = field(default_factory=list)`
+- `profile: List[ProfilEintrag] = field(default_factory=list)`
 - `staebe: List[StabEintrag] = field(default_factory=list)`
 - `stablinien: List[StablinieEintrag] = field(default_factory=list)`
 - `spannglieder: List[SpanngliedEintrag] = field(default_factory=list)`
@@ -345,9 +365,9 @@ naechste Aenderung machte daraus einen Fehler beim Rechnen.
 def leer(self) -> bool
 ```
 
-Ob noch nichts gezeichnet ist, was traegt: keine Flaeche, kein Stab,
-keine Stablinie, kein Spannglied, keine Schubwand. Knoten und
-Hilfslinien allein sind Bauhilfen. So beginnt eine neue Analyse
+Ob noch nichts gezeichnet ist, was traegt: keine Flaeche, kein Profil,
+kein Stab, keine Stablinie, kein Spannglied, keine Schubwand. Knoten
+und Hilfslinien allein sind Bauhilfen. So beginnt eine neue Analyse
 (Benutzer, 2026-10-19), und so gibt es nichts zu rechnen -- aber auch
 keinen Fehler.
 
@@ -390,6 +410,16 @@ def polygon(self, punkte: Sequence[Ort], material: str='') -> FlaecheEintrag
 ```
 
 Ein Polygon aus Ecken `[y, z]` in mm; ohne Material eine Aussparung.
+
+#### QuerschnittsanalyseEintrag.profil
+
+```python
+def profil(self, y: float, z: float, profil: str, **felder: Any) -> ProfilEintrag
+```
+
+Ein Stahlprofil der Tabelle, «HEB 300», die Mitte bei `(y, z)`; die
+Felder wie [[opencivil.projekt.profile#ProfilEintrag|ProfilEintrag]]. Einen Namen, den die Tabelle nicht
+kennt, sagt ein [[opencivil.projekt.lesen#ProjektFehler|ProjektFehler]] -- wie im Balkensystem.
 
 #### QuerschnittsanalyseEintrag.stab
 
@@ -516,11 +546,14 @@ Feldmoment; das Rechteck gibt es als Vorlage im Zeichenfenster.
 - [[opencivil.projekt.fallnamen]]
 - [[opencivil.projekt.lesen]]
 - [[opencivil.projekt.netz]]
+- [[opencivil.projekt.profile]]
 - [[opencivil.projekt.spannglieder]]
 - [[opencivil.querschnitt.geometrie]]
 - [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.vorlagen]]
 - [[opencivil.querschnitt.zugseite]]
+- [[opencivil.stahlprofile.lage]]
+- [[opencivil.stahlprofile.tabelle]]
 
 ## Gebraucht von
 

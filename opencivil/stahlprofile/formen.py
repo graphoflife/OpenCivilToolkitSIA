@@ -1,12 +1,14 @@
 """
-opencivil/stabwerk/profilformen.py -- die Formen der Stahlprofile, mit ihren Formeln.
+opencivil/stahlprofile/formen.py -- die Formen der Stahlprofile, mit ihren Formeln.
 
 VERANTWORTUNG:
 Je Form eines Walzprofils oder Rohrs die Masse und die Formeln fuer ``A``,
 ``I_y``, ``I_z`` und ``I_T`` -- als Vorlage in Zeichen und als Rechnung, wie
 bei den Vorlagen der Stabquerschnitte (:mod:`opencivil.stabwerk.querschnitte`),
 deren :class:`Stabvorlage` sie sind. Welche Groessen es gibt, sagt die
-Profiltabelle (:mod:`opencivil.stabwerk.profiltabelle`).
+Profiltabelle (:mod:`opencivil.stahlprofile.tabelle`). Dazu je Form ihr
+Umriss: das Bild im Balkensystem, die Flaeche in der Querschnittsanalyse
+(:mod:`opencivil.stahlprofile.lage`).
 
 DIE FORMEN:
 I-Profil (IPE, HEA, HEB, HEM), U-Profil mit parallelen Flanschen (UPE),
@@ -39,7 +41,7 @@ from dataclasses import replace
 from typing import List, Mapping, Sequence, Tuple
 
 from opencivil.core.einheiten import CM2, CM4, EINHEITSLOS, MIO_MM4, MM, MM2, PROZENT, Groesse
-from opencivil.querschnitt.vorlagen import Mass
+from opencivil.querschnitt.vorlagen import Mass, kreispunkte
 from opencivil.stabwerk.querschnitte import (
     EINS, KREISRING, ROHRTORSION, Kennformel, Stabvorlage,
 )
@@ -53,8 +55,16 @@ Punkt = Tuple[float, float]
 #: (1/3 - π/16 - 1/(3(12 - 3π))) -- um beide Achsen dasselbe.
 ZWICKEL = (0.2146, 0.2234, 0.00755)
 
-#: Je Viertelkreis eines Umrisses so viele Ecken -- fuer das Bild genug.
-BOGENECKEN = 6
+#: Je Viertelkreis eines Umrisses so viele Ecken. Die Querschnittsanalyse
+#: rechnet mit dem Umriss (:mod:`~opencivil.stahlprofile.lage`): mit 12 trifft
+#: er A und I der Tabelle bei den I- und UPE-Profilen auf 0.06 %, beim RRK auf
+#: 0.33 % -- mit 6, wie bis 2026-11-26 fuer das Bild, waren es 0.24 % und 1.3 %.
+BOGENECKEN = 12
+
+#: So viele Ecken hat der Umriss eines Rundrohrs -- doppelt so viele wie ein
+#: Kreis der Vorlagen (:data:`~opencivil.querschnitt.vorlagen.KREISECKEN`):
+#: A trifft dann die Tabelle auf 0.08 %, I auf 0.15 %.
+ROHRECKEN = 96
 
 _RRK = "kaltgefertigten Rechteckrohrs"
 
@@ -391,14 +401,20 @@ def _in_cm(f: Kennformel) -> Kennformel:
     return replace(f, einheit={MM2: CM2, MIO_MM4: CM4}.get(f.einheit, f.einheit), stellen=2)
 
 
+def _rundrohr_umriss(m: Mapping[str, float]) -> List[List[Punkt]]:
+    mitte = (m["D"] / 2, m["D"] / 2)
+    return [kreispunkte(mitte, m["D"] / 2, ROHRECKEN),
+            kreispunkte(mitte, m["D"] / 2 - m["t"], ROHRECKEN)]
+
+
 #: Rundrohr -- ROR: aussen ``D``, Wand ``t``; die Formeln und Seiten des
-#: Kreisrings, nur in cm² und cm⁴.
+#: Kreisrings, nur in cm² und cm⁴, der Umriss feiner (:data:`ROHRECKEN`).
 RUNDROHR = Stabvorlage(
     schluessel="rundrohr", name="Rundrohr",
     masse=KREISRING.masse,
     formeln=tuple(_in_cm(f) for f in KREISRING.formeln),
     pruefung=KREISRING.pruefung,
-    umriss=KREISRING.umriss,
+    umriss=_rundrohr_umriss,
 )
 
 PROFILFORMEN: Tuple[Stabvorlage, ...] = (I_PROFIL, U_PARALLEL, U_GENEIGT, RECHTECKROHR_KALT,

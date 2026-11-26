@@ -31,6 +31,7 @@
 import {
   nachBild, pfad, text, zahlText,
 } from './cad_ansicht.js';
+import { teileVon } from './cad_auswahl.js';
 import {
   abstand, aufStrecke, eckeSchluessel, entlang, minus,
 } from './cad_modell.js';
@@ -265,7 +266,10 @@ function auswahlGeometrie(a, nurGanze) {
     const ecken = m.verweise(art, e).map((k, i) => [lagen.get(k), bewegt ? bewegt.has(k) : (ganz
       || a.auswahl.has(art.form === 'punkt' ? e.kennung : eckeSchluessel(e.kennung, i)))]);
     if (ecken.some(([p]) => !p) || !ecken.some(([, mit]) => mit)) continue;
-    formen.push({ form: art.form, ecken });
+    // Ein Punkt mit Fläche, wie ein Stahlprofil: sein Umriss geht mit.
+    const teile = teileVon(a, art, e);
+    if (teile) formen.push(...teile.map((teil) => ({ form: 'flaeche', ecken: teil.map((p) => [p, true]) })));
+    else formen.push({ form: art.form, ecken });
   }
   for (const k of z.knoten || []) {
     if (a.auswahl.has(k.kennung)) formen.push({ form: 'punkt', ecken: [[m.lage(k), true]] });

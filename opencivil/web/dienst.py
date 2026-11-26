@@ -40,6 +40,7 @@ from opencivil.projekt.mappe import projekt_aus_datei
 from opencivil.projekt.staebe import MitStaeben
 from opencivil.querschnitt import vorlagen
 from opencivil.querschnitt.widerstandsflaeche import GROESSEN
+from opencivil.stahlprofile import lage as profillage
 from opencivil.web import (
     api, balkendaten, deckendaten, diagrammdaten, speicher, zeichengeometrie,
 )
@@ -624,13 +625,37 @@ def vorlage(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     Die Teile einer Vorlage zu den eingestellten Massen -- fuer die Skizze,
     waehrend man tippt. Passen die Masse nicht zueinander, steht der Grund in
     ``fehler`` und es gibt keine Teile: das ist keine falsche Anfrage, nur
-    eine unfertige Eingabe.
+    eine unfertige Eingabe. Beim Stahlprofil das Profil (:func:`_profilskizze`).
     """
+    wahl = rumpf.get("wahl") or {}
+    if wahl.get("art") == profillage.VORLAGE:
+        return _profilskizze(wahl)
     try:
         teile = _vorlage(rumpf).bauen(**_vorlagenwahl(rumpf))
     except ValueError as fehler:
         return {"fehler": str(fehler), "teile": None}
     return {"fehler": None, "teile": teile.als_dict()}
+
+
+def _profilskizze(wahl: Mapping[str, Any]) -> Dict[str, Any]:
+    """
+    Die Skizze eines Stahlprofils, gedreht und gespiegelt, mit seinen zwei
+    Massen von aussen -- und ob Drehen und Spiegeln es aendern: sonst zeigt
+    das Fenster die Schalter dafuer nicht. Eingesetzt wird es von der
+    Oberflaeche, wie jedes Element eines Werkzeugs: es ist ein Eintrag an
+    einem Knoten.
+    """
+    name = str(wahl.get("profil") or "")
+    drehung = wahl.get("drehung", 0)
+    if drehung not in profillage.DREHUNGEN:
+        raise DienstFehler(400, f"Ein Profil dreht sich um "
+                                f"{', '.join(map(str, profillage.DREHUNGEN))} Grad.")
+    try:
+        teile = profillage.skizze(name, drehung, bool(wahl.get("gespiegelt")))
+    except KeyError:
+        return {"fehler": f"Das Profil «{name}» gibt es in der Tabelle nicht.", "teile": None}
+    return {"fehler": None, "teile": teile.als_dict(), "drehbar": profillage.drehbar(name),
+            "spiegelbar": profillage.spiegelbar(name)}
 
 
 def vorlage_einsetzen(rumpf: Mapping[str, Any]) -> Dict[str, Any]:

@@ -1,5 +1,5 @@
 ---
-erzeugt: de5bcfd5c6ee
+erzeugt: b892981030da
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -167,6 +167,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.projekt.netz]] – Knoten mit Kennungen, und wie neue dazukommen.
     - [[opencivil.projekt.pfahl]] – ein Einzelpfahl, wie die Oberflaeche ihn beschreibt.
     - [[opencivil.projekt.platte]] – eine Platte, wie die Oberflaeche sie beschreibt.
+    - [[opencivil.projekt.profile]] – ein Stahlprofil, wie die Oberflaeche es beschreibt.
     - [[opencivil.projekt.projekt]] – das Projekt als Ganzes.
     - [[opencivil.projekt.querschnittsanalyse]] – ein gezeichneter Querschnitt, wie die Oberflaeche ihn beschreibt.
     - [[opencivil.projekt.setzung]] – eine Setzungsberechnung, wie die Oberflaeche sie beschreibt.
@@ -209,8 +210,6 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.stabwerk.herleitung]] – wie ein Balkensystem seine Rechnung aufschreibt.
     - [[opencivil.stabwerk.matrix]] – das Gleichungssystem eines Stabwerks.
     - [[opencivil.stabwerk.modell]] – was gerechnet wird: das ebene Stabwerk in SI.
-    - [[opencivil.stabwerk.profilformen]] – die Formen der Stahlprofile, mit ihren Formeln.
-    - [[opencivil.stabwerk.profiltabelle]] – welche Stahlprofile es gibt, mit ihren Massen.
     - [[opencivil.stabwerk.querschnitte]] – die Querschnitte der Staebe, nach Vorlage.
     - [[opencivil.stabwerk.rechnung]] – das Balkensystem im Rechenwerk.
     - [[opencivil.stabwerk.stab]] – der ebene Stab: Steifigkeit, Lasten, Bettung.
@@ -223,6 +222,10 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.stabwerk3d.raum]] – Vektoren, Richtungen und Strecken im Raum.
     - [[opencivil.stabwerk3d.rechnung]] – das 3D-Balkensystem im Rechenwerk.
     - [[opencivil.stabwerk3d.stab]] – der raeumliche Stab: drei ebene in einem.
+- [[opencivil.stahlprofile]] – die Stahlprofile: ihre Formen, welche es gibt, wie eines im Querschnitt liegt.
+    - [[opencivil.stahlprofile.formen]] – die Formen der Stahlprofile, mit ihren Formeln.
+    - [[opencivil.stahlprofile.lage]] – ein Stahlprofil im gezeichneten Querschnitt.
+    - [[opencivil.stahlprofile.tabelle]] – welche Stahlprofile es gibt, mit ihren Massen.
 - [[opencivil.web]] – die Oberflaeche, von der Seite des Rechenkerns.
     - [[opencivil.web.anzeige]] – Zahlen und Zeilen, wie die Oberflaeche sie zeigt.
     - [[opencivil.web.api]] – Uebersetzung der Rechenergebnisse nach JSON.

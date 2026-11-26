@@ -7,6 +7,67 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-26 · Stahlprofile in der Querschnittsanalyse
+
+Aus dem Plan vom 2026-11-25, Schritt 11c. Der Benutzer: ein Stahlprofil
+bleibt ein Profil – man wählt Reihe und Grösse, verschiebt und dreht es;
+freie Bleche zeichnet man als Fläche aus Baustahl.
+
+**Vorher und nachher.** Vorher kannte die Querschnittsanalyse kein Profil;
+ein HEB 300 hätte man als Polygon mit seinen Ausrundungen von Hand zeichnen
+müssen. Nachher wählt man unter den Vorlagen «Stahlprofil», dort Reihe,
+Grösse, Baustahl, Drehung und Spiegeln, und klickt den Punkt, an den seine
+Mitte kommt. Ein HEB 300 aus S355 hat dann A = 14 914 mm² (die Tabelle
+des Benutzers: 14 908) und rechnet wie jede Fläche.
+
+**Ein Profil ist ein Punkt mit Fläche.** Es hängt an einem Knoten, seiner
+Mitte: der Mitte des umschreibenden Rechtecks, nicht dem Schwerpunkt, der
+beim U daneben liegt (zu prüfen, TODO). Seinen Umriss, samt dem Loch eines
+Rohrs, schickt der Kern mit der Antwort zur Zeichnung (`profile`); die
+Oberfläche schiebt ihn nur mit, wenn der Knoten wandert, bis die nächste
+Antwort da ist. Das allgemeine Zeichenfenster kennt dafür Punkte mit
+Fläche (`punktUmriss` des Adapters): ein Klick trifft ein Rohr in seinem
+Stahl, nicht in seinem Loch; ein Rahmen wählt es wie die Ecke eines
+Polygons, und die Vorschau beim Verschieben zeigt seinen Umriss.
+
+**Gerechnet wird mit dem Umriss** (`stahlprofile/lage.py`). Die
+Ausrundungen sind Vielecke mit 12 Ecken je Viertelkreis, das Rundrohr hat
+96. Gegen die Formeln, mit denen das Balkensystem dasselbe Profil rechnet,
+weichen A, I_y und I_z höchstens 0.44 % ab (UNP, I_z), die anderen Reihen
+höchstens 0.33 %. Gegen die Werte der Tabelle des Benutzers sind es beim
+UNP bis 0.9 %: dort sind sie von Hand mit drei Stellen eingetippt. Ein
+Satz im Bericht sagt, wie genau der Umriss ist.
+
+**Drehen und Spiegeln nur, wo es etwas ändert**, das sagt der Kern: ein
+Rundrohr und ein quadratisches Rohr drehen sich nicht, nur das U spiegelt
+sich. Erst gespiegelt, dann gedreht, gegen den Uhrzeigersinn; ein
+ungespiegeltes U um 90° ist nach oben offen. Im schwebenden Fenster
+stehen die vier Drehungen unter ihrem Namen, wie jede Wahl mit mehr als
+zwei Stellungen dort.
+
+**Ein Paket für beide** (`opencivil/stahlprofile/`): Formen, Tabelle und
+Lage, gebraucht vom Balkensystem und von der Querschnittsanalyse. Die Wahl
+ist in beiden dieselbe (`profilwahl.js`): die Reihen als Schalter mit dem
+Bild ihres mittleren Profils, die Grösse als Liste. Im Balkensystem hat
+der Schalter damit Bilder bekommen.
+
+**Grau, was fehlt; rot, was falsch ist.** Ohne Baustahl steht «Profil 1:
+noch kein Material gewählt.» Ein Beton als Material eines Profils ist rot,
+ein Name, den die Tabelle nicht kennt, auch – mit einem Punkt an seiner
+Mitte, damit man es findet.
+
+**Am Rand.** Die Antwort zur Zeichnung sagt je Fläche ihre Tiefe statt
+ihrer Eltern: ein Profil im Beton liegt über ihm, ein Beton im Rohr über
+dem Rohr. Die Übersicht unter der Zeichnung hat eine Gruppe
+«Stahlprofile», die Liste der Analysen nennt sie («2 × HEB 300»). Eine
+lange Liste in einer Zeile des schwebenden Fensters kürzt sich, statt das
+Fenster breiter zu drücken.
+
+**Was offen bleibt.** Die Bleche je Form für die Querschnittsklasse kommen
+mit Schritt 12, wenn ein Nachweis sie braucht. Die neuen Reihen (L, RRW,
+HEAA, T, INP, VKT, RND, FL) brauchen eine Quelle und die Erlaubnis des
+Benutzers, sie zu holen (Schritt 11d).
+
 ## 2026-11-26 · Spannung-Dehnung-Analysen für Holz und Stahl
 
 Aus dem Plan vom 2026-11-25, Schritt 11b: ein Querschnitt aus Holz oder

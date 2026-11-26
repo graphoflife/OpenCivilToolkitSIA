@@ -1,5 +1,5 @@
 ---
-erzeugt: beabdb0b0c82
+erzeugt: 295921b3dc0e
 art: modul
 tags: [modul]
 ---
@@ -92,6 +92,7 @@ geschieht erst beim Aufbau, ueber die [[opencivil.core.einheiten#Groesse|Groesse
 - [[opencivil.projekt.netz]] – Knoten mit Kennungen, und wie neue dazukommen.
 - [[opencivil.projekt.pfahl]] – ein Einzelpfahl, wie die Oberflaeche ihn beschreibt.
 - [[opencivil.projekt.platte]] – eine Platte, wie die Oberflaeche sie beschreibt.
+- [[opencivil.projekt.profile]] – ein Stahlprofil, wie die Oberflaeche es beschreibt.
 - [[opencivil.projekt.projekt]] – das Projekt als Ganzes.
 - [[opencivil.projekt.querschnittsanalyse]] – ein gezeichneter Querschnitt, wie die Oberflaeche ihn beschreibt.
 - [[opencivil.projekt.setzung]] – eine Setzungsberechnung, wie die Oberflaeche sie beschreibt.
