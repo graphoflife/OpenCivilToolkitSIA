@@ -12,8 +12,9 @@ Umriss: das Bild im Balkensystem, die Flaeche in der Querschnittsanalyse
 
 DIE FORMEN:
 I-Profil (IPE, HEA, HEB, HEM), U-Profil mit parallelen Flanschen (UPE),
-U-Profil mit geneigten Flanschen (UNP), kaltgefertigtes Rechteckrohr (RRK)
-und Rundrohr (ROR).
+U-Profil mit geneigten Flanschen (UNP), Rechteckrohr mit runden Ecken -- kalt-
+oder warmgefertigt (RRK, RRW): sie unterscheiden sich nur in den Radien
+-- und Rundrohr (ROR).
 
 ACHSEN:
 Das Profil steht: der Steg senkrecht, beim U der Ruecken links. ``y`` ist
@@ -66,7 +67,7 @@ BOGENECKEN = 12
 #: A trifft dann die Tabelle auf 0.08 %, I auf 0.15 %.
 ROHRECKEN = 96
 
-_RRK = "kaltgefertigten Rechteckrohrs"
+_RRG = "Rechteckrohrs mit runden Ecken"
 
 
 # ---------------------------------------------------------------------------
@@ -148,7 +149,7 @@ def _rohr_traegheit(achse, quer: str, laengs: str) -> Kennformel:
         return ((l * q ** 3 - (l - 2 * t) * (q - 2 * t) ** 3) / 12
                 - 4 * _zw(r_o, q / 2 - ZWICKEL[1] * r_o) + 4 * _zw(r_i, q / 2 - t - ZWICKEL[1] * r_i))
 
-    return achse(_RRK, vorlage, funktion)
+    return achse(_RRG, vorlage, funktion)
 
 
 # ---------------------------------------------------------------------------
@@ -363,15 +364,16 @@ U_GENEIGT = Stabvorlage(
                                  for k in ("h", "b", "t_w", "t_1", "t_2", "r_1", "r_2"))),
 )
 
-#: Rechteckrohr, kaltgefertigt -- RRK: Wand ``t`` ringsum, die Ecken aussen mit
-#: ``r_o``, innen mit ``r_i`` gerundet; ``h`` steht senkrecht.
-RECHTECKROHR_KALT = Stabvorlage(
-    schluessel="rechteckrohr_kalt", name="Rechteckrohr, kaltgefertigt",
+#: Rechteckrohr mit runden Ecken -- RRK und RRW: Wand ``t`` ringsum, die Ecken
+#: aussen mit ``r_o``, innen mit ``r_i`` gerundet; ``h`` steht senkrecht. Die
+#: Radien kommen mit der Reihe (:mod:`~opencivil.stahlprofile.tabelle`).
+RECHTECKROHR_GERUNDET = Stabvorlage(
+    schluessel="rechteckrohr_gerundet", name="Rechteckrohr mit runden Ecken",
     masse=(Mass("h", "h", "Höhe", 200.0), Mass("b", "b", "Breite", 100.0),
            Mass("t", "t", "Wanddicke", 8.0), Mass("r_o", "r_o", "Radius aussen", 20.0),
            Mass("r_i", "r_i", "Radius innen", 12.0)),
     formeln=(
-        _flaeche(_RRK, r"2 \cdot @t \cdot \left(@h + @b - 2 \cdot @t\right) - 4 \cdot 0.2146 \cdot "
+        _flaeche(_RRG, r"2 \cdot @t \cdot \left(@h + @b - 2 \cdot @t\right) - 4 \cdot 0.2146 \cdot "
                        r"\left(\left(@r_o\right)^{2} - \left(@r_i\right)^{2}\right)",
                  lambda t, h, b, r_o, r_i: (2 * t * (h + b - 2 * t)
                                             - 4 * ZWICKEL[0] * (r_o ** 2 - r_i ** 2))),
@@ -381,12 +383,12 @@ RECHTECKROHR_KALT = Stabvorlage(
                    r"2 \cdot \left(@h + @b - 2 \cdot @t\right) - \left(@r_o + @r_i\right) \cdot "
                    r"\left(4 - \pi\right)",
                    lambda h, b, t, r_o, r_i: 2 * (h + b - 2 * t) - (r_o + r_i) * (4 - math.pi),
-                   f"Umfang der Mittellinie eines {_RRK}"),
+                   f"Umfang der Mittellinie eines {_RRG}"),
         Kennformel("A_m", "A_m", CM2, 2, "von der Mittellinie umschlossene Fläche",
                    r"\left(@h - @t\right) \cdot \left(@b - @t\right) - \left(\frac{@r_o + @r_i}{2}"
                    r"\right)^{2} \cdot \left(4 - \pi\right)",
                    lambda h, t, b, r_o, r_i: (h - t) * (b - t) - ((r_o + r_i) / 2) ** 2 * (4 - math.pi),
-                   f"Umschlossene Fläche eines {_RRK}"),
+                   f"Umschlossene Fläche eines {_RRG}"),
         # Dieselbe Formel wie beim Rechteckrohr der Vorlagen -- nur p_m und A_m
         # haben hier runde Ecken. Darum dieselbe Seite.
         _it("Rechteckrohrs", *ROHRTORSION),
@@ -417,5 +419,5 @@ RUNDROHR = Stabvorlage(
     umriss=_rundrohr_umriss,
 )
 
-PROFILFORMEN: Tuple[Stabvorlage, ...] = (I_PROFIL, U_PARALLEL, U_GENEIGT, RECHTECKROHR_KALT,
-                                         RUNDROHR)
+PROFILFORMEN: Tuple[Stabvorlage, ...] = (I_PROFIL, U_PARALLEL, U_GENEIGT,
+                                         RECHTECKROHR_GERUNDET, RUNDROHR)

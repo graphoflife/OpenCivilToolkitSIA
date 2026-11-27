@@ -120,7 +120,7 @@ def widerstand(lage: Profillage, flaeche: float, richtung: str, *, f_y: float, t
         D, t = masse["D"], masse["t"]
         return Schubwiderstand(2.0 * t * (D - t), tau_y, rf"2 \cdot {t:g} \cdot ({D:g} - {t:g})",
                                NACH_VORGABE)
-    if form == "rechteckrohr_kalt":
+    if form == "rechteckrohr_gerundet":
         lang, t = (masse["h"] if steg else masse["b"]), masse["t"]
         b = lang - t
         tau = tau_beulen(b, t, E=E, tau_y=tau_y)

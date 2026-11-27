@@ -117,13 +117,21 @@ class TestHilfen(unittest.TestCase):
         self.assertAlmostEqual(st.omega(-1.0), 0.4)
 
     def test_kurven_der_figur_7(self):
-        """Um die starke und um die schwache Achse."""
+        """Um die starke und um die schwache Achse -- RRK und RRW, dieselbe Form, kalt und warm."""
         for name, kurven in (("IPE 600", "ab"), ("HEB 300", "bc"), ("HEM 180", "bc"),
                              ("ROR 219.1 x 8", "aa"), ("RRK 200 x 100 x 8", "cc"),
-                             ("UPE 200", "cc"), ("UNP 200", "cc")):
+                             ("RRW 200 x 100 x 8", "aa"), ("UPE 200", "cc"), ("UNP 200", "cc")):
             with self.subTest(profil=name):
                 profil = tabelle.profil(name)
                 self.assertEqual(st.kurve(profil, True)[0] + st.kurve(profil, False)[0], kurven)
+        self.assertEqual(st.kurve(tabelle.profil("RRW 200 x 100 x 8"), True)[1],
+                         "warmgefertigtes Hohlprofil")
+
+    def test_jede_reihe_hat_ihre_kurve(self):
+        """Wer eine Reihe dazunimmt, die kein I ist, muss ihr eine Kurve geben."""
+        for reihe in tabelle.PROFILREIHEN:
+            with self.subTest(reihe=reihe.kurz):
+                self.assertIn(st.kurve(reihe.profile[0], True)[0], "abcd")
 
     def test_druckgurt_eines_i(self):
         """Der Flansch und ein Drittel der halben Hoehe zwischen den Flanschen, ohne Ausrundung."""

@@ -10,12 +10,19 @@ Namen (:func:`profil`).
 QUELLE:
 Die Tabelle des Benutzers, «Festigkeitsnachweise I-Standardprofile Stahl» vom
 2019-04-15, Blatt «Querschnitte» -- dieselben Groessen in derselben Folge
-(Benutzer, 2026-11-15). Was noch fehlt -- L, INP, T, HEAA und die
-warmgefertigten Rechteckrohre --, steht im Notizbuch unter TODO.
+(Benutzer, 2026-11-15). Die warmgefertigten Rechteckrohre (RRW) hat sie
+nicht: ihre Groessen kommen aus dem Katalog «Hollow Structural Sections» von
+ArcelorMittal Tubular Products Europe, 2024, Rohre nach EN 10210 -- jede
+Wanddicke, die er fuer ein Mass h × b als lieferbar zeigt (geholt am
+2026-11-27 mit Erlaubnis des Benutzers). L, INP, T und HEAA hat der Benutzer
+am 2026-11-27 zurueckgestellt; sie stehen im Notizbuch unter TODO.
 
 NACH VORGABE, NICHT NACHGESCHLAGEN:
 * RRK: die Radien aus der Wanddicke, wie in der Tabelle -- bis t = 6 mm
   r_o = 2t und r_i = t, bis 10 mm 2.5t und 1.5t, darueber 3t und 2t.
+* RRW: r_o = 1.5t und r_i = t, wie ueblich fuer warmgefertigte Rohre -- der
+  Katalog nennt keine Radien, und EN 10210-2 liegt nicht vor. Damit hat das
+  RRW 200 x 100 x 8 A = 44.75 cm² und I_y = 2234 cm⁴.
 * UNP: bis h = 300 mm sind die Flansche um 8 % geneigt, und t_f gilt bei
   b/2; darueber 5 %, und t_f gilt in der Mitte des Flanschs, (b + t_w)/2.
   Damit trifft die Rechnung die Werte der Tabelle, die keine Formeln hat.
@@ -27,7 +34,7 @@ from dataclasses import dataclass
 from typing import Callable, Dict, List, Mapping, Tuple
 
 from opencivil.stahlprofile.formen import (
-    I_PROFIL, RECHTECKROHR_KALT, RUNDROHR, U_GENEIGT, U_PARALLEL,
+    I_PROFIL, RECHTECKROHR_GERUNDET, RUNDROHR, U_GENEIGT, U_PARALLEL,
 )
 from opencivil.stabwerk.querschnitte import Stabvorlage
 
@@ -502,6 +509,69 @@ _RRK = """
 400  300    16
 """
 
+#: RRW: h, b und dahinter jede lieferbare Wanddicke t -- je Zeile, wie im
+#: Katalog: erst die quadratischen, dann die rechteckigen.
+_RRW = """
+  80   80  5 6 6.3 7.1 8 10 12 12.5
+  90   90  5 6 6.3 7.1 8 10 12 12.5
+ 100  100  5 6 6.3 7.1 8 10 12 12.5
+ 110  110  5 6 6.3 7.1 8 10 12 12.5
+ 120  120  5 6 6.3 7.1 8 10 12 12.5
+ 130  130  5 6 6.3 7.1 8 10 12 12.5
+ 140  140  5 6 6.3 7.1 8 10 12 12.5
+ 150  150  5 6 6.3 7.1 8 10 12 12.5 16
+ 160  160  5 6 6.3 7.1 8 10 12 12.5 16
+ 180  180  5 6 6.3 7.1 8 10 12 12.5 16
+ 200  200  5 6 6.3 7.1 8 10 12 12.5 16
+ 220  220  5 6 6.3 7.1 8 10 12 12.5 16
+ 250  250  5 6 6.3 7.1 8 10 12 12.5 16
+ 260  260  6 6.3 7.1 8 10 12 12.5 16
+ 300  300  6 6.3 7.1 8 10 12 12.5 16
+ 350  350  8 10 12 12.5 16
+ 400  400  8 10 12 12.5 16
+  80   50  4 4.5 5 5.6 6 6.3 7.1 8 10
+  80   60  4 4.5 5 5.6 6 6.3 7.1 8 10
+  90   50  4 4.5 5 5.6 6 6.3 7.1 8 10
+ 100   40  4 4.5 5 5.6 6 6.3 7.1 8
+ 100   50  4 4.5 5 5.6 6 6.3 7.1 8 10
+ 100   60  4 4.5 5 5.6 6 6.3 7.1 8 10
+ 100   80  4 4.5 5 5.6 6 6.3 7.1 8 10
+ 110   60  4 4.5 5 5.6 6 6.3 7.1
+ 120   60  3.6 4 4.5 5 5.6 6 6.3 7.1 8 10 12.5
+ 120   80  4 4.5 5 5.6 6 6.3 7.1 8 10 12.5
+ 120  100  5 5.6 6 6.3 7.1 8 10 12.5
+ 140   70  4 4.5 5 5.6 6 6.3 7.1 8 10 12.5
+ 140   80  4 4.5 5 5.6 6 6.3 7.1 8 10 12.5
+ 150  100  4 4.5 5 5.6 6 6.3 7.1 8 10 12.5 14.2
+ 160   80  4 4.5 5 5.6 6 6.3 7.1 8 10 12.5
+ 160   90  4 4.5 5 5.6 6 6.3 7.1 8 10 12.5 14.2
+ 180   80  4 4.5 5 5.6 6 6.3 7.1 8 10 12.5
+ 180  100  4 4.5 5 5.6 6 6.3 7.1 8 10 12.5 14.2
+ 180  120  5 5.6 6 6.3 7.1 8 10 12.5
+ 200  100  5 5.6 6 6.3 7.1 8 10 12.5 14.2 16
+ 200  120  5 5.6 6 6.3 7.1 8 10 12.5 14.2
+ 200  150  5 5.6 6 6.3 7.1 8 10 12.5
+ 220  120  5 5.6 6 6.3 7.1 8 10
+ 250   50  5 5.6 6 6.3 7.1 8
+ 250  100  5 5.6 6 6.3 7.1 8 10 12.5
+ 250  150  5 5.6 6 6.3 7.1 8 10 12.5 14.2
+ 250  200  6.3 7.1 8 10 12.5
+ 260  140  6 6.3 7.1 8 10 12.5 14.2
+ 260  180  6 6.3 7.1 8 10 12.5 14.2
+ 300   50  5 5.6 6 6.3 7.1 8
+ 300  100  5 5.6 6 6.3 7.1 8 10 12.5
+ 300  150  5 5.6 6 6.3 7.1 8 10 12.5 14.2
+ 300  200  5 5.6 6 6.3 7.1 8 10 12.5 14.2 16
+ 350  150  5 5.6 6 6.3 7.1 8 10 12.5 14.2
+ 350  250  6 6.3 7.1 8 10 12.5 14.2 16
+ 400  100  6 6.3 7.1 8 10 12.5
+ 400  200  6 6.3 7.1 8 10 12.5 14.2 16
+ 400  300  6.3 7.1 8 10 12.5 14.2 16
+ 450  250  6.3 7.1 8 10 12.5 14.2 16
+ 500  200  6.3 7.1 8 10 12.5 14.2 16
+ 500  300  8 10 12.5 14.2 16
+"""
+
 #: ROR: D, t.
 _ROR = """
  21.3   2.3
@@ -767,6 +837,13 @@ def _rrk(h: float, b: float, t: float) -> Dict[str, float]:
     return dict(h=h, b=b, t=t, r_o=r_o, r_i=r_i)
 
 
+def _rrw(text: str) -> Tuple[Profil, ...]:
+    """Die RRW einer Zeile «h b t t t» nach der anderen -- die Radien aus der Wanddicke."""
+    return tuple(Profil(f"RRW {_z(h)} x {_z(b)} x {_z(t)}", "RRW",
+                        dict(h=float(h), b=float(b), t=float(t), r_o=1.5 * float(t), r_i=float(t)))
+                 for h, b, *dicken in _zahlen(text) for t in dicken)
+
+
 def _benannt(kurz: str, text: str, masse: Callable[..., Dict[str, float]]) -> Tuple[Profil, ...]:
     """Die Zeilen einer Reihe, deren Name vorne steht: «IPE 80  80  46 ...»."""
     return tuple(Profil(f"{z[0]} {z[1]}", kurz, masse(*map(float, z[2:])))
@@ -784,9 +861,10 @@ PROFILREIHEN: Tuple[Profilreihe, ...] = (
     Profilreihe("HEM", "Breitflanschträger, verstärkte Reihe", I_PROFIL, _benannt("HEM", _I_PROFILE, _i)),
     Profilreihe("UPE", "U-Profil mit parallelen Flanschen", U_PARALLEL, _benannt("UPE", _UPE, _i)),
     Profilreihe("UNP", "U-Profil mit geneigten Flanschen", U_GENEIGT, _benannt("UNP", _UNP, _unp)),
-    Profilreihe("RRK", "Rechteckrohr, kaltgefertigt", RECHTECKROHR_KALT, tuple(
+    Profilreihe("RRK", "Rechteckrohr, kaltgefertigt", RECHTECKROHR_GERUNDET, tuple(
         Profil(f"RRK {_z(h)} x {_z(b)} x {_z(t)}", "RRK", _rrk(float(h), float(b), float(t)))
         for h, b, t in _zahlen(_RRK))),
+    Profilreihe("RRW", "Rechteckrohr, warmgefertigt", RECHTECKROHR_GERUNDET, _rrw(_RRW)),
     Profilreihe("ROR", "Rundrohr", RUNDROHR, tuple(
         Profil(f"ROR {_z(D)} x {_z(t)}", "ROR", dict(D=float(D), t=float(t)))
         for D, t in _zahlen(_ROR))),

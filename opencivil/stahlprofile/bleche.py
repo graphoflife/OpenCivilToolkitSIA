@@ -17,8 +17,9 @@ von der Mittellinie des Stegs bis zum freien Rand. Mit ihr rechnet die
 mitwirkende Breite: 4.5.3.3 misst von den theoretischen Scheibenschnittlinien
 aus. Die Schlankheit misst die Breite ``c``, die die Bilder der Tabellen 5a
 und 5b zeigen: beim gewalzten Profil ohne die Ausrundungen, beim
-kaltgefertigten Rechteckrohr ohne 1.5 t je Seite. Sie liegt auf derselben
-Geraden, ``vor`` nach dem Anfang der theoretischen.
+Rechteckrohr ohne 1.5 t je Seite, ob kalt- oder warmgefertigt -- Tabelle 5a
+unterscheidet nicht. Sie liegt auf derselben Geraden, ``vor`` nach dem
+Anfang der theoretischen.
 
 DAS UNP -- nach Vorgabe, nicht nachgeschlagen:
 Seine Flansche sind geneigt. Gerechnet wird mit der Flanschdicke ``t_f`` der
@@ -139,7 +140,7 @@ def _steg(y: float, h: float, t_f: float, t_w: float, r: float) -> _Roh:
             h - 2.0 * t_f - 2.0 * r, t_f / 2.0 + r)
 
 
-def _rrk(m: Mapping[str, float]) -> List[_Roh]:
+def _rechteckrohr(m: Mapping[str, float]) -> List[_Roh]:
     """Vier Waende zwischen den Mittellinien der anderen; ``c`` ohne 1.5 t je Seite (Tabelle 5a)."""
     h, b, t = m["h"], m["b"], m["t"]
     links, rechts, unten, oben = t / 2.0, b - t / 2.0, t / 2.0, h - t / 2.0
@@ -156,14 +157,14 @@ def _ror(m: Mapping[str, float]) -> List[_Roh]:
 
 
 #: Die Formen, die ein Kasten sind -- siehe Dateikopf.
-_KASTEN = {"rechteckrohr_kalt"}
+_KASTEN = {"rechteckrohr_gerundet"}
 
 #: Je Form, welche Bleche sie hat -- nach dem Schluessel ihrer Vorlage.
 _BLECHE: Dict[str, Callable[[Mapping[str, float]], List[_Roh]]] = {
     "i_profil": _i,
     "u_parallel": lambda m: _u(m, m["r"]),
     "u_geneigt": lambda m: _u(m, m["r_1"]),
-    "rechteckrohr_kalt": _rrk,
+    "rechteckrohr_gerundet": _rechteckrohr,
     "rundrohr": _ror,
 }
 

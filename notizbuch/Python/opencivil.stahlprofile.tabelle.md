@@ -1,5 +1,5 @@
 ---
-erzeugt: 261180684506
+erzeugt: 4aa7b5c604b6
 art: modul
 tags: [modul]
 ---
@@ -19,14 +19,21 @@ Namen ([[opencivil.stahlprofile.tabelle#profil|profil]]).
 
 Die Tabelle des Benutzers, «Festigkeitsnachweise I-Standardprofile Stahl» vom
 2019-04-15, Blatt «Querschnitte» -- dieselben Groessen in derselben Folge
-(Benutzer, 2026-11-15). Was noch fehlt -- L, INP, T, HEAA und die
-warmgefertigten Rechteckrohre --, steht im Notizbuch unter TODO.
+(Benutzer, 2026-11-15). Die warmgefertigten Rechteckrohre (RRW) hat sie
+nicht: ihre Groessen kommen aus dem Katalog «Hollow Structural Sections» von
+ArcelorMittal Tubular Products Europe, 2024, Rohre nach EN 10210 -- jede
+Wanddicke, die er fuer ein Mass h × b als lieferbar zeigt (geholt am
+2026-11-27 mit Erlaubnis des Benutzers). L, INP, T und HEAA hat der Benutzer
+am 2026-11-27 zurueckgestellt; sie stehen im Notizbuch unter TODO.
 
 
 ## NACH VORGABE, NICHT NACHGESCHLAGEN
 
 * RRK: die Radien aus der Wanddicke, wie in der Tabelle -- bis t = 6 mm
   r_o = 2t und r_i = t, bis 10 mm 2.5t und 1.5t, darueber 3t und 2t.
+* RRW: r_o = 1.5t und r_i = t, wie ueblich fuer warmgefertigte Rohre -- der
+  Katalog nennt keine Radien, und EN 10210-2 liegt nicht vor. Damit hat das
+  RRW 200 x 100 x 8 A = 44.75 cm² und I_y = 2234 cm⁴.
 * UNP: bis h = 300 mm sind die Flansche um 8 % geneigt, und t_f gilt bei
   b/2; darueber 5 %, und t_f gilt in der Mitte des Flanschs, (b + t_w)/2.
   Damit trifft die Rechnung die Werte der Tabelle, die keine Formeln hat.
@@ -89,6 +96,14 @@ def _rrk(h: float, b: float, t: float) -> Dict[str, float]
 
 Die Masse eines RRK -- die Radien aus der Wanddicke.
 
+### _rrw
+
+```python
+def _rrw(text: str) -> Tuple[Profil, ...]
+```
+
+Die RRW einer Zeile «h b t t t» nach der anderen -- die Radien aus der Wanddicke.
+
 ### _benannt
 
 ```python
@@ -118,6 +133,7 @@ Das Profil dieses Namens -- ein unbekannter ist ein `KeyError`, der es sagt.
 - `_UPE = '\nUPE 80 80 50 4 7 10\nUPE 100 100 55 4.5 7.5 10\nUPE 120 120 60 5 8…` – UPE: Name, h, b, t_w, t_f, r.
 - `_UNP = '\nUNP 65 65 42 5.5 7.5 7.5 4\nUNP 80 80 45 6 8 8 4\nUNP 100 100 50 6…` – UNP: Name, h, b, t_w, t_f, r_1, r_2.
 - `_RRK = '\n 20 20 2\n 25 25 2\n 25 25 2.5\n 25 25 3\n 30 30 2\n 30 30 2.5\n 3…` – RRK: h, b, t -- erst die quadratischen, dann die rechteckigen.
+- `_RRW = '\n 80 80 5 6 6.3 7.1 8 10 12 12.5\n 90 90 5 6 6.3 7.1 8 10 12 12.5\n…` – RRW: h, b und dahinter jede lieferbare Wanddicke t -- je Zeile, wie im Katalog: erst die quadratischen, dann die rechteckigen.
 - `_ROR = '\n 21.3 2.3\n 21.3 2.6\n 21.3 3.2\n 26.9 2.3\n 26.9 2.6\n 26.9 3.2\n…` – ROR: D, t.
 - `PROFILREIHEN = (Profilreihe('IPE', 'I-Träger, schmale Flansche', I_PROFIL, _benannt(…`
 - `PROFILE = {p.name: p for r in PROFILREIHEN for p in r.profile}` – Jedes Profil nach seinem Namen -- «HEB 300», «RRK 200 x 100 x 8».

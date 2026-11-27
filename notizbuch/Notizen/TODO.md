@@ -1822,6 +1822,11 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       werden (A, I_y auf 0.6 %, e_y 1 %, I_z 1.4 %); I_T des UNP wie beim
       UPE, mit t_f und r_1. Gegen eine Profiltabelle prüfen, etwa die
       Stahlbautabellen des SZS.
+      Die warmgefertigten Rechteckrohre (RRW, seit 2026-11-27): ihre Grössen
+      aus dem Katalog von ArcelorMittal, Radien nennt er keine. Gerechnet
+      mit r_o = 1.5 t und r_i = t, wie für warmgefertigte Rohre üblich – EN
+      10210-2 liegt nicht vor. Das RRW 200 × 100 × 8 hat damit A = 44.75 cm²,
+      I_y = 2234 cm⁴ und I_z = 739 cm⁴.
 
 ### 3D-Balkensysteme
 
@@ -1892,12 +1897,13 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
 
 ## Noch nicht gebaut
 
-- [ ] **Stahlprofile, was fehlt:** L, INP, T, HEAA und die warmgefertigten
-      Rechteckrohre (RRW) -- die Tabelle des Benutzers hat sie nicht, und
-      eine andere Quelle braucht seine Erlaubnis. Für das Kippen fehlt noch
-      I_w (Schritt 12d); W_el, W_pl und A_v rechnet seit 2026-11-26 die
-      Querschnittsanalyse am Umriss, die Bleche für die Querschnittsklasse
-      liefert jede Form (`stahlprofile/bleche.py`).
+- [ ] **Stahlprofile, was fehlt:** L, INP, T und HEAA – die Tabelle des
+      Benutzers hat sie nicht. Das Verkaufsprogramm von ArcelorMittal dafür
+      hat er am 2026-11-27 nicht holen lassen: «weglassen». Die RRW sind seit
+      dem Tag drin, aus dem Rohrkatalog derselben Firma. Für das Kippen
+      fehlt noch I_w (Schritt 12d); W_el, W_pl und A_v rechnet seit
+      2026-11-26 die Querschnittsanalyse am Umriss, die Bleche für die
+      Querschnittsklasse liefert jede Form (`stahlprofile/bleche.py`).
 
 - [ ] **Holz, was nach Schritt 13 fehlt:** der Querdruck f_c,90,d, mit
       Vorholz oder am Endauflager samt den Klammerwerten der Tabellen 6 und

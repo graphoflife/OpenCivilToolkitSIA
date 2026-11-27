@@ -47,6 +47,6 @@ $$
 ## Theorie
 
 Dieselbe Rechnung wie beim
-[[Flächenträgheitsmoment eines kaltgefertigten Rechteckrohrs um y]], mit
+[[Flächenträgheitsmoment eines Rechteckrohrs mit runden Ecken um y]], mit
 $b$ und $h$ vertauscht: um $z$ steht die Breite $b$ quer zur Achse. Beim
 quadratischen Rohr ist $I_z = I_y$.

@@ -83,7 +83,7 @@ from opencivil.querschnitt.plastisch import Starrplastisch
 from opencivil.stahlbau import stabilitaet as st
 from opencivil.stahlbau.querschnitt import Teil, normale
 from opencivil.stahlprofile import tabelle
-from opencivil.stahlprofile.formen import I_PROFIL, RECHTECKROHR_KALT, RUNDROHR
+from opencivil.stahlprofile.formen import I_PROFIL, RECHTECKROHR_GERUNDET, RUNDROHR
 from opencivil.verbund.querschnitt import NEBEN, Verbundquerschnitt
 
 REFERENZ_ART = "SIA 264:2014, 5.3.1.1; 5.3.2.1; Tabelle 7"
@@ -190,7 +190,7 @@ def querschnittsart(verbund: Verbundquerschnitt) -> Tuple[Optional[Art], str]:
         return None, NICHT_IN_TABELLE
     teil, form = teile[0], tabelle.profil(lage.name).form
     aussen = sum(s.gewicht * s.werte.A for s in verbund.fuge[0]) > AUSSEN_AB
-    if form in (RUNDROHR, RECHTECKROHR_KALT):
+    if form in (RUNDROHR, RECHTECKROHR_GERUNDET):
         if _art_bei(verbund, lage.mitte) is not Baustoffart.BETON:
             return None, LEERES_ROHR.format(name=lage.name)
         return (None, NICHT_IN_TABELLE) if aussen else (Art.ROHR, "")
@@ -332,7 +332,7 @@ class Stuetze:
             return None
         if self.profil.form is RUNDROHR:
             return "d/t", m["D"] / m["t"], BEULEN_RUND * e * e, f"{BEULEN_RUND:g} ε²"
-        if self.profil.form is RECHTECKROHR_KALT:
+        if self.profil.form is RECHTECKROHR_GERUNDET:
             h = max(m["h"], m["b"])
             return "h/t", h / m["t"], BEULEN_RECHTECK * e, f"{BEULEN_RECHTECK:g} ε"
         return "b/t_f", m["b"] / m["t_f"], BEULEN_FLANSCH * e, f"{BEULEN_FLANSCH:g} ε"

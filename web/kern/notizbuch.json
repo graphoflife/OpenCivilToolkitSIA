@@ -1905,17 +1905,6 @@
       ]
     },
     {
-      "name": "Fläche eines kaltgefertigten Rechteckrohrs",
-      "pfad": "Formelsammlung/Formeln/Fläche eines kaltgefertigten Rechteckrohrs.md",
-      "art": "formel",
-      "zeichen": [
-        "A_{\\text{Q18}}"
-      ],
-      "themen": [
-        "Stabquerschnitte"
-      ]
-    },
-    {
       "name": "Fläche eines Kreises",
       "pfad": "Formelsammlung/Formeln/Fläche eines Kreises.md",
       "art": "formel",
@@ -1943,6 +1932,17 @@
       "art": "formel",
       "zeichen": [
         "A_{\\text{Q4}}"
+      ],
+      "themen": [
+        "Stabquerschnitte"
+      ]
+    },
+    {
+      "name": "Fläche eines Rechteckrohrs mit runden Ecken",
+      "pfad": "Formelsammlung/Formeln/Fläche eines Rechteckrohrs mit runden Ecken.md",
+      "art": "formel",
+      "zeichen": [
+        "A_{\\text{Q18}}"
       ],
       "themen": [
         "Stabquerschnitte"
@@ -2058,28 +2058,6 @@
       ]
     },
     {
-      "name": "Flächenträgheitsmoment eines kaltgefertigten Rechteckrohrs um y",
-      "pfad": "Formelsammlung/Formeln/Flächenträgheitsmoment eines kaltgefertigten Rechteckrohrs um y.md",
-      "art": "formel",
-      "zeichen": [
-        "I_{y}"
-      ],
-      "themen": [
-        "Stabquerschnitte"
-      ]
-    },
-    {
-      "name": "Flächenträgheitsmoment eines kaltgefertigten Rechteckrohrs um z",
-      "pfad": "Formelsammlung/Formeln/Flächenträgheitsmoment eines kaltgefertigten Rechteckrohrs um z.md",
-      "art": "formel",
-      "zeichen": [
-        "I_{z}"
-      ],
-      "themen": [
-        "Stabquerschnitte"
-      ]
-    },
-    {
       "name": "Flächenträgheitsmoment eines Kreises",
       "pfad": "Formelsammlung/Formeln/Flächenträgheitsmoment eines Kreises.md",
       "art": "formel",
@@ -2118,6 +2096,28 @@
       "art": "formel",
       "zeichen": [
         "I_{y}"
+      ],
+      "themen": [
+        "Stabquerschnitte"
+      ]
+    },
+    {
+      "name": "Flächenträgheitsmoment eines Rechteckrohrs mit runden Ecken um y",
+      "pfad": "Formelsammlung/Formeln/Flächenträgheitsmoment eines Rechteckrohrs mit runden Ecken um y.md",
+      "art": "formel",
+      "zeichen": [
+        "I_{y}"
+      ],
+      "themen": [
+        "Stabquerschnitte"
+      ]
+    },
+    {
+      "name": "Flächenträgheitsmoment eines Rechteckrohrs mit runden Ecken um z",
+      "pfad": "Formelsammlung/Formeln/Flächenträgheitsmoment eines Rechteckrohrs mit runden Ecken um z.md",
+      "art": "formel",
+      "zeichen": [
+        "I_{z}"
       ],
       "themen": [
         "Stabquerschnitte"
@@ -11042,7 +11042,7 @@
         "Blech.streifen",
         "_u",
         "_steg",
-        "_rrk",
+        "_rechteckrohr",
         "bleche"
       ]
     },
@@ -11092,6 +11092,7 @@
         "_z",
         "_unp",
         "_rrk",
+        "_rrw",
         "_benannt",
         "reihe",
         "profil"

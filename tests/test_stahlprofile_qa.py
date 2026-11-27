@@ -109,7 +109,8 @@ class TestUmriss(unittest.TestCase):
     def test_drehbar_und_spiegelbar(self):
         """Ein Rundrohr und ein quadratisches Rohr dreht nichts, gespiegelt aendert sich nur das U."""
         fest = {n for n, p in PROFILE.items()
-                if n.startswith("ROR") or (n.startswith("RRK") and p.masse["h"] == p.masse["b"])}
+                if n.startswith("ROR") or (n.startswith(("RRK", "RRW"))
+                                           and p.masse["h"] == p.masse["b"])}
         self.assertEqual({n for n in PROFILE if not lage.drehbar(n)}, fest)
         self.assertEqual({n for n in PROFILE if lage.spiegelbar(n)},
                          {n for n in PROFILE if n.startswith(("UPE", "UNP"))})
@@ -290,7 +291,7 @@ class TestVorlage(unittest.TestCase):
     def test_im_katalog(self):
         k = katalog()
         self.assertEqual([r["kurz"] for r in k["profilreihen"]],
-                         ["IPE", "HEA", "HEB", "HEM", "UPE", "UNP", "RRK", "ROR"])
+                         ["IPE", "HEA", "HEB", "HEM", "UPE", "UNP", "RRK", "RRW", "ROR"])
         heb = next(r for r in k["profilreihen"] if r["kurz"] == "HEB")
         self.assertEqual(heb["profile"][0], "HEB 100")
         self.assertTrue(heb["skizze"]["polygone"])

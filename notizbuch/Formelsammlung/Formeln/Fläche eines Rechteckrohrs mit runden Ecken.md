@@ -46,11 +46,14 @@ $$
 
 ## Theorie
 
-Vier Wände der Dicke $t$, zusammen $2t\,(h + b - 2t)$ -- so gezählt, dass
+Vier Wände der Dicke $t$, zusammen $2t\,(h + b - 2t)$ – so gezählt, dass
 keine Ecke doppelt steht. Die Ecken sind rund, aussen mit $r_o$ und innen
 mit $r_i$: aussen fehlt je ein Zwickel mit $0.2146\,r_o^2$, innen kommt je
 einer mit $0.2146\,r_i^2$ hinzu, denn das Loch ist an seinen Ecken kleiner.
 
-Die Radien kommen aus der Wanddicke, wie in der Tabelle des Benutzers: bis
-$t = 6$ mm ist $r_o = 2t$ und $r_i = t$, bis 10 mm $2.5\,t$ und $1.5\,t$,
-darüber $3t$ und $2t$. Nach Vorgabe, nicht nachgeschlagen.
+So rechnen das kalt- und das warmgefertigte Rohr; sie unterscheiden sich nur
+in den Radien. Beim kaltgefertigten (RRK) kommen sie aus der Wanddicke wie
+in der Tabelle des Benutzers: bis $t = 6$ mm ist $r_o = 2t$ und $r_i = t$,
+bis 10 mm $2.5\,t$ und $1.5\,t$, darüber $3t$ und $2t$. Beim
+warmgefertigten (RRW) ist $r_o = 1.5\,t$ und $r_i = t$. Beides nach
+Vorgabe, nicht nachgeschlagen.

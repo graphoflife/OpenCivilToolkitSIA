@@ -1,5 +1,5 @@
 ---
-erzeugt: 0b54be2b1620
+erzeugt: 9156a38841d7
 art: modul
 tags: [modul]
 ---
@@ -26,8 +26,9 @@ von der Mittellinie des Stegs bis zum freien Rand. Mit ihr rechnet die
 mitwirkende Breite: 4.5.3.3 misst von den theoretischen Scheibenschnittlinien
 aus. Die Schlankheit misst die Breite `c`, die die Bilder der Tabellen 5a
 und 5b zeigen: beim gewalzten Profil ohne die Ausrundungen, beim
-kaltgefertigten Rechteckrohr ohne 1.5 t je Seite. Sie liegt auf derselben
-Geraden, `vor` nach dem Anfang der theoretischen.
+Rechteckrohr ohne 1.5 t je Seite, ob kalt- oder warmgefertigt -- Tabelle 5a
+unterscheidet nicht. Sie liegt auf derselben Geraden, `vor` nach dem
+Anfang der theoretischen.
 
 
 ## DAS UNP
@@ -140,10 +141,10 @@ def _steg(y: float, h: float, t_f: float, t_w: float, r: float) -> _Roh
 
 Der Steg zwischen den Mittellinien der Flansche, `c` bis zu den Ausrundungen.
 
-### _rrk
+### _rechteckrohr
 
 ```python
-def _rrk(m: Mapping[str, float]) -> List[_Roh]
+def _rechteckrohr(m: Mapping[str, float]) -> List[_Roh]
 ```
 
 Vier Waende zwischen den Mittellinien der anderen; `c` ohne 1.5 t je Seite (Tabelle 5a).
@@ -161,7 +162,7 @@ Die Bleche des Profils, wo es in der Zeichnung liegt -- siehe Dateikopf.
 
 - `_Roh = Tuple[Tuple[str, ...], Halterung, Punkt, Punkt, float, float, float]` – Ein Blech, wie die Form es zeichnet: sein Name aus Woertern -- die Richtungen darin dreht und spiegelt die Lage mit --, die Halterung, die Enden der theoretischen Breite, die Dicke, `c` und `vor`.
 - `_RICHTUNGEN = ('oben', 'unten', 'links', 'rechts')`
-- `_KASTEN = {'rechteckrohr_kalt'}` – Die Formen, die ein Kasten sind -- siehe Dateikopf.
+- `_KASTEN = {'rechteckrohr_gerundet'}` – Die Formen, die ein Kasten sind -- siehe Dateikopf.
 - `_BLECHE = {'i_profil': _i, 'u_parallel': lambda m: _u(m, m['r']), 'u_geneigt': …` – Je Form, welche Bleche sie hat -- nach dem Schluessel ihrer Vorlage.
 
 ## Braucht

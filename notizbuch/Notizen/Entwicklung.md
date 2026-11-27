@@ -7,6 +7,47 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-27 · Warmgefertigte Rechteckrohre (RRW)
+
+Aus dem Plan vom 2026-11-25, Schritt 11d. Der Benutzer hat am selben Tag
+entschieden: den Rohrkatalog von ArcelorMittal holen, das Verkaufsprogramm
+für L, INP, T und HEAA nicht – diese Reihen bleiben weg.
+
+**Vorher und nachher.** Vorher gab es nur das kaltgefertigte Rechteckrohr
+RRK. Nachher steht daneben die Reihe RRW, 481 Grössen von RRW 80 x 80 x 5
+bis RRW 500 x 300 x 16. Das RRW 200 x 100 x 8 hat A = 44.75 cm² und knickt
+nach Kurve a; das RRK derselben Masse hat 43.24 cm² – seine Ecken sind
+runder – und knickt nach Kurve c. Bei λ̄_K = 1.0 ist χ_K damit 0.67 statt
+0.54.
+
+**Woher die Grössen.** Der Katalog «Hollow Structural Sections» von
+ArcelorMittal Tubular Products Europe (2024) zeigt je Mass h × b, welche
+Wanddicken lieferbar sind: als farbige Felder einer Tabelle. Zeile und
+Spalte kommen aus der Textschicht, die Farbe aus der Mitte jeder Zelle im
+Bild; Stichproben im Bild stimmen. Die hellen Felder sind nur die Streifen
+leerer Spalten, keine zweite Art von Lieferbarkeit. Radien nennt der
+Katalog keine.
+
+**Eine Form für beide Rohre.** RRK und RRW unterscheiden sich nur in den
+Radien. Die Form heisst darum neu «Rechteckrohr mit runden Ecken», und die
+Reihe bringt ihre Radien mit: das RRK die der Tabelle des Benutzers, das
+RRW 1.5 t und t (nach Vorgabe, nicht nachgeschlagen: EN 10210-2 liegt nicht
+vor). Was ein Rohr ist – Wände, Kasten, Schubfläche, gefülltes Rohr im
+Verbund –, gilt so für beide, ohne eine Stelle mehr. Die drei Formelseiten
+heissen nun «… eines Rechteckrohrs mit runden Ecken»; ihre Theorie zog mit.
+Im Stabwerk heisst die Form `RECHTECKROHR_GERUNDET`, weil die Vorlage mit
+scharfen Ecken dort schon `RECHTECKROHR` heisst.
+
+**Die Knickkurve kommt von der Reihe.** Figur 7 von SIA 263 trennt
+warmgefertigte Hohlprofile (Kurve a) von kaltgefertigten (Kurve c). Weil
+beide dieselbe Form haben, steht die Kurve nun je Reihe statt je Form; ein
+Test verlangt sie für jede Reihe, die kein I-Profil ist. Die Schlankheit
+der Wände misst Tabelle 5a bei jedem Rechteckrohr ohne 1.5 t je Seite, ob
+kalt oder warm – dort ändert sich nichts.
+
+**Was offen bleibt.** VKT, RND und FL mit frei eingegebenen Massen, wie
+der Benutzer am 2026-11-27 gewählt hat – der nächste Schritt.
+
 ## 2026-11-27 · Blechverbunddecken nach SIA 264
 
 Aus dem Plan vom 2026-11-25, Schritt 14d, zweiter Teil: die

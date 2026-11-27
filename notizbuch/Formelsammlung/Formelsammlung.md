@@ -1,5 +1,5 @@
 ---
-erzeugt: 29bc07da1dce
+erzeugt: d33727cdabef
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -230,10 +230,10 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Fläche des Tragstabs nach Abrostung]] · $A_s$
 - [[Fläche eines Doppel-T-Querschnitts]] · $A_{\text{Q6}}$
 - [[Fläche eines I-Profils]] · $A_{\text{Q11}}$
-- [[Fläche eines kaltgefertigten Rechteckrohrs]] · $A_{\text{Q18}}$
 - [[Fläche eines Kreises]] · $A_{\text{Q2}}$
 - [[Fläche eines Kreisrings]] · $A_{\text{Q3}}$
 - [[Fläche eines Rechteckrohrs]] · $A_{\text{Q4}}$
+- [[Fläche eines Rechteckrohrs mit runden Ecken]] · $A_{\text{Q18}}$
 - [[Fläche eines Rechtecks]] · $A_{\text{Q1}}$
 - [[Fläche eines T-Querschnitts]] · $A_{\text{Q5}}$
 - [[Fläche eines Trapezes]] · $A_{\text{Q7}}$
@@ -244,12 +244,12 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Flächenträgheitsmoment eines Doppel-T-Querschnitts]] · $I_{y}$
 - [[Flächenträgheitsmoment eines I-Profils um y]] · $I_{y}$
 - [[Flächenträgheitsmoment eines I-Profils um z]] · $I_{z}$
-- [[Flächenträgheitsmoment eines kaltgefertigten Rechteckrohrs um y]] · $I_{y}$
-- [[Flächenträgheitsmoment eines kaltgefertigten Rechteckrohrs um z]] · $I_{z}$
 - [[Flächenträgheitsmoment eines Kreises]] · $I_{y}$
 - [[Flächenträgheitsmoment eines Kreisrings]] · $I_{y}$
 - [[Flächenträgheitsmoment eines Kreisrings um z]] · $I_{z}$
 - [[Flächenträgheitsmoment eines Rechteckrohrs]] · $I_{y}$
+- [[Flächenträgheitsmoment eines Rechteckrohrs mit runden Ecken um y]] · $I_{y}$
+- [[Flächenträgheitsmoment eines Rechteckrohrs mit runden Ecken um z]] · $I_{z}$
 - [[Flächenträgheitsmoment eines Rechtecks]] · $I_{y}$
 - [[Flächenträgheitsmoment eines Rechtecks um z]] · $I_{z}$
 - [[Flächenträgheitsmoment eines T-Querschnitts]] · $I_{y}$
@@ -592,10 +592,10 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Fläche der Längsbewehrung]] · [[opencivil.pfahl.innen#InnererWiderstand|InnererWiderstand._bohrpfahl]]
 - [[Fläche eines Doppel-T-Querschnitts]] · [[opencivil.stabwerk.querschnitte]]
 - [[Fläche eines I-Profils]] · [[opencivil.stahlprofile.formen]]
-- [[Fläche eines kaltgefertigten Rechteckrohrs]] · [[opencivil.stahlprofile.formen]]
 - [[Fläche eines Kreises]] · [[opencivil.stabwerk.querschnitte]]
 - [[Fläche eines Kreisrings]] · [[opencivil.stabwerk.querschnitte]]
 - [[Fläche eines Rechteckrohrs]] · [[opencivil.stabwerk.querschnitte]]
+- [[Fläche eines Rechteckrohrs mit runden Ecken]] · [[opencivil.stahlprofile.formen]]
 - [[Fläche eines Rechtecks]] · [[opencivil.spannungsanalyse.platte#Loeserpaar.herleitung_bruttoquerschnitt|Loeserpaar.herleitung_bruttoquerschnitt]], [[opencivil.stabwerk.querschnitte]]
 - [[Fläche eines T-Querschnitts]] · [[opencivil.stabwerk.querschnitte]]
 - [[Fläche eines Trapezes]] · [[opencivil.stabwerk.querschnitte]]
@@ -605,12 +605,12 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Flächenträgheitsmoment eines Doppel-T-Querschnitts]] · [[opencivil.stabwerk.querschnitte]]
 - [[Flächenträgheitsmoment eines I-Profils um y]] · [[opencivil.stahlprofile.formen]]
 - [[Flächenträgheitsmoment eines I-Profils um z]] · [[opencivil.stahlprofile.formen]]
-- [[Flächenträgheitsmoment eines kaltgefertigten Rechteckrohrs um y]] · [[opencivil.stahlprofile.formen#_rohr_traegheit|_rohr_traegheit]]
-- [[Flächenträgheitsmoment eines kaltgefertigten Rechteckrohrs um z]] · [[opencivil.stahlprofile.formen#_rohr_traegheit|_rohr_traegheit]]
 - [[Flächenträgheitsmoment eines Kreises]] · [[opencivil.stabwerk.querschnitte]]
 - [[Flächenträgheitsmoment eines Kreisrings]] · [[opencivil.stabwerk.querschnitte]]
 - [[Flächenträgheitsmoment eines Kreisrings um z]] · [[opencivil.stabwerk.querschnitte#_wie_um_y|_wie_um_y]]
 - [[Flächenträgheitsmoment eines Rechteckrohrs]] · [[opencivil.stabwerk.querschnitte]]
+- [[Flächenträgheitsmoment eines Rechteckrohrs mit runden Ecken um y]] · [[opencivil.stahlprofile.formen#_rohr_traegheit|_rohr_traegheit]]
+- [[Flächenträgheitsmoment eines Rechteckrohrs mit runden Ecken um z]] · [[opencivil.stahlprofile.formen#_rohr_traegheit|_rohr_traegheit]]
 - [[Flächenträgheitsmoment eines Rechtecks]] · [[opencivil.spannungsanalyse.platte#Loeserpaar.herleitung_bruttoquerschnitt|Loeserpaar.herleitung_bruttoquerschnitt]], [[opencivil.stabwerk.querschnitte]]
 - [[Flächenträgheitsmoment eines Rechtecks um z]] · [[opencivil.stabwerk.querschnitte]]
 - [[Flächenträgheitsmoment eines T-Querschnitts]] · [[opencivil.stabwerk.querschnitte]]

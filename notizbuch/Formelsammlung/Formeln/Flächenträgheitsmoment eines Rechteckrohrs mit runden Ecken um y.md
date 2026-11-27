@@ -55,4 +55,6 @@ wie beim [[Flächenträgheitsmoment eines I-Profils um y]].
 
 Nach Vorgabe, nicht nachgeschlagen: die Formel der Tabelle des Benutzers.
 Dort stehen die Beiwerte der Zwickel genau, hier gerundet wie beim
-I-Profil; das ändert höchstens die fünfte Stelle.
+I-Profil; das ändert höchstens die fünfte Stelle. Kalt- und warmgefertigte
+Rohre rechnen gleich, nur mit ihren eigenen Radien – siehe
+[[Fläche eines Rechteckrohrs mit runden Ecken]].

@@ -1,5 +1,5 @@
 ---
-erzeugt: dac62398ec0d
+erzeugt: 151fb43b44b4
 art: modul
 tags: [modul]
 ---
@@ -232,7 +232,7 @@ Ob Beton im I-Profil den Flansch innen, den Steg beidseits deckt -- siehe Dateik
 - `BREITE_BETON = 0.8` – Wie breit der Beton nach dem Bild der Tabelle 3 mindestens ist: `b_c/b`.
 - `NEBEN = 1.0` – Wie weit neben dem Flansch und an wie vielen Stellen geprueft wird, ob Beton ihn deckt.
 - `STELLEN = 5`
-- `DOPPELSYMMETRISCH = (I_PROFIL, RECHTECKROHR_KALT, RUNDROHR)` – Die Formen, deren Profile zwei Symmetrieachsen haben.
+- `DOPPELSYMMETRISCH = (I_PROFIL, RECHTECKROHR_GERUNDET, RUNDROHR)` – Die Formen, deren Profile zwei Symmetrieachsen haben.
 - `IN_DER_KAMMER = 'in der Kammer'` – Wie ein Stueck heisst, das in der Huelle eines Profils liegt -- siehe Dateikopf.
 - `SEITE_AB = 1.0` – Wie weit die Schwerpunkte von Baustahl und Beton mindestens auseinander liegen, in mm, damit der Beton eine Seite hat.
 

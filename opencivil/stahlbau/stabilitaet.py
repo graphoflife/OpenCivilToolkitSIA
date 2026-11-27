@@ -98,9 +98,7 @@ from opencivil.querschnitt.zugseite import Zugseite
 from opencivil.stahlbau import widerstand as wd
 from opencivil.stahlbau.querschnitt import Stahlquerschnitt, normale
 from opencivil.stahlprofile import tabelle
-from opencivil.stahlprofile.formen import (
-    I_PROFIL, RECHTECKROHR_KALT, RUNDROHR, U_GENEIGT, U_PARALLEL,
-)
+from opencivil.stahlprofile.formen import I_PROFIL, RECHTECKROHR_GERUNDET
 from opencivil.stahlprofile.lage import Profillage
 
 REFERENZ_KNICKEN = "SIA 263:2013, 4.5.1.3, (7); 4.5.1.4, (8); Tabelle 8"
@@ -165,12 +163,15 @@ STARK = 1.0 + 1e-6
 #: Ab welchem Versatz in mm der wirksame Schwerpunkt neben dem ganzen liegt.
 VERSATZ = 1e-6
 
-#: Figur 7 ohne die I-Walzprofile: je Form die Kurve um beide Achsen und warum.
-_KURVE_DER_FORM: Dict[object, Tuple[str, str]] = {
-    RUNDROHR: ("a", "warmgefertigtes Hohlprofil"),
-    RECHTECKROHR_KALT: ("c", "kaltgefertigtes Hohlprofil"),
-    U_PARALLEL: ("c", "U-Profil"),
-    U_GENEIGT: ("c", "U-Profil"),
+#: Figur 7 ohne die I-Walzprofile: je Reihe die Kurve um beide Achsen und warum
+#: -- nach der Reihe, nicht nach der Form: RRK und RRW haben dieselbe Form,
+#: das eine kalt-, das andere warmgefertigt.
+_KURVE_DER_REIHE: Dict[str, Tuple[str, str]] = {
+    "ROR": ("a", "warmgefertigtes Hohlprofil"),
+    "RRW": ("a", "warmgefertigtes Hohlprofil"),
+    "RRK": ("c", "kaltgefertigtes Hohlprofil"),
+    "UPE": ("c", "U-Profil"),
+    "UNP": ("c", "U-Profil"),
 }
 
 #: Was fehlt -- Saetze fuer die Herleitung und die Zusammenfassung.
@@ -204,7 +205,7 @@ def kurve(profil: tabelle.Profil, stark: bool) -> Tuple[str, str]:
     schwache Achse -- und in Worten, warum.
     """
     if profil.form is not I_PROFIL:
-        return _KURVE_DER_FORM[profil.form]
+        return _KURVE_DER_REIHE[profil.reihe]
     m = profil.masse
     h, b, t_f = m["h"], m["b"], m["t_f"]
     if t_f > 100.0:
@@ -256,7 +257,7 @@ def druckgurt(profil: tabelle.Profil) -> Optional[Druckgurt]:
     m = profil.masse
     if profil.form is I_PROFIL:
         return Druckgurt(m["b"], m["t_f"], m["t_w"], (m["h"] - 2.0 * m["t_f"]) / 2.0, 1, 0.0)
-    if profil.form is RECHTECKROHR_KALT and m["h"] != m["b"]:
+    if profil.form is RECHTECKROHR_GERUNDET and m["h"] != m["b"]:
         hoch, breit, t = max(m["h"], m["b"]), min(m["h"], m["b"]), m["t"]
         return Druckgurt(breit, t, t, (hoch - 2.0 * t) / 2.0, 2, (breit - t) / 2.0)
     return None

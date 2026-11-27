@@ -28,10 +28,11 @@ def flaeche(punkte):
 
 class TestTabelle(unittest.TestCase):
     def test_jedes_profil_der_tabelle(self):
-        self.assertEqual(set(PROFILE), set(WERTE))
+        """Jedes Profil der Tabelle des Benutzers, dazu die RRW aus dem Katalog."""
+        self.assertEqual({n for n in PROFILE if not n.startswith("RRW ")}, set(WERTE))
         self.assertEqual({r.kurz: len(r.profile) for r in PROFILREIHEN},
                          {"IPE": 18, "HEA": 24, "HEB": 24, "HEM": 24, "UPE": 14, "UNP": 17,
-                          "RRK": 306, "ROR": 239})
+                          "RRK": 306, "RRW": 481, "ROR": 239})
         for r in PROFILREIHEN:
             with self.subTest(reihe=r.kurz):
                 self.assertTrue(all(p.name.startswith(f"{r.kurz} ") for p in r.profile))
@@ -77,6 +78,31 @@ class TestTabelle(unittest.TestCase):
                 m = profil(name).masse
                 self.assertAlmostEqual(m["r_o"], r_o)
                 self.assertAlmostEqual(m["r_i"], r_i)
+
+    def test_rrw(self):
+        """
+        Die Radien 1.5t und t; das RRW 200 x 100 x 8 von Hand mit den Zwickeln
+        der Tabelle -- r_o = 12, r_i = 8 --, das kleinste und das groesste.
+        """
+        m = profil("RRW 200 x 100 x 8").masse
+        self.assertEqual((m["r_o"], m["r_i"]), (12.0, 8.0))
+        w = gerechnet("RRW 200 x 100 x 8")
+        A = 2 * 8 * (200 + 100 - 16) - 4 * 0.2146 * (12 ** 2 - 8 ** 2)
+        self.assertAlmostEqual(w["A"].in_einheit(MM2), A, places=6)
+        self.assertAlmostEqual(A, 4475.328, places=3)
+
+        def zwickel(r, a):
+            return 0.00755 * r ** 4 + 0.2146 * r ** 2 * a ** 2
+
+        I_y = ((100 * 200 ** 3 - 84 * 184 ** 3) / 12 - 4 * zwickel(12, 100 - 0.2234 * 12)
+               + 4 * zwickel(8, 100 - 8 - 0.2234 * 8))
+        self.assertAlmostEqual(w["I_y"].in_einheit(CM4), I_y / 1e4, places=6)
+        self.assertAlmostEqual(I_y / 1e4, 2233.6, places=1)
+        rrw = next(r for r in PROFILREIHEN if r.kurz == "RRW")
+        namen = [p.name for p in rrw.profile]
+        self.assertEqual((namen[0], namen[-1]), ("RRW 80 x 80 x 5", "RRW 500 x 300 x 16"))
+        self.assertIn("RRW 120 x 60 x 3.6", namen)
+        self.assertNotIn("RRW 110 x 60 x 8", namen)
 
     def test_neigung_der_unp(self):
         """Bis h = 300 mm 8 % und t_f bei b/2, darüber 5 % und t_f in der Mitte des Flanschs."""

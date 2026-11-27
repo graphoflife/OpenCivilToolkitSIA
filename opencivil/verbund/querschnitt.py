@@ -91,7 +91,7 @@ from opencivil.stahlbau import klasse as kl
 from opencivil.stahlbau.querschnitt import Blechzustand, Gruppe, Stahlquerschnitt, Teil
 from opencivil.stahlprofile import tabelle
 from opencivil.stahlprofile.bleche import Blech, Halterung
-from opencivil.stahlprofile.formen import I_PROFIL, RECHTECKROHR_KALT, RUNDROHR
+from opencivil.stahlprofile.formen import I_PROFIL, RECHTECKROHR_GERUNDET, RUNDROHR
 
 #: Was der Kammerbeton je Blech erlaubt: die Grenzen ``c/t`` der Klassen 1 und 2, durch
 #: ``ε``, und woher sie kommen -- siehe Dateikopf.
@@ -106,7 +106,7 @@ NEBEN = 1.0
 STELLEN = 5
 
 #: Die Formen, deren Profile zwei Symmetrieachsen haben.
-DOPPELSYMMETRISCH = (I_PROFIL, RECHTECKROHR_KALT, RUNDROHR)
+DOPPELSYMMETRISCH = (I_PROFIL, RECHTECKROHR_GERUNDET, RUNDROHR)
 
 #: Wie ein Stueck heisst, das in der Huelle eines Profils liegt -- siehe Dateikopf.
 IN_DER_KAMMER = "in der Kammer"

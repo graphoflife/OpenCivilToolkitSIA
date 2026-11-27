@@ -1,5 +1,5 @@
 ---
-erzeugt: 245c8e54250a
+erzeugt: 3c891b227057
 art: thema
 tags: [thema]
 ---
@@ -43,9 +43,9 @@ Der äquivalente E-Modul eines Stabs: der Modul, den ein reiner, ungerissener Be
 29. [[Flächenträgheitsmoment eines U-Profils mit geneigten Flanschen um y]]
 30. [[Schwerpunkt eines U-Profils mit geneigten Flanschen]]
 31. [[Flächenträgheitsmoment eines U-Profils mit geneigten Flanschen um z]]
-32. [[Fläche eines kaltgefertigten Rechteckrohrs]]
-33. [[Flächenträgheitsmoment eines kaltgefertigten Rechteckrohrs um y]]
-34. [[Flächenträgheitsmoment eines kaltgefertigten Rechteckrohrs um z]]
+32. [[Fläche eines Rechteckrohrs mit runden Ecken]]
+33. [[Flächenträgheitsmoment eines Rechteckrohrs mit runden Ecken um y]]
+34. [[Flächenträgheitsmoment eines Rechteckrohrs mit runden Ecken um z]]
 35. [[Flächenträgheitsmoment eines Kreisrings um z]]
 36. [[Äquivalenter E-Modul eines Stabs]]
 37. [[Flächenträgheitsmoment eines Rechtecks um z]]

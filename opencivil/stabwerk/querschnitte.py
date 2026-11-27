@@ -28,7 +28,7 @@ Formeln des Rechtecks) und der Bruttoquerschnitt einer Querschnittsanalyse
 TORSION -- NACH VORGABE, NICHT NACHGESCHLAGEN:
 Kreis und Kreisring haben ``I_T = 2 · I_y``, wie jeder Kreisquerschnitt.
 Das Rechteckrohr rechnet als duenne Wand: offen und nach Bredt geschlossen,
-dieselbe Formel wie beim kaltgefertigten Rohr. Rechteck, T und Doppel-T
+dieselbe Formel wie beim Rohr mit runden Ecken. Rechteck, T und Doppel-T
 zerfallen in Rechtecke, und jedes traegt ``s · t³ · (1/3 - 0.21 · t/s ·
 (1 - t⁴/(12 · s⁴)))`` bei, mit ``t`` der kuerzeren und ``s`` der laengeren
 Seite -- die Naeherung von Roark, beim Rechteck auf weniger als ein Prozent
@@ -132,7 +132,7 @@ RECHTECKTORSION = (
 
 #: Das Torsionstraegheitsmoment eines Rechteckrohrs: offen und geschlossen
 #: (Bredt), mit dem Umfang ``p_m`` und der umschlossenen Flaeche ``A_m`` der
-#: Mittellinie -- auch beim kaltgefertigten Rohr (:mod:`~opencivil.stahlprofile.formen`).
+#: Mittellinie -- auch beim Rohr mit runden Ecken (:mod:`~opencivil.stahlprofile.formen`).
 ROHRTORSION = (
     r"\frac{\left(@t\right)^{3} \cdot @p_m}{3} + \frac{4 \cdot \left(@A_m\right)^{2} \cdot @t}"
     r"{@p_m}",

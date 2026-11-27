@@ -1,5 +1,5 @@
 ---
-erzeugt: 6d1baf6cf148
+erzeugt: 15926225845c
 art: modul
 tags: [modul]
 ---
@@ -674,7 +674,7 @@ ist bei null kleiner als eins. Durch Halbieren, bis auf 1e-12 genau.
 - `PSI_ETA_MIN = -0.5` – Ab wo (94) gilt -- darunter bleibt η beim Wert dort (Dateikopf).
 - `STARK = 1.0 + 1e-06` – Um so viel muss ein Traegheitsmoment groesser sein, damit seine Achse die starke ist.
 - `VERSATZ = 1e-06` – Ab welchem Versatz in mm der wirksame Schwerpunkt neben dem ganzen liegt.
-- `_KURVE_DER_FORM = {RUNDROHR: ('a', 'warmgefertigtes Hohlprofil'), RECHTECKROHR_KALT: ('…` – Figur 7 ohne die I-Walzprofile: je Form die Kurve um beide Achsen und warum.
+- `_KURVE_DER_REIHE = {'ROR': ('a', 'warmgefertigtes Hohlprofil'), 'RRW': ('a', 'warmgefert…` – Figur 7 ohne die I-Walzprofile: je Reihe die Kurve um beide Achsen und warum -- nach der Reihe, nicht nach der Form: RRK und RRW haben dieselbe Form, das eine kalt-, das andere warmgefertigt.
 - `KURVE_FEHLT = '{was}: Figur 7 kennt das Werkzeug nur für einen Querschnitt aus eine…` – Was fehlt -- Saetze fuer die Herleitung und die Zusammenfassung.
 - `KIPPEN_FEHLT = 'Kippen rechnet das Werkzeug nur für einen Querschnitt aus einem einz…`
 

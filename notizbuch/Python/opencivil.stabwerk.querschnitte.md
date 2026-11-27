@@ -1,5 +1,5 @@
 ---
-erzeugt: 6377e072284e
+erzeugt: 998abc7c0e54
 art: modul
 tags: [modul]
 ---
@@ -39,7 +39,7 @@ Formeln des Rechtecks) und der Bruttoquerschnitt einer Querschnittsanalyse
 
 Kreis und Kreisring haben `I_T = 2 · I_y`, wie jeder Kreisquerschnitt.
 Das Rechteckrohr rechnet als duenne Wand: offen und nach Bredt geschlossen,
-dieselbe Formel wie beim kaltgefertigten Rohr. Rechteck, T und Doppel-T
+dieselbe Formel wie beim Rohr mit runden Ecken. Rechteck, T und Doppel-T
 zerfallen in Rechtecke, und jedes traegt ``s · t³ · (1/3 - 0.21 · t/s ·
 (1 - t⁴/(12 · s⁴)))` bei, mit `t` der kuerzeren und `s`` der laengeren
 Seite -- die Naeherung von Roark, beim Rechteck auf weniger als ein Prozent
@@ -163,7 +163,7 @@ def vorlage(schluessel: str) -> Stabvorlage
 
 - `EINS = Groesse(1.0, EINHEITSLOS)` – Eins ohne Einheit -- fuer `1 - x` mit Groessen.
 - `RECHTECKTORSION = '@s \\cdot \\left(@t\\right)^{3} \\cdot \\left(\\frac{1}{3} - 0.21 \\…` – Was ein Rechteck zum Torsionstraegheitsmoment beitraegt, mit der kuerzeren Seite `t` und der laengeren `s` -- die Naeherung von Roark (Dateikopf).
-- `ROHRTORSION = ('\\frac{\\left(@t\\right)^{3} \\cdot @p_m}{3} + \\frac{4 \\cdot \\le…` – Das Torsionstraegheitsmoment eines Rechteckrohrs: offen und geschlossen (Bredt), mit dem Umfang `p_m` und der umschlossenen Flaeche `A_m` der Mittellinie -- auch beim kaltgefertigten Rohr ([[opencivil.stahlprofile.formen|formen]]).
+- `ROHRTORSION = ('\\frac{\\left(@t\\right)^{3} \\cdot @p_m}{3} + \\frac{4 \\cdot \\le…` – Das Torsionstraegheitsmoment eines Rechteckrohrs: offen und geschlossen (Bredt), mit dem Umfang `p_m` und der umschlossenen Flaeche `A_m` der Mittellinie -- auch beim Rohr mit runden Ecken ([[opencivil.stahlprofile.formen|formen]]).
 - `RECHTECK = Stabvorlage(schluessel='rechteck', name='Rechteck', masse=(Mass('b', …` – Rechteck: b breit, h hoch.
 - `KREIS = Stabvorlage(schluessel='kreis', name='Kreis', masse=(Mass('d', 'd', '…` – Kreis: Durchmesser d.
 - `KREISRING = Stabvorlage(schluessel='kreisring', name='Kreisring', masse=(Mass('D'…` – Kreisring: aussen D, Wand t.
