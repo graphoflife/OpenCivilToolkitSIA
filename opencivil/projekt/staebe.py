@@ -327,9 +327,10 @@ class MitStaeben:
         Knoten, Linie, Lager und Querschnitt (Benutzer, 2026-10-19), aber mit
         den Lastfaellen Eigengewicht -- es kommt von selbst --, Auflast und
         Nutzlast, die beiden ohne Last, und den Kombinationen GZT mit 1.35,
-        1.35 und 1.5 und GZG mit je 1.0 (Benutzer, 2026-10-23). Dazu die
-        Diagramme :attr:`NEUE_DIAGRAMME` der GZT und die Verschiebung der GZG,
-        und das Material M1, ein Beton: welcher, sagt
+        1.35 und 1.5 und GZG mit je 1.0 (Benutzer, 2026-10-23), dazwischen
+        «GZT günstig» mit 0.80 auf den staendigen Lasten (Benutzer,
+        2026-11-27). Dazu die Diagramme :attr:`NEUE_DIAGRAMME` der GZT und die
+        Verschiebung der GZG, und das Material M1, ein Beton: welcher, sagt
         :attr:`ERSTE_MATERIALIEN`.
         """
         s = cls(kennung=kennung, name=name)

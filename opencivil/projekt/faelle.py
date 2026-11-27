@@ -75,12 +75,20 @@ class MitFaellen:
         """
         Die Faelle eines frischen Bauteils (Benutzer, 2026-10-23): Eigengewicht
         -- es kommt von selbst --, Auflast und Nutzlast, die beiden ohne Last,
-        und die Kombination GZT mit 1.35, 1.35 und 1.5. Zurueck kommt die GZT.
+        und die Kombination GZT mit 1.35, 1.35 und 1.5. Dazu «GZT günstig»
+        fuer die Stellen, an denen die staendigen Lasten entlasten -- etwa am
+        Kragarm oder gegen Abheben --: beide mit 0.80, ohne Nutzlast
+        (Benutzer, 2026-11-27). Die Beiwerte sind die des Typs 2 nach
+        SIA 260:2013, 4.4.3.4, Tabelle 1; nach ihrer Fussnote 1 nimmt die
+        ganze staendige Last den einen oder den anderen. Zurueck kommt die
+        GZT.
         """
         g = self.lastfall("Eigengewicht", eigengewicht=True)
         auflast = self.lastfall("Auflast")
         nutzlast = self.lastfall("Nutzlast")
-        return self.kombination("GZT", (g, 1.35), (auflast, 1.35), (nutzlast, 1.5))
+        gzt = self.kombination("GZT", (g, 1.35), (auflast, 1.35), (nutzlast, 1.5))
+        self.kombination("GZT günstig", (g, 0.80), (auflast, 0.80))
+        return gzt
 
     def gebrauchskombination(self) -> LastkombinationEintrag:
         """Die Kombination GZG eines frischen Balkensystems: jeder Lastfall mit 1.0 (Benutzer, 2026-10-23)."""

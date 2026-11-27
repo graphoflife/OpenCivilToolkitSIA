@@ -67,7 +67,7 @@ class TestBeschreibung(unittest.TestCase):
     def test_neu_mit_den_diagrammen_des_raums(self):
         s = Balkensystem3dEintrag.neu("u1", "Raum")
         self.assertEqual([(d.fall, d.groesse) for d in s.diagramme],
-                         [("LK1", "M_y"), ("LK1", "M_z"), ("LK1", "N"), ("LK2", "verschiebung")])
+                         [("LK1", "M_y"), ("LK1", "M_z"), ("LK1", "N"), ("LK3", "verschiebung")])
 
     def test_nur_was_der_raum_kennt(self):
         s = Balkensystem3dEintrag(kennung="u1", name="S")

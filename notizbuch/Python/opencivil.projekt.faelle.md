@@ -1,5 +1,5 @@
 ---
-erzeugt: 4a22f8f243d6
+erzeugt: f126e45c8607
 art: modul
 tags: [modul]
 ---
@@ -88,7 +88,13 @@ def standardfaelle(self) -> LastkombinationEintrag
 
 Die Faelle eines frischen Bauteils (Benutzer, 2026-10-23): Eigengewicht
 – es kommt von selbst –, Auflast und Nutzlast, die beiden ohne Last,
-und die Kombination GZT mit 1.35, 1.35 und 1.5. Zurueck kommt die GZT.
+und die Kombination GZT mit 1.35, 1.35 und 1.5. Dazu «GZT günstig»
+fuer die Stellen, an denen die staendigen Lasten entlasten – etwa am
+Kragarm oder gegen Abheben –: beide mit 0.80, ohne Nutzlast
+(Benutzer, 2026-11-27). Die Beiwerte sind die des Typs 2 nach
+SIA 260:2013, 4.4.3.4, Tabelle 1; nach ihrer Fussnote 1 nimmt die
+ganze staendige Last den einen oder den anderen. Zurueck kommt die
+GZT.
 
 #### MitFaellen.gebrauchskombination
 

@@ -87,7 +87,11 @@ class TestBeschreibung(unittest.TestCase):
         self.assertEqual(d.materialien(), ["b1"])
 
     def test_neu_hat_die_lastfaelle_eines_frischen_balkensystems_ohne_gzg(self):
-        """Die Streifenmethode gilt für die Tragsicherheit: eine neue Decke bekommt nur die GZT."""
+        """
+        Die Streifenmethode gilt für die Tragsicherheit: eine neue Decke bekommt
+        nur deren Kombinationen, GZT und «GZT günstig» -- die ständigen Lasten
+        mit 0.80, ohne Nutzlast.
+        """
         d = DeckeEintrag.neu("e1", "Decke")
         self.assertEqual((d.knoten, d.platten, d.linienlager, d.stuetzen, d.unterzuege, d.zonen),
                          ([], [], [], [], [], []))
@@ -95,10 +99,11 @@ class TestBeschreibung(unittest.TestCase):
         self.assertEqual([(lf.kennung, lf.name, lf.eigengewicht) for lf in d.lastfaelle],
                          [("LF1", "Eigengewicht", True), ("LF2", "Auflast", False), ("LF3", "Nutzlast", False)])
         self.assertEqual({k.name: k.faktoren for k in d.kombinationen},
-                         {"GZT": {"LF1": 1.35, "LF2": 1.35, "LF3": 1.5}})
+                         {"GZT": {"LF1": 1.35, "LF2": 1.35, "LF3": 1.5},
+                          "GZT günstig": {"LF1": 0.8, "LF2": 0.8}})
         b = BalkensystemEintrag.neu("r1", "System")
         self.assertEqual((b.lastfaelle, b.kombinationen[0]), (d.lastfaelle, d.kombinationen[0]))
-        self.assertEqual([k.name for k in b.kombinationen], ["GZT", "GZG"])
+        self.assertEqual([k.name for k in b.kombinationen], ["GZT", "GZT günstig", "GZG"])
         gzt = next(k.kennung for k in d.kombinationen if k.name == "GZT")
         self.assertEqual([(z.fall, z.groesse) for z in d.diagramme],
                          [(gzt, "m_x"), (gzt, "m_y"), (gzt, "v_0"), (gzt, "lager")])
@@ -226,7 +231,8 @@ class TestLasten(unittest.TestCase):
         self.assertEqual((flaeche.name, flaeche.wert, len(flaeche.ecken)), ("FL1", 3000.0, 4))
         self.assertEqual(punkt, Punktlast("PL1", (2.0, 2.0), 20000.0, 0.5, 1.0))
         self.assertEqual({k.name: k.faktoren for k in decke.kombinationen},
-                         {"GZT": {"Eigengewicht": 1.35, "Auflast": 1.35, "Nutzlast": 1.5}})
+                         {"GZT": {"Eigengewicht": 1.35, "Auflast": 1.35, "Nutzlast": 1.5},
+                          "GZT günstig": {"Eigengewicht": 0.8, "Auflast": 0.8}})
 
     def test_eine_plattenlast_je_lastfall(self):
         """Wie in der Oberfläche: eine zweite Last auf derselben Platte im selben Lastfall ersetzt die erste."""
@@ -270,11 +276,14 @@ class TestLasten(unittest.TestCase):
     def test_die_probe_je_fall(self):
         """Je Fall tragen die Lager die ganze Last; eine Kombination ist die Summe ihrer Fälle mal Beiwert."""
         faelle = {f["name"]: f for f in zeichnung(mit_lasten()).daten["uebersicht"]["faelle"]}
-        self.assertEqual(list(faelle), ["Eigengewicht", "Auflast", "Nutzlast", "GZT"])
+        self.assertEqual(list(faelle),
+                         ["Eigengewicht", "Auflast", "Nutzlast", "GZT", "GZT günstig"])
         # 4 · 3 · 0.20 · 25 + 4 · 3 · 0.25 · 25 kN; 1.5 · 12 + 8 · 2; 3 · 4 + 20.
         for name, summe in (("Eigengewicht", 135.0), ("Auflast", 34.0), ("Nutzlast", 32.0)):
             self.assertAlmostEqual(faelle[name]["summe"], summe, places=6)
         self.assertAlmostEqual(faelle["GZT"]["summe"], 1.35 * 135.0 + 1.35 * 34.0 + 1.5 * 32.0, places=6)
+        # Die günstige Kombination ohne Nutzlast.
+        self.assertAlmostEqual(faelle["GZT günstig"]["summe"], 0.8 * (135.0 + 34.0), places=6)
         for f in faelle.values():
             self.assertAlmostEqual(f["lager"], f["summe"], places=6)
             self.assertEqual((f["daneben"], f["nicht_getragen"], f["meldungen"]), (0.0, 0.0, []))
@@ -463,7 +472,8 @@ class TestBilder(unittest.TestCase):
         antwort = bilder(mit_lasten(), "GZX")
         self.assertEqual((antwort.status, antwort.daten["fehler"]),
                          (400, "Einen Fall «GZX» gibt es in «Zwei Felder» nicht. "
-                               "Gerechnet sind: Eigengewicht, Auflast, Nutzlast, GZT."))
+                               "Gerechnet sind: Eigengewicht, Auflast, Nutzlast, GZT, "
+                               "GZT günstig."))
 
 
 if __name__ == "__main__":

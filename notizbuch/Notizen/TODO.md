@@ -76,13 +76,6 @@ Kräften je Geschoss und Wand, ohne Verbindung ins Balkensystem.
       (4.1.4.2.4); quer braucht es trotzdem mindestens 20 % der
       Hauptbewehrung (5.5.3.2). Die Einzellast selbst steht nach SIA 261:2020,
       Tabelle 8 auf 50 × 50 mm.
-- [ ] **Günstige ständige Last in den Vorgaben.** Die Vorgabe-Kombination
-      GZT nimmt Eigengewicht und Auflast mit 1.35 und die Nutzlast mit 1.5,
-      im Balkensystem wie in der Decke. SIA 260:2013, Tabelle 1 kennt für
-      eine günstig wirkende ständige Last 0.80; massgebend ist sie etwa beim
-      Kragarm mit Nachbarfeld, beim Abheben eines Lagers oder beim Gleiten.
-      Vorschlag: eine zweite Vorgabe-Kombination mit 0.80 auf den ständigen
-      Lasten, oder ein Hinweis in der Herleitung. Entscheid des Benutzers.
 - [ ] Decken: B-B des Kolloquiums 4 weicht von der Musterlösung ab
       (−60.1 statt −58.5 kNm/m, Stützen 115.0/276.4 statt 115.5/275.1 kN),
       weil die App die Last aus C-C dort ablegt, wo sie aufliegt, statt mit

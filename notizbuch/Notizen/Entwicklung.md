@@ -7,6 +7,30 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-27 · Neue Systeme und Decken: auch «GZT günstig»
+
+Eine Frage aus dem TODO, vom Benutzer am 2026-11-27 beantwortet: eine
+zweite Kombination mit 0.8 auf den ständigen Lasten, «aber dann konsequent
+auch ohne Nutzlast».
+
+Vorher bekam ein neues Balkensystem – eben wie räumlich – die Kombinationen
+GZT (Eigengewicht und Auflast mit 1.35, Nutzlast mit 1.5) und GZG, eine
+neue Decke nur die GZT. Wo die ständige Last entlastet – am Kragarm neben
+einem Feld, gegen das Abheben eines Lagers –, fehlte der Fall mit der
+kleinen ständigen Last. Nachher steht gleich nach der GZT «GZT günstig»:
+Eigengewicht und Auflast mit 0.80, ohne Nutzlast. Ein Beispiel aus den
+Tests, Eigengewicht 135 kN, Auflast 34 kN, Nutzlast 32 kN: die GZT trägt
+1.35 · 169 + 1.5 · 32 = 276.2 kN, «GZT günstig» 0.80 · 169 = 135.2 kN.
+
+- Die Beiwerte sind die des Typs 2 nach SIA 260:2013, 4.4.3.4,
+  Tabelle 1: γ_G,sup = 1.35, γ_G,inf = 0.80. Nach der Fussnote 1 nimmt die
+  ganze ständige Last den einen oder den anderen Beiwert; darum gilt 0.80
+  für Eigengewicht und Auflast zusammen.
+- Bestehende Systeme und Decken behalten ihre Kombinationen. Bilder zeigt
+  die neue Kombination von selbst keine; man wählt sie wie jede andere.
+
+---
+
 ## 2026-11-27 · Überdeckung: neu 35 mm
 
 Eine Frage aus dem TODO, vom Benutzer am 2026-11-27 beantwortet: «Vorgabe

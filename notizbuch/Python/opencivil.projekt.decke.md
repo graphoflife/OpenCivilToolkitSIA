@@ -1,5 +1,5 @@
 ---
-erzeugt: c6c90f0a989c
+erzeugt: 291e01066913
 art: modul
 tags: [modul]
 ---
@@ -430,9 +430,10 @@ def neu(cls, kennung: str, name: str) -> 'DeckeEintrag'
 
 Eine frische Decke, wie der Benutzer sie angelegt bekommt: ohne
 Platte, aber mit den Lastfällen eines frischen Balkensystems – das
-Eigengewicht kommt von selbst – und nur der Kombination GZT, ohne
-GZG: die Streifenmethode gilt für die Tragsicherheit (Benutzer,
-2026-11-14). Dazu die Bilder m_x, m_y, v_0 und die Lagerkräfte der GZT.
+Eigengewicht kommt von selbst – und nur den Kombinationen der
+Tragsicherheit, GZT und «GZT günstig», ohne GZG: die Streifenmethode
+gilt für die Tragsicherheit (Benutzer, 2026-11-14). Dazu die Bilder
+m_x, m_y, v_0 und die Lagerkräfte der GZT.
 
 
 ## Konstanten

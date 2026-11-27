@@ -431,9 +431,10 @@ class DeckeEintrag(MitFaellen, BauteilEintrag):
         """
         Eine frische Decke, wie der Benutzer sie angelegt bekommt: ohne
         Platte, aber mit den Lastfällen eines frischen Balkensystems -- das
-        Eigengewicht kommt von selbst -- und nur der Kombination GZT, ohne
-        GZG: die Streifenmethode gilt für die Tragsicherheit (Benutzer,
-        2026-11-14). Dazu die Bilder m_x, m_y, v_0 und die Lagerkräfte der GZT.
+        Eigengewicht kommt von selbst -- und nur den Kombinationen der
+        Tragsicherheit, GZT und «GZT günstig», ohne GZG: die Streifenmethode
+        gilt für die Tragsicherheit (Benutzer, 2026-11-14). Dazu die Bilder
+        m_x, m_y, v_0 und die Lagerkräfte der GZT.
         """
         d = cls(kennung=kennung, name=name)
         gzt = d.standardfaelle()

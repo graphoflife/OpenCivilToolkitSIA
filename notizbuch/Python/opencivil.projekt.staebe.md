@@ -1,5 +1,5 @@
 ---
-erzeugt: 21b780236b17
+erzeugt: d47a2d4fd20a
 art: modul
 tags: [modul]
 ---
@@ -258,9 +258,10 @@ Ein frisches System, wie der Benutzer es angelegt bekommt: ohne
 Knoten, Linie, Lager und Querschnitt (Benutzer, 2026-10-19), aber mit
 den Lastfaellen Eigengewicht – es kommt von selbst –, Auflast und
 Nutzlast, die beiden ohne Last, und den Kombinationen GZT mit 1.35,
-1.35 und 1.5 und GZG mit je 1.0 (Benutzer, 2026-10-23). Dazu die
-Diagramme [[opencivil.projekt.staebe#MitStaeben|NEUE_DIAGRAMME]] der GZT und die Verschiebung der GZG,
-und das Material M1, ein Beton: welcher, sagt
+1.35 und 1.5 und GZG mit je 1.0 (Benutzer, 2026-10-23), dazwischen
+«GZT günstig» mit 0.80 auf den staendigen Lasten (Benutzer,
+2026-11-27). Dazu die Diagramme [[opencivil.projekt.staebe#MitStaeben|NEUE_DIAGRAMME]] der GZT und die
+Verschiebung der GZG, und das Material M1, ein Beton: welcher, sagt
 [[opencivil.projekt.staebe#MitStaeben|ERSTE_MATERIALIEN]].
 
 #### MitStaeben.wo
