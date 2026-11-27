@@ -1,5 +1,5 @@
 ---
-erzeugt: 6782bc4509a1
+erzeugt: 2b6601e84101
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.4.3.2.5, (104)"
@@ -26,7 +26,7 @@ $$
 Mit den Zahlen aus dem Beispielprojekt:
 
 $$
-\rho_{u} = \frac{A_{s,2,x}}{b \cdot d_{2,x}} = \frac{2450\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 248.1\,\mathrm{mm}} = 0.00988
+\rho_{u} = \frac{A_{s,2,x}}{b \cdot d_{2,x}} = \frac{2450\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 243.1\,\mathrm{mm}} = 0.01008
 $$
 
 ## Gebraucht von

@@ -105,20 +105,20 @@ class TestNachweis(unittest.TestCase):
         ist der Hebel kleiner als bei einer aussen liegenden Lage.
 
             A_s = 2450 mm²
-            d   = z = 248.1 mm     (untere Lage -> gedrückt ist oben)
+            d   = z = 243.1 mm     (untere Lage -> gedrückt ist oben)
             x   = 62.7 mm          (hängt nur von A_s ab, nicht von d)
-            x/d = 0.253 ≤ 0.350    -> erfüllt (0.35 · 435 / 434.78)
-            α   = 0.350/0.253 = 1.39
+            x/d = 0.258 ≤ 0.350    -> erfüllt (0.35 · 435 / 434.78)
+            α   = 0.350/0.258 = 1.36
         """
         lagen, gefunden = urteile(projekt_mit())
         erg = lagen[0]
         self.assertEqual(erg.lage.nummer, 2)
         self.assertAlmostEqual(erg.a_s * 1e6, 2450.0, delta=2.0)
-        self.assertAlmostEqual(erg.d * 1e3, 248.1, delta=0.2)
+        self.assertAlmostEqual(erg.d * 1e3, 243.1, delta=0.2)
         self.assertAlmostEqual(erg.x * 1e3, 62.7, delta=0.2)
-        self.assertAlmostEqual(erg.verhaeltnis, 0.253, delta=0.002)
+        self.assertAlmostEqual(erg.verhaeltnis, 0.258, delta=0.002)
         self.assertTrue(erg.erfuellt)
-        self.assertAlmostEqual(erg.erfuellungsgrad, 1.39, delta=0.02)
+        self.assertAlmostEqual(erg.erfuellungsgrad, 1.36, delta=0.02)
 
     def test_der_erfuellungsgrad_ist_die_grenze_durch_das_verhaeltnis(self):
         lagen, _ = urteile(projekt_mit())
@@ -277,7 +277,7 @@ class TestHerleitungAusVorlagen(unittest.TestCase):
         schwerpunkt = next(b for b in self.bloecke
                            if b.titel == "Gemeinsamer Schwerpunkt der Lage")
         # Beide Posten mit Querschnitt und Höhe, nicht nur das Resultat.
-        self.assertIn(r"1696\,\mathrm{mm}^{2} \cdot 249\,\mathrm{mm}", schwerpunkt.latex)
+        self.assertIn(r"1696\,\mathrm{mm}^{2} \cdot 244\,\mathrm{mm}", schwerpunkt.latex)
 
 
 class TestStahl(unittest.TestCase):
@@ -289,12 +289,12 @@ class TestStahl(unittest.TestCase):
         tiefere Druckzone zugleich -- bis 2026-11-14 hielt sie 0.35.
 
             x      = 2450e-6 · 608.7e6 / (0.85 · 1.0 · 20e6) = 87.7 mm
-            x/d    = 87.7 / 248.1 = 0.354
+            x/d    = 87.7 / 243.1 = 0.361
             Grenze = 0.35 · 435 / 608.7 = 0.250
         """
         erg = urteile(mit_stahl(projekt_mit(), "B700B"))[0][0]
         self.assertAlmostEqual(erg.grenze, 0.2501, delta=1e-4)
-        self.assertAlmostEqual(erg.verhaeltnis, 0.354, delta=0.002)
+        self.assertAlmostEqual(erg.verhaeltnis, 0.361, delta=0.002)
         self.assertFalse(erg.erfuellt)
         self.assertAlmostEqual(erg.erfuellungsgrad, erg.grenze / erg.verhaeltnis)
 
@@ -311,7 +311,7 @@ class TestEigeneGrenze(unittest.TestCase):
     """Der Beiwert k der Grenze je Platte: Vorgabe 0.35, höchstens 0.5."""
 
     def dicke_untere_lage(self, grenze: float) -> Projekt:
-        """⌀26@150 + ⌀10@150 unten: x/d = 0.43 -- über 0.35, unter 0.5."""
+        """⌀26@150 + ⌀10@150 unten: x/d = 0.435 -- über 0.35, unter 0.5."""
         projekt = projekt_mit(x_d_max=grenze)
         lage = projekt.querschnitte[0].lagen[x_lagen(projekt)[0] - 1]
         lage.grund.durchmesser, lage.zulage.durchmesser = 26.0, 10.0
@@ -325,7 +325,7 @@ class TestEigeneGrenze(unittest.TestCase):
         for grenze, erfuellt in ((0.35, False), (0.5, True)):
             erg = urteile(self.dicke_untere_lage(grenze))[0][0]
             with self.subTest(grenze=grenze):
-                self.assertAlmostEqual(erg.verhaeltnis, 0.426, delta=0.002)
+                self.assertAlmostEqual(erg.verhaeltnis, 0.435, delta=0.002)
                 self.assertIs(erg.erfuellt, erfuellt)
                 self.assertAlmostEqual(erg.grenze, grenze * 435 / (500 / 1.15))
                 self.assertAlmostEqual(erg.erfuellungsgrad, erg.grenze / erg.verhaeltnis)

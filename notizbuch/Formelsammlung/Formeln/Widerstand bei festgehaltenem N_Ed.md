@@ -1,5 +1,5 @@
 ---
-erzeugt: 758752d5cf9c
+erzeugt: a36e369d3818
 art: formel
 tags: [formel]
 ---
@@ -34,7 +34,7 @@ $$
 Mit den Zahlen aus dem Beispielprojekt:
 
 $$
-M_{Rd} = M_{Rd}(N_{Ed}=0)^{+} = 235.9\,\mathrm{kNm}
+M_{Rd} = M_{Rd}(N_{Ed}=0)^{+} = 230.6\,\mathrm{kNm}
 $$
 
 Mit den Zahlen aus dem Beispielprojekt:
@@ -42,8 +42,8 @@ Mit den Zahlen aus dem Beispielprojekt:
 $$
 \begin{aligned}
   M_{Rd} &= M_1 + \frac{N_{Ed} - N_1}{N_2 - N_1} \cdot \left(M_2 - M_1\right) \\
-  &= 324.4\,\mathrm{kNm} + \frac{-300\,\mathrm{kN} - \left(-1484.6\,\mathrm{kN}\right)}{0\,\mathrm{kN} - \left(-1484.6\,\mathrm{kN}\right)} \cdot \left(235.9\,\mathrm{kNm} - 324.4\,\mathrm{kNm}\right) \\
-  &= 253.8\,\mathrm{kNm}
+  &= 319\,\mathrm{kNm} + \frac{-300\,\mathrm{kN} - \left(-1485.6\,\mathrm{kN}\right)}{0\,\mathrm{kN} - \left(-1485.6\,\mathrm{kN}\right)} \cdot \left(230.6\,\mathrm{kNm} - 319\,\mathrm{kNm}\right) \\
+  &= 248.5\,\mathrm{kNm}
 \end{aligned}
 $$
 

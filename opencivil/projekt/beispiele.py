@@ -48,13 +48,9 @@ def beispiel() -> Projekt:
     projekt.stahl("B500B")
     # Aussen y, innen x -- der übliche Fall: die Querrichtung läuft unten
     # und oben durch, die Tragrichtung liegt dazwischen und verliert
-    # dadurch statische Höhe. Die 2. Lage trägt eine Zulage. Die
-    # Überdeckung bleibt 30 mm, die Vorgabe bis 2026-11-27, wie ein
-    # gespeichertes Projekt seine Zahl behält: an den Zahlen dieser Platte
-    # hängen Bericht, Formelsammlung und Handrechnungen der Tests.
+    # dadurch statische Höhe. Die 2. Lage trägt eine Zulage.
     platte = projekt.platte("Decke über EG", h=300,
-                            x=[18, 12], x_zulage=[12, 0], y=[12, 12],
-                            ueberdeckung_unten=30.0, ueberdeckung_oben=30.0)
+                            x=[18, 12], x_zulage=[12, 0], y=[12, 12])
     # Die Werte sind so gewählt, dass das Beispiel grün startet.
     platte.einwirkung("Feld", M_Ed=100.0)
     platte.einwirkung("Feld mit Druck", M_Ed=100.0, N_Ed=-300.0)

@@ -1,5 +1,5 @@
 ---
-erzeugt: 9fe1fa02bdda
+erzeugt: 70d319e08141
 art: formel
 tags: [formel]
 normstelle: ["SIA 262:2025, 4.3.3.2.1, (35), (36)", "SIA 262:2025, 4.3.3.2.1, (35), (36); 4.3.3.2.2, (38)", "SIA 262:2025, 4.3.3.4.2; 4.3.3.4.3, (45); 4.3.3.4.6, (47)"]
@@ -27,8 +27,8 @@ Mit den Zahlen aus dem Beispielprojekt:
 $$
 \begin{aligned}
   V_{Rd,max} &= \min\left[V_{Rd}^{+}(M_{Ed} = 0);\ V_{Rd}^{-}(M_{Ed} = 0)\right] \\
-  &= \min\left[271.8\,\mathrm{kN}/\mathrm{m};\ 276.1\,\mathrm{kN}/\mathrm{m}\right] \\
-  &= 271.8\,\mathrm{kN}/\mathrm{m}
+  &= \min\left[266.3\,\mathrm{kN}/\mathrm{m};\ 270.6\,\mathrm{kN}/\mathrm{m}\right] \\
+  &= 266.3\,\mathrm{kN}/\mathrm{m}
 \end{aligned}
 $$
 

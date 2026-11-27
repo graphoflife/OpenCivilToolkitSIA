@@ -1,5 +1,5 @@
 ---
-erzeugt: 63bca466f5e9
+erzeugt: 38794366a1d2
 art: formel
 tags: [formel]
 ---
@@ -28,8 +28,8 @@ Mit den Zahlen aus dem Beispielprojekt:
 $$
 \begin{aligned}
   z_{2,x} &= \frac{A_{s,2,x,g} \cdot z_{2,x,g} + A_{s,2,x,z} \cdot z_{2,x,z}}{A_{s,2,x,g} + A_{s,2,x,z}} \\
-  &= \frac{1696\,\mathrm{mm}^{2} \cdot 249\,\mathrm{mm} + 754\,\mathrm{mm}^{2} \cdot 246\,\mathrm{mm}}{1696\,\mathrm{mm}^{2} + 754\,\mathrm{mm}^{2}} \\
-  &= 248.1\,\mathrm{mm}
+  &= \frac{1696\,\mathrm{mm}^{2} \cdot 244\,\mathrm{mm} + 754\,\mathrm{mm}^{2} \cdot 241\,\mathrm{mm}}{1696\,\mathrm{mm}^{2} + 754\,\mathrm{mm}^{2}} \\
+  &= 243.1\,\mathrm{mm}
 \end{aligned}
 $$
 

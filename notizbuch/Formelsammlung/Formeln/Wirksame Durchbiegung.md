@@ -1,5 +1,5 @@
 ---
-erzeugt: 4a9a5d1a8c59
+erzeugt: e005b7a25679
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.4.3.2.5, (104)"
@@ -25,7 +25,7 @@ $$
 Mit den Zahlen aus dem Beispielprojekt:
 
 $$
-w_{eff} = \omega_w \cdot w = 4 \cdot 3.5\,\mathrm{mm} = 14\,\mathrm{mm}
+w_{eff} = \omega_w \cdot w = 4.18 \cdot 3.5\,\mathrm{mm} = 14.6\,\mathrm{mm}
 $$
 
 ## Im Code

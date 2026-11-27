@@ -1,5 +1,5 @@
 ---
-erzeugt: d4a3856a8050
+erzeugt: dd2c65c2b4ec
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.4.3.2.5, (104)"
@@ -36,8 +36,8 @@ Mit den Zahlen aus dem Beispielprojekt:
 $$
 \begin{aligned}
   \omega_w &= \frac{1 - 20 \cdot \rho'_{u}}{10 \cdot \rho_{u}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{2,x}}\right)^{3} \\
-  &= \frac{1 - 20 \cdot 0.00304}{10 \cdot 0.00988^{0.7}} \cdot \left(0.75 + 0.1 \cdot 2\right) \cdot \left(\frac{300\,\mathrm{mm}}{248.1\,\mathrm{mm}}\right)^{3} \\
-  &= 4
+  &= \frac{1 - 20 \cdot 0.0031}{10 \cdot 0.01008^{0.7}} \cdot \left(0.75 + 0.1 \cdot 2\right) \cdot \left(\frac{300\,\mathrm{mm}}{243.1\,\mathrm{mm}}\right)^{3} \\
+  &= 4.18
 \end{aligned}
 $$
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: 4305fe5a8b9e
+erzeugt: 2fea92668d34
 art: formel
 tags: [formel]
 normstelle: ["SIA 262:2025, 4.3.3.2.9", "SIA 262:2025, 4.3.6.2.1, Figur 21"]
@@ -24,7 +24,7 @@ $$
 Mit den Zahlen aus dem Beispielprojekt:
 
 $$
-d_v^{+} = d^{+} = 248.1\,\mathrm{mm}
+d_v^{+} = d^{+} = 243.1\,\mathrm{mm}
 $$
 
 ## Gebraucht von

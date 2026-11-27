@@ -1,5 +1,5 @@
 ---
-erzeugt: 27ffe2a94aec
+erzeugt: 17b16483ce9a
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.1.4.2.5"
@@ -25,7 +25,7 @@ $$
 Mit den Zahlen aus dem Beispielprojekt:
 
 $$
-\left(x/d\right)^{+} = \frac{x^{+}}{d_{2,x}} = \frac{62.7\,\mathrm{mm}}{248.1\,\mathrm{mm}} = 0.253
+\left(x/d\right)^{+} = \frac{x^{+}}{d_{2,x}} = \frac{62.7\,\mathrm{mm}}{243.1\,\mathrm{mm}} = 0.258
 $$
 
 ## Im Code

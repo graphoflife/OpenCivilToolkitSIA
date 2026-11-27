@@ -325,19 +325,19 @@ class TestZwaengungBiegung(unittest.TestCase):
         Untere x-Lage, φ = 2, normale Anforderung:
 
             n       = 17.85
-            x       = 109.9 mm,  z = 211.4 mm
-            M_s,adm = 500 · 2450 · 211.4 = 259.1 kNm
+            x       = 108.5 mm,  z = 206.9 mm
+            M_s,adm = 500 · 2450 · 206.9 = 253.5 kNm
             M_Riss  = 41.4 kNm
-            α       = 6.25
+            α       = 6.12
         """
         projekt = projekt_zwang_biegung()
         erg = befund(projekt, "zwaengung_biegung").ergebnisse[0]
         self.assertEqual(erg.lage.nummer, x_lagen(projekt)[0])
         self.assertAlmostEqual(erg.n, 17.85, delta=0.02)
-        self.assertAlmostEqual(erg.x * 1e3, 109.9, delta=0.3)
-        self.assertAlmostEqual(erg.hebelarm * 1e3, 211.4, delta=0.3)
-        self.assertAlmostEqual(erg.M_s_adm / 1e3, 259.1, delta=0.5)
-        self.assertAlmostEqual(erg.erfuellungsgrad, 6.25, delta=0.03)
+        self.assertAlmostEqual(erg.x * 1e3, 108.5, delta=0.3)
+        self.assertAlmostEqual(erg.hebelarm * 1e3, 206.9, delta=0.3)
+        self.assertAlmostEqual(erg.M_s_adm / 1e3, 253.5, delta=0.5)
+        self.assertAlmostEqual(erg.erfuellungsgrad, 6.12, delta=0.03)
         self.assertTrue(erg.erfuellt)
 
     def test_bei_den_oberen_lagen_wird_von_unten_gemessen(self):
@@ -430,8 +430,8 @@ class TestSproedesVersagen(unittest.TestCase):
 
     def test_untere_lage_von_hand(self):
         """
-        Untere x-Lage (⌀18 + ⌀12, innen liegend): M_Rd(N=0) = 235.9 kNm,
-        M_Riss = 41.4 kNm, α = 5.70.
+        Untere x-Lage (⌀18 + ⌀12, innen liegend): M_Rd(N=0) = 230.6 kNm,
+        M_Riss = 41.4 kNm, α = 5.57.
         """
         projekt = Projekt.beispiel()
         aufbau = projekt.aufbauen()
@@ -439,12 +439,12 @@ class TestSproedesVersagen(unittest.TestCase):
         nachweis = aufbau.feld("sproede")["q1.x"]
         erg = loesung.befund(nachweis).ergebnisse[0]
         self.assertEqual(erg.lage.nummer, x_lagen(projekt)[0])
-        self.assertAlmostEqual(erg.M_Rd / 1e3, 235.9, delta=0.5)
+        self.assertAlmostEqual(erg.M_Rd / 1e3, 230.6, delta=0.5)
         # M_Riss steht als Einwirkung im Urteil -- dort, wo man es liest.
         urteil = next(u for u in loesung.urteile
                       if u.raum == nachweis.id and u.fall == f"{erg.lage.nummer}. Lage")
         self.assertAlmostEqual(urteil.einwirkung.groesse.si / 1e3, 41.4, delta=0.1)
-        self.assertAlmostEqual(erg.erfuellungsgrad, 5.70, delta=0.05)
+        self.assertAlmostEqual(erg.erfuellungsgrad, 5.57, delta=0.05)
         self.assertTrue(erg.erfuellt)
 
     def test_die_obere_lage_nimmt_den_negativen_eckwert(self):

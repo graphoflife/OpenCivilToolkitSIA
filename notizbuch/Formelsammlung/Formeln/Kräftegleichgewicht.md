@@ -1,5 +1,5 @@
 ---
-erzeugt: fd66e2286fbf
+erzeugt: 4ea0a7578db0
 art: formel
 tags: [formel]
 ---
@@ -27,8 +27,8 @@ Mit den Zahlen aus dem Beispielprojekt:
 $$
 \begin{aligned}
   N_{Rd}^{+} &= -f_{cd} \cdot b \cdot 0.85 \cdot x^{+} + A_{s,2,x} \cdot \sigma_{sd} \\
-  &= -20\,\mathrm{N}/\mathrm{mm}^{2} \cdot 1000\,\mathrm{mm} \cdot 0.85 \cdot 150\,\mathrm{mm} + 2450\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \\
-  &= -1484.6\,\mathrm{kN}
+  &= -20\,\mathrm{N}/\mathrm{mm}^{2} \cdot 1000\,\mathrm{mm} \cdot 0.85 \cdot 150\,\mathrm{mm} + 2450\,\mathrm{mm}^{2} \cdot 434\,\mathrm{N}/\mathrm{mm}^{2} \\
+  &= -1485.6\,\mathrm{kN}
 \end{aligned}
 $$
 

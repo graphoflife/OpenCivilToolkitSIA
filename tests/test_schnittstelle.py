@@ -621,10 +621,10 @@ class TestQuerkraftbewehrungInDerAusgabe(unittest.TestCase):
         hoehen = {z[0]["text"]: z[-1] for z in tabelle["zeilen"]}
         self.assertEqual(hoehen, {
             "Überdeckung oben": {"text": "–"},
-            "4. Lage": {"mathe": "264"},
-            "3. Lage": {"mathe": "252"},
-            "2. Lage": {"mathe": "51 / 54"},
-            "1. Lage": {"mathe": "36"},
+            "4. Lage": {"mathe": "259"},
+            "3. Lage": {"mathe": "247"},
+            "2. Lage": {"mathe": "56 / 59"},
+            "1. Lage": {"mathe": "41"},
             "Überdeckung unten": {"text": "–"},
         })
 

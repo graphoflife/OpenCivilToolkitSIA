@@ -1,5 +1,5 @@
 ---
-erzeugt: 143c37b70865
+erzeugt: 9743b6eb4bdd
 art: formel
 tags: [formel]
 ---
@@ -26,8 +26,8 @@ Mit den Zahlen aus dem Beispielprojekt:
 $$
 \begin{aligned}
   M_{Rd}(N_{Ed}=0)^{+} &= A_{s,2,x} \cdot f_{yd} \cdot \left(d_{2,x} - \frac{0.85 \cdot x^{+}}{2}\right) \\
-  &= 2450\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(248.1\,\mathrm{mm} - \frac{0.85 \cdot 62.7\,\mathrm{mm}}{2}\right) \\
-  &= 235.9\,\mathrm{kNm}
+  &= 2450\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(243.1\,\mathrm{mm} - \frac{0.85 \cdot 62.7\,\mathrm{mm}}{2}\right) \\
+  &= 230.6\,\mathrm{kNm}
 \end{aligned}
 $$
 

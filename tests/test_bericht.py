@@ -399,7 +399,7 @@ class TestKnappVerfehlterGrad(unittest.TestCase):
         loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
         linie = api.loesung_dict(loesung, aufbau=aufbau)["linien"]["q1.x"]
         self.assertEqual([k["grad_text"] for k in linie["kombinationen"]],
-                         ["2.36", "2.54", "1.60"])
+                         ["2.31", "2.48", "1.57"])
         knick = linie["knickfaelle"][0]
         self.assertFalse(knick["erfuellt"])
         from opencivil.core.wert import grad_als_text

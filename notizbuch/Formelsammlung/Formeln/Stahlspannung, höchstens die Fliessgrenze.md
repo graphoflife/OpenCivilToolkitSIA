@@ -1,5 +1,5 @@
 ---
-erzeugt: 50994744b32e
+erzeugt: a8da003a4917
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.2.2.2, Figur 16"
@@ -26,8 +26,8 @@ Mit den Zahlen aus dem Beispielprojekt:
 $$
 \begin{aligned}
   \sigma_{sd} &= \min\left[E_s \cdot \varepsilon_s^{+};\ f_{yd}\right] \\
-  &= \min\left[200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 2.29\,\text{‰};\ 435\,\mathrm{N}/\mathrm{mm}^{2}\right] \\
-  &= 435\,\mathrm{N}/\mathrm{mm}^{2}
+  &= \min\left[200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 2.17\,\text{‰};\ 435\,\mathrm{N}/\mathrm{mm}^{2}\right] \\
+  &= 434\,\mathrm{N}/\mathrm{mm}^{2}
 \end{aligned}
 $$
 

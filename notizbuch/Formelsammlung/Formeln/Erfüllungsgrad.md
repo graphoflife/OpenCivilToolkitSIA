@@ -1,5 +1,5 @@
 ---
-erzeugt: 8967a97ec4fd
+erzeugt: 65349e1e833b
 art: formel
 tags: [formel]
 ---
@@ -22,7 +22,7 @@ $$
 Mit den Zahlen aus dem Beispielprojekt:
 
 $$
-\alpha_{eff,x,\text{Feld}} = \frac{M_{Rd}}{M_{Ed}} = \frac{235.9\,\mathrm{kNm}}{100\,\mathrm{kNm}} = 2.36 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,x,\text{Feld}} = \frac{M_{Rd}}{M_{Ed}} = \frac{230.6\,\mathrm{kNm}}{100\,\mathrm{kNm}} = 2.31 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 ## Im Code

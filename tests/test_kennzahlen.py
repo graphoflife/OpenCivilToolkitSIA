@@ -47,10 +47,10 @@ class TestHandrechnung(unittest.TestCase):
         f_yd = 500e6 / 1.15
         a_u = math.pi * (18e-3 ** 2 + 12e-3 ** 2) / 4 / 0.15
         a_o = math.pi * 12e-3 ** 2 / 4 / 0.15
-        z_u = (math.pi * 18e-3 ** 2 / 4 * 0.249 + math.pi * 12e-3 ** 2 / 4 * 0.246) \
+        z_u = (math.pi * 18e-3 ** 2 / 4 * 0.244 + math.pi * 12e-3 ** 2 / 4 * 0.241) \
             / (math.pi * (18e-3 ** 2 + 12e-3 ** 2) / 4)
         N_t = (a_u + a_o) * f_yd
-        M_t = a_u * f_yd * (z_u - 0.15) + a_o * f_yd * (0.048 - 0.15)
+        M_t = a_u * f_yd * (z_u - 0.15) + a_o * f_yd * (0.053 - 0.15)
         M_neg = wert(self.aufbau, self.loesung, "M_Rd_neg")
         erwartet = N_t + (0.0 - M_t) / (M_neg - M_t) * (0.0 - N_t)
         self.assertAlmostEqual(wert(self.aufbau, self.loesung, "N_Rd_zug"), erwartet, delta=1.0)
@@ -59,7 +59,7 @@ class TestHandrechnung(unittest.TestCase):
         """x = A_s f_yd / (0.85 b f_cd), d bis zum Schwerpunkt der gezogenen Lage."""
         f_yd, f_cd = 500e6 / 1.15, 20e6
         a_u = math.pi * (18e-3 ** 2 + 12e-3 ** 2) / 4 / 0.15
-        z_u = (math.pi * 18e-3 ** 2 / 4 * 0.249 + math.pi * 12e-3 ** 2 / 4 * 0.246) \
+        z_u = (math.pi * 18e-3 ** 2 / 4 * 0.244 + math.pi * 12e-3 ** 2 / 4 * 0.241) \
             / (math.pi * (18e-3 ** 2 + 12e-3 ** 2) / 4)
         x = a_u * f_yd / (0.85 * 1.0 * f_cd)
         self.assertAlmostEqual(wert(self.aufbau, self.loesung, "x_d_pos"), x / z_u, places=9)
@@ -79,8 +79,8 @@ class TestHandrechnung(unittest.TestCase):
         self.assertTrue(any(t.startswith("Kennzahlen: Resistenzlinie") for t in titel))
 
 
-#: Statische Höhe unten im Beispiel: ⌀18 auf 249 mm, ⌀12 auf 246 mm.
-D_UNTEN = 0.249 - 0.003 * 12 ** 2 / (18 ** 2 + 12 ** 2)
+#: Statische Höhe unten im Beispiel: ⌀18 auf 244 mm, ⌀12 auf 241 mm.
+D_UNTEN = 0.244 - 0.003 * 12 ** 2 / (18 ** 2 + 12 ** 2)
 
 
 class TestQuerkraft(unittest.TestCase):
@@ -96,7 +96,7 @@ class TestQuerkraft(unittest.TestCase):
         """
         tau = self.loesung.werte["beton.b1.tau_cd"].groesse.si
         k_g, eps = 1.2, (500 / 1.15) / 200000
-        d_u, d_o = D_UNTEN, 0.300 - 0.048
+        d_u, d_o = D_UNTEN, 0.300 - 0.053
         null = [tau * d for d in (d_u, d_o)]
         voll = [tau * d / (1.0 + eps * d * 1e3 * k_g) for d in (d_u, d_o)]
         self.assertAlmostEqual(wert(self.aufbau, self.loesung, "V_Rd_max"), min(null), places=6)
@@ -117,7 +117,7 @@ class TestQuerkraft(unittest.TestCase):
             beste_neigung([buegelwiderstand(alpha=a, a_s=a_s, s_x=0.2, s_y=0.2, d=d,
                                             f_yd=f_yd, f_cd=f_cd, k_c=0.55)
                            for a in range(b.alpha_min, b.alpha_max + 1)]).V_Rd
-            for d in (D_UNTEN, 0.252))
+            for d in (D_UNTEN, 0.247))
         self.assertAlmostEqual(wert(aufbau, loesung, "V_Rd_buegel"), erwartet, places=6)
 
 
@@ -139,7 +139,7 @@ class TestImmer(unittest.TestCase):
             "Querkraftwiderstand ohne Bügel, kleinster bei elastischer Bewehrung"])
         faktor = next(z for z in antwort["kennzahlen"]["q1"]["zeilen"]
                       if z["zellen"][1] == {"mathe": r"\omega_w"})
-        self.assertEqual(faktor["zellen"][2], {"mathe": "4.00"})
+        self.assertEqual(faktor["zellen"][2], {"mathe": "4.18"})
 
     def test_als_tabelle_mit_auge_und_kopierknoepfen(self):
         """

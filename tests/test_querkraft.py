@@ -37,26 +37,26 @@ class TestQuerkraft(unittest.TestCase):
         """
         Feld, x-Richtung, M_Ed = 100 kNm/m, N_Ed = 0, von Hand nachgerechnet:
 
-            d     = 248.08 mm         (Schwerpunkt der 2. Lage: Grund ⌀18
-                                       bei 249 mm -- darunter liegt die
+            d     = 243.08 mm         (Schwerpunkt der 2. Lage: Grund ⌀18
+                                       bei 244 mm -- darunter liegt die
                                        y-Lage ⌀12 --, die Zulage ⌀12 bei
                                        ungünstiger Lage 3 mm weiter innen;
                                        beide @150, Flächen wie 324 : 144:
-                                       249 - 3·144/468 = 248.08)
+                                       244 - 3·144/468 = 243.08)
             k_g   = max(1.20; 48/(16+32·1))   = 1.200   ← der Riegel greift
-            m_Rd  = 235.9 kNm/m       (Handrechnung bei N_Ed = 0)
-            eps_v = 434.8·100/(200000·235.9)  = 0.9214 ‰
-            k_d   = 1/(1+0.9214e-3·248.08·1.200) = 0.7847
+            m_Rd  = 230.6 kNm/m       (Handrechnung bei N_Ed = 0)
+            eps_v = 434.8·100/(200000·230.6)  = 0.9427 ‰
+            k_d   = 1/(1+0.9427e-3·243.08·1.200) = 0.7843
             tau_cd= 0.3·sqrt(30)/1.5          = 1.0954 N/mm²
-            v_Rd  = 0.7847·1.0954·248.08      = 213.3 kN/m
+            v_Rd  = 0.7843·1.0954·243.08      = 208.8 kN/m
 
-        Bis 2026-11-14 zählte der Grundstab allein, d = 249 mm.
+        Bis 2026-11-14 zählte der Grundstab allein, hier d = 244 mm.
         """
         erg = querkraftbefund(projekt_mit_querkraft()).ergebnisse[0]
-        self.assertAlmostEqual(erg.d * 1e3, 249.0 - 3.0 * 144 / 468, places=6)
-        self.assertAlmostEqual(erg.eps_v * 1e3, 0.9214, places=4)
-        self.assertAlmostEqual(erg.k_d, 0.7847, places=4)
-        self.assertAlmostEqual(erg.v_Rd / 1e3, 213.3, delta=0.2)
+        self.assertAlmostEqual(erg.d * 1e3, 244.0 - 3.0 * 144 / 468, places=6)
+        self.assertAlmostEqual(erg.eps_v * 1e3, 0.9427, places=4)
+        self.assertAlmostEqual(erg.k_d, 0.7843, places=4)
+        self.assertAlmostEqual(erg.v_Rd / 1e3, 208.8, delta=0.2)
 
     def test_k_g_hat_einen_unteren_riegel(self):
         """
@@ -347,9 +347,9 @@ class TestQuerkraftkurve(unittest.TestCase):
         kurve = self.befund().kurve(0.0)
         unten = self.ast(kurve, "unten")["d"]
         oben = self.ast(kurve, "oben")["d"]
-        # Unten ⌀18 bei 249 mm und die Zulage ⌀12 3 mm weiter innen, oben ⌀12.
-        self.assertAlmostEqual(unten, 0.249 - 0.003 * 144 / 468, places=9)
-        self.assertAlmostEqual(oben, 0.252, places=6)
+        # Unten ⌀18 bei 244 mm und die Zulage ⌀12 3 mm weiter innen, oben ⌀12.
+        self.assertAlmostEqual(unten, 0.244 - 0.003 * 144 / 468, places=9)
+        self.assertAlmostEqual(oben, 0.247, places=6)
         self.assertNotAlmostEqual(unten, oben)
 
     def test_fuenfzig_punkte_je_ast_von_null_bis_m_rd_plus_zwanzig(self):
@@ -571,10 +571,10 @@ class TestNachweisMitBuegeln(unittest.TestCase):
     def test_der_widerstand_kommt_aus_dem_fachwerkmodell(self):
         erg = querkraftbefund(projekt_mit_buegeln()).ergebnisse[0]
         self.assertIsNotNone(erg.massgebend)
-        self.assertAlmostEqual(erg.d * 1e3, 249.0 - 3.0 * 144 / 468, places=6)
+        self.assertAlmostEqual(erg.d * 1e3, 244.0 - 3.0 * 144 / 468, places=6)
         self.assertAlmostEqual(erg.v_Rd, erg.massgebend.V_Rd)
-        # 78.54/(200·200) · 0.9·248.08 · 434.8 · cot 30° = 330.1 kN/m
-        self.assertAlmostEqual(erg.v_Rd / 1e3, 330.1, delta=0.1)
+        # 78.54/(200·200) · 0.9·243.08 · 434.8 · cot 30° = 323.5 kN/m
+        self.assertAlmostEqual(erg.v_Rd / 1e3, 323.5, delta=0.1)
 
     def test_buegel_ersetzen_den_betonanteil(self):
         """Nicht addieren: das wäre ein drittes Modell."""

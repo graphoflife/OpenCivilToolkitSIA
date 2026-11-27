@@ -515,8 +515,10 @@ class TestNurDieEigenePlatte(unittest.TestCase):
     def mit_nachbarn(self) -> Projekt:
         projekt = platte()
 
+        # Zwischen den Überdeckungen von je 35 mm bleiben 10 mm: Platz für
+        # keine Bewehrung, die 500 kNm trüge -- aber eine gültige Platte.
         zu_duenn = copy.deepcopy(projekt.querschnitte[0])
-        zu_duenn.kennung, zu_duenn.name, zu_duenn.h = "q2", "zu dünn", 70.0
+        zu_duenn.kennung, zu_duenn.name, zu_duenn.h = "q2", "zu dünn", 80.0
         for k in zu_duenn.kombinationen:
             k.M_Ed = 500.0
 

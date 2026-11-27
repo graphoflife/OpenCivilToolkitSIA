@@ -1,5 +1,5 @@
 ---
-erzeugt: 70857ae36774
+erzeugt: 2abfd84a93eb
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.3.2.1, (35), (36)"
@@ -25,7 +25,7 @@ $$
 Mit den Zahlen aus dem Beispielprojekt:
 
 $$
-V_{Rd}^{+}(M_{Ed} = 0) = \tau_{cd} \cdot d_v^{+} = 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 248.1\,\mathrm{mm} = 271.8\,\mathrm{kN}/\mathrm{m}
+V_{Rd}^{+}(M_{Ed} = 0) = \tau_{cd} \cdot d_v^{+} = 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 243.1\,\mathrm{mm} = 266.3\,\mathrm{kN}/\mathrm{m}
 $$
 
 ## Gebraucht von

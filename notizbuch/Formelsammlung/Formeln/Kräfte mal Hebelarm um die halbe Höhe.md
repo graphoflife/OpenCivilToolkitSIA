@@ -1,5 +1,5 @@
 ---
-erzeugt: 2ad7d831b296
+erzeugt: 50ece9f4af23
 art: formel
 tags: [formel]
 ---
@@ -28,8 +28,8 @@ Mit den Zahlen aus dem Beispielprojekt:
 $$
 \begin{aligned}
   M_{Rd}(N_{Rd}^{+}) &= A_{s,2,x} \cdot f_{yd} \cdot \left(z_{2,x} - \tfrac{h}{2}\right) + A_{s,3,x} \cdot f_{yd} \cdot \left(z_{3,x} - \tfrac{h}{2}\right) \\
-  &= 2450\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(248.1\,\mathrm{mm} - \tfrac{300\,\mathrm{mm}}{2}\right) + 754\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(48\,\mathrm{mm} - \tfrac{300\,\mathrm{mm}}{2}\right) \\
-  &= 71.1\,\mathrm{kNm}
+  &= 2450\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(243.1\,\mathrm{mm} - \tfrac{300\,\mathrm{mm}}{2}\right) + 754\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(53\,\mathrm{mm} - \tfrac{300\,\mathrm{mm}}{2}\right) \\
+  &= 67.4\,\mathrm{kNm}
 \end{aligned}
 $$
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: dc29879fb524
+erzeugt: 3194a404cd25
 art: formel
 tags: [formel]
 ---
@@ -36,8 +36,8 @@ Mit den Zahlen aus dem Beispielprojekt:
 $$
 \begin{aligned}
   N_{Rd}^{+}(M_{Ed} = 0) &= N_1 + \frac{M_{Ed} - M_1}{M_2 - M_1} \cdot \left(N_2 - N_1\right) \\
-  &= 1393.2\,\mathrm{kN} + \frac{0\,\mathrm{kNm} - 71.1\,\mathrm{kNm}}{-79.9\,\mathrm{kNm} - 71.1\,\mathrm{kNm}} \cdot \left(0\,\mathrm{kN} - 1393.2\,\mathrm{kN}\right) \\
-  &= 737.5\,\mathrm{kN}
+  &= 1393.2\,\mathrm{kN} + \frac{0\,\mathrm{kNm} - 67.4\,\mathrm{kNm}}{-78.3\,\mathrm{kNm} - 67.4\,\mathrm{kNm}} \cdot \left(0\,\mathrm{kN} - 1393.2\,\mathrm{kN}\right) \\
+  &= 748.8\,\mathrm{kN}
 \end{aligned}
 $$
 

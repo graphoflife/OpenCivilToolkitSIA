@@ -549,8 +549,8 @@ class Plattenquerschnitt(Rechenobjekt):
                     f"Bewehrungsquerschnitt {bezeichnung}", 0,
                     referenz=REFERENZ_NENNDURCHMESSER)
                 # Die Tiefe ab Oberkante, nicht die statische Hoehe: bei einer
-                # oberen Lage misst die ab der Unterkante. Mit «d» hiess eine
-                # obere Lage hier 48 mm, im Nachweis darunter 252 mm.
+                # oberen Lage misst die ab der Unterkante. Mit «d» hiesse die
+                # obere Lage des Beispiels hier 53 mm, im Nachweis darunter 247 mm.
                 d_z = self._def(
                     f"lage.{marke}.z", f"z_{{{index}}}", MM,
                     f"Tiefe {bezeichnung} ab Oberkante", 1)

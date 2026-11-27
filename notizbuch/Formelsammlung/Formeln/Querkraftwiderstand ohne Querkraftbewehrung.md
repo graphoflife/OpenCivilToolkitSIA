@@ -1,5 +1,5 @@
 ---
-erzeugt: aa119822d3c8
+erzeugt: 2d8da04d7deb
 art: formel
 tags: [formel]
 normstelle: ["SIA 262:2025, 4.3.3.2.1, (35)", "SIA 262:2025, 4.3.3.2.1, (35), (36)"]
@@ -34,8 +34,8 @@ Mit den Zahlen aus dem Beispielprojekt:
 $$
 \begin{aligned}
   V_{Rd}^{+}(M_{Ed} = M_{Rd}^{+}) &= k_d^{+} \cdot \tau_{cd} \cdot d_v^{+} \\
-  &= 0.6071 \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 248.1\,\mathrm{mm} \\
-  &= 165\,\mathrm{kN}/\mathrm{m}
+  &= 0.612 \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 243.1\,\mathrm{mm} \\
+  &= 162.9\,\mathrm{kN}/\mathrm{m}
 \end{aligned}
 $$
 

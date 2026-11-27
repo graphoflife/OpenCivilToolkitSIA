@@ -1,5 +1,5 @@
 ---
-erzeugt: 2f13518d6be7
+erzeugt: dd6ff6694900
 art: formel
 tags: [formel]
 ---
@@ -24,8 +24,8 @@ Mit den Zahlen aus dem Beispielprojekt:
 $$
 \begin{aligned}
   h_{Dist} &= \text{OK innere untere Lage} - \text{UK innere obere Lage} \\
-  &= 240\,\mathrm{mm} - 54\,\mathrm{mm} \\
-  &= 186\,\mathrm{mm}
+  &= 235\,\mathrm{mm} - 59\,\mathrm{mm} \\
+  &= 176\,\mathrm{mm}
 \end{aligned}
 $$
 

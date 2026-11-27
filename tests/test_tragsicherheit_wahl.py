@@ -152,7 +152,8 @@ class TestGenaueLinie(unittest.TestCase):
         lässt den Druckstahl weg: an der Stütze, wo unten viel Stahl gedrückt
         wird, liegt sie deutlich darunter. Höher als die genaue Linie liegt sie
         kaum -- nur dort, wo der Stahl bei eps_ud reisst, bevor der Beton
-        eps_c2d erreicht, ist die Druckzone weniger voll als ihr Block.
+        eps_c2d erreicht, ist die Druckzone weniger voll als ihr Block: im
+        Feld des Beispiels um 0.2 %.
         """
         _, hand = gerechnet()
         _, block = gerechnet("block")
@@ -161,7 +162,7 @@ class TestGenaueLinie(unittest.TestCase):
             schluessel = f"{BASIS}.{fall}.M_Rd_bei_N_Ed"
             h, b, p = (x.werte[schluessel].groesse.si for x in (hand, block, parabel))
             self.assertAlmostEqual(b / p, 1.0, delta=0.01, msg=fall)
-            self.assertLess(h / p, 1.002, msg=fall)
+            self.assertLess(h / p, 1.003, msg=fall)
         stuetze = f"{BASIS}.Stütze.M_Rd_bei_N_Ed"
         self.assertLess(hand.werte[stuetze].groesse.si, 0.95 * parabel.werte[stuetze].groesse.si)
 

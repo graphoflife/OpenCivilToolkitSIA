@@ -69,19 +69,19 @@ class TestFaktor(unittest.TestCase):
                                           ("Kragarm", 1.0, 2.5, "oben")))
 
     def test_die_zahlen_des_beispiels(self):
-        """Unten 2450 mm² in 248.1 mm, oben 754 mm² in 252 mm, φ = 2."""
-        self.assertEqual(round(faktor(self.loesung, "q1", "unten"), 2), 4.00)
-        self.assertEqual(round(faktor(self.loesung, "q1", "oben"), 2), 7.55)
+        """Unten 2450 mm² in 243.1 mm, oben 754 mm² in 247 mm, φ = 2."""
+        self.assertEqual(round(faktor(self.loesung, "q1", "unten"), 2), 4.18)
+        self.assertEqual(round(faktor(self.loesung, "q1", "oben"), 2), 7.86)
 
     def test_von_hand(self):
-        """⌀18 + ⌀12 je @150 unten in 249 und 246 mm, ⌀12@150 oben in 48 mm."""
+        """⌀18 + ⌀12 je @150 unten in 244 und 241 mm, ⌀12@150 oben in 53 mm."""
         a18, a12 = (math.pi * d * d / 4 * 1000 / 150 for d in (18, 12))
-        d_u = (a18 * 249 + a12 * 246) / (a18 + a12)
-        rho_u, rho_o = (a18 + a12) / (1000 * d_u), a12 / (1000 * 252)
+        d_u = (a18 * 244 + a12 * 241) / (a18 + a12)
+        rho_u, rho_o = (a18 + a12) / (1000 * d_u), a12 / (1000 * 247)
         # rho' mit dem d der gezogenen Seite (SIA 262:2025, 4.4.3.2.5).
-        gegen_u, gegen_o = a12 / (1000 * d_u), (a18 + a12) / (1000 * 252)
+        gegen_u, gegen_o = a12 / (1000 * d_u), (a18 + a12) / (1000 * 247)
         unten = (1 - 20 * gegen_u) / (10 * rho_u ** 0.7) * (0.75 + 0.2) * (300 / d_u) ** 3
-        oben = (1 - 20 * gegen_o) / (10 * rho_o ** 0.7) * (0.75 + 0.2) * (300 / 252) ** 3
+        oben = (1 - 20 * gegen_o) / (10 * rho_o ** 0.7) * (0.75 + 0.2) * (300 / 247) ** 3
         self.assertAlmostEqual(faktor(self.loesung, "q1", "unten"), unten, places=9)
         self.assertAlmostEqual(faktor(self.loesung, "q1", "oben"), oben, places=9)
 
@@ -93,16 +93,16 @@ class TestFaktor(unittest.TestCase):
 
     def test_die_statische_hoehe_heisst_wie_in_den_nachweisen_der_lagen(self):
         """
-        248.1 mm sind d_{2,x}, wie in den Nachweisen der Lagen -- bis
+        243.1 mm sind d_{2,x}, wie in den Nachweisen der Lagen -- bis
         2026-10-18 hiessen sie hier d_u, dieselbe Zahl unter zwei Namen.
         """
         hoehen = {b.wert_id: b.latex for b in self.loesung.protokoll.alle_bloecke()
                   if getattr(b, "wert_id", "").startswith("querschnitt.q1.vergroesserung.")
                   and b.wert_id.endswith(".d")}
         self.assertEqual(hoehen, {
-            "querschnitt.q1.vergroesserung.unten.d": r"d_{2,x} = z_{2,x} = 248.1\,\mathrm{mm}",
+            "querschnitt.q1.vergroesserung.unten.d": r"d_{2,x} = z_{2,x} = 243.1\,\mathrm{mm}",
             "querschnitt.q1.vergroesserung.oben.d":
-                r"d_{3,x,g} = h - z_{3,x,g} = 300\,\mathrm{mm} - 48\,\mathrm{mm} = 252\,\mathrm{mm}",
+                r"d_{3,x,g} = h - z_{3,x,g} = 300\,\mathrm{mm} - 53\,\mathrm{mm} = 247\,\mathrm{mm}",
         })
 
     def test_beide_seiten_immer_auch_ohne_fall(self):

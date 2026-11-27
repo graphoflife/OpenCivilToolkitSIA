@@ -247,7 +247,8 @@ class TestMomentenKruemmung(unittest.TestCase):
         Am Beispiel der Beton am Rand oben bei −ε_c2d -- und eine Spur mehr
         Krümmung hat kein Gleichgewicht mehr. Bis 2026-10-09 endete die Linie
         dort, wo die Suche des Lösers aufgab: bei χ = 0.040 statt 0.057 1/m,
-        mit −2.7 ‰ am Rand und 234.6 statt 235.4 kNm.
+        mit −2.7 ‰ am Rand und 234.6 statt 235.4 kNm -- damals mit 30 mm
+        Überdeckung.
         """
         bruch = self.kurve.bruch
         self.assertAlmostEqual(bruch.eps_oben, -0.0035, delta=1e-7)
@@ -256,8 +257,8 @@ class TestMomentenKruemmung(unittest.TestCase):
         eps_m, chi = ebene_am_ende(self.paar, self.kurve)
         self.assertAlmostEqual(eps_m - chi * self.paar.h / 2, bruch.eps_oben, places=9)
         self.assertIsNone(self.paar.gerissen.mitteldehnung(chi * 1.001, 0.0))
-        self.assertAlmostEqual(chi, 0.0565, delta=0.0005)
-        self.assertAlmostEqual(bruch.kraft / 1e3, 235.4, delta=0.1)
+        self.assertAlmostEqual(chi, 0.0549, delta=0.0005)
+        self.assertAlmostEqual(bruch.kraft / 1e3, 229.6, delta=0.1)
 
     def test_der_fliessbeginn_liegt_bei_der_fliessdehnung(self):
         """
@@ -275,8 +276,8 @@ class TestMomentenKruemmung(unittest.TestCase):
         self.assertAlmostEqual(eps_s, self.paar.gerissen.lagen[i].stahl.eps_yd, delta=1e-9)
         self.assertLess(fliessen.kraft, self.kurve.bruch.kraft)
         self.assertIn(chi, [p.verformung for p in self.kurve.punkte])
-        # Am Beispiel 224.6 kNm bei 0.0147 1/m.
-        self.assertAlmostEqual(fliessen.kraft / 1e3, 224.6, delta=0.1)
+        # Am Beispiel 219.1 kNm bei 0.0151 1/m.
+        self.assertAlmostEqual(fliessen.kraft / 1e3, 219.1, delta=0.1)
 
     def test_die_kruemmung_waechst_mit_dem_moment(self):
         """
@@ -405,15 +406,23 @@ class TestGegenDieHandrechnung(unittest.TestCase):
         self.assertAlmostEqual(linie / hand, 1.0, delta=0.001)
 
     def test_mit_druckbewehrung_traegt_die_linie_mehr(self):
-        """Am Beispiel 236.2 statt 235.9 kNm: der obere Stahl trägt mit."""
-        linie, hand = self.widerstand(None)
-        self.assertGreater(linie, hand)
+        """
+        Gedrückter Stahl zählt in der Linie, in der Handrechnung nicht. Mehr
+        trägt er nur, wo er höher liegt, als der Spannungsblock ohne ihn
+        reicht -- hier 53 mm: dann rückt die ganze Druckkraft nach oben, und
+        der Hebelarm wächst. Mit 20 mm Überdeckung liegt die obere x-Lage in
+        38 mm: 232.2 statt 230.6 kNm. Im Beispiel liegt sie seit c_nom =
+        35 mm selbst in 53 mm und bringt nichts mehr: 230.5 statt 230.6 kNm.
+        """
+        linie, hand = self.widerstand(platte("Mit Druckbewehrung", x=[18, 12], x_zulage=[12, 0],
+                                             y=[12, 12], ueberdeckung_oben=20.0))
+        self.assertGreater(linie / hand, 1.005)
 
     def test_die_handrechnung_laesst_die_druckbewehrung_weg(self):
         """
         Unter negativem Moment ist die starke untere Lage gedrückt: die
         Handrechnung lässt sie weg, die 0.85·x-Vereinfachung zählt sie --
-        am Beispiel 79.9 statt 90.1 kNm.
+        am Beispiel 78.3 statt 91.4 kNm.
         """
         def m_rd_negativ(rechenart):
             projekt = Projekt.beispiel()
@@ -423,8 +432,8 @@ class TestGegenDieHandrechnung(unittest.TestCase):
             eckwert = aufbau.feld("nachweise")["q1.x"].d_eckwerte["M_Rd_N0_neg"]
             return -loesung.werte[eckwert.id].groesse.si / 1e3
         hand, block = m_rd_negativ("handrechnung"), m_rd_negativ("block")
-        self.assertAlmostEqual(hand, 79.9, delta=0.1)
-        self.assertAlmostEqual(block, 90.1, delta=0.1)
+        self.assertAlmostEqual(hand, 78.3, delta=0.1)
+        self.assertAlmostEqual(block, 91.4, delta=0.1)
 
     def test_die_handrechnung_gibt_es_in_der_analyse_nicht(self):
         """
@@ -552,7 +561,7 @@ class TestWahl(unittest.TestCase):
         k = loeserpaar(satz=Werkstoffsatz.CHARAKTERISTISCH)
         bild = sa.aus_schnittgroessen(k.ebenen().gerissen, N=0.0, M=60e3, arten=k.wahl.arten)
         self.assertTrue(bild.konvergiert)
-        self.assertAlmostEqual(max(s.sigma for s in bild.stahl) / 1e6, 114.7, delta=0.1)
+        self.assertAlmostEqual(max(s.sigma for s in bild.stahl) / 1e6, 117.4, delta=0.1)
 
     def test_ohne_kriechzahl_gilt_die_vorgabe(self):
         """Eine Kriechzahl der Platte, die einspringt, gibt es seit 2026-10-09 nicht mehr."""
@@ -658,14 +667,14 @@ class TestNormalkraftDehnung(unittest.TestCase):
         """
         Das Beispiel hat unten 2450, oben 754 mm² Stahl. Bei 20 kNm um die
         halbe Höhe fliessen beide Lagen, und der untere Rand wird gedrückt,
-        bis er −ε_c2d erreicht -- bei 1030 kN, nicht bei Σ A_s · f_yd =
+        bis er −ε_c2d erreicht -- bei 1058 kN, nicht bei Σ A_s · f_yd =
         1393 kN. Die erreichte man nur beim Moment, das der Stahlschwerpunkt
-        verlangt, rund 71 kNm.
+        verlangt, rund 67 kNm.
         """
         paar = loeserpaar()
         kurve = sa.normalkraft_dehnung(paar, M=20e3)
         self.assertIn("Beton C30/37, Rand unten", kurve.bruch.massgebend)
-        self.assertAlmostEqual(kurve.bruch.kraft / 1e3, 1030.0, delta=1.0)
+        self.assertAlmostEqual(kurve.bruch.kraft / 1e3, 1058.0, delta=1.0)
         self.assertLess(kurve.fliessen.kraft, kurve.bruch.kraft)
 
     def test_traegt_er_das_moment_nicht_gibt_es_keine_linie(self):
@@ -763,12 +772,12 @@ class TestAequivalenterModul(unittest.TestCase):
         biegung, zug = antwort.daten["spannungsanalysen"]["q1"]
         kurve = biegung["kurve"]
         self.assertEqual(biegung["titel"], "Äquivalenter E-Modul über dem Moment")
-        self.assertAlmostEqual(kurve["sprung"]["vor"]["wert"], 35903, delta=1)
-        self.assertAlmostEqual(kurve["sprung"]["nach"]["wert"], 8925, delta=1)
+        self.assertAlmostEqual(kurve["sprung"]["vor"]["wert"], 35677, delta=1)
+        self.assertAlmostEqual(kurve["sprung"]["nach"]["wert"], 8522, delta=1)
         self.assertEqual((kurve["bezug"]["zeichen"], kurve["bezug"]["text"]), ("E_{cm}", "E_cm"))
         self.assertAlmostEqual(kurve["bezug"]["wert"], 33620, delta=1)
         # Das Vielfache von E_cm rechnet der Kern, nicht die Oberfläche (2026-10-18).
-        self.assertAlmostEqual(kurve["sprung"]["nach"]["vielfaches"], 8925 / 33620, delta=1e-4)
+        self.assertAlmostEqual(kurve["sprung"]["nach"]["vielfaches"], 8522 / 33620, delta=1e-4)
         self.assertEqual(kurve["groessen"]["modul"]["einheit"], "N/mm²")
         self.assertEqual((kurve["groessen"]["kraft"]["zeichen"],
                           kurve["groessen"]["kraft"]["einheit"]), ("M", "kNm"))

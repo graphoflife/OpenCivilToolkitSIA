@@ -1,5 +1,5 @@
 ---
-erzeugt: 1e263e00a816
+erzeugt: 8e2e328d6d40
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.3.2.1, (36)"
@@ -24,7 +24,7 @@ $$
 Mit den Zahlen aus dem Beispielprojekt:
 
 $$
-k_d^{+} = \frac{1}{1 + \varepsilon_v^{+} \cdot d^{+} \cdot k_g} = \frac{1}{1 + 2.174\,\text{‰} \cdot 248.1 \cdot 1.2} = 0.6071 \quad \left(d^{+}\ \text{in}\ \mathrm{mm}\right)
+k_d^{+} = \frac{1}{1 + \varepsilon_v^{+} \cdot d^{+} \cdot k_g} = \frac{1}{1 + 2.174\,\text{‰} \cdot 243.1 \cdot 1.2} = 0.612 \quad \left(d^{+}\ \text{in}\ \mathrm{mm}\right)
 $$
 
 ## Gebraucht von

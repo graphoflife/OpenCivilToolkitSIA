@@ -338,7 +338,7 @@ class TestStahlspannungAusRissbreite(unittest.TestCase):
 
         nachweis = self.nachweis(self.projekt(
             "normal", *(GebrauchsfallEintrag(f"M{m}", M_Ed=float(m))
-                        for m in (262, 266, 270, 275))))
+                        for m in (258, 261, 264, 267))))
         grade = [e.erfuellungsgrad for e in nachweis.ergebnisse[-4:]]
         self.assertEqual(grade, sorted(grade, reverse=True))
         self.assertTrue(all(e.fliesst for e in nachweis.ergebnisse[-4:]))

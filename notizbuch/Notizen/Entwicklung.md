@@ -7,6 +7,32 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-27 · Startbeispiel mit 35 mm Überdeckung
+
+Eine Frage aus dem TODO, vom Benutzer am 2026-11-27 beantwortet: das
+Startbeispiel auf 35 mm, wie jede neue Platte.
+
+Vorher hatte die Platte des Beispiels oben und unten c_nom = 30 mm – als
+einzige, damit Bericht, Formelsammlung und Handrechnungen der Tests ihre
+Zahlen behielten. Nachher nimmt sie die Vorgabe von 35 mm. Jede Lage liegt
+5 mm weiter innen, die untere x-Lage in d = 243.1 statt 248.1 mm. Damit
+sinkt M_Rd bei N = 0 von 235.9 auf 230.6 kNm, und der Erfüllungsgrad im
+Feld von 2.36 auf 2.31. Kein Urteil kippt; das Beispiel startet grün.
+
+- Rund dreissig Handrechnungen der Tests sind nachgerechnet, jede mit
+  ihrer eigenen Formel, nicht aus dem Programm abgeschrieben.
+- Ein Satz stimmte nicht mehr: dass der obere Stahl im Beispiel mehr
+  Widerstand bringt. Gedrückter Stahl hilft nur, wo er höher liegt, als
+  der Spannungsblock ohne ihn reicht – hier 53 mm. Seit 35 mm liegt die
+  obere x-Lage selbst in 53 mm: 230.5 statt 230.6 kNm. Der Test zeigt die
+  Wirkung jetzt an einer Platte mit 20 mm Überdeckung oben, 232.2 statt
+  230.6 kNm.
+- Eine absichtlich zu dünne Platte der Bewehrungssuche war 70 mm dick.
+  Zwischen zwei Überdeckungen von 35 mm bliebe da kein Platz, und sie
+  wäre ungültig statt nur zu schwach. Jetzt ist sie 80 mm dick.
+
+---
+
 ## 2026-11-27 · Alle Tests in knapp zwei Minuten
 
 Dem Benutzer war die Wartezeit vor jedem Commit zu lang: alle Tests

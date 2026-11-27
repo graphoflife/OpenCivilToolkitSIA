@@ -1,5 +1,5 @@
 ---
-erzeugt: 9b3cfcb59733
+erzeugt: 173d67551fff
 art: formel
 tags: [formel]
 ---
@@ -31,13 +31,13 @@ $$
 Mit den Zahlen aus dem Beispielprojekt:
 
 $$
-d_{2,x} = z_{2,x} = 248.1\,\mathrm{mm}
+d_{2,x} = z_{2,x} = 243.1\,\mathrm{mm}
 $$
 
 Mit den Zahlen aus dem Beispielprojekt:
 
 $$
-d_{3,x} = h - z_{3,x} = 300\,\mathrm{mm} - 48\,\mathrm{mm} = 252\,\mathrm{mm}
+d_{3,x} = h - z_{3,x} = 300\,\mathrm{mm} - 53\,\mathrm{mm} = 247\,\mathrm{mm}
 $$
 
 ## Gebraucht von

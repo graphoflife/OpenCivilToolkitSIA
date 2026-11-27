@@ -46,11 +46,11 @@ b_y = 1000\,\mathrm{mm}
 \end{equation*}
 \noindent\textbf{Überdeckung unten} \hfill \normref{SIA 262:2025, 5.2.2.1; 5.2.2.4, Tabelle 18}
 \begin{equation*}
-c_{nom,u} = 30\,\mathrm{mm}
+c_{nom,u} = 35\,\mathrm{mm}
 \end{equation*}
 \noindent\textbf{Überdeckung oben} \hfill \normref{SIA 262:2025, 5.2.2.1; 5.2.2.4, Tabelle 18}
 \begin{equation*}
-c_{nom,o} = 30\,\mathrm{mm}
+c_{nom,o} = 35\,\mathrm{mm}
 \end{equation*}
 \noindent\textbf{Bewehrungsquerschnitt über die Breite b} \hfill \normref{SIA 262:2025, 4.2.2.4}
 \begin{equation*}
@@ -64,8 +64,8 @@ A_s = \frac{\pi \cdot \varnothing^{2}}{4} \cdot \frac{b}{s}
 \begin{equation*}
 \begin{aligned}
   h_{Dist} &= \text{OK innere untere Lage} - \text{UK innere obere Lage} \\
-  &= 240\,\mathrm{mm} - 54\,\mathrm{mm} \\
-  &= 186\,\mathrm{mm}
+  &= 235\,\mathrm{mm} - 59\,\mathrm{mm} \\
+  &= 176\,\mathrm{mm}
 \end{aligned}
 \end{equation*}
 \noindent\textbf{Randabstände, Tiefen ab Oberkante und Bewehrungsquerschnitte}
@@ -74,11 +74,11 @@ A_s = \frac{\pi \cdot \varnothing^{2}}{4} \cdot \frac{b}{s}
 Bewehrung & Richtung & Stahl & $\varnothing\ [\mathrm{mm}]$ & $s\ [\mathrm{mm}]$ & Randabstand [mm] & $z\ [\mathrm{mm}]$ & $A_s\ [\mathrm{mm}^2]$ \\
 \hline
 \endhead
-1. Lage Grundbewehrung & y & B500B & $12$ & $150$ & $36$ & $264$ & $754$ \\
-2. Lage Grundbewehrung & x & B500B & $18$ & $150$ & $51$ & $249$ & $1696$ \\
-2. Lage Zulage & x & B500B & $12$ & $150$ & $54$ & $246$ & $754$ \\
-3. Lage Grundbewehrung & x & B500B & $12$ & $150$ & $48$ & $48$ & $754$ \\
-4. Lage Grundbewehrung & y & B500B & $12$ & $150$ & $36$ & $36$ & $754$ \\
+1. Lage Grundbewehrung & y & B500B & $12$ & $150$ & $41$ & $259$ & $754$ \\
+2. Lage Grundbewehrung & x & B500B & $18$ & $150$ & $56$ & $244$ & $1696$ \\
+2. Lage Zulage & x & B500B & $12$ & $150$ & $59$ & $241$ & $754$ \\
+3. Lage Grundbewehrung & x & B500B & $12$ & $150$ & $53$ & $53$ & $754$ \\
+4. Lage Grundbewehrung & y & B500B & $12$ & $150$ & $41$ & $41$ & $754$ \\
 \hline
 \end{longtable}
 \subsection{Resistenzlinie aus Handrechnung – x-Richtung}
@@ -90,8 +90,8 @@ Bewehrung & Richtung & Stahl & $\varnothing\ [\mathrm{mm}]$ & $s\ [\mathrm{mm}]$
 \begin{equation*}
 \begin{aligned}
   z_{2,x} &= \frac{A_{s,2,x,g} \cdot z_{2,x,g} + A_{s,2,x,z} \cdot z_{2,x,z}}{A_{s,2,x,g} + A_{s,2,x,z}} \\
-  &= \frac{1696\,\mathrm{mm}^{2} \cdot 249\,\mathrm{mm} + 754\,\mathrm{mm}^{2} \cdot 246\,\mathrm{mm}}{1696\,\mathrm{mm}^{2} + 754\,\mathrm{mm}^{2}} \\
-  &= 248.1\,\mathrm{mm}
+  &= \frac{1696\,\mathrm{mm}^{2} \cdot 244\,\mathrm{mm} + 754\,\mathrm{mm}^{2} \cdot 241\,\mathrm{mm}}{1696\,\mathrm{mm}^{2} + 754\,\mathrm{mm}^{2}} \\
+  &= 243.1\,\mathrm{mm}
 \end{aligned}
 \end{equation*}
 \noindent\textbf{Bewehrungsquerschnitt der zusammengefassten Lage}
@@ -104,8 +104,8 @@ A_{s,2,x} = A_{s,2,x,g} + A_{s,2,x,z} = 1696\,\mathrm{mm}^{2} + 754\,\mathrm{mm}
 Seite & $A_s\ [\mathrm{mm}^2]$ & $z\ [\mathrm{mm}]$ & $f_{yd}\ [\mathrm{N/mm^2}]$ \\
 \hline
 \endhead
-2. Lage Grundbewehrung + 2. Lage Zulage & $2450$ & $248.1$ & $435$ \\
-3. Lage Grundbewehrung & $754$ & $48.0$ & $435$ \\
+2. Lage Grundbewehrung + 2. Lage Zulage & $2450$ & $243.1$ & $435$ \\
+3. Lage Grundbewehrung & $754$ & $53.0$ & $435$ \\
 \hline
 \end{longtable}
 \subsubsection{Grösste Druckkraft}
@@ -130,14 +130,14 @@ M_{Rd}(N_{Rd}^{-}) = 0\,\mathrm{kNm}
 \begin{equation*}
 \begin{aligned}
   M_{Rd}(N_{Rd}^{+}) &= A_{s,2,x} \cdot f_{yd} \cdot \left(z_{2,x} - \tfrac{h}{2}\right) + A_{s,3,x} \cdot f_{yd} \cdot \left(z_{3,x} - \tfrac{h}{2}\right) \\
-  &= 2450\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(248.1\,\mathrm{mm} - \tfrac{300\,\mathrm{mm}}{2}\right) + 754\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(48\,\mathrm{mm} - \tfrac{300\,\mathrm{mm}}{2}\right) \\
-  &= 71.1\,\mathrm{kNm}
+  &= 2450\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(243.1\,\mathrm{mm} - \tfrac{300\,\mathrm{mm}}{2}\right) + 754\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(53\,\mathrm{mm} - \tfrac{300\,\mathrm{mm}}{2}\right) \\
+  &= 67.4\,\mathrm{kNm}
 \end{aligned}
 \end{equation*}
 \subsubsection{Positives Moment (Zug unten)}
 \noindent\textbf{Statische Höhe der Lage unten, ab dem gedrückten Rand oben}
 \begin{equation*}
-d_{2,x} = z_{2,x} = 248.1\,\mathrm{mm}
+d_{2,x} = z_{2,x} = 243.1\,\mathrm{mm}
 \end{equation*}
 \noindent\textbf{Druckzonenhöhe aus dem Kräftegleichgewicht} \hfill \normref{SIA 262:2025, 4.2.1.5, Figur 12}
 \begin{equation*}
@@ -147,8 +147,8 @@ x^{+} = \frac{A_{s,2,x} \cdot f_{yd}}{0.85 \cdot b \cdot f_{cd}} = \frac{2450\,\
 \begin{equation*}
 \begin{aligned}
   M_{Rd}(N_{Ed}=0)^{+} &= A_{s,2,x} \cdot f_{yd} \cdot \left(d_{2,x} - \frac{0.85 \cdot x^{+}}{2}\right) \\
-  &= 2450\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(248.1\,\mathrm{mm} - \frac{0.85 \cdot 62.7\,\mathrm{mm}}{2}\right) \\
-  &= 235.9\,\mathrm{kNm}
+  &= 2450\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(243.1\,\mathrm{mm} - \frac{0.85 \cdot 62.7\,\mathrm{mm}}{2}\right) \\
+  &= 230.6\,\mathrm{kNm}
 \end{aligned}
 \end{equation*}
 \noindent\textbf{Nulllinie auf halber Höhe}
@@ -157,36 +157,36 @@ x^{+} = \frac{h}{2} = \frac{300\,\mathrm{mm}}{2} = 150\,\mathrm{mm}
 \end{equation*}
 \noindent\textbf{Dehnung der Zugbewehrung} \hfill \normref{SIA 262:2025, 4.3.2.3; 4.2.1.4, Tabelle 8}
 \begin{equation*}
-\varepsilon_s^{+} = \left(d_{2,x} - x^{+}\right) \cdot \frac{\varepsilon_{c2d}}{x^{+}} = \left(248.1\,\mathrm{mm} - 150\,\mathrm{mm}\right) \cdot \frac{3.5\,\text{‰}}{150\,\mathrm{mm}} = 2.29\,\text{‰}
+\varepsilon_s^{+} = \left(d_{2,x} - x^{+}\right) \cdot \frac{\varepsilon_{c2d}}{x^{+}} = \left(243.1\,\mathrm{mm} - 150\,\mathrm{mm}\right) \cdot \frac{3.5\,\text{‰}}{150\,\mathrm{mm}} = 2.17\,\text{‰}
 \end{equation*}
 \noindent\textbf{Stahlspannung, höchstens die Fliessgrenze} \hfill \normref{SIA 262:2025, 4.2.2.2, Figur 16}
 \begin{equation*}
 \begin{aligned}
   \sigma_{sd} &= \min\left[E_s \cdot \varepsilon_s^{+};\ f_{yd}\right] \\
-  &= \min\left[200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 2.29\,\text{‰};\ 435\,\mathrm{N}/\mathrm{mm}^{2}\right] \\
-  &= 435\,\mathrm{N}/\mathrm{mm}^{2}
+  &= \min\left[200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 2.17\,\text{‰};\ 435\,\mathrm{N}/\mathrm{mm}^{2}\right] \\
+  &= 434\,\mathrm{N}/\mathrm{mm}^{2}
 \end{aligned}
 \end{equation*}
 \noindent\textbf{Kräftegleichgewicht}
 \begin{equation*}
 \begin{aligned}
   N_{Rd}^{+} &= -f_{cd} \cdot b \cdot 0.85 \cdot x^{+} + A_{s,2,x} \cdot \sigma_{sd} \\
-  &= -20\,\mathrm{N}/\mathrm{mm}^{2} \cdot 1000\,\mathrm{mm} \cdot 0.85 \cdot 150\,\mathrm{mm} + 2450\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \\
-  &= -1484.6\,\mathrm{kN}
+  &= -20\,\mathrm{N}/\mathrm{mm}^{2} \cdot 1000\,\mathrm{mm} \cdot 0.85 \cdot 150\,\mathrm{mm} + 2450\,\mathrm{mm}^{2} \cdot 434\,\mathrm{N}/\mathrm{mm}^{2} \\
+  &= -1485.6\,\mathrm{kN}
 \end{aligned}
 \end{equation*}
 \noindent\textbf{Momentengleichgewicht um die halbe Höhe}
 \begin{equation*}
 \begin{aligned}
   M_{Rd}^{+} &= \left[f_{cd} \cdot b \cdot 0.85 \cdot x^{+} \cdot \left(\tfrac{h}{2} - \tfrac{0.85 \cdot x^{+}}{2}\right) + A_{s,2,x} \cdot \sigma_{sd} \cdot \left(d_{2,x} - \tfrac{h}{2}\right)\right] \\
-  &= \left[20\,\mathrm{N}/\mathrm{mm}^{2} \cdot 1000\,\mathrm{mm} \cdot 0.85 \cdot 150\,\mathrm{mm} \cdot \left(\tfrac{300\,\mathrm{mm}}{2} - \tfrac{0.85 \cdot 150\,\mathrm{mm}}{2}\right) + 2450\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(248.1\,\mathrm{mm} - \tfrac{300\,\mathrm{mm}}{2}\right)\right] \\
-  &= 324.4\,\mathrm{kNm}
+  &= \left[20\,\mathrm{N}/\mathrm{mm}^{2} \cdot 1000\,\mathrm{mm} \cdot 0.85 \cdot 150\,\mathrm{mm} \cdot \left(\tfrac{300\,\mathrm{mm}}{2} - \tfrac{0.85 \cdot 150\,\mathrm{mm}}{2}\right) + 2450\,\mathrm{mm}^{2} \cdot 434\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(243.1\,\mathrm{mm} - \tfrac{300\,\mathrm{mm}}{2}\right)\right] \\
+  &= 319\,\mathrm{kNm}
 \end{aligned}
 \end{equation*}
 \subsubsection{Negatives Moment (Zug oben)}
 \noindent\textbf{Statische Höhe der Lage oben, ab dem gedrückten Rand unten}
 \begin{equation*}
-d_{3,x} = h - z_{3,x} = 300\,\mathrm{mm} - 48\,\mathrm{mm} = 252\,\mathrm{mm}
+d_{3,x} = h - z_{3,x} = 300\,\mathrm{mm} - 53\,\mathrm{mm} = 247\,\mathrm{mm}
 \end{equation*}
 \noindent\textbf{Druckzonenhöhe aus dem Kräftegleichgewicht} \hfill \normref{SIA 262:2025, 4.2.1.5, Figur 12}
 \begin{equation*}
@@ -196,8 +196,8 @@ x^{-} = \frac{A_{s,3,x} \cdot f_{yd}}{0.85 \cdot b \cdot f_{cd}} = \frac{754\,\m
 \begin{equation*}
 \begin{aligned}
   M_{Rd}(N_{Ed}=0)^{-} &= -A_{s,3,x} \cdot f_{yd} \cdot \left(d_{3,x} - \frac{0.85 \cdot x^{-}}{2}\right) \\
-  &= -754\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(252\,\mathrm{mm} - \frac{0.85 \cdot 19.3\,\mathrm{mm}}{2}\right) \\
-  &= -79.9\,\mathrm{kNm}
+  &= -754\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(247\,\mathrm{mm} - \frac{0.85 \cdot 19.3\,\mathrm{mm}}{2}\right) \\
+  &= -78.3\,\mathrm{kNm}
 \end{aligned}
 \end{equation*}
 \noindent\textbf{Nulllinie auf halber Höhe}
@@ -206,13 +206,13 @@ x^{-} = \frac{h}{2} = \frac{300\,\mathrm{mm}}{2} = 150\,\mathrm{mm}
 \end{equation*}
 \noindent\textbf{Dehnung der Zugbewehrung} \hfill \normref{SIA 262:2025, 4.3.2.3; 4.2.1.4, Tabelle 8}
 \begin{equation*}
-\varepsilon_s^{-} = \left(d_{3,x} - x^{-}\right) \cdot \frac{\varepsilon_{c2d}}{x^{-}} = \left(252\,\mathrm{mm} - 150\,\mathrm{mm}\right) \cdot \frac{3.5\,\text{‰}}{150\,\mathrm{mm}} = 2.38\,\text{‰}
+\varepsilon_s^{-} = \left(d_{3,x} - x^{-}\right) \cdot \frac{\varepsilon_{c2d}}{x^{-}} = \left(247\,\mathrm{mm} - 150\,\mathrm{mm}\right) \cdot \frac{3.5\,\text{‰}}{150\,\mathrm{mm}} = 2.26\,\text{‰}
 \end{equation*}
 \noindent\textbf{Stahlspannung, höchstens die Fliessgrenze} \hfill \normref{SIA 262:2025, 4.2.2.2, Figur 16}
 \begin{equation*}
 \begin{aligned}
   \sigma_{sd} &= \min\left[E_s \cdot \varepsilon_s^{-};\ f_{yd}\right] \\
-  &= \min\left[200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 2.38\,\text{‰};\ 435\,\mathrm{N}/\mathrm{mm}^{2}\right] \\
+  &= \min\left[200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 2.26\,\text{‰};\ 435\,\mathrm{N}/\mathrm{mm}^{2}\right] \\
   &= 435\,\mathrm{N}/\mathrm{mm}^{2}
 \end{aligned}
 \end{equation*}
@@ -228,8 +228,8 @@ x^{-} = \frac{h}{2} = \frac{300\,\mathrm{mm}}{2} = 150\,\mathrm{mm}
 \begin{equation*}
 \begin{aligned}
   M_{Rd}^{-} &= -\left[f_{cd} \cdot b \cdot 0.85 \cdot x^{-} \cdot \left(\tfrac{h}{2} - \tfrac{0.85 \cdot x^{-}}{2}\right) + A_{s,3,x} \cdot \sigma_{sd} \cdot \left(d_{3,x} - \tfrac{h}{2}\right)\right] \\
-  &= -\left[20\,\mathrm{N}/\mathrm{mm}^{2} \cdot 1000\,\mathrm{mm} \cdot 0.85 \cdot 150\,\mathrm{mm} \cdot \left(\tfrac{300\,\mathrm{mm}}{2} - \tfrac{0.85 \cdot 150\,\mathrm{mm}}{2}\right) + 754\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(252\,\mathrm{mm} - \tfrac{300\,\mathrm{mm}}{2}\right)\right] \\
-  &= -253.4\,\mathrm{kNm}
+  &= -\left[20\,\mathrm{N}/\mathrm{mm}^{2} \cdot 1000\,\mathrm{mm} \cdot 0.85 \cdot 150\,\mathrm{mm} \cdot \left(\tfrac{300\,\mathrm{mm}}{2} - \tfrac{0.85 \cdot 150\,\mathrm{mm}}{2}\right) + 754\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(247\,\mathrm{mm} - \tfrac{300\,\mathrm{mm}}{2}\right)\right] \\
+  &= -251.7\,\mathrm{kNm}
 \end{aligned}
 \end{equation*}
 \noindent\textbf{Eckpunkte der Resistenzlinie aus Handrechnung}
@@ -239,11 +239,11 @@ Eckpunkt & $N\ [\mathrm{kN}]$ & $M\ [\mathrm{kNm}]$ \\
 \hline
 \endhead
 $N_{Rd}^{-}$ & $-6000.0$ & $0.0$ \\
-$M_{Rd}(x=\tfrac{h}{2})^{+}$ & $-1484.6$ & $324.4$ \\
-$M_{Rd}(N_{Ed}=0)^{+}$ & $0.0$ & $235.9$ \\
-$N_{Rd}^{+}$ & $1393.2$ & $71.1$ \\
-$M_{Rd}(N_{Ed}=0)^{-}$ & $0.0$ & $-79.9$ \\
-$M_{Rd}(x=\tfrac{h}{2})^{-}$ & $-2222.2$ & $-253.4$ \\
+$M_{Rd}(x=\tfrac{h}{2})^{+}$ & $-1485.6$ & $319.0$ \\
+$M_{Rd}(N_{Ed}=0)^{+}$ & $0.0$ & $230.6$ \\
+$N_{Rd}^{+}$ & $1393.2$ & $67.4$ \\
+$M_{Rd}(N_{Ed}=0)^{-}$ & $0.0$ & $-78.3$ \\
+$M_{Rd}(x=\tfrac{h}{2})^{-}$ & $-2222.2$ & $-251.7$ \\
 \hline
 \end{longtable}
 \subsubsection{Nachweis – Feld}
@@ -253,11 +253,11 @@ M_{Ed} = 100\,\mathrm{kNm} \qquad N_{Ed} = 0\,\mathrm{kN}
 \end{equation*}
 \noindent\textbf{Widerstand bei N\_Ed = 0.0 kN – ein Eckpunkt liegt genau dort}
 \begin{equation*}
-M_{Rd} = M_{Rd}(N_{Ed}=0)^{+} = 235.9\,\mathrm{kNm}
+M_{Rd} = M_{Rd}(N_{Ed}=0)^{+} = 230.6\,\mathrm{kNm}
 \end{equation*}
 \noindent\textbf{Erfüllungsgrad}
 \begin{equation*}
-\alpha_{eff,x,\text{Feld}} = \frac{M_{Rd}}{M_{Ed}} = \frac{235.9\,\mathrm{kNm}}{100\,\mathrm{kNm}} = 2.36 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,x,\text{Feld}} = \frac{M_{Rd}}{M_{Ed}} = \frac{230.6\,\mathrm{kNm}}{100\,\mathrm{kNm}} = 2.31 \quad \Rightarrow \quad \text{erfüllt}
 \end{equation*}
 \subsubsection{Nachweis – Feld mit Druck}
 \noindent\textbf{Einwirkung}
@@ -268,8 +268,8 @@ M_{Ed} = 100\,\mathrm{kNm} \qquad N_{Ed} = -300\,\mathrm{kN}
 \begin{equation*}
 \begin{aligned}
   M_{Rd} &= M_1 + \frac{N_{Ed} - N_1}{N_2 - N_1} \cdot \left(M_2 - M_1\right) \\
-  &= 324.4\,\mathrm{kNm} + \frac{-300\,\mathrm{kN} - \left(-1484.6\,\mathrm{kN}\right)}{0\,\mathrm{kN} - \left(-1484.6\,\mathrm{kN}\right)} \cdot \left(235.9\,\mathrm{kNm} - 324.4\,\mathrm{kNm}\right) \\
-  &= 253.8\,\mathrm{kNm}
+  &= 319\,\mathrm{kNm} + \frac{-300\,\mathrm{kN} - \left(-1485.6\,\mathrm{kN}\right)}{0\,\mathrm{kN} - \left(-1485.6\,\mathrm{kN}\right)} \cdot \left(230.6\,\mathrm{kNm} - 319\,\mathrm{kNm}\right) \\
+  &= 248.5\,\mathrm{kNm}
 \end{aligned}
 \end{equation*}
 \noindent\textbf{Stützpunkte der Interpolation}
@@ -278,13 +278,13 @@ M_{Ed} = 100\,\mathrm{kNm} \qquad N_{Ed} = -300\,\mathrm{kN}
 Punkt & $N\ [\mathrm{kN}]$ & $M\ [\mathrm{kNm}]$ \\
 \hline
 \endhead
-$M_{Rd}(x=\tfrac{h}{2})^{+}$ & $-1484.6$ & $324.4$ \\
-$M_{Rd}(N_{Ed}=0)^{+}$ & $0.0$ & $235.9$ \\
+$M_{Rd}(x=\tfrac{h}{2})^{+}$ & $-1485.6$ & $319.0$ \\
+$M_{Rd}(N_{Ed}=0)^{+}$ & $0.0$ & $230.6$ \\
 \hline
 \end{longtable}
 \noindent\textbf{Erfüllungsgrad}
 \begin{equation*}
-\alpha_{eff,x,\text{Feld mit Druck}} = \frac{M_{Rd}}{M_{Ed}} = \frac{253.8\,\mathrm{kNm}}{100\,\mathrm{kNm}} = 2.54 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,x,\text{Feld mit Druck}} = \frac{M_{Rd}}{M_{Ed}} = \frac{248.5\,\mathrm{kNm}}{100\,\mathrm{kNm}} = 2.48 \quad \Rightarrow \quad \text{erfüllt}
 \end{equation*}
 \subsubsection{Nachweis – Stütze}
 \noindent\textbf{Einwirkung}
@@ -293,11 +293,11 @@ M_{Ed} = -50\,\mathrm{kNm} \qquad N_{Ed} = 0\,\mathrm{kN}
 \end{equation*}
 \noindent\textbf{Widerstand bei N\_Ed = 0.0 kN – ein Eckpunkt liegt genau dort}
 \begin{equation*}
-M_{Rd} = M_{Rd}(N_{Ed}=0)^{-} = -79.9\,\mathrm{kNm}
+M_{Rd} = M_{Rd}(N_{Ed}=0)^{-} = -78.3\,\mathrm{kNm}
 \end{equation*}
 \noindent\textbf{Erfüllungsgrad}
 \begin{equation*}
-\alpha_{eff,x,\text{Stütze}} = \frac{M_{Rd}}{M_{Ed}} = \frac{-79.9\,\mathrm{kNm}}{-50\,\mathrm{kNm}} = 1.60 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,x,\text{Stütze}} = \frac{M_{Rd}}{M_{Ed}} = \frac{-78.3\,\mathrm{kNm}}{-50\,\mathrm{kNm}} = 1.57 \quad \Rightarrow \quad \text{erfüllt}
 \end{equation*}
 \subsection{Vergrösserungsfaktor der Durchbiegung}
 \noindent\textbf{Vergrösserungsfaktor der Durchbiegung – allgemein} \hfill \normref{SIA 262:2025, 4.4.3.2.5, (104)}
@@ -316,48 +316,48 @@ A_{s,2,x} = A_{s,2,x,g} + A_{s,2,x,z} = 1696\,\mathrm{mm}^{2} + 754\,\mathrm{mm}
 \begin{equation*}
 \begin{aligned}
   z_{2,x} &= \frac{A_{s,2,x,g} \cdot z_{2,x,g} + A_{s,2,x,z} \cdot z_{2,x,z}}{A_{s,2,x,g} + A_{s,2,x,z}} \\
-  &= \frac{1696\,\mathrm{mm}^{2} \cdot 249\,\mathrm{mm} + 754\,\mathrm{mm}^{2} \cdot 246\,\mathrm{mm}}{1696\,\mathrm{mm}^{2} + 754\,\mathrm{mm}^{2}} \\
-  &= 248.1\,\mathrm{mm}
+  &= \frac{1696\,\mathrm{mm}^{2} \cdot 244\,\mathrm{mm} + 754\,\mathrm{mm}^{2} \cdot 241\,\mathrm{mm}}{1696\,\mathrm{mm}^{2} + 754\,\mathrm{mm}^{2}} \\
+  &= 243.1\,\mathrm{mm}
 \end{aligned}
 \end{equation*}
 \noindent\textbf{Statische Höhe der Lage unten, ab dem gedrückten Rand oben}
 \begin{equation*}
-d_{2,x} = z_{2,x} = 248.1\,\mathrm{mm}
+d_{2,x} = z_{2,x} = 243.1\,\mathrm{mm}
 \end{equation*}
 \noindent\textbf{Bewehrungsgehalt unten} \hfill \normref{SIA 262:2025, 4.4.3.2.5, (104)}
 \begin{equation*}
-\rho_{u} = \frac{A_{s,2,x}}{b \cdot d_{2,x}} = \frac{2450\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 248.1\,\mathrm{mm}} = 0.00988
+\rho_{u} = \frac{A_{s,2,x}}{b \cdot d_{2,x}} = \frac{2450\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 243.1\,\mathrm{mm}} = 0.01008
 \end{equation*}
 \noindent\textbf{Statische Höhe der Lage oben, ab dem gedrückten Rand unten}
 \begin{equation*}
-d_{3,x,g} = h - z_{3,x,g} = 300\,\mathrm{mm} - 48\,\mathrm{mm} = 252\,\mathrm{mm}
+d_{3,x,g} = h - z_{3,x,g} = 300\,\mathrm{mm} - 53\,\mathrm{mm} = 247\,\mathrm{mm}
 \end{equation*}
 \noindent\textbf{Bewehrungsgehalt oben} \hfill \normref{SIA 262:2025, 4.4.3.2.5, (104)}
 \begin{equation*}
-\rho_{o} = \frac{A_{s,3,x,g}}{b \cdot d_{3,x,g}} = \frac{754\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 252\,\mathrm{mm}} = 0.00299
+\rho_{o} = \frac{A_{s,3,x,g}}{b \cdot d_{3,x,g}} = \frac{754\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 247\,\mathrm{mm}} = 0.00305
 \end{equation*}
 \noindent\textbf{Bewehrungsgehalt der Gegenseite, Zug unten} \hfill \normref{SIA 262:2025, 4.4.3.2.5, (104)}
 \begin{equation*}
-\rho'_{u} = \frac{A_{s,3,x,g}}{b \cdot d_{2,x}} = \frac{754\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 248.1\,\mathrm{mm}} = 0.00304
+\rho'_{u} = \frac{A_{s,3,x,g}}{b \cdot d_{2,x}} = \frac{754\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 243.1\,\mathrm{mm}} = 0.0031
 \end{equation*}
 \noindent\textbf{Vergrösserungsfaktor, Zug unten} \hfill \normref{SIA 262:2025, 4.4.3.2.5, (104)}
 \begin{equation*}
 \begin{aligned}
   \omega_w &= \frac{1 - 20 \cdot \rho'_{u}}{10 \cdot \rho_{u}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{2,x}}\right)^{3} \\
-  &= \frac{1 - 20 \cdot 0.00304}{10 \cdot 0.00988^{0.7}} \cdot \left(0.75 + 0.1 \cdot 2\right) \cdot \left(\frac{300\,\mathrm{mm}}{248.1\,\mathrm{mm}}\right)^{3} \\
-  &= 4
+  &= \frac{1 - 20 \cdot 0.0031}{10 \cdot 0.01008^{0.7}} \cdot \left(0.75 + 0.1 \cdot 2\right) \cdot \left(\frac{300\,\mathrm{mm}}{243.1\,\mathrm{mm}}\right)^{3} \\
+  &= 4.18
 \end{aligned}
 \end{equation*}
 \noindent\textbf{Bewehrungsgehalt der Gegenseite, Zug oben} \hfill \normref{SIA 262:2025, 4.4.3.2.5, (104)}
 \begin{equation*}
-\rho'_{o} = \frac{A_{s,2,x}}{b \cdot d_{3,x,g}} = \frac{2450\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 252\,\mathrm{mm}} = 0.00972
+\rho'_{o} = \frac{A_{s,2,x}}{b \cdot d_{3,x,g}} = \frac{2450\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 247\,\mathrm{mm}} = 0.00992
 \end{equation*}
 \noindent\textbf{Vergrösserungsfaktor, Zug oben} \hfill \normref{SIA 262:2025, 4.4.3.2.5, (104)}
 \begin{equation*}
 \begin{aligned}
   \omega_w' &= \frac{1 - 20 \cdot \rho'_{o}}{10 \cdot \rho_{o}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{3,x,g}}\right)^{3} \\
-  &= \frac{1 - 20 \cdot 0.00972}{10 \cdot 0.00299^{0.7}} \cdot \left(0.75 + 0.1 \cdot 2\right) \cdot \left(\frac{300\,\mathrm{mm}}{252\,\mathrm{mm}}\right)^{3} \\
-  &= 7.55
+  &= \frac{1 - 20 \cdot 0.00992}{10 \cdot 0.00305^{0.7}} \cdot \left(0.75 + 0.1 \cdot 2\right) \cdot \left(\frac{300\,\mathrm{mm}}{247\,\mathrm{mm}}\right)^{3} \\
+  &= 7.86
 \end{aligned}
 \end{equation*}
 \subsection{Verformung}
@@ -365,7 +365,7 @@ d_{3,x,g} = h - z_{3,x,g} = 300\,\mathrm{mm} - 48\,\mathrm{mm} = 252\,\mathrm{mm
 \subsubsection{Verformung – Feld}
 \noindent\textbf{Wirksame Durchbiegung, Zug unten} \hfill \normref{SIA 262:2025, 4.4.3.2.5, (104)}
 \begin{equation*}
-w_{eff} = \omega_w \cdot w = 4 \cdot 3.5\,\mathrm{mm} = 14\,\mathrm{mm}
+w_{eff} = \omega_w \cdot w = 4.18 \cdot 3.5\,\mathrm{mm} = 14.6\,\mathrm{mm}
 \end{equation*}
 \noindent\textbf{Grenzwert der Durchbiegung} \hfill \normref{SIA 260:2013, Anhang A, Tabelle 3}
 \begin{equation*}
@@ -373,11 +373,11 @@ w_{max} = \frac{L}{350} = \frac{6\,\mathrm{m}}{350} = 17.1\,\mathrm{mm}
 \end{equation*}
 \noindent\textbf{Durchbiegung gegen Grenzwert}
 \begin{equation*}
-w_{eff} = 14\,\mathrm{mm} \quad \le \quad w_{max} = 17.1\,\mathrm{mm}
+w_{eff} = 14.6\,\mathrm{mm} \quad \le \quad w_{max} = 17.1\,\mathrm{mm}
 \end{equation*}
 \noindent\textbf{Erfüllungsgrad}
 \begin{equation*}
-\alpha_{eff,w,\text{Feld}} = \frac{w_{max}}{w_{eff}} = \frac{17.1\,\mathrm{mm}}{14\,\mathrm{mm}} = 1.23 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,w,\text{Feld}} = \frac{w_{max}}{w_{eff}} = \frac{17.1\,\mathrm{mm}}{14.6\,\mathrm{mm}} = 1.17 \quad \Rightarrow \quad \text{erfüllt}
 \end{equation*}
 \subsection{Kennzahlen}
 Die Eckpunkte stammen aus der Handrechnung der Tragsicherheit – sie rechnet ebenso, von Hand mit Bemessungswerten.
@@ -385,26 +385,26 @@ Die Eckpunkte stammen aus der Handrechnung der Tragsicherheit – sie rechnet eb
 \subsubsection{Biegung und Normalkraft}
 \noindent\textbf{Momentenwiderstand bei N\_Ed = 0, Zug unten}
 \begin{equation*}
-M_{Rd}^{+}(N_{Ed} = 0) = M_{Rd}(N_{Ed}=0)^{+} = 235.9\,\mathrm{kNm}
+M_{Rd}^{+}(N_{Ed} = 0) = M_{Rd}(N_{Ed}=0)^{+} = 230.6\,\mathrm{kNm}
 \end{equation*}
 \noindent\textbf{Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug unten}
 \begin{equation*}
-\left(x/d\right)^{+} = \frac{x^{+}}{d_{2,x}} = \frac{62.7\,\mathrm{mm}}{248.1\,\mathrm{mm}} = 0.253
+\left(x/d\right)^{+} = \frac{x^{+}}{d_{2,x}} = \frac{62.7\,\mathrm{mm}}{243.1\,\mathrm{mm}} = 0.258
 \end{equation*}
 \noindent\textbf{Momentenwiderstand bei N\_Ed = 0, Zug oben}
 \begin{equation*}
-M_{Rd}^{-}(N_{Ed} = 0) = M_{Rd}(N_{Ed}=0)^{-} = -79.9\,\mathrm{kNm}
+M_{Rd}^{-}(N_{Ed} = 0) = M_{Rd}(N_{Ed}=0)^{-} = -78.3\,\mathrm{kNm}
 \end{equation*}
 \noindent\textbf{Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug oben}
 \begin{equation*}
-\left(x/d\right)^{-} = \frac{x^{-}}{d_{3,x}} = \frac{19.3\,\mathrm{mm}}{252\,\mathrm{mm}} = 0.077
+\left(x/d\right)^{-} = \frac{x^{-}}{d_{3,x}} = \frac{19.3\,\mathrm{mm}}{247\,\mathrm{mm}} = 0.078
 \end{equation*}
 \noindent\textbf{Zugwiderstand bei M\_Ed = 0}
 \begin{equation*}
 \begin{aligned}
   N_{Rd}^{+}(M_{Ed} = 0) &= N_1 + \frac{M_{Ed} - M_1}{M_2 - M_1} \cdot \left(N_2 - N_1\right) \\
-  &= 1393.2\,\mathrm{kN} + \frac{0\,\mathrm{kNm} - 71.1\,\mathrm{kNm}}{-79.9\,\mathrm{kNm} - 71.1\,\mathrm{kNm}} \cdot \left(0\,\mathrm{kN} - 1393.2\,\mathrm{kN}\right) \\
-  &= 737.5\,\mathrm{kN}
+  &= 1393.2\,\mathrm{kN} + \frac{0\,\mathrm{kNm} - 67.4\,\mathrm{kNm}}{-78.3\,\mathrm{kNm} - 67.4\,\mathrm{kNm}} \cdot \left(0\,\mathrm{kN} - 1393.2\,\mathrm{kN}\right) \\
+  &= 748.8\,\mathrm{kN}
 \end{aligned}
 \end{equation*}
 \noindent\textbf{Stützpunkte der Interpolation}
@@ -413,8 +413,8 @@ M_{Rd}^{-}(N_{Ed} = 0) = M_{Rd}(N_{Ed}=0)^{-} = -79.9\,\mathrm{kNm}
 Punkt & $M\ [\mathrm{kNm}]$ & $N\ [\mathrm{kN}]$ \\
 \hline
 \endhead
-$N_{Rd}^{+}$ & $71.1$ & $1393.2$ \\
-$M_{Rd}(N_{Ed}=0)^{-}$ & $-79.9$ & $0.0$ \\
+$N_{Rd}^{+}$ & $67.4$ & $1393.2$ \\
+$M_{Rd}(N_{Ed}=0)^{-}$ & $-78.3$ & $0.0$ \\
 \hline
 \end{longtable}
 \noindent\textbf{Druckwiderstand bei M\_Ed = 0}
@@ -434,21 +434,21 @@ N_{Rd}^{-}(M_{Ed} = 0) = N_{Rd}^{-} = -6000\,\mathrm{kN}
 \begin{equation*}
 \begin{aligned}
   z_s^{+} &= \frac{A_{s,2,x,g} \cdot z_{2,x,g} + A_{s,2,x,z} \cdot z_{2,x,z}}{A_{s,2,x,g} + A_{s,2,x,z}} \\
-  &= \frac{1696\,\mathrm{mm}^{2} \cdot 249\,\mathrm{mm} + 754\,\mathrm{mm}^{2} \cdot 246\,\mathrm{mm}}{1696\,\mathrm{mm}^{2} + 754\,\mathrm{mm}^{2}} \\
-  &= 248.1\,\mathrm{mm}
+  &= \frac{1696\,\mathrm{mm}^{2} \cdot 244\,\mathrm{mm} + 754\,\mathrm{mm}^{2} \cdot 241\,\mathrm{mm}}{1696\,\mathrm{mm}^{2} + 754\,\mathrm{mm}^{2}} \\
+  &= 243.1\,\mathrm{mm}
 \end{aligned}
 \end{equation*}
 \noindent\textbf{Statische Höhe der Lage unten, ab dem gedrückten Rand oben}
 \begin{equation*}
-d^{+} = z_s^{+} = 248.1\,\mathrm{mm}
+d^{+} = z_s^{+} = 243.1\,\mathrm{mm}
 \end{equation*}
 \noindent\textbf{Wirksame Höhe (Einlage nicht massgebend)} \hfill \normref{SIA 262:2025, 4.3.3.2.9}
 \begin{equation*}
-d_v^{+} = d^{+} = 248.1\,\mathrm{mm}
+d_v^{+} = d^{+} = 243.1\,\mathrm{mm}
 \end{equation*}
 \noindent\textbf{Zug unten, M\_Ed = 0: ε\_v = 0, k\_d = 1} \hfill \normref{SIA 262:2025, 4.3.3.2.1, (35), (36)}
 \begin{equation*}
-V_{Rd}^{+}(M_{Ed} = 0) = \tau_{cd} \cdot d_v^{+} = 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 248.1\,\mathrm{mm} = 271.8\,\mathrm{kN}/\mathrm{m}
+V_{Rd}^{+}(M_{Ed} = 0) = \tau_{cd} \cdot d_v^{+} = 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 243.1\,\mathrm{mm} = 266.3\,\mathrm{kN}/\mathrm{m}
 \end{equation*}
 \noindent\textbf{Zug unten, M\_Ed = M\_Rd: Dehnung beim Fliessbeginn} \hfill \normref{SIA 262:2025, 4.3.3.2.2, (38)}
 \begin{equation*}
@@ -456,27 +456,27 @@ V_{Rd}^{+}(M_{Ed} = 0) = \tau_{cd} \cdot d_v^{+} = 1.0954\,\mathrm{N}/\mathrm{mm
 \end{equation*}
 \noindent\textbf{Beiwert für den Querkraftwiderstand} \hfill \normref{SIA 262:2025, 4.3.3.2.1, (36)}
 \begin{equation*}
-k_d^{+} = \frac{1}{1 + \varepsilon_v^{+} \cdot d^{+} \cdot k_g} = \frac{1}{1 + 2.174\,\text{‰} \cdot 248.1 \cdot 1.2} = 0.6071 \quad \left(d^{+}\ \text{in}\ \mathrm{mm}\right)
+k_d^{+} = \frac{1}{1 + \varepsilon_v^{+} \cdot d^{+} \cdot k_g} = \frac{1}{1 + 2.174\,\text{‰} \cdot 243.1 \cdot 1.2} = 0.612 \quad \left(d^{+}\ \text{in}\ \mathrm{mm}\right)
 \end{equation*}
 \noindent\textbf{Zug unten, M\_Ed = M\_Rd} \hfill \normref{SIA 262:2025, 4.3.3.2.1, (35)}
 \begin{equation*}
 \begin{aligned}
   V_{Rd}^{+}(M_{Ed} = M_{Rd}^{+}) &= k_d^{+} \cdot \tau_{cd} \cdot d_v^{+} \\
-  &= 0.6071 \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 248.1\,\mathrm{mm} \\
-  &= 165\,\mathrm{kN}/\mathrm{m}
+  &= 0.612 \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 243.1\,\mathrm{mm} \\
+  &= 162.9\,\mathrm{kN}/\mathrm{m}
 \end{aligned}
 \end{equation*}
 \noindent\textbf{Statische Höhe der Lage oben, ab dem gedrückten Rand unten}
 \begin{equation*}
-d^{-} = h - z_{3,x,g} = 300\,\mathrm{mm} - 48\,\mathrm{mm} = 252\,\mathrm{mm}
+d^{-} = h - z_{3,x,g} = 300\,\mathrm{mm} - 53\,\mathrm{mm} = 247\,\mathrm{mm}
 \end{equation*}
 \noindent\textbf{Wirksame Höhe (Einlage nicht massgebend)} \hfill \normref{SIA 262:2025, 4.3.3.2.9}
 \begin{equation*}
-d_v^{-} = d^{-} = 252\,\mathrm{mm}
+d_v^{-} = d^{-} = 247\,\mathrm{mm}
 \end{equation*}
 \noindent\textbf{Zug oben, M\_Ed = 0: ε\_v = 0, k\_d = 1} \hfill \normref{SIA 262:2025, 4.3.3.2.1, (35), (36)}
 \begin{equation*}
-V_{Rd}^{-}(M_{Ed} = 0) = \tau_{cd} \cdot d_v^{-} = 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 252\,\mathrm{mm} = 276.1\,\mathrm{kN}/\mathrm{m}
+V_{Rd}^{-}(M_{Ed} = 0) = \tau_{cd} \cdot d_v^{-} = 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 247\,\mathrm{mm} = 270.6\,\mathrm{kN}/\mathrm{m}
 \end{equation*}
 \noindent\textbf{Zug oben, M\_Ed = M\_Rd: Dehnung beim Fliessbeginn} \hfill \normref{SIA 262:2025, 4.3.3.2.2, (38)}
 \begin{equation*}
@@ -484,30 +484,30 @@ V_{Rd}^{-}(M_{Ed} = 0) = \tau_{cd} \cdot d_v^{-} = 1.0954\,\mathrm{N}/\mathrm{mm
 \end{equation*}
 \noindent\textbf{Beiwert für den Querkraftwiderstand} \hfill \normref{SIA 262:2025, 4.3.3.2.1, (36)}
 \begin{equation*}
-k_d^{-} = \frac{1}{1 + \varepsilon_v^{-} \cdot d^{-} \cdot k_g} = \frac{1}{1 + 2.174\,\text{‰} \cdot 252 \cdot 1.2} = 0.6034 \quad \left(d^{-}\ \text{in}\ \mathrm{mm}\right)
+k_d^{-} = \frac{1}{1 + \varepsilon_v^{-} \cdot d^{-} \cdot k_g} = \frac{1}{1 + 2.174\,\text{‰} \cdot 247 \cdot 1.2} = 0.6081 \quad \left(d^{-}\ \text{in}\ \mathrm{mm}\right)
 \end{equation*}
 \noindent\textbf{Zug oben, M\_Ed = M\_Rd} \hfill \normref{SIA 262:2025, 4.3.3.2.1, (35)}
 \begin{equation*}
 \begin{aligned}
   V_{Rd}^{-}(M_{Ed} = M_{Rd}^{-}) &= k_d^{-} \cdot \tau_{cd} \cdot d_v^{-} \\
-  &= 0.6034 \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 252\,\mathrm{mm} \\
-  &= 166.6\,\mathrm{kN}/\mathrm{m}
+  &= 0.6081 \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 247\,\mathrm{mm} \\
+  &= 164.5\,\mathrm{kN}/\mathrm{m}
 \end{aligned}
 \end{equation*}
 \noindent\textbf{Querkraftwiderstand ohne Bügel bei M\_Ed = 0, das Kleinere beider Seiten} \hfill \normref{SIA 262:2025, 4.3.3.2.1, (35), (36)}
 \begin{equation*}
 \begin{aligned}
   V_{Rd,max} &= \min\left[V_{Rd}^{+}(M_{Ed} = 0);\ V_{Rd}^{-}(M_{Ed} = 0)\right] \\
-  &= \min\left[271.8\,\mathrm{kN}/\mathrm{m};\ 276.1\,\mathrm{kN}/\mathrm{m}\right] \\
-  &= 271.8\,\mathrm{kN}/\mathrm{m}
+  &= \min\left[266.3\,\mathrm{kN}/\mathrm{m};\ 270.6\,\mathrm{kN}/\mathrm{m}\right] \\
+  &= 266.3\,\mathrm{kN}/\mathrm{m}
 \end{aligned}
 \end{equation*}
 \noindent\textbf{Querkraftwiderstand ohne Bügel bei M\_Ed = M\_Rd, das Kleinere beider Seiten} \hfill \normref{SIA 262:2025, 4.3.3.2.1, (35), (36); 4.3.3.2.2, (38)}
 \begin{equation*}
 \begin{aligned}
   V_{Rd,min} &= \min\left[V_{Rd}^{+}(M_{Ed} = M_{Rd}^{+});\ V_{Rd}^{-}(M_{Ed} = M_{Rd}^{-})\right] \\
-  &= \min\left[165\,\mathrm{kN}/\mathrm{m};\ 166.6\,\mathrm{kN}/\mathrm{m}\right] \\
-  &= 165\,\mathrm{kN}/\mathrm{m}
+  &= \min\left[162.9\,\mathrm{kN}/\mathrm{m};\ 164.5\,\mathrm{kN}/\mathrm{m}\right] \\
+  &= 162.9\,\mathrm{kN}/\mathrm{m}
 \end{aligned}
 \end{equation*}
 \subsection{Beton: C30/37}
@@ -3728,12 +3728,12 @@ v'' = \frac{M}{EI} \qquad u' = \frac{N}{EA}
 Lage & Richtung & Bewehrung & $A_s\ [\mathrm{mm}^2]$ & Höhe ab UK [mm] \\
 \hline
 \endhead
-Überdeckung oben & – & $30\,\mathrm{mm}$ & – & – \\
-4. Lage & y & $\varnothing 12@150$ & $754$ & $264$ \\
-3. Lage & x & $\varnothing 12@150$ & $754$ & $252$ \\
-2. Lage & x & $\varnothing 18@150 + \varnothing 12@150$ & $2450$ & $51 / 54$ \\
-1. Lage & y & $\varnothing 12@150$ & $754$ & $36$ \\
-Überdeckung unten & – & $30\,\mathrm{mm}$ & – & – \\
+Überdeckung oben & – & $35\,\mathrm{mm}$ & – & – \\
+4. Lage & y & $\varnothing 12@150$ & $754$ & $259$ \\
+3. Lage & x & $\varnothing 12@150$ & $754$ & $247$ \\
+2. Lage & x & $\varnothing 18@150 + \varnothing 12@150$ & $2450$ & $56 / 59$ \\
+1. Lage & y & $\varnothing 12@150$ & $754$ & $41$ \\
+Überdeckung unten & – & $35\,\mathrm{mm}$ & – & – \\
 \hline
 \end{longtable}
 \begin{xltabular}{\linewidth}{>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}Xrrr}
@@ -3741,10 +3741,10 @@ Lage & Richtung & Bewehrung & $A_s\ [\mathrm{mm}^2]$ & Höhe ab UK [mm] \\
 Nachweis & Bezeichnung & Widerstand & Einwirkung & $\alpha_{eff}$ \\
 \hline
 \endhead
-Biegung und Normalkraft & Feld & $M_{Rd,x}(N_{Ed} = 0\,\mathrm{kN}) = 235.9\,\mathrm{kNm}$ & $M_{Ed,x} = 100.0\,\mathrm{kNm}$ & $2.36$ \\
-Biegung und Normalkraft & Feld mit Druck & $M_{Rd,x}(N_{Ed} = -300\,\mathrm{kN}) = 253.8\,\mathrm{kNm}$ & $M_{Ed,x} = 100.0\,\mathrm{kNm}$ & $2.54$ \\
-Biegung und Normalkraft & Stütze & $M_{Rd,x}(N_{Ed} = 0\,\mathrm{kN}) = -79.9\,\mathrm{kNm}$ & $M_{Ed,x} = -50.0\,\mathrm{kNm}$ & $1.60$ \\
-Verformung & Feld & $w_{max} = 17.1\,\mathrm{mm}$ & $w_{eff} = 14.0\,\mathrm{mm}$ & $1.23$ \\
+Biegung und Normalkraft & Feld & $M_{Rd,x}(N_{Ed} = 0\,\mathrm{kN}) = 230.6\,\mathrm{kNm}$ & $M_{Ed,x} = 100.0\,\mathrm{kNm}$ & $2.31$ \\
+Biegung und Normalkraft & Feld mit Druck & $M_{Rd,x}(N_{Ed} = -300\,\mathrm{kN}) = 248.5\,\mathrm{kNm}$ & $M_{Ed,x} = 100.0\,\mathrm{kNm}$ & $2.48$ \\
+Biegung und Normalkraft & Stütze & $M_{Rd,x}(N_{Ed} = 0\,\mathrm{kN}) = -78.3\,\mathrm{kNm}$ & $M_{Ed,x} = -50.0\,\mathrm{kNm}$ & $1.57$ \\
+Verformung & Feld & $w_{max} = 17.1\,\mathrm{mm}$ & $w_{eff} = 14.6\,\mathrm{mm}$ & $1.17$ \\
 \hline
 \end{xltabular}
 \hinweis{Hinweis}{Risse: Zwängung Normalkraft – 3. Lage: nicht erfüllt (α\_eff = 0.996), ausgeschaltet. N\_s,adm = 754 mm² · 500 N/mm² = 377.0 kN < N\_Riss = 378.3 kN.}
@@ -3755,17 +3755,17 @@ Kennzahl & Zeichen & Wert \\
 \hline
 \endhead
 Bewehrungsmass & $\mu_s$ & $123\,\mathrm{kg}/\mathrm{m}^{3}$ \\
-Höhe der Distanzhalter & $h_{Dist}$ & $186\,\mathrm{mm}$ \\
-Vergrösserungsfaktor, Zug unten & $\omega_w$ & $4.00$ \\
-Vergrösserungsfaktor, Zug oben & $\omega_w'$ & $7.55$ \\
-Momentenwiderstand, Zug unten & $M_{Rd}^{+}(N_{Ed} = 0)$ & $235.9\,\mathrm{kNm}$ \\
-Momentenwiderstand, Zug oben & $M_{Rd}^{-}(N_{Ed} = 0)$ & $-79.9\,\mathrm{kNm}$ \\
-Zugwiderstand & $N_{Rd}^{+}(M_{Ed} = 0)$ & $737.5\,\mathrm{kN}$ \\
+Höhe der Distanzhalter & $h_{Dist}$ & $176\,\mathrm{mm}$ \\
+Vergrösserungsfaktor, Zug unten & $\omega_w$ & $4.18$ \\
+Vergrösserungsfaktor, Zug oben & $\omega_w'$ & $7.86$ \\
+Momentenwiderstand, Zug unten & $M_{Rd}^{+}(N_{Ed} = 0)$ & $230.6\,\mathrm{kNm}$ \\
+Momentenwiderstand, Zug oben & $M_{Rd}^{-}(N_{Ed} = 0)$ & $-78.3\,\mathrm{kNm}$ \\
+Zugwiderstand & $N_{Rd}^{+}(M_{Ed} = 0)$ & $748.8\,\mathrm{kN}$ \\
 Druckwiderstand & $N_{Rd}^{-}(M_{Ed} = 0)$ & $-6000\,\mathrm{kN}$ \\
-Bezogene Druckzonenhöhe, Zug unten & $\left(x/d\right)^{+}$ & $0.253$ \\
-Bezogene Druckzonenhöhe, Zug oben & $\left(x/d\right)^{-}$ & $0.077$ \\
-Querkraftwiderstand ohne Bügel, grösster & $V_{Rd,max}$ & $271.8\,\mathrm{kN}/\mathrm{m}$ \\
-Querkraftwiderstand ohne Bügel, kleinster bei elastischer Bewehrung & $V_{Rd,min}$ & $165\,\mathrm{kN}/\mathrm{m}$ \\
+Bezogene Druckzonenhöhe, Zug unten & $\left(x/d\right)^{+}$ & $0.258$ \\
+Bezogene Druckzonenhöhe, Zug oben & $\left(x/d\right)^{-}$ & $0.078$ \\
+Querkraftwiderstand ohne Bügel, grösster & $V_{Rd,max}$ & $266.3\,\mathrm{kN}/\mathrm{m}$ \\
+Querkraftwiderstand ohne Bügel, kleinster bei elastischer Bewehrung & $V_{Rd,min}$ & $162.9\,\mathrm{kN}/\mathrm{m}$ \\
 \hline
 \end{longtable}
 \subsection{Unterzug}
@@ -4098,67 +4098,67 @@ Grösstkorndurchmesser & $D_{max}$ & $32$ & mm & Vorgabe \\
 Betrachtete Breite (x) & $b$ & $1000$ & mm & Vorgabe \\
 Betrachtete Breite (y) & $b_y$ & $1000$ & mm & Vorgabe \\
 Bewehrungsmass je Kubikmeter Beton & $\mu_s$ & $123$ & kg/m³ & berechnet \\
-Überdeckung oben & $c_{nom,o}$ & $30$ & mm & Vorgabe \\
-Überdeckung unten & $c_{nom,u}$ & $30$ & mm & Vorgabe \\
-Höhe der Distanzhalter (OK innere untere bis UK innere obere Lage) & $h_{Dist}$ & $186$ & mm & berechnet \\
+Überdeckung oben & $c_{nom,o}$ & $35$ & mm & Vorgabe \\
+Überdeckung unten & $c_{nom,u}$ & $35$ & mm & Vorgabe \\
+Höhe der Distanzhalter (OK innere untere bis UK innere obere Lage) & $h_{Dist}$ & $176$ & mm & berechnet \\
 Grösstes Mass der Einlage (Breite oder Höhe) & $e_{Einlage}$ & $0$ & mm & Vorgabe \\
 Plattendicke & $h$ & $300$ & mm & Vorgabe \\
-Momentenwiderstand bei N\_Ed = 0, Zug oben & $M_{Rd}^{-}(N_{Ed} = 0)$ & $-79.9$ & kNm & berechnet \\
-Momentenwiderstand bei N\_Ed = 0, Zug unten & $M_{Rd}^{+}(N_{Ed} = 0)$ & $235.9$ & kNm & berechnet \\
+Momentenwiderstand bei N\_Ed = 0, Zug oben & $M_{Rd}^{-}(N_{Ed} = 0)$ & $-78.3$ & kNm & berechnet \\
+Momentenwiderstand bei N\_Ed = 0, Zug unten & $M_{Rd}^{+}(N_{Ed} = 0)$ & $230.6$ & kNm & berechnet \\
 Druckwiderstand bei M\_Ed = 0 & $N_{Rd}^{-}(M_{Ed} = 0)$ & $-6000$ & kN & berechnet \\
-Zugwiderstand bei M\_Ed = 0 & $N_{Rd}^{+}(M_{Ed} = 0)$ & $737.5$ & kN & berechnet \\
-Querkraftwiderstand ohne Bügel bei M\_Ed = 0 und N\_Ed = 0 & $V_{Rd,max}$ & $271.8$ & kN/m & berechnet \\
-Querkraftwiderstand ohne Bügel bei M\_Ed = M\_Rd und N\_Ed = 0 & $V_{Rd,min}$ & $165$ & kN/m & berechnet \\
-Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug oben & $\left(x/d\right)^{-}$ & $0.077$ &  & berechnet \\
-Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug unten & $\left(x/d\right)^{+}$ & $0.253$ &  & berechnet \\
+Zugwiderstand bei M\_Ed = 0 & $N_{Rd}^{+}(M_{Ed} = 0)$ & $748.8$ & kN & berechnet \\
+Querkraftwiderstand ohne Bügel bei M\_Ed = 0 und N\_Ed = 0 & $V_{Rd,max}$ & $266.3$ & kN/m & berechnet \\
+Querkraftwiderstand ohne Bügel bei M\_Ed = M\_Rd und N\_Ed = 0 & $V_{Rd,min}$ & $162.9$ & kN/m & berechnet \\
+Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug oben & $\left(x/d\right)^{-}$ & $0.078$ &  & berechnet \\
+Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug unten & $\left(x/d\right)^{+}$ & $0.258$ &  & berechnet \\
 Bewehrungsquerschnitt 1. Lage Grundbewehrung & $A_{s,1,y,g}$ & $754$ & mm² & berechnet \\
 Stabdurchmesser 1. Lage Grundbewehrung & $\varnothing_{1,y,g}$ & $12$ & mm & Vorgabe \\
 Teilung 1. Lage Grundbewehrung & $s_{1,y,g}$ & $150$ & mm & Vorgabe \\
-Tiefe 1. Lage Grundbewehrung ab Oberkante & $z_{1,y,g}$ & $264$ & mm & berechnet \\
+Tiefe 1. Lage Grundbewehrung ab Oberkante & $z_{1,y,g}$ & $259$ & mm & berechnet \\
 Bewehrungsquerschnitt 2. Lage Grundbewehrung & $A_{s,2,x,g}$ & $1696$ & mm² & berechnet \\
 Stabdurchmesser 2. Lage Grundbewehrung & $\varnothing_{2,x,g}$ & $18$ & mm & Vorgabe \\
 Teilung 2. Lage Grundbewehrung & $s_{2,x,g}$ & $150$ & mm & Vorgabe \\
-Tiefe 2. Lage Grundbewehrung ab Oberkante & $z_{2,x,g}$ & $249$ & mm & berechnet \\
+Tiefe 2. Lage Grundbewehrung ab Oberkante & $z_{2,x,g}$ & $244$ & mm & berechnet \\
 Bewehrungsquerschnitt 2. Lage Zulage & $A_{s,2,x,z}$ & $754$ & mm² & berechnet \\
 Stabdurchmesser 2. Lage Zulage & $\varnothing_{2,x,z}$ & $12$ & mm & Vorgabe \\
 Teilung 2. Lage Zulage & $s_{2,x,z}$ & $150$ & mm & Vorgabe \\
-Tiefe 2. Lage Zulage ab Oberkante & $z_{2,x,z}$ & $246$ & mm & berechnet \\
+Tiefe 2. Lage Zulage ab Oberkante & $z_{2,x,z}$ & $241$ & mm & berechnet \\
 Bewehrungsquerschnitt 3. Lage Grundbewehrung & $A_{s,3,x,g}$ & $754$ & mm² & berechnet \\
 Stabdurchmesser 3. Lage Grundbewehrung & $\varnothing_{3,x,g}$ & $12$ & mm & Vorgabe \\
 Teilung 3. Lage Grundbewehrung & $s_{3,x,g}$ & $150$ & mm & Vorgabe \\
-Tiefe 3. Lage Grundbewehrung ab Oberkante & $z_{3,x,g}$ & $48$ & mm & berechnet \\
+Tiefe 3. Lage Grundbewehrung ab Oberkante & $z_{3,x,g}$ & $53$ & mm & berechnet \\
 Bewehrungsquerschnitt 4. Lage Grundbewehrung & $A_{s,4,y,g}$ & $754$ & mm² & berechnet \\
 Stabdurchmesser 4. Lage Grundbewehrung & $\varnothing_{4,y,g}$ & $12$ & mm & Vorgabe \\
 Teilung 4. Lage Grundbewehrung & $s_{4,y,g}$ & $150$ & mm & Vorgabe \\
-Tiefe 4. Lage Grundbewehrung ab Oberkante & $z_{4,y,g}$ & $36$ & mm & berechnet \\
-Erfüllungsgrad Duktilität – 2. Lage & $\alpha_{eff,D,2}$ & $1.39$ &  & berechnet \\
-Bezogene Druckzonenhöhe – 2. Lage & $\left(x/d\right)_{2}$ & $0.253$ &  & berechnet \\
-Erfüllungsgrad Duktilität – 3. Lage & $\alpha_{eff,D,3}$ & $4.58$ &  & berechnet \\
-Bezogene Druckzonenhöhe – 3. Lage & $\left(x/d\right)_{3}$ & $0.077$ &  & berechnet \\
-Momentenwiderstand bei N\_Ed (x-Richtung) – Feld & $M_{Rd,x}(N_{Ed})_{\text{Feld}}$ & $235.9$ & kNm & berechnet \\
-Erfüllungsgrad x-Richtung – Feld & $\alpha_{eff,x,\text{Feld}}$ & $2.36$ &  & berechnet \\
-Momentenwiderstand bei N\_Ed (x-Richtung) – Feld mit Druck & $M_{Rd,x}(N_{Ed})_{\text{Feld mit Druck}}$ & $253.8$ & kNm & berechnet \\
-Erfüllungsgrad x-Richtung – Feld mit Druck & $\alpha_{eff,x,\text{Feld mit Druck}}$ & $2.54$ &  & berechnet \\
-Momentenwiderstand bei N = 0, negativ (x-Richtung) & $M_{Rd,x}(N=0)^{-}$ & $-79.9$ & kNm & berechnet \\
-Momentenwiderstand bei N = 0, positiv (x-Richtung) & $M_{Rd,x}(N=0)^{+}$ & $235.9$ & kNm & berechnet \\
-Grösster positiver Momentenwiderstand (x-Richtung) & $M_{Rd,x}^{+}$ & $324.4$ & kNm & berechnet \\
-Grösster negativer Momentenwiderstand (x-Richtung) & $M_{Rd,x}^{-}$ & $-253.4$ & kNm & berechnet \\
+Tiefe 4. Lage Grundbewehrung ab Oberkante & $z_{4,y,g}$ & $41$ & mm & berechnet \\
+Erfüllungsgrad Duktilität – 2. Lage & $\alpha_{eff,D,2}$ & $1.36$ &  & berechnet \\
+Bezogene Druckzonenhöhe – 2. Lage & $\left(x/d\right)_{2}$ & $0.258$ &  & berechnet \\
+Erfüllungsgrad Duktilität – 3. Lage & $\alpha_{eff,D,3}$ & $4.49$ &  & berechnet \\
+Bezogene Druckzonenhöhe – 3. Lage & $\left(x/d\right)_{3}$ & $0.078$ &  & berechnet \\
+Momentenwiderstand bei N\_Ed (x-Richtung) – Feld & $M_{Rd,x}(N_{Ed})_{\text{Feld}}$ & $230.6$ & kNm & berechnet \\
+Erfüllungsgrad x-Richtung – Feld & $\alpha_{eff,x,\text{Feld}}$ & $2.31$ &  & berechnet \\
+Momentenwiderstand bei N\_Ed (x-Richtung) – Feld mit Druck & $M_{Rd,x}(N_{Ed})_{\text{Feld mit Druck}}$ & $248.5$ & kNm & berechnet \\
+Erfüllungsgrad x-Richtung – Feld mit Druck & $\alpha_{eff,x,\text{Feld mit Druck}}$ & $2.48$ &  & berechnet \\
+Momentenwiderstand bei N = 0, negativ (x-Richtung) & $M_{Rd,x}(N=0)^{-}$ & $-78.3$ & kNm & berechnet \\
+Momentenwiderstand bei N = 0, positiv (x-Richtung) & $M_{Rd,x}(N=0)^{+}$ & $230.6$ & kNm & berechnet \\
+Grösster positiver Momentenwiderstand (x-Richtung) & $M_{Rd,x}^{+}$ & $319$ & kNm & berechnet \\
+Grösster negativer Momentenwiderstand (x-Richtung) & $M_{Rd,x}^{-}$ & $-251.7$ & kNm & berechnet \\
 Grösste aufnehmbare Druckkraft (x-Richtung) & $N_{Rd,x}^{-}$ & $-6000$ & kN & berechnet \\
 Grösste aufnehmbare Zugkraft (x-Richtung) & $N_{Rd,x}^{+}$ & $1393.2$ & kN & berechnet \\
-Momentenwiderstand bei N\_Ed (x-Richtung) – Stütze & $M_{Rd,x}(N_{Ed})_{\text{Stütze}}$ & $79.9$ & kNm & berechnet \\
-Erfüllungsgrad x-Richtung – Stütze & $\alpha_{eff,x,\text{Stütze}}$ & $1.60$ &  & berechnet \\
+Momentenwiderstand bei N\_Ed (x-Richtung) – Stütze & $M_{Rd,x}(N_{Ed})_{\text{Stütze}}$ & $78.3$ & kNm & berechnet \\
+Erfüllungsgrad x-Richtung – Stütze & $\alpha_{eff,x,\text{Stütze}}$ & $1.57$ &  & berechnet \\
 Erfüllungsgrad Rissnormalkraft – 2. Lage x & $\alpha_{eff,NR,2,x}$ & $3.24$ &  & berechnet \\
 Erfüllungsgrad Rissnormalkraft – 3. Lage x & $\alpha_{eff,NR,3,x}$ & $0.996$ &  & berechnet \\
-Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Feld (60 \%) & $\alpha_{eff,\sigma,w,x,\text{Feld (60 \%)}}$ & $4.57$ &  & berechnet \\
-Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Feld mit Druck (60 \%) & $\alpha_{eff,\sigma,w,x,\text{Feld mit Druck (60 \%)}}$ & $6.88$ &  & berechnet \\
-Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Stütze (60 \%) & $\alpha_{eff,\sigma,w,x,\text{Stütze (60 \%)}}$ & $3.05$ &  & berechnet \\
-Erfüllungsgrad sprödes Versagen – 2. Lage x & $\alpha_{eff,SV,2,x}$ & $5.69$ &  & berechnet \\
-Erfüllungsgrad sprödes Versagen – 3. Lage x & $\alpha_{eff,SV,3,x}$ & $1.93$ &  & berechnet \\
-Erfüllungsgrad Verformung – Feld & $\alpha_{eff,w,\text{Feld}}$ & $1.23$ &  & berechnet \\
-Erfüllungsgrad Zwängung auf Biegung – 2. Lage x & $\alpha_{eff,ZB,2,x}$ & $6.63$ &  & berechnet \\
-Erfüllungsgrad Zwängung auf Biegung – 3. Lage x & $\alpha_{eff,ZB,3,x}$ & $2.16$ &  & berechnet \\
-Vergrösserungsfaktor der Durchbiegung, Zug oben & $\omega_w'$ & $7.55$ &  & berechnet \\
-Vergrösserungsfaktor der Durchbiegung, Zug unten & $\omega_w$ & $4$ &  & berechnet \\
+Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Feld (60 \%) & $\alpha_{eff,\sigma,w,x,\text{Feld (60 \%)}}$ & $4.47$ &  & berechnet \\
+Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Feld mit Druck (60 \%) & $\alpha_{eff,\sigma,w,x,\text{Feld mit Druck (60 \%)}}$ & $6.74$ &  & berechnet \\
+Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Stütze (60 \%) & $\alpha_{eff,\sigma,w,x,\text{Stütze (60 \%)}}$ & $3.03$ &  & berechnet \\
+Erfüllungsgrad sprödes Versagen – 2. Lage x & $\alpha_{eff,SV,2,x}$ & $5.57$ &  & berechnet \\
+Erfüllungsgrad sprödes Versagen – 3. Lage x & $\alpha_{eff,SV,3,x}$ & $1.89$ &  & berechnet \\
+Erfüllungsgrad Verformung – Feld & $\alpha_{eff,w,\text{Feld}}$ & $1.17$ &  & berechnet \\
+Erfüllungsgrad Zwängung auf Biegung – 2. Lage x & $\alpha_{eff,ZB,2,x}$ & $6.49$ &  & berechnet \\
+Erfüllungsgrad Zwängung auf Biegung – 3. Lage x & $\alpha_{eff,ZB,3,x}$ & $2.12$ &  & berechnet \\
+Vergrösserungsfaktor der Durchbiegung, Zug oben & $\omega_w'$ & $7.86$ &  & berechnet \\
+Vergrösserungsfaktor der Durchbiegung, Zug unten & $\omega_w$ & $4.18$ &  & berechnet \\
 Fläche des Bruttoquerschnitts & $A$ & $180000$ & mm² & berechnet \\
 Stahlfläche der Bewehrung & $A_{s,tot}$ & $1169$ & mm² & berechnet \\
 Trägheitsmoment um y & $I_y$ & $5400$ & ·10⁶ mm⁴ & berechnet \\
