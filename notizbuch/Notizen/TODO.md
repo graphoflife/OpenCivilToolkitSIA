@@ -1818,7 +1818,7 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       Wanddicke wie in der Tabelle (bis 6 mm 2t/t, bis 10 mm 2.5t/1.5t,
       darüber 3t/2t). Beim UNP hat die Tabelle keine Formeln: gerechnet mit
       8 % Neigung und t_f bei b/2 bis h = 300 mm, darüber 5 % und t_f in der
-      Mitte des Flanschs -- so gewählt, dass die Werte der Tabelle getroffen
+      Mitte des Flanschs – so gewählt, dass die Werte der Tabelle getroffen
       werden (A, I_y auf 0.6 %, e_y 1 %, I_z 1.4 %); I_T des UNP wie beim
       UPE, mit t_f und r_1. Gegen eine Profiltabelle prüfen, etwa die
       Stahlbautabellen des SZS.
@@ -1827,6 +1827,13 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       mit r_o = 1.5 t und r_i = t, wie für warmgefertigte Rohre üblich – EN
       10210-2 liegt nicht vor. Das RRW 200 × 100 × 8 hat damit A = 44.75 cm²,
       I_y = 2234 cm⁴ und I_z = 739 cm⁴.
+      Vollstahl (VKT, RND, FL, seit 2026-11-27): ohne Bleche in Klasse 1, und
+      die Querkraft trägt der ganze Querschnitt, A_v = A – SIA 263 verweist
+      für A_v auf SN EN 1993-1-1, die nicht vorliegt, und die Tabellen 5a
+      und 5b kennen nur Bleche und Rohre. Elastisch wären es beim Rechteck
+      zwei Drittel davon. Der Flachstahl liegt: FL 100 x 10 ist 100 mm breit
+      und 10 mm dick; hochkant steht er um 90° gedreht oder, im
+      Balkensystem, «um z» gebogen. Prüfen, ob A_v = A bleiben soll.
 
 ### 3D-Balkensysteme
 
@@ -1900,7 +1907,10 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
 - [ ] **Stahlprofile, was fehlt:** L, INP, T und HEAA – die Tabelle des
       Benutzers hat sie nicht. Das Verkaufsprogramm von ArcelorMittal dafür
       hat er am 2026-11-27 nicht holen lassen: «weglassen». Die RRW sind seit
-      dem Tag drin, aus dem Rohrkatalog derselben Firma. Für das Kippen
+      dem Tag drin, aus dem Rohrkatalog derselben Firma, dazu Vierkant-,
+      Rund- und Flachstahl mit freien Massen. Ein Flachstahl kippt im
+      Werkzeug nicht: den Druckgurt nach Figur 40 kennt es nur beim I und
+      beim Rechteckrohr. Für das Kippen
       fehlt noch I_w (Schritt 12d); W_el, W_pl und A_v rechnet seit
       2026-11-26 die Querschnittsanalyse am Umriss, die Bleche für die
       Querschnittsklasse liefert jede Form (`stahlprofile/bleche.py`).

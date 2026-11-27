@@ -41,7 +41,7 @@ from opencivil.projekt.staebe import (
     MATERIAL_DES_QUERSCHNITTS, Querschnittsart, StabquerschnittBasis,
 )
 from opencivil.spannungsanalyse.modul import ModulAusAnalyse, ModulAusPlatte, Modulfrage
-from opencivil.stahlprofile.tabelle import PROFILE
+from opencivil.stahlprofile import tabelle
 from opencivil.stabwerk.rechnung import Balkensystem, Materialkennwert, Stabmaterial
 from opencivil.stabwerk.stabquerschnitt import (
     AusAnalyse, AusPlatte, NachVorlage, Stabquerschnitt, VonHand,
@@ -278,10 +278,10 @@ def form_von(q: StabquerschnittBasis, wo: str,
                            fehler=q.fehler() or "", vorlage=vorlage,
                            masse=q.masse_mit_vorgaben())
     if q.art is Querschnittsart.PROFIL:
-        profil = PROFILE.get(q.profil)
-        if profil is None:
-            raise ProjektFehler(f"der Querschnitt «{q.name}» nimmt das Profil "
-                                f"«{q.profil}», das es in der Tabelle nicht gibt.", wo=wo)
+        try:
+            profil = tabelle.profil(q.profil)
+        except KeyError as grund:
+            raise ProjektFehler(f"der Querschnitt «{q.name}»: {grund.args[0]}", wo=wo) from None
         form = NachVorlage(kennung=q.kennung, name=q.name, herkunft=q.profil,
                            fehler=q.fehler() or "", vorlage=profil.form, masse=dict(profil.masse))
         return form if achse is None else replace(

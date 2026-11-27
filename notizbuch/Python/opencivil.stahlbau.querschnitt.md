@@ -1,5 +1,5 @@
 ---
-erzeugt: 62166d166d2c
+erzeugt: eb110c611492
 art: modul
 tags: [modul]
 ---
@@ -36,8 +36,9 @@ dort. Ein Polygon aus anderem Werkstoff -- im Verbund der Beton -- ist fuer
 den Stahl eine Aussparung. Mit einem Gewicht dazwischen faellt ein Teil eines
 Blechs nur anteilig weg: so mindert die Querkraft den Steg
 ([[opencivil.stahlbau.querschnitt#Stahlquerschnitt.mit|Stahlquerschnitt.mit]]). Die Dicke eines Profils ist die seines dicksten
-Blechs, die einer frei gezeichneten Flaeche ihre kleinste Breite -- die ihrer
-konvexen Huelle. Nach Vorgabe, nicht nachgeschlagen: das ganze Profil
+Blechs, die eines Vollstahls -- ohne Bleche -- und einer frei gezeichneten
+Flaeche ihre kleinste Breite, die ihrer konvexen Huelle. Nach Vorgabe, nicht
+nachgeschlagen: das ganze Profil
 rechnet so mit der Fliessgrenze seines dicksten Blechs, und eine freie
 Flaeche nie mit einer zu grossen. Ueber 40 mm gelten die Werte der rechten
 Spalte von Tabelle 1, auch ueber 100 mm, wo die Tabelle endet.

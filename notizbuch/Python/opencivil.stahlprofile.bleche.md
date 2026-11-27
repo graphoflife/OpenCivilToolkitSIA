@@ -1,5 +1,5 @@
 ---
-erzeugt: 9156a38841d7
+erzeugt: b426863ce123
 art: modul
 tags: [modul]
 ---
@@ -46,6 +46,14 @@ Seite.
 Die Waende eines Rechteckrohrs mindern nach dem genaueren Faktor fuer
 Kastentraeger ([[opencivil.stahlbau.klasse#abminderung_kasten|abminderung_kasten]]); das
 weiss jedes seiner Bleche ([[opencivil.stahlprofile.bleche#Blech|Blech.kasten]]).
+
+
+## VOLLSTAHL
+
+nach Vorgabe, nicht nachgeschlagen
+Flach-, Vierkant- und Rundstahl haben keine Bleche: sie beulen nicht, und
+ohne Blech zaehlt ein Profil in Klasse 1 -- die Tabellen 5a und 5b kennen
+nur Bleche und Rohre.
 
 ## Inhalt
 

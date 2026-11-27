@@ -1,5 +1,5 @@
 ---
-erzeugt: 30192cdf626f
+erzeugt: 511a4a94b4df
 art: modul
 tags: [modul]
 ---
@@ -453,9 +453,9 @@ Ein Polygon aus Ecken `[y, z]` in mm; ohne Material eine Aussparung.
 def profil(self, y: float, z: float, profil: str, **felder: Any) -> ProfilEintrag
 ```
 
-Ein Stahlprofil der Tabelle, «HEB 300», die Mitte bei `(y, z)`; die
-Felder wie [[opencivil.projekt.profile#ProfilEintrag|ProfilEintrag]]. Einen Namen, den die Tabelle nicht
-kennt, sagt ein [[opencivil.projekt.lesen#ProjektFehler|ProjektFehler]] -- wie im Balkensystem.
+Ein Stahlprofil, «HEB 300» oder aus Vollstahl «FL 100 x 10», die Mitte
+bei `(y, z)`; die Felder wie [[opencivil.projekt.profile#ProfilEintrag|ProfilEintrag]]. Einen Namen, der
+nicht geht, sagt ein [[opencivil.projekt.lesen#ProjektFehler|ProjektFehler]] -- wie im Balkensystem.
 
 #### QuerschnittsanalyseEintrag.blechdecke
 

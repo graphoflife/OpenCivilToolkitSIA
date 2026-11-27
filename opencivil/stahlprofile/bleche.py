@@ -32,6 +32,11 @@ DER KASTEN:
 Die Waende eines Rechteckrohrs mindern nach dem genaueren Faktor fuer
 Kastentraeger (:func:`~opencivil.stahlbau.klasse.abminderung_kasten`); das
 weiss jedes seiner Bleche (:attr:`Blech.kasten`).
+
+VOLLSTAHL -- nach Vorgabe, nicht nachgeschlagen:
+Flach-, Vierkant- und Rundstahl haben keine Bleche: sie beulen nicht, und
+ohne Blech zaehlt ein Profil in Klasse 1 -- die Tabellen 5a und 5b kennen
+nur Bleche und Rohre.
 """
 
 from __future__ import annotations
@@ -166,6 +171,8 @@ _BLECHE: Dict[str, Callable[[Mapping[str, float]], List[_Roh]]] = {
     "u_geneigt": lambda m: _u(m, m["r_1"]),
     "rechteckrohr_gerundet": _rechteckrohr,
     "rundrohr": _ror,
+    "vollrechteck": lambda m: [],
+    "vollkreis": lambda m: [],
 }
 
 

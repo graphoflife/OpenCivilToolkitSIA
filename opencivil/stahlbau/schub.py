@@ -17,6 +17,9 @@ DIE SCHUBFLAECHEN:
 * Das Rechteckrohr: je Wand in der Richtung (13), ``b`` zwischen den
   Mittellinien der beiden anderen Waende. Ohne Beulen sind das
   ``2 τ_y t (h - t)/γ_M1``, wie in den Excel-Dateien.
+* Vollstahl -- Flach-, Vierkant- und Rundstahl -- mit ``A_v = A``: der ganze
+  Querschnitt fliesst auf Schub, wie bei plastischer Rechnung (nach Vorgabe,
+  nicht nachgeschlagen).
 
 DAS SCHUBBEULEN:
 Beim I und beim U genuegt (42); haelt der Steg es nicht ein, widersteht er
@@ -37,6 +40,7 @@ ganz, ``2 b t_f`` wie ihre Schubflaeche; beim Rechteckrohr die beiden Waende
 in ihrer Richtung, je ``h - 3 t`` wie in 5.1.5.3. Das Rundrohr hat keine
 solchen Bleche: dort steht die Schubflaeche gleichmaessig ueber den Ring
 verteilt, ``A_v/A`` von jedem Teil (nach Vorgabe, nicht nachgeschlagen).
+Beim Vollstahl steht sie im ganzen Querschnitt.
 """
 
 from __future__ import annotations
@@ -59,6 +63,12 @@ NACH_VORGABE = "nach Vorgabe, nicht nachgeschlagen"
 #: Der Schubbeulwert des langen Felds ohne Quersteifen (Figur 8, α gross) --
 #: siehe Dateikopf.
 K_TAU = 5.34
+
+#: Die Formen aus Vollstahl -- nach dem Schluessel ihrer Vorlage.
+_VOLL = ("vollrechteck", "vollkreis")
+
+#: Die Formen, die in jeder Richtung gleich tragen.
+_RUND = ("rundrohr", "vollkreis")
 
 
 @dataclass(frozen=True)
@@ -120,6 +130,8 @@ def widerstand(lage: Profillage, flaeche: float, richtung: str, *, f_y: float, t
         D, t = masse["D"], masse["t"]
         return Schubwiderstand(2.0 * t * (D - t), tau_y, rf"2 \cdot {t:g} \cdot ({D:g} - {t:g})",
                                NACH_VORGABE)
+    if form in _VOLL:
+        return Schubwiderstand(flaeche, tau_y, "A", NACH_VORGABE)
     if form == "rechteckrohr_gerundet":
         lang, t = (masse["h"] if steg else masse["b"]), masse["t"]
         b = lang - t
@@ -150,8 +162,8 @@ def widerstand(lage: Profillage, flaeche: float, richtung: str, *, f_y: float, t
 
 
 def rund(lage: Profillage) -> bool:
-    """Ob das Profil in jeder Richtung gleich traegt -- das Rundrohr."""
-    return tabelle.profil(lage.name).form.schluessel == "rundrohr"
+    """Ob das Profil in jeder Richtung gleich traegt -- das Rundrohr und der Rundstahl."""
+    return tabelle.profil(lage.name).form.schluessel in _RUND
 
 
 def _parallel(von: Punkt, bis: Punkt, richtung: str) -> bool:
@@ -165,10 +177,12 @@ def streifen(lage: Profillage, richtung: str) -> List[Tuple[str, float, Tuple[Pu
     Wo die Querkraft in ``richtung`` im Profil steht -- siehe Dateikopf: je
     Streifen der Name seines Blechs, sein Anteil und sein Umriss in der
     Zeichnung. Beim Rundrohr der Ring mit ``A_v/A``: der Umriss aussen mit
-    diesem Anteil, das Loch mit dem negativen.
+    diesem Anteil, das Loch mit dem negativen; beim Vollstahl der ganze Umriss.
     """
     profil = tabelle.profil(lage.name)
     masse, form = profil.masse, profil.form.schluessel
+    if form in _VOLL:
+        return [("Querschnitt", 1.0, tuple(lage.umrisse[0]))]
     if form == "rundrohr":
         aussen, loch = lage.umrisse
         D, t = masse["D"], masse["t"]

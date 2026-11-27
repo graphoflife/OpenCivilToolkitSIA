@@ -1,5 +1,5 @@
 ---
-erzeugt: 39eb4de9e482
+erzeugt: 6750bab25779
 art: modul
 tags: [modul]
 ---
@@ -63,6 +63,7 @@ prueft die Vorlage.
 - `vorgabe: float`
 - `einheit: Einheit = MM`
 - `ganzzahlig: bool = False`
+- `pfeil: float = 0.0` – Um wie viel ein Pfeil am Feld den Wert aendert -- 0: um 1 bei einer Anzahl, sonst um 10.
 
 #### Mass.heisst
 
@@ -87,7 +88,7 @@ def bereich(self) -> Bereich
 def schritt(self) -> float
 ```
 
-Um wie viel ein Pfeil am Feld den Wert aendert.
+Um wie viel ein Pfeil am Feld den Wert aendert -- siehe [[opencivil.querschnitt.vorlagen#Mass|pfeil]].
 
 #### Mass.grund
 
@@ -229,5 +230,6 @@ Die Vorlage zu einem Schluessel -- `ValueError`, wenn es sie nicht gibt.
 - [[opencivil.stabwerk.querschnitte]]
 - [[opencivil.stahlprofile.formen]]
 - [[opencivil.stahlprofile.lage]]
+- [[opencivil.stahlprofile.tabelle]]
 - [[opencivil.web.api]]
 - [[opencivil.web.dienst]]

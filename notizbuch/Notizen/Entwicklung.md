@@ -7,6 +7,45 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-27 · Vollstahl: Vierkant, Rund und Flach mit freien Massen
+
+Aus dem Plan vom 2026-11-25, Schritt 11d, zweiter Teil. Der Benutzer hat am
+selben Tag entschieden: Vierkant-, Rund- und Flachstahl bekommen keine
+Tabelle, man gibt ihre Masse frei ein.
+
+**Vorher und nachher.** Vorher kannte die Profilwahl nur Walzprofile und
+Rohre aus Tabellen. Nachher stehen im Schalter der Reihen auch VKT, RND und
+FL. Wer FL wählt, sieht statt einer Liste zwei Zahlenfelder, Breite und
+Dicke, mit 100 und 10 mm zu Beginn; aus ihnen wird der Name «FL 100 x 10».
+Ein FL 200 x 20 aus S355 trägt in der Querschnittsanalyse plastisch
+M_Rd = 6.76 kNm und V_Rd = 781 kN. Als frei gezeichnetes Blech derselben
+Masse waren es elastisch 4.51 kNm und keine Querkraft.
+
+**Der Name trägt die Masse.** Ein Profil heisst wie bisher nach Reihe und
+Zahlen, mit « x » dazwischen wie bei den Rohren. Der Kern liest die Zahlen
+aus dem Namen und prüft sie wie ein Feld: «VKT 0» geht nicht, weil die
+Seite grösser als null sein muss, und «VKT 40.0» heisst «VKT 40». Jede
+Zahl steht so kurz, wie sie genau bleibt – so schreibt sie auch
+JavaScript, und die Oberfläche braucht keine eigene Regel. Die Felder mit
+ihren Grenzen schickt der Kern im Katalog mit. Ein falscher Name meldet
+nun seinen Grund – am Profil, im Balkensystem und in der Skizze –, statt
+nur «gibt es in der Tabelle nicht».
+
+**Die Formen der Vorlagen.** Vollstahl rechnet mit dem Rechteck und dem
+Kreis der Stabquerschnitte, nur in cm² und cm⁴; es gelten dieselben
+Formelseiten. Der Vierkant gibt seine Seite a als b und h weiter.
+
+**Was er rechnet, nach Vorgabe.** Vollstahl hat keine Bleche, die beulen:
+er zählt in Klasse 1. Die Querkraft trägt der ganze Querschnitt, A_v = A;
+SIA 263 verweist dafür auf eine Norm, die nicht vorliegt. Der Rundstahl
+trägt wie das Rundrohr die Resultierende von V_y und V_z. Die Knickkurve
+ist c, wie Figur 7 sie für Vollquerschnitte zeigt. Kippen rechnet der
+Flachstahl nicht: den Druckgurt nach Figur 40 kennt das Werkzeug nur beim
+I und beim Rechteckrohr, und die Meldung sagt das grau.
+
+**Pfeile in Millimetern.** Ein Mass einer Vorlage kann nun sagen, um wie
+viel seine Pfeile springen; beim Vollstahl um 1 mm statt um 10.
+
 ## 2026-11-27 · Warmgefertigte Rechteckrohre (RRW)
 
 Aus dem Plan vom 2026-11-25, Schritt 11d. Der Benutzer hat am selben Tag

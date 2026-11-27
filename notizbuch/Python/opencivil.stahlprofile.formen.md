@@ -1,5 +1,5 @@
 ---
-erzeugt: ccd23bc48858
+erzeugt: c1c023b58388
 art: modul
 tags: [modul]
 ---
@@ -23,7 +23,9 @@ Umriss: das Bild im Balkensystem, die Flaeche in der Querschnittsanalyse
 I-Profil (IPE, HEA, HEB, HEM), U-Profil mit parallelen Flanschen (UPE),
 U-Profil mit geneigten Flanschen (UNP), Rechteckrohr mit runden Ecken -- kalt-
 oder warmgefertigt (RRK, RRW): sie unterscheiden sich nur in den Radien
--- und Rundrohr (ROR).
+-- und Rundrohr (ROR). Dazu Vollstahl: das volle Rechteck fuer Flach- und
+Vierkantstahl (FL, VKT) und der volle Kreis fuer Rundstahl (RND), mit den
+Formeln der Vorlagen.
 
 
 ## ACHSEN
@@ -105,7 +107,8 @@ Ein U, der Ruecken links -- am Steg `t_1` dick, an der Spitze `t_2`.
 def _in_cm(f: Kennformel) -> Kennformel
 ```
 
-Eine Formel der Vorlagen, in den Einheiten der Profile: Flaechen in cm², Momente in cm⁴.
+Eine Formel der Vorlagen, in den Einheiten der Profile: Flaechen in cm²,
+Momente in cm⁴, je mit zwei Stellen -- eine Laenge bleibt, wie sie ist.
 
 
 ## Konstanten
@@ -122,7 +125,9 @@ Eine Formel der Vorlagen, in den Einheiten der Profile: Flaechen in cm², Moment
 - `U_GENEIGT = Stabvorlage(schluessel='u_geneigt', name='U-Profil mit geneigten Flan…` – U-Profil mit geneigten Flanschen -- UNP: die Flansche innen um `p` geneigt, `t_f` gilt im Abstand `c` vom Ruecken; am Steg die Ausrundung `r_1`, an der Spitze die Rundung `r_2`.
 - `RECHTECKROHR_GERUNDET = Stabvorlage(schluessel='rechteckrohr_gerundet', name='Rechteckrohr mi…` – Rechteckrohr mit runden Ecken -- RRK und RRW: Wand `t` ringsum, die Ecken aussen mit `r_o`, innen mit `r_i` gerundet; `h` steht senkrecht. Die Radien kommen mit der Reihe ([[opencivil.stahlprofile.tabelle|tabelle]]).
 - `RUNDROHR = Stabvorlage(schluessel='rundrohr', name='Rundrohr', masse=KREISRING.m…` – Rundrohr -- ROR: aussen `D`, Wand `t`; die Formeln und Seiten des Kreisrings, nur in cm² und cm⁴, der Umriss feiner ([[opencivil.stahlprofile.formen#Konstanten|ROHRECKEN]]).
-- `PROFILFORMEN = (I_PROFIL, U_PARALLEL, U_GENEIGT, RECHTECKROHR_GERUNDET, RUNDROHR)`
+- `VOLLRECHTECK = Stabvorlage(schluessel='vollrechteck', name='Rechteck aus Vollstahl',…` – Rechteck aus Vollstahl -- Flach- und Vierkantstahl (FL, VKT): `b` breit, `h` hoch; die Formeln und Seiten des Rechtecks der Vorlagen, in cm² und cm⁴.
+- `VOLLKREIS = Stabvorlage(schluessel='vollkreis', name='Kreis aus Vollstahl', masse…` – Kreis aus Vollstahl -- Rundstahl (RND): Durchmesser `d`; die Formeln und Seiten des Kreises der Vorlagen, in cm² und cm⁴, der Umriss so fein wie der des Rundrohrs ([[opencivil.stahlprofile.formen#Konstanten|ROHRECKEN]]).
+- `PROFILFORMEN = (I_PROFIL, U_PARALLEL, U_GENEIGT, RECHTECKROHR_GERUNDET, RUNDROHR, VO…`
 
 ## Braucht
 

@@ -172,6 +172,9 @@ _KURVE_DER_REIHE: Dict[str, Tuple[str, str]] = {
     "RRK": ("c", "kaltgefertigtes Hohlprofil"),
     "UPE": ("c", "U-Profil"),
     "UNP": ("c", "U-Profil"),
+    "VKT": ("c", "Vollquerschnitt"),
+    "RND": ("c", "Vollquerschnitt"),
+    "FL": ("c", "Vollquerschnitt"),
 }
 
 #: Was fehlt -- Saetze fuer die Herleitung und die Zusammenfassung.

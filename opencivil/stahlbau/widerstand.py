@@ -140,9 +140,9 @@ def querkraefte(stahl: Stahlquerschnitt, V_y: float, V_z: float,
                 V_Rd: Dict[str, float]) -> List[Querkraft]:
     """
     Die Querkraefte eines Lastfalls, wie nachgewiesen: je Richtung, die einen
-    Widerstand hat -- in einem Querschnitt aus lauter Rundrohren ihre
-    Resultierende, denn ein Rundrohr traegt in jeder Richtung gleich; so
-    rechnen auch die Excel-Dateien des Benutzers. Ohne Profil keine.
+    Widerstand hat -- in einem Querschnitt aus lauter Rundrohren und Rundstahl
+    ihre Resultierende, denn sie tragen in jeder Richtung gleich; so rechnen
+    auch die Excel-Dateien des Benutzers beim Rundrohr. Ohne Profil keine.
     """
     if "y" in V_Rd and all(schub.rund(t.flaeche.profil) for t in stahl.profile):
         return [Querkraft("z", math.hypot(V_y, V_z), V_Rd["z"], resultierend=True)]

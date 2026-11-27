@@ -169,6 +169,12 @@ class KennzahlenStahlQA(Kennzahlprozedur):
                   "darum nur genähert.")
         if text:
             p.hinweis(text)
+        voll = [f"«{t.name}»" for t in self.stahl.profile if not t.bleche]
+        if voll:
+            zaehlt, traegt = ("zählt", "trägt") if len(voll) == 1 else ("zählen", "tragen")
+            p.annahme(f"Vollstahl hat keine Bleche, die beulen: {', '.join(voll)} {zaehlt} in "
+                      f"Klasse 1 und {traegt} die Querkraft mit dem ganzen Querschnitt, A_v = A – "
+                      f"nach Vorgabe, nicht nachgeschlagen.")
         p.annahme("Den Nettoquerschnitt nach (39) prüft das Werkzeug nicht: gerechnet wird der "
                   "gezeichnete Querschnitt nach (38) – nach Vorgabe, nicht nachgeschlagen.")
 
@@ -176,11 +182,12 @@ class KennzahlenStahlQA(Kennzahlprozedur):
         p.titel("Teile", ebene=3)
         p.erklaerung(
             "Jedes Teil rechnet mit der Fliessgrenze seiner Dicke: ein Profil mit der seines "
-            "dicksten Blechs, eine frei gezeichnete Fläche mit der ihrer kleinsten Breite. Über "
-            "40 mm gilt die rechte Spalte der Tabelle 1, auch über 100 mm, wo sie endet.")
-        p.annahme("Ein Profil rechnet ganz mit der Fliessgrenze seines dicksten Blechs, eine "
-                  "frei gezeichnete Fläche mit der ihrer kleinsten Breite – nach Vorgabe, nicht "
-                  "nachgeschlagen.")
+            "dicksten Blechs, Vollstahl und eine frei gezeichnete Fläche mit der ihrer kleinsten "
+            "Breite. Über 40 mm gilt die rechte Spalte der Tabelle 1, auch über 100 mm, wo sie "
+            "endet.")
+        p.annahme("Ein Profil rechnet ganz mit der Fliessgrenze seines dicksten Blechs, Vollstahl "
+                  "und eine frei gezeichnete Fläche mit der ihrer kleinsten Breite – nach Vorgabe, "
+                  "nicht nachgeschlagen.")
         p.ansatz(r"\varepsilon = \sqrt{\frac{235}{f_y}}",
                  titel="Beiwert der Grenzschlankheiten, f_y in N/mm²", referenz=kl.REFERENZ_EPSILON,
                  name="Beiwert ε der Grenzschlankheiten")
@@ -361,8 +368,8 @@ def querkraft(p: Protokoll, sw: Stahlwerte, stahl: Stahlquerschnitt, richtungen:
         "Je Profil allein, ohne Normalkraft und Biegung: kein Blech ist gedrückt, der "
         "Querschnitt rechnet plastisch. Beim I und beim U prüft (42), ob der Steg beulen "
         "kann; tut er es, trägt er nach (13). Die Wände eines Rechteckrohrs tragen je "
-        "nach (13). Zusammen tragen die Profile die Summe; frei gezeichnete Flächen "
-        "tragen nichts.")
+        "nach (13), Vollstahl mit dem ganzen Querschnitt. Zusammen tragen die Profile die "
+        "Summe; frei gezeichnete Flächen tragen nichts.")
     p.ansatz("V_{Rd} = " + sw.bruch(r"\tau_y\, A_v"), titel="Querkraftwiderstand",
              referenz=schub.REFERENZ_SCHUB, name="Querkraftwiderstand eines Stahlprofils")
     p.ansatz(r"\frac{h - t_f}{t_w} \le \sqrt{\frac{4 E}{f_y}}",

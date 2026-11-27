@@ -26,7 +26,7 @@ import { zahlText } from './cad_ansicht.js';
 import { jaNein } from './cad_app.js';
 import { cadZeile, schalterzeile } from './cad_palette.js';
 import { el } from './dom.js';
-import { groessenListe, reihenSchalter } from './profilwahl.js';
+import { groessenZeilen, reihenSchalter } from './profilwahl.js';
 import { feldangabe, katalog } from './zustand.js';
 
 /**
@@ -73,12 +73,11 @@ export function drehZeilen(wert, setzen, info = null) {
  */
 export function profilFelder(wert, setzen, info = null) {
   const profil = wert('profil');
-  const groessen = groessenListe(profil, setzen('profil'));
   return [
     wahlBlock('Reihe', reihenSchalter(profil, setzen('profil'), '.cad-wahl')),
-    groessen ? cadZeile('Profil', groessen) : null,
+    ...groessenZeilen(profil, setzen('profil'), cadZeile),
     profil === VAR ? el('p.cad-hinweis-klein', {
-      text: 'Die gewählten sind verschiedene Profile – eine Reihe wählen, dann gilt ihr kleinstes für alle.',
+      text: 'Die gewählten sind verschiedene Profile – eine Reihe wählen, dann gilt für alle ihr kleinstes, beim Vollstahl seine Vorgabe.',
     }) : null,
     cadZeile('Stahl', materialliste({
       art: feldangabe('profil', 'stahl').stoffe, gewaehlt: wert('stahl'), setzen: setzen('stahl'),

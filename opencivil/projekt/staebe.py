@@ -182,9 +182,10 @@ class StabquerschnittBasis(Beschreibung):
 
     profil: str = "IPE 300"
     """
-    Der Name des Stahlprofils (:mod:`opencivil.stahlprofile.tabelle`). Kein
-    Wahlfeld, damit die Meldung nicht alle 666 Profile aufzaehlt: einen
-    unbekannten Namen meldet der Aufbau, wie eine Platte, die es nicht gibt.
+    Der Name des Stahlprofils (:mod:`opencivil.stahlprofile.tabelle`), aus
+    Vollstahl mit seinen Massen: «FL 100 x 10». Kein Wahlfeld, damit die
+    Meldung nicht alle Profile aufzaehlt: einen Namen, der nicht geht, meldet
+    der Aufbau mit dem Grund, wie eine Platte, die es nicht gibt.
     """
 
     platte: str = ""

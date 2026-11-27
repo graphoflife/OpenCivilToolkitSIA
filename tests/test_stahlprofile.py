@@ -3,6 +3,7 @@ Die Stahlprofile: ihre Formeln gegen die Tabelle des Benutzers, ihre Umrisse,
 und ein Profil als Querschnitt im Balkensystem.
 """
 
+import math
 import unittest
 
 from opencivil.core.einheiten import CM, CM2, CM4, MM2
@@ -28,11 +29,15 @@ def flaeche(punkte):
 
 class TestTabelle(unittest.TestCase):
     def test_jedes_profil_der_tabelle(self):
-        """Jedes Profil der Tabelle des Benutzers, dazu die RRW aus dem Katalog."""
-        self.assertEqual({n for n in PROFILE if not n.startswith("RRW ")}, set(WERTE))
+        """
+        Jedes Profil der Tabelle des Benutzers, dazu die RRW aus dem Katalog
+        und je Reihe aus Vollstahl ihre Vorgabe.
+        """
+        dazu = ("RRW", "VKT", "RND", "FL")
+        self.assertEqual({n for n, p in PROFILE.items() if p.reihe not in dazu}, set(WERTE))
         self.assertEqual({r.kurz: len(r.profile) for r in PROFILREIHEN},
                          {"IPE": 18, "HEA": 24, "HEB": 24, "HEM": 24, "UPE": 14, "UNP": 17,
-                          "RRK": 306, "RRW": 481, "ROR": 239})
+                          "RRK": 306, "RRW": 481, "ROR": 239, "VKT": 1, "RND": 1, "FL": 1})
         for r in PROFILREIHEN:
             with self.subTest(reihe=r.kurz):
                 self.assertTrue(all(p.name.startswith(f"{r.kurz} ") for p in r.profile))
@@ -117,6 +122,42 @@ class TestTabelle(unittest.TestCase):
             profil("HEB 333")
 
 
+class TestVollstahl(unittest.TestCase):
+    """Vierkant-, Rund- und Flachstahl: die Masse stehen im Namen (Benutzer, 2026-11-27)."""
+
+    def test_von_hand(self):
+        """Mit den Formeln des Rechtecks und des Kreises der Vorlagen, in cm² und cm⁴."""
+        w = gerechnet("VKT 40")
+        self.assertAlmostEqual(w["A"].in_einheit(CM2), 16.0)
+        self.assertAlmostEqual(w["I_y"].in_einheit(CM4), 40 ** 4 / 12 / 1e4)
+        self.assertAlmostEqual(w["I_z"].in_einheit(CM4), 40 ** 4 / 12 / 1e4)
+        w = gerechnet("RND 25")
+        self.assertAlmostEqual(w["A"].in_einheit(MM2), math.pi * 25 ** 2 / 4)
+        self.assertAlmostEqual(w["I_T"].in_einheit(CM4), math.pi * 25 ** 4 / 32 / 1e4)
+        w = gerechnet("FL 100 x 10")
+        self.assertAlmostEqual(w["A"].in_einheit(CM2), 10.0)
+        self.assertAlmostEqual(w["I_y"].in_einheit(CM4), 100 * 10 ** 3 / 12 / 1e4)
+        self.assertAlmostEqual(w["I_z"].in_einheit(CM4), 10 * 100 ** 3 / 12 / 1e4)
+
+    def test_jede_zahl_die_geht(self):
+        """Der Vierkant gibt seine Seite a als b und h weiter."""
+        self.assertEqual(dict(profil("VKT 55").masse), {"a": 55.0, "b": 55.0, "h": 55.0})
+        self.assertEqual(dict(profil("RND 12.5").masse), {"d": 12.5})
+        self.assertEqual((profil("FL 60 x 8").reihe, dict(profil("FL 60 x 8").masse)),
+                         ("FL", {"b": 60.0, "h": 8.0}))
+
+    def test_was_nicht_geht(self):
+        """Jeder Name, der nicht geht, sagt warum -- und wie er richtig heisst."""
+        for name, grund in (
+                ("VKT 40.0", "es heisst «VKT 40»"),
+                ("VKT 0", "Das Profil «VKT 0» geht nicht: Seite a muss grösser als null"),
+                ("FL 100", "ein Flachstahl heisst wie «FL 100 x 10»"),
+                ("RND -5", "ein Rundstahl heisst wie «RND 40», mit Durchmesser d in mm"),
+                ("FL 100x10", "mit Breite b und Dicke h in mm")):
+            with self.subTest(name=name), self.assertRaisesRegex(KeyError, grund):
+                profil(name)
+
+
 class TestUmriss(unittest.TestCase):
     def test_flaeche_des_umrisses(self):
         """Das Bild zeigt, was die Formeln rechnen: seine Fläche ist A, bis auf 1 %."""
@@ -176,12 +217,20 @@ class TestImBalkensystem(unittest.TestCase):
         q = wieder.balkensysteme[0].querschnitte[0]
         self.assertEqual((q.art, q.profil, q.achse), ("profil", "RRK 200 x 100 x 8", "z"))
 
+    def test_vollstahl(self):
+        """Ein Flachstahl hochkant: um z gebogen, mit I_z = h b³/12."""
+        I_z = 10 * 100 ** 3 / 12 * 1e-12
+        self.assertAlmostEqual(self.EI(stahltraeger("FL 100 x 10", "z")) / (210000e6 * I_z), 1.0,
+                               delta=1e-9)
+
     def test_unbekanntes_profil(self):
         with self.assertRaisesRegex(ProjektFehler, "«HEB 333» gibt es nicht"):
             stahltraeger("HEB 333")
         p = stahltraeger()
         p.balkensysteme[0].querschnitte[0].profil = "HEB 333"
-        self.assertIn("nimmt das Profil «HEB 333», das es in der Tabelle nicht gibt", meldung(p))
+        self.assertIn("der Querschnitt «Träger»: Ein Profil «HEB 333» gibt es nicht.", meldung(p))
+        p.balkensysteme[0].querschnitte[0].profil = "VKT 0"
+        self.assertIn("der Querschnitt «Träger»: Das Profil «VKT 0» geht nicht", meldung(p))
 
 
 if __name__ == "__main__":

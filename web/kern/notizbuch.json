@@ -11077,6 +11077,7 @@
         "drehbar",
         "spiegelbar",
         "fangpunkte",
+        "_aussen",
         "skizze"
       ]
     },
@@ -11090,12 +11091,15 @@
         "Profil.form",
         "Profilreihe",
         "_z",
+        "_name",
         "_unp",
         "_rrk",
         "_rrw",
         "_benannt",
+        "_vollstahl",
         "reihe",
-        "profil"
+        "profil",
+        "_aus_vollstahl"
       ]
     },
     {

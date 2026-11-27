@@ -251,8 +251,11 @@ def katalog() -> dict:
         # Reihe ihre Namen in der Folge der Tabelle -- die Masse kennt nur
         # der Kern -- und die Skizze ihres mittleren Profils, das Bild im
         # Schalter der Reihe. Bis 2026-11-26 im Katalog der Balkensysteme.
+        # Beim Vollstahl dazu die Masse, die man frei eingibt, je wie ein
+        # Mass einer Vorlage: aus ihnen baut die Oberflaeche den Namen.
         "profilreihen": [{"kurz": r.kurz, "beschreibung": r.beschreibung,
                           "profile": [p.name for p in r.profile],
+                          "frei": [m.als_dict() for m in r.frei],
                           "skizze": profillage.skizze(r.profile[len(r.profile) // 2].name).als_dict()}
                          for r in PROFILREIHEN],
         # Je Klasse von Eintraegen, was der Kern ueber ihre Felder weiss --

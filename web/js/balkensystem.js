@@ -38,7 +38,7 @@ import {
 } from './dom.js';
 import { fenster, fensterOeffnen } from './fenster.js';
 import { kapitelFenster, kapitelPanel, zeilenstand } from './kapitel.js';
-import { groessenListe, reihenSchalter } from './profilwahl.js';
+import { groessenZeilen, reihenSchalter } from './profilwahl.js';
 import { diagrammzeilen, lastenKapitel, lastfallWaehlen } from './lastfaelle.js';
 import { rechenwahlZeile } from './nachweise.js';
 import { plattenmaterialien } from './plattenkapitel.js';
@@ -426,16 +426,16 @@ function querschnittFenster(system, kennung) {
       }), m.angabe.einheit));
     }
   } else if (q.art === 'profil') {
-    // Die Reihe als Schalter mit Bild, die Grösse als Liste mit dem Bild
-    // daneben -- wie die Vorlage (Benutzer, 2026-10-24) -- und in der Ebene
-    // die Achse. Dieselbe Wahl wie beim Profil einer Querschnittsanalyse
-    // (profilwahl.js); einen Namen, den die Tabelle nicht kennt, meldet der Kern.
+    // Die Reihe als Schalter mit Bild, die Grösse als Liste -- beim
+    // Vollstahl als Zahlen -- mit dem Bild daneben, wie die Vorlage
+    // (Benutzer, 2026-10-24), und in der Ebene die Achse. Dieselbe Wahl wie
+    // beim Profil einer Querschnittsanalyse (profilwahl.js); einen Namen,
+    // der nicht geht, meldet der Kern.
     const achsen = systemkatalog(art, 'profilachsen');
-    const groessen = groessenListe(q.profil, setzen('profil'));
     zeilen.push(
       wahlBlock('Reihe', reihenSchalter(q.profil, setzen('profil'))),
       el('div.bs-qvorlage', {}, [
-        groessen ? feld('Profil', groessen) : null,
+        el('div', {}, groessenZeilen(q.profil, setzen('profil'), feld)),
         umrissBild(system, q, 120, 90),
       ]),
       // Wie geschrieben: die Achsen heissen y und z, nicht Y und Z.

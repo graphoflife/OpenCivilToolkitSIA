@@ -2,10 +2,19 @@
 opencivil/stahlprofile/tabelle.py -- welche Stahlprofile es gibt, mit ihren Massen.
 
 VERANTWORTUNG:
-Die Reihen der Walzprofile und Rohre und je Groesse ihre Masse in mm. Was
-daraus gerechnet wird, sagt die Form der Reihe
+Die Reihen der Walzprofile, Rohre und des Vollstahls und je Groesse ihre
+Masse in mm. Was daraus gerechnet wird, sagt die Form der Reihe
 (:mod:`opencivil.stahlprofile.formen`); gesucht wird ein Profil nach seinem
 Namen (:func:`profil`).
+
+VOLLSTAHL -- MASSE FREI (Benutzer, 2026-11-27):
+Vierkant-, Rund- und Flachstahl haben keine Tabelle: ihr Name sagt ihre
+Masse in mm, «VKT 40», «RND 25», «FL 100 x 10» -- die Reihe, dann die
+Zahlen mit « x » dazwischen, wie bei den Rohren (:func:`_name`).
+:func:`profil` liest sie daraus; welche es sind und wie weit sie gehen,
+sagt die Reihe (:attr:`Profilreihe.frei`). Jede Zahl steht so kurz, wie
+sie genau bleibt: «FL 100 x 10», nicht «FL 100.0 x 10». Ein Flachstahl
+liegt: ``b`` ist seine Breite, ``h`` seine Dicke.
 
 QUELLE:
 Die Tabelle des Benutzers, «Festigkeitsnachweise I-Standardprofile Stahl» vom
@@ -30,11 +39,13 @@ NACH VORGABE, NICHT NACHGESCHLAGEN:
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
-from typing import Callable, Dict, List, Mapping, Tuple
+from typing import Callable, Dict, List, Mapping, Sequence, Tuple, Union
 
+from opencivil.querschnitt.vorlagen import Mass
 from opencivil.stahlprofile.formen import (
-    I_PROFIL, RECHTECKROHR_GERUNDET, RUNDROHR, U_GENEIGT, U_PARALLEL,
+    I_PROFIL, RECHTECKROHR_GERUNDET, RUNDROHR, U_GENEIGT, U_PARALLEL, VOLLKREIS, VOLLRECHTECK,
 )
 from opencivil.stabwerk.querschnitte import Stabvorlage
 
@@ -60,6 +71,16 @@ class Profilreihe:
     beschreibung: str
     form: Stabvorlage
     profile: Tuple[Profil, ...]
+    """Die Groessen der Tabelle -- bei Vollstahl nur die eine, mit der die Reihe beginnt."""
+
+    frei: Tuple[Mass, ...] = ()
+    """
+    Bei Vollstahl die Masse, die man frei eingibt, in der Folge des Namens
+    (Dateikopf) -- leer bei einer Reihe der Tabelle.
+    """
+
+    zur_form: Callable[..., Dict[str, float]] = dict
+    """Aus den freien Massen die der Form -- beim Vierkant ``b`` und ``h`` aus ``a``."""
 
 
 # ---------------------------------------------------------------------------
@@ -820,9 +841,18 @@ def _zahlen(text: str) -> List[List[str]]:
     return [zeile.split() for zeile in text.strip().splitlines()]
 
 
-def _z(text: str) -> str:
-    """Eine Zahl, wie sie im Namen steht: 21.3, 400."""
-    return f"{float(text):g}"
+def _z(zahl: Union[str, float]) -> str:
+    """
+    Eine Zahl, wie sie im Namen steht: 21.3, 400 -- so kurz, wie sie genau
+    bleibt, wie ``String`` in JavaScript (profilwahl.js).
+    """
+    text = repr(float(zahl))
+    return text[:-2] if text.endswith(".0") else text
+
+
+def _name(kurz: str, *zahlen: Union[str, float]) -> str:
+    """Ein Name: die Reihe, dann die Zahlen mit « x » dazwischen -- «RRK 200 x 100 x 8»."""
+    return f"{kurz} {' x '.join(_z(z) for z in zahlen)}"
 
 
 def _unp(h: float, b: float, t_w: float, t_f: float, r_1: float, r_2: float) -> Dict[str, float]:
@@ -839,7 +869,7 @@ def _rrk(h: float, b: float, t: float) -> Dict[str, float]:
 
 def _rrw(text: str) -> Tuple[Profil, ...]:
     """Die RRW einer Zeile «h b t t t» nach der anderen -- die Radien aus der Wanddicke."""
-    return tuple(Profil(f"RRW {_z(h)} x {_z(b)} x {_z(t)}", "RRW",
+    return tuple(Profil(_name("RRW", h, b, t), "RRW",
                         dict(h=float(h), b=float(b), t=float(t), r_o=1.5 * float(t), r_i=float(t)))
                  for h, b, *dicken in _zahlen(text) for t in dicken)
 
@@ -854,6 +884,14 @@ def _i(h: float, b: float, t_w: float, t_f: float, r: float) -> Dict[str, float]
     return dict(h=h, b=b, t_w=t_w, t_f=t_f, r=r)
 
 
+def _vollstahl(kurz: str, beschreibung: str, form: Stabvorlage, frei: Tuple[Mass, ...],
+               zur_form: Callable[..., Dict[str, float]] = dict) -> Profilreihe:
+    """Eine Reihe aus Vollstahl -- ihr eines Profil aus den Vorgaben ihrer Masse (Dateikopf)."""
+    erstes = Profil(_name(kurz, *(m.vorgabe for m in frei)), kurz,
+                    zur_form(**{m.schluessel: m.vorgabe for m in frei}))
+    return Profilreihe(kurz, beschreibung, form, (erstes,), frei, zur_form)
+
+
 PROFILREIHEN: Tuple[Profilreihe, ...] = (
     Profilreihe("IPE", "I-Träger, schmale Flansche", I_PROFIL, _benannt("IPE", _I_PROFILE, _i)),
     Profilreihe("HEA", "Breitflanschträger, leichte Reihe", I_PROFIL, _benannt("HEA", _I_PROFILE, _i)),
@@ -862,12 +900,17 @@ PROFILREIHEN: Tuple[Profilreihe, ...] = (
     Profilreihe("UPE", "U-Profil mit parallelen Flanschen", U_PARALLEL, _benannt("UPE", _UPE, _i)),
     Profilreihe("UNP", "U-Profil mit geneigten Flanschen", U_GENEIGT, _benannt("UNP", _UNP, _unp)),
     Profilreihe("RRK", "Rechteckrohr, kaltgefertigt", RECHTECKROHR_GERUNDET, tuple(
-        Profil(f"RRK {_z(h)} x {_z(b)} x {_z(t)}", "RRK", _rrk(float(h), float(b), float(t)))
+        Profil(_name("RRK", h, b, t), "RRK", _rrk(float(h), float(b), float(t)))
         for h, b, t in _zahlen(_RRK))),
     Profilreihe("RRW", "Rechteckrohr, warmgefertigt", RECHTECKROHR_GERUNDET, _rrw(_RRW)),
     Profilreihe("ROR", "Rundrohr", RUNDROHR, tuple(
-        Profil(f"ROR {_z(D)} x {_z(t)}", "ROR", dict(D=float(D), t=float(t)))
+        Profil(_name("ROR", D, t), "ROR", dict(D=float(D), t=float(t)))
         for D, t in _zahlen(_ROR))),
+    _vollstahl("VKT", "Vierkantstahl", VOLLRECHTECK, (Mass("a", "a", "Seite", 40.0, pfeil=1.0),),
+               lambda a: dict(a=a, b=a, h=a)),
+    _vollstahl("RND", "Rundstahl", VOLLKREIS, (Mass("d", "d", "Durchmesser", 40.0, pfeil=1.0),)),
+    _vollstahl("FL", "Flachstahl", VOLLRECHTECK, (Mass("b", "b", "Breite", 100.0, pfeil=1.0),
+                                                   Mass("h", "h", "Dicke", 10.0, pfeil=1.0))),
 )
 
 #: Jedes Profil nach seinem Namen -- «HEB 300», «RRK 200 x 100 x 8».
@@ -880,9 +923,37 @@ def reihe(kurz: str) -> Profilreihe:
     return _REIHEN[kurz]
 
 
+#: Eine Zahl im Namen eines Profils aus Vollstahl: ohne Vorzeichen und Exponent, 12 oder 12.5.
+_ZAHL = re.compile(r"\d+(\.\d+)?")
+
+
 def profil(name: str) -> Profil:
-    """Das Profil dieses Namens -- ein unbekannter ist ein ``KeyError``, der es sagt."""
-    try:
+    """
+    Das Profil dieses Namens: aus der Tabelle oder, bei Vollstahl, aus den
+    Zahlen im Namen (Dateikopf). Was nicht geht, sagt ein ``KeyError`` mit
+    dem Grund, als Satz.
+    """
+    if name in PROFILE:
         return PROFILE[name]
-    except KeyError:
-        raise KeyError(f"Ein Profil «{name}» gibt es nicht.") from None
+    kurz, _, zahlen = name.partition(" ")
+    r = _REIHEN.get(kurz)
+    if r is None or not r.frei:
+        raise KeyError(f"Ein Profil «{name}» gibt es nicht.")
+    return _aus_vollstahl(r, name, zahlen.split(" x "))
+
+
+def _aus_vollstahl(r: Profilreihe, name: str, teile: Sequence[str]) -> Profil:
+    """Ein Profil aus Vollstahl aus den Zahlen seines Namens, ``teile`` -- siehe :func:`profil`."""
+    if len(teile) != len(r.frei) or not all(_ZAHL.fullmatch(t) for t in teile):
+        masse = " und ".join(m.heisst for m in r.frei)
+        raise KeyError(f"Ein Profil «{name}» gibt es nicht – ein {r.beschreibung} heisst wie "
+                       f"«{r.profile[0].name}», mit {masse} in mm.")
+    werte = {m.schluessel: float(t) for m, t in zip(r.frei, teile)}
+    richtig = _name(r.kurz, *werte.values())
+    if richtig != name:
+        raise KeyError(f"Ein Profil «{name}» gibt es nicht – es heisst «{richtig}».")
+    for m in r.frei:
+        grund = m.grund(werte[m.schluessel])
+        if grund:
+            raise KeyError(f"Das Profil «{name}» geht nicht: {grund}")
+    return Profil(name, r.kurz, r.zur_form(**werte))

@@ -66,6 +66,8 @@ class Mass:
     vorgabe: float
     einheit: Einheit = MM
     ganzzahlig: bool = False
+    pfeil: float = 0.0
+    """Um wie viel ein Pfeil am Feld den Wert aendert -- 0: um 1 bei einer Anzahl, sonst um 10."""
 
     @property
     def heisst(self) -> str:
@@ -78,8 +80,8 @@ class Mass:
 
     @property
     def schritt(self) -> float:
-        """Um wie viel ein Pfeil am Feld den Wert aendert."""
-        return 1.0 if self.ganzzahlig else 10.0
+        """Um wie viel ein Pfeil am Feld den Wert aendert -- siehe :attr:`pfeil`."""
+        return self.pfeil or (1.0 if self.ganzzahlig else 10.0)
 
     def grund(self, wert: float) -> str:
         """Was an ``wert`` nicht geht, als Satz mit Punkt -- leer, wenn er geht."""

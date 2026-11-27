@@ -1,5 +1,5 @@
 ---
-erzeugt: 9bb3b26cb785
+erzeugt: cd161a55a4ac
 art: thema
 tags: [thema]
 ---
@@ -20,9 +20,9 @@ Mit Bügeln trägt das Fachwerk; gesucht wird ganzgradig zwischen α\_min und α
 
 Was der Stahlquerschnitt aufnimmt, ohne Bezug auf einen Lastfall: die Querschnittsklasse bei Druck und bei Biegung, die Widerstände des Querschnitts gegen Zug, Druck und Biegung und, mit Profilen, gegen Querkraft. Knicken und Kippen gehören dem Stab und sind hier nicht dabei.
 
-Jedes Teil rechnet mit der Fliessgrenze seiner Dicke: ein Profil mit der seines dicksten Blechs, eine frei gezeichnete Fläche mit der ihrer kleinsten Breite. Über 40 mm gilt die rechte Spalte der Tabelle 1, auch über 100 mm, wo sie endet.
+Jedes Teil rechnet mit der Fliessgrenze seiner Dicke: ein Profil mit der seines dicksten Blechs, Vollstahl und eine frei gezeichnete Fläche mit der ihrer kleinsten Breite. Über 40 mm gilt die rechte Spalte der Tabelle 1, auch über 100 mm, wo sie endet.
 
-Je Profil allein, ohne Normalkraft und Biegung: kein Blech ist gedrückt, der Querschnitt rechnet plastisch. Beim I und beim U prüft (42), ob der Steg beulen kann; tut er es, trägt er nach (13). Die Wände eines Rechteckrohrs tragen je nach (13). Zusammen tragen die Profile die Summe; frei gezeichnete Flächen tragen nichts.
+Je Profil allein, ohne Normalkraft und Biegung: kein Blech ist gedrückt, der Querschnitt rechnet plastisch. Beim I und beim U prüft (42), ob der Steg beulen kann; tut er es, trägt er nach (13). Die Wände eines Rechteckrohrs tragen je nach (13), Vollstahl mit dem ganzen Querschnitt. Zusammen tragen die Profile die Summe; frei gezeichnete Flächen tragen nichts.
 
 Was der Holzquerschnitt aufnimmt, ohne Bezug auf einen Lastfall: je Beanspruchung allein, linear, mit den Bemessungswerten der Tabellen und η\_w der Feuchteklasse – ohne stossartige Einwirkung. Knicken und Kippen gehören dem Stab und sind hier nicht dabei.
 

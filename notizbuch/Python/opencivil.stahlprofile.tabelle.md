@@ -1,5 +1,5 @@
 ---
-erzeugt: 4aa7b5c604b6
+erzeugt: 76310712d4e4
 art: modul
 tags: [modul]
 ---
@@ -9,10 +9,21 @@ tags: [modul]
 
 ## VERANTWORTUNG
 
-Die Reihen der Walzprofile und Rohre und je Groesse ihre Masse in mm. Was
-daraus gerechnet wird, sagt die Form der Reihe
+Die Reihen der Walzprofile, Rohre und des Vollstahls und je Groesse ihre
+Masse in mm. Was daraus gerechnet wird, sagt die Form der Reihe
 ([[opencivil.stahlprofile.formen]]); gesucht wird ein Profil nach seinem
 Namen ([[opencivil.stahlprofile.tabelle#profil|profil]]).
+
+
+## VOLLSTAHL -- MASSE FREI (Benutzer, 2026-11-27)
+
+Vierkant-, Rund- und Flachstahl haben keine Tabelle: ihr Name sagt ihre
+Masse in mm, «VKT 40», «RND 25», «FL 100 x 10» -- die Reihe, dann die
+Zahlen mit « x » dazwischen, wie bei den Rohren ([[opencivil.stahlprofile.tabelle#_name|_name]]).
+[[opencivil.stahlprofile.tabelle#profil|profil]] liest sie daraus; welche es sind und wie weit sie gehen,
+sagt die Reihe ([[opencivil.stahlprofile.tabelle#Profilreihe|Profilreihe.frei]]). Jede Zahl steht so kurz, wie
+sie genau bleibt: «FL 100 x 10», nicht «FL 100.0 x 10». Ein Flachstahl
+liegt: `b` ist seine Breite, `h` seine Dicke.
 
 
 ## QUELLE
@@ -70,15 +81,26 @@ class Profilreihe
 - `kurz: str` – Wie die Reihe heisst und womit jeder ihrer Namen beginnt: «IPE».
 - `beschreibung: str`
 - `form: Stabvorlage`
-- `profile: Tuple[Profil, ...]`
+- `profile: Tuple[Profil, ...]` – Die Groessen der Tabelle -- bei Vollstahl nur die eine, mit der die Reihe beginnt.
+- `frei: Tuple[Mass, ...] = ()` – Bei Vollstahl die Masse, die man frei eingibt, in der Folge des Namens (Dateikopf) -- leer bei einer Reihe der Tabelle.
+- `zur_form: Callable[..., Dict[str, float]] = dict` – Aus den freien Massen die der Form -- beim Vierkant `b` und `h` aus `a`.
 
 ### _z
 
 ```python
-def _z(text: str) -> str
+def _z(zahl: Union[str, float]) -> str
 ```
 
-Eine Zahl, wie sie im Namen steht: 21.3, 400.
+Eine Zahl, wie sie im Namen steht: 21.3, 400 -- so kurz, wie sie genau
+bleibt, wie `String` in JavaScript (profilwahl.js).
+
+### _name
+
+```python
+def _name(kurz: str, *zahlen: Union[str, float]) -> str
+```
+
+Ein Name: die Reihe, dann die Zahlen mit « x » dazwischen -- «RRK 200 x 100 x 8».
 
 ### _unp
 
@@ -112,6 +134,14 @@ def _benannt(kurz: str, text: str, masse: Callable[..., Dict[str, float]]) -> Tu
 
 Die Zeilen einer Reihe, deren Name vorne steht: «IPE 80  80  46 ...».
 
+### _vollstahl
+
+```python
+def _vollstahl(kurz: str, beschreibung: str, form: Stabvorlage, frei: Tuple[Mass, ...], zur_form: Callable[..., Dict[str, float]]=dict) -> Profilreihe
+```
+
+Eine Reihe aus Vollstahl -- ihr eines Profil aus den Vorgaben ihrer Masse (Dateikopf).
+
 ### reihe
 
 ```python
@@ -124,7 +154,17 @@ def reihe(kurz: str) -> Profilreihe
 def profil(name: str) -> Profil
 ```
 
-Das Profil dieses Namens -- ein unbekannter ist ein `KeyError`, der es sagt.
+Das Profil dieses Namens: aus der Tabelle oder, bei Vollstahl, aus den
+Zahlen im Namen (Dateikopf). Was nicht geht, sagt ein `KeyError` mit
+dem Grund, als Satz.
+
+### _aus_vollstahl
+
+```python
+def _aus_vollstahl(r: Profilreihe, name: str, teile: Sequence[str]) -> Profil
+```
+
+Ein Profil aus Vollstahl aus den Zahlen seines Namens, `teile` -- siehe [[opencivil.stahlprofile.tabelle#profil|profil]].
 
 
 ## Konstanten
@@ -138,9 +178,11 @@ Das Profil dieses Namens -- ein unbekannter ist ein `KeyError`, der es sagt.
 - `PROFILREIHEN = (Profilreihe('IPE', 'I-Träger, schmale Flansche', I_PROFIL, _benannt(…`
 - `PROFILE = {p.name: p for r in PROFILREIHEN for p in r.profile}` – Jedes Profil nach seinem Namen -- «HEB 300», «RRK 200 x 100 x 8».
 - `_REIHEN = {r.kurz: r for r in PROFILREIHEN}`
+- `_ZAHL = re.compile('\\d+(\\.\\d+)?')` – Eine Zahl im Namen eines Profils aus Vollstahl: ohne Vorzeichen und Exponent, 12 oder 12.5.
 
 ## Braucht
 
+- [[opencivil.querschnitt.vorlagen]]
 - [[opencivil.stabwerk.querschnitte]]
 - [[opencivil.stahlprofile.formen]]
 

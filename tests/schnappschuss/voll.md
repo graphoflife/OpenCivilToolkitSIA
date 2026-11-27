@@ -10880,7 +10880,7 @@ $$
 
 #### Teile
 
-> **Annahme:** Ein Profil rechnet ganz mit der Fliessgrenze seines dicksten Blechs, eine frei gezeichnete Fläche mit der ihrer kleinsten Breite – nach Vorgabe, nicht nachgeschlagen.
+> **Annahme:** Ein Profil rechnet ganz mit der Fliessgrenze seines dicksten Blechs, Vollstahl und eine frei gezeichnete Fläche mit der ihrer kleinsten Breite – nach Vorgabe, nicht nachgeschlagen.
 
 **Beiwert der Grenzschlankheiten, f\_y in N/mm²** *(SIA 263:2013, Tabelle 5b)*
 
@@ -30907,9 +30907,9 @@ $$
 
 Was der Stahlquerschnitt aufnimmt, ohne Bezug auf einen Lastfall: die Querschnittsklasse bei Druck und bei Biegung, die Widerstände des Querschnitts gegen Zug, Druck und Biegung und, mit Profilen, gegen Querkraft. Knicken und Kippen gehören dem Stab und sind hier nicht dabei.
 
-Jedes Teil rechnet mit der Fliessgrenze seiner Dicke: ein Profil mit der seines dicksten Blechs, eine frei gezeichnete Fläche mit der ihrer kleinsten Breite. Über 40 mm gilt die rechte Spalte der Tabelle 1, auch über 100 mm, wo sie endet.
+Jedes Teil rechnet mit der Fliessgrenze seiner Dicke: ein Profil mit der seines dicksten Blechs, Vollstahl und eine frei gezeichnete Fläche mit der ihrer kleinsten Breite. Über 40 mm gilt die rechte Spalte der Tabelle 1, auch über 100 mm, wo sie endet.
 
-Je Profil allein, ohne Normalkraft und Biegung: kein Blech ist gedrückt, der Querschnitt rechnet plastisch. Beim I und beim U prüft (42), ob der Steg beulen kann; tut er es, trägt er nach (13). Die Wände eines Rechteckrohrs tragen je nach (13). Zusammen tragen die Profile die Summe; frei gezeichnete Flächen tragen nichts.
+Je Profil allein, ohne Normalkraft und Biegung: kein Blech ist gedrückt, der Querschnitt rechnet plastisch. Beim I und beim U prüft (42), ob der Steg beulen kann; tut er es, trägt er nach (13). Die Wände eines Rechteckrohrs tragen je nach (13), Vollstahl mit dem ganzen Querschnitt. Zusammen tragen die Profile die Summe; frei gezeichnete Flächen tragen nichts.
 
 Was der Verbundquerschnitt aufnimmt, ohne Bezug auf einen Lastfall: die Widerstände gegen Zug, Druck und Biegung, plastisch nach SIA 264, und mit Profilen gegen Querkraft – die trägt der Stahl allein (4.3.2.2). Mit Kopfbolzendübeln dazu, was einer trägt. Knicken und Kippen gehören dem Träger und sind hier nicht dabei.
 

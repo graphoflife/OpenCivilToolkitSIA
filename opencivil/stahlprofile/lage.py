@@ -2,7 +2,7 @@
 opencivil/stahlprofile/lage.py -- ein Stahlprofil im gezeichneten Querschnitt.
 
 VERANTWORTUNG:
-Wo ein Profil der Tabelle in einer Querschnittsanalyse liegt
+Wo ein Profil der Tabelle oder aus Vollstahl in einer Querschnittsanalyse liegt
 (:class:`Profillage`): aus seiner Mitte, seiner Drehung und ob es gespiegelt
 ist, seine Umrisse in der Zeichnung und wie es in Bericht und Meldungen
 heisst; ob Drehen oder Spiegeln es ueberhaupt aendert (:func:`drehbar`,
@@ -72,6 +72,10 @@ _RICHTUNGEN = {"oben": (0, 1), "unten": (0, -1), "links": (-1, 0), "rechts": (1,
 #: Einsetzen einer Vorlage, damit die Summe keinen Rundungsrest behaelt.
 _STELLEN = 6
 
+#: So viele Profile behaelt jeder Speicher unten -- die der Tabelle alle,
+#: dazu die frei eingegebenen aus Vollstahl, deren Zahl offen ist.
+_GEMERKT = 4096
+
 
 def _rahmen(punkte: Sequence[Punkt]) -> Tuple[float, float, float, float]:
     ys = [p[0] for p in punkte]
@@ -79,14 +83,14 @@ def _rahmen(punkte: Sequence[Punkt]) -> Tuple[float, float, float, float]:
     return min(ys), min(zs), max(ys), max(zs)
 
 
-@lru_cache(maxsize=None)
+@lru_cache(maxsize=_GEMERKT)
 def _lokal(name: str) -> Tuple[Tuple[Punkt, ...], ...]:
-    """Die Umrisse, wie die Form sie zeichnet -- einmal je Profil: die Tabelle aendert sich nicht."""
+    """Die Umrisse, wie die Form sie zeichnet -- einmal je Profil: sein Name sagt seine Masse."""
     profil = tabelle.profil(name)
     return tuple(tuple(teil) for teil in profil.form.umriss(profil.masse))
 
 
-@lru_cache(maxsize=None)
+@lru_cache(maxsize=_GEMERKT)
 def _mitte_lokal(name: str) -> Punkt:
     """Die Mitte des umschreibenden Rechtecks, wie die Form das Profil zeichnet."""
     y0, z0, y1, z1 = _rahmen(_lokal(name)[0])
@@ -96,10 +100,10 @@ def _mitte_lokal(name: str) -> Punkt:
 @dataclass(frozen=True)
 class Profillage:
     """
-    Ein Profil der Tabelle, wie es im Querschnitt liegt: sein Name, seine
-    Mitte in mm, seine Drehung und ob es gespiegelt ist -- siehe Dateikopf.
-    Einen Namen, den die Tabelle nicht kennt, sagt ein ``KeyError``, sobald
-    etwas gerechnet wird (:func:`~opencivil.stahlprofile.tabelle.profil`).
+    Ein Profil, wie es im Querschnitt liegt: sein Name, seine Mitte in mm,
+    seine Drehung und ob es gespiegelt ist -- siehe Dateikopf. Einen Namen,
+    der nicht geht, sagt ein ``KeyError``, sobald etwas gerechnet wird
+    (:func:`~opencivil.stahlprofile.tabelle.profil`).
     """
 
     name: str
@@ -151,13 +155,13 @@ def _gleich(a: Sequence[Sequence[Punkt]], b: Sequence[Sequence[Punkt]]) -> bool:
     return len(a) == len(b) and all(ecken(p) == ecken(q) for p, q in zip(a, b))
 
 
-@lru_cache(maxsize=None)
+@lru_cache(maxsize=_GEMERKT)
 def drehbar(name: str) -> bool:
     """Ob eine Drehung um 90 Grad das Profil aendert -- beim Rundrohr nicht, beim quadratischen Rohr auch nicht."""
     return not _gleich(Profillage(name).umrisse, Profillage(name, drehung=90).umrisse)
 
 
-@lru_cache(maxsize=None)
+@lru_cache(maxsize=_GEMERKT)
 def spiegelbar(name: str) -> bool:
     """Ob das Spiegeln das Profil aendert -- nur, wenn es zur senkrechten Achse nicht symmetrisch ist, wie das U."""
     return not _gleich(Profillage(name).umrisse, Profillage(name, gespiegelt=True).umrisse)
@@ -174,21 +178,33 @@ def fangpunkte(teile: Sequence[Sequence[Punkt]]) -> List[Punkt]:
     return [(y0, z0), (ym, z0), (y1, z0), (y1, zm), (y1, z1), (ym, z1), (y0, z1), (y0, zm)]
 
 
+def _aussen(profil: tabelle.Profil) -> Tuple[str, ...]:
+    """
+    Welche Masse die Skizze zeigt: bei Vollstahl die frei eingegebenen --
+    beim Vierkant nur ``a`` --, beim Rundrohr ``D``, sonst ``b`` und ``h``.
+    """
+    frei = tabelle.reihe(profil.reihe).frei
+    if frei:
+        return tuple(m.schluessel for m in frei)
+    return ("D",) if "D" in profil.masse else ("b", "h")
+
+
 def skizze(name: str, drehung: int = 0, gespiegelt: bool = False) -> Teile:
     """
     Das Profil fuer das Fenster der Vorlagen: seine Umrisse um seine Mitte
     -- nicht von unten links wie die Teile der anderen Vorlagen: die Mitte
-    kommt an den Einsetzpunkt -- und die zwei Masse, die es von aussen hat,
-    Breite unten, Hoehe links, nach der Drehung. Beim Rundrohr nur ``D``.
+    kommt an den Einsetzpunkt -- und die Masse, die es von aussen hat
+    (:func:`_aussen`), Breite unten, Hoehe links, nach der Drehung; ein
+    einziges steht unten.
     """
     teile = Profillage(name, drehung=drehung, gespiegelt=gespiegelt).umrisse
     y0, z0, y1, z1 = _rahmen(teile[0])
-    m = tabelle.profil(name).masse
-    if "D" in m:
-        masse = [masslinie((y0, z0), (y1, z0), "D", m["D"], "unten")]
-    else:
-        quer, hoch = ("h", "b") if drehung in (90, 270) else ("b", "h")
-        masse = [masslinie((y0, z0), (y1, z0), quer, m[quer], "unten"),
-                 masslinie((y0, z0), (y0, z1), hoch, m[hoch], "links")]
+    profil = tabelle.profil(name)
+    namen = _aussen(profil)
+    if len(namen) == 2 and drehung in (90, 270):
+        namen = namen[::-1]
+    seiten = (((y0, z0), (y1, z0), "unten"), ((y0, z0), (y0, z1), "links"))
+    masse = [masslinie(von, bis, n, profil.masse[n], seite)
+             for n, (von, bis, seite) in zip(namen, seiten)]
     return Teile(polygone=[{"punkte": teil, "aussparung": i > 0} for i, teil in enumerate(teile)],
                  masslinien=masse)

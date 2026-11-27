@@ -14,7 +14,9 @@ DIE FORMEN:
 I-Profil (IPE, HEA, HEB, HEM), U-Profil mit parallelen Flanschen (UPE),
 U-Profil mit geneigten Flanschen (UNP), Rechteckrohr mit runden Ecken -- kalt-
 oder warmgefertigt (RRK, RRW): sie unterscheiden sich nur in den Radien
--- und Rundrohr (ROR).
+-- und Rundrohr (ROR). Dazu Vollstahl: das volle Rechteck fuer Flach- und
+Vierkantstahl (FL, VKT) und der volle Kreis fuer Rundstahl (RND), mit den
+Formeln der Vorlagen.
 
 ACHSEN:
 Das Profil steht: der Steg senkrecht, beim U der Ruecken links. ``y`` ist
@@ -44,7 +46,7 @@ from typing import List, Mapping, Sequence, Tuple
 from opencivil.core.einheiten import CM2, CM4, EINHEITSLOS, MIO_MM4, MM, MM2, PROZENT, Groesse
 from opencivil.querschnitt.vorlagen import Mass, kreispunkte
 from opencivil.stabwerk.querschnitte import (
-    EINS, KREISRING, ROHRTORSION, Kennformel, Stabvorlage,
+    EINS, KREIS, KREISRING, RECHTECK, ROHRTORSION, Kennformel, Stabvorlage,
 )
 
 Punkt = Tuple[float, float]
@@ -399,8 +401,12 @@ RECHTECKROHR_GERUNDET = Stabvorlage(
 
 
 def _in_cm(f: Kennformel) -> Kennformel:
-    """Eine Formel der Vorlagen, in den Einheiten der Profile: Flaechen in cm², Momente in cm⁴."""
-    return replace(f, einheit={MM2: CM2, MIO_MM4: CM4}.get(f.einheit, f.einheit), stellen=2)
+    """
+    Eine Formel der Vorlagen, in den Einheiten der Profile: Flaechen in cm²,
+    Momente in cm⁴, je mit zwei Stellen -- eine Laenge bleibt, wie sie ist.
+    """
+    einheit = {MM2: CM2, MIO_MM4: CM4}.get(f.einheit)
+    return f if einheit is None else replace(f, einheit=einheit, stellen=2)
 
 
 def _rundrohr_umriss(m: Mapping[str, float]) -> List[List[Punkt]]:
@@ -419,5 +425,26 @@ RUNDROHR = Stabvorlage(
     umriss=_rundrohr_umriss,
 )
 
-PROFILFORMEN: Tuple[Stabvorlage, ...] = (I_PROFIL, U_PARALLEL, U_GENEIGT,
-                                         RECHTECKROHR_GERUNDET, RUNDROHR)
+#: Rechteck aus Vollstahl -- Flach- und Vierkantstahl (FL, VKT): ``b`` breit,
+#: ``h`` hoch; die Formeln und Seiten des Rechtecks der Vorlagen, in cm² und cm⁴.
+VOLLRECHTECK = Stabvorlage(
+    schluessel="vollrechteck", name="Rechteck aus Vollstahl",
+    masse=RECHTECK.masse,
+    formeln=tuple(_in_cm(f) for f in RECHTECK.formeln),
+    pruefung=RECHTECK.pruefung,
+    umriss=RECHTECK.umriss,
+)
+
+#: Kreis aus Vollstahl -- Rundstahl (RND): Durchmesser ``d``; die Formeln und
+#: Seiten des Kreises der Vorlagen, in cm² und cm⁴, der Umriss so fein wie
+#: der des Rundrohrs (:data:`ROHRECKEN`).
+VOLLKREIS = Stabvorlage(
+    schluessel="vollkreis", name="Kreis aus Vollstahl",
+    masse=KREIS.masse,
+    formeln=tuple(_in_cm(f) for f in KREIS.formeln),
+    pruefung=KREIS.pruefung,
+    umriss=lambda m: [kreispunkte((m["d"] / 2, m["d"] / 2), m["d"] / 2, ROHRECKEN)],
+)
+
+PROFILFORMEN: Tuple[Stabvorlage, ...] = (I_PROFIL, U_PARALLEL, U_GENEIGT, RECHTECKROHR_GERUNDET,
+                                         RUNDROHR, VOLLRECHTECK, VOLLKREIS)

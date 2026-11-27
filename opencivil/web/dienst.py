@@ -657,8 +657,8 @@ def _profilskizze(wahl: Mapping[str, Any]) -> Dict[str, Any]:
                                 f"{', '.join(map(str, profillage.DREHUNGEN))} Grad.")
     try:
         teile = profillage.skizze(name, drehung, bool(wahl.get("gespiegelt")))
-    except KeyError:
-        return {"fehler": f"Das Profil «{name}» gibt es in der Tabelle nicht.", "teile": None}
+    except KeyError as grund:
+        return {"fehler": grund.args[0], "teile": None}
     return {"fehler": None, "teile": teile.als_dict(), "drehbar": profillage.drehbar(name),
             "spiegelbar": profillage.spiegelbar(name)}
 

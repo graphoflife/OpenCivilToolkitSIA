@@ -661,9 +661,8 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben, JeMaterial):
             liegt = profillage.Profillage(p.profil, ort[0], p.drehung, p.gespiegelt)
             try:
                 umrisse = liegt.umrisse
-            except KeyError:
-                fehler.append({"text": f"{name}: das Profil «{p.profil}» gibt es in der "
-                                       f"Tabelle nicht.", "elemente": [p.kennung or name]})
+            except KeyError as grund:
+                fehler.append({"text": f"{name}: {grund.args[0]}", "elemente": [p.kennung or name]})
                 continue
             profile.append(benannt(
                 name, p.kennung, lage=ort[0], profil=p.profil, stahl=p.stahl,
@@ -751,9 +750,9 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben, JeMaterial):
 
     def profil(self, y: float, z: float, profil: str, **felder: Any) -> ProfilEintrag:
         """
-        Ein Stahlprofil der Tabelle, «HEB 300», die Mitte bei ``(y, z)``; die
-        Felder wie :class:`ProfilEintrag`. Einen Namen, den die Tabelle nicht
-        kennt, sagt ein :class:`ProjektFehler` -- wie im Balkensystem.
+        Ein Stahlprofil, «HEB 300» oder aus Vollstahl «FL 100 x 10», die Mitte
+        bei ``(y, z)``; die Felder wie :class:`ProfilEintrag`. Einen Namen, der
+        nicht geht, sagt ein :class:`ProjektFehler` -- wie im Balkensystem.
         """
         try:
             profiltabelle.profil(profil)

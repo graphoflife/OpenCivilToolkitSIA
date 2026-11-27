@@ -1,5 +1,5 @@
 ---
-erzeugt: 434b919b00ca
+erzeugt: 0a0444e158c4
 art: modul
 tags: [modul]
 ---
@@ -9,7 +9,7 @@ tags: [modul]
 
 ## VERANTWORTUNG
 
-Wo ein Profil der Tabelle in einer Querschnittsanalyse liegt
+Wo ein Profil der Tabelle oder aus Vollstahl in einer Querschnittsanalyse liegt
 ([[opencivil.stahlprofile.lage#Profillage|Profillage]]): aus seiner Mitte, seiner Drehung und ob es gespiegelt
 ist, seine Umrisse in der Zeichnung und wie es in Bericht und Meldungen
 heisst; ob Drehen oder Spiegeln es ueberhaupt aendert ([[opencivil.stahlprofile.lage#drehbar|drehbar]],
@@ -47,16 +47,16 @@ jeder gezeichneten Flaeche. Wie genau es die Tabelle trifft, steht bei
 ### _lokal
 
 ```python
-@lru_cache(maxsize=None)
+@lru_cache(maxsize=_GEMERKT)
 def _lokal(name: str) -> Tuple[Tuple[Punkt, ...], ...]
 ```
 
-Die Umrisse, wie die Form sie zeichnet -- einmal je Profil: die Tabelle aendert sich nicht.
+Die Umrisse, wie die Form sie zeichnet -- einmal je Profil: sein Name sagt seine Masse.
 
 ### _mitte_lokal
 
 ```python
-@lru_cache(maxsize=None)
+@lru_cache(maxsize=_GEMERKT)
 def _mitte_lokal(name: str) -> Punkt
 ```
 
@@ -69,10 +69,10 @@ Die Mitte des umschreibenden Rechtecks, wie die Form das Profil zeichnet.
 class Profillage
 ```
 
-Ein Profil der Tabelle, wie es im Querschnitt liegt: sein Name, seine
-Mitte in mm, seine Drehung und ob es gespiegelt ist -- siehe Dateikopf.
-Einen Namen, den die Tabelle nicht kennt, sagt ein `KeyError`, sobald
-etwas gerechnet wird ([[opencivil.stahlprofile.tabelle#profil|profil]]).
+Ein Profil, wie es im Querschnitt liegt: sein Name, seine Mitte in mm,
+seine Drehung und ob es gespiegelt ist -- siehe Dateikopf. Einen Namen,
+der nicht geht, sagt ein `KeyError`, sobald etwas gerechnet wird
+([[opencivil.stahlprofile.tabelle#profil|profil]]).
 
 - `name: str`
 - `mitte: Punkt = (0.0, 0.0)`
@@ -126,7 +126,7 @@ Ob zwei Umrisse dieselben Ecken haben, auf einen Hundertstel Millimeter -- gleic
 ### drehbar
 
 ```python
-@lru_cache(maxsize=None)
+@lru_cache(maxsize=_GEMERKT)
 def drehbar(name: str) -> bool
 ```
 
@@ -135,7 +135,7 @@ Ob eine Drehung um 90 Grad das Profil aendert -- beim Rundrohr nicht, beim quadr
 ### spiegelbar
 
 ```python
-@lru_cache(maxsize=None)
+@lru_cache(maxsize=_GEMERKT)
 def spiegelbar(name: str) -> bool
 ```
 
@@ -151,6 +151,15 @@ Woran der Zeiger am Profil faengt: die Ecken des umschreibenden
 Rechtecks und die Mitten seiner Seiten -- beim I die Spitzen und Mitten
 der Flansche, so legt sich eine Platte auf den Obergurt.
 
+### _aussen
+
+```python
+def _aussen(profil: tabelle.Profil) -> Tuple[str, ...]
+```
+
+Welche Masse die Skizze zeigt: bei Vollstahl die frei eingegebenen --
+beim Vierkant nur `a` --, beim Rundrohr `D`, sonst `b` und `h`.
+
 ### skizze
 
 ```python
@@ -159,8 +168,9 @@ def skizze(name: str, drehung: int=0, gespiegelt: bool=False) -> Teile
 
 Das Profil fuer das Fenster der Vorlagen: seine Umrisse um seine Mitte
 -- nicht von unten links wie die Teile der anderen Vorlagen: die Mitte
-kommt an den Einsetzpunkt -- und die zwei Masse, die es von aussen hat,
-Breite unten, Hoehe links, nach der Drehung. Beim Rundrohr nur `D`.
+kommt an den Einsetzpunkt -- und die Masse, die es von aussen hat
+([[opencivil.stahlprofile.lage#_aussen|_aussen]]), Breite unten, Hoehe links, nach der Drehung; ein
+einziges steht unten.
 
 
 ## Konstanten
@@ -171,6 +181,7 @@ Breite unten, Hoehe links, nach der Drehung. Beim Rundrohr nur `D`.
 - `_DREHUNG = {0: (1, 0), 90: (0, 1), 180: (-1, 0), 270: (0, -1)}` – cos und sin je Drehung -- genau, ohne Rundungsrest der Winkelfunktionen.
 - `_RICHTUNGEN = {'oben': (0, 1), 'unten': (0, -1), 'links': (-1, 0), 'rechts': (1, 0)}` – Die vier Richtungen der Zeichnung, als Einheitsvektor -- so heisst ein Blech nach seiner Lage, auch am gedrehten Profil ([[opencivil.stahlprofile.lage#Profillage.richtung|Profillage.richtung]]).
 - `_STELLEN = 6` – Auf so viele Stellen nach dem Komma in mm liegen die Ecken -- wie beim Einsetzen einer Vorlage, damit die Summe keinen Rundungsrest behaelt.
+- `_GEMERKT = 4096` – So viele Profile behaelt jeder Speicher unten -- die der Tabelle alle, dazu die frei eingegebenen aus Vollstahl, deren Zahl offen ist.
 
 ## Braucht
 

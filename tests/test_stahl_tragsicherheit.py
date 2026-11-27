@@ -21,6 +21,12 @@ Kennzahlen, :mod:`tests.test_stahlbau`):
   Klasse 1: M_Rd = f W (1 - |N_Ed|/N_Rd).
 * ROR 219.1 x 8: die Resultierende gegen V_Rd = 205 · 2 · 8 · (219.1 - 8)/1.05
   = 659.4 kN.
+* FL 200 x 20 -- dasselbe Rechteck wie das freie Blech, als Profil: ohne
+  Bleche in Klasse 1, M_Rd = f · 200 · 20²/4 = 6.76 kNm statt elastisch
+  f · 200 · 20²/6, und die Querkraft mit A_v = A: V_Rd = 205 · 4000/1.05
+  = 780.9 kN.
+* RND 40: die Resultierende gegen V_Rd = 205 · A/1.05, A die Flaeche des
+  Umrisses.
 """
 
 import math
@@ -29,9 +35,11 @@ import unittest
 from opencivil.bericht.markdown import als_markdown
 from opencivil.nachweis.qa_stahl import OHNE_PROFIL, OHNE_TORSION
 from opencivil.nachweis.qa_stahl_werte import ROHR_KLASSE_4
+from opencivil.querschnitt import geometrie as geo
 from opencivil.querschnitt.biegung import SCHIEF
 from opencivil.querschnitt.gesetzwahl import Werkstoffsatz
 from opencivil.stahlbau import widerstand as wd
+from opencivil.stahlprofile.lage import Profillage
 from tests.test_stahlbau import kennzahlen, rechteck
 from tests.test_stahlprofile_qa import analyse, projekt
 
@@ -198,6 +206,21 @@ class TestRohr(unittest.TestCase):
                               faelle={"LF": {"V_y_Ed": 300, "V_z_Ed": 400}})
         V_Rd = 205 * 2 * 8 * (219.1 - 8) / 1.05 / 1e3
         self.assertAlmostEqual(grad(urteile["V", "LF"]), V_Rd / 500, delta=GENAU)
+
+
+class TestVollstahl(unittest.TestCase):
+    """Ohne Bleche Klasse 1, die Querkraft im ganzen Querschnitt -- nach Vorgabe."""
+
+    def test_flachstahl(self):
+        urteile, *_ = rechnen((0, 0, "FL 200 x 20", {}), faelle={"LF": {"M_y_Ed": 1, "V_z_Ed": 10}})
+        self.assertAlmostEqual(grad(urteile["M-N", "LF"]), F * 200 * 20 ** 2 / 4 / 1e6, delta=GENAU)
+        self.assertAlmostEqual(grad(urteile["V", "LF"]), 205 * 200 * 20 / 1.05 / 1e3 / 10,
+                               delta=GENAU)
+
+    def test_rundstahl_traegt_die_resultierende(self):
+        urteile, *_ = rechnen((0, 0, "RND 40", {}), faelle={"LF": {"V_y_Ed": 30, "V_z_Ed": 40}})
+        A = geo.flaechenwerte(Profillage("RND 40").umrisse[0]).A
+        self.assertAlmostEqual(grad(urteile["V", "LF"]), 205 * A / 1.05 / 1e3 / 50, delta=GENAU)
 
 
 class TestOhneProfil(unittest.TestCase):

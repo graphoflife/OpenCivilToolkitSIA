@@ -1,5 +1,5 @@
 ---
-erzeugt: 7527dcee9da6
+erzeugt: c9fc1ae7c934
 art: modul
 tags: [modul]
 ---
@@ -140,9 +140,9 @@ def querkraefte(stahl: Stahlquerschnitt, V_y: float, V_z: float, V_Rd: Dict[str,
 ```
 
 Die Querkraefte eines Lastfalls, wie nachgewiesen: je Richtung, die einen
-Widerstand hat -- in einem Querschnitt aus lauter Rundrohren ihre
-Resultierende, denn ein Rundrohr traegt in jeder Richtung gleich; so
-rechnen auch die Excel-Dateien des Benutzers. Ohne Profil keine.
+Widerstand hat -- in einem Querschnitt aus lauter Rundrohren und Rundstahl
+ihre Resultierende, denn sie tragen in jeder Richtung gleich; so rechnen
+auch die Excel-Dateien des Benutzers beim Rundrohr. Ohne Profil keine.
 
 ### Abgemindert
 

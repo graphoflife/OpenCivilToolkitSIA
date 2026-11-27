@@ -1,5 +1,5 @@
 ---
-erzeugt: ed470e1e50a3
+erzeugt: caa5e7260739
 art: modul
 tags: [modul]
 ---
@@ -26,6 +26,9 @@ rechnet plastisch (5.1.4).
 * Das Rechteckrohr: je Wand in der Richtung (13), `b` zwischen den
   Mittellinien der beiden anderen Waende. Ohne Beulen sind das
   `2 τ_y t (h - t)/γ_M1`, wie in den Excel-Dateien.
+* Vollstahl -- Flach-, Vierkant- und Rundstahl -- mit `A_v = A`: der ganze
+  Querschnitt fliesst auf Schub, wie bei plastischer Rechnung (nach Vorgabe,
+  nicht nachgeschlagen).
 
 
 ## DAS SCHUBBEULEN
@@ -52,6 +55,7 @@ ganz, `2 b t_f` wie ihre Schubflaeche; beim Rechteckrohr die beiden Waende
 in ihrer Richtung, je `h - 3 t` wie in 5.1.5.3. Das Rundrohr hat keine
 solchen Bleche: dort steht die Schubflaeche gleichmaessig ueber den Ring
 verteilt, `A_v/A` von jedem Teil (nach Vorgabe, nicht nachgeschlagen).
+Beim Vollstahl steht sie im ganzen Querschnitt.
 
 ## Inhalt
 
@@ -125,7 +129,7 @@ Der Querkraftwiderstand eines Profils in `richtung` («y» oder «z») --
 def rund(lage: Profillage) -> bool
 ```
 
-Ob das Profil in jeder Richtung gleich traegt -- das Rundrohr.
+Ob das Profil in jeder Richtung gleich traegt -- das Rundrohr und der Rundstahl.
 
 ### _parallel
 
@@ -144,7 +148,7 @@ def streifen(lage: Profillage, richtung: str) -> List[Tuple[str, float, Tuple[Pu
 Wo die Querkraft in `richtung` im Profil steht -- siehe Dateikopf: je
 Streifen der Name seines Blechs, sein Anteil und sein Umriss in der
 Zeichnung. Beim Rundrohr der Ring mit `A_v/A`: der Umriss aussen mit
-diesem Anteil, das Loch mit dem negativen.
+diesem Anteil, das Loch mit dem negativen; beim Vollstahl der ganze Umriss.
 
 
 ## Konstanten
@@ -155,6 +159,8 @@ diesem Anteil, das Loch mit dem negativen.
 - `REFERENZ_BEULEN = 'SIA 263:2013, 4.5.4.1, (13); Figur 8'`
 - `NACH_VORGABE = 'nach Vorgabe, nicht nachgeschlagen'`
 - `K_TAU = 5.34` – Der Schubbeulwert des langen Felds ohne Quersteifen (Figur 8, α gross) -- siehe Dateikopf.
+- `_VOLL = ('vollrechteck', 'vollkreis')` – Die Formen aus Vollstahl -- nach dem Schluessel ihrer Vorlage.
+- `_RUND = ('rundrohr', 'vollkreis')` – Die Formen, die in jeder Richtung gleich tragen.
 
 ## Braucht
 

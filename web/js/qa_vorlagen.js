@@ -30,7 +30,7 @@ import { hakenSchalter, materialliste, wahlBlock } from './bausteine.js';
 import { pfad } from './cad_ansicht.js';
 import { schalterzeile } from './cad_palette.js';
 import { el, grenzeVerletzt, melden, svgEl, zahlfeld } from './dom.js';
-import { groessenListe, reihenSchalter } from './profilwahl.js';
+import { groessenZeilen, reihenSchalter } from './profilwahl.js';
 import { BLECHDECKE, MASSE, STOFFE } from './qa_blechdecke.js';
 import { PROFIL, drehZeilen } from './qa_profile.js';
 import { skizze } from './qa_skizze.js';
@@ -280,7 +280,6 @@ function profilvorlage(a, neu, holen) {
     holen();
   }, a.qa.profilform));
   zeigen();
-  const groessen = groessenListe(e.profil, setzen('profil'));
   return {
     anfrage: () => ({
       art: stahlprofil().schluessel, profil: e.profil, drehung: e.drehung, gespiegelt: e.gespiegelt,
@@ -292,7 +291,7 @@ function profilvorlage(a, neu, holen) {
     },
     zeilen: [
       wahlBlock('Reihe', reihenSchalter(e.profil, setzen('profil'), '.cad-wahl')),
-      groessen ? zeile('Profil', groessen) : null,
+      ...groessenZeilen(e.profil, setzen('profil'), zeile),
       zeile('Stahl', materialliste({
         art: stoffe, gewaehlt: e.stahl, titel: 'Woraus das Profil ist', setzen: setzen('stahl'),
       })),

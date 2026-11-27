@@ -107,10 +107,13 @@ class TestUmriss(unittest.TestCase):
         self.assertGreater(werte(lage.Profillage("UPE 200", drehung=90, gespiegelt=True).umrisse).z_S, 10.0)
 
     def test_drehbar_und_spiegelbar(self):
-        """Ein Rundrohr und ein quadratisches Rohr dreht nichts, gespiegelt aendert sich nur das U."""
+        """
+        Rund- und Vierkantstahl, ein Rundrohr und ein quadratisches Rohr dreht
+        nichts, gespiegelt aendert sich nur das U.
+        """
         fest = {n for n, p in PROFILE.items()
-                if n.startswith("ROR") or (n.startswith(("RRK", "RRW"))
-                                           and p.masse["h"] == p.masse["b"])}
+                if p.reihe in ("ROR", "VKT", "RND") or (p.reihe in ("RRK", "RRW")
+                                                       and p.masse["h"] == p.masse["b"])}
         self.assertEqual({n for n in PROFILE if not lage.drehbar(n)}, fest)
         self.assertEqual({n for n in PROFILE if lage.spiegelbar(n)},
                          {n for n in PROFILE if n.startswith(("UPE", "UNP"))})
@@ -226,7 +229,7 @@ class TestZeichnung(unittest.TestCase):
         a.profile[0].profil = "HEB 999"
         antwort = zeichnung(p, a)
         self.assertEqual(antwort["meldungen"], [{
-            "text": "Profil 1: das Profil «HEB 999» gibt es in der Tabelle nicht.",
+            "text": "Profil 1: Ein Profil «HEB 999» gibt es nicht.",
             "elemente": ["R1"], "fehler": True}])
         self.assertEqual(antwort["profile"], [])
 
@@ -282,7 +285,21 @@ class TestVorlage(unittest.TestCase):
 
     def test_ein_unbekannter_name_ist_nur_unfertig(self):
         self.assertEqual(dienst.vorlage({"wahl": {"art": "stahlprofil", "profil": "HEB 999"}}),
-                         {"fehler": "Das Profil «HEB 999» gibt es in der Tabelle nicht.", "teile": None})
+                         {"fehler": "Ein Profil «HEB 999» gibt es nicht.", "teile": None})
+        self.assertEqual(dienst.vorlage({"wahl": {"art": "stahlprofil", "profil": "FL 0 x 10"}}),
+                         {"fehler": "Das Profil «FL 0 x 10» geht nicht: Breite b muss grösser "
+                                    "als null sein, angegeben ist 0 mm.", "teile": None})
+
+    def test_vollstahl_bemasst_seine_eigenen_masse(self):
+        """Der Vierkant nur a, der Flachstahl b und h -- um 90° gedreht h unten."""
+        for profil, drehung, texte, drehbar in (("VKT 40", 0, ["a = 40"], False),
+                                                ("RND 12.5", 0, ["d = 12.5"], False),
+                                                ("FL 60 x 8", 90, ["h = 8", "b = 60"], True)):
+            with self.subTest(profil=profil):
+                antwort = dienst.vorlage({"wahl": {"art": "stahlprofil", "profil": profil,
+                                                   "drehung": drehung}})
+                self.assertEqual([m["text"] for m in antwort["teile"]["masslinien"]], texte)
+                self.assertEqual((antwort["drehbar"], antwort["spiegelbar"]), (drehbar, False))
 
     def test_eine_falsche_drehung_ist_eine_falsche_anfrage(self):
         with self.assertRaises(dienst.DienstFehler):
@@ -291,10 +308,17 @@ class TestVorlage(unittest.TestCase):
     def test_im_katalog(self):
         k = katalog()
         self.assertEqual([r["kurz"] for r in k["profilreihen"]],
-                         ["IPE", "HEA", "HEB", "HEM", "UPE", "UNP", "RRK", "RRW", "ROR"])
+                         ["IPE", "HEA", "HEB", "HEM", "UPE", "UNP", "RRK", "RRW", "ROR",
+                          "VKT", "RND", "FL"])
         heb = next(r for r in k["profilreihen"] if r["kurz"] == "HEB")
-        self.assertEqual(heb["profile"][0], "HEB 100")
+        self.assertEqual((heb["profile"][0], heb["frei"]), ("HEB 100", []))
         self.assertTrue(heb["skizze"]["polygone"])
+        fl = next(r for r in k["profilreihen"] if r["kurz"] == "FL")
+        self.assertEqual(fl["profile"], ["FL 100 x 10"])
+        self.assertEqual([(m["schluessel"], m["beschriftung"], m["vorgabe"], m["schritt"])
+                          for m in fl["frei"]],
+                         [("b", "Breite", 100.0, 1.0), ("h", "Dicke", 10.0, 1.0)])
+        self.assertEqual(fl["frei"][0]["angabe"]["ueber"], 0.0)
         vorlage = k["querschnittsanalyse"]["profil"]
         self.assertEqual((vorlage["schluessel"], vorlage["name"]), ("stahlprofil", "Stahlprofil"))
         self.assertEqual([d["wert"] for d in vorlage["drehungen"]], [0, 90, 180, 270])
