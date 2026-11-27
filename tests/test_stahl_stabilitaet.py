@@ -314,6 +314,17 @@ class TestWasFehlt(unittest.TestCase):
         self.assertEqual(st.rechnen(s, fall(N=-600, M_y=20, L_K_y=4.0, L_D=3.0)).fehlt,
                          st.KIPPEN_FEHLT)
 
+    def test_ein_flachstahl_kippt_im_werkzeug_nicht(self):
+        """
+        Doppelsymmetrisch, aber ohne Druckgurt nach Figur 40 -- der Satz sagt
+        es so und nicht wie beim U (Benutzer, 2026-11-27).
+        """
+        s = stab((0, 0, "FL 100 x 10", {}))
+        biegung = {f"M_{s.stark}": 2.0}
+        self.assertEqual(st.rechnen(s, fall(L_D=2.0, **biegung)).fehlt, st.KIPPEN_FLACHSTAHL)
+        self.assertEqual(st.rechnen(s, fall(**biegung)).fehlt, "", "gehalten kippt es nicht")
+        self.assertIn("doppelsymmetrisch, aber den Druckgurt nach Figur 40", st.KIPPEN_FLACHSTAHL)
+
     def test_ein_u_kippt_nicht_nach_anhang_b(self):
         s = stab((0, 0, "UPE 200", {}))
         self.assertEqual(st.rechnen(s, fall(M_y=20, L_D=3.0)).fehlt, st.KIPPEN_FEHLT)

@@ -139,6 +139,14 @@ class TestVollstahl(unittest.TestCase):
         self.assertAlmostEqual(w["I_y"].in_einheit(CM4), 100 * 10 ** 3 / 12 / 1e4)
         self.assertAlmostEqual(w["I_z"].in_einheit(CM4), 10 * 100 ** 3 / 12 / 1e4)
 
+    def test_ein_duenner_flachstahl_steht_nicht_als_null_da(self):
+        """FL 20 × 3: I_y = 0.0045 cm⁴ -- mit zwei Stellen stand dort 0 (Benutzer, 2026-11-27)."""
+        stellen = {f.kurzname: f.stellen for f in profil("FL 20 x 3").form.formeln}
+        w = gerechnet("FL 20 x 3")
+        self.assertEqual(w["I_y"].formatiert(stellen["I_y"], CM4), "0.0045")
+        self.assertEqual(w["A"].formatiert(stellen["A"], CM2), "0.6")
+        self.assertEqual(stellen["A"], 2)
+
     def test_jede_zahl_die_geht(self):
         """Der Vierkant gibt seine Seite a als b und h weiter."""
         self.assertEqual(dict(profil("VKT 55").masse), {"a": 55.0, "b": 55.0, "h": 55.0})

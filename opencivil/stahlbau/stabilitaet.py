@@ -98,7 +98,7 @@ from opencivil.querschnitt.zugseite import Zugseite
 from opencivil.stahlbau import widerstand as wd
 from opencivil.stahlbau.querschnitt import Stahlquerschnitt, normale
 from opencivil.stahlprofile import tabelle
-from opencivil.stahlprofile.formen import I_PROFIL, RECHTECKROHR_GERUNDET
+from opencivil.stahlprofile.formen import I_PROFIL, RECHTECKROHR_GERUNDET, VOLLRECHTECK
 from opencivil.stahlprofile.lage import Profillage
 
 REFERENZ_KNICKEN = "SIA 263:2013, 4.5.1.3, (7); 4.5.1.4, (8); Tabelle 8"
@@ -183,6 +183,12 @@ KURVE_FEHLT = ("{was}: Figur 7 kennt das Werkzeug nur für einen Querschnitt aus
 KIPPEN_FEHLT = ("Kippen rechnet das Werkzeug nur für einen Querschnitt aus einem einzigen I-Profil "
                 "oder Rechteckrohr: Anhang B gilt für doppelsymmetrische Querschnitte. Ist der "
                 "Stab gehalten, ist die Kipplänge null.")
+#: Beim Flachstahl eigens: er ist doppelsymmetrisch, der Satz oben laese sich
+#: wie ein Grund, der nicht stimmt (Benutzer, 2026-11-27).
+KIPPEN_FLACHSTAHL = ("Kippen rechnet das Werkzeug für einen Flachstahl nicht. Er ist "
+                     "doppelsymmetrisch, aber den Druckgurt nach Figur 40, aus dem Anhang B den "
+                     "Wölbanteil (93) rechnet, kennt das Werkzeug nur bei I-Profilen und "
+                     "Rechteckrohren. Ist der Stab gehalten, ist die Kipplänge null.")
 
 
 def abminderung(lam: float, alpha: float, lam_0: float) -> Tuple[float, float]:
@@ -630,7 +636,8 @@ def rechnen(stab: Stab, fall: Stabfall) -> Ergebnis:
     if s is not None and M[s] != 0.0 and fall.L_D > 0.0:
         gurt = druckgurt(stab.profil) if stab.profil is not None else None
         if gurt is None:
-            e.fehlt = KIPPEN_FEHLT
+            e.fehlt = (KIPPEN_FLACHSTAHL if stab.profil is not None
+                       and stab.profil.form is VOLLRECHTECK else KIPPEN_FEHLT)
             return e
         seite = seite_von(s, M[s])
         e.kippen = _kippen(stab, e, s, seite, gurt, eta(fall.psi(s)))

@@ -7,6 +7,26 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-27 · Flachstahl: Kippen und kleine Kennwerte
+
+Aus der Durchsicht nach HALFEN HDB; der Benutzer hat es am 2026-11-27
+gewählt.
+
+**Kippen.** Ein Flachstahl unter Biegung um die starke Achse, nicht
+seitlich gehalten: das Werkzeug rechnet kein Kippen. Vorher stand als
+Grund, Anhang B gelte für doppelsymmetrische Querschnitte – das las sich,
+als wäre der Flachstahl keiner. Nachher sagt der Satz, wie es ist: er ist
+doppelsymmetrisch, aber das Werkzeug nimmt den Wölbanteil (93) aus dem
+Druckgurt nach Figur 40 (SIA 263, S. 85), und den kennt es nur bei
+I-Profilen und Rechteckrohren. Für U-Profile und Querschnitte aus mehreren
+Teilen bleibt der alte Satz; er stimmt dort.
+
+**Kleine Kennwerte.** Ein Flachstahl 20 × 3 mm hat I_y = 0.0045 cm⁴. Mit
+zwei Stellen stand vorher «0 cm⁴» da. Nachher haben die Momente von Flach-,
+Vierkant- und Rundstahl vier Stellen; seine Masse sind frei, und ein
+dünner Stahl soll nicht als null erscheinen. Die Flächen behalten zwei,
+die Profile aus Tabellen auch.
+
 ## 2026-11-27 · Nachweise, die sich nicht führen lassen: grau statt rot
 
 Aus der Durchsicht nach HALFEN HDB; der Benutzer hat es am 2026-11-27

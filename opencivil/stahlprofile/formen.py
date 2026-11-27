@@ -400,13 +400,16 @@ RECHTECKROHR_GERUNDET = Stabvorlage(
 )
 
 
-def _in_cm(f: Kennformel) -> Kennformel:
+def _in_cm(f: Kennformel, momente: int = 2) -> Kennformel:
     """
-    Eine Formel der Vorlagen, in den Einheiten der Profile: Flaechen in cm²,
-    Momente in cm⁴, je mit zwei Stellen -- eine Laenge bleibt, wie sie ist.
+    Eine Formel der Vorlagen, in den Einheiten der Profile: Flaechen in cm²
+    mit zwei Stellen, Momente in cm⁴ mit ``momente`` -- eine Laenge bleibt,
+    wie sie ist. Beim Vollstahl sind es vier: seine Masse sind frei, und ein
+    duenner Flachstahl, etwa 20 × 3 mm, haette mit zwei I = 0 cm⁴ statt
+    0.0045 (Benutzer, 2026-11-27).
     """
-    einheit = {MM2: CM2, MIO_MM4: CM4}.get(f.einheit)
-    return f if einheit is None else replace(f, einheit=einheit, stellen=2)
+    neu = {MM2: (CM2, 2), MIO_MM4: (CM4, momente)}.get(f.einheit)
+    return f if neu is None else replace(f, einheit=neu[0], stellen=neu[1])
 
 
 def _rundrohr_umriss(m: Mapping[str, float]) -> List[List[Punkt]]:
@@ -426,22 +429,23 @@ RUNDROHR = Stabvorlage(
 )
 
 #: Rechteck aus Vollstahl -- Flach- und Vierkantstahl (FL, VKT): ``b`` breit,
-#: ``h`` hoch; die Formeln und Seiten des Rechtecks der Vorlagen, in cm² und cm⁴.
+#: ``h`` hoch; die Formeln und Seiten des Rechtecks der Vorlagen, in cm² und
+#: cm⁴, die Momente mit vier Stellen (:func:`_in_cm`).
 VOLLRECHTECK = Stabvorlage(
     schluessel="vollrechteck", name="Rechteck aus Vollstahl",
     masse=RECHTECK.masse,
-    formeln=tuple(_in_cm(f) for f in RECHTECK.formeln),
+    formeln=tuple(_in_cm(f, momente=4) for f in RECHTECK.formeln),
     pruefung=RECHTECK.pruefung,
     umriss=RECHTECK.umriss,
 )
 
 #: Kreis aus Vollstahl -- Rundstahl (RND): Durchmesser ``d``; die Formeln und
-#: Seiten des Kreises der Vorlagen, in cm² und cm⁴, der Umriss so fein wie
-#: der des Rundrohrs (:data:`ROHRECKEN`).
+#: Seiten des Kreises der Vorlagen, in cm² und cm⁴ wie beim Rechteck aus
+#: Vollstahl, der Umriss so fein wie der des Rundrohrs (:data:`ROHRECKEN`).
 VOLLKREIS = Stabvorlage(
     schluessel="vollkreis", name="Kreis aus Vollstahl",
     masse=KREIS.masse,
-    formeln=tuple(_in_cm(f) for f in KREIS.formeln),
+    formeln=tuple(_in_cm(f, momente=4) for f in KREIS.formeln),
     pruefung=KREIS.pruefung,
     umriss=lambda m: [kreispunkte((m["d"] / 2, m["d"] / 2), m["d"] / 2, ROHRECKEN)],
 )
