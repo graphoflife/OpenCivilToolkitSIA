@@ -27,11 +27,8 @@ from typing import Any, Dict, List, Mapping, NamedTuple, Optional, Sequence, Tup
 from opencivil.core.protokoll import Abschnitt
 from opencivil.core.rechenwerk import Rechenwerk
 from opencivil.material.basis import Baustoff, Baustoffart
-from opencivil.material.spannstahl import erzeugnis
 from opencivil.projekt.aufbau.kern import baustoff_im_werk, materialgrund
-from opencivil.projekt.aufbau.querschnittsanalyse import (
-    erzeugnis_grund, ohne_analysen, ohne_nachweise,
-)
+from opencivil.projekt.aufbau.querschnittsanalyse import ohne_analysen, ohne_nachweise
 from opencivil.projekt.blechdecken import BlechdeckeEintrag
 from opencivil.projekt.lesen import stoffe_des_felds
 from opencivil.projekt.querschnittsanalyse import (
@@ -47,7 +44,7 @@ from opencivil.querschnitt.geometrie import (
     linienflaeche, stab_in_ueberdeckung, ueberdeckungspolygon,
 )
 from opencivil.querschnitt.spannglieder import (
-    Spannglied, Spannglieder, aus_glied, geneigt, grenzen_verletzt, lotrecht,
+    Spannglied, Spannglieder, aus_glied, geneigt, grenzen_verletzt, lotrecht, was_fehlt,
 )
 from opencivil.stahlbau import stabilitaet
 
@@ -349,8 +346,8 @@ def _spannglieder(roh: Sequence[Mapping], projekt) -> _Glieder:
     Die Glieder, die rechnen, je Kennung -- und ihre Werte aus derselben
     Herleitung wie im Bericht (:class:`Spannglieder`), mit den Saetzen dazu,
     was an ihren Spannungen die Norm verletzt (:func:`grenzen_verletzt`).
-    Dazu die Meldungen zu denen, deren Durchmesser es in der Sorte nicht
-    gibt: grau, wie beim Bauen (:func:`erzeugnis_grund`). Ein falsches oder
+    Dazu die Meldungen zu denen, deren Erzeugnis oder Art es in der Sorte
+    nicht gibt: grau, wie beim Bauen (:func:`was_fehlt`). Ein falsches oder
     fehlendes Material meldet schon :func:`materialgrund`; ein Material, das
     selbst nicht rechnet, sagt es in seinem Fenster.
     """
@@ -368,13 +365,13 @@ def _spannglieder(roh: Sequence[Mapping], projekt) -> _Glieder:
         stahl = stoffe[m.kennung]
         if stahl is None:
             continue
-        gefunden = erzeugnis(stahl.sorte, g["durchmesser"])
-        if gefunden is None:
-            fehlt.append({"text": f"{g['name']}: "
-                                  f"{erzeugnis_grund(stahl.name, stahl.sorte, g['durchmesser'])}.",
-                          "elemente": [g["kennung"]], "fehler": False})
+        mit_stahl = {**g, "stahl": stahl}
+        grund = was_fehlt(mit_stahl)
+        if grund:
+            fehlt.append({"text": f"{g['name']}: {grund}.", "elemente": [g["kennung"]],
+                          "fehler": False})
             continue
-        glieder[g["kennung"]] = aus_glied({**g, "stahl": stahl}, gefunden)
+        glieder[g["kennung"]] = aus_glied(mit_stahl)
     if not glieder:
         return _Glieder(glieder, {}, fehlt, [])
     herleitung = Spannglieder(list(glieder.values()), basis="zeichnung",
@@ -395,7 +392,7 @@ def _spannglieder(roh: Sequence[Mapping], projekt) -> _Glieder:
         grenzen += [{"text": f"{g.name}: {satz}.", "elemente": [kennung], "fehler": True}
                     for satz in grenzen_verletzt(je["sigma_p0"], je["sigma_pinf"],
                                                  kennwert(g, "f_pk"), kennwert(g, "f_p01k"))]
-        werte[kennung] = {**je, "erzeugnis": g.erzeugnis.bezeichnung(g.stahl.sorte)}
+        werte[kennung] = {**je, "bezeichnung": g.bezeichnung}
         if geneigt(g):
             # Was es von einem gleich gerichteten V_z traegt (Gleichung (50)).
             werte[kennung]["V_p"] = lotrecht(je["P_inf"], g.neigung)

@@ -1,5 +1,5 @@
 ---
-erzeugt: 5bce30096ba3
+erzeugt: 60fd0ce1d8d2
 art: modul
 tags: [modul]
 ---
@@ -103,6 +103,15 @@ def modul(self) -> str
 
 Der Kurzname des Moduls, der fuer diese Art gilt (3.3.2.4).
 
+#### Erzeugnisart.erklaerung
+
+```python
+@property
+def erklaerung(self) -> str
+```
+
+Was an der Art haengt, wo die Flaeche eines Glieds eingegeben ist: ihr Modul.
+
 ### Erzeugnis
 
 ```python
@@ -156,6 +165,14 @@ Das Erzeugnis der Sorte mit diesem Durchmesser – `None`, wenn Tabelle 7
 es fuer die Sorte nicht nennt. Je Sorte hat jedes einen eigenen
 Durchmesser; daran waehlt ein Spannglied seines.
 
+### erzeugnisarten
+
+```python
+def erzeugnisarten(sorte: str) -> Tuple[Erzeugnisart, ...]
+```
+
+In welchen Arten Tabelle 7 die Sorte nennt, in ihrer Folge: Y1860 als Draht und Litze.
+
 ### spannstahlsorten_zum_anlegen
 
 ```python
@@ -194,12 +211,12 @@ Erzeugt einen Spannstahl aus der Sortentabelle.
 ## Gebraucht von
 
 - [[opencivil.material.arten]]
-- [[opencivil.projekt.aufbau.querschnittsanalyse]]
+- [[opencivil.projekt.frueher]]
 - [[opencivil.projekt.projekt]]
+- [[opencivil.projekt.spannglieder]]
 - [[opencivil.querschnitt.spannglieder]]
 - [[opencivil.web.api]]
 - [[opencivil.web.werkstoffkurven]]
-- [[opencivil.web.zeichengeometrie]]
 
 ## Formeln aus diesem Modul
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: 5578da710c7f
+erzeugt: 642b45c9472d
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.1.5.1.5"
@@ -17,7 +17,7 @@ $$
 
 | Zeichen | Bedeutung | Einheit | Woher |
 | --- | --- | --- | --- |
-| $\sigma_{p\infty,1}$ | Spannung nach allen Verlusten, Spannglied 1 | N/mm² | [[Spannung im Spannglied nach Vorgabe]] |
+| $\sigma_{p\infty,1}$ | Spannung nach allen Verlusten, Spannglied 1 | N/mm² | [[Spannung im Spannglied]] |
 | $E_p^{\mathrm{Litze}}$ | Elastizitätsmodul von Litzen | N/mm² | Vorgabe |
 
 ## Beispiel

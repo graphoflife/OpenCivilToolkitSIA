@@ -1,5 +1,5 @@
 ---
-erzeugt: b5a4752f0ef8
+erzeugt: 58c1cb51de62
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -465,7 +465,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Spannkraft eines Spannglieds]] · $P_{\infty,1}$
 - [[Spannung aus dem Moment an der Ecke, die zuerst reisst]] · $\sigma_M$
 - [[Spannung aus der Vorspannung an der Ecke]] · $\sigma_p$
-- [[Spannung im Spannglied nach Vorgabe]] · $\sigma_{p0,1}$
+- [[Spannung im Spannglied]] · $\sigma_{p0,1}$
 - [[Spannung im ungerissenen Querschnitt]]
 - [[Spannung in der Durchstanzbewehrung]] · $\sigma_{sd}$
 - [[Spannungsblock des Betons]]

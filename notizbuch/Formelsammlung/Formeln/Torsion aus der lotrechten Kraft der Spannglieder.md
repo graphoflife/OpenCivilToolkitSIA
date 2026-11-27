@@ -1,5 +1,5 @@
 ---
-erzeugt: 57dc59ac2e18
+erzeugt: 95615688f0c4
 art: formel
 tags: [formel]
 ---
@@ -25,7 +25,7 @@ $$
 Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
-T_p = P_{max,2} \cdot \sin \beta_{p,2} \cdot e_{p,2} = 378\,\mathrm{kN} \cdot \sin \left(-4{}^{\circ}\right) \cdot \left(-80\,\mathrm{mm}\right) = 2.1\,\mathrm{kNm}
+T_p = P_{max,2} \cdot \sin \beta_{p,2} \cdot e_{p,2} = 380.2\,\mathrm{kN} \cdot \sin \left(-4{}^{\circ}\right) \cdot \left(-80\,\mathrm{mm}\right) = 2.1\,\mathrm{kNm}
 $$
 
 ## Gebraucht von

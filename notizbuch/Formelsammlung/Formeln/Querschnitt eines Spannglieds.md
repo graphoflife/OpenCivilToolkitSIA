@@ -53,3 +53,10 @@ Darum wählt man im Werkzeug einen Durchmesser unter den Erzeugnissen der
 Sorte, und die Fläche kommt aus der Tabelle. Gibt es den Durchmesser in
 der Sorte nicht – etwa nach dem Wechsel zu Y1030, das es nur in Stäben
 gibt –, fehlt die Wahl noch: das Glied rechnet nicht und sagt es grau.
+
+Seit 2026-11-27 lässt sich die Fläche auch eingeben, mit dem Schalter
+«Menge»: etwa für ein Glied aus zwölf Litzen, 1800 mm², oder ein
+Erzeugnis, das die Tabelle nicht führt. Dann zählt nur noch die Art, denn
+an ihr hängt der Modul: 195 000 N/mm² für Litzen, 200 000 für Drähte und
+Stäbe (SIA 262:2025, 3.3.2.4.1 und 3.3.2.4.2). Auch die Art muss es in der
+Sorte geben; sonst fehlt die Wahl wie beim Durchmesser.

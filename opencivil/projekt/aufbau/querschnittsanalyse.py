@@ -19,7 +19,6 @@ from typing import TYPE_CHECKING, Any, Dict, Iterable, List, Mapping, Tuple
 
 from opencivil.core.berechnung import Kennzahlprozedur
 from opencivil.material.basis import Baustoff, Baustoffart
-from opencivil.material.spannstahl import erzeugnis
 from opencivil.projekt.lesen import ProjektFehler, als_groesse, ort_von, stoffe_des_felds
 from opencivil.projekt.querschnittsanalyse import (
     QuerschnittsanalyseEintrag, SchubwandEintrag, StabEintrag, StablinieEintrag,
@@ -51,7 +50,7 @@ from opencivil.querschnitt.bauweise import Bauweise
 from opencivil.querschnitt.biegung import EINACHSIG, SCHIEF
 from opencivil.querschnitt.geometrie import GeometrieFehler
 from opencivil.querschnitt.profilblech import aus_form
-from opencivil.querschnitt.spannglieder import Spannglied, aus_glied
+from opencivil.querschnitt.spannglieder import Spannglied, aus_glied, was_fehlt
 from opencivil.verbund import duebel as vd
 
 from opencivil.projekt.aufbau.kern import (
@@ -417,24 +416,11 @@ def _analyse(eintrag: QuerschnittsanalyseEintrag, baustoffe: Mapping[str, Bausto
 
 def _glied(g: Mapping, stahl: Baustoff, wo: str) -> Spannglied:
     """
-    Ein Spannglied mit seinem Spannstahl -- und dem Erzeugnis, das sein
-    Durchmesser in der Sorte waehlt. Nennt Tabelle 7 keines, fehlt die Wahl
-    noch (:func:`erzeugnis_grund`).
+    Ein Spannglied mit seinem Spannstahl. Nennt Tabelle 7 sein Erzeugnis oder
+    seine Art fuer die Sorte nicht, fehlt die Wahl noch (:func:`was_fehlt`).
     """
-    gefunden = erzeugnis(stahl.sorte, g["durchmesser"])
-    if gefunden is None:
-        raise ProjektFehler(f"{g['name']}: {erzeugnis_grund(stahl.name, stahl.sorte, g['durchmesser'])}.",
-                            wo=wo)
-    return aus_glied({**g, "stahl": stahl}, gefunden)
-
-
-def erzeugnis_grund(name: str, sorte: str, durchmesser: float) -> str:
-    """
-    Warum ein Spannglied noch kein Erzeugnis hat -- die eine Stelle fuer den
-    Aufbau und das Zeichenfenster (:mod:`opencivil.web.zeichengeometrie`). Es
-    fehlt nur eine Wahl, etwa nach dem Wechsel zu einer Sorte, die es nur in
-    Staeben gibt.
-    """
-    nennt = f" (Sorte {sorte})" if sorte and sorte != name else ""
-    return (f"{name}{nennt} gibt es nicht mit ⌀{durchmesser:g} mm (Tabelle 7) – "
-            f"einen Durchmesser wählen")
+    mit_stahl = {**g, "stahl": stahl}
+    grund = was_fehlt(mit_stahl)
+    if grund:
+        raise ProjektFehler(f"{g['name']}: {grund}.", wo=wo)
+    return aus_glied(mit_stahl)

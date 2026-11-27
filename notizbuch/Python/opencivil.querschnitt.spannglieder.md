@@ -1,5 +1,5 @@
 ---
-erzeugt: 54a47aefc4e8
+erzeugt: bd382251f232
 art: modul
 tags: [modul]
 ---
@@ -10,12 +10,23 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Ein Spannglied der Querschnittsanalyse ([[opencivil.querschnitt.spannglieder#Spannglied|Spannglied]]): wo es liegt,
-aus welchem Erzeugnis und wie vielen davon, wie es wirkt – und was daraus
-folgt: die Spannung nach dem Spannen und nach allen Verlusten, die
-Vordehnung, die Kraft, sein Gesetz im Querschnitt und seine Grenzdehnung.
-Jede Regel dazu steht hier, einmal: die Herleitung ([[opencivil.querschnitt.spannglieder#Spannglieder|Spannglieder]])
-und das Zeichenfenster ([[opencivil.web.zeichengeometrie]]) fragen beide
-hier ([[opencivil.querschnitt.spannglieder#vorspannung|vorspannung]], [[opencivil.querschnitt.spannglieder#grenzen_verletzt|grenzen_verletzt]]).
+aus welchem Erzeugnis und wie vielen davon oder mit welcher Flaeche, wie es
+wirkt – und was daraus folgt: die Spannung nach dem Spannen und nach allen
+Verlusten, die Vordehnung, die Kraft, sein Gesetz im Querschnitt und seine
+Grenzdehnung. Jede Regel dazu steht hier, einmal: die Herleitung
+([[opencivil.querschnitt.spannglieder#Spannglieder|Spannglieder]]), der Aufbau und das Zeichenfenster
+([[opencivil.web.zeichengeometrie]]) fragen alle hier ([[opencivil.querschnitt.spannglieder#was_fehlt|was_fehlt]],
+[[opencivil.querschnitt.spannglieder#aus_glied|aus_glied]], [[opencivil.querschnitt.spannglieder#vorspannung|vorspannung]], [[opencivil.querschnitt.spannglieder#grenzen_verletzt|grenzen_verletzt]]).
+
+
+## DIE FLAECHE ([[opencivil.querschnitt.spannglieder#Flaechenangabe|Flaechenangabe]])
+
+Aus einem Erzeugnis – ein Draht, eine Litze oder ein Stab, den Tabelle 7
+fuer die Sorte nennt, mit seiner Flaeche aus der Tabelle, und wie viele
+davon –, oder eingegeben, etwa fuer ein Glied aus zwoelf Litzen oder ein
+Erzeugnis, das die Tabelle nicht fuehrt. Dann zaehlt nur noch die Art: von
+ihr haengt E_p ab, 195 000 N/mm² fuer Litzen, 200 000 fuer Draehte und
+Staebe (3.3.2.4). Die Art muss es in der Sorte geben, wie das Erzeugnis.
 
 
 ## DIE VORSPANNUNG ALS WIDERSTAND
@@ -42,13 +53,17 @@ Vordehnung, um `sigma_pinf` gesenkt. Es beginnt bei null und endet bei
 Verbund bleibt davon nichts.
 
 
-## DIE VORGABEN
+## DIE SPANNUNGEN
 
-Leer gelassen, gilt `sigma_p0 = 0.70 f_pk` und ``sigma_pinf = 0.85
-sigma_p0`` – nach Vorgabe, nicht nachgeschlagen (Benutzer, 2026-11-25).
-Die Verluste haengen am Bauwerk (4.1.5.3); die Vorgabe ersetzt ihre
-Rechnung nicht. Die Vordehnung ist `sigma_pinf/E_p` mit dem Modul des
-Erzeugnisses: die Stauchung des Betons beim Vorspannen faellt weg – nach
+Eingegeben sind zwei Faktoren, je hoechstens 1: `sigma_p0 = k_p0 f_pk`
+und `sigma_pinf = k_pinf sigma_p0`. Vorgabe `k_p0 = 0.70` und ``k_pinf
+= 0.85`` – nach Vorgabe, nicht nachgeschlagen (Benutzer, 2026-11-25). Die
+Verluste haengen am Bauwerk (4.1.5.3); die Vorgabe ersetzt ihre Rechnung
+nicht. Bis 2026-11-27 waren die Spannungen selbst die Felder, leer die
+Vorgabe: so blieb die Zahl nach einem Wechsel der Sorte stehen, und
+`sigma_pinf` durfte `sigma_p0` nicht uebersteigen – mit einem Faktor
+bis 1 kann es das nicht. Die Vordehnung ist `sigma_pinf/E_p` mit dem
+Modul der Art: die Stauchung des Betons beim Vorspannen faellt weg – nach
 Vorgabe, nicht nachgeschlagen.
 
 
@@ -80,8 +95,8 @@ in der Herleitung; gerechnet wird mit seinen Zahlen.
 
 ## EINHEITEN
 
-Lage und Durchmesser in mm, Flaechen in mm², die eingegebenen Spannungen in
-N/mm² – wie in der Zeichnung. Die Gesetze rechnen in SI.
+Lage und Durchmesser in mm, Flaechen in mm², die Spannungen in N/mm² –
+wie in der Zeichnung. Die Gesetze rechnen in SI.
 
 ## Inhalt
 
@@ -162,15 +177,39 @@ Im Schalter hinter dem Wort «Verbund».
 def erklaerung(self) -> str
 ```
 
+### Flaechenangabe
+
+```python
+class Flaechenangabe(Wahl)
+```
+
+Woher die Flaeche eines Glieds kommt – siehe Dateikopf.
+
+- `ERZEUGNIS = 'erzeugnis'`
+- `FLAECHE = 'flaeche'`
+
+#### Flaechenangabe.beschriftung
+
+```python
+@property
+def beschriftung(self) -> str
+```
+
+#### Flaechenangabe.erklaerung
+
+```python
+@property
+def erklaerung(self) -> str
+```
+
 ### vorspannung
 
 ```python
-def vorspannung(f_pk: float, sigma_p0: Optional[float], sigma_pinf: Optional[float]) -> Tuple[float, float]
+def vorspannung(f_pk: float, anteil_p0: float, anteil_pinf: float) -> Tuple[float, float]
 ```
 
-`sigma_p0` und `sigma_pinf`: eingegeben oder nach Vorgabe
-([[opencivil.querschnitt.spannglieder#Konstanten|ANTEIL_SPANNEN]], [[opencivil.querschnitt.spannglieder#Konstanten|ANTEIL_NACH_VERLUSTEN]]) – in der
-Einheit von `f_pk`, wie die Eingaben.
+`sigma_p0 = k_p0 f_pk` und `sigma_pinf = k_pinf sigma_p0` – in der
+Einheit von `f_pk`.
 
 ### grenze_nach_spannen
 
@@ -188,6 +227,26 @@ def grenzen_verletzt(p0: float, pinf: float, f_pk: float, f_p01k: float) -> List
 
 Was an den Spannungen eines Glieds nicht stimmt, je ein Satz ohne Punkt
 – alles in N/mm². Leer, wenn alles stimmt.
+
+### was_fehlt
+
+```python
+def was_fehlt(g: Mapping) -> str
+```
+
+Warum ein Glied der Beschreibung noch nicht rechnet, als Satzteil – leer,
+wenn es rechnet. `g["stahl"]` ist sein Spannstahl als Baustoff. Es fehlt
+nur eine Wahl: ein Erzeugnis, das Tabelle 7 fuer die Sorte nennt, oder,
+wo die Flaeche eingegeben ist, eine Art, die es in ihr gibt – etwa nach
+dem Wechsel zu Y1030, das es nur in Staeben gibt.
+
+### _stellen
+
+```python
+def _stellen(zahl: float) -> int
+```
+
+Mit so vielen Stellen steht ein Faktor in der Herleitung: zwei, mehr nur wo er sie hat.
 
 ### geneigt
 
@@ -346,15 +405,16 @@ class Spannglied(Bewehrungselement)
 ```
 
 Ein Spannglied der Zeichnung – `von` und `bis` sind seine Lage,
-`flaeche` ist `anzahl` mal die des Erzeugnisses (Tabelle 7). Die
-Spannungen stehen, wie eingegeben, in N/mm²; `None` heisst Vorgabe.
+`flaeche` ist `anzahl` mal die des Erzeugnisses (Tabelle 7) oder
+eingegeben. Die Spannungen stehen als Faktoren da, siehe Dateikopf.
 
-- `erzeugnis: Erzeugnis`
-- `anzahl: int`
+- `art: Erzeugnisart` – Draht, Litze oder Stab: daran haengt E_p (3.3.2.4).
+- `erzeugnis: Optional[Erzeugnis]` – Die Zeile von Tabelle 7 – `None`, wo die Flaeche eingegeben ist.
+- `anzahl: int` – Wie viele Stuecke des Erzeugnisses; wo die Flaeche eingegeben ist, zaehlt sie nicht.
 - `wirkung: Spannwirkung`
 - `verbund: Verbund`
-- `sigma_p0: Optional[float]`
-- `sigma_pinf: Optional[float]`
+- `anteil_p0: float` – `k_p0`: `sigma_p0 = k_p0 f_pk`.
+- `anteil_pinf: float` – `k_pinf`: `sigma_pinf = k_pinf sigma_p0`.
 - `neigung: float` – `beta_p` in Grad, siehe Dateikopf.
 - `vorgespannt: ClassVar[bool] = True`
 
@@ -371,6 +431,24 @@ def punkte(self) -> Tuple[Tuple[float, float], ...]
 @property
 def lage(self) -> Mathe
 ```
+
+#### Spannglied.stuecke
+
+```python
+@property
+def stuecke(self) -> str
+```
+
+Woraus es besteht: «4 × Litze ⌀15.7» – mit eingegebener Flaeche die Art, «Litzen».
+
+#### Spannglied.bezeichnung
+
+```python
+@property
+def bezeichnung(self) -> str
+```
+
+Wie Tabelle 7 es nennt, «Y1860S7-15.7» – mit eingegebener Flaeche die Art, «Litzen».
 
 #### Spannglied.menge
 
@@ -423,11 +501,12 @@ Ein Quadrat seiner Flaeche, wie ein Stab – im Verbund rechnet das Werkzeug kei
 ### aus_glied
 
 ```python
-def aus_glied(g: Mapping, erzeugnis: Erzeugnis) -> Spannglied
+def aus_glied(g: Mapping) -> Spannglied
 ```
 
 Ein Spannglied der Beschreibung ([[opencivil.projekt.querschnittsanalyse#QuerschnittsanalyseEintrag.elemente|QuerschnittsanalyseEintrag.elemente]]),
-mit seinem Spannstahl als Baustoff unter `stahl` und seinem Erzeugnis.
+mit seinem Spannstahl als Baustoff unter `stahl` – eines, dem nichts
+fehlt ([[opencivil.querschnitt.spannglieder#was_fehlt|was_fehlt]]): sein Erzeugnis kommt aus Tabelle 7.
 
 ### Spannglieder
 
@@ -516,9 +595,9 @@ Die Werte eines Glieds, hergeleitet – und seine Zeile der Tabelle.
 - `REFERENZ_GUENSTIG = 'SIA 262:2025, 4.3.3.4.8, (50)'`
 - `REFERENZ_UNGUENSTIG = 'SIA 262:2025, 4.3.3.4.9'`
 - `NACH_VORGABE = 'nach Vorgabe, nicht nachgeschlagen'`
-- `ANTEIL_SPANNEN = 0.7` – `sigma_p0 = 0.70 f_pk`, wo nichts eingegeben ist – nach Vorgabe, nicht nachgeschlagen (Benutzer, 2026-11-25).
-- `ANTEIL_NACH_VERLUSTEN = 0.85` – `sigma_pinf = 0.85 sigma_p0`, wo nichts eingegeben ist – nach Vorgabe, nicht nachgeschlagen (Benutzer, 2026-11-25).
-- `VORGABE_SPANNUNG = {'sigma_p0': f'{ANTEIL_SPANNEN:.2f}·f_pk', 'sigma_pinf': f'{ANTEIL_NA…` – Was ein leeres Feld der Spannung heisst – fuer den Platzhalter im Zeichenfenster, solange noch kein Glied die Zahl kennt.
+- `ANTEIL_SPANNEN = 0.7` – `k_p0`, womit ein neues Glied beginnt: `sigma_p0 = 0.70 f_pk` – nach Vorgabe, nicht nachgeschlagen (Benutzer, 2026-11-25).
+- `ANTEIL_NACH_VERLUSTEN = 0.85` – `k_pinf`, womit ein neues Glied beginnt: `sigma_pinf = 0.85 sigma_p0` – nach Vorgabe, nicht nachgeschlagen (Benutzer, 2026-11-25).
+- `FAKTOREN = ({'feld': 'anteil_p0', 'vor': 'σ_p0 =', 'nach': '· f_pk', 'spannung':…` – Wie die Faktoren im Zeichenfenster stehen – «σ_p0 = [0.70] · f_pk = 1302 N/mm²»: vor und nach dem Feld, und welche Spannung des Glieds die Zeile dahinter nennt, sobald der Kern sie kennt.
 - `GRENZE_F_PK = 0.75` – Gleichung (22): `sigma_p0 <= min(0.75 f_pk; 0.85 f_p0.1k)`.
 - `GRENZE_F_P01K = 0.85`
 - `MINDESTENS_F_PK = 0.45` – 4.1.5.2.3: nach allen Verlusten mindestens `0.45 f_pk`.
@@ -526,8 +605,8 @@ Die Werte eines Glieds, hergeleitet – und seine Zeile der Tabelle.
 - `KENNWERTE = ('f_pk', 'f_p01k', 'E_p', 'E_p_litze')` – Die Kennwerte des Spannstahls, die die Herleitung der Glieder liest.
 - `NEIGUNG_ERKLAERT = {'titel': f'Neigung gegen die Stabachse in Grad, höchstens {GRENZE_NE…` – Was das Feld der Neigung im Zeichenfenster sagt: als Titel, in einer Zeile darunter – und an seiner Stelle, wo sie nicht zaehlt.
 - `DEHNUNG_AM_GLIED = 'Bei einem Spannglied ist ε die Dehnung des Betons an seiner Stelle: …` – Was eine Tabelle oder ein Bild sagt, das die Dehnung eines Glieds zeigt: es ist die des Betons an seiner Stelle, nicht die des Stahls.
-- `FLAECHE = 'Querschnitt eines Spannglieds'` – Die Seiten im Notizbuch, je Groesse eine: Querschnitt, Spannungen nach Vorgabe, Vordehnung und Kraft eines Glieds, die Grenzen seiner Spannung, sein Gesetz im Querschnitt – dieses eine fuer alle drei Arten.
-- `NACH_VORGABE_GESPANNT = 'Spannung im Spannglied nach Vorgabe'`
+- `FLAECHE = 'Querschnitt eines Spannglieds'` – Die Seiten im Notizbuch, je Groesse eine: Querschnitt, Spannungen, Vordehnung und Kraft eines Glieds, die Grenzen seiner Spannung, sein Gesetz im Querschnitt – dieses eine fuer alle drei Arten.
+- `GESPANNT = 'Spannung im Spannglied'`
 - `VORDEHNUNG = 'Vordehnung eines Spannglieds'`
 - `SPANNKRAFT = 'Spannkraft eines Spannglieds'`
 - `GRENZEN = 'Grenzen der Spannung im Spannstahl'`
@@ -541,6 +620,7 @@ Die Werte eines Glieds, hergeleitet – und seine Zeile der Tabelle.
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wahl]]
 - [[opencivil.core.wert]]
+- [[opencivil.material.basis]]
 - [[opencivil.material.spannstahl]]
 - [[opencivil.querschnitt.bewehrungselemente]]
 - [[opencivil.querschnitt.interaktion]]
@@ -551,6 +631,7 @@ Die Werte eines Glieds, hergeleitet – und seine Zeile der Tabelle.
 - [[opencivil.nachweis.schiefe_biegung]]
 - [[opencivil.nachweis.schubwandnachweis]]
 - [[opencivil.projekt.aufbau.querschnittsanalyse]]
+- [[opencivil.projekt.frueher]]
 - [[opencivil.projekt.spannglieder]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.spannungsanalyse.bild]]
@@ -564,6 +645,6 @@ Die Werte eines Glieds, hergeleitet – und seine Zeile der Tabelle.
 - [[Querschnitt eines Spannglieds]] · `Spannglieder._glied`
 - [[Spannkraft eines Spannglieds]] · `Spannglieder._glied`
 - [[Spannkraft eines Spannglieds]] · `Spannglieder.rechne`
-- [[Spannung im Spannglied nach Vorgabe]] · `Spannglieder._glied`
-- [[Spannung im Spannglied nach Vorgabe]] · `Spannglieder.rechne`
+- [[Spannung im Spannglied]] · `Spannglieder._glied`
+- [[Spannung im Spannglied]] · `Spannglieder.rechne`
 - [[Vordehnung eines Spannglieds]] · `Spannglieder._glied`

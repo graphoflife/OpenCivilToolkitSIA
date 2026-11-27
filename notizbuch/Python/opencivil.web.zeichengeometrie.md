@@ -1,5 +1,5 @@
 ---
-erzeugt: c3470da133e8
+erzeugt: b19b1210b990
 art: modul
 tags: [modul]
 ---
@@ -152,8 +152,8 @@ def _spannglieder(roh: Sequence[Mapping], projekt) -> _Glieder
 Die Glieder, die rechnen, je Kennung – und ihre Werte aus derselben
 Herleitung wie im Bericht ([[opencivil.querschnitt.spannglieder#Spannglieder|Spannglieder]]), mit den Saetzen dazu,
 was an ihren Spannungen die Norm verletzt ([[opencivil.querschnitt.spannglieder#grenzen_verletzt|grenzen_verletzt]]).
-Dazu die Meldungen zu denen, deren Durchmesser es in der Sorte nicht
-gibt: grau, wie beim Bauen ([[opencivil.projekt.aufbau.querschnittsanalyse#erzeugnis_grund|erzeugnis_grund]]). Ein falsches oder
+Dazu die Meldungen zu denen, deren Erzeugnis oder Art es in der Sorte
+nicht gibt: grau, wie beim Bauen ([[opencivil.querschnitt.spannglieder#was_fehlt|was_fehlt]]). Ein falsches oder
 fehlendes Material meldet schon [[opencivil.projekt.aufbau.kern#materialgrund|materialgrund]]; ein Material, das
 selbst nicht rechnet, sagt es in seinem Fenster.
 
@@ -163,7 +163,6 @@ selbst nicht rechnet, sagt es in seinem Fenster.
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.rechenwerk]]
 - [[opencivil.material.basis]]
-- [[opencivil.material.spannstahl]]
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.aufbau.querschnittsanalyse]]
 - [[opencivil.projekt.blechdecken]]

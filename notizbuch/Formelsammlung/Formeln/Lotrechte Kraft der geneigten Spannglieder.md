@@ -1,5 +1,5 @@
 ---
-erzeugt: 5490638b4b53
+erzeugt: 58e59b8ea5f8
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.3.4.8, (50); SIA 262:2025, 4.3.3.4.9"
@@ -35,8 +35,8 @@ Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 $$
 \begin{aligned}
   V_p &= P_{\infty,1} \cdot \sin \beta_{p,1} + P_{max,2} \cdot \sin \beta_{p,2} \\
-  &= 664\,\mathrm{kN} \cdot \sin 5{}^{\circ} + 378\,\mathrm{kN} \cdot \sin \left(-4{}^{\circ}\right) \\
-  &= 31.5\,\mathrm{kN}
+  &= 664\,\mathrm{kN} \cdot \sin 5{}^{\circ} + 380.2\,\mathrm{kN} \cdot \sin \left(-4{}^{\circ}\right) \\
+  &= 31.4\,\mathrm{kN}
 \end{aligned}
 $$
 

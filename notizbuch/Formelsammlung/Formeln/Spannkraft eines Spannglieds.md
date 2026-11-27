@@ -1,5 +1,5 @@
 ---
-erzeugt: 9af343d6c260
+erzeugt: 54f832942e35
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 3.3.2.2, Tabelle 7; SIA 262:2025, 4.1.5.1.5"
@@ -7,7 +7,7 @@ normstelle: "SIA 262:2025, 3.3.2.2, Tabelle 7; SIA 262:2025, 4.1.5.1.5"
 > [!info] Normstelle
 > SIA 262:2025, 3.3.2.2, Tabelle 7; SIA 262:2025, 4.1.5.1.5
 
-*In der Herleitung: «Querschnitt, Vordehnung und Spannkraft eines Glieds aus n Drähten, Litzen oder Stäben»*
+*In der Herleitung: «Querschnitt, Vordehnung und Spannkraft eines Glieds – A\_p aus n Drähten, Litzen oder Stäben oder eingegeben»*
 
 $$
 A_p = n \cdot a_p \qquad \varepsilon_p = \frac{\sigma_{p\infty}}{E_p} \qquad P_\infty = A_p \cdot \sigma_{p\infty}
@@ -24,7 +24,7 @@ $$
 | Zeichen | Bedeutung | Einheit | Woher |
 | --- | --- | --- | --- |
 | $A_{p,1}$ | Querschnitt des Spannstahls, Spannglied 1 | mm² | [[Querschnitt eines Spannglieds]] |
-| $\sigma_{p\infty,1}$ | Spannung nach allen Verlusten, Spannglied 1 | N/mm² | [[Spannung im Spannglied nach Vorgabe]] |
+| $\sigma_{p\infty,1}$ | Spannung nach allen Verlusten, Spannglied 1 | N/mm² | [[Spannung im Spannglied]] |
 
 ## Beispiel
 

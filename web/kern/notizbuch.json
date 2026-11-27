@@ -4439,8 +4439,8 @@
       ]
     },
     {
-      "name": "Spannung im Spannglied nach Vorgabe",
-      "pfad": "Formelsammlung/Formeln/Spannung im Spannglied nach Vorgabe.md",
+      "name": "Spannung im Spannglied",
+      "pfad": "Formelsammlung/Formeln/Spannung im Spannglied.md",
       "art": "formel",
       "zeichen": [
         "\\sigma_{p0,1}",
@@ -7299,11 +7299,13 @@
         "Erzeugnisart.mehrzahl",
         "Erzeugnisart.kuerzel",
         "Erzeugnisart.modul",
+        "Erzeugnisart.erklaerung",
         "Erzeugnis",
         "Erzeugnis.modul",
         "Erzeugnis.bezeichnung",
         "Spannstahlsorte",
         "erzeugnis",
+        "erzeugnisarten",
         "spannstahlsorten_zum_anlegen",
         "spannstahl"
       ]
@@ -8959,8 +8961,7 @@
         "ohne_analysen",
         "_in_si",
         "_analyse",
-        "_glied",
-        "erzeugnis_grund"
+        "_glied"
       ]
     },
     {
@@ -9227,7 +9228,10 @@
       "stichworte": [
         "gamma_w_heraus",
         "wasser_einsetzen",
-        "_alt"
+        "_alt",
+        "spannungen_als_faktoren",
+        "_zugfestigkeiten",
+        "_faktoren"
       ]
     },
     {
@@ -10127,9 +10131,14 @@
         "Verbund.beschriftung",
         "Verbund.kurz",
         "Verbund.erklaerung",
+        "Flaechenangabe",
+        "Flaechenangabe.beschriftung",
+        "Flaechenangabe.erklaerung",
         "vorspannung",
         "grenze_nach_spannen",
         "grenzen_verletzt",
+        "was_fehlt",
+        "_stellen",
         "geneigt",
         "lotrecht",
         "guenstig",
@@ -10149,6 +10158,8 @@
         "Spannglied",
         "Spannglied.punkte",
         "Spannglied.lage",
+        "Spannglied.stuecke",
+        "Spannglied.bezeichnung",
         "Spannglied.menge",
         "Spannglied.kurzmenge",
         "Spannglied.rissdurchmesser",

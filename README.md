@@ -469,7 +469,10 @@ ein Knopf mit Zeichen:
 * *Stahlprofil* I und *Blechverbunddecke* D -- ein Walzprofil aus dem
   Katalog oder eine Betonplatte auf einem Profilblech, an einem Punkt
   eingesetzt;
-* *Spannstahl* S -- ein Spannglied je Klick;
+* *Spannstahl* S -- ein Spannglied je Klick: aus Drähten, Litzen oder
+  Stäben nach Tabelle 7 oder mit eingegebener Fläche A_p und ihrer Art, die
+  Spannungen als Faktoren -- σ_p0 = 0.70 · f_pk und σ_p∞ = 0.85 · σ_p0 nach
+  Vorgabe, die Zahl steht gerechnet dahinter;
 * *Schubwand* W -- eine Wand mit Bügeln;
 * *Hilfspunkt* K und *Hilfslinie* H -- zum Konstruieren, sie rechnen nicht
   mit; geschlossene Hilfslinien werden auf Wunsch eine Fläche;

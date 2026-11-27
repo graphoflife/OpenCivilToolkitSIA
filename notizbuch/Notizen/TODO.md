@@ -36,6 +36,13 @@ sammeln sie sich hier, je mit dem, was vorläufig gebaut ist.
       wie es ist, steht aber in keiner Norm. Es heisst darum «Feste Sorte»
       und trägt die Marke «fest», wo Normsorten «SIA» tragen. Vorschlag: so
       lassen. Sonst etwa «Vorgabe». Vorläufig: «fest».
+- [ ] **Spannglied: beim Umschalten auf «Fläche A_p» die Fläche des
+      Erzeugnisses übernehmen?** Heute behält jede Stellung ihre Zahl: wer
+      4 Litzen ⌀15.7 hat (600 mm²) und auf «Fläche A_p» schaltet, sieht dort
+      150 mm², die Vorgabe, oder was er früher eingab. Vorschlag: so lassen,
+      hin und her geht nichts verloren. Sonst schriebe das Umschalten die
+      600 mm² ins Feld, eine früher eingegebene Zahl wäre dann weg.
+      Vorläufig: jede Stellung behält ihre Zahl.
 
 ## Wünsche vom 2026-11-20
 
@@ -1644,13 +1651,17 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
 
 - [ ] **Spannglieder: die Vorgabe der Spannung bei Y1100 und Y1030 – zu
       entscheiden** (`opencivil/querschnitt/spannglieder.py`, `vorspannung`,
-      seit 2026-11-26). Leer gilt σ_p0 = 0.70·f_pk und σ_p∞ = 0.85·σ_p0, so
-      gewählt vom Benutzer am 2026-11-25, nach Vorgabe, nicht nachgeschlagen:
-      die Verluste hängen am Bauwerk (SIA 262:2025, 4.1.5.3). Bei den Stäben
-      Y1100 und Y1030 liegt schon die Vorgabe über der Grenze nach Gleichung
-      (22): 770 über 765 und 721 über 705.5 N/mm²; dort steht sie rot am
-      Glied. Bei allen anderen Sorten hält sie, bei Y1570 knapp (1099 unter
-      1105). Empfehlung: Vorgabe = min(0.70·f_pk; Grenze nach Gleichung (22)).
+      seit 2026-11-26). Ein neues Glied beginnt mit den Faktoren 0.70 und
+      0.85, σ_p0 = 0.70·f_pk und σ_p∞ = 0.85·σ_p0, so gewählt vom Benutzer am
+      2026-11-25, nach Vorgabe, nicht nachgeschlagen: die Verluste hängen am
+      Bauwerk (SIA 262:2025, 4.1.5.3). Bei den Stäben Y1100 und Y1030 liegt
+      schon die Vorgabe über der Grenze nach Gleichung (22): 770 über 765 und
+      721 über 705.5 N/mm²; dort steht sie rot am Glied, und ein kleinerer
+      Faktor, etwa 0.65, hält sie. Bei allen anderen Sorten hält sie, bei
+      Y1570 knapp (1099 unter 1105). Seit 2026-11-27 ist die Vorgabe ein
+      Faktor am Glied, nicht an der Sorte: ihn beim Wechsel des Stahls von
+      selbst zu senken, deutete die Zahl des Benutzers um. Empfehlung: so
+      lassen.
 - [ ] **Spannglieder: Vordehnung ohne die Stauchung des Betons.** Eingebaut:
       ε_p = σ_p∞/E_p. Die Stauchung, die die Vorspannung im Beton an der
       Stelle des Glieds weckt, fehlt; ohne Last trägt ein Glied darum etwas

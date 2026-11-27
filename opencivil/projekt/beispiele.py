@@ -745,8 +745,9 @@ def _spannbeton(kennung: str) -> QuerschnittsanalyseEintrag:
     """
     Ein Träger 400 × 800 mm mit Betonstahl oben und unten und drei
     Spanngliedern aus Y1860, je eines in jedem Gesetz: vier Litzen mit
-    Vordehnung und Verbund, die Spannungen nach Vorgabe; zwei ohne Verbund,
-    die Spannungen eingegeben; zwei schlaff mit Restfestigkeit. Die
+    Vordehnung und Verbund, die Faktoren der Spannungen nach Vorgabe; eines
+    ohne Verbund mit eingegebener Fläche, 280 mm² wie zwei Litzen ⌀15.3, und
+    eigenen Faktoren; zwei schlaff mit Restfestigkeit. Die
     Duktilität sieht Spannstahl in der Zugzone, sprödes Versagen und
     Zwängung messen am Rissmoment mit Vorspannung, die Stahlspannung gilt
     dem Betonstahl, und die Linie beginnt bei der Krümmung, die die
@@ -761,8 +762,8 @@ def _spannbeton(kennung: str) -> QuerschnittsanalyseEintrag:
     a.stablinie([50, 50], [350, 50], art="anzahl", durchmesser=14, anzahl=4, stahl="s1")
     a.stablinie([50, 750], [350, 750], art="anzahl", durchmesser=12, anzahl=3, stahl="s1")
     a.spannglied(200, 120, stahl="sp1", durchmesser=15.7, anzahl=4, neigung=5.0)
-    a.spannglied(120, 160, stahl="sp1", durchmesser=15.3, anzahl=2, verbund="ohne",
-                 sigma_p0=1350.0, sigma_pinf=1100.0, neigung=-4.0)
+    a.spannglied(120, 160, stahl="sp1", flaechenangabe="flaeche", flaeche=280.0, art="litze",
+                 verbund="ohne", anteil_p0=0.73, anteil_pinf=0.81, neigung=-4.0)
     a.spannglied(280, 160, stahl="sp1", durchmesser=12.9, anzahl=2, wirkung="restfestigkeit",
                  neigung=3.0)
     ecken = [[50, 50], [350, 50], [350, 750], [50, 750]]

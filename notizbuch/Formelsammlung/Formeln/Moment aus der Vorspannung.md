@@ -1,5 +1,5 @@
 ---
-erzeugt: 989878cc1f4d
+erzeugt: b87497f36bea
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.1.2; 4.4.3.2.4"
@@ -29,7 +29,7 @@ Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 $$
 \begin{aligned}
   M_{p,y} &= \left(P_{\infty,1} \cdot z'_{p,1} + P_{\infty,2} \cdot z'_{p,2}\right) \\
-  &= \left(664\,\mathrm{kN} \cdot \left(-280\,\mathrm{mm}\right) + 308\,\mathrm{kN} \cdot \left(-240\,\mathrm{mm}\right)\right) \\
+  &= \left(664\,\mathrm{kN} \cdot \left(-280\,\mathrm{mm}\right) + 307.9\,\mathrm{kN} \cdot \left(-240\,\mathrm{mm}\right)\right) \\
   &= -259.8\,\mathrm{kNm}
 \end{aligned}
 $$

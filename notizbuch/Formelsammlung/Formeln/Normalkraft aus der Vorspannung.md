@@ -1,5 +1,5 @@
 ---
-erzeugt: 9255bf39f970
+erzeugt: 3a00804dc749
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.1.2; 4.4.3.2.4"
@@ -23,7 +23,7 @@ $$
 Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
-N_p = -\left(P_{\infty,1} + P_{\infty,2}\right) = -\left(664\,\mathrm{kN} + 308\,\mathrm{kN}\right) = -972\,\mathrm{kN}
+N_p = -\left(P_{\infty,1} + P_{\infty,2}\right) = -\left(664\,\mathrm{kN} + 307.9\,\mathrm{kN}\right) = -972\,\mathrm{kN}
 $$
 
 ## Gebraucht von

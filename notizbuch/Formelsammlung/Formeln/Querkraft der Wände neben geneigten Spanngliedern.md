@@ -1,5 +1,5 @@
 ---
-erzeugt: 408285bbbbea
+erzeugt: 10158430a73a
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.3.4.8, (50); SIA 262:2025, 4.3.3.4.9; nach Vorgabe, nicht nachgeschlagen"
@@ -31,7 +31,7 @@ $$
 Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
-V_{z,w} = V_{z,Ed} - V_p = 450\,\mathrm{kN} - 31.5\,\mathrm{kN} = 418.5\,\mathrm{kN}
+V_{z,w} = V_{z,Ed} - V_p = 450\,\mathrm{kN} - 31.4\,\mathrm{kN} = 418.6\,\mathrm{kN}
 $$
 
 ## Im Code

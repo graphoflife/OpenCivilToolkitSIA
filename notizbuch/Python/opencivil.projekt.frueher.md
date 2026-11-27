@@ -1,5 +1,5 @@
 ---
-erzeugt: 51dfa6f6256a
+erzeugt: 23c2aa5e803a
 art: modul
 tags: [modul]
 ---
@@ -22,6 +22,17 @@ denselben Methoden, mit denen man ein Projekt in Python baut.
 Bis dahin hatten Grundbruch und Pfahl je eine Zahl `gamma_w`, die Raumlast
 des Grundwassers, mit 10 kN/m³ als Vorgabe. Seither waehlen sie eine
 Fluessigkeit aus den Materialien (`wasser`, [[opencivil.material.fluessigkeit]]).
+
+
+## DIE SPANNUNGEN DER SPANNGLIEDER (2026-11-27)
+
+Bis dahin hatte ein Spannglied die Spannungen `sigma_p0` und
+`sigma_pinf` in N/mm², leer die Vorgabe. Seither die Faktoren
+`anteil_p0` und `anteil_pinf` ([[opencivil.projekt.spannglieder]]).
+Eine leere Spannung wird die Vorgabe ihres Faktors, eine Zahl der Faktor,
+der sie ergibt – mit f_pk des Spannstahls, wie die Datei ihn nennt
+([[opencivil.projekt.frueher#spannungen_als_faktoren|spannungen_als_faktoren]]). So rechnet das Glied wie zuvor, auch wo
+der Faktor dann 0.7258… heisst.
 
 ## Inhalt
 
@@ -54,17 +65,47 @@ def _alt(eintrag: Any) -> bool
 
 Ob ein Eintrag noch eine Zahl `gamma_w` hat und keine Fluessigkeit.
 
+### spannungen_als_faktoren
+
+```python
+def spannungen_als_faktoren(roh: Any) -> Any
+```
+
+`roh` mit Faktoren statt der Spannungen der Spannglieder – siehe
+Dateikopf. Was sich nicht umrechnen laesst, weil der Spannstahl fehlt
+oder eine Spannung keine Zahl ist, bleibt stehen und meldet sich beim
+Lesen.
+
+### _zugfestigkeiten
+
+```python
+def _zugfestigkeiten(materialien: Any) -> Dict[str, float]
+```
+
+Je Spannstahl der Datei sein f_pk in N/mm²: ueberschrieben, abgewichen oder der Sorte.
+
+### _faktoren
+
+```python
+def _faktoren(glied: Any, f_pk: Mapping[str, float]) -> Any
+```
+
+Ein Glied mit Faktoren statt Spannungen – `glied` selbst, wo das nicht geht.
+
 
 ## Konstanten
 
 - `_MIT_WASSER = ('grundbrueche', 'pfaehle')` – Die Listen, deren Eintraege bis 2026-11-27 ein `gamma_w` hatten.
 - `Alt = Tuple[str, int, float]` – Wo ein Eintrag mit einer alten Zahl stand: Liste, Stelle, Zahl in kN/m³.
+- `_SPANNUNGEN = ('sigma_p0', 'sigma_pinf')` – Was ein Spannglied bis 2026-11-27 statt seiner Faktoren hatte.
 
 ## Braucht
 
 - [[opencivil.material.basis]]
 - [[opencivil.material.fluessigkeit]]
+- [[opencivil.material.spannstahl]]
 - [[opencivil.projekt.projekt]]
+- [[opencivil.querschnitt.spannglieder]]
 
 ## Gebraucht von
 

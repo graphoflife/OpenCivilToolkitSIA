@@ -1,5 +1,5 @@
 ---
-erzeugt: e18ee51b29ec
+erzeugt: e0bd66e7cc1e
 art: modul
 tags: [modul]
 ---
@@ -227,8 +227,9 @@ def _spannbeton(kennung: str) -> QuerschnittsanalyseEintrag
 
 Ein Träger 400 × 800 mm mit Betonstahl oben und unten und drei
 Spanngliedern aus Y1860, je eines in jedem Gesetz: vier Litzen mit
-Vordehnung und Verbund, die Spannungen nach Vorgabe; zwei ohne Verbund,
-die Spannungen eingegeben; zwei schlaff mit Restfestigkeit. Die
+Vordehnung und Verbund, die Faktoren der Spannungen nach Vorgabe; eines
+ohne Verbund mit eingegebener Fläche, 280 mm² wie zwei Litzen ⌀15.3, und
+eigenen Faktoren; zwei schlaff mit Restfestigkeit. Die
 Duktilität sieht Spannstahl in der Zugzone, sprödes Versagen und
 Zwängung messen am Rissmoment mit Vorspannung, die Stahlspannung gilt
 dem Betonstahl, und die Linie beginnt bei der Krümmung, die die

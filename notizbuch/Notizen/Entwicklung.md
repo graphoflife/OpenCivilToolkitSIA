@@ -7,6 +7,56 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-27 · Spannglied: Erzeugnis oder Fläche, Faktoren statt Spannungen
+
+Schritt 4 des Plans vom 2026-11-27.
+
+**Wie viel Stahl.** Ein Schalter «Menge» [Erzeugnis | Fläche A_p].
+
+- Erzeugnis wie bisher: Draht, Litze oder Stab mit einem Durchmesser aus
+  Tabelle 7, dazu die Anzahl.
+- Fläche: A_p frei in mm², dazu nur die Art, denn an ihr hängt E_p:
+  195 000 N/mm² für Litzen, 200 000 für Drähte und Stäbe (SIA 262:2025,
+  3.3.2.4). Zur Wahl stehen nur die Arten, die es von der Sorte gibt –
+  Y1860 als Draht und Litze, Y1030 nur als Stab. Passt die Art nicht, steht
+  grau am Ort «Y1030 gibt es nicht als Litze (Tabelle 7) – eine Art
+  wählen.»; die Zahlen neben den Faktoren bleiben dann leer.
+- Was an einem Glied fehlt, sagt eine Funktion, `was_fehlt` in
+  `querschnitt/spannglieder.py`, für Aufbau und Zeichnung zugleich. Vorher
+  hatten beide ihre eigene Prüfung des Durchmessers.
+- A_p beginnt mit 150 mm², einer Litze ⌀15.7 wie das Erzeugnis der
+  Vorgabe. Jede Stellung behält ihre Zahl; wer hin und her schaltet,
+  verliert nichts (Frage im [[TODO]]).
+
+**Faktoren statt Spannungen.** σ_p0 und σ_p∞ sind keine Felder mehr.
+Eingestellt werden k_p0 = σ_p0/f_pk und k_p∞ = σ_p∞/σ_p0, je über null und
+höchstens 1; das Feld weist 1.2 schon bei der Eingabe ab. Die Spannung steht
+daneben, gerechnet im Kern: Y1860 mit den Vorgaben 0.70 · 1860 = 1302 N/mm²,
+dann 0.85 · 1302 = 1107 N/mm².
+
+- Die Regel «σ_p∞ höchstens σ_p0» fiel weg: k_p∞ ≤ 1 sagt dasselbe.
+- Gl. (22) bleibt ein roter Hinweis. Mit der Vorgabe 0.70 schlägt er beim
+  Y1030 an, 721 über 706 N/mm²; der Punkt im [[TODO]] ist auf die Faktoren
+  umgeschrieben.
+- Die Herleitung zeigt k_p0 und k_p∞ mit ihren Stellen, 0.725 bleibt
+  0.725. Steht k_p∞ auf der Vorgabe, sagt eine Annahme, dass die Verluste
+  am Bauwerk hängen (4.1.5.3) und die Vorgabe ihre Rechnung nicht ersetzt.
+- Die Formel heisst «Spannung im Spannglied» statt «… nach Vorgabe»; ihre
+  Theorie zog mit.
+
+**Alte Dateien** öffnen sich weiter und rechnen wie zuvor:
+`spannungen_als_faktoren` in `projekt/frueher.py` teilt σ_p0 durch f_pk
+des gewählten Stahls, mit seinen Abweichungen und Überschreibungen, und
+σ_p∞ durch σ_p0. Eine leere Spannung nimmt die Vorgabe wie damals. Ohne
+Stahl bleibt das Glied unverändert und meldet das unbekannte Feld.
+
+**Beispiel.** Das zweite Glied des Spannbetons hat jetzt eine eingegebene
+Fläche, 280 mm² wie zwei Litzen ⌀15.3, und die Faktoren 0.73 und 0.81 statt
+der Spannungen 1350 und 1100 N/mm². Damit σ_p0,2 = 1358 N/mm²,
+P∞,2 = 307.9 statt 308 kN und M_Rd = 879.4 statt 879.5 kNm.
+
+---
+
 ## 2026-11-27 · Test: ein Spannglied verdrängt den Beton
 
 Aufräumen A3 des Plans vom 2026-11-27. Dass ein Stab den Beton an seiner

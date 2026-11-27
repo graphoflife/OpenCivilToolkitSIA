@@ -67,12 +67,12 @@ Unmittelbar nach dem Spannen darf die Spannung im Spannstahl
 $\min(0.75 \cdot f_{pk};\ 0.85 \cdot f_{p0.1k})$ nicht übersteigen
 (SIA 262:2025, 4.1.5.2.2, Gleichung (22)); nach allen Verlusten sollen
 mindestens $0.45 \cdot f_{pk}$ bleiben (4.1.5.2.3). Bei Y1860 sind das
-$\min(1395;\ 1360)$ = 1360 N/mm² und 837 N/mm². Dazu meldet das Werkzeug
-ein $\sigma_{p\infty}$ über $\sigma_{p0}$: Verluste mindern die Spannung,
-sie heben sie nicht.
+$\min(1395;\ 1360)$ = 1360 N/mm² und 837 N/mm². Dass $\sigma_{p\infty}$
+nicht über $\sigma_{p0}$ liegt, prüft schon das Feld: der Faktor
+$k_{p\infty}$ ist höchstens 1. Bis 2026-11-27 meldete es ein roter Hinweis.
 
 Liegt eine Spannung ausserhalb, sagt es ein roter Hinweis am Glied und in
-der Herleitung. Gerechnet wird trotzdem mit den Zahlen des Benutzers – sie
-werden nie still umgedeutet. Die Vorgabe $0.70 \cdot f_{pk}$
-([[Spannung im Spannglied nach Vorgabe]]) hält die Grenze bei allen Sorten
-ausser den Stäben Y1100 und Y1030.
+der Herleitung. Gerechnet wird trotzdem mit den Faktoren des Benutzers –
+sie werden nie still umgedeutet. Die Vorgabe $0.70 \cdot f_{pk}$
+([[Spannung im Spannglied]]) hält die Grenze bei allen Sorten ausser den
+Stäben Y1100 und Y1030.

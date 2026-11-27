@@ -8882,19 +8882,19 @@ $$
 | Wand 3 | $(350;\ 750) \rightarrow (50;\ 750)$ | $300$ | $100$ | $1 \times \varnothing 10\ @\ 150$ | $524$ |
 | Wand 4 | $(50;\ 750) \rightarrow (50;\ 50)$ | $700$ | $100$ | $1 \times \varnothing 10\ @\ 150$ | $524$ |
 
-**Querschnitt, Vordehnung und Spannkraft eines Glieds aus n Drähten, Litzen oder Stäben** *(SIA 262:2025, 3.3.2.2, Tabelle 7; SIA 262:2025, 4.1.5.1.5)*
+**Querschnitt, Vordehnung und Spannkraft eines Glieds – A\_p aus n Drähten, Litzen oder Stäben oder eingegeben** *(SIA 262:2025, 3.3.2.2, Tabelle 7; SIA 262:2025, 4.1.5.1.5)*
 
 $$
 A_p = n \cdot a_p \qquad \varepsilon_p = \frac{\sigma_{p\infty}}{E_p} \qquad P_\infty = A_p \cdot \sigma_{p\infty}
 $$
 
-**Spannungen nach Vorgabe, wo keine eingegeben ist** *(nach Vorgabe, nicht nachgeschlagen)*
+**Spannungen nach dem Spannen und nach allen Verlusten, aus den Faktoren des Glieds**
 
 $$
-\sigma_{p0} = 0.70 \cdot f_{pk} \qquad \sigma_{p\infty} = 0.85 \cdot \sigma_{p0}
+\sigma_{p0} = k_{p0} \cdot f_{pk} \qquad \sigma_{p\infty} = k_{p\infty} \cdot \sigma_{p0}
 $$
 
-> **Annahme:** Spannglied 1, Spannglied 3: Spannung nach Vorgabe – die Verluste hängen am Bauwerk (SIA 262:2025, 4.1.5.3), die Vorgabe ersetzt ihre Rechnung nicht.
+> **Annahme:** Spannglied 1, Spannglied 3: k\_p∞ = 0.85 nach Vorgabe, 15 % Verlust – die Verluste hängen am Bauwerk (SIA 262:2025, 4.1.5.3), die Vorgabe ersetzt ihre Rechnung nicht.
 
 > **Annahme:** Die Vordehnung ist σ\_p∞/E\_p: die Stauchung des Betons beim Vorspannen fällt weg (nach Vorgabe, nicht nachgeschlagen).
 
@@ -8915,13 +8915,13 @@ $$
 **Spannglied 1: nach dem Spannen, nach Vorgabe** *(nach Vorgabe, nicht nachgeschlagen)*
 
 $$
-\sigma_{p0,1} = 0.70 \cdot f_{pk} = 0.70 \cdot 1860\,\mathrm{N}/\mathrm{mm}^{2} = 1302\,\mathrm{N}/\mathrm{mm}^{2}
+\sigma_{p0,1} = k_{p0,1} \cdot f_{pk} = 0.7 \cdot 1860\,\mathrm{N}/\mathrm{mm}^{2} = 1302\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 **Spannglied 1: nach allen Verlusten, nach Vorgabe** *(nach Vorgabe, nicht nachgeschlagen)*
 
 $$
-\sigma_{p\infty,1} = 0.85 \cdot \sigma_{p0,1} = 0.85 \cdot 1302\,\mathrm{N}/\mathrm{mm}^{2} = 1107\,\mathrm{N}/\mathrm{mm}^{2}
+\sigma_{p\infty,1} = k_{p\infty,1} \cdot \sigma_{p0,1} = 0.85 \cdot 1302\,\mathrm{N}/\mathrm{mm}^{2} = 1107\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 **Spannglied 1: Grenze nach dem Spannen** *(SIA 262:2025, 4.1.5.2.2, (22))*
@@ -8952,22 +8952,22 @@ $$
 P_{\infty,1} = A_{p,1} \cdot \sigma_{p\infty,1} = 600\,\mathrm{mm}^{2} \cdot 1107\,\mathrm{N}/\mathrm{mm}^{2} = 664\,\mathrm{kN}
 $$
 
-**Spannglied 2: 2 × Litze ⌀15.3 aus Y1860** *(SIA 262:2025, 3.3.2.2, Tabelle 7)*
+**Spannglied 2: Litzen aus Y1860, die Fläche eingegeben**
 
 $$
-A_{p,2} = n \cdot a_p = 2 \cdot 140\,\mathrm{mm}^{2} = 280\,\mathrm{mm}^{2}
+A_{p,2} = 280\,\mathrm{mm}^{2}
 $$
 
-**Spannglied 2: nach dem Spannen, eingegeben**
+**Spannglied 2: nach dem Spannen**
 
 $$
-\sigma_{p0,2} = 1350\,\mathrm{N}/\mathrm{mm}^{2}
+\sigma_{p0,2} = k_{p0,2} \cdot f_{pk} = 0.73 \cdot 1860\,\mathrm{N}/\mathrm{mm}^{2} = 1358\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
-**Spannglied 2: nach allen Verlusten, eingegeben** *(SIA 262:2025, 4.1.5.3)*
+**Spannglied 2: nach allen Verlusten** *(SIA 262:2025, 4.1.5.3)*
 
 $$
-\sigma_{p\infty,2} = 1100\,\mathrm{N}/\mathrm{mm}^{2}
+\sigma_{p\infty,2} = k_{p\infty,2} \cdot \sigma_{p0,2} = 0.81 \cdot 1358\,\mathrm{N}/\mathrm{mm}^{2} = 1100\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 **Spannglied 2: Grenze nach dem Spannen** *(SIA 262:2025, 4.1.5.2.2, (22))*
@@ -8976,7 +8976,7 @@ $$
 \begin{aligned}
   \sigma_{p,max} &= \min\left(0.75 \cdot f_{pk};\ 0.85 \cdot f_{p0.1k}\right) \\
   &= \min\left(0.75 \cdot 1860\,\mathrm{N}/\mathrm{mm}^{2};\ 0.85 \cdot 1600\,\mathrm{N}/\mathrm{mm}^{2}\right) \\
-  &= 1360\,\mathrm{N}/\mathrm{mm}^{2} \quad \ge \quad \sigma_{p0,2} = 1350\,\mathrm{N}/\mathrm{mm}^{2}
+  &= 1360\,\mathrm{N}/\mathrm{mm}^{2} \quad \ge \quad \sigma_{p0,2} = 1358\,\mathrm{N}/\mathrm{mm}^{2}
 \end{aligned}
 $$
 
@@ -8995,7 +8995,7 @@ $$
 **Spannglied 2: Spannkraft nach allen Verlusten**
 
 $$
-P_{\infty,2} = A_{p,2} \cdot \sigma_{p\infty,2} = 280\,\mathrm{mm}^{2} \cdot 1100\,\mathrm{N}/\mathrm{mm}^{2} = 308\,\mathrm{kN}
+P_{\infty,2} = A_{p,2} \cdot \sigma_{p\infty,2} = 280\,\mathrm{mm}^{2} \cdot 1100\,\mathrm{N}/\mathrm{mm}^{2} = 307.9\,\mathrm{kN}
 $$
 
 **Spannglied 3: 2 × Litze ⌀12.9 aus Y1860** *(SIA 262:2025, 3.3.2.2, Tabelle 7)*
@@ -9007,13 +9007,13 @@ $$
 **Spannglied 3: nach dem Spannen, nach Vorgabe** *(nach Vorgabe, nicht nachgeschlagen)*
 
 $$
-\sigma_{p0,3} = 0.70 \cdot f_{pk} = 0.70 \cdot 1860\,\mathrm{N}/\mathrm{mm}^{2} = 1302\,\mathrm{N}/\mathrm{mm}^{2}
+\sigma_{p0,3} = k_{p0,3} \cdot f_{pk} = 0.7 \cdot 1860\,\mathrm{N}/\mathrm{mm}^{2} = 1302\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 **Spannglied 3: nach allen Verlusten, nach Vorgabe** *(nach Vorgabe, nicht nachgeschlagen)*
 
 $$
-\sigma_{p\infty,3} = 0.85 \cdot \sigma_{p0,3} = 0.85 \cdot 1302\,\mathrm{N}/\mathrm{mm}^{2} = 1107\,\mathrm{N}/\mathrm{mm}^{2}
+\sigma_{p\infty,3} = k_{p\infty,3} \cdot \sigma_{p0,3} = 0.85 \cdot 1302\,\mathrm{N}/\mathrm{mm}^{2} = 1107\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 **Spannglied 3: Grenze nach dem Spannen** *(SIA 262:2025, 4.1.5.2.2, (22))*
@@ -9049,7 +9049,7 @@ $$
 | Glied | $\text{Lage}\ [\mathrm{mm}]$ | Spannstahl | $A_p\ [\mathrm{mm}^2]$ | $\sigma_{p\infty}\ [\mathrm{N/mm^2}]$ | $\varepsilon_p\ [\text{‰}]$ | $P_\infty\ [\mathrm{kN}]$ | Wirkung | Verbund | $\beta_p\ [{}^{\circ}]$ |
 | :--- | :--- | :--- | ---: | ---: | ---: | ---: | :--- | :--- | ---: |
 | Spannglied 1 | $(200;\ 120)$ | 4 × Litze ⌀15.7, Y1860 | $600$ | $1107$ | $5.68$ | $664.0$ | mit Vordehnung | mit Verbund | $5.0$ |
-| Spannglied 2 | $(120;\ 160)$ | 2 × Litze ⌀15.3, Y1860 | $280$ | $1100$ | $5.64$ | $308.0$ | mit Vordehnung | ohne Verbund | $-4.0$ |
+| Spannglied 2 | $(120;\ 160)$ | Litzen, Y1860 | $280$ | $1100$ | $5.64$ | $307.9$ | mit Vordehnung | ohne Verbund | $-4.0$ |
 | Spannglied 3 | $(280;\ 160)$ | 2 × Litze ⌀12.9, Y1860 | $200$ | $1107$ | $5.68$ | $221.3$ | schlaff mit Restfestigkeit | mit Verbund | – |
 
 **Dehnungsebene und innere Kräfte** *(SIA 262:2025, 4.3.2.3)*
@@ -9162,8 +9162,8 @@ Bruchzustand: Zugrichtung n = (0.174; -0.985), -80.0° gegen die y-Achse. Die Nu
 | C30/37 | $-1334.7$ | $185.9$ | $713.2$ | – | – |
 | Linie 1 | $267.7$ | $200.0$ | $50.0$ | $7.91 \ldots 8.71$ | $435$ |
 | Linie 2 | $-132.7$ | $190.9$ | $750.0$ | $-2.62 \ldots -1.82$ | $-435 \ldots -364$ |
-| Spannglied 1 | $834.8$ | $200.0$ | $120.0$ | $7.25$ | $1391$ |
-| Spannglied 2 | $308.0$ | $120.0$ | $160.0$ | $6.44$ | $1100$ |
+| Spannglied 1 | $834.8$ | $200.0$ | $120.0$ | $7.26$ | $1391$ |
+| Spannglied 2 | $307.9$ | $120.0$ | $160.0$ | $6.44$ | $1100$ |
 | Spannglied 3 | $56.9$ | $280.0$ | $160.0$ | $6.87$ | $285$ |
 
 Bei einem Spannglied ist ε die Dehnung des Betons an seiner Stelle: mit Verbund ist der Stahl um seine Vordehnung ε\_p mehr gedehnt, ohne Verbund hängt seine Spannung nicht an ε.
@@ -9177,7 +9177,7 @@ $$
 **Probe: Moment um y**
 
 $$
-M_{y,Rd} = -\sum F_i \cdot (z_i - z_S) = 879.5\,\mathrm{kNm}
+M_{y,Rd} = -\sum F_i \cdot (z_i - z_S) = 879.4\,\mathrm{kNm}
 $$
 
 **Probe: Moment um z**
@@ -9189,13 +9189,13 @@ $$
 **Widerstand in der Richtung der Einwirkung**
 
 $$
-M_{Rd} = \sqrt{M_{y,Rd}^{2} + M_{z,Rd}^{2}} = \sqrt{\left(879.5\,\mathrm{kNm}\right)^{2} + \left(0\,\mathrm{kNm}\right)^{2}} = 879.5\,\mathrm{kNm}
+M_{Rd} = \sqrt{M_{y,Rd}^{2} + M_{z,Rd}^{2}} = \sqrt{\left(879.4\,\mathrm{kNm}\right)^{2} + \left(0\,\mathrm{kNm}\right)^{2}} = 879.4\,\mathrm{kNm}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,\text{Feld}} = \frac{M_{Rd}}{M_{Ed}} = \frac{879.5\,\mathrm{kNm}}{600\,\mathrm{kNm}} = 1.47 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,\text{Feld}} = \frac{M_{Rd}}{M_{Ed}} = \frac{879.4\,\mathrm{kNm}}{600\,\mathrm{kNm}} = 1.47 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 #### Auflager
@@ -9223,8 +9223,8 @@ Bruchzustand: Zugrichtung n = (0.174; -0.985), -80.0° gegen die y-Achse. Die Nu
 | C30/37 | $-1334.7$ | $185.9$ | $713.2$ | – | – |
 | Linie 1 | $267.7$ | $200.0$ | $50.0$ | $7.91 \ldots 8.71$ | $435$ |
 | Linie 2 | $-132.7$ | $190.9$ | $750.0$ | $-2.62 \ldots -1.82$ | $-435 \ldots -364$ |
-| Spannglied 1 | $834.8$ | $200.0$ | $120.0$ | $7.25$ | $1391$ |
-| Spannglied 2 | $308.0$ | $120.0$ | $160.0$ | $6.44$ | $1100$ |
+| Spannglied 1 | $834.8$ | $200.0$ | $120.0$ | $7.26$ | $1391$ |
+| Spannglied 2 | $307.9$ | $120.0$ | $160.0$ | $6.44$ | $1100$ |
 | Spannglied 3 | $56.9$ | $280.0$ | $160.0$ | $6.87$ | $285$ |
 
 Bei einem Spannglied ist ε die Dehnung des Betons an seiner Stelle: mit Verbund ist der Stahl um seine Vordehnung ε\_p mehr gedehnt, ohne Verbund hängt seine Spannung nicht an ε.
@@ -9238,7 +9238,7 @@ $$
 **Probe: Moment um y**
 
 $$
-M_{y,Rd} = -\sum F_i \cdot (z_i - z_S) = 879.5\,\mathrm{kNm}
+M_{y,Rd} = -\sum F_i \cdot (z_i - z_S) = 879.4\,\mathrm{kNm}
 $$
 
 **Probe: Moment um z**
@@ -9250,13 +9250,13 @@ $$
 **Widerstand in der Richtung der Einwirkung**
 
 $$
-M_{Rd} = \sqrt{M_{y,Rd}^{2} + M_{z,Rd}^{2}} = \sqrt{\left(879.5\,\mathrm{kNm}\right)^{2} + \left(0\,\mathrm{kNm}\right)^{2}} = 879.5\,\mathrm{kNm}
+M_{Rd} = \sqrt{M_{y,Rd}^{2} + M_{z,Rd}^{2}} = \sqrt{\left(879.4\,\mathrm{kNm}\right)^{2} + \left(0\,\mathrm{kNm}\right)^{2}} = 879.4\,\mathrm{kNm}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,\text{Auflager}} = \frac{M_{Rd}}{M_{Ed}} = \frac{879.5\,\mathrm{kNm}}{150\,\mathrm{kNm}} = 5.86 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,\text{Auflager}} = \frac{M_{Rd}}{M_{Ed}} = \frac{879.4\,\mathrm{kNm}}{150\,\mathrm{kNm}} = 5.86 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 **Querkraft über die Federn der Wände**
@@ -9329,7 +9329,7 @@ $$
 **Spannglied 2: ohne Verbund die Kraft nach dem Spannen** *(SIA 262:2025, 4.3.3.4.9; nach Vorgabe, nicht nachgeschlagen)*
 
 $$
-P_{max,2} = A_{p,2} \cdot \sigma_{p0,2} = 280\,\mathrm{mm}^{2} \cdot 1350\,\mathrm{N}/\mathrm{mm}^{2} = 378\,\mathrm{kN}
+P_{max,2} = A_{p,2} \cdot \sigma_{p0,2} = 280\,\mathrm{mm}^{2} \cdot 1358\,\mathrm{N}/\mathrm{mm}^{2} = 380.2\,\mathrm{kN}
 $$
 
 **Geneigte Spannglieder**
@@ -9337,7 +9337,7 @@ $$
 | Glied | $\beta_p\ [{}^{\circ}]$ | $y - y_S\ [\mathrm{mm}]$ | $P_\infty\ [\mathrm{kN}]$ | $P_{max}\ [\mathrm{kN}]$ | Verbund |
 | :--- | ---: | ---: | ---: | ---: | :--- |
 | Spannglied 1 | $5.0$ | $0$ | $664.0$ | $834.8$ | mit Verbund |
-| Spannglied 2 | $-4.0$ | $-80$ | $308.0$ | $378.0$ | ohne Verbund |
+| Spannglied 2 | $-4.0$ | $-80$ | $307.9$ | $380.2$ | ohne Verbund |
 
 #### Auflager
 
@@ -9356,21 +9356,21 @@ Spannglied 1: trägt V\_z mit → P∞; Spannglied 2: wirkt V\_z entgegen → P\
 $$
 \begin{aligned}
   V_p &= P_{\infty,1} \cdot \sin \beta_{p,1} + P_{max,2} \cdot \sin \beta_{p,2} \\
-  &= 664\,\mathrm{kN} \cdot \sin 5{}^{\circ} + 378\,\mathrm{kN} \cdot \sin \left(-4{}^{\circ}\right) \\
-  &= 31.5\,\mathrm{kN}
+  &= 664\,\mathrm{kN} \cdot \sin 5{}^{\circ} + 380.2\,\mathrm{kN} \cdot \sin \left(-4{}^{\circ}\right) \\
+  &= 31.4\,\mathrm{kN}
 \end{aligned}
 $$
 
 **Was die Wände von V\_z tragen**
 
 $$
-V_{z,w} = V_{z,Ed} - V_p = 450\,\mathrm{kN} - 31.5\,\mathrm{kN} = 418.5\,\mathrm{kN}
+V_{z,w} = V_{z,Ed} - V_p = 450\,\mathrm{kN} - 31.4\,\mathrm{kN} = 418.6\,\mathrm{kN}
 $$
 
 **Ihr Moment um den Schwerpunkt**
 
 $$
-T_p = P_{max,2} \cdot \sin \beta_{p,2} \cdot e_{p,2} = 378\,\mathrm{kN} \cdot \sin \left(-4{}^{\circ}\right) \cdot \left(-80\,\mathrm{mm}\right) = 2.1\,\mathrm{kNm}
+T_p = P_{max,2} \cdot \sin \beta_{p,2} \cdot e_{p,2} = 380.2\,\mathrm{kN} \cdot \sin \left(-4{}^{\circ}\right) \cdot \left(-80\,\mathrm{mm}\right) = 2.1\,\mathrm{kNm}
 $$
 
 **Was die Wände von T tragen**
@@ -9395,23 +9395,23 @@ $$
 
 | Zelle | $A_k\ [\mathrm{mm}^2]$ | $q_k\ [\mathrm{kN/m}]$ |
 | :--- | ---: | ---: |
-| Zelle 1 | $210000$ | $-5.0$ |
+| Zelle 1 | $210000$ | $-5.1$ |
 
 **Je Wand: Kraft der Feder, ganze Kraft, Widerstand**
 
 | Wand | $V_i\ [\mathrm{kN}]$ | $V_{Ed}\ [\mathrm{kN}]$ | $\alpha\ [{}^{\circ}]$ | $V_{Rd,s}\ [\mathrm{kN}]$ | $V_{Rd,c}\ [\mathrm{kN}]$ | $V_{Rd}\ [\mathrm{kN}]$ | $\alpha_{eff}$ |
 | :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Wand 1 | $0.0$ | $1.5$ | $30$ | $118.3$ | $142.9$ | $118.3$ | $78.51$ |
-| Wand 2 | $209.2$ | $205.7$ | $30$ | $276.0$ | $333.4$ | $276.0$ | $1.34$ |
-| Wand 3 | $0.0$ | $1.5$ | $30$ | $118.3$ | $142.9$ | $118.3$ | $78.51$ |
-| Wand 4 | $-209.2$ | $212.8$ | $30$ | $276.0$ | $333.4$ | $276.0$ | $1.30$ |
+| Wand 1 | $0.0$ | $1.5$ | $30$ | $118.3$ | $142.9$ | $118.3$ | $78.06$ |
+| Wand 2 | $209.3$ | $205.8$ | $30$ | $276.0$ | $333.4$ | $276.0$ | $1.34$ |
+| Wand 3 | $0.0$ | $1.5$ | $30$ | $118.3$ | $142.9$ | $118.3$ | $78.06$ |
+| Wand 4 | $-209.3$ | $212.9$ | $30$ | $276.0$ | $333.4$ | $276.0$ | $1.30$ |
 
 Massgebend: Wand 4.
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,V,\text{Auflager}} = \frac{V_{Rd}}{V_{Ed}} = \frac{276\,\mathrm{kN}}{212.8\,\mathrm{kN}} = 1.30 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,V,\text{Auflager}} = \frac{V_{Rd}}{V_{Ed}} = \frac{276\,\mathrm{kN}}{212.9\,\mathrm{kN}} = 1.30 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 **Bedingung** *(SIA 262:2025, 4.1.4.2.5)*
@@ -9511,7 +9511,7 @@ $$
 **Normalkraft aus der Vorspannung** *(SIA 262:2025, 4.3.1.2; 4.4.3.2.4)*
 
 $$
-N_p = -\left(P_{\infty,1} + P_{\infty,2}\right) = -\left(664\,\mathrm{kN} + 308\,\mathrm{kN}\right) = -972\,\mathrm{kN}
+N_p = -\left(P_{\infty,1} + P_{\infty,2}\right) = -\left(664\,\mathrm{kN} + 307.9\,\mathrm{kN}\right) = -972\,\mathrm{kN}
 $$
 
 **Moment aus der Vorspannung um y** *(SIA 262:2025, 4.3.1.2; 4.4.3.2.4)*
@@ -9519,7 +9519,7 @@ $$
 $$
 \begin{aligned}
   M_{p,y} &= \left(P_{\infty,1} \cdot z'_{p,1} + P_{\infty,2} \cdot z'_{p,2}\right) \\
-  &= \left(664\,\mathrm{kN} \cdot \left(-280\,\mathrm{mm}\right) + 308\,\mathrm{kN} \cdot \left(-240\,\mathrm{mm}\right)\right) \\
+  &= \left(664\,\mathrm{kN} \cdot \left(-280\,\mathrm{mm}\right) + 307.9\,\mathrm{kN} \cdot \left(-240\,\mathrm{mm}\right)\right) \\
   &= -259.8\,\mathrm{kNm}
 \end{aligned}
 $$
@@ -9529,7 +9529,7 @@ $$
 $$
 \begin{aligned}
   M_{p,z} &= \left(P_{\infty,1} \cdot y'_{p,1} + P_{\infty,2} \cdot y'_{p,2}\right) \\
-  &= \left(664\,\mathrm{kN} \cdot 0\,\mathrm{mm} + 308\,\mathrm{kN} \cdot \left(-80\,\mathrm{mm}\right)\right) \\
+  &= \left(664\,\mathrm{kN} \cdot 0\,\mathrm{mm} + 307.9\,\mathrm{kN} \cdot \left(-80\,\mathrm{mm}\right)\right) \\
   &= -24.6\,\mathrm{kNm}
 \end{aligned}
 $$
@@ -9557,13 +9557,13 @@ $$
 **Biegewiderstand bei N = 0 in dieser Richtung**
 
 $$
-M_{Rd} = 879.5\,\mathrm{kNm}
+M_{Rd} = 879.4\,\mathrm{kNm}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,Riss,\text{Zug unten}} = \frac{M_{Rd}}{M_{Riss}} = \frac{879.5\,\mathrm{kNm}}{449.3\,\mathrm{kNm}} = 1.96 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,Riss,\text{Zug unten}} = \frac{M_{Rd}}{M_{Riss}} = \frac{879.4\,\mathrm{kNm}}{449.3\,\mathrm{kNm}} = 1.96 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 #### Zug oben
@@ -9595,7 +9595,7 @@ $$
 **Normalkraft aus der Vorspannung** *(SIA 262:2025, 4.3.1.2; 4.4.3.2.4)*
 
 $$
-N_p = -\left(P_{\infty,1} + P_{\infty,2}\right) = -\left(664\,\mathrm{kN} + 308\,\mathrm{kN}\right) = -972\,\mathrm{kN}
+N_p = -\left(P_{\infty,1} + P_{\infty,2}\right) = -\left(664\,\mathrm{kN} + 307.9\,\mathrm{kN}\right) = -972\,\mathrm{kN}
 $$
 
 **Moment aus der Vorspannung um y** *(SIA 262:2025, 4.3.1.2; 4.4.3.2.4)*
@@ -9603,7 +9603,7 @@ $$
 $$
 \begin{aligned}
   M_{p,y} &= \left(P_{\infty,1} \cdot z'_{p,1} + P_{\infty,2} \cdot z'_{p,2}\right) \\
-  &= \left(664\,\mathrm{kN} \cdot \left(-280\,\mathrm{mm}\right) + 308\,\mathrm{kN} \cdot \left(-240\,\mathrm{mm}\right)\right) \\
+  &= \left(664\,\mathrm{kN} \cdot \left(-280\,\mathrm{mm}\right) + 307.9\,\mathrm{kN} \cdot \left(-240\,\mathrm{mm}\right)\right) \\
   &= -259.8\,\mathrm{kNm}
 \end{aligned}
 $$
@@ -9613,7 +9613,7 @@ $$
 $$
 \begin{aligned}
   M_{p,z} &= \left(P_{\infty,1} \cdot y'_{p,1} + P_{\infty,2} \cdot y'_{p,2}\right) \\
-  &= \left(664\,\mathrm{kN} \cdot 0\,\mathrm{mm} + 308\,\mathrm{kN} \cdot \left(-80\,\mathrm{mm}\right)\right) \\
+  &= \left(664\,\mathrm{kN} \cdot 0\,\mathrm{mm} + 307.9\,\mathrm{kN} \cdot \left(-80\,\mathrm{mm}\right)\right) \\
   &= -24.6\,\mathrm{kNm}
 \end{aligned}
 $$
@@ -9679,7 +9679,7 @@ $$
 **Normalkraft aus der Vorspannung** *(SIA 262:2025, 4.3.1.2; 4.4.3.2.4)*
 
 $$
-N_p = -\left(P_{\infty,1} + P_{\infty,2}\right) = -\left(664\,\mathrm{kN} + 308\,\mathrm{kN}\right) = -972\,\mathrm{kN}
+N_p = -\left(P_{\infty,1} + P_{\infty,2}\right) = -\left(664\,\mathrm{kN} + 307.9\,\mathrm{kN}\right) = -972\,\mathrm{kN}
 $$
 
 **Moment aus der Vorspannung um y** *(SIA 262:2025, 4.3.1.2; 4.4.3.2.4)*
@@ -9687,7 +9687,7 @@ $$
 $$
 \begin{aligned}
   M_{p,y} &= \left(P_{\infty,1} \cdot z'_{p,1} + P_{\infty,2} \cdot z'_{p,2}\right) \\
-  &= \left(664\,\mathrm{kN} \cdot \left(-280\,\mathrm{mm}\right) + 308\,\mathrm{kN} \cdot \left(-240\,\mathrm{mm}\right)\right) \\
+  &= \left(664\,\mathrm{kN} \cdot \left(-280\,\mathrm{mm}\right) + 307.9\,\mathrm{kN} \cdot \left(-240\,\mathrm{mm}\right)\right) \\
   &= -259.8\,\mathrm{kNm}
 \end{aligned}
 $$
@@ -9697,7 +9697,7 @@ $$
 $$
 \begin{aligned}
   M_{p,z} &= \left(P_{\infty,1} \cdot y'_{p,1} + P_{\infty,2} \cdot y'_{p,2}\right) \\
-  &= \left(664\,\mathrm{kN} \cdot 0\,\mathrm{mm} + 308\,\mathrm{kN} \cdot \left(-80\,\mathrm{mm}\right)\right) \\
+  &= \left(664\,\mathrm{kN} \cdot 0\,\mathrm{mm} + 307.9\,\mathrm{kN} \cdot \left(-80\,\mathrm{mm}\right)\right) \\
   &= -24.6\,\mathrm{kNm}
 \end{aligned}
 $$
@@ -9763,7 +9763,7 @@ $$
 **Normalkraft aus der Vorspannung** *(SIA 262:2025, 4.3.1.2; 4.4.3.2.4)*
 
 $$
-N_p = -\left(P_{\infty,1} + P_{\infty,2}\right) = -\left(664\,\mathrm{kN} + 308\,\mathrm{kN}\right) = -972\,\mathrm{kN}
+N_p = -\left(P_{\infty,1} + P_{\infty,2}\right) = -\left(664\,\mathrm{kN} + 307.9\,\mathrm{kN}\right) = -972\,\mathrm{kN}
 $$
 
 **Moment aus der Vorspannung um y** *(SIA 262:2025, 4.3.1.2; 4.4.3.2.4)*
@@ -9771,7 +9771,7 @@ $$
 $$
 \begin{aligned}
   M_{p,y} &= \left(P_{\infty,1} \cdot z'_{p,1} + P_{\infty,2} \cdot z'_{p,2}\right) \\
-  &= \left(664\,\mathrm{kN} \cdot \left(-280\,\mathrm{mm}\right) + 308\,\mathrm{kN} \cdot \left(-240\,\mathrm{mm}\right)\right) \\
+  &= \left(664\,\mathrm{kN} \cdot \left(-280\,\mathrm{mm}\right) + 307.9\,\mathrm{kN} \cdot \left(-240\,\mathrm{mm}\right)\right) \\
   &= -259.8\,\mathrm{kNm}
 \end{aligned}
 $$
@@ -9781,7 +9781,7 @@ $$
 $$
 \begin{aligned}
   M_{p,z} &= \left(P_{\infty,1} \cdot y'_{p,1} + P_{\infty,2} \cdot y'_{p,2}\right) \\
-  &= \left(664\,\mathrm{kN} \cdot 0\,\mathrm{mm} + 308\,\mathrm{kN} \cdot \left(-80\,\mathrm{mm}\right)\right) \\
+  &= \left(664\,\mathrm{kN} \cdot 0\,\mathrm{mm} + 307.9\,\mathrm{kN} \cdot \left(-80\,\mathrm{mm}\right)\right) \\
   &= -24.6\,\mathrm{kNm}
 \end{aligned}
 $$
@@ -9955,7 +9955,7 @@ $$
 **Normalkraft aus der Vorspannung** *(SIA 262:2025, 4.3.1.2; 4.4.3.2.4)*
 
 $$
-N_p = -\left(P_{\infty,1} + P_{\infty,2}\right) = -\left(664\,\mathrm{kN} + 308\,\mathrm{kN}\right) = -972\,\mathrm{kN}
+N_p = -\left(P_{\infty,1} + P_{\infty,2}\right) = -\left(664\,\mathrm{kN} + 307.9\,\mathrm{kN}\right) = -972\,\mathrm{kN}
 $$
 
 **Moment aus der Vorspannung um y** *(SIA 262:2025, 4.3.1.2; 4.4.3.2.4)*
@@ -9963,7 +9963,7 @@ $$
 $$
 \begin{aligned}
   M_{p,y} &= \left(P_{\infty,1} \cdot z'_{p,1} + P_{\infty,2} \cdot z'_{p,2}\right) \\
-  &= \left(664\,\mathrm{kN} \cdot \left(-280\,\mathrm{mm}\right) + 308\,\mathrm{kN} \cdot \left(-240\,\mathrm{mm}\right)\right) \\
+  &= \left(664\,\mathrm{kN} \cdot \left(-280\,\mathrm{mm}\right) + 307.9\,\mathrm{kN} \cdot \left(-240\,\mathrm{mm}\right)\right) \\
   &= -259.8\,\mathrm{kNm}
 \end{aligned}
 $$
@@ -9973,7 +9973,7 @@ $$
 $$
 \begin{aligned}
   M_{p,z} &= \left(P_{\infty,1} \cdot y'_{p,1} + P_{\infty,2} \cdot y'_{p,2}\right) \\
-  &= \left(664\,\mathrm{kN} \cdot 0\,\mathrm{mm} + 308\,\mathrm{kN} \cdot \left(-80\,\mathrm{mm}\right)\right) \\
+  &= \left(664\,\mathrm{kN} \cdot 0\,\mathrm{mm} + 307.9\,\mathrm{kN} \cdot \left(-80\,\mathrm{mm}\right)\right) \\
   &= -24.6\,\mathrm{kNm}
 \end{aligned}
 $$
@@ -10063,7 +10063,7 @@ $$
 **Normalkraft aus der Vorspannung** *(SIA 262:2025, 4.3.1.2; 4.4.3.2.4)*
 
 $$
-N_p = -\left(P_{\infty,1} + P_{\infty,2}\right) = -\left(664\,\mathrm{kN} + 308\,\mathrm{kN}\right) = -972\,\mathrm{kN}
+N_p = -\left(P_{\infty,1} + P_{\infty,2}\right) = -\left(664\,\mathrm{kN} + 307.9\,\mathrm{kN}\right) = -972\,\mathrm{kN}
 $$
 
 **Moment aus der Vorspannung um y** *(SIA 262:2025, 4.3.1.2; 4.4.3.2.4)*
@@ -10071,7 +10071,7 @@ $$
 $$
 \begin{aligned}
   M_{p,y} &= \left(P_{\infty,1} \cdot z'_{p,1} + P_{\infty,2} \cdot z'_{p,2}\right) \\
-  &= \left(664\,\mathrm{kN} \cdot \left(-280\,\mathrm{mm}\right) + 308\,\mathrm{kN} \cdot \left(-240\,\mathrm{mm}\right)\right) \\
+  &= \left(664\,\mathrm{kN} \cdot \left(-280\,\mathrm{mm}\right) + 307.9\,\mathrm{kN} \cdot \left(-240\,\mathrm{mm}\right)\right) \\
   &= -259.8\,\mathrm{kNm}
 \end{aligned}
 $$
@@ -10081,7 +10081,7 @@ $$
 $$
 \begin{aligned}
   M_{p,z} &= \left(P_{\infty,1} \cdot y'_{p,1} + P_{\infty,2} \cdot y'_{p,2}\right) \\
-  &= \left(664\,\mathrm{kN} \cdot 0\,\mathrm{mm} + 308\,\mathrm{kN} \cdot \left(-80\,\mathrm{mm}\right)\right) \\
+  &= \left(664\,\mathrm{kN} \cdot 0\,\mathrm{mm} + 307.9\,\mathrm{kN} \cdot \left(-80\,\mathrm{mm}\right)\right) \\
   &= -24.6\,\mathrm{kNm}
 \end{aligned}
 $$
@@ -10109,19 +10109,19 @@ $$
 **Moment, bei dem der erste gezogene Stab σ\_s,adm erreicht**
 
 $$
-M_{s,adm} = -947.5\,\mathrm{kNm}
+M_{s,adm} = -947.7\,\mathrm{kNm}
 $$
 
 **Gefundene Dehnungsebene: Zugrichtung, Dehnung im Schwerpunkt, Krümmung**
 
 $$
-\psi = -83.2^\circ \qquad \varepsilon_0 = 0.7592\,\text{‰} \qquad \kappa = 0.00477\,\mathrm{m}^{-1}
+\psi = -83.2^\circ \qquad \varepsilon_0 = 0.7596\,\text{‰} \qquad \kappa = 0.00477\,\mathrm{m}^{-1}
 $$
 
 **Probe: die Ebene erzeugt die Einwirkung**
 
 $$
-N_{int} = 0\,\mathrm{kN} \;\checkmark \qquad M_{y,int} = 947.5\,\mathrm{kNm} \;\checkmark \qquad M_{z,int} = 0\,\mathrm{kNm} \;\checkmark
+N_{int} = 0\,\mathrm{kN} \;\checkmark \qquad M_{y,int} = 947.7\,\mathrm{kNm} \;\checkmark \qquad M_{z,int} = 0\,\mathrm{kNm} \;\checkmark
 $$
 
 **An der Grenze: Linie 1 (y = 350 mm, z = 50 mm)**
@@ -10133,13 +10133,13 @@ $$
 **Zwängung auf Biegung**
 
 $$
-M_{s,adm} = -947.5\,\mathrm{kNm} \quad \ge \quad M_{Riss} = -70.3\,\mathrm{kNm}
+M_{s,adm} = -947.7\,\mathrm{kNm} \quad \ge \quad M_{Riss} = -70.3\,\mathrm{kNm}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,ZB,\text{Zug oben}} = \frac{M_{s,adm}}{M_{Riss}} = \frac{-947.5\,\mathrm{kNm}}{-70.3\,\mathrm{kNm}} = 13.47 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,ZB,\text{Zug oben}} = \frac{M_{s,adm}}{M_{Riss}} = \frac{-947.7\,\mathrm{kNm}}{-70.3\,\mathrm{kNm}} = 13.47 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 #### Zug links
@@ -10171,7 +10171,7 @@ $$
 **Normalkraft aus der Vorspannung** *(SIA 262:2025, 4.3.1.2; 4.4.3.2.4)*
 
 $$
-N_p = -\left(P_{\infty,1} + P_{\infty,2}\right) = -\left(664\,\mathrm{kN} + 308\,\mathrm{kN}\right) = -972\,\mathrm{kN}
+N_p = -\left(P_{\infty,1} + P_{\infty,2}\right) = -\left(664\,\mathrm{kN} + 307.9\,\mathrm{kN}\right) = -972\,\mathrm{kN}
 $$
 
 **Moment aus der Vorspannung um y** *(SIA 262:2025, 4.3.1.2; 4.4.3.2.4)*
@@ -10179,7 +10179,7 @@ $$
 $$
 \begin{aligned}
   M_{p,y} &= \left(P_{\infty,1} \cdot z'_{p,1} + P_{\infty,2} \cdot z'_{p,2}\right) \\
-  &= \left(664\,\mathrm{kN} \cdot \left(-280\,\mathrm{mm}\right) + 308\,\mathrm{kN} \cdot \left(-240\,\mathrm{mm}\right)\right) \\
+  &= \left(664\,\mathrm{kN} \cdot \left(-280\,\mathrm{mm}\right) + 307.9\,\mathrm{kN} \cdot \left(-240\,\mathrm{mm}\right)\right) \\
   &= -259.8\,\mathrm{kNm}
 \end{aligned}
 $$
@@ -10189,7 +10189,7 @@ $$
 $$
 \begin{aligned}
   M_{p,z} &= \left(P_{\infty,1} \cdot y'_{p,1} + P_{\infty,2} \cdot y'_{p,2}\right) \\
-  &= \left(664\,\mathrm{kN} \cdot 0\,\mathrm{mm} + 308\,\mathrm{kN} \cdot \left(-80\,\mathrm{mm}\right)\right) \\
+  &= \left(664\,\mathrm{kN} \cdot 0\,\mathrm{mm} + 307.9\,\mathrm{kN} \cdot \left(-80\,\mathrm{mm}\right)\right) \\
   &= -24.6\,\mathrm{kNm}
 \end{aligned}
 $$
@@ -10223,7 +10223,7 @@ $$
 **Gefundene Dehnungsebene: Zugrichtung, Dehnung im Schwerpunkt, Krümmung**
 
 $$
-\psi = -15.9^\circ \qquad \varepsilon_0 = 1.0193\,\text{‰} \qquad \kappa = -0.00936\,\mathrm{m}^{-1}
+\psi = -15.9^\circ \qquad \varepsilon_0 = 1.0192\,\text{‰} \qquad \kappa = -0.00936\,\mathrm{m}^{-1}
 $$
 
 **Probe: die Ebene erzeugt die Einwirkung**
@@ -10279,7 +10279,7 @@ $$
 **Normalkraft aus der Vorspannung** *(SIA 262:2025, 4.3.1.2; 4.4.3.2.4)*
 
 $$
-N_p = -\left(P_{\infty,1} + P_{\infty,2}\right) = -\left(664\,\mathrm{kN} + 308\,\mathrm{kN}\right) = -972\,\mathrm{kN}
+N_p = -\left(P_{\infty,1} + P_{\infty,2}\right) = -\left(664\,\mathrm{kN} + 307.9\,\mathrm{kN}\right) = -972\,\mathrm{kN}
 $$
 
 **Moment aus der Vorspannung um y** *(SIA 262:2025, 4.3.1.2; 4.4.3.2.4)*
@@ -10287,7 +10287,7 @@ $$
 $$
 \begin{aligned}
   M_{p,y} &= \left(P_{\infty,1} \cdot z'_{p,1} + P_{\infty,2} \cdot z'_{p,2}\right) \\
-  &= \left(664\,\mathrm{kN} \cdot \left(-280\,\mathrm{mm}\right) + 308\,\mathrm{kN} \cdot \left(-240\,\mathrm{mm}\right)\right) \\
+  &= \left(664\,\mathrm{kN} \cdot \left(-280\,\mathrm{mm}\right) + 307.9\,\mathrm{kN} \cdot \left(-240\,\mathrm{mm}\right)\right) \\
   &= -259.8\,\mathrm{kNm}
 \end{aligned}
 $$
@@ -10297,7 +10297,7 @@ $$
 $$
 \begin{aligned}
   M_{p,z} &= \left(P_{\infty,1} \cdot y'_{p,1} + P_{\infty,2} \cdot y'_{p,2}\right) \\
-  &= \left(664\,\mathrm{kN} \cdot 0\,\mathrm{mm} + 308\,\mathrm{kN} \cdot \left(-80\,\mathrm{mm}\right)\right) \\
+  &= \left(664\,\mathrm{kN} \cdot 0\,\mathrm{mm} + 307.9\,\mathrm{kN} \cdot \left(-80\,\mathrm{mm}\right)\right) \\
   &= -24.6\,\mathrm{kNm}
 \end{aligned}
 $$
@@ -10469,7 +10469,7 @@ $$
 **Gefundene Dehnungsebene: Zugrichtung, Dehnung im Schwerpunkt, Krümmung**
 
 $$
-\psi = -69.6^\circ \qquad \varepsilon_0 = -0.0069\,\text{‰} \qquad \kappa = 0.00088\,\mathrm{m}^{-1}
+\psi = -69.6^\circ \qquad \varepsilon_0 = -0.0068\,\text{‰} \qquad \kappa = 0.00088\,\mathrm{m}^{-1}
 $$
 
 **Probe: die Ebene erzeugt die Einwirkung**
@@ -10495,7 +10495,7 @@ $$
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,\sigma,w,\text{Dauer}} = \frac{\sigma_{s,adm}}{\sigma_s} = \frac{500\,\mathrm{N}/\mathrm{mm}^{2}}{65\,\mathrm{N}/\mathrm{mm}^{2}} = 7.66 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,\sigma,w,\text{Dauer}} = \frac{\sigma_{s,adm}}{\sigma_s} = \frac{500\,\mathrm{N}/\mathrm{mm}^{2}}{65\,\mathrm{N}/\mathrm{mm}^{2}} = 7.65 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 ### Kennzahlen
@@ -10511,13 +10511,13 @@ $$
 **Momentenwiderstand bei N\_Ed = 0, Zug unten**
 
 $$
-M_{y,Rd}^{+}(N_{Ed} = 0) = 879.5\,\mathrm{kNm}
+M_{y,Rd}^{+}(N_{Ed} = 0) = 879.4\,\mathrm{kNm}
 $$
 
 **Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug unten**
 
 $$
-\left(x/d\right)_{y}^{+} = \frac{x}{d} = \frac{229.2\,\mathrm{mm}}{717.7\,\mathrm{mm}} = 0.319
+\left(x/d\right)_{y}^{+} = \frac{x}{d} = \frac{229.2\,\mathrm{mm}}{717.6\,\mathrm{mm}} = 0.319
 $$
 
 **Momentenwiderstand bei N\_Ed = 0, Zug oben**
@@ -30699,16 +30699,16 @@ $$
 \frac{A_{sw}}{s} = \frac{n \cdot \pi\, \varnothing^2 / 4}{s}
 $$
 
-**Querschnitt, Vordehnung und Spannkraft eines Glieds aus n Drähten, Litzen oder Stäben** *(SIA 262:2025, 3.3.2.2, Tabelle 7; SIA 262:2025, 4.1.5.1.5)*
+**Querschnitt, Vordehnung und Spannkraft eines Glieds – A\_p aus n Drähten, Litzen oder Stäben oder eingegeben** *(SIA 262:2025, 3.3.2.2, Tabelle 7; SIA 262:2025, 4.1.5.1.5)*
 
 $$
 A_p = n \cdot a_p \qquad \varepsilon_p = \frac{\sigma_{p\infty}}{E_p} \qquad P_\infty = A_p \cdot \sigma_{p\infty}
 $$
 
-**Spannungen nach Vorgabe, wo keine eingegeben ist** *(nach Vorgabe, nicht nachgeschlagen)*
+**Spannungen nach dem Spannen und nach allen Verlusten, aus den Faktoren des Glieds**
 
 $$
-\sigma_{p0} = 0.70 \cdot f_{pk} \qquad \sigma_{p\infty} = 0.85 \cdot \sigma_{p0}
+\sigma_{p0} = k_{p0} \cdot f_{pk} \qquad \sigma_{p\infty} = k_{p\infty} \cdot \sigma_{p0}
 $$
 
 **Grenzen der Spannung nach dem Spannen und nach allen Verlusten** *(SIA 262:2025, 4.1.5.2.2, (22); SIA 262:2025, 4.1.5.2.3)*
@@ -30726,13 +30726,13 @@ $$
 **Spannglied 1: nach dem Spannen, nach Vorgabe** *(nach Vorgabe, nicht nachgeschlagen)*
 
 $$
-\sigma_{p0,1} = 0.70 \cdot f_{pk}
+\sigma_{p0,1} = k_{p0,1} \cdot f_{pk}
 $$
 
 **Spannglied 1: nach allen Verlusten, nach Vorgabe** *(nach Vorgabe, nicht nachgeschlagen)*
 
 $$
-\sigma_{p\infty,1} = 0.85 \cdot \sigma_{p0,1}
+\sigma_{p\infty,1} = k_{p\infty,1} \cdot \sigma_{p0,1}
 $$
 
 **Spannglied 1: Grenze nach dem Spannen** *(SIA 262:2025, 4.1.5.2.2, (22))*
@@ -33730,7 +33730,7 @@ $$
 | Linie 1 | $4 \varnothing 14$ | B500B |
 | Linie 2 | $3 \varnothing 12$ | B500B |
 | Spannglied 1 | $4 \times \text{Litze}\ \varnothing 15.7$ | Y1860 |
-| Spannglied 2 | $2 \times \text{Litze}\ \varnothing 15.3$ | Y1860 |
+| Spannglied 2 | $\text{Litzen}$ | Y1860 |
 | Spannglied 3 | $2 \times \text{Litze}\ \varnothing 12.9$ | Y1860 |
 | Wand 1 | $b_w = 100,\ 1 \times \varnothing 10\ @\ 150$ | B500B |
 | Wand 2 | $b_w = 100,\ 1 \times \varnothing 10\ @\ 150$ | B500B |
@@ -33739,13 +33739,13 @@ $$
 
 | Nachweis | Bezeichnung | Widerstand | Einwirkung | $\alpha_{eff}$ |
 | :--- | :--- | ---: | ---: | ---: |
-| Biegung und Normalkraft | Feld | $M_{Rd} = 879.5\,\mathrm{kNm}$ | $M_{Ed} = 600.0\,\mathrm{kNm}$ | $1.47$ |
-| Biegung und Normalkraft | Auflager | $M_{Rd} = 879.5\,\mathrm{kNm}$ | $M_{Ed} = 150.0\,\mathrm{kNm}$ | $5.86$ |
-| Querkraft und Torsion | Auflager | $V_{Rd} = 276.0\,\mathrm{kN}$ | $V_{Ed} = 212.8\,\mathrm{kN}$ | $1.30$ |
+| Biegung und Normalkraft | Feld | $M_{Rd} = 879.4\,\mathrm{kNm}$ | $M_{Ed} = 600.0\,\mathrm{kNm}$ | $1.47$ |
+| Biegung und Normalkraft | Auflager | $M_{Rd} = 879.4\,\mathrm{kNm}$ | $M_{Ed} = 150.0\,\mathrm{kNm}$ | $5.86$ |
+| Querkraft und Torsion | Auflager | $V_{Rd} = 276.0\,\mathrm{kN}$ | $V_{Ed} = 212.9\,\mathrm{kN}$ | $1.30$ |
 | Duktilität | Zug unten | – | – | – |
-| Sprödes Versagen | Zug unten | $M_{Rd} = 879.5\,\mathrm{kNm}$ | $M_{Riss} = 449.3\,\mathrm{kNm}$ | $1.96$ |
+| Sprödes Versagen | Zug unten | $M_{Rd} = 879.4\,\mathrm{kNm}$ | $M_{Riss} = 449.3\,\mathrm{kNm}$ | $1.96$ |
 | Risse: Zwängung Biegung | Zug unten | $M_{s,adm} = 949.2\,\mathrm{kNm}$ | $M_{Riss} = 449.3\,\mathrm{kNm}$ | $2.11$ |
-| Risse: Quasi-ständige Lastfälle | Dauer | $\sigma_{s,adm} = 500\,\mathrm{N}/\mathrm{mm}^{2}$ | $\sigma_s = 65\,\mathrm{N}/\mathrm{mm}^{2}$ | $7.66$ |
+| Risse: Quasi-ständige Lastfälle | Dauer | $\sigma_{s,adm} = 500\,\mathrm{N}/\mathrm{mm}^{2}$ | $\sigma_s = 65\,\mathrm{N}/\mathrm{mm}^{2}$ | $7.65$ |
 
 > **Hinweis:** Duktilität – Zug unten: Spannstahl Y1860 in der Zugzone – die Regel gilt für Betonstahl der Klassen B und C → kein Nachweis über x/d. Umlagern nur mit einem Nachweis des Verformungsvermögens (SIA 262:2025, 4.1.4.2.6).
 
@@ -33756,7 +33756,7 @@ $$
 | Kennzahl | Zeichen | Wert |
 | :--- | :--- | ---: |
 | Bewehrungsmass | $\mu_s$ | $23\,\mathrm{kg}/\mathrm{m}^{3}$ |
-| Momentenwiderstand, Zug unten | $M_{y,Rd}^{+}(N_{Ed} = 0)$ | $879.5\,\mathrm{kNm}$ |
+| Momentenwiderstand, Zug unten | $M_{y,Rd}^{+}(N_{Ed} = 0)$ | $879.4\,\mathrm{kNm}$ |
 | Momentenwiderstand, Zug oben | $M_{y,Rd}^{-}(N_{Ed} = 0)$ | $-175.2\,\mathrm{kNm}$ |
 | Momentenwiderstand, Zug links | $M_{z,Rd}^{+}(N_{Ed} = 0)$ | $203.1\,\mathrm{kNm}$ |
 | Momentenwiderstand, Zug rechts | $M_{z,Rd}^{-}(N_{Ed} = 0)$ | $-159.2\,\mathrm{kNm}$ |
@@ -36021,9 +36021,9 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Spannung nach dem Spannen, Spannglied 1 | $\sigma_{p0,1}$ | $1302$ | N/mm² | berechnet |
 | Spannung nach allen Verlusten, Spannglied 1 | $\sigma_{p\infty,1}$ | $1107$ | N/mm² | berechnet |
 | Querschnitt des Spannstahls, Spannglied 2 | $A_{p,2}$ | $280$ | mm² | berechnet |
-| Spannkraft nach allen Verlusten, Spannglied 2 | $P_{\infty,2}$ | $308$ | kN | berechnet |
+| Spannkraft nach allen Verlusten, Spannglied 2 | $P_{\infty,2}$ | $307.9$ | kN | berechnet |
 | Vordehnung, Spannglied 2 | $\varepsilon_{p,2}$ | $5.64$ | ‰ | berechnet |
-| Spannung nach dem Spannen, Spannglied 2 | $\sigma_{p0,2}$ | $1350$ | N/mm² | berechnet |
+| Spannung nach dem Spannen, Spannglied 2 | $\sigma_{p0,2}$ | $1358$ | N/mm² | berechnet |
 | Spannung nach allen Verlusten, Spannglied 2 | $\sigma_{p\infty,2}$ | $1100$ | N/mm² | berechnet |
 | Querschnitt des Spannstahls, Spannglied 3 | $A_{p,3}$ | $200$ | mm² | berechnet |
 | Spannkraft nach allen Verlusten, Spannglied 3 | $P_{\infty,3}$ | $221.3$ | kN | berechnet |
@@ -36036,7 +36036,7 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Momentenwiderstand bei N\_Ed = 0, Zug links | $M_{z,Rd}^{+}(N_{Ed} = 0)$ | $203.1$ | kNm | berechnet |
 | Momentenwiderstand bei N\_Ed = 0, Zug oben | $M_{y,Rd}^{-}(N_{Ed} = 0)$ | $-175.2$ | kNm | berechnet |
 | Momentenwiderstand bei N\_Ed = 0, Zug rechts | $M_{z,Rd}^{-}(N_{Ed} = 0)$ | $-159.2$ | kNm | berechnet |
-| Momentenwiderstand bei N\_Ed = 0, Zug unten | $M_{y,Rd}^{+}(N_{Ed} = 0)$ | $879.5$ | kNm | berechnet |
+| Momentenwiderstand bei N\_Ed = 0, Zug unten | $M_{y,Rd}^{+}(N_{Ed} = 0)$ | $879.4$ | kNm | berechnet |
 | Druckwiderstand bei gleichmässiger Dehnung | $N_{Rd}^{-}$ | $-6081.3$ | kN | berechnet |
 | Zugwiderstand bei gleichmässiger Dehnung | $N_{Rd}^{+}$ | $1614.9$ | kN | berechnet |
 | Torsionswiderstand der Schubwände, allein | $T_{Rd}$ | $165.6$ | kNm | berechnet |
@@ -36056,9 +36056,9 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Grösste aufnehmbare Druckkraft | $N_{Rd}^{-}$ | $-6081.3$ | kN | berechnet |
 | Grösste aufnehmbare Zugkraft | $N_{Rd}^{+}$ | $1614.9$ | kN | berechnet |
 | Erfüllungsgrad Rissnormalkraft – ganzer Querschnitt | $\alpha_{eff,NR}$ | $0.62$ |  | berechnet |
-| Erfüllungsgrad Stahlspannung aus Rissbreite – Auflager (60 %) | $\alpha_{eff,\sigma,w,\text{Auflager (60 \%)}}$ | $49.03$ |  | berechnet |
-| Erfüllungsgrad Stahlspannung aus Rissbreite – Dauer | $\alpha_{eff,\sigma,w,\text{Dauer}}$ | $7.66$ |  | berechnet |
-| Erfüllungsgrad Stahlspannung aus Rissbreite – Feld (60 %) | $\alpha_{eff,\sigma,w,\text{Feld (60 \%)}}$ | $9952.95$ |  | berechnet |
+| Erfüllungsgrad Stahlspannung aus Rissbreite – Auflager (60 %) | $\alpha_{eff,\sigma,w,\text{Auflager (60 \%)}}$ | $49.04$ |  | berechnet |
+| Erfüllungsgrad Stahlspannung aus Rissbreite – Dauer | $\alpha_{eff,\sigma,w,\text{Dauer}}$ | $7.65$ |  | berechnet |
+| Erfüllungsgrad Stahlspannung aus Rissbreite – Feld (60 %) | $\alpha_{eff,\sigma,w,\text{Feld (60 \%)}}$ | $9699.30$ |  | berechnet |
 | Erfüllungsgrad sprödes Versagen – Zug links | $\alpha_{eff,Riss,\text{Zug links}}$ | $11.59$ |  | berechnet |
 | Erfüllungsgrad sprödes Versagen – Zug unten | $\alpha_{eff,Riss,\text{Zug unten}}$ | $1.96$ |  | berechnet |
 | Erfüllungsgrad Querkraft und Torsion – Auflager | $\alpha_{eff,V,\text{Auflager}}$ | $1.30$ |  | berechnet |

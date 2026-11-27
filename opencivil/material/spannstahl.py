@@ -82,6 +82,13 @@ class Erzeugnisart(Wahl):
         """Der Kurzname des Moduls, der fuer diese Art gilt (3.3.2.4)."""
         return "E_p_litze" if self is Erzeugnisart.LITZE else "E_p"
 
+    @property
+    def erklaerung(self) -> str:
+        """Was an der Art haengt, wo die Flaeche eines Glieds eingegeben ist: ihr Modul."""
+        vorlage = next(v for v in SPANNSTAHL_VORLAGEN if v.kurzname == self.modul)
+        return (f"{self.mehrzahl}: E_p = {vorlage.festwert.in_einheit(N_PRO_MM2):.0f} N/mm² "
+                f"({vorlage.referenz})")
+
 
 @dataclass(frozen=True)
 class Erzeugnis:
@@ -147,6 +154,12 @@ def erzeugnis(sorte: str, durchmesser: float) -> Optional[Erzeugnis]:
     if s is None:
         return None
     return next((e for e in s.erzeugnisse if abs(e.durchmesser - durchmesser) < 1e-9), None)
+
+
+def erzeugnisarten(sorte: str) -> Tuple[Erzeugnisart, ...]:
+    """In welchen Arten Tabelle 7 die Sorte nennt, in ihrer Folge: Y1860 als Draht und Litze."""
+    s = SPANNSTAHLSORTEN.get(sorte)
+    return tuple(dict.fromkeys(e.art for e in s.erzeugnisse)) if s is not None else ()
 
 
 def spannstahlsorten_zum_anlegen() -> List[str]:

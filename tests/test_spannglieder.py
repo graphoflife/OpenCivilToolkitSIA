@@ -36,6 +36,7 @@ Stelle wie ein Stab -- A = 300 · 600 = 180 000 mm²:
     mit Vordehnung, ohne        N_Rd^- = −f_cd · (A − A_p) + P∞  = −2923.98 kN
 """
 
+import copy
 import math
 import unittest
 
@@ -43,8 +44,10 @@ from opencivil.material.spannstahl import SPANNSTAHLSORTEN
 from opencivil.nachweis.gebrauchsebene import gebrauchsebene
 from opencivil.nachweis.rissgroessen import bruttoquerschnitt, rissmoment
 from opencivil.nachweis.spannungsbegrenzung import VORGABE
+from opencivil.projekt import ProjektFehler
 from opencivil.projekt.projekt import Projekt
 from opencivil.projekt.querschnittsanalyse import QuerschnittsanalyseEintrag
+from opencivil.projekt.spannglieder import SpanngliedEintrag
 from opencivil.querschnitt.biegung import EINACHSIG
 from opencivil.querschnitt.spannglieder import (
     ANTEIL_NACH_VERLUSTEN, ANTEIL_SPANNEN, FesteSpannung, Restfestigkeit,
@@ -97,17 +100,36 @@ def geloest(p: Projekt):
 
 
 class TestRegeln(unittest.TestCase):
-    """Die Vorgaben und die Grenzen der Spannung, in N/mm²."""
+    """Die Faktoren und die Grenzen der Spannung, in N/mm²."""
 
     def test_vorgaben(self):
-        p0, pinf = vorspannung(1860.0, None, None)
+        """Ein neues Glied beginnt mit 0.70 und 0.85: 1302 und 1106.7 N/mm² bei Y1860."""
+        neu = SpanngliedEintrag()
+        self.assertEqual((neu.anteil_p0, neu.anteil_pinf),
+                         (ANTEIL_SPANNEN, ANTEIL_NACH_VERLUSTEN))
+        p0, pinf = vorspannung(1860.0, neu.anteil_p0, neu.anteil_pinf)
         self.assertAlmostEqual(p0, 1302.0)
         self.assertAlmostEqual(pinf, 1106.7)
 
-    def test_was_eingegeben_ist_gilt(self):
-        """σ_p∞ folgt einem eingegebenen σ_p0 -- und ein eingegebenes σ_p∞ bleibt."""
-        self.assertEqual(vorspannung(1860.0, 1400.0, None), (1400.0, 0.85 * 1400.0))
-        self.assertEqual(vorspannung(1860.0, None, 1000.0), (0.70 * 1860.0, 1000.0))
+    def test_die_faktoren_gelten(self):
+        """σ_p∞ folgt σ_p0: 0.75 · 1860 = 1395, 0.80 · 1395 = 1116."""
+        p0, pinf = vorspannung(1860.0, 0.75, 0.80)
+        self.assertAlmostEqual(p0, 1395.0)
+        self.assertAlmostEqual(pinf, 1116.0)
+
+    def test_ein_faktor_ueber_eins_haelt_die_analyse_an(self):
+        """
+        Das Feld weist ihn schon ab (Katalog); bis 2026-11-27 durfte σ_p∞ nur
+        σ_p0 nicht übersteigen.
+        """
+        p = projekt()
+        p.querschnittsanalysen[0].spannglieder[0].anteil_pinf = 1.2
+        self.assertEqual(unfertig.grund(p, "a1"), "Spannglied 1: σ_p∞/σ_p0 muss grösser als null "
+                                                  "und höchstens 1 sein, angegeben ist 1.2")
+        felder = api.katalog()["felder"]["spannglied"]
+        self.assertEqual({k: (felder[k]["ueber"], felder[k]["bis"])
+                          for k in ("anteil_p0", "anteil_pinf")},
+                         {"anteil_p0": (0.0, 1.0), "anteil_pinf": (0.0, 1.0)})
 
     def test_grenze_nach_dem_spannen(self):
         """Gl. (22): min(0.75 · 1860; 0.85 · 1600) = min(1395; 1360)."""
@@ -121,8 +143,6 @@ class TestRegeln(unittest.TestCase):
         self.assertIn("= 1360 N/mm² (SIA 262:2025, 4.1.5.2.2, Gl. 22)", zu_hoch)
         zu_tief, = grenzen_verletzt(1302.0, 800.0, 1860.0, 1600.0)
         self.assertIn("unter 0.45·f_pk = 837 N/mm²", zu_tief)
-        gewachsen, = grenzen_verletzt(1302.0, 1350.0, 1860.0, 1600.0)
-        self.assertIn("über σ_p0 = 1302 N/mm²", gewachsen)
 
     def test_wo_die_vorgabe_ueber_gl_22_liegt(self):
         """
@@ -131,7 +151,8 @@ class TestRegeln(unittest.TestCase):
         (TODO); bei allen anderen Sorten hält sie.
         """
         ueber = [sorte for sorte, s in SPANNSTAHLSORTEN.items()
-                 if grenzen_verletzt(*vorspannung(s.f_pk, None, None), s.f_pk, s.f_p01k)]
+                 if grenzen_verletzt(*vorspannung(s.f_pk, ANTEIL_SPANNEN, ANTEIL_NACH_VERLUSTEN),
+                                     s.f_pk, s.f_p01k)]
         self.assertEqual(ueber, ["Y1100", "Y1030"])
 
     def test_gezeichnet_mit_seiner_flaeche(self):
@@ -187,14 +208,26 @@ class TestWerte(unittest.TestCase):
         self.assertAlmostEqual(w["eps_p"] * 1e3, 5.675, places=3)
         self.assertAlmostEqual(w["P_inf"] / 1e3, 664.02)
 
-    def test_eingegebene_spannungen(self):
+    def test_eingegebene_faktoren(self):
+        """0.725 · 1860 = 1348.5 und 0.80 · 1348.5 = 1078.8 N/mm²."""
         p = projekt()
         g = p.querschnittsanalysen[0].spannglieder[0]
-        g.sigma_p0, g.sigma_pinf = 1350.0, 1000.0
+        g.anteil_p0, g.anteil_pinf = 0.725, 0.80
         w = self.werte(p)
-        self.assertAlmostEqual(w["sigma_p0"] / 1e6, 1350.0)
-        self.assertAlmostEqual(w["P_inf"] / 1e3, 600.0)
-        self.assertAlmostEqual(w["eps_p"], 1000.0 / 195000.0)
+        self.assertAlmostEqual(w["sigma_p0"] / 1e6, 1348.5)
+        self.assertAlmostEqual(w["sigma_pinf"] / 1e6, 1078.8)
+        self.assertAlmostEqual(w["P_inf"] / 1e3, 600.0 * 1078.8 / 1e3)
+        self.assertAlmostEqual(w["eps_p"], 1078.8 / 195000.0)
+
+    def test_der_faktor_steht_mit_seinen_stellen_da(self):
+        """0.725 nicht als 0.73 -- und die Vorgabe sagt, dass sie eine ist."""
+        p = projekt()
+        p.querschnittsanalysen[0].spannglieder[0].anteil_p0 = 0.725
+        bloecke = {b.titel: b for b in p.rechnen().loesung.protokoll.alle_bloecke()
+                   if getattr(b, "titel", "").startswith("Spannglied 1: nach")}
+        self.assertIn(r"= 0.725 \cdot 1860", bloecke["Spannglied 1: nach dem Spannen"].latex)
+        vorgabe = bloecke["Spannglied 1: nach allen Verlusten, nach Vorgabe"]
+        self.assertEqual(vorgabe.referenz, "nach Vorgabe, nicht nachgeschlagen")
 
     def test_draehte_mit_ihrem_modul(self):
         """30 Drähte ⌀5.0 à 19.6 mm², mit E_p = 200 kN/mm² statt 195."""
@@ -204,6 +237,54 @@ class TestWerte(unittest.TestCase):
         w = self.werte(p)
         self.assertAlmostEqual(w["A_p"], 30 * 19.6e-6)
         self.assertAlmostEqual(w["eps_p"], 1106.7 / 200000.0)
+
+
+class TestFlaeche(unittest.TestCase):
+    """
+    Die Fläche eingegeben statt aus einem Erzeugnis: zwölf Litzen sind
+    1800 mm², als Drähte mit E_p = 200 kN/mm². Was nicht gewählt ist --
+    Durchmesser und Anzahl --, bleibt stehen und zählt nicht.
+    """
+
+    def glied(self, **felder):
+        p = projekt()
+        g = p.querschnittsanalysen[0].spannglieder[0]
+        for feld, wert in {"flaechenangabe": "flaeche", "flaeche": 1800.0, **felder}.items():
+            setattr(g, feld, wert)
+        return p
+
+    def werte(self, p):
+        e = p.rechnen()
+        return {k: e.wert(f"querschnittsanalyse.a1.P1.{k}").groesse.si
+                for k in ("A_p", "eps_p", "P_inf")}
+
+    def test_mit_dem_modul_der_art(self):
+        for art, modul in (("litze", 195000.0), ("draht", 200000.0)):
+            with self.subTest(art):
+                w = self.werte(self.glied(art=art))
+                self.assertAlmostEqual(w["A_p"], 1800e-6)
+                self.assertAlmostEqual(w["eps_p"], 1106.7 / modul)
+                self.assertAlmostEqual(w["P_inf"] / 1e3, 1.8 * 1106.7)
+
+    def test_die_herleitung_sagt_es(self):
+        bloecke = [b for b in self.glied().rechnen().loesung.protokoll.alle_bloecke()
+                   if getattr(b, "titel", "").startswith("Spannglied 1: Litzen")]
+        self.assertEqual([b.titel for b in bloecke],
+                         ["Spannglied 1: Litzen aus Y1860, die Fläche eingegeben"])
+        self.assertEqual(bloecke[0].referenz, "")
+
+    def test_eine_art_die_es_in_der_sorte_nicht_gibt_fehlt_noch(self):
+        """Y1860 gibt es nicht als Stab: grau, wie ein fehlender Durchmesser."""
+        p = self.glied(art="stab")
+        self.assertEqual(unfertig.grund(p, "a1"),
+                         "Spannglied 1: Y1860 gibt es nicht als Stab (Tabelle 7) – eine Art wählen")
+
+    def test_was_nicht_gewaehlt_ist_bleibt(self):
+        p = self.glied()
+        g = p.querschnittsanalysen[0].spannglieder[0]
+        self.assertEqual((g.durchmesser, g.anzahl), (15.7, 4))
+        g.flaechenangabe = "erzeugnis"
+        self.assertAlmostEqual(self.werte(p)["A_p"], A_P)
 
 
 class TestBiegewiderstand(unittest.TestCase):
@@ -436,9 +517,12 @@ class TestZeichnung(unittest.TestCase):
         a.spannglied(150.0, 100.0, stahl="sp1", durchmesser=15.7, anzahl=4, neigung=5.0)
         a.spannglied(100.0, 100.0, stahl="sp2", durchmesser=15.7)
         a.spannglied(200.0, 100.0, stahl="sp1", durchmesser=12.9, anzahl=2,
-                     sigma_p0=1450.0, sigma_pinf=800.0)
+                     anteil_p0=0.78, anteil_pinf=0.55)
         a.spannglied(250.0, 100.0, stahl="b1", durchmesser=15.7)
         a.spannglied(-20.0, 100.0, stahl="", durchmesser=15.7)
+        a.spannglied(150.0, 300.0, stahl="sp2", flaechenangabe="flaeche", flaeche=1018.0,
+                     art="stab", anteil_p0=0.65)
+        a.spannglied(150.0, 400.0, stahl="sp2", flaechenangabe="flaeche", art="litze")
         cls.d = dienst.bearbeite("geometrie", {"projekt": p.als_dict(), "kennung": "a1"}).daten
         cls.glieder = {g["kennung"]: g for g in cls.d["spannglieder"]}
 
@@ -448,7 +532,7 @@ class TestZeichnung(unittest.TestCase):
     def test_werte_des_beispiels(self):
         g = self.glieder["P1"]
         self.assertEqual(self.meldungen("P1"), [])
-        self.assertEqual(g["werte"]["erzeugnis"], "Y1860S7-15.7")
+        self.assertEqual(g["werte"]["bezeichnung"], "Y1860S7-15.7")
         self.assertAlmostEqual(g["werte"]["P_inf"], 664.02)
         self.assertAlmostEqual(g["werte"]["eps_p"], 1106.7 / 195.0)
         self.assertAlmostEqual(g["durchmesser"], flaechendurchmesser(600.0))
@@ -466,11 +550,30 @@ class TestZeichnung(unittest.TestCase):
         self.assertFalse(self.d["gueltig"])
 
     def test_verletzte_grenzen_sind_rot_und_es_rechnet(self):
+        """0.78 · 1860 = 1450.8 über 1360, 0.55 · 1450.8 = 797.9 unter 837 N/mm²."""
         meldungen = self.meldungen("P3")
         self.assertEqual([f for f, _ in meldungen], [True, True])
         self.assertIn("Gl. 22", meldungen[0][1])
         self.assertIn("0.45·f_pk", meldungen[1][1])
-        self.assertAlmostEqual(self.glieder["P3"]["werte"]["P_inf"], 160.0)
+        self.assertAlmostEqual(self.glieder["P3"]["werte"]["P_inf"], 200.0 * 0.55 * 0.78 * 1.860)
+
+    def test_mit_eingegebener_flaeche(self):
+        """
+        Ein Stab aus Y1030 mit 1018 mm², gespannt auf 0.65 · 1030 = 669.5 N/mm²
+        -- unter Gl. (22), anders als die Vorgabe: E_p der Stäbe, gezeichnet
+        mit seiner Fläche.
+        """
+        g = self.glieder["P6"]
+        self.assertEqual(self.meldungen("P6"), [])
+        self.assertEqual(g["werte"]["bezeichnung"], "Stäbe")
+        self.assertAlmostEqual(g["werte"]["A_p"], 1018.0)
+        self.assertAlmostEqual(g["werte"]["eps_p"], 0.65 * 0.85 * 1030.0 / 200.0)
+        self.assertAlmostEqual(g["durchmesser"], flaechendurchmesser(1018.0))
+
+    def test_eine_fehlende_art_ist_grau(self):
+        self.assertEqual(self.meldungen("P7"), [
+            (False, "Spannglied 7: Y1030 gibt es nicht als Litze (Tabelle 7) – eine Art wählen.")])
+        self.assertIsNone(self.glieder["P7"]["werte"])
 
     def test_falsches_material_rot_fehlendes_grau(self):
         self.assertEqual(self.meldungen("P4"), [(True, "Spannglied 4: «C30/37» ist kein Spannstahl.")])
@@ -488,8 +591,15 @@ class TestEintrag(unittest.TestCase):
 
     def test_rundreise(self):
         a = projekt().querschnittsanalysen[0]
-        a.spannglieder[0].sigma_p0 = 1350.0
+        g = a.spannglieder[0]
+        g.flaechenangabe, g.flaeche, g.art, g.anteil_p0 = "flaeche", 1800.0, "draht", 0.72
         self.assertEqual(QuerschnittsanalyseEintrag.aus_dict(a.als_dict()), a)
+
+    def test_die_eingegebene_flaeche_beginnt_mit_dem_erzeugnis(self):
+        """Eine Litze ⌀15.7, 150 mm²: wer umschaltet, sieht dasselbe Glied."""
+        neu = SpanngliedEintrag()
+        self.assertEqual((neu.flaechenangabe, neu.durchmesser, neu.anzahl, neu.flaeche, neu.art),
+                         ("erzeugnis", 15.7, 1, 150.0, "litze"))
 
     def test_kennungen_mit_p(self):
         a = projekt().querschnittsanalysen[0]
@@ -504,8 +614,65 @@ class TestEintrag(unittest.TestCase):
         self.assertEqual(set(sp["neigung"]), {"titel", "hinweis", "ohne"})
         self.assertEqual([(v["wert"], v["kurz"]) for v in sp["verbunde"]],
                          [("mit", "mit"), ("ohne", "ohne")])
-        self.assertEqual(sp["vorgaben"], {"sigma_p0": f"{ANTEIL_SPANNEN:.2f}·f_pk",
-                                          "sigma_pinf": f"{ANTEIL_NACH_VERLUSTEN:.2f}·σ_p0"})
+        self.assertEqual([(a["wert"], a["beschriftung"]) for a in sp["angaben"]],
+                         [("erzeugnis", "Erzeugnis"), ("flaeche", "Fläche A_p")])
+        self.assertEqual([(a["wert"], a["beschriftung"]) for a in sp["arten"]],
+                         [("draht", "Draht"), ("litze", "Litze"), ("stab", "Stab")])
+        self.assertIn("E_p = 195000 N/mm² (SIA 262:2025, 3.3.2.4.2)", sp["arten"][1]["titel"])
+        self.assertEqual([(f["vor"], f["feld"], f["nach"], f["spannung"]) for f in sp["faktoren"]],
+                         [("σ_p0 =", "anteil_p0", "· f_pk", "sigma_p0"),
+                          ("σ_p∞ =", "anteil_pinf", "· σ_p0", "sigma_pinf")])
+
+
+
+class TestVonFrueher(unittest.TestCase):
+    """
+    Eine Datei von vor 2026-11-27, mit den Spannungen σ_p0 und σ_p∞ in N/mm²
+    statt der Faktoren, öffnet sich und rechnet wie zuvor
+    (opencivil.projekt.frueher).
+    """
+
+    def alt(self, sigma_p0, sigma_pinf, **spannstahl) -> Projekt:
+        roh = copy.deepcopy(projekt().als_dict())
+        next(m for m in roh["materialien"] if m["kennung"] == "sp1").update(spannstahl)
+        g = roh["querschnittsanalysen"][0]["spannglieder"][0]
+        del g["anteil_p0"], g["anteil_pinf"]
+        g["sigma_p0"], g["sigma_pinf"] = sigma_p0, sigma_pinf
+        return Projekt.aus_dict(roh)
+
+    def spannungen(self, p: Projekt):
+        e = p.rechnen()
+        return tuple(e.wert(f"querschnittsanalyse.a1.P1.{k}").groesse.si / 1e6
+                     for k in ("sigma_p0", "sigma_pinf"))
+
+    def test_leer_wird_die_vorgabe(self):
+        g = self.alt(None, None).querschnittsanalysen[0].spannglieder[0]
+        self.assertEqual((g.anteil_p0, g.anteil_pinf), (ANTEIL_SPANNEN, ANTEIL_NACH_VERLUSTEN))
+
+    def test_eine_zahl_wird_ihr_faktor(self):
+        """1350 und 1100 N/mm² bei f_pk = 1860: k_p0 = 0.7258…, dieselben Spannungen."""
+        p = self.alt(1350.0, 1100.0)
+        self.assertAlmostEqual(p.querschnittsanalysen[0].spannglieder[0].anteil_p0, 1350.0 / 1860.0)
+        for ist, soll in zip(self.spannungen(p), (1350.0, 1100.0)):
+            self.assertAlmostEqual(ist, soll)
+
+    def test_sigma_pinf_allein_misst_sich_an_der_vorgabe(self):
+        """Leer war σ_p0 = 0.70 · 1860 = 1302: σ_p∞ = 1000 gibt k_p∞ = 1000/1302."""
+        for ist, soll in zip(self.spannungen(self.alt(None, 1000.0)), (1302.0, 1000.0)):
+            self.assertAlmostEqual(ist, soll)
+
+    def test_mit_der_zugfestigkeit_eines_eigenen_spannstahls(self):
+        p = self.alt(1350.0, None, eigenstaendig=True, name="SP1", abweichungen={"f_pk": 1770.0})
+        for ist, soll in zip(self.spannungen(p), (1350.0, 0.85 * 1350.0)):
+            self.assertAlmostEqual(ist, soll)
+
+    def test_was_keine_zahl_ist_meldet_sich(self):
+        with self.assertRaisesRegex(ProjektFehler, "ein Feld 'sigma_p0' gibt es nicht"):
+            self.alt("hoch", None)
+
+    def test_eine_neue_datei_bleibt_wie_sie_ist(self):
+        p = projekt()
+        self.assertEqual(Projekt.aus_dict(p.als_dict()).als_dict(), p.als_dict())
 
 
 if __name__ == "__main__":

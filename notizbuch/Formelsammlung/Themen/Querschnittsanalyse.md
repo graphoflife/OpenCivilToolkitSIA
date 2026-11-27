@@ -1,5 +1,5 @@
 ---
-erzeugt: d0c12db78a46
+erzeugt: 143c08694586
 art: thema
 tags: [thema]
 ---
@@ -24,7 +24,7 @@ Für ein beliebiges Polygon gibt es keine Formel für I\_T. Gerechnet wird mit d
 4. [[Bügelquerschnitt je Länge einer Schubwand (n Schnitte)]]
 5. [[Verschmierte Stahlfläche aus Stäben]]
 6. [[Spannkraft eines Spannglieds]]
-7. [[Spannung im Spannglied nach Vorgabe]]
+7. [[Spannung im Spannglied]]
 8. [[Grenzen der Spannung im Spannstahl]]
 9. [[Querschnitt eines Spannglieds]]
 10. [[Vordehnung eines Spannglieds]]

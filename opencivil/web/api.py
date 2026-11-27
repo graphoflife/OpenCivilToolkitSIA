@@ -39,7 +39,7 @@ from opencivil.material.arten import MATERIALARTEN
 from opencivil.material.beton import BETONSORTEN
 from opencivil.material.holz import REFERENZ_ETA_T, STOSSARTIG, TABELLE_4, Feuchteklasse, eta_t
 from opencivil.material.betonstahl import STAHLSORTEN
-from opencivil.material.spannstahl import Erzeugnis
+from opencivil.material.spannstahl import Erzeugnis, Erzeugnisart
 from opencivil.nachweis.biegung_normalkraft import Erfuellungsart
 from opencivil.nachweis.qa_blechverbund import EINE_RICHTUNG
 from opencivil.nachweis.rissanforderung import Rissanforderung
@@ -58,7 +58,7 @@ from opencivil.querschnitt.bauweise import BEWEHRT
 from opencivil.querschnitt import profilblech
 from opencivil.querschnitt.platte import BREITE_Y_MM
 from opencivil.querschnitt.spannglieder import (
-    NEIGUNG_ERKLAERT, VORGABE_SPANNUNG, Spannwirkung, Verbund,
+    FAKTOREN, NEIGUNG_ERKLAERT, Flaechenangabe, Spannwirkung, Verbund,
 )
 from opencivil.querschnitt.zugseite import UM_Y, Zugseite
 from opencivil.querschnitt.geometrie import VERSCHMIERT, Linienart
@@ -413,17 +413,23 @@ def katalog() -> dict:
             "randabstand": RANDABSTAND.als_dict(),
             # Worin Bewehrung liegt: eine Vorlage aus anderem kommt ohne.
             "bewehrt": BEWEHRT.value,
-            # Die Schalter eines Spannglieds, was seine leeren Spannungen
-            # heissen und was seine Neigung -- die Regeln stehen in
+            # Die Schalter eines Spannglieds, wie seine Faktoren stehen und
+            # was seine Neigung heisst -- die Regeln stehen in
             # opencivil.querschnitt.spannglieder. Je Wirkung, ob die Neigung
-            # zaehlt: sonst steht an ihrem Feld, warum nicht.
+            # zaehlt: sonst steht an ihrem Feld, warum nicht. Die Arten fuer
+            # die eingegebene Flaeche: welche eine Sorte hat, sagen ihre
+            # Erzeugnisse (materialarten).
             "spannglied": {
+                "angaben": [{"wert": a.value, "beschriftung": a.beschriftung,
+                             "titel": a.erklaerung} for a in Flaechenangabe],
+                "arten": [{"wert": a.value, "beschriftung": a.beschriftung,
+                           "mehrzahl": a.mehrzahl, "titel": a.erklaerung} for a in Erzeugnisart],
                 "wirkungen": [{"wert": w.value, "beschriftung": w.beschriftung, "kurz": w.kurz,
                                "titel": w.erklaerung, "neigung": w.mit_neigung}
                               for w in Spannwirkung],
                 "verbunde": [{"wert": v.value, "beschriftung": v.beschriftung, "kurz": v.kurz,
                               "titel": v.erklaerung} for v in Verbund],
-                "vorgaben": dict(VORGABE_SPANNUNG),
+                "faktoren": [dict(f) for f in FAKTOREN],
                 "neigung": dict(NEIGUNG_ERKLAERT),
             },
         },

@@ -3,12 +3,21 @@ opencivil/querschnitt/spannglieder.py -- Spannglieder im gezeichneten Querschnit
 
 VERANTWORTUNG:
 Ein Spannglied der Querschnittsanalyse (:class:`Spannglied`): wo es liegt,
-aus welchem Erzeugnis und wie vielen davon, wie es wirkt -- und was daraus
-folgt: die Spannung nach dem Spannen und nach allen Verlusten, die
-Vordehnung, die Kraft, sein Gesetz im Querschnitt und seine Grenzdehnung.
-Jede Regel dazu steht hier, einmal: die Herleitung (:class:`Spannglieder`)
-und das Zeichenfenster (:mod:`opencivil.web.zeichengeometrie`) fragen beide
-hier (:func:`vorspannung`, :func:`grenzen_verletzt`).
+aus welchem Erzeugnis und wie vielen davon oder mit welcher Flaeche, wie es
+wirkt -- und was daraus folgt: die Spannung nach dem Spannen und nach allen
+Verlusten, die Vordehnung, die Kraft, sein Gesetz im Querschnitt und seine
+Grenzdehnung. Jede Regel dazu steht hier, einmal: die Herleitung
+(:class:`Spannglieder`), der Aufbau und das Zeichenfenster
+(:mod:`opencivil.web.zeichengeometrie`) fragen alle hier (:func:`was_fehlt`,
+:func:`aus_glied`, :func:`vorspannung`, :func:`grenzen_verletzt`).
+
+DIE FLAECHE (:class:`Flaechenangabe`):
+Aus einem Erzeugnis -- ein Draht, eine Litze oder ein Stab, den Tabelle 7
+fuer die Sorte nennt, mit seiner Flaeche aus der Tabelle, und wie viele
+davon --, oder eingegeben, etwa fuer ein Glied aus zwoelf Litzen oder ein
+Erzeugnis, das die Tabelle nicht fuehrt. Dann zaehlt nur noch die Art: von
+ihr haengt E_p ab, 195 000 N/mm² fuer Litzen, 200 000 fuer Draehte und
+Staebe (3.3.2.4). Die Art muss es in der Sorte geben, wie das Erzeugnis.
 
 DIE VORSPANNUNG ALS WIDERSTAND:
 Die Zugkraft im Spannstahl zaehlt zum Widerstand (SIA 262:2025, 4.1.5.5.1):
@@ -28,12 +37,16 @@ Vordehnung, um ``sigma_pinf`` gesenkt. Es beginnt bei null und endet bei
 ``f_pd - sigma_pinf``; gedrueckt verliert es bis ``sigma_pinf``. Ohne
 Verbund bleibt davon nichts.
 
-DIE VORGABEN:
-Leer gelassen, gilt ``sigma_p0 = 0.70 f_pk`` und ``sigma_pinf = 0.85
-sigma_p0`` -- nach Vorgabe, nicht nachgeschlagen (Benutzer, 2026-11-25).
-Die Verluste haengen am Bauwerk (4.1.5.3); die Vorgabe ersetzt ihre
-Rechnung nicht. Die Vordehnung ist ``sigma_pinf/E_p`` mit dem Modul des
-Erzeugnisses: die Stauchung des Betons beim Vorspannen faellt weg -- nach
+DIE SPANNUNGEN:
+Eingegeben sind zwei Faktoren, je hoechstens 1: ``sigma_p0 = k_p0 f_pk``
+und ``sigma_pinf = k_pinf sigma_p0``. Vorgabe ``k_p0 = 0.70`` und ``k_pinf
+= 0.85`` -- nach Vorgabe, nicht nachgeschlagen (Benutzer, 2026-11-25). Die
+Verluste haengen am Bauwerk (4.1.5.3); die Vorgabe ersetzt ihre Rechnung
+nicht. Bis 2026-11-27 waren die Spannungen selbst die Felder, leer die
+Vorgabe: so blieb die Zahl nach einem Wechsel der Sorte stehen, und
+``sigma_pinf`` durfte ``sigma_p0`` nicht uebersteigen -- mit einem Faktor
+bis 1 kann es das nicht. Die Vordehnung ist ``sigma_pinf/E_p`` mit dem
+Modul der Art: die Stauchung des Betons beim Vorspannen faellt weg -- nach
 Vorgabe, nicht nachgeschlagen.
 
 DIE NEIGUNG:
@@ -59,8 +72,8 @@ Gleichung (22)), nach allen Verlusten ``sigma_pinf >= 0.45 f_pk``
 in der Herleitung; gerechnet wird mit seinen Zahlen.
 
 EINHEITEN:
-Lage und Durchmesser in mm, Flaechen in mm², die eingegebenen Spannungen in
-N/mm² -- wie in der Zeichnung. Die Gesetze rechnen in SI.
+Lage und Durchmesser in mm, Flaechen in mm², die Spannungen in N/mm² --
+wie in der Zeichnung. Die Gesetze rechnen in SI.
 """
 
 from __future__ import annotations
@@ -75,7 +88,10 @@ from opencivil.core.latex import Mathe, Zelle, angabe, fest, vergleich
 from opencivil.core.protokoll import Abschnitt, Protokoll, Zwischenwerte
 from opencivil.core.wahl import Wahl
 from opencivil.core.wert import Wert, WertDef
-from opencivil.material.spannstahl import TABELLE_7, Erzeugnis
+from opencivil.material.basis import Baustoff
+from opencivil.material.spannstahl import (
+    TABELLE_7, Erzeugnis, Erzeugnisart, erzeugnis, erzeugnisarten,
+)
 from opencivil.querschnitt.bewehrungselemente import (
     MM, Bewehrungselement, Flaechen, Verdraengt, quadrate,
 )
@@ -95,20 +111,26 @@ REFERENZ_GUENSTIG = "SIA 262:2025, 4.3.3.4.8, (50)"
 REFERENZ_UNGUENSTIG = "SIA 262:2025, 4.3.3.4.9"
 NACH_VORGABE = "nach Vorgabe, nicht nachgeschlagen"
 
-#: ``sigma_p0 = 0.70 f_pk``, wo nichts eingegeben ist -- nach Vorgabe, nicht
-#: nachgeschlagen (Benutzer, 2026-11-25).
+#: ``k_p0``, womit ein neues Glied beginnt: ``sigma_p0 = 0.70 f_pk`` -- nach
+#: Vorgabe, nicht nachgeschlagen (Benutzer, 2026-11-25).
 ANTEIL_SPANNEN = 0.70
 
-#: ``sigma_pinf = 0.85 sigma_p0``, wo nichts eingegeben ist -- nach Vorgabe,
-#: nicht nachgeschlagen (Benutzer, 2026-11-25).
+#: ``k_pinf``, womit ein neues Glied beginnt: ``sigma_pinf = 0.85 sigma_p0``
+#: -- nach Vorgabe, nicht nachgeschlagen (Benutzer, 2026-11-25).
 ANTEIL_NACH_VERLUSTEN = 0.85
 
-#: Was ein leeres Feld der Spannung heisst -- fuer den Platzhalter im
-#: Zeichenfenster, solange noch kein Glied die Zahl kennt.
-VORGABE_SPANNUNG = {
-    "sigma_p0": f"{ANTEIL_SPANNEN:.2f}·f_pk",
-    "sigma_pinf": f"{ANTEIL_NACH_VERLUSTEN:.2f}·σ_p0",
-}
+#: Wie die Faktoren im Zeichenfenster stehen -- «σ_p0 = [0.70] · f_pk =
+#: 1302 N/mm²»: vor und nach dem Feld, und welche Spannung des Glieds die
+#: Zeile dahinter nennt, sobald der Kern sie kennt.
+FAKTOREN = (
+    {"feld": "anteil_p0", "vor": "σ_p0 =", "nach": "· f_pk", "spannung": "sigma_p0",
+     "titel": f"Die Spannung nach dem Spannen als Anteil von f_pk, höchstens 1 – Vorgabe "
+              f"{ANTEIL_SPANNEN:.2f}, nach Vorgabe, nicht nachgeschlagen"},
+    {"feld": "anteil_pinf", "vor": "σ_p∞ =", "nach": "· σ_p0", "spannung": "sigma_pinf",
+     "titel": f"Die Spannung nach allen Verlusten als Anteil von σ_p0, höchstens 1 – Vorgabe "
+              f"{ANTEIL_NACH_VERLUSTEN:.2f}, nach Vorgabe, nicht nachgeschlagen; die Verluste "
+              f"hängen am Bauwerk (SIA 262:2025, 4.1.5.3)"},
+)
 
 #: Gleichung (22): ``sigma_p0 <= min(0.75 f_pk; 0.85 f_p0.1k)``.
 GRENZE_F_PK = 0.75
@@ -143,11 +165,11 @@ DEHNUNG_AM_GLIED = (
     "der Stahl um seine Vordehnung ε_p mehr gedehnt, ohne Verbund hängt seine Spannung "
     "nicht an ε.")
 
-#: Die Seiten im Notizbuch, je Groesse eine: Querschnitt, Spannungen nach
-#: Vorgabe, Vordehnung und Kraft eines Glieds, die Grenzen seiner Spannung,
-#: sein Gesetz im Querschnitt -- dieses eine fuer alle drei Arten.
+#: Die Seiten im Notizbuch, je Groesse eine: Querschnitt, Spannungen,
+#: Vordehnung und Kraft eines Glieds, die Grenzen seiner Spannung, sein
+#: Gesetz im Querschnitt -- dieses eine fuer alle drei Arten.
 FLAECHE = "Querschnitt eines Spannglieds"
-NACH_VORGABE_GESPANNT = "Spannung im Spannglied nach Vorgabe"
+GESPANNT = "Spannung im Spannglied"
 VORDEHNUNG = "Vordehnung eines Spannglieds"
 SPANNKRAFT = "Spannkraft eines Spannglieds"
 GRENZEN = "Grenzen der Spannung im Spannstahl"
@@ -214,20 +236,40 @@ class Verbund(Wahl):
         }[self]
 
 
+class Flaechenangabe(Wahl):
+    """Woher die Flaeche eines Glieds kommt -- siehe Dateikopf."""
+
+    ERZEUGNIS = "erzeugnis"
+    FLAECHE = "flaeche"
+
+    @property
+    def beschriftung(self) -> str:
+        return {Flaechenangabe.ERZEUGNIS: "Erzeugnis", Flaechenangabe.FLAECHE: "Fläche A_p"}[self]
+
+    @property
+    def erklaerung(self) -> str:
+        return {
+            Flaechenangabe.ERZEUGNIS:
+                "Drähte, Litzen oder Stäbe, die Tabelle 7 für die Sorte nennt, je mit ihrer "
+                f"Fläche aus der Tabelle, und wie viele davon ({TABELLE_7}).",
+            Flaechenangabe.FLAECHE:
+                "Die Fläche A_p eingegeben, dazu nur die Art: von ihr hängt E_p ab "
+                "(SIA 262:2025, 3.3.2.4).",
+        }[self]
+
+
 # ===========================================================================
 # Die Regeln
 # ===========================================================================
 
 
-def vorspannung(f_pk: float, sigma_p0: Optional[float],
-                sigma_pinf: Optional[float]) -> Tuple[float, float]:
+def vorspannung(f_pk: float, anteil_p0: float, anteil_pinf: float) -> Tuple[float, float]:
     """
-    ``sigma_p0`` und ``sigma_pinf``: eingegeben oder nach Vorgabe
-    (:data:`ANTEIL_SPANNEN`, :data:`ANTEIL_NACH_VERLUSTEN`) -- in der
-    Einheit von ``f_pk``, wie die Eingaben.
+    ``sigma_p0 = k_p0 f_pk`` und ``sigma_pinf = k_pinf sigma_p0`` -- in der
+    Einheit von ``f_pk``.
     """
-    p0 = ANTEIL_SPANNEN * f_pk if sigma_p0 is None else sigma_p0
-    return p0, (ANTEIL_NACH_VERLUSTEN * p0 if sigma_pinf is None else sigma_pinf)
+    p0 = anteil_p0 * f_pk
+    return p0, anteil_pinf * p0
 
 
 def grenze_nach_spannen(f_pk: float, f_p01k: float) -> float:
@@ -245,13 +287,37 @@ def grenzen_verletzt(p0: float, pinf: float, f_pk: float, f_p01k: float) -> List
     if p0 > grenze * (1.0 + 1e-9):
         saetze.append(f"σ_p0 = {p0:.0f} N/mm² liegt über min(0.75·f_pk; 0.85·f_p0.1k) "
                       f"= {grenze:.0f} N/mm² (SIA 262:2025, 4.1.5.2.2, Gl. 22)")
-    if pinf > p0 * (1.0 + 1e-9):
-        saetze.append(f"σ_p∞ = {pinf:.0f} N/mm² liegt über σ_p0 = {p0:.0f} N/mm² – "
-                      f"die Verluste mindern die Spannung")
     if pinf < MINDESTENS_F_PK * f_pk * (1.0 - 1e-9):
         saetze.append(f"σ_p∞ = {pinf:.0f} N/mm² liegt unter 0.45·f_pk = "
                       f"{MINDESTENS_F_PK * f_pk:.0f} N/mm² (SIA 262:2025, 4.1.5.2.3)")
     return saetze
+
+
+def was_fehlt(g: Mapping) -> str:
+    """
+    Warum ein Glied der Beschreibung noch nicht rechnet, als Satzteil -- leer,
+    wenn es rechnet. ``g["stahl"]`` ist sein Spannstahl als Baustoff. Es fehlt
+    nur eine Wahl: ein Erzeugnis, das Tabelle 7 fuer die Sorte nennt, oder,
+    wo die Flaeche eingegeben ist, eine Art, die es in ihr gibt -- etwa nach
+    dem Wechsel zu Y1030, das es nur in Staeben gibt.
+    """
+    stahl: Baustoff = g["stahl"]
+    nennt = (f"{stahl.name} (Sorte {stahl.sorte})" if stahl.sorte and stahl.sorte != stahl.name
+             else stahl.name)
+    if Flaechenangabe(g["flaechenangabe"]) is Flaechenangabe.FLAECHE:
+        art = Erzeugnisart(g["art"])
+        if art in erzeugnisarten(stahl.sorte):
+            return ""
+        return f"{nennt} gibt es nicht als {art.beschriftung} (Tabelle 7) – eine Art wählen"
+    if erzeugnis(stahl.sorte, g["durchmesser"]) is not None:
+        return ""
+    return (f"{nennt} gibt es nicht mit ⌀{g['durchmesser']:g} mm (Tabelle 7) – "
+            f"einen Durchmesser wählen")
+
+
+def _stellen(zahl: float) -> int:
+    """Mit so vielen Stellen steht ein Faktor in der Herleitung: zwei, mehr nur wo er sie hat."""
+    return next((s for s in (2, 3) if abs(round(zahl, s) - zahl) < 1e-12), 4)
 
 
 def geneigt(g: "Spannglied") -> bool:
@@ -415,16 +481,27 @@ class FesteSpannung(Gesetz):
 class Spannglied(Bewehrungselement):
     """
     Ein Spannglied der Zeichnung -- ``von`` und ``bis`` sind seine Lage,
-    ``flaeche`` ist ``anzahl`` mal die des Erzeugnisses (Tabelle 7). Die
-    Spannungen stehen, wie eingegeben, in N/mm²; ``None`` heisst Vorgabe.
+    ``flaeche`` ist ``anzahl`` mal die des Erzeugnisses (Tabelle 7) oder
+    eingegeben. Die Spannungen stehen als Faktoren da, siehe Dateikopf.
     """
 
-    erzeugnis: Erzeugnis
+    art: Erzeugnisart
+    """Draht, Litze oder Stab: daran haengt E_p (3.3.2.4)."""
+
+    erzeugnis: Optional[Erzeugnis]
+    """Die Zeile von Tabelle 7 -- ``None``, wo die Flaeche eingegeben ist."""
+
     anzahl: int
+    """Wie viele Stuecke des Erzeugnisses; wo die Flaeche eingegeben ist, zaehlt sie nicht."""
+
     wirkung: Spannwirkung
     verbund: Verbund
-    sigma_p0: Optional[float]
-    sigma_pinf: Optional[float]
+    anteil_p0: float
+    """``k_p0``: ``sigma_p0 = k_p0 f_pk``."""
+
+    anteil_pinf: float
+    """``k_pinf``: ``sigma_pinf = k_pinf sigma_p0``."""
+
     neigung: float
     """``beta_p`` in Grad, siehe Dateikopf."""
 
@@ -439,8 +516,24 @@ class Spannglied(Bewehrungselement):
         return Mathe(f"({self.von[0]:g};\\ {self.von[1]:g})")
 
     @property
+    def stuecke(self) -> str:
+        """Woraus es besteht: «4 × Litze ⌀15.7» -- mit eingegebener Flaeche die Art, «Litzen»."""
+        if self.erzeugnis is None:
+            return self.art.mehrzahl
+        return f"{self.anzahl} × {self.art.beschriftung} ⌀{self.erzeugnis.durchmesser:g}"
+
+    @property
+    def bezeichnung(self) -> str:
+        """Wie Tabelle 7 es nennt, «Y1860S7-15.7» -- mit eingegebener Flaeche die Art, «Litzen»."""
+        if self.erzeugnis is None:
+            return self.art.mehrzahl
+        return self.erzeugnis.bezeichnung(self.stahl.sorte)
+
+    @property
     def menge(self) -> Zelle:
-        return Mathe(rf"{self.anzahl} \times \text{{{self.erzeugnis.art.beschriftung}}}"
+        if self.erzeugnis is None:
+            return Mathe(rf"\text{{{self.art.mehrzahl}}}")
+        return Mathe(rf"{self.anzahl} \times \text{{{self.art.beschriftung}}}"
                      rf"\ \varnothing {self.erzeugnis.durchmesser:g}")
 
     @property
@@ -450,7 +543,7 @@ class Spannglied(Bewehrungselement):
     @property
     def rissdurchmesser(self) -> float:
         """Nur der Form halber: die Rissbreite pruefen die Staebe aus Betonstahl."""
-        return self.erzeugnis.durchmesser
+        return self.durchmesser if self.erzeugnis is None else self.erzeugnis.durchmesser
 
     @property
     def durchmesser(self) -> float:
@@ -468,17 +561,25 @@ class Spannglied(Bewehrungselement):
         return quadrate(self.punkte, self.durchmesser)
 
 
-def aus_glied(g: Mapping, erzeugnis: Erzeugnis) -> Spannglied:
+def aus_glied(g: Mapping) -> Spannglied:
     """
     Ein Spannglied der Beschreibung (:meth:`QuerschnittsanalyseEintrag.elemente`),
-    mit seinem Spannstahl als Baustoff unter ``stahl`` und seinem Erzeugnis.
+    mit seinem Spannstahl als Baustoff unter ``stahl`` -- eines, dem nichts
+    fehlt (:func:`was_fehlt`): sein Erzeugnis kommt aus Tabelle 7.
     """
     lage = tuple(g["lage"])
+    if Flaechenangabe(g["flaechenangabe"]) is Flaechenangabe.FLAECHE:
+        gewaehlt, art, flaeche = None, Erzeugnisart(g["art"]), float(g["flaeche"])
+    else:
+        gewaehlt = erzeugnis(g["stahl"].sorte, g["durchmesser"])
+        if gewaehlt is None:
+            raise ValueError(f"{g['name']}: {was_fehlt(g)}.")
+        art, flaeche = gewaehlt.art, g["anzahl"] * gewaehlt.flaeche
     return Spannglied(
         name=g["name"], kennung=g["kennung"], stahl=g["stahl"], von=lage, bis=lage,
-        flaeche=g["anzahl"] * erzeugnis.flaeche, erzeugnis=erzeugnis, anzahl=int(g["anzahl"]),
+        flaeche=flaeche, art=art, erzeugnis=gewaehlt, anzahl=int(g["anzahl"]),
         wirkung=Spannwirkung(g["wirkung"]), verbund=Verbund(g["verbund"]),
-        sigma_p0=g["sigma_p0"], sigma_pinf=g["sigma_pinf"], neigung=g["neigung"])
+        anteil_p0=g["anteil_p0"], anteil_pinf=g["anteil_pinf"], neigung=g["neigung"])
 
 
 # ===========================================================================
@@ -509,7 +610,7 @@ class Spannglieder(Prozedur):
                                referenz=referenz, stellen=stellen)
             self.d[g.kennung] = {
                 "A_p": d("A_p", f"A_{{p{index}}}", MM2, "Querschnitt des Spannstahls",
-                         referenz=TABELLE_7),
+                         referenz=TABELLE_7 if g.erzeugnis is not None else ""),
                 "sigma_p0": d("sigma_p0", f"\\sigma_{{p0{index}}}", N_PRO_MM2,
                               "Spannung nach dem Spannen"),
                 "sigma_pinf": d("sigma_pinf", f"\\sigma_{{p\\infty{index}}}", N_PRO_MM2,
@@ -567,7 +668,7 @@ class Spannglieder(Prozedur):
                                         -math.inf, math.inf, grenzname=g.name))
                 continue
             w = lambda k, s=g.stahl: abs(wert(s.id_von(k)))
-            stahl = Spannstahlgesetz(E_p=w(g.erzeugnis.modul),
+            stahl = Spannstahlgesetz(E_p=w(g.art.modul),
                                      f_pd=w(wahl.satz(g.stahl).spannstahl), eps_ud=w("eps_ud"))
             eps_p = wert(self.d[g.kennung]["eps_p"].id)
             gesetz = (VorgedehnterSpannstahl(stahl=stahl, eps_p=eps_p) if vordehnung
@@ -585,7 +686,7 @@ class Spannglieder(Prozedur):
         """
         for g, w in zip(self.glieder, werkstoffe):
             stoff = g.stahl
-            kurz = {"f_p": wahl.satz(stoff).spannstahl, "E_p": g.erzeugnis.modul,
+            kurz = {"f_p": wahl.satz(stoff).spannstahl, "E_p": g.art.modul,
                     "eps_ud": "eps_ud"}
             werte = {rolle: e[stoff.eingabename(k)] for rolle, k in kurz.items()}
             werte.update({rolle: e[f"{rolle}__{g.kennung}"] for rolle in ("eps_p", "sigma_pinf")})
@@ -605,18 +706,19 @@ class Spannglieder(Prozedur):
             "nur, was über σ_p∞ hinausgeht.")
         p.ansatz(r"A_p = n \cdot a_p \qquad \varepsilon_p = \frac{\sigma_{p\infty}}{E_p}"
                  r" \qquad P_\infty = A_p \cdot \sigma_{p\infty}",
-                 titel="Querschnitt, Vordehnung und Spannkraft eines Glieds aus n Drähten, "
-                       "Litzen oder Stäben",
+                 titel="Querschnitt, Vordehnung und Spannkraft eines Glieds – A_p aus n Drähten, "
+                       "Litzen oder Stäben oder eingegeben",
                  referenz=f"{TABELLE_7}; {REFERENZ_VORDEHNUNG}", name=SPANNKRAFT)
-        vorgabe = [g for g in self.glieder if g.sigma_p0 is None or g.sigma_pinf is None]
+        p.ansatz(r"\sigma_{p0} = k_{p0} \cdot f_{pk} \qquad "
+                 r"\sigma_{p\infty} = k_{p\infty} \cdot \sigma_{p0}",
+                 titel="Spannungen nach dem Spannen und nach allen Verlusten, aus den Faktoren "
+                       "des Glieds", name=GESPANNT)
+        vorgabe = [g.name for g in self.glieder if g.anteil_pinf == ANTEIL_NACH_VERLUSTEN]
         if vorgabe:
-            p.ansatz(rf"\sigma_{{p0}} = {ANTEIL_SPANNEN:.2f} \cdot f_{{pk}} \qquad "
-                     rf"\sigma_{{p\infty}} = {ANTEIL_NACH_VERLUSTEN:.2f} \cdot \sigma_{{p0}}",
-                     titel="Spannungen nach Vorgabe, wo keine eingegeben ist",
-                     referenz=NACH_VORGABE, name=NACH_VORGABE_GESPANNT)
-            p.annahme(f"{', '.join(g.name for g in vorgabe)}: Spannung nach Vorgabe – die "
-                      f"Verluste hängen am Bauwerk ({REFERENZ_VERLUSTE}), die Vorgabe "
-                      "ersetzt ihre Rechnung nicht.")
+            p.annahme(f"{', '.join(vorgabe)}: k_p∞ = {ANTEIL_NACH_VERLUSTEN:.2f} nach Vorgabe, "
+                      f"{(1.0 - ANTEIL_NACH_VERLUSTEN) * 100:.0f} % Verlust – die Verluste "
+                      f"hängen am Bauwerk ({REFERENZ_VERLUSTE}), die Vorgabe ersetzt ihre "
+                      "Rechnung nicht.")
         p.annahme("Die Vordehnung ist σ_p∞/E_p: die Stauchung des Betons beim Vorspannen "
                   f"fällt weg ({NACH_VORGABE}).")
         if any(geneigt(g) for g in self.glieder):
@@ -650,42 +752,49 @@ class Spannglieder(Prozedur):
         d, stoff = self.d[g.kennung], g.stahl
         werte = Zwischenwerte(f"{self.id}.{g.kennung}")
         f_pk, f_p01k = e[stoff.eingabename("f_pk")], e[stoff.eingabename("f_p01k")]
-        E_p = e[stoff.eingabename(g.erzeugnis.modul)]
+        E_p = e[stoff.eingabename(g.art.modul)]
 
         def belegt(kurz: str, groesse: Groesse) -> Wert:
             ergebnis[d[kurz].id] = groesse
             return d[kurz].belegen(groesse)
 
-        art = g.erzeugnis.art
-        erzeugnis = f"{g.anzahl} × {art.beschriftung} ⌀{g.erzeugnis.durchmesser:g}"
+        art = g.art
         A_p = belegt("A_p", Groesse(g.flaeche, MM2))
-        p.formel(A_p, r"@n \cdot @a_p",
-                 {"n": werte.zahl("n", "n", g.anzahl, "Anzahl der Drähte, Litzen oder Stäbe",
-                                  stellen=0),
-                  "a_p": werte.flaeche("a_p", "a_p", g.erzeugnis.flaeche * 1e-6,
-                                       "Querschnitt eines Drahts, einer Litze oder eines Stabs",
-                                       stellen=1)},
-                 titel=f"{g.name}: {erzeugnis} aus {stoff.name}", name=FLAECHE)
+        if g.erzeugnis is None:
+            p.wert(A_p, titel=f"{g.name}: {art.mehrzahl} aus {stoff.name}, die Fläche eingegeben")
+        else:
+            p.formel(A_p, r"@n \cdot @a_p",
+                     {"n": werte.zahl("n", "n", g.anzahl, "Anzahl der Drähte, Litzen oder Stäbe",
+                                      stellen=0),
+                      "a_p": werte.flaeche("a_p", "a_p", g.erzeugnis.flaeche * 1e-6,
+                                           "Querschnitt eines Drahts, einer Litze oder eines "
+                                           "Stabs", stellen=1)},
+                     titel=f"{g.name}: {g.stuecke} aus {stoff.name}", name=FLAECHE)
 
-        p0_si, pinf_si = vorspannung(
-            f_pk.groesse.si,
-            None if g.sigma_p0 is None else g.sigma_p0 * 1e6,
-            None if g.sigma_pinf is None else g.sigma_pinf * 1e6)
+        p0_si, pinf_si = vorspannung(f_pk.groesse.si, g.anteil_p0, g.anteil_pinf)
+        index = self.index(g)
+
+        def faktor(kurz: str, symbol: str, zahl: float, beschreibung: str) -> Wert:
+            return werte.zahl(kurz, f"k_{{{symbol}{index}}}", zahl, beschreibung,
+                              stellen=_stellen(zahl))
+
+        def woher(zahl: float, vorgabe: float) -> Tuple[str, Optional[str]]:
+            """Was der Titel nach dem Faktor sagt, und die Stelle -- bei der Vorgabe diese."""
+            return (", nach Vorgabe", NACH_VORGABE) if zahl == vorgabe else ("", None)
+
+        nachsatz, stelle = woher(g.anteil_p0, ANTEIL_SPANNEN)
         p0 = belegt("sigma_p0", Groesse.aus_si(p0_si, N_PRO_MM2))
-        if g.sigma_p0 is None:
-            p.formel(p0, rf"{ANTEIL_SPANNEN:.2f} \cdot @f_pk", {"f_pk": f_pk},
-                     titel=f"{g.name}: nach dem Spannen, nach Vorgabe", referenz=NACH_VORGABE,
-                     name=NACH_VORGABE_GESPANNT)
-        else:
-            p.wert(p0, titel=f"{g.name}: nach dem Spannen, eingegeben")
+        p.formel(p0, r"@k \cdot @f_pk",
+                 {"k": faktor("k_p0", "p0", g.anteil_p0, "Anteil von f_pk nach dem Spannen"),
+                  "f_pk": f_pk},
+                 titel=f"{g.name}: nach dem Spannen{nachsatz}", referenz=stelle, name=GESPANNT)
+        nachsatz, stelle = woher(g.anteil_pinf, ANTEIL_NACH_VERLUSTEN)
         pinf = belegt("sigma_pinf", Groesse.aus_si(pinf_si, N_PRO_MM2))
-        if g.sigma_pinf is None:
-            p.formel(pinf, rf"{ANTEIL_NACH_VERLUSTEN:.2f} \cdot @p0", {"p0": p0},
-                     titel=f"{g.name}: nach allen Verlusten, nach Vorgabe",
-                     referenz=NACH_VORGABE, name=NACH_VORGABE_GESPANNT)
-        else:
-            p.wert(pinf, titel=f"{g.name}: nach allen Verlusten, eingegeben",
-                   referenz=REFERENZ_VERLUSTE)
+        p.formel(pinf, r"@k \cdot @p0",
+                 {"k": faktor("k_pinf", r"p\infty", g.anteil_pinf,
+                              "Anteil von σ_p0 nach allen Verlusten"), "p0": p0},
+                 titel=f"{g.name}: nach allen Verlusten{nachsatz}",
+                 referenz=stelle or REFERENZ_VERLUSTE, name=GESPANNT)
 
         grenze = werte.spannung("grenze", r"\sigma_{p,max}", grenze_nach_spannen(
             f_pk.groesse.si, f_p01k.groesse.si))
@@ -710,7 +819,7 @@ class Spannglieder(Prozedur):
         P = belegt("P_inf", Groesse.aus_si(g.flaeche * 1e-6 * pinf_si, KN))
         p.formel(P, r"@A_p \cdot @pinf", {"A_p": A_p, "pinf": pinf},
                  titel=f"{g.name}: Spannkraft nach allen Verlusten", name=SPANNKRAFT)
-        return [g.name, g.lage, f"{erzeugnis}, {stoff.name}", Mathe(fest(g.flaeche, 0)),
+        return [g.name, g.lage, f"{g.stuecke}, {stoff.name}", Mathe(fest(g.flaeche, 0)),
                 Mathe(fest(pinf_si / 1e6, 0)), Mathe(fest(eps_p.groesse.si * 1e3, 2)),
                 Mathe(fest(P.groesse.si / 1e3, 1)), g.wirkung.beschriftung,
                 g.verbund.beschriftung]
