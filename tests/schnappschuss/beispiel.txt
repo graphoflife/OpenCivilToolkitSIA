@@ -1386,6 +1386,8 @@ nicht nachgeschlagen. Ein Zugpfahl muss die Zugkraft über seine ganze Länge tr
 
 Bemessungswert auf Druck
 ------------------------
+[*] Annahme: η_a ist der Grenzwert für «Berechnung». Der Grenzwert gilt, wenn R_a,k sehr zuverlässig
+bestimmt ist; sonst ist η_a kleiner (SIA 267:2013, 9.5.2.2.6).
 
 Widerstandsbeiwert auf Druck   [SIA 267:2013, 9.5.2.2.4, (43)]
     \gamma_{M,a} = 1.3

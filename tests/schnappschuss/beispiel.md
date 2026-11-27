@@ -2228,6 +2228,8 @@ $$
 
 #### Bemessungswert auf Druck
 
+> **Annahme:** η\_a ist der Grenzwert für «Berechnung». Der Grenzwert gilt, wenn R\_a,k sehr zuverlässig bestimmt ist; sonst ist η\_a kleiner (SIA 267:2013, 9.5.2.2.6).
+
 **Widerstandsbeiwert auf Druck** *(SIA 267:2013, 9.5.2.2.4, (43))*
 
 $$

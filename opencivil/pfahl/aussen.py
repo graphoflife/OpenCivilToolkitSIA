@@ -52,7 +52,9 @@ from opencivil.geotechnik.tragfaehigkeit import tragfaehigkeitsfaktoren
 from opencivil.pfahl import buch
 from opencivil.pfahl.achse import Achsnachweis
 from opencivil.pfahl.boden import Mantel, Profil, Stueck
-from opencivil.pfahl.pfahl import Abscheren, Kombination, Pfahl, Spitze
+from opencivil.pfahl.pfahl import (
+    GRENZWERT_GILT, Abscheren, Kombination, Pfahl, Spitze, Umrechnung,
+)
 
 #: Die Widerstandsbeiwerte des äusseren axialen Widerstands, auf Druck und
 #: auf Zug, mit ihrer Stelle (SIA 267:2013, 9.5.2.2.4).
@@ -350,8 +352,14 @@ class AeussererWiderstand(Achsnachweis):
 
     def _bemessung(self, e: Eingaben, p: Protokoll, werte: Zwischenwerte, R_ak: Wert, *,
                    druck: bool) -> Wert:
-        """R_a,d = η_a · R_a,k / γ_M,a (42) -- auf Druck oder auf Zug."""
+        """
+        R_a,d = η_a · R_a,k / γ_M,a (42) -- auf Druck oder auf Zug. Ist η_a der
+        Grenzwert der Grundlage, sagt es eine Annahme einmal, auf Druck.
+        """
         p.titel(f"Bemessungswert auf {'Druck' if druck else 'Zug'}", ebene=3)
+        if druck and self.pfahl.umrechnung is Umrechnung.GRUNDLAGE:
+            p.annahme(f"η_a ist der Grenzwert für «{self.pfahl.grundlage.beschriftung}». "
+                      f"{GRENZWERT_GILT}")
         zahl, referenz = GAMMA_M[druck]
         z = "" if druck else "_zug"
         gamma = werte.zahl(f"gamma_M{z}", r"\gamma_{M,a}", zahl,

@@ -55,7 +55,8 @@ def bauen(art: "Bauteilart", eintrag: PfahlEintrag, aufbau: Aufbau) -> Bauteil:
     pfahl = Pfahl(
         name=eintrag.name, praefix=f"{art.raum}.{eintrag.kennung}", art=eintrag.art,
         D=g("D"), L=g("L"), t_K=g("t_K"), t_w=g("t_w"), wasser=wasser,
-        schichten=schichten, grundlage=eintrag.grundlage, eta_a=g("eta_a"), R_ak=g("R_ak"),
+        schichten=schichten, grundlage=eintrag.grundlage, umrechnung=eintrag.umrechnung,
+        eta_a=g("eta_a"), R_ak=g("R_ak"),
         R_ak_zug=g("R_ak_zug"), spitze=eintrag.spitze, abscheren=eintrag.abscheren,
         q_b=g("q_b"), eta_i=g("eta_i"),
         stahl=material(aufbau.baustoffe, eintrag.stahl, "betonstahl", wo,

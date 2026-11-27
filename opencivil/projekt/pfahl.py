@@ -15,13 +15,15 @@ Stäbe ⌀ 20 mit einer Wendel ⌀ 10 und 75 mm Überdeckung, dem grössten Wert
 von SIA 267:2013, 9.6.3.2.6. Eine Schicht, 20 m Kies mit φ'_k = 30° und
 K = 0.5, etwa K_0 = 1 − sin φ'_k (Kap. 2.7), und δ = φ'_k, wie das Buch
 für raue Pfähle sagt (Kap. 12.5); undrainiert α = 0.6, sein Wert für
-Bohrpfähle in weichem Ton. η_a = 0.7 und η_i = 0.8 sind die Grenzwerte der
-Norm für eine Berechnung und ohne Prüfung der Integrität, quer zur Achse
-ebenso η_a,tr = 0.7: der Querwiderstand wird immer gerechnet. Der Mikropfahl
-hat ein Rohr 114.3 × 10 mm ohne Abrostung, bis jemand eine angibt. Der
-Verformungsmodul E_s,k = 30 MN/m² ist der des Beispiels im Buch zu Cassans
-Federn (Kap. 12.8); der Kopf dreht sich frei, und die Bettung quer wächst
-bis 2 m unter Terrain von null an.
+Bohrpfähle in weichem Ton. η_a kommt aus der Grundlage, ihr Grenzwert,
+von Hand mit 0.7, dem Grenzwert einer Berechnung; η_i = 0.8 ist der
+Grenzwert ohne Prüfung der Integrität, quer zur Achse η_a,tr = 0.7: der
+Querwiderstand wird immer gerechnet. Der Fuss trägt mit einem eingegebenen
+Spitzendruck q_b,k = 2000 kPa (Benutzer, 2026-11-27; bis dahin gerechnet).
+Der Mikropfahl hat ein Rohr 114.3 × 10 mm ohne Abrostung, bis jemand eine
+angibt. Der Verformungsmodul E_s,k = 30 MN/m² ist der des Beispiels im Buch
+zu Cassans Federn (Kap. 12.8); der Kopf dreht sich frei, und die Bettung
+quer wächst bis 2 m unter Terrain von null an.
 
 Die Namen der Schichten müssen nicht verschieden sein, wie bei der Setzung:
 die Werte tragen die Nummer der Schicht.
@@ -42,7 +44,8 @@ from opencivil.core.einheiten import GRAD, KN, KN_PRO_M3, KNM, KPA, M, MM, MN_PR
 from opencivil.geotechnik.verhalten import Verhalten
 from opencivil.pfahl.boden import Mantel
 from opencivil.pfahl.pfahl import (
-    ETA_I_HOECHSTENS, Abscheren, Grundlage, Kopf, Pfahlart, Spitze, Tragglied, quer_belastet,
+    ETA_I_HOECHSTENS, Abscheren, Grundlage, Kopf, Pfahlart, Spitze, Tragglied, Umrechnung,
+    quer_belastet,
 )
 from opencivil.projekt.eintraege import BauteilEintrag, Beschreibung
 from opencivil.projekt.fallnamen import Fallnamen
@@ -125,12 +128,18 @@ class PfahlEintrag(BauteilEintrag):
     """Kennung des Grundwassers, einer Flüssigkeit -- bis 2026-11-27 die Zahl γ_w."""
 
     grundlage: Grundlage = Grundlage.BERECHNUNG
+    umrechnung: Umrechnung = Umrechnung.GRUNDLAGE
+    """Ob η_a der Grenzwert der Grundlage ist oder :attr:`eta_a` von Hand."""
+
     eta_a: float = bereich(0.7, heisst="η_a", ueber=0.0, bis=1.0)
-    """Höchstens der Grenzwert der Grundlage -- das prüft :meth:`regeln`."""
+    """
+    Von Hand höchstens der Grenzwert der Grundlage -- das weist schon die
+    Maske ab und prüft :meth:`regeln`. Aus der Grundlage zählt er nicht.
+    """
 
     R_ak: float = bereich(1000.0, heisst="R_a,k auf Druck", einheit=KN, ab=0.0)
     R_ak_zug: float = bereich(500.0, heisst="R_a,k auf Zug", einheit=KN, ab=0.0)
-    spitze: Spitze = Spitze.RECHNEN
+    spitze: Spitze = Spitze.EINGEBEN
     abscheren: Abscheren = Abscheren.OERTLICH
     q_b: float = bereich(2000.0, heisst="q_b,k", einheit=KPA, ab=0.0)
 
@@ -221,7 +230,7 @@ class PfahlEintrag(BauteilEintrag):
         (:meth:`_baugrund`). Jede dieser Meldungen hält nur den Pfahl auf,
         nicht das Projekt (:meth:`~opencivil.projekt.aufbau.kern.Aufbau.unfertig`).
         """
-        if self.eta_a > self.grundlage.eta_grenze:
+        if self.umrechnung is Umrechnung.HAND and self.eta_a > self.grundlage.eta_grenze:
             raise ProjektFehler(
                 f"η_a = {self.eta_a:g} liegt über {self.grundlage.eta_grenze:g}, dem "
                 f"Grenzwert für «{self.grundlage.beschriftung}» ({self.grundlage.referenz}).",

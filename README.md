@@ -683,10 +683,12 @@ Kapitel 12 des Buches von Lang, Huder, Amann und Puzrin. Oben das Panel
 Tragglied aus Stahl (Rohr oder Vollstab, mit Abrostung), Durchmesser, Länge
 und Tiefe des Kopfs, Grundwasser mit Tiefe und Wasser, der Querschnitt mit η_i und worauf der
 äussere Widerstand beruht -- Berechnung, Erfahrung oder ein Versuch, danach
-richtet sich, wie gross η_a sein darf. Darunter die Schichten vom Terrain an,
-je drainiert mit φ'_k und c'_k oder undrainiert mit s_u,k, die Mantelreibung
-gerechnet oder eingegeben, und die Kombinationen mit N_Ed am Kopf. Der
-äussere Widerstand ist Mantel und Fuss (41), auf Zug nur der Mantel;
+richtet sich, wie gross η_a sein darf. η_a ist dieser Grenzwert («aus der
+Grundlage») oder eine kleinere Zahl «von Hand». Darunter die Schichten vom
+Terrain an, je drainiert mit φ'_k und c'_k oder undrainiert mit s_u,k, die
+Mantelreibung gerechnet oder eingegeben, und die Kombinationen mit N_Ed am
+Kopf. Der Spitzendruck ist zu Beginn eingegeben, q_b,k = 2000 kPa, oder
+gerechnet. Der äussere Widerstand ist Mantel und Fuss (41), auf Zug nur der Mantel;
 R_a,d = η_a·R_a,k/γ_M,a mit 1.3 auf Druck und 1.6 auf Zug (42). Der innere
 ist der Querschnitt nach SIA 262, ganz gedrückt oder ganz gezogen, mal η_i
 (50). Rechts stehen die Widerstände beider Nachweise und unter «Diagramme»

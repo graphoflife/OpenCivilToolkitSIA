@@ -7,6 +7,40 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-27 · Pfahl: η_a aus der Grundlage, Spitzendruck eingegeben
+
+Schritt 6 des Plans vom 2026-11-27.
+
+**η_a.** Vorher setzte die Grundlage nur die Obergrenze von η_a; das Feld
+blieb auf 0.7, auch nach einem statischen Versuch, wo 1.0 erlaubt ist.
+Jetzt wählt unter der Grundlage ein Schalter [aus der Grundlage | von Hand]:
+
+- Aus der Grundlage ist η_a ihr Grenzwert und steht grau im Feld:
+  Berechnung 0.7, Erfahrung 0.9, dynamischer Versuch 0.9, statischer
+  Versuch 1.0 (SIA 267:2013, 9.5.2.2.5, (45)–(48), am Scan S. 64
+  geprüft). Die Herleitung sagt in einer Annahme, dass der Grenzwert nur
+  gilt, wenn R_a,k sehr zuverlässig bestimmt ist, sonst ist η_a kleiner
+  (9.5.2.2.6); grau unter dem Schalter steht dasselbe.
+- Von Hand ist das Feld offen und weist eine Zahl über dem Grenzwert ab:
+  «η_a ist für «Berechnung» höchstens 0.7 (SIA 267:2013, 9.5.2.2.5, (48)):
+  0.8 ist nicht übernommen.» Wer danach auf eine strengere Grundlage
+  wechselt, sieht die Meldung von vorher: η_a = 0.95 liegt über 0.7.
+- Dafür kann ein Feld der Vorgaben (`core/vorgaben.py`) nach den Wahlen
+  enger begrenzt sein (`bis`, `bis_satz`) oder festgelegt (`fest`). Die
+  Regel steht so an einer Stelle, `_aussen` in `pfahl/pfahl.py`: die Maske
+  zeigt, was sie sagt, und die Herleitung rechnet mit derselben Zahl.
+- Alte Dateien rechnen wie zuvor: ein Pfahl ohne den Schalter behält eine
+  Zahl, die vom Grenzwert abweicht, von Hand (`umrechnung_setzen` in
+  `projekt/frueher.py`); sonst kommt sie aus der Grundlage.
+
+**Spitzendruck.** Ein neuer Pfahl hat den Spitzendruck eingegeben,
+q_b,k = 2000 kPa, statt gerechnet. Beispiel D = 900 mm:
+R_b,k = π/4 · 0.9² · 2000 = 1272 kN. Das Startbeispiel und die Pfähle von
+«Jeder Nachweis» setzen «gerechnet» ausdrücklich und behalten ihre Zahlen;
+ebenso die Handrechnungen der Tests.
+
+---
+
 ## 2026-11-27 · Vorlagen: Trapez, Doppel-T, Platte mit Aufbeton, Bewehrung je Lage
 
 Schritt 5 des Plans vom 2026-11-27.

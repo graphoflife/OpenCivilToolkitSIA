@@ -1,5 +1,5 @@
 ---
-erzeugt: ad674cc1048d
+erzeugt: 8d0e5dcbc442
 art: modul
 tags: [modul]
 ---
@@ -129,7 +129,8 @@ K über K_0: das Buch sieht für Bohrpfähle höchstens etwa K_0 (Kap. 12.5).
 def _bemessung(self, e: Eingaben, p: Protokoll, werte: Zwischenwerte, R_ak: Wert, *, druck: bool) -> Wert
 ```
 
-R_a,d = η_a · R_a,k / γ_M,a (42) – auf Druck oder auf Zug.
+R_a,d = η_a · R_a,k / γ_M,a (42) – auf Druck oder auf Zug. Ist η_a der
+Grenzwert der Grundlage, sagt es eine Annahme einmal, auf Druck.
 
 
 ## Konstanten

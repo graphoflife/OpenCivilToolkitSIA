@@ -17,7 +17,8 @@
  * Kacheln, Felder, Zeichen und Hinweise kommen aus dem Kern, wie beim
  * Grundbruch (`katalog.vorgaben`, opencivil/pfahl/pfahl.py): nur die Felder,
  * die er mit den gewählten Stellungen liest, beim Umrechnungsfaktor η_a mit
- * dem Grenzwert seiner Grundlage. Hier stehen nur die Schalter und die
+ * dem Grenzwert seiner Grundlage -- aus der Grundlage grau, von Hand bis zu
+ * ihm (seit 2026-11-27). Hier stehen nur die Schalter und die
  * Materialien, je bei ihrer Gruppe -- das Wasser seit 2026-11-27 beim
  * Grundwasser, statt der Zahl γ_w. Bis 2026-11-20 standen die Felder hier
  * ein zweites Mal. Gerechnet wird nichts: die Widerstände und die Federn am
@@ -32,6 +33,7 @@ import {
   materialliste, mitBild, namensfeld, panel, verhaltenSchalter, wahlBlock, wahlSchalter,
 } from './bausteine.js';
 import { el, zahlfeld } from './dom.js';
+import { span } from './mathe.js';
 import { anfuegenKnopf, fallkopf, fallzeile } from './faelle.js';
 import {
   gruppenkapitel, kapitelFenster, kapitelPanel, zeilenstand,
@@ -129,6 +131,12 @@ function ausVersuch(t) {
 /** Das Wort einer Stellung, wie der Katalog es nennt: «gerechnet», «frei drehbar». */
 function wortVon(liste, wert) {
   return katalog('pfahl', liste).find((w) => w.wert === wert)?.beschriftung || '';
+}
+
+/** Was eine Stellung bewirkt, wie der Katalog es sagt -- grau unter ihrem Schalter. */
+function erklaerungVon(liste, wert) {
+  const titel = katalog('pfahl', liste).find((w) => w.wert === wert)?.titel;
+  return titel ? el('p.hinweis', { text: titel }) : null;
 }
 
 function kopfPanel(t) {
@@ -271,7 +279,10 @@ function kapitel(t) {
       zeichen: 'widerstand', wort: wortVon('grundlagen', t.grundlage), werte: ['eta_a'],
       hilfe: HILFE.aussen,
       vor: [wahlBlock('Grundlage', schalter(t.grundlage, 'grundlagen', setzen('grundlage'),
-        'Worauf R_a,k beruht – danach richtet sich, wie gross η_a höchstens ist'))],
+        'Worauf R_a,k beruht – danach richtet sich, wie gross η_a höchstens ist')),
+      wahlBlock([span('\\eta_a')], schalter(t.umrechnung, 'umrechnungen', setzen('umrechnung'),
+        'Ob η_a der Grenzwert der Grundlage ist oder eine Zahl von Hand')),
+      erklaerungVon('umrechnungen', t.umrechnung)],
     }),
     gruppenkapitel(vorgaben, 'Fuss', ausVersuch(t) ? { zeichen: 'pfahlfuss' } : {
       zeichen: 'pfahlfuss', wort: wortVon('spitzen', t.spitze), werte: ['q_b'], hilfe: HILFE.fuss,

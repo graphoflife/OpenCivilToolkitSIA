@@ -1,5 +1,5 @@
 ---
-erzeugt: 9adf1c7bd754
+erzeugt: a7bca5b1c9e5
 art: modul
 tags: [modul]
 ---
@@ -19,6 +19,7 @@ Rechenwerk, und nur die, die nach den Wahlen gelten ([[opencivil.pfahl.pfahl#Kon
 * [[opencivil.pfahl.pfahl#Grundlage|Grundlage]] – worauf der äussere Widerstand R_a,k beruht: auf einer
   Berechnung aus den Schichten, auf Erfahrung oder auf einem Versuch, und
   wie gross der Umrechnungsfaktor η_a darum höchstens ist;
+* [[opencivil.pfahl.pfahl#Umrechnung|Umrechnung]] – ob η_a dieser Grenzwert ist oder von Hand kommt;
 * [[opencivil.pfahl.pfahl#Spitze|Spitze]] und [[opencivil.pfahl.pfahl#Abscheren|Abscheren]] – ob der Fuss trägt und wie;
 * [[opencivil.pfahl.pfahl#Kopf|Kopf]] – ob sich der Kopf frei drehen kann oder eingespannt ist.
 
@@ -131,6 +132,34 @@ def aus_versuch(self) -> bool
 ```
 
 Ob R_a,k eingegeben wird, statt aus den Schichten zu folgen.
+
+### Umrechnung
+
+```python
+class Umrechnung(Wahl)
+```
+
+Woher der Umrechnungsfaktor η_a kommt (Benutzer, 2026-11-27): aus der
+Grundlage, dann ist er ihr Grenzwert, oder von Hand, höchstens dieser
+Grenzwert ([[opencivil.pfahl.pfahl#Konstanten|GRENZWERT_GILT]]). Bis 2026-11-27 war η_a immer eine
+Zahl von Hand, Vorgabe 0.7 – auch nach einem statischen Versuch.
+
+- `GRUNDLAGE = 'grundlage'`
+- `HAND = 'hand'`
+
+#### Umrechnung.beschriftung
+
+```python
+@property
+def beschriftung(self) -> str
+```
+
+#### Umrechnung.erklaerung
+
+```python
+@property
+def erklaerung(self) -> str
+```
 
 ### Spitze
 
@@ -279,10 +308,11 @@ Die Masse – was D meint, hängt an der Art (siehe Dateikopf).
 ### _aussen
 
 ```python
-def _aussen(grundlage: Grundlage) -> Tuple[Feld, ...]
+def _aussen(grundlage: Grundlage, umrechnung: Umrechnung) -> Tuple[Feld, ...]
 ```
 
-η_a mit dem Grenzwert seiner Grundlage – aus einem Versuch dazu R_a,k selbst.
+η_a: aus der Grundlage fest ihr Grenzwert, von Hand höchstens er – aus
+einem Versuch dazu R_a,k selbst.
 
 ### _fuss
 
@@ -336,7 +366,8 @@ Siehe Dateikopf.
 - `wasser: Baustoff` – Das Grundwasser, eine Flüssigkeit: seine Raumlast γ_w rechnet der Pfahl aus ihr ([[opencivil.geotechnik.wasser]]). Bis 2026-11-27 eine Zahl.
 - `schichten: Sequence[Pfahlschicht]`
 - `grundlage: Grundlage`
-- `eta_a: Groesse`
+- `umrechnung: Umrechnung`
+- `eta_a: Groesse` – η_a von Hand – aus der Grundlage gilt ihr Grenzwert ([[opencivil.pfahl.pfahl#_aussen|_aussen]]).
 - `R_ak: Groesse`
 - `R_ak_zug: Groesse` – R_a,k aus einem Versuch, auf Druck und auf Zug – nur dann.
 - `spitze: Spitze`
@@ -444,6 +475,7 @@ Angabe aus allen. Die Schichten heissen zusammen «Schicht».
 
 - `ETA_I_HOECHSTENS = 0.9` – Wie gross der Umrechnungsfaktor des inneren Widerstands höchstens ist – nur mit verlässlicher Prüfung der Integrität (SIA 267:2013, 9.5.2.4.9).
 - `ETA_I_REGEL = 0.8` – Ohne diese Prüfung, in der Regel (SIA 267:2013, 9.5.2.4.4, (51)).
+- `GRENZWERT_GILT = 'Der Grenzwert gilt, wenn R_a,k sehr zuverlässig bestimmt ist; sonst …` – Wann der Grenzwert von η_a gilt – am Schalter, in der Maske und in der Herleitung (SIA 267:2013, 9.5.2.2.6).
 - `_VERSUCH = 'SIA 267:2013, 9.4.4.1.3, 9.4.4.1.6'` – R_a,k aus einem Versuch: der kleinste gemessene Wert.
 - `_ABROSTUNG = Feld('dt', '\\Delta t', MM, 'Abrostung aussen', 1, 'SIA 267:2013, 9.6…`
 - `VORGABEN = (Gruppe('Pfahl', _pfahl, nach=('art',)), Gruppe('Grundwasser', lambda…` – Die Vorgaben des Pfahls, je Kasten der Herleitung und Karte der Maske ([[opencivil.core.vorgaben]]) – je nur, was nach den Wahlen gilt.
@@ -475,6 +507,7 @@ Angabe aus allen. Die Schichten heissen zusammen «Schicht».
 - [[opencivil.pfahl.uebersicht]]
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.aufbau.pfahl]]
+- [[opencivil.projekt.frueher]]
 - [[opencivil.projekt.pfahl]]
 - [[opencivil.web.api]]
 - [[opencivil.web.pfahldaten]]

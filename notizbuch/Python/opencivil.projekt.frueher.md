@@ -1,5 +1,5 @@
 ---
-erzeugt: 23c2aa5e803a
+erzeugt: bb7e9816df18
 art: modul
 tags: [modul]
 ---
@@ -34,6 +34,16 @@ der sie ergibt – mit f_pk des Spannstahls, wie die Datei ihn nennt
 ([[opencivil.projekt.frueher#spannungen_als_faktoren|spannungen_als_faktoren]]). So rechnet das Glied wie zuvor, auch wo
 der Faktor dann 0.7258… heisst.
 
+
+## DER UMRECHNUNGSFAKTOR EINES PFAHLS (2026-11-27)
+
+Bis dahin war η_a eines Pfahls immer eine Zahl von Hand, Vorgabe 0.7.
+Seither waehlt ein Schalter (`umrechnung`), ob η_a der Grenzwert der
+Grundlage ist oder von Hand kommt; neu angelegt aus der Grundlage. Ein Pfahl
+ohne den Schalter behaelt seine Zahl von Hand, wo sie vom Grenzwert
+abweicht, sonst nimmt er den Grenzwert – so rechnet er wie zuvor
+([[opencivil.projekt.frueher#umrechnung_setzen|umrechnung_setzen]]).
+
 ## Inhalt
 
 ### gamma_w_heraus
@@ -64,6 +74,23 @@ def _alt(eintrag: Any) -> bool
 ```
 
 Ob ein Eintrag noch eine Zahl `gamma_w` hat und keine Fluessigkeit.
+
+### umrechnung_setzen
+
+```python
+def umrechnung_setzen(roh: Any) -> Any
+```
+
+`roh` mit dem Schalter η_a an jedem Pfahl, der keinen hat – siehe Dateikopf.
+
+### _umrechnung
+
+```python
+def _umrechnung(pfahl: Any) -> Any
+```
+
+Ein Pfahl mit dem Schalter – `pfahl` selbst, wo er ihn schon hat oder
+die Grundlage keine ist: das meldet dann das Lesen.
 
 ### spannungen_als_faktoren
 
@@ -97,6 +124,7 @@ Ein Glied mit Faktoren statt Spannungen – `glied` selbst, wo das nicht geht.
 
 - `_MIT_WASSER = ('grundbrueche', 'pfaehle')` – Die Listen, deren Eintraege bis 2026-11-27 ein `gamma_w` hatten.
 - `Alt = Tuple[str, int, float]` – Wo ein Eintrag mit einer alten Zahl stand: Liste, Stelle, Zahl in kN/m³.
+- `_ETA_A_BIS_DAHIN = 0.7` – η_a eines Pfahls ohne Zahl in der Datei, bis 2026-11-27.
 - `_SPANNUNGEN = ('sigma_p0', 'sigma_pinf')` – Was ein Spannglied bis 2026-11-27 statt seiner Faktoren hatte.
 
 ## Braucht
@@ -104,6 +132,7 @@ Ein Glied mit Faktoren statt Spannungen – `glied` selbst, wo das nicht geht.
 - [[opencivil.material.basis]]
 - [[opencivil.material.fluessigkeit]]
 - [[opencivil.material.spannstahl]]
+- [[opencivil.pfahl.pfahl]]
 - [[opencivil.projekt.projekt]]
 - [[opencivil.querschnitt.spannglieder]]
 

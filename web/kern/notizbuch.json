@@ -8663,6 +8663,9 @@
         "Grundlage.eta_grenze",
         "Grundlage.referenz",
         "Grundlage.aus_versuch",
+        "Umrechnung",
+        "Umrechnung.beschriftung",
+        "Umrechnung.erklaerung",
         "Spitze",
         "Spitze.beschriftung",
         "Spitze.erklaerung",
@@ -9229,6 +9232,8 @@
         "gamma_w_heraus",
         "wasser_einsetzen",
         "_alt",
+        "umrechnung_setzen",
+        "_umrechnung",
         "spannungen_als_faktoren",
         "_zugfestigkeiten",
         "_faktoren"

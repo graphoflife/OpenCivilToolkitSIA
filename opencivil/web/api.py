@@ -86,7 +86,9 @@ from opencivil.erdbeben.ersatzkraft import (
 from opencivil.projekt.erdbeben import ErdbebenEintrag, GeschossEintrag, TragwandEintrag
 from opencivil.pfahl import pfahl
 from opencivil.pfahl.boden import Mantel
-from opencivil.pfahl.pfahl import Abscheren, Grundlage, Kopf, Pfahlart, Spitze, Tragglied
+from opencivil.pfahl.pfahl import (
+    Abscheren, Grundlage, Kopf, Pfahlart, Spitze, Tragglied, Umrechnung,
+)
 from opencivil.projekt.pfahl import PfahlEintrag, PfahlschichtEintrag
 from opencivil.web import (
     balkendaten, diagrammdaten, durchstanzdaten, systemkatalog, werkstoffkurven,
@@ -322,7 +324,8 @@ def katalog() -> dict:
                       for w in wahl]
                for name, wahl in (("arten", Pfahlart), ("spitzen", Spitze),
                                   ("abscheren", Abscheren), ("tragglieder", Tragglied),
-                                  ("mantel", Mantel), ("koepfe", Kopf))},
+                                  ("mantel", Mantel), ("koepfe", Kopf),
+                                  ("umrechnungen", Umrechnung))},
             "grundlagen": [{"wert": g.value, "beschriftung": g.beschriftung,
                             "titel": g.erklaerung, "versuch": g.aus_versuch}
                            for g in Grundlage],

@@ -372,12 +372,13 @@ export function eingabegruppen(klasse, eintrag, aendern, { gelesen = null } = {}
     zeilen: (titel) => gruppenzeilen(klasse, eintrag, gruppe(titel), aendern, gelesen),
     /**
      * Je Feld aus `felder`, das gilt und gelesen wird, sein Zeichen, der
-     * Wert des Eintrags und die Einheit des Kerns -- in der Folge der Gruppe.
+     * Wert, der gilt (`vorgabewert`), und die Einheit des Kerns -- in der
+     * Folge der Gruppe.
      */
     werte: (titel, felder) => felderDer(gruppe(titel), eintrag)
       .filter((f) => felder.includes(f.feld) && (!gelesen || gelesen.has(f.feld)))
       .map((f) => ({
-        zeichen: f.zeichen, wert: eintrag[f.feld], einheit: feldangabe(klasse, f.feld).einheit || '',
+        zeichen: f.zeichen, wert: vorgabewert(f, eintrag), einheit: feldangabe(klasse, f.feld).einheit || '',
       })),
     vollstaendig() {
       const fehlt = [...gruppen.keys()].filter((titel) => !gefragt.has(titel));
@@ -422,15 +423,27 @@ export function vorgabetitel(f) {
 }
 
 /**
+ * Die Zahl eines Feldes der Vorgaben, die gilt: die des Eintrags -- oder,
+ * legen die Wahlen sie fest (`fest`, opencivil/core/vorgaben.py), ihre
+ * Grenze, etwa η_a aus der Grundlage eines Pfahls.
+ */
+function vorgabewert(f, eintrag) {
+  return f.fest ? f.bis : eintrag[f.feld];
+}
+
+/**
  * Ein Feld der Vorgaben als Zeile: die Beschriftung mit dem Zeichen, Einheit
  * und Grenzen aus dem Katalog (`katalog.felder[klasse]`) -- in welcher
  * Einheit der Kern eine Zahl meint, steht an ihrem Feld im Kern und nur dort.
+ * Begrenzen die Wahlen die Zahl enger (`bis`), weist das Feld eine grössere
+ * mit dem Satz des Kerns ab; legen sie sie fest, steht sie grau da.
  */
 function vorgabezeile(klasse, eintrag, f, aendern) {
   const angabe = feldangabe(klasse, f.feld);
   const titel = vorgabetitel(f);
   return feld([`${f.beschriftung} `, span(f.zeichen)], zahlfeld({
-    wert: eintrag[f.feld], schritt: f.schritt, angabe, titel,
+    wert: vorgabewert(f, eintrag), schritt: f.schritt, titel, readonly: f.fest,
+    angabe: f.bis === undefined ? angabe : { ...angabe, bis_wahl: { zahl: f.bis, satz: f.bis_satz } },
     beiAenderung: (v) => aendern((x) => { x[f.feld] = v; }),
   }), angabe.einheit || '', titel);
 }
@@ -546,10 +559,14 @@ export function klappgruppe(titel, zeilen, offen, klasse) {
  * -- neben ihr fände er keinen Platz, und seine Stellungen brechen um --,
  * ebenso eine Liste mit langer Beschriftung, etwa die Querschnittsanalyse
  * einer Wand. Ein «div», kein «label»: ein Klick auf den Text löste sonst
- * die erste Stellung aus.
+ * die erste Stellung aus. Die Beschriftung ist Text oder, wie bei `feld`,
+ * eine Liste mit einem Zeichen darin: `[span('\\eta_a')]`.
  */
 export function wahlBlock(beschriftung, wahl) {
-  return el('div.wahlblock', {}, [el('span.wahlblock-titel', { text: beschriftung }), wahl]);
+  const titel = typeof beschriftung === 'string'
+    ? el('span.wahlblock-titel', { text: beschriftung })
+    : el('span.wahlblock-titel', {}, beschriftung);
+  return el('div.wahlblock', {}, [titel, wahl]);
 }
 
 /**

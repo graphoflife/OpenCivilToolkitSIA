@@ -15,7 +15,7 @@ from opencivil.durchstanzen.flaeche import Lage, Stuetzenform
 from opencivil.durchstanzen.stelle import KeArt, Naeherungsstufe, Plattenart
 from opencivil.geotechnik.verhalten import Verhalten
 from opencivil.pfahl.boden import Mantel
-from opencivil.pfahl.pfahl import Grundlage, Pfahlart, Spitze, Tragglied
+from opencivil.pfahl.pfahl import Grundlage, Pfahlart, Spitze, Tragglied, Umrechnung
 from opencivil.projekt import Projekt
 from opencivil.web.api import katalog
 
@@ -103,15 +103,16 @@ class TestMaskeWieHerleitung(unittest.TestCase):
 
     def test_pfahl(self):
         """Jede Stellung der Wahlen des Pfahls, darunter je eine Schicht jeder Stellung."""
-        for art, tragglied, grundlage, spitze in itertools.product(
-                Pfahlart, Tragglied, Grundlage, Spitze):
-            with self.subTest(art=art, tragglied=tragglied, grundlage=grundlage, spitze=spitze):
+        for art, tragglied, grundlage, umrechnung, spitze in itertools.product(
+                Pfahlart, Tragglied, Grundlage, Umrechnung, Spitze):
+            with self.subTest(art=art, tragglied=tragglied, grundlage=grundlage,
+                              umrechnung=umrechnung, spitze=spitze):
                 p = Projekt(name="Probe")
                 p.fluessigkeit()
                 beton = p.beton().kennung if art is Pfahlart.BOHRPFAHL else ""
                 t = p.pfahl("P", stahl=p.stahl().kennung, beton=beton, art=art.value,
                             tragglied=tragglied.value, grundlage=grundlage.value,
-                            spitze=spitze.value)
+                            umrechnung=umrechnung.value, spitze=spitze.value)
                 for verhalten, mantel in itertools.product(Verhalten, Mantel):
                     t.schicht(f"{verhalten.value}, {mantel.value}", verhalten=verhalten.value,
                               mantel=mantel.value)

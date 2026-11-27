@@ -1,5 +1,5 @@
 ---
-erzeugt: b830ace133c0
+erzeugt: 17bcb247d2d4
 art: modul
 tags: [modul]
 ---
@@ -34,6 +34,16 @@ ist, eine kurze `beschriftung`; die Maske zeigt die Beschreibung im Titel
 Pfeile (`schritt`) braucht nur die Maske. Die Einheit und die Grenzen nimmt
 sie vom Feld der Beschreibung (`katalog.felder`) – dort steht, in welcher
 Einheit der Kern eine Zahl liest.
+
+
+## ENGER NACH DEN WAHLEN
+
+Ein Feld kann nach den Wahlen enger begrenzt sein als sein Feld in der
+Beschreibung ([[opencivil.core.vorgaben#Feld|Feld.bis]]): η_a eines Pfahls ist höchstens der
+Grenzwert seiner Grundlage. Die Maske weist eine grössere Zahl ab, mit dem
+Satz des Feldes. Legen die Wahlen die Zahl fest ([[opencivil.core.vorgaben#Feld|Feld.fest]]), steht
+sie grau in der Maske, und die Herleitung rechnet mit ihr statt mit der
+Zahl der Beschreibung – η_a aus der Grundlage (Benutzer, 2026-11-27).
 
 
 ## WIEDERHOLTE GRUPPEN
@@ -75,6 +85,9 @@ Eine Zahl, die ein Nachweis liest – in der Herleitung und in der Maske.
 - `beschriftung: str = ''` – Die Beschriftung in der Maske, wo die Beschreibung zu lang ist – leer: die Beschreibung.
 - `schritt: float = 1.0` – Wie weit ein Pfeil in der Maske die Zahl verschiebt.
 - `hinweis: str = ''` – Was die Maske über dem Feld dazu sagt – etwa, wie ein Winkel zählt.
+- `bis: Optional[float] = None` – Wie gross die Zahl nach den Wahlen höchstens ist, in [[opencivil.core.vorgaben#Feld|einheit]] – wo das enger ist als die Grenze ihres Feldes. Die Maske weist eine grössere ab und sagt [[opencivil.core.vorgaben#Feld|bis_satz]]; im Kern prüft die Beschreibung selbst (`regeln`), denn nur sie weiss, ob die Zahl gilt.
+- `bis_satz: str = ''` – Warum die Zahl höchstens [[opencivil.core.vorgaben#Feld|bis]] ist – der Satz, mit dem die Maske eine grössere abweist.
+- `fest: bool = False` – Ob die Wahlen die Zahl auf [[opencivil.core.vorgaben#Feld|bis]] festlegen: die Maske zeigt sie grau, und die Herleitung rechnet mit ihr statt mit der Zahl der Beschreibung ([[opencivil.core.vorgaben#Feld.vorgabe|vorgabe]]).
 
 #### Feld.vorgabe
 
@@ -82,7 +95,9 @@ Eine Zahl, die ein Nachweis liest – in der Herleitung und in der Maske.
 def vorgabe(self, praefix: str, abschnitt: Abschnitt, gruppe: str, groesse: Groesse) -> Tuple[WertDef, Vorgabe]
 ```
 
-Die Definition der Zahl und ihre Vorgabe in der Herleitung, im Kasten `gruppe`.
+Die Definition der Zahl und ihre Vorgabe in der Herleitung, im Kasten
+`gruppe` – `groesse`, die Zahl der Beschreibung, oder, ist das
+Feld [[opencivil.core.vorgaben#Feld|fest]], seine Zahl [[opencivil.core.vorgaben#Feld|bis]].
 
 #### Feld.nummeriert
 
@@ -98,7 +113,8 @@ Das Feld der Schicht `i`: `d` wird `d_1`, sein Zeichen `d_{1}`, «#» «Schicht 
 def als_dict(self) -> Dict[str, Any]
 ```
 
-Was die Maske von ihm braucht – «#» steht dort für die Schicht ihrer Karte.
+Was die Maske von ihm braucht – «#» steht dort für die Schicht ihrer
+Karte. `bis` mit seinem Satz und `fest` nur, wo es sie gibt.
 
 ### Gruppe
 

@@ -36,7 +36,9 @@ from opencivil.projekt.eintraege import Beschreibung, MaterialEintrag, erstes_ma
 from opencivil.projekt.balkensystem import BalkensystemEintrag
 from opencivil.projekt.balkensystem3d import Balkensystem3dEintrag
 from opencivil.projekt.erdbeben import ErdbebenEintrag
-from opencivil.projekt.frueher import gamma_w_heraus, spannungen_als_faktoren, wasser_einsetzen
+from opencivil.projekt.frueher import (
+    gamma_w_heraus, spannungen_als_faktoren, umrechnung_setzen, wasser_einsetzen,
+)
 from opencivil.projekt.grundbruch import GrundbruchEintrag
 from opencivil.projekt.pfahl import PfahlEintrag
 from opencivil.projekt.lesen import (
@@ -847,9 +849,10 @@ class Projekt(Beschreibung):
         Ein Projekt aus der Datei, gelesen und geprueft. Was eine Datei von
         frueher anders schreibt, bringt :mod:`~opencivil.projekt.frueher` in
         die neue Form: die Zahl γ_w von Grundbruch und Pfahl wird ein Wasser,
-        die Spannungen eines Spannglieds werden Faktoren.
+        die Spannungen eines Spannglieds werden Faktoren, und ein Pfahl
+        bekommt den Schalter für η_a.
         """
-        roh, alte = gamma_w_heraus(spannungen_als_faktoren(roh))
+        roh, alte = gamma_w_heraus(spannungen_als_faktoren(umrechnung_setzen(roh)))
         projekt = super().aus_dict(roh, wo)
         wasser_einsetzen(projekt, alte)
         return projekt

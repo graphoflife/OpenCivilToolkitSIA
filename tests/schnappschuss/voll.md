@@ -23798,6 +23798,8 @@ $$
 
 #### Bemessungswert auf Druck
 
+> **Annahme:** η\_a ist der Grenzwert für «Berechnung». Der Grenzwert gilt, wenn R\_a,k sehr zuverlässig bestimmt ist; sonst ist η\_a kleiner (SIA 267:2013, 9.5.2.2.6).
+
 **Widerstandsbeiwert auf Druck** *(SIA 267:2013, 9.5.2.2.4, (43))*
 
 $$
@@ -24711,6 +24713,8 @@ $$
 
 #### Bemessungswert auf Druck
 
+> **Annahme:** η\_a ist der Grenzwert für «Berechnung». Der Grenzwert gilt, wenn R\_a,k sehr zuverlässig bestimmt ist; sonst ist η\_a kleiner (SIA 267:2013, 9.5.2.2.6).
+
 **Widerstandsbeiwert auf Druck** *(SIA 267:2013, 9.5.2.2.4, (43))*
 
 $$
@@ -25431,6 +25435,8 @@ R\_a,k ist eingegeben, Grundlage: statischer Versuch. Er ist der kleinste gemess
 
 #### Bemessungswert auf Druck
 
+> **Annahme:** η\_a ist der Grenzwert für «statischer Versuch». Der Grenzwert gilt, wenn R\_a,k sehr zuverlässig bestimmt ist; sonst ist η\_a kleiner (SIA 267:2013, 9.5.2.2.6).
+
 **Widerstandsbeiwert auf Druck** *(SIA 267:2013, 9.5.2.2.4, (43))*
 
 $$
@@ -25768,6 +25774,8 @@ $$
 > **Annahme:** Auf Zug trägt nur der Mantel, mit derselben Mantelreibung wie auf Druck – nach Vorgabe, nicht nachgeschlagen. Ein Zugpfahl muss die Zugkraft über seine ganze Länge tragen (SIA 267:2013, 9.5.3.4.2).
 
 #### Bemessungswert auf Druck
+
+> **Annahme:** η\_a ist der Grenzwert für «vergleichbare Erfahrung». Der Grenzwert gilt, wenn R\_a,k sehr zuverlässig bestimmt ist; sonst ist η\_a kleiner (SIA 267:2013, 9.5.2.2.6).
 
 **Widerstandsbeiwert auf Druck** *(SIA 267:2013, 9.5.2.2.4, (43))*
 

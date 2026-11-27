@@ -108,10 +108,10 @@ def beispiel() -> Projekt:
     setzung.schicht("Moräne", d=4.0, M_E=100.0, M_E_strich=250.0)
     # Und als Pfahl gegründet: ein Bohrpfahl ⌀ 900 durch die Auffüllung, die
     # nicht trägt, und den Kies bis in die Moräne, am Kopf auch quer belastet
-    # -- grün, wie der Rest.
+    # -- grün, wie der Rest. Der Spitzendruck gerechnet, wie vor 2026-11-27.
     pfahl = projekt.pfahl("Pfahl Stütze", stahl=_erstes(projekt, "betonstahl"),
                           beton=_erstes(projekt, "beton"), D=900.0, L=12.0, t_K=1.5,
-                          t_w=3.0)
+                          t_w=3.0, spitze="rechnen")
     pfahl.schicht("Auffüllung", d=2.0, gamma=19.0, mantel="eingeben", q_s=0.0, E_s=10.0)
     pfahl.schicht("Kies, sandig", d=6.0, gamma=21.0, phi_k=34.0, K=0.44, E_s=60.0)
     pfahl.schicht("Moräne", d=15.0, gamma=22.0, phi_k=36.0, c_k=5.0, K=0.41, E_s=120.0)
@@ -465,7 +465,7 @@ def _pfaehle(p: Projekt) -> None:
     """
     stahl, beton = _erstes(p, "betonstahl"), _erstes(p, "beton")
     kies = p.pfahl("Kies, örtlich", stahl=stahl, beton=beton, D=900.0, L=12.0, t_K=1.0,
-                   t_w=4.0)
+                   t_w=4.0, spitze="rechnen")
     kies.schicht("Auffüllung", d=2.5, gamma=19.0, mantel="eingeben", q_s=0.0, E_s=8.0)
     kies.schicht("Kies, sandig", d=7.0, gamma=21.0, phi_k=34.0, K=0.44, E_s=50.0)
     kies.schicht("Moräne", d=20.0, gamma=22.0, phi_k=36.0, c_k=5.0, K=0.6, delta_faktor=0.8,
@@ -474,7 +474,8 @@ def _pfaehle(p: Projekt) -> None:
     kies.kombination("Zug", N_Ed=-300.0)
 
     ton = p.pfahl("Ton, undrainiert", stahl=stahl, beton=beton, D=1200.0, L=15.0, t_K=0.5,
-                  t_w=1.0, abscheren="allgemein", n=16, phi_l=26.0, kopf="eingespannt")
+                  t_w=1.0, spitze="rechnen", abscheren="allgemein", n=16, phi_l=26.0,
+                  kopf="eingespannt")
     ton.schicht("Seeton", d=8.0, gamma=18.0, verhalten="undrainiert", s_u=25.0, alpha=0.6,
                 E_s=6.0)
     ton.schicht("Ton, steif", d=20.0, gamma=20.0, verhalten="undrainiert", s_u=110.0,
@@ -482,13 +483,13 @@ def _pfaehle(p: Projekt) -> None:
     ton.kombination("Druck", N_Ed=6000.0, H_Ed=300.0, M_Ed=200.0)
 
     rohr = p.pfahl("Mikropfahl, Versuch", stahl=stahl, art="mikropfahl", D=200.0, L=8.0,
-                   t_K=0.5, grundlage="statisch", eta_a=1.0, R_ak=900.0, R_ak_zug=700.0,
+                   t_K=0.5, grundlage="statisch", R_ak=900.0, R_ak_zug=700.0,
                    d_a=88.9, t_r=8.0, dt=1.0, eta_i=0.9)
     rohr.kombination("Druck", N_Ed=450.0)
     rohr.kombination("Zug", N_Ed=-380.0)
 
     stab = p.pfahl("Mikropfahl, Stab", stahl=stahl, art="mikropfahl", D=150.0, L=6.0,
-                   t_K=0.0, t_w=10.0, grundlage="erfahrung", eta_a=0.9, tragglied="stab",
+                   t_K=0.0, t_w=10.0, grundlage="erfahrung", tragglied="stab",
                    d_a=40.0, dt=2.0, spitze="eingeben", q_b=2500.0)
     stab.schicht("Kies", d=12.0, gamma=21.0, phi_k=35.0, mantel="eingeben", q_s=120.0,
                  E_s=80.0)

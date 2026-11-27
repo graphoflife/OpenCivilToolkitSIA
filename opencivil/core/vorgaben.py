@@ -26,6 +26,14 @@ Pfeile (``schritt``) braucht nur die Maske. Die Einheit und die Grenzen nimmt
 sie vom Feld der Beschreibung (``katalog.felder``) -- dort steht, in welcher
 Einheit der Kern eine Zahl liest.
 
+ENGER NACH DEN WAHLEN:
+Ein Feld kann nach den Wahlen enger begrenzt sein als sein Feld in der
+Beschreibung (:attr:`Feld.bis`): η_a eines Pfahls ist höchstens der
+Grenzwert seiner Grundlage. Die Maske weist eine grössere Zahl ab, mit dem
+Satz des Feldes. Legen die Wahlen die Zahl fest (:attr:`Feld.fest`), steht
+sie grau in der Maske, und die Herleitung rechnet mit ihr statt mit der
+Zahl der Beschreibung -- η_a aus der Grundlage (Benutzer, 2026-11-27).
+
 WIEDERHOLTE GRUPPEN:
 Die Schichten unter einem Fundament oder an einem Pfahl haben je dieselben
 Felder: eine Gruppe als Vorlage, je Schicht mit ihrer Nummer
@@ -41,7 +49,7 @@ from __future__ import annotations
 import itertools
 import re
 from dataclasses import dataclass, replace
-from typing import Any, Callable, Dict, Mapping, Sequence, Tuple
+from typing import Any, Callable, Dict, Mapping, Optional, Sequence, Tuple
 
 from opencivil.core.berechnung import Vorgabe
 from opencivil.core.einheiten import Einheit, Groesse
@@ -91,11 +99,39 @@ class Feld:
     hinweis: str = ""
     """Was die Maske über dem Feld dazu sagt -- etwa, wie ein Winkel zählt."""
 
+    bis: Optional[float] = None
+    """
+    Wie gross die Zahl nach den Wahlen höchstens ist, in :attr:`einheit` --
+    wo das enger ist als die Grenze ihres Feldes. Die Maske weist eine
+    grössere ab und sagt :attr:`bis_satz`; im Kern prüft die Beschreibung
+    selbst (``regeln``), denn nur sie weiss, ob die Zahl gilt.
+    """
+
+    bis_satz: str = ""
+    """Warum die Zahl höchstens :attr:`bis` ist -- der Satz, mit dem die Maske eine grössere abweist."""
+
+    fest: bool = False
+    """
+    Ob die Wahlen die Zahl auf :attr:`bis` festlegen: die Maske zeigt sie
+    grau, und die Herleitung rechnet mit ihr statt mit der Zahl der
+    Beschreibung (:meth:`vorgabe`).
+    """
+
+    def __post_init__(self) -> None:
+        if self.fest and self.bis is None:
+            raise ValueError(f"Das Feld {self.kurz} ist fest, aber ohne Zahl (bis).")
+
     def vorgabe(self, praefix: str, abschnitt: Abschnitt, gruppe: str,
                 groesse: Groesse) -> Tuple[WertDef, Vorgabe]:
-        """Die Definition der Zahl und ihre Vorgabe in der Herleitung, im Kasten ``gruppe``."""
+        """
+        Die Definition der Zahl und ihre Vorgabe in der Herleitung, im Kasten
+        ``gruppe`` -- ``groesse``, die Zahl der Beschreibung, oder, ist das
+        Feld :attr:`fest`, seine Zahl :attr:`bis`.
+        """
         d = WertDef(id=f"{praefix}.{self.kurz}", symbol=self.zeichen, einheit=self.einheit,
                     beschreibung=self.beschreibung, referenz=self.referenz, stellen=self.stellen)
+        if self.fest:
+            groesse = Groesse(self.bis, self.einheit)
         return d, Vorgabe(id=d.id, ausgabe=d, groesse=groesse, abschnitt=abschnitt, gruppe=gruppe)
 
     def nummeriert(self, i: int) -> "Feld":
@@ -104,11 +140,19 @@ class Feld:
                        beschreibung=self.beschreibung.replace("#", f"{SCHICHT} {i}"))
 
     def als_dict(self) -> Dict[str, Any]:
-        """Was die Maske von ihm braucht -- «#» steht dort für die Schicht ihrer Karte."""
+        """
+        Was die Maske von ihm braucht -- «#» steht dort für die Schicht ihrer
+        Karte. ``bis`` mit seinem Satz und ``fest`` nur, wo es sie gibt.
+        """
         beschreibung = self.beschreibung.replace("#", SCHICHT)
-        return {"feld": self.kurz, "zeichen": self.zeichen,
-                "beschriftung": self.beschriftung or beschreibung, "beschreibung": beschreibung,
-                "referenz": self.referenz, "schritt": self.schritt, "hinweis": self.hinweis}
+        angabe = {"feld": self.kurz, "zeichen": self.zeichen,
+                  "beschriftung": self.beschriftung or beschreibung, "beschreibung": beschreibung,
+                  "referenz": self.referenz, "schritt": self.schritt, "hinweis": self.hinweis}
+        if self.bis is not None:
+            angabe.update(bis=self.bis, bis_satz=self.bis_satz)
+        if self.fest:
+            angabe["fest"] = True
+        return angabe
 
 
 @dataclass(frozen=True)

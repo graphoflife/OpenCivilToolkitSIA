@@ -14,8 +14,9 @@ sammeln sie sich hier, je mit dem, was vorläufig gebaut ist.
 - [ ] **Knicken und Kippen: die Spalten in den Kern?** Zeichen, Einheiten
       und Titel der Felder stehen noch in `qa_stabilitaet.js`. Das
       widerspricht «Felder, Gruppen und Zeichen einer Maske kommen aus dem
-      Kern». Vorschlag: mit Schritt 5, wo ohnehin Felder in den Kern
-      wandern. Vorläufig unverändert.
+      Kern». Vorschlag: als eigener kleiner Schritt nach dem Plan; in
+      Schritt 5 blieb es liegen, weil dort nur die Vorlagen umzogen.
+      Vorläufig unverändert.
 - [ ] **App-Kacheln: kürzere Namen?** In den kleineren Kacheln braucht
       «Querschnittsanalyse» drei Zeilen («Quer-schnitts-analyse»), die
       anderen höchstens zwei. Vorschlag: so lassen, die Reihe ist nur so
@@ -36,13 +37,16 @@ sammeln sie sich hier, je mit dem, was vorläufig gebaut ist.
       wie es ist, steht aber in keiner Norm. Es heisst darum «Feste Sorte»
       und trägt die Marke «fest», wo Normsorten «SIA» tragen. Vorschlag: so
       lassen. Sonst etwa «Vorgabe». Vorläufig: «fest».
-- [ ] **Spannglied: beim Umschalten auf «Fläche A_p» die Fläche des
-      Erzeugnisses übernehmen?** Heute behält jede Stellung ihre Zahl: wer
-      4 Litzen ⌀15.7 hat (600 mm²) und auf «Fläche A_p» schaltet, sieht dort
-      150 mm², die Vorgabe, oder was er früher eingab. Vorschlag: so lassen,
-      hin und her geht nichts verloren. Sonst schriebe das Umschalten die
-      600 mm² ins Feld, eine früher eingegebene Zahl wäre dann weg.
-      Vorläufig: jede Stellung behält ihre Zahl.
+- [ ] **Beim Umschalten die Zahl der anderen Stellung übernehmen?** Heute
+      behält jede Stellung ihre Zahl. Vorschlag: so lassen, hin und her geht
+      nichts verloren; sonst wäre eine früher eingegebene Zahl weg.
+      Vorläufig: jede Stellung behält ihre Zahl. Zwei Stellen:
+      - Spannglied: wer 4 Litzen ⌀15.7 hat (600 mm²) und auf «Fläche A_p»
+        schaltet, sieht dort 150 mm², die Vorgabe, oder was er früher
+        eingab – nicht 600 mm².
+      - Pfahl (Schritt 6): wer nach einem statischen Versuch η_a «aus der
+        Grundlage» hat (1.0) und auf «von Hand» schaltet, sieht dort 0.7,
+        die Vorgabe, oder was er früher eingab – nicht 1.0.
 
 ## Wünsche vom 2026-11-20
 

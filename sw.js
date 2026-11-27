@@ -61,7 +61,7 @@ const VORRAT = {
     "web/js/arten.js?v=452add6cf92b",
     "web/js/balkensystem.js?v=1022d26d8dad",
     "web/js/baum.js?v=97b983cbbf34",
-    "web/js/bausteine.js?v=c672458e6e8e",
+    "web/js/bausteine.js?v=64f6acb1d5f8",
     "web/js/bericht.js?v=2d9f33efce48",
     "web/js/bewehrungssuche.js?v=2582eafd0f54",
     "web/js/bs_diagramme.js?v=b94694de6703",
@@ -87,7 +87,7 @@ const VORRAT = {
     "web/js/dk_grundriss.js?v=3377f145094a",
     "web/js/dk_schnitt.js?v=1cc553f65830",
     "web/js/dk_zeichnung.js?v=f5a5bd05660c",
-    "web/js/dom.js?v=5e053c0be06f",
+    "web/js/dom.js?v=171f61663900",
     "web/js/ds_ansicht.js?v=126bc2761415",
     "web/js/ds_grundriss.js?v=4f1f43cfdf19",
     "web/js/ds_zeichnung.js?v=edfc39294208",
@@ -121,7 +121,7 @@ const VORRAT = {
     "web/js/pf_querschnitt.js?v=62fc3206c74b",
     "web/js/pf_verlauf.js?v=077aa49f7b6c",
     "web/js/pf_zeichnung.js?v=5f0e72c42071",
-    "web/js/pfahl.js?v=3985fde9711a",
+    "web/js/pfahl.js?v=783cfa2dbc7c",
     "web/js/platte.js?v=016db10e2ffc",
     "web/js/platte_bilder.js?v=415c593f5f98",
     "web/js/plattenkapitel.js?v=fed707010dce",
@@ -149,8 +149,8 @@ const VORRAT = {
     "web/js/variablen.js?v=7d43b6f38cd9",
     "web/js/zeichnen.js?v=da6e8eec5dc8",
     "web/js/zustand.js?v=3385a39c0f84",
-    "web/kern/notizbuch.json?v=0d688c0ee54c",
-    "web/kern/quellen.json?v=f915a981fcfa"
+    "web/kern/notizbuch.json?v=e2f5c70880db",
+    "web/kern/quellen.json?v=e67be691e162"
   ],
   "fremd": {
     "web/vendor/jetbrains-mono/": {

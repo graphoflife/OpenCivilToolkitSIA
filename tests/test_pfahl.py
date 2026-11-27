@@ -25,11 +25,15 @@ E_S = 200000.0
 
 
 def projekt(**felder):
-    """Ein Projekt mit C30/37, B500B, dem Wasser und einem Pfahl «P» mit diesen Feldern."""
+    """
+    Ein Projekt mit C30/37, B500B, dem Wasser und einem Pfahl «P» mit diesen
+    Feldern -- der Spitzendruck gerechnet, wie die Handrechnungen hier; neu
+    angelegt ist er seit 2026-11-27 eingegeben (:class:`TestEintrag`).
+    """
     p = Projekt(name="Probe")
     p.fluessigkeit()
     beton, stahl = p.beton("C30/37").kennung, p.stahl("B500B").kennung
-    return p, p.pfahl("P", stahl=stahl, beton=beton, **felder)
+    return p, p.pfahl("P", stahl=stahl, beton=beton, **{"spitze": "rechnen", **felder})
 
 
 def rechnen(p):
@@ -186,14 +190,40 @@ class TestFaktorenDerNorm(unittest.TestCase):
         self.assertAlmostEqual(grade["Druck"], 900.0 / 1.3 / 600.0)
         self.assertAlmostEqual(grade["Zug"], 700.0 / 1.6 / 400.0)
 
-    def test_eta_a_hoechstens_der_grenzwert_der_grundlage(self):
+    def test_eta_a_von_hand_hoechstens_der_grenzwert_der_grundlage(self):
         for grundlage, eta, gleichung in (("berechnung", 0.8, "(48)"), ("erfahrung", 0.95, "(46)"),
                                           ("dynamisch", 0.95, "(47)")):
-            p, t = projekt(grundlage=grundlage, eta_a=eta)
+            p, t = projekt(grundlage=grundlage, umrechnung="hand", eta_a=eta)
             t.schicht("Kies", d=20.0)
             t.kombination("K", N_Ed=100.0)
             with self.subTest(grundlage=grundlage):
                 self.assertIn(f"SIA 267:2013, 9.5.2.2.5, {gleichung}", meldung(p))
+
+    def test_eta_a_aus_der_grundlage_ist_ihr_grenzwert(self):
+        """
+        Aus der Grundlage zählt die Zahl von Hand nicht, auch eine zu grosse
+        nicht; die Herleitung sagt, wann der Grenzwert gilt (9.5.2.2.6).
+        """
+        for grundlage, grenze in (("berechnung", 0.7), ("erfahrung", 0.9), ("dynamisch", 0.9),
+                                  ("statisch", 1.0)):
+            p, t = projekt(grundlage=grundlage, eta_a=0.5 if grenze == 1.0 else 1.0,
+                           R_ak=900.0, R_ak_zug=700.0)
+            t.schicht("Kies", d=20.0)
+            t.kombination("K", N_Ed=100.0)
+            with self.subTest(grundlage=grundlage):
+                _, loesung, aussen, _ = rechnen(p)
+                self.assertEqual(loesung.werte[f"pfahl.{t.kennung}.eta_a"].groesse.si, grenze)
+                self.assertAlmostEqual(aussen.R_ad, grenze * aussen.R_ak / 1.3)
+                self.assertIn("9.5.2.2.6", " ".join(hinweise(loesung)))
+
+    def test_eta_a_von_hand(self):
+        """Von Hand gilt die Zahl, unter dem Grenzwert -- und keine Annahme dazu."""
+        p, t = projekt(grundlage="statisch", umrechnung="hand", eta_a=0.8, R_ak=900.0,
+                       R_ak_zug=700.0)
+        t.kombination("K", N_Ed=100.0)
+        _, loesung, aussen, _ = rechnen(p)
+        self.assertAlmostEqual(aussen.R_ad / 1e3, 0.8 * 900.0 / 1.3)
+        self.assertNotIn("9.5.2.2.6", " ".join(hinweise(loesung)))
 
     def test_eta_i_ueber_0_8_mit_hinweis_hoechstens_0_9(self):
         p, t = projekt(eta_i=0.9)
@@ -262,6 +292,43 @@ class TestEintrag(unittest.TestCase):
         self.assertEqual([s.name for s in t.schichten], ["Schicht 1"])
         self.assertEqual([(k.name, k.N_Ed) for k in t.kombinationen], [("Kombination 1", 1000.0)])
         self.assertEqual((t.art, t.D, t.L, t.eta_a, t.eta_i), ("bohrpfahl", 900.0, 10.0, 0.7, 0.8))
+        # Seit 2026-11-27: η_a aus der Grundlage, der Spitzendruck eingegeben.
+        self.assertEqual((t.umrechnung, t.spitze, t.q_b), ("grundlage", "eingeben", 2000.0))
+
+    def test_neu_angelegt_traegt_der_fuss_mit_2000_kpa(self):
+        """R_b,k = π/4 · D² · q_b,k = π/4 · 0.9² · 2000 kPa, R_a,d = 0.7 · R_a,k / 1.3."""
+        p = Projekt(name="Probe")
+        p.fluessigkeit()
+        beton, stahl = p.beton("C30/37").kennung, p.stahl("B500B").kennung
+        t = p.pfahl("P", stahl=stahl, beton=beton)
+        t.schicht("Kies", d=20.0)
+        t.kombination("K", N_Ed=100.0)
+        _, _, aussen, _ = rechnen(p)
+        self.assertAlmostEqual(aussen.q_b / 1e3, 2000.0)
+        self.assertAlmostEqual(aussen.R_b / 1e3, math.pi / 4.0 * 0.81 * 2000.0)
+        self.assertAlmostEqual(aussen.R_ad, 0.7 * (aussen.R_b + aussen.R_s) / 1.3)
+
+    def test_eine_datei_von_frueher_rechnet_mit_ihrem_eta_a(self):
+        """
+        Ohne den Schalter von 2026-11-27: eine Zahl unter dem Grenzwert bleibt
+        von Hand, eine gleich dem Grenzwert kommt aus der Grundlage, ohne Zahl
+        gilt die Vorgabe von damals, 0.7 -- auch nach einem statischen Versuch.
+        """
+        faelle = (("berechnung", 0.6, "hand", 0.6), ("berechnung", 0.7, "grundlage", 0.7),
+                  ("statisch", 1.0, "grundlage", 1.0), ("statisch", None, "hand", 0.7))
+        p = Projekt(name="Probe")
+        for i, (grundlage, eta, _, _) in enumerate(faelle):
+            p.pfahl(f"P{i}", stahl="", grundlage=grundlage)
+        roh = p.als_dict()
+        for t, (_, eta, _, _) in zip(roh["pfaehle"], faelle):
+            del t["umrechnung"]
+            if eta is None:
+                del t["eta_a"]
+            else:
+                t["eta_a"] = eta
+        wieder = Projekt.aus_dict(roh)
+        self.assertEqual([(t.umrechnung, t.eta_a) for t in wieder.pfaehle],
+                         [(wahl, eta) for _, _, wahl, eta in faelle])
 
     def test_hin_und_zurueck(self):
         p = beispiel_17_15()
@@ -352,14 +419,25 @@ class TestWasDieOberflaecheSieht(unittest.TestCase):
         self.assertEqual(k["felder"]["pfahl"]["D"]["einheit"], "mm")
         self.assertEqual(k["felder"]["pfahlschicht"]["q_s"]["einheit"], "kPa")
         self.assertEqual(k["felder"]["pfahlkombination"]["N_Ed"]["einheit"], "kN")
-        # Der Grenzwert von η_a steht im Hinweis über seinem Feld, je Grundlage.
+        # Der Grenzwert von η_a je Grundlage: aus der Grundlage fest, von Hand
+        # die Grenze des Feldes, mit dem Satz, der eine grössere Zahl abweist.
         aussen = next(g for g in k["vorgaben"]["pfahl"] if g["titel"] == "Äusserer Widerstand")
-        self.assertEqual([(g["wert"], aussen["felder"][g["wert"]][0]["hinweis"], g["versuch"])
+        self.assertEqual(aussen["nach"], ["grundlage", "umrechnung"])
+        eta = {schluessel: felder[0] for schluessel, felder in aussen["felder"].items()}
+        self.assertEqual([(g["wert"], eta[f"{g['wert']}|hand"]["bis"], g["versuch"])
                           for g in k["pfahl"]["grundlagen"]],
-                         [("berechnung", "höchstens 0.7", False),
-                          ("erfahrung", "höchstens 0.9", False),
-                          ("dynamisch", "höchstens 0.9", True),
-                          ("statisch", "höchstens 1.0", True)])
+                         [("berechnung", 0.7, False), ("erfahrung", 0.9, False),
+                          ("dynamisch", 0.9, True), ("statisch", 1.0, True)])
+        self.assertEqual(eta["berechnung|hand"]["hinweis"], "höchstens 0.7 für «Berechnung»")
+        self.assertEqual(eta["berechnung|hand"]["bis_satz"],
+                         "η_a ist für «Berechnung» höchstens 0.7 (SIA 267:2013, 9.5.2.2.5, (48))")
+        self.assertNotIn("fest", eta["berechnung|hand"])
+        self.assertEqual((eta["statisch|grundlage"]["fest"], eta["statisch|grundlage"]["bis"],
+                          eta["statisch|grundlage"]["hinweis"]),
+                         (True, 1.0, "der Grenzwert für «statischer Versuch»"))
+        self.assertEqual([(u["wert"], u["beschriftung"]) for u in k["pfahl"]["umrechnungen"]],
+                         [("grundlage", "aus der Grundlage"), ("hand", "von Hand")])
+        self.assertTrue(all("9.5.2.2.6" in u["titel"] for u in k["pfahl"]["umrechnungen"]))
         # Auf dem Knopf ein Wort, die Erklärung darüber.
         # Das Verhalten teilt der Pfahl mit dem Grundbruch (2026-11-19).
         listen = {liste: k["pfahl"][liste]

@@ -22,6 +22,14 @@ Eine leere Spannung wird die Vorgabe ihres Faktors, eine Zahl der Faktor,
 der sie ergibt -- mit f_pk des Spannstahls, wie die Datei ihn nennt
 (:func:`spannungen_als_faktoren`). So rechnet das Glied wie zuvor, auch wo
 der Faktor dann 0.7258… heisst.
+
+DER UMRECHNUNGSFAKTOR EINES PFAHLS (2026-11-27):
+Bis dahin war η_a eines Pfahls immer eine Zahl von Hand, Vorgabe 0.7.
+Seither waehlt ein Schalter (``umrechnung``), ob η_a der Grenzwert der
+Grundlage ist oder von Hand kommt; neu angelegt aus der Grundlage. Ein Pfahl
+ohne den Schalter behaelt seine Zahl von Hand, wo sie vom Grenzwert
+abweicht, sonst nimmt er den Grenzwert -- so rechnet er wie zuvor
+(:func:`umrechnung_setzen`).
 """
 
 from __future__ import annotations
@@ -31,6 +39,7 @@ from typing import TYPE_CHECKING, Any, Dict, List, Mapping, Tuple
 from opencivil.material.basis import ERDBESCHLEUNIGUNG, Baustoffart
 from opencivil.material.fluessigkeit import ERSTE_FLUESSIGKEIT, FLUESSIGKEITSSORTEN
 from opencivil.material.spannstahl import SPANNSTAHLSORTEN
+from opencivil.pfahl.pfahl import Grundlage, Umrechnung
 from opencivil.querschnitt.spannglieder import ANTEIL_SPANNEN
 
 if TYPE_CHECKING:
@@ -99,6 +108,33 @@ def _alt(eintrag: Any) -> bool:
 
 def _zahl(wert: Any) -> bool:
     return isinstance(wert, (int, float)) and not isinstance(wert, bool)
+
+
+#: η_a eines Pfahls ohne Zahl in der Datei, bis 2026-11-27.
+_ETA_A_BIS_DAHIN = 0.7
+
+
+def umrechnung_setzen(roh: Any) -> Any:
+    """``roh`` mit dem Schalter η_a an jedem Pfahl, der keinen hat -- siehe Dateikopf."""
+    if not isinstance(roh, Mapping) or not isinstance(roh.get("pfaehle"), list):
+        return roh
+    return {**roh, "pfaehle": [_umrechnung(t) for t in roh["pfaehle"]]}
+
+
+def _umrechnung(pfahl: Any) -> Any:
+    """
+    Ein Pfahl mit dem Schalter -- ``pfahl`` selbst, wo er ihn schon hat oder
+    die Grundlage keine ist: das meldet dann das Lesen.
+    """
+    if not isinstance(pfahl, Mapping) or "umrechnung" in pfahl:
+        return pfahl
+    try:
+        grenze = Grundlage(pfahl.get("grundlage", Grundlage.BERECHNUNG.value)).eta_grenze
+    except ValueError:
+        return pfahl
+    eta = pfahl.get("eta_a", _ETA_A_BIS_DAHIN)
+    wahl = Umrechnung.GRUNDLAGE if eta == grenze else Umrechnung.HAND
+    return {**pfahl, "umrechnung": wahl.value, "eta_a": eta}
 
 
 #: Was ein Spannglied bis 2026-11-27 statt seiner Faktoren hatte.

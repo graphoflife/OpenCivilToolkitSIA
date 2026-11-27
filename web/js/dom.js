@@ -127,7 +127,9 @@ export function naechsteStufe(wert, richtung, { stufen, schritt = 1 } = {}) {
 /**
  * Warum der Kern eine Zahl abwiese -- leer, wenn er sie nimmt. `angabe` sind
  * die Grenzen ihres Feldes aus dem Katalog (`feldangabe`): «Teilung muss
- * grösser als null sein». Begrenzt sie ein anderes Feld desselben Eintrags
+ * grösser als null sein». Begrenzen die Wahlen des Eintrags sie enger
+ * (`bis_wahl`: η_a höchstens der Grenzwert der Grundlage eines Pfahls), sagt
+ * es deren Satz. Begrenzt sie ein anderes Feld desselben Eintrags
  * (`bis_feld`, `ab_felder`: α_min nicht über α_max, mit `faktor` ein
  * Vielfaches -- der Durchmesser eines Dübels höchstens ein Viertel seiner
  * Länge --, mit `offen` ausgeschlossen -- die Breite einer Rippe unter
@@ -143,6 +145,7 @@ export function grenzeVerletzt(angabe, zahl, neben = {}) {
   const draussen = (ueber !== undefined && !(zahl > ueber)) || (ab !== undefined && !(zahl >= ab))
     || (bis !== undefined && !(zahl <= bis)) || (unter !== undefined && !(zahl < unter));
   if (draussen) return `${angabe.heisst} ${angabe.verlangt}`;
+  if (angabe.bis_wahl && zahl > angabe.bis_wahl.zahl) return angabe.bis_wahl.satz;
   const oben = grenzeNeben(hoch, neben);
   if (oben !== undefined && (zahl > oben || (hoch.offen && zahl === oben))) return hoch.satz;
   for (const tief of tiefe) {
@@ -219,7 +222,7 @@ export function zahlfeld({
     ...(angabe.ab_felder || []).map((g) => grenzeNeben(g, neben, schritt)));
   const oben = engste(Math.min,
     max ?? angabe.bis ?? (angabe.unter === undefined ? undefined : angabe.unter - schritt),
-    grenzeNeben(angabe.bis_feld, neben, -schritt));
+    grenzeNeben(angabe.bis_feld, neben, -schritt), angabe.bis_wahl?.zahl);
   const uebernehmen = (neu, getippt = String(neu)) => {
     const grund = neu === null ? '' : grenzeVerletzt(angabe, neu, neben);
     if (!grund) {

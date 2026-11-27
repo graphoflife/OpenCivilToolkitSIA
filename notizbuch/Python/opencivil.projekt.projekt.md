@@ -1,5 +1,5 @@
 ---
-erzeugt: cdfa5a288e2a
+erzeugt: 7692fecee701
 art: modul
 tags: [modul]
 ---
@@ -608,7 +608,8 @@ def aus_dict(cls, roh: Mapping[str, Any], wo: Optional[str]=None) -> 'Projekt'
 Ein Projekt aus der Datei, gelesen und geprueft. Was eine Datei von
 frueher anders schreibt, bringt [[opencivil.projekt.frueher|frueher]] in
 die neue Form: die Zahl γ_w von Grundbruch und Pfahl wird ein Wasser,
-die Spannungen eines Spannglieds werden Faktoren.
+die Spannungen eines Spannglieds werden Faktoren, und ein Pfahl
+bekommt den Schalter für η_a.
 
 #### Projekt.neu
 

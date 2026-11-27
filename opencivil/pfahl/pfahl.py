@@ -12,6 +12,7 @@ Rechenwerk, und nur die, die nach den Wahlen gelten (:data:`VORGABEN`,
 * :class:`Grundlage` -- worauf der äussere Widerstand R_a,k beruht: auf einer
   Berechnung aus den Schichten, auf Erfahrung oder auf einem Versuch, und
   wie gross der Umrechnungsfaktor η_a darum höchstens ist;
+* :class:`Umrechnung` -- ob η_a dieser Grenzwert ist oder von Hand kommt;
 * :class:`Spitze` und :class:`Abscheren` -- ob der Fuss trägt und wie;
 * :class:`Kopf` -- ob sich der Kopf frei drehen kann oder eingespannt ist.
 
@@ -129,6 +130,34 @@ class Grundlage(Wahl):
     def aus_versuch(self) -> bool:
         """Ob R_a,k eingegeben wird, statt aus den Schichten zu folgen."""
         return self in (Grundlage.DYNAMISCH, Grundlage.STATISCH)
+
+
+#: Wann der Grenzwert von η_a gilt -- am Schalter, in der Maske und in der
+#: Herleitung (SIA 267:2013, 9.5.2.2.6).
+GRENZWERT_GILT = ("Der Grenzwert gilt, wenn R_a,k sehr zuverlässig bestimmt ist; sonst ist "
+                  "η_a kleiner (SIA 267:2013, 9.5.2.2.6).")
+
+
+class Umrechnung(Wahl):
+    """
+    Woher der Umrechnungsfaktor η_a kommt (Benutzer, 2026-11-27): aus der
+    Grundlage, dann ist er ihr Grenzwert, oder von Hand, höchstens dieser
+    Grenzwert (:data:`GRENZWERT_GILT`). Bis 2026-11-27 war η_a immer eine
+    Zahl von Hand, Vorgabe 0.7 -- auch nach einem statischen Versuch.
+    """
+
+    GRUNDLAGE = "grundlage"
+    HAND = "hand"
+
+    @property
+    def beschriftung(self) -> str:
+        return {Umrechnung.GRUNDLAGE: "aus der Grundlage", Umrechnung.HAND: "von Hand"}[self]
+
+    @property
+    def erklaerung(self) -> str:
+        return {Umrechnung.GRUNDLAGE: "η_a ist der Grenzwert der Grundlage.",
+                Umrechnung.HAND: "η_a von Hand, höchstens der Grenzwert der Grundlage."}[self] \
+            + " " + GRENZWERT_GILT
 
 
 class Spitze(Wahl):
@@ -259,11 +288,18 @@ def _pfahl(art: Pfahlart) -> Tuple[Feld, ...]:
                  hinweis="darüber trägt der Boden nur als Auflast"))
 
 
-def _aussen(grundlage: Grundlage) -> Tuple[Feld, ...]:
-    """η_a mit dem Grenzwert seiner Grundlage -- aus einem Versuch dazu R_a,k selbst."""
+def _aussen(grundlage: Grundlage, umrechnung: Umrechnung) -> Tuple[Feld, ...]:
+    """
+    η_a: aus der Grundlage fest ihr Grenzwert, von Hand höchstens er -- aus
+    einem Versuch dazu R_a,k selbst.
+    """
+    grenze, fuer = grundlage.eta_grenze, f"für «{grundlage.beschriftung}»"
+    fest = umrechnung is Umrechnung.GRUNDLAGE
     eta = Feld("eta_a", r"\eta_a", EINHEITSLOS, "Umrechnungsfaktor des äusseren Widerstands", 2,
                grundlage.referenz, beschriftung="Umrechnungsfaktor", schritt=0.05,
-               hinweis=f"höchstens {grundlage.eta_grenze:.1f}")
+               hinweis=(f"der Grenzwert {fuer}" if fest else f"höchstens {grenze:.1f} {fuer}"),
+               bis=grenze, fest=fest,
+               bis_satz=f"η_a ist {fuer} höchstens {grenze:g} ({grundlage.referenz})")
     if not grundlage.aus_versuch:
         return (eta,)
     return (eta,
@@ -322,7 +358,7 @@ VORGABEN = (
         Feld("t_w", "t_w", M, "Tiefe des höchsten Grundwasserspiegels unter Terrain", 2,
              "SIA 267:2013, 4.2.2.3", beschriftung="Tiefe des Grundwassers", schritt=0.5),
     )),
-    Gruppe("Äusserer Widerstand", _aussen, nach=("grundlage",)),
+    Gruppe("Äusserer Widerstand", _aussen, nach=("grundlage", "umrechnung")),
     Gruppe("Fuss", _fuss, nach=("grundlage", "spitze")),
     Gruppe("Querschnitt", _querschnitt, nach=("art", "tragglied")),
     Gruppe("Querlast", lambda: (
@@ -417,7 +453,10 @@ class Pfahl(Rechenobjekt):
 
     schichten: Sequence[Pfahlschicht]
     grundlage: Grundlage
+    umrechnung: Umrechnung
     eta_a: Groesse
+    """η_a von Hand -- aus der Grundlage gilt ihr Grenzwert (:func:`_aussen`)."""
+
     R_ak: Groesse
     R_ak_zug: Groesse
     """R_a,k aus einem Versuch, auf Druck und auf Zug -- nur dann."""
