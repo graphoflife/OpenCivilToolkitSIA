@@ -1,5 +1,5 @@
 ---
-erzeugt: 7b475b37ae86
+erzeugt: 407f8b1fa27c
 art: modul
 tags: [modul]
 ---
@@ -174,24 +174,25 @@ Die Rechnung eines Stabwerks der Klasse `klasse` – in der Ebene und im Raum.
 ### form_von
 
 ```python
-def form_von(q: StabquerschnittBasis, wo: str, achse: Optional[Profilachse]=None) -> Stabquerschnitt
+def form_von(q: StabquerschnittBasis, wo: str) -> Stabquerschnitt
 ```
 
 Ein Querschnitt nach Vorlage, als Stahlprofil oder von Hand – in der
-Ebene und im Raum. Ein Profil biegt sich in der Ebene um `achse`, im
-Raum um beide.
+Ebene und im Raum. Ein Profil biegt sich um seine
+[[opencivil.projekt.staebe#StabquerschnittBasis.biegeachse|biegeachse]]; hat
+es keine, gilt sein I_y – im Raum biegt es sich um beide.
 
 ### stabquerschnitt_von
 
 ```python
-def stabquerschnitt_von(q: StabquerschnittBasis, aufbau: Aufbau, wo: str, achse: Optional[Profilachse]=None) -> Stabquerschnitt
+def stabquerschnitt_von(q: StabquerschnittBasis, aufbau: Aufbau, wo: str) -> Stabquerschnitt
 ```
 
 Woher die Kennwerte eines Querschnitts kommen – hier wird seine Art
 aufgeloest, in der Ebene und im Raum. Die Platte oder Analyse dazu muss
 es geben; ist noch keine gewaehlt oder fehlt ihr noch etwas
-([[opencivil.projekt.aufbau.kern#Aufbau|Aufbau.unfertige]]), rechnet er nicht, und die Meldung sagt es. Ein Profil biegt sich in der Ebene um `achse`, im Raum um
-beide ([[opencivil.projekt.aufbau.balkensystem#form_von|form_von]]).
+([[opencivil.projekt.aufbau.kern#Aufbau|Aufbau.unfertige]]), rechnet er nicht, und die Meldung sagt es.
+Ein Profil biegt sich um seine Biegeachse ([[opencivil.projekt.aufbau.balkensystem#form_von|form_von]]).
 
 ### _rechnet_nicht
 

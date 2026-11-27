@@ -1,5 +1,5 @@
 ---
-erzeugt: d8d80dee68af
+erzeugt: ee6a4eee4d1e
 art: formel
 tags: [formel]
 ---
@@ -35,6 +35,7 @@ $$
 
 - [[Biegesteifigkeit]]
 - [[Flächenträgheitsmoment eines Kreisrings um z]]
+- [[Torsionsträgheitsmoment eines Kreisrings]]
 
 ## Im Code
 

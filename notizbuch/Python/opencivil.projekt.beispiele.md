@@ -1,5 +1,5 @@
 ---
-erzeugt: 9361c64ef04a
+erzeugt: c33a57ae33e9
 art: modul
 tags: [modul]
 ---
@@ -186,14 +186,14 @@ Charakteristische Werte fuer jedes Material, auf das der Eintrag zeigt.
 def _alles_einmal(p: Projekt, decke: QuerschnittEintrag, analyse: QuerschnittsanalyseEintrag) -> None
 ```
 
-Jede Vorlage, Kennwerte von Hand, Platte und Analyse als
-Querschnitt, beide mit E_eq; jede Form der Stahlprofile um beide
-Achsen – ohne Stab, ausser dem HEB –, das Doppel-T ohne Stab; ein
-Beton und ein Baustahl des Projekts
-und ein eigenes Material, ein weicherer Beton; ein Stab mit dem
-Material gemäss Querschnitt; Gelenke und ein Knoten, dessen Drehung
-keine Steifigkeit hat; Federn am Lager, Bettung, feste Linienlager mit
-und ohne Stab; jede Lastart, auch projiziert.
+Jede Vorlage, Kennwerte von Hand, Platte und Analyse als Querschnitt,
+beide mit E_eq; jede Form der Stahlprofile um beide Achsen – ohne Stab,
+ausser dem HEB –, das Rundrohr ohne Achse, das Doppel-T ohne Stab; ein
+Beton und ein Baustahl des Projekts und ein eigenes Material, ein
+weicherer Beton; ein Stab mit dem Material gemäss Querschnitt; Gelenke
+und ein Knoten, dessen Drehung keine Steifigkeit hat; Federn am Lager,
+Bettung, feste Linienlager mit und ohne Stab; jede Lastart, auch
+projiziert.
 
 ### _beweglich
 
@@ -213,10 +213,11 @@ Ein Rahmen im Raum, der alles einmal braucht: Stützen aus Beton, Stahl
 und Holz, je mit anderem Lager – eingespannt, gelenkig mit Drehfeder,
 verschieblich und in y gehalten –, Riegel in x und y, einer gedreht und
 einer mit Gelenk, ein geneigter Kragarm, ein gebetteter Fundamentbalken;
-Querschnitte nach Vorlage, als Profil, von Hand, aus einer Platte mit
-E_eq und aus einer Querschnittsanalyse, deren I_T sie dafür rechnet –
-beide mit dem Material gemäss Querschnitt –, ein eigenes Material mit
-G; Lasten in jeder Richtung, Torsion, projiziert, an Knoten.
+Querschnitte nach Vorlage, als Profil – dazu ein Rundrohr ohne Stab,
+mit I_z wie I_y –, von Hand, aus einer Platte mit E_eq und aus einer
+Querschnittsanalyse, deren I_T sie dafür rechnet – beide mit dem
+Material gemäss Querschnitt –, ein eigenes Material mit G; Lasten in
+jeder Richtung, Torsion, projiziert, an Knoten.
 
 ### _spannbeton
 

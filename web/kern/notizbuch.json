@@ -4733,6 +4733,17 @@
       ]
     },
     {
+      "name": "Torsionsträgheitsmoment eines Kreisrings",
+      "pfad": "Formelsammlung/Formeln/Torsionsträgheitsmoment eines Kreisrings.md",
+      "art": "formel",
+      "zeichen": [
+        "I_{T}"
+      ],
+      "themen": [
+        "Stabquerschnitte"
+      ]
+    },
+    {
       "name": "Torsionsträgheitsmoment eines Rechtecks",
       "pfad": "Formelsammlung/Formeln/Torsionsträgheitsmoment eines Rechtecks.md",
       "art": "formel",
@@ -8922,6 +8933,7 @@
         "KnotenlastEintrag",
         "StabmaterialEintrag",
         "StabquerschnittEintrag",
+        "StabquerschnittEintrag.biegeachse",
         "StatikdiagrammEintrag",
         "BalkensystemEintrag",
         "BalkensystemEintrag._kehrt_um",
@@ -9475,6 +9487,7 @@
         "StabquerschnittBasis",
         "StabquerschnittBasis.neu",
         "StabquerschnittBasis.bezug",
+        "StabquerschnittBasis.biegeachse",
         "StabquerschnittBasis.stabvorlage",
         "StabquerschnittBasis.masse_mit_vorgaben",
         "StabquerschnittBasis.fehler",
@@ -11334,6 +11347,7 @@
         "verlauf",
         "faelle",
         "umrisse",
+        "biegeachsen",
         "stabachsen"
       ]
     },

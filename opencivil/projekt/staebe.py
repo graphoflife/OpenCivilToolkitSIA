@@ -216,6 +216,15 @@ class StabquerschnittBasis(Beschreibung):
         return {Querschnittsart.PLATTE: self.platte,
                 Querschnittsart.ANALYSE: self.analyse}.get(self.art, "")
 
+    @property
+    def biegeachse(self) -> Optional[Any]:
+        """
+        Um welche Achse sich ein Profil im ebenen Rahmen biegt, eine
+        :class:`~opencivil.projekt.balkensystem.Profilachse` -- hier keine:
+        im Raum biegt es sich um beide.
+        """
+        return None
+
     def stabvorlage(self) -> qs.Stabvorlage:
         return qs.vorlage(self.vorlage)
 

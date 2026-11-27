@@ -59,7 +59,7 @@ const VORRAT = {
     "web/js/app.js?v=b0a9990a1352",
     "web/js/apps.js?v=eb96de56e594",
     "web/js/arten.js?v=901a5bbbd1ab",
-    "web/js/balkensystem.js?v=6e7c0ee5c854",
+    "web/js/balkensystem.js?v=1022d26d8dad",
     "web/js/baum.js?v=97b983cbbf34",
     "web/js/bausteine.js?v=c7d470595059",
     "web/js/bericht.js?v=2d9f33efce48",
@@ -149,8 +149,8 @@ const VORRAT = {
     "web/js/variablen.js?v=7d43b6f38cd9",
     "web/js/zeichnen.js?v=da6e8eec5dc8",
     "web/js/zustand.js?v=3385a39c0f84",
-    "web/kern/notizbuch.json?v=ff9aef21b22e",
-    "web/kern/quellen.json?v=d8457fe096c0"
+    "web/kern/notizbuch.json?v=511e58211962",
+    "web/kern/quellen.json?v=ce3c3e8c63a2"
   ],
   "fremd": {
     "web/vendor/jetbrains-mono/": {

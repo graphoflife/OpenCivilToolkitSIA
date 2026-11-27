@@ -1,12 +1,12 @@
 ---
-erzeugt: e6de088ae04b
+erzeugt: f02647c6978b
 art: formel
 tags: [formel]
 ---
 > [!warning] Normstelle fehlt noch
 > Sie kommt vom Benutzer und wird im Code eingetragen – von dort steht sie im Bericht und hier.
 
-*In der Herleitung: «Flächenträgheitsmoment um z, «Rundrohr» (ROR 219.1 x 8, um z, die schwache Achse)»*
+*In der Herleitung: «Flächenträgheitsmoment um z, «Rundrohr» (ROR 219.1 x 8)»*
 
 $$
 I_{z} = I_{y}
@@ -23,7 +23,7 @@ $$
 Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
-I_{z,\text{Q20}} = I_{y,\text{Q20}} = 2959.63\,\mathrm{cm}^{4}
+I_{z,\text{Q6}} = I_{y,\text{Q6}} = 2959.63\,\mathrm{cm}^{4}
 $$
 
 ## Im Code

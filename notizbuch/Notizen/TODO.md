@@ -21,41 +21,6 @@ Kräften je Geschoss und Wand, ohne Verbindung ins Balkensystem.
 
 ## Offen
 
-
-- [ ] **Stahlprofil in der Querschnittsanalyse: der Bezugspunkt – bitte
-      prüfen** (Schritt 11c, 2026-11-26). Ein Profil hängt an der Mitte
-      seines umschreibenden Rechtecks, nicht am Schwerpunkt, der beim U
-      daneben liegt; im Fenster heisst sie «Mitte y/z». Die Vorlage setzt
-      sie an den geklickten Punkt, die Vorlagen der Flächen dagegen ihre
-      Ecke unten links. Bestätigen oder einen anderen Punkt nennen, etwa den
-      Schwerpunkt oder die Mitte des Stegs.
-
-- [ ] **Stahlquerschnitt: das Rechteckrohr als Kasten – bitte prüfen**
-      (Schritt 12a, 2026-11-26; `opencivil/stahlbau/klasse.py`). Für
-      Kastenträger sei ρ = 0.9/λ_p zu ungenau, sagt SIA 263:2013, 4.5.3.4,
-      und verweist auf Gleichung (70) in 5.6.4.3, die dort für den
-      Druckflansch steht. Eingebaut: (70) für jede Wand jedes
-      Rechteckrohrs. Beispiel RRK 200 × 200 × 5 aus S355 unter Druck:
-      λ_p = 0.844; mit 0.9/λ_p bliebe ρ = 1, mit (70) ist ρ = 0.876, und
-      N_Rd sinkt von 1296.6 auf 1133.1 kN. Bestätigen oder sagen, ob (70)
-      nur für die Flansche grosser Kastenträger gelten soll.
-
-- [ ] **Balkensystem: «Biegung um y – stark | um z – schwach» auch beim
-      Rundrohr** (gesehen am 2026-11-26). Beim ROR und beim quadratischen
-      RRK sind beide Achsen gleich; der Schalter ändert dort nichts.
-      Empfehlung: ihn dort weglassen, wie die Drehung in der
-      Querschnittsanalyse (`drehbar` in `stahlprofile/lage.py`).
-
-- [ ] **Ein Fehler der Zeichnung steht zweimal da.** Liegt ein Stab der
-      Querschnittsanalyse nicht ganz im Beton, steht über der Zeichnung
-      «Nichts zu rechnen: Linie 3, 1. Stab … liegt nicht ganz im Beton.»
-      und an der Zeichnung dieselbe Meldung, rot, ein Klick wählt den Stab.
-      Ebenso ein Material, das es nicht mehr gibt. Empfehlung: der Kern
-      kennzeichnet einen Grund, den die Zeichnung selbst prüft (`bauen` der
-      Analyse, nicht `_vorab_pruefen`), und der Hinweis darüber schweigt
-      dann. Anders als bei der leeren Zeichnung (2026-11-21, [[Entwicklung]])
-      weiss nur der Kern, woher ein Grund kommt: ein Material, das selbst
-      nicht rechnet, zeigt die Zeichnung nicht.
 - [ ] Kurzform hinter dem Auge: weitere Nachweise kennzeichnen. Heute die
       Platte – Biegung bei N = 0, Querkraft mit und ohne Bügel – und seit
       2026-11-18 die Querkraft im Bohrpfahl (Wendel, Druckdiagonalen, das

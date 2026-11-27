@@ -1,5 +1,5 @@
 ---
-erzeugt: 41fdd5fcdf5e
+erzeugt: 21b780236b17
 art: modul
 tags: [modul]
 ---
@@ -171,6 +171,17 @@ def bezug(self) -> str
 ```
 
 Die Kennung der Platte oder Analyse, aus der er kommt – leer bei einer Form.
+
+#### StabquerschnittBasis.biegeachse
+
+```python
+@property
+def biegeachse(self) -> Optional[Any]
+```
+
+Um welche Achse sich ein Profil im ebenen Rahmen biegt, eine
+[[opencivil.projekt.balkensystem#Profilachse|Profilachse]] – hier keine:
+im Raum biegt es sich um beide.
 
 #### StabquerschnittBasis.stabvorlage
 

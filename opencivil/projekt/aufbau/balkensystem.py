@@ -33,7 +33,7 @@ from opencivil.core.einheiten import Groesse
 from opencivil.material.arten import MATERIALARTEN
 from opencivil.material.basis import Baustoff
 from opencivil.projekt.balkensystem import (
-    EINHEIT_DER_LAST, BalkensystemEintrag, Knotenlastart, Profilachse, StabmaterialEintrag,
+    EINHEIT_DER_LAST, BalkensystemEintrag, Knotenlastart, StabmaterialEintrag,
 )
 from opencivil.core.sprache import aufgezaehlt
 from opencivil.projekt.lesen import ProjektFehler, als_groesse
@@ -247,8 +247,7 @@ def bauen(art: "Bauteilart", eintrag: BalkensystemEintrag, aufbau: Aufbau) -> Ba
     Projekts rechnet.
     """
     modell = modell_von(eintrag)
-    querschnitte = [stabquerschnitt_von(q, aufbau, eintrag.wo, q.achse)
-                    for q in eintrag.querschnitte]
+    querschnitte = [stabquerschnitt_von(q, aufbau, eintrag.wo) for q in eintrag.querschnitte]
     return stabwerk_bauen(Balkensystem, art, eintrag, aufbau, modell, querschnitte)
 
 
@@ -265,12 +264,12 @@ def stabwerk_bauen(klasse: type, art: "Bauteilart", eintrag: Any, aufbau: Aufbau
                    weitere_ziele=system.ziele(), bezuege=tuple(system.bezuege))
 
 
-def form_von(q: StabquerschnittBasis, wo: str,
-             achse: Optional[Profilachse] = None) -> Stabquerschnitt:
+def form_von(q: StabquerschnittBasis, wo: str) -> Stabquerschnitt:
     """
     Ein Querschnitt nach Vorlage, als Stahlprofil oder von Hand -- in der
-    Ebene und im Raum. Ein Profil biegt sich in der Ebene um ``achse``, im
-    Raum um beide.
+    Ebene und im Raum. Ein Profil biegt sich um seine
+    :attr:`~opencivil.projekt.staebe.StabquerschnittBasis.biegeachse`; hat
+    es keine, gilt sein I_y -- im Raum biegt es sich um beide.
     """
     if q.art is Querschnittsart.VORLAGE:
         vorlage = q.stabvorlage()
@@ -284,23 +283,23 @@ def form_von(q: StabquerschnittBasis, wo: str,
             raise ProjektFehler(f"der Querschnitt «{q.name}»: {grund.args[0]}", wo=wo) from None
         form = NachVorlage(kennung=q.kennung, name=q.name, herkunft=q.profil,
                            fehler=q.fehler() or "", vorlage=profil.form, masse=dict(profil.masse))
+        achse = q.biegeachse
         return form if achse is None else replace(
             form, herkunft=f"{q.profil}, {achse.beschriftung}", traegheit=achse.traegheit)
     return VonHand(kennung=q.kennung, name=q.name, herkunft="von Hand",
                    fehler=q.fehler() or "", masse=dict(q.kennwerte))
 
 
-def stabquerschnitt_von(q: StabquerschnittBasis, aufbau: Aufbau, wo: str,
-                        achse: Optional[Profilachse] = None) -> Stabquerschnitt:
+def stabquerschnitt_von(q: StabquerschnittBasis, aufbau: Aufbau, wo: str) -> Stabquerschnitt:
     """
     Woher die Kennwerte eines Querschnitts kommen -- hier wird seine Art
     aufgeloest, in der Ebene und im Raum. Die Platte oder Analyse dazu muss
     es geben; ist noch keine gewaehlt oder fehlt ihr noch etwas
-    (:attr:`Aufbau.unfertige`), rechnet er nicht, und die Meldung sagt es. Ein Profil biegt sich in der Ebene um ``achse``, im Raum um
-    beide (:func:`form_von`).
+    (:attr:`Aufbau.unfertige`), rechnet er nicht, und die Meldung sagt es.
+    Ein Profil biegt sich um seine Biegeachse (:func:`form_von`).
     """
     if not q.art.aus_bauteil:
-        return form_von(q, wo, achse)
+        return form_von(q, wo)
     platte = q.art is Querschnittsart.PLATTE
     klasse = AusPlatte if platte else AusAnalyse
     if not q.bezug:

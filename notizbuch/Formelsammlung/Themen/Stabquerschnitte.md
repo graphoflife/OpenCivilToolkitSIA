@@ -1,10 +1,10 @@
 ---
-erzeugt: 3c891b227057
+erzeugt: 07a056664aeb
 art: thema
 tags: [thema]
 ---
 > [!abstract] Balkensysteme
-> 45 Formeln, in der Folge, in der gerechnet wird.
+> 46 Formeln, in der Folge, in der gerechnet wird.
 
 ## Was die Rechnung dazu sagt
 
@@ -46,17 +46,18 @@ Der äquivalente E-Modul eines Stabs: der Modul, den ein reiner, ungerissener Be
 32. [[Fläche eines Rechteckrohrs mit runden Ecken]]
 33. [[Flächenträgheitsmoment eines Rechteckrohrs mit runden Ecken um y]]
 34. [[Flächenträgheitsmoment eines Rechteckrohrs mit runden Ecken um z]]
-35. [[Flächenträgheitsmoment eines Kreisrings um z]]
-36. [[Äquivalenter E-Modul eines Stabs]]
-37. [[Flächenträgheitsmoment eines Rechtecks um z]]
-38. [[Längere Seite eines Rechtecks]]
-39. [[Kürzere Seite eines Rechtecks]]
-40. [[Torsionsträgheitsmoment eines Rechtecks]]
-41. [[Kreis im Knoten eines I-Profils]]
-42. [[Torsionsträgheitsmoment eines I-Profils]]
-43. [[Biegesteifigkeit um y]]
-44. [[Biegesteifigkeit um z]]
-45. [[Torsionssteifigkeit]]
+35. [[Äquivalenter E-Modul eines Stabs]]
+36. [[Flächenträgheitsmoment eines Rechtecks um z]]
+37. [[Längere Seite eines Rechtecks]]
+38. [[Kürzere Seite eines Rechtecks]]
+39. [[Torsionsträgheitsmoment eines Rechtecks]]
+40. [[Kreis im Knoten eines I-Profils]]
+41. [[Torsionsträgheitsmoment eines I-Profils]]
+42. [[Flächenträgheitsmoment eines Kreisrings um z]]
+43. [[Torsionsträgheitsmoment eines Kreisrings]]
+44. [[Biegesteifigkeit um y]]
+45. [[Biegesteifigkeit um z]]
+46. [[Torsionssteifigkeit]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

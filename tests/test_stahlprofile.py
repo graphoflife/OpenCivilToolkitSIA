@@ -8,8 +8,10 @@ import unittest
 
 from opencivil.core.einheiten import CM, CM2, CM4, MM2
 from opencivil.projekt import Projekt
+from opencivil.projekt.balkensystem3d import RaumquerschnittEintrag
 from opencivil.projekt.lesen import ProjektFehler
 from opencivil.stahlprofile.tabelle import PROFILE, PROFILREIHEN, profil
+from opencivil.web import dienst
 from tests.profilwerte import WERTE
 from tests.unfertig import meldung
 
@@ -230,6 +232,32 @@ class TestImBalkensystem(unittest.TestCase):
         I_z = 10 * 100 ** 3 / 12 * 1e-12
         self.assertAlmostEqual(self.EI(stahltraeger("FL 100 x 10", "z")) / (210000e6 * I_z), 1.0,
                                delta=1e-9)
+
+    def test_keine_achse_wo_sie_nichts_aendert(self):
+        """
+        Ein Rundrohr, ein quadratisches Rohr, Vierkant- und Rundstahl sehen um
+        90° gedreht gleich aus: auch «um z» gilt ihr I_y, und der Bericht
+        nennt keine Achse (Benutzer, 2026-11-27).
+        """
+        for name in ("ROR 168.3 x 8", "RRK 200 x 200 x 5", "VKT 40", "RND 30"):
+            with self.subTest(name):
+                ergebnis = stahltraeger(name, "z").rechnen()
+                self.assertIn("balkensystem.r1.Q1.I_y", ergebnis.loesung.werte)
+                self.assertNotIn("balkensystem.r1.Q1.I_z", ergebnis.loesung.werte)
+                bericht = ergebnis.bericht()
+                self.assertIn(name, bericht)
+                self.assertNotIn(f"{name}, um", bericht)
+
+    def test_die_achse_fuer_die_oberflaeche(self):
+        """
+        Den Schalter für die Achse zeigt die Oberfläche nur, wo der Kern eine
+        nennt -- beim HEB, nicht beim Rundrohr, und im Raum bei keinem.
+        """
+        p = stahltraeger("HEB 300", "z")
+        p.balkensysteme[0].stahlprofil("Rohr", "ROR 168.3 x 8", "z")
+        daten = dienst.bearbeite("rechnen", {"projekt": p.als_dict()}).daten["zeichendaten"]
+        self.assertEqual(daten["r1"]["biegeachsen"], {"Q1": "z"})
+        self.assertIsNone(RaumquerschnittEintrag(art="profil", profil="HEB 300").biegeachse)
 
     def test_unbekanntes_profil(self):
         with self.assertRaisesRegex(ProjektFehler, "«HEB 333» gibt es nicht"):

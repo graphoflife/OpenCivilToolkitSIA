@@ -1,5 +1,5 @@
 ---
-erzeugt: 5d135fedd941
+erzeugt: 88a3293b419b
 art: modul
 tags: [modul]
 ---
@@ -171,6 +171,19 @@ Je Querschnitt eines Systems sein Umriss in mm, fuer das Bildchen in
 seiner Zeile (Benutzer, 2026-10-24) – ihn kennt jeder Querschnitt selbst
 ([[opencivil.stabwerk.stabquerschnitt#Stabquerschnitt.umriss|umriss]]).
 Ein Querschnitt, der nicht geht, hat keinen.
+
+### biegeachsen
+
+```python
+def biegeachsen(eintrag: Any) -> Dict[str, str]
+```
+
+Je Querschnitt eines Systems, dessen Profil sich um eine gewaehlte Achse
+biegt, diese Achse: «y» oder «z»
+([[opencivil.projekt.staebe#StabquerschnittBasis.biegeachse|biegeachse]]). Nur
+dort zeigt die Oberflaeche den Schalter dafuer und die Achse in seiner
+Zeile – beim Rundrohr aendert die Wahl nichts (Benutzer, 2026-11-27),
+und im Raum biegt sich jedes Profil um beide.
 
 ### stabachsen
 

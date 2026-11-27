@@ -306,6 +306,16 @@ function umrissBild(system, q, breite, hoehe) {
   return svg;
 }
 
+/**
+ * Um welche Achse sich das Profil eines Querschnitts biegt, «y» oder «z» --
+ * vom Kern, und nur, wo die Wahl etwas ändert: ein Rundrohr, ein
+ * quadratisches Rohr, Vierkant- und Rundstahl sehen gedreht gleich aus
+ * (Benutzer, 2026-11-27), und im Raum biegt sich jedes um beide Achsen.
+ */
+function biegeachse(system, q) {
+  return zustand.loesung?.zeichendaten?.[system.kennung]?.biegeachsen?.[q.kennung] ?? null;
+}
+
 /** Die Masse einer Vorlage mit ihren Vorgaben, aus dem Katalog. */
 function vorgabenDer(art, schluessel) {
   return Object.fromEntries((systemkatalog(art, 'vorlagen').find((v) => v.schluessel === schluessel)?.masse || [])
@@ -317,16 +327,19 @@ const artKurz = (art, q) => systemkatalog(art, 'querschnittsarten').find((x) => 
 
 /**
  * Woher ein Querschnitt kommt, in Worten -- mit den Massen einer Vorlage;
- * ein Profil in der Ebene mit der Achse, um die es sich biegt. Im Raum
- * biegt es sich um beide.
+ * ein Profil mit der Achse, um die es sich biegt, wo sie etwas ändert.
  */
-function herkunftText(art, q) {
+function herkunftText(system, q) {
+  const art = systemart(system.kennung);
   if (q.art === 'vorlage') {
     const vorlage = systemkatalog(art, 'vorlagen').find((v) => v.schluessel === q.vorlage);
     const masse = (vorlage?.masse || []).map((m) => `${m.symbol} ${q.masse?.[m.schluessel] ?? m.vorgabe}`);
     return `${vorlage?.name || q.vorlage} · ${masse.join(' · ')} mm`;
   }
-  if (q.art === 'profil') return q.achse ? `${q.profil} · um ${q.achse}` : q.profil;
+  if (q.art === 'profil') {
+    const achse = biegeachse(system, q);
+    return achse ? `${q.profil} · um ${achse}` : q.profil;
+  }
   if (q.art === 'kennwerte') return 'Kennwerte von Hand';
   const liste = q.art === 'platte' ? zustand.projekt.querschnitte : (zustand.projekt.querschnittsanalysen || []);
   // Die Platte steht in «platte», die Analyse in «analyse»: Felder wie ihre Art.
@@ -367,7 +380,7 @@ function querschnittZeile(system, q, i) {
       }),
       werte ? el('div.bs-kennwerte', { text: werte })
         : el('div.bs-qfehler', { text: fehler?.text || `${kennwertnamen(art)}: –`, title: fehler?.text || '' }),
-      el('div.bs-benutzt', { text: `${herkunftText(art, q)} · ${benutzt.length ? `trägt ${benutzt.join(', ')}` : 'trägt keinen Stab'}` }),
+      el('div.bs-benutzt', { text: `${herkunftText(system, q)} · ${benutzt.length ? `trägt ${benutzt.join(', ')}` : 'trägt keinen Stab'}` }),
     ]),
     el('button.weg', { type: 'button', text: '×', title: 'Querschnitt löschen', on: { click: weg } }),
   ]);
@@ -428,10 +441,10 @@ function querschnittFenster(system, kennung) {
   } else if (q.art === 'profil') {
     // Die Reihe als Schalter mit Bild, die Grösse als Liste -- beim
     // Vollstahl als Zahlen -- mit dem Bild daneben, wie die Vorlage
-    // (Benutzer, 2026-10-24), und in der Ebene die Achse. Dieselbe Wahl wie
-    // beim Profil einer Querschnittsanalyse (profilwahl.js); einen Namen,
-    // der nicht geht, meldet der Kern.
-    const achsen = systemkatalog(art, 'profilachsen');
+    // (Benutzer, 2026-10-24), und die Achse, wo sie etwas ändert. Dieselbe
+    // Wahl wie beim Profil einer Querschnittsanalyse (profilwahl.js); einen
+    // Namen, der nicht geht, meldet der Kern.
+    const achsen = biegeachse(system, q) ? systemkatalog(art, 'profilachsen') : [];
     zeilen.push(
       wahlBlock('Reihe', reihenSchalter(q.profil, setzen('profil'))),
       el('div.bs-qvorlage', {}, [

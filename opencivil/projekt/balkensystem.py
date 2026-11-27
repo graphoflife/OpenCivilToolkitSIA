@@ -56,10 +56,11 @@ from opencivil.material.beton import ERSTER_BETON, sortenwerte
 from opencivil.projekt.eintraege import BauteilEintrag, Beschreibung
 from opencivil.projekt.faelle import LastfallEintrag, LastkombinationEintrag, MitFaellen
 from opencivil.projekt.lesen import bereich, einer_von
-from opencivil.projekt.staebe import MitStaeben, StabquerschnittBasis
+from opencivil.projekt.staebe import MitStaeben, Querschnittsart, StabquerschnittBasis
 from opencivil.stabwerk.modell import Lastart, Lastrichtung
 from opencivil.stabwerk.rechnung import DICHTE, E_MODUL, SCHUBMODUL, STABKENNWERTE
 from opencivil.stabwerk.stabquerschnitt import EBEN
+from opencivil.stahlprofile import lage as profillage
 
 #: Wie ein Lager oder Linienlager je Richtung haelt.
 HALT = ("frei", "fest", "feder")
@@ -307,6 +308,20 @@ class StabquerschnittEintrag(StabquerschnittBasis):
     KENNWERTE = EBEN
 
     achse: Profilachse = Profilachse.Y
+
+    @property
+    def biegeachse(self) -> Optional[Profilachse]:
+        """
+        Um welche Achse sich das Profil biegt: ``achse`` -- keine, wo die Wahl
+        nichts aendert. Ein Rundrohr, ein quadratisches Rohr, Vierkant- und
+        Rundstahl sehen um 90 Grad gedreht gleich aus
+        (:func:`~opencivil.stahlprofile.lage.drehbar`), ihr I_y ist ihr I_z:
+        dort steht kein Schalter, und der Bericht nennt keine Achse (Benutzer,
+        2026-11-27). Bis dahin bog sich ein Rundrohr «um y, die starke Achse».
+        """
+        if self.art is not Querschnittsart.PROFIL or not profillage.drehbar(self.profil):
+            return None
+        return self.achse
 
 
 @dataclass

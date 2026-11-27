@@ -31,12 +31,14 @@ from opencivil.web import (
 def _balkensystem(aufbau: Aufbau, kennung: str, loesung: Loesung) -> Dict[str, Any]:
     """
     Eben wie im Raum: die knappe Uebersicht, je Querschnitt sein Umriss und
-    je Linie ihre Achsen, die die Oberflaeche nicht selbst legt -- auch wenn
-    das System nicht rechnet.
+    die Achse, um die sich sein Profil biegt, und je Linie ihre Achsen, die
+    die Oberflaeche nicht selbst legt -- auch wenn das System nicht rechnet.
     """
-    system = aufbau.teile[kennung].objekt
+    teil = aufbau.teile[kennung]
+    system = teil.objekt
     return {"uebersicht": balkendaten.uebersicht(loesung.befunde.get(system.rechnung.id)),
             "umrisse": balkendaten.umrisse(system, loesung),
+            "biegeachsen": balkendaten.biegeachsen(teil.eintrag),
             "achsen": balkendaten.stabachsen(system)}
 
 

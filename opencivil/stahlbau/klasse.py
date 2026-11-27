@@ -33,7 +33,7 @@ DER KASTEN:
 Fuer Kastentraeger sei die Naeherung ρ = 0.9/λ_p zu ungenau (4.5.3.4); dort
 gilt (70). Ein Rechteckrohr ist ein Kasten -- und (70) gilt hier fuer jede
 seiner Waende, nicht nur fuer den Druckflansch, den 5.6.4.3 nennt (nach
-Vorgabe, nicht nachgeschlagen).
+Vorgabe, nicht nachgeschlagen; so vom Benutzer bestaetigt am 2026-11-27).
 """
 
 from __future__ import annotations

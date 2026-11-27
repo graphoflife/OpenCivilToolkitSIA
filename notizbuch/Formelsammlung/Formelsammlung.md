@@ -1,5 +1,5 @@
 ---
-erzeugt: d33727cdabef
+erzeugt: 3ceba1799d53
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -49,7 +49,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 **Balkensysteme**
 
-- [[Stabquerschnitte]] · 45
+- [[Stabquerschnitte]] · 46
 - [[Steifigkeitsmethode]] · 11
 
 **Grundbruch**
@@ -488,6 +488,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Torsionssteifigkeit]] · $GI_{T}$
 - [[Torsionsträgheitsmoment aus der Spannungsfunktion]]
 - [[Torsionsträgheitsmoment eines I-Profils]] · $I_{T}$
+- [[Torsionsträgheitsmoment eines Kreisrings]] · $I_{T}$
 - [[Torsionsträgheitsmoment eines Rechtecks]] · $I_{T}$
 - [[Torsionsträgheitsmoment, nach Richardson aus beiden Gittern]] · $I_T$
 - [[Torsionswiderstand eines Rechtecks aus Holz]] · $T_{Rd}$
@@ -552,7 +553,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 ## Normstelle fehlt noch
 
-142 von 465 Formeln haben im Code keine Normstelle – meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle – von dort kommt sie in Bericht und Notizbuch.
+143 von 466 Formeln haben im Code keine Normstelle – meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle – von dort kommt sie in Bericht und Notizbuch.
 
 - [[Achsen eines Stabs im Raum]] · [[opencivil.stabwerk3d.herleitung|_ansaetze]]
 - [[Äquivalenter E-Modul eines Stabs]] · [[opencivil.spannungsanalyse.modul#ModulProzedur|ModulProzedur._schreiben]]
@@ -680,6 +681,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Torsionssteifigkeit]] · [[opencivil.stabwerk.rechnung#_modul_mal_kennwert|_modul_mal_kennwert]]
 - [[Torsionsträgheitsmoment aus der Spannungsfunktion]] · [[opencivil.querschnitt.analyse#Querschnittsanalyse.torsion_protokollieren|Querschnittsanalyse.torsion_protokollieren]]
 - [[Torsionsträgheitsmoment eines I-Profils]] · [[opencivil.stahlprofile.formen]]
+- [[Torsionsträgheitsmoment eines Kreisrings]] · [[opencivil.stabwerk.querschnitte#_wie_um_y|_wie_um_y]]
 - [[Torsionsträgheitsmoment eines Rechtecks]] · [[opencivil.stabwerk.querschnitte#_torsion|_torsion]]
 - [[Torsionsträgheitsmoment, nach Richardson aus beiden Gittern]] · [[opencivil.querschnitt.analyse#Querschnittsanalyse.torsion_protokollieren|Querschnittsanalyse.torsion_protokollieren]]
 - [[Torsionswiderstandsmoment des Rechtecks]] · [[opencivil.nachweis.qa_holz_werte#HolzwerteQA|HolzwerteQA._torsion]]

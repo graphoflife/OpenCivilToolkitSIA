@@ -1,5 +1,5 @@
 ---
-erzeugt: 9539eda0a040
+erzeugt: f30d88da95ed
 art: modul
 tags: [modul]
 ---
@@ -21,10 +21,10 @@ kommen, rechnet dieselbe Lage ([[opencivil.stahlprofile.bleche|bleche]]).
 ## DIE MITTE
 
 Die Mitte des umschreibenden Rechtecks, in mm – nicht der Schwerpunkt, der
-beim U neben ihr liegt. An ihr haengt das Profil in der Zeichnung (ein
-Knoten), um sie dreht es sich. Ungedreht steht es wie in der Tabelle
-([[opencivil.stahlprofile.formen|formen]]): der Steg senkrecht, beim U der
-Ruecken links.
+beim U neben ihr liegt (so vom Benutzer bestaetigt am 2026-11-27). An ihr
+haengt das Profil in der Zeichnung (ein Knoten), um sie dreht es sich.
+Ungedreht steht es wie in der Tabelle ([[opencivil.stahlprofile.formen|formen]]):
+der Steg senkrecht, beim U der Ruecken links.
 
 
 ## DREHEN UND SPIEGELN
@@ -190,6 +190,7 @@ einziges steht unten.
 
 ## Gebraucht von
 
+- [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.profile]]
 - [[opencivil.projekt.querschnittsanalyse]]
 - [[opencivil.querschnitt.analyse]]

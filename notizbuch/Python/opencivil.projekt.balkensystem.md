@@ -1,5 +1,5 @@
 ---
-erzeugt: 9c73db2c8f7a
+erzeugt: 6dd6ec1d7c80
 art: modul
 tags: [modul]
 ---
@@ -287,6 +287,20 @@ Ein Querschnitt der Staebe in der Ebene: ein Stahlprofil biegt sich um `achse`.
 - `KENNWERTE = EBEN`
 - `achse: Profilachse = Profilachse.Y`
 
+#### StabquerschnittEintrag.biegeachse
+
+```python
+@property
+def biegeachse(self) -> Optional[Profilachse]
+```
+
+Um welche Achse sich das Profil biegt: `achse` – keine, wo die Wahl
+nichts aendert. Ein Rundrohr, ein quadratisches Rohr, Vierkant- und
+Rundstahl sehen um 90 Grad gedreht gleich aus
+([[opencivil.stahlprofile.lage#drehbar|drehbar]]), ihr I_y ist ihr I_z:
+dort steht kein Schalter, und der Bericht nennt keine Achse (Benutzer,
+2026-11-27). Bis dahin bog sich ein Rundrohr «um y, die starke Achse».
+
 ### StatikdiagrammEintrag
 
 ```python
@@ -386,6 +400,7 @@ Ein Stahlprofil aus der Tabelle, «HEB 300» – gebogen um `achse`, y die stark
 - [[opencivil.stabwerk.modell]]
 - [[opencivil.stabwerk.rechnung]]
 - [[opencivil.stabwerk.stabquerschnitt]]
+- [[opencivil.stahlprofile.lage]]
 
 ## Gebraucht von
 

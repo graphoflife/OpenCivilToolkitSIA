@@ -544,14 +544,14 @@ def charakteristisch(eintrag) -> dict:
 def _alles_einmal(p: Projekt, decke: QuerschnittEintrag,
                   analyse: QuerschnittsanalyseEintrag) -> None:
     """
-    Jede Vorlage, Kennwerte von Hand, Platte und Analyse als
-    Querschnitt, beide mit E_eq; jede Form der Stahlprofile um beide
-    Achsen -- ohne Stab, ausser dem HEB --, das Doppel-T ohne Stab; ein
-    Beton und ein Baustahl des Projekts
-    und ein eigenes Material, ein weicherer Beton; ein Stab mit dem
-    Material gemäss Querschnitt; Gelenke und ein Knoten, dessen Drehung
-    keine Steifigkeit hat; Federn am Lager, Bettung, feste Linienlager mit
-    und ohne Stab; jede Lastart, auch projiziert.
+    Jede Vorlage, Kennwerte von Hand, Platte und Analyse als Querschnitt,
+    beide mit E_eq; jede Form der Stahlprofile um beide Achsen -- ohne Stab,
+    ausser dem HEB --, das Rundrohr ohne Achse, das Doppel-T ohne Stab; ein
+    Beton und ein Baustahl des Projekts und ein eigenes Material, ein
+    weicherer Beton; ein Stab mit dem Material gemäss Querschnitt; Gelenke
+    und ein Knoten, dessen Drehung keine Steifigkeit hat; Federn am Lager,
+    Bettung, feste Linienlager mit und ohne Stab; jede Lastart, auch
+    projiziert.
     """
     s = p.balkensystem("Alles einmal")
     beton = s.beton("b1")
@@ -626,10 +626,11 @@ def _raumrahmen(p: Projekt, decke: QuerschnittEintrag,
     und Holz, je mit anderem Lager -- eingespannt, gelenkig mit Drehfeder,
     verschieblich und in y gehalten --, Riegel in x und y, einer gedreht und
     einer mit Gelenk, ein geneigter Kragarm, ein gebetteter Fundamentbalken;
-    Querschnitte nach Vorlage, als Profil, von Hand, aus einer Platte mit
-    E_eq und aus einer Querschnittsanalyse, deren I_T sie dafür rechnet --
-    beide mit dem Material gemäss Querschnitt --, ein eigenes Material mit
-    G; Lasten in jeder Richtung, Torsion, projiziert, an Knoten.
+    Querschnitte nach Vorlage, als Profil -- dazu ein Rundrohr ohne Stab,
+    mit I_z wie I_y --, von Hand, aus einer Platte mit E_eq und aus einer
+    Querschnittsanalyse, deren I_T sie dafür rechnet -- beide mit dem
+    Material gemäss Querschnitt --, ein eigenes Material mit G; Lasten in
+    jeder Richtung, Torsion, projiziert, an Knoten.
     """
     s = p.balkensystem3d("Raumrahmen")
     beton = s.beton("b1")
@@ -641,6 +642,7 @@ def _raumrahmen(p: Projekt, decke: QuerschnittEintrag,
                                         I_T=225.0)
     streifen = s.querschnitt_aus("Deckenstreifen", "platte", decke, E_eq={"M": 20.0})
     kasten = s.querschnitt_aus("Kasten", "analyse", analyse)
+    s.stahlprofil("Rundrohr", "ROR 219.1 x 8")
     s.linie((0, 0, 0), (0, 0, 3), querschnitt=balken, material=beton)
     s.linie((6, 0, 0), (6, 0, 3), querschnitt=heb, material=stahl, drehung=90.0)
     s.linie((0, 4, 0), (0, 4, 3), querschnitt=hand, material=holz)

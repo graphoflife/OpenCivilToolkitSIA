@@ -1,5 +1,5 @@
 ---
-erzeugt: 288c36805605
+erzeugt: 3b4a10dfabaa
 art: modul
 tags: [modul]
 ---
@@ -208,4 +208,5 @@ def vorlage(schluessel: str) -> Stabvorlage
 - [[Kürzere Seite eines Rechtecks]] · `_seiten`
 - [[Längere Seite eines Rechtecks]] · `_seiten`
 - [[Schwerpunkt eines T-Querschnitts]]
+- [[Torsionsträgheitsmoment eines Kreisrings]] · `_wie_um_y`
 - [[Torsionsträgheitsmoment eines Rechtecks]] · `_torsion`

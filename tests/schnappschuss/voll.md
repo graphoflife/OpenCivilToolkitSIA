@@ -1,6 +1,6 @@
 # Voll
 
-952 Berechnungen ausgeführt, 1542 Werte bestimmt.
+957 Berechnungen ausgeführt, 1547 Werte bestimmt.
 
 ## Herleitung
 
@@ -27584,7 +27584,7 @@ $$
 \end{aligned}
 $$
 
-**Querschnittsfläche, «Rundrohr» (ROR 219.1 x 8, um z, die schwache Achse)**
+**Querschnittsfläche, «Rundrohr» (ROR 219.1 x 8)**
 
 $$
 \begin{aligned}
@@ -27594,7 +27594,7 @@ $$
 \end{aligned}
 $$
 
-**Flächenträgheitsmoment um y, «Rundrohr» (ROR 219.1 x 8, um z, die schwache Achse)**
+**Flächenträgheitsmoment um y, «Rundrohr» (ROR 219.1 x 8)**
 
 $$
 \begin{aligned}
@@ -27602,12 +27602,6 @@ $$
   &= \frac{\pi \cdot \left(\left(219.1\,\mathrm{mm}\right)^{4} - \left(219.1\,\mathrm{mm} - 2 \cdot 8\,\mathrm{mm}\right)^{4}\right)}{64} \\
   &= 2959.63\,\mathrm{cm}^{4}
 \end{aligned}
-$$
-
-**Flächenträgheitsmoment um z, «Rundrohr» (ROR 219.1 x 8, um z, die schwache Achse)**
-
-$$
-I_{z,\text{Q20}} = I_{y,\text{Q20}} = 2959.63\,\mathrm{cm}^{4}
 $$
 
 **Normalkraft für E\_eq, «Deckenstreifen»**
@@ -28470,6 +28464,38 @@ $$
 
 $$
 I_{yz,\text{Q5}} = 0\,\cdot 10^{6}\,\mathrm{mm}^{4}
+$$
+
+**Querschnittsfläche, «Rundrohr» (ROR 219.1 x 8)**
+
+$$
+\begin{aligned}
+  A_{\text{Q6}} &= \frac{\pi \cdot \left(\left(D_{\text{Q6}}\right)^{2} - \left(D_{\text{Q6}} - 2 \cdot t_{\text{Q6}}\right)^{2}\right)}{4} \\
+  &= \frac{\pi \cdot \left(\left(219.1\,\mathrm{mm}\right)^{2} - \left(219.1\,\mathrm{mm} - 2 \cdot 8\,\mathrm{mm}\right)^{2}\right)}{4} \\
+  &= 53.06\,\mathrm{cm}^{2}
+\end{aligned}
+$$
+
+**Flächenträgheitsmoment um y, «Rundrohr» (ROR 219.1 x 8)**
+
+$$
+\begin{aligned}
+  I_{y,\text{Q6}} &= \frac{\pi \cdot \left(\left(D_{\text{Q6}}\right)^{4} - \left(D_{\text{Q6}} - 2 \cdot t_{\text{Q6}}\right)^{4}\right)}{64} \\
+  &= \frac{\pi \cdot \left(\left(219.1\,\mathrm{mm}\right)^{4} - \left(219.1\,\mathrm{mm} - 2 \cdot 8\,\mathrm{mm}\right)^{4}\right)}{64} \\
+  &= 2959.63\,\mathrm{cm}^{4}
+\end{aligned}
+$$
+
+**Flächenträgheitsmoment um z, «Rundrohr» (ROR 219.1 x 8)**
+
+$$
+I_{z,\text{Q6}} = I_{y,\text{Q6}} = 2959.63\,\mathrm{cm}^{4}
+$$
+
+**Torsionsträgheitsmoment, «Rundrohr» (ROR 219.1 x 8)**
+
+$$
+I_{T,\text{Q6}} = 2 \cdot I_{y,\text{Q6}} = 2 \cdot 2959.63\,\mathrm{cm}^{4} = 5919.27\,\mathrm{cm}^{4}
 $$
 
 **Normalkraft für E\_eq, «Deckenstreifen»**
@@ -32981,12 +33007,6 @@ $$
 I_{z} = \frac{h_{\text{Q19}} \cdot \left(b_{\text{Q19}}\right)^{3} - \left(h_{\text{Q19}} - 2 \cdot t_{\text{Q19}}\right) \cdot \left(b_{\text{Q19}} - 2 \cdot t_{\text{Q19}}\right)^{3}}{12} - 4 \cdot \left(0.00755 \cdot \left(r_{o}\right)^{4} + 0.2146 \cdot \left(r_{o}\right)^{2} \cdot \left(\frac{b_{\text{Q19}}}{2} - 0.2234 \cdot r_{o}\right)^{2}\right) + 4 \cdot \left(0.00755 \cdot \left(r_{i}\right)^{4} + 0.2146 \cdot \left(r_{i}\right)^{2} \cdot \left(\frac{b_{\text{Q19}}}{2} - t_{\text{Q19}} - 0.2234 \cdot r_{i}\right)^{2}\right)
 $$
 
-**Flächenträgheitsmoment um z, «Rundrohr» (ROR 219.1 x 8, um z, die schwache Achse)**
-
-$$
-I_{z} = I_{y}
-$$
-
 **Äquivalenter E-Modul, «Deckenstreifen»**
 
 $$
@@ -33045,6 +33065,18 @@ $$
 
 $$
 I_{T} = \frac{2}{3} \cdot b_{\text{Q2}} \cdot \left(t_{f}\right)^{3} \cdot \left(1 - 0.63 \cdot \frac{t_{f}}{b_{\text{Q2}}}\right) + \frac{1}{3} \cdot \left(h_{\text{Q2}} - 2 \cdot t_{f}\right) \cdot \left(t_{w}\right)^{3} + 2 \cdot \left(0.145 + 0.1 \cdot \frac{r_{\text{Q2}}}{t_{f}}\right) \cdot \frac{t_{w}}{t_{f}} \cdot \left(d_{K}\right)^{4}
+$$
+
+**Flächenträgheitsmoment um z, «Rundrohr» (ROR 219.1 x 8)**
+
+$$
+I_{z} = I_{y}
+$$
+
+**Torsionsträgheitsmoment, «Rundrohr» (ROR 219.1 x 8)**
+
+$$
+I_{T} = 2 \cdot I_{y}
 $$
 
 **Biegesteifigkeit um y, «Balken 300×500» aus C30/37**
@@ -34740,7 +34772,6 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Querschnittsfläche, Rundrohr | $A_{\text{Q20}}$ | $53.06$ | cm² | berechnet |
 | Aussendurchmesser, Rundrohr | $D_{\text{Q20}}$ | $219.1$ | mm | Vorgabe |
 | Flächenträgheitsmoment um y, Rundrohr | $I_{y,\text{Q20}}$ | $2959.63$ | cm⁴ | berechnet |
-| Flächenträgheitsmoment um z, Rundrohr | $I_{z,\text{Q20}}$ | $2959.63$ | cm⁴ | berechnet |
 | Wanddicke, Rundrohr | $t_{\text{Q20}}$ | $8$ | mm | Vorgabe |
 | Querschnittsfläche, Rohr | $A_{\text{Q3}}$ | $4973$ | mm² | berechnet |
 | Aussendurchmesser, Rohr | $D_{\text{Q3}}$ | $168.3$ | mm | Vorgabe |
@@ -34858,6 +34889,12 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Biegesteifigkeit um z, Kasten, C30/37 | $EI_{z,\text{Q5}}$ | $755604$ | kNm² | berechnet |
 | Torsionssteifigkeit, Kasten, C30/37 | $GI_{T,\text{Q5}}$ | $384911$ | kNm² | berechnet |
 | Eigengewicht je Meter, Kasten, C30/37 | $g_{k,\text{Q5}}$ | $8.25$ | kN/m | berechnet |
+| Querschnittsfläche, Rundrohr | $A_{\text{Q6}}$ | $53.06$ | cm² | berechnet |
+| Aussendurchmesser, Rundrohr | $D_{\text{Q6}}$ | $219.1$ | mm | Vorgabe |
+| Torsionsträgheitsmoment, Rundrohr | $I_{T,\text{Q6}}$ | $5919.27$ | cm⁴ | berechnet |
+| Flächenträgheitsmoment um y, Rundrohr | $I_{y,\text{Q6}}$ | $2959.63$ | cm⁴ | berechnet |
+| Flächenträgheitsmoment um z, Rundrohr | $I_{z,\text{Q6}}$ | $2959.63$ | cm⁴ | berechnet |
+| Wanddicke, Rundrohr | $t_{\text{Q6}}$ | $8$ | mm | Vorgabe |
 | Erdbeschleunigung | $g$ | $10$ | m/s² | Vorgabe |
 | Elastizitätsmodul des Baustahls | $E_{a,\text{S355}}$ | $210000$ | N/mm² | Vorgabe |
 | Schubmodul des Baustahls | $G_{a,\text{S355}}$ | $81000$ | N/mm² | Vorgabe |

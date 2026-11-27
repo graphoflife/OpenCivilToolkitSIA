@@ -7,6 +7,39 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-27 · Balkensystem: keine Achse, wo sie nichts ändert
+
+Der Benutzer hat es am 2026-11-27 gewählt; gesehen am 2026-11-26.
+
+**Vorher und nachher.** Ein Stab aus einem Rundrohr ROR 168.3 × 8 im
+ebenen Balkensystem. Vorher stand im Fenster des Querschnitts der Schalter
+«Biegung: um y – stark | um z – schwach», die Zeile hiess «ROR 168.3 x 8 ·
+um y», und der Bericht schrieb «ROR 168.3 x 8, um y, die starke Achse».
+Ein Rundrohr hat keine starke Achse, und der Schalter änderte nichts.
+Nachher steht dort kein Schalter, die Zeile heisst «ROR 168.3 x 8», und der
+Bericht nennt keine Achse. Ebenso beim quadratischen Rechteckrohr, beim
+Vierkant- und beim Rundstahl.
+
+**Eine Stelle.** Ob die Achse etwas ändert, sagt dieselbe Regel, die in
+der Querschnittsanalyse die Drehung weglässt: sieht ein Profil um 90°
+gedreht gleich aus, ist I_y gleich I_z (`drehbar` in
+`stahlprofile/lage.py`). Der Querschnitt des Balkensystems fragt sie
+(`biegeachse`). Die Rechnung nimmt dann I_y, und die Oberfläche bekommt die
+Achse mit den Zeichendaten, nur dort, wo sie etwas ändert. Die gespeicherte
+Wahl bleibt: wer zurück auf ein HEB wechselt, findet sie wieder.
+
+**So bleibt es (Benutzer, 2026-11-27).** Drei Fragen aus dem TODO hat der
+Benutzer am selben Tag beantwortet:
+
+- Ein Stahlprofil in der Querschnittsanalyse hängt an der Mitte seines
+  umschreibenden Rechtecks, nicht am Schwerpunkt.
+- Ein Rechteckrohr ist ein Kasten: Gleichung (70) der SIA 263 gilt für
+  jede seiner Wände, nicht nur für den Druckflansch. Ein RRK 200 × 200 × 5
+  aus S355 trägt damit unter Druck 1133.1 kN statt 1296.6 kN.
+- Liegt ein Stab der Querschnittsanalyse nicht ganz im Beton, steht die
+  Meldung weiter zweimal da: über der Zeichnung und rot an ihr, wo ein
+  Klick den Stab wählt.
+
 ## 2026-11-27 · Flachstahl: Kippen und kleine Kennwerte
 
 Aus der Durchsicht nach HALFEN HDB; der Benutzer hat es am 2026-11-27

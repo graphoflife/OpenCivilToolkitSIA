@@ -1,5 +1,5 @@
 ---
-erzeugt: 6fe9ed7d4fc1
+erzeugt: 3991a4f922da
 art: modul
 tags: [modul]
 ---
@@ -27,8 +27,8 @@ def _balkensystem(aufbau: Aufbau, kennung: str, loesung: Loesung) -> Dict[str, A
 ```
 
 Eben wie im Raum: die knappe Uebersicht, je Querschnitt sein Umriss und
-je Linie ihre Achsen, die die Oberflaeche nicht selbst legt – auch wenn
-das System nicht rechnet.
+die Achse, um die sich sein Profil biegt, und je Linie ihre Achsen, die
+die Oberflaeche nicht selbst legt – auch wenn das System nicht rechnet.
 
 ### zeichendaten
 

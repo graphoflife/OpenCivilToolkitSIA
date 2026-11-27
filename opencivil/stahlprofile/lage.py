@@ -12,10 +12,10 @@ kommen, rechnet dieselbe Lage (:mod:`~opencivil.stahlprofile.bleche`).
 
 DIE MITTE:
 Die Mitte des umschreibenden Rechtecks, in mm -- nicht der Schwerpunkt, der
-beim U neben ihr liegt. An ihr haengt das Profil in der Zeichnung (ein
-Knoten), um sie dreht es sich. Ungedreht steht es wie in der Tabelle
-(:mod:`~opencivil.stahlprofile.formen`): der Steg senkrecht, beim U der
-Ruecken links.
+beim U neben ihr liegt (so vom Benutzer bestaetigt am 2026-11-27). An ihr
+haengt das Profil in der Zeichnung (ein Knoten), um sie dreht es sich.
+Ungedreht steht es wie in der Tabelle (:mod:`~opencivil.stahlprofile.formen`):
+der Steg senkrecht, beim U der Ruecken links.
 
 DREHEN UND SPIEGELN:
 Erst gespiegelt, an der senkrechten Achse durch die Mitte -- beim U ist der

@@ -280,6 +280,19 @@ def umrisse(system: Stabwerksrechnung, loesung: Any) -> Dict[str, List[List[List
             for q in system.querschnitte}
 
 
+def biegeachsen(eintrag: Any) -> Dict[str, str]:
+    """
+    Je Querschnitt eines Systems, dessen Profil sich um eine gewaehlte Achse
+    biegt, diese Achse: «y» oder «z»
+    (:attr:`~opencivil.projekt.staebe.StabquerschnittBasis.biegeachse`). Nur
+    dort zeigt die Oberflaeche den Schalter dafuer und die Achse in seiner
+    Zeile -- beim Rundrohr aendert die Wahl nichts (Benutzer, 2026-11-27),
+    und im Raum biegt sich jedes Profil um beide.
+    """
+    return {q.kennung: achse.value for q in eintrag.querschnitte
+            if (achse := q.biegeachse) is not None}
+
+
 def stabachsen(rechnung: Stabwerksrechnung) -> Dict[str, Dict[str, List[float]]]:
     """
     Je Linie eines Systems ihre Achsen, wie der Rechenkern sie legt
