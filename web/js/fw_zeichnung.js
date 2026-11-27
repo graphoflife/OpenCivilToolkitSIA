@@ -114,6 +114,8 @@ function adapter(kennung) {
     umriss: () => umrissVon((eintragVon(kennung)?.knoten || []).map((k) => [k.x, k.y]), [[0, 0], [6, 3]]),
     fragen: () => api.fachwerkZeichnung(zustand.projekt, kennung),
     nehmen: (_, antwort) => antwort.uebersicht,
+    // Unter der Zeichnung auch, was zum Fachwerk zu sagen ist: wo noch keines gesucht ist, welche Last offen bleibt.
+    meldungen: (_, antwort) => [...antwort.meldungen, ...antwort.zum_fachwerk],
     eigenschaften,
     neuEigenschaften,
   };

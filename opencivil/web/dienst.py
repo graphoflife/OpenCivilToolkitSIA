@@ -538,12 +538,32 @@ def fachwerk_zeichnung(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     Beschreibung noch hat.
     """
     projekt = _projekt(rumpf)
-    kennung = str(rumpf.get("kennung") or "")
-    if not isinstance(projekt.bauteil(kennung), FachwerkmodellEintrag):
-        raise DienstFehler(400, f"'{kennung}' ist kein Fachwerkmodell.")
+    kennung = _fachwerkmodell(projekt, rumpf).kennung
     aufbau = projekt.aufbauen()
     loesung = _bauteil_rechnen(projekt, aufbau, kennung)
     return {"uebersicht": endlich(fachwerkdaten.zeichnung(aufbau, kennung, loesung))}
+
+
+def fachwerk_suchen(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
+    """
+    Eine Runde der Suche nach einem Fachwerk (:func:`fachwerkdaten.suchen`):
+    der Zustand der letzten Runde hinein, der naechste, das Fachwerk und der
+    Stand heraus -- gleich fuer Server und Pyodide. Die Seite fragt Runde um
+    Runde an, bis die Suche fertig ist oder jemand anhaelt; sie rechnet
+    dabei nichts. Ohne ``zustand`` beginnt die Suche von vorn, ebenso, wenn
+    er zu einem anderen Stand des Modells gehoert.
+    """
+    projekt = _projekt(rumpf)
+    return endlich(fachwerkdaten.suchen(_fachwerkmodell(projekt, rumpf), rumpf.get("zustand")))
+
+
+def _fachwerkmodell(projekt: Projekt, rumpf: Mapping[str, Any]) -> FachwerkmodellEintrag:
+    """Das Fachwerkmodell, das ``kennung`` nennt -- sonst ist die Anfrage falsch."""
+    kennung = str(rumpf.get("kennung") or "")
+    eintrag = projekt.bauteil(kennung)
+    if not isinstance(eintrag, FachwerkmodellEintrag):
+        raise DienstFehler(400, f"'{kennung}' ist kein Fachwerkmodell.")
+    return eintrag
 
 
 def decke_ergebnis(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
@@ -755,6 +775,7 @@ ANFRAGEN: Dict[str, Callable[[Mapping[str, Any]], Dict[str, Any]]] = {
     "decke_zeichnung": decke_zeichnung,
     "decke_ergebnis": decke_ergebnis,
     "fachwerk_zeichnung": fachwerk_zeichnung,
+    "fachwerk_suchen": fachwerk_suchen,
     "vorlage": vorlage,
     "vorlage_einsetzen": vorlage_einsetzen,
 }

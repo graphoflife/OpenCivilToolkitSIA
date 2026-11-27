@@ -136,6 +136,40 @@ sammeln sie sich hier, je mit dem, was vorläufig gebaut ist.
       Scheibe hängt; dann liegt das Zeichen auf ihr. Vorschlag: so lassen,
       später nach aussen drehen, wo kein Material ist. Vorläufig: unten,
       nur in x links.
+- [ ] **Fachwerkmodell: die Suche von selbst starten?** Heute sucht sie nur
+      auf Knopfdruck, «Fachwerk suchen» im Fenster «Verfahren»; nach einer
+      Änderung sagt die Kachel grau «neu zu suchen». Auf der Seite dauert
+      die Suche für die Wandscheibe mit Türe 4.5 s bei h = 0.55 m und 40 s
+      bei 0.25 m; von selbst liefe sie nach jedem Verschieben eines Knotens
+      an. Vorschlag: so lassen. Vorläufig: auf Knopfdruck.
+- [ ] **Fachwerkmodell: unter gleich leichten Fachwerken das mit den
+      wenigsten Stäben?** Tragen zwei Wege gleich leicht – etwa zwei
+      Diagonalen –, endet die Optimierung in ihrer Mitte: beide mit halber
+      Kraft. Danach fallen die Stäbe unter N_min der grössten Kraft weg
+      (Vorgabe 1 %), und das Gleichgewicht wird ohne sie neu gesucht; was
+      darüber liegt, bleibt. Bei h = 0.55 m sind es so 49 statt 102 Stäbe,
+      gleich leicht. Ein Schritt am Schluss, der unter den gleich leichten
+      eines mit wenigen Stäben wählt, wäre eigene Arbeit. Vorschlag: so
+      lassen; wer weniger Stäbe will, hebt N_min. Vorläufig: so.
+- [ ] **Fachwerkmodell: was nach Vorgabe gebaut ist, nicht nachgeschlagen.**
+      Je mit dem Vorschlag «so lassen»:
+      - die Rasterweite h = 0.5 m;
+      - höchstens 600 Knoten; ein Raster mit mehr als 200 000 Punkten im
+        Rechteck um die Scheibe wird gar nicht erst gelegt;
+      - die erste Runde nur mit Stäben bis 1.5 h;
+      - w_Z = 1, Zug zählt wie Druck, wählbar von 0.1 bis 10; N_min = 1 %
+        der grössten Kraft, wählbar von 0 bis 50 %;
+      - geht das Gleichgewicht ohne die dünnen Stäbe nicht auf, halbiert
+        die Nachbearbeitung die Schwelle, höchstens 30-mal und nur in der
+        letzten Runde – in jeder Runde dauerte die Suche bei 0.5 m 5 statt
+        2 s;
+      - zwei Stäbe in einer Flucht durch einen Knoten ohne Last und Lager
+        werden einer;
+      - die Optimierung: Genauigkeit 10⁻⁸, höchstens 100 Schritte, je
+        Schritt 99.5 % des Wegs zum Rand; offen bleiben darf vom
+        Gleichgewicht 10⁻⁶ der grössten Last, und ein Rest kostet das
+        Tausendfache dessen, was die Last über die Diagonale der Scheibe zu
+        tragen kostete.
 
 ## Wünsche vom 2026-11-20
 

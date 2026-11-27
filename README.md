@@ -292,7 +292,7 @@ Fertig und getestet (am 2026-11-21: 2145 Tests):
 | `stabwerk/rechnung`, `herleitung` | das Balkensystem im Rechenwerk und wie es seine Rechnung aufschreibt |
 | `stabwerk3d/` | das Balkensystem im Raum: Vektoren (`raum`), die Beschreibung in SI (`modell`), der Stab als drei ebene (`stab`), das System mit sechs Unbekannten je Knoten (`system`), die Verläufe (`verlauf`), im Rechenwerk (`rechnung`) und wie es seine Rechnung aufschreibt (`herleitung`) |
 | `decke/` | eine Decke nach der Streifenmethode: die Beschreibung in SI (`modell`), die Streifen und ihre Durchlaufträger (`streifen`), wie die Last auf die Richtungen und Streifen geht (`aufteilung`, `lasten`), jeder Streifen als Durchlaufträger (`durchlauftraeger`), Fall für Fall von unten nach oben (`rechnung`), die Schnittkräfte der Platte an einer Stelle und wo Bilder und Bericht hinsehen (`feld`), im Rechenwerk (`werk`) und wie sie ihre Rechnung aufschreibt (`herleitung`) |
-| `fachwerkmodell/` | ein Fachwerkmodell einer Scheibe: Umrisse, Löcher, Lager und Lasten in SI (`modell`), was ihm fehlt oder an ihm nicht stimmt – auch, ob die Lager die Scheibe halten (`pruefen`) –, im Rechenwerk (`werk`) und wie es seine Rechnung aufschreibt (`herleitung`). Ein Verfahren, das darin ein Fachwerk sucht, kommt noch |
+| `fachwerkmodell/` | ein Fachwerkmodell einer Scheibe: Umrisse, Löcher, Lager und Lasten in SI (`modell`), was ihm fehlt oder an ihm nicht stimmt – auch, ob die Lager die Scheibe halten (`pruefen`) –, das Verfahren Ground Structure – Raster und mögliche Stäbe (`grundstruktur`), die lineare Optimierung als Innere-Punkte-Verfahren (`optimierung`), die Suche Runde um Runde mit der Nachbearbeitung (`suche`) –, das Gleichgewicht des gefundenen Fachwerks nachgerechnet (`nachrechnung`), im Rechenwerk (`werk`) und wie es seine Rechnung aufschreibt (`herleitung`) |
 | `geotechnik/grundbruch` | ein Flachfundament: Bemessungswerte des Bodens, Grundbruch nach der erweiterten Tragfähigkeitsformel (drainiert und undrainiert), Gleiten in der Sohle, der Gleitkörper nach Prandtl |
 | `geotechnik/wasser` | die Raumlast des Grundwassers, aus der Flüssigkeit, die Grundbruch oder Pfahl wählt |
 | `geotechnik/setzung` | ein Flachfundament auf geschichtetem Baugrund: der Einflussfaktor nach Boussinesq im Punkt K oder in der Mitte, die Setzung je Teilschicht aus Wieder- und Erstbelastung, s gegen s_zul |
@@ -324,7 +324,7 @@ Fertig und getestet (am 2026-11-21: 2145 Tests):
 | `web/balkendaten.py` | was die Oberfläche von einem Balkensystem zeigt, eben oder im Raum: Übersicht und Verläufe |
 | `web/systemkatalog.py` | was die Oberfläche an einem Balkensystem wählen lässt, eben und im Raum mit denselben Schlüsseln: Querschnitte, Materialien, Lasten, Lager, Diagramme |
 | `web/deckendaten.py` | was die Oberfläche von einer Decke zeigt: die Übersicht beim Zeichnen und die Bilder eines Falls |
-| `web/fachwerkdaten.py` | was die Oberfläche von einem Fachwerkmodell zeigt: die Meldungen beim Zeichnen und wie ein Lager halten kann |
+| `web/fachwerkdaten.py` | was die Oberfläche von einem Fachwerkmodell zeigt: die Meldungen, das gefundene Fachwerk nachgerechnet, eine Runde der Suche und wie ein Lager halten kann |
 | `web/grundbruchdaten.py` | was die Situationszeichnung eines Grundbruchs vom Kern braucht: Gleitkörper, Grundwasser, Kräfte je Kombination |
 | `web/setzungsdaten.py` | was die Situationszeichnung einer Setzung vom Kern braucht: der Punkt, J über die Tiefe, die Setzung je Schicht |
 | `web/erdbebendaten.py` | was die Ansicht eines Gebäudes im Erdbeben vom Kern braucht: je Richtung die Kräfte, die Querkräfte und die Anteile der Wände; je Wand, was ihr fehlt |
@@ -346,7 +346,7 @@ Fertig und getestet (am 2026-11-21: 2145 Tests):
 | `web/js/balkensystem.js`, `bs_texte.js`, `bs_diagramme.js` | die übrige Eingabe des Balkensystems, eben und im Raum, ihre Texte je Art und seine Ergebnisse |
 | `web/js/decke.js`, `dk_zeichnung.js`, `dk_eigenschaften.js` | die Eingabe einer Decke, was das Zeichenfenster von ihr zeichnet und seine Seitenleiste |
 | `web/js/dk_grundriss.js`, `dk_ergebnis.js` | ihr Grundriss mit Aufteilung und Streifen, und ihre Ergebnisbilder |
-| `web/js/fachwerkmodell.js`, `fw_zeichnung.js`, `fw_bild.js` | die Eingabe eines Fachwerkmodells, sein Zeichenfenster mit der Seitenleiste und sein Bild |
+| `web/js/fachwerkmodell.js`, `fw_zeichnung.js`, `fw_bild.js`, `fw_suche.js` | die Eingabe eines Fachwerkmodells, sein Zeichenfenster mit der Seitenleiste, sein Bild mit dem Fachwerk und die Suche, die den Kern Runde um Runde fragt |
 | `web/js/grundbruch.js`, `gb_zeichnung.js` | die Eingabe eines Grundbruchs und das Bild seiner Situation |
 | `web/js/setzung.js`, `sz_zeichnung.js`, `gb_skizze.js` | die Eingabe einer Setzung, das Bild ihrer Situation und die Bausteine, die die Bilder des Grundbaus teilen |
 | `web/js/pfahl.js`, `pf_zeichnung.js`, `pf_verlauf.js` | die Eingabe eines Pfahls, das Bild seiner Situation und seine Verläufe über die Tiefe |
@@ -650,18 +650,27 @@ Zeile --, was jedes Lager trägt, die grössten Schnittkräfte der Platte, die
 Biegewiderstände nach der linearisierten Fliessbedingung (SIA 262:2025,
 4.3.2.6) und die Lastverteilelemente über Stützen und unter Einzellasten.
 
-**Fachwerkmodelle:** eine Scheibe, in der später ein Fachwerk aus
-Druckstreben und Zuggliedern die Lasten zu den Lagern trägt -- ohne
-Material und ohne Dicke, denn ohne Bemessung hängen Fachwerk und Kräfte nur
-von Form, Lagern und Lasten ab. Gezeichnet wird in Metern: Scheiben als
-Umrisse -- mehrere zusammen sind das Material --, Löcher, auf deren Rand
-noch Material ist, Lager an beliebigen Knoten, fest in x und y, nur in x
-oder nur in y, und Punktlasten in jeder Richtung, F_h nach rechts und F_v
-nach unten positiv. Der Kern sagt am Ort, was fehlt oder nicht stimmt:
-eine Last neben der Scheibe oder in einem Loch steht rot, Lager, die die
-Scheibe noch nicht halten, grau mit der Bewegung, die bleibt -- «sie kann
-sich um das Lager A2 drehen». Ein Verfahren, das das Fachwerk sucht, kommt
-in den nächsten Schritten.
+**Fachwerkmodelle:** eine Scheibe, in der ein Fachwerk aus Druckstreben
+und Zuggliedern die Lasten zu den Lagern trägt – ohne Material und ohne
+Dicke, denn ohne Bemessung hängen Fachwerk und Kräfte nur von Form, Lagern
+und Lasten ab. Gezeichnet wird in Metern: Scheiben als Umrisse – mehrere
+zusammen sind das Material –, Löcher, auf deren Rand noch Material ist,
+Lager an beliebigen Knoten, fest in x und y, nur in x oder nur in y, und
+Punktlasten in jeder Richtung, F_h nach rechts und F_v nach unten positiv.
+Der Kern sagt am Ort, was fehlt oder nicht stimmt: eine Last neben der
+Scheibe oder in einem Loch steht rot, Lager, die die Scheibe noch nicht
+halten, grau mit der Bewegung, die bleibt – «sie kann sich um das Lager A2
+drehen». Das Fachwerk sucht das Verfahren Ground Structure (He, Gilbert &
+Song 2019): Knoten in einem Raster der Weite h, je zwei ein möglicher Stab,
+wenn er ganz im Material liegt; eine lineare Optimierung wählt im
+Gleichgewicht das leichteste, das mit dem kleinsten V = Σ l · (w_Z · N⁺ +
+N⁻). «Fachwerk suchen» im Fenster «Verfahren» fragt den Kern Runde um
+Runde und zeigt nach jeder das Fachwerk, bis keine Stäbe mehr dazukommen
+oder man «Anhalten» drückt: Zug rot, Druck blau gestrichelt, je dicker,
+desto grösser die Kraft. Danach ist es eine Eingabe wie jede andere: die
+Rechnung rechnet sein Gleichgewicht und die Lagerkräfte nach, und ändern
+sich Scheibe, Lager, Lasten oder Verfahren, sagt sie, dass neu zu suchen
+ist. Beispiel «Wandscheibe mit Türe» bei h = 1 m: 27 Stäbe, V = 3734.0 kNm.
 
 **Grundbruch:** ein Flachfundament auf seinem Baugrund, nach dem Kapitel 9.2
 «Tragfähigkeit», das der Benutzer geliefert hat. Oben das Panel «Grundbruch

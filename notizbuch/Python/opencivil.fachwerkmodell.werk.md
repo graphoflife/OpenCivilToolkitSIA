@@ -1,5 +1,5 @@
 ---
-erzeugt: d7a57aca9d19
+erzeugt: 3da3b97af48c
 art: modul
 tags: [modul]
 ---
@@ -9,10 +9,23 @@ tags: [modul]
 
 ## VERANTWORTUNG
 
-Was ein Fachwerkmodell im Rechenwerk anmeldet: eine Prozedur, die sein
-Modell prüft ([[opencivil.fachwerkmodell.pruefen|pruefen]]) und die Herleitung
-schreibt ([[opencivil.fachwerkmodell.herleitung|herleitung]]). Es liest nichts von
-aussen – kein Material, keine Dicke (Plan vom 2026-11-27, Entscheid 11).
+Was ein Fachwerkmodell im Rechenwerk anmeldet: die Zahlen seines
+Verfahrens als Vorgaben ([[opencivil.fachwerkmodell.suche#Konstanten|VORGABEN]])
+und eine Prozedur, die sein Modell prüft
+([[opencivil.fachwerkmodell.pruefen|pruefen]]), das gefundene Fachwerk
+nachrechnet ([[opencivil.fachwerkmodell.nachrechnung|nachrechnung]]) und die
+Herleitung schreibt ([[opencivil.fachwerkmodell.herleitung|herleitung]]). Es liest
+nichts von aussen – kein Material, keine Dicke (Plan vom 2026-11-27,
+Entscheid 11).
+
+
+## GESUCHT WIRD DANEBEN
+
+Die Suche läuft nicht hier, sondern Runde um Runde auf Anfrage der Seite
+([[opencivil.fachwerkmodell.suche#runde|runde]]); was sie zuletzt fand,
+steht im Projekt. Hier zählt es nur, wenn sein Abdruck zu Modell und
+Verfahren passt – sonst sagt eine Meldung, dass es zu einem früheren
+Stand gehört, und es steht nirgends.
 
 
 ## DAS ERGEBNIS
@@ -30,19 +43,24 @@ mit Meldung und keine Ausnahme: der Rest des Projekts rechnet weiter.
 class Fachwerkbefund
 ```
 
-Was die Rechnung fand: das Modell und die Meldungen – die der Beschreibung zuerst.
+Was die Rechnung fand: das Modell, seine Meldungen und das Fachwerk, mit dem, was dazu zu sagen ist.
 
 - `modell: Modell`
-- `meldungen: List[Meldung]`
+- `meldungen: List[Meldung]` – Was das Modell meldet – die Meldungen der Beschreibung zuerst.
+- `bereit: bool` – Ob sich ein Fachwerk suchen lässt: keine Meldung des Modells hält es auf.
+- `abdruck: str = ''` – Der Abdruck von Modell und Verfahren – leer, solange das Modell nicht bereit ist.
+- `stand: str = ''` – Wie es um das Fachwerk steht: `keines`, `veraltet`, `unlesbar` oder `gefunden` – leer, solange das Modell nicht bereit ist.
+- `zum_fachwerk: List[Meldung] = field(default_factory=list)` – Was zum Fachwerk zu sagen ist: dass noch keines gesucht ist oder es zu einem früheren Stand gehört, wo sein Gleichgewicht nicht aufgeht, dass die Suche angehalten wurde.
+- `gefunden: Optional[Suchergebnis] = None` – Was die Suche fand – nur, wenn es zu Modell und Verfahren gehört.
+- `nachrechnung: Optional[Nachrechnung] = None`
 
-#### Fachwerkbefund.haelt_an
+### offen_meldungen
 
 ```python
-@property
-def haelt_an(self) -> bool
+def offen_meldungen(n: Nachrechnung) -> List[Meldung]
 ```
 
-Ob eine Meldung die Suche nach einem Fachwerk aufhält.
+Wo das Gleichgewicht nicht aufgeht, rot: je Last, die es nicht ganz trägt, eine Meldung.
 
 ### FachwerkProzedur
 
@@ -50,7 +68,7 @@ Ob eine Meldung die Suche nach einem Fachwerk aufhält.
 class FachwerkProzedur(Prozedur)
 ```
 
-Das ganze Fachwerkmodell, geprüft und aufgeschrieben.
+Das ganze Fachwerkmodell, geprüft, nachgerechnet und aufgeschrieben.
 
 #### FachwerkProzedur.rechne
 
@@ -88,23 +106,46 @@ Was ein Lauf rechnen muss: das Modell.
 def rechnen_und_schreiben(self, p: Protokoll) -> Ausfuehrung
 ```
 
-Das Modell geprüft, die Herleitung geschrieben.
+Das Modell geprüft, das Fachwerk nachgerechnet, die Herleitung geschrieben.
+
+#### Fachwerksystem._fachwerk
+
+```python
+def _fachwerk(self, befund: Fachwerkbefund) -> None
+```
+
+Was im Projekt steht, wenn es zu Modell und Verfahren gehört, nachgerechnet – sonst warum nicht.
+
+#### Fachwerksystem._zum_fachwerk
+
+```python
+def _zum_fachwerk(self, gefunden: Suchergebnis) -> List[Meldung]
+```
+
+Was sonst am gefundenen Fachwerk zu sagen ist: wo die Suche anhielt, was dünn blieb.
 
 
 ## Konstanten
 
 - `THEMA = 'Fachwerkmodell'` – Unter welchem Thema seine Herleitung in der Formelsammlung steht.
-- `OHNE_VERFAHREN = 'Noch ohne Verfahren: geprüft sind Scheibe, Lager und Lasten, ein Fac…` – Solange kein Verfahren das Fachwerk sucht – ein Hinweis, wenn sonst nichts fehlt.
+- `IM_FENSTER = 'im Fenster «Verfahren» mit «Fachwerk suchen»'` – Wo die Suche beginnt – in den Meldungen genannt.
+- `NOCH_KEINES = f'Noch kein Fachwerk gesucht – {IM_FENSTER}.'`
+- `VERALTET = f'Das Fachwerk gehört zu einem früheren Stand: Scheibe, Lager, Lasten…`
+- `UNLESBAR = f'Das gespeicherte Fachwerk lässt sich nicht lesen – neu suchen {IM_F…`
 
 ## Braucht
 
 - [[opencivil.core.berechnung]]
+- [[opencivil.core.einheiten]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.rechenobjekt]]
 - [[opencivil.core.wert]]
+- [[opencivil.decke.herleitung]]
 - [[opencivil.fachwerkmodell.herleitung]]
 - [[opencivil.fachwerkmodell.modell]]
+- [[opencivil.fachwerkmodell.nachrechnung]]
 - [[opencivil.fachwerkmodell.pruefen]]
+- [[opencivil.fachwerkmodell.suche]]
 - [[opencivil.stabwerk.system]]
 
 ## Gebraucht von

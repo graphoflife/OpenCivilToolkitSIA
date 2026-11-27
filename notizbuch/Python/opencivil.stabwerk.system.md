@@ -1,5 +1,5 @@
 ---
-erzeugt: dc25702bc167
+erzeugt: c14e4f9a3e1e
 art: modul
 tags: [modul]
 ---
@@ -413,3 +413,4 @@ Wie u, v, w und θx, θy, θz eines Stabendes an den Unbekannten haengen.
 - [[opencivil.stabwerk3d.herleitung]]
 - [[opencivil.web.balkendaten]]
 - [[opencivil.web.deckendaten]]
+- [[opencivil.web.fachwerkdaten]]

@@ -1,5 +1,5 @@
 ---
-erzeugt: 8a75be3fdd44
+erzeugt: a4e669dd6d23
 art: modul
 tags: [modul]
 ---
@@ -163,8 +163,11 @@ Ob bei `p` Material ist: in einer Scheibe und in keinem Loch.
 
 ## Gebraucht von
 
+- [[opencivil.fachwerkmodell.grundstruktur]]
 - [[opencivil.fachwerkmodell.herleitung]]
+- [[opencivil.fachwerkmodell.nachrechnung]]
 - [[opencivil.fachwerkmodell.pruefen]]
+- [[opencivil.fachwerkmodell.suche]]
 - [[opencivil.fachwerkmodell.werk]]
 - [[opencivil.projekt.aufbau.fachwerkmodell]]
 - [[opencivil.projekt.fachwerkmodell]]

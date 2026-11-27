@@ -1,5 +1,5 @@
 ---
-erzeugt: 0065326194bc
+erzeugt: 70b6203389f5
 art: modul
 tags: [modul]
 ---
@@ -340,6 +340,27 @@ seine Meldungen ([[opencivil.web.fachwerkdaten#uebersicht|fachwerkdaten.uebersic
 eine eigene Anfrage, gebraucht nach jeder Aenderung; gerechnet wird das
 eine Modell, aus dem Zwischenspeicher, wenn er es zu dieser
 Beschreibung noch hat.
+
+### fachwerk_suchen
+
+```python
+def fachwerk_suchen(rumpf: Mapping[str, Any]) -> Dict[str, Any]
+```
+
+Eine Runde der Suche nach einem Fachwerk ([[opencivil.web.fachwerkdaten#suchen|fachwerkdaten.suchen]]):
+der Zustand der letzten Runde hinein, der naechste, das Fachwerk und der
+Stand heraus – gleich fuer Server und Pyodide. Die Seite fragt Runde um
+Runde an, bis die Suche fertig ist oder jemand anhaelt; sie rechnet
+dabei nichts. Ohne `zustand` beginnt die Suche von vorn, ebenso, wenn
+er zu einem anderen Stand des Modells gehoert.
+
+### _fachwerkmodell
+
+```python
+def _fachwerkmodell(projekt: Projekt, rumpf: Mapping[str, Any]) -> FachwerkmodellEintrag
+```
+
+Das Fachwerkmodell, das `kennung` nennt – sonst ist die Anfrage falsch.
 
 ### decke_ergebnis
 

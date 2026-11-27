@@ -1,5 +1,5 @@
 ---
-erzeugt: 3b930009b8e5
+erzeugt: 0f70ec88d8ef
 art: modul
 tags: [modul]
 ---
@@ -240,6 +240,7 @@ Je Stütze und Einzellast, was ihr Bereich zusätzlich braucht.
 - [[opencivil.decke.werk]]
 - [[opencivil.fachwerkmodell.herleitung]]
 - [[opencivil.fachwerkmodell.pruefen]]
+- [[opencivil.fachwerkmodell.werk]]
 
 ## Formeln aus diesem Modul
 

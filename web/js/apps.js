@@ -30,7 +30,9 @@ import {
   deckeEditor, deckeFenster, deckenKarten, deckenZusammenfassung,
 } from './decke.js';
 import { durchstanzEditor, durchstanzFenster, stellenmass } from './durchstanzen.js';
-import { fachwerkEditor, fachwerkKarten, fachwerkZusammenfassung } from './fachwerkmodell.js';
+import {
+  fachwerkEditor, fachwerkFenster, fachwerkKarten, fachwerkZusammenfassung,
+} from './fachwerkmodell.js';
 import { grundbruchEditor, grundbruchFenster } from './grundbruch.js';
 import { setzungEditor, setzungFenster } from './setzung.js';
 import { pfahlEditor, pfahlFenster } from './pfahl.js';
@@ -361,6 +363,7 @@ const FACHWERKMODELL = bauteil('fachwerkmodell', {
   editor: fachwerkEditor,
   karten: fachwerkKarten,
   uebersicht: fachwerkZusammenfassung,
+  fenster: fachwerkFenster,
 });
 
 /** Ein Fundament mit den Vorgaben des Kerns und einer Kombination -- ohne Material. */

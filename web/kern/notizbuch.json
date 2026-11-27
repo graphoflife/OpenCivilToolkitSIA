@@ -307,6 +307,12 @@
       "bereich": "Durchstanzen"
     },
     {
+      "name": "Fachwerkmodell",
+      "pfad": "Formelsammlung/Themen/Fachwerkmodell.md",
+      "art": "thema",
+      "bereich": "Fachwerkmodelle"
+    },
+    {
       "name": "Spannung-Dehnung-Analyse",
       "pfad": "Formelsammlung/Themen/Spannung-Dehnung-Analyse.md",
       "art": "thema",
@@ -3102,6 +3108,15 @@
       "zeichen": [],
       "themen": [
         "Streifenmethode"
+      ]
+    },
+    {
+      "name": "Leichtestes Fachwerk",
+      "pfad": "Formelsammlung/Formeln/Leichtestes Fachwerk.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Fachwerkmodell"
       ]
     },
     {
@@ -7225,12 +7240,32 @@
       "stichworte": []
     },
     {
+      "name": "opencivil.fachwerkmodell.grundstruktur",
+      "pfad": "Python/opencivil.fachwerkmodell.grundstruktur.md",
+      "art": "modul",
+      "kurz": "die Knoten und die möglichen Stäbe einer Scheibe.",
+      "stichworte": [
+        "ZuVieleKnoten",
+        "Grundstruktur",
+        "Grundstruktur.spalten",
+        "Grundstruktur.knoten_bei",
+        "grundstruktur",
+        "_knoten",
+        "_zu_viele",
+        "_staebe",
+        "_auf_innen",
+        "_rasterknoten_auf",
+        "_im_material"
+      ]
+    },
+    {
       "name": "opencivil.fachwerkmodell.herleitung",
       "pfad": "Python/opencivil.fachwerkmodell.herleitung.md",
       "art": "modul",
       "kurz": "wie ein Fachwerkmodell seine Rechnung aufschreibt.",
       "stichworte": [
-        "schreiben"
+        "schreiben",
+        "_fachwerk"
       ]
     },
     {
@@ -7254,6 +7289,33 @@
       ]
     },
     {
+      "name": "opencivil.fachwerkmodell.nachrechnung",
+      "pfad": "Python/opencivil.fachwerkmodell.nachrechnung.md",
+      "art": "modul",
+      "kurz": "ein gefundenes Fachwerk, nachgerechnet.",
+      "stichworte": [
+        "Lagerkraft",
+        "Nachrechnung",
+        "Nachrechnung.im_gleichgewicht",
+        "nachrechnen"
+      ]
+    },
+    {
+      "name": "opencivil.fachwerkmodell.optimierung",
+      "pfad": "Python/opencivil.fachwerkmodell.optimierung.md",
+      "art": "modul",
+      "kurz": "das leichteste Fachwerk im Gleichgewicht, als lineare Optimierung.",
+      "stichworte": [
+        "Optimum",
+        "Gleichgewicht",
+        "Gleichgewicht.mal",
+        "Gleichgewicht.mal_transponiert",
+        "Gleichgewicht.normalmatrix",
+        "optimieren",
+        "_weite"
+      ]
+    },
+    {
       "name": "opencivil.fachwerkmodell.pruefen",
       "pfad": "Python/opencivil.fachwerkmodell.pruefen.md",
       "art": "modul",
@@ -7269,19 +7331,46 @@
       ]
     },
     {
+      "name": "opencivil.fachwerkmodell.suche",
+      "pfad": "Python/opencivil.fachwerkmodell.suche.md",
+      "art": "modul",
+      "kurz": "das leichteste Fachwerk, Runde um Runde.",
+      "stichworte": [
+        "Einstellung",
+        "Suchzustand",
+        "Fachwerk",
+        "Suchergebnis",
+        "Runde",
+        "abdruck",
+        "runde",
+        "ganz_suchen",
+        "_optimum",
+        "_strafe",
+        "_verletzt",
+        "nachbearbeiten",
+        "_ohne_duenne",
+        "_zusammengelegt",
+        "_in_flucht",
+        "_gefasst",
+        "_grundstruktur"
+      ]
+    },
+    {
       "name": "opencivil.fachwerkmodell.werk",
       "pfad": "Python/opencivil.fachwerkmodell.werk.md",
       "art": "modul",
       "kurz": "das Fachwerkmodell im Rechenwerk.",
       "stichworte": [
         "Fachwerkbefund",
-        "Fachwerkbefund.haelt_an",
+        "offen_meldungen",
         "FachwerkProzedur",
         "FachwerkProzedur.rechne",
         "Fachwerksystem",
         "Fachwerksystem.abschnitt",
         "Fachwerksystem.ziele",
-        "Fachwerksystem.rechnen_und_schreiben"
+        "Fachwerksystem.rechnen_und_schreiben",
+        "Fachwerksystem._fachwerk",
+        "Fachwerksystem._zum_fachwerk"
       ]
     },
     {
@@ -9258,6 +9347,7 @@
       "kurz": "ein Fachwerkmodell wird Rechnung.",
       "stichworte": [
         "modell_von",
+        "einstellung_von",
         "bauen"
       ]
     },
@@ -9461,6 +9551,7 @@
         "jeder_nachweis",
         "_decken",
         "_fachwerkmodell",
+        "_fachwerk_der_wandscheibe",
         "_durchstanzstellen",
         "_grundbrueche",
         "_setzungen",
@@ -9629,13 +9720,19 @@
         "LochEintrag",
         "ScheibenlagerEintrag",
         "ScheibenlastEintrag",
+        "FachwerkpunktEintrag",
+        "FachwerkstabEintrag",
+        "GefundenesFachwerk",
+        "GefundenesFachwerk.aus",
+        "GefundenesFachwerk.ergebnis",
         "FachwerkmodellEintrag",
         "FachwerkmodellEintrag.lagen",
         "FachwerkmodellEintrag.netz",
         "FachwerkmodellEintrag.scheibe",
         "FachwerkmodellEintrag.loch",
         "FachwerkmodellEintrag.lager_setzen",
-        "FachwerkmodellEintrag.last"
+        "FachwerkmodellEintrag.last",
+        "FachwerkmodellEintrag.suchen"
       ]
     },
     {
@@ -12085,6 +12182,8 @@
         "balkensystem_verlauf",
         "decke_zeichnung",
         "fachwerk_zeichnung",
+        "fachwerk_suchen",
+        "_fachwerkmodell",
         "decke_ergebnis",
         "balkensystem_bearbeiten",
         "_vorlagenwahl",
@@ -12135,6 +12234,10 @@
       "stichworte": [
         "zeichnung",
         "uebersicht",
+        "_fachwerk",
+        "suchen",
+        "_ohne",
+        "_zustand",
         "katalog"
       ]
     },

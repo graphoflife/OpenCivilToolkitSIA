@@ -11,6 +11,13 @@ Form, Lagern und Lasten (Plan vom 2026-11-27, Entscheid 11).
     pruefen.py     was der Beschreibung fehlt oder an ihr nicht stimmt --
                    ohne Lager, ohne Last, ein Lager im Loch, eine Scheibe,
                    die sich noch bewegen kann
+    grundstruktur.py  Ground Structure: die Knoten im Raster und die
+                   möglichen Stäbe, die ganz im Material liegen
+    optimierung.py die lineare Optimierung, ein primal-duales
+                   Innere-Punkte-Verfahren
+    suche.py       die Suche Runde um Runde, mit der Nachbearbeitung
+    nachrechnung.py  das Gleichgewicht des gefundenen Fachwerks und was die
+                   Lager aufnehmen
     werk.py        das Fachwerkmodell im Rechenwerk und sein Befund
     herleitung.py  wie es seine Rechnung aufschreibt
 """

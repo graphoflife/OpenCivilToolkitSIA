@@ -1,5 +1,5 @@
 ---
-erzeugt: ad0664fc7a3d
+erzeugt: ab5fbc1cba66
 art: modul
 tags: [modul]
 ---
@@ -550,6 +550,7 @@ Ein Wert, wie er in einer Meldung steht – ein Text in Anfuehrungszeichen.
 - [[opencivil.projekt.aufbau.balkensystem]]
 - [[opencivil.projekt.aufbau.durchstanzen]]
 - [[opencivil.projekt.aufbau.erdbeben]]
+- [[opencivil.projekt.aufbau.fachwerkmodell]]
 - [[opencivil.projekt.aufbau.grundbruch]]
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.aufbau.pfahl]]
@@ -581,5 +582,6 @@ Ein Wert, wie er in einer Meldung steht – ein Text in Anfuehrungszeichen.
 - [[opencivil.web.api]]
 - [[opencivil.web.dienst]]
 - [[opencivil.web.erdbebendaten]]
+- [[opencivil.web.fachwerkdaten]]
 - [[opencivil.web.systemkatalog]]
 - [[opencivil.web.zeichengeometrie]]

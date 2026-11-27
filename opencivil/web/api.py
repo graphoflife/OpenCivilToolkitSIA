@@ -79,8 +79,10 @@ from opencivil.projekt.grundbruch import GrundbruchEintrag
 from opencivil.projekt.setzung import SchichtEintrag, SetzungEintrag
 from opencivil.durchstanzen import stelle
 from opencivil.erdbeben import ersatzkraft
+from opencivil.fachwerkmodell import suche as fachwerksuche
 from opencivil.erdbeben.ersatzkraft import Baugrundklasse, Bauwerksklasse, Erdbebenzone, Schwingzeit
 from opencivil.projekt.erdbeben import ErdbebenEintrag, GeschossEintrag
+from opencivil.projekt.fachwerkmodell import FachwerkmodellEintrag
 from opencivil.pfahl import pfahl
 from opencivil.pfahl.boden import Mantel
 from opencivil.pfahl.pfahl import (
@@ -214,7 +216,8 @@ def _vorgaben() -> Dict[str, List[dict]]:
                                  (PfahlEintrag, pfahl.VORGABEN),
                                  (PfahlschichtEintrag, pfahl.JE_SCHICHT),
                                  (ErdbebenEintrag, ersatzkraft.VORGABEN),
-                                 (GeschossEintrag, ersatzkraft.JE_GESCHOSS))}
+                                 (GeschossEintrag, ersatzkraft.JE_GESCHOSS),
+                                 (FachwerkmodellEintrag, fachwerksuche.VORGABEN))}
 
 
 def katalog() -> dict:

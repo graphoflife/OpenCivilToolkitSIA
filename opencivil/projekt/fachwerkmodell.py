@@ -22,17 +22,26 @@ KOORDINATEN UND EINHEITEN:
 x nach rechts, y nach oben, in m. Eine Last in kN, ``F_h`` nach rechts,
 ``F_v`` nach unten positiv -- wie im Balkensystem. Umgerechnet wird beim
 Bauen.
+
+DAS GEFUNDENE FACHWERK:
+Was die Suche zuletzt fand, steht im Eintrag (:class:`GefundenesFachwerk`):
+die Seite fragt sie Runde um Runde an und legt hier ab, was die letzte
+gab -- fertig oder angehalten. Geschrieben vom Kern, nicht von Hand; die
+Rechnung glaubt ihm nur, was sie nicht nachrechnen kann, und erkennt am
+Abdruck, ob es noch zu Modell und Verfahren gehört
+(:mod:`opencivil.fachwerkmodell.suche`).
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, List, Sequence, Union
+from typing import Any, List, Optional, Sequence, Union
 
-from opencivil.core.einheiten import KN, M
+from opencivil.core.einheiten import KN, M, PROZENT
 from opencivil.fachwerkmodell.modell import Halt
+from opencivil.fachwerkmodell.suche import Fachwerk, Suchergebnis
 from opencivil.projekt.eintraege import BauteilEintrag, Beschreibung
-from opencivil.projekt.lesen import bereich, lesen
+from opencivil.projekt.lesen import ProjektFehler, bereich, lesen, teil
 from opencivil.projekt.netz import Netz, neue_kennung
 
 #: Ein Ort im Baukasten: die Kennung eines Knotens oder ``(x, y)`` in m.
@@ -90,6 +99,71 @@ class ScheibenlastEintrag(Beschreibung):
 
 
 @dataclass
+class FachwerkpunktEintrag(Beschreibung):
+    """Ein Knoten des gefundenen Fachwerks, in m."""
+
+    IM_ORT = "Knoten des Fachwerks"
+
+    x: float = bereich(0.0, heisst="x", einheit=M)
+    y: float = bereich(0.0, heisst="y", einheit=M)
+
+
+@dataclass
+class FachwerkstabEintrag(Beschreibung):
+    """Ein Stab des gefundenen Fachwerks: von Knoten zu Knoten, gezählt ab null, mit seiner Kraft."""
+
+    IM_ORT = "Stab des Fachwerks"
+
+    von: int = bereich(0, heisst="von", ab=0)
+    bis: int = bereich(0, heisst="bis", ab=0)
+    N: float = bereich(0.0, heisst="N", einheit=KN)
+    """Zug positiv."""
+
+
+@dataclass
+class GefundenesFachwerk(Beschreibung):
+    """Was die Suche zuletzt fand -- siehe Dateikopf."""
+
+    abdruck: str = ""
+    """Woran es Modell und Verfahren erkennt, zu denen es gehört."""
+
+    runden: int = bereich(0, heisst="Runden", ab=0)
+    fertig: bool = False
+    """Ob die Suche zu Ende kam -- sonst wurde sie angehalten."""
+
+    moeglich: int = bereich(0, heisst="Mögliche Stäbe", ab=0)
+    """Wie viele Stäbe die Grundstruktur hatte."""
+
+    im_modell: int = bereich(0, heisst="Stäbe im Modell", ab=0)
+    """Wie viele davon in der letzten Runde im Modell waren."""
+
+    knoten: List[FachwerkpunktEintrag] = field(default_factory=list)
+    staebe: List[FachwerkstabEintrag] = field(default_factory=list)
+
+    @classmethod
+    def aus(cls, ergebnis: Suchergebnis) -> "GefundenesFachwerk":
+        """Das Ergebnis einer Runde, wie es im Projekt steht: Kräfte in kN."""
+        fw = ergebnis.fachwerk
+        return cls(abdruck=ergebnis.abdruck, runden=ergebnis.runden, fertig=ergebnis.fertig,
+                   moeglich=ergebnis.moeglich, im_modell=ergebnis.im_modell,
+                   knoten=[FachwerkpunktEintrag(x, y) for x, y in fw.knoten],
+                   staebe=[FachwerkstabEintrag(a, b, N / 1e3) for a, b, N in fw.staebe])
+
+    def ergebnis(self) -> Optional[Suchergebnis]:
+        """
+        Zurück in SI -- ``None``, wenn ein Stab auf einen Knoten zeigt, den es
+        nicht gibt: dann ist es keines, das die Suche schrieb.
+        """
+        n = len(self.knoten)
+        if any(not (0 <= s.von < n and 0 <= s.bis < n) or s.von == s.bis for s in self.staebe):
+            return None
+        fw = Fachwerk(knoten=tuple((k.x, k.y) for k in self.knoten),
+                      staebe=tuple((s.von, s.bis, s.N * 1e3) for s in self.staebe))
+        return Suchergebnis(fachwerk=fw, abdruck=self.abdruck, runden=self.runden,
+                            fertig=self.fertig, moeglich=self.moeglich, im_modell=self.im_modell)
+
+
+@dataclass
 class FachwerkmodellEintrag(BauteilEintrag):
     """
     Ein Fachwerkmodell: eine Scheibe aus Umrissen und Löchern an Lagern,
@@ -108,6 +182,18 @@ class FachwerkmodellEintrag(BauteilEintrag):
     loecher: List[LochEintrag] = field(default_factory=list)
     lager: List[ScheibenlagerEintrag] = field(default_factory=list)
     lasten: List[ScheibenlastEintrag] = field(default_factory=list)
+    rasterweite: float = bereich(0.5, heisst="Rasterweite", einheit=M, ueber=0.0)
+    """Wie weit die Knoten der Grundstruktur auseinander liegen."""
+
+    w_Z: float = bereich(1.0, heisst="w_Z", ab=0.1, bis=10.0)
+    """Wie schwer Zug gegenüber Druck zählt -- 1: gleich (Plan vom 2026-11-27, Entscheid 11)."""
+
+    N_min: float = bereich(1.0, heisst="N_min", einheit=PROZENT, ab=0.0, bis=50.0)
+    """Die kleinste Stabkraft, die stehen bleibt, bezogen auf die grösste."""
+
+    fachwerk: Optional[GefundenesFachwerk] = teil(lambda: None, heisst="Gefundenes Fachwerk")
+    """Was die Suche zuletzt fand -- siehe Dateikopf."""
+
     beschreibung: str = ""
     """Freier Text -- geht in keine Rechnung ein."""
 
@@ -151,3 +237,21 @@ class FachwerkmodellEintrag(BauteilEintrag):
         """Eine Punktlast bei ``ort`` -- ``F_h`` nach rechts, ``F_v`` nach unten, in kN."""
         return self._anlegen("lasten", ScheibenlastEintrag,
                              {"knoten": self._knoten(self.netz(), ort), **felder}, "Last")
+
+    def suchen(self) -> GefundenesFachwerk:
+        """
+        Sucht das Fachwerk bis zum Ende, wie «Fachwerk suchen» auf der Seite,
+        und legt es ab. Fehlt dem Modell etwas, sagt ein :class:`ProjektFehler`,
+        was; ein zu feines Raster meldet
+        :class:`~opencivil.fachwerkmodell.grundstruktur.ZuVieleKnoten`.
+        """
+        # Erst hier: der Aufbau liest diesen Eintrag.
+        from opencivil.fachwerkmodell.pruefen import pruefen
+        from opencivil.fachwerkmodell.suche import ganz_suchen
+        from opencivil.projekt.aufbau.fachwerkmodell import einstellung_von, modell_von
+        modell, meldungen = modell_von(self)
+        halt = [m.text for m in meldungen + pruefen(modell) if m.haelt_an]
+        if halt:
+            raise ProjektFehler(f"Fachwerkmodell '{self.name}': {' '.join(halt)}")
+        self.fachwerk = GefundenesFachwerk.aus(ganz_suchen(modell, einstellung_von(self)))
+        return self.fachwerk

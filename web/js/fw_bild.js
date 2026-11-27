@@ -17,15 +17,20 @@
  * Betrag; beim Darüberfahren beide Teile, F_h nach rechts und F_v nach
  * unten.
  *
+ * DAS FACHWERK, nur auf der Karte, über der Scheibe und unter Lagern und
+ * Lasten: Zug rot und durchgezogen, Druck blau und gestrichelt, wie in
+ * Fachwerkmodellen üblich, jeder Stab so dick, wie seine Kraft gross ist --
+ * bezogen auf die grösste. Beim Darüberfahren Kraft und Länge.
+ *
  * Gerechnet wird hier nichts: nur Lagen fürs Auge -- wie lang ein Pfeil im
- * Bild ist, wo ein Name steht.
+ * Bild ist, wo ein Name steht, wie dick ein Stab.
  */
 
 import {
   ansichtNeu, einpassen, nachBild, pfad, zahlText,
 } from './cad_ansicht.js';
 import { mitTitel, umrissVon } from './cad_app.js';
-import { svgEl } from './dom.js';
+import { el, svgEl } from './dom.js';
 
 /** So lang ist ein Lastpfeil im Bild, in px -- gleich, wie gross die Kraft ist. */
 const PFEIL = 38;
@@ -81,13 +86,55 @@ function lastpfeil(x, y, f) {
   return { d, ende, u };
 }
 
+/** So dick ist ein Stab im Bild, in px: der dünnste und der mit der grössten Kraft. */
+const STAB = [1.2, 6];
+
 /**
- * Das ganze Modell: die Flächen der Scheiben, die Löcher, die Umrisse, die
- * Lager, die Lasten und die Namen. `fehler(kennung)` und `texte(kennung)`
- * sagen, was der Kern an einem Teil meldet -- rot, und als Titel beim
- * Darüberfahren.
+ * Das Fachwerk (fw_suche.js, `gezeigtesFachwerk`): je Stab eine Linie von
+ * Knoten zu Knoten, dazu die Knoten, an denen Stäbe enden.
  */
-export function scheibe(v, modell, { fehler = () => false, texte = () => [] } = {}) {
+function fachwerkLinien(v, fachwerk) {
+  const g = svgEl('g', { class: 'fw-fachwerk' });
+  const groesste = Math.max(0, ...fachwerk.staebe.map((s) => Math.abs(s.N)));
+  const bild = (k) => nachBild(v, [fachwerk.knoten[k].x, fachwerk.knoten[k].y]);
+  const enden = new Set();
+  fachwerk.staebe.forEach((s, i) => {
+    const [[x1, y1], [x2, y2]] = [bild(s.von), bild(s.bis)];
+    const dicke = STAB[0] + (STAB[1] - STAB[0]) * (groesste > 0 ? Math.abs(s.N) / groesste : 0);
+    const zug = s.N > 0;
+    g.append(mitTitel(svgEl('line', {
+      x1: x1.toFixed(1), y1: y1.toFixed(1), x2: x2.toFixed(1), y2: y2.toFixed(1),
+      class: zug ? 'fw-stab ist-zug' : 'fw-stab ist-druck', 'stroke-width': dicke.toFixed(2),
+    }), [`Stab ${i + 1}: ${zug ? 'Zug' : 'Druck'}, N = ${zahlText(s.N, 1)} kN, l = ${zahlText(s.l, 2)} m`]));
+    enden.add(s.von).add(s.bis);
+  });
+  for (const k of enden) {
+    const [x, y] = bild(k);
+    g.append(svgEl('circle', { cx: x.toFixed(1), cy: y.toFixed(1), r: 2.2, class: 'fw-knoten' }));
+  }
+  return g;
+}
+
+/** Was die Linien des Fachwerks heissen -- unter dem Bild. */
+export function fachwerkLegende() {
+  const probe = (klasse, text) => {
+    const svg = svgEl('svg', { viewBox: '0 0 26 8', width: 26, height: 8, 'aria-hidden': 'true' });
+    svg.append(svgEl('line', { x1: 1, y1: 4, x2: 25, y2: 4, class: klasse, 'stroke-width': 2.4 }));
+    return el('span.dk-legende-eintrag', {}, [svg, text]);
+  };
+  return el('div.dk-legende', {}, [
+    probe('fw-stab ist-zug', 'Zug'), probe('fw-stab ist-druck', 'Druck'),
+    el('span.dk-legende-eintrag', { text: 'je dicker, desto grösser die Kraft' }),
+  ]);
+}
+
+/**
+ * Das ganze Modell: die Flächen der Scheiben, die Löcher, die Umrisse, das
+ * Fachwerk, wenn eines da ist, die Lager, die Lasten und die Namen.
+ * `fehler(kennung)` und `texte(kennung)` sagen, was der Kern an einem Teil
+ * meldet -- rot, und als Titel beim Darüberfahren.
+ */
+export function scheibe(v, modell, { fehler = () => false, texte = () => [], fachwerk = null } = {}) {
   const g = svgEl('g', { class: 'fw-modell' });
   const lagen = new Map((modell.knoten || []).map((k) => [k.kennung, [k.x, k.y]]));
   const orte = (knoten) => {
@@ -135,15 +182,17 @@ export function scheibe(v, modell, { fehler = () => false, texte = () => [] } = 
     namen.append(text(lage, `${f.kennung} · ${zahlText(betrag(f), 1)} kN`,
       `dk-name ist-klein ist-last${waagrecht && u[0] > 0 ? ' ist-links' : ''}`));
   }
-  g.append(flaechen, umrisse, lager, lasten, namen);
+  g.append(flaechen, umrisse);
+  if (fachwerk) g.append(fachwerkLinien(v, fachwerk));
+  g.append(lager, lasten, namen);
   return g;
 }
 
 /** So breit ist ein Bild auf seiner Karte, und so hoch höchstens und mindestens -- px. */
 const BILD = { breite: 720, hoehe: [240, 520], rand: 48 };
 
-/** Das Modell als Bild, fest im Massstab -- mit Rand für Lager und Pfeile. */
-export function scheibeBild(modell) {
+/** Das Modell als Bild, fest im Massstab -- mit Rand für Lager und Pfeile, darin das `fachwerk`, wenn eines da ist. */
+export function scheibeBild(modell, fachwerk = null) {
   const umriss = umrissVon((modell.knoten || []).map((k) => [k.x, k.y]), [[0, 0], [6, 3]]);
   const [[x0, y0], [x1, y1]] = umriss;
   const breit = Math.max(x1 - x0, 1);
@@ -154,6 +203,6 @@ export function scheibeBild(modell) {
   Object.assign(v, { breite: BILD.breite, hoehe });
   einpassen(v, umriss, { rand: BILD.rand });
   const svg = svgEl('svg', { viewBox: `0 0 ${BILD.breite} ${hoehe.toFixed(0)}`, class: 'gb-bild fw-bild' });
-  svg.append(scheibe(v, modell));
+  svg.append(scheibe(v, modell, { fachwerk }));
   return svg;
 }

@@ -1,5 +1,5 @@
 ---
-erzeugt: 3af5b9d3bdae
+erzeugt: e8551a76f455
 art: modul
 tags: [modul]
 ---
@@ -462,6 +462,8 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - [[opencivil.durchstanzen.stelle]]
 - [[opencivil.erdbeben.ersatzkraft]]
 - [[opencivil.erdbeben.kern]]
+- [[opencivil.fachwerkmodell.suche]]
+- [[opencivil.fachwerkmodell.werk]]
 - [[opencivil.geotechnik.fundament]]
 - [[opencivil.geotechnik.gleiten]]
 - [[opencivil.geotechnik.grundbruch]]
@@ -553,6 +555,7 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - [[opencivil.web.diagrammdaten]]
 - [[opencivil.web.durchstanzdaten]]
 - [[opencivil.web.erdbebendaten]]
+- [[opencivil.web.fachwerkdaten]]
 - [[opencivil.web.grundbruchdaten]]
 - [[opencivil.web.pfahldaten]]
 - [[opencivil.web.setzungsdaten]]

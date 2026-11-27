@@ -1,5 +1,5 @@
 ---
-erzeugt: 012cbf733f63
+erzeugt: 68810f9117d4
 art: modul
 tags: [modul]
 ---
@@ -88,7 +88,17 @@ def _fachwerkmodell(p: Projekt) -> None
 ```
 
 Eine Wandscheibe 6 × 3 m mit einer Türe, links fest, rechts auf einem
-Rollenlager, oben zwei Lasten – eine schräg.
+Rollenlager, oben zwei Lasten – eine schräg. Mit dem Fachwerk, das die
+Suche im Raster von 1 m findet, wie nach «Fachwerk suchen».
+
+### _fachwerk_der_wandscheibe
+
+```python
+@lru_cache(maxsize=None)
+def _fachwerk_der_wandscheibe() -> GefundenesFachwerk
+```
+
+Je Lauf einmal gesucht – eine Viertelsekunde, und das Beispiel entsteht oft.
 
 ### _durchstanzstellen
 
@@ -304,6 +314,7 @@ allein nach (29), stossartig Biegung allein nach (38), mit k_m \< 1.
 - [[opencivil.projekt.beispiele_verbund]]
 - [[opencivil.projekt.decke]]
 - [[opencivil.projekt.eintraege]]
+- [[opencivil.projekt.fachwerkmodell]]
 - [[opencivil.projekt.platte]]
 - [[opencivil.projekt.projekt]]
 - [[opencivil.projekt.querschnittsanalyse]]

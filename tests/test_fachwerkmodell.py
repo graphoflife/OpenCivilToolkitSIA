@@ -10,7 +10,7 @@ from opencivil.core.latex import Mathe
 from opencivil.core.protokoll import HinweisArt, HinweisBlock, TabellenBlock
 from opencivil.fachwerkmodell.modell import Halt, Lager, Last, Modell, Umriss
 from opencivil.fachwerkmodell.pruefen import beweglich, pruefen
-from opencivil.fachwerkmodell.werk import OHNE_VERFAHREN
+from opencivil.fachwerkmodell.werk import NOCH_KEINES
 from opencivil.projekt import Projekt, beispiele
 from opencivil.projekt.aufbau.fachwerkmodell import modell_von
 from opencivil.web import dienst
@@ -183,36 +183,39 @@ class TestLagerung(unittest.TestCase):
 
 
 class TestRechnung(unittest.TestCase):
-    """Der Befund im Rechenwerk und die Herleitung: noch ohne Verfahren."""
+    """Der Befund im Rechenwerk und die Herleitung, solange noch kein Fachwerk gesucht ist."""
 
     def gerechnet(self, p: Projekt):
         aufbau = p.aufbauen()
         loesung = aufbau.werk.loese(*aufbau.ziele_von("f1"))
         return loesung, loesung.befunde[aufbau.fachwerkmodelle["f1"].rechnung.id]
 
-    def test_bereit_sagt_dass_noch_kein_verfahren_sucht(self):
+    def test_bereit_sagt_dass_noch_kein_fachwerk_gesucht_ist(self):
         loesung, befund = self.gerechnet(wandscheibe())
-        self.assertFalse(befund.haelt_an)
-        self.assertEqual([(m.text, m.fehler, m.unfertig) for m in befund.meldungen],
-                         [(OHNE_VERFAHREN, False, False)])
+        self.assertTrue(befund.bereit)
+        self.assertEqual((befund.meldungen, befund.stand), ([], "keines"))
+        self.assertEqual([(m.text, m.fehler, m.unfertig) for m in befund.zum_fachwerk],
+                         [(NOCH_KEINES, False, False)])
+        self.assertEqual(len(befund.abdruck), 16)
         hinweise = [b.text for b in loesung.protokoll.alle_bloecke() if isinstance(b, HinweisBlock)]
-        self.assertIn(OHNE_VERFAHREN, hinweise)
+        self.assertIn(NOCH_KEINES, hinweise)
 
     def test_herleitung_mit_summe_der_lasten(self):
         loesung, _ = self.gerechnet(wandscheibe())
         tabellen = {b.titel: b for b in loesung.protokoll.alle_bloecke() if isinstance(b, TabellenBlock)}
         self.assertEqual(sorted(tabellen), ["Lager", "Lasten", "Löcher", "Scheiben"])
+        # Ohne gefundenes Fachwerk keine Tabelle der Stäbe -- die Zahlen des Verfahrens stehen da.
         zeilen = [[z.latex if isinstance(z, Mathe) else z for z in zeile] for zeile in tabellen["Lasten"].zeilen]
         self.assertEqual(zeilen[-1], ["Summe", "", "50.0", "500.0"])
         self.assertEqual(tabellen["Scheiben"].zeilen[0][2].latex, "18.00")
         self.assertEqual([z[2] for z in tabellen["Lager"].zeilen], ["x und y", "nur y"])
 
-    def test_unfertig_ohne_hinweis_auf_das_verfahren(self):
+    def test_unfertig_ohne_hinweis_auf_die_suche(self):
         p = wandscheibe()
         p.fachwerkmodelle[0].lasten.clear()
         loesung, befund = self.gerechnet(p)
-        self.assertTrue(befund.haelt_an)
-        self.assertNotIn(OHNE_VERFAHREN, [m.text for m in befund.meldungen])
+        self.assertFalse(befund.bereit)
+        self.assertEqual((befund.zum_fachwerk, befund.stand, befund.abdruck), ([], "", ""))
 
     def test_falsches_steht_rot_im_bericht(self):
         p = wandscheibe()
@@ -229,8 +232,11 @@ class TestZeichnung(unittest.TestCase):
     def test_bereit(self):
         antwort = zeichnung(wandscheibe())
         self.assertEqual(antwort.status, 200)
-        self.assertEqual(antwort.daten["uebersicht"], {"bereit": True, "meldungen": [
-            {"text": OHNE_VERFAHREN, "elemente": [], "fehler": False, "unfertig": False}]})
+        uebersicht = antwort.daten["uebersicht"]
+        self.assertEqual(len(uebersicht.pop("abdruck")), 16)
+        self.assertEqual(uebersicht, {
+            "bereit": True, "stand": "keines", "fachwerk": None, "meldungen": [], "zum_fachwerk": [
+                {"text": NOCH_KEINES, "elemente": [], "fehler": False, "unfertig": False}]})
 
     def test_unfertig(self):
         p = Projekt(name="Fachwerk")

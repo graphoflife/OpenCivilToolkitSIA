@@ -1,5 +1,5 @@
 ---
-erzeugt: 11fcd8842def
+erzeugt: 8b2d64df713f
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -88,6 +88,10 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 **Durchstanzen**
 
 - [[Durchstanzen]] · 39
+
+**Fachwerkmodelle**
+
+- [[Fachwerkmodell]] · 1
 
 ## Formeln von A bis Z
 
@@ -345,6 +349,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Lastneigungsfaktor i_q]] · $i_q$
 - [[Lastneigungsfaktor i_γ]] · $i_{\gamma}$
 - [[Lastverteilelement]]
+- [[Leichtestes Fachwerk]]
 - [[Lineares Zusammenwirken im Stahlquerschnitt]]
 - [[Linearisierte Fliessbedingung]]
 - [[Lotrechte Kraft der geneigten Spannglieder]] · $V_p$
@@ -570,7 +575,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 ## Normstelle fehlt noch
 
-148 von 476 Formeln haben im Code keine Normstelle – meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle – von dort kommt sie in Bericht und Notizbuch.
+148 von 477 Formeln haben im Code keine Normstelle – meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle – von dort kommt sie in Bericht und Notizbuch.
 
 - [[Achsen eines Stabs im Raum]] · [[opencivil.stabwerk3d.herleitung|_ansaetze]]
 - [[Äquivalenter E-Modul eines Stabs]] · [[opencivil.spannungsanalyse.modul#ModulProzedur|ModulProzedur._schreiben]]

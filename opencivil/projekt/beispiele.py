@@ -14,7 +14,9 @@ damit fast neunhundert Zeilen hatte.
 
 from __future__ import annotations
 
+import copy
 import math
+from functools import lru_cache
 
 from opencivil.decke.feld import GROESSEN as STREIFENGROESSEN
 from opencivil.decke.schnitt import BALKENGROESSEN
@@ -23,6 +25,7 @@ from opencivil.projekt import beispiele_verbund as verbund
 from opencivil.projekt.balkensystem import DIAGRAMMGROESSEN
 from opencivil.projekt.balkensystem3d import DIAGRAMMGROESSEN as DIAGRAMMGROESSEN3D
 from opencivil.projekt.decke import PLATTENGROESSEN
+from opencivil.projekt.fachwerkmodell import FachwerkmodellEintrag, GefundenesFachwerk
 from opencivil.projekt.eintraege import (
     Gebrauchswahl, KnickVerformungswahl, KnickWiderstandswahl, RechenwahlEintrag, erstes_material,
 )
@@ -399,9 +402,24 @@ def _decken(p: Projekt) -> None:
 def _fachwerkmodell(p: Projekt) -> None:
     """
     Eine Wandscheibe 6 × 3 m mit einer Türe, links fest, rechts auf einem
-    Rollenlager, oben zwei Lasten -- eine schräg.
+    Rollenlager, oben zwei Lasten -- eine schräg. Mit dem Fachwerk, das die
+    Suche im Raster von 1 m findet, wie nach «Fachwerk suchen».
     """
     f = p.fachwerkmodell("Wandscheibe mit Türe")
+    _wandscheibe(f)
+    f.fachwerk = copy.deepcopy(_fachwerk_der_wandscheibe())
+
+
+@lru_cache(maxsize=None)
+def _fachwerk_der_wandscheibe() -> GefundenesFachwerk:
+    """Je Lauf einmal gesucht -- eine Viertelsekunde, und das Beispiel entsteht oft."""
+    f = FachwerkmodellEintrag(kennung="f", name="Wandscheibe mit Türe")
+    _wandscheibe(f)
+    return f.suchen()
+
+
+def _wandscheibe(f: FachwerkmodellEintrag) -> None:
+    f.rasterweite = 1.0
     f.scheibe([(0, 0), (6, 0), (6, 3), (0, 3)])
     f.loch([(3.5, 0), (4.5, 0), (4.5, 2.2), (3.5, 2.2)])
     f.lager_setzen((0, 0))

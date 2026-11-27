@@ -356,6 +356,17 @@ const ZEICHEN = {
     pfade: ['M3.5 3.5h17v17h-17z', 'M12 3.5v17 M3.5 12h17',
       'M3.5 3.5L20.5 20.5 M12 3.5L20.5 12 M3.5 12L12 20.5'],
   },
+
+  // -- Die Knöpfe des Fachwerkmodells -----------------------------------------
+
+  // Das Verfahren Ground Structure: Knoten im Raster, gestrichelt Stäbe, die
+  // möglich sind, kräftig die gewählten -- ein Bogen mit Zugband.
+  'fw-verfahren': {
+    strich: ['M4.5 5h15 M4.5 5l7.5 7 M19.5 5l-7.5 7 M4.5 12h15'],
+    pfade: ['M4.5 19L12 5l7.5 14z'],
+    voll: [[4.5, 5, 1.3], [12, 5, 1.3], [19.5, 5, 1.3], [4.5, 12, 1.3], [12, 12, 1.3],
+      [19.5, 12, 1.3], [4.5, 19, 1.3], [12, 19, 1.3], [19.5, 19, 1.3]],
+  },
   // Die Ergebnisse: die Platte, gestrichelt ein Schnitt durch sie und
   // darüber der Verlauf längs ihm -- wie beim Werkzeug, das ihn zeichnet.
   ergebnisse: {

@@ -1,5 +1,5 @@
 ---
-erzeugt: 74da990a8b7d
+erzeugt: cd76e116705a
 art: modul
 tags: [modul]
 ---
@@ -118,3 +118,5 @@ lassen: das Kreuzprodukt zweier unabhängiger Zeilen.
 ## Gebraucht von
 
 - [[opencivil.fachwerkmodell.werk]]
+- [[opencivil.projekt.fachwerkmodell]]
+- [[opencivil.web.fachwerkdaten]]

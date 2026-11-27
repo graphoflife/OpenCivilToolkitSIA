@@ -223,6 +223,11 @@ export const api = {
   deckeErgebnis: (projekt, kennung, fall) => ruf('decke_ergebnis', { projekt, kennung, fall }),
   /** Was das Zeichenfenster eines Fachwerkmodells unter seine Teile legt: die Meldungen, ob es bereit ist. */
   fachwerkZeichnung: (projekt, kennung) => ruf('fachwerk_zeichnung', { projekt, kennung }),
+  /**
+   * Eine Runde der Suche nach einem Fachwerk: den Zustand der letzten hinein
+   * -- null für die erste --, den nächsten, das Fachwerk und den Stand heraus.
+   */
+  fachwerkSuchen: (projekt, kennung, zustand) => ruf('fachwerk_suchen', { projekt, kennung, zustand }),
 };
 
 export { KernFehler };

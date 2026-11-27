@@ -275,6 +275,20 @@
 .fw-lagergruppe.ist-fehler .fw-rolle { stroke: var(--schlecht); }
 .fw-last.ist-fehler { fill: var(--schlecht); }
 
+/* Das Fachwerk: Zug rot und durchgezogen, Druck blau und gestrichelt -- die
+   Farben der positiven und negativen Schnittkräfte, Zug positiv. Wie dick
+   ein Stab ist, setzt das Bild nach seiner Kraft. */
+.fw-stab { fill: none; stroke-linecap: round; }
+.fw-stab.ist-zug { stroke: var(--feld-plus); }
+.fw-stab.ist-druck { stroke: var(--feld-minus); stroke-dasharray: 7 4; stroke-linecap: butt; }
+.fw-knoten { fill: var(--schrift); stroke: none; }
+
+/* Die Suche im Fenster «Verfahren»: der Knopf und «Anhalten» nebeneinander,
+   darunter, wie weit sie ist -- dieselbe Zeile auch über dem Bild rechts. */
+.fw-suche { margin-top: 10px; }
+.fw-suchleiste { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 6px; }
+.fw-suchstand { margin: 6px 0; font-size: 13px; color: var(--schrift); }
+
 /* ----------------------------------------------------------- Grundbruch -- */
 
 /* Die Bemessungswerte des Bodens unter seinen Feldern, wie der Kern sie rechnet. */

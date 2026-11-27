@@ -7,6 +7,59 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-28 · Fachwerkmodell: Ground Structure live
+
+Schritt 11b des Plans vom 2026-11-27. Die Kachel «Verfahren» hat die
+Rasterweite h, das Gewicht w_Z des Zugs gegenüber dem Druck und die
+kleinste Stabkraft N_min; ihr Fenster den Knopf «Fachwerk suchen». Vorher
+stand dort «Noch ohne Verfahren»; jetzt zeigt das Bild nach jeder Runde das
+Fachwerk, Zug rot, Druck blau gestrichelt, je dicker, desto grösser die
+Kraft, bis keine Stäbe mehr dazukommen oder man anhält. Beispiel
+«Wandscheibe mit Türe»: bei h = 1 m 188 mögliche Stäbe, 16 Runden,
+27 Stäbe, V = 3734.0 kNm; bei 0.5 m 1528 mögliche, 20 Runden, 36 Stäbe,
+V = 3662.5 kNm, 2 % leichter.
+
+- Das Verfahren nach He, Gilbert & Song (2019), Abschnitt 3: eine lineare
+  Optimierung über die Stabkräfte, selbst geschrieben als primal-duales
+  Innere-Punkte-Verfahren nach Mehrotra, mit dem Gleichungslöser der
+  Stabwerke (Profilmatrix, Reverse-Cuthill-McKee). Die erste Runde kennt
+  nur die Stäbe bis 1.5 h; danach kommen je Runde die dazu, die das
+  Fachwerk noch leichter machten (Gl. (7), α = β = 0.05). Ein Rest je
+  Knoten mit hoher Strafe hält jede Runde lösbar – geht das Gleichgewicht
+  nicht auf, sagt die Nachrechnung rot, welche Last offen bleibt.
+- Die Seite rechnet nichts: sie schickt den Zustand der letzten Runde
+  zurück – welche Stäbe im Modell sind, mit dem Abdruck von Modell und
+  Verfahren –, der Kern gibt die nächste Runde und das Fachwerk zum
+  Zeichnen. Ändert man das Modell während der Suche, passt der Abdruck
+  nicht mehr, und sie beginnt von vorn. Wird das Modell gelöscht oder ein
+  anderes Projekt gewählt, hört sie auf und legt nichts ab.
+- Am Ende legt die Seite das Fachwerk im Eintrag ab; von da an ist es eine
+  Eingabe wie jede andere. Die Rechnung rechnet sein Gleichgewicht nach
+  und erkennt am Abdruck, ob es noch zum Modell passt – sonst grau «gehört
+  zu einem früheren Stand». Auch die Seite vergleicht den Abdruck: ohne das
+  stünde zwischen dem Ende der Suche und der nächsten Rechnung einen
+  Augenblick «Noch kein Fachwerk gesucht».
+- Die Meldungen sind zweierlei: was das Modell meldet und was zum Fachwerk
+  zu sagen ist (`zum_fachwerk`) – noch keines, veraltet, angehalten, offen.
+- Das Innere-Punkte-Verfahren endet bei mehreren gleich leichten
+  Fachwerken in ihrer Mitte, mit vielen kleinen Stäben. Die Nachbearbeitung
+  lässt die unter N_min der grössten Kraft weg und sucht das Gleichgewicht
+  ohne sie neu; geht es nicht auf, halbiert sie die Schwelle. Bei 0.55 m:
+  49 statt 102 Stäbe, gleich leicht. Gründlich, mit bis zu 30 Versuchen,
+  nur in der letzten Runde – sonst dauerte die Suche bei 0.5 m 5 statt
+  2 s. Zuletzt werden zwei Stäbe in einer Flucht durch einen freien Knoten
+  einer.
+- Zeit für die Wandscheibe: in CPython 0.3 s bei 1 m und 2 s bei 0.5 m;
+  auf der Seite (Pyodide, 150 bis 170 ms je Runde) 4.5 s bei 0.55 m und
+  40 s bei 0.25 m. Darum sucht sie auf Knopfdruck (Frage im [[TODO]]).
+- Das Prüfprojekt hat das Fachwerk, das die Suche bei 1 m findet
+  (`FachwerkmodellEintrag.suchen`, je Lauf einmal gesucht): der Bericht
+  zeigt die Stäbe, V, die Lagerkräfte und die Formel «Leichtestes
+  Fachwerk». Gegen die Handrechnung prüft eine Konsole 1 × 2 m, links
+  oben und unten gehalten, 100 kN nach unten an der rechten Kante auf
+  halber Höhe: zwei Stäbe mit ±70.7 kN, V = 200 kNm, mit w_Z = 2
+  300 kNm.
+
 ## 2026-11-27 · Fachwerkmodell: Scheibe, Lager und Lasten zeichnen
 
 Schritt 11a des Plans vom 2026-11-27: eine neue App «Fachwerkmodelle»,

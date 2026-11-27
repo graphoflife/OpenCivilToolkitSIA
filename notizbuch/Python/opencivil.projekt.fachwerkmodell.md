@@ -1,5 +1,5 @@
 ---
-erzeugt: bf863053f06a
+erzeugt: e9e7307c4bc1
 art: modul
 tags: [modul]
 ---
@@ -35,6 +35,16 @@ ab. Ein Satz Lasten je Modell; für einen zweiten Lastfall kopiert man es
 x nach rechts, y nach oben, in m. Eine Last in kN, `F_h` nach rechts,
 `F_v` nach unten positiv – wie im Balkensystem. Umgerechnet wird beim
 Bauen.
+
+
+## DAS GEFUNDENE FACHWERK
+
+Was die Suche zuletzt fand, steht im Eintrag ([[opencivil.projekt.fachwerkmodell#GefundenesFachwerk|GefundenesFachwerk]]):
+die Seite fragt sie Runde um Runde an und legt hier ab, was die letzte
+gab – fertig oder angehalten. Geschrieben vom Kern, nicht von Hand; die
+Rechnung glaubt ihm nur, was sie nicht nachrechnen kann, und erkennt am
+Abdruck, ob es noch zu Modell und Verfahren gehört
+([[opencivil.fachwerkmodell.suche]]).
 
 ## Inhalt
 
@@ -102,6 +112,68 @@ Eine Punktlast an einem Knoten, in jeder Richtung.
 - `F_h: float = bereich(0.0, heisst='F_h', einheit=KN)` – Waagrecht, nach rechts positiv.
 - `F_v: float = bereich(100.0, heisst='F_v', einheit=KN)` – Senkrecht, nach unten positiv.
 
+### FachwerkpunktEintrag
+
+```python
+@dataclass
+class FachwerkpunktEintrag(Beschreibung)
+```
+
+Ein Knoten des gefundenen Fachwerks, in m.
+
+- `IM_ORT = 'Knoten des Fachwerks'`
+- `x: float = bereich(0.0, heisst='x', einheit=M)`
+- `y: float = bereich(0.0, heisst='y', einheit=M)`
+
+### FachwerkstabEintrag
+
+```python
+@dataclass
+class FachwerkstabEintrag(Beschreibung)
+```
+
+Ein Stab des gefundenen Fachwerks: von Knoten zu Knoten, gezählt ab null, mit seiner Kraft.
+
+- `IM_ORT = 'Stab des Fachwerks'`
+- `von: int = bereich(0, heisst='von', ab=0)`
+- `bis: int = bereich(0, heisst='bis', ab=0)`
+- `N: float = bereich(0.0, heisst='N', einheit=KN)` – Zug positiv.
+
+### GefundenesFachwerk
+
+```python
+@dataclass
+class GefundenesFachwerk(Beschreibung)
+```
+
+Was die Suche zuletzt fand – siehe Dateikopf.
+
+- `abdruck: str = ''` – Woran es Modell und Verfahren erkennt, zu denen es gehört.
+- `runden: int = bereich(0, heisst='Runden', ab=0)`
+- `fertig: bool = False` – Ob die Suche zu Ende kam – sonst wurde sie angehalten.
+- `moeglich: int = bereich(0, heisst='Mögliche Stäbe', ab=0)` – Wie viele Stäbe die Grundstruktur hatte.
+- `im_modell: int = bereich(0, heisst='Stäbe im Modell', ab=0)` – Wie viele davon in der letzten Runde im Modell waren.
+- `knoten: List[FachwerkpunktEintrag] = field(default_factory=list)`
+- `staebe: List[FachwerkstabEintrag] = field(default_factory=list)`
+
+#### GefundenesFachwerk.aus
+
+```python
+@classmethod
+def aus(cls, ergebnis: Suchergebnis) -> 'GefundenesFachwerk'
+```
+
+Das Ergebnis einer Runde, wie es im Projekt steht: Kräfte in kN.
+
+#### GefundenesFachwerk.ergebnis
+
+```python
+def ergebnis(self) -> Optional[Suchergebnis]
+```
+
+Zurück in SI – `None`, wenn ein Stab auf einen Knoten zeigt, den es
+nicht gibt: dann ist es keines, das die Suche schrieb.
+
 ### FachwerkmodellEintrag
 
 ```python
@@ -123,6 +195,10 @@ weiter.
 - `loecher: List[LochEintrag] = field(default_factory=list)`
 - `lager: List[ScheibenlagerEintrag] = field(default_factory=list)`
 - `lasten: List[ScheibenlastEintrag] = field(default_factory=list)`
+- `rasterweite: float = bereich(0.5, heisst='Rasterweite', einheit=M, ueber=0.0)` – Wie weit die Knoten der Grundstruktur auseinander liegen.
+- `w_Z: float = bereich(1.0, heisst='w_Z', ab=0.1, bis=10.0)` – Wie schwer Zug gegenüber Druck zählt – 1: gleich (Plan vom 2026-11-27, Entscheid 11).
+- `N_min: float = bereich(1.0, heisst='N_min', einheit=PROZENT, ab=0.0, bis=50.0)` – Die kleinste Stabkraft, die stehen bleibt, bezogen auf die grösste.
+- `fachwerk: Optional[GefundenesFachwerk] = teil(lambda: None, heisst='Gefundenes Fachwerk')` – Was die Suche zuletzt fand – siehe Dateikopf.
 - `beschreibung: str = ''` – Freier Text – geht in keine Rechnung ein.
 
 #### FachwerkmodellEintrag.lagen
@@ -169,6 +245,17 @@ def last(self, ort: Ort, **felder: Any) -> ScheibenlastEintrag
 
 Eine Punktlast bei `ort` – `F_h` nach rechts, `F_v` nach unten, in kN.
 
+#### FachwerkmodellEintrag.suchen
+
+```python
+def suchen(self) -> GefundenesFachwerk
+```
+
+Sucht das Fachwerk bis zum Ende, wie «Fachwerk suchen» auf der Seite,
+und legt es ab. Fehlt dem Modell etwas, sagt ein [[opencivil.projekt.lesen#ProjektFehler|ProjektFehler]],
+was; ein zu feines Raster meldet
+[[opencivil.fachwerkmodell.grundstruktur#ZuVieleKnoten|ZuVieleKnoten]].
+
 
 ## Konstanten
 
@@ -179,6 +266,9 @@ Eine Punktlast bei `ort` – `F_h` nach rechts, `F_v` nach unten, in kN.
 
 - [[opencivil.core.einheiten]]
 - [[opencivil.fachwerkmodell.modell]]
+- [[opencivil.fachwerkmodell.pruefen]]
+- [[opencivil.fachwerkmodell.suche]]
+- [[opencivil.projekt.aufbau.fachwerkmodell]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.lesen]]
 - [[opencivil.projekt.netz]]
@@ -188,5 +278,7 @@ Eine Punktlast bei `ort` – `F_h` nach rechts, `F_v` nach unten, in kN.
 - [[opencivil.projekt]]
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.aufbau.fachwerkmodell]]
+- [[opencivil.projekt.beispiele]]
 - [[opencivil.projekt.projekt]]
+- [[opencivil.web.api]]
 - [[opencivil.web.fachwerkdaten]]
