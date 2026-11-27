@@ -227,8 +227,10 @@ class Projekt(Beschreibung):
                 and (kennung in e.materialien() or kennung in e.bezuege())]
 
     def eigener_name(self, art: str) -> str:
-        """Der erste freie Name eines eigenen Materials: BE1, BE2 ..., S1 ..., ST1 ..., SP1 ...
-        oder H1 ..."""
+        """
+        Der erste freie Name eines eigenen Materials: BE1, BE2 ..., S1 ..., ST1 ...,
+        SP1 ..., H1 ... oder PB1 ...
+        """
         vorsilbe = MATERIALARTEN[art].eigene
         vergeben = {m.anzeigename for m in self.materialien}
         i = 1
@@ -263,6 +265,10 @@ class Projekt(Beschreibung):
     def holz(self, sorte: str = "C24") -> MaterialEintrag:
         """Eine Holzsorte nach SIA 265 -- Kennung ``h1``, ``h2`` ..."""
         return self._normsorte("holz", sorte)
+
+    def profilblech(self, sorte: str = "SE 350 G") -> MaterialEintrag:
+        """Ein Profilblechstahl nach SIA 264 -- Kennung ``pb1``, ``pb2`` ..."""
+        return self._normsorte("profilblech", sorte)
 
     def eigener_beton(self, vorlage: str = "C30/37") -> MaterialEintrag:
         """

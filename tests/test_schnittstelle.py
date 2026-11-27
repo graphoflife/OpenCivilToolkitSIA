@@ -219,7 +219,8 @@ class TestApiAbbildung(unittest.TestCase):
         self.assertEqual(len(k["stahlsorten"]), 5)
         self.assertEqual(len(k["erfuellungsarten"]), 4)
         self.assertEqual(list(k["materialarten"]),
-                         ["beton", "betonstahl", "baustahl", "spannstahl", "holz"])
+                         ["beton", "betonstahl", "baustahl", "spannstahl", "holz",
+                          "profilblech"])
         for art, angaben in k["materialarten"].items():
             with self.subTest(art=art):
                 self.assertTrue(any(v["berechnet"] for v in angaben["kennwerte"]))
@@ -228,8 +229,10 @@ class TestApiAbbildung(unittest.TestCase):
                          ["S235", "S275", "S355", "S460"])
         self.assertEqual(k["materialarten"]["spannstahl"]["anlegen"][0], "Y1860")
         self.assertEqual(k["materialarten"]["holz"]["anlegen"][0], "C24")
+        self.assertEqual(k["materialarten"]["profilblech"]["anlegen"][0], "SE 350 G")
+        self.assertEqual(k["materialarten"]["profilblech"]["neu"], "Neuer Profilblechstahl")
         self.assertEqual({a["eigene"] for a in k["materialarten"].values()},
-                         {"BE", "S", "ST", "SP", "H"})
+                         {"BE", "S", "ST", "SP", "H", "PB"})
 
     def test_werte_tragen_ihre_herkunft(self):
         d = self.d

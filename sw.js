@@ -144,8 +144,8 @@ const VORRAT = {
     "web/js/variablen.js?v=7d43b6f38cd9",
     "web/js/zeichnen.js?v=da6e8eec5dc8",
     "web/js/zustand.js?v=3385a39c0f84",
-    "web/kern/notizbuch.json?v=966d978a3bea",
-    "web/kern/quellen.json?v=815bdb1ac556"
+    "web/kern/notizbuch.json?v=624de1d758ee",
+    "web/kern/quellen.json?v=25a9bfb18e77"
   ],
   "fremd": {
     "web/vendor/jetbrains-mono/": {

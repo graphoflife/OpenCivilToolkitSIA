@@ -993,6 +993,14 @@ Norm dazu sagt.
       zu Fliessdehnung, das 3.2.2.4 für die plastischen Verfahren verlangt.
       Bestätigen oder eine andere Zahl nennen. Wirkt seit 2026-11-26 in den
       Spannung-Dehnung-Analysen: dort endet die Linie eines Stahlquerschnitts.
+- [ ] **Profilblechstahl, nach Vorgabe** (`opencivil/material/profilblech.py`,
+      seit 2026-11-27).
+      - Die Linie endet wie beim Baustahl bei ε_ud = 15·ε_yp, für SE 350 G
+        bei 25 ‰. Weder SIA 264 noch SIA 263 nennen eine Grenzdehnung.
+      - Ein neuer Profilblechstahl beginnt mit SE 350 G; 3.3.1 nennt
+        SE 320 G und SE 350 G als üblich, aber keine zuerst.
+
+      Bestätigen oder eine andere Zahl und Sorte nennen.
 - [ ] **Holz, Grenzstauchung nach Vorgabe** (`opencivil/material/holz.py`,
       `STAUCHBARKEIT`, seit 2026-11-26). Elastisch-plastisch geht der Druck
       bis ε_cu = 3·ε_c,0,d, bei C24 bis 3.27 ‰. SIA 265:2012, 3.1.2.2 lässt

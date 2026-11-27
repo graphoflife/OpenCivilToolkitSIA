@@ -1,5 +1,5 @@
 ---
-erzeugt: f01557d3add6
+erzeugt: bd4b37f49de0
 art: modul
 tags: [modul]
 ---
@@ -148,8 +148,8 @@ der Platten ihn nimmt.
 def eigener_name(self, art: str) -> str
 ```
 
-Der erste freie Name eines eigenen Materials: BE1, BE2 ..., S1 ..., ST1 ..., SP1 ...
-oder H1 ...
+Der erste freie Name eines eigenen Materials: BE1, BE2 ..., S1 ..., ST1 ...,
+SP1 ..., H1 ... oder PB1 ...
 
 #### Projekt.beton
 
@@ -190,6 +190,14 @@ def holz(self, sorte: str='C24') -> MaterialEintrag
 ```
 
 Eine Holzsorte nach SIA 265 -- Kennung `h1`, `h2` ...
+
+#### Projekt.profilblech
+
+```python
+def profilblech(self, sorte: str='SE 350 G') -> MaterialEintrag
+```
+
+Ein Profilblechstahl nach SIA 264 -- Kennung `pb1`, `pb2` ...
 
 #### Projekt.eigener_beton
 

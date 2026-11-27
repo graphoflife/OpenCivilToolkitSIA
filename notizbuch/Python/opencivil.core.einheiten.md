@@ -1,5 +1,5 @@
 ---
-erzeugt: 0b3ff91a5302
+erzeugt: 8b8d68cbc990
 art: modul
 tags: [modul]
 ---
@@ -466,6 +466,7 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - [[opencivil.material.beton]]
 - [[opencivil.material.betonstahl]]
 - [[opencivil.material.holz]]
+- [[opencivil.material.profilblech]]
 - [[opencivil.material.spannstahl]]
 - [[opencivil.nachweis.biegung_normalkraft]]
 - [[opencivil.nachweis.duktilitaet]]

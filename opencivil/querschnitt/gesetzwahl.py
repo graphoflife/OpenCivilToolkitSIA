@@ -169,6 +169,19 @@ class Werkstoffsatz(Wahl):
         return {"f_s": self.baustahl, "E_s": "E_a", "eps_ud": "eps_ud"}
 
     @property
+    def profilblech(self) -> str:
+        """
+        Kurzname der Streckgrenze des Profilblechstahls -- dort beginnt sein
+        Plateau: ``f_ypd = f_yp/γ_ap`` oder ``f_yp`` (SIA 264:2014, 4.1.3).
+        """
+        return "f_ypd" if self is Werkstoffsatz.BEMESSUNG else "f_yp"
+
+    @property
+    def profilblechkennwerte(self) -> Dict[str, str]:
+        """Dasselbe fuer das Gesetz des Profilblechstahls -- wie beim Baustahl."""
+        return {"f_s": self.profilblech, "E_s": "E_a", "eps_ud": "eps_ud"}
+
+    @property
     def spannstahl(self) -> str:
         """
         Kurzname der Fliessgrenze des Spannstahls -- dort beginnt sein Plateau:
@@ -184,7 +197,8 @@ class Werkstoffsatz(Wahl):
         fuer den Titel des Schalters (:mod:`opencivil.web.api`, ``satztitel``).
         """
         return {Baustoffart.BETON: self.beton, Baustoffart.BETONSTAHL: self.stahl,
-                Baustoffart.SPANNSTAHL: self.spannstahl, Baustoffart.BAUSTAHL: self.baustahl}[art]
+                Baustoffart.SPANNSTAHL: self.spannstahl, Baustoffart.BAUSTAHL: self.baustahl,
+                Baustoffart.PROFILBLECH: self.profilblech}[art]
 
     @property
     def spannstahlkennwerte(self) -> Dict[str, str]:
@@ -479,6 +493,7 @@ class Rechenwahl:
         satz = self.satz(stoff)
         return {Baustoffart.SPANNSTAHL: satz.spannstahlkennwerte,
                 Baustoffart.BAUSTAHL: satz.baustahlkennwerte,
+                Baustoffart.PROFILBLECH: satz.profilblechkennwerte,
                 Baustoffart.BETONSTAHL: satz.stahlkennwerte}[stoff.art]
 
     @property

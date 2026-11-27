@@ -1,5 +1,5 @@
 ---
-erzeugt: 1ec142ee8185
+erzeugt: 747bc6405a67
 art: modul
 tags: [modul]
 ---
@@ -85,10 +85,18 @@ def _baustahlkurve(wert, sorte: str) -> Optional[dict]
 
 Baustahl: elastisch -- ideal plastisch, in Zug und Druck gleich, mit `f_yd = f_y / gamma_M1`.
 
+### _profilblechkurve
+
+```python
+def _profilblechkurve(wert, sorte: str) -> Optional[dict]
+```
+
+Profilblechstahl: wie der Baustahl, mit `f_ypd = f_yp / gamma_ap`.
+
 ### _knickkurve
 
 ```python
-def _knickkurve(gesetz: Stahlgesetz, titel: str) -> dict
+def _knickkurve(gesetz: Stahlgesetz, titel: str, fliessen: str='ε_yd') -> dict
 ```
 
 Eine Linie ohne Verfestigung, aus ihrem Gesetz. Fuenf Eckpunkte genuegen

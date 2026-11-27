@@ -56,7 +56,9 @@ from opencivil.querschnitt.fasern import FASERN
 from opencivil.querschnitt.gesetzwahl import Rechenwahl, betongesetz, holzgesetz
 from opencivil.querschnitt.spannglieder import Spannglied, Spannglieder
 from opencivil.querschnitt.torsion import torsion
-from opencivil.querschnitt.werkstoffgesetz import Baustahlgesetz, Gesetz, Stahlgesetz
+from opencivil.querschnitt.werkstoffgesetz import (
+    Baustahlgesetz, Gesetz, Profilblechgesetz, Stahlgesetz,
+)
 from opencivil.querschnitt.zugseite import Zugseite
 from opencivil.stahlprofile import lage as profillage
 from opencivil.stahlprofile.lage import Profillage
@@ -71,6 +73,7 @@ KENNWERTE = {
     Baustoffart.SPANNSTAHL: ("f_pk", "f_p01k", "f_pd", "E_p", "E_p_litze", "eps_ud"),
     Baustoffart.BAUSTAHL: ("f_y", "f_yd", "E_a", "eps_ud"),
     Baustoffart.HOLZ: ("f_t_0_d", "f_c_0_d", "E_0_mean", "eps_cu"),
+    Baustoffart.PROFILBLECH: ("f_yp", "f_ypd", "E_a", "eps_ud"),
 }
 
 
@@ -115,8 +118,9 @@ def werkstoff(stoff: Baustoff, wert: Callable[[str], float], wahl: Rechenwahl, *
         return Werkstoff(stoff.name, gesetz, -eps_c2d, math.inf,
                          c_punkt=(eps_c1d, eps_c2d), verdraengbar=True, wort=stoff.art.beschriftung)
     k = wahl.kennwerte(stoff)
-    if stoff.art is Baustoffart.BAUSTAHL:
-        gesetz = Baustahlgesetz.gleich(E_a=w(k["E_s"]), f_yd=w(k["f_s"]), eps_ud=w(k["eps_ud"]))
+    if stoff.art in (Baustoffart.BAUSTAHL, Baustoffart.PROFILBLECH):
+        art = Baustahlgesetz if stoff.art is Baustoffart.BAUSTAHL else Profilblechgesetz
+        gesetz = art.gleich(E_a=w(k["E_s"]), f_yd=w(k["f_s"]), eps_ud=w(k["eps_ud"]))
         return Werkstoff(stoff.name, gesetz, -gesetz.eps_ud, gesetz.eps_ud,
                          wort=stoff.art.beschriftung)
     if stoff.art is Baustoffart.HOLZ:

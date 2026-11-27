@@ -7,6 +7,27 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-27 · Profilblechstahl als Material
+
+Aus dem Plan vom 2026-11-25, Schritt 14d, erster Teil: der Stahl der
+Profilbleche einer Blechverbunddecke ist ein Material wie Baustahl und
+Holz. Das Blech selbst – Rippen, Fläche, m und k aus dem Datenblatt –
+kommt als Element der Querschnittsanalyse.
+
+**Vorher und nachher.** Vorher gab es unter «Materialien» keinen Stahl
+für Profilbleche. Nachher gibt es «+ Profilblechstahl» mit den sechs
+Sorten der SIA 264:2014, Tabelle 1, SE 220 G bis SE 550 G. SE 350 G steht
+zuerst: f_yp = 350 N/mm², f_ypd = 350/1.05 = 333 N/mm². Das Bild zeigt
+die Linie elastisch – ideal plastisch, wie beim Baustahl.
+
+**Was die Norm nicht nennt.** E_a kommt über 3.1.1 aus der SIA 263, also
+210 000 N/mm². Eine Grenzdehnung nennt keine der beiden Normen: die Linie
+endet wie beim Baustahl bei 15 Fliessdehnungen, nach Vorgabe. Welche der
+beiden üblichen Sorten, SE 320 G oder SE 350 G, zuerst steht, ist auch
+eine Vorgabe.
+
+---
+
 ## 2026-11-27 · Verbund nach SIA 264, Verbundstützen
 
 Aus dem Plan vom 2026-11-25, Schritt 14c: die Verbundstütze nach SIA

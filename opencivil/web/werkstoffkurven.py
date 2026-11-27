@@ -22,7 +22,8 @@ from opencivil.material.basis import Baustoffart
 from opencivil.material.spannstahl import SPANNSTAHLSORTEN, Erzeugnisart
 from opencivil.projekt import Aufbau
 from opencivil.querschnitt.werkstoffgesetz import (
-    BLOCKANTEIL, Baustahlgesetz, Betongesetz, Holzgesetz, HolzPlastisch, Spannstahlgesetz,
+    BLOCKANTEIL, Baustahlgesetz, Betongesetz, Holzgesetz, HolzPlastisch, Profilblechgesetz,
+    Spannstahlgesetz,
     Spannungsblock, Stahlgesetz,
 )
 from opencivil.web.anzeige import zahl
@@ -143,7 +144,16 @@ def _baustahlkurve(wert, sorte: str) -> Optional[dict]:
     return _knickkurve(Baustahlgesetz.gleich(E_a, f_yd, eps_ud), "Baustahl – elastisch-plastisch")
 
 
-def _knickkurve(gesetz: Stahlgesetz, titel: str) -> dict:
+def _profilblechkurve(wert, sorte: str) -> Optional[dict]:
+    """Profilblechstahl: wie der Baustahl, mit ``f_ypd = f_yp / gamma_ap``."""
+    E_a, f_ypd, eps_ud = wert("E_a"), wert("f_ypd"), wert("eps_ud")
+    if None in (E_a, f_ypd, eps_ud):
+        return None
+    return _knickkurve(Profilblechgesetz.gleich(E_a, f_ypd, eps_ud),
+                       "Profilblechstahl – elastisch-plastisch", fliessen="ε_ypd")
+
+
+def _knickkurve(gesetz: Stahlgesetz, titel: str, fliessen: str = "ε_yd") -> dict:
     """
     Eine Linie ohne Verfestigung, aus ihrem Gesetz. Fuenf Eckpunkte genuegen
     -- dazwischen ist sie gerade, und mehr Punkte wuerden nur vortaeuschen,
@@ -159,7 +169,7 @@ def _knickkurve(gesetz: Stahlgesetz, titel: str) -> dict:
         "titel": titel,
         "referenz": gesetz.REFERENZ,
         "marken": [
-            {"eps": zahl(eps_yd, PROMILLE), "sigma": zahl(f, N_PRO_MM2), "text": "ε_yd"},
+            {"eps": zahl(eps_yd, PROMILLE), "sigma": zahl(f, N_PRO_MM2), "text": fliessen},
             {"eps": zahl(eps_ud, PROMILLE), "sigma": zahl(f, N_PRO_MM2), "text": "ε_ud"},
         ],
     }
@@ -240,4 +250,5 @@ KURVEN: Dict[Baustoffart, Callable[[Callable[[str], Optional[float]], str], Opti
     Baustoffart.BAUSTAHL: _baustahlkurve,
     Baustoffart.SPANNSTAHL: _spannstahlkurve,
     Baustoffart.HOLZ: _holzkurve,
+    Baustoffart.PROFILBLECH: _profilblechkurve,
 }

@@ -1,5 +1,5 @@
 ---
-erzeugt: ea6d3b8bc6f4
+erzeugt: 0da21b4d7a84
 art: modul
 tags: [modul]
 ---
@@ -102,6 +102,7 @@ Erzeugt einen frei definierten Betonstahl ohne Sortentabelle.
 - [[opencivil.durchstanzen.systeme]]
 - [[opencivil.material.arten]]
 - [[opencivil.material.baustahl]]
+- [[opencivil.material.profilblech]]
 - [[opencivil.material.spannstahl]]
 - [[opencivil.mcp.werkzeuge]]
 - [[opencivil.nachweis.duktilitaet]]

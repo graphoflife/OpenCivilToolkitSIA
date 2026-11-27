@@ -1,5 +1,5 @@
 ---
-erzeugt: 95e97ebb6861
+erzeugt: 805a7dcc7b96
 art: modul
 tags: [modul]
 ---
@@ -422,6 +422,21 @@ def latex(self, zug: str='f_{yd}', druck: str='') -> str
 ```
 
 Als Formel -- `zug` ist das Zeichen der Streckgrenze, auf Druck dieselbe.
+
+### Profilblechgesetz
+
+```python
+class Profilblechgesetz(Baustahlgesetz)
+```
+
+Profilblechstahl nach SIA 264:2014 wie der Baustahl: elastisch -- ideal
+plastisch, in Zug und Druck gleich, mit `f_ypd = f_yp/γ_ap` (4.1.3,
+(1)). Die Grenzdehnung ist nach Vorgabe, nicht nachgeschlagen
+([[opencivil.material.profilblech]]).
+
+- `NAME = 'Elastisch-plastische Beziehung des Profilblechstahls'`
+- `WORT = 'Profilblechstahl, elastisch-plastisch'`
+- `REFERENZ = 'SIA 264:2014, 3.1.1; 4.1.3 – die Grenzdehnung nach Vorgabe'`
 
 ### Spannstahlgesetz
 

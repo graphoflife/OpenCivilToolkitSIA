@@ -1,5 +1,5 @@
 ---
-erzeugt: 5140d2fd3286
+erzeugt: da342685bcda
 art: modul
 tags: [modul]
 ---
@@ -220,6 +220,25 @@ def baustahlkennwerte(self) -> Dict[str, str]
 ```
 
 Dasselbe fuer das Gesetz des Baustahls, in Zug und Druck dieselbe Streckgrenze.
+
+#### Werkstoffsatz.profilblech
+
+```python
+@property
+def profilblech(self) -> str
+```
+
+Kurzname der Streckgrenze des Profilblechstahls -- dort beginnt sein
+Plateau: `f_ypd = f_yp/γ_ap` oder `f_yp` (SIA 264:2014, 4.1.3).
+
+#### Werkstoffsatz.profilblechkennwerte
+
+```python
+@property
+def profilblechkennwerte(self) -> Dict[str, str]
+```
+
+Dasselbe fuer das Gesetz des Profilblechstahls -- wie beim Baustahl.
 
 #### Werkstoffsatz.spannstahl
 

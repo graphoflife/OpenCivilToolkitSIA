@@ -6967,7 +6967,7 @@
       "name": "opencivil.material",
       "pfad": "Python/opencivil.material.md",
       "art": "modul",
-      "kurz": "die Baustoffe: Beton, Betonstahl, Baustahl, Spannstahl und Holz.",
+      "kurz": "die Baustoffe: Beton, Betonstahl, Baustahl, Spannstahl, Holz und",
       "stichworte": []
     },
     {
@@ -7067,6 +7067,17 @@
         "zugglied_grund",
         "holzsorten_zum_anlegen",
         "holz"
+      ]
+    },
+    {
+      "name": "opencivil.material.profilblech",
+      "pfad": "Python/opencivil.material.profilblech.md",
+      "art": "modul",
+      "kurz": "Profilblechstahl nach SIA 264:2014.",
+      "stichworte": [
+        "Profilblechsorte",
+        "profilblechsorten_zum_anlegen",
+        "profilblech"
       ]
     },
     {
@@ -9138,6 +9149,7 @@
         "Projekt.baustahl",
         "Projekt.spannstahl",
         "Projekt.holz",
+        "Projekt.profilblech",
         "Projekt.eigener_beton",
         "Projekt.eigener_stahl",
         "Projekt.eigener_baustahl",
@@ -9556,6 +9568,8 @@
         "Werkstoffsatz.stahlkennwerte",
         "Werkstoffsatz.baustahl",
         "Werkstoffsatz.baustahlkennwerte",
+        "Werkstoffsatz.profilblech",
+        "Werkstoffsatz.profilblechkennwerte",
         "Werkstoffsatz.spannstahl",
         "Werkstoffsatz.festigkeit",
         "Werkstoffsatz.spannstahlkennwerte",
@@ -9928,6 +9942,7 @@
         "Baustahlgesetz.gleich",
         "Baustahlgesetz.formel",
         "Baustahlgesetz.latex",
+        "Profilblechgesetz",
         "Spannstahlgesetz",
         "Spannstahlgesetz.eps_pd",
         "Spannstahlgesetz.formel",
@@ -11336,6 +11351,7 @@
         "_spannungsblock",
         "_stahlkurve",
         "_baustahlkurve",
+        "_profilblechkurve",
         "_knickkurve",
         "_spannstahlkurve",
         "_holzkurve"

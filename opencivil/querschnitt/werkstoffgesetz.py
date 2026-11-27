@@ -493,6 +493,19 @@ class Baustahlgesetz(Stahlgesetz):
         )
 
 
+class Profilblechgesetz(Baustahlgesetz):
+    """
+    Profilblechstahl nach SIA 264:2014 wie der Baustahl: elastisch -- ideal
+    plastisch, in Zug und Druck gleich, mit ``f_ypd = f_yp/γ_ap`` (4.1.3,
+    (1)). Die Grenzdehnung ist nach Vorgabe, nicht nachgeschlagen
+    (:mod:`opencivil.material.profilblech`).
+    """
+
+    NAME = "Elastisch-plastische Beziehung des Profilblechstahls"
+    WORT = "Profilblechstahl, elastisch-plastisch"
+    REFERENZ = "SIA 264:2014, 3.1.1; 4.1.3 – die Grenzdehnung nach Vorgabe"
+
+
 @dataclass(frozen=True)
 class Spannstahlgesetz(Gesetz):
     """

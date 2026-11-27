@@ -26,6 +26,9 @@ from opencivil.material.betonstahl import (
     STAHL_VORLAGEN, STAHLSORTEN, betonstahl, stahlsorten_zum_anlegen,
 )
 from opencivil.material.holz import HOLZ_VORLAGEN, HOLZSORTEN, holz, holzsorten_zum_anlegen
+from opencivil.material.profilblech import (
+    PROFILBLECH_VORLAGEN, PROFILBLECHSORTEN, profilblech, profilblechsorten_zum_anlegen,
+)
 from opencivil.material.spannstahl import (
     SPANNSTAHL_VORLAGEN, SPANNSTAHLSORTEN, TABELLE_7, Erzeugnis, spannstahl,
     spannstahlsorten_zum_anlegen,
@@ -44,12 +47,12 @@ class Materialart:
     """Die Sorten in der Folge, in der das Fenster «Neues Material» sie anbietet."""
 
     kennung: str
-    """Womit die Kennung beginnt: b1, s1, st1, sp1, h1."""
+    """Womit die Kennung beginnt: b1, s1, st1, sp1, h1, pb1."""
 
     eigene: str
     """
     Womit der Name eines eigenen Materials beginnt: BE1, S1, ST1 (Benutzer,
-    2026-10-16), SP1 beim Spannstahl, H1 beim Holz.
+    2026-10-16), SP1 beim Spannstahl, H1 beim Holz, PB1 beim Profilblechstahl.
     """
 
     grundlage: str
@@ -115,5 +118,8 @@ MATERIALARTEN: Dict[str, Materialart] = {a.art.value: a for a in (
                 grundlage=("Bemessungswerte nach SIA 265:2012 für Feuchteklasse 1, "
                            "die Dichte nach SIA 261:2020"),
                 saechlich=True),
+    Materialart(Baustoffart.PROFILBLECH, PROFILBLECHSORTEN, PROFILBLECH_VORLAGEN, profilblech,
+                tuple(profilblechsorten_zum_anlegen()), kennung="pb", eigene="PB",
+                grundlage="Kennwerte nach SIA 264:2014, E_a nach SIA 263:2013"),
 )}
 
