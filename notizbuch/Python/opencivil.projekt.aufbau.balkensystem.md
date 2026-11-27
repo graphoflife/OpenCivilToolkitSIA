@@ -1,5 +1,5 @@
 ---
-erzeugt: d159023aea03
+erzeugt: 464fdb02d7f8
 art: modul
 tags: [modul]
 ---
@@ -262,6 +262,7 @@ Teil sagt, warum.
 ## Braucht
 
 - [[opencivil.core.einheiten]]
+- [[opencivil.core.sprache]]
 - [[opencivil.material.arten]]
 - [[opencivil.material.basis]]
 - [[opencivil.projekt.aufbau]]

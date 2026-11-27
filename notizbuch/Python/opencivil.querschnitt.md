@@ -1,5 +1,5 @@
 ---
-erzeugt: 2a998eec1213
+erzeugt: af3c30d65a10
 art: modul
 tags: [modul]
 ---
@@ -27,6 +27,7 @@ schiefer Biegung, Querkraft und Torsion auf Schubwaende.
 - [[opencivil.querschnitt.lagenaufbau]] – wo die Bewehrung einer Platte liegt.
 - [[opencivil.querschnitt.plastisch]] – Spannungsbloecke an einer geraden Nulllinie, starr-plastisch.
 - [[opencivil.querschnitt.platte]] – Stahlbeton-Plattenquerschnitt.
+- [[opencivil.querschnitt.profilblech]] – das Profilblech einer Blechverbunddecke.
 - [[opencivil.querschnitt.randzone]] – der Beton nahe am Rand eines gezeichneten Querschnitts.
 - [[opencivil.querschnitt.schubwaende]] – Querkraft und Torsion auf Schubwaende verteilt.
 - [[opencivil.querschnitt.spannglieder]] – Spannglieder im gezeichneten Querschnitt.

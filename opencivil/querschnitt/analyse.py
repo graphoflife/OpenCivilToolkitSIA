@@ -455,12 +455,15 @@ class Querschnittsanalyse(Rechenobjekt):
         alpha_min: int, alpha_max: int, k_c: float,
         wahl: Rechenwahl, biegung: Biegung = SCHIEF,
         spannglieder: Sequence[Spannglied] = (),
+        bleche: Sequence[Bewehrungselement] = (),
     ) -> None:
         """
         ``staebe``, ``linien`` und ``waende`` wie bei :class:`Zeichnung`, je
         mit ``name``, ``kennung`` und dem Stahl als :class:`Baustoff` (eine
         Wand ohne Buegel: ``None``); die Spannglieder fertig
-        (:func:`~opencivil.querschnitt.spannglieder.aus_glied`).
+        (:func:`~opencivil.querschnitt.spannglieder.aus_glied`), ebenso die
+        Profilbleche (:func:`~opencivil.querschnitt.profilblech.aus_form`) --
+        ihr Beton steht unter den Flaechen, die Zeichnung prueft ihn dort.
         """
         self.name = name
         self.id = praefix
@@ -499,7 +502,10 @@ class Querschnittsanalyse(Rechenobjekt):
         self.brutto = self.zeichnung.brutto
         self.bewehrungselemente: List[Bewehrungselement] = (
             [aus_stab(s) for s in staebe]
-            + [aus_linie(l, linie) for l, linie in zip(linien, self.zeichnung.linien)])
+            + [aus_linie(l, linie) for l, linie in zip(linien, self.zeichnung.linien)]
+            + list(bleche))
+        self.bleche: Tuple[Bewehrungselement, ...] = tuple(bleche)
+        """Die Profilbleche, fuer sich -- die Blechverbunddecke liest ihre Form."""
         self.spannglieder: Tuple[Spannglied, ...] = tuple(spannglieder)
         """
         Die Spannglieder, fuer sich: was nur dem Betonstahl gilt, fragt die
@@ -724,22 +730,29 @@ class Querschnittsanalyse(Rechenobjekt):
         return {self.d_torsion.id: groesse}
 
     def _bewehrung_protokollieren(self, p: Protokoll) -> float:
-        if not self.bewehrungselemente:
-            p.text("Kein Betonstahl gezeichnet." if self.spannglieder
+        """Die Bewehrung als Tabelle, das Profilblech fuer sich -- zurueck ihre Stahlflaeche."""
+        if self.bleche:
+            p.tabelle(kopf=["Element", "Blech", "Stahl", Mathe(r"A_p\ [\mathrm{mm}^2]")],
+                      zeilen=[[g.name, g.menge, g.stahl.name, Mathe(f"{g.flaeche:.0f}")]
+                              for g in self.bleche],
+                      titel="Profilblech", ausrichtung="lllr")
+        staebe = [g for g in self.bewehrungselemente if g not in self.bleche]
+        if not staebe:
+            p.text("Kein Betonstahl gezeichnet." if self.spannglieder or self.bleche
                    else "Keine Bewehrung gezeichnet.")
             return 0.0
         p.ansatz(r"s = \frac{L}{m} \qquad m = \mathrm{runde}\left(\frac{L}{s_{gewählt}}\right)",
                  titel="Teilung einer Stablinie: gleiche Felder, auf die Länge gerundet")
-        if any(g.verschmiert and not g.fiktiv for g in self.bewehrungselemente):
+        if any(g.verschmiert and not g.fiktiv for g in staebe):
             p.ansatz(r"A_s = \frac{L}{s} \cdot \frac{\pi\, \varnothing^2}{4}",
                      titel="Verschmierte Stäbe: ⌀ im Abstand s über die Länge L",
                      name="Verschmierte Stahlfläche aus Stäben")
         zeilen = [[g.name, g.lage, g.menge, g.stahl.name, Mathe(f"{g.flaeche:.0f}")]
-                  for g in self.bewehrungselemente]
+                  for g in staebe]
         p.tabelle(kopf=["Element", Mathe(r"\text{Lage}\ [\mathrm{mm}]"), "Bewehrung",
                         "Stahl", Mathe(r"A_s\ [\mathrm{mm}^2]")],
                   zeilen=zeilen, titel="Bewehrung", ausrichtung="lllr" + "r")
-        return sum(g.flaeche for g in self.bewehrungselemente)
+        return sum(g.flaeche for g in staebe)
 
     def _waende_protokollieren(self, p: Protokoll) -> None:
         p.ansatz(r"\frac{A_{sw}}{s} = \frac{n \cdot \pi\, \varnothing^2 / 4}{s}",

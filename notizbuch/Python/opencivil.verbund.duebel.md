@@ -1,5 +1,5 @@
 ---
-erzeugt: 807db41872a6
+erzeugt: 54cb7d9c6cf7
 art: modul
 tags: [modul]
 ---
@@ -194,9 +194,11 @@ Profil mit der Fliessgrenze `f_y` in N/mm², `L_e` in m.
 
 ## Gebraucht von
 
+- [[opencivil.nachweis.qa_blechverbund]]
 - [[opencivil.nachweis.qa_verbund]]
 - [[opencivil.nachweis.qa_verbund_kennzahlen]]
 - [[opencivil.projekt.aufbau.querschnittsanalyse]]
-- [[opencivil.projekt.beispiele]]
+- [[opencivil.projekt.beispiele_verbund]]
 - [[opencivil.projekt.querschnittsanalyse]]
+- [[opencivil.verbund.blechdecke]]
 - [[opencivil.web.api]]

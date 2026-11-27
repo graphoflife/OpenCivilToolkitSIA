@@ -1,5 +1,5 @@
 ---
-erzeugt: 83e5818e8924
+erzeugt: 32fdc46b0a84
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 2.4.2.4, (3)"
@@ -25,6 +25,10 @@ Mit den Zahlen aus dem Beispielprojekt:
 $$
 \tau_{cd} = \frac{0.3 \cdot \sqrt{f_{ck}}}{\gamma_c} = \frac{0.3 \cdot \sqrt{30}}{1.5} = 1.1\,\mathrm{N}/\mathrm{mm}^{2} \quad \left(f_{ck}\ \text{in}\ \mathrm{N}/\mathrm{mm}^{2}\right)
 $$
+
+## Gebraucht von
+
+- [[Querkraftwiderstand einer Blechverbunddecke]]
 
 ## Im Code
 

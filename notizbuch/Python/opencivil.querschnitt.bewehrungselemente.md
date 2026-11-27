@@ -1,5 +1,5 @@
 ---
-erzeugt: e347b95c44b6
+erzeugt: 7024ff4885e6
 art: modul
 tags: [modul]
 ---
@@ -12,10 +12,13 @@ tags: [modul]
 Ein Bewehrungselement der Querschnittsanalyse ist ein Einzelstab
 ([[opencivil.querschnitt.bewehrungselemente#Einzelstab|Einzelstab]]), eine Reihe gleicher Staebe auf einer Linie
 ([[opencivil.querschnitt.bewehrungselemente#Stabreihe|Stabreihe]]) oder eine verschmierte Linie
-([[opencivil.querschnitt.bewehrungselemente#VerschmierteLinie|VerschmierteLinie]]). Was je Art anders ist, steht in ihrer Klasse,
-je einmal: wo ihre Staebe liegen, wie sie in den Tabellen der Herleitung
-steht, wie sie in den Querschnitt eingeht
-([[opencivil.querschnitt.bewehrungselemente#Bewehrungselement.als_bewehrung|Bewehrungselement.als_bewehrung]]) und welcher Durchmesser ihre
+([[opencivil.querschnitt.bewehrungselemente#VerschmierteLinie|VerschmierteLinie]]) -- dazu das Spannglied
+([[opencivil.querschnitt.spannglieder]]) und das Profilblech einer
+Blechverbunddecke ([[opencivil.querschnitt.profilblech]]). Was je Art
+anders ist, steht in ihrer Klasse, je einmal: wo ihre Staebe liegen, wie sie
+in den Tabellen der Herleitung steht, wie sie in den Querschnitt eingeht
+([[opencivil.querschnitt.bewehrungselemente#Bewehrungselement.als_bewehrung|Bewehrungselement.als_bewehrung]]), welche Flaechen sie dort hat
+([[opencivil.querschnitt.bewehrungselemente#Bewehrungselement.stahlflaechen|Bewehrungselement.stahlflaechen]]) und welcher Durchmesser ihre
 Rissbreite bestimmt. Welche Art eine Beschreibung ist, wird einmal
 entschieden, beim Bauen ([[opencivil.querschnitt.bewehrungselemente#aus_stab|aus_stab]], [[opencivil.querschnitt.bewehrungselemente#aus_linie|aus_linie]]).
 
@@ -53,6 +56,15 @@ def punkte(self) -> Tuple[Punkt, ...]
 ```
 
 Die Stabmitten -- verschmiert keine.
+
+#### Bewehrungselement.strecken
+
+```python
+@property
+def strecken(self) -> Tuple[Tuple[Punkt, Punkt], ...]
+```
+
+Die geraden Strecken, ueber die der Stahl verschmiert ist -- in Staeben keine.
 
 #### Bewehrungselement.lage
 
@@ -111,6 +123,36 @@ def als_bewehrung(self, stahl: int, verdraengt: Verdraengt) -> List[Bewehrung]
 
 Wie es in den Querschnitt eingeht, in Meter -- `stahl` ist der Index seines Stahls.
 
+#### Bewehrungselement.stahlflaechen
+
+```python
+@abstractmethod
+def stahlflaechen(self) -> Flaechen
+```
+
+Seine Flaechen als Polygone, in mm, fuer den starr-plastischen
+Querschnitt ([[opencivil.verbund.querschnitt#Verbundquerschnitt|Verbundquerschnitt]]):
+ein Stab ist ein Quadrat seiner Flaeche um seine Mitte, eine Strecke
+ein Rechteck ihrer Flaeche ueber ihre Laenge.
+
+### quadrate
+
+```python
+def quadrate(punkte: Tuple[Punkt, ...], durchmesser: float) -> Flaechen
+```
+
+Je Stab ein Quadrat seiner Flaeche um seine Mitte -- dort verdraengt er den Beton.
+
+### baender
+
+```python
+def baender(strecken: Tuple[Tuple[Punkt, Punkt], ...], flaeche: float, verdraengt: bool) -> Flaechen
+```
+
+Die Flaeche `flaeche` gleich dick ueber die Strecken verteilt, je ein
+Rechteck um die Strecke -- mit `verdraengt` nimmt es den Beton an ihrer
+Mitte weg.
+
 ### Einzelstab
 
 ```python
@@ -155,6 +197,12 @@ def rissdurchmesser(self) -> float
 
 ```python
 def als_bewehrung(self, stahl: int, verdraengt: Verdraengt) -> List[Bewehrung]
+```
+
+#### Einzelstab.stahlflaechen
+
+```python
+def stahlflaechen(self) -> Flaechen
 ```
 
 ### Stabreihe
@@ -204,6 +252,12 @@ def rissdurchmesser(self) -> float
 def als_bewehrung(self, stahl: int, verdraengt: Verdraengt) -> List[Bewehrung]
 ```
 
+#### Stabreihe.stahlflaechen
+
+```python
+def stahlflaechen(self) -> Flaechen
+```
+
 ### VerschmierteLinie
 
 ```python
@@ -216,6 +270,13 @@ aus Staeben ⌀ im Abstand s ueber eine Laenge L.
 
 - `aus_staeben: Optional[Tuple[float, float, float]] = None` – ⌀, s und L, aus denen die Flaeche kommt -- von Hand keine.
 - `verschmiert = True`
+
+#### VerschmierteLinie.strecken
+
+```python
+@property
+def strecken(self) -> Tuple[Tuple[Punkt, Punkt], ...]
+```
 
 #### VerschmierteLinie.menge
 
@@ -257,6 +318,12 @@ Abstand [[opencivil.querschnitt.geometrie#Konstanten|TEILUNG_VERSCHMIERT]]
 def als_bewehrung(self, stahl: int, verdraengt: Verdraengt) -> List[Bewehrung]
 ```
 
+#### VerschmierteLinie.stahlflaechen
+
+```python
+def stahlflaechen(self) -> Flaechen
+```
+
 ### aus_stab
 
 ```python
@@ -279,6 +346,7 @@ Eine Stablinie der Beschreibung mit ihren aufgeloesten Staeben `linie`
 
 - `MM = 0.001` – mm in m.
 - `Verdraengt = Callable[[Punkt], Optional[int]]` – Zu einem Punkt der Zeichnung der Werkstoff, der dort liegt und den der Stahl verdraengt -- als Index, ohne Beton `None`.
+- `Flaechen = List[Tuple[Tuple[Punkt, ...], Optional[Punkt]]]` – Die Flaechen eines Elements als Polygone, je mit dem Punkt, an dem es den Beton verdraengt -- `None`, wo es keinen verdraengt ([[opencivil.querschnitt.bewehrungselemente#Bewehrungselement.stahlflaechen|Bewehrungselement.stahlflaechen]]).
 
 ## Braucht
 
@@ -292,6 +360,7 @@ Eine Stablinie der Beschreibung mit ihren aufgeloesten Staeben `linie`
 - [[opencivil.nachweis.schiefe_biegung]]
 - [[opencivil.nachweis.stabgrenzen]]
 - [[opencivil.querschnitt.analyse]]
+- [[opencivil.querschnitt.profilblech]]
 - [[opencivil.querschnitt.spannglieder]]
 - [[opencivil.spannungsanalyse.schnitt]]
 - [[opencivil.verbund.querschnitt]]

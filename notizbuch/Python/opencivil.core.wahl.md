@@ -1,5 +1,5 @@
 ---
-erzeugt: 0bfe8e3bcf43
+erzeugt: 305fb8b3f821
 art: modul
 tags: [modul]
 ---
@@ -59,4 +59,5 @@ Eine Wahl: das Mitglied ist sein Text.
 - [[opencivil.stabwerk3d.modell]]
 - [[opencivil.stahlbau.stabilitaet]]
 - [[opencivil.stahlprofile.bleche]]
+- [[opencivil.verbund.blechdecke]]
 - [[opencivil.verbund.duebel]]

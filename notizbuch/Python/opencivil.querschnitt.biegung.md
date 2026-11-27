@@ -1,5 +1,5 @@
 ---
-erzeugt: b2151f9152f8
+erzeugt: 35c0b5318cb5
 art: modul
 tags: [modul]
 ---
@@ -176,6 +176,7 @@ def neigung(self, M_y: float) -> Optional[float]
 ## Gebraucht von
 
 - [[opencivil.nachweis.gebrauchsebene]]
+- [[opencivil.nachweis.qa_blechverbund]]
 - [[opencivil.nachweis.qa_holz_stabilitaet]]
 - [[opencivil.nachweis.qa_kennzahlen]]
 - [[opencivil.nachweis.qa_stahl]]
@@ -187,4 +188,5 @@ def neigung(self, M_y: float) -> Optional[float]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.stahlbau.stabilitaet]]
 - [[opencivil.stahlbau.widerstand]]
+- [[opencivil.verbund.blechdecke]]
 - [[opencivil.verbund.widerstand]]

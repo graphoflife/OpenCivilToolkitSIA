@@ -1,5 +1,5 @@
 ---
-erzeugt: 87567f148a46
+erzeugt: 22d9cafccfdd
 art: modul
 tags: [modul]
 ---
@@ -329,6 +329,7 @@ def beschreibung(self) -> str
 - [[opencivil.nachweis.knicken]]
 - [[opencivil.nachweis.lagennachweis]]
 - [[opencivil.nachweis.mindestbewehrung]]
+- [[opencivil.nachweis.qa_blechverbund]]
 - [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.qa_holz]]
 - [[opencivil.nachweis.qa_holz_kennzahlen]]

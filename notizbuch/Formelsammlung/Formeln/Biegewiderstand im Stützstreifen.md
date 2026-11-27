@@ -1,5 +1,5 @@
 ---
-erzeugt: 6a51d0ae9e31
+erzeugt: 9a0254003401
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.6.4.5; 4.2.1.5, Figur 12"
@@ -17,7 +17,7 @@ $$
 
 | Zeichen | Bedeutung | Einheit | Woher |
 | --- | --- | --- | --- |
-| $a_{s,x}$ | Bewehrung in x je Meter | mm^2/m | [[Biegebewehrung im Stützstreifen je Meter]] |
+| $a_{s,x}$ | Bewehrung in x je Meter | mm²/m | [[Biegebewehrung im Stützstreifen je Meter]] |
 | $f_{yd}$ | Bemessungswert der Fliessgrenze | N/mm² | [[Bemessungswert der Fliessgrenze]] |
 | $d_x$ | – | mm | [[Statische Höhe der äusseren Lage]] |
 | $x_x$ | – | mm | [[Druckzonenhöhe im Stützstreifen]] |

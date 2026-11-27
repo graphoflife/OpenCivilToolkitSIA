@@ -1,5 +1,5 @@
 ---
-erzeugt: 81f97f695cee
+erzeugt: 2334d9d67568
 art: modul
 tags: [modul]
 ---
@@ -220,6 +220,7 @@ def pruefe(self, e: Eingaben, p: Protokoll)
 
 ## Gebraucht von
 
+- [[opencivil.nachweis.qa_blechverbund]]
 - [[opencivil.nachweis.qa_stahl_stabilitaet]]
 - [[opencivil.nachweis.qa_verbund]]
 - [[opencivil.nachweis.qa_verbund_kennzahlen]]

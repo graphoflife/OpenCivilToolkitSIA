@@ -1,5 +1,5 @@
 ---
-erzeugt: 5239490b1bb5
+erzeugt: b587850d8f18
 art: formel
 tags: [formel]
 ---
@@ -31,6 +31,7 @@ $$
 - [[Stahlquerschnitt]]
 - [[Kennzahlen]]
 - [[Verbundquerschnitt]]
+- [[Blechverbunddecke]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

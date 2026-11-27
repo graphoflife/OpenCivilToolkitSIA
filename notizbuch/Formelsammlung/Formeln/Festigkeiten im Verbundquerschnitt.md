@@ -1,5 +1,5 @@
 ---
-erzeugt: 5dbcb9e88287
+erzeugt: b1f9bd50c404
 art: formel
 tags: [formel]
 normstelle: "SIA 264:2014, 4.1.3, (1); 4.1.5; 4.3.2.1; 5.1.2.1"
@@ -13,6 +13,18 @@ $$
 f_{yd} = \frac{f_y}{\gamma_a} \qquad 0.85\, f_{cd} = 0.85\, \frac{\eta_{fc}\, f_{ck}}{\gamma_c},\ \eta_{fc} = 1 \qquad f_{sd} = \frac{f_{sk}}{\gamma_s}
 $$
 
+*In der Herleitung: «Festigkeiten im plastischen Zustand – der Beton nur gedrückt, das Blech nur gezogen»*
+
+$$
+0.85\, f_{cd} = 0.85\, \frac{\eta_{fc}\, f_{ck}}{\gamma_c},\ \eta_{fc} = 1 \qquad f_{ypd} = \frac{f_{yp}}{\gamma_{ap}}
+$$
+
+*In der Herleitung: «Festigkeiten im plastischen Zustand – der Beton nur gedrückt, das Blech nur gezogen»*
+
+$$
+0.85\, f_{cd} = 0.85\, \frac{\eta_{fc}\, f_{ck}}{\gamma_c},\ \eta_{fc} = 1 \qquad f_{sd} = \frac{f_{sk}}{\gamma_s} \qquad f_{ypd} = \frac{f_{yp}}{\gamma_{ap}}
+$$
+
 ## Im Code
 
 - [[opencivil.nachweis.qa_verbund_werte#festigkeiten|festigkeiten]]
@@ -20,6 +32,7 @@ $$
 ## Themen
 
 - [[Kennzahlen]]
+- [[Blechverbunddecke]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 
@@ -35,6 +48,11 @@ Im plastischen Zustand trägt jeder Werkstoff mit einer einzigen Spannung:
   SIA 264 eins. Zug trägt er keinen.
 - **Betonstahl** mit $f_{sd} = f_{sk}/\gamma_s$, gedrückt mit dem Wert,
   den sein Material dafür nennt.
+- **Profilblech** einer Blechverbunddecke nur gezogen, mit
+  $f_{ypd} = f_{yp}/\gamma_{ap}$, $\gamma_{ap}$ = 1.05. Gedrückt beult das
+  dünne Blech; das Werkzeug lässt es dort weg – eine Vorgabe, nicht aus
+  der Norm. Unter negativem Moment zählt es auch gezogen nicht
+  (SIA 264, 5.4.3.2).
 
 Mit charakteristischen Werten fallen die Beiwerte weg; der Beton trägt dann
 $0.85\, f_{ck}$.

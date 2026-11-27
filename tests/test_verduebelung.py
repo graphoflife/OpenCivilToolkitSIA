@@ -265,9 +265,9 @@ class TestFelder(unittest.TestCase):
         self.assertEqual(felder["duebel_d"]["bis_feld"], {
             "feld": "duebel_h", "faktor": 0.25,
             "satz": "Durchmesser d darf nicht grösser sein als 0.25 · Länge h_D"})
-        self.assertEqual(felder["duebel_h"]["ab_feld"], {
+        self.assertEqual(felder["duebel_h"]["ab_felder"], [{
             "feld": "duebel_d", "faktor": 4.0,
-            "satz": "Länge h_D darf nicht kleiner sein als 4 · Durchmesser d"})
+            "satz": "Länge h_D darf nicht kleiner sein als 4 · Durchmesser d"}])
         self.assertEqual((felder["duebel_d"]["ab"], felder["duebel_d"]["bis"]), (16.0, 25.0))
 
     def test_zu_kurz_haelt_die_rechnung_an(self):

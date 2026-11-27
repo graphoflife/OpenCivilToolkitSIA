@@ -27,9 +27,12 @@ Ein Polygon aus Beton zaehlt wie eines aus Stahl: +1, wo es liegt, -1 im
 Elternteil, den es dort ersetzt (:func:`~opencivil.querschnitt.plastisch.stuecke`)
 -- ein Profil im Beton nimmt ihn dort weg. Ein Stab ist ein Quadrat seiner
 Flaeche um seine Mitte, eine verschmierte Linie ein Rechteck ihrer Flaeche
-ueber ihre Laenge; beide verdraengen den Beton, in dem sie liegen, wie im
-Stahlbeton. Liegt die Nulllinie in einem Stab, verteilt sich seine Kraft so
-ueber das Quadrat -- nach Vorgabe, nicht nachgeschlagen.
+ueber ihre Laenge
+(:meth:`~opencivil.querschnitt.bewehrungselemente.Bewehrungselement.stahlflaechen`);
+beide verdraengen den Beton, in dem sie liegen, wie im Stahlbeton. Liegt
+die Nulllinie in einem Stab, verteilt sich seine Kraft so ueber das Quadrat
+-- nach Vorgabe, nicht nachgeschlagen. Das Profilblech einer
+Blechverbunddecke liegt am Rand ihres Betons und verdraengt keinen.
 
 WAS DIE DUEBEL VERBINDEN:
 Die Kopfbolzenduebel sitzen in der Fuge zwischen dem Beton und dem Profil.
@@ -113,29 +116,6 @@ IN_DER_KAMMER = "in der Kammer"
 SEITE_AB = 1.0
 
 
-def _quadrat(mitte: Punkt, seite: float) -> Tuple[Punkt, ...]:
-    h = seite / 2.0
-    y, z = mitte
-    return ((y - h, z - h), (y + h, z - h), (y + h, z + h), (y - h, z + h))
-
-
-def stahlflaechen(element: Bewehrungselement) -> List[Tuple[Tuple[Punkt, ...], Punkt]]:
-    """
-    Die Flaechen eines Bewehrungselements als Polygone, je mit dem Punkt, an
-    dem es den Beton verdraengt -- siehe Dateikopf.
-    """
-    if element.verschmiert:
-        (y_1, z_1), (y_2, z_2) = element.von, element.bis
-        laenge = math.dist(element.von, element.bis)
-        halb = element.flaeche / laenge / 2.0
-        n = (-(z_2 - z_1) / laenge * halb, (y_2 - y_1) / laenge * halb)
-        ecken = ((y_1 - n[0], z_1 - n[1]), (y_2 - n[0], z_2 - n[1]),
-                 (y_2 + n[0], z_2 + n[1]), (y_1 + n[0], z_1 + n[1]))
-        return [(ecken, ((y_1 + y_2) / 2.0, (z_1 + z_2) / 2.0))]
-    seite = math.sqrt(math.pi) * element.durchmesser / 2.0
-    return [(_quadrat(p, seite), p) for p in element.punkte]
-
-
 class Verbundquerschnitt:
     """Die Polygone und Staebe eines Verbundquerschnitts -- siehe Dateikopf."""
 
@@ -162,9 +142,9 @@ class Verbundquerschnitt:
             g = self._gruppe(element.stahl)
             teil = len(self.namen)
             self.namen.append(element.name)
-            for ecken, mitte in stahlflaechen(element):
+            for ecken, mitte in element.stahlflaechen():
                 weitere.append(Stueck(g, 1.0, ecken, teil))
-                beton = geo.innerstes(mitte, polygone)
+                beton = None if mitte is None else geo.innerstes(mitte, polygone)
                 if beton in gruppe_von:
                     weitere.append(Stueck(gruppe_von[beton], -1.0, ecken, teil_von[beton]))
         self.weitere: Tuple[Stueck, ...] = tuple(weitere)

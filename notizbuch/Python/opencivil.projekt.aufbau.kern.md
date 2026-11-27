@@ -1,5 +1,5 @@
 ---
-erzeugt: 9a5e970ebacb
+erzeugt: 7cae29eeb657
 art: modul
 tags: [modul]
 ---
@@ -605,6 +605,7 @@ Feldes; `mehr` fuer die Analyse.
 - [[opencivil.core.einheiten]]
 - [[opencivil.core.nachweis]]
 - [[opencivil.core.rechenwerk]]
+- [[opencivil.core.sprache]]
 - [[opencivil.core.wert]]
 - [[opencivil.decke.werk]]
 - [[opencivil.geotechnik.fundament]]

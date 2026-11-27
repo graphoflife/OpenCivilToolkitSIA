@@ -149,11 +149,6 @@ class ModulEintrag(Beschreibung, JeMaterial):
     rechenarten: Dict[str, Rechenart] = je_material(Rechenart.PARABEL, FASERARTEN)
 
 
-def aufgezaehlt(namen: Sequence[str]) -> str:
-    """«A und I», «A, I_y, I_z und I_T»."""
-    return " und ".join(filter(None, (", ".join(namen[:-1]), namen[-1])))
-
-
 @dataclass
 class StabquerschnittBasis(Beschreibung):
     """

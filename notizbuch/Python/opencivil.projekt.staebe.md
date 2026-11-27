@@ -1,5 +1,5 @@
 ---
-erzeugt: f93790c79131
+erzeugt: cabe5bccf226
 art: modul
 tags: [modul]
 ---
@@ -120,14 +120,6 @@ Rechenart je Beton wie dort (Benutzer, 2026-10-23, je Material
 - `kriechzahl: float = bereich(0.0, heisst='Kriechzahl φ', ab=0.0)`
 - `werkstoffsaetze: Dict[str, Werkstoffsatz] = je_material(Werkstoffsatz.BEMESSUNG)`
 - `rechenarten: Dict[str, Rechenart] = je_material(Rechenart.PARABEL, FASERARTEN)`
-
-### aufgezaehlt
-
-```python
-def aufgezaehlt(namen: Sequence[str]) -> str
-```
-
-«A und I», «A, I_y, I_z und I_T».
 
 ### StabquerschnittBasis
 

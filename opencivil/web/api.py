@@ -42,9 +42,11 @@ from opencivil.material.holz import REFERENZ_ETA_T, STOSSARTIG, TABELLE_4, Feuch
 from opencivil.material.betonstahl import STAHLSORTEN
 from opencivil.material.spannstahl import Erzeugnis
 from opencivil.nachweis.biegung_normalkraft import Erfuellungsart
+from opencivil.nachweis.qa_blechverbund import EINE_RICHTUNG
 from opencivil.nachweis.rissanforderung import Rissanforderung
 from opencivil.projekt import BAUTEILE, Aufbau
 from opencivil.projekt.balkensystem import BalkensystemEintrag
+from opencivil.projekt.blechdecken import BlechdeckeEintrag
 from opencivil.projekt.balkensystem3d import Balkensystem3dEintrag
 from opencivil.projekt.durchstanzen import DurchstanzEintrag
 from opencivil.decke.schnitt import BALKENGROESSEN
@@ -56,6 +58,7 @@ from opencivil.projekt.projekt import APPLISTEN, Projekt
 from opencivil.projekt.profile import ProfilEintrag
 from opencivil.projekt.querschnittsanalyse import SCHNITTE
 from opencivil.querschnitt.bauweise import BEWEHRT
+from opencivil.querschnitt import profilblech
 from opencivil.querschnitt.platte import BREITE_Y_MM
 from opencivil.querschnitt.spannglieder import (
     NEIGUNG_ERKLAERT, VORGABE_SPANNUNG, Spannwirkung, Verbund,
@@ -71,6 +74,7 @@ from opencivil.stahlbau.stabilitaet import Knickkurve
 from opencivil.stahlprofile import lage as profillage
 from opencivil.stahlprofile.tabelle import PROFILREIHEN
 from opencivil.stabwerk3d.rechnung import Balkensystem3d
+from opencivil.verbund import blechdecke
 from opencivil.verbund.duebel import Verduebelung
 from opencivil.geotechnik import fundament, setzung
 from opencivil.geotechnik.setzung import Steifigkeit
@@ -359,6 +363,22 @@ def katalog() -> dict:
             # mit Kopfbolzenduebeln gerechnet.
             "verduebelungen": [{"wert": v.value, "beschriftung": v.beschriftung,
                                 "titel": v.erklaerung} for v in Verduebelung],
+            # Bei der Blechverbunddecke: wo ihr Feld liegt und wie die Last
+            # steht -- danach die Schublaenge in (28); ``mit_abstand``, ob sie
+            # dann der Abstand a ist. Dazu die Vorlage, die eine Decke
+            # einsetzt: ihr Knopf mit dem Bild der Decke nach Vorgabe -- sein
+            # Name mit weichen Trennstrichen, sonst passt er nicht auf den
+            # Knopf --, und was die Decke nachweist.
+            "blechfelder": [{"wert": f.value, "beschriftung": f.beschriftung,
+                             "titel": f.erklaerung} for f in blechdecke.Feld],
+            "blechlasten": [{"wert": b.value, "beschriftung": b.beschriftung,
+                             "titel": b.erklaerung, "mit_abstand": b.mit_abstand}
+                            for b in blechdecke.Belastung],
+            "blechdecke": {
+                "schluessel": profilblech.VORLAGE, "name": "Blech\u00adverbund\u00addecke",
+                "skizze": profilblech.skizze(BlechdeckeEintrag().form((0.0, 0.0))).als_dict(),
+                "richtung": EINE_RICHTUNG,
+            },
             # Beim Holz: die Feuchteklassen, je wo das Holz so feucht ist und
             # ihr η_w, und je Fall die Dauer der Einwirkung, mit ihrem η_t.
             "feuchteklassen": [{"wert": k.value, "beschriftung": k.beschriftung,

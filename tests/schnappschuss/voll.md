@@ -1,6 +1,6 @@
 # Voll
 
-940 Berechnungen ausgeführt, 1490 Werte bestimmt.
+952 Berechnungen ausgeführt, 1542 Werte bestimmt.
 
 ## Herleitung
 
@@ -16292,6 +16292,952 @@ $$
 V_{z,Rd} = 659.4\,\mathrm{kN}
 $$
 
+### Querschnittsanalyse: Blechverbunddecke
+
+**Fläche und Schwerpunkt eines Polygons (Satz von Gauss)**
+
+$$
+A = \frac{1}{2} \sum_i c_i \qquad y_S = \frac{1}{6A} \sum_i (y_i + y_{i+1})\, c_i \qquad z_S = \frac{1}{6A} \sum_i (z_i + z_{i+1})\, c_i \qquad c_i = y_i\, z_{i+1} - y_{i+1}\, z_i
+$$
+
+**Trägheitsmomente eines Polygons, bezogen auf den Schwerpunkt**
+
+$$
+I_y = \frac{1}{12} \sum_i (z_i^2 + z_i z_{i+1} + z_{i+1}^2)\, c_i - A\, z_S^2\qquad I_z = \frac{1}{12} \sum_i (y_i^2 + y_i y_{i+1} + y_{i+1}^2)\, c_i - A\, y_S^2
+$$
+
+**Polygone des Querschnitts**
+
+| Polygon | Material | liegt in | Ecken | $\pm A\ [\mathrm{mm}^2]$ | $y_S\ [\mathrm{mm}]$ | $z_S\ [\mathrm{mm}]$ |
+| :--- | :--- | :--- | ---: | ---: | ---: | ---: |
+| Blechverbunddecke 1, Beton | C30/37 | – | $24$ | $108500$ | $500.0$ | $82.3$ |
+
+**Fläche des Bruttoquerschnitts**
+
+$$
+A = 108500\,\mathrm{mm}^{2}
+$$
+
+**Schwerpunkt, y**
+
+$$
+y_S = 500\,\mathrm{mm}
+$$
+
+**Schwerpunkt, z**
+
+$$
+z_S = 82.3\,\mathrm{mm}
+$$
+
+**Trägheitsmoment um y**
+
+$$
+I_y = 146.4\,\cdot 10^{6}\,\mathrm{mm}^{4}
+$$
+
+**Trägheitsmoment um z**
+
+$$
+I_z = 8969.6\,\cdot 10^{6}\,\mathrm{mm}^{4}
+$$
+
+**Deviationsmoment**
+
+$$
+I_{yz} = 0\,\cdot 10^{6}\,\mathrm{mm}^{4}
+$$
+
+**Profilblech**
+
+| Element | Blech | Stahl | $A_p\ [\mathrm{mm}^2]$ |
+| :--- | :--- | :--- | ---: |
+| Blechverbunddecke 1, Blech | $5 \times 200\,\mathrm{mm},\ h_p = 60\,\mathrm{mm},\ t = 0.79\,\mathrm{mm}$ | SE 350 G | $1100$ |
+
+Kein Betonstahl gezeichnet.
+
+**Stahlfläche der Bewehrung**
+
+$$
+A_{s,tot} = 0\,\mathrm{mm}^{2}
+$$
+
+### Biegung und Normalkraft
+
+Festigkeiten wie in den Kennzahlen: C30/37 gedrückt 17.0 N/mm², SE 350 G gezogen 333.3 N/mm².
+
+**Erfüllungsgrad bei fester Normalkraft – einachsig um y** *(SIA 264:2014, 5.4.1.1)*
+
+$$
+\alpha_{eff} = \frac{M_{Rd}}{M_{Ed}} \qquad M_{Ed} = |M_{y,Ed}|
+$$
+
+#### Feld
+
+**Einwirkung**
+
+| Einwirkung | Wert |  |
+| :--- | ---: | :--- |
+| N\_Ed | $0.0$ | kN |
+| M\_y,Ed | $30.0$ | kNm |
+| V\_z,Ed | $20.0$ | kN |
+
+Nulllinie: Zugrichtung n = (0.000; -1.000), -90.0° gegen die y-Achse; gezogen ist, wo n\_y y + n\_z z \> -118.4 mm.
+
+**Kräfte im plastischen Zustand – je Teil und Zone**
+
+| Teil | Zone | $F\ [\mathrm{kN}]$ | $y\ [\mathrm{mm}]$ | $z\ [\mathrm{mm}]$ |
+| :--- | :--- | ---: | ---: | ---: |
+| Blechverbunddecke 1, Beton | Druck | $-366.7$ | $500.0$ | $129.2$ |
+| Blechverbunddecke 1, Blech | Zug | $366.7$ | $500.0$ | $31.1$ |
+
+**Probe: Normalkraft**
+
+$$
+N_{Rd} = \sum F_i = 0\,\mathrm{kN}
+$$
+
+**Probe: Moment um y**
+
+$$
+M_{y,Rd} = -\sum F_i \cdot (z_i - z_S) = 36\,\mathrm{kNm}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,\text{Feld}} = \frac{M_{pl,Rd}}{M_{Ed}} = \frac{36\,\mathrm{kNm}}{30\,\mathrm{kNm}} = 1.20 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+#### Stütze ohne Bewehrung
+
+**Einwirkung**
+
+| Einwirkung | Wert |  |
+| :--- | ---: | :--- |
+| N\_Ed | $0.0$ | kN |
+| M\_y,Ed | $-10.0$ | kNm |
+| V\_z,Ed | $-25.0$ | kN |
+
+Bei negativem Moment zählt das Blech nicht, auch gezogen nicht (5.4.3.2).
+
+> **Hinweis:** Nichts trägt hier Zug: der Beton nicht, das Blech zählt bei negativem Moment nicht (5.4.3.2), und Betonstahl liegt keiner in der Decke. Der Widerstand ist null.
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,\text{Stütze ohne Bewehrung}} = \frac{M_{pl,Rd}}{M_{Ed}} = \frac{0\,\mathrm{kNm}}{10\,\mathrm{kNm}} = 0.00 \quad \Rightarrow \quad \text{NICHT erfüllt}
+$$
+
+#### Druck
+
+**Einwirkung**
+
+| Einwirkung | Wert |  |
+| :--- | ---: | :--- |
+| N\_Ed | $-500.0$ | kN |
+| M\_y,Ed | $5.0$ | kNm |
+| V\_z,Ed | $0.0$ | kN |
+
+Nulllinie: Zugrichtung n = (0.000; -1.000), -90.0° gegen die y-Achse; gezogen ist, wo n\_y y + n\_z z \> -89.0 mm.
+
+**Kräfte im plastischen Zustand – je Teil und Zone**
+
+| Teil | Zone | $F\ [\mathrm{kN}]$ | $y\ [\mathrm{mm}]$ | $z\ [\mathrm{mm}]$ |
+| :--- | :--- | ---: | ---: | ---: |
+| Blechverbunddecke 1, Beton | Druck | $-866.7$ | $500.0$ | $114.5$ |
+| Blechverbunddecke 1, Blech | Zug | $366.7$ | $500.0$ | $31.1$ |
+
+**Probe: Normalkraft**
+
+$$
+N_{Rd} = \sum F_i = -500\,\mathrm{kN}
+$$
+
+**Probe: Moment um y**
+
+$$
+M_{y,Rd} = -\sum F_i \cdot (z_i - z_S) = 46.7\,\mathrm{kNm}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,\text{Druck}} = \frac{M_{pl,Rd}}{M_{Ed}} = \frac{46.7\,\mathrm{kNm}}{5\,\mathrm{kNm}} = 9.34 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+#### Zug
+
+**Einwirkung**
+
+| Einwirkung | Wert |  |
+| :--- | ---: | :--- |
+| N\_Ed | $150.0$ | kN |
+| M\_y,Ed | $0.0$ | kNm |
+| V\_z,Ed | $0.0$ | kN |
+
+**Zugwiderstand, Σ A · f je Werkstoff** *(SIA 264:2014, 5.4.3.2; 5.1.2.1)*
+
+$$
+N_{pl,Rd}^{+} = 366.7\,\mathrm{kN}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,\text{Zug}} = \frac{N_{pl,Rd}^{+}}{N_{Ed}} = \frac{366.7\,\mathrm{kN}}{150\,\mathrm{kN}} = 2.44 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+### Kennzahlen
+
+> **Annahme:** Eine Blechverbunddecke trägt in Richtung ihrer Rippen (5.4.1.1): nachgewiesen werden N, M\_y und V\_z über die ganze gezeichnete Breite b – M\_z, V\_y und T nicht.
+
+#### Festigkeiten
+
+**Festigkeiten im plastischen Zustand – der Beton nur gedrückt, das Blech nur gezogen** *(SIA 264:2014, 4.1.3, (1); 4.1.5; 4.3.2.1; 5.1.2.1)*
+
+$$
+0.85\, f_{cd} = 0.85\, \frac{\eta_{fc}\, f_{ck}}{\gamma_c},\ \eta_{fc} = 1 \qquad f_{ypd} = \frac{f_{yp}}{\gamma_{ap}}
+$$
+
+**Festigkeiten je Werkstoff**
+
+| Werkstoff | Art | $f_k\ [\mathrm{N}/\mathrm{mm}^2]$ | $\gamma$ | $\text{gezogen}\ [\mathrm{N}/\mathrm{mm}^2]$ | $\text{gedrückt}\ [\mathrm{N}/\mathrm{mm}^2]$ |
+| :--- | :--- | ---: | ---: | ---: | ---: |
+| C30/37 | Beton | $30$ | $1.50$ | $0.0$ | $17.0$ |
+| SE 350 G | Profilblechstahl | $350$ | $1.05$ | $333.3$ | $0.0$ |
+
+f\_k ist f\_ck oder f\_yp; γ ist γ\_c oder γ\_ap.
+
+#### Profilblech
+
+5 Rippen im Abstand b\_s = 200 mm, offen; h = 140 mm, h\_p = 60 mm, b\_o = 120 mm, b\_u = 70 mm, A\_p = 1100 mm² je m nach dem Datenblatt.
+
+**Das Blech je Rippe: Steg, Abwicklung, Dicke und Schwerpunkt**
+
+$$
+L_w = \sqrt{h_p^2 + \left(\frac{b_o - b_u}{2}\right)^2} \qquad s = b_s - b_o + 2\, L_w + b_u \qquad t = \frac{A_p\, b_s}{s} \qquad e = \frac{h_p\, (L_w + b_s - b_o)}{s}
+$$
+
+**Das Blech aus seinen Massen**
+
+| Grösse | Bedeutung | Wert |
+| :--- | :--- | ---: |
+| $L_w$ | Länge eines Stegs | $65\,\mathrm{mm}$ |
+| $s$ | Abgewickelte Länge des Blechs je Rippe | $280\,\mathrm{mm}$ |
+| $t$ | Dicke des Blechs | $0.79\,\mathrm{mm}$ |
+| $e$ | Schwerpunkt des Blechs über seiner Unterkante | $31.1\,\mathrm{mm}$ |
+| $h_c$ | Beton über den Rippen | $80\,\mathrm{mm}$ |
+| $b$ | Breite der Decke, n · b\_s | $1000\,\mathrm{mm}$ |
+| $A_p$ | Fläche des Blechs über die Breite b | $1100\,\mathrm{mm}^{2}$ |
+
+> **Annahme:** Das Blech ist gleich dick, seine Fläche gleichmässig über die Abwicklung verteilt; Sicken und Ausrundungen zählen nicht (nach Vorgabe, nicht nachgeschlagen).
+
+**Statische Höhe – bis zum Schwerpunkt des Blechs** *(SIA 264:2014, 5.4.3.3; Figur 9)*
+
+$$
+d_p = h - e = 140\,\mathrm{mm} - 31.1\,\mathrm{mm} = 108.9\,\mathrm{mm}
+$$
+
+**Rippenbreite, offen: auf halber Höhe der Rippe** *(SIA 264:2014, Figur 18)*
+
+$$
+b_0 = \frac{b_o + b_u}{2} = \frac{120\,\mathrm{mm} + 70\,\mathrm{mm}}{2} = 95\,\mathrm{mm}
+$$
+
+#### Normalkraft
+
+**Fläche und Festigkeit je Werkstoff**
+
+| Werkstoff | $A\ [\mathrm{mm}^2]$ | $\text{gezogen}\ [\mathrm{N}/\mathrm{mm}^2]$ | $\text{gedrückt}\ [\mathrm{N}/\mathrm{mm}^2]$ |
+| :--- | ---: | ---: | ---: |
+| C30/37 | $108500$ | $0.0$ | $17.0$ |
+| SE 350 G | $1100$ | $333.3$ | $0.0$ |
+
+Die Fläche des Betons ist ohne die Stäbe in ihm; das Blech liegt an seinem Rand.
+
+**Zugwiderstand: Σ A · f gezogen** *(SIA 264:2014, 5.4.3.2; 5.1.2.1)*
+
+$$
+N_{pl,Rd}^{+} = 366.7\,\mathrm{kN}
+$$
+
+**Druckwiderstand: Σ A · f gedrückt** *(SIA 264:2014, 5.4.3.2; 5.1.2.1)*
+
+$$
+N_{pl,Rd}^{-} = -1844.5\,\mathrm{kN}
+$$
+
+#### Biegung, Zug unten
+
+Nulllinie: Zugrichtung n = (0.000; -1.000), -90.0° gegen die y-Achse; gezogen ist, wo n\_y y + n\_z z \> -118.4 mm.
+
+**Kräfte im plastischen Zustand, Zug unten**
+
+| Teil | Zone | $F\ [\mathrm{kN}]$ | $y\ [\mathrm{mm}]$ | $z\ [\mathrm{mm}]$ |
+| :--- | :--- | ---: | ---: | ---: |
+| Blechverbunddecke 1, Beton | Druck | $-366.7$ | $500.0$ | $129.2$ |
+| Blechverbunddecke 1, Blech | Zug | $366.7$ | $500.0$ | $31.1$ |
+
+**Probe: Normalkraft**
+
+$$
+N_{Rd} = \sum F_i = 0\,\mathrm{kN}
+$$
+
+**Probe: Moment um y**
+
+$$
+M_{y,pl,Rd} = -\sum F_i \cdot (z_i - z_S) = 36\,\mathrm{kNm}
+$$
+
+**Plastischer Momentenwiderstand, Zug unten** *(SIA 264:2014, 5.4.3.2; 5.1.2.1)*
+
+$$
+M_{y,Rd}^{+} = 36\,\mathrm{kNm}
+$$
+
+#### Biegung, Zug oben
+
+Bei negativem Moment zählt das Blech nicht, auch gezogen nicht (5.4.3.2).
+
+> **Hinweis:** Nichts trägt hier Zug: der Beton nicht, das Blech zählt bei negativem Moment nicht (5.4.3.2), und Betonstahl liegt keiner in der Decke. Der Widerstand ist null.
+
+**Momentenwiderstand** *(SIA 264:2014, 5.4.3.2; 5.1.2.1)*
+
+$$
+M_{y,Rd}^{-} = 0\,\mathrm{kNm}
+$$
+
+#### Querkraft
+
+**Querkraftwiderstand über die Breite b: (26) mal b** *(SIA 264:2014, 5.4.3.3, (26); Figur 18)*
+
+$$
+\begin{aligned}
+  V_{Rd} &= k_d \cdot \tau_{cd} \cdot d_p \cdot \frac{b_0}{b_s} \cdot b \\
+  &= 0.8 \cdot 1.1\,\mathrm{N}/\mathrm{mm}^{2} \cdot 108.9\,\mathrm{mm} \cdot \frac{95\,\mathrm{mm}}{200\,\mathrm{mm}} \cdot 1000\,\mathrm{mm} \\
+  &= 45.3\,\mathrm{kN}
+\end{aligned}
+$$
+
+#### Längsschub – m-k-Methode
+
+Endfeld einer durchlaufenden Decke: gerechnet wird mit 0.9 L. Gleichmässig über die ganze Spannweite verteilt: die Schublänge ist L/4.
+
+**Schublänge, gleichmässig verteilt – Endfeld** *(SIA 264:2014, 5.4.3.5)*
+
+$$
+L_s = \frac{0.9 \cdot L}{4} = \frac{0.9 \cdot 3\,\mathrm{m}}{4} = 675\,\mathrm{mm}
+$$
+
+**Widerstandsbeiwert für Verbund, auch mit charakteristischen Werten** *(SIA 264:2014, 5.4.3.5, (28))*
+
+$$
+\gamma_v = 1.25
+$$
+
+**Längsschubwiderstand zwischen Blech und Beton** *(SIA 264:2014, 5.4.3.5, (28))*
+
+$$
+\begin{aligned}
+  V_{L,Rd} &= b \cdot d_p \cdot \frac{m \cdot \frac{A_p}{b \cdot L_s} + k}{\gamma_v} \\
+  &= 1000\,\mathrm{mm} \cdot 108.9\,\mathrm{mm} \cdot \frac{150\,\mathrm{N}/\mathrm{mm}^{2} \cdot \frac{1100\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 675\,\mathrm{mm}} + 0.1\,\mathrm{N}/\mathrm{mm}^{2}}{1.25} \\
+  &= 30\,\mathrm{kN}
+\end{aligned}
+$$
+
+#### Schlankheit
+
+**Schlankheit der Decke** *(SIA 264:2014, 5.4.4.3)*
+
+$$
+L/d_p = \frac{L}{d_p} = \frac{3\,\mathrm{m}}{108.9\,\mathrm{mm}} = 27.5
+$$
+
+> **Hinweis:** L/d\_p liegt über 26: die Durchbiegung ist zu rechnen (5.4.4.2) – das Werkzeug rechnet sie für die Decke noch nicht.
+
+> **Hinweis:** Nicht gerechnet: das Durchstanzen unter Einzellasten (27), die Endverankerung (5.4.3.6), der Bauzustand (5.4.4.4), die Mindestbewehrung über den Stützen (5.4.4.6) und die Schwingungen (5.4.4.7).
+
+### Querkraft und Längsschub
+
+#### Feld
+
+**Querkraft über die ganze Breite der Decke, als Betrag**
+
+$$
+V_{z,Ed} = 20\,\mathrm{kN}
+$$
+
+##### Querkraft
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,V,\text{Feld}} = \frac{V_{Rd}}{V_{z,Ed}} = \frac{45.3\,\mathrm{kN}}{20\,\mathrm{kN}} = 2.27 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+##### Längsschub
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,L,\text{Feld}} = \frac{V_{L,Rd}}{V_{z,Ed}} = \frac{30\,\mathrm{kN}}{20\,\mathrm{kN}} = 1.50 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+#### Stütze ohne Bewehrung
+
+**Querkraft über die ganze Breite der Decke, als Betrag**
+
+$$
+V_{z,Ed} = 25\,\mathrm{kN}
+$$
+
+##### Querkraft
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,V,\text{Stütze ohne Bewehrung}} = \frac{V_{Rd}}{V_{z,Ed}} = \frac{45.3\,\mathrm{kN}}{25\,\mathrm{kN}} = 1.81 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+##### Längsschub
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,L,\text{Stütze ohne Bewehrung}} = \frac{V_{L,Rd}}{V_{z,Ed}} = \frac{30\,\mathrm{kN}}{25\,\mathrm{kN}} = 1.20 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+#### Druck
+
+Keine Einwirkung → kein Nachweis.
+
+#### Zug
+
+Keine Einwirkung → kein Nachweis.
+
+### Torsionsträgheitsmoment
+
+> **Annahme:** I\_T nach St. Venant am Bruttoquerschnitt, ungerissen und ohne Bewehrung, numerisch aus der Spannungsfunktion von Prandtl (nach Vorgabe, nicht nachgeschlagen).
+
+**Spannungsfunktion von Prandtl; am Rand des Hohlraums k ist φ = φ\_k**
+
+$$
+\nabla^2 \phi = -2 \qquad \phi = 0 \ \text{am Rand} \qquad \oint_k \frac{\partial \phi}{\partial n}\, ds = -2\, A_k
+$$
+
+**Torsionsträgheitsmoment aus der Spannungsfunktion**
+
+$$
+I_T = 2 \int_A \phi\, dA + 2 \sum_k \phi_k\, A_k
+$$
+
+**Die beiden Gitter**
+
+| Gitter | Zellen | mit Material | $A_k\ [\mathrm{mm}^2]$ | $I_T\ [10^6\,\mathrm{mm}^4]$ |
+| :--- | ---: | ---: | ---: | ---: |
+| grob | $60 \times 10$ | $470$ | – | $332.2$ |
+| fein | $120 \times 20$ | $1900$ | – | $322.9$ |
+
+**Torsionsträgheitsmoment, nach Richardson aus beiden Gittern**
+
+$$
+\begin{aligned}
+  I_T &= \frac{4 \cdot I_{T,fein} - I_{T,grob}}{3} \\
+  &= \frac{4 \cdot 322.9\,\cdot 10^{6}\,\mathrm{mm}^{4} - 332.2\,\cdot 10^{6}\,\mathrm{mm}^{4}}{3} \\
+  &= 319.9\,\cdot 10^{6}\,\mathrm{mm}^{4}
+\end{aligned}
+$$
+
+### Profilblechstahl: SE 350 G
+
+**Streckgrenze des Profilblechstahls** *(SIA 264:2014, 3.3.1, Tabelle 1)*
+
+$$
+f_{yp} = 350\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Widerstandsbeiwert des Profilblechstahls** *(SIA 264:2014, 4.1.5)*
+
+$$
+\gamma_{ap} = 1.05
+$$
+
+### Querschnittsanalyse: Hinterschnittene Blechdecke
+
+**Fläche und Schwerpunkt eines Polygons (Satz von Gauss)**
+
+$$
+A = \frac{1}{2} \sum_i c_i \qquad y_S = \frac{1}{6A} \sum_i (y_i + y_{i+1})\, c_i \qquad z_S = \frac{1}{6A} \sum_i (z_i + z_{i+1})\, c_i \qquad c_i = y_i\, z_{i+1} - y_{i+1}\, z_i
+$$
+
+**Trägheitsmomente eines Polygons, bezogen auf den Schwerpunkt**
+
+$$
+I_y = \frac{1}{12} \sum_i (z_i^2 + z_i z_{i+1} + z_{i+1}^2)\, c_i - A\, z_S^2\qquad I_z = \frac{1}{12} \sum_i (y_i^2 + y_i y_{i+1} + y_{i+1}^2)\, c_i - A\, y_S^2
+$$
+
+**Polygone des Querschnitts**
+
+| Polygon | Material | liegt in | Ecken | $\pm A\ [\mathrm{mm}^2]$ | $y_S\ [\mathrm{mm}]$ | $z_S\ [\mathrm{mm}]$ |
+| :--- | :--- | :--- | ---: | ---: | ---: | ---: |
+| Blechverbunddecke 1, Beton | C30/37 | – | $24$ | $168500$ | $500.0$ | $112.6$ |
+
+**Fläche des Bruttoquerschnitts**
+
+$$
+A = 168500\,\mathrm{mm}^{2}
+$$
+
+**Schwerpunkt, y**
+
+$$
+y_S = 500\,\mathrm{mm}
+$$
+
+**Schwerpunkt, z**
+
+$$
+z_S = 112.6\,\mathrm{mm}
+$$
+
+**Trägheitsmoment um y**
+
+$$
+I_y = 486.4\,\cdot 10^{6}\,\mathrm{mm}^{4}
+$$
+
+**Trägheitsmoment um z**
+
+$$
+I_z = 13969.6\,\cdot 10^{6}\,\mathrm{mm}^{4}
+$$
+
+**Deviationsmoment**
+
+$$
+I_{yz} = 0\,\cdot 10^{6}\,\mathrm{mm}^{4}
+$$
+
+**Profilblech**
+
+| Element | Blech | Stahl | $A_p\ [\mathrm{mm}^2]$ |
+| :--- | :--- | :--- | ---: |
+| Blechverbunddecke 1, Blech | $5 \times 200\,\mathrm{mm},\ h_p = 60\,\mathrm{mm},\ t = 0.58\,\mathrm{mm}$ | SE 350 G | $1100$ |
+
+**Teilung einer Stablinie: gleiche Felder, auf die Länge gerundet**
+
+$$
+s = \frac{L}{m} \qquad m = \mathrm{runde}\left(\frac{L}{s_{gewählt}}\right)
+$$
+
+**Bewehrung**
+
+| Element | $\text{Lage}\ [\mathrm{mm}]$ | Bewehrung | Stahl | $A_s\ [\mathrm{mm}^2]$ |
+| :--- | :--- | :--- | ---: | ---: |
+| Linie 1 | $(20;\ 170) \rightarrow (980;\ 170)$ | $7 \varnothing 10\ @\ 160.0\ (\text{gewählt } 150)$ | B500B | $550$ |
+
+**Stahlfläche der Bewehrung**
+
+$$
+A_{s,tot} = 550\,\mathrm{mm}^{2}
+$$
+
+### Biegung und Normalkraft
+
+Festigkeiten wie in den Kennzahlen: C30/37 gedrückt 17.0 N/mm², B500B 434.8 N/mm², SE 350 G gezogen 333.3 N/mm².
+
+**Erfüllungsgrad bei fester Normalkraft – einachsig um y** *(SIA 264:2014, 5.4.1.1)*
+
+$$
+\alpha_{eff} = \frac{M_{Rd}}{M_{Ed}} \qquad M_{Ed} = |M_{y,Ed}|
+$$
+
+#### Stütze
+
+**Einwirkung**
+
+| Einwirkung | Wert |  |
+| :--- | ---: | :--- |
+| N\_Ed | $0.0$ | kN |
+| M\_y,Ed | $-15.0$ | kNm |
+| V\_z,Ed | $30.0$ | kN |
+
+Bei negativem Moment zählt das Blech nicht, auch gezogen nicht (5.4.3.2).
+
+Nulllinie: Zugrichtung n = (0.000; 1.000), 90.0° gegen die y-Achse; gezogen ist, wo n\_y y + n\_z z \> 25.7 mm.
+
+**Kräfte im plastischen Zustand – je Teil und Zone**
+
+| Teil | Zone | $F\ [\mathrm{kN}]$ | $y\ [\mathrm{mm}]$ | $z\ [\mathrm{mm}]$ |
+| :--- | :--- | ---: | ---: | ---: |
+| Blechverbunddecke 1, Beton | Druck | $-239.0$ | $500.0$ | $12.4$ |
+| Linie 1 | Zug | $239.0$ | $500.0$ | $170.0$ |
+
+**Probe: Normalkraft**
+
+$$
+N_{Rd} = \sum F_i = 0\,\mathrm{kN}
+$$
+
+**Probe: Moment um y**
+
+$$
+M_{y,Rd} = -\sum F_i \cdot (z_i - z_S) = -37.7\,\mathrm{kNm}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,\text{Stütze}} = \frac{M_{pl,Rd}}{M_{Ed}} = \frac{37.7\,\mathrm{kNm}}{15\,\mathrm{kNm}} = 2.51 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+#### Feld
+
+**Einwirkung**
+
+| Einwirkung | Wert |  |
+| :--- | ---: | :--- |
+| N\_Ed | $0.0$ | kN |
+| M\_y,Ed | $25.0$ | kNm |
+| V\_z,Ed | $20.0$ | kN |
+
+Nulllinie: Zugrichtung n = (0.000; -1.000), -90.0° gegen die y-Achse; gezogen ist, wo n\_y y + n\_z z \> -172.0 mm.
+
+**Kräfte im plastischen Zustand – je Teil und Zone**
+
+| Teil | Zone | $F\ [\mathrm{kN}]$ | $y\ [\mathrm{mm}]$ | $z\ [\mathrm{mm}]$ |
+| :--- | :--- | ---: | ---: | ---: |
+| Blechverbunddecke 1, Beton | Druck | $-473.7$ | $500.0$ | $186.1$ |
+| Linie 1 | Zug | $173.0$ | $500.0$ | $168.8$ |
+| Linie 1 | Druck | $-66.0$ | $500.0$ | $173.2$ |
+| Blechverbunddecke 1, Blech | Zug | $366.7$ | $500.0$ | $30.8$ |
+
+**Probe: Normalkraft**
+
+$$
+N_{Rd} = \sum F_i = 0\,\mathrm{kN}
+$$
+
+**Probe: Moment um y**
+
+$$
+M_{y,Rd} = -\sum F_i \cdot (z_i - z_S) = 59.1\,\mathrm{kNm}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,\text{Feld}} = \frac{M_{pl,Rd}}{M_{Ed}} = \frac{59.1\,\mathrm{kNm}}{25\,\mathrm{kNm}} = 2.36 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+#### Schief
+
+**Einwirkung**
+
+| Einwirkung | Wert |  |
+| :--- | ---: | :--- |
+| N\_Ed | $0.0$ | kN |
+| M\_y,Ed | $10.0$ | kNm |
+| V\_z,Ed | $0.0$ | kN |
+
+Nulllinie: Zugrichtung n = (0.000; -1.000), -90.0° gegen die y-Achse; gezogen ist, wo n\_y y + n\_z z \> -172.0 mm.
+
+**Kräfte im plastischen Zustand – je Teil und Zone**
+
+| Teil | Zone | $F\ [\mathrm{kN}]$ | $y\ [\mathrm{mm}]$ | $z\ [\mathrm{mm}]$ |
+| :--- | :--- | ---: | ---: | ---: |
+| Blechverbunddecke 1, Beton | Druck | $-473.7$ | $500.0$ | $186.1$ |
+| Linie 1 | Zug | $173.0$ | $500.0$ | $168.8$ |
+| Linie 1 | Druck | $-66.0$ | $500.0$ | $173.2$ |
+| Blechverbunddecke 1, Blech | Zug | $366.7$ | $500.0$ | $30.8$ |
+
+**Probe: Normalkraft**
+
+$$
+N_{Rd} = \sum F_i = 0\,\mathrm{kN}
+$$
+
+**Probe: Moment um y**
+
+$$
+M_{y,Rd} = -\sum F_i \cdot (z_i - z_S) = 59.1\,\mathrm{kNm}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,\text{Schief}} = \frac{M_{pl,Rd}}{M_{Ed}} = \frac{59.1\,\mathrm{kNm}}{10\,\mathrm{kNm}} = 5.91 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+### Kennzahlen
+
+> **Annahme:** Eine Blechverbunddecke trägt in Richtung ihrer Rippen (5.4.1.1): nachgewiesen werden N, M\_y und V\_z über die ganze gezeichnete Breite b – M\_z, V\_y und T nicht.
+
+#### Festigkeiten
+
+**Festigkeiten im plastischen Zustand – der Beton nur gedrückt, das Blech nur gezogen** *(SIA 264:2014, 4.1.3, (1); 4.1.5; 4.3.2.1; 5.1.2.1)*
+
+$$
+0.85\, f_{cd} = 0.85\, \frac{\eta_{fc}\, f_{ck}}{\gamma_c},\ \eta_{fc} = 1 \qquad f_{sd} = \frac{f_{sk}}{\gamma_s} \qquad f_{ypd} = \frac{f_{yp}}{\gamma_{ap}}
+$$
+
+**Festigkeiten je Werkstoff**
+
+| Werkstoff | Art | $f_k\ [\mathrm{N}/\mathrm{mm}^2]$ | $\gamma$ | $\text{gezogen}\ [\mathrm{N}/\mathrm{mm}^2]$ | $\text{gedrückt}\ [\mathrm{N}/\mathrm{mm}^2]$ |
+| :--- | :--- | ---: | ---: | ---: | ---: |
+| C30/37 | Beton | $30$ | $1.50$ | $0.0$ | $17.0$ |
+| B500B | Betonstahl | $500$ | $1.15$ | $434.8$ | $434.8$ |
+| SE 350 G | Profilblechstahl | $350$ | $1.05$ | $333.3$ | $0.0$ |
+
+f\_k ist f\_ck, f\_sk oder f\_yp; γ ist γ\_c, γ\_s oder γ\_ap.
+
+#### Profilblech
+
+5 Rippen im Abstand b\_s = 200 mm, hinterschnitten; h = 200 mm, h\_p = 60 mm, b\_o = 70 mm, b\_u = 120 mm, A\_p = 1100 mm² je m nach dem Datenblatt.
+
+**Das Blech je Rippe: Steg, Abwicklung, Dicke und Schwerpunkt**
+
+$$
+L_w = \sqrt{h_p^2 + \left(\frac{b_o - b_u}{2}\right)^2} \qquad s = b_s - b_o + 2\, L_w + b_u \qquad t = \frac{A_p\, b_s}{s} \qquad e = \frac{h_p\, (L_w + b_s - b_o)}{s}
+$$
+
+**Das Blech aus seinen Massen**
+
+| Grösse | Bedeutung | Wert |
+| :--- | :--- | ---: |
+| $L_w$ | Länge eines Stegs | $65\,\mathrm{mm}$ |
+| $s$ | Abgewickelte Länge des Blechs je Rippe | $380\,\mathrm{mm}$ |
+| $t$ | Dicke des Blechs | $0.58\,\mathrm{mm}$ |
+| $e$ | Schwerpunkt des Blechs über seiner Unterkante | $30.8\,\mathrm{mm}$ |
+| $h_c$ | Beton über den Rippen | $140\,\mathrm{mm}$ |
+| $b$ | Breite der Decke, n · b\_s | $1000\,\mathrm{mm}$ |
+| $A_p$ | Fläche des Blechs über die Breite b | $1100\,\mathrm{mm}^{2}$ |
+
+> **Annahme:** Das Blech ist gleich dick, seine Fläche gleichmässig über die Abwicklung verteilt; Sicken und Ausrundungen zählen nicht (nach Vorgabe, nicht nachgeschlagen).
+
+**Statische Höhe – bis zum Schwerpunkt des Blechs** *(SIA 264:2014, 5.4.3.3; Figur 9)*
+
+$$
+d_p = h - e = 200\,\mathrm{mm} - 30.8\,\mathrm{mm} = 169.2\,\mathrm{mm}
+$$
+
+**Rippenbreite, hinterschnitten: oben, wo die Rippe am schmalsten ist** *(SIA 264:2014, Figur 18)*
+
+$$
+b_0 = b_o = 70\,\mathrm{mm}
+$$
+
+#### Normalkraft
+
+**Fläche und Festigkeit je Werkstoff**
+
+| Werkstoff | $A\ [\mathrm{mm}^2]$ | $\text{gezogen}\ [\mathrm{N}/\mathrm{mm}^2]$ | $\text{gedrückt}\ [\mathrm{N}/\mathrm{mm}^2]$ |
+| :--- | ---: | ---: | ---: |
+| C30/37 | $167950$ | $0.0$ | $17.0$ |
+| B500B | $550$ | $434.8$ | $434.8$ |
+| SE 350 G | $1100$ | $333.3$ | $0.0$ |
+
+Die Fläche des Betons ist ohne die Stäbe in ihm; das Blech liegt an seinem Rand.
+
+**Zugwiderstand: Σ A · f gezogen** *(SIA 264:2014, 5.4.3.2; 5.1.2.1)*
+
+$$
+N_{pl,Rd}^{+} = 605.7\,\mathrm{kN}
+$$
+
+**Druckwiderstand: Σ A · f gedrückt** *(SIA 264:2014, 5.4.3.2; 5.1.2.1)*
+
+$$
+N_{pl,Rd}^{-} = -3094.2\,\mathrm{kN}
+$$
+
+#### Biegung, Zug unten
+
+Nulllinie: Zugrichtung n = (0.000; -1.000), -90.0° gegen die y-Achse; gezogen ist, wo n\_y y + n\_z z \> -172.0 mm.
+
+**Kräfte im plastischen Zustand, Zug unten**
+
+| Teil | Zone | $F\ [\mathrm{kN}]$ | $y\ [\mathrm{mm}]$ | $z\ [\mathrm{mm}]$ |
+| :--- | :--- | ---: | ---: | ---: |
+| Blechverbunddecke 1, Beton | Druck | $-473.7$ | $500.0$ | $186.1$ |
+| Linie 1 | Zug | $173.0$ | $500.0$ | $168.8$ |
+| Linie 1 | Druck | $-66.0$ | $500.0$ | $173.2$ |
+| Blechverbunddecke 1, Blech | Zug | $366.7$ | $500.0$ | $30.8$ |
+
+**Probe: Normalkraft**
+
+$$
+N_{Rd} = \sum F_i = 0\,\mathrm{kN}
+$$
+
+**Probe: Moment um y**
+
+$$
+M_{y,pl,Rd} = -\sum F_i \cdot (z_i - z_S) = 59.1\,\mathrm{kNm}
+$$
+
+**Plastischer Momentenwiderstand, Zug unten** *(SIA 264:2014, 5.4.3.2; 5.1.2.1)*
+
+$$
+M_{y,Rd}^{+} = 59.1\,\mathrm{kNm}
+$$
+
+#### Biegung, Zug oben
+
+Bei negativem Moment zählt das Blech nicht, auch gezogen nicht (5.4.3.2).
+
+Nulllinie: Zugrichtung n = (0.000; 1.000), 90.0° gegen die y-Achse; gezogen ist, wo n\_y y + n\_z z \> 25.7 mm.
+
+**Kräfte im plastischen Zustand, Zug oben**
+
+| Teil | Zone | $F\ [\mathrm{kN}]$ | $y\ [\mathrm{mm}]$ | $z\ [\mathrm{mm}]$ |
+| :--- | :--- | ---: | ---: | ---: |
+| Blechverbunddecke 1, Beton | Druck | $-239.0$ | $500.0$ | $12.4$ |
+| Linie 1 | Zug | $239.0$ | $500.0$ | $170.0$ |
+
+**Probe: Normalkraft**
+
+$$
+N_{Rd} = \sum F_i = 0\,\mathrm{kN}
+$$
+
+**Probe: Moment um y**
+
+$$
+M_{y,pl,Rd} = -\sum F_i \cdot (z_i - z_S) = -37.7\,\mathrm{kNm}
+$$
+
+**Plastischer Momentenwiderstand, Zug oben** *(SIA 264:2014, 5.4.3.2; 5.1.2.1)*
+
+$$
+M_{y,Rd}^{-} = -37.7\,\mathrm{kNm}
+$$
+
+#### Querkraft
+
+> **Hinweis:** d\_p = 169.2 mm liegt über 150 mm: dann gelten für die Querkraft die Regeln der SIA 262 (5.4.3.3), und die rechnet das Werkzeug für die Decke noch nicht.
+
+#### Längsschub – m-k-Methode
+
+Innenfeld einer durchlaufenden Decke: gerechnet wird mit 0.8 L. Zwei gleiche Einzellasten, symmetrisch im Feld: die Schublänge ist ihr Abstand a vom nächsten Auflager.
+
+**Schublänge – der Abstand a der Einzellasten vom nächsten Auflager** *(SIA 264:2014, 5.4.3.5)*
+
+$$
+L_s = 900\,\mathrm{mm}
+$$
+
+Der Abstand a gilt im gleichwertigen Einfeld, wie eingegeben (nach Vorgabe, nicht nachgeschlagen).
+
+**Widerstandsbeiwert für Verbund, auch mit charakteristischen Werten** *(SIA 264:2014, 5.4.3.5, (28))*
+
+$$
+\gamma_v = 1.25
+$$
+
+**Längsschubwiderstand zwischen Blech und Beton** *(SIA 264:2014, 5.4.3.5, (28))*
+
+$$
+\begin{aligned}
+  V_{L,Rd} &= b \cdot d_p \cdot \frac{m \cdot \frac{A_p}{b \cdot L_s} + k}{\gamma_v} \\
+  &= 1000\,\mathrm{mm} \cdot 169.2\,\mathrm{mm} \cdot \frac{180\,\mathrm{N}/\mathrm{mm}^{2} \cdot \frac{1100\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 900\,\mathrm{mm}} + 0.05\,\mathrm{N}/\mathrm{mm}^{2}}{1.25} \\
+  &= 36.5\,\mathrm{kN}
+\end{aligned}
+$$
+
+#### Schlankheit
+
+**Schlankheit der Decke** *(SIA 264:2014, 5.4.4.3)*
+
+$$
+L/d_p = \frac{L}{d_p} = \frac{3.6\,\mathrm{m}}{169.2\,\mathrm{mm}} = 21.3
+$$
+
+L/d\_p ≤ 26: die Durchbiegung muss nicht gerechnet werden (5.4.4.3).
+
+> **Hinweis:** Nicht gerechnet: das Durchstanzen unter Einzellasten (27), die Endverankerung (5.4.3.6), der Bauzustand (5.4.4.4), die Mindestbewehrung über den Stützen (5.4.4.6) und die Schwingungen (5.4.4.7).
+
+### Querkraft und Längsschub
+
+#### Stütze
+
+**Querkraft über die ganze Breite der Decke, als Betrag**
+
+$$
+V_{z,Ed} = 30\,\mathrm{kN}
+$$
+
+##### Querkraft
+
+> **Hinweis:** d\_p über 150 mm: für die Querkraft gilt SIA 262, das rechnet das Werkzeug für die Decke noch nicht.
+
+##### Längsschub
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,L,\text{Stütze}} = \frac{V_{L,Rd}}{V_{z,Ed}} = \frac{36.5\,\mathrm{kN}}{30\,\mathrm{kN}} = 1.22 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+#### Feld
+
+**Querkraft über die ganze Breite der Decke, als Betrag**
+
+$$
+V_{z,Ed} = 20\,\mathrm{kN}
+$$
+
+##### Querkraft
+
+> **Hinweis:** d\_p über 150 mm: für die Querkraft gilt SIA 262, das rechnet das Werkzeug für die Decke noch nicht.
+
+##### Längsschub
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,L,\text{Feld}} = \frac{V_{L,Rd}}{V_{z,Ed}} = \frac{36.5\,\mathrm{kN}}{20\,\mathrm{kN}} = 1.83 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+#### Schief
+
+Keine Einwirkung → kein Nachweis.
+
+### Torsionsträgheitsmoment
+
+> **Annahme:** I\_T nach St. Venant am Bruttoquerschnitt, ungerissen und ohne Bewehrung, numerisch aus der Spannungsfunktion von Prandtl (nach Vorgabe, nicht nachgeschlagen).
+
+**Spannungsfunktion von Prandtl; am Rand des Hohlraums k ist φ = φ\_k**
+
+$$
+\nabla^2 \phi = -2 \qquad \phi = 0 \ \text{am Rand} \qquad \oint_k \frac{\partial \phi}{\partial n}\, ds = -2\, A_k
+$$
+
+**Torsionsträgheitsmoment aus der Spannungsfunktion**
+
+$$
+I_T = 2 \int_A \phi\, dA + 2 \sum_k \phi_k\, A_k
+$$
+
+**Die beiden Gitter**
+
+| Gitter | Zellen | mit Material | $A_k\ [\mathrm{mm}^2]$ | $I_T\ [10^6\,\mathrm{mm}^4]$ |
+| :--- | ---: | ---: | ---: | ---: |
+| grob | $60 \times 14$ | $710$ | – | $1026.3$ |
+| fein | $120 \times 28$ | $2860$ | – | $997.0$ |
+
+**Torsionsträgheitsmoment, nach Richardson aus beiden Gittern**
+
+$$
+\begin{aligned}
+  I_T &= \frac{4 \cdot I_{T,fein} - I_{T,grob}}{3} \\
+  &= \frac{4 \cdot 997\,\cdot 10^{6}\,\mathrm{mm}^{4} - 1026.3\,\cdot 10^{6}\,\mathrm{mm}^{4}}{3} \\
+  &= 987.2\,\cdot 10^{6}\,\mathrm{mm}^{4}
+\end{aligned}
+$$
+
 ### Querschnittsanalyse: Holzträger
 
 **Fläche und Schwerpunkt eines Polygons (Satz von Gauss)**
@@ -30445,6 +31391,80 @@ $$
 e_{0,y} = \frac{L}{300}
 $$
 
+### Blechverbunddecke
+
+Je Lastfall der plastische Zustand bei N\_Ed, dessen Moment die Seite von M\_y,Ed zieht – wie im Verbundträger: Blech und Betonstahl ganz gezogen, der Beton nur gedrückt, mit 0.85 f\_cd über die ganze Druckzone. Bei negativem Moment zählt das Blech nicht. Die Normalkraft bleibt, das Moment wächst, bis der Widerstand erreicht ist.
+
+Was die Blechverbunddecke aufnimmt, ohne Bezug auf einen Lastfall: die Widerstände gegen Zug, Druck und Biegung, plastisch wie im Verbundträger, gegen Querkraft und gegen den Längsschub zwischen Blech und Beton nach der m-k-Methode – alle über die ganze gezeichnete Breite b. Dazu die Schlankheit L/d\_p: bis 26 muss die Durchbiegung nicht gerechnet werden.
+
+Je Lastfall die Querkraft V\_z,Ed über die ganze Breite der Decke, gegen ihren Querkraftwiderstand und gegen den Längsschubwiderstand zwischen Blech und Beton – beide aus den Kennzahlen.
+
+**Erfüllungsgrad bei fester Normalkraft – einachsig um y** *(SIA 264:2014, 5.4.1.1)*
+
+$$
+\alpha_{eff} = \frac{M_{Rd}}{M_{Ed}} \qquad M_{Ed} = |M_{y,Ed}|
+$$
+
+**Festigkeiten im plastischen Zustand – der Beton nur gedrückt, das Blech nur gezogen** *(SIA 264:2014, 4.1.3, (1); 4.1.5; 4.3.2.1; 5.1.2.1)*
+
+$$
+0.85\, f_{cd} = 0.85\, \frac{\eta_{fc}\, f_{ck}}{\gamma_c},\ \eta_{fc} = 1 \qquad f_{ypd} = \frac{f_{yp}}{\gamma_{ap}}
+$$
+
+**Das Blech je Rippe: Steg, Abwicklung, Dicke und Schwerpunkt**
+
+$$
+L_w = \sqrt{h_p^2 + \left(\frac{b_o - b_u}{2}\right)^2} \qquad s = b_s - b_o + 2\, L_w + b_u \qquad t = \frac{A_p\, b_s}{s} \qquad e = \frac{h_p\, (L_w + b_s - b_o)}{s}
+$$
+
+**Statische Höhe – bis zum Schwerpunkt des Blechs** *(SIA 264:2014, 5.4.3.3; Figur 9)*
+
+$$
+d_p = h - e
+$$
+
+**Rippenbreite, offen: auf halber Höhe der Rippe** *(SIA 264:2014, Figur 18)*
+
+$$
+b_0 = \frac{b_o + b_u}{2}
+$$
+
+**Querkraftwiderstand über die Breite b: (26) mal b** *(SIA 264:2014, 5.4.3.3, (26); Figur 18)*
+
+$$
+V_{Rd} = k_d \cdot \tau_{cd} \cdot d_p \cdot \frac{b_0}{b_s} \cdot b
+$$
+
+**Schublänge, gleichmässig verteilt – Endfeld** *(SIA 264:2014, 5.4.3.5)*
+
+$$
+L_s = \frac{0.9 \cdot L}{4}
+$$
+
+**Längsschubwiderstand zwischen Blech und Beton** *(SIA 264:2014, 5.4.3.5, (28))*
+
+$$
+V_{L,Rd} = b \cdot d_p \cdot \frac{m \cdot \frac{A_p}{b \cdot L_s} + k}{\gamma_v}
+$$
+
+**Schlankheit der Decke** *(SIA 264:2014, 5.4.4.3)*
+
+$$
+L/d_p = \frac{L}{d_p}
+$$
+
+**Festigkeiten im plastischen Zustand – der Beton nur gedrückt, das Blech nur gezogen** *(SIA 264:2014, 4.1.3, (1); 4.1.5; 4.3.2.1; 5.1.2.1)*
+
+$$
+0.85\, f_{cd} = 0.85\, \frac{\eta_{fc}\, f_{ck}}{\gamma_c},\ \eta_{fc} = 1 \qquad f_{sd} = \frac{f_{sk}}{\gamma_s} \qquad f_{ypd} = \frac{f_{yp}}{\gamma_{ap}}
+$$
+
+**Rippenbreite, hinterschnitten: oben, wo die Rippe am schmalsten ist** *(SIA 264:2014, Figur 18)*
+
+$$
+b_0 = b_o
+$$
+
 ### Holzquerschnitt
 
 Holz rechnet linear (SIA 265, 4.1.2): die Spannungen sind elastisch, am Bruttoquerschnitt. Was die Nachweise der Lastfälle, die Kennzahlen und der Stab daraus lesen, steht hier einmal.
@@ -32901,6 +33921,93 @@ $$
 | Momentenwiderstand, Zug oben | $M_{y,Rd}^{-}$ | $-142.2\,\mathrm{kNm}$ |
 | Querkraftwiderstand in z | $V_{z,Rd}$ | $659.4\,\mathrm{kN}$ |
 
+### Blechverbunddecke
+
+**Angaben zum Querschnitt**
+
+$$
+\text{C30/37} \qquad A = 108500\,\mathrm{mm}^2 \qquad y_S = 500.0\,\mathrm{mm} \qquad z_S = 82.3\,\mathrm{mm}
+$$
+
+**Bewehrung und Schubwände**
+
+| Element | Bewehrung | Stahl |
+| :--- | :--- | :--- |
+| Blechverbunddecke 1, Blech | $1100\,\mathrm{mm}^2$ | SE 350 G |
+
+| Nachweis | Bezeichnung | Widerstand | Einwirkung | $\alpha_{eff}$ |
+| :--- | :--- | ---: | ---: | ---: |
+| Biegung und Normalkraft | Feld | $M_{pl,Rd} = 36.0\,\mathrm{kNm}$ | $M_{Ed} = 30.0\,\mathrm{kNm}$ | $1.20$ |
+| Biegung und Normalkraft | Stütze ohne Bewehrung | $M_{pl,Rd} = 0.0\,\mathrm{kNm}$ | $M_{Ed} = 10.0\,\mathrm{kNm}$ | $0.00$ |
+| Biegung und Normalkraft | Druck | $M_{pl,Rd} = 46.7\,\mathrm{kNm}$ | $M_{Ed} = 5.0\,\mathrm{kNm}$ | $9.34$ |
+| Biegung und Normalkraft | Zug | $N_{pl,Rd}^{+} = 366.7\,\mathrm{kN}$ | $N_{Ed} = 150.0\,\mathrm{kN}$ | $2.44$ |
+| Querkraft | Feld | $V_{Rd} = 45.3\,\mathrm{kN}$ | $V_{z,Ed} = 20.0\,\mathrm{kN}$ | $2.27$ |
+| Längsschub | Feld | $V_{L,Rd} = 30.0\,\mathrm{kN}$ | $V_{z,Ed} = 20.0\,\mathrm{kN}$ | $1.50$ |
+| Querkraft | Stütze ohne Bewehrung | $V_{Rd} = 45.3\,\mathrm{kN}$ | $V_{z,Ed} = 25.0\,\mathrm{kN}$ | $1.81$ |
+| Längsschub | Stütze ohne Bewehrung | $V_{L,Rd} = 30.0\,\mathrm{kN}$ | $V_{z,Ed} = 25.0\,\mathrm{kN}$ | $1.20$ |
+| Querkraft | Druck | – | – | $\infty$ |
+| Längsschub | Druck | – | – | $\infty$ |
+| Querkraft | Zug | – | – | $\infty$ |
+| Längsschub | Zug | – | – | $\infty$ |
+
+> **Hinweis:** Querkraft – Druck, Längsschub – Druck, Querkraft – Zug, Längsschub – Zug: Keine Einwirkung → kein Nachweis.
+
+> **Warnung:** Biegung und Normalkraft – Stütze ohne Bewehrung: nicht erfüllt. Nichts trägt hier Zug: der Beton nicht, das Blech zählt bei negativem Moment nicht (5.4.3.2), und Betonstahl liegt keiner in der Decke. Der Widerstand ist null.
+
+**Kennzahlen**
+
+| Kennzahl | Zeichen | Wert |
+| :--- | :--- | ---: |
+| Zugwiderstand | $N_{pl,Rd}^{+}$ | $366.7\,\mathrm{kN}$ |
+| Druckwiderstand | $N_{pl,Rd}^{-}$ | $-1844.5\,\mathrm{kN}$ |
+| Momentenwiderstand, Zug unten | $M_{y,Rd}^{+}$ | $36\,\mathrm{kNm}$ |
+| Momentenwiderstand, Zug oben | $M_{y,Rd}^{-}$ | $0\,\mathrm{kNm}$ |
+| Querkraftwiderstand | $V_{Rd}$ | $45.3\,\mathrm{kN}$ |
+| Längsschubwiderstand | $V_{L,Rd}$ | $30\,\mathrm{kN}$ |
+| Schlankheit | $L/d_p$ | $27.5$ |
+
+### Hinterschnittene Blechdecke
+
+**Angaben zum Querschnitt**
+
+$$
+\text{C30/37} \qquad A = 168500\,\mathrm{mm}^2 \qquad y_S = 500.0\,\mathrm{mm} \qquad z_S = 112.6\,\mathrm{mm}
+$$
+
+**Bewehrung und Schubwände**
+
+| Element | Bewehrung | Stahl |
+| :--- | :--- | :--- |
+| Linie 1 | $7 \varnothing 10$ | B500B |
+| Blechverbunddecke 1, Blech | $1100\,\mathrm{mm}^2$ | SE 350 G |
+
+| Nachweis | Bezeichnung | Widerstand | Einwirkung | $\alpha_{eff}$ |
+| :--- | :--- | ---: | ---: | ---: |
+| Biegung und Normalkraft | Stütze | $M_{pl,Rd} = 37.7\,\mathrm{kNm}$ | $M_{Ed} = 15.0\,\mathrm{kNm}$ | $2.51$ |
+| Biegung und Normalkraft | Feld | $M_{pl,Rd} = 59.1\,\mathrm{kNm}$ | $M_{Ed} = 25.0\,\mathrm{kNm}$ | $2.36$ |
+| Biegung und Normalkraft | Schief | $M_{pl,Rd} = 59.1\,\mathrm{kNm}$ | $M_{Ed} = 10.0\,\mathrm{kNm}$ | $5.91$ |
+| Querkraft | Stütze | – | – | $0.00$ |
+| Längsschub | Stütze | $V_{L,Rd} = 36.5\,\mathrm{kN}$ | $V_{z,Ed} = 30.0\,\mathrm{kN}$ | $1.22$ |
+| Querkraft | Feld | – | – | $0.00$ |
+| Längsschub | Feld | $V_{L,Rd} = 36.5\,\mathrm{kN}$ | $V_{z,Ed} = 20.0\,\mathrm{kN}$ | $1.83$ |
+| Querkraft | Schief | – | – | $\infty$ |
+| Längsschub | Schief | – | – | $\infty$ |
+
+> **Hinweis:** Querkraft – Stütze, Querkraft – Feld: d\_p über 150 mm: für die Querkraft gilt SIA 262, das rechnet das Werkzeug für die Decke noch nicht.
+
+> **Hinweis:** Querkraft – Schief, Längsschub – Schief: Keine Einwirkung → kein Nachweis.
+
+**Kennzahlen**
+
+| Kennzahl | Zeichen | Wert |
+| :--- | :--- | ---: |
+| Zugwiderstand | $N_{pl,Rd}^{+}$ | $605.7\,\mathrm{kN}$ |
+| Druckwiderstand | $N_{pl,Rd}^{-}$ | $-3094.2\,\mathrm{kN}$ |
+| Momentenwiderstand, Zug unten | $M_{y,Rd}^{+}$ | $59.1\,\mathrm{kNm}$ |
+| Momentenwiderstand, Zug oben | $M_{y,Rd}^{-}$ | $-37.7\,\mathrm{kNm}$ |
+| Längsschubwiderstand | $V_{L,Rd}$ | $36.5\,\mathrm{kN}$ |
+| Schlankheit | $L/d_p$ | $21.3$ |
+
 ### Innenstütze
 
 **Angaben zur Durchstanzstelle**
@@ -33516,6 +34623,8 @@ Mindestens ein Nachweis ist nicht erfüllt.
 > **Warnung:** Querschnittsanalyse 'Stahlträger', Feld: Torsion weist das Werkzeug beim Stahlquerschnitt nicht nach: SIA 263 nennt in 5.1 bis 5.3 keinen Torsionswiderstand des Querschnitts (nach Vorgabe, nicht nachgeschlagen).
 
 > **Warnung:** Querschnittsanalyse 'Verbundträger', Stütze: Torsion weist das Werkzeug beim Verbundquerschnitt nicht nach (nach Vorgabe, nicht nachgeschlagen).
+
+> **Warnung:** Querschnittsanalyse 'Hinterschnittene Blechdecke', Schief: Eine Blechverbunddecke trägt in Richtung ihrer Rippen (5.4.1.1): nachgewiesen werden N, M\_y und V\_z über die ganze gezeichnete Breite b – M\_z, V\_y und T nicht.
 
 > **Warnung:** Setzung 'Ohne Schicht': noch keine Schicht – unter «Schichten» eine anlegen → kein Nachweis.
 
@@ -34215,6 +35324,8 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Bemessungswert der Fliessgrenze | $f_{yd,\text{sw}}$ | $435$ | N/mm² | berechnet |
 | Charakteristische Fliessgrenze | $f_{yk,\text{sw}}$ | $500$ | N/mm² | Vorgabe |
 | Teilsicherheitsbeiwert für Betonstahl | $\gamma_{s,\text{sw}}$ | $1.15$ |  | Vorgabe |
+| Streckgrenze des Profilblechstahls | $f_{yp}$ | $350$ | N/mm² | Vorgabe |
+| Widerstandsbeiwert des Profilblechstahls | $\gamma_{ap}$ | $1.05$ |  | Vorgabe |
 | Betrachtete Breite (x) | $b$ | $1000$ | mm | Vorgabe |
 | Betrachtete Breite (y) | $b_y$ | $1000$ | mm | Vorgabe |
 | Bewehrungsmass je Kubikmeter Beton | $\mu_s$ | $123$ | kg/m³ | berechnet |
@@ -34681,6 +35792,50 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Erfüllungsgrad Verbundstütze – Druck und Biegung | $\alpha_{eff,\text{Druck und Biegung}}$ | $1.57$ |  | berechnet |
 | Schwerpunkt, y | $y_S$ | $0$ | mm | berechnet |
 | Schwerpunkt, z | $z_S$ | $0$ | mm | berechnet |
+| Fläche des Bruttoquerschnitts | $A$ | $108500$ | mm² | berechnet |
+| Stahlfläche der Bewehrung | $A_{s,tot}$ | $0$ | mm² | berechnet |
+| Torsionsträgheitsmoment nach St. Venant | $I_T$ | $319.9$ | ·10⁶ mm⁴ | berechnet |
+| Trägheitsmoment um y | $I_y$ | $146.4$ | ·10⁶ mm⁴ | berechnet |
+| Deviationsmoment | $I_{yz}$ | $0$ | ·10⁶ mm⁴ | berechnet |
+| Trägheitsmoment um z | $I_z$ | $8969.6$ | ·10⁶ mm⁴ | berechnet |
+| Schlankheit der Decke | $L/d_p$ | $27.5$ |  | berechnet |
+| Plastischer Momentenwiderstand bei N = 0, Zug oben | $M_{y,Rd}^{-}$ | $0$ | kNm | berechnet |
+| Plastischer Momentenwiderstand bei N = 0, Zug unten | $M_{y,Rd}^{+}$ | $36$ | kNm | berechnet |
+| Druckwiderstand der Blechverbunddecke, ohne Knicken | $N_{pl,Rd}^{-}$ | $-1844.5$ | kN | berechnet |
+| Zugwiderstand der Blechverbunddecke | $N_{pl,Rd}^{+}$ | $366.7$ | kN | berechnet |
+| Längsschubwiderstand nach der m-k-Methode | $V_{L,Rd}$ | $30$ | kN | berechnet |
+| Querkraftwiderstand der Decke über ihre Breite b | $V_{Rd}$ | $45.3$ | kN | berechnet |
+| Erfüllungsgrad Biegung und Normalkraft – Druck | $\alpha_{eff,\text{Druck}}$ | $9.34$ |  | berechnet |
+| Erfüllungsgrad Biegung und Normalkraft – Feld | $\alpha_{eff,\text{Feld}}$ | $1.20$ |  | berechnet |
+| Erfüllungsgrad Biegung und Normalkraft – Stütze ohne Bewehrung | $\alpha_{eff,\text{Stütze ohne Bewehrung}}$ | $0.00$ |  | berechnet |
+| Erfüllungsgrad Biegung und Normalkraft – Zug | $\alpha_{eff,\text{Zug}}$ | $2.44$ |  | berechnet |
+| Erfüllungsgrad Längsschub – Feld | $\alpha_{eff,L,\text{Feld}}$ | $1.50$ |  | berechnet |
+| Erfüllungsgrad Querkraft – Feld | $\alpha_{eff,V,\text{Feld}}$ | $2.27$ |  | berechnet |
+| Erfüllungsgrad Längsschub – Stütze ohne Bewehrung | $\alpha_{eff,L,\text{Stütze ohne Bewehrung}}$ | $1.20$ |  | berechnet |
+| Erfüllungsgrad Querkraft – Stütze ohne Bewehrung | $\alpha_{eff,V,\text{Stütze ohne Bewehrung}}$ | $1.81$ |  | berechnet |
+| Schwerpunkt, y | $y_S$ | $500$ | mm | berechnet |
+| Schwerpunkt, z | $z_S$ | $82.3$ | mm | berechnet |
+| Fläche des Bruttoquerschnitts | $A$ | $168500$ | mm² | berechnet |
+| Stahlfläche der Bewehrung | $A_{s,tot}$ | $550$ | mm² | berechnet |
+| Torsionsträgheitsmoment nach St. Venant | $I_T$ | $987.2$ | ·10⁶ mm⁴ | berechnet |
+| Trägheitsmoment um y | $I_y$ | $486.4$ | ·10⁶ mm⁴ | berechnet |
+| Deviationsmoment | $I_{yz}$ | $0$ | ·10⁶ mm⁴ | berechnet |
+| Trägheitsmoment um z | $I_z$ | $13969.6$ | ·10⁶ mm⁴ | berechnet |
+| Schlankheit der Decke | $L/d_p$ | $21.3$ |  | berechnet |
+| Plastischer Momentenwiderstand bei N = 0, Zug oben | $M_{y,Rd}^{-}$ | $-37.7$ | kNm | berechnet |
+| Plastischer Momentenwiderstand bei N = 0, Zug unten | $M_{y,Rd}^{+}$ | $59.1$ | kNm | berechnet |
+| Druckwiderstand der Blechverbunddecke, ohne Knicken | $N_{pl,Rd}^{-}$ | $-3094.2$ | kN | berechnet |
+| Zugwiderstand der Blechverbunddecke | $N_{pl,Rd}^{+}$ | $605.7$ | kN | berechnet |
+| Längsschubwiderstand nach der m-k-Methode | $V_{L,Rd}$ | $36.5$ | kN | berechnet |
+| Erfüllungsgrad Biegung und Normalkraft – Feld | $\alpha_{eff,\text{Feld}}$ | $2.36$ |  | berechnet |
+| Erfüllungsgrad Biegung und Normalkraft – Schief | $\alpha_{eff,\text{Schief}}$ | $5.91$ |  | berechnet |
+| Erfüllungsgrad Biegung und Normalkraft – Stütze | $\alpha_{eff,\text{Stütze}}$ | $2.51$ |  | berechnet |
+| Erfüllungsgrad Längsschub – Feld | $\alpha_{eff,L,\text{Feld}}$ | $1.83$ |  | berechnet |
+| Erfüllungsgrad Querkraft – Feld | $\alpha_{eff,V,\text{Feld}}$ | $0.00$ |  | berechnet |
+| Erfüllungsgrad Längsschub – Stütze | $\alpha_{eff,L,\text{Stütze}}$ | $1.22$ |  | berechnet |
+| Erfüllungsgrad Querkraft – Stütze | $\alpha_{eff,V,\text{Stütze}}$ | $0.00$ |  | berechnet |
+| Schwerpunkt, y | $y_S$ | $500$ | mm | berechnet |
+| Schwerpunkt, z | $z_S$ | $112.6$ | mm | berechnet |
 | Fläche des Bruttoquerschnitts | $A$ | $160000$ | mm² | berechnet |
 | Stahlfläche der Bewehrung | $A_{s,tot}$ | $1885$ | mm² | berechnet |
 | Trägheitsmoment um y | $I_y$ | $2133.3$ | ·10⁶ mm⁴ | berechnet |

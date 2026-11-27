@@ -649,9 +649,9 @@ def zeichnung(bauteil) -> dict:
         "staebe": [{"y": p[0], "z": p[1], "d": g.durchmesser, "name": g.name,
                     "stahl": g.stahl.name}
                    for g in bauteil.bewehrungselemente for p in g.punkte],
-        "flaechenlinien": [{"von": list(g.von), "bis": list(g.bis), "name": g.name,
+        "flaechenlinien": [{"von": list(von), "bis": list(bis), "name": g.name,
                             "stahl": g.stahl.name}
-                           for g in bauteil.bewehrungselemente if g.verschmiert],
+                           for g in bauteil.bewehrungselemente for von, bis in g.strecken],
         "spannglieder": [{"y": g.von[0], "z": g.von[1], "d": g.durchmesser, "name": g.name,
                           "stahl": g.stahl.name} for g in bauteil.spannglieder],
         "schwerpunkt": [bauteil.brutto.y_S, bauteil.brutto.z_S],

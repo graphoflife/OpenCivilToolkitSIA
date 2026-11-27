@@ -111,6 +111,8 @@ class TestSinnbilder(unittest.TestCase):
             "knickkurve": k["querschnittsanalyse"]["knickkurven"],
             "feuchteklasse": k["querschnittsanalyse"]["feuchteklassen"],
             "verduebelung": k["querschnittsanalyse"]["verduebelungen"],
+            "blechfeld": k["querschnittsanalyse"]["blechfelder"],
+            "blechlast": k["querschnittsanalyse"]["blechlasten"],
             # Grund und Zulage, je in den unteren und den oberen Lagen (platte.js).
             "zulage": [{"wert": f"{seite}-{gunst}"} for seite in ("unten", "oben")
                        for gunst in ("unguenstig", "guenstig")],

@@ -1,5 +1,5 @@
 ---
-erzeugt: 53ed39f906be
+erzeugt: 7527dcee9da6
 art: modul
 tags: [modul]
 ---
@@ -418,6 +418,7 @@ gedrueckte freie Flaechen hoechstens 3.
 
 ## Gebraucht von
 
+- [[opencivil.nachweis.qa_blechverbund]]
 - [[opencivil.nachweis.qa_stahl]]
 - [[opencivil.nachweis.qa_stahl_stabilitaet]]
 - [[opencivil.nachweis.qa_stahl_werte]]

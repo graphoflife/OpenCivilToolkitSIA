@@ -1,5 +1,5 @@
 ---
-erzeugt: c7505b77cead
+erzeugt: cb5cc62f8517
 art: modul
 tags: [modul]
 ---
@@ -474,6 +474,7 @@ d null, ohne Beton beides null.
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.bewehrungselemente]]
 - [[opencivil.querschnitt.plastisch]]
+- [[opencivil.querschnitt.profilblech]]
 - [[opencivil.querschnitt.spannglieder]]
 - [[opencivil.querschnitt.widerstandsflaeche]]
 - [[opencivil.spannungsanalyse.schnitt]]

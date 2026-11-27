@@ -1,5 +1,5 @@
 ---
-erzeugt: 0b05324b4aa9
+erzeugt: 3eb3ad0e8a44
 art: modul
 tags: [modul]
 ---
@@ -182,13 +182,17 @@ Was ein Material im Feld `feld` ([[opencivil.projekt.lesen#je_material|je_materi
 ### bereich
 
 ```python
-def bereich(vorgabe: Any=dataclasses.MISSING, *, heisst: str, einheit: Optional[Einheit]=None, ueber: Optional[float]=None, ab: Optional[float]=None, bis: Optional[float]=None, unter: Optional[float]=None, bis_feld: Optional[str]=None, bis_faktor: float=1.0, quer_zu: Optional[Tuple[str, float]]=None, fabrik: Optional[Callable[[], Any]]=None) -> Any
+def bereich(vorgabe: Any=dataclasses.MISSING, *, heisst: str, einheit: Optional[Einheit]=None, ueber: Optional[float]=None, ab: Optional[float]=None, bis: Optional[float]=None, unter: Optional[float]=None, bis_feld: Optional[str]=None, unter_feld: Optional[str]=None, bis_faktor: float=1.0, quer_zu: Optional[Tuple[str, float]]=None, fabrik: Optional[Callable[[], Any]]=None, zeichen: Optional[str]=None) -> Any
 ```
 
 Ein Feld, dessen Zahl in einem [[opencivil.core.bereich#Bereich|Bereich]] liegen muss -- eine
 Kriechzahl ab null etwa. Bei einer Liste von Zahlen gilt er fuer jede,
 und leer ist sie nie ([[opencivil.projekt.lesen#inhalt_pruefen|inhalt_pruefen]]); ihre Vorgabe kommt dann
-aus `fabrik`.
+aus `fabrik`. `bis_feld` nennt ein Feld, dessen Zahl diese nicht
+uebersteigt, `unter_feld` eines, unter dessen Zahl sie bleibt
+([[opencivil.core.bereich#Bereich|Bereich.bis_offen]]) -- wie `bis` und `unter`. `zeichen`
+steht in einer engen Maske statt des Namens, der dann ihr Titel ist:
+«h_p» statt «Höhe der Rippe h_p» ([[opencivil.projekt.lesen#feldangaben|feldangaben]]).
 
 ### als_groesse
 
@@ -217,15 +221,18 @@ Wahllisten des Katalogs, mit Beschriftung.
 
 Begrenzt ein Feld ein anderes ([[opencivil.core.bereich#Bereich|Bereich.bis_feld]]), steht das an
 beiden, mit dem Namen des anderen Feldes und dem Satz, den das Feld
-sagt: `bis_feld` bei α_min, `ab_feld` bei α_max -- mit `faktor`,
-wo die Grenze ein Vielfaches des anderen ist ([[opencivil.core.bereich#Bereich|Bereich.bis_faktor]],
-beim anderen Feld sein Kehrwert). Ebenso `quer_zu`
+sagt: `bis_feld` bei α_min, in `ab_felder` bei α_max -- mit
+`faktor`, wo die Grenze ein Vielfaches des anderen ist
+([[opencivil.core.bereich#Bereich|Bereich.bis_faktor]], beim anderen Feld sein Kehrwert), mit
+`offen`, wo sie ausgeschlossen ist ([[opencivil.core.bereich#Bereich|Bereich.bis_offen]]). Ein Feld
+kann mehrere begrenzen: der Rippenabstand beide Breiten der Rippe. Ebenso `quer_zu`
 an beiden Feldern, mit dem kleinsten Abstand als Linien in Grad
 ([[opencivil.core.bereich#Bereich|Bereich.quer_zu]], `mindestens`). Die Zahl des anderen Feldes
 kennt erst die Maske.
 
 Nimmt ein Feld ein Material ([[opencivil.projekt.lesen#materialfeld|materialfeld]]), steht dort, welche
-Arten: `stoffe`.
+Arten: `stoffe`. Hat es ein Zeichen fuer eine enge Maske
+([[opencivil.projekt.lesen#bereich|bereich]]), steht es dort mit seinem Namen: `zeichen`, `heisst`.
 
 Haelt ein Feld je Material eine Wahl ([[opencivil.projekt.lesen#je_material|je_material]]), steht dort,
 was ein Material ohne eigene waehlt: `vorgabe` -- und ist die Wahl
@@ -551,6 +558,7 @@ Ein Wert, wie er in einer Meldung steht -- ein Text in Anfuehrungszeichen.
 - [[opencivil.projekt.aufbau.setzung]]
 - [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.balkensystem3d]]
+- [[opencivil.projekt.blechdecken]]
 - [[opencivil.projekt.decke]]
 - [[opencivil.projekt.durchstanzen]]
 - [[opencivil.projekt.eintraege]]
@@ -569,5 +577,6 @@ Ein Wert, wie er in einer Meldung steht -- ein Text in Anfuehrungszeichen.
 - [[opencivil.projekt.stabilitaet]]
 - [[opencivil.projekt.staebe]]
 - [[opencivil.web.api]]
+- [[opencivil.web.dienst]]
 - [[opencivil.web.systemkatalog]]
 - [[opencivil.web.zeichengeometrie]]

@@ -1,5 +1,5 @@
 ---
-erzeugt: 664076e91bf5
+erzeugt: 30192cdf626f
 art: modul
 tags: [modul]
 ---
@@ -10,7 +10,8 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Der [[opencivil.projekt.querschnittsanalyse#QuerschnittsanalyseEintrag|QuerschnittsanalyseEintrag]]: Knoten, Polygone mit Material,
-Stahlprofile ([[opencivil.projekt.profile]]), Staebe und Stablinien,
+Stahlprofile ([[opencivil.projekt.profile]]), Blechverbunddecken
+([[opencivil.projekt.blechdecken]]), Staebe und Stablinien,
 Spannglieder ([[opencivil.projekt.spannglieder]]), Schubwaende,
 Hilfslinien, die Wahl der Werkstoffgesetze, die
 Lastfaelle, die Faelle von Knicken und Kippen bei Stahl und Holz
@@ -25,10 +26,12 @@ zeichnet ([[opencivil.projekt.querschnittsanalyse#QuerschnittsanalyseEintrag.pol
 
 Die Elemente tragen keine eigenen Koordinaten, sie verweisen auf Knoten --
 ein Polygon auf seine Ecken, ein Stab auf seine Lage, ein Profil auf seine
-Mitte, eine Linie auf Anfang und Ende. Wer einen Knoten verschiebt,
-verschiebt alles, was an ihm haengt. Jedes Element hat eine Kennung, die nie
-wiederkommt ([[opencivil.projekt.netz]]): K fuer Knoten, F fuer Flaechen,
-R fuer Stahlprofile, S fuer Staebe, P fuer Spannglieder, L fuer alle Linien.
+Mitte, eine Blechverbunddecke auf ihre Ecke links unten, eine Linie auf
+Anfang und Ende. Wer einen Knoten verschiebt, verschiebt alles, was an ihm
+haengt. Jedes Element hat eine Kennung, die nie wiederkommt
+([[opencivil.projekt.netz]]): K fuer Knoten, F fuer Flaechen, R fuer
+Stahlprofile, B fuer Blechverbunddecken, S fuer Staebe, P fuer Spannglieder,
+L fuer alle Linien.
 
 
 ## KOORDINATEN UND EINHEITEN
@@ -299,6 +302,7 @@ Elemente danach heissen weiter so wie vorher.
 - `spannglieder: List[dict] = field(default_factory=list)` – Je Spannglied die Felder der Beschreibung, `lage` als Punkt.
 - `hilfslinien: List[dict] = field(default_factory=list)` – Je Hilfslinie `von` und `bis` -- gerechnet wird mit ihnen nichts.
 - `profile: List[dict] = field(default_factory=list)` – Je Stahlprofil die Felder der Beschreibung, `lage` als Punkt -- die Mitte --, dazu `umrisse` in der Zeichnung (der erste aussen, dann die Loecher), `beschreibung`: «HEB 300, um 90° gedreht», und all das in einem: `profillage` ([[opencivil.stahlprofile.lage#Profillage|Profillage]]).
+- `blechdecken: List[dict] = field(default_factory=list)` – Je Blechverbunddecke `beton`, `blech`, `lage` als Punkt -- die Ecke links unten -- und `form` ([[opencivil.querschnitt.profilblech#Blechform|Blechform]]), dazu `namen`: je Materialfeld, wie Meldungen und Bericht den Teil nennen, «Blechverbunddecke 1, Beton» -- die Decke hat zwei Materialien, und «Blechverbunddecke 1: noch kein Material gewählt» sagte nicht, welches.
 - `fehler: List[dict] = field(default_factory=list)` – Was sich nicht aufloesen liess: `text` und `elemente` (Kennungen), wie eine Meldung.
 
 #### Elemente.flaechen
@@ -310,7 +314,8 @@ def flaechen(self) -> List[dict]
 
 Jede Flaeche, wie Pruefung und Rechnung sie sehen: erst die Polygone,
 in ihrer Folge, dann je Profil sein Umriss aus Baustahl und seine
-Loecher als Aussparungen, «Profil 1, innen». Je Flaeche `name`,
+Loecher als Aussparungen, «Profil 1, innen», dann je
+Blechverbunddecke ihr Beton ueber dem Blech. Je Flaeche `name`,
 `kennung` (beim Profil auch die des Lochs), `punkte`,
 `aussparung`, `material`, `stoffe` -- die Arten von Material,
 die das Element nimmt --, `ueberdeckung` (beim Profil null) und
@@ -335,6 +340,7 @@ Was er mit der Platte gleich angibt, steht in der Grundlage
 - `knoten: List[KnotenEintrag] = field(default_factory=list)`
 - `flaechen: List[FlaecheEintrag] = field(default_factory=list)`
 - `profile: List[ProfilEintrag] = field(default_factory=list)`
+- `blechdecken: List[BlechdeckeEintrag] = field(default_factory=list)` – Hoechstens eine: die Nachweise der Decke gelten ihr allein ([[opencivil.projekt.querschnittsanalyse#QuerschnittsanalyseEintrag.elemente|elemente]]).
 - `staebe: List[StabEintrag] = field(default_factory=list)`
 - `stablinien: List[StablinieEintrag] = field(default_factory=list)`
 - `spannglieder: List[SpanngliedEintrag] = field(default_factory=list)`
@@ -360,7 +366,22 @@ Was er mit der Platte gleich angibt, steht in der Grundlage
 - `duebel_h: float = bereich(100.0, heisst='Länge h_D', einheit=MM, ueber=0.0)`
 - `duebel_f_u: float = bereich(vd.F_U_VORGABE, heisst='Zugfestigkeit f_u', einheit=N_PRO_MM2…` – Ueber 500 N/mm² zaehlt sie in (31) mit 500 -- die Zahl bleibt, wie eingegeben.
 - `stuetze_kriechzahl: float = bereich(0.0, heisst='Kriechzahl φ', ab=0.0)` – Im Verbund: `φ(t,t_0)` des Betons fuer die Verbundstuetze (SIA 264:2014, (19)) -- einmal fuer die Analyse, der staendige Anteil je Fall. Null rechnet ohne Kriechen.
+- `blech_m: Optional[float] = bereich(None, heisst='Beiwert m', einheit=N_PRO_MM2, ueber=0.0)`
+- `blech_k: Optional[float] = bereich(None, heisst='Beiwert k', einheit=N_PRO_MM2)` – Bei einer Blechverbunddecke: `m` und `k` der m-k-Methode aus dem Datenblatt des Blechs (SIA 264:2014, (28)) -- `k` darf negativ sein. Leer: noch keine Zahl, der Laengsschub fehlt grau.
+- `blech_L: Optional[float] = bereich(None, heisst='Spannweite L', einheit=M, ueber=0.0)` – Bei einer Blechverbunddecke: die Spannweite ihres Felds in m -- fuer (28) und `L/d_p`.
+- `blech_feld: bd.Feld = bd.Feld.EINFELD`
+- `blech_last: bd.Belastung = bd.Belastung.GLEICHMAESSIG`
+- `blech_a: Optional[float] = bereich(None, heisst='Abstand a', einheit=M, ueber=0.0, bis_feld='ble…` – Mit zwei Einzellasten: ihr Abstand vom naechsten Auflager in m, hoechstens L/2.
 - `spannungsfaelle: List[QASpannungsfallEintrag] = field(default_factory=list)` – Die Spannung-Dehnung-Analysen -- kein Nachweis, ein Blick in den Querschnitt.
+
+#### QuerschnittsanalyseEintrag.laengsschub
+
+```python
+@property
+def laengsschub(self) -> bd.Laengsschub
+```
+
+Was der Laengsschub einer Blechverbunddecke ausser ihrem Querschnitt braucht.
 
 #### QuerschnittsanalyseEintrag.materialien
 
@@ -381,7 +402,7 @@ def leer(self) -> bool
 ```
 
 Ob noch nichts gezeichnet ist, was traegt: keine Flaeche, kein Profil,
-kein Stab, keine Stablinie, kein Spannglied, keine Schubwand. Knoten
+keine Decke, kein Stab, keine Stablinie, kein Spannglied, keine Schubwand. Knoten
 und Hilfslinien allein sind Bauhilfen. So beginnt eine neue Analyse
 (Benutzer, 2026-10-19), und so gibt es nichts zu rechnen -- aber auch
 keinen Fehler.
@@ -435,6 +456,15 @@ def profil(self, y: float, z: float, profil: str, **felder: Any) -> ProfilEintra
 Ein Stahlprofil der Tabelle, «HEB 300», die Mitte bei `(y, z)`; die
 Felder wie [[opencivil.projekt.profile#ProfilEintrag|ProfilEintrag]]. Einen Namen, den die Tabelle nicht
 kennt, sagt ein [[opencivil.projekt.lesen#ProjektFehler|ProjektFehler]] -- wie im Balkensystem.
+
+#### QuerschnittsanalyseEintrag.blechdecke
+
+```python
+def blechdecke(self, y: float, z: float, **felder: Any) -> BlechdeckeEintrag
+```
+
+Eine Blechverbunddecke, die Ecke links unten bei `(y, z)`; die
+Felder wie [[opencivil.projekt.blechdecken#BlechdeckeEintrag|BlechdeckeEintrag]].
 
 #### QuerschnittsanalyseEintrag.stab
 
@@ -585,6 +615,7 @@ Feldmoment; das Rechteck gibt es als Vorlage im Zeichenfenster.
 - [[opencivil.core.einheiten]]
 - [[opencivil.material.holz]]
 - [[opencivil.nachweis.rechenwahl]]
+- [[opencivil.projekt.blechdecken]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.fallnamen]]
 - [[opencivil.projekt.lesen]]
@@ -599,6 +630,7 @@ Feldmoment; das Rechteck gibt es als Vorlage im Zeichenfenster.
 - [[opencivil.stahlbau.stabilitaet]]
 - [[opencivil.stahlprofile.lage]]
 - [[opencivil.stahlprofile.tabelle]]
+- [[opencivil.verbund.blechdecke]]
 - [[opencivil.verbund.duebel]]
 
 ## Gebraucht von
@@ -607,6 +639,7 @@ Feldmoment; das Rechteck gibt es als Vorlage im Zeichenfenster.
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.aufbau.querschnittsanalyse]]
 - [[opencivil.projekt.beispiele]]
+- [[opencivil.projekt.beispiele_verbund]]
 - [[opencivil.projekt.projekt]]
 - [[opencivil.web.api]]
 - [[opencivil.web.zeichengeometrie]]

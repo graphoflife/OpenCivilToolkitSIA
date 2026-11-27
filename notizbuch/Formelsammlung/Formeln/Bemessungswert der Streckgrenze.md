@@ -1,14 +1,22 @@
 ---
-erzeugt: 55d1da9e476d
+erzeugt: 5c086c0d63aa
 art: formel
 tags: [formel]
-normstelle: "SIA 263:2013, 4.1.1, (1); 4.1.3"
+normstelle: ["SIA 263:2013, 4.1.1, (1); 4.1.3", "SIA 264:2014, 4.1.3, (1); 4.1.5"]
 ---
-> [!info] Normstelle
-> SIA 263:2013, 4.1.1, (1); 4.1.3
+> [!info] Normstellen
+> SIA 263:2013, 4.1.1, (1); 4.1.3 · SIA 264:2014, 4.1.3, (1); 4.1.5
+
+*In der Herleitung: «Bemessungswert der Streckgrenze»*
 
 $$
 f_{yd} = \frac{f_{y}}{\gamma_{M1}}
+$$
+
+*In der Herleitung: «Bemessungswert der Streckgrenze»*
+
+$$
+f_{ypd} = \frac{f_{yp}}{\gamma_{ap}}
 $$
 
 ## Grössen
@@ -17,6 +25,8 @@ $$
 | --- | --- | --- | --- |
 | $f_{y}$ | Streckgrenze | N/mm² | Vorgabe |
 | $\gamma_{M1}$ | Widerstandsbeiwert für Festigkeits- und Stabilitätsnachweise | – | Vorgabe |
+| $f_{yp}$ | Streckgrenze des Profilblechstahls | N/mm² | Vorgabe |
+| $\gamma_{ap}$ | Widerstandsbeiwert des Profilblechstahls | – | Vorgabe |
 
 ## Beispiel
 
@@ -26,13 +36,21 @@ $$
 f_{yd,\text{S355}} = \frac{f_{y,\text{S355}}}{\gamma_{M1,\text{S355}}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2}}{1.05} = 338\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
+Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
+
+$$
+f_{ypd} = \frac{f_{yp}}{\gamma_{ap}} = \frac{350\,\mathrm{N}/\mathrm{mm}^{2}}{1.05} = 333\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
 ## Im Code
 
 - [[opencivil.material.baustahl]]
+- [[opencivil.material.profilblech]]
 
 ## Themen
 
 - [[Baustahl]]
+- [[Profilblechstahl]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

@@ -31,6 +31,7 @@ from opencivil.core.bereich import Bereich
 from opencivil.core.einheiten import Groesse
 from opencivil.core.nachweis import Nachweis, NachweisUrteil
 from opencivil.core.rechenwerk import Rechenwerk
+from opencivil.core.sprache import aufgezaehlt
 from opencivil.core.wert import Kennzahl
 from opencivil.material.arten import MATERIALARTEN
 from opencivil.material.basis import Baustoff, Baustoffart, KennwertVorlage
@@ -131,7 +132,8 @@ class Aufbau:
                       "qa_rissnormalkraft", "qa_zwaengung_biegung", "qa_spannung_riss",
                       "qa_spannung", "qa_knicken", "qa_stahl", "qa_stahl_schub",
                       "qa_stahl_stabilitaet", "qa_verbund", "qa_verbund_schub",
-                      "qa_verbund_stuetze", "qa_holz", "qa_holz_schub", "qa_holz_stabilitaet",
+                      "qa_verbund_stuetze", "qa_blech", "qa_blech_schub", "qa_holz",
+                      "qa_holz_schub", "qa_holz_stabilitaet",
                       "durchstanzen", "grundbruch", "gleiten", "setzung", "pfahl_aussen",
                       "pfahl_innen", "pfahl_quer", "pfahl_innen_quer", "erdbeben")
 
@@ -554,8 +556,7 @@ def materialgrund(kennung: str, gefunden: Optional[Tuple[str, str]],
     arten = (art,) if isinstance(art, str) else tuple(art)
     if gefunden[0] not in arten:
         namen = [Baustoffart(a).beschriftung for a in arten]
-        liste = " oder ".join(filter(None, (", ".join(namen[:-1]), namen[-1])))
-        return Grund(f"«{gefunden[1]}» ist kein {liste}", falsch=True)
+        return Grund(f"«{gefunden[1]}» ist kein {aufgezaehlt(namen, 'oder')}", falsch=True)
     return None
 
 

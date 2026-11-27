@@ -1,5 +1,5 @@
 ---
-erzeugt: 8b639642b954
+erzeugt: 463dfba9396a
 art: modul
 tags: [modul]
 ---
@@ -274,12 +274,14 @@ Der Zustand bei `N` an der Nulllinie mit der Zugrichtung `n`.
 
 ## Gebraucht von
 
+- [[opencivil.nachweis.qa_blechverbund]]
 - [[opencivil.nachweis.qa_stahl]]
 - [[opencivil.nachweis.qa_stahl_kennzahlen]]
 - [[opencivil.nachweis.qa_verbund]]
 - [[opencivil.nachweis.qa_verbund_kennzahlen]]
 - [[opencivil.stahlbau.querschnitt]]
 - [[opencivil.stahlbau.widerstand]]
+- [[opencivil.verbund.blechdecke]]
 - [[opencivil.verbund.querschnitt]]
 - [[opencivil.verbund.stuetze]]
 - [[opencivil.verbund.widerstand]]

@@ -1,5 +1,5 @@
 ---
-erzeugt: b3fdd9227be9
+erzeugt: b8cf9fc302df
 art: modul
 tags: [modul]
 ---
@@ -14,6 +14,7 @@ die Nachweise in [[opencivil.nachweis]].
 
 ## Module
 
+- [[opencivil.verbund.blechdecke]] – Blechverbunddecken nach SIA 264:2014, 5.4.
 - [[opencivil.verbund.duebel]] – Kopfbolzenduebel nach SIA 264:2014, 6.1.
 - [[opencivil.verbund.querschnitt]] – ein gezeichneter Querschnitt aus Baustahl und Beton.
 - [[opencivil.verbund.stuetze]] – eine Verbundstuetze nach SIA 264:2014, 5.3.

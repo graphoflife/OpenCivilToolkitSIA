@@ -1,5 +1,5 @@
 ---
-erzeugt: 64953b5bdca2
+erzeugt: a7c752d664d4
 art: modul
 tags: [modul]
 ---
@@ -14,9 +14,10 @@ die [[opencivil.querschnitt.analyse#Querschnittsanalyse|Querschnittsanalyse]] un
 Nachweise: Biegung und Normalkraft, Querkraft und Torsion, Duktilitaet,
 sproedes Versagen, die Zwaengungen, die Stahlspannungen und das Knicken
 ([[opencivil.projekt.aufbau.querschnittsanalyse#bauen|bauen]]) -- dazu die Kennzahlen. Ein Querschnitt aus Stahl hat seine
-eigenen ([[opencivil.projekt.aufbau.querschnittsanalyse#_stahl|_stahl]]), einer im Verbund ([[opencivil.projekt.aufbau.querschnittsanalyse#_verbund|_verbund]]) und einer aus
-Holz auch ([[opencivil.projekt.aufbau.querschnittsanalyse#_holz|_holz]]). Eine leere oder fehlerhafte Zeichnung wird kein
-Bauteil, nur ein Hinweis.
+eigenen ([[opencivil.projekt.aufbau.querschnittsanalyse#_stahl|_stahl]]), einer im Verbund ([[opencivil.projekt.aufbau.querschnittsanalyse#_verbund|_verbund]]), eine
+Blechverbunddecke ([[opencivil.projekt.aufbau.querschnittsanalyse#_blechverbund|_blechverbund]]) und einer aus Holz auch
+([[opencivil.projekt.aufbau.querschnittsanalyse#_holz|_holz]]). Eine leere oder fehlerhafte Zeichnung wird kein Bauteil,
+nur ein Hinweis.
 
 ## Inhalt
 
@@ -37,12 +38,13 @@ Stahlspannungen, sobald es Lastfaelle gibt
 Knicken, sobald ein Fall eingeschaltet ist.
 
 Das alles beim Stahlbeton. Ein Querschnitt aus Stahl rechnet nach SIA 263
-([[opencivil.projekt.aufbau.querschnittsanalyse#_stahl|_stahl]]), einer im Verbund nach SIA 264 ([[opencivil.projekt.aufbau.querschnittsanalyse#_verbund|_verbund]]), einer
-aus Holz nach SIA 265 ([[opencivil.projekt.aufbau.querschnittsanalyse#_holz|_holz]]). Einer aus mehreren Hoelzern
-rechnet bisher nur seine Werte -- Flaeche, Schwerpunkt,
-Traegheitsmomente --; seine Zusammenfassung sagt, dass die Nachweise
-fehlen ([[opencivil.projekt.aufbau.querschnittsanalyse#ohne_nachweise|ohne_nachweise]]). Seine Spannung-Dehnung-Analysen rechnet
-er trotzdem. Der Verbund hat noch keine ([[opencivil.projekt.aufbau.querschnittsanalyse#ohne_analysen|ohne_analysen]]).
+([[opencivil.projekt.aufbau.querschnittsanalyse#_stahl|_stahl]]), einer im Verbund nach SIA 264 ([[opencivil.projekt.aufbau.querschnittsanalyse#_verbund|_verbund]]), eine
+Blechverbunddecke auch ([[opencivil.projekt.aufbau.querschnittsanalyse#_blechverbund|_blechverbund]]), einer aus Holz nach
+SIA 265 ([[opencivil.projekt.aufbau.querschnittsanalyse#_holz|_holz]]). Einer aus mehreren Hoelzern rechnet bisher nur
+seine Werte -- Flaeche, Schwerpunkt, Traegheitsmomente --; seine
+Zusammenfassung sagt, dass die Nachweise fehlen ([[opencivil.projekt.aufbau.querschnittsanalyse#ohne_nachweise|ohne_nachweise]]).
+Seine Spannung-Dehnung-Analysen rechnet er trotzdem. Der Verbund und die
+Blechverbunddecke haben noch keine ([[opencivil.projekt.aufbau.querschnittsanalyse#ohne_analysen|ohne_analysen]]).
 
 Ist noch nichts gezeichnet ([[opencivil.projekt.querschnittsanalyse#QuerschnittsanalyseEintrag.leer|QuerschnittsanalyseEintrag.leer]]), gibt
 es nichts zu rechnen und kein Bauteil -- aber auch keinen Fehler, der das
@@ -90,6 +92,20 @@ sagt es. Sobald ein Stabilitaetsfall eingeschaltet ist, die
 Verbundstuetze ([[opencivil.nachweis.qa_verbund_stuetze|qa_verbund_stuetze]]); das
 Kippen des Verbundtraegers fehlt noch, ebenso die
 Spannung-Dehnung-Analysen ([[opencivil.projekt.aufbau.querschnittsanalyse#ohne_analysen|ohne_analysen]]).
+
+### _blechverbund
+
+```python
+def _blechverbund(eintrag: QuerschnittsanalyseEintrag, analyse: Querschnittsanalyse, teil: Bauteil, aufbau: Aufbau) -> Bauteil
+```
+
+Eine Blechverbunddecke nach SIA 264, 5.4
+([[opencivil.nachweis.qa_blechverbund|qa_blechverbund]]): je Lastfall Biegung und
+Normalkraft, plastisch, und Querkraft und Laengsschub, sobald einer
+`V_z` hat -- beide lesen ihre Widerstaende aus den Kennzahlen. Die
+Decke traegt in einer Richtung: ein Lastfall mit `M_z`, `V_y` oder
+`T` sagt, dass sie nicht nachgewiesen werden. Eine Analyse rechnet
+eine Decke ([[opencivil.projekt.querschnittsanalyse#QuerschnittsanalyseEintrag.elemente|QuerschnittsanalyseEintrag.elemente]]).
 
 ### _holz
 
@@ -156,10 +172,10 @@ def ohne_analysen(bauweise: Bauweise) -> str
 
 Warum ein Querschnitt dieser Bauweise keine Spannung-Dehnung-Analyse hat
 -- leer, wo er eine hat. Ein Satz mit Punkt, fuer die Zeichnung
-([[opencivil.web.zeichengeometrie#geometrie|geometrie]]). Der Verbund rechnet
-seine Nachweise plastisch; seine Linien braeuchten den Riss am ideellen
-Querschnitt, mit `E_a/E_cm` gewichtet, und die Werte der Analyse sind
-ungewichtet.
+([[opencivil.web.zeichengeometrie#geometrie|geometrie]]). Der Verbund und die
+Blechverbunddecke rechnen ihre Nachweise plastisch; ihre Linien
+braeuchten den Riss am ideellen Querschnitt, mit `E_a/E_cm` gewichtet,
+und die Werte der Analyse sind ungewichtet.
 
 ### _in_si
 
@@ -206,6 +222,7 @@ Staeben gibt.
 - [[opencivil.core.berechnung]]
 - [[opencivil.material.basis]]
 - [[opencivil.material.spannstahl]]
+- [[opencivil.nachweis.qa_blechverbund]]
 - [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.qa_holz]]
 - [[opencivil.nachweis.qa_holz_kennzahlen]]
@@ -224,6 +241,7 @@ Staeben gibt.
 - [[opencivil.nachweis.schubwandnachweis]]
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.aufbau.kern]]
+- [[opencivil.projekt.blechdecken]]
 - [[opencivil.projekt.lesen]]
 - [[opencivil.projekt.querschnittsanalyse]]
 - [[opencivil.projekt.spannglieder]]
@@ -231,6 +249,7 @@ Staeben gibt.
 - [[opencivil.querschnitt.bauweise]]
 - [[opencivil.querschnitt.biegung]]
 - [[opencivil.querschnitt.geometrie]]
+- [[opencivil.querschnitt.profilblech]]
 - [[opencivil.querschnitt.spannglieder]]
 - [[opencivil.verbund.duebel]]
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: 2a6ccbffe101
+erzeugt: 39eb4de9e482
 art: modul
 tags: [modul]
 ---
@@ -120,6 +120,7 @@ Was eine Vorlage baut -- in mm, der Ursprung unten links.
 - `staebe: List[dict] = field(default_factory=list)` – Je Stab `lage` und `durchmesser`.
 - `stablinien: List[dict] = field(default_factory=list)` – Je Linie `von`, `bis` und die Felder, die von der Vorgabe abweichen.
 - `schubwaende: List[dict] = field(default_factory=list)` – Je Wand `von`, `bis` und `dicke`.
+- `bleche: List[dict] = field(default_factory=list)` – Je Profilblech `punkte`, seine Linie -- nur in der Skizze einer Blechverbunddecke.
 - `masslinien: List[dict] = field(default_factory=list)` – Nur fuer die Skizze: `von`, `bis`, `text` und `seite` ('unten', 'oben', 'links', 'rechts') -- wohin sie neben dem Bauteil steht.
 
 #### Teile.als_dict
@@ -222,8 +223,9 @@ Die Vorlage zu einem Schluessel -- `ValueError`, wenn es sie nicht gibt.
 ## Gebraucht von
 
 - [[opencivil.pfahl.innen]]
-- [[opencivil.projekt.beispiele]]
+- [[opencivil.projekt.beispiele_verbund]]
 - [[opencivil.projekt.querschnittsanalyse]]
+- [[opencivil.querschnitt.profilblech]]
 - [[opencivil.stabwerk.querschnitte]]
 - [[opencivil.stahlprofile.formen]]
 - [[opencivil.stahlprofile.lage]]

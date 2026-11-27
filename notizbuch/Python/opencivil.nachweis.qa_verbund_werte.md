@@ -1,5 +1,5 @@
 ---
-erzeugt: 24a66f3b45c9
+erzeugt: 1743cd91db5f
 art: modul
 tags: [modul]
 ---
@@ -19,6 +19,9 @@ Festigkeiten und schreiben dieselben Tabellen; beides steht hier, je einmal:
 * die Tabelle der Bleche mit ihren Klassen ([[opencivil.nachweis.qa_verbund_werte#klassen|klassen]]);
 * `β` nach 5.1.2.2 mit `x_p` und `h` ([[opencivil.nachweis.qa_verbund_werte#beta|beta]]).
 
+Die Blechverbunddecke ([[opencivil.nachweis.qa_blechverbund]]) liest
+dieselben Festigkeiten: ihr Profilblech ist eine Gruppe wie ein Betonstahl.
+
 
 ## DIE FESTIGKEITEN (SIA 264:2014, 4.1.3 und 5.1.2.1)
 
@@ -27,7 +30,9 @@ Baustahl `f_y/γ_a` gezogen und gedrueckt, je Dicke wie im Stahl
 `γ_M1` des Baustahls -- 4.1.5 nennt 1.05, wie SIA 263. Beton gedrueckt
 `0.85 η_fc f_ck/γ_c` mit `η_fc = 1` und ohne `η_t`, also nicht `f_cd`
 der SIA 262; gezogen nichts (4.3.2.1). Betonstahl `f_sd` seines Materials,
-gedrueckt mit dem Wert fuer Druck.
+gedrueckt mit dem Wert fuer Druck. Profilblech `f_yp/γ_ap` (4.1.3, (1)),
+nur gezogen: gedrueckt beult das duenne Blech, und das Werkzeug rechnet es
+dort nicht (nach Vorgabe, nicht nachgeschlagen).
 
 
 ## BEMESSUNG ODER CHARAKTERISTISCH
@@ -95,7 +100,8 @@ Der Beiwert der Gruppe `g` -- eins mit charakteristischen Werten.
 def kennwert(self, g: int) -> float
 ```
 
-Die charakteristische Festigkeit: `f_y` in der Dicke der Gruppe, `f_ck`, `f_sk`.
+Die charakteristische Festigkeit: `f_y` in der Dicke der Gruppe,
+`f_ck`, `f_sk` oder `f_yp`.
 
 #### Verbundwerte.festigkeiten
 
@@ -202,6 +208,7 @@ hierher.
 - `MODUL = {Baustoffart.BAUSTAHL: 'E_a', Baustoffart.BETON: 'E_cm', Baustoffart.…` – Der Elastizitaetsmodul je Art.
 - `_GAMMA = {Baustoffart.BAUSTAHL: 'gamma_M1', Baustoffart.BETON: 'gamma_c', Baus…` – Der Beiwert je Art -- beim Baustahl `γ_M1`, im Verbund `γ_a` genannt.
 - `_ANSATZ = {Baustoffart.BAUSTAHL: ('f_{yd} = \\frac{f_y}{\\gamma_a}', 'f_{yd} = …` – Je Art der Teil des Ansatzes, mit und ohne Beiwert.
+- `_ZEICHEN = {Baustoffart.BAUSTAHL: ('f_y in der Dicke der Gruppe', 'γ_a = γ_M1 de…` – Je Art, was in der Tabelle der Festigkeiten `f_k` und `γ` sind.
 - `SPANNUNG = '\\ [\\mathrm{N}/\\mathrm{mm}^2]'`
 - `MIT_BETA = 'Plastischer Biegewiderstand mit β'` – Wie die Formel mit `β` in der Formelsammlung heisst -- in den Kennzahlen und je Lastfall.
 
@@ -210,6 +217,7 @@ hierher.
 - [[opencivil.core.berechnung]]
 - [[opencivil.core.latex]]
 - [[opencivil.core.protokoll]]
+- [[opencivil.core.sprache]]
 - [[opencivil.core.wert]]
 - [[opencivil.material.basis]]
 - [[opencivil.nachweis.qa_stahl_werte]]
@@ -221,6 +229,7 @@ hierher.
 
 ## Gebraucht von
 
+- [[opencivil.nachweis.qa_blechverbund]]
 - [[opencivil.nachweis.qa_verbund]]
 - [[opencivil.nachweis.qa_verbund_kennzahlen]]
 - [[opencivil.nachweis.qa_verbund_stuetze]]

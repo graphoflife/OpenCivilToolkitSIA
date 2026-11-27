@@ -1,5 +1,5 @@
 ---
-erzeugt: 506849e30f47
+erzeugt: 489f183613d1
 art: modul
 tags: [modul]
 ---
@@ -609,6 +609,7 @@ Oberflaeche und alle Berichte gehen.
 - [[opencivil.nachweis.knicken]]
 - [[opencivil.nachweis.lagennachweis]]
 - [[opencivil.nachweis.mindestbewehrung]]
+- [[opencivil.nachweis.qa_blechverbund]]
 - [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.qa_holz]]
 - [[opencivil.nachweis.qa_holz_kennzahlen]]

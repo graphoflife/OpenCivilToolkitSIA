@@ -1,11 +1,11 @@
 ---
-erzeugt: 5e68ce25ee12
+erzeugt: 7b01fd2b27aa
 art: formel
 tags: [formel]
-normstelle: ["SIA 262:2025, 4.2.2.2, Figur 16", "SIA 262:2025, 4.3.3.2.2, (38)", "SIA 263:2013, 3.2.2.4", "SIA 262:2025, 4.2.3.3, Figur 17"]
+normstelle: ["SIA 262:2025, 4.2.2.2, Figur 16", "SIA 262:2025, 4.3.3.2.2, (38)", "SIA 263:2013, 3.2.2.4", "SIA 262:2025, 4.2.3.3, Figur 17", "SIA 264:2014, 3.1.1"]
 ---
 > [!info] Normstellen
-> SIA 262:2025, 4.2.2.2, Figur 16 · SIA 262:2025, 4.3.3.2.2, (38) · SIA 263:2013, 3.2.2.4 · SIA 262:2025, 4.2.3.3, Figur 17
+> SIA 262:2025, 4.2.2.2, Figur 16 · SIA 262:2025, 4.3.3.2.2, (38) · SIA 263:2013, 3.2.2.4 · SIA 262:2025, 4.2.3.3, Figur 17 · SIA 264:2014, 3.1.1
 
 *In der Herleitung: «Fliessdehnung (Bemessungswert)»*
 
@@ -31,6 +31,12 @@ $$
 \varepsilon_{pd}^{\mathrm{Litze}} = \frac{f_{pd}}{E_p^{\mathrm{Litze}}}
 $$
 
+*In der Herleitung: «Fliessdehnung des Profilblechstahls»*
+
+$$
+\varepsilon_{yp} = \frac{f_{yp}}{E_a}
+$$
+
 *In der Herleitung: «Grösste Zugdehnung in der Bewehrung»*
 
 $$
@@ -48,6 +54,8 @@ $$
 | $f_{pd}$ | Bemessungswert der Fliessgrenze | N/mm² | [[Bemessungswert der Fliessgrenze]] |
 | $E_p$ | Elastizitätsmodul von Drähten und Stäben | N/mm² | Vorgabe |
 | $E_p^{\mathrm{Litze}}$ | Elastizitätsmodul von Litzen | N/mm² | Vorgabe |
+| $f_{yp}$ | Streckgrenze des Profilblechstahls | N/mm² | Vorgabe |
+| $E_a$ | Elastizitätsmodul des Stahls | N/mm² | Vorgabe |
 | $f_{yk}$ | Charakteristische Fliessgrenze | N/mm² | Vorgabe |
 
 ## Beispiel
@@ -79,6 +87,12 @@ $$
 Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
+\varepsilon_{yp} = \frac{f_{yp}}{E_a} = \frac{350\,\mathrm{N}/\mathrm{mm}^{2}}{210000\,\mathrm{N}/\mathrm{mm}^{2}} = 1.67\,\text{‰}
+$$
+
+Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
+
+$$
 \varepsilon_y = \frac{f_{yk}}{E_s} = \frac{500\,\mathrm{N}/\mathrm{mm}^{2}}{200000\,\mathrm{N}/\mathrm{mm}^{2}} = 2.5\,\text{‰} \quad < \quad \varepsilon_{s,x} = 3.47\,\text{‰}
 $$
 
@@ -86,11 +100,13 @@ $$
 
 - [[Beiwert für den Querkraftwiderstand]]
 - [[Grenzdehnung des Baustahls]]
+- [[Grenzdehnung des Profilblechstahls]]
 
 ## Im Code
 
 - [[opencivil.material.baustahl]]
 - [[opencivil.material.betonstahl]]
+- [[opencivil.material.profilblech]]
 - [[opencivil.material.spannstahl]]
 - [[opencivil.nachweis.kennzahlen#Plattenkennzahlen|Plattenkennzahlen._ohne_buegel]]
 - [[opencivil.nachweis.spannungsbegrenzung#Spannungsbegrenzung._protokoll_fliessen|Spannungsbegrenzung._protokoll_fliessen]]
@@ -102,6 +118,7 @@ $$
 - [[Kennzahlen]]
 - [[Baustahl]]
 - [[Spannstahl]]
+- [[Profilblechstahl]]
 - [[Stahlspannung aus Rissbreite]]
 - [[Spannung-Dehnung-Analyse]]
 

@@ -8,7 +8,8 @@
  *   Elemente           je Art eine Gruppe, je Element eine Zeile -- jede
  *                      klappt auf und zu, zu Beginn zu; ein Spannglied mit
  *                      seiner Spannkraft P∞, ein Stahlprofil, wie es liegt,
- *                      beides vom Kern
+ *                      beides vom Kern; eine Blechverbunddecke mit ihren
+ *                      Rippen und ihren zwei Materialien
  *
  * Meldungen, Gruppen und Zeilen baut cad_app.js, wie im Balkensystem und in
  * der Decke; ein Klick wählt das Element im Fenster. Jede Zahl steht so in
@@ -64,6 +65,10 @@ export function uebersicht(a) {
       // «HEB 300, um 90° gedreht · S355» und rechts die Mitte.
       ['Stahlprofile', z.profile.map((e) => element(e.kennung,
         `${profilinfo.get(e.kennung)?.beschreibung || e.profil} · ${stoffname(e.stahl)}`, lage(e.knoten)))],
+      // «5 × 200, h 140 · C25/30, SE 350 G» und rechts die Ecke links unten.
+      ['Blechverbunddecken', (z.blechdecken || []).map((e) => element(e.kennung,
+        `${e.rippen} × ${zahlText(e.b_s)}, h ${zahlText(e.h)} · ${stoffname(e.beton)}, ${stoffname(e.blech)}`,
+        lage(e.knoten)))],
       ['Stäbe', z.staebe.map((s) => element(s.kennung,
         `⌀${zahlText(s.durchmesser)} ${stoffname(s.stahl)}`, lage(s.knoten)))],
       ['Spannglieder', z.spannglieder.map((s) => {

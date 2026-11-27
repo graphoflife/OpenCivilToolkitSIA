@@ -7,6 +7,63 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-27 · Blechverbunddecken nach SIA 264
+
+Aus dem Plan vom 2026-11-25, Schritt 14d, zweiter Teil: die
+Blechverbunddecke nach SIA 264:2014, 5.4, als Element der
+Querschnittsanalyse.
+
+**Vorher und nachher.** Vorher liess sich kein Profilblech zeichnen.
+Nachher gibt es die Vorlage «Blechverbunddecke»: Rippen, Abstand, Höhe,
+die zwei Breiten der Rippe, die Fläche des Blechs je Meter und die Dicke
+der Decke; daneben zeigt eine Rippe, was jedes Zeichen meint. Eingesetzt
+wird die Decke mit ihrem Beton und ihrem Blech. Fünf Rippen 60 mm hoch,
+oben 120 und unten 70 mm breit, im Abstand von 200 mm, 1100 mm² je
+Meter, unter 140 mm C25/30 aus SE 350 G haben d_p = 108.9 mm. Sie tragen
+M_Rd = 35.2 kNm und V_Rd = 41.4 kN; mit m = 150 und k = 0.1 N/mm² über
+ein Einfeld von 3 m V_L,Rd = 27.9 kN. L/d_p = 27.5 liegt über 26: ein
+Hinweis sagt, dass die Durchbiegung zu rechnen wäre.
+
+**Die Decke ist ein Element mit ihrem Beton**, nicht ein Blech unter
+einem gezeichneten Polygon: so passen Beton und Blech immer zueinander,
+und eine andere Rippe ändert beide. Bewehrung zeichnet man in ihren Beton
+wie in jedes Polygon. Verschoben wird sie wie ein Profil, geändert im
+schwebenden Fenster. Eine Analyse rechnet eine Decke; eine zweite meldet
+die Zeichnung rot.
+
+**Eine Richtung.** Die Decke trägt entlang ihrer Rippen (5.4.1.1):
+gerechnet wird einachsig, mit N, M_y und V_z über die ganze gezeichnete
+Breite. Die Tragsicherheit hat darum keinen Schalter «einachsig | schief»,
+sondern sagt es in einem Satz. Die Spalten M_z, V_y und T stehen nur,
+solange ein Lastfall dort eine Zahl hat; ein solcher Fall sagt gelb, dass
+sie nicht nachgewiesen werden.
+
+**Der Längsschub hat eine eigene Kachel.** m und k aus dem Datenblatt,
+das Feld – Einfeld, Endfeld mit 0.9 L, Innenfeld mit 0.8 L – und die
+Last – gleichmässig mit L_s = L/4, zwei Einzellasten mit ihrem Abstand
+a – als Schalter mit Bild, darunter die Spannweite. Was fehlt, sagt die
+Kachel grau, «m, k und L fehlen»; der Rest der Decke rechnet weiter.
+
+**Unter negativem Moment zählt das Blech nicht** (5.4.3.2). Ohne
+Betonstahl trägt über der Stütze nichts Zug: der Erfüllungsgrad ist null,
+rot, mit dem Grund. Eine Decke von 200 mm auf hinterschnittenen Rippen
+mit ⌀10 @ 150 oben trägt dort 37.0 kNm.
+
+**Die Oberfläche.** Stahlprofil und Decke sind beide Elemente mit einem
+Umriss vom Kern. Was sie teilen, steht in `qa_umriss.js`, je Art eine
+Beschreibung in `UMRISSE`. Die Knöpfe neben der Auswahl – Bewehrung in
+die Überdeckung, Hilfslinien als Fläche – zogen nach `qa_aktionen.js`,
+damit `qa_zeichnung.js` unter 1000 Zeilen bleibt; die Beispiele des
+Verbunds zogen nach `beispiele_verbund.py`.
+
+**Formelsammlung.** Neun neue Seiten mit Theorie, verlinkt in den Themen
+«Blechverbunddecke» und «Profilblechstahl»: das Prüfprojekt hat jetzt
+einen Profilblechstahl, die «Blechverbunddecke» und die «Hinterschnittene
+Blechdecke». Was nach Vorgabe eingebaut ist und was
+noch fehlt, steht im [[TODO]].
+
+---
+
 ## 2026-11-27 · Profilblechstahl als Material
 
 Aus dem Plan vom 2026-11-25, Schritt 14d, erster Teil: der Stahl der

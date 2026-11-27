@@ -3,7 +3,8 @@ opencivil/projekt/querschnittsanalyse.py -- ein gezeichneter Querschnitt, wie di
 
 VERANTWORTUNG:
 Der :class:`QuerschnittsanalyseEintrag`: Knoten, Polygone mit Material,
-Stahlprofile (:mod:`opencivil.projekt.profile`), Staebe und Stablinien,
+Stahlprofile (:mod:`opencivil.projekt.profile`), Blechverbunddecken
+(:mod:`opencivil.projekt.blechdecken`), Staebe und Stablinien,
 Spannglieder (:mod:`opencivil.projekt.spannglieder`), Schubwaende,
 Hilfslinien, die Wahl der Werkstoffgesetze, die
 Lastfaelle, die Faelle von Knicken und Kippen bei Stahl und Holz
@@ -16,10 +17,12 @@ zeichnet (:meth:`QuerschnittsanalyseEintrag.polygon` und folgende).
 KNOTEN:
 Die Elemente tragen keine eigenen Koordinaten, sie verweisen auf Knoten --
 ein Polygon auf seine Ecken, ein Stab auf seine Lage, ein Profil auf seine
-Mitte, eine Linie auf Anfang und Ende. Wer einen Knoten verschiebt,
-verschiebt alles, was an ihm haengt. Jedes Element hat eine Kennung, die nie
-wiederkommt (:mod:`opencivil.projekt.netz`): K fuer Knoten, F fuer Flaechen,
-R fuer Stahlprofile, S fuer Staebe, P fuer Spannglieder, L fuer alle Linien.
+Mitte, eine Blechverbunddecke auf ihre Ecke links unten, eine Linie auf
+Anfang und Ende. Wer einen Knoten verschiebt, verschiebt alles, was an ihm
+haengt. Jedes Element hat eine Kennung, die nie wiederkommt
+(:mod:`opencivil.projekt.netz`): K fuer Knoten, F fuer Flaechen, R fuer
+Stahlprofile, B fuer Blechverbunddecken, S fuer Staebe, P fuer Spannglieder,
+L fuer alle Linien.
 
 KOORDINATEN UND EINHEITEN:
 y nach rechts, z nach oben, alles in Millimetern -- so, wie gezeichnet und
@@ -58,6 +61,7 @@ from opencivil.material.holz import Feuchteklasse
 from opencivil.projekt.lesen import (
     ProjektFehler, bereich, einer_von, je_material, materialfeld, ort_von, stoffe_des_felds, teil,
 )
+from opencivil.projekt.blechdecken import BlechdeckeEintrag
 from opencivil.projekt.netz import Netz, neue_kennung
 from opencivil.projekt.profile import ProfilEintrag
 from opencivil.projekt.spannglieder import SpanngliedEintrag
@@ -65,6 +69,7 @@ from opencivil.projekt.stabilitaet import QAStabilitaetEintrag
 from opencivil.stahlbau.stabilitaet import Knickkurve, Stabfall
 from opencivil.stahlprofile import lage as profillage
 from opencivil.stahlprofile import tabelle as profiltabelle
+from opencivil.verbund import blechdecke as bd
 from opencivil.verbund import duebel as vd
 
 #: Schnitte eines Buegels durch eine Schubwand: so viele Schenkel kreuzen sie.
@@ -380,6 +385,15 @@ class Elemente:
     einem: ``profillage`` (:class:`~opencivil.stahlprofile.lage.Profillage`).
     """
 
+    blechdecken: List[dict] = field(default_factory=list)
+    """
+    Je Blechverbunddecke ``beton``, ``blech``, ``lage`` als Punkt -- die
+    Ecke links unten -- und ``form`` (:class:`~opencivil.querschnitt.profilblech.Blechform`),
+    dazu ``namen``: je Materialfeld, wie Meldungen und Bericht den Teil
+    nennen, «Blechverbunddecke 1, Beton» -- die Decke hat zwei Materialien,
+    und «Blechverbunddecke 1: noch kein Material gewählt» sagte nicht, welches.
+    """
+
     fehler: List[dict] = field(default_factory=list)
     """Was sich nicht aufloesen liess: ``text`` und ``elemente`` (Kennungen), wie eine Meldung."""
 
@@ -388,7 +402,8 @@ class Elemente:
         """
         Jede Flaeche, wie Pruefung und Rechnung sie sehen: erst die Polygone,
         in ihrer Folge, dann je Profil sein Umriss aus Baustahl und seine
-        Loecher als Aussparungen, «Profil 1, innen». Je Flaeche ``name``,
+        Loecher als Aussparungen, «Profil 1, innen», dann je
+        Blechverbunddecke ihr Beton ueber dem Blech. Je Flaeche ``name``,
         ``kennung`` (beim Profil auch die des Lochs), ``punkte``,
         ``aussparung``, ``material``, ``stoffe`` -- die Arten von Material,
         die das Element nimmt --, ``ueberdeckung`` (beim Profil null) und
@@ -408,6 +423,10 @@ class Elemente:
                           "material": p["stahl"], "profil": p["profillage"]})
             teile += [{**teil, "name": f"{p['name']}, innen", "punkte": tuple(loch),
                        "aussparung": True, "material": "", "profil": None} for loch in loecher]
+        beton = stoffe_des_felds(BlechdeckeEintrag, "beton")
+        teile += [{"name": d["namen"]["beton"], "kennung": d["kennung"], "punkte": d["form"].beton,
+                   "aussparung": False, "material": d["beton"], "stoffe": beton,
+                   "ueberdeckung": 0.0, "profil": None} for d in self.blechdecken]
         return teile
 
 
@@ -430,6 +449,9 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben, JeMaterial):
     knoten: List[KnotenEintrag] = field(default_factory=list)
     flaechen: List[FlaecheEintrag] = field(default_factory=list)
     profile: List[ProfilEintrag] = field(default_factory=list)
+    blechdecken: List[BlechdeckeEintrag] = field(default_factory=list)
+    """Hoechstens eine: die Nachweise der Decke gelten ihr allein (:meth:`elemente`)."""
+
     staebe: List[StabEintrag] = field(default_factory=list)
     stablinien: List[StablinieEintrag] = field(default_factory=list)
     spannglieder: List[SpanngliedEintrag] = field(default_factory=list)
@@ -528,6 +550,29 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben, JeMaterial):
     rechnet ohne Kriechen.
     """
 
+    blech_m: Optional[float] = bereich(None, heisst="Beiwert m", einheit=N_PRO_MM2, ueber=0.0)
+    blech_k: Optional[float] = bereich(None, heisst="Beiwert k", einheit=N_PRO_MM2)
+    """
+    Bei einer Blechverbunddecke: ``m`` und ``k`` der m-k-Methode aus dem
+    Datenblatt des Blechs (SIA 264:2014, (28)) -- ``k`` darf negativ sein.
+    Leer: noch keine Zahl, der Laengsschub fehlt grau.
+    """
+
+    blech_L: Optional[float] = bereich(None, heisst="Spannweite L", einheit=M, ueber=0.0)
+    """Bei einer Blechverbunddecke: die Spannweite ihres Felds in m -- fuer (28) und ``L/d_p``."""
+
+    blech_feld: bd.Feld = bd.Feld.EINFELD
+    blech_last: bd.Belastung = bd.Belastung.GLEICHMAESSIG
+    blech_a: Optional[float] = bereich(None, heisst="Abstand a", einheit=M, ueber=0.0,
+                                       bis_feld="blech_L", bis_faktor=0.5)
+    """Mit zwei Einzellasten: ihr Abstand vom naechsten Auflager in m, hoechstens L/2."""
+
+    @property
+    def laengsschub(self) -> bd.Laengsschub:
+        """Was der Laengsschub einer Blechverbunddecke ausser ihrem Querschnitt braucht."""
+        return bd.Laengsschub(m=self.blech_m, k=self.blech_k, L=self.blech_L,
+                              feld=self.blech_feld, last=self.blech_last, a=self.blech_a)
+
     spannungsfaelle: List[QASpannungsfallEintrag] = field(default_factory=list)
     """Die Spannung-Dehnung-Analysen -- kein Nachweis, ein Blick in den Querschnitt."""
 
@@ -541,6 +586,7 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben, JeMaterial):
         gesehen: List[str] = []
         for kennung in ([f.material for f in self.flaechen]
                         + [p.stahl for p in self.profile]
+                        + [m for d in self.blechdecken for m in (d.beton, d.blech)]
                         + [s.stahl for s in self.staebe]
                         + [l.stahl for l in self.stablinien]
                         + [w.stahl for w in self.schubwaende]
@@ -553,13 +599,13 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben, JeMaterial):
     def leer(self) -> bool:
         """
         Ob noch nichts gezeichnet ist, was traegt: keine Flaeche, kein Profil,
-        kein Stab, keine Stablinie, kein Spannglied, keine Schubwand. Knoten
+        keine Decke, kein Stab, keine Stablinie, kein Spannglied, keine Schubwand. Knoten
         und Hilfslinien allein sind Bauhilfen. So beginnt eine neue Analyse
         (Benutzer, 2026-10-19), und so gibt es nichts zu rechnen -- aber auch
         keinen Fehler.
         """
-        return not (self.flaechen or self.profile or self.staebe or self.stablinien
-                    or self.spannglieder or self.schubwaende)
+        return not (self.flaechen or self.profile or self.blechdecken or self.staebe
+                    or self.stablinien or self.spannglieder or self.schubwaende)
 
     def elemente(self) -> Elemente:
         """Die Elemente mit Name und Kennung, Koordinaten in mm -- siehe :class:`Elemente`."""
@@ -598,6 +644,7 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben, JeMaterial):
             return [lage[v] for v in verweise]
 
         polygone, staebe, linien, waende, hilfslinien, glieder, profile = [], [], [], [], [], [], []
+        decken: List[dict] = []
         # Je Element sein Wort und seine Nummer, wie in Meldungen ueber seine
         # Felder (``IM_ORT``); ein Polygon ohne Material ist eine Aussparung.
         for i, f in enumerate(self.flaechen, start=1):
@@ -622,6 +669,17 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben, JeMaterial):
                 name, p.kennung, lage=ort[0], profil=p.profil, stahl=p.stahl,
                 drehung=p.drehung, gespiegelt=p.gespiegelt, umrisse=umrisse,
                 beschreibung=liegt.beschreibung, profillage=liegt))
+        for i, d in enumerate(self.blechdecken, start=1):
+            name = f"{d.IM_ORT} {i}"
+            ort = orte(name, d.kennung, d.knoten)
+            if ort is not None:
+                decken.append(benannt(name, d.kennung, lage=ort[0], beton=d.beton,
+                                      blech=d.blech, form=d.form(ort[0]),
+                                      namen={"beton": f"{name}, Beton", "blech": f"{name}, Blech"}))
+        if len(decken) > 1:
+            fehler.append({"text": f"{', '.join(d['name'] for d in decken)}: eine Analyse "
+                                   f"rechnet eine Blechverbunddecke – die übrigen löschen.",
+                           "elemente": [d["kennung"] for d in decken]})
         for i, s in enumerate(self.staebe, start=1):
             name = f"{s.IM_ORT} {i}"
             ort = orte(name, s.kennung, s.knoten)
@@ -660,7 +718,7 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben, JeMaterial):
                 hilfslinien.append(benannt(name, h.kennung, von=ende[0], bis=ende[1]))
         return Elemente(polygone=polygone, staebe=staebe, linien=linien, waende=waende,
                         spannglieder=glieder, hilfslinien=hilfslinien, profile=profile,
-                        fehler=fehler)
+                        blechdecken=decken, fehler=fehler)
 
     # -- Zeichnen ohne Oberflaeche -------------------------------------------
 
@@ -677,8 +735,8 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben, JeMaterial):
 
     def _kennung(self, vorsilbe: str) -> str:
         """Die naechste Kennung -- alle Linien zaehlen gemeinsam, ob Bewehrung, Wand oder Hilfslinie."""
-        listen = {"F": [self.flaechen], "R": [self.profile], "S": [self.staebe],
-                  "P": [self.spannglieder],
+        listen = {"F": [self.flaechen], "R": [self.profile], "B": [self.blechdecken],
+                  "S": [self.staebe], "P": [self.spannglieder],
                   "L": [self.stablinien, self.schubwaende, self.hilfslinien]}[vorsilbe]
         return neue_kennung(self, vorsilbe, (e.kennung for liste in listen for e in liste))
 
@@ -705,6 +763,17 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben, JeMaterial):
             {"kennung": self._kennung("R"), "knoten": self._knoten(self.netz(), (y, z)),
              "profil": profil, **felder}, f"{ort_von(self)}, profile")
         self.profile.append(eintrag)
+        return eintrag
+
+    def blechdecke(self, y: float, z: float, **felder: Any) -> BlechdeckeEintrag:
+        """
+        Eine Blechverbunddecke, die Ecke links unten bei ``(y, z)``; die
+        Felder wie :class:`BlechdeckeEintrag`.
+        """
+        eintrag = BlechdeckeEintrag.aus_dict(
+            {"kennung": self._kennung("B"), "knoten": self._knoten(self.netz(), (y, z)),
+             **felder}, f"{ort_von(self)}, blechdecken")
+        self.blechdecken.append(eintrag)
         return eintrag
 
     def stab(self, y: float, z: float, **felder: Any) -> StabEintrag:

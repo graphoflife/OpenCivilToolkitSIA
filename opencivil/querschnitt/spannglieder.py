@@ -76,7 +76,9 @@ from opencivil.core.protokoll import Abschnitt, Protokoll, Zwischenwerte
 from opencivil.core.wahl import Wahl
 from opencivil.core.wert import Wert, WertDef
 from opencivil.material.spannstahl import TABELLE_7, Erzeugnis
-from opencivil.querschnitt.bewehrungselemente import MM, Bewehrungselement, Verdraengt
+from opencivil.querschnitt.bewehrungselemente import (
+    MM, Bewehrungselement, Flaechen, Verdraengt, quadrate,
+)
 from opencivil.querschnitt.interaktion import Bewehrung, Werkstoff
 from opencivil.querschnitt.werkstoffgesetz import (
     RUNDUNG, Gesetz, Spannstahlgesetz, Werte, _gebaut,
@@ -460,6 +462,10 @@ class Spannglied(Bewehrungselement):
         return [Bewehrung(lage=(self.von[0] * MM, self.von[1] * MM),
                           flaeche=self.flaeche * MM * MM, werkstoff=stahl,
                           verdraengt=verdraengt(self.von))]
+
+    def stahlflaechen(self) -> Flaechen:
+        """Ein Quadrat seiner Flaeche, wie ein Stab -- im Verbund rechnet das Werkzeug keins."""
+        return quadrate(self.punkte, self.durchmesser)
 
 
 def aus_glied(g: Mapping, erzeugnis: Erzeugnis) -> Spannglied:

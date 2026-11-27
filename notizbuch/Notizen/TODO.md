@@ -1001,6 +1001,25 @@ Norm dazu sagt.
         SE 320 G und SE 350 G als üblich, aber keine zuerst.
 
       Bestätigen oder eine andere Zahl und Sorte nennen.
+- [ ] **Blechverbunddecke, nach Vorgabe eingebaut**
+      (`opencivil/verbund/blechdecke.py`, `opencivil/nachweis/qa_blechverbund.py`,
+      seit 2026-11-27). Jede Annahme steht auch in der Herleitung.
+      - Das Blech ist gleich dick, seine Fläche gleichmässig über die
+        Abwicklung verteilt; Sicken und Ausrundungen zählen nicht.
+      - Gedrückt trägt das Blech nichts: es beult. Ohne Moment zählt es
+        gezogen, unter negativem Moment nicht (5.4.3.2).
+      - Mit zwei Einzellasten bleibt der Abstand a, wie eingegeben, auch im
+        End- oder Innenfeld: die Norm sagt nicht, ob er im gleichwertigen
+        Einfeld kürzer wird.
+      - L/d_p rechnet mit der eingegebenen Spannweite, nicht mit der des
+        gleichwertigen Einfelds.
+      - τ_cd in (26) und γ_v = 1.25 in (28) bleiben, auch wo die
+        Tragsicherheit charakteristisch rechnet.
+      - Eine Analyse rechnet eine Decke; eine Decke hat höchstens 100 Rippen.
+      - Wo bei einer Normalkraft selbst das grösste Moment dieser Zugseite
+        in die Gegenrichtung zeigt, ist der Widerstand null.
+
+      Vorschlag: so lassen. Entscheid des Benutzers.
 - [ ] **Holz, Grenzstauchung nach Vorgabe** (`opencivil/material/holz.py`,
       `STAUCHBARKEIT`, seit 2026-11-26). Elastisch-plastisch geht der Druck
       bis ε_cu = 3·ε_c,0,d, bei C24 bis 3.27 ‰. SIA 265:2012, 3.1.2.2 lässt
@@ -1552,8 +1571,9 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       - der Längsschub in der Platte mit ihrer Querbewehrung (5.1.4,
         (4) bis (12));
       - Dübel unter Zug (6.1.2.2) und das Abheben der Platte (6.1.1.5);
-      - die Abminderung im Profilblech (6.1.3, (32) und (33)) – kommt mit
-        den Blechverbunddecken (Schritt 14d);
+      - die Abminderung im Profilblech (6.1.3, (32) und (33)): die
+        Blechverbunddecke gibt es seit 2026-11-27, einen Verbundträger mit
+        Dübeln durch ihr Blech noch nicht;
       - wie die Dübel bis zum Momentennullpunkt verteilt sind: gleichmässig
         nur unter den Bedingungen von 6.1.2.3; das Werkzeug fragt nur ihre
         Zahl.
@@ -1907,12 +1927,27 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       (SIA 265) haben seit 2026-11-26 ihre Nachweise, mit Knicken und
       Kippen, der Verbund (SIA 264) die Tragsicherheit des Querschnitts.
       Seit 2026-11-27 auch die Verdübelung (6.1) und die Verbundstützen
-      (5.3). Beim Verbund fehlen noch die Blechverbunddecken (5.4, 14d),
+      (5.3), die Blechverbunddecken (5.4). Beim Verbund fehlen noch
       das Kippen (5.1.2.6), der elastische Widerstand der Klasse 3
       (5.1.2.4, 5.1.2.5) und die Spannung-Dehnung-Analysen: sein Riss
       braucht den ideellen Querschnitt. Ein E_eq im Balkensystem gibt es
       bis dahin nur beim Stahlbeton. Dazu weitere Nachweise (Wände ohne
       Bügel).
+- [ ] **Blechverbunddecke, noch nicht nachgewiesen** (seit 2026-11-27; die
+      Herleitung der Kennzahlen nennt das meiste):
+      - das Durchstanzen unter Einzellasten (5.4.3.4, (27));
+      - die Querkraft bei d_p über 150 mm nach SIA 262 – bis dahin steht das
+        Urteil mit Erfüllungsgrad null und einem Hinweis da;
+      - die Endverankerung (5.4.3.6) und, statt der m-k-Methode, die
+        Teilverdübelung nach SN EN 1994-1-1;
+      - andere Lasten als gleichmässig oder zwei symmetrische Einzellasten
+        für die Schublänge (5.4.3.5);
+      - die Durchbiegung, wo L/d_p über 26 liegt (5.4.4.2);
+      - der Bauzustand (5.4.4.4) und die Schwingungen (5.4.4.7);
+      - die Mindestbewehrung über den Stützen (5.4.4.6), mit der Kette von
+        Einfeldern nach 5.4.2.3;
+      - M_z, V_y und T: die Decke trägt in einer Richtung (5.4.1.1);
+      - die Spannung-Dehnung-Analysen, wie beim Verbund.
 - [ ] **Baustahl: die Wärmedehnzahl** α_T = 10·10⁻⁶/°C (SIA 263:2013,
       3.2.2.2) fehlt -- es gibt keine Temperatur als Einheit, und keine
       Rechnung braucht sie. Kommt mit der ersten, die sie braucht.

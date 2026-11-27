@@ -128,37 +128,43 @@ export function naechsteStufe(wert, richtung, { stufen, schritt = 1 } = {}) {
  * Warum der Kern eine Zahl abwiese -- leer, wenn er sie nimmt. `angabe` sind
  * die Grenzen ihres Feldes aus dem Katalog (`feldangabe`): «Teilung muss
  * grösser als null sein». Begrenzt sie ein anderes Feld desselben Eintrags
- * (`bis_feld`, `ab_feld`: α_min nicht über α_max, mit `faktor` ein
+ * (`bis_feld`, `ab_felder`: α_min nicht über α_max, mit `faktor` ein
  * Vielfaches -- der Durchmesser eines Dübels höchstens ein Viertel seiner
- * Länge; `quer_zu`: zwei Richtungen mindestens 5° auseinander, als Linien),
- * steht dessen Zahl in `neben`, dem Eintrag.
+ * Länge --, mit `offen` ausgeschlossen -- die Breite einer Rippe unter
+ * ihrem Abstand; `quer_zu`: zwei Richtungen mindestens 5° auseinander, als
+ * Linien), steht dessen Zahl in `neben`, dem Eintrag. Ein Feld kann
+ * mehrere begrenzen: der Rippenabstand beide Breiten einer Rippe.
  */
 export function grenzeVerletzt(angabe, zahl, neben = {}) {
   if (angabe.ganz && !Number.isInteger(zahl)) return 'Nur ganze Zahlen';
   const {
-    ueber, ab, bis, unter, bis_feld: hoch, ab_feld: tief, quer_zu: quer,
+    ueber, ab, bis, unter, bis_feld: hoch, ab_felder: tiefe = [], quer_zu: quer,
   } = angabe;
   const draussen = (ueber !== undefined && !(zahl > ueber)) || (ab !== undefined && !(zahl >= ab))
     || (bis !== undefined && !(zahl <= bis)) || (unter !== undefined && !(zahl < unter));
   if (draussen) return `${angabe.heisst} ${angabe.verlangt}`;
   const oben = grenzeNeben(hoch, neben);
-  const unten = grenzeNeben(tief, neben);
-  if (oben !== undefined && zahl > oben) return hoch.satz;
-  if (unten !== undefined && zahl < unten) return tief.satz;
+  if (oben !== undefined && (zahl > oben || (hoch.offen && zahl === oben))) return hoch.satz;
+  for (const tief of tiefe) {
+    const unten = grenzeNeben(tief, neben);
+    if (unten !== undefined && (zahl < unten || (tief.offen && zahl === unten))) return tief.satz;
+  }
   const da = (feld) => neben[feld] !== undefined && neben[feld] !== null;
   if (quer && da(quer.feld) && linienabstand(zahl, neben[quer.feld]) < quer.mindestens) return quer.satz;
   return '';
 }
 
 /**
- * Die Grenze, die ein anderes Feld setzt (`bis_feld`, `ab_feld`): seine Zahl,
- * mal `faktor`, wo es einen gibt. Ein leeres Nachbarfeld begrenzt nichts --
- * wie im Kern (Bereich.grund_gegen): «zahl > null» hiesse in JavaScript
- * «zahl > 0».
+ * Die Grenze, die ein anderes Feld setzt (`bis_feld`, `ab_felder`): seine
+ * Zahl, mal `faktor`, wo es einen gibt -- eine ausgeschlossene (`offen`) für
+ * die Pfeile um `schritt` nach innen gerückt. Ein leeres Nachbarfeld
+ * begrenzt nichts -- wie im Kern (Bereich.grund_gegen): «zahl > null» hiesse
+ * in JavaScript «zahl > 0».
  */
-function grenzeNeben(grenze, neben) {
+function grenzeNeben(grenze, neben, schritt = 0) {
   const zahl = grenze ? neben[grenze.feld] : undefined;
-  return zahl === undefined || zahl === null ? undefined : zahl * (grenze.faktor ?? 1);
+  if (zahl === undefined || zahl === null) return undefined;
+  return zahl * (grenze.faktor ?? 1) + (grenze.offen ? schritt : 0);
 }
 
 /** Wie weit zwei Winkel in Grad als Linien auseinander liegen, 0° bis 90° -- 180° weiter ist dieselbe. */
@@ -210,10 +216,10 @@ export function zahlfeld({
 }) {
   const unten = engste(Math.max,
     min ?? angabe.ab ?? (angabe.ueber === undefined ? undefined : angabe.ueber + schritt),
-    grenzeNeben(angabe.ab_feld, neben));
+    ...(angabe.ab_felder || []).map((g) => grenzeNeben(g, neben, schritt)));
   const oben = engste(Math.min,
     max ?? angabe.bis ?? (angabe.unter === undefined ? undefined : angabe.unter - schritt),
-    grenzeNeben(angabe.bis_feld, neben));
+    grenzeNeben(angabe.bis_feld, neben, -schritt));
   const uebernehmen = (neu, getippt = String(neu)) => {
     const grund = neu === null ? '' : grenzeVerletzt(angabe, neu, neben);
     if (!grund) {

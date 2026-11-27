@@ -336,7 +336,8 @@ MNM = Einheit("MNm", MOMENT, 1e6)
 # Auf die Breite bezogene Groessen (Platten pro Laufmeter)
 KN_PRO_M = Einheit("kN/m", KRAFT_PRO_LAENGE, 1e3, latex=r"\mathrm{kN}/\mathrm{m}")
 KNM_PRO_M = Einheit("kNm/m", MOMENT_PRO_LAENGE, 1e3, latex=r"\mathrm{kNm}/\mathrm{m}")
-MM2_PRO_M = Einheit("mm^2/m", FLAECHE_PRO_LAENGE, 1e-6, latex=r"\mathrm{mm}^{2}/\mathrm{m}")
+MM2_PRO_M = Einheit("mm^2/m", FLAECHE_PRO_LAENGE, 1e-6, latex=r"\mathrm{mm}^{2}/\mathrm{m}",
+                   beschriftung="mm²/m")
 PRO_M = Einheit("1/m", KRUEMMUNG, 1.0, latex=r"\mathrm{m}^{-1}", beschriftung="1/m")
 
 # Steifigkeiten der Stabwerke: Biegesteifigkeit EI, Drehfeder. Die Dehnsteifigkeit

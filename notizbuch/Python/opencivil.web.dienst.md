@@ -1,5 +1,5 @@
 ---
-erzeugt: a35a3384ac5f
+erzeugt: 27b3cb5de199
 art: modul
 tags: [modul]
 ---
@@ -379,7 +379,8 @@ def vorlage(rumpf: Mapping[str, Any]) -> Dict[str, Any]
 Die Teile einer Vorlage zu den eingestellten Massen -- fuer die Skizze,
 waehrend man tippt. Passen die Masse nicht zueinander, steht der Grund in
 `fehler` und es gibt keine Teile: das ist keine falsche Anfrage, nur
-eine unfertige Eingabe. Beim Stahlprofil das Profil ([[opencivil.web.dienst#_profilskizze|_profilskizze]]).
+eine unfertige Eingabe. Beim Stahlprofil das Profil ([[opencivil.web.dienst#_profilskizze|_profilskizze]]),
+bei der Blechverbunddecke die Decke ([[opencivil.web.dienst#_deckenskizze|_deckenskizze]]).
 
 ### _profilskizze
 
@@ -391,6 +392,19 @@ Die Skizze eines Stahlprofils, gedreht und gespiegelt, mit seinen zwei
 Massen von aussen -- und ob Drehen und Spiegeln es aendern: sonst zeigt
 das Fenster die Schalter dafuer nicht. Eingesetzt wird es von der
 Oberflaeche, wie jedes Element eines Werkzeugs: es ist ein Eintrag an
+einem Knoten.
+
+### _deckenskizze
+
+```python
+def _deckenskizze(wahl: Mapping[str, Any]) -> Dict[str, Any]
+```
+
+Die Skizze einer Blechverbunddecke zu den eingestellten Massen: die ganze
+Decke in `teile`, eine Rippe mit ihren Massen in `rippe`
+([[opencivil.querschnitt.profilblech#skizze|skizze]]). Passen die Masse
+nicht zueinander, sagt `fehler` es mit den Worten der Felder. Eingesetzt
+wird sie von der Oberflaeche, wie ein Profil: sie ist ein Eintrag an
 einem Knoten.
 
 ### vorlage_einsetzen
@@ -440,6 +454,7 @@ entspricht dem, was der Server ueber HTTP melden wuerde.
 - `SPEICHER = speicher.Ergebnisspeicher()` – Das Gedaechtnis zwischen zwei Anfragen -- siehe [[opencivil.web.speicher]]. Im Modul und damit im Prozess: beim Server die laufende Sitzung, im Browser der offene Reiter.
 - `ANALYSEN = speicher.Ergebnisspeicher()` – Dasselbe fuer die Zeichendaten der Spannung-Dehnung-Analysen, je Bauteil unter demselben Abdruck wie seine Loesung ([[opencivil.web.dienst#_analysen|_analysen]]).
 - `DIAGRAMME = speicher.Ergebnisspeicher()` – Und fuer die Diagramme einer Querschnittsanalyse, unter ihrem Abdruck und dem Schnitt ([[opencivil.web.dienst#analysediagramme|analysediagramme]]). Die Oberflaeche fragt nach jeder Aenderung am Projekt neu, gleich wo; ob sich fuer diese Analyse etwas geaendert hat, entscheidet erst der Abdruck hier.
+- `BLECHMASSE = ('h', 'rippen', 'h_p', 'b_s', 'b_o', 'b_u', 'A_p')` – Was die Skizze einer Blechverbunddecke von ihrer Wahl liest: ihre Masse.
 - `ANFRAGEN = {'katalog': katalog, 'beispiel': beispiel, 'pruefen': pruefen, 'mappe…` – Name der Anfrage -> Funktion. Diese Namen sind der ganze Vertrag zwischen Oberflaeche und Kern; beide Huellen reichen sie unveraendert durch.
 
 ## Braucht
@@ -449,8 +464,11 @@ entspricht dem, was der Server ueber HTTP melden wuerde.
 - [[opencivil.bewehrungssuche]]
 - [[opencivil.core.rechenwerk]]
 - [[opencivil.projekt]]
+- [[opencivil.projekt.blechdecken]]
+- [[opencivil.projekt.lesen]]
 - [[opencivil.projekt.mappe]]
 - [[opencivil.projekt.staebe]]
+- [[opencivil.querschnitt.profilblech]]
 - [[opencivil.querschnitt.vorlagen]]
 - [[opencivil.querschnitt.widerstandsflaeche]]
 - [[opencivil.stahlprofile.lage]]

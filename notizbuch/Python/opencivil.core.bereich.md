@@ -1,5 +1,5 @@
 ---
-erzeugt: 2c98ab8ca3cc
+erzeugt: 79b09efe6e71
 art: modul
 tags: [modul]
 ---
@@ -44,6 +44,7 @@ Wo eine Zahl liegen muss -- jede Grenze darf fehlen, `ueber` und
 - `unter: Optional[float] = None`
 - `bis_feld: Optional[str] = None` – Ein Feld desselben Eintrags, dessen Zahl diese nicht uebersteigen darf: α_min nicht ueber α_max. Die Regel steht so einmal, beim kleineren Feld. Die Maske weist sie an beiden Feldern ab ([[opencivil.projekt.lesen#feldangaben|feldangaben]]), die Pruefung vor dem Rechnen haelt eine Datei damit auf -- mit denselben Worten ([[opencivil.core.bereich#Bereich.gegen|gegen]]).
 - `bis_faktor: float = 1.0` – Das Wievielfache der Zahl von [[opencivil.core.bereich#Bereich|bis_feld]] diese hoechstens ist: der Durchmesser eines Kopfbolzenduebels ein Viertel seiner Laenge. Sonst eins.
+- `bis_offen: bool = False` – Ob die Grenze von [[opencivil.core.bereich#Bereich|bis_feld]] ausgeschlossen ist: die Breite einer Rippe unten muss kleiner sein als ihr Abstand, gleich stiessen die Rippen aneinander ([[opencivil.projekt.lesen#bereich|bereich]], `unter_feld`).
 - `quer_zu: Optional[Tuple[str, float]] = None` – Ein Feld desselben Eintrags mit einem Winkel in Grad, und um wie viel Grad dieser hier mindestens von ihm abweicht -- als Linie: 180° weiter ist dieselbe. Die zwei Richtungen einer Deckenplatte etwa liegen mindestens 5° auseinander, sonst trügen sie kaum anders als eine. Wie bei [[opencivil.core.bereich#Bereich|bis_feld]] steht die Regel einmal, an einem der beiden Felder, und die Maske weist sie an beiden ab ([[opencivil.core.bereich#Bereich.quer|quer]]).
 
 #### Bereich.grund

@@ -429,8 +429,8 @@ class TestEinheitenAmFeld(unittest.TestCase):
         gegen = {
             "alpha_min": {"bis_feld": {"feld": "alpha_max",
                                        "satz": "α_min darf nicht grösser sein als α_max"}},
-            "alpha_max": {"ab_feld": {"feld": "alpha_min",
-                                      "satz": "α_max darf nicht kleiner sein als α_min"}},
+            "alpha_max": {"ab_felder": [{"feld": "alpha_min",
+                                         "satz": "α_max darf nicht kleiner sein als α_min"}]},
         }
         for art in ("querkraftbewehrung", "querschnittsanalyse"):
             for feld in ("alpha_min", "alpha_max"):

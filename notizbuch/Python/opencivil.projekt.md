@@ -1,5 +1,5 @@
 ---
-erzeugt: 6541d2330071
+erzeugt: e88f1afc3465
 art: modul
 tags: [modul]
 ---
@@ -80,6 +80,8 @@ geschieht erst beim Aufbau, ueber die [[opencivil.core.einheiten#Groesse|Groesse
 - [[opencivil.projekt.balkensystem]] – ein 2D-Balkensystem, wie die Oberflaeche es beschreibt.
 - [[opencivil.projekt.balkensystem3d]] – ein 3D-Balkensystem, wie die Oberflaeche es beschreibt.
 - [[opencivil.projekt.beispiele]] – die Prüfprojekte: das Beispiel und «Jeder Nachweis».
+- [[opencivil.projekt.beispiele_verbund]] – die Querschnitte im Verbund des Pruefprojekts.
+- [[opencivil.projekt.blechdecken]] – eine Blechverbunddecke, wie die Oberflaeche sie beschreibt.
 - [[opencivil.projekt.decke]] – eine Stahlbetondecke, wie die Oberflaeche sie beschreibt.
 - [[opencivil.projekt.durchstanzen]] – ein Durchstanznachweis, wie die Oberflaeche ihn beschreibt.
 - [[opencivil.projekt.eintraege]] – die Teile einer Projektbeschreibung.

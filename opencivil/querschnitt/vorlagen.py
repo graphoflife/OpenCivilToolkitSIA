@@ -125,6 +125,9 @@ class Teile:
     schubwaende: List[dict] = field(default_factory=list)
     """Je Wand ``von``, ``bis`` und ``dicke``."""
 
+    bleche: List[dict] = field(default_factory=list)
+    """Je Profilblech ``punkte``, seine Linie -- nur in der Skizze einer Blechverbunddecke."""
+
     masslinien: List[dict] = field(default_factory=list)
     """Nur fuer die Skizze: ``von``, ``bis``, ``text`` und ``seite``
     ('unten', 'oben', 'links', 'rechts') -- wohin sie neben dem Bauteil steht."""

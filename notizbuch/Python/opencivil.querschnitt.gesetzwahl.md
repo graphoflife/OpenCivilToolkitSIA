@@ -1,5 +1,5 @@
 ---
-erzeugt: da342685bcda
+erzeugt: 056945cf3c0b
 art: modul
 tags: [modul]
 ---
@@ -719,6 +719,7 @@ der Wahl ([[opencivil.querschnitt.gesetzwahl#Rechenwahl|Rechenwahl.modul]]), ohn
 - [[opencivil.nachweis.kennzahlen]]
 - [[opencivil.nachweis.knicken]]
 - [[opencivil.nachweis.mindestbewehrung]]
+- [[opencivil.nachweis.qa_blechverbund]]
 - [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.qa_knicken]]
 - [[opencivil.nachweis.qa_stahl_werte]]

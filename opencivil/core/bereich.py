@@ -58,6 +58,13 @@ class Bereich:
     Durchmesser eines Kopfbolzenduebels ein Viertel seiner Laenge. Sonst eins.
     """
 
+    bis_offen: bool = False
+    """
+    Ob die Grenze von :attr:`bis_feld` ausgeschlossen ist: die Breite einer
+    Rippe unten muss kleiner sein als ihr Abstand, gleich stiessen die
+    Rippen aneinander (:func:`~opencivil.projekt.lesen.bereich`, ``unter_feld``).
+    """
+
     quer_zu: Optional[Tuple[str, float]] = None
     """
     Ein Feld desselben Eintrags mit einem Winkel in Grad, und um wie viel
@@ -94,12 +101,13 @@ class Bereich:
         nicht kleiner sein als α_min» -- mit einem Faktor «… als 0.25 · Länge
         h_D», «… als 4 · Durchmesser d».
         """
-        if self.bis_faktor == 1.0:
-            return (f"{self.heisst} darf nicht grösser sein als {anderer.heisst}",
-                    f"{anderer.heisst} darf nicht kleiner sein als {self.heisst}")
-        return (f"{self.heisst} darf nicht grösser sein als {self.bis_faktor:g} · {anderer.heisst}",
-                f"{anderer.heisst} darf nicht kleiner sein als "
-                f"{1.0 / self.bis_faktor:g} · {self.heisst}")
+        faktor, kehr = (("", "") if self.bis_faktor == 1.0 else
+                        (f"{self.bis_faktor:g} · ", f"{1.0 / self.bis_faktor:g} · "))
+        if self.bis_offen:
+            return (f"{self.heisst} muss kleiner sein als {faktor}{anderer.heisst}",
+                    f"{anderer.heisst} muss grösser sein als {kehr}{self.heisst}")
+        return (f"{self.heisst} darf nicht grösser sein als {faktor}{anderer.heisst}",
+                f"{anderer.heisst} darf nicht kleiner sein als {kehr}{self.heisst}")
 
     def grund_gegen(self, wert: Optional[float], anderer: Bereich,
                     grenze: Optional[float]) -> str:
@@ -107,7 +115,10 @@ class Bereich:
         Was :attr:`bis_feld` verletzt -- die Zahl ueber der des anderen
         Feldes --, als Satz mit Punkt; leer, wenn nichts.
         """
-        if wert is not None and grenze is not None and wert > self.bis_faktor * grenze:
+        if wert is None or grenze is None:
+            return ""
+        oben = self.bis_faktor * grenze
+        if wert > oben or (self.bis_offen and wert == oben):
             return (f"{self.gegen(anderer)[0]}, angegeben sind "
                     f"{self.zahl(wert)} und {anderer.zahl(grenze)}.")
         return ""

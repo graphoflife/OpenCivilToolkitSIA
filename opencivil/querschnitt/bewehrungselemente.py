@@ -5,10 +5,13 @@ VERANTWORTUNG:
 Ein Bewehrungselement der Querschnittsanalyse ist ein Einzelstab
 (:class:`Einzelstab`), eine Reihe gleicher Staebe auf einer Linie
 (:class:`Stabreihe`) oder eine verschmierte Linie
-(:class:`VerschmierteLinie`). Was je Art anders ist, steht in ihrer Klasse,
-je einmal: wo ihre Staebe liegen, wie sie in den Tabellen der Herleitung
-steht, wie sie in den Querschnitt eingeht
-(:meth:`Bewehrungselement.als_bewehrung`) und welcher Durchmesser ihre
+(:class:`VerschmierteLinie`) -- dazu das Spannglied
+(:mod:`opencivil.querschnitt.spannglieder`) und das Profilblech einer
+Blechverbunddecke (:mod:`opencivil.querschnitt.profilblech`). Was je Art
+anders ist, steht in ihrer Klasse, je einmal: wo ihre Staebe liegen, wie sie
+in den Tabellen der Herleitung steht, wie sie in den Querschnitt eingeht
+(:meth:`Bewehrungselement.als_bewehrung`), welche Flaechen sie dort hat
+(:meth:`Bewehrungselement.stahlflaechen`) und welcher Durchmesser ihre
 Rissbreite bestimmt. Welche Art eine Beschreibung ist, wird einmal
 entschieden, beim Bauen (:func:`aus_stab`, :func:`aus_linie`).
 
@@ -39,6 +42,10 @@ MM = 1e-3
 #: verdraengt -- als Index, ohne Beton ``None``.
 Verdraengt = Callable[[Punkt], Optional[int]]
 
+#: Die Flaechen eines Elements als Polygone, je mit dem Punkt, an dem es den Beton
+#: verdraengt -- ``None``, wo es keinen verdraengt (:meth:`Bewehrungselement.stahlflaechen`).
+Flaechen = List[Tuple[Tuple[Punkt, ...], Optional[Punkt]]]
+
 
 @dataclass(frozen=True)
 class Bewehrungselement(ABC):
@@ -64,6 +71,11 @@ class Bewehrungselement(ABC):
     @property
     def punkte(self) -> Tuple[Punkt, ...]:
         """Die Stabmitten -- verschmiert keine."""
+        return ()
+
+    @property
+    def strecken(self) -> Tuple[Tuple[Punkt, Punkt], ...]:
+        """Die geraden Strecken, ueber die der Stahl verschmiert ist -- in Staeben keine."""
         return ()
 
     @property
@@ -96,6 +108,15 @@ class Bewehrungselement(ABC):
     def als_bewehrung(self, stahl: int, verdraengt: Verdraengt) -> List[Bewehrung]:
         """Wie es in den Querschnitt eingeht, in Meter -- ``stahl`` ist der Index seines Stahls."""
 
+    @abstractmethod
+    def stahlflaechen(self) -> Flaechen:
+        """
+        Seine Flaechen als Polygone, in mm, fuer den starr-plastischen
+        Querschnitt (:class:`~opencivil.verbund.querschnitt.Verbundquerschnitt`):
+        ein Stab ist ein Quadrat seiner Flaeche um seine Mitte, eine Strecke
+        ein Rechteck ihrer Flaeche ueber ihre Laenge.
+        """
+
 
 def _staebe(punkte: Tuple[Punkt, ...], durchmesser: float, stahl: int,
             verdraengt: Verdraengt) -> List[Bewehrung]:
@@ -103,6 +124,32 @@ def _staebe(punkte: Tuple[Punkt, ...], durchmesser: float, stahl: int,
     return [Bewehrung(lage=(p[0] * MM, p[1] * MM), flaeche=einzeln, werkstoff=stahl,
                       verdraengt=verdraengt(p))
             for p in punkte]
+
+
+def quadrate(punkte: Tuple[Punkt, ...], durchmesser: float) -> Flaechen:
+    """Je Stab ein Quadrat seiner Flaeche um seine Mitte -- dort verdraengt er den Beton."""
+    h = math.sqrt(math.pi) * durchmesser / 4.0
+    return [(((y - h, z - h), (y + h, z - h), (y + h, z + h), (y - h, z + h)), (y, z))
+            for y, z in punkte]
+
+
+def baender(strecken: Tuple[Tuple[Punkt, Punkt], ...], flaeche: float,
+            verdraengt: bool) -> Flaechen:
+    """
+    Die Flaeche ``flaeche`` gleich dick ueber die Strecken verteilt, je ein
+    Rechteck um die Strecke -- mit ``verdraengt`` nimmt es den Beton an ihrer
+    Mitte weg.
+    """
+    laenge = sum(math.dist(a, b) for a, b in strecken)
+    halb = flaeche / laenge / 2.0
+    baender: Flaechen = []
+    for (y_1, z_1), (y_2, z_2) in strecken:
+        l = math.dist((y_1, z_1), (y_2, z_2))
+        n = (-(z_2 - z_1) / l * halb, (y_2 - y_1) / l * halb)
+        ecken = ((y_1 - n[0], z_1 - n[1]), (y_2 - n[0], z_2 - n[1]),
+                 (y_2 + n[0], z_2 + n[1]), (y_1 + n[0], z_1 + n[1]))
+        baender.append((ecken, ((y_1 + y_2) / 2.0, (z_1 + z_2) / 2.0) if verdraengt else None))
+    return baender
 
 
 @dataclass(frozen=True)
@@ -131,6 +178,9 @@ class Einzelstab(Bewehrungselement):
 
     def als_bewehrung(self, stahl: int, verdraengt: Verdraengt) -> List[Bewehrung]:
         return _staebe(self.punkte, self.durchmesser, stahl, verdraengt)
+
+    def stahlflaechen(self) -> Flaechen:
+        return quadrate(self.punkte, self.durchmesser)
 
 
 @dataclass(frozen=True)
@@ -165,6 +215,9 @@ class Stabreihe(Bewehrungselement):
     def als_bewehrung(self, stahl: int, verdraengt: Verdraengt) -> List[Bewehrung]:
         return _staebe(self.punkte, self.durchmesser, stahl, verdraengt)
 
+    def stahlflaechen(self) -> Flaechen:
+        return quadrate(self.punkte, self.durchmesser)
+
 
 @dataclass(frozen=True)
 class VerschmierteLinie(Bewehrungselement):
@@ -177,6 +230,10 @@ class VerschmierteLinie(Bewehrungselement):
     """⌀, s und L, aus denen die Flaeche kommt -- von Hand keine."""
 
     verschmiert = True
+
+    @property
+    def strecken(self) -> Tuple[Tuple[Punkt, Punkt], ...]:
+        return ((self.von, self.bis),)
 
     @property
     def menge(self) -> Zelle:
@@ -211,6 +268,9 @@ class VerschmierteLinie(Bewehrungselement):
         return linie_als_bewehrung(
             (self.von[0] * MM, self.von[1] * MM), (self.bis[0] * MM, self.bis[1] * MM),
             self.flaeche * MM * MM, stahl, verdraengt(mitte))
+
+    def stahlflaechen(self) -> Flaechen:
+        return baender(self.strecken, self.flaeche, verdraengt=True)
 
 
 def aus_stab(s: Mapping) -> Einzelstab:

@@ -1,5 +1,5 @@
 ---
-erzeugt: fe3ccb4c8309
+erzeugt: 2556fef92841
 art: modul
 tags: [modul]
 ---
@@ -411,6 +411,14 @@ def als_bewehrung(self, stahl: int, verdraengt: Verdraengt) -> List[Bewehrung]
 ```
 
 `stahl` ist der Index seines eigenen Werkstoffs, nicht der seines Spannstahls.
+
+#### Spannglied.stahlflaechen
+
+```python
+def stahlflaechen(self) -> Flaechen
+```
+
+Ein Quadrat seiner Flaeche, wie ein Stab -- im Verbund rechnet das Werkzeug keins.
 
 ### aus_glied
 

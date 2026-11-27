@@ -58,12 +58,14 @@ class TestFormelsammlung(unittest.TestCase):
         self.assertEqual(art["Baustahl"], "baustahl")
         self.assertEqual(art["Spannstahl"], "spannstahl")
         self.assertEqual(art["Holz"], "holz")
+        self.assertEqual(art["Profilblechstahl"], "profilblech")
         for name in ("Querschnitt", "Biegung und Normalkraft", "Querkraft", "Knicken",
                      "Spannung-Dehnung-Analyse"):
             with self.subTest(thema=name):
                 self.assertEqual(art[name], "querschnitt")
         for name in ("Querschnittsanalyse", "Schiefe Biegung", "Querkraft und Torsion",
-                     "Duktilität je Richtung", "Sprödes Versagen je Richtung"):
+                     "Duktilität je Richtung", "Sprödes Versagen je Richtung",
+                     "Blechverbunddecke"):
             with self.subTest(thema=name):
                 self.assertEqual(art[name], "querschnittsanalyse")
         for name in ("Stabquerschnitte", "Steifigkeitsmethode"):
@@ -80,8 +82,8 @@ class TestFormelsammlung(unittest.TestCase):
             with self.subTest(thema=name):
                 self.assertEqual(art[name], "pfahl")
         self.assertEqual({t.art for t in self.alle},
-                         {"beton", "betonstahl", "baustahl", "spannstahl", "holz", "querschnitt",
-                          "querschnittsanalyse",
+                         {"beton", "betonstahl", "baustahl", "spannstahl", "holz", "profilblech",
+                          "querschnitt", "querschnittsanalyse",
                           "balkensystem", "decke", "durchstanzen", "grundbruch", "setzung", "pfahl",
                           "erdbeben"})
 

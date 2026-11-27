@@ -1,5 +1,5 @@
 ---
-erzeugt: 4148b1dab9fa
+erzeugt: 206c9a098fb6
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.2.1.5, Figur 12"
@@ -17,7 +17,7 @@ $$
 
 | Zeichen | Bedeutung | Einheit | Woher |
 | --- | --- | --- | --- |
-| $a_{s,x}$ | Bewehrung in x je Meter | mm^2/m | [[Biegebewehrung im Stützstreifen je Meter]] |
+| $a_{s,x}$ | Bewehrung in x je Meter | mm²/m | [[Biegebewehrung im Stützstreifen je Meter]] |
 | $f_{yd}$ | Bemessungswert der Fliessgrenze | N/mm² | [[Bemessungswert der Fliessgrenze]] |
 | $f_{cd}$ | Bemessungswert der Betondruckfestigkeit | N/mm² | [[Bemessungswert der Betondruckfestigkeit]] |
 

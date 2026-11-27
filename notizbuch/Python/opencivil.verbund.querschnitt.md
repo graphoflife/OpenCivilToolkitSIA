@@ -1,5 +1,5 @@
 ---
-erzeugt: 11c50aab2a4f
+erzeugt: dac62398ec0d
 art: modul
 tags: [modul]
 ---
@@ -36,9 +36,12 @@ Ein Polygon aus Beton zaehlt wie eines aus Stahl: +1, wo es liegt, -1 im
 Elternteil, den es dort ersetzt ([[opencivil.querschnitt.plastisch#stuecke|stuecke]])
 -- ein Profil im Beton nimmt ihn dort weg. Ein Stab ist ein Quadrat seiner
 Flaeche um seine Mitte, eine verschmierte Linie ein Rechteck ihrer Flaeche
-ueber ihre Laenge; beide verdraengen den Beton, in dem sie liegen, wie im
-Stahlbeton. Liegt die Nulllinie in einem Stab, verteilt sich seine Kraft so
-ueber das Quadrat -- nach Vorgabe, nicht nachgeschlagen.
+ueber ihre Laenge
+([[opencivil.querschnitt.bewehrungselemente#Bewehrungselement.stahlflaechen|stahlflaechen]]);
+beide verdraengen den Beton, in dem sie liegen, wie im Stahlbeton. Liegt
+die Nulllinie in einem Stab, verteilt sich seine Kraft so ueber das Quadrat
+-- nach Vorgabe, nicht nachgeschlagen. Das Profilblech einer
+Blechverbunddecke liegt am Rand ihres Betons und verdraengt keinen.
 
 
 ## WAS DIE DUEBEL VERBINDEN
@@ -86,15 +89,6 @@ ist (5.2.1.2), nimmt es an. Dass die Duebel einen Druckflansch nach 4.2.2.3
 in die Klasse 1 heben, prueft es nicht.
 
 ## Inhalt
-
-### stahlflaechen
-
-```python
-def stahlflaechen(element: Bewehrungselement) -> List[Tuple[Tuple[Punkt, ...], Punkt]]
-```
-
-Die Flaechen eines Bewehrungselements als Polygone, je mit dem Punkt, an
-dem es den Beton verdraengt -- siehe Dateikopf.
 
 ### Verbundquerschnitt
 
@@ -259,5 +253,6 @@ Ob Beton im I-Profil den Flansch innen, den Steg beidseits deckt -- siehe Dateik
 
 - [[opencivil.nachweis.qa_verbund_kennzahlen]]
 - [[opencivil.nachweis.qa_verbund_werte]]
+- [[opencivil.verbund.blechdecke]]
 - [[opencivil.verbund.stuetze]]
 - [[opencivil.verbund.widerstand]]

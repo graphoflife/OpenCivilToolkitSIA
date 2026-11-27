@@ -182,16 +182,25 @@ def bereich(vorgabe: Any = dataclasses.MISSING, *, heisst: str,
             einheit: Optional[Einheit] = None, ueber: Optional[float] = None,
             ab: Optional[float] = None, bis: Optional[float] = None,
             unter: Optional[float] = None, bis_feld: Optional[str] = None,
-            bis_faktor: float = 1.0, quer_zu: Optional[Tuple[str, float]] = None,
-            fabrik: Optional[Callable[[], Any]] = None) -> Any:
+            unter_feld: Optional[str] = None, bis_faktor: float = 1.0,
+            quer_zu: Optional[Tuple[str, float]] = None,
+            fabrik: Optional[Callable[[], Any]] = None, zeichen: Optional[str] = None) -> Any:
     """
     Ein Feld, dessen Zahl in einem :class:`Bereich` liegen muss -- eine
     Kriechzahl ab null etwa. Bei einer Liste von Zahlen gilt er fuer jede,
     und leer ist sie nie (:func:`inhalt_pruefen`); ihre Vorgabe kommt dann
-    aus ``fabrik``.
+    aus ``fabrik``. ``bis_feld`` nennt ein Feld, dessen Zahl diese nicht
+    uebersteigt, ``unter_feld`` eines, unter dessen Zahl sie bleibt
+    (:attr:`Bereich.bis_offen`) -- wie ``bis`` und ``unter``. ``zeichen``
+    steht in einer engen Maske statt des Namens, der dann ihr Titel ist:
+    «h_p» statt «Höhe der Rippe h_p» (:func:`feldangaben`).
     """
-    metadata = {"bereich": Bereich(heisst, einheit, ueber=ueber, ab=ab, bis=bis, unter=unter,
-                                   bis_feld=bis_feld, bis_faktor=bis_faktor, quer_zu=quer_zu)}
+    metadata: Dict[str, Any] = {
+        "bereich": Bereich(heisst, einheit, ueber=ueber, ab=ab, bis=bis, unter=unter,
+                           bis_feld=bis_feld or unter_feld, bis_faktor=bis_faktor,
+                           bis_offen=unter_feld is not None, quer_zu=quer_zu)}
+    if zeichen is not None:
+        metadata["zeichen"] = zeichen
     if fabrik is not None:
         return dataclasses.field(default_factory=fabrik, metadata=metadata)
     return dataclasses.field(default=vorgabe, metadata=metadata)
@@ -220,15 +229,18 @@ def feldangaben(cls: type) -> Dict[str, Dict[str, Any]]:
 
     Begrenzt ein Feld ein anderes (:attr:`Bereich.bis_feld`), steht das an
     beiden, mit dem Namen des anderen Feldes und dem Satz, den das Feld
-    sagt: ``bis_feld`` bei α_min, ``ab_feld`` bei α_max -- mit ``faktor``,
-    wo die Grenze ein Vielfaches des anderen ist (:attr:`Bereich.bis_faktor`,
-    beim anderen Feld sein Kehrwert). Ebenso ``quer_zu``
+    sagt: ``bis_feld`` bei α_min, in ``ab_felder`` bei α_max -- mit
+    ``faktor``, wo die Grenze ein Vielfaches des anderen ist
+    (:attr:`Bereich.bis_faktor`, beim anderen Feld sein Kehrwert), mit
+    ``offen``, wo sie ausgeschlossen ist (:attr:`Bereich.bis_offen`). Ein Feld
+    kann mehrere begrenzen: der Rippenabstand beide Breiten der Rippe. Ebenso ``quer_zu``
     an beiden Feldern, mit dem kleinsten Abstand als Linien in Grad
     (:attr:`Bereich.quer_zu`, ``mindestens``). Die Zahl des anderen Feldes
     kennt erst die Maske.
 
     Nimmt ein Feld ein Material (:func:`materialfeld`), steht dort, welche
-    Arten: ``stoffe``.
+    Arten: ``stoffe``. Hat es ein Zeichen fuer eine enge Maske
+    (:func:`bereich`), steht es dort mit seinem Namen: ``zeichen``, ``heisst``.
 
     Haelt ein Feld je Material eine Wahl (:func:`je_material`), steht dort,
     was ein Material ohne eigene waehlt: ``vorgabe`` -- und ist die Wahl
@@ -250,6 +262,8 @@ def feldangaben(cls: type) -> Dict[str, Dict[str, Any]]:
             angabe["ganz"] = True
         if "stoffe" in f.metadata:
             angabe["stoffe"] = list(f.metadata["stoffe"])
+        if "zeichen" in f.metadata:
+            angabe.update(zeichen=f.metadata["zeichen"], heisst=b.heisst)
         if "je_material" in f.metadata:
             angabe["vorgabe"] = f.metadata["je_material"]
             if "wahl" in f.metadata:
@@ -263,8 +277,10 @@ def feldangaben(cls: type) -> Dict[str, Dict[str, Any]]:
             unten = {"feld": name, "satz": dort}
             if b.bis_faktor != 1.0:
                 oben["faktor"], unten["faktor"] = b.bis_faktor, 1.0 / b.bis_faktor
+            if b.bis_offen:
+                oben["offen"] = unten["offen"] = True
             angaben.setdefault(name, {})["bis_feld"] = oben
-            angaben.setdefault(b.bis_feld, {})["ab_feld"] = unten
+            angaben.setdefault(b.bis_feld, {}).setdefault("ab_felder", []).append(unten)
         if b.quer_zu is not None:
             feld, mindestens = b.quer_zu
             hier, dort = b.quer(bereiche[feld])

@@ -163,6 +163,12 @@
       "bereich": "Baustoffe"
     },
     {
+      "name": "Profilblechstahl",
+      "pfad": "Formelsammlung/Themen/Profilblechstahl.md",
+      "art": "thema",
+      "bereich": "Baustoffe"
+    },
+    {
       "name": "Querkraft",
       "pfad": "Formelsammlung/Themen/Querkraft.md",
       "art": "thema",
@@ -255,6 +261,12 @@
     {
       "name": "Verbundstütze",
       "pfad": "Formelsammlung/Themen/Verbundstütze.md",
+      "art": "thema",
+      "bereich": "Querschnittsanalyse"
+    },
+    {
+      "name": "Blechverbunddecke",
+      "pfad": "Formelsammlung/Themen/Blechverbunddecke.md",
       "art": "thema",
       "bereich": "Querschnittsanalyse"
     },
@@ -817,10 +829,12 @@
       "pfad": "Formelsammlung/Formeln/Bemessungswert der Streckgrenze.md",
       "art": "formel",
       "zeichen": [
-        "f_{yd}"
+        "f_{yd}",
+        "f_{ypd}"
       ],
       "themen": [
-        "Baustahl"
+        "Baustahl",
+        "Profilblechstahl"
       ]
     },
     {
@@ -1690,6 +1704,7 @@
         "Knicken und Kippen eines Holzstabs",
         "Verbundquerschnitt",
         "Verbundstütze",
+        "Blechverbunddecke",
         "Durchstanzen"
       ]
     },
@@ -1705,6 +1720,15 @@
         "Holzquerschnitt",
         "Knicken und Kippen eines Holzstabs",
         "Verbundquerschnitt"
+      ]
+    },
+    {
+      "name": "Erfüllungsgrad bei fester Normalkraft – einachsig um y",
+      "pfad": "Formelsammlung/Formeln/Erfüllungsgrad bei fester Normalkraft – einachsig um y.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Blechverbunddecke"
       ]
     },
     {
@@ -1796,7 +1820,8 @@
       "art": "formel",
       "zeichen": [],
       "themen": [
-        "Kennzahlen"
+        "Kennzahlen",
+        "Blechverbunddecke"
       ]
     },
     {
@@ -2196,6 +2221,7 @@
         "\\varepsilon_{y}",
         "\\varepsilon_{pd}",
         "\\varepsilon_{pd}^{\\mathrm{Litze}}",
+        "\\varepsilon_{yp}",
         "\\varepsilon_y"
       ],
       "themen": [
@@ -2203,6 +2229,7 @@
         "Kennzahlen",
         "Baustahl",
         "Spannstahl",
+        "Profilblechstahl",
         "Stahlspannung aus Rissbreite",
         "Spannung-Dehnung-Analyse"
       ]
@@ -2374,6 +2401,17 @@
       ],
       "themen": [
         "Baustahl"
+      ]
+    },
+    {
+      "name": "Grenzdehnung des Profilblechstahls",
+      "pfad": "Formelsammlung/Formeln/Grenzdehnung des Profilblechstahls.md",
+      "art": "formel",
+      "zeichen": [
+        "\\varepsilon_{ud}"
+      ],
+      "themen": [
+        "Profilblechstahl"
       ]
     },
     {
@@ -2636,6 +2674,15 @@
       "zeichen": [],
       "themen": [
         "Knicken"
+      ]
+    },
+    {
+      "name": "Kennwerte eines Profilblechs",
+      "pfad": "Formelsammlung/Formeln/Kennwerte eines Profilblechs.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Blechverbunddecke"
       ]
     },
     {
@@ -2960,6 +3007,17 @@
       ],
       "themen": [
         "Pfahlsteifigkeit"
+      ]
+    },
+    {
+      "name": "Längsschubwiderstand nach der m-k-Methode",
+      "pfad": "Formelsammlung/Formeln/Längsschubwiderstand nach der m-k-Methode.md",
+      "art": "formel",
+      "zeichen": [
+        "V_{L,Rd}"
+      ],
+      "themen": [
+        "Blechverbunddecke"
       ]
     },
     {
@@ -3481,7 +3539,8 @@
         "Schiefe Biegung",
         "Stahlquerschnitt",
         "Kennzahlen",
-        "Verbundquerschnitt"
+        "Verbundquerschnitt",
+        "Blechverbunddecke"
       ]
     },
     {
@@ -3509,7 +3568,8 @@
         "Schiefe Biegung",
         "Stahlquerschnitt",
         "Kennzahlen",
-        "Verbundquerschnitt"
+        "Verbundquerschnitt",
+        "Blechverbunddecke"
       ]
     },
     {
@@ -3612,6 +3672,17 @@
       ],
       "themen": [
         "Innerer Pfahlwiderstand quer"
+      ]
+    },
+    {
+      "name": "Querkraftwiderstand einer Blechverbunddecke",
+      "pfad": "Formelsammlung/Formeln/Querkraftwiderstand einer Blechverbunddecke.md",
+      "art": "formel",
+      "zeichen": [
+        "V_{Rd}"
+      ],
+      "themen": [
+        "Blechverbunddecke"
       ]
     },
     {
@@ -3813,6 +3884,17 @@
       ]
     },
     {
+      "name": "Rippenbreite einer Blechverbunddecke",
+      "pfad": "Formelsammlung/Formeln/Rippenbreite einer Blechverbunddecke.md",
+      "art": "formel",
+      "zeichen": [
+        "b_0"
+      ],
+      "themen": [
+        "Blechverbunddecke"
+      ]
+    },
+    {
       "name": "Rissaktive Dicke des gezeichneten Querschnitts",
       "pfad": "Formelsammlung/Formeln/Rissaktive Dicke des gezeichneten Querschnitts.md",
       "art": "formel",
@@ -3949,6 +4031,17 @@
       ]
     },
     {
+      "name": "Schlankheit einer Blechverbunddecke",
+      "pfad": "Formelsammlung/Formeln/Schlankheit einer Blechverbunddecke.md",
+      "art": "formel",
+      "zeichen": [
+        "L/d_p"
+      ],
+      "themen": [
+        "Blechverbunddecke"
+      ]
+    },
+    {
       "name": "Schlankheit eines Holzstabs",
       "pfad": "Formelsammlung/Formeln/Schlankheit eines Holzstabs.md",
       "art": "formel",
@@ -4052,6 +4145,17 @@
       ],
       "themen": [
         "Holzquerschnitt"
+      ]
+    },
+    {
+      "name": "Schublänge einer Blechverbunddecke",
+      "pfad": "Formelsammlung/Formeln/Schublänge einer Blechverbunddecke.md",
+      "art": "formel",
+      "zeichen": [
+        "L_s"
+      ],
+      "themen": [
+        "Blechverbunddecke"
       ]
     },
     {
@@ -4448,6 +4552,17 @@
       ],
       "themen": [
         "Innerer Pfahlwiderstand quer"
+      ]
+    },
+    {
+      "name": "Statische Höhe einer Blechverbunddecke",
+      "pfad": "Formelsammlung/Formeln/Statische Höhe einer Blechverbunddecke.md",
+      "art": "formel",
+      "zeichen": [
+        "d_p"
+      ],
+      "themen": [
+        "Blechverbunddecke"
       ]
     },
     {
@@ -5862,6 +5977,15 @@
         "_Lauf._als_fehlend_vermerken",
         "_Lauf._bis_zur_wurzel",
         "_Lauf.abschliessen"
+      ]
+    },
+    {
+      "name": "opencivil.core.sprache",
+      "pfad": "Python/opencivil.core.sprache.md",
+      "art": "modul",
+      "kurz": "wie das Werkzeug eine Liste von Woertern in einen Satz setzt.",
+      "stichworte": [
+        "aufgezaehlt"
       ]
     },
     {
@@ -7456,6 +7580,25 @@
       ]
     },
     {
+      "name": "opencivil.nachweis.qa_blechverbund",
+      "pfad": "Python/opencivil.nachweis.qa_blechverbund.md",
+      "art": "modul",
+      "kurz": "eine Blechverbunddecke nach SIA 264:2014, 5.4.",
+      "stichworte": [
+        "_stellen",
+        "_bezug",
+        "KennzahlenBlechQA",
+        "KennzahlenBlechQA.rechne",
+        "KennzahlenBlechQA._form",
+        "_zieht",
+        "BlechBiegungQA",
+        "BlechBiegungQA.pruefe",
+        "BlechBiegungQA._normalkraft",
+        "BlechSchubQA",
+        "BlechSchubQA.pruefe"
+      ]
+    },
+    {
       "name": "opencivil.nachweis.qa_gebrauch",
       "pfad": "Python/opencivil.nachweis.qa_gebrauch.md",
       "art": "modul",
@@ -8720,6 +8863,7 @@
         "_lastfaelle",
         "_stahl",
         "_verbund",
+        "_blechverbund",
         "_holz",
         "_stossartig",
         "_kennzahlen",
@@ -8813,11 +8957,31 @@
         "_raumrahmen",
         "_spannbeton",
         "_stahltraeger",
-        "_holztraeger",
-        "_verbundtraeger",
-        "_verbundduebel",
-        "_verbundstuetze",
-        "_verbundrohr"
+        "_holztraeger"
+      ]
+    },
+    {
+      "name": "opencivil.projekt.beispiele_verbund",
+      "pfad": "Python/opencivil.projekt.beispiele_verbund.md",
+      "art": "modul",
+      "kurz": "die Querschnitte im Verbund des Pruefprojekts.",
+      "stichworte": [
+        "traeger",
+        "traeger_mit_duebeln",
+        "stuetze",
+        "rohr",
+        "blechdecke",
+        "hinterschnittene_blechdecke"
+      ]
+    },
+    {
+      "name": "opencivil.projekt.blechdecken",
+      "pfad": "Python/opencivil.projekt.blechdecken.md",
+      "art": "modul",
+      "kurz": "eine Blechverbunddecke, wie die Oberflaeche sie beschreibt.",
+      "stichworte": [
+        "BlechdeckeEintrag",
+        "BlechdeckeEintrag.form"
       ]
     },
     {
@@ -9213,6 +9377,7 @@
         "Elemente",
         "Elemente.flaechen",
         "QuerschnittsanalyseEintrag",
+        "QuerschnittsanalyseEintrag.laengsschub",
         "QuerschnittsanalyseEintrag.materialien",
         "QuerschnittsanalyseEintrag.leer",
         "QuerschnittsanalyseEintrag.elemente",
@@ -9221,6 +9386,7 @@
         "QuerschnittsanalyseEintrag._kennung",
         "QuerschnittsanalyseEintrag.polygon",
         "QuerschnittsanalyseEintrag.profil",
+        "QuerschnittsanalyseEintrag.blechdecke",
         "QuerschnittsanalyseEintrag.stab",
         "QuerschnittsanalyseEintrag.spannglied",
         "QuerschnittsanalyseEintrag.stablinie",
@@ -9293,7 +9459,6 @@
         "Querschnittsart.aus_bauteil",
         "Querschnittsart.bauteil",
         "ModulEintrag",
-        "aufgezaehlt",
         "StabquerschnittBasis",
         "StabquerschnittBasis.neu",
         "StabquerschnittBasis.bezug",
@@ -9370,6 +9535,7 @@
         "Querschnittsanalyse.baustoffe_mit_werkstoff",
         "Querschnittsanalyse.aufbau_protokollieren",
         "Querschnittsanalyse.torsion_protokollieren",
+        "Querschnittsanalyse._bewehrung_protokollieren",
         "Querschnittsanalyse.angaben",
         "Querschnittsanalyse.werkstoffbezuege",
         "Querschnittsanalyse.stoff_von_werkstoff",
@@ -9409,30 +9575,38 @@
       "stichworte": [
         "Bewehrungselement",
         "Bewehrungselement.punkte",
+        "Bewehrungselement.strecken",
         "Bewehrungselement.lage",
         "Bewehrungselement.menge",
         "Bewehrungselement.kurzmenge",
         "Bewehrungselement.fiktiv",
         "Bewehrungselement.rissdurchmesser",
         "Bewehrungselement.als_bewehrung",
+        "Bewehrungselement.stahlflaechen",
+        "quadrate",
+        "baender",
         "Einzelstab",
         "Einzelstab.punkte",
         "Einzelstab.lage",
         "Einzelstab.menge",
         "Einzelstab.rissdurchmesser",
         "Einzelstab.als_bewehrung",
+        "Einzelstab.stahlflaechen",
         "Stabreihe",
         "Stabreihe.punkte",
         "Stabreihe.menge",
         "Stabreihe.kurzmenge",
         "Stabreihe.rissdurchmesser",
         "Stabreihe.als_bewehrung",
+        "Stabreihe.stahlflaechen",
         "VerschmierteLinie",
+        "VerschmierteLinie.strecken",
         "VerschmierteLinie.menge",
         "VerschmierteLinie.kurzmenge",
         "VerschmierteLinie.fiktiv",
         "VerschmierteLinie.rissdurchmesser",
         "VerschmierteLinie.als_bewehrung",
+        "VerschmierteLinie.stahlflaechen",
         "aus_stab",
         "aus_linie"
       ]
@@ -9748,6 +9922,38 @@
       ]
     },
     {
+      "name": "opencivil.querschnitt.profilblech",
+      "pfad": "Python/opencivil.querschnitt.profilblech.md",
+      "art": "modul",
+      "kurz": "das Profilblech einer Blechverbunddecke.",
+      "stichworte": [
+        "Blechform",
+        "Blechform.breite",
+        "Blechform.h_c",
+        "Blechform.hinterschnitten",
+        "Blechform.b_0",
+        "Blechform.L_w",
+        "Blechform.s",
+        "Blechform.t",
+        "Blechform.e",
+        "Blechform.d_p",
+        "Blechform.flaeche",
+        "Blechform.linie",
+        "Blechform.strecken",
+        "Blechform.beton",
+        "Profilblech",
+        "Profilblech.strecken",
+        "Profilblech.menge",
+        "Profilblech.kurzmenge",
+        "Profilblech.rissdurchmesser",
+        "Profilblech.als_bewehrung",
+        "Profilblech.stahlflaechen",
+        "skizze",
+        "rippenskizze",
+        "aus_form"
+      ]
+    },
+    {
       "name": "opencivil.querschnitt.randzone",
       "pfad": "Python/opencivil.querschnitt.randzone.md",
       "art": "modul",
@@ -9841,6 +10047,7 @@
         "Spannglied.rissdurchmesser",
         "Spannglied.durchmesser",
         "Spannglied.als_bewehrung",
+        "Spannglied.stahlflaechen",
         "aus_glied",
         "Spannglieder",
         "Spannglieder.index",
@@ -10898,6 +11105,31 @@
       "stichworte": []
     },
     {
+      "name": "opencivil.verbund.blechdecke",
+      "pfad": "Python/opencivil.verbund.blechdecke.md",
+      "art": "modul",
+      "kurz": "Blechverbunddecken nach SIA 264:2014, 5.4.",
+      "stichworte": [
+        "Feld",
+        "Feld.faktor",
+        "Feld.beschriftung",
+        "Feld.erklaerung",
+        "Belastung",
+        "Belastung.beschriftung",
+        "Belastung.mit_abstand",
+        "Belastung.erklaerung",
+        "Laengsschub",
+        "Laengsschub.L_ersatz",
+        "Laengsschub.L_s",
+        "Laengsschub.fehlt",
+        "Laengsschub.fehlt_in_worten",
+        "Laengsschub.fehlt_kurz",
+        "plastisch",
+        "querkraft",
+        "laengsschub"
+      ]
+    },
+    {
       "name": "opencivil.verbund.duebel",
       "pfad": "Python/opencivil.verbund.duebel.md",
       "art": "modul",
@@ -10921,7 +11153,6 @@
       "art": "modul",
       "kurz": "ein gezeichneter Querschnitt aus Baustahl und Beton.",
       "stichworte": [
-        "stahlflaechen",
         "Verbundquerschnitt",
         "Verbundquerschnitt.art",
         "Verbundquerschnitt.gruppen_der",
@@ -11207,6 +11438,7 @@
         "_vorlagenwahl",
         "vorlage",
         "_profilskizze",
+        "_deckenskizze",
         "vorlage_einsetzen",
         "bearbeite",
         "bearbeite_json"
@@ -11377,6 +11609,7 @@
         "_knickkurven",
         "_tiefen",
         "_profil",
+        "_blechdecke",
         "_als_satz",
         "_Glieder",
         "_spannglieder"

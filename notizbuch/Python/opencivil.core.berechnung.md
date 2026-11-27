@@ -1,5 +1,5 @@
 ---
-erzeugt: 6f0a7c419003
+erzeugt: b238324ee494
 art: modul
 tags: [modul]
 ---
@@ -476,6 +476,7 @@ Die Kennzahl `kurz` mit dem Wert `si` in SI-Basis -- auch in `ergebnis`.
 - [[opencivil.nachweis.knicken]]
 - [[opencivil.nachweis.lagennachweis]]
 - [[opencivil.nachweis.mindestbewehrung]]
+- [[opencivil.nachweis.qa_blechverbund]]
 - [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.qa_holz]]
 - [[opencivil.nachweis.qa_holz_kennzahlen]]

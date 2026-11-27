@@ -23,6 +23,11 @@ export function imVerbund(analyse) {
   return bauweiseVon(analyse.kennung) === 'verbund';
 }
 
+/** Ob der Querschnitt eine Blechverbunddecke ist -- das sagt der Kern (`bauweiseVon`). */
+export function imBlechverbund(analyse) {
+  return bauweiseVon(analyse.kennung) === 'blechverbund';
+}
+
 /** Was beim Holz an der Stelle der Rechenwahl steht: es rechnet immer gleich. */
 export const HOLZ_RECHNET = 'Das Holz rechnet linear, mit den Bemessungswerten der Norm und dem '
   + 'η_w der Feuchteklasse – ein stossartiger Fall dazu mit η_t.';

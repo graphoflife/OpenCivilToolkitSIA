@@ -1,5 +1,5 @@
 ---
-erzeugt: 96e0454a98a9
+erzeugt: 29bc07da1dce
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -14,6 +14,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Baustahl]] · 3
 - [[Spannstahl]] · 2
 - [[Holz]] · 3
+- [[Profilblechstahl]] · 3
 
 **Platte**
 
@@ -44,6 +45,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Knicken und Kippen eines Holzstabs]] · 19
 - [[Verbundquerschnitt]] · 14
 - [[Verbundstütze]] · 20
+- [[Blechverbunddecke]] · 12
 
 **Balkensysteme**
 
@@ -211,6 +213,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Erdwiderstand je Meter Pfahl]]
 - [[Erfüllungsgrad]] · $\alpha_{eff,x}$
 - [[Erfüllungsgrad bei fester Normalkraft und fester Richtung]]
+- [[Erfüllungsgrad bei fester Normalkraft – einachsig um y]]
 - [[Ersatzimperfektion des Stabs]] · $w_{0,y}$
 - [[Ersatzimperfektion einer Verbundstütze]] · $e_{0,y}$
 - [[Ersatzkraft]] · $F_{d,x}$
@@ -272,6 +275,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Gleichungssystem der Steifigkeitsmethode]]
 - [[Gleitwiderstand]] · $T_{Rd}$
 - [[Grenzdehnung des Baustahls]] · $\varepsilon_{ud}$
+- [[Grenzdehnung des Profilblechstahls]] · $\varepsilon_{ud}$
 - [[Grenzdehnungen am Ende der Linie]]
 - [[Grenze der bezogenen Druckzonenhöhe]] · $\left(x/d\right)_{max}$
 - [[Grenze der Grundschwingzeit]] · $T_{1,max}$
@@ -296,6 +300,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Innerer Hebelarm]] · $z$
 - [[Innerer Widerstand des Pfahls]] · $R_{i,d}$
 - [[Iteration der Ausmitte 2. Ordnung]]
+- [[Kennwerte eines Profilblechs]]
 - [[Kippbeiwert des Holzes]] · $k_m$
 - [[Kippen eines Holzträgers]]
 - [[Kippmoment am Fuss]] · $M_{0,x}$
@@ -326,6 +331,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Lage des Punktes längs L]] · $x_K$
 - [[Längere Seite eines Rechtecks]] · $s_{\text{Q1}}$
 - [[Längsfeder des Pfahlkopfs]] · $k_v$
+- [[Längsschubwiderstand nach der m-k-Methode]] · $V_{L,Rd}$
 - [[Längszugkraft aus der Querkraft]] · $F_{tVd}$
 - [[Lastneigungsfaktor i_c]] · $i_c$
 - [[Lastneigungsfaktor i_q]] · $i_q$
@@ -385,6 +391,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Querkraft über die Federn der Wände]]
 - [[Querkraftwiderstand des Pfahls]] · $V_{Rd}$
 - [[Querkraftwiderstand des Tragglieds]] · $V_{Rd}$
+- [[Querkraftwiderstand einer Blechverbunddecke]] · $V_{Rd}$
 - [[Querkraftwiderstand eines Holzquerschnitts]] · $V_{z,Rd}$
 - [[Querkraftwiderstand eines Stahlprofils]]
 - [[Querkraftwiderstand mit Querkraftbewehrung]] · $V_{Rd,x}$
@@ -403,6 +410,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Reichweite des Gleitkörpers]] · $L_{Gl}$
 - [[Relative Schlankheit beim Kippen von Holz]] · $\lambda_{rel,m}$
 - [[Relative Schlankheit beim Knicken von Holz]] · $\lambda_{rel,y}$
+- [[Rippenbreite einer Blechverbunddecke]] · $b_0$
 - [[Rissaktive Dicke des gezeichneten Querschnitts]] · $t$
 - [[Rissaktive Plattendicke]] · $h_{eff}$
 - [[Risskraft der gezogenen Querschnittshälfte]] · $N_{Riss}$
@@ -415,6 +423,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Schiefstellung]] · $\alpha_i$
 - [[Schlankheit beim Kippen]] · $\bar{\lambda}_{D}$
 - [[Schlankheit beim Knicken]] · $\bar{\lambda}_{K,y}$
+- [[Schlankheit einer Blechverbunddecke]] · $L/d_p$
 - [[Schlankheit eines Holzstabs]] · $\lambda_y$
 - [[Schnittgrössen aus der Spannungsverteilung]]
 - [[Schnittgrössen eines Stabs im Raum]]
@@ -426,6 +435,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Schubbeulen des Blechs, ohne Quersteifen]]
 - [[Schubfestigkeit des Holzes im Lastfall]] · $\eta f_{v,d}$
 - [[Schubfläche nach Jourawski]] · $A_{V,z}$
+- [[Schublänge einer Blechverbunddecke]] · $L_s$
 - [[Schubspannung aus Querkraft im Holz]] · $\tau_{z,d}$
 - [[Schubspannung aus Querkraft nach Jourawski]]
 - [[Schubspannung aus Torsion im Holz]] · $\tau_{tor,d}$
@@ -461,6 +471,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Statische Höhe der äusseren Lage]] · $d_x$
 - [[Statische Höhe der inneren Lage]] · $d_y$
 - [[Statische Höhe des Kreisquerschnitts]] · $d$
+- [[Statische Höhe einer Blechverbunddecke]] · $d_p$
 - [[Stauchung an der Druckgrenze in Faserrichtung]] · $\varepsilon_{c,0,d}$
 - [[Steg ohne Schubbeulen]]
 - [[Stegbreite des Kreisquerschnitts]] · $b_w$
@@ -541,7 +552,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 ## Normstelle fehlt noch
 
-141 von 456 Formeln haben im Code keine Normstelle – meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle – von dort kommt sie in Bericht und Notizbuch.
+142 von 465 Formeln haben im Code keine Normstelle – meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle – von dort kommt sie in Bericht und Notizbuch.
 
 - [[Achsen eines Stabs im Raum]] · [[opencivil.stabwerk3d.herleitung|_ansaetze]]
 - [[Äquivalenter E-Modul eines Stabs]] · [[opencivil.spannungsanalyse.modul#ModulProzedur|ModulProzedur._schreiben]]
@@ -617,6 +628,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Hilfsgrösse der Nulllinie]] · [[opencivil.nachweis.mindestbewehrung#ZwaengungBiegung.protokoll_lage|ZwaengungBiegung.protokoll_lage]]
 - [[Höhe der Distanzhalter]] · [[opencivil.querschnitt.lagenaufbau#Lagenaufbau._kennzahlen|Lagenaufbau._kennzahlen]]
 - [[Innerer Hebelarm]] · [[opencivil.nachweis.mindestbewehrung#ZwaengungBiegung.protokoll_lage|ZwaengungBiegung.protokoll_lage]]
+- [[Kennwerte eines Profilblechs]] · [[opencivil.nachweis.qa_blechverbund#KennzahlenBlechQA._form|KennzahlenBlechQA._form]]
 - [[Kraft im Beton bei voller Verdübelung]] · [[opencivil.nachweis.qa_verbund#VerbundBiegungQA._verduebelung|VerbundBiegungQA._verduebelung]]
 - [[Kräfte mal Hebelarm um die halbe Höhe]] · [[opencivil.nachweis.handrechnung#Handrechnung._groesste_zugkraft|Handrechnung._groesste_zugkraft]]
 - [[Kräftegleichgewicht]] · [[opencivil.nachweis.handrechnung#Handrechnung._halbe_hoehe|Handrechnung._halbe_hoehe]]
@@ -632,7 +644,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Nulllinie auf halber Höhe]] · [[opencivil.nachweis.handrechnung#Handrechnung._halbe_hoehe|Handrechnung._halbe_hoehe]]
 - [[Nulllinie des gerissenen Querschnitts]] · [[opencivil.nachweis.mindestbewehrung#ZwaengungBiegung.protokoll_lage|ZwaengungBiegung.protokoll_lage]]
 - [[Platz für die Durchstanzbewehrung]] · [[opencivil.durchstanzen.mit_bewehrung#nachweisen|nachweisen]]
-- [[Probe – Moment um y]] · [[opencivil.nachweis.qa_stahl#probe|probe]], [[opencivil.nachweis.qa_verbund_kennzahlen#KennzahlenVerbundQA|KennzahlenVerbundQA._biegung]], [[opencivil.nachweis.schiefe_biegung#SchiefeBiegung|SchiefeBiegung._protokoll_bruchzustand]]
+- [[Probe – Moment um y]] · [[opencivil.nachweis.qa_blechverbund#KennzahlenBlechQA|KennzahlenBlechQA._biegung]], [[opencivil.nachweis.qa_stahl#probe|probe]], [[opencivil.nachweis.qa_verbund_kennzahlen#KennzahlenVerbundQA|KennzahlenVerbundQA._biegung]], [[opencivil.nachweis.schiefe_biegung#SchiefeBiegung|SchiefeBiegung._protokoll_bruchzustand]]
 - [[Probe – Moment um z]] · [[opencivil.nachweis.qa_stahl#probe|probe]], [[opencivil.nachweis.qa_verbund_kennzahlen#KennzahlenVerbundQA|KennzahlenVerbundQA._biegung]], [[opencivil.nachweis.schiefe_biegung#SchiefeBiegung|SchiefeBiegung._protokoll_bruchzustand]]
 - [[Probe – Normalkraft]] · [[opencivil.nachweis.qa_stahl#krafttabelle|krafttabelle]], [[opencivil.nachweis.schiefe_biegung#SchiefeBiegung|SchiefeBiegung._protokoll_bruchzustand]]
 - [[Querkraft über die Federn der Wände]] · [[opencivil.nachweis.schubwandnachweis#Schubwandnachweis|Schubwandnachweis._protokoll_ansatz]]
@@ -660,7 +672,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Statische Höhe der inneren Lage]] · [[opencivil.durchstanzen.nachweis#Durchstanzen._statische_hoehe|Durchstanzen._statische_hoehe]]
 - [[Stegbreite des Kreisquerschnitts]] · [[opencivil.pfahl.innen_quer#InnererQuerwiderstand._fachwerk|InnererQuerwiderstand._fachwerk]]
 - [[Steifigkeitsmatrix eines Stabs]] · [[opencivil.stabwerk.herleitung|_ansaetze]], [[opencivil.stabwerk3d.herleitung|_ansaetze]]
-- [[Teilung einer Stablinie – gleiche Felder, auf die Länge gerundet]] · [[opencivil.querschnitt.analyse#Querschnittsanalyse|Querschnittsanalyse._bewehrung_protokollieren]]
+- [[Teilung einer Stablinie – gleiche Felder, auf die Länge gerundet]] · [[opencivil.querschnitt.analyse#Querschnittsanalyse._bewehrung_protokollieren|Querschnittsanalyse._bewehrung_protokollieren]]
 - [[Teilung in y aus der Stabzahl]] · [[opencivil.nachweis.querkraft_buegel#QuerkraftMitBuegeln.protokoll_teilung_y|QuerkraftMitBuegeln.protokoll_teilung_y]]
 - [[Torsion aus der lotrechten Kraft der Spannglieder]] · [[opencivil.nachweis.schubwandnachweis#Schubwandnachweis._ohne_glieder|Schubwandnachweis._ohne_glieder]]
 - [[Torsion der Wände neben geneigten Spanngliedern]] · [[opencivil.nachweis.schubwandnachweis#Schubwandnachweis._ohne_glieder|Schubwandnachweis._ohne_glieder]]
@@ -674,7 +686,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Trägheitsmomente eines Polygons, bezogen auf den Schwerpunkt]] · [[opencivil.querschnitt.analyse#Querschnittsanalyse.aufbau_protokollieren|Querschnittsanalyse.aufbau_protokollieren]]
 - [[Umfang des Pfahls]] · [[opencivil.pfahl.aussen#AeussererWiderstand._mantel|AeussererWiderstand._mantel]]
 - [[Versatz – Moment der Querkraftanteile um den Schwerpunkt]] · [[opencivil.nachweis.schubwandnachweis#Schubwandnachweis|Schubwandnachweis._ein_fall]]
-- [[Verschmierte Stahlfläche aus Stäben]] · [[opencivil.querschnitt.analyse#Querschnittsanalyse|Querschnittsanalyse._bewehrung_protokollieren]]
+- [[Verschmierte Stahlfläche aus Stäben]] · [[opencivil.querschnitt.analyse#Querschnittsanalyse._bewehrung_protokollieren|Querschnittsanalyse._bewehrung_protokollieren]]
 - [[Was die Zellen tragen]] · [[opencivil.nachweis.schubwandnachweis#Schubwandnachweis|Schubwandnachweis._ein_fall]]
 - [[Widerstand bei festgehaltenem M_Ed]] · [[opencivil.nachweis.resistenzlinie#Handlinie.protokoll_treffer|Handlinie.protokoll_treffer]]
 - [[Widerstand bei festgehaltenem N_Ed]] · [[opencivil.nachweis.resistenzlinie#Handlinie.protokoll_treffer|Handlinie.protokoll_treffer]]

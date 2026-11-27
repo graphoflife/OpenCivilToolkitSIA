@@ -1,5 +1,5 @@
 ---
-erzeugt: 5eff9a407e9e
+erzeugt: b388dc0ebfb5
 art: formel
 tags: [formel]
 ---
@@ -27,6 +27,7 @@ $$
 
 ## Im Code
 
+- [[opencivil.nachweis.qa_blechverbund#KennzahlenBlechQA|KennzahlenBlechQA._biegung]]
 - [[opencivil.nachweis.qa_stahl#probe|probe]]
 - [[opencivil.nachweis.qa_verbund_kennzahlen#KennzahlenVerbundQA|KennzahlenVerbundQA._biegung]]
 - [[opencivil.nachweis.schiefe_biegung#SchiefeBiegung|SchiefeBiegung._protokoll_bruchzustand]]
@@ -37,6 +38,7 @@ $$
 - [[Stahlquerschnitt]]
 - [[Kennzahlen]]
 - [[Verbundquerschnitt]]
+- [[Blechverbunddecke]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

@@ -7,9 +7,10 @@ die :class:`~opencivil.querschnitt.analyse.Querschnittsanalyse` und ihre
 Nachweise: Biegung und Normalkraft, Querkraft und Torsion, Duktilitaet,
 sproedes Versagen, die Zwaengungen, die Stahlspannungen und das Knicken
 (:func:`bauen`) -- dazu die Kennzahlen. Ein Querschnitt aus Stahl hat seine
-eigenen (:func:`_stahl`), einer im Verbund (:func:`_verbund`) und einer aus
-Holz auch (:func:`_holz`). Eine leere oder fehlerhafte Zeichnung wird kein
-Bauteil, nur ein Hinweis.
+eigenen (:func:`_stahl`), einer im Verbund (:func:`_verbund`), eine
+Blechverbunddecke (:func:`_blechverbund`) und einer aus Holz auch
+(:func:`_holz`). Eine leere oder fehlerhafte Zeichnung wird kein Bauteil,
+nur ein Hinweis.
 """
 
 from __future__ import annotations
@@ -23,7 +24,11 @@ from opencivil.projekt.lesen import ProjektFehler, als_groesse, ort_von, stoffe_
 from opencivil.projekt.querschnittsanalyse import (
     QuerschnittsanalyseEintrag, SchubwandEintrag, StabEintrag, StablinieEintrag,
 )
+from opencivil.projekt.blechdecken import BlechdeckeEintrag
 from opencivil.projekt.spannglieder import SpanngliedEintrag
+from opencivil.nachweis.qa_blechverbund import (
+    EINE_RICHTUNG, BlechBiegungQA, BlechSchubQA, KennzahlenBlechQA,
+)
 from opencivil.nachweis.qa_gebrauch import AnalyseStellen, RissnormalkraftQA, ZwaengungBiegungQA
 from opencivil.nachweis.qa_holz import HolzBiegungQA, HolzSchubQA
 from opencivil.nachweis.qa_holz_kennzahlen import KennzahlenHolzQA
@@ -45,6 +50,7 @@ from opencivil.querschnitt.analyse import Flaechenteil, Lastfall, Querschnittsan
 from opencivil.querschnitt.bauweise import Bauweise
 from opencivil.querschnitt.biegung import EINACHSIG, SCHIEF
 from opencivil.querschnitt.geometrie import GeometrieFehler
+from opencivil.querschnitt.profilblech import aus_form
 from opencivil.querschnitt.spannglieder import Spannglied, aus_glied
 from opencivil.verbund import duebel as vd
 
@@ -70,12 +76,13 @@ def bauen(art: "Bauteilart", eintrag: QuerschnittsanalyseEintrag,
     Knicken, sobald ein Fall eingeschaltet ist.
 
     Das alles beim Stahlbeton. Ein Querschnitt aus Stahl rechnet nach SIA 263
-    (:func:`_stahl`), einer im Verbund nach SIA 264 (:func:`_verbund`), einer
-    aus Holz nach SIA 265 (:func:`_holz`). Einer aus mehreren Hoelzern
-    rechnet bisher nur seine Werte -- Flaeche, Schwerpunkt,
-    Traegheitsmomente --; seine Zusammenfassung sagt, dass die Nachweise
-    fehlen (:func:`ohne_nachweise`). Seine Spannung-Dehnung-Analysen rechnet
-    er trotzdem. Der Verbund hat noch keine (:func:`ohne_analysen`).
+    (:func:`_stahl`), einer im Verbund nach SIA 264 (:func:`_verbund`), eine
+    Blechverbunddecke auch (:func:`_blechverbund`), einer aus Holz nach
+    SIA 265 (:func:`_holz`). Einer aus mehreren Hoelzern rechnet bisher nur
+    seine Werte -- Flaeche, Schwerpunkt, Traegheitsmomente --; seine
+    Zusammenfassung sagt, dass die Nachweise fehlen (:func:`ohne_nachweise`).
+    Seine Spannung-Dehnung-Analysen rechnet er trotzdem. Der Verbund und die
+    Blechverbunddecke haben noch keine (:func:`ohne_analysen`).
 
     Ist noch nichts gezeichnet (:attr:`QuerschnittsanalyseEintrag.leer`), gibt
     es nichts zu rechnen und kein Bauteil -- aber auch keinen Fehler, der das
@@ -100,6 +107,8 @@ def bauen(art: "Bauteilart", eintrag: QuerschnittsanalyseEintrag,
         return _stahl(eintrag, analyse, teil, aufbau)
     if analyse.bauweise is Bauweise.VERBUND:
         return _verbund(eintrag, analyse, teil, aufbau)
+    if analyse.bauweise is Bauweise.BLECHVERBUND:
+        return _blechverbund(eintrag, analyse, teil, aufbau)
     fehlt = ohne_nachweise(analyse.bauweise, ((s.art, s.name) for s in analyse.baustoffe))
     if fehlt:
         aufbau.ohne_nachweis(teil, ort_von(eintrag), fehlt)
@@ -233,6 +242,32 @@ def _verbund(eintrag: QuerschnittsanalyseEintrag, analyse: Querschnittsanalyse, 
     return teil
 
 
+def _blechverbund(eintrag: QuerschnittsanalyseEintrag, analyse: Querschnittsanalyse,
+                  teil: Bauteil, aufbau: Aufbau) -> Bauteil:
+    """
+    Eine Blechverbunddecke nach SIA 264, 5.4
+    (:mod:`~opencivil.nachweis.qa_blechverbund`): je Lastfall Biegung und
+    Normalkraft, plastisch, und Querkraft und Laengsschub, sobald einer
+    ``V_z`` hat -- beide lesen ihre Widerstaende aus den Kennzahlen. Die
+    Decke traegt in einer Richtung: ein Lastfall mit ``M_z``, ``V_y`` oder
+    ``T`` sagt, dass sie nicht nachgewiesen werden. Eine Analyse rechnet
+    eine Decke (:meth:`QuerschnittsanalyseEintrag.elemente`).
+    """
+    kennzahlen = KennzahlenBlechQA(analyse, analyse.bleche[0], eintrag.laengsschub)
+    lastfaelle = _lastfaelle(eintrag)
+    if lastfaelle:
+        aufbau.eintragen(teil, "qa_blech", eintrag.kennung,
+                         BlechBiegungQA(analyse, lastfaelle, kennzahlen))
+    if any(l.V_z for l in lastfaelle):
+        aufbau.eintragen(teil, "qa_blech_schub", eintrag.kennung,
+                         BlechSchubQA(analyse, lastfaelle, kennzahlen))
+    quer = [l.name for l in lastfaelle if l.M_z or l.V_y or l.T]
+    if quer:
+        aufbau.warnen(teil.raum, f"{ort_von(eintrag)}, {', '.join(quer)}: {EINE_RICHTUNG}")
+    _kennzahlen(kennzahlen, teil, aufbau)
+    return teil
+
+
 def _holz(eintrag: QuerschnittsanalyseEintrag, analyse: Querschnittsanalyse, teil: Bauteil,
           aufbau: Aufbau) -> Bauteil:
     """
@@ -316,12 +351,12 @@ def ohne_analysen(bauweise: Bauweise) -> str:
     """
     Warum ein Querschnitt dieser Bauweise keine Spannung-Dehnung-Analyse hat
     -- leer, wo er eine hat. Ein Satz mit Punkt, fuer die Zeichnung
-    (:func:`~opencivil.web.zeichengeometrie.geometrie`). Der Verbund rechnet
-    seine Nachweise plastisch; seine Linien braeuchten den Riss am ideellen
-    Querschnitt, mit ``E_a/E_cm`` gewichtet, und die Werte der Analyse sind
-    ungewichtet.
+    (:func:`~opencivil.web.zeichengeometrie.geometrie`). Der Verbund und die
+    Blechverbunddecke rechnen ihre Nachweise plastisch; ihre Linien
+    braeuchten den Riss am ideellen Querschnitt, mit ``E_a/E_cm`` gewichtet,
+    und die Werte der Analyse sind ungewichtet.
     """
-    if bauweise is not Bauweise.VERBUND:
+    if bauweise not in (Bauweise.VERBUND, Bauweise.BLECHVERBUND):
         return ""
     return f"Einen {bauweise.querschnitt} rechnen die Spannung-Dehnung-Analysen noch nicht."
 
@@ -364,6 +399,10 @@ def _analyse(eintrag: QuerschnittsanalyseEintrag, baustoffe: Mapping[str, Bausto
               for w in elemente.waende]
     glieder = [_glied(g, stoff(g, "stahl", SpanngliedEintrag), wo)
                for g in elemente.spannglieder]
+    bleche = [aus_form(d["namen"]["blech"], d["kennung"],
+                       material(baustoffe, d["blech"], stoffe_des_felds(BlechdeckeEintrag, "blech"),
+                                wo, d["namen"]["blech"]), d["form"])
+              for d in elemente.blechdecken]
     # Jeder Baustoff bekommt seine Wahl, auch wer keine eigene hat: so steht
     # die Vorgabe nur an der Beschreibung.
     wahl = eintrag.wahl({k: baustoffe[k] for k in eintrag.materialien() if k in baustoffe})
@@ -371,7 +410,9 @@ def _analyse(eintrag: QuerschnittsanalyseEintrag, baustoffe: Mapping[str, Bausto
         name=eintrag.name, praefix=praefix,
         flaechen=flaechen, staebe=staebe, linien=linien, waende=waende,
         alpha_min=eintrag.alpha_min, alpha_max=eintrag.alpha_max, k_c=eintrag.k_c,
-        wahl=wahl, biegung=EINACHSIG if eintrag.einachsig else SCHIEF, spannglieder=glieder)
+        # Eine Blechverbunddecke traegt in einer Richtung (SIA 264:2014, 5.4.1.1).
+        wahl=wahl, biegung=EINACHSIG if eintrag.einachsig or bleche else SCHIEF,
+        spannglieder=glieder, bleche=bleche)
 
 
 def _glied(g: Mapping, stahl: Baustoff, wo: str) -> Spannglied:

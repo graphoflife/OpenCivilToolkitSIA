@@ -1,5 +1,5 @@
 ---
-erzeugt: 8b8d68cbc990
+erzeugt: 9896c61a05f7
 art: modul
 tags: [modul]
 ---
@@ -475,6 +475,7 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - [[opencivil.nachweis.knicken]]
 - [[opencivil.nachweis.linie]]
 - [[opencivil.nachweis.mindestbewehrung]]
+- [[opencivil.nachweis.qa_blechverbund]]
 - [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.qa_holz_kennzahlen]]
 - [[opencivil.nachweis.qa_holz_werte]]
@@ -507,6 +508,7 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - [[opencivil.projekt.aufbau.platte]]
 - [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.balkensystem3d]]
+- [[opencivil.projekt.blechdecken]]
 - [[opencivil.projekt.decke]]
 - [[opencivil.projekt.durchstanzen]]
 - [[opencivil.projekt.eintraege]]

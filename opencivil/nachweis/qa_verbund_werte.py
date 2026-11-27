@@ -12,13 +12,18 @@ Festigkeiten und schreiben dieselben Tabellen; beides steht hier, je einmal:
 * die Tabelle der Bleche mit ihren Klassen (:func:`klassen`);
 * ``β`` nach 5.1.2.2 mit ``x_p`` und ``h`` (:func:`beta`).
 
+Die Blechverbunddecke (:mod:`opencivil.nachweis.qa_blechverbund`) liest
+dieselben Festigkeiten: ihr Profilblech ist eine Gruppe wie ein Betonstahl.
+
 DIE FESTIGKEITEN (SIA 264:2014, 4.1.3 und 5.1.2.1):
 Baustahl ``f_y/γ_a`` gezogen und gedrueckt, je Dicke wie im Stahl
 (:class:`~opencivil.nachweis.qa_stahl_werte.Stahlwerte`); ``γ_a`` ist
 ``γ_M1`` des Baustahls -- 4.1.5 nennt 1.05, wie SIA 263. Beton gedrueckt
 ``0.85 η_fc f_ck/γ_c`` mit ``η_fc = 1`` und ohne ``η_t``, also nicht ``f_cd``
 der SIA 262; gezogen nichts (4.3.2.1). Betonstahl ``f_sd`` seines Materials,
-gedrueckt mit dem Wert fuer Druck.
+gedrueckt mit dem Wert fuer Druck. Profilblech ``f_yp/γ_ap`` (4.1.3, (1)),
+nur gezogen: gedrueckt beult das duenne Blech, und das Werkzeug rechnet es
+dort nicht (nach Vorgabe, nicht nachgeschlagen).
 
 BEMESSUNG ODER CHARAKTERISTISCH:
 Wie beim Stahl je Material der Wertesatz, den die Tragsicherheit waehlt:
@@ -36,6 +41,7 @@ from typing import List, Optional, Sequence, Tuple
 from opencivil.core.berechnung import Eingabebezug, Eingaben
 from opencivil.core.latex import Mathe, fest
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
+from opencivil.core.sprache import aufgezaehlt
 from opencivil.core.wert import Wert
 from opencivil.material.basis import Baustoffart
 from opencivil.nachweis.qa_stahl_werte import KENNWERTE, Stahlwerte
@@ -55,6 +61,7 @@ _KENNWERTE = {
     Baustoffart.BAUSTAHL: KENNWERTE,
     Baustoffart.BETON: ("f_ck", "gamma_c"),
     Baustoffart.BETONSTAHL: ("f_yk", "f_yk_druck", "gamma_s", "f_yd", "f_yd_druck"),
+    Baustoffart.PROFILBLECH: ("f_yp", "gamma_ap"),
 }
 
 #: Der Elastizitaetsmodul je Art.
@@ -62,7 +69,7 @@ MODUL = {Baustoffart.BAUSTAHL: "E_a", Baustoffart.BETON: "E_cm", Baustoffart.BET
 
 #: Der Beiwert je Art -- beim Baustahl ``γ_M1``, im Verbund ``γ_a`` genannt.
 _GAMMA = {Baustoffart.BAUSTAHL: "gamma_M1", Baustoffart.BETON: "gamma_c",
-          Baustoffart.BETONSTAHL: "gamma_s"}
+          Baustoffart.BETONSTAHL: "gamma_s", Baustoffart.PROFILBLECH: "gamma_ap"}
 
 #: Je Art der Teil des Ansatzes, mit und ohne Beiwert.
 _ANSATZ = {
@@ -70,6 +77,15 @@ _ANSATZ = {
     Baustoffart.BETON: (r"0.85\, f_{cd} = 0.85\, \frac{\eta_{fc}\, f_{ck}}{\gamma_c},\ "
                         r"\eta_{fc} = 1", r"0.85\, f_{ck}"),
     Baustoffart.BETONSTAHL: (r"f_{sd} = \frac{f_{sk}}{\gamma_s}", r"f_{sd} = f_{sk}"),
+    Baustoffart.PROFILBLECH: (r"f_{ypd} = \frac{f_{yp}}{\gamma_{ap}}", r"f_{ypd} = f_{yp}"),
+}
+
+#: Je Art, was in der Tabelle der Festigkeiten ``f_k`` und ``γ`` sind.
+_ZEICHEN = {
+    Baustoffart.BAUSTAHL: ("f_y in der Dicke der Gruppe", "γ_a = γ_M1 des Baustahls"),
+    Baustoffart.BETON: ("f_ck", "γ_c"),
+    Baustoffart.BETONSTAHL: ("f_sk", "γ_s"),
+    Baustoffart.PROFILBLECH: ("f_yp", "γ_ap"),
 }
 
 SPANNUNG = r"\ [\mathrm{N}/\mathrm{mm}^2]"
@@ -117,11 +133,15 @@ class Verbundwerte:
         return self.zahl(g, _GAMMA[self.verbund.art(g)]) if self.bemessung[g] else 1.0
 
     def kennwert(self, g: int) -> float:
-        """Die charakteristische Festigkeit: ``f_y`` in der Dicke der Gruppe, ``f_ck``, ``f_sk``."""
+        """
+        Die charakteristische Festigkeit: ``f_y`` in der Dicke der Gruppe,
+        ``f_ck``, ``f_sk`` oder ``f_yp``.
+        """
         art = self.verbund.art(g)
         if art is Baustoffart.BAUSTAHL:
             return self.stahl.zahl(g, "f_y")
-        return self.zahl(g, "f_ck" if art is Baustoffart.BETON else "f_yk")
+        return self.zahl(g, {Baustoffart.BETON: "f_ck", Baustoffart.PROFILBLECH: "f_yp"}
+                         .get(art, "f_yk"))
 
     @cached_property
     def festigkeiten(self) -> List[Tuple[float, float]]:
@@ -133,6 +153,8 @@ class Verbundwerte:
                 werte.append((self.stahl.f[g], self.stahl.f[g]))
             elif art is Baustoffart.BETON:
                 werte.append((0.0, self.beton_faktor * self.zahl(g, "f_ck") / self.gamma(g)))
+            elif art is Baustoffart.PROFILBLECH:
+                werte.append((self.zahl(g, "f_yp") / self.gamma(g), 0.0))
             else:
                 zug, druck = ("f_yd", "f_yd_druck") if self.bemessung[g] else ("f_yk", "f_yk_druck")
                 werte.append((self.zahl(g, zug), self.zahl(g, druck)))
@@ -174,6 +196,7 @@ class Verbundwerte:
         for g, (zug, druck) in enumerate(self.festigkeiten):
             name = self.verbund.gruppen[g].name
             teile.append(f"{name} gedrückt {druck:.1f} N/mm²" if zug == 0.0 else
+                         f"{name} gezogen {zug:.1f} N/mm²" if druck == 0.0 else
                          f"{name} {zug:.1f} N/mm²" if zug == druck else
                          f"{name} gezogen {zug:.1f}, gedrückt {druck:.1f} N/mm²")
         return "Festigkeiten wie in den Kennzahlen: " + ", ".join(teile) + "."
@@ -182,14 +205,14 @@ class Verbundwerte:
 def festigkeiten(p: Protokoll, werte: Verbundwerte) -> None:
     """Die Festigkeiten je Gruppe als Tabelle, mit dem Ansatz fuer die Arten, die vorkommen."""
     verbund = werte.verbund
+    arten = [art for art in _ANSATZ if verbund.gruppen_der(art)]
     teile = []
-    for art in (Baustoffart.BAUSTAHL, Baustoffart.BETON, Baustoffart.BETONSTAHL):
-        gruppen = verbund.gruppen_der(art)
-        if gruppen:
-            mit, ohne = _ANSATZ[art]
-            teile.append(mit if any(werte.bemessung[g] for g in gruppen) else ohne)
+    for art in arten:
+        mit, ohne = _ANSATZ[art]
+        teile.append(mit if any(werte.bemessung[g] for g in verbund.gruppen_der(art)) else ohne)
+    blech = ", das Blech nur gezogen" if Baustoffart.PROFILBLECH in arten else ""
     p.ansatz(r" \qquad ".join(teile),
-             titel="Festigkeiten im plastischen Zustand – der Beton nur gedrückt",
+             titel=f"Festigkeiten im plastischen Zustand – der Beton nur gedrückt{blech}",
              referenz=REFERENZ_FESTIGKEIT, name="Festigkeiten im Verbundquerschnitt")
     p.tabelle(
         kopf=["Werkstoff", "Art", Mathe(r"f_k" + SPANNUNG), Mathe(r"\gamma"),
@@ -199,8 +222,8 @@ def festigkeiten(p: Protokoll, werte: Verbundwerte) -> None:
                 for g, (gruppe, (zug, druck)) in enumerate(zip(verbund.gruppen,
                                                                werte.festigkeiten))],
         titel="Festigkeiten je Werkstoff", ausrichtung="llrrrr")
-    p.text("f_k ist f_y in der Dicke der Gruppe, f_ck oder f_sk; γ ist γ_a = γ_M1 des "
-           "Baustahls, γ_c oder γ_s.")
+    p.text(f"f_k ist {aufgezaehlt([_ZEICHEN[a][0] for a in arten], 'oder')}; "
+           f"γ ist {aufgezaehlt([_ZEICHEN[a][1] for a in arten], 'oder')}.")
     ohne = [g.name for g, b in zip(verbund.gruppen, werte.bemessung) if not b]
     if ohne:
         p.text(f"Mit charakteristischen Werten, ohne γ: {', '.join(ohne)} – so wählt es die "

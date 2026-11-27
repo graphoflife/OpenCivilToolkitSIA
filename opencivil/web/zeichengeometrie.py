@@ -6,8 +6,9 @@ Was das Zeichenfenster einer Querschnittsanalyse vom Kern ueber ihre
 Zeichnung erfaehrt (Anfrage ``geometrie``): jede Meldung am Element, das sie
 betrifft, die Staebe einer Linie mit ihrer tatsaechlichen Teilung, die
 Lage in der Ueberdeckung, der Schwerpunkt, die Zellen der Schubwaende, je
-Spannglied seine Werte und je Stahlprofil sein Umriss. Gerechnet wird nur
-Geometrie -- und die Spannkraft, aus derselben Herleitung wie im Bericht.
+Spannglied seine Werte, je Stahlprofil sein Umriss und je
+Blechverbunddecke ihr Beton und ihr Blech. Gerechnet wird nur Geometrie --
+und die Spannkraft, aus derselben Herleitung wie im Bericht.
 Schnell genug fuer jede Aenderung.
 
 Bis 2026-11-26 stand das in :mod:`opencivil.web.api`; mit den Spanngliedern
@@ -31,6 +32,7 @@ from opencivil.projekt.aufbau.kern import baustoff_im_werk, materialgrund
 from opencivil.projekt.aufbau.querschnittsanalyse import (
     erzeugnis_grund, ohne_analysen, ohne_nachweise,
 )
+from opencivil.projekt.blechdecken import BlechdeckeEintrag
 from opencivil.projekt.lesen import stoffe_des_felds
 from opencivil.projekt.querschnittsanalyse import (
     SchubwandEintrag, StabEintrag, StablinieEintrag,
@@ -39,6 +41,7 @@ from opencivil.projekt.spannglieder import SpanngliedEintrag
 from opencivil.stahlprofile import lage as profillage
 from opencivil.querschnitt.analyse import Zeichnung
 from opencivil.querschnitt.bauweise import BEWEHRT, Mischung, bauweise
+from opencivil.querschnitt.profilblech import rippenskizze
 from opencivil.querschnitt.geometrie import (
     Linienart, aequivalenter_durchmesser, buegelgehalt, flaeche, linie_in_ueberdeckung,
     linienflaeche, stab_in_ueberdeckung, ueberdeckungspolygon,
@@ -68,11 +71,16 @@ def geometrie(eintrag, projekt) -> dict:
     leer ohne. ``ohne_nachweise`` ist der Satz, warum ein Querschnitt dieser
     Bauweise keinen Nachweis hat -- leer beim Stahlbeton, beim Stahl und ohne
     Bauweise --, ``ohne_analysen`` derselbe fuer die
-    Spannung-Dehnung-Analysen, leer ausser im Verbund. Danach zeigt die
+    Spannung-Dehnung-Analysen, leer ausser im Verbund und in der
+    Blechverbunddecke. Danach zeigt die
     Analyse ihre Kacheln (:func:`ohne_nachweise`, :func:`ohne_analysen`).
     ``knickkurven`` sagt je Achse die Knickspannungskurve, die Figur 7 dem
     einzigen Profil des Querschnitts zuweist, ``knickkurven_fehlen``, welche
     einem Stabilitaetsnachweis fehlt (:func:`_knickkurven`).
+    ``laengsschub_fehlt`` sagt fuer die Kachel «Längsschub» einer
+    Blechverbunddecke, was ihm noch fehlt, «m und k fehlen» -- leer, wo
+    nichts fehlt oder keine Decke gezeichnet ist
+    (:attr:`~opencivil.verbund.blechdecke.Laengsschub.fehlt_kurz`).
 
     ``gueltig`` heisst: die Zeichnung rechnet. Eine Spannung ueber der
     Grenze der Norm steht rot am Glied, haelt die Rechnung aber nicht an --
@@ -93,9 +101,14 @@ def geometrie(eintrag, projekt) -> dict:
         else:
             passend.append(gefunden)
 
+    # Der Beton einer Blechverbunddecke ist eine Flaeche wie jede, ihr Blech
+    # meldet sich unter seinem eigenen Namen: «Blechverbunddecke 1, Blech».
     for f in flaechen:
         if not f["aussparung"]:
             stoff_pruefen(f, f["material"], f["stoffe"])
+    for d in elemente.blechdecken:
+        stoff_pruefen({**d, "name": d["namen"]["blech"]}, d["blech"],
+                      stoffe_des_felds(BlechdeckeEintrag, "blech"))
     for klasse, liste in ((StabEintrag, elemente.staebe), (StablinieEintrag, elemente.linien),
                           (SchubwandEintrag, elemente.waende),
                           (SpanngliedEintrag, elemente.spannglieder)):
@@ -189,6 +202,7 @@ def geometrie(eintrag, projekt) -> dict:
                               if c[i] > 0.0 else None)}
             for i, f in enumerate(elemente.polygone)],
         "profile": [_profil(p, tiefe.get(p["kennung"], 0)) for p in elemente.profile],
+        "blechdecken": [_blechdecke(d, tiefe.get(d["kennung"], 0)) for d in elemente.blechdecken],
         "brutto": None if b is None else {
             "A": b.A, "y_S": b.y_S, "z_S": b.z_S, "I_y": b.I_y, "I_z": b.I_z,
             "I_yz": b.I_yz},
@@ -224,6 +238,7 @@ def geometrie(eintrag, projekt) -> dict:
         "ohne_nachweise": _als_satz(ohne_nachweise(art, passend)) if art is not None else "",
         "ohne_analysen": ohne_analysen(art) if art is not None else "",
         **_knickkurven(eintrag, flaechen, b),
+        "laengsschub_fehlt": eintrag.laengsschub.fehlt_kurz if elemente.blechdecken else "",
     }
 
 
@@ -286,6 +301,30 @@ def _profil(p: Mapping, tiefe: int) -> dict:
         "fang": [list(q) for q in profillage.fangpunkte(p["umrisse"])],
         "drehbar": profillage.drehbar(p["profil"]),
         "spiegelbar": profillage.spiegelbar(p["profil"]),
+    }
+
+
+def _blechdecke(d: Mapping, tiefe: int) -> dict:
+    """
+    Eine Blechverbunddecke, wie das Fenster sie zeichnet: der Umriss ihres
+    Betons und die Linie ihres Blechs zur Ecke links unten, an der sie haengt
+    -- wie beim Profil schiebt das Fenster beides mit dem Knoten mit, bis die
+    naechste Antwort da ist. Gefangen wird an jeder Ecke des Betons. Dazu,
+    was aus den Massen folgt, aus derselben Form wie in der Herleitung
+    (:class:`~opencivil.querschnitt.profilblech.Blechform`): die Breite ``b``,
+    die Dicke ``t`` des Blechs, sein Schwerpunkt ``e`` ueber der Unterkante,
+    ``d_p``, ``b_0`` und die Flaeche ``A`` des Blechs ueber die ganze Breite.
+    Und eine Rippe mit ihren Massen als Bild: es sagt im Fenster, was die
+    Zeichen der Felder meinen (:func:`~opencivil.querschnitt.profilblech.rippenskizze`).
+    """
+    f = d["form"]
+    beton = [list(p) for p in f.beton]
+    return {
+        "element": d["name"], "kennung": d["kennung"], "tiefe": tiefe, "lage": list(d["lage"]),
+        "umriss": [beton], "blech": [list(p) for p in f.linie], "fang": beton,
+        "hinterschnitten": f.hinterschnitten,
+        "werte": {"b": f.breite, "t": f.t, "e": f.e, "d_p": f.d_p, "b_0": f.b_0, "A": f.flaeche},
+        "rippe": rippenskizze(f).als_dict(),
     }
 
 

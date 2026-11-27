@@ -1,5 +1,5 @@
 ---
-erzeugt: 362efdfc9e18
+erzeugt: cbc7cb35faa6
 art: modul
 tags: [modul]
 ---
@@ -13,8 +13,9 @@ Was das Zeichenfenster einer Querschnittsanalyse vom Kern ueber ihre
 Zeichnung erfaehrt (Anfrage `geometrie`): jede Meldung am Element, das sie
 betrifft, die Staebe einer Linie mit ihrer tatsaechlichen Teilung, die
 Lage in der Ueberdeckung, der Schwerpunkt, die Zellen der Schubwaende, je
-Spannglied seine Werte und je Stahlprofil sein Umriss. Gerechnet wird nur
-Geometrie -- und die Spannkraft, aus derselben Herleitung wie im Bericht.
+Spannglied seine Werte, je Stahlprofil sein Umriss und je
+Blechverbunddecke ihr Beton und ihr Blech. Gerechnet wird nur Geometrie --
+und die Spannkraft, aus derselben Herleitung wie im Bericht.
 Schnell genug fuer jede Aenderung.
 
 Bis 2026-11-26 stand das in [[opencivil.web.api]]; mit den Spanngliedern
@@ -51,11 +52,16 @@ Meldung ohne Element, grau.
 leer ohne. `ohne_nachweise` ist der Satz, warum ein Querschnitt dieser
 Bauweise keinen Nachweis hat -- leer beim Stahlbeton, beim Stahl und ohne
 Bauweise --, `ohne_analysen` derselbe fuer die
-Spannung-Dehnung-Analysen, leer ausser im Verbund. Danach zeigt die
+Spannung-Dehnung-Analysen, leer ausser im Verbund und in der
+Blechverbunddecke. Danach zeigt die
 Analyse ihre Kacheln ([[opencivil.projekt.aufbau.querschnittsanalyse#ohne_nachweise|ohne_nachweise]], [[opencivil.projekt.aufbau.querschnittsanalyse#ohne_analysen|ohne_analysen]]).
 `knickkurven` sagt je Achse die Knickspannungskurve, die Figur 7 dem
 einzigen Profil des Querschnitts zuweist, `knickkurven_fehlen`, welche
 einem Stabilitaetsnachweis fehlt ([[opencivil.web.zeichengeometrie#_knickkurven|_knickkurven]]).
+`laengsschub_fehlt` sagt fuer die Kachel «Längsschub» einer
+Blechverbunddecke, was ihm noch fehlt, «m und k fehlen» -- leer, wo
+nichts fehlt oder keine Decke gezeichnet ist
+([[opencivil.verbund.blechdecke#Laengsschub.fehlt_kurz|fehlt_kurz]]).
 
 `gueltig` heisst: die Zeichnung rechnet. Eine Spannung ueber der
 Grenze der Norm steht rot am Glied, haelt die Rechnung aber nicht an --
@@ -98,6 +104,23 @@ wird, schiebt das Fenster das Bild mit, bis die naechste Antwort da ist.
 Dazu, was es ist, seine Flaeche aus dem Umriss, die Masse von aussen und
 die Punkte zum Fangen; ob Drehen und Spiegeln es aendern, sagt, ob das
 Fenster die Schalter dafuer zeigt.
+
+### _blechdecke
+
+```python
+def _blechdecke(d: Mapping, tiefe: int) -> dict
+```
+
+Eine Blechverbunddecke, wie das Fenster sie zeichnet: der Umriss ihres
+Betons und die Linie ihres Blechs zur Ecke links unten, an der sie haengt
+-- wie beim Profil schiebt das Fenster beides mit dem Knoten mit, bis die
+naechste Antwort da ist. Gefangen wird an jeder Ecke des Betons. Dazu,
+was aus den Massen folgt, aus derselben Form wie in der Herleitung
+([[opencivil.querschnitt.profilblech#Blechform|Blechform]]): die Breite `b`,
+die Dicke `t` des Blechs, sein Schwerpunkt `e` ueber der Unterkante,
+`d_p`, `b_0` und die Flaeche `A` des Blechs ueber die ganze Breite.
+Und eine Rippe mit ihren Massen als Bild: es sagt im Fenster, was die
+Zeichen der Felder meinen ([[opencivil.querschnitt.profilblech#rippenskizze|rippenskizze]]).
 
 ### _als_satz
 
@@ -143,12 +166,14 @@ selbst nicht rechnet, sagt es in seinem Fenster.
 - [[opencivil.material.spannstahl]]
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.aufbau.querschnittsanalyse]]
+- [[opencivil.projekt.blechdecken]]
 - [[opencivil.projekt.lesen]]
 - [[opencivil.projekt.querschnittsanalyse]]
 - [[opencivil.projekt.spannglieder]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.bauweise]]
 - [[opencivil.querschnitt.geometrie]]
+- [[opencivil.querschnitt.profilblech]]
 - [[opencivil.querschnitt.spannglieder]]
 - [[opencivil.stahlbau.stabilitaet]]
 - [[opencivil.stahlprofile.lage]]

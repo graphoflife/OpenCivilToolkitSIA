@@ -104,7 +104,8 @@ class TestRegel(unittest.TestCase):
     def test_norm_und_name(self):
         self.assertEqual([(b.querschnitt, b.norm) for b in Bauweise], [
             ("Stahlbetonquerschnitt", "SIA 262:2025"), ("Stahlquerschnitt", "SIA 263:2013"),
-            ("Verbundquerschnitt", "SIA 264:2014"), ("Holzquerschnitt", "SIA 265:2012")])
+            ("Verbundquerschnitt", "SIA 264:2014"), ("Blechverbundquerschnitt", "SIA 264:2014"),
+            ("Holzquerschnitt", "SIA 265:2012")])
         self.assertIs(BEWEHRT, BETON)
 
 

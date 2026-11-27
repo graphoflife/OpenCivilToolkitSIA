@@ -1,5 +1,5 @@
 ---
-erzeugt: 423ac38aee3d
+erzeugt: 7c838e31f707
 art: modul
 tags: [modul]
 ---
@@ -269,59 +269,6 @@ nach (10). Unter 600 mm Hoehe mit k_h.
 Dazu ein Stab: Druck und Biegung mit Knicken und Kippen nach (37), Druck
 allein nach (29), stossartig Biegung allein nach (38), mit k_m \< 1.
 
-### _verbundtraeger
-
-```python
-def _verbundtraeger(kennung: str) -> QuerschnittsanalyseEintrag
-```
-
-Ein HEA 300 aus S460 unter einer Platte 1500 × 120 mm aus C30/37, Beton
-auch zwischen den Flanschen, Betonstahl B500B in der Platte, zweiachsig
-(SIA 264:2014). Der Kammerbeton hebt die gedrückten Flansche nach
-Tabelle 3 in die Klasse 2 und den Steg nach 5.2.1.3; S460 mindert mit β.
-
-Im Feld plastisch und schief, die Nulllinie im Profil; an der Stütze
-negativ, der Betonstahl gezogen, mit einer Querkraft über der Hälfte von
-V_Rd, die dem Steg nimmt, und mit Torsion, die nur ein Hinweis ist; mit
-viel Druck reicht die Druckzone über 0.4 h, wo Figur 1 endet; reiner Zug,
-reiner Druck und eine Druckkraft jenseits des Widerstands.
-
-### _verbundduebel
-
-```python
-def _verbundduebel(kennung: str) -> QuerschnittsanalyseEintrag
-```
-
-Ein IPE 400 aus S355 unter einer Platte 2000 × 150 mm aus C30/37 mit
-Betonstahl B500B, einachsig, mit Kopfbolzendübeln ⌀19 × 125 mm (SIA
-264:2014, 6.1). Im Feld teilverdübelt, (29) gehalten -- mit zu wenig
-Dübeln nicht; an der Stütze verlangt das negative Moment volle
-Verdübelung; ohne Zahl der Dübel und ohne L_e grau; L_e über 25 m
-verlangt volle Verdübelung; ohne Moment prüft er die Dübel nicht. Als
-Verbundstütze kennt ihn Tabelle 7 nicht: sein Stabilitätsfall steht grau.
-
-### _verbundstuetze
-
-```python
-def _verbundstuetze(kennung: str) -> QuerschnittsanalyseEintrag
-```
-
-Ein HEB 300 aus S355, ganz einbetoniert in 500 × 500 mm aus C30/37, mit
-vier ⌀20 aus B500B in den Ecken, zweiachsig, Kriechzahl 2 (SIA 264:2014,
-5.3). Einachsig gebogen um y, zweiachsig, zentrisch, um y gehalten und
-ohne Druck; grau, wo die Knicklänge die Stütze überragt und wo λ̄ über 2
-liegt; ausgeknickt, wo N_Ed N_cr,eff erreicht.
-
-### _verbundrohr
-
-```python
-def _verbundrohr(kennung: str) -> QuerschnittsanalyseEintrag
-```
-
-Ein ROR 219.1 x 8 aus S355, mit C30/37 gefüllt und vier ⌀16 aus B500B,
-einachsig (SIA 264:2014, 5.3): der Beton mit 1.0 statt 0.85 (5.3.2.5),
-ρ_s unter 3 % und darum Kurve a, ohne Kriechen.
-
 
 ## Braucht
 
@@ -329,6 +276,7 @@ einachsig (SIA 264:2014, 5.3): der Beton mit 1.0 statt 0.85 (5.3.2.5),
 - [[opencivil.material.holz]]
 - [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.balkensystem3d]]
+- [[opencivil.projekt.beispiele_verbund]]
 - [[opencivil.projekt.decke]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.platte]]
@@ -338,8 +286,6 @@ einachsig (SIA 264:2014, 5.3): der Beton mit 1.0 statt 0.85 (5.3.2.5),
 - [[opencivil.projekt.staebe]]
 - [[opencivil.querschnitt.geometrie]]
 - [[opencivil.querschnitt.gesetzwahl]]
-- [[opencivil.querschnitt.vorlagen]]
-- [[opencivil.verbund.duebel]]
 
 ## Gebraucht von
 

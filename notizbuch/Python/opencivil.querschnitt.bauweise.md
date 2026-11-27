@@ -1,5 +1,5 @@
 ---
-erzeugt: 1af1f3a78f79
+erzeugt: c57b8760c338
 art: modul
 tags: [modul]
 ---
@@ -10,7 +10,7 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Die Bauweise eines gezeichneten Querschnitts aus den Arten seiner Baustoffe
-([[opencivil.querschnitt.bauweise#bauweise|bauweise]]): Stahlbeton, Stahl, Verbund oder Holz. Nach ihr richtet
+([[opencivil.querschnitt.bauweise#bauweise|bauweise]]): Stahlbeton, Stahl, Verbund, Blechverbund oder Holz. Nach ihr richtet
 sich, welche Nachweise er hat und nach welcher Norm. Eine Mischung, die
 keine davon ist, rechnet das Werkzeug nicht; der Satz dazu nennt die
 Materialien beim Namen.
@@ -23,6 +23,10 @@ Materialien beim Namen.
 * nur Baustahl: Stahl.
 * Baustahl mit Beton, mit oder ohne Betonstahl: Verbund.
 * nur Holz: Holz.
+* Profilblechstahl mit Beton, mit oder ohne Betonstahl: Blechverbund -- eine
+  Blechverbunddecke nach SIA 264:2014, 5.4 (2026-11-27). Mit Baustahl dazu
+  waere es ein Verbundtraeger mit Profilblech (6.1.3); den rechnet das
+  Werkzeug noch nicht.
 
 Holz mit einem anderen Baustoff ist keine davon, ebenso Spannstahl neben
 Baustahl. Ohne Material hat ein Querschnitt keine Bauweise: es gibt nichts,
@@ -46,6 +50,7 @@ Woraus ein gezeichneter Querschnitt besteht -- siehe Dateikopf.
 - `STAHLBETON = 'stahlbeton'`
 - `STAHL = 'stahl'`
 - `VERBUND = 'verbund'`
+- `BLECHVERBUND = 'blechverbund'`
 - `HOLZ = 'holz'`
 
 #### Bauweise.querschnitt
@@ -90,9 +95,11 @@ nicht.»
 ## Konstanten
 
 - `BEWEHRT = Baustoffart.BETON` – Worin Bewehrung liegt -- Stab, Stablinie, Schubwand und Spannglied: nur im Beton, nicht in Holz und nicht in Baustahl (Benutzer, 2026-11-25). Die Zeichnung prueft es ([[opencivil.querschnitt.analyse#Zeichnung|Zeichnung]]), und eine Vorlage aus anderem kommt ohne Bewehrung.
+- `BLECHVERBUND = frozenset({Baustoffart.PROFILBLECH, Baustoffart.BETON, Baustoffart.BE…` – Woraus eine Blechverbunddecke sein darf -- Beton muss dabei sein.
 
 ## Braucht
 
+- [[opencivil.core.sprache]]
 - [[opencivil.core.wahl]]
 - [[opencivil.material.basis]]
 

@@ -12,6 +12,8 @@
  *   Spannstahl   ein Spannglied je Klick (qa_spannglied.js)
  *   (Profil)     ein Stahlprofil der Tabelle -- ohne Werkzeug: eingesetzt
  *                wird es mit der Vorlage «Stahlprofil» (qa_profile.js)
+ *   (Decke)      eine Blechverbunddecke mit ihrem Beton und Blech -- ebenso
+ *                mit der Vorlage «Blechverbunddecke» (qa_blechdecke.js)
  *   Schubwand    eine Linie mit Dicke und Bügeln
  *   Hilfslinie   eine Linie, die nicht mitrechnet
  *   Hilfspunkt   ein Knoten ohne Element, zum Fangen
@@ -40,22 +42,26 @@ import {
 } from './cad_ansicht.js';
 import {
   auswahlEigenschaften, cadApp, cadBereichMitListe, frischeAntwort, jaNein, kernfehler, laengenzeile,
-  lagefelder, meldungenJe, meldungszeilen, mitTitel, umrissVon, vorgabe, zahlfeldMitVar, zugleich,
+  lagefelder, meldungenJe, meldungszeilen, mitTitel, umrissVon as rahmenVon, vorgabe, zahlfeldMitVar,
+  zugleich,
 } from './cad_app.js';
 import { cadZeile } from './cad_palette.js';
 import {
-  abstand, eckeSchluessel, knotenname,
+  abstand, knotenname,
 } from './cad_modell.js';
-import {
-  PROFIL, profilFang, profilFelder, profilInfo, profilPfad, profilUmriss,
-} from './qa_profile.js';
+import { aktionen } from './qa_aktionen.js';
+import { BLECHDECKE } from './qa_blechdecke.js';
+import { PROFIL } from './qa_profile.js';
 import {
   SPANNGLIED, SPANNSTAHL, gliedFelder, gliedInfo, gliedText, gliedVorgabe, vorgabePruefen,
 } from './qa_spannglied.js';
+import {
+  aussenVon, fangVon, umrissVon,
+} from './qa_umriss.js';
 import { vorlageOeffnen } from './qa_vorlagen.js';
 import { sinnbild } from './sinnbilder.js';
 import {
-  el, melden, svgEl, zahlfeld,
+  el, svgEl, zahlfeld,
 } from './dom.js';
 import {
   ausVorlage, eintragVon, feldangabe, katalog, materialien, mitteAendern, zustand,
@@ -75,6 +81,19 @@ import {
  * `klasse`: unter welchem Namen der Katalog Vorlage und Felder der Elemente
  * führt (`ausVorlage`, `feldangabe`).
  */
+
+/**
+ * Die Arten, deren Umriss nur der Kern kennt -- Stahlprofil und
+ * Blechverbunddecke (qa_umriss.js): ein Punkt mit einer Fläche, eingesetzt
+ * mit ihrer Vorlage. Was sie zeichnen und im Fenster zeigen, sagt jede selbst.
+ */
+const UMRISSE = [PROFIL, BLECHDECKE];
+
+/** Die Art mit einem Umriss vom Kern, deren Elemente in der Liste `liste` stehen -- oder undefined. */
+function umrissart(liste) {
+  return UMRISSE.find((art) => art.liste === liste);
+}
+
 const ARTEN = [
   { liste: 'flaechen', klasse: 'flaeche', form: 'flaeche', vorsilbe: 'F', rang: 4 },
   { liste: 'staebe', klasse: 'stab', form: 'punkt', vorsilbe: 'S', rang: 1 },
@@ -85,7 +104,7 @@ const ARTEN = [
   },
   { liste: 'schubwaende', klasse: 'schubwand', form: 'linie', vorsilbe: 'L', rang: 2 },
   { liste: 'hilfslinien', klasse: 'hilfslinie', form: 'linie', vorsilbe: 'L', rang: 3 },
-  PROFIL,
+  ...UMRISSE,
 ];
 
 /** Unter welchem Namen der Katalog die Elemente einer Liste führt. */
@@ -234,6 +253,14 @@ export function knickkurvenVon(kennung) {
   };
 }
 
+/**
+ * Was dem Längsschub einer Blechverbunddecke fehlt, kurz für ihre Kachel:
+ * «m, k und L fehlen». Leer, wo nichts fehlt -- und ohne Decke.
+ */
+export function laengsschubFehltVon(kennung) {
+  return bauweisenangabe(kennung, 'laengsschub_fehlt');
+}
+
 // ===========================================================================
 // Der Adapter
 // ===========================================================================
@@ -294,7 +321,7 @@ function adapter(kennung) {
     achsen: ['y', 'z'],
     arten: ARTEN,
     name: elementname,
-    neuText: (a, werkzeug) => neuText(a.qa, werkzeug),
+    neuText,
     punktAnlegen,
     linieAnlegen,
     flaecheAnlegen,
@@ -302,13 +329,14 @@ function adapter(kennung) {
     punktVorschau,
     linienVorschau,
     // Der Schwerpunkt und die Ecken der Überdeckung (Benutzer, 2026-10-23),
-    // dazu der Rahmen jedes Profils: so legt sich eine Platte auf den Flansch.
+    // dazu der Rahmen jedes Profils -- so legt sich eine Platte auf den
+    // Flansch -- und die Ecken des Betons einer Decke.
     fangpunkte: (a) => {
       const g = frischeAntwort(a);
       return [
         ...(g?.brutto ? [{ p: [g.brutto.y_S, g.brutto.z_S] }] : []),
         ...(g?.polygone || []).flatMap((x) => (x.ueberdeckung || []).map((p) => ({ p }))),
-        ...profilFang(a, eintragVon(kennung)),
+        ...fangVon(a, UMRISSE, eintragVon(kennung)),
       ];
     },
     trefferradius: (a, art, e) => {
@@ -316,20 +344,24 @@ function adapter(kennung) {
       if (art.liste === 'spannglieder') return gliedDurchmesser(a, e) / 2;
       return 0;
     },
-    punktUmriss: (a, art, e) => (art === PROFIL ? profilUmriss(a, e) : null),
+    punktUmriss: (a, art, e) => (UMRISSE.includes(art) ? umrissVon(a, art, e) : null),
     umriss: (a) => umriss(a, eintragVon(kennung)),
-    // Die Masse eines Profils kennt nur der Kern: bis zu seiner Antwort fehlt es im Umriss.
-    umrissVollstaendig: (a) => (eintragVon(kennung)?.profile || []).every((e) => profilUmriss(a, e)),
+    // Die Masse eines Profils oder einer Decke kennt nur der Kern: bis zu
+    // seiner Antwort fehlt das Element im Umriss.
+    umrissVollstaendig: (a) => UMRISSE.every((art) => (eintragVon(kennung)?.[art.liste] || [])
+      .every((e) => umrissVon(a, art, e))),
     fragen: () => api.geometrie(zustand.projekt, kennung),
     nehmen: (a, antwort) => {
-      a.qa.namen = new Map([antwort.polygone, antwort.profile, antwort.staebe, antwort.spannglieder,
-        antwort.linien, antwort.waende, antwort.hilfslinien].flatMap((liste) => (liste || []).map((x) => [x.kennung, x.element])));
+      a.qa.namen = new Map([antwort.polygone, ...UMRISSE.map((art) => antwort[art.liste]), antwort.staebe,
+        antwort.spannglieder, antwort.linien, antwort.waende, antwort.hilfslinien]
+        .flatMap((liste) => (liste || []).map((x) => [x.kennung, x.element])));
       // Aus Holz oder Stahl statt Beton: die Analyse zeigt andere Kacheln
       // (`bauweiseVon`, `ohneNachweiseVon`, `ohneAnalysenVon`) -- und der
-      // Kachel «Knicken und Kippen» fehlt eine Kurve oder nicht mehr.
+      // Kachel «Knicken und Kippen» fehlt eine Kurve oder nicht mehr, der
+      // Kachel «Längsschub» eine Angabe.
       const vorher = a.adapter.kern.antwort;
-      a.qa.andereKacheln = ['bauweise', 'ohne_nachweise', 'ohne_analysen', 'knickkurven_fehlen']
-        .some((s) => antwort[s] !== (vorher?.[s] ?? ''));
+      a.qa.andereKacheln = ['bauweise', 'ohne_nachweise', 'ohne_analysen', 'knickkurven_fehlen',
+        'laengsschub_fehlt'].some((s) => antwort[s] !== (vorher?.[s] ?? ''));
       return antwort;
     },
     beantwortet: (a) => { if (zustand.fenster || a.qa.andereKacheln) mitteAendern(); },
@@ -352,9 +384,13 @@ export function stoffname(kennung) {
   return m ? (m.name || m.sorte) : '–';
 }
 
-/** Was das Werkzeug als Nächstes anlegt, in Worten -- für die Frage im schwebenden Fenster. */
-function neuText(qa, werkzeug) {
-  const v = qa.vorgaben;
+/**
+ * Was das Werkzeug als Nächstes anlegt, in Worten -- für die Frage im
+ * schwebenden Fenster. Mit den geprüften Vorgaben: es nennt das Material,
+ * das das neue Element wirklich bekommt.
+ */
+function neuText(a, werkzeug) {
+  const v = vorgaben(a);
   if (werkzeug === 'polygon') {
     return v.flaechen.material ? `Fläche ${stoffname(v.flaechen.material)}` : 'Aussparung';
   }
@@ -392,10 +428,10 @@ function flaecheAnlegen(a, z, knoten) {
   return kennung;
 }
 
-/** Was im Bild sein soll: alle Knoten und Profile -- sonst ein Meter im Quadrat. */
+/** Was im Bild sein soll: alle Knoten, Profile und Decken -- sonst ein Meter im Quadrat. */
 function umriss(a, analyse) {
-  return umrissVon([...(analyse?.knoten || []).map((k) => [k.y, k.z]),
-    ...(analyse?.profile || []).flatMap((e) => profilUmriss(a, e)?.[0] || [])], [[0, 0], [1000, 1000]]);
+  return rahmenVon([...(analyse?.knoten || []).map((k) => [k.y, k.z]), ...aussenVon(a, UMRISSE, analyse)],
+    [[0, 0], [1000, 1000]]);
 }
 
 // ===========================================================================
@@ -473,25 +509,34 @@ function zeichnen(a, g) {
   defs.append(schraffur);
   g.append(defs);
 
-  // Flächen und Profile: die äusseren zuerst, damit die inneren darüber
-  // liegen. Wie tief jedes liegt, sagt der Kern -- auch eine ältere Antwort;
-  // was er noch nicht kennt, liegt zuunterst. Ein Profil ist aus Baustahl,
-  // sein Loch ausgespart; einen Namen, den die Tabelle nicht kennt, zeigt
-  // ein roter Punkt an seiner Mitte.
-  const tiefe = new Map([...(roh?.polygone || []), ...(roh?.profile || [])].map((x) => [x.kennung, x.tiefe]));
+  // Flächen, Profile und Decken: die äusseren zuerst, damit die inneren
+  // darüber liegen. Wie tief jedes liegt, sagt der Kern -- auch eine ältere
+  // Antwort; was er noch nicht kennt, liegt zuunterst. Wie ein Element mit
+  // einem Umriss vom Kern aussieht, sagt seine Art: ein Profil ist aus
+  // Baustahl, sein Loch ausgespart. Ohne Umriss -- ein Name, den die Tabelle
+  // nicht kennt -- zeigt es ein Punkt an seinem Knoten, weiter unten.
+  const tiefe = new Map([roh?.polygone, ...UMRISSE.map((art) => roh?.[art.liste])]
+    .flatMap((liste) => (liste || []).map((x) => [x.kennung, x.tiefe])));
   const flaechen = [
     ...z.flaechen.map((f) => {
       const punkte = f.knoten.map(ort);
       const gibt = punkte.length >= 2 && punkte.every(Boolean);
       return gibt && { kennung: f.kennung, d: pfad(a.v, punkte), klasse: flaechenklasse(f.material) };
     }),
-    ...z.profile.map((e) => {
-      const d = profilPfad(a, e);
-      return d && { kennung: e.kennung, d, klasse: 'cad-baustahl', 'fill-rule': 'evenodd' };
-    }),
+    ...UMRISSE.flatMap((art) => (z[art.liste] || []).map((e) => {
+      const teile = umrissVon(a, art, e);
+      return teile && { kennung: e.kennung, d: teile.map((t) => pfad(a.v, t)).join(' '), ...art.flaeche };
+    })),
   ].filter(Boolean).sort((p, q) => (tiefe.get(p.kennung) ?? 0) - (tiefe.get(q.kennung) ?? 0));
   for (const { kennung, klasse, ...pfadwerte } of flaechen) {
     g.append(mitTitel(svgEl('path', { ...pfadwerte, class: klassen(kennung, klasse) }), texte(kennung)));
+  }
+  // Was über allen Flächen zu einem Element gehört: das Blech einer Decke.
+  for (const art of UMRISSE) {
+    for (const e of z[art.liste] || []) {
+      const bild = art.darueber?.(a, e, klassen);
+      if (bild) g.append(mitTitel(bild, texte(e.kennung)));
+    }
   }
 
   // Die Überdeckung: das gerückte Polygon, gepunktet -- eine Hilfe zum
@@ -558,10 +603,12 @@ function zeichnen(a, g) {
         texte(s.kennung)));
     }
   }
-  for (const e of z.profile) {
-    const p = ort(e.knoten);
-    if (p && !profilUmriss(a, e)) {
-      g.append(mitTitel(stabKreis(a, p, 0, klassen(e.kennung, 'cad-baustahl')), texte(e.kennung)));
+  for (const art of UMRISSE) {
+    for (const e of z[art.liste] || []) {
+      const p = ort(e.knoten);
+      if (p && !umrissVon(a, art, e)) {
+        g.append(mitTitel(stabKreis(a, p, 0, klassen(e.kennung, art.flaeche.klasse)), texte(e.kennung)));
+      }
     }
   }
 
@@ -579,10 +626,10 @@ function zeichnen(a, g) {
   }
 }
 
-/** Breite und Höhe dessen, was Material hat -- auch der Profile --: eine Masslinie unten, eine links. */
+/** Breite und Höhe dessen, was Material hat -- auch der Profile und Decken --: eine Masslinie unten, eine links. */
 function masseZeichnen(a, z, ort) {
   const punkte = [...z.flaechen.filter((f) => f.material).flatMap((f) => f.knoten.map(ort)),
-    ...z.profile.flatMap((e) => profilUmriss(a, e)?.[0] || [])].filter(Boolean);
+    ...aussenVon(a, UMRISSE, z)].filter(Boolean);
   if (punkte.length < 2) return null;
   const ys = punkte.map((p) => p[0]);
   const zs = punkte.map((p) => p[1]);
@@ -636,12 +683,13 @@ function linienVorschau(a, g, p, q, werkzeug) {
  * Projekt, bei der Vorgabe in die Ansicht (`zugleich` und `vorgabe` in
  * cad_app.js). `info` ist, was der Kern zu einer gewählten Linie weiss: ihre
  * Stahlfläche steht grau unter den Stäben, aus denen sie kommt -- gerechnet
- * wird sie dort, nicht hier; ebenso zu einem Spannglied. Die Grenzen jeder
- * Zahl kommen aus dem Kern.
+ * wird sie dort, nicht hier; ebenso zu einem Spannglied. Die Felder eines
+ * Elements mit einem Umriss vom Kern sagt seine Art. Die Grenzen jeder Zahl
+ * kommen aus dem Kern.
  */
 function felderVon(liste, wert, setzen, info = null) {
   if (liste === 'spannglieder') return gliedFelder(wert, setzen, info);
-  if (liste === 'profile') return profilFelder(wert, setzen, info);
+  if (umrissart(liste)) return umrissart(liste).felder(wert, setzen, info);
   const durchmesser = katalog('durchmesser');
   const zahl = (feld, titel, optionen = {}) => zahlfeldMitVar({
     wert: wert(feld), titel, schritt: 1, angabe: feldangabe(klasseVon(liste), feld), ...optionen,
@@ -792,30 +840,35 @@ function eigenschaften(a) {
  */
 function elementEigenschaften(a, z, kennungen, liste) {
   const { gewaehlt, wert, setzen } = zugleich(a, z, liste, kennungen);
-  // Ein Profil hängt mit seiner Mitte an einem Knoten: ihre Lage steht bei ihm.
-  const mitte = liste === 'profile' ? lagefelder(a, z, kennungen, 'Mitte ') : [];
+  // Ein Profil hängt mit seiner Mitte an einem Knoten, eine Decke mit ihrer
+  // Ecke: deren Lage steht bei ihm.
+  const art = umrissart(liste);
+  const lage = art ? lagefelder(a, z, kennungen, art.lage) : [];
   if (gewaehlt.length > 1) {
     return {
       titel: `${gewaehlt.length} × ${artText(liste, wert('material'))}`,
-      inhalt: [...felderVon(liste, wert, setzen), ...mitte].filter(Boolean),
+      inhalt: [...felderVon(liste, wert, setzen), ...lage].filter(Boolean),
     };
   }
   const [e] = gewaehlt;
   const geo = frischeAntwort(a);
-  const info = [...(geo?.linien || []), ...(geo?.spannglieder || []), ...(geo?.profile || [])]
+  const info = [...(geo?.linien || []), ...(geo?.spannglieder || []), ...(art ? geo?.[liste] || [] : [])]
     .find((x) => x.kennung === e.kennung);
   return {
     titel: `${elementname(a, e.kennung)} · ${artText(liste, e.material, e)}`,
-    inhalt: [...felderVon(liste, wert, setzen, info), ...mitte, ...infozeilen(a, z, liste, e)].filter(Boolean),
+    inhalt: [...felderVon(liste, wert, setzen, info), ...lage, ...infozeilen(a, z, liste, e)].filter(Boolean),
   };
 }
 
-/** Was ein Element ist, für den Titel des Fensters -- ein einzelnes Spannglied mit seinem Erzeugnis. */
+/**
+ * Was ein Element ist, für den Titel des Fensters -- ein einzelnes
+ * Spannglied mit seinem Erzeugnis, ein Profil mit seinem Namen.
+ */
 function artText(liste, material, e = null) {
+  if (umrissart(liste)) return umrissart(liste).titel(e);
   return {
     staebe: 'Punktbewehrung', stablinien: 'Linienbewehrung', schubwaende: 'Schubwand', hilfslinien: 'Hilfslinie',
     spannglieder: e ? gliedText(e) : 'Spannglied',
-    profile: e ? e.profil : 'Stahlprofil',
     flaechen: material === VAR ? 'Flächen' : (material ? stoffname(material) : 'Aussparung'),
   }[liste];
 }
@@ -842,116 +895,9 @@ function infozeilen(a, z, liste, e) {
     LINIENLISTEN.includes(liste) ? laengenzeile(a, z, e) : null,
     ...zeilen.map((t) => el('p.cad-info', { text: t })),
     ...(liste === 'spannglieder' ? gliedInfo(e, geo?.spannglieder?.find((x) => x.kennung === e.kennung)) : []),
-    ...(liste === 'profile' ? profilInfo(geo?.profile?.find((x) => x.kennung === e.kennung)) : []),
+    ...(umrissart(liste)?.info(geo?.[liste]?.find((x) => x.kennung === e.kennung)) || []),
     ...meldungszeilen(a, [e.kennung]),
     e.ueberdeckung > 0 && polygon && !polygon.ueberdeckung
       ? el('p.cad-meldung', { text: 'Die Überdeckung ist zu gross: vom Polygon bleibt nichts übrig.' }) : null,
   ];
 }
-
-// ===========================================================================
-// Was neben der Auswahl angeboten wird
-// ===========================================================================
-
-/**
- * Die gewählten Hilfslinien als ein geschlossener Umriss -- seine Knoten der
- * Reihe nach, oder null. Jede Ecke hat genau zwei Linien, und alle hängen
- * zusammen.
- */
-function umlauf(z, kennungen) {
-  const linien = (z.hilfslinien || []).filter((h) => kennungen.has(h.kennung));
-  if (linien.length < 3 || linien.length !== kennungen.size) return null;
-  const nachbarn = new Map();
-  for (const h of linien) {
-    if (h.von === h.bis) return null;
-    nachbarn.set(h.von, [...(nachbarn.get(h.von) || []), h.bis]);
-    nachbarn.set(h.bis, [...(nachbarn.get(h.bis) || []), h.von]);
-  }
-  if ([...nachbarn.values()].some((n) => n.length !== 2)) return null;
-  const start = linien[0].von;
-  const reihe = [start];
-  let vorher = null;
-  let jetzt = start;
-  for (;;) {
-    const weiter = nachbarn.get(jetzt).find((k) => k !== vorher);
-    if (weiter === start) break;
-    if (reihe.includes(weiter)) return null;
-    reihe.push(weiter);
-    vorher = jetzt;
-    jetzt = weiter;
-  }
-  return reihe.length === nachbarn.size ? reihe : null;
-}
-
-/**
- * Schiebt die gewählte Bewehrung in die Überdeckung -- dorthin, wo der Kern
- * sagt (`ueberdeckt` in seiner Antwort zur Zeichnung). Ein Stab als Ganzes,
- * eine Linie Ende für Ende; was sonst am selben Knoten hängt, bleibt liegen.
- * Ein Schritt für «Rückgängig».
- */
-function ueberdeckungBeachten(a, bewehrung) {
-  const geo = frischeAntwort(a);
-  if (!geo) {
-    melden('Die Zeichnung wird noch geprüft – gleich noch einmal.');
-    return;
-  }
-  const ziele = new Map([...geo.staebe, ...geo.spannglieder, ...geo.linien].map((x) => [x.kennung, x.ueberdeckt]));
-  const lagen = a.modell.lagen(eintragVon(a.qa.kennung));
-  const schritte = [];
-  for (const { art, e } of bewehrung) {
-    const ziel = ziele.get(e.kennung);
-    if (!ziel) continue;
-    const enden = art.form === 'punkt' ? [[e.kennung, e.knoten, ziel]]
-      : [[eckeSchluessel(e.kennung, 0), e.von, ziel[0]], [eckeSchluessel(e.kennung, 1), e.bis, ziel[1]]];
-    for (const [schluessel, knoten, p] of enden) {
-      const q = lagen.get(knoten);
-      const d = [p[0] - q[0], p[1] - q[1]];
-      if (Math.hypot(d[0], d[1]) > 1e-6) schritte.push([schluessel, d]);
-    }
-  }
-  if (!schritte.length) {
-    melden(bewehrung.some(({ e }) => ziele.get(e.kennung))
-      ? 'Die Bewehrung liegt schon in der Überdeckung.'
-      : 'Für diese Bewehrung gilt keine Überdeckung, oder das Polygon ist dafür zu klein.');
-    return;
-  }
-  a.aendern((zz) => {
-    for (const [schluessel, d] of schritte) a.modell.verschieben(zz, new Set([schluessel]), d);
-  });
-}
-
-function aktionen(a) {
-  const z = eintragVon(a.qa.kennung);
-  const liste = [];
-  // Bewehrung gewählt, und ein Polygon hat eine Überdeckung: sie beachten.
-  const verzeichnis = a.modell.verzeichnis(z);
-  const bewehrung = [...a.auswahl].map((k) => verzeichnis.get(k))
-    .filter((x) => x && ['staebe', 'spannglieder', 'stablinien'].includes(x.art?.liste));
-  if (bewehrung.length && z.flaechen.some((f) => f.ueberdeckung > 0)) {
-    liste.push({
-      zeichen: '⇲', text: 'Überdeckung beachten',
-      titel: 'Die Bewehrung so verschieben, dass sie mit ihrem Radius gerade ganz in der Überdeckung liegt',
-      tun: () => ueberdeckungBeachten(a, bewehrung),
-    });
-  }
-  const reihe = umlauf(z, a.auswahl);
-  if (reihe) {
-    // Was entsteht, sagt die Vorgabe des Werkzeugs Polygon -- bis 2026-11-19
-    // sagte der Knopf es nicht.
-    const entsteht = vorgaben(a).flaechen.material ? neuText(a.qa, 'polygon') : 'Aussparung';
-    liste.push({
-      zeichen: '▱', text: 'Fläche bilden',
-      titel: `Die geschlossenen Hilfslinien werden eine ${entsteht} – wie die Vorgabe des Werkzeugs Polygon`,
-      tun: () => {
-        const weg = new Set(a.auswahl);
-        let neu = null;
-        a.aendern((zz) => {
-          neu = flaecheAnlegen(a, zz, reihe);
-          zz.hilfslinien = zz.hilfslinien.filter((h) => !weg.has(h.kennung));
-        }, { auswahl: () => [neu] });
-      },
-    });
-  }
-  return liste;
-}
-

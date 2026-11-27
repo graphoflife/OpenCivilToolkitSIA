@@ -13,7 +13,9 @@
  * (qa_stabilitaet.js). Einer aus Holz hat davor die Feuchteklasse, je Fall
  * dazu, ob die Einwirkung stossartig ist. Einer im Verbund hat davor die
  * Verdübelung, mit Kopfbolzendübeln je Lastfall dazu, wie viele bis zum
- * Momentennullpunkt sitzen.
+ * Momentennullpunkt sitzen. Eine Blechverbunddecke hat davor den
+ * Längsschub (qa_laengsschub.js); ihre Lastfälle haben nur N, M_y und V_z,
+ * denn sie trägt in einer Richtung.
  *
  * Wie bei der Platte steht oben, was der Querschnitt *ist*, und in den
  * Fenstern, was von ihm *verlangt* wird. Gerechnet wird nichts: jede Zeile
@@ -39,8 +41,9 @@ import {
   analysenKapitel, mitKopf, nachweisKapitel, werkstoffzeilen,
 } from './nachweise.js';
 import {
-  HOLZ_RECHNET, ausHolz, biegungsWahl, dauerSchalter, imVerbund,
+  HOLZ_RECHNET, ausHolz, biegungsWahl, dauerSchalter, imBlechverbund, imVerbund,
 } from './qa_fallteile.js';
+import { LAENGSSCHUB } from './qa_laengsschub.js';
 import { STABILITAET, STABILITAET_HOLZ, STABILITAET_VERBUND } from './qa_stabilitaet.js';
 import { uebersicht } from './qa_uebersicht.js';
 import {
@@ -85,6 +88,16 @@ const HILFE = {
       ['Betonstahl', 'zieht ihn ein Moment, rechnet es plastisch nur mit Klasse B oder C (5.1.2.3)'],
       ['V', 'der Stahl allein, je Richtung gegen V_Rd der Profile; über der Hälfte von V_Rd tragen die Bleche, in denen sie steht, für M-N nur noch 1 − (V/V_Rd)²'],
       ['T', 'nicht nachgewiesen'],
+      ['Werte', 'je Material nach Wahl, oben in diesem Fenster'],
+    ],
+    formel: 'α_eff = Widerstand / Einwirkung ≥ 1',
+  },
+  tragsicherheitBlech: {
+    zeilen: [
+      ['Richtung', 'die Decke trägt in Richtung ihrer Rippen: N, M_y und V_z über die ganze Breite b (5.4.1.1)'],
+      ['M-N', 'plastisch wie der Verbundträger: der Beton mit 0.85 · f_cd nur gedrückt, Blech und Betonstahl gezogen; bei negativem Moment ohne das Blech (5.4.3.2)'],
+      ['V', 'V_Rd = k_d · τ_cd · d_p · b_0 / b_s je Breite, mit k_d = 0.8 bis d_p = 150 mm (26) – darüber grau'],
+      ['Längsschub', 'V_L,Rd nach der m-k-Methode (28) – was er braucht, steht in der Kachel «Längsschub»'],
       ['Werte', 'je Material nach Wahl, oben in diesem Fenster'],
     ],
     formel: 'α_eff = Widerstand / Einwirkung ≥ 1',
@@ -171,6 +184,7 @@ const HILFE = {
 /**
  * Die Spalten eines Lastfalls. `zweiachsig`: nur bei schiefer Biegung --
  * einachsig zählen M_z und V_y nicht, also stehen sie auch nicht da.
+ * `torsion`: was eine Blechverbunddecke nicht trägt, wie M_z und V_y.
  */
 const SPALTEN = [
   { feld: 'N_Ed', symbol: 'N', schritt: 50, titel: 'Normalkraft in kN – Zug positiv' },
@@ -184,10 +198,23 @@ const SPALTEN = [
     titel: 'Querkraft in y in kN – positiv nach rechts',
   },
   { feld: 'V_z_Ed', symbol: 'V_z', schritt: 10, titel: 'Querkraft in z in kN – positiv nach oben' },
-  { feld: 'T_Ed', symbol: 'T', schritt: 5, titel: 'Torsion in kNm – positiv im Gegenuhrzeigersinn' },
+  {
+    feld: 'T_Ed', symbol: 'T', schritt: 5, torsion: true,
+    titel: 'Torsion in kNm – positiv im Gegenuhrzeigersinn',
+  },
 ];
 
+/**
+ * Die Spalten der Lastfälle einer Analyse. Eine Blechverbunddecke trägt
+ * nur N, M_y und V_z (5.4.1.1): M_z, V_y und T stehen bei ihr nur da,
+ * solange ein Lastfall dort noch eine Zahl hat -- der Kern meldet sie gelb,
+ * und hier lässt sie sich löschen.
+ */
 function spalten(analyse) {
+  if (imBlechverbund(analyse)) {
+    return SPALTEN.filter((s) => !(s.zweiachsig || s.torsion)
+      || analyse.lastfaelle.some((fall) => fall[s.feld]));
+  }
   return SPALTEN.filter((s) => !(analyse.einachsig && s.zweiachsig));
 }
 
@@ -195,6 +222,15 @@ function spalten(analyse) {
 const VERBUND_RECHNET = 'Im Verbund rechnet der Querschnitt plastisch: der Beton mit 0.85 · f_cd '
   + 'über die ganze Druckzone und ohne Zug, Baustahl und Betonstahl mit ihrer Fliessgrenze '
   + '(SIA 264, 5.1.2.1). Eine Rechenart des Betons gibt es darum hier nicht.';
+
+/** Dasselbe in einer Blechverbunddecke -- mit dem Blech. */
+const BLECH_RECHNET = 'Die Blechverbunddecke rechnet plastisch wie der Verbundträger: der Beton '
+  + 'mit 0.85 · f_cd über die ganze Druckzone und ohne Zug, Betonstahl und Blech mit ihrer '
+  + 'Fliessgrenze – das Blech nur gezogen und bei negativem Moment gar nicht (SIA 264, 5.4.3.2). '
+  + 'Eine Rechenart des Betons gibt es darum hier nicht.';
+
+/** Wo der Beton immer plastisch rechnet, je Bauweise: was dann unter den Werten steht. */
+const PLASTISCH = { verbund: VERBUND_RECHNET, blechverbund: BLECH_RECHNET };
 
 /** Ob im Verbund mit Kopfbolzendübeln gerechnet wird -- sonst gilt die Verdübelung als voll. */
 function mitDuebeln(analyse) {
@@ -254,17 +290,17 @@ function querschnittGruppe(analyse) {
  * beim Beton dazu seine Rechenart -- dieselben Zeilen wie die Rechenwahl
  * jedes Moduls (`werkstoffzeilen`), ohne Kriechzahl: der Bruch rechnet ohne
  * Kriechen. Duktilität und sprödes Versagen rechnen am selben Querschnitt.
- * Im Verbund rechnet der Beton immer plastisch: dort steht statt seiner
- * Rechenart, wie (`VERBUND_RECHNET`).
+ * Im Verbund und in der Blechverbunddecke rechnet der Beton immer
+ * plastisch: dort steht statt seiner Rechenart, wie (`PLASTISCH`).
  */
 function rechenwahl(analyse) {
-  const verbund = imVerbund(analyse);
+  const plastisch = PLASTISCH[bauweiseVon(analyse.kennung)];
   return el('div.rechenwahl', {}, [
     el('span.rechenwahl-titel', { text: 'Rechenwahl' }),
     werkstoffzeilen(analyse, (veraenderer) => eintragAendern(analyse.kennung, veraenderer), {
-      ...werkstoffeVon(analyse.kennung), klasse: 'querschnittsanalyse', mitRechenart: !verbund,
+      ...werkstoffeVon(analyse.kennung), klasse: 'querschnittsanalyse', mitRechenart: !plastisch,
     }),
-    verbund ? el('p.qa-erlaeuterung', { text: VERBUND_RECHNET }) : null,
+    plastisch ? el('p.qa-erlaeuterung', { text: plastisch }) : null,
   ]);
 }
 
@@ -312,16 +348,21 @@ function schubwandAngaben(analyse) {
  * Tragsicherheit: womit gerechnet wird und die Lastfälle -- beim Stahlbeton
  * dazu, was Querkraft und Torsion brauchen (`schubwandAngaben`). Das Holz
  * hat keine Wahl, wie es rechnet; dort steht, wie. Stahl und Verbund wählen
- * die Werte je Material.
+ * die Werte je Material. Eine Blechverbunddecke trägt in einer Richtung:
+ * statt der Wahl der Biegung steht, was sie trägt -- vom Kern --, und das
+ * Bild der Vorzeichen hat weder M_z noch V_y noch T.
  */
 function lastfallAngaben(analyse) {
   const aendern = (veraenderer) => eintragAendern(analyse.kennung, veraenderer);
   const faelle = analyse.lastfaelle;
+  const decke = imBlechverbund(analyse);
   return [
     ausHolz(analyse) ? el('p.qa-erlaeuterung', { text: HOLZ_RECHNET }) : rechenwahl(analyse),
     el('div.qa-kopfzeile', {}, [
-      el('div.qa-schalter', {}, [biegungsWahl(analyse)]),
-      vorzeichenbild(analyse.einachsig),
+      el('div.qa-schalter', {}, [decke
+        ? el('p.qa-erlaeuterung', { text: katalog('querschnittsanalyse', 'blechdecke').richtung })
+        : biegungsWahl(analyse)]),
+      vorzeichenbild(analyse.einachsig || decke, { torsion: !decke }),
     ]),
     faelle.length ? lastfallKopf(analyse) : null,
     ...(faelle.length
@@ -371,16 +412,15 @@ function lastfallZeile(analyse, index) {
 
 /**
  * Das kleine Bild der Vorzeichen: Achsen mit V_y und V_z, der Drehsinn von
- * T, und dick die Kanten, die ein positives Moment zieht.
+ * T, und dick die Kanten, die ein positives Moment zieht. Einachsig ohne
+ * M_z und V_y, ohne `torsion` auch ohne T.
  */
-function vorzeichenbild(einachsig) {
+function vorzeichenbild(einachsig, { torsion = true } = {}) {
+  const teile = ['N > 0 Zug', 'M_y > 0 Zug unten', ...(einachsig ? [] : ['M_z > 0 Zug links', 'V_y nach rechts']),
+    'V_z nach oben', ...(torsion ? ['T im Gegenuhrzeigersinn'] : [])];
   const bild = svgEl('svg', {
     viewBox: '0 0 168 120', width: 168, height: 120, class: 'vorzeichenbild',
-    role: 'img',
-    'aria-label': einachsig
-      ? 'Vorzeichen: N > 0 Zug, M_y > 0 Zug unten, V_z nach oben, T im Gegenuhrzeigersinn'
-      : 'Vorzeichen: N > 0 Zug, M_y > 0 Zug unten, M_z > 0 Zug links, V_y nach rechts, '
-        + 'V_z nach oben, T im Gegenuhrzeigersinn',
+    role: 'img', 'aria-label': `Vorzeichen: ${teile.join(', ')}`,
   });
   const text = (x, y, inhalt, klasse = '', anker = 'middle') => {
     const t = svgEl('text', { x, y, 'text-anchor': anker, class: klasse });
@@ -421,23 +461,24 @@ function vorzeichenbild(einachsig) {
   bild.append(pfeil(sx, sy, sx, 6, 'vz-achse'));
   bild.append(text(sx + 6, 12, 'z, V_z', 'vz-achstext', 'start'));
 
-  // T im Gegenuhrzeigersinn -- ein Bogen um S mit Spitze am Ende.
+  bild.append(svgEl('circle', { cx: sx, cy: sy, r: 2.2, class: 'vz-schwerpunkt' }));
+  if (torsion) bild.append(...drehsinn(sx, sy, text));
+  return el('div.vorzeichen', { title: 'N > 0: Zug. Bezugspunkt: Schwerpunkt S' }, [bild]);
+}
+
+/** Der Drehsinn von T im Bild der Vorzeichen -- ein Bogen um S mit Spitze am Ende, und sein Name. */
+function drehsinn(sx, sy, text) {
   const rad = 13;
   const punkt = (w) => [sx + rad * Math.cos(w), sy - rad * Math.sin(w)];
   const [ax, ay] = punkt(-0.6);
   const [ex, ey] = punkt(3.6);
-  bild.append(svgEl('path', {
-    d: `M ${ax} ${ay} A ${rad} ${rad} 0 1 0 ${ex} ${ey}`, class: 'vz-drehung',
-  }));
   const tangente = 3.6 + Math.PI / 2;
   const spitze = (w) => `${ex - 6 * Math.cos(tangente + w)},${ey + 6 * Math.sin(tangente + w)}`;
-  bild.append(svgEl('polygon', {
-    points: `${ex},${ey} ${spitze(0.5)} ${spitze(-0.5)}`, class: 'vz-drehspitze',
-  }));
-  bild.append(text(sx + rad + 4, sy + rad + 4, 'T', 'vz-achstext', 'start'));
-  bild.append(svgEl('circle', { cx: sx, cy: sy, r: 2.2, class: 'vz-schwerpunkt' }));
-
-  return el('div.vorzeichen', { title: 'N > 0: Zug. Bezugspunkt: Schwerpunkt S' }, [bild]);
+  return [
+    svgEl('path', { d: `M ${ax} ${ay} A ${rad} ${rad} 0 1 0 ${ex} ${ey}`, class: 'vz-drehung' }),
+    svgEl('polygon', { points: `${ex},${ey} ${spitze(0.5)} ${spitze(-0.5)}`, class: 'vz-drehspitze' }),
+    text(sx + rad + 4, sy + rad + 4, 'T', 'vz-achstext', 'start'),
+  ];
 }
 
 // ===========================================================================
@@ -477,6 +518,14 @@ const TRAGSICHERHEIT_VERBUND = {
 
 /** Dieselbe Kachel für einen Querschnitt aus Holz, nach SIA 265. */
 const TRAGSICHERHEIT_HOLZ = { ...TRAGSICHERHEIT_STAHL, hilfe: HILFE.tragsicherheitHolz };
+
+/**
+ * Dieselbe Kachel für eine Blechverbunddecke, nach SIA 264, 5.4: ohne
+ * Schubwände -- die Querkraft trägt die Decke nach (26).
+ */
+const TRAGSICHERHEIT_BLECH = {
+  ...TRAGSICHERHEIT, hilfe: HILFE.tragsicherheitBlech, inhalt: lastfallAngaben,
+};
 
 /** Die Feuchteklasse der Analyse -- oder die des Kerns, solange keine gewählt ist. */
 function feuchteklasse(analyse) {
@@ -577,6 +626,7 @@ const VERDUEBELUNG = {
 const EIGENE_NACHWEISE = {
   stahl: [TRAGSICHERHEIT_STAHL, STABILITAET],
   verbund: [VERDUEBELUNG, TRAGSICHERHEIT_VERBUND, STABILITAET_VERBUND],
+  blechverbund: [LAENGSSCHUB, TRAGSICHERHEIT_BLECH],
   holz: [FEUCHTEKLASSE, TRAGSICHERHEIT_HOLZ, STABILITAET_HOLZ],
 };
 
@@ -658,11 +708,13 @@ const ORT = {
  * Die Kacheln der Analyse. Die Nachweise sind die des Stahlbetons, beim
  * Stahl die Tragsicherheit und Knicken und Kippen nach SIA 263, beim Holz
  * dazu davor die Feuchteklasse, nach SIA 265, im Verbund die
- * Verdübelung, die Tragsicherheit und die Verbundstütze nach SIA 264
- * (`bauweiseVon`). Ein Querschnitt aus
+ * Verdübelung, die Tragsicherheit und die Verbundstütze nach SIA 264, in
+ * einer Blechverbunddecke der Längsschub und die Tragsicherheit nach
+ * SIA 264, 5.4 (`bauweiseVon`). Ein Querschnitt aus
  * mehreren Hölzern hat keine, statt ihrer steht grau, warum
  * (`ohneNachweiseVon`). Die Spannung-Dehnung-Analysen hat jeder ausser dem
- * Verbund (`ohneAnalysenVon`). Was in den Kacheln eingestellt ist, bleibt.
+ * Verbund und der Decke (`ohneAnalysenVon`). Was in den Kacheln eingestellt
+ * ist, bleibt.
  */
 function kapitel(analyse) {
   const gruppe = (titel, ohne, kacheln) => (ohne ? { titel, hinweis: ohne, kapitel: [] }

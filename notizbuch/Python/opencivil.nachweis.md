@@ -1,5 +1,5 @@
 ---
-erzeugt: a34d512c396e
+erzeugt: 942621d71433
 art: modul
 tags: [modul]
 ---
@@ -25,6 +25,7 @@ Kapitel waehlt, womit es rechnet.
 - [[opencivil.nachweis.lagennachweis]] – ein Nachweis je Platte, ein Urteil je Bewehrungslage.
 - [[opencivil.nachweis.linie]] – Geometrie einer geschlossenen M-N-Linie.
 - [[opencivil.nachweis.mindestbewehrung]] – Mindestbewehrung gegen breite Risse bei Zwang.
+- [[opencivil.nachweis.qa_blechverbund]] – eine Blechverbunddecke nach SIA 264:2014, 5.4.
 - [[opencivil.nachweis.qa_gebrauch]] – Gebrauchsnachweise des gezeichneten Querschnitts.
 - [[opencivil.nachweis.qa_holz]] – die Lastfaelle eines Holzquerschnitts nach SIA 265:2012.
 - [[opencivil.nachweis.qa_holz_kennzahlen]] – was ein Holzquerschnitt aufnimmt, ohne Einwirkung.

@@ -1,5 +1,5 @@
 ---
-erzeugt: 7c73a6631eac
+erzeugt: e940103f4f1a
 art: modul
 tags: [modul]
 ---
@@ -643,6 +643,7 @@ Eine zu pruefende Schnittgroessenkombination.
 - [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.balkensystem3d]]
 - [[opencivil.projekt.beispiele]]
+- [[opencivil.projekt.blechdecken]]
 - [[opencivil.projekt.decke]]
 - [[opencivil.projekt.durchstanzen]]
 - [[opencivil.projekt.erdbeben]]

@@ -35,9 +35,10 @@ from opencivil.material.basis import Baustoff
 from opencivil.projekt.balkensystem import (
     EINHEIT_DER_LAST, BalkensystemEintrag, Knotenlastart, Profilachse, StabmaterialEintrag,
 )
+from opencivil.core.sprache import aufgezaehlt
 from opencivil.projekt.lesen import ProjektFehler, als_groesse
 from opencivil.projekt.staebe import (
-    MATERIAL_DES_QUERSCHNITTS, Querschnittsart, StabquerschnittBasis, aufgezaehlt,
+    MATERIAL_DES_QUERSCHNITTS, Querschnittsart, StabquerschnittBasis,
 )
 from opencivil.spannungsanalyse.modul import ModulAusAnalyse, ModulAusPlatte, Modulfrage
 from opencivil.stahlprofile.tabelle import PROFILE

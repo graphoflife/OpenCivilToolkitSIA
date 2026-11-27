@@ -36,9 +36,11 @@ from opencivil.bericht.latex_dokument import als_tex
 from opencivil.bericht.markdown import als_markdown
 from opencivil.core.rechenwerk import Loesung, RechenwerkFehler
 from opencivil.projekt import DeckeEintrag, Mappe, Projekt, ProjektFehler
+from opencivil.projekt.blechdecken import BlechdeckeEintrag
+from opencivil.projekt.lesen import inhalt_pruefen
 from opencivil.projekt.mappe import projekt_aus_datei
 from opencivil.projekt.staebe import MitStaeben
-from opencivil.querschnitt import vorlagen
+from opencivil.querschnitt import profilblech, vorlagen
 from opencivil.querschnitt.widerstandsflaeche import GROESSEN
 from opencivil.stahlprofile import lage as profillage
 from opencivil.web import (
@@ -625,11 +627,14 @@ def vorlage(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     Die Teile einer Vorlage zu den eingestellten Massen -- fuer die Skizze,
     waehrend man tippt. Passen die Masse nicht zueinander, steht der Grund in
     ``fehler`` und es gibt keine Teile: das ist keine falsche Anfrage, nur
-    eine unfertige Eingabe. Beim Stahlprofil das Profil (:func:`_profilskizze`).
+    eine unfertige Eingabe. Beim Stahlprofil das Profil (:func:`_profilskizze`),
+    bei der Blechverbunddecke die Decke (:func:`_deckenskizze`).
     """
     wahl = rumpf.get("wahl") or {}
     if wahl.get("art") == profillage.VORLAGE:
         return _profilskizze(wahl)
+    if wahl.get("art") == profilblech.VORLAGE:
+        return _deckenskizze(wahl)
     try:
         teile = _vorlage(rumpf).bauen(**_vorlagenwahl(rumpf))
     except ValueError as fehler:
@@ -656,6 +661,31 @@ def _profilskizze(wahl: Mapping[str, Any]) -> Dict[str, Any]:
         return {"fehler": f"Das Profil «{name}» gibt es in der Tabelle nicht.", "teile": None}
     return {"fehler": None, "teile": teile.als_dict(), "drehbar": profillage.drehbar(name),
             "spiegelbar": profillage.spiegelbar(name)}
+
+
+#: Was die Skizze einer Blechverbunddecke von ihrer Wahl liest: ihre Masse.
+BLECHMASSE = ("h", "rippen", "h_p", "b_s", "b_o", "b_u", "A_p")
+
+
+def _deckenskizze(wahl: Mapping[str, Any]) -> Dict[str, Any]:
+    """
+    Die Skizze einer Blechverbunddecke zu den eingestellten Massen: die ganze
+    Decke in ``teile``, eine Rippe mit ihren Massen in ``rippe``
+    (:func:`~opencivil.querschnitt.profilblech.skizze`). Passen die Masse
+    nicht zueinander, sagt ``fehler`` es mit den Worten der Felder. Eingesetzt
+    wird sie von der Oberflaeche, wie ein Profil: sie ist ein Eintrag an
+    einem Knoten.
+    """
+    wo = "Vorlage «Blechverbunddecke»"
+    masse = {k: v for k, v in wahl.items() if k in BLECHMASSE}
+    try:
+        decke = BlechdeckeEintrag.aus_dict(masse, wo)
+        inhalt_pruefen(decke, wo)
+    except ProjektFehler as fehler:
+        return {"fehler": fehler.grund, "teile": None}
+    form = decke.form((0.0, 0.0))
+    return {"fehler": None, "teile": profilblech.skizze(form).als_dict(),
+            "rippe": profilblech.rippenskizze(form).als_dict()}
 
 
 def vorlage_einsetzen(rumpf: Mapping[str, Any]) -> Dict[str, Any]:

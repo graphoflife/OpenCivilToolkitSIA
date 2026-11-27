@@ -1,5 +1,5 @@
 ---
-erzeugt: 051e317c0de0
+erzeugt: 108a843c502d
 art: modul
 tags: [modul]
 ---
@@ -165,6 +165,7 @@ die waagrechte Nulllinie einer einachsigen Rechnung es braucht.
 
 - [[opencivil.nachweis.handrechnung]]
 - [[opencivil.nachweis.kennzahlen]]
+- [[opencivil.nachweis.qa_blechverbund]]
 - [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.qa_kennzahlen]]
 - [[opencivil.nachweis.qa_knicken]]

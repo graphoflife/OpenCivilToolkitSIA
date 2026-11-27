@@ -683,6 +683,39 @@ const ZEICHEN = {
       'M16.5 3.5v16.2', 'M19.5 3.5L15 8.9', 'M19 8.9L13.5 19.7'],
     strich: ['M15 8.9h4'],
   },
+  // Der Längsschub der Blechverbunddecke: die Decke in der Ansicht, unten
+  // voll ihr Blech -- darüber und darunter je ein Pfeil, wie Beton und Blech
+  // gegeneinander gleiten wollen.
+  laengsschub: {
+    pfade: ['M3 7h18v8H3z', 'M6 4h10 M14 2.5l2 1.5-2 1.5', 'M18 19.5H8 M10 18l-2 1.5 2 1.5'],
+    flaechen: ['M3 15h18v1.6H3z'],
+  },
+  // Wo das Feld der Decke liegt: ein Einfeld auf zwei Lagern; das End- und
+  // ein Innenfeld einer durchlaufenden Decke, gestrichelt ihre Nachbarfelder.
+  'blechfeld-einfeld': {
+    pfade: ['M4 11h16', 'M4 11l-1.6 2.8h3.2z', 'M20 11l-1.6 2.8h3.2z'],
+  },
+  'blechfeld-endfeld': {
+    pfade: ['M3 11h10', 'M3 11l-1.6 2.8h3.2z', 'M13 11l-1.6 2.8h3.2z', 'M21 11l-1.6 2.8h3.2z'],
+    strich: ['M13 11h8'],
+  },
+  'blechfeld-innenfeld': {
+    pfade: ['M8 11h8', 'M2.5 11l-1.6 2.8h3.2z', 'M8 11l-1.6 2.8h3.2z', 'M16 11l-1.6 2.8h3.2z',
+      'M21.5 11l-1.6 2.8h3.2z'],
+    strich: ['M2.5 11H8 M16 11h5.5'],
+  },
+  // Wie die Last auf dem Feld steht: gleichmässig verteilt, oder zwei
+  // Einzellasten, je im Abstand a von ihrem Lager -- unten sein Mass.
+  'blechlast-gleichmaessig': {
+    pfade: ['M4 14h16', 'M4 14l-1.6 2.8h3.2z', 'M20 14l-1.6 2.8h3.2z', 'M4 5.5h16',
+      'M6 5.5v6 M10 5.5v6 M14 5.5v6 M18 5.5v6',
+      'M5 10.3l1 1.2 1-1.2 M9 10.3l1 1.2 1-1.2 M13 10.3l1 1.2 1-1.2 M17 10.3l1 1.2 1-1.2'],
+  },
+  'blechlast-einzellasten': {
+    pfade: ['M4 14h16', 'M4 14l-1.6 2.8h3.2z', 'M20 14l-1.6 2.8h3.2z',
+      'M9 4v8 M7.6 10.6L9 12l1.4-1.4', 'M15 4v8 M13.6 10.6L15 12l1.4-1.4',
+      'M4 20h5 M4 18.8v2.4 M9 18.8v2.4'],
+  },
 };
 
 /**

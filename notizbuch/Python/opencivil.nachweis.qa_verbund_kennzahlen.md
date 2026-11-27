@@ -1,5 +1,5 @@
 ---
-erzeugt: 5350947cd223
+erzeugt: 39336caddf13
 art: modul
 tags: [modul]
 ---
@@ -121,6 +121,7 @@ def _summe(self, p: Protokoll, werte: Verbundwerte, ergebnis: Dict[str, Groesse]
 
 ## Gebraucht von
 
+- [[opencivil.nachweis.qa_blechverbund]]
 - [[opencivil.nachweis.qa_verbund]]
 - [[opencivil.nachweis.qa_verbund_stuetze]]
 - [[opencivil.projekt.aufbau.querschnittsanalyse]]

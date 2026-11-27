@@ -1,5 +1,5 @@
 ---
-erzeugt: aa5383c967c5
+erzeugt: d848c94c7dd8
 art: modul
 tags: [modul]
 ---
@@ -339,6 +339,14 @@ def torsion_protokollieren(self, p: Protokoll) -> Dict[str, Groesse]
 es kommt. Unter eigener Ueberschrift: gerechnet wird es, wenn es einer
 braucht, oft nach den Nachweisen.
 
+#### Querschnittsanalyse._bewehrung_protokollieren
+
+```python
+def _bewehrung_protokollieren(self, p: Protokoll) -> float
+```
+
+Die Bewehrung als Tabelle, das Profilblech fuer sich -- zurueck ihre Stahlflaeche.
+
 #### Querschnittsanalyse.angaben
 
 ```python
@@ -522,6 +530,7 @@ Jede Ecke eines Polygons mit Material -- fuer das Rissmoment, in mm.
 
 ## Gebraucht von
 
+- [[opencivil.nachweis.qa_blechverbund]]
 - [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.qa_holz]]
 - [[opencivil.nachweis.qa_holz_kennzahlen]]

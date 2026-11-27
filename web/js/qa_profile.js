@@ -15,15 +15,14 @@
  * WAS HIER GERECHNET WIRD -- UND WAS NICHT:
  * Nichts. Den Umriss eines Profils -- gedreht, gespiegelt, mit seinem Loch
  * --, seine Fläche, seine Masse von aussen und woran der Zeiger fängt,
- * schickt der Kern mit der Antwort zur Zeichnung (`profile`). Hier wird das
- * nur mitgeschoben: um das, was sein Knoten seit der Antwort gewandert ist,
- * bis die nächste da ist.
+ * schickt der Kern mit der Antwort zur Zeichnung (`profile`); mitgeschoben
+ * wird es wie jedes Element mit einem Umriss vom Kern (qa_umriss.js).
  */
 
 import {
   VAR, hakenSchalter, materialliste, mitVar, wahlBlock, wahlSchalter,
 } from './bausteine.js';
-import { pfad, zahlText } from './cad_ansicht.js';
+import { zahlText } from './cad_ansicht.js';
 import { jaNein } from './cad_app.js';
 import { cadZeile, schalterzeile } from './cad_palette.js';
 import { el } from './dom.js';
@@ -31,45 +30,19 @@ import { groessenListe, reihenSchalter } from './profilwahl.js';
 import { feldangabe, katalog } from './zustand.js';
 
 /**
- * Die Art der Elemente, für das allgemeine Fenster: ein Punkt mit Fläche
- * (`profilUmriss`). Liegen Ecken aufeinander, kommt das Profil nach den
- * Flächen dran.
+ * Die Art der Elemente, für das allgemeine Fenster: ein Punkt mit einem
+ * Umriss vom Kern (qa_umriss.js), aus Baustahl, sein Loch gerade-ungerade
+ * ausgespart. Gefangen wird an den Ecken und Seitenmitten seines Rahmens.
+ * Liegen Ecken aufeinander, kommt das Profil nach den Flächen dran.
  */
-export const PROFIL = { liste: 'profile', klasse: 'profil', form: 'punkt', vorsilbe: 'R', rang: 5 };
-
-/**
- * Was der Kern zuletzt über ein Profil sagte -- auch in einer älteren
- * Antwort: es ist nur das Bild --, und wie seine Punkte mit dem Knoten
- * mitgehen. Null, solange er es nicht kennt: vor der ersten Antwort, oder
- * bei einem Namen, den die Tabelle nicht hat.
- */
-function gesehen(a, e) {
-  const info = a.adapter.kern.antwort?.profile?.find((x) => x.kennung === e.kennung);
-  const p = a.modell.lagen(a.adapter.zeichnung()).get(e.knoten);
-  if (!info || !p) return null;
-  const [dy, dz] = [p[0] - info.lage[0], p[1] - info.lage[1]];
-  return { info, schieben: ([y, z]) => [y + dy, z + dz] };
-}
-
-/** Die Umrisse eines Profils in der Zeichnung, der erste aussen, die weiteren Löcher -- oder null. */
-export function profilUmriss(a, e) {
-  const g = gesehen(a, e);
-  return g && g.info.umriss.map((teil) => teil.map(g.schieben));
-}
-
-/** Woran der Zeiger an den Profilen fängt: die Ecken und Seitenmitten ihres Rahmens. */
-export function profilFang(a, z) {
-  return (z.profile || []).flatMap((e) => {
-    const g = gesehen(a, e);
-    return g ? g.info.fang.map((p) => ({ p: g.schieben(p) })) : [];
-  });
-}
-
-/** Der Pfad eines Profils im Bild, sein Loch gerade-ungerade ausgespart -- oder null. */
-export function profilPfad(a, e) {
-  const teile = profilUmriss(a, e);
-  return teile && teile.map((teil) => pfad(a.v, teil)).join(' ');
-}
+export const PROFIL = {
+  liste: 'profile', klasse: 'profil', form: 'punkt', vorsilbe: 'R', rang: 5,
+  flaeche: { klasse: 'cad-baustahl', 'fill-rule': 'evenodd' },
+  felder: profilFelder,
+  info: profilInfo,
+  titel: (e) => (e ? e.profil : 'Stahlprofil'),
+  lage: 'Mitte ',
+};
 
 /**
  * Drehung und Spiegeln -- nur, wo sie das Profil ändern: das sagt `info`
@@ -120,14 +93,4 @@ export function profilInfo(info) {
   return [el('p.cad-info', {
     text: `${zahlText(info.breite)} × ${zahlText(info.hoehe)} mm · A = ${zahlText(info.A, 0)} mm²`,
   })];
-}
-
-/** Setzt ein Profil `e` mit seiner Mitte an `p` ein -- an einen neuen Knoten oder einen, der dort liegt. */
-export function profilEinsetzen(a, e, p) {
-  let neu = null;
-  a.aendern((z) => {
-    const knoten = a.modell.knotenAn(z, p);
-    neu = a.modell.naechsteKennung(z, PROFIL.vorsilbe);
-    z.profile.push({ ...structuredClone(e), kennung: neu, knoten });
-  }, { auswahl: () => [neu] });
 }

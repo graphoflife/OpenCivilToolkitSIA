@@ -1,5 +1,5 @@
 ---
-erzeugt: ae12654cf8cf
+erzeugt: 1c4633dc0547
 art: formel
 tags: [formel]
 ---
@@ -14,7 +14,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.querschnitt.analyse#Querschnittsanalyse|Querschnittsanalyse._bewehrung_protokollieren]]
+- [[opencivil.querschnitt.analyse#Querschnittsanalyse._bewehrung_protokollieren|Querschnittsanalyse._bewehrung_protokollieren]]
 
 ## Themen
 

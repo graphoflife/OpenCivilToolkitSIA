@@ -1,6 +1,6 @@
 /**
  * qa_vorlagen.js -- ein Querschnitt aus einer Vorlage: Rechteck, T-Balken,
- * Hohlkasten, Kreis -- oder ein Stahlprofil.
+ * Hohlkasten, Kreis -- oder ein Stahlprofil, eine Blechverbunddecke.
  *
  * T oder der Knopf «Vorlage» öffnet ein Fenster oben links in der Zeichnung.
  * Oben stehen die Vorlagen als kleine Bilder, darunter ihre Masse als Felder
@@ -17,7 +17,12 @@
  * Die Vorlage «Stahlprofil» setzt ein Profil ein, keine Fläche (Plan vom
  * 2026-11-25): Reihe, Grösse, Baustahl, Drehung und ob gespiegelt, wie im
  * schwebenden Fenster eines gezeichneten (qa_profile.js). Ihre Mitte kommt
- * an den Einsetzpunkt -- bei den anderen die Ecke unten links.
+ * an den Einsetzpunkt -- bei den anderen die Ecke unten links. Ebenso setzt
+ * die Vorlage «Blechverbunddecke» eine Decke ein, mit ihren Massen und
+ * Materialien (qa_blechdecke.js); unter ihrer Skizze steht eine Rippe mit
+ * ihren Massen.
+ *
+ * Die Skizzen zeichnet qa_skizze.js.
  */
 
 import { api } from './api.js';
@@ -26,7 +31,10 @@ import { pfad } from './cad_ansicht.js';
 import { schalterzeile } from './cad_palette.js';
 import { el, grenzeVerletzt, melden, svgEl, zahlfeld } from './dom.js';
 import { groessenListe, reihenSchalter } from './profilwahl.js';
-import { drehZeilen, profilEinsetzen } from './qa_profile.js';
+import { BLECHDECKE, MASSE, STOFFE } from './qa_blechdecke.js';
+import { PROFIL, drehZeilen } from './qa_profile.js';
+import { skizze } from './qa_skizze.js';
+import { umrissEinsetzen } from './qa_umriss.js';
 import {
   ausVorlage, eintragVon, feldangabe, katalog, materialien, zustand,
 } from './zustand.js';
@@ -39,6 +47,11 @@ function vorlagen() {
 /** Die Vorlage, die ein Stahlprofil einsetzt: ihr Schlüssel, ihr Name, ihr Bild. */
 function stahlprofil() {
   return katalog('querschnittsanalyse', 'profil');
+}
+
+/** Die Vorlage, die eine Blechverbunddecke einsetzt: ihr Schlüssel, ihr Name, ihr Bild. */
+function blechdecke() {
+  return katalog('querschnittsanalyse', 'blechdecke');
 }
 
 /** Wie ein Stahlprofil in einer Skizze aussieht: aus Baustahl, ein Stück mit seinem Loch. */
@@ -56,93 +69,6 @@ function wahlVon(a) {
     schubwaende: true,
   };
   return a.qa.vorlage;
-}
-
-// ===========================================================================
-// Die Skizze
-// ===========================================================================
-
-/** Alle Punkte der Teile -- für den Rahmen der Skizze. */
-function punkteVon(teile) {
-  return [
-    ...teile.polygone.flatMap((p) => p.punkte),
-    ...teile.staebe.map((s) => s.lage),
-  ];
-}
-
-/** Eine Masslinie neben dem Bauteil, auf der Seite, die der Kern nennt. */
-function masslinie(g, m, nach) {
-  const ab = 12;
-  const [dx, dy] = { unten: [0, ab], oben: [0, -ab], links: [-ab, 0], rechts: [ab, 0] }[m.seite] || [0, ab];
-  const [x0, y0] = nach(m.von);
-  const [x1, y1] = nach(m.bis);
-  const [p, q] = [[x0 + dx, y0 + dy], [x1 + dx, y1 + dy]];
-  const kurz = (x, y) => (dx ? `M${x - 3} ${y} H${x + 3}` : `M${x} ${y - 3} V${y + 3}`);
-  g.append(svgEl('path', {
-    d: `M${x0} ${y0} L${p[0]} ${p[1]} M${x1} ${y1} L${q[0]} ${q[1]} M${p[0]} ${p[1]} L${q[0]} ${q[1]} `
-      + `${kurz(...p)} ${kurz(...q)}`,
-    class: 'cad-mass',
-  }));
-  const [mx, my] = [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2];
-  const t = svgEl('text', { class: 'cad-masstext', 'text-anchor': 'middle' });
-  t.textContent = m.text;
-  if (dx) {
-    const x = mx + (dx < 0 ? -4 : 11);
-    t.setAttribute('x', x);
-    t.setAttribute('y', my);
-    t.setAttribute('transform', `rotate(-90 ${x} ${my})`);
-  } else {
-    t.setAttribute('x', mx);
-    t.setAttribute('y', my + (dy > 0 ? 11 : -4));
-  }
-  g.append(t);
-}
-
-/**
- * Die Teile einer Vorlage als kleines Bild, `breite` × `hoehe` px -- mit
- * Masslinien, wenn `masse`, sonst als Bildchen für ihren Knopf. Die
- * Flächen haben die Klasse `flaeche`: die ihres Materials. Ein Stück --
- * ein Stahlprofil -- ist ein Pfad, sein Loch gerade-ungerade ausgespart;
- * sonst ist ein Loch eine Aussparung, wie in der Zeichnung.
- */
-function skizze(teile, breite, hoehe, { masse = true, flaeche = 'cad-beton', einStueck = false } = {}) {
-  const bild = svgEl('svg', {
-    viewBox: `0 0 ${breite} ${hoehe}`, width: breite, height: hoehe, class: 'cad-skizze',
-  });
-  const punkte = punkteVon(teile);
-  if (!punkte.length) return bild;
-  const ys = punkte.map((p) => p[0]);
-  const zs = punkte.map((p) => p[1]);
-  const [y0, y1, z0, z1] = [Math.min(...ys), Math.max(...ys), Math.min(...zs), Math.max(...zs)];
-  const rand = masse ? 30 : 3;
-  const s = Math.min((breite - 2 * rand) / Math.max(y1 - y0, 1), (hoehe - 2 * rand) / Math.max(z1 - z0, 1));
-  const ox = (breite - s * (y1 - y0)) / 2 - s * y0;
-  const oy = (hoehe + s * (z1 - z0)) / 2 + s * z0;
-  const v = { massstab: s, ursprung: [ox, oy] };
-  const nach = (p) => [ox + s * p[0], oy - s * p[1]];
-  const g = svgEl('g');
-  if (einStueck) {
-    g.append(svgEl('path', {
-      d: teile.polygone.map((p) => pfad(v, p.punkte)).join(' '), class: flaeche, 'fill-rule': 'evenodd',
-    }));
-  }
-  for (const p of einStueck ? [] : teile.polygone) {
-    g.append(svgEl('path', { d: pfad(v, p.punkte), class: p.aussparung ? 'cad-loch' : flaeche }));
-  }
-  for (const w of teile.schubwaende) {
-    g.append(svgEl('path', {
-      d: pfad(v, [w.von, w.bis], false), class: 'cad-skizze-wand',
-      'stroke-width': Math.max(1, w.dicke * s).toFixed(1),
-    }));
-  }
-  for (const l of teile.stablinien) g.append(svgEl('path', { d: pfad(v, [l.von, l.bis], false), class: 'cad-linie' }));
-  for (const st of teile.staebe) {
-    const [x, y] = nach(st.lage);
-    g.append(svgEl('circle', { cx: x, cy: y, r: Math.max(1.5, (st.durchmesser * s) / 2), class: 'cad-stab' }));
-  }
-  if (masse) for (const m of teile.masslinien) masslinie(g, m, nach);
-  bild.append(g);
-  return bild;
 }
 
 // ===========================================================================
@@ -172,24 +98,28 @@ function mitOhne(text, an, setzen) {
 /**
  * Die Zeile eines Masses: ein Zahlenfeld, das schon beim Tippen meldet --
  * die Skizze soll mitgehen. Name, Grenze, Satz und Einheit kommen mit dem
- * Mass aus dem Kern (`angabe`), wie bei jedem Feld.
+ * Mass aus dem Kern (`angabe`), wie bei jedem Feld; steht statt des Namens
+ * ein Zeichen da, ist der Name sein Titel (`mass.titel`).
  *
  * Beim Tippen geht nur eine Zahl in die Skizze, die das Feld auch nimmt.
  * Nimmt es eine nicht, zeigt es wieder die zuletzt übernommene: das Fenster
  * zeichnet sich beim Tippen nicht neu, und das Feld kennt sonst nur die
- * Zahl, mit der es aufging.
+ * Zahl, mit der es aufging. Begrenzt ein Mass ein anderes -- die Rippe
+ * einer Decke ist niedriger als die Decke --, stehen die Masse in `neben`.
  */
-function massZeile(mass, wert, setzen) {
+function massZeile(mass, wert, setzen, neben = {}) {
   let gilt = wert;
   const nehmen = (x) => {
     gilt = x;
     setzen(x);
   };
-  const feld = zahlfeld({ wert, schritt: mass.schritt, angabe: mass.angabe, beiAenderung: nehmen });
+  const feld = zahlfeld({
+    wert, schritt: mass.schritt, angabe: mass.angabe, titel: mass.titel, neben, beiAenderung: nehmen,
+  });
   const eingabe = feld.querySelector('input');
   eingabe?.addEventListener('input', (e) => {
     const w = Number(e.target.value);
-    if (e.target.value.trim() !== '' && Number.isFinite(w) && !grenzeVerletzt(mass.angabe, w)) nehmen(w);
+    if (e.target.value.trim() !== '' && Number.isFinite(w) && !grenzeVerletzt(mass.angabe, w, neben)) nehmen(w);
   });
   eingabe?.addEventListener('change', () => { eingabe.value = String(gilt); });
   return zeile(mass.heisst, feld, mass.angabe.einheit || '');
@@ -219,7 +149,7 @@ export function vorlageOeffnen(a, vorgaben, flaechenklasse) {
 
 function vorlageZeichnen(a, knoten, vorgaben, flaechenklasse) {
   const w = wahlVon(a);
-  const alle = [...vorlagen(), stahlprofil()];
+  const alle = [...vorlagen(), stahlprofil(), blechdecke()];
   const v = alle.find((x) => x.schluessel === w.art) || alle[0];
   w.art = v.schluessel;
   const neu = () => vorlageZeichnen(a, knoten, vorgaben, flaechenklasse);
@@ -258,8 +188,11 @@ function vorlageZeichnen(a, knoten, vorgaben, flaechenklasse) {
     }).catch((fehler) => melden(fehler.message, true));
   };
 
-  const art = v.schluessel === stahlprofil().schluessel ? profilvorlage(a, neu, holen)
-    : flaechenvorlage(a, w, v, { vorgaben, flaechenklasse, neu, holen });
+  const eigene = {
+    [stahlprofil().schluessel]: () => profilvorlage(a, neu, holen),
+    [blechdecke().schluessel]: () => deckenvorlage(a, neu, holen),
+  };
+  const art = eigene[v.schluessel]?.() || flaechenvorlage(a, w, v, { vorgaben, flaechenklasse, neu, holen });
   knoten.replaceChildren(
     el('div.cad-dialog-kopf', {}, [
       el('span', { text: 'Vorlage' }),
@@ -338,9 +271,7 @@ function profilvorlage(a, neu, holen) {
   a.qa.vorlagenprofil = a.qa.vorlagenprofil || ausVorlage('profil');
   const e = a.qa.vorlagenprofil;
   const stoffe = feldangabe('profil', 'stahl').stoffe;
-  if (!stoffe.some((art) => materialien(art).some((m) => m.kennung === e.stahl))) {
-    e.stahl = stoffe.map((art) => materialien(art)[0]?.kennung).find(Boolean) || e.stahl;
-  }
+  gibtMaterial(e, 'profil', 'stahl');
   const setzen = (feld) => (x) => { e[feld] = x; neu(); };
   const drehen = el('div.cad-dialog-gruppe');
   const zeigen = () => drehen.replaceChildren(...drehZeilen((feld) => e[feld], (feld) => (x) => {
@@ -368,8 +299,57 @@ function profilvorlage(a, neu, holen) {
       drehen,
     ],
     hinweis: 'Die Mitte des Profils kommt an den Punkt',
-    hinein: (p) => profilEinsetzen(a, e, p),
+    hinein: (p) => umrissEinsetzen(a, PROFIL, e, p),
   };
+}
+
+/**
+ * Die Vorlage «Blechverbunddecke»: eine Decke an ihrer Ecke links unten,
+ * keine Fläche -- ihr Beton, ihr Blech und die Masse aus dem Datenblatt,
+ * wie im schwebenden Fenster einer gezeichneten. Was eingestellt ist, bleibt
+ * je Analyse in der Ansicht (`a.qa.vorlagendecke`). Unter der Skizze der
+ * ganzen Decke steht eine Rippe mit ihren Massen: in der ganzen wären sie
+ * nicht zu lesen. Die Masse ändern nur die Skizzen, ein Material das ganze
+ * Fenster.
+ */
+function deckenvorlage(a, neu, holen) {
+  a.qa.vorlagendecke = a.qa.vorlagendecke || ausVorlage('blechdecke');
+  const e = a.qa.vorlagendecke;
+  for (const [feld] of STOFFE) gibtMaterial(e, 'blechdecke', feld);
+  const rippe = el('div.cad-vorlagenskizze');
+  return {
+    anfrage: () => ({
+      art: blechdecke().schluessel, ...Object.fromEntries(MASSE.map(([feld]) => [feld, e[feld]])),
+    }),
+    beantwortet: (antwort) => rippe.replaceChildren(skizze(antwort.rippe, 276, 150)),
+    zeilen: [
+      rippe,
+      ...STOFFE.map(([feld, beschriftung]) => zeile(beschriftung, materialliste({
+        art: feldangabe('blechdecke', feld).stoffe, gewaehlt: e[feld],
+        setzen: (x) => { e[feld] = x; neu(); },
+      }))),
+      ...MASSE.map(([feld, schritt]) => {
+        const angabe = feldangabe('blechdecke', feld);
+        return massZeile({ heisst: angabe.zeichen, titel: angabe.heisst, schritt, angabe }, e[feld],
+          (x) => { e[feld] = x; holen(); }, e);
+      }),
+    ],
+    hinweis: 'Die Ecke links unten – die Unterkante der Rippen – kommt an den Punkt',
+    hinein: (p) => umrissEinsetzen(a, BLECHDECKE, e, p),
+  };
+}
+
+/**
+ * Gibt es das Material im Feld `feld` des Eintrags `e` der Klasse `klasse`
+ * nicht mehr, folgt ihm das erste, das das Feld nimmt -- wie in einem neuen
+ * Fenster. Gibt es keines, bleibt der Verweis: die Liste sagt dann, dass es
+ * im Projekt noch keines gibt.
+ */
+function gibtMaterial(e, klasse, feld) {
+  const stoffe = feldangabe(klasse, feld).stoffe;
+  if (!stoffe.some((art) => materialien(art).some((m) => m.kennung === e[feld]))) {
+    e[feld] = stoffe.map((art) => materialien(art)[0]?.kennung).find(Boolean) || e[feld];
+  }
 }
 
 // ===========================================================================
@@ -388,7 +368,7 @@ async function einsetzen(a, wahl, ursprung, { material, stahl }) {
 
 /**
  * Der Befehl nach «Einsetzen»: ein Punkt, an den die Vorlage kommt -- bei
- * den Flächen ihre Ecke unten links, beim Profil seine Mitte; was dort
+ * den Flächen und der Decke ihre Ecke unten links, beim Profil seine Mitte; was dort
  * hinkommt, sagt `art.hinweis`, eingesetzt wird mit `art.hinein(p)`.
  * Die Vorschau zeigt die Umrisse der Skizze am Zeiger.
  */

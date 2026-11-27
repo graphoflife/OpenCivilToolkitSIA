@@ -1,5 +1,5 @@
 ---
-erzeugt: 17782f298683
+erzeugt: 43da2431403a
 art: modul
 tags: [modul]
 ---
@@ -12,9 +12,11 @@ tags: [modul]
 Sortentabelle und Kennwerte des Stahls, aus dem die Profilbleche einer
 Blechverbunddecke sind, aufgebaut wie der Baustahl
 ([[opencivil.material.baustahl]]): jeder Kennwert ist eine eigene, einzeln
-ueberschreibbare Berechnung. Das Blech selbst -- Rippen, Flaeche, `m` und
-`k` aus dem Datenblatt -- ist ein Element der Querschnittsanalyse
-([[opencivil.projekt|opencivil.projekt.profilbleche]]), nicht des Materials.
+ueberschreibbare Berechnung. Das Blech selbst -- seine Rippen und seine
+Flaeche aus dem Datenblatt -- gehoert zur Blechverbunddecke, einem Element
+der Querschnittsanalyse ([[opencivil.projekt.blechdecken]]); seine Form
+rechnet [[opencivil.querschnitt.profilblech]], und `m` und `k` des
+Laengsschubs stehen an der Analyse. Nichts davon gehoert zum Material.
 
 
 ## DIE SORTENTABELLE
@@ -98,3 +100,9 @@ Erzeugt einen Profilblechstahl aus der Sortentabelle.
 ## Gebraucht von
 
 - [[opencivil.material.arten]]
+
+## Formeln aus diesem Modul
+
+- [[Bemessungswert der Streckgrenze]]
+- [[Fliessdehnung]]
+- [[Grenzdehnung des Profilblechstahls]]
