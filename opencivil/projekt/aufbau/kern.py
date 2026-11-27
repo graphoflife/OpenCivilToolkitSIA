@@ -280,7 +280,7 @@ class Aufbau:
     def kennzahlen_eintragen(self, teil: "Bauteil", prozedur: Kennzahlprozedur) -> None:
         """
         Kennzahlen anmelden: im Rechenwerk, als Ziel ihres Bauteils und unter
-        ihm in der Zusammenfassung -- ein Weg wie für die Nachweise
+        ihm in der Zusammenfassung -- ein Weg wie fuer die Nachweise
         (:meth:`eintragen`). Bis 2026-11-27 schrieben Querschnittsanalyse und
         Pfahl dieselben drei Zeilen je selbst.
         """

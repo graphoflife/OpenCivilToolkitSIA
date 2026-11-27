@@ -1,5 +1,5 @@
 ---
-erzeugt: 34c0b21e7883
+erzeugt: 342ebd34d4d9
 art: modul
 tags: [modul]
 ---
@@ -241,7 +241,7 @@ def kennzahlen_eintragen(self, teil: 'Bauteil', prozedur: Kennzahlprozedur) -> N
 ```
 
 Kennzahlen anmelden: im Rechenwerk, als Ziel ihres Bauteils und unter
-ihm in der Zusammenfassung – ein Weg wie für die Nachweise
+ihm in der Zusammenfassung – ein Weg wie fuer die Nachweise
 ([[opencivil.projekt.aufbau.kern#Aufbau.eintragen|eintragen]]). Bis 2026-11-27 schrieben Querschnittsanalyse und
 Pfahl dieselben drei Zeilen je selbst.
 
