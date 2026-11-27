@@ -9,13 +9,14 @@ sproedes Versagen, die Zwaengungen, die Stahlspannungen und das Knicken
 (:func:`bauen`) -- dazu die Kennzahlen. Ein Querschnitt aus Stahl hat seine
 eigenen (:func:`_stahl`), einer im Verbund (:func:`_verbund`), eine
 Blechverbunddecke (:func:`_blechverbund`) und einer aus Holz auch
-(:func:`_holz`). Eine leere oder fehlerhafte Zeichnung wird kein Bauteil,
-nur ein Hinweis.
+(:func:`_holz`). Jede Bauweise rechnet den Schubfluss in den Schnitten
+(:func:`_schubfluss`). Eine leere oder fehlerhafte Zeichnung wird kein
+Bauteil, nur ein Hinweis.
 """
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Dict, Iterable, List, Mapping, Tuple
+from typing import TYPE_CHECKING, Any, Callable, Dict, Iterable, List, Mapping, Tuple
 
 from opencivil.material.basis import Baustoff, Baustoffart
 from opencivil.projekt.lesen import ProjektFehler, als_groesse, ort_von, stoffe_des_felds
@@ -41,9 +42,11 @@ from opencivil.nachweis.qa_verbund import VerbundBiegungQA, VerbundQuerkraftQA
 from opencivil.nachweis.qa_verbund_kennzahlen import KennzahlenVerbundQA
 from opencivil.nachweis.qa_verbund_stuetze import VerbundStuetzeQA
 from opencivil.nachweis.qa_knicken import KnickenQA, QAKnickfall
+from opencivil.nachweis.qa_schubfluss import Schubflussfall, SchubflussQA
 from opencivil.nachweis.richtungsnachweise import DuktilitaetQA, SproedesVersagenQA
 from opencivil.nachweis.schiefe_biegung import SchiefeBiegung
 from opencivil.nachweis.schubwandnachweis import Schubwandnachweis, schub_belastet
+from opencivil.querschnitt.abtrennen import aus_schnitt
 from opencivil.querschnitt.analyse import Flaechenteil, Lastfall, Querschnittsanalyse
 from opencivil.querschnitt.bauweise import Bauweise
 from opencivil.querschnitt.biegung import EINACHSIG, SCHIEF
@@ -63,24 +66,9 @@ if TYPE_CHECKING:
 def bauen(art: "Bauteilart", eintrag: QuerschnittsanalyseEintrag,
           aufbau: Aufbau) -> Bauteil:
     """
-    Ein gezeichneter Querschnitt: das Bauteil und seine Nachweise.
-
-    Biegung und Normalkraft immer -- ihre Eckwerte gehoeren dem Querschnitt.
-    Querkraft und Torsion, sobald ein Lastfall sie hat oder die
-    Laengszugkraft zaehlt. Duktilitaet, sproedes Versagen und die Zwaengungen
-    immer, still, wenn ausgeschaltet -- wie bei der Platte. Ebenso die
-    Stahlspannungen, sobald es Lastfaelle gibt
-    (:func:`~opencivil.projekt.aufbau.kern.spannungsnachweise`), und das
-    Knicken, sobald ein Fall eingeschaltet ist.
-
-    Das alles beim Stahlbeton. Ein Querschnitt aus Stahl rechnet nach SIA 263
-    (:func:`_stahl`), einer im Verbund nach SIA 264 (:func:`_verbund`), eine
-    Blechverbunddecke auch (:func:`_blechverbund`), einer aus Holz nach
-    SIA 265 (:func:`_holz`). Einer aus mehreren Hoelzern rechnet bisher nur
-    seine Werte -- Flaeche, Schwerpunkt, Traegheitsmomente --; seine
-    Zusammenfassung sagt, dass die Nachweise fehlen (:func:`ohne_nachweise`).
-    Seine Spannung-Dehnung-Analysen rechnet er trotzdem. Der Verbund und die
-    Blechverbunddecke haben noch keine (:func:`ohne_analysen`).
+    Ein gezeichneter Querschnitt: das Bauteil, seine Nachweise und Kennzahlen
+    nach seiner Bauweise (:func:`_nachweise`) und der Schubfluss in seinen
+    Schnitten (:func:`_schubfluss`).
 
     Ist noch nichts gezeichnet (:attr:`QuerschnittsanalyseEintrag.leer`), gibt
     es nichts zu rechnen und kein Bauteil -- aber auch keinen Fehler, der das
@@ -101,20 +89,44 @@ def bauen(art: "Bauteilart", eintrag: QuerschnittsanalyseEintrag,
         # Die Werte des Querschnitts rechnet jede Bauweise -- der Bericht
         # zeigt sie, ein Stab im Balkensystem nimmt sie.
         teil.weitere_ziele += [d.id for d in (*analyse.d_brutto.values(), analyse.d_torsion)]
-    if analyse.bauweise is Bauweise.STAHL:
-        return _stahl(eintrag, analyse, teil, aufbau)
-    if analyse.bauweise is Bauweise.VERBUND:
-        return _verbund(eintrag, analyse, teil, aufbau)
-    if analyse.bauweise is Bauweise.BLECHVERBUND:
-        return _blechverbund(eintrag, analyse, teil, aufbau)
+    _nachweise(eintrag, analyse, teil, aufbau)
+    _schubfluss(eintrag, analyse, teil, aufbau)
+    return teil
+
+
+def _nachweise(eintrag: QuerschnittsanalyseEintrag, analyse: Querschnittsanalyse,
+               teil: Bauteil, aufbau: Aufbau) -> None:
+    """
+    Die Nachweise und Kennzahlen nach der Bauweise: beim Stahlbeton nach
+    SIA 262 (:func:`_stahlbeton`), aus Stahl nach SIA 263 (:func:`_stahl`),
+    im Verbund nach SIA 264 (:func:`_verbund`), eine Blechverbunddecke auch
+    (:func:`_blechverbund`), aus Holz nach SIA 265 (:func:`_holz`). Einer
+    aus mehreren Hoelzern rechnet bisher nur seine Werte -- Flaeche,
+    Schwerpunkt, Traegheitsmomente --; seine Zusammenfassung sagt, dass die
+    Nachweise fehlen (:func:`ohne_nachweise`). Seine
+    Spannung-Dehnung-Analysen rechnet er trotzdem. Der Verbund und die
+    Blechverbunddecke haben noch keine (:func:`ohne_analysen`).
+    """
     fehlt = ohne_nachweise(analyse.bauweise, ((s.art, s.name) for s in analyse.baustoffe))
     if fehlt:
         aufbau.ohne_nachweis(teil, ort_von(eintrag), fehlt)
         if not ohne_analysen(analyse.bauweise):
             spannungsfaelle(eintrag, stoffe_von(aufbau, analyse.baustoffe), aufbau)
-        return teil
-    if analyse.bauweise is Bauweise.HOLZ:
-        return _holz(eintrag, analyse, teil, aufbau)
+        return
+    _NACH_BAUWEISE[analyse.bauweise](eintrag, analyse, teil, aufbau)
+
+
+def _stahlbeton(eintrag: QuerschnittsanalyseEintrag, analyse: Querschnittsanalyse,
+                teil: Bauteil, aufbau: Aufbau) -> None:
+    """
+    Ein Querschnitt aus Stahlbeton nach SIA 262. Biegung und Normalkraft
+    immer -- ihre Eckwerte gehoeren dem Querschnitt. Querkraft und Torsion,
+    sobald ein Lastfall sie hat oder die Laengszugkraft zaehlt. Duktilitaet,
+    sproedes Versagen und die Zwaengungen immer, still, wenn ausgeschaltet
+    -- wie bei der Platte. Ebenso die Stahlspannungen, sobald es Lastfaelle
+    gibt (:func:`~opencivil.projekt.aufbau.kern.spannungsnachweise`), und
+    das Knicken, sobald ein Fall eingeschaltet ist.
+    """
     stoffe = stoffe_von(aufbau, analyse.baustoffe)
     lastfaelle = _lastfaelle(eintrag)
 
@@ -159,7 +171,6 @@ def bauen(art: "Bauteilart", eintrag: QuerschnittsanalyseEintrag,
     # Platte (Benutzer, 2026-10-23). Am Ende, nach seinen Nachweisen.
     aufbau.kennzahlen_eintragen(teil, KennzahlenQA(analyse))
     spannungsfaelle(eintrag, stoffe, aufbau)
-    return teil
 
 
 def _lastfaelle(eintrag: QuerschnittsanalyseEintrag) -> List[Lastfall]:
@@ -169,7 +180,7 @@ def _lastfaelle(eintrag: QuerschnittsanalyseEintrag) -> List[Lastfall]:
 
 
 def _stahl(eintrag: QuerschnittsanalyseEintrag, analyse: Querschnittsanalyse, teil: Bauteil,
-           aufbau: Aufbau) -> Bauteil:
+           aufbau: Aufbau) -> None:
     """
     Ein Querschnitt aus Stahl nach SIA 263 (:mod:`~opencivil.nachweis.qa_stahl`):
     je Lastfall Biegung und Normalkraft, Querkraft, sobald einer sie hat --
@@ -196,11 +207,10 @@ def _stahl(eintrag: QuerschnittsanalyseEintrag, analyse: Querschnittsanalyse, te
                          StahlStabilitaetQA(analyse, stabfaelle, eintrag.knickkurven))
     aufbau.kennzahlen_eintragen(teil, kennzahlen)
     spannungsfaelle(eintrag, stoffe_von(aufbau, analyse.baustoffe), aufbau)
-    return teil
 
 
 def _verbund(eintrag: QuerschnittsanalyseEintrag, analyse: Querschnittsanalyse, teil: Bauteil,
-             aufbau: Aufbau) -> Bauteil:
+             aufbau: Aufbau) -> None:
     """
     Ein Querschnitt aus Baustahl und Beton nach SIA 264
     (:mod:`~opencivil.nachweis.qa_verbund`): je Lastfall Biegung und
@@ -237,11 +247,10 @@ def _verbund(eintrag: QuerschnittsanalyseEintrag, analyse: Querschnittsanalyse, 
         aufbau.eintragen(teil, "qa_verbund_stuetze", eintrag.kennung,
                          VerbundStuetzeQA(analyse, stabfaelle, eintrag.stuetze_kriechzahl))
     aufbau.kennzahlen_eintragen(teil, kennzahlen)
-    return teil
 
 
 def _blechverbund(eintrag: QuerschnittsanalyseEintrag, analyse: Querschnittsanalyse,
-                  teil: Bauteil, aufbau: Aufbau) -> Bauteil:
+                  teil: Bauteil, aufbau: Aufbau) -> None:
     """
     Eine Blechverbunddecke nach SIA 264, 5.4
     (:mod:`~opencivil.nachweis.qa_blechverbund`): je Lastfall Biegung und
@@ -263,11 +272,10 @@ def _blechverbund(eintrag: QuerschnittsanalyseEintrag, analyse: Querschnittsanal
     if quer:
         aufbau.warnen(teil.raum, f"{ort_von(eintrag)}, {', '.join(quer)}: {EINE_RICHTUNG}")
     aufbau.kennzahlen_eintragen(teil, kennzahlen)
-    return teil
 
 
 def _holz(eintrag: QuerschnittsanalyseEintrag, analyse: Querschnittsanalyse, teil: Bauteil,
-          aufbau: Aufbau) -> Bauteil:
+          aufbau: Aufbau) -> None:
     """
     Ein Querschnitt aus einem einzigen Holz nach SIA 265: seine Werte fuer die
     Feuchteklasse der Analyse (:mod:`~opencivil.nachweis.qa_holz_werte`), je
@@ -293,7 +301,35 @@ def _holz(eintrag: QuerschnittsanalyseEintrag, analyse: Querschnittsanalyse, tei
             analyse, stabfaelle, werte, _stossartig(eintrag.stabilitaetsfaelle)))
     aufbau.kennzahlen_eintragen(teil, KennzahlenHolzQA(analyse, werte))
     spannungsfaelle(eintrag, stoffe_von(aufbau, analyse.baustoffe), aufbau)
-    return teil
+
+
+#: Je Bauweise, wer ihre Nachweise und Kennzahlen anmeldet -- eine Stelle statt einer
+#: Kette von Abfragen.
+_NACH_BAUWEISE: Dict[Bauweise, Callable[..., None]] = {
+    Bauweise.STAHLBETON: _stahlbeton, Bauweise.STAHL: _stahl, Bauweise.VERBUND: _verbund,
+    Bauweise.BLECHVERBUND: _blechverbund, Bauweise.HOLZ: _holz,
+}
+
+
+def _schubfluss(eintrag: QuerschnittsanalyseEintrag, analyse: Querschnittsanalyse,
+                teil: Bauteil, aufbau: Aufbau) -> None:
+    """
+    Der Schubfluss in den Schnitten (:mod:`~opencivil.nachweis.qa_schubfluss`),
+    sobald es einen Schnitt und einen eingeschalteten Fall gibt -- in jeder
+    Bauweise, auch ohne Nachweise: er ist keiner. Jeder Fall rechnet mit
+    seiner Wahl am Bauteil.
+    """
+    faelle = [f for f in eintrag.schubflussfaelle if f.aktiv]
+    schnitte = eintrag.elemente().schnitte
+    if not (faelle and schnitte):
+        return
+    stoffe = stoffe_von(aufbau, analyse.baustoffe)
+    prozedur = SchubflussQA(analyse, [aus_schnitt(s) for s in schnitte], [
+        Schubflussfall(name=f.name, N=si["N"], V=si["V_z"], M=si["M_y"], wahl=f.wahl(stoffe))
+        for f, si in ((f, _in_si(f, "N", "V_z", "M_y")) for f in faelle)])
+    aufbau.werk.registriere(prozedur)
+    teil.weitere_ziele.append(prozedur.id)
+    teil.schubfluss = prozedur
 
 
 def _stossartig(faelle: Iterable[Any]) -> frozenset:

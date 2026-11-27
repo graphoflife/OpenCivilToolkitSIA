@@ -396,6 +396,12 @@ const ZEICHEN = {
     strich: ['M12 5a7 7 0 1 1 0 14a7 7 0 1 1 0-14'],
     voll: [[12, 12, 2]],
   },
+  // Ein Schnitt: ein Querschnitt, strichpunktiert die Strecke quer durch ihn,
+  // aus ihrer Mitte der Pfeil zum Teil, den sie abtrennt.
+  'cad-schnitt': {
+    pfade: ['M5 4h14v16H5z', 'M2.5 13h3 M7.5 13h2 M11.5 13h1 M14.5 13h2 M18.5 13h3',
+      'M12 12V6.5 M10.3 8.2L12 6.5l1.7 1.7'],
+  },
   // Eine Linie, die nicht mitrechnet: gestrichelt, mit ihren Enden.
   'cad-hilfslinie': {
     strich: ['M5.5 18.5l13-13'],
@@ -695,6 +701,13 @@ const ZEICHEN = {
     pfade: ['M2 3.5h9v5H2z', 'M3.5 9.3h6 M6.5 9.3v10.4 M3.5 19.7h6', 'M6.5 8.5V5.8 M5.3 5.8h2.4',
       'M16.5 3.5v16.2', 'M19.5 3.5L15 8.9', 'M19 8.9L13.5 19.7'],
     strich: ['M15 8.9h4'],
+  },
+  // Der Schubfluss: ein Plattenbalken im Schnitt, gestrichelt die Schnitte
+  // am Steg, aus ihnen die Pfeile in die Flanschen, die sie abtrennen.
+  schubfluss: {
+    pfade: ['M2.5 4h19v5h-6.5v11h-5V9H2.5z', 'M8.5 6.5H4.6 M5.9 5.2L4.6 6.5l1.3 1.3',
+      'M15.5 6.5h3.9 M18.1 5.2l1.3 1.3-1.3 1.3'],
+    strich: ['M10 4v5 M14 4v5'],
   },
   // Der Längsschub der Blechverbunddecke: die Decke in der Ansicht, unten
   // voll ihr Blech -- darüber und darunter je ein Pfeil, wie Beton und Blech

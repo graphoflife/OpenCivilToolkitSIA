@@ -44,6 +44,7 @@ import {
   HOLZ_RECHNET, ausHolz, biegungsWahl, dauerSchalter, imBlechverbund, imVerbund,
 } from './qa_fallteile.js';
 import { LAENGSSCHUB } from './qa_laengsschub.js';
+import { SCHUBFLUSS } from './qa_schubfluss.js';
 import { STABILITAET, STABILITAET_HOLZ, STABILITAET_VERBUND } from './qa_stabilitaet.js';
 import { uebersicht } from './qa_uebersicht.js';
 import {
@@ -713,8 +714,8 @@ const ORT = {
  * SIA 264, 5.4 (`bauweiseVon`). Ein Querschnitt aus
  * mehreren Hölzern hat keine, statt ihrer steht grau, warum
  * (`ohneNachweiseVon`). Die Spannung-Dehnung-Analysen hat jeder ausser dem
- * Verbund und der Decke (`ohneAnalysenVon`). Was in den Kacheln eingestellt
- * ist, bleibt.
+ * Verbund und der Decke (`ohneAnalysenVon`), den Schubfluss in den Schnitten
+ * jeder (qa_schubfluss.js). Was in den Kacheln eingestellt ist, bleibt.
  */
 function kapitel(analyse) {
   const gruppe = (titel, ohne, kacheln) => (ohne ? { titel, hinweis: ohne, kapitel: [] }
@@ -725,6 +726,7 @@ function kapitel(analyse) {
         || [TRAGSICHERHEIT, ...nachweisKapitel(ORT)]),
     gruppe('Spannung-Dehnung-Analysen', ohneAnalysenVon(analyse.kennung),
       () => analysenKapitel(ORT)),
+    gruppe('Schnitte', '', () => [SCHUBFLUSS]),
   ];
 }
 

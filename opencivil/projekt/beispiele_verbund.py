@@ -57,6 +57,11 @@ def traeger_mit_duebeln(kennung: str) -> QuerschnittsanalyseEintrag:
     Verdübelung; ohne Zahl der Dübel und ohne L_e grau; L_e über 25 m
     verlangt volle Verdübelung; ohne Moment prüft er die Dübel nicht. Als
     Verbundstütze kennt ihn Tabelle 7 nicht: sein Stabilitätsfall steht grau.
+
+    Dazu der Schubfluss: ein Schnitt längs der Oberkante des Profils trennt
+    die Platte ab -- v ist, was die Dübel je Meter tragen --, ein zweiter in
+    der Platte trennt nichts ab; im Feld, an der Stütze und mit einem Moment
+    jenseits des Widerstands, das keinen hat.
     """
     a = QuerschnittsanalyseEintrag(kennung=kennung, name="Verbundträger mit Dübeln")
     a.einachsig = True
@@ -74,6 +79,11 @@ def traeger_mit_duebeln(kennung: str) -> QuerschnittsanalyseEintrag:
     a.lastfall("Weit gespannt", M_y_Ed=400.0, duebelzahl=40, L_e=30.0)
     a.lastfall("Zug", N_Ed=500.0, duebelzahl=10)
     a.stabilitaetsfall("Als Stütze", N_Ed=-1000.0, L_K_y=4.0, L_K_z=4.0, L=4.0)
+    a.schnitt([-90, 400], [90, 400], seite="links")
+    a.schnitt([-950, 450], [-950, 500], seite="links")
+    a.schubflussfall("Feld", V_z_Ed=300.0, M_y_Ed=500.0)
+    a.schubflussfall("Stütze", V_z_Ed=200.0, M_y_Ed=-300.0)
+    a.schubflussfall("Zu viel", V_z_Ed=100.0, M_y_Ed=5000.0)
     return a
 
 

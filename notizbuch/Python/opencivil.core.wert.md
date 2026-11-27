@@ -1,5 +1,5 @@
 ---
-erzeugt: c434bb51d031
+erzeugt: 72353434f903
 art: modul
 tags: [modul]
 ---
@@ -337,6 +337,7 @@ def beschreibung(self) -> str
 - [[opencivil.nachweis.qa_holz_kennzahlen]]
 - [[opencivil.nachweis.qa_holz_stabilitaet]]
 - [[opencivil.nachweis.qa_holz_werte]]
+- [[opencivil.nachweis.qa_schubfluss]]
 - [[opencivil.nachweis.qa_stahl]]
 - [[opencivil.nachweis.qa_stahl_kennzahlen]]
 - [[opencivil.nachweis.qa_stahl_stabilitaet]]

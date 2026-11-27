@@ -1,5 +1,5 @@
 ---
-erzeugt: 6c73f53711cf
+erzeugt: ba66da7e3e94
 art: modul
 tags: [modul]
 ---
@@ -722,6 +722,7 @@ der Wahl ([[opencivil.querschnitt.gesetzwahl#Rechenwahl|Rechenwahl.modul]]), ohn
 - [[opencivil.nachweis.qa_blechverbund]]
 - [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.qa_knicken]]
+- [[opencivil.nachweis.qa_schubfluss]]
 - [[opencivil.nachweis.qa_stahl_werte]]
 - [[opencivil.nachweis.qa_verbund_werte]]
 - [[opencivil.nachweis.querschnittsloeser]]
@@ -734,6 +735,7 @@ der Wahl ([[opencivil.querschnitt.gesetzwahl#Rechenwahl|Rechenwahl.modul]]), ohn
 - [[opencivil.projekt.beispiele]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.querschnittsanalyse]]
+- [[opencivil.projekt.schubfluss]]
 - [[opencivil.projekt.staebe]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.spannungsanalyse.analysen]]

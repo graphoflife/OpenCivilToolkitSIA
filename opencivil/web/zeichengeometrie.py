@@ -6,9 +6,10 @@ Was das Zeichenfenster einer Querschnittsanalyse vom Kern ueber ihre
 Zeichnung erfaehrt (Anfrage ``geometrie``): jede Meldung am Element, das sie
 betrifft, die Staebe einer Linie mit ihrer tatsaechlichen Teilung, die
 Lage in der Ueberdeckung, der Schwerpunkt, die Zellen der Schubwaende, je
-Spannglied seine Werte, je Stahlprofil sein Umriss und je
-Blechverbunddecke ihr Beton und ihr Blech. Gerechnet wird nur Geometrie --
-und die Spannkraft, aus derselben Herleitung wie im Bericht.
+Spannglied seine Werte, je Stahlprofil sein Umriss, je
+Blechverbunddecke ihr Beton und ihr Blech und je Schnitt, was er abtrennt.
+Gerechnet wird nur Geometrie -- und die Spannkraft, aus derselben
+Herleitung wie im Bericht.
 Schnell genug fuer jede Aenderung.
 
 Bis 2026-11-26 stand das in :mod:`opencivil.web.api`; mit den Spanngliedern
@@ -36,6 +37,7 @@ from opencivil.projekt.querschnittsanalyse import (
 )
 from opencivil.projekt.spannglieder import SpanngliedEintrag
 from opencivil.stahlprofile import lage as profillage
+from opencivil.querschnitt.abtrennen import aus_schnitt
 from opencivil.querschnitt.analyse import Zeichnung
 from opencivil.querschnitt.bauweise import BEWEHRT, Mischung, bauweise
 from opencivil.querschnitt.profilblech import rippenskizze
@@ -188,10 +190,12 @@ def geometrie(eintrag, projekt) -> dict:
             "ueberdeckt": linie_ueberdeckt(l),
         })
     b = z.brutto
+    schnitte, ohne_schnitt = _schnitte(elemente.schnitte, z)
     return {
         "gueltig": z.gueltig and not vorab,
         "meldungen": vorab + [{"text": m.text, "elemente": list(m.elemente),
-                               "fehler": m.fehler} for m in z.meldungen] + glieder.grenzen,
+                               "fehler": m.fehler} for m in z.meldungen] + glieder.grenzen
+                     + ohne_schnitt,
         "polygone": [
             {"element": f["name"], "kennung": f["kennung"], "tiefe": tiefe.get(f["kennung"], 0),
              "aussparung": not z.traegt[i],
@@ -226,6 +230,7 @@ def geometrie(eintrag, projekt) -> dict:
                    for ecken, flaeche in z.zellen],
         "hilfslinien": [{"element": h["name"], "kennung": h["kennung"]}
                         for h in elemente.hilfslinien],
+        "schnitte": schnitte,
         # Die Materialien, auf die die Zeichnung zeigt -- fuer die Werte je
         # Material jeder Rechenwahl der Analyse und eines Balkensystems, das
         # einen Querschnitt aus ihr nimmt. Bis 2026-10-18 zaehlte die
@@ -237,6 +242,36 @@ def geometrie(eintrag, projekt) -> dict:
         **_knickkurven(eintrag, flaechen, b),
         "laengsschub_fehlt": eintrag.laengsschub.fehlt_kurz if elemente.blechdecken else "",
     }
+
+
+def _schnitte(schnitte: Sequence[Mapping],
+              z: Zeichnung) -> Tuple[List[dict], List[dict]]:
+    """
+    Je Schnitt, was er abtrennt (:mod:`opencivil.querschnitt.abtrennen`): die
+    Stuecke mit ihren Ecken, ``b_i`` und ``A′`` in mm und mm², dazu je Seite,
+    wohin ihr Pfeil zeigt, in Worten fuer den Schalter -- und je Schnitt, der
+    nichts abtrennt, seine Meldung, grau: er rechnet nicht, der Rest schon.
+    Solange die Zeichnung nicht rechnet, sagt sie selbst warum, und kein
+    Schnitt trennt etwas ab.
+    """
+    daten: List[dict] = []
+    meldungen: List[dict] = []
+    for s in schnitte:
+        schnitt = aus_schnitt(s)
+        a = (schnitt.abtrennen(z.punkte, z.traegt, z.eltern) if z.eltern is not None
+             else None)
+        if isinstance(a, str):
+            meldungen.append({"text": schnitt.nichts_abgetrennt(a), "elemente": [s["kennung"]],
+                              "fehler": False})
+        getrennt = a is not None and not isinstance(a, str)
+        daten.append({
+            "element": s["name"], "kennung": s["kennung"],
+            "pfeile": {"links": schnitt.pfeil(True), "rechts": schnitt.pfeil(False)},
+            "stuecke": [[list(p) for p in st.punkte] for st in a.stuecke] if getrennt else [],
+            "breite": a.breite if getrennt else 0.0,
+            "flaeche": a.flaeche if getrennt else 0.0,
+        })
+    return daten, meldungen
 
 
 def _knickkurven(eintrag, flaechen: Sequence[Mapping], brutto) -> Dict[str, Any]:

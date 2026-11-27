@@ -24,6 +24,7 @@ was unter der Tabelle steht, steht jetzt hier und nur hier.
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Sequence, Tuple
 
@@ -32,7 +33,7 @@ from opencivil.core.einheiten import MM, MM2, Groesse
 from opencivil.core.latex import Mathe, Zelle, als_text
 from opencivil.core.protokoll import GleichungBlock, TabellenBlock
 from opencivil.core.rechenwerk import Loesung
-from opencivil.core.wert import Kennzahl, Wert
+from opencivil.core.wert import Kennzahl, Wert, WertDef
 from opencivil.durchstanzen import nachweis as durchstanzen
 from opencivil.erdbeben import ersatzkraft
 from opencivil.geotechnik import fundament, grundbruch, setzung
@@ -145,7 +146,7 @@ def zusammenfassen(aufbau: Optional["Aufbau"], loesung: Loesung) -> Zusammenfass
                         aufbau.urteile_von(b.kennung, loesung.stille_maengel)],
                 art=b.art.name,
             )
-            for b in aufbau.bauteile() if b.nachweise
+            for b in aufbau.bauteile() if b.nachweise or b.schubfluss is not None
         ]
     return Zusammenfassung(
         bauteile=bauteile,
@@ -345,6 +346,36 @@ def kennzahlentabelle(zeilen: Sequence[Tuple[Kennzahl, Wert]]) -> TabellenBlock:
                  Mathe(k.text(wert) + wert.einheit.als_latex())]
                 for k, wert in zeilen],
         titel="Kennzahlen", ausrichtung="llr")
+
+
+def schubfluss(aufbau: "Aufbau", kennung: str,
+               loesung: Loesung) -> Tuple[Optional[TabellenBlock], List[str]]:
+    """
+    Der Schubfluss einer Querschnittsanalyse, wie Zusammenfassung und Bericht
+    ihn zeigen (Benutzer, 2026-11-27): je Schnitt und Fall eine Zeile mit
+    b_i, v und τ -- ohne Ergebnis «–» -- und darunter die Saetze, warum ein
+    Schnitt nichts abtrennt oder ein Fall keinen Schubfluss hat
+    (:class:`~opencivil.nachweis.qa_schubfluss.SchubflussQA`). Ohne Schnitt
+    und Fall nichts, ebenso, was dieser Lauf nicht gerechnet hat.
+    """
+    sf = aufbau.bauteil(kennung).schubfluss
+    befund = loesung.befunde.get(sf.id) if sf is not None else None
+    if befund is None:
+        return None, []
+    saetze = sf.ohne + [f"Lastfall «{name}»: kein Schubfluss. {grund}"
+                        for name, grund in befund.gruende.items()]
+    if not sf.zeilen:
+        return None, saetze
+
+    def zahl(d: WertDef) -> Zelle:
+        wert = loesung.werte[d.id]
+        return "–" if math.isnan(wert.groesse.si) else Mathe(wert.formatiert())
+
+    return TabellenBlock(
+        kopf=["Schnitt", "Lastfall", Mathe(r"b_i\ [\mathrm{mm}]"),
+              Mathe(r"v\ [\mathrm{kN/m}]"), Mathe(r"\tau\ [\mathrm{N/mm^2}]")],
+        zeilen=[[z.schnitt, z.fall, zahl(z.b_i), zahl(z.v), zahl(z.tau)] for z in sf.zeilen],
+        titel="Schubfluss", ausrichtung="llrrr"), saetze
 
 
 def plattenangaben(qs: Plattenquerschnitt) -> GleichungBlock:

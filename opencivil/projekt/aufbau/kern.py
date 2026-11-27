@@ -431,6 +431,13 @@ class Bauteil:
     ohne_nachweis: str = ""
     """Warum es keinen seiner Nachweise fuehrt -- leer, wenn nichts fehlt (:meth:`Aufbau.ohne_nachweis`)."""
 
+    schubfluss: Any = None
+    """
+    Bei einer Querschnittsanalyse mit Schnitt und Fall ihr Schubfluss
+    (:class:`~opencivil.nachweis.qa_schubfluss.SchubflussQA`): seine Zeilen
+    stehen unter dem Bauteil wie die Kennzahlen. Sonst keiner.
+    """
+
     @property
     def bezuege(self) -> Tuple[str, ...]:
         """

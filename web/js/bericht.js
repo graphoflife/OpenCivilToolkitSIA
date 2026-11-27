@@ -412,6 +412,7 @@ function nachweiskarten(kennung, tabelle, loesung, verfolgen) {
   // zusammenzustellen hiesse, dieselbe Tabelle zweimal zu pflegen -- einmal
   // fürs Auge, einmal für den Kopierknopf.
   const kennzahlen = loesung.kennzahlen?.[kennung];
+  const schubfluss = loesung.schubfluesse?.[kennung];
   return [
     // Was das Bauteil ist und wie es bewehrt ist, steht über der Tabelle --
     // als gewöhnliche Gleichung und gewöhnliche Tabelle, mit denselben
@@ -443,6 +444,14 @@ function nachweiskarten(kennung, tabelle, loesung, verfolgen) {
     // Herleitung, darunter Word, TeX und MD (Benutzer, 2026-11-25).
     kennzahlen
       ? karte('Kennzahlen', [augenblock(kennzahlen, verfolgen, 'Herleitung dieses Werts zeigen')])
+      : null,
+    // Der Schubfluss je Schnitt und Fall ebenso (Benutzer, 2026-11-27);
+    // darunter, warum ein Schnitt nichts abtrennt oder ein Fall keinen hat.
+    schubfluss
+      ? karte('Schubfluss', [
+        schubfluss.zeilen ? augenblock(schubfluss, verfolgen, 'Herleitung dieses Werts zeigen') : null,
+        ...schubfluss.hinweise.map((text) => el('p.hinweis', { text })),
+      ].filter(Boolean))
       : null,
   ];
 }

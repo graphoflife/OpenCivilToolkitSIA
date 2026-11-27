@@ -1,5 +1,5 @@
 ---
-erzeugt: a7a3430ce028
+erzeugt: 2445fdcbf8b2
 art: modul
 tags: [modul]
 ---
@@ -357,6 +357,7 @@ Eine Stablinie der Beschreibung mit ihren aufgeloesten Staeben `linie`
 
 ## Gebraucht von
 
+- [[opencivil.nachweis.qa_schubfluss]]
 - [[opencivil.nachweis.schiefe_biegung]]
 - [[opencivil.nachweis.stabgrenzen]]
 - [[opencivil.querschnitt.analyse]]

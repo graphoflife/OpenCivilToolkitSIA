@@ -1,5 +1,5 @@
 ---
-erzeugt: bb8e863e5247
+erzeugt: 363e9f5246aa
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -117,6 +117,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.nachweis.qa_holz_werte]] – die Werte eines Holzquerschnitts, einmal fuer alle Nachweise.
     - [[opencivil.nachweis.qa_kennzahlen]] – was ein gezeichneter Querschnitt aufnimmt, ohne Einwirkung.
     - [[opencivil.nachweis.qa_knicken]] – Knicken am gezeichneten Querschnitt.
+    - [[opencivil.nachweis.qa_schubfluss]] – der Schubfluss in den Schnitten eines Querschnitts.
     - [[opencivil.nachweis.qa_stahl]] – die Lastfaelle eines Stahlquerschnitts nach SIA 263:2013.
     - [[opencivil.nachweis.qa_stahl_kennzahlen]] – was ein gezeichneter Stahlquerschnitt aufnimmt, ohne Einwirkung.
     - [[opencivil.nachweis.qa_stahl_stabilitaet]] – Knicken und Kippen eines Stahlstabs nach SIA 263:2013.
@@ -196,12 +197,14 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.projekt.profile]] – ein Stahlprofil, wie die Oberflaeche es beschreibt.
     - [[opencivil.projekt.projekt]] – das Projekt als Ganzes.
     - [[opencivil.projekt.querschnittsanalyse]] – ein gezeichneter Querschnitt, wie die Oberflaeche ihn beschreibt.
+    - [[opencivil.projekt.schubfluss]] – Schnitte und Lastfaelle des Schubflusses, wie beschrieben.
     - [[opencivil.projekt.setzung]] – eine Setzungsberechnung, wie die Oberflaeche sie beschreibt.
     - [[opencivil.projekt.skript]] – ein Python-Skript der App «Python», wie es
     - [[opencivil.projekt.spannglieder]] – ein Spannglied, wie die Oberflaeche es beschreibt.
     - [[opencivil.projekt.stabilitaet]] – ein Fall von Knicken und Kippen, wie die Oberflaeche ihn beschreibt.
     - [[opencivil.projekt.staebe]] – der Baukasten eines Stabwerks, eben und im Raum.
 - [[opencivil.querschnitt]] – die Querschnitte: die Platte und der gezeichnete.
+    - [[opencivil.querschnitt.abtrennen]] – was ein Schnitt vom Querschnitt abtrennt.
     - [[opencivil.querschnitt.analyse]] – der gezeichnete Querschnitt als Bauteil im Rechenwerk.
     - [[opencivil.querschnitt.bauweise]] – woraus ein gezeichneter Querschnitt besteht.
     - [[opencivil.querschnitt.bewehrungselemente]] – die gezeichnete Bewehrung, je nach Art.

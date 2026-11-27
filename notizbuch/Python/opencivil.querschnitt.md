@@ -1,5 +1,5 @@
 ---
-erzeugt: af3c30d65a10
+erzeugt: e4865e9131e8
 art: modul
 tags: [modul]
 ---
@@ -15,6 +15,7 @@ schiefer Biegung, Querkraft und Torsion auf Schubwaende.
 
 ## Module
 
+- [[opencivil.querschnitt.abtrennen]] – was ein Schnitt vom Querschnitt abtrennt.
 - [[opencivil.querschnitt.analyse]] – der gezeichnete Querschnitt als Bauteil im Rechenwerk.
 - [[opencivil.querschnitt.bauweise]] – woraus ein gezeichneter Querschnitt besteht.
 - [[opencivil.querschnitt.bewehrungselemente]] – die gezeichnete Bewehrung, je nach Art.

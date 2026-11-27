@@ -1,5 +1,5 @@
 ---
-erzeugt: 64fe8c4c8291
+erzeugt: d2506845789e
 art: modul
 tags: [modul]
 ---
@@ -153,6 +153,18 @@ Auges, wie bei den Nachweisen, und ihre Erklaerung als Tooltip
 (Benutzer, 2026-11-25). Auch ohne Lastfall, darum nicht in der
 Zusammenfassung, die es nur mit Urteilen gibt. Welche Kennzahlen ein
 Bauteil hat, sagt es selbst; die meisten haben keine.
+
+### schubflusstabellen
+
+```python
+def schubflusstabellen(aufbau: Aufbau, loesung: Loesung) -> dict
+```
+
+Je Querschnittsanalyse mit Schnitt und Fall des Schubflusses ihre
+Tabelle – dieselbe wie im Bericht
+([[opencivil.bericht.zusammenfassung#schubfluss|schubfluss]]), je Zeile mit dem
+Schubfluss als Ziel des Auges – und die Saetze darunter. Trennt kein
+Schnitt etwas ab, gibt es nur die Saetze.
 
 ### zusammenfassungen
 

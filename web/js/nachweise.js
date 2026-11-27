@@ -614,10 +614,11 @@ export function werkstoffzeilen(ziel, aendern, {
  * Wirkt φ bei keiner gewählten Art, steht das Feld blass da -- es bleibt
  * aber stehen, damit die Zahl nicht verloren geht, wenn man die Art wieder
  * wechselt. `phiImmer`: in den Analysen rechnet der ungerissene Teil immer
- * mit E_cm/(1+φ), dort wirkt φ bei jeder Art. Ohne Beton kriecht nichts:
- * dann steht statt des Feldes `null` (seit 2026-11-26, Holz und Stahl).
+ * mit E_cm/(1+φ), dort wirkt φ bei jeder Art -- ebenso im Schubfluss
+ * (qa_schubfluss.js). Ohne Beton kriecht nichts: dann steht statt des
+ * Feldes `null` (seit 2026-11-26, Holz und Stahl).
  */
-function rechenwahlFelder(ziel, aendern, { phiImmer = false, werkstoffe }) {
+export function rechenwahlFelder(ziel, aendern, { phiImmer = false, werkstoffe }) {
   const { klasse, materialien } = werkstoffe;
   const alle = katalog('rechenwahl', 'rechenarten') || [];
   const vorgabe = feldangabe(klasse, 'rechenarten').vorgabe;

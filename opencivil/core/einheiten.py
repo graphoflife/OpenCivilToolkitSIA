@@ -589,10 +589,14 @@ class Groesse:
         Formatiert den Zahlenwert (ohne Einheit) mit fester Nachkommastellenzahl.
 
         Nachlaufende Nullen werden entfernt, damit ``18.70`` als ``18.7``
-        erscheint -- so wie es im Bericht gelesen werden soll.
+        erscheint -- so wie es im Bericht gelesen werden soll. Eine Zahl, die
+        es nicht gibt (NaN), steht als «–»: ein Schubfluss ohne
+        Gleichgewichtslage (:mod:`opencivil.nachweis.qa_schubfluss`).
         """
         ziel = einheit_ or self.anzeige
         wert = self.in_einheit(ziel)
+        if math.isnan(wert):
+            return "–"
         text = f"{wert:.{max(stellen, 0)}f}"
         if "." in text:
             text = text.rstrip("0").rstrip(".")
@@ -600,8 +604,10 @@ class Groesse:
         return "0" if text in ("", "-0") else text
 
     def als_latex(self, stellen: int = 2, einheit_: Optional[Einheit] = None) -> str:
-        """Formatierter Zahlenwert samt Einheit als LaTeX-Fragment."""
+        """Formatierter Zahlenwert samt Einheit als LaTeX-Fragment -- ohne Zahl ein Strich."""
         ziel = einheit_ or self.anzeige
+        if math.isnan(self.si):
+            return r"\text{–}"
         return f"{self.formatiert(stellen, ziel)}{ziel.als_latex()}"
 
     def __str__(self) -> str:

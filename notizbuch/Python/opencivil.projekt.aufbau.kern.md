@@ -1,5 +1,5 @@
 ---
-erzeugt: 342ebd34d4d9
+erzeugt: 61daf92f8387
 art: modul
 tags: [modul]
 ---
@@ -386,6 +386,7 @@ steht hier – niemand muss es aus einer Kennung wie «q1.x» zurueckgewinnen.
 - `weitere_ziele: List[str] = field(default_factory=list)` – Was es ausser seinen Nachweisen rechnet – ein Balkensystem seine Querschnitte und sich.
 - `kennzahlen: List[Kennzahl] = field(default_factory=list)` – Was es beschreibt, gleich welche Lastfaelle es gibt, in der Folge der Zusammenfassung – jede so, wie ihr Erzeuger sie nennt.
 - `ohne_nachweis: str = ''` – Warum es keinen seiner Nachweise fuehrt – leer, wenn nichts fehlt ([[opencivil.projekt.aufbau.kern#Aufbau.ohne_nachweis|Aufbau.ohne_nachweis]]).
+- `schubfluss: Any = None` – Bei einer Querschnittsanalyse mit Schnitt und Fall ihr Schubfluss ([[opencivil.nachweis.qa_schubfluss#SchubflussQA|SchubflussQA]]): seine Zeilen stehen unter dem Bauteil wie die Kennzahlen. Sonst keiner.
 
 #### Bauteil.bezuege
 

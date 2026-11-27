@@ -1,5 +1,5 @@
 ---
-erzeugt: 1aed4cd7fe0a
+erzeugt: 91dd7393c88e
 art: modul
 tags: [modul]
 ---
@@ -491,6 +491,7 @@ Leser sieht alle Zweige und erkennt, welcher gegriffen hat.
 - [[opencivil.nachweis.qa_holz]]
 - [[opencivil.nachweis.qa_holz_stabilitaet]]
 - [[opencivil.nachweis.qa_kennzahlen]]
+- [[opencivil.nachweis.qa_schubfluss]]
 - [[opencivil.nachweis.qa_stahl]]
 - [[opencivil.nachweis.qa_stahl_kennzahlen]]
 - [[opencivil.nachweis.qa_stahl_stabilitaet]]

@@ -24,8 +24,7 @@ from opencivil.bericht.formelsammlung import formelname, in_sammlung
 from opencivil.bericht.markdown import block_markdown
 from opencivil.bericht.zusammenfassung import (
     GRAD_SPALTE, STAPEL_SPALTEN, angaben, hinweise, kennzahlen, kennzahlentabelle,
-    nachweistabelle,
-    stiller_hinweis, zusammenfassen,
+    nachweistabelle, schubfluss, stiller_hinweis, zusammenfassen,
 )
 from opencivil.core.kurzform import kurzform
 from opencivil.core.protokoll import (
@@ -706,6 +705,7 @@ def loesung_dict(loesung: Loesung, aufbau: Optional[Aufbau] = None, *,
         # eigene Anfrage (dienst.balkensystem_verlauf).
         ergebnis["zeichendaten"] = endlich(zeichendaten(aufbau, loesung))
         ergebnis["kennzahlen"] = kennzahltabellen(aufbau, loesung)
+        ergebnis["schubfluesse"] = schubflusstabellen(aufbau, loesung)
         # Je Hinweis der Namensraum seines Eintrags: die Oberflaeche grenzt
         # ihn ein wie alles andere (kern.Warnung).
         ergebnis["warnungen"] = [w._asdict() for w in aufbau.warnungen]
@@ -744,6 +744,29 @@ def kennzahltabellen(aufbau: Aufbau, loesung: Loesung) -> dict:
                         "bezeichnung": k.beschriftung, "erklaerung": k.erklaerung}
                        for (k, wert), zellen in zip(zeilen, tabelle.zeilen)],
         }
+    return ergebnis
+
+
+def schubflusstabellen(aufbau: Aufbau, loesung: Loesung) -> dict:
+    """
+    Je Querschnittsanalyse mit Schnitt und Fall des Schubflusses ihre
+    Tabelle -- dieselbe wie im Bericht
+    (:func:`~opencivil.bericht.zusammenfassung.schubfluss`), je Zeile mit dem
+    Schubfluss als Ziel des Auges -- und die Saetze darunter. Trennt kein
+    Schnitt etwas ab, gibt es nur die Saetze.
+    """
+    ergebnis: Dict[str, Any] = {}
+    for kennung, teil in aufbau.teile.items():
+        tabelle, saetze = schubfluss(aufbau, kennung, loesung)
+        if tabelle is None and not saetze:
+            continue
+        ergebnis[kennung] = {"hinweise": saetze}
+        if tabelle is not None:
+            ergebnis[kennung].update(_tabelle_dict(tabelle))
+            ergebnis[kennung]["zeilen"] = [
+                {"zellen": [zelle_dict(c) for c in zellen], "ziel": z.v.id,
+                 "bezeichnung": f"{z.schnitt}, {z.fall}", "erklaerung": ""}
+                for z, zellen in zip(teil.schubfluss.zeilen, tabelle.zeilen)]
     return ergebnis
 
 

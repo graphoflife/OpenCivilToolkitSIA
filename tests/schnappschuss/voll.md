@@ -1,6 +1,6 @@
 # Voll
 
-988 Berechnungen ausgeführt, 1604 Werte bestimmt.
+992 Berechnungen ausgeführt, 1614 Werte bestimmt.
 
 ## Herleitung
 
@@ -12844,6 +12844,26 @@ $$
 G_{a,\text{S355}} = 81000\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
+**Bemessungswert der Streckgrenze** *(SIA 263:2013, 4.1.1, (1); 4.1.3)*
+
+$$
+f_{yd,\text{S355}} = \frac{f_{y,\text{S355}}}{\gamma_{M1,\text{S355}}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2}}{1.05} = 338\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Fliessdehnung des Baustahls** *(SIA 263:2013, 3.2.2.4)*
+
+$$
+\varepsilon_{y,\text{S355}} = \frac{f_{y,\text{S355}}}{E_{a,\text{S355}}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2}}{210000\,\mathrm{N}/\mathrm{mm}^{2}} = 1.69\,\text{‰}
+$$
+
+**Grenzdehnung des Baustahls** *(SIA 263:2013, 3.2.2.4; als Grenzdehnung nach Vorgabe)*
+
+$$
+\varepsilon_{ud,\text{S355}} = 15 \cdot \varepsilon_{y,\text{S355}} = 15 \cdot 1.69\,\text{‰} = 25.4\,\text{‰}
+$$
+
+> **Hinweis:** Nach Vorgabe, nicht nachgeschlagen: die Norm nennt keine Grenzdehnung. Die Linie endet bei 15 Fliessdehnungen – so weit dehnen sich die Sorten der Tabelle 1 nach 3.2.2.4 mindestens.
+
 **Dichte des Baustahls** *(SIA 263:2013, 3.2.2.1)*
 
 $$
@@ -14694,6 +14714,92 @@ $$
   &= 2198.9\,\cdot 10^{6}\,\mathrm{mm}^{4}
 \end{aligned}
 $$
+
+### Schubfluss
+
+**Schubfluss aus der Kraft im abgetrennten Teil** *(nach Vorgabe, nicht nachgeschlagen)*
+
+$$
+v = \frac{\left|F'(M + \Delta M) - F'(M)\right|}{\Delta x}, \qquad \Delta M = V \cdot \Delta x, \qquad \tau = \frac{v}{b_i}
+$$
+
+> **Annahme:** Δx = 10 mm, ΔM mit dem Vorzeichen von M, ohne Moment positiv; ohne Gleichgewichtslage bei M + ΔM der Schritt zurück (nach Vorgabe, nicht nachgeschlagen).
+
+> **Hinweis:** Schnitt 2 trennt nichts ab: der Teil auf der Seite des Pfeils hängt noch ausserhalb der Strecke am Rest – sie muss ganz durch den Querschnitt gehen.
+
+**Schnitt 1: so lang trennt er Material von Material**
+
+$$
+b_i = 180\,\mathrm{mm}
+$$
+
+#### Lastfall «Feld»
+
+N = 0.0 kN, V\_z = 300.0 kN, M\_y = 500.0 kNm.
+
+**Das Moment ändert sich über Δx um** *(nach Vorgabe, nicht nachgeschlagen)*
+
+$$
+\Delta M = V_z \cdot \Delta x = 300\,\mathrm{kN} \cdot 10\,\mathrm{mm} = 3\,\mathrm{kNm}
+$$
+
+**Die beiden Dehnungsebenen – ε\_m im Schwerpunkt, χ positiv mit Zug unten**
+
+| Ebene | $M_y\ [\mathrm{kNm}]$ | $\varepsilon_m\ [‰]$ | $\chi\ [\mathrm{1/km}]$ |
+| :--- | ---: | ---: | ---: |
+| $M$ | $500.00$ | $-0.0803$ | $2.7757$ |
+| $M + \Delta M$ | $503.00$ | $-0.0809$ | $2.7930$ |
+
+Schnitt 1 trennt ab: Polygon 1, Linie 1 – A′ = 300000 mm².
+
+**Schubfluss – die Kraft im abgetrennten Teil bei M und daneben** *(nach Vorgabe, nicht nachgeschlagen)*
+
+$$
+v = \frac{\left|F'_1 - F'_0\right|}{\Delta x} = \frac{\left|-1182.05\,\mathrm{kN} - \left(-1174.98\,\mathrm{kN}\right)\right|}{10\,\mathrm{mm}} = 706.8\,\mathrm{kN}/\mathrm{m}
+$$
+
+**Schubspannung über b\_i** *(nach Vorgabe, nicht nachgeschlagen)*
+
+$$
+\tau = \frac{v}{b_i} = \frac{706.8\,\mathrm{kN}/\mathrm{m}}{180\,\mathrm{mm}} = 3.93\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+#### Lastfall «Stütze»
+
+N = 0.0 kN, V\_z = 200.0 kN, M\_y = −300.0 kNm.
+
+**Das Moment ändert sich über Δx um** *(nach Vorgabe, nicht nachgeschlagen)*
+
+$$
+\Delta M = V_z \cdot \Delta x = 200\,\mathrm{kN} \cdot 10\,\mathrm{mm} = 2\,\mathrm{kNm}
+$$
+
+**Die beiden Dehnungsebenen – ε\_m im Schwerpunkt, χ positiv mit Zug unten**
+
+| Ebene | $M_y\ [\mathrm{kNm}]$ | $\varepsilon_m\ [‰]$ | $\chi\ [\mathrm{1/km}]$ |
+| :--- | ---: | ---: | ---: |
+| $M$ | $-300.00$ | $1.2780$ | $-5.1249$ |
+| $M + \Delta M$ | $-302.00$ | $1.2866$ | $-5.1591$ |
+
+Schnitt 1 trennt ab: Polygon 1, Linie 1 – A′ = 300000 mm².
+
+**Schubfluss – die Kraft im abgetrennten Teil bei M und daneben** *(nach Vorgabe, nicht nachgeschlagen)*
+
+$$
+v = \frac{\left|F'_1 - F'_0\right|}{\Delta x} = \frac{\left|165.59\,\mathrm{kN} - 164.5\,\mathrm{kN}\right|}{10\,\mathrm{mm}} = 109.7\,\mathrm{kN}/\mathrm{m}
+$$
+
+**Schubspannung über b\_i** *(nach Vorgabe, nicht nachgeschlagen)*
+
+$$
+\tau = \frac{v}{b_i} = \frac{109.7\,\mathrm{kN}/\mathrm{m}}{180\,\mathrm{mm}} = 0.61\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+#### Lastfall «Zu viel»
+
+N = 0.0 kN, V\_z = 100.0 kN, M\_y = 5000.0 kNm.
+
+Zu N und M gibt es keine Gleichgewichtslage: der Querschnitt nimmt sie nicht auf → kein Schubfluss.
 
 ### Querschnittsanalyse: Verbundstütze
 
@@ -32910,6 +33016,26 @@ $$
 M_{Riss} = \left(f_{ct,eff} - \sigma_p\right) \cdot W
 $$
 
+### Baustahl
+
+**Bemessungswert der Streckgrenze** *(SIA 263:2013, 4.1.1, (1); 4.1.3)*
+
+$$
+f_{yd} = \frac{f_{y}}{\gamma_{M1}}
+$$
+
+**Fliessdehnung des Baustahls** *(SIA 263:2013, 3.2.2.4)*
+
+$$
+\varepsilon_{y} = \frac{f_{y}}{E_{a}}
+$$
+
+**Grenzdehnung des Baustahls** *(SIA 263:2013, 3.2.2.4; als Grenzdehnung nach Vorgabe)*
+
+$$
+\varepsilon_{ud} = 15 \cdot \varepsilon_{y}
+$$
+
 ### Kennzahlen
 
 Was der Stahlquerschnitt aufnimmt, ohne Bezug auf einen Lastfall: die Querschnittsklasse bei Druck und bei Biegung, die Widerstände des Querschnitts gegen Zug, Druck und Biegung und, mit Profilen, gegen Querkraft. Knicken und Kippen gehören dem Stab und sind hier nicht dabei.
@@ -34828,6 +34954,34 @@ $$
 S_{d,y} = \max\left(2.5 \cdot \gamma_f \cdot \frac{a_{gd}}{g} \cdot S \cdot \frac{T_C \cdot T_D}{T_{1,y}^2 \cdot q_y};\ 0.1 \cdot \gamma_f \cdot \frac{a_{gd}}{g}\right)
 $$
 
+### Schubfluss
+
+Wächst das Moment längs des Bauteils, wächst auch die Kraft im Teil, den ein Schnitt abtrennt. Was sie auf einer Länge Δx gewinnt, kommt durch den Schnitt: der Schubfluss v = ΔF′/Δx, mit ΔM = V·Δx. F′ ist die Kraft im abgetrennten Teil, aus zwei Dehnungsebenen des ganzen Querschnitts – gerissen, mit waagrechter Nulllinie und der Rechenwahl des Falls. Elastisch ist das V·S′/I.
+
+**Schubfluss aus der Kraft im abgetrennten Teil** *(nach Vorgabe, nicht nachgeschlagen)*
+
+$$
+v = \frac{\left|F'(M + \Delta M) - F'(M)\right|}{\Delta x}, \qquad \Delta M = V \cdot \Delta x, \qquad \tau = \frac{v}{b_i}
+$$
+
+**Das Moment ändert sich über Δx um** *(nach Vorgabe, nicht nachgeschlagen)*
+
+$$
+\Delta M = V_z \cdot \Delta x
+$$
+
+**Schubfluss – die Kraft im abgetrennten Teil bei M und daneben** *(nach Vorgabe, nicht nachgeschlagen)*
+
+$$
+v = \frac{\left|F'_1 - F'_0\right|}{\Delta x}
+$$
+
+**Schubspannung über b\_i** *(nach Vorgabe, nicht nachgeschlagen)*
+
+$$
+\tau = \frac{v}{b_i}
+$$
+
 ### Stabquerschnitte
 
 Der äquivalente E-Modul eines Stabs: der Modul, den ein reiner, ungerissener Betonquerschnitt bräuchte, um sich unter dem Moment gleich stark zu krümmen wie der bewehrte. An derselben Stelle wie die Linie M–E\_eq der Spannung-Dehnung-Analyse: ungerissen bis zum Rissmoment, darüber gerissen, gezählt ab der Krümmung ohne Moment. Er gilt für EA und EI jedes Stabs mit diesem Querschnitt und seinem Material.
@@ -35867,6 +36021,18 @@ $$
 | Momentenwiderstand, Zug oben | $M_{y,Rd}^{-}$ | $-511.4\,\mathrm{kNm}$ |
 | Querkraftwiderstand in z | $V_{z,Rd}$ | $834.3\,\mathrm{kN}$ |
 | Dübelwiderstand | $P_{Rd}$ | $81.7\,\mathrm{kN}$ |
+
+**Schubfluss**
+
+| Schnitt | Lastfall | $b_i\ [\mathrm{mm}]$ | $v\ [\mathrm{kN/m}]$ | $\tau\ [\mathrm{N/mm^2}]$ |
+| :--- | :--- | ---: | ---: | ---: |
+| Schnitt 1 | Feld | $180$ | $706.8$ | $3.93$ |
+| Schnitt 1 | Stütze | $180$ | $109.7$ | $0.61$ |
+| Schnitt 1 | Zu viel | $180$ | – | – |
+
+> **Hinweis:** Schnitt 2 trennt nichts ab: der Teil auf der Seite des Pfeils hängt noch ausserhalb der Strecke am Rest – sie muss ganz durch den Querschnitt gehen.
+
+> **Hinweis:** Lastfall «Zu viel»: kein Schubfluss. Zu N und M gibt es keine Gleichgewichtslage: der Querschnitt nimmt sie nicht auf.
 
 ### Winkelwand
 
@@ -36973,8 +37139,11 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Erdbeschleunigung | $g$ | $10$ | m/s² | Vorgabe |
 | Elastizitätsmodul des Baustahls | $E_{a,\text{S355}}$ | $210000$ | N/mm² | Vorgabe |
 | Schubmodul des Baustahls | $G_{a,\text{S355}}$ | $81000$ | N/mm² | Vorgabe |
+| Grenzdehnung des Baustahls | $\varepsilon_{ud,\text{S355}}$ | $25.4$ | ‰ | berechnet |
+| Fliessdehnung des Baustahls | $\varepsilon_{y,\text{S355}}$ | $1.69$ | ‰ | berechnet |
 | Streckgrenze | $f_{y,\text{S355}}$ | $355$ | N/mm² | Vorgabe |
 | Streckgrenze für 40 mm \< t ≤ 100 mm | $f_{y,\text{S355}}^{t>40}$ | $335$ | N/mm² | Vorgabe |
+| Bemessungswert der Streckgrenze | $f_{yd,\text{S355}}$ | $338$ | N/mm² | berechnet |
 | Widerstandsbeiwert für Festigkeits- und Stabilitätsnachweise | $\gamma_{M1,\text{S355}}$ | $1.05$ |  | Vorgabe |
 | Dichte des Baustahls | $\rho_{a,\text{S355}}$ | $7850$ | kg/m³ | Vorgabe |
 | Fliessschubspannung | $\tau_{y,\text{S355}}$ | $205$ | N/mm² | Vorgabe |
@@ -38202,6 +38371,11 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Erfüllungsgrad Verdübelung – Weit gespannt | $\alpha_{eff,\eta,\text{Weit gespannt}}$ | $1.14$ |  | berechnet |
 | Erfüllungsgrad Biegung und Normalkraft – Zug | $\alpha_{eff,\text{Zug}}$ | $6.19$ |  | berechnet |
 | Erfüllungsgrad Verbundstütze – Als Stütze | $\alpha_{eff,\text{Als Stütze}}$ | $0.00$ |  | berechnet |
+| Schubspannung im Schnitt 1, Feld | $\tau$ | $3.93$ | N/mm² | berechnet |
+| Schubfluss im Schnitt 1, Feld | $v$ | $706.8$ | kN/m | berechnet |
+| Schubspannung im Schnitt 1, Stütze | $\tau$ | $0.61$ | N/mm² | berechnet |
+| Schubfluss im Schnitt 1, Stütze | $v$ | $109.7$ | kN/m | berechnet |
+| Schnitt 1: Länge, auf der er Material von Material trennt | $b_i$ | $180$ | mm | berechnet |
 | Schwerpunkt, y | $y_S$ | $0$ | mm | berechnet |
 | Schwerpunkt, z | $z_S$ | $467.5$ | mm | berechnet |
 | Fläche des Bruttoquerschnitts | $A$ | $1437500$ | mm² | berechnet |

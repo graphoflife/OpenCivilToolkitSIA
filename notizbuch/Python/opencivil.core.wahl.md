@@ -1,5 +1,5 @@
 ---
-erzeugt: fe405f3b66d7
+erzeugt: 2ffe5171c001
 art: modul
 tags: [modul]
 ---
@@ -47,6 +47,7 @@ Eine Wahl: das Mitglied ist sein Text.
 - [[opencivil.pfahl.boden]]
 - [[opencivil.pfahl.pfahl]]
 - [[opencivil.projekt.balkensystem]]
+- [[opencivil.projekt.schubfluss]]
 - [[opencivil.projekt.staebe]]
 - [[opencivil.querschnitt.bauweise]]
 - [[opencivil.querschnitt.geometrie]]

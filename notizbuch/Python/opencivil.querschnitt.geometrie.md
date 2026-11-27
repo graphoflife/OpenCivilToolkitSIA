@@ -1,5 +1,5 @@
 ---
-erzeugt: 1aa6dbe83f5d
+erzeugt: 5151a98098df
 art: modul
 tags: [modul]
 ---
@@ -608,6 +608,7 @@ Ueberdeckung, oder wenn die Linie dabei keine Laenge behielte.
 - [[opencivil.projekt.beispiele]]
 - [[opencivil.projekt.platte]]
 - [[opencivil.projekt.querschnittsanalyse]]
+- [[opencivil.querschnitt.abtrennen]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.bewehrungselemente]]
 - [[opencivil.querschnitt.interaktion]]

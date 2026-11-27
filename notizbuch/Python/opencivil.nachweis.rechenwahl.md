@@ -1,5 +1,5 @@
 ---
-erzeugt: 622bfc5b8ad5
+erzeugt: 65c9c1ff0d30
 art: modul
 tags: [modul]
 ---
@@ -309,6 +309,7 @@ ersten Lage.
 - [[opencivil.nachweis.spannungsbegrenzung]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.querschnittsanalyse]]
+- [[opencivil.projekt.schubfluss]]
 - [[opencivil.projekt.staebe]]
 - [[opencivil.spannungsanalyse.modul]]
 - [[opencivil.spannungsanalyse.platte]]

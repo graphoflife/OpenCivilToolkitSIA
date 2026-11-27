@@ -1,5 +1,5 @@
 ---
-erzeugt: 9b85072c8112
+erzeugt: 76c2d2dfaf62
 art: modul
 tags: [modul]
 ---
@@ -13,7 +13,8 @@ Der [[opencivil.projekt.querschnittsanalyse#QuerschnittsanalyseEintrag|Querschni
 Stahlprofile ([[opencivil.projekt.profile]]), Blechverbunddecken
 ([[opencivil.projekt.blechdecken]]), Staebe und Stablinien,
 Spannglieder ([[opencivil.projekt.spannglieder]]), Schubwaende,
-Hilfslinien, die Wahl der Werkstoffgesetze, die
+Hilfslinien, die Schnitte und Faelle des Schubflusses
+([[opencivil.projekt.schubfluss]]), die Wahl der Werkstoffgesetze, die
 Lastfaelle, die Faelle von Knicken und Kippen bei Stahl und Holz
 ([[opencivil.projekt.stabilitaet]]), beim Holz seine Feuchteklasse und die
 Schalter der Nachweise – als eine speicherbare
@@ -31,7 +32,7 @@ Anfang und Ende. Wer einen Knoten verschiebt, verschiebt alles, was an ihm
 haengt. Jedes Element hat eine Kennung, die nie wiederkommt
 ([[opencivil.projekt.netz]]): K fuer Knoten, F fuer Flaechen, R fuer
 Stahlprofile, B fuer Blechverbunddecken, S fuer Staebe, P fuer Spannglieder,
-L fuer alle Linien.
+L fuer alle Linien, auch die Schnitte.
 
 
 ## KOORDINATEN UND EINHEITEN
@@ -301,6 +302,7 @@ Elemente danach heissen weiter so wie vorher.
 - `waende: List[dict]` – Je Schubwand die Felder der Beschreibung, `von` und `bis` als Punkte.
 - `spannglieder: List[dict] = field(default_factory=list)` – Je Spannglied die Felder der Beschreibung, `lage` als Punkt.
 - `hilfslinien: List[dict] = field(default_factory=list)` – Je Hilfslinie `von` und `bis` – gerechnet wird mit ihnen nichts.
+- `schnitte: List[dict] = field(default_factory=list)` – Je Schnitt `von` und `bis` als Punkte und `seite`, die des Pfeils.
 - `profile: List[dict] = field(default_factory=list)` – Je Stahlprofil die Felder der Beschreibung, `lage` als Punkt – die Mitte –, dazu `umrisse` in der Zeichnung (der erste aussen, dann die Loecher), `beschreibung`: «HEB 300, um 90° gedreht», und all das in einem: `profillage` ([[opencivil.stahlprofile.lage#Profillage|Profillage]]).
 - `blechdecken: List[dict] = field(default_factory=list)` – Je Blechverbunddecke `beton`, `blech`, `lage` als Punkt – die Ecke links unten – und `form` ([[opencivil.querschnitt.profilblech#Blechform|Blechform]]), dazu `namen`: je Materialfeld, wie Meldungen und Bericht den Teil nennen, «Blechverbunddecke 1, Beton» – die Decke hat zwei Materialien, und «Blechverbunddecke 1: noch kein Material gewählt» sagte nicht, welches.
 - `fehler: List[dict] = field(default_factory=list)` – Was sich nicht aufloesen liess: `text` und `elemente` (Kennungen), wie eine Meldung.
@@ -346,6 +348,7 @@ Was er mit der Platte gleich angibt, steht in der Grundlage
 - `spannglieder: List[SpanngliedEintrag] = field(default_factory=list)`
 - `schubwaende: List[SchubwandEintrag] = field(default_factory=list)`
 - `hilfslinien: List[HilfslinieEintrag] = field(default_factory=list)`
+- `schnitte: List[SchnittEintrag] = field(default_factory=list)` – Die Schnitte des Schubflusses – gerechnet wird mit ihnen nur er.
 - `werkstoffsaetze: Dict[str, Werkstoffsatz] = je_material(Werkstoffsatz.BEMESSUNG)` – Je Material die Werte der Tragsicherheit: Bemessungs- oder charakteristische – das legt fest, wo die Plateaus liegen (`f_cd` oder `f_ck`, `f_yd` oder `f_yk`). Duktilitaet und sproedes Versagen rechnen am selben Querschnitt.
 - `rechenarten: Dict[str, Rechenart] = je_material(Rechenart.PARABEL, FASERARTEN)` – Je Beton die Rechenart der Tragsicherheit: praezise mit der Parabel-Rechteck-Beziehung oder mit dem vereinfachten Spannungsblock 0.85·x. Bis 2026-11-25 hiess das Feld `betongesetze`, als einziges je Beton.
 - `kriechzahl: ClassVar[float] = 0.0` – Die Tragsicherheit rechnet ohne Kriechen ([[opencivil.projekt.eintraege#JeMaterial.wahl|JeMaterial.wahl]]).
@@ -373,6 +376,7 @@ Was er mit der Platte gleich angibt, steht in der Grundlage
 - `blech_last: bd.Belastung = bd.Belastung.GLEICHMAESSIG`
 - `blech_a: Optional[float] = bereich(None, heisst='Abstand a', einheit=M, ueber=0.0, bis_feld='ble…` – Mit zwei Einzellasten: ihr Abstand vom naechsten Auflager in m, hoechstens L/2.
 - `spannungsfaelle: List[QASpannungsfallEintrag] = field(default_factory=list)` – Die Spannung-Dehnung-Analysen – kein Nachweis, ein Blick in den Querschnitt.
+- `schubflussfaelle: List[SchubflussfallEintrag] = field(default_factory=list)` – Die Lastfaelle des Schubflusses – je Schnitt v und τ, kein Nachweis.
 
 #### QuerschnittsanalyseEintrag.laengsschub
 
@@ -506,6 +510,14 @@ def hilfslinie(self, von: Ort, bis: Ort) -> HilfslinieEintrag
 
 Eine Hilfslinie – nur zum Konstruieren, gerechnet wird mit ihr nicht.
 
+#### QuerschnittsanalyseEintrag.schnitt
+
+```python
+def schnitt(self, von: Ort, bis: Ort, seite: str='links') -> SchnittEintrag
+```
+
+Ein Schnitt, der Pfeil `links` oder `rechts` von ihm, in seiner Richtung gesehen.
+
 #### QuerschnittsanalyseEintrag.lage
 
 ```python
@@ -602,6 +614,14 @@ Eine Spannung-Dehnung-Analyse – Felder wie bei der Platte, die
 Richtung als Zugseite (`unten`, `oben`, `links`, `rechts`).
 Gelesen wie aus einer Datei, also mit denselben Pruefungen.
 
+#### QuerschnittsanalyseEintrag.schubflussfall
+
+```python
+def schubflussfall(self, name: str, **felder: Any) -> SchubflussfallEintrag
+```
+
+Ein Lastfall des Schubflusses – N_Ed, V_z_Ed in kN, M_y_Ed in kNm, die Rechenwahl.
+
 #### QuerschnittsanalyseEintrag.neu
 
 ```python
@@ -631,6 +651,7 @@ Feldmoment; das Rechteck gibt es als Vorlage im Zeichenfenster.
 - [[opencivil.projekt.lesen]]
 - [[opencivil.projekt.netz]]
 - [[opencivil.projekt.profile]]
+- [[opencivil.projekt.schubfluss]]
 - [[opencivil.projekt.spannglieder]]
 - [[opencivil.projekt.stabilitaet]]
 - [[opencivil.querschnitt.geometrie]]

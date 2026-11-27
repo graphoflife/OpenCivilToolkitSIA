@@ -7,6 +7,51 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-27 · Querschnittsanalyse: Schubfluss in Schnitten
+
+Schritt 9 des Plans vom 2026-11-27. Neu ist im Zeichenfenster der
+Querschnittsanalyse das Werkzeug «Schnitt» (Taste X): eine Strecke quer
+durch den Querschnitt, ein Pfeil zeigt auf den Teil, den sie abtrennt. Dazu
+die Kachel «Schubfluss» mit eigenen Lastfällen N, V_z und M_y, einachsig um
+y, je mit der Rechenwahl einer Spannung-Dehnung-Analyse. In der
+Zusammenfassung steht je Schnitt und Fall der Schubfluss v und τ = v/b_i.
+Beispiel Plattenbalken, Flansch 1600 × 200, Steg 400, 4 ⌀26, C30/37,
+V = 400 kN, M = 500 kNm: ein Schnitt am Steg trennt 600 mm Flansch ab, 3/8
+der Druckkraft, v = 210.9 kN/m, τ = 1.05 N/mm² über b_i = 200 mm. Nur die
+Einwirkung, ohne Widerstand (Benutzer).
+
+- Die Regel: v = |F′(M + ΔM) − F′(M)|/Δx mit ΔM = V·Δx und Δx = 10 mm
+  (`nachweis/qa_schubfluss.py`). F′ kommt aus zwei Dehnungsebenen des
+  ganzen Querschnitts, vom Faserlöser der Spannung-Dehnung-Analysen,
+  gerissen. Elastisch gibt das V·S′/I (Test am I-Profil und am
+  Verbundträger über der Stütze), gerissen mit festem Hebelarm β·V/z.
+  Warum nicht β·V/z selbst: das braucht einen Hebelarm und gilt nur ohne
+  Normalkraft; zwei Zustände des ganzen Querschnitts brauchen beides nicht.
+- Was ein Schnitt abtrennt (`querschnitt/abtrennen.py`): die Flächen werden
+  an der Strecke geteilt; abgetrennt ist, was auf der Seite des Pfeils
+  liegt und mit dem Rest nur über die Strecke zusammenhängt. Stäbe und
+  Spannglieder zählen mit ihrer Mitte, verschmierte Linien mit ihren
+  Stücken. Trennt ein Schnitt nichts ab – zu kurz, neben dem Querschnitt,
+  ein Kasten durch nur eine Wand –, steht er grau, die Meldung sagt warum,
+  und die anderen rechnen.
+- Der abgetrennte Teil rechnet auf den Streifen des ganzen Querschnitts,
+  geteilt an seinen eigenen Ecken (`Querschnitt(raster=…)`). Mit eigenen
+  Streifen gaben die Fuge einer Aufdopplung und ein Schnitt über dem Stahl,
+  die dieselbe Druckzone abtrennen, um 0.26 % verschiedene v; jetzt
+  dieselbe Zahl.
+- Nimmt der Querschnitt N und M nicht auf, gibt es kein v: die Tabelle
+  zeigt «–», darunter steht der Grund. Eine Grösse ohne Zahl zeigt dafür
+  überall «–» statt «nan» (`Groesse.formatiert`, `als_latex`), und der
+  Bericht lässt sie in der Liste der Werte weg.
+- Im Bericht steht der Schubfluss unter den Kennzahlen, auch bei einer
+  Analyse ohne Nachweise.
+- Der Pfeil zeigt zuerst links der Zeichenrichtung; der Schalter «Pfeil»
+  nennt die Richtung im Bild, «nach oben | nach unten», vom Kern.
+- Im Prüfprojekt «Jeder Nachweis» hat der Träger mit Dübeln zwei Schnitte:
+  einen längs der Oberkante des Profils – v ist, was die Dübel je Meter
+  tragen, 706.8 kN/m im Feld – und einen in der Platte, der nichts
+  abtrennt. Dazu drei Fälle, einer jenseits des Widerstands.
+
 ## 2026-11-27 · Erdbeben: ein Kern je Geschoss, Massen im Bild
 
 Schritt 8 des Plans vom 2026-11-27. Vorher wählte man unter «Wände» jede

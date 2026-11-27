@@ -18,6 +18,8 @@
  *                (qa_vorlagen.js, qa_blechdecke.js)
  *   Spannstahl   ein Spannglied je Klick (qa_spannglied.js)
  *   Schubwand    eine Linie mit Dicke und Bügeln
+ *   Schnitt      eine Strecke quer durch den Querschnitt, ein Pfeil zum Teil,
+ *                den sie abtrennt -- für den Schubfluss (qa_schnitt.js)
  *   Hilfspunkt   ein Knoten ohne Element, zum Fangen
  *   Hilfslinie   eine Linie, die nicht mitrechnet
  *   Vorlage      Rechteck, T-Balken, Doppel-T, Trapez, Hohlkasten, Platte
@@ -58,6 +60,9 @@ import {
 import { aktionen } from './qa_aktionen.js';
 import { BLECHDECKE } from './qa_blechdecke.js';
 import { PROFIL } from './qa_profile.js';
+import {
+  SCHNITT, SCHNITTWERKZEUG, schnittBild, schnittFelder, schnittHinweis, schnittInfo, schnitteZeichnen,
+} from './qa_schnitt.js';
 import {
   SPANNGLIED, SPANNSTAHL, gliedFelder, gliedInfo, gliedText, gliedVorgabe, vorgabePruefen,
 } from './qa_spannglied.js';
@@ -110,6 +115,7 @@ const ARTEN = [
   },
   { liste: 'schubwaende', klasse: 'schubwand', form: 'linie', vorsilbe: 'L', rang: 2 },
   { liste: 'hilfslinien', klasse: 'hilfslinie', form: 'linie', vorsilbe: 'L', rang: 3 },
+  SCHNITT,
   ...UMRISSE,
 ];
 
@@ -168,6 +174,7 @@ const WERKZEUGE = [
   SPANNSTAHL,
   { name: 'schubwand', text: 'Schubwand', zeichen: 'cad-schubwand', taste: 'w', form: 'linie',
     titel: 'Schubwand: eine Wand mit Bügeln, für Querkraft und Torsion' },
+  SCHNITTWERKZEUG,
   { name: 'hilfspunkt', text: 'Hilfspunkt', zeichen: 'cad-hilfspunkt', taste: 'k', form: 'knoten',
     titel: 'Hilfspunkt: ein Knoten ohne Element, zum Fangen' },
   { name: 'hilfslinie', text: 'Hilfslinie', zeichen: 'cad-hilfslinie', taste: 'h', form: 'linie',
@@ -176,7 +183,9 @@ const WERKZEUGE = [
 ];
 
 /** Welche Liste eine Linie des Werkzeugs füllt. */
-const LINIE_VON = { bewehrung: 'stablinien', schubwand: 'schubwaende', hilfslinie: 'hilfslinien' };
+const LINIE_VON = {
+  bewehrung: 'stablinien', schubwand: 'schubwaende', hilfslinie: 'hilfslinien', schnitt: 'schnitte',
+};
 
 // ===========================================================================
 // Das Fenster einer Analyse
@@ -289,6 +298,7 @@ function vorgabenNeu() {
     stablinien: stahl('stablinien'),
     schubwaende: stahl('schubwaende'),
     hilfslinien: mit('hilfslinien'),
+    schnitte: mit('schnitte'),
     flaechen: mit('flaechen', { material: erstes(stoffeVon('flaechen', 'material')) || '' }),
     spannglieder: gliedVorgabe(),
   };
@@ -364,7 +374,7 @@ function adapter(kennung) {
     fragen: () => api.geometrie(zustand.projekt, kennung),
     nehmen: (a, antwort) => {
       a.qa.namen = new Map([antwort.polygone, ...UMRISSE.map((art) => antwort[art.liste]), antwort.staebe,
-        antwort.spannglieder, antwort.linien, antwort.waende, antwort.hilfslinien]
+        antwort.spannglieder, antwort.linien, antwort.waende, antwort.hilfslinien, antwort.schnitte]
         .flatMap((liste) => (liste || []).map((x) => [x.kennung, x.element])));
       // Aus Holz oder Stahl statt Beton: die Analyse zeigt andere Kacheln
       // (`bauweiseVon`, `ohneNachweiseVon`, `ohneAnalysenVon`) -- und der
@@ -576,6 +586,8 @@ function zeichnen(a, g) {
     const [p, q] = [ort(h.von), ort(h.bis)];
     if (p && q) g.append(svgEl('path', { d: pfad(a.v, [p, q], false), class: 'cad-hilfslinie' }));
   }
+  schnitteZeichnen(a, g, z.schnitte, ort, new Map((geo?.schnitte || []).map((x) => [x.kennung, x])),
+    klassen, texte);
 
   const linieninfo = new Map((geo?.linien || []).map((x) => [x.kennung, x]));
   for (const l of z.stablinien) {
@@ -677,6 +689,7 @@ function punktVorschau(a, g, p, werkzeug) {
 }
 
 function linienVorschau(a, g, p, q, werkzeug) {
+  if (werkzeug === 'schnitt') g.append(schnittBild(a, p, q, a.qa.vorgaben.schnitte.seite, 'cad-geist'));
   if (werkzeug !== 'schubwand') return;
   const ecken = band(p, q, a.qa.vorgaben.schubwaende.dicke);
   if (ecken) g.append(svgEl('path', { d: pfad(a.v, ecken), class: 'cad-wand cad-geist' }));
@@ -699,6 +712,7 @@ function linienVorschau(a, g, p, q, werkzeug) {
  */
 function felderVon(liste, wert, setzen, info = null) {
   if (liste === 'spannglieder') return gliedFelder(wert, setzen, info);
+  if (liste === 'schnitte') return schnittFelder(wert, setzen, info);
   if (umrissart(liste)) return umrissart(liste).felder(wert, setzen, info);
   const durchmesser = katalog('durchmesser');
   const zahl = (feld, titel, optionen = {}) => zahlfeldMitVar({
@@ -838,6 +852,7 @@ function neuEigenschaften(a, werkzeug) {
     hilfspunkt: () => [hinweis('Ein Knoten ohne Element: daran fängt der Zeiger.')],
     hilfslinie: () => [hinweis('Rechnet nicht mit. Gewählt und geschlossen, werden '
       + 'Hilfslinien zu einer Fläche.')],
+    schnitt: () => [schnittHinweis(), ...felder('schnitte')],
   }[werkzeug]?.() || [];
   return { inhalt: inhalt.filter(Boolean), schluessel: JSON.stringify([werkzeug, v]) };
 }
@@ -867,8 +882,8 @@ function elementEigenschaften(a, z, kennungen, liste) {
   }
   const [e] = gewaehlt;
   const geo = frischeAntwort(a);
-  const info = [...(geo?.linien || []), ...(geo?.spannglieder || []), ...(art ? geo?.[liste] || [] : [])]
-    .find((x) => x.kennung === e.kennung);
+  const info = [...(geo?.linien || []), ...(geo?.spannglieder || []), ...(geo?.schnitte || []),
+    ...(art ? geo?.[liste] || [] : [])].find((x) => x.kennung === e.kennung);
   return {
     titel: `${elementname(a, e.kennung)} · ${artText(liste, e.material, e)}`,
     inhalt: [...felderVon(liste, wert, setzen, info), ...lage, ...infozeilen(a, z, liste, e)].filter(Boolean),
@@ -883,6 +898,7 @@ function artText(liste, material, e = null) {
   if (umrissart(liste)) return umrissart(liste).titel(e);
   return {
     staebe: 'Punktbewehrung', stablinien: 'Linienbewehrung', schubwaende: 'Schubwand', hilfslinien: 'Hilfslinie',
+    schnitte: 'Schnitt',
     spannglieder: e ? gliedText(e) : 'Spannglied',
     flaechen: material === VAR ? 'Flächen' : (material ? stoffname(material) : 'Aussparung'),
   }[liste];
@@ -911,6 +927,7 @@ function infozeilen(a, z, liste, e) {
     ...zeilen.map((t) => el('p.cad-info', { text: t })),
     ...(liste === 'spannglieder' ? gliedInfo(e, geo?.spannglieder?.find((x) => x.kennung === e.kennung)) : []),
     ...(umrissart(liste)?.info(geo?.[liste]?.find((x) => x.kennung === e.kennung)) || []),
+    ...(liste === 'schnitte' ? schnittInfo(geo?.schnitte?.find((x) => x.kennung === e.kennung)) : []),
     ...meldungszeilen(a, [e.kennung]),
     e.ueberdeckung > 0 && polygon && !polygon.ueberdeckung
       ? el('p.cad-meldung', { text: 'Die Überdeckung ist zu gross: vom Polygon bleibt nichts übrig.' }) : null,

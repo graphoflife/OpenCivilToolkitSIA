@@ -1,5 +1,5 @@
 ---
-erzeugt: 942621d71433
+erzeugt: 42b2455c3c19
 art: modul
 tags: [modul]
 ---
@@ -33,6 +33,7 @@ Kapitel waehlt, womit es rechnet.
 - [[opencivil.nachweis.qa_holz_werte]] – die Werte eines Holzquerschnitts, einmal fuer alle Nachweise.
 - [[opencivil.nachweis.qa_kennzahlen]] – was ein gezeichneter Querschnitt aufnimmt, ohne Einwirkung.
 - [[opencivil.nachweis.qa_knicken]] – Knicken am gezeichneten Querschnitt.
+- [[opencivil.nachweis.qa_schubfluss]] – der Schubfluss in den Schnitten eines Querschnitts.
 - [[opencivil.nachweis.qa_stahl]] – die Lastfaelle eines Stahlquerschnitts nach SIA 263:2013.
 - [[opencivil.nachweis.qa_stahl_kennzahlen]] – was ein gezeichneter Stahlquerschnitt aufnimmt, ohne Einwirkung.
 - [[opencivil.nachweis.qa_stahl_stabilitaet]] – Knicken und Kippen eines Stahlstabs nach SIA 263:2013.

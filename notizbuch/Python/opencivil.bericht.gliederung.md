@@ -1,5 +1,5 @@
 ---
-erzeugt: 683d8d100cba
+erzeugt: a9cbd6f7d25e
 art: modul
 tags: [modul]
 ---
@@ -71,7 +71,7 @@ def _nachweise(p: Protokoll, zusammenfassung: Zusammenfassung, aufbau: Optional[
 
 Je Platte dasselbe wie auf dem Bildschirm: Angaben, Bewehrung,
 Nachweistabelle, darunter Hinweise und stille Maengel, zuletzt die
-Kennzahlen – die auch ohne Lastfall.
+Kennzahlen und der Schubfluss – die auch ohne Lastfall der Nachweise.
 
 Eines kommt dazu. Auf dem Bildschirm ist ein nicht erfuellter Nachweis
 rot hinterlegt und traegt seine Begruendung im Tooltip – auf Papier
@@ -90,7 +90,9 @@ Regelmaessigkeit eines regelmaessigen Gebaeudes. Was er sagt, steht bei
 den Nachweisen in Worten («Keine Einwirkung → kein Nachweis.»), oder er
 traegt gar kein Urteil ([[opencivil.core.nachweis#Nachweis.rechne|rechne]]).
 In der Werteliste stuende nur «∞» – bis 2026-11-21 etwa «Erfuellungsgrad
-Regelmaessigkeit ∞» beim regelmaessigen Gebaeude.
+Regelmaessigkeit ∞» beim regelmaessigen Gebaeude. Ebenso eine Zahl, die
+es nicht gibt (NaN): ein Schubfluss ohne Gleichgewichtslage – warum,
+steht unter seiner Tabelle.
 
 
 ## Braucht

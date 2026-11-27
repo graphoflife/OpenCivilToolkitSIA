@@ -1,5 +1,5 @@
 ---
-erzeugt: 92472c55caa4
+erzeugt: 7ea69ba03e27
 art: modul
 tags: [modul]
 ---
@@ -528,6 +528,7 @@ auf halber Hoehe, beim gezeichneten Querschnitt im Schwerpunkt.
 
 ## Gebraucht von
 
+- [[opencivil.nachweis.qa_schubfluss]]
 - [[opencivil.spannungsanalyse]]
 - [[opencivil.spannungsanalyse.analysen]]
 - [[opencivil.spannungsanalyse.bild]]

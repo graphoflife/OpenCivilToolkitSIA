@@ -32,7 +32,7 @@ from opencivil.bericht.formelsammlung import anfuegen as formelsammlung_anfuegen
 from opencivil.bericht.formelsammlung import formelsammlung
 from opencivil.bericht.zusammenfassung import (
     Zusammenfassung, angaben, hinweise, kennzahlen, kennzahlentabelle, nachweistabelle,
-    stiller_hinweis, zusammenfassen,
+    schubfluss, stiller_hinweis, zusammenfassen,
 )
 from opencivil.core.latex import Mathe
 from opencivil.core.protokoll import Protokoll, TabellenBlock
@@ -92,7 +92,7 @@ def _nachweise(p: Protokoll, zusammenfassung: Zusammenfassung,
     """
     Je Platte dasselbe wie auf dem Bildschirm: Angaben, Bewehrung,
     Nachweistabelle, darunter Hinweise und stille Maengel, zuletzt die
-    Kennzahlen -- die auch ohne Lastfall.
+    Kennzahlen und der Schubfluss -- die auch ohne Lastfall der Nachweise.
 
     Eines kommt dazu. Auf dem Bildschirm ist ein nicht erfuellter Nachweis
     rot hinterlegt und traegt seine Begruendung im Tooltip -- auf Papier
@@ -101,17 +101,29 @@ def _nachweise(p: Protokoll, zusammenfassung: Zusammenfassung,
     """
     zahlen = {b.kennung: (kennzahlen(aufbau, b.kennung, loesung) if aufbau is not None
                           else []) for b in zusammenfassung.bauteile}
+    fluesse = {b.kennung: (schubfluss(aufbau, b.kennung, loesung) if aufbau is not None
+                           else (None, [])) for b in zusammenfassung.bauteile}
     if all(bauteil.leer for bauteil in zusammenfassung.bauteile) \
-            and not zusammenfassung.warnungen and not any(zahlen.values()):
+            and not zusammenfassung.warnungen and not any(zahlen.values()) \
+            and not any(t is not None or saetze for t, saetze in fluesse.values()):
         return
+
+    def darunter(kennung: str) -> None:
+        if zahlen[kennung]:
+            p.anfuegen(kennzahlentabelle(zahlen[kennung]))
+        tabelle, saetze = fluesse[kennung]
+        if tabelle is not None:
+            p.anfuegen(tabelle)
+        for satz in saetze:
+            p.hinweis(satz)
+
     _abschnitt(p, "Nachweise")
     for bauteil in zusammenfassung.bauteile:
         if bauteil.name:
             p.titel(bauteil.name)
         if bauteil.leer:
             p.text("Kein Nachweis geführt.")
-            if zahlen[bauteil.kennung]:
-                p.anfuegen(kennzahlentabelle(zahlen[bauteil.kennung]))
+            darunter(bauteil.kennung)
             continue
         if aufbau is not None:
             p.anfuegen(*(b for b in angaben(aufbau, bauteil.kennung, loesung) if b is not None))
@@ -125,8 +137,7 @@ def _nachweise(p: Protokoll, zusammenfassung: Zusammenfassung,
                           f"{zeile.urteil.begruendung}".rstrip())
         for zeile in bauteil.stille:
             p.hinweis(stiller_hinweis(zeile))
-        if zahlen[bauteil.kennung]:
-            p.anfuegen(kennzahlentabelle(zahlen[bauteil.kennung]))
+        darunter(bauteil.kennung)
 
     if zusammenfassung.gefuehrt:
         p.text(zusammenfassung.satz)
@@ -142,9 +153,12 @@ def _ohne_aussage(wert: Wert) -> bool:
     den Nachweisen in Worten («Keine Einwirkung → kein Nachweis.»), oder er
     traegt gar kein Urteil (:meth:`~opencivil.core.nachweis.Nachweis.rechne`).
     In der Werteliste stuende nur «∞» -- bis 2026-11-21 etwa «Erfuellungsgrad
-    Regelmaessigkeit ∞» beim regelmaessigen Gebaeude.
+    Regelmaessigkeit ∞» beim regelmaessigen Gebaeude. Ebenso eine Zahl, die
+    es nicht gibt (NaN): ein Schubfluss ohne Gleichgewichtslage -- warum,
+    steht unter seiner Tabelle.
     """
-    return wert.definition.erfuellungsgrad and math.isinf(wert.groesse.si)
+    return ((wert.definition.erfuellungsgrad and math.isinf(wert.groesse.si))
+            or math.isnan(wert.groesse.si))
 
 
 def _werte(p: Protokoll, loesung: Loesung) -> None:

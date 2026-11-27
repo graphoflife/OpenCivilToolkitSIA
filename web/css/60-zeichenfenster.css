@@ -324,6 +324,18 @@
 .cad-wand { fill: var(--mat-wand); fill-opacity: .85; stroke: var(--mat-wand-linie); stroke-opacity: .8; stroke-width: 1; }
 .cad-wandachse { fill: none; stroke: var(--mat-wand-linie); stroke-width: 1.6; stroke-dasharray: 9 3 2 3; }
 .cad-hilfslinie { fill: none; stroke: var(--schrift-matt); stroke-width: 1; stroke-dasharray: 2 3; }
+/* Ein Schnitt: strichpunktiert wie eine Schnittlinie, aus seiner Mitte der
+   Pfeil zum Teil, den er abtrennt, der Teil zart getönt. Trennt er nichts
+   ab, steht er grau; was nicht stimmt, rot. */
+.cad-schnitt { fill: none; stroke: var(--schnitt); stroke-width: 1.8; stroke-dasharray: 10 3 2 3; }
+.cad-schnittpfeil { fill: none; stroke: var(--schnitt); stroke-width: 1.6; }
+.cad-schnittspitze { fill: var(--schnitt); stroke: none; }
+.cad-abgetrennt { fill: var(--schnitt); fill-opacity: .16; stroke: none; }
+.cad-schnitttext { fill: var(--schnitt); font-weight: 600; }
+.ist-ohne .cad-schnitt, .ist-ohne .cad-schnittpfeil { stroke: var(--schrift-zart); }
+.ist-ohne .cad-schnittspitze { fill: var(--schrift-zart); }
+.ist-fehler .cad-schnitt, .ist-fehler .cad-schnittpfeil { stroke: var(--schlecht); }
+.ist-fehler .cad-schnittspitze { fill: var(--schlecht); }
 /* Die Überdeckung: das gerückte Polygon, grün gepunktet -- eine Hilfe zum
    Zeichnen wie die Hilfslinie, aber von ihr zu unterscheiden. */
 .cad-ueberdeckung {

@@ -6,7 +6,8 @@ Der :class:`QuerschnittsanalyseEintrag`: Knoten, Polygone mit Material,
 Stahlprofile (:mod:`opencivil.projekt.profile`), Blechverbunddecken
 (:mod:`opencivil.projekt.blechdecken`), Staebe und Stablinien,
 Spannglieder (:mod:`opencivil.projekt.spannglieder`), Schubwaende,
-Hilfslinien, die Wahl der Werkstoffgesetze, die
+Hilfslinien, die Schnitte und Faelle des Schubflusses
+(:mod:`opencivil.projekt.schubfluss`), die Wahl der Werkstoffgesetze, die
 Lastfaelle, die Faelle von Knicken und Kippen bei Stahl und Holz
 (:mod:`opencivil.projekt.stabilitaet`), beim Holz seine Feuchteklasse und die
 Schalter der Nachweise -- als eine speicherbare
@@ -22,7 +23,7 @@ Anfang und Ende. Wer einen Knoten verschiebt, verschiebt alles, was an ihm
 haengt. Jedes Element hat eine Kennung, die nie wiederkommt
 (:mod:`opencivil.projekt.netz`): K fuer Knoten, F fuer Flaechen, R fuer
 Stahlprofile, B fuer Blechverbunddecken, S fuer Staebe, P fuer Spannglieder,
-L fuer alle Linien.
+L fuer alle Linien, auch die Schnitte.
 
 KOORDINATEN UND EINHEITEN:
 y nach rechts, z nach oben, alles in Millimetern -- so, wie gezeichnet und
@@ -64,6 +65,7 @@ from opencivil.projekt.lesen import (
 from opencivil.projekt.blechdecken import BlechdeckeEintrag
 from opencivil.projekt.netz import Netz, neue_kennung
 from opencivil.projekt.profile import ProfilEintrag
+from opencivil.projekt.schubfluss import SchnittEintrag, SchubflussfallEintrag
 from opencivil.projekt.spannglieder import SpanngliedEintrag
 from opencivil.projekt.stabilitaet import QAStabilitaetEintrag
 from opencivil.stahlbau.stabilitaet import Knickkurve, Stabfall
@@ -377,6 +379,9 @@ class Elemente:
     hilfslinien: List[dict] = field(default_factory=list)
     """Je Hilfslinie ``von`` und ``bis`` -- gerechnet wird mit ihnen nichts."""
 
+    schnitte: List[dict] = field(default_factory=list)
+    """Je Schnitt ``von`` und ``bis`` als Punkte und ``seite``, die des Pfeils."""
+
     profile: List[dict] = field(default_factory=list)
     """
     Je Stahlprofil die Felder der Beschreibung, ``lage`` als Punkt -- die
@@ -457,6 +462,9 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben, JeMaterial):
     spannglieder: List[SpanngliedEintrag] = field(default_factory=list)
     schubwaende: List[SchubwandEintrag] = field(default_factory=list)
     hilfslinien: List[HilfslinieEintrag] = field(default_factory=list)
+    schnitte: List[SchnittEintrag] = field(default_factory=list)
+    """Die Schnitte des Schubflusses -- gerechnet wird mit ihnen nur er."""
+
     werkstoffsaetze: Dict[str, Werkstoffsatz] = je_material(Werkstoffsatz.BEMESSUNG)
     """
     Je Material die Werte der Tragsicherheit: Bemessungs- oder
@@ -576,6 +584,9 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben, JeMaterial):
     spannungsfaelle: List[QASpannungsfallEintrag] = field(default_factory=list)
     """Die Spannung-Dehnung-Analysen -- kein Nachweis, ein Blick in den Querschnitt."""
 
+    schubflussfaelle: List[SchubflussfallEintrag] = field(default_factory=list)
+    """Die Lastfaelle des Schubflusses -- je Schnitt v und τ, kein Nachweis."""
+
     def materialien(self) -> List[str]:
         """
         Jedes Material, auf das die Analyse zeigt, in der Reihenfolge des
@@ -644,6 +655,7 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben, JeMaterial):
             return [lage[v] for v in verweise]
 
         polygone, staebe, linien, waende, hilfslinien, glieder, profile = [], [], [], [], [], [], []
+        schnitte: List[dict] = []
         decken: List[dict] = []
         # Je Element sein Wort und seine Nummer, wie in Meldungen ueber seine
         # Felder (``IM_ORT``); ein Polygon ohne Material ist eine Aussparung.
@@ -717,9 +729,14 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben, JeMaterial):
             ende = orte(name, h.kennung, h.von, h.bis)
             if ende is not None:
                 hilfslinien.append(benannt(name, h.kennung, von=ende[0], bis=ende[1]))
+        for i, s in enumerate(self.schnitte, start=1):
+            name = f"{s.IM_ORT} {i}"
+            ende = orte(name, s.kennung, s.von, s.bis)
+            if ende is not None:
+                schnitte.append(benannt(name, s.kennung, von=ende[0], bis=ende[1], seite=s.seite))
         return Elemente(polygone=polygone, staebe=staebe, linien=linien, waende=waende,
                         spannglieder=glieder, hilfslinien=hilfslinien, profile=profile,
-                        blechdecken=decken, fehler=fehler)
+                        blechdecken=decken, schnitte=schnitte, fehler=fehler)
 
     # -- Zeichnen ohne Oberflaeche -------------------------------------------
 
@@ -738,7 +755,8 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben, JeMaterial):
         """Die naechste Kennung -- alle Linien zaehlen gemeinsam, ob Bewehrung, Wand oder Hilfslinie."""
         listen = {"F": [self.flaechen], "R": [self.profile], "B": [self.blechdecken],
                   "S": [self.staebe], "P": [self.spannglieder],
-                  "L": [self.stablinien, self.schubwaende, self.hilfslinien]}[vorsilbe]
+                  "L": [self.stablinien, self.schubwaende, self.hilfslinien,
+                        self.schnitte]}[vorsilbe]
         return neue_kennung(self, vorsilbe, (e.kennung for liste in listen for e in liste))
 
     def polygon(self, punkte: Sequence[Ort], material: str = "") -> FlaecheEintrag:
@@ -819,6 +837,15 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben, JeMaterial):
         self.hilfslinien.append(eintrag)
         return eintrag
 
+    def schnitt(self, von: Ort, bis: Ort, seite: str = "links") -> SchnittEintrag:
+        """Ein Schnitt, der Pfeil ``links`` oder ``rechts`` von ihm, in seiner Richtung gesehen."""
+        netz = self.netz()
+        eintrag = SchnittEintrag.aus_dict(
+            {"kennung": self._kennung("L"), "von": self._knoten(netz, von),
+             "bis": self._knoten(netz, bis), "seite": seite}, f"{ort_von(self)}, schnitte")
+        self.schnitte.append(eintrag)
+        return eintrag
+
     def lage(self, kennung: str) -> Optional[Tuple[float, float]]:
         """Wo ein Knoten liegt, in mm -- ``None``, wenn es ihn nicht gibt."""
         return self.netz().lage(kennung)
@@ -881,6 +908,8 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben, JeMaterial):
             spannungsfallnamen(self.spannungsfaelle),
             Fallnamen.aus("knickfaelle", "Knicknachweis", self.knickfaelle),
             Fallnamen.aus("stabilitaetsfaelle", "Stabilitätsnachweis", self.stabilitaetsfaelle),
+            Fallnamen.aus("schubflussfaelle", "Lastfall des Schubflusses",
+                          self.schubflussfaelle),
         ]
 
     def lastfall(self, name: str, **werte: float) -> QALastfallEintrag:
@@ -931,6 +960,13 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben, JeMaterial):
         eintrag = QASpannungsfallEintrag.aus_dict(
             {"name": name, "art": art, **felder}, f"{ort_von(self)}, spannungsfaelle")
         self.spannungsfaelle.append(eintrag)
+        return eintrag
+
+    def schubflussfall(self, name: str, **felder: Any) -> SchubflussfallEintrag:
+        """Ein Lastfall des Schubflusses -- N_Ed, V_z_Ed in kN, M_y_Ed in kNm, die Rechenwahl."""
+        eintrag = SchubflussfallEintrag.aus_dict({"name": name, **felder},
+                                                 f"{ort_von(self)}, schubflussfaelle")
+        self.schubflussfaelle.append(eintrag)
         return eintrag
 
     @classmethod

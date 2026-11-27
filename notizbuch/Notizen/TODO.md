@@ -64,6 +64,21 @@ sammeln sie sich hier, je mit dem, was vorläufig gebaut ist.
       Fuss die Kräfte verteilt. Vorschlag: so lassen; ein Geschoss ohne Kern
       ist meist vergessen, und die Meldung sagt, welches. Sonst genügte mit
       T₁ von Hand der Kern am Fuss. Vorläufig: jedes braucht einen.
+- [ ] **Schubfluss: Δx = 10 mm und das Vorzeichen von ΔM?** Gerechnet wird
+      v = |F′(M + ΔM) − F′(M)|/Δx mit ΔM = |V|·Δx, im Vorzeichen von M – das
+      Moment wächst im Betrag. Gibt es bei M + ΔM keine Gleichgewichtslage,
+      gilt M − ΔM. Angegeben ist der Betrag von v. Beispiel Plattenbalken:
+      ΔM = 400 kN · 10 mm = 4 kNm, v = 210.9 kN/m; mit Δx = 1 mm ändert
+      sich v um weniger als 0.01 %, mit 100 mm um 0.2 %. Vorschlag: so
+      lassen. Vorläufig: 10 mm, im Betrag wachsend.
+- [ ] **Schubfluss: der Pfeil zeigt zuerst links der Zeichenrichtung?** Wer
+      von links nach rechts zeichnet, bekommt den Pfeil nach oben; der
+      Schalter «Pfeil» nennt die Richtung im Bild, «nach oben | nach
+      unten». Für v spielt die Seite kaum eine Rolle: was der eine Teil
+      gewinnt, verliert der andere – nur ein Stab genau auf dem Schnitt
+      zählt nie zum abgetrennten Teil. Sie bestimmt, welcher Teil getönt
+      ist und welche Fläche A′ dasteht. Vorschlag: so lassen. Vorläufig:
+      links.
 
 ## Wünsche vom 2026-11-20
 
@@ -1402,6 +1417,17 @@ Norm dazu sagt.
 ### Querschnittsanalyse
 
 Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
+
+- [ ] **Schubfluss, nach Vorgabe eingebaut** (`opencivil/nachweis/qa_schubfluss.py`,
+      seit 2026-11-27). Die SIA 262 nennt die einwirkende Kraft in einer
+      Fuge nicht; der Eurocode nimmt β·V/z (EN 1992-1-1, 6.2.5 – liegt nicht
+      vor, nicht nachgeschlagen). Eingebaut ist v = ΔF′/Δx aus zwei
+      Dehnungsebenen des ganzen Querschnitts, gerissen, mit der Rechenwahl
+      des Falls; elastisch gibt das V·S′/I, gerissen mit festem Hebelarm
+      β·V/z. Dazu Δx = 10 mm, ΔM im Vorzeichen von M, ohne
+      Gleichgewichtslage bei M + ΔM der Schritt zurück, und τ = v/b_i als
+      Mittel über die Länge, auf der der Schnitt Material von Material
+      trennt.
 
 - [ ] **Stahlquerschnitt, nach Vorgabe eingebaut** (`opencivil/stahlbau/`,
       `opencivil/nachweis/qa_stahl_kennzahlen.py`, seit 2026-11-26). Jede

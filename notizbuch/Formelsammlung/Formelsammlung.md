@@ -1,5 +1,5 @@
 ---
-erzeugt: 9264d7a18325
+erzeugt: a50eefb342da
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -45,6 +45,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Holzquerschnitt]] · 28
 - [[Knicken und Kippen eines Holzstabs]] · 19
 - [[Verbundquerschnitt]] · 14
+- [[Schubfluss]] · 3
 - [[Verbundstütze]] · 20
 - [[Blechverbunddecke]] · 12
 
@@ -443,11 +444,13 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Schubbeulen des Blechs, ohne Quersteifen]]
 - [[Schubfestigkeit des Holzes im Lastfall]] · $\eta f_{v,d}$
 - [[Schubfläche nach Jourawski]] · $A_{V,z}$
+- [[Schubfluss im Schnitt]] · $v$
 - [[Schublänge einer Blechverbunddecke]] · $L_s$
 - [[Schubspannung aus Querkraft im Holz]] · $\tau_{z,d}$
 - [[Schubspannung aus Querkraft nach Jourawski]]
 - [[Schubspannung aus Torsion im Holz]] · $\tau_{tor,d}$
 - [[Schubspannung aus zwei Querkräften]] · $\tau_d$
+- [[Schubspannung im Schnitt]] · $\tau$
 - [[Schubwiderstand eines Kopfbolzendübels]] · $P_{Rd}$
 - [[Schubwiderstand eines Kopfbolzendübels – Betonstauchung]] · $P_{Rd,c}$
 - [[Schubwiderstand eines Kopfbolzendübels – Versagen des Dübels]] · $P_{Rd,s}$
@@ -558,11 +561,12 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Zulässige Stahlspannung]] · $\sigma_{s,adm}$
 - [[Zulässige Stahlspannung (normale Anforderung)]] · $\sigma_{s,adm}$
 - [[Zulässige Stahlspannung (Rissbreite w_nom)]] · $\sigma_{s,adm,2,x}$
+- [[Zuwachs des Moments über Δx]] · $\Delta M$
 - [[Zweiachsige Biegung einer Verbundstütze]] · $\sum \frac{M_{Ed,II}}{\mu_d\, M_{pl,Rd}}$
 
 ## Normstelle fehlt noch
 
-145 von 470 Formeln haben im Code keine Normstelle – meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle – von dort kommt sie in Bericht und Notizbuch.
+145 von 473 Formeln haben im Code keine Normstelle – meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle – von dort kommt sie in Bericht und Notizbuch.
 
 - [[Achsen eines Stabs im Raum]] · [[opencivil.stabwerk3d.herleitung|_ansaetze]]
 - [[Äquivalenter E-Modul eines Stabs]] · [[opencivil.spannungsanalyse.modul#ModulProzedur|ModulProzedur._schreiben]]

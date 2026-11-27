@@ -1,5 +1,5 @@
 ---
-erzeugt: 21d5c1a54c29
+erzeugt: 34aa62df42f9
 art: modul
 tags: [modul]
 ---
@@ -99,6 +99,7 @@ geschieht erst beim Aufbau, ueber die [[opencivil.core.einheiten#Groesse|Groesse
 - [[opencivil.projekt.profile]] – ein Stahlprofil, wie die Oberflaeche es beschreibt.
 - [[opencivil.projekt.projekt]] – das Projekt als Ganzes.
 - [[opencivil.projekt.querschnittsanalyse]] – ein gezeichneter Querschnitt, wie die Oberflaeche ihn beschreibt.
+- [[opencivil.projekt.schubfluss]] – Schnitte und Lastfaelle des Schubflusses, wie beschrieben.
 - [[opencivil.projekt.setzung]] – eine Setzungsberechnung, wie die Oberflaeche sie beschreibt.
 - [[opencivil.projekt.skript]] – ein Python-Skript der App «Python», wie es
 - [[opencivil.projekt.spannglieder]] – ein Spannglied, wie die Oberflaeche es beschreibt.

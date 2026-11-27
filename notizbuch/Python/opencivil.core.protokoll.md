@@ -1,5 +1,5 @@
 ---
-erzeugt: 38919a5b149e
+erzeugt: 083b5ccdcb78
 art: modul
 tags: [modul]
 ---
@@ -620,6 +620,7 @@ Oberflaeche und alle Berichte gehen.
 - [[opencivil.nachweis.qa_holz_werte]]
 - [[opencivil.nachweis.qa_kennzahlen]]
 - [[opencivil.nachweis.qa_knicken]]
+- [[opencivil.nachweis.qa_schubfluss]]
 - [[opencivil.nachweis.qa_stahl]]
 - [[opencivil.nachweis.qa_stahl_kennzahlen]]
 - [[opencivil.nachweis.qa_stahl_stabilitaet]]

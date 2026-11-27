@@ -1,5 +1,5 @@
 ---
-erzeugt: 11a8d9508018
+erzeugt: 661402872763
 art: modul
 tags: [modul]
 ---
@@ -247,7 +247,9 @@ def formatiert(self, stellen: int=2, einheit_: Optional[Einheit]=None) -> str
 Formatiert den Zahlenwert (ohne Einheit) mit fester Nachkommastellenzahl.
 
 Nachlaufende Nullen werden entfernt, damit `18.70` als `18.7`
-erscheint – so wie es im Bericht gelesen werden soll.
+erscheint – so wie es im Bericht gelesen werden soll. Eine Zahl, die
+es nicht gibt (NaN), steht als «–»: ein Schubfluss ohne
+Gleichgewichtslage ([[opencivil.nachweis.qa_schubfluss]]).
 
 #### Groesse.als_latex
 
@@ -255,7 +257,7 @@ erscheint – so wie es im Bericht gelesen werden soll.
 def als_latex(self, stellen: int=2, einheit_: Optional[Einheit]=None) -> str
 ```
 
-Formatierter Zahlenwert samt Einheit als LaTeX-Fragment.
+Formatierter Zahlenwert samt Einheit als LaTeX-Fragment – ohne Zahl ein Strich.
 
 #### Groesse._pruefe_dimension
 
@@ -485,6 +487,7 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - [[opencivil.nachweis.qa_holz_kennzahlen]]
 - [[opencivil.nachweis.qa_holz_werte]]
 - [[opencivil.nachweis.qa_kennzahlen]]
+- [[opencivil.nachweis.qa_schubfluss]]
 - [[opencivil.nachweis.qa_stahl]]
 - [[opencivil.nachweis.qa_stahl_kennzahlen]]
 - [[opencivil.nachweis.qa_stahl_stabilitaet]]
@@ -523,6 +526,7 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - [[opencivil.projekt.pfahl]]
 - [[opencivil.projekt.platte]]
 - [[opencivil.projekt.querschnittsanalyse]]
+- [[opencivil.projekt.schubfluss]]
 - [[opencivil.projekt.setzung]]
 - [[opencivil.projekt.spannglieder]]
 - [[opencivil.projekt.stabilitaet]]

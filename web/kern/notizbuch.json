@@ -271,6 +271,12 @@
       "bereich": "Querschnittsanalyse"
     },
     {
+      "name": "Schubfluss",
+      "pfad": "Formelsammlung/Themen/Schubfluss.md",
+      "art": "thema",
+      "bereich": "Querschnittsanalyse"
+    },
+    {
       "name": "Verbundstütze",
       "pfad": "Formelsammlung/Themen/Verbundstütze.md",
       "art": "thema",
@@ -4190,6 +4196,17 @@
       ]
     },
     {
+      "name": "Schubfluss im Schnitt",
+      "pfad": "Formelsammlung/Formeln/Schubfluss im Schnitt.md",
+      "art": "formel",
+      "zeichen": [
+        "v"
+      ],
+      "themen": [
+        "Schubfluss"
+      ]
+    },
+    {
       "name": "Schublänge einer Blechverbunddecke",
       "pfad": "Formelsammlung/Formeln/Schublänge einer Blechverbunddecke.md",
       "art": "formel",
@@ -4240,6 +4257,17 @@
       ],
       "themen": [
         "Holzquerschnitt"
+      ]
+    },
+    {
+      "name": "Schubspannung im Schnitt",
+      "pfad": "Formelsammlung/Formeln/Schubspannung im Schnitt.md",
+      "art": "formel",
+      "zeichen": [
+        "\\tau"
+      ],
+      "themen": [
+        "Schubfluss"
       ]
     },
     {
@@ -5473,6 +5501,17 @@
       ]
     },
     {
+      "name": "Zuwachs des Moments über Δx",
+      "pfad": "Formelsammlung/Formeln/Zuwachs des Moments über Δx.md",
+      "art": "formel",
+      "zeichen": [
+        "\\Delta M"
+      ],
+      "themen": [
+        "Schubfluss"
+      ]
+    },
+    {
       "name": "Zweiachsige Biegung einer Verbundstütze",
       "pfad": "Formelsammlung/Formeln/Zweiachsige Biegung einer Verbundstütze.md",
       "art": "formel",
@@ -5605,6 +5644,7 @@
         "_befund",
         "kennzahlen",
         "kennzahlentabelle",
+        "schubfluss",
         "plattenangaben",
         "bewehrungsuebersicht"
       ]
@@ -7871,6 +7911,24 @@
       ]
     },
     {
+      "name": "opencivil.nachweis.qa_schubfluss",
+      "pfad": "Python/opencivil.nachweis.qa_schubfluss.md",
+      "art": "modul",
+      "kurz": "der Schubfluss in den Schnitten eines Querschnitts.",
+      "stichworte": [
+        "Schubflussfall",
+        "Schubflusszeile",
+        "Schubflussbefund",
+        "Zustaende",
+        "zustaende",
+        "teilquerschnitt",
+        "kraft_im_teil",
+        "SchubflussQA",
+        "SchubflussQA.rechne",
+        "SchubflussQA._fall"
+      ]
+    },
+    {
       "name": "opencivil.nachweis.qa_stahl",
       "pfad": "Python/opencivil.nachweis.qa_stahl.md",
       "art": "modul",
@@ -9009,11 +9067,14 @@
       "kurz": "ein gezeichneter Querschnitt wird Rechnung.",
       "stichworte": [
         "bauen",
+        "_nachweise",
+        "_stahlbeton",
         "_lastfaelle",
         "_stahl",
         "_verbund",
         "_blechverbund",
         "_holz",
+        "_schubfluss",
         "_stossartig",
         "ohne_nachweise",
         "ohne_diagramm",
@@ -9567,6 +9628,7 @@
         "QuerschnittsanalyseEintrag.stablinie",
         "QuerschnittsanalyseEintrag.schubwand",
         "QuerschnittsanalyseEintrag.hilfslinie",
+        "QuerschnittsanalyseEintrag.schnitt",
         "QuerschnittsanalyseEintrag.lage",
         "QuerschnittsanalyseEintrag.vorlage_einsetzen",
         "QuerschnittsanalyseEintrag.teile_einsetzen",
@@ -9577,7 +9639,19 @@
         "QuerschnittsanalyseEintrag.stabfaelle",
         "QuerschnittsanalyseEintrag.stabilitaetsfall",
         "QuerschnittsanalyseEintrag.spannungsfall",
+        "QuerschnittsanalyseEintrag.schubflussfall",
         "QuerschnittsanalyseEintrag.neu"
+      ]
+    },
+    {
+      "name": "opencivil.projekt.schubfluss",
+      "pfad": "Python/opencivil.projekt.schubfluss.md",
+      "art": "modul",
+      "kurz": "Schnitte und Lastfaelle des Schubflusses, wie beschrieben.",
+      "stichworte": [
+        "Pfeilseite",
+        "SchnittEintrag",
+        "SchubflussfallEintrag"
       ]
     },
     {
@@ -9678,6 +9752,32 @@
       "art": "modul",
       "kurz": "die Querschnitte: die Platte und der gezeichnete.",
       "stichworte": []
+    },
+    {
+      "name": "opencivil.querschnitt.abtrennen",
+      "pfad": "Python/opencivil.querschnitt.abtrennen.md",
+      "art": "modul",
+      "kurz": "was ein Schnitt vom Querschnitt abtrennt.",
+      "stichworte": [
+        "Stueck",
+        "Abgetrennt",
+        "Abgetrennt.flaeche",
+        "Abgetrennt.polygone",
+        "Abgetrennt.auf_dem_schnitt",
+        "Abgetrennt.enthaelt",
+        "Abgetrennt.strecke_teilen",
+        "_im_trapez",
+        "_Trapez",
+        "_ebenen",
+        "_streifen",
+        "_lage",
+        "abtrennen",
+        "Schnitt",
+        "Schnitt.abtrennen",
+        "Schnitt.nichts_abgetrennt",
+        "Schnitt.pfeil",
+        "aus_schnitt"
+      ]
     },
     {
       "name": "opencivil.querschnitt.analyse",
@@ -11505,6 +11605,7 @@
         "kurzform_liste",
         "loesung_dict",
         "kennzahltabellen",
+        "schubflusstabellen",
         "zusammenfassungen",
         "zuordnung",
         "_werte",
@@ -11824,6 +11925,7 @@
       "kurz": "die Zeichnung einer Querschnittsanalyse, wie der Kern sie sieht.",
       "stichworte": [
         "geometrie",
+        "_schnitte",
         "_knickkurven",
         "_tiefen",
         "_profil",

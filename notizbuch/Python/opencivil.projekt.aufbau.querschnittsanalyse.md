@@ -1,5 +1,5 @@
 ---
-erzeugt: fef7862dbdf3
+erzeugt: d9b8918ff147
 art: modul
 tags: [modul]
 ---
@@ -16,8 +16,9 @@ sproedes Versagen, die Zwaengungen, die Stahlspannungen und das Knicken
 ([[opencivil.projekt.aufbau.querschnittsanalyse#bauen|bauen]]) – dazu die Kennzahlen. Ein Querschnitt aus Stahl hat seine
 eigenen ([[opencivil.projekt.aufbau.querschnittsanalyse#_stahl|_stahl]]), einer im Verbund ([[opencivil.projekt.aufbau.querschnittsanalyse#_verbund|_verbund]]), eine
 Blechverbunddecke ([[opencivil.projekt.aufbau.querschnittsanalyse#_blechverbund|_blechverbund]]) und einer aus Holz auch
-([[opencivil.projekt.aufbau.querschnittsanalyse#_holz|_holz]]). Eine leere oder fehlerhafte Zeichnung wird kein Bauteil,
-nur ein Hinweis.
+([[opencivil.projekt.aufbau.querschnittsanalyse#_holz|_holz]]). Jede Bauweise rechnet den Schubfluss in den Schnitten
+([[opencivil.projekt.aufbau.querschnittsanalyse#_schubfluss|_schubfluss]]). Eine leere oder fehlerhafte Zeichnung wird kein
+Bauteil, nur ein Hinweis.
 
 ## Inhalt
 
@@ -27,24 +28,9 @@ nur ein Hinweis.
 def bauen(art: 'Bauteilart', eintrag: QuerschnittsanalyseEintrag, aufbau: Aufbau) -> Bauteil
 ```
 
-Ein gezeichneter Querschnitt: das Bauteil und seine Nachweise.
-
-Biegung und Normalkraft immer – ihre Eckwerte gehoeren dem Querschnitt.
-Querkraft und Torsion, sobald ein Lastfall sie hat oder die
-Laengszugkraft zaehlt. Duktilitaet, sproedes Versagen und die Zwaengungen
-immer, still, wenn ausgeschaltet – wie bei der Platte. Ebenso die
-Stahlspannungen, sobald es Lastfaelle gibt
-([[opencivil.projekt.aufbau.kern#spannungsnachweise|spannungsnachweise]]), und das
-Knicken, sobald ein Fall eingeschaltet ist.
-
-Das alles beim Stahlbeton. Ein Querschnitt aus Stahl rechnet nach SIA 263
-([[opencivil.projekt.aufbau.querschnittsanalyse#_stahl|_stahl]]), einer im Verbund nach SIA 264 ([[opencivil.projekt.aufbau.querschnittsanalyse#_verbund|_verbund]]), eine
-Blechverbunddecke auch ([[opencivil.projekt.aufbau.querschnittsanalyse#_blechverbund|_blechverbund]]), einer aus Holz nach
-SIA 265 ([[opencivil.projekt.aufbau.querschnittsanalyse#_holz|_holz]]). Einer aus mehreren Hoelzern rechnet bisher nur
-seine Werte – Flaeche, Schwerpunkt, Traegheitsmomente –; seine
-Zusammenfassung sagt, dass die Nachweise fehlen ([[opencivil.projekt.aufbau.querschnittsanalyse#ohne_nachweise|ohne_nachweise]]).
-Seine Spannung-Dehnung-Analysen rechnet er trotzdem. Der Verbund und die
-Blechverbunddecke haben noch keine ([[opencivil.projekt.aufbau.querschnittsanalyse#ohne_analysen|ohne_analysen]]).
+Ein gezeichneter Querschnitt: das Bauteil, seine Nachweise und Kennzahlen
+nach seiner Bauweise ([[opencivil.projekt.aufbau.querschnittsanalyse#_nachweise|_nachweise]]) und der Schubfluss in seinen
+Schnitten ([[opencivil.projekt.aufbau.querschnittsanalyse#_schubfluss|_schubfluss]]).
 
 Ist noch nichts gezeichnet ([[opencivil.projekt.querschnittsanalyse#QuerschnittsanalyseEintrag.leer|QuerschnittsanalyseEintrag.leer]]), gibt
 es nichts zu rechnen und kein Bauteil – aber auch keinen Fehler, der das
@@ -52,6 +38,36 @@ ganze Projekt aufhielte: so beginnt jede neue Analyse (Benutzer,
 2026-10-19). Ebenso eine Zeichnung, die sich noch nicht rechnen laesst,
 etwa Bewehrung ohne Polygon darum: die Zeichnung sagt, was nicht
 stimmt, und der Rest rechnet weiter ([[opencivil.projekt.aufbau.kern#Aufbau.unfertig|Aufbau.unfertig]]).
+
+### _nachweise
+
+```python
+def _nachweise(eintrag: QuerschnittsanalyseEintrag, analyse: Querschnittsanalyse, teil: Bauteil, aufbau: Aufbau) -> None
+```
+
+Die Nachweise und Kennzahlen nach der Bauweise: beim Stahlbeton nach
+SIA 262 ([[opencivil.projekt.aufbau.querschnittsanalyse#_stahlbeton|_stahlbeton]]), aus Stahl nach SIA 263 ([[opencivil.projekt.aufbau.querschnittsanalyse#_stahl|_stahl]]),
+im Verbund nach SIA 264 ([[opencivil.projekt.aufbau.querschnittsanalyse#_verbund|_verbund]]), eine Blechverbunddecke auch
+([[opencivil.projekt.aufbau.querschnittsanalyse#_blechverbund|_blechverbund]]), aus Holz nach SIA 265 ([[opencivil.projekt.aufbau.querschnittsanalyse#_holz|_holz]]). Einer
+aus mehreren Hoelzern rechnet bisher nur seine Werte – Flaeche,
+Schwerpunkt, Traegheitsmomente –; seine Zusammenfassung sagt, dass die
+Nachweise fehlen ([[opencivil.projekt.aufbau.querschnittsanalyse#ohne_nachweise|ohne_nachweise]]). Seine
+Spannung-Dehnung-Analysen rechnet er trotzdem. Der Verbund und die
+Blechverbunddecke haben noch keine ([[opencivil.projekt.aufbau.querschnittsanalyse#ohne_analysen|ohne_analysen]]).
+
+### _stahlbeton
+
+```python
+def _stahlbeton(eintrag: QuerschnittsanalyseEintrag, analyse: Querschnittsanalyse, teil: Bauteil, aufbau: Aufbau) -> None
+```
+
+Ein Querschnitt aus Stahlbeton nach SIA 262. Biegung und Normalkraft
+immer – ihre Eckwerte gehoeren dem Querschnitt. Querkraft und Torsion,
+sobald ein Lastfall sie hat oder die Laengszugkraft zaehlt. Duktilitaet,
+sproedes Versagen und die Zwaengungen immer, still, wenn ausgeschaltet
+– wie bei der Platte. Ebenso die Stahlspannungen, sobald es Lastfaelle
+gibt ([[opencivil.projekt.aufbau.kern#spannungsnachweise|spannungsnachweise]]), und
+das Knicken, sobald ein Fall eingeschaltet ist.
 
 ### _lastfaelle
 
@@ -64,7 +80,7 @@ Die eingeschalteten Lastfaelle in SI, aus der Einheit ihrer Felder: N, M_y ... a
 ### _stahl
 
 ```python
-def _stahl(eintrag: QuerschnittsanalyseEintrag, analyse: Querschnittsanalyse, teil: Bauteil, aufbau: Aufbau) -> Bauteil
+def _stahl(eintrag: QuerschnittsanalyseEintrag, analyse: Querschnittsanalyse, teil: Bauteil, aufbau: Aufbau) -> None
 ```
 
 Ein Querschnitt aus Stahl nach SIA 263 ([[opencivil.nachweis.qa_stahl|qa_stahl]]):
@@ -78,7 +94,7 @@ stehen in der Herleitung vor den Nachweisen, die aus ihnen lesen.
 ### _verbund
 
 ```python
-def _verbund(eintrag: QuerschnittsanalyseEintrag, analyse: Querschnittsanalyse, teil: Bauteil, aufbau: Aufbau) -> Bauteil
+def _verbund(eintrag: QuerschnittsanalyseEintrag, analyse: Querschnittsanalyse, teil: Bauteil, aufbau: Aufbau) -> None
 ```
 
 Ein Querschnitt aus Baustahl und Beton nach SIA 264
@@ -96,7 +112,7 @@ Spannung-Dehnung-Analysen ([[opencivil.projekt.aufbau.querschnittsanalyse#ohne_a
 ### _blechverbund
 
 ```python
-def _blechverbund(eintrag: QuerschnittsanalyseEintrag, analyse: Querschnittsanalyse, teil: Bauteil, aufbau: Aufbau) -> Bauteil
+def _blechverbund(eintrag: QuerschnittsanalyseEintrag, analyse: Querschnittsanalyse, teil: Bauteil, aufbau: Aufbau) -> None
 ```
 
 Eine Blechverbunddecke nach SIA 264, 5.4
@@ -110,7 +126,7 @@ eine Decke ([[opencivil.projekt.querschnittsanalyse#QuerschnittsanalyseEintrag.e
 ### _holz
 
 ```python
-def _holz(eintrag: QuerschnittsanalyseEintrag, analyse: Querschnittsanalyse, teil: Bauteil, aufbau: Aufbau) -> Bauteil
+def _holz(eintrag: QuerschnittsanalyseEintrag, analyse: Querschnittsanalyse, teil: Bauteil, aufbau: Aufbau) -> None
 ```
 
 Ein Querschnitt aus einem einzigen Holz nach SIA 265: seine Werte fuer die
@@ -119,6 +135,17 @@ Lastfall Biegung und Normalkraft, Schub und Torsion, sobald einer sie hat
 ([[opencivil.nachweis.qa_holz|qa_holz]]), Knicken und Kippen, sobald ein Fall
 eingeschaltet ist ([[opencivil.nachweis.qa_holz_stabilitaet|qa_holz_stabilitaet]]). Alle
 lesen aus den Werten; «stossartig» gilt je Fall.
+
+### _schubfluss
+
+```python
+def _schubfluss(eintrag: QuerschnittsanalyseEintrag, analyse: Querschnittsanalyse, teil: Bauteil, aufbau: Aufbau) -> None
+```
+
+Der Schubfluss in den Schnitten ([[opencivil.nachweis.qa_schubfluss|qa_schubfluss]]),
+sobald es einen Schnitt und einen eingeschalteten Fall gibt – in jeder
+Bauweise, auch ohne Nachweise: er ist keiner. Jeder Fall rechnet mit
+seiner Wahl am Bauteil.
 
 ### _stossartig
 
@@ -197,6 +224,10 @@ Ein Spannglied mit seinem Spannstahl. Nennt Tabelle 7 sein Erzeugnis oder
 seine Art fuer die Sorte nicht, fehlt die Wahl noch ([[opencivil.querschnitt.spannglieder#was_fehlt|was_fehlt]]).
 
 
+## Konstanten
+
+- `_NACH_BAUWEISE = {Bauweise.STAHLBETON: _stahlbeton, Bauweise.STAHL: _stahl, Bauweise.V…` – Je Bauweise, wer ihre Nachweise und Kennzahlen anmeldet – eine Stelle statt einer Kette von Abfragen.
+
 ## Braucht
 
 - [[opencivil.material.basis]]
@@ -208,6 +239,7 @@ seine Art fuer die Sorte nicht, fehlt die Wahl noch ([[opencivil.querschnitt.spa
 - [[opencivil.nachweis.qa_holz_werte]]
 - [[opencivil.nachweis.qa_kennzahlen]]
 - [[opencivil.nachweis.qa_knicken]]
+- [[opencivil.nachweis.qa_schubfluss]]
 - [[opencivil.nachweis.qa_stahl]]
 - [[opencivil.nachweis.qa_stahl_kennzahlen]]
 - [[opencivil.nachweis.qa_stahl_stabilitaet]]
@@ -223,6 +255,7 @@ seine Art fuer die Sorte nicht, fehlt die Wahl noch ([[opencivil.querschnitt.spa
 - [[opencivil.projekt.lesen]]
 - [[opencivil.projekt.querschnittsanalyse]]
 - [[opencivil.projekt.spannglieder]]
+- [[opencivil.querschnitt.abtrennen]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.bauweise]]
 - [[opencivil.querschnitt.biegung]]

@@ -1,5 +1,5 @@
 ---
-erzeugt: e655ee9d7c51
+erzeugt: 4f36d8f6eaff
 art: modul
 tags: [modul]
 ---
@@ -210,6 +210,19 @@ def kennzahlentabelle(zeilen: Sequence[Tuple[Kennzahl, Wert]]) -> TabellenBlock
 ```
 
 Die Kennzahlen als Tabelle des Berichts: Beschriftung, Zeichen, Wert.
+
+### schubfluss
+
+```python
+def schubfluss(aufbau: 'Aufbau', kennung: str, loesung: Loesung) -> Tuple[Optional[TabellenBlock], List[str]]
+```
+
+Der Schubfluss einer Querschnittsanalyse, wie Zusammenfassung und Bericht
+ihn zeigen (Benutzer, 2026-11-27): je Schnitt und Fall eine Zeile mit
+b_i, v und τ – ohne Ergebnis «–» – und darunter die Saetze, warum ein
+Schnitt nichts abtrennt oder ein Fall keinen Schubfluss hat
+([[opencivil.nachweis.qa_schubfluss#SchubflussQA|SchubflussQA]]). Ohne Schnitt
+und Fall nichts, ebenso, was dieser Lauf nicht gerechnet hat.
 
 ### plattenangaben
 

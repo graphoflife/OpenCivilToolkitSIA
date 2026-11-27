@@ -1,5 +1,5 @@
 ---
-erzeugt: b19b1210b990
+erzeugt: ebc5ddf338d5
 art: modul
 tags: [modul]
 ---
@@ -13,9 +13,10 @@ Was das Zeichenfenster einer Querschnittsanalyse vom Kern ueber ihre
 Zeichnung erfaehrt (Anfrage `geometrie`): jede Meldung am Element, das sie
 betrifft, die Staebe einer Linie mit ihrer tatsaechlichen Teilung, die
 Lage in der Ueberdeckung, der Schwerpunkt, die Zellen der Schubwaende, je
-Spannglied seine Werte, je Stahlprofil sein Umriss und je
-Blechverbunddecke ihr Beton und ihr Blech. Gerechnet wird nur Geometrie –
-und die Spannkraft, aus derselben Herleitung wie im Bericht.
+Spannglied seine Werte, je Stahlprofil sein Umriss, je
+Blechverbunddecke ihr Beton und ihr Blech und je Schnitt, was er abtrennt.
+Gerechnet wird nur Geometrie – und die Spannkraft, aus derselben
+Herleitung wie im Bericht.
 Schnell genug fuer jede Aenderung.
 
 Bis 2026-11-26 stand das in [[opencivil.web.api]]; mit den Spanngliedern
@@ -66,6 +67,19 @@ nichts fehlt oder keine Decke gezeichnet ist
 `gueltig` heisst: die Zeichnung rechnet. Eine Spannung ueber der
 Grenze der Norm steht rot am Glied, haelt die Rechnung aber nicht an –
 gerechnet wird mit den Zahlen des Benutzers.
+
+### _schnitte
+
+```python
+def _schnitte(schnitte: Sequence[Mapping], z: Zeichnung) -> Tuple[List[dict], List[dict]]
+```
+
+Je Schnitt, was er abtrennt ([[opencivil.querschnitt.abtrennen]]): die
+Stuecke mit ihren Ecken, `b_i` und `A′` in mm und mm², dazu je Seite,
+wohin ihr Pfeil zeigt, in Worten fuer den Schalter – und je Schnitt, der
+nichts abtrennt, seine Meldung, grau: er rechnet nicht, der Rest schon.
+Solange die Zeichnung nicht rechnet, sagt sie selbst warum, und kein
+Schnitt trennt etwas ab.
 
 ### _knickkurven
 
@@ -169,6 +183,7 @@ selbst nicht rechnet, sagt es in seinem Fenster.
 - [[opencivil.projekt.lesen]]
 - [[opencivil.projekt.querschnittsanalyse]]
 - [[opencivil.projekt.spannglieder]]
+- [[opencivil.querschnitt.abtrennen]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.bauweise]]
 - [[opencivil.querschnitt.geometrie]]

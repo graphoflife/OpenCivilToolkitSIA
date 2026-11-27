@@ -1,5 +1,5 @@
 ---
-erzeugt: efbe58d2aba8
+erzeugt: 7f34bc39d22c
 art: modul
 tags: [modul]
 ---
@@ -249,6 +249,12 @@ Ein gezeichneter Querschnitt im Bruchzustand.
 `bezug` ist der Punkt, auf den sich N und die Momente beziehen – in der
 Querschnittsanalyse der Schwerpunkt des Bruttoquerschnitts.
 
+`raster` sind Teile, deren Ecken die Streifen mit begrenzen und deren
+Tiefe ihre groesste Hoehe bestimmt – ohne Angabe die eigenen. Der Teil,
+den ein Schnitt abtrennt, liest so dieselben Streifen wie der ganze
+Querschnitt, dazu die an seinen eigenen Ecken (Schubfluss,
+[[opencivil.nachweis.qa_schubfluss#teilquerschnitt|teilquerschnitt]]).
+
 #### Querschnitt.richtung
 
 ```python
@@ -464,6 +470,7 @@ d null, ohne Beton beides null.
 - [[opencivil.nachweis.gebrauchsebene]]
 - [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.qa_knicken]]
+- [[opencivil.nachweis.qa_schubfluss]]
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.nachweis.resistenzlinie]]
 - [[opencivil.nachweis.schiefe_biegung]]

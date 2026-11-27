@@ -1,5 +1,5 @@
 ---
-erzeugt: ad40b89ab524
+erzeugt: 539b7c73e687
 art: modul
 tags: [modul]
 ---
@@ -394,6 +394,7 @@ aus einer Loesung.
 
 ## Gebraucht von
 
+- [[opencivil.nachweis.qa_schubfluss]]
 - [[opencivil.spannungsanalyse]]
 - [[opencivil.spannungsanalyse.analysen]]
 - [[opencivil.spannungsanalyse.modul]]

@@ -335,11 +335,18 @@ class Querschnitt:
 
     ``bezug`` ist der Punkt, auf den sich N und die Momente beziehen -- in der
     Querschnittsanalyse der Schwerpunkt des Bruttoquerschnitts.
+
+    ``raster`` sind Teile, deren Ecken die Streifen mit begrenzen und deren
+    Tiefe ihre groesste Hoehe bestimmt -- ohne Angabe die eigenen. Der Teil,
+    den ein Schnitt abtrennt, liest so dieselben Streifen wie der ganze
+    Querschnitt, dazu die an seinen eigenen Ecken (Schubfluss,
+    :func:`~opencivil.nachweis.qa_schubfluss.teilquerschnitt`).
     """
 
     def __init__(
         self, *, werkstoffe: Sequence[Werkstoff], teile: Sequence[Teil],
         bewehrung: Sequence[Bewehrung], bezug: Punkt, streifen: int = STREIFEN,
+        raster: Sequence[Teil] = (),
     ) -> None:
         if not teile:
             raise ValueError("Ein Querschnitt ohne Fläche hat keinen Widerstand.")
@@ -348,6 +355,7 @@ class Querschnitt:
         self.bewehrung = tuple(bewehrung)
         self.bezug = bezug
         self.streifen = streifen
+        self.raster = tuple(raster)
         self._richtungen: Dict[float, Richtung] = {}
         # Was schon gesucht wurde. Duktilitaet und sproedes Versagen fragen
         # dieselben Richtungen bei N = 0 ab; ein zweites Mal kostete dieselbe
@@ -375,7 +383,7 @@ class Querschnitt:
         t_s = t[0] * sy + t[1] * sz
 
         # -- Streifen: Grenzen auf jeder Ecke, dazwischen gleichmaessig ------
-        ecken = sorted({v_von(p) for teil in self.teile for p in teil.punkte})
+        ecken = sorted({v_von(p) for teil in (*self.teile, *self.raster) for p in teil.punkte})
         tiefe = ecken[-1] - ecken[0]
         hoechstens = tiefe / self.streifen
         mitten: List[float] = []

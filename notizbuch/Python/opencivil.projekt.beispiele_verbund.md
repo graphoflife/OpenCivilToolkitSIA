@@ -1,5 +1,5 @@
 ---
-erzeugt: cf3ee7e46e45
+erzeugt: cb95587e8c86
 art: modul
 tags: [modul]
 ---
@@ -50,6 +50,11 @@ Dübeln nicht; an der Stütze verlangt das negative Moment volle
 Verdübelung; ohne Zahl der Dübel und ohne L_e grau; L_e über 25 m
 verlangt volle Verdübelung; ohne Moment prüft er die Dübel nicht. Als
 Verbundstütze kennt ihn Tabelle 7 nicht: sein Stabilitätsfall steht grau.
+
+Dazu der Schubfluss: ein Schnitt längs der Oberkante des Profils trennt
+die Platte ab – v ist, was die Dübel je Meter tragen –, ein zweiter in
+der Platte trennt nichts ab; im Feld, an der Stütze und mit einem Moment
+jenseits des Widerstands, das keinen hat.
 
 ### stuetze
 
