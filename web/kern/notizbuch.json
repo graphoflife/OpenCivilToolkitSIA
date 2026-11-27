@@ -7126,6 +7126,7 @@
       "stichworte": [
         "Materialart",
         "Materialart.titel",
+        "Materialart.grundlage_von",
         "Materialart.neu",
         "Materialart.eigen",
         "Materialart.einen",

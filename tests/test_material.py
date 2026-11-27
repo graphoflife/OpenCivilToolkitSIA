@@ -8,6 +8,7 @@ from opencivil.core.rechenwerk import Rechenwerk
 from opencivil.core.wert import Quelle
 from opencivil.material.beton import BETONSORTEN, beton, beton_frei, betonsorten_zum_anlegen
 from opencivil.material.betonstahl import STAHLSORTEN, betonstahl, stahlsorten_zum_anlegen
+from opencivil.web.api import katalog
 
 
 def werk_mit(baustoff) -> Rechenwerk:
@@ -235,6 +236,40 @@ class TestMehrereMaterialien(unittest.TestCase):
         self.assertTrue(loesung.hat(c30.id_von("f_cd")))
         self.assertTrue(loesung.hat(b500.id_von("f_yd")))
 
+
+
+class TestStahlII(unittest.TestCase):
+    """
+    Der «Stahl II» alter Bauwerke steht nicht in SIA 262:2025, sondern in
+    SIA 269/2:2011, Tabelle 8: die Sorten II a und II b der SIA 162 von 1956,
+    Duktilitätsklasse B, ohne Dehnungen (Benutzer, 2026-11-27).
+    """
+
+    def test_seine_herleitung_nennt_seine_norm(self):
+        stahl = betonstahl("Stahl II")
+        self.assertTrue(stahl.definitionen["f_yk"].referenz.startswith(
+            "SIA 269/2:2011, 3.3.1, Tabelle 8"))
+        for kurz in ("eps_uk", "eps_ud"):
+            self.assertIn("Klasse B; SIA 262:2025", stahl.definitionen[kurz].referenz)
+        self.assertEqual(betonstahl("B500B").definitionen["f_yk"].referenz,
+                         "SIA 262:2025, 3.2.2.2, Tabelle 5")
+
+    def test_klasse_b_und_f_sd_wie_in_der_tabelle(self):
+        """Tabelle 8 nennt f_sd = 300 N/mm²: 345 / 1.15."""
+        sorte = STAHLSORTEN["Stahl II"]
+        self.assertEqual((sorte.f_yk, sorte.klasse), (345.0, "B"))
+        werk = Rechenwerk()
+        stahl = betonstahl("Stahl II")
+        stahl.ins_rechenwerk(werk)
+        f_yd = werk.loese(stahl.id_von("f_yd")).groesse(stahl.id_von("f_yd"))
+        self.assertAlmostEqual(f_yd.in_einheit(N_PRO_MM2), 300.0, places=9)
+
+    def test_am_material_steht_seine_grundlage(self):
+        grundlagen = katalog()["materialarten"]["betonstahl"]["grundlagen"]
+        self.assertIn("SIA 269/2:2011, Tabelle 8", grundlagen["Stahl II"])
+        self.assertEqual(grundlagen["B500B"],
+                         "Kennwerte nach SIA 262:2025, die Dichte nach Vorgabe")
+        self.assertEqual(set(grundlagen), set(STAHLSORTEN))
 
 
 class TestNeueSorten(unittest.TestCase):

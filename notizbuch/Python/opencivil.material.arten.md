@@ -1,5 +1,5 @@
 ---
-erzeugt: 9330a9283dec
+erzeugt: 2eb06f7a0dbf
 art: modul
 tags: [modul]
 ---
@@ -35,6 +35,7 @@ class Materialart
 - `kennung: str` – Womit die Kennung beginnt: b1, s1, st1, sp1, h1, pb1.
 - `eigene: str` – Womit der Name eines eigenen Materials beginnt: BE1, S1, ST1 (Benutzer, 2026-10-16), SP1 beim Spannstahl, H1 beim Holz, PB1 beim Profilblechstahl.
 - `grundlage: str` – Worauf die Kennwerte einer Normsorte stehen – so steht es in der Oberflaeche.
+- `grundlagen: Mapping[str, str] = field(default_factory=dict)` – Je Sorte, deren Kennwerte anderswo stehen, worauf – beim Betonstahl der «Stahl II» aus SIA 269/2:2011 ([[opencivil.material.betonstahl#Konstanten|STAHL_II]]).
 - `erzeugnisse: Mapping[str, Tuple[Erzeugnis, ...]] = field(default_factory=dict)` – Je Sorte, in welchen Erzeugnissen es sie gibt – beim Spannstahl Draehte, Litzen und Staebe nach Tabelle 7; die anderen Arten haben keine Liste.
 - `erzeugnisquelle: str = ''` – Wo die Erzeugnisse stehen.
 - `saechlich: bool = False` – Ob die Art «das» heisst: «Neues Holz», «ein Holz» – die anderen sind maennlich. Bis 2026-11-26 stand «Neuer» und «einen» fest im Text.
@@ -45,6 +46,14 @@ class Materialart
 @property
 def titel(self) -> str
 ```
+
+#### Materialart.grundlage_von
+
+```python
+def grundlage_von(self, sorte: str) -> str
+```
+
+Worauf die Kennwerte der Normsorte `sorte` stehen – ihre eigene oder die der Art.
 
 #### Materialart.neu
 

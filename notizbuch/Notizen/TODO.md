@@ -87,18 +87,6 @@ Kräften je Geschoss und Wand, ohne Verbindung ins Balkensystem.
       (−60.1 statt −58.5 kNm/m, Stützen 115.0/276.4 statt 115.5/275.1 kN),
       weil die App die Last aus C-C dort ablegt, wo sie aufliegt, statt mit
       dem Faktor 8.0 über die ganze Länge. Dem Benutzer so vorlegen.
-- [ ] **«Stahl II» ist keine Sorte von SIA 262:2025.** Geprüft am
-      2026-11-14: die neun Betonsorten stimmen mit Tabelle 3, B500A, B500B,
-      B500C und B700B mit den Tabellen 5 und 9. «Stahl II» (f_yk = 345 N/mm²,
-      Dehnungen wie B500B) steht in keiner Tabelle der Norm, wird aber als
-      Normsorte «nach SIA 262:2025» angeboten. Vorschlag: aus den Normsorten
-      nehmen; wer ihn braucht, legt ihn als eigenes Material an. Oder seine
-      Quelle nennen, etwa eine ältere Norm. Entscheid des Benutzers.
-- [ ] **Tabelle 8 rundet, das Werkzeug rechnet genau.** f_cd und τ_cd kommen
-      aus den Gleichungen (2) und (3); Tabelle 8 nennt gerundete Werte, bis
-      1.6 % daneben (C16/20: 10.67 statt 10.5 N/mm²). Vorschlag: bei der
-      Formel bleiben, die Tabelle verweist selbst auf sie. Entscheid des
-      Benutzers.
 - [ ] **Vorgabe der Überdeckung.** c_nom = 30 mm liegt unter dem Grösstkorn
       D_max = 32 mm, und SIA 262:2025, 5.2.2.2 will bei stark beanspruchten
       Bauteilen mehr; Tabelle 18 verlangt schon für XC2 und XC3 35 mm.

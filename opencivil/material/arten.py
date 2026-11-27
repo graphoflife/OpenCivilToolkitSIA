@@ -58,6 +58,12 @@ class Materialart:
     grundlage: str
     """Worauf die Kennwerte einer Normsorte stehen -- so steht es in der Oberflaeche."""
 
+    grundlagen: Mapping[str, str] = field(default_factory=dict)
+    """
+    Je Sorte, deren Kennwerte anderswo stehen, worauf -- beim Betonstahl der
+    «Stahl II» aus SIA 269/2:2011 (:data:`~opencivil.material.betonstahl.STAHL_II`).
+    """
+
     erzeugnisse: Mapping[str, Tuple[Erzeugnis, ...]] = field(default_factory=dict)
     """
     Je Sorte, in welchen Erzeugnissen es sie gibt -- beim Spannstahl Draehte,
@@ -76,6 +82,10 @@ class Materialart:
     @property
     def titel(self) -> str:
         return self.art.beschriftung
+
+    def grundlage_von(self, sorte: str) -> str:
+        """Worauf die Kennwerte der Normsorte ``sorte`` stehen -- ihre eigene oder die der Art."""
+        return self.grundlagen.get(sorte, self.grundlage)
 
     @property
     def neu(self) -> str:
@@ -104,7 +114,8 @@ MATERIALARTEN: Dict[str, Materialart] = {a.art.value: a for a in (
                 grundlage="Kennwerte nach SIA 262:2025, die Dichten und k_E nach Vorgabe"),
     Materialart(Baustoffart.BETONSTAHL, STAHLSORTEN, STAHL_VORLAGEN, betonstahl,
                 tuple(stahlsorten_zum_anlegen()), kennung="s", eigene="S",
-                grundlage="Kennwerte nach SIA 262:2025, die Dichte nach Vorgabe"),
+                grundlage="Kennwerte nach SIA 262:2025, die Dichte nach Vorgabe",
+                grundlagen={s: v.grundlage for s, v in STAHLSORTEN.items() if v.grundlage}),
     Materialart(Baustoffart.BAUSTAHL, BAUSTAHLSORTEN, BAUSTAHL_VORLAGEN, baustahl,
                 tuple(baustahlsorten_zum_anlegen()), kennung="st", eigene="ST",
                 grundlage="Kennwerte nach SIA 263:2013"),

@@ -90,7 +90,9 @@ function kennwertZeile(material, vorlage) {
 
   return el('div.kennwert', {
     class: `${istUeberschrieben ? 'ist-ueberschrieben' : ''} ${schalter ? 'mit-schalter' : ''}`,
-    title: [vorlage.beschreibung, vorlage.referenz].filter(Boolean).join(' — '),
+    // Die Normstelle des gerechneten Werts: sie kann je Sorte eine andere
+    // sein -- beim Stahl II SIA 269/2:2011 statt SIA 262:2025.
+    title: [vorlage.beschreibung, wert?.referenz || vorlage.referenz].filter(Boolean).join(' — '),
   }, [
     el('span.bezeichnung', {}, [span(vorlage.symbol), ' ', el('small', { text: vorlage.beschreibung })]),
     schalter,
@@ -134,7 +136,7 @@ export function materialEditor(material) {
       el('span.sia', { text: 'SIA' }),
       el('div', { style: { flex: '1 1 220px' } }, [
         el('b', { text: `Normsorte ${material.sorte}` }),
-        ` · ${katalog('materialarten', material.art, 'grundlage')}; nicht `
+        ` · ${katalog('materialarten', material.art, 'grundlagen', material.sorte)}; nicht `
         + 'änderbar. Abweichen: links «+» → eigenes Material.',
       ]),
     ])

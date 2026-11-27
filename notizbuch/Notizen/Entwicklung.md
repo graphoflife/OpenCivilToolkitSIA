@@ -7,6 +7,34 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-27 · Stahl II aus SIA 269/2; f_cd bleibt gerechnet
+
+Zwei Fragen aus dem TODO, vom Benutzer am 2026-11-27 beantwortet.
+
+**Stahl II.** Vorher hiess er eine Sorte nach SIA 262:2025, und die
+Herleitung nannte für f_yk = 345 N/mm² deren Tabelle 5 – dort steht er
+nicht. Der Benutzer hat die Quelle genannt: SIA 269/2:2011, Tabelle 8
+(S. 38), die Betonstähle früherer Normen. Dort stehen die Sorten II a und
+II b der SIA 162 von 1956 mit f_sk = 345 N/mm², f_sd = 300 N/mm² und der
+Duktilitätsklasse B; Dehnungen nennt die Tabelle für sie keine. Nachher:
+
+- Die Herleitung nennt für f_yk «SIA 269/2:2011, 3.3.1, Tabelle 8», für
+  ε_uk und ε_ud die Klasse B nach SIA 262:2025, Tabellen 5 und 9. Die
+  Zahlen bleiben 5.0 % und 4.5 %, und f_yd = 345/1.15 = 300 N/mm² trifft
+  f_sd der Tabelle.
+- Am Material und im Fenster «Neues Material» steht die Norm, und dass
+  ihre Werte nur gelten, wenn bekannt ist, wann der Stahl hergestellt
+  wurde, die Sorte an ihren Rippen erkannt und der Stahl unbeschädigt ist
+  (3.3.1). Das Fenster nennt die Grundlage der gewählten Sorte, nicht mehr
+  eine für alle.
+- Er hat die Duktilitätsklasse B, wie die Tabelle sagt; bisher hatte er
+  keine. An den Nachweisen ändert das nichts.
+
+**Festigkeiten des Betons.** f_cd und τ_cd kommen weiter genau aus den
+Gleichungen (2) und (3) der SIA 262:2025. Ihre Tabelle 8 rundet, bis 1.6 %
+daneben: bei C16/20 nennt sie 10.5 statt 10.67 N/mm². Der Benutzer hat das
+Rechnen bestätigt.
+
 ## 2026-11-27 · Balkensystem: keine Achse, wo sie nichts ändert
 
 Der Benutzer hat es am 2026-11-27 gewählt; gesehen am 2026-11-26.

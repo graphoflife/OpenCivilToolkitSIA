@@ -233,11 +233,14 @@ def katalog() -> dict:
         # Reihenfolge das Fenster «Neues Material» die Sorten anbietet,
         # womit Kennungen und Namen eigener Materialien beginnen, worauf die
         # Kennwerte stehen -- die Kennwerte selbst und, wo es sie gibt, die
-        # Erzeugnisse je Sorte. Dazu, wie ein Satz die Art nennt: «Neues Holz».
+        # Erzeugnisse je Sorte. Dazu, wie ein Satz die Art nennt: «Neues Holz»,
+        # und je Sorte, worauf ihre Kennwerte stehen -- beim Stahl II nicht
+        # auf SIA 262:2025.
         "materialarten": {
             name: {"titel": a.titel, "neu": a.neu, "eigen": a.eigen, "keinen": a.keinen,
                    "kennung": a.kennung, "eigene": a.eigene,
                    "grundlage": a.grundlage, "anlegen": list(a.anlegen),
+                   "grundlagen": {sorte: a.grundlage_von(sorte) for sorte in a.sorten},
                    "kennwerte": [_vorlage_dict(v) for v in a.vorlagen],
                    "erzeugnisse": {sorte: [_erzeugnis_dict(e, sorte) for e in liste]
                                    for sorte, liste in a.erzeugnisse.items()},

@@ -1,5 +1,5 @@
 ---
-erzeugt: 6d83c1c92e30
+erzeugt: 3aa154b5019b
 art: modul
 tags: [modul]
 ---
@@ -44,6 +44,8 @@ Zeile der Sortentabelle.
 - `eps_uk: float` – Dehnung bei Hoechstlast in %.
 - `eps_ud: float` – Bemessungswert der Dehnung bei Hoechstlast in %.
 - `klasse: str = ''` – Duktilitaetsklasse A, B oder C (Tabelle 5) – leer, wo sie nicht bekannt ist.
+- `grundlage: str = ''` – Worauf die Werte stehen, wo nicht wie bei jeder Sorte auf SIA 262:2025 ([[opencivil.material.arten#Materialart|grundlage]]) – so steht es am Material und im Fenster «Neues Material».
+- `referenzen: Tuple[Tuple[str, str], ...] = ()` – Je Kennwert der Tabelle, dessen Normstelle eine andere ist als in [[opencivil.material.betonstahl#Konstanten|STAHL_VORLAGEN]], die eigene: `(kurzname, referenz)`.
 
 ### duktilitaetsklasse
 
@@ -84,7 +86,8 @@ Erzeugt einen frei definierten Betonstahl ohne Sortentabelle.
 ## Konstanten
 
 - `FLIESSDEHNUNG = 'Fliessdehnung'` – Die Seite im Notizbuch fuer die Dehnung, bei der der Stahl zu fliessen beginnt – mit Bemessungswert oder charakteristisch, wo immer sie steht.
-- `STAHLSORTEN = {'B500A': Stahlsorte(f_yk=500.0, f_yk_druck=500.0, eps_uk=2.5, eps_ud…` – Betonstahlsorten nach SIA 262:2025, Tabelle 5 (f_yk, eps_uk) und Tabelle 9 (eps_ud). Am 2026-11-14 gegen die gedruckten Tabellen geprueft: B500A, B500B, B500C und B700B stimmen. «Stahl II» steht in keiner Tabelle von SIA 262:2025; woher er stammt, ist offen (TODO im Notizbuch).
+- `STAHL_II = 'SIA 269/2:2011, 3.3.1, Tabelle 8'` – Woher der «Stahl II» kommt: SIA 269/2:2011, Tabelle 8, nennt fuer die Sorten II a und II b der SIA 162 von 1956 f_sk = 345 N/mm² und die Duktilitaetsklasse B, aber keine Dehnungen. Die Werte duerfen gelten, wenn bekannt ist, wann der Stahl hergestellt wurde, die Sorte an ihren Rippen erkannt ist und der Stahl unbeschaedigt ist (3.3.1). Die Dehnungen kommen darum aus der Klasse B, nach SIA 262:2025, Tabellen 5 und 9. Die Quelle hat der Benutzer genannt, nachgeschlagen am 2026-11-27; bis dahin hiess er eine Sorte nach SIA 262:2025.
+- `STAHLSORTEN = {'B500A': Stahlsorte(f_yk=500.0, f_yk_druck=500.0, eps_uk=2.5, eps_ud…` – Betonstahlsorten nach SIA 262:2025, Tabelle 5 (f_yk, eps_uk) und Tabelle 9 (eps_ud). Am 2026-11-14 gegen die gedruckten Tabellen geprueft: B500A, B500B, B500C und B700B stimmen. Dazu der «Stahl II» alter Bauwerke ([[opencivil.material.betonstahl#Konstanten|STAHL_II]]).
 - `ERSTER_STAHL = 'B500B'` – Womit ein neuer Betonstahl anfängt, wenn man in der Oberfläche einen anlegt: B500B, danach die übrigen der Reihe nach (Benutzer, 2026-10-15).
 - `STAHLDICHTE = 7850.0` – Die Dichte von Betonstahl in kg/m³ – die Vorgabe seines Kennwerts `rho_s` und die Zahl des Bewehrungsmasses.
 - `BUEGELDURCHMESSER = (8, 10, 12, 14, 16, 18, 20, 22, 26)` – Die Durchmesser, aus denen Bügel gebogen werden, in mm: Bügel dicker als ⌀26 biegt niemand. Aus ihnen wählen die Bügelsuche der Platte und die Bügel als Durchstanzbewehrung ([[opencivil.durchstanzen.systeme]]).

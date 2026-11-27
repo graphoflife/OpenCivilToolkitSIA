@@ -67,11 +67,14 @@ export function materialKopieren(material) {
 
 /** Öffnet das Fenster für ein neues Material dieser Art: 'beton', 'betonstahl', 'baustahl' … */
 export function materialAnlegen(art) {
-  const { neu, eigen, grundlage, anlegen: sorten } = artVon(art);
+  const { neu, eigen, grundlagen, anlegen: sorten } = artVon(art);
   const vergeben = new Set(zustand.projekt.materialien.map((m) => m.name || m.sorte));
   const frei = sorten.filter((s) => !vergeben.has(s));
   let norm = frei[0];
   let vorlage = sorten[0];
+  const grundlageSatz = (sorte) => `${grundlagen[sorte]}. Das Material heisst wie die Sorte `
+    + 'und lässt sich danach nicht mehr ändern – auch die Sorte nicht.';
+  const grundlageText = el('p.materialwahl-text', { text: frei.length ? grundlageSatz(norm) : '' });
 
   dialogFenster({
     titel: neu,
@@ -80,15 +83,14 @@ export function materialAnlegen(art) {
     klasse: '.materialwahl',
     inhalt: (schliessen) => [
       karte('Normsorte nach SIA', frei.length ? [
-        el('p.materialwahl-text', {
-          text: `${grundlage}. Das Material heisst wie die Sorte und lässt `
-            + 'sich danach nicht mehr ändern – auch die Sorte nicht.',
-        }),
+        // Worauf die Kennwerte stehen, gilt für die gewählte Sorte: beim
+        // Stahl II ist es eine andere Norm als bei B500B.
+        grundlageText,
         el('div.materialwahl-zeile', {}, [
           auswahl({
             werte: frei.map((s) => ({ wert: s, beschriftung: s })),
             gewaehlt: norm, titel: 'Sorte',
-            beiAenderung: (s) => { norm = s; },
+            beiAenderung: (s) => { norm = s; grundlageText.textContent = grundlageSatz(s); },
           }),
           el('button.knopf.knopf-haupt', {
             type: 'button', text: 'Normsorte anlegen',
