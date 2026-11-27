@@ -194,12 +194,15 @@ export const api = {
     ruf('analysediagramme', { projekt, kennung, schnitt }),
   /**
    * Die Teile einer Vorlage zu ihren Massen, für die Skizze --
-   * `wahl` = {art, masse, randabstand, bewehrung, schubwaende}.
+   * `wahl` = {art, masse, bewehrung, schubwaende, stoffe}; `masse` trägt
+   * auch Überdeckung, Lagen und Bügel.
    */
   vorlage: (wahl) => ruf('vorlage', { wahl }),
   /**
-   * Setzt eine Vorlage ein, ihre Flächen aus `material`, ihre Bewehrung aus
-   * `stahl`; zurück kommen die Elementlisten der Analyse und was neu ist.
+   * Setzt eine Vorlage ein, ihre Flächen aus `material` -- ein zweites
+   * Material, wo sie eines zur Wahl stellt, aus `wahl.stoffe` --, ihre
+   * Bewehrung aus `stahl`; zurück kommen die Elementlisten der Analyse und
+   * was neu ist.
    */
   vorlageEinsetzen: (projekt, kennung, wahl, ursprung, material, stahl) =>
     ruf('vorlage_einsetzen', {

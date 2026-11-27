@@ -964,6 +964,14 @@ Diese Punkte sind **nicht** entschieden. Eingebaut ist je eine Annahme; wo die
 Prüfung vom 2026-11-14 den Bereich schon erreicht hat, steht dabei, was die
 Norm dazu sagt.
 
+- [ ] **Vorlage Trapez: Dicke der Schubwand nach Vorgabe**
+      (`opencivil/querschnitt/vorlagen.py`, `_trapez`, seit 2026-11-27).
+      Die Vorlage gibt der Wand die engste Breite zwischen den beiden
+      Stablagen: bei b oben 400 und b unten 300 mm die Breite auf der Höhe
+      der unteren Stäbe, etwa 309 mm. Die kleinere Breite gibt den kleineren
+      Widerstand der Druckstrebe (Gl. (47)); nicht nachgeschlagen, ob
+      SIA 262:2025 für einen Steg mit veränderlicher Breite etwas sagt. Die
+      Dicke lässt sich nach dem Einsetzen an der Wand ändern.
 - [ ] **Spannstahl gedrückt** (`opencivil/querschnitt/werkstoffgesetz.py`,
       `Spannstahlgesetz`, seit 2026-11-26). Figur 17 der SIA 262:2025
       idealisiert nur den Zug (4.2.3.3); nach Vorgabe, nicht nachgeschlagen,

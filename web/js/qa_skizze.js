@@ -1,8 +1,8 @@
 /**
  * qa_skizze.js -- ein kleines Bild aus Teilen des Kerns, mit Masslinien.
  *
- * Die Teile einer Vorlage -- Polygone, Stäbe, Stablinien, Schubwände, die
- * Linie eines Profilblechs und Masslinien -- baut der Kern
+ * Die Teile einer Vorlage -- Polygone, Stäbe, Stablinien samt ihren Stäben,
+ * Schubwände, die Linie eines Profilblechs und Masslinien -- baut der Kern
  * (`opencivil/querschnitt/vorlagen.py`, `Teile`); hier werden sie nur
  * gezeichnet: im Fenster der Vorlagen (qa_vorlagen.js) und als Rippe einer
  * gewählten Blechverbunddecke (qa_blechdecke.js). Bis 2026-11-27 stand das in
@@ -88,7 +88,7 @@ export function skizze(teile, breite, hoehe, { masse = true, flaeche = 'cad-beto
     }));
   }
   for (const l of teile.stablinien) g.append(svgEl('path', { d: pfad(v, [l.von, l.bis], false), class: 'cad-linie' }));
-  for (const st of teile.staebe) {
+  for (const st of [...teile.staebe, ...(teile.stabmitten || [])]) {
     const [x, y] = nach(st.lage);
     g.append(svgEl('circle', { cx: x, cy: y, r: Math.max(1.5, (st.durchmesser * s) / 2), class: 'cad-stab' }));
   }

@@ -7,6 +7,60 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-27 · Vorlagen: Trapez, Doppel-T, Platte mit Aufbeton, Bewehrung je Lage
+
+Schritt 5 des Plans vom 2026-11-27.
+
+**Bewehrung je Lage.** Vorher setzte jede Vorlage feste Stäbe, das
+Rechteck etwa drei ⌀20 unten und zwei ⌀12 oben, jede Achse 50 mm vom Rand
+(«Achsabstand»). Jetzt hat jede Lage einen Durchmesser und eine Teilung,
+der Kreis Durchmesser und Anzahl. Statt des Achsabstands steht die
+Überdeckung c_nom, Vorgabe 35 mm.
+
+- c_nom misst bis zum äussersten Stab: mit Schubwänden bis zum Bügel, ohne
+  bis zum Längsstab. Darum haben auch die Bügel ⌀ und s, Vorgabe ⌀10 und
+  150 mm wie bei einer neuen Wand.
+- Die Teilung ist ein Wunsch wie beim Zeichnen einer Stablinie: gerundet
+  auf den nächsten Abstand, der aufgeht. Jede Lage wird eine Stablinie mit
+  Teilung.
+- Beispiel Rechteck b = 300 mm, c_nom = 35, Bügel ⌀10, unten ⌀20 mit
+  s = 100: die Achsen liegen 35 + 10 + 10 = 55 mm vom Rand, dazwischen
+  bleiben 190 mm. Unter der Lage steht «→ 3 Stäbe, Abstand 95 mm»; die
+  Zahl kommt aus dem Kern, aus derselben Rundung wie die Stablinie.
+- Ist «Bewehrung» aus, sind ihre Felder grau und gesperrt, ebenso die der
+  Bügel ohne Schubwände, c_nom erst, wenn beides aus ist. Vorher blieben
+  sie offen, ohne etwas zu bewirken.
+- Passt eine Lage nicht, sagt es die Meldung mit ihrem Namen: «Die Stäbe
+  unten passen nicht in den Querschnitt – Überdeckung, Bügel oder
+  Durchmesser sind zu gross.» Im Kreis prüft der Kern auch, dass die Stäbe
+  nicht ineinander liegen: bei D = 100 mm wären es acht ⌀16 im Abstand von
+  5 mm.
+- Die Schubwände enden auf der Höhe der Stabachsen, auch ohne Bewehrung.
+
+**Drei neue Vorlagen.**
+
+- Trapez: b oben, b unten, h. Die Lagen halten c_nom quer zur schrägen
+  Kante. Die Wand ist so dick wie die engste Stelle zwischen den Lagen –
+  nach Vorgabe, im [[TODO]].
+- Doppel-T: Obergurt b_o und h_o, Steg b_w, Untergurt b_u und h_u, Höhe h.
+  Die Wand reicht wie beim T von den Stäben unten bis in die Mitte des
+  Obergurts. Eingesetzt mit den Vorgaben: unten 5 ⌀20 im Abstand 97.5 mm
+  (gewünscht 100), oben 6 ⌀12 im Abstand 139.6 mm (gewünscht 150).
+- Platte mit Aufbeton: b, Dicke unten h_u, oben h_o und ein zweiter Beton
+  für den Aufbeton; die Platte darunter ist aus dem Material der Vorlage.
+  Ohne Schubwände, wie eine Platte.
+
+**Das Rechteck der Skripte.** `Projekt.querschnittsanalyse` und viele
+Tests bauen auf dem alten Rechteck auf: 300 × 600 mm, 3 ⌀20 und 2 ⌀12, je
+50 mm vom Rand. Es steht jetzt für sich, `rechteck_der_skripte` in
+`querschnitt/vorlagen.py`; seine Zahlen bleiben, kein Test änderte sich.
+
+**Woher die Felder kommen.** Masse, Lagen, Bügel und die Wahl des zweiten
+Betons stehen im Katalog des Kerns; die Seitenleiste baut daraus ihre
+Zeilen.
+
+---
+
 ## 2026-11-27 · Spannglied: Erzeugnis oder Fläche, Faktoren statt Spannungen
 
 Schritt 4 des Plans vom 2026-11-27.

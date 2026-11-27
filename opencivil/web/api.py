@@ -62,7 +62,7 @@ from opencivil.querschnitt.spannglieder import (
 )
 from opencivil.querschnitt.zugseite import UM_Y, Zugseite
 from opencivil.querschnitt.geometrie import VERSCHMIERT, Linienart
-from opencivil.querschnitt.vorlagen import RANDABSTAND, VORLAGEN
+from opencivil.querschnitt.vorlagen import BUEGEL, UEBERDECKUNG, VORLAGEN
 from opencivil.querschnitt.gesetzwahl import Holzrechnung, Werkstoffsatz
 from opencivil.nachweis.rechenwahl import RECHENARTEN
 from opencivil.spannungsanalyse import Analyseart
@@ -401,16 +401,20 @@ def katalog() -> dict:
                                "titel": f"Um {d}° gegen den Uhrzeigersinn gedreht"}
                               for d in profillage.DREHUNGEN],
             },
-            # Die Vorlagen aus Flaechen mit ihren Massen -- und je eine Skizze
-            # nach Vorgabe fuer das Bildchen auf ihrem Knopf. Der Achsabstand der
-            # Staebe ist ein Mass aller Vorlagen.
+            # Die Vorlagen aus Flaechen mit ihren Massen, ihren Lagen und
+            # einem zweiten Material, wo sie eines zur Wahl stellen -- und je
+            # eine Skizze nach Vorgabe fuer das Bildchen auf ihrem Knopf.
+            # Ueberdeckung und Buegel sind Masse aller Vorlagen.
             "vorlagen": [
                 {"schluessel": v.schluessel, "name": v.name, "hat_waende": v.hat_waende,
                  "masse": [m.als_dict() for m in v.masse],
+                 "lagen": [l.als_dict() for l in v.lagen],
+                 "stoffe": [s.als_dict() for s in v.stoffe],
                  "skizze": v.bauen().als_dict()}
                 for v in VORLAGEN
             ],
-            "randabstand": RANDABSTAND.als_dict(),
+            "ueberdeckung": UEBERDECKUNG.als_dict(),
+            "buegel": BUEGEL.als_dict(),
             # Worin Bewehrung liegt: eine Vorlage aus anderem kommt ohne.
             "bewehrt": BEWEHRT.value,
             # Die Schalter eines Spannglieds, wie seine Faktoren stehen und

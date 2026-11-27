@@ -825,23 +825,34 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben, JeMaterial):
 
     def vorlage_einsetzen(self, schluessel: str, *, material: str, stahl: str,
                           masse: Optional[Mapping[str, float]] = None,
-                          randabstand: float = vorlagen.RANDABSTAND.vorgabe,
                           bewehrung: bool = True,
                           schubwaende: bool = True,
+                          stoffe: Optional[Mapping[str, str]] = None,
                           ursprung: Tuple[float, float] = (0.0, 0.0)) -> List[str]:
         """
-        Setzt eine Vorlage ein (:mod:`opencivil.querschnitt.vorlagen`) -- dazu,
-        nicht anstatt: was schon gezeichnet ist, bleibt, und wo ein Punkt der
-        Vorlage genau auf einem Knoten liegt, haengt sie an ihm. ``ursprung``
-        ist, wohin ihre Ecke unten links kommt; die Lagen auf einen
-        Millionstel Millimeter wie im Zeichenfenster, damit die Summe keinen
-        Rundungsrest behaelt. Gibt die Kennungen der neuen Elemente zurueck.
-        Passen die Masse nicht zueinander, ein ``ValueError`` mit dem Grund.
-        ``material`` ist das der Flaechen -- Beton, Baustahl oder Holz --,
-        ``stahl`` der der Bewehrung; bis 2026-11-26 hiess ``material``
-        ``beton``.
+        Setzt eine Vorlage ein (:mod:`opencivil.querschnitt.vorlagen`) mit
+        ihren ``masse`` -- auch Ueberdeckung, Lagen und Buegel; was fehlt,
+        nach Vorgabe. Passen die Masse nicht zueinander, ein ``ValueError``
+        mit dem Grund. Eingesetzt wird wie mit :meth:`teile_einsetzen`.
         """
-        teile = vorlagen.vorlage(schluessel).bauen(masse, randabstand, bewehrung, schubwaende)
+        teile = vorlagen.vorlage(schluessel).bauen(masse, bewehrung, schubwaende)
+        return self.teile_einsetzen(teile, material=material, stahl=stahl, stoffe=stoffe,
+                                    ursprung=ursprung)
+
+    def teile_einsetzen(self, teile: vorlagen.Teile, *, material: str, stahl: str,
+                        stoffe: Optional[Mapping[str, str]] = None,
+                        ursprung: Tuple[float, float] = (0.0, 0.0)) -> List[str]:
+        """
+        Setzt die Teile einer Vorlage ein -- dazu, nicht anstatt: was schon
+        gezeichnet ist, bleibt, und wo ein Punkt genau auf einem Knoten
+        liegt, haengen sie an ihm. ``ursprung`` ist, wohin ihre Ecke unten
+        links kommt; die Lagen auf einen Millionstel Millimeter wie im
+        Zeichenfenster, damit die Summe keinen Rundungsrest behaelt. Gibt
+        die Kennungen der neuen Elemente zurueck. ``material`` ist das der
+        Flaechen -- Beton, Baustahl oder Holz --, ``stoffe`` je zweites
+        Material das seine, sonst auch ``material`` (der Aufbeton einer
+        Platte); ``stahl`` ist der der Bewehrung.
+        """
         dy, dz = float(ursprung[0]), float(ursprung[1])
 
         def an(p: Sequence[float]) -> List[float]:
@@ -849,16 +860,16 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben, JeMaterial):
 
         neu: List[str] = []
         for f in teile.polygone:
-            neu.append(self.polygon([an(p) for p in f["punkte"]],
-                                    material="" if f["aussparung"] else material).kennung)
+            stoff = "" if f["aussparung"] else (stoffe or {}).get(f["stoff"]) or material
+            neu.append(self.polygon([an(p) for p in f["punkte"]], material=stoff).kennung)
         for s in teile.staebe:
             neu.append(self.stab(*an(s["lage"]), durchmesser=s["durchmesser"], stahl=stahl).kennung)
         for l in teile.stablinien:
             felder = {k: v for k, v in l.items() if k not in ("von", "bis")}
             neu.append(self.stablinie(an(l["von"]), an(l["bis"]), stahl=stahl, **felder).kennung)
         for w in teile.schubwaende:
-            neu.append(self.schubwand(an(w["von"]), an(w["bis"]), dicke=w["dicke"],
-                                      stahl=stahl).kennung)
+            felder = {k: v for k, v in w.items() if k not in ("von", "bis")}
+            neu.append(self.schubwand(an(w["von"]), an(w["bis"]), stahl=stahl, **felder).kennung)
         return neu
 
     def fallnamen(self) -> List[Fallnamen]:

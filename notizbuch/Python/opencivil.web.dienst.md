@@ -1,5 +1,5 @@
 ---
-erzeugt: a9d939099214
+erzeugt: 4f618013e09d
 art: modul
 tags: [modul]
 ---
@@ -368,7 +368,8 @@ der auf die Linie gelotet wird.
 def _vorlagenwahl(rumpf: Mapping[str, Any]) -> Dict[str, Any]
 ```
 
-Was die Oberflaeche zu einer Vorlage eingestellt hat – Masse, Achsabstand, die zwei Schalter.
+Was die Oberflaeche zu einer Vorlage eingestellt hat: die Masse – auch
+Ueberdeckung, Lagen und Buegel – und die zwei Schalter.
 
 ### vorlage
 

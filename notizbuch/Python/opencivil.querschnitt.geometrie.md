@@ -1,5 +1,5 @@
 ---
-erzeugt: f5e4e0235ff8
+erzeugt: 038a486ebfd1
 art: modul
 tags: [modul]
 ---
@@ -596,6 +596,7 @@ Ueberdeckung, oder wenn die Linie dabei keine Laenge behielte.
 - [[opencivil.querschnitt.profilblech]]
 - [[opencivil.querschnitt.randzone]]
 - [[opencivil.querschnitt.torsion]]
+- [[opencivil.querschnitt.vorlagen]]
 - [[opencivil.stahlbau.querschnitt]]
 - [[opencivil.stahlbau.schub]]
 - [[opencivil.stahlbau.stabilitaet]]

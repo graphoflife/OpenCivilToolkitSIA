@@ -23,6 +23,7 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple, Union
 
 from opencivil.querschnitt.platte import LAGENZAHL, Richtung
+from opencivil.querschnitt.vorlagen import rechteck_der_skripte
 from opencivil.ergebnis import Ergebnis
 from opencivil.material.arten import MATERIALARTEN
 from opencivil.material.baustahl import ERSTER_BAUSTAHL
@@ -443,8 +444,8 @@ class Projekt(Beschreibung):
         """
         eintrag = QuerschnittsanalyseEintrag.neu(
             kennung=self.freie_kennung(ANALYSE.vorsilbe), name=name)
-        eintrag.vorlage_einsetzen("rechteck", material=self._einziges("beton", beton),
-                                  stahl=self._einziges("betonstahl", stahl), schubwaende=False)
+        eintrag.teile_einsetzen(rechteck_der_skripte(), material=self._einziges("beton", beton),
+                                stahl=self._einziges("betonstahl", stahl))
         eintrag = lesen(QuerschnittsanalyseEintrag, felder, f"Querschnittsanalyse '{name}'",
                         eintrag)
         self.querschnittsanalysen.append(eintrag)

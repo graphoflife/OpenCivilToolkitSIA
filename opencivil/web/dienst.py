@@ -602,16 +602,17 @@ def balkensystem_bearbeiten(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
 
 
 def _vorlagenwahl(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
-    """Was die Oberflaeche zu einer Vorlage eingestellt hat -- Masse, Achsabstand, die zwei Schalter."""
+    """
+    Was die Oberflaeche zu einer Vorlage eingestellt hat: die Masse -- auch
+    Ueberdeckung, Lagen und Buegel -- und die zwei Schalter.
+    """
     wahl = rumpf.get("wahl") or {}
     try:
         masse = {str(k): float(v) for k, v in (wahl.get("masse") or {}).items()
                  if v is not None and v != ""}
-        randabstand = float(wahl.get("randabstand", vorlagen.RANDABSTAND.vorgabe))
     except (TypeError, ValueError):
         raise DienstFehler(400, "Die Masse einer Vorlage müssen Zahlen sein.") from None
-    return {"masse": masse, "randabstand": randabstand,
-            "bewehrung": bool(wahl.get("bewehrung", True)),
+    return {"masse": masse, "bewehrung": bool(wahl.get("bewehrung", True)),
             "schubwaende": bool(wahl.get("schubwaende", True))}
 
 
@@ -703,10 +704,13 @@ def vorlage_einsetzen(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
         ursprung = (float(ursprung[0]), float(ursprung[1]))
     except (TypeError, ValueError, IndexError):
         raise DienstFehler(400, "Der Einsetzpunkt muss zwei Zahlen haben.") from None
+    # Das zweite Material, das eine Vorlage zur Wahl stellt -- der Aufbeton.
+    stoffe = {str(k): str(v) for k, v in ((rumpf.get("wahl") or {}).get("stoffe") or {}).items()}
     try:
         neu = eintrag.vorlage_einsetzen(
             _vorlage(rumpf).schluessel, material=str(rumpf.get("material") or ""),
-            stahl=str(rumpf.get("stahl") or ""), ursprung=ursprung, **_vorlagenwahl(rumpf))
+            stahl=str(rumpf.get("stahl") or ""), stoffe=stoffe, ursprung=ursprung,
+            **_vorlagenwahl(rumpf))
     except ValueError as fehler:
         raise DienstFehler(400, str(fehler)) from None
     d = eintrag.als_dict()

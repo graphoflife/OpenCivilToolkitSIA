@@ -1,7 +1,7 @@
 /**
  * qa_vorlagen.js -- die Werkzeuge, die etwas Fertiges an einem Punkt
- * einsetzen: «Vorlage» (Rechteck, T-Balken, Hohlkasten, Kreis),
- * «Stahlprofil» und «Blechverbunddecke».
+ * einsetzen: «Vorlage» (Rechteck, T-Balken, Doppel-T, Trapez, Hohlkasten,
+ * Platte mit Aufbeton, Kreis), «Stahlprofil» und «Blechverbunddecke».
  *
  * Jedes hat seinen eigenen Knopf (Benutzer, 2026-11-27). Seine Felder
  * stehen in der Seitenleiste, über ihnen eine Skizze mit Masslinien, die
@@ -16,6 +16,13 @@
  * dort. Hier wird gewählt und gezeigt: die Skizze kommt aus der Anfrage
  * `vorlage`, eingesetzt wird mit dem Baukasten des Kerns über
  * `vorlage_einsetzen`.
+ *
+ * Die Bewehrung je Lage mit Durchmesser und Teilung, die Bügel ebenso, und
+ * die Überdeckung c_nom bis zum äussersten Stab (Benutzer, 2026-11-27).
+ * Unter jeder Lage steht, was aus ihr wird -- «→ 3 Stäbe, Abstand 95 mm»,
+ * vom Kern mit der Skizze geschickt. Ist «Bewehrung» aus, sind ihre Felder
+ * grau und gesperrt, ebenso die der Bügel ohne Schubwände; bis dahin blieben
+ * sie offen, ohne etwas zu bewirken.
  *
  * Das Stahlprofil setzt ein Profil ein, keine Fläche (Plan vom 2026-11-25):
  * Reihe, Grösse, Baustahl, Drehung und ob gespiegelt, wie in der
@@ -41,7 +48,7 @@ import {
   ausVorlage, eintragVon, feldangabe, katalog, materialien, zustand,
 } from './zustand.js';
 
-/** Die Vorlagen aus Flächen, wie der Kern sie kennt: Rechteck, T-Balken, Hohlkasten, Kreis. */
+/** Die Vorlagen aus Flächen, wie der Kern sie kennt: Rechteck, T-Balken, … Kreis. */
 function vorlagen() {
   return katalog('querschnittsanalyse', 'vorlagen');
 }
@@ -49,16 +56,15 @@ function vorlagen() {
 /** Wie ein Stahlprofil in einer Skizze aussieht: aus Baustahl, ein Stück mit seinem Loch. */
 const PROFILBILD = { flaeche: 'cad-baustahl', einStueck: true };
 
-/** Der Achsabstand der Stäbe vom Rand -- ein Mass aller Vorlagen. */
-function randabstand() {
-  return katalog('querschnittsanalyse', 'randabstand');
-}
-
-/** Was zuletzt eingestellt war -- je Analyse in der Ansicht, nicht im Projekt. */
+/**
+ * Was zuletzt eingestellt war -- je Analyse in der Ansicht, nicht im
+ * Projekt. `masse` trägt alle Zahlen, auch Überdeckung, Lagen und Bügel;
+ * was fehlt, gilt nach der Vorgabe der Vorlage. `stoffe` sind die zweiten
+ * Materialien, etwa der Aufbeton.
+ */
 function wahlVon(a) {
   a.qa.vorlage = a.qa.vorlage || {
-    art: 'rechteck', masse: {}, randabstand: randabstand().vorgabe, bewehrung: true,
-    schubwaende: true,
+    art: 'rechteck', masse: {}, bewehrung: true, schubwaende: true, stoffe: {},
   };
   return a.qa.vorlage;
 }
@@ -93,7 +99,7 @@ export const VORLAGEN = {
     'Blechverbunddecke: Beton auf einem Profilblech, die Masse aus dem Datenblatt',
     'Die Ecke links unten – die Unterkante der Rippen – kommt an den Punkt'),
   vorlage: werkzeug('vorlage', 'Vorlage', 'cad-vorlage', 't',
-    'Vorlage: Rechteck, T-Balken, Hohlkasten oder Kreis – aus Beton mit Bewehrung',
+    'Vorlage: ein Querschnitt zum Anfangen, etwa Rechteck, T-Balken oder Kreis – mit Bewehrung je Lage',
     'Die Ecke unten links kommt an den Punkt'),
 };
 
@@ -197,6 +203,8 @@ export function vorlagenInhalt(a, name, { vorgaben, flaechenklasse }) {
         bild.replaceChildren(skizze(antwort.teile, 276, 140, art.bild));
         art.beantwortet?.(antwort);
       }
+      // Ohne Teile auch keine Stabzahlen: nie eine alte stehen lassen.
+      art.stabzahlen?.(antwort.teile?.lagen || {});
       a.obenBald();
     }).catch((fehler) => melden(fehler.message, true));
   };
@@ -228,23 +236,26 @@ function vorlagenwahl(a, neu) {
 
 /**
  * Mit oder ohne, etwa «Bewehrung» -- ein Schalter wie in den Eigenschaften
- * der Zeichnung, kein Haken (Benutzer, 2026-11-19). Die Seitenleiste baut
- * sich beim Umschalten nicht neu, nur die Skizze: darum ersetzt sich die
- * Zeile selbst.
+ * der Zeichnung, kein Haken (Benutzer, 2026-11-19). Umschalten baut die
+ * Seitenleiste neu (`neu`): es sperrt die Felder, die dann nichts bewirken.
  */
 function mitOhne(text, an, setzen) {
-  const zeile = schalterzeile(text, hakenSchalter(an, (x) => {
-    setzen(x);
-    zeile.replaceWith(mitOhne(text, x, setzen));
-  }, text));
-  return zeile;
+  return schalterzeile(text, hakenSchalter(an, setzen, text));
 }
 
 /**
- * Die Zeile eines Masses: ein Zahlenfeld, das schon beim Tippen meldet --
- * die Skizze soll mitgehen. Name, Grenze, Satz und Einheit kommen mit dem
- * Mass aus dem Kern (`angabe`), wie bei jedem Feld; steht statt des Namens
- * ein Zeichen da, ist der Name sein Titel (`mass.titel`).
+ * Zeilen, die nur mit einem Schalter etwas bewirken: ist er aus, sind sie
+ * grau und gesperrt -- ein `fieldset` sperrt Felder und Pfeile zusammen.
+ */
+function gesperrt(aus, zeilen) {
+  return el('fieldset.cad-sperre', { disabled: aus }, zeilen);
+}
+
+/**
+ * Das Feld eines Masses: ein Zahlenfeld, das schon beim Tippen meldet --
+ * die Skizze soll mitgehen. Grenze, Satz und Einheit kommen mit dem Mass
+ * aus dem Kern (`angabe`), wie bei jedem Feld; `mass.titel` ist sein
+ * Titel, wo die Zeile nur ein Zeichen zeigt.
  *
  * Beim Tippen geht nur eine Zahl in die Skizze, die das Feld auch nimmt.
  * Nimmt es eine nicht, zeigt es wieder die zuletzt übernommene: die
@@ -253,7 +264,7 @@ function mitOhne(text, an, setzen) {
  * Rippe einer Decke ist niedriger als die Decke --, stehen die Masse in
  * `neben`.
  */
-function massZeile(mass, wert, setzen, neben = {}) {
+function massFeld(mass, wert, setzen, neben = {}) {
   let gilt = wert;
   const nehmen = (x) => {
     gilt = x;
@@ -268,41 +279,88 @@ function massZeile(mass, wert, setzen, neben = {}) {
     if (e.target.value.trim() !== '' && Number.isFinite(w) && !grenzeVerletzt(mass.angabe, w, neben)) nehmen(w);
   });
   eingabe?.addEventListener('change', () => { eingabe.value = String(gilt); });
-  return cadZeile(mass.heisst, feld, mass.angabe.einheit || '');
+  return feld;
+}
+
+/** Die Zeile eines Masses: sein Name, sein Feld, seine Einheit. */
+function massZeile(mass, wert, setzen, neben = {}) {
+  return cadZeile(mass.heisst, massFeld(mass, wert, setzen, neben), mass.angabe.einheit || '');
 }
 
 /**
- * Eine Vorlage aus Flächen -- Rechteck, T-Balken, Hohlkasten, Kreis: ihre
- * Masse, das Material der Flächen und die Bewehrung. Bewehrung und
- * Schubwände liegen nur im Beton (Benutzer, 2026-11-25): aus Holz oder
- * Baustahl kommt die Vorlage ohne, und ihre Schalter warten, bis das
- * Material wieder Beton ist.
+ * Die Zeile einer Lage -- oder der Bügel: Durchmesser und Teilung, beim
+ * Kreis Durchmesser und Anzahl, je mit dem kurzen Zeichen des Kerns
+ * (`lage.kurz`: ⌀, s, n) und ihrer Einheit; der ganze Name ist der Titel
+ * des Feldes. Die Zahlen stehen in `masse` der Wahl.
+ */
+function lagenZeile(lage, masse, holen) {
+  const felder = lage.masse.flatMap((m, i) => [
+    el('span', { text: lage.kurz[i] }),
+    massFeld({ ...m, titel: m.heisst }, masse[m.schluessel] ?? m.vorgabe, (x) => {
+      masse[m.schluessel] = x;
+      holen();
+    }),
+    m.angabe.einheit ? el('span.einheit', { text: m.angabe.einheit }) : null,
+  ]);
+  return el('div.cad-zeile', {}, [el('span', { text: lage.name }), el('div.cad-lage', {}, felder), el('span')]);
+}
+
+/**
+ * Eine Vorlage aus Flächen -- Rechteck, T-Balken, … Kreis: ihre Masse, das
+ * Material der Flächen, ein zweites, wo sie eines zur Wahl stellt (der
+ * Aufbeton), und die Bewehrung. Bewehrung und Schubwände liegen nur im
+ * Beton (Benutzer, 2026-11-25): aus Holz oder Baustahl kommt die Vorlage
+ * ohne, und ihre Schalter warten, bis das Material wieder Beton ist.
+ *
+ * Die Überdeckung zählt für Stäbe und Wände: sie ist nur gesperrt, wenn
+ * beide aus sind.
  */
 function flaechenvorlage(a, { vorgaben, flaechenklasse, neu, holen }) {
   const w = wahlVon(a);
   const v = gewaehlteVorlage(a);
   const { material } = vorgaben.flaechen;
   const bewehrt = eintragVon(material)?.art === katalog('querschnittsanalyse', 'bewehrt');
+  w.stoffe = w.stoffe || {};
+  for (const s of v.stoffe) w.stoffe[s.schluessel] = gueltigesMaterial(s.arten, w.stoffe[s.schluessel]);
   const anfrage = () => structuredClone({
     ...w, bewehrung: bewehrt && w.bewehrung, schubwaende: bewehrt && w.schubwaende,
   });
   const waende = v.hat_waende;
+  const zahl = (m) => massZeile(m, w.masse[m.schluessel] ?? m.vorgabe,
+    (x) => { w.masse[m.schluessel] = x; holen(); });
+  // Unter jeder Lage, was aus ihr wird -- gesetzt, sobald die Skizze kommt.
+  const stabzahlen = Object.fromEntries(v.lagen.map((l) => [l.schluessel, el('p.cad-hinweis-klein.cad-stabzahl')]));
+  const bewehrung = () => [
+    gesperrt(!w.bewehrung && !(waende && w.schubwaende), [zahl(katalog('querschnittsanalyse', 'ueberdeckung'))]),
+    mitOhne('Bewehrung', w.bewehrung, (x) => { w.bewehrung = x; neu(); }),
+    gesperrt(!w.bewehrung, v.lagen.flatMap((l) => [
+      lagenZeile(l, w.masse, holen), el('div.cad-zeile', {}, [el('span'), stabzahlen[l.schluessel]]),
+    ])),
+    ...(waende ? [
+      mitOhne('Schubwände', w.schubwaende, (x) => { w.schubwaende = x; neu(); }),
+      gesperrt(!w.schubwaende, [lagenZeile(katalog('querschnittsanalyse', 'buegel'), w.masse, holen)]),
+    ] : []),
+  ];
   return {
     anfrage,
     bild: { flaeche: flaechenklasse(material) },
+    stabzahlen: (lagen) => {
+      for (const [schluessel, p] of Object.entries(stabzahlen)) {
+        p.textContent = lagen[schluessel] ? `→ ${lagen[schluessel]}` : '';
+      }
+    },
     zeilen: [
-      ...v.masse.map((m) => massZeile(m, w.masse[m.schluessel] ?? m.vorgabe,
-        (x) => { w.masse[m.schluessel] = x; holen(); })),
+      ...v.masse.map(zahl),
       cadZeile('Material', materialliste({
         art: feldangabe('flaeche', 'material').stoffe, gewaehlt: material,
         titel: 'Woraus die Flächen der Vorlage sind – so auch die nächste gezeichnete',
         setzen: (x) => { vorgaben.flaechen.material = x; neu(); },
       })),
-      ...(bewehrt ? [
-        massZeile(randabstand(), w.randabstand, (x) => { w.randabstand = x; holen(); }),
-        mitOhne('Bewehrung', w.bewehrung, (x) => { w.bewehrung = x; holen(); }),
-        waende ? mitOhne('Schubwände', w.schubwaende, (x) => { w.schubwaende = x; holen(); }) : null,
-      ] : [el('p.hinweis', {
+      ...v.stoffe.map((s) => cadZeile(s.beschriftung, materialliste({
+        art: s.arten, gewaehlt: w.stoffe[s.schluessel], titel: s.titel,
+        setzen: (x) => { w.stoffe[s.schluessel] = x; neu(); },
+      }))),
+      ...(bewehrt ? bewehrung() : [el('p.hinweis', {
         text: `${waende ? 'Bewehrung und Schubwände liegen' : 'Bewehrung liegt'} nur im Beton – `
           + 'die Vorlage kommt ohne.',
       })]),
@@ -394,16 +452,18 @@ function deckenvorlage(a, neu, holen) {
 }
 
 /**
- * Gibt es das Material im Feld `feld` des Eintrags `e` der Klasse `klasse`
- * nicht mehr, folgt ihm das erste, das das Feld nimmt -- wie in einem neuen
- * Fenster. Gibt es keines, bleibt der Verweis: die Liste sagt dann, dass es
- * im Projekt noch keines gibt.
+ * Das Material `gewaehlt`, wenn es eines der `arten` im Projekt ist -- sonst
+ * das erste, das passt, wie in einem neuen Fenster. Gibt es keines, bleibt
+ * der Verweis: die Liste sagt dann, dass es im Projekt noch keines gibt.
  */
+function gueltigesMaterial(arten, gewaehlt) {
+  if (arten.some((art) => materialien(art).some((m) => m.kennung === gewaehlt))) return gewaehlt;
+  return arten.map((art) => materialien(art)[0]?.kennung).find(Boolean) || gewaehlt;
+}
+
+/** Folgt dem Material im Feld `feld` des Eintrags `e` der Klasse `klasse` (`gueltigesMaterial`). */
 function gibtMaterial(e, klasse, feld) {
-  const stoffe = feldangabe(klasse, feld).stoffe;
-  if (!stoffe.some((art) => materialien(art).some((m) => m.kennung === e[feld]))) {
-    e[feld] = stoffe.map((art) => materialien(art)[0]?.kennung).find(Boolean) || e[feld];
-  }
+  e[feld] = gueltigesMaterial(feldangabe(klasse, feld).stoffe, e[feld]);
 }
 
 /** Setzt eine Vorlage aus Flächen ein -- ihre Flächen aus `material`, ihre Bewehrung aus `stahl`. */

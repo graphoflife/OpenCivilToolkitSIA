@@ -8,9 +8,19 @@ import math
 import unittest
 
 from opencivil.projekt import Projekt, QuerschnittsanalyseEintrag
-from opencivil.querschnitt import vorlagen
+from opencivil.querschnitt import geometrie, vorlagen
 from opencivil.web import api, dienst, zeichengeometrie
 from tests.test_querschnittsanalyse import balken, projekt, urteile
+
+
+def eingesetzt(schluessel, **wahl):
+    """Eine Vorlage in einer leeren Analyse, aus C30/37 (b1) und B500B (s1)."""
+    p = projekt()
+    a = p.querschnittsanalysen[0]
+    for liste in ("knoten", "flaechen", "staebe", "stablinien", "schubwaende"):
+        setattr(a, liste, [])
+    neu = a.vorlage_einsetzen(schluessel, material="b1", stahl="s1", **wahl)
+    return p, a, neu
 
 
 class TestVorlagen(unittest.TestCase):
@@ -20,23 +30,23 @@ class TestVorlagen(unittest.TestCase):
     """
 
     #: Bruttofläche nach Vorgabe, von Hand: Rechteck 300·600; T-Balken
-    #: 1200·200 + 300·500; Hohlkasten 1200·800 − 800·400; Kreis als
-    #: 48-Eck mit r = 250: 24 · r² · sin(7.5°). Die Ecken des Kreises sind auf
-    #: Tausendstel gerundet -- das ändert seine Fläche um 0.25 mm².
+    #: 1200·200 + 300·500; Doppel-T 800·150 + 200·650 + 500·200; Trapez
+    #: (400 + 300)/2 · 600; Hohlkasten 1200·800 − 800·400; Platte mit
+    #: Aufbeton 1000·200 + 1000·100; Kreis als 48-Eck mit r = 250:
+    #: 24 · r² · sin(7.5°). Die Ecken des Kreises sind auf Tausendstel
+    #: gerundet -- das ändert seine Fläche um 0.25 mm².
     FLAECHEN = {
         "rechteck": 300 * 600,
         "tbalken": 1200 * 200 + 300 * 500,
+        "doppel_t": 800 * 150 + 200 * 650 + 500 * 200,
+        "trapez": (400 + 300) / 2 * 600,
         "hohlkasten": 1200 * 800 - 800 * 400,
+        "aufbeton": 1000 * 200 + 1000 * 100,
         "kreis": 24 * 250 ** 2 * math.sin(math.radians(7.5)),
     }
 
     def eingesetzt(self, schluessel, **wahl):
-        p = projekt()
-        a = p.querschnittsanalysen[0]
-        for liste in ("knoten", "flaechen", "staebe", "stablinien", "schubwaende"):
-            setattr(a, liste, [])
-        neu = a.vorlage_einsetzen(schluessel, material="b1", stahl="s1", **wahl)
-        return p, a, neu
+        return eingesetzt(schluessel, **wahl)
 
     def test_jede_ist_gueltig_und_hat_ihre_flaeche(self):
         self.assertEqual({v.schluessel for v in vorlagen.VORLAGEN}, set(self.FLAECHEN))
@@ -53,8 +63,11 @@ class TestVorlagen(unittest.TestCase):
         self.assertTrue(a.leer)
         self.assertEqual((a.knoten, a.flaechen, a.stablinien, a.lastfaelle), ([], [], [], []))
 
-    def test_das_rechteck_ohne_schubwand(self):
-        """Das Rechteck der Vorlage, wie die frische Analyse bis 2026-10-19: dieselben Knoten, Linien und Werte."""
+    def test_das_rechteck_der_skripte(self):
+        """
+        Das Rechteck der Skripte, wie die Vorlage bis 2026-11-27 und die
+        frische Analyse bis 2026-10-19: dieselben Knoten, Linien und Werte.
+        """
         a = balken()
         self.assertEqual([(k.kennung, k.y, k.z) for k in a.knoten], [
             ("K1", 0.0, 0.0), ("K2", 300.0, 0.0), ("K3", 300.0, 600.0), ("K4", 0.0, 600.0),
@@ -92,12 +105,12 @@ class TestVorlagen(unittest.TestCase):
             vorlagen.vorlage("tbalken").bauen({"b": 200.0, "b_w": 300.0})
         with self.assertRaisesRegex(ValueError, "^Höhe h muss grösser als null sein, angegeben ist 0 mm.$"):
             vorlagen.vorlage("rechteck").bauen({"h": 0.0})
-        # Der Achsabstand ist ein Mass wie die anderen: derselbe Satz, und die
+        # Die Überdeckung ist ein Mass wie die anderen: derselbe Satz, und die
         # Maske bekommt Vorgabe und Grenze aus dem Katalog.
-        with self.assertRaisesRegex(ValueError, "^Achsabstand muss grösser als null sein"):
-            vorlagen.vorlage("rechteck").bauen(randabstand=0.0)
-        rand = api.katalog()["querschnittsanalyse"]["randabstand"]
-        self.assertEqual((rand["vorgabe"], rand["angabe"]["ueber"]), (50.0, 0.0))
+        with self.assertRaisesRegex(ValueError, "^Überdeckung c_nom muss grösser als null sein"):
+            vorlagen.vorlage("rechteck").bauen({"c_nom": 0.0})
+        c = api.katalog()["querschnittsanalyse"]["ueberdeckung"]
+        self.assertEqual((c["vorgabe"], c["angabe"]["ueber"]), (35.0, 0.0))
         d = dienst.bearbeite("vorlage", {"wahl": {"art": "hohlkasten", "masse": {"t": 700}}}).daten
         self.assertIn("Wände", d["fehler"])
         self.assertIsNone(d["teile"])
@@ -106,11 +119,11 @@ class TestVorlagen(unittest.TestCase):
     def test_der_kreis_mit_n_staeben(self):
         """
         Wie viele Stäbe der Kreis hat, stellt man ein (Benutzer, 2026-11-16):
-        gleich verteilt im Achsabstand vom Rand, der erste rechts. Eine halbe
-        Zahl wird nicht still gerundet.
+        gleich verteilt, ihre Achsen c_nom + ⌀/2 vom Rand, der erste rechts --
+        hier 42 + 8 = 50 mm. Eine halbe Zahl wird nicht still gerundet.
         """
         kreis = vorlagen.vorlage("kreis")
-        teile = kreis.bauen({"D": 400.0, "n": 6.0}, randabstand=50.0)
+        teile = kreis.bauen({"D": 400.0, "n": 6.0, "c_nom": 42.0, "d": 16.0})
         self.assertEqual(len(teile.staebe), 6)
         for k, s in enumerate(teile.staebe):
             winkel = math.radians(60 * k)
@@ -122,12 +135,14 @@ class TestVorlagen(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "grösser als null"):
             kreis.bauen({"n": 0.0})
         # Der Katalog sagt dem Fenster, dass n eine Anzahl ist: ohne Einheit,
-        # in ganzen Schritten.
+        # in ganzen Schritten -- n gehört zur Lage, D zur Form.
         katalog = {v["schluessel"]: v for v in api.katalog()["querschnittsanalyse"]["vorlagen"]}
-        self.assertEqual([(m["schluessel"], m["angabe"].get("einheit"), m["schritt"],
-                           m["angabe"].get("ganz", False))
-                          for m in katalog["kreis"]["masse"]],
-                         [("D", "mm", 10.0, False), ("n", None, 1.0, True)])
+        angaben = lambda masse: [(m["schluessel"], m["angabe"].get("einheit"), m["schritt"],
+                                  m["angabe"].get("ganz", False)) for m in masse]
+        self.assertEqual(angaben(katalog["kreis"]["masse"]), [("D", "mm", 10.0, False)])
+        self.assertEqual(angaben(katalog["kreis"]["lagen"][0]["masse"]),
+                         [("d", "mm", 10.0, False), ("n", None, 1.0, True)])
+        self.assertEqual(katalog["kreis"]["lagen"][0]["kurz"], ["⌀", "n"])
 
     def test_einsetzen_ueber_den_dienst(self):
         p = projekt()
@@ -140,8 +155,136 @@ class TestVorlagen(unittest.TestCase):
         # Der Katalog hat je Vorlage ihre Masse und eine Skizze.
         katalog = api.katalog()["querschnittsanalyse"]["vorlagen"]
         self.assertEqual([v["schluessel"] for v in katalog],
-                         ["rechteck", "tbalken", "hohlkasten", "kreis"])
+                         ["rechteck", "tbalken", "doppel_t", "trapez", "hohlkasten", "aufbeton",
+                          "kreis"])
         self.assertEqual(len(katalog[0]["skizze"]["masslinien"]), 2)
+
+
+class TestBewehrungJeLage(unittest.TestCase):
+    """
+    Je Lage Durchmesser und Teilung, die Überdeckung c_nom bis zum äussersten
+    Stab (Benutzer, 2026-11-27). Das Beispiel des Plans: Rechteck b = 300 mm,
+    c_nom = 35 mm, Bügel ⌀10, unten ⌀20 mit s = 100 mm -- die Achsen
+    35 + 10 + 10 = 55 mm vom Rand, dazwischen 190 mm: zwei Felder zu 95 mm,
+    drei Stäbe.
+    """
+
+    def test_das_beispiel_des_plans(self):
+        teile = vorlagen.vorlage("rechteck").bauen()
+        unten = teile.stablinien[0]
+        self.assertEqual((unten["von"], unten["bis"]), ((55.0, 55.0), (245.0, 55.0)))
+        self.assertEqual((unten["art"], unten["teilung"], unten["durchmesser"]),
+                         ("teilung", 100.0, 20.0))
+        self.assertEqual(teile.lagen, {"unten": "3 Stäbe, Abstand 95 mm",
+                                       "oben": "2 Stäbe, Abstand 198 mm"})
+        self.assertEqual([s["lage"] for s in teile.stabmitten[:3]],
+                         [(55.0, 55.0), (150.0, 55.0), (245.0, 55.0)])
+
+    def test_eingesetzt_zaehlt_die_zeichnung_dieselben_staebe(self):
+        """Die Lage wird eine Stablinie mit Teilung, gerundet wie jede gezeichnete."""
+        p, a, _ = eingesetzt("rechteck")
+        linie = zeichengeometrie.geometrie(a, p)["linien"][0]
+        self.assertEqual((linie["gewaehlt"], linie["teilung"], linie["felder"]), (100.0, 95.0, 2))
+        self.assertEqual(linie["punkte"], [[55.0, 55.0], [150.0, 55.0], [245.0, 55.0]])
+
+    def test_ohne_schubwaende_bis_zum_stab(self):
+        """Ohne Bügel liegt die Achse c_nom + ⌀/2 = 45 mm vom Rand: 210 mm, zwei Felder zu 105."""
+        teile = vorlagen.vorlage("rechteck").bauen(schubwaende=False)
+        self.assertEqual(teile.stablinien[0]["von"], (45.0, 45.0))
+        self.assertEqual(teile.lagen["unten"], "3 Stäbe, Abstand 105 mm")
+        self.assertEqual(teile.schubwaende, [])
+
+    def test_die_wand_mit_ihren_buegeln(self):
+        """
+        Die Wand endet auf der Höhe der Stabachsen und trägt die Bügel der
+        Vorlage -- ohne Bewehrung dort, wo sie läge. Bügel ⌀12: 35 + 12 + 10.
+        """
+        for bewehrung in (True, False):
+            with self.subTest(bewehrung=bewehrung):
+                _, a, _ = eingesetzt("rechteck", bewehrung=bewehrung,
+                                     masse={"d_b": 12.0, "s_b": 200.0})
+                (wand,) = a.schubwaende
+                self.assertEqual([(k.y, k.z) for k in a.knoten if k.kennung in (wand.von, wand.bis)],
+                                 [(150.0, 57.0), (150.0, 600.0 - 35 - 12 - 6)])
+                self.assertEqual((wand.dicke, wand.durchmesser, wand.teilung), (300.0, 12.0, 200.0))
+
+    def test_die_staebe_muessen_platz_haben(self):
+        """
+        Jeder Stab ganz im Querschnitt, nicht in einem Loch: ein Kasten mit
+        60 mm Wand hat für 35 + 10 + 16 mm keinen Platz, ein Flansch von
+        40 mm nicht für die Stäbe oben.
+        """
+        platz = "passen nicht in den Querschnitt – Überdeckung, Bügel oder Durchmesser sind zu gross."
+        for schluessel, masse, lage in (("rechteck", {"b": 100.0}, "unten"),
+                                        ("hohlkasten", {"t": 60.0}, "unten"),
+                                        ("tbalken", {"h_f": 40.0}, "oben"),
+                                        ("kreis", {"D": 80.0}, "am Rand")):
+            with self.subTest(vorlage=schluessel):
+                with self.assertRaisesRegex(ValueError, f"^Die Stäbe {lage} {platz}$"):
+                    vorlagen.vorlage(schluessel).bauen(masse)
+        with self.assertRaisesRegex(ValueError, "zu niedrig"):
+            vorlagen.vorlage("rechteck").bauen({"h": 100.0})
+        # Acht Stäbe ⌀16 auf einem Ring von 7 mm Radius: Sehne 5 mm.
+        with self.assertRaisesRegex(ValueError, "^Die Stäbe am Rand liegen ineinander – ihr "
+                                                "Abstand 5 mm ist kleiner als ihr Durchmesser 16 mm.$"):
+            vorlagen.vorlage("kreis").bauen({"D": 100.0})
+        # Ohne Bewehrung zählt nur die Form.
+        self.assertEqual(vorlagen.vorlage("hohlkasten").bauen({"t": 60.0}, bewehrung=False,
+                                                              schubwaende=False).lagen, {})
+
+    def test_im_trapez_quer_zur_schraegen_kante(self):
+        """Der äusserste Stab liegt c_nom + ⌀_b + ⌀/2 = 55 mm von der schrägen Kante, nicht waagrecht."""
+        teile = vorlagen.vorlage("trapez").bauen()
+        links = teile.stabmitten[0]["lage"]
+        kante = teile.polygone[0]["punkte"][3], teile.polygone[0]["punkte"][0]
+        self.assertAlmostEqual(geometrie.abstand_zur_strecke(links, *kante), 55.0)
+        self.assertAlmostEqual(links[1], 55.0)
+        # Die Wand so dick wie das Trapez an der engsten Stelle zwischen den Stäben.
+        self.assertAlmostEqual(teile.schubwaende[0]["dicke"], 300 + 100 * 55 / 600)
+
+    def test_der_aufbeton_aus_seinem_beton(self):
+        """Zwei Betone zur Wahl; ohne zweiten gilt der der Platte auch oben."""
+        p = projekt()
+        p.beton("C40/50")
+        a = p.querschnittsanalysen[0]
+        a.vorlage_einsetzen("aufbeton", material="b1", stahl="s1", stoffe={"aufbeton": "b2"},
+                            ursprung=(1000.0, 0.0))
+        self.assertEqual([f.material for f in a.flaechen[-2:]], ["b1", "b2"])
+        a.vorlage_einsetzen("aufbeton", material="b1", stahl="s1", ursprung=(3000.0, 0.0))
+        self.assertEqual([f.material for f in a.flaechen[-2:]], ["b1", "b1"])
+        # Die Stäbe oben liegen im Aufbeton, 35 + 5 = 40 mm unter seiner Oberkante.
+        teile = vorlagen.vorlage("aufbeton").bauen()
+        self.assertEqual(teile.stablinien[1]["von"], (40.0, 260.0))
+        self.assertEqual([x["stoff"] for x in teile.polygone], ["", "aufbeton"])
+
+    def test_der_katalog_der_lagen(self):
+        q = api.katalog()["querschnittsanalyse"]
+        rechteck = q["vorlagen"][0]
+        self.assertEqual([(l["schluessel"], l["name"], l["kurz"],
+                           [(m["schluessel"], m["heisst"], m["vorgabe"]) for m in l["masse"]])
+                          for l in rechteck["lagen"]],
+                         [("unten", "unten", ["⌀", "s"], [("d_u", "Durchmesser unten ⌀_u", 20.0),
+                                                          ("s_u", "Teilung unten s_u", 100.0)]),
+                          ("oben", "oben", ["⌀", "s"], [("d_o", "Durchmesser oben ⌀_o", 12.0),
+                                                        ("s_o", "Teilung oben s_o", 200.0)])])
+        self.assertEqual([(m["schluessel"], m["vorgabe"]) for m in q["buegel"]["masse"]],
+                         [("d_b", 10.0), ("s_b", 150.0)])
+        aufbeton = next(v for v in q["vorlagen"] if v["schluessel"] == "aufbeton")
+        self.assertEqual([(s["schluessel"], s["arten"]) for s in aufbeton["stoffe"]],
+                         [("aufbeton", ["beton"])])
+        # Die Skizze nach dem Dienst sagt, was aus jeder Lage wird.
+        d = dienst.bearbeite("vorlage", {"wahl": {"art": "rechteck"}}).daten
+        self.assertEqual(d["teile"]["lagen"]["unten"], "3 Stäbe, Abstand 95 mm")
+
+    def test_das_aufbeton_beispiel_rechnet(self):
+        """Eine Platte mit Aufbeton aus zwei Betonen rechnet wie jede Analyse."""
+        p, a, _ = eingesetzt("aufbeton")
+        p.beton("C40/50")
+        a.flaechen[1].material = "b2"
+        a.lastfall("Feld", M_y_Ed=100.0)
+        e = p.rechnen()
+        self.assertEqual(e.warnungen, [])
+        self.assertTrue(urteile(e, "biegung") or e.urteile_von("a1"))
 
 
 class TestLeereAnalyse(unittest.TestCase):

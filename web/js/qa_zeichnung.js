@@ -20,7 +20,8 @@
  *   Schubwand    eine Linie mit Dicke und Bügeln
  *   Hilfspunkt   ein Knoten ohne Element, zum Fangen
  *   Hilfslinie   eine Linie, die nicht mitrechnet
- *   Vorlage      Rechteck, T-Balken, Hohlkasten oder Kreis, an einem Punkt
+ *   Vorlage      Rechteck, T-Balken, Doppel-T, Trapez, Hohlkasten, Platte
+ *                mit Aufbeton oder Kreis, an einem Punkt
  *                eingesetzt (qa_vorlagen.js)
  *
  * In der Seitenleiste steht immer nur eine Art: beim Zeichnen die des

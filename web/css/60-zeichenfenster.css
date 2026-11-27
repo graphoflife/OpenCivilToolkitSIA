@@ -246,6 +246,18 @@
    länger als die der anderen Werkzeuge. */
 .cad-vorlage { display: flex; flex-direction: column; gap: 6px; }
 .cad-vorlage .cad-zeile { grid-template-columns: 112px minmax(0, auto) minmax(0, 1fr); }
+/* Zeilen, die ein Schalter sperrt -- die Lagen ohne Bewehrung, die Bügel
+   ohne Schubwände: ohne Rahmen wie die übrigen, gesperrt grau und ohne
+   Pfeile. */
+.cad-sperre { display: flex; flex-direction: column; gap: 6px; min-width: 0; margin: 0; padding: 0; border: 0; }
+.cad-sperre:disabled .cad-zeile > span:first-child,
+.cad-sperre:disabled .cad-lage > span { color: var(--schrift-zart); }
+.cad-sperre:disabled .zahlpfeile { display: none; }
+/* Eine Lage: ⌀ und s mit ihren Feldern auf einer Zeile, umgebrochen, wo
+   sie nicht passt; darunter, was aus ihr wird. */
+.cad-lage { display: flex; flex-wrap: wrap; align-items: center; gap: 3px 4px; }
+.cad-lage .zahlfeld { width: var(--zahlbreite-knapp); }
+.cad-stabzahl { grid-column: 2 / -1; }
 /* Zeilen, die sich zusammen neu bauen -- Drehung und Spiegeln eines
    Profils --, in der Seitenleiste wie jede andere Zeile. */
 .cad-gruppe { display: contents; }

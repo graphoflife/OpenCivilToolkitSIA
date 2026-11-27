@@ -1,5 +1,5 @@
 ---
-erzeugt: f0c60ee577d4
+erzeugt: cdfa5a288e2a
 art: modul
 tags: [modul]
 ---
@@ -676,6 +676,7 @@ Jeder Nachweis einmal laut – gebaut in [[opencivil.projekt.beispiele|.beispiel
 - [[opencivil.projekt.setzung]]
 - [[opencivil.projekt.skript]]
 - [[opencivil.querschnitt.platte]]
+- [[opencivil.querschnitt.vorlagen]]
 
 ## Gebraucht von
 

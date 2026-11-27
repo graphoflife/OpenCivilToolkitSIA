@@ -107,8 +107,11 @@ das Zeichenfenster -- verschoben wird dort aber nur, was gewählt ist: Wer
 die Bewehrungslinie verschiebt, nimmt die Wände nicht mit. Ein Klick wählt
 eine Ecke, wo mehrere aufeinander liegen, ein Rahmen alle. Eine Vorlage
 kommt dazu, wo man will:
-`u.vorlage_einsetzen("kreis", beton="b1", stahl="s1", masse={"D": 400},
-ursprung=(600, 0))` -- Rechteck, T-Balken, Hohlkasten oder Kreis.
+`u.vorlage_einsetzen("kreis", material="b1", stahl="s1", masse={"D": 400,
+"d": 20}, ursprung=(600, 0))` -- Rechteck, T-Balken, Doppel-T, Trapez,
+Hohlkasten, Platte mit Aufbeton oder Kreis. Die Bewehrung kommt je Lage
+mit Durchmesser und Teilung, etwa `"d_u": 20, "s_u": 100` unten, und hält
+die Überdeckung `"c_nom"` (Vorgabe 35 mm) bis zum äussersten Stab.
 
 Ein ebener Rahmen ebenso -- Koordinaten in m, x nach rechts, z nach oben:
 
@@ -278,7 +281,7 @@ Fertig und getestet (am 2026-11-21: 2145 Tests):
 | `querschnitt/interaktion` | der Dehnungsfächer für jede Form, schiefe Biegung, Widerstand in Momentenrichtung |
 | `querschnitt/schubwaende` | Querkraft und Torsion auf die Wände: Federn, Zellen, Bredt, Fachwerk, Längszugkraft |
 | `querschnitt/analyse` | die Querschnittsanalyse als Bauteil: Zeichnung, Werte, Werkstoffwahl |
-| `querschnitt/vorlagen` | Rechteck, T-Balken, Hohlkasten, Kreis zum Anfangen |
+| `querschnitt/vorlagen` | sieben Querschnitte zum Anfangen, die Bewehrung je Lage, das Rechteck der Skripte |
 | `stabwerk/matrix` | Gleichungslöser im Profil (LDLᵀ), Nummerierung nach Cuthill-McKee, die freie Bewegung eines beweglichen Systems |
 | `stabwerk/stab`, `modell` | der ebene Stab: Steifigkeit, Drehung, Bettung, arbeitsgleiche Lasten; das Stabwerk in SI |
 | `stabwerk/system` | das ganze System: Unbekannte, Gelenke, Federn, Linienlager, Knoten auf Stäben, Kombinationen, Lagerkräfte, Gleichgewichtsprobe |
@@ -476,8 +479,9 @@ ein Knopf mit Zeichen:
 * *Schubwand* W -- eine Wand mit Bügeln;
 * *Hilfspunkt* K und *Hilfslinie* H -- zum Konstruieren, sie rechnen nicht
   mit; geschlossene Hilfslinien werden auf Wunsch eine Fläche;
-* *Vorlage* T -- Rechteck, T-Balken, Hohlkasten oder Kreis samt Bewehrung,
-  an einem Punkt eingesetzt.
+* *Vorlage* T -- Rechteck, T-Balken, Doppel-T, Trapez, Hohlkasten, Platte
+  mit Aufbeton oder Kreis, an einem Punkt eingesetzt; die Bewehrung je Lage
+  mit Durchmesser und Teilung, «→ 3 Stäbe, Abstand 95 mm» darunter.
 
 Ein Polygon kann eine Überdeckung c tragen. Dann steht es grün gepunktet so
 weit nach innen gerückt da -- eine Aussparung nach aussen --, und an seinen

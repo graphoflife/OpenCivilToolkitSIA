@@ -10,6 +10,7 @@ from opencivil.projekt import (
     Projekt, ProjektFehler, QALastfallEintrag, QuerschnittsanalyseEintrag,
 )
 from opencivil.projekt.lesen import inhalt_pruefen
+from opencivil.querschnitt.vorlagen import rechteck_der_skripte
 from opencivil.web import api
 from tests.unfertig import meldung
 
@@ -18,10 +19,10 @@ def balken() -> QuerschnittsanalyseEintrag:
     """
     Das Rechteck 300 × 600 mm mit drei Stäben unten und zwei oben und ein
     Feldmoment -- bis 2026-10-19 die neue Analyse der Oberfläche; die beginnt
-    jetzt leer.
+    jetzt leer. Das Rechteck der Skripte, wie die Vorlage bis 2026-11-27.
     """
     a = QuerschnittsanalyseEintrag.neu("a1", "Balken")
-    a.vorlage_einsetzen("rechteck", material="b1", stahl="s1", schubwaende=False)
+    a.teile_einsetzen(rechteck_der_skripte(), material="b1", stahl="s1")
     a.lastfall("Tragsicherheit 1", M_y_Ed=100.0)
     return a
 

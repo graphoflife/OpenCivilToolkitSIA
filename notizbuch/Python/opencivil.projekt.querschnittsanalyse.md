@@ -1,5 +1,5 @@
 ---
-erzeugt: d97947f7c452
+erzeugt: e89b4252180d
 art: modul
 tags: [modul]
 ---
@@ -517,19 +517,29 @@ Wo ein Knoten liegt, in mm – `None`, wenn es ihn nicht gibt.
 #### QuerschnittsanalyseEintrag.vorlage_einsetzen
 
 ```python
-def vorlage_einsetzen(self, schluessel: str, *, material: str, stahl: str, masse: Optional[Mapping[str, float]]=None, randabstand: float=vorlagen.RANDABSTAND.vorgabe, bewehrung: bool=True, schubwaende: bool=True, ursprung: Tuple[float, float]=(0.0, 0.0)) -> List[str]
+def vorlage_einsetzen(self, schluessel: str, *, material: str, stahl: str, masse: Optional[Mapping[str, float]]=None, bewehrung: bool=True, schubwaende: bool=True, stoffe: Optional[Mapping[str, str]]=None, ursprung: Tuple[float, float]=(0.0, 0.0)) -> List[str]
 ```
 
-Setzt eine Vorlage ein ([[opencivil.querschnitt.vorlagen]]) – dazu,
-nicht anstatt: was schon gezeichnet ist, bleibt, und wo ein Punkt der
-Vorlage genau auf einem Knoten liegt, haengt sie an ihm. `ursprung`
-ist, wohin ihre Ecke unten links kommt; die Lagen auf einen
-Millionstel Millimeter wie im Zeichenfenster, damit die Summe keinen
-Rundungsrest behaelt. Gibt die Kennungen der neuen Elemente zurueck.
-Passen die Masse nicht zueinander, ein `ValueError` mit dem Grund.
-`material` ist das der Flaechen – Beton, Baustahl oder Holz –,
-`stahl` der der Bewehrung; bis 2026-11-26 hiess `material`
-`beton`.
+Setzt eine Vorlage ein ([[opencivil.querschnitt.vorlagen]]) mit
+ihren `masse` – auch Ueberdeckung, Lagen und Buegel; was fehlt,
+nach Vorgabe. Passen die Masse nicht zueinander, ein `ValueError`
+mit dem Grund. Eingesetzt wird wie mit [[opencivil.projekt.querschnittsanalyse#QuerschnittsanalyseEintrag.teile_einsetzen|teile_einsetzen]].
+
+#### QuerschnittsanalyseEintrag.teile_einsetzen
+
+```python
+def teile_einsetzen(self, teile: vorlagen.Teile, *, material: str, stahl: str, stoffe: Optional[Mapping[str, str]]=None, ursprung: Tuple[float, float]=(0.0, 0.0)) -> List[str]
+```
+
+Setzt die Teile einer Vorlage ein – dazu, nicht anstatt: was schon
+gezeichnet ist, bleibt, und wo ein Punkt genau auf einem Knoten
+liegt, haengen sie an ihm. `ursprung` ist, wohin ihre Ecke unten
+links kommt; die Lagen auf einen Millionstel Millimeter wie im
+Zeichenfenster, damit die Summe keinen Rundungsrest behaelt. Gibt
+die Kennungen der neuen Elemente zurueck. `material` ist das der
+Flaechen – Beton, Baustahl oder Holz –, `stoffe` je zweites
+Material das seine, sonst auch `material` (der Aufbeton einer
+Platte); `stahl` ist der der Bewehrung.
 
 #### QuerschnittsanalyseEintrag.fallnamen
 
