@@ -1,5 +1,5 @@
 ---
-erzeugt: 6d1feb8f572c
+erzeugt: 6d1e16ecf81e
 art: modul
 tags: [modul]
 ---
@@ -174,7 +174,8 @@ Je Länge der Leisten -- Anker je Leiste -- wie viele es sind; die längsten zue
 def name(self) -> str
 ```
 
-Wie das System ihn nennt: «12 × ancoPLUS DA3-0215», «12 × 3 Bügelschenkel ⌀10».
+Wie das System ihn nennt: «12 × ancoPLUS DA3-0215», «12 × HDB ⌀14 mit
+3 Ankern», «12 × 3 Bügelschenkel ⌀10».
 
 ### anrechenbar
 

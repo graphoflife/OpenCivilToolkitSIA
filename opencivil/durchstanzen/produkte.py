@@ -18,6 +18,13 @@ Fernández Ruiz von 2007 für die erhöhte Obergrenze 3·k_r festgelegt
 SIA 262:2025 war nicht lesbar; die Regeln gelten darum **nach Vorgabe,
 nicht nachgeschlagen**.
 
+HALFEN HDB (Leviat):
+Doppelkopfanker aus Betonstahl B500 auf einer Montageleiste, mit den
+Durchmessern 12, 14, 16, 20 und 25 mm (Produktinformation Technik 09/2026,
+S. 4–5). Den Faktor 3.5 anstelle der 2 in Gleichung (70) nennt die
+Unterlage nach einem Gutachten, das nicht vorliegt; Abstände und Höhen
+nennt sie nicht. Wie das Werkzeug HDB darum anordnet, sagt :mod:`.systeme`.
+
 ZEUS (AncoTech AG):
 Stahlpilze aus Stahlprofilen, als einfaches Kreuz, Doppelkreuz oder H-Kreuz,
 s × s im Grundriss, Höhe h. Aus der Preisliste 12.2018 (S. 8–9). Profile,
@@ -38,6 +45,7 @@ from typing import Optional, Tuple
 QUELLE_ANCOPLUS = ("AncoTech, Gutachten Muttoni / Fernández Ruiz 2007 (07-A05-R1c) und "
                    "Preisliste ancoPLUS")
 QUELLE_ZEUS = "AncoTech, Preisliste ZEUS 12.2018"
+QUELLE_HDB = "Leviat, Produktinformation Technik Halfen HDB, 09/2026"
 
 
 @dataclass(frozen=True)
@@ -105,6 +113,14 @@ KLEINSTES_D = 0.160
 K_SYS_HOCH = 3.0
 K_SYS_NORM = 2.0
 GRENZE = 3.5
+
+#: Die Durchmesser von HALFEN HDB in mm, dünnste zuerst (Produktinformation, S. 5).
+HDB_DURCHMESSER: Tuple[float, ...] = (12, 14, 16, 20, 25)
+
+#: Der Faktor anstelle der 2 in Gleichung (70), den die Produktinformation
+#: für HDB nennt (S. 4). Er gilt mit den Regeln eines Gutachtens, das nicht
+#: vorliegt; gerechnet wird darum mit der 2 (:class:`.systeme.HalfenHdb`).
+HDB_FAKTOR = 3.5
 
 #: Die Höhen h_A enden auf 5 mm, in Schritten von 10 mm (Preisliste).
 HOEHENSCHRITT = 0.010

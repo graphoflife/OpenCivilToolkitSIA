@@ -3,8 +3,8 @@ opencivil/durchstanzen/mit_bewehrung.py -- der Nachweis mit Durchstanzbewehrung 
 
 VERANTWORTUNG:
 Was der Durchstanznachweis tut, wenn der Beton allein nicht reicht: die
-kleinste Bewehrung des gewählten Systems suchen -- ancoPLUS oder Bügel
-(:mod:`.systeme`, :func:`.bewehrung.bemessen`) -- und mit ihr die drei
+kleinste Bewehrung des gewählten Systems suchen -- ancoPLUS, HALFEN HDB
+oder Bügel (:mod:`.systeme`, :func:`.bewehrung.bemessen`) -- und mit ihr die drei
 Nachweise nach SIA 262:2025, 4.3.6.5.1, schreiben -- den ersten geteilt in
 den Beitrag der Bewehrung (66), (68), (69) und das Verformungsvermögen (67),
 dazu die erste Betondruckdiagonale (70) und ausserhalb der Bewehrung
@@ -17,7 +17,7 @@ in (67) und (69) gilt seine Fliessgrenze, nicht die der Biegebewehrung
 (4.3.6.5.4). Liegt ihre Verankerung auf der Druckseite tiefer als d_v/6,
 tragen (68) und (70) 30 % weniger (5.5.3.11). k_sys ist der Faktor des
 Systems anstelle der 2 in (70) (:meth:`.systeme.System.k_sys`): bei ancoPLUS
-aus dem Gutachten, wie 4.3.6.5.9 es zulässt, bei Bügeln die 2 selbst.
+aus dem Gutachten, wie 4.3.6.5.9 es zulässt, bei HDB und Bügeln die 2 selbst.
 
 IM ÄUSSEREN SCHNITT:
 d_v,out reicht von der Zugbewehrung bis zur Verankerung der Anker auf der

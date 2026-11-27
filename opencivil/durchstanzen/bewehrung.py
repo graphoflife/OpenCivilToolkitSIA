@@ -215,7 +215,10 @@ class Vorschlag:
 
     @property
     def name(self) -> str:
-        """Wie das System ihn nennt: «12 × ancoPLUS DA3-0215», «12 × 3 Bügelschenkel ⌀10»."""
+        """
+        Wie das System ihn nennt: «12 × ancoPLUS DA3-0215», «12 × HDB ⌀14 mit
+        3 Ankern», «12 × 3 Bügelschenkel ⌀10».
+        """
         return self.system.name(self)
 
 

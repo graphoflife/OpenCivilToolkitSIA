@@ -86,7 +86,10 @@ class DurchstanzEintrag(BauteilEintrag):
     """
 
     system: Durchstanzsystem = Durchstanzsystem.ANCOPLUS
-    """Woraus die Durchstanzbewehrung besteht, wo es eine braucht: ancoPLUS oder Bügel."""
+    """
+    Woraus die Durchstanzbewehrung besteht, wo es eine braucht: ancoPLUS,
+    HALFEN HDB oder Bügel.
+    """
 
     D_max: float = bereich(32.0, heisst="Grösstkorn D_max", einheit=MM, ueber=0.0)
 

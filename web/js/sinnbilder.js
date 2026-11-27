@@ -207,11 +207,17 @@ const ZEICHEN = {
       'M17.5 7v4.5 M15.9 7h3.2 M15.9 11.5h3.2'],
     flaechen: ['M3 14h5v7.5H3z'],
   },
-  // Woraus die Durchstanzbewehrung besteht: Doppelkopfanker, oder ein Bügel
-  // um vier Stäbe der Biegebewehrung, im Schnitt.
+  // Woraus die Durchstanzbewehrung besteht: Doppelkopfanker -- bei HDB mit
+  // der Montageleiste unter den Köpfen, wie er auf der Schalung steht --,
+  // oder ein Bügel um vier Stäbe der Biegebewehrung, im Schnitt.
   'system-ancoplus': {
     pfade: ['M8 6v12 M16 6v12'],
     flaechen: ['M5 4h6v2.2H5z M5 17.8h6V20H5z M13 4h6v2.2h-6z M13 17.8h6V20h-6z'],
+  },
+  'system-hdb': {
+    pfade: ['M8 5v11 M16 5v11'],
+    flaechen: ['M5 3h6v2.2H5z M5 15.8h6V18H5z M13 3h6v2.2h-6z M13 15.8h6V18h-6z',
+      'M2.5 18h19v2.2h-19z'],
   },
   'system-buegel': {
     pfade: ['M8.5 4h7a2.5 2.5 0 0 1 2.5 2.5v11a2.5 2.5 0 0 1-2.5 2.5h-7A2.5 2.5 0 0 1 6 17.5v-11A2.5 2.5 0 0 1 8.5 4z'],

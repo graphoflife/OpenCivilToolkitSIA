@@ -14,7 +14,7 @@
  *       Biegebewehrung     ⌀ und Abstand je Richtung, welche Lage aussen liegt
  *       Plattenrotation    Näherungsstufe; Spannweiten oder r_s und m_sd
  *       Einwirkung         V_d, die Flächenlast im Schnitt, k_e
- *       Durchstanzbewehrung  das System -- ancoPLUS oder Bügel -- und c_v;
+ *       Durchstanzbewehrung  das System -- ancoPLUS, HALFEN HDB oder Bügel -- und c_v;
  *                        bemessen wird sie vom Werkzeug
  *
  * Gerechnet wird nichts: Nachweisschnitt, Rotation und Widerstand stehen
@@ -86,6 +86,8 @@ const HILFE = {
   durchstanzbewehrung: {
     zeilen: [
       ['ancoPLUS', 'Doppelkopfanker auf Leisten; Typen, Höhen und Abstände nach dem Hersteller'],
+      ['HALFEN HDB', 'Doppelkopfanker auf Leisten; Durchmesser nach dem Hersteller, Abstände '
+        + 'nach Tabelle 21 wie bei Bügeln – in (70) die 2 der Norm, nicht die 3.5 des Herstellers'],
       ['Bügel', 'senkrechte Bügel um die Biegebewehrung; Durchmesser und Abstände nach Tabelle 21'],
       ['c_v', 'von der Oberfläche der Druckseite bis zum Kopf des Ankers oder zur Biegung des Bügels'],
       ['Bemessung', 'Durchmesser, Anzahl und Abstände wählt das Werkzeug selbst, wo es '

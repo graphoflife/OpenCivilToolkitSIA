@@ -1,5 +1,5 @@
 ---
-erzeugt: 7b111d1e32fe
+erzeugt: 2b284023ca50
 art: modul
 tags: [modul]
 ---
@@ -26,6 +26,15 @@ Fernández Ruiz von 2007 für die erhöhte Obergrenze 3·k_r festgelegt
 (Bericht 07-A05-R1c, zu SIA 262:2003, S. 5–6). Ein neueres Gutachten zu
 SIA 262:2025 war nicht lesbar; die Regeln gelten darum **nach Vorgabe,
 nicht nachgeschlagen**.
+
+
+## HALFEN HDB (Leviat)
+
+Doppelkopfanker aus Betonstahl B500 auf einer Montageleiste, mit den
+Durchmessern 12, 14, 16, 20 und 25 mm (Produktinformation Technik 09/2026,
+S. 4–5). Den Faktor 3.5 anstelle der 2 in Gleichung (70) nennt die
+Unterlage nach einem Gutachten, das nicht vorliegt; Abstände und Höhen
+nennt sie nicht. Wie das Werkzeug HDB darum anordnet, sagt [[opencivil.durchstanzen.systeme|.systeme]].
 
 
 ## ZEUS (AncoTech AG)
@@ -159,6 +168,7 @@ umschliessen die gestützte Fläche ausserhalb des Pilzes
 
 - `QUELLE_ANCOPLUS = 'AncoTech, Gutachten Muttoni / Fernández Ruiz 2007 (07-A05-R1c) und P…` – Woher die Regeln von ancoPLUS stammen -- so steht es in der Herleitung.
 - `QUELLE_ZEUS = 'AncoTech, Preisliste ZEUS 12.2018'`
+- `QUELLE_HDB = 'Leviat, Produktinformation Technik Halfen HDB, 09/2026'`
 - `ANKERTYPEN = (Element(0.01, 0.125, 0.295, 'X'), Element(0.012, 0.125, 0.315, 'A'),…` – Die Typen von ancoPLUS mit ihren Höhen h_A (Preisliste ancoPLUS, S. 6). Bei 22, 25 und 28 mm nennt die Liste mehrere Buchstaben und für 25/28 auch 26/30 mm; genommen ist der erste Buchstabe und der kleinere Durchmesser.
 - `ANKER_JE_LEISTE = range(2, 10)` – So viele Anker trägt eine Leiste -- nur ganze Elemente sind lieferbar.
 - `ABSTAND_ERSTER = 0.375` – Die Abstände der Typen «D…», in Vielfachen von d (siehe Dateikopf): vom Rand der Stütze zum ersten Anker, bis zum dritten, danach.
@@ -170,6 +180,8 @@ umschliessen die gestützte Fläche ausserhalb des Pilzes
 - `K_SYS_HOCH = 3.0` – Der Faktor des Gutachtens anstelle der 2 in Gleichung (70); die Obergrenze 3.5 bleibt. Für Innenstützen, Wandenden und einspringende Ecken 3·k_r, wenn die Köpfe auf der Druckseite höchstens d/10 tief liegen; bei d/6 gilt wieder 2·k_r, dazwischen linear (Gutachten 2007, S. 5–7). Für Rand- und Eckstützen 2.0 wie in der Norm -- die Software von 2026 nennt dort 3.0, ein Gutachten dazu war nicht lesbar.
 - `K_SYS_NORM = 2.0`
 - `GRENZE = 3.5`
+- `HDB_DURCHMESSER = (12, 14, 16, 20, 25)` – Die Durchmesser von HALFEN HDB in mm, dünnste zuerst (Produktinformation, S. 5).
+- `HDB_FAKTOR = 3.5` – Der Faktor anstelle der 2 in Gleichung (70), den die Produktinformation für HDB nennt (S. 4). Er gilt mit den Regeln eines Gutachtens, das nicht vorliegt; gerechnet wird darum mit der 2 ([[opencivil.durchstanzen.systeme#HalfenHdb|.systeme.HalfenHdb]]).
 - `HOEHENSCHRITT = 0.01` – Die Höhen h_A enden auf 5 mm, in Schritten von 10 mm (Preisliste).
 - `STAHL = 'B500B'` – Der Stahl der Anker (Herstellerangabe, nach Vorgabe, nicht nachgeschlagen). In (67) und (69) gilt seine Fliessgrenze, nicht die der Biegebewehrung (SIA 262:2025, 4.3.6.5.4).
 - `STAHLPILZE = tuple(sorted(_pilze('Kreuz', 470, (100, 120)) + _pilze('Kreuz', 530, …` – Die ZEUS-Pilze der Preisliste, kleinste zuerst. Die Sondertypen (Rechteck) und der Doppelkreuz ohne g sind weggelassen.

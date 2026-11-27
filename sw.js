@@ -91,7 +91,7 @@ const VORRAT = {
     "web/js/ds_ansicht.js?v=126bc2761415",
     "web/js/ds_grundriss.js?v=4f1f43cfdf19",
     "web/js/ds_zeichnung.js?v=232bf46b0015",
-    "web/js/durchstanzen.js?v=a2d5701aa26b",
+    "web/js/durchstanzen.js?v=c7c418f6d86c",
     "web/js/eb_verlauf.js?v=62b2741794a7",
     "web/js/eb_zeichnung.js?v=7899548ed1e6",
     "web/js/editor.js?v=97f3abad7a0d",
@@ -143,14 +143,14 @@ const VORRAT = {
     "web/js/qa_zeichnung.js?v=54fa8f508da2",
     "web/js/querschnittsanalyse.js?v=7549c1cd6c9c",
     "web/js/setzung.js?v=21db1c68db33",
-    "web/js/sinnbilder.js?v=064aa45de45e",
+    "web/js/sinnbilder.js?v=61249c22ce06",
     "web/js/spannungsbild.js?v=5bf6ce4eb080",
     "web/js/sz_zeichnung.js?v=8ce828560c47",
     "web/js/variablen.js?v=7d43b6f38cd9",
     "web/js/zeichnen.js?v=da6e8eec5dc8",
     "web/js/zustand.js?v=3385a39c0f84",
-    "web/kern/notizbuch.json?v=db2bd57a8cfc",
-    "web/kern/quellen.json?v=3b4c100f9e60"
+    "web/kern/notizbuch.json?v=a91a81350d50",
+    "web/kern/quellen.json?v=0becd8753998"
   ],
   "fremd": {
     "web/vendor/jetbrains-mono/": {

@@ -7,6 +7,44 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-27 · Durchstanzen: HALFEN HDB
+
+Aus dem Plan vom 2026-11-25, Schritt 8, letzter Teil. Der Benutzer hat am
+2026-11-27 erlaubt, die Unterlage von Leviat zu holen: die
+«Produktinformation Technik» zur Durchstanzbewehrung (09/2026, 12 Seiten).
+
+**Vorher und nachher.** Innenstütze 400 × 400 mm, Platte 280 mm aus
+C30/37, V_d = 800 kN. Vorher gab es zur Wahl ancoPLUS oder Bügel. Nachher
+steht im Schalter [ancoPLUS | HALFEN HDB | Bügel]. Mit HDB schlägt das
+Werkzeug 16 Leisten mit je 4 Ankern ⌀12 vor, 85 / 145 / 175 / 175 mm vom
+Rand der Stütze, h_A = 220 mm – angeordnet wie die Bügel, aber mit Ankern.
+Alle Nachweise sind erfüllt; die Druckdiagonale hält mit 2·k_r:
+V_Rd,max = 867 kN.
+
+**Was die Unterlage hergibt.** Wenig: Doppelkopfanker aus B500, die
+Durchmesser 12, 14, 16, 20 und 25 mm, und den Faktor 3.5 anstelle der 2
+in Gleichung (70), nach einem Gutachten von A. Kenel. Abstände, Höhen und
+Regeln für die Anordnung nennt sie nicht.
+
+**Warum die 2 und nicht 3.5.** Einen grösseren Faktor als die 2 lässt
+SIA 262:2025, 4.3.6.5.9, nur zu, wo Versuche die Sicherheit zeigen – meist
+mit strengeren Regeln für die Anordnung, als die Norm sie stellt. Diese
+Regeln stünden im Gutachten, und es liegt nicht vor. Mit 3.5 und den
+Abständen der Norm rechnete das Werkzeug womöglich zu günstig. Darum stehen
+die Anker nach den Regeln der Norm (5.5.3.8, 5.5.3.9, 5.5.3.12, Tabelle
+21), und es gilt die 2; die Herleitung sagt, warum. Liegen die Regeln des
+Herstellers vor, ist das eine kleine Änderung (TODO).
+
+**Bügel und HDB teilen ihre Regeln.** Was die Norm vorgibt – die
+Abstände, die Grenze des Durchmessers, die 2 in (70) –, steht einmal, in
+`NachNorm` (`opencivil/durchstanzen/systeme.py`). Bügel und HDB
+unterscheiden sich in den Durchmessern, der Höhe, den Wörtern und dem Bild.
+Die Höhe der Anker ist der Platz zwischen den Überdeckungen, auf 5 mm
+abgerundet (nach Vorgabe, nicht nachgeschlagen).
+
+**Das Bild im Schalter.** Zwei Anker mit ihren Köpfen wie bei ancoPLUS,
+dazu die Montageleiste unter den Köpfen – so steht HDB auf der Schalung.
+
 ## 2026-11-27 · Vollstahl: Vierkant, Rund und Flach mit freien Massen
 
 Aus dem Plan vom 2026-11-25, Schritt 11d, zweiter Teil. Der Benutzer hat am

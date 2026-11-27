@@ -1199,9 +1199,18 @@ Norm dazu sagt.
       umfasst ein Bügel sie, liegt er um seinen Durchmesser näher an der
       Oberfläche. Die Höhe geht in keinen Widerstand ein, nur in Text und
       Bild.
-- [ ] **Durchstanzbewehrung HALFEN HDB.** Gewünscht am 2026-11-25. Wartet
-      auf dein Ja, die Unterlage von Leviat zu holen (Datei und Quelle nenne
-      ich vorher).
+- [ ] **Durchstanzbewehrung HALFEN HDB: der Faktor 3.5.** Eingebaut am
+      2026-11-27 nach der Produktinformation Technik von Leviat (09/2026):
+      Doppelkopfanker aus B500, ⌀12, 14, 16, 20 und 25. Die Unterlage nennt
+      in (70) den Faktor 3.5 anstelle der 2, nach einem Gutachten (Kenel),
+      das nicht vorliegt; ohne dessen Regeln für die Anordnung lässt
+      4.3.6.5.9 nicht mehr als die 2 zu. Nach Vorgabe, nicht nachgeschlagen:
+      die Anker stehen wie die Bügel nach der Norm (0.35·d_v, d_v, danach
+      s_1 nach Tabelle 21), die Durchmesser bis zur Grenze der Tabelle 21, in
+      (70) die 2, die Höhe h − c − c_v auf 5 mm abgerundet, der Stahl B500B.
+      Offen: das Gutachten oder eine technische Dokumentation mit Abständen
+      und Faktor – dann gälte 3.5 mit den Regeln des Herstellers. Holen nur
+      mit deinem Ja, Datei für Datei.
 - [ ] **Durchstanzbewehrung an Aussparungen.** Eingebaut: eine Leiste hält
       zur Aussparung die Überdeckung c_nom, wie zum Plattenrand (nach Vorgabe,
       nicht nachgeschlagen), und im Schatten einer Aussparung nach Figur 23d
@@ -1930,8 +1939,8 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
 
 - [ ] **Durchstanzen, nächste Schritte:** Stahlpilze an Rand und Ecke
       (der Katalog hat nur ganze Pilze); Durchstanzbewehrung an Wandende und
-      Wandecke; weitere Produkte (DURA-Körbe und S-Elemente, HDB, FIDECA --
-      Bügel gibt es seit 2026-11-26);
+      Wandecke; weitere Produkte (DURA-Körbe und S-Elemente, FIDECA – Bügel
+      gibt es seit 2026-11-26, HALFEN HDB seit 2026-11-27);
       Sicherung gegen Totaleinsturz (4.3.6.7).
 
 - [ ] **Balkensysteme, nächste Schritte:** Umhüllende der Kombinationen,

@@ -19,9 +19,9 @@ Die Durchstanzbewehrung hat ihren eigenen Stahl, den ihres Systems
 (SIA 262:2025, 4.3.6.5.4). Er steht als Baustoff neben der Stelle, mit dem
 Index «sw» an seinen Zeichen; alle Stellen mit demselben System teilen ihn.
 Bis 2026-11-14 rechneten die Anker mit dem Stahl der Biegebewehrung -- mit
-B700B um 40 % zu günstig. Welches System die Stelle nimmt, ancoPLUS oder
-Bügel, wählt der Benutzer (:class:`.systeme.Durchstanzsystem`); was c_v
-heisst, richtet sich danach.
+B700B um 40 % zu günstig. Welches System die Stelle nimmt, ancoPLUS, HALFEN
+HDB oder Bügel, wählt der Benutzer (:class:`.systeme.Durchstanzsystem`); was
+c_v heisst, richtet sich danach.
 
 DECKE UND BODENPLATTE:
 Bei einer Decke liegt die Zugbewehrung über der Stütze oben, bei einer

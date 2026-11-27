@@ -29,7 +29,8 @@ class TestRegeln(unittest.TestCase):
 
     def test_jede_stellung_hat_ihre_regeln(self):
         self.assertEqual(set(SYSTEME), set(Durchstanzsystem))
-        self.assertEqual([s.beschriftung for s in Durchstanzsystem], ["ancoPLUS", "Bügel"])
+        self.assertEqual([s.beschriftung for s in Durchstanzsystem],
+                         ["ancoPLUS", "HALFEN HDB", "Bügel"])
 
     def test_abstaende(self):
         """
@@ -138,6 +139,7 @@ class TestWahlDesSystems(unittest.TestCase):
         k = katalog()
         self.assertEqual(k["durchstanzen"]["systeme"], [
             {"wert": "ancoplus", "beschriftung": "ancoPLUS"},
+            {"wert": "hdb", "beschriftung": "HALFEN HDB"},
             {"wert": "buegel", "beschriftung": "Bügel"}])
         gruppe = next(g for g in k["vorgaben"]["durchstanz"] if g["titel"] == "Durchstanzbewehrung")
         self.assertEqual(gruppe["nach"], ["plattenart", "system"])
