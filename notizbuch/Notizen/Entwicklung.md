@@ -7,6 +7,36 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-27 · Oberfläche: kleinere App-Kacheln, kompakte Tabellen, das Handy
+
+Schritt 1 des Plans vom 2026-11-27: die Seite soll kleiner und kompakter
+werden, auch auf dem Handy.
+
+**App-Kacheln.** Vorher standen drei Kacheln in einer Reihe, vier Reihen,
+zusammen 396 px hoch. Nachher sind es vier je Reihe mit kleinerem Bild und
+der Zahl der Einträge in der Ecke, zusammen 202 px. Eine Kachel ist nur gut
+60 px breit; lange Namen brechen darum an weichen Trennstellen um
+(«Quer-schnitts-analyse», «Stahl-beton-Platten», «Grund-bruch»,
+«Mate-rialien»), und eine Reihe ist nur so hoch wie ihr längster Name.
+
+- Die Regeln stehen unter `.app-wahl`: `.kachel` aus `30-eingaben.css`
+  hat dieselbe Spezifität, wird später geladen und gewann sonst.
+- Nur die Kacheln der Apps werden kleiner. Die Kacheln in einer App, etwa
+  «Schichten» im Pfahl, zeigen einen Wert und bleiben, wie sie sind.
+
+**Handy.** Vorher rollte nur die Liste unter den Kacheln. Die Kacheln
+füllten den Bildschirm, und an die Liste kam man kaum. Nachher rollt die
+ganze linke Tafel samt Kacheln; `overscroll-behavior: contain` hält die
+Seite dahinter still. Das Auge der Nachweise bekommt auf dem Handy 34 px
+als Fingerziel wie die anderen kleinen Knöpfe.
+
+**Tabellen.** Nachweise und Kennzahlen teilen eine Tabelle. Vorher war eine
+Zeile 38 px hoch, mit Widerstand über Einwirkung 50 px. Nachher sind es 27
+und 41 px: Zeilenabstand 1.35, weniger Polsterung, das Auge 20 statt
+26 px. Die Striche sind hell (`--linie`, neu in `10-grundlage.css`), der
+Kopf hat 1 statt 2 px. Die Tabellen der Angaben (`table.gitter`) folgen.
+Ein dunkles Thema hat die Seite nicht; es gibt also nur eine Linienfarbe.
+
 ## 2026-11-27 · Knicken und Kippen: eine Zeile je Fall, ein Bild zu ψ
 
 Drei Wünsche des Benutzers zur Kachel «Knicken und Kippen nach SIA 263».

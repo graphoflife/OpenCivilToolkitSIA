@@ -22,7 +22,7 @@ export const ARTEN = [
     vorsilbe: 'q',
     /** Ihr Knopf links: das Zeichen (sinnbilder.js) und der Name, mit weichem Trennstrich. */
     zeichen: 'platte',
-    knopf: 'Stahlbeton-Platten',
+    knopf: 'Stahl\u00ADbeton-Platten',
     titel: 'Stahlbeton-Platten',
     /** Was über ihrem Editor steht. */
     bezeichnung: 'Stahlbeton-Platte',
@@ -36,7 +36,7 @@ export const ARTEN = [
     liste: 'querschnittsanalysen',
     vorsilbe: 'a',
     zeichen: 'analyse',
-    knopf: 'Querschnitts\u00ADanalyse',
+    knopf: 'Quer\u00ADschnitts\u00ADanalyse',
     titel: 'Querschnittsanalyse',
     bezeichnung: 'Querschnittsanalyse',
     einzahl: 'Querschnittsanalyse',
@@ -96,7 +96,7 @@ export const ARTEN = [
     liste: 'grundbrueche',
     vorsilbe: 'g',
     zeichen: 'grundbruch',
-    knopf: 'Grundbruch',
+    knopf: 'Grund\u00ADbruch',
     titel: 'Grundbruch',
     bezeichnung: 'Grundbruch und Gleiten',
     einzahl: 'Grundbruch',

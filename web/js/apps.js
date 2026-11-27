@@ -237,7 +237,7 @@ function mitHinweis(liste, editor, leer = () => false) {
  * (Benutzer, 2026-10-16) --, aber ob es eine Normsorte ist.
  */
 const MATERIAL = {
-  app: 'material', liste: 'materialien', knopf: 'Materialien', zeichen: 'material',
+  app: 'material', liste: 'materialien', knopf: 'Mate\u00ADrialien', zeichen: 'material',
   gruppen: (p) => Object.entries(katalog('materialarten'))
     .map(([art, { titel }]) => ({
       titel, leer: `kein ${titel}`, eintraege: p.materialien.filter((m) => m.art === art),

@@ -134,8 +134,10 @@
 
 .tabelle-titel { font-size: 12.5px; font-weight: 600; color: var(--schrift-matt); margin: 14px 0 4px; }
 table.gitter { border-collapse: collapse; font-size: 12.5px; }
-table.gitter th, table.gitter td { padding: 3px 10px; text-align: right; border-bottom: 1px solid var(--rand); }
-table.gitter th { font-weight: 600; color: var(--schrift-matt); border-bottom: 2px solid var(--rand-stark); }
+/* Kompakt, mit hellen Linien und einem Kopf von 1 px, wie die Nachweise
+   (Benutzer, 2026-11-27). */
+table.gitter th, table.gitter td { padding: 2px 10px; text-align: right; border-bottom: 1px solid var(--linie); }
+table.gitter th { font-weight: 600; color: var(--schrift-matt); border-bottom: 1px solid var(--rand-stark); }
 table.gitter td:first-child, table.gitter th:first-child { text-align: left; }
 .tabelle-huelle { overflow-x: auto; }
 
@@ -145,10 +147,13 @@ table.gitter td:first-child, table.gitter th:first-child { text-align: left; }
    wo ihr Inhalt es verlangt -- schmaler als die Zeilen, die nicht umbrechen,
    macht der Browser eine Tabelle nie; `min-width: max-content` braucht es
    dafür nicht (und machte sie in Chrome fünfmal so breit). Ist die Tafel
-   schmaler, rollt die Hülle. */
+   schmaler, rollt die Hülle. Eine Zeile ist 27 px hoch, mit Widerstand über
+   Einwirkung 41 px; das Auge misst 20 px, die Linien sind hell und der Kopf
+   hat 1 px (Benutzer, 2026-11-27; bis dahin 38 und 50 px, mit dunkleren
+   Linien und einem Kopf von 2 px). */
 .augen-tabelle {
   width: var(--tabellenbreite);
-  border-collapse: collapse; font-size: 12.5px;
+  border-collapse: collapse; font-size: 12.5px; line-height: 1.35;
 }
 .augen-tabelle .zeile { display: block; white-space: nowrap; }
 .augen-tabelle .links { text-align: left; }
@@ -157,9 +162,10 @@ table.gitter td:first-child, table.gitter th:first-child { text-align: left; }
 .augen-tabelle td.auge-zelle { width: 1%; padding: 0 4px; }
 .auge {
   display: inline-flex; align-items: center; justify-content: center;
-  width: 26px; height: 26px; padding: 0; border: 0; border-radius: 6px;
+  width: 20px; height: 20px; padding: 0; border: 0; border-radius: 5px;
   background: none; color: var(--schrift-zart); cursor: pointer;
 }
+.auge svg { width: 15px; height: 15px; }
 .auge:hover, .auge:focus-visible, .auge.ist-an {
   background: var(--blau-hell); color: var(--blau);
 }
@@ -174,11 +180,11 @@ table.gitter td:first-child, table.gitter th:first-child { text-align: left; }
 }
 .augen-tabelle th {
   font-size: 11px; text-transform: uppercase; letter-spacing: .4px;
-  color: var(--schrift-matt); text-align: right; padding: 5px 8px;
-  border-bottom: 2px solid var(--rand-stark);
+  color: var(--schrift-matt); text-align: right; padding: 4px 8px;
+  border-bottom: 1px solid var(--rand-stark);
 }
 .augen-tabelle th:first-child { text-align: left; }
-.augen-tabelle td { padding: 6px 8px; border-bottom: 1px solid var(--rand); text-align: right; }
+.augen-tabelle td { padding: 3px 8px; border-bottom: 1px solid var(--linie); text-align: right; }
 .augen-tabelle td:first-child { text-align: left; font-weight: 500; }
 .augen-tabelle td.zahl { font-variant-numeric: tabular-nums; }
 .augen-tabelle tr.ist-gut td:first-child      { box-shadow: inset 4px 0 0 var(--gut); }

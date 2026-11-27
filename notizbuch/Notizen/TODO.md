@@ -5,6 +5,22 @@ gelernt wurde, steht in [[Entwicklung]].
 
 ---
 
+## Fragen an den Benutzer – Plan vom 2026-11-27
+
+Der Benutzer will den Plan vom 2026-11-27 ganz abgearbeitet haben und die
+Fragen erst am Schluss mit Claude durchgehen (2026-11-27). Bis dahin
+sammeln sie sich hier, je mit dem, was vorläufig gebaut ist.
+
+- [ ] **Knicken und Kippen: die Spalten in den Kern?** Zeichen, Einheiten
+      und Titel der Felder stehen noch in `qa_stabilitaet.js`. Das
+      widerspricht «Felder, Gruppen und Zeichen einer Maske kommen aus dem
+      Kern». Vorschlag: mit Schritt 5, wo ohnehin Felder in den Kern
+      wandern. Vorläufig unverändert.
+- [ ] **App-Kacheln: kürzere Namen?** In den kleineren Kacheln braucht
+      «Querschnittsanalyse» drei Zeilen («Quer-schnitts-analyse»), die
+      anderen höchstens zwei. Vorschlag: so lassen, die Reihe ist nur so
+      hoch wie nötig. Sonst etwa «Querschnitt». Vorläufig mit Trennstellen.
+
 ## Wünsche vom 2026-11-20
 
 Sechzehn Wünsche des Benutzers, geplant am 2026-11-20: kleines Sichtbares

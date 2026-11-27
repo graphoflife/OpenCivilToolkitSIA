@@ -27,6 +27,9 @@
   --panel:        #eceff4;
   --rand:         #d6dce6;
   --rand-stark:   #b4becd;
+  /* Die Linie zwischen zwei Zeilen einer Tabelle: heller als ein Rand, sie
+     trennt nur (Benutzer, 2026-11-27). */
+  --linie:        #e6eaf0;
   --schrift:      #16202c;
   --schrift-matt: #56657a;
   --schrift-zart: #8895a8;

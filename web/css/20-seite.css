@@ -190,14 +190,31 @@ a.knopf { display: inline-block; text-decoration: none; }
 
 /* --------------------------------------------------------------- Baum -- */
 
-/* Die Apps: dieselben Knöpfe wie die Kapitel einer Platte. Sie rollen nicht
-   mit -- nur die Liste darunter. Die gewählte trägt den Rand der Auswahl. */
+/* Die Apps: dieselben Knöpfe wie die Kapitel einer Platte, nur kleiner --
+   vier je Reihe, auch in der schmalen linken Tafel (Benutzer, 2026-11-27;
+   bis dahin drei je Reihe, zusammen rund 400 px hoch). Ein langer Name
+   bricht an seinen weichen Trennstrichen um (arten.js, apps.js), die Zahl der
+   Einträge steht klein in der Ecke statt in einer eigenen Zeile. Jede Reihe
+   ist so hoch wie ihr längster Name -- anders als bei den Kapiteln: sonst
+   machte die «Quer-schnitts-analyse» alle drei Reihen dreizeilig. Sie rollen
+   nicht mit -- nur die Liste darunter, ausser auf dem Telefon (50-schmal.css).
+   Die gewählte trägt den Rand der Auswahl. Die Kapitel in einer App
+   behalten ihre Grösse: sie zeigen einen Wert. Die Regeln stehen unter
+   `.app-wahl`, damit sie die der Kapitel (30-eingaben.css, später geladen)
+   überstimmen. */
 .app-wahl {
   flex: none; padding: 10px 20px 2px 12px;
   border-bottom: 1px solid var(--rand);
   container-type: inline-size;
 }
-.app-wahl .kacheln { margin-bottom: 8px; }
+.app-wahl .kacheln {
+  grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: auto;
+  gap: 5px; margin-bottom: 8px;
+}
+.app-wahl .kachel { position: relative; min-height: 0; gap: 2px; padding: 7px 2px 5px; }
+.app-wahl .kachel .sinnbild { width: 18px; height: 18px; }
+.app-wahl .kachel-name { font-size: 10px; line-height: 1.15; }
+.app-wahl .kachel-stand { position: absolute; top: 2px; right: 4px; margin: 0; font-size: 9.5px; }
 .kachel.ist-gewaehlt { border-color: var(--blau); background: var(--blau-hell); }
 .kachel.ist-gewaehlt .sinnbild { color: var(--blau); }
 .kachel.ist-gewaehlt .kachel-stand { color: var(--blau-tief); }
