@@ -1,5 +1,5 @@
 ---
-erzeugt: 14d1ccfdf080
+erzeugt: a0ddc4eee297
 art: modul
 tags: [modul]
 ---
@@ -23,7 +23,7 @@ Die Spannungen sind elastisch, am Bruttoquerschnitt, wie die Werte der
 Analyse. y und z gelten als Hauptachsen, wie beim Stahl
 ([[opencivil.stahlbau.querschnitt]]): eine Biegung um y hat ihre
 Nulllinie waagrecht. Die Biegespannung je Achse ist die an der weitesten
-Faser -- beim Rechteck M/W; bei einem Querschnitt, dessen Fasern ungleich
+Faser – beim Rechteck M/W; bei einem Querschnitt, dessen Fasern ungleich
 weit vom Schwerpunkt liegen, auf der sicheren Seite (nach Vorgabe, nicht
 nachgeschlagen).
 
@@ -31,7 +31,7 @@ nachgeschlagen).
 ## SCHUB AUS QUERKRAFT
 
 `τ = V·S/(I·b)` nach Jourawski, auf dem Schnitt quer zur Querkraft, auf
-dem `S/b` am groessten ist -- gesucht zwischen je zwei Ecken auf
+dem `S/b` am groessten ist – gesucht zwischen je zwei Ecken auf
 [[opencivil.holzbau.querschnitt#Konstanten|TEILE]] Schnitten und im Schwerpunkt. Beim Rechteck ist das die
 Mitte, mit `τ = 1.5·V/A`.
 
@@ -67,7 +67,7 @@ Der Schnitt mit dem groessten `S/b`: `S` in mm³, `b` und `lage` in mm.
 def faktor(self) -> float
 ```
 
-`S/b` in mm² -- mal `V/I` gibt das `τ`.
+`S/b` in mm² – mal `V/I` gibt das `τ`.
 
 ### Holzquerschnitt
 
@@ -76,8 +76,8 @@ def faktor(self) -> float
 class Holzquerschnitt
 ```
 
-Die Polygone eines Holzquerschnitts, je mit ihrem Gewicht -- +1 mit Holz,
--1 fuer eine Aussparung darin --, und sein Schwerpunkt, in mm.
+Die Polygone eines Holzquerschnitts, je mit ihrem Gewicht – +1 mit Holz,
+-1 fuer eine Aussparung darin –, und sein Schwerpunkt, in mm.
 
 - `polygone: Tuple[Tuple[Tuple[Punkt, ...], float], ...]`
 - `y_S: float`
@@ -141,7 +141,7 @@ def schubschnitt(self, richtung: str) -> Optional[Schubschnitt]
 ```
 
 Der Schnitt quer zu einer Querkraft in `richtung` ("y" oder "z"),
-auf dem `S/b` am groessten ist -- `None`, wo keiner Holz trifft.
+auf dem `S/b` am groessten ist – `None`, wo keiner Holz trifft.
 
 #### Holzquerschnitt._schnitt
 
@@ -167,7 +167,7 @@ def k_2(verhaeltnis: float) -> float
 ```
 
 Der Beiwert `k_2` in `W_T = k_2·h·b²` eines Rechtecks mit
-`h/b = verhaeltnis ≥ 1` -- aus den Reihen von Saint-Venant fuer
+`h/b = verhaeltnis ≥ 1` – aus den Reihen von Saint-Venant fuer
 `I_T = β·h·b³` und die groesste Schubspannung, `τ = c·T·b/I_T`, in der
 Mitte der langen Seite: `k_2 = β/c`. 0.208 beim Quadrat, gegen 1/3 beim
 schmalen Rechteck.
@@ -186,7 +186,7 @@ Die Summe ueber die ungeraden `n`, bis ein Glied kleiner ist als [[opencivil.hol
 def _sech(x: float) -> float
 ```
 
-`1/cosh x` -- auch fuer grosse `x`, wo `cosh` ueberliefe.
+`1/cosh x` – auch fuer grosse `x`, wo `cosh` ueberliefe.
 
 ### starke_achse
 

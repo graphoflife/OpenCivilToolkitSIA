@@ -1,5 +1,5 @@
 ---
-erzeugt: 6ec445ece87f
+erzeugt: ad5b50115936
 art: modul
 tags: [modul]
 ---
@@ -18,10 +18,10 @@ Eigengewicht, und eine Prozedur, die das System rechnet
 [[opencivil.stabwerk.rechnung#Stabwerksrechnung|Stabwerksrechnung]].
 
 
-## STEIFIGKEIT -- NACH VORGABE, NICHT NACHGESCHLAGEN
+## STEIFIGKEIT – NACH VORGABE, NICHT NACHGESCHLAGEN
 
 Wie in der Ebene, die Torsion mit `G_cm` des Betons, `G_a` des
-Baustahls oder G von Hand -- am ungerissenen Querschnitt und nach St.
+Baustahls oder G von Hand – am ungerissenen Querschnitt und nach St.
 Venant, ohne Woelbkrafttorsion. Die Herleitung sagt es, das TODO fuehrt es.
 
 ## Inhalt

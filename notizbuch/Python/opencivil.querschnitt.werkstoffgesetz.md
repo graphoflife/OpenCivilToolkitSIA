@@ -1,5 +1,5 @@
 ---
-erzeugt: 805a7dcc7b96
+erzeugt: a935190f078a
 art: modul
 tags: [modul]
 ---
@@ -10,7 +10,7 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Jedes Werkstoffgesetz ist ein Objekt, das rechnet und sich selbst als Formel
-schreibt -- dieselben Werte, dieselben Aeste. Beton: die
+schreibt – dieselben Werte, dieselben Aeste. Beton: die
 Parabel-Rechteck-Beziehung (SIA 262:2025, 4.2.1.5 mit Figur 12, 4.2.1.6,
 [[opencivil.querschnitt.werkstoffgesetz#Betongesetz|Betongesetz]]), der Spannungsblock 0.85·x (4.2.1.5,
 [[opencivil.querschnitt.werkstoffgesetz#Spannungsblock|Spannungsblock]]) und ungerissen linear ([[opencivil.querschnitt.werkstoffgesetz#BetonUngerissen|BetonUngerissen]],
@@ -18,9 +18,9 @@ Parabel-Rechteck-Beziehung (SIA 262:2025, 4.2.1.5 mit Figur 12, 4.2.1.6,
 gestrichene Rechenart «elastisch» ([[opencivil.querschnitt.gesetzwahl]]).
 Betonstahl: bilinear, auf Zug und Druck getrennt begrenzt
 ([[opencivil.querschnitt.werkstoffgesetz#Stahlgesetz|Stahlgesetz]], 4.2.2.2 mit Figur 16), oder nur auf Zug. Baustahl:
-elastisch -- ideal plastisch, in Zug und Druck gleich
+elastisch – ideal plastisch, in Zug und Druck gleich
 ([[opencivil.querschnitt.werkstoffgesetz#Baustahlgesetz|Baustahlgesetz]], SIA 263:2013), mit einer Grenzdehnung nach Vorgabe.
-Spannstahl: elastisch -- ideal plastisch, nur auf Zug
+Spannstahl: elastisch – ideal plastisch, nur auf Zug
 ([[opencivil.querschnitt.werkstoffgesetz#Spannstahlgesetz|Spannstahlgesetz]], 4.2.3.3 mit Figur 17). Holz: linear bis zum
 Bruch ([[opencivil.querschnitt.werkstoffgesetz#Holzgesetz|Holzgesetz]], SIA 265:2012, 3.1.2.1), oder auf Druck
 elastisch-plastisch ([[opencivil.querschnitt.werkstoffgesetz#HolzPlastisch|HolzPlastisch]], 3.1.2.2).
@@ -34,7 +34,7 @@ gedrueckten Stahl stand in der Herleitung etwas anderes, als gerechnet wurde.
 
 Jedes Gesetz schreibt sich selbst ([[opencivil.querschnitt.werkstoffgesetz#Gesetz.protokoll|Gesetz.protokoll]]): als Formel mit
 den Zeichen der Werte, mit denen es rechnet, unter dem Namen seiner Seite im
-Notizbuch, und danach diese Werte. Die Werte bringt, wer schreibt -- je
+Notizbuch, und danach diese Werte. Die Werte bringt, wer schreibt – je
 Rolle ([[opencivil.querschnitt.werkstoffgesetz#Konstanten|Werte]]), denn wie ein Kennwert im Rechenwerk heisst, weiss die
 Platte anders als der gezeichnete Querschnitt. Bis 2026-10-17 schrieben fuenf
 Stellen die Gesetze an, jede mit eigener Weiche nach Art des Gesetzes.
@@ -44,10 +44,10 @@ Stellen die Gesetze an, jede mit eigener Weiche nach Art des Gesetzes.
 
 Null: eine Faser jenseits ihrer Bruchstauchung oder Bruchdehnung traegt
 nicht, und eine Suche bleibt im gueltigen Bereich. Auf der Grenze selbst
-gilt das Gesetz -- auch um eine Rundung darueber ([[opencivil.querschnitt.werkstoffgesetz#Konstanten|RUNDUNG]]): wer den
+gilt das Gesetz – auch um eine Rundung darueber ([[opencivil.querschnitt.werkstoffgesetz#Konstanten|RUNDUNG]]): wer den
 Rand abfaehrt, die genaue Resistenzlinie, legt eine Lage genau auf `eps_ud`,
 und die darf nicht an der letzten Stelle auf null kippen. Bis 2026-10-16
-hielt der Loeser die Grenze hart und die Linie gar nicht -- zwei Gesetze fuer
+hielt der Loeser die Grenze hart und die Linie gar nicht – zwei Gesetze fuer
 eines.
 
 
@@ -85,7 +85,7 @@ def anteil_punkt_c(eps_c1d: float, eps_c2d: float) -> float
 
 Wo der Punkt C liegt, als Anteil der Hoehe ab dem gedrueckten Rand:
 `1 - eps_c1d/eps_c2d`. Ist der ganze Querschnitt gedrueckt, laufen die
-Ebenen des Bruchs durch ihn, mit der Stauchung `-eps_c1d` -- der reine
+Ebenen des Bruchs durch ihn, mit der Stauchung `-eps_c1d` – der reine
 Druck endet darum bei `-eps_c1d`, nicht bei `-eps_c2d`. Bis
 2026-10-16 stand die Formel dreimal da: im Faecher der Platte, in ihren
 Grenzen und in der Interaktion des gezeichneten Querschnitts.
@@ -96,7 +96,7 @@ Grenzen und in der Interaktion des gezeichneten Querschnitts.
 def _gebaut(gesetz, funktion: Funktion) -> None
 ```
 
-Legt die Funktion an ein eingefrorenes Gesetz -- einmal, beim Bauen.
+Legt die Funktion an ein eingefrorenes Gesetz – einmal, beim Bauen.
 
 ### Gesetz
 
@@ -105,13 +105,13 @@ Legt die Funktion an ein eingefrorenes Gesetz -- einmal, beim Bauen.
 class Gesetz
 ```
 
-Was jedes Werkstoffgesetz ist: es rechnet -- `funktion`, einmal gebaut,
-mit blanken SI-Zahlen --, es heisst wie seine Seite im Notizbuch
+Was jedes Werkstoffgesetz ist: es rechnet – `funktion`, einmal gebaut,
+mit blanken SI-Zahlen –, es heisst wie seine Seite im Notizbuch
 ([[opencivil.querschnitt.werkstoffgesetz#Gesetz|NAME]]), und es schreibt sich selbst in eine Herleitung
 ([[opencivil.querschnitt.werkstoffgesetz#Gesetz.protokoll|protokoll]]). `mittel` hat nur ein Gesetz, das springt
 ([[opencivil.querschnitt.werkstoffgesetz#Spannungsblock.mittel|Spannungsblock.mittel]]).
 
-- `NAME: ClassVar[str] = ''` – Die Seite im Notizbuch -- gleich, wer das Gesetz unter welchem Titel aufschreibt.
+- `NAME: ClassVar[str] = ''` – Die Seite im Notizbuch – gleich, wer das Gesetz unter welchem Titel aufschreibt.
 - `WORT: ClassVar[str] = ''` – Wie ein Titel das Gesetz nennt: «Beton, Parabel-Rechteck».
 - `REFERENZ: ClassVar[str] = ''` – Die Normstelle, wo es eine hat.
 - `ROLLEN: ClassVar[Tuple[str, ...]] = ()` – Die Rollen seiner Werte ([[opencivil.querschnitt.werkstoffgesetz#Konstanten|Werte]]), in der Folge der Angabe.
@@ -126,7 +126,7 @@ mit blanken SI-Zahlen --, es heisst wie seine Seite im Notizbuch
 def fliessbereich(self) -> Optional[Tuple[float, float]]
 ```
 
-Zwischen welchen Dehnungen das Gesetz elastisch bleibt -- jenseits
+Zwischen welchen Dehnungen das Gesetz elastisch bleibt – jenseits
 fliesst es: beim Stahl `±f/E`, beim Holz, das auf Druck plastisch
 rechnet, `-f_c/E` bis ohne Grenze. `None` bei einem Gesetz, das
 nicht fliesst: der Beton ist von Anfang an nichtlinear, das lineare
@@ -179,16 +179,16 @@ sig = f_cd -----------------------      für 0 <= |eps| <= eps_c1d
 sig = f_cd                              für eps_c1d < |eps| <= eps_c2d
 ```
 
-Jenseits von `eps_c2d` null -- siehe Dateikopf.
+Jenseits von `eps_c2d` null – siehe Dateikopf.
 
 - `NAME = 'Parabel-Rechteck-Beziehung des Betons'`
 - `WORT = 'Beton, Parabel-Rechteck'`
 - `REFERENZ = 'SIA 262:2025, 4.2.1.5, Figur 12; 4.2.1.6, (27)'`
 - `ROLLEN = ('f_c', 'eps_c1d', 'eps_c2d')`
-- `f_cd: float` – Festigkeit in N/m^2 (positiver Betrag) -- je nach Werkstoffsatz `f_cd` oder `f_ck`.
+- `f_cd: float` – Festigkeit in N/m^2 (positiver Betrag) – je nach Werkstoffsatz `f_cd` oder `f_ck`.
 - `eps_c1d: float` – Dehnung am Ende des ansteigenden Astes (positiver Betrag).
 - `eps_c2d: float` – Bruchdehnung (positiver Betrag).
-- `k_sigma: float` – Gerechnet wird mit mindestens [[opencivil.querschnitt.werkstoffgesetz#Konstanten|K_SIGMA_MIN]] -- siehe dort.
+- `k_sigma: float` – Gerechnet wird mit mindestens [[opencivil.querschnitt.werkstoffgesetz#Konstanten|K_SIGMA_MIN]] – siehe dort.
 
 #### Betongesetz.mit_modul
 
@@ -197,7 +197,7 @@ Jenseits von `eps_c2d` null -- siehe Dateikopf.
 def mit_modul(cls, *, f_c: float, E_c: float, eps_c1d: float, eps_c2d: float) -> 'Betongesetz'
 ```
 
-Das Gesetz zum Modul `E_c` -- `k_sigma` aus [[opencivil.querschnitt.werkstoffgesetz#k_sigma|k_sigma]], die eine Stelle.
+Das Gesetz zum Modul `E_c` – `k_sigma` aus [[opencivil.querschnitt.werkstoffgesetz#k_sigma|k_sigma]], die eine Stelle.
 
 #### Betongesetz.formel
 
@@ -219,7 +219,7 @@ Vorab der Beiwert der Parabel, aus dem Modul `E_c` der Werte.
 def latex(self, f: str='f_{cd}') -> str
 ```
 
-Als Formel -- `f` ist das Zeichen der Festigkeit, `f_{ck}` bei charakteristischen Werten.
+Als Formel – `f` ist das Zeichen der Festigkeit, `f_{ck}` bei charakteristischen Werten.
 
 ### Spannungsblock
 
@@ -231,8 +231,8 @@ class Spannungsblock(Gesetz)
 Der vereinfachte, rechteckige Spannungsverlauf des Betons.
 
 Unterhalb von `(1 - 0.85) * eps_c2d` keine Spannung, darueber
-durchgehend `f_cd`. Liegt der gedrueckte Rand bei `eps_c2d` -- im
-Bruchzustand --, ist das genau der Block der Hoehe `0.85 x`, mit dem die
+durchgehend `f_cd`. Liegt der gedrueckte Rand bei `eps_c2d` – im
+Bruchzustand –, ist das genau der Block der Hoehe `0.85 x`, mit dem die
 Handrechnung rechnet. Als Gesetz gilt er auch dort, wo der Rand nicht bei
 `eps_c2d` liegt; so setzt ihn die Interaktionslinie des gezeichneten
 Querschnitts ein.
@@ -241,13 +241,13 @@ Der Block steht in SIA 262:2025, 4.2.1.5 mit Figur 12: ein Rechteck der
 Hoehe 0.85·x mit der Spannung f_cd. Die Schwelle `(1 - 0.85)·eps_c2d`
 bildet ihn nach, wo der Rand `eps_c2d` erreicht; dass sie auch bei
 kleinerer Randstauchung gilt (Rand bei 2 ‰: Block 0.74·x), ist eine
-Vorgabe -- die Norm regelt diesen Fall nicht.
+Vorgabe – die Norm regelt diesen Fall nicht.
 
 - `NAME = 'Spannungsblock des Betons'`
 - `WORT = f'Beton, Spannungsblock {BLOCKANTEIL}·x'`
 - `REFERENZ = 'SIA 262:2025, 4.2.1.5, Figur 12'`
 - `ROLLEN = ('f_c', 'eps_c2d')`
-- `f_cd: float` – Festigkeit des Blocks in N/m^2 (positiver Betrag) -- je nach Werkstoffsatz `f_cd` oder `f_ck`.
+- `f_cd: float` – Festigkeit des Blocks in N/m^2 (positiver Betrag) – je nach Werkstoffsatz `f_cd` oder `f_ck`.
 - `eps_c2d: float` – Bruchdehnung (positiver Betrag).
 
 #### Spannungsblock.eps_knick
@@ -266,12 +266,12 @@ def mittel(self, eps_a: float, eps_b: float) -> float
 ```
 
 Die mittlere Spannung, wenn die Dehnung linear von `eps_a` nach
-`eps_b` laeuft -- genau: `f_cd` mal der Anteil, der im Block liegt,
+`eps_b` laeuft – genau: `f_cd` mal der Anteil, der im Block liegt,
 zwischen dem Knick und `-eps_c2d`.
 
 Der Block springt. In der Mitte einer Faser gelesen, springt darum auch
-N, sobald eine Faser den Knick ueberschreitet -- am Kastentraeger um
-gut 20 kN --, und keine Ebene trifft N_Ed genau. Ueber die Faser
+N, sobald eine Faser den Knick ueberschreitet – am Kastentraeger um
+gut 20 kN –, und keine Ebene trifft N_Ed genau. Ueber die Faser
 gemittelt, waechst N stetig.
 
 #### Spannungsblock.formel
@@ -286,7 +286,7 @@ def formel(self, werte: Werte) -> str
 def latex(self, f: str='f_{cd}') -> str
 ```
 
-Als Formel -- `f` ist das Zeichen der Festigkeit, `f_{ck}` bei charakteristischen Werten.
+Als Formel – `f` ist das Zeichen der Festigkeit, `f_{ck}` bei charakteristischen Werten.
 
 ### Stahlgesetz
 
@@ -308,7 +308,7 @@ haben. Den Stahl, der gedrueckt nichts traegt, rechnet [[opencivil.querschnitt.w
 - `ROLLEN = ('f_s', 'f_s_druck', 'E_s', 'eps_ud')`
 - `WERTTITEL = 'Werte des Stahls'`
 - `E_s: float` – Elastizitaetsmodul in N/m^2.
-- `f_yd: float` – Fliessgrenze auf Zug in N/m^2 -- je nach Werkstoffsatz `f_yd` oder `f_yk`.
+- `f_yd: float` – Fliessgrenze auf Zug in N/m^2 – je nach Werkstoffsatz `f_yd` oder `f_yk`.
 - `f_yd_druck: float` – Fliessgrenze auf Druck in N/m^2 (positiver Betrag).
 - `eps_ud: float` – Grenzdehnung (positiver Betrag).
 
@@ -340,7 +340,7 @@ def formel(self, werte: Werte) -> str
 def latex(self, zug: str='f_{yd}', druck: str='f_{yd}^{-}') -> str
 ```
 
-Als Formel -- `zug` und `druck` sind die Zeichen der Plateaus.
+Als Formel – `zug` und `druck` sind die Zeichen der Plateaus.
 
 ### StahlNurZug
 
@@ -349,7 +349,7 @@ Als Formel -- `zug` und `druck` sind die Zeichen der Plateaus.
 class StahlNurZug(Stahlgesetz)
 ```
 
-Der Stahl der Handrechnung: gedrueckt traegt er nichts -- so laesst sie
+Der Stahl der Handrechnung: gedrueckt traegt er nichts – so laesst sie
 die Druckbewehrung weg. Er hat seine eigene Seite, keine Normstelle und
 kein Plateau auf Druck. Bis 2026-11-10 war er ein Schalter `nur_zug`
 am [[opencivil.querschnitt.werkstoffgesetz#Stahlgesetz|Stahlgesetz]], nach dem sechs Stellen fragten.
@@ -380,7 +380,7 @@ def formel(self, werte: Werte) -> str
 def latex(self, zug: str='f_{yd}', druck: str='') -> str
 ```
 
-Als Formel -- `zug` ist das Zeichen des Plateaus; ein Druckplateau gibt es nicht.
+Als Formel – `zug` ist das Zeichen des Plateaus; ein Druckplateau gibt es nicht.
 
 ### Baustahlgesetz
 
@@ -389,7 +389,7 @@ Als Formel -- `zug` ist das Zeichen des Plateaus; ein Druckplateau gibt es nicht
 class Baustahlgesetz(Stahlgesetz)
 ```
 
-Baustahl, elastisch -- ideal plastisch und in Zug und Druck gleich: mit
+Baustahl, elastisch – ideal plastisch und in Zug und Druck gleich: mit
 `E_a` bis zur Streckgrenze, dann waagrecht bis zur Grenzdehnung. SIA
 263:2013 nennt die Kennwerte (3.2.2.1, Tabelle 1) und den Bemessungswert
 (4.1.1), keine Linie; die Grenzdehnung ist nach Vorgabe, nicht
@@ -421,7 +421,7 @@ def formel(self, werte: Werte) -> str
 def latex(self, zug: str='f_{yd}', druck: str='') -> str
 ```
 
-Als Formel -- `zug` ist das Zeichen der Streckgrenze, auf Druck dieselbe.
+Als Formel – `zug` ist das Zeichen der Streckgrenze, auf Druck dieselbe.
 
 ### Profilblechgesetz
 
@@ -429,7 +429,7 @@ Als Formel -- `zug` ist das Zeichen der Streckgrenze, auf Druck dieselbe.
 class Profilblechgesetz(Baustahlgesetz)
 ```
 
-Profilblechstahl nach SIA 264:2014 wie der Baustahl: elastisch -- ideal
+Profilblechstahl nach SIA 264:2014 wie der Baustahl: elastisch – ideal
 plastisch, in Zug und Druck gleich, mit `f_ypd = f_yp/γ_ap` (4.1.3,
 (1)). Die Grenzdehnung ist nach Vorgabe, nicht nachgeschlagen
 ([[opencivil.material.profilblech]]).
@@ -446,9 +446,9 @@ class Spannstahlgesetz(Gesetz)
 ```
 
 Spannstahl nach SIA 262:2025, Figur 17: mit `E_p` bis zur Fliessgrenze,
-dann waagrecht bis `eps_ud` -- ohne die Verfestigung, die 4.2.3.6
+dann waagrecht bis `eps_ud` – ohne die Verfestigung, die 4.2.3.6
 zuliesse, ideal plastisch wie 4.2.3.5. Die Figur zeigt nur den Zug
-(4.2.3.3); gedrueckt traegt der Spannstahl hier nichts -- nach Vorgabe,
+(4.2.3.3); gedrueckt traegt der Spannstahl hier nichts – nach Vorgabe,
 nicht nachgeschlagen. Ein vorgespanntes Glied kommt dort nie hin: seine
 Vordehnung ist groesser als jede Stauchung des Betons.
 
@@ -461,7 +461,7 @@ Vordehnung ist groesser als jede Stauchung des Betons.
 - `ROLLEN = ('f_p', 'E_p', 'eps_ud')`
 - `WERTTITEL = 'Werte des Spannstahls'`
 - `E_p: float` – Elastizitaetsmodul in N/m^2.
-- `f_pd: float` – Fliessgrenze in N/m^2 -- je nach Werkstoffsatz `f_pd` oder `f_p0.1k`.
+- `f_pd: float` – Fliessgrenze in N/m^2 – je nach Werkstoffsatz `f_pd` oder `f_p0.1k`.
 - `eps_ud: float` – Bruchdehnung, positiv.
 
 #### Spannstahlgesetz.eps_pd
@@ -485,7 +485,7 @@ def formel(self, werte: Werte) -> str
 def latex(self, zug: str='f_{pd}') -> str
 ```
 
-Als Formel -- `zug` ist das Zeichen der Fliessgrenze.
+Als Formel – `zug` ist das Zeichen der Fliessgrenze.
 
 ### Holzgesetz
 
@@ -494,7 +494,7 @@ Als Formel -- `zug` ist das Zeichen der Fliessgrenze.
 class Holzgesetz(Gesetz)
 ```
 
-Holz nach SIA 265:2012, 3.1.2.1: linear bis zum Bruch -- auf Zug bis
+Holz nach SIA 265:2012, 3.1.2.1: linear bis zum Bruch – auf Zug bis
 `f_t`, auf Druck bis `f_c`, beides in Faserrichtung; jenseits traegt
 es nichts mehr. Die Werte sind Bemessungswerte der Tabellen 6 und 7.
 
@@ -596,7 +596,7 @@ def formel(self, werte: Werte) -> str
 def latex(self, f_t: str='f_{t,0,d}', f_c: str='f_{c,0,d}', E: str='E_{0,mean}', eps_cu: str='\\varepsilon_{cu}') -> str
 ```
 
-Als Formel -- wie [[opencivil.querschnitt.werkstoffgesetz#Holzgesetz.latex|Holzgesetz.latex]], mit der Grenzstauchung.
+Als Formel – wie [[opencivil.querschnitt.werkstoffgesetz#Holzgesetz.latex|Holzgesetz.latex]], mit der Grenzstauchung.
 
 ### _stahlfunktion
 
@@ -605,8 +605,8 @@ def _stahlfunktion(E_s: float, f: float, f_druck: float, eps_ud: float) -> Funkt
 ```
 
 Die Funktion des Stahls, je Fall eine eigene: in der Schleife entscheidet
-sie nichts, was schon beim Bauen feststeht. Sind beide Plateaus gleich --
-bei den Normsorten --, rechnet sie mit dem Betrag.
+sie nichts, was schon beim Bauen feststeht. Sind beide Plateaus gleich –
+bei den Normsorten –, rechnet sie mit dem Betrag.
 
 ### BetonUngerissen
 
@@ -615,11 +615,11 @@ bei den Normsorten --, rechnet sie mit dem Betrag.
 class BetonUngerissen(Gesetz)
 ```
 
-Beton linear in beiden Richtungen -- der ungerissene Vergleichszustand.
+Beton linear in beiden Richtungen – der ungerissene Vergleichszustand.
 
 Ohne Abminderung im Zug und ohne Abbruch bei `f_ct`. Das ist Absicht:
 gebraucht wird die *Steifigkeit* des ungerissenen Querschnitts, und wo er
-reisst, sagt das Rissmoment -- oberhalb davon gilt die Linie gerissen,
+reisst, sagt das Rissmoment – oberhalb davon gilt die Linie gerissen,
 dieser Zustand steht dort nur noch zum Vergleich. Ein Gesetz, das bei
 `f_ct` abfiele, waere ausserdem nicht mehr monoton, und die Bisektion
 des Loesers braucht Monotonie.
@@ -642,7 +642,7 @@ def formel(self, werte: Werte) -> str
 def latex(self, E: str='E_{c,eff}') -> str
 ```
 
-Als Formel -- `E` ist der Modul.
+Als Formel – `E` ist der Modul.
 
 ### Dehnungsebene
 
@@ -667,7 +667,7 @@ Die Bernoulli-Hypothese steckt genau hier: die Dehnung ist linear ueber z.
 def durch_zwei_punkte(cls, eps_a: float, z_a: float, eps_b: float, z_b: float, h: float) -> 'Dehnungsebene'
 ```
 
-Legt die Ebene durch zwei Dehnungspunkte -- so wird der Fächer aufgebaut.
+Legt die Ebene durch zwei Dehnungspunkte – so wird der Fächer aufgebaut.
 
 #### Dehnungsebene.bei
 
@@ -695,19 +695,19 @@ def nulllinie(self) -> float
 
 Lage der Nulllinie in m von der Oberkante.
 
-Bei reiner Zug- oder Druckbeanspruchung gibt es keine -- dann ist das
+Bei reiner Zug- oder Druckbeanspruchung gibt es keine – dann ist das
 Ergebnis unendlich, was die Auswertung sauber ueberspringt.
 
 
 ## Konstanten
 
-- `Werte = Mapping[str, Wert]` – Womit ein Gesetz sich anschreibt: je Rolle der Wert, mit seinem Zeichen. Beim Beton die Festigkeit des Wertesatzes `f_c` (`f_cd` oder `f_ck`), der Modul `E_c`, an dem ein Gesetz haengt -- der wirksame, wo Kriechen zaehlt --, und die Dehnungen `eps_c1d` und `eps_c2d`; beim Stahl die Plateaus `f_s` und `f_s_druck`, `E_s` und `eps_ud`.
-- `RUNDUNG = 1e-12` – Um so viel darf eine Dehnung ueber ihrer Grenze liegen und gilt noch als auf ihr: eine Rundung. Ein Milliardstel Promille -- weit unter allem, was eine Eingabe oder eine Suche unterscheidet, weit ueber der letzten Stelle.
-- `K_SIGMA_MIN = 1.0` – Kleiner rechnet die Parabel `k_sigma` nicht. Darunter haette ihr Nenner `1 + (k_sigma - 2)·eta` im ansteigenden Ast eine Nullstelle, bei `eta = 1/(2 - k_sigma)` -- die Spannung spraenge dort ins Unendliche und wechselte das Vorzeichen. So weit kommt es mit dem kriechweichen Modul: `E_cm/(1 + phi)` mit charakteristischen Werten und `phi = 2` gibt `k_sigma = 0.93`. Mit 1 ist der Beton bis `f_c` bei `eps_c1d` linear. Nach Vorgabe: SIA 262:2025, 4.2.1.6 kennt keine Untergrenze. Mit den Werten der Norm braucht es auch keine -- `E_cd/(400·f_cd)` liegt fuer C12/15 bis C50/60 zwischen 2.6 und 8.5; unter 1 kommt erst der kriechweiche Modul mit `f_ck`.
-- `K_SIGMA_LATEX = '\\max\\left(1;\\ \\frac{@E_c}{400 \\cdot @f_c}\\right)'` – Dieselbe Regel als Formel, fuer die Herleitung -- mit `@E_c` und `@f_c`.
-- `K_SIGMA_SEITE = 'Beiwert der Parabel'` – Ihre Seite im Notizbuch -- eine fuer jede Herleitung, die sie anschreibt, mit welchem Modul auch immer.
+- `Werte = Mapping[str, Wert]` – Womit ein Gesetz sich anschreibt: je Rolle der Wert, mit seinem Zeichen. Beim Beton die Festigkeit des Wertesatzes `f_c` (`f_cd` oder `f_ck`), der Modul `E_c`, an dem ein Gesetz haengt – der wirksame, wo Kriechen zaehlt –, und die Dehnungen `eps_c1d` und `eps_c2d`; beim Stahl die Plateaus `f_s` und `f_s_druck`, `E_s` und `eps_ud`.
+- `RUNDUNG = 1e-12` – Um so viel darf eine Dehnung ueber ihrer Grenze liegen und gilt noch als auf ihr: eine Rundung. Ein Milliardstel Promille – weit unter allem, was eine Eingabe oder eine Suche unterscheidet, weit ueber der letzten Stelle.
+- `K_SIGMA_MIN = 1.0` – Kleiner rechnet die Parabel `k_sigma` nicht. Darunter haette ihr Nenner `1 + (k_sigma - 2)·eta` im ansteigenden Ast eine Nullstelle, bei `eta = 1/(2 - k_sigma)` – die Spannung spraenge dort ins Unendliche und wechselte das Vorzeichen. So weit kommt es mit dem kriechweichen Modul: `E_cm/(1 + phi)` mit charakteristischen Werten und `phi = 2` gibt `k_sigma = 0.93`. Mit 1 ist der Beton bis `f_c` bei `eps_c1d` linear. Nach Vorgabe: SIA 262:2025, 4.2.1.6 kennt keine Untergrenze. Mit den Werten der Norm braucht es auch keine – `E_cd/(400·f_cd)` liegt fuer C12/15 bis C50/60 zwischen 2.6 und 8.5; unter 1 kommt erst der kriechweiche Modul mit `f_ck`.
+- `K_SIGMA_LATEX = '\\max\\left(1;\\ \\frac{@E_c}{400 \\cdot @f_c}\\right)'` – Dieselbe Regel als Formel, fuer die Herleitung – mit `@E_c` und `@f_c`.
+- `K_SIGMA_SEITE = 'Beiwert der Parabel'` – Ihre Seite im Notizbuch – eine fuer jede Herleitung, die sie anschreibt, mit welchem Modul auch immer.
 - `STAHL_NUR_ZUG = 'Betonstahl nur auf Zug'` – Die Seite im Notizbuch fuer den Stahl der Handrechnung, der nur Zug traegt.
-- `_JENSEITS_BETON = ' 0 & |\\varepsilon_c| > \\varepsilon_{c2d} \\quad (\\text{jenseits d…` – Was jenseits der Bruchstauchung gilt -- als Fall in der Formel der Parabel.
+- `_JENSEITS_BETON = ' 0 & |\\varepsilon_c| > \\varepsilon_{c2d} \\quad (\\text{jenseits d…` – Was jenseits der Bruchstauchung gilt – als Fall in der Formel der Parabel.
 - `BLOCKANTEIL = 0.85` – Anteil der Druckzonenhoehe, ueber den der Spannungsblock wirkt. Steht hier und nirgends sonst: die Handrechnung der Platte, ihr Duktilitaetsnachweis, das Diagramm der Werkstoffgesetze und der gezeichnete Querschnitt meinen alle denselben Block.
 
 ## Braucht

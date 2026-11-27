@@ -49,5 +49,5 @@ $$
 ## Theorie
 
 Für die Auflast wächst der Tiefenfaktor mit
-$\tan\varphi\,(1 - \sin\varphi)^2$ -- am stärksten bei mittleren
+$\tan\varphi\,(1 - \sin\varphi)^2$ – am stärksten bei mittleren
 Reibungswinkeln. Der Faktor des Gleitkörpergewichts bleibt $d_{\gamma} = 1$.

@@ -57,7 +57,7 @@ Das ganze Rechteck $b \times h$, weniger die Lücke zwischen den Flanschen:
 sie ist $b - t_w$ breit, am Steg $h - 2t_1$ und an der Spitze $h - 2t_2$
 hoch, im Mittel also $h - t_1 - t_2$. Dazu kommen die zwei Ausrundungen am
 Steg mit $r_1$, weg gehen die zwei Rundungen an den Flanschspitzen mit
-$r_2$ -- beide als Zwickel mit $0.2146\,r^2$.
+$r_2$ – beide als Zwickel mit $0.2146\,r^2$.
 
 Die Zwickel sind die des rechten Winkels, obwohl die Flansche geneigt
 sind. Die Tabelle des Benutzers hat beim UNP nur Werte, keine Formeln; die

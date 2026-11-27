@@ -1,5 +1,5 @@
 ---
-erzeugt: 2eb5dada7a63
+erzeugt: 55fd08c4d044
 art: modul
 tags: [modul]
 ---
@@ -10,7 +10,7 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Die Angaben zum Pfahl, aus den Werten der Lösung ([[opencivil.pfahl.uebersicht#angaben|angaben]]), und die
-Widerstände beider Nachweise nebeneinander, auf Druck und auf Zug -- vom
+Widerstände beider Nachweise nebeneinander, auf Druck und auf Zug – vom
 Mantel bis zum Bemessungswert ([[opencivil.pfahl.uebersicht#widerstandstabelle|widerstandstabelle]]). Gerechnet wird
 hier nichts: die Zahlen stehen in den Befunden.
 

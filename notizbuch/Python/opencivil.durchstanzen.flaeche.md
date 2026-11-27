@@ -1,5 +1,5 @@
 ---
-erzeugt: 3f33193eb16b
+erzeugt: d3c47c07f619
 art: modul
 tags: [modul]
 ---
@@ -13,7 +13,7 @@ Die Wahlen der Lage und der Form ([[opencivil.durchstanzen.flaeche#Lage|Lage]], 
 je Lage eine Art gestützter Fläche: [[opencivil.durchstanzen.flaeche#Innenstuetze|Innenstuetze]],
 [[opencivil.durchstanzen.flaeche#Randstuetze|Randstuetze]] und [[opencivil.durchstanzen.flaeche#Eckstuetze|Eckstuetze]] mit ihrer Form,
 [[opencivil.durchstanzen.flaeche#Wandende|Wandende]] und [[opencivil.durchstanzen.flaeche#Wandecke|Wandecke]]. Jede Art weiss, was der Nachweis
-von ihr braucht -- ihre Masse, den Umriss, die Achse, die Plattenränder, die
+von ihr braucht – ihre Masse, den Umriss, die Achse, die Plattenränder, die
 Kandidaten des Nachweisschnitts, u_0 als Formel, wo es eine gibt, die
 Näherung für k_e, die Gleichungen der Momente im Stützstreifen, welche
 Streifen der Plattenrand begrenzt (Figur 25) und ob das
@@ -76,7 +76,7 @@ class Randbreite
 Was die Breite b_sr eines Stützstreifens am Plattenrand bestimmt
 (Figur 25): b_sr = quer + 2 · (längs + a), mit den Abmessungen der Stütze
 quer und längs zum Streifen und ihrem Abstand a zum Rand, auf den der
-Streifen zuläuft -- die Breite zwischen zwei Linien unter 45° von den
+Streifen zuläuft – die Breite zwischen zwei Linien unter 45° von den
 inneren Ecken der Stütze. An der Eckstütze liegt quer zum Streifen ein
 zweiter Rand, `zweiter` ist der Abstand der Stütze zu ihm: er schneidet
 den Streifen ab, auf dieser Seite reicht er von der Achse nur bis zum
@@ -110,7 +110,7 @@ class Stuetzenform(Wahl)
 ```
 
 Die Form einer Stütze im Grundriss. Die Ovalstütze ist ein Rechteck mit
-halbrunden Enden, b_x × b_y über alles -- so heisst sie in der Software von
+halbrunden Enden, b_x × b_y über alles – so heisst sie in der Software von
 Leviat (DURA); der Name ist nicht aus der Norm.
 
 - `RECHTECK = 'rechteck'`
@@ -138,7 +138,7 @@ def masse(self) -> Tuple[str, ...]
 def kurz(self) -> str
 ```
 
-Wie die Liste die Stütze nennt -- mit den Kurznamen ihrer Masse, in mm.
+Wie die Liste die Stütze nennt – mit den Kurznamen ihrer Masse, in mm.
 
 #### Stuetzenform.flaeche
 
@@ -154,7 +154,7 @@ Die Stütze aus ihren Massen, mit der Achse im Ursprung.
 def breite(self, masse: Masse, achse: str) -> Mass
 ```
 
-Die Abmessung in `achse` («x» oder «y») -- an der Rundstütze der Durchmesser.
+Die Abmessung in `achse` («x» oder «y») – an der Rundstütze der Durchmesser.
 
 #### Stuetzenform.umfang
 
@@ -162,7 +162,7 @@ Die Abmessung in `achse` («x» oder «y») -- an der Rundstütze der Durchmesse
 def umfang(self, e: Eingaben, d_v: Wert, wert: float) -> Umfangsformel
 ```
 
-u_0 rundum, ohne Rand, Ecken und Aussparungen (Figur 22) -- `wert` aus dem Schnitt.
+u_0 rundum, ohne Rand, Ecken und Aussparungen (Figur 22) – `wert` aus dem Schnitt.
 
 ### Lage
 
@@ -170,7 +170,7 @@ u_0 rundum, ohne Rand, Ecken und Aussparungen (Figur 22) -- `wert` aus dem Schni
 class Lage(Wahl)
 ```
 
-Wo die gestützte Fläche in der Platte liegt -- [[opencivil.durchstanzen.flaeche#Lage.flaeche|flaeche]] macht daraus ihre Art.
+Wo die gestützte Fläche in der Platte liegt – [[opencivil.durchstanzen.flaeche#Lage.flaeche|flaeche]] macht daraus ihre Art.
 
 - `INNEN = 'innen'`
 - `RAND = 'rand'`
@@ -192,7 +192,7 @@ def beschriftung(self) -> str
 def mehrzahl(self) -> str
 ```
 
-«Innenstützen», «Wandenden» -- wie die Näherung von 4.3.6.2.5 sie nennt.
+«Innenstützen», «Wandenden» – wie die Näherung von 4.3.6.2.5 sie nennt.
 
 #### Lage.flaeche
 
@@ -208,15 +208,15 @@ Die Art der gestützten Fläche; `form` gilt nur für Stützen.
 class GestuetzteFlaeche(ABC)
 ```
 
-Eine Art gestützter Fläche -- siehe Dateikopf.
+Eine Art gestützter Fläche – siehe Dateikopf.
 
 - `lage: ClassVar[Lage]`
 - `titel: ClassVar[str]` – Wie die Maske ihre Masse überschreibt: «Stütze» oder «Wand».
 - `k_e: ClassVar[float]` – Die Näherung nach SIA 262:2025, 4.3.6.2.5.
 - `hat_form: ClassVar[bool] = False`
-- `momente: ClassVar[bool] = True` – Ob 4.3.6.4.7 Momente im Stützstreifen nennt -- für Wände nicht.
-- `ecken_abziehen: ClassVar[bool] = True` – Ob neben Ecken etwas vom Schnitt abgeht -- an Wänden zählt u_0 nur 1.5·d_v entlang der Wand.
-- `vorschlag: ClassVar[bool] = True` – Ob das Werkzeug Durchstanzbewehrung vorschlägt -- an Wänden noch nicht.
+- `momente: ClassVar[bool] = True` – Ob 4.3.6.4.7 Momente im Stützstreifen nennt – für Wände nicht.
+- `ecken_abziehen: ClassVar[bool] = True` – Ob neben Ecken etwas vom Schnitt abgeht – an Wänden zählt u_0 nur 1.5·d_v entlang der Wand.
+- `vorschlag: ClassVar[bool] = True` – Ob das Werkzeug Durchstanzbewehrung vorschlägt – an Wänden noch nicht.
 - `stahlpilz: ClassVar[bool] = False` – Ob ein ZEUS-Stahlpilz in Frage kommt: der Katalog hat sie nur für Innenstützen.
 - `k_sys_erhoeht: ClassVar[bool] = False` – Ob das Gutachten von ancoPLUS 3·k_r zulässt: an Innenstützen und Wandenden.
 
@@ -238,7 +238,7 @@ Die Kurznamen der Masse, die für sie gelten.
 def kurz(self) -> str
 ```
 
-Wie die Liste sie nennt -- mit den Kurznamen ihrer Masse, in mm.
+Wie die Liste sie nennt – mit den Kurznamen ihrer Masse, in mm.
 
 #### GestuetzteFlaeche.kandidaten
 
@@ -247,7 +247,7 @@ Wie die Liste sie nennt -- mit den Kurznamen ihrer Masse, in mm.
 def kandidaten(self, masse: Masse, abstand: float, d_v: float) -> List[Kandidat]
 ```
 
-Die möglichen Nachweisschnitte im Abstand `abstand` -- siehe [[opencivil.durchstanzen.schnitt|.schnitt]].
+Die möglichen Nachweisschnitte im Abstand `abstand` – siehe [[opencivil.durchstanzen.schnitt|.schnitt]].
 
 #### GestuetzteFlaeche.umriss
 
@@ -264,7 +264,7 @@ Der Umriss fürs Bild.
 def achse(self, masse: Masse) -> Punkt
 ```
 
-Die Achse -- von ihr gehen die Strahlen an Aussparungen vorbei.
+Die Achse – von ihr gehen die Strahlen an Aussparungen vorbei.
 
 #### GestuetzteFlaeche.raender
 
@@ -280,7 +280,7 @@ Die Plattenränder.
 def umfang(self, e: Eingaben, d_v: Wert, a: Auswertung) -> Optional[Umfangsformel]
 ```
 
-u_0 als Formel -- oder nichts, dann steht der Schnitt als Länge in der Platte.
+u_0 als Formel – oder nichts, dann steht der Schnitt als Länge in der Platte.
 
 #### GestuetzteFlaeche.k_e_naeherung
 
@@ -296,7 +296,7 @@ Die Näherung für k_e (4.3.6.2.5), am Schnitt `a` um die Fläche.
 def momentengleichung(self, r: Richtung, masse: Masse) -> Momentengleichung
 ```
 
-Die Gleichung der Momente im Stützstreifen in `r` -- nur, wo [[opencivil.durchstanzen.flaeche#GestuetzteFlaeche|momente]] gilt.
+Die Gleichung der Momente im Stützstreifen in `r` – nur, wo [[opencivil.durchstanzen.flaeche#GestuetzteFlaeche|momente]] gilt.
 
 #### GestuetzteFlaeche.randbreite
 
@@ -305,7 +305,7 @@ def randbreite(self, r: Richtung, masse: Masse) -> Optional[Randbreite]
 ```
 
 Was den Stützstreifen in `r` am Plattenrand begrenzt (4.3.6.4.6,
-Figur 25) -- nichts, wo kein Rand ihn begrenzt.
+Figur 25) – nichts, wo kein Rand ihn begrenzt.
 
 ### Stuetze
 
@@ -508,7 +508,7 @@ def kandidaten(self, masse: Masse, abstand: float, d_v: float) -> List[Kandidat]
 def umriss(self, masse: Masse, d_v: float) -> List[Punkt]
 ```
 
-Die Wand 4·d_v weit -- etwas über den Schnitt hinaus, der 3.5·d_v weit reicht.
+Die Wand 4·d_v weit – etwas über den Schnitt hinaus, der 3.5·d_v weit reicht.
 
 #### Wandende.achse
 

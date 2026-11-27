@@ -1,5 +1,5 @@
 ---
-erzeugt: 46090e9997a7
+erzeugt: e6d237ab94b4
 art: modul
 tags: [modul]
 ---
@@ -10,7 +10,7 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Die Zahlen der Nachweise eines Holzquerschnitts und eines Holzstabs, in
-N/mm², mm und ohne Einheit -- die Herleitungen schreiben
+N/mm², mm und ohne Einheit – die Herleitungen schreiben
 [[opencivil.nachweis.qa_holz]] und
 [[opencivil.nachweis.qa_holz_stabilitaet]], mit denselben Funktionen:
 
@@ -27,7 +27,7 @@ N/mm², mm und ohne Einheit -- die Herleitungen schreiben
 ## DER ERFUELLUNGSGRAD
 
 Wie beim Stahl: die Normalkraft bleibt, Momente und Querkraefte wachsen mit
-`λ`, bis die Gleichung aufgeht -- `α = λ`. Ohne Moment, oder wo schon
+`λ`, bis die Gleichung aufgeht – `α = λ`. Ohne Moment, oder wo schon
 die Normalkraft allein nicht traegt, ist es ihr Verhaeltnis, `f/σ`. In
 (25) wachsen Querkraft und Torsion zusammen.
 
@@ -39,7 +39,7 @@ die Normalkraft allein nicht traegt, ist es ihr Verhaeltnis, `f/σ`. In
 def k_h(h: float) -> float
 ```
 
-`(600/h)^0.1 ≤ 1.1` bei Brettschichtholz unter 600 mm Hoehe, `h` in mm -- sonst 1.
+`(600/h)^0.1 ≤ 1.1` bei Brettschichtholz unter 600 mm Hoehe, `h` in mm – sonst 1.
 
 ### Biegung
 
@@ -71,7 +71,7 @@ Ob `α` das Verhaeltnis der Normalkraft ist: ohne Moment, oder sie traegt nicht.
 def biegung_normalkraft(sigma_N: float, sigma_m_y: float, sigma_m_z: float, *, f_t: float, f_c: float, f_m_y: float, f_m_z: float) -> Optional[Biegung]
 ```
 
-Die Gleichung, die der Lastfall braucht -- `sigma_N` positiv Zug, die
+Die Gleichung, die der Lastfall braucht – `sigma_N` positiv Zug, die
 Biegespannungen als Betrag; `None` ohne Normalkraft und Moment.
 
 ### Schub
@@ -84,7 +84,7 @@ class Schub
 Schub und Torsion in einem Lastfall: welche Gleichung, ihre Anteile, der Erfuellungsgrad.
 
 - `gleichung: str` – `(23)`, `(24)` oder `(25)`.
-- `v: float` – `τ_d/f_v,d` -- in (25) im Quadrat.
+- `v: float` – `τ_d/f_v,d` – in (25) im Quadrat.
 - `t: float` – `τ_tor,d/f_v,d`.
 - `alpha: float`
 
@@ -94,7 +94,7 @@ Schub und Torsion in einem Lastfall: welche Gleichung, ihre Anteile, der Erfuell
 def schub_torsion(tau: float, tau_tor: float, f_v: float) -> Optional[Schub]
 ```
 
-(23) ohne Torsion, (24) ohne Querkraft, sonst (25) -- als Betraege;
+(23) ohne Torsion, (24) ohne Querkraft, sonst (25) – als Betraege;
 `None` ohne beides. In (25) wachsen beide mit `λ`:
 `λ·t + λ²·v² = 1`.
 
@@ -112,7 +112,7 @@ def lambda_rel(lam: float, f_c_0_k: float, E_0_05: float) -> float
 def k_c(lambda_rel_: float, beta_c: float) -> float
 ```
 
-(30) mit (31) -- eins bis `λ_rel = 0.3`.
+(30) mit (31) – eins bis `λ_rel = 0.3`.
 
 ### sigma_m_crit
 
@@ -146,11 +146,11 @@ class Stabachse
 ```
 
 Der Nachweis eines Stabs fuer eine Hauptachse: (29) mit Druck allein,
-(37) mit Druck und Biegung, (38) mit Biegung allein -- die Anteile und
+(37) mit Druck und Biegung, (38) mit Biegung allein – die Anteile und
 der Erfuellungsgrad.
 
 - `gleichung: str`
-- `druck: float` – `σ_c,0,d/(k_c·f_c,0,d)` -- null in (38).
+- `druck: float` – `σ_c,0,d/(k_c·f_c,0,d)` – null in (38).
 - `biegung: float` – `σ_m,d/(k_m·f_m,d)`.
 - `alpha: float`
 

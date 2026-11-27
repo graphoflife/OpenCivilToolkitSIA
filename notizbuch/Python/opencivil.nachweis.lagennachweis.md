@@ -1,5 +1,5 @@
 ---
-erzeugt: db20bd10b6f0
+erzeugt: eed3328f03ec
 art: modul
 tags: [modul]
 ---
@@ -10,7 +10,7 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Die Schablone ([[opencivil.nachweis.lagennachweis#Lagennachweis|Lagennachweis]]) der Nachweise, die jede Lage einer
-Platte fuer sich ansehen -- Duktilitaet, sproedes Versagen, Zwaengung auf
+Platte fuer sich ansehen – Duktilitaet, sproedes Versagen, Zwaengung auf
 Biegung und auf Normalkraft. Hier steht einmal, was sie teilen: welche
 Lagen und ihre Posten, je Lage ein Erfuellungsgrad mit derselben Kennung,
 demselben Zeichen und derselben Benennung, die Bezuege auf Posten und
@@ -25,7 +25,7 @@ Lage ([[opencivil.nachweis.lagennachweis#Lagennachweis.eine_lage|eine_lage]]) un
 ## LAGEN OHNE STAHL
 
 Sproedes Versagen, Zwaengung auf Biegung und Duktilitaet lassen eine Lage
-ohne Stahl weg (Benutzer, 2026-10-19) -- der Aufbau gibt sie ihnen nicht.
+ohne Stahl weg (Benutzer, 2026-10-19) – der Aufbau gibt sie ihnen nicht.
 Bekommen sie trotzdem eine, ist das ein Fehler des Aufbaus und meldet sich
 (`NUR_MIT_STAHL`). Nur die Zwaengung auf Normalkraft prueft jede Lage,
 auch die leere: gerade sie faellt durch und soll es sichtbar tun.
@@ -42,12 +42,12 @@ trug `ohne_bewehrung` mit, und in drei der vier lief dieser Zweig nie.
 class Lagennachweis(Teilnachweis)
 ```
 
-Ein Nachweis je Platte, ein Urteil je Lage -- siehe Dateikopf.
+Ein Nachweis je Platte, ein Urteil je Lage – siehe Dateikopf.
 
-- `KUERZEL: str = ''` – Im Zeichen des Grads: α_eff,D,2 -- «D».
-- `BENENNUNG: str = ''` – Im Text des Grads: «Erfüllungsgrad Duktilität – 2. Lage» -- «Duktilität».
+- `KUERZEL: str = ''` – Im Zeichen des Grads: α_eff,D,2 – «D».
+- `BENENNUNG: str = ''` – Im Text des Grads: «Erfüllungsgrad Duktilität – 2. Lage» – «Duktilität».
 - `REFERENZ: str = ''`
-- `NUR_MIT_STAHL: bool = True` – Ob er nur Lagen mit Stahl bekommt -- siehe Dateikopf.
+- `NUR_MIT_STAHL: bool = True` – Ob er nur Lagen mit Stahl bekommt – siehe Dateikopf.
 - `TEILE_EINER_FRAGE = True`
 
 #### Lagennachweis.lagen_waehlen
@@ -57,7 +57,7 @@ Ein Nachweis je Platte, ein Urteil je Lage -- siehe Dateikopf.
 def lagen_waehlen(querschnitt, richtung: Richtung, nummern: Sequence[int]) -> List[Bewehrungslage]
 ```
 
-Die gewaehlten Lagen einer Richtung -- keine ist ein Fehler des Aufbaus.
+Die gewaehlten Lagen einer Richtung – keine ist ein Fehler des Aufbaus.
 
 #### Lagennachweis.ohne_bewehrung
 
@@ -93,7 +93,7 @@ def grad_des_teils(self, lage: Bewehrungslage) -> WertDef
 def ansatz(self, e: Eingaben, p: Protokoll) -> Any
 ```
 
-Was alle Lagen brauchen, mit seiner Herleitung -- es geht an jede Lage weiter.
+Was alle Lagen brauchen, mit seiner Herleitung – es geht an jede Lage weiter.
 
 #### Lagennachweis.eine_lage
 

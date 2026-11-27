@@ -1,5 +1,5 @@
 ---
-erzeugt: 8c605c22e20f
+erzeugt: 5a8ae3e06df5
 art: modul
 tags: [modul]
 ---
@@ -9,27 +9,27 @@ tags: [modul]
 
 Der Rechenkern der App «Decken»: Platten beliebiger Form und Dicke auf
 Linienlagern und Stützen, mit versteckten Unterzügen, unter Flächen-,
-Linien- und Einzellasten -- gerechnet nicht mit finiten Elementen, sondern
+Linien- und Einzellasten – gerechnet nicht mit finiten Elementen, sondern
 nach der Streifenmethode von Hillerborg (Stahlbeton II, 7.2 Platten,
 Folien 27 bis 39): jede Last geht in Streifen zweier Richtungen zu den
 Lagern, Drillmomente werden nicht gebraucht. Das ist eine
-Gleichgewichtslösung -- ein unterer Grenzwert der Traglast.
+Gleichgewichtslösung – ein unterer Grenzwert der Traglast.
 
-* [[opencivil.decke.geometrie|geometrie]] -- Vielecke: Schnitte, Dreiecke und die
+* [[opencivil.decke.geometrie|geometrie]] – Vielecke: Schnitte, Dreiecke und die
   Breite eines Stücks quer zum Streifen.
-* [[opencivil.decke.modell|modell]] -- was gerechnet wird, in SI.
-* [[opencivil.decke.traeger|traeger]] -- ein Streifen als Durchlaufträger:
+* [[opencivil.decke.modell|modell]] – was gerechnet wird, in SI.
+* [[opencivil.decke.traeger|traeger]] – ein Streifen als Durchlaufträger:
   elastisch gelöst, dann die Statik mit gleichmässiger Pressung der
   Flächenlager.
-* [[opencivil.decke.streifen|streifen]] -- die Decke in Streifen und Träger
+* [[opencivil.decke.streifen|streifen]] – die Decke in Streifen und Träger
   zerlegt, und worauf jeder liegt.
-* [[opencivil.decke.aufteilung|aufteilung]] -- welcher Anteil der Last in welche
+* [[opencivil.decke.aufteilung|aufteilung]] – welcher Anteil der Last in welche
   Richtung geht.
-* [[opencivil.decke.lasten|lasten]] -- die Lasten eines Lastfalls auf den
+* [[opencivil.decke.lasten|lasten]] – die Lasten eines Lastfalls auf den
   Streifen.
-* [[opencivil.decke.rechnung|rechnung]] -- je Fall alle Träger, von den
+* [[opencivil.decke.rechnung|rechnung]] – je Fall alle Träger, von den
   Feldstreifen über die Unterzüge zu Stützen und Linienlagern.
-* [[opencivil.decke.feld|feld]] -- was an einer Stelle der Platte wirkt:
+* [[opencivil.decke.feld|feld]] – was an einer Stelle der Platte wirkt:
   `m_x`, `m_y`, `m_xy`, die Querkräfte, die Biegewiderstände und die
   Lastverteilelemente.
 

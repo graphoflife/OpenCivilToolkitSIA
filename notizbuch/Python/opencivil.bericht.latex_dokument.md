@@ -1,5 +1,5 @@
 ---
-erzeugt: 180f22de263e
+erzeugt: c7f710037948
 art: modul
 tags: [modul]
 ---
@@ -11,7 +11,7 @@ tags: [modul]
 
 Schreibt aus einer [[opencivil.core.rechenwerk#Loesung|Loesung]] ein vollstaendiges, fuer sich uebersetzbares
 `.tex`-Dokument und uebersetzt es zu PDF, sofern eine TeX-Maschine vorhanden
-ist. Ist keine da, bleibt es beim `.tex` -- das laesst sich unveraendert in
+ist. Ist keine da, bleibt es beim `.tex` – das laesst sich unveraendert in
 Overleaf einfuegen.
 
 Wie der Konsolenbericht rechnet auch dieser Baustein nichts: was im Bericht
@@ -24,7 +24,7 @@ nur gesetzt.
 Word uebernimmt aus der Zwischenablage MathML als richtige, weiter
 bearbeitbare Formel. Die Oberflaeche rendert die hier erzeugten LaTeX-Zeichen-
 ketten ohnehin mit KaTeX, und KaTeX erzeugt neben der HTML-Darstellung auch
-MathML -- der Kopierknopf braucht also nur diesen Teil in die Zwischenablage zu
+MathML – der Kopierknopf braucht also nur diesen Teil in die Zwischenablage zu
 legen. [[opencivil.bericht.latex_dokument#formeln_sammeln|formeln_sammeln]] liefert die dafuer noetige Liste.
 
 
@@ -74,7 +74,7 @@ Die Gliederungsstufe; tiefer als die letzte geht es nicht.
 def als_tex(loesung: Loesung, titel: str='Berechnung', untertitel: str='', *, aufbau: Optional['Aufbau']=None) -> str
 ```
 
-Baut das vollstaendige LaTeX-Dokument -- mit `aufbau` die Nachweise je Platte.
+Baut das vollstaendige LaTeX-Dokument – mit `aufbau` die Nachweise je Platte.
 
 ### finde_tex_maschine
 
@@ -96,7 +96,7 @@ Fehlt jede TeX-Maschine, ist das kein Fehler: das `.tex` steht dann
 trotzdem bereit und die Meldung sagt, was fehlt.
 
 Eigener Schritt, weil das Bauen des Dokuments ueberall laeuft, das
-Uebersetzen aber einen Unterprozess braucht -- und den gibt es im Browser
+Uebersetzen aber einen Unterprozess braucht – und den gibt es im Browser
 nicht. Dort endet der Weg beim `.tex`.
 
 ### schreibe
@@ -140,7 +140,7 @@ dessen das von KaTeX miterzeugte MathML in die Zwischenablage.
 - `TEX_MASCHINEN = (('tectonic', ('tectonic', '--keep-logs', '--outdir')), ('latexmk', (…` – Uebersetzer in der Reihenfolge, in der sie versucht werden.
 - `PRAEAMBEL = '\\documentclass[11pt,a4paper]{article}\n\\usepackage[utf8]{inputenc}…`
 - `_STUFEN = ('section', 'subsection', 'subsubsection', 'paragraph')`
-- `TAFEL = {TitelBlock: _titel, TextBlock: _text, GleichungBlock: _gleichung, Ta…` – Je Blockart, wie das LaTeX-Dokument sie setzt -- jede als Zeilen.
+- `TAFEL = {TitelBlock: _titel, TextBlock: _text, GleichungBlock: _gleichung, Ta…` – Je Blockart, wie das LaTeX-Dokument sie setzt – jede als Zeilen.
 
 ## Braucht
 

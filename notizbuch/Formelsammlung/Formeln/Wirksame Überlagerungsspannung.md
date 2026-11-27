@@ -34,5 +34,5 @@ dem Wasser 4 m unter Terrain sind es in 8 m Tiefe 4 · 20 + 4 · 10 =
 Für die Reibung am Mantel zählt die Spannung in der Mitte jedes Stücks. Ein
 Stück liegt ganz in einer Schicht und ganz auf einer Seite des Wassers; darin
 verläuft die Spannung linear, und ihr Wert in der Mitte ist ihr Mittel. Das
-Buch nimmt die Spannung auf halber Einbindetiefe (Kap. 12.5) -- dasselbe,
+Buch nimmt die Spannung auf halber Einbindetiefe (Kap. 12.5) – dasselbe,
 solange kein Wasserspiegel die Schicht teilt.

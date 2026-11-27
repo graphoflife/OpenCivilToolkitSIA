@@ -26,7 +26,7 @@ $$
 ## Theorie
 
 Wie viel einer gleichmässigen Pressung $q$ in der Tiefe $z$ unter einem Punkt
-ankommt, sagt der Einflussfaktor $J = \Delta\sigma'_z / q$ nach Boussinesq --
+ankommt, sagt der Einflussfaktor $J = \Delta\sigma'_z / q$ nach Boussinesq –
 für einen homogenen, elastischen Halbraum unter einer schlaffen Last. Unter
 der Ecke eines Rechtecks $a \times b$ gibt es dafür eine geschlossene Formel,
 $J_E$. Unter einem anderen Punkt teilt man die Fläche in die vier Rechtecke,

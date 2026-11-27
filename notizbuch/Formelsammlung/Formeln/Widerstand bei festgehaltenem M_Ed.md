@@ -59,7 +59,7 @@ $$
 
 ## Theorie
 
-Wie viel Normalkraft der Querschnitt bei einem festen Moment aufnimmt --
+Wie viel Normalkraft der Querschnitt bei einem festen Moment aufnimmt –
 das Gegenstück zum [[Widerstand bei festgehaltenem N_Ed]]. Auf der Linie der
 Handrechnung liegt er zwischen den beiden Eckpunkten, zwischen denen das
 Moment liegt, und folgt durch lineare Interpolation; fällt das Moment genau

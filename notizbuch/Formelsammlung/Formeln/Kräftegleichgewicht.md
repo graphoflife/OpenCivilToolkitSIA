@@ -47,5 +47,5 @@ $$
 
 Die Normalkraft des Eckpunkts: was der Spannungsblock an Druck liefert,
 negativ, plus was der Stahl an Zug liefert. Weil die Nulllinie hier
-vorgegeben ist und nicht gesucht, ergibt sich die Normalkraft -- meist ein
+vorgegeben ist und nicht gesucht, ergibt sich die Normalkraft – meist ein
 Druck, denn der Block über der halben Höhe drückt mehr, als der Stahl zieht.

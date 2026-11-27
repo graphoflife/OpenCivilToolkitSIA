@@ -1,5 +1,5 @@
 ---
-erzeugt: 747bc6405a67
+erzeugt: d26e7f7aff4f
 art: modul
 tags: [modul]
 ---
@@ -12,7 +12,7 @@ tags: [modul]
 Was der Reiter «Diagramme» unter «Werkstoffgesetze» zeichnet: je Material
 seine Linie, aus denselben Gesetzen, mit denen der Querschnitt rechnet
 ([[opencivil.querschnitt.werkstoffgesetz]]), in ‰ und N/mm². Welche Art
-welche Linie hat, steht in [[opencivil.web.werkstoffkurven#Konstanten|KURVEN]] -- eine neue Materialart ohne
+welche Linie hat, steht in [[opencivil.web.werkstoffkurven#Konstanten|KURVEN]] – eine neue Materialart ohne
 Linie faellt im Test auf, nicht erst beim Rechnen.
 
 Bis 2026-11-26 stand das in [[opencivil.web.diagrammdaten]], das damit
@@ -28,7 +28,7 @@ def werkstoffgesetze(aufbau: Aufbau, loesung: Loesung) -> dict
 
 Punktfolgen der Spannungs-Dehnungs-Beziehungen, je Material.
 
-Gerechnet wird mit denselben Gesetzen wie im Nachweis -- die Kurve zeigt
+Gerechnet wird mit denselben Gesetzen wie im Nachweis – die Kurve zeigt
 also genau das, was der Querschnittsintegration zugrunde liegt, und nicht
 eine zweite, nachgebaute Fassung.
 
@@ -41,7 +41,7 @@ was nicht Beton war, als Betonstahl, und ein Baustahl fiel still weg,
 weil ihm dessen Kennwerte fehlten.
 
 Ausser Punkten und Marken kann eine Kurve einen `hinweis` tragen: was
-das Bild nicht zeigt -- beim Spannstahl der flachere Anstieg der Litzen --,
+das Bild nicht zeigt – beim Spannstahl der flachere Anstieg der Litzen –,
 und eine `zweite` Linie, die ein Schalter zeigt: beim Beton den
 Spannungsblock, beim Holz den Druck elastisch-plastisch.
 
@@ -51,7 +51,7 @@ Spannungsblock, beim Holz den Druck elastisch-plastisch.
 def _betonkurve(wert, sorte: str, schritte: int=80) -> Optional[dict]
 ```
 
-Parabel-Rechteck-Beziehung, von null bis zur Bruchdehnung -- mit
+Parabel-Rechteck-Beziehung, von null bis zur Bruchdehnung – mit
 Bemessungswerten, ohne Kriechen, gebaut wie in jeder Rechnung: der
 Beiwert aus `E_cm` ([[opencivil.querschnitt.werkstoffgesetz#Betongesetz.mit_modul|Betongesetz.mit_modul]]).
 
@@ -65,7 +65,7 @@ Der vereinfachte, rechteckige Spannungsverlauf.
 
 Unterhalb von `(1 - 0.85) * eps_c2d` wird keine Spannung angesetzt,
 darueber durchgehend `f_cd`. Das ist dieselbe Vereinfachung, die auch der
-Handrechnung zugrunde liegt -- dort als Druckzone der Hoehe `0.85 x`.
+Handrechnung zugrunde liegt – dort als Druckzone der Hoehe `0.85 x`.
 Beide Bilder gehoeren zusammen, und genau deshalb steht die Stufe hier neben
 der Parabel: man sieht, was man aufgibt, wenn man von Hand rechnet.
 
@@ -83,7 +83,7 @@ Betonstahl: bilinear, auf Zug und Druck getrennt begrenzt.
 def _baustahlkurve(wert, sorte: str) -> Optional[dict]
 ```
 
-Baustahl: elastisch -- ideal plastisch, in Zug und Druck gleich, mit `f_yd = f_y / gamma_M1`.
+Baustahl: elastisch – ideal plastisch, in Zug und Druck gleich, mit `f_yd = f_y / gamma_M1`.
 
 ### _profilblechkurve
 
@@ -100,7 +100,7 @@ def _knickkurve(gesetz: Stahlgesetz, titel: str, fliessen: str='ε_yd') -> dict
 ```
 
 Eine Linie ohne Verfestigung, aus ihrem Gesetz. Fuenf Eckpunkte genuegen
--- dazwischen ist sie gerade, und mehr Punkte wuerden nur vortaeuschen,
+– dazwischen ist sie gerade, und mehr Punkte wuerden nur vortaeuschen,
 dass etwas gekruemmt waere.
 
 ### _spannstahlkurve
@@ -109,7 +109,7 @@ dass etwas gekruemmt waere.
 def _spannstahlkurve(wert, sorte: str) -> Optional[dict]
 ```
 
-Spannstahl: Figur 17, nur auf Zug -- mit dem Modul der Draehte und
+Spannstahl: Figur 17, nur auf Zug – mit dem Modul der Draehte und
 Staebe. Hat die Sorte auch Litzen (Tabelle 7), sagt der Hinweis, dass
 sie flacher ansteigen (195 statt 200 GPa) und wo sie zu fliessen beginnen.
 
@@ -120,13 +120,13 @@ def _holzkurve(wert, sorte: str) -> Optional[dict]
 ```
 
 Holz: linear bis zum Bruch, auf Zug wie auf Druck (SIA 265:2012,
-3.1.2.1) -- und als zweite Linie der Druck elastisch-plastisch (3.1.2.2),
+3.1.2.1) – und als zweite Linie der Druck elastisch-plastisch (3.1.2.2),
 bis zur Grenzstauchung nach Vorgabe.
 
 
 ## Konstanten
 
-- `KURVEN = {Baustoffart.BETON: _betonkurve, Baustoffart.BETONSTAHL: _stahlkurve,…` – Je Materialart ihre Spannung-Dehnung-Linie, aus den Kennwerten einer Loesung -- wo es eines gibt, ein Gesetz des Querschnitts -- und der Sorte: beim Spannstahl sagt sie, ob es Litzen gibt.
+- `KURVEN = {Baustoffart.BETON: _betonkurve, Baustoffart.BETONSTAHL: _stahlkurve,…` – Je Materialart ihre Spannung-Dehnung-Linie, aus den Kennwerten einer Loesung – wo es eines gibt, ein Gesetz des Querschnitts – und der Sorte: beim Spannstahl sagt sie, ob es Litzen gibt.
 
 ## Braucht
 

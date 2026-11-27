@@ -1,5 +1,5 @@
 ---
-erzeugt: 2915ce352e44
+erzeugt: 9440b1d7fef3
 art: modul
 tags: [modul]
 ---
@@ -16,7 +16,7 @@ beide Welten kennt.
 
 Wichtig: hier wird nichts gerechnet und nichts formatiert, was der Rechenkern
 nicht schon bestimmt hat. Die Oberflaeche bekommt fertige LaTeX-Zeichenketten
-und fertig formatierte Zahlen -- sie soll die Darstellung nicht ein zweites Mal
+und fertig formatierte Zahlen – sie soll die Darstellung nicht ein zweites Mal
 erfinden, sonst laufen Bericht und Bildschirm auseinander.
 
 ## Inhalt
@@ -27,7 +27,7 @@ erfinden, sonst laufen Bericht und Bildschirm auseinander.
 def _rechenarten(arten) -> list
 ```
 
-Die Rechenarten mit Beschriftung -- und ob die Kriechzahl bei ihnen wirkt.
+Die Rechenarten mit Beschriftung – und ob die Kriechzahl bei ihnen wirkt.
 
 ### _satztitel
 
@@ -37,7 +37,7 @@ def _satztitel() -> Dict[str, str]
 
 Je Art mit Wertesatz der Titel seines Schalters, mit den Zeichen ihrer
 Festigkeit: «Bemessungswert f_cd oder charakteristischer f_ck». Das Holz
-steht nicht da -- es hat keinen Satz, und so hat es keinen Schalter. Bis
+steht nicht da – es hat keinen Satz, und so hat es keinen Schalter. Bis
 2026-11-26 standen zwei Titel in der Oberflaeche, und jeder Stahl hiess
 «f_yd oder f_yk», auch der Baustahl und der Spannstahl.
 
@@ -48,7 +48,7 @@ def _vorlage(cls: type) -> Dict[str, Any]
 ```
 
 Wie ein frischer Eintrag dieser Klasse aussieht ([[opencivil.projekt.eintraege#Beschreibung.frisch|Beschreibung.frisch]])
--- ohne Kennung, Namen und Materialien: die setzt die Oberflaeche.
+– ohne Kennung, Namen und Materialien: die setzt die Oberflaeche.
 
 ### _neues_projekt
 
@@ -66,7 +66,7 @@ def klassen() -> Dict[str, type]
 ```
 
 Jede Klasse von Eintraegen unter dem Projekt, unter ihrem Namen ohne
-«Eintrag», klein: `grundbruch`, `schicht`, `kombination` -- so
+«Eintrag», klein: `grundbruch`, `schicht`, `kombination` – so
 heissen ihre Feldangaben und ihre Vorlage im Katalog.
 
 ### _vorgaben
@@ -76,7 +76,7 @@ def _vorgaben() -> Dict[str, List[dict]]
 ```
 
 Je Klasse von Eintraegen, unter ihrem Namen im Katalog, die Gruppen der
-Vorgaben ihres Nachweises ([[opencivil.core.vorgaben]]) -- fuer jede
+Vorgaben ihres Nachweises ([[opencivil.core.vorgaben]]) – fuer jede
 Stellung der Wahlen, nach denen sie sich richten, mit den Werten, die die
 Beschreibung fuer diese Wahlen kennt.
 
@@ -94,7 +94,7 @@ Alles, was die Oberflaeche zum Aufbau ihrer Auswahlfelder braucht.
 def obergrenzen(projekt) -> Dict[str, str]
 ```
 
-Je Platte die Obergrenze der automatischen Bewehrung, fertig als Text --
+Je Platte die Obergrenze der automatischen Bewehrung, fertig als Text –
 «4712 mm²/m» oder «keine». Die Oberflaeche zeigt sie neben den Eingaben,
 ohne selbst zu rechnen.
 
@@ -124,7 +124,7 @@ def protokoll_liste(protokoll: Protokoll) -> List[dict]
 def kurzform_liste(protokoll: Protokoll, ziele: Sequence[str]) -> List[dict]
 ```
 
-Die Kurzform je Ziel ([[opencivil.core.kurzform#kurzform|opencivil.core.kurzform.kurzform]]) -- ihre
+Die Kurzform je Ziel ([[opencivil.core.kurzform#kurzform|opencivil.core.kurzform.kurzform]]) – ihre
 Zeilen als Gleichungen, wie die Herleitung sie bekommt.
 
 ### loesung_dict
@@ -134,7 +134,7 @@ def loesung_dict(loesung: Loesung, aufbau: Optional[Aufbau]=None, *, spannungsan
 ```
 
 Vollstaendige Abbildung eines Rechenlaufs. `spannungsanalysen` sind die
-Zeichendaten der Analysen, wo der Aufrufer sie schon hat -- aus dem
+Zeichendaten der Analysen, wo der Aufrufer sie schon hat – aus dem
 Zwischenspeicher ([[opencivil.web.dienst#rechnen|opencivil.web.dienst.rechnen]]); sonst werden sie
 hier gerechnet.
 
@@ -144,7 +144,7 @@ hier gerechnet.
 def kennzahltabellen(aufbau: Aufbau, loesung: Loesung) -> dict
 ```
 
-Je Bauteil mit Kennzahlen ihre Tabelle -- dieselbe wie im Bericht
+Je Bauteil mit Kennzahlen ihre Tabelle – dieselbe wie im Bericht
 ([[opencivil.bericht.zusammenfassung#kennzahlentabelle|kennzahlentabelle]]), mit LaTeX
 und Markdown fuer die Kopierknoepfe. Je Zeile dazu ihr Wert als Ziel des
 Auges, wie bei den Nachweisen, und ihre Erklaerung als Tooltip
@@ -158,10 +158,10 @@ Bauteil hat, sagt es selbst; die meisten haben keine.
 def zusammenfassungen(loesung: Loesung, aufbau: Aufbau) -> dict
 ```
 
-Je Platte die Nachweistabelle -- Zeilen **und** ihr LaTeX.
+Je Platte die Nachweistabelle – Zeilen **und** ihr LaTeX.
 
 Was darin steht, darueber und darunter, baut
-[[opencivil.bericht.zusammenfassung]] -- dieselben Stuecke, die auch
+[[opencivil.bericht.zusammenfassung]] – dieselben Stuecke, die auch
 im Bericht stehen. Hier werden sie nur abgebildet; die Oberflaeche faerbt
 ein, was `erfuellt` sagt, und haengt die Begruendung als Tooltip an die
 Zeile.
@@ -173,7 +173,7 @@ def zuordnung(aufbau: Aufbau) -> dict
 ```
 
 Verbindet die Kennungen der Oberflaeche mit den Wert-IDs des Rechenwerks:
-die Materialien und je Bauteilart unter ihrer Liste die Bauteile -- je
+die Materialien und je Bauteilart unter ihrer Liste die Bauteile – je
 Namensraum, Name und was [[opencivil.web.api#Konstanten|_ZUORDNUNG]] fuer ihre Art sagt.
 
 ### _werte
@@ -190,17 +190,17 @@ Wo die Werte eines Bauteils stehen, nach Kurzname.
 def _systemzuordnung(teil) -> dict
 ```
 
-Je Querschnitt eines Systems, wo A und I stehen -- und je Paar aus Querschnitt und Material EA und EI.
+Je Querschnitt eines Systems, wo A und I stehen – und je Paar aus Querschnitt und Material EA und EI.
 
 
 ## Konstanten
 
-- `_WERKSTOFFSAETZE = [{'wert': s.value, 'beschriftung': s.beschriftung, 'kurz': s.kurz} fo…` – Die Wertesaetze und Betongesetze mit Beschriftung -- dieselben in der Querschnittsanalyse und in jeder Spannung-Dehnung-Analyse. `kurz` fuer die Karte einer Analyse, in der die lange nicht Platz hat. Die Woerter stehen beim Wertesatz selbst.
-- `_VERSCHMIERUNGEN = {'flaeche': ('Stahlfläche', 'Die Stahlfläche der ganzen Linie, von Ha…` – Wie die Angaben einer verschmierten Stablinie heissen: kurz im Schalter, lang in seinem Titel -- je Angabe, die die Beschreibung kennt.
-- `_DECKENGROESSEN = {'m_x': ('m_x', 'Moment m_x'), 'm_y': ('m_y', 'Moment m_y'), 'm_xy': …` – Wie die Aufteilungen einer Decke heissen: kurz im Schalter, lang in seinem Titel. Die Regel dahinter steht in [[opencivil.decke.aufteilung]]. Wie die Ergebnisbilder einer Decke heissen: kurz im Schalter, lang ueber dem Bild -- je Groesse, die die Beschreibung kennt. M und V sind die eines ganzen Unterzugs.
+- `_WERKSTOFFSAETZE = [{'wert': s.value, 'beschriftung': s.beschriftung, 'kurz': s.kurz} fo…` – Die Wertesaetze und Betongesetze mit Beschriftung – dieselben in der Querschnittsanalyse und in jeder Spannung-Dehnung-Analyse. `kurz` fuer die Karte einer Analyse, in der die lange nicht Platz hat. Die Woerter stehen beim Wertesatz selbst.
+- `_VERSCHMIERUNGEN = {'flaeche': ('Stahlfläche', 'Die Stahlfläche der ganzen Linie, von Ha…` – Wie die Angaben einer verschmierten Stablinie heissen: kurz im Schalter, lang in seinem Titel – je Angabe, die die Beschreibung kennt.
+- `_DECKENGROESSEN = {'m_x': ('m_x', 'Moment m_x'), 'm_y': ('m_y', 'Moment m_y'), 'm_xy': …` – Wie die Aufteilungen einer Decke heissen: kurz im Schalter, lang in seinem Titel. Die Regel dahinter steht in [[opencivil.decke.aufteilung]]. Wie die Ergebnisbilder einer Decke heissen: kurz im Schalter, lang ueber dem Bild – je Groesse, die die Beschreibung kennt. M und V sind die eines ganzen Unterzugs.
 - `_AUFTEILUNGEN = {Aufteilung.AUTOMATISCH: ('automatisch', 'Je Stelle nach ihren Lagern…`
-- `TAFEL = {TitelBlock: _titel_dict, TextBlock: _text_dict, GleichungBlock: _gle…` – Je Blockart, wie die Oberflaeche sie bekommt -- jede als JSON-Objekt.
-- `_ZUORDNUNG = {'platte': _plattenzuordnung, 'balkensystem': _systemzuordnung, 'balk…` – Was eine Bauteilart in der Zuordnung mehr hat als Namensraum und Name -- ohne Eintrag ihre Werte ([[opencivil.web.api#_werte|_werte]]). Bis 2026-10-25 stand die Zuordnung je Art von Hand da, zwei Bloecke wortgleich.
+- `TAFEL = {TitelBlock: _titel_dict, TextBlock: _text_dict, GleichungBlock: _gle…` – Je Blockart, wie die Oberflaeche sie bekommt – jede als JSON-Objekt.
+- `_ZUORDNUNG = {'platte': _plattenzuordnung, 'balkensystem': _systemzuordnung, 'balk…` – Was eine Bauteilart in der Zuordnung mehr hat als Namensraum und Name – ohne Eintrag ihre Werte ([[opencivil.web.api#_werte|_werte]]). Bis 2026-10-25 stand die Zuordnung je Art von Hand da, zwei Bloecke wortgleich.
 
 ## Braucht
 

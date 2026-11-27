@@ -1,5 +1,5 @@
 ---
-erzeugt: b91f64aec059
+erzeugt: ff76e7ebcf9b
 art: modul
 tags: [modul]
 ---
@@ -9,9 +9,9 @@ tags: [modul]
 
 ## VERANTWORTUNG
 
-Das [[opencivil.geotechnik.setzung#Setzungsfundament|Setzungsfundament]] -- die Lastfläche L × B, die Pressungen in der
+Das [[opencivil.geotechnik.setzung#Setzungsfundament|Setzungsfundament]] – die Lastfläche L × B, die Pressungen in der
 Sohle, die zulässige Setzung und die Schichten des Baugrunds mit ihren
-M_E-Werten, als Vorgaben im Rechenwerk -- und der Nachweis [[opencivil.geotechnik.setzung#Setzung|Setzung]]:
+M_E-Werten, als Vorgaben im Rechenwerk – und der Nachweis [[opencivil.geotechnik.setzung#Setzung|Setzung]]:
 s ≤ s_zul.
 
 
@@ -47,7 +47,7 @@ R   = √(a² + b² + z²)
 Unter einem anderen Punkt der Fläche die Summe der vier Rechtecke, die sich in
 ihm treffen ([[opencivil.geotechnik.setzung#einflussfaktor|einflussfaktor]]), wie Bild 3.15 sie überlagert. Welcher Punkt, sagt die
 [[opencivil.geotechnik.setzung#Steifigkeit|Steifigkeit]] (Kap. 8.10): beim starren Fundament der kennzeichnende
-Punkt K, 0.13 L und 0.13 B von einer Ecke (Bild 8.15) -- dort setzt sich die
+Punkt K, 0.13 L und 0.13 B von einer Ecke (Bild 8.15) – dort setzt sich die
 schlaffe Last so stark, wie sich das starre Fundament im Mittel setzt; beim
 schlaffen die Mitte, wo die Setzungsmulde am tiefsten ist.
 
@@ -74,7 +74,7 @@ Alles in SI-Basis.
 class Steifigkeit(Wahl)
 ```
 
-Ob das Fundament der Setzungsmulde folgt -- und darum, unter welchem Punkt
+Ob das Fundament der Setzungsmulde folgt – und darum, unter welchem Punkt
 gerechnet wird (Kap. 8.10).
 
 - `STARR = 'starr'`
@@ -113,7 +113,7 @@ def einflussfaktor_ecke(a: float, b: float, z: float) -> float
 ```
 
 J_E unter einer Ecke der gleichmässig belasteten Rechteckfläche a × b, in
-der Tiefe z -- in m. In der Sohle ein Viertel: die vier Rechtecke um einen
+der Tiefe z – in m. In der Sohle ein Viertel: die vier Rechtecke um einen
 Punkt tragen dort zusammen die ganze Pressung.
 
 ### einflussfaktor
@@ -132,7 +132,7 @@ aus; alles in m.
 def einflusslinie(L: float, B: float, x: float, y: float, tiefe: float, schritte: int=60) -> List[Tuple[float, float]]
 ```
 
-J über die Tiefe, von der Sohle bis `tiefe` -- für das Bild. Die
+J über die Tiefe, von der Sohle bis `tiefe` – für das Bild. Die
 Schritte werden zur Sohle hin dichter: dort ändert sich J am schnellsten.
 
 ### Schicht
@@ -192,7 +192,7 @@ class Teilschicht
 
 Eine Zeile der Tabelle: Tiefen in m ab der Sohle, Setzungen in m.
 
-- `schicht: int` – Die Schicht, in der sie liegt -- ihr Platz in der Liste, ab null.
+- `schicht: int` – Die Schicht, in der sie liegt – ihr Platz in der Liste, ab null.
 - `z_o: float`
 - `z_u: float`
 - `J_o: float`
@@ -223,7 +223,7 @@ def J(self) -> float
 class Schichtsetzung
 ```
 
-Was eine Schicht zur Setzung beiträgt -- Tiefen in m ab der Sohle, Setzungen in m.
+Was eine Schicht zur Setzung beiträgt – Tiefen in m ab der Sohle, Setzungen in m.
 
 - `name: str`
 - `z_o: float`
@@ -245,7 +245,7 @@ def s(self) -> float
 class Setzungsbefund
 ```
 
-Was ausser dem Erfüllungsgrad bleibt -- für die Zusammenfassung und das Bild.
+Was ausser dem Erfüllungsgrad bleibt – für die Zusammenfassung und das Bild.
 
 - `punkt: Tuple[float, float]` – Wo gerechnet wurde, von einer Ecke aus: längs L und längs B, in m.
 - `teilschichten: List[Teilschicht]`
@@ -297,7 +297,7 @@ def pruefe(self, e: Eingaben, p: Protokoll) -> Ausfuehrung
 def _punkt(self, e: Eingaben, p: Protokoll) -> Tuple[float, float]
 ```
 
-Wo gerechnet wird -- K oder die Mitte --, mit der Formel für J darunter.
+Wo gerechnet wird – K oder die Mitte –, mit der Formel für J darunter.
 
 #### Setzung._teilschichten
 
@@ -313,7 +313,7 @@ Jede Schicht in gleich dicke Teilschichten, je eine Zeile der Tabelle.
 def _schichten(self, e: Eingaben, p: Protokoll, teile: Sequence[Teilschicht], x: float, y: float) -> Setzungsbefund
 ```
 
-Die Teilschichten je Schicht zusammengezählt -- und was am Fuss noch ankommt.
+Die Teilschichten je Schicht zusammengezählt – und was am Fuss noch ankommt.
 
 #### Setzung._fall
 
@@ -354,7 +354,7 @@ Die Schichten, wie man sie im Schnitt sieht: Tiefe, M_E-Werte und ihr Beitrag zu
 - `MODUL = MN_PRO_M2.latex` – Die Einheit der M_E-Werte in den Köpfen der Tabellen.
 - `VORGABEN = (Gruppe('Fundament', lambda: (Feld('B', 'B', M, 'Breite des Fundament…` – Die Vorgaben der Setzung, je Kasten der Herleitung und Karte der Maske ([[opencivil.core.vorgaben]]).
 - `_MODUL = 'Kap. 5.3, 8.5; SIA 267:2013, 5.3.2.8'` – Im Gebrauch ohne Partialfaktor (SIA 267:2013, 5.3.2.8): M_E, wie gemessen.
-- `JE_SCHICHT = (Gruppe(SCHICHT, lambda: (Feld('d', 'd', M, 'Dicke der #', 2, schritt…` – Die Vorgaben jeder Schicht, je mit ihrer Nummer -- in der Herleitung ein Kasten je Schicht, in der Maske eine Zeile.
+- `JE_SCHICHT = (Gruppe(SCHICHT, lambda: (Feld('d', 'd', M, 'Dicke der #', 2, schritt…` – Die Vorgaben jeder Schicht, je mit ihrer Nummer – in der Herleitung ein Kasten je Schicht, in der Maske eine Zeile.
 
 ## Braucht
 

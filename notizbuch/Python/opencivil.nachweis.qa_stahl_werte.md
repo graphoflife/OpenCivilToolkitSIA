@@ -1,5 +1,5 @@
 ---
-erzeugt: db209420becf
+erzeugt: 383550f1b79b
 art: modul
 tags: [modul]
 ---
@@ -13,7 +13,7 @@ Die Kennzahlen ([[opencivil.nachweis.qa_stahl_kennzahlen]]) und die
 Nachweise je Lastfall ([[opencivil.nachweis.qa_stahl]]) lesen dieselben
 Kennwerte und schreiben dieselben Tabellen; beides steht hier, je einmal:
 
-* die Kennwerte je Gruppe -- Baustahl in einer Dicke -- und die Festigkeit,
+* die Kennwerte je Gruppe – Baustahl in einer Dicke – und die Festigkeit,
   mit der gerechnet wird ([[opencivil.nachweis.qa_stahl_werte#Stahlwerte|Stahlwerte]]);
 * die Tabelle der Bleche mit ihren Klassen ([[opencivil.nachweis.qa_stahl_werte#klassen|klassen]]);
 * die Tabelle der mitwirkenden Breiten in Klasse 4 ([[opencivil.nachweis.qa_stahl_werte#breiten|breiten]]).
@@ -25,7 +25,7 @@ Wie beim Stahlbeton rechnet ein Baustahl mit dem Wertesatz, den die
 Tragsicherheit der Analyse fuer ihn waehlt
 ([[opencivil.querschnitt.gesetzwahl#Werkstoffsatz|Werkstoffsatz]]): mit `f_y/γ_M1`
 und `τ_y/γ_M1` oder mit `f_y` und `τ_y`. Die Widerstaende heissen in
-beiden Faellen `Rd` -- wie beim Stahlbeton (nach Vorgabe, nicht
+beiden Faellen `Rd` – wie beim Stahlbeton (nach Vorgabe, nicht
 nachgeschlagen).
 
 ## Inhalt
@@ -44,7 +44,7 @@ Die Kennwerte aller Baustaehle des Querschnitts, als Eingaben.
 class Stahlwerte
 ```
 
-Die Kennwerte der Gruppen eines Stahlquerschnitts -- siehe Dateikopf.
+Die Kennwerte der Gruppen eines Stahlquerschnitts – siehe Dateikopf.
 
 #### Stahlwerte.wert
 
@@ -86,7 +86,7 @@ Je Gruppe die Fliessgrenze, mit der gerechnet wird: `f_y/γ_M1` oder `f_y`.
 def eps(self) -> List[float]
 ```
 
-Je Gruppe `ε` -- immer mit `f_y`.
+Je Gruppe `ε` – immer mit `f_y`.
 
 #### Stahlwerte.mit_gamma
 
@@ -95,7 +95,7 @@ Je Gruppe `ε` -- immer mit `f_y`.
 def mit_gamma(self) -> bool
 ```
 
-Ob einer der Staehle mit Bemessungswerten rechnet -- dann steht `γ_M1` in den Formeln.
+Ob einer der Staehle mit Bemessungswerten rechnet – dann steht `γ_M1` in den Formeln.
 
 #### Stahlwerte.formel
 
@@ -103,7 +103,7 @@ Ob einer der Staehle mit Bemessungswerten rechnet -- dann steht `γ_M1` in den F
 def formel(self, g: int, x: str, zeichen: str='f_y') -> Tuple[str, Dict[str, Wert]]
 ```
 
-`f_y X/γ_M1` der Gruppe `g` als Vorlage mit ihren Werten -- mit
+`f_y X/γ_M1` der Gruppe `g` als Vorlage mit ihren Werten – mit
 charakteristischen Werten ohne `γ_M1`. `x` ist `X` in der
 Vorlage, etwa `@W`.
 
@@ -113,7 +113,7 @@ Vorlage, etwa `@W`.
 def bruch(self, oben: str) -> str
 ```
 
-`oben/γ_M1` als LaTeX, wo mit Bemessungswerten gerechnet wird -- sonst `oben`.
+`oben/γ_M1` als LaTeX, wo mit Bemessungswerten gerechnet wird – sonst `oben`.
 
 ### klassen
 
@@ -121,8 +121,8 @@ def bruch(self, oben: str) -> str
 def klassen(p: Protokoll, zustaende: Sequence[Blechzustand], freie: Sequence[Teil], titel: str) -> Tuple[int, str]
 ```
 
-Die Klasse je Blech, als Tabelle, und die des Querschnitts -- die
-unguenstigste -- mit dem Namen dessen, was sie bestimmt (ohne Namen in
+Die Klasse je Blech, als Tabelle, und die des Querschnitts – die
+unguenstigste – mit dem Namen dessen, was sie bestimmt (ohne Namen in
 Klasse 1). Gedrueckte freie Flaechen zaehlen mit Klasse 3.
 
 ### breiten
@@ -137,7 +137,7 @@ Die mitwirkenden Breiten der Bleche in Klasse 4, als Tabelle mit ihren Formeln.
 ## Konstanten
 
 - `KENNWERTE = ('f_y', 'f_y_dick', 'tau_y', 'tau_y_dick', 'gamma_M1', 'E_a')` – Was Kennzahlen und Nachweise je Baustahl lesen.
-- `_JEDE_DICKE = ('gamma_M1', 'E_a', 'G_a')` – Was in jeder Dicke gilt -- die anderen Kennwerte haben einen Wert ueber 40 mm. `G_a` liest nur das Kippen ([[opencivil.nachweis.qa_stahl_stabilitaet]]).
+- `_JEDE_DICKE = ('gamma_M1', 'E_a', 'G_a')` – Was in jeder Dicke gilt – die anderen Kennwerte haben einen Wert ueber 40 mm. `G_a` liest nur das Kippen ([[opencivil.nachweis.qa_stahl_stabilitaet]]).
 - `ROHR_KLASSE_4 = f'{wd.ROHR_KLASSE_4} Der Widerstand steht darum auf null.'` – Warum ein Rundrohr der Klasse 4 nichts traegt.
 - `SPANNUNG = Mathe('f_y\\ [\\mathrm{N}/\\mathrm{mm}^2]')`
 - `WIDERSTANDSMOMENT = 'Widerstandsmoment bis zur weitesten Faser'` – Namen der Formeln, die Kennzahlen und Nachweise beide schreiben: eine Formel, ein Name in der Formelsammlung, gleich in welcher Klasse.

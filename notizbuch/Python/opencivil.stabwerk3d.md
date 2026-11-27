@@ -1,5 +1,5 @@
 ---
-erzeugt: 4a1086f7f01f
+erzeugt: 1e2254a4f8f1
 art: modul
 tags: [modul]
 ---
@@ -10,15 +10,15 @@ tags: [modul]
 Die App «3D Balkensysteme»: ein Rahmen im Raum, gerechnet mit
 Euler-Bernoulli-Staeben und Torsion nach St. Venant, Theorie 1. Ordnung, mit
 sechs Unbekannten je Knoten. Gerechnet wird im gemeinsamen Kern
-([[opencivil.stabwerk.system]]), der auch die Ebene rechnet -- hier steht,
+([[opencivil.stabwerk.system]]), der auch die Ebene rechnet – hier steht,
 was nur der Raum hat:
 
-* [[opencivil.stabwerk3d.modell|modell]] -- was gerechnet wird, in SI.
-* [[opencivil.stabwerk3d.raum|raum]] -- Vektoren, Richtungen und Strecken.
-* [[opencivil.stabwerk3d.stab|stab]] -- der einzelne Stab: seine Achsen, und
+* [[opencivil.stabwerk3d.modell|modell]] – was gerechnet wird, in SI.
+* [[opencivil.stabwerk3d.raum|raum]] – Vektoren, Richtungen und Strecken.
+* [[opencivil.stabwerk3d.stab|stab]] – der einzelne Stab: seine Achsen, und
   wie er aus drei ebenen Staeben besteht.
 * [[opencivil.stabwerk3d.rechnung|rechnung]] und
-  [[opencivil.stabwerk3d.herleitung|herleitung]] -- das 3D-Balkensystem im
+  [[opencivil.stabwerk3d.herleitung|herleitung]] – das 3D-Balkensystem im
   Rechenwerk und wie es seine Rechnung aufschreibt.
 
 Nur die Standardbibliothek.

@@ -1,5 +1,5 @@
 ---
-erzeugt: 53f10cdff803
+erzeugt: 09fbe708690e
 art: modul
 tags: [modul]
 ---
@@ -22,7 +22,7 @@ Kombination: seine Masse in mm, mit r_s und dem Durchmesser nach der
 Abrostung aus denselben Funktionen wie im Nachweis.
 
 Und je Kombination die Verläufe über die Tiefe, wie die Steifigkeit sie
-gerechnet hat ([[opencivil.web.pfahldaten#verlaeufe|verlaeufe]]), mit dem Satz, der unter ihnen steht --
+gerechnet hat ([[opencivil.web.pfahldaten#verlaeufe|verlaeufe]]), mit dem Satz, der unter ihnen steht –
 neben Moment und Querkraft der Widerstand des Pfahls, neben dem
 Bettungsdruck der Erdwiderstand: die Grenzen, die sie nicht übersteigen
 dürfen. Jede Grösse bringt Zeichen, Einheit und Stellen mit
@@ -39,7 +39,7 @@ def situation(aufbau: Aufbau, kennung: str, loesung: Loesung) -> Dict[str, Any]
 ```
 
 Was die Zeichnung eines Pfahls braucht. Ohne Kombination gibt es keinen
-Nachweis und keinen Befund -- dann zeichnet sie nur den Pfahl im Boden.
+Nachweis und keinen Befund – dann zeichnet sie nur den Pfahl im Boden.
 
 ### querschnitt
 
@@ -49,8 +49,8 @@ def querschnitt(pfahl: Pfahl) -> Dict[str, Any]
 
 Was das Bild des Querschnitts braucht, in mm: beim Bohrpfahl
 Durchmesser, Laengsstaebe, Wendel und der Radius r_s ihrer Mitten, beim
-Mikropfahl Verpresskoerper und Tragglied -- `t` `None` beim
-Vollstab -- mit dem Durchmesser nach der Abrostung. Dazu die Legende.
+Mikropfahl Verpresskoerper und Tragglied – `t` `None` beim
+Vollstab – mit dem Durchmesser nach der Abrostung. Dazu die Legende.
 
 ### _befund
 
@@ -58,7 +58,7 @@ Vollstab -- mit dem Durchmesser nach der Abrostung. Dazu die Legende.
 def _befund(aufbau: Aufbau, kennung: str, loesung: Loesung, feld: str) -> Optional[Any]
 ```
 
-Der Befund des Nachweises in `feld` -- `None`, wo es ihn nicht gibt.
+Der Befund des Nachweises in `feld` – `None`, wo es ihn nicht gibt.
 
 ### verlaeufe
 
@@ -66,7 +66,7 @@ Der Befund des Nachweises in `feld` -- `None`, wo es ihn nicht gibt.
 def verlaeufe(aufbau: Aufbau, kennung: str, loesung: Loesung) -> Dict[str, Any]
 ```
 
-Je Kombination Setzung, Normalkraft und -- wo quer gerechnet ist --
+Je Kombination Setzung, Normalkraft und – wo quer gerechnet ist –
 Verschiebung, Verdrehung, Moment, Querkraft und Bettungsdruck über die
 Tiefe ab Terrain, dazu der Satz darunter. Leer ohne Steifigkeit.
 
@@ -85,7 +85,7 @@ Grenze, wo es eine gibt (sonst `None`).
 def _grenzen(name: str, aussen: Optional[Querbefund], innen: Optional[Innenquerbefund]) -> Dict[str, List[float]]
 ```
 
-Die Grenzen einer Kombination neben M, V und p, in SI -- leer, wo sie nicht quer belastet.
+Die Grenzen einer Kombination neben M, V und p, in SI – leer, wo sie nicht quer belastet.
 
 ### _legende
 

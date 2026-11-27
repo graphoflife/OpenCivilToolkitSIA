@@ -43,5 +43,5 @@ ob er den Gleitkörper erreicht. Ist $T$ mindestens so gross wie die
 [[Tiefe des Gleitkörpers]] $H$ (Bild 9.2.10, Lage 3), bleibt dieser trocken.
 
 Dazwischen verlangt das Kapitel eine Stabilitätsberechnung. Das Werkzeug
-rechnet dann so, als stünde das Wasser auf der Sohle -- auf der sicheren
+rechnet dann so, als stünde das Wasser auf der Sohle – auf der sicheren
 Seite, aber eine eigene Annahme, im TODO vermerkt.

@@ -482,7 +482,7 @@ class TestBibliothek(unittest.TestCase):
 
     def test_eingerueckt_nach_text_setzt_den_absatz_fort(self):
         seite = self.seiten["opencivil.core.rechenwerk"]
-        self.assertIn("**Rueckwaerts** -- \"Ich will diesen Wert. Was ist dafuer noetig?\"\n"
+        self.assertIn("**Rueckwaerts** – \"Ich will diesen Wert. Was ist dafuer noetig?\"\n"
                       "[[opencivil.core.rechenwerk#Rechenwerk.loese|Rechenwerk.loese]] verfolgt",
                       seite)
 
@@ -501,6 +501,12 @@ class TestBibliothek(unittest.TestCase):
         self.assertEqual(_maskieren("a|b $5 <i> 50%% x==y [[z]]", am_anfang=False),
                          "a\\|b \\$5 \\<i> 50\\%\\% x\\=\\=y \\[\\[z]]")
         self.assertEqual(_maskieren("# kein Titel", am_anfang=True), "\\# kein Titel")
+
+    def test_der_gedankenstrich_wird_echt(self):
+        """Im Docstring «--», auf der Seite «–» (Benutzer, 2026-11-27) -- eine Option nicht."""
+        from opencivil.notizbuch.bibliothek import _maskieren
+        self.assertEqual(_maskieren("a -- b --, c --", am_anfang=False), "a – b –, c –")
+        self.assertEqual(_maskieren("mit --uebernehmen", am_anfang=False), "mit --uebernehmen")
 
     def test_formeln_stehen_bei_ihrem_modul(self):
         alle = {s.name: s.rumpf for s in bruecke.notizbuch_seiten()}

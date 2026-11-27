@@ -1,5 +1,5 @@
 ---
-erzeugt: bc6118ede0c9
+erzeugt: ff6d8c5ef678
 art: modul
 tags: [modul]
 ---
@@ -20,7 +20,7 @@ und unter zentrischem Zug sind alle Raender gezogen.
 
 Jede Kante zwischen Material und Leere: die Umrisse aussen und die Raender
 der Aussparungen. Nicht dazu gehoert, wo zwei Materialien aneinander
-grenzen -- ein Polygon in einem anderen, oder zwei, die sich entlang einer
+grenzen – ein Polygon in einem anderen, oder zwei, die sich entlang einer
 Kante beruehren.
 
 
@@ -31,15 +31,15 @@ Auf waagrechten Linien. Je Linie die Strecken, die einem Polygon gehoeren
 `abstand` an einer Randkante liegen: um jede Kante liegt ein Streifen mit
 runden Enden, und jede Linie schneidet ihn in einer Strecke. Die Linien
 liegen in Baendern zwischen den Hoehen, an denen die Strecken springen oder
-knicken -- an den Ecken, den Ecken ± `abstand` und den Ecken der
-Streifen --, in jedem Band mindestens eine, sonst nach seiner Hoehe
+knicken – an den Ecken, den Ecken ± `abstand` und den Ecken der
+Streifen –, in jedem Band mindestens eine, sonst nach seiner Hoehe
 verteilt. Bei Rechtecken ist das genau; eine einspringende Ecke zieht einen
 Kreisbogen, dort liegt der Fehler unter einem Promille.
 
 
 ## EINHEITEN
 
-Keine -- die der Punkte, wie in [[opencivil.querschnitt.geometrie]].
+Keine – die der Punkte, wie in [[opencivil.querschnitt.geometrie]].
 
 ## Inhalt
 
@@ -62,8 +62,8 @@ def _randkanten(polygone: Sequence[Sequence[Punkt]], eltern: Sequence[Optional[i
 
 Die Kanten zwischen Material und Leere. Ein Polygon traegt sie bei, wenn
 innen anderes liegt als aussen; wo zwei solche Kanten aufeinander liegen,
-grenzt auf beiden Seiten dasselbe -- Material an Material oder Leere an
-Leere --, und das Stueck faellt weg.
+grenzt auf beiden Seiten dasselbe – Material an Material oder Leere an
+Leere –, und das Stueck faellt weg.
 
 ### _deckung
 
@@ -71,7 +71,7 @@ Leere --, und das Stueck faellt weg.
 def _deckung(a: Punkt, b: Punkt, c: Punkt, d: Punkt) -> Optional[Strecke]
 ```
 
-Welches Stueck der Kante a–b die Kante c–d deckt, als Parameter in [0, 1] -- oder nichts.
+Welches Stueck der Kante a–b die Kante c–d deckt, als Parameter in [0, 1] – oder nichts.
 
 ### _reste
 
@@ -87,7 +87,7 @@ Die Stuecke der Kante a–b, die keine andere deckt.
 def _bandgrenzen(polygone: Sequence[Sequence[Punkt]], kanten: Sequence[Kante], abstand: float) -> List[float]
 ```
 
-Die Hoehen, an denen die Strecken einer Linie springen oder knicken -- aufsteigend.
+Die Hoehen, an denen die Strecken einer Linie springen oder knicken – aufsteigend.
 
 ### _innen
 
@@ -95,7 +95,7 @@ Die Hoehen, an denen die Strecken einer Linie springen oder knicken -- aufsteige
 def _innen(punkte: Sequence[Punkt], z: float) -> List[Strecke]
 ```
 
-Wo die Linie auf der Hoehe `z` im Polygon liegt -- keine Ecke liegt auf ihr.
+Wo die Linie auf der Hoehe `z` im Polygon liegt – keine Ecke liegt auf ihr.
 
 ### _streifen
 
@@ -113,7 +113,7 @@ ist konvex, die Linie schneidet ihn in einer Strecke.
 def _zwischen(faktor: float, rest: float, unten: float, oben: float, y0: float) -> Optional[Strecke]
 ```
 
-Die `y` mit `unten <= (y - y0)·faktor + rest <= oben` -- alle, wenn `faktor` null ist.
+Die `y` mit `unten <= (y - y0)·faktor + rest <= oben` – alle, wenn `faktor` null ist.
 
 ### _vereinigen
 
@@ -129,7 +129,7 @@ Die Strecken, sortiert und ohne Ueberlappung.
 def _schneiden(a: Sequence[Strecke], b: Sequence[Strecke]) -> List[Strecke]
 ```
 
-Was in beiden liegt -- beide sortiert und ohne Ueberlappung.
+Was in beiden liegt – beide sortiert und ohne Ueberlappung.
 
 ### _abziehen
 
@@ -137,12 +137,12 @@ Was in beiden liegt -- beide sortiert und ohne Ueberlappung.
 def _abziehen(a: Sequence[Strecke], b: Sequence[Strecke]) -> List[Strecke]
 ```
 
-Was in `a` liegt und nicht in `b` -- beide sortiert und ohne Ueberlappung.
+Was in `a` liegt und nicht in `b` – beide sortiert und ohne Ueberlappung.
 
 
 ## Konstanten
 
-- `LINIEN = 400` – Wie viele Linien ueber die Hoehe des Querschnitts verteilt werden -- dazu wenigstens eine je Band.
+- `LINIEN = 400` – Wie viele Linien ueber die Hoehe des Querschnitts verteilt werden – dazu wenigstens eine je Band.
 
 ## Braucht
 

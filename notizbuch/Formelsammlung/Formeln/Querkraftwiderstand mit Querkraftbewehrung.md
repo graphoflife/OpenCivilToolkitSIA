@@ -57,9 +57,9 @@ Diagonalen, die Längsbewehrung bildet den Gurt. Der innere Hebelarm ist
 $0.9\,d$. Die Neigung $\alpha$ der Diagonalen gegen die Plattenebene ist
 nicht vorgegeben:
 
-- je flacher die Diagonale, desto mehr Bügel schneidet ein Schnitt -- der
+- je flacher die Diagonale, desto mehr Bügel schneidet ein Schnitt – der
   [[Widerstand der Bügel]] wächst mit $\cot\alpha$;
-- desto schmaler aber auch die Druckstrebe -- der
+- desto schmaler aber auch die Druckstrebe – der
   [[Widerstand der Druckdiagonalen]] fällt unter 45° mit
   $\sin\alpha\,\cos\alpha$.
 

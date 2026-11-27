@@ -1,5 +1,5 @@
 ---
-erzeugt: ba03320a109f
+erzeugt: 1d01c5c44dcf
 art: modul
 tags: [modul]
 ---
@@ -12,12 +12,12 @@ tags: [modul]
 Die zulaessige Stahlspannung der Gebrauchsnachweise, an der Platte wie am
 gezeichneten Querschnitt ([[opencivil.nachweis.spannungsbegrenzung]]):
 
-* **die Grenzen** -- gegen das Fliessen `f_yd - 80 N/mm²`
+* **die Grenzen** – gegen das Fliessen `f_yd - 80 N/mm²`
   ([[opencivil.nachweis.spannungsgrenzen#GrenzeGegenFliessen|GrenzeGegenFliessen]]), aus der Rissbreite `sigma_s,adm`
   ([[opencivil.nachweis.spannungsgrenzen#GrenzeAusRissbreite|GrenzeAusRissbreite]]), jede mit ihren Woertern, Eingaben und
   ihrem Absatz in der Herleitung ([[opencivil.nachweis.spannungsgrenzen#Spannungsgrenze|Spannungsgrenze]]);
-* **die Stellen**, an denen gemessen wird -- bei der Platte ihre Lagen, beim
-  gezeichneten Querschnitt jeder Stab ([[opencivil.nachweis.spannungsgrenzen#Stelle|Stelle]]) --, und je Stelle
+* **die Stellen**, an denen gemessen wird – bei der Platte ihre Lagen, beim
+  gezeichneten Querschnitt jeder Stab ([[opencivil.nachweis.spannungsgrenzen#Stelle|Stelle]]) –, und je Stelle
   ihre Grenze, in Gruppen gleicher Grenze hergeleitet ([[opencivil.nachweis.spannungsgrenzen#Grenzen|Grenzen]]).
 
 Gegen das Fliessen gilt je Stahl dieselbe Zahl, fuer jede Geometrie
@@ -48,7 +48,7 @@ Wo eine Stahlspannung gemessen wird: eine Lage der Platte, ein Stab des gezeichn
 class Stahlzustand
 ```
 
-Was ein Ort fuer eine Rechnung vorbereitet -- aus ihren Eingaben: die
+Was ein Ort fuer eine Rechnung vorbereitet – aus ihren Eingaben: die
 Stellen und ihre Staehle. Jeder Ort fuegt hinzu, was nur er braucht.
 
 - `stellen: Tuple[Stelle, ...]`
@@ -61,13 +61,13 @@ Stellen und ihre Staehle. Jeder Ort fuegt hinzu, was nur er braucht.
 class Grenzgruppe
 ```
 
-Stellen mit derselben zulaessigen Spannung -- und woraus sie entsteht.
+Stellen mit derselben zulaessigen Spannung – und woraus sie entsteht.
 
 - `sigma: float` – `sigma_s,adm` in Pa.
 - `stahl: Baustoff`
 - `stab: Optional['Stabangabe'] = None` – Nur beim gezeichneten Querschnitt, wo die Rissbreite zaehlt: ein Stab der Gruppe, fuer Durchmesser und Beton. Bei normaler Anforderung, gegen das Fliessen und an der Platte gilt die Grenze fuer jede Stelle des Stahls.
 - `stellen: List[int] = field(default_factory=list)` – Die Stellen der Gruppe, nach ihrer Nummer.
-- `wert: Optional[Wert] = None` – Die Grenze, wie sie in Herleitung und Vergleich steht -- gesetzt beim Protokollieren.
+- `wert: Optional[Wert] = None` – Die Grenze, wie sie in Herleitung und Vergleich steht – gesetzt beim Protokollieren.
 
 ### Grenzen
 
@@ -76,7 +76,7 @@ Stellen mit derselben zulaessigen Spannung -- und woraus sie entsteht.
 class Grenzen
 ```
 
-Die Grenze jeder Stelle -- und die Gruppen, in denen sie hergeleitet wird.
+Die Grenze jeder Stelle – und die Gruppen, in denen sie hergeleitet wird.
 
 - `gruppen: List[Grenzgruppe]`
 - `je_stelle: List[int]` – Je Stelle die Nummer ihrer Gruppe.
@@ -110,7 +110,7 @@ Betonstahl); fuer sie gilt keine dieser Grenzen.
 def strengste(self) -> int
 ```
 
-Die Stelle mit der kleinsten Grenze -- sie steht da, wo keine gezogen ist.
+Die Stelle mit der kleinsten Grenze – sie steht da, wo keine gezogen ist.
 
 ### nach_stahl
 
@@ -118,7 +118,7 @@ Die Stelle mit der kleinsten Grenze -- sie steht da, wo keine gezogen ist.
 def nach_stahl(zustand: Stahlzustand, sigma: Callable[[Baustoff], float]) -> Grenzen
 ```
 
-Je Stahl eine Gruppe, in der Folge der Staehle des Zustands -- jede
+Je Stahl eine Gruppe, in der Folge der Staehle des Zustands – jede
 Stelle in der ihres Stahls. `sigma` gibt die Grenze eines Stahls.
 
 ### je_stahl
@@ -127,7 +127,7 @@ Stelle in der ihres Stahls. `sigma` gibt die Grenze eines Stahls.
 def je_stahl(name: str, symbol: str, stahl: Baustoff, alle: Sequence[Baustoff]) -> Tuple[str, str]
 ```
 
-Name und Zeichen eines Werts, der zu einem Stahl gehoert -- mit dem
+Name und Zeichen eines Werts, der zu einem Stahl gehoert – mit dem
 Stahl daran, sobald es mehr als einen gibt.
 
 ### gegen_fliessen
@@ -136,7 +136,7 @@ Stahl daran, sobald es mehr als einen gibt.
 def gegen_fliessen(zustand: Stahlzustand, e: Eingaben, p: Protokoll, basis: str) -> Grenzen
 ```
 
-`f_yd - 80 N/mm²` je Stahl, hergeleitet -- fuer jede Geometrie dasselbe:
+`f_yd - 80 N/mm²` je Stahl, hergeleitet – fuer jede Geometrie dasselbe:
 der Durchmesser zaehlt hier nicht. Setzt [[opencivil.nachweis.spannungsgrenzen#Grenzgruppe|Grenzgruppe.wert]].
 
 ### Spannungsgrenze
@@ -145,7 +145,7 @@ der Durchmesser zaehlt hier nicht. Setzt [[opencivil.nachweis.spannungsgrenzen#G
 class Spannungsgrenze(ABC)
 ```
 
-Wogegen ein Stahlspannungsnachweis haelt -- und alles, was nur dazugehoert.
+Wogegen ein Stahlspannungsnachweis haelt – und alles, was nur dazugehoert.
 
 Die Zahl, die Eingaben, aus denen sie entsteht, und die Absaetze, die sie
 begruenden. Dazu die Woerter, unter denen der Nachweis ueberall erscheint:
@@ -166,7 +166,7 @@ braucht, fragt sie den Ort
 - `art: str` – Kurzzeichen im Urteil.
 - `langname: str` – Spalte «Nachweis» der Zusammenfassung.
 - `thema: str` – Thema in der Formelsammlung, und wovon der Erfuellungsgrad spricht.
-- `einwirkung: str` – «häufiger» / «quasi-ständiger» -- im Titel.
+- `einwirkung: str` – «häufiger» / «quasi-ständiger» – im Titel.
 - `lastindex: str` – Index an M_Ed und N_Ed in der Herleitung.
 - `fallwort: str` – Ueberschrift je Fall.
 - `referenz: str`
@@ -199,7 +199,7 @@ Was nur diese Grenze braucht, zusaetzlich zur gemeinsamen Rechnung.
 def bestimmen(cls, ort: 'Stahlspannungsort', zustand: Stahlzustand, e: Eingaben, p: Protokoll, anforderung: Rissanforderung, basis: str) -> Grenzen
 ```
 
-Die zulaessige Stahlspannung jeder Stelle -- gerechnet und
+Die zulaessige Stahlspannung jeder Stelle – gerechnet und
 mitgeschrieben, mit [[opencivil.nachweis.spannungsgrenzen#Grenzgruppe|Grenzgruppe.wert]] gesetzt.
 
 #### Spannungsgrenze.festlegung
@@ -210,7 +210,7 @@ mitgeschrieben, mit [[opencivil.nachweis.spannungsgrenzen#Grenzgruppe|Grenzgrupp
 def festlegung(cls, p: Protokoll, ort: 'Stahlspannungsort', anforderung: Rissanforderung) -> None
 ```
 
-Welche Werte die Grenze ansetzt, und warum -- nur der Absatz.
+Welche Werte die Grenze ansetzt, und warum – nur der Absatz.
 
 ### GrenzeGegenFliessen
 
@@ -218,9 +218,9 @@ Welche Werte die Grenze ansetzt, und warum -- nur der Absatz.
 class GrenzeGegenFliessen(Spannungsgrenze)
 ```
 
-`f_yd - 80 N/mm²` unter haeufiger Einwirkung -- das Fliessen verhindern.
+`f_yd - 80 N/mm²` unter haeufiger Einwirkung – das Fliessen verhindern.
 
-Nur bei erhoehter und hoher Anforderung -- bei normaler steht in
+Nur bei erhoehter und hoher Anforderung – bei normaler steht in
 Tabelle 17 ein Strich ([[opencivil.nachweis.rissanforderung#Rissanforderung.gegen_fliessen|Rissanforderung.gegen_fliessen]]). Der
 Aufbau fragt [[opencivil.nachweis.spannungsgrenzen#GrenzeGegenFliessen.gilt_bei|gilt_bei]].
 
@@ -271,7 +271,7 @@ class GrenzeAusRissbreite(Spannungsgrenze)
 
 `sigma_s,adm` aus der Rissanforderung, unter quasi-staendiger Einwirkung.
 
-Dieselbe zulaessige Spannung wie bei der Zwaengung -- dieselbe Funktion,
+Dieselbe zulaessige Spannung wie bei der Zwaengung – dieselbe Funktion,
 [[opencivil.nachweis.spannungsgrenzen#GrenzeAusRissbreite|mindestbewehrung.zulaessige_stahlspannung]], und keine zweite
 Fassung davon. Bei normaler Anforderung `f_yk`: die Bewehrung darf
 unter Dauerlast nicht fliessen. Bei erhoehter und hoher zusaetzlich die
@@ -318,7 +318,7 @@ def festlegung(cls, p: Protokoll, ort: 'Stahlspannungsort', anforderung: Rissanf
 ## Konstanten
 
 - `FLIESSABSTAND = 80000000.0` – Abstand zur Bemessungsfliessgrenze, in Pa. SIA 262:2025, Tabelle 17.
-- `FUSSNOTE_RISSBREITE = 'Die Grenze nach Gl. (102) gilt für den Augenblick, in dem der Riss e…` – Was die Grenze aus der Rissbreite nicht deckt: SIA 262:2025, Tabelle 17, Fussnote 1 zu Zeile 2 -- in eigenen Worten. Nur wo eine Rissbreite verlangt ist; bei normaler Anforderung gilt f_yk ohne sie.
+- `FUSSNOTE_RISSBREITE = 'Die Grenze nach Gl. (102) gilt für den Augenblick, in dem der Riss e…` – Was die Grenze aus der Rissbreite nicht deckt: SIA 262:2025, Tabelle 17, Fussnote 1 zu Zeile 2 – in eigenen Worten. Nur wo eine Rissbreite verlangt ist; bei normaler Anforderung gilt f_yk ohne sie.
 
 ## Braucht
 

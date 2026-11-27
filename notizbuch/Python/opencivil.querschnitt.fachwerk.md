@@ -1,5 +1,5 @@
 ---
-erzeugt: 9ab7f6183ea0
+erzeugt: 0667b03e2fae
 art: modul
 tags: [modul]
 ---
@@ -12,7 +12,7 @@ tags: [modul]
 Das Druckfeld eines Stegs mit Buegeln, an einer Stelle: was er bei einer
 Neigung der Druckdiagonalen aufnimmt ([[opencivil.querschnitt.fachwerk#fachwerk|fachwerk]]), zwischen welchen
 Neigungen gesucht wird ([[opencivil.querschnitt.fachwerk#Konstanten|ALPHA_MIN]], [[opencivil.querschnitt.fachwerk#Konstanten|ALPHA_MAX]], bei Normalzug
-gehoben, [[opencivil.querschnitt.fachwerk#druckfeldgrenzen|druckfeldgrenzen]]), mit welchem `k_c` ([[opencivil.querschnitt.fachwerk#Konstanten|K_C]]) --
+gehoben, [[opencivil.querschnitt.fachwerk#druckfeldgrenzen|druckfeldgrenzen]]), mit welchem `k_c` ([[opencivil.querschnitt.fachwerk#Konstanten|K_C]]) –
 und welche Neigung den groessten Widerstand gibt ([[opencivil.querschnitt.fachwerk#guenstigste|guenstigste]]).
 Fuer die Buegel einer Platte ([[opencivil.nachweis.querkraft_buegel]]),
 eine Schubwand des gezeichneten Querschnitts
@@ -49,7 +49,7 @@ in N, fuer die ganze Wand.
 def V_Rd(self) -> float
 ```
 
-Massgebend ist der kleinere der beiden -- eines von beiden versagt.
+Massgebend ist der kleinere der beiden – eines von beiden versagt.
 
 ### fachwerk
 
@@ -57,7 +57,7 @@ Massgebend ist der kleinere der beiden -- eines von beiden versagt.
 def fachwerk(*, alpha: int, a_sw_s: float, z: float, b_w: float, f_yd: float, f_cd: float, k_c: float) -> Buegelpunkt
 ```
 
-Fachwerkmodell mit veraenderlicher Neigung der Druckdiagonalen -- fuer die
+Fachwerkmodell mit veraenderlicher Neigung der Druckdiagonalen – fuer die
 Buegel einer Platte wie fuer eine Schubwand der Querschnittsanalyse.
 
 Alles in SI-Basis: Flaechen in m^2, Laengen in m, Festigkeiten in Pa:
@@ -78,7 +78,7 @@ def beste_neigung(punkte: Sequence[Buegelpunkt]) -> Buegelpunkt
 
 Die Neigung mit dem groessten Widerstand.
 
-`V_Rd,s` waechst mit flacherer Diagonale, `V_Rd,c` faellt dabei --
+`V_Rd,s` waechst mit flacherer Diagonale, `V_Rd,c` faellt dabei –
 das Kleinere von beiden hat sein Groesstes dort, wo sich die beiden
 Aeste treffen. Gesucht wird ganzgradig; bei Gleichstand gilt die
 steilere Neigung, weil sie die Druckdiagonale weniger beansprucht.
@@ -95,7 +95,7 @@ Vorzeichen von `N_Ed`.
 Bei Normalzug steilt sich die Druckdiagonale auf: `alpha_min` ist dann
 mindestens 40°, und `alpha_max` wird notfalls mitgehoben, damit der
 Bereich nicht leer wird (SIA 262:2025, 4.3.3.3.3). Bis 2026-11-14 wurde
-`alpha_min` auf genau 40° gesetzt -- auch von 42° herunter.
+`alpha_min` auf genau 40° gesetzt – auch von 42° herunter.
 
 ### Neigungssuche
 
@@ -119,7 +119,7 @@ def guenstigste(punkt: Callable[[int], Buegelpunkt], *, alpha_min: int, alpha_ma
 
 Die Neigung mit dem groessten Widerstand, ganzgradig zwischen den
 Grenzen, die eine Normalzugkraft hebt ([[opencivil.querschnitt.fachwerk#druckfeldgrenzen|druckfeldgrenzen]]).
-`punkt` ist das Fachwerk des Nutzers bei einer Neigung in Grad -- die
+`punkt` ist das Fachwerk des Nutzers bei einer Neigung in Grad – die
 Buegel einer Platte je Laufmeter, eine Schubwand, eine Wendel.
 Zwischenwerte sind eine Genauigkeit, die das Fachwerkmodell nicht
 hergibt.
@@ -131,7 +131,7 @@ hergibt.
 - `ALPHA_MAX = 45`
 - `ALPHA_ZUG = 40` – Bei einer Normalzugkraft steilt sich die Druckdiagonale auf. Beide Grenzen werden dann auf mindestens diesen Wert gehoben (SIA 262:2025, 4.3.3.3.3).
 - `K_C = 0.55` – Vorgabe fuer den Abminderungsbeiwert der Betondruckfestigkeit in der Druckdiagonalen: der Wert fuer Stege, deren Druckfeld die Bewehrung schief kreuzt (SIA 262:2025, 4.2.1.7).
-- `REFERENZ_ALPHA_MIN = 'SIA 262:2025, 4.3.3.3.3'` – Wo die Grenzen der Neigung und k_c stehen -- fuer die Platte, die Querschnittsanalyse und den Pfahl.
+- `REFERENZ_ALPHA_MIN = 'SIA 262:2025, 4.3.3.3.3'` – Wo die Grenzen der Neigung und k_c stehen – fuer die Platte, die Querschnittsanalyse und den Pfahl.
 - `REFERENZ_ALPHA_MAX = 'SIA 262:2025, 4.3.3.3.2, (42)'`
 - `REFERENZ_K_C = 'SIA 262:2025, 4.2.1.7'`
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: 2556fef92841
+erzeugt: 54a47aefc4e8
 art: modul
 tags: [modul]
 ---
@@ -10,7 +10,7 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Ein Spannglied der Querschnittsanalyse ([[opencivil.querschnitt.spannglieder#Spannglied|Spannglied]]): wo es liegt,
-aus welchem Erzeugnis und wie vielen davon, wie es wirkt -- und was daraus
+aus welchem Erzeugnis und wie vielen davon, wie es wirkt – und was daraus
 folgt: die Spannung nach dem Spannen und nach allen Verlusten, die
 Vordehnung, die Kraft, sein Gesetz im Querschnitt und seine Grenzdehnung.
 Jede Regel dazu steht hier, einmal: die Herleitung ([[opencivil.querschnitt.spannglieder#Spannglieder|Spannglieder]])
@@ -30,7 +30,7 @@ sigma_p(eps) = sigma_Figur17(eps + eps_p)        eps_p = sigma_pinf / E_p
 ```
 
 Ohne Verbund wirkt die Kraft nach allen Verlusten, ohne Zuwachs (4.1.5.1.6):
-`sigma_p = sigma_pinf`, gleich welche Dehnung -- und keine Grenzdehnung.
+`sigma_p = sigma_pinf`, gleich welche Dehnung – und keine Grenzdehnung.
 
 
 ## SCHLAFF MIT RESTFESTIGKEIT
@@ -45,10 +45,10 @@ Verbund bleibt davon nichts.
 ## DIE VORGABEN
 
 Leer gelassen, gilt `sigma_p0 = 0.70 f_pk` und ``sigma_pinf = 0.85
-sigma_p0`` -- nach Vorgabe, nicht nachgeschlagen (Benutzer, 2026-11-25).
+sigma_p0`` – nach Vorgabe, nicht nachgeschlagen (Benutzer, 2026-11-25).
 Die Verluste haengen am Bauwerk (4.1.5.3); die Vorgabe ersetzt ihre
 Rechnung nicht. Die Vordehnung ist `sigma_pinf/E_p` mit dem Modul des
-Erzeugnisses: die Stauchung des Betons beim Vorspannen faellt weg -- nach
+Erzeugnisses: die Stauchung des Betons beim Vorspannen faellt weg – nach
 Vorgabe, nicht nachgeschlagen.
 
 
@@ -60,13 +60,13 @@ Ein Glied mit Vordehnung darf gegen die Stabachse geneigt sein, um
 `beta_p > 0` heisst, sie wirkt wie ein positives `V_z`. Wirkt sie in
 einem Lastfall wie dessen `V_z`, traegt sie es mit, mit `F = P_inf`
 ([[opencivil.querschnitt.spannglieder#guenstig|guenstig]]; 4.3.3.4.8, Gleichung (50)); wirkt sie entgegen, kommt
-sie dazu, mit der groessten Kraft im Glied (4.3.3.4.9) -- was der
+sie dazu, mit der groessten Kraft im Glied (4.3.3.4.9) – was der
 Nachweis der Schubwaende rechnet
 ([[opencivil.nachweis.schubwandnachweis]]). Schlaff zaehlt die Neigung
 nicht: dort steht die Vorspannung schon samt ihr in den Lastfaellen
 (Benutzer, 2026-11-25). Im Biegewiderstand und im Gebrauch zaehlt ein
 geneigtes Glied, als laege es laengs: `cos beta_p` ist bis
-[[opencivil.querschnitt.spannglieder#Konstanten|GRENZE_NEIGUNG]] mindestens 0.94 -- nach Vorgabe, nicht
+[[opencivil.querschnitt.spannglieder#Konstanten|GRENZE_NEIGUNG]] mindestens 0.94 – nach Vorgabe, nicht
 nachgeschlagen.
 
 
@@ -81,7 +81,7 @@ in der Herleitung; gerechnet wird mit seinen Zahlen.
 ## EINHEITEN
 
 Lage und Durchmesser in mm, Flaechen in mm², die eingegebenen Spannungen in
-N/mm² -- wie in der Zeichnung. Die Gesetze rechnen in SI.
+N/mm² – wie in der Zeichnung. Die Gesetze rechnen in SI.
 
 ## Inhalt
 
@@ -91,7 +91,7 @@ N/mm² -- wie in der Zeichnung. Die Gesetze rechnen in SI.
 class Spannwirkung(Wahl)
 ```
 
-Wie ein Spannglied im Widerstand zaehlt -- siehe Dateikopf.
+Wie ein Spannglied im Widerstand zaehlt – siehe Dateikopf.
 
 - `VORDEHNUNG = 'vordehnung'`
 - `RESTFESTIGKEIT = 'restfestigkeit'`
@@ -119,7 +119,7 @@ Im Schalter des Zeichenfensters, wo der Platz knapp ist.
 def mit_neigung(self) -> bool
 ```
 
-Ob die Neigung zaehlt -- nur mit Vordehnung, siehe Dateikopf.
+Ob die Neigung zaehlt – nur mit Vordehnung, siehe Dateikopf.
 
 #### Spannwirkung.erklaerung
 
@@ -134,7 +134,7 @@ def erklaerung(self) -> str
 class Verbund(Wahl)
 ```
 
-Ob das Glied mit dem Beton verbunden ist -- siehe Dateikopf.
+Ob das Glied mit dem Beton verbunden ist – siehe Dateikopf.
 
 - `MIT = 'mit'`
 - `OHNE = 'ohne'`
@@ -169,7 +169,7 @@ def vorspannung(f_pk: float, sigma_p0: Optional[float], sigma_pinf: Optional[flo
 ```
 
 `sigma_p0` und `sigma_pinf`: eingegeben oder nach Vorgabe
-([[opencivil.querschnitt.spannglieder#Konstanten|ANTEIL_SPANNEN]], [[opencivil.querschnitt.spannglieder#Konstanten|ANTEIL_NACH_VERLUSTEN]]) -- in der
+([[opencivil.querschnitt.spannglieder#Konstanten|ANTEIL_SPANNEN]], [[opencivil.querschnitt.spannglieder#Konstanten|ANTEIL_NACH_VERLUSTEN]]) – in der
 Einheit von `f_pk`, wie die Eingaben.
 
 ### grenze_nach_spannen
@@ -178,7 +178,7 @@ Einheit von `f_pk`, wie die Eingaben.
 def grenze_nach_spannen(f_pk: float, f_p01k: float) -> float
 ```
 
-`min(0.75 f_pk; 0.85 f_p0.1k)` -- Gleichung (22).
+`min(0.75 f_pk; 0.85 f_p0.1k)` – Gleichung (22).
 
 ### grenzen_verletzt
 
@@ -187,7 +187,7 @@ def grenzen_verletzt(p0: float, pinf: float, f_pk: float, f_p01k: float) -> List
 ```
 
 Was an den Spannungen eines Glieds nicht stimmt, je ein Satz ohne Punkt
--- alles in N/mm². Leer, wenn alles stimmt.
+– alles in N/mm². Leer, wenn alles stimmt.
 
 ### geneigt
 
@@ -195,7 +195,7 @@ Was an den Spannungen eines Glieds nicht stimmt, je ein Satz ohne Punkt
 def geneigt(g: 'Spannglied') -> bool
 ```
 
-Ob ein Glied mit seiner Neigung in der Querkraft zaehlt -- siehe Dateikopf.
+Ob ein Glied mit seiner Neigung in der Querkraft zaehlt – siehe Dateikopf.
 
 ### lotrecht
 
@@ -212,7 +212,7 @@ def guenstig(neigung: float, V_z: float) -> bool
 ```
 
 Ob die lotrechte Kraft eines Glieds die Querkraft `V_z` mittraegt:
-beide gleich gerichtet. Ohne `V_z` kommt sie dazu -- unguenstig.
+beide gleich gerichtet. Ohne `V_z` kommt sie dazu – unguenstig.
 
 ### flaechendurchmesser
 
@@ -220,7 +220,7 @@ beide gleich gerichtet. Ohne `V_z` kommt sie dazu -- unguenstig.
 def flaechendurchmesser(flaeche: float) -> float
 ```
 
-Der Durchmesser eines Kreises mit dieser Flaeche -- so gross zeichnet sich ein Glied.
+Der Durchmesser eines Kreises mit dieser Flaeche – so gross zeichnet sich ein Glied.
 
 ### VorgedehnterSpannstahl
 
@@ -247,7 +247,7 @@ verschoben (4.1.5.1.5). Bei `eps = 0` traegt es `sigma_pinf`.
 def abzug(self) -> float
 ```
 
-Was vom Gesetz abgeht -- mit Vordehnung nichts.
+Was vom Gesetz abgeht – mit Vordehnung nichts.
 
 #### VorgedehnterSpannstahl.eps_yd
 
@@ -287,13 +287,13 @@ class Restfestigkeit(VorgedehnterSpannstahl)
 ```
 
 Ein schlaffes Spannglied mit Verbund: was es ueber `sigma_pinf` hinaus
-traegt, wenn die Vorspannung schon als Einwirkung zaehlt (4.1.5.5.2) --
+traegt, wenn die Vorspannung schon als Einwirkung zaehlt (4.1.5.5.2) –
 das Gesetz mit Vordehnung, um `sigma_pinf` gesenkt.
 
 - `WORT = 'schlaff mit Restfestigkeit'`
 - `REFERENZ = f'{REFERENZ_EINWIRKUNG}; {REFERENZ_VORDEHNUNG}; 4.2.3.3, Figur 17'`
 - `ROLLEN = ('f_p', 'E_p', 'eps_ud', 'eps_p', 'sigma_pinf')`
-- `sigma_pinf: float = 0.0` – Die Spannung nach allen Verlusten in N/m² -- sie zaehlt schon als Einwirkung.
+- `sigma_pinf: float = 0.0` – Die Spannung nach allen Verlusten in N/m² – sie zaehlt schon als Einwirkung.
 
 #### Restfestigkeit.abzug
 
@@ -316,7 +316,7 @@ class FesteSpannung(Gesetz)
 
 Ein Spannglied ohne Verbund: die Spannung nach allen Verlusten, gleich
 welche Dehnung der Querschnitt an seiner Stelle hat (4.1.5.1.6). Schlaff
-angesetzt ist sie null -- das Glied traegt nichts bei.
+angesetzt ist sie null – das Glied traegt nichts bei.
 
 - `NAME = IM_QUERSCHNITT`
 - `WORT = 'ohne Verbund'`
@@ -345,7 +345,7 @@ def protokoll(self, p: Protokoll, werte: Werte, *, titel: str, basis: str='') ->
 class Spannglied(Bewehrungselement)
 ```
 
-Ein Spannglied der Zeichnung -- `von` und `bis` sind seine Lage,
+Ein Spannglied der Zeichnung – `von` und `bis` sind seine Lage,
 `flaeche` ist `anzahl` mal die des Erzeugnisses (Tabelle 7). Die
 Spannungen stehen, wie eingegeben, in N/mm²; `None` heisst Vorgabe.
 
@@ -418,7 +418,7 @@ def als_bewehrung(self, stahl: int, verdraengt: Verdraengt) -> List[Bewehrung]
 def stahlflaechen(self) -> Flaechen
 ```
 
-Ein Quadrat seiner Flaeche, wie ein Stab -- im Verbund rechnet das Werkzeug keins.
+Ein Quadrat seiner Flaeche, wie ein Stab – im Verbund rechnet das Werkzeug keins.
 
 ### aus_glied
 
@@ -437,7 +437,7 @@ class Spannglieder(Prozedur)
 
 Die Spannglieder einer Analyse: je Glied `A_p`, `sigma_p0`,
 `sigma_pinf`, `eps_p` und `P_inf` als Werte des Rechenwerks, mit
-ihrer Herleitung -- und daraus je Glied sein Werkstoff im Querschnitt
+ihrer Herleitung – und daraus je Glied sein Werkstoff im Querschnitt
 ([[opencivil.querschnitt.spannglieder#Spannglieder.werkstoffe|werkstoffe]]). Die Nachweise lesen die Werte ueber
 [[opencivil.querschnitt.spannglieder#Spannglieder.gliedbezuege|gliedbezuege]], damit jede Spannkraft rueckverfolgbar bleibt.
 
@@ -447,7 +447,7 @@ ihrer Herleitung -- und daraus je Glied sein Werkstoff im Querschnitt
 def index(self, g: Spannglied) -> str
 ```
 
-Was an den Symbolen eines Glieds unten steht: «,2» -- bei nur einem nichts.
+Was an den Symbolen eines Glieds unten steht: «,2» – bei nur einem nichts.
 
 #### Spannglieder.gliedbezuege
 
@@ -455,7 +455,7 @@ Was an den Symbolen eines Glieds unten steht: «,2» -- bei nur einem nichts.
 def gliedbezuege(self, kurze: Sequence[str]=('sigma_pinf', 'eps_p', 'P_inf'), glieder: Optional[Sequence[Spannglied]]=None) -> List[Eingabebezug]
 ```
 
-Was ein Nachweis von den Gliedern liest, als `{kurz}__{kennung}` --
+Was ein Nachweis von den Gliedern liest, als `{kurz}__{kennung}` –
 jeder `sigma_pinf`, `eps_p` und `P_inf` von allen; wer mehr
 braucht, nennt die Werte und die Glieder.
 
@@ -465,8 +465,8 @@ braucht, nennt die Werte und die Glieder.
 def spannkraefte(self) -> List[Tuple[Spannglied, str]]
 ```
 
-Die Glieder, deren Kraft den Beton schon ohne Last drueckt -- die mit
-Vordehnung, mit oder ohne Verbund --, je mit der ID ihres `P_inf`.
+Die Glieder, deren Kraft den Beton schon ohne Last drueckt – die mit
+Vordehnung, mit oder ohne Verbund –, je mit der ID ihres `P_inf`.
 Schlaff angesetzt steht die Vorspannung schon in den Lastfaellen.
 
 #### Spannglieder.werkstoffe
@@ -486,7 +486,7 @@ Wert-ID die Zahl in SI.
 def gesetze_protokollieren(self, p: Protokoll, e: Eingaben, wahl, werkstoffe: Sequence[Werkstoff], *, titel: Callable[[Spannglied], str], basis: str) -> None
 ```
 
-Je Glied sein Gesetz, mit seinen Werten -- `werkstoffe` die von
+Je Glied sein Gesetz, mit seinen Werten – `werkstoffe` die von
 [[opencivil.querschnitt.spannglieder#Spannglieder.werkstoffe|werkstoffe]], `titel` wie die Zeile eines Glieds heisst.
 
 #### Spannglieder.rechne
@@ -501,7 +501,7 @@ def rechne(self, e: Eingaben, p: Protokoll) -> Dict[str, Groesse]
 def _glied(self, e: Eingaben, p: Protokoll, g: Spannglied, ergebnis: Dict[str, Groesse]) -> List[Zelle]
 ```
 
-Die Werte eines Glieds, hergeleitet -- und seine Zeile der Tabelle.
+Die Werte eines Glieds, hergeleitet – und seine Zeile der Tabelle.
 
 
 ## Konstanten
@@ -516,17 +516,17 @@ Die Werte eines Glieds, hergeleitet -- und seine Zeile der Tabelle.
 - `REFERENZ_GUENSTIG = 'SIA 262:2025, 4.3.3.4.8, (50)'`
 - `REFERENZ_UNGUENSTIG = 'SIA 262:2025, 4.3.3.4.9'`
 - `NACH_VORGABE = 'nach Vorgabe, nicht nachgeschlagen'`
-- `ANTEIL_SPANNEN = 0.7` – `sigma_p0 = 0.70 f_pk`, wo nichts eingegeben ist -- nach Vorgabe, nicht nachgeschlagen (Benutzer, 2026-11-25).
-- `ANTEIL_NACH_VERLUSTEN = 0.85` – `sigma_pinf = 0.85 sigma_p0`, wo nichts eingegeben ist -- nach Vorgabe, nicht nachgeschlagen (Benutzer, 2026-11-25).
-- `VORGABE_SPANNUNG = {'sigma_p0': f'{ANTEIL_SPANNEN:.2f}·f_pk', 'sigma_pinf': f'{ANTEIL_NA…` – Was ein leeres Feld der Spannung heisst -- fuer den Platzhalter im Zeichenfenster, solange noch kein Glied die Zahl kennt.
+- `ANTEIL_SPANNEN = 0.7` – `sigma_p0 = 0.70 f_pk`, wo nichts eingegeben ist – nach Vorgabe, nicht nachgeschlagen (Benutzer, 2026-11-25).
+- `ANTEIL_NACH_VERLUSTEN = 0.85` – `sigma_pinf = 0.85 sigma_p0`, wo nichts eingegeben ist – nach Vorgabe, nicht nachgeschlagen (Benutzer, 2026-11-25).
+- `VORGABE_SPANNUNG = {'sigma_p0': f'{ANTEIL_SPANNEN:.2f}·f_pk', 'sigma_pinf': f'{ANTEIL_NA…` – Was ein leeres Feld der Spannung heisst – fuer den Platzhalter im Zeichenfenster, solange noch kein Glied die Zahl kennt.
 - `GRENZE_F_PK = 0.75` – Gleichung (22): `sigma_p0 <= min(0.75 f_pk; 0.85 f_p0.1k)`.
 - `GRENZE_F_P01K = 0.85`
 - `MINDESTENS_F_PK = 0.45` – 4.1.5.2.3: nach allen Verlusten mindestens `0.45 f_pk`.
-- `GRENZE_NEIGUNG = 20.0` – Wie steil ein Glied hoechstens liegt, in Grad, nach oben wie nach unten: bis dahin zaehlt es im Biegewiderstand laengs, `cos 20° = 0.94` -- nach Vorgabe, nicht nachgeschlagen.
+- `GRENZE_NEIGUNG = 20.0` – Wie steil ein Glied hoechstens liegt, in Grad, nach oben wie nach unten: bis dahin zaehlt es im Biegewiderstand laengs, `cos 20° = 0.94` – nach Vorgabe, nicht nachgeschlagen.
 - `KENNWERTE = ('f_pk', 'f_p01k', 'E_p', 'E_p_litze')` – Die Kennwerte des Spannstahls, die die Herleitung der Glieder liest.
-- `NEIGUNG_ERKLAERT = {'titel': f'Neigung gegen die Stabachse in Grad, höchstens {GRENZE_NE…` – Was das Feld der Neigung im Zeichenfenster sagt: als Titel, in einer Zeile darunter -- und an seiner Stelle, wo sie nicht zaehlt.
+- `NEIGUNG_ERKLAERT = {'titel': f'Neigung gegen die Stabachse in Grad, höchstens {GRENZE_NE…` – Was das Feld der Neigung im Zeichenfenster sagt: als Titel, in einer Zeile darunter – und an seiner Stelle, wo sie nicht zaehlt.
 - `DEHNUNG_AM_GLIED = 'Bei einem Spannglied ist ε die Dehnung des Betons an seiner Stelle: …` – Was eine Tabelle oder ein Bild sagt, das die Dehnung eines Glieds zeigt: es ist die des Betons an seiner Stelle, nicht die des Stahls.
-- `FLAECHE = 'Querschnitt eines Spannglieds'` – Die Seiten im Notizbuch, je Groesse eine: Querschnitt, Spannungen nach Vorgabe, Vordehnung und Kraft eines Glieds, die Grenzen seiner Spannung, sein Gesetz im Querschnitt -- dieses eine fuer alle drei Arten.
+- `FLAECHE = 'Querschnitt eines Spannglieds'` – Die Seiten im Notizbuch, je Groesse eine: Querschnitt, Spannungen nach Vorgabe, Vordehnung und Kraft eines Glieds, die Grenzen seiner Spannung, sein Gesetz im Querschnitt – dieses eine fuer alle drei Arten.
 - `NACH_VORGABE_GESPANNT = 'Spannung im Spannglied nach Vorgabe'`
 - `VORDEHNUNG = 'Vordehnung eines Spannglieds'`
 - `SPANNKRAFT = 'Spannkraft eines Spannglieds'`

@@ -41,10 +41,10 @@ $$
 ## Theorie
 
 Wieder- und Erstbelastung zusammen: die Setzung unter dem Punkt, für den
-gerechnet wurde -- beim starren Fundament die mittlere, beim schlaffen die
+gerechnet wurde – beim starren Fundament die mittlere, beim schlaffen die
 grösste ([[Lage des Punktes längs L]]). Sie wird gegen die zulässige Setzung
 gehalten, $s \le s_{zul}$, der [[Erfüllungsgrad]] ist $s_{zul}/s$. Welche
-Setzung zulässig ist, hängt am Bauwerk -- an seinem Zweck, seiner
+Setzung zulässig ist, hängt am Bauwerk – an seinem Zweck, seiner
 Konstruktion, seinen Anschlüssen (Kap. 8.12); SIA 267:2013 verlangt, sie je
 Objekt festzulegen (8.5.4.1). Die Vorgabe der Maske ist nur ein Startwert.
 Die Aufteilung in Wieder- und Erstbelastung stammt aus Kap. 8.5.

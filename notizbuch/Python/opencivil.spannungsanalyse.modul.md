@@ -1,5 +1,5 @@
 ---
-erzeugt: c6b7da7c3001
+erzeugt: c216b3cd481d
 art: modul
 tags: [modul]
 ---
@@ -11,7 +11,7 @@ tags: [modul]
 
 Die letzten zwei Fragen: eine Linie, umgerechnet in den Modul, den ein
 reiner, ungerissener, elastischer Betonquerschnitt braeuchte, um sich gleich
-stark zu kruemmen oder zu dehnen ([[opencivil.spannungsanalyse.modul#Modullinie|Modullinie]]) -- bei einem
+stark zu kruemmen oder zu dehnen ([[opencivil.spannungsanalyse.modul#Modullinie|Modullinie]]) – bei einem
 Querschnitt ohne Beton derselbe Querschnitt, linear-elastisch
 ([[opencivil.spannungsanalyse.linie#Modulbezug|Modulbezug]]). Und derselbe Modul
 an einer Stelle der Linie, fuer die Staebe eines Balkensystems
@@ -30,7 +30,7 @@ class Modulpunkt
 ```
 
 Ein Punkt der Linie des aequivalenten Moduls: die laufende Kraft und der
-Modul, der dort gilt -- dazu beide Zustaende zum Vergleich, wie bei der
+Modul, der dort gilt – dazu beide Zustaende zum Vergleich, wie bei der
 Linie, aus der er stammt.
 
 - `kraft: float`
@@ -48,8 +48,8 @@ class Modullinie
 
 Der aequivalente E-Modul ueber dem Moment oder ueber der Normalkraft.
 
-Der Modul, den ein reiner Betonquerschnitt braeuchte -- ungerissen, ohne
-Stahl, elastisch --, um sich unter der laufenden Kraft gleich stark zu
+Der Modul, den ein reiner Betonquerschnitt braeuchte – ungerissen, ohne
+Stahl, elastisch –, um sich unter der laufenden Kraft gleich stark zu
 kruemmen bzw. zu dehnen wie der bewehrte Querschnitt:
 
 ```
@@ -61,14 +61,14 @@ Ohne Beton misst er sich am Querschnitt selbst, mit `I` und `A`
 ([[opencivil.spannungsanalyse.linie#Modulbezug|Modulbezug]]): bis zum Fliessbeginn ist er dort der Modul des
 Werkstoffs.
 
-Gezaehlt wird ab dem Zustand ohne laufende Kraft -- `chi_0` bei M = 0
+Gezaehlt wird ab dem Zustand ohne laufende Kraft – `chi_0` bei M = 0
 unter der festen Normalkraft, `eps_0` bei N = 0 unter dem festen
-Moment --, nach Vorgabe (2026-10-11); SIA 262:2025 kennt keinen solchen
+Moment –, nach Vorgabe (2026-10-11); SIA 262:2025 kennt keinen solchen
 Modul. Was die festgehaltene Kraft allein
 verformt, kann ein gerader, ungerissener Betonquerschnitt nicht abbilden:
 bei unsymmetrischer Bewehrung kruemmt schon eine Normalkraft, und ein
 gerissener Querschnitt dehnt sich schon unter dem Moment allein. Ab null
-gezaehlt, ergaebe das nahe null Ausreisser -- am Beispiel bei M = 30 kNm
+gezaehlt, ergaebe das nahe null Ausreisser – am Beispiel bei M = 30 kNm
 und N = 16 kN 99 500 N/mm², fast das Dreifache von E_cm. Ist die feste
 Kraft null, ist es genau `M = E·I·chi` bzw. `N = E·A·eps`.
 
@@ -78,7 +78,7 @@ N-eps-Linie daneben.
 
 - `art: Analyseart`
 - `linie: Linie` – Die M-chi- oder N-eps-Linie, aus der umgerechnet wird.
-- `bezug: Modulbezug` – Woran er sich misst: `I` bzw. `A` -- und `E` zum Vergleich, `E_eq/E` ist der Faktor, um den man `E` abmindert: beim Stahlbeton `E_cm`, sonst der Modul des Materials.
+- `bezug: Modulbezug` – Woran er sich misst: `I` bzw. `A` – und `E` zum Vergleich, `E_eq/E` ist der Faktor, um den man `E` abmindert: beim Stahlbeton `E_cm`, sonst der Modul des Materials.
 - `null: float` – Die Verformung ohne laufende Kraft: `chi_0` bzw. `eps_0`.
 - `punkte: List[Modulpunkt] = field(default_factory=list)`
 
@@ -97,7 +97,7 @@ def querschnitt(self) -> float
 def modul(self, kraft: float, verformung: float) -> Optional[float]
 ```
 
-`Kraft / (Querschnitt · (Verformung − null))` -- `None`, wo das nichts sagt.
+`Kraft / (Querschnitt · (Verformung − null))` – `None`, wo das nichts sagt.
 
 #### Modullinie.ungerissen
 
@@ -106,7 +106,7 @@ def modul(self, kraft: float, verformung: float) -> Optional[float]
 def ungerissen(self) -> Optional[float]
 ```
 
-Der Modul des ungerissenen Teils -- dort ist der Querschnitt linear.
+Der Modul des ungerissenen Teils – dort ist der Querschnitt linear.
 
 #### Modullinie.riss
 
@@ -131,7 +131,7 @@ def fliessen(self) -> Optional[float]
 def ende(self) -> Optional[float]
 ```
 
-Der Modul am Ende der Linie -- beim Bruch, oder ungerissen, wenn sie es bleibt.
+Der Modul am Ende der Linie – beim Bruch, oder ungerissen, wenn sie es bleibt.
 
 ### aequivalenter_modul
 
@@ -139,10 +139,10 @@ Der Modul am Ende der Linie -- beim Bruch, oder ungerissen, wenn sie es bleibt.
 def aequivalenter_modul(linie: Linie, bezug: Modulbezug) -> Modullinie
 ```
 
-Die M-chi- oder N-eps-Linie als Linie des aequivalenten Moduls -- siehe
+Die M-chi- oder N-eps-Linie als Linie des aequivalenten Moduls – siehe
 [[opencivil.spannungsanalyse.modul#Modullinie|Modullinie]]. Beide Vergleichszustaende zaehlen ab ihrer eigenen
 Verformung ohne laufende Kraft. `bezug` ist der Querschnitt, an dem
-sich der Modul misst -- beim Stahlbeton der reine Betonquerschnitt.
+sich der Modul misst – beim Stahlbeton der reine Betonquerschnitt.
 
 ### Modulstelle
 
@@ -151,13 +151,13 @@ sich der Modul misst -- beim Stahlbeton der reine Betonquerschnitt.
 class Modulstelle
 ```
 
-Der aequivalente Modul bei N und M -- und woraus er folgt, fuer die Herleitung.
+Der aequivalente Modul bei N und M – und woraus er folgt, fuer die Herleitung.
 
 - `N: float`
-- `M: float` – Das Moment, bei dem gerechnet wurde, zur Zugseite -- bei M = 0 das halbe Rissmoment.
+- `M: float` – Das Moment, bei dem gerechnet wurde, zur Zugseite – bei M = 0 das halbe Rissmoment.
 - `riss: float` – `M_Riss(N)`.
 - `gerissen: bool`
-- `chi_0: float` – Die Kruemmung ohne Moment -- ab ihr wird gezaehlt.
+- `chi_0: float` – Die Kruemmung ohne Moment – ab ihr wird gezaehlt.
 - `chi: float`
 - `I_c: float`
 - `modul: float` – In Pa.
@@ -169,14 +169,14 @@ def modul_bei(paar: Paar, *, N: float, M: float) -> Tuple[Optional[Modulstelle],
 ```
 
 Der aequivalente E-Modul bei der Normalkraft `N` (Zug positiv) und dem
-Moment `M >= 0` zur Zugseite des Paars, in SI -- an derselben Stelle der
+Moment `M >= 0` zur Zugseite des Paars, in SI – an derselben Stelle der
 M-E_eq-Linie ([[opencivil.spannungsanalyse.modul#aequivalenter_modul|aequivalenter_modul]] ueber
 [[opencivil.spannungsanalyse.linie#moment_kruemmung|moment_kruemmung]]): ungerissen
 bis `M_Riss(N)`, darueber gerissen, gezaehlt ab der Kruemmung ohne
-Moment. Bei `M = 0` der Wert, mit dem die Linie beginnt -- ungerissen
+Moment. Bei `M = 0` der Wert, mit dem die Linie beginnt – ungerissen
 ist der Querschnitt linear, das halbe Rissmoment gibt ihn genau.
 
-Ohne Gleichgewicht `None`, dazu der Satz, warum -- klein beginnend, er
+Ohne Gleichgewicht `None`, dazu der Satz, warum – klein beginnend, er
 steht hinter einem Doppelpunkt.
 
 ### Modulbefund
@@ -186,7 +186,7 @@ steht hinter einem Doppelpunkt.
 class Modulbefund
 ```
 
-Was die Suche nach E_eq fand: die Stelle -- oder warum es keine gibt.
+Was die Suche nach E_eq fand: die Stelle – oder warum es keine gibt.
 
 - `stelle: Optional[Modulstelle]`
 - `grund: str = ''`
@@ -198,7 +198,7 @@ Was die Suche nach E_eq fand: die Stelle -- oder warum es keine gibt.
 class ModulAusAnalyse
 ```
 
-Woher das E_eq kommt: eine Querschnittsanalyse -- das Paar ihrer
+Woher das E_eq kommt: eine Querschnittsanalyse – das Paar ihrer
 Spannung-Dehnung-Analyse in der Zugrichtung des Moments
 ([[opencivil.spannungsanalyse.schnitt#schnittpaar|schnittpaar]]).
 
@@ -225,7 +225,7 @@ Was das Paar liest: Schwerpunkt, Werkstoffe, Flaeche und Traegheitsmomente.
 def paar(self, M: float, wert: Callable[[str], float], wahl: Rechenwahl) -> Tuple[Optional[Paar], str, str]
 ```
 
-Das Paar zur Zugseite von `M`, wie sie heisst -- ohne Paar warum.
+Das Paar zur Zugseite von `M`, wie sie heisst – ohne Paar warum.
 Eines gibt es bisher nur beim Stahlbeton: das Paar rechnet mit Riss
 und Beton ([[opencivil.spannungsanalyse.schnitt#schnittpaar|schnittpaar]]).
 
@@ -236,7 +236,7 @@ und Beton ([[opencivil.spannungsanalyse.schnitt#schnittpaar|schnittpaar]]).
 class ModulAusPlatte
 ```
 
-Woher das E_eq kommt: eine Platte -- immer in x-Richtung und mit Zug
+Woher das E_eq kommt: eine Platte – immer in x-Richtung und mit Zug
 unten (Benutzer, 2026-10-24), das Paar ihrer Spannung-Dehnung-Analyse
 ([[opencivil.spannungsanalyse.platte#loeserpaar|loeserpaar]]). Ein negatives
 Moment hat darum kein E_eq: es zoege oben.
@@ -264,7 +264,7 @@ Was das Paar liest: Dicke und Breite in x, der Beton, die Lagen in x.
 def paar(self, M: float, wert: Callable[[str], float], wahl: Rechenwahl) -> Tuple[Optional[Paar], str, str]
 ```
 
-Das Paar in x mit Zug unten -- ohne Paar warum.
+Das Paar in x mit Zug unten – ohne Paar warum.
 
 ### Modulfrage
 
@@ -275,7 +275,7 @@ class Modulfrage
 
 Das E_eq eines Querschnitts bei `N` in kN (Zug positiv) und `M` in
 kNm (positiv mit Zug unten), fuer die Staebe eines Balkensystems mit
-ihm (Benutzer, 2026-10-23) -- gerechnet mit `wahl` wie eine
+ihm (Benutzer, 2026-10-23) – gerechnet mit `wahl` wie eine
 Spannung-Dehnung-Analyse ihrer `quelle`.
 
 - `quelle: Any` – [[opencivil.spannungsanalyse.modul#ModulAusAnalyse|ModulAusAnalyse]] oder [[opencivil.spannungsanalyse.modul#ModulAusPlatte|ModulAusPlatte]].
@@ -293,8 +293,8 @@ Die Berechnungen dazu, im Namensraum des Systems: N und M als
 Vorgaben, die Suche ([[opencivil.spannungsanalyse.modul#ModulProzedur|ModulProzedur]]) und E aus ihrem Befund
 ([[opencivil.spannungsanalyse.modul#ModulAusBefund|ModulAusBefund]]). ``definieren(kurzname, symbol, einheit,
 beschreibung, stellen)`` legt einen Wert des Systems an. Zurueck die
-Berechnungen, die Wert-ID von E -- sie fehlt, wo die Suche keinen
-Modul fand -- und die ID der Suche.
+Berechnungen, die Wert-ID von E – sie fehlt, wo die Suche keinen
+Modul fand – und die ID der Suche.
 
 ### ModulProzedur
 
@@ -303,7 +303,7 @@ class ModulProzedur(Prozedur)
 ```
 
 Sucht das E_eq einer [[opencivil.spannungsanalyse.modul#Modulfrage|Modulfrage]]: mit dem Paar ihrer Quelle, an
-der Stelle der M-E_eq-Linie ([[opencivil.spannungsanalyse.modul#modul_bei|modul_bei]]). Ohne Ausgabe -- ihr
+der Stelle der M-E_eq-Linie ([[opencivil.spannungsanalyse.modul#modul_bei|modul_bei]]). Ohne Ausgabe – ihr
 Befund ist der [[opencivil.spannungsanalyse.modul#Modulbefund|Modulbefund]], und die Herleitung sagt, was sie
 fand. So haelt ein Moment ueber dem Widerstand nur das System auf, nicht
 das Projekt.
@@ -320,7 +320,7 @@ def rechne(self, e: Eingaben, p: Protokoll) -> Ausfuehrung
 class ModulAusBefund(Prozedur)
 ```
 
-E aus dem Befund der Suche -- nur, wo sie einen Modul fand. Sonst ist sie
+E aus dem Befund der Suche – nur, wo sie einen Modul fand. Sonst ist sie
 nicht anwendbar: E fehlt, mit ihm EA und EI, und das System sagt warum.
 
 #### ModulAusBefund.anwendbar
@@ -338,8 +338,8 @@ def rechne(self, e: Eingaben, p: Protokoll) -> dict
 
 ## Konstanten
 
-- `NULLKRAFT = 1e-06` – Unter diesem Anteil der groessten Kraft der Linie gilt eine Kraft als null -- der erste Punkt einer gerissen beginnenden Linie traegt null bis auf die Schranke des Loesers.
-- `OHNE_BEWEHRUNG = 'ohne sie gibt es keine Momenten-Krümmungs-Linie.'` – Was eine Suche ohne Bewehrung sagt -- in der Analyse und in der Platte.
+- `NULLKRAFT = 1e-06` – Unter diesem Anteil der groessten Kraft der Linie gilt eine Kraft als null – der erste Punkt einer gerissen beginnenden Linie traegt null bis auf die Schranke des Loesers.
+- `OHNE_BEWEHRUNG = 'ohne sie gibt es keine Momenten-Krümmungs-Linie.'` – Was eine Suche ohne Bewehrung sagt – in der Analyse und in der Platte.
 
 ## Braucht
 

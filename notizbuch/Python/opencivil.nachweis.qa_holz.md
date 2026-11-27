@@ -1,5 +1,5 @@
 ---
-erzeugt: 31b433d9bcf1
+erzeugt: 53e2e4b767d4
 art: modul
 tags: [modul]
 ---
@@ -9,7 +9,7 @@ tags: [modul]
 
 ## VERANTWORTUNG
 
-Zwei Nachweise je Lastfall, mit ihrer Herleitung -- gerechnet wird in
+Zwei Nachweise je Lastfall, mit ihrer Herleitung – gerechnet wird in
 [[opencivil.holzbau.gleichungen]]:
 
 * **Biegung und Normalkraft** ([[opencivil.nachweis.qa_holz#HolzBiegungQA|HolzBiegungQA]]): (6) oder (10) mit
@@ -28,7 +28,7 @@ Lastfall, der stossartig ist (2.2.6), sonst 1.
 
 ## DER ERFUELLUNGSGRAD
 
-Wie beim Stahl -- die Normalkraft bleibt, die Momente wachsen um `λ`, bis
+Wie beim Stahl – die Normalkraft bleibt, die Momente wachsen um `λ`, bis
 die Gleichung aufgeht: `α = λ`. Ohne Moment, oder wo schon die
 Normalkraft allein nicht traegt, steht die Normalkraft gegen ihren
 Widerstand. In (25) wachsen Querkraft und Torsion zusammen.
@@ -36,12 +36,12 @@ Widerstand. In (25) wachsen Querkraft und Torsion zusammen.
 
 ## QUERKRAFT IN BEIDEN RICHTUNGEN
 
-`τ_d = √(τ_y² + τ_z²)` -- die beiden groessten Schubspannungen, als laegen
+`τ_d = √(τ_y² + τ_z²)` – die beiden groessten Schubspannungen, als laegen
 sie an derselben Stelle: auf der sicheren Seite (nach Vorgabe, nicht
 nachgeschlagen).
 
 
-## WAS FEHLT -- GRAU
+## WAS FEHLT – GRAU
 
 Torsion an einem Querschnitt, der kein Rechteck ist
 ([[opencivil.nachweis.qa_holz_werte#Konstanten|TORSION_NUR_RECHTECK]]).
@@ -68,7 +68,7 @@ def bezuege(analyse: Querschnittsanalyse, werte: HolzwerteQA) -> List[Eingabebez
 def einwirkung(p: Protokoll, analyse: Querschnittsanalyse, fall: Lastfall, groessen: Sequence[str]) -> None
 ```
 
-Die Einwirkung als Tabelle -- je Groesse, die zaehlt, eine Zeile; einachsig ohne M_z, V_y.
+Die Einwirkung als Tabelle – je Groesse, die zaehlt, eine Zeile; einachsig ohne M_z, V_y.
 
 ### ansaetze
 
@@ -76,7 +76,7 @@ Die Einwirkung als Tabelle -- je Groesse, die zaehlt, eine Zeile; einachsig ohne
 def ansaetze(p: Protokoll, gleichungen: AbstractSet[str]) -> None
 ```
 
-Die Gleichungen, die die Faelle brauchen, ohne Zahlen -- in der Folge der Norm.
+Die Gleichungen, die die Faelle brauchen, ohne Zahlen – in der Folge der Norm.
 
 ### bemessungswerte
 
@@ -101,14 +101,14 @@ def _bruch(oben: str, *unten: float) -> str
 class _Fall
 ```
 
-Ein Lastfall am Querschnitt, in N/mm² -- was Gleichung und Herleitung teilen.
+Ein Lastfall am Querschnitt, in N/mm² – was Gleichung und Herleitung teilen.
 
 - `N: float` – In N, positiv Zug.
-- `M: Dict[str, float]` – Je Achse das Moment in Nm, das zaehlt -- auch null.
+- `M: Dict[str, float]` – Je Achse das Moment in Nm, das zaehlt – auch null.
 - `eta: float`
 - `sigma_N: float` – Positiv Zug.
 - `sigma_m: Dict[str, float] = field(default_factory=dict)` – Je Achse der Betrag an der weitesten Faser.
-- `f_m: Dict[str, float] = field(default_factory=dict)` – Je Achse `k_h·f_m,d` -- ohne η.
+- `f_m: Dict[str, float] = field(default_factory=dict)` – Je Achse `k_h·f_m,d` – ohne η.
 - `biegung: Optional[gl.Biegung] = None`
 
 ### HolzBiegungQA
@@ -117,7 +117,7 @@ Ein Lastfall am Querschnitt, in N/mm² -- was Gleichung und Herleitung teilen.
 class HolzBiegungQA(Nachweis)
 ```
 
-Biegung und Normalkraft eines Holzquerschnitts, je Lastfall -- siehe Dateikopf.
+Biegung und Normalkraft eines Holzquerschnitts, je Lastfall – siehe Dateikopf.
 
 - `THEMA = 'Holzquerschnitt'`
 - `LANGNAME = 'Biegung und Normalkraft'`
@@ -135,7 +135,7 @@ def pruefe(self, e: Eingaben, p: Protokoll)
 def _rechnen(self, e: Eingaben, fall: Lastfall) -> _Fall
 ```
 
-Spannungen und Gleichung eines Lastfalls -- ohne Herleitung.
+Spannungen und Gleichung eines Lastfalls – ohne Herleitung.
 
 #### HolzBiegungQA._normalspannung
 
@@ -143,7 +143,7 @@ Spannungen und Gleichung eines Lastfalls -- ohne Herleitung.
 def _normalspannung(self, p: Protokoll, e: Eingaben, werte: Zwischenwerte, x: _Fall, zug: bool) -> str
 ```
 
-σ = \|N\|/A in die Herleitung -- und ihr Glied mit Zahlen, in (22) im Quadrat.
+σ = \|N\|/A in die Herleitung – und ihr Glied mit Zahlen, in (22) im Quadrat.
 
 #### HolzBiegungQA._biegespannung
 
@@ -151,7 +151,7 @@ def _normalspannung(self, p: Protokoll, e: Eingaben, werte: Zwischenwerte, x: _F
 def _biegespannung(self, p: Protokoll, e: Eingaben, werte: Zwischenwerte, x: _Fall, a: str) -> str
 ```
 
-σ_m = \|M\|/W um `a` in die Herleitung -- und ihr Glied, mit Zahlen.
+σ_m = \|M\|/W um `a` in die Herleitung – und ihr Glied, mit Zahlen.
 
 #### HolzBiegungQA._normalkraftwiderstand
 
@@ -159,7 +159,7 @@ def _biegespannung(self, p: Protokoll, e: Eingaben, werte: Zwischenwerte, x: _Fa
 def _normalkraftwiderstand(self, p: Protokoll, e: Eingaben, werte: Zwischenwerte, eta: Wert, zug: bool) -> Wert
 ```
 
-`η f A` -- mit dem Zeichen der Normalkraft, wie die Kennzahlen.
+`η f A` – mit dem Zeichen der Normalkraft, wie die Kennzahlen.
 
 ### HolzSchubQA
 
@@ -167,7 +167,7 @@ def _normalkraftwiderstand(self, p: Protokoll, e: Eingaben, werte: Zwischenwerte
 class HolzSchubQA(Nachweis)
 ```
 
-Schub aus Querkraft und Torsion eines Holzquerschnitts, je Lastfall -- siehe Dateikopf.
+Schub aus Querkraft und Torsion eines Holzquerschnitts, je Lastfall – siehe Dateikopf.
 
 - `THEMA = 'Holzquerschnitt'`
 - `LANGNAME = 'Schub und Torsion'`
@@ -179,7 +179,7 @@ Schub aus Querkraft und Torsion eines Holzquerschnitts, je Lastfall -- siehe Dat
 def _schub(self, fall: Lastfall) -> Dict[str, float]
 ```
 
-Je Richtung die Querkraft in N, die zaehlt -- einachsig nur z.
+Je Richtung die Querkraft in N, die zaehlt – einachsig nur z.
 
 #### HolzSchubQA.pruefe
 
@@ -193,15 +193,15 @@ def pruefe(self, e: Eingaben, p: Protokoll)
 def _querkraft(self, p: Protokoll, e: Eingaben, werte: Zwischenwerte, V: Dict[str, float]) -> Optional[Wert]
 ```
 
-τ je Richtung, mit beiden ihre Resultierende -- `None` ohne Querkraft.
+τ je Richtung, mit beiden ihre Resultierende – `None` ohne Querkraft.
 
 
 ## Konstanten
 
 - `REFERENZ_BIEGUNG = 'SIA 265:2012, 4.2.1–4.2.4'`
 - `REFERENZ_SCHUB = 'SIA 265:2012, 4.2.5'`
-- `ERFUELLUNGSGRAD = '\\alpha_{eff} = \\frac{M_{Rd}}{M_{Ed}} \\qquad M = \\sqrt{M_y^2 + M_…` – Der Erfuellungsgrad -- derselbe Ansatz wie beim Stahl, eine Seite in der Formelsammlung.
-- `_MOMENTE = '\\frac{\\sigma_{m,y,d}}{f_{m,y,d}} + \\frac{\\sigma_{m,z,d}}{f_{m,z,…` – Die Gleichungen ohne Zahlen, je mit ihrem Titel und ihrem Namen in der Formelsammlung -- f_d steht fuer η·f_d der Tabelle.
+- `ERFUELLUNGSGRAD = '\\alpha_{eff} = \\frac{M_{Rd}}{M_{Ed}} \\qquad M = \\sqrt{M_y^2 + M_…` – Der Erfuellungsgrad – derselbe Ansatz wie beim Stahl, eine Seite in der Formelsammlung.
+- `_MOMENTE = '\\frac{\\sigma_{m,y,d}}{f_{m,y,d}} + \\frac{\\sigma_{m,z,d}}{f_{m,z,…` – Die Gleichungen ohne Zahlen, je mit ihrem Titel und ihrem Namen in der Formelsammlung – f_d steht fuer η·f_d der Tabelle.
 - `ANSAETZE = {'(6)': ('\\sigma_{t,0,d} \\le f_{t,0,d}', 'Zug allein', 'Zug im Holz…`
 - `_EINWIRKUNG = {'N': ('N_Ed', 'kN'), 'M_y': ('M_y,Ed', 'kNm'), 'M_z': ('M_z,Ed', 'kN…` – Die Zeilen der Einwirkung: je Groesse des Lastfalls ihr Name und ihre Einheit.
 

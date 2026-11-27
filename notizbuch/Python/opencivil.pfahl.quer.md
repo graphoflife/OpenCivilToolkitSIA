@@ -1,5 +1,5 @@
 ---
-erzeugt: 0f3cecb4c1b9
+erzeugt: c5e34bc2dc58
 art: modul
 tags: [modul]
 ---
@@ -29,7 +29,7 @@ q_d(z) = |p(z)| · D  ≤  p_E,d(z) = η_a,tr · p_E,k(z) / γ_M,a
 ```
 
 Die Verläufe kommen aus der Steifigkeit ([[opencivil.pfahl.steifigkeit|.steifigkeit]]), der
-Querschnitt aus dem inneren Widerstand ([[opencivil.pfahl.innen|.innen]]) -- beide als Befund.
+Querschnitt aus dem inneren Widerstand ([[opencivil.pfahl.innen|.innen]]) – beide als Befund.
 
 
 ## DER BIEGEWIDERSTAND IM BRUCH
@@ -63,7 +63,7 @@ SI-Basis.
 class Querfall
 ```
 
-Was eine Kombination quer ergab, in SI -- R_tr nur mit H_Ed.
+Was eine Kombination quer ergab, in SI – R_tr nur mit H_Ed.
 
 - `grenze: List[float]` – In jeder Tiefe der Verläufe p_E,d / D: der Erdwiderstand als Druck, wie der Bettungsdruck.
 - `R_trk: Optional[float] = None`
@@ -77,7 +77,7 @@ Was eine Kombination quer ergab, in SI -- R_tr nur mit H_Ed.
 class Querbefund
 ```
 
-Je Kombination, nach ihrem Namen, was sie quer ergab -- für das Bild.
+Je Kombination, nach ihrem Namen, was sie quer ergab – für das Bild.
 
 - `faelle: Dict[str, Querfall] = field(default_factory=dict)`
 
@@ -104,7 +104,7 @@ def pruefe(self, e: Eingaben, p: Protokoll) -> Ausfuehrung
 def _erdwiderstand(self, e: Eingaben, p: Protokoll, oben: float, unten: float) -> Erdwiderstand
 ```
 
-p_E,k aus den Schichten -- die Erddrücke nur für die Arten, die am Pfahl vorkommen.
+p_E,k aus den Schichten – die Erddrücke nur für die Arten, die am Pfahl vorkommen.
 
 #### AeussererQuerwiderstand._tabelle
 
@@ -128,12 +128,12 @@ Die Brüche, die der Kopf zulässt.
 def _bettung(self, e: Eingaben, p: Protokoll, werte: Zwischenwerte, k: Kombination, v: Verlauf, erd: Erdwiderstand, fall: Querfall) -> NachweisUrteil
 ```
 
-In jeder Tiefe der Verläufe die Bettungskraft gegen p_E,d -- massgebend die knappste.
+In jeder Tiefe der Verläufe die Bettungskraft gegen p_E,d – massgebend die knappste.
 
 
 ## Konstanten
 
-- `GAMMA_M_QUER = 1.4` – Der Widerstandsbeiwert quer zur Achse -- der kleinste, den die Norm zulässt.
+- `GAMMA_M_QUER = 1.4` – Der Widerstandsbeiwert quer zur Achse – der kleinste, den die Norm zulässt.
 - `GAMMA_M_QUER_REFERENZ = 'SIA 267:2013, 9.5.2.3.1, (49)'`
 - `WAHL_BRUCH = Rechenwahl(arten=Rechenarten.alle(Rechenart.PARABEL), saetze=Wertesae…` – Womit der Pfahl im Bruch biegt: charakteristische Werte, der Beton als Parabel.
 

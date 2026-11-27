@@ -1,5 +1,5 @@
 ---
-erzeugt: 0af1a57bfc13
+erzeugt: 87b08943a577
 art: modul
 tags: [modul]
 ---
@@ -11,7 +11,7 @@ tags: [modul]
 
 Eine Seite des Notizbuchs heisst wie ihre Datei, und Obsidian verlinkt ueber
 den Dateinamen: `[[Bemessungswert der Betondruckfestigkeit]]`. Was eine
-Formel oder ein Thema heisst, muss darum auch als Dateiname taugen -- auf
+Formel oder ein Thema heisst, muss darum auch als Dateiname taugen – auf
 jedem System und in jedem Link. Die Regel dafuer steht hier und nur hier;
 Formelsammlung, Bruecke und api fragen sie ab.
 
@@ -28,7 +28,7 @@ codiert, wo immer die Datei entstand.
 ## NIE STILL KUERZEN
 
 Ein zu langer Name ist ein Fehler. Abgeschnitten fielen zwei Namen mit
-gleichem Anfang zusammen -- und eine Seite verschwaende hinter der anderen.
+gleichem Anfang zusammen – und eine Seite verschwaende hinter der anderen.
 
 Dieses Modul importiert nichts aus `opencivil`: die api laedt es auch in
 Pyodide, wo jedes Modul beim Start mitkommt.
@@ -49,7 +49,7 @@ Aus diesem Text wird kein brauchbarer Seitenname.
 def seitenname(text: str) -> str
 ```
 
-Der Name, unter dem eine Seite im Notizbuch steht -- zugleich ihr
+Der Name, unter dem eine Seite im Notizbuch steht – zugleich ihr
 Dateiname ohne `.md`.
 
 Einmal angewandt, aendert eine zweite Anwendung nichts mehr.
@@ -69,7 +69,7 @@ unterscheiden gross und klein nicht.
 def sortierschluessel(name: str) -> str
 ```
 
-Deutsch sortiert, und auf jedem Rechner gleich: ä wie a, ß wie ss --
+Deutsch sortiert, und auf jedem Rechner gleich: ä wie a, ß wie ss –
 ohne die Spracheinstellung des Systems zu fragen.
 
 
@@ -77,7 +77,7 @@ ohne die Spracheinstellung des Systems zu fragen.
 
 - `ERSATZ = {'/': '∕', '\\': '∕', '|': '¦', '*': '·', '"': "'", '<': '‹', '>': '›…` – Was in einem Dateinamen oder einem Link nicht stehen darf, und wofuer es steht. `:` hat eine eigene Regel (siehe [[opencivil.notizbuch.namen#seitenname|seitenname]]).
 - `WEG = '?#^'` – Zeichen, die ersatzlos wegfallen: `#` und `^` meinen in einem Obsidian-Link Ueberschrift und Absatz.
-- `HOECHSTENS = 100` – Laenger wird kein Name -- sonst ist er keiner mehr, sondern ein Satz.
+- `HOECHSTENS = 100` – Laenger wird kein Name – sonst ist er keiner mehr, sondern ein Satz.
 
 ## Gebraucht von
 

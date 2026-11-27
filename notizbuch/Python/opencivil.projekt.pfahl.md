@@ -1,5 +1,5 @@
 ---
-erzeugt: bac38a8da22f
+erzeugt: b1c39bf9a08a
 art: modul
 tags: [modul]
 ---
@@ -11,7 +11,7 @@ tags: [modul]
 
 Der [[opencivil.projekt.pfahl#PfahlEintrag|PfahlEintrag]]: Art und Masse des Pfahls, sein Querschnitt, die
 Schichten des Baugrunds, das Grundwasser, worauf der äussere Widerstand
-beruht, wie der Kopf gehalten ist, und die Kräfte am Kopf -- als
+beruht, wie der Kopf gehalten ist, und die Kräfte am Kopf – als
 speicherbare Datenklasse. Gerechnet wird in [[opencivil.pfahl]].
 
 
@@ -44,7 +44,7 @@ die Werte tragen die Nummer der Schicht.
 class PfahlschichtEintrag(Beschreibung)
 ```
 
-Eine Schicht des Baugrunds, vom Terrain an nach unten -- siehe [[opencivil.pfahl.boden#Pfahlschicht|Pfahlschicht]].
+Eine Schicht des Baugrunds, vom Terrain an nach unten – siehe [[opencivil.pfahl.boden#Pfahlschicht|Pfahlschicht]].
 
 - `IM_ORT = 'Schicht'`
 - `name: str`
@@ -57,8 +57,8 @@ Eine Schicht des Baugrunds, vom Terrain an nach unten -- siehe [[opencivil.pfahl
 - `mantel: Mantel = Mantel.RECHNEN`
 - `q_s: float = bereich(50.0, heisst='q_s,k', einheit=KPA, ab=0.0)`
 - `K: float = bereich(0.5, heisst='K', ab=0.0)`
-- `delta_faktor: float = bereich(1.0, heisst="δ/φ'_k", ab=0.0, bis=1.0)` – Höchstens eins: zwischen Pfahl und Boden reibt es nie stärker als im Boden -- nach Vorgabe, nicht nachgeschlagen.
-- `alpha: float = bereich(0.6, heisst='α', ab=0.0, bis=1.0)` – Höchstens eins: die Adhäsion erreicht höchstens die Scherfestigkeit -- nach Vorgabe, nicht nachgeschlagen.
+- `delta_faktor: float = bereich(1.0, heisst="δ/φ'_k", ab=0.0, bis=1.0)` – Höchstens eins: zwischen Pfahl und Boden reibt es nie stärker als im Boden – nach Vorgabe, nicht nachgeschlagen.
+- `alpha: float = bereich(0.6, heisst='α', ab=0.0, bis=1.0)` – Höchstens eins: die Adhäsion erreicht höchstens die Scherfestigkeit – nach Vorgabe, nicht nachgeschlagen.
 - `E_s: float = bereich(30.0, heisst='Verformungsmodul E_s,k', einheit=MN_PRO_M2, ueb…`
 
 ### PfahlkombinationEintrag
@@ -69,7 +69,7 @@ class PfahlkombinationEintrag(Beschreibung)
 ```
 
 Eine Einwirkung auf den Pfahlkopf: die Normalkraft in kN, Druck positiv,
-die Querkraft in kN und das Moment in kNm -- siehe
+die Querkraft in kN und das Moment in kNm – siehe
 [[opencivil.pfahl.pfahl#Kombination|Kombination]].
 
 - `IM_ORT = 'Kombination'`
@@ -86,7 +86,7 @@ die Querkraft in kN und das Moment in kNm -- siehe
 class PfahlEintrag(BauteilEintrag)
 ```
 
-Ein Einzelpfahl in seinem Baugrund, mit seinen Einwirkungen -- siehe Dateikopf.
+Ein Einzelpfahl in seinem Baugrund, mit seinen Einwirkungen – siehe Dateikopf.
 
 - `BEZEICHNUNG = 'Pfahl'`
 - `STAMM = 'Pfahl'`
@@ -94,7 +94,7 @@ Ein Einzelpfahl in seinem Baugrund, mit seinen Einwirkungen -- siehe Dateikopf.
 - `kennung: str`
 - `name: str`
 - `art: Pfahlart = Pfahlart.BOHRPFAHL`
-- `beton: str = ''` – Kennung des Betons -- nur beim Bohrpfahl.
+- `beton: str = ''` – Kennung des Betons – nur beim Bohrpfahl.
 - `stahl: str = ''` – Kennung des Stahls: die Längsbewehrung des Bohrpfahls, das Tragglied des Mikropfahls.
 - `D: float = bereich(900.0, heisst='Durchmesser D', einheit=MM, ueber=0.0)`
 - `L: float = bereich(10.0, heisst='Länge L', einheit=M, ueber=0.0)`
@@ -102,7 +102,7 @@ Ein Einzelpfahl in seinem Baugrund, mit seinen Einwirkungen -- siehe Dateikopf.
 - `t_w: float = bereich(0.0, heisst='Tiefe des Grundwassers t_w', einheit=M, ab=0.0)`
 - `gamma_w: float = bereich(10.0, heisst='γ_w', einheit=KN_PRO_M3, ab=0.0)`
 - `grundlage: Grundlage = Grundlage.BERECHNUNG`
-- `eta_a: float = bereich(0.7, heisst='η_a', ueber=0.0, bis=1.0)` – Höchstens der Grenzwert der Grundlage -- das prüft [[opencivil.projekt.pfahl#PfahlEintrag.regeln|regeln]].
+- `eta_a: float = bereich(0.7, heisst='η_a', ueber=0.0, bis=1.0)` – Höchstens der Grenzwert der Grundlage – das prüft [[opencivil.projekt.pfahl#PfahlEintrag.regeln|regeln]].
 - `R_ak: float = bereich(1000.0, heisst='R_a,k auf Druck', einheit=KN, ab=0.0)`
 - `R_ak_zug: float = bereich(500.0, heisst='R_a,k auf Zug', einheit=KN, ab=0.0)`
 - `spitze: Spitze = Spitze.RECHNEN`
@@ -120,8 +120,8 @@ Ein Einzelpfahl in seinem Baugrund, mit seinen Einwirkungen -- siehe Dateikopf.
 - `dt: float = bereich(0.0, heisst='Abrostung Δt', einheit=MM, ab=0.0)`
 - `kopf: Kopf = Kopf.FREI`
 - `t_red: float = bereich(2.0, heisst='Tiefe der Abminderung t_red', einheit=M, ab=0.0)`
-- `eta_tr: float = bereich(0.7, heisst='η_a,tr', ueber=0.0, bis=1.0)` – Höchstens der Grenzwert einer Berechnung: R_tr,k wird immer aus den Schichten gerechnet (SIA 267:2013, 9.5.2.3.2) -- das prüft [[opencivil.projekt.pfahl#PfahlEintrag.regeln|regeln]].
-- `beschreibung: str = ''` – Freier Text -- geht in keine Rechnung ein.
+- `eta_tr: float = bereich(0.7, heisst='η_a,tr', ueber=0.0, bis=1.0)` – Höchstens der Grenzwert einer Berechnung: R_tr,k wird immer aus den Schichten gerechnet (SIA 267:2013, 9.5.2.3.2) – das prüft [[opencivil.projekt.pfahl#PfahlEintrag.regeln|regeln]].
+- `beschreibung: str = ''` – Freier Text – geht in keine Rechnung ein.
 - `schichten: List[PfahlschichtEintrag] = field(default_factory=list)` – Vom Terrain an nach unten.
 - `kombinationen: List[PfahlkombinationEintrag] = field(default_factory=list)`
 
@@ -155,7 +155,7 @@ def bohrpfahl(self) -> bool
 def schicht(self, name: str, **felder: Any) -> PfahlschichtEintrag
 ```
 
-Eine Schicht unten anfügen -- Dicke in m, Raumlast in kN/m³, Winkel in
+Eine Schicht unten anfügen – Dicke in m, Raumlast in kN/m³, Winkel in
 Grad, Spannungen in kPa, den Verformungsmodul in MN/m²; `verhalten`
 und `mantel` als Wort, wie in der Datei: `verhalten="undrainiert"`.
 
@@ -165,7 +165,7 @@ und `mantel` als Wort, wie in der Datei: `verhalten="undrainiert"`.
 def kombination(self, name: str, *, N_Ed: float, H_Ed: float=0.0, M_Ed: float=0.0) -> PfahlkombinationEintrag
 ```
 
-Eine Kombination anfügen -- N_Ed und H_Ed in kN, Druck positiv, M_Ed in kNm.
+Eine Kombination anfügen – N_Ed und H_Ed in kN, Druck positiv, M_Ed in kNm.
 
 #### PfahlEintrag.boden_unter_dem_fuss
 
@@ -174,7 +174,7 @@ Eine Kombination anfügen -- N_Ed und H_Ed in kN, Druck positiv, M_Ed in kNm.
 def boden_unter_dem_fuss(self) -> bool
 ```
 
-Ob die Schichten tiefer reichen als der Fuss -- nur dann trägt ihn Boden.
+Ob die Schichten tiefer reichen als der Fuss – nur dann trägt ihn Boden.
 
 #### PfahlEintrag.fallnamen
 

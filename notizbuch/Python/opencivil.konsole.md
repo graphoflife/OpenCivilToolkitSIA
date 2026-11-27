@@ -1,5 +1,5 @@
 ---
-erzeugt: 0efd4a7ca0ef
+erzeugt: 3a707fd41658
 art: modul
 tags: [modul]
 ---
@@ -9,15 +9,15 @@ tags: [modul]
 
 Ein Skript oder eine Zeile der Konsole läuft in einer Sitzung, deren
 Variablen bleiben; rechts stehen sie im Beobachter. Ausgeführt wird im
-Browser, in einem eigenen Faden mit Pyodide -- nie auf dem Rechner.
+Browser, in einem eigenen Faden mit Pyodide – nie auf dem Rechner.
 
-* [[opencivil.konsole.sitzung|sitzung]] -- der Namensraum, das Ausführen, was
+* [[opencivil.konsole.sitzung|sitzung]] – der Namensraum, das Ausführen, was
   dabei herauskommt, und die Variablen.
-* [[opencivil.konsole.zeichnen|zeichnen]] -- Diagramme mit den Befehlen von
+* [[opencivil.konsole.zeichnen|zeichnen]] – Diagramme mit den Befehlen von
   matplotlib, ohne matplotlib: `import zeichnen as plt`.
-* [[opencivil.konsole.pakete|pakete]] -- welche Fremdpakete beiliegen (numpy,
+* [[opencivil.konsole.pakete|pakete]] – welche Fremdpakete beiliegen (numpy,
   pandas) und wann sie geladen werden.
-* [[opencivil.konsole.dienst|dienst]] -- die Anfragen des Fadens, als JSON.
+* [[opencivil.konsole.dienst|dienst]] – die Anfragen des Fadens, als JSON.
 
 Nichts davon rechnet einen Nachweis: die Skripte gehören dem Benutzer, und
 was sie ausgeben, steht in keinem Bericht.

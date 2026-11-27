@@ -1,5 +1,5 @@
 ---
-erzeugt: 381f5a7a3724
+erzeugt: fee31d362693
 art: modul
 tags: [modul]
 ---
@@ -14,13 +14,13 @@ Tiefe ab Oberkante und seinen Querschnitt, dazu Bewehrungsmass und
 Distanzhalter. Die Nachweise fassen die Posten einer Lage mit den Helfern
 hier zusammen: Querschnitt, gemeinsamer Schwerpunkt und statische Hoehe
 ([[opencivil.querschnitt.lagenaufbau#lage_aus_posten|lage_aus_posten]], [[opencivil.querschnitt.lagenaufbau#protokoll_lage|protokoll_lage]], [[opencivil.querschnitt.lagenaufbau#protokoll_schwerpunkt|protokoll_schwerpunkt]]).
-Den Schwerpunkt mehrerer Flaechen rechnet [[opencivil.querschnitt.lagenaufbau#schwerpunkt|schwerpunkt]] -- fuer die
+Den Schwerpunkt mehrerer Flaechen rechnet [[opencivil.querschnitt.lagenaufbau#schwerpunkt|schwerpunkt]] – fuer die
 Posten einer Lage wie fuer die Lagen einer Seite.
 
 
 ## EIN POSTEN, EINE GESTALT
 
-Ein Posten reist als [[opencivil.querschnitt.lagenaufbau#Postenbezug|Postenbezug]] -- Lage, Art, Posten und seine
+Ein Posten reist als [[opencivil.querschnitt.lagenaufbau#Postenbezug|Postenbezug]] – Lage, Art, Posten und seine
 Werte. Bis 2026-10-25 reiste er als Tupel ``(Lage, Art, Posten, ID von A_s,
 ID von z)``, wurde rund zwanzigmal nach Stelle zerlegt, und seine Marke
 `1g` entstand an neun Stellen neu. Bis dahin stand all das auch in
@@ -35,7 +35,7 @@ ID von z)``, wurde rund zwanzigmal nach Stelle zerlegt, und seine Marke
 class Postenbezug
 ```
 
-Ein Bewehrungsposten einer Platte samt den Werten, die ihn beschreiben --
+Ein Bewehrungsposten einer Platte samt den Werten, die ihn beschreiben –
 siehe Dateikopf. Angelegt nur von der Platte
 ([[opencivil.querschnitt.platte#Plattenquerschnitt|Plattenquerschnitt]]), die auch
 Marke, Index und Bezeichnung bildet.
@@ -48,11 +48,11 @@ sie auch die Helfer hier.
 - `art: Postenart`
 - `posten: Bewehrungsposten`
 - `marke: str` – Kurzform fuer die Namen der Werte, z.B. `1g`.
-- `index: str` – Der Symbolindex, z.B. `1,x,g`: Lage, Richtung, Art -- in dieser Reihenfolge, und immer alle drei. Damit ist jedes Symbol eindeutig, auch wenn zwei Lagen dieselbe Richtung tragen. Die Handrechnung braucht denselben Index fuer ihre zusammengefassten Lagen.
+- `index: str` – Der Symbolindex, z.B. `1,x,g`: Lage, Richtung, Art – in dieser Reihenfolge, und immer alle drei. Damit ist jedes Symbol eindeutig, auch wenn zwei Lagen dieselbe Richtung tragen. Die Handrechnung braucht denselben Index fuer ihre zusammengefassten Lagen.
 - `bezeichnung: str` – `1. Lage Grundbewehrung`.
 - `phi_def: WertDef` – Der Stabdurchmesser.
 - `as_def: WertDef` – Der Bewehrungsquerschnitt, aus dem Lagenaufbau.
-- `z_def: WertDef` – Die Tiefe ab Oberkante, aus dem Lagenaufbau -- nicht die statische Hoehe.
+- `z_def: WertDef` – Die Tiefe ab Oberkante, aus dem Lagenaufbau – nicht die statische Hoehe.
 
 #### Postenbezug.name
 
@@ -68,7 +68,7 @@ Der Name, unter dem ein Nachweis eine Groesse des Postens liest: `a_s_1g`.
 def bezuege(self, *groessen: str) -> List[Eingabebezug]
 ```
 
-Diese Groessen des Postens -- `a_s`, `z`, `phi` -- als Eingaben, je unter [[opencivil.querschnitt.lagenaufbau#Postenbezug.name|name]].
+Diese Groessen des Postens – `a_s`, `z`, `phi` – als Eingaben, je unter [[opencivil.querschnitt.lagenaufbau#Postenbezug.name|name]].
 
 ### lagenindex
 
@@ -76,11 +76,11 @@ Diese Groessen des Postens -- `a_s`, `z`, `phi` -- als Eingaben, je unter [[open
 def lagenindex(posten: Sequence[Postenbezug]) -> str
 ```
 
-Der Symbolindex einer Lage aus ihren Posten -- `1,x` statt `1,x,g`.
+Der Symbolindex einer Lage aus ihren Posten – `1,x` statt `1,x,g`.
 
 Gerechnet wird mit der ganzen Lage, nicht mit einem Posten; ein
 Postenindex am Symbol behauptete etwas anderes. Hat die Lage nur einen
-Posten, ist dessen Index auch ihrer -- dann heisst `A_s` so wie in der
+Posten, ist dessen Index auch ihrer – dann heisst `A_s` so wie in der
 Tabelle der Platte.
 
 ### statische_hoehe
@@ -90,7 +90,7 @@ def statische_hoehe(z: float, h: float, seite: Zugseite) -> float
 ```
 
 Die statische Hoehe einer Lage in der Tiefe `z` unter der Oberkante,
-gemessen ab dem gedrueckten Rand: unten `d = z`, oben `d = h - z` --
+gemessen ab dem gedrueckten Rand: unten `d = z`, oben `d = h - z` –
 die Zahl zur Zeile von [[opencivil.querschnitt.lagenaufbau#protokoll_statische_hoehe|protokoll_statische_hoehe]]. Wer `z`
 stehen liesse, bekaeme bei den oberen Lagen eine Zahl, die keine
 statische Hoehe ist.
@@ -116,7 +116,7 @@ def lage_aus_posten(e: Eingaben, posten: Sequence[Postenbezug]) -> Tuple[float, 
 ```
 
 Querschnitt, gemeinsamer Schwerpunkt und statische Hoehe einer Lage aus
-ihren Posten -- die Zahlen, die [[opencivil.querschnitt.lagenaufbau#protokoll_lage|protokoll_lage]] herleitet. Der
+ihren Posten – die Zahlen, die [[opencivil.querschnitt.lagenaufbau#protokoll_lage|protokoll_lage]] herleitet. Der
 Nachweis liest dafuer je Posten `a_s` und `z`
 ([[opencivil.querschnitt.lagenaufbau#Postenbezug.bezuege|Postenbezug.bezuege]]), dazu die Dicke `h`.
 
@@ -132,10 +132,10 @@ def protokoll_lage(p: Protokoll, e: Eingaben, werte: Zwischenwerte, posten: Sequ
 ```
 
 Querschnitt und statische Hoehe einer Lage, aus ihren Posten hergeleitet
--- gelesen wie bei [[opencivil.querschnitt.lagenaufbau#lage_aus_posten|lage_aus_posten]].
+– gelesen wie bei [[opencivil.querschnitt.lagenaufbau#lage_aus_posten|lage_aus_posten]].
 
 Liegen Grundbewehrung und Zulage in der Lage, stehen Summe und gemeinsamer
-Schwerpunkt da -- sonst fiele der Schwerpunkt vom Himmel. Ohne `z` nur
+Schwerpunkt da – sonst fiele der Schwerpunkt vom Himmel. Ohne `z` nur
 der Querschnitt. Zurueck kommen `A_s` und `d` fuer die Formeln danach.
 
 ### protokoll_schwerpunkt
@@ -145,7 +145,7 @@ def protokoll_schwerpunkt(p: Protokoll, e: Eingaben, werte: Zwischenwerte, poste
 ```
 
 Die Tiefe mehrerer Posten in ihrem gemeinsamen Schwerpunkt, nach Flaechen
-gewichtet -- die Zeile zu [[opencivil.querschnitt.lagenaufbau#schwerpunkt|schwerpunkt]]. Bei einem Posten ist es
+gewichtet – die Zeile zu [[opencivil.querschnitt.lagenaufbau#schwerpunkt|schwerpunkt]]. Bei einem Posten ist es
 dessen eigene Tiefe, ohne Zeile. `name` ist Kurzname und Zeichen des
 Schwerpunkts. Fuer eine Lage ([[opencivil.querschnitt.lagenaufbau#protokoll_lage|protokoll_lage]]) wie fuer die
 gezogene Seite im Querkraftnachweis.
@@ -159,7 +159,7 @@ def protokoll_statische_hoehe(p: Protokoll, d: Wert, *, h: Wert, z: Wert, seite:
 Die statische Hoehe einer gezogenen Lage, gemessen ab dem gedrueckten Rand.
 
 Eine untere Lage misst ab der Oberkante, `d = z`; eine obere ab der
-Unterkante, `d = h - z`. Mehrere Nachweise brauchen diese Zeile -- steht
+Unterkante, `d = h - z`. Mehrere Nachweise brauchen diese Zeile – steht
 sie an einer Stelle, sagt «unten» in allen dasselbe.
 
 ### Lagenaufbau
@@ -171,7 +171,7 @@ class Lagenaufbau(Prozedur)
 Bestimmt statische Hoehe und Bewehrungsquerschnitt aller Posten.
 
 Beides in einem Zug und in einer Tabelle. Frueher stand fuer jeden Posten
-eine eigene Flaechenformel in der Herleitung -- fuenf Lagen ergaben fuenf
+eine eigene Flaechenformel in der Herleitung – fuenf Lagen ergaben fuenf
 gleich aussehende Bloecke, in denen sich nur die Zahlen unterschieden. Die
 Formel steht jetzt einmal da, die Ergebnisse stehen in der Tabelle.
 
@@ -180,7 +180,7 @@ Formel steht jetzt einmal da, die Ergebnisse stehen in der Tabelle.
 Die Lagen werden je Seite von aussen nach innen gestapelt. Die Huelle einer
 Lage beginnt bei der Ueberdeckung und waechst um den groessten Durchmesser
 der davorliegenden Lage. `d` wird von der gezogenen Randfaser aus
-gemessen -- bei den unteren Lagen von der Unterkante, bei den oberen von
+gemessen – bei den unteren Lagen von der Unterkante, bei den oberen von
 der Oberkante.
 
 Wie Grundbewehrung und Zulage innerhalb einer Lage zueinander liegen, sagt
@@ -200,14 +200,14 @@ def _kennzahlen(self, p: Protokoll, e: Eingaben, h: Groesse, b: Groesse, flaeche
 
 Bewehrungsmass und Hoehe der Distanzhalter.
 
-Beides sind Angaben fuer die Ausfuehrung, keine Nachweisgroessen -- sie
+Beides sind Angaben fuer die Ausfuehrung, keine Nachweisgroessen – sie
 gehoeren aber in den Kern und nicht in die Oberflaeche, damit sie in der
 Herleitung stehen und sich zurueckverfolgen lassen.
 
 
 ## Konstanten
 
-- `REFERENZ_NENNDURCHMESSER = 'SIA 262:2025, 4.2.2.4'` – Die Querschnittsflaeche eines Stabs aus seinem Nenndurchmesser -- mit dem bemisst die Norm. Der Rest von `A_s` ist Geometrie.
+- `REFERENZ_NENNDURCHMESSER = 'SIA 262:2025, 4.2.2.4'` – Die Querschnittsflaeche eines Stabs aus seinem Nenndurchmesser – mit dem bemisst die Norm. Der Rest von `A_s` ist Geometrie.
 
 ## Braucht
 

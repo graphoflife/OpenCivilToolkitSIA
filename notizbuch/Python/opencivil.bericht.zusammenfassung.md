@@ -1,5 +1,5 @@
 ---
-erzeugt: 12b60297e744
+erzeugt: e655ee9d7c51
 art: modul
 tags: [modul]
 ---
@@ -9,7 +9,7 @@ tags: [modul]
 
 ## VERANTWORTUNG
 
-Je Bauteil -- Platte, Querschnittsanalyse, Grundbruch oder Setzung -- die
+Je Bauteil – Platte, Querschnittsanalyse, Grundbruch oder Setzung – die
 gefuehrten Urteile und darunter die still verfehlten; dazu, was ueber der
 Nachweistabelle steht (Angaben, Bewehrung, die Faktoren des Grundbruchs oder
 die Schichten der Setzung)
@@ -61,7 +61,7 @@ def aus(cls, urteil: NachweisUrteil) -> 'Zeile'
 def bezeichnung(self) -> str
 ```
 
-Nachweis und Fall in einem -- fuer einen Satz, wo keine Spalten sind.
+Nachweis und Fall in einem – fuer einen Satz, wo keine Spalten sind.
 
 ### Bauteil
 
@@ -70,13 +70,13 @@ Nachweis und Fall in einem -- fuer einen Satz, wo keine Spalten sind.
 class Bauteil
 ```
 
-Die Zusammenfassung eines Bauteils -- einer Platte oder einer Analyse.
+Die Zusammenfassung eines Bauteils – einer Platte oder einer Analyse.
 
 - `kennung: str`
 - `name: str` – Leer fuer die eine Gruppe eines Rechenwerks ohne Bauteile.
-- `zeilen: List[Zeile]` – Die gefuehrten Urteile -- je Nachweis mit Lagen nur die schlechtere.
+- `zeilen: List[Zeile]` – Die gefuehrten Urteile – je Nachweis mit Lagen nur die schlechtere.
 - `stille: List[Zeile]` – Was ausgeschaltet ist und trotzdem nicht aufgeht.
-- `art: str = 'platte'` – `platte` oder `querschnittsanalyse` -- was ueber der Tabelle steht, haengt daran.
+- `art: str = 'platte'` – `platte` oder `querschnittsanalyse` – was ueber der Tabelle steht, haengt daran.
 
 #### Bauteil.leer
 
@@ -96,7 +96,7 @@ Alle Bauteile, das Gesamturteil und was beim Aufbau auffiel.
 
 - `bauteile: List[Bauteil]`
 - `satz: str` – Das Gesamturteil als Satz ([[opencivil.core.nachweis#gesamturteil|gesamturteil]]): Bericht und Konsole sagen dasselbe, auch wenn sich ein Nachweis nicht fuehren liess.
-- `gefuehrt: bool` – Ob ueberhaupt einer gefuehrt wurde -- sonst gibt es kein Gesamturteil.
+- `gefuehrt: bool` – Ob ueberhaupt einer gefuehrt wurde – sonst gibt es kein Gesamturteil.
 - `warnungen: List[str]`
 
 ### zusammenfassen
@@ -107,14 +107,14 @@ def zusammenfassen(aufbau: Optional['Aufbau'], loesung: Loesung) -> Zusammenfass
 
 Die Zeilen je Bauteil, in der Reihenfolge der Beschreibung: erst die
 Platten, dann die Querschnittsanalysen. Ein Balkensystem fuehrt keine
-Nachweise und hat darum hier keine Gruppe -- seine Ergebnisse stehen in
+Nachweise und hat darum hier keine Gruppe – seine Ergebnisse stehen in
 seiner Herleitung.
 
 Die Urteile kommen fertig aus der Loesung: ohne die stillen, und je
 Nachweis, der seine Lagen sammelt, nur die schlechteste. Hier zu filtern
 hiesse, diese Regel ein zweites Mal zu schreiben.
 
-Ohne Aufbau -- ein Rechenwerk, das keine Bauteile kennt -- stehen alle
+Ohne Aufbau – ein Rechenwerk, das keine Bauteile kennt – stehen alle
 Urteile in einer Gruppe ohne Namen. Ein Weg fuer beide Faelle, nicht zwei.
 
 ### _groesse
@@ -123,7 +123,7 @@ Urteile in einer Gruppe ohne Namen. Ein Weg fuer beide Faelle, nicht zwei.
 def _groesse(wert: Optional[Wert]) -> Zelle
 ```
 
-Feste Stellenzahl -- in einer Spalte steht immer dieselbe Groesse.
+Feste Stellenzahl – in einer Spalte steht immer dieselbe Groesse.
 
 ### _grad
 
@@ -131,7 +131,7 @@ Feste Stellenzahl -- in einer Spalte steht immer dieselbe Groesse.
 def _grad(urteil: NachweisUrteil) -> Zelle
 ```
 
-Der Erfuellungsgrad -- liess sich der Nachweis nicht fuehren, ein Strich wie in _groesse.
+Der Erfuellungsgrad – liess sich der Nachweis nicht fuehren, ein Strich wie in _groesse.
 
 ### nachweistabelle
 
@@ -152,7 +152,7 @@ Was unter der Tabelle stehen muss, nach Grund gebuendelt.
 Nur was eine Pruefung ausdruecklich meldet (siehe
 [[opencivil.core.nachweis#NachweisUrteil|NachweisUrteil.hinweis]]): ein Widerstand von null erklaert sich
 nicht von selbst. Eine ganze Tragrichtung ohne Bewehrung laesst aber jeden
-ihrer Nachweise aus demselben Grund ausfallen -- sechsmal derselbe Satz
+ihrer Nachweise aus demselben Grund ausfallen – sechsmal derselbe Satz
 waere keine Erklaerung, sondern eine Wand.
 
 ### stiller_hinweis
@@ -161,7 +161,7 @@ waere keine Erklaerung, sondern eine Wand.
 def stiller_hinweis(zeile: Zeile) -> str
 ```
 
-Ein ausgeschalteter Nachweis, der nicht aufgeht -- als Satz.
+Ein ausgeschalteter Nachweis, der nicht aufgeht – als Satz.
 
 Er steht weder in der Tabelle noch in der Herleitung. Die Begruendung ist
 darum das Einzige, was sagt, woran es fehlt.
@@ -173,12 +173,12 @@ def angaben(aufbau: 'Aufbau', kennung: str, loesung: Loesung) -> Angaben
 ```
 
 Was ueber der Nachweistabelle eines Bauteils steht: eine Zeile mit den
-Angaben und eine Tabelle -- bei der Platte ihre Lagen, bei der
+Angaben und eine Tabelle – bei der Platte ihre Lagen, bei der
 Querschnittsanalyse ihre Staebe und Schubwaende, beim Grundbruch die
 Faktoren der Tragfaehigkeitsformel, bei der Setzung die Schichten mit
 ihrem Anteil, beim Pfahl seine Widerstaende auf Druck und Zug. Die
 stehen erst nach dem Rechnen fest; darum die Loesung.
-Was je Art, sagt [[opencivil.bericht.zusammenfassung#Konstanten|ANGABEN]] -- bis 2026-10-25 wurde die Art durch
+Was je Art, sagt [[opencivil.bericht.zusammenfassung#Konstanten|ANGABEN]] – bis 2026-10-25 wurde die Art durch
 Probieren gefunden, ein Register nach dem anderen.
 
 ### _befund
@@ -187,7 +187,7 @@ Probieren gefunden, ein Register nach dem anderen.
 def _befund(teil, feld: str, loesung: Loesung)
 ```
 
-Der Befund seines Nachweises in diesem Feld -- `None`, wenn der Lauf ihn nicht hat.
+Der Befund seines Nachweises in diesem Feld – `None`, wenn der Lauf ihn nicht hat.
 
 ### kennzahlen
 
@@ -196,7 +196,7 @@ def kennzahlen(aufbau: 'Aufbau', kennung: str, loesung: Loesung) -> List[Tuple[K
 ```
 
 Die Kennzahlen eines Bauteils mit ihren Werten, wie Zusammenfassung und
-Bericht sie zeigen -- bei der Platte Bewehrungsmass und Distanzhalter, die
+Bericht sie zeigen – bei der Platte Bewehrungsmass und Distanzhalter, die
 Vergroesserungsfaktoren omega_w und omega_w', die Eckwerte der
 Handrechnung und der Querkraftwiderstand bei N_Ed = 0 (Benutzer,
 2026-10-16). Welche es gibt und wie sie heissen, sagen ihre Erzeuger
@@ -217,7 +217,7 @@ Die Kennzahlen als Tabelle des Berichts: Beschriftung, Zeichen, Wert.
 def plattenangaben(qs: Plattenquerschnitt) -> GleichungBlock
 ```
 
-Beton, Betonstahl, Dicke und betrachtete Breite -- eine Zeile ueber der
+Beton, Betonstahl, Dicke und betrachtete Breite – eine Zeile ueber der
 Tabelle.
 
 Der Betonstahl steht hier einmal, nicht in jeder Zeile der Bewehrung
@@ -236,15 +236,15 @@ def bewehrungsuebersicht(qs: Plattenquerschnitt, werte: Dict[str, Wert]) -> Tabe
 Überdeckungen und Lagen, wie man die Platte im Schnitt sieht.
 
 Von oben nach unten gelesen: obere Überdeckung, 4. bis 1. Lage, untere
-Überdeckung. Dieselbe Folge wie in der Eingabemaske -- wer beides
+Überdeckung. Dieselbe Folge wie in der Eingabemaske – wer beides
 nebeneinander hat, soll nicht umdenken müssen.
 
-Grundbewehrung und Zulage stehen in einer Zeile, getrennt durch `+` --
+Grundbewehrung und Zulage stehen in einer Zeile, getrennt durch `+` –
 die Lage ist eine Lage, auch wenn sie aus zwei Posten besteht. Daneben
 ihr Querschnitt A_s ueber die Breite ihres Streifens, b_x fuer eine Lage
 in x, b_y fuer eine in y, Grund und Zulage zusammen, aus dem
 Lagenaufbau; den Stahl nennt [[opencivil.bericht.zusammenfassung#plattenangaben|plattenangaben]] einmal darueber
-(Benutzer, 2026-11-25 -- bis dahin stand er in jeder Zeile). Zuletzt
+(Benutzer, 2026-11-25 – bis dahin stand er in jeder Zeile). Zuletzt
 die Höhe ihrer Stabachse über der Unterkante, `h - z` aus dem
 Lagenaufbau (Benutzer, 2026-10-16); liegen Grund und Zulage verschieden
 hoch, beide, getrennt durch `/`.
@@ -252,11 +252,11 @@ hoch, beide, getrennt durch `/`.
 
 ## Konstanten
 
-- `NACHWEISKOPF = ['Nachweis', 'Bezeichnung', 'Widerstand', 'Einwirkung', Mathe('\\alph…` – Eine Spalte *Urteil* gibt es nicht: sie stand neben dem Erfuellungsgrad und sagte dasselbe noch einmal. *Nachweis* und *Bezeichnung* stehen dagegen getrennt -- vorher stand dort `M-N: Feld`, und zwei Kombinationen gleichen Namens in x und y ergaben zweimal dieselbe Zeile.
-- `GRAD_SPALTE = 4` – Welche Spalte den Erfuellungsgrad traegt. Die Oberflaeche hinterlegt genau sie -- zaehlen statt raten, sonst haenge die Einfaerbung an der Reihenfolge der Kopfzeile.
+- `NACHWEISKOPF = ['Nachweis', 'Bezeichnung', 'Widerstand', 'Einwirkung', Mathe('\\alph…` – Eine Spalte *Urteil* gibt es nicht: sie stand neben dem Erfuellungsgrad und sagte dasselbe noch einmal. *Nachweis* und *Bezeichnung* stehen dagegen getrennt – vorher stand dort `M-N: Feld`, und zwei Kombinationen gleichen Namens in x und y ergaben zweimal dieselbe Zeile.
+- `GRAD_SPALTE = 4` – Welche Spalte den Erfuellungsgrad traegt. Die Oberflaeche hinterlegt genau sie – zaehlen statt raten, sonst haenge die Einfaerbung an der Reihenfolge der Kopfzeile.
 - `STAPEL_SPALTEN = (2, 3)` – Widerstand und Einwirkung: die Oberflaeche setzt sie uebereinander in eine Zelle, der Bericht behaelt beide Spalten.
 - `AUSRICHTUNG = 'LLrrr'` – Nachweis und Bezeichnung duerfen umbrechen: mit zwei Formeln daneben liefe die Tabelle im Bericht sonst ueber den Rand.
-- `ANGABEN = {'platte': lambda teil, loesung: (plattenangaben(teil.objekt), bewehr…` – Je Bauteilart, nach ihrem Namen, was ueber ihrer Tabelle steht. Ein Balkensystem hat keine Nachweise und keine Tabelle -- auch das steht hier (`None`). Dass jede Art hier steht, prueft tests/test_bauteilarten.py; beim Laden ginge es nicht, der Bericht laedt vor den Bauteilarten.
+- `ANGABEN = {'platte': lambda teil, loesung: (plattenangaben(teil.objekt), bewehr…` – Je Bauteilart, nach ihrem Namen, was ueber ihrer Tabelle steht. Ein Balkensystem hat keine Nachweise und keine Tabelle – auch das steht hier (`None`). Dass jede Art hier steht, prueft tests/test_bauteilarten.py; beim Laden ginge es nicht, der Bericht laedt vor den Bauteilarten.
 
 ## Braucht
 

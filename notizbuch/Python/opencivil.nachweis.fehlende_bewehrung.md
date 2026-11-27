@@ -1,5 +1,5 @@
 ---
-erzeugt: 61bddf5d86ed
+erzeugt: fed28fb705b1
 art: modul
 tags: [modul]
 ---
@@ -9,7 +9,7 @@ tags: [modul]
 
 ## VERANTWORTUNG
 
-Sagt, dass in dieser Tragrichtung nichts zu rechnen ist -- und sagt es
+Sagt, dass in dieser Tragrichtung nichts zu rechnen ist – und sagt es
 sichtbar. Gerechnet wird hier nichts.
 
 
@@ -21,15 +21,15 @@ der Nachweis darum stillschweigend: wer eine Einwirkung in y-Richtung angegeben
 hatte, fand sie in der Zusammenfassung nirgends wieder. Ein leerer Platz liest
 sich aber wie *geprueft und in Ordnung*.
 
-Ohne Stahl ist der Momentenwiderstand der Handrechnung **null** -- nicht etwa
+Ohne Stahl ist der Momentenwiderstand der Handrechnung **null** – nicht etwa
 das, was der Beton allein noch aufnaehme. Der Erfuellungsgrad ist damit
 ebenfalls null und der Nachweis nicht erfuellt. Genau das steht jetzt da.
 
 
 ## NICHT ZU VERWECHSELN MIT
 
-Der Fall, dass nur *eine Seite* unbewehrt ist -- untere Lage vorhanden, obere
-nicht --, wird von den Nachweisen selbst behandelt. Hier geht es um eine
+Der Fall, dass nur *eine Seite* unbewehrt ist – untere Lage vorhanden, obere
+nicht –, wird von den Nachweisen selbst behandelt. Hier geht es um eine
 Richtung, in der ueberhaupt kein Posten liegt.
 
 ## Inhalt
@@ -43,7 +43,7 @@ class Ausgefallen
 
 Ein einzelner Nachweis, der nicht gefuehrt werden kann.
 
-- `art: str` – Kurzzeichen der Nachweisart -- `M-N` oder `V`.
+- `art: str` – Kurzzeichen der Nachweisart – `M-N` oder `V`.
 - `langname: str` – Die Nachweisart ausgeschrieben, mit Richtung.
 - `fall: str` – Name der Einwirkungskombination.
 - `symbol: str` – Symbol des Widerstands, z.B. `M_{Rd,y}`.
@@ -64,7 +64,7 @@ def kennung(self) -> str
 class FehlendeBewehrung(Nachweis)
 ```
 
-Die Nachweise einer unbewehrten Tragrichtung -- alle nicht erfuellt.
+Die Nachweise einer unbewehrten Tragrichtung – alle nicht erfuellt.
 
 Ein Baustein je Platte und Richtung, ein Urteil je ausgefallenem Nachweis.
 Er hat keine Eingaenge: es gibt nichts zu beschaffen, wenn nichts da ist.

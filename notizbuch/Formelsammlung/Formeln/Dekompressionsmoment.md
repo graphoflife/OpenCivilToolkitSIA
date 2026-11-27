@@ -43,7 +43,7 @@ $$
 ## Theorie
 
 Eine Normalkraft $N_{Ed}$ in der halben Höhe erzeugt am Rand die Spannung
-$N/A$, ein Moment $m$ dazu $m/W$ -- im Streifen mit $A = b\,h$ und
+$N/A$, ein Moment $m$ dazu $m/W$ – im Streifen mit $A = b\,h$ und
 $W = b\,h^2/6$. Spannungsfrei ist der gezogene Rand bei
 $m = -N_{Ed} \cdot h/6$, Zug positiv gezählt:
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: 108a843c502d
+erzeugt: aeb83700dfc8
 art: modul
 tags: [modul]
 ---
@@ -10,7 +10,7 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Die Zugseite eines gezeichneten Querschnitts: unten, oben, links oder
-rechts -- dazu die Zugrichtung als Winkel, die Achse, um die gebogen wird,
+rechts – dazu die Zugrichtung als Winkel, die Achse, um die gebogen wird,
 und wie die beiden Raender heissen. Eine Wahl fuer sich, in einem eigenen
 Modul: die Beschreibung des Projekts, die Nachweise und die Analysen fragen
 sie, und keiner von ihnen soll dafuer die Spannung-Dehnung-Analyse laden.
@@ -34,7 +34,7 @@ und in drei Winkelausdruecken.
 class Zugseite(Wahl)
 ```
 
-Die Seite, die ein positives Moment zieht -- und die Richtung, die dazu gehoert.
+Die Seite, die ein positives Moment zieht – und die Richtung, die dazu gehoert.
 
 - `UNTEN = 'unten'`
 - `OBEN = 'oben'`
@@ -65,7 +65,7 @@ def moment(self) -> Tuple[float, float]
 ```
 
 Ein Moment von eins, das diese Seite zieht, als `(M_y, M_z)`: M_y > 0
-zieht unten, M_z > 0 links -- wie
+zieht unten, M_z > 0 links – wie
 [[opencivil.querschnitt.interaktion#Querschnitt.neigung_fuer|neigung_fuer]].
 
 #### Zugseite.um_y
@@ -75,7 +75,7 @@ zieht unten, M_z > 0 links -- wie
 def um_y(self) -> bool
 ```
 
-Ob die Biegung um die y-Achse geht -- Zug unten oder oben.
+Ob die Biegung um die y-Achse geht – Zug unten oder oben.
 
 #### Zugseite.raender
 
@@ -93,7 +93,7 @@ Wie die beiden Raender heissen: der gedrueckte und der gezogene.
 def gegen(self) -> 'Zugseite'
 ```
 
-Die Gegenseite -- die gedrueckte.
+Die Gegenseite – die gedrueckte.
 
 #### Zugseite.positiv
 
@@ -149,7 +149,7 @@ der Oberflaeche, der auch in einer schmalen Spalte Platz finden muss
 def aus_moment(cls, M_y: float) -> 'Zugseite'
 ```
 
-Die Seite, die ein Moment um y zieht -- bei M_y = 0 die untere, wie
+Die Seite, die ein Moment um y zieht – bei M_y = 0 die untere, wie
 die waagrechte Nulllinie einer einachsigen Rechnung es braucht.
 
 

@@ -26,7 +26,7 @@ $$
 ## Theorie
 
 Was im Beben mitschwingt: das ständige Gewicht des Geschosses und der
-quasi-ständige Teil seiner Nutzlast, $\psi_2 \cdot Q_k$ -- dieselbe Summe
+quasi-ständige Teil seiner Nutzlast, $\psi_2 \cdot Q_k$ – dieselbe Summe
 nimmt die Norm für die Auslenkung (16.5.2.3) und für die Verteilung (42).
 Das Gewicht sitzt auf der Höhe seiner Decke, $z_i$, gezählt ab der Ebene, in
 der das Beben angreift: der Einspannung der Wände. Bei steifen

@@ -1,5 +1,5 @@
 ---
-erzeugt: 8670d045a8e3
+erzeugt: b9261a7359b0
 art: modul
 tags: [modul]
 ---
@@ -7,21 +7,21 @@ tags: [modul]
 > ein Einzelpfahl nach SIA 267:2013, Kapitel 9.
 > Paket [[opencivil]] · [Quelltext](../../opencivil/pfahl/__init__.py)
 
-* [[opencivil.pfahl.pfahl|pfahl]] -- der Pfahl: Bohr- oder Mikropfahl, Masse,
+* [[opencivil.pfahl.pfahl|pfahl]] – der Pfahl: Bohr- oder Mikropfahl, Masse,
   Querschnitt, Grundwasser und Beiwerte, als Vorgaben im Rechenwerk.
-* [[opencivil.pfahl.boden|boden]] -- die Schichten des Baugrunds, die
+* [[opencivil.pfahl.boden|boden]] – die Schichten des Baugrunds, die
   Spannungen darin und die Stücke des Mantels.
-* [[opencivil.pfahl.buch|buch]] -- die Zahlen des Buches von Lang, Huder,
+* [[opencivil.pfahl.buch|buch]] – die Zahlen des Buches von Lang, Huder,
   Amann und Puzrin: Bilder 12.4 und 12.5, örtliches Abscheren, K_0.
-* [[opencivil.pfahl.achse|achse]] -- was beide Nachweise längs der Achse
+* [[opencivil.pfahl.achse|achse]] – was beide Nachweise längs der Achse
   teilen: je Kombination Druck oder Zug gegen den Widerstand.
-* [[opencivil.pfahl.aussen|aussen]] -- der äussere Widerstand: Mantel und Fuss.
-* [[opencivil.pfahl.innen|innen]] -- der innere Widerstand: der Querschnitt.
-* [[opencivil.pfahl.steifigkeit|steifigkeit]] -- der Pfahl als Stab auf Federn: die
+* [[opencivil.pfahl.aussen|aussen]] – der äussere Widerstand: Mantel und Fuss.
+* [[opencivil.pfahl.innen|innen]] – der innere Widerstand: der Querschnitt.
+* [[opencivil.pfahl.steifigkeit|steifigkeit]] – der Pfahl als Stab auf Federn: die
   Federn des Bodens, die Federn am Kopf und je Kombination die Verläufe.
-* [[opencivil.pfahl.bettung|bettung]] -- der gebettete Stab, längs und quer, mit
+* [[opencivil.pfahl.bettung|bettung]] – der gebettete Stab, längs und quer, mit
   den Elementen und Verläufen des Stabwerks gelöst.
-* [[opencivil.pfahl.uebersicht|uebersicht]] -- was über der Nachweistabelle steht.
+* [[opencivil.pfahl.uebersicht|uebersicht]] – was über der Nachweistabelle steht.
 
 ## Module
 

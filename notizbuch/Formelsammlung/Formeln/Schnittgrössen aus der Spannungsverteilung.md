@@ -27,7 +27,7 @@ $$
 Zu einer Dehnungsebene gehört über die Werkstoffgesetze eine Spannung an
 jeder Stelle des Querschnitts. Ihre Summe ist die Normalkraft, ihre Summe mal
 dem Abstand zur halben Höhe das Moment. Das Werkzeug teilt den Beton dafür in
-200 Fasern über die Höhe und zählt den Stahl Lage für Lage -- an der Stelle
+200 Fasern über die Höhe und zählt den Stahl Lage für Lage – an der Stelle
 einer Lage zählt der Stahl statt des Betons.
 
 So entsteht jeder Punkt der Linie aus Dehnungsebenen: Ebene wählen,

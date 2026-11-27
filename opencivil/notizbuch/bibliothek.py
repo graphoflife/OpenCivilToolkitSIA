@@ -24,6 +24,9 @@ AUS DEM DOCSTRING WIRD MARKDOWN:
   aufloesen laesst, bleibt Code -- ein Test haelt die Liste leer.
 * Was Markdown, Obsidian oder MathJax anders lesen wuerden -- ``$``, ``<``,
   ``|``, ``%%``, ``==``, ``[[`` --, wird maskiert.
+* Der Gedankenstrich `` -- `` im Text wird «–»: im Code darf er bleiben, wo
+  der Benutzer liest, steht der echte (Benutzer, 2026-11-19 und 2026-11-27).
+  Was Code ist, bleibt, wie es ist.
 
 WIE EIN NAME AUFGELOEST WIRD:
 In dieser Folge: ein ganzes Modul; das laengste Modul am Anfang des Namens;
@@ -59,6 +62,9 @@ _ROLLE = re.compile(r":(?:class|func|meth|attr|mod|data|exc|obj):`([^`]+)`")
 _CODE = re.compile(r"``(.+?)``")
 _LISTE = re.compile(r"^(\s*)([*-]|\d+\.)\s")
 _KOPF = re.compile(r"^opencivil[\w/.]*\s+--\s+(.*)$")
+#: Der Gedankenstrich der Docstrings: zwei Striche nach einem Leerzeichen und
+#: vor einem Leerzeichen, einem Satzzeichen oder dem Ende -- nicht ``--flag``.
+_STRICH = re.compile(r"(?:(?<=\s)|^)--(?=\s|$|[,.;:)])")
 
 
 @dataclass
@@ -590,7 +596,7 @@ def _ist_fortsetzung(heraus: List[str]) -> bool:
 
 
 def _maskieren(text: str, *, am_anfang: bool) -> str:
-    """Was Markdown, Obsidian oder MathJax anders lesen wuerden."""
+    """Was Markdown, Obsidian oder MathJax anders lesen wuerden -- und der Gedankenstrich."""
     text = text.replace("\\", "\\\\")
     for zeichen in ("$", "<", "|"):
         text = text.replace(zeichen, "\\" + zeichen)
@@ -598,7 +604,7 @@ def _maskieren(text: str, *, am_anfang: bool) -> str:
         text = text.replace(doppelt, "\\" + doppelt[0] + "\\" + doppelt[1])
     if am_anfang:
         text = re.sub(r"^(\s*)([#>])", r"\1\\\2", text)
-    return text
+    return _STRICH.sub("–", text)
 
 
 def _text(text: str) -> str:

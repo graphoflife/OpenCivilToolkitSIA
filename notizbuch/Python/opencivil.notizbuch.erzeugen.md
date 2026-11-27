@@ -1,5 +1,5 @@
 ---
-erzeugt: fd9c623fe469
+erzeugt: c12dbdcebdbc
 art: modul
 tags: [modul]
 ---
@@ -14,7 +14,7 @@ die Stelle im Code auf die Seite ihres Moduls, und die Modulseiten nennen die
 Formeln, die das Modul schreibt. Die Bruecke schreibt, was hier herauskommt
 ([[opencivil.web.bruecke#notizbuch_schreiben|opencivil.web.bruecke.notizbuch_schreiben]]).
 
-Ein eigenes Modul, weil beide Seiten voneinander wissen muessen -- und weil
+Ein eigenes Modul, weil beide Seiten voneinander wissen muessen – und weil
 `opencivil.notizbuch` beim Import nichts laden darf: die Formelsammlung
 braucht daraus die Namensregel.
 

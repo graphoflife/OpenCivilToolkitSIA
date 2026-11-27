@@ -34,7 +34,7 @@ Gerechnet mit der wirksamen Spannung, unter dem Grundwasser also mit
 γ − γ_w.
 
 Kies mit φ'_k = 35° in 5 m Tiefe, trocken, γ = 20 kN/m³: σ'_v = 100 kPa,
-K_p = 3.69 und K_a = 0.27 -- vorne e_p = 369 kPa, hinten e_a = 27 kPa.
+K_p = 3.69 und K_a = 0.27 – vorne e_p = 369 kPa, hinten e_a = 27 kPa.
 
 Ohne Wandreibung bleibt K_p auf der sicheren Seite: mit ihr wäre er
 grösser. Wie die beiden Drücke zum Widerstand je Meter Pfahl werden, steht

@@ -40,5 +40,5 @@ also lang.
 Das Werkzeug löst beides mit finiten Elementen, mit den Schichten und der
 Abminderung am Terrain, wie sie eingegeben sind. Es rechnet linear: die
 Federn ohne Grenze und ohne Theorie zweiter Ordnung, für die die Norm eine
-eigene Untersuchung verlangt (SIA 267:2013, 9.5.3.4.3) -- nach Vorgabe,
+eigene Untersuchung verlangt (SIA 267:2013, 9.5.3.4.3) – nach Vorgabe,
 nicht nachgeschlagen.

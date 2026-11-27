@@ -34,6 +34,6 @@ nicht.
 
 Mit p_E überall gleich c wird lang H = 2 · √(M_R · c), mit
 s_h = 2 · √(M_R / c). Für c = 200 kN/m und M_R = 500 kNm: H = 632 kN in
-s_h = 3.16 m -- gut 40 % mehr als frei drehbar. Ist er so kurz, dass
-M_R ≥ c · L² / 2 -- hier bis L = 2.24 m --, schiebt er sich als Ganzes:
+s_h = 3.16 m – gut 40 % mehr als frei drehbar. Ist er so kurz, dass
+M_R ≥ c · L² / 2 – hier bis L = 2.24 m –, schiebt er sich als Ganzes:
 H = c · L.

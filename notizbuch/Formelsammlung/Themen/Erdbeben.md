@@ -42,7 +42,7 @@ Ob das Verfahren gilt, ist ein Urteil wie ein Nachweis: $T_1 \le 4 \cdot
 T_C$ in beiden Richtungen, dazu ein regelmässiger Grund- und Aufriss
 ([[Grenze der Grundschwingzeit]]). Was das Verfahren verlangt und hier nicht
 gerechnet wird, steht grau unter dem Bild: die Torsion (16.5.2.7), die
-vertikale Komponente (16.5.4) und die sekundären Bauteile (16.7) -- und wo
+vertikale Komponente (16.5.4) und die sekundären Bauteile (16.7) – und wo
 $q$ über 2.0 liegt, die Bemessungswerte duktiler Tragwände nach SIA
 262:2025, 4.3.9.4.
 

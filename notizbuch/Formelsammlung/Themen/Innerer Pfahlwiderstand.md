@@ -30,7 +30,7 @@ Der Pfahl selbst muss die Kraft tragen, die er an den Boden abgibt. Sein Quersch
 ## Theorie
 
 Der Pfahl als Bauteil: sein Querschnitt muss die Kraft tragen, die der Boden
-ihm abnimmt -- am Kopf die ganze. Gerechnet wird er nach SIA 262, ganz
+ihm abnimmt – am Kopf die ganze. Gerechnet wird er nach SIA 262, ganz
 gedrückt oder ganz gezogen (SIA 267:2013, 9.5.2.4.2). Was ihn von einer
 Stütze über dem Terrain unterscheidet, ist die Herstellung: im Boden
 betoniert oder verpresst, ohne dass man ihn sieht. Dafür steht der

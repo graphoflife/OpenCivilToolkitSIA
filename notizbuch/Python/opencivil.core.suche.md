@@ -1,5 +1,5 @@
 ---
-erzeugt: ae8cb715ef5d
+erzeugt: 994580daad19
 art: modul
 tags: [modul]
 ---
@@ -12,7 +12,7 @@ tags: [modul]
 Die Verfahren, mit denen das Werkzeug eine Nullstelle sucht, an einer
 Stelle: [[opencivil.core.suche#Halbieren|Halbieren]], [[opencivil.core.suche#Illinois|Illinois]] mit [[opencivil.core.suche#illinois|illinois]],
 [[opencivil.core.suche#eingrenzen|eingrenzen]] und fuer die Neigung einer Nulllinie
-[[opencivil.core.suche#winkel_suchen|winkel_suchen]]. Gesucht wird ueberall dasselbe -- eine Stelle zwischen
+[[opencivil.core.suche#winkel_suchen|winkel_suchen]]. Gesucht wird ueberall dasselbe – eine Stelle zwischen
 zwei Grenzen, an der eine Funktion das Vorzeichen wechselt: die Dehnung, bei
 der die Normalkraft stimmt, die Kruemmung zum Moment, der Bruchzustand bei
 einer Normalkraft, die Neigung der Nulllinie. Bis 2026-10-17 stand Illinois
@@ -23,8 +23,8 @@ Eingrenzen mit wachsenden Schritten zweimal im Loeser.
 ## HALBIEREN ODER ILLINOIS
 
 Halbieren ist sicher: es findet die Stelle auch, wo die Funktion springt,
-und braucht bis auf die Schranke rund vierzig Schritte. Illinois -- eine
-Sekante, die abwechselnd von beiden Seiten herankommt -- braucht auf glatten
+und braucht bis auf die Schranke rund vierzig Schritte. Illinois – eine
+Sekante, die abwechselnd von beiden Seiten herankommt – braucht auf glatten
 Stuecken ein Viertel davon: zwischen zwei Knicken der Werkstoffgesetze ist
 die Kraft eine Gerade, und dort trifft die Sekante. Springt die Funktion,
 findet Illinois eine der Stellen um den Sprung, und welche, haengt am Weg
@@ -40,7 +40,7 @@ wieder abschalteten.
 
 ## EINHEITEN
 
-Keine -- hier gibt es nur Zahlen.
+Keine – hier gibt es nur Zahlen.
 
 ## Inhalt
 
@@ -50,11 +50,11 @@ Keine -- hier gibt es nur Zahlen.
 class Suche(Protocol)
 ```
 
-Was eine Suche kann und von sich sagt -- [[opencivil.core.suche#Halbieren|Halbieren]] oder [[opencivil.core.suche#Illinois|Illinois]].
+Was eine Suche kann und von sich sagt – [[opencivil.core.suche#Halbieren|Halbieren]] oder [[opencivil.core.suche#Illinois|Illinois]].
 
-- `vom_letzten: bool` – Ob sie bei der zuletzt gefundenen Stelle anfaengt und von dort eingrenzt ([[opencivil.core.suche#eingrenzen|eingrenzen]]) -- das lohnt nur, wo sie nahe am Ziel schnell trifft.
-- `auch_bei_sprung: bool` – Ob sie auch dort taugt, wo die Funktion springt -- wo es also mehrere Stellen gibt und welche gefunden wird, am Weg haengt.
-- `wie: str` – Wie sie die Stelle findet, in Worten -- fuer die Mitschrift: «durch Halbieren».
+- `vom_letzten: bool` – Ob sie bei der zuletzt gefundenen Stelle anfaengt und von dort eingrenzt ([[opencivil.core.suche#eingrenzen|eingrenzen]]) – das lohnt nur, wo sie nahe am Ziel schnell trifft.
+- `auch_bei_sprung: bool` – Ob sie auch dort taugt, wo die Funktion springt – wo es also mehrere Stellen gibt und welche gefunden wird, am Weg haengt.
+- `wie: str` – Wie sie die Stelle findet, in Worten – fuer die Mitschrift: «durch Halbieren».
 
 #### Suche.finde
 
@@ -84,10 +84,10 @@ Funktion springt: die Stelle haengt nur am Fenster.
 def finde(self, f: Callable[[float], Wert], unten: float, oben: float, schranke: float, f_unten: Wert=None, f_oben: Wert=None) -> Wert
 ```
 
-Wo `f` zwischen `unten` und `oben` null wird -- `f` steigt,
+Wo `f` zwischen `unten` und `oben` null wird – `f` steigt,
 unten ist es negativ, oben nicht. Halbiert, bis das Fenster schmaler
 ist als `schranke`; `None`, wenn `f` unterwegs keinen Wert hat.
-`f_unten` und `f_oben` braucht das Halbieren nicht -- sie sind fuer
+`f_unten` und `f_oben` braucht das Halbieren nicht – sie sind fuer
 eine Suche, die mit ihnen schneller ist ([[opencivil.core.suche#Illinois|Illinois]]).
 
 ### Illinois
@@ -98,14 +98,14 @@ class Illinois
 
 Regula falsi mit der Illinois-Abwandlung: der naechste Punkt liegt, wo die
 Sekante durch die beiden Enden null wird, und bleibt ein Ende zweimal
-hintereinander stehen, wird sein Wert halbiert -- sonst kroeche die
+hintereinander stehen, wird sein Wert halbiert – sonst kroeche die
 Sekante an einer gekruemmten Funktion nur von einer Seite heran. Bleibt
 eingegrenzt wie das Halbieren, konvergiert auf glatten Stuecken aber fast
-so schnell wie das Sekantenverfahren -- am schnellsten, wo es nahe der
+so schnell wie das Sekantenverfahren – am schnellsten, wo es nahe der
 Stelle anfaengt: darum bei der zuletzt gefundenen.
 
 Springt die Funktion, findet es eine der Stellen um den Sprung, und
-welche, haengt am Weg -- von der zuletzt gefundenen Stelle aus also an
+welche, haengt am Weg – von der zuletzt gefundenen Stelle aus also an
 der Reihenfolge der Fragen. Taugen soll es dort nur, wo das nicht zaehlt:
 `auch_bei_sprung` fuer eine Suche, die je Frage frisch anfaengt.
 
@@ -122,7 +122,7 @@ def finde(self, f: Callable[[float], Wert], unten: float, oben: float, schranke:
 ```
 
 Wie [[opencivil.core.suche#Halbieren.finde|Halbieren.finde]]: wo `f` zwischen `unten` und `oben`
-null wird, bis das Fenster schmaler ist als `schranke` -- zurueck
+null wird, bis das Fenster schmaler ist als `schranke` – zurueck
 kommt die zuletzt gefundene Stelle. Die Werte an den Enden werden
 gebraucht; wer sie schon kennt, gibt sie mit.
 
@@ -133,15 +133,15 @@ def illinois(f: Callable[[float], Tuple[float, Optional[B]]], a: float, fa: floa
 ```
 
 Eine Nullstelle von `f` zwischen `a` und `b`, die verschiedene
-Vorzeichen haben -- mit [[opencivil.core.suche#Illinois|Illinois]], aber fuer eine Frage, die mehr
+Vorzeichen haben – mit [[opencivil.core.suche#Illinois|Illinois]], aber fuer eine Frage, die mehr
 als die Stelle braucht: `f` gibt `(Wert, Beigabe)` zurueck, und
-zurueck kommt die Beigabe der besten Stelle -- `None`, wenn schon die
+zurueck kommt die Beigabe der besten Stelle – `None`, wenn schon die
 erste keinen Wert hat. Fertig ist die Suche, sobald der Wert unter
 `schranke_f` liegt oder das Fenster unter `schranke_x`.
 
 Hat `f` an einer Stelle keinen Wert (`nan`), endet die Suche dort: ohne
 ihn laesst sich nicht weiter eingrenzen. Bis 2026-10-17 rechnete sie mit
-`nan` weiter, bis eine Zerlegung bei ψ = nan abbrach -- an der kippenden
+`nan` weiter, bis eine Zerlegung bei ψ = nan abbrach – an der kippenden
 Nulllinie eines L, wo zwischen zwei Neigungen mit Gleichgewicht eine ohne
 liegen kann.
 
@@ -151,7 +151,7 @@ liegen kann.
 def winkel_suchen(f: Callable[[float], Tuple[float, Optional[B]]], a: float, *, schranke: float) -> Optional[B]
 ```
 
-Der Winkel, bei dem `f` null wird -- `f` gibt wie bei [[opencivil.core.suche#illinois|illinois]]
+Der Winkel, bei dem `f` null wird – `f` gibt wie bei [[opencivil.core.suche#illinois|illinois]]
 `(Abweichung, Beigabe)` und faellt, wo der Winkel waechst; zurueck
 kommt die Beigabe. So sucht die Nulllinie eines Querschnitts die Neigung,
 bei der sein Moment in die Richtung der Einwirkung zeigt: im Beton
@@ -161,7 +161,7 @@ im Stahl ([[opencivil.stahlbau.widerstand]]).
 Bei einem L laeuft die Abweichung in Stufen: ueber weite Bereiche kaum
 eine Aenderung, dann ein Sprung. Ein Sekantenverfahren verliert dort die
 Spur. Darum: von `a` aus in die richtige Richtung mit wachsenden
-Schritten -- 5°, doppelt so weit, hoechstens 45° --, bis die Abweichung
+Schritten – 5°, doppelt so weit, hoechstens 45° –, bis die Abweichung
 das Vorzeichen wechselt, dann Illinois. Ein Wechsel ueber einen halben
 Kreis ist der Sprung von +180° auf -180° und zaehlt nicht. Fertig, sobald
 die Abweichung unter `schranke` liegt.
@@ -190,26 +190,26 @@ Ende; sonst bleibt `a` stehen, und sein Wert wird halbiert.
 def eingrenzen(f: Callable[[float], Wert], a: float, fa: float, schritt: float, *, faktor: float, unten: float=-math.inf, oben: float=math.inf) -> Optional[Tuple[float, float, float, float]]
 ```
 
-Von `a` aus ein Fenster, in dem `f` das Vorzeichen wechselt -- mit
+Von `a` aus ein Fenster, in dem `f` das Vorzeichen wechselt – mit
 wachsenden Schritten in die Richtung, in der `f` null wird (`f`
 steigt): `schritt`, dann mal `faktor`. Zurueck kommt
 `(unten, oben, f_unten, f_oben)`, unten der kleinere Wert, wie
-[[opencivil.core.suche#Illinois.finde|Illinois.finde]] sie nimmt -- `None`, wo `f` unterwegs keinen
+[[opencivil.core.suche#Illinois.finde|Illinois.finde]] sie nimmt – `None`, wo `f` unterwegs keinen
 Wert hat oder das Fenster an `unten` bzw. `oben` stoesst, ohne dass das
 Vorzeichen wechselt.
 
-Fuer Suchen, die bei einer Stelle anfangen, die nahe liegt -- der zuletzt
+Fuer Suchen, die bei einer Stelle anfangen, die nahe liegt – der zuletzt
 gefundenen Ebene: dort ist das Fenster in wenigen Schritten eng.
 
 
 ## Konstanten
 
 - `SCHRITTE = 80` – Hoechstzahl der Schritte einer Suche. Erreicht wird sie nicht: abgebrochen wird an der Schranke. Die Zahl steht nur da, damit keine Schleife ewig laeuft.
-- `Wert = Optional[float]` – Was eine Funktion an einer Stelle hat -- `None`, wo sie keinen Wert hat.
+- `Wert = Optional[float]` – Was eine Funktion an einer Stelle hat – `None`, wo sie keinen Wert hat.
 - `B = TypeVar('B')` – Was [[opencivil.core.suche#illinois|illinois]] neben dem Wert mitgibt und an der besten Stelle zurueckgibt.
-- `HALBIEREN = Halbieren()` – Die beiden Suchen, wie sie meist gebraucht werden. Ohne eigenen Zustand -- wo eine Suche bei der zuletzt gefundenen Stelle anfaengt, merkt sich die Stelle, wer sucht.
+- `HALBIEREN = Halbieren()` – Die beiden Suchen, wie sie meist gebraucht werden. Ohne eigenen Zustand – wo eine Suche bei der zuletzt gefundenen Stelle anfaengt, merkt sich die Stelle, wer sucht.
 - `ILLINOIS = Illinois()`
-- `ILLINOIS_VON_VORN = Illinois(vom_letzten=False)` – Illinois ohne Gedaechtnis: jede Suche im ganzen Fenster -- fuer einen Loeser, der viele Fragen beantwortet und dessen Antworten nicht an ihrer Reihenfolge haengen sollen.
+- `ILLINOIS_VON_VORN = Illinois(vom_letzten=False)` – Illinois ohne Gedaechtnis: jede Suche im ganzen Fenster – fuer einen Loeser, der viele Fragen beantwortet und dessen Antworten nicht an ihrer Reihenfolge haengen sollen.
 
 ## Gebraucht von
 

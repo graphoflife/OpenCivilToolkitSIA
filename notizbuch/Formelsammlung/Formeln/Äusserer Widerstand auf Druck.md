@@ -47,7 +47,7 @@ $$
 Fuss und Mantel zusammen (SIA 267:2013, 9.4.4.1.1, (41)); die Norm will beide
 Teile möglichst getrennt bestimmt sehen. Beide sind Bruchwerte: der Mantel
 trägt schon bei kleinen Verschiebungen voll, der Fuss erst, wenn sich der
-Pfahl deutlich setzt -- darum schert er hier in der Regel örtlich ab.
+Pfahl deutlich setzt – darum schert er hier in der Regel örtlich ab.
 
 Kommt R_a,k aus Versuchen, ist er der kleinste gemessene Wert
 (SIA 267:2013, 9.4.4.1.6) und wird eingegeben.

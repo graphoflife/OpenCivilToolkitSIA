@@ -42,7 +42,7 @@ $$
 Die [[Bruchspannung in der Sohle]] mal Sohlfläche, wie das Buch die Bruchlast
 des Rechteckfundaments schreibt (Kap. 9.2.11). Weil $\varphi_{eff}$ und
 $c_{eff}$ schon Bemessungswerte sind, ist $N_{Rd}$ ein Bemessungswiderstand
-und steht direkt gegen $N_{Ed}$ (SIA 267:2013, 8.5.3.5) -- ohne einen
+und steht direkt gegen $N_{Ed}$ (SIA 267:2013, 8.5.3.5) – ohne einen
 globalen Sicherheitsfaktor, wie ihn das Buch für die zulässige Last
 verwendet. Den Widerstandsbeiwert $\gamma_R$ der Norm (8.5.2.1) setzt das
 Werkzeug 1.0. Ergibt die Formel eine negative Bruchspannung, gilt null.

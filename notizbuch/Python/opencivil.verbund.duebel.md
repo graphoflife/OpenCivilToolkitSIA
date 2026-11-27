@@ -1,5 +1,5 @@
 ---
-erzeugt: 54cb7d9c6cf7
+erzeugt: b67815c65663
 art: modul
 tags: [modul]
 ---
@@ -10,15 +10,15 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Was ein Kopfbolzenduebel traegt und wie viele es braucht, ohne Herleitung,
-in N, mm und N/mm² -- die Herleitung schreiben die Kennzahlen
+in N, mm und N/mm² – die Herleitung schreiben die Kennzahlen
 ([[opencivil.nachweis.qa_verbund_kennzahlen]]) und die Nachweise je
 Lastfall ([[opencivil.nachweis.qa_verbund]]):
 
 * ob Stahl und Beton voll verduebelt angenommen sind oder mit Kopfbolzen-
   duebeln gerechnet wird ([[opencivil.verbund.duebel#Verduebelung|Verduebelung]]);
 * der Duebel ([[opencivil.verbund.duebel#Kopfbolzen|Kopfbolzen]]): Schaftdurchmesser `d` von 16 bis
-  25 mm, Laenge `h_D` ab `4 d` -- so ist er verformungsfaehig
-  (6.1.1.3), und nur fuer ihn nennt 6.1.2.1 einen Widerstand --,
+  25 mm, Laenge `h_D` ab `4 d` – so ist er verformungsfaehig
+  (6.1.1.3), und nur fuer ihn nennt 6.1.2.1 einen Widerstand –,
   Zugfestigkeit `f_u`; ihre Vorgabe 450 N/mm² ist die der
   Kopfbolzenduebel in SIA 263:2013, Tabelle 3. Die Grenzen weisen schon
   die Felder ab ([[opencivil.projekt.querschnittsanalyse#QuerschnittsanalyseEintrag|QuerschnittsanalyseEintrag]]);
@@ -28,7 +28,7 @@ Lastfall ([[opencivil.nachweis.qa_verbund]]):
 * je Lastfall der Abschnitt bis zum Momentennullpunkt ([[opencivil.verbund.duebel#Abschnitt|Abschnitt]]):
   wie viele Duebel dort sitzen, `N`, und wie weit die Momentennullpunkte
   auseinander liegen, `L_e`;
-* der kleinste Verduebelungsgrad ([[opencivil.verbund.duebel#eta_min|eta_min]], 6.1.1.6, (29)) -- und
+* der kleinste Verduebelungsgrad ([[opencivil.verbund.duebel#eta_min|eta_min]], 6.1.1.6, (29)) – und
   ob ein Lastfall im Bereich negativer Momente liegt, wo er eins ist
   ([[opencivil.verbund.duebel#negativ|negativ]]).
 
@@ -37,7 +37,7 @@ Lastfall ([[opencivil.nachweis.qa_verbund]]):
 
 Zwischen dem Schnitt und dem Momentennullpunkt tragen die `N` Duebel die
 Kraft, die Beton und Betonstahl ausserhalb der Profile zusammen im Schnitt
-haben -- Kammerbeton zaehlt zum Stahl
+haben – Kammerbeton zaehlt zum Stahl
 ([[opencivil.verbund.querschnitt#Verbundquerschnitt.fuge|fuge]]); am
 Momentennullpunkt haben sie keine (nach Vorgabe, nicht nachgeschlagen: mit
 einer Normalkraft kann dort schon ein Teil im Beton stecken). Die volle
@@ -50,7 +50,7 @@ Auch wo die Tragsicherheit charakteristische Werte waehlt, rechnet der
 Duebel mit `γ_v = 1.25`: er ist kein Material des Projekts, das eine
 eigene Wahl haette (nach Vorgabe, nicht nachgeschlagen).
 
-(29) -- UND OHNE DOPPELTE SYMMETRIE:
+(29) – UND OHNE DOPPELTE SYMMETRIE:
 Teilweise verduebelt sein darf ein Traeger nur im Bereich positiver Momente
 (6.1.1.6), und dort nur, wenn `η` die Grenze von (29) haelt; (29) gilt
 fuer doppelsymmetrische Stahlprofile, mit `f_y` des Profils. Fuer andere
@@ -65,7 +65,7 @@ positiv ist: die Platte kann oben oder unten liegen. Das Werkzeug sieht den
 Bereich negativer Momente, wo Beton und Betonstahl ausserhalb der Profile bei
 voller Verduebelung
 zusammen gezogen sind oder die plastische Nulllinie die Seite zieht, auf der
-der Beton liegt ([[opencivil.verbund.duebel#negativ|negativ]]) -- so auch ueber Kammerbeton, der
+der Beton liegt ([[opencivil.verbund.duebel#negativ|negativ]]) – so auch ueber Kammerbeton, der
 gedrueckt mehr traegt als der gezogene Betonstahl der Platte (nach Vorgabe,
 nicht nachgeschlagen).
 
@@ -77,7 +77,7 @@ nicht nachgeschlagen).
 class Verduebelung(Wahl)
 ```
 
-Wie Stahl und Beton verbunden sind -- einmal fuer die ganze Analyse.
+Wie Stahl und Beton verbunden sind – einmal fuer die ganze Analyse.
 
 - `VOLL = 'voll'`
 - `KOPFBOLZEN = 'kopfbolzen'`
@@ -103,7 +103,7 @@ def erklaerung(self) -> str
 class Kopfbolzen
 ```
 
-Ein Kopfbolzenduebel -- siehe Dateikopf. `d` und `h` in mm, `f_u` in N/mm².
+Ein Kopfbolzenduebel – siehe Dateikopf. `d` und `h` in mm, `f_u` in N/mm².
 
 - `d: float`
 - `h: float`
@@ -124,7 +124,7 @@ def f_u_wirksam(self) -> float
 def betonstauchung(self, f_ck: float, E_cm: float) -> float
 ```
 
-(30): was der Beton um den Duebel traegt, in N -- `f_ck` und `E_cm` in N/mm².
+(30): was der Beton um den Duebel traegt, in N – `f_ck` und `E_cm` in N/mm².
 
 #### Kopfbolzen.schaft
 
@@ -155,7 +155,7 @@ solange es nicht angegeben ist.
 def negativ(n: Tuple[float, float], zum_beton: Optional[Tuple[float, float]], N_c: float) -> bool
 ```
 
-Ob ein Lastfall im Bereich negativer Momente liegt -- siehe Dateikopf:
+Ob ein Lastfall im Bereich negativer Momente liegt – siehe Dateikopf:
 `N_c` die Kraft in Beton und Betonstahl ausserhalb der Profile bei
 voller Verduebelung, in N
 (Zug positiv), `n` die Zugrichtung ihrer Nulllinie, `zum_beton` vom
@@ -182,9 +182,9 @@ Profil mit der Fliessgrenze `f_y` in N/mm², `L_e` in m.
 - `BETONSTAUCHUNG = 0.29` – Die Beiwerte von (30) und (31).
 - `SCHAFT = 0.8`
 - `LAENGE_IN_D = 4.0`
-- `F_U_HOECHSTENS = 500.0` – Bis wohin `f_u` zaehlt, in N/mm² (6.1.2.1) -- und die Vorgabe aus SIA 263, Tabelle 3.
+- `F_U_HOECHSTENS = 500.0` – Bis wohin `f_u` zaehlt, in N/mm² (6.1.2.1) – und die Vorgabe aus SIA 263, Tabelle 3.
 - `F_U_VORGABE = 450.0`
-- `F_Y_BEZUG = 355.0` – (29): der Bezug der Fliessgrenze in N/mm², die Beiwerte, die Untergrenze und bis wohin `L_e` in m die Formel gilt -- darueber verlangt sie volle Verduebelung.
+- `F_Y_BEZUG = 355.0` – (29): der Bezug der Fliessgrenze in N/mm², die Beiwerte, die Untergrenze und bis wohin `L_e` in m die Formel gilt – darueber verlangt sie volle Verduebelung.
 - `GRAD_AB = 0.4`
 - `L_E_BIS = 25.0`
 

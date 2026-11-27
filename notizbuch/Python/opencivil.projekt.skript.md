@@ -1,5 +1,5 @@
 ---
-erzeugt: 282025d665e7
+erzeugt: 308d34166e1b
 art: modul
 tags: [modul]
 ---
@@ -46,7 +46,7 @@ Ein neues Skript, mit der [[opencivil.projekt.skript#Konstanten|VORLAGE]] darin.
 
 ## Konstanten
 
-- `VORLAGE = '# Python im Browser: die Standardbibliothek, numpy, pandas und openc…` – Was ein neues Skript schon enthält: ein Diagramm ohne Download -- numpy und pandas kosten beim ersten Einbinden ein paar Megabyte.
+- `VORLAGE = '# Python im Browser: die Standardbibliothek, numpy, pandas und openc…` – Was ein neues Skript schon enthält: ein Diagramm ohne Download – numpy und pandas kosten beim ersten Einbinden ein paar Megabyte.
 
 ## Braucht
 

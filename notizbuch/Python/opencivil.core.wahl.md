@@ -1,5 +1,5 @@
 ---
-erzeugt: 305fb8b3f821
+erzeugt: fe405f3b66d7
 art: modul
 tags: [modul]
 ---
@@ -10,8 +10,8 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Die Grundlage jeder Wahl im Projekt: Rechenart, Wertesatz, Zugseite,
-Rissanforderung und die übrigen. Ein Mitglied ist zugleich sein Text --
-`Rechenart.BLOCK == "block"`, und `json.dumps` schreibt `"block"` --,
+Rissanforderung und die übrigen. Ein Mitglied ist zugleich sein Text –
+`Rechenart.BLOCK == "block"`, und `json.dumps` schreibt `"block"` –,
 und es gibt sich als dieser Text aus, in Meldungen und in Formeln. Ein
 Text, den es nicht gibt, meldet sich mit den möglichen Werten.
 

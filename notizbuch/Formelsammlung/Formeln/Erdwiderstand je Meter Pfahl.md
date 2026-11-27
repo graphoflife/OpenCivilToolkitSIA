@@ -28,7 +28,7 @@ $$
 Vor einer schmalen Druckfläche bricht der Boden nicht nur auf deren Breite:
 der Bruchkörper greift seitlich aus. Das Buch nimmt grob die dreifache
 Breite an (Kap. 10.8). Hier gilt sie für beide Seiten, vorne passiv, hinten
-aktiv: je Meter Pfahl p_E,k = 3 · D · (e_p − max(0; e_a)) -- nach Vorgabe,
+aktiv: je Meter Pfahl p_E,k = 3 · D · (e_p − max(0; e_a)) – nach Vorgabe,
 nicht nachgeschlagen.
 
 ⌀ 900 mm im trockenen Kies mit φ'_k = 35°, in 5 m Tiefe:
@@ -40,7 +40,7 @@ Genauer rechnet das Buch nach Weissenbach (Kap. 10.8, Tabelle 10.21): mit
 einem räumlichen Gleitkeil und Reibung am Träger, und mit einer Abminderung,
 wo die Fläche schmaler ist als etwa 0.3-mal ihre Tiefe. Die dreifache
 Breite ohne Wandreibung bleibt darunter: ⌀ 900 mm in Kies mit φ'_k = 35°
-gibt bis 6 m Tiefe 43 % der Kraft nach Weissenbach -- offen in [[TODO]].
+gibt bis 6 m Tiefe 43 % der Kraft nach Weissenbach – offen in [[TODO]].
 Auf den passiven Druck gehört nach demselben Kapitel ein Faktor von
 mindestens 2, damit die Verformungen klein bleiben; η_a,tr / γ_M,a =
 0.7 / 1.4 gibt genau ihn.

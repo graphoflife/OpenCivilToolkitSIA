@@ -28,7 +28,7 @@ Quer zur Achse hält den Pfahl der Boden neben ihm. Gibt der Boden nach, dreht o
 ## Theorie
 
 Wie viel Querkraft der Pfahl am Kopf tragen kann, bevor er im Boden bricht
--- und ob der Boden die Bettung hält, mit der die Steifigkeit rechnet.
+– und ob der Boden die Bettung hält, mit der die Steifigkeit rechnet.
 Beides nach SIA 267:2013: R_tr,k aus Erdwiderstand und innerem Widerstand
 (9.4.4.2.2), R_tr,d mit η_a,tr und γ_M,a = 1.4 (9.5.2.3), die
 Bettungskraft gegen den Erdwiderstand (9.5.4.5).
@@ -36,7 +36,7 @@ Bettungskraft gegen den Erdwiderstand (9.5.4.5).
 Der Erdwiderstand nach dem Buch: Rankine drainiert und undrainiert
 (Kap. 9.3.5, 9.3.6), auf der dreifachen Breite vor dem schmalen Pfahl
 (Kap. 10.8). Der Biegewiderstand aus demselben Querschnitt wie der innere
-Widerstand, mit f_ck und f_yk, mal η_i -- an Kopf und Fuss der kleinere.
+Widerstand, mit f_ck und f_yk, mal η_i – an Kopf und Fuss der kleinere.
 
 Was die Rechnung annimmt, ohne dass Norm oder Buch es so sagen, steht in der
 Herleitung als «nach Vorgabe, nicht nachgeschlagen»: hinten der aktive

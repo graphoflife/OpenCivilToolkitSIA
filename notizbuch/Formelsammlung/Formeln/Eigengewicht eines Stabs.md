@@ -41,7 +41,7 @@ $$
 ## Theorie
 
 Was ein Stab je Meter seiner Länge wiegt: Dichte mal Erdbeschleunigung mal
-Querschnittsfläche. Beim Beton gilt die Dichte des Stahlbetons, 2500 kg/m³ --
+Querschnittsfläche. Beim Beton gilt die Dichte des Stahlbetons, 2500 kg/m³ –
 sie schliesst die Bewehrung schon ein, der Stahl kommt nicht noch einmal dazu.
 Beim Stahl gilt seine Dichte, 7850 kg/m³. g ist auf 10 m/s² gerundet
 (Benutzer, 2026-10-23).

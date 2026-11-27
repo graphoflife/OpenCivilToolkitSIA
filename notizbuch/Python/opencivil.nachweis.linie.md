@@ -1,5 +1,5 @@
 ---
-erzeugt: 4eb085a10813
+erzeugt: 9ae8c4723868
 art: modul
 tags: [modul]
 ---
@@ -10,7 +10,7 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Punkt-in-Linie, Schnitte mit einer Geraden, kuerzester Abstand. Reine
-Geometrie -- von Beton, Stahl und Norm weiss dieser Baustein nichts.
+Geometrie – von Beton, Stahl und Norm weiss dieser Baustein nichts.
 
 
 ## WARUM EIGENSTAENDIG
@@ -19,7 +19,7 @@ Es gibt zwei Resistenzlinien: die punktweise aus Dehnungsebenen aufgebaute
 ([[opencivil.nachweis.resistenzlinie#Ebenenlinie|Ebenenlinie]]) und das Polygon aus der
 Handrechnung ([[opencivil.nachweis.handrechnung]]). Beide werden auf genau
 dieselbe Art ausgewertet. Laege die Geometrie bei einer der beiden, muesste die
-andere sie entweder einbinden -- was einen Ring ergaebe -- oder nachbauen. Das
+andere sie entweder einbinden – was einen Ring ergaebe – oder nachbauen. Das
 zweite waere der Anfang vom Auseinanderlaufen.
 
 
@@ -27,9 +27,9 @@ zweite waere der Anfang vom Auseinanderlaufen.
 
 Ob ein Widerstand bei festgehaltener Normalkraft (waagrecht) oder bei
 festgehaltenem Moment (senkrecht) gesucht wird, steckt in [[opencivil.nachweis.linie#Achse|Achse]].
-Vorher stand dieselbe Unterscheidung vierfach da -- als Funktionspaar
+Vorher stand dieselbe Unterscheidung vierfach da – als Funktionspaar
 `..._bei_N`/`..._bei_M`, als `positiv`-Schalter, als Zeichenkette `"M"`
-und als Enum-Mitglied -- und wurde an sechs Stellen abgefragt. Jetzt gibt es
+und als Enum-Mitglied – und wurde an sechs Stellen abgefragt. Jetzt gibt es
 sie einmal, und die Funktionen hier kennen nur noch *eine* Achse und ihre
 Gegenachse.
 
@@ -63,7 +63,7 @@ Alles, was eine Normalkraft und ein Moment hat.
 class Stelle
 ```
 
-Ein schlichter Punkt der M-N-Ebene -- etwa eine Einwirkung.
+Ein schlichter Punkt der M-N-Ebene – etwa eine Einwirkung.
 
 - `N: float`
 - `M: float`
@@ -77,7 +77,7 @@ class Achse
 
 Eine der beiden Achsen der M-N-Ebene, samt allem, was sie unterscheidet.
 
-`name` ist zugleich der Feldname eines [[opencivil.nachweis.linie#Punkt|Punkt]] -- damit kommt
+`name` ist zugleich der Feldname eines [[opencivil.nachweis.linie#Punkt|Punkt]] – damit kommt
 [[opencivil.nachweis.linie#Achse.von|von]] ohne Fallunterscheidung aus.
 
 - `name: str` – `"M"` oder `"N"`.
@@ -101,7 +101,7 @@ Der Wert dieses Punktes auf dieser Achse.
 def gegen(self) -> 'Achse'
 ```
 
-Die andere Achse -- die bei einem Schnitt festgehalten wird.
+Die andere Achse – die bei einem Schnitt festgehalten wird.
 
 ### innerhalb
 
@@ -122,7 +122,7 @@ Eckpunkt, der genau auf ihr liegt.
 
 Liefert Tripel `(Wert auf achse, Punkt a, Punkt b)`; ein Eckpunkt auf
 der Geraden kommt als `(Wert, a, a)`. Die einzige Stelle, an der ueber
-die Linie gelaufen wird -- alles Weitere waehlt daraus aus.
+die Linie gelaufen wird – alles Weitere waehlt daraus aus.
 
 Die Eckpunkte zaehlen fuer sich, weil die Linie die Gerade auch nur
 beruehren kann, ohne sie zu kreuzen: eine Platte nur mit oberer Bewehrung
@@ -144,11 +144,11 @@ Alle Werte auf `achse`, bei denen `achse.gegen = fest` die Linie trifft.
 def kante(linie: Sequence[Punkt], achse: Achse, fest: float, positiv: bool) -> Optional[Tuple[float, Punkt, Punkt]]
 ```
 
-Der aeusserste Schnittpunkt -- mit den beiden Eckpunkten, zwischen denen er liegt.
+Der aeusserste Schnittpunkt – mit den beiden Eckpunkten, zwischen denen er liegt.
 
 Die Eckpunkte braucht die Mitschrift: dort soll stehen, *zwischen welchen
 beiden* interpoliert wurde, nicht bloss das Ergebnis. Sonst waere die Zahl
-wieder nicht von Hand nachvollziehbar -- und genau darum geht es hier.
+wieder nicht von Hand nachvollziehbar – und genau darum geht es hier.
 
 ### ohne_wiederholungen
 
@@ -159,7 +159,7 @@ def ohne_wiederholungen(linie: Sequence, toleranz: float=1e-07) -> List
 Entfernt aufeinanderfolgende Punkte, die auf dieselbe Stelle fallen.
 
 Solange saemtliche Bewehrung fliesst und der Beton gerissen ist, aendert
-eine Drehung der Dehnungsebene nichts an N und M -- am reinen Zug entstehen
+eine Drehung der Dehnungsebene nichts an N und M – am reinen Zug entstehen
 so dutzende deckungsgleiche Punkte, und an der Nahtstelle der beiden Faecher
 liegt der Punkt des reinen Drucks doppelt vor. Fuer die Geometrie sind das
 entartete Segmente: Punkt-in-Polygon und Schnittsuche stolpern darueber, und
@@ -173,7 +173,7 @@ def naechster_punkt(N: float, M: float, linie: Sequence[Punkt], N_ref: float, M_
 
 Kuerzester Abstand zur Linie im normierten Diagramm.
 
-Ohne Normierung waere der Abstand von der Wahl der Einheiten abhaengig --
+Ohne Normierung waere der Abstand von der Wahl der Einheiten abhaengig –
 kN und kNm lassen sich nicht sinnvoll gegeneinander aufrechnen.
 
 

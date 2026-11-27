@@ -45,7 +45,7 @@ Die Bettung der Steifigkeit ist elastisch und kennt keine Grenze, der Boden
 schon. Bettung und Widerstand müssen nach der Norm über die Tiefe
 zusammenpassen (SIA 267:2013, 9.5.4.5). Das Werkzeug vergleicht darum in
 jeder Tiefe der Verläufe die Bettungskraft q_d = |p| · D mit dem
-Erdwiderstand, abgemindert wie R_tr: p_E,d = η_a,tr · p_E,k / γ_M,a --
+Erdwiderstand, abgemindert wie R_tr: p_E,d = η_a,tr · p_E,k / γ_M,a –
 nach Vorgabe, nicht nachgeschlagen. Massgebend ist die Tiefe, in der q_d
 dem Erdwiderstand am nächsten kommt; meist liegt sie nahe dem Kopf.
 

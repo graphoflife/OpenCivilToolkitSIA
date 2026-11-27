@@ -57,4 +57,4 @@ die Wendel schief; k_c = 0.55 mindert die Festigkeit des Betons darum wie in
 einem Steg (4.2.1.7).
 
 ⌀ 900 mm, C30/37, α = 30°: V_Rd,c = 474 mm · 608 mm · 0.55 · 20 N/mm² · 0.43
-= 1375 kN -- viermal so viel wie die Wendel.
+= 1375 kN – viermal so viel wie die Wendel.

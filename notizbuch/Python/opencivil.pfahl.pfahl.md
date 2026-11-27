@@ -1,5 +1,5 @@
 ---
-erzeugt: e3715e9bef2b
+erzeugt: cec1b48c850c
 art: modul
 tags: [modul]
 ---
@@ -10,22 +10,22 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Der [[opencivil.pfahl.pfahl#Pfahl|Pfahl]]: Art, Masse und Querschnitt, die Schichten des Baugrunds,
-das Grundwasser und die Beiwerte des Widerstands -- als Vorgaben im
+das Grundwasser und die Beiwerte des Widerstands – als Vorgaben im
 Rechenwerk, und nur die, die nach den Wahlen gelten ([[opencivil.pfahl.pfahl#Konstanten|VORGABEN]],
 [[opencivil.pfahl.pfahl#Konstanten|JE_SCHICHT]]):
 
-* [[opencivil.pfahl.pfahl#Pfahlart|Pfahlart]] -- Bohrpfahl aus Stahlbeton oder Mikropfahl mit einem
+* [[opencivil.pfahl.pfahl#Pfahlart|Pfahlart]] – Bohrpfahl aus Stahlbeton oder Mikropfahl mit einem
   Tragglied aus Stahl ([[opencivil.pfahl.pfahl#Tragglied|Tragglied]]) in einem Verpresskörper;
-* [[opencivil.pfahl.pfahl#Grundlage|Grundlage]] -- worauf der äussere Widerstand R_a,k beruht: auf einer
+* [[opencivil.pfahl.pfahl#Grundlage|Grundlage]] – worauf der äussere Widerstand R_a,k beruht: auf einer
   Berechnung aus den Schichten, auf Erfahrung oder auf einem Versuch, und
   wie gross der Umrechnungsfaktor η_a darum höchstens ist;
-* [[opencivil.pfahl.pfahl#Spitze|Spitze]] und [[opencivil.pfahl.pfahl#Abscheren|Abscheren]] -- ob der Fuss trägt und wie;
-* [[opencivil.pfahl.pfahl#Kopf|Kopf]] -- ob sich der Kopf frei drehen kann oder eingespannt ist.
+* [[opencivil.pfahl.pfahl#Spitze|Spitze]] und [[opencivil.pfahl.pfahl#Abscheren|Abscheren]] – ob der Fuss trägt und wie;
+* [[opencivil.pfahl.pfahl#Kopf|Kopf]] – ob sich der Kopf frei drehen kann oder eingespannt ist.
 
 Gerechnet wird in den Nachweisen: äusserer Widerstand in
 [[opencivil.pfahl.aussen]], innerer in [[opencivil.pfahl.innen]], der
 äussere quer zur Achse in [[opencivil.pfahl.quer]], der innere quer in
-[[opencivil.pfahl.innen_quer]] -- und die Steifigkeit
+[[opencivil.pfahl.innen_quer]] – und die Steifigkeit
 in [[opencivil.pfahl.steifigkeit]]. Welche Kombination den Pfahl quer
 belastet, sagt [[opencivil.pfahl.pfahl#Pfahl.quer_belastet|Pfahl.quer_belastet]].
 
@@ -38,7 +38,7 @@ der Fuss in t_K + L. Über dem Kopf trägt der Boden nur als Auflast.
 
 ## DER DURCHMESSER
 
-Beim Bohrpfahl der des Pfahls -- verrohrt aussen an der Verrohrung,
+Beim Bohrpfahl der des Pfahls – verrohrt aussen an der Verrohrung,
 unverrohrt der des Bohrwerkzeugs (SIA 267:2013, 9.5.2.4.7); beim
 Mikropfahl der des Verpresskörpers, an dem Mantel und Fuss tragen. Das
 Tragglied hat seine eigenen Masse.
@@ -56,7 +56,7 @@ SI-Basis.
 class Pfahlart(Wahl)
 ```
 
-Was für ein Pfahl -- daran hängen sein Querschnitt und was der Durchmesser meint.
+Was für ein Pfahl – daran hängen sein Querschnitt und was der Durchmesser meint.
 
 - `BOHRPFAHL = 'bohrpfahl'`
 - `MIKROPFAHL = 'mikropfahl'`
@@ -81,7 +81,7 @@ def erklaerung(self) -> str
 class Grundlage(Wahl)
 ```
 
-Worauf der charakteristische äussere Widerstand R_a,k beruht -- und
+Worauf der charakteristische äussere Widerstand R_a,k beruht – und
 darum, wie gross der Umrechnungsfaktor η_a höchstens ist
 (SIA 267:2013, 9.5.2.2.5). Aus einer Berechnung oder aus Erfahrung kommt
 R_a,k aus den Schichten, aus einem Versuch wird er eingegeben.
@@ -217,7 +217,7 @@ def erklaerung(self) -> str
 class Kopf(Wahl)
 ```
 
-Wie der Pfahlkopf gehalten ist -- daran hängt, was eine Querkraft mit ihm macht.
+Wie der Pfahlkopf gehalten ist – daran hängt, was eine Querkraft mit ihm macht.
 
 - `FREI = 'frei'`
 - `EINGESPANNT = 'eingespannt'`
@@ -243,7 +243,7 @@ def quer_belastet(H: float, M: float, kopf: Kopf) -> bool
 ```
 
 Ob Kräfte am Kopf den Pfahl quer belasten: eine Querkraft, oder ein Moment
-am frei drehbaren Kopf -- am eingespannten ist das Moment Reaktion.
+am frei drehbaren Kopf – am eingespannten ist das Moment Reaktion.
 
 ### Kombination
 
@@ -253,7 +253,7 @@ class Kombination
 ```
 
 Eine Einwirkung auf den Pfahlkopf: die Normalkraft, Druck positiv, die
-Querkraft und das Moment -- das Moment dreht wie die Querkraft, wenn sie
+Querkraft und das Moment – das Moment dreht wie die Querkraft, wenn sie
 über dem Kopf angreift.
 
 - `name: str`
@@ -274,7 +274,7 @@ def kennung(self) -> str
 def _pfahl(art: Pfahlart) -> Tuple[Feld, ...]
 ```
 
-Die Masse -- was D meint, hängt an der Art (siehe Dateikopf).
+Die Masse – was D meint, hängt an der Art (siehe Dateikopf).
 
 ### _aussen
 
@@ -282,7 +282,7 @@ Die Masse -- was D meint, hängt an der Art (siehe Dateikopf).
 def _aussen(grundlage: Grundlage) -> Tuple[Feld, ...]
 ```
 
-η_a mit dem Grenzwert seiner Grundlage -- aus einem Versuch dazu R_a,k selbst.
+η_a mit dem Grenzwert seiner Grundlage – aus einem Versuch dazu R_a,k selbst.
 
 ### _fuss
 
@@ -290,7 +290,7 @@ def _aussen(grundlage: Grundlage) -> Tuple[Feld, ...]
 def _fuss(grundlage: Grundlage, spitze: Spitze) -> Tuple[Feld, ...]
 ```
 
-Der Spitzendruck, wo er eingegeben wird -- aus einem Versuch nie: R_a,k enthält den Fuss.
+Der Spitzendruck, wo er eingegeben wird – aus einem Versuch nie: R_a,k enthält den Fuss.
 
 ### _querschnitt
 
@@ -298,7 +298,7 @@ Der Spitzendruck, wo er eingegeben wird -- aus einem Versuch nie: R_a,k enthält
 def _querschnitt(art: Pfahlart, tragglied: Tragglied) -> Tuple[Feld, ...]
 ```
 
-Beim Bohrpfahl die Bewehrung, beim Mikropfahl das Tragglied -- dazu η_i.
+Beim Bohrpfahl die Bewehrung, beim Mikropfahl das Tragglied – dazu η_i.
 
 ### _festigkeit
 
@@ -306,7 +306,7 @@ Beim Bohrpfahl die Bewehrung, beim Mikropfahl das Tragglied -- dazu η_i.
 def _festigkeit(verhalten: Verhalten) -> Tuple[Feld, ...]
 ```
 
-Drainiert φ'_k und c'_k, undrainiert s_u,k -- wie beim Grundbruch.
+Drainiert φ'_k und c'_k, undrainiert s_u,k – wie beim Grundbruch.
 
 ### _mantel
 
@@ -338,13 +338,13 @@ Siehe Dateikopf.
 - `grundlage: Grundlage`
 - `eta_a: Groesse`
 - `R_ak: Groesse`
-- `R_ak_zug: Groesse` – R_a,k aus einem Versuch, auf Druck und auf Zug -- nur dann.
+- `R_ak_zug: Groesse` – R_a,k aus einem Versuch, auf Druck und auf Zug – nur dann.
 - `spitze: Spitze`
 - `abscheren: Abscheren`
-- `q_b: Groesse` – Der Spitzendruck, charakteristisch -- eingegeben.
+- `q_b: Groesse` – Der Spitzendruck, charakteristisch – eingegeben.
 - `eta_i: Groesse`
 - `stahl: Baustoff` – Die Längsbewehrung des Bohrpfahls, das Tragglied des Mikropfahls.
-- `beton: Optional[Baustoff]` – Der Beton des Bohrpfahls -- beim Mikropfahl trägt nur der Stahl.
+- `beton: Optional[Baustoff]` – Der Beton des Bohrpfahls – beim Mikropfahl trägt nur der Stahl.
 - `n: Groesse`
 - `phi_l: Groesse`
 - `c: Groesse`
@@ -391,7 +391,7 @@ Ob eine Kombination den Pfahl quer belastet ([[opencivil.pfahl.pfahl#Pfahl.quer_
 def fuss_traegt(self) -> bool
 ```
 
-Ob der Fuss trägt: nach der Wahl «Fuss» -- mit R_a,k aus einem Versuch
+Ob der Fuss trägt: nach der Wahl «Fuss» – mit R_a,k aus einem Versuch
 immer, der Versuch hat den ganzen Pfahl belastet.
 
 #### Pfahl.baustoffe
@@ -401,7 +401,7 @@ immer, der Versuch hat den ganzen Pfahl belastet.
 def baustoffe(self) -> Tuple[Baustoff, ...]
 ```
 
-Keine eigenen -- Beton und Stahl meldet das Projekt an.
+Keine eigenen – Beton und Stahl meldet das Projekt an.
 
 #### Pfahl.stoffe
 
@@ -426,8 +426,8 @@ Die Schichten und das Wasser als Zahlen, aus den Eingaben eines Nachweises.
 def _vorgaben(self) -> Iterator[Tuple[str, str, Feld, Groesse]]
 ```
 
-Je Vorgabe, die nach den Wahlen gilt: ihre Gruppe -- die der Schichten
-zusammen «Schicht» --, ihr Kasten in der Herleitung, ihr Feld und ihre
+Je Vorgabe, die nach den Wahlen gilt: ihre Gruppe – die der Schichten
+zusammen «Schicht» –, ihr Kasten in der Herleitung, ihr Feld und ihre
 Grösse.
 
 #### Pfahl.kurznamen
@@ -436,18 +436,18 @@ Grösse.
 def kurznamen(self, *gruppen: str) -> List[str]
 ```
 
-Die Kurznamen der Vorgaben, die gelten -- aus den genannten Gruppen, ohne
+Die Kurznamen der Vorgaben, die gelten – aus den genannten Gruppen, ohne
 Angabe aus allen. Die Schichten heissen zusammen «Schicht».
 
 
 ## Konstanten
 
-- `ETA_I_HOECHSTENS = 0.9` – Wie gross der Umrechnungsfaktor des inneren Widerstands höchstens ist -- nur mit verlässlicher Prüfung der Integrität (SIA 267:2013, 9.5.2.4.9).
+- `ETA_I_HOECHSTENS = 0.9` – Wie gross der Umrechnungsfaktor des inneren Widerstands höchstens ist – nur mit verlässlicher Prüfung der Integrität (SIA 267:2013, 9.5.2.4.9).
 - `ETA_I_REGEL = 0.8` – Ohne diese Prüfung, in der Regel (SIA 267:2013, 9.5.2.4.4, (51)).
 - `_VERSUCH = 'SIA 267:2013, 9.4.4.1.3, 9.4.4.1.6'` – R_a,k aus einem Versuch: der kleinste gemessene Wert.
 - `_ABROSTUNG = Feld('dt', '\\Delta t', MM, 'Abrostung aussen', 1, 'SIA 267:2013, 9.6…`
-- `VORGABEN = (Gruppe('Pfahl', _pfahl, nach=('art',)), Gruppe('Grundwasser', lambda…` – Die Vorgaben des Pfahls, je Kasten der Herleitung und Karte der Maske ([[opencivil.core.vorgaben]]) -- je nur, was nach den Wahlen gilt.
-- `JE_SCHICHT = (Gruppe(SCHICHT, lambda: (Feld('d', 'd', M, 'Dicke der #', 2, beschri…` – Die Vorgaben jeder Schicht, je mit ihrer Nummer -- in der Herleitung ein Kasten je Schicht, in der Maske eine Karte. Die Gruppen teilen sich beide; ihre Titel sagen der Maske nur, wo die Schalter für Verhalten und Mantel stehen.
+- `VORGABEN = (Gruppe('Pfahl', _pfahl, nach=('art',)), Gruppe('Grundwasser', lambda…` – Die Vorgaben des Pfahls, je Kasten der Herleitung und Karte der Maske ([[opencivil.core.vorgaben]]) – je nur, was nach den Wahlen gilt.
+- `JE_SCHICHT = (Gruppe(SCHICHT, lambda: (Feld('d', 'd', M, 'Dicke der #', 2, beschri…` – Die Vorgaben jeder Schicht, je mit ihrer Nummer – in der Herleitung ein Kasten je Schicht, in der Maske eine Karte. Die Gruppen teilen sich beide; ihre Titel sagen der Maske nur, wo die Schalter für Verhalten und Mantel stehen.
 
 ## Braucht
 

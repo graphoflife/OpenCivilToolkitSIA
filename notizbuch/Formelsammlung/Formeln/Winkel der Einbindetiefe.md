@@ -47,7 +47,7 @@ $$
 
 Wie tief das Fundament im Verhältnis zu seiner Breite eingebunden ist, als
 Winkel: $\arctan(t/b)$. Er geht in die Tiefenfaktoren ein und begrenzt sie
-zugleich -- auch ein sehr tief eingebundenes Fundament kommt nicht über
+zugleich – auch ein sehr tief eingebundenes Fundament kommt nicht über
 90°.
 
 Die Tiefenfaktoren rechnen mit seinem Zahlenwert in Grad, wie das Kapitel

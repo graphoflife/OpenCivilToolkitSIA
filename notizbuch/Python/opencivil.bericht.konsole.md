@@ -1,5 +1,5 @@
 ---
-erzeugt: f799fc612928
+erzeugt: 7eff8f9e9df1
 art: modul
 tags: [modul]
 ---
@@ -10,11 +10,11 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Macht das Backend fuer sich allein bedienbar. Die LaTeX-Formeln werden roh
-ausgegeben -- nicht gesetzt, sondern als Quelltext, damit man sie lesen,
+ausgegeben – nicht gesetzt, sondern als Quelltext, damit man sie lesen,
 pruefen und direkt weiterverwenden kann.
 
 Der Bericht ist reine Darstellung: was darin steht und in welcher Folge,
-legt [[opencivil.bericht.gliederung#bericht|opencivil.bericht.gliederung.bericht]] fest -- fuer die Konsole
+legt [[opencivil.bericht.gliederung#bericht|opencivil.bericht.gliederung.bericht]] fest – fuer die Konsole
 wie fuer das LaTeX-Dokument. Hier wird es nur als Text gesetzt.
 
 
@@ -50,11 +50,11 @@ Wandelt eine Mitschrift in Konsolenzeilen um.
 def _tabelle_zeilen(block: TabellenBlock, einzug: int) -> List[str]
 ```
 
-Setzt die Tabelle als Text -- Spaltenbreiten nach dem laengsten Eintrag.
+Setzt die Tabelle als Text – Spaltenbreiten nach dem laengsten Eintrag.
 
 Zahlen rechts, Text links, wenn die Tabelle es sagt (`ausrichtung` wie
 in LaTeX, `l`, `c` oder `r` je Spalte). Ohne Angabe alles rechts.
-Frueher galt immer rechts, auch wo die Tabelle `l` verlangte -- im
+Frueher galt immer rechts, auch wo die Tabelle `l` verlangte – im
 LaTeX-Dokument stand sie richtig, auf der Konsole nicht.
 
 ### _zelle
@@ -71,7 +71,7 @@ Text wie er ist; eine Formel als Quelltext, wie ueberall auf der Konsole.
 def _wert_text(wert: Optional[Wert]) -> str
 ```
 
-Zahl und Einheit, ohne Formelzeichen -- die Spalte sagt, was es ist.
+Zahl und Einheit, ohne Formelzeichen – die Spalte sagt, was es ist.
 
 ### zusammenfassung
 
@@ -79,13 +79,13 @@ Zahl und Einheit, ohne Formelzeichen -- die Spalte sagt, was es ist.
 def zusammenfassung(zusammenfassung: 'Zusammenfassung') -> str
 ```
 
-Je Platte eine Tabelle der Nachweise -- die Zusammenfassung der
+Je Platte eine Tabelle der Nachweise – die Zusammenfassung der
 Oberflaeche, fuer die Konsole.
 
 Welche Zeilen dastehen, entscheidet
 [[opencivil.bericht.zusammenfassung#zusammenfassen|opencivil.bericht.zusammenfassung.zusammenfassen]]; hier wird nur
 gesetzt. Je Platte eine eigene Tabelle, weil die Urteilsnamen die Platte
-nicht nennen -- zwei Platten mit einer Kombination «Feld» stuenden sonst
+nicht nennen – zwei Platten mit einer Kombination «Feld» stuenden sonst
 als zwei gleiche Zeilen da.
 
 ### als_text
@@ -94,7 +94,7 @@ als zwei gleiche Zeilen da.
 def als_text(loesung: Loesung, titel: str='Berechnung', *, aufbau: Optional['Aufbau']=None) -> str
 ```
 
-Der ganze Bericht als Text -- mit `aufbau` die Nachweise je Platte.
+Der ganze Bericht als Text – mit `aufbau` die Nachweise je Platte.
 
 ### drucke
 
@@ -109,7 +109,7 @@ Schreibt den Bericht auf die Konsole (oder einen anderen Datenstrom).
 
 - `_BREITE = min(shutil.get_terminal_size((100, 24)).columns, 100)`
 - `_MARKE = {HinweisArt.INFO: 'i', HinweisArt.WARNUNG: '!', HinweisArt.ANNAHME: '…`
-- `TAFEL = {TitelBlock: _titel, TextBlock: _text, GleichungBlock: _gleichung, Ta…` – Je Blockart, wie die Konsole sie setzt -- jede als Zeilen.
+- `TAFEL = {TitelBlock: _titel, TextBlock: _text, GleichungBlock: _gleichung, Ta…` – Je Blockart, wie die Konsole sie setzt – jede als Zeilen.
 
 ## Braucht
 

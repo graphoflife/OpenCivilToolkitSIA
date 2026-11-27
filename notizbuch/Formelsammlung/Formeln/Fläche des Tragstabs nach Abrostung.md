@@ -46,4 +46,4 @@ $$
 
 Wie beim Rohr: der Stab rostet aussen um Δt, sein Durchmesser wird um 2 Δt
 kleiner (SIA 267:2013, 9.6.1.5.2). Ein Stab ⌀ 40 hat mit Δt = 2 mm statt
-1257 noch 1018 mm² -- ein Fünftel weniger.
+1257 noch 1018 mm² – ein Fünftel weniger.

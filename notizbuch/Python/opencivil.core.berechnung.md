@@ -1,5 +1,5 @@
 ---
-erzeugt: b238324ee494
+erzeugt: 2b2b2eb5463b
 art: modul
 tags: [modul]
 ---
@@ -15,32 +15,32 @@ es liefert, wie gerechnet wird und wie das Ergebnis aufzuschreiben ist.
 
 ## DREI AUSPRAEGUNGEN
 
-* [[opencivil.core.berechnung#Formel|Formel]]   -- ein Einzeiler: eine Ausgabe, eine analytische Formel.
-* [[opencivil.core.berechnung#Prozedur|Prozedur]] -- ein ganzer Ablauf: mehrere Ausgaben, Iterationen,
+* [[opencivil.core.berechnung#Formel|Formel]]   – ein Einzeiler: eine Ausgabe, eine analytische Formel.
+* [[opencivil.core.berechnung#Prozedur|Prozedur]] – ein ganzer Ablauf: mehrere Ausgaben, Iterationen,
   Fallunterscheidungen; schreibt ihren Ablauf selbst ins Protokoll.
-* [[opencivil.core.nachweis#Nachweis|Nachweis]] -- ein Vergleich von Einwirkung
+* [[opencivil.core.nachweis#Nachweis|Nachweis]] – ein Vergleich von Einwirkung
   und Widerstand mit Urteil und Erfuellungsgrad; er hat seine eigene Datei.
 
 
-## VARIANTEN -- WELCHE FORMEL GILT?
+## VARIANTEN – WELCHE FORMEL GILT?
 
 ?
 Oft haengt es von den vorhandenen Eingaben ab, welche Formel anzuwenden ist.
 Dafuer duerfen mehrere Berechnungen denselben Wert liefern. Der Loeser waehlt
 unter ihnen in zwei Stufen:
 
-1. *Verfuegbarkeit* -- sind alle Pflichteingaben ueberhaupt beschaffbar?
-2. *Anwendbarkeit*  -- [[opencivil.core.berechnung#Berechnung.anwendbar|Berechnung.anwendbar]] darf zusaetzlich von den
+1. *Verfuegbarkeit* – sind alle Pflichteingaben ueberhaupt beschaffbar?
+2. *Anwendbarkeit*  – [[opencivil.core.berechnung#Berechnung.anwendbar|Berechnung.anwendbar]] darf zusaetzlich von den
    tatsaechlichen Zahlenwerten abhaengen (z.B. "nur fuer f_ck \<= 50 N/mm^2").
 
-Die Begruendung der Wahl landet im Protokoll -- der Leser sieht, warum gerade
+Die Begruendung der Wahl landet im Protokoll – der Leser sieht, warum gerade
 diese Formel gegriffen hat.
 
 
 ## FEHLER WERDEN NICHT VERSCHLUCKT
 
 Im alten Code fing der Wertzugriff jede Ausnahme ab, warnte und lieferte einen
-veralteten Wert zurueck -- eine defekte Formel ergab damit eine plausible
+veralteten Wert zurueck – eine defekte Formel ergab damit eine plausible
 falsche Zahl. Hier fuehrt jeder Rechenfehler zu einem [[opencivil.core.berechnung#BerechnungsFehler|BerechnungsFehler]]
 mit Angabe der schuldigen Berechnung; die urspruengliche Ausnahme bleibt als
 Ursache erhalten.
@@ -81,7 +81,7 @@ Fuer eine Rechnung, die mehr als eine Zahl einer anderen braucht: die
 Querkraft den Momentenwiderstand bei ihrer Normalkraft samt seiner
 Herleitung, das Knicken die Resistenzlinie der Tragsicherheit. Der
 Loeser rechnet die andere Berechnung vorher und reicht ihren Befund
-durch ([[opencivil.core.berechnung#Eingaben.befund|Eingaben.befund]]) -- die Abhaengigkeit steht so im Graphen,
+durch ([[opencivil.core.berechnung#Eingaben.befund|Eingaben.befund]]) – die Abhaengigkeit steht so im Graphen,
 wie ein Wert es tut.
 
 - `name: str`
@@ -121,7 +121,7 @@ Prueft, ob eine optionale Eingabe vorliegt.
 def g(self, name: str) -> Groesse
 ```
 
-Nur die Groesse -- die Kurzform fuers Rechnen.
+Nur die Groesse – die Kurzform fuers Rechnen.
 
 #### Eingaben.si_nach_id
 
@@ -129,7 +129,7 @@ Nur die Groesse -- die Kurzform fuers Rechnen.
 def si_nach_id(self) -> Callable[[str], float]
 ```
 
-Die Zahl einer Eingabe in SI, nach ihrer Wert-ID -- fuer, wer seine
+Die Zahl einer Eingabe in SI, nach ihrer Wert-ID – fuer, wer seine
 Werte nach ID liest: die Stahllagen der Platte, die Werkstoffe des
 gezeichneten Querschnitts. So lesen sie aus einer Loesung wie aus den
 Eingaben eines Nachweises.
@@ -140,7 +140,7 @@ Eingaben eines Nachweises.
 def nach_id(self) -> Callable[[str], Wert]
 ```
 
-Eine Eingabe nach ihrer Wert-ID -- fuer eine Herleitung, die wie aus einer Loesung liest.
+Eine Eingabe nach ihrer Wert-ID – fuer eine Herleitung, die wie aus einer Loesung liest.
 
 #### Eingaben.groessen
 
@@ -156,7 +156,7 @@ Alle Eingaben als `name -> Groesse`, passend fuer `funktion(**...)`.
 def teilmenge(self, *namen: str) -> 'Eingaben'
 ```
 
-Auswahl einzelner Eingaben -- praktisch fuer LaTeX-Vorlagen.
+Auswahl einzelner Eingaben – praktisch fuer LaTeX-Vorlagen.
 
 ### Ausfuehrung
 
@@ -165,7 +165,7 @@ Auswahl einzelner Eingaben -- praktisch fuer LaTeX-Vorlagen.
 class Ausfuehrung
 ```
 
-Was eine Berechnung in einem Lauf liefert: ihre Ausgaben -- und, wo es
+Was eine Berechnung in einem Lauf liefert: ihre Ausgaben – und, wo es
 mehr gibt, ihre Urteile und ihren Befund.
 
 Der **Befund** ist alles, was ueber die Ausgabewerte hinausgeht und
@@ -173,7 +173,7 @@ spaeter jemand lesen will: Resistenzlinien, Fallergebnisse, das Ergebnis
 eines Balkensystems. Er steht nach dem Lauf in der Loesung
 ([[opencivil.core.rechenwerk#Loesung|befunde]]), nicht am Objekt.
 Ein Objekt beschreibt eine Rechnung, eine Loesung haelt fest, was sie
-ergab -- so laesst sich eine Loesung aufheben und wiederverwenden, ohne
+ergab – so laesst sich eine Loesung aufheben und wiederverwenden, ohne
 die Objekte umzuhaengen, die sie hervorgebracht haben.
 
 [[opencivil.core.berechnung#Berechnung.rechne|Berechnung.rechne]] liefert die Ausgaben als Groessen,
@@ -194,12 +194,12 @@ Basisklasse aller Rechenschritte.
 Unterklassen implementieren [[opencivil.core.berechnung#Berechnung.rechne|rechne]]. Aufgerufen wird immer
 [[opencivil.core.berechnung#Berechnung.ausfuehren|ausfuehren]], das die Ergebnisse prueft und in [[opencivil.core.wert#Wert|Wert]] verpackt.
 
-Eine Berechnung darf ohne Ausgabe sein -- ein Nachweis ohne Lastfall, ein
+Eine Berechnung darf ohne Ausgabe sein – ein Nachweis ohne Lastfall, ein
 Balkensystem: was sie findet, steht dann allein in ihrem Befund. Zum
 Rechnen nennt man sie unter ihrer ID als Ziel (siehe
 [[opencivil.core.rechenwerk#Rechenwerk.loese|loese]]).
 
-- `THEMA: str = ''` – Unter welchem Thema ihre Formeln in der Formelsammlung stehen -- ein Nachweis nennt sich selbst. Leer: das Thema ihres Abschnitts.
+- `THEMA: str = ''` – Unter welchem Thema ihre Formeln in der Formelsammlung stehen – ein Nachweis nennt sich selbst. Leer: das Thema ihres Abschnitts.
 
 #### Berechnung.thema
 
@@ -286,8 +286,8 @@ def rechne(self, e: Eingaben, p: Protokoll) -> Union[Mapping[str, Groesse], Ausf
 Fuehrt die Rechnung aus und schreibt sie ins Protokoll.
 
 :param e: aufgeloeste Eingaben unter ihren lokalen Namen
-:param p: Mitschrift -- hier wird die Herleitung festgehalten
-:return: `{Wert-ID: Groesse}` fuer jede deklarierte Ausgabe --
+:param p: Mitschrift – hier wird die Herleitung festgehalten
+:return: `{Wert-ID: Groesse}` fuer jede deklarierte Ausgabe –
 oder eine [[opencivil.core.berechnung#Ausfuehrung|Ausfuehrung]] mit diesen Groessen, wo es dazu
 Urteile oder einen Befund gibt
 
@@ -300,7 +300,7 @@ def ausfuehren(self, e: Eingaben, p: Protokoll) -> Ausfuehrung
 Ruft [[opencivil.core.berechnung#Berechnung.rechne|rechne]] auf und prueft dessen Ergebnis.
 
 Verpackt jede Groesse in einen [[opencivil.core.wert#Wert|Wert]] mit der deklarierten
-Definition -- dabei wird auch die Dimension geprueft. Urteile und
+Definition – dabei wird auch die Dimension geprueft. Urteile und
 Befund reicht es unveraendert durch.
 
 ### Formel
@@ -352,7 +352,7 @@ def rechne(self, e: Eingaben, p: Protokoll) -> Mapping[str, Groesse]
 class Vorgabe(Berechnung)
 ```
 
-Liefert einen festen Wert ohne Herleitung -- Normvorgabe oder Vorlagenwert.
+Liefert einen festen Wert ohne Herleitung – Normvorgabe oder Vorlagenwert.
 
 Erlaubt es, auch Konstanten (Teilsicherheitsbeiwerte, Tabellenwerte) als
 ordentliche Knoten im Rechengraph zu fuehren, statt sie im Code zu
@@ -380,7 +380,7 @@ class Prozedur(Berechnung)
 Ein mehrstufiger Ablauf: Iterationen, Fallunterscheidungen, mehrere Ausgaben.
 
 Unterklassen implementieren [[opencivil.core.berechnung#Prozedur|rechne]] und schreiben dabei ihren Ablauf
-ins Protokoll -- Ansatz, Startwerte, Zwischenschritte (gerne als Tabelle),
+ins Protokoll – Ansatz, Startwerte, Zwischenschritte (gerne als Tabelle),
 Abbruchkriterium, Ergebnis. Der Leser muss die Rechnung von Hand
 nachvollziehen koennen; nur das Endergebnis auszugeben genuegt nicht.
 
@@ -408,7 +408,7 @@ class Kennzahlprozedur(Prozedur)
 ```
 
 Eine Prozedur, die Kennzahlen eines Bauteils rechnet: Werte, die es
-beschreiben, gleich welche Lastfaelle es gibt -- die Widerstaende der
+beschreiben, gleich welche Lastfaelle es gibt – die Widerstaende der
 Platte und des gezeichneten Querschnitts, die Federn eines Pfahls.
 
 Jede legt ihre Kennzahlen an, bevor sie `super().__init__` ruft
@@ -416,7 +416,7 @@ Jede legt ihre Kennzahlen an, bevor sie `super().__init__` ruft
 Beim Rechnen belegt sie jede mit [[opencivil.core.berechnung#Kennzahlprozedur._belegen|_belegen]]. Bis 2026-11-21
 schrieb jede der drei beides selbst, Zeile fuer Zeile gleich.
 
-- `d: Dict[str, WertDef]` – Je Kurzname die Definition -- zum Belegen.
+- `d: Dict[str, WertDef]` – Je Kurzname die Definition – zum Belegen.
 - `kennzahlen: List[Kennzahl]` – Dieselben, wie sie unter dem Bauteil stehen, in dieser Folge.
 
 #### Kennzahlprozedur.anlegen
@@ -437,12 +437,12 @@ Bauteil.
 def _belegen(self, ergebnis: Dict[str, Groesse], kurz: str, si: float) -> Wert
 ```
 
-Die Kennzahl `kurz` mit dem Wert `si` in SI-Basis -- auch in `ergebnis`.
+Die Kennzahl `kurz` mit dem Wert `si` in SI-Basis – auch in `ergebnis`.
 
 
 ## Konstanten
 
-- `FormelFunktion = Callable[..., Union[Groesse, EmpirischesErgebnis]]` – Eine Rechenfunktion bekommt die Eingaben als Groessen unter ihren lokalen Namen und liefert eine Groesse -- oder ein EmpirischesErgebnis, wenn die Normformel dimensionell inhomogen ist.
+- `FormelFunktion = Callable[..., Union[Groesse, EmpirischesErgebnis]]` – Eine Rechenfunktion bekommt die Eingaben als Groessen unter ihren lokalen Namen und liefert eine Groesse – oder ein EmpirischesErgebnis, wenn die Normformel dimensionell inhomogen ist.
 
 ## Braucht
 

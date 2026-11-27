@@ -1,5 +1,5 @@
 ---
-erzeugt: b426863ce123
+erzeugt: 1727a3e9f8fd
 art: modul
 tags: [modul]
 ---
@@ -12,7 +12,7 @@ tags: [modul]
 Je Form die ebenen Teile eines Profils, an denen SIA 263:2013 die
 Schlankheit misst (Tabellen 5a und 5b) und die mitwirkende Breite rechnet
 (4.5.3): die Flansche und der Steg des I und des U, die vier Waende des
-Rechteckrohrs -- und das Rundrohr als Ganzes, dessen Grenze D/t heisst. Jedes
+Rechteckrohrs – und das Rundrohr als Ganzes, dessen Grenze D/t heisst. Jedes
 Blech liegt, wo das Profil in der Zeichnung liegt
 ([[opencivil.stahlprofile.lage#Profillage|Profillage]]), und heisst nach seiner
 Lage dort: «Flansch oben, links», auch am gedrehten Profil.
@@ -21,12 +21,12 @@ Lage dort: «Flansch oben, links», auch am gedrehten Profil.
 ## ZWEI BREITEN AUF EINER GERADEN
 
 Die theoretische Breite `b` laeuft auf der Mittelebene des Blechs zwischen
-den Mittellinien der Bleche, an denen es haengt -- beim einseitig gehaltenen
+den Mittellinien der Bleche, an denen es haengt – beim einseitig gehaltenen
 von der Mittellinie des Stegs bis zum freien Rand. Mit ihr rechnet die
 mitwirkende Breite: 4.5.3.3 misst von den theoretischen Scheibenschnittlinien
 aus. Die Schlankheit misst die Breite `c`, die die Bilder der Tabellen 5a
 und 5b zeigen: beim gewalzten Profil ohne die Ausrundungen, beim
-Rechteckrohr ohne 1.5 t je Seite, ob kalt- oder warmgefertigt -- Tabelle 5a
+Rechteckrohr ohne 1.5 t je Seite, ob kalt- oder warmgefertigt – Tabelle 5a
 unterscheidet nicht. Sie liegt auf derselben Geraden, `vor` nach dem
 Anfang der theoretischen.
 
@@ -37,7 +37,7 @@ nach Vorgabe, nicht nachgeschlagen
 Seine Flansche sind geneigt. Gerechnet wird mit der Flanschdicke `t_f` der
 Tabelle, die in der Mitte des Flanschs gilt, und mit `r_1` wie beim UPE
 mit `r`: der Steg bis zur Ausrundung misst so `h - 2 t_f - 2 r_1`, etwas
-mehr als zwischen den dickeren Wurzeln der Flansche -- auf der sicheren
+mehr als zwischen den dickeren Wurzeln der Flansche – auf der sicheren
 Seite.
 
 
@@ -52,7 +52,7 @@ weiss jedes seiner Bleche ([[opencivil.stahlprofile.bleche#Blech|Blech.kasten]])
 
 nach Vorgabe, nicht nachgeschlagen
 Flach-, Vierkant- und Rundstahl haben keine Bleche: sie beulen nicht, und
-ohne Blech zaehlt ein Profil in Klasse 1 -- die Tabellen 5a und 5b kennen
+ohne Blech zaehlt ein Profil in Klasse 1 – die Tabellen 5a und 5b kennen
 nur Bleche und Rohre.
 
 ## Inhalt
@@ -63,7 +63,7 @@ nur Bleche und Rohre.
 class Halterung(Wahl)
 ```
 
-Wie ein Blech gehalten ist -- danach waehlt die Norm ihre Tabelle.
+Wie ein Blech gehalten ist – danach waehlt die Norm ihre Tabelle.
 
 - `BEIDSEITIG = 'beidseitig'`
 - `EINSEITIG = 'einseitig'`
@@ -85,7 +85,7 @@ Wo seine Grenzen stehen: Tabelle 5a fuer beidseitig gestuetzte Scheiben und Rohr
 class Blech
 ```
 
-Ein Blech eines Profils, in mm in der Zeichnung -- siehe Dateikopf.
+Ein Blech eines Profils, in mm in der Zeichnung – siehe Dateikopf.
 `von` und `bis` sind die Enden der theoretischen Breite, beim
 einseitig gehaltenen `von` am gehaltenen Rand und `bis` am freien.
 Beim Rundrohr liegen beide in seiner Mitte, und `c` ist `D`.
@@ -97,7 +97,7 @@ Beim Rundrohr liegen beide in seiner Mitte, und `c` ist `D`.
 - `t: float`
 - `c: float`
 - `vor: float = 0.0`
-- `kasten: bool = False` – Ob es eine Wand eines Kastens ist -- siehe Dateikopf.
+- `kasten: bool = False` – Ob es eine Wand eines Kastens ist – siehe Dateikopf.
 
 #### Blech.b
 
@@ -163,15 +163,15 @@ Vier Waende zwischen den Mittellinien der anderen; `c` ohne 1.5 t je Seite (Tabe
 def bleche(lage: Profillage) -> List[Blech]
 ```
 
-Die Bleche des Profils, wo es in der Zeichnung liegt -- siehe Dateikopf.
+Die Bleche des Profils, wo es in der Zeichnung liegt – siehe Dateikopf.
 
 
 ## Konstanten
 
-- `_Roh = Tuple[Tuple[str, ...], Halterung, Punkt, Punkt, float, float, float]` – Ein Blech, wie die Form es zeichnet: sein Name aus Woertern -- die Richtungen darin dreht und spiegelt die Lage mit --, die Halterung, die Enden der theoretischen Breite, die Dicke, `c` und `vor`.
+- `_Roh = Tuple[Tuple[str, ...], Halterung, Punkt, Punkt, float, float, float]` – Ein Blech, wie die Form es zeichnet: sein Name aus Woertern – die Richtungen darin dreht und spiegelt die Lage mit –, die Halterung, die Enden der theoretischen Breite, die Dicke, `c` und `vor`.
 - `_RICHTUNGEN = ('oben', 'unten', 'links', 'rechts')`
-- `_KASTEN = {'rechteckrohr_gerundet'}` – Die Formen, die ein Kasten sind -- siehe Dateikopf.
-- `_BLECHE = {'i_profil': _i, 'u_parallel': lambda m: _u(m, m['r']), 'u_geneigt': …` – Je Form, welche Bleche sie hat -- nach dem Schluessel ihrer Vorlage.
+- `_KASTEN = {'rechteckrohr_gerundet'}` – Die Formen, die ein Kasten sind – siehe Dateikopf.
+- `_BLECHE = {'i_profil': _i, 'u_parallel': lambda m: _u(m, m['r']), 'u_geneigt': …` – Je Form, welche Bleche sie hat – nach dem Schluessel ihrer Vorlage.
 
 ## Braucht
 

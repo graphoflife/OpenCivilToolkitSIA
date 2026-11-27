@@ -48,7 +48,7 @@ $$
 ## Theorie
 
 Der Krümmungsbeiwert der Parabel aus dem Modul, mit dem das Gesetz rechnet
--- eine Regel für jede Rechnung. Im Bruchzustand des Querschnitts ist das
+– eine Regel für jede Rechnung. Im Bruchzustand des Querschnitts ist das
 $E_{cm}$, also $\gamma_{cE} = 1.0$; für die Verformung beim Knicken
 $E_{cd} = E_{cm}/1.2$ (SIA 262:2025, 4.2.1.15 bis 4.2.1.17). Unter Dauerlast
 kommt der kriechweiche [[Wirksamer Elastizitätsmodul|wirksame Modul]]
@@ -60,6 +60,6 @@ stand hier, mit $\gamma_{cE} = 1$ sei das dieselbe Zahl.
 Mit grossem $\varphi$ und charakteristischen Werten würde $k_\sigma$ kleiner
 als 1. Dann hätte der Nenner der Parabel, $1 + (k_\sigma - 2)\,\eta$, im
 ansteigenden Ast eine Nullstelle, bei $\eta = 1/(2 - k_\sigma)$. Darum wird
-$k_\sigma$ nicht kleiner als 1 angesetzt -- dann ist der Beton bis $f_c$ bei
+$k_\sigma$ nicht kleiner als 1 angesetzt – dann ist der Beton bis $f_c$ bei
 $\varepsilon_{c1d}$ linear. Diese Grenze ist nach Vorgabe eingebaut, nicht
 nachgeschlagen.

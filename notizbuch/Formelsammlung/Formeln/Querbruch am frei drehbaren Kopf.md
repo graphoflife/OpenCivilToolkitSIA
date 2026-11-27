@@ -28,7 +28,7 @@ $$
 Die Norm verlangt den Widerstand quer aus dem Erdwiderstand und dem inneren
 Widerstand des Pfahls (SIA 267:2013, 9.4.4.2.2), ohne einen Weg
 vorzugeben. Das Werkzeug sucht ihn mit Bruchmechanismen, wie sie für kurze
-und lange Pfähle üblich sind -- nach Vorgabe, nicht nachgeschlagen:
+und lange Pfähle üblich sind – nach Vorgabe, nicht nachgeschlagen:
 
 - Kurz dreht sich der ganze Pfahl starr um einen Punkt s_r: darüber drückt
   er vorne gegen den Boden, darunter hinten.
@@ -41,7 +41,7 @@ zählt als Hebel e = M_Ed / H_Ed ([[Hebel des Moments am Pfahlkopf]]).
 
 Mit p_E überall gleich c und e = 0 wird lang H = √(2 · M_R · c), kurz
 H = (√2 − 1) · c · L mit s_r = L / √2. Für c = 200 kN/m und M_R = 500 kNm:
-s_h = 2.24 m und H = 447 kN -- genau dort wird die Querkraft im Pfahl null,
+s_h = 2.24 m und H = 447 kN – genau dort wird die Querkraft im Pfahl null,
 das Moment also am grössten.
 
 Der kleinste Wert aller Mechanismen, mit [[Querbruch durch Verschieben]],

@@ -1,5 +1,5 @@
 ---
-erzeugt: 7024ff4885e6
+erzeugt: a7a3430ce028
 art: modul
 tags: [modul]
 ---
@@ -12,7 +12,7 @@ tags: [modul]
 Ein Bewehrungselement der Querschnittsanalyse ist ein Einzelstab
 ([[opencivil.querschnitt.bewehrungselemente#Einzelstab|Einzelstab]]), eine Reihe gleicher Staebe auf einer Linie
 ([[opencivil.querschnitt.bewehrungselemente#Stabreihe|Stabreihe]]) oder eine verschmierte Linie
-([[opencivil.querschnitt.bewehrungselemente#VerschmierteLinie|VerschmierteLinie]]) -- dazu das Spannglied
+([[opencivil.querschnitt.bewehrungselemente#VerschmierteLinie|VerschmierteLinie]]) – dazu das Spannglied
 ([[opencivil.querschnitt.spannglieder]]) und das Profilblech einer
 Blechverbunddecke ([[opencivil.querschnitt.profilblech]]). Was je Art
 anders ist, steht in ihrer Klasse, je einmal: wo ihre Staebe liegen, wie sie
@@ -25,7 +25,7 @@ entschieden, beim Bauen ([[opencivil.querschnitt.bewehrungselemente#aus_stab|aus
 Bis 2026-10-25 war ein Element ein Datensatz mit der Art als Text, und ein
 Dutzend Weichen in fuenf Modulen fragten sie ab.
 
-Koordinaten und Durchmesser in mm, Flaechen in mm² -- wie in der Zeichnung.
+Koordinaten und Durchmesser in mm, Flaechen in mm² – wie in der Zeichnung.
 Erst [[opencivil.querschnitt.bewehrungselemente#Bewehrungselement.als_bewehrung|als_bewehrung]] rechnet in Meter um.
 
 ## Inhalt
@@ -37,7 +37,7 @@ Erst [[opencivil.querschnitt.bewehrungselemente#Bewehrungselement.als_bewehrung|
 class Bewehrungselement(ABC)
 ```
 
-Ein Bewehrungselement der Zeichnung -- siehe Dateikopf.
+Ein Bewehrungselement der Zeichnung – siehe Dateikopf.
 
 - `name: str`
 - `kennung: str`
@@ -46,7 +46,7 @@ Ein Bewehrungselement der Zeichnung -- siehe Dateikopf.
 - `bis: Punkt`
 - `flaeche: float` – Die ganze Stahlflaeche des Elements in mm².
 - `verschmiert: ClassVar[bool] = False` – Ob der Stahl ueber eine Linie verteilt ist statt in Staeben.
-- `vorgespannt: ClassVar[bool] = False` – Ob es ein Spannglied ist ([[opencivil.querschnitt.spannglieder]]) -- was nur dem Betonstahl gilt, etwa die Rissbreite, laesst es aus.
+- `vorgespannt: ClassVar[bool] = False` – Ob es ein Spannglied ist ([[opencivil.querschnitt.spannglieder]]) – was nur dem Betonstahl gilt, etwa die Rissbreite, laesst es aus.
 
 #### Bewehrungselement.punkte
 
@@ -55,7 +55,7 @@ Ein Bewehrungselement der Zeichnung -- siehe Dateikopf.
 def punkte(self) -> Tuple[Punkt, ...]
 ```
 
-Die Stabmitten -- verschmiert keine.
+Die Stabmitten – verschmiert keine.
 
 #### Bewehrungselement.strecken
 
@@ -64,7 +64,7 @@ Die Stabmitten -- verschmiert keine.
 def strecken(self) -> Tuple[Tuple[Punkt, Punkt], ...]
 ```
 
-Die geraden Strecken, ueber die der Stahl verschmiert ist -- in Staeben keine.
+Die geraden Strecken, ueber die der Stahl verschmiert ist – in Staeben keine.
 
 #### Bewehrungselement.lage
 
@@ -121,7 +121,7 @@ Der Durchmesser, der die Rissbreite bestimmt.
 def als_bewehrung(self, stahl: int, verdraengt: Verdraengt) -> List[Bewehrung]
 ```
 
-Wie es in den Querschnitt eingeht, in Meter -- `stahl` ist der Index seines Stahls.
+Wie es in den Querschnitt eingeht, in Meter – `stahl` ist der Index seines Stahls.
 
 #### Bewehrungselement.stahlflaechen
 
@@ -141,7 +141,7 @@ ein Rechteck ihrer Flaeche ueber ihre Laenge.
 def quadrate(punkte: Tuple[Punkt, ...], durchmesser: float) -> Flaechen
 ```
 
-Je Stab ein Quadrat seiner Flaeche um seine Mitte -- dort verdraengt er den Beton.
+Je Stab ein Quadrat seiner Flaeche um seine Mitte – dort verdraengt er den Beton.
 
 ### baender
 
@@ -150,7 +150,7 @@ def baender(strecken: Tuple[Tuple[Punkt, Punkt], ...], flaeche: float, verdraeng
 ```
 
 Die Flaeche `flaeche` gleich dick ueber die Strecken verteilt, je ein
-Rechteck um die Strecke -- mit `verdraengt` nimmt es den Beton an ihrer
+Rechteck um die Strecke – mit `verdraengt` nimmt es den Beton an ihrer
 Mitte weg.
 
 ### Einzelstab
@@ -160,7 +160,7 @@ Mitte weg.
 class Einzelstab(Bewehrungselement)
 ```
 
-Ein Stab -- `von` und `bis` sind seine Mitte.
+Ein Stab – `von` und `bis` sind seine Mitte.
 
 - `durchmesser: float`
 - `kurzmenge = menge`
@@ -216,7 +216,7 @@ Gleiche Staebe auf einer Linie, nach Anzahl oder Teilung ([[opencivil.querschnit
 
 - `durchmesser: float`
 - `linie: geo.Stablinie`
-- `gewaehlt: Optional[float] = None` – Nach Teilung der eingegebene Abstand -- nach Anzahl keiner.
+- `gewaehlt: Optional[float] = None` – Nach Teilung der eingegebene Abstand – nach Anzahl keiner.
 
 #### Stabreihe.punkte
 
@@ -268,7 +268,7 @@ class VerschmierteLinie(Bewehrungselement)
 Stahl, gleichmaessig ueber eine Linie verteilt: die Flaeche von Hand oder
 aus Staeben ⌀ im Abstand s ueber eine Laenge L.
 
-- `aus_staeben: Optional[Tuple[float, float, float]] = None` – ⌀, s und L, aus denen die Flaeche kommt -- von Hand keine.
+- `aus_staeben: Optional[Tuple[float, float, float]] = None` – ⌀, s und L, aus denen die Flaeche kommt – von Hand keine.
 - `verschmiert = True`
 
 #### VerschmierteLinie.strecken
@@ -339,14 +339,14 @@ def aus_linie(l: Mapping, linie: geo.Stablinie) -> Bewehrungselement
 ```
 
 Eine Stablinie der Beschreibung mit ihren aufgeloesten Staeben `linie`
--- nach ihrer Art eine Reihe von Staeben oder eine verschmierte Linie.
+– nach ihrer Art eine Reihe von Staeben oder eine verschmierte Linie.
 
 
 ## Konstanten
 
 - `MM = 0.001` – mm in m.
-- `Verdraengt = Callable[[Punkt], Optional[int]]` – Zu einem Punkt der Zeichnung der Werkstoff, der dort liegt und den der Stahl verdraengt -- als Index, ohne Beton `None`.
-- `Flaechen = List[Tuple[Tuple[Punkt, ...], Optional[Punkt]]]` – Die Flaechen eines Elements als Polygone, je mit dem Punkt, an dem es den Beton verdraengt -- `None`, wo es keinen verdraengt ([[opencivil.querschnitt.bewehrungselemente#Bewehrungselement.stahlflaechen|Bewehrungselement.stahlflaechen]]).
+- `Verdraengt = Callable[[Punkt], Optional[int]]` – Zu einem Punkt der Zeichnung der Werkstoff, der dort liegt und den der Stahl verdraengt – als Index, ohne Beton `None`.
+- `Flaechen = List[Tuple[Tuple[Punkt, ...], Optional[Punkt]]]` – Die Flaechen eines Elements als Polygone, je mit dem Punkt, an dem es den Beton verdraengt – `None`, wo es keinen verdraengt ([[opencivil.querschnitt.bewehrungselemente#Bewehrungselement.stahlflaechen|Bewehrungselement.stahlflaechen]]).
 
 ## Braucht
 

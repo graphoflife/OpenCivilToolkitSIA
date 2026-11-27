@@ -60,5 +60,5 @@ um einen Stahlpilz werden nach denselben Regeln geführt wie der um die
 Stütze (4.3.6.5.10, 4.3.6.6.2): nach (57) je mit der eigenen Fläche und dem
 eigenen Schwerpunkt; die Näherung gilt für die gestützte Fläche und damit für
 jeden ihrer Schnitte. Aussen ist die Fläche grösser, an Rand- und Eckstützen
-liegt ihr Schwerpunkt aber weiter von der Stütze weg -- dort wird $k_e$
+liegt ihr Schwerpunkt aber weiter von der Stütze weg – dort wird $k_e$
 aussen kleiner. Bis 2026-11-14 galt aussen der Wert von innen.

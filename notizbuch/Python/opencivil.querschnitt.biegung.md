@@ -1,5 +1,5 @@
 ---
-erzeugt: 35c0b5318cb5
+erzeugt: 51cffbfd3e23
 art: modul
 tags: [modul]
 ---
@@ -13,7 +13,7 @@ Ein gezeichneter Querschnitt biegt schief ([[opencivil.querschnitt.biegung#Konst
 Biegung kippt die Nulllinie, bis kein Moment um die andere Achse bleibt, und
 jede Seite kann gezogen werden. Oder er biegt «einachsig» um y
 ([[opencivil.querschnitt.biegung#Konstanten|EINACHSIG]]): die Nulllinie bleibt waagrecht, `M_z` und `V_y`
-zaehlen nicht, und gezogen wird nur unten oder oben -- wie bei der Platte.
+zaehlen nicht, und gezogen wird nur unten oder oben – wie bei der Platte.
 
 Was davon abhaengt, steht hier, je einmal: welche Momente und Querkraefte
 zaehlen, der Betrag des Moments, welche Seiten ein Nachweis ziehen laesst,
@@ -23,8 +23,8 @@ gehoert. Gewaehlt wird einmal, im Aufbau der Analyse
 2026-10-25 fragten 17 Dateien ein `einachsig` ab, und die Regel fuer den
 Bruchzustand stand dreimal da, der Betrag des Moments viermal.
 
-Wo eine Herleitung je Art anders lautet -- die Spannung am ungerissenen
-Querschnitt, der Riss der Spannung-Dehnung-Analyse --, fragt sie
+Wo eine Herleitung je Art anders lautet – die Spannung am ungerissenen
+Querschnitt, der Riss der Spannung-Dehnung-Analyse –, fragt sie
 [[opencivil.querschnitt.biegung#Biegung|Biegung.einachsig]].
 
 ## Inhalt
@@ -35,10 +35,10 @@ Querschnitt, der Riss der Spannung-Dehnung-Analyse --, fragt sie
 class Biegung(ABC)
 ```
 
-Wie ein gezeichneter Querschnitt biegt -- siehe Dateikopf.
+Wie ein gezeichneter Querschnitt biegt – siehe Dateikopf.
 
-- `einachsig: bool` – Ob die Nulllinie waagrecht bleibt -- fuer die Herleitungen, die je Art anders lauten.
-- `zugseiten: Tuple[Zugseite, ...]` – Die Seiten, die je ein Nachweis ziehen laesst -- einachsig nur unten und oben, um z wird dann nicht nachgewiesen. Ihre Namen, «Zug unten», sind die der Faelle; die Kennungen «Zug_unten».
+- `einachsig: bool` – Ob die Nulllinie waagrecht bleibt – fuer die Herleitungen, die je Art anders lauten.
+- `zugseiten: Tuple[Zugseite, ...]` – Die Seiten, die je ein Nachweis ziehen laesst – einachsig nur unten und oben, um z wird dann nicht nachgewiesen. Ihre Namen, «Zug unten», sind die der Faelle; die Kennungen «Zug_unten».
 
 #### Biegung.momente
 
@@ -55,7 +55,7 @@ Die Momente, die zaehlen, je mit ihrer Achse: `(("y", M_y), ("z", M_z))`.
 def wirkt(self, M_y: float, M_z: float) -> Tuple[float, float]
 ```
 
-`(M_y, M_z)`, wie nachgewiesen -- was nicht zaehlt, ist null.
+`(M_y, M_z)`, wie nachgewiesen – was nicht zaehlt, ist null.
 
 #### Biegung.betrag
 
@@ -63,7 +63,7 @@ def wirkt(self, M_y: float, M_z: float) -> Tuple[float, float]
 def betrag(self, M_y: float, M_z: float) -> float
 ```
 
-Der Betrag des Moments, das zaehlt -- einachsig `|M_y|`.
+Der Betrag des Moments, das zaehlt – einachsig `|M_y|`.
 
 #### Biegung.querkraft_y
 
@@ -72,7 +72,7 @@ Der Betrag des Moments, das zaehlt -- einachsig `|M_y|`.
 def querkraft_y(self, V_y: float) -> float
 ```
 
-Die Querkraft in y, wie nachgewiesen -- einachsig null.
+Die Querkraft in y, wie nachgewiesen – einachsig null.
 
 #### Biegung.neigung
 
@@ -82,7 +82,7 @@ def neigung(self, M_y: float) -> Optional[float]
 ```
 
 Die Zugrichtung, wenn sie feststeht: einachsig die der Seite, die
-`M_y` zieht -- bei `M_y = 0` die untere. Sonst `None`: dann wird
+`M_y` zieht – bei `M_y = 0` die untere. Sonst `None`: dann wird
 sie gesucht.
 
 #### Biegung.bruchpunkt

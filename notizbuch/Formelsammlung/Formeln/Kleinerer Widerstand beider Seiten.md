@@ -45,6 +45,6 @@ $$
 ## Theorie
 
 Eine Kennzahl ohne Momentenrichtung soll für beide gelten: massgebend ist
-darum das Kleinere der beiden Seiten -- Zug unten mit der statischen Höhe
+darum das Kleinere der beiden Seiten – Zug unten mit der statischen Höhe
 der unteren Lagen, Zug oben mit der der oberen. Beide Werte stehen in der
 Herleitung darüber, für wen die Richtung kennt.

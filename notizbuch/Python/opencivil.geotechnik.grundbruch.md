@@ -1,5 +1,5 @@
 ---
-erzeugt: 7b5f1acd1e25
+erzeugt: 3d21b414100c
 art: modul
 tags: [modul]
 ---
@@ -55,7 +55,7 @@ t_1 ist die Tiefe des höchsten Grundwasserspiegels unter Terrain. Liegt er
 über der Sohle oder auf ihr (Lage 1, 2), zählt unter ihm gamma'; liegt er um
 mindestens die Tiefe H des Gleitkörpers tiefer (Lage 3), zählt gamma.
 Dazwischen verlangt das Kapitel eine Stabilitätsberechnung; gerechnet wird
-dann mit gamma' wie in Lage 2, auf der sicheren Seite -- eine Annahme, nicht
+dann mit gamma' wie in Lage 2, auf der sicheren Seite – eine Annahme, nicht
 aus dem Kapitel (notizbuch/Notizen/TODO.md). Undrainiert zählen totale
 Spannungen, das Wasser spielt dort keine Rolle.
 
@@ -72,7 +72,7 @@ Alles in SI-Basis; die Winkel als Groessen in Grad.
 def grad(winkel: Groesse) -> float
 ```
 
-Ein Winkel in Grad -- so gehen alpha, beta und arctan(t/b) in die Faktoren ein.
+Ein Winkel in Grad – so gehen alpha, beta und arctan(t/b) in die Faktoren ein.
 
 ### Spalte
 
@@ -81,16 +81,16 @@ Ein Winkel in Grad -- so gehen alpha, beta und arctan(t/b) in die Faktoren ein.
 class Spalte
 ```
 
-Eine Spalte der Tragfähigkeitsformel -- Kohäsion, seitliche Auflast oder
+Eine Spalte der Tragfähigkeitsformel – Kohäsion, seitliche Auflast oder
 Gewicht des Gleitkörpers: der Tragfähigkeitsfaktor N und die Faktoren s,
 d, g und b', die nicht an der Last hängen; die Lastneigung i bringt der
 Fall. Aus ihr kommen die Zahl ([[opencivil.geotechnik.grundbruch#Spalte.produkt|produkt]]) und die Formel der
 Herleitung ([[opencivil.geotechnik.grundbruch#Spalte.vorlage|vorlage]]): ein Faktor, mit dem gerechnet wird, steht
 darum auch da, und keiner steht da, mit dem nicht gerechnet wird. Bis
-2026-11-19 stand die Formel in vier Formen -- d_γ = 1 als «1», als 1.0
+2026-11-19 stand die Formel in vier Formen – d_γ = 1 als «1», als 1.0
 und in der Rechnung gar nicht.
 
-- `kurz: str` – «c», «q» oder «g» -- davor heissen die Platzhalter der Formel: `c_N`.
+- `kurz: str` – «c», «q» oder «g» – davor heissen die Platzhalter der Formel: `c_N`.
 - `N: Wert`
 - `s: Wert`
 - `d: Wert`
@@ -111,7 +111,7 @@ Die Faktoren in der Folge der Formel, N s d i g b, unter ihren Platzhaltern.
 def produkt(self, i: Wert) -> float
 ```
 
-N · s · d · i · g · b' -- was die Spalte in einem Fall beiträgt, ohne Vorfaktor.
+N · s · d · i · g · b' – was die Spalte in einem Fall beiträgt, ohne Vorfaktor.
 
 #### Spalte.vorlage
 
@@ -132,7 +132,7 @@ Was der Grundbruch bei einer Kombination ergibt.
 
 - `kombination: Kombination`
 - `delta_R: float` – Die Neigung der Last gegen die Sohlnormale, in rad.
-- `i: Dict[str, Optional[float]] = field(default_factory=dict)` – Die Lastneigungsfaktoren je Spalte -- `None`, wo es keinen gibt.
+- `i: Dict[str, Optional[float]] = field(default_factory=dict)` – Die Lastneigungsfaktoren je Spalte – `None`, wo es keinen gibt.
 - `sigma_f: float = 0.0`
 - `N_Rd: float = 0.0`
 
@@ -143,12 +143,12 @@ Was der Grundbruch bei einer Kombination ergibt.
 class Grundbruchbefund
 ```
 
-Was ausser den Erfüllungsgraden bleibt -- für die Zusammenfassung und das Bild.
+Was ausser den Erfüllungsgraden bleibt – für die Zusammenfassung und das Bild.
 
 - `undrainiert: bool`
 - `spalten: Dict[str, Spalte]` – Je Spalte der Formel (`c`, `q`, `g`) ihre Faktoren; undrainiert nur `c`.
-- `L_gl: Optional[float] = None` – Wie weit der Gleitkörper neben das Fundament reicht, in m -- drainiert.
-- `H_gl: Optional[float] = None` – Wie tief er unter die Sohle reicht, in m -- drainiert.
+- `L_gl: Optional[float] = None` – Wie weit der Gleitkörper neben das Fundament reicht, in m – drainiert.
+- `H_gl: Optional[float] = None` – Wie tief er unter die Sohle reicht, in m – drainiert.
 - `grundwasser: str = ''`
 - `ergebnisse: List[Fallergebnis] = field(default_factory=list)`
 
@@ -189,7 +189,7 @@ def _grundwasser(self, e: Eingaben, p: Protokoll, werte: Zwischenwerte, H_gl: We
 def _einbindewinkel(p: Protokoll, werte: Zwischenwerte, t: Wert, b: Wert) -> Wert
 ```
 
-arctan(t/b) in Grad -- so steht er in den Tiefenfaktoren.
+arctan(t/b) in Grad – so steht er in den Tiefenfaktoren.
 
 ### gleitkoerper
 
@@ -198,7 +198,7 @@ def gleitkoerper(b: float, phi: float, schritte: int=24) -> List[Tuple[float, fl
 ```
 
 Der Umriss des Gleitkörpers nach Prandtl, für Sohle und Gelände waagrecht
--- so, wie die Formeln für L_Gl und H_Gl ihn messen. In m, gemessen von
+– so, wie die Formeln für L_Gl und H_Gl ihn messen. In m, gemessen von
 der Sohlkante auf der Seite, zu der T zeigt: x von dort weg vom
 Fundament, z nach unten; das Fundament liegt bei -b \< x \< 0.
 
@@ -214,7 +214,7 @@ bei H_Gl. `phi` in rad, grösser als null.
 def _hoch5(klammer: float) -> float
 ```
 
-Eine Klammer hoch fünf -- unter null gilt null (siehe Herleitung).
+Eine Klammer hoch fünf – unter null gilt null (siehe Herleitung).
 
 ### faktortabelle
 
@@ -222,15 +222,15 @@ Eine Klammer hoch fünf -- unter null gilt null (siehe Herleitung).
 def faktortabelle(befund: Grundbruchbefund) -> TabellenBlock
 ```
 
-Die Faktoren der Tragfähigkeitsformel in drei Spalten -- Kohäsion,
-seitliche Auflast, Gewicht des Gleitkörpers --, wie der Benutzer sie
+Die Faktoren der Tragfähigkeitsformel in drei Spalten – Kohäsion,
+seitliche Auflast, Gewicht des Gleitkörpers –, wie der Benutzer sie
 tabelliert. Die Lastneigung je Kombination eine Zeile; undrainiert nur
 die Spalte der Kohäsion.
 
 
 ## Konstanten
 
-- `N_C_UNDRAINIERT = 5.1` – Der Beiwert der undrainierten Tragfähigkeitsformel, Kap. 9.2.17 -- 5.1, wie das Kapitel ihn schreibt (pi + 2 = 5.14 gerundet).
+- `N_C_UNDRAINIERT = 5.1` – Der Beiwert der undrainierten Tragfähigkeitsformel, Kap. 9.2.17 – 5.1, wie das Kapitel ihn schreibt (pi + 2 = 5.14 gerundet).
 - `KAP_GRUNDWASSER = 'Kap. 9.2.8'` – Die Abschnitte des Buches, an den Formeln als Referenz.
 - `KAP_FORMEL = 'Kap. 9.2.10'`
 - `KAP_FORM = 'Kap. 9.2.12'`

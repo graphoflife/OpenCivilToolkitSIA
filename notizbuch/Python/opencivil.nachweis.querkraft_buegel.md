@@ -1,5 +1,5 @@
 ---
-erzeugt: 2b53719e210b
+erzeugt: f420e9c69349
 art: modul
 tags: [modul]
 ---
@@ -28,7 +28,7 @@ Die Buegel stehen in SIA 262:2025, 4.3.3.4.3, Gl. (45), die Druckdiagonale
 in 4.3.3.4.6, Gl. (47), der Hebelarm `0.9 * d` in 4.3.3.4.2.
 
 Gesucht wird ganzgradig zwischen `alpha_min` und `alpha_max` (4.3.3.3.2,
-Gl. (42)). Bei Normalzug steilt sich die Druckdiagonale auf -- beide Grenzen
+Gl. (42)). Bei Normalzug steilt sich die Druckdiagonale auf – beide Grenzen
 werden dann auf mindestens `ALPHA_ZUG` gehoben (4.3.3.3.3). Der Betonanteil
 des Ansatzes ohne Buegel geht nicht zusaetzlich ein.
 
@@ -48,7 +48,7 @@ V_Rd,c = 0.9 · d · k_c · f_cd · sin(alpha) · cos(alpha)
 ```
 
 `A_(⌀,V)/(s_x · s_y)` ist der Bewehrungsgehalt: ein Buegelschenkel je
-Rasterfeld. Beide Groessen gelten **je Laufmeter** -- so wie `V_Ed` und
+Rasterfeld. Beide Groessen gelten **je Laufmeter** – so wie `V_Ed` und
 wie der Widerstand ohne Buegel. Darum ist die Stegbreite ein Meter, und der
 Hebelarm `0.9 · d`.
 
@@ -65,7 +65,7 @@ dazu die Grenzen der Neigung.
 Alles in SI-Basis, die Neigung in Grad. Gebaut von
 [[opencivil.nachweis.querkraft_buegel#QuerkraftMitBuegeln.buegelwerte|QuerkraftMitBuegeln.buegelwerte]]; damit rechnen die Faelle und die
 Kennzahlen der Platte je Zugseite ([[opencivil.nachweis.querkraft_buegel#Buegelwerte.suche|suche]]) und das Bild ueber der
-Neigung ([[opencivil.nachweis.querkraft_buegel#Buegelwerte.neigungen|neigungen]]) -- ohne dass einer, auch nicht die
+Neigung ([[opencivil.nachweis.querkraft_buegel#Buegelwerte.neigungen|neigungen]]) – ohne dass einer, auch nicht die
 Oberflaeche, die Formel ein zweites Mal enthaelt. Dasselbe Muster wie
 [[opencivil.nachweis.querkraft_buegel#Buegelwerte|Kurvenbeiwerte]] beim Ansatz ohne Buegel.
 
@@ -76,7 +76,7 @@ Oberflaeche, die Formel ein zweites Mal enthaelt. Dasselbe Muster wie
 - `f_cd: float`
 - `k_c: float`
 - `alpha_min: int`
-- `alpha_max: int` – Die Grenzen der Neigung, wie eingegeben -- bei Normalzug hebt sie [[opencivil.nachweis.querkraft_buegel#Buegelwerte.suche|suche]].
+- `alpha_max: int` – Die Grenzen der Neigung, wie eingegeben – bei Normalzug hebt sie [[opencivil.nachweis.querkraft_buegel#Buegelwerte.suche|suche]].
 
 #### Buegelwerte.punkt
 
@@ -93,7 +93,7 @@ def neigungen(self, d: float, von: int, bis: int) -> List[Buegelpunkt]
 ```
 
 Der Widerstand je ganzes Grad von `von` bis `bis` bei der
-statischen Hoehe `d` -- fuer das Bild, das auch ausserhalb der
+statischen Hoehe `d` – fuer das Bild, das auch ausserhalb der
 Grenzen zeichnet, dort blass. Jeder Punkt kommt aus [[opencivil.nachweis.querkraft_buegel#Buegelwerte.punkt|punkt]], wie
 bei der Suche: zwei Rechenwege fuer dieselbe Kurve liefen auseinander.
 
@@ -104,7 +104,7 @@ def suche(self, d: float, *, zugkraft: bool) -> Neigungssuche
 ```
 
 Die guenstigste Neigung bei der statischen Hoehe `d`
-([[opencivil.querschnitt.fachwerk#guenstigste|guenstigste]]) -- fuer die
+([[opencivil.querschnitt.fachwerk#guenstigste|guenstigste]]) – fuer die
 Faelle und die Kennzahlen der Platte dieselbe Suche.
 
 ### buegelteilung_y
@@ -113,7 +113,7 @@ Faelle und die Kennzahlen der Platte dieselbe Suche.
 def buegelteilung_y(buegel, b: float, menge_y: float) -> float
 ```
 
-Die Buegelteilung in y, in m: angegeben -- oder aus der Stabzahl ueber die
+Die Buegelteilung in y, in m: angegeben – oder aus der Stabzahl ueber die
 betrachtete Breite `b`. Die Formel kennt nur Teilungen.
 
 ### protokoll_mit_buegeln
@@ -139,9 +139,9 @@ die geloesten Eingaenge des Ansatzes. Daraus zeichnet sich der Verlauf
 ueber der Neigung, ohne dass die Oberflaeche die Formel ein zweites Mal
 enthaelt. Steht nach dem Lauf in der Loesung, nicht am Nachweis.
 
-- `buegelwerte: Buegelwerte` – Die geloesten Eingaenge -- fuer das Bild ueber der Neigung ([[opencivil.nachweis.querkraft_buegel#Buegelwerte.neigungen|Buegelwerte.neigungen]]).
+- `buegelwerte: Buegelwerte` – Die geloesten Eingaenge – fuer das Bild ueber der Neigung ([[opencivil.nachweis.querkraft_buegel#Buegelwerte.neigungen|Buegelwerte.neigungen]]).
 - `ergebnisse: List['ErgebnisMitBuegeln'] = field(default_factory=list)`
-- `ohne_einwirkung: Optional['ErgebnisMitBuegeln'] = None` – Ohne Lastfall: der Ast ueber der Neigung bei M = 0 und N = 0, damit das Bild auch ohne Fall dasteht. Kein Fall des Nachweises -- ohne Ausgabe, Urteil und Herleitung.
+- `ohne_einwirkung: Optional['ErgebnisMitBuegeln'] = None` – Ohne Lastfall: der Ast ueber der Neigung bei M = 0 und N = 0, damit das Bild auch ohne Fall dasteht. Kein Fall des Nachweises – ohne Ausgabe, Urteil und Herleitung.
 
 ### ErgebnisMitBuegeln
 
@@ -153,7 +153,7 @@ class ErgebnisMitBuegeln(Querkraftergebnis)
 Alle Zwischenwerte eines Falls mit Buegeln, damit die Herleitung vollstaendig ist.
 
 - `punkte: Tuple[Buegelpunkt, ...] = ()` – Der Widerstand je ganzem Grad zwischen den beiden Grenzwinkeln.
-- `massgebend: Optional[Buegelpunkt] = None` – Der Punkt mit dem groessten Widerstand -- daraus stammt `v_Rd`.
+- `massgebend: Optional[Buegelpunkt] = None` – Der Punkt mit dem groessten Widerstand – daraus stammt `v_Rd`.
 - `alpha_min: int = 0`
 - `alpha_max: int = 0` – Die tatsaechlich verwendeten Grenzen; bei Normalzug angehoben.
 - `zug_hebt_alpha: bool = False` – Ob die Grenzen wegen einer Normalzugkraft angehoben wurden.
@@ -164,7 +164,7 @@ Alle Zwischenwerte eines Falls mit Buegeln, damit die Herleitung vollstaendig is
 class QuerkraftMitBuegeln(Querkraft)
 ```
 
-Der Querkraftnachweis einer Platte mit Buegeln -- siehe Dateikopf.
+Der Querkraftnachweis einer Platte mit Buegeln – siehe Dateikopf.
 
 - `REFERENZ = REFERENZ`
 
@@ -174,7 +174,7 @@ Der Querkraftnachweis einer Platte mit Buegeln -- siehe Dateikopf.
 def buegelwerte(self, e: Eingaben) -> Buegelwerte
 ```
 
-Die geloesten Eingaenge des Ansatzes -- fuer die Faelle, das Bild und
+Die geloesten Eingaenge des Ansatzes – fuer die Faelle, das Bild und
 die Kennzahlen der Platte dieselben. Eine Stabzahl in y wird hier eine
 Teilung ([[opencivil.nachweis.querkraft_buegel#buegelteilung_y|buegelteilung_y]]): die Formel kennt nur Teilungen, und
 die Umrechnung steht in der Herleitung ([[opencivil.nachweis.querkraft_buegel#QuerkraftMitBuegeln.protokoll_teilung_y|protokoll_teilung_y]]).
@@ -204,7 +204,7 @@ def pruefe(self, e: Eingaben, p: Protokoll)
 
 Fachwerkmodell: Bügel gegen Druckdiagonale, über die Neigung gesucht.
 
-Der Betonanteil des bügellosen Ansatzes entfällt hier vollständig --
+Der Betonanteil des bügellosen Ansatzes entfällt hier vollständig –
 beides zu addieren wäre ein anderes Modell, und dieses Werkzeug rechnet
 nur, was es auch herleitet.
 

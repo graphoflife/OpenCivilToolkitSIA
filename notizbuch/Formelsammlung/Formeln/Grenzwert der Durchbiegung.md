@@ -47,6 +47,6 @@ seltener Last und $L/300$ fürs Aussehen unter quasi-ständiger Last.
 Die Tabelle meint je Zeile nur einen Teil der Durchbiegung: was nach dem
 Einbau dazukommt, was die veränderlichen Lasten bewirken, oder alles
 abzüglich einer Überhöhung. Gehalten wird hier die ganze Durchbiegung samt
-Kriechen -- strenger als jede dieser Zeilen ausser $L/500$. Welche Grenze
+Kriechen – strenger als jede dieser Zeilen ausser $L/500$. Welche Grenze
 für ein Bauteil gilt, hängt davon ab, was es trägt und was an ihm hängt;
 das legt das Projekt fest.

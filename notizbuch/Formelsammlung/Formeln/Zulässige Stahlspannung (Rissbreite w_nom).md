@@ -59,7 +59,7 @@ Rissbreite von 0.5 mm, bei hoher von 0.2 mm.
 
 Die Wurzelformel verknüpft beides: eine Rissbreite $w$ entsteht aus der
 Stahldehnung über die Länge, auf der der Verbund die Kraft wieder in den
-Beton leitet -- und die wächst mit dem Durchmesser. Löst man nach der
+Beton leitet – und die wächst mit dem Durchmesser. Löst man nach der
 Spannung auf, steht der Durchmesser im Nenner. Dimensionell stimmt die
 Formel: $E_s \cdot f_{ctm}$ ist eine Spannung im Quadrat, $w/\varnothing$
 dimensionslos.

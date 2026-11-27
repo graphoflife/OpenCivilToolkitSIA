@@ -1,5 +1,5 @@
 ---
-erzeugt: a63fee94e1bd
+erzeugt: 5552f3b096f8
 art: modul
 tags: [modul]
 ---
@@ -15,7 +15,7 @@ kommt ([[opencivil.spannungsanalyse.rissfrei#RissfreiesPaar|RissfreiesPaar]], ei
 reisst er nicht: er hat einen Zustand, seine beiden Loeser sind derselbe, und
 jede Linie laeuft ganz ueber die Verformung, von der festgehaltenen Kraft
 allein bis zum Ende. Fliessen beginnt, wo eine Faser ihren elastischen
-Bereich verlaesst -- Baustahl auf Zug und Druck, Holz auf Druck, wenn es dort
+Bereich verlaesst – Baustahl auf Zug und Druck, Holz auf Druck, wenn es dort
 elastisch-plastisch rechnet
 ([[opencivil.querschnitt.werkstoffgesetz#Gesetz.fliessbereich|fliessbereich]]). Seine
 Ebenen findet er wie der Stahlbeton
@@ -26,14 +26,14 @@ Ebenen findet er wie der Stahlbeton
 
 Bezogen auf den Querschnitt selbst, mit dem Modul seines Materials: `E_a`
 beim Baustahl, `E_0,mean` beim Holz. Solange keine Faser fliesst, ist
-`E_eq` genau dieser Modul -- kippt die Nulllinie, mit `I - I_yz²/I_quer`
+`E_eq` genau dieser Modul – kippt die Nulllinie, mit `I - I_yz²/I_quer`
 ([[opencivil.nachweis.rissgroessen#Bruttoquerschnitt.traegheit|traegheit]]).
 
 
 ## NACH VORGABE, NICHT NACHGESCHLAGEN
 
-Ist der Querschnitt aus mehreren Materialien derselben Art -- zwei Hoelzer,
-zwei Baustaehle --, misst sich der Modul an dem mit der groessten Flaeche.
+Ist der Querschnitt aus mehreren Materialien derselben Art – zwei Hoelzer,
+zwei Baustaehle –, misst sich der Modul an dem mit der groessten Flaeche.
 
 
 ## EINHEITEN
@@ -53,15 +53,15 @@ Das Paar eines Querschnitts ohne Beton in einer Zugrichtung: ein Loeser
 fuer beide Zustaende, dazu seine Zerlegung fuer die kippende Nulllinie,
 seine Traegheitsmomente fuer den Modul und was die Herleitung braucht.
 
-- `gerissen: Faserloeser` – Der eine Zustand -- «gerissen» heisst er nur, weil jedes Paar so fragt.
+- `gerissen: Faserloeser` – Der eine Zustand – «gerissen» heisst er nur, weil jedes Paar so fragt.
 - `seite: Zugseite`
 - `wahl: Rechenwahl`
-- `zerlegung: Zerlegung` – Derselbe Zustand in jeder Richtung -- fuer die kippende Nulllinie.
-- `brutto: Bruttoquerschnitt` – Die Traegheitsmomente des Querschnitts mit der Wahl der Biegung -- ohne Ecken: er reisst nicht.
+- `zerlegung: Zerlegung` – Derselbe Zustand in jeder Richtung – fuer die kippende Nulllinie.
+- `brutto: Bruttoquerschnitt` – Die Traegheitsmomente des Querschnitts mit der Wahl der Biegung – ohne Ecken: er reisst nicht.
 - `A: float` – Flaeche des Querschnitts, m².
-- `stoffe: Tuple[Baustoff, ...]` – Die Materialien der Flaechen, jedes einmal -- zuerst das mit der groessten Flaeche.
+- `stoffe: Tuple[Baustoff, ...]` – Die Materialien der Flaechen, jedes einmal – zuerst das mit der groessten Flaeche.
 - `gesetze: Tuple[Gesetz, ...]` – Je Material sein Gesetz, wie die Wahl es will.
-- `E: float` – Der Modul des ersten Materials, Pa -- Massstab des aequivalenten Moduls.
+- `E: float` – Der Modul des ersten Materials, Pa – Massstab des aequivalenten Moduls.
 - `ids: Mapping[str, str] = field(default_factory=dict)` – Kurzname -> Wert-ID der Eingaben, fuer die Herleitung: A und I.
 - `OHNE_FLIESSEN = 'Bis zum Bruch fliesst keine Faser: der Querschnitt bleibt linear, bi…`
 - `mit_kriechzahl = False` – Ohne Beton kriecht nichts.
@@ -116,7 +116,7 @@ Woraus die Flaeche ist: «Baustahl» oder «Holz».
 def rechenart(self) -> str
 ```
 
-Wie das Holz rechnet, in Worten -- beim Baustahl gibt es nichts zu waehlen.
+Wie das Holz rechnet, in Worten – beim Baustahl gibt es nichts zu waehlen.
 
 #### RissfreiesPaar.beschriftung
 
@@ -152,7 +152,7 @@ die Tiefe und `A`, `I` des Querschnitts.
 def herleitung_traegheit(self, p: Protokoll, w: Zwischenwerte, I: 'Wert') -> 'Wert'
 ```
 
-Der Bezug ueber dem Moment: der Querschnitt selbst -- gekippt mit `I - I_yz²/I_quer`.
+Der Bezug ueber dem Moment: der Querschnitt selbst – gekippt mit `I - I_yz²/I_quer`.
 
 #### RissfreiesPaar.herleitung_flaeche
 

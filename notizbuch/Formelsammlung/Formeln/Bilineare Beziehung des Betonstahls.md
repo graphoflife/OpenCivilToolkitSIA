@@ -37,7 +37,7 @@ $$
 
 ## Theorie
 
-Elastisch mit $E_s$ bis zur Fliessgrenze, dann ein waagrechtes Plateau --
+Elastisch mit $E_s$ bis zur Fliessgrenze, dann ein waagrechtes Plateau –
 auf Zug bei $f_{yd}$, auf Druck bei $f_{yd}^-$. Die Verfestigung nach dem
 Fliessen wird nicht angesetzt; das liegt auf der sicheren Seite. Begrenzt
 ist die Dehnung durch $\varepsilon_{ud}$: dort endet die Linie aus

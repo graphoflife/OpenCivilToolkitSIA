@@ -1,5 +1,5 @@
 ---
-erzeugt: 6cad371e8388
+erzeugt: 29fb8f78bf34
 art: modul
 tags: [modul]
 ---
@@ -9,8 +9,8 @@ tags: [modul]
 
 ## VERANTWORTUNG
 
-Ein Rechenobjekt -- ein Fundament, eine Platte, ein Balkensystem, ein
-Baustoff -- traegt seine Werte nach Kurzname (`definitionen`) und seine
+Ein Rechenobjekt – ein Fundament, eine Platte, ein Balkensystem, ein
+Baustoff – traegt seine Werte nach Kurzname (`definitionen`) und seine
 Berechnungen (`berechnungen`) und meldet beides beim Rechenwerk an, nach
 den Baustoffen, die es braucht. [[opencivil.core.rechenobjekt#Rechenobjekt|Rechenobjekt]] sagt das einmal: die
 Kennung eines Werts ([[opencivil.core.rechenobjekt#Rechenobjekt.id_von|id_von]]) und das Anmelden
@@ -29,7 +29,7 @@ class Rechenobjekt
 ```
 
 Siehe Dateikopf. Wer erbt, hat `name`, `definitionen` und
-`berechnungen` -- als Felder seiner Datenklasse oder aus seinem
+`berechnungen` – als Felder seiner Datenklasse oder aus seinem
 `__init__`.
 
 - `WAS: ClassVar[str] = 'Bauteil'` – Wie eine Meldung das Objekt nennt: «Querschnitt 'Decke' kennt …».
@@ -52,7 +52,7 @@ Die Wert-ID zu einem Kurznamen, etwa `f_cd` -> `beton.C30_37.f_cd`.
 def baustoffe(self) -> Sequence[Any]
 ```
 
-Die Baustoffe, die es braucht -- angemeldet vor ihm. Ohne Angabe keine.
+Die Baustoffe, die es braucht – angemeldet vor ihm. Ohne Angabe keine.
 
 #### Rechenobjekt.ins_rechenwerk
 
@@ -61,7 +61,7 @@ def ins_rechenwerk(self, werk) -> Any
 ```
 
 Meldet erst die Baustoffe an, dann die eigenen Werte und Berechnungen.
-Einen Baustoff zweimal anzumelden ist wirkungslos -- eine Platte weiss
+Einen Baustoff zweimal anzumelden ist wirkungslos – eine Platte weiss
 nicht, ob eine andere ihren Beton schon angemeldet hat.
 
 

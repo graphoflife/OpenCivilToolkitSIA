@@ -55,7 +55,7 @@ Die Dehnung wächst linear in Zugrichtung, ε = ε\_m + χ·v mit v ab dem Schwe
 
 Ein schlanker, gedrückter Stab biegt sich unter seiner Last aus. Die
 Ausbiegung vergrössert den Hebelarm der Normalkraft, das Moment wächst, der
-Stab krümmt sich mehr -- und so fort. Ob diese Folge zur Ruhe kommt, ist die
+Stab krümmt sich mehr – und so fort. Ob diese Folge zur Ruhe kommt, ist die
 Frage des Knicknachweises: kommt sie zur Ruhe, gibt es eine
 Gleichgewichtslage, und der Stab steht; wächst sie ohne Ende, knickt er.
 

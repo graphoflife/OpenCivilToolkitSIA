@@ -1,5 +1,5 @@
 ---
-erzeugt: e5ef14139f23
+erzeugt: 05140fe7e487
 art: modul
 tags: [modul]
 ---
@@ -9,9 +9,9 @@ tags: [modul]
 
 ## VERANTWORTUNG
 
-Aus einem System -- eben ([[opencivil.stabwerk.modell]]) oder im Raum
-([[opencivil.stabwerk3d.modell]]) -- die Unbekannten, die
-Steifigkeitsmatrix und je Lastfall und Kombination die rechte Seite -- und
+Aus einem System – eben ([[opencivil.stabwerk.modell]]) oder im Raum
+([[opencivil.stabwerk3d.modell]]) – die Unbekannten, die
+Steifigkeitsmatrix und je Lastfall und Kombination die rechte Seite – und
 nach dem Loesen Verschiebungen, Stabendkraefte und Lagerkraefte. Wie die
 Schnittgroessen laengs der Staebe verlaufen, rechnet
 [[opencivil.stabwerk.verlauf|verlauf]] aus dem, was hier herauskommt.
@@ -24,7 +24,7 @@ Gerechnet wird immer im Raum, mit den Staeben aus
 Art ([[opencivil.stabwerk.art|art]]): in welchen Richtungen sich ein Ort
 verschiebt und um welche Achsen er sich dreht, ob ein Stab sich auch quer
 zur Ebene biegt und Torsion traegt, wie seine Achsen liegen. Was aus der
-Ebene hinausfuehrte, ist keine Unbekannte und kein Lager -- es gibt es
+Ebene hinausfuehrte, ist keine Unbekannte und kein Lager – es gibt es
 nicht. Die Ergebnisse stehen in den Achsen der Art: eben `(u_x, u_z, φ)`
 und `(R_x, R_z, M)`, wie von Hand.
 
@@ -32,29 +32,29 @@ und `(R_x, R_z, M)`, wie von Hand.
 ## ORTE UND TEILSTAEBE
 
 Gerechnet wird an Orten, nicht an Knoten. Ein Ort ist ein Knoten der
-Beschreibung -- oder ein Punkt im Innern eines Stabs, wo er geteilt ist:
+Beschreibung – oder ein Punkt im Innern eines Stabs, wo er geteilt ist:
 
 * Liegt ein Knoten auf einem Stab, nicht an dessen Ende, ist er mit ihm
   verbunden (T-Stoss); der Stab wird dort geteilt. Linien, die sich ohne
-  Knoten kreuzen, sind nicht verbunden -- dazu ein Hinweis.
+  Knoten kreuzen, sind nicht verbunden – dazu ein Hinweis.
 * Ein gebetteter Stab wird in kurze Stuecke geteilt, nach der Regel des
   gebetteten Stabs ([[opencivil.stabwerk.stab#schritt|schritt]]), mit dem
   groessten β quer und laengs. Hoechstens [[opencivil.stabwerk.system#Konstanten|TEILE_HOECHSTENS]].
 
-Zwischen zwei Orten liegt ein Teilstab -- ein Stab im Sinn von
+Zwischen zwei Orten liegt ein Teilstab – ein Stab im Sinn von
 [[opencivil.stabwerk3d.stab|stab]].
 
 
 ## UNBEKANNTE
 
-Je Ort seine Verschiebungen und Drehungen, weniger was festgehalten ist --
+Je Ort seine Verschiebungen und Drehungen, weniger was festgehalten ist –
 als Richtungen: ein Lager haelt in den Achsen des Systems, ein festes
 Linienlager laengs oder quer zu seinem Stab, also auch schief. Je Ort eine
 orthonormale Basis aus den festen Richtungen und dem, was frei bleibt;
 unbekannt sind nur die freien, moeglichst entlang der Achsen der Art.
 
 
-## GELENKE -- IM RAUM NACH VORGABE, NICHT NACHGESCHLAGEN
+## GELENKE – IM RAUM NACH VORGABE, NICHT NACHGESCHLAGEN
 
 Ein Gelenk am Stabende gibt dem Stab dort eigene Drehungen als Unbekannte,
 mit der Steifigkeit `4EI/L` des Stabs; der Knoten dreht sich davon
@@ -69,17 +69,17 @@ die Achse eines solchen Stabs hat keinen Halt und ist ein Fehler.
 ## DREHUNG OHNE STEIFIGKEIT
 
 Ein Ort hat Drehsteifigkeit um die Achsen, die ein starr angeschlossener
-Stab, eine Drehfeder oder eine Einspannung halten -- um die uebrigen nicht,
+Stab, eine Drehfeder oder eine Einspannung halten – um die uebrigen nicht,
 in der Ebene etwa, wenn er nur an Gelenken haengt. Diese Drehungen sind
 gestrichen und null gesetzt, und die Ausgabe sagt es ([[opencivil.stabwerk.system#Konstanten|UNBESTIMMT]]).
 Erkannt wird das an der Verbindung, nicht an einer Zahl. Greift dort ein
-Moment an, ist das ein Fehler -- nichts koennte es aufnehmen.
+Moment an, ist das ein Fehler – nichts koennte es aufnehmen.
 
 Die Torsion haelt einen Knoten nur, wenn etwas das andere Ende des Stabs
 haelt. Haelt nichts, dreht sich der Stab mit dem Knoten um seine Achse: Das
 System ist beweglich, und die Meldung sagt, dass sich dabei nichts
 verschiebt. Ein einfacher Balken im Raum auf zwei gelenkigen Lagern braucht
-darum an einem Ende eine Gabel -- ein Lager, das die Drehung um seine Achse
+darum an einem Ende eine Gabel – ein Lager, das die Drehung um seine Achse
 festhaelt.
 
 
@@ -90,7 +90,7 @@ x-z-Ebene: seine Verschiebung in z ist an jedem Ort null, und wo er ohne
 Gelenk anschliesst, auch die Drehung um seine y-Achse. Seine Lasten in
 dieser Ebene gehen geradewegs ins Lager; er selbst hat dort keine Querkraft
 und kein Moment. Quer in y und laengs ebenso; die Torsion traegt er weiter.
-Das ist der Grenzfall einer unendlich steifen Bettung -- und genau.
+Das ist der Grenzfall einer unendlich steifen Bettung – und genau.
 
 
 ## MELDUNGEN
@@ -108,9 +108,9 @@ zeigt die Meldungen an den Elementen; der Rest des Projekts rechnet weiter.
 class Meldung
 ```
 
-Was die Rechnung zu sagen hat. `fehler`: etwas ist falsch -- rot, und
+Was die Rechnung zu sagen hat. `fehler`: etwas ist falsch – rot, und
 die Rechnung haelt an. `unfertig`: es fehlt nur etwas, etwa ein
-geloeschtes Material -- grau, aber ohne es haelt die Rechnung auch an
+geloeschtes Material – grau, aber ohne es haelt die Rechnung auch an
 (Benutzer, 2026-11-19). Sonst ist es ein Hinweis, und es wird gerechnet.
 
 - `text: str`
@@ -140,23 +140,23 @@ Fuer die Oberflaeche: `fehler` steht rot, `unfertig` grau, und beide halten an.
 class Ort
 ```
 
-Ein Punkt des Systems mit Unbekannten -- ein Knoten oder ein Punkt in einem Stab.
+Ein Punkt des Systems mit Unbekannten – ein Knoten oder ein Punkt in einem Stab.
 
 - `name: str`
 - `x: float`
 - `y: float`
 - `z: float`
-- `knoten: Optional[str] = None` – Der Knoten der Beschreibung -- `None` im Innern eines Stabs.
+- `knoten: Optional[str] = None` – Der Knoten der Beschreibung – `None` im Innern eines Stabs.
 - `stab: Optional[str] = None`
 - `stelle: float = 0.0` – Bei einem inneren Ort: wo auf welchem Stab, in m ab seinem Anfang.
-- `zwang: List[Vektor] = field(default_factory=list)` – Die Richtungen, in denen er nicht verschoben wird -- wie gesammelt.
-- `drehzwang: List[Vektor] = field(default_factory=list)` – Die Achsen, um die er nicht gedreht wird -- wie gesammelt.
-- `steif: List[Vektor] = field(default_factory=list)` – Die Achsen, um die ihn etwas steif haelt: Staebe und Drehfedern -- wie gesammelt.
+- `zwang: List[Vektor] = field(default_factory=list)` – Die Richtungen, in denen er nicht verschoben wird – wie gesammelt.
+- `drehzwang: List[Vektor] = field(default_factory=list)` – Die Achsen, um die er nicht gedreht wird – wie gesammelt.
+- `steif: List[Vektor] = field(default_factory=list)` – Die Achsen, um die ihn etwas steif haelt: Staebe und Drehfedern – wie gesammelt.
 - `fest: List[Vektor] = field(default_factory=list)`
 - `frei: List[Vektor] = field(default_factory=list)` – Orthonormal: die festen und die freien Richtungen der Verschiebung.
 - `dreh_fest: List[Vektor] = field(default_factory=list)`
 - `dreh_frei: List[Vektor] = field(default_factory=list)`
-- `offen: List[Vektor] = field(default_factory=list)` – Orthonormal: die Drehachsen -- fest, frei und ohne Steifigkeit, also gestrichen.
+- `offen: List[Vektor] = field(default_factory=list)` – Orthonormal: die Drehachsen – fest, frei und ohne Steifigkeit, also gestrichen.
 - `verschiebung: List[int] = field(default_factory=list)` – Je freie Richtung die Nummer ihrer Unbekannten.
 - `drehung: List[int] = field(default_factory=list)` – Je freie Drehachse die Nummer ihrer Unbekannten.
 - `feder: List[float] = field(default_factory=lambda: [0.0, 0.0, 0.0])` – Federn in x, y und z des Systems, N/m.
@@ -198,10 +198,10 @@ Ein Stueck eines Stabs zwischen zwei Orten.
 - `k_y: float = 0.0`
 - `k_z: float = 0.0`
 - `k_x: float = 0.0` – Die Bettung quer in y und z und laengs, N/m².
-- `biegung_y: bool = True` – Ob er sich in seiner x-y-Ebene biegt -- nicht, wenn er quer in y fest aufliegt, und nicht in der Ebene.
-- `biegung_z: bool = True` – Ob er sich in seiner x-z-Ebene biegt -- nicht, wenn er quer in z fest aufliegt.
-- `laengs: bool = True` – Ob er sich dehnt -- nicht, wenn er laengs fest aufliegt.
-- `torsion: bool = True` – Ob er Torsion traegt -- nicht mit Gelenken an beiden Enden, und nicht in der Ebene.
+- `biegung_y: bool = True` – Ob er sich in seiner x-y-Ebene biegt – nicht, wenn er quer in y fest aufliegt, und nicht in der Ebene.
+- `biegung_z: bool = True` – Ob er sich in seiner x-z-Ebene biegt – nicht, wenn er quer in z fest aufliegt.
+- `laengs: bool = True` – Ob er sich dehnt – nicht, wenn er laengs fest aufliegt.
+- `torsion: bool = True` – Ob er Torsion traegt – nicht mit Gelenken an beiden Enden, und nicht in der Ebene.
 - `gelenk_a: bool = False`
 - `gelenk_b: bool = False`
 - `gelenkindizes: Dict[Tuple[str, int], int] = field(default_factory=dict)` – Je Ende (`a`, `b`) und Achse des Stabs (0, 1, 2) die Nummer seiner Drehung am Gelenk.
@@ -251,7 +251,7 @@ def gesperrt(self) -> Tuple[int, ...]
 ```
 
 Die lokalen Unbekannten der Teile, die er nicht traegt: wo ein festes
-Linienlager alles nimmt, die Torsion zwischen zwei Gelenken -- und in
+Linienlager alles nimmt, die Torsion zwischen zwei Gelenken – und in
 der Ebene, was aus ihr hinausfuehrte.
 
 #### Teilstab.lokal
@@ -275,7 +275,7 @@ def bettungsmatrix(self) -> List[List[float]]
 class Teilergebnis
 ```
 
-Was ein Teilstab in einem Fall tut -- in seinen Achsen.
+Was ein Teilstab in einem Fall tut – in seinen Achsen.
 
 - `teil: Teilstab`
 - `lasten: st3.Lasten`
@@ -299,12 +299,12 @@ je Drehachse eine Drehung oder ein Moment.
 - `F: List[float]`
 - `x: List[float]`
 - `teile: List[Teilergebnis]`
-- `verschiebungen: Dict[str, Werte]` – Je Ort -- auch die inneren --, eben `(u_x, u_z, φ)`, im Raum `(u_x, u_y, u_z, φ_x, φ_y, φ_z)`.
+- `verschiebungen: Dict[str, Werte]` – Je Ort – auch die inneren –, eben `(u_x, u_z, φ)`, im Raum `(u_x, u_y, u_z, φ_x, φ_y, φ_z)`.
 - `lagerkraefte: Dict[str, Werte]` – Je gehaltenen Ort `(R_x, R_z, M)` oder `(R_x, R_y, R_z, M_x, M_y, M_z)`, auf das Tragwerk wirkend.
-- `linienlast: Dict[str, Werte]` – Je fest aufliegenden Stab, was seine Lasten geradewegs ins Lager geben -- Kraft und Moment um den Ursprung.
-- `bettung: Dict[str, Werte]` – Je gebetteten Stab die Summe der Bettungskraefte auf das Tragwerk -- ebenso.
+- `linienlast: Dict[str, Werte]` – Je fest aufliegenden Stab, was seine Lasten geradewegs ins Lager geben – Kraft und Moment um den Ursprung.
+- `bettung: Dict[str, Werte]` – Je gebetteten Stab die Summe der Bettungskraefte auf das Tragwerk – ebenso.
 - `lastsumme: Werte`
-- `gleichgewicht: Werte` – Was in den Summen der Kraefte und der Momente um den Ursprung uebrig bleibt -- null bis auf Rundung.
+- `gleichgewicht: Werte` – Was in den Summen der Kraefte und der Momente um den Ursprung uebrig bleibt – null bis auf Rundung.
 
 ### Ergebnis
 
@@ -357,7 +357,7 @@ def _name(zeichen: str, ort: str, richtung: Vektor, achsen: Sequence[Tuple[str, 
 def _traegt_torsion(stab_: Stab) -> bool
 ```
 
-Ob ein Stab Torsion traegt: nicht mit Gelenken an beiden Enden -- siehe Dateikopf.
+Ob ein Stab Torsion traegt: nicht mit Gelenken an beiden Enden – siehe Dateikopf.
 
 ### rechnen
 
@@ -365,7 +365,7 @@ Ob ein Stab Torsion traegt: nicht mit Gelenken an beiden Enden -- siehe Dateikop
 def rechnen(system: Any, art: Art) -> Ergebnis
 ```
 
-Ein System dieser Art, gerechnet -- oder, wo das nicht geht, die Meldungen dazu.
+Ein System dieser Art, gerechnet – oder, wo das nicht geht, die Meldungen dazu.
 
 ### _ende
 

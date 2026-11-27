@@ -1,5 +1,5 @@
 ---
-erzeugt: 7f7b7cae8ff7
+erzeugt: 1d061aa797ff
 art: modul
 tags: [modul]
 ---
@@ -22,15 +22,15 @@ Verhaeltnisse ψ der Endmomente, die Knicklaengen und die Laenge der Stuetze
 einmal je Analyse ([[opencivil.verbund.stuetze#Stuetze|Stuetze]])
 * Die Art nach Tabelle 7 ([[opencivil.verbund.stuetze#querschnittsart|querschnittsart]]): ein einziges I-Profil
   oder Rohr aus der Profiltabelle, ganz einbetoniert, kammerbetoniert oder
-  mit Beton gefuellt (5.3.1.1). Andere -- ein Rohr mit einem Profil darin,
-  zwei Profile, ein Traeger unter einer Platte -- kennt Tabelle 7 nicht.
+  mit Beton gefuellt (5.3.1.1). Andere – ein Rohr mit einem Profil darin,
+  zwei Profile, ein Traeger unter einer Platte – kennt Tabelle 7 nicht.
 * Doppelsymmetrisch und konstant (5.3.2.1), `0.2 ≤ h/b ≤ 5` (5.3.2.3)
-  und die Grenzen der Tabelle 6 gegen das lokale Beulen (5.3.1.7) -- das
+  und die Grenzen der Tabelle 6 gegen das lokale Beulen (5.3.1.7) – das
   ganz einbetonierte Profil braucht keine.
 * Je Gruppe Flaeche und Traegheitsmomente um die Mitte des Profils
   ([[opencivil.verbund.stuetze#Werkstoff|Werkstoff]]); der Betonstahl zaehlt hoechstens mit 6 % der
   Betonflaeche (5.3.2.2).
-* `N_pl,Rd` (14) -- im gefuellten Rohr mit 1.0 statt 0.85 (5.3.2.5) --,
+* `N_pl,Rd` (14) – im gefuellten Rohr mit 1.0 statt 0.85 (5.3.2.5) –,
   `N_pl,Rk` mit γ = 1 (16) und `δ` (13) zwischen 0.2 und 0.9 (5.3.1.2).
 
 
@@ -40,7 +40,7 @@ einmal je Analyse ([[opencivil.verbund.stuetze#Stuetze|Stuetze]])
   Kriechzahl der Analyse.
 * Die Achse ohne Moment knickt ([[opencivil.verbund.stuetze#Knicken|Knicken]]): `(EI)_eff,λ` (17),
   `N_cr` (20), `λ̄` (16) hoechstens 2.0, `χ_K` nach SIA 263 (8) mit
-  der Kurve der Tabelle 7, `N_Ed ≤ χ_K N_pl,Rd` (15) -- 5.3.4.2.
+  der Kurve der Tabelle 7, `N_Ed ≤ χ_K N_pl,Rd` (15) – 5.3.4.2.
 * Die Achse mit Moment ([[opencivil.verbund.stuetze#Biegeachse|Biegeachse]]): `(EI)_eff,d` (22),
   `N_cr,eff` (23) mit der Laenge der Stuetze, `k` (24) mit `ω` nach
   SIA 263, die Ersatzimperfektion `e_0` der Tabelle 7:
@@ -55,18 +55,18 @@ einmal je Analyse ([[opencivil.verbund.stuetze#Stuetze|Stuetze]])
   Millimeter neben der Mitte des Profils, und `|I_yz|` um sie erreicht
   kein Hundertstel von `√(I_y I_z)`.
 * Ganz einbetoniert heisst: acht Punkte einen Millimeter ausserhalb des
-  umschreibenden Rechtecks des Profils -- Ecken und Mitten der Seiten --
+  umschreibenden Rechtecks des Profils – Ecken und Mitten der Seiten –
   liegen im Beton. Kammerbetoniert: Beton deckt den Steg beidseits und
   jeden Flansch innen
   ([[opencivil.verbund.querschnitt#Verbundquerschnitt.kammerbetoniert|kammerbetoniert]]),
   ausserhalb des Profils liegt nichts. Gefuellt: in der Mitte des Rohrs
   liegt Beton, ausserhalb nichts.
 * Der Betonstahl ueber 6 % der Betonflaeche zaehlt in jedem Stab
-  gleichmaessig weniger -- auch in `M_pl` und `EI`.
+  gleichmaessig weniger – auch in `M_pl` und `EI`.
 * Die Imperfektion waechst mit `k_0 = 1/(1 - N_Ed/N_cr,eff)`, also mit
   `ω = 1` wie unter einer Querlast; zweiachsig wirkt sie in beiden Achsen
   zugleich.
-* Zweiachsig: `Σ M_Ed,II/(μ_d M_pl,Rd) ≤ 0.9` (0.8) -- 5.3.5 nennt die
+* Zweiachsig: `Σ M_Ed,II/(μ_d M_pl,Rd) ≤ 0.9` (0.8) – 5.3.5 nennt die
   lineare Interaktion, aber keine Grenze; die von (25) liegt auf der
   sicheren Seite.
 * `μ_d` hoechstens eins: ob das Moment aus der Normalkraft selbst
@@ -80,7 +80,7 @@ einmal je Analyse ([[opencivil.verbund.stuetze#Stuetze|Stuetze]])
 
 ## VORZEICHEN
 
-N \< 0 Druck; M_y > 0 zieht unten, M_z > 0 links -- um die Mitte des
+N \< 0 Druck; M_y > 0 zieht unten, M_z > 0 links – um die Mitte des
 Profils, die bei einer doppelsymmetrischen Stuetze der Schwerpunkt ist.
 
 ## Inhalt
@@ -91,7 +91,7 @@ Profils, die bei einer doppelsymmetrischen Stuetze der Schwerpunkt ist.
 class Art(Enum)
 ```
 
-Wie Profil und Beton nach Tabelle 7 zusammen liegen -- siehe Dateikopf.
+Wie Profil und Beton nach Tabelle 7 zusammen liegen – siehe Dateikopf.
 
 - `EINBETONIERT = 'ganz einbetoniert'`
 - `KAMMERBETONIERT = 'kammerbetoniert'`
@@ -103,7 +103,7 @@ Wie Profil und Beton nach Tabelle 7 zusammen liegen -- siehe Dateikopf.
 def _art_bei(verbund: Verbundquerschnitt, p: Punkt) -> Optional[Baustoffart]
 ```
 
-Die Art des Materials an `p` -- `None` in einer Aussparung oder daneben.
+Die Art des Materials an `p` – `None` in einer Aussparung oder daneben.
 
 ### _rundum
 
@@ -111,7 +111,7 @@ Die Art des Materials an `p` -- `None` in einer Aussparung oder daneben.
 def _rundum(teil: Teil) -> List[Punkt]
 ```
 
-Acht Punkte `NEBEN` ausserhalb des umschreibenden Rechtecks -- Ecken und Seitenmitten.
+Acht Punkte `NEBEN` ausserhalb des umschreibenden Rechtecks – Ecken und Seitenmitten.
 
 ### querschnittsart
 
@@ -119,7 +119,7 @@ Acht Punkte `NEBEN` ausserhalb des umschreibenden Rechtecks -- Ecken und Seitenm
 def querschnittsart(verbund: Verbundquerschnitt) -> Tuple[Optional[Art], str]
 ```
 
-Die Art nach Tabelle 7 (siehe Dateikopf) -- oder `None` und warum
+Die Art nach Tabelle 7 (siehe Dateikopf) – oder `None` und warum
 Tabelle 7 den Querschnitt nicht kennt.
 
 ### Werkstoff
@@ -154,7 +154,7 @@ def I(self, achse: str) -> float
 def _werkstoffe(verbund: Verbundquerschnitt, mitte: Punkt) -> Tuple[Werkstoff, ...]
 ```
 
-Je Gruppe ihre Werte um `mitte` -- Beton ohne, was Stahl und Staebe verdraengen.
+Je Gruppe ihre Werte um `mitte` – Beton ohne, was Stahl und Staebe verdraengen.
 
 ### Festigkeiten
 
@@ -164,8 +164,8 @@ class Festigkeiten
 ```
 
 Je Gruppe in N/mm²: gezogen und gedrueckt mit der Wahl der
-Tragsicherheit, gedrueckt charakteristisch -- der Beton beide Male mit
-seinem Umrechnungsfaktor -- und der Elastizitaetsmodul: `E_a`,
+Tragsicherheit, gedrueckt charakteristisch – der Beton beide Male mit
+seinem Umrechnungsfaktor – und der Elastizitaetsmodul: `E_a`,
 `E_cm` oder `E_s`.
 
 - `zug: Tuple[float, ...]`
@@ -179,7 +179,7 @@ seinem Umrechnungsfaktor -- und der Elastizitaetsmodul: `E_a`,
 class Stuetze
 ```
 
-Der Querschnitt als Verbundstuetze -- siehe Dateikopf. `eps` ist `ε`
+Der Querschnitt als Verbundstuetze – siehe Dateikopf. `eps` ist `ε`
 des Profils, `hochfest`, ob es S420 oder S460 ist.
 
 #### Stuetze.der_art
@@ -225,7 +225,7 @@ def zaehlt(self, w: Werkstoff) -> float
 def unsymmetrisch(self) -> str
 ```
 
-Warum die Stuetze nicht doppelsymmetrisch ist -- leer, wo sie es ist (Dateikopf).
+Warum die Stuetze nicht doppelsymmetrisch ist – leer, wo sie es ist (Dateikopf).
 
 #### Stuetze.masse
 
@@ -251,7 +251,7 @@ def beulen(self) -> Optional[Tuple[str, float, float, str]]
 ```
 
 Tabelle 6: das Verhaeltnis, seine Zahl, seine Grenze und wie sie
-steht -- `None` beim ganz einbetonierten Profil.
+steht – `None` beim ganz einbetonierten Profil.
 
 #### Stuetze.N_a
 
@@ -268,7 +268,7 @@ def N_a(self) -> float
 def N_pl(self, charakteristisch: bool=False) -> float
 ```
 
-`N_pl,Rd` (14) in N -- oder `N_pl,Rk` mit γ = 1 (16).
+`N_pl,Rd` (14) in N – oder `N_pl,Rk` mit γ = 1 (16).
 
 #### Stuetze.delta
 
@@ -286,7 +286,7 @@ def delta(self) -> float
 def fehlt(self) -> str
 ```
 
-Warum die Stuetze nicht nach 5.3 rechnet, der erste Grund -- leer,
+Warum die Stuetze nicht nach 5.3 rechnet, der erste Grund – leer,
 wo sie es tut: die Symmetrie, `h/b`, Tabelle 6, `δ`.
 
 #### Stuetze.stark
@@ -296,7 +296,7 @@ wo sie es tut: die Symmetrie, `h/b`, Tabelle 6, `δ`.
 def stark(self) -> Optional[str]
 ```
 
-Die starke Achse des Profils -- `None` beim runden und beim quadratischen Rohr.
+Die starke Achse des Profils – `None` beim runden und beim quadratischen Rohr.
 
 #### Stuetze.kurve
 
@@ -320,7 +320,7 @@ def EI(self, achse: str, E_c: Mapping[int, float], beton: float) -> float
 def E_c_eff(self, staendig: float, kriechzahl: float) -> Dict[int, float]
 ```
 
-(19) je Beton, in N/mm² -- `staendig` ist `N_G,Ed/N_Ed`.
+(19) je Beton, in N/mm² – `staendig` ist `N_G,Ed/N_Ed`.
 
 #### Stuetze.starr
 
@@ -329,7 +329,7 @@ def E_c_eff(self, staendig: float, kriechzahl: float) -> Dict[int, float]
 def starr(self) -> Starrplastisch
 ```
 
-Der Querschnitt in rechteckigen Spannungsbloecken -- der Betonstahl mit seinem Anteil.
+Der Querschnitt in rechteckigen Spannungsbloecken – der Betonstahl mit seinem Anteil.
 
 #### Stuetze.M_pl
 
@@ -339,7 +339,7 @@ def M_pl(self, achse: str, M: float, N: float) -> Tuple[float, Optional[float]]
 
 Der plastische Biegewiderstand um `achse` bei `N` in N, zur
 Seite, die `M` zieht: sein Betrag in N mm und wie weit die
-Nulllinie von der Mitte zur gezogenen Seite liegt, in mm --
+Nulllinie von der Mitte zur gezogenen Seite liegt, in mm –
 `(0, None)`, wo der Querschnitt `N` nicht traegt.
 
 ### Knicken
@@ -349,7 +349,7 @@ Nulllinie von der Mitte zur gezogenen Seite liegt, in mm --
 class Knicken
 ```
 
-Die Achse ohne Moment, nach (15): in N und mm -- gehalten mit
+Die Achse ohne Moment, nach (15): in N und mm – gehalten mit
 `L_K = 0`, `N_cr` unendlich und `χ_K = 1`.
 
 - `achse: str`
@@ -420,7 +420,7 @@ def nutzung(self) -> float
 class Ergebnis
 ```
 
-Ein Fall der Stuetze -- in N und mm.
+Ein Fall der Stuetze – in N und mm.
 
 - `fall: st.Stabfall`
 - `E_c: Dict[int, float]` – (19) je Beton.
@@ -443,7 +443,7 @@ def N(self) -> float
 def summe(self) -> float
 ```
 
-Zweiachsig: `Σ M_Ed,II/(μ_d M_pl,Rd)` -- 5.3.5, siehe Dateikopf.
+Zweiachsig: `Σ M_Ed,II/(μ_d M_pl,Rd)` – 5.3.5, siehe Dateikopf.
 
 #### Ergebnis.grade
 
@@ -467,7 +467,7 @@ def massgebend(self) -> Tuple[str, float]
 def rechnen(stuetze: Stuetze, fall: st.Stabfall, kriechzahl: float, momente: Mapping[str, float]) -> Ergebnis
 ```
 
-Ein Fall mit Druck -- `momente` je Achse in N mm, wie sie zaehlen
+Ein Fall mit Druck – `momente` je Achse in N mm, wie sie zaehlen
 (einachsig ohne `M_z`), `kriechzahl` `φ(t,t_0)`.
 
 ### _zu_lang
@@ -476,7 +476,7 @@ Ein Fall mit Druck -- `momente` je Achse in N mm, wie sie zaehlen
 def _zu_lang(fall: st.Stabfall, achse: str) -> str
 ```
 
-Warum die Knicklaenge um `achse` nicht zur Stuetze passt -- leer, wo sie passt.
+Warum die Knicklaenge um `achse` nicht zur Stuetze passt – leer, wo sie passt.
 
 ### momente
 
@@ -484,7 +484,7 @@ Warum die Knicklaenge um `achse` nicht zur Stuetze passt -- leer, wo sie passt.
 def momente(biegung_wirkt: Sequence[float]) -> Dict[str, float]
 ```
 
-Die Momente eines Falls je Achse in N mm -- aus `Biegung.wirkt` in Nm.
+Die Momente eines Falls je Achse in N mm – aus `Biegung.wirkt` in Nm.
 
 
 ## Konstanten
@@ -493,7 +493,7 @@ Die Momente eines Falls je Achse in N mm -- aus `Biegung.wirkt` in Nm.
 - `REFERENZ_HB = 'SIA 264:2014, 5.3.2.3'`
 - `REFERENZ_BEULEN = 'SIA 264:2014, 5.3.1.7, Tabelle 6'`
 - `REFERENZ_BEWEHRUNG = 'SIA 264:2014, 5.3.2.2'`
-- `REFERENZ_N_PL_ROHR = 'SIA 264:2014, 5.3.2.4, (14); 5.3.2.5'` – (14) im gefuellten Rohr -- ohne Rohr gilt `qa_verbund_kennzahlen.REFERENZ_14`.
+- `REFERENZ_N_PL_ROHR = 'SIA 264:2014, 5.3.2.4, (14); 5.3.2.5'` – (14) im gefuellten Rohr – ohne Rohr gilt `qa_verbund_kennzahlen.REFERENZ_14`.
 - `REFERENZ_N_PL_K = 'SIA 264:2014, 5.3.2.7, (16)'`
 - `REFERENZ_DELTA = 'SIA 264:2014, 5.3.1.2, (13)'`
 - `REFERENZ_KURVE = 'SIA 264:2014, 5.3.2.6, Tabelle 7'`
@@ -514,7 +514,7 @@ Die Momente eines Falls je Achse in N mm -- aus `Biegung.wirkt` in Nm.
 - `ROHR_FAKTOR = 1.0` – 5.3.2.5 und 5.3.4.4: der Umrechnungsfaktor der Betondruckfestigkeit im gefuellten Rohr.
 - `BETON_LAMBDA = 0.6` – (17): wie der Beton in `(EI)_eff,λ` zaehlt; (22): wie in `(EI)_eff,d`, und der Beiwert davor.
 - `ROHR_RHO = 0.03` – Tabelle 7: bis zu welchem `ρ_s` ein gefuelltes Rohr mit Kurve a rechnet.
-- `SYMMETRIE_VERSATZ = 1.0` – Wie weit ein Schwerpunkt neben der Mitte liegen und welchen Teil von `√(I_y I_z)` `|I_yz|` erreichen darf, damit eine Gruppe als doppelsymmetrisch gilt -- siehe Dateikopf.
+- `SYMMETRIE_VERSATZ = 1.0` – Wie weit ein Schwerpunkt neben der Mitte liegen und welchen Teil von `√(I_y I_z)` `|I_yz|` erreichen darf, damit eine Gruppe als doppelsymmetrisch gilt – siehe Dateikopf.
 - `SYMMETRIE_I_YZ = 0.01`
 - `AUSSEN_AB = 1.0` – Ab wie viel mm² Beton oder Betonstahl ausserhalb des Profils liegen.
 - `NICHT_IN_TABELLE = 'Tabelle 7 kennt diesen Querschnitt nicht. Als Verbundstütze rechnet …` – Warum ein Querschnitt nicht als Verbundstuetze rechnet.

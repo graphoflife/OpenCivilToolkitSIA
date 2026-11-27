@@ -56,6 +56,6 @@ ein doppelt so breiter nur doppelt.
 Im Balkensystem geht es über die [[Biegesteifigkeit]] in die Rechnung ein. In
 der Spannung-Dehnung-Analyse ist es der reine Betonquerschnitt ohne
 Bewehrung, der Vergleichsquerschnitt für den
-[[Äquivalenter E-Modul über dem Moment|äquivalenten E-Modul]] -- mit ihm
+[[Äquivalenter E-Modul über dem Moment|äquivalenten E-Modul]] – mit ihm
 rechnet man, wenn man eine Platte als homogenes, elastisches Bauteil
 berechnet.

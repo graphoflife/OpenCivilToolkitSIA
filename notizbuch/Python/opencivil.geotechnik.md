@@ -1,5 +1,5 @@
 ---
-erzeugt: c804d0a31a7a
+erzeugt: 5d4cd72b9c7a
 art: modul
 tags: [modul]
 ---
@@ -7,19 +7,19 @@ tags: [modul]
 > Nachweise im Baugrund.
 > Paket [[opencivil]] · [Quelltext](../../opencivil/geotechnik/__init__.py)
 
-* [[opencivil.geotechnik.fundament|fundament]] -- ein Flachfundament: seine
+* [[opencivil.geotechnik.fundament|fundament]] – ein Flachfundament: seine
   Vorgaben, die Bemessungswerte des Bodens und was seine zwei Nachweise
   teilen.
-* [[opencivil.geotechnik.grundbruch|grundbruch]] -- der Grundbruchwiderstand N_Rd
+* [[opencivil.geotechnik.grundbruch|grundbruch]] – der Grundbruchwiderstand N_Rd
   nach der erweiterten Tragfähigkeitsformel.
-* [[opencivil.geotechnik.gleiten|gleiten]] -- der Gleitwiderstand T_Rd in der
+* [[opencivil.geotechnik.gleiten|gleiten]] – der Gleitwiderstand T_Rd in der
   Sohle.
-* [[opencivil.geotechnik.tragfaehigkeit|tragfaehigkeit]] -- die Tragfähigkeitsfaktoren
+* [[opencivil.geotechnik.tragfaehigkeit|tragfaehigkeit]] – die Tragfähigkeitsfaktoren
   N_q und N_c, die Fundament und Pfahl teilen.
-* [[opencivil.geotechnik.setzung|setzung]] -- ein Flachfundament auf
+* [[opencivil.geotechnik.setzung|setzung]] – ein Flachfundament auf
   geschichtetem Baugrund: die Setzung aus Wieder- und Erstbelastung, mit dem
   Einflussfaktor nach Boussinesq, gegen die zulässige Setzung.
-* [[opencivil.geotechnik.verhalten|verhalten]] -- wie ein Boden trägt, drainiert
+* [[opencivil.geotechnik.verhalten|verhalten]] – wie ein Boden trägt, drainiert
   oder undrainiert: der Schalter, den Grundbruch und Pfahl teilen.
 
 ## Module

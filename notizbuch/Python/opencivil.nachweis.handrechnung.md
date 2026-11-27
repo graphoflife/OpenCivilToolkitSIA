@@ -1,5 +1,5 @@
 ---
-erzeugt: 186c509c1b88
+erzeugt: fbb313f07e05
 art: modul
 tags: [modul]
 ---
@@ -11,7 +11,7 @@ tags: [modul]
 
 Rechnet die wenigen Punkte der M-N-Interaktion, die sich mit Papier und
 Taschenrechner nachvollziehen lassen, und schreibt dabei jeden Schritt
-mit -- Formel, eingesetzte Zahlen, Ergebnis. Aus den Punkten entsteht ein
+mit – Formel, eingesetzte Zahlen, Ergebnis. Aus den Punkten entsteht ein
 Polygon, und gegen dieses Polygon wird nachgewiesen.
 
 
@@ -20,7 +20,7 @@ Polygon, und gegen dieses Polygon wird nachgewiesen.
 Die punktweise aus Dehnungsebenen aufgebaute Linie in
 [[opencivil.nachweis.biegung_normalkraft]] ist genauer, aber sie entsteht aus
 einer Faserintegration ueber hunderte Stuetzstellen. Wer das Ergebnis prueft,
-kann es nicht nachrechnen -- er kann es nur glauben. Genau das soll dieses
+kann es nicht nachrechnen – er kann es nur glauben. Genau das soll dieses
 Werkzeug nicht verlangen. Die genaue Linie bleibt darum als Vergleich im
 Diagramm stehen, das Urteil faellt aber ueber die Handrechnung.
 
@@ -28,11 +28,11 @@ Diagramm stehen, das Urteil faellt aber ueber die Handrechnung.
 ## ANSATZ
 
 * Druckzone als Spannungsblock der Hoehe `0.85 x` mit durchgehend `f_cd`
-  -- oder `f_ck` mit charakteristischen Werten ([[opencivil.querschnitt.gesetzwahl#Werkstoffsatz|Werkstoffsatz]]);
+  – oder `f_ck` mit charakteristischen Werten ([[opencivil.querschnitt.gesetzwahl#Werkstoffsatz|Werkstoffsatz]]);
   dann heissen die Eckpunkte `R_k` statt `R_d`.
 * **Gedrueckter Stahl wird durchgehend vernachlaessigt.** Das liegt auf der
   sicheren Seite und erspart die Frage, ob er ueberhaupt fliesst.
-* Bewehrung je Richtung zu zwei Lagen zusammengefasst -- eine je Seite.
+* Bewehrung je Richtung zu zwei Lagen zusammengefasst – eine je Seite.
 
 
 ## VORZEICHEN
@@ -75,9 +75,9 @@ Die zu einer Seite zusammengefasste Bewehrung.
 - `E_s: float`
 - `text: str = ''`
 - `index: str = ''` – Index der zusammengefassten Lage, z.B. `1,x`.
-- `stahl_index: str = ''` – Index der Stahlsorte ihrer Seite -- leer, solange es nur eine gibt. Ohne ihn stuende bei zwei Platten aus verschiedenen Sorten zweimal `f_yd` mit verschiedenen Zahlen im selben Bericht, und niemand koennte sagen, welche Sorte gemeint ist.
-- `teile: Tuple[Stahllage, ...] = ()` – Die Posten, aus denen sie entstanden ist -- fuer die Mitschrift.
-- `satz: Werkstoffsatz = Werkstoffsatz.BEMESSUNG` – Der Wertesatz ihres Stahls -- `f_yd` oder `f_yk`.
+- `stahl_index: str = ''` – Index der Stahlsorte ihrer Seite – leer, solange es nur eine gibt. Ohne ihn stuende bei zwei Platten aus verschiedenen Sorten zweimal `f_yd` mit verschiedenen Zahlen im selben Bericht, und niemand koennte sagen, welche Sorte gemeint ist.
+- `teile: Tuple[Stahllage, ...] = ()` – Die Posten, aus denen sie entstanden ist – fuer die Mitschrift.
+- `satz: Werkstoffsatz = Werkstoffsatz.BEMESSUNG` – Der Wertesatz ihres Stahls – `f_yd` oder `f_yk`.
 
 #### Lage.symbol_flaeche
 
@@ -86,7 +86,7 @@ Die zu einer Seite zusammengefasste Bewehrung.
 def symbol_flaeche(self) -> str
 ```
 
-`A_{s,1,x}` -- oder schlicht `A_s`, wenn es keinen Index gibt.
+`A_{s,1,x}` – oder schlicht `A_s`, wenn es keinen Index gibt.
 
 Eine unbewehrte Seite hat keine Lagennummer, also auch keinen Index.
 Ihn hier zu erzwingen ergaebe `A_{s,}` mit leerem Tiefstellen; darum
@@ -100,7 +100,7 @@ zusammenzusetzen.
 def symbol_f_yd(self) -> str
 ```
 
-`f_{yd,        ext{B500B}}` -- oder `f_{yd}`, solange es nur eine Sorte gibt.
+`f_{yd,        ext{B500B}}` – oder `f_{yd}`, solange es nur eine Sorte gibt.
 
 #### Lage.symbol_sigma_sd
 
@@ -125,7 +125,7 @@ def symbol_E_s(self) -> str
 def symbol_d(self) -> str
 ```
 
-`d_{1,x}` -- oder schlicht `d`. Siehe [[opencivil.nachweis.handrechnung#Lage.symbol_flaeche|symbol_flaeche]].
+`d_{1,x}` – oder schlicht `d`. Siehe [[opencivil.nachweis.handrechnung#Lage.symbol_flaeche|symbol_flaeche]].
 
 #### Lage.symbol_z
 
@@ -134,7 +134,7 @@ def symbol_d(self) -> str
 def symbol_z(self) -> str
 ```
 
-`z_{1,x}`, die Tiefe ab Oberkante -- oder `z`. Siehe [[opencivil.nachweis.handrechnung#Lage.symbol_flaeche|symbol_flaeche]].
+`z_{1,x}`, die Tiefe ab Oberkante – oder `z`. Siehe [[opencivil.nachweis.handrechnung#Lage.symbol_flaeche|symbol_flaeche]].
 
 ### Eckpunkt
 
@@ -146,13 +146,13 @@ class Eckpunkt
 Ein von Hand nachrechenbarer Punkt der Resistenzlinie.
 
 - `kennung: str`
-- `symbol: str` – LaTeX -- so steht der Punkt in der Mitschrift.
-- `name: str` – Klartext -- fuer Kurzhinweise im Diagramm.
+- `symbol: str` – LaTeX – so steht der Punkt in der Mitschrift.
+- `name: str` – Klartext – fuer Kurzhinweise im Diagramm.
 - `N: float` – Normalkraft in N (Zug positiv).
 - `M: float` – Moment in Nm (Zug unten positiv).
 - `x: Optional[Wert] = field(default=None, compare=False)`
-- `d: Optional[Wert] = field(default=None, compare=False)` – Druckzonenhoehe und statische Hoehe -- nur bei M_Rd(N = 0), wie sie dort hergeleitet sind. Daraus rechnen die Kennzahlen der Platte x/d.
-- `werte: Dict[str, Wert] = field(default_factory=dict, compare=False)` – N und M, wie die Mitschrift sie rechnet -- je Achse (`"N"`, `"M"`), soweit eine Zeile sie schreibt; bei reiner Biegung fehlt N = 0. Ein Widerstand, der genau auf den Punkt faellt, gibt diesen Wert weiter: so findet die Kurzform des Nachweises die Formel dahinter ([[opencivil.core.kurzform]]).
+- `d: Optional[Wert] = field(default=None, compare=False)` – Druckzonenhoehe und statische Hoehe – nur bei M_Rd(N = 0), wie sie dort hergeleitet sind. Daraus rechnen die Kennzahlen der Platte x/d.
+- `werte: Dict[str, Wert] = field(default_factory=dict, compare=False)` – N und M, wie die Mitschrift sie rechnet – je Achse (`"N"`, `"M"`), soweit eine Zeile sie schreibt; bei reiner Biegung fehlt N = 0. Ein Widerstand, der genau auf den Punkt faellt, gibt diesen Wert weiter: so findet die Kurzform des Nachweises die Formel dahinter ([[opencivil.core.kurzform]]).
 
 ### Handrechnung
 
@@ -162,7 +162,7 @@ class Handrechnung
 
 Die Eckpunkte einer Richtung, samt Mitschrift.
 
-Rechnet und schreibt in einem Zug -- wie jede Berechnung in diesem Werkzeug.
+Rechnet und schreibt in einem Zug – wie jede Berechnung in diesem Werkzeug.
 Was in der Mitschrift steht, ist genau das, was gerechnet wurde.
 
 #### Handrechnung.rechnen
@@ -193,7 +193,7 @@ Spannung.
 def _groesste_druckkraft(self, p: Protokoll) -> Eckpunkt
 ```
 
-Reiner Beton ohne Stahl -- die einfachste aller Grenzen.
+Reiner Beton ohne Stahl – die einfachste aller Grenzen.
 
 #### Handrechnung._groesste_zugkraft
 
@@ -212,7 +212,7 @@ Dehnungszustand ist eindeutig, also auch das zugehoerige Moment.
 def _seite(self, p: Protokoll, seite: Zugseite) -> List[Eckpunkt]
 ```
 
-Die beiden Punkte eines Momentenvorzeichens -- des Moments, das `seite` zieht.
+Die beiden Punkte eines Momentenvorzeichens – des Moments, das `seite` zieht.
 
 #### Handrechnung._bei_n_null
 
@@ -236,14 +236,14 @@ die genaue Linie unter Druck hat.
 
 **Die Zugbewehrung traegt, was ihre Dehnung hergibt:**
 `sigma_sd = min(E_s * eps_s; f_yd)`. Frueher galt der Punkt nur,
-solange sie fliesst -- also fuer `d >= h/2 * (1 + eps_yd/eps_c2d)` --,
+solange sie fliesst – also fuer `d >= h/2 * (1 + eps_yd/eps_c2d)` –,
 sonst fiel er weg und mit ihm der ganze Bauch. Bei tief liegender
 x-Bewehrung (dicke y-Lage aussen, x in der 2. Lage) lief das Polygon
 dann geradlinig vom reinen Druck zu M_Rd(N = 0): bei N = -2000 kN
 standen 81 kNm statt rund 250. Die Dehnungsebene ist dieselbe; der
 Stahl rechnet nur mit der Spannung, die zu ihr gehoert.
 
-Und er gilt nur, wenn es diese Zugbewehrung ueberhaupt gibt -- unter
+Und er gilt nur, wenn es diese Zugbewehrung ueberhaupt gibt – unter
 der Nulllinie. Ohne sie blieb der Betondruckblock allein stehen und
 schob dem Polygon ein Moment unter, das aus nichts stammte: eine
 Platte nur mit unterer Bewehrung wies so ein negatives Moment von
@@ -263,7 +263,7 @@ und `stahl_index` geben je Sorte
 Wertesatz und den Index ihrer Symbole.
 
 Ist nur eine Seite bewehrt, zaehlt die andere mit null Flaeche, damit die
-Formeln unveraendert gelten -- mit den Kennwerten des Stahls der anderen.
+Formeln unveraendert gelten – mit den Kennwerten des Stahls der anderen.
 
 
 ## Braucht

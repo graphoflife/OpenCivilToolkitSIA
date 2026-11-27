@@ -37,7 +37,7 @@ $$
 
 Die [[Setzung einer Teilschicht|Teilschichten]] über alle Schichten, nur der
 Anteil der Wiederbelastung: $q_W$ mit $M'_E$. Nach Kap. 8.5 lässt er sich
-meist vernachlässigen -- ausser bei Böden, die sich auch bei Wiederbelastung
+meist vernachlässigen – ausser bei Böden, die sich auch bei Wiederbelastung
 stark zusammendrücken, oder wenn die Wiederbelastung einen grossen Teil der
 Pressung ausmacht. Gerechnet wird er hier trotzdem, aus den angegebenen
 Zahlen.

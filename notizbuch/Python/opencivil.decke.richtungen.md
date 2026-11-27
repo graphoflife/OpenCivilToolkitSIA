@@ -1,5 +1,5 @@
 ---
-erzeugt: 6a8268ac9a67
+erzeugt: 988b65b92770
 art: modul
 tags: [modul]
 ---
@@ -10,15 +10,15 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Für jede Platte mit `von_selbst` ([[opencivil.decke.modell#Platte|Platte]])
-Richtung 1 und 2 der Lastabtragung, entlang ihrer Ränder -- bevor die Decke
+Richtung 1 und 2 der Lastabtragung, entlang ihrer Ränder – bevor die Decke
 in Streifen zerfällt ([[opencivil.decke.rechnung#rechnen|rechnen]]). Die übrigen
 Platten behalten ihre Richtungen, wie der Benutzer sie gab.
 
 
 ## DIE REGEL
 
-* Platten, die von selbst wählen und aneinanderstossen -- ein Stück Rand
-  gemeinsam haben, nicht nur eine Ecke --, bekommen dieselben Richtungen,
+* Platten, die von selbst wählen und aneinanderstossen – ein Stück Rand
+  gemeinsam haben, nicht nur eine Ecke –, bekommen dieselben Richtungen,
   damit ihre Streifen über die Fuge laufen. Eine Platte mit Richtungen von
   Hand ändert nichts an denen daneben.
 * Richtung 1 läuft parallel zu den meisten Metern Rand; ein Rand quer dazu
@@ -39,7 +39,7 @@ Platten behalten ihre Richtungen, wie der Benutzer sie gab.
 def festgelegt(decke: Decke) -> Decke
 ```
 
-Die Decke, in der jede Platte mit `von_selbst` ihre Richtungen gewählt hat -- die übrigen, wie sie sind.
+Die Decke, in der jede Platte mit `von_selbst` ihre Richtungen gewählt hat – die übrigen, wie sie sind.
 
 ### entlang
 
@@ -48,7 +48,7 @@ def entlang(raender: Sequence[Tuple[float, float]]) -> Tuple[float, float]
 ```
 
 Richtung 1 und 2 in rad zu Rändern, je `(Winkel, Länge)`: Richtung 1
-parallel zu den meisten Metern -- ein Rand quer dazu zählt mit --, über
+parallel zu den meisten Metern – ein Rand quer dazu zählt mit –, über
 −45° bis 45°; bei gleich vielen Metern die näher an x. Ohne Rand x und y.
 
 ### raender
@@ -57,7 +57,7 @@ parallel zu den meisten Metern -- ein Rand quer dazu zählt mit --, über
 def raender(platten: Sequence[Platte]) -> List[Tuple[float, float]]
 ```
 
-Je Rand der Platten sein Winkel in rad und seine Länge nach aussen, in m -- was in einer Fuge liegt, zählt nicht.
+Je Rand der Platten sein Winkel in rad und seine Länge nach aussen, in m – was in einer Fuge liegt, zählt nicht.
 
 ### gemeinsam
 
@@ -65,7 +65,7 @@ Je Rand der Platten sein Winkel in rad und seine Länge nach aussen, in m -- was
 def gemeinsam(k: Kante, m: Kante) -> float
 ```
 
-Wie lang zwei Ränder aufeinander liegen, in m -- null, wenn sie sich nur kreuzen oder an einer Ecke treffen.
+Wie lang zwei Ränder aufeinander liegen, in m – null, wenn sie sich nur kreuzen oder an einer Ecke treffen.
 
 ### _gruppen
 
@@ -73,7 +73,7 @@ Wie lang zwei Ränder aufeinander liegen, in m -- null, wenn sie sich nur kreuze
 def _gruppen(platten: Sequence[Platte]) -> List[List[int]]
 ```
 
-Die Platten, die aneinanderstossen, je in einer Gruppe -- als Stellen in `platten`, in ihrer Folge.
+Die Platten, die aneinanderstossen, je in einer Gruppe – als Stellen in `platten`, in ihrer Folge.
 
 ### kanten
 
@@ -81,7 +81,7 @@ Die Platten, die aneinanderstossen, je in einer Gruppe -- als Stellen in `platte
 def kanten(p: Platte) -> List[Kante]
 ```
 
-Die Ränder der Platte im Gegenuhrzeigersinn -- innen liegt links.
+Die Ränder der Platte im Gegenuhrzeigersinn – innen liegt links.
 
 ### _abstand
 
@@ -89,13 +89,13 @@ Die Ränder der Platte im Gegenuhrzeigersinn -- innen liegt links.
 def _abstand(v: float, w: float) -> float
 ```
 
-Wie weit zwei Winkel auseinander liegen, über 90° gefaltet -- −45° und 45° sind derselbe.
+Wie weit zwei Winkel auseinander liegen, über 90° gefaltet – −45° und 45° sind derselbe.
 
 
 ## Konstanten
 
-- `FUGE = 1e-06` – So nahe liegen zwei Ränder einer Fuge mindestens beieinander, in m -- und so lang ist sie mindestens.
-- `GLEICH = 1e-06` – Unter diesem Winkel laufen zwei Ränder gleich, in rad -- wie [[opencivil.decke.streifen#Konstanten|PARALLEL]].
+- `FUGE = 1e-06` – So nahe liegen zwei Ränder einer Fuge mindestens beieinander, in m – und so lang ist sie mindestens.
+- `GLEICH = 1e-06` – Unter diesem Winkel laufen zwei Ränder gleich, in rad – wie [[opencivil.decke.streifen#Konstanten|PARALLEL]].
 
 ## Braucht
 

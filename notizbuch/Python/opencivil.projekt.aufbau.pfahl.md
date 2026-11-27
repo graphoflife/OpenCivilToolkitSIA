@@ -1,5 +1,5 @@
 ---
-erzeugt: 5fd2d65b603c
+erzeugt: 387e66fc4412
 art: modul
 tags: [modul]
 ---
@@ -22,7 +22,7 @@ def bauen(art: 'Bauteilart', eintrag: PfahlEintrag, aufbau: Aufbau) -> Bauteil
 ```
 
 Ein Pfahl und seine beiden Nachweise, sobald eine Kombination
-eingeschaltet ist -- ohne sie steht er allein da, wie ein Grundbruch
+eingeschaltet ist – ohne sie steht er allein da, wie ein Grundbruch
 ohne Kombination. Seine Steifigkeit, gleich ob mit Kombinationen, sobald
 unter dem Fuss Boden ist; sie liest nur die Schichten, auch wenn R_a,k
 aus einem Versuch kommt. Mit ihr der äussere und der innere Widerstand

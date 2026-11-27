@@ -1,5 +1,5 @@
 ---
-erzeugt: 0aee31be3c92
+erzeugt: fd55a276e73e
 art: modul
 tags: [modul]
 ---
@@ -21,7 +21,7 @@ Baustahl. Wo es dann liegt, rechnet [[opencivil.stahlprofile.lage]].
 
 ## DER NAME
 
-Kein Wahlfeld -- wie beim Stahlprofil des Balkensystems
+Kein Wahlfeld – wie beim Stahlprofil des Balkensystems
 ([[opencivil.projekt.staebe|StabquerschnittEintrag]]), sonst zaehlte
 die Meldung alle Profile auf: einen Namen, der nicht geht, meldet die
 Zeichnung am Profil, mit dem Grund.
@@ -35,20 +35,20 @@ Zeichnung am Profil, mit dem Grund.
 class ProfilEintrag(Beschreibung)
 ```
 
-Ein Stahlprofil an einem Knoten -- siehe Dateikopf.
+Ein Stahlprofil an einem Knoten – siehe Dateikopf.
 
 - `IM_ORT = 'Profil'`
 - `kennung: str = ''`
 - `knoten: str = ''` – Die Mitte als Knoten: die Mitte des umschreibenden Rechtecks, nicht der Schwerpunkt.
 - `profil: str = VORGABE` – Reihe und Groesse in einem: «HEB 300», aus Vollstahl «FL 100 x 10».
 - `stahl: str = materialfeld('baustahl')` – Kennung des Baustahls.
-- `drehung: int = einer_von(DREHUNGEN, 0)` – Um so viele Grad gegen den Uhrzeigersinn gedreht, um die Mitte -- nach dem Spiegeln.
+- `drehung: int = einer_von(DREHUNGEN, 0)` – Um so viele Grad gegen den Uhrzeigersinn gedreht, um die Mitte – nach dem Spiegeln.
 - `gespiegelt: bool = False` – An der senkrechten Achse durch die Mitte gespiegelt: beim U der Ruecken rechts.
 
 
 ## Konstanten
 
-- `VORGABE = 'IPE 300'` – Womit ein neues Profil beginnt -- dasselbe wie im Balkensystem.
+- `VORGABE = 'IPE 300'` – Womit ein neues Profil beginnt – dasselbe wie im Balkensystem.
 
 ## Braucht
 

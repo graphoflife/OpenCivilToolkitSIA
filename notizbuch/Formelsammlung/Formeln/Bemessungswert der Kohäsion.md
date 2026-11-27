@@ -48,7 +48,7 @@ $$
 
 Die Kohäsion ist der Teil der Scherfestigkeit, der auch ohne Normalspannung
 trägt. Sie wird mit einem eigenen Partialfaktor $\gamma_c$ geteilt, nach
-SIA 267:2013, Tabelle 1, 1.5 -- ebenso $\gamma_{cu}$ für die undrainierte
+SIA 267:2013, Tabelle 1, 1.5 – ebenso $\gamma_{cu}$ für die undrainierte
 Scherfestigkeit. Neben $\varphi$ zählt sie nur, wo sie dauerhaft wirkt
 (8.5.1.6), in der Sohlfuge beim Gleiten gar nicht (8.4.1.2).
 

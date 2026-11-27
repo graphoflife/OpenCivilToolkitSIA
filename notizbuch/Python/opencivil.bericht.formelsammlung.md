@@ -1,5 +1,5 @@
 ---
-erzeugt: 0fecdc5ad631
+erzeugt: a06cabc1224e
 art: modul
 tags: [modul]
 ---
@@ -9,7 +9,7 @@ tags: [modul]
 
 ## VERANTWORTUNG
 
-Sammelt aus einer Herleitung je Thema -- «Beton», «Querkraft», «Knicken» --
+Sammelt aus einer Herleitung je Thema – «Beton», «Querkraft», «Knicken» –
 die Formeln in ihrer symbolischen Fassung, `Symbol = Formel`, mit Titel
 und Normstelle, und die Erklaerungen dazu. Die Herleitung zeigt Formeln mit
 Zahlen und laesst die Erklaerungen weg; hier ist es umgekehrt: keine Zahlen,
@@ -24,12 +24,12 @@ dafuer das Warum.
   ([[opencivil.notizbuch.formelseiten]]), vorab geschrieben von
   `python3 -m opencivil.web.bruecke`.
 * Die eines Laufs ([[opencivil.bericht.formelsammlung#formelsammlung|formelsammlung]]): im Bericht als «Verwendete
-  Formeln» -- die Erklaerungen zu dem, was er rechnet, und nicht zu allem.
+  Formeln» – die Erklaerungen zu dem, was er rechnet, und nicht zu allem.
 
 
 ## JEDE FORMEL EINMAL
 
-Dieselbe Formel steht in der Herleitung oft mehrfach -- je Lage, je Fall, je
+Dieselbe Formel steht in der Herleitung oft mehrfach – je Lage, je Fall, je
 Platte, mit anderen Indizes an den Symbolen, fuer das negative Moment mit
 Minus davor. Erkannt wird sie an ihrer Vorlage (`@name`-Form, siehe
 [[opencivil.core.latex#Formelzeile|Formelzeile.vorlage]], ohne fuehrendes Minus) und dem Grundzeichen ihres
@@ -39,8 +39,8 @@ Und was gesetzt gleich aussieht, ist dieselbe Formel: Summe und Schwerpunkt
 einer Lage schreiben Handrechnung und Lagennachweise mit anderen
 Platzhalternamen.
 
-Einmal im ganzen Lauf, nicht je Thema: gemeinsame Bausteine -- die statische
-Hoehe, der Querschnittsloeser, die Zugfestigkeit -- stehen beim ersten Thema,
+Einmal im ganzen Lauf, nicht je Thema: gemeinsame Bausteine – die statische
+Hoehe, der Querschnittsloeser, die Zugfestigkeit – stehen beim ersten Thema,
 das sie braucht, und nicht bei jedem noch einmal.
 
 
@@ -56,7 +56,7 @@ sagt. Formeln mit gleichem Namen sind Fassungen derselben Seite.
 
 Das Rechenwerk stempelt es auf jeden Block, den eine Berechnung schreibt
 ([[opencivil.core.protokoll#Protokoll.herkunft_stempeln|Protokoll.herkunft_stempeln]]). Zu welchem Bestandteil ein Thema
-gehoert -- Beton, Betonstahl, Platte --, sagt der Abschnitt, unter dem es zum
+gehoert – Beton, Betonstahl, Platte –, sagt der Abschnitt, unter dem es zum
 ersten Mal steht: sein Namensraum beginnt mit der Art (`beton.b1`). Danach
 ordnet die Uebersicht des Notizbuchs die Themen.
 
@@ -97,7 +97,7 @@ def ohne_zahlenangabe(titel: str) -> str
 def schluessel(block: GleichungBlock | TextBlock) -> Optional[tuple]
 ```
 
-Woran derselbe Eintrag wiederzuerkennen ist -- `None`: er gehoert nicht hinein.
+Woran derselbe Eintrag wiederzuerkennen ist – `None`: er gehoert nicht hinein.
 
 ### in_sammlung
 
@@ -105,7 +105,7 @@ Woran derselbe Eintrag wiederzuerkennen ist -- `None`: er gehoert nicht hinein.
 def in_sammlung(block: Block) -> bool
 ```
 
-Gehoert diese Gleichung in die Formelsammlung -- und damit ins Notizbuch?
+Gehoert diese Gleichung in die Formelsammlung – und damit ins Notizbuch?
 
 ### formelname
 
@@ -114,7 +114,7 @@ def formelname(block: GleichungBlock) -> str
 ```
 
 Unter welchem Namen die Formel im Notizbuch steht: der Name, den der Code
-ihr gibt, sonst ihr Titel ohne Zahlenangabe -- als Seitenname. Fuer die
+ihr gibt, sonst ihr Titel ohne Zahlenangabe – als Seitenname. Fuer die
 Formel in der Herleitung und fuer ihre symbolische Fassung derselbe.
 
 ### ergebniszeichen
@@ -124,7 +124,7 @@ def ergebniszeichen(block: GleichungBlock) -> str
 ```
 
 Was die Formel liefert, ohne Fall und Sorte: `f_{cd}`. Leer bei einem
-Ansatz -- der liefert keinen Wert.
+Ansatz – der liefert keinen Wert.
 
 ### symbolisch
 
@@ -133,7 +133,7 @@ def symbolisch(block: GleichungBlock) -> GleichungBlock
 ```
 
 Die Formel ohne Zahlen, `Symbol = Formel`. Gebaut erst fuer einen neuen
-Schluessel -- neun von zehn Gleichungen sind Wiederholungen.
+Schluessel – neun von zehn Gleichungen sind Wiederholungen.
 
 ### formelsammlung
 
@@ -150,14 +150,14 @@ Je Thema, in der Folge ihres ersten Auftretens, Erklaerungen und Formeln.
 def laeufe() -> Tuple[Protokoll, ...]
 ```
 
-Die Laeufe, aus denen die ganze Sammlung entsteht -- je Projekt ein
+Die Laeufe, aus denen die ganze Sammlung entsteht – je Projekt ein
 Protokoll, samt seinen Spannung-Dehnung-Analysen.
 
 [[opencivil.projekt.projekt#Projekt.beispiel|Projekt.beispiel]] und [[opencivil.projekt.projekt#Projekt.jeder_nachweis|Projekt.jeder_nachweis]] fuehren
 zusammen jeden Nachweis laut, mit allen Kennwerten der Baustoffe
 (`alle_ziele`: sonst fehlte etwa ε_yd). Im schnellen Aufbau: die
 Grenzkraftsuche beim Knicken schreibt keine eigene Formel, und ganz stille
-Nachweise schreiben nichts -- dieselbe Sammlung, Zeichen fuer Zeichen, in
+Nachweise schreiben nichts – dieselbe Sammlung, Zeichen fuer Zeichen, in
 einem Zehntel der Zeit. Die Analysen sind kein Nachweis und laufen nicht
 im Rechenwerk, schreiben aber ebenso auf, wie ihre Linien entstehen.
 Der Titel eines Protokolls sagt, aus welchem Projekt es stammt.
@@ -165,7 +165,7 @@ Der Titel eines Protokolls sagt, aus welchem Projekt es stammt.
 Gerechnet wird einmal je Lauf des Programms, gut vier Sekunden; Bruecke
 und Tests fragen mehrmals. Getrennt je Projekt, weil eine Kennung wie
 `querschnitt.q1` in beiden vorkommt und je etwas anderes meint. Die
-Protokolle werden geteilt -- nicht veraendern.
+Protokolle werden geteilt – nicht veraendern.
 
 ### vollstaendig
 
@@ -173,7 +173,7 @@ Protokolle werden geteilt -- nicht veraendern.
 def vollstaendig() -> List[Thema]
 ```
 
-Jede Formel des Werkzeugs, zum Nachschlagen -- gleich, welches Projekt
+Jede Formel des Werkzeugs, zum Nachschlagen – gleich, welches Projekt
 offen ist und welche Nachweise darin laufen. Aus [[opencivil.bericht.formelsammlung#laeufe|laeufe]].
 
 ### anfuegen
@@ -187,9 +187,9 @@ Fuer den Bericht: je Thema ein Titel, die Erklaerungen, dann die Formeln.
 
 ## Konstanten
 
-- `_ZAHLENANGABE = re.compile('\\s*=\\s*-?\\d[\\d,]*\\.\\d+(?:\\s*[^\\s–,;)]+)?')` – Eine Zahlenangabe in einem Titel: `= -300.0 kN`. Die Herleitung nennt damit den Fall, die Sammlung zeigt die Formel ohne ihn. Nur mit Nachkommastelle -- `bei M_Ed = 0` ist eine Bedingung und bleibt.
+- `_ZAHLENANGABE = re.compile('\\s*=\\s*-?\\d[\\d,]*\\.\\d+(?:\\s*[^\\s–,;)]+)?')` – Eine Zahlenangabe in einem Titel: `= -300.0 kN`. Die Herleitung nennt damit den Fall, die Sammlung zeigt die Formel ohne ihn. Nur mit Nachkommastelle – `bei M_Ed = 0` ist eine Bedingung und bleibt.
 - `_GRUNDZEICHEN = re.compile('^[^_^({]*')` – Das Grundzeichen eines Ergebnisses: `\sigma_{s,adm,2,x}` -> `\sigma`. Ohne Index, denn der traegt Lage und Richtung; mit Zeichen, denn zwei Formeln mit derselben kurzen Vorlage (`@z`) und verschiedenen Ergebnissen sind verschiedene Formeln.
-- `_FALLWERTE = re.compile('\\([^()]*\\\\mathrm\\{[^()]*\\)')` – Fallwerte im Ergebnissymbol: `V_{Rd,x}(M_{Ed} = 150\,\mathrm{kNm}, ...)`. Erkannt an der Einheit -- eine Bedingung wie `(N_{Ed}=0)` bleibt.
+- `_FALLWERTE = re.compile('\\([^()]*\\\\mathrm\\{[^()]*\\)')` – Fallwerte im Ergebnissymbol: `V_{Rd,x}(M_{Ed} = 150\,\mathrm{kNm}, ...)`. Erkannt an der Einheit – eine Bedingung wie `(N_{Ed}=0)` bleibt.
 
 ## Braucht
 

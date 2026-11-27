@@ -43,7 +43,7 @@ bei. Als Kriterien nennt 16.5.2.1 darum in beiden Hauptrichtungen
 $T_1 \le 4 \cdot T_C$ (39) und einen regelmässigen Grundriss (16.5.1.3) und
 Aufriss (16.5.1.4). Der [[Erfüllungsgrad]] ist $T_{1,max}/T_1$.
 
-Fehlt eine Bedingung, gilt das Verfahren für das ganze Gebäude nicht --
+Fehlt eine Bedingung, gilt das Verfahren für das ganze Gebäude nicht –
 auch nicht für die Richtung, die sie erfüllt. Dann ist das
 Antwortspektrenverfahren anzuwenden (16.5.3.1). Die Zahlen bleiben stehen,
 die Meldung steht rot darüber und nennt jeden Grund.

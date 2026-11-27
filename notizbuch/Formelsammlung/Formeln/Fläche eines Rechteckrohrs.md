@@ -46,5 +46,5 @@ $$
 
 Das äussere Rechteck $b \times h$ minus das innere $(b - 2t) \times (h - 2t)$:
 ein Hohlprofil mit derselben Wanddicke ringsum. Die Ausrundungen an den Ecken
-eines gewalzten Profils fehlen -- sein Tabellenwert liegt darum etwas
+eines gewalzten Profils fehlen – sein Tabellenwert liegt darum etwas
 daneben.

@@ -1,5 +1,5 @@
 ---
-erzeugt: d848c94c7dd8
+erzeugt: e045967238e4
 art: modul
 tags: [modul]
 ---
@@ -11,7 +11,7 @@ tags: [modul]
 
 Aus der Beschreibung einer Querschnittsanalyse wird hier ein Bauteil wie die
 Platte ([[opencivil.querschnitt.platte#Plattenquerschnitt|Plattenquerschnitt]]): mit
-Namensraum, Ueberschrift, Werten und einer Herleitung des Querschnitts --
+Namensraum, Ueberschrift, Werten und einer Herleitung des Querschnitts –
 Polygone, Bruttoquerschnitt, Bewehrung, Schubwaende. Dazu, fuer sich,
 `I_T` ([[opencivil.querschnitt.torsion|torsion]]): es braucht nur ein Stab
 im Raum, und das Rechenwerk rechnet nur, was ein Ziel braucht. Die Nachweise bekommen
@@ -22,7 +22,7 @@ das Rechenwerk, damit jede rueckverfolgbar bleibt.
 ## DIE ZEICHNUNG WIRD HIER GEPRUEFT
 
 Kreuzt sich ein Polygon, ueberlappen sich zwei, liegt ein Stab nicht ganz im
-Beton oder eine Wand ausserhalb -- dann entsteht kein Bauteil, sondern ein
+Beton oder eine Wand ausserhalb – dann entsteht kein Bauteil, sondern ein
 [[opencivil.querschnitt.geometrie#GeometrieFehler|GeometrieFehler]] mit dem Element,
 das nicht stimmt. Ebenso, wenn die Baustoffe zusammen keine Bauweise sind
 ([[opencivil.querschnitt.bauweise|bauweise]]): ein Polygon ist aus Beton,
@@ -44,7 +44,7 @@ einmal in Meter umgerechnet ([[opencivil.querschnitt.analyse#Querschnittsanalyse
 def _zehntel(x: float) -> str
 ```
 
-Eine Zahl auf eine Stelle -- mit `+ 0.0`: ein Profil um die Mitte hat sonst y_S = -0.0.
+Eine Zahl auf eine Stelle – mit `+ 0.0`: ein Profil um die Mitte hat sonst y_S = -0.0.
 
 ### werkstoff
 
@@ -52,13 +52,13 @@ Eine Zahl auf eine Stelle -- mit `+ 0.0`: ein Profil um die Mitte hat sonst y_S 
 def werkstoff(stoff: Baustoff, wert: Callable[[str], float], wahl: Rechenwahl, *, ungerissen: bool=False) -> Werkstoff
 ```
 
-Ein Baustoff als Werkstoff der Interaktion -- die eine Stelle, die ihn
+Ein Baustoff als Werkstoff der Interaktion – die eine Stelle, die ihn
 baut, fuer den gezeichneten Querschnitt und den Pfahl. `wert` liefert
 zu einer Wert-ID die Zahl in SI.
 
 Beton: das Gesetz seiner Rechenart, gebaut wie bei der Platte
 ([[opencivil.querschnitt.gesetzwahl#betongesetz|betongesetz]]), der Beiwert der
-Parabel also aus `E_cm/(1+phi)` -- oder, `ungerissen`, linear in
+Parabel also aus `E_cm/(1+phi)` – oder, `ungerissen`, linear in
 Druck und Zug mit demselben Modul, aus derselben Stelle; gedrueckt bis
 `-eps_c2d` samt Punkt C, verdraengt von den Staeben. Betonstahl: bilinear,
 `±eps_ud`. Baustahl: elastisch-plastisch, in Zug und Druck gleich,
@@ -83,7 +83,7 @@ def gesetz_protokollieren(p: Protokoll, e: Eingaben, stoff: Baustoff, gesetz: Ge
 ```
 
 Das Gesetz eines Baustoffs in die Herleitung, mit den Kennwerten, aus
-denen es gebaut ist ([[opencivil.querschnitt.analyse#werkstoff|werkstoff]]) -- gelesen aus `e` unter
+denen es gebaut ist ([[opencivil.querschnitt.analyse#werkstoff|werkstoff]]) – gelesen aus `e` unter
 [[opencivil.material.basis#Baustoff.eingabename|eingabename]].
 
 ### Lastfall
@@ -120,13 +120,13 @@ def kennung(self) -> str
 class Flaechenteil
 ```
 
-Ein Polygon der Zeichnung -- Ecken in mm, ohne Material eine Aussparung.
+Ein Polygon der Zeichnung – Ecken in mm, ohne Material eine Aussparung.
 
 - `name: str`
 - `kennung: str`
 - `punkte: Tuple[Punkt, ...]`
 - `stoff: Optional[Baustoff]`
-- `profil: Optional[Profillage] = None` – Beim Umriss eines Stahlprofils seine Lage -- daraus kennt der Stahlbau seine Bleche.
+- `profil: Optional[Profillage] = None` – Beim Umriss eines Stahlprofils seine Lage – daraus kennt der Stahlbau seine Bleche.
 
 #### Flaechenteil.herkunft
 
@@ -135,7 +135,7 @@ Ein Polygon der Zeichnung -- Ecken in mm, ohne Material eine Aussparung.
 def herkunft(self) -> str
 ```
 
-Was es ist, wenn mehr als ein Polygon: beim Stahlprofil «HEB 300» -- so steht es im Bericht.
+Was es ist, wenn mehr als ein Polygon: beim Stahlprofil «HEB 300» – so steht es im Bericht.
 
 ### Wandangabe
 
@@ -185,7 +185,7 @@ Text nennt sie beim Namen, `elemente` traegt ihre Kennungen.
 
 - `text: str`
 - `elemente: Tuple[str, ...]`
-- `fehler: bool = True` – Ob etwas nicht stimmt -- sonst fehlt nur etwas, und die Zeichnung ist unfertig: «Es gibt kein Polygon mit Material» bei Bewehrung allein.
+- `fehler: bool = True` – Ob etwas nicht stimmt – sonst fehlt nur etwas, und die Zeichnung ist unfertig: «Es gibt kein Polygon mit Material» bei Bewehrung allein.
 
 ### Zeichnung
 
@@ -193,19 +193,19 @@ Text nennt sie beim Namen, `elemente` traegt ihre Kennungen.
 class Zeichnung
 ```
 
-Die Zeichnung einer Analyse, geprueft -- in mm und ohne Rechenwerk.
+Die Zeichnung einer Analyse, geprueft – in mm und ohne Rechenwerk.
 
 Sammelt jede Meldung, statt bei der ersten abzubrechen: das Zeichenfenster
 zeigt sie alle auf einmal, jede an ihrem Element. Das Bauteil
-([[opencivil.querschnitt.analyse#Querschnittsanalyse|Querschnittsanalyse]]) baut darauf und bricht bei der ersten ab --
+([[opencivil.querschnitt.analyse#Querschnittsanalyse|Querschnittsanalyse]]) baut darauf und bricht bei der ersten ab –
 gerechnet wird nur, was ganz stimmt. Dieselben Pruefungen an einer Stelle.
 
 Jedes Element ist ein Woerterbuch mit `name` und `kennung`, wie sie
-[[opencivil.querschnitt.analyse#Zeichnung|QuerschnittsanalyseEintrag.elemente]] vergibt -- benannt wird hier
+[[opencivil.querschnitt.analyse#Zeichnung|QuerschnittsanalyseEintrag.elemente]] vergibt – benannt wird hier
 nichts. `polygone` tragen `punkte`, `traegt` (ohne Material ist
 es eine Aussparung), `beton`: ob Bewehrung in ihm liegen darf
 ([[opencivil.querschnitt.bauweise#Konstanten|BEWEHRT]]), und `profil`: beim
-Umriss eines Stahlprofils seine Lage, sonst `None` -- ein Polygon mit
+Umriss eines Stahlprofils seine Lage, sonst `None` – ein Polygon mit
 Material darin ersetzte seinen Stahl und ist ein Fehler, im Loch eines
 Rohrs dagegen fuellt es das Rohr. `staebe` `lage`
 und `durchmesser`, `linien` und `waende` die Felder der
@@ -239,7 +239,7 @@ def innerstes(self, p: Punkt) -> Optional[int]
 def _linie(self, l: Mapping) -> Optional[geo.Stablinie]
 ```
 
-Die aufgeloeste Linie -- auch wenn ein Stab danebenliegt, fuer die Zeichnung.
+Die aufgeloeste Linie – auch wenn ein Stab danebenliegt, fuer die Zeichnung.
 
 #### Zeichnung._zellen
 
@@ -251,7 +251,7 @@ Die geschlossenen Flaechen der Wandachsen, als Umriss und Flaeche, in mm.
 
 Gesucht wird in Metern, wie im Nachweis: die Toleranz, ab der zwei
 Wandenden ein Knoten sind, ist eine Laenge. In Millimetern gesucht,
-hiesse sie hier etwas anderes als dort -- und das Fenster zeigte eine
+hiesse sie hier etwas anderes als dort – und das Fenster zeigte eine
 Zelle nicht, mit der gerechnet wird.
 
 ### Herleitungsteil
@@ -260,7 +260,7 @@ Zelle nicht, mit der gerechnet wird.
 class Herleitungsteil(Prozedur)
 ```
 
-Ein Teil der Herleitung des Querschnitts -- die Analyse schreibt ihn selbst.
+Ein Teil der Herleitung des Querschnitts – die Analyse schreibt ihn selbst.
 
 #### Herleitungsteil.rechne
 
@@ -319,7 +319,7 @@ die Staehle, zuletzt der Spannstahl.
 def baustoffe_mit_werkstoff(self) -> List[Baustoff]
 ```
 
-Die Baustoffe mit je einem Werkstoff im Querschnitt -- alle ausser dem
+Die Baustoffe mit je einem Werkstoff im Querschnitt – alle ausser dem
 Spannstahl: jedes Spannglied hat seinen eigenen, nach diesen
 ([[opencivil.querschnitt.analyse#Querschnittsanalyse.werkstoffe|werkstoffe]]).
 
@@ -335,7 +335,7 @@ def aufbau_protokollieren(self, p: Protokoll) -> Dict[str, Groesse]
 def torsion_protokollieren(self, p: Protokoll) -> Dict[str, Groesse]
 ```
 
-`I_T` nach St. Venant, numerisch -- mit den beiden Gittern, aus denen
+`I_T` nach St. Venant, numerisch – mit den beiden Gittern, aus denen
 es kommt. Unter eigener Ueberschrift: gerechnet wird es, wenn es einer
 braucht, oft nach den Nachweisen.
 
@@ -345,7 +345,7 @@ braucht, oft nach den Nachweisen.
 def _bewehrung_protokollieren(self, p: Protokoll) -> float
 ```
 
-Die Bewehrung als Tabelle, das Profilblech fuer sich -- zurueck ihre Stahlflaeche.
+Die Bewehrung als Tabelle, das Profilblech fuer sich – zurueck ihre Stahlflaeche.
 
 #### Querschnittsanalyse.angaben
 
@@ -354,7 +354,7 @@ def angaben(self) -> Tuple[GleichungBlock, Optional[TabellenBlock]]
 ```
 
 Was ueber der Nachweistabelle steht: die Werkstoffe der Flaechen,
-Flaeche, Schwerpunkt; die Bewehrung -- ohne Stab, Spannglied und Wand,
+Flaeche, Schwerpunkt; die Bewehrung – ohne Stab, Spannglied und Wand,
 etwa beim Stahl, keine Tabelle.
 
 #### Querschnittsanalyse.werkstoffbezuege
@@ -372,7 +372,7 @@ def stoff_von_werkstoff(self, w: int) -> Baustoff
 ```
 
 Der Baustoff hinter einem Werkstoff des Querschnitts ([[opencivil.querschnitt.analyse#Querschnittsanalyse.werkstoffe|werkstoffe]])
--- bei dem eines Spannglieds sein Spannstahl.
+– bei dem eines Spannglieds sein Spannstahl.
 
 #### Querschnittsanalyse.kennwert
 
@@ -399,7 +399,7 @@ Spannungen und Knicken die des Kapitels.
 def querschnitt(self, wert: Callable[[str], float], wahl: Rechenwahl, *, ungerissen: bool=False) -> Tuple[Querschnitt, List[Bewehrungselement], Dict[int, Stahlgesetz]]
 ```
 
-Der Querschnitt mit den Gesetzen einer Rechenwahl -- dazu je
+Der Querschnitt mit den Gesetzen einer Rechenwahl – dazu je
 Bewehrung ihr Element und je Stahl sein Gesetz,
 nach dem Index des Werkstoffs. `wert` liefert zu einer Wert-ID die
 Zahl in SI. Zerlegt in so viele Streifen, wie die Platte Fasern hat
@@ -411,7 +411,7 @@ Zahl in SI. Zerlegt in so viele Streifen, wie die Platte Fasern hat
 def werkstoffe_protokollieren(self, p: Protokoll, e: Eingaben, basis: str) -> None
 ```
 
-Die Gesetze, mit denen gerechnet wird, je Material mit seiner Wahl --
+Die Gesetze, mit denen gerechnet wird, je Material mit seiner Wahl –
 jedes schreibt sich selbst, mit den Werten darin. Ohne Kriechen: die
 Parabel haengt hier an `E_cm`.
 
@@ -421,7 +421,7 @@ Parabel haengt hier an `E_cm`.
 def gliedgesetze_protokollieren(self, p: Protokoll, e: Eingaben, werkstoffe: Sequence[Werkstoff], wahl: Rechenwahl, *, titel: Callable[[Spannglied], str], basis: str) -> None
 ```
 
-Die Gesetze der Spannglieder -- `werkstoffe` die von [[opencivil.querschnitt.analyse#Querschnittsanalyse.werkstoffe|werkstoffe]].
+Die Gesetze der Spannglieder – `werkstoffe` die von [[opencivil.querschnitt.analyse#Querschnittsanalyse.werkstoffe|werkstoffe]].
 
 #### Querschnittsanalyse.grundbezuege
 
@@ -439,7 +439,7 @@ def interaktion(self, e: Eingaben) -> Tuple[Querschnitt, List[Bewehrungselement]
 ```
 
 Der Querschnitt im Bruchzustand, mit den gewaehlten Werkstoffgesetzen
-und dem Schwerpunkt aus dem Rechenwerk als Bezugspunkt -- dazu je
+und dem Schwerpunkt aus dem Rechenwerk als Bezugspunkt – dazu je
 Bewehrung das Element, aus dem sie stammt.
 
 #### Querschnittsanalyse.geometrie
@@ -448,7 +448,7 @@ Bewehrung das Element, aus dem sie stammt.
 def geometrie(self, index_von: Callable[[Baustoff], int]) -> Tuple[List[Teil], List[Bewehrung], List[Bewehrungselement]]
 ```
 
-Polygone und Bewehrung in Metern, mit den Werkstoffen als Index --
+Polygone und Bewehrung in Metern, mit den Werkstoffen als Index –
 dazu je Bewehrung das Element, aus dem sie stammt: sein Name steht in
 der Probe, sein Durchmesser bestimmt die Rissbreite. Die Spannglieder
 kommen zuletzt, je mit ihrem eigenen Werkstoff, der nach denen der
@@ -470,7 +470,7 @@ def schubwaende_mit(self, e: Eingaben) -> List[Wand]
 ```
 
 Die Schubwaende mit den Festigkeiten ihrer Werkstoffe, wie deren
-Rechenwahl sie waehlt: `f_yd` der Buegel -- ohne Buegel null --,
+Rechenwahl sie waehlt: `f_yd` der Buegel – ohne Buegel null –,
 `f_cd` des Betons, in dem die Wand liegt. Der Nachweis der Waende
 und die Kennzahlen lesen sie hier.
 
@@ -497,12 +497,12 @@ Was die Schubwaende ausser den Werkstoffen lesen: die Neigungsgrenzen und k_c.
 def beton_ecken(self) -> List[Tuple[Punkt, Baustoff]]
 ```
 
-Jede Ecke eines Polygons mit Material -- fuer das Rissmoment, in mm.
+Jede Ecke eines Polygons mit Material – fuer das Rissmoment, in mm.
 
 
 ## Konstanten
 
-- `KENNWERTE = {Baustoffart.BETON: ('f_ck', 'f_cd', 'eps_c1d', 'eps_c2d', 'f_ctm', '…` – Die Kennwerte, die die Nachweise eines Werkstoffs lesen -- je Art alle, die eine der Wahlen braucht. Das Rechenwerk rechnet sie ohnehin. Aus `E_cm` entsteht der Beiwert der Parabel, wie bei der Platte, beim Knicken aus `E_cd`; der Gebrauchszustand rechnet mit `E_cm/(1+phi)`.
+- `KENNWERTE = {Baustoffart.BETON: ('f_ck', 'f_cd', 'eps_c1d', 'eps_c2d', 'f_ctm', '…` – Die Kennwerte, die die Nachweise eines Werkstoffs lesen – je Art alle, die eine der Wahlen braucht. Das Rechenwerk rechnet sie ohnehin. Aus `E_cm` entsteht der Beiwert der Parabel, wie bei der Platte, beim Knicken aus `E_cd`; der Gebrauchszustand rechnet mit `E_cm/(1+phi)`.
 
 ## Braucht
 

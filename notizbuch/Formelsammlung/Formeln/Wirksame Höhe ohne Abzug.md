@@ -62,6 +62,6 @@ Beim Durchstanzen ist $d$ das Mittel der beiden Lagen der Zugbewehrung
 wirksame Höhe $d_v$ ist kleiner, wenn die gestützte Fläche in die Platte
 reicht (Figur 21); reicht sie nicht hinein, ist $d_v = d$.
 
-Bis 2026-10-30 hiess die Seite «Wirksame Höhe (Einlage nicht massgebend)» --
+Bis 2026-10-30 hiess die Seite «Wirksame Höhe (Einlage nicht massgebend)» –
 seit das Durchstanzen dieselbe Formel schreibt, trägt sie einen Namen, der
 für beide passt.

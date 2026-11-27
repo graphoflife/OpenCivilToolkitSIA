@@ -22,8 +22,8 @@ nimmt $E_a$ für die Steifigkeit und $\rho_a$ für das
 noch keine.
 
 Die Sortentabelle (SIA 263:2013, 3.2.2.3, Tabelle 1) gibt je Sorte drei
-Festigkeiten -- Streckgrenze $f_y$, Fliessschubspannung $\tau_y$,
-Zugfestigkeit $f_u$ --, und das zweimal: für Dicken bis 40 mm und darüber
+Festigkeiten – Streckgrenze $f_y$, Fliessschubspannung $\tau_y$,
+Zugfestigkeit $f_u$ –, und das zweimal: für Dicken bis 40 mm und darüber
 bis 100 mm. Ein dickeres Blech ist schwächer, S355 etwa 335 statt
 355 N/mm². Welche Spalte gilt, hängt am Blech oder Profil, nicht am
 Material; darum stehen beide als Kennwerte da, die dicke mit $t>40$ oben.

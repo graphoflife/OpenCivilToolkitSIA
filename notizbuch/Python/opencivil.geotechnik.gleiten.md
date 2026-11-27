@@ -1,5 +1,5 @@
 ---
-erzeugt: da4aa720ec3f
+erzeugt: 19f83fc40bfe
 art: modul
 tags: [modul]
 ---
@@ -10,7 +10,7 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Der Nachweis [[opencivil.geotechnik.gleiten#Gleiten|Gleiten]]: je Einwirkungskombination der
-Gleitwiderstand in der Sohle nach SIA 267:2013, 8.5.2.2 -- drainiert
+Gleitwiderstand in der Sohle nach SIA 267:2013, 8.5.2.2 – drainiert
 T_Rd = N_Ed · tan delta_d, mit delta_k = min(k_delta · phi_k; 35°) nach
 8.4.1.1 und tan delta_d = tan delta_k / gamma_phi; undrainiert
 T_Rd = b · L · s_u,d, Gl. (32). Das Fundament und seine Bemessungswerte
@@ -30,8 +30,8 @@ class Gleiten(Fundamentnachweis)
 ```
 
 Der Gleitwiderstand in der Sohle je Kombination nach SIA 267:2013,
-8.5.2.2 -- drainiert aus der Reibung, undrainiert aus der Scherfestigkeit
---, ohne Erdwiderstand, wie im Buch für eine geneigte Sohle.
+8.5.2.2 – drainiert aus der Reibung, undrainiert aus der Scherfestigkeit
+–, ohne Erdwiderstand, wie im Buch für eine geneigte Sohle.
 
 - `THEMA = 'Gleiten'`
 - `ART = 'GL'`
@@ -65,7 +65,7 @@ Drainiert die Reibung unter N, undrainiert die Scherfestigkeit auf der Sohlfläc
 
 ## Konstanten
 
-- `SOHLREIBUNG_GRENZE = 35.0` – Wie gross der Sohlreibungswinkel delta_k höchstens ist, in Grad -- SIA 267:2013, 8.4.1.1.
+- `SOHLREIBUNG_GRENZE = 35.0` – Wie gross der Sohlreibungswinkel delta_k höchstens ist, in Grad – SIA 267:2013, 8.4.1.1.
 
 ## Braucht
 

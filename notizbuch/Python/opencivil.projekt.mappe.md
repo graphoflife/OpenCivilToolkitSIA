@@ -1,5 +1,5 @@
 ---
-erzeugt: 0a84bb32f13e
+erzeugt: 83e08301ce2b
 art: modul
 tags: [modul]
 ---
@@ -10,7 +10,7 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Die [[opencivil.projekt.mappe#Mappe|Mappe]] haelt die Projekte, die zusammen gespeichert und geoeffnet
-werden -- «Wohnhaus», «Halle». Gerechnet wird je Projekt, jedes fuer sich;
+werden – «Wohnhaus», «Halle». Gerechnet wird je Projekt, jedes fuer sich;
 die Mappe prueft nur, was zwischen ihnen gilt: es gibt mindestens eines, und
 jedes heisst anders. Am Namen erkennt man ein Projekt in der Oberflaeche, in
 Meldungen und im Zwischenspeicher des Dienstes ([[opencivil.web.speicher]]).
@@ -32,7 +32,7 @@ def projekt_aus_datei(roh: Any) -> Projekt
 ```
 
 Ein Projekt, wie es in einer Datei steht: erkannt ([[opencivil.projekt.mappe#Konstanten|KENNFELDER]]),
-gelesen und geprueft -- durch denselben Leser wie alles andere
+gelesen und geprueft – durch denselben Leser wie alles andere
 ([[opencivil.projekt.lesen]]), nicht durch eine zweite Pruefung in
 JavaScript. Alte Formate liest er nicht; eine solche Datei nennt das
 erste Feld, das er nicht kennt.
@@ -52,7 +52,7 @@ Wie das Projekt an Stelle `i` in Meldungen heisst: «Projekt 'Halle'», ohne Nam
 def _im(wer: str) -> Iterator[None]
 ```
 
-Ein Fehler darin nennt sein Projekt zuerst -- «Projekt 'Halle', Platte
+Ein Fehler darin nennt sein Projekt zuerst – «Projekt 'Halle', Platte
 'Decke': …»: in einer Mappe steht eine Platte 'Decke' vielleicht in
 jedem Projekt. Wo der Ort schon das Projekt ist, steht es einmal.
 
@@ -98,13 +98,13 @@ def aus_dict(cls, roh: Any) -> 'Mappe'
 ```
 
 Eine Mappe aus der Datei, gelesen und geprueft. Ohne `projekte` ist
-es ein einzelnes Projekt, wie bis 2026-11-20 gespeichert -- die Mappe
+es ein einzelnes Projekt, wie bis 2026-11-20 gespeichert – die Mappe
 hat dann dieses eine, und seine Meldungen lauten wie damals.
 
 
 ## Konstanten
 
-- `KENNFELDER = ('name', 'materialien', *(art.liste for art in BAUTEILE))` – Woran ein Projekt in einer Datei zu erkennen ist -- mindestens eines davon muss dastehen. Jedes Feld eines Projekts hat eine Vorgabe, `{}` liest sich darum als leeres Projekt: wer beim Oeffnen eine falsche Datei erwischte, bekaeme wortlos ein leeres und haette seine Arbeit verloren.
+- `KENNFELDER = ('name', 'materialien', *(art.liste for art in BAUTEILE))` – Woran ein Projekt in einer Datei zu erkennen ist – mindestens eines davon muss dastehen. Jedes Feld eines Projekts hat eine Vorgabe, `{}` liest sich darum als leeres Projekt: wer beim Oeffnen eine falsche Datei erwischte, bekaeme wortlos ein leeres und haette seine Arbeit verloren.
 
 ## Braucht
 

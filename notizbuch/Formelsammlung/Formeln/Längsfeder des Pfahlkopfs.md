@@ -43,8 +43,8 @@ Wie weit sich der Kopf unter einer Normalkraft setzt, als Feder für das
 Modell des Tragwerks: die Kraft durch die Setzung. Weil alles linear ist,
 gibt jede Last dieselbe Feder; das Werkzeug setzt 1 MN an.
 
-Auf Druck tragen Mantel und Fuss, auf Zug nur der Mantel -- die Zugfeder
+Auf Druck tragen Mantel und Fuss, auf Zug nur der Mantel – die Zugfeder
 ist darum weicher. Gerechnet wird mit E_s,k: in der Gebrauchstauglichkeit
 zählen die Kennwerte des Bodens ohne Faktor (SIA 267:2013, 5.3.2.8).
 ⌀ 900 mm, 12 m lang, aus C30/37 in E_s,k = 30 MN/m²: 468 MN/m auf Druck,
-396 MN/m auf Zug -- dieselben Zahlen wie die geschlossene Lösung von Cassan.
+396 MN/m auf Zug – dieselben Zahlen wie die geschlossene Lösung von Cassan.

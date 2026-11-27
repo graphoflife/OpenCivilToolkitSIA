@@ -38,7 +38,7 @@ Für ein beliebiges Polygon gibt es keine Formel für I\_T. Gerechnet wird mit d
 
 Neben der Platte kennt das Werkzeug den gezeichneten Querschnitt: beliebige
 Polygone, jedes mit seinem Material, dazu Stäbe, Stablinien und Schubwände.
-Ein Unterzug, ein Hohlkasten, eine Stütze mit Aussparung -- was sich zeichnen
+Ein Unterzug, ein Hohlkasten, eine Stütze mit Aussparung – was sich zeichnen
 lässt, lässt sich rechnen.
 
 Aus der Zeichnung entstehen zuerst die Querschnittswerte: Fläche,

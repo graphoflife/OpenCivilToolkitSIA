@@ -23,6 +23,6 @@ $$
 ## Theorie
 
 Wie viel Bügelfläche eine Schubwand je Länge hat: die Fläche eines Bügelstabs
-mal die Zahl der Schnitte durch die Wand -- ein geschlossener Bügel schneidet
-zweimal -- geteilt durch den Abstand. Das ist $A_{sw}/s$ im
+mal die Zahl der Schnitte durch die Wand – ein geschlossener Bügel schneidet
+zweimal – geteilt durch den Abstand. Das ist $A_{sw}/s$ im
 [[Widerstand einer Wand (Fachwerk, ihre Länge l als Hebelarm)|Fachwerkwiderstand]].

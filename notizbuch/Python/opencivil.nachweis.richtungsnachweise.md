@@ -1,5 +1,5 @@
 ---
-erzeugt: 20c988a817da
+erzeugt: 56ac1fe81130
 art: modul
 tags: [modul]
 ---
@@ -12,12 +12,12 @@ tags: [modul]
 Zwei Nachweise, die wie bei der Platte dem Querschnitt gehoeren und keinem
 Lastfall: Duktilitaet (`x/d`) und sproedes Versagen (`M_Rd >= M_Riss`).
 Wo die Platte je Lage fragt, fragt der gezeichnete Querschnitt je Richtung:
-Zug unten, oben, links, rechts -- einachsig nur unten und oben. In der
+Zug unten, oben, links, rechts – einachsig nur unten und oben. In der
 Zusammenfassung steht die unguenstigere ([[opencivil.nachweis.richtungsnachweise#Richtungsnachweis|Richtungsnachweis]]).
 
 Gerechnet wird bei reiner Biegung, `N = 0`, mit dem Bruchzustand aus
 [[opencivil.querschnitt.interaktion]]. Eine Richtung ohne Bewehrung auf
-ihrer gezogenen Seite des Schwerpunkts hat keinen solchen Nachweis -- dort
+ihrer gezogenen Seite des Schwerpunkts hat keinen solchen Nachweis – dort
 steht ein Satz und kein Urteil, wie bei einer unbewehrten Lage der Platte.
 
 
@@ -25,7 +25,7 @@ steht ein Satz und kein Urteil, wie bei einer unbewehrten Lage der Platte.
 
 Das Rissmoment gehoert dem ungerissenen Bruttoquerschnitt: unter reiner
 Biegung das Moment, bei dem `f_ct,eff` zum ersten Mal irgendwo erreicht
-wird -- mit `I_yz`, einachsig mit waagrechter Nulllinie. Es steht mit den
+wird – mit `I_yz`, einachsig mit waagrechter Nulllinie. Es steht mit den
 uebrigen Rissgroessen an einer Stelle ([[opencivil.nachweis.rissgroessen]]);
 die Zwaengung auf Biegung ([[opencivil.nachweis.qa_gebrauch]]) haelt
 dasselbe Rissmoment gegen ihre Bewehrung.
@@ -38,7 +38,7 @@ dasselbe Rissmoment gegen ihre Bewehrung.
 def grade_je_seite(basis: str, symbol: str, beschreibung: str, referenz: str, analyse: Querschnittsanalyse) -> Dict[str, WertDef]
 ```
 
-Je Zugseite der Analyse ein Erfuellungsgrad -- Kennung, Zeichen und Text
+Je Zugseite der Analyse ein Erfuellungsgrad – Kennung, Zeichen und Text
 nach einem Muster fuer alle Nachweise des gezeichneten Querschnitts, die
 je Seite urteilen: `alpha_{eff,<symbol>,<Seite>}`.
 

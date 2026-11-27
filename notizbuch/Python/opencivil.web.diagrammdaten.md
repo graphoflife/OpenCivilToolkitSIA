@@ -1,5 +1,5 @@
 ---
-erzeugt: 0f0d3a1b999e
+erzeugt: 81f05a2e7411
 art: modul
 tags: [modul]
 ---
@@ -30,7 +30,7 @@ def linien(aufbau: Aufbau, loesung: Loesung) -> dict
 ```
 
 Je gerechneter M-N-Nachweis seine Linien, dazu die Bemessungs- und
-Knickpunkte -- und die Kennung seines Bauteils, damit niemand sie aus
+Knickpunkte – und die Kennung seines Bauteils, damit niemand sie aus
 dem Schluessel lesen muss.
 
 ### querkraftkurven
@@ -39,7 +39,7 @@ dem Schluessel lesen muss.
 def querkraftkurven(aufbau: Aufbau, loesung: Loesung) -> dict
 ```
 
-Der Querkraftwiderstand ueber dem Moment -- eine Kurve je Tragrichtung.
+Der Querkraftwiderstand ueber dem Moment – eine Kurve je Tragrichtung.
 
 Eine je Platte ohne Buegel, auch ohne Querkraft: dann rechnet der
 Nachweis still, nur fuer dieses Bild. Die Waagrechte ist vorzeichenbehaftet: rechts das positive
@@ -47,12 +47,12 @@ Moment (Zug unten), links das negative (Zug oben). Beide Aeste im selben
 Bild, weil sie dieselbe Platte beschreiben.
 
 Einen Ast gibt es nur, wo auf der gezogenen Seite Bewehrung liegt. Fehlt
-sie, gibt es kein `d` -- und ohne `d` keinen Widerstand.
+sie, gibt es kein `d` – und ohne `d` keinen Widerstand.
 
 `v_Rd` haengt ueber `m_Rd(N_Ed)` von der Normalkraft ab. Welche gilt,
 waehlt der Benutzer unter dem Diagramm, und sie steht an der Platte
 (`querkraftkurve_normalkraft`). Ohne Angabe gilt die des ersten Falls
-dieser Richtung -- dann liegen dessen Punkte auf der Kurve --, ohne Fall
+dieser Richtung – dann liegen dessen Punkte auf der Kurve –, ohne Fall
 null; was gilt, sagt `hinweis` unter dem Feld.
 
 Die Einheiten stehen in [[opencivil.web.diagrammdaten#Konstanten|MV]].
@@ -65,7 +65,7 @@ def neigungskurven(aufbau: Aufbau, loesung: Loesung) -> dict
 
 Der Querkraftwiderstand ueber der Neigung der Druckdiagonalen.
 
-Nur wo Buegel liegen -- sonst haengt der Widerstand am Moment und das
+Nur wo Buegel liegen – sonst haengt der Widerstand am Moment und das
 andere Diagramm gilt.
 
 **Ein Bild je statischer Hoehe und Neigungsbereich.** Beides haengt am
@@ -74,7 +74,7 @@ der Normalkraft. Faelle, die darin uebereinstimmen, liegen auf derselben
 Kurve und kommen ins selbe Bild; die anderen bekommen ihr eigenes.
 
 Gezeichnet wird ueber den ganzen Achsenbereich, auch ausserhalb der beiden
-Grenzen -- dort blass. Die Oberflaeche entscheidet das an `gewaehlt`,
+Grenzen – dort blass. Die Oberflaeche entscheidet das an `gewaehlt`,
 gerechnet wird beides hier.
 
 ### _bild_dict
@@ -92,7 +92,7 @@ def spannungsanalysen(aufbau: Aufbau, loesung: Loesung, *, nur: Optional[Collect
 ```
 
 Die Auswertungen am Querschnitt, je Platte und je gezeichnetem Querschnitt
--- fertig zum Zeichnen; mit `nur` die dieser Bauteile.
+– fertig zum Zeichnen; mit `nur` die dieser Bauteile.
 
 Gerechnet wird in [[opencivil.spannungsanalyse.analysen]]; hier wird
 nur in Zeichengroessen abgebildet.
@@ -103,7 +103,7 @@ nur in Zeichengroessen abgebildet.
 def liniengroessen(art) -> Optional[dict]
 ```
 
-Was die Linie einer Frage zeigt -- Kraft, Festgehaltenes, Verformung --,
+Was die Linie einer Frage zeigt – Kraft, Festgehaltenes, Verformung –,
 wie es in ihren Daten steht; `None` fuer die beiden Bilder. Fuer den
 Katalog: die Maske nennt damit, wie weit eine Linie laeuft.
 
@@ -114,7 +114,7 @@ def _linie_dict(linie) -> dict
 ```
 
 Eine Linie in Zeichengroessen: die Kraft in kNm bzw. kN, die Verformung
-als Kruemmung in 1/m bzw. als Dehnung in Promille -- und unter
+als Kruemmung in 1/m bzw. als Dehnung in Promille – und unter
 `groessen` Zeichen und Einheit dazu ([[opencivil.web.diagrammdaten#Konstanten|_LINIENGROESSEN]]).
 
 ### _modul_dict
@@ -125,7 +125,7 @@ def _modul_dict(modul) -> dict
 
 Der aequivalente E-Modul in Zeichengroessen: die laufende Kraft in kNm
 bzw. kN, der Modul in N/mm², dazu der Modul, an dem er sich misst
-(`bezug`: beim Stahlbeton E_cm, sonst der des Materials) -- und sein
+(`bezug`: beim Stahlbeton E_cm, sonst der des Materials) – und sein
 Vielfaches davon, wo er angeschrieben wird: je Punkt daneben, an den
 Ecken mit ihm (`{"wert", "vielfaches"}`). Gerechnet ist alles im Kern
 ([[opencivil.spannungsanalyse.modul#Modullinie|Modullinie]]); bis 2026-10-18 teilte
@@ -141,7 +141,7 @@ Die Knicknachweise als Punktepaare fuer das M-N-Diagramm.
 
 Zu jedem Fall zwei Punkte auf derselben Hoehe N_Ed: das Moment 1. Ordnung
 und das am verformten System. Die Strecke dazwischen ist der Zuwachs aus
-Schiefstellung und Verformung -- im Diagramm sieht man sofort, ob er den
+Schiefstellung und Verformung – im Diagramm sieht man sofort, ob er den
 Punkt ueber die Linie schiebt.
 
 Nur in x-Richtung, denn nur dort gibt es einen Knicknachweis.
@@ -152,7 +152,7 @@ Nur in x-Richtung, denn nur dort gibt es einen Knicknachweis.
 def _knicken(aufbau, nachweis)
 ```
 
-Der Knicknachweis zu diesem M-N-Nachweis -- nur in x, nur wenn es ihn gibt.
+Der Knicknachweis zu diesem M-N-Nachweis – nur in x, nur wenn es ihn gibt.
 
 ### _linienzug
 
@@ -161,7 +161,7 @@ def _linienzug(linie) -> Optional[dict]
 ```
 
 Eine Resistenzlinie zum Zeichnen. `ecken`: ob ihre Punkte Eckpunkte mit
-Namen sind -- beim Polygon der Handrechnung --, oder Stuetzstellen eines
+Namen sind – beim Polygon der Handrechnung –, oder Stuetzstellen eines
 Randes, die man nicht einzeln markiert.
 
 ### linie
@@ -170,7 +170,7 @@ Randes, die man nicht einzeln markiert.
 def linie(nachweis, loesung: Loesung, aufbau=None) -> dict
 ```
 
-Die M-N-Interaktionslinien zum Zeichnen -- in den Grössen von [[opencivil.web.diagrammdaten#Konstanten|MN]].
+Die M-N-Interaktionslinien zum Zeichnen – in den Grössen von [[opencivil.web.diagrammdaten#Konstanten|MN]].
 
 Die massgebende Linie, gegen die nachgewiesen wird, und daneben die zum
 Vergleich: die Parabel neben der Handrechnung, sonst die Handrechnung.
@@ -183,10 +183,10 @@ oder bringt.
 def analyse(aufbau: Aufbau, loesung: Loesung, kennung: str, schnitt: Tuple[str, float]=('M_z', 0.0)) -> dict
 ```
 
-Die Diagramme einer Querschnittsanalyse -- in mm, kN und kNm.
+Die Diagramme einer Querschnittsanalyse – in mm, kN und kNm.
 
 Das Interaktionsdiagramm: die Flaeche aller Bruchzustaende, geschnitten
-bei `schnitt` -- der festen Groesse (N, M_y oder M_z) und ihrem Wert in
+bei `schnitt` – der festen Groesse (N, M_y oder M_z) und ihrem Wert in
 kN bzw. kNm. Welche beiden anderen auf welcher Achse stehen, waehlt die
 Oberflaeche; die Punkte tragen alle drei. Es ist das einzige
 Interaktionsdiagramm der Analyse: je Lastfall stehen darin seine
@@ -194,16 +194,16 @@ Einwirkung und der Widerstand seines Nachweises, ebenfalls mit allen
 drei Groessen.
 
 Je Lastfall ausserdem der Bruchzustand im Schnitt (Nulllinie, Druckzone,
-die Dehnung jedes Stabs) und der Schubfluss in den Waenden -- oder je ein
+die Dehnung jedes Stabs) und der Schubfluss in den Waenden – oder je ein
 Satz, warum es das Bild nicht gibt. Was die
 Nachweise schon wissen, kommt aus ihren Befunden in `loesung`; neu
-gerechnet wird nur die Flaeche, nach der kein Nachweis fragt -- an
+gerechnet wird nur die Flaeche, nach der kein Nachweis fragt – an
 demselben Querschnitt.
 
 Die Einwirkung steht so da, wie nachgewiesen: mit der Laengszugkraft aus
 Querkraft und Torsion, wo sie zugeschaltet ist.
 
-Ein Querschnitt ohne Interaktionsdiagramm -- aus Holz oder Stahl -- hat
+Ein Querschnitt ohne Interaktionsdiagramm – aus Holz oder Stahl – hat
 weder die Flaeche noch Lastfaelle; `ohne_diagramm` sagt in einem Satz,
 warum ([[opencivil.projekt.aufbau.querschnittsanalyse#ohne_diagramm|ohne_diagramm]]).
 Beim Stahlbeton ist er leer.
@@ -214,7 +214,7 @@ Beim Stahlbeton ist er leer.
 def _als_kn(punkte) -> List[dict]
 ```
 
-Punkte `(N, M_y, M_z)` in N und Nm -- fuer die Oberflaeche in kN und kNm.
+Punkte `(N, M_y, M_z)` in N und Nm – fuer die Oberflaeche in kN und kNm.
 
 ### _faecherpaar
 
@@ -222,7 +222,7 @@ Punkte `(N, M_y, M_z)` in N und Nm -- fuer die Oberflaeche in kN und kNm.
 def _faecherpaar(q, psi: float)
 ```
 
-Der Faecher bei ψ und der gegenueber -- zusammen eine geschlossene Linie.
+Der Faecher bei ψ und der gegenueber – zusammen eine geschlossene Linie.
 
 ### _interaktion
 
@@ -235,7 +235,7 @@ geschnitten bei `fest = wert` (kN bzw. kNm).
 
 Einachsig gibt es nur die Linie um y: die Nulllinie bleibt waagrecht,
 und das M_z, das ein unsymmetrischer Querschnitt dabei weckt, zaehlt
-nicht -- dieselben Faecher wie im Nachweis.
+nicht – dieselben Faecher wie im Nachweis.
 
 ### _tiefe
 
@@ -243,7 +243,7 @@ nicht -- dieselben Faecher wie im Nachweis.
 def _tiefe(eltern: Sequence[Optional[int]], i: int) -> int
 ```
 
-Wie oft ein Polygon in einem anderen liegt -- Eltern werden zuerst gezeichnet.
+Wie oft ein Polygon in einem anderen liegt – Eltern werden zuerst gezeichnet.
 
 ### zeichnung
 
@@ -251,7 +251,7 @@ Wie oft ein Polygon in einem anderen liegt -- Eltern werden zuerst gezeichnet.
 def zeichnung(bauteil) -> dict
 ```
 
-Was im Schnitt zu sehen ist, in mm -- die Stäbe der Linien schon
+Was im Schnitt zu sehen ist, in mm – die Stäbe der Linien schon
 aufgeloest. Je Polygon die Art seines Baustoffs (`material`, ohne eine
 Aussparung) und dessen Name, je Stab und Linie Name und Stahl: daraus
 das Bild «Querschnitt» seine Farben und seine Legende. Auch die Wände
@@ -264,7 +264,7 @@ eines Gebäudes im Erdbeben zeichnen sich daraus
 def _halbebene(punkte: Sequence[Punkt], innen: Callable[[Punkt], float]) -> List[List[float]]
 ```
 
-Das Stueck eines Polygons, auf dem `innen(p) <= 0` gilt -- nach
+Das Stueck eines Polygons, auf dem `innen(p) <= 0` gilt – nach
 Sutherland und Hodgman, gegen eine einzige Gerade.
 
 ### _gerade_im_rahmen
@@ -282,7 +282,7 @@ def _bruch(q, bauteil, punkt) -> dict
 ```
 
 Der Bruchzustand im Schnitt: die Nulllinie, die gedrueckte Flaeche je
-Polygon und die Dehnung jedes Stabs und Spannglieds -- in mm und ‰, beim
+Polygon und die Dehnung jedes Stabs und Spannglieds – in mm und ‰, beim
 Glied die des Betons an seiner Stelle.
 
 Gedrueckt ist die Seite kleiner v: die Kruemmung zeigt nie gegen die
@@ -294,7 +294,7 @@ Zugrichtung. Ohne Kruemmung ist alles gedrueckt oder nichts.
 def _ohne_schub(analyse, schub: Optional[Schubbefund], fall) -> str
 ```
 
-Warum ein Lastfall kein Bild des Schubflusses hat, als Satz -- leer, wo
+Warum ein Lastfall kein Bild des Schubflusses hat, als Satz – leer, wo
 er eines hat, und wo der Schnitt weder eine Schubwand noch Querkraft
 oder Torsion kennt: dort ist Schub kein Thema, und die Karte fehlt. Bis
 2026-11-19 fehlte sie immer ohne ein Wort.
@@ -305,23 +305,23 @@ oder Torsion kennt: dort ist Schub kein Thema, und die Karte fehlt. Bis
 def _schubfluss(schub: Schubbefund, fall) -> Optional[dict]
 ```
 
-Je Schubwand, wie der Nachweis sie sieht -- an ihren Knoten geteilt
-([[opencivil.querschnitt.schubwaende#einzeln|einzeln]]) --, ihre Achse und
+Je Schubwand, wie der Nachweis sie sieht – an ihren Knoten geteilt
+([[opencivil.querschnitt.schubwaende#einzeln|einzeln]]) –, ihre Achse und
 Dicke in mm, ihr Fluss mit Vorzeichen entlang der Achse in kN/m und ihre
 ganze Kraft gegen ihren Widerstand in kN, bei der Neigung, die der
 Nachweis gewaehlt hat. Ohne Verteilung (keine Wand, keine Last) nichts;
 warum, sagt [[opencivil.web.diagrammdaten#_ohne_schub|_ohne_schub]]. `V_p` ist, was geneigte Spannglieder
-von `V_z` tragen, in kN -- ohne sie `None`.
+von `V_z` tragen, in kN – ohne sie `None`.
 
 
 ## Konstanten
 
-- `MN = {'M': Anzeigegroesse('M', KNM), 'N': Anzeigegroesse('N', KN)}` – Das M-N-Diagramm: jeder Punkt in Moment und Normalkraft -- der Linien, der Fälle und des Knickens.
+- `MN = {'M': Anzeigegroesse('M', KNM), 'N': Anzeigegroesse('N', KN)}` – Das M-N-Diagramm: jeder Punkt in Moment und Normalkraft – der Linien, der Fälle und des Knickens.
 - `MV = {'M': Anzeigegroesse('M_Ed', KNM, 'M_{Ed}'), 'v': Anzeigegroesse('v_R…` – Querkraft über Moment: das Moment, der Widerstand und die Einwirkung je Meter, die Normalkraft, für die die Kurve gilt.
 - `NEIGUNG = {'alpha': Anzeigegroesse('α', GRAD, '\\alpha', 0), 'V': Anzeigegroess…` – Querkraft über Neigung: die Neigung steht schon in ganzen Grad (die Suche geht gradweise), Widerstand und Einwirkung je Meter, die statische Höhe.
-- `NEIGUNG_VON = 25` – Wie weit die Neigungskurve mindestens reicht, in Grad. Die beiden Grenzen des Benutzers liegen normalerweise darin; gehen sie darueber hinaus, waechst die Achse mit -- ein abgeschnittener Ast waere schlimmer als eine breite Achse.
+- `NEIGUNG_VON = 25` – Wie weit die Neigungskurve mindestens reicht, in Grad. Die beiden Grenzen des Benutzers liegen normalerweise darin; gehen sie darueber hinaus, waechst die Achse mit – ein abgeschnittener Ast waere schlimmer als eine breite Achse.
 - `NEIGUNG_BIS = 45`
-- `_LINIENGROESSEN = {spannungsanalyse.Analyseart.MOMENT_KRUEMMUNG: (Anzeigegroesse('M', K…` – Was eine Linie zeigt, je Art ihrer Linie: die laufende Kraft, die festgehaltene und die Verformung. Massstab und Beschriftung an einer Stelle -- bis 2026-10-18 skalierte der Kern hier, und spannungsbild.js schrieb Zeichen und Einheiten ein zweites Mal daneben (LINIEN, MODULE).
+- `_LINIENGROESSEN = {spannungsanalyse.Analyseart.MOMENT_KRUEMMUNG: (Anzeigegroesse('M', K…` – Was eine Linie zeigt, je Art ihrer Linie: die laufende Kraft, die festgehaltene und die Verformung. Massstab und Beschriftung an einer Stelle – bis 2026-10-18 skalierte der Kern hier, und spannungsbild.js schrieb Zeichen und Einheiten ein zweites Mal daneben (LINIEN, MODULE).
 - `_MODUL = Anzeigegroesse('E_eq', N_PRO_MM2, 'E_{eq}', 0)` – Der aequivalente Modul, ueber der laufenden Kraft.
 - `_RANDDEHNUNG = Anzeigegroesse('ε', PROMILLE, '\\varepsilon', 2)` – Die Randdehnungen beim Bruch.
 

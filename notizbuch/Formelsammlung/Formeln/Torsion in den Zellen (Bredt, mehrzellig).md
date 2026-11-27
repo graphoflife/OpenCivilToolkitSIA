@@ -27,7 +27,7 @@ Eine geschlossene Zelle trägt Torsion als Schubfluss $q$, der ringsum läuft:
 das Moment ist $2 A_k\,q$, mit $A_k$ der umschlossenen Fläche (Bredt). Die
 Norm misst $A_k$ bis zu den Längsstäben in den Ecken (SIA 262, 4.3.5.2):
 die Wandachsen gehören darum durch die Eckstäbe. Bei mehreren Zellen teilt sich die Torsion so auf, dass sich alle
-Zellen gleich verdrillen -- die zweite Gleichung, das Ringintegral, sagt das
+Zellen gleich verdrillen – die zweite Gleichung, das Ringintegral, sagt das
 für jede Zelle. Wände zwischen zwei Zellen tragen die Differenz beider
 Schubflüsse.
 

@@ -48,7 +48,7 @@ Druckzone als Spannungsblock der Höhe 0.85·x mit durchgehend f\_ck; gedrückte
 ## Theorie
 
 Eine Platte unter Moment und Normalkraft trägt, solange der Punkt
-$(N_{Ed}, M_{Ed})$ innerhalb ihrer **Resistenzlinie** liegt -- der
+$(N_{Ed}, M_{Ed})$ innerhalb ihrer **Resistenzlinie** liegt – der
 geschlossenen Linie aller Kombinationen, die der Querschnitt gerade noch
 aufnimmt. Rechts endet sie im reinen Zug, links im reinen Druck, oben und
 unten liegen die grössten Momente beider Vorzeichen.
@@ -67,12 +67,12 @@ Das Werkzeug kennt zwei Linien:
   Dehnungsebenen ab. Der Querschnitt bleibt eben, Beton und Stahl folgen
   ihren Werkstoffgesetzen ([[Parabel-Rechteck-Beziehung des Betons]] oder
   [[Spannungsblock des Betons]], [[Bilineare Beziehung des Betonstahls]]),
-  und jede Lage zählt für sich -- auch die gedrückte. Die
+  und jede Lage zählt für sich – auch die gedrückte. Die
   [[Schnittgrössen aus der Spannungsverteilung]] folgen durch Integration
   über 200 Fasern.
 
 Welche Linie gilt, wählt das Kapitel mit seiner Rechenwahl; die andere steht
 zum Vergleich im Diagramm. Wie weit eine Einwirkung von der Linie entfernt
-ist, sagt der [[Erfüllungsgrad]] -- gemessen bei festgehaltener Normalkraft,
+ist, sagt der [[Erfüllungsgrad]] – gemessen bei festgehaltener Normalkraft,
 bei festgehaltenem Moment oder als kürzester Abstand im normierten
 Diagramm.

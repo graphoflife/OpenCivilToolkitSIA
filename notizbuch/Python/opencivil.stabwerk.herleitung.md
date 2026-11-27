@@ -1,5 +1,5 @@
 ---
-erzeugt: f656c6e518f3
+erzeugt: d652ada3fb44
 art: modul
 tags: [modul]
 ---
@@ -10,8 +10,8 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Die Herleitung der Steifigkeitsmethode, so dass man sie von Hand
-nachrechnen kann: das System in Tabellen, die Ansaetze -- Steifigkeitsmatrix
-eines Stabs, Drehung, Bettung, arbeitsgleiche Lasten, Gleichungssystem --,
+nachrechnen kann: das System in Tabellen, die Ansaetze – Steifigkeitsmatrix
+eines Stabs, Drehung, Bettung, arbeitsgleiche Lasten, Gleichungssystem –,
 die Matrizen mit Zahlen, solange sie klein genug sind, und je Lastfall und
 Kombination die Verschiebungen der Knoten, die Kraefte an den Stabenden, die
 Lagerkraefte, die Extremwerte und die Gleichgewichtsprobe.
@@ -27,7 +27,7 @@ eine Wand aus Zahlen, die niemand nachrechnet; die Tabellen gibt es immer.
 ## EINHEITEN
 
 Laengen in m, Verschiebungen in mm, Drehungen in mrad, Kraefte in kN,
-Momente in kNm -- in den Matrizen kN und m. Die Schnittgroessen mit den
+Momente in kNm – in den Matrizen kN und m. Die Schnittgroessen mit den
 Vorzeichen der Baustatik ([[opencivil.stabwerk.verlauf|verlauf]]).
 
 ## Inhalt
@@ -52,7 +52,7 @@ def halt_text(halt: Halt, einheit: str, faktor: float=1000.0) -> str
 def gelenke_text(stab) -> str
 ```
 
-Wo ein Stab ein Gelenk hat -- in der Ebene und im Raum.
+Wo ein Stab ein Gelenk hat – in der Ebene und im Raum.
 
 ### linienlager_text
 
@@ -60,7 +60,7 @@ Wo ein Stab ein Gelenk hat -- in der Ebene und im Raum.
 def linienlager_text(*richtungen: Tuple[str, Halt]) -> str
 ```
 
-Wie ein Stab aufliegt, je Richtung -- `("quer", halt), ("längs", halt)`.
+Wie ein Stab aufliegt, je Richtung – `("quer", halt), ("längs", halt)`.
 
 ### teilname
 
@@ -68,7 +68,7 @@ Wie ein Stab aufliegt, je Richtung -- `("quer", halt), ("längs", halt)`.
 def teilname(e: Ergebnis, teil) -> str
 ```
 
-Der Name eines Teilstabs: der seines Stabs -- mit Nummer, wenn dieser geteilt ist.
+Der Name eines Teilstabs: der seines Stabs – mit Nummer, wenn dieser geteilt ist.
 
 ### unbekannte
 
@@ -82,7 +82,7 @@ def unbekannte(p: Protokoll, e: Ergebnis) -> None
 def kopf_eines_falls(p: Protokoll, befund: 'Systembefund', fall) -> None
 ```
 
-Titel, Beiwerte einer Kombination, Lastvektor und Loesung -- in der Ebene und im Raum.
+Titel, Beiwerte einer Kombination, Lastvektor und Loesung – in der Ebene und im Raum.
 
 ### lagerkraefte
 
@@ -96,7 +96,7 @@ def lagerkraefte(p: Protokoll, befund: 'Systembefund', fall, groessen: Sequence[
 def extremwerte(p: Protokoll, verlaeufe, groessen: Sequence[Tuple[str, str, str, float, int]]=EXTREMWERTE_DER_EBENE, durchbiegungen: Sequence[str]=(IN_DER_EBENE['w'],)) -> None
 ```
 
-Kleinster und groesster Wert je Stab -- dazu die massgebende der
+Kleinster und groesster Wert je Stab – dazu die massgebende der
 `durchbiegungen` (Felder) ueber alle Staebe, wie der Bildschirm sie
 zeigt ([[opencivil.stabwerk.verlauf#grenzwerte|grenzwerte]]).
 
@@ -106,7 +106,7 @@ zeigt ([[opencivil.stabwerk.verlauf#grenzwerte|grenzwerte]]).
 def gleichgewicht(p: Protokoll, fall, summen=SUMMEN_DER_EBENE) -> None
 ```
 
-Lasten und Lagerkraefte zusammen -- null bis auf Rundung.
+Lasten und Lagerkraefte zusammen – null bis auf Rundung.
 
 ### _zahl
 
@@ -114,7 +114,7 @@ Lasten und Lagerkraefte zusammen -- null bis auf Rundung.
 def _zahl(x: float) -> str
 ```
 
-Vier gueltige Ziffern -- ab einer Million und unter einem Tausendstel mit Zehnerpotenz.
+Vier gueltige Ziffern – ab einer Million und unter einem Tausendstel mit Zehnerpotenz.
 
 ### matrix_latex
 
@@ -128,7 +128,7 @@ def matrix_latex(zeilen: Sequence[Sequence[float]], faktor: float) -> str
 - `STAEBE_MIT_MATRIX = 6` – Bis zu so vielen Teilstaeben steht die Matrix jedes einzelnen mit Zahlen da.
 - `UNBEKANNTE_MIT_MATRIX = 12` – Bis zu so vielen Unbekannten stehen Gesamtmatrix, Lastvektor und Loesung mit Zahlen da.
 - `ANNAHME = 'Steifigkeit: E_cm des Betons, E_a des Baustahls oder das E eines eig…` – Was die Steifigkeit und das Gleichgewicht annehmen.
-- `DURCHBIEGUNG = 'Die Durchbiegung w misst jeder Stab gegen die Gerade zwischen seinen…` – Was die Durchbiegung w ist -- und was sie nicht ist.
+- `DURCHBIEGUNG = 'Die Durchbiegung w misst jeder Stab gegen die Gerade zwischen seinen…` – Was die Durchbiegung w ist – und was sie nicht ist.
 - `GLEICHUNGSSYSTEM_LATEX = '\\mathbf{K} = \\sum_{\\text{Stäbe}} \\mathbf{T}^{\\mathsf{T}} \\cdot…` – Das Gleichungssystem in Zeichen.
 - `SCHNITTGROESSEN_LATEX = 'N(0) = -s_{u,a} \\qquad V(0) = s_{v,a} \\qquad M(0) = -s_{\\theta,a}…` – Von den Kraeften an den Stabenden zu den Schnittgroessen laengs des Stabs.
 - `BIEGELINIE_LATEX = "v'' = \\frac{M}{EI} \\qquad u' = \\frac{N}{EA}"` – Die Biegelinie aus Moment und Normalkraft.

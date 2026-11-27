@@ -1,5 +1,5 @@
 ---
-erzeugt: a897eb3acda6
+erzeugt: b11b8abf0111
 art: modul
 tags: [modul]
 ---
@@ -9,10 +9,10 @@ tags: [modul]
 
 ## VERANTWORTUNG
 
-* [[opencivil.pfahl.erdwiderstand#Erdwiderstand|Erdwiderstand]] -- je Meter Pfahl die grösste Kraft, die der Boden
+* [[opencivil.pfahl.erdwiderstand#Erdwiderstand|Erdwiderstand]] – je Meter Pfahl die grösste Kraft, die der Boden
   quer aufnimmt, über die Tiefe: p_E,k. Als Stücke, auf denen sie linear
   verläuft ([[opencivil.pfahl.erdwiderstand#Erdwiderstand.linien|Erdwiderstand.linien]]).
-* [[opencivil.pfahl.erdwiderstand#brueche|brueche]] -- wie ein Pfahl quer zu seiner Achse bricht: der Boden
+* [[opencivil.pfahl.erdwiderstand#brueche|brueche]] – wie ein Pfahl quer zu seiner Achse bricht: der Boden
   längs des Pfahls gibt nach, und wo das Moment den Biegewiderstand M_R
   erreicht, knickt der Pfahl in einem Gelenk. Der kleinste Bruch ist der
   charakteristische Querwiderstand R_tr,k (SIA 267:2013, 9.4.4.2.2).
@@ -65,7 +65,7 @@ die Integrale sind exakt.
   wächst nicht ohne Grenze mit der Tiefe.
 * Rankine, ohne Reibung zwischen Pfahl und Boden.
 * Die Mechanismen: der ganze Pfahl starr, oder Gelenke, unter denen er
-  stillsteht -- wie für kurze und lange Pfähle üblich. Die Norm verlangt
+  stillsteht – wie für kurze und lange Pfähle üblich. Die Norm verlangt
   nur, R_tr,k aus Erdwiderstand und innerem Widerstand zu rechnen.
 
 
@@ -82,7 +82,7 @@ SI-Basis.
 class Festigkeit
 ```
 
-Womit eine Schicht dem Pfahl quer widersteht -- in SI, φ' im Bogenmass.
+Womit eine Schicht dem Pfahl quer widersteht – in SI, φ' im Bogenmass.
 
 - `drainiert: bool`
 - `phi: float = 0.0`
@@ -96,7 +96,7 @@ Womit eine Schicht dem Pfahl quer widersteht -- in SI, φ' im Bogenmass.
 def K_p(self) -> float
 ```
 
-Der Erdwiderstandsbeiwert nach Rankine, ohne Wandreibung -- undrainiert eins.
+Der Erdwiderstandsbeiwert nach Rankine, ohne Wandreibung – undrainiert eins.
 
 #### Festigkeit.erddruecke
 
@@ -104,7 +104,7 @@ Der Erdwiderstandsbeiwert nach Rankine, ohne Wandreibung -- undrainiert eins.
 def erddruecke(self, sigma: float) -> Tuple[float, float]
 ```
 
-e_p und e_a unter der Spannung `sigma` -- drainiert der wirksamen,
+e_p und e_a unter der Spannung `sigma` – drainiert der wirksamen,
 undrainiert der totalen, mit K_p = K_a = 1 und s_u statt c'.
 
 ### Linie
@@ -114,7 +114,7 @@ undrainiert der totalen, mit K_p = K_a = 1 und s_u statt c'.
 class Linie
 ```
 
-Ein Stück des Pfahls, auf dem p_E,k linear verläuft -- z ab Terrain, p je Meter Pfahl.
+Ein Stück des Pfahls, auf dem p_E,k linear verläuft – z ab Terrain, p je Meter Pfahl.
 
 - `schicht: int` – Die Schicht, in der es liegt: ihr Platz in der Liste, ab null.
 - `oben: float`
@@ -158,7 +158,7 @@ p_E,k = b' · (e_p − max(0; e_a)): vorne passiv, hinten aktiv oder ein Spalt.
 def bei(self, z: float) -> float
 ```
 
-p_E,k in der Tiefe z -- an der Grenze zweier Schichten der kleinere Wert.
+p_E,k in der Tiefe z – an der Grenze zweier Schichten der kleinere Wert.
 
 #### Erdwiderstand.linien
 
@@ -180,7 +180,7 @@ class Bruch
 Ein Mechanismus an seiner ungünstigsten Lage: was bricht, wo, und bei welcher Querkraft.
 
 - `was: str`
-- `lage: Optional[float]` – s_r oder s_h ab Kopf, in m -- `None` bei der Verschiebung.
+- `lage: Optional[float]` – s_r oder s_h ab Kopf, in m – `None` bei der Verschiebung.
 - `H: float`
 
 ### _Integrale
@@ -189,7 +189,7 @@ Ein Mechanismus an seiner ungünstigsten Lage: was bricht, wo, und bei welcher Q
 class _Integrale
 ```
 
-Vom Kopf bis zu jedem Knoten ∫ p ds und ∫ p · s ds, s ab Kopf -- exakt,
+Vom Kopf bis zu jedem Knoten ∫ p ds und ∫ p · s ds, s ab Kopf – exakt,
 weil p zwischen zwei Knoten linear ist.
 
 #### _Integrale.oben

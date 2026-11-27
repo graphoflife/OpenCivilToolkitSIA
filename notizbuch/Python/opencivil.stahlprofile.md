@@ -1,5 +1,5 @@
 ---
-erzeugt: a36d87d8eaf2
+erzeugt: 3e3e637e4e3f
 art: modul
 tags: [modul]
 ---
@@ -8,15 +8,15 @@ tags: [modul]
 > Paket [[opencivil]] · [Quelltext](../../opencivil/stahlprofile/__init__.py)
 
 Das Balkensystem rechnet mit ihren Kennwerten, die Querschnittsanalyse mit
-ihrem Umriss -- darum stehen sie in keinem der beiden Pakete (seit
+ihrem Umriss – darum stehen sie in keinem der beiden Pakete (seit
 2026-11-26; bis dahin in [[opencivil.stabwerk]]).
 
-* [[opencivil.stahlprofile.formen|formen]] -- je Form die Masse, die Formeln
+* [[opencivil.stahlprofile.formen|formen]] – je Form die Masse, die Formeln
   fuer `A`, `I_y`, `I_z` und `I_T` und der Umriss. Die Formen sind
   Vorlagen von Stabquerschnitten ([[opencivil.stabwerk.querschnitte#Stabvorlage|opencivil.stabwerk.querschnitte.Stabvorlage]]).
-* [[opencivil.stahlprofile.tabelle|tabelle]] -- welche Profile es gibt, je
+* [[opencivil.stahlprofile.tabelle|tabelle]] – welche Profile es gibt, je
   Reihe mit ihren Massen.
-* [[opencivil.stahlprofile.lage|lage]] -- ein Profil im gezeichneten
+* [[opencivil.stahlprofile.lage|lage]] – ein Profil im gezeichneten
   Querschnitt: an seiner Mitte, gedreht und gespiegelt.
 
 ## Module

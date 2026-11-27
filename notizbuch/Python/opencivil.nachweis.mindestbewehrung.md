@@ -1,5 +1,5 @@
 ---
-erzeugt: efd6fab220b0
+erzeugt: d9534d571ead
 art: modul
 tags: [modul]
 ---
@@ -9,7 +9,7 @@ tags: [modul]
 
 ## VERANTWORTUNG
 
-Prueft, ob die Bewehrung uebernehmen kann, was der Beton beim Reissen abgibt --
+Prueft, ob die Bewehrung uebernehmen kann, was der Beton beim Reissen abgibt –
 ohne dabei ueber die zulaessige Stahlspannung zu kommen: die Begrenzung der
 Rissbreiten unter aufgezwungenen oder behinderten Verformungen, beim
 Erreichen von `f_ct,eff` (SIA 262:2025, 4.4.2.3.4, Tabelle 17, Zeile 2).
@@ -44,7 +44,7 @@ reisst (4.4.1.3, (99), (100)). Bei massigen Bauteilen darf die Zugzone auf
 
 ## ZULAESSIGE STAHLSPANNUNG
 
-Bei *normaler* Anforderung gilt `f_yk` -- die Bewehrung darf bis an die
+Bei *normaler* Anforderung gilt `f_yk` – die Bewehrung darf bis an die
 Fliessgrenze gehen. Bei *erhoehter* und *hoher* Anforderung begrenzt
 zusaetzlich die nominelle Rissbreite, 0.5 und 0.2 mm (Tabelle 17):
 
@@ -57,7 +57,7 @@ sigma_s,adm = min( sqrt(9 * E_s * f_ctm * w_nom / durchmesser); f_yk )
 
 ## EINHEITEN
 
-Alles in SI-Basis. Die Wurzelformel ist dimensionell stimmig -- `E_s * f_ctm`
+Alles in SI-Basis. Die Wurzelformel ist dimensionell stimmig – `E_s * f_ctm`
 gibt Pa^2, `w_nom/durchmesser` ist dimensionslos, die Wurzel also Pa.
 
 ## Inhalt
@@ -95,7 +95,7 @@ def zulaessige_stahlspannung(*, anforderung: Rissanforderung, f_yk: float, E_s: 
 Die Spannung, bis zu der die Bewehrung beansprucht werden darf.
 
 Bei normaler Anforderung `f_yk`. Sonst zusaetzlich begrenzt durch die
-nominelle Rissbreite -- je duenner der Stab, desto mehr darf er tragen,
+nominelle Rissbreite – je duenner der Stab, desto mehr darf er tragen,
 weil sich der Riss auf mehr Staebe verteilt.
 
 Alles in SI-Basis. Ohne Bewehrung (`durchmesser = 0`) faellt die
@@ -108,12 +108,12 @@ scheitert an ihr.
 def protokoll_zulaessige_stahlspannung(p: Protokoll, sigma: Wert, *, anforderung: Rissanforderung, f_yk: Wert, E_s: Wert, f_ctm: Wert, durchmesser: Wert, basis: str) -> None
 ```
 
-Wie [[opencivil.nachweis.mindestbewehrung#zulaessige_stahlspannung|zulaessige_stahlspannung]] zu ihrer Zahl kommt -- eine
+Wie [[opencivil.nachweis.mindestbewehrung#zulaessige_stahlspannung|zulaessige_stahlspannung]] zu ihrer Zahl kommt – eine
 Herleitung fuer jeden Nachweis, der sie braucht.
 
 `sigma` ist das Resultat unter dem Symbol, unter dem es im Nachweis
 steht; `durchmesser` der Stab, der die Rissbreite bestimmt. Die Formel
-ist dimensionsrein -- (N/mm²)² unter der Wurzel -- und steht darum mit
+ist dimensionsrein – (N/mm²)² unter der Wurzel – und steht darum mit
 Einheiten da.
 
 ### _protokoll_stahlspannung
@@ -122,7 +122,7 @@ Einheiten da.
 def _protokoll_stahlspannung(p: Protokoll, e: Eingaben, werte: Zwischenwerte, erg, *, posten: Sequence[Postenbezug], anforderung: Rissanforderung) -> Wert
 ```
 
-`sigma_s,adm` einer Lage -- fuer beide Zwängungen dieselbe Herleitung.
+`sigma_s,adm` einer Lage – fuer beide Zwängungen dieselbe Herleitung.
 
 Liegen mehrere Posten in der Lage und begrenzt die Rissbreite, steht
 zuerst da, welcher Stab der dickste ist: er bestimmt die Rissbreite.
@@ -140,7 +140,7 @@ Was der Nachweis fuer eine Lage gefunden hat: N_s,adm gegen N_Riss.
 
 - `lage: Bewehrungslage`
 - `a_s: float = 0.0`
-- `durchmesser: float = 0.0` – Der groesste Stabdurchmesser der Lage, in m -- er bestimmt die Rissbreite.
+- `durchmesser: float = 0.0` – Der groesste Stabdurchmesser der Lage, in m – er bestimmt die Rissbreite.
 - `sigma_s_adm: float = 0.0`
 - `N_s_adm: float = 0.0`
 
@@ -153,7 +153,7 @@ class Normalzwang(Nachweis)
 Was die Zwaengung auf Normalkraft an der Platte ([[opencivil.nachweis.mindestbewehrung#Rissnormalkraft|Rissnormalkraft]])
 und am gezeichneten Querschnitt
 ([[opencivil.nachweis.qa_gebrauch#RissnormalkraftQA|RissnormalkraftQA]]) teilt: Name,
-Thema, Kuerzel, Normstelle und den ersten Satz der Herleitung -- wie
+Thema, Kuerzel, Normstelle und den ersten Satz der Herleitung – wie
 [[opencivil.nachweis.mindestbewehrung#Biegezwang|Biegezwang]] bei der Biegung. Bis 2026-11-21 schrieb der
 gezeichnete Querschnitt sie ab.
 
@@ -179,7 +179,7 @@ Zwängung auf Normalkraft: die Rissbreite bei Zwang, beim Erreichen von
 `f_ct,eff` ([[opencivil.nachweis.lagennachweis#Lagennachweis|Lagennachweis]]).
 
 Ein Urteil je Lage der Tragrichtung: die untere und die obere müssen beide
-die Risskraft aufnehmen können -- ein Zwang kennt keine Zugseite, er
+die Risskraft aufnehmen können – ein Zwang kennt keine Zugseite, er
 beansprucht den Querschnitt über die ganze Höhe. In der Zusammenfassung
 steht die ungünstigere der beiden; die Urteile sind als Teile derselben
 Frage gestempelt (siehe `Nachweis.teilurteile`).
@@ -192,7 +192,7 @@ Frage gestempelt (siehe `Nachweis.teilurteile`).
 def ansatz(self, e: Eingaben, p: Protokoll) -> Rissgroessen
 ```
 
-Die Risskraft der gezogenen Querschnittshälfte -- und ihre Herleitung.
+Die Risskraft der gezogenen Querschnittshälfte – und ihre Herleitung.
 
 #### Rissnormalkraft.eine_lage
 
@@ -206,7 +206,7 @@ def eine_lage(self, e: Eingaben, lage: Bewehrungslage, ansatz: Rissgroessen) -> 
 def _n_riss(self, groessen: Rissgroessen) -> Wert
 ```
 
-Die Risskraft -- die Einwirkung in Tabelle und Herleitung.
+Die Risskraft – die Einwirkung in Tabelle und Herleitung.
 
 #### Rissnormalkraft._n_s_adm
 
@@ -214,7 +214,7 @@ Die Risskraft -- die Einwirkung in Tabelle und Herleitung.
 def _n_s_adm(self, erg: Lagenergebnis) -> Wert
 ```
 
-Was die Lage aufnimmt -- der Widerstand in Tabelle und Herleitung.
+Was die Lage aufnimmt – der Widerstand in Tabelle und Herleitung.
 
 #### Rissnormalkraft.protokoll_lage
 
@@ -230,7 +230,7 @@ class Momentlagenergebnis(Fallausgang)
 ```
 
 Was der Nachweis gegen das Rissmoment fuer eine Lage gefunden hat. Sein
-Ausgang: M_s,adm gegen M_Riss -- nicht fuehrbar ohne Bewehrung in der
+Ausgang: M_s,adm gegen M_Riss – nicht fuehrbar ohne Bewehrung in der
 Lage.
 
 - `lage: Bewehrungslage`
@@ -259,7 +259,7 @@ Thema, Kuerzel, Normstelle und den ersten Satz der Herleitung.
 Mehr teilen sie nicht. Die Platte rechnet je Lage von Hand, mit dem
 Hebelarm `d - x/3`; der gezeichnete Querschnitt sucht je Zugseite das
 Moment, bei dem der erste gezogene Stab seine Grenze erreicht. Gleich ist
-nur der Vergleich `M_s,adm >= M_Riss` -- ein gemeinsamer Nachweis haette
+nur der Vergleich `M_s,adm >= M_Riss` – ein gemeinsamer Nachweis haette
 fast nur weitergereicht (Benutzer, 2026-10-17).
 
 - `THEMA = 'Zwängung auf Biegung'`
@@ -282,7 +282,7 @@ Zwei Urteile: die untere Lage (positives Moment) und die obere (negatives).
 Beim Reissen gibt der Beton sein Moment ab; die Bewehrung muss es
 übernehmen können, ohne über `sigma_s,adm` zu kommen.
 
-Der aufnehmbare Moment wird am **gerissenen** Querschnitt bestimmt --
+Der aufnehmbare Moment wird am **gerissenen** Querschnitt bestimmt –
 unmittelbar nach dem Riss ist der Querschnitt genau dort, und die
 Spannungen sind Gebrauchsspannungen, also elastisch. Eine plastische
 Druckzone gibt es in diesem Augenblick nicht.
@@ -293,7 +293,7 @@ Druckzone gibt es in diesem Augenblick nicht.
 def ansatz(self, e: Eingaben, p: Protokoll) -> Wert
 ```
 
-Das Rissmoment des Rechtecks -- und seine Herleitung.
+Das Rissmoment des Rechtecks – und seine Herleitung.
 
 #### ZwaengungBiegung.eine_lage
 
@@ -307,7 +307,7 @@ def eine_lage(self, e: Eingaben, lage: Bewehrungslage, ansatz: Wert) -> Momentla
 def _m_s_adm(self, erg: Momentlagenergebnis) -> Wert
 ```
 
-Was die Lage aufnimmt -- der Widerstand in Tabelle und Herleitung.
+Was die Lage aufnimmt – der Widerstand in Tabelle und Herleitung.
 
 #### ZwaengungBiegung.protokoll_lage
 
@@ -324,14 +324,14 @@ def _erster_E_s(e: Eingaben, lagen: Sequence[Bewehrungslage]) -> Optional[Wert]
 Der Elastizitaetsmodul fuer die Wertigkeit im Ansatz.
 
 Im Ansatz steht n einmal; je Lage wird es mit dem Stahl dieser Lage
-gerechnet. Bei einer Platte mit zwei Sorten weichen die Zahlen dann ab --
+gerechnet. Bei einer Platte mit zwei Sorten weichen die Zahlen dann ab –
 massgebend ist, was in der Lagenrechnung steht. `None`, wenn keine der
 Lagen einen Stahl traegt.
 
 
 ## Konstanten
 
-- `REFERENZ_RISSBREITE = 'SIA 262:2025, 4.4.2.3.4, Tabelle 17'` – Die Begrenzung der Rissbreite: bei Zwang beim Erreichen von f_ct,eff und unter quasi-staendiger Last -- dieselbe Zeile der Tabelle.
+- `REFERENZ_RISSBREITE = 'SIA 262:2025, 4.4.2.3.4, Tabelle 17'` – Die Begrenzung der Rissbreite: bei Zwang beim Erreichen von f_ct,eff und unter quasi-staendiger Last – dieselbe Zeile der Tabelle.
 - `REFERENZ_TABELLE = 'SIA 262:2025, Tabelle 17'` – Die Grenzen der Tabelle: die zulaessige Stahlspannung bei normaler Anforderung und die Bedingung sigma_s \<= sigma_s,adm. Sonst gilt die Wurzelformel mit w_nom nach der Tabelle.
 - `REFERENZ_WURZELFORMEL = 'SIA 262:2025, 4.4.2.3.4, (102); Tabelle 17'`
 - `REFERENZ_DICKE = 'SIA 262:2025, 4.4.1.3'` – Die rissaktive Dicke unter Zug, ohne und mit der Begrenzung massiger Bauteile.

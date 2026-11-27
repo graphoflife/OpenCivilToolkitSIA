@@ -46,5 +46,5 @@ verhält sie sich wie die [[Dehnsteifigkeit]], mit $GI_T/L$ statt $EA/L$.
 Der Schubmodul ist der des Materials, beim Beton der
 [[Mittelwert des Schubmoduls]]. Beim Stahlbeton gilt die Steifigkeit für den
 ungerissenen Querschnitt; reisst er unter Torsion, fällt sie stark ab. In
-einem unbestimmten System trägt dann die Biegung der Nachbarstäbe mehr --
+einem unbestimmten System trägt dann die Biegung der Nachbarstäbe mehr –
 wie viel, hängt an diesem Verhältnis. Offen in [[TODO]].

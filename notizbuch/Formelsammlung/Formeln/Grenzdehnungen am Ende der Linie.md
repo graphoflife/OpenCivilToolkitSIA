@@ -23,7 +23,7 @@ $$
 ## Theorie
 
 Wo eine Linie der Analyse endet: bei der grössten Verformung, zu der es noch
-ein Gleichgewicht gibt -- dort, wo die erste Grenzdehnung erreicht ist. Der
+ein Gleichgewicht gibt – dort, wo die erste Grenzdehnung erreicht ist. Der
 Beton am gedrückten Rand bis $\varepsilon_{c2d}$, jede Stahllage bis
 $\pm\varepsilon_{ud}$, und, sobald der ganze Querschnitt gedrückt ist, der
 Beton im Punkt C bis $\varepsilon_{c1d}$. Es sind dieselben Grenzen wie im

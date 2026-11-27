@@ -51,4 +51,4 @@ ihrer Längsrichtung fast alles und quer kaum etwas.
 Die Norm verlangt eine mittlere Steifigkeit bis zum Fliessbeginn (16.5.1.1,
 16.5.5.2), nicht die des ungerissenen Querschnitts. Wie viel davon bleibt,
 sagt $\eta_{EI}$; der Startwert 0.5 ist nach Vorgabe, nicht nachgeschlagen,
-ebenso, dass nur die Biegung zählt -- Schub und Torsion der Wände nicht.
+ebenso, dass nur die Biegung zählt – Schub und Torsion der Wände nicht.

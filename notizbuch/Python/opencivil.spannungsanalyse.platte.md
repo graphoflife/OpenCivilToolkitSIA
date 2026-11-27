@@ -1,5 +1,5 @@
 ---
-erzeugt: 2d4e1442cab6
+erzeugt: 009a7ce008e0
 art: modul
 tags: [modul]
 ---
@@ -14,7 +14,7 @@ Herleitung nur von der Platte weiss ([[opencivil.spannungsanalyse.platte#Loeserp
 [[opencivil.spannungsanalyse.linie#Paar|Paar]]). Die Loeser sind die jedes
 Querschnitts: die Platte als Rechteck mit Staeben
 ([[opencivil.nachweis.rechenwahl#Gesetze.loeser|loeser]]). Den Riss rechnet
-sie wie der gezeichnete Querschnitt, am Bruttoquerschnitt -- dem Rechteck
+sie wie der gezeichnete Querschnitt, am Bruttoquerschnitt – dem Rechteck
 `b × h` ([[opencivil.spannungsanalyse.riss#Bruttoriss|Bruttoriss]]).
 
 ## Inhalt
@@ -26,10 +26,10 @@ sie wie der gezeichnete Querschnitt, am Bruttoquerschnitt -- dem Rechteck
 class Loeserpaar(Bruttoriss)
 ```
 
-Die beiden Loeser einer Tragrichtung -- gerissen und nicht.
+Die beiden Loeser einer Tragrichtung – gerissen und nicht.
 
 Sie unterscheiden sich in genau einem Stueck, dem Betongesetz. Alles
-andere -- Hoehe, Breite, Lagen, Stahlgesetz, Grenzen -- ist dasselbe, und
+andere – Hoehe, Breite, Lagen, Stahlgesetz, Grenzen – ist dasselbe, und
 das muss es sein: sonst verglichen die beiden Zustaende zwei verschiedene
 Querschnitte. Dazu, was zum Riss und zum Fliessen gehoert, und womit
 gerechnet wird.
@@ -38,15 +38,15 @@ gerechnet wird.
 - `ungerissen: Faserloeser`
 - `h: float`
 - `b: float` – Hoehe und Breite des Streifens, m.
-- `brutto: Bruttoquerschnitt` – Das Rechteck `b × h` ohne Stahl -- an ihm reisst die Platte.
+- `brutto: Bruttoquerschnitt` – Das Rechteck `b × h` ohne Stahl – an ihm reisst die Platte.
 - `riss: Rissmoment` – Das Rissmoment unter reiner Biegung, ohne Normalkraft.
-- `staehle: Tuple[Any, ...] = ()` – Die Staehle der Lagen, jeder einmal -- fuer die Fliessdehnung in der Herleitung. Fliessen beginnt, wo die erste Lage die Fliessdehnung ihres eigenen Stahls erreicht ([[opencivil.spannungsanalyse.platte#Loeserpaar|Stahlgesetz.eps_yd]] der Lage).
-- `wahl: Rechenwahl = Rechenwahl(arten=Rechenarten.alle(Rechenart.PARABEL))` – Womit gerechnet wird -- Kriechzahl, Wertesatz, Rechenart.
+- `staehle: Tuple[Any, ...] = ()` – Die Staehle der Lagen, jeder einmal – fuer die Fliessdehnung in der Herleitung. Fliessen beginnt, wo die erste Lage die Fliessdehnung ihres eigenen Stahls erreicht ([[opencivil.spannungsanalyse.platte#Loeserpaar|Stahlgesetz.eps_yd]] der Lage).
+- `wahl: Rechenwahl = Rechenwahl(arten=Rechenarten.alle(Rechenart.PARABEL))` – Womit gerechnet wird – Kriechzahl, Wertesatz, Rechenart.
 - `ids: Mapping[str, str] = field(default_factory=dict)` – Kurzname -> Wert-ID der Eingaben, fuer die Herleitung.
-- `E_cm: float = 0.0` – Der Modul des Betons -- daran misst sich der aequivalente Modul.
+- `E_cm: float = 0.0` – Der Modul des Betons – daran misst sich der aequivalente Modul.
 - `seite = Zugseite.UNTEN` – Ein positives Moment zieht unten.
 - `DICKE_UNTER_ZUG = 'die Dicke der Platte'`
-- `bezugsort = 'auf halber Höhe'` – Wo die Mitteldehnung gilt -- dort greift N an.
+- `bezugsort = 'auf halber Höhe'` – Wo die Mitteldehnung gilt – dort greift N an.
 
 #### Loeserpaar.ebenen
 
@@ -80,7 +80,7 @@ Die rissaktive Dicke unter Zug: die ganze Dicke der Platte.
 def tiefe(self, w: Zwischenwerte, ein: Callable[[str], 'Wert']) -> 'Wert'
 ```
 
-Die Dicke, ueber die die Linie laeuft -- ein Wert der Platte.
+Die Dicke, ueber die die Linie laeuft – ein Wert der Platte.
 
 #### Loeserpaar.herleitung_bruttoquerschnitt
 
@@ -98,7 +98,7 @@ def herleitung_dicke_unter_zug(self, p: Protokoll, w: Zwischenwerte, h: 'Wert') 
 
 Unter Zug reisst die ganze Dicke, `t = h`: der Streifen `b` ist keine
 Abmessung der Platte ([[opencivil.nachweis.rissgroessen#rissaktive_dicke|rissaktive_dicke]]).
-Ein Satz statt einer Formel -- `t` steht fuer `h`, wie bisher.
+Ein Satz statt einer Formel – `t` steht fuer `h`, wie bisher.
 
 #### Loeserpaar.herleitung_dehnung_am_ende
 
@@ -106,7 +106,7 @@ Ein Satz statt einer Formel -- `t` steht fuer `h`, wie bisher.
 def herleitung_dehnung_am_ende(self, p: Protokoll, w: Zwischenwerte, bruch: 'Grenzzustand', oben: 'Wert', unten: 'Wert', h: 'Wert') -> None
 ```
 
-Die Dehnung, ueber die die N-eps-Linie laeuft, am Ende -- auf halber Hoehe.
+Die Dehnung, ueber die die N-eps-Linie laeuft, am Ende – auf halber Hoehe.
 
 ### loeserpaar
 
@@ -114,15 +114,15 @@ Die Dehnung, ueber die die N-eps-Linie laeuft, am Ende -- auf halber Hoehe.
 def loeserpaar(querschnitt, richtung: Richtung, wert: Callable[[str], float], wahl: Rechenwahl=Rechenwahl(arten=Rechenarten.alle(Rechenart.PARABEL))) -> Optional[Loeserpaar]
 ```
 
-Das Loeserpaar einer Platte in einer Richtung -- `None` ohne Bewehrung.
+Das Loeserpaar einer Platte in einer Richtung – `None` ohne Bewehrung.
 
 `wert` liefert zu einer Wert-ID die Zahl in SI, aus einer Loesung.
-`wahl` sagt, womit gerechnet wird: Kriechzahl, Wertesatz, Rechenart --
+`wahl` sagt, womit gerechnet wird: Kriechzahl, Wertesatz, Rechenart –
 die Gesetze dazu baut [[opencivil.nachweis.rechenwahl#gesetze|gesetze]].
 
 Stand frueher in der Schnittstelle zur Oberflaeche. Dort war sie ohne
 Oberflaeche nicht erreichbar, und ein Test baute sie als eigene Kopie
-nach -- er pruefte seine Kopie statt der echten.
+nach – er pruefte seine Kopie statt der echten.
 
 
 ## Braucht

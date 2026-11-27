@@ -1,5 +1,5 @@
 ---
-erzeugt: 2f4935d5b480
+erzeugt: a3c87c6670fb
 art: modul
 tags: [modul]
 ---
@@ -35,7 +35,7 @@ einem festen Wert von N, M_y oder M_z: ein geschlossener Zug von Punkten
 `(N, M_y, M_z)`, auf dem die feste Groesse diesen Wert hat. Leer, wo
 die Ebene die Flaeche nicht trifft.
 
-Bei festem N je Neigung der Punkt des Faechers mit diesem N -- dieselbe
+Bei festem N je Neigung der Punkt des Faechers mit diesem N – dieselbe
 Suche wie im Nachweis. Bei festem Moment die Faecher aller Neigungen,
 je auf Stufen in N gelesen; auf jeder Stufe schneidet die Gerade des
 festen Moments den Umriss in zwei Punkten. Zwischen den Stuetzstellen
@@ -48,7 +48,7 @@ nachgewiesen wird damit nichts.
 def _flaechenstufen(q: Querschnitt, neigungen: int) -> Stufen
 ```
 
-Je Stufe in N der Umriss `(M_y, M_z)` ueber alle Neigungen -- aus den
+Je Stufe in N der Umriss `(M_y, M_z)` ueber alle Neigungen – aus den
 Faechern, einmal je Querschnitt. Die Stufen liegen wie die Knoten von
 Tschebyschow zwischen reinem Zug und reinem Druck, ohne die Enden: dort
 zieht sich der Umriss auf einen Punkt zusammen.
@@ -68,14 +68,14 @@ Stuetzstellen, zwischen denen N liegt. Vom Zug zum Druck nimmt N ab.
 def _schnittstellen(umriss: Sequence[Punkt], achse: int, wert: float) -> List[float]
 ```
 
-Wo die Gerade `Punkt[achse] = wert` den geschlossenen Umriss kreuzt --
+Wo die Gerade `Punkt[achse] = wert` den geschlossenen Umriss kreuzt –
 die andere Koordinate jeder Stelle.
 
 
 ## Konstanten
 
-- `FLAECHE_SCHRITTE = 8` – Stuetzstellen je Abschnitt fuer die Flaeche der Widerstaende -- weniger als fuer eine Linie; die Luecken fuellt das Halbieren.
-- `FLAECHE_NEIGUNGEN = 72` – Neigungen, mit denen die Flaeche der Widerstaende abgetastet wird -- alle 5°.
+- `FLAECHE_SCHRITTE = 8` – Stuetzstellen je Abschnitt fuer die Flaeche der Widerstaende – weniger als fuer eine Linie; die Luecken fuellt das Halbieren.
+- `FLAECHE_NEIGUNGEN = 72` – Neigungen, mit denen die Flaeche der Widerstaende abgetastet wird – alle 5°.
 - `SCHNITT_STUFEN = 120` – Stufen in N, auf denen die Flaeche bei festem Moment geschnitten wird. Zu den Enden hin dichter, wo sie sich zum reinen Zug und Druck schliesst.
 - `GROESSEN = ('N', 'M_y', 'M_z')` – Wonach geschnitten werden kann.
 - `Stufen = List[Tuple[float, List[Punkt]]]` – Je Stufe in N der Umriss `(M_y, M_z)` ueber alle Neigungen.

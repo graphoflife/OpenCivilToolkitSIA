@@ -1,5 +1,5 @@
 ---
-erzeugt: 43da2431403a
+erzeugt: 8e60ce1fdcd8
 art: modul
 tags: [modul]
 ---
@@ -12,8 +12,8 @@ tags: [modul]
 Sortentabelle und Kennwerte des Stahls, aus dem die Profilbleche einer
 Blechverbunddecke sind, aufgebaut wie der Baustahl
 ([[opencivil.material.baustahl]]): jeder Kennwert ist eine eigene, einzeln
-ueberschreibbare Berechnung. Das Blech selbst -- seine Rippen und seine
-Flaeche aus dem Datenblatt -- gehoert zur Blechverbunddecke, einem Element
+ueberschreibbare Berechnung. Das Blech selbst – seine Rippen und seine
+Flaeche aus dem Datenblatt – gehoert zur Blechverbunddecke, einem Element
 der Querschnittsanalyse ([[opencivil.projekt.blechdecken]]); seine Form
 rechnet [[opencivil.querschnitt.profilblech]], und `m` und `k` des
 Laengsschubs stehen an der Analyse. Nichts davon gehoert zum Material.
@@ -37,13 +37,13 @@ Widerstandsbeiwert `γ_ap = 1.05` steht in 4.1.5, der Bemessungswert
 
 ## DIE ERSTE SORTE
 
-SE 350 G -- nach 3.3.1 sind SE 320 G und SE 350 G ueblich (nach Vorgabe,
+SE 350 G – nach 3.3.1 sind SE 320 G und SE 350 G ueblich (nach Vorgabe,
 nicht nachgeschlagen, welche von beiden zuerst steht).
 
 
 ## DAS GESETZ
 
-Wie beim Baustahl elastisch -- ideal plastisch, in Zug und Druck gleich
+Wie beim Baustahl elastisch – ideal plastisch, in Zug und Druck gleich
 ([[opencivil.querschnitt.werkstoffgesetz#Profilblechgesetz|Profilblechgesetz]]). Die Norm
 nennt keine Linie und keine Grenzdehnung; nach Vorgabe, nicht
 nachgeschlagen, endet sie wie beim Baustahl bei
@@ -85,9 +85,9 @@ Erzeugt einen Profilblechstahl aus der Sortentabelle.
 
 ## Konstanten
 
-- `TABELLE_1 = 'SIA 264:2014, 3.3.1, Tabelle 1'` – Wo die Sortentabelle steht -- jeder Wert aus ihr nennt diese Stelle.
-- `PROFILBLECHSORTEN = {'SE 220 G': Profilblechsorte(220.0, 300.0), 'SE 250 G': Profilblechs…` – Profilblechstahl nach SIA 264:2014, Tabelle 1 -- in ihrer Folge.
-- `ERSTES_PROFILBLECH = 'SE 350 G'` – Womit ein neuer Profilblechstahl anfaengt -- siehe Dateikopf.
+- `TABELLE_1 = 'SIA 264:2014, 3.3.1, Tabelle 1'` – Wo die Sortentabelle steht – jeder Wert aus ihr nennt diese Stelle.
+- `PROFILBLECHSORTEN = {'SE 220 G': Profilblechsorte(220.0, 300.0), 'SE 250 G': Profilblechs…` – Profilblechstahl nach SIA 264:2014, Tabelle 1 – in ihrer Folge.
+- `ERSTES_PROFILBLECH = 'SE 350 G'` – Womit ein neuer Profilblechstahl anfaengt – siehe Dateikopf.
 - `PROFILBLECH_VORLAGEN = (KennwertVorlage(kurzname='f_yp', symbol='f_{yp}', einheit=N_PRO_MM2,…`
 
 ## Braucht

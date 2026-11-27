@@ -40,6 +40,6 @@ $$
 ## Theorie
 
 Wird der Pfahl gezogen, trägt der Fuss nichts: es bleibt der Mantel. Hier mit
-derselben Mantelreibung wie auf Druck -- nach Vorgabe, nicht nachgeschlagen.
+derselben Mantelreibung wie auf Druck – nach Vorgabe, nicht nachgeschlagen.
 Der Pfahl selbst muss die Zugkraft dabei über seine ganze Länge tragen
 (SIA 267:2013, 9.5.3.4.2).

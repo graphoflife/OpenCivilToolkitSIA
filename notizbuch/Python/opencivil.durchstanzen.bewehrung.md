@@ -1,5 +1,5 @@
 ---
-erzeugt: 6d1e16ecf81e
+erzeugt: ee4d25a215d1
 art: modul
 tags: [modul]
 ---
@@ -50,7 +50,7 @@ die Anker selbst, und eine Leiste konnte durch eine Aussparung laufen
 Er läuft im Abstand 0.5·d_v,out um die äussersten Anker; von einer geraden
 Strecke zwischen zwei äussersten Ankern zählen höchstens 1.5·d_v,out von
 jedem Ende her. Das ist die Regel der Ecken grosser Stützen (Figur 23a), mit
-den äussersten Ankern als Ecken -- gebaut wird er darum wie der Schnitt um
+den äussersten Ankern als Ecken – gebaut wird er darum wie der Schnitt um
 eine Stütze, deren Kern die konvexe Hülle der äussersten Anker und der
 Stütze ist ([[opencivil.durchstanzen.schnitt#kandidaten_stuetze|kandidaten_stuetze]]). Am Plattenrand endet er
 wie der innere, wenn er so kürzer wird.
@@ -70,7 +70,7 @@ class Leiste
 ```
 
 Eine Leiste: wo sie am Rand der gestützten Fläche ansetzt, wohin sie läuft
-und wie viele Anker sie trägt -- null heisst: so viele, wie es Abstände gibt.
+und wie viele Anker sie trägt – null heisst: so viele, wie es Abstände gibt.
 
 - `wurzel: Punkt`
 - `richtung: Punkt`
@@ -98,7 +98,7 @@ Nach aussen, für einen Rand gegen den Uhrzeigersinn.
 def leisten_anordnen(stuecke: Sequence[Stueck], r_2: float, e_max: float) -> List[Leiste]
 ```
 
-Die Leisten um eine gestützte Fläche -- `stuecke` ist der geschlossene
+Die Leisten um eine gestützte Fläche – `stuecke` ist der geschlossene
 Schnitt im Abstand `r_2` um sie (siehe Dateikopf).
 
 ### setzen
@@ -108,7 +108,7 @@ def setzen(leisten: Sequence[Leiste], radien: Sequence[float], angerechnet: int,
 ```
 
 Die Leisten, wie sie liegen dürfen (siehe Dateikopf): jede so lang, wie sie
-die Überdeckung zum Plattenrand und zu jeder Aussparung hält -- mit ihren
+die Überdeckung zum Plattenrand und zu jeder Aussparung hält – mit ihren
 Ankern und mit dem Stahl dazwischen. Wer nicht wenigstens die ersten
 `angerechnet` Anker behält oder mit ihnen im Schatten einer Aussparung
 liegt (Figur 23d), fällt weg.
@@ -119,7 +119,7 @@ liegt (Figur 23d), fällt weg.
 def aeussere_kandidaten(leisten: Sequence[Leiste], radien: Sequence[float], umriss: Sequence[Punkt], raender: Sequence[Halbebene], d_v_out: float) -> List[Kandidat]
 ```
 
-Die Kandidaten des äusseren Schnitts (Figur 26) -- siehe Dateikopf.
+Die Kandidaten des äusseren Schnitts (Figur 26) – siehe Dateikopf.
 
 ### Vorschlag
 
@@ -165,7 +165,7 @@ Die anrechenbare Durchstanzbewehrung: Leisten mal Anker im Bereich mal Fläche.
 def gruppen(self) -> List[Tuple[int, int]]
 ```
 
-Je Länge der Leisten -- Anker je Leiste -- wie viele es sind; die längsten zuerst.
+Je Länge der Leisten – Anker je Leiste – wie viele es sind; die längsten zuerst.
 
 #### Vorschlag.name
 
@@ -209,8 +209,8 @@ kein Durchmesser trägt, stehen die Leisten dichter ([[opencivil.durchstanzen.be
 Fläche; `schatten` sind die Schatten der Aussparungen am inneren Schnitt
 ([[opencivil.durchstanzen.schnitt#schatten_am_schnitt|schatten_am_schnitt]]).
 
-Reicht nichts, kommt der stärkste Versuch zurück -- die dichtesten Leisten
-mit dem grössten Durchmesser und neun Ankern --, und seine Prüfung sagt,
+Reicht nichts, kommt der stärkste Versuch zurück – die dichtesten Leisten
+mit dem grössten Durchmesser und neun Ankern –, und seine Prüfung sagt,
 was fehlt. `None` nur, wo das System nichts bietet: die Platte ist zu
 dünn, keine Höhe ist lieferbar, oder keine Leiste findet Platz.
 

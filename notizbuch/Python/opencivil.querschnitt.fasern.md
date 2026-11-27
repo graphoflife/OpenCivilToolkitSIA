@@ -1,5 +1,5 @@
 ---
-erzeugt: 803d56353639
+erzeugt: 6b9bec341061
 art: modul
 tags: [modul]
 ---
@@ -31,14 +31,14 @@ Abstand vom Schwerpunkt entlang der Zugrichtung. Ein positives `chi` zieht
 also auf der Seite, auf die `v` waechst.
 
 `quer` ist die Lage einer Faser entlang der Nulllinie. Nur wer auch das
-Moment um die zweite Achse braucht -- die schiefe Biegung -- gibt sie an. Die
+Moment um die zweite Achse braucht – die schiefe Biegung – gibt sie an. Die
 Platte gibt sie nicht an, und ihre Schleife bleibt so schnell wie bisher.
 
 
 ## GESETZE MIT SPRUNG
 
 Gelesen wird die Spannung in der Mitte jeder Faser. Bei einem stetigen Gesetz
-ist das genau genug. Springt es -- der Spannungsblock --, springt mit jeder
+ist das genau genug. Springt es – der Spannungsblock –, springt mit jeder
 Faser, die den Knick ueberschreitet, auch N, und keine Ebene trifft eine
 verlangte Normalkraft genau. Ein solches Gesetz hat darum ``mittel(eps_a,
 eps_b)``, die mittlere Spannung ueber einen linear verlaufenden Bereich. Wo
@@ -51,9 +51,9 @@ verdraengte Material), wird damit gemittelt.
 Jede Grenze ist eine Stelle `v` mit einem zulaessigen Dehnungsbereich. Weil
 die Ebene linear ist, wird daraus in `(eps_m, chi)` je Grenze ein Streifen
 zwischen zwei Geraden, zusammen ein konvexes Vieleck. Bei festem `chi` ist
-sein Schnitt das Fenster fuer `eps_m` -- das braucht der Loeser in
+sein Schnitt das Fenster fuer `eps_m` – das braucht der Loeser in
 [[opencivil.nachweis.querschnittsloeser]]. Sein Rand ist der
-Dehnungsfaecher -- das braucht die Interaktionslinie. Eine Regel, zwei Nutzer.
+Dehnungsfaecher – das braucht die Interaktionslinie. Eine Regel, zwei Nutzer.
 
 
 ## EINHEITEN
@@ -84,7 +84,7 @@ class Fasergruppe
 
 Fasern aus einem Werkstoff.
 
-`flaechen` ist eine Zahl, wenn alle Fasern gleich gross sind -- dann
+`flaechen` ist eine Zahl, wenn alle Fasern gleich gross sind – dann
 laeuft die Summe ohne Nachschlagen, und das ist die Schleife, die bei der
 Platte hunderttausendfach laeuft. Sonst eine Flaeche je Faser.
 
@@ -92,7 +92,7 @@ Platte hunderttausendfach laeuft. Sonst eine Flaeche je Faser.
 - `arme: Tuple[float, ...]`
 - `flaechen: Union[float, Tuple[float, ...]]`
 - `quer: Optional[Tuple[float, ...]] = None`
-- `dicken: Optional[Tuple[float, ...]] = None` – Ausdehnung jeder Faser in `v` -- gebraucht, wenn das Gesetz springt.
+- `dicken: Optional[Tuple[float, ...]] = None` – Ausdehnung jeder Faser in `v` – gebraucht, wenn das Gesetz springt.
 
 ### Stab
 
@@ -101,7 +101,7 @@ Platte hunderttausendfach laeuft. Sonst eine Flaeche je Faser.
 class Stab
 ```
 
-Ein Bewehrungsstab -- oder ein Stueck einer verschmierten Stablinie.
+Ein Bewehrungsstab – oder ein Stueck einer verschmierten Stablinie.
 
 `verdraengt` ist das Gesetz des Materials, in dem er liegt: an seiner
 Stelle zaehlt der Stab, nicht der Beton, sonst zaehlte dieselbe Flaeche
@@ -120,7 +120,7 @@ zweimal.
 class Faserquerschnitt
 ```
 
-Fasergruppen und Staebe -- und die Kraefte, die eine Ebene in ihnen weckt.
+Fasergruppen und Staebe – und die Kraefte, die eine Ebene in ihnen weckt.
 
 #### Faserquerschnitt.springt
 
@@ -129,7 +129,7 @@ Fasergruppen und Staebe -- und die Kraefte, die eine Ebene in ihnen weckt.
 def springt(self) -> bool
 ```
 
-Ob ein Gesetz springt und darum ueber die Faser gemittelt wird -- der
+Ob ein Gesetz springt und darum ueber die Faser gemittelt wird – der
 Spannungsblock, auch wo ein Stab ihn verdraengt.
 
 #### Faserquerschnitt.kraefte
@@ -152,7 +152,7 @@ class Dehnungsgrenze
 ```
 
 An der Stelle `arm` muss die Dehnung zwischen `eps_min` und `eps_max`
-liegen. `name` sagt, was dort liegt -- «Stahl der 1. Lage» --, fuer
+liegen. `name` sagt, was dort liegt – «Stahl der 1. Lage» –, fuer
 die Mitschrift und fuer Meldungen. Bis 2026-10-18 reisten die Namen als
 eigenes Tupel neben den Grenzen durch sechs Gegenstaende und wurden nach
 ihrer Stelle zugeordnet.
@@ -168,7 +168,7 @@ ihrer Stelle zugeordnet.
 class Dehnungsgrenzen
 ```
 
-Die Grenzen eines Querschnitts -- und was aus ihnen fuer die Ebene folgt.
+Die Grenzen eines Querschnitts – und was aus ihnen fuer die Ebene folgt.
 
 #### Dehnungsgrenzen.fenster
 
@@ -177,7 +177,7 @@ def fenster(self, chi: float) -> Optional[Tuple[float, float]]
 ```
 
 In welchem Bereich `eps_m` liegen darf, damit an keiner Grenze die
-Dehnung aus ihrem Bereich faellt -- bei dieser Kruemmung.
+Dehnung aus ihrem Bereich faellt – bei dieser Kruemmung.
 
 Jede Grenze verlangt `eps_min <= eps_m + chi·arm <= eps_max`. Ist das
 Fenster leer, ist die Kruemmung fuer diesen Querschnitt zu gross.
@@ -189,7 +189,7 @@ def verletzt(self, eps_m: float, chi: float, *, toleranz: float=0.0) -> List[Tup
 ```
 
 Die Grenzen, an denen die Ebene `eps_m + chi·arm` aus ihrem Bereich
-faellt, je mit der Dehnung dort -- an denselben Grenzen, in denen der
+faellt, je mit der Dehnung dort – an denselben Grenzen, in denen der
 Loeser sucht. `toleranz` laesst eine gerundete Eingabe gelten.
 
 #### Dehnungsgrenzen.kruemmungsfenster
@@ -199,7 +199,7 @@ def kruemmungsfenster(self, eps_m: float) -> Optional[Tuple[float, float]]
 ```
 
 In welchem Bereich `chi` liegen darf, damit an keiner Grenze die
-Dehnung aus ihrem Bereich faellt -- bei dieser Dehnung `eps_m` im
+Dehnung aus ihrem Bereich faellt – bei dieser Dehnung `eps_m` im
 Bezugspunkt. Das Gegenstueck zu [[opencivil.querschnitt.fasern#Dehnungsgrenzen.fenster|fenster]], fuer Linien, die
 ueber die Dehnung statt ueber die Kruemmung laufen.
 
@@ -223,7 +223,7 @@ unterste Lage gegen den oberen Rand, `(eps_ud + eps_c2d) / d`.
 
 ## Konstanten
 
-- `FASERN = 60` – Fasern ueber die Plattenhoehe -- und Streifen, wo der gezeichnete Querschnitt wie die Platte rechnet. 60 reichen: die Betonspannung ist stetig, und der Fehler der Mittelpunktsregel faellt mit dem Quadrat der Faserdicke.
+- `FASERN = 60` – Fasern ueber die Plattenhoehe – und Streifen, wo der gezeichnete Querschnitt wie die Platte rechnet. 60 reichen: die Betonspannung ist stetig, und der Fehler der Mittelpunktsregel faellt mit dem Quadrat der Faserdicke.
 
 ## Braucht
 

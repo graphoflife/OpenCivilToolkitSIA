@@ -27,7 +27,7 @@ $$
 
 Die Streifen nehmen die Kraft $Q$ einer Stütze als gleichmässige Pressung
 über den Stützenbereich $l_x \times l_y$ ab
-([[Pressung eines Flächenlagers]]) -- die Stütze drückt aber nur auf ihre
+([[Pressung eines Flächenlagers]]) – die Stütze drückt aber nur auf ihre
 kleine Fläche. Damit beides zusammenpasst, braucht der Bereich ein eigenes
 Element, das die Kraft vom Punkt auf die Fläche verteilt. Es verlangt
 zusätzlich zu dem, was die Streifen brauchen, oben $Q/8 \cdot l_x/l_y$ in x

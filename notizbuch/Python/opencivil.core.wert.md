@@ -1,5 +1,5 @@
 ---
-erzeugt: 22d9cafccfdd
+erzeugt: 9efb1a25a438
 art: modul
 tags: [modul]
 ---
@@ -10,8 +10,8 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Trennt sauber zwischen der *Definition* eines Wertes (Symbol, Einheit,
-Beschreibung, Normreferenz -- statisch) und seiner *Belegung* (Zahlenwert,
-Herkunft -- dynamisch). Diese Trennung ist bewusst: im alten Code waren
+Beschreibung, Normreferenz – statisch) und seiner *Belegung* (Zahlenwert,
+Herkunft – dynamisch). Diese Trennung ist bewusst: im alten Code waren
 Definition und Instanz dasselbe veraenderliche Objekt, was zu global
 mutierbaren Vorlagen und schwer nachvollziehbarem Zustand fuehrte.
 
@@ -41,7 +41,7 @@ def kennung_aus(text: str) -> str
 Ein Name, wie er in einer Wert-ID stehen darf.
 
 Alles ausser Buchstaben und Ziffern wird zum Unterstrich. Damit bilden
-«Feld A» und «Feld-A» auf dieselbe Kennung ab -- wer Namen prueft, muss
+«Feld A» und «Feld-A» auf dieselbe Kennung ab – wer Namen prueft, muss
 darum auch die Kennungen pruefen, nicht nur die Namen.
 
 Die eine Stelle fuer diese Regel. Sie stand einmal neunmal da, in jedem
@@ -54,7 +54,7 @@ ergeben, die nicht mehr zu den Namen in der Pruefung passen.
 class Quelle(str, Enum)
 ```
 
-Woher ein Wert stammt -- entscheidend fuer die Nachvollziehbarkeit.
+Woher ein Wert stammt – entscheidend fuer die Nachvollziehbarkeit.
 
 - `EINGABE = 'eingabe'` – Direkt vom Benutzer eingegeben.
 - `VORGABE = 'vorgabe'` – Normvorgabe oder Vorlagenwert (z.B. f_ck aus der Betonsorte).
@@ -83,7 +83,7 @@ True, wenn der Wert nicht aus einer Berechnung stammt.
 def grad_als_text(grad: float, erfuellt: bool, *, latex: bool=False) -> str
 ```
 
-Ein Erfuellungsgrad als Text -- knapp, aber nie gerundet bis zur Luege.
+Ein Erfuellungsgrad als Text – knapp, aber nie gerundet bis zur Luege.
 
 Zwei Stellen genuegen fast immer. Nur wo ein Nachweis knapp nicht
 aufgeht, zeigen sie `1.00` und sagen damit das Gegenteil des Urteils
@@ -92,7 +92,7 @@ Grad soll kleiner als eins bleiben, weil er das ist.
 
 Die eine Stelle fuer diese Regel. Zuerst stand sie nur in der
 Schnittstelle, und Konsolenbericht, LaTeX-Dokument und die Tooltips der
-Diagramme rundeten weiter selbst -- dort stand bei 0.9966 «1» neben
+Diagramme rundeten weiter selbst – dort stand bei 0.9966 «1» neben
 «nicht erfuellt».
 
 `latex` sagt, in welcher Sprache die Unendlichkeit geschrieben wird:
@@ -117,7 +117,7 @@ Unveraenderlich, damit Definitionen gefahrlos geteilt werden koennen.
 - `beschreibung: str = ''` – Deutscher Klartext, z.B. 'Bemessungswert der Betondruckfestigkeit'.
 - `referenz: str = ''` – Normstelle, z.B. 'SIA 262:2025, 2.4.2.3'.
 - `stellen: int = 2` – Nachkommastellen fuer die Darstellung.
-- `erfuellungsgrad: bool = False` – Ein Erfuellungsgrad: gesetzt nach [[opencivil.core.wert#grad_als_text|grad_als_text]] statt mit `stellen` -- in Herleitung, Werttabelle und Oberflaeche derselbe Text.
+- `erfuellungsgrad: bool = False` – Ein Erfuellungsgrad: gesetzt nach [[opencivil.core.wert#grad_als_text|grad_als_text]] statt mit `stellen` – in Herleitung, Werttabelle und Oberflaeche derselbe Text.
 
 #### WertDef.kurzname
 
@@ -245,7 +245,7 @@ Zahlenwert samt Einheit als LaTeX-Fragment, z.B. `18.7\,\mathrm{MPa}`.
 class Kennzahl
 ```
 
-Ein Wert, der ein Bauteil beschreibt, gleich welche Lastfaelle es gibt --
+Ein Wert, der ein Bauteil beschreibt, gleich welche Lastfaelle es gibt –
 und wie er unter ihm steht. Wer ihn rechnet, nennt ihn: die Platte ihr
 Bewehrungsmass, der Vergroesserungsfaktor sein omega_w, die Kennzahlen
 ihre Widerstaende. Bis 2026-10-18 stand eine Handliste der Beschriftungen
@@ -254,7 +254,7 @@ in der Zusammenfassung, getrennt von den Werten, die sie beschriftete.
 - `definition: WertDef`
 - `beschriftung: str`
 - `erklaerung: str = ''`
-- `feste_stellen: bool = False` – Mit allen Stellen, auch nachlaufenden Nullen -- der Vergroesserungsfaktor.
+- `feste_stellen: bool = False` – Mit allen Stellen, auch nachlaufenden Nullen – der Vergroesserungsfaktor.
 
 #### Kennzahl.text
 
@@ -262,7 +262,7 @@ in der Zusammenfassung, getrennt von den Werten, die sie beschriftete.
 def text(self, wert: Wert) -> str
 ```
 
-Die Zahl, wie sie dasteht -- ohne Einheit.
+Die Zahl, wie sie dasteht – ohne Einheit.
 
 ### FehlendeEingabe
 
@@ -273,12 +273,12 @@ class FehlendeEingabe
 
 Eine Eingabe, die zur Berechnung eines Ziels noetig waere, aber fehlt.
 
-Der Loeser sammelt diese, statt abzubrechen -- so kann die Oberflaeche dem
+Der Loeser sammelt diese, statt abzubrechen – so kann die Oberflaeche dem
 Benutzer genau sagen, was er noch angeben muss und wofuer.
 
 - `id: str` – ID des fehlenden Wertes.
 - `benoetigt_von: str` – ID der Berechnung, die ihn braucht.
-- `pfad: tuple = field(default_factory=tuple)` – Kette der Ziele, ueber die man hierher kam -- fuer die Begruendung.
+- `pfad: tuple = field(default_factory=tuple)` – Kette der Ziele, ueber die man hierher kam – fuer die Begruendung.
 - `definition: Optional[WertDef] = None` – Definition, falls bekannt (dann kennt man Symbol, Einheit, Beschreibung).
 
 #### FehlendeEingabe.beschreibung

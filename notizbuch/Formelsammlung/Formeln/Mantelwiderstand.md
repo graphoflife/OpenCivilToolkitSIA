@@ -47,7 +47,7 @@ Die Mantelreibung über den ganzen Mantel: je Stück seine Länge h mal q_s,k,
 die Summe mal dem Umfang. R_s,k ist der eine Teil des äusseren Widerstands
 (SIA 267:2013, 9.4.4.1.1).
 
-Eine Schicht, die nicht trägt -- eine weiche Auffüllung, Torf --, bekommt
+Eine Schicht, die nicht trägt – eine weiche Auffüllung, Torf –, bekommt
 q_s,k = 0. Bei einem stehenden Pfahl zählt das Buch nur den Mantel in der
 tragenden Schicht (Kap. 12.4, Bild 12.3); den Schichten darüber gibt man dann
 ebenfalls null.

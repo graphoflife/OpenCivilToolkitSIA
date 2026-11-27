@@ -51,7 +51,7 @@ $$
 
 Wie gut sich die Ufer eines Risses verzahnen, hängt an der Gesteinskörnung:
 grobe Körner greifen besser ineinander. Bei sehr festem Beton laufen die
-Risse durch die Körner statt um sie herum, und ihre Grösse zählt weniger --
+Risse durch die Körner statt um sie herum, und ihre Grösse zählt weniger –
 daher der Faktor $\min[1;\ (60/f_{ck})^2]$ am Grösstkorn. Der Beiwert hat
 eine untere Grenze von 1.2.
 

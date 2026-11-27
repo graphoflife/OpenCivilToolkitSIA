@@ -34,7 +34,7 @@ gestrichelten Faser.
 Die Querkräfte sind die Ableitungen der Momente, solange kein verteiltes
 Moment auf dem Stab liegt: $V_z$ gehört zu $M_y$, $V_y$ zu $M_z$. Das
 Torsionsmoment $T$ ist positiv, wenn sein Vektor am Schnittufer nach aussen
-zeigt -- wie der Zug bei $N$.
+zeigt – wie der Zug bei $N$.
 
 Nach der Rechtsschraube hätte $M_z$ das andere Vorzeichen; welches bleiben
 soll, steht in [[TODO]].

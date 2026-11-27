@@ -26,5 +26,5 @@ $$
 Das ganze Moment am verformten Stab, in einer Zeile: die Normalkraft mal der
 Summe dreier Ausmitten. Die gewollte kommt aus dem Moment erster Ordnung, die
 zweiter Ordnung aus der Krümmung. Für eine sinusförmige Biegelinie ist die
-grösste Ausbiegung die Krümmung mal $l_{cr}^2/\pi^2$ -- daher diese Beziehung
+grösste Ausbiegung die Krümmung mal $l_{cr}^2/\pi^2$ – daher diese Beziehung
 zwischen Krümmung und Ausmitte.

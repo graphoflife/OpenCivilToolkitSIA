@@ -41,5 +41,5 @@ Fliesst die Bewehrung unter der Einwirkung, bleibt ihre Spannung am Plateau
 stehen, und ein Vergleich der Spannungen sagte nichts mehr. Verglichen wird
 dann die Dehnung: die wirkende gegen die Dehnung, die zur zulässigen
 Spannung gehört. Solange der Stahl elastisch bleibt, ist das genau der
-Spannungsvergleich; fliesst er, fällt der Nachweis durch -- um so
+Spannungsvergleich; fliesst er, fällt der Nachweis durch – um so
 deutlicher, je weiter er gedehnt ist.

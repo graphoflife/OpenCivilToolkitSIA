@@ -1,5 +1,5 @@
 ---
-erzeugt: b8e11af8ddde
+erzeugt: a862b1436cee
 art: modul
 tags: [modul]
 ---
@@ -21,10 +21,10 @@ der Seite.
 Ein Werkzeug aendert an einer Kopie des Projekts ([[opencivil.mcp.sitzung#Sitzung.aendern|Sitzung.aendern]]).
 Gilt sie, ersetzt sie das Projekt; sonst bleibt alles, wie es war, und die
 Meldung des Kerns geht unveraendert zurueck. Abgewiesen wird, was der Kern
-nicht lesen kann -- ein Feld, das es nicht gibt, ein Text statt einer Zahl
---, und was das ganze Projekt anhielte, wo es vorher rechnete: zwei
-Materialien mit demselben Namen. Was nur den Eintrag anhaelt -- eine Platte
-ohne Bewehrung, eine Dicke von null --, gilt; der Rest rechnet weiter
+nicht lesen kann – ein Feld, das es nicht gibt, ein Text statt einer Zahl
+–, und was das ganze Projekt anhielte, wo es vorher rechnete: zwei
+Materialien mit demselben Namen. Was nur den Eintrag anhaelt – eine Platte
+ohne Bewehrung, eine Dicke von null –, gilt; der Rest rechnet weiter
 (Benutzer, 2026-11-19), und die Antwort sagt gleich, was fehlt, in den Worten
 des Kerns ([[opencivil.mcp.sitzung#Geaendert|Geaendert.hinweise]]).
 
@@ -36,7 +36,7 @@ des Kerns ([[opencivil.mcp.sitzung#Geaendert|Geaendert.hinweise]]).
 class Werkzeugfehler(Exception)
 ```
 
-Was ein Werkzeug nicht tun kann -- ein Satz, der so zurueckgeht.
+Was ein Werkzeug nicht tun kann – ein Satz, der so zurueckgeht.
 
 ### Fund
 
@@ -60,8 +60,8 @@ class Geaendert
 Was eine Aenderung hinterlaesst: den Eintrag und was der Kern zu ihm sagt.
 
 - `eintrag: Any`
-- `hinweise: List[str] = field(default_factory=list)` – Die Hinweise des Aufbaus zu ihm, wie der Kern sie schreibt -- auch, was ihm fehlt.
-- `projektfehler: str = ''` – Warum das Projekt nicht rechnet -- nur, wo es das schon vorher nicht tat.
+- `hinweise: List[str] = field(default_factory=list)` – Die Hinweise des Aufbaus zu ihm, wie der Kern sie schreibt – auch, was ihm fehlt.
+- `projektfehler: str = ''` – Warum das Projekt nicht rechnet – nur, wo es das schon vorher nicht tat.
 
 ### Sitzung
 
@@ -100,7 +100,7 @@ Eine neue Mappe mit einem neuen Projekt, noch ohne Datei.
 def speichern(self, pfad: str='', *, ueberschreiben: bool=False) -> Path
 ```
 
-Schreibt die Mappe, wie «Speichern» der Seite, mit den Sandboxen --
+Schreibt die Mappe, wie «Speichern» der Seite, mit den Sandboxen –
 ohne `pfad` in ihre Datei. Eine andere, die es schon gibt, nur mit
 `ueberschreiben`.
 
@@ -110,7 +110,7 @@ ohne `pfad` in ihre Datei. Eine andere, die es schon gibt, nur mit
 def offen(self) -> Mappe
 ```
 
-Die offene Mappe -- ohne eine sagt der Fehler, wie man zu einer kommt.
+Die offene Mappe – ohne eine sagt der Fehler, wie man zu einer kommt.
 
 #### Sitzung.projekt
 
@@ -119,7 +119,7 @@ Die offene Mappe -- ohne eine sagt der Fehler, wie man zu einer kommt.
 def projekt(self) -> Projekt
 ```
 
-Das gewaehlte Projekt -- in ihm arbeitet jedes Werkzeug.
+Das gewaehlte Projekt – in ihm arbeitet jedes Werkzeug.
 
 #### Sitzung.waehlen
 
@@ -133,7 +133,7 @@ def waehlen(self, name: str) -> Projekt
 def projekt_anlegen(self, name: str='') -> Projekt
 ```
 
-Ein neues Projekt hinter den anderen, gleich gewaehlt -- wie «+» der Projektreihe.
+Ein neues Projekt hinter den anderen, gleich gewaehlt – wie «+» der Projektreihe.
 
 #### Sitzung.finden
 
@@ -142,7 +142,7 @@ def finden(self, eintrag: str, app: str='') -> Fund
 ```
 
 Ein Eintrag des gewaehlten Projekts, nach seinem Namen oder seiner
-Kennung -- mit `app` nur in deren Liste. Heissen mehrere so, etwa
+Kennung – mit `app` nur in deren Liste. Heissen mehrere so, etwa
 die Sandboxen, sagt der Fehler, welche.
 
 #### Sitzung.aendern
@@ -162,7 +162,7 @@ def ersetzen(self, eintrag: str, app: str, neu: Callable[[Dict[str, Any]], Any])
 ```
 
 Ersetzt einen Eintrag durch das, was `neu` aus seiner Datei-Form
-macht -- gelesen vom Leser des Kerns, wie eine Datei. Seine Kennung
+macht – gelesen vom Leser des Kerns, wie eine Datei. Seine Kennung
 bleibt, auf sie zeigen andere; eine Kennung seiner Elemente kommt nie
 wieder ([[opencivil.projekt.netz#von_hand|von_hand]]).
 
@@ -200,7 +200,7 @@ Die Liste einer App, gesagt mit ihr selbst («querschnitte») oder dem Namen ihr
 def name_von(eintrag: Any) -> str
 ```
 
-Wie ein Eintrag heisst -- ein Material ohne eigenen Namen nach seiner Sorte.
+Wie ein Eintrag heisst – ein Material ohne eigenen Namen nach seiner Sorte.
 
 ### kennung_im_raum
 
@@ -209,7 +209,7 @@ def kennung_im_raum(raum: str) -> str
 ```
 
 Die Kennung des Eintrags, dem ein Name im Rechenwerk gehoert: «q3» in
-«querschnitt.q3.nachweis.mn.x» -- wie `inSandbox` in web/js/zustand.js.
+«querschnitt.q3.nachweis.mn.x» – wie `inSandbox` in web/js/zustand.js.
 
 ### datei_form
 
@@ -217,7 +217,7 @@ Die Kennung des Eintrags, dem ein Name im Rechenwerk gehoert: «q3» in
 def datei_form(eintrag: Any) -> Dict[str, Any]
 ```
 
-Ein Eintrag, wie er in der Datei steht -- als JSON-Daten, eine Wahl als ihr Text.
+Ein Eintrag, wie er in der Datei steht – als JSON-Daten, eine Wahl als ihr Text.
 
 ### unbekannt
 
@@ -225,7 +225,7 @@ Ein Eintrag, wie er in der Datei steht -- als JSON-Daten, eine Wahl als ihr Text
 def unbekannt(satz: str, name: str, namen: Iterable[str]) -> str
 ```
 
-`satz`, und wenn es einen gibt, der aehnlichste der `namen` -- wie der Leser des Kerns.
+`satz`, und wenn es einen gibt, der aehnlichste der `namen` – wie der Leser des Kerns.
 
 ### dateipfad
 
@@ -233,7 +233,7 @@ def unbekannt(satz: str, name: str, namen: Iterable[str]) -> str
 def dateipfad(pfad: str) -> Path
 ```
 
-Ein Pfad, wie ein Werkzeug ihn bekommt -- `~` und Relatives vom Arbeitsverzeichnis aus aufgeloest.
+Ein Pfad, wie ein Werkzeug ihn bekommt – `~` und Relatives vom Arbeitsverzeichnis aus aufgeloest.
 
 ### schreiben
 
@@ -241,7 +241,7 @@ Ein Pfad, wie ein Werkzeug ihn bekommt -- `~` und Relatives vom Arbeitsverzeichn
 def schreiben(ziel: Path, text: str, *, ueberschreiben: bool=False) -> None
 ```
 
-Schreibt `text` nach `ziel` -- eine Datei, die es schon gibt, nur mit
+Schreibt `text` nach `ziel` – eine Datei, die es schon gibt, nur mit
 `ueberschreiben`. Erst ganz daneben, dann an ihren Ort: bricht etwas
 ab, bleibt die alte Datei heil.
 
@@ -251,12 +251,12 @@ ab, bleibt die alte Datei heil.
 def _rechnet(projekt: Projekt) -> bool
 ```
 
-Ob der Kern das Projekt aufbauen kann -- ohne Fehler, der alles anhaelt.
+Ob der Kern das Projekt aufbauen kann – ohne Fehler, der alles anhaelt.
 
 
 ## Konstanten
 
-- `LISTEN = {'materialien': MaterialEintrag, **{liste: klasse for liste, (klasse,…` – Die Listen, deren Eintraege ein Werkzeug anspricht -- die Materialien und die Apps --, je mit der Klasse ihrer Eintraege.
+- `LISTEN = {'materialien': MaterialEintrag, **{liste: klasse for liste, (klasse,…` – Die Listen, deren Eintraege ein Werkzeug anspricht – die Materialien und die Apps –, je mit der Klasse ihrer Eintraege.
 - `BAUTEILLISTEN = tuple((art.liste for art in BAUTEILE))` – Die Listen, deren Eintraege rechnen: ohne Materialien und Skripte.
 
 ## Braucht

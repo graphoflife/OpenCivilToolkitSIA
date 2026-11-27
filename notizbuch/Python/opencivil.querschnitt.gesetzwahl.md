@@ -1,5 +1,5 @@
 ---
-erzeugt: 056945cf3c0b
+erzeugt: 6c73f53711cf
 art: modul
 tags: [modul]
 ---
@@ -12,7 +12,7 @@ tags: [modul]
 Die Wahl der Werkstoffgesetze: der Wertesatz ([[opencivil.querschnitt.gesetzwahl#Werkstoffsatz|Werkstoffsatz]]), die
 Rechenart des Betons ([[opencivil.querschnitt.gesetzwahl#Rechenart|Rechenart]]) und die des Holzes
 ([[opencivil.querschnitt.gesetzwahl#Holzrechnung|Holzrechnung]]), mit der Kriechzahl zusammen eine
-[[opencivil.querschnitt.gesetzwahl#Rechenwahl|Rechenwahl]] -- und die Stellen, die daraus die Gesetze bauen: den
+[[opencivil.querschnitt.gesetzwahl#Rechenwahl|Rechenwahl]] – und die Stellen, die daraus die Gesetze bauen: den
 Beton ([[opencivil.querschnitt.gesetzwahl#betongesetz|betongesetz]]), mit dem wirksamen Modul ([[opencivil.querschnitt.gesetzwahl#wirksamer_modul|wirksamer_modul]]),
 und das Holz ([[opencivil.querschnitt.gesetzwahl#holzgesetz|holzgesetz]]).
 Das gehoert dem Querschnitt: die Platte, der gezeichnete Querschnitt und die
@@ -25,16 +25,16 @@ Nachweisen.
 
 ## DIE RECHENARTEN
 
-* **Handrechnung** -- im Loeser derselbe Querschnitt wie in der
+* **Handrechnung** – im Loeser derselbe Querschnitt wie in der
   Resistenzlinie aus Handrechnung: der Spannungsblock, die Bewehrung nur auf
-  Zug, je Seite zu einer Lage im Schwerpunkt zusammengefasst -- beide mit
-  [[opencivil.nachweis.querschnittsloeser#je_seite|je_seite]] --, und der Beton
+  Zug, je Seite zu einer Lage im Schwerpunkt zusammengefasst – beide mit
+  [[opencivil.nachweis.querschnittsloeser#je_seite|je_seite]] –, und der Beton
   auch dort gezaehlt, wo der Stahl liegt. Die gedrueckte Bewehrung zaehlt
-  nicht -- in keiner anderen Rechenart fehlt sie.
-* **0.85·x-Vereinfachung** -- derselbe Spannungsblock, ueber die Hoehe
+  nicht – in keiner anderen Rechenart fehlt sie.
+* **0.85·x-Vereinfachung** – derselbe Spannungsblock, ueber die Hoehe
   integriert, jede Faser mit ihrer mittleren Spannung. Die gedrueckte
   Bewehrung wirkt mit und verdraengt den Beton an ihrer Stelle.
-* **Praezise ohne Vereinfachung** -- die Parabel-Rechteck-Beziehung, ihr
+* **Praezise ohne Vereinfachung** – die Parabel-Rechteck-Beziehung, ihr
   Anstieg mit dem wirksamen Modul `E_cm/(1+phi)`, `k_sigma` nie unter 1.
 
 Die Namen hat der Benutzer am 2026-10-12 gewaehlt; vorher hiessen sie
@@ -42,19 +42,19 @@ Die Namen hat der Benutzer am 2026-10-12 gewaehlt; vorher hiessen sie
 2026-11-25 gab es fuer die Stahlspannungen dazu «elastisch»: der Beton linear
 mit `E_cm/(1+phi)`, hoechstens `f_c`. Der Benutzer hat es gestrichen: im
 Gebrauch ist die Parabel beinahe eine Gerade, und die Stahlspannung lag um
-etwa ein Prozent neben der praezisen -- bei phi = 2 etwa 344 statt
+etwa ein Prozent neben der praezisen – bei phi = 2 etwa 344 statt
 340 N/mm².
 
 Die Kriechzahl wirkt nur bei praezise: an den anderen Gesetzen haengt kein
 Modul. Der Wertesatz bestimmt, wo die Plateaus liegen
-([[opencivil.querschnitt.gesetzwahl#Werkstoffsatz|Werkstoffsatz]]), und wie ein Widerstand heisst -- `R_d` oder
+([[opencivil.querschnitt.gesetzwahl#Werkstoffsatz|Werkstoffsatz]]), und wie ein Widerstand heisst – `R_d` oder
 `R_k`.
 
 
 ## JE MATERIAL
 
 Den Wertesatz waehlt ein Kapitel je Material ([[opencivil.querschnitt.gesetzwahl#Wertesaetze|Wertesaetze]]), wie
-die Tragsicherheit der Querschnittsanalyse es schon tat -- in jedem Modul
+die Tragsicherheit der Querschnittsanalyse es schon tat – in jedem Modul
 dieselbe Wahl (Benutzer, 2026-11-20). Bis dahin galt in der Platte, beim
 Knicken, in den Stahlspannungen, den Analysen und beim E_eq eines Stabs ein
 Satz fuer alle Materialien. Rechnen Beton und Stahl mit verschiedenen
@@ -71,15 +71,15 @@ class Werkstoffsatz(Wahl)
 
 Mit welchen Festigkeiten die Werkstoffgesetze rechnen.
 
-**Bemessung** -- `f_cd` und `f_yd`. Fuer die Tragsicherheit: gefragt
+**Bemessung** – `f_cd` und `f_yd`. Fuer die Tragsicherheit: gefragt
 ist, was der Querschnitt *darf*, und dahinein gehoert der
 Teilsicherheitsbeiwert.
 
-**Charakteristisch** -- `f_ck` und `f_yk`. Fuer die
+**Charakteristisch** – `f_ck` und `f_yk`. Fuer die
 Gebrauchstauglichkeit: gefragt ist, was der Querschnitt *tut*, und Stahl
 fliesst bei `f_yk`, nicht bei `f_yd`. Mit dem Plateau bei `f_yd`
-laege jede Stahlspannung unter 435 N/mm², und eine Grenze darueber --
-`f_yk` bei normaler Rissanforderung -- waere nie zu ueberschreiten: ein
+laege jede Stahlspannung unter 435 N/mm², und eine Grenze darueber –
+`f_yk` bei normaler Rissanforderung – waere nie zu ueberschreiten: ein
 Nachweis, der per Konstruktion immer aufgeht.
 
 Der Satz bestimmt, **wo die Plateaus liegen**, und sonst nichts. Die
@@ -87,7 +87,7 @@ Moduln und Dehnungsgrenzen sind in beiden Saetzen dieselben. Er steht hier
 als Name und nicht als zwei Zahlen an jeder Aufrufstelle: welche Werte ein
 Nachweis ansetzt, ist eine Entscheidung, und eine Entscheidung soll man
 lesen koennen, statt sie aus `f_sd=...` erschliessen zu muessen. Jeder
-Nutzer des Loesers nennt darum seinen Satz -- der Knicknachweis
+Nutzer des Loesers nennt darum seinen Satz – der Knicknachweis
 `BEMESSUNG`, die Spannungsbegrenzung `CHARAKTERISTISCH`; die
 Spannung-Dehnung-Analyse waehlt ihn je Analyse.
 
@@ -135,7 +135,7 @@ Der Index an einem Widerstand: `M_{Rd}` oder `M_{Rk}`.
 def stahl_druck(self) -> str
 ```
 
-Kurzname der Stahlfestigkeit auf Druck -- dort beginnt das Plateau.
+Kurzname der Stahlfestigkeit auf Druck – dort beginnt das Plateau.
 
 #### Werkstoffsatz.stahl
 
@@ -144,7 +144,7 @@ Kurzname der Stahlfestigkeit auf Druck -- dort beginnt das Plateau.
 def stahl(self) -> str
 ```
 
-Kurzname der Stahlfestigkeit -- dort beginnt das Fliessplateau.
+Kurzname der Stahlfestigkeit – dort beginnt das Fliessplateau.
 
 #### Werkstoffsatz.beton
 
@@ -153,7 +153,7 @@ Kurzname der Stahlfestigkeit -- dort beginnt das Fliessplateau.
 def beton(self) -> str
 ```
 
-Kurzname der Betonfestigkeit -- dort endet der Anstieg im Druck.
+Kurzname der Betonfestigkeit – dort endet der Anstieg im Druck.
 
 #### Werkstoffsatz.stahl_zeichen
 
@@ -162,7 +162,7 @@ Kurzname der Betonfestigkeit -- dort endet der Anstieg im Druck.
 def stahl_zeichen(self) -> str
 ```
 
-Das Formelzeichen dazu, fuer die Herleitung -- `f_{yd}`.
+Das Formelzeichen dazu, fuer die Herleitung – `f_{yd}`.
 
 #### Werkstoffsatz.stahl_druck_zeichen
 
@@ -171,7 +171,7 @@ Das Formelzeichen dazu, fuer die Herleitung -- `f_{yd}`.
 def stahl_druck_zeichen(self) -> str
 ```
 
-Das Zeichen des Plateaus auf Druck -- `f_{yd}^{-}`.
+Das Zeichen des Plateaus auf Druck – `f_{yd}^{-}`.
 
 #### Werkstoffsatz.beton_zeichen
 
@@ -180,7 +180,7 @@ Das Zeichen des Plateaus auf Druck -- `f_{yd}^{-}`.
 def beton_zeichen(self) -> str
 ```
 
-Das Formelzeichen dazu, fuer die Herleitung -- `f_{cd}`.
+Das Formelzeichen dazu, fuer die Herleitung – `f_{cd}`.
 
 #### Werkstoffsatz.betonkennwerte
 
@@ -191,7 +191,7 @@ def betonkennwerte(self) -> Dict[str, str]
 
 Je Rolle eines Betongesetzes
 ([[opencivil.querschnitt.werkstoffgesetz#Konstanten|Werte]]) der Kurzname
-seines Kennwerts in diesem Satz -- `E_c` als `E_cm`, ohne Kriechen.
+seines Kennwerts in diesem Satz – `E_c` als `E_cm`, ohne Kriechen.
 
 #### Werkstoffsatz.stahlkennwerte
 
@@ -209,7 +209,7 @@ Dasselbe fuer ein Stahlgesetz.
 def baustahl(self) -> str
 ```
 
-Kurzname der Streckgrenze des Baustahls -- dort beginnt sein Plateau:
+Kurzname der Streckgrenze des Baustahls – dort beginnt sein Plateau:
 `f_yd = f_y/γ_M1` oder `f_y` (SIA 263:2013, 4.1.1).
 
 #### Werkstoffsatz.baustahlkennwerte
@@ -228,7 +228,7 @@ Dasselbe fuer das Gesetz des Baustahls, in Zug und Druck dieselbe Streckgrenze.
 def profilblech(self) -> str
 ```
 
-Kurzname der Streckgrenze des Profilblechstahls -- dort beginnt sein
+Kurzname der Streckgrenze des Profilblechstahls – dort beginnt sein
 Plateau: `f_ypd = f_yp/γ_ap` oder `f_yp` (SIA 264:2014, 4.1.3).
 
 #### Werkstoffsatz.profilblechkennwerte
@@ -238,7 +238,7 @@ Plateau: `f_ypd = f_yp/γ_ap` oder `f_yp` (SIA 264:2014, 4.1.3).
 def profilblechkennwerte(self) -> Dict[str, str]
 ```
 
-Dasselbe fuer das Gesetz des Profilblechstahls -- wie beim Baustahl.
+Dasselbe fuer das Gesetz des Profilblechstahls – wie beim Baustahl.
 
 #### Werkstoffsatz.spannstahl
 
@@ -247,7 +247,7 @@ Dasselbe fuer das Gesetz des Profilblechstahls -- wie beim Baustahl.
 def spannstahl(self) -> str
 ```
 
-Kurzname der Fliessgrenze des Spannstahls -- dort beginnt sein Plateau:
+Kurzname der Fliessgrenze des Spannstahls – dort beginnt sein Plateau:
 `f_pd` oder `f_p01k` (SIA 262:2025, Figur 17).
 
 #### Werkstoffsatz.festigkeit
@@ -257,7 +257,7 @@ def festigkeit(self, art: Baustoffart) -> str
 ```
 
 Der Kurzname der Festigkeit, deren Plateau dieser Satz waehlt, je Art
-des Baustoffs -- `f_cd` oder `f_ck` beim Beton, `f_yd` oder
+des Baustoffs – `f_cd` oder `f_ck` beim Beton, `f_yd` oder
 `f_y` beim Baustahl. Das Holz hat keinen Satz ([[opencivil.querschnitt.gesetzwahl#Konstanten|HOLZKENNWERTE]]);
 fuer den Titel des Schalters ([[opencivil.web.api]], `satztitel`).
 
@@ -269,7 +269,7 @@ def spannstahlkennwerte(self) -> Dict[str, str]
 ```
 
 Dasselbe fuer das Gesetz des Spannstahls, mit dem Modul der Draehte und
-Staebe -- ein Spannglied aus Litzen nimmt seinen eigenen
+Staebe – ein Spannglied aus Litzen nimmt seinen eigenen
 ([[opencivil.querschnitt.spannglieder]]).
 
 ### Holzrechnung
@@ -301,7 +301,7 @@ def beschriftung(self) -> str
 def kurz(self) -> str
 ```
 
-Fuer schmale Zeilen -- im Schalter unter dem Holz.
+Fuer schmale Zeilen – im Schalter unter dem Holz.
 
 ### Rechenart
 
@@ -309,7 +309,7 @@ Fuer schmale Zeilen -- im Schalter unter dem Holz.
 class Rechenart(Wahl)
 ```
 
-Wie der Querschnitt gerechnet wird -- siehe Dateikopf.
+Wie der Querschnitt gerechnet wird – siehe Dateikopf.
 
 - `HANDRECHNUNG = 'handrechnung'`
 - `BLOCK = 'block'`
@@ -329,7 +329,7 @@ def beschriftung(self) -> str
 def kurz(self) -> str
 ```
 
-Fuer schmale Zeilen -- etwa die Auswahl auf der Karte einer Analyse.
+Fuer schmale Zeilen – etwa die Auswahl auf der Karte einer Analyse.
 
 #### Rechenart.latex
 
@@ -338,7 +338,7 @@ Fuer schmale Zeilen -- etwa die Auswahl auf der Karte einer Analyse.
 def latex(self) -> str
 ```
 
-Der Name als Formeltext -- fuer die Zeile «Rechenwahl» der Herleitung.
+Der Name als Formeltext – fuer die Zeile «Rechenwahl» der Herleitung.
 
 #### Rechenart.mit_kriechzahl
 
@@ -347,7 +347,7 @@ Der Name als Formeltext -- fuer die Zeile «Rechenwahl» der Herleitung.
 def mit_kriechzahl(self) -> bool
 ```
 
-Ob `phi` etwas aendert -- nur, wo ein Gesetz am Modul haengt.
+Ob `phi` etwas aendert – nur, wo ein Gesetz am Modul haengt.
 
 #### Rechenart.mit_block
 
@@ -366,7 +366,7 @@ def ohne_ebene(self) -> str
 ```
 
 Was statt der Probe dasteht, wenn die Suche ihre Ebene verfehlt
-([[opencivil.nachweis.querschnittsloeser#Ebene|verfehlt]]) --
+([[opencivil.nachweis.querschnittsloeser#Ebene|verfehlt]]) –
 mit dem Spannungsblock bei viel Druck und wenig Moment. Mit der
 Parabel gibt es die Ebene dort.
 
@@ -380,11 +380,11 @@ class JeBaustoff
 Je Baustoff eines Bauteils eine Wahl: der Wertesatz ([[opencivil.querschnitt.gesetzwahl#Wertesaetze|Wertesaetze]])
 oder beim Beton die Rechenart ([[opencivil.querschnitt.gesetzwahl#Rechenarten|Rechenarten]]). `je_baustoff`
 nennt die Baustoffe mit ihrer Wahl, nach Baustoff-ID geordnet; ein anderer
-rechnet mit `vorgabe` -- so auch jeder, wo ein Kapitel eine Wahl fuer
+rechnet mit `vorgabe` – so auch jeder, wo ein Kapitel eine Wahl fuer
 alle festlegt ([[opencivil.querschnitt.gesetzwahl#JeBaustoff.alle|alle]]).
 Unveraenderlich und vergleichbar: eine Wahl ist Schluessel von
 Zwischenspeichern, und zwei gleiche Wahlen teilen sich eine Linie. Darum
-wird eine Wahl fuer alle immer zu [[opencivil.querschnitt.gesetzwahl#JeBaustoff.alle|alle]] ([[opencivil.querschnitt.gesetzwahl#JeBaustoff.je|je]]) -- sonst
+wird eine Wahl fuer alle immer zu [[opencivil.querschnitt.gesetzwahl#JeBaustoff.alle|alle]] ([[opencivil.querschnitt.gesetzwahl#JeBaustoff.je|je]]) – sonst
 rechneten die Kennzahlen, die mit Bemessungswerten fest waehlen, ihre
 eigene Linie neben der gleichen der Tragsicherheit.
 
@@ -407,7 +407,7 @@ Jeder Baustoff mit derselben Wahl.
 def je(cls, wahlen: Mapping[str, Any], vorgabe: Any=None)
 ```
 
-Aus Baustoff-ID und Wahl -- je Baustoff des Bauteils eine. Haben alle
+Aus Baustoff-ID und Wahl – je Baustoff des Bauteils eine. Haben alle
 dieselbe, ist es [[opencivil.querschnitt.gesetzwahl#JeBaustoff.alle|alle]] mit ihr; ohne Baustoff die `vorgabe`,
 ohne Angabe die der Klasse.
 
@@ -435,7 +435,7 @@ Die Wahlen, mit denen gerechnet wird.
 def einheitlich(self)
 ```
 
-Die Wahl, wenn alle Baustoffe dieselbe haben -- sonst `None`.
+Die Wahl, wenn alle Baustoffe dieselbe haben – sonst `None`.
 
 ### Wertesaetze
 
@@ -456,7 +456,7 @@ def index(self) -> str
 ```
 
 Wie ein Widerstand heisst: `Rd` mit Bemessungswerten, `Rk` mit
-charakteristischen -- gemischt weder das eine noch das andere,
+charakteristischen – gemischt weder das eine noch das andere,
 `R` (nach Vorgabe, nicht nachgeschlagen).
 
 #### Wertesaetze.kuerzel
@@ -466,7 +466,7 @@ charakteristischen -- gemischt weder das eine noch das andere,
 def kuerzel(self) -> str
 ```
 
-Der Buchstabe am Index, `d` oder `k` -- gemischt keiner.
+Der Buchstabe am Index, `d` oder `k` – gemischt keiner.
 
 #### Wertesaetze.kurz
 
@@ -475,7 +475,7 @@ Der Buchstabe am Index, `d` oder `k` -- gemischt keiner.
 def kurz(self) -> str
 ```
 
-Fuer Legenden: «Bemessung», «charakteristisch» -- oder «gemischt».
+Fuer Legenden: «Bemessung», «charakteristisch» – oder «gemischt».
 
 #### Wertesaetze.beschriftung
 
@@ -484,7 +484,7 @@ Fuer Legenden: «Bemessung», «charakteristisch» -- oder «gemischt».
 def beschriftung(self) -> str
 ```
 
-Ueber einem Bild: «Bemessungswerte», «charakteristisch» -- oder «gemischte Werte».
+Ueber einem Bild: «Bemessungswerte», «charakteristisch» – oder «gemischte Werte».
 
 ### Rechenarten
 
@@ -493,7 +493,7 @@ Ueber einem Bild: «Bemessungswerte», «charakteristisch» -- oder «gemischte 
 class Rechenarten(JeBaustoff)
 ```
 
-Je Beton seine Rechenart ([[opencivil.querschnitt.gesetzwahl#Rechenart|Rechenart]]) -- ein Stahl hat keine,
+Je Beton seine Rechenart ([[opencivil.querschnitt.gesetzwahl#Rechenart|Rechenart]]) – ein Stahl hat keine,
 er rechnet in jeder Art mit seinem Gesetz. Wo ein Kapitel mehrere Betone
 rechnet, fragt es hier, ob einer von ihnen am Modul haengt oder als
 Block rechnet.
@@ -536,7 +536,7 @@ praezise zu rechnen.
 class Holzrechnungen(JeBaustoff)
 ```
 
-Je Holz, wie es rechnet ([[opencivil.querschnitt.gesetzwahl#Holzrechnung|Holzrechnung]]) -- ohne Wahl linear.
+Je Holz, wie es rechnet ([[opencivil.querschnitt.gesetzwahl#Holzrechnung|Holzrechnung]]) – ohne Wahl linear.
 
 - `vorgabe: Holzrechnung = Holzrechnung.LINEAR`
 
@@ -552,13 +552,13 @@ Beton die Rechenart, in den Spannung-Dehnung-Analysen dazu je Holz, wie
 es rechnet. Die Rechenart je Beton seit 2026-11-25 (Benutzer:
 unter dem Beton, in jedem Modul); bis dahin galt in einem Kapitel eine
 fuer alle Betone, und nur die Tragsicherheit der Querschnittsanalyse
-waehlte je Beton -- mit einer eigenen Wahl fuer jeden Baustoff.
+waehlte je Beton – mit einer eigenen Wahl fuer jeden Baustoff.
 
 - `kriechzahl: float = 0.0`
 - `saetze: Wertesaetze = Wertesaetze()`
 - `arten: Rechenarten = Rechenarten()`
 - `holz: Holzrechnungen = Holzrechnungen()`
-- `modul: str = 'E_cm'` – Der Kurzname des Elastizitaetsmoduls, an dem der Beton haengt: `E_cm`, bei der Verformung des Knickens `E_cd` (SIA 262:2025, 4.2.1.17). Keine Wahl des Benutzers -- das Kapitel setzt ihn.
+- `modul: str = 'E_cm'` – Der Kurzname des Elastizitaetsmoduls, an dem der Beton haengt: `E_cm`, bei der Verformung des Knickens `E_cd` (SIA 262:2025, 4.2.1.17). Keine Wahl des Benutzers – das Kapitel setzt ihn.
 
 #### Rechenwahl.satz
 
@@ -591,7 +591,7 @@ Wie ein Holz rechnet ([[opencivil.querschnitt.gesetzwahl#JeBaustoff.von|JeBausto
 def art(self) -> Rechenart
 ```
 
-Die Rechenart, wo alle Betone dieselbe haben -- in einem Bauteil mit
+Die Rechenart, wo alle Betone dieselbe haben – in einem Bauteil mit
 einem Beton immer, in der Platte etwa. Rechnen mehrere Betone
 verschieden, gibt es die eine nicht: dann fragt man je Beton
 ([[opencivil.querschnitt.gesetzwahl#Rechenwahl.art_von|art_von]]), und hier zu fragen ist ein Fehler im Programm.
@@ -610,7 +610,7 @@ Die Kennwerte des Betongesetzes ([[opencivil.querschnitt.gesetzwahl#Werkstoffsat
 def kennwerte(self, stoff) -> Dict[str, str]
 ```
 
-Je Rolle des Gesetzes eines Baustoffs der Kurzname seines Kennwerts --
+Je Rolle des Gesetzes eines Baustoffs der Kurzname seines Kennwerts –
 nach der Art des Baustoffs, die eine Stelle dafuer: Beton
 ([[opencivil.querschnitt.gesetzwahl#Rechenwahl.betonkennwerte|betonkennwerte]]), Betonstahl, Spannstahl, Baustahl und Holz.
 Das Holz kennt keinen Wertesatz: SIA 265:2012 nennt nur
@@ -623,7 +623,7 @@ Bemessungswerte ([[opencivil.querschnitt.gesetzwahl#Konstanten|HOLZKENNWERTE]]).
 def index(self) -> str
 ```
 
-`Rd`, `Rk` oder gemischt `R` -- wie ein Widerstand dieser Wahl heisst ([[opencivil.querschnitt.gesetzwahl#Wertesaetze.index|Wertesaetze.index]]).
+`Rd`, `Rk` oder gemischt `R` – wie ein Widerstand dieser Wahl heisst ([[opencivil.querschnitt.gesetzwahl#Wertesaetze.index|Wertesaetze.index]]).
 
 #### Rechenwahl.beschriftung
 
@@ -631,7 +631,7 @@ def index(self) -> str
 def beschriftung(self, betone: Sequence=()) -> str
 ```
 
-Fuer Legenden: «Präzise ohne Vereinfachung, φ = 2, Bemessung» -- phi
+Fuer Legenden: «Präzise ohne Vereinfachung, φ = 2, Bemessung» – phi
 nur, wo es wirkt. Rechnen die `betone` verschieden, steht jede Art
 mit dem Namen ihres Betons da ([[opencivil.querschnitt.gesetzwahl#arten_text|arten_text]]).
 
@@ -664,7 +664,7 @@ ohne Vereinfachung»; sonst je Beton aus `betone` mit seinem Namen,
 def holz_text(wahl: Rechenwahl, hoelzer: Sequence) -> str
 ```
 
-Wie die `hoelzer` rechnen, in Worten -- wie [[opencivil.querschnitt.gesetzwahl#arten_text|arten_text]]: alle
+Wie die `hoelzer` rechnen, in Worten – wie [[opencivil.querschnitt.gesetzwahl#arten_text|arten_text]]: alle
 gleich «Linear bis zum Bruch», sonst je Holz mit seinem Namen; ohne Holz
 nichts.
 
@@ -674,7 +674,7 @@ nichts.
 def holzgesetz(rechnung: Holzrechnung, *, E: float, f_t: float, f_c: float, eps_cu: float) -> Holzgesetz
 ```
 
-Das Gesetz eines Holzes, wie es rechnet -- die eine Stelle, die zwischen
+Das Gesetz eines Holzes, wie es rechnet – die eine Stelle, die zwischen
 linear und elastisch-plastisch waehlt. Werte in SI, positiv.
 
 ### wirksamer_modul
@@ -683,7 +683,7 @@ linear und elastisch-plastisch waehlt. Werte in SI, positiv.
 def wirksamer_modul(E_c: float, phi: float) -> float
 ```
 
-`E_c,eff = E_c / (1 + phi)` -- das Kriechen weicht den Beton auf ([[opencivil.querschnitt.gesetzwahl#Konstanten|REFERENZ_KRIECHEN]]).
+`E_c,eff = E_c / (1 + phi)` – das Kriechen weicht den Beton auf ([[opencivil.querschnitt.gesetzwahl#Konstanten|REFERENZ_KRIECHEN]]).
 
 ### betongesetz
 
@@ -691,7 +691,7 @@ def wirksamer_modul(E_c: float, phi: float) -> float
 def betongesetz(wahl: Rechenwahl, art: Rechenart, *, f_c: float, E_c: float, eps_c1d: float, eps_c2d: float, ungerissen: bool=False) -> Gesetz
 ```
 
-Ein Beton einer Wahl -- im gerissenen Zustand nach seiner Rechenart
+Ein Beton einer Wahl – im gerissenen Zustand nach seiner Rechenart
 `art` ([[opencivil.querschnitt.gesetzwahl#Rechenwahl.art_von|Rechenwahl.art_von]]), `ungerissen` linear in Druck und
 Zug mit dem wirksamen Modul. Die eine Stelle fuer beide: der Loeser der
 Platte, die genaue Resistenzlinie und der gezeichnete Querschnitt
@@ -703,7 +703,7 @@ der Wahl ([[opencivil.querschnitt.gesetzwahl#Rechenwahl|Rechenwahl.modul]]), ohn
 
 ## Konstanten
 
-- `HOLZKENNWERTE = {'f_t': 'f_t_0_d', 'f_c': 'f_c_0_d', 'E': 'E_0_mean', 'eps_cu': 'eps_…` – Je Rolle der Gesetze des Holzes der Kurzname seines Kennwerts -- die Bemessungswerte in Faserrichtung und der mittlere Modul (SIA 265:2012, Tabellen 6 und 7), dazu die Grenzstauchung des elastisch-plastischen ([[opencivil.querschnitt.werkstoffgesetz#HolzPlastisch|HolzPlastisch]]).
+- `HOLZKENNWERTE = {'f_t': 'f_t_0_d', 'f_c': 'f_c_0_d', 'E': 'E_0_mean', 'eps_cu': 'eps_…` – Je Rolle der Gesetze des Holzes der Kurzname seines Kennwerts – die Bemessungswerte in Faserrichtung und der mittlere Modul (SIA 265:2012, Tabellen 6 und 7), dazu die Grenzstauchung des elastisch-plastischen ([[opencivil.querschnitt.werkstoffgesetz#HolzPlastisch|HolzPlastisch]]).
 - `REFERENZ_KRIECHEN = 'SIA 262:2025, 3.1.2.6.1, (12)'` – Die Kriechdehnung ist `phi` mal die elastische; zusammen `(1 + phi)` mal, und daraus folgt der wirksame Modul.
 
 ## Braucht

@@ -73,7 +73,7 @@ eine Dicke, ein gezeichneter Querschnitt zwei Abmessungen: angesetzt wird
 die kleinere Ausdehnung des Betons, gemessen am umschreibenden Rechteck. Bei
 einem Rechteck ist das seine Dicke, wie bei der Platte. Die Norm nimmt die
 kleinste Abmessung des gezogenen Teils (SIA 262, 4.4.1.3); bei Steg,
-Flansch oder Hohlkasten ist das weniger als die Seite des Rechtecks -- das
+Flansch oder Hohlkasten ist das weniger als die Seite des Rechtecks – das
 ist offen, siehe [[TODO]].
 
 Mit dem Schalter «500 mm» gilt bei massigen Bauteilen $k_t$ für 500 mm, und

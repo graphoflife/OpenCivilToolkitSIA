@@ -40,7 +40,7 @@ N\_Ed zählt mit Vorzeichen, Zug positiv: Druck hebt das Dekompressionsmoment un
 ## Theorie
 
 Ob eine Platte Querkraftbewehrung trägt, entscheidet, welcher von zwei
-Ansätzen gilt -- addiert werden sie nicht.
+Ansätzen gilt – addiert werden sie nicht.
 
 **Ohne Bügel** trägt der Beton allein. Die Querkraft läuft über einen
 Druckbogen, und was sie begrenzt, ist der kritische Schubriss: je breiter er

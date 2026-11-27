@@ -1,5 +1,5 @@
 ---
-erzeugt: 4a1d7e26d7cc
+erzeugt: 6f328234b8f4
 art: modul
 tags: [modul]
 ---
@@ -10,12 +10,12 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Der Katalog eines Balkensystems, eben und im Raum aus derselben Funktion
-([[opencivil.web.systemkatalog#katalog|katalog]]): Querschnitte -- Vorlagen, Stahlprofile, Arten --,
+([[opencivil.web.systemkatalog#katalog|katalog]]): Querschnitte – Vorlagen, Stahlprofile, Arten –,
 Materialien, Lasten und ihre Richtungen, Lager und Linienlager, die
 Diagramme und wie die Ergebnisse heissen. Beide haben dieselben Schluessel;
-was eine Art anders hat, sagen ihre Beschreibung -- Achsen, Lagerfelder,
-Linienlager, die Wahl jedes Feldes, die Einheiten der Federn --, ihre
-Rechnung -- die Kennwerte von Querschnitt und Material -- und die
+was eine Art anders hat, sagen ihre Beschreibung – Achsen, Lagerfelder,
+Linienlager, die Wahl jedes Feldes, die Einheiten der Federn –, ihre
+Rechnung – die Kennwerte von Querschnitt und Material – und die
 Darstellung ihrer Ergebnisse ([[opencivil.web.balkendaten]]). Bis
 2026-11-15 stand der Katalog des 2D-Balkensystems in [[opencivil.web.api]].
 
@@ -50,8 +50,8 @@ Klasse, die sie rechnet, `darstellung` wie ihre Ergebnisse gezeigt werden.
 
 ## Konstanten
 
-- `_DIAGRAMME = {'M': ('M', 'Moment M', 'M', 'z'), 'V': ('V', 'Querkraft V', 'V', 'z'…` – Wie ein Diagramm heisst -- kurz im Schalter, lang ueber dem Diagramm --, welches Feld der Proben es zeigt und zu welcher Achse des Stabs ein positiver Wert aufgetragen wird: zur Faser, an der ein positives Moment zieht, die Querkraft wie ihr Moment. Ohne Achse die, die im Bild laenger ist -- bei N und T gibt es keine Seite.
-- `_LINIENLAGER = {'quer': ('Lager quer', 'quer', '⊥', 'Quer zur Linie, auf der Seite d…` – Wie ein Linienlager heisst -- im Fenster, kurz in der Liste, als Zeichen seiner Bettung --, was sein Schalter erklaert und in welcher Achse des Stabs es haelt: quer in der Ebene zur gestrichelten Faser, in z.
+- `_DIAGRAMME = {'M': ('M', 'Moment M', 'M', 'z'), 'V': ('V', 'Querkraft V', 'V', 'z'…` – Wie ein Diagramm heisst – kurz im Schalter, lang ueber dem Diagramm –, welches Feld der Proben es zeigt und zu welcher Achse des Stabs ein positiver Wert aufgetragen wird: zur Faser, an der ein positives Moment zieht, die Querkraft wie ihr Moment. Ohne Achse die, die im Bild laenger ist – bei N und T gibt es keine Seite.
+- `_LINIENLAGER = {'quer': ('Lager quer', 'quer', '⊥', 'Quer zur Linie, auf der Seite d…` – Wie ein Linienlager heisst – im Fenster, kurz in der Liste, als Zeichen seiner Bettung –, was sein Schalter erklaert und in welcher Achse des Stabs es haelt: quer in der Ebene zur gestrichelten Faser, in z.
 
 ## Braucht
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: 2b284023ca50
+erzeugt: bb7416f61d8d
 art: modul
 tags: [modul]
 ---
@@ -9,8 +9,8 @@ tags: [modul]
 
 ## VERANTWORTUNG
 
-Die Produkte, aus denen die Bemessung wählt, mit ihren Regeln -- Typen,
-Durchmesser, Höhen, Abstände, der Faktor des Gutachtens -- und woher jede
+Die Produkte, aus denen die Bemessung wählt, mit ihren Regeln – Typen,
+Durchmesser, Höhen, Abstände, der Faktor des Gutachtens – und woher jede
 Zahl stammt. Gerechnet wird hier nichts, was über ein Produkt hinausgeht:
 welches System die Stelle nimmt, sagt [[opencivil.durchstanzen.systeme|.systeme]], die Anordnung um die
 Stütze steht in [[opencivil.durchstanzen.bewehrung|.bewehrung]], der Nachweis in [[opencivil.durchstanzen.nachweis|.nachweis]].
@@ -91,7 +91,7 @@ def ankerhoehe(h: float, c_zug: float, c_druck: float) -> float
 ```
 
 Die Höhe h_A der Anker: die Plattendicke ohne beide Überdeckungen, auf
-eine lieferbare Höhe abgerundet -- auf 5 mm, in Schritten von 10 mm.
+eine lieferbare Höhe abgerundet – auf 5 mm, in Schritten von 10 mm.
 Nach der Zulassung ETA-13/0196 und zwei Beispielen von AncoTech, nach
 Vorgabe, nicht nachgeschlagen.
 
@@ -101,7 +101,7 @@ Vorgabe, nicht nachgeschlagen.
 def k_sys(c_druck: float, d: float, mit_ausnahme: bool) -> float
 ```
 
-Der Faktor anstelle der 2 in Gleichung (70) -- siehe [[opencivil.durchstanzen.produkte#Konstanten|K_SYS_HOCH]].
+Der Faktor anstelle der 2 in Gleichung (70) – siehe [[opencivil.durchstanzen.produkte#Konstanten|K_SYS_HOCH]].
 `mit_ausnahme`: Innenstütze, Wandende oder einspringende Ecke.
 
 ### abstaende
@@ -110,7 +110,7 @@ Der Faktor anstelle der 2 in Gleichung (70) -- siehe [[opencivil.durchstanzen.pr
 def abstaende(d: float, anzahl: int) -> Tuple[float, ...]
 ```
 
-Die Abstände einer Leiste vom Rand der Stütze an, auf 5 mm abgerundet --
+Die Abstände einer Leiste vom Rand der Stütze an, auf 5 mm abgerundet –
 der erste vom Rand zum ersten Anker, dann von Anker zu Anker.
 
 ### typname
@@ -150,7 +150,7 @@ def name(self) -> str
 def stege(self) -> Tuple[Tuple[Tuple[float, float], Tuple[float, float]], ...]
 ```
 
-Die Stege als Strecken im Grundriss -- fürs Bild: beim Kreuz zwei, sonst vier.
+Die Stege als Strecken im Grundriss – fürs Bild: beim Kreuz zwei, sonst vier.
 
 #### Stahlpilz.armenden
 
@@ -166,18 +166,18 @@ umschliessen die gestützte Fläche ausserhalb des Pilzes
 
 ## Konstanten
 
-- `QUELLE_ANCOPLUS = 'AncoTech, Gutachten Muttoni / Fernández Ruiz 2007 (07-A05-R1c) und P…` – Woher die Regeln von ancoPLUS stammen -- so steht es in der Herleitung.
+- `QUELLE_ANCOPLUS = 'AncoTech, Gutachten Muttoni / Fernández Ruiz 2007 (07-A05-R1c) und P…` – Woher die Regeln von ancoPLUS stammen – so steht es in der Herleitung.
 - `QUELLE_ZEUS = 'AncoTech, Preisliste ZEUS 12.2018'`
 - `QUELLE_HDB = 'Leviat, Produktinformation Technik Halfen HDB, 09/2026'`
 - `ANKERTYPEN = (Element(0.01, 0.125, 0.295, 'X'), Element(0.012, 0.125, 0.315, 'A'),…` – Die Typen von ancoPLUS mit ihren Höhen h_A (Preisliste ancoPLUS, S. 6). Bei 22, 25 und 28 mm nennt die Liste mehrere Buchstaben und für 25/28 auch 26/30 mm; genommen ist der erste Buchstabe und der kleinere Durchmesser.
-- `ANKER_JE_LEISTE = range(2, 10)` – So viele Anker trägt eine Leiste -- nur ganze Elemente sind lieferbar.
+- `ANKER_JE_LEISTE = range(2, 10)` – So viele Anker trägt eine Leiste – nur ganze Elemente sind lieferbar.
 - `ABSTAND_ERSTER = 0.375` – Die Abstände der Typen «D…», in Vielfachen von d (siehe Dateikopf): vom Rand der Stütze zum ersten Anker, bis zum dritten, danach.
 - `ABSTAND_BIS_DRITTER = 0.6`
 - `ABSTAND_DANACH = 0.75`
 - `TANGENTIAL = 1.5` – Höchstens so weit stehen zwei Leisten beim zweiten Anker auseinander, in Vielfachen von d_v: das Gutachten 2007 (Regel 5) misst in d, SIA 262:2025, 5.5.3.9, in d_v. An der Stütze ist das dasselbe, um einen Stahlpilz ist d_v kleiner.
 - `GROESSTER_DURCHMESSER = ((0.18, 0.014), (0.22, 0.016), (0.26, 0.018), (0.34, 0.02), (0.6, 0.0…` – Die Durchmesser je statischer Höhe d (Gutachten 2007, Tabelle 1): bis zu diesem d höchstens dieser Durchmesser; unter 0.160 m keiner.
 - `KLEINSTES_D = 0.16`
-- `K_SYS_HOCH = 3.0` – Der Faktor des Gutachtens anstelle der 2 in Gleichung (70); die Obergrenze 3.5 bleibt. Für Innenstützen, Wandenden und einspringende Ecken 3·k_r, wenn die Köpfe auf der Druckseite höchstens d/10 tief liegen; bei d/6 gilt wieder 2·k_r, dazwischen linear (Gutachten 2007, S. 5–7). Für Rand- und Eckstützen 2.0 wie in der Norm -- die Software von 2026 nennt dort 3.0, ein Gutachten dazu war nicht lesbar.
+- `K_SYS_HOCH = 3.0` – Der Faktor des Gutachtens anstelle der 2 in Gleichung (70); die Obergrenze 3.5 bleibt. Für Innenstützen, Wandenden und einspringende Ecken 3·k_r, wenn die Köpfe auf der Druckseite höchstens d/10 tief liegen; bei d/6 gilt wieder 2·k_r, dazwischen linear (Gutachten 2007, S. 5–7). Für Rand- und Eckstützen 2.0 wie in der Norm – die Software von 2026 nennt dort 3.0, ein Gutachten dazu war nicht lesbar.
 - `K_SYS_NORM = 2.0`
 - `GRENZE = 3.5`
 - `HDB_DURCHMESSER = (12, 14, 16, 20, 25)` – Die Durchmesser von HALFEN HDB in mm, dünnste zuerst (Produktinformation, S. 5).
@@ -185,7 +185,7 @@ umschliessen die gestützte Fläche ausserhalb des Pilzes
 - `HOEHENSCHRITT = 0.01` – Die Höhen h_A enden auf 5 mm, in Schritten von 10 mm (Preisliste).
 - `STAHL = 'B500B'` – Der Stahl der Anker (Herstellerangabe, nach Vorgabe, nicht nachgeschlagen). In (67) und (69) gilt seine Fliessgrenze, nicht die der Biegebewehrung (SIA 262:2025, 4.3.6.5.4).
 - `STAHLPILZE = tuple(sorted(_pilze('Kreuz', 470, (100, 120)) + _pilze('Kreuz', 530, …` – Die ZEUS-Pilze der Preisliste, kleinste zuerst. Die Sondertypen (Rechteck) und der Doppelkreuz ohne g sind weggelassen.
-- `PILZ_UNTEN = 0.02` – Unter dem Pilz bleiben 20 mm Beton, über ihm 50 mm bis zur Oberfläche -- die Vorgaben der AncoTech-Software (Theorie 2010, S. 11, aus dem Bild).
+- `PILZ_UNTEN = 0.02` – Unter dem Pilz bleiben 20 mm Beton, über ihm 50 mm bis zur Oberfläche – die Vorgaben der AncoTech-Software (Theorie 2010, S. 11, aus dem Bild).
 - `PILZ_OBEN = 0.05`
 - `PILZ_UEBERSTAND = 0.05` – So weit müssen die Stege mindestens über die Stütze hinausreichen, sonst vergrössert der Pilz die gestützte Fläche kaum (nach Vorgabe, nicht nachgeschlagen).
 

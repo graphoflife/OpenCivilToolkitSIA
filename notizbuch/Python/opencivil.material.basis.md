@@ -1,5 +1,5 @@
 ---
-erzeugt: bfb8df6ed0e5
+erzeugt: fe9fbd320e61
 art: modul
 tags: [modul]
 ---
@@ -26,7 +26,7 @@ jedes Material ein eigenes Exemplar mit eigenem Namensraum.
 ## ALLES IST UEBERSCHREIBBAR
 
 Jeder abgeleitete Kennwert ist eine gewoehnliche Berechnung. Wer ihn von Hand
-setzen will, ruft `werk.setze(...)` -- die Berechnung wird dann uebersprungen,
+setzen will, ruft `werk.setze(...)` – die Berechnung wird dann uebersprungen,
 und im Bericht steht der Wert als 'vom Benutzer überschrieben'.
 
 ## Inhalt
@@ -79,7 +79,7 @@ def beschriftung(self) -> str
 class KennwertVorlage
 ```
 
-Beschreibung eines Baustoffkennwerts -- unabhaengig vom konkreten Material.
+Beschreibung eines Baustoffkennwerts – unabhaengig vom konkreten Material.
 
 Ist `funktion` gesetzt, wird der Kennwert gerechnet; sonst ist er eine
 Eingabe, deren Zahlenwert aus der Sortenvorlage kommt.
@@ -95,7 +95,7 @@ Eingabe, deren Zahlenwert aus der Sortenvorlage kommt.
 - `eingaben: Tuple[str, ...] = ()` – Kurznamen der Kennwerte desselben Baustoffs, die eingehen.
 - `festwert: Optional[Groesse] = None` – Normvorgabe, die nicht aus der Sortentabelle kommt (z.B. gamma_c).
 - `begruendung: str = ''`
-- `name: str = ''` – Name der Formel im Notizbuch, wo die Beschreibung nicht taugt -- siehe `GleichungBlock.name`.
+- `name: str = ''` – Name der Formel im Notizbuch, wo die Beschreibung nicht taugt – siehe `GleichungBlock.name`.
 
 #### KennwertVorlage.ist_berechnet
 
@@ -140,7 +140,7 @@ loesung = werk.loese(c30.id_von("f_cd"))
 - `name: str` – Anzeigename, z.B. `C30/37`.
 - `art: Baustoffart`
 - `sorte: str = ''`
-- `symbol_index: str = ''` – Index, der an die Symbole dieses Baustoffs gehaengt wird -- leer, solange es nur einen seiner Art gibt. Steht hier, damit auch die Nachweise ihn erreichen. Sie bauen Symbole wie `f_{cd}` selbst, und ohne den Index waere bei zwei Betonen nicht zu sehen, welcher gemeint ist. Vergeben wird er beim Aufbau des Projekts, wo sich zaehlen laesst, wie viele Baustoffe einer Art vorkommen.
+- `symbol_index: str = ''` – Index, der an die Symbole dieses Baustoffs gehaengt wird – leer, solange es nur einen seiner Art gibt. Steht hier, damit auch die Nachweise ihn erreichen. Sie bauen Symbole wie `f_{cd}` selbst, und ohne den Index waere bei zwei Betonen nicht zu sehen, welcher gemeint ist. Vergeben wird er beim Aufbau des Projekts, wo sich zaehlen laesst, wie viele Baustoffe einer Art vorkommen.
 - `definitionen: Dict[str, WertDef] = field(default_factory=dict)`
 - `berechnungen: List[Berechnung] = field(default_factory=list)`
 
@@ -151,7 +151,7 @@ def eingabename(self, kurzname: str) -> str
 ```
 
 Der Name, unter dem ein Nachweis einen Kennwert dieses Baustoffs
-liest, z.B. `E_s__B500B` -- mit der Kennung des Baustoffs, weil ein
+liest, z.B. `E_s__B500B` – mit der Kennung des Baustoffs, weil ein
 Nachweis die Kennwerte mehrerer Baustoffe nebeneinander lesen kann.
 
 #### Baustoff.bezug
@@ -190,7 +190,7 @@ def ins_rechenwerk(self, werk) -> 'Baustoff'
 Meldet Berechnungen und Sortenwerte beim Rechenwerk an.
 
 Die Sortenwerte werden als [[opencivil.core.berechnung#Vorgabe|Vorgabe]]-Berechnungen registriert und
-nicht als gesetzte Eingaben -- so bleiben sie normale Knoten im Graphen
+nicht als gesetzte Eingaben – so bleiben sie normale Knoten im Graphen
 und der Benutzer kann sie mit `werk.setze(...)` ueberschreiben.
 
 Mehrfaches Anmelden ist ausdruecklich erlaubt und wirkungslos: derselbe
@@ -220,7 +220,7 @@ Giesst aus den Vorlagen ein Material mit eigenem Namensraum.
 ## Konstanten
 
 - `_SYMBOL = re.compile('^(?P<basis>.+?)(?:_\\{(?P<tief_lang>[^{}]*)\\}|_(?P<tief_…` – Symbol mit optionalem Index und optionalem Hochgestellten, z.B. `f_{yk}^{-}`.
-- `text_maskieren = text_latex` – Maskierung fuer `\text{...}`. Liegt in core.latex, weil es nichts mit Baustoffen zu tun hat -- der Name bleibt hier als gewohnter Zugang stehen.
+- `text_maskieren = text_latex` – Maskierung fuer `\text{...}`. Liegt in core.latex, weil es nichts mit Baustoffen zu tun hat – der Name bleibt hier als gewohnter Zugang stehen.
 
 ## Braucht
 

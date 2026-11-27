@@ -1,5 +1,5 @@
 ---
-erzeugt: f26f698c5a1f
+erzeugt: 16aeea49b40a
 art: modul
 tags: [modul]
 ---
@@ -11,7 +11,7 @@ tags: [modul]
 
 Was die Platte unter Gebrauchslast nachweist, am gezeichneten Querschnitt:
 
-* die Stahlspannung -- unter quasi-staendiger Einwirkung aus der Rissbreite
+* die Stahlspannung – unter quasi-staendiger Einwirkung aus der Rissbreite
   begrenzt, unter haeufiger gegen das Fliessen: derselbe Nachweis wie bei
   der Platte ([[opencivil.nachweis.spannungsbegrenzung#Spannungsbegrenzung|Spannungsbegrenzung]]),
   hier mit den Staeben als Stellen ([[opencivil.nachweis.qa_gebrauch#AnalyseStellen|AnalyseStellen]]);
@@ -30,7 +30,7 @@ Anders ist, woran sie gemessen werden.
 
 Die Platte haelt je Lage den dicksten Stab gegen die Rissbreite. Hier haelt
 jeder gezogene Stab gegen seine eigene Grenze, und massgebend ist der
-kleinste Erfuellungsgrad (Benutzer, 2026-10-15) -- wie ein Stab zu seiner
+kleinste Erfuellungsgrad (Benutzer, 2026-10-15) – wie ein Stab zu seiner
 Grenze kommt, steht in [[opencivil.nachweis.stabgrenzen]], wie die Ebene
 unter Gebrauchslast gefunden wird, in [[opencivil.nachweis.gebrauchsebene]].
 
@@ -48,19 +48,19 @@ N_Riss   = Σ A_c · k_t · f_ctm        je Beton
 N_s,adm  = Σ A_s,i · sigma_s,adm,i   >=  N_Riss
 ```
 
-Bei der Platte nimmt jede Lage die Haelfte -- zusammen derselbe Gedanke.
+Bei der Platte nimmt jede Lage die Haelfte – zusammen derselbe Gedanke.
 Mit der Begrenzung fuer massige Bauteile zaehlt nur der Beton bis 250 mm vom
 Rand, und `t` ist hoechstens 500 mm (SIA 262:2025, 4.4.2.3.7): unter
 zentrischem Zug sind alle Raender gezogen ([[opencivil.querschnitt.randzone]]).
 Bis 2026-11-14 begrenzte der Schalter nur `t` und liess die ganze Flaeche
-stehen -- er verlangte damit mehr Bewehrung statt weniger.
+stehen – er verlangte damit mehr Bewehrung statt weniger.
 
 
 ## ZWAENGUNG AUF BIEGUNG
 
 Je Richtung wie das sproede Versagen: dasselbe Rissmoment
 ([[opencivil.nachweis.rissgroessen#rissmoment|rissmoment]]), gehalten gegen
-das Moment, bei dem der erste gezogene Stab sein `sigma_s,adm` erreicht --
+das Moment, bei dem der erste gezogene Stab sein `sigma_s,adm` erreicht –
 am gerissenen Querschnitt, praezise, ohne Normalkraft, mit eigenem φ
 (Benutzer, 2026-10-15; bis 2026-11-25 elastisch). Die Platte rechnet dasselbe von Hand, mit dem
 Hebelarm `d - x/3` und ohne die gedrueckte Bewehrung; hier wirkt sie mit.
@@ -70,7 +70,7 @@ Hebelarm `d - x/3` und ohne die gedrueckte Bewehrung; hier wirkt sie mit.
 
 Beide Zwaengungen begrenzen die Rissbreite beim Erreichen von `f_ct,eff`
 (SIA 262:2025, 4.4.2.3.4, Tabelle 17, Zeile 2); gerechnet wird gerissen,
-ohne Zug im Beton (4.1.4.1.4), und praezise mit der Parabel -- bis
+ohne Zug im Beton (4.1.4.1.4), und praezise mit der Parabel – bis
 2026-11-25 linear, «elastisch». `t` ist nach 4.4.1.3 die
 kleinste Abmessung des Zuggurts, bei Rechtecken unter Biegung `h/3`.
 
@@ -193,7 +193,7 @@ def glieder_im_gleichgewicht(p: Protokoll, analyse: Querschnittsanalyse) -> None
 ```
 
 Was eine Stahlspannung ueber die Spannglieder sagt: sie tragen im
-Gleichgewicht mit, geprueft wird nur der Betonstahl -- grau, denn es
+Gleichgewicht mit, geprueft wird nur der Betonstahl – grau, denn es
 fehlt etwas, nichts ist falsch.
 
 ### _tabelle_gezogen
@@ -203,7 +203,7 @@ def _tabelle_gezogen(p: Protokoll, staebe: Sequence[Stabangabe], grenzen: Grenze
 ```
 
 Je Element mit gezogenen Staeben der unguenstigste: Dehnung, Spannung,
-Grenze -- bei einer verschmierten Linie das Stueck, das seiner Grenze
+Grenze – bei einer verschmierten Linie das Stueck, das seiner Grenze
 am naechsten kommt.
 
 ### betonflaechen
@@ -212,7 +212,7 @@ am naechsten kommt.
 def betonflaechen(analyse: Querschnittsanalyse, randzone: Optional[float]=None) -> List[Tuple[Baustoff, float]]
 ```
 
-Die Flaeche jedes Betons, in m² -- ein Polygon zaehlt fuer seinen Beton
+Die Flaeche jedes Betons, in m² – ein Polygon zaehlt fuer seinen Beton
 und wird dem abgezogen, in dem es liegt, wie in der Interaktion. Mit
 `randzone` (in m) nur der Beton bis zu diesem Abstand vom Rand des
 Bauteils ([[opencivil.querschnitt.randzone#flaechen_am_rand|flaechen_am_rand]]).
@@ -261,7 +261,7 @@ def _an_der_grenze(self, q: Querschnitt, staebe: Sequence[Stabangabe], grenzen: 
 ```
 
 Das Moment ohne Normalkraft, bei dem der erste gezogene Stab seine
-Grenze erreicht -- samt Ebene und Stab. `None`, wo auf der gezogenen
+Grenze erreicht – samt Ebene und Stab. `None`, wo auf der gezogenen
 Seite des Schwerpunkts kein Stab liegt.
 
 Bleibt alles linear, ist es ein Dreisatz: die Spannungen wachsen mit
@@ -275,7 +275,7 @@ findet, liegt jenseits der Grenze: der Stahl fliesst dort laengst.
 
 - `GRENZ_SCHRANKE = 1e-07` – Wann das Moment der Zwaengung auf Biegung gefunden ist: wie nahe der erste gezogene Stab seiner Grenze kommen muss, als Teil von ihr.
 - `REFERENZ_SPANNSTAHL = 'SIA 262:2025, 4.4.2.3.10'` – Wo die Norm den Spannstahl in der Rissbreite mitzaehlen laesst: sein Spannungszuwachs gegen die zulaessige Stahlspannung, seine Spannung gegen f_pd.
-- `RANDZONE = 'Massiges Bauteil: es wirkt nur der Beton bis 250 mm vom Rand mit, un…` – Was die Begrenzung fuer massige Bauteile aendert -- im Bericht.
+- `RANDZONE = 'Massiges Bauteil: es wirkt nur der Beton bis 250 mm vom Rand mit, un…` – Was die Begrenzung fuer massige Bauteile aendert – im Bericht.
 
 ## Braucht
 

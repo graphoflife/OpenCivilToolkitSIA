@@ -30,7 +30,7 @@ Stützkraft an der Oberfläche null und lässt sie nach unten zunehmen
 (Kap. 12.10), die Norm verlangt, die Bettung dort abzumindern
 (SIA 267:2013, 9.5.4.5). Wie, sagt sie nicht. Das Werkzeug lässt die
 Bettung von null am Terrain linear bis zur Tiefe t_red wachsen, vorgegeben
-2 m -- nach Vorgabe, nicht nachgeschlagen. Mit t_red = 0 gibt es keine
+2 m – nach Vorgabe, nicht nachgeschlagen. Mit t_red = 0 gibt es keine
 Abminderung.
 
 Steht der Kopf tiefer als das Terrain, beginnt der Pfahl schon mit einem

@@ -61,7 +61,7 @@ $$
 
 $\varepsilon_v$ ist die nominelle Dehnung der Zugbewehrung, mit der die Norm
 den Widerstand ohne Bügel bemisst. Sie steht für die Öffnung des kritischen
-Schubrisses -- eine Rechengrösse, keine Dehnung, die man am Bauteil misst.
+Schubrisses – eine Rechengrösse, keine Dehnung, die man am Bauteil misst.
 Das Werkzeug rechnet sie so:
 
 - bis zum [[Dekompressionsmoment]] null: der Querschnitt bleibt ungerissen;

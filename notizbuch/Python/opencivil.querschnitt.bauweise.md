@@ -1,5 +1,5 @@
 ---
-erzeugt: c57b8760c338
+erzeugt: a8e43004e86b
 art: modul
 tags: [modul]
 ---
@@ -18,12 +18,12 @@ Materialien beim Namen.
 
 ## DIE REGEL (Benutzer, 2026-11-25)
 
-* Beton, mit oder ohne Betonstahl und Spannstahl: Stahlbeton -- auch ohne
+* Beton, mit oder ohne Betonstahl und Spannstahl: Stahlbeton – auch ohne
   Bewehrung, wie bisher; seine Nachweise sagen dann, was ihnen fehlt.
 * nur Baustahl: Stahl.
 * Baustahl mit Beton, mit oder ohne Betonstahl: Verbund.
 * nur Holz: Holz.
-* Profilblechstahl mit Beton, mit oder ohne Betonstahl: Blechverbund -- eine
+* Profilblechstahl mit Beton, mit oder ohne Betonstahl: Blechverbund – eine
   Blechverbunddecke nach SIA 264:2014, 5.4 (2026-11-27). Mit Baustahl dazu
   waere es ein Verbundtraeger mit Profilblech (6.1.3); den rechnet das
   Werkzeug noch nicht.
@@ -45,7 +45,7 @@ Bewehrung liegt, in [[opencivil.querschnitt.bauweise#Konstanten|BEWEHRT]].
 class Bauweise(Wahl)
 ```
 
-Woraus ein gezeichneter Querschnitt besteht -- siehe Dateikopf.
+Woraus ein gezeichneter Querschnitt besteht – siehe Dateikopf.
 
 - `STAHLBETON = 'stahlbeton'`
 - `STAHL = 'stahl'`
@@ -77,7 +77,7 @@ Die Norm, nach der ein Querschnitt dieser Bauweise nachgewiesen wird.
 class Mischung(ValueError)
 ```
 
-Baustoffe, die zusammen keine Bauweise sind -- der Text nennt sie.
+Baustoffe, die zusammen keine Bauweise sind – der Text nennt sie.
 
 ### bauweise
 
@@ -85,7 +85,7 @@ Baustoffe, die zusammen keine Bauweise sind -- der Text nennt sie.
 def bauweise(stoffe: Iterable[Tuple[Baustoffart, str]]) -> Optional[Bauweise]
 ```
 
-Die Bauweise aus Art und Name jedes Baustoffs eines Querschnitts --
+Die Bauweise aus Art und Name jedes Baustoffs eines Querschnitts –
 `None` ohne Baustoff. Ist die Mischung keine Bauweise, eine
 [[opencivil.querschnitt.bauweise#Mischung|Mischung]], die jede Art mit ihren Materialien nennt: «Einen
 Querschnitt aus Holz («C24») und Beton («C30/37») rechnet das Werkzeug
@@ -94,8 +94,8 @@ nicht.»
 
 ## Konstanten
 
-- `BEWEHRT = Baustoffart.BETON` – Worin Bewehrung liegt -- Stab, Stablinie, Schubwand und Spannglied: nur im Beton, nicht in Holz und nicht in Baustahl (Benutzer, 2026-11-25). Die Zeichnung prueft es ([[opencivil.querschnitt.analyse#Zeichnung|Zeichnung]]), und eine Vorlage aus anderem kommt ohne Bewehrung.
-- `BLECHVERBUND = frozenset({Baustoffart.PROFILBLECH, Baustoffart.BETON, Baustoffart.BE…` – Woraus eine Blechverbunddecke sein darf -- Beton muss dabei sein.
+- `BEWEHRT = Baustoffart.BETON` – Worin Bewehrung liegt – Stab, Stablinie, Schubwand und Spannglied: nur im Beton, nicht in Holz und nicht in Baustahl (Benutzer, 2026-11-25). Die Zeichnung prueft es ([[opencivil.querschnitt.analyse#Zeichnung|Zeichnung]]), und eine Vorlage aus anderem kommt ohne Bewehrung.
+- `BLECHVERBUND = frozenset({Baustoffart.PROFILBLECH, Baustoffart.BETON, Baustoffart.BE…` – Woraus eine Blechverbunddecke sein darf – Beton muss dabei sein.
 
 ## Braucht
 

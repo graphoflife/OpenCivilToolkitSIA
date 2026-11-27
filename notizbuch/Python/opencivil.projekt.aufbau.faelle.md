@@ -1,5 +1,5 @@
 ---
-erzeugt: c309c0c1215a
+erzeugt: a04d075aaee3
 art: modul
 tags: [modul]
 ---
@@ -13,7 +13,7 @@ Die Regeln der Lastfaelle und Kombinationen eines Bauteils, an einer
 Stelle: verschiedene Namen, hoechstens ein Lastfall mit dem Eigengewicht,
 je Teil eine Kennung, eine Last ohne Lastfall bleibt weg, und die Beiwerte
 einer Kombination nach den Namen ihrer Lastfaelle. Was nicht stimmt, steht
-in den Meldungen des Bauteils -- ein Fehler haelt das Bauteil auf, der Rest
+in den Meldungen des Bauteils – ein Fehler haelt das Bauteil auf, der Rest
 des Projekts rechnet weiter (bis 2026-10-15 hielten gleiche Fallnamen das
 ganze Projekt auf).
 
@@ -36,7 +36,7 @@ def faelle_pruefen(lastfaelle: Sequence[LastfallEintrag], kombinationen: Sequenc
 ```
 
 Die Faelle werden an ihrem Namen erkannt, zwei gleiche waeren nicht zu
-unterscheiden -- auch nicht ein Lastfall und eine Kombination. Und das
+unterscheiden – auch nicht ein Lastfall und eine Kombination. Und das
 Eigengewicht gehoert in einen Lastfall, nicht in zwei.
 
 ### ohne_lastfall

@@ -1,5 +1,5 @@
 ---
-erzeugt: 918758127a68
+erzeugt: 6bb195e9c7da
 art: modul
 tags: [modul]
 ---
@@ -14,7 +14,7 @@ im Raum: aus einem
 [[opencivil.projekt.balkensystem3d#Balkensystem3dEintrag|Balkensystem3dEintrag]] das
 Stabwerk in SI ([[opencivil.projekt.aufbau.balkensystem3d#modell_von|modell_von]]) und daraus die Rechnung mit
 aufgeloesten Materialien und Querschnitten ([[opencivil.projekt.aufbau.balkensystem3d#bauen|bauen]]). Was beide gleich
-pruefen und aufloesen, kommt von dort -- auch ein Querschnitt aus einer
+pruefen und aufloesen, kommt von dort – auch ein Querschnitt aus einer
 Platte oder Querschnittsanalyse, deren I_T sie dann rechnet, und das
 Material «gemäss Querschnitt»; hier
 steht nur, was der Raum anders macht: der Drehwinkel in rad, eine Last an
@@ -36,7 +36,7 @@ Das Stabwerk zum Rechnen, in SI ([[opencivil.stabwerk3d.modell]]).
 def _knotenlast(p: RaumknotenlastEintrag, wert: float) -> Knotenlast
 ```
 
-Eine Kraft in ihre Richtung oder ein Moment um sie -- in den Achsen des Systems.
+Eine Kraft in ihre Richtung oder ein Moment um sie – in den Achsen des Systems.
 
 ### bauen
 
@@ -44,7 +44,7 @@ Eine Kraft in ihre Richtung oder ein Moment um sie -- in den Achsen des Systems.
 def bauen(art: 'Bauteilart', eintrag: Balkensystem3dEintrag, aufbau: Aufbau) -> Bauteil
 ```
 
-Ein 3D-Balkensystem -- seine Querschnitte aufgeloest wie in der Ebene.
+Ein 3D-Balkensystem – seine Querschnitte aufgeloest wie in der Ebene.
 
 
 ## Braucht

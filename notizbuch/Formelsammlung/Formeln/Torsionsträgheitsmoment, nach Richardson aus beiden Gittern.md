@@ -62,5 +62,5 @@ eine dünne schräge Wand, und es wird feiner gerechnet.
 
 Gegen genaue Werte geprüft: Rechteck, gleichseitiges Dreieck, Kreis und Rohr
 auf ein Promille; ein dünner Hohlkasten liegt knapp über Bredt, wie er soll.
-Gerechnet wird am ungerissenen Querschnitt ohne Bewehrung -- was Risse daraus
+Gerechnet wird am ungerissenen Querschnitt ohne Bewehrung – was Risse daraus
 machen, steht in [[TODO]].

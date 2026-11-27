@@ -1,5 +1,5 @@
 ---
-erzeugt: dc982d875b8f
+erzeugt: 22f20401afc0
 art: modul
 tags: [modul]
 ---
@@ -13,7 +13,7 @@ Ein Streifen der Decke ist ein Balken über seine Lager. Hier wird er
 gerechnet, in zwei Schritten:
 
 1. **Elastisch**, mit den Lagern als Punkten: die Lagerkräfte eines statisch
-   unbestimmten Streifens folgen aus der Biegelinie -- mit den Elementen des
+   unbestimmten Streifens folgen aus der Biegelinie – mit den Elementen des
    Stabwerks ([[opencivil.stabwerk.stab]]), Knoten an den Lagern und wo
    die Steifigkeit wechselt. Zwischen den Knoten ist die Hermite-Biegelinie
    die genaue Lösung; die Lagerkräfte stimmen exakt. Über das erste und das
@@ -21,8 +21,8 @@ gerechnet, in zwei Schritten:
    bestimmt, und seine Last geht als Kraft und Moment an das Lager.
 2. **Statik**: mit diesen Lagerkräften laufen Querkraft und Moment vom
    Anfang des Streifens bis zu seinem Ende, gerechnet wie in einem ebenen
-   Stab des Stabwerks, starr ([[opencivil.decke.traeger#statik|statik]]). Ein Flächenlager -- ein
-   versteckter Unterzug, eine Stütze -- drückt dabei nicht in einem Punkt,
+   Stab des Stabwerks, starr ([[opencivil.decke.traeger#statik|statik]]). Ein Flächenlager – ein
+   versteckter Unterzug, eine Stütze – drückt dabei nicht in einem Punkt,
    sondern gleichmässig über seine Breite; so steht es in der Vorlesung
    («Flächenlager mit gleichmässiger Pressung», Stahlbeton II, 7.2 Platten,
    Folie 33), und so rechnet die Musterlösung des Kolloquiums 4 ihr
@@ -39,7 +39,7 @@ Gegenuhrzeigersinn. `M > 0` zieht unten (Feldmoment), `V = dM/ds`:
 M(s) = Σ_links [F_k · (s − s_k) − C_k] − ∫_links p(σ) · (s − σ) dσ
 ```
 
-Am Ende eines Trägers sind V und M null -- eine Probe, die
+Am Ende eines Trägers sind V und M null – eine Probe, die
 [[opencivil.decke.traeger#statik|statik]] macht.
 
 ## Inhalt
@@ -51,7 +51,7 @@ Am Ende eines Trägers sind V und M null -- eine Probe, die
 class Streckenlast
 ```
 
-Eine Last je Länge, linear von `a` nach `b`, in N/m -- nach unten positiv.
+Eine Last je Länge, linear von `a` nach `b`, in N/m – nach unten positiv.
 
 - `a: float`
 - `b: float`
@@ -128,7 +128,7 @@ def stabil(halte: Sequence[Halt]) -> bool
 ```
 
 Ob die Lager den Träger halten: zwei Höhenlager an verschiedenen
-Stellen -- oder eines und eine Einspannung.
+Stellen – oder eines und eine Einspannung.
 
 ### Balken
 
@@ -137,7 +137,7 @@ class Balken
 ```
 
 Der elastische Durchlaufträger: Knoten, Elemente, die zerlegte
-Steifigkeitsmatrix -- einmal gebaut, für jeden Fall nur noch gelöst.
+Steifigkeitsmatrix – einmal gebaut, für jeden Fall nur noch gelöst.
 
 #### Balken.knoten_bei
 
@@ -160,7 +160,7 @@ def lagerkraefte(self, lasten: Sequence[Teillast]) -> List[Tuple[float, float]]
 ```
 
 Je Lager die Kraft nach oben `F` und das Moment `C` im
-Gegenuhrzeigersinn, die es auf den Träger ausübt -- elastisch, mit
+Gegenuhrzeigersinn, die es auf den Träger ausübt – elastisch, mit
 den Lagern als Punkten.
 
 ### _resultante
@@ -169,8 +169,8 @@ den Lagern als Punkten.
 def _resultante(lasten: Sequence[st.Teillast], x0: float) -> Tuple[float, float]
 ```
 
-Kraft quer und Moment um `x0` -- im Gegenuhrzeigersinn, in den Achsen
-eines ebenen Stabs -- der Lasten eines freien Endes.
+Kraft quer und Moment um `x0` – im Gegenuhrzeigersinn, in den Achsen
+eines ebenen Stabs – der Lasten eines freien Endes.
 
 ### statik
 
@@ -179,13 +179,13 @@ def statik(L: float, lasten: Sequence[Teillast]) -> List[EbenesIntervall]
 ```
 
 Querkraft und Moment längs des Trägers, von links: aus allen Kräften auf
-ihn -- Lasten nach unten, Lagerkräfte als Einzellasten oder Pressungen
+ihn – Lasten nach unten, Lagerkräfte als Einzellasten oder Pressungen
 nach oben (negativ). Gerechnet wie ein ebener Stab des Stabwerks, starr
 ([[opencivil.stabwerk.verlauf#ebener_verlauf|ebener_verlauf]] mit `EI = ∞`): die
 Biegelinie braucht hier niemand. Bis 2026-11-20 integrierte die Decke
 Querkraft und Moment ein zweites Mal selbst.
 
-Was näher als [[opencivil.decke.traeger#Konstanten|GLEICH]] beieinanderliegt, gilt als eine Stelle --
+Was näher als [[opencivil.decke.traeger#Konstanten|GLEICH]] beieinanderliegt, gilt als eine Stelle –
 der Rand eines Lagers und die Grenze eines Streifens unterscheiden sich
 oft nur in der Rundung. Wirft, wenn am Ende etwas übrig bleibt: dann
 stehen die Kräfte nicht im Gleichgewicht.
@@ -196,13 +196,13 @@ stehen die Kräfte nicht im Gleichgewicht.
 def wert(teile: Sequence[EbenesIntervall], groesse: str, s: float, links: bool=False) -> float
 ```
 
-`V` oder `M` an der Stelle `s` -- an einem Sprung rechts davon, mit `links` links davon.
+`V` oder `M` an der Stelle `s` – an einem Sprung rechts davon, mit `links` links davon.
 
 
 ## Konstanten
 
 - `GLEICH = 1e-09` – Was in m als dieselbe Stelle gilt.
-- `WECHSEL = 0.01` – Ein Wechsel der Steifigkeit näher als so viel an einem anderen Knoten gilt dort, in m. Als eigenes Element zwischen freien Knoten wäre ein so kurzes Stück fast starr: sein Pivot fiele unter die Schranke der Zerlegung ([[opencivil.stabwerk.matrix#Konstanten|SCHRANKE]]), und sie hielte den Knoten still fest wie ein Lager, das es nicht gibt -- bei 1 mm zwischen zwei Wechseln schon. So schmal wirkt ein Wechsel auf die Lagerkräfte kaum; die 1 cm sind nach Vorgabe, nicht nachgeschlagen.
+- `WECHSEL = 0.01` – Ein Wechsel der Steifigkeit näher als so viel an einem anderen Knoten gilt dort, in m. Als eigenes Element zwischen freien Knoten wäre ein so kurzes Stück fast starr: sein Pivot fiele unter die Schranke der Zerlegung ([[opencivil.stabwerk.matrix#Konstanten|SCHRANKE]]), und sie hielte den Knoten still fest wie ein Lager, das es nicht gibt – bei 1 mm zwischen zwei Wechseln schon. So schmal wirkt ein Wechsel auf die Lagerkräfte kaum; die 1 cm sind nach Vorgabe, nicht nachgeschlagen.
 
 ## Braucht
 

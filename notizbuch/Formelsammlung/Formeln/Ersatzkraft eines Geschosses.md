@@ -27,12 +27,12 @@ $$
 
 Verteilt wird nach $z_i \cdot W_i$: je höher und schwerer ein Geschoss,
 desto mehr Kraft. Dahinter steht eine erste Schwingungsform, die gerade mit
-der Höhe wächst -- und die Annahme, dass höhere Formen wenig beitragen
+der Höhe wächst – und die Annahme, dass höhere Formen wenig beitragen
 (16.5.2.1). Die Kräfte zusammen ergeben wieder $F_d$; unter jedem Geschoss
 wirkt als Querkraft die Summe der Kräfte darüber, am Fuss die ganze
 [[Ersatzkraft]].
 
 Die Wände teilen sich jede Kraft nach ihrem Anteil an der
-[[Biegesteifigkeit der Wände|Biegesteifigkeit]] -- nach Vorgabe, nicht
+[[Biegesteifigkeit der Wände|Biegesteifigkeit]] – nach Vorgabe, nicht
 nachgeschlagen. Die Torsion aus einer Exzentrizität der Massen (16.5.2.7)
 gehört dazu und wird nicht gerechnet.

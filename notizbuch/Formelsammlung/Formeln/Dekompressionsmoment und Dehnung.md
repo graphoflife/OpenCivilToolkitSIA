@@ -27,6 +27,6 @@ Der Ansatz, nach dem die
 [[Nominelle Dehnung der Zugbewehrung|nominelle Dehnung der Zugbewehrung]]
 gerechnet wird. Eine Druckkraft drückt den Querschnitt vor, bevor er reissen
 kann: erst das [[Dekompressionsmoment]] $m_{Dd}$ hebt diesen Druck am Rand
-auf. Was an Moment darüber liegt, dehnt die Bewehrung -- linear bis zum
+auf. Was an Moment darüber liegt, dehnt die Bewehrung – linear bis zum
 Fliessen beim Biegewiderstand $m_{Rd}$. Eine Zugkraft macht $m_{Dd}$
 negativ: die Bewehrung ist dann schon ohne Moment gedehnt.

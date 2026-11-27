@@ -48,4 +48,4 @@ sein Gewicht mal die Ordinate des Spektrums bei der Grundschwingzeit
 
 Für Abheben und Kippen verlangt die Norm $q = 1.0$ (16.5.1.9). Die
 Herleitung rechnet $F_d$ darum ein zweites Mal mit dem Spektrum bei $q = 1$
--- daher die zweite Normstelle der Seite.
+– daher die zweite Normstelle der Seite.

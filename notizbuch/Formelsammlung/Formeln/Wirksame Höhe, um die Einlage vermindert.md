@@ -44,7 +44,7 @@ $$
 
 ## Theorie
 
-Liegt in der Platte eine Einlage -- ein Leitungsrohr, ein Kanal --, schwächt
+Liegt in der Platte eine Einlage – ein Leitungsrohr, ein Kanal –, schwächt
 sie den Querschnitt dort, wo die Querkraft durch muss. Es zählt ihr grösstes
 Mass, Breite oder Höhe. Ist es grösser als ein Sechstel der statischen Höhe,
 wird $d$ um dieses Mass vermindert; sonst gilt die

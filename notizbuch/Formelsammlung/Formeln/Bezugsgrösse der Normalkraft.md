@@ -46,7 +46,7 @@ $$
 
 ## Theorie
 
-Normalkraft und Moment haben verschiedene Einheiten -- ein «kürzester
+Normalkraft und Moment haben verschiedene Einheiten – ein «kürzester
 Abstand» in kN und kNm hinge davon ab, welche Einheiten man wählt. Darum wird
 jede Achse durch ihren grössten Wert geteilt: die Normalkraft durch die
 grössere der beiden Grenzkräfte, Zug oder Druck.

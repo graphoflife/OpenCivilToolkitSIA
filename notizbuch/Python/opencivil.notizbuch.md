@@ -1,5 +1,5 @@
 ---
-erzeugt: 7bfeaab1eb73
+erzeugt: 9651fe1a97f1
 art: modul
 tags: [modul]
 ---
@@ -12,8 +12,8 @@ tags: [modul]
 Schreibt die Seiten des Ordners `notizbuch/`, die aus dem Code entstehen:
 je Formel eine Seite, je Thema eine, je Modul eine. Obsidian liest den Ordner
 als Tresor, die Oberflaeche zeigt ihn unter «Formelsammlung». Die Seiten
-schreibt `python3 -m opencivil.web.bruecke`; was von Hand dazukommt -- die
-Theorie unter der Linie, eigene Notizen --, bleibt dabei stehen.
+schreibt `python3 -m opencivil.web.bruecke`; was von Hand dazukommt – die
+Theorie unter der Linie, eigene Notizen –, bleibt dabei stehen.
 
 ## Module
 

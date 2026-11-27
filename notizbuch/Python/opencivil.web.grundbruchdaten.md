@@ -1,5 +1,5 @@
 ---
-erzeugt: 6f08080aca33
+erzeugt: a53c40d63058
 art: modul
 tags: [modul]
 ---
@@ -10,7 +10,7 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Je Fundament die Zahlen der Situationszeichnung, in den Einheiten der
-Anzeige -- m, kN: wie tief und wie weit der Gleitkoerper reicht, sein
+Anzeige – m, kN: wie tief und wie weit der Gleitkoerper reicht, sein
 Umriss und je Kombination die Kraefte und die beiden Erfuellungsgrade. Dazu
 die Legende unter dem Bild ([[opencivil.web.anzeige]]): je Kombination
 ihre Zeile mit der Neigung der Last, darunter das Grundwasser, wie die
@@ -31,7 +31,7 @@ def situation(aufbau: Aufbau, kennung: str, loesung: Loesung) -> Dict[str, Any]
 ```
 
 Was die Zeichnung eines Fundaments braucht. Ohne eingeschaltete
-Kombination gibt es keinen Nachweis und keinen Befund -- dann zeichnet
+Kombination gibt es keinen Nachweis und keinen Befund – dann zeichnet
 sie nur das Fundament, ohne Gleitkörper und ohne Kräfte.
 
 ### _legende
@@ -41,7 +41,7 @@ def _legende(fundament: Fundament, befund: Optional[grundbruch.Grundbruchbefund]
 ```
 
 Die Zeilen unter dem Bild, die fuer jede Kombination gelten: das
-Grundwasser, der Gleitkoerper -- gezeichnet ist er ohne die Neigungen --
+Grundwasser, der Gleitkoerper – gezeichnet ist er ohne die Neigungen –
 und die Laenge senkrecht zum Bild. Die Zeile der gezeigten Kombination
 steht bei ihr.
 

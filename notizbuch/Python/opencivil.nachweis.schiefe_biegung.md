@@ -1,5 +1,5 @@
 ---
-erzeugt: 6a0f951d800b
+erzeugt: 3d2fbe3f13d2
 art: modul
 tags: [modul]
 ---
@@ -10,7 +10,7 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Prueft je Lastfall `(N_Ed, M_y,Ed, M_z,Ed)` gegen den Bruchzustand des
-gezeichneten Querschnitts -- schief, oder auf Wunsch nur um y.
+gezeichneten Querschnitts – schief, oder auf Wunsch nur um y.
 
 
 ## WOGEGEN NACHGEWIESEN WIRD
@@ -21,7 +21,7 @@ nachgewiesen wird darum gegen den Dehnungsfaecher selbst
 ([[opencivil.querschnitt.interaktion]]). Was in der Herleitung steht, ist
 nicht die Suche, sondern ihre **Probe**: die gefundene Dehnungsebene, die
 Kraefte jedes Teils mit ihrem Angriffspunkt, und die drei Summen `N`,
-`M_y` und `M_z`. Wer nachrechnen will, rechnet diese Summen -- das geht
+`M_y` und `M_z`. Wer nachrechnen will, rechnet diese Summen – das geht
 von Hand. Dasselbe Vorgehen wie beim Loeser der Platte.
 
 
@@ -34,7 +34,7 @@ Richtung von `(M_y,Ed, M_z,Ed)`. Ohne Moment `N_Rd / N_Ed`.
 ## LAENGSZUGKRAFT
 
 Ist sie zugeschaltet, kommt das, was das Druckfeld der Schubwaende in
-Laengsrichtung braucht, zu N und den Momenten dazu -- siehe
+Laengsrichtung braucht, zu N und den Momenten dazu – siehe
 [[opencivil.querschnitt.schubwaende]]. Die Werte liefert der Nachweis der
 Schubwaende; dieser hier liest sie ueber das Rechenwerk.
 
@@ -52,14 +52,14 @@ N > 0 Zug; M_y > 0 zieht unten, M_z > 0 links.
 class Fallergebnis(Fallausgang)
 ```
 
-Was ein Lastfall ergab -- fuer die Diagramme nach dem Lauf.
+Was ein Lastfall ergab – fuer die Diagramme nach dem Lauf.
 
 - `fall: Lastfall`
 - `N: float`
 - `M_y: float`
-- `M_z: float` – Die Einwirkung, wie nachgewiesen -- mit Laengszugkraft, wo zugeschaltet.
+- `M_z: float` – Die Einwirkung, wie nachgewiesen – mit Laengszugkraft, wo zugeschaltet.
 - `punkt: Optional[Bruchpunkt]`
-- `ohne_bruch: str = ''` – Warum es keinen Bruchzustand gibt, wo es keinen gibt -- das Diagramm zeigt den Satz an seiner Stelle. Bis 2026-11-19 fehlte dort die Karte ohne ein Wort.
+- `ohne_bruch: str = ''` – Warum es keinen Bruchzustand gibt, wo es keinen gibt – das Diagramm zeigt den Satz an seiner Stelle. Bis 2026-11-19 fehlte dort die Karte ohne ein Wort.
 
 ### Bruchbefund
 
@@ -69,7 +69,7 @@ class Bruchbefund
 ```
 
 Was der Nachweis im Lauf fand: den Querschnitt mit seinen
-Bruchzustaenden -- das Interaktionsdiagramm schneidet ihn -- und je
+Bruchzustaenden – das Interaktionsdiagramm schneidet ihn – und je
 Lastfall das Ergebnis.
 
 - `querschnitt: Querschnitt`
@@ -81,7 +81,7 @@ Lastfall das Ergebnis.
 def protokoll_dehnungsebene(p: Protokoll) -> None
 ```
 
-Die Ebene, schraeg, und was sie an Kraeften erzeugt -- fuer jeden
+Die Ebene, schraeg, und was sie an Kraeften erzeugt – fuer jeden
 Nachweis, der am gezeichneten Querschnitt eine Ebene sucht.
 
 ### SchiefeBiegung
@@ -113,8 +113,8 @@ Die Einwirkung, wie nachgewiesen: mit der Laengszugkraft, wo sie zaehlt.
 
 ## Konstanten
 
-- `KEIN_MOMENT = 1e-06` – Ab welchem Moment ein Lastfall als Biegung gilt, in Nm. Darunter ist es reine Normalkraft -- eine Richtung des Moments gibt es dann nicht.
-- `OHNE_MOMENT = 'Ohne Moment gibt es keinen Bruchzustand im Schnitt: nachgewiesen wir…` – Warum ein Lastfall keinen Bruchzustand hat -- dieselben Saetze in Herleitung, Zusammenfassung und Diagramm; ohne Einwirkung der Satz aller Nachweise ([[opencivil.core.nachweis#Konstanten|OHNE_EINWIRKUNG]]).
+- `KEIN_MOMENT = 1e-06` – Ab welchem Moment ein Lastfall als Biegung gilt, in Nm. Darunter ist es reine Normalkraft – eine Richtung des Moments gibt es dann nicht.
+- `OHNE_MOMENT = 'Ohne Moment gibt es keinen Bruchzustand im Schnitt: nachgewiesen wir…` – Warum ein Lastfall keinen Bruchzustand hat – dieselben Saetze in Herleitung, Zusammenfassung und Diagramm; ohne Einwirkung der Satz aller Nachweise ([[opencivil.core.nachweis#Konstanten|OHNE_EINWIRKUNG]]).
 - `JENSEITS = 'Die Normalkraft liegt jenseits dessen, was der Querschnitt gleichmäs…`
 
 ## Braucht

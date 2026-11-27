@@ -1,5 +1,5 @@
 ---
-erzeugt: d587ead02a45
+erzeugt: f8959a86a9e1
 art: modul
 tags: [modul]
 ---
@@ -11,7 +11,7 @@ tags: [modul]
 
 An jeder Stelle einer Platte geht ein Anteil der Last in ihre Richtung 1,
 der Rest in Richtung 2 (Stahlbeton II, 7.2 Platten, Folien 29 bis 31).
-Hier steht, welcher -- als Flächen mit Anteil, je Feldstreifen und je Gruppe
+Hier steht, welcher – als Flächen mit Anteil, je Feldstreifen und je Gruppe
 von Platten mit denselben Richtungen. [[opencivil.decke.lasten|lasten]] legt
 die Last darauf.
 
@@ -20,19 +20,19 @@ die Last darauf.
 
 1. **Gezeichnete Zonen** gehen vor: dort gilt ihr Anteil.
 2. Sonst, bei **fester Aufteilung**, überall derselbe Anteil.
-3. Sonst, **automatisch**, nach dem Muster der Folie 31 -- was nahe an einem
+3. Sonst, **automatisch**, nach dem Muster der Folie 31 – was nahe an einem
    Rand liegt, geht auf kürzestem Weg in dessen Lager. Gerechnet wird je
    Zelle, wo sich ein Streifen der einen und einer der anderen Richtung
    kreuzen:
 
-   * Trägt nur eine Richtung -- der Streifen der anderen ist beweglich --,
+   * Trägt nur eine Richtung – der Streifen der anderen ist beweglich –,
      geht alles in sie. Trägt keine, geht die Last trotzdem je zur Hälfte
      in die Streifen: dort fällt sie aus, die Probe zählt sie als nicht
      getragen, und das Bild zeigt die Stelle als «trägt nicht».
    * `b` ist die kleinere Spannweite der beiden Felder, in denen die
      Zelle liegt; eine Kragplatte zählt doppelt so lang.
    * Liegt die Zelle in einer Richtung höchstens `b/4` vor einem Lager,
-     geht die Last in diese Richtung -- liegt sie in beiden so nahe, je zur
+     geht die Last in diese Richtung – liegt sie in beiden so nahe, je zur
      Hälfte (die Ecken der Folie 31).
    * Sonst geht sie mehr in die Richtung mit dem kürzeren Feld: bei
      gleichen Feldern je zur Hälfte, ab dem Verhältnis [[opencivil.decke.aufteilung#Konstanten|GANZ_AB]] der
@@ -53,7 +53,7 @@ statischen Methode gilt jede, die im Gleichgewicht ist (SIA 262:2025,
 ## WO LAST AUSFÄLLT
 
 Je Zelle, ob ihre Last auf einen Träger kommt, der nicht trägt: weil keine
-Richtung trägt -- dann fehlt ein Lager oder ein Unterzug --, oder weil die
+Richtung trägt – dann fehlt ein Lager oder ein Unterzug –, oder weil die
 feste Aufteilung oder eine Zone Last in eine Richtung gibt, die nicht
 trägt. Je Platte und Ursache steht das in einer grauen Meldung an der
 Platte, mit der Fläche: es fehlt etwas, und der Rest rechnet (Benutzer,
@@ -65,7 +65,7 @@ liegt.
 
 Ein [[opencivil.decke.aufteilung#Anteil|Anteil]] ist ein konvexes Vieleck und ein Faktor: die Last
 darauf, mal den Faktor, geht in den Streifen. Eine Zone wird abgezogen und
-hinzugefügt -- ihr Faktor ist der Unterschied zum Grundanteil darunter --,
+hinzugefügt – ihr Faktor ist der Unterschied zum Grundanteil darunter –,
 darum dürfen sich Zonen nicht überlappen.
 
 ## Inhalt
@@ -106,7 +106,7 @@ Schwerpunkt und wo er auf den Trägern beider Richtungen liegt.
 def flaeche_in(self, platte: Platte) -> float
 ```
 
-Wie viel von ihr in der Platte liegt -- jedes Stück liegt in einer, sein Schwerpunkt also auch.
+Wie viel von ihr in der Platte liegt – jedes Stück liegt in einer, sein Schwerpunkt also auch.
 
 ### Aufteilungen
 
@@ -115,10 +115,10 @@ Wie viel von ihr in der Platte liegt -- jedes Stück liegt in einer, sein Schwer
 class Aufteilungen
 ```
 
-Je `(Feldstreifen, Gruppe)` die Flächen mit Anteil -- und je Zelle, was automatisch entschieden wurde.
+Je `(Feldstreifen, Gruppe)` die Flächen mit Anteil – und je Zelle, was automatisch entschieden wurde.
 
 - `flaechen: Dict[Tuple[str, int], List[Anteil]]`
-- `zellen: List[Bildzelle]` – Fürs Bild, was automatisch entschieden wurde: Vieleck und Anteil in Richtung 1 -- `None`, wo keine Richtung trägt --, je Streifen der Richtung 1 die Zellen gleichen Anteils zusammengelegt, wie die Last sie bekommt, geschnitten mit der Platte.
+- `zellen: List[Bildzelle]` – Fürs Bild, was automatisch entschieden wurde: Vieleck und Anteil in Richtung 1 – `None`, wo keine Richtung trägt –, je Streifen der Richtung 1 die Zellen gleichen Anteils zusammengelegt, wie die Last sie bekommt, geschnitten mit der Platte.
 - `meldungen: List[Meldung]`
 
 ### aufteilen
@@ -151,7 +151,7 @@ def _automatisch(gruppe: Gruppe, streifen1: Sequence[Streifen], streifen2: Seque
 
 Je Streifen die Flächen nach dem Anteil jeder Zelle, Zellen gleichen
 Anteils längs des Streifens zusammengelegt. Fürs Bild dieselben Flächen
-der Richtung 1, geschnitten mit der Platte -- ohne Anteil, wo keine
+der Richtung 1, geschnitten mit der Platte – ohne Anteil, wo keine
 Richtung trägt.
 
 ### _ausfall
@@ -170,7 +170,7 @@ eine Zone Last in eine Richtung gibt, die nicht trägt, wer und wie viel.
 def _wo(je_richtung: Dict[str, List[str]]) -> str
 ```
 
-«in x liegt sie nur auf «W3», …; in y liegt sie auf nichts» -- gleiche Gründe einmal, «in x und y».
+«in x liegt sie nur auf «W3», …; in y liegt sie auf nichts» – gleiche Gründe einmal, «in x und y».
 
 ### _zusammengelegt
 
@@ -180,7 +180,7 @@ def _zusammengelegt(band: Sequence[Punkt], quer: Sequence[Streifen], folge: Sequ
 
 Die Zellen längs eines Streifens, die nebeneinanderliegenden mit gleichem
 Anteil zu einer: das Band, geschnitten mit den Streifen quer von der
-ersten bis zur letzten -- je Vieleck und Anteil.
+ersten bis zur letzten – je Vieleck und Anteil.
 
 ### _anteil_bei
 
@@ -188,7 +188,7 @@ ersten bis zur letzten -- je Vieleck und Anteil.
 def _anteil_bei(la: Lage, lb: Lage) -> Optional[float]
 ```
 
-Der Anteil in Richtung 1, wo eine Stelle in `la` und `lb` liegt -- `None`, wenn keine Richtung trägt.
+Der Anteil in Richtung 1, wo eine Stelle in `la` und `lb` liegt – `None`, wenn keine Richtung trägt.
 
 ### in_der_mitte
 
@@ -198,7 +198,7 @@ def in_der_mitte(spannweite_1: float, spannweite_2: float) -> float
 
 Der Anteil in Richtung 1 fern der Lager: je zur Hälfte bei gleichen
 Spannweiten, geradlinig mehr in die kürzere, ganz in sie ab dem
-Verhältnis [[opencivil.decke.aufteilung#Konstanten|GANZ_AB]]. Ohne Feld -- unendlich -- in beiden
+Verhältnis [[opencivil.decke.aufteilung#Konstanten|GANZ_AB]]. Ohne Feld – unendlich – in beiden
 Richtungen je zur Hälfte.
 
 ### lage
@@ -216,7 +216,7 @@ Feldstreifen.
 
 - `UEBERSTAND = 1.0` – So viel länger als die Gruppe reicht ein Anteil, der einen ganzen Streifen deckt, in m.
 - `GANZ_AB = 1.5` – Ab diesem Verhältnis der Spannweiten geht die Mitte eines Felds ganz in die kürzere Richtung.
-- `Bildzelle = Tuple[Tuple[Punkt, ...], Optional[float]]` – Fürs Bild ein Vieleck und sein Anteil in Richtung 1 -- `None`, wo keine Richtung trägt.
+- `Bildzelle = Tuple[Tuple[Punkt, ...], Optional[float]]` – Fürs Bild ein Vieleck und sein Anteil in Richtung 1 – `None`, wo keine Richtung trägt.
 
 ## Braucht
 

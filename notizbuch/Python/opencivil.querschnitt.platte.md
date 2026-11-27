@@ -1,5 +1,5 @@
 ---
-erzeugt: 0766059f6663
+erzeugt: e763a493a7b5
 art: modul
 tags: [modul]
 ---
@@ -15,7 +15,7 @@ Querschnitt je Posten rechnet und wie ein Posten zu den Nachweisen reist,
 steht in [[opencivil.querschnitt.lagenaufbau]].
 
 
-## AUFBAU -- VIER LAGEN
+## AUFBAU – VIER LAGEN
 
 Eine Platte hat vier Bewehrungslagen, von unten nach oben durchgezaehlt:
 
@@ -30,7 +30,7 @@ Eine Platte hat vier Bewehrungslagen, von unten nach oben durchgezaehlt:
 ```
 
 Jede Lage besteht aus einer **Grundbewehrung** und einer optionalen **Zulage**.
-Beide liegen auf derselben Hoehe -- sie beruehren dieselbe Huellebene und sind
+Beide liegen auf derselben Hoehe – sie beruehren dieselbe Huellebene und sind
 je um ihren eigenen Halbmesser eingerueckt. Die Huelle fuer die naechste Lage
 richtet sich nach dem groesseren der beiden Durchmesser.
 
@@ -84,7 +84,7 @@ def breite(self) -> str
 ```
 
 Der Name der Breite, je die in dieser Richtung gerechnet wird: `b`
-in x, `b_y` in y -- in y stets je Laufmeter ([[opencivil.querschnitt.platte#Konstanten|BREITE_Y_MM]]).
+in x, `b_y` in y – in y stets je Laufmeter ([[opencivil.querschnitt.platte#Konstanten|BREITE_Y_MM]]).
 
 ### Postenart
 
@@ -169,7 +169,7 @@ Eine der vier Lagen, bestehend aus Grundbewehrung und Zulage.
 - `stahl: Baustoff`
 - `grund: Bewehrungsposten = field(default_factory=Bewehrungsposten)`
 - `zulage: Bewehrungsposten = field(default_factory=Bewehrungsposten)`
-- `unguenstig: bool = True` – Wie Grundbewehrung und Zulage innerhalb der Lage liegen. `False` (guenstig): beide beruehren dieselbe Huellebene und sind je um ihren eigenen Halbmesser eingerueckt -- die **aeusseren** Kanten fluchten. Das ist die guenstigste Anordnung; der duennere Stab bekommt den groessten Hebelarm. `True` (unguenstig, Vorgabe): die **inneren** Kanten fluchten, der duennere Stab wird also zur Plattenmitte hin geschoben. Bei den unteren Lagen heisst das: gleiche Oberkante; bei den oberen: gleiche Unterkante. Massgebend ist je der dickere Stab. Auf der Baustelle laesst sich nicht steuern, welche Kante fluchtet -- deshalb ist das die Vorgabe.
+- `unguenstig: bool = True` – Wie Grundbewehrung und Zulage innerhalb der Lage liegen. `False` (guenstig): beide beruehren dieselbe Huellebene und sind je um ihren eigenen Halbmesser eingerueckt – die **aeusseren** Kanten fluchten. Das ist die guenstigste Anordnung; der duennere Stab bekommt den groessten Hebelarm. `True` (unguenstig, Vorgabe): die **inneren** Kanten fluchten, der duennere Stab wird also zur Plattenmitte hin geschoben. Bei den unteren Lagen heisst das: gleiche Oberkante; bei den oberen: gleiche Unterkante. Massgebend ist je der dickere Stab. Auf der Baustelle laesst sich nicht steuern, welche Kante fluchtet – deshalb ist das die Vorgabe.
 
 #### Bewehrungslage.seite
 
@@ -178,7 +178,7 @@ Eine der vier Lagen, bestehend aus Grundbewehrung und Zulage.
 def seite(self) -> Zugseite
 ```
 
-Die Seite, an der sie liegt -- und die ein Moment ziehen muss, damit
+Die Seite, an der sie liegt – und die ein Moment ziehen muss, damit
 sie traegt: Lagen 1 und 2 unten, von der Unterkante aus gestapelt.
 
 #### Bewehrungslage.stapelrang
@@ -229,7 +229,7 @@ def beschriftung(self) -> str
 def index(self) -> str
 ```
 
-Der Symbolindex der Lage, z.B. `1,x` -- der eines Postens haengt die Art an.
+Der Symbolindex der Lage, z.B. `1,x` – der eines Postens haengt die Art an.
 
 ### Querkraftbewehrung
 
@@ -238,12 +238,12 @@ Der Symbolindex der Lage, z.B. `1,x` -- der eines Postens haengt die Art an.
 class Querkraftbewehrung
 ```
 
-Bügelbewehrung einer Platte -- ein Raster über die ganze Fläche.
+Bügelbewehrung einer Platte – ein Raster über die ganze Fläche.
 
 Ein Durchmesser, eine Teilung in x und eine in y. In y darf statt der
 Teilung eine Stabzahl über die betrachtete Breite `b` stehen; in x
 nicht. Der Widerstand bezieht sich auf den Laufmeter in Tragrichtung, und
-eine Stabzahl in x hätte darin keinen Bezug -- wer sie angibt, bekommt
+eine Stabzahl in x hätte darin keinen Bezug – wer sie angibt, bekommt
 deshalb nur noch Nachweise in x-Richtung.
 
 `alpha_min` und `alpha_max` begrenzen die Neigung der Druckdiagonalen.
@@ -296,7 +296,7 @@ def stapelhoehe(lagen: Iterable[Bewehrungslage]) -> Groesse
 ```
 
 Wie hoch die Lagen zusammen stehen, ohne die Ueberdeckungen: je Lage ihr
-dickster Stab -- so stapelt sie der Lagenaufbau von beiden Seiten nach
+dickster Stab – so stapelt sie der Lagenaufbau von beiden Seiten nach
 innen ([[opencivil.querschnitt.lagenaufbau|lagenaufbau]]). Mit den Ueberdeckungen
 hoeher als h, kreuzten sich die oberen und unteren Lagen.
 
@@ -320,7 +320,7 @@ alle Schnittgroessen Werte pro Laufmeter.
 - `lagen: List[Bewehrungslage] = field(default_factory=list)`
 - `ueberdeckung_unten: Groesse = field(default_factory=lambda: Groesse(30, MM))`
 - `ueberdeckung_oben: Groesse = field(default_factory=lambda: Groesse(30, MM))`
-- `d_max: Groesse = field(default_factory=lambda: Groesse(32, MM))` – Grösstkorndurchmesser -- geht in den Querkraftwiderstand ein.
+- `d_max: Groesse = field(default_factory=lambda: Groesse(32, MM))` – Grösstkorndurchmesser – geht in den Querkraftwiderstand ein.
 - `einlagenhoehe: Groesse = field(default_factory=lambda: Groesse(0, MM))` – Grösstes Mass einer Einlage, Breite oder Höhe. Übersteigt es d/6, vermindert es die wirksame statische Höhe d_v (SIA 262:2025, 4.3.3.2.9). Der Name stammt von früher, als nur die Höhe zählte.
 - `k_c: Groesse = field(default_factory=lambda: Groesse(K_C, EINHEITSLOS))` – Abminderung der Betondruckfestigkeit in der Druckdiagonalen.
 - `querkraftbewehrung: Optional[Querkraftbewehrung] = None` – Bügel, sofern welche angegeben sind. `None` heisst: ohne.
@@ -337,7 +337,7 @@ def id_breite(self, richtung: Richtung) -> str
 
 Kennung der Breite, die fuer diese Tragrichtung gilt.
 
-Eine Platte wird in y stets je Laufmeter nachgewiesen -- die Angabe
+Eine Platte wird in y stets je Laufmeter nachgewiesen – die Angabe
 `b` beschreibt den Streifen in x. Wer beides dieselbe Breite nehmen
 laesst, bekommt bei b != 1000 mm in y einen Widerstand, der zur
 eingegebenen Bewehrung nicht passt.
@@ -383,7 +383,7 @@ def staehle(self) -> List[Baustoff]
 def baustoffe(self) -> List[Baustoff]
 ```
 
-Beton und Staehle -- angemeldet vor der Platte.
+Beton und Staehle – angemeldet vor der Platte.
 
 #### Plattenquerschnitt.abschnitt
 
@@ -407,7 +407,7 @@ def hat_buegel(self) -> bool
 def _querkraftbewehrung_aufbauen(self, abschnitt: Abschnitt) -> None
 ```
 
-Die Werte der Bügel -- Durchmesser, Teilungen, Grenzwinkel, k_c.
+Die Werte der Bügel – Durchmesser, Teilungen, Grenzwinkel, k_c.
 
 `k_c` entsteht auch ohne Bügel: er gehört zur Platte, nicht zur
 Bewehrung, und eine Vorgabe, die je nach Eingabe da ist oder nicht,
@@ -420,10 +420,10 @@ Rechnung sehen statt nur die Zahl.
 
 ## Konstanten
 
-- `LAGENZAHL = 4` – Anzahl Lagen einer Platte. Bewusst fest -- eine Platte hat unten und oben je eine Haupt- und eine Querlage, mehr braucht es nicht, weniger waere ein Sonderfall mit leeren Lagen.
+- `LAGENZAHL = 4` – Anzahl Lagen einer Platte. Bewusst fest – eine Platte hat unten und oben je eine Haupt- und eine Querlage, mehr braucht es nicht, weniger waere ein Sonderfall mit leeren Lagen.
 - `BREITE_Y_MM = 1000.0` – Breite, auf die sich eine y-Lage bezieht: in y wird immer je Laufmeter gerechnet, `b` ist der Streifen in x.
-- `REFERENZ_UEBERDECKUNG = 'SIA 262:2025, 5.2.2.1; 5.2.2.4, Tabelle 18'` – Was die Ueberdeckung c_nom ist und welche sie mindestens sein muss: die Werte je Expositionsklasse stehen in Tabelle 18. Die Vorgabe 30 mm ist keiner davon -- die Klasse kennt nur der Ingenieur.
-- `UEBERDECKUNGEN = 'Überdeckungen'` – Die beiden Kaesten, in denen die Plattenangaben zusammenstehen. Der erste traegt die Betonsorte im Namen: sie ist keine gerechnete Groesse und hat darum keine eigene Kette, an der sie haengen koennte -- als Aufschrift des Kastens gilt sie dagegen immer, denn eine Platte hat genau einen Beton.
+- `REFERENZ_UEBERDECKUNG = 'SIA 262:2025, 5.2.2.1; 5.2.2.4, Tabelle 18'` – Was die Ueberdeckung c_nom ist und welche sie mindestens sein muss: die Werte je Expositionsklasse stehen in Tabelle 18. Die Vorgabe 30 mm ist keiner davon – die Klasse kennt nur der Ingenieur.
+- `UEBERDECKUNGEN = 'Überdeckungen'` – Die beiden Kaesten, in denen die Plattenangaben zusammenstehen. Der erste traegt die Betonsorte im Namen: sie ist keine gerechnete Groesse und hat darum keine eigene Kette, an der sie haengen koennte – als Aufschrift des Kastens gilt sie dagegen immer, denn eine Platte hat genau einen Beton.
 
 ## Braucht
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: d1756685e1d1
+erzeugt: 462bf54334cb
 art: modul
 tags: [modul]
 ---
@@ -13,7 +13,7 @@ Nimmt die Anfragen der App «Python» an, wie [[opencivil.web.dienst]] die
 des Rechenkerns: Name und Rumpf als JSON hinein, `{"status", "daten"}` als
 JSON heraus. Derselbe Faden (`web/js/kern_arbeiter.js`) trägt beide; die
 Konsole bekommt einen eigenen, damit eine Endlosschleife im Skript weder die
-Seite noch den Rechenkern anhält -- und damit «Abbrechen» ihn einfach
+Seite noch den Rechenkern anhält – und damit «Abbrechen» ihn einfach
 beenden kann.
 
 
@@ -37,7 +37,7 @@ wie beim Rechenkern ([[opencivil.web.umschlag]]).
 async def bearbeite_json(name: str, rumpf: str) -> str
 ```
 
-Eine Anfrage, als JSON hinein und hinaus -- Fehler kommen als Antwort, nie als Absturz.
+Eine Anfrage, als JSON hinein und hinaus – Fehler kommen als Antwort, nie als Absturz.
 
 
 ## Konstanten

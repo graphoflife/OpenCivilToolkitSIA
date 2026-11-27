@@ -1,5 +1,5 @@
 ---
-erzeugt: 085754c5da64
+erzeugt: b6ccaf34b73e
 art: modul
 tags: [modul]
 ---
@@ -29,11 +29,11 @@ lang und höchstens `schritt` ([[opencivil.pfahl.bettung#elementlaenge|elementla
 die Stäbe des Stabwerks, längs mit linearem, quer mit kubischem Ansatz und
 konsistent verteilter Bettung ([[opencivil.stabwerk.stab#steifigkeit|opencivil.stabwerk.stab.steifigkeit]],
 [[opencivil.stabwerk.stab#bettung|bettung]]). Quer darf die Bettung über eine
-Strecke linear wachsen -- so steht die Abminderung am Terrain genau im
+Strecke linear wachsen – so steht die Abminderung am Terrain genau im
 Modell, ohne Stufen. Gelöst wird mit dem Profillöser des Stabwerks
 ([[opencivil.stabwerk.matrix]]). N, M und V folgen danach je Element aus
 den Kräften an seinen Enden und der Bettung dazwischen, für den Ansatz genau
-integriert -- wie im Balkensystem ([[opencivil.stabwerk.verlauf#ebener_verlauf|ebener_verlauf]]),
+integriert – wie im Balkensystem ([[opencivil.stabwerk.verlauf#ebener_verlauf|ebener_verlauf]]),
 nicht aus der Krümmung eines Elements, die eine Ordnung ungenauer wäre. Am
 eingespannten Kopf ist das Moment die Kraft auf das oberste Element: die
 Reaktion.
@@ -44,7 +44,7 @@ Reaktion.
 z zählt vom Pfahlkopf nach unten. Längs: w positiv nach unten, N positiv als
 Druck. Quer: y in Richtung der Kopfkraft H; das Kopfmoment M_0 dreht wie eine
 Kraft H, die über dem Kopf angreift (M_0 = H·e), und die Verdrehung θ wie
-diese Kraft -- so verrichten H an y und M_0 an θ Arbeit. Es gilt V = dM/dz,
+diese Kraft – so verrichten H an y und M_0 an θ Arbeit. Es gilt V = dM/dz,
 am Kopf V = H und M = M_0.
 
 
@@ -64,7 +64,7 @@ class Strecke
 Ein Stück des Pfahls von `oben` bis `unten` (m unter dem Kopf).
 `laengs` ist die Feder am Mantel je Meter Pfahl (Schubspannung mal
 Umfang je Setzung), gleich über das Stück; `quer` die Bettung je Meter
-Pfahl (k_s · D) oben und unten, dazwischen linear -- alle in N/m².
+Pfahl (k_s · D) oben und unten, dazwischen linear – alle in N/m².
 
 - `oben: float`
 - `unten: float`
@@ -107,7 +107,7 @@ Verschiebung, Verdrehung, Moment, Querkraft und Bettungskraft je Knoten.
 - `theta: List[float]`
 - `M: List[float]`
 - `V: List[float]`
-- `q: List[float]` – Bettungskraft je Meter Pfahl, N/m: die Bettung mal y -- an der Grenze zweier Strecken mit der unteren.
+- `q: List[float]` – Bettungskraft je Meter Pfahl, N/m: die Bettung mal y – an der Grenze zweier Strecken mit der unteren.
 
 ### knoten
 
@@ -125,7 +125,7 @@ def elementlaenge(strecken: Sequence[Strecke], EA: float, EI: float) -> float
 
 Wie lang ein Element höchstens ist: [[opencivil.pfahl.bettung#Konstanten|SCHRITT]], und so kurz, wie es
 der gebettete Stab für die steifste Bettung längs oder quer verlangt
-([[opencivil.stabwerk.stab#schritt|schritt]]) -- dieselbe Regel wie im
+([[opencivil.stabwerk.stab#schritt|schritt]]) – dieselbe Regel wie im
 Balkensystem.
 
 ### laengs
@@ -135,7 +135,7 @@ def laengs(strecken: Sequence[Strecke], EA: float, fussfeder: float, N_kopf: flo
 ```
 
 Der Stab längs unter der Kopfkraft `N_kopf` (Druck positiv), mit der
-Feder `fussfeder` (N/m) am Fuss -- null, wo der Fuss nicht trägt.
+Feder `fussfeder` (N/m) am Fuss – null, wo der Fuss nicht trägt.
 
 ### quer
 
@@ -144,7 +144,7 @@ def quer(strecken: Sequence[Strecke], EI: float, H: float, M_0: float, *, einges
 ```
 
 Der Balken quer unter H und M_0 am Kopf, der Fuss frei. `eingespannt`:
-der Kopf dreht sich nicht, M_0 zählt dann nicht -- das Moment am Kopf ist
+der Kopf dreht sich nicht, M_0 zählt dann nicht – das Moment am Kopf ist
 die Reaktion.
 
 ### _element
@@ -170,15 +170,15 @@ def _verlauf(l: float, k: st.Matrix, d: Sequence[float], **verlauf) -> EbenesInt
 ```
 
 Ein Element der Länge `l` mit der Matrix `k` als Teil eines Stabs, in
-x ab seinem oberen Ende: aus den Kräften an seinen Enden -- `k · d`,
-eine Last trägt es nicht -- und seiner Bettung
+x ab seinem oberen Ende: aus den Kräften an seinen Enden – `k · d`,
+eine Last trägt es nicht – und seiner Bettung
 ([[opencivil.stabwerk.verlauf#ebener_verlauf|ebener_verlauf]]). y des Pfahls ist v
 des Stabs, φ = dy/dz seine Drehung.
 
 
 ## Konstanten
 
-- `SCHRITT = 0.1` – So lang ist ein Element höchstens, in m -- so dicht lesen die Nachweise die Verläufe, in jeder Tiefe. Wo die Bettung steif ist, sind die Elemente kürzer ([[opencivil.pfahl.bettung#elementlaenge|elementlaenge]]).
+- `SCHRITT = 0.1` – So lang ist ein Element höchstens, in m – so dicht lesen die Nachweise die Verläufe, in jeder Tiefe. Wo die Bettung steif ist, sind die Elemente kürzer ([[opencivil.pfahl.bettung#elementlaenge|elementlaenge]]).
 
 ## Braucht
 

@@ -32,7 +32,7 @@ orthogonal, zurück geht es mit $\mathbf{R}^{\mathsf{T}}$, und die Steifigkeit
 in den Achsen des Systems ist $\mathbf{T}^{\mathsf{T}}\,\mathbf{k}\,\mathbf{T}$.
 
 $x$ läuft vom Anfang zum Ende. $z$ liegt in der lotrechten Ebene durch den
-Stab und zeigt nach unten -- dorthin, wo im 2D-Balkensystem die gestrichelte
+Stab und zeigt nach unten – dorthin, wo im 2D-Balkensystem die gestrichelte
 Faser liegt. $y = z \times x$ ergänzt zum Rechtssystem. Ein lotrechter Stab
 hat keine eigene lotrechte Ebene; bei ihm ist $y$ die Achse $-Y$ des Systems.
 Der Drehwinkel $\beta$ dreht $y$ und $z$ danach im Rechtssinn um $x$: so steht

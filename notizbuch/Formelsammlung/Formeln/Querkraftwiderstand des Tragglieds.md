@@ -44,7 +44,7 @@ $$
 Stahl fliesst auf Schub bei τ_y = f_y/√3 (SIA 263:2013, 1.2), und so viel
 trägt die wirksame Schubfläche (5.1.4.1, (41)). Die Norm teilt dort durch
 γ_M1 = 1.05 (4.1.3); hier steht f_yd nach SIA 262, durch γ_s = 1.15 geteilt,
-wie beim Tragglied längs -- rund 9 % weniger, nach Vorgabe. Dazu η_i wie
+wie beim Tragglied längs – rund 9 % weniger, nach Vorgabe. Dazu η_i wie
 längs (SIA 267:2013, 9.5.2.4.1, (50)).
 
 Vollstab ⌀ 36 mm, B500B: V_Rd = 0.8 · 648 mm² · 435 N/mm² / √3 = 130 kN.

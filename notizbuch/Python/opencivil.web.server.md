@@ -1,5 +1,5 @@
 ---
-erzeugt: 2e60ebeeedba
+erzeugt: 8140a2edbea8
 art: modul
 tags: [modul]
 ---
@@ -10,7 +10,7 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Liefert die Dateien der Oberflaeche aus und reicht Anfragen an
-[[opencivil.web.dienst]] weiter. Mehr nicht -- gerechnet wird ausschliesslich
+[[opencivil.web.dienst]] weiter. Mehr nicht – gerechnet wird ausschliesslich
 dort, und zwar von demselben Code, der im Browser unter Pyodide laeuft.
 
 Bewusst nur mit der Standardbibliothek gebaut. Der Rechenkern kommt ohne
@@ -22,7 +22,7 @@ mit einem blossen `python3` laeuft.
 
 Zwei Dinge kann nur er. Erstens startet die Oberflaeche sofort, statt erst
 einige Sekunden auf Pyodide zu warten. Zweitens kann er den Bericht mit einer
-richtigen TeX-Maschine zu PDF uebersetzen -- im Browser bleibt es beim `.tex`.
+richtigen TeX-Maschine zu PDF uebersetzen – im Browser bleibt es beim `.tex`.
 
 
 ## WURZEL DES DOKUMENTBAUMS
@@ -30,7 +30,7 @@ richtigen TeX-Maschine zu PDF uebersetzen -- im Browser bleibt es beim `.tex`.
 Ausgeliefert wird vom Projektverzeichnis aus, nicht von `web/`. Das ist
 Absicht: auf GitHub Pages liegt das Repo genauso im Netz, und die Bruecke im
 Browser holt sich die `.py`-Dateien unter `/opencivil/…`. Waere die Wurzel
-hier eine andere, haetten die Adressen auf beiden Wegen verschiedene Tiefe --
+hier eine andere, haetten die Adressen auf beiden Wegen verschiedene Tiefe –
 und genau solche Unterschiede faellt einem erst auf der veroeffentlichten Seite
 auf die Fuesse.
 
@@ -61,7 +61,7 @@ def bericht_mit_pdf(rumpf: dict) -> dienst.Antwort
 
 Der Bericht des Dienstes, zusaetzlich auf die Platte gelegt und uebersetzt.
 
-Das `.tex` stammt unveraendert aus [[opencivil.web.dienst#bericht|opencivil.web.dienst.bericht]] --
+Das `.tex` stammt unveraendert aus [[opencivil.web.dienst#bericht|opencivil.web.dienst.bericht]] –
 hier kommt nur dazu, was ein Browser nicht kann.
 
 ### aufloesen
@@ -70,15 +70,15 @@ hier kommt nur dazu, was ein Browser nicht kann.
 def aufloesen(pfad: str) -> Path | None
 ```
 
-Wandelt eine Adresse in eine Datei -- oder `None`, wenn sie nicht darf.
+Wandelt eine Adresse in eine Datei – oder `None`, wenn sie nicht darf.
 
 Erlaubt ist nur, was in [[opencivil.web.server#Konstanten|OEFFENTLICH]] und
-[[opencivil.web.server#Konstanten|OEFFENTLICHE_DATEIEN]] steht. Alles andere im Projektverzeichnis --
-`daten/`, `.git/`, `tests/` -- bleibt draussen, auch wenn der Server
+[[opencivil.web.server#Konstanten|OEFFENTLICHE_DATEIEN]] steht. Alles andere im Projektverzeichnis –
+`daten/`, `.git/`, `tests/` – bleibt draussen, auch wenn der Server
 ohnehin nur auf 127.0.0.1 horcht.
 
 Die Adresse kommt verschluesselt: «Statische Höhe.md» als
-`Statische%20H%C3%B6he.md`. Erst entschluesselt, dann geprueft -- sonst
+`Statische%20H%C3%B6he.md`. Erst entschluesselt, dann geprueft – sonst
 fiele ein `%2E%2E` an der Pruefung auf `..` vorbei.
 
 ### Handler

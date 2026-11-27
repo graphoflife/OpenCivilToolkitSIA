@@ -1,5 +1,5 @@
 ---
-erzeugt: 7f4ae2e276a2
+erzeugt: 3246cca23521
 art: modul
 tags: [modul]
 ---
@@ -26,7 +26,7 @@ gab es nur ancoPLUS, seit 2026-11-27 auch HALFEN HDB.
 
 Doppelkopfanker auf Leisten, mit den Werten des Herstellers
 ([[opencivil.durchstanzen.produkte|.produkte]]): Typen und Höhen aus der Preisliste, Abstände und k_sys
-aus dem Gutachten von 2007 -- nach Vorgabe, nicht nachgeschlagen.
+aus dem Gutachten von 2007 – nach Vorgabe, nicht nachgeschlagen.
 
 
 ## NACH DER NORM ([[opencivil.durchstanzen.systeme#NachNorm|NachNorm]])
@@ -38,9 +38,9 @@ kleiner als s_1, und tangential höchstens 1.5·d_v beim zweiten Ring;
 Elemente näher als 0.35·d_v zählen nicht. Gewählt sind, nach Vorgabe, nicht
 nachgeschlagen:
 
-- das erste Element 0.35·d_v vom Rand, auf 5 mm aufgerundet -- so nah, wie
+- das erste Element 0.35·d_v vom Rand, auf 5 mm aufgerundet – so nah, wie
   es noch zählt;
-- das zweite bei d_v, auf 5 mm abgerundet, höchstens s_1 weiter -- so
+- das zweite bei d_v, auf 5 mm abgerundet, höchstens s_1 weiter – so
   zählen zwei Reihen;
 - danach s_1, so gross, wie Tabelle 21 es zulässt, auf 5 mm abgerundet;
 - die Durchmesser des Systems bis zur Grenze der Tabelle 21.
@@ -66,7 +66,7 @@ Herstellers ([[opencivil.durchstanzen.produkte|.produkte]]). Den Faktor 3.5 in (
 nach einem Gutachten, das nicht vorliegt, und mit ihm die strengeren
 Regeln, die 4.3.6.5.9 dafür verlangt. Darum stehen die Anker nach der Norm,
 und es gilt die 2. Die Höhe ist der Platz zwischen den Überdeckungen, auf
-5 mm abgerundet -- nach Vorgabe, nicht nachgeschlagen: die Unterlage nennt
+5 mm abgerundet – nach Vorgabe, nicht nachgeschlagen: die Unterlage nennt
 keine Höhen. Der Stahl ist B500B: die Unterlage nennt B500, und in (67) und
 (69) zählen nur f_sd und E_s, für jede Duktilitätsklasse gleich.
 
@@ -99,7 +99,7 @@ Auf [[opencivil.durchstanzen.systeme#Konstanten|RASTER]] aufgerundet.
 class System(ABC)
 ```
 
-Die Regeln eines Systems -- siehe Dateikopf.
+Die Regeln eines Systems – siehe Dateikopf.
 
 - `NAME: str` – Wie es im Schalter und in der Herleitung heisst.
 - `ELEMENT: str` – Ein Element, auch mehrere: «Anker», «Bügelschenkel».
@@ -108,11 +108,11 @@ Die Regeln eines Systems -- siehe Dateikopf.
 - `LEISTEN: str` – Was um die gestützte Fläche steht: «Leisten», «Bügel».
 - `LEISTE: str` – Was die Elemente einer Richtung trägt, in der Einzahl: «Leiste», «Linie».
 - `FORM: str` – Wie das Bild der Leiste ein Element zeichnet: «kopfanker», ein Schaft mit zwei Köpfen, oder «buegel».
-- `ENDEN: str` – Wie die Enden eines Elements heissen -- das Bild zeichnet sie schematisch: «Köpfe», «Biegungen».
+- `ENDEN: str` – Wie die Enden eines Elements heissen – das Bild zeichnet sie schematisch: «Köpfe», «Biegungen».
 - `KEINES: str` – Das Urteil, wenn es keines gibt: «Kein ancoPLUS passt in diese Platte.»
 - `KEINES_REICHT: str` – Der Hinweis, wenn auch der stärkste Versuch nicht alles erfüllt.
-- `STAHL = 'B500B'` – Der Stahl der Elemente -- in (67) und (69) gilt seine Fliessgrenze (4.3.6.5.4).
-- `ANZAHLEN: range = produkte.ANKER_JE_LEISTE` – Wie viele Elemente eine Leiste tragen kann: bei ancoPLUS die lieferbaren Leisten, bei Bügeln und HDB nach Vorgabe ebenso viele Reihen -- mindestens zwei, wie 5.5.3.8 es verlangt.
+- `STAHL = 'B500B'` – Der Stahl der Elemente – in (67) und (69) gilt seine Fliessgrenze (4.3.6.5.4).
+- `ANZAHLEN: range = produkte.ANKER_JE_LEISTE` – Wie viele Elemente eine Leiste tragen kann: bei ancoPLUS die lieferbaren Leisten, bei Bügeln und HDB nach Vorgabe ebenso viele Reihen – mindestens zwei, wie 5.5.3.8 es verlangt.
 
 #### System.elemente
 
@@ -140,7 +140,7 @@ Die Höhe eines Elements zwischen den Überdeckungen c (Zugseite) und c_v (Druck
 def hoehentext(self) -> str
 ```
 
-Wie die Höhe zustande kommt -- der Titel ihrer Zeile in der Herleitung.
+Wie die Höhe zustande kommt – der Titel ihrer Zeile in der Herleitung.
 
 #### System.abstaende
 
@@ -177,7 +177,7 @@ Woher k_sys kommt, für die Herleitung.
 def k_sys_titel(self, c_v: float, d: float) -> str
 ```
 
-Der Titel der Zeile von k_sys -- mit den Zahlen, nach denen er sich richtet.
+Der Titel der Zeile von k_sys – mit den Zahlen, nach denen er sich richtet.
 
 #### System.name
 
@@ -186,7 +186,7 @@ Der Titel der Zeile von k_sys -- mit den Zahlen, nach denen er sich richtet.
 def name(self, vorschlag: 'Vorschlag') -> str
 ```
 
-Wie ein Vorschlag heisst -- je Länge der Leisten, wie viele es sind.
+Wie ein Vorschlag heisst – je Länge der Leisten, wie viele es sind.
 
 #### System.regeln
 
@@ -205,7 +205,7 @@ Der Satz der Herleitung, der den Vorschlag und seine Regeln nennt; `wo`: «um de
 def warum_keines(self) -> str
 ```
 
-Warum es in dieser Platte keines gibt -- wenn [[opencivil.durchstanzen.systeme#System.elemente|elemente]] leer bleibt oder keine Leiste Platz findet.
+Warum es in dieser Platte keines gibt – wenn [[opencivil.durchstanzen.systeme#System.elemente|elemente]] leer bleibt oder keine Leiste Platz findet.
 
 ### AncoPlus
 
@@ -213,7 +213,7 @@ Warum es in dieser Platte keines gibt -- wenn [[opencivil.durchstanzen.systeme#S
 class AncoPlus(System)
 ```
 
-ancoPLUS von AncoTech -- siehe Dateikopf und [[opencivil.durchstanzen.produkte|.produkte]].
+ancoPLUS von AncoTech – siehe Dateikopf und [[opencivil.durchstanzen.produkte|.produkte]].
 
 - `NAME = 'ancoPLUS'`
 - `ELEMENT = 'Anker'`
@@ -298,9 +298,9 @@ def warum_keines(self) -> str
 class NachNorm(System)
 ```
 
-Ein System, das allein die Norm regelt -- Bügel und HALFEN HDB; siehe Dateikopf.
+Ein System, das allein die Norm regelt – Bügel und HALFEN HDB; siehe Dateikopf.
 
-- `DURCHMESSER: Tuple[float, ...]` – Die Durchmesser in mm, dünnste zuerst -- genommen bis zur Grenze der Tabelle 21.
+- `DURCHMESSER: Tuple[float, ...]` – Die Durchmesser in mm, dünnste zuerst – genommen bis zur Grenze der Tabelle 21.
 - `LINIEN: str` – Die Mehrzahl von [[opencivil.durchstanzen.systeme#NachNorm|LEISTE]]: «Linien», «Leisten».
 
 #### NachNorm.elemente
@@ -333,7 +333,7 @@ def k_sys_titel(self, c_v: float, d: float) -> str
 def anordnung(self) -> str
 ```
 
-Die Sätze der Herleitung, wie die Elemente nach der Norm stehen -- siehe Dateikopf.
+Die Sätze der Herleitung, wie die Elemente nach der Norm stehen – siehe Dateikopf.
 
 ### Buegel
 
@@ -341,7 +341,7 @@ Die Sätze der Herleitung, wie die Elemente nach der Norm stehen -- siehe Dateik
 class Buegel(NachNorm)
 ```
 
-Bügel nach SIA 262:2025, 5.5.3 -- siehe Dateikopf.
+Bügel nach SIA 262:2025, 5.5.3 – siehe Dateikopf.
 
 - `NAME = 'Bügel'`
 - `ELEMENT = 'Bügelschenkel'`
@@ -403,7 +403,7 @@ def warum_keines(self) -> str
 class HalfenHdb(NachNorm)
 ```
 
-HALFEN HDB von Leviat, angeordnet nach der Norm -- siehe Dateikopf und [[opencivil.durchstanzen.produkte|.produkte]].
+HALFEN HDB von Leviat, angeordnet nach der Norm – siehe Dateikopf und [[opencivil.durchstanzen.produkte|.produkte]].
 
 - `NAME = 'HALFEN HDB'`
 - `ELEMENT = 'Anker'`
@@ -466,7 +466,7 @@ def warum_keines(self) -> str
 class Durchstanzsystem(Wahl)
 ```
 
-Woraus die Durchstanzbewehrung besteht -- siehe Dateikopf.
+Woraus die Durchstanzbewehrung besteht – siehe Dateikopf.
 
 - `ANCOPLUS = 'ancoplus'`
 - `HDB = 'hdb'`
@@ -492,7 +492,7 @@ Die Regeln dieses Systems.
 ## Konstanten
 
 - `RASTER = 0.005` – Auf so viel werden Abstände gerundet.
-- `SYSTEME = {Durchstanzsystem.ANCOPLUS: AncoPlus(), Durchstanzsystem.HDB: HalfenH…` – Je Stellung ihre Regeln -- eine Instanz je System, ohne eigenen Zustand.
+- `SYSTEME = {Durchstanzsystem.ANCOPLUS: AncoPlus(), Durchstanzsystem.HDB: HalfenH…` – Je Stellung ihre Regeln – eine Instanz je System, ohne eigenen Zustand.
 
 ## Braucht
 

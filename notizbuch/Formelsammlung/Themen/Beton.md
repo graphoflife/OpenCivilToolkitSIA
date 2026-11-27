@@ -26,7 +26,7 @@ Festigkeitsklasse: aus der charakteristischen Zylinderdruckfestigkeit $f_{ck}$
 und den Teilsicherheitsbeiwerten. Daraus entstehen zwei Familien von Werten.
 
 - **Bemessungswerte** für die Tragsicherheit: $f_{cd}$ für Druck, $\tau_{cd}$
-  für Schub, $E_{cd}$ für die Steifigkeit beim Knicken -- gemindert mit
+  für Schub, $E_{cd}$ für die Steifigkeit beim Knicken – gemindert mit
   Beiwerten und geteilt durch Teilsicherheiten. In $f_{cd}$ steckt auch die
   Dauer der Einwirkung, $\eta_t$, im Normalfall 1.0.
 - **Mittelwerte** für das Verhalten im Gebrauch: $f_{cm}$ und $E_{cm}$ sagen,

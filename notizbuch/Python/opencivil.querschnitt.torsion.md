@@ -1,5 +1,5 @@
 ---
-erzeugt: 69c6a8bde15b
+erzeugt: 9b597a3ca112
 art: modul
 tags: [modul]
 ---
@@ -52,7 +52,7 @@ Eine Wand mit n Zellen ueber ihre Dicke rechnet um 2/n² zu steif. Darum ein
 zweites Gitter, jede Zelle halbiert, und I_T = (4·I_fein − I_grob)/3: das
 hebt den quadratischen Fehler auf. Liegen die beiden mehr als
 [[opencivil.querschnitt.torsion#Konstanten|ABWEICHUNG]] auseinander, ist das grobe Gitter fuer eine Wand zu grob
--- meist fuer eine duenne schraege. Dann dasselbe feiner, solange das feine
+– meist fuer eine duenne schraege. Dann dasselbe feiner, solange das feine
 Gitter nicht mehr als [[opencivil.querschnitt.torsion#Konstanten|ZELLEN_HOECHSTENS]] Zellen mit Material und
 [[opencivil.querschnitt.torsion#Konstanten|GITTER_HOECHSTENS]] Zellen im Ganzen bekaeme.
 
@@ -69,7 +69,7 @@ was seine Wanddicke dazugibt.
 class Gitterlauf
 ```
 
-`I_T` auf einem Gitter -- wie fein es war und wie die Rechnung lief.
+`I_T` auf einem Gitter – wie fein es war und wie die Rechnung lief.
 
 - `spalten: int` – Zellen in y.
 - `zeilen: int` – Zellen in z.
@@ -85,7 +85,7 @@ class Gitterlauf
 class Torsion
 ```
 
-`I_T` eines Querschnitts -- und die beiden Gitter, aus denen es kommt.
+`I_T` eines Querschnitts – und die beiden Gitter, aus denen es kommt.
 
 - `grob: Gitterlauf`
 - `fein: Gitterlauf`
@@ -139,8 +139,8 @@ Die Strecken in z mit Material auf der Geraden bei `y`.
 def _strecken(self, c: float, laengs: int) -> List[Strecke]
 ```
 
-Wo die Gerade die Kanten schneidet -- eine Ecke auf ihr zaehlt zur
-Seite darunter --, und dazwischen, ob das innerste Polygon traegt.
+Wo die Gerade die Kanten schneidet – eine Ecke auf ihr zaehlt zur
+Seite darunter –, und dazwischen, ob das innerste Polygon traegt.
 
 ### _darin
 
@@ -199,7 +199,7 @@ def hohlraeume(self, t: int) -> List[Set[int]]
 ```
 
 Die Hohlraeume von Teil `t`: was nicht zu ihm gehoert und den Rand
-des Gitters nicht erreicht -- samt einem anderen Teil darin.
+des Gitters nicht erreicht – samt einem anderen Teil darin.
 
 #### _Zellen.fuellen
 
@@ -259,10 +259,10 @@ Kopplungen, die Diagonale als Vorkonditionierer.
 
 - `TEILUNG = 30` – In so viele Zellen teilt das grobe Gitter die laengere Seite des Umrisses.
 - `ABWEICHUNG = 0.05` – So weit duerfen die beiden Gitter auseinanderliegen, relativ zum feinen.
-- `ZELLEN_HOECHSTENS = 25000` – Mehr Zellen mit Material bekommt das feine Gitter nicht -- so viele Unbekannte hat die Rechnung hoechstens.
+- `ZELLEN_HOECHSTENS = 25000` – Mehr Zellen mit Material bekommt das feine Gitter nicht – so viele Unbekannte hat die Rechnung hoechstens.
 - `GITTER_HOECHSTENS = 250000` – Mehr Zellen im Ganzen bekommt das feine Gitter nicht: eine duenne schraege Wand fuellt nur wenige davon, eingeteilt wird aber jede.
 - `GENAUIGKEIT = 1e-09` – Die konjugierten Gradienten hoeren auf, wenn das Residuum so klein ist, relativ zur Last.
-- `NAEHE = 0.01` – Naeher liegt keine Mitte am Rand, relativ zu ihrer Zelle -- sonst wuechse der Fluss dorthin ohne Grenze.
+- `NAEHE = 0.01` – Naeher liegt keine Mitte am Rand, relativ zu ihrer Zelle – sonst wuechse der Fluss dorthin ohne Grenze.
 
 ## Braucht
 

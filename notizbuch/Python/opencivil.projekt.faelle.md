@@ -1,5 +1,5 @@
 ---
-erzeugt: 82772011785d
+erzeugt: 4a22f8f243d6
 art: modul
 tags: [modul]
 ---
@@ -9,9 +9,9 @@ tags: [modul]
 
 ## VERANTWORTUNG
 
-Was Balkensystem und Decke an Faellen gleich fuehren: der Lastfall -- eine
+Was Balkensystem und Decke an Faellen gleich fuehren: der Lastfall – eine
 Kennung, auf die die Lasten zeigen, ein Name, und ob er das Eigengewicht
-bekommt -- und die Kombination mit je Lastfall einem Beiwert. Dazu der
+bekommt – und die Kombination mit je Lastfall einem Beiwert. Dazu der
 Baukasten, mit dem ein Bauteil in Python seine Faelle anlegt
 ([[opencivil.projekt.faelle#MitFaellen|MitFaellen]]), samt den Faellen, die ein frisches Bauteil
 mitbringt. Geprueft werden sie beim Bauen
@@ -25,7 +25,7 @@ mitbringt. Geprueft werden sie beim Bauen
 def kennung_von(eintrag: Any) -> str
 ```
 
-Die Kennung eines Eintrags -- oder die Kennung selbst.
+Die Kennung eines Eintrags – oder die Kennung selbst.
 
 ### LastfallEintrag
 
@@ -39,7 +39,7 @@ Ein Lastfall: eine Kennung, auf die die Lasten zeigen, und ein Name.
 - `IM_ORT = 'Lastfall'`
 - `kennung: str = ''`
 - `name: str = ''`
-- `eigengewicht: bool = False` – Ob der Lastfall das Eigengewicht bekommt -- von selbst, aus Dichte und Querschnitt (Benutzer, 2026-10-23). Ein Bauteil hat einen davon.
+- `eigengewicht: bool = False` – Ob der Lastfall das Eigengewicht bekommt – von selbst, aus Dichte und Querschnitt (Benutzer, 2026-10-23). Ein Bauteil hat einen davon.
 
 ### LastkombinationEintrag
 
@@ -61,7 +61,7 @@ Eine Kombination: je Lastfall (Kennung) ein Beiwert, von Hand.
 class MitFaellen
 ```
 
-Der Baukasten der Faelle -- fuer ein Bauteil mit `lastfaelle` und `kombinationen`.
+Der Baukasten der Faelle – fuer ein Bauteil mit `lastfaelle` und `kombinationen`.
 
 - `lastfaelle: List[LastfallEintrag]`
 - `kombinationen: List[LastkombinationEintrag]`
@@ -78,7 +78,7 @@ def lastfall(self, name: str, *, eigengewicht: bool=False) -> LastfallEintrag
 def kombination(self, name: str, *faktoren: Tuple[Any, float]) -> LastkombinationEintrag
 ```
 
-Eine Kombination -- je Lastfall (Eintrag oder Kennung) ein Beiwert: `(g, 1.35), (w, 1.5)`.
+Eine Kombination – je Lastfall (Eintrag oder Kennung) ein Beiwert: `(g, 1.35), (w, 1.5)`.
 
 #### MitFaellen.standardfaelle
 
@@ -87,7 +87,7 @@ def standardfaelle(self) -> LastkombinationEintrag
 ```
 
 Die Faelle eines frischen Bauteils (Benutzer, 2026-10-23): Eigengewicht
--- es kommt von selbst --, Auflast und Nutzlast, die beiden ohne Last,
+– es kommt von selbst –, Auflast und Nutzlast, die beiden ohne Last,
 und die Kombination GZT mit 1.35, 1.35 und 1.5. Zurueck kommt die GZT.
 
 #### MitFaellen.gebrauchskombination

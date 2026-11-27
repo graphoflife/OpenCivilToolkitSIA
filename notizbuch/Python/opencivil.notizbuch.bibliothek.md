@@ -1,5 +1,5 @@
 ---
-erzeugt: f91cab4973ad
+erzeugt: eaece4db7848
 art: modul
 tags: [modul]
 ---
@@ -12,7 +12,7 @@ tags: [modul]
 Je Modul und je Paket eine Seite im Notizbuch, aus den Docstrings: was das
 Modul verantwortet, seine Klassen und Funktionen samt Signatur, seine
 Konstanten, was es braucht und wer es braucht, und welche Formeln es
-schreibt. Gelesen wird mit `ast` -- nichts wird dafuer importiert. Was ueber
+schreibt. Gelesen wird mit `ast` – nichts wird dafuer importiert. Was ueber
 ein Modul zu sagen ist, steht in seinem Docstring; die Seite ist ganz
 erzeugt, ohne eigenen Teil.
 
@@ -21,7 +21,7 @@ erzeugt, ohne eigenen Teil.
 
 * Die Kopfzeile `opencivil/<pfad>.py -- Kurzbeschreibung.` wird zur
   Kurzbeschreibung oben auf der Seite.
-* Eine Zeile in GROSSBUCHSTABEN wird zur Ueberschrift -- im Docstring eines
+* Eine Zeile in GROSSBUCHSTABEN wird zur Ueberschrift – im Docstring eines
   Moduls oder Pakets; in dem einer Klasse oder Funktion bleibt sie fett. Eine
   Klammer gehoert dazu (`VORZEICHEN (wie in …):`), ein Schwanz nach
   ` -- ` in Kleinbuchstaben beginnt den Absatz darunter.
@@ -30,9 +30,12 @@ erzeugt, ohne eigenen Teil.
   deren Absatz fort.
 * `x` wird `x`; eine Rolle wie `` :class:`~opencivil.x.Y ``` wird ein Link
   auf die Seite des Moduls und die Ueberschrift dort. Was sich nicht
-  aufloesen laesst, bleibt Code -- ein Test haelt die Liste leer.
-* Was Markdown, Obsidian oder MathJax anders lesen wuerden -- `$`, `<`,
-  `|`, `%%`, `==`, `[[` --, wird maskiert.
+  aufloesen laesst, bleibt Code – ein Test haelt die Liste leer.
+* Was Markdown, Obsidian oder MathJax anders lesen wuerden – `$`, `<`,
+  `|`, `%%`, `==`, `[[` –, wird maskiert.
+* Der Gedankenstrich ` -- ` im Text wird «–»: im Code darf er bleiben, wo
+  der Benutzer liest, steht der echte (Benutzer, 2026-11-19 und 2026-11-27).
+  Was Code ist, bleibt, wie es ist.
 
 
 ## WIE EIN NAME AUFGELOEST WIRD
@@ -51,7 +54,7 @@ nur einmal gibt.
 class Eintrag
 ```
 
-Eine Klasse, Funktion oder Methode -- eine Ueberschrift auf der Seite.
+Eine Klasse, Funktion oder Methode – eine Ueberschrift auf der Seite.
 
 - `anker: str`
 - `knoten: ast.AST`
@@ -115,7 +118,7 @@ def lesen(cls, paket: Path=PAKET) -> 'Bibliothek'
 def ziel(self, text: str, modul: Modul, klasse: Optional[str]=None, tiefe: int=0) -> Optional[Tuple[str, str]]
 ```
 
-`(Modul, Anker)` zu einem Namen, wie ihn ein Docstring nennt -- Anker
+`(Modul, Anker)` zu einem Namen, wie ihn ein Docstring nennt – Anker
 leer: die Seite. `klasse` ist die Klasse, in deren Docstring er steht.
 
 #### Bibliothek._im_modul
@@ -125,7 +128,7 @@ def _im_modul(self, modul: Modul, rest: str) -> Optional[str]
 ```
 
 Die Ueberschrift zu einem Namen in diesem Modul: genau so, oder die
-Klasse davor, oder die einzige Methode dieses Namens -- eine Konstante
+Klasse davor, oder die einzige Methode dieses Namens – eine Konstante
 steht unter «Konstanten».
 
 #### Bibliothek._in_modul
@@ -142,7 +145,7 @@ In einem bestimmten Modul: die Ueberschrift, sonst was es weiterreicht, sonst di
 def verweis(self, text: str, modul: Modul, klasse: Optional[str]=None) -> str
 ```
 
-Der Link fuer eine Rolle -- oder Code, wenn sich nichts findet. Mit `~` zeigt er nur den letzten Teil.
+Der Link fuer eine Rolle – oder Code, wenn sich nichts findet. Mit `~` zeigt er nur den letzten Teil.
 
 #### Bibliothek.codestelle
 
@@ -150,7 +153,7 @@ Der Link fuer eine Rolle -- oder Code, wenn sich nichts findet. Mit `~` zeigt er
 def codestelle(self, stelle: str) -> str
 ```
 
-Ein Link zu `modul:Klasse.methode` -- so weit die Seite sie kennt.
+Ein Link zu `modul:Klasse.methode` – so weit die Seite sie kennt.
 
 #### Bibliothek.seiten
 
@@ -183,7 +186,7 @@ Eine Zeile Docstring als Markdown: Code, Rollen als Links, der Rest maskiert.
 def _eintraege(baum: ast.Module) -> Iterable[Eintrag]
 ```
 
-Klassen, Funktionen und ihre Methoden -- oeffentlich, oder privat mit Docstring.
+Klassen, Funktionen und ihre Methoden – oeffentlich, oder privat mit Docstring.
 
 ### _kommentar
 
@@ -199,7 +202,7 @@ Die `#:`-Zeilen direkt ueber einer Zuweisung, zu einem Satz verbunden.
 def _hat_konstante(modul: Modul, name: str) -> bool
 ```
 
-Ob `name` unter «Konstanten» steht -- dieselbe Auswahl wie dort.
+Ob `name` unter «Konstanten» steht – dieselbe Auswahl wie dort.
 
 ### _ueberschrift
 
@@ -215,7 +218,7 @@ Titel, der Rest als Beginn des Absatzes, und ob ein Codeblock folgt.
 def _block(zeilen: List[str], i: int) -> Tuple[List[str], int]
 ```
 
-Ein eingerueckter Block ab `i`, gemeinsam ausgerueckt -- Leerzeilen darin bleiben.
+Ein eingerueckter Block ab `i`, gemeinsam ausgerueckt – Leerzeilen darin bleiben.
 
 ### _ist_fortsetzung
 
@@ -223,7 +226,7 @@ Ein eingerueckter Block ab `i`, gemeinsam ausgerueckt -- Leerzeilen darin bleibe
 def _ist_fortsetzung(heraus: List[str]) -> bool
 ```
 
-Ob die letzte Zeile ein Listenpunkt ist -- dann gehoert Eingeruecktes zu ihm.
+Ob die letzte Zeile ein Listenpunkt ist – dann gehoert Eingeruecktes zu ihm.
 
 ### _maskieren
 
@@ -231,7 +234,7 @@ Ob die letzte Zeile ein Listenpunkt ist -- dann gehoert Eingeruecktes zu ihm.
 def _maskieren(text: str, *, am_anfang: bool) -> str
 ```
 
-Was Markdown, Obsidian oder MathJax anders lesen wuerden.
+Was Markdown, Obsidian oder MathJax anders lesen wuerden – und der Gedankenstrich.
 
 ### _text
 
@@ -253,6 +256,7 @@ Eine Kurzbeschreibung in einer Liste: ohne Rollen, maskiert.
 - `_CODE = re.compile('``(.+?)``')`
 - `_LISTE = re.compile('^(\\s*)([*-]|\\d+\\.)\\s')`
 - `_KOPF = re.compile('^opencivil[\\w/.]*\\s+--\\s+(.*)$')`
+- `_STRICH = re.compile('(?:(?<=\\s)|^)--(?=\\s|$|[,.;:)])')` – Der Gedankenstrich der Docstrings: zwei Striche nach einem Leerzeichen und vor einem Leerzeichen, einem Satzzeichen oder dem Ende – nicht `--flag`.
 
 ## Braucht
 

@@ -47,4 +47,4 @@ $$
 
 Zwei Flansche $b \times t_f$ und der Steg zwischen ihnen,
 $t_w \times (h - 2 t_f)$. Ohne die Ausrundungen zwischen Steg und Flansch,
-die ein Walzprofil hat -- dessen Tabellenwert ist darum etwas grösser.
+die ein Walzprofil hat – dessen Tabellenwert ist darum etwas grösser.

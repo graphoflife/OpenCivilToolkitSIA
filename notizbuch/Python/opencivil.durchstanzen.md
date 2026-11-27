@@ -1,5 +1,5 @@
 ---
-erzeugt: 06d7b38f9c94
+erzeugt: 697826e3cd85
 art: modul
 tags: [modul]
 ---
@@ -7,20 +7,20 @@ tags: [modul]
 > der Durchstanznachweis nach SIA 262:2025, 4.3.6.
 > Paket [[opencivil]] · [Quelltext](../../opencivil/durchstanzen/__init__.py)
 
-* [[opencivil.durchstanzen.schnitt|schnitt]] -- der Nachweisschnitt um die
+* [[opencivil.durchstanzen.schnitt|schnitt]] – der Nachweisschnitt um die
   gestützte Fläche: was von ihm zählt (Figur 22 und 23), seine Länge u, die
   Fläche darin und sein Schwerpunkt.
-* [[opencivil.durchstanzen.stelle|stelle]] -- die Durchstanzstelle: Platte,
+* [[opencivil.durchstanzen.stelle|stelle]] – die Durchstanzstelle: Platte,
   gestützte Fläche, Biegebewehrung und Einwirkung als Vorgaben im
   Rechenwerk, und die Wahlen dazu.
-* [[opencivil.durchstanzen.nachweis|nachweis]] -- der Nachweis: statische Höhe,
+* [[opencivil.durchstanzen.nachweis|nachweis]] – der Nachweis: statische Höhe,
   k_e, die Lasten im Schnitt, die Plattenrotation und der Widerstand ohne
   Durchstanzbewehrung.
-* [[opencivil.durchstanzen.mit_bewehrung|mit_bewehrung]] -- reicht der Beton nicht:
+* [[opencivil.durchstanzen.mit_bewehrung|mit_bewehrung]] – reicht der Beton nicht:
   die vier Nachweise mit Durchstanzbewehrung (4.3.6.5).
-* [[opencivil.durchstanzen.bewehrung|bewehrung]] -- wo die Leisten liegen, der
+* [[opencivil.durchstanzen.bewehrung|bewehrung]] – wo die Leisten liegen, der
   äussere Schnitt (Figur 26) und die Suche nach der kleinsten, die reicht.
-* [[opencivil.durchstanzen.produkte|produkte]] -- ancoPLUS und ZEUS von AncoTech:
+* [[opencivil.durchstanzen.produkte|produkte]] – ancoPLUS und ZEUS von AncoTech:
   Typen, Höhen, Abstände und die Faktoren ihrer Gutachten.
 
 ## Module

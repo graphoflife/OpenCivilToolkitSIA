@@ -1,5 +1,5 @@
 ---
-erzeugt: caa5e7260739
+erzeugt: c39c5d18dce0
 art: modul
 tags: [modul]
 ---
@@ -19,14 +19,14 @@ rechnet plastisch (5.1.4).
 ## DIE SCHUBFLAECHEN
 
 * I-Profil in Stegrichtung: (41a).
-* Die anderen nach Vorgabe, nicht nachgeschlagen -- die Norm verweist dafuer
+* Die anderen nach Vorgabe, nicht nachgeschlagen – die Norm verweist dafuer
   auf SN EN 1993-1-1, die hier nicht vorliegt: das U in Stegrichtung
   `A - 2 b t_f + (t_w + r) t_f`, I und U quer dazu `2 b t_f`, das
   Rundrohr `2 t (D - t)`. So rechnen auch die Excel-Dateien des Benutzers.
 * Das Rechteckrohr: je Wand in der Richtung (13), `b` zwischen den
   Mittellinien der beiden anderen Waende. Ohne Beulen sind das
   `2 τ_y t (h - t)/γ_M1`, wie in den Excel-Dateien.
-* Vollstahl -- Flach-, Vierkant- und Rundstahl -- mit `A_v = A`: der ganze
+* Vollstahl – Flach-, Vierkant- und Rundstahl – mit `A_v = A`: der ganze
   Querschnitt fliesst auf Schub, wie bei plastischer Rechnung (nach Vorgabe,
   nicht nachgeschlagen).
 
@@ -36,13 +36,13 @@ rechnet plastisch (5.1.4).
 Beim I und beim U genuegt (42); haelt der Steg es nicht ein, widersteht er
 nach (13) mit `b t = (h - t_f) t_w`. Der Beulwert ist der des langen Felds,
 `k_τ = 5.34`: wo Quersteifen stehen, weiss das Werkzeug nicht (nach
-Vorgabe, nicht nachgeschlagen). Flansche und Rundrohre beulen hier nicht --
+Vorgabe, nicht nachgeschlagen). Flansche und Rundrohre beulen hier nicht –
 nach Vorgabe, nicht nachgeschlagen: gewalzte sind dafuer zu gedrungen.
 
 
 ## RICHTUNG
 
-`z` ist die Richtung, in der das ungedrehte Profil steht -- beim I und U
+`z` ist die Richtung, in der das ungedrehte Profil steht – beim I und U
 die des Stegs, beim Rechteckrohr die von `h`. Um 90° oder 270° gedreht,
 traegt es dasselbe in `y`.
 
@@ -67,14 +67,14 @@ class Schubwiderstand
 ```
 
 Was ein Profil in einer Richtung traegt, in mm und N/mm²: die Flaeche,
-auf der die Schubspannung `tau` wirkt -- `A_v` nach (41) oder `b t`
-der Bleche nach (13) -- und woher beides kommt.
+auf der die Schubspannung `tau` wirkt – `A_v` nach (41) oder `b t`
+der Bleche nach (13) – und woher beides kommt.
 
 - `flaeche: float`
 - `tau: float`
 - `formel: str` – Die Flaeche als LaTeX, mit Zahlen: «A - 2 b t_f + ...» oder «2 \\cdot 92 \\cdot 4».
-- `herkunft: str` – Die Stelle der Flaeche -- eine Normstelle oder «nach Vorgabe».
-- `beulen: Optional['Schubbeulen'] = None` – Wie das Blech nach (13) beult -- `None` bei (41).
+- `herkunft: str` – Die Stelle der Flaeche – eine Normstelle oder «nach Vorgabe».
+- `beulen: Optional['Schubbeulen'] = None` – Wie das Blech nach (13) beult – `None` bei (41).
 - `steg: Optional[Tuple[float, float]] = None` – Beim I und U in Stegrichtung (42): `(h - t_f)/t_w` und seine Grenze `√(4 E/f_y)`.
 
 #### Schubwiderstand.V_Rd
@@ -120,7 +120,7 @@ Die kritische Schubspannung `τ_cr = k_τ · 0.9 E (t/b)²` (4.5.4.1).
 def widerstand(lage: Profillage, flaeche: float, richtung: str, *, f_y: float, tau_y: float, E: float) -> Schubwiderstand
 ```
 
-Der Querkraftwiderstand eines Profils in `richtung` («y» oder «z») --
+Der Querkraftwiderstand eines Profils in `richtung` («y» oder «z») –
 `flaeche` ist seine Flaeche `A` in mm², wie gezeichnet. Siehe Dateikopf.
 
 ### rund
@@ -129,7 +129,7 @@ Der Querkraftwiderstand eines Profils in `richtung` («y» oder «z») --
 def rund(lage: Profillage) -> bool
 ```
 
-Ob das Profil in jeder Richtung gleich traegt -- das Rundrohr und der Rundstahl.
+Ob das Profil in jeder Richtung gleich traegt – das Rundrohr und der Rundstahl.
 
 ### _parallel
 
@@ -145,7 +145,7 @@ Ob die Strecke von `von` nach `bis` in `richtung` laeuft, «y» oder «z».
 def streifen(lage: Profillage, richtung: str) -> List[Tuple[str, float, Tuple[Punkt, ...]]]
 ```
 
-Wo die Querkraft in `richtung` im Profil steht -- siehe Dateikopf: je
+Wo die Querkraft in `richtung` im Profil steht – siehe Dateikopf: je
 Streifen der Name seines Blechs, sein Anteil und sein Umriss in der
 Zeichnung. Beim Rundrohr der Ring mit `A_v/A`: der Umriss aussen mit
 diesem Anteil, das Loch mit dem negativen; beim Vollstahl der ganze Umriss.
@@ -158,8 +158,8 @@ diesem Anteil, das Loch mit dem negativen; beim Vollstahl der ganze Umriss.
 - `REFERENZ_42 = 'SIA 263:2013, 5.1.4.2, (42)'`
 - `REFERENZ_BEULEN = 'SIA 263:2013, 4.5.4.1, (13); Figur 8'`
 - `NACH_VORGABE = 'nach Vorgabe, nicht nachgeschlagen'`
-- `K_TAU = 5.34` – Der Schubbeulwert des langen Felds ohne Quersteifen (Figur 8, α gross) -- siehe Dateikopf.
-- `_VOLL = ('vollrechteck', 'vollkreis')` – Die Formen aus Vollstahl -- nach dem Schluessel ihrer Vorlage.
+- `K_TAU = 5.34` – Der Schubbeulwert des langen Felds ohne Quersteifen (Figur 8, α gross) – siehe Dateikopf.
+- `_VOLL = ('vollrechteck', 'vollkreis')` – Die Formen aus Vollstahl – nach dem Schluessel ihrer Vorlage.
 - `_RUND = ('rundrohr', 'vollkreis')` – Die Formen, die in jeder Richtung gleich tragen.
 
 ## Braucht

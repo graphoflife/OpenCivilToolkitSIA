@@ -1,5 +1,5 @@
 ---
-erzeugt: 506201d759be
+erzeugt: 0e2afc4ec911
 art: modul
 tags: [modul]
 ---
@@ -10,7 +10,7 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Der Knicknachweis der Platte am gezeichneten Querschnitt, je Knickfall in
-einer Richtung: der Zugseite, zu der sich der Stab biegt -- unten, oben,
+einer Richtung: der Zugseite, zu der sich der Stab biegt – unten, oben,
 links oder rechts, wie bei den Spannung-Dehnung-Analysen
 ([[opencivil.querschnitt.zugseite#Zugseite|Zugseite]]). Das Verfahren ist
 dasselbe ([[opencivil.nachweis.knicken#Knickverfahren|Knickverfahren]]: Ausmitten-
@@ -20,7 +20,7 @@ Iteration, Grenzkraft N_Rd); hier steht nur, woher der Stab kommt
 * die Verformung aus den Fasern in dieser Richtung, mit den Gesetzen der
   Wahl «Verformung» ([[opencivil.querschnitt.analyse#Querschnittsanalyse.querschnitt|querschnitt]]);
 * der Widerstand aus dem Bruchzustand bei der Druckkraft in dieser Richtung,
-  mit den Gesetzen der Wahl «Widerstand» -- das Moment in Biegerichtung;
+  mit den Gesetzen der Wahl «Widerstand» – das Moment in Biegerichtung;
 * die statische Hoehe vom gedrueckten Rand bis zum entferntesten Stab in
   Zugrichtung, fuer die Mindestausmitte `d/30`.
 
@@ -29,7 +29,7 @@ Iteration, Grenzkraft N_Rd); hier steht nur, woher der Stab kommt
 
 wie in der einachsigen Tragsicherheit und den Analysen. Das Moment um die
 andere Achse, das ein unsymmetrischer Querschnitt dabei weckt, zaehlt nicht;
-um beide Achsen zugleich knickt hier kein Stab -- je Richtung ein Fall.
+um beide Achsen zugleich knickt hier kein Stab – je Richtung ein Fall.
 Nach Vorgabe: SIA 262:2025, 4.3.7 regelt das Knicken um beide Achsen
 zugleich nicht (`notizbuch/Notizen/TODO.md`).
 
@@ -55,7 +55,7 @@ SI-Basis; die Zeichnung in mm.
 class QAKnickfall(Knickfall)
 ```
 
-Ein Knickfall des gezeichneten Querschnitts -- mit der Seite, zu der er sich biegt.
+Ein Knickfall des gezeichneten Querschnitts – mit der Seite, zu der er sich biegt.
 
 - `richtung: Zugseite = Zugseite.UNTEN`
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: fa2f43a54f21
+erzeugt: 0d0a520de1db
 art: modul
 tags: [modul]
 ---
@@ -24,18 +24,18 @@ Querschnitts ([[opencivil.pfahl.innen|.innen]]), beide mal η_i (SIA 267:2013, 9
 
 N_V ist die Normalkraft in derselben Tiefe, Druck positiv. Im Bohrpfahl
 zieht das Fachwerk der Querkraft an beiden Gurten, je zur Hälfte, zusammen
-F_tVd = \|V\| · cot α (SIA 262:2025, 4.3.3.4.11, (51)) -- ein Zug in der
+F_tVd = \|V\| · cot α (SIA 262:2025, 4.3.3.4.11, (51)) – ein Zug in der
 Achse: N_V = N − F_tVd, mit dem α der Querkraft. Der Mikropfahl hat kein
 Fachwerk: N_V = N.
 
 M_Rd wird an [[opencivil.pfahl.innen_quer#Konstanten|STUETZSTELLEN]] gleich verteilten N_V gerechnet und
 dazwischen linear gelesen ([[opencivil.pfahl.innen_quer#zwischen|zwischen]]): die Fläche der Widerstände ist
-konvex, M_Rd in N also konkav -- die Gerade liegt darunter.
+konvex, M_Rd in N also konkav – die Gerade liegt darunter.
 
 
 ## DIE QUERKRAFT
 
-* Bohrpfahl -- das Fachwerk ([[opencivil.querschnitt.fachwerk#fachwerk|fachwerk]])
+* Bohrpfahl – das Fachwerk ([[opencivil.querschnitt.fachwerk#fachwerk|fachwerk]])
   mit der Wendel:
 
 ```
@@ -46,7 +46,7 @@ konvex, M_Rd in N also konkav -- die Gerade liegt darunter.
 
 α ganzgradig zwischen 30° und 45°, unter Zug ab 40° (4.3.3.3.2, 4.3.3.3.3).
 ```
-* Mikropfahl -- das Tragglied aus Stahl:
+* Mikropfahl – das Tragglied aus Stahl:
 
 ```
 V_R,d = A_v · f_yd / √3,   A_v = 2 · A / π          (SIA 263:2013, 5.1.4.1, (41))
@@ -56,7 +56,7 @@ V_R,d = A_v · f_yd / √3,   A_v = 2 · A / π          (SIA 263:2013, 5.1.4.1,
 ## NACH VORGABE, NICHT NACHGESCHLAGEN (notizbuch/Notizen/TODO.md)
 
 * Gezogen ist die halbe Bewehrung, die Stäbe gleichmässig auf dem Kreis.
-* b_w ist die Sehne des Kreises auf der Höhe des Druckgurts -- die kleinste
+* b_w ist die Sehne des Kreises auf der Höhe des Druckgurts – die kleinste
   Breite zwischen den Gurten.
 * α_min = 30° auch unter Druck, wo 4.3.3.3.3 bei bedeutendem Druck 25° zuliesse.
 * Die Wendel aus dem Stahl der Längsbewehrung.
@@ -76,7 +76,7 @@ SI-Basis.
 def gezogen(N: float) -> bool
 ```
 
-Ob die Normalkraft ein Zug ist, Druck positiv -- über dem Rauschen.
+Ob die Normalkraft ein Zug ist, Druck positiv – über dem Rauschen.
 
 ### stuetzstellen
 
@@ -84,7 +84,7 @@ Ob die Normalkraft ein Zug ist, Druck positiv -- über dem Rauschen.
 def stuetzstellen(von: float, bis: float) -> List[float]
 ```
 
-[[opencivil.pfahl.innen_quer#Konstanten|STUETZSTELLEN]] Normalkräfte gleich verteilt von `von` bis `bis` -- eine, wo beide gleich sind.
+[[opencivil.pfahl.innen_quer#Konstanten|STUETZSTELLEN]] Normalkräfte gleich verteilt von `von` bis `bis` – eine, wo beide gleich sind.
 
 ### zwischen
 
@@ -92,7 +92,7 @@ def stuetzstellen(von: float, bis: float) -> List[float]
 def zwischen(stellen: Sequence[float], werte: Sequence[float], x: float) -> float
 ```
 
-Der Wert in x, linear zwischen den Stützstellen -- null, wo einer der
+Der Wert in x, linear zwischen den Stützstellen – null, wo einer der
 beiden Nachbarn nichts trägt: dazwischen ist unbekannt, wie viel.
 
 ### anteil
@@ -101,7 +101,7 @@ beiden Nachbarn nichts trägt: dazwischen ist unbekannt, wie viel.
 def anteil(einwirkung: float, widerstand: float) -> float
 ```
 
-\|E\| / R -- unendlich, wo nichts trägt und doch etwas wirkt.
+\|E\| / R – unendlich, wo nichts trägt und doch etwas wirkt.
 
 ### Schub
 
@@ -113,7 +113,7 @@ class Schub
 Der Querkraftwiderstand für einen Bereich der Normalkraft: V_Rd, mal η_i, und das α des Fachwerks.
 
 - `V_Rd: Wert`
-- `alpha: Optional[Wert] = None` – Nur beim Bohrpfahl -- der Mikropfahl hat kein Fachwerk.
+- `alpha: Optional[Wert] = None` – Nur beim Bohrpfahl – der Mikropfahl hat kein Fachwerk.
 
 #### Schub.laengszug
 
@@ -130,7 +130,7 @@ F_tVd = \|V\| · cot α (SIA 262:2025, 4.3.3.4.11, (51)), ohne Fachwerk null.
 class Innenquerfall
 ```
 
-In jeder Tiefe der Verläufe M_Rd und V_Rd einer Kombination, in SI -- für das Bild.
+In jeder Tiefe der Verläufe M_Rd und V_Rd einer Kombination, in SI – für das Bild.
 
 - `M_grenze: List[float]`
 - `V_grenze: List[float]`
@@ -169,7 +169,7 @@ def pruefe(self, e: Eingaben, p: Protokoll) -> Ausfuehrung
 def _fachwerk(self, e: Eingaben, p: Protokoll, werte: Zwischenwerte, innen: Innenbefund, bereiche: Sequence[bool]) -> Dict[bool, Schub]
 ```
 
-Der Bohrpfahl: das Fachwerk mit der Wendel, je Bereich der Normalkraft -- Zug: `True`.
+Der Bohrpfahl: das Fachwerk mit der Wendel, je Bereich der Normalkraft – Zug: `True`.
 
 #### InnererQuerwiderstand._neigung
 
@@ -178,7 +178,7 @@ def _neigung(self, e: Eingaben, p: Protokoll, werte: Zwischenwerte, w: Dict[str,
 ```
 
 Die Neigung mit dem grössten Widerstand, Wendel, Druckdiagonalen und
-V_Rd -- aus den Werten `w` des Fachwerks.
+V_Rd – aus den Werten `w` des Fachwerks.
 
 #### InnererQuerwiderstand._tragglied
 
@@ -194,7 +194,7 @@ Der Mikropfahl: das Tragglied aus Stahl fliesst auf Schub.
 def _biegung(self, e: Eingaben, p: Protokoll, werte: Zwischenwerte, k: Kombination, v: Verlauf, q: Querschnitt, innen: Innenbefund, schub: Dict[bool, Schub]) -> Tuple[NachweisUrteil, List[float]]
 ```
 
-In jeder Tiefe \|M\| gegen M_Rd mit der Normalkraft dort -- massgebend die knappste.
+In jeder Tiefe \|M\| gegen M_Rd mit der Normalkraft dort – massgebend die knappste.
 
 #### InnererQuerwiderstand._querkraft
 
@@ -202,7 +202,7 @@ In jeder Tiefe \|M\| gegen M_Rd mit der Normalkraft dort -- massgebend die knapp
 def _querkraft(self, p: Protokoll, werte: Zwischenwerte, k: Kombination, v: Verlauf, schub: Dict[bool, Schub]) -> Tuple[NachweisUrteil, List[float]]
 ```
 
-In jeder Tiefe \|V\| gegen V_Rd -- massgebend die knappste.
+In jeder Tiefe \|V\| gegen V_Rd – massgebend die knappste.
 
 
 ## Konstanten

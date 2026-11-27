@@ -70,7 +70,7 @@ Beim Rissmoment springt die Krümmung bei demselben Moment vom ungerissenen auf
 den gerissenen Wert.
 
 Gerechnet wird wie beim [[Rissmoment des ungerissenen Querschnitts]] am
-Bruttoquerschnitt ohne Stahl -- nach Vorgabe, nicht nachgeschlagen.
+Bruttoquerschnitt ohne Stahl – nach Vorgabe, nicht nachgeschlagen.
 
 Beim gezeichneten Querschnitt gehört $W$ zur Ecke, die unter reiner Biegung
 zuerst reisst: kippt die Nulllinie, mit dem Deviationsmoment

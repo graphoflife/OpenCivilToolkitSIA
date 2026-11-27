@@ -42,7 +42,7 @@ $$
 ## Theorie
 
 $f_{ck}$ ist ein Fraktilwert: 95 % der Prüfkörper sind fester. Für das
-Verhalten im Mittel -- Steifigkeit, Verformung, Rissbildung -- zählt der
+Verhalten im Mittel – Steifigkeit, Verformung, Rissbildung – zählt der
 Mittelwert. Der feste Zuschlag von $8\,\mathrm{N/mm^2}$ entspricht bei normal
 verteilter Festigkeit dem 1.645-fachen einer Standardabweichung von
 $4.8\,\mathrm{N/mm^2}$, wie sie die Norm annimmt.

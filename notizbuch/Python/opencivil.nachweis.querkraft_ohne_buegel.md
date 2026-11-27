@@ -1,5 +1,5 @@
 ---
-erzeugt: c85f8308d728
+erzeugt: f00e75a631b2
 art: modul
 tags: [modul]
 ---
@@ -31,7 +31,7 @@ d_v = d       sonst
 
 Die Nummern sind die der Gleichungen in SIA 262:2025, 4.3.3.2; die Einlage
 regelt 4.3.3.2.9, das Dekompressionsmoment 4.3.3.2.6. Dass `h/6` dazu
-gehoert, sagt die Norm nicht -- es ist der Rand eines Rechtecks, der unter
+gehoert, sagt die Norm nicht – es ist der Rand eines Rechtecks, der unter
 `N_Ed` und `m_Dd` spannungsfrei wird.
 
 
@@ -46,11 +46,11 @@ setzte ein Sonderfall bei Zug `V_Rd = 0`.
 
 ## EINHEITEN
 
-Die Formeln der Norm sind dimensionell inhomogen -- `d` und `D_max` gehen
+Die Formeln der Norm sind dimensionell inhomogen – `d` und `D_max` gehen
 in Millimeter ein, `f_ck` in N/mm^2. `k_g` laeuft deshalb ueber
 [[opencivil.core.einheiten#empirisch|opencivil.core.einheiten.empirisch]], das diese Voraussetzung erzwingt;
 `k_d` rechnet `d` in Millimeter um, und die Herleitung sagt es dazu.
-`V_Rd` ergibt sich in N/mm, also kN/m -- eine Querkraft je Laufmeter.
+`V_Rd` ergibt sich in N/mm, also kN/m – eine Querkraft je Laufmeter.
 
 ## Inhalt
 
@@ -65,14 +65,14 @@ Was ausser Moment und Normalkraft in den Widerstand eingeht.
 
 Alles in SI-Basis. Gebaut von [[opencivil.nachweis.querkraft_ohne_buegel#QuerkraftOhneBuegel.kurvenbeiwerte|QuerkraftOhneBuegel.kurvenbeiwerte]];
 damit rechnen je Zugseite ([[opencivil.nachweis.querkraft_ohne_buegel#Kurvenbeiwerte.widerstand|widerstand]]) die Faelle, die Kurve zu
-jeder eingestellten Normalkraft und die Kennzahlen der Platte -- ohne dass
+jeder eingestellten Normalkraft und die Kennzahlen der Platte – ohne dass
 einer, auch nicht die Oberflaeche, die Formel ein zweites Mal enthaelt.
 
 - `h: float`
 - `statische_hoehen: Mapping[Zugseite, float]` – Je Zugseite die statische Hoehe der gezogenen Bewehrung ([[opencivil.nachweis.querkraft#statische_hoehen|statische_hoehen]]). Fehlt eine Seite, liegt auf ihr keine Bewehrung.
 - `einlage: float` – Das groesste Mass der Einlage, Breite oder Hoehe.
 - `tau_cd: float`
-- `zugstahl: Mapping[Zugseite, Tuple[float, float]]` – Je Zugseite `(f_yd, E_s)` des Stahls, der dort liegt -- unten und oben duerfen verschiedene Staehle liegen. Fehlt eine Seite, liegt auf ihr keine Bewehrung.
+- `zugstahl: Mapping[Zugseite, Tuple[float, float]]` – Je Zugseite `(f_yd, E_s)` des Stahls, der dort liegt – unten und oben duerfen verschiedene Staehle liegen. Fehlt eine Seite, liegt auf ihr keine Bewehrung.
 - `k_g: float`
 
 #### Kurvenbeiwerte.hoehen
@@ -81,7 +81,7 @@ einer, auch nicht die Oberflaeche, die Formel ein zweites Mal enthaelt.
 def hoehen(self, seite: Zugseite) -> Optional[Tuple[float, float]]
 ```
 
-`(d, d_v)` fuer diese Zugseite -- `None` ohne Zugbewehrung.
+`(d, d_v)` fuer diese Zugseite – `None` ohne Zugbewehrung.
 
 #### Kurvenbeiwerte.widerstand
 
@@ -90,7 +90,7 @@ def widerstand(self, seite: Zugseite, *, M_Ed: float, N_Ed: float, m_Rd: float, 
 ```
 
 Der Widerstand der Zugseite `seite` bei diesem Moment und
-dieser Normalkraft ([[opencivil.nachweis.querkraft_ohne_buegel#Kurvenbeiwerte.widerstand|widerstand]]) -- fuer die Faelle, die Kurve
+dieser Normalkraft ([[opencivil.nachweis.querkraft_ohne_buegel#Kurvenbeiwerte.widerstand|widerstand]]) – fuer die Faelle, die Kurve
 und die Kennzahlen der Platte dieselbe Rechnung. Nur fuer eine Seite
 mit Zugbewehrung ([[opencivil.nachweis.querkraft_ohne_buegel#Kurvenbeiwerte.hoehen|hoehen]]).
 
@@ -101,11 +101,11 @@ def wirksame_hoehe(d: float, einlage: float) -> float
 ```
 
 `d_v`: `d`, um die Einlage vermindert, sobald ihr groesstes Mass `d/6`
-uebersteigt -- sonst `d` (SIA 262:2025, 4.3.3.2.9). Eine obere Grenze
+uebersteigt – sonst `d` (SIA 262:2025, 4.3.3.2.9). Eine obere Grenze
 gibt es nicht: reicht die Einlage ueber `d`, wird `d_v` null oder
 negativ, und ohne Buegel bleibt kein Widerstand ([[opencivil.nachweis.querkraft_ohne_buegel#widerstand|widerstand]]).
 
-Bis 2026-11-14 zaehlte die Einlage erst ab `h/6` und nur bis `d` --
+Bis 2026-11-14 zaehlte die Einlage erst ab `h/6` und nur bis `d` –
 zwischen `d/6` und `h/6` und ab `d` blieb sie unbeachtet.
 
 ### Widerstandspunkt
@@ -117,7 +117,7 @@ class Widerstandspunkt
 
 Was bei einem bestimmten Moment noch an Querkraft aufnehmbar ist.
 
-Ein einzelner Punkt der Rechnung -- der Nachweis braucht ihn fuer seine
+Ein einzelner Punkt der Rechnung – der Nachweis braucht ihn fuer seine
 Faelle, die Kurve fuer ihre fuenfzig Stuetzstellen. Beide ueber dieselbe
 Funktion, sonst zeigte das Diagramm etwas anderes als der Nachweis.
 
@@ -137,20 +137,20 @@ def widerstand(*, M_Ed: float, N_Ed: float, h: float, d: float, d_v: float, tau_
 Der Querkraftwiderstand bei diesem Moment und dieser Normalkraft.
 
 Alles in SI-Basis; `tau_cd` in Pa, `m_Rd` in Nm, Rueckgabe in N/m.
-`index` ist der des Momentenwiderstands, `Rd` oder `Rk` -- je nach
+`index` ist der des Momentenwiderstands, `Rd` oder `Rk` – je nach
 der Linie, aus der er kommt; er steht nur im Text.
 
 **DREI AESTE**
 
 
-* `|m_Ed| <= m_Dd` -- der Querschnitt bleibt ungerissen, `eps_v = 0`
+* `|m_Ed| <= m_Dd` – der Querschnitt bleibt ungerissen, `eps_v = 0`
   und `k_d` damit am groessten. Unter Zug ist `m_Dd` negativ, und
   diesen Ast gibt es nicht.
-* `|m_Ed| <= m_Rd` -- der Regelfall der Norm.
-* `|m_Ed| >  m_Rd` -- die Bewehrung fliesst. Die Dehnung folgt dann nicht
+* `|m_Ed| <= m_Rd` – der Regelfall der Norm.
+* `|m_Ed| >  m_Rd` – die Bewehrung fliesst. Die Dehnung folgt dann nicht
   mehr dem Moment, sondern ist **fest**: `eps_v = 1.5 * f_yd/E_s`. Der
   Widerstand faellt an dieser Stelle sprunghaft und bleibt danach
-  unveraendert -- in der Kurve eine Waagrechte.
+  unveraendert – in der Kurve eine Waagrechte.
 
 Ist `d_v` null oder negativ, nimmt die Einlage die ganze Hoehe: kein
 Widerstand.
@@ -161,7 +161,7 @@ Widerstand.
 def beiwert_k_g(p: Protokoll, basis: str, D_max: Wert, f_ck: Wert) -> Wert
 ```
 
-Der Beiwert der Gesteinskoernung, samt seiner Zeile in der Herleitung --
+Der Beiwert der Gesteinskoernung, samt seiner Zeile in der Herleitung –
 fuer den Querkraftnachweis und die Kennzahlen der Platte, eine Formel.
 Empirisch: `D_max` in mm, `f_ck` in N/mm^2.
 
@@ -197,9 +197,9 @@ die geloesten Eingaenge des Ansatzes. Daraus zeichnet sich die Kurve
 ueber dem Moment, ohne dass die Oberflaeche die Formel ein zweites Mal
 enthaelt. Steht nach dem Lauf in der Loesung, nicht am Nachweis.
 
-- `beiwerte: Kurvenbeiwerte` – Die geloesten Eingaenge -- fuer [[opencivil.nachweis.querkraft_ohne_buegel#BefundOhneBuegel.kurve|kurve]].
+- `beiwerte: Kurvenbeiwerte` – Die geloesten Eingaenge – fuer [[opencivil.nachweis.querkraft_ohne_buegel#BefundOhneBuegel.kurve|kurve]].
 - `mn: MNBefund` – Der Befund des M-N-Nachweises: aus seiner Linie kommt `m_Rd(N_Ed)` der Kurve.
-- `index: str = 'Rd'` – Wie der Momentenwiderstand heisst -- `Rd`, oder `Rk` mit charakteristischen Werten.
+- `index: str = 'Rd'` – Wie der Momentenwiderstand heisst – `Rd`, oder `Rk` mit charakteristischen Werten.
 - `ergebnisse: List['ErgebnisOhneBuegel'] = field(default_factory=list)`
 
 #### BefundOhneBuegel.kurve
@@ -238,7 +238,7 @@ def _ast(self, N_Ed: float, seite: Zugseite) -> Optional[dict]
 Ein Ast der Kurve. `None`, wenn es ihn nicht gibt.
 
 Es gibt ihn nicht, wenn auf der gezogenen Seite keine Bewehrung liegt
-oder die Normalkraft ausserhalb der Resistenzlinie faellt -- in beiden
+oder die Normalkraft ausserhalb der Resistenzlinie faellt – in beiden
 Faellen waere jeder gezeichnete Widerstand erfunden.
 
 ### ErgebnisOhneBuegel
@@ -255,7 +255,7 @@ Alle Zwischenwerte eines Falls ohne Buegel, damit die Herleitung vollstaendig is
 - `eps_v: float = 0.0`
 - `m_Dd: float = 0.0`
 - `m_Rd: float = 0.0` – Momentenwiderstand bei der wirkenden Normalkraft, in Nm.
-- `plastisch: bool = False` – `m_Ed` liegt ueber dem Momentenwiderstand -- siehe [[opencivil.nachweis.querkraft_ohne_buegel#widerstand|widerstand]].
+- `plastisch: bool = False` – `m_Ed` liegt ueber dem Momentenwiderstand – siehe [[opencivil.nachweis.querkraft_ohne_buegel#widerstand|widerstand]].
 
 ### QuerkraftOhneBuegel
 
@@ -263,7 +263,7 @@ Alle Zwischenwerte eines Falls ohne Buegel, damit die Herleitung vollstaendig is
 class QuerkraftOhneBuegel(Querkraft)
 ```
 
-Der Querkraftnachweis einer Platte ohne Buegel -- siehe Dateikopf.
+Der Querkraftnachweis einer Platte ohne Buegel – siehe Dateikopf.
 
 - `REFERENZ = REFERENZ`
 
@@ -273,7 +273,7 @@ Der Querkraftnachweis einer Platte ohne Buegel -- siehe Dateikopf.
 def zugstahl(self, e: Eingaben, seite: Zugseite) -> Tuple[Wert, Wert]
 ```
 
-`f_yd` und `E_s` des Stahls der gezogenen Seite -- unten und oben
+`f_yd` und `E_s` des Stahls der gezogenen Seite – unten und oben
 duerfen verschiedene liegen, eine Seite hat nur einen.
 
 #### QuerkraftOhneBuegel.kurvenbeiwerte
@@ -283,7 +283,7 @@ def kurvenbeiwerte(self, e: Eingaben, k_g: float) -> Kurvenbeiwerte
 ```
 
 Die geloesten Eingaenge des Ansatzes, `k_g` aus [[opencivil.nachweis.querkraft_ohne_buegel#beiwert_k_g|beiwert_k_g]]
--- fuer die Faelle, die Kurve und die Kennzahlen der Platte dieselben;
+– fuer die Faelle, die Kurve und die Kennzahlen der Platte dieselben;
 auch `d_v` entsteht darum an einer Stelle ([[opencivil.nachweis.querkraft_ohne_buegel#Kurvenbeiwerte.hoehen|Kurvenbeiwerte.hoehen]]).
 
 #### QuerkraftOhneBuegel.pruefe
@@ -300,15 +300,15 @@ def _protokoll_fall(self, p: Protokoll, e: Eingaben, erg: ErgebnisOhneBuegel, k_
 
 Die vollstaendige Rechnung eines Falls, mit Zahlen in jeder Zeile.
 
-Frueher stand hier nur der Ansatz und eine Ergebnistabelle -- damit war
+Frueher stand hier nur der Ansatz und eine Ergebnistabelle – damit war
 der Querkraftwiderstand die einzige Zahl im ganzen Werkzeug, die man
 nicht nachrechnen konnte.
 
 
 ## Konstanten
 
-- `K_G_MINDEST = 1.2` – Unterer Riegel fuer den Beiwert der Gesteinskoernung -- er steht in der Gleichung selbst.
-- `PLASTISCH = 1.5` – Vielfaches der Fliessdehnung, sobald `m_Ed` den Widerstand ueberschreitet. `eps_v = PLASTISCH * f_yd / E_s` -- fest, nicht vom Moment abhaengig. Die Norm setzt den Wert, wo plastische Verformungen der Biegebewehrung nicht auszuschliessen sind ([[opencivil.nachweis.querkraft_ohne_buegel#Konstanten|REFERENZ_PLASTISCH]]).
+- `K_G_MINDEST = 1.2` – Unterer Riegel fuer den Beiwert der Gesteinskoernung – er steht in der Gleichung selbst.
+- `PLASTISCH = 1.5` – Vielfaches der Fliessdehnung, sobald `m_Ed` den Widerstand ueberschreitet. `eps_v = PLASTISCH * f_yd / E_s` – fest, nicht vom Moment abhaengig. Die Norm setzt den Wert, wo plastische Verformungen der Biegebewehrung nicht auszuschliessen sind ([[opencivil.nachweis.querkraft_ohne_buegel#Konstanten|REFERENZ_PLASTISCH]]).
 - `REFERENZ = 'SIA 262:2025, 4.3.3.2.1, (35)'` – Wo die Gleichungen stehen, je eine Stelle.
 - `REFERENZ_K_D = 'SIA 262:2025, 4.3.3.2.1, (36)'`
 - `REFERENZ_K_G = 'SIA 262:2025, 4.3.3.2.1, (37)'`
@@ -316,10 +316,10 @@ nicht nachrechnen konnte.
 - `REFERENZ_PLASTISCH = 'SIA 262:2025, 4.3.3.2.3, (41)'`
 - `REFERENZ_DEKOMPRESSION = 'SIA 262:2025, 4.3.3.2.6'`
 - `DEHNUNG = 'Nominelle Dehnung der Zugbewehrung'` – Was eps_v ist: die Dehnung, mit der die Norm den Widerstand bemisst.
-- `OHNE_BUEGEL = 'Querkraftwiderstand ohne Querkraftbewehrung'` – Die Seite des Widerstands im Notizbuch -- Ansatz und Rechnung stehen darauf.
+- `OHNE_BUEGEL = 'Querkraftwiderstand ohne Querkraftbewehrung'` – Die Seite des Widerstands im Notizbuch – Ansatz und Rechnung stehen darauf.
 - `KURVENPUNKTE = 50` – Stuetzstellen der M_Ed-v_Rd-Kurve.
 - `KURVENZUGABE = 20000.0` – Wie weit die Kurve ueber `m_Rd` hinaus gezeichnet wird, in Nm.
-- `SPRUNGSCHRITT = 0.001` – Abstand der beiden Stellen, zwischen denen der Sprung bei `m_Rd` liegt, in Nm. Nur damit der Absatz senkrecht gezeichnet wird -- 1 mNm.
+- `SPRUNGSCHRITT = 0.001` – Abstand der beiden Stellen, zwischen denen der Sprung bei `m_Rd` liegt, in Nm. Nur damit der Absatz senkrecht gezeichnet wird – 1 mNm.
 
 ## Braucht
 

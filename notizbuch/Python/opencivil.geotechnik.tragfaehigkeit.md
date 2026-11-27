@@ -1,5 +1,5 @@
 ---
-erzeugt: 8c8086324d3f
+erzeugt: 789b39c1bf90
 art: modul
 tags: [modul]
 ---
@@ -18,7 +18,7 @@ N_c = (N_q - 1) / tan phi
 ```
 
 Unter einem Fundament ([[opencivil.geotechnik.grundbruch|grundbruch]]) und am Fuss
-eines Pfahls ([[opencivil.pfahl.aussen|aussen]]) dieselben Formeln -- darum in
+eines Pfahls ([[opencivil.pfahl.aussen|aussen]]) dieselben Formeln – darum in
 einem Modul, das keinem der beiden gehört.
 
 
@@ -35,7 +35,7 @@ def tragfaehigkeitsfaktoren(p: Protokoll, werte: Zwischenwerte, phi: Wert) -> Tu
 ```
 
 N_q und N_c für den Reibungswinkel `phi` (Kap. 9.2.6), in die
-Herleitung geschrieben -- unter einem Fundament und am Fuss eines Pfahls
+Herleitung geschrieben – unter einem Fundament und am Fuss eines Pfahls
 dieselben Formeln ([[opencivil.pfahl.aussen]]). `phi` grösser als null.
 
 

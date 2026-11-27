@@ -1,5 +1,5 @@
 ---
-erzeugt: c7ca63632d1a
+erzeugt: 359688d0a589
 art: modul
 tags: [modul]
 ---
@@ -19,7 +19,7 @@ R_i,d = η_i · R_mat,d     (50)    η_i ≤ 0.8 in der Regel (51), bis 0.9 mit
 ```
 
 R_mat,d ist der Widerstand des Querschnitts nach SIA 262, gleichmässig
-gestaucht oder gedehnt -- der Bruchzustand derselben Interaktion, mit der
+gestaucht oder gedehnt – der Bruchzustand derselben Interaktion, mit der
 die Querschnittsanalyse rechnet
 ([[opencivil.querschnitt.interaktion#Querschnitt.reine_normalkraft|reine_normalkraft]]),
 mit denselben Werkstoffen ([[opencivil.querschnitt.analyse#werkstoff|werkstoff]]).
@@ -28,9 +28,9 @@ Ganz gedrückt endet der Beton dort bei −ε_c1d, und der Stahl mit ihm.
 
 ## DER QUERSCHNITT ([[opencivil.pfahl.innen#querschnitt|querschnitt]])
 
-* Bohrpfahl -- ein Kreis aus Beton mit dem Durchmesser D, darin n Längsstäbe
+* Bohrpfahl – ein Kreis aus Beton mit dem Durchmesser D, darin n Längsstäbe
   auf dem Kreis, den Überdeckung und Wendel frei lassen.
-* Mikropfahl -- nur das Tragglied aus Stahl, um die Abrostung aussen
+* Mikropfahl – nur das Tragglied aus Stahl, um die Abrostung aussen
   verkleinert: ein Rohr oder ein Vollstab.
 Kreise sind Vielecke derselben Fläche ([[opencivil.pfahl.innen#kreis|kreis]]).
 
@@ -76,7 +76,7 @@ def nach_abrostung(d_a: float, dt: float) -> float
 ```
 
 Der Aussendurchmesser des Tragglieds nach der Abrostung Δt rundum, in m
-(SIA 267:2013, 9.5.2.4.8) -- fuer den Nachweis und das Bild.
+(SIA 267:2013, 9.5.2.4.8) – fuer den Nachweis und das Bild.
 
 ### Masse
 
@@ -85,14 +85,14 @@ Der Aussendurchmesser des Tragglieds nach der Abrostung Δt rundum, in m
 class Masse
 ```
 
-Was der Querschnitt aus den Eingaben braucht, in m -- je Pfahlart ein Teil davon.
+Was der Querschnitt aus den Eingaben braucht, in m – je Pfahlart ein Teil davon.
 
 - `D: float = 0.0` – Bohrpfahl: Durchmesser des Betons.
 - `r_s: float = 0.0` – Bohrpfahl: Radius des Kreises, auf dem die Längsstäbe liegen.
 - `n: int = 0`
 - `phi_l: float = 0.0`
 - `d_aussen: float = 0.0` – Mikropfahl: Aussendurchmesser des Tragglieds nach der Abrostung.
-- `d_innen: float = 0.0` – Mikropfahl: Innendurchmesser des Rohrs -- null beim Vollstab.
+- `d_innen: float = 0.0` – Mikropfahl: Innendurchmesser des Rohrs – null beim Vollstab.
 
 ### querschnitt
 
@@ -110,7 +110,7 @@ def biegewiderstand(q: Querschnitt, N: float, eta_i: float, staebe: int=0) -> fl
 ```
 
 Das Moment, das der Pfahl bei der Normalkraft N trägt, Druck positiv:
-η_i · M_R(N / η_i) -- die Fläche der Widerstände um η_i verkleinert, wie
+η_i · M_R(N / η_i) – die Fläche der Widerstände um η_i verkleinert, wie
 (50) den Widerstand. Von `staebe` Stäben gilt die Lage, die dem Moment
 weniger nützt: ein Stab im gezogenen Rand oder zwei beidseits davon.
 Null, wo N allein schon mehr ist, als der Querschnitt trägt.
@@ -122,7 +122,7 @@ Null, wo N allein schon mehr ist, als der Querschnitt trägt.
 class Innenbefund
 ```
 
-Was ausser den Erfüllungsgraden bleibt -- für Zusammenfassung und Bild, in SI.
+Was ausser den Erfüllungsgraden bleibt – für Zusammenfassung und Bild, in SI.
 
 - `masse: Masse`
 - `A_s: float`
@@ -158,7 +158,7 @@ def _normalkraft(self, p: Protokoll, werte: Zwischenwerte, q: Querschnitt, werks
 ```
 
 R_mat,d in einer Richtung: die Dehnung aus der Interaktion, die
-Spannungen aus den Gesetzen, die Kraft als Summe -- Druck und Zug
+Spannungen aus den Gesetzen, die Kraft als Summe – Druck und Zug
 als Beträge.
 
 #### InnererWiderstand._bemessung

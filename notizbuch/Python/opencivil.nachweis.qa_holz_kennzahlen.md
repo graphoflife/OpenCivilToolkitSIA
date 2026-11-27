@@ -1,5 +1,5 @@
 ---
-erzeugt: 30afdf0d4e0a
+erzeugt: 0c578f21d5de
 art: modul
 tags: [modul]
 ---
@@ -10,7 +10,7 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Die Kennzahlen eines Querschnitts aus Holz nach SIA 265:2012, wie die des
-Stahls ([[opencivil.nachweis.qa_stahl_kennzahlen]]) -- gerechnet immer, ob
+Stahls ([[opencivil.nachweis.qa_stahl_kennzahlen]]) – gerechnet immer, ob
 es Lastfaelle gibt oder nicht. Je Beanspruchung allein, linear (4.1.2), mit
 den Bemessungswerten der Tabellen 6 und 7 und dem Beiwert η_w der
 Feuchteklasse der Analyse:
@@ -21,7 +21,7 @@ Feuchteklasse der Analyse:
 * je Richtung der Querkraftwiderstand nach (23), aus der Schubflaeche;
 * beim Rechteck der Torsionswiderstand nach (24).
 
-Die Werte des Querschnitts -- `W`, `k_h`, `A_V`, `W_T` -- rechnet
+Die Werte des Querschnitts – `W`, `k_h`, `A_V`, `W_T` – rechnet
 [[opencivil.nachweis.qa_holz_werte#HolzwerteQA|HolzwerteQA]]; hier stehen nur die
 Widerstaende. Stossartig ist hier nichts: `η_t` gehoert dem Lastfall.
 
@@ -33,7 +33,7 @@ Widerstaende. Stossartig ist hier nichts: `η_t` gehoert dem Lastfall.
 class KennzahlenHolzQA(Kennzahlprozedur)
 ```
 
-Die Kennzahlen eines Holzquerschnitts -- siehe Dateikopf.
+Die Kennzahlen eines Holzquerschnitts – siehe Dateikopf.
 
 - `THEMA = 'Kennzahlen'`
 
@@ -54,7 +54,7 @@ def rechne(self, e: Eingaben, p: Protokoll) -> Dict[str, Groesse]
 
 ## Konstanten
 
-- `BIEGUNG = ('@eta \\cdot @f_m \\cdot @W', 'Biegewiderstand eines Holzquerschnitt…` – Die Biegung, je mit und ohne k_h -- eine Vorlage, ein Name.
+- `BIEGUNG = ('@eta \\cdot @f_m \\cdot @W', 'Biegewiderstand eines Holzquerschnitt…` – Die Biegung, je mit und ohne k_h – eine Vorlage, ein Name.
 - `BIEGUNG_K_H = ('@eta \\cdot @k_h \\cdot @f_m \\cdot @W', 'Biegewiderstand des Brett…`
 
 ## Braucht

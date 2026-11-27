@@ -1,5 +1,5 @@
 ---
-erzeugt: 557b115a5113
+erzeugt: 8f831de2c451
 art: modul
 tags: [modul]
 ---
@@ -53,7 +53,7 @@ Fuer die Auswahl in der Zeile.
 def linie(self) -> Optional['Analyseart']
 ```
 
-Die Linie, auf der diese Frage laeuft: M-chi oder N-eps -- der Modul
+Die Linie, auf der diese Frage laeuft: M-chi oder N-eps – der Modul
 ist dieselbe Linie, umgerechnet. `None` fuer die beiden Bilder.
 
 #### Analyseart.ueber_moment
@@ -63,7 +63,7 @@ ist dieselbe Linie, umgerechnet. `None` fuer die beiden Bilder.
 def ueber_moment(self) -> bool
 ```
 
-Ob die Linie ueber dem Moment laeuft -- die M-chi-Linie und der Modul
+Ob die Linie ueber dem Moment laeuft – die M-chi-Linie und der Modul
 ueber ihr; sonst ueber der Normalkraft. Fuer die Linien gefragt, nicht
 fuer die beiden Bilder.
 
@@ -75,7 +75,7 @@ def eingaben(self) -> Tuple[str, ...]
 ```
 
 Die Felder des Falls, die diese Frage braucht, in der Folge der Maske:
-N und M, die beiden Randdehnungen -- oder bei einer Linie das, was auf
+N und M, die beiden Randdehnungen – oder bei einer Linie das, was auf
 ihr festgehalten wird: N auf der M-chi-Linie, M auf der N-eps-Linie.
 
 #### Analyseart.modul

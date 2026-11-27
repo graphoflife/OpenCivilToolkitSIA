@@ -58,6 +58,6 @@ schlaff, mit gleichmässiger Pressung, setzt sich ein Punkt genau um $s_m$:
 der kennzeichnende Punkt K, beim Rechteck $0.13\,L$ und $0.13\,B$ von einer
 Ecke (Bild 8.15). Für ein starres Fundament wird darum unter K gerechnet.
 
-Ein schlaffes Fundament -- eine Schüttung, ein Damm -- folgt der Mulde, und
+Ein schlaffes Fundament – eine Schüttung, ein Damm – folgt der Mulde, und
 am tiefsten ist sie unter der Mitte. Dort, bei $L/2$ und $B/2$, wird für ein
 schlaffes gerechnet (Kap. 8.10).

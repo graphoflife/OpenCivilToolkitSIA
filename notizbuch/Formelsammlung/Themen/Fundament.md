@@ -18,7 +18,7 @@ tags: [thema]
 ## Theorie
 
 Das Fundament mit seinem Baugrund: Boden, Masse, Gelände und Grundwasser,
-und was aus ihnen folgt, bevor ein Nachweis rechnet -- drainiert die
+und was aus ihnen folgt, bevor ein Nachweis rechnet – drainiert die
 Bemessungswerte $\varphi_{eff}$ und $c_{eff}$ und die Raumlast unter Auftrieb
 $\gamma'$, undrainiert allein $s_{u,d}$.
 

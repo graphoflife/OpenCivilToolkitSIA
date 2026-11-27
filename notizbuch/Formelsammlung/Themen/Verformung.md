@@ -32,8 +32,8 @@ Die Durchbiegung w ist mit der Steifigkeit E\_cm ermittelt: elastisch, am ungeri
 
 Eine Platte, die trägt, biegt sich. Im Gebrauch soll sie das nur so weit,
 dass nichts darunter leidet: Trennwände, Bodenbeläge, Fenster, das Gefälle
-eines Dachs. Wie weit sie sich biegt, hängt vom ganzen System ab -- Lager,
-Spannweiten, Lasten --, und das rechnet der Benutzer selbst, elastisch und
+eines Dachs. Wie weit sie sich biegt, hängt vom ganzen System ab – Lager,
+Spannweiten, Lasten –, und das rechnet der Benutzer selbst, elastisch und
 mit $E_{cm}$.
 
 Die Platte trägt dazu bei, was das System nicht weiss: dass sie reisst und

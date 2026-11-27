@@ -41,7 +41,7 @@ Der Pfahl gibt seine Last über den Mantel und den Fuss an den Boden ab. Am Mant
 Ein Pfahl gibt seine Last auf zwei Wegen an den Boden ab: durch Reibung am
 Mantel und durch Druck am Fuss. Die Rechnung bestimmt beide aus den Schichten
 nach Kap. 12.5 des Buches und zählt sie zusammen (SIA 267:2013, 9.4.4.1.1,
-(41)) -- oder nimmt R_a,k aus Versuchen (9.4.4.1.6). Auf Zug trägt nur der
+(41)) – oder nimmt R_a,k aus Versuchen (9.4.4.1.6). Auf Zug trägt nur der
 Mantel.
 
 Der Bemessungswert folgt mit η_a, das sagt, wie verlässlich R_a,k bestimmt

@@ -1,5 +1,5 @@
 ---
-erzeugt: 87febae7283d
+erzeugt: 2271bcb4790a
 art: modul
 tags: [modul]
 ---
@@ -16,12 +16,12 @@ eine eigene, einzeln ueberschreibbare Berechnung.
 
 ## SORTEN UND ERZEUGNISSE
 
-Tabelle 7 (3.3.2.2) nennt je Erzeugnis -- Draht, Litze oder Stab mit seinem
-Durchmesser -- die Querschnittsflaeche A_p, die Zugfestigkeit f_pk und die
+Tabelle 7 (3.3.2.2) nennt je Erzeugnis – Draht, Litze oder Stab mit seinem
+Durchmesser – die Querschnittsflaeche A_p, die Zugfestigkeit f_pk und die
 0.1-%-Dehngrenze f_p0.1k. Die Festigkeiten haengen nur an der Sorte: jede
 Sorte Y… hat in allen ihren Zeilen dieselben. Darum ist die Sorte das
 Material, und die Erzeugnisse stehen bei ihr ([[opencivil.material.spannstahl#Erzeugnis|Erzeugnis]]): ein
-Spannglied waehlt eines davon, und die Flaeche kommt aus der Tabelle -- eine
+Spannglied waehlt eines davon, und die Flaeche kommt aus der Tabelle – eine
 Litze 15.7 mm hat 150 mm², nicht π·d²/4. Die Sorten stehen in der Folge der
 Tabelle 10 (4.2.3.1), Y1860 zuerst. Am 2026-11-26 gegen die gedruckten
 Tabellen 7 und 10 geprueft.
@@ -38,11 +38,11 @@ Erzeugnis ([[opencivil.material.spannstahl#Erzeugnis.modul|Erzeugnis.modul]]).
 ## DAS GESETZ
 
 Figur 17 (4.2.3.3) idealisiert nur den Zug: mit E_p bis f_pd, dann
-waagrecht bis eps_ud = 2 % (Tabelle 10) -- ideal plastisch, wie 4.2.3.5 es
+waagrecht bis eps_ud = 2 % (Tabelle 10) – ideal plastisch, wie 4.2.3.5 es
 zulaesst ([[opencivil.querschnitt.werkstoffgesetz#Spannstahlgesetz|Spannstahlgesetz]]).
 f_pd = f_p0.1k / gamma_s nach Gleichung (5) (2.4.2.5) mit gamma_s = 1.15
 (2.4.2.6). Tabelle 10 nennt dieselben Zahlen gerundet: 1390 statt 1391
-N/mm² bei Y1860 -- gerechnet wird ungerundet, wie f_yd des Betonstahls.
+N/mm² bei Y1860 – gerechnet wird ungerundet, wie f_yd des Betonstahls.
 
 
 ## EIGENSTAENDIG NUTZBAR
@@ -152,7 +152,7 @@ Eine Sorte: f_pk und f_p0.1k in N/mm², dazu ihre Erzeugnisse aus Tabelle 7.
 def erzeugnis(sorte: str, durchmesser: float) -> Optional[Erzeugnis]
 ```
 
-Das Erzeugnis der Sorte mit diesem Durchmesser -- `None`, wenn Tabelle 7
+Das Erzeugnis der Sorte mit diesem Durchmesser – `None`, wenn Tabelle 7
 es fuer die Sorte nicht nennt. Je Sorte hat jedes einen eigenen
 Durchmesser; daran waehlt ein Spannglied seines.
 
@@ -162,7 +162,7 @@ Durchmesser; daran waehlt ein Spannglied seines.
 def spannstahlsorten_zum_anlegen() -> List[str]
 ```
 
-Die Sorten in der Reihenfolge, in der neue angelegt werden -- wie in Tabelle 10.
+Die Sorten in der Reihenfolge, in der neue angelegt werden – wie in Tabelle 10.
 
 ### spannstahl
 
@@ -178,8 +178,8 @@ Erzeugt einen Spannstahl aus der Sortentabelle.
 
 ## Konstanten
 
-- `TABELLE_7 = 'SIA 262:2025, 3.3.2.2, Tabelle 7'` – Wo die Sortentabelle steht -- jeder Wert aus ihr nennt diese Stelle.
-- `_STAEBE = _reihe(_S, (26.0, 531.0), (26.5, 552.0), (32.0, 804.0), (36.0, 1018.0…` – Die Staebe der Sorten Y1030, Y1050 und Y1230 -- in Tabelle 7 je dieselben vier.
+- `TABELLE_7 = 'SIA 262:2025, 3.3.2.2, Tabelle 7'` – Wo die Sortentabelle steht – jeder Wert aus ihr nennt diese Stelle.
+- `_STAEBE = _reihe(_S, (26.0, 531.0), (26.5, 552.0), (32.0, 804.0), (36.0, 1018.0…` – Die Staebe der Sorten Y1030, Y1050 und Y1230 – in Tabelle 7 je dieselben vier.
 - `SPANNSTAHLSORTEN = {'Y1860': Spannstahlsorte(1860.0, 1600.0, _reihe(_D, (3.0, 7.1), (4.0…` – Spannstahlsorten nach SIA 262:2025, Tabelle 7, in der Folge der Tabelle 10.
 - `ERSTER_SPANNSTAHL = 'Y1860'` – Womit ein neuer Spannstahl anfaengt: die Folge der Tabelle 10.
 - `SPANNSTAHL_VORLAGEN = (KennwertVorlage(kurzname='f_pk', symbol='f_{pk}', einheit=N_PRO_MM2,…`

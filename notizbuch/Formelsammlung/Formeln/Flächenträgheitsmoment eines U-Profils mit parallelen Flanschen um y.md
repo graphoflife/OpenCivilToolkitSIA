@@ -51,4 +51,4 @@ ihm mit ihrem Eigenanteil $(b - t_w)\,t_f^3/12$ und dem Steineranteil
 $(b - t_w)\,t_f\,((h - t_f)/2)^2$; die zwei Zwickel der Ausrundungen mit
 $0.00755\,r^4$ und ihrem Steineranteil. Das U ist zur Achse $y$
 symmetrisch, sie liegt auf halber Höhe wie beim I. Die Formel der Tabelle
-des Benutzers -- nach Vorgabe, nicht nachgeschlagen.
+des Benutzers – nach Vorgabe, nicht nachgeschlagen.

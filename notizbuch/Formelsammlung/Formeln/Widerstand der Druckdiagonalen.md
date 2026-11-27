@@ -50,7 +50,7 @@ $$
 ## Theorie
 
 Die Druckdiagonalen tragen die Querkraft schräg ab. Ihr Querschnitt je
-Laufmeter ist $0.9\,d \cdot \cos\alpha$, ihre Kraft wirkt unter $\alpha$ --
+Laufmeter ist $0.9\,d \cdot \cos\alpha$, ihre Kraft wirkt unter $\alpha$ –
 daher $\sin\alpha \cdot \cos\alpha$, am grössten bei 45°. Der Beton der
 Diagonalen ist längs gerissen, und die Bügel kreuzen ihn schief; er trägt
 darum weniger als ein ungestört gedrückter. $k_c = 0.55$, der Wert der

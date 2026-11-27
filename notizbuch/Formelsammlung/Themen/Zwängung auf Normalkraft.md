@@ -34,8 +34,8 @@ Eine verschmierte Linie mit ihrer Fläche von Hand hat keinen Durchmesser – si
 
 ## Theorie
 
-Eine Platte, die sich nicht frei verkürzen kann -- beim Schwinden, beim
-Abkühlen --, bekommt Zug, ohne dass eine Last wirkt. Die Kraft wächst, bis
+Eine Platte, die sich nicht frei verkürzen kann – beim Schwinden, beim
+Abkühlen –, bekommt Zug, ohne dass eine Last wirkt. Die Kraft wächst, bis
 der Beton reisst; dann gibt er sie schlagartig an die Bewehrung ab. Nimmt
 die Bewehrung sie nur mit hoher Spannung auf, öffnen sich wenige breite
 Risse statt vieler feiner.

@@ -58,7 +58,7 @@ $$
 ## Theorie
 
 $w_c$ ist die Durchbiegung, die man elastisch am ungerissenen Betonquerschnitt
-rechnet, mit der Steifigkeit $E_{cm}$ -- leicht zu bekommen, aber zu klein:
+rechnet, mit der Steifigkeit $E_{cm}$ – leicht zu bekommen, aber zu klein:
 die gerissene Platte ist weicher, und unter Dauerlast kriecht der Beton. Der
 Faktor $\omega_w = w/w_c$ schätzt, um wie viel beides die Durchbiegung
 vergrössert.
@@ -75,6 +75,6 @@ vergrössert.
 - $(h/d)^3$ rechnet die Steifigkeit von der statischen Höhe auf die ganze
   Dicke um.
 
-Gerechnet wird in x, je Seite, die ein Verformungsfall zieht -- einmal je
+Gerechnet wird in x, je Seite, die ein Verformungsfall zieht – einmal je
 Platte, nicht je Fall.
 Der Faktor geht in die [[Wirksame Durchbiegung]] ein.

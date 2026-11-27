@@ -57,7 +57,7 @@ Kräften je Geschoss und Wand, ohne Verbindung ins Balkensystem.
       weiss nur der Kern, woher ein Grund kommt: ein Material, das selbst
       nicht rechnet, zeigt die Zeichnung nicht.
 - [ ] Kurzform hinter dem Auge: weitere Nachweise kennzeichnen. Heute die
-      Platte -- Biegung bei N = 0, Querkraft mit und ohne Bügel -- und seit
+      Platte – Biegung bei N = 0, Querkraft mit und ohne Bügel – und seit
       2026-11-18 die Querkraft im Bohrpfahl (Wendel, Druckdiagonalen, das
       Minimum im Erfüllungsgrad). Der Mikropfahl bleibt ohne: sein
       Widerstand ist schon zwei kurze Zeilen. Welche weiter, entscheidet der
@@ -67,16 +67,16 @@ Kräften je Geschoss und Wand, ohne Verbindung ins Balkensystem.
       verschwinden sollen.
 - [ ] Decken: eine schräge Richtung heisst nach ihrem Winkel, ihre
       Streifen «71.57° 1 … 71.57° 8», und der Bericht nennt den Winkel
-      daneben noch einmal. Mit den Ergebnisbildern besser benennen --
+      daneben noch einmal. Mit den Ergebnisbildern besser benennen –
       der Benutzer spricht von m_η.
 - [ ] Decken: «Knoten einfügen» auf einer Kante, die zwei Platten
       teilen, setzt den Knoten nur in die gewählte Platte; die andere
       behält ihre Kante ohne ihn. Prüfen, ob beide ihn bekommen sollen.
-- [ ] Decken: ein Klick auf «40 Streifen tragen nicht …» wählt nichts aus --
+- [ ] Decken: ein Klick auf «40 Streifen tragen nicht …» wählt nichts aus –
       Streifen sind keine Teile der Zeichnung. Die Platten darunter wären
       die Wahl; dafür müsste der Kern wissen, auf welcher Platte ein Träger
       liegt. Gefunden bei der Durchsicht vom 2026-11-19. Seit 2026-11-26
-      steht daneben an jeder Platte, wo bei ihr Last ausfällt und warum --
+      steht daneben an jeder Platte, wo bei ihr Last ausfällt und warum –
       ein Klick darauf wählt sie; die Meldung je Fall wählt weiter nichts.
 - [ ] Zeichenfenster: während eines Befehls heissen P und S «parallel»
       und «senkrecht», nicht Platte und Stütze. Erst Esc, dann die Taste.
@@ -84,13 +84,13 @@ Kräften je Geschoss und Wand, ohne Verbindung ins Balkensystem.
       Aufteilung, wo Folie 31 nichts sagt (die Spannweite eines Kragarms
       zählt doppelt, entschieden wird im Schwerpunkt jeder Zelle; die Mitte
       eines Felds teilt geradlinig bis ganz in die kürzere Spannweite ab
-      dem Verhältnis 1.5 -- so gewählt vom Benutzer am 2026-11-25, statt
+      dem Verhältnis 1.5 – so gewählt vom Benutzer am 2026-11-25, statt
       «innerhalb 1 % je zur Hälfte, sonst ganz»); die Grösse des
       Stützenbereichs, wenn sie fehlt (ein Quadrat, so breit wie die Stütze
-      oder der breiteste Unterzug über ihr -- Folie 39 lässt sie offen);
+      oder der breiteste Unterzug über ihr – Folie 39 lässt sie offen);
       die Richtungen, die eine Platte selbst wählt (parallel zu den meisten
       Metern Rand, ein Rand quer dazu zählt mit; aneinanderstossende
-      gemeinsam -- seit 2026-11-26, `decke/richtungen.py`);
+      gemeinsam – seit 2026-11-26, `decke/richtungen.py`);
       Streifen in zwei Richtungen, die nicht rechtwinklig aufeinander stehen;
       die Linienlast als Band von 1 mm, die Einzellast über 1 × 1 m verteilt;
       ein Wechsel der Steifigkeit eines Streifens, näher als 1 cm an einem
@@ -144,7 +144,7 @@ Kräften je Geschoss und Wand, ohne Verbindung ins Balkensystem.
       Abstand von mindestens D_max, dem Nachbarstab und 20 mm (5.2.3.2); die
       grösste Teilung 1.2·h und 300 mm (5.5.3.1); die Querbewehrung von
       mindestens 20 % der Hauptbewehrung (5.5.3.2); die Mindestbügel nach
-      (116) (5.5.2.2, 5.5.3.4). Beispiel: h = 200 mm mit Teilung 250 mm --
+      (116) (5.5.2.2, 5.5.3.4). Beispiel: h = 200 mm mit Teilung 250 mm –
       erlaubt wären 240 mm. Vorschlag: (116), 1.2·h und 300 mm als
       Bedingung, 5.2.1 und die 20 % als Meldung. Entscheid des Benutzers.
 - [x] **Bügel und Längsbewehrung in einem Zug suchen.** Erledigt
@@ -202,7 +202,7 @@ Kräften je Geschoss und Wand, ohne Verbindung ins Balkensystem.
 - [ ] **Dichten aus SIA 261.** 2400 und 2500 kg/m³ für Beton und Stahlbeton,
       7850 kg/m³ für Stahl stehen so in SIA 261:2020, Anhang A, Tabelle 28
       (mit g = 10 m/s²); SIA 262 nennt keine. Ob der Verweis eingetragen wird,
-      entscheidet der Benutzer -- bis dahin «nach Vorgabe».
+      entscheidet der Benutzer – bis dahin «nach Vorgabe».
 - [ ] **Kriechzahl bei hoher Spannung.** Über 0.4·f_cm kriecht der Beton
       stärker, und die Norm erhöht φ (SIA 262:2025, 3.1.2.6.3, (14)). φ ist
       eine Eingabe; das Werkzeug prüft das nicht. Zur Kenntnis.
@@ -217,7 +217,7 @@ Kräften je Geschoss und Wand, ohne Verbindung ins Balkensystem.
       Dieselbe Tabelle nennt L/500 (seltene Last, spröde Einbauten) und
       L/300 (quasi-ständige Last, Aussehen); welches Kriterium gilt, legt das
       Projekt fest (SIA 262:2025, 4.4.3.2.1). Die Tabelle meint je Zeile nur
-      einen Teil der Durchbiegung -- was nach dem Einbau dazukommt, was die
+      einen Teil der Durchbiegung – was nach dem Einbau dazukommt, was die
       veränderlichen Lasten bewirken, oder alles abzüglich Überhöhung; das
       Werkzeug hält die ganze samt Kriechen gegen L/350, strenger als jede
       Zeile ausser L/500. Vorschlag: ein Schalter 500 / 350 / 300, Vorgabe
@@ -232,7 +232,7 @@ Kräften je Geschoss und Wand, ohne Verbindung ins Balkensystem.
 - [ ] **Grundbruch: die Raumlast unter Wasser.** Das Buch bildet γ' aus
       der gesättigten Raumlast, γ' = γ_g − γ_w (Kap. 1.4); das Werkzeug hat
       nur ein γ und nimmt es auch unter dem Wasser. Mit γ = 21 statt
-      γ_g = 22 kN/m³ wird γ' 11 statt 12, gut 8 % kleiner -- sicher, denn
+      γ_g = 22 kN/m³ wird γ' 11 statt 12, gut 8 % kleiner – sicher, denn
       γ' hält den Gleitkörper nieder; die Hilfe sagt es. Empfehlung: ein
       eigenes Feld γ_g für den Boden unter dem Wasser, Vorgabe 22 kN/m³.
       Entscheid des Benutzers.
@@ -250,13 +250,13 @@ Kräften je Geschoss und Wand, ohne Verbindung ins Balkensystem.
       mit max[0; σ_f] (seit 2026-11-19). Bestätigt sind dagegen: b_γ mit tan φ (Tabelle
       9.2.18 lässt sich nur so nachrechnen) und die Partialfaktoren statt
       F_stat (SIA 267:2013, 5.3.2.1, 5.3.2.2, Tabelle 1).
-- [ ] **Grundbruch und Gleiten, nicht gebaut** -- SIA 267:2013 verlangt
+- [ ] **Grundbruch und Gleiten, nicht gebaut** – SIA 267:2013 verlangt
       es, wo massgebend: die Ausmitte der Last mit der wirksamen Fläche
       A' = a'·b' (8.4.4.4, Figur 4; im Buch Kap. 9.2.11), bis dahin sagt
       die Hilfe, b und L als wirksame Masse einzugeben; das Kippen
       (8.5.3.6, (38)–(40)) und im Gebrauch die Ausmitte bis zur einfachen
       Kernweite (8.5.4.7); der Erdwiderstand vor dem Fundament (8.4.3,
-      8.5.2.3, γ_M = 1.4) -- ihn wegzulassen ist sicher; der Geländebruch
+      8.5.2.3, γ_M = 1.4) – ihn wegzulassen ist sicher; der Geländebruch
       (8.5.3.3, Kap. 14 der Norm); benachbarte Fundamente (8.4.4.3).
       Der Gleitkörper im Bild gilt für waagrechte Sohle und waagrechtes
       Gelände, wie die Formeln für L_Gl und H_Gl.
@@ -265,7 +265,7 @@ Kräften je Geschoss und Wand, ohne Verbindung ins Balkensystem.
       festzulegen (SIA 267:2013, 8.5.4.1; Kap. 8.12), das Beispiel in
       Kap. 8.8 nimmt 2 cm. Δz_max = 0.5 m: das Buch schweigt, sein
       Beispiel teilt in 1 m. M'_E = 60 MN/m² bei M_E = 20: das Buch nimmt
-      grob M'_E ≈ 8 bis 10 · M_E an (Kap. 5.3) -- 3 · M_E ist weicher als
+      grob M'_E ≈ 8 bis 10 · M_E an (Kap. 5.3) – 3 · M_E ist weicher als
       jede Angabe. Wirkt nur, solange q_W > 0. Empfehlung: M'_E = 160
       (8 · M_E). Bestätigt: MN/m² statt kN/m² (nur die Anzeige, Tabelle
       8.4 trifft) und «starr» als Vorgabe (das Beispiel in Kap. 8.3 rechnet
@@ -273,7 +273,7 @@ Kräften je Geschoss und Wand, ohne Verbindung ins Balkensystem.
 - [ ] Setzung, nicht gebaut: Setzungsdifferenzen und Verkippung
       (Kap. 8.11 bis 8.13; SIA 267:2013, 8.5.1.2, 8.5.4.4), der zeitliche
       Verlauf (Konsolidation; 8.5.4.3), die Einflusstiefe als Abbruch
-      (Kap. 8.4) -- gerechnet wird bis zur untersten Schicht, und unter der
+      (Kap. 8.4) – gerechnet wird bis zur untersten Schicht, und unter der
       Tabelle steht, wie viel J dort noch ist. Liegen darunter weichere
       Schichten, mahnt das Buch zur Vorsicht.
 - [ ] Der Dienst «bericht» und das PDF des lokalen Servers haben seit dem
@@ -294,7 +294,7 @@ Kräften je Geschoss und Wand, ohne Verbindung ins Balkensystem.
       oder Stabs deckt die halbe Zeichnung. Zuklappen geht, aber bei Lasten
       mit vielen Feldern wird es lang.
 - [ ] Keine Testumgebung für die Zeichenhilfen des Balkensystems
-      (`bs_symbole.js`, die verbundene Zeichnung in `cad_modell.js`) --
+      (`bs_symbole.js`, die verbundene Zeichnung in `cad_modell.js`) –
       geprüft von Hand im Browser.
 
 ## Entschieden: Durchsicht der Fenster vom 2026-11-19
@@ -307,7 +307,7 @@ in [[Entwicklung]] (Schritte 1 bis 13 und der Nachtrag zur Karte
 «Schubfluss»).
 
 - [x] **Ein fehlendes Material: grau oder rot?** Die Querschnittsanalyse
-      zeigt «Linie 1: das Material … gibt es nicht mehr -- eines wählen.»
+      zeigt «Linie 1: das Material … gibt es nicht mehr – eines wählen.»
       grau, weil nur etwas fehlt. Decke und Balkensystem zeigen denselben
       Satz rot, und die ganze Decke bzw. das ganze System rechnet nicht:
       dort hält eine Meldung die Rechnung nur an, wenn sie ein Fehler ist
@@ -316,7 +316,7 @@ in [[Entwicklung]] (Schritte 1 bis 13 und der Nachtrag zur Karte
       Beton); dafür «hält an» und «ist falsch» trennen.
 - [x] **Die Meldung nennt die interne Kennung.** «das Material 'b9' gibt es
       nicht mehr»: 'b9' sieht der Benutzer nirgends, die Listen zeigen
-      Namen. Empfehlung: «das gewählte Material gibt es nicht mehr -- eines
+      Namen. Empfehlung: «das gewählte Material gibt es nicht mehr – eines
       wählen.» Der Satz steht an einer Stelle (`materialgrund` in
       `opencivil/projekt/aufbau/kern.py`).
 - [x] **«erfüllt, ∞» ohne Last.** Ein frisches Durchstanzen (V_d = 0) und
@@ -334,7 +334,7 @@ in [[Entwicklung]] (Schritte 1 bis 13 und der Nachtrag zur Karte
       Seite, ist aber kaum gemeint. Die Vorgaben sind für beide Arten
       dieselben, «die Vorgabe der neuen Art» gibt es also nicht. Empfehlung:
       die Zahlen lassen und nach dem Umschalten am Schalter sagen, was
-      jetzt für die andere Seite gilt -- «c, c_v, q_d und die
+      jetzt für die andere Seite gilt – «c, c_v, q_d und die
       Biegebewehrung gelten jetzt für die Bodenplatte: prüfen». Sonst: alles
       auf die Vorgaben zurück.
 - [x] **Bilder an Schaltern**, wo Wörter nicht reichen (`wahlSchalter` kann
@@ -342,7 +342,7 @@ in [[Entwicklung]] (Schritte 1 bis 13 und der Nachtrag zur Karte
       2026-11-19): alle. Erledigt am 2026-11-19, alle Gruppen, siehe
       [[Entwicklung]].
       - Durchstanzen «Lage» (`durchstanzen.js`): wo der Plattenrand liegt,
-        steht heute erst in der Hilfe -- je Stellung die Stütze mit dem Rand;
+        steht heute erst in der Hilfe – je Stellung die Stütze mit dem Rand;
       - Pfahl «Kopf frei / eingespannt» und «Tragglied Rohr / Stab»;
       - Durchstanzen «Form»; Setzung «starr / schlaff» (Setzung im Punkt K
         oder in der Mitte);
@@ -356,13 +356,13 @@ in [[Entwicklung]] (Schritte 1 bis 13 und der Nachtrag zur Karte
       der Querschnittsanalyse (`qa_vorlagen.js`). Sonst ist jede feste Wahl
       ein Schalter. Empfehlung: Schalter.
 - [x] **Zwei Striche in sichtbaren Texten**: Meldungen und Hinweise
-      schreiben teils «--» («noch keine Kombination -- unter «Einwirkungen»
+      schreiben teils «--» («noch keine Kombination – unter «Einwirkungen»
       eine anlegen»), teils «–». Empfehlung: in allem, was der Benutzer
       liest, «–»; im Code darf «--» bleiben.
 
 ## Umbau: Befunde der Strukturdurchsicht vom 2026-11-19
 
-Neun Durchsichten über das ganze Repo -- Fundament und Ausgabe;
+Neun Durchsichten über das ganze Repo – Fundament und Ausgabe;
 Querschnitt, Spannungsanalyse und Suche; Nachweise; Balkensystem und
 Decke; Durchstanzen, Pfahl und Boden; Projekt und Dienst; die Apps mit
 Zeichenfenster; die übrigen Fachfenster und Bilder; Rahmen und Stilblatt.
@@ -466,7 +466,7 @@ empfohlenen Reihenfolge, 3 und 4 nach den kleinen.
         Noch selbst geschrieben, heute gleich wie im Kern: `GROESSE` in
         `qa_diagramme.js` (N, M_y, M_z), die Achsen von `spannungsbild.js`
         (ε, σ, z) und die Kennwerte in den Skizzen von Grundbruch und
-        Setzung -- derselbe Schritt, falls gewünscht. Der Hinweis «unter Zug
+        Setzung – derselbe Schritt, falls gewünscht. Der Hinweis «unter Zug
         mindestens 40°» unter der Neigungskurve steht als Text im JS.
       - Knotenlasten: Art und Einheit von Hand, mit widersprüchlichen
         Rückfällen (`lastFelder` kNm für alles ausser «kraft», Zeichnung
@@ -519,7 +519,7 @@ empfohlenen Reihenfolge, 3 und 4 nach den kleinen.
         Nulllinie der Platte nie kippt.
       - Offen, verwandt, je ein eigener Umbau:
         - Erledigt (2026-11-21): Platte und Analyse teilen, was gleich ist
-          -- den Anfang der Knicknachweise (`Knickverfahren.__init__`),
+          – den Anfang der Knicknachweise (`Knickverfahren.__init__`),
           Thema und Namen der Rissnormalkraft (`Normalzwang`), Anlegen und
           Belegen der Kennzahlen (`Kennzahlprozedur`, auch für den Pfahl).
           Siehe [[Entwicklung]].
@@ -636,7 +636,7 @@ empfohlenen Reihenfolge, 3 und 4 nach den kleinen.
       - Was eine Art des Balkensystems zeigt (Achsen, Zeichen, Einheiten),
         steht in acht Tabellen der Herleitungen und in `EBEN`/`RAUM` von
         Hand. Welches I die Ebene nimmt, entscheiden drei Mechanismen.
-      - Was auf null rundet, hat kein Vorzeichen -- in `fest` und
+      - Was auf null rundet, hat kein Vorzeichen – in `fest` und
         `einheiten.py`, nicht in `zusammenfassung._groesse` und
         `Kennzahl.text` («-0.0»). Zwei Markdown-Maskierungen
         (`bibliothek._maskieren`, `bericht/markdown.text_markdown`).
@@ -651,7 +651,7 @@ empfohlenen Reihenfolge, 3 und 4 nach den kleinen.
       - Ungenutzt: `betonstahl_frei`; nur in Tests: `beton_frei`,
         `formeln_sammeln` und `Formeleintrag`; der Alias `text_maskieren`.
       - Erledigt (2026-11-19): `naechsteKennung` vergab die
-        grösste plus eins -- LK3 löschen, die nächste hiess wieder LK3, und
+        grösste plus eins – LK3 löschen, die nächste hiess wieder LK3, und
         eine Diagrammzeile, die auf die gelöschte zeigte, zeigte still die
         neue. Dieselbe Regel in `cad_modell.js` 144. Entschieden (Benutzer,
         2026-11-19): eine Kennung wird nie wieder vergeben, und wer auf eine
@@ -678,11 +678,11 @@ empfohlenen Reihenfolge, 3 und 4 nach den kleinen.
 ## Umbau: Befunde der Strukturdurchsicht vom 2026-11-15
 
 Drei Durchsichten: der Rechenkern der Balkensysteme in 2D und 3D, die
-Pfähle, die Oberfläche beider Balkensysteme -- jeder Punkt am Code
+Pfähle, die Oberfläche beider Balkensysteme – jeder Punkt am Code
 nachgeprüft. Urteil: umbauen, bevor weiter darauf gebaut wird. Gerechnet
 wird richtig, aber den gebetteten Stab lösen drei Programme, und Regeln des
 Kerns stehen ein zweites Mal im JS. Empfohlene Reihenfolge: 1, dann 3a und
-3b, dann 2 -- vor Knicken oder 2. Ordnung am Pfahl; der Rest, wenn dort
+3b, dann 2 – vor Knicken oder 2. Ordnung am Pfahl; der Rest, wenn dort
 ohnehin gearbeitet wird. Die Punkte 1, 3a und 3b und der kleine Umbau aus
 Punkt 2 sind erledigt (unten unter «Erledigt zuletzt»); von Punkt 2 bleibt
 der grosse.
@@ -694,11 +694,11 @@ der grosse.
       teilen Pfahl und Balkensystem gebettete Stäbe in Stücke von 1/(5β),
       wo für die Lösung 1/(2β) genügte. Kosten: Knicken oder 2. Ordnung am Pfahl zweimal
       zusammenbauen; rund 15 % Rechenzeit im Balkensystem. Umbau, gross:
-      der Pfahl als lotrechter Stab eines ebenen Systems -- dann fände er
+      der Pfahl als lotrechter Stab eines ebenen Systems – dann fände er
       seine grössten Werte genau wie das Balkensystem, und beide könnten
       wieder gröber teilen.
 - [ ] **3c. Die Eingabe der Pfähle entscheidet selbst, welche Felder
-      gelten** -- drainiert, Mantel eingegeben, Bohrpfahl, Kopf frei --,
+      gelten** – drainiert, Mantel eingegeben, Bohrpfahl, Kopf frei –,
       obwohl der Kern es weiss (`Pfahlschicht.kurznamen`, die Gruppen in
       `pfahl.py`); Durchstanzen und Spannungsanalyse holen das schon aus dem
       Kern. Die Texte laufen auseinander: «Durchmesser der Längsstäbe» im
@@ -736,8 +736,8 @@ der grosse.
       `raumlagerSymbol` mit gleichen Teilen. Die Anbindung an den Kern steht
       seit 2026-11-20 einmal (`kernFragen` in `cad_app.js`).
 - [ ] **7. `cad_fenster.js` hat 899 Zeilen**, 101 bis zur Grenze. Nähte:
-      die Aktionen der Auswahl nach `cad_auswahl.js` -- dann fällt der Haken
-      `a.aktionen` weg --, die Bedienung im Raum in die Ansicht aus 4b, die
+      die Aktionen der Auswahl nach `cad_auswahl.js` – dann fällt der Haken
+      `a.aktionen` weg –, die Bedienung im Raum in die Ansicht aus 4b, die
       Eingabe mit Maus und Tasten (rund 260 Zeilen) in eine eigene Datei.
 - [ ] **8. Klein.** `stahlprofile/formen.py` schreibt `_flaeche`, `_iy`, `_iz`
       und `_it` aus `querschnitte.py` ab, nur in cm, obwohl `_in_cm` genau
@@ -753,7 +753,7 @@ der grosse.
 - [x] **10. Extremwert null an zufälliger Stelle.** Erledigt
       (2026-11-20) mit Punkt 1 vom 2026-11-19: `extremwerte` nimmt bei
       gleichen Werten die vorderste Stelle. Ist die Durchbiegung
-      eines Stabs überall null -- etwa bei einem, der nur Normalkraft trägt --,
+      eines Stabs überall null – etwa bei einem, der nur Normalkraft trägt –,
       nennt die Tabelle der Extremwerte für 0.00 mm eine Stelle x, die nur
       vom Rundungsrauschen abhängt; seit Punkt 1 an sechs Stellen der
       Beispiele eine andere als vorher. Umbau: Werte, die sich bis auf
@@ -771,7 +771,7 @@ schon dreifach da. 1 und 2 sind am 2026-11-09 erledigt, 3 bis 12 am
 
 **Im übrigen Repo, neu gefunden:**
 
-- **cad_fenster.js hatte 1138 Zeilen** -- am 2026-11-15 entlang dieser
+- **cad_fenster.js hatte 1138 Zeilen** – am 2026-11-15 entlang dieser
       Nähte geteilt, jetzt 899; was noch hinausgehört, steht in der
       Durchsicht vom 2026-11-15, Punkt 7.
 
@@ -788,7 +788,7 @@ durchstanzen.js).
 
 Vier Durchsichten über das ganze Repo, jeder Punkt am Code nachgeprüft.
 Die Punkte im Rechenkern sind am 2026-10-25 behoben, siehe [[Entwicklung]]
--- bis auf zwei, die auch die Oberfläche betreffen: die Stablinie vor dem
+– bis auf zwei, die auch die Oberfläche betreffen: die Stablinie vor dem
 Bauen und die Einheiten am Feld. Offen sind sonst die Punkte der
 Oberfläche. Was in den Abschnitten darunter schon steht, steht hier nicht
 noch einmal: die Grundlage der Apps mit Zeichenfenster, die
@@ -799,7 +799,7 @@ noch einmal: die Grundlage der Apps mit Zeichenfenster, die
       `bericht.js`) mit drei Regeln für Fehler: ohne Antwort des Kerns
       bleibt die Querschnittsanalyse still ohne Geometrie, das
       Balkensystem zeigt den Fehler. Besser `nachgefragt(schluessel,
-      abdruck, holen)` mit `{daten, alt, fehler}` -- gehört zur Grundlage
+      abdruck, holen)` mit `{daten, alt, fehler}` – gehört zur Grundlage
       der Apps mit Zeichenfenster unten.
 - [ ] **Der Adapter des Zeichenfensters ist ein Sammelsurium:** 32 Glieder,
       14 davon braucht nur eine App. Das Fenster gibt den Namen des
@@ -811,7 +811,7 @@ noch einmal: die Grundlage der Apps mit Zeichenfenster, die
       Querschnittsanalyse und M–χ oder N–ε sind seit 2026-10-25 behoben):
       Die Beschreibung einer Stablinie fragen vor dem Bauen noch die Prüfung
       der Zeichnung, `geometrie.linienflaeche` und die Liste unter der
-      Zeichnung (`zeichengeometrie.geometrie`) je nach Art ab -- dort ist
+      Zeichnung (`zeichengeometrie.geometrie`) je nach Art ab – dort ist
       der Stahl noch eine Kennung, kein Baustoff.
 - [ ] **Die Oberfläche wiederholt Kern-Wissen, neu dazugekommen** (zum
       Punkt «Keine Rechnung und keine Norm in der Oberfläche» unten):
@@ -826,10 +826,10 @@ noch einmal: die Grundlage der Apps mit Zeichenfenster, die
 - [ ] **Einheiten nicht an jedem Feld.** Der Katalog bringt seit 2026-10-25
       die Feldangaben jeder Klasse von Einträgen, aus einem Durchgang über
       den Baum der Beschreibung. Viele Felder tragen ihre Einheit aber
-      nicht -- `KombinationEintrag.M_Ed` und Co. --, und die Oberfläche
+      nicht – `KombinationEintrag.M_Ed` und Co. –, und die Oberfläche
       schreibt sie darum selbst («M_Ed [kNm]» in `plattenkapitel.js`).
       Besser: die Einheit ans Feld (`bereich(einheit=…)`), dann liest die
-      Maske sie aus dem Katalog -- zusammen mit «Einheiten der Platte beim
+      Maske sie aus dem Katalog – zusammen mit «Einheiten der Platte beim
       Bauen ein zweites Mal» unten.
 - [ ] **Kleineres:** sieben Helfer bauen SVG-Pfade, und die Diagramme
       kennen zwei Regime für Farben.
@@ -878,12 +878,12 @@ Kennzahlen, und Phase 5, die Oberfläche (beide 2026-10-18, siehe
 - [ ] **Die Karten des Berichts je Bauteilart** stehen noch neben den Zeilen
       von `apps.js`: `UEBERSICHTEN` und `DIAGRAMME` in `bericht.js`. In die
       Zeilen ziehen sie erst, wenn `plattenkarten` und `spannungskarten` aus
-      `bericht.js` ausziehen -- sonst importierten sich `apps.js` und
+      `bericht.js` ausziehen – sonst importierten sich `apps.js` und
       `bericht.js` gegenseitig.
 - [ ] **Kern-Wissen im JS, neu dazugekommen:**
       - Das Querschnittsbild einer Analyse (Punkt aus N und M oder aus
         Randdehnungen) beschriftet seine Zahlen selbst mit kN, kNm, ‰, 1/m
-        und mm -- wie seine Zeichendaten sie liefern (`_bild_dict`). Die
+        und mm – wie seine Zeichendaten sie liefern (`_bild_dict`). Die
         Linien bringen ihre Grössen seit 2026-10-18 mit.
       - Die Situationszeichnung des Grundbruchs (`gb_zeichnung.js`)
         beschriftet b, t, t₁, α, β und q_Ed selbst mit m, ° und kPa; ihre
@@ -936,21 +936,21 @@ Befund, die gemischten Stahlsorten, dazu «Ergebnisse in den Rechenlauf»,
       Darüberfahren verbindet `bs_diagramme.js` zwei Proben gerade, obwohl
       der Kern den Wert genau kennt; Grenzwerte und grösste Durchbiegung
       wählt das JS selbst (dieselbe Regel in `stabwerk/herleitung.py`).
-      Hilfetexte wiederholen Regeln des Kerns -- «x/d ≤ 0.35»
-      steht neben einem Feld bis 0.5 (`nachweise.js`) --, eine Normstelle
+      Hilfetexte wiederholen Regeln des Kerns – «x/d ≤ 0.35»
+      steht neben einem Feld bis 0.5 (`nachweise.js`) –, eine Normstelle
       steht in `editor.js`, Wert-IDs werden aus Text nachgebaut
       (`zustand.js` `namensraum`). Besser: eine `Fallauswertung` im
-      Stabwerk für Herleitung und Bildschirm -- für die Lagerkräfte gibt es
-      sie schon (`Systembefund.lagerkraefte`) --, Anzeige auf der nächsten
+      Stabwerk für Herleitung und Bildschirm – für die Lagerkräfte gibt es
+      sie schon (`Systembefund.lagerkraefte`) –, Anzeige auf der nächsten
       Probe, Hilfetexte und Formeln aus denselben Konstanten über den
       Katalog.
 - [ ] **Balkensystem: Kennung statt Name.** Ein Fall wird an seinem Namen
-      erkannt, gleiche Namen sind darum verboten -- seit 2026-10-15 als
+      erkannt, gleiche Namen sind darum verboten – seit 2026-10-15 als
       Meldung am System, nicht mehr als Fehler des ganzen Projekts. Stäbe
       und Lasten werden in vier Durchgängen aufgelöst, mit einem Schalter
       `melden`. Besser: LF1/LK1 als Identität, Lasten einmal je Fall
       auflösen. («Fest» als `math.inf` ist seit 2026-10-25 ein `Halt`.)
-- [ ] **Varianten im Kern -- deine Entscheidung.** `prioritaet`,
+- [ ] **Varianten im Kern – deine Entscheidung.** `prioritaet`,
       `bedingung`, `anwendbar`, `verworfene_varianten` benutzt ausserhalb des
       Kerns niemand. Wer zwei Berechnungen für denselben Wert anmeldet
       (kopierter Namensraum), bekommt keinen Fehler, sondern still eine
@@ -959,8 +959,8 @@ Befund, die gemischten Stahlsorten, dazu «Ergebnisse in den Rechenlauf»,
 - [ ] **Dateien über 1000 Zeilen**, je entlang einer Naht, die schon da ist:
       `cad_fenster.js` (Bedienung, Rückgängig, Punkteingabe auslagern; die
       Befehle stehen in vier Listen, Knöpfe täuschen Tastendrücke vor),
-      `stil.css` -- geteilt am 2026-11-20, nach Bausteinen statt je App;
-      `cad_fenster.js` 1138 -- geteilt am 2026-11-15, jetzt 902.
+      `stil.css` – geteilt am 2026-11-20, nach Bausteinen statt je App;
+      `cad_fenster.js` 1138 – geteilt am 2026-11-15, jetzt 902.
       `querkraft.py` und `querschnitt/platte.py` sind
       geteilt (2026-10-25); die Regel für d_v steht in Kurve und Nachweis
       ohne Bügel noch je einmal.
@@ -983,8 +983,8 @@ Norm dazu sagt.
       `Spannstahlgesetz`, seit 2026-11-26). Figur 17 der SIA 262:2025
       idealisiert nur den Zug (4.2.3.3); nach Vorgabe, nicht nachgeschlagen,
       trägt der Spannstahl gedrückt nichts. Ein vorgespanntes Glied kommt
-      nie dorthin -- seine Vordehnung ist grösser als jede Stauchung des
-      Betons --, ein schlaffes ohne Vorspannung schon. Bestätigen oder sagen,
+      nie dorthin – seine Vordehnung ist grösser als jede Stauchung des
+      Betons –, ein schlaffes ohne Vorspannung schon. Bestätigen oder sagen,
       ob er gedrückt wie der Betonstahl tragen soll.
 - [ ] **Baustahl, Grenzdehnung nach Vorgabe**
       (`opencivil/material/baustahl.py`, `DUKTILITAET`). Die Linie des
@@ -1040,13 +1040,13 @@ Norm dazu sagt.
 - [ ] **Erdbeben, nach Vorgabe eingebaut** (`opencivil/erdbeben/ersatzkraft.py`).
       Jede Wand trägt nach ihrem Anteil an der Biegesteifigkeit; verformt
       werden die Wände nur durch Biegung, weder durch Schub noch im
-      Fundament; η_EI = 0.5 als Anteil der ungerissenen Steifigkeit --
+      Fundament; η_EI = 0.5 als Anteil der ungerissenen Steifigkeit –
       16.5.5.2 verlangt eine mittlere Steifigkeit bis zum Fliessbeginn;
       g = 10 m/s² wie beim Eigengewicht. Nicht gerechnet, und das Ergebnis
       sagt es grau: die Torsion (16.5.2.7), die vertikale Komponente
       (16.5.4), sekundäre Bauteile (16.7) und, wo q über 2.0 liegt, die
       Bemessungswerte duktiler Tragwände (SIA 262:2025, 4.3.9.4).
-      Entschieden (Benutzer, 2026-11-21): der Anteil heisst η_EI, nicht κ --
+      Entschieden (Benutzer, 2026-11-21): der Anteil heisst η_EI, nicht κ –
       κ ist in der Querschnittsanalyse die Krümmung und in SIA 262:2025 die
       Vergrösserung der Querkraft für höhere Eigenformen (4.3.9.4.4, (97)).
 - [ ] **Pfähle, nach Vorgabe eingebaut** (`opencivil/pfahl/`). Beim
@@ -1057,14 +1057,14 @@ Norm dazu sagt.
       die Überlagerung, das Gewicht des Pfahls steht ebenso wenig in der
       Einwirkung. Auf Zug dieselbe Mantelreibung wie auf Druck. δ/φ'_k und α
       höchstens 1. Der Mörtel im Rohr eines Mikropfahls zählt nicht, obwohl
-      SIA 267:2013, 9.5.2.4.8 ihn zuliesse -- nach SIA 262 endete der ganze
+      SIA 267:2013, 9.5.2.4.8 ihn zuliesse – nach SIA 262 endete der ganze
       Querschnitt sonst bei −ε_c1d. Das Tragglied rechnet als Betonstahl nach
       SIA 262 mit γ_s; SIA 263:2013 liegt im Ordner der Normen und ist nur
       für die Querkraft eingearbeitet. Vorschlag: so lassen, jede Annahme steht in der
       Herleitung. Entscheid des Benutzers.
 - [ ] **Pfähle, Steifigkeit nach Vorgabe eingebaut**
       (`opencivil/pfahl/steifigkeit.py`). Die Bettung quer wächst vom
-      Terrain linear bis t_red, vorgegeben 2 m -- 9.5.4.5 verlangt nur, sie
+      Terrain linear bis t_red, vorgegeben 2 m – 9.5.4.5 verlangt nur, sie
       nahe der Oberfläche abzumindern. Der Mikropfahl rechnet mit Cassans
       Federn für Bohrpfähle. Der Querschnitt ungerissen und ohne Bewehrung,
       beim Bohrpfahl mit E_cm, beim Mikropfahl nur das Tragglied. γ_E = 1.5,
@@ -1086,19 +1086,19 @@ Norm dazu sagt.
       kleinere an Kopf und Fuss. γ_M,a = 1.4, nach (49) in der Regel der
       kleinste Wert. Die Bettungskraft gegen η_a,tr · p_E,k / γ_M,a, mit
       denselben Beiwerten wie R_tr (9.5.4.5 nennt keine). Nur ein Moment am
-      Kopf, ohne Querkraft, gibt keinen Nachweis R_tr -- geprüft wird dann nur die
+      Kopf, ohne Querkraft, gibt keinen Nachweis R_tr – geprüft wird dann nur die
       Bettungskraft. Vorschlag: so lassen, jede Annahme steht in der
       Herleitung. Entscheid des Benutzers.
 - [ ] **Pfähle, innerer Widerstand quer nach Vorgabe eingebaut**
       (`opencivil/pfahl/innen_quer.py`). Bohrpfahl: d reicht bis zum
       Schwerpunkt der halben Bewehrung, als ob die Stäbe gleichmässig auf dem
-      Kreis lägen; b_w ist die Sehne auf der Höhe des Druckgurts -- für den
+      Kreis lägen; b_w ist die Sehne auf der Höhe des Druckgurts – für den
       Kreis nennt SIA 262:2025 keine Breite; α_min = 30° auch unter Druck, wo
       4.3.3.3.3 bei bedeutendem Druck 25° zuliesse; die Wendel ist aus dem
       Stahl der Längsbewehrung; die Längszugkraft F_tVd (4.3.3.4.11) wirkt in
       der Achse statt je zur Hälfte an den Gurten, auf der sicheren Seite;
       die Querkraft zählt auch nahe dem Kopf, wo 4.3.3.4.1 sie im Abstand
-      z · cot α nähme. Mikropfahl: A_v = 2·A/π für Rohr und Vollstab --
+      z · cot α nähme. Mikropfahl: A_v = 2·A/π für Rohr und Vollstab –
       SIA 263:2013, 5.1.4.1 verweist für runde Querschnitte auf
       SN EN 1993-1-1, die nicht vorliegt; f_yd nach SIA 262 (γ_s = 1.15) statt
       f_y/γ_M1 (1.05, SIA 263:2013, 4.1.3); dass die Querkraft über der
@@ -1109,8 +1109,8 @@ Norm dazu sagt.
       Näherung (Kap. 10.8) und daneben den Weg nach Weissenbach: ein
       räumlicher Gleitkeil, die resultierende Kraft bis in die Tiefe t aus
       Tabelle 10.21 (mit δ = 27.5°), und eine Abminderung, wo die Fläche
-      schmaler ist als etwa 0.3 · t. Die eingebaute Näherung -- Rankine ohne
-      Wandreibung, hinten aktiv abgezogen -- bleibt darunter: ⌀ 900 mm in
+      schmaler ist als etwa 0.3 · t. Die eingebaute Näherung – Rankine ohne
+      Wandreibung, hinten aktiv abgezogen – bleibt darunter: ⌀ 900 mm in
       Kies mit φ' = 35°, bis 3 m Tiefe 60 %, bis 6 m 43 % der Kraft nach
       Weissenbach. Nur sehr nahe am Terrain und bei kleinem φ' kommt sie an
       die Tabelle heran. Die Abminderung gehört zum Weg nach Weissenbach und
@@ -1164,7 +1164,7 @@ Norm dazu sagt.
       Quadrat, Seite D/√2. Entscheid des Benutzers.
 - [ ] **Durchstanzen, «grosse Aussparungen» für k_e = 0.7 (4.3.6.2.5).**
       Eingebaut: eine Innenstütze bekommt 0.7, sobald eine Aussparung den
-      Nachweisschnitt mindert (Figur 23d) -- wie gross sie ist, zählt nicht.
+      Nachweisschnitt mindert (Figur 23d) – wie gross sie ist, zählt nicht.
       Geprüft (2026-11-14): die Norm nennt keine Grösse; die Annahme ist
       strenger als nötig, nicht falsch.
 - [ ] **Durchstanzen, Ovalstütze.** Eingebaut: ihre geraden Seiten zählen wie
@@ -1195,7 +1195,7 @@ Norm dazu sagt.
       Schenkel 0.35·d_v vom Rand, auf 5 mm aufgerundet; der zweite bei d_v,
       abgerundet, höchstens s_1 weiter; danach s_1; ⌀8 bis ⌀26 (die Liste
       der Bügelsuche) bis zur Grenze der Tabelle 21, aus B500B; zwei bis neun
-      Reihen; die Höhe h − c − c_v. Offen: c misst bis zur Biegebewehrung --
+      Reihen; die Höhe h − c − c_v. Offen: c misst bis zur Biegebewehrung –
       umfasst ein Bügel sie, liegt er um seinen Durchmesser näher an der
       Oberfläche. Die Höhe geht in keinen Widerstand ein, nur in Text und
       Bild.
@@ -1210,7 +1210,8 @@ Norm dazu sagt.
       (70) die 2, die Höhe h − c − c_v auf 5 mm abgerundet, der Stahl B500B.
       Offen: das Gutachten oder eine technische Dokumentation mit Abständen
       und Faktor – dann gälte 3.5 mit den Regeln des Herstellers. Holen nur
-      mit deinem Ja, Datei für Datei.
+      mit deinem Ja, Datei für Datei. Entschieden (Benutzer, 2026-11-27):
+      bis diese Regeln vorliegen, bleibt die 2.
 - [ ] **Durchstanzbewehrung an Aussparungen.** Eingebaut: eine Leiste hält
       zur Aussparung die Überdeckung c_nom, wie zum Plattenrand (nach Vorgabe,
       nicht nachgeschlagen), und im Schatten einer Aussparung nach Figur 23d
@@ -1241,7 +1242,7 @@ Norm dazu sagt.
       gegen die zulässige Stahlspannung der Zwängung, und die liegt bei
       normaler Anforderung bei `f_yk`, bei erhöhter für ⌀10 und ⌀12 ebenfalls
       über `f_yd`. Beispiel: Platte h = 250 mm, C30/37, normale Anforderung,
-      `N_Riss` = 322 kN je Lage und Meter -- heute genügen 644 mm²/m, mit
+      `N_Riss` = 322 kN je Lage und Meter – heute genügen 644 mm²/m, mit
       `A_s·f_yd ≥ N_Riss` brauchte es 741 mm²/m (+15 %). Vorschlag: die
       Bedingung als eigenen Nachweis führen. Entscheid des Benutzers.
 - [ ] **Gebrauch mit Mittelwerten.** Gebrauchsnachweise rechnen mit den
@@ -1251,7 +1252,7 @@ Norm dazu sagt.
       und `E_cm`, die schon Mittelwerte sind. Einen Mittelwert der
       Fliessgrenze kennt die Norm nicht, beim Stahl bleibt `f_yk`. Die Grenze
       gegen Fliessen ist `f_yd − 80 N/mm²`, so nennt sie Tabelle 17.
-      Empfehlung: lassen -- `f_ck` liegt auf der sicheren Seite. Entscheid
+      Empfehlung: lassen – `f_ck` liegt auf der sicheren Seite. Entscheid
       des Benutzers.
 - [ ] **Welcher Durchmesser bestimmt `σ_s,adm` unter quasi-ständiger Last?**
       Eingebaut: der dickste Stab der Tragrichtung; er gibt die kleinste
@@ -1293,7 +1294,7 @@ Norm dazu sagt.
       Schwerpunkt, der Beton auch dort gezählt, wo der Stahl liegt. Nach
       Vorgabe: den Block lässt SIA 262:2025, 4.2.1.5 für den Bruch zu,
       Spannungen rechnet 4.1.4.1.4 ungerissen linear elastisch und gerissen
-      ohne Zug im Beton -- dort ist er ein Modell, keine Normregel. Das Druckplateau `f_y,druck` des Stahls
+      ohne Zug im Beton – dort ist er ein Modell, keine Normregel. Das Druckplateau `f_y,druck` des Stahls
       im Löser deckt 4.2.2.2: Figur 16 gilt für Zug und Druck.
 - [ ] **Rechnet die Tragsicherheit charakteristisch,** nehmen drei
       Nachweise charakteristische Werte, wo die Norm Bemessungswerte meint:
@@ -1354,14 +1355,14 @@ Norm dazu sagt.
       selben N und M auch nicht am selben Punkt: die M-χ-Linie bei
       N = 300 kN bei 26.4 kNm, die N-ε-Linie bei M = 26.4 kNm schon bei
       228 kN. Vorschlag: `f_ctm`, wahlweise 0.7·`f_ctm` oder 1.3·`f_ctm`, am
-      Querschnitt mit Stahl -- dann reissen beide Linien am selben Punkt.
+      Querschnitt mit Stahl – dann reissen beide Linien am selben Punkt.
       Entscheid des Benutzers.
 - [ ] **Der äquivalente E-Modul** (Spannung-Dehnung-Analyse, M–E_eq und
       N–E_eq) zählt die Verformung ab dem Zustand ohne laufende Kraft (deine
       Wahl, 2026-10-11): `E_eq = M/(I_c·(χ − χ_0))`. Ein Modell mit dem
       ungerissenen Betonquerschnitt gibt damit die Verformung aus der
       laufenden Kraft wieder, nicht, was die feste allein verformt. Er gilt
-      für den Querschnitt, ohne Zugversteifung -- für eine Durchbiegung liegt
+      für den Querschnitt, ohne Zugversteifung – für eine Durchbiegung liegt
       er damit tief (sicher), für Zwangkräfte nicht. SIA 262:2025 kennt
       keinen solchen Modul (geprüft am 2026-11-14); bestätigen lassen.
 - [ ] **Der kürzeste Abstand bei der genauen Linie** misst zum gezeichneten
@@ -1737,7 +1738,7 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       Flansch oder Hohlkasten liegt `k_t` darum zu tief, auf der unsicheren
       Seite. Beispiel Plattenbalken, Steg 200 × 800 mm unter einer Platte
       600 × 200 mm, Zug unten: heute t = 333 mm und `k_t` = 0.857, nach der
-      Norm zählt der Steg, t = 200 mm und `k_t` = 0.909 -- Rissmoment und
+      Norm zählt der Steg, t = 200 mm und `k_t` = 0.909 – Rissmoment und
       Mindestbewehrung rund 6 % zu klein. Unter Zug heute `k_t` = 0.769
       (t = 600 mm) statt 0.909. Vorschlag: `t` aus der Dicke des gezogenen
       Teils (Steg- oder Plattendicke); einfach und sicher wäre die dünnste
@@ -1746,7 +1747,7 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       eines Vollquerschnitts höchstens `d_k/8` dick, `d_k` der grösste Kreis
       in `A_k` (SIA 262:2025, 4.3.5.3, (56)); für die Querkraft allein zählt
       die Stegbreite. Das Beispiel «Unterzug» 300 × 600 nimmt 100 mm, für die
-      Torsion wären höchstens 25 mm erlaubt -- es rechnet sie viermal zu
+      Torsion wären höchstens 25 mm erlaubt – es rechnet sie viermal zu
       dick. Vorschlag: Hinweis am Feld «Dicke» mit beiden Regeln, im
       Beispiel 25 mm oder Torsion und Querkraft getrennt. Entscheid des
       Benutzers.
@@ -1759,7 +1760,7 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
 - [ ] **Querkraft: Regeln, die das Werkzeug nicht prüft.** Mindestbügel und
       grösster Bügelabstand (SIA 262:2025, 5.5.2.2, (116); 5.5.3.4); die
       feste Dehnung `1.5·f_yd/E_s`, wo die Biegebewehrung plastisch werden
-      kann, etwa nach der Streifenmethode (4.3.3.2.3, (41)) -- das Werkzeug
+      kann, etwa nach der Streifenmethode (4.3.3.2.3, (41)) – das Werkzeug
       nimmt sie erst über `m_Rd`; dort auch `α_min = 40°` und `k_c = 0.4`
       (4.3.3.3.3, 4.2.1.7); abgestufte Längsbewehrung, schiefe Querkraft,
       Einzellast nahe am Auflager (4.3.3.2.4, 4.3.3.2.5, 4.3.3.2.8); wo der
@@ -1786,10 +1787,10 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       Seite des umschreibenden Rechtecks (siehe «k_t bei beliebiger Form»),
       gegen `Σ A_s·σ_s,adm` aller Stäbe. Mit dem Schalter «500 mm» zählt bei
       massigen Bauteilen nur der Beton bis 250 mm vom Rand, und `k_t` gilt
-      für 500 mm (SIA 262:2025, 4.4.2.3.7) -- seit 2026-11-14, vorher
+      für 500 mm (SIA 262:2025, 4.4.2.3.7) – seit 2026-11-14, vorher
       begrenzte der Schalter nur `t`. Die Zwängung auf Biegung je Richtung
       mit dem Rissmoment des spröden Versagens gegen das Moment, bei dem der
-      erste gezogene Stab `σ_s,adm` erreicht -- gerissen, ohne Zug im Beton
+      erste gezogene Stab `σ_s,adm` erreicht – gerissen, ohne Zug im Beton
       wie in 4.1.4.1.4, präzise mit der Parabel (bis 2026-11-25 linear);
       ohne N, mit eigenem φ und mit der gedrückten Bewehrung (die
       Platte lässt sie weg), dazu sagt die Norm nichts. `σ_s,adm` je Stab mit
@@ -1797,7 +1798,7 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       eine verschmierte Linie mit einem fiktiven Durchmesser (siehe «Welcher
       Durchmesser …»).
 - [ ] **Knicken je Richtung.** Eingebaut (`nachweis/qa_knicken.py`): je Fall
-      zu einer Zugseite, die Nulllinie parallel zur Achse wie einachsig --
+      zu einer Zugseite, die Nulllinie parallel zur Achse wie einachsig –
       ein unsymmetrischer Querschnitt, der um beide Achsen zugleich knickt,
       wird nicht erfasst; SIA 262:2025, 4.3.7 regelt das nicht. `d` für die
       Mindestausmitte `d/30` (4.3.7.5) reicht bis zum entferntesten Stab in
@@ -1810,7 +1811,7 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       Stab gegen die Gerade zwischen seinen Enden; die Norm misst gegenüber
       den Auflagern (SIA 262:2025, 4.4.3.1.1), beim Kragarm über die doppelte
       Länge (SIA 260:2013, 1.2.2). Beispiel mit EI = 22 693 kNm² und
-      q = 10 kN/m: einfacher Balken 6 m, w = 7.44 mm (L/w = 807) -- liegt ein
+      q = 10 kN/m: einfacher Balken 6 m, w = 7.44 mm (L/w = 807) – liegt ein
       Knoten in Feldmitte, zeigt die App 1.60 mm. Kragarm 2 m: die Spitze
       senkt sich 0.88 mm, die App zeigt 0.14 mm. Seit 2026-11-14 sagt der
       Bericht das, und L/w steht nicht mehr da. Vorschlag: w je Feld gegen
@@ -1893,7 +1894,7 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       Verschiebungen, «verschieblich» nur die lotrechte, «eingespannt» alle
       sechs Richtungen. Danach lässt sich jede Richtung für sich frei, fest
       oder federnd stellen, wie in der Ebene.
-- [ ] **Ein eigenes Material hat G = 80 000 N/mm², nach Vorgabe** -- wie
+- [ ] **Ein eigenes Material hat G = 80 000 N/mm², nach Vorgabe** – wie
       E = 200 000 N/mm² und ρ = 7850 kg/m³ ungefähr ein Stahl. Wer ein
       eigenes Material nimmt, gibt G selbst ein.
 - [ ] **Im Raum fehlt ein Diagramm der Verdrehung.** Ein Knoten dreht sich
@@ -1906,7 +1907,7 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       getrennt. Offen, ob es mehr braucht.
 - [ ] **Ein Knoten, der sich um eine Achse frei dreht, zeigt keine
       Drehung.** Im Raum zählt ein Knoten als «nicht bestimmbar», sobald ihn
-      um eine Achse nichts hält -- etwa mit einer Drehfeder um eine Achse,
+      um eine Achse nichts hält – etwa mit einer Drehfeder um eine Achse,
       wo sonst nur Gelenke hängen. Beim Darüberfahren steht dann der Satz
       statt aller drei Drehungen, auch der bestimmten; die Herleitung nennt
       den Knoten (`web/balkendaten.py`). Besser wäre je Achse.
@@ -1974,11 +1975,11 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       - M_z, V_y und T: die Decke trägt in einer Richtung (5.4.1.1);
       - die Spannung-Dehnung-Analysen, wie beim Verbund.
 - [ ] **Baustahl: die Wärmedehnzahl** α_T = 10·10⁻⁶/°C (SIA 263:2013,
-      3.2.2.2) fehlt -- es gibt keine Temperatur als Einheit, und keine
+      3.2.2.2) fehlt – es gibt keine Temperatur als Einheit, und keine
       Rechnung braucht sie. Kommt mit der ersten, die sie braucht.
 - [ ] **Kriechzahl φ an den Flächen der Querschnittsanalyse.** Die
       Stahlspannungen und die Zwängung auf Biegung rechnen mit dem φ ihres
-      Kapitels, wie bei der Platte -- für jeden Beton dasselbe. Ein φ je
+      Kapitels, wie bei der Platte – für jeden Beton dasselbe. Ein φ je
       Fläche bräuchte es erst, wenn zwei Betone verschieden kriechen sollen.
       Die Eigenschaften einer Fläche stehen im schwebenden Fenster; φ käme
       dort ohne Umbau dazu.
@@ -1987,12 +1988,12 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       wer es genauer will, zeichnet mehr Ecken.
 
 - [ ] **Neu gerechnet wird je Bauteil, nicht je Wert.** Eine Platte, deren
-      Beschreibung sich nicht geändert hat, kommt aus dem Zwischenspeicher --
+      Beschreibung sich nicht geändert hat, kommt aus dem Zwischenspeicher –
       das war das Ziel und es steht. Innerhalb einer Platte wird aber weiter
       alles gerechnet: ein umgelegter Duktilitätsschalter rechnet den
       Knicknachweis derselben Platte mit, obwohl der nichts davon weiss. Feiner
       ginge es erst, wenn die Nachweise ihre Lastfälle nicht mehr im Bauch
-      trügen, sondern über Bezüge -- heute hätte ein Knickfall mit geänderter
+      trügen, sondern über Bezüge – heute hätte ein Knickfall mit geänderter
       Normalkraft denselben Bezugsgraphen wie vorher, und ein feiner Abdruck
       sähe den Unterschied nicht. Das wäre ein Umbau an jedem Nachweis, und der
       Fehlerfall wäre eine stillschweigend falsche Zahl.
@@ -2001,7 +2002,7 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       gerissen. Für die Durchbiegung eines Bauteils fehlt die
       Mitwirkung des Betons zwischen den Rissen. Bis 2026-10-06 stand sie als
       `ζ = 1 − β·(M_Riss/M)²` mit β = 1.0 drin (üblich: 1.0 kurzzeitig, 0.5
-      dauernd oder wiederholt) -- dafür war der Sprung nicht zu sehen. Ob eine
+      dauernd oder wiederholt) – dafür war der Sprung nicht zu sehen. Ob eine
       Linie des Bauteils dazukommt, mit welcher Regel und welchem Beiwert nach
       SIA 262, ist nicht nachgeschlagen. Für eine Durchbiegung ist der
       kleinere Beiwert (weicher) der ungünstige, für eine Zwängung der
@@ -2010,13 +2011,13 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       `E_cm/(1+φ)` und charakteristischen Werten wird `E_c/(400·f_c)` kleiner
       als 1 (C30/37, φ = 2: 0.93); dann hätte der Nenner der Parabel im
       ansteigenden Ast eine Nullstelle. Angesetzt wird `max(1; E_c/(400·f_c))`:
-      der Beton ist dann bis f_c bei ε_c1d linear -- nach Vorgabe;
+      der Beton ist dann bis f_c bei ε_c1d linear – nach Vorgabe;
       SIA 262:2025, 4.2.1.6 nennt keine Untergrenze. Das Kriechen über den
       Modul der Parabel ist ebenfalls Vorgabe; beim Druckglied setzt es die
       Norm über die Krümmung an (siehe «Kriechen beim Knicken»).
 - [ ] **Das Ende der Linien** liegt an den Grenzen des Dehnungsfächers:
       Betonrand −ε_c2d (Tabelle 8), Stahllagen ±ε_ud (Tabelle 9), Punkt C
-      −ε_c1d bei `z_C = h·(1 − ε_c1d/ε_c2d)` -- dieselben Grenzen wie
+      −ε_c1d bei `z_C = h·(1 − ε_c1d/ε_c2d)` – dieselben Grenzen wie
       überall, gezogen in `querschnitt/interaktion.py`; Punkt C nach Vorgabe
       (siehe oben).
 
@@ -2078,7 +2079,7 @@ Handrechnung und die Resistenzlinie aus Handrechnung · der Schwerpunkt
 mehrerer Flächen an einer Stelle (`schwerpunkt`) ·
 
 Aus der Strukturdurchsicht vom 2026-11-09, Punkt 8: die vier Nachweise je
-Lage der Platte auf einer Schablone (`Lagennachweis`) -- Lagenwahl, Grade,
+Lage der Platte auf einer Schablone (`Lagennachweis`) – Lagenwahl, Grade,
 Bezüge und Schleife einmal; eine leere Lage, wo keine hingehört, meldet
 sich ·
 
@@ -2096,7 +2097,7 @@ des Balkensystems in aufbau/balkensystem.py · die Bilder der Platte und
 ihre Karten in platte_bilder.js ·
 
 Aus der Strukturdurchsicht vom 2026-11-09, Punkt 3: eine Grundlage für die
-Apps mit Zeichenfenster (`cad_app.js`) -- Lesen, Schreiben, Fenster je
+Apps mit Zeichenfenster (`cad_app.js`) – Lesen, Schreiben, Fenster je
 Kennung, Wählen von aussen, Vergessen, die Liste darunter, Lagefelder,
 Umriss, Knotennamen ·
 
@@ -2109,7 +2110,7 @@ Kennung, geleert beim Anlegen, Kopieren, Löschen und Öffnen ·
 
 Aus der Strukturdurchsicht vom 2026-11-09, Punkt 6: ein Eintrag wird über
 seine Kennung gefunden und geändert (`eintragVon`, `eintragAendern`),
-gleich in welcher Liste -- ohne Listennamen, ohne `anBauteil` und ohne
+gleich in welcher Liste – ohne Listennamen, ohne `anBauteil` und ohne
 acht eigene Leser ·
 
 Aus der Strukturdurchsicht vom 2026-11-09, Punkt 4: Lage und Form der
@@ -2135,7 +2136,7 @@ Platte und ihre Werkstoffe an einer Stelle · Punkt C an einer Stelle · der
 Hinweis zu Randdehnungen misst Druck und Zug je für sich ·
 
 Eingaben an einer Stelle geprüft (C1, 2026-10-16): ein Leser aus den Feldern
-der Datenklassen, streng, und dieselbe Prüfung vor jedem Rechnen -- die
+der Datenklassen, streng, und dieselbe Prüfung vor jedem Rechnen – die
 Fassade geht durch dieselbe Tür wie eine Datei · alte Formate weg · die
 Rissanforderung in einer Tabelle statt in vier · was beim Rechnen still einen
 Ersatz nahm, meldet sich: ein Posten ohne Teilung, eine Knicklänge null, Stäbe
@@ -2143,7 +2144,7 @@ und Bügel ohne Stahl, ein Kennwert «fck», zwei gleiche Kennungen, ein Mass
 «B» am Stabquerschnitt, eine leere Teilungsliste der Suche ·
 
 Vom Benutzer entschieden (2026-10-16): die Kennzahlen der Platte bleiben, wie
-sie sind -- x/d je Seite, mit Bügeln das Kleinere beider Seiten, von Hand mit
+sie sind – x/d je Seite, mit Bügeln das Kleinere beider Seiten, von Hand mit
 Bemessungswerten · eigener Betonstahl heisst S1, S2 … statt BS1 ·
 
 Vier sichtbare Punkte: eine Bügelteilung von null wird gemeldet statt still
@@ -2159,11 +2160,11 @@ die Bewehrungssuche rechnet nur ihr Bauteil ·
 
 Ergebnisse in den Rechenlauf: Urteile und Befunde kommen mit der Ausführung,
 kein Nachweis legt mehr etwas auf sich ab · der Speicher legt je Bauteil
-seine Lösung ab · ein Ziel darf eine Berechnung sein -- die Zahl der
+seine Lösung ab · ein Ziel darf eine Berechnung sein – die Zahl der
 Unbekannten, die Zeilenzahl des Blatts und der Querkraft-Nullfall sind fort ·
 
 Gemischte Stahlsorten: Stahlspannung, Knicken, Querkraft und Analyse
-nahmen den Stahl der ersten Lage für alle Lagen -- jetzt trägt jede Lage
+nahmen den Stahl der ersten Lage für alle Lagen – jetzt trägt jede Lage
 ihren Stahl, gebaut an einer Stelle (`stahllagen`) · Stahlspannung je Stahl
 mit eigener Grenze, massgebend der kleinste Erfüllungsgrad · Querkraft mit
 dem Stahl der gezogenen Seite · Fliessbeginn der Analyse je Lage ·
@@ -2214,7 +2215,7 @@ Nachgewiesen wird nur noch die Tragrichtung x; die y-Lagen bleiben im
 Querschnitt, weil sie die statische Höhe von x bestimmen und zum
 Bewehrungsgehalt zählen · Vorgabe ist x auf der 2. und 3. Lage, also innen ·
 Ein Schalter je Nachweis statt einer je Lage, angezeigt wird die ungünstigere
-der beiden x-Lagen · Gesammelt wird in der Darstellung, nicht in der Prüfung --
+der beiden x-Lagen · Gesammelt wird in der Darstellung, nicht in der Prüfung –
 die Suche zählt weiterhin jede Lage, sonst wäre die Ebene zurück, an der sie
 einmal stehenblieb ·
 

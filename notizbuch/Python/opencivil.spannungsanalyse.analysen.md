@@ -1,5 +1,5 @@
 ---
-erzeugt: a97576ae1dd8
+erzeugt: 39134647ee1a
 art: modul
 tags: [modul]
 ---
@@ -9,7 +9,7 @@ tags: [modul]
 
 ## VERANTWORTUNG
 
-Je Bauteil -- Platte oder gezeichneter Querschnitt -- und je Fall die eine
+Je Bauteil – Platte oder gezeichneter Querschnitt – und je Fall die eine
 Frage, mit dem Paar seiner Richtung und seiner Wahl, dazu die Herleitung
 jeder Linie ([[opencivil.spannungsanalyse.analysen#analysen|analysen]]). Ein gezeichneter Querschnitt aus Stahlbeton
 reisst ([[opencivil.spannungsanalyse.schnitt#schnittpaar|schnittpaar]]), einer aus
@@ -24,16 +24,16 @@ Stahl oder Holz nicht ([[opencivil.spannungsanalyse.rissfrei#rissfreies_paar|ris
 class Analyse
 ```
 
-Ein Spannungsfall der Beschreibung -- und was die Auswertung ergab.
+Ein Spannungsfall der Beschreibung – und was die Auswertung ergab.
 
 - `fall: Any` – Der [[opencivil.spannungsanalyse.analysen#Analyse|SpannungsfallEintrag]], wie er in der Beschreibung steht.
 - `art: Analyseart`
 - `richtung: Any` – Die Tragrichtung einer Platte ([[opencivil.spannungsanalyse.analysen#Analyse|Richtung]]) oder die Zugseite eines gezeichneten Querschnitts ([[opencivil.querschnitt.zugseite#Zugseite|Zugseite]]).
-- `richtung_text: str = ''` – Wie sie neben dem Titel steht -- «x», «Zug unten».
-- `raender: Tuple[str, str] = Zugseite.UNTEN.raender` – Wie die Raender heissen, zwischen denen das Bild laeuft: der bei z = 0 und der bei z = h -- dieselben Namen wie die Randdehnungen der Eingabe. Die Platte zaehlt z immer ab oben; der gezeichnete Querschnitt ab dem Rand gegenueber seiner Zugseite. Bis 2026-11-19 schrieb das Bild immer «ab Oberkante», auch bei Zug oben, links oder rechts.
+- `richtung_text: str = ''` – Wie sie neben dem Titel steht – «x», «Zug unten».
+- `raender: Tuple[str, str] = Zugseite.UNTEN.raender` – Wie die Raender heissen, zwischen denen das Bild laeuft: der bei z = 0 und der bei z = h – dieselben Namen wie die Randdehnungen der Eingabe. Die Platte zaehlt z immer ab oben; der gezeichnete Querschnitt ab dem Rand gegenueber seiner Zugseite. Bis 2026-11-19 schrieb das Bild immer «ab Oberkante», auch bei Zug oben, links oder rechts.
 - `bild: Optional[Querschnittsbild] = None`
-- `kurve: Optional[Union[Linie, 'Modullinie']] = None` – Die M-chi- oder N-eps-Linie -- oder der aequivalente Modul daraus.
-- `paar: Optional[Paar] = None` – Womit gerechnet wurde -- das Paar mit Kriechzahl, Wertesatz, Betongesetz: das der Platte oder das des gezeichneten Querschnitts.
+- `kurve: Optional[Union[Linie, 'Modullinie']] = None` – Die M-chi- oder N-eps-Linie – oder der aequivalente Modul daraus.
+- `paar: Optional[Paar] = None` – Womit gerechnet wurde – das Paar mit Kriechzahl, Wertesatz, Betongesetz: das der Platte oder das des gezeichneten Querschnitts.
 - `hinweis: str = ''` – Warum es nichts auszuwerten gab, falls es nichts gab.
 
 #### Analyse.moeglich
@@ -49,11 +49,11 @@ def moeglich(self) -> bool
 def auswerten(fall, art: Analyseart, paar: Paar) -> Tuple[Optional[Querschnittsbild], Optional[Union[Linie, Modullinie]]]
 ```
 
-Die eine der sechs Fragen stellen, die dieser Fall stellt -- in SI, an
+Die eine der sechs Fragen stellen, die dieser Fall stellt – in SI, an
 das Paar einer Platte oder eines gezeichneten Querschnitts. Gelesen wird
 nur, was die Frage braucht ([[opencivil.spannungsanalyse.art#Analyseart.eingaben|Analyseart.eingaben]]), und in der
 Einheit seines Feldes: in der zeigt die Maske die Zahl. Bis 2026-10-18
-rechnete hier ein eigenes `* 1e3` -- eine zweite Angabe der Einheit,
+rechnete hier ein eigenes `* 1e3` – eine zweite Angabe der Einheit,
 die still um 10³ haette abweichen koennen, wie zuvor beim Grundbruch.
 
 ### _Bauteilart
@@ -94,10 +94,10 @@ Die Auswertungen am Querschnitt, je Platte und je gezeichnetem Querschnitt.
 Kein Nachweis: hier steht kein Erfuellungsgrad und kein Urteil, sondern
 eine Antwort auf die Frage, was im Querschnitt geschieht. Gerechnet wird
 trotzdem mit demselben Faserintegral und denselben Werkstoffgesetzen wie
-in den Nachweisen -- ein zweites Modell daneben waere eine zweite
+in den Nachweisen – ein zweites Modell daneben waere eine zweite
 Wahrheit ueber denselben Querschnitt.
 
-Mit `protokoll` schreibt jede Linie dorthin, wie sie entstand -- daraus
+Mit `protokoll` schreibt jede Linie dorthin, wie sie entstand – daraus
 sammelt die Formelsammlung ihr Thema. `nur` rechnet nur diese Bauteile:
 die uebrigen hat der Zwischenspeicher der Oberflaeche noch
 ([[opencivil.web.dienst#rechnen|opencivil.web.dienst.rechnen]]). Eine Schleife fuer beide

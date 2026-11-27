@@ -1,5 +1,5 @@
 ---
-erzeugt: e2958d5dd165
+erzeugt: 79ed4e58e7c7
 art: modul
 tags: [modul]
 ---
@@ -11,7 +11,7 @@ tags: [modul]
 
 Der [[opencivil.projekt.balkensystem3d#Balkensystem3dEintrag|Balkensystem3dEintrag]]: ein Rahmen im Raum aus Knoten und
 Linien, Lagern und Lasten, mit seinen Materialien, Querschnitten,
-Lastfaellen und Kombinationen -- wie das 2D-Balkensystem
+Lastfaellen und Kombinationen – wie das 2D-Balkensystem
 ([[opencivil.projekt.balkensystem]]), mit dessen Baukasten
 ([[opencivil.projekt.staebe]]). Was dort ueber Geometrie und Lasten an
 ihren Elementen steht, gilt hier genauso. Gerechnet wird in
@@ -26,7 +26,7 @@ ihre Achse und Linienlager laengs und quer in y und z des Querschnitts.
 Eine Last zeigt senkrecht, in x, y oder z des Systems oder laengs und quer
 in y oder z des Stabs ([[opencivil.stabwerk3d.modell#Richtung|Richtung]]),
 eine an einem Knoten nur in eine Richtung des Systems. Ein Querschnitt ist
-nach Vorlage, ein Stahlprofil -- y die starke Achse, gedreht wird mit β --,
+nach Vorlage, ein Stahlprofil – y die starke Achse, gedreht wird mit β –,
 von Hand mit I_y, I_z und I_T oder aus einer Platte oder
 Querschnittsanalyse, wie in der Ebene (Benutzer, 2026-11-18): der Streifen
 b × h mit den Formeln des Rechtecks, b waagrecht, wenn β null ist; die
@@ -73,7 +73,7 @@ Ein Punkt des Systems, in m.
 class RaumstablastEintrag(StablastEintrag)
 ```
 
-Eine Last auf einem Stab -- wie in der Ebene, mit einer Richtung des Raums.
+Eine Last auf einem Stab – wie in der Ebene, mit einer Richtung des Raums.
 
 - `richtung: Richtung = Richtung.SENKRECHT`
 
@@ -91,7 +91,7 @@ oder ohne Stab, ein Linienlager laengs und quer in y und z.
 - `von: str = ''`
 - `bis: str = ''`
 - `querschnitt: str = ''` – Kennung des Querschnitts im System (`Q1`); leer: kein Stab, nur eine Linie.
-- `material: str = ''` – Kennung eines Materials des Systems (`M1`) -- oder [[opencivil.projekt.staebe#Konstanten|MATERIAL_DES_QUERSCHNITTS]]: der Beton, den eine Platte oder Querschnittsanalyse als Querschnitt mitbringt.
+- `material: str = ''` – Kennung eines Materials des Systems (`M1`) – oder [[opencivil.projekt.staebe#Konstanten|MATERIAL_DES_QUERSCHNITTS]]: der Beton, den eine Platte oder Querschnittsanalyse als Querschnitt mitbringt.
 - `drehung: float = bereich(0.0, heisst='Drehwinkel β', einheit=GRAD)` – Wie weit der Querschnitt um die Achse des Stabs gedreht ist ([[opencivil.stabwerk3d.stab]]).
 - `gelenk_anfang: bool = False`
 - `gelenk_ende: bool = False`
@@ -110,7 +110,7 @@ oder ohne Stab, ein Linienlager laengs und quer in y und z.
 def stab(self) -> bool
 ```
 
-Ob die Linie traegt -- sie hat einen Querschnitt.
+Ob die Linie traegt – sie hat einen Querschnitt.
 
 ### RaumlagerEintrag
 
@@ -143,7 +143,7 @@ Ein Lager an einem Knoten: je Richtung des Systems frei, fest oder Feder.
 class RaumknotenlastEintrag(KnotenlastEintrag)
 ```
 
-Eine Last an einem Knoten -- eine Kraft in ihre Richtung oder ein Moment um sie.
+Eine Last an einem Knoten – eine Kraft in ihre Richtung oder ein Moment um sie.
 
 - `richtung: Richtung = einer_von(KNOTENRICHTUNGEN, Richtung.SENKRECHT)`
 
@@ -154,9 +154,9 @@ Eine Last an einem Knoten -- eine Kraft in ihre Richtung oder ein Moment um sie.
 class RaummaterialEintrag(StabmaterialEintrag)
 ```
 
-Ein Material der Staebe -- wie in der Ebene, ein eigenes dazu mit seinem Schubmodul.
+Ein Material der Staebe – wie in der Ebene, ein eigenes dazu mit seinem Schubmodul.
 
-- `G: float = bereich(EIGENES_MATERIAL['G'], heisst='Schubmodul G', einheit=N_PRO_M…` – N/mm² -- nur bei `eigen`; zu Beginn G_cm des ersten Betons ([[opencivil.projekt.balkensystem#Konstanten|EIGENES_MATERIAL]]).
+- `G: float = bereich(EIGENES_MATERIAL['G'], heisst='Schubmodul G', einheit=N_PRO_M…` – N/mm² – nur bei `eigen`; zu Beginn G_cm des ersten Betons ([[opencivil.projekt.balkensystem#Konstanten|EIGENES_MATERIAL]]).
 
 ### RaumquerschnittEintrag
 
@@ -165,7 +165,7 @@ Ein Material der Staebe -- wie in der Ebene, ein eigenes dazu mit seinem Schubmo
 class RaumquerschnittEintrag(StabquerschnittBasis)
 ```
 
-Ein Querschnitt der Staebe im Raum -- siehe Dateikopf.
+Ein Querschnitt der Staebe im Raum – siehe Dateikopf.
 
 - `KENNWERTE = RAEUMLICH`
 
@@ -188,7 +188,7 @@ class Balkensystem3dEintrag(MitStaeben, MitFaellen, BauteilEintrag)
 ```
 
 Ein Rahmen im Raum: Knoten, Linien, Lager, Lasten, Querschnitte,
-Lastfaelle, Kombinationen -- was nicht stimmt, steht wie beim
+Lastfaelle, Kombinationen – was nicht stimmt, steht wie beim
 2D-Balkensystem in seinen Meldungen.
 
 - `BEZEICHNUNG = '3D-Balkensystem'`
@@ -198,7 +198,7 @@ Lastfaelle, Kombinationen -- was nicht stimmt, steht wie beim
 - `LINIENLAGER = ('quer_y', 'quer_z', 'laengs')`
 - `LAGERARTEN = LAGERARTEN`
 - `NEUE_DIAGRAMME = ('M_y', 'M_z', 'N')`
-- `LAUFRICHTUNGEN = ()` – Keine: eine neue Linie laeuft, wie sie gezeichnet ist -- ihre Faser legt der Drehwinkel β.
+- `LAUFRICHTUNGEN = ()` – Keine: eine neue Linie laeuft, wie sie gezeichnet ist – ihre Faser legt der Drehwinkel β.
 - `KNOTEN = RaumknotenEintrag`
 - `LINIE = RaumlinieEintrag`
 - `LAGER = RaumlagerEintrag`
@@ -218,7 +218,7 @@ Lastfaelle, Kombinationen -- was nicht stimmt, steht wie beim
 - `lastfaelle: List[LastfallEintrag] = field(default_factory=list)`
 - `kombinationen: List[LastkombinationEintrag] = field(default_factory=list)`
 - `diagramme: List[RaumdiagrammEintrag] = field(default_factory=list)`
-- `beschreibung: str = ''` – Freier Text -- geht in keine Rechnung ein.
+- `beschreibung: str = ''` – Freier Text – geht in keine Rechnung ein.
 
 #### Balkensystem3dEintrag._kehrt_um
 
@@ -236,14 +236,14 @@ laengs oder quer in y kehrt um, ein Moment um diese Achsen ebenso.
 def umkehren(self, kennung: str) -> None
 ```
 
-Wie in der Ebene -- und der Drehwinkel so, dass der Querschnitt steht wie vorher.
+Wie in der Ebene – und der Drehwinkel so, dass der Querschnitt steht wie vorher.
 
 
 ## Konstanten
 
-- `KNOTENRICHTUNGEN = tuple((r for r in Richtung if r.im_system))` – Wohin eine Last an einem Knoten zeigt -- in die Richtungen des Systems.
+- `KNOTENRICHTUNGEN = tuple((r for r in Richtung if r.im_system))` – Wohin eine Last an einem Knoten zeigt – in die Richtungen des Systems.
 - `DIAGRAMMGROESSEN = ('N', 'V_y', 'V_z', 'T', 'M_y', 'M_z', 'verschiebung', 'lagerkraefte')` – Was ein Diagramm zeigt: je Stab den Verlauf einer Schnittgroesse, das verschobene System oder die Lagerkraefte.
-- `LAGERARTEN = {'gelenkig': ('fest', 'fest', 'fest', 'frei', 'frei', 'frei'), 'versc…` – Die Vorwahlen eines Lagers -- je Richtung frei oder fest, in der Folge x, y, z, φ_x, φ_y, φ_z. Gelenkig haelt jede Verschiebung, verschieblich nur die lotrechte.
+- `LAGERARTEN = {'gelenkig': ('fest', 'fest', 'fest', 'frei', 'frei', 'frei'), 'versc…` – Die Vorwahlen eines Lagers – je Richtung frei oder fest, in der Folge x, y, z, φ_x, φ_y, φ_z. Gelenkig haelt jede Verschiebung, verschieblich nur die lotrechte.
 
 ## Braucht
 

@@ -46,5 +46,5 @@ $$
 
 Der Querschnitt bleibt eben: die Dehnung wächst linear mit dem Abstand von
 der Nulllinie. Am gedrückten Rand ist sie $\varepsilon_{c2d}$, in der Nulllinie
-null, in der Tiefe der Zugbewehrung also $\varepsilon_{c2d}\,(d - x)/x$ --
+null, in der Tiefe der Zugbewehrung also $\varepsilon_{c2d}\,(d - x)/x$ –
 nach dem Strahlensatz.

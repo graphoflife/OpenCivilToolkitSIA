@@ -1,5 +1,5 @@
 ---
-erzeugt: 9ce3b1b2f71e
+erzeugt: 68e4d2cfdde7
 art: modul
 tags: [modul]
 ---
@@ -11,7 +11,7 @@ tags: [modul]
 
 Aus den Lasten eines Lastfalls, was jeder Streifen trägt: eine Last je
 Länge längs seiner Achse, genau integriert über seine Breite. Je Stelle geht
-der Anteil seiner Richtung in ihn ([[opencivil.decke.aufteilung|aufteilung]]) --
+der Anteil seiner Richtung in ihn ([[opencivil.decke.aufteilung|aufteilung]]) –
 liegt die Stelle in einem Unterzug derselben Richtung, in diesen.
 
 
@@ -30,7 +30,7 @@ lineare Last je Länge, ohne Näherung.
 ## LINIENLASTEN
 
 Eine Linienlast liegt auf einem Band von 1 mm. Wo die Linie im Innern liegt,
-je zur Hälfte zu beiden Seiten -- auf einer Grenze zwischen zwei Streifen
+je zur Hälfte zu beiden Seiten – auf einer Grenze zwischen zwei Streifen
 trägt also jeder die Hälfte, keiner das Doppelte. Liegt sie auf dem Rand
 einer Platte, ganz auf der Seite der Platte. Ein Millimeter verschiebt
 nichts, was man in den Ergebnissen sähe.
@@ -50,7 +50,7 @@ def kn(F: float) -> str
 ```
 
 Eine Kraft in N als Zahl in kN fuer eine Meldung: drei gueltige Stellen,
-nie mit Exponent -- «80», «0.25», «1500», nicht «1.5e+03» wie bis
+nie mit Exponent – «80», «0.25», «1500», nicht «1.5e+03» wie bis
 2026-11-20.
 
 ### Belastung
@@ -60,7 +60,7 @@ nie mit Exponent -- «80», «0.25», «1500», nicht «1.5e+03» wie bis
 class Belastung
 ```
 
-Je Streifen seine Lasten, in `s = p·n` seiner Richtung -- und die Summen.
+Je Streifen seine Lasten, in `s = p·n` seiner Richtung – und die Summen.
 
 - `je_streifen: Dict[str, List[Teillast]] = field(default_factory=dict)`
 - `summe: float = 0.0` – Alle Lasten zusammen, in N.
@@ -79,7 +79,7 @@ def hinzu(self, name: str, last: Teillast) -> None
 def kombiniert(belastungen: Dict[str, Belastung], kombination: Kombination) -> Belastung
 ```
 
-Eine Kombination: jede Last ihres Lastfalls mal dessen Beiwert -- alles ist linear.
+Eine Kombination: jede Last ihres Lastfalls mal dessen Beiwert – alles ist linear.
 
 ### belasten
 
@@ -95,7 +95,7 @@ Die Lasten des Lastfalls auf den Streifen.
 def flaechen(decke: Decke, lastfall: Lastfall, meldungen: List[Meldung]) -> List[Tuple[str, List[Punkt], float]]
 ```
 
-Die Flächen des Lastfalls mit ihrer Last in N/m² -- ohne die Linienlasten.
+Die Flächen des Lastfalls mit ihrer Last in N/m² – ohne die Linienlasten.
 
 ### linienband
 
@@ -121,7 +121,7 @@ Ein konvexes Stück mit `q` in N/m², auf einer Platte der Gruppe `g`, auf die S
 def _zuordnen(heraus: Belastung, zerlegung: Zerlegung, streifen: Streifen, last: Streckenlast) -> None
 ```
 
-In den Feldstreifen -- oder, wo er in einem Unterzug seiner Richtung liegt, in diesen.
+In den Feldstreifen – oder, wo er in einem Unterzug seiner Richtung liegt, in diesen.
 
 
 ## Konstanten

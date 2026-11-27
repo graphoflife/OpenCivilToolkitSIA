@@ -36,5 +36,5 @@ Richtwerte der SIA 260:2013, Anhang A, Tabelle 3 gelten je nach Lastfall
 und mit den Langzeitwirkungen. Gegen die Sehne ist das nur dasselbe, wo ein
 Stab von Auflager zu Auflager reicht: liegt ein Knoten im Feld, misst jeder
 Teil gegen seine eigene Sehne, und am Kragarm fällt die Spitze weg. Dazu ist
-$w$ ein Kurzzeitwert am ungerissenen Querschnitt, die untere Grenze --
+$w$ ein Kurzzeitwert am ungerissenen Querschnitt, die untere Grenze –
 Risse und Kriechen machen den Balken weicher.

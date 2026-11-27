@@ -1,5 +1,5 @@
 ---
-erzeugt: 19f23340da87
+erzeugt: 1521cd0902a3
 art: modul
 tags: [modul]
 ---
@@ -9,8 +9,8 @@ tags: [modul]
 
 ## VERANTWORTUNG
 
-Was eine Querschnittsanalyse mit einer Blechverbunddecke rechnet -- ihr
-Beton, ihr Profilblech, Betonstahl darin --, mit Herleitung; gerechnet wird
+Was eine Querschnittsanalyse mit einer Blechverbunddecke rechnet – ihr
+Beton, ihr Profilblech, Betonstahl darin –, mit Herleitung; gerechnet wird
 in [[opencivil.verbund.blechdecke]], die Form des Blechs kennt
 [[opencivil.querschnitt.profilblech]]:
 
@@ -33,7 +33,7 @@ entlang ihrer Rippen. Gerechnet wird einachsig um y, mit `N`, `M_y` und
 `T` eines Lastfalls weist das Werkzeug nicht nach.
 
 
-## WAS FEHLT -- GRAU
+## WAS FEHLT – GRAU
 
 `d_p` ueber 150 mm, wo (26) auf SIA 262 verweist; eine Angabe zum
 Laengsschub; die Durchbiegung, wo `L/d_p` ueber 26 liegt. Was das Werkzeug
@@ -43,7 +43,7 @@ an der Decke gar nicht rechnet, nennt die Herleitung der Kennzahlen
 
 ## VORZEICHEN
 
-N > 0 Zug; M_y > 0 zieht unten -- um den Schwerpunkt der Analyse.
+N > 0 Zug; M_y > 0 zieht unten – um den Schwerpunkt der Analyse.
 
 ## Inhalt
 
@@ -53,7 +53,7 @@ N > 0 Zug; M_y > 0 zieht unten -- um den Schwerpunkt der Analyse.
 def _stellen(zahl: float, hoechstens: int=4) -> int
 ```
 
-So viele Stellen, wie die eingegebene Zahl hat -- sie wird nicht gerundet gezeigt.
+So viele Stellen, wie die eingegebene Zahl hat – sie wird nicht gerundet gezeigt.
 
 ### _bezug
 
@@ -61,7 +61,7 @@ So viele Stellen, wie die eingegebene Zahl hat -- sie wird nicht gerundet gezeig
 def _bezug(e: Eingaben) -> Tuple[float, float]
 ```
 
-Der Schwerpunkt der Analyse in mm -- der Bezugspunkt der Momente.
+Der Schwerpunkt der Analyse in mm – der Bezugspunkt der Momente.
 
 ### KennzahlenBlechQA
 
@@ -69,7 +69,7 @@ Der Schwerpunkt der Analyse in mm -- der Bezugspunkt der Momente.
 class KennzahlenBlechQA(Kennzahlprozedur)
 ```
 
-Die Kennzahlen einer Blechverbunddecke -- siehe Dateikopf.
+Die Kennzahlen einer Blechverbunddecke – siehe Dateikopf.
 
 - `THEMA = 'Blechverbunddecke'`
 
@@ -85,7 +85,7 @@ def rechne(self, e: Eingaben, p: Protokoll) -> Dict[str, Groesse]
 def _form(self, p: Protokoll) -> Dict[str, Wert]
 ```
 
-Die Form des Blechs als Tabelle, `d_p` und `b_0` als Formeln -- siehe Dateikopf.
+Die Form des Blechs als Tabelle, `d_p` und `b_0` als Formeln – siehe Dateikopf.
 
 ### _zieht
 
@@ -93,7 +93,7 @@ Die Form des Blechs als Tabelle, `d_p` und `b_0` als Formeln -- siehe Dateikopf.
 def _zieht(bloecke: Sequence[Block]) -> bool
 ```
 
-Ob im plastischen Zustand etwas Zug traegt -- ohne Zug gibt es kein Moment.
+Ob im plastischen Zustand etwas Zug traegt – ohne Zug gibt es kein Moment.
 
 ### BlechBiegungQA
 
@@ -101,7 +101,7 @@ Ob im plastischen Zustand etwas Zug traegt -- ohne Zug gibt es kein Moment.
 class BlechBiegungQA(Nachweis)
 ```
 
-Biegung und Normalkraft einer Blechverbunddecke, je Lastfall -- siehe Dateikopf.
+Biegung und Normalkraft einer Blechverbunddecke, je Lastfall – siehe Dateikopf.
 
 - `THEMA = 'Blechverbunddecke'`
 - `LANGNAME = 'Biegung und Normalkraft'`
@@ -127,7 +127,7 @@ Ohne Moment, oder wo die Normalkraft allein nicht traegt: `N_Ed` gegen `N_pl,Rd`
 class BlechSchubQA(Nachweis)
 ```
 
-Querkraft und Laengsschub einer Blechverbunddecke, je Lastfall -- siehe Dateikopf.
+Querkraft und Laengsschub einer Blechverbunddecke, je Lastfall – siehe Dateikopf.
 
 - `THEMA = 'Blechverbunddecke'`
 - `LANGNAME = 'Querkraft und Längsschub'`
@@ -142,18 +142,18 @@ def pruefe(self, e: Eingaben, p: Protokoll)
 
 ## Konstanten
 
-- `EINE_RICHTUNG = 'Eine Blechverbunddecke trägt in Richtung ihrer Rippen (5.4.1.1): nac…` – Was eine Blechverbunddecke traegt -- siehe Dateikopf.
+- `EINE_RICHTUNG = 'Eine Blechverbunddecke trägt in Richtung ihrer Rippen (5.4.1.1): nac…` – Was eine Blechverbunddecke traegt – siehe Dateikopf.
 - `OHNE_TORSION = 'Torsion weist das Werkzeug bei der Blechverbunddecke nicht nach: sie…`
 - `NICHT_GERECHNET = 'Nicht gerechnet: das Durchstanzen unter Einzellasten (27), die Endve…` – Was das Werkzeug an der Decke nicht rechnet.
-- `OHNE_BLECH = 'Bei negativem Moment zählt das Blech nicht, auch gezogen nicht (5.4.…` – Warum bei negativem Moment das Blech fehlt -- und was folgt, wo dann nichts Zug traegt.
+- `OHNE_BLECH = 'Bei negativem Moment zählt das Blech nicht, auch gezogen nicht (5.4.…` – Warum bei negativem Moment das Blech fehlt – und was folgt, wo dann nichts Zug traegt.
 - `OHNE_ZUG = 'Nichts trägt hier Zug: der Beton nicht, das Blech zählt bei negative…`
 - `GEGENRICHTUNG = 'Bei dieser Normalkraft zeigt selbst das grösste Moment, das die Deck…`
 - `DICKE = 'Das Blech ist gleich dick, seine Fläche gleichmässig über die Abwick…` – Die Dicke des Blechs ([[opencivil.querschnitt.profilblech]]).
 - `TAU_BEMESSUNG = 'τ_cd bleibt ein Bemessungswert, auch wo die Tragsicherheit den Beton…` – (26) mit charakteristischen Werten.
 - `KACHEL = 'in der Kachel «Längsschub»'` – Wo die Angaben zum Laengsschub stehen.
-- `RIPPENBREITE = 'Rippenbreite einer Blechverbunddecke'` – Die Namen der Formeln in der Formelsammlung -- in jeder Fassung derselbe.
+- `RIPPENBREITE = 'Rippenbreite einer Blechverbunddecke'` – Die Namen der Formeln in der Formelsammlung – in jeder Fassung derselbe.
 - `SCHUBLAENGE = 'Schublänge einer Blechverbunddecke'`
-- `SEITEN = (Zugseite.UNTEN, Zugseite.OBEN)` – Die Seiten, die ein Moment der Decke zieht -- unten mit dem Blech, oben ohne (5.4.3.2).
+- `SEITEN = (Zugseite.UNTEN, Zugseite.OBEN)` – Die Seiten, die ein Moment der Decke zieht – unten mit dem Blech, oben ohne (5.4.3.2).
 
 ## Braucht
 

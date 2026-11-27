@@ -1,5 +1,5 @@
 ---
-erzeugt: a4b25ff46f6e
+erzeugt: 0cd943070a36
 art: modul
 tags: [modul]
 ---
@@ -26,8 +26,8 @@ braucht, soll dafuer nicht alle Nachweise importieren.
 
 ## RECHENWEG
 
-Ein [[opencivil.projekt.projekt#Projekt|Projekt]] ist eine Beschreibung -- Baustoffe,
-Platten, gezeichnete Querschnitte, Einwirkungen --, so wie die Oberflaeche
+Ein [[opencivil.projekt.projekt#Projekt|Projekt]] ist eine Beschreibung – Baustoffe,
+Platten, gezeichnete Querschnitte, Einwirkungen –, so wie die Oberflaeche
 sie speichert. [[opencivil.projekt.projekt#Projekt.aufbauen|Projekt.aufbauen]] macht daraus einen
 [[opencivil.projekt.aufbau.kern#Aufbau|Aufbau]]: ein
 [[opencivil.core.rechenwerk#Rechenwerk|Rechenwerk]] voller Berechnungen, je
@@ -35,13 +35,13 @@ Kennwert, je Lage, je Nachweis eine.
 
 Gefragt wird rueckwaerts: [[opencivil.core.rechenwerk#Rechenwerk.loese|Rechenwerk.loese]] verfolgt, was ein Ziel
 braucht, und rechnet genau das. Jede Berechnung schreibt dabei ihre
-Herleitung ins [[opencivil.core.protokoll#Protokoll|Protokoll]] -- Formel,
+Herleitung ins [[opencivil.core.protokoll#Protokoll|Protokoll]] – Formel,
 Zahlen, Ergebnis. Heraus kommt eine
 [[opencivil.core.rechenwerk#Loesung|Loesung]]: die Werte, die Urteile und das
 Protokoll.
 
 Daraus setzt [[opencivil.bericht]] den Bericht und [[opencivil.web]]
-die Oberflaeche -- ohne selbst zu rechnen. Daneben zeigt
+die Oberflaeche – ohne selbst zu rechnen. Daneben zeigt
 [[opencivil.spannungsanalyse]], was ein Querschnitt tut, ohne ihn
 nachzuweisen, und [[opencivil.bewehrungssuche]] sucht eine Bewehrung,
 statt sie zu setzen. Das Notizbuch ([[opencivil.notizbuch]]) schreibt aus

@@ -1,5 +1,5 @@
 ---
-erzeugt: 959e37e6e75d
+erzeugt: e758d740226c
 art: modul
 tags: [modul]
 ---
@@ -11,7 +11,7 @@ tags: [modul]
 
 Was ein einzelner Stab zum System beitraegt, in seinen eigenen Achsen: die
 Steifigkeitsmatrix, die Lasten als arbeitsgleiche Knotenkraefte, die
-Bettung -- und fuer die Herleitung die Drehung in die Achsen des Systems,
+Bettung – und fuer die Herleitung die Drehung in die Achsen des Systems,
 in Zeichen. Gedreht und zusammengebaut wird im Raum: ein Stab dort besteht
 aus drei ebenen ([[opencivil.stabwerk3d.stab]]), das System rechnet
 [[opencivil.stabwerk.system|system]].
@@ -19,8 +19,8 @@ aus drei ebenen ([[opencivil.stabwerk3d.stab]]), das System rechnet
 
 ## DIE ACHSEN DES STABS
 
-`x` laeuft vom Anfang zum Ende, `y` steht links davon -- `x` um 90° im
-Gegenuhrzeigersinn gedreht --, Drehungen zaehlen im Gegenuhrzeigersinn. In
+`x` laeuft vom Anfang zum Ende, `y` steht links davon – `x` um 90° im
+Gegenuhrzeigersinn gedreht –, Drehungen zaehlen im Gegenuhrzeigersinn. In
 diesen Achsen ist die Steifigkeitsmatrix die des Lehrbuchs. Die gestrichelte
 Faser liegt auf der anderen Seite, bei `-y`: dorthin zeigt `z` der
 Baustatik, und dort zieht ein positives Moment
@@ -35,7 +35,7 @@ v   quer, in y
 ```
 
 Euler-Bernoulli: eben bleibende Querschnitte, ohne Schubverformung. Laengs
-ist der Stab linear, quer kubisch (Hermite) -- fuer einen Stab ohne Bettung
+ist der Stab linear, quer kubisch (Hermite) – fuer einen Stab ohne Bettung
 ist das die genaue Loesung, und die Knotenverschiebungen stimmen exakt.
 
 
@@ -44,7 +44,7 @@ ist das die genaue Loesung, und die Knotenverschiebungen stimmen exakt.
 Eine Last zwischen den Knoten geht als die Knotenkraefte ins System, die an
 denselben Verschiebungen dieselbe Arbeit leisten: `f_i = ∫ N_i · p dx`.
 Fuer diesen Stab sind das genau die Volleinspannkraefte mit umgekehrtem
-Vorzeichen. Integriert wird nach Gauss-Legendre mit drei Punkten -- exakt
+Vorzeichen. Integriert wird nach Gauss-Legendre mit drei Punkten – exakt
 bis Grad fuenf, und eine lineare Last mal eine kubische Formfunktion hat
 Grad vier. Ein verteiltes Moment `m` leistet Arbeit an der Drehung
 `θ = v'`: `f_i = ∫ N_i' · m dx`.
@@ -53,13 +53,13 @@ Grad vier. Ein verteiltes Moment `m` leistet Arbeit an der Drehung
 ## BETTUNG
 
 Ein Stab auf einem nachgiebigen Linienlager (Winkler) bekommt zu seiner
-Steifigkeit `k · ∫ Nᵀ N dx` -- die konsistente Bettungsmatrix. Mit
+Steifigkeit `k · ∫ Nᵀ N dx` – die konsistente Bettungsmatrix. Mit
 kubischen Formfunktionen ist das eine Naeherung; ein gebetteter Stab wird
 darum in kurze Stuecke geteilt, nach einer Regel fuer das System
 ([[opencivil.stabwerk.system|system]]) und den Pfahl
 ([[opencivil.pfahl.bettung]]): jedes Stueck hoechstens [[opencivil.stabwerk.stab#Konstanten|TEILUNG]]
 mal die Laenge `1/β`, auf der seine Biegelinie abklingt ([[opencivil.stabwerk.stab#schritt|schritt]]).
-Quer darf `k` vom Anfang zum Ende linear wachsen -- der gebettete Pfahl
+Quer darf `k` vom Anfang zum Ende linear wachsen – der gebettete Pfahl
 mindert so die Bettung am Terrain ab; das System selbst bettet
 gleichmaessig.
 
@@ -87,7 +87,7 @@ def bettung(L: float, k_quer: Tuple[float, float]=(0.0, 0.0), k_laengs: float=0.
 
 Die konsistente Bettungsmatrix 6 × 6: `k · ∫ Nᵀ N dx`, quer auf
 `v` und `θ`, laengs auf `u`. `k` in N/m je m Stab, also N/m²;
-quer am Anfang und am Ende, dazwischen linear -- an beiden Enden gleich
+quer am Anfang und am Ende, dazwischen linear – an beiden Enden gleich
 ist es die Matrix mit `k · L / 420` ([[opencivil.stabwerk.stab#Konstanten|BETTUNG_LATEX]]).
 
 ### abklingen_quer
@@ -96,7 +96,7 @@ ist es die Matrix mit `k · L / 420` ([[opencivil.stabwerk.stab#Konstanten|BETTU
 def abklingen_quer(k: float, EI: float) -> float
 ```
 
-`β = (k/(4EI))^(1/4)`: wie schnell die Biegelinie auf der Bettung `k` abklingt -- null ohne.
+`β = (k/(4EI))^(1/4)`: wie schnell die Biegelinie auf der Bettung `k` abklingt – null ohne.
 
 ### abklingen_laengs
 
@@ -104,7 +104,7 @@ def abklingen_quer(k: float, EI: float) -> float
 def abklingen_laengs(k: float, EA: float) -> float
 ```
 
-`β = √(k/EA)`: wie schnell die Verschiebung laengs abklingt -- null ohne Bettung.
+`β = √(k/EA)`: wie schnell die Verschiebung laengs abklingt – null ohne Bettung.
 
 ### schritt
 
@@ -121,7 +121,7 @@ def stuecke(laenge: float, schritt_: float) -> int
 ```
 
 In wie viele gleich lange Stuecke von hoechstens `schritt_` ein Stab
-der Laenge `laenge` geteilt wird -- auf Rundung genau: 0.1 m sind bei
+der Laenge `laenge` geteilt wird – auf Rundung genau: 0.1 m sind bei
 0.1 m ein Stueck, nicht zwei.
 
 ### summe
@@ -143,7 +143,7 @@ def formfunktionen(x: float, L: float) -> Tuple[float, ...]
 ```
 
 `(N1, N2, H1, H2, H3, H4)` an der Stelle `x`: laengs linear, quer
-nach Hermite -- je eine Funktion zu `u1, u2` und `v1, θ1, v2, θ2`.
+nach Hermite – je eine Funktion zu `u1, u2` und `v1, θ1, v2, θ2`.
 
 ### ableitungen
 
@@ -151,7 +151,7 @@ nach Hermite -- je eine Funktion zu `u1, u2` und `v1, θ1, v2, θ2`.
 def ableitungen(x: float, L: float) -> Tuple[float, float, float, float]
 ```
 
-`(H1', H2', H3', H4')` nach `x` -- die Drehung `θ = v'` je Einheitsverschiebung.
+`(H1', H2', H3', H4')` nach `x` – die Drehung `θ = v'` je Einheitsverschiebung.
 
 ### Strecke
 
@@ -210,7 +210,7 @@ Eine Last an der Stelle `a`: Kraefte `Px`, `Py` in N, Moment `M` in Nm.
 def aufteilen(lasten: Sequence[Teillast], von: float, bis: float, *, ende: bool) -> List[Teillast]
 ```
 
-Die Lasten eines Stabs, die auf `[von, bis]` liegen -- in den Achsen
+Die Lasten eines Stabs, die auf `[von, bis]` liegen – in den Achsen
 dieses Stuecks. Eine Einzellast genau auf der Grenze zweier Stuecke
 gehoert dem ersten, dessen Ende sie ist; nur am letzten (`ende`)
 zaehlt auch das Ende des Stabs.
@@ -221,16 +221,16 @@ zaehlt auch das Ende des Stabs.
 def knotenlasten(L: float, lasten: Sequence[Teillast]) -> List[float]
 ```
 
-Die arbeitsgleichen Knotenkraefte `f` (6) in den Achsen des Stabs --
+Die arbeitsgleichen Knotenkraefte `f` (6) in den Achsen des Stabs –
 `f_i = ∫ N_i·p + N_i'·m` und die Einzellasten an ihren Stellen.
 
 
 ## Konstanten
 
 - `GAUSS3 = ((-math.sqrt(0.6), 5.0 / 9.0), (0.0, 8.0 / 9.0), (math.sqrt(0.6), 5.0…` – Gauss-Legendre mit drei Punkten auf [-1, 1]: Stelle und Gewicht.
-- `STEIFIGKEIT_LATEX = '\\mathbf{k} = \\begin{bmatrix} \\frac{EA}{L} & 0 & 0 & -\\frac{EA}{L…` – Die Steifigkeitsmatrix in Zeichen -- fuer die Herleitung.
+- `STEIFIGKEIT_LATEX = '\\mathbf{k} = \\begin{bmatrix} \\frac{EA}{L} & 0 & 0 & -\\frac{EA}{L…` – Die Steifigkeitsmatrix in Zeichen – fuer die Herleitung.
 - `DREHUNG_LATEX = '\\mathbf{d} = \\mathbf{T} \\cdot \\mathbf{d}_{glob} \\qquad \\mathbf…` – Die Drehung von den Achsen des Systems in die des Stabs.
-- `BETTUNG_LATEX = '\\mathbf{k}_{b} = \\frac{k_{\\perp} \\cdot L}{420} \\begin{bmatrix} …` – Die Bettung in Zeichen -- quer und laengs.
+- `BETTUNG_LATEX = '\\mathbf{k}_{b} = \\frac{k_{\\perp} \\cdot L}{420} \\begin{bmatrix} …` – Die Bettung in Zeichen – quer und laengs.
 - `LASTEN_LATEX = "f_i = \\int_0^L N_i(x) \\cdot p(x)\\,\\mathrm{d}x + \\int_0^L N_i'(x…` – Die arbeitsgleichen Knotenkraefte in Zeichen.
 - `TEILUNG = 0.2` – Wie lang ein gebettetes Stueck hoechstens ist, als Teil der Laenge 1/β, auf der seine Biegelinie abklingt. Bei 1/(5β) weicht die kubische Naeherung am langen Balken auf der Bettung um 0.006 ‰ ab, bei 1/(2β) waeren es 0.2 ‰. So fein, weil der Pfahl seine Nachweise an den Knoten abliest ([[opencivil.pfahl.bettung#Konstanten|opencivil.pfahl.bettung.SCHRITT]]): unter einer Kraft am frei drehbaren Kopf laege das groesste Moment zwischen zwei Knoten bei 1/(2β) bis 6 % ueber dem abgelesenen, bei 1/(5β) bis 1 %.
 

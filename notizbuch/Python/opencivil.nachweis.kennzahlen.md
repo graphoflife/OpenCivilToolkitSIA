@@ -1,5 +1,5 @@
 ---
-erzeugt: 204e5b1ca41f
+erzeugt: b37a343d6428
 art: modul
 tags: [modul]
 ---
@@ -9,7 +9,7 @@ tags: [modul]
 
 ## VERANTWORTUNG
 
-Die Kennzahlen der Platte in x, gerechnet immer -- ob es Lastfaelle gibt oder
+Die Kennzahlen der Platte in x, gerechnet immer – ob es Lastfaelle gibt oder
 nicht (Benutzer, 2026-10-16). Die Zusammenfassung zeigt sie unter jeder
 Platte:
 
@@ -19,7 +19,7 @@ Platte:
 * der Querkraftwiderstand bei `N_Ed = 0`. Ohne Buegel `V_Rd,max`, das
   Kleinere beider Seiten bei `M_Ed = 0`, und `V_Rd,min`, das Kleinere
   bei `M_Ed = M_Rd`. Mit Buegeln der Widerstand bei der guenstigsten
-  Neigung, `V_Rd(alpha_opt)` -- auch er das Kleinere beider Seiten.
+  Neigung, `V_Rd(alpha_opt)` – auch er das Kleinere beider Seiten.
 
 x/d je Seite, das Kleinere beider Seiten auch mit Buegeln und die
 Handrechnung mit Bemessungswerten hat der Benutzer am 2026-10-16 bestaetigt.
@@ -34,15 +34,15 @@ Zusammenfassung stellt sie dazu.
 Jede Kennzahl steht mit ihrer Beschriftung hier ([[opencivil.nachweis.kennzahlen#Plattenkennzahlen|Plattenkennzahlen.kennzahlen]]),
 und nur, was die Platte hat: ein x/d gibt es nur fuer eine Seite mit
 Zugbewehrung. Bis 2026-10-18 stand fuer die andere 0, und ein Widerstand, den
-die Linie nicht traf, ebenfalls -- so hatte eine Platte nur mit oberer
+die Linie nicht traf, ebenfalls – so hatte eine Platte nur mit oberer
 Bewehrung den Druckwiderstand 0 statt -5000 kN.
 
 
 ## NICHTS ZWEIMAL
 
-Rechnet die Tragsicherheit von Hand mit Bemessungswerten -- die Vorgabe --,
+Rechnet die Tragsicherheit von Hand mit Bemessungswerten – die Vorgabe –,
 lesen die Kennzahlen deren Linie aus ihrem Befund und leiten nichts ein
-zweites Mal her; sonst rechnen sie eine eigene, mit Herleitung -- das
+zweites Mal her; sonst rechnen sie eine eigene, mit Herleitung – das
 entscheidet, wie beim Knicken, die
 [[opencivil.nachweis.biegung_normalkraft#Linienquelle|Linienquelle]]. Die
 Querkraft rechnet ihr Nachweis: er liest die
@@ -51,7 +51,7 @@ loest sie ([[opencivil.nachweis.querkraft_ohne_buegel#QuerkraftOhneBuegel.kurven
 [[opencivil.nachweis.querkraft_buegel#QuerkraftMitBuegeln.buegelwerte|buegelwerte]])
 und rechnet je Zugseite
 ([[opencivil.nachweis.querkraft_ohne_buegel#Kurvenbeiwerte.widerstand|widerstand]],
-[[opencivil.nachweis.querkraft_buegel#Buegelwerte.suche|suche]]) -- fuer seine
+[[opencivil.nachweis.querkraft_buegel#Buegelwerte.suche|suche]]) – fuer seine
 Faelle wie fuer die Kennzahlen. Geschrieben wird mit den Funktionen seiner
 Herleitung: [[opencivil.nachweis.querkraft_ohne_buegel#beiwert_k_g|beiwert_k_g]],
 [[opencivil.nachweis.querkraft#protokoll_hoehen|protokoll_hoehen]],
@@ -80,7 +80,7 @@ der Widerstand liegt unter `V_Rd,min`.
 class Plattenkennzahlen(Kennzahlprozedur)
 ```
 
-Die Kennzahlen einer Platte in x -- siehe Dateikopf.
+Die Kennzahlen einer Platte in x – siehe Dateikopf.
 
 - `THEMA = 'Kennzahlen'`
 
@@ -96,7 +96,7 @@ def rechne(self, e: Eingaben, p: Protokoll) -> Dict[str, Groesse]
 def _handrechnung(self, e: Eingaben, p: Protokoll, werte: Zwischenwerte, ergebnis: Dict[str, Groesse]) -> Dict[Zugseite, float]
 ```
 
-M_Rd und x/d bei N = 0, N_Rd bei M = 0 -- aus der Linie der Handrechnung.
+M_Rd und x/d bei N = 0, N_Rd bei M = 0 – aus der Linie der Handrechnung.
 
 #### Plattenkennzahlen._auf_der_linie
 
@@ -104,7 +104,7 @@ M_Rd und x/d bei N = 0, N_Rd bei M = 0 -- aus der Linie der Handrechnung.
 def _auf_der_linie(self, p: Protokoll, linie, ergebnis: Dict[str, Groesse], achse: geo.Achse, positiv: bool, kurz: str, titel: str) -> float
 ```
 
-Ein Widerstand auf der Linie, die Gegengroesse null -- hergeleitet, wie
+Ein Widerstand auf der Linie, die Gegengroesse null – hergeleitet, wie
 die Linie ihn findet: als Eckpunkt oder zwischen zweien.
 
 Getroffen wird sie immer: sie umschliesst den Querschnitt ohne
@@ -118,7 +118,7 @@ trifft sie (bei einseitiger Bewehrung als Eckpunkt,
 def _hoehen(self, e: Eingaben, werte: Zwischenwerte, p: Protokoll, seite: Zugseite, d: float, d_v: Optional[float]=None) -> Tuple[Wert, Optional[Wert]]
 ```
 
-`d` der gezogenen Seite und, ohne Buegel, `d_v` -- hergeleitet wie im Querkraftnachweis.
+`d` der gezogenen Seite und, ohne Buegel, `d_v` – hergeleitet wie im Querkraftnachweis.
 
 #### Plattenkennzahlen._mit_buegeln
 
@@ -134,14 +134,14 @@ Mit Buegeln haengt der Widerstand nicht am Moment, nur an der gezogenen Seite.
 def _kleinstes(self, p: Protokoll, ergebnis: Dict[str, Groesse], kurz: str, teile: List[Wert], titel: str) -> None
 ```
 
-Das Kleinere der Seiten mit Zugbewehrung -- bei nur einer sie selbst.
+Das Kleinere der Seiten mit Zugbewehrung – bei nur einer sie selbst.
 Eine hat die Platte immer: ohne x-Bewehrung gibt es keine Kennzahlen.
 
 
 ## Konstanten
 
 - `WAHL = Rechenwahl()` – Womit die Kennzahlen rechnen: die Handrechnung mit Bemessungswerten.
-- `HAND = 'Handrechnung mit Bemessungswerten'` – Woher die Eckwerte stammen -- ihre Erklaerung unter der Platte.
+- `HAND = 'Handrechnung mit Bemessungswerten'` – Woher die Eckwerte stammen – ihre Erklaerung unter der Platte.
 
 ## Braucht
 

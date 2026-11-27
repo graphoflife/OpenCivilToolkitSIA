@@ -61,7 +61,7 @@ $$
 
 Die Faktoren $N$ gelten für einen unendlich langen Streifen. Ein Rechteck-
 oder Quadratfundament bricht räumlich, und der Gleitkörper wird an den Enden
-grösser -- das trägt mehr. Der Formfaktor der Kohäsion wächst darum mit
+grösser – das trägt mehr. Der Formfaktor der Kohäsion wächst darum mit
 $b/L$; für den Streifen ($b/L \to 0$) ist er 1.
 
 In der [[Tragfähigkeitsformel undrainiert|undrainierten Formel]] steht er als

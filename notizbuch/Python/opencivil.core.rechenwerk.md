@@ -1,5 +1,5 @@
 ---
-erzeugt: 2f9dd5e7d0fa
+erzeugt: a9ee6b3e1323
 art: modul
 tags: [modul]
 ---
@@ -12,16 +12,16 @@ tags: [modul]
 Das Rechenwerk kennt alle Berechnungen und alle vom Benutzer gesetzten Werte.
 Es beantwortet die beiden Fragen, um die es in diesem Werkzeug geht:
 
-**Rueckwaerts** -- "Ich will diesen Wert. Was ist dafuer noetig?"
+**Rueckwaerts** – "Ich will diesen Wert. Was ist dafuer noetig?"
 [[opencivil.core.rechenwerk#Rechenwerk.loese|Rechenwerk.loese]] verfolgt das Ziel rueckwaerts durch den Graphen,
 fuehrt genau die noetigen Berechnungen aus (und nur die) und meldet jede
-Eingabe, die dafuer fehlt -- samt der Kette, ueber die sie gebraucht wird.
+Eingabe, die dafuer fehlt – samt der Kette, ueber die sie gebraucht wird.
 
-**Vorwaerts** -- "Was laesst sich mit dem, was ich habe, ueberhaupt rechnen?"
+**Vorwaerts** – "Was laesst sich mit dem, was ich habe, ueberhaupt rechnen?"
 [[opencivil.core.rechenwerk#Rechenwerk.loese_alles|Rechenwerk.loese_alles]] berechnet alles Erreichbare und listet fuer
 den Rest auf, woran es scheitert.
 
-Ein Ziel ist ein Wert -- oder eine Berechnung unter ihrer ID. Dann laeuft
+Ein Ziel ist ein Wert – oder eine Berechnung unter ihrer ID. Dann laeuft
 sie, auch wenn sie keine Ausgabe hat: ein Nachweis ohne Lastfall, ein
 Balkensystem. Was sie findet, steht in ihrem Befund.
 
@@ -35,7 +35,7 @@ einer Variante vorliegen, wird geprueft, ob sie anwendbar ist; wenn nicht,
 kommt die naechste an die Reihe.
 
 Weil rekursiv in die Tiefe gearbeitet wird, steht im Protokoll jede Groesse vor
-der, die sie braucht -- die Reihenfolge des Berichts stimmt also von selbst.
+der, die sie braucht – die Reihenfolge des Berichts stimmt also von selbst.
 
 
 ## EIGENSTAENDIG NUTZBAR
@@ -75,7 +75,7 @@ Im Abhaengigkeitsgraphen wurde ein Kreis entdeckt.
 class Herkunft
 ```
 
-Wie ein Wert zustande kam -- die Kante im Abhaengigkeitsgraphen.
+Wie ein Wert zustande kam – die Kante im Abhaengigkeitsgraphen.
 
 - `wert_id: str`
 - `berechnung_id: str`
@@ -105,7 +105,7 @@ Teilurteile derselben Frage auf das schlechteste zusammenziehen.
 Gesammelt wird je Namensraum, also je Nachweis: die vier Lagen des
 Duktilitaetsnachweises sind vier Antworten auf dieselbe Frage, die drei
 Lastfaelle des M-N-Nachweises sind drei verschiedene Fragen. Welche von
-beidem es ist, sagt das Urteil selbst -- nicht diese Stelle, die von den
+beidem es ist, sagt das Urteil selbst – nicht diese Stelle, die von den
 Nachweisen nichts weiss.
 
 Die Reihenfolge bleibt die des ersten Teilurteils: eine Tabelle, in der
@@ -128,7 +128,7 @@ Ergebnis eines Rechenlaufs.
 - `fehlende: List[FehlendeEingabe] = field(default_factory=list)`
 - `nicht_berechenbar: Dict[str, NichtBerechenbar] = field(default_factory=dict)`
 - `urteile: List[NachweisUrteil] = field(default_factory=list)`
-- `befunde: Dict[str, Any] = field(default_factory=dict)` – Je Berechnung, was sie ueber ihre Ausgaben hinaus festgehalten hat -- Linien, Fallergebnisse, das Ergebnis eines Systems (siehe [[opencivil.core.berechnung#Ausfuehrung|Ausfuehrung]]). Nach Berechnungs-ID.
+- `befunde: Dict[str, Any] = field(default_factory=dict)` – Je Berechnung, was sie ueber ihre Ausgaben hinaus festgehalten hat – Linien, Fallergebnisse, das Ergebnis eines Systems (siehe [[opencivil.core.berechnung#Ausfuehrung|Ausfuehrung]]). Nach Berechnungs-ID.
 
 #### Loesung.anhaengen
 
@@ -136,7 +136,7 @@ Ergebnis eines Rechenlaufs.
 def anhaengen(self, teil: 'Loesung') -> None
 ```
 
-Einen weiteren Lauf anhaengen, in dieser Reihenfolge -- so setzt der
+Einen weiteren Lauf anhaengen, in dieser Reihenfolge – so setzt der
 Dienst die Bauteile zusammen, jedes aus seinem eigenen Lauf oder aus
 dem Zwischenspeicher. `teil` bleibt dabei, wie es ist.
 
@@ -146,7 +146,7 @@ dem Zwischenspeicher. `teil` bleibt dabei, wie es ist.
 def befund(self, berechnung: Union[str, Berechnung]) -> Any
 ```
 
-Der Befund einer Berechnung -- nach ihrer ID oder ihr selbst.
+Der Befund einer Berechnung – nach ihrer ID oder ihr selbst.
 
 #### Loesung.wert
 
@@ -183,7 +183,7 @@ def gefuehrte_urteile(self) -> List[NachweisUrteil]
 Die Urteile, die in eine Tabelle gehoeren.
 
 Ohne die stillen: ein stiller Nachweis ist ausgeschaltet, er rechnet
-mit, damit ein Hinweis stehen kann, wenn er nicht aufgeht -- gefuehrt
+mit, damit ein Hinweis stehen kann, wenn er nicht aufgeht – gefuehrt
 hat ihn niemand.
 
 Und je Nachweis, der seine Faelle als Teile derselben Frage stempelt
@@ -198,7 +198,7 @@ der schlechtesten Lage.
 def stille_maengel(self) -> List[NachweisUrteil]
 ```
 
-Ausgeschaltete Nachweise, die nicht aufgehen -- nur als Hinweis.
+Ausgeschaltete Nachweise, die nicht aufgehen – nur als Hinweis.
 
 #### Loesung.alle_nachweise_erfuellt
 
@@ -210,7 +210,7 @@ def alle_nachweise_erfuellt(self) -> bool
 Ohne die stillen: sie sind ausgeschaltet und zaehlen nicht mit.
 
 Sonst staende oben rechts «nicht erfuellt» wegen eines Nachweises,
-den niemand fuehrt -- und man faende in der Tabelle nichts dazu. Ein
+den niemand fuehrt – und man faende in der Tabelle nichts dazu. Ein
 offener ([[opencivil.core.nachweis#NachweisUrteil|offen]]) ist
 nicht erfuellt: was sich nicht fuehren liess, ist nicht nachgewiesen.
 
@@ -266,7 +266,7 @@ def registriere(self, *berechnungen: Berechnung) -> 'Rechenwerk'
 
 Nimmt Berechnungen auf.
 
-Mehrere Berechnungen duerfen denselben Wert liefern -- das sind die
+Mehrere Berechnungen duerfen denselben Wert liefern – das sind die
 Varianten, unter denen der Loeser spaeter waehlt. Dieselbe Berechnung
 zweimal anzumelden ist dagegen ein Aufbaufehler und wird gemeldet;
 wer nicht weiss, ob schon angemeldet wurde, fragt vorher mit
@@ -281,7 +281,7 @@ def setze(self, wert_id: str | WertDef, groesse: Groesse, quelle: Optional[Quell
 Setzt einen Wert von Hand.
 
 Gibt es fuer den Wert eine Berechnung, gilt er als *ueberschrieben* und
-die Berechnung wird uebersprungen -- genau das erlaubt es, berechnete
+die Berechnung wird uebersprungen – genau das erlaubt es, berechnete
 Materialkennwerte gezielt durch eigene zu ersetzen. Gibt es keine, ist
 es eine gewoehnliche *Eingabe*.
 
@@ -291,7 +291,7 @@ es eine gewoehnliche *Eingabe*.
 def loesche(self, wert_id: str) -> 'Rechenwerk'
 ```
 
-Nimmt eine Ueberschreibung zurueck -- der Wert wird wieder gerechnet.
+Nimmt eine Ueberschreibung zurueck – der Wert wird wieder gerechnet.
 
 #### Rechenwerk.berechnungen
 
@@ -326,7 +326,7 @@ def definition(self, wert_id: str) -> Optional[WertDef]
 def moegliche_ziele(self) -> Tuple[str, ...]
 ```
 
-Alle Werte, die ueberhaupt berechenbar waeren -- und die Berechnungen
+Alle Werte, die ueberhaupt berechenbar waeren – und die Berechnungen
 ohne Ausgabe, nach denen sonst kein Wert fragte.
 
 #### Rechenwerk.loese
@@ -338,12 +338,12 @@ def loese(self, *ziele: str, bekannt: Optional[Mapping[str, Wert]]=None, ohne_he
 Berechnet die angegebenen Ziele und alles, was dafuer noetig ist.
 
 Ein Ziel ist die ID eines Werts oder einer Berechnung. Eine Berechnung
-laeuft dann als Ganzes, einmal -- auch ohne Ausgabe, wie ein Nachweis
+laeuft dann als Ganzes, einmal – auch ohne Ausgabe, wie ein Nachweis
 ohne Lastfall. Eine Formel traegt die ID ihres Ergebnisses; dort ist
 der Wert gemeint, was auf dasselbe hinauslaeuft.
 
 Nicht mehr: Werte, die kein Ziel braucht, werden nicht angefasst.
-Laesst sich ein Ziel nicht aufloesen, bricht der Lauf nicht ab -- das
+Laesst sich ein Ziel nicht aufloesen, bricht der Lauf nicht ab – das
 Ziel landet in [[opencivil.core.rechenwerk#Loesung|Loesung.nicht_berechenbar]], und die fehlenden
 Eingaben werden benannt.
 
@@ -351,14 +351,14 @@ Eingaben werden benannt.
 gerechnet: der Lauf holt sie nicht noch einmal und schreibt sie auch
 nicht noch einmal ins Protokoll. Damit lassen sich mehrere Laeufe
 aneinanderhaengen, ohne dass die Baustoffe in jedem davon erneut
-hergeleitet werden -- und damit laesst sich ein Bauteil auslassen,
+hergeleitet werden – und damit laesst sich ein Bauteil auslassen,
 dessen Ergebnis von einem frueheren Lauf noch gilt.
 
 **Der Aufrufer haftet dafuer, dass die Werte noch gelten.** Das
 Rechenwerk prueft es nicht; es kann es nicht, denn was eine Eingabe
 wert ist, weiss nur, wer sie gesetzt hat.
 
-`ohne_herleitung` rechnet dasselbe, schreibt aber nichts mit --
+`ohne_herleitung` rechnet dasselbe, schreibt aber nichts mit –
 fuer Laeufe, die nur Werte und Urteile brauchen.
 
 #### Rechenwerk.loese_alles
@@ -390,7 +390,7 @@ die Quere kommen.
 def ziel(self, ziel: str) -> None
 ```
 
-Loest ein angefordertes Ziel auf -- Wert oder Berechnung -- und merkt es sich.
+Loest ein angefordertes Ziel auf – Wert oder Berechnung – und merkt es sich.
 
 #### _Lauf.rechnen
 
@@ -398,7 +398,7 @@ Loest ein angefordertes Ziel auf -- Wert oder Berechnung -- und merkt es sich.
 def rechnen(self, berechnung_id: str, pfad: Tuple[str, ...]) -> bool
 ```
 
-Eine Berechnung als Ganzes, einmal je Lauf -- ob sie Ausgaben hat oder
+Eine Berechnung als Ganzes, einmal je Lauf – ob sie Ausgaben hat oder
 nicht. `False`, wenn ihr Eingaben fehlen oder sie nicht anwendbar
 ist; der Grund steht dann unter ihrer ID.
 
@@ -420,7 +420,7 @@ Liefert den Wert oder None, wenn er nicht beschaffbar ist.
 def _als_fehlend_vermerken(self, ziel: str, pfad: Tuple[str, ...]) -> None
 ```
 
-Ein Wert ohne jeden Erzeuger -- eine echte Eingabe, die fehlt.
+Ein Wert ohne jeden Erzeuger – eine echte Eingabe, die fehlt.
 
 #### _Lauf._bis_zur_wurzel
 
@@ -430,7 +430,7 @@ def _bis_zur_wurzel(self, ziel: str, gesehen: Set[str]) -> List[FehlendeEingabe]
 
 Faehrt die Fehlschlagkette hinunter bis zu den echten Eingabeluecken.
 
-Dem Benutzer nuetzt die Meldung "f_cd nicht berechenbar" wenig -- er
+Dem Benutzer nuetzt die Meldung "f_cd nicht berechenbar" wenig – er
 will wissen, dass f_ck und gamma_c fehlen. Darum wird jede fehlende
 Zwischengroesse weiter aufgeloest, bis nur noch Werte uebrig sind, fuer
 die es ueberhaupt keinen Erzeuger gibt.

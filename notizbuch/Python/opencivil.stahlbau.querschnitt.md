@@ -1,5 +1,5 @@
 ---
-erzeugt: eb110c611492
+erzeugt: a84f37ebfafe
 art: modul
 tags: [modul]
 ---
@@ -13,15 +13,15 @@ Was die Kennzahlen eines Stahlquerschnitts
 ([[opencivil.nachweis.qa_stahl_kennzahlen]]) aus der Zeichnung brauchen,
 ohne Rechenwerk und ohne Herleitung, in mm und N/mm²:
 
-* die Teile, nach Baustahl und Dicke in Gruppen -- je Gruppe eine
+* die Teile, nach Baustahl und Dicke in Gruppen – je Gruppe eine
   Fliessgrenze ([[opencivil.stahlbau.querschnitt#Gruppe|Gruppe]]);
-* je Beanspruchung -- Druck, Biegung zu einer Seite oder ein Lastfall -- den
+* je Beanspruchung – Druck, Biegung zu einer Seite oder ein Lastfall – den
   Zustand jedes Blechs, plastisch `α` und elastisch `ψ`, je an einer
   Nulllinie ([[opencivil.querschnitt.plastisch#Linie|Linie]]), und daraus seine Klasse
   ([[opencivil.stahlbau.klasse]]);
 * den Querschnitt starr-plastisch, je Gruppe `±f`
-  ([[opencivil.stahlbau.querschnitt#Stahlquerschnitt.starr|Stahlquerschnitt.starr]]) -- gerechnet wird in
-  [[opencivil.querschnitt.plastisch]] --, die elastischen Werte und den
+  ([[opencivil.stahlbau.querschnitt#Stahlquerschnitt.starr|Stahlquerschnitt.starr]]) – gerechnet wird in
+  [[opencivil.querschnitt.plastisch]] –, die elastischen Werte und den
   wirksamen Querschnitt der Klasse 4.
 
 Was ein Lastfall daraus macht, steht in [[opencivil.stahlbau.widerstand]].
@@ -32,11 +32,11 @@ Was ein Lastfall daraus macht, steht in [[opencivil.stahlbau.widerstand]].
 Ein Polygon zaehlt in seiner Gruppe mit +1 und in der seines Elternteils mit
 -1 ([[opencivil.querschnitt.plastisch#stuecke|stuecke]]): so nimmt eine
 Aussparung den Stahl darum weg, und ein Polygon aus anderem Stahl ersetzt ihn
-dort. Ein Polygon aus anderem Werkstoff -- im Verbund der Beton -- ist fuer
+dort. Ein Polygon aus anderem Werkstoff – im Verbund der Beton – ist fuer
 den Stahl eine Aussparung. Mit einem Gewicht dazwischen faellt ein Teil eines
 Blechs nur anteilig weg: so mindert die Querkraft den Steg
 ([[opencivil.stahlbau.querschnitt#Stahlquerschnitt.mit|Stahlquerschnitt.mit]]). Die Dicke eines Profils ist die seines dicksten
-Blechs, die eines Vollstahls -- ohne Bleche -- und einer frei gezeichneten
+Blechs, die eines Vollstahls – ohne Bleche – und einer frei gezeichneten
 Flaeche ihre kleinste Breite, die ihrer konvexen Huelle. Nach Vorgabe, nicht
 nachgeschlagen: das ganze Profil
 rechnet so mit der Fliessgrenze seines dicksten Blechs, und eine freie
@@ -65,7 +65,7 @@ Je Blech der Klasse 4 faellt ein Streifen weg, so dick wie das Blech, aus
 der gedrueckten Zone `b_c` seiner theoretischen Breite, wie Tabelle 10 ihn
 legt: beim beidseitig gestuetzten in der Mitte, sodass je `b_eff/2` an
 den Enden der Zone bleiben; beim einseitig gestuetzten am freien Ende,
-sodass `b_eff` am gehaltenen bleibt -- Tabelle 10 zeigt das nur fuer
+sodass `b_eff` am gehaltenen bleibt – Tabelle 10 zeigt das nur fuer
 gleichmaessigen Druck (nach Vorgabe, nicht nachgeschlagen). `ψ` kommt aus
 den Spannungen des Bruttoquerschnitts; dass die Nulllinie des wirksamen
 sich verschiebt, aendert die Streifen nicht mehr (nach Vorgabe, nicht
@@ -80,7 +80,7 @@ rechnet das Werkzeug es nicht.
 def normale(seite: Zugseite) -> Tuple[float, float]
 ```
 
-Die Richtung zur gezogenen Seite -- genau 0 oder ±1.
+Die Richtung zur gezogenen Seite – genau 0 oder ±1.
 
 ### Gruppe
 
@@ -116,7 +116,7 @@ Der Kennwert in dieser Dicke: `f_y` oder `f_y_dick`.
 class Teil
 ```
 
-Ein Polygon aus Baustahl, mit seiner Dicke -- ein Profil mit seinen Blechen.
+Ein Polygon aus Baustahl, mit seiner Dicke – ein Profil mit seinen Blechen.
 
 - `flaeche: Flaechenteil`
 - `gruppe: int`
@@ -139,7 +139,7 @@ class Blechzustand
 ```
 
 Wie ein Blech unter einer Beanspruchung gedrueckt ist und in welche Klasse
-es damit faellt -- gemessen ueber `c`: `alpha` der plastisch
+es damit faellt – gemessen ueber `c`: `alpha` der plastisch
 gedrueckte Anteil, `psi` das Verhaeltnis der elastischen Spannungen
 (`None`: elastisch nicht gedrueckt), `frei` ob der freie Rand der
 staerker gedrueckte ist.
@@ -151,8 +151,8 @@ staerker gedrueckte ist.
 - `frei: bool`
 - `grenzen: kl.Grenzen`
 - `klasse: int`
-- `frei_plastisch: bool = False` – Ob der freie Rand plastisch der staerker gedrueckte ist -- fuer die Grenzen mit `α`.
-- `tabelle: str = ''` – Wo die Grenzen stehen, wenn nicht in der Tabelle der Halterung -- beim kammerbetonierten Blech im Verbund ([[opencivil.verbund.querschnitt]]).
+- `frei_plastisch: bool = False` – Ob der freie Rand plastisch der staerker gedrueckte ist – fuer die Grenzen mit `α`.
+- `tabelle: str = ''` – Wo die Grenzen stehen, wenn nicht in der Tabelle der Halterung – beim kammerbetonierten Blech im Verbund ([[opencivil.verbund.querschnitt]]).
 
 #### Blechzustand.name
 
@@ -175,7 +175,7 @@ def schlankheit(self) -> float
 class Wirksam
 ```
 
-Die mitwirkende Breite eines Blechs der Klasse 4 -- in mm, ueber seine theoretische Breite.
+Die mitwirkende Breite eines Blechs der Klasse 4 – in mm, ueber seine theoretische Breite.
 
 - `zustand: Blechzustand`
 - `psi: float`
@@ -183,7 +183,7 @@ Die mitwirkende Breite eines Blechs der Klasse 4 -- in mm, ueber seine theoretis
 - `lambda_p: float`
 - `rho: float`
 - `b_c: float`
-- `streifen: Optional[Tuple[Punkt, ...]]` – Was wegfaellt -- `None`, wo das ganze Blech mitwirkt.
+- `streifen: Optional[Tuple[Punkt, ...]]` – Was wegfaellt – `None`, wo das ganze Blech mitwirkt.
 
 #### Wirksam.b_eff
 
@@ -202,10 +202,10 @@ class Elastisch
 Ein Querschnitt elastisch, quer zu einer Richtung `n`: in mm und mm⁴.
 
 - `n: Tuple[float, float]`
-- `v: float` – `n·S` -- wo die Nulllinie bei `N = 0` liegt, durch den Schwerpunkt `S`.
+- `v: float` – `n·S` – wo die Nulllinie bei `N = 0` liegt, durch den Schwerpunkt `S`.
 - `I: float`
 - `A: float`
-- `abstaende: Tuple[float, ...]` – Je Gruppe der weiteste Punkt ihres Stahls von der Nulllinie -- 0 ohne Stahl.
+- `abstaende: Tuple[float, ...]` – Je Gruppe der weiteste Punkt ihres Stahls von der Nulllinie – 0 ohne Stahl.
 - `schwerpunkt: Punkt`
 
 #### Elastisch.linie
@@ -232,7 +232,7 @@ in N·mm, und die Gruppe, in der sie liegt: `min f_g I/z_g`.
 def kleinste_breite(punkte: Sequence[Punkt]) -> float
 ```
 
-Die kleinste Breite eines Polygons -- die seiner konvexen Huelle, quer zu einer ihrer Kanten.
+Die kleinste Breite eines Polygons – die seiner konvexen Huelle, quer zu einer ihrer Kanten.
 
 ### _huelle
 
@@ -248,7 +248,7 @@ Die konvexe Huelle, linksherum (Andrew).
 def _null(d: float) -> float
 ```
 
-Eine Entfernung von der Nulllinie -- null, wo sie auf ihr liegt.
+Eine Entfernung von der Nulllinie – null, wo sie auf ihr liegt.
 
 ### anteil
 
@@ -256,7 +256,7 @@ Eine Entfernung von der Nulllinie -- null, wo sie auf ihr liegt.
 def anteil(d_1: float, d_2: float) -> float
 ```
 
-Der gedrueckte Anteil einer Strecke, deren Enden `d` von der Nulllinie liegen -- gedrueckt, wo `d < 0`.
+Der gedrueckte Anteil einer Strecke, deren Enden `d` von der Nulllinie liegen – gedrueckt, wo `d < 0`.
 
 ### verhaeltnis
 
@@ -264,7 +264,7 @@ Der gedrueckte Anteil einer Strecke, deren Enden `d` von der Nulllinie liegen --
 def verhaeltnis(d_1: float, d_2: float) -> Optional[float]
 ```
 
-`ψ` ueber eine Strecke: die Spannung am anderen Ende durch die am staerker gedrueckten -- `None` ohne Druck.
+`ψ` ueber eine Strecke: die Spannung am anderen Ende durch die am staerker gedrueckten – `None` ohne Druck.
 
 ### Stahlquerschnitt
 
@@ -272,7 +272,7 @@ def verhaeltnis(d_1: float, d_2: float) -> Optional[float]
 class Stahlquerschnitt
 ```
 
-Die Polygone einer Querschnittsanalyse aus Baustahl -- siehe Dateikopf.
+Die Polygone einer Querschnittsanalyse aus Baustahl – siehe Dateikopf.
 
 #### Stahlquerschnitt.mit
 
@@ -281,7 +281,7 @@ def mit(self, zusatz: Sequence[Stueck]) -> 'Stahlquerschnitt'
 ```
 
 Derselbe Querschnitt mit weiteren Stuecken: ein Streifen mit negativem
-Gewicht nimmt so viel Stahl weg -- ein Blech der Klasse 4 ganz, die
+Gewicht nimmt so viel Stahl weg – ein Blech der Klasse 4 ganz, die
 Querkraft anteilig. Teile und Bleche bleiben, wie gezeichnet.
 
 #### Stahlquerschnitt.profile
@@ -298,7 +298,7 @@ def profile(self) -> List[Teil]
 def freie(self) -> List[Teil]
 ```
 
-Die frei gezeichneten Flaechen aus Baustahl -- siehe Dateikopf.
+Die frei gezeichneten Flaechen aus Baustahl – siehe Dateikopf.
 
 #### Stahlquerschnitt.flaechen
 
@@ -314,7 +314,7 @@ Je Gruppe ihre Flaeche in mm².
 def werte(self) -> geo.Flaechenwerte
 ```
 
-Flaeche, Schwerpunkt und Traegheitsmomente des Stahls -- alle Staehle haben dasselbe `E`.
+Flaeche, Schwerpunkt und Traegheitsmomente des Stahls – alle Staehle haben dasselbe `E`.
 
 #### Stahlquerschnitt.starr
 
@@ -330,7 +330,7 @@ Der Querschnitt starr-plastisch: je Gruppe `f` gezogen und `-f` gedrueckt.
 def plastisch(self, n: Tuple[float, float], v: float) -> List[float]
 ```
 
-Je Gruppe `∫|n·p - v| dA` in mm³ -- ihr Anteil am plastischen
+Je Gruppe `∫|n·p - v| dA` in mm³ – ihr Anteil am plastischen
 Widerstandsmoment um die Nulllinie `v`.
 
 #### Stahlquerschnitt.elastisch
@@ -339,7 +339,7 @@ Widerstandsmoment um die Nulllinie `v`.
 def elastisch(self, n: Tuple[float, float]) -> Elastisch
 ```
 
-Der Querschnitt elastisch, quer zu `n` -- alle Staehle haben dasselbe `E`.
+Der Querschnitt elastisch, quer zu `n` – alle Staehle haben dasselbe `E`.
 
 #### Stahlquerschnitt.zustaende
 
@@ -348,7 +348,7 @@ def zustaende(self, pl: Linie, el: Optional[Linie], eps: Sequence[float]) -> Lis
 ```
 
 Jedes Blech jedes Profils, plastisch an der Nulllinie `pl`,
-elastisch an `el` -- mit `ε` je Gruppe. Ohne `el` gilt keine
+elastisch an `el` – mit `ε` je Gruppe. Ohne `el` gilt keine
 Grenze der Klasse 3: so fragt der Verbund nur, ob ein Blech die
 Klasse 1 oder 2 haelt ([[opencivil.verbund.querschnitt]]).
 
@@ -358,7 +358,7 @@ Klasse 1 oder 2 haelt ([[opencivil.verbund.querschnitt]]).
 def freie_gedrueckt(self, pl: Linie, el: Optional[Linie]) -> List[Teil]
 ```
 
-Die freien Flaechen, die plastisch oder elastisch gedrueckt sind -- siehe Dateikopf.
+Die freien Flaechen, die plastisch oder elastisch gedrueckt sind – siehe Dateikopf.
 
 #### Stahlquerschnitt.wirksamer
 
@@ -368,7 +368,7 @@ def wirksamer(self, zustaende: Sequence[Blechzustand], el: Linie, eps: Sequence[
 
 Der wirksame Querschnitt zu diesen Zustaenden (4.5.3): die
 mitwirkenden Breiten der Bleche in Klasse 4 und der Querschnitt ohne
-ihre Streifen -- `None` mit einem Rundrohr darunter (siehe
+ihre Streifen – `None` mit einem Rundrohr darunter (siehe
 Dateikopf). `rest` sagt je Blech, wie viel von ihm noch zaehlt: hat
 die Querkraft schon einen Teil genommen, nimmt sein Streifen nur den
 Rest.
@@ -379,7 +379,7 @@ Rest.
 def wirksam(self, zustand: Blechzustand, el: Linie, eps: float) -> Wirksam
 ```
 
-Die mitwirkende Breite eines Blechs der Klasse 4 -- kein Rundrohr --,
+Die mitwirkende Breite eines Blechs der Klasse 4 – kein Rundrohr –,
 ueber seine theoretische Breite `b`, mit `ψ` ueber dieselbe, an der
 elastischen Nulllinie `el`. Siehe Dateikopf.
 
@@ -415,7 +415,7 @@ liegt; seine Grenze haengt an nichts sonst.
 def _elastisch_gedrueckt(blech: Blech, linie: Linie) -> Tuple[Optional[float], bool]
 ```
 
-`ψ` an der elastischen Nulllinie -- `None`, wo nichts gedrueckt ist -- und ob der freie Rand es ist.
+`ψ` an der elastischen Nulllinie – `None`, wo nichts gedrueckt ist – und ob der freie Rand es ist.
 
 
 ## Konstanten

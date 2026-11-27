@@ -1,5 +1,5 @@
 ---
-erzeugt: e7d1285316ad
+erzeugt: 08e492b918eb
 art: modul
 tags: [modul]
 ---
@@ -9,11 +9,11 @@ tags: [modul]
 
 Vier Teile, jeder mit einer Frage:
 
-* [[opencivil.bewehrungssuche.bewertung|.bewertung]] -- wie weit ist eine Bewehrung vom Ziel, und gegen
+* [[opencivil.bewehrungssuche.bewertung|.bewertung]] – wie weit ist eine Bewehrung vom Ziel, und gegen
   welche Platte wird gesucht?
-* [[opencivil.bewehrungssuche.laengs|.laengs]] -- die kleinste Laengsbewehrung, die alles erfuellt.
-* [[opencivil.bewehrungssuche.dicke|.dicke]] -- die duennste Platte, bei der die Laengssuche aufgeht.
-* [[opencivil.bewehrungssuche.buegel|.buegel]] -- die duennsten Buegel fuer den Querkraftnachweis.
+* [[opencivil.bewehrungssuche.laengs|.laengs]] – die kleinste Laengsbewehrung, die alles erfuellt.
+* [[opencivil.bewehrungssuche.dicke|.dicke]] – die duennste Platte, bei der die Laengssuche aufgeht.
+* [[opencivil.bewehrungssuche.buegel|.buegel]] – die duennsten Buegel fuer den Querkraftnachweis.
 
 Nach aussen gilt, was hier steht; die Teile duerfen sich innen umbauen.
 

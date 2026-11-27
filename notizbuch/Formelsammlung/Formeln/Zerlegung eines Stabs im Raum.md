@@ -35,8 +35,8 @@ Dehnsteifigkeit.
 
 Die Minuszeichen kommen von den Achsen: der ebene Stab hat seine Querachse
 links, und sein Moment zieht an der rechten Faser; im Raum zeigt $z$ nach
-unten. So steht jede Regel des ebenen Stabs -- Steifigkeit, Lasten, Bettung,
-Verlauf -- nur einmal.
+unten. So steht jede Regel des ebenen Stabs – Steifigkeit, Lasten, Bettung,
+Verlauf – nur einmal.
 
 Was die Zerlegung nicht kennt: die Kopplung von Biegung und Torsion, wenn der
 Schubmittelpunkt neben dem Schwerpunkt liegt wie beim U-Profil, die

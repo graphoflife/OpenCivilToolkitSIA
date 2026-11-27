@@ -42,7 +42,7 @@ die Spannung-Dehnung-Analysen des Werkzeugs brauchen eine. Gewählt ist, nach
 Vorgabe, nicht nachgeschlagen, das 15-Fache der [[Fliessdehnung]]: so viel
 verlangt 3.2.2.4 mindestens, damit die plastischen Verfahren EP und PP
 gelten dürfen, und die Sorten der Tabelle 1 erfüllen es. Für S355 sind das
-25.4 ‰ -- weniger als die 45 ‰ des B500B.
+25.4 ‰ – weniger als die 45 ‰ des B500B.
 
 Der Stahl selbst bricht viel später: nach derselben Ziffer liegt seine
 Bruchdehnung über 15 %. Die Grenze ist also keine Bruchdehnung, sondern die

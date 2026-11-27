@@ -30,7 +30,7 @@ breitet sich im Boden aus, und jede Schicht drückt sich unter dem Teil
 zusammen, der in ihrer Tiefe ankommt. Gerechnet wird in Tabellenform
 (Kap. 8.3): die Schichten in Teilschichten geteilt, je Teilschicht der
 [[Einflussfaktor der Rechtecklast|Einflussfaktor]] an Ober- und Unterkante,
-gemittelt, und daraus ihre [[Setzung einer Teilschicht|Setzung]] -- getrennt
+gemittelt, und daraus ihre [[Setzung einer Teilschicht|Setzung]] – getrennt
 nach Wiederbelastung mit $M'_E$ und Erstbelastung mit $M_E$.
 
 Unter welchem Punkt gerechnet wird, hängt an der Steifigkeit des Fundaments:

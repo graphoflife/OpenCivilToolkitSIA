@@ -1,5 +1,5 @@
 ---
-erzeugt: 8336c85812de
+erzeugt: ded3043226f7
 art: modul
 tags: [modul]
 ---
@@ -9,13 +9,13 @@ tags: [modul]
 
 ## VERANTWORTUNG
 
-Das [[opencivil.erdbeben.ersatzkraft#Gebaeude|Gebaeude]] -- Standort, Verhaltensbeiwerte, Geschosse und
-Tragwaende als Vorgaben im Rechenwerk -- und seine Rechnung
+Das [[opencivil.erdbeben.ersatzkraft#Gebaeude|Gebaeude]] – Standort, Verhaltensbeiwerte, Geschosse und
+Tragwaende als Vorgaben im Rechenwerk – und seine Rechnung
 [[opencivil.erdbeben.ersatzkraft#Ersatzkraft|Ersatzkraft]]: je Hauptrichtung x und y die Grundschwingzeit, der
 Wert des Bemessungsspektrums, die Ersatzkraft und ihre Verteilung auf die
 Geschosse und auf die Waende. Ob das Verfahren gilt (16.5.2.1), sagen die
-Urteile: je Richtung T_1 \<= 4 T_C (39), mit seinem Erfuellungsgrad, und --
-nur wo Grund- oder Aufriss nicht regelmaessig sind -- eines dazu, rot. Was
+Urteile: je Richtung T_1 \<= 4 T_C (39), mit seinem Erfuellungsgrad, und –
+nur wo Grund- oder Aufriss nicht regelmaessig sind – eines dazu, rot. Was
 eines davon verfehlt, gilt fuer das ganze Gebaeude: die Norm verlangt (39) in
 beiden Richtungen.
 
@@ -51,7 +51,7 @@ und im Bild liegt sie um 90 Grad gedreht ([[opencivil.erdbeben.ersatzkraft#Wandl
 
 - die Verteilung auf die Waende nach ihrer Biegesteifigkeit;
 - nur die Biegung der Waende verformt, weder Schub noch Fundament;
-- eta_EI = 0.5 als Anteil der ungerissenen Steifigkeit -- verlangt ist nur
+- eta_EI = 0.5 als Anteil der ungerissenen Steifigkeit – verlangt ist nur
   eine mittlere Steifigkeit bis zum Fliessbeginn (16.5.5.2). Nicht kappa:
   das ist in der Querschnittsanalyse die Kruemmung und in SIA 262:2025 die
   Vergroesserung der Querkraft fuer hoehere Eigenformen (97) (Benutzer,
@@ -81,7 +81,7 @@ def duktile_waende(richtungen: Sequence[str]) -> str
 
 Der Hinweis, wo q duktiles Verhalten heisst: fuer schlanke Tragwaende
 gelten dann eigene Bemessungswerte (SIA 262:2025, 4.3.9.4), die diese
-Rechnung nicht kennt -- die Kraefte je Wand sind nicht schon die der
+Rechnung nicht kennt – die Kraefte je Wand sind nicht schon die der
 Bemessung.
 
 ### Erdbebenzone
@@ -90,7 +90,7 @@ Bemessung.
 class Erdbebenzone(Wahl)
 ```
 
-Die Zone des Standorts (16.2.1) -- sie gibt die Bodenbeschleunigung a_gd.
+Die Zone des Standorts (16.2.1) – sie gibt die Bodenbeschleunigung a_gd.
 
 - `Z1A = 'Z1a'`
 - `Z1B = 'Z1b'`
@@ -150,7 +150,7 @@ def werte(self) -> Spektrumwerte
 def erklaerung(self) -> str
 ```
 
-Der Baugrund der Klasse, kurz und in eigenen Worten -- fuer den Titel des Schalters.
+Der Baugrund der Klasse, kurz und in eigenen Worten – fuer den Titel des Schalters.
 
 ### Bauwerksklasse
 
@@ -158,7 +158,7 @@ Der Baugrund der Klasse, kurz und in eigenen Worten -- fuer den Titel des Schalt
 class Bauwerksklasse(Wahl)
 ```
 
-Die Bauwerksklasse (16.3, Tabelle 25) -- sie gibt den Bedeutungsbeiwert gamma_f.
+Die Bauwerksklasse (16.3, Tabelle 25) – sie gibt den Bedeutungsbeiwert gamma_f.
 
 - `I = 'I'`
 - `II = 'II'`
@@ -254,7 +254,7 @@ class Regelmaessigkeit
 ```
 
 Ein Schalter der Regelmaessigkeit: das Feld des Eintrags, wie er heisst,
-seine Ziffer und ihre Kriterien in eigenen Worten -- fuer die Maske.
+seine Ziffer und ihre Kriterien in eigenen Worten – fuer die Maske.
 
 - `feld: str`
 - `beschriftung: str`
@@ -305,7 +305,7 @@ Was eine Wand aus ihrer Querschnittsanalyse nimmt: Namen und die Wert-IDs.
 class Wand
 ```
 
-Eine oder mehrere gleiche Tragwaende -- `nummer` ist ihr Platz in der Liste, ab 1.
+Eine oder mehrere gleiche Tragwaende – `nummer` ist ihr Platz in der Liste, ab 1.
 
 - `nummer: int`
 - `name: str`
@@ -323,7 +323,7 @@ class Gebaeude(Rechenobjekt)
 
 Ein Gebaeude im Erdbeben: die Eingaben als Vorgaben im Rechenwerk. Die
 Geschosse liegen von unten nach oben; `waende` sind nur die, die
-rechnen -- ihre Querschnittsanalyse rechnet und hat einen Beton.
+rechnen – ihre Querschnittsanalyse rechnet und hat einen Beton.
 
 - `WAS = 'Gebäude'`
 - `name: str`
@@ -359,13 +359,13 @@ Ueberschrift, unter der das Gebaeude in der Herleitung steht.
 class Wandanteil
 ```
 
-Was eine Wand einer Richtung traegt -- je eine von `n` gleichen; SI-Einheiten.
+Was eine Wand einer Richtung traegt – je eine von `n` gleichen; SI-Einheiten.
 
 - `nummer: int`
 - `name: str`
 - `n: int`
 - `EI: float` – Die Biegesteifigkeit einer Wand in dieser Richtung, N m².
-- `anteil: float` – Ihr Anteil an EI der Richtung -- einer Wand, nicht aller n.
+- `anteil: float` – Ihr Anteil an EI der Richtung – einer Wand, nicht aller n.
 - `V: float` – Die Querkraft am Fuss, N.
 - `M: float` – Das Moment am Fuss, N m.
 
@@ -385,7 +385,7 @@ def momente(kraefte: Sequence[float], z: Sequence[float]) -> Tuple[float, ...]
 
 Je Geschoss, von unten, das Moment unter ihm, auf der Hoehe der Decke
 darunter: die Kraefte von dort bis oben, je mal ihr Abstand. Am Fuss ist
-es das Kippmoment M_0 -- der Kragarm ist dort eingespannt.
+es das Kippmoment M_0 – der Kragarm ist dort eingespannt.
 
 ### Richtungsbefund
 
@@ -398,7 +398,7 @@ Was eine Hauptrichtung ergab, in SI-Einheiten. Die Kraefte je Geschoss von unten
 
 - `richtung: str`
 - `T1: float`
-- `u: Optional[float]` – Die Auslenkung, aus der T_1 kommt -- `None` bei T_1 von Hand.
+- `u: Optional[float]` – Die Auslenkung, aus der T_1 kommt – `None` bei T_1 von Hand.
 - `S_d: float`
 - `F_d: float`
 - `kraefte: Tuple[float, ...]`
@@ -406,7 +406,7 @@ Was eine Hauptrichtung ergab, in SI-Einheiten. Die Kraefte je Geschoss von unten
 - `S_d_1: float`
 - `F_d_1: float`
 - `M_0_1: float` – Dasselbe mit q = 1.0, fuer Abheben und Kippen (16.5.1.9).
-- `EI: float` – Die Biegesteifigkeit aller Waende dieser Richtung, N m² -- null ohne Wand.
+- `EI: float` – Die Biegesteifigkeit aller Waende dieser Richtung, N m² – null ohne Wand.
 - `waende: Tuple[Wandanteil, ...]`
 
 ### Erdbebenbefund
@@ -418,11 +418,11 @@ class Erdbebenbefund
 
 Was die Rechnung ergab: Hoehen und Gewichte der Geschosse und je Richtung, was gilt.
 
-- `z: Tuple[float, ...]` – Die Hoehe jedes Geschosses ueber der Einspannung, m -- dort wirkt sein Gewicht.
+- `z: Tuple[float, ...]` – Die Hoehe jedes Geschosses ueber der Einspannung, m – dort wirkt sein Gewicht.
 - `W: Tuple[float, ...]` – Die Gewichte, N.
 - `richtungen: Tuple[Richtungsbefund, ...]` – Je Richtung, die sich rechnen liess.
-- `gruende: Tuple[str, ...] = ()` – Warum das Verfahren nicht gilt -- leer, wo es gilt (16.5.2.1).
-- `hinweise: Tuple[str, ...] = ()` – Was die Rechnung grau dazu sagt: je Querschnittsanalyse, deren y und z keine Hauptachsen sind, ein Satz -- und wo q duktiles Verhalten heisst, was das fuer die Waende bedeutet.
+- `gruende: Tuple[str, ...] = ()` – Warum das Verfahren nicht gilt – leer, wo es gilt (16.5.2.1).
+- `hinweise: Tuple[str, ...] = ()` – Was die Rechnung grau dazu sagt: je Querschnittsanalyse, deren y und z keine Hauptachsen sind, ein Satz – und wo q duktiles Verhalten heisst, was das fuer die Waende bedeutet.
 
 #### Erdbebenbefund.zulaessig
 
@@ -438,7 +438,7 @@ def zulaessig(self) -> bool
 def ohne_einwirkung(self) -> bool
 ```
 
-Ohne Gewicht keine Ersatzkraft -- dann rechnet keine Richtung.
+Ohne Gewicht keine Ersatzkraft – dann rechnet keine Richtung.
 
 ### Ersatzkraft
 
@@ -447,7 +447,7 @@ class Ersatzkraft(Nachweis)
 ```
 
 Das Ersatzkraftverfahren je Hauptrichtung. Die Urteile sagen, ob es gilt
-(16.5.2.1): je Richtung T_1 \<= 4 T_C (39), dazu -- nur wo es fehlt -- ein
+(16.5.2.1): je Richtung T_1 \<= 4 T_C (39), dazu – nur wo es fehlt – ein
 regelmaessiger Grund- und Aufriss. Die Kraefte stehen im Befund.
 
 - `THEMA = 'Erdbeben'`
@@ -467,7 +467,7 @@ def _unregelmaessig(g: Gebaeude, W: Sequence[float]) -> Tuple[str, ...]
 ```
 
 Warum das Verfahren nicht gilt, abgesehen von T_1: der Grund- oder der
-Aufriss, wie der Benutzer sie angibt -- und das Gewicht, das nach oben
+Aufriss, wie der Benutzer sie angibt – und das Gewicht, das nach oben
 zunimmt, was die Zahlen selbst zeigen.
 
 ### Lauf
@@ -485,7 +485,7 @@ einmal, dann je Richtung ([[opencivil.erdbeben.ersatzkraft#Lauf.richtung|richtun
 def _standort(self) -> Dict[str, Wert]
 ```
 
-a_gd, S, T_B, T_C, T_D, gamma_f und g -- aus den Tabellen der Norm, als Werte.
+a_gd, S, T_B, T_C, T_D, gamma_f und g – aus den Tabellen der Norm, als Werte.
 
 #### Lauf._gewichte
 
@@ -493,7 +493,7 @@ a_gd, S, T_B, T_C, T_D, gamma_f und g -- aus den Tabellen der Norm, als Werte.
 def _gewichte(self) -> Tuple[List[float], List[float]]
 ```
 
-Je Geschoss seine Hoehe ueber der Einspannung und sein Gewicht, von unten -- SI.
+Je Geschoss seine Hoehe ueber der Einspannung und sein Gewicht, von unten – SI.
 
 #### Lauf.hauptachsen
 
@@ -502,7 +502,7 @@ def hauptachsen(self) -> Tuple[str, ...]
 ```
 
 Je Querschnittsanalyse einer Wand, deren y und z merklich keine
-Hauptachsen sind, der Hinweis -- derselbe wie im Raum
+Hauptachsen sind, der Hinweis – derselbe wie im Raum
 ([[opencivil.stabwerk.stabquerschnitt#keine_hauptachsen|keine_hauptachsen]]).
 
 #### Lauf.duktil
@@ -511,7 +511,7 @@ Hauptachsen sind, der Hinweis -- derselbe wie im Raum
 def duktil(self) -> Tuple[str, ...]
 ```
 
-Der Hinweis zu duktil bemessenen Waenden ([[opencivil.erdbeben.ersatzkraft#duktile_waende|duktile_waende]]) --
+Der Hinweis zu duktil bemessenen Waenden ([[opencivil.erdbeben.ersatzkraft#duktile_waende|duktile_waende]]) –
 nur mit Wand, und in der Herleitung mit dem q, das ihn ausloest.
 
 #### Lauf.richtung
@@ -520,7 +520,7 @@ nur mit Wand, und in der Herleitung mit dem q, das ihn ausloest.
 def richtung(self, r: str) -> Optional[Richtungsbefund]
 ```
 
-Der Befund einer Richtung -- `None`, wo sich T_1 nicht rechnen laesst.
+Der Befund einer Richtung – `None`, wo sich T_1 nicht rechnen laesst.
 
 #### Lauf._steifigkeit
 
@@ -528,7 +528,7 @@ Der Befund einer Richtung -- `None`, wo sich T_1 nicht rechnen laesst.
 def _steifigkeit(self, r: str) -> Tuple[Optional[Wert], Dict[int, float]]
 ```
 
-EI aller Waende in `r` -- `None` ohne Wand --, je Wand das EI einer von ihnen in N m².
+EI aller Waende in `r` – `None` ohne Wand –, je Wand das EI einer von ihnen in N m².
 
 #### Lauf._schwingzeit
 
@@ -536,7 +536,7 @@ EI aller Waende in `r` -- `None` ohne Wand --, je Wand das EI einer von ihnen in
 def _schwingzeit(self, r: str, EI: Optional[Wert]) -> Tuple[Optional[Wert], Optional[float]]
 ```
 
-T_1 von Hand oder aus den Waenden (40) -- ohne Wand keine; dazu u in m.
+T_1 von Hand oder aus den Waenden (40) – ohne Wand keine; dazu u in m.
 
 #### Lauf._spektrum
 
@@ -560,7 +560,7 @@ F_d (41), die Kraefte je Geschoss (42) und das Kippmoment am Fuss.
 def _waende(self, r: str, EI: float, je_wand: Dict[int, float], F_d: float, M_0: float) -> Tuple[Wandanteil, ...]
 ```
 
-Je Wand ihr Anteil an EI -- und so viel von Querkraft und Moment am Fuss.
+Je Wand ihr Anteil an EI – und so viel von Querkraft und Moment am Fuss.
 
 #### Lauf._kippen
 
@@ -568,7 +568,7 @@ Je Wand ihr Anteil an EI -- und so viel von Querkraft und Moment am Fuss.
 def _kippen(self, r: str, T1: Wert, F_d: float, M_0: float) -> Tuple[float, float, float]
 ```
 
-Dasselbe mit q = 1.0 -- fuer Abheben und Kippen (16.5.1.9): F_d, M_0 und S_d.
+Dasselbe mit q = 1.0 – fuer Abheben und Kippen (16.5.1.9): F_d, M_0 und S_d.
 
 #### Lauf.zulaessigkeit
 
@@ -576,8 +576,8 @@ Dasselbe mit q = 1.0 -- fuer Abheben und Kippen (16.5.1.9): F_d, M_0 und S_d.
 def zulaessigkeit(self) -> Tuple[Tuple[NachweisUrteil, ...], Tuple[str, ...]]
 ```
 
-Die Urteile, ob das Verfahren gilt (16.5.2.1) -- je Richtung T_1 \<= 4 T_C
-(39), dazu, nur wo es fehlt, die Regelmaessigkeit -- und alle Gruende,
+Die Urteile, ob das Verfahren gilt (16.5.2.1) – je Richtung T_1 \<= 4 T_C
+(39), dazu, nur wo es fehlt, die Regelmaessigkeit – und alle Gruende,
 warum nicht. Wer verfehlt, nennt im Hinweis jeden Grund: das Verfahren
 gilt fuer das Gebaeude oder gar nicht.
 
@@ -588,7 +588,7 @@ def angaben(gebaeude: Gebaeude, werte: Dict[str, Wert]) -> GleichungBlock
 ```
 
 Ueber der Tabelle: in der ersten Zeile Standort und Bauwerksklasse, in der
-zweiten, was sie geben, und die Verhaltensbeiwerte -- eine Zeile waere
+zweiten, was sie geben, und die Verhaltensbeiwerte – eine Zeile waere
 breiter als die rechte Spalte.
 
 ### kraefte
@@ -597,7 +597,7 @@ breiter als die rechte Spalte.
 def kraefte(befund: Erdbebenbefund) -> TabellenBlock
 ```
 
-Je Richtung T_1, S_d, F_d und das Kippmoment -- mit q und mit q = 1.0.
+Je Richtung T_1, S_d, F_d und das Kippmoment – mit q und mit q = 1.0.
 
 
 ## Konstanten
@@ -617,14 +617,14 @@ Je Richtung T_1, S_d, F_d und das Kippmoment -- mit q und mit q = 1.0.
 - `RICHTUNGEN = ('x', 'y')` – Die Hauptrichtungen des Gebaeudes, in denen gerechnet wird.
 - `NICHT_ZULAESSIG = 'nicht zulässig – Antwortspektrenverfahren (16.5.3.1)'` – Was gilt, wo das Ersatzkraftverfahren nicht gilt (16.5.3.1).
 - `REGELMAESSIGKEIT = 'Regelmässigkeit'` – Das Urteil, das nur steht, wo Grund- oder Aufriss nicht regelmaessig sind.
-- `NICHT_GERECHNET = 'Nicht gerechnet: die Torsion (16.5.2.7), die vertikale Komponente (1…` – Was diese Rechnung nicht kennt -- grau im Ergebnis.
-- `Q_NICHT_DUKTIL = 2.0` – Das groesste q fuer nicht-duktiles Verhalten (SIA 262:2025, 4.3.9.2.2, Tabelle 14); wer mehr ansetzt, bemisst duktil (4.3.9.3.5, Tabelle 15) -- und fuer Tragwaende gilt dann 4.3.9.4.
+- `NICHT_GERECHNET = 'Nicht gerechnet: die Torsion (16.5.2.7), die vertikale Komponente (1…` – Was diese Rechnung nicht kennt – grau im Ergebnis.
+- `Q_NICHT_DUKTIL = 2.0` – Das groesste q fuer nicht-duktiles Verhalten (SIA 262:2025, 4.3.9.2.2, Tabelle 14); wer mehr ansetzt, bemisst duktil (4.3.9.3.5, Tabelle 15) – und fuer Tragwaende gilt dann 4.3.9.4.
 - `ZIFFER_DUKTIL = 'SIA 262:2025, 4.3.9.2.2, Tabelle 14; 4.3.9.3.5, Tabelle 15; 4.3.9.4'`
 - `_A_GD = {Erdbebenzone.Z1A: 0.6, Erdbebenzone.Z1B: 0.8, Erdbebenzone.Z2: 1.0, …`
 - `_SPEKTRUM = {Baugrundklasse.A: Spektrumwerte(1.0, 0.07, 0.25, 2.0), Baugrundklass…`
 - `_BAUGRUND = {Baugrundklasse.A: 'Fels, darüber höchstens 5 m Lockergestein', Baugr…`
 - `REGELMAESSIG = (Regelmaessigkeit('grundriss_regelmaessig', 'Grundriss regelmässig', …` – Was der Benutzer bejaht, wenn er Grund- und Aufriss regelmaessig nennt.
-- `_Q_HINWEIS = 'Stahlbeton nicht duktil: 1.5 mit Betonstahl A, 2.0 mit B oder C (SIA…` – Was ueber dem Verhaltensbeiwert steht -- die Werte der Normen, in eigenen Worten.
+- `_Q_HINWEIS = 'Stahlbeton nicht duktil: 1.5 mit Betonstahl A, 2.0 mit B oder C (SIA…` – Was ueber dem Verhaltensbeiwert steht – die Werte der Normen, in eigenen Worten.
 - `VORGABEN = (Gruppe('Verhaltensbeiwert', lambda: tuple((Feld(f'q_{r}', f'q_{r}', …` – Die Vorgaben des Gebaeudes, je Kasten der Herleitung und Karte der Maske ([[opencivil.core.vorgaben]]).
 - `GESCHOSS = 'Geschoss'`
 - `WAND = 'Wand'`

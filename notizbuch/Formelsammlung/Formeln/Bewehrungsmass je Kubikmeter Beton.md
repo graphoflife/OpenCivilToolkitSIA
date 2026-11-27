@@ -41,4 +41,4 @@ $$
 Wie viel Stahl im Beton steckt, als Masse je Kubikmeter: die ganze
 Bewehrung der Platte, mal der Dichte des Stahls von 7850 kg/m³, geteilt
 durch das Volumen des Streifens. Eine Kennzahl für Menge und Kosten, kein
-Nachweis -- gewöhnliche Decken liegen etwa zwischen 60 und 150 kg/m³.
+Nachweis – gewöhnliche Decken liegen etwa zwischen 60 und 150 kg/m³.

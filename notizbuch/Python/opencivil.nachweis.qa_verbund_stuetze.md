@@ -1,5 +1,5 @@
 ---
-erzeugt: 38f7e74b6932
+erzeugt: c43bb1f7e676
 art: modul
 tags: [modul]
 ---
@@ -15,7 +15,7 @@ einmal fuer alle Faelle, der Querschnitt als Stuetze ([[opencivil.nachweis.qa_ve
 seine Art nach Tabelle 7, was 5.3.1 und 5.3.2 von ihm verlangen, je
 Werkstoff Flaeche, Festigkeit und Traegheitsmomente, `N_pl,Rd`, `δ` und
 `N_pl,Rk`. Dann je Fall ([[opencivil.nachweis.qa_verbund_stuetze#_Fall|_Fall]]) `E_c,eff`, die Achse ohne
-Moment nach (15), die mit Moment nach (25) -- zweiachsig linear.
+Moment nach (15), die mit Moment nach (25) – zweiachsig linear.
 
 
 ## DER ERFUELLUNGSGRAD
@@ -26,7 +26,7 @@ Je Nachweis der Widerstand durch die Einwirkung, massgebend der kleinste:
 `N_cr,eff/|N_Ed|`.
 
 
-## WAS FEHLT -- GRAU
+## WAS FEHLT – GRAU
 
 Ein Querschnitt, den Tabelle 7 nicht kennt, und was
 [[opencivil.verbund.stuetze#Stuetze.fehlt|fehlt]] und
@@ -45,7 +45,7 @@ N \< 0 Druck; M_y > 0 zieht unten, M_z > 0 links.
 def _nulllinie(lage: Optional[float]) -> str
 ```
 
-Wo die Nulllinie liegt, in Worten -- von der Mitte zur gezogenen oder gedrueckten Seite.
+Wo die Nulllinie liegt, in Worten – von der Mitte zur gezogenen oder gedrueckten Seite.
 
 ### VerbundStuetzeQA
 
@@ -53,7 +53,7 @@ Wo die Nulllinie liegt, in Worten -- von der Mitte zur gezogenen oder gedrueckte
 class VerbundStuetzeQA(Nachweis)
 ```
 
-Eine Verbundstuetze, je Fall -- siehe Dateikopf. `kriechzahl` ist `φ(t,t_0)`.
+Eine Verbundstuetze, je Fall – siehe Dateikopf. `kriechzahl` ist `φ(t,t_0)`.
 
 - `THEMA = 'Verbundstütze'`
 - `ART = 'Stab'`
@@ -78,7 +78,7 @@ Jeder Fall grau, mit demselben Grund: er liegt am Querschnitt.
 def _einwirkung(p: Protokoll, biegung: Biegung, fall: st.Stabfall) -> None
 ```
 
-Die Einwirkung und die Stuetze als Tabelle -- einachsig ohne M_z.
+Die Einwirkung und die Stuetze als Tabelle – einachsig ohne M_z.
 
 ### _Querschnitt
 
@@ -86,7 +86,7 @@ Die Einwirkung und die Stuetze als Tabelle -- einachsig ohne M_z.
 class _Querschnitt
 ```
 
-Der Querschnitt als Stuetze, vorweg fuer alle Faelle -- mit den Werten, die sie lesen.
+Der Querschnitt als Stuetze, vorweg fuer alle Faelle – mit den Werten, die sie lesen.
 
 #### _Querschnitt.steifigkeit
 
@@ -94,7 +94,7 @@ Der Querschnitt als Stuetze, vorweg fuer alle Faelle -- mit den Werten, die sie 
 def steifigkeit(self, achse: str, E_c: Dict[int, Wert], beton: float) -> Tuple[str, Dict[str, Wert]]
 ```
 
-`Σ E I` um `achse` als Vorlage mit ihren Werten -- der Beton mit
+`Σ E I` um `achse` als Vorlage mit ihren Werten – der Beton mit
 `beton · E_c,eff`, der Betonstahl mit seinem Anteil (5.3.2.2).
 
 ### _Fall
@@ -103,7 +103,7 @@ def steifigkeit(self, achse: str, E_c: Dict[int, Wert], beton: float) -> Tuple[s
 class _Fall
 ```
 
-Die Herleitung eines Falls -- je Achse, mit den Vergleichen, die er fuehrt.
+Die Herleitung eines Falls – je Achse, mit den Vergleichen, die er fuehrt.
 
 #### _Fall._kriechen
 
@@ -127,7 +127,7 @@ Eine Biegesteifigkeit, `si` in N mm².
 def _biegung(self, b: vs.Biegeachse) -> Optional[Tuple[Wert, Wert, Wert]]
 ```
 
-Die Achse mit Moment, bis `M_Ed,II`, `μ_d` und `M_pl,Rd` -- die
+Die Achse mit Moment, bis `M_Ed,II`, `μ_d` und `M_pl,Rd` – die
 gibt sie zurueck, oder `None`, wo die Stuetze ausknickt.
 
 #### _Fall._zweite_ordnung
@@ -136,7 +136,7 @@ gibt sie zurueck, oder `None`, wo die Stuetze ausknickt.
 def _zweite_ordnung(self, b: vs.Biegeachse, M: Wert, M_II: Wert) -> bool
 ```
 
-(22) bis (24) und die Imperfektion -- falsch, wo die Stuetze ausknickt.
+(22) bis (24) und die Imperfektion – falsch, wo die Stuetze ausknickt.
 
 #### _Fall._interaktion
 
@@ -144,7 +144,7 @@ def _zweite_ordnung(self, b: vs.Biegeachse, M: Wert, M_II: Wert) -> bool
 def _interaktion(self, b: vs.Biegeachse) -> Tuple[Wert, Wert]
 ```
 
-`M_pl,Rd`, `M_pl,N,Rd` und `μ_d` (Figur 7) -- zurueck gibt es
+`M_pl,Rd`, `M_pl,N,Rd` und `μ_d` (Figur 7) – zurueck gibt es
 `μ_d` und `M_pl,Rd`.
 
 #### _Fall._zweiachsig
@@ -153,7 +153,7 @@ def _interaktion(self, b: vs.Biegeachse) -> Tuple[Wert, Wert]
 def _zweiachsig(self, teile: Dict[str, Tuple[Wert, Wert, Wert]]) -> None
 ```
 
-5.3.5: beide Achsen linear -- gegen die Grenze von (25).
+5.3.5: beide Achsen linear – gegen die Grenze von (25).
 
 
 ## Konstanten
@@ -161,7 +161,7 @@ def _zweiachsig(self, teile: Dict[str, Tuple[Wert, Wert, Wert]]) -> None
 - `REFERENZ = 'SIA 264:2014, 5.3'`
 - `ERKLAERUNG = 'Die Stütze hat den gezeichneten Querschnitt und ist an ihren Enden s…`
 - `ANNAHME = f'Doppelsymmetrisch heisst: je Werkstoff liegt der Schwerpunkt höchst…`
-- `ANSATZ_ROHR = 'N_{pl,Rd} = A_a\\, f_{yd} + A_c\\, 1.0\\, f_{cd} + A_s\\, f_{sd}'` – (14) im gefuellten Rohr, mit 1.0 statt 0.85 (5.3.2.5) -- eine eigene Formel.
+- `ANSATZ_ROHR = 'N_{pl,Rd} = A_a\\, f_{yd} + A_c\\, 1.0\\, f_{cd} + A_s\\, f_{sd}'` – (14) im gefuellten Rohr, mit 1.0 statt 0.85 (5.3.2.5) – eine eigene Formel.
 - `NAME_ROHR = 'Plastischer Normalkraftwiderstand eines gefüllten Rohrs'`
 - `NICHT_GEDRUECKT = 'Nicht gedrückt: die Stütze knickt nicht. Biegung allein weist die Tr…` – Was ein Fall ohne Druck sagt.
 - `_KUERZEL = {Baustoffart.BAUSTAHL: 'a', Baustoffart.BETON: 'c', Baustoffart.BETON…` – Das Kuerzel je Art, an den Zeichen der Gruppen: A_a, I_c, E_s.

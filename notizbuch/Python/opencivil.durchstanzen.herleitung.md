@@ -1,5 +1,5 @@
 ---
-erzeugt: 1d690ee61ae3
+erzeugt: bfde951aada5
 art: modul
 tags: [modul]
 ---
@@ -9,8 +9,8 @@ tags: [modul]
 
 ## VERANTWORTUNG
 
-Die Schritte, die jeder Schnitt durchläuft -- was von ihm nicht zählt, k_e
-nach (57), der wirksame Umfang, die Querkraft und der Widerstand (58) --, einmal
+Die Schritte, die jeder Schnitt durchläuft – was von ihm nicht zählt, k_e
+nach (57), der wirksame Umfang, die Querkraft und der Widerstand (58) –, einmal
 geschrieben: für den Schnitt um die Stütze ([[opencivil.durchstanzen.nachweis|.nachweis]]), um die
 äussersten Anker und um einen Stahlpilz ([[opencivil.durchstanzen.mit_bewehrung|.mit_bewehrung]]). Die Zahlen
 kommen aus der [[opencivil.durchstanzen.pruefung#Schnittpruefung|Schnittpruefung]], sie werden hier nicht
@@ -37,8 +37,8 @@ SI-Basis.
 class Index
 ```
 
-Wie die Werte eines Schnitts heissen: `zeichen` hängt am Symbol -- leer um
-die Stütze, «out» aussen um die Anker, «P» um den Pilz --, `vorsilbe` an
+Wie die Werte eines Schnitts heissen: `zeichen` hängt am Symbol – leer um
+die Stütze, «out» aussen um die Anker, «P» um den Pilz –, `vorsilbe` an
 den Namen der Zwischenwerte, damit die Leisten um die Stütze und um den
 Pilz nebeneinander stehen können.
 
@@ -57,7 +57,7 @@ def name(self, grund: str) -> str
 def unten(self, *teile: str) -> str
 ```
 
-Der Index eines Symbols, der eigene zuletzt: `unten("red")` -- «red» oder «red,out».
+Der Index eines Symbols, der eigene zuletzt: `unten("red")` – «red» oder «red,out».
 
 #### Index.symbol
 
@@ -65,7 +65,7 @@ Der Index eines Symbols, der eigene zuletzt: `unten("red")` -- «red» oder «re
 def symbol(self, grund: str, *teile: str) -> str
 ```
 
-`symbol("V", "d")` -- «V_{d,out}»; ohne Index «V_d», «u».
+`symbol("V", "d")` – «V_{d,out}»; ohne Index «V_d», «u».
 
 ### rand
 
@@ -81,8 +81,8 @@ u_0: der Schnitt, soweit er in der Platte liegt.
 def abzuege(p: Protokoll, w: Zwischenwerte, a: Auswertung, u_0: Wert, *, ix: Index, ecken_text: str, ecken_referenz: str, ecken: bool=True) -> Wert
 ```
 
-Was vom Schnitt nicht zählt -- neben den Ecken und hinter Aussparungen
-(Figur 23) -- und was bleibt, u_red. `ecken` falsch, wo u_0 die Ecken
+Was vom Schnitt nicht zählt – neben den Ecken und hinter Aussparungen
+(Figur 23) – und was bleibt, u_red. `ecken` falsch, wo u_0 die Ecken
 schon nicht mitzählt (die Formeln um Wandende und Wandecke). Die Zahl ist
 die der Auswertung, mit der auch die Prüfung rechnet.
 
@@ -94,7 +94,7 @@ def k_e(p: Protokoll, w: Zwischenwerte, s: Schnittpruefung, *, ix: Index, an_der
 
 k_e an diesem Schnitt, wie die Regel der Stelle ihn gibt
 ([[opencivil.durchstanzen.pruefung#KeRegel|KeRegel]]). `an_der_stuetze` ist k_e am Schnitt um
-die Stütze -- fehlt es, ist es dieser. Die Näherung steht nur dort und
+die Stütze – fehlt es, ist es dieser. Die Näherung steht nur dort und
 gilt an jedem Schnitt; (57) steht an jedem, mit seiner Fläche, b und e_u.
 
 ### wirksam

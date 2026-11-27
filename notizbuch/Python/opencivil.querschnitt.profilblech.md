@@ -1,5 +1,5 @@
 ---
-erzeugt: 384a4cd5e355
+erzeugt: 337a4207c298
 art: modul
 tags: [modul]
 ---
@@ -19,11 +19,11 @@ in [[opencivil.nachweis.qa_blechverbund]], ihr Eintrag in
 
 ## DIE FORM (SIA 264:2014, Figur 18)
 
-`n` Rippen im Abstand `b_s`. Eine Rippe -- der Beton zwischen zwei
-Stegen des Blechs -- ist oben `b_o` breit, unten `b_u` und `h_p`
+`n` Rippen im Abstand `b_s`. Eine Rippe – der Beton zwischen zwei
+Stegen des Blechs – ist oben `b_o` breit, unten `b_u` und `h_p`
 hoch; ist sie oben schmaler als unten, ist das Blech hinterschnitten. Ueber
 den Rippen liegt der Beton `h_c = h − h_p`. Die Decke liegt mit ihrer
-Ecke links unten -- der Unterkante der Rippen, dem linken Rand -- auf ihrem
+Ecke links unten – der Unterkante der Rippen, dem linken Rand – auf ihrem
 Punkt.
 
 `b_0`, die Breite einer Rippe fuer die Querkraft, ist bei einem offenen
@@ -66,7 +66,7 @@ Massen von aussen ([[opencivil.querschnitt.profilblech#skizze|skizze]]), dazu ei
 class Blechform
 ```
 
-Die Masse eines Profilblechs nach seinem Datenblatt, in mm -- siehe Dateikopf.
+Die Masse eines Profilblechs nach seinem Datenblatt, in mm – siehe Dateikopf.
 
 - `ursprung: Punkt` – Die Ecke links unten: die Unterkante der Rippen, der linke Rand.
 - `rippen: int`
@@ -134,7 +134,7 @@ Die Abwicklung des Blechs je Rippe.
 def t(self) -> float
 ```
 
-Die Dicke des Blechs, gleich ueber die Abwicklung -- siehe Dateikopf.
+Die Dicke des Blechs, gleich ueber die Abwicklung – siehe Dateikopf.
 
 #### Blechform.e
 
@@ -195,7 +195,7 @@ Der Beton ueber dem Blech, gegen den Uhrzeigersinn.
 class Profilblech(Bewehrungselement)
 ```
 
-Das Blech einer Blechverbunddecke -- `von` und `bis` sind die Enden
+Das Blech einer Blechverbunddecke – `von` und `bis` sind die Enden
 seiner Linie, `flaeche` die des Blechs ueber die ganze Breite.
 
 - `form: Blechform`
@@ -235,7 +235,7 @@ def rissdurchmesser(self) -> float
 def als_bewehrung(self, stahl: int, verdraengt: Verdraengt) -> List[Bewehrung]
 ```
 
-Je Strecke ihr Teil der Flaeche, ohne den Beton zu verdraengen -- siehe Dateikopf.
+Je Strecke ihr Teil der Flaeche, ohne den Beton zu verdraengen – siehe Dateikopf.
 
 #### Profilblech.stahlflaechen
 
@@ -250,7 +250,7 @@ def skizze(form: Blechform) -> Teile
 ```
 
 Die Decke fuer das Fenster der Vorlagen: ihr Beton, die Linie ihres
-Blechs und ihre zwei Masse von aussen -- die Breite unten, «5 × 200 =
+Blechs und ihre zwei Masse von aussen – die Breite unten, «5 × 200 =
 1000», die Dicke links. Die Ecke links unten liegt im Ursprung der Form:
 sie kommt an den Einsetzpunkt, wie bei den Flaechen.
 
@@ -275,7 +275,7 @@ Das Blech einer Decke mit dieser Form, aus dem Baustoff `stahl`.
 
 ## Konstanten
 
-- `VORLAGE = 'blechdecke'` – Unter welchem Schluessel das Fenster der Vorlagen die Decke fuehrt -- neben den Flaechen ([[opencivil.querschnitt.vorlagen]]) und dem Stahlprofil.
+- `VORLAGE = 'blechdecke'` – Unter welchem Schluessel das Fenster der Vorlagen die Decke fuehrt – neben den Flaechen ([[opencivil.querschnitt.vorlagen]]) und dem Stahlprofil.
 - `GLEICH = 1e-09` – Wie nah zwei Punkte der Linie liegen duerfen, in mm, ehe sie einer sind: bei `b_o = b_s` stossen die Rippen oben aneinander.
 
 ## Braucht

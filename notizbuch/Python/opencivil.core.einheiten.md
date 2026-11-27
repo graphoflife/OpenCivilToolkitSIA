@@ -1,5 +1,5 @@
 ---
-erzeugt: 9896c61a05f7
+erzeugt: 1342fe47bc10
 art: modul
 tags: [modul]
 ---
@@ -95,8 +95,8 @@ gewuenscht ist (z.B. `kNm/m`), wird die Einheit unten explizit definiert.
 - `dimension: Dimension`
 - `faktor: float = 1.0`
 - `latex: Optional[str] = None`
-- `klebt: bool = False` – Ob das Zeichen unmittelbar an der Zahl haengt, ohne schmalen Abstand. Der Regelfall ist der Abstand: `30\,\mathrm{mm}`. Das Gradzeichen gehoert dagegen an die Zahl -- `30°`, nicht `30 °`.
-- `beschriftung: Optional[str] = None` – Lesbare Schreibweise fuer die Oberflaeche: `N/mm²`. Der `name` bleibt ASCII, weil er als Schluessel dient und in IDs vorkommt. Wo eine Zahl ohne LaTeX-Satz neben ihrer Einheit steht -- in der Werteliste, an den Eingabefeldern --, gehoert die lesbare Form hin. Andernfalls stuende dort `N/mm^2`, waehrend die Herleitung daneben `N/mm²` setzt.
+- `klebt: bool = False` – Ob das Zeichen unmittelbar an der Zahl haengt, ohne schmalen Abstand. Der Regelfall ist der Abstand: `30\,\mathrm{mm}`. Das Gradzeichen gehoert dagegen an die Zahl – `30°`, nicht `30 °`.
+- `beschriftung: Optional[str] = None` – Lesbare Schreibweise fuer die Oberflaeche: `N/mm²`. Der `name` bleibt ASCII, weil er als Schluessel dient und in IDs vorkommt. Wo eine Zahl ohne LaTeX-Satz neben ihrer Einheit steht – in der Werteliste, an den Eingabefeldern –, gehoert die lesbare Form hin. Andernfalls stuende dort `N/mm^2`, waehrend die Herleitung daneben `N/mm²` setzt.
 
 #### Einheit.als_latex
 
@@ -123,7 +123,7 @@ def _name_zu_text(name: str) -> str
 Macht aus dem ASCII-Namen die lesbare Schreibweise: `mm^2` -> `mm²`.
 
 Nur die Potenzen, und nur solange jede Ziffer ein hochgestelltes Zeichen
-hat. Fuer alles Weitere -- `‰` etwa -- gibt die Einheit ihre
+hat. Fuer alles Weitere – `‰` etwa – gibt die Einheit ihre
 `beschriftung` selbst an; mechanisch ableiten liesse sich das nicht.
 
 ### einheit
@@ -168,7 +168,7 @@ Ein physikalischer Zahlenwert mit Dimension.
 
 Der Wert wird intern immer in SI-Basiseinheiten gehalten ([[opencivil.core.einheiten#Groesse|si]]).
 `anzeige` merkt sich lediglich, in welcher Einheit die Groesse dargestellt
-werden soll -- das Rechenergebnis haengt nie davon ab.
+werden soll – das Rechenergebnis haengt nie davon ab.
 
 Beispiele:
 
@@ -236,7 +236,7 @@ Quadratwurzel. Halbiert die Dimensionsexponenten.
 def nahe(self, andere: 'Groesse', rel: float=1e-09, abs_: float=0.0) -> bool
 ```
 
-Toleranter Vergleich -- fuer Tests und Iterationsabbrueche.
+Toleranter Vergleich – fuer Tests und Iterationsabbrueche.
 
 #### Groesse.formatiert
 
@@ -247,7 +247,7 @@ def formatiert(self, stellen: int=2, einheit_: Optional[Einheit]=None) -> str
 Formatiert den Zahlenwert (ohne Einheit) mit fester Nachkommastellenzahl.
 
 Nachlaufende Nullen werden entfernt, damit `18.70` als `18.7`
-erscheint -- so wie es im Bericht gelesen werden soll.
+erscheint – so wie es im Bericht gelesen werden soll.
 
 #### Groesse.als_latex
 
@@ -263,7 +263,7 @@ Formatierter Zahlenwert samt Einheit als LaTeX-Fragment.
 def _pruefe_dimension(self, andere: Dimension, aktion: str) -> None
 ```
 
-Strenge Dimensionspruefung -- fuer Vergleiche und Umrechnungen.
+Strenge Dimensionspruefung – fuer Vergleiche und Umrechnungen.
 
 #### Groesse._vertraegliche_anzeige
 
@@ -274,7 +274,7 @@ def _vertraegliche_anzeige(self, andere: 'Groesse', aktion: str) -> Einheit
 Prueft Addierbarkeit und waehlt die Anzeige-Einheit des Resultats.
 
 Eine dimensionslose Null gilt als neutrales Element und darf zu jeder
-Groesse addiert werden -- sonst waere `summe([])` oder das Aufsummieren
+Groesse addiert werden – sonst waere `summe([])` oder das Aufsummieren
 einer anfangs leeren Liste unnoetig umstaendlich. Die Anzeige-Einheit
 kommt dann vom dimensionsbehafteten Operanden.
 
@@ -355,7 +355,7 @@ deklarierte Ergebnis-Einheit.
 So bleibt die Einheiten-Konvention der Norm explizit und nachvollziehbar,
 statt als unsichtbare Annahme im Code zu verschwinden.
 
-Beispiel -- SIA 262:2025, 2.4.2.4:
+Beispiel – SIA 262:2025, 2.4.2.4:
 
 ```python
 erg = empirisch(
@@ -400,9 +400,9 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - `CM2 = Einheit('cm^2', FLAECHE, 0.0001)`
 - `MM2 = Einheit('mm^2', FLAECHE, 1e-06)`
 - `M3 = Einheit('m^3', VOLUMEN, 1.0)`
-- `MIO_MM3 = Einheit('10^6 mm^3', LAENGE ** 3, 0.001, latex='\\cdot 10^{6}\\,\\mat…` – Widerstandsmoment in Millionen mm^3 -- aus demselben Grund wie darunter.
+- `MIO_MM3 = Einheit('10^6 mm^3', LAENGE ** 3, 0.001, latex='\\cdot 10^{6}\\,\\mat…` – Widerstandsmoment in Millionen mm^3 – aus demselben Grund wie darunter.
 - `MIO_MM4 = Einheit('10^6 mm^4', LAENGE ** 4, 1e-06, latex='\\cdot 10^{6}\\,\\mat…` – Flaechenmoment zweiten Grades in Millionen mm^4. Bei Betonquerschnitten stuende in mm^4 eine zehnstellige Zahl; so heisst es «5400 · 10⁶ mm⁴».
-- `CM4 = Einheit('cm^4', LAENGE ** 4, 1e-08)` – Dasselbe in cm⁴ -- so stehen die Stahlprofile in ihren Tabellen.
+- `CM4 = Einheit('cm^4', LAENGE ** 4, 1e-08)` – Dasselbe in cm⁴ – so stehen die Stahlprofile in ihren Tabellen.
 - `CM3 = Einheit('cm^3', LAENGE ** 3, 1e-06)` – Ein Widerstandsmoment in cm³, wie in denselben Tabellen.
 - `N = Einheit('N', KRAFT, 1.0)`
 - `KN = Einheit('kN', KRAFT, 1000.0)`
@@ -413,7 +413,7 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - `GPA = Einheit('GPa', SPANNUNG, 1000000000.0)`
 - `N_PRO_MM2 = Einheit('N/mm^2', SPANNUNG, 1000000.0, latex='\\mathrm{N}/\\mathrm{mm…`
 - `KN_PRO_M2 = Einheit('kN/m^2', SPANNUNG, 1000.0, latex='\\mathrm{kN}/\\mathrm{m}^{…`
-- `MN_PRO_M2 = Einheit('MN/m^2', SPANNUNG, 1000000.0, latex='\\mathrm{MN}/\\mathrm{m…` – Die M_E-Werte des Baugrunds -- so stehen sie im geologischen Bericht.
+- `MN_PRO_M2 = Einheit('MN/m^2', SPANNUNG, 1000000.0, latex='\\mathrm{MN}/\\mathrm{m…` – Die M_E-Werte des Baugrunds – so stehen sie im geologischen Bericht.
 - `NM = Einheit('Nm', MOMENT, 1.0)`
 - `KNM = Einheit('kNm', MOMENT, 1000.0)`
 - `MNM = Einheit('MNm', MOMENT, 1000000.0)`
@@ -436,7 +436,7 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - `H = Einheit('h', ZEIT, 3600.0)`
 - `RAD = Einheit('rad', DIMENSIONSLOS, 1.0)`
 - `GRAD = Einheit('Grad', DIMENSIONSLOS, math.pi / 180.0, latex='{}^{\\circ}', …`
-- `MRAD = Einheit('mrad', DIMENSIONSLOS, 0.001)` – Tausendstel Radiant -- die Drehungen eines Stabwerks.
+- `MRAD = Einheit('mrad', DIMENSIONSLOS, 0.001)` – Tausendstel Radiant – die Drehungen eines Stabwerks.
 - `EINHEITEN = {e.name: e for e in (EINHEITSLOS, PROZENT, PROMILLE, M, DM, CM, MM, K…` – Alle benannten Einheiten, nach Namen auffindbar.
 
 ## Gebraucht von

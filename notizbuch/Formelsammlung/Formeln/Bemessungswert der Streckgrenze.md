@@ -61,7 +61,7 @@ teilt jeden charakteristischen Widerstand durch einen Widerstandsbeiwert
 (4.1.1, Gleichung (1)); für Festigkeits- und Stabilitätsnachweise ist das
 $\gamma_{M1} = 1.05$ (4.1.3). Für S355 bis 40 mm Dicke gibt das 338 N/mm².
 
-$f_{yd}$ ist das Plateau der elastisch-plastischen Beziehung des Baustahls --
+$f_{yd}$ ist das Plateau der elastisch-plastischen Beziehung des Baustahls –
 in Zug und Druck dasselbe, anders als beim Betonstahl, der auf Druck eine
 eigene Fliessgrenze haben darf ([[Bemessungswert der Fliessgrenze auf Druck]]).
 Gerechnet wird mit der Streckgrenze bis 40 mm Dicke; die kleinere darüber

@@ -1,5 +1,5 @@
 ---
-erzeugt: 300ae4d5c27b
+erzeugt: e91c9f7a91f5
 art: modul
 tags: [modul]
 ---
@@ -10,13 +10,13 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Eine Schnittstelle fuer beide Arten Resistenzlinie, damit der Nachweis und
-alles, was an ihm mitliest -- Querkraft, sproedes Versagen, Knicken --, nicht
+alles, was an ihm mitliest – Querkraft, sproedes Versagen, Knicken –, nicht
 fragen muss, welche er vor sich hat:
 
-* [[opencivil.nachweis.resistenzlinie#Handlinie|Handlinie]] -- das Polygon der Handrechnung
+* [[opencivil.nachweis.resistenzlinie#Handlinie|Handlinie]] – das Polygon der Handrechnung
   ([[opencivil.nachweis.handrechnung]]): wenige Eckpunkte, dazwischen
   geradlinig interpoliert. Jede Zahl laesst sich von Hand nachrechnen.
-* [[opencivil.nachweis.resistenzlinie#Ebenenlinie|Ebenenlinie]] -- der Rand des Dehnungsfaechers, mit dem
+* [[opencivil.nachweis.resistenzlinie#Ebenenlinie|Ebenenlinie]] – der Rand des Dehnungsfaechers, mit dem
   Spannungsblock oder der Parabel, die gedrueckte Bewehrung eingeschlossen:
   der Faecher der Interaktion
   ([[opencivil.querschnitt.interaktion#Querschnitt.faecherebenen|faecherebenen]]),
@@ -24,7 +24,7 @@ fragen muss, welche er vor sich hat:
   ([[opencivil.nachweis.rechenwahl#Gesetze.querschnitt|querschnitt]]). Ihr Polygon
   dient zum Zeichnen und zum Eingrenzen. Den Widerstand bei einer
   Normalkraft (oder einem Moment) sucht sie auf dem Faecher selbst, zwischen
-  den beiden Ebenen, die ihn einschliessen -- nicht auf der Sehne
+  den beiden Ebenen, die ihn einschliessen – nicht auf der Sehne
   dazwischen. So haengt keine Zahl im Bericht an der Schrittweite der
   Zeichnung. Bis 2026-11-20 fuhr sie einen eigenen Faecher ab, mit eigenen
   Grenzen und Fasern.
@@ -43,7 +43,7 @@ protokoll_treffer(...)       wie ein Widerstand gefunden wurde
 
 ## WIE EIN WIDERSTAND DER EBENENLINIE IN DIE HERLEITUNG KOMMT
 
-Nicht die Suche, sondern ihre Probe -- wie bei der Querschnittsanalyse: die
+Nicht die Suche, sondern ihre Probe – wie bei der Querschnittsanalyse: die
 gefundene Ebene, die Kraft jedes Teils und die Summen. Das laesst sich mit
 dem Taschenrechner nachpruefen, die Suche nicht.
 
@@ -85,7 +85,7 @@ Wo eine Gerade `achse.gegen = fest` die Linie aeusserst trifft.
 - `a: Any`
 - `b: Any` – Die Stuetzpunkte des Polygons, zwischen denen er liegt.
 - `eps_oben: Optional[float] = None`
-- `eps_unten: Optional[float] = None` – Die Dehnungsebene dort -- nur bei der Ebenenlinie, die ihn genau sucht.
+- `eps_unten: Optional[float] = None` – Die Dehnungsebene dort – nur bei der Ebenenlinie, die ihn genau sucht.
 
 ### Widerstandslinie
 
@@ -93,7 +93,7 @@ Wo eine Gerade `achse.gegen = fest` die Linie aeusserst trifft.
 class Widerstandslinie
 ```
 
-Was der M-N-Nachweis von einer Resistenzlinie braucht -- siehe Dateikopf.
+Was der M-N-Nachweis von einer Resistenzlinie braucht – siehe Dateikopf.
 
 - `wahl: Rechenwahl`
 - `punkte: List[Any]`
@@ -123,7 +123,7 @@ def kante(self, achse: geo.Achse, fest: float, positiv: bool) -> Optional[Treffe
 def moment_bei(self, N: float, positiv: bool) -> Optional[float]
 ```
 
-Der Momentenwiderstand bei dieser Normalkraft, als Betrag -- `None`,
+Der Momentenwiderstand bei dieser Normalkraft, als Betrag – `None`,
 wenn sie ausserhalb der Linie liegt.
 
 #### Widerstandslinie.eckwerte
@@ -139,7 +139,7 @@ def protokoll_treffer(self, p: Protokoll, treffer: Treffer, *, achse: geo.Achse,
 ```
 
 Wie der Widerstand gefunden wurde. `ergebnis` ist der Wert, unter dem
-er weitergeht -- etwa eine Kennzahl der Platte; ohne ihn heisst er
+er weitergeht – etwa eine Kennzahl der Platte; ohne ihn heisst er
 schlicht `N_Rd` oder `M_Rd`.
 
 ### _eckwerte
@@ -148,7 +148,7 @@ schlicht `N_Rd` oder `M_Rd`.
 def _eckwerte(extrem: Callable[[geo.Achse, bool], float], bei_null: Sequence[float]) -> Dict[str, float]
 ```
 
-Die Eckwerte, in SI -- bei beiden Linien in derselben Gestalt.
+Die Eckwerte, in SI – bei beiden Linien in derselben Gestalt.
 `extrem(achse, positiv)` ist der groesste (oder kleinste) Wert der
 Linie auf einer Achse.
 
@@ -158,7 +158,7 @@ Linie auf einer Achse.
 class Handlinie(Widerstandslinie)
 ```
 
-Das Polygon der Handrechnung -- geradlinig zwischen den Eckpunkten.
+Das Polygon der Handrechnung – geradlinig zwischen den Eckpunkten.
 
 #### Handlinie.innerhalb
 
@@ -190,8 +190,8 @@ mit welchem Anteil.
 Ohne diesen Schritt stuende in der Mitschrift eine Zahl, die zwar aus
 nachvollziehbaren Eckpunkten stammt, aber selbst vom Himmel faellt.
 
-Faellt die festgehaltene Groesse genau auf einen Eckpunkt -- der haeufige
-Fall `N_Ed = 0`, und ebenso `M_Ed = 0` bei reiner Normalkraft --, wird
+Faellt die festgehaltene Groesse genau auf einen Eckpunkt – der haeufige
+Fall `N_Ed = 0`, und ebenso `M_Ed = 0` bei reiner Normalkraft –, wird
 nicht interpoliert. Dort stuende sonst ein Bruch mit null im Zaehler, der
 nichts erklaert und nur so aussieht, als waere etwas gerechnet worden.
 
@@ -201,7 +201,7 @@ nichts erklaert und nur so aussieht, als waere etwas gerechnet worden.
 class Ebenenlinie(Widerstandslinie)
 ```
 
-Der Rand des Dehnungsfaechers -- genau nachgeschaerft, siehe Dateikopf.
+Der Rand des Dehnungsfaechers – genau nachgeschaerft, siehe Dateikopf.
 
 `querschnitt` ist die Platte als Querschnitt der Interaktion
 ([[opencivil.nachweis.rechenwahl#Gesetze.querschnitt|querschnitt]]), `lagen`
@@ -218,7 +218,7 @@ Lage liegt im Faecher genau auf dieser Grenze.
 def kraefte(self, eps_oben: float, eps_unten: float) -> Tuple[float, float]
 ```
 
-N und M der Ebene durch `eps_oben` und `eps_unten` -- um die halbe Hoehe.
+N und M der Ebene durch `eps_oben` und `eps_unten` – um die halbe Hoehe.
 
 #### Ebenenlinie.kante
 
@@ -229,7 +229,7 @@ def kante(self, achse: geo.Achse, fest: float, positiv: bool) -> Optional[Treffe
 Der aeusserste Schnitt, auf dem Faecher gesucht: zwischen den beiden
 Ebenen, deren Punkte ihn einschliessen. Zwei benachbarte Punkte liegen
 im selben Abschnitt des Faechers, und dort ist jede Ebene dazwischen
-selbst eine des Faechers -- die Suche bleibt auf dem Rand.
+selbst eine des Faechers – die Suche bleibt auf dem Rand.
 
 Einmal je Frage gerechnet: das Urteil, der Grad und der Widerstand
 bei N_Ed fragen dieselbe Kante.
@@ -250,7 +250,7 @@ widersprechen, der an denselben Raendern gemessen wird.
 def eckwerte(self) -> Dict[str, float]
 ```
 
-Auch die Spitzen liegen meist zwischen zwei Ebenen -- das groesste
+Auch die Spitzen liegen meist zwischen zwei Ebenen – das groesste
 Moment, und ebenso die groesste Druckkraft: kippt die Ebene ein wenig
 um den Punkt C, fliesst die gedrueckte Bewehrung und traegt mehr als
 beim gleichmaessigen -eps_c1d. Sie werden dort gesucht, wie der
@@ -264,7 +264,7 @@ def _extrem(self, achse: geo.Achse, positiv: bool) -> float
 
 Der groesste (oder kleinste) Wert auf einer Achse: um den Punkt der
 Linie, der ihn traegt, ueber die Ebenen bis zu seinen beiden
-Nachbarn -- mit dem Goldenen Schnitt.
+Nachbarn – mit dem Goldenen Schnitt.
 
 #### Ebenenlinie.erreicht
 
@@ -272,7 +272,7 @@ Nachbarn -- mit dem Goldenen Schnitt.
 def erreicht(self, eps_oben: float, eps_unten: float) -> List[str]
 ```
 
-Welche Grenzen diese Ebene erreicht -- die, die ihren Bruchzustand bestimmen.
+Welche Grenzen diese Ebene erreicht – die, die ihren Bruchzustand bestimmen.
 
 #### Ebenenlinie.protokoll_ansatz
 
@@ -280,7 +280,7 @@ Welche Grenzen diese Ebene erreicht -- die, die ihren Bruchzustand bestimmen.
 def protokoll_ansatz(self, p: Protokoll, e: Eingaben, *, beton, posten, phi: Wert, basis: str) -> None
 ```
 
-Wie die Linie entsteht -- einmal je Nachweis, vor den Kombinationen.
+Wie die Linie entsteht – einmal je Nachweis, vor den Kombinationen.
 Den Titel setzt der Nachweis; `e` und `posten` sind die der Linie
 ([[opencivil.nachweis.biegung_normalkraft#linienbezuege|linienbezuege]]).
 
@@ -291,7 +291,7 @@ def protokoll_treffer(self, p: Protokoll, treffer: Treffer, *, achse: geo.Achse,
 ```
 
 Die Probe des Bruchzustands, an dem der Widerstand liegt: die Ebene,
-die Kraft jedes Teils, die Summen -- und welche Grenze ihn bestimmt.
+die Kraft jedes Teils, die Summen – und welche Grenze ihn bestimmt.
 
 Der Stahl mit seiner vollen Spannung, `F = sigma_s · A_s`; der Beton
 als Resultierende ohne die Flaeche, die der Stahl einnimmt. So ist
@@ -323,7 +323,7 @@ Ein SI-Wert in Kilo-Einheiten, eine Nachkommastelle.
 - `SCHRITTE = 80` – Schritte je Abschnitt des Faechers der [[opencivil.nachweis.resistenzlinie#Ebenenlinie|Ebenenlinie]]. Die Linie nahe dem reinen Druck laeuft schnell und waere mit weniger sichtbar eckig. Die Zahlen im Bericht haengen nicht daran: die Linie sucht jeden Widerstand zwischen zwei Schritten genau.
 - `SCHRITTE_SUCHE = 20` – Schritte fuer die Bewehrungssuche, die kein Diagramm zeichnet. Ihre Zahlen sind dieselben (auf 1e-9): die Linie sucht jeden Widerstand und jede Spitze zwischen zwei Schritten genau, der Faecher grenzt nur ein. Ein Viertel der Ebenen, ein Viertel der Zeit.
 - `AUF_DER_GRENZE = 1e-12` – Ab welchem Abstand eine Dehnung nicht mehr auf ihrer Grenze liegt. Die gefundene Ebene haelt ihren Drehpunkt bis auf Rundung (1e-18); was naeher als dies an einer Grenze liegt, liegt auf ihr.
-- `GOLDSCHRITTE = 30` – Schritte des Goldenen Schnitts, der eine Spitze der Linie zwischen zwei Ebenen sucht: das Fenster schrumpft auf 1e-6 einer Schrittweite. An der Spitze ist die Linie flach -- der Fehler im Wert ist das Quadrat davon.
+- `GOLDSCHRITTE = 30` – Schritte des Goldenen Schnitts, der eine Spitze der Linie zwischen zwei Ebenen sucht: das Fenster schrumpft auf 1e-6 einer Schrittweite. An der Spitze ist die Linie flach – der Fehler im Wert ist das Quadrat davon.
 
 ## Braucht
 

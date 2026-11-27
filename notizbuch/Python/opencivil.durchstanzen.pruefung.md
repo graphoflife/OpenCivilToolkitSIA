@@ -1,5 +1,5 @@
 ---
-erzeugt: 95f1ed6257a3
+erzeugt: ae444b9e5975
 art: modul
 tags: [modul]
 ---
@@ -67,7 +67,7 @@ SI-Basis; Kräfte in N.
 class Grenzen
 ```
 
-Was Tabelle 21 bei einer statischen Höhe zulässt -- in m.
+Was Tabelle 21 bei einer statischen Höhe zulässt – in m.
 
 - `durchmesser: float`
 - `s_1: float`
@@ -78,7 +78,7 @@ Was Tabelle 21 bei einer statischen Höhe zulässt -- in m.
 def tabelle_21(d: float) -> Optional[Grenzen]
 ```
 
-Die Grenzen nach Tabelle 21 bei dieser statischen Höhe -- `None` unter 140 mm.
+Die Grenzen nach Tabelle 21 bei dieser statischen Höhe – `None` unter 140 mm.
 
 ### minderung
 
@@ -111,7 +111,7 @@ def exzentrizitaet(resultierende: Punkt, a: Auswertung) -> Tuple[float, float]
 ```
 
 e_u (4.3.6.2.4): vom Schwerpunkt der zählenden Teile eines Schnitts zur
-Resultierenden der Auflagerkraft -- je Komponente, in m.
+Resultierenden der Auflagerkraft – je Komponente, in m.
 
 ### KeRegel
 
@@ -121,7 +121,7 @@ class KeRegel(ABC)
 
 Wie k_e an den Schnitten einer Stelle bestimmt wird: einmal gewählt
 ([[opencivil.durchstanzen.nachweis#Durchstanzen.pruefe|.nachweis.Durchstanzen.pruefe]]), gefragt von jeder
-[[opencivil.durchstanzen.pruefung#Schnittpruefung|Schnittpruefung]] -- um die Stütze, um die Anker und um den Pilz.
+[[opencivil.durchstanzen.pruefung#Schnittpruefung|Schnittpruefung]] – um die Stütze, um die Anker und um den Pilz.
 
 #### KeRegel.hoechstens
 
@@ -131,7 +131,7 @@ Wie k_e an den Schnitten einer Stelle bestimmt wird: einmal gewählt
 def hoechstens(self) -> float
 ```
 
-Das grösste k_e, das die Regel an einem Schnitt gibt -- für die rasche Auslese der Pilze.
+Das grösste k_e, das die Regel an einem Schnitt gibt – für die rasche Auslese der Pilze.
 
 #### KeRegel.k_e
 
@@ -315,8 +315,8 @@ class Leistenpruefung
 ```
 
 Eine Durchstanzbewehrung an ihrem Ort und die Nachweise mit ihr
-(4.3.6.5.1): `innen` ist der Schnitt um die gestützte Fläche -- Stütze
-oder Pilz --, `aussen` der um die äussersten Anker.
+(4.3.6.5.1): `innen` ist der Schnitt um die gestützte Fläche – Stütze
+oder Pilz –, `aussen` der um die äussersten Anker.
 
 - `vorschlag: Vorschlag`
 - `innen: Schnittpruefung`
@@ -326,7 +326,7 @@ oder Pilz --, `aussen` der um die äussersten Anker.
 - `sigma_sd: float`
 - `f_yd: float` – Die Fliessgrenze der Anker (4.3.6.5.4).
 - `k_sys: float`
-- `eta: float` – η auf (68) und (70) -- siehe [[opencivil.durchstanzen.pruefung#minderung|minderung]].
+- `eta: float` – η auf (68) und (70) – siehe [[opencivil.durchstanzen.pruefung#minderung|minderung]].
 
 #### Leistenpruefung.A_sw
 
@@ -420,7 +420,7 @@ def diagonale_haelt(self) -> bool
 def reicht(self) -> bool
 ```
 
-Was mehr oder längere Leisten erreichen können -- die Druckdiagonale nicht.
+Was mehr oder längere Leisten erreichen können – die Druckdiagonale nicht.
 
 ### Pilzbefund
 

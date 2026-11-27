@@ -1,5 +1,5 @@
 ---
-erzeugt: e1709b9a6399
+erzeugt: 3aa57056ce8e
 art: modul
 tags: [modul]
 ---
@@ -9,11 +9,11 @@ tags: [modul]
 
 ## VERANTWORTUNG
 
-Der Riss einer Linie -- fuer die Platte und den gezeichneten Querschnitt
+Der Riss einer Linie – fuer die Platte und den gezeichneten Querschnitt
 dieselbe Rechnung und dieselbe Herleitung ([[opencivil.spannungsanalyse.riss#Bruttoriss|Bruttoriss]]), und was ein
 Paar aus Stahlbeton sonst in die Herleitung schreibt: den wirksamen Modul,
 die Gesetze des Betons, die Fliessdehnungen und die Grenzdehnungen
-([[opencivil.spannungsanalyse.riss#Bruttoriss.herleitung_gesetze|Bruttoriss.herleitung_gesetze]]) -- bis 2026-11-26 stand das in
+([[opencivil.spannungsanalyse.riss#Bruttoriss.herleitung_gesetze|Bruttoriss.herleitung_gesetze]]) – bis 2026-11-26 stand das in
 [[opencivil.spannungsanalyse.herleitung]], fuer jedes Paar. Gerechnet
 wird am ungerissenen Bruttoquerschnitt, ohne Stahl, wie beim sproeden
 Versagen ([[opencivil.nachweis.rissgroessen]]):
@@ -28,14 +28,14 @@ Unter reiner Biegung mit dem Deviationsmoment `I_yz`, «einachsig» mit
 fuer die rissaktive Dicke; der Beton der Ecke gibt `f_ctm`. Die Platte ist
 ein Rechteck `b × h` und immer einachsig: `A = b·h`, `W = b·h²/6`.
 
-Was nur das Paar weiss, schreibt es selbst: woher `A` und `I` kommen --
-aus der Querschnittsanalyse oder aus `b` und `h` -- und welche Dicke
+Was nur das Paar weiss, schreibt es selbst: woher `A` und `I` kommen –
+aus der Querschnittsanalyse oder aus `b` und `h` – und welche Dicke
 unter Zug reisst: beim gezeichneten Querschnitt die kleinere Abmessung
 `min(h; b)`, bei der Platte ihre Dicke `h`, denn ihr Streifen `b` ist
 keine Abmessung der Platte
 ([[opencivil.nachweis.rissgroessen#rissaktive_dicke|rissaktive_dicke]]). Bis 2026-11-21
 rechnete die Platte ihren Riss selbst, in `b` und `h`:
-`M_Riss(N) = M_Riss - N·h/6` -- dieselben Zahlen, aber eine zweite
+`M_Riss(N) = M_Riss - N·h/6` – dieselben Zahlen, aber eine zweite
 Rechnung, und ihre Herleitung nannte `M_Riss`, ohne es herzuleiten.
 
 
@@ -46,7 +46,7 @@ Zustand daneben rechnet mit Stahl und Kriechzahl und ist darum steifer; beim
 Rissmoment steht sein Rand etwas unter `f_ct,eff`. SIA 262:2025 laesst den
 Querschnitt reissen, wenn der Beton `f_ctm` oder eine Fraktile erreicht,
 ohne `k_t` (4.2.1.14), und rechnet ihn ungerissen mit dem Stahl
-(4.1.4.1.4) -- Entscheid des Benutzers offen (`notizbuch/Notizen/TODO.md`).
+(4.1.4.1.4) – Entscheid des Benutzers offen (`notizbuch/Notizen/TODO.md`).
 Das Rissmoment nimmt `k_t` fuer ein Drittel der Tiefe, auch unter Zug; die
 Rissnormalkraft die ganze rissaktive Dicke. Beim selben N und M reissen die
 beiden Linien darum nicht am selben Punkt.
@@ -65,7 +65,7 @@ class Bruttoriss
 ```
 
 Der Riss eines Paars am Bruttoquerschnitt: Rechnung und Herleitung, dazu
-der reine Betonquerschnitt des aequivalenten Moduls -- derselbe
+der reine Betonquerschnitt des aequivalenten Moduls – derselbe
 Querschnitt.
 
 Das Paar gibt den Bruttoquerschnitt (`brutto`) mit seinem Rissmoment
@@ -73,7 +73,7 @@ unter reiner Biegung (`riss`), seine Flaeche `A`, die rissaktive
 Dicke unter Zug (`t_zug`), die Zugseite (`seite`), den gerissenen
 Loeser (`gerissen`), seine Wahl (`wahl`), den Modul `E_cm` des
 Betons, die Staehle seiner Lagen (`staehle`) und die Wert-IDs der
-Herleitung (`ids`) -- und Stuecke Herleitung, die nur es kennt:
+Herleitung (`ids`) – und Stuecke Herleitung, die nur es kennt:
 [[opencivil.spannungsanalyse.riss#Bruttoriss.tiefe|tiefe]], [[opencivil.spannungsanalyse.riss#Bruttoriss.herleitung_bruttoquerschnitt|herleitung_bruttoquerschnitt]] und
 [[opencivil.spannungsanalyse.riss#Bruttoriss.herleitung_dicke_unter_zug|herleitung_dicke_unter_zug]].
 
@@ -89,7 +89,7 @@ Herleitung (`ids`) -- und Stuecke Herleitung, die nur es kennt:
 - `ids: Mapping[str, str]`
 - `flaeche = 'Beton'` – Woraus die Flaeche ist, fuer das Bild.
 - `OHNE_FLIESSEN = 'Bis zum Bruch fliesst kein Stahl: der Beton versagt zuerst.'` – Was eine Linie sagt, die bis zum Bruch nicht fliesst.
-- `ZUR_ANDEREN_ACHSE = ''` – Was die Erklaerung der festen Nulllinie ueber das Moment um die andere Achse sagt -- beim gezeichneten Querschnitt ist «einachsig» eine Wahl; an der Platte, einem Rechteck, entsteht keines.
+- `ZUR_ANDEREN_ACHSE = ''` – Was die Erklaerung der festen Nulllinie ueber das Moment um die andere Achse sagt – beim gezeichneten Querschnitt ist «einachsig» eine Wahl; an der Platte, einem Rechteck, entsteht keines.
 - `DICKE_UNTER_ZUG = ''` – Welche Dicke unter Zug reisst, in Worten.
 - `mit_kriechzahl = True` – In den Analysen rechnet der ungerissene Teil immer mit `E_cm/(1+phi)`: die Kriechzahl wirkt bei jeder Rechenart.
 
@@ -110,7 +110,7 @@ und sein Gesetz zeigt die Herleitung. Die Platte hat nur ihn.
 def betone(self) -> Tuple[Any, ...]
 ```
 
-Die Betone des Querschnitts, jeder einmal -- aus den Ecken des Bruttoquerschnitts.
+Die Betone des Querschnitts, jeder einmal – aus den Ecken des Bruttoquerschnitts.
 
 #### Bruttoriss.rechenart
 
@@ -191,7 +191,7 @@ def k_t_zug(self) -> float
 def rissmoment_bei(self, N: float) -> float
 ```
 
-`M_Riss(N) = (f_ct,eff - N/A)·W` in Nm, N Zug positiv -- Druck hebt es, Zug senkt es.
+`M_Riss(N) = (f_ct,eff - N/A)·W` in Nm, N Zug positiv – Druck hebt es, Zug senkt es.
 
 #### Bruttoriss.rissnormalkraft
 
@@ -199,7 +199,7 @@ def rissmoment_bei(self, N: float) -> float
 def rissnormalkraft(self, M: float) -> Rissnormalkraft
 ```
 
-Die Rissnormalkraft beim Moment `M` -- an der Ecke, die zuerst reisst.
+Die Rissnormalkraft beim Moment `M` – an der Ecke, die zuerst reisst.
 
 #### Bruttoriss.rissnormalkraft_bei
 
@@ -207,7 +207,7 @@ Die Rissnormalkraft beim Moment `M` -- an der Ecke, die zuerst reisst.
 def rissnormalkraft_bei(self, M: float) -> float
 ```
 
-`N_Riss(M) = (f_ct,eff,t - σ_M)·A` in N -- ein Moment senkt sie, gleich in welche Richtung.
+`N_Riss(M) = (f_ct,eff,t - σ_M)·A` in N – ein Moment senkt sie, gleich in welche Richtung.
 
 #### Bruttoriss.vorgespannt
 
@@ -216,7 +216,7 @@ def rissnormalkraft_bei(self, M: float) -> float
 def vorgespannt(self) -> bool
 ```
 
-Ob Spannglieder mit Vordehnung den Beton druecken -- sie verschieben den Riss.
+Ob Spannglieder mit Vordehnung den Beton druecken – sie verschieben den Riss.
 
 #### Bruttoriss.tiefe
 
@@ -224,7 +224,7 @@ Ob Spannglieder mit Vordehnung den Beton druecken -- sie verschieben den Riss.
 def tiefe(self, w: Zwischenwerte, ein: Callable[[str], 'Wert']) -> 'Wert'
 ```
 
-Die Tiefe `h`, ueber die die Linie laeuft -- wie das Paar sie misst.
+Die Tiefe `h`, ueber die die Linie laeuft – wie das Paar sie misst.
 
 #### Bruttoriss.herleitung_bruttoquerschnitt
 
@@ -232,7 +232,7 @@ Die Tiefe `h`, ueber die die Linie laeuft -- wie das Paar sie misst.
 def herleitung_bruttoquerschnitt(self, p: Protokoll, w: Zwischenwerte, ein: Callable[[str], 'Wert'], h: 'Wert') -> Tuple['Wert', 'Wert']
 ```
 
-`A` und `I` als Werte der Herleitung -- woher sie kommen, weiss das Paar.
+`A` und `I` als Werte der Herleitung – woher sie kommen, weiss das Paar.
 
 #### Bruttoriss.herleitung_dicke_unter_zug
 
@@ -240,7 +240,7 @@ def herleitung_bruttoquerschnitt(self, p: Protokoll, w: Zwischenwerte, ein: Call
 def herleitung_dicke_unter_zug(self, p: Protokoll, w: Zwischenwerte, h: 'Wert') -> 'Wert'
 ```
 
-Die rissaktive Dicke unter Zug, `t` -- wie das Paar sie misst.
+Die rissaktive Dicke unter Zug, `t` – wie das Paar sie misst.
 
 #### Bruttoriss.herleitung_gesetze
 
@@ -250,8 +250,8 @@ def herleitung_gesetze(self, p: Protokoll, w: Zwischenwerte, linie: 'Linie', ein
 
 Was ein Paar aus Stahlbeton vor dem Ende der Linie schreibt: den
 wirksamen Modul, den Beton ungerissen und gerissen, wie die Loeser ihn
-rechnen -- aus derselben Stelle
-([[opencivil.querschnitt.gesetzwahl#betongesetz|betongesetz]]) --, den Riss
+rechnen – aus derselben Stelle
+([[opencivil.querschnitt.gesetzwahl#betongesetz|betongesetz]]) –, den Riss
 ([[opencivil.spannungsanalyse.riss#Bruttoriss.herleitung_riss|herleitung_riss]]), die Fliessdehnung jedes Stahls und die
 Grenzdehnungen. Zurueck die Tiefe und `A`, `I` des
 Bruttoquerschnitts.
@@ -264,7 +264,7 @@ def herleitung_riss(self, p: Protokoll, w: Zwischenwerte, linie: 'Linie', ein: C
 
 Wo die Linie reisst: das Rissmoment bei N oder die Rissnormalkraft bei
 M, am Bruttoquerschnitt. Zurueck kommen dessen `A` und `I`, wie die
-Herleitung sie nennt -- auf sie bezieht sich der aequivalente Modul.
+Herleitung sie nennt – auf sie bezieht sich der aequivalente Modul.
 
 #### Bruttoriss._herleitung_rissmoment
 
@@ -304,7 +304,7 @@ Der reine Betonquerschnitt des Moduls ueber der Normalkraft: der Bruttoquerschni
 class _Abzug
 ```
 
-Was die Vorspannung in eine Rissbedingung schreibt -- ohne sie nichts.
+Was die Vorspannung in eine Rissbedingung schreibt – ohne sie nichts.
 
 
 ## Braucht

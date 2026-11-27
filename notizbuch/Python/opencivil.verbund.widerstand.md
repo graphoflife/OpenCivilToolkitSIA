@@ -1,5 +1,5 @@
 ---
-erzeugt: 9a70cc63fb35
+erzeugt: 3bbd216d22f8
 art: modul
 tags: [modul]
 ---
@@ -9,8 +9,8 @@ tags: [modul]
 
 ## VERANTWORTUNG
 
-Zu einem Lastfall -- `N`, die Momente um den Bezugspunkt, die Querkraefte
--- der plastische Widerstand des gezeichneten Verbundquerschnitts nach
+Zu einem Lastfall – `N`, die Momente um den Bezugspunkt, die Querkraefte
+– der plastische Widerstand des gezeichneten Verbundquerschnitts nach
 SIA 264:2014, ohne Herleitung, in N, mm und N/mm² ([[opencivil.verbund.widerstand#rechnen|rechnen]]); dazu
 der Widerstand bei `N = 0` zu einer Seite ([[opencivil.verbund.widerstand#biegewiderstand|biegewiderstand]]). Die
 Herleitung schreiben [[opencivil.nachweis.qa_verbund]] und
@@ -28,14 +28,14 @@ Herleitung schreiben [[opencivil.nachweis.qa_verbund]] und
   (5.1.2.3); sonst steht grau, warum nicht ([[opencivil.verbund.widerstand#Fall|Fall.grund]]);
 * `β` nach 5.1.2.2, wo ein Baustahl S420 oder S460 ist;
 * mit Duebeln, die weniger tragen, als der gedrueckte Beton bei voller
-  Verduebelung braucht, der Zustand mit Teilverduebelung (6.1.1.6) -- siehe
+  Verduebelung braucht, der Zustand mit Teilverduebelung (6.1.1.6) – siehe
   unten. Ob sie dafuer reichen (29), prueft der Nachweis
   ([[opencivil.nachweis.qa_verbund]]), mit [[opencivil.verbund.duebel]].
 
 
 ## TEILVERDUEBELUNG
 
-(6.1.1.6) -- nach der Theorie der teilweisen Verduebelung
+(6.1.1.6) – nach der Theorie der teilweisen Verduebelung
 Beton und Betonstahl ausserhalb der Profile tragen zusammen nur die Kraft
 der Duebel, `-N·P_Rd`, der Stahl mit dem Kammerbeton den Rest von `N`
 ([[opencivil.verbund.querschnitt#Verbundquerschnitt.getrennt|getrennt]]). Jeder
@@ -51,11 +51,11 @@ den Zustand mit einer Nulllinie).
 ## DER MASSSTAB
 
 Wie beim Stahl ([[opencivil.stahlbau.widerstand]]): `N` bleibt, das
-Moment waechst in seiner Richtung, bis der Widerstand erreicht ist --
+Moment waechst in seiner Richtung, bis der Widerstand erreicht ist –
 `α = M_Rd/M_Ed`. Ohne Moment `N_Rd/N_Ed`. Traegt schon die Normalkraft
 allein nicht, misst `α` sie.
 
-5.1.2.3 -- nach Vorgabe, nicht nachgeschlagen:
+5.1.2.3 – nach Vorgabe, nicht nachgeschlagen:
 Die Norm nennt den Fall des negativen Moments eines Traegers: die Platte
 gezogen. Der Querschnitt weiss nicht, was Platte ist; gefragt wird darum
 jeder Betonstahl, den ein Moment zieht. Ohne Moment gilt die Regel nicht.
@@ -85,7 +85,7 @@ Warum ein gezogener Betonstahl den plastischen Widerstand verbietet (5.1.2.3).
 class Beta
 ```
 
-`x_p` und `h` nach 5.1.2.2 an einer Nulllinie, in mm -- und was daraus folgt.
+`x_p` und `h` nach 5.1.2.2 an einer Nulllinie, in mm – und was daraus folgt.
 
 - `x_p: float`
 - `h: float`
@@ -104,7 +104,7 @@ def verhaeltnis(self) -> float
 def beta(self) -> Optional[float]
 ```
 
-`β` nach Figur 1 -- `None` ueber 0.4, wo sie endet.
+`β` nach Figur 1 – `None` ueber 0.4, wo sie endet.
 
 ### Teilzustand
 
@@ -140,7 +140,7 @@ def teilverduebelt(beton: Starrplastisch, stahl: Starrplastisch, N: float, N_bet
 
 Der Zustand, in dem Beton und Betonstahl ausserhalb der Profile zusammen
 `N_beton` tragen und der Stahl mit dem Kammerbeton den Rest von `N`,
-mit dem Moment in der Richtung von `(M_y, M_z)` -- `None`, wo ein
+mit dem Moment in der Richtung von `(M_y, M_z)` – `None`, wo ein
 Teil das Seine nicht traegt.
 
 ### Fall
@@ -150,7 +150,7 @@ Teil das Seine nicht traegt.
 class Fall
 ```
 
-Was ein Lastfall am Verbundquerschnitt ergibt -- siehe Dateikopf. In N und N·mm.
+Was ein Lastfall am Verbundquerschnitt ergibt – siehe Dateikopf. In N und N·mm.
 
 - `N: float`
 - `M_y: float`
@@ -159,17 +159,17 @@ Was ein Lastfall am Verbundquerschnitt ergibt -- siehe Dateikopf. In N und N·mm
 - `querkraefte: Tuple[wd.Querkraft, ...]`
 - `abgemindert: wd.Abgemindert`
 - `starr: Starrplastisch`
-- `linie: Linie` – Die plastische Nulllinie -- ohne Moment gleichmaessig gedrueckt oder gezogen.
+- `linie: Linie` – Die plastische Nulllinie – ohne Moment gleichmaessig gedrueckt oder gezogen.
 - `zustaende: List[Blechzustand]`
 - `freie: List[Teil]` – Die frei gezeichneten Flaechen aus Baustahl, die gedrueckt sind.
 - `klasse: int` – 1, 2 oder 3 fuer «über 2» ([[opencivil.verbund.querschnitt]]).
 - `plastisch: Optional[Zustand] = None`
 - `beta: Optional[Beta] = None` – Nur mit einem Baustahl S420 oder S460 und gedruecktem Beton.
 - `sproede: List[str] = field(default_factory=list)` – Die Namen der gezogenen Betonstaehle, die nicht in Klasse B oder C sind (5.1.2.3).
-- `N_c: Optional[float] = None` – Was Beton und Betonstahl ausserhalb der Profile zusammen im plastischen Zustand bei voller Verduebelung tragen, in N -- negativ gedrueckt; nur mit diesem Zustand.
-- `duebel: Optional[float] = None` – Was die Duebel bis zum Momentennullpunkt tragen, `N·P_Rd` in N -- `None`: volle Verduebelung.
+- `N_c: Optional[float] = None` – Was Beton und Betonstahl ausserhalb der Profile zusammen im plastischen Zustand bei voller Verduebelung tragen, in N – negativ gedrueckt; nur mit diesem Zustand.
+- `duebel: Optional[float] = None` – Was die Duebel bis zum Momentennullpunkt tragen, `N·P_Rd` in N – `None`: volle Verduebelung.
 - `teil: Optional[Teilzustand] = None` – Der Zustand mit Teilverduebelung, wo er gilt ([[opencivil.verbund.widerstand#Fall.teilverduebelt|teilverduebelt]]).
-- `grund: str = ''` – Warum der Fall grau bleibt -- leer, wo er rechnet.
+- `grund: str = ''` – Warum der Fall grau bleibt – leer, wo er rechnet.
 - `alpha: Optional[float] = None`
 - `alpha_N: Optional[float] = None` – Wo die Normalkraft allein nicht traegt: um welchen Faktor sie kleiner sein muesste.
 
@@ -221,7 +221,7 @@ Die Nulllinie, an der der Beton gedrueckt ist und der Betonstahl gezogen.
 def _fall(verbund: Verbundquerschnitt, ab: wd.Abgemindert, starr: Starrplastisch, eps: Sequence[float], N: float, M_y: float, M_z: float, moment: float, querkraefte: Sequence[wd.Querkraft], linie: Linie) -> Fall
 ```
 
-Der Fall mit den Klassen an der Nulllinie -- grau, wo ein Blech ueber Klasse 2 liegt.
+Der Fall mit den Klassen an der Nulllinie – grau, wo ein Blech ueber Klasse 2 liegt.
 
 ### sproede_gezogen
 
@@ -237,7 +237,7 @@ Die gezogenen Betonstaehle, die nicht in der Duktilitaetsklasse B oder C sind (5
 def _bewerten(fall: Fall, verbund: Verbundquerschnitt, hochfest: bool) -> None
 ```
 
-5.1.2.3 und `β` an einem plastischen Zustand mit Moment -- siehe Dateikopf.
+5.1.2.3 und `β` an einem plastischen Zustand mit Moment – siehe Dateikopf.
 
 ### rechnen
 
@@ -245,12 +245,12 @@ def _bewerten(fall: Fall, verbund: Verbundquerschnitt, hochfest: bool) -> None
 def rechnen(verbund: Verbundquerschnitt, zug: Sequence[float], druck: Sequence[float], eps: Sequence[float], N: float, M_y: float, M_z: float, querkraefte: Sequence[wd.Querkraft], bezug: Punkt, biegung: Biegung, hochfest: bool, duebel: Optional[float]=None) -> Fall
 ```
 
-Ein Lastfall am Verbundquerschnitt -- siehe Dateikopf. `zug` und
+Ein Lastfall am Verbundquerschnitt – siehe Dateikopf. `zug` und
 `druck` je Gruppe die Festigkeiten, `eps` je Gruppe des Stahls sein
 `ε`; `M_y` und `M_z`, wie sie zaehlen
 ([[opencivil.querschnitt.biegung#Biegung.wirkt|wirkt]]); `hochfest`, ob
 ein Baustahl S420 oder S460 ist; `duebel`, was die Duebel bis zum
-Momentennullpunkt tragen, in N -- `None`: volle Verduebelung, wie
+Momentennullpunkt tragen, in N – `None`: volle Verduebelung, wie
 5.1.2.1 sie annimmt.
 
 ### biegewiderstand
@@ -259,7 +259,7 @@ Momentennullpunkt tragen, in N -- `None`: volle Verduebelung, wie
 def biegewiderstand(verbund: Verbundquerschnitt, zug: Sequence[float], druck: Sequence[float], eps: Sequence[float], seite: Zugseite, bezug: Punkt, hochfest: bool) -> Fall
 ```
 
-Der Widerstand bei `N = 0` gegen ein Moment, das `seite` zieht --
+Der Widerstand bei `N = 0` gegen ein Moment, das `seite` zieht –
 die Nulllinie parallel zu y oder z. Sein Moment steht in
 [[opencivil.verbund.widerstand#Fall|Fall.plastisch]], mit `β` mal [[opencivil.verbund.widerstand#Fall.faktor_beta|Fall.faktor_beta]].
 

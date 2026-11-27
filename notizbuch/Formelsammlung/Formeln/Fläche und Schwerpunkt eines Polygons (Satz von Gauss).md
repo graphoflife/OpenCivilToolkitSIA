@@ -24,7 +24,7 @@ $$
 
 Fläche und Schwerpunkt eines beliebigen Polygons aus seinen Ecken allein: der
 Satz von Gauss verwandelt das Flächenintegral in eine Summe über die Kanten.
-Jede Kante trägt mit dem Kreuzprodukt $c_i$ ihrer beiden Ecken bei -- das ist
+Jede Kante trägt mit dem Kreuzprodukt $c_i$ ihrer beiden Ecken bei – das ist
 die doppelte Fläche des Dreiecks aus Ursprung und Kante. Gegen den Uhrzeiger
 umlaufen ergibt sich eine positive Fläche.
 

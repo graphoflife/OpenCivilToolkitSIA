@@ -1,5 +1,5 @@
 ---
-erzeugt: 7c838e31f707
+erzeugt: 9361c64ef04a
 art: modul
 tags: [modul]
 ---
@@ -29,7 +29,7 @@ def beispiel() -> Projekt
 Ein lauffähiges Beispiel, damit die Oberfläche nicht leer startet.
 
 Gebaut über dieselben Methoden, die man ohne Oberfläche benutzt. So
-steht die Fassade an einer Stelle vorgeführt -- und der
+steht die Fassade an einer Stelle vorgeführt – und der
 Schnappschuss-Test prüft sie mit: baute sie etwas anderes als die
 Einträge von Hand, die hier vorher standen, änderte sich der Bericht.
 
@@ -39,11 +39,11 @@ Einträge von Hand, die hier vorher standen, änderte sich der Bericht.
 def jeder_nachweis() -> Projekt
 ```
 
-Jeder Nachweis einmal laut -- und die Fälle, die das Beispiel nie zeigt.
+Jeder Nachweis einmal laut – und die Fälle, die das Beispiel nie zeigt.
 
 Zusammen mit [[opencivil.projekt.beispiele#beispiel|beispiel]] führt es jeden Nachweis einmal laut; ein
 Test wacht darüber. Aus den beiden stammen der Schnappschuss des
-Berichts und die Formelsammlung der Oberfläche -- darum steht es hier
+Berichts und die Formelsammlung der Oberfläche – darum steht es hier
 und nicht bei den Tests.
 
 Erhöhte Anforderung mit allen Schaltern und begrenzter rissaktiver
@@ -51,10 +51,10 @@ Dicke, häufige und quasi-ständige Lastfälle abgeleitet und eigene, Bügel
 mit Stabzahl in y, ein Knickfall, die Verformung im Feld und am
 Kragarm; eine zweite Platte mit x aussen und b = 500 mm, die im Feld
 nicht aufgeht, auch nicht in der Durchbiegung, und deren Stahl unter
-Dauerlast fliesst, dazu Querkraft ohne Bügel -- einmal über m_Rd,
+Dauerlast fliesst, dazu Querkraft ohne Bügel – einmal über m_Rd,
 einmal darunter, mit Einlage; eine dritte ohne x-Bewehrung; eine vierte mit
 Querkraft ohne Einlage, einer Einwirkung, die am kürzesten Abstand
-gemessen wird, und ⌀40 in y unter der x-Bewehrung -- die fliesst bei
+gemessen wird, und ⌀40 in y unter der x-Bewehrung – die fliesst bei
 x = h/2 nicht. Gebaut über die Fassade, wie ein Benutzer es in Python
 täte.
 
@@ -70,7 +70,7 @@ einer Wand und drei Stützen, versteckte Unterzüge in zwei Stufen, fest
 Platte, das Eigengewicht darin. Und eine, die jede Wahl einmal braucht:
 zwei Platten verschiedener Dicke in einem L, automatisch aufgeteilt, mit
 einer Zone, einer eingespannten Wand, einem Rand an einer Symmetrieachse
-und einer Stütze mit Stützenbereich von Hand -- daneben eine schiefe
+und einer Stütze mit Stützenbereich von Hand – daneben eine schiefe
 Platte, deren Streifen ihren Rändern folgen. Sie hat die Lastfälle und
 Kombinationen einer frischen Decke und jede Art Last: auf einer ganzen
 Platte, gezeichnet, längs einer Linie und an einem Punkt. Die erste
@@ -115,9 +115,9 @@ Widerstand gibt.
 def _setzungen(p: Projekt) -> None
 ```
 
-Das Beispiel der Tabelle 8.4 des Kapitels -- ein Bauwerk 15 × 8 m, starr,
+Das Beispiel der Tabelle 8.4 des Kapitels – ein Bauwerk 15 × 8 m, starr,
 auf Kiessand über Ton; der Kiessand setzt sich dort nicht, hier fast
-nicht --, das mit 20 mm nicht aufgeht; dazu ein schlaffer Damm mit
+nicht –, das mit 20 mm nicht aufgeht; dazu ein schlaffer Damm mit
 Wiederbelastung, und eine Berechnung ohne Schicht.
 
 ### _pfaehle
@@ -130,12 +130,12 @@ Jede Spielart des Pfahls. Ein Bohrpfahl im Kies, das Grundwasser teilt
 eine Schicht, die oberste trägt nicht; sein Fuss schert örtlich ab, in
 der Moräne liegt K über K_0, und er wird auch gezogen, quer mit einem
 Moment am frei drehbaren Kopf. Ein Bohrpfahl im Ton, undrainiert an
-Mantel und Fuss, der auf Druck nicht aufgeht, der Kopf eingespannt --
+Mantel und Fuss, der auf Druck nicht aufgeht, der Kopf eingespannt –
 sein Moment zählt dann nicht. Ein Mikropfahl mit Rohr aus einem
 statischen Versuch, ohne Schichten und darum ohne Steifigkeit, mit
 Abrostung und η_i über dem Regelwert; einer mit Vollstab aus Erfahrung,
 die Mantelreibung aus dem geotechnischen Bericht, der Spitzendruck
-eingegeben, quer leicht belastet -- und schon das trägt er nicht: ein
+eingegeben, quer leicht belastet – und schon das trägt er nicht: ein
 gezogener Stab hält quer wenig, und am Terrain drückt er den Kies
 stärker, als dieser hält.
 
@@ -146,13 +146,13 @@ def _gebaeude(p: Projekt) -> None
 ```
 
 Was das Wohnhaus des Beispiels nie zeigt. Ein Lager mit T_1 von Hand und
-ohne Wand -- die Kraefte je Geschoss bleiben ohne Verteilung --, in
+ohne Wand – die Kraefte je Geschoss bleiben ohne Verteilung –, in
 Zone Z3b auf Baugrund E, Bauwerksklasse III: in x liegt T_1 unter T_B
 (31), in y zwischen T_C und T_D (33) und ueber 4 T_C, (39) geht dort
 nicht auf. Sein Grundriss ist nicht regelmaessig und das Dach schwerer
 als das Erdgeschoss: das Verfahren gilt nicht. Ein schlanker Turm auf
-einer Winkelwand, deren y und z keine Hauptachsen sind -- in y schwingt
-er langsamer als T_D (34) --, duktil bemessen mit q = 3.0: dafuer steht
+einer Winkelwand, deren y und z keine Hauptachsen sind – in y schwingt
+er langsamer als T_D (34) –, duktil bemessen mit q = 3.0: dafuer steht
 der graue Satz zu den Waenden. Und ein Gebaeude, dessen Wand noch keinen
 Querschnitt hat: es rechnet nicht.
 
@@ -188,7 +188,7 @@ def _alles_einmal(p: Projekt, decke: QuerschnittEintrag, analyse: Querschnittsan
 
 Jede Vorlage, Kennwerte von Hand, Platte und Analyse als
 Querschnitt, beide mit E_eq; jede Form der Stahlprofile um beide
-Achsen -- ohne Stab, ausser dem HEB --, das Doppel-T ohne Stab; ein
+Achsen – ohne Stab, ausser dem HEB –, das Doppel-T ohne Stab; ein
 Beton und ein Baustahl des Projekts
 und ein eigenes Material, ein weicherer Beton; ein Stab mit dem
 Material gemäss Querschnitt; Gelenke und ein Knoten, dessen Drehung
@@ -201,7 +201,7 @@ und ohne Stab; jede Lastart, auch projiziert.
 def _beweglich(p: Projekt) -> None
 ```
 
-Ein Träger auf zwei Rollen: nichts hält ihn waagrecht -- eine Meldung statt einer Zahl.
+Ein Träger auf zwei Rollen: nichts hält ihn waagrecht – eine Meldung statt einer Zahl.
 
 ### _raumrahmen
 
@@ -210,12 +210,12 @@ def _raumrahmen(p: Projekt, decke: QuerschnittEintrag, analyse: Querschnittsanal
 ```
 
 Ein Rahmen im Raum, der alles einmal braucht: Stützen aus Beton, Stahl
-und Holz, je mit anderem Lager -- eingespannt, gelenkig mit Drehfeder,
-verschieblich und in y gehalten --, Riegel in x und y, einer gedreht und
+und Holz, je mit anderem Lager – eingespannt, gelenkig mit Drehfeder,
+verschieblich und in y gehalten –, Riegel in x und y, einer gedreht und
 einer mit Gelenk, ein geneigter Kragarm, ein gebetteter Fundamentbalken;
 Querschnitte nach Vorlage, als Profil, von Hand, aus einer Platte mit
-E_eq und aus einer Querschnittsanalyse, deren I_T sie dafür rechnet --
-beide mit dem Material gemäss Querschnitt --, ein eigenes Material mit
+E_eq und aus einer Querschnittsanalyse, deren I_T sie dafür rechnet –
+beide mit dem Material gemäss Querschnitt –, ein eigenes Material mit
 G; Lasten in jeder Richtung, Torsion, projiziert, an Knoten.
 
 ### _spannbeton

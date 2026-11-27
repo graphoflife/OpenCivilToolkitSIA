@@ -1,5 +1,5 @@
 ---
-erzeugt: 6661a07efeb3
+erzeugt: 1ac2866fdd0d
 art: modul
 tags: [modul]
 ---
@@ -20,12 +20,12 @@ Fundament und seine beiden Nachweise, Grundbruch und Gleiten ([[opencivil.projek
 def bauen(art: 'Bauteilart', eintrag: GrundbruchEintrag, aufbau: Aufbau) -> Bauteil
 ```
 
-Ein Fundament und seine beiden Nachweise -- Grundbruch und Gleiten --,
+Ein Fundament und seine beiden Nachweise – Grundbruch und Gleiten –,
 sobald eine Kombination eingeschaltet ist. Ohne sie steht das Fundament
 allein da, wie eine Platte ohne Einwirkung.
 
 Jede Zahl in der Einheit ihres Feldes ([[opencivil.projekt.lesen#als_groesse|als_groesse]])
--- bis 2026-10-18 stand sie hier ein zweites Mal.
+– bis 2026-10-18 stand sie hier ein zweites Mal.
 
 
 ## Braucht

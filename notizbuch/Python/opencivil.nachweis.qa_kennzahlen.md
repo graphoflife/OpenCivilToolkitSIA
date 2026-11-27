@@ -1,5 +1,5 @@
 ---
-erzeugt: 715fef6b512d
+erzeugt: 4ff1a97ab17c
 art: modul
 tags: [modul]
 ---
@@ -10,12 +10,12 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Die Kennzahlen des gezeichneten Querschnitts, wie die der Platte
-([[opencivil.nachweis.kennzahlen]]) -- gerechnet immer, ob es Lastfaelle
+([[opencivil.nachweis.kennzahlen]]) – gerechnet immer, ob es Lastfaelle
 gibt oder nicht (Benutzer, 2026-10-23):
 
 * das Bewehrungsmass: die Laengsbewehrung je Kubikmeter Beton, wie bei der
   Platte ohne Buegel;
-* je Zugseite der Momentenwiderstand bei `N = 0` -- unten, oben, links,
+* je Zugseite der Momentenwiderstand bei `N = 0` – unten, oben, links,
   rechts, einachsig nur unten und oben;
 * der Zug- und der Druckwiderstand bei gleichmaessiger Dehnung: dieselben
   Grenzen, gegen die der M-N-Nachweis reine Normalkraft haelt;
@@ -63,7 +63,7 @@ Um welche Achse ein Moment diese Seite zieht: y fuer unten und oben, sonst z.
 def _getragen(analyse: Querschnittsanalyse) -> List[str]
 ```
 
-Welche Lasten die Schubwaende tragen koennen -- das haengt allein an ihrer
+Welche Lasten die Schubwaende tragen koennen – das haengt allein an ihrer
 Lage, nicht an den Festigkeiten: V_y bei lauter senkrechten Waenden
 nicht, Torsion nicht ohne Zelle und ohne drei Waende, die sich nicht in
 einem Punkt treffen. Einachsig zaehlt V_y nicht.
@@ -74,7 +74,7 @@ einem Punkt treffen. Einachsig zaehlt V_y nicht.
 def _einheit(last: str, biegung: Biegung) -> Dict[str, float]
 ```
 
-Eine Einheitslast in dieser Richtung -- 1 N oder 1 Nm, die anderen null;
+Eine Einheitslast in dieser Richtung – 1 N oder 1 Nm, die anderen null;
 so, wie sie wirkt: einachsig ist `V_y` null.
 
 ### KennzahlenQA
@@ -83,7 +83,7 @@ so, wie sie wirkt: einachsig ist `V_y` null.
 class KennzahlenQA(Kennzahlprozedur)
 ```
 
-Die Kennzahlen eines gezeichneten Querschnitts -- siehe Dateikopf.
+Die Kennzahlen eines gezeichneten Querschnitts – siehe Dateikopf.
 
 - `THEMA = 'Kennzahlen'`
 
@@ -93,7 +93,7 @@ Die Kennzahlen eines gezeichneten Querschnitts -- siehe Dateikopf.
 def _bewehrt(self, seite: Zugseite) -> bool
 ```
 
-Ob auf der gezogenen Seite des Schwerpunkts Bewehrung liegt -- an der
+Ob auf der gezogenen Seite des Schwerpunkts Bewehrung liegt – an der
 Zeichnung entschieden, damit feststeht, welche Kennzahlen es gibt. Eine
 verschmierte Linie zaehlt mit ihren Enden, ein Spannglied wie ein Stab.
 
@@ -106,7 +106,7 @@ def rechne(self, e: Eingaben, p: Protokoll) -> Dict[str, Groesse]
 
 ## Konstanten
 
-- `BRUCH = 'N_Ed = 0, Dehnungsfächer mit der Rechenwahl der Tragsicherheit'` – Woher die Widerstaende stammen -- ihre Erklaerung unter dem Querschnitt.
+- `BRUCH = 'N_Ed = 0, Dehnungsfächer mit der Rechenwahl der Tragsicherheit'` – Woher die Widerstaende stammen – ihre Erklaerung unter dem Querschnitt.
 - `SCHUB = (('V_z_Rd', 'V_z', 'V_{z,Rd}', KN, 'Querkraftwiderstand in z', sw.REF…` – Die Lasten, gegen die die Schubwaende einzeln widerstehen: Kurzname, Komponente der Verteilung, Zeichen, Einheit, Beschriftung.
 
 ## Braucht

@@ -1,5 +1,5 @@
 ---
-erzeugt: 8df8c0c9eff7
+erzeugt: 0f9fc1d0cfcb
 art: modul
 tags: [modul]
 ---
@@ -10,13 +10,13 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Wie in der Ebene ([[opencivil.stabwerk.herleitung]]), im Raum: das
-System in Tabellen, die Ansaetze -- der Stab als drei ebene, seine Achsen,
-Bettung, arbeitsgleiche Lasten, Gleichungssystem --, die Matrizen mit
+System in Tabellen, die Ansaetze – der Stab als drei ebene, seine Achsen,
+Bettung, arbeitsgleiche Lasten, Gleichungssystem –, die Matrizen mit
 Zahlen, solange sie klein genug sind, und je Lastfall und Kombination die
 Verschiebungen der Knoten, die Schnittgroessen an den Stabenden, die
 Lagerkraefte, die Extremwerte und die Gleichgewichtsprobe. Was die Ebene
-schon schreibt -- Zahlen und Matrizen, Unbekannte, den Kopf eines Falls,
-Lagerkraefte, Extremwerte, die Probe --, kommt von dort, mit den Groessen
+schon schreibt – Zahlen und Matrizen, Unbekannte, den Kopf eines Falls,
+Lagerkraefte, Extremwerte, die Probe –, kommt von dort, mit den Groessen
 des Raums.
 
 
@@ -56,13 +56,13 @@ des Systems, die eine gestrichene Achse beruehrt, ist nicht bestimmbar.
 
 - `STAEBE_MIT_MATRIX = 2` – Bis zu so vielen Teilstaeben steht die Matrix jedes einzelnen mit Zahlen da.
 - `ANNAHME = f'Steifigkeit: E_cm und G_cm des Betons, E_a und G_a des Baustahls od…` – Was die Steifigkeit und das Gleichgewicht annehmen.
-- `DURCHBIEGUNG = 'Die Durchbiegungen f_y und f_z misst jeder Stab gegen die Gerade zwi…` – Was die Durchbiegungen f_y und f_z sind -- und was sie nicht sind.
+- `DURCHBIEGUNG = 'Die Durchbiegungen f_y und f_z misst jeder Stab gegen die Gerade zwi…` – Was die Durchbiegungen f_y und f_z sind – und was sie nicht sind.
 - `SCHNITTGROESSEN_LATEX = '\\sigma = \\frac{N}{A} + \\frac{M_y \\cdot z}{I_y} + \\frac{M_z \\cd…` – Die Vorzeichen der Schnittgroessen, in den Achsen des Stabs.
 - `BIEGELINIE_LATEX = "w'' = -\\frac{M_y}{EI_y} \\qquad v'' = -\\frac{M_z}{EI_z} \\qquad u'…` – Die Biegelinien, die Laengsverschiebung und die Verdrillung.
 - `LAGERKRAEFTE = (('R_x', 'kN'), ('R_y', 'kN'), ('R_z', 'kN'), ('M_x', 'kNm'), ('M_y',…` – Eine Lagerkraft im Raum, in der Folge des Rechenkerns: Zeichen und Einheit.
-- `SUMMEN = (('\\sum F_x', 'kN'), ('\\sum F_y', 'kN'), ('\\sum F_z', 'kN'), ('\\s…` – Die Summen der Gleichgewichtsprobe im Raum -- Momente um den Ursprung.
-- `EINHEITEN = {'N': 'kN', 'V_y': 'kN', 'V_z': 'kN', 'T': 'kNm', 'M_y': 'kNm', 'M_z'…` – Je Schnittgroesse ihre Einheit -- Kraefte in kN, Momente in kNm.
-- `EXTREMWERTE = (*((g, g, EINHEITEN[g], 0.001, 1) for g in SCHNITTGROESSEN), ('f_y', …` – Die Extremwerte im Raum: Feld im Verlauf, Zeichen, Einheit, Faktor von SI und Nachkommastellen -- das Zeichen ist das Feld.
+- `SUMMEN = (('\\sum F_x', 'kN'), ('\\sum F_y', 'kN'), ('\\sum F_z', 'kN'), ('\\s…` – Die Summen der Gleichgewichtsprobe im Raum – Momente um den Ursprung.
+- `EINHEITEN = {'N': 'kN', 'V_y': 'kN', 'V_z': 'kN', 'T': 'kNm', 'M_y': 'kNm', 'M_z'…` – Je Schnittgroesse ihre Einheit – Kraefte in kN, Momente in kNm.
+- `EXTREMWERTE = (*((g, g, EINHEITEN[g], 0.001, 1) for g in SCHNITTGROESSEN), ('f_y', …` – Die Extremwerte im Raum: Feld im Verlauf, Zeichen, Einheit, Faktor von SI und Nachkommastellen – das Zeichen ist das Feld.
 
 ## Braucht
 

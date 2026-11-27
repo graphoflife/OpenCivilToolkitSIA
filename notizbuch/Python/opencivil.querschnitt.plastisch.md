@@ -1,5 +1,5 @@
 ---
-erzeugt: 463dfba9396a
+erzeugt: 91761bdc5e5b
 art: modul
 tags: [modul]
 ---
@@ -14,14 +14,14 @@ Verbundquerschnitt ([[opencivil.verbund.querschnitt]]) plastisch teilen,
 in mm und N/mm²:
 
 * Polygone mit Gewicht in Gruppen ([[opencivil.querschnitt.plastisch#Stueck|Stueck]]), je Gruppe ein Werkstoff
-  mit seiner Festigkeit -- und die Regel, nach der ein Polygon seinen
+  mit seiner Festigkeit – und die Regel, nach der ein Polygon seinen
   Elternteil dort ersetzt, wo es liegt ([[opencivil.querschnitt.plastisch#stuecke|stuecke]]);
 * an einer Nulllinie ([[opencivil.querschnitt.plastisch#Linie|Linie]]) je Gruppe die Spannung `+zug` auf der
   gezogenen und `-druck` auf der gedrueckten Seite ([[opencivil.querschnitt.plastisch#Starrplastisch|Starrplastisch]]):
   die Kraefte, je Teil die Bloecke mit ihrem Angriffspunkt, die Nulllinie bei
   einer Normalkraft und der Zustand, dessen Moment in die Richtung einer
   Einwirkung zeigt;
-* die Suche dieser Richtung ([[opencivil.querschnitt.plastisch#in_richtung|in_richtung]]) -- fuer einen Zustand mit
+* die Suche dieser Richtung ([[opencivil.querschnitt.plastisch#in_richtung|in_richtung]]) – fuer einen Zustand mit
   einer Nulllinie wie fuer einen mit zweien, je Teil eine, beim Verbund mit
   Teilverduebelung ([[opencivil.verbund.widerstand]]).
 
@@ -33,7 +33,7 @@ hier steht nur die Rechnung, an einer Stelle.
 ## VORZEICHEN
 
 N > 0 Zug; `M_y = -∫σ (z - z_b) dA` zieht unten, `M_z = -∫σ (y - y_b) dA`
-links -- um einen Bezugspunkt `b`.
+links – um einen Bezugspunkt `b`.
 
 ## Inhalt
 
@@ -45,7 +45,7 @@ class Linie
 ```
 
 Eine Nulllinie `n·p = v`, in mm: gezogen, wo `n·p > v`, gedrueckt, wo
-`n·p < v` -- `n` zeigt zur gezogenen Seite. Mit `n = (0, 0)` liegt
+`n·p < v` – `n` zeigt zur gezogenen Seite. Mit `n = (0, 0)` liegt
 sie ausserhalb des Querschnitts: dann ist alles gedrueckt
 ([[opencivil.querschnitt.plastisch#Konstanten|DRUCK]]) oder alles gezogen ([[opencivil.querschnitt.plastisch#Konstanten|ZUG]]).
 
@@ -58,7 +58,7 @@ sie ausserhalb des Querschnitts: dann ist alles gedrueckt
 def d(self, p: Punkt) -> float
 ```
 
-Wie weit `p` auf der gezogenen Seite liegt -- negativ, wo es gedrueckt ist.
+Wie weit `p` auf der gezogenen Seite liegt – negativ, wo es gedrueckt ist.
 
 ### Stueck
 
@@ -68,9 +68,9 @@ class Stueck
 ```
 
 Ein Polygon mit Gewicht in einer Gruppe: +1, wo es liegt, -1 im
-Elternteil, den es dort ersetzt, dazwischen ein Anteil -- so mindert die
+Elternteil, den es dort ersetzt, dazwischen ein Anteil – so mindert die
 Querkraft einen Steg. `teil` ist der Index des Teils, zu dem es zaehlt
--- bei einer Aussparung der des Teils darum --, `was` sagt, wofuer ein
+– bei einer Aussparung der des Teils darum –, `was` sagt, wofuer ein
 Streifen weggenommen ist.
 
 - `gruppe: int`
@@ -122,7 +122,7 @@ Der Zustand an einer Nulllinie: was die Bloecke tragen, in N und N·mm um den Be
 def linien(self) -> Tuple[Tuple[str, Linie], ...]
 ```
 
-Die Nulllinie -- ohne Teil, sie gilt im ganzen Querschnitt.
+Die Nulllinie – ohne Teil, sie gilt im ganzen Querschnitt.
 
 ### Plastisch
 
@@ -131,7 +131,7 @@ class Plastisch(Protocol)
 ```
 
 Was die Probe eines plastischen Zustands von ihm liest: seine Momente und
-seine Nulllinien, je mit dem Teil, in dem sie liegt -- ein
+seine Nulllinien, je mit dem Teil, in dem sie liegt – ein
 [[opencivil.querschnitt.plastisch#Zustand|Zustand]] hat eine, einer mit Teilverduebelung zwei
 ([[opencivil.verbund.widerstand#Teilzustand|Teilzustand]]).
 
@@ -152,7 +152,7 @@ def stuecke(punkte: Sequence[Sequence[Punkt]], eltern: Sequence[Optional[int]], 
 ```
 
 Die Stuecke einer Zeichnung: ein Polygon zaehlt in seiner Gruppe mit +1
-und in der seines Elternteils mit -1 -- so nimmt eine Aussparung den
+und in der seines Elternteils mit -1 – so nimmt eine Aussparung den
 Werkstoff darum weg, und ein Polygon aus anderem ersetzt ihn dort. Ein
 Polygon ohne Gruppe in `gruppe_von` zaehlt nicht mit: fuer diese
 Gruppen ist es eine Aussparung. `teil_von` sagt je Polygon mit
@@ -165,7 +165,7 @@ def in_richtung(bei: Callable[[Tuple[float, float]], Z], M_y: float, M_z: float,
 ```
 
 Der Zustand `bei(n)`, dessen Moment in die Richtung von `(M_y, M_z)`
-zeigt -- `n` ist die Zugrichtung der Nulllinie. Mit fester Zugrichtung
+zeigt – `n` ist die Zugrichtung der Nulllinie. Mit fester Zugrichtung
 `neigung`, wo sie feststeht
 ([[opencivil.querschnitt.biegung#Biegung.neigung|neigung]]); sonst gesucht wie
 beim Stahlbeton ([[opencivil.core.suche#winkel_suchen|winkel_suchen]]).
@@ -178,7 +178,7 @@ class Starrplastisch
 ```
 
 Stuecke mit ihren Festigkeiten, je Gruppe `zug` und `druck` als
-Betraege in N/mm² -- siehe Dateikopf.
+Betraege in N/mm² – siehe Dateikopf.
 
 - `stuecke: Tuple[Stueck, ...]`
 - `zug: Tuple[float, ...]`
@@ -216,7 +216,7 @@ Was die Bloecke an der Nulllinie tragen: `(N, M_y, M_z)` in N, N·mm um `bezug`.
 def bloecke(self, linie: Linie) -> List[Block]
 ```
 
-Je Teil -- und je weggenommenem Streifen -- die Kraft seiner gezogenen
+Je Teil – und je weggenommenem Streifen – die Kraft seiner gezogenen
 und seiner gedrueckten Zone an der Nulllinie, mit Angriffspunkt: die
 Probe zu [[opencivil.querschnitt.plastisch#Starrplastisch.kraefte|kraefte]], Teil fuer Teil.
 
@@ -238,7 +238,7 @@ def zustand(self, N: float, M_y: float, M_z: float, bezug: Punkt, neigung: Optio
 ```
 
 Der Zustand bei `N`, dessen Moment in die Richtung von
-`(M_y, M_z)` zeigt -- mit fester Zugrichtung `neigung`, wo sie
+`(M_y, M_z)` zeigt – mit fester Zugrichtung `neigung`, wo sie
 feststeht ([[opencivil.querschnitt.biegung#Biegung.neigung|neigung]]).
 `None`, wo `N` jenseits der reinen Zug- oder Druckkraft liegt.
 Die Neigung der Nulllinie sucht [[opencivil.querschnitt.plastisch#in_richtung|in_richtung]].
@@ -262,9 +262,9 @@ Der Zustand bei `N` an der Nulllinie mit der Zugrichtung `n`.
 
 ## Konstanten
 
-- `DRUCK = Linie((0.0, 0.0), 1.0)` – Gleichmaessiger Druck und gleichmaessiger Zug -- ohne Nulllinie im Querschnitt.
+- `DRUCK = Linie((0.0, 0.0), 1.0)` – Gleichmaessiger Druck und gleichmaessiger Zug – ohne Nulllinie im Querschnitt.
 - `ZUG = Linie((0.0, 0.0), -1.0)`
-- `Z = TypeVar('Z')` – Ein Zustand mit seinen Momenten `M_y` und `M_z` -- mit einer Nulllinie oder mit zweien.
+- `Z = TypeVar('Z')` – Ein Zustand mit seinen Momenten `M_y` und `M_z` – mit einer Nulllinie oder mit zweien.
 
 ## Braucht
 

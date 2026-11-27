@@ -1,5 +1,5 @@
 ---
-erzeugt: 1cb441c67925
+erzeugt: 986c1758bc8b
 art: modul
 tags: [modul]
 ---
@@ -11,7 +11,7 @@ tags: [modul]
 
 Der Nachweis [[opencivil.durchstanzen.nachweis#Durchstanzen|Durchstanzen]] an einer Durchstanzstelle: der
 Durchstanzwiderstand ohne Durchstanzbewehrung (4.3.6.3) gegen den
-Bemessungswert der Querkraft, mit allem, was er braucht -- der statischen
+Bemessungswert der Querkraft, mit allem, was er braucht – der statischen
 Höhe (4.3.6.2.1), dem Nachweisschnitt (4.3.6.2.2 und 4.3.6.2.3,
 [[opencivil.durchstanzen.schnitt|.schnitt]]), k_e (4.3.6.2.4 und 4.3.6.2.5), den Lasten im Schnitt
 (4.3.6.2.6) und der Plattenrotation (4.3.6.4).
@@ -29,7 +29,7 @@ u      = k_e · u_red
 
 `u_red` ist der Nachweisschnitt ohne das, was nach Figur 23 nicht zählt;
 `d` die mittlere statische Höhe der beiden Lagen der Zugbewehrung und
-`d_v` die wirksame -- gleich `d`, solange die gestützte Fläche nicht in die
+`d_v` die wirksame – gleich `d`, solange die gestützte Fläche nicht in die
 Platte reicht (Figur 21).
 
 
@@ -65,7 +65,7 @@ nicht verlangt. Das Skript «Stahlbeton II, 7.4 Platten» (Kaufmann, FS 2026,
 Folie 28) verknuepft m_sd mit der Stuetzenreaktion: die Momente im
 Stuetzstreifen entstehen aus der ganzen Stuetzenkraft. Das liegt auf der
 sicheren Seite. Den Abzug behaelt die Querkraft im Nachweis, in (66) und
-(67) und am aeusseren Schnitt. Bis 2026-11-25 kam m_sd aus V_d,red -- bei
+(67) und am aeusseren Schnitt. Bis 2026-11-25 kam m_sd aus V_d,red – bei
 einer Bodenplatte mit 150 kN/m² Bodenpressung bis 7 % zu viel Widerstand,
 bei einer Decke unter 1 %.
 
@@ -98,7 +98,7 @@ Die Plattenrotation in einer Richtung: r_s, m_sd/m_Rd und ψ.
 class Biegelage
 ```
 
-Eine Lage der Zugbewehrung über der Stütze, wie gerechnet -- fürs Bild der Leiste.
+Eine Lage der Zugbewehrung über der Stütze, wie gerechnet – fürs Bild der Leiste.
 
 - `richtung: Richtung`
 - `tiefe: float` – Wie weit ihre Mitte unter der Oberfläche der Zugseite liegt: h − d in ihrer Richtung.
@@ -112,7 +112,7 @@ Eine Lage der Zugbewehrung über der Stütze, wie gerechnet -- fürs Bild der Le
 class Durchstanzbefund
 ```
 
-Was der Nachweis gefunden hat -- für die Zusammenfassung und das Bild.
+Was der Nachweis gefunden hat – für die Zusammenfassung und das Bild.
 Längen in m, Kräfte in N. Leisten und Stahlpilz stehen nur da, wo es sie
 braucht; jedes mit seinen eigenen Zahlen.
 
@@ -135,7 +135,7 @@ braucht; jedes mit seinen eigenen Zahlen.
 class Durchstanzen(Nachweis)
 ```
 
-Der Durchstanznachweis an einer Durchstanzstelle -- siehe Dateikopf.
+Der Durchstanznachweis an einer Durchstanzstelle – siehe Dateikopf.
 
 - `THEMA = 'Durchstanzen'`
 - `ART = 'DS'`
@@ -193,7 +193,7 @@ def _resultierende(self, e: Eingaben, masse: Masse) -> Punkt
 
 Wo die Auflagerkraft angreift: in der Stützenachse, verschoben um die
 Exzentrizität e_x, e_y, wo k_e nach (57) sie liest. Von hier misst e_u
-an jedem Schnitt -- um die Stütze, um die äussersten Anker und um den Pilz.
+an jedem Schnitt – um die Stütze, um die äussersten Anker und um den Pilz.
 
 #### Durchstanzen._rotation
 
@@ -201,7 +201,7 @@ an jedem Schnitt -- um die Stütze, um die äussersten Anker und um den Pilz.
 def _rotation(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, d: Wert, hoehen: Dict[Richtung, Wert], e_u: Tuple[float, float], masse: Dict[str, float]) -> Tuple[Tuple[Rotation, ...], Wert]
 ```
 
-ψ je Richtung und die massgebende -- die grössere (4.3.6.4.1).
+ψ je Richtung und die massgebende – die grössere (4.3.6.4.1).
 
 #### Durchstanzen._m_Rd
 
@@ -218,7 +218,7 @@ def _m_sd(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, r_s: Dict[Richtung,
 ```
 
 Die mittleren Momente im Stützstreifen in Näherungsstufe 2 (4.3.6.4.7),
-aus der ganzen Auflagerkraft -- siehe Dateikopf.
+aus der ganzen Auflagerkraft – siehe Dateikopf.
 
 #### Durchstanzen._b_sr
 
@@ -226,7 +226,7 @@ aus der ganzen Auflagerkraft -- siehe Dateikopf.
 def _b_sr(self, p: Protokoll, w: Zwischenwerte, r: Richtung, rand: Randbreite) -> Wert
 ```
 
-b_sr des Streifens in `r`: zwischen den Linien unter 45° (Figur 25) -- siehe Kopf.
+b_sr des Streifens in `r`: zwischen den Linien unter 45° (Figur 25) – siehe Kopf.
 
 #### Durchstanzen._breite_am_rand
 
@@ -235,7 +235,7 @@ def _breite_am_rand(self, p: Protokoll, w: Zwischenwerte, r: Richtung, b_s: Wert
 ```
 
 Die Breite eines Streifens, den der Plattenrand begrenzt: höchstens
-b_sr, an der Ecke vom zweiten Rand abgeschnitten -- siehe Dateikopf.
+b_sr, an der Ecke vom zweiten Rand abgeschnitten – siehe Dateikopf.
 
 #### Durchstanzen._r_s_am_rand
 
@@ -267,7 +267,7 @@ Was über der Tabelle steht: Lage, Platte, Beton und die Masse, wie gerechnet.
 def kennwerttabelle(befund: Durchstanzbefund) -> TabellenBlock
 ```
 
-Die Grössen, aus denen der Widerstand entsteht -- eine Zeile je Grösse. Mit
+Die Grössen, aus denen der Widerstand entsteht – eine Zeile je Grösse. Mit
 Stahlpilz und Durchstanzbewehrung dazu, was sie sind und was sie tragen.
 
 

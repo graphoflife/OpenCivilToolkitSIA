@@ -1,5 +1,5 @@
 ---
-erzeugt: 1c9c95941e68
+erzeugt: 1327150ab7ad
 art: modul
 tags: [modul]
 ---
@@ -9,7 +9,7 @@ tags: [modul]
 
 ## VERANTWORTUNG
 
-Die Nachweise je Lastfall, mit ihrer Herleitung -- gerechnet wird in
+Die Nachweise je Lastfall, mit ihrer Herleitung – gerechnet wird in
 [[opencivil.verbund.widerstand]] und [[opencivil.verbund.duebel]]:
 
 * **Biegung und Normalkraft** ([[opencivil.nachweis.qa_verbund#VerbundBiegungQA|VerbundBiegungQA]]): der plastische
@@ -21,7 +21,7 @@ Die Nachweise je Lastfall, mit ihrer Herleitung -- gerechnet wird in
   Verduebelung braucht, mit Teilverduebelung (6.1.1.6). Die Herleitung
   zeigt die Probe wie im Stahl ([[opencivil.nachweis.qa_stahl#probe|probe]]).
 * **Verduebelung**, im selben Nachweis, wo Kopfbolzenduebel gewaehlt sind:
-  der Verduebelungsgrad `η = N/N_f` gegen (29) -- gegen eins im Bereich
+  der Verduebelungsgrad `η = N/N_f` gegen (29) – gegen eins im Bereich
   negativer Momente ([[opencivil.verbund.duebel#negativ|negativ]]) oder wo das
   Profil nicht doppelsymmetrisch ist. `P_Rd` steht in den Kennzahlen.
 * **Querkraft** ([[opencivil.nachweis.qa_verbund#VerbundQuerkraftQA|VerbundQuerkraftQA]]): wie im Stahl, denn der Stahl
@@ -29,14 +29,14 @@ Die Nachweise je Lastfall, mit ihrer Herleitung -- gerechnet wird in
   ([[opencivil.nachweis.qa_verbund_kennzahlen]]).
 
 
-## WAS FEHLT -- GRAU
+## WAS FEHLT – GRAU
 
 * Wo plastisch nicht gerechnet werden darf
   ([[opencivil.verbund.widerstand#Fall|grund]]): elastisch nach 5.1.2.4
   und 5.1.2.5 rechnet das Werkzeug noch nicht. Die Verduebelung folgt dem
   plastischen Zustand: wo er nicht gilt, steht sie nicht da.
-* Einem Lastfall die Zahl seiner Duebel -- Biegung und Normalkraft rechnen
-  dann mit voller Verduebelung --, oder `L_e`, wo (29) es braucht.
+* Einem Lastfall die Zahl seiner Duebel – Biegung und Normalkraft rechnen
+  dann mit voller Verduebelung –, oder `L_e`, wo (29) es braucht.
 * Torsion: ein `T_Ed` steht in der Einwirkung, nachgewiesen wird es nicht
   (nach Vorgabe, nicht nachgeschlagen).
 * Knicken und Kippen gehoeren dem Traeger, ebenso der Laengsschub in der
@@ -45,7 +45,7 @@ Die Nachweise je Lastfall, mit ihrer Herleitung -- gerechnet wird in
 
 ## VORZEICHEN
 
-N > 0 Zug; M_y > 0 zieht unten, M_z > 0 links -- um den Schwerpunkt der
+N > 0 Zug; M_y > 0 zieht unten, M_z > 0 links – um den Schwerpunkt der
 Analyse.
 
 ## Inhalt
@@ -64,7 +64,7 @@ Schwerpunkt, Kennwerte der Materialien und was die Kennzahlen fuer die Faelle ha
 class VerbundBiegungQA(Nachweis)
 ```
 
-Biegung und Normalkraft eines Verbundquerschnitts, je Lastfall -- siehe Dateikopf.
+Biegung und Normalkraft eines Verbundquerschnitts, je Lastfall – siehe Dateikopf.
 
 - `THEMA = 'Verbundquerschnitt'`
 - `LANGNAME = 'Biegung und Normalkraft'`
@@ -82,7 +82,7 @@ def pruefe(self, e: Eingaben, p: Protokoll)
 def _rechnen(self, e: Eingaben, werte: Verbundwerte, bezug: Tuple[float, float], fall: Lastfall) -> Optional[vw.Fall]
 ```
 
-Der Lastfall am Querschnitt -- `None` ohne Normalkraft und Moment.
+Der Lastfall am Querschnitt – `None` ohne Normalkraft und Moment.
 
 #### VerbundBiegungQA._normalkraft
 
@@ -98,7 +98,7 @@ Ohne Moment, oder wo die Normalkraft allein nicht traegt: `N_Ed` gegen `N_pl,Rd`
 def _verduebelung(self, p: Protokoll, e: Eingaben, werte: Verbundwerte, zwischen: Zwischenwerte, x: vw.Fall, bezug: Tuple[float, float], fall: Lastfall, teile: Tuple[Starrplastisch, Starrplastisch]) -> Tuple[NachweisUrteil, Optional[Wert]]
 ```
 
-`η` gegen (29) oder eins -- und mit Teilverduebelung ihr
+`η` gegen (29) oder eins – und mit Teilverduebelung ihr
 Momentenwiderstand (siehe Dateikopf). `teile`: Beton und Stahl je
 auf ihrer Seite der Fuge.
 
@@ -108,7 +108,7 @@ auf ihrer Seite der Fuge.
 def _verlangt(self, p: Protokoll, werte: Verbundwerte, zwischen: Zwischenwerte, x: vw.Fall, abschnitt: vd.Abschnitt) -> Optional[Wert]
 ```
 
-Der kleinste Verduebelungsgrad: nach (29) oder eins -- `None`, wo `L_e` fehlt.
+Der kleinste Verduebelungsgrad: nach (29) oder eins – `None`, wo `L_e` fehlt.
 
 #### VerbundBiegungQA._teilverduebelt
 
@@ -124,7 +124,7 @@ Der Momentenwiderstand mit Teilverduebelung, mit seiner Probe.
 class VerbundQuerkraftQA(StahlQuerkraftQA)
 ```
 
-Die Querkraft eines Verbundquerschnitts, je Lastfall: wie im Stahl -- siehe Dateikopf.
+Die Querkraft eines Verbundquerschnitts, je Lastfall: wie im Stahl – siehe Dateikopf.
 
 - `THEMA = 'Verbundquerschnitt'`
 - `REFERENZ = vw.REFERENZ_SCHUB`
@@ -132,10 +132,10 @@ Die Querkraft eines Verbundquerschnitts, je Lastfall: wie im Stahl -- siehe Date
 
 ## Konstanten
 
-- `OHNE_TORSION = 'Torsion weist das Werkzeug beim Verbundquerschnitt nicht nach (nach …` – Warum Torsion nicht nachgewiesen wird -- siehe Dateikopf.
-- `VOLL_ANGENOMMEN = 'Verdübelung voll angenommen, wie 5.1.2.1 es tut: Stahl und Beton tra…` – Wie die Verduebelung in die Lastfaelle eingeht -- ohne Duebel und mit.
+- `OHNE_TORSION = 'Torsion weist das Werkzeug beim Verbundquerschnitt nicht nach (nach …` – Warum Torsion nicht nachgewiesen wird – siehe Dateikopf.
+- `VOLL_ANGENOMMEN = 'Verdübelung voll angenommen, wie 5.1.2.1 es tut: Stahl und Beton tra…` – Wie die Verduebelung in die Lastfaelle eingeht – ohne Duebel und mit.
 - `MIT_DUEBELN = 'Bis zum Momentennullpunkt tragen die N Dübel eines Lastfalls N · P_R…`
-- `OHNE_ANZAHL = 'Für diesen Lastfall fehlt noch die Zahl der Dübel bis zum Momentennu…` – Was einem Lastfall fuer die Verduebelung fehlen kann -- grau.
+- `OHNE_ANZAHL = 'Für diesen Lastfall fehlt noch die Zahl der Dübel bis zum Momentennu…` – Was einem Lastfall fuer die Verduebelung fehlen kann – grau.
 - `OHNE_L_E = 'Für (29) fehlt diesem Lastfall noch L_e, der Abstand der Momentennul…`
 - `OHNE_MOMENT = 'Ohne Moment prüft das Werkzeug die Dübel nicht: (29) gilt dem Längss…`
 - `NEGATIV = 'Im Bereich negativer Momente lässt 6.1.1.6 keine Teilverdübelung zu:…` – Warum volle Verduebelung verlangt ist, wo (29) nicht gilt.

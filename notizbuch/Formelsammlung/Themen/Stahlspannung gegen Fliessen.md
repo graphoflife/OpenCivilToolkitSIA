@@ -28,7 +28,7 @@ Unter häufiger Einwirkung darf die Bewehrung nicht fliessen – sonst bleiben R
 
 ## Theorie
 
-Unter häufiger Einwirkung -- Lasten, die oft, aber nicht dauernd wirken --
+Unter häufiger Einwirkung – Lasten, die oft, aber nicht dauernd wirken –
 darf die Bewehrung nicht fliessen. Fliesst sie, bleiben Risse und
 Durchbiegung, wenn die Last weg ist. Gerechnet wird wie bei der
 [[Stahlspannung aus Rissbreite]], nur gegen eine andere Grenze: einen festen

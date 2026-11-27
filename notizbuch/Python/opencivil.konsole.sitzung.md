@@ -1,5 +1,5 @@
 ---
-erzeugt: b235ab4dd5d8
+erzeugt: 0bb9da114e80
 art: modul
 tags: [modul]
 ---
@@ -9,11 +9,11 @@ tags: [modul]
 
 ## VERANTWORTUNG
 
-Führt aus, was der Benutzer schreibt -- ein Skript oder eine Zeile der
-Konsole -- in einem Namensraum, der zwischen den Läufen bleibt: was Skript A
+Führt aus, was der Benutzer schreibt – ein Skript oder eine Zeile der
+Konsole – in einem Namensraum, der zwischen den Läufen bleibt: was Skript A
 anlegt, sieht Skript B (Benutzer, 2026-10-15). Was dabei herauskommt, steht
-der Reihe nach als Ereignis da -- Ausgabe, Fehlerausgabe, der Wert der
-letzten Zeile, ein Fehler, ein Bild aus [[opencivil.konsole.zeichnen]] --,
+der Reihe nach als Ereignis da – Ausgabe, Fehlerausgabe, der Wert der
+letzten Zeile, ein Fehler, ein Bild aus [[opencivil.konsole.zeichnen]] –,
 und dazu die Variablen für den Beobachter rechts.
 
 
@@ -28,7 +28,7 @@ ihm ausführen. Getestet wird sie unter CPython; nur das Nachladen der Pakete
 ## REINES PYTHON
 
 Im Namensraum liegt nichts vom Projekt (Benutzer, 2026-10-15). Wer will,
-schreibt `import opencivil` -- der Rechenkern liegt im Faden bei.
+schreibt `import opencivil` – der Rechenkern liegt im Faden bei.
 
 ## Inhalt
 
@@ -50,7 +50,7 @@ Was ein Lauf ergab: die Ereignisse der Reihe nach, und ob er ohne Fehler durchka
 def schreiben(self, art: str, text: str) -> None
 ```
 
-Text an die Ereignisse -- an das letzte gleicher Art, wenn es direkt davor steht.
+Text an die Ereignisse – an das letzte gleicher Art, wenn es direkt davor steht.
 
 ### _Strom
 
@@ -78,7 +78,7 @@ def flush(self) -> None
 class Sitzung
 ```
 
-Ein Namensraum und das Ausführen darin -- eine Konsole, ein Gedächtnis.
+Ein Namensraum und das Ausführen darin – eine Konsole, ein Gedächtnis.
 
 #### Sitzung.zuruecksetzen
 
@@ -86,7 +86,7 @@ Ein Namensraum und das Ausführen darin -- eine Konsole, ein Gedächtnis.
 def zuruecksetzen(self) -> None
 ```
 
-Ein leerer Namensraum -- alle Variablen weg, wie nach einem Neustart.
+Ein leerer Namensraum – alle Variablen weg, wie nach einem Neustart.
 
 #### Sitzung.ausfuehren
 
@@ -95,7 +95,7 @@ def ausfuehren(self, code: str, *, name: str='Konsole', eingabe: bool=False) -> 
 ```
 
 Führt `code` aus. `name` steht in einer Fehlermeldung als Datei:
-der Name des Skripts. Mit `eingabe` -- einer Zeile der Konsole --
+der Name des Skripts. Mit `eingabe` – einer Zeile der Konsole –
 steht der Wert der letzten Zeile da, wenn sie ein Ausdruck ist, wie
 in der Python-Konsole: `1 + 1` zeigt `2`.
 
@@ -107,7 +107,7 @@ def variablen(self) -> List[Dict[str, str]]
 
 Die Variablen des Namensraums, nach Namen: was der Benutzer angelegt
 hat. Weggelassen werden Namen mit Unterstrich, Module, Funktionen und
-Klassen -- wie im Variablen-Explorer von Spyder.
+Klassen – wie im Variablen-Explorer von Spyder.
 
 ### _typ
 
@@ -123,7 +123,7 @@ Der Typ, wie man ihn sucht: `int`, `ndarray float64`, `DataFrame`.
 def _groesse(wert: Any) -> str
 ```
 
-Wie gross: Form eines Feldes oder einer Tabelle, sonst die Länge -- leer bei Zahlen.
+Wie gross: Form eines Feldes oder einer Tabelle, sonst die Länge – leer bei Zahlen.
 
 ### _darstellung
 
@@ -131,7 +131,7 @@ Wie gross: Form eines Feldes oder einer Tabelle, sonst die Länge -- leer bei Za
 def _darstellung(wert: Any, laenge: int, *, einzeilig: bool=False) -> str
 ```
 
-`repr` -- gekürzt, und für die Zeile des Beobachters in eine Zeile gelegt.
+`repr` – gekürzt, und für die Zeile des Beobachters in eine Zeile gelegt.
 
 ### _fehlertext
 
@@ -139,15 +139,15 @@ def _darstellung(wert: Any, laenge: int, *, einzeilig: bool=False) -> str
 def _fehlertext(fehler: BaseException, name: str) -> str
 ```
 
-Die Fehlermeldung, wie Python sie schreibt -- ohne die Rahmen der Konsole
+Die Fehlermeldung, wie Python sie schreibt – ohne die Rahmen der Konsole
 selbst: wer sein Skript liest, sucht seine Zeile, nicht unsere. Fehlt ein
 Modul, steht dazu, was beiliegt.
 
 
 ## Konstanten
 
-- `EIGENE = str(Path(__file__).resolve().parent)` – Wo die Konsole selbst liegt -- ihre Rahmen gehören in keine Fehlermeldung.
-- `KURZ = 120` – Wie lang ein Wert in der Zeile des Beobachters wird -- und beim Darüberfahren.
+- `EIGENE = str(Path(__file__).resolve().parent)` – Wo die Konsole selbst liegt – ihre Rahmen gehören in keine Fehlermeldung.
+- `KURZ = 120` – Wie lang ein Wert in der Zeile des Beobachters wird – und beim Darüberfahren.
 - `LANG = 4000`
 - `ZEICHENMODUL = 'zeichnen'` – Unter diesem Namen holt sich ein Skript das Zeichenmodul: `import zeichnen as plt`.
 

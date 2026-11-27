@@ -1,5 +1,5 @@
 ---
-erzeugt: acf48feee2cf
+erzeugt: 893b95d0d168
 art: modul
 tags: [modul]
 ---
@@ -9,8 +9,8 @@ tags: [modul]
 
 ## VERANTWORTUNG
 
-Aus der gestützten Fläche -- einer Stütze oder dem Ende oder der Ecke einer
-Wand --, ihrer Lage in der Platte, den Aussparungen und dem Abstand des
+Aus der gestützten Fläche – einer Stütze oder dem Ende oder der Ecke einer
+Wand –, ihrer Lage in der Platte, den Aussparungen und dem Abstand des
 Schnitts der Nachweisschnitt nach SIA 262:2025, 4.3.6.2.2 und 4.3.6.2.3:
 welche Teile von ihm zählen, seine wirksame Länge u, die Fläche, die er
 umschliesst, und der Schwerpunkt seiner zählenden Teile. Mit der Fläche
@@ -21,8 +21,8 @@ Momente selbst, k_e, ist Sache des Nachweises.
 
 ## DER SCHNITT (Figur 22)
 
-Im Abstand `a` um die gestützte Fläche -- `d_v/2`, beim äusseren Schnitt
-`d_v,out/2` --, um ihre konvexe Hülle: bei konkaver Geometrie ist der
+Im Abstand `a` um die gestützte Fläche – `d_v/2`, beim äusseren Schnitt
+`d_v,out/2` –, um ihre konvexe Hülle: bei konkaver Geometrie ist der
 Umfang zu minimieren (Figur 22c). Eine Stütze ist ein konvexer Kern mit
 einem Radius ([[opencivil.durchstanzen.schnitt#Stuetzenflaeche|Stuetzenflaeche]]): ein Rechteck hat den Radius null,
 eine Rundstütze einen Punkt als Kern. Ihr Schnitt besteht aus Strecken
@@ -40,8 +40,8 @@ An einem Wandende und einer Wandecke läuft er um das Ende bzw. um die
   Eine Strecke weiss darum, wie weit sie von jedem Ende her zählt
   ([[opencivil.durchstanzen.schnitt#Strecke|Strecke]]); wo eine Wand weiterläuft, zählt sie von dort her nicht.
 - Am Plattenrand endet der Schnitt, wenn er dadurch kürzer wird (Figur
-  22d). Gerechnet werden die möglichen Schnitte -- der geschlossene und die,
-  die zu einem oder zu beiden Rändern laufen --, und es gilt der kürzeste
+  22d). Gerechnet werden die möglichen Schnitte – der geschlossene und die,
+  die zu einem oder zu beiden Rändern laufen –, und es gilt der kürzeste
   ([[opencivil.durchstanzen.schnitt#nachweisschnitt|nachweisschnitt]]). Was ausserhalb der Platte liegt, zählt nie.
 - Hinter einer Aussparung, die näher als 5·d_v am Schnitt liegt, zählt nicht,
   was zwischen den beiden Strahlen von der Stützenachse an ihr vorbei liegt
@@ -164,8 +164,8 @@ def enthaelt(self, p: Punkt) -> bool
 class Stuetzenflaeche
 ```
 
-Eine Stütze: ein konvexer Kern -- Polygon gegen den Uhrzeigersinn, Strecke
-oder Punkt -- mit einem Radius darum. Ein Rechteck ist sein eigener Kern
+Eine Stütze: ein konvexer Kern – Polygon gegen den Uhrzeigersinn, Strecke
+oder Punkt – mit einem Radius darum. Ein Rechteck ist sein eigener Kern
 mit Radius null; eine Rundstütze ein Punkt mit dem halben Durchmesser.
 
 - `kern: Tuple[Punkt, ...]`
@@ -186,7 +186,7 @@ Die Stützenachse: der Schwerpunkt des Kerns.
 def umriss(self, schritte: int=16) -> List[Punkt]
 ```
 
-Der Umriss der Stütze als Polygon -- fürs Bild und für Prüfungen.
+Der Umriss der Stütze als Polygon – fürs Bild und für Prüfungen.
 
 #### Stuetzenflaeche.grenzen
 
@@ -221,7 +221,7 @@ Die Normale der Seite `p → q` nach aussen, für ein Polygon gegen den Uhrzeige
 def _polygon(stuecke: Sequence[Stueck], schritte: int=16) -> List[Punkt]
 ```
 
-Die Stücke als geschlossenes Polygon -- die Endpunkte, Bögen in feinen Schritten.
+Die Stücke als geschlossenes Polygon – die Endpunkte, Bögen in feinen Schritten.
 
 ### Kandidat
 
@@ -251,7 +251,7 @@ diesen Rändern läuft (Figur 22d). Zum Rand verlängert wird der Kern: er
 reicht dann bis über den Rand hinaus, und was jenseits liegt, zählt nicht.
 
 Eine Strecke entlang einer Seite der Stütze zählt `eckenbereich` von
-jeder Ecke her (1.5·d_v, Figur 23a); eine, die zum Rand läuft, ganz --
+jeder Ecke her (1.5·d_v, Figur 23a); eine, die zum Rand läuft, ganz –
 am freien Rand ballt sich keine Querkraft.
 
 ### _abstand_zum_rand
@@ -260,7 +260,7 @@ am freien Rand ballt sich keine Querkraft.
 def _abstand_zum_rand(stuetze: Stuetzenflaeche, h: Halbebene) -> float
 ```
 
-Wie weit die Stütze vom Rand entfernt ist -- in Richtung seiner Normalen.
+Wie weit die Stütze vom Rand entfernt ist – in Richtung seiner Normalen.
 
 ### kandidat_wandende
 
@@ -333,7 +333,7 @@ kleinste Bogen, der die Richtungen zu allen ihren Ecken enthält.
 def schatten_am_schnitt(aussparungen: Sequence[Sequence[Punkt]], stuecke: Sequence[Stueck], *, d_v: float, achse: Punkt) -> List[Schatten]
 ```
 
-Die Schatten der Aussparungen, die näher als 5·d_v am Schnitt liegen --
+Die Schatten der Aussparungen, die näher als 5·d_v am Schnitt liegen –
 nur sie mindern ihn (Figur 23d). Dort zählt auch keine
 Durchstanzbewehrung ([[opencivil.durchstanzen.bewehrung|.bewehrung]]).
 
@@ -343,7 +343,7 @@ Durchstanzbewehrung ([[opencivil.durchstanzen.bewehrung|.bewehrung]]).
 def abstand_zum_schnitt(aussparung: Sequence[Punkt], stuecke: Sequence[Stueck]) -> float
 ```
 
-Der kleinste Abstand zwischen der Aussparung und dem Schnitt -- auf 1 cm genau genügt.
+Der kleinste Abstand zwischen der Aussparung und dem Schnitt – auf 1 cm genau genügt.
 
 ### Linienzug
 
@@ -391,7 +391,7 @@ def u(self) -> float
 def auswerten(kandidat: Kandidat, *, d_v: float, achse: Punkt, aussparungen: Sequence[Sequence[Punkt]]=()) -> Auswertung
 ```
 
-Welche Teile des Kandidaten zählen -- in der Platte, neben einer Ecke und
+Welche Teile des Kandidaten zählen – in der Platte, neben einer Ecke und
 nicht hinter einer Aussparung, die näher als 5·d_v liegt.
 
 ### _vereinfacht
@@ -400,7 +400,7 @@ nicht hinter einer Aussparung, die näher als 5·d_v liegt.
 def _vereinfacht(punkte: Sequence[Punkt], toleranz: float=0.0002) -> List[Punkt]
 ```
 
-Fast gerade Folgen von Punkten auf ihre Ecken gekürzt -- fürs Bild genügt
+Fast gerade Folgen von Punkten auf ihre Ecken gekürzt – fürs Bild genügt
 das. Nach Douglas und Peucker: kein weggelassener Punkt liegt weiter als
 `toleranz` von der Linie, die bleibt. Bis 2026-10-30 wurde nur mit dem
 nächsten Punkt verglichen, und ein Bogen wurde zum Vieleck.
@@ -411,7 +411,7 @@ nächsten Punkt verglichen, und ein Bogen wurde zum Vieleck.
 def _ueberlappung(aussparung: Sequence[Punkt], umschlossen: Sequence[Punkt]) -> float
 ```
 
-Wie viel der Aussparung in der umschlossenen Fläche liegt -- die ist konvex.
+Wie viel der Aussparung in der umschlossenen Fläche liegt – die ist konvex.
 
 ### Nachweisschnitt
 
@@ -420,7 +420,7 @@ Wie viel der Aussparung in der umschlossenen Fläche liegt -- die ist konvex.
 class Nachweisschnitt
 ```
 
-Der massgebende Schnitt -- der kürzeste der Kandidaten -- und alle, die gerechnet wurden.
+Der massgebende Schnitt – der kürzeste der Kandidaten – und alle, die gerechnet wurden.
 
 - `massgebend: Auswertung`
 - `alle: Tuple[Auswertung, ...] = field(default_factory=tuple)`
@@ -439,7 +439,7 @@ def nachweisschnitt(kandidaten: Sequence[Kandidat], *, d_v: float, achse: Punkt,
 ```
 
 Alle Kandidaten ausgewertet; es gilt der mit der kleinsten wirksamen Länge
-(Figur 22d). Sind zwei gleich lang -- die Stütze steht am Rand --, heisst
+(Figur 22d). Sind zwei gleich lang – die Stütze steht am Rand –, heisst
 er nach dem, der zum Rand läuft.
 
 

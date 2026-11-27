@@ -1,5 +1,5 @@
 ---
-erzeugt: 756535111d9d
+erzeugt: dcc0d188b974
 art: modul
 tags: [modul]
 ---
@@ -9,7 +9,7 @@ tags: [modul]
 
 ## VERANTWORTUNG
 
-Liest die Vorlage einer Formelzeile -- LaTeX mit `@name`-Platzhaltern --
+Liest die Vorlage einer Formelzeile – LaTeX mit `@name`-Platzhaltern –
 als Baum, setzt darin fuer einen Platzhalter eine andere Formel ein, kuerzt,
 setzt den Baum wieder als LaTeX, mit Symbolen und mit Zahlen, und rechnet
 ihn nach. Daraus baut die Kurzform eines Nachweises aus mehreren Zeilen eine
@@ -24,14 +24,14 @@ M_Rd = A_s \cdot f_yd \cdot (d - \frac{0.85 \cdot x}{2})
 Gelesen wird die Teilmenge von LaTeX, in der die Formeln dieses Werkzeugs
 stehen: `+ - \cdot \times /`, Nebeneinander als Produkt, `\frac`,
 `\sqrt`, Klammern, Hochzahlen mit fester Zahl, `\pi`, `\min`,
-`\max`, Betraege und die Winkelfunktionen. Was darueber hinausgeht -- eine
-Zahl mit Einheit, `\text`, `\sum`, ein Winkel in Grad -- wirft
+`\max`, Betraege und die Winkelfunktionen. Was darueber hinausgeht – eine
+Zahl mit Einheit, `\text`, `\sum`, ein Winkel in Grad – wirft
 [[opencivil.core.formelbaum#Unlesbar|Unlesbar]], und die Formel bleibt, wie sie geschrieben ist. Die
 Kurzform rechnet jede Umformung nach; ein falsch gelesener Baum gibt darum
 nie eine falsche Formel, nur keine kuerzere.
 
 Gekuerzt wird wenig, und nur, was dasteht: gleiche Faktoren in Zaehler und
-Nenner, Faktoren eins, Summanden null. Zahlen werden nicht verrechnet -- die
+Nenner, Faktoren eins, Summanden null. Zahlen werden nicht verrechnet – die
 0.85 des Spannungsblocks soll man wiedererkennen, solange sie dasteht.
 
 ## Inhalt
@@ -51,7 +51,7 @@ Die Vorlage geht ueber das hinaus, was der Baum lesen kann.
 class Zahl
 ```
 
-Eine Zahl, die in der Vorlage steht -- so geschrieben, wie sie dasteht.
+Eine Zahl, die in der Vorlage steht – so geschrieben, wie sie dasteht.
 
 - `wert: float`
 - `text: str = field(default='', compare=False)`
@@ -64,7 +64,7 @@ class Blatt
 ```
 
 Ein Platzhalter mit seinem Wert. `empirisch`: die Einheit, in der er
-in eine empirische Formel als blanke Zahl eingeht -- in ein solches Blatt
+in eine empirische Formel als blanke Zahl eingeht – in ein solches Blatt
 wird nie eingesetzt, die Formel dahinter rechnet in SI.
 
 - `kennung: str`
@@ -78,7 +78,7 @@ wird nie eingesetzt, die Formel dahinter rechnet in SI.
 class Produkt
 ```
 
-Faktoren mit ihrer Hochzahl -- ein Nenner hat eine negative.
+Faktoren mit ihrer Hochzahl – ein Nenner hat eine negative.
 
 - `faktoren: Tuple[Tuple['Ausdruck', Fraction], ...]`
 - `vorzeichen: int = 1`
@@ -198,7 +198,7 @@ Die Argumente von `\min` und `\max`, durch `;` oder `,` getrennt.
 def _bruch(hoch: Ausdruck) -> Fraction
 ```
 
-Eine Hochzahl als Bruch -- sie muss eine feste Zahl sein.
+Eine Hochzahl als Bruch – sie muss eine feste Zahl sein.
 
 ### lesen
 
@@ -232,7 +232,7 @@ def einsetzen(a: Ausdruck, kennung: str, teil: Ausdruck) -> Ausdruck
 def blaetter(a: Ausdruck) -> List[Blatt]
 ```
 
-Die Blaetter in der Reihenfolge, in der sie dastehen -- jedes einmal.
+Die Blaetter in der Reihenfolge, in der sie dastehen – jedes einmal.
 
 ### empirische
 
@@ -240,7 +240,7 @@ Die Blaetter in der Reihenfolge, in der sie dastehen -- jedes einmal.
 def empirische(a: Ausdruck) -> List[Tuple[str, Einheit]]
 ```
 
-`(Symbol, Einheit)` je empirischem Blatt -- fuer den Einheitenhinweis.
+`(Symbol, Einheit)` je empirischem Blatt – fuer den Einheitenhinweis.
 
 ### rechnen
 
@@ -249,7 +249,7 @@ def rechnen(a: Ausdruck) -> float
 ```
 
 Der Wert des Baums in SI; ein empirisches Blatt in seiner Einheit. Eine
-negative Zahl unter einer Wurzel gibt `nan` -- dann stimmt nichts mehr.
+negative Zahl unter einer Wurzel gibt `nan` – dann stimmt nichts mehr.
 
 ### symbolisch
 
@@ -282,16 +282,16 @@ Ein Faktor mit seiner (positiven) Hochzahl; `allein` im Zaehler oder Nenner.
 
 ## Konstanten
 
-- `WINKEL = {'sin': math.sin, 'cos': math.cos, 'tan': math.tan, 'cot': lambda x: …` – Die Winkelfunktionen, wie LaTeX sie schreibt -- mit ihrer Rechnung.
+- `WINKEL = {'sin': math.sin, 'cos': math.cos, 'tan': math.tan, 'cot': lambda x: …` – Die Winkelfunktionen, wie LaTeX sie schreibt – mit ihrer Rechnung.
 - `_FUNKTIONEN = {'min': min, 'max': max, 'abs': abs, **WINKEL}`
 - `EINS = Zahl(1.0, '1')`
-- `_ABSTAENDE = {',', ';', ':', '!', ' ', 'quad', 'qquad'}` – Zwischenraeume -- sie tragen nichts zur Rechnung bei.
+- `_ABSTAENDE = {',', ';', ':', '!', ' ', 'quad', 'qquad'}` – Zwischenraeume – sie tragen nichts zur Rechnung bei.
 - `_BEFEHL = re.compile('\\\\([A-Za-z]+|.)')`
 - `_ZAHL = re.compile('\\d+(?:\\.\\d+)?')`
 - `_ZEICHEN = set('{}()[]|+-^;,/')`
 - `_FAKTORBEFEHLE = {'frac', 'tfrac', 'dfrac', 'sqrt', 'left', 'pi', 'min', 'max', *WINKE…` – Was ein Faktor sein kann, der ohne Rechenzeichen folgt: `2 \\cos x`.
 - `_ZU = {'(': ')', '[': ']', '|': '|'}`
-- `Blattsatz = Callable[[Blatt, bool, bool], str]` – Wie ein Blatt dasteht: `(blatt, vorn, hoch) -> LaTeX` -- `vorn`, wenn kein Rechenzeichen davorsteht, `hoch`, wenn ein Exponent folgt.
+- `Blattsatz = Callable[[Blatt, bool, bool], str]` – Wie ein Blatt dasteht: `(blatt, vorn, hoch) -> LaTeX` – `vorn`, wenn kein Rechenzeichen davorsteht, `hoch`, wenn ein Exponent folgt.
 
 ## Braucht
 

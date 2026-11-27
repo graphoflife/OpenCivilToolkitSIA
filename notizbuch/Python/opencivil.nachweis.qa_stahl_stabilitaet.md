@@ -1,5 +1,5 @@
 ---
-erzeugt: 7436708bb9f5
+erzeugt: b7ac7c1e5f91
 art: modul
 tags: [modul]
 ---
@@ -12,14 +12,14 @@ tags: [modul]
 Je Stabilitaetsfall der Querschnittsanalyse ein Nachweis mit seiner
 Herleitung; gerechnet wird in [[opencivil.stahlbau.stabilitaet]]. Der
 Reihe nach: die Klasse im Fall, die Widerstaende nach ihr, das Knicken je
-Achse, das Kippen um die starke Achse, dann das Zusammenwirken -- (50) und
-(51) in den Klassen 1 bis 3, (62) und (63) in Klasse 4 -- und der
+Achse, das Kippen um die starke Achse, dann das Zusammenwirken – (50) und
+(51) in den Klassen 1 bis 3, (62) und (63) in Klasse 4 – und der
 Erfuellungsgrad wie in der Tragsicherheit: die Normalkraft bleibt, die
 Momente wachsen. Ohne Moment steht die Normalkraft gegen den kleineren
 Knickwiderstand.
 
 
-## WAS FEHLT -- GRAU
+## WAS FEHLT – GRAU
 
 Was [[opencivil.stahlbau.stabilitaet#Ergebnis|fehlt]] nennt: eine
 Knickspannungskurve, wo der Querschnitt nicht aus einem einzigen Profil
@@ -29,7 +29,7 @@ nicht kennt; ein Rundrohr der Klasse 4.
 
 ## VORZEICHEN
 
-N \< 0 Druck; M_y > 0 zieht unten, M_z > 0 links -- um den Schwerpunkt.
+N \< 0 Druck; M_y > 0 zieht unten, M_z > 0 links – um den Schwerpunkt.
 
 ## Inhalt
 
@@ -47,7 +47,7 @@ Die Seite, die ein Glied bei `λ` zieht.
 class StahlStabilitaetQA(Nachweis)
 ```
 
-Knicken und Kippen eines Stahlstabs, je Fall -- siehe Dateikopf.
+Knicken und Kippen eines Stahlstabs, je Fall – siehe Dateikopf.
 
 - `THEMA = 'Knicken und Kippen'`
 - `ART = 'Stab'`
@@ -64,7 +64,7 @@ def pruefe(self, e: Eingaben, p: Protokoll)
 def _urteil(self, p: Protokoll, werte: Zwischenwerte, r: '_Herleitung', d_grad: WertDef, fall: st.Stabfall) -> NachweisUrteil
 ```
 
-Der Vergleich: die Momente gegen ihren Widerstand -- ohne Moment die Normalkraft.
+Der Vergleich: die Momente gegen ihren Widerstand – ohne Moment die Normalkraft.
 
 ### _einwirkung
 
@@ -72,7 +72,7 @@ Der Vergleich: die Momente gegen ihren Widerstand -- ohne Moment die Normalkraft
 def _einwirkung(p: Protokoll, biegung: Biegung, fall: st.Stabfall) -> None
 ```
 
-Die Einwirkung und der Stab als Tabelle -- einachsig ohne M_z.
+Die Einwirkung und der Stab als Tabelle – einachsig ohne M_z.
 
 ### _Herleitung
 
@@ -80,7 +80,7 @@ Die Einwirkung und der Stab als Tabelle -- einachsig ohne M_z.
 class _Herleitung
 ```
 
-Die Herleitung eines Falls -- Schritt fuer Schritt, mit den Werten, die sie teilen.
+Die Herleitung eines Falls – Schritt fuer Schritt, mit den Werten, die sie teilen.
 
 #### _Herleitung.seiten
 
@@ -122,7 +122,7 @@ def kippen(self) -> None
 def _druckgurt(self, gurt: st.Druckgurt) -> Wert
 ```
 
-Der Druckgurt nach Figur 40 -- sein Traegheitsradius.
+Der Druckgurt nach Figur 40 – sein Traegheitsradius.
 
 #### _Herleitung._omega
 
@@ -130,7 +130,7 @@ Der Druckgurt nach Figur 40 -- sein Traegheitsradius.
 def _omega(self, achse: str) -> Wert
 ```
 
-`ω` um `achse` -- beim ersten Mal mit seiner Formel.
+`ω` um `achse` – beim ersten Mal mit seiner Formel.
 
 #### _Herleitung.gleichung_50
 

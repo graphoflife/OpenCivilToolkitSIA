@@ -58,8 +58,8 @@ Gesucht wird die Ebene, die N, M\_y und M\_z zugleich trägt. Zu einer festen Zu
 
 ## Theorie
 
-Eine aufgezwungene Krümmung -- etwa ein Temperaturunterschied zwischen Ober-
-und Unterseite einer eingespannten Platte -- erzeugt ein Moment, ohne dass
+Eine aufgezwungene Krümmung – etwa ein Temperaturunterschied zwischen Ober-
+und Unterseite einer eingespannten Platte – erzeugt ein Moment, ohne dass
 eine Last wirkt. Beim Riss geht es auf die Bewehrung über. Anders als beim
 spröden Versagen steht hier nicht der Biegewiderstand gegen das Rissmoment,
 sondern die Stahlspannung gegen ihre Grenze.
@@ -69,6 +69,6 @@ linear, die Bewehrung mit der [[Wertigkeit im gerissenen Zustand]]. Daraus
 folgen die [[Nulllinie des gerissenen Querschnitts]], der
 [[Innerer Hebelarm|innere Hebelarm]] und das
 [[Aufnehmbares Moment der Bewehrung|Moment, das die Bewehrung bei ihrer zulässigen Spannung aufnimmt]].
-Es muss das Rissmoment des ungerissenen Querschnitts übertreffen -- zwei
+Es muss das Rissmoment des ungerissenen Querschnitts übertreffen – zwei
 verschiedene Querschnitte, vor und nach dem Riss, und genau das ist die
 Frage.

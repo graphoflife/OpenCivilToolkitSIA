@@ -1,5 +1,5 @@
 ---
-erzeugt: 14cbeffc8e9e
+erzeugt: c880cd8af5f7
 art: modul
 tags: [modul]
 ---
@@ -16,14 +16,14 @@ gegen die angegebenen Querkraefte.
 ## ZWEI ANSAETZE, EINER DAVON GILT
 
 Ob die Platte eine Querkraftbewehrung traegt, entscheidet allein, welcher der
-beiden laeuft -- je einer eine Klasse in seinem Modul:
+beiden laeuft – je einer eine Klasse in seinem Modul:
 
 * ohne Buegel ([[opencivil.nachweis.querkraft_ohne_buegel|querkraft_ohne_buegel]]):
   `V_Rd = k_d * tau_cd * d_v`, abhaengig von Moment und Normalkraft;
 * mit Buegeln ([[opencivil.nachweis.querkraft_buegel|querkraft_buegel]]): das
   Fachwerkmodell mit veraenderlicher Neigung der Druckdiagonalen.
 
-Beides zu addieren waere ein drittes Modell -- und dieses Werkzeug rechnet
+Beides zu addieren waere ein drittes Modell – und dieses Werkzeug rechnet
 nur, was es auch herleitet. Hier steht, was beide teilen: die Faelle, die
 statische Hoehe der gezogenen Bewehrung, die Ausgaben, das Urteil und die
 letzte Zeile der Herleitung.
@@ -37,7 +37,7 @@ Bis 2026-10-25 steckten beide Ansaetze in einer Klasse hinter einem
 `d` ist die statische Hoehe der *gezogenen* Bewehrung und haengt damit vom
 Vorzeichen des Moments ab: bei positivem Moment liegt der Zug unten, bei
 negativem oben. Gemessen wird bis zum Schwerpunkt aller gezogenen Posten der
-Richtung -- Grundbewehrung, Zulage, auch mehrere Lagen (SIA 262:2025,
+Richtung – Grundbewehrung, Zulage, auch mehrere Lagen (SIA 262:2025,
 4.3.3.2.2). Bis 2026-11-14 galt der aeusserste Posten; mit einer Zulage war
 `d` damit 1 bis 3 mm zu gross.
 
@@ -49,12 +49,12 @@ Richtung -- Grundbewehrung, Zulage, auch mehrere Lagen (SIA 262:2025,
 def zugposten(posten: Sequence[Postenbezug], seite: Zugseite) -> List[Postenbezug]
 ```
 
-Die Posten der gezogenen Seite -- bei positivem Moment die unteren
+Die Posten der gezogenen Seite – bei positivem Moment die unteren
 ([[opencivil.querschnitt.zugseite#Zugseite.aus_moment|aus_moment]]). **Nur sie
 zaehlen.** Wer alle nimmt, bekommt bei
 einseitiger Bewehrung eine Zahl, die gar keine statische Hoehe ist: eine
 Platte nur mit unterer Bewehrung lieferte fuers negative Moment
-`h - 261 = 39 mm` -- den Abstand der Unterkante zur *unteren* Lage.
+`h - 261 = 39 mm` – den Abstand der Unterkante zur *unteren* Lage.
 
 ### statische_hoehen
 
@@ -63,7 +63,7 @@ def statische_hoehen(e: Eingaben, posten: Sequence[Postenbezug]) -> Dict[Zugseit
 ```
 
 Je Zugseite der Platte, unten und oben, die statische Hoehe der
-gezogenen Bewehrung, in m ab dem gedrueckten Rand -- im Schwerpunkt ihrer
+gezogenen Bewehrung, in m ab dem gedrueckten Rand – im Schwerpunkt ihrer
 Posten ([[opencivil.querschnitt.lagenaufbau#lage_aus_posten|lage_aus_posten]]). Fuer
 den Nachweis und die Kennzahlen.
 
@@ -85,7 +85,7 @@ def protokoll_hoehen(p: Protokoll, werte: Zwischenwerte, e: Eingaben, gezogen: S
 ```
 
 Die statische Hoehe der gezogenen Bewehrung und, ohne Buegel, die
-wirksame -- geschrieben, und fuer die Formeln danach. `gezogen` sind die
+wirksame – geschrieben, und fuer die Formeln danach. `gezogen` sind die
 Posten der gezogenen Seite ([[opencivil.nachweis.querkraft#zugposten|zugposten]]), `seite` die gezogene.
 Liegen dort mehrere, steht zuerst ihr Schwerpunkt da. `zeichen` hebt die
 Groessen hoch, wo zwei Seiten nebeneinander stehen: `d^{+}` (die
@@ -101,7 +101,7 @@ Buegel mit einer Einlage null mitbenutzten.
 def _ohne_zugbewehrung(M_Ed: float) -> str
 ```
 
-Die Begruendung, wenn die gezogene Seite keinen Stahl hat -- fuer beide Ansaetze.
+Die Begruendung, wenn die gezogene Seite keinen Stahl hat – fuer beide Ansaetze.
 
 ### Querkraftfall
 
@@ -131,14 +131,14 @@ def kennung(self) -> str
 class Querkraftergebnis(Fallausgang)
 ```
 
-Was ein Fall ergibt, in beiden Ansaetzen -- ihre eigenen Zwischenwerte
+Was ein Fall ergibt, in beiden Ansaetzen – ihre eigenen Zwischenwerte
 tragen [[opencivil.nachweis.querkraft_ohne_buegel#ErgebnisOhneBuegel|ErgebnisOhneBuegel]]
 und [[opencivil.nachweis.querkraft_buegel#ErgebnisMitBuegeln|ErgebnisMitBuegeln]].
-Sein Ausgang: \|V_Ed\| gegen v_Rd -- nicht fuehrbar, wo sich kein
+Sein Ausgang: \|V_Ed\| gegen v_Rd – nicht fuehrbar, wo sich kein
 Widerstand bestimmen liess.
 
 - `fall: Querkraftfall`
-- `zugposten: Tuple[Postenbezug, ...] = ()` – Die Posten der gezogenen Seite -- aus ihrem Schwerpunkt kommt `d`; leer ohne Zugbewehrung.
+- `zugposten: Tuple[Postenbezug, ...] = ()` – Die Posten der gezogenen Seite – aus ihrem Schwerpunkt kommt `d`; leer ohne Zugbewehrung.
 - `d: float = 0.0`
 - `v_Rd: float = 0.0` – in N/m.
 
@@ -148,15 +148,15 @@ Widerstand bestimmen liess.
 class Querkraft(Teilnachweis)
 ```
 
-Der Querkraftnachweis einer Platte in einer Tragrichtung -- was beide
+Der Querkraftnachweis einer Platte in einer Tragrichtung – was beide
 Ansaetze teilen. Welcher gilt, entscheidet allein, ob die Platte Buegel
 traegt: [[opencivil.nachweis.querkraft_ohne_buegel#QuerkraftOhneBuegel|QuerkraftOhneBuegel]]
 oder [[opencivil.nachweis.querkraft_buegel#QuerkraftMitBuegeln|QuerkraftMitBuegeln]].
 
 - `THEMA = 'Querkraft'`
 - `ART = 'V'`
-- `REFERENZ: str` – Wo der Widerstand des Ansatzes steht -- fuer Nachweis, Widerstand und Erfuellungsgrad.
-- `buegel = None` – Die Buegel der Platte -- nur der Ansatz mit Buegeln hat welche.
+- `REFERENZ: str` – Wo der Widerstand des Ansatzes steht – fuer Nachweis, Widerstand und Erfuellungsgrad.
+- `buegel = None` – Die Buegel der Platte – nur der Ansatz mit Buegeln hat welche.
 
 #### Querkraft._ansatzbezuege
 
@@ -173,7 +173,7 @@ Was der Ansatz ausser der Hoehe und den Lagen der Bewehrung liest.
 def _fallbezuege(self) -> List[Eingabebezug]
 ```
 
-Was je Fall dazukommt -- ohne Buegel sein Momentenwiderstand.
+Was je Fall dazukommt – ohne Buegel sein Momentenwiderstand.
 
 #### Querkraft._befunde
 
@@ -181,7 +181,7 @@ Was je Fall dazukommt -- ohne Buegel sein Momentenwiderstand.
 def _befunde(self) -> List[Befundbezug]
 ```
 
-Wessen Befund der Ansatz liest -- ohne Buegel den des M-N-Nachweises.
+Wessen Befund der Ansatz liest – ohne Buegel den des M-N-Nachweises.
 
 #### Querkraft.ausgaben_des_teils
 
@@ -189,7 +189,7 @@ Wessen Befund der Ansatz liest -- ohne Buegel den des M-N-Nachweises.
 def ausgaben_des_teils(self, erg: Querkraftergebnis) -> Mapping[str, Groesse]
 ```
 
-Was ein Fall ausser seinem Grad ausgibt, `v_Rd` -- fuer beide
+Was ein Fall ausser seinem Grad ausgibt, `v_Rd` – fuer beide
 Ansaetze dasselbe. Was ein Querkraftnachweis herausgibt, haengt nicht
 davon ab, wie der Widerstand zustande kam; zweimal geschrieben liefen
 die beiden frueher oder spaeter auseinander.
@@ -200,7 +200,7 @@ die beiden frueher oder spaeter auseinander.
 def _einwirkung(self, fall: Querkraftfall) -> Wert
 ```
 
-Die Querkraft als Betrag -- fuer Urteil und Erfuellungsgrad dieselbe.
+Die Querkraft als Betrag – fuer Urteil und Erfuellungsgrad dieselbe.
 
 Das Vorzeichen spielt keine Rolle, verglichen wird der Betrag. Also
 steht auch der Betrag da; sonst teilte der Leser den Widerstand durch
@@ -214,7 +214,7 @@ sie sagen nichts, was die Zahl daneben nicht schon zeigt.
 def _widerstand(self, erg: Querkraftergebnis) -> Wert
 ```
 
-Der Widerstand eines Falls -- fuer Urteil und Herleitung derselbe.
+Der Widerstand eines Falls – fuer Urteil und Herleitung derselbe.
 
 Er gilt nur unter genau dieser Einwirkung; das gehoert ins Symbol,
 sonst liest sich V_Rd wie ein Kennwert des Querschnitts.
@@ -225,7 +225,7 @@ sonst liest sich V_Rd wie ein Kennwert des Querschnitts.
 def _widerstandssymbol(self, fall: Querkraftfall) -> str
 ```
 
-`V_Rd(M_Ed = 100 kNm, N_Ed = -300 kN)` -- der Widerstand ist bedingt.
+`V_Rd(M_Ed = 100 kNm, N_Ed = -300 kN)` – der Widerstand ist bedingt.
 
 #### Querkraft._protokoll_grad
 
@@ -233,7 +233,7 @@ def _widerstandssymbol(self, fall: Querkraftfall) -> str
 def _protokoll_grad(self, p: Protokoll, erg: Querkraftergebnis) -> None
 ```
 
-Die letzte Zeile jedes Falls -- für beide Ansätze dieselbe. Der
+Die letzte Zeile jedes Falls – für beide Ansätze dieselbe. Der
 Widerstand steht hier kurz: seine Bedingung steht in der Zeile, die ihn
 herleitet.
 

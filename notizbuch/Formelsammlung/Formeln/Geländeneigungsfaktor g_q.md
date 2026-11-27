@@ -48,5 +48,5 @@ $g_{\gamma} = g_q$. Die fünfte Potenz macht ihn empfindlich: bei
 $\beta = 15°$ bleibt knapp die Hälfte (0.49), bei 30° knapp ein Fünftel
 (0.18).
 
-Wird die Klammer kleiner als null -- erst bei sehr steilem Gelände --, gilt
+Wird die Klammer kleiner als null – erst bei sehr steilem Gelände –, gilt
 null.

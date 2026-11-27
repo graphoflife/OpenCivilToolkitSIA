@@ -1,5 +1,5 @@
 ---
-erzeugt: 8e065328ee30
+erzeugt: 10b15820b5f6
 art: modul
 tags: [modul]
 ---
@@ -9,20 +9,20 @@ tags: [modul]
 
 ## VERANTWORTUNG
 
-Was der Kern der Oberflaeche gibt, steht in den Einheiten der Anzeige --
+Was der Kern der Oberflaeche gibt, steht in den Einheiten der Anzeige –
 kN, kNm, mm, N/mm², Promille. Umgerechnet wird hier, mit den Einheiten des
 Kerns ([[opencivil.core.einheiten]]): [[opencivil.web.anzeige#zahl|zahl]] von SI in eine
 Einheit, [[opencivil.web.anzeige#si|si]] zurueck fuer das, was die Oberflaeche schickt. Eine
 Groesse einer Linie traegt dazu Zeichen und Stellen
 ([[opencivil.web.anzeige#Anzeigegroesse|Anzeigegroesse]]).
 
-Dazu die Zellen einer Zeile -- Text oder Formel, wie in den Tabellen der
+Dazu die Zellen einer Zeile – Text oder Formel, wie in den Tabellen der
 Herleitung ([[opencivil.web.anzeige#zelle_dict|zelle_dict]]). Aus ihnen bestehen die Legenden der
 Situationsbilder ([[opencivil.web.anzeige#zeile|zeile]], [[opencivil.web.anzeige#zahlformel|zahlformel]]): die Zahlen, ihr
 Vergleich und das Urteil kommen aus dem Kern, die Oberflaeche setzt sie nur.
 
 BIS 2026-11-10 standen die Einheiten der Anzeige auf drei Wegen da: als
-Groesse nur fuer die Linien der Diagramme, sonst als nackte Faktoren -- und
+Groesse nur fuer die Linien der Diagramme, sonst als nackte Faktoren – und
 `kN = 1e-3` in den Bildern hiess das Gegenteil von `kN = 1e3` beim
 Bauen. Die Legenden baute das JS selbst, samt Urteil und Normstelle.
 
@@ -34,7 +34,7 @@ Bauen. Die Legenden baute das JS selbst, samt Urteil und Normstelle.
 def zahl(si_wert: Optional[float], einheit: Einheit) -> Optional[float]
 ```
 
-Ein Wert in SI, in der Einheit der Anzeige -- `None` bleibt `None`.
+Ein Wert in SI, in der Einheit der Anzeige – `None` bleibt `None`.
 
 ### si
 
@@ -65,7 +65,7 @@ Eine Groesse einer Linie, wie sie in den Zeichendaten steht: Zeichen und Einheit
 - `einheit: Einheit`
 - `latex: str = ''`
 - `stellen: int = 1`
-- `am_bezugsort: bool = False` – Ob sie an einem Ort des Querschnitts gilt -- die Mitteldehnung, nicht die Kruemmung.
+- `am_bezugsort: bool = False` – Ob sie an einem Ort des Querschnitts gilt – die Mitteldehnung, nicht die Kruemmung.
 
 #### Anzeigegroesse.zahl
 
@@ -90,7 +90,7 @@ def zelle_dict(zelle: Zelle) -> dict
 ```
 
 Eine Zelle fuer die Oberflaeche: `{"text": ...}` oder `{"mathe": ...}`.
-Die Oberflaeche setzt nur Formeln mit KaTeX -- Text aus LaTeX
+Die Oberflaeche setzt nur Formeln mit KaTeX – Text aus LaTeX
 zurueckzulesen, wie sie es frueher musste, entfaellt.
 
 ### zeile
@@ -115,7 +115,7 @@ def masszahl(si_wert: float, einheit: Einheit, stellen: int) -> str
 def zahlformel(zeichen: str, si_wert: float, einheit: Einheit, stellen: int) -> Mathe
 ```
 
-`Zeichen = Zahl Einheit` als Formel -- eine Zahl in einer Zeile.
+`Zeichen = Zahl Einheit` als Formel – eine Zahl in einer Zeile.
 
 ### urteil
 
@@ -125,7 +125,7 @@ def urteil(links: str, soll: str, rechts: str, erfuellt: bool, grad: str) -> Lis
 
 Ein Vergleich mit seinem Urteil, als Teile einer Zeile:
 `s = 12 mm ≤ s_zul = 25 mm – erfüllt, α = 2.08`. `links` und
-`rechts` in LaTeX, `soll` das Zeichen, das gelten muss -- geht er
+`rechts` in LaTeX, `soll` das Zeichen, das gelten muss – geht er
 nicht auf, steht sein Gegenteil da; `grad` der Erfuellungsgrad in LaTeX.
 
 

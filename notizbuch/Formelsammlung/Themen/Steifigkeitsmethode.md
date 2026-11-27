@@ -38,5 +38,5 @@ Stab die [[Schnittgrössen längs eines Stabs|Schnittgrössen]] und die
 
 Ein Gelenk gibt einem Stabende eine eigene Drehung, Federn und
 [[Bettung eines Stabs|Bettung]] geben zusätzliche Steifigkeit, und ein festes
-Linienlager hält einen Stab auf ganzer Länge -- er biegt sich dann nicht, und
+Linienlager hält einen Stab auf ganzer Länge – er biegt sich dann nicht, und
 seine Last geht geradewegs ins Lager.

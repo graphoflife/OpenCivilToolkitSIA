@@ -49,8 +49,8 @@ $$
 ## Theorie
 
 Die Fläche des Rechtecks $b \times h$. Im Balkensystem ist es die Fläche
-eines Stabs mit Rechteckquerschnitt -- auch eines Plattenstreifens der Breite
-$b$ und der Dicke $h$ -- und sie geht über die [[Dehnsteifigkeit]] in die
+eines Stabs mit Rechteckquerschnitt – auch eines Plattenstreifens der Breite
+$b$ und der Dicke $h$ – und sie geht über die [[Dehnsteifigkeit]] in die
 Rechnung ein.
 
 In der Spannung-Dehnung-Analyse ist es der reine Betonquerschnitt ohne

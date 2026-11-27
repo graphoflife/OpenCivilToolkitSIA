@@ -1,5 +1,5 @@
 ---
-erzeugt: 9ce9e561fe30
+erzeugt: ea38fb81711f
 art: modul
 tags: [modul]
 ---
@@ -8,7 +8,7 @@ tags: [modul]
 > Paket [[opencivil]] · [Quelltext](../../opencivil/bericht/__init__.py)
 
 Die Gliederung des Berichts ([[opencivil.bericht.gliederung]]) und seine
-Darstellungen -- Konsole, LaTeX-Dokument, Markdown --, jede mit einer Tafel
+Darstellungen – Konsole, LaTeX-Dokument, Markdown –, jede mit einer Tafel
 je Blockart. Dazu die Zusammenfassung und die Formelsammlung. Gerechnet wird
 hier nichts: alles steht schon in der Loesung.
 

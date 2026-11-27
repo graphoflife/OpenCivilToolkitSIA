@@ -1,5 +1,5 @@
 ---
-erzeugt: 258160dbc6f7
+erzeugt: d398b2ae86d3
 art: modul
 tags: [modul]
 ---
@@ -24,7 +24,7 @@ ob der bewehrte Querschnitt mehr traegt als der unbewehrte im Augenblick des
 Risses. Genau das ist `M_Rd >= M_Riss`.
 
 Frueher stand hier `M_s,adm = sigma_s,adm * A_s * z`. Das war ein anderer
-Nachweis -- naemlich der gegen eine **Zwaengung auf Biegung**, und der steht
+Nachweis – naemlich der gegen eine **Zwaengung auf Biegung**, und der steht
 jetzt in [[opencivil.nachweis.mindestbewehrung]]. Bei normaler Anforderung
 war er ausserdem *weniger* streng als `M_Rd`: `f_yk/f_yd = 1.15` wiegt den
 kleineren Hebelarm des gerissenen Querschnitts mehr als auf.
@@ -67,7 +67,7 @@ class SproedesVersagen(Lagennachweis)
 Mindestbewehrung gegen sprödes Versagen ([[opencivil.nachweis.lagennachweis#Lagennachweis|Lagennachweis]]).
 
 Ein Nachweis je Platte, ein Urteil je Lage der Tragrichtung. In der
-Zusammenfassung steht die ungünstigere der beiden -- geht die auf, geht
+Zusammenfassung steht die ungünstigere der beiden – geht die auf, geht
 auch die andere auf.
 
 `M_Rd(N=0)` kommt als Eingang aus dem M-N-Nachweis. Als Eingang und nicht
@@ -86,7 +86,7 @@ Rückverfolgung sie zeigt.
 def ansatz(self, e: Eingaben, p: Protokoll) -> Tuple[Rissgroessen, Wert]
 ```
 
-Das Rissmoment des Rechtecks -- und seine Herleitung.
+Das Rissmoment des Rechtecks – und seine Herleitung.
 
 #### SproedesVersagen.eine_lage
 
@@ -100,7 +100,7 @@ def eine_lage(self, e: Eingaben, lage: Bewehrungslage, ansatz: Tuple[Rissgroesse
 def _m_rd(self, erg: Lagenergebnis) -> Wert
 ```
 
-Der Biegewiderstand der Lage -- der Widerstand in Tabelle und Herleitung.
+Der Biegewiderstand der Lage – der Widerstand in Tabelle und Herleitung.
 
 #### SproedesVersagen.protokoll_lage
 

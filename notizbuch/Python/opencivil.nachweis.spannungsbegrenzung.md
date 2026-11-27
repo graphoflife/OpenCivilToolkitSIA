@@ -1,5 +1,5 @@
 ---
-erzeugt: 1dcc9dfa4d73
+erzeugt: 666bdfbd80e8
 art: modul
 tags: [modul]
 ---
@@ -14,10 +14,10 @@ gegen eine Grenze. Zwei Nachweise teilen sich diese Rechnung:
 
 * **Gegen Fliessen**, unter *haeufiger* Einwirkung: ``sigma_s \<= f_yd - 80
   N/mm²`` (SIA 262:2025, Tabelle 17). Nur bei erhoehter und hoher
-  Anforderung -- bei normaler steht in der Tabelle ein Strich.
+  Anforderung – bei normaler steht in der Tabelle ein Strich.
 * **Aus der Rissbreite**, unter *quasi-staendiger* Einwirkung:
   `sigma_s <= sigma_s,adm`, dieselbe zulaessige Spannung wie bei der
-  Zwaengung -- `f_yk` bei normaler Anforderung, die Wurzelformel mit
+  Zwaengung – `f_yk` bei normaler Anforderung, die Wurzelformel mit
   `w_nom` bei erhoehter und hoher. Immer gefuehrt.
 
 
@@ -25,7 +25,7 @@ gegen eine Grenze. Zwei Nachweise teilen sich diese Rechnung:
 
 Die Rechnung ist in beiden Faellen dieselbe: derselbe Loeser, dieselbe
 Fallschleife, dieselbe groesste Zugdehnung. Verschieden ist allein die
-Grenze -- ihre Zahl, die Eingaben, aus denen sie entsteht, und ihr Absatz in
+Grenze – ihre Zahl, die Eingaben, aus denen sie entsteht, und ihr Absatz in
 der Herleitung. Die drei gehoeren zusammen und stehen darum in einer Klasse,
 die dem Nachweis mitgegeben wird
 ([[opencivil.nachweis.spannungsgrenzen#Spannungsgrenze|Spannungsgrenze]], mit den
@@ -37,8 +37,8 @@ denselben Querschnitt verschiedene sigma_s melden.
 ## EINE KLASSE, ZWEI GEOMETRIEN
 
 Dasselbe gilt fuer die Platte und den gezeichneten Querschnitt. Gemessen
-wird an **Stellen** -- bei der Platte an ihren Lagen, beim gezeichneten
-Querschnitt an jedem Stab --, und was der Nachweis von der Geometrie wissen
+wird an **Stellen** – bei der Platte an ihren Lagen, beim gezeichneten
+Querschnitt an jedem Stab –, und was der Nachweis von der Geometrie wissen
 muss, sagt ihm ein schmaler Anschluss ([[opencivil.nachweis.spannungsbegrenzung#Stahlspannungsort|Stahlspannungsort]]): die
 Ebene je Fall, die Stellen, die Grenze aus der Rissbreite und die Absaetze,
 die nur die Geometrie schreiben kann. Welche Stelle massgebend ist, wie
@@ -51,18 +51,18 @@ kopiertem Urteil und kopiertem Vergleich.
 
 Ueber [[opencivil.nachweis.querschnittsloeser]]: gesucht wird die
 Dehnungsebene, die `M_Ed` und `N_Ed` des Lastfalls im Gleichgewicht
-haelt -- am gezeichneten Querschnitt mit gedrehter Nulllinie
+haelt – am gezeichneten Querschnitt mit gedrehter Nulllinie
 ([[opencivil.nachweis.gebrauchsebene]]). Der Beton nimmt keinen Zug auf.
 Womit gerechnet wird, waehlt das Kapitel
 ([[opencivil.querschnitt.gesetzwahl#Rechenwahl|Rechenwahl]]): die Kriechzahl, den
-Wertesatz und die Rechenart. Die Vorgabe ist **praezise** -- die Parabel
-mit dem wirksamen Modul `E_cm/(1+phi)` -- mit den **charakteristischen**
+Wertesatz und die Rechenart. Die Vorgabe ist **praezise** – die Parabel
+mit dem wirksamen Modul `E_cm/(1+phi)` – mit den **charakteristischen**
 Festigkeiten: der Stahl fliesst bei `f_yk`, der Beton traegt hoechstens
 `f_ck`. Bis 2026-11-25 war es «elastisch», der Beton linear mit demselben
 Modul; der Benutzer hat diese Rechenart gestrichen
 ([[opencivil.querschnitt.gesetzwahl]]).
 
-Die gedrueckte Bewehrung wirkt mit, wie im Querschnitt -- nur in der
+Die gedrueckte Bewehrung wirkt mit, wie im Querschnitt – nur in der
 Rechenart «Handrechnung» nicht. Gemessen wird an der am staerksten
 gezogenen Stelle. (Bis 2026-10-09 stand hier, nur gezogene Bewehrung zaehle;
 gerechnet wurde aber schon damals mit beiden.)
@@ -71,7 +71,7 @@ gerechnet wurde aber schon damals mit beiden.)
 ## WENN DER STAHL FLIESST
 
 Auf dem Plateau bleibt die Spannung bei `f_yk` stehen. Bei normaler
-Anforderung ist aber gerade `f_yk` die Grenze -- ein fliessender Stahl
+Anforderung ist aber gerade `f_yk` die Grenze – ein fliessender Stahl
 haette dann `sigma_s = sigma_s,adm` und stuende mit Erfuellungsgrad 1.00
 als «erfuellt» in der Tabelle. Darum wird an der **Dehnung** gemessen:
 
@@ -83,14 +83,14 @@ Solange der Stahl elastisch bleibt, ist `E_s * eps_s` genau `sigma_s`, und
 das ist der uebliche Spannungsvergleich, Bit fuer Bit. Fliesst er, waechst die
 Dehnung weiter, waehrend die Spannung stehen bleibt: der Nachweis faellt
 durch, und zwar um so deutlicher, je weiter die Bewehrung ueber die Grenze
-gedehnt ist. Das braucht auch die Bewehrungssuche -- ein Erfuellungsgrad, der
+gedehnt ist. Das braucht auch die Bewehrungssuche – ein Erfuellungsgrad, der
 auf dem Plateau festsitzt, zeigt ihr keine Richtung.
 
 
 ## WAS IN DER MITSCHRIFT STEHT
 
 Der **Ablauf** der Suche (aus [[opencivil.nachweis.querschnittsloeser#protokoll_verfahren|querschnittsloeser.protokoll_verfahren]]),
-die Festlegungen dahinter -- Kriechzahl, Werkstoffgesetze, Grenze --, dann je
+die Festlegungen dahinter – Kriechzahl, Werkstoffgesetze, Grenze –, dann je
 Fall die gefundene Ebene und die **Probe**: mit diesem `eps_m` und `chi`
 entstehen genau `N_Ed` und `M_Ed`. Die einzelnen Halbierungen stehen nicht
 da; sie sind kein Rechenschritt, sondern der Weg zu einem, und belegt wird der
@@ -105,9 +105,9 @@ durch die Probe.
 class Gebrauchsfall
 ```
 
-Eine Schnittgroessenkombination unter Gebrauchslast -- an der Platte.
+Eine Schnittgroessenkombination unter Gebrauchslast – an der Platte.
 
-Haeufig oder quasi-staendig -- das sagt nicht der Fall, sondern der
+Haeufig oder quasi-staendig – das sagt nicht der Fall, sondern der
 Nachweis, dem er mitgegeben wird. Der gezeichnete Querschnitt nimmt
 seinen [[opencivil.querschnitt.analyse#Lastfall|Lastfall]].
 
@@ -139,7 +139,7 @@ und den gezeichneten Querschnitt dieselben Absaetze.
 class Stahlebene(Protocol)
 ```
 
-Was der Nachweis von der Ebene eines Falls liest -- je Stelle Dehnung und Spannung.
+Was der Nachweis von der Ebene eines Falls liest – je Stelle Dehnung und Spannung.
 
 - `konvergiert: bool`
 - `verfehlt: bool`
@@ -152,7 +152,7 @@ Was der Nachweis von der Ebene eines Falls liest -- je Stelle Dehnung und Spannu
 class Stahlspannungsort(ABC)
 ```
 
-Was [[opencivil.nachweis.spannungsbegrenzung#Spannungsbegrenzung|Spannungsbegrenzung]] von seiner Geometrie wissen muss -- und
+Was [[opencivil.nachweis.spannungsbegrenzung#Spannungsbegrenzung|Spannungsbegrenzung]] von seiner Geometrie wissen muss – und
 nicht mehr: die Platte je Tragrichtung ([[opencivil.nachweis.spannungsbegrenzung#PlattenStellen|PlattenStellen]]), der
 gezeichnete Querschnitt
 ([[opencivil.nachweis.qa_gebrauch#AnalyseStellen|AnalyseStellen]]).
@@ -163,19 +163,19 @@ er die Ebene ([[opencivil.nachweis.spannungsbegrenzung#Stahlspannungsort.ebene|e
 ([[opencivil.nachweis.spannungsbegrenzung#Stahlspannungsort.aus_rissbreite|aus_rissbreite]]), und die Absaetze, die nur er schreiben kann.
 
 Was in Kennungen, Zeichen und Titeln anders heisst, sagen die Woerter
-unten -- so blieben Bericht und Kennungen beider Geometrien, wie sie vor
+unten – so blieben Bericht und Kennungen beider Geometrien, wie sie vor
 der Zusammenlegung waren (2026-10-17).
 
 - `name: str`
 - `abschnitt: Abschnitt`
-- `richtung: Optional[Richtung] = None` – Die Tragrichtung, wo es eine gibt -- sie steht im Namen jedes Urteils.
-- `zeichen: str = ''` – Im Index des Erfuellungsgrads nach der Grenze -- bei der Platte «,x».
-- `beschriftung: str = ''` – Im Titel des Nachweises nach «Einwirkung» -- bei der Platte « in x-Richtung».
-- `titelzusatz: str = ''` – Im Titel der Herleitung -- bei der Platte « – in x-Richtung».
-- `stahlindex: str = 's'` – Der Index an ε_s und σ_s -- bei der Platte «{s,x}».
+- `richtung: Optional[Richtung] = None` – Die Tragrichtung, wo es eine gibt – sie steht im Namen jedes Urteils.
+- `zeichen: str = ''` – Im Index des Erfuellungsgrads nach der Grenze – bei der Platte «,x».
+- `beschriftung: str = ''` – Im Titel des Nachweises nach «Einwirkung» – bei der Platte « in x-Richtung».
+- `titelzusatz: str = ''` – Im Titel der Herleitung – bei der Platte « – in x-Richtung».
+- `stahlindex: str = 's'` – Der Index an ε_s und σ_s – bei der Platte «{s,x}».
 - `messung: str = ''` – Woran gemessen wird: der zweite Satz der Herleitung.
 - `regel_der_rissbreite: str = ''` – Mit welchem Durchmesser die Grenze aus der Rissbreite gilt, als Satz.
-- `baustoffe: Tuple[Baustoff, ...] = ()` – Die Baustoffe, mit denen gerechnet wird -- die Rechenwahl nennt sie, wenn ihre Wertesaetze verschieden sind.
+- `baustoffe: Tuple[Baustoff, ...] = ()` – Die Baustoffe, mit denen gerechnet wird – die Rechenwahl nennt sie, wenn ihre Wertesaetze verschieden sind.
 
 #### Stahlspannungsort.basis
 
@@ -201,7 +201,7 @@ Was die Rechnung liest, mit jeder Grenze.
 def stahlbezuege(self, kennwerte: Sequence[str]) -> List[Eingabebezug]
 ```
 
-Diese Kennwerte je Stahl -- wo sie nicht schon in [[opencivil.nachweis.spannungsbegrenzung#Stahlspannungsort.bezuege|bezuege]] stehen.
+Diese Kennwerte je Stahl – wo sie nicht schon in [[opencivil.nachweis.spannungsbegrenzung#Stahlspannungsort.bezuege|bezuege]] stehen.
 
 #### Stahlspannungsort.rissbreitenbezuege
 
@@ -227,7 +227,7 @@ Was eine Rechnung braucht, aus ihren Eingaben.
 def aus_rissbreite(self, zustand: Stahlzustand, e: Eingaben, p: Protokoll, anforderung: Rissanforderung, basis: str) -> Grenzen
 ```
 
-`sigma_s,adm` jeder Stelle aus der Rissbreite -- gerechnet und hergeleitet.
+`sigma_s,adm` jeder Stelle aus der Rissbreite – gerechnet und hergeleitet.
 
 #### Stahlspannungsort.ebene
 
@@ -236,7 +236,7 @@ def aus_rissbreite(self, zustand: Stahlzustand, e: Eingaben, p: Protokoll, anfor
 def ebene(self, zustand: Stahlzustand, fall) -> Stahlebene
 ```
 
-Die Dehnungsebene, die den Fall traegt -- auch eine ohne Gleichgewicht.
+Die Dehnungsebene, die den Fall traegt – auch eine ohne Gleichgewicht.
 
 #### Stahlspannungsort.keine_ebene
 
@@ -254,7 +254,7 @@ Was dasteht, wo sich zum Fall keine Ebene findet.
 def begruendung(self, zustand: Stahlzustand, erg: 'Fallergebnis') -> str
 ```
 
-Die Begruendung des Urteils -- mit dem Satz des Vergleichs.
+Die Begruendung des Urteils – mit dem Satz des Vergleichs.
 
 #### Stahlspannungsort.dehnungsgrenze
 
@@ -271,7 +271,7 @@ def dehnungsgrenze(self, basis: str, werte: Zwischenwerte, erg: 'Fallergebnis') 
 def protokoll_vor_den_grenzen(self, p: Protokoll, e: Eingaben, zustand: Stahlzustand, wahl: Rechenwahl, phi: Wert, basis: str) -> None
 ```
 
-Was vor der Grenze steht -- bei der Platte der wirksame Modul.
+Was vor der Grenze steht – bei der Platte der wirksame Modul.
 
 #### Stahlspannungsort.protokoll_gesetze
 
@@ -318,21 +318,21 @@ class Fallergebnis(Fallausgang)
 
 Was der Nachweis fuer einen Lastfall gefunden hat. Sein Ausgang stellt
 Spannungen gegeneinander, solange der Stahl elastisch bleibt; fliesst
-er, Dehnungen -- sonst stuende `f_yk` neben `f_yk` und daneben
+er, Dehnungen – sonst stuende `f_yk` neben `f_yk` und daneben
 «nicht erfuellt», richtig gerechnet und doch nicht zu lesen. Entschieden
 wird das einmal, in [[opencivil.nachweis.spannungsbegrenzung#Spannungsbegrenzung._vergleich|Spannungsbegrenzung._vergleich]]. Nicht
 fuehrbar ohne Bewehrung und ohne Gleichgewichtslage.
 
 - `fall: object` – Bei der Platte ein [[opencivil.nachweis.spannungsbegrenzung#Gebrauchsfall|Gebrauchsfall]], am gezeichneten Querschnitt ein Lastfall.
-- `ebene: Optional[Stahlebene] = None` – Die Ebene, die der Ort fand -- fehlt nur ohne Bewehrung.
+- `ebene: Optional[Stahlebene] = None` – Die Ebene, die der Ort fand – fehlt nur ohne Bewehrung.
 - `stelle: int = 0` – Die massgebende Stelle: die gezogene mit dem kleinsten Erfuellungsgrad.
-- `eps_s: float = 0.0` – Ihre Dehnung -- die groesste Zugdehnung, wo nur ein Stahl liegt.
-- `sigma_s: float = 0.0` – Die Spannung dazu, in Pa -- auf dem Plateau `f_yk`.
+- `eps_s: float = 0.0` – Ihre Dehnung – die groesste Zugdehnung, wo nur ein Stahl liegt.
+- `sigma_s: float = 0.0` – Die Spannung dazu, in Pa – auf dem Plateau `f_yk`.
 - `E_s: float = 0.0`
 - `sigma_s_adm: float = 0.0`
-- `eps_s_adm: float = 0.0` – `sigma_s_adm / E_s` -- dagegen wird gemessen, wenn der Stahl fliesst.
+- `eps_s_adm: float = 0.0` – `sigma_s_adm / E_s` – dagegen wird gemessen, wenn der Stahl fliesst.
 - `eps_y: float = 0.0` – Die Fliessdehnung `f_s / E_s`.
-- `stahl: Optional[Baustoff] = None` – Der Stahl der massgebenden Stelle -- seine Grenze, sein `E_s` und seine Fliessdehnung gelten. Mit verschiedenen Staehlen ist massgebend die gezogene Stelle mit dem kleinsten Erfuellungsgrad, nicht die am staerksten gedehnte.
+- `stahl: Optional[Baustoff] = None` – Der Stahl der massgebenden Stelle – seine Grenze, sein `E_s` und seine Fliessdehnung gelten. Mit verschiedenen Staehlen ist massgebend die gezogene Stelle mit dem kleinsten Erfuellungsgrad, nicht die am staerksten gedehnte.
 - `konvergiert: bool = True`
 - `satz: str = ''` – Der Vergleich als Satz, fuer die Begruendung.
 
@@ -363,7 +363,7 @@ Dazu der Loeser der Tragrichtung und die Kennwerte des Betons.
 class PlattenStellen(Stahlspannungsort)
 ```
 
-Die Platte in einer Tragrichtung: Stellen sind ihre Lagen -- in der
+Die Platte in einer Tragrichtung: Stellen sind ihre Lagen – in der
 Handrechnung je Seite eine. Die Grenze aus der Rissbreite gilt mit dem
 dicksten Stab der Tragrichtung, fuer jede Lage dieselbe.
 
@@ -371,7 +371,7 @@ dicksten Stab der Tragrichtung, fuer jede Lage dieselbe.
 Rissnormalkraft, wo je Lage ein Urteil faellt und die Grenze zu *dieser*
 Lage gehoert: hier kommt sigma_s aus dem Faserintegral ueber den ganzen
 Querschnitt, und welche Lage die groesste Zugspannung traegt, wechselt mit
-dem Lastfall -- bei einem Feldmoment die untere, bei einem Stuetzmoment
+dem Lastfall – bei einem Feldmoment die untere, bei einem Stuetzmoment
 die obere. Der dickste Stab gibt die kleinste zulaessige Spannung; das
 liegt fuer jede der beiden auf der sicheren Seite.
 
@@ -473,7 +473,7 @@ def protokoll_ebene(self, p: Protokoll, werte: Zwischenwerte, zustand: Stahlzust
 class Spannungsbegrenzung(Teilnachweis)
 ```
 
-Stahlspannung unter Gebrauchslast gegen eine Grenze -- an der Platte je
+Stahlspannung unter Gebrauchslast gegen eine Grenze – an der Platte je
 Tragrichtung, am gezeichneten Querschnitt; wo, sagt `ort`.
 
 Ein Urteil je Lastfall. Gerechnet wird am gerissenen Querschnitt, womit,
@@ -513,10 +513,10 @@ def urteil_des_teils(self, fall, erg: Fallergebnis) -> NachweisUrteil
 def _vergleich(self, erg: Fallergebnis, grenzen: Grenzen) -> Vergleich
 ```
 
-Spannungen oder Dehnungen -- die eine Stelle, die das entscheidet.
+Spannungen oder Dehnungen – die eine Stelle, die das entscheidet.
 
 Gemessen wird an der Dehnung, siehe Dateikopf: elastisch ist
-`E_s * eps_s` dieselbe Zahl wie `sigma_s` -- Bit fuer Bit, denn das
+`E_s * eps_s` dieselbe Zahl wie `sigma_s` – Bit fuer Bit, denn das
 Gesetz rechnet dort genau dieses Produkt. Ohne Zug steht null da, und
 es gibt nichts zu begrenzen.
 
@@ -527,7 +527,7 @@ es gibt nichts zu begrenzen.
 def _satz(erg: Fallergebnis) -> str
 ```
 
-Der Vergleich als Satz -- in der Groesse, die verglichen wurde.
+Der Vergleich als Satz – in der Groesse, die verglichen wurde.
 
 #### Spannungsbegrenzung._protokoll_ansatz
 
@@ -535,7 +535,7 @@ Der Vergleich als Satz -- in der Groesse, die verglichen wurde.
 def _protokoll_ansatz(self, p: Protokoll, e: Eingaben, zustand: Stahlzustand) -> Grenzen
 ```
 
-Was fuer alle Faelle gilt -- und die Grenzen, die dabei entstehen.
+Was fuer alle Faelle gilt – und die Grenzen, die dabei entstehen.
 
 #### Spannungsbegrenzung._protokoll_fliessen
 
@@ -548,8 +548,8 @@ Der Fall, in dem die Spannung am Plateau stehen bleibt.
 
 ## Konstanten
 
-- `VORGABE = Rechenwahl(saetze=Wertesaetze.alle(Werkstoffsatz.CHARAKTERISTISCH), a…` – Womit die Stahlspannungen rechnen, wenn das Kapitel nichts anderes waehlt: praezise, mit charakteristischen Werten -- ein Gebrauchsnachweis fragt, was der Querschnitt tut, nicht was er darf. Die Norm verlangt Mittelwerte (SIA 262:2025, 4.4.1.2): beim Stahl gibt es nur f_yk, beim Beton laege f_cm hoeher als f_ck -- f_ck liegt sicher (`notizbuch/Notizen/TODO.md`).
-- `VERGLEICH_BEIM_FLIESSEN = 'Fliesst die Bewehrung, bleibt ihre Spannung am Plateau stehen, währe…` – Was verglichen wird, wenn die Bewehrung fliesst -- siehe Dateikopf.
+- `VORGABE = Rechenwahl(saetze=Wertesaetze.alle(Werkstoffsatz.CHARAKTERISTISCH), a…` – Womit die Stahlspannungen rechnen, wenn das Kapitel nichts anderes waehlt: praezise, mit charakteristischen Werten – ein Gebrauchsnachweis fragt, was der Querschnitt tut, nicht was er darf. Die Norm verlangt Mittelwerte (SIA 262:2025, 4.4.1.2): beim Stahl gibt es nur f_yk, beim Beton laege f_cm hoeher als f_ck – f_ck liegt sicher (`notizbuch/Notizen/TODO.md`).
+- `VERGLEICH_BEIM_FLIESSEN = 'Fliesst die Bewehrung, bleibt ihre Spannung am Plateau stehen, währe…` – Was verglichen wird, wenn die Bewehrung fliesst – siehe Dateikopf.
 
 ## Braucht
 

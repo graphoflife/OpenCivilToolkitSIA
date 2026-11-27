@@ -1,5 +1,5 @@
 ---
-erzeugt: 1743cd91db5f
+erzeugt: 5e022487a866
 art: modul
 tags: [modul]
 ---
@@ -13,7 +13,7 @@ Die Kennzahlen ([[opencivil.nachweis.qa_verbund_kennzahlen]]) und die
 Nachweise je Lastfall ([[opencivil.nachweis.qa_verbund]]) lesen dieselben
 Festigkeiten und schreiben dieselben Tabellen; beides steht hier, je einmal:
 
-* je Gruppe die Festigkeit gezogen und gedrueckt ([[opencivil.nachweis.qa_verbund_werte#Verbundwerte|Verbundwerte]]) --
+* je Gruppe die Festigkeit gezogen und gedrueckt ([[opencivil.nachweis.qa_verbund_werte#Verbundwerte|Verbundwerte]]) –
   fuer die Verbundstuetze auch charakteristisch und den Elastizitaetsmodul;
 * die Tabelle dieser Festigkeiten mit ihrem Ansatz ([[opencivil.nachweis.qa_verbund_werte#festigkeiten|festigkeiten]]);
 * die Tabelle der Bleche mit ihren Klassen ([[opencivil.nachweis.qa_verbund_werte#klassen|klassen]]);
@@ -27,7 +27,7 @@ dieselben Festigkeiten: ihr Profilblech ist eine Gruppe wie ein Betonstahl.
 
 Baustahl `f_y/γ_a` gezogen und gedrueckt, je Dicke wie im Stahl
 ([[opencivil.nachweis.qa_stahl_werte#Stahlwerte|Stahlwerte]]); `γ_a` ist
-`γ_M1` des Baustahls -- 4.1.5 nennt 1.05, wie SIA 263. Beton gedrueckt
+`γ_M1` des Baustahls – 4.1.5 nennt 1.05, wie SIA 263. Beton gedrueckt
 `0.85 η_fc f_ck/γ_c` mit `η_fc = 1` und ohne `η_t`, also nicht `f_cd`
 der SIA 262; gezogen nichts (4.3.2.1). Betonstahl `f_sd` seines Materials,
 gedrueckt mit dem Wert fuer Druck. Profilblech `f_yp/γ_ap` (4.1.3, (1)),
@@ -58,7 +58,7 @@ Die Kennwerte aller Materialien des Querschnitts, als Eingaben.
 class Verbundwerte
 ```
 
-Die Festigkeiten der Gruppen eines Verbundquerschnitts -- siehe
+Die Festigkeiten der Gruppen eines Verbundquerschnitts – siehe
 Dateikopf. `beton_faktor` rechnet die Druckfestigkeit des Betons um:
 0.85, im gefuellten Rohr der Verbundstuetze 1.0.
 
@@ -68,7 +68,7 @@ Dateikopf. `beton_faktor` rechnet die Druckfestigkeit des Betons um:
 def wert(self, g: int, kurz: str) -> Wert
 ```
 
-Ein Kennwert des Materials der Gruppe `g`, unter seinem Namen -- ohne die Dicke.
+Ein Kennwert des Materials der Gruppe `g`, unter seinem Namen – ohne die Dicke.
 
 #### Verbundwerte.zahl
 
@@ -92,7 +92,7 @@ Der Elastizitaetsmodul der Gruppe `g` in N/mm²: `E_a`, `E_cm` oder `E_s`.
 def gamma(self, g: int) -> float
 ```
 
-Der Beiwert der Gruppe `g` -- eins mit charakteristischen Werten.
+Der Beiwert der Gruppe `g` – eins mit charakteristischen Werten.
 
 #### Verbundwerte.kennwert
 
@@ -110,7 +110,7 @@ Die charakteristische Festigkeit: `f_y` in der Dicke der Gruppe,
 def festigkeiten(self) -> List[Tuple[float, float]]
 ```
 
-Je Gruppe `(zug, druck)` in N/mm² -- siehe Dateikopf.
+Je Gruppe `(zug, druck)` in N/mm² – siehe Dateikopf.
 
 #### Verbundwerte.druck_k
 
@@ -175,7 +175,7 @@ Die Festigkeiten je Gruppe als Tabelle, mit dem Ansatz fuer die Arten, die vorko
 def klassen(p: Protokoll, zustaende: Sequence[Blechzustand], freie: Sequence[Teil], titel: str) -> Tuple[int, str]
 ```
 
-Ob jedes Blech in Klasse 1 oder 2 liegt, als Tabelle -- und die Klasse
+Ob jedes Blech in Klasse 1 oder 2 liegt, als Tabelle – und die Klasse
 des Querschnitts, die unguenstigste, mit dem Namen dessen, was sie
 bestimmt (ohne Namen in Klasse 1). 3 heisst «über 2»; gedrueckte freie
 Flaechen zaehlen so.
@@ -194,7 +194,7 @@ Eine Klasse im Verbund: 1, 2 oder «über 2».
 def beta(p: Protokoll, werte: Zwischenwerte, b: vw.Beta) -> Optional[Wert]
 ```
 
-`β` nach 5.1.2.2 an einer Nulllinie, mit `x_p` und `h` -- `None`,
+`β` nach 5.1.2.2 an einer Nulllinie, mit `x_p` und `h` – `None`,
 wo es eins ist und nichts mindert. Ueber 0.4 rechnet der Fall nicht
 ([[opencivil.verbund.widerstand#Konstanten|UEBER_FIGUR_1]]) und kommt nicht
 hierher.
@@ -206,11 +206,11 @@ hierher.
 - `BETON_FAKTOR = 0.85` – Der Umrechnungsfaktor der Betondruckfestigkeit im plastischen Widerstand (5.1.2.1).
 - `_KENNWERTE = {Baustoffart.BAUSTAHL: KENNWERTE, Baustoffart.BETON: ('f_ck', 'gamma_…` – Was je Material gelesen wird, nach seiner Art.
 - `MODUL = {Baustoffart.BAUSTAHL: 'E_a', Baustoffart.BETON: 'E_cm', Baustoffart.…` – Der Elastizitaetsmodul je Art.
-- `_GAMMA = {Baustoffart.BAUSTAHL: 'gamma_M1', Baustoffart.BETON: 'gamma_c', Baus…` – Der Beiwert je Art -- beim Baustahl `γ_M1`, im Verbund `γ_a` genannt.
+- `_GAMMA = {Baustoffart.BAUSTAHL: 'gamma_M1', Baustoffart.BETON: 'gamma_c', Baus…` – Der Beiwert je Art – beim Baustahl `γ_M1`, im Verbund `γ_a` genannt.
 - `_ANSATZ = {Baustoffart.BAUSTAHL: ('f_{yd} = \\frac{f_y}{\\gamma_a}', 'f_{yd} = …` – Je Art der Teil des Ansatzes, mit und ohne Beiwert.
 - `_ZEICHEN = {Baustoffart.BAUSTAHL: ('f_y in der Dicke der Gruppe', 'γ_a = γ_M1 de…` – Je Art, was in der Tabelle der Festigkeiten `f_k` und `γ` sind.
 - `SPANNUNG = '\\ [\\mathrm{N}/\\mathrm{mm}^2]'`
-- `MIT_BETA = 'Plastischer Biegewiderstand mit β'` – Wie die Formel mit `β` in der Formelsammlung heisst -- in den Kennzahlen und je Lastfall.
+- `MIT_BETA = 'Plastischer Biegewiderstand mit β'` – Wie die Formel mit `β` in der Formelsammlung heisst – in den Kennzahlen und je Lastfall.
 
 ## Braucht
 

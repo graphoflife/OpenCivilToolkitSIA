@@ -1,5 +1,5 @@
 ---
-erzeugt: 8e8b84bbf594
+erzeugt: d6479a006b69
 art: modul
 tags: [modul]
 ---
@@ -11,18 +11,18 @@ tags: [modul]
 
 Der [[opencivil.projekt.setzung#SetzungEintrag|SetzungEintrag]]: Lastflaeche, Pressungen aus Wiederbelastung und
 Erstbelastung, zulaessige Setzung, die Steifigkeit des Fundaments und die
-Schichten des Baugrunds mit Dicke und M_E-Werten -- als speicherbare
+Schichten des Baugrunds mit Dicke und M_E-Werten – als speicherbare
 Datenklasse. Gerechnet wird in [[opencivil.geotechnik.setzung]].
 
-Die Vorgaben der Felder: B = L = 1 m wie beim Grundbruch; keine Pressung --
+Die Vorgaben der Felder: B = L = 1 m wie beim Grundbruch; keine Pressung –
 eine neue Berechnung bringt keine Einwirkung mit, wie ein neuer Lastfall
 (Benutzer, 2026-10-19). Die zulaessige Setzung von 20 mm, die Dicke der
 Teilschichten von 0.5 m und die Schicht, mit der eine neue Berechnung
-beginnt -- 2 m mit M_E = 20 und M'_E = 60 MN/m² --, sind nicht vom Benutzer,
+beginnt – 2 m mit M_E = 20 und M'_E = 60 MN/m² –, sind nicht vom Benutzer,
 sondern gesetzt, damit sich gleich etwas rechnen laesst. Keine davon steht
 in einer Quelle: s_zul ist je Bauwerk festzulegen (SIA 267:2013, 8.5.4.1),
 und fuer M'_E nimmt das Buch grob das 8- bis 10-Fache von M_E an (Kap. 5.3)
--- 60 ist nur ein Startwert.
+– 60 ist nur ein Startwert.
 
 Die Namen der Schichten muessen nicht verschieden sein: sie beschriften nur,
 die Werte tragen die Nummer der Schicht. Zwei Tonschichten, durch Sand
@@ -63,9 +63,9 @@ Ein Flachfundament auf geschichtetem Baugrund, mit seinen Pressungen.
 - `steifigkeit: Steifigkeit = Steifigkeit.STARR` – Starr: gerechnet wird im Punkt K; schlaff: unter der Mitte (Kap. 8.10).
 - `q_W: float = bereich(0.0, heisst='Pressung aus Wiederbelastung q_W', einheit=KN_PR…` – Der Teil der Pressung in der Sohle, der den Boden nur wieder belastet, in kN/m².
 - `q_E: float = bereich(0.0, heisst='Pressung aus Erstbelastung q_E', einheit=KN_PRO_…` – Der Teil, der darüber hinausgeht und den Boden zum ersten Mal belastet, in kN/m².
-- `s_zul: float = bereich(20.0, heisst='Zulässige Setzung s_zul', einheit=MM, ueber=0.0)` – Die Setzung, die das Fundament höchstens erfahren darf, in mm -- je Bauwerk festzulegen (SIA 267:2013, 8.5.4.1; Kap. 8.12).
-- `dz: float = bereich(0.5, heisst='Dicke der Teilschichten Δz_max', einheit=M, uebe…` – Wie dick eine Teilschicht höchstens ist, in m -- jede Schicht wird so geteilt.
-- `beschreibung: str = ''` – Freier Text -- geht in keine Rechnung ein.
+- `s_zul: float = bereich(20.0, heisst='Zulässige Setzung s_zul', einheit=MM, ueber=0.0)` – Die Setzung, die das Fundament höchstens erfahren darf, in mm – je Bauwerk festzulegen (SIA 267:2013, 8.5.4.1; Kap. 8.12).
+- `dz: float = bereich(0.5, heisst='Dicke der Teilschichten Δz_max', einheit=M, uebe…` – Wie dick eine Teilschicht höchstens ist, in m – jede Schicht wird so geteilt.
+- `beschreibung: str = ''` – Freier Text – geht in keine Rechnung ein.
 - `schichten: List[SchichtEintrag] = field(default_factory=list)` – Von der Sohle an nach unten; darunter gilt der Baugrund als unzusammendrückbar.
 
 #### SetzungEintrag.neu
@@ -83,7 +83,7 @@ Eine frische Berechnung, wie die Oberflaeche sie anlegt: mit einer Schicht.
 def schicht(self, name: str, *, d: float, M_E: float, M_E_strich: float) -> SchichtEintrag
 ```
 
-Eine Schicht unten anfügen -- Dicke in m, M_E-Werte in MN/m².
+Eine Schicht unten anfügen – Dicke in m, M_E-Werte in MN/m².
 
 
 ## Braucht

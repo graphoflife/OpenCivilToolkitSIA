@@ -1,5 +1,5 @@
 ---
-erzeugt: 9de84f439e2c
+erzeugt: d3886d0c7671
 art: modul
 tags: [modul]
 ---
@@ -10,9 +10,9 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Die Schichten des Baugrunds, wie der Pfahl sie braucht ([[opencivil.pfahl.boden#Pfahlschicht|Pfahlschicht]]):
-Dicke, Raumlast, das Verhalten -- drainiert mit φ'_k und c'_k, undrainiert
+Dicke, Raumlast, das Verhalten – drainiert mit φ'_k und c'_k, undrainiert
 mit s_u,k ([[opencivil.geotechnik.verhalten#Verhalten|Verhalten]], wie im
-Grundbruch) --, woher die Mantelreibung kommt: gerechnet
+Grundbruch) –, woher die Mantelreibung kommt: gerechnet
 oder eingegeben ([[opencivil.pfahl.boden#Mantel|Mantel]]), und der Verformungsmodul, auf dem der
 Pfahl gebettet ist. Dazu als Zahlen die Spannungen
 im Boden und die Stücke des Mantels, über die die Mantelreibung summiert
@@ -24,7 +24,7 @@ wird ([[opencivil.pfahl.boden#Profil|Profil]]).
 z zählt ab Oberkante Terrain nach unten, in m; die Schichten liegen vom
 Terrain an untereinander. Unter dem Grundwasserspiegel t_w steht das
 Porenwasser unter u = γ_w · (z − t_w), und es zählt die wirksame Spannung
-σ'_v = σ_v − u -- mit einer Raumlast γ je Schicht über und unter dem
+σ'_v = σ_v − u – mit einer Raumlast γ je Schicht über und unter dem
 Wasser, darunter also γ − γ_w, wie beim Grundbruch.
 
 
@@ -34,7 +34,7 @@ Je Schicht der Teil des Pfahls, der in ihr steckt, am Grundwasserspiegel
 noch einmal geteilt: innerhalb eines Stücks ändert sich σ'_v linear, der Wert
 in seiner Mitte ist also sein Mittel, und die Summe über die Stücke das
 Integral der Mantelreibung. Das Buch rechnet mit der Spannung auf halber
-Einbindetiefe (Kap. 12.5) -- dasselbe, solange kein Wasserspiegel das Stück
+Einbindetiefe (Kap. 12.5) – dasselbe, solange kein Wasserspiegel das Stück
 teilt.
 
 
@@ -85,14 +85,14 @@ gehen nicht ein.
 - `d: Groesse` – Die Dicke der Schicht.
 - `gamma: Groesse` – Die Raumlast, über und unter dem Wasser dieselbe.
 - `verhalten: Verhalten`
-- `phi_k: Groesse` – Der Reibungswinkel, charakteristisch -- drainiert.
-- `c_k: Groesse` – Die Kohäsion, charakteristisch -- drainiert; sie zählt am Fuss und im Erdwiderstand quer.
-- `s_u: Groesse` – Die undrainierte Scherfestigkeit, charakteristisch -- undrainiert.
+- `phi_k: Groesse` – Der Reibungswinkel, charakteristisch – drainiert.
+- `c_k: Groesse` – Die Kohäsion, charakteristisch – drainiert; sie zählt am Fuss und im Erdwiderstand quer.
+- `s_u: Groesse` – Die undrainierte Scherfestigkeit, charakteristisch – undrainiert.
 - `mantel: Mantel`
-- `q_s: Groesse` – Die Mantelreibung, charakteristisch -- eingegeben.
-- `K: Groesse` – Der Erddruckbeiwert am Mantel -- gerechnet, drainiert.
-- `delta_faktor: Groesse` – Der Reibungswinkel zwischen Pfahl und Boden im Verhältnis zu φ'_k -- gerechnet, drainiert.
-- `alpha: Groesse` – Die Adhäsion im Verhältnis zu s_u,k -- gerechnet, undrainiert.
+- `q_s: Groesse` – Die Mantelreibung, charakteristisch – eingegeben.
+- `K: Groesse` – Der Erddruckbeiwert am Mantel – gerechnet, drainiert.
+- `delta_faktor: Groesse` – Der Reibungswinkel zwischen Pfahl und Boden im Verhältnis zu φ'_k – gerechnet, drainiert.
+- `alpha: Groesse` – Die Adhäsion im Verhältnis zu s_u,k – gerechnet, undrainiert.
 - `E_s: Groesse` – Der Verformungsmodul, charakteristisch: woraus die Bettung des Pfahls folgt.
 
 #### Pfahlschicht.drainiert
@@ -109,7 +109,7 @@ def drainiert(self) -> bool
 class Stueck
 ```
 
-Ein Stück des Mantels in einer Schicht, auf einer Seite des Wassers -- z in m.
+Ein Stück des Mantels in einer Schicht, auf einer Seite des Wassers – z in m.
 
 - `schicht: int` – Die Schicht, in der es liegt: ihr Platz in der Liste, ab null.
 - `z_o: float`
@@ -136,7 +136,7 @@ class Profil
 ```
 
 Die Schichten als Zahlen: ihre Grenzen, Raumlasten und das Wasser, in
-SI-Basis -- woraus die Spannungen in jeder Tiefe folgen.
+SI-Basis – woraus die Spannungen in jeder Tiefe folgen.
 
 #### Profil.tiefe
 
@@ -153,7 +153,7 @@ Wie tief die unterste Schicht reicht.
 def schicht_bei(self, z: float) -> int
 ```
 
-Die Schicht, in der die Tiefe z liegt -- an einer Grenze die untere:
+Die Schicht, in der die Tiefe z liegt – an einer Grenze die untere:
 ein Fuss auf der Grenze steht auf ihr.
 
 #### Profil.sigma_v

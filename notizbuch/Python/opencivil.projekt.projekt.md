@@ -1,5 +1,5 @@
 ---
-erzeugt: bd4b37f49de0
+erzeugt: 86733e5813ab
 art: modul
 tags: [modul]
 ---
@@ -28,7 +28,7 @@ reicht nur weiter.
 def naechster_name(stamm: str, namen: Iterable[str]) -> str
 ```
 
-Der Name eines neuen Eintrags: «Platte 1», «Platte 2» … -- der erste, den
+Der Name eines neuen Eintrags: «Platte 1», «Platte 2» … – der erste, den
 es unter `namen` noch nicht gibt. So nennt auch die Oberflaeche, was
 «+» anlegt (`naechsterName`, web/js/zustand.js); ein Test haelt beide
 gleich.
@@ -39,7 +39,7 @@ gleich.
 def kopie_name(name: str, namen: Iterable[str]) -> str
 ```
 
-Der Name einer Kopie: «Decke über EG (Kopie)», dann «… (Kopie 2)» -- der
+Der Name einer Kopie: «Decke über EG (Kopie)», dann «… (Kopie 2)» – der
 erste, den es unter `namen` noch nicht gibt. Wie ⧉ in der Oberflaeche
 (`kopieName`, web/js/zustand.js); ein Test haelt beide gleich.
 
@@ -64,10 +64,10 @@ Die vollstaendige, speicherbare Beschreibung eines Projekts.
 - `grundbrueche: List[GrundbruchEintrag] = field(default_factory=list)` – Flachfundamente mit Grundbruch und Gleiten.
 - `setzungen: List[SetzungEintrag] = field(default_factory=list)` – Flachfundamente auf geschichtetem Baugrund, mit ihrer Setzung.
 - `pfaehle: List[PfahlEintrag] = field(default_factory=list)` – Einzelpfähle: Bohr- und Mikropfähle mit äusserem und innerem Widerstand.
-- `erdbeben: List[ErdbebenEintrag] = field(default_factory=list)` – Gebäude im Erdbeben, nach dem Ersatzkraftverfahren -- Geschosse und Tragwände.
-- `skripte: List[SkriptEintrag] = field(default_factory=list)` – Die Python-Skripte der App «Python» -- gespeichert, nicht gerechnet.
-- `sandboxen: Dict[str, str] = field(default_factory=dict)` – Je Liste einer App ([[opencivil.projekt.projekt#Konstanten|APPLISTEN]]) die Kennung ihrer Sandbox, des Eintrags zum Ausprobieren -- siehe [[opencivil.projekt.projekt#Projekt.sandbox_zuruecksetzen|sandbox_zuruecksetzen]]. Hier und nicht an den Eintraegen: so steht die Regel an einer Stelle, und eine Kopie der Sandbox ist von selbst ein gewoehnlicher Eintrag.
-- `vergeben: Dict[str, int] = field(default_factory=dict)` – Je Vorsilbe die hoechste Nummer, die das Projekt je vergeben hat -- an Materialien, Bauteile, Skripte: eine Kennung kommt nie wieder ([[opencivil.projekt.netz#neue_kennung|neue_kennung]]).
+- `erdbeben: List[ErdbebenEintrag] = field(default_factory=list)` – Gebäude im Erdbeben, nach dem Ersatzkraftverfahren – Geschosse und Tragwände.
+- `skripte: List[SkriptEintrag] = field(default_factory=list)` – Die Python-Skripte der App «Python» – gespeichert, nicht gerechnet.
+- `sandboxen: Dict[str, str] = field(default_factory=dict)` – Je Liste einer App ([[opencivil.projekt.projekt#Konstanten|APPLISTEN]]) die Kennung ihrer Sandbox, des Eintrags zum Ausprobieren – siehe [[opencivil.projekt.projekt#Projekt.sandbox_zuruecksetzen|sandbox_zuruecksetzen]]. Hier und nicht an den Eintraegen: so steht die Regel an einer Stelle, und eine Kopie der Sandbox ist von selbst ein gewoehnlicher Eintrag.
+- `vergeben: Dict[str, int] = field(default_factory=dict)` – Je Vorsilbe die hoechste Nummer, die das Projekt je vergeben hat – an Materialien, Bauteile, Skripte: eine Kennung kommt nie wieder ([[opencivil.projekt.netz#neue_kennung|neue_kennung]]).
 
 #### Projekt.material
 
@@ -93,7 +93,7 @@ def querschnittsanalyse(self, kennung: str) -> QuerschnittsanalyseEintrag
 def bauteile(self) -> List[Any]
 ```
 
-Alle Bauteile in der Reihenfolge der Beschreibung -- siehe [[opencivil.projekt.aufbau#Konstanten|BAUTEILE]].
+Alle Bauteile in der Reihenfolge der Beschreibung – siehe [[opencivil.projekt.aufbau#Konstanten|BAUTEILE]].
 
 #### Projekt.nur
 
@@ -101,12 +101,12 @@ Alle Bauteile in der Reihenfolge der Beschreibung -- siehe [[opencivil.projekt.a
 def nur(self, kennung: str) -> 'Projekt'
 ```
 
-Eine Kopie, in der von den Bauteilen nur dieses eine steht -- mit
+Eine Kopie, in der von den Bauteilen nur dieses eine steht – mit
 denen, deren Querschnitt es nimmt (`bezuege`), auch ueber mehrere
 Stufen; die Materialien bleiben. So rechnet die Bewehrungssuche: die
 anderen Bauteile kann sie nicht beeinflussen, und ihre Urteile
 zaehlten sonst mit. Und so holt der MCP-Zugang die Herleitung eines
-Bauteils -- ein Stab, dessen Querschnitt eine Analyse ist, rechnete
+Bauteils – ein Stab, dessen Querschnitt eine Analyse ist, rechnete
 ohne sie nicht.
 
 #### Projekt.bauteil
@@ -115,7 +115,7 @@ ohne sie nicht.
 def bauteil(self, kennung: str) -> Any
 ```
 
-Ein Bauteil gleich welcher Art -- eine Platte, eine Analyse, ein System.
+Ein Bauteil gleich welcher Art – eine Platte, eine Analyse, ein System.
 
 #### Projekt.freie_kennung
 
@@ -123,7 +123,7 @@ Ein Bauteil gleich welcher Art -- eine Platte, eine Analyse, ein System.
 def freie_kennung(self, vorsilbe: str) -> str
 ```
 
-Eine Kennung, die es im Projekt nie gab -- siehe [[opencivil.projekt.netz#neue_kennung|neue_kennung]].
+Eine Kennung, die es im Projekt nie gab – siehe [[opencivil.projekt.netz#neue_kennung|neue_kennung]].
 
 #### Projekt.verweise
 
@@ -131,7 +131,7 @@ Eine Kennung, die es im Projekt nie gab -- siehe [[opencivil.projekt.netz#neue_k
 def verweise(self, kennung: str) -> List[Any]
 ```
 
-Die Bauteile, die auf diese Kennung zeigen -- als Material oder als
+Die Bauteile, die auf diese Kennung zeigen – als Material oder als
 Querschnitt ([[opencivil.projekt.projekt#Projekt|materialien]] und [[opencivil.projekt.projekt#Projekt|bezuege]] jedes Eintrags).
 Was hier steht, darf nicht geloescht werden; die Oberflaeche fragt hier,
 bevor sie loescht (Dienst `verweise`), statt es in einer eigenen
@@ -157,7 +157,7 @@ SP1 ..., H1 ... oder PB1 ...
 def beton(self, sorte: str='C30/37') -> MaterialEintrag
 ```
 
-Eine Betonsorte nach Norm -- Kennung `b1`, `b2` ...
+Eine Betonsorte nach Norm – Kennung `b1`, `b2` ...
 
 #### Projekt.stahl
 
@@ -165,7 +165,7 @@ Eine Betonsorte nach Norm -- Kennung `b1`, `b2` ...
 def stahl(self, sorte: str='B500B') -> MaterialEintrag
 ```
 
-Eine Betonstahlsorte nach Norm -- Kennung `s1`, `s2` ...
+Eine Betonstahlsorte nach Norm – Kennung `s1`, `s2` ...
 
 #### Projekt.baustahl
 
@@ -173,7 +173,7 @@ Eine Betonstahlsorte nach Norm -- Kennung `s1`, `s2` ...
 def baustahl(self, sorte: str='S235') -> MaterialEintrag
 ```
 
-Eine Baustahlsorte nach SIA 263 -- Kennung `st1`, `st2` ...
+Eine Baustahlsorte nach SIA 263 – Kennung `st1`, `st2` ...
 
 #### Projekt.spannstahl
 
@@ -181,7 +181,7 @@ Eine Baustahlsorte nach SIA 263 -- Kennung `st1`, `st2` ...
 def spannstahl(self, sorte: str='Y1860') -> MaterialEintrag
 ```
 
-Eine Spannstahlsorte nach SIA 262 -- Kennung `sp1`, `sp2` ...
+Eine Spannstahlsorte nach SIA 262 – Kennung `sp1`, `sp2` ...
 
 #### Projekt.holz
 
@@ -189,7 +189,7 @@ Eine Spannstahlsorte nach SIA 262 -- Kennung `sp1`, `sp2` ...
 def holz(self, sorte: str='C24') -> MaterialEintrag
 ```
 
-Eine Holzsorte nach SIA 265 -- Kennung `h1`, `h2` ...
+Eine Holzsorte nach SIA 265 – Kennung `h1`, `h2` ...
 
 #### Projekt.profilblech
 
@@ -197,7 +197,7 @@ Eine Holzsorte nach SIA 265 -- Kennung `h1`, `h2` ...
 def profilblech(self, sorte: str='SE 350 G') -> MaterialEintrag
 ```
 
-Ein Profilblechstahl nach SIA 264 -- Kennung `pb1`, `pb2` ...
+Ein Profilblechstahl nach SIA 264 – Kennung `pb1`, `pb2` ...
 
 #### Projekt.eigener_beton
 
@@ -205,7 +205,7 @@ Ein Profilblechstahl nach SIA 264 -- Kennung `pb1`, `pb2` ...
 def eigener_beton(self, vorlage: str='C30/37') -> MaterialEintrag
 ```
 
-Ein eigener Beton, `BE1`, `BE2` ... -- mit den Kennwerten der Sorte
+Ein eigener Beton, `BE1`, `BE2` ... – mit den Kennwerten der Sorte
 `vorlage`, abzuaendern ueber `abweichungen` und
 `ueberschreibungen`. Eine Normsorte selbst bleibt, wie sie ist.
 
@@ -215,7 +215,7 @@ Ein eigener Beton, `BE1`, `BE2` ... -- mit den Kennwerten der Sorte
 def eigener_stahl(self, vorlage: str='B500B') -> MaterialEintrag
 ```
 
-Ein eigener Betonstahl, `S1`, `S2` ... -- siehe [[opencivil.projekt.projekt#Projekt.eigener_beton|eigener_beton]].
+Ein eigener Betonstahl, `S1`, `S2` ... – siehe [[opencivil.projekt.projekt#Projekt.eigener_beton|eigener_beton]].
 
 #### Projekt.eigener_baustahl
 
@@ -223,7 +223,7 @@ Ein eigener Betonstahl, `S1`, `S2` ... -- siehe [[opencivil.projekt.projekt#Proj
 def eigener_baustahl(self, vorlage: str='S235') -> MaterialEintrag
 ```
 
-Ein eigener Baustahl, `ST1`, `ST2` ... -- siehe [[opencivil.projekt.projekt#Projekt.eigener_beton|eigener_beton]].
+Ein eigener Baustahl, `ST1`, `ST2` ... – siehe [[opencivil.projekt.projekt#Projekt.eigener_beton|eigener_beton]].
 
 #### Projekt.eigener_spannstahl
 
@@ -231,7 +231,7 @@ Ein eigener Baustahl, `ST1`, `ST2` ... -- siehe [[opencivil.projekt.projekt#Proj
 def eigener_spannstahl(self, vorlage: str='Y1860') -> MaterialEintrag
 ```
 
-Ein eigener Spannstahl, `SP1`, `SP2` ... -- siehe [[opencivil.projekt.projekt#Projekt.eigener_beton|eigener_beton]].
+Ein eigener Spannstahl, `SP1`, `SP2` ... – siehe [[opencivil.projekt.projekt#Projekt.eigener_beton|eigener_beton]].
 
 #### Projekt.eigenes_holz
 
@@ -239,7 +239,7 @@ Ein eigener Spannstahl, `SP1`, `SP2` ... -- siehe [[opencivil.projekt.projekt#Pr
 def eigenes_holz(self, vorlage: str='C24') -> MaterialEintrag
 ```
 
-Ein eigenes Holz, `H1`, `H2` ... -- siehe [[opencivil.projekt.projekt#Projekt.eigener_beton|eigener_beton]].
+Ein eigenes Holz, `H1`, `H2` ... – siehe [[opencivil.projekt.projekt#Projekt.eigener_beton|eigener_beton]].
 
 #### Projekt.material_anlegen
 
@@ -247,7 +247,7 @@ Ein eigenes Holz, `H1`, `H2` ... -- siehe [[opencivil.projekt.projekt#Projekt.ei
 def material_anlegen(self, art: str, sorte: str, *, eigen: bool=False) -> MaterialEintrag
 ```
 
-«+ Material»: eine Normsorte der Art `art` -- mit `eigen` ein
+«+ Material»: eine Normsorte der Art `art` – mit `eigen` ein
 eigenes Material, die Sorte als Vorlage ([[opencivil.projekt.projekt#Projekt.eigener_beton|eigener_beton]]). Fuer
 wer die Art als Text hat, den MCP-Zugang; [[opencivil.projekt.projekt#Projekt.beton|beton]] und die
 anderen sagen sie im Namen.
@@ -269,7 +269,7 @@ an der Zeile auffallen, in der er steht.
 def platte(self, name: str, *, h: float=300.0, x: Sequence[float]=(12.0, 12.0), y: Sequence[float]=(12.0, 12.0), x_zulage: Sequence[float]=(0.0, 0.0), y_zulage: Sequence[float]=(0.0, 0.0), teilung: float=150.0, x_innen: bool=True, beton: Union[str, MaterialEintrag, None]=None, stahl: Union[str, MaterialEintrag, None]=None, **felder: Any) -> QuerschnittEintrag
 ```
 
-Eine Platte -- Masse in mm, Bewehrung als Durchmesser je Richtung.
+Eine Platte – Masse in mm, Bewehrung als Durchmesser je Richtung.
 
 `x` und `y` sind je zwei Durchmesser, *unten* und *oben*;
 `x_zulage` und `y_zulage` ebenso, null heisst keine. Alle Posten
@@ -277,8 +277,8 @@ liegen in derselben `teilung`. `x_innen` legt die Tragrichtung
 auf die 2. und 3. Lage, wie die Vorgabe der Oberflaeche.
 
 `beton` und `stahl` duerfen fehlen, solange das Projekt nur je
-einen hat. Alles Weitere -- `b`, `rissanforderung`,
-`duktilitaet` ... -- geht als Stichwort an den Eintrag; ein
+einen hat. Alles Weitere – `b`, `rissanforderung`,
+`duktilitaet` ... – geht als Stichwort an den Eintrag; ein
 unbekanntes Stichwort wird gemeldet, statt still zu verschwinden.
 Gelesen wird es wie aus einer Datei: ein Teil darf als Eintrag kommen
 oder als seine Felder, `tragsicherheit_wahl={"kriechzahl": 1.0}`
@@ -294,13 +294,13 @@ Einwirkungen selbst an.
 def analyse(self, name: str, *, beton: Union[str, MaterialEintrag, None]=None, stahl: Union[str, MaterialEintrag, None]=None, **felder: Any) -> QuerschnittsanalyseEintrag
 ```
 
-Eine Querschnittsanalyse -- ein Rechteck 300 × 600 mm mit drei
+Eine Querschnittsanalyse – ein Rechteck 300 × 600 mm mit drei
 Staeben unten und zwei oben, ohne Lastfall: wer rechnet, gibt seine
 Lastfaelle selbst an. In der Oberflaeche beginnt eine neue Analyse
 seit 2026-10-19 leer; hier bleibt das Rechteck, auf dem Skripte und
 Tests aufbauen.
 
-Gezeichnet wird danach mit dem Baukasten des Eintrags --
+Gezeichnet wird danach mit dem Baukasten des Eintrags –
 `polygon`, `stab`, `stablinie`, `schubwand`, `hilfslinie`,
 Masse in mm. Wie bei [[opencivil.projekt.projekt#Projekt.platte|platte]] geht alles Weitere als Stichwort
 an den Eintrag.
@@ -312,9 +312,9 @@ def balkensystem(self, name: str, **felder: Any) -> BalkensystemEintrag
 ```
 
 Ein leeres Balkensystem, ein ebener Rahmen. Gezeichnet wird danach
-mit dem Baukasten des Eintrags -- `querschnitt`, `linie`,
+mit dem Baukasten des Eintrags – `querschnitt`, `linie`,
 `lager_an`, `lastfall`, `stablast`, `knotenlast`,
-`kombination` --, Koordinaten in m. Leer, ohne die Lastfaelle und
+`kombination` –, Koordinaten in m. Leer, ohne die Lastfaelle und
 Kombinationen, die die Oberflaeche mitbringt: wer in Python zeichnet,
 zeichnet sein eigenes System.
 
@@ -324,7 +324,7 @@ zeichnet sein eigenes System.
 def balkensystem3d(self, name: str, **felder: Any) -> Balkensystem3dEintrag
 ```
 
-Ein leeres 3D-Balkensystem, ein Rahmen im Raum -- gezeichnet wie das
+Ein leeres 3D-Balkensystem, ein Rahmen im Raum – gezeichnet wie das
 ebene ([[opencivil.projekt.projekt#Projekt.balkensystem|balkensystem]]), mit Punkten `(x, y, z)` in m.
 
 #### Projekt.decke
@@ -334,8 +334,8 @@ def decke(self, name: str, **felder: Any) -> DeckeEintrag
 ```
 
 Eine leere Decke. Gezeichnet wird danach mit dem Baukasten des
-Eintrags -- `platte`, `lager` (ein Linienlager), `stuetze`,
-`unterzug`, `zone` --, Koordinaten in m.
+Eintrags – `platte`, `lager` (ein Linienlager), `stuetze`,
+`unterzug`, `zone` –, Koordinaten in m.
 
 #### Projekt.durchstanzen
 
@@ -344,8 +344,8 @@ def durchstanzen(self, name: str, beton: str, stahl: str, **felder: Any) -> Durc
 ```
 
 Ein Durchstanznachweis mit den Vorgaben der Oberflaeche. `beton` und
-`stahl` sind Kennungen von Materialien; alles Weitere -- `h`,
-`lage`, `V_d` ... -- geht als Stichwort an den Eintrag: Masse der
+`stahl` sind Kennungen von Materialien; alles Weitere – `h`,
+`lage`, `V_d` ... – geht als Stichwort an den Eintrag: Masse der
 Platte und der Stütze in mm, Spannweiten in m, Kräfte in kN.
 Aussparungen mit [[opencivil.projekt.durchstanzen#DurchstanzEintrag.aussparung|aussparung]].
 
@@ -357,8 +357,8 @@ def grundbruch(self, name: str, **felder: Any) -> GrundbruchEintrag
 
 Ein Grundbruchnachweis mit den Vorgaben der Oberflaeche, aber ohne
 ihre Startkombination: wer rechnet, gibt seine Einwirkungen mit
-`kombination` selbst an. Alles Weitere -- `phi_k`, `b`, `t` ...
--- geht als Stichwort an den Eintrag; Winkel in Grad, Masse in m,
+`kombination` selbst an. Alles Weitere – `phi_k`, `b`, `t` ...
+– geht als Stichwort an den Eintrag; Winkel in Grad, Masse in m,
 Spannungen in kPa.
 
 #### Projekt.setzung
@@ -369,8 +369,8 @@ def setzung(self, name: str, **felder: Any) -> SetzungEintrag
 
 Eine Setzungsberechnung mit den Vorgaben der Oberflaeche, aber ohne
 ihre Startschicht: wer rechnet, gibt seine Schichten mit `schicht`
-selbst an, von der Sohle an nach unten. Alles Weitere -- `B`,
-`q_E`, `steifigkeit` ... -- geht als Stichwort an den Eintrag;
+selbst an, von der Sohle an nach unten. Alles Weitere – `B`,
+`q_E`, `steifigkeit` ... – geht als Stichwort an den Eintrag;
 Masse in m, Pressungen in kN/m², die zulaessige Setzung in mm.
 
 #### Projekt.pfahl
@@ -382,8 +382,8 @@ def pfahl(self, name: str, stahl: str, beton: str='', **felder: Any) -> PfahlEin
 Ein Pfahl mit den Vorgaben der Oberflaeche, aber ohne ihre Startschicht
 und Startkombination: wer rechnet, gibt sie mit `schicht` und
 `kombination` selbst an. `stahl` und `beton` sind Kennungen von
-Materialien, der Beton nur beim Bohrpfahl. Alles Weitere -- `art`,
-`D`, `grundlage` ... -- geht als Stichwort an den Eintrag; Masse
+Materialien, der Beton nur beim Bohrpfahl. Alles Weitere – `art`,
+`D`, `grundlage` ... – geht als Stichwort an den Eintrag; Masse
 des Querschnitts in mm, Tiefen in m, Spannungen in kPa.
 
 #### Projekt.gebaeude
@@ -395,7 +395,7 @@ def gebaeude(self, name: str, **felder: Any) -> ErdbebenEintrag
 Ein Gebaeude fuer das Erdbeben, mit den Vorgaben der Oberflaeche, aber
 ohne ihr Startgeschoss und ihre Startwand: wer rechnet, gibt sie mit
 `geschoss` und `wand` selbst an, die Geschosse von unten. Alles
-Weitere -- `zone`, `baugrund`, `q_x` ... -- geht als Stichwort an
+Weitere – `zone`, `baugrund`, `q_x` ... – geht als Stichwort an
 den Eintrag; Hoehen in m, Lasten in kN, Schwingzeiten in s.
 
 #### Projekt.skript
@@ -404,7 +404,7 @@ den Eintrag; Hoehen in m, Lasten in kN, Schwingzeiten in s.
 def skript(self, name: str, code: str='') -> SkriptEintrag
 ```
 
-Ein Python-Skript für die App «Python» -- Kennung `p1`, `p2` ...
+Ein Python-Skript für die App «Python» – Kennung `p1`, `p2` ...
 Ausgeführt wird es in der Konsole der Oberfläche, nicht hier.
 
 #### Projekt._einziges
@@ -413,7 +413,7 @@ Ausgeführt wird es in der Konsole der Oberfläche, nicht hier.
 def _einziges(self, art: str, gewaehlt: Union[str, MaterialEintrag, None]) -> str
 ```
 
-Die Kennung des gewaehlten Materials -- oder des einzigen dieser Art.
+Die Kennung des gewaehlten Materials – oder des einzigen dieser Art.
 
 #### Projekt.rechnen
 
@@ -421,10 +421,10 @@ Die Kennung des gewaehlten Materials -- oder des einzigen dieser Art.
 def rechnen(self) -> Ergebnis
 ```
 
-Alles rechnen, was die Oberflaeche auch rechnet -- ohne sie.
+Alles rechnen, was die Oberflaeche auch rechnet – ohne sie.
 
 Dieselben Ziele in derselben Reihenfolge ([[opencivil.projekt.aufbau.kern#Aufbau.alle_ziele|Aufbau.alle_ziele]]),
-also derselbe Bericht -- ohne die Sandboxen, wie dort
+also derselbe Bericht – ohne die Sandboxen, wie dort
 ([[opencivil.projekt.projekt#Projekt.ohne_sandboxen|ohne_sandboxen]]). Ohne Zwischenspeicher: der lohnt sich erst,
 wenn man dieselbe Platte hundertmal rechnet.
 
@@ -437,7 +437,7 @@ def eintrag_anlegen(self, liste: str) -> Any
 «+» einer App: ein frischer Eintrag nach der Vorlage seiner Klasse und
 mit dem ersten Material jeder Art, die er nimmt
 ([[opencivil.projekt.eintraege#Beschreibung.frisch|frisch]]), unter einer
-Kennung, die es im Projekt nie gab, am Ende der Liste -- und mit dem
+Kennung, die es im Projekt nie gab, am Ende der Liste – und mit dem
 Namen, den «+» gibt: «Platte 1» ([[opencivil.projekt.projekt#naechster_name|naechster_name]]). Fehlt ein
 Material, das er nimmt, rechnet er erst, wenn eines da ist, wie die
 Sandbox.
@@ -449,7 +449,7 @@ def eintrag_kopieren(self, kennung: str) -> Any
 ```
 
 ⧉: eine Kopie gleich hinter dem Original, alles wie dort, nur Kennung
-und Name neu -- «Decke über EG (Kopie)» ([[opencivil.projekt.projekt#kopie_name|kopie_name]]). Die
+und Name neu – «Decke über EG (Kopie)» ([[opencivil.projekt.projekt#kopie_name|kopie_name]]). Die
 Kopie der Sandbox ist ein gewoehnlicher Eintrag und heisst wie ein
 neuer, «Platte 1».
 
@@ -459,7 +459,7 @@ neuer, «Platte 1».
 def eintrag_loeschen(self, kennung: str) -> Any
 ```
 
-×: ein Eintrag einer App oder ein Material geht -- nicht die Sandbox,
+×: ein Eintrag einer App oder ein Material geht – nicht die Sandbox,
 die nur zurueckgesetzt wird, und nicht, solange ein Bauteil auf ihn
 zeigt ([[opencivil.projekt.projekt#Projekt.verweise|verweise]]); der Fehler nennt dann die Bauteile. Gibt den
 geloeschten Eintrag zurueck.
@@ -498,7 +498,7 @@ Die Sandbox einer App, frisch: nach der Vorlage ihrer Klasse und mit
 dem ersten Material jeder Art, das sie nimmt, wie ein neuer Eintrag
 der Oberflaeche ([[opencivil.projekt.eintraege#Beschreibung.frisch|frisch]]).
 Eine vorhandene wird an ihrem Platz ersetzt und behaelt ihre Kennung
--- wer auf sie zeigt, zeigt weiter auf sie. Eine fehlende kommt
+– wer auf sie zeigt, zeigt weiter auf sie. Eine fehlende kommt
 zuoberst in die Liste.
 
 #### Projekt.sandboxen_anlegen
@@ -507,7 +507,7 @@ zuoberst in die Liste.
 def sandboxen_anlegen(self, *, frisch: bool=False) -> None
 ```
 
-Jede Sandbox, die fehlt -- in einem neuen Projekt, in einer Datei, die
+Jede Sandbox, die fehlt – in einem neuen Projekt, in einer Datei, die
 noch keine kennt. Mit `frisch` beginnt auch jede vorhandene neu: so
 startet die Seite (Benutzer, 2026-11-20).
 
@@ -517,7 +517,7 @@ startet die Seite (Benutzer, 2026-11-20).
 def ohne_sandboxen(self) -> 'Projekt'
 ```
 
-Eine Kopie ohne die Sandboxen -- das Projekt, wie es im Bericht steht.
+Eine Kopie ohne die Sandboxen – das Projekt, wie es im Bericht steht.
 
 #### Projekt.pruefen
 
@@ -525,14 +525,14 @@ Eine Kopie ohne die Sandboxen -- das Projekt, wie es im Bericht steht.
 def pruefen(self) -> None
 ```
 
-Prueft die Form der Beschreibung -- vor jedem Rechnen und beim Oeffnen
+Prueft die Form der Beschreibung – vor jedem Rechnen und beim Oeffnen
 einer Datei: jedes Feld gegen das, was an ihm steht
 ([[opencivil.projekt.lesen#felder_pruefen|felder_pruefen]]), eine Kennung je
 Eintrag und die Sorte jedes Materials. Was in Python gebaut wurde,
 geht so durch dieselbe Tuer wie eine Datei.
 
-Den Inhalt -- Bereiche, die Regeln der Bauteile und Materialien, ihre
-Namen -- prueft erst das Rechnen
+Den Inhalt – Bereiche, die Regeln der Bauteile und Materialien, ihre
+Namen – prueft erst das Rechnen
 ([[opencivil.projekt.lesen#inhalt_pruefen|inhalt_pruefen]]): ein abgelegtes
 Projekt mit zwei gleich benannten Materialien soll sich oeffnen und
 korrigieren lassen.
@@ -543,7 +543,7 @@ korrigieren lassen.
 def regeln(self, wo: str) -> None
 ```
 
-Die Namen der Materialien, vor dem Rechnen -- je Material einer.
+Die Namen der Materialien, vor dem Rechnen – je Material einer.
 
 #### Projekt.inhalt_pruefen
 
@@ -601,7 +601,7 @@ rechnet, braucht sie nicht.
 def beispiel(cls) -> 'Projekt'
 ```
 
-Das Beispiel, mit dem die Oberflaeche startet -- gebaut in [[opencivil.projekt.beispiele|.beispiele]].
+Das Beispiel, mit dem die Oberflaeche startet – gebaut in [[opencivil.projekt.beispiele|.beispiele]].
 
 #### Projekt.jeder_nachweis
 
@@ -610,7 +610,7 @@ Das Beispiel, mit dem die Oberflaeche startet -- gebaut in [[opencivil.projekt.b
 def jeder_nachweis(cls) -> 'Projekt'
 ```
 
-Jeder Nachweis einmal laut -- gebaut in [[opencivil.projekt.beispiele|.beispiele]].
+Jeder Nachweis einmal laut – gebaut in [[opencivil.projekt.beispiele|.beispiele]].
 
 
 ## Konstanten

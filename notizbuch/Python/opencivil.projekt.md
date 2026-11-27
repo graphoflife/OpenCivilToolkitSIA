@@ -1,5 +1,5 @@
 ---
-erzeugt: e88f1afc3465
+erzeugt: 18fc2580a224
 art: modul
 tags: [modul]
 ---
@@ -11,7 +11,7 @@ tags: [modul]
 
 Eine Oberflaeche braucht Materialien und Querschnitte als Daten: etwas, das sich
 als JSON speichern, im Browser bearbeiten und wieder zu einem [[opencivil.core.rechenwerk#Rechenwerk|Rechenwerk]]
-zusammenbauen laesst. Genau das ist ein [[opencivil.projekt.projekt#Projekt|Projekt]] -- eine reine
+zusammenbauen laesst. Genau das ist ein [[opencivil.projekt.projekt#Projekt|Projekt]] – eine reine
 Beschreibung ohne Rechenlogik.
 
 
@@ -71,7 +71,7 @@ Deckmantel einer Normbezeichnung im Bericht landen.
 ## EINHEITEN IN DER BESCHREIBUNG
 
 Alle Zahlen stehen in der Anzeige-Einheit des jeweiligen Kennwerts (mm, N/mm^2,
-kNm, ...) -- also so, wie der Benutzer sie eintippt. Die Umrechnung in SI
+kNm, ...) – also so, wie der Benutzer sie eintippt. Die Umrechnung in SI
 geschieht erst beim Aufbau, ueber die [[opencivil.core.einheiten#Groesse|Groesse]].
 
 ## Module
@@ -87,7 +87,7 @@ geschieht erst beim Aufbau, ueber die [[opencivil.core.einheiten#Groesse|Groesse
 - [[opencivil.projekt.eintraege]] – die Teile einer Projektbeschreibung.
 - [[opencivil.projekt.erdbeben]] – ein Gebaeude im Erdbeben, wie die Oberflaeche es beschreibt.
 - [[opencivil.projekt.faelle]] – Lastfaelle und Kombinationen eines Bauteils.
-- [[opencivil.projekt.fallnamen]] – Die Namen der Faelle eines Bauteils -- je Liste verschieden, auch als Kennung.
+- [[opencivil.projekt.fallnamen]] – Die Namen der Faelle eines Bauteils – je Liste verschieden, auch als Kennung.
 - [[opencivil.projekt.grundbruch]] – ein Grundbruchnachweis, wie die Oberflaeche ihn beschreibt.
 - [[opencivil.projekt.lesen]] – was in einer Projektdatei stehen darf, und wie es gelesen wird.
 - [[opencivil.projekt.mappe]] – mehrere Projekte in einer Datei.

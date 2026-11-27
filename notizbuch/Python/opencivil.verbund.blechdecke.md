@@ -1,5 +1,5 @@
 ---
-erzeugt: fcb0378d3aca
+erzeugt: 66eaafb7624c
 art: modul
 tags: [modul]
 ---
@@ -10,7 +10,7 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Was eine Blechverbunddecke traegt, ohne Rechenwerk und ohne Herleitung, in N,
-mm und N/mm² -- die Herleitung schreiben ihre Kennzahlen und Nachweise
+mm und N/mm² – die Herleitung schreiben ihre Kennzahlen und Nachweise
 ([[opencivil.nachweis.qa_blechverbund]]), die Form des Blechs kennt
 [[opencivil.querschnitt.profilblech]]:
 
@@ -22,7 +22,7 @@ mm und N/mm² -- die Herleitung schreiben ihre Kennzahlen und Nachweise
   nicht, und die Zeile bleibt grau;
 * der Laengsschub nach der m-k-Methode (5.4.3.5, (28)) mit seinen Angaben
   ([[opencivil.verbund.blechdecke#Laengsschub|Laengsschub]], [[opencivil.verbund.blechdecke#laengsschub|laengsschub]]): die Beiwerte `m` und `k`
-  aus Versuchen -- dem Datenblatt des Blechs --, die Spannweite `L`, ob
+  aus Versuchen – dem Datenblatt des Blechs –, die Spannweite `L`, ob
   das Feld ein Einfeld, ein End- oder ein Innenfeld ist, und wie die Last
   steht;
 * die Schlankheit `L/d_p`: bis 26 muss die Durchbiegung nicht gerechnet
@@ -60,7 +60,7 @@ Einwirkung der Querschnittsanalyse.
 class Feld(Wahl)
 ```
 
-Wo das Feld der Decke liegt -- danach die Spannweite fuer den Laengsschub.
+Wo das Feld der Decke liegt – danach die Spannweite fuer den Laengsschub.
 
 - `EINFELD = 'einfeld'`
 - `ENDFELD = 'endfeld'`
@@ -95,7 +95,7 @@ def erklaerung(self) -> str
 class Belastung(Wahl)
 ```
 
-Wie die Last auf dem Feld steht -- danach die Schublaenge `L_s`.
+Wie die Last auf dem Feld steht – danach die Schublaenge `L_s`.
 
 - `GLEICHMAESSIG = 'gleichmaessig'`
 - `EINZELLASTEN = 'einzellasten'`
@@ -114,7 +114,7 @@ def beschriftung(self) -> str
 def mit_abstand(self) -> bool
 ```
 
-Ob die Schublaenge der Abstand `a` der Last ist -- sonst kommt sie aus `L`.
+Ob die Schublaenge der Abstand `a` der Last ist – sonst kommt sie aus `L`.
 
 #### Belastung.erklaerung
 
@@ -130,7 +130,7 @@ def erklaerung(self) -> str
 class Laengsschub
 ```
 
-Was (28) ausser dem Querschnitt braucht -- siehe Dateikopf. `m` und
+Was (28) ausser dem Querschnitt braucht – siehe Dateikopf. `m` und
 `k` in N/mm², `L` und `a` in m, wie eingegeben; `None`, solange
 eine Angabe fehlt.
 
@@ -148,7 +148,7 @@ eine Angabe fehlt.
 def L_ersatz(self) -> Optional[float]
 ```
 
-Die Spannweite des gleichwertigen Einfelds in m -- `None` ohne `L`.
+Die Spannweite des gleichwertigen Einfelds in m – `None` ohne `L`.
 
 #### Laengsschub.L_s
 
@@ -157,7 +157,7 @@ Die Spannweite des gleichwertigen Einfelds in m -- `None` ohne `L`.
 def L_s(self) -> Optional[float]
 ```
 
-Die Schublaenge in mm -- `None`, solange fehlt, woraus sie kommt.
+Die Schublaenge in mm – `None`, solange fehlt, woraus sie kommt.
 
 #### Laengsschub.fehlt
 
@@ -166,7 +166,7 @@ Die Schublaenge in mm -- `None`, solange fehlt, woraus sie kommt.
 def fehlt(self) -> List[str]
 ```
 
-Die Zeichen dessen, was (28) noch fehlt, «m», «L» -- leer, wenn er rechnen kann.
+Die Zeichen dessen, was (28) noch fehlt, «m», «L» – leer, wenn er rechnen kann.
 
 #### Laengsschub.fehlt_in_worten
 
@@ -175,7 +175,7 @@ Die Zeichen dessen, was (28) noch fehlt, «m», «L» -- leer, wenn er rechnen k
 def fehlt_in_worten(self) -> str
 ```
 
-Dasselbe im Satz: «der Beiwert m und die Spannweite L» -- leer, wenn nichts fehlt.
+Dasselbe im Satz: «der Beiwert m und die Spannweite L» – leer, wenn nichts fehlt.
 
 #### Laengsschub.fehlt_kurz
 
@@ -184,7 +184,7 @@ Dasselbe im Satz: «der Beiwert m und die Spannweite L» -- leer, wenn nichts fe
 def fehlt_kurz(self) -> str
 ```
 
-Dasselbe fuer die Kachel: «m und k fehlen», «L fehlt» -- leer, wenn nichts fehlt.
+Dasselbe fuer die Kachel: «m und k fehlen», «L fehlt» – leer, wenn nichts fehlt.
 
 ### plastisch
 
@@ -193,7 +193,7 @@ def plastisch(verbund: Verbundquerschnitt, zug: Sequence[float], druck: Sequence
 ```
 
 Die Decke starr-plastisch bei `N` in N und `M_y` in N·mm, einachsig um
-y (5.4.1.1): je Gruppe mit `zug` und `druck` -- unter negativem
+y (5.4.1.1): je Gruppe mit `zug` und `druck` – unter negativem
 Moment zaehlt das Blech auch gezogen nicht (5.4.3.2). Dazu der Zustand,
 dessen Moment die Seite von `M_y` zieht; `None`, wo `N` jenseits
 dessen liegt, was die Decke ganz gezogen oder ganz gedrueckt traegt.
@@ -204,7 +204,7 @@ dessen liegt, was die Decke ganz gezogen oder ganz gedrueckt traegt.
 def querkraft(tau_cd: float, d_p: float, b_0: float, b_s: float) -> float
 ```
 
-(26): was die Decke je mm Breite an Querkraft traegt, in N/mm -- `τ_cd` in N/mm².
+(26): was die Decke je mm Breite an Querkraft traegt, in N/mm – `τ_cd` in N/mm².
 
 ### laengsschub
 
@@ -212,7 +212,7 @@ def querkraft(tau_cd: float, d_p: float, b_0: float, b_s: float) -> float
 def laengsschub(b: float, d_p: float, A_p: float, L_s: float, m: float, k: float) -> float
 ```
 
-(28): der Laengsschubwiderstand in N -- `A_p` die Flaeche des Blechs ueber `b`.
+(28): der Laengsschubwiderstand in N – `A_p` die Flaeche des Blechs ueber `b`.
 
 
 ## Konstanten
@@ -225,10 +225,10 @@ def laengsschub(b: float, d_p: float, A_p: float, L_s: float, m: float, k: float
 - `REFERENZ_SCHUBLAENGE = 'SIA 264:2014, 5.4.3.5'`
 - `REFERENZ_SCHLANKHEIT = 'SIA 264:2014, 5.4.4.3'`
 - `REFERENZ_EINACHSIG = 'SIA 264:2014, 5.4.1.1'`
-- `K_D = 0.8` – Der Beiwert von (26) -- und bis zu welcher statischen Hoehe in mm er gilt.
+- `K_D = 0.8` – Der Beiwert von (26) – und bis zu welcher statischen Hoehe in mm er gilt.
 - `D_P_BIS = 150.0`
 - `SCHLANKHEIT = 26.0` – Bis zu welchem `L/d_p` die Durchbiegung nicht gerechnet werden muss (5.4.4.3).
-- `ANGABEN = {'m': 'der Beiwert m', 'k': 'der Beiwert k', 'L': 'die Spannweite L',…` – Was (28) ausser dem Querschnitt braucht, je Zeichen in Worten -- fuer die Saetze, die sagen, was davon fehlt ([[opencivil.verbund.blechdecke#Laengsschub.fehlt|Laengsschub.fehlt]]).
+- `ANGABEN = {'m': 'der Beiwert m', 'k': 'der Beiwert k', 'L': 'die Spannweite L',…` – Was (28) ausser dem Querschnitt braucht, je Zeichen in Worten – fuer die Saetze, die sagen, was davon fehlt ([[opencivil.verbund.blechdecke#Laengsschub.fehlt|Laengsschub.fehlt]]).
 
 ## Braucht
 

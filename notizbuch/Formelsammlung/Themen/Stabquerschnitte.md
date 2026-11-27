@@ -65,7 +65,7 @@ Der äquivalente E-Modul eines Stabs: der Modul, den ein reiner, ungerissener Be
 Was ein Stab des Balkensystems von seinem Querschnitt braucht: die Fläche
 $A$ und das Flächenträgheitsmoment $I$ um die Achse senkrecht zur Ebene des
 Rahmens. Sie kommen aus einer Vorlage mit ihren Formeln, aus einem
-Stahlprofil, von Hand, aus einer Platte -- ein Streifen $b \times h$ --
+Stahlprofil, von Hand, aus einer Platte – ein Streifen $b \times h$ –
 oder aus dem Bruttoquerschnitt einer Querschnittsanalyse.
 
 Ein Stahlprofil kommt aus der Tabelle des Benutzers: IPE, HEA, HEB, HEM,

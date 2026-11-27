@@ -42,5 +42,5 @@ $$
 Aus der [[Schiefstellung]]: ein Stab der Knicklänge $l_{cr}$, um $\alpha_i$
 geneigt, weicht in seiner Mitte um $\alpha_i \cdot l_{cr}/2$ ab. Bei kurzen
 Stäben ist das wenig; dann gilt eine Mindestausmitte aus der statischen Höhe,
-$d/30$ (SIA 262:2025, 4.3.7.5, (75)) -- nicht aus der Abmessung des
+$d/30$ (SIA 262:2025, 4.3.7.5, (75)) – nicht aus der Abmessung des
 Querschnitts, wie hier bis 2026-11-14 stand.

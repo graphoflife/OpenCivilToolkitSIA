@@ -1,5 +1,5 @@
 ---
-erzeugt: 8377c2d14dd3
+erzeugt: 23ead200b9ee
 art: modul
 tags: [modul]
 ---
@@ -11,7 +11,7 @@ tags: [modul]
 
 Das Auge in der Zusammenfassung zeigt einen Nachweis mit allem, was er
 braucht: Baustoffe, Bewehrung, jeden Zwischenschritt. Fuer den Bericht in
-Word will man meist nur die Formeln, die ihn fuehren --
+Word will man meist nur die Formeln, die ihn fuehren –
 `M_Rd = A_s f_yd (d - A_s f_yd / (2 b f_cd))` und den Erfuellungsgrad. Die
 Kurzform baut sie aus der Mitschrift: vom Ergebnis des Nachweises aus
 rueckwaerts, je Platzhalter die Zeile, die seinen Wert rechnet.
@@ -33,7 +33,7 @@ dahinter steht dann unter dem Symbol, unter dem der Wert gebraucht wird.
 
 Jede eingesetzte Formel wird nachgerechnet ([[opencivil.core.formelbaum#rechnen|formelbaum.rechnen]]):
 gibt sie nicht das Ergebnis ihrer Zeile, bleibt es bei den einzelnen Zeilen.
-Die Kurzform rechnet also nichts Neues -- sie schreibt dieselbe Rechnung
+Die Kurzform rechnet also nichts Neues – sie schreibt dieselbe Rechnung
 kuerzer auf.
 
 ## Inhalt
@@ -44,7 +44,7 @@ kuerzer auf.
 def kurzform(protokoll: Protokoll, ziel: str) -> List[GleichungBlock]
 ```
 
-Die Kurzform des Nachweises, dessen Ergebnis der Wert `ziel` ist -- leer,
+Die Kurzform des Nachweises, dessen Ergebnis der Wert `ziel` ist – leer,
 wenn sie nur die Zeile waere, die ihn ohnehin abschliesst.
 
 ### _Bau
@@ -61,7 +61,7 @@ Die Zeilen der Mitschrift, nach dem Wert, den sie rechnen.
 def anfuegen(self, block: GleichungBlock, symbol: str, heraus: List[GleichungBlock]) -> None
 ```
 
-Die Zeile von `block` unter `symbol` ans Ende -- nach dem, was sie braucht.
+Die Zeile von `block` unter `symbol` ans Ende – nach dem, was sie braucht.
 
 #### _Bau.ausgebaut
 
@@ -79,7 +79,7 @@ steht, kommt nach `davor`. [[opencivil.core.formelbaum#Unlesbar|Unlesbar]], wenn
 def versuch(self, baum: Ausdruck, blatt: Blatt, quelle: GleichungBlock, resultat: Optional[Wert]) -> Optional[Tuple[Ausdruck, List[GleichungBlock], List[GleichungBlock]]]
 ```
 
-`baum` mit der Formel von `quelle` fuer `blatt` -- samt den
+`baum` mit der Formel von `quelle` fuer `blatt` – samt den
 eingesetzten Zeilen und denen, die davor stehen muessen. None, wenn
 er zu breit wuerde, einen Bruch im Bruch bekaeme oder nicht mehr
 `resultat` ergaebe.
@@ -90,7 +90,7 @@ er zu breit wuerde, einen Bruch im Bruch bekaeme oder nicht mehr
 def quelle(self, blatt: Blatt) -> Tuple[Optional[GleichungBlock], bool]
 ```
 
-Die Zeile, die den Wert eines Blatts rechnet -- ueber Zeilen hinweg,
+Die Zeile, die den Wert eines Blatts rechnet – ueber Zeilen hinweg,
 die ihn nur weitergeben, solange die Zahl dieselbe bleibt; und ob es
 solche gab.
 
@@ -108,7 +108,7 @@ Ergibt der Baum genau das Ergebnis der Zeile?
 def _unter(block: GleichungBlock, symbol: str) -> GleichungBlock
 ```
 
-Der Block, wie er ist -- unter dem Symbol, unter dem sein Wert gebraucht wird.
+Der Block, wie er ist – unter dem Symbol, unter dem sein Wert gebraucht wird.
 
 ### _gesetzt
 
@@ -117,7 +117,7 @@ def _gesetzt(block: GleichungBlock, baum: Ausdruck, eingesetzt: List[GleichungBl
 ```
 
 Die Zeile von `block` mit den eingesetzten Formeln. Sie hat keine
-Vorlage mehr -- eine solche Formel steht nicht in der Formelsammlung --,
+Vorlage mehr – eine solche Formel steht nicht in der Formelsammlung –,
 dafuer die Normstellen aller Zeilen, die in ihr aufgingen.
 
 ### normstellen
@@ -133,7 +133,7 @@ ist, was vor dem ersten Komma steht.
 
 ## Konstanten
 
-- `KURZBREITE = 40.0` – Wie breit eine Formel mit Symbolen hoechstens werden darf, wenn eine andere in sie eingesetzt wird -- in Zeichen, wie [[opencivil.core.latex#sichtbare_breite|sichtbare_breite]] sie zaehlt. Breiter liest sie sich nicht mehr auf einen Blick.
+- `KURZBREITE = 40.0` – Wie breit eine Formel mit Symbolen hoechstens werden darf, wenn eine andere in sie eingesetzt wird – in Zeichen, wie [[opencivil.core.latex#sichtbare_breite|sichtbare_breite]] sie zaehlt. Breiter liest sie sich nicht mehr auf einen Blick.
 
 ## Braucht
 

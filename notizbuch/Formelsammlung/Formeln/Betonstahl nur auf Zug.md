@@ -25,12 +25,12 @@ $$
 ## Theorie
 
 Der Stahl, wie die Handrechnung ihn sieht: auf Zug bilinear bis zum Plateau,
-auf Druck gar nicht. Gedrückte Bewehrung wird weggelassen -- das ist die
+auf Druck gar nicht. Gedrückte Bewehrung wird weggelassen – das ist die
 Vereinfachung, mit der die Resistenzlinie aus Handrechnung entsteht, und auf
 der sicheren Seite.
 
 Wählt ein Kapitel die Rechenart «Handrechnung», rechnet auch sein
-Querschnittslöser so -- das gibt es nur bei den Stahlspannungen im Gebrauch.
+Querschnittslöser so – das gibt es nur bei den Stahlspannungen im Gebrauch.
 Beim Knicken und in den Spannung-Dehnung-Analysen steht die Handrechnung seit
 2026-10-12 nicht mehr zur Wahl: dort wird die Normalkraft Ebene für Ebene
 genau gerechnet, und ein Polygon aus Eckpunkten wäre nur eine schlechtere

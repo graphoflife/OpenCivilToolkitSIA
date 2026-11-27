@@ -43,7 +43,7 @@ $$
 ## Theorie
 
 Die Wendel umschlingt die Längsstäbe als Schraube. Ein Schnitt längs durch
-den Pfahl trifft sie je Gang zweimal, auf beiden Seiten -- wie die zwei
+den Pfahl trifft sie je Gang zweimal, auf beiden Seiten – wie die zwei
 Schenkel eines Bügels.
 
 ⌀ 10 mm: A_sw = 2 · 78.5 = 157 mm².

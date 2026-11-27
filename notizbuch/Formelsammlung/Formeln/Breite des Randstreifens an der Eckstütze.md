@@ -57,5 +57,5 @@ Rand, und auch das höchstens $b_{sr}/2$.
 
 Beispiel: Eckstütze 300 × 300 mm direkt in der Ecke. $b_{sr}$ = 900 mm, zur
 Platte hin 450 mm, zum zweiten Rand 150 + 0 mm: der Streifen ist 600 mm breit.
-Bis 2026-11-14 lag er symmetrisch um die Stützenachse und war 900 mm breit --
+Bis 2026-11-14 lag er symmetrisch um die Stützenachse und war 900 mm breit –
 das mittlere Moment kam dabei bis zu einem Drittel zu klein heraus.

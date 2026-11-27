@@ -42,6 +42,6 @@ $$
 
 Die Plattendicke weniger die Überdeckung der Zugbewehrung und die der Anker
 auf der Druckseite: so hoch dürfen die Anker sein. Die Höhe $h_A$ ist die
-nächstkleinere, die ancoPLUS liefert -- sie endet auf 5 mm, in Schritten von
+nächstkleinere, die ancoPLUS liefert – sie endet auf 5 mm, in Schritten von
 10 mm. Diese Regel ist aus der Zulassung des Herstellers und zwei seiner
 Beispiele abgeleitet, nicht nachgeschlagen.

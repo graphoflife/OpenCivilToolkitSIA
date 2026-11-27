@@ -47,5 +47,5 @@ Die Druckzonenhöhe im Verhältnis zur statischen Höhe der Lage. Über die
 Ebenheit des Querschnitts ist sie mit den Dehnungen verknüpft: bei
 Randstauchung $\varepsilon_{cu}$ ist die Stahldehnung
 $\varepsilon_{cu}\,(1 - x/d)/(x/d)$. Ein kleines $x/d$ heisst grosse
-Stahldehnung, also viel Fliessen vor dem Bruch -- deshalb die Grenze in der
+Stahldehnung, also viel Fliessen vor dem Bruch – deshalb die Grenze in der
 [[Bedingung der Duktilität]].

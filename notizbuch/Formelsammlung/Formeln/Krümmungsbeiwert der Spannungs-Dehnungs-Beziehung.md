@@ -51,5 +51,5 @@ beginnt, sagt $k_\sigma$: ihr Anstieg dort ist $k_\sigma \cdot f_{cd} /
   Nullstelle (siehe [[Beiwert der Parabel]]).
 
 Mit $k_\sigma = E_{cd}/(400 \cdot f_{cd})$ und $\varepsilon_{c1d}$ = 2 ‰ ist der
-Anstieg bei null $1.25 \cdot E_{cd}$ -- ein bekannter Unterschied, den das
+Anstieg bei null $1.25 \cdot E_{cd}$ – ein bekannter Unterschied, den das
 Werkzeug so lässt (entschieden 2026-10-11, siehe [[Arbeitsweise]]).

@@ -1,5 +1,5 @@
 ---
-erzeugt: 511a4a94b4df
+erzeugt: d97947f7c452
 art: modul
 tags: [modul]
 ---
@@ -16,7 +16,7 @@ Spannglieder ([[opencivil.projekt.spannglieder]]), Schubwaende,
 Hilfslinien, die Wahl der Werkstoffgesetze, die
 Lastfaelle, die Faelle von Knicken und Kippen bei Stahl und Holz
 ([[opencivil.projekt.stabilitaet]]), beim Holz seine Feuchteklasse und die
-Schalter der Nachweise -- als eine speicherbare
+Schalter der Nachweise – als eine speicherbare
 Datenklasse, wie die Platte in [[opencivil.projekt.platte]]. Dazu die
 Vorlage einer frischen Analyse und ein Baukasten, der ohne Oberflaeche
 zeichnet ([[opencivil.projekt.querschnittsanalyse#QuerschnittsanalyseEintrag.polygon|QuerschnittsanalyseEintrag.polygon]] und folgende).
@@ -24,7 +24,7 @@ zeichnet ([[opencivil.projekt.querschnittsanalyse#QuerschnittsanalyseEintrag.pol
 
 ## KNOTEN
 
-Die Elemente tragen keine eigenen Koordinaten, sie verweisen auf Knoten --
+Die Elemente tragen keine eigenen Koordinaten, sie verweisen auf Knoten –
 ein Polygon auf seine Ecken, ein Stab auf seine Lage, ein Profil auf seine
 Mitte, eine Blechverbunddecke auf ihre Ecke links unten, eine Linie auf
 Anfang und Ende. Wer einen Knoten verschiebt, verschiebt alles, was an ihm
@@ -36,7 +36,7 @@ L fuer alle Linien.
 
 ## KOORDINATEN UND EINHEITEN
 
-y nach rechts, z nach oben, alles in Millimetern -- so, wie gezeichnet und
+y nach rechts, z nach oben, alles in Millimetern – so, wie gezeichnet und
 eingetippt wird. Schnittgroessen in kN und kNm. Umgerechnet wird beim Bauen.
 
 
@@ -51,7 +51,7 @@ Achsrichtung, T im Gegenuhrzeigersinn.
 
 Ob die Polygone sich ueberlappen, ob ein Stab im Beton liegt: das prueft der
 Aufbau. Eine abgelegte Analyse mit einem verunglueckten Polygon soll sich
-oeffnen und korrigieren lassen -- dasselbe Vorgehen wie bei den Abmessungen
+oeffnen und korrigieren lassen – dasselbe Vorgehen wie bei den Abmessungen
 der Platte ([[opencivil.projekt.platte#QuerschnittEintrag.regeln|QuerschnittEintrag.regeln]]).
 
 ## Inhalt
@@ -62,7 +62,7 @@ der Platte ([[opencivil.projekt.platte#QuerschnittEintrag.regeln|QuerschnittEint
 def _punkt(roh: Any, wo: str) -> List[float]
 ```
 
-Ein Punkt `[y, z]` -- zwei Zahlen, sonst ein Satz, was fehlt.
+Ein Punkt `[y, z]` – zwei Zahlen, sonst ein Satz, was fehlt.
 
 ### KnotenEintrag
 
@@ -90,8 +90,8 @@ Ein Polygon des Querschnitts. Ohne Material ist es eine Aussparung.
 - `IM_ORT = 'Polygon'` – In der Zeichnung heisst eines ohne Material «Aussparung» ([[opencivil.projekt.querschnittsanalyse#QuerschnittsanalyseEintrag.elemente|QuerschnittsanalyseEintrag.elemente]]).
 - `kennung: str = ''`
 - `knoten: List[str] = field(default_factory=list)` – Die Ecken als Knoten, der Reihe nach; die erste wird am Ende nicht wiederholt.
-- `material: str = materialfeld('beton', 'baustahl', 'holz')` – Kennung des Materials -- Beton, Baustahl oder Holz; leer heisst Aussparung. Woraus die Flaechen sind, bestimmt die Bauweise der Analyse ([[opencivil.querschnitt.bauweise|bauweise]]).
-- `ueberdeckung: float = bereich(0.0, heisst='Überdeckung c', einheit=MM, ab=0.0)` – Die Ueberdeckung der Bewehrung in mm, eine Hilfe beim Zeichnen: ueber null zeigt das Zeichenfenster das Polygon so weit nach innen gerueckt -- bei einer Aussparung nach aussen -- und «Überdeckung beachten» schiebt Bewehrung hinein ([[opencivil.querschnitt.geometrie#stab_in_ueberdeckung|stab_in_ueberdeckung]]). Gerechnet wird mit ihr nicht.
+- `material: str = materialfeld('beton', 'baustahl', 'holz')` – Kennung des Materials – Beton, Baustahl oder Holz; leer heisst Aussparung. Woraus die Flaechen sind, bestimmt die Bauweise der Analyse ([[opencivil.querschnitt.bauweise|bauweise]]).
+- `ueberdeckung: float = bereich(0.0, heisst='Überdeckung c', einheit=MM, ab=0.0)` – Die Ueberdeckung der Bewehrung in mm, eine Hilfe beim Zeichnen: ueber null zeigt das Zeichenfenster das Polygon so weit nach innen gerueckt – bei einer Aussparung nach aussen – und «Überdeckung beachten» schiebt Bewehrung hinein ([[opencivil.querschnitt.geometrie#stab_in_ueberdeckung|stab_in_ueberdeckung]]). Gerechnet wird mit ihr nicht.
 
 #### FlaecheEintrag.ist_aussparung
 
@@ -122,7 +122,7 @@ Ein einzelner Bewehrungsstab, an einem Knoten.
 class StablinieEintrag(Beschreibung)
 ```
 
-Eine Linie von Staeben -- oder eine verschmierte Stahlflaeche.
+Eine Linie von Staeben – oder eine verschmierte Stahlflaeche.
 
 Je Art ein eigenes Feld fuer die Menge: wer die Art wechselt und wieder
 zurueck, findet seine Zahl noch vor. Welche gilt, sagt `art`.
@@ -132,12 +132,12 @@ zurueck, findet seine Zahl noch vor. Welche gilt, sagt `art`.
 - `von: str = ''`
 - `bis: str = ''` – Anfang und Ende als Knoten.
 - `art: Linienart = Linienart.TEILUNG`
-- `durchmesser: float = bereich(16.0, heisst='Durchmesser', einheit=MM, ueber=0.0)` – Bei Anzahl und Teilung -- und bei verschmierten Staeben -- der Stabdurchmesser in mm.
-- `flaeche: float = bereich(1000.0, heisst='Stahlfläche', einheit=MM2, ueber=0.0)` – Bei Art «Fläche» die ganze Stahlflaeche der Linie in mm² -- von Hand.
-- `verschmiert: str = einer_von(VERSCHMIERT, 'flaeche')` – Bei Art «Fläche», wie die Stahlflaeche angegeben ist: `flaeche` von Hand -- oder `staebe`: Staebe `durchmesser` im Abstand `teilung` ueber `laenge`, verschmiert (Benutzer, 2026-10-24).
-- `laenge: Optional[float] = bereich(None, heisst='Länge', einheit=MM, ueber=0.0)` – Bei verschmierten Staeben die Laenge in mm, ueber die sie liegen -- leer: die der Linie.
+- `durchmesser: float = bereich(16.0, heisst='Durchmesser', einheit=MM, ueber=0.0)` – Bei Anzahl und Teilung – und bei verschmierten Staeben – der Stabdurchmesser in mm.
+- `flaeche: float = bereich(1000.0, heisst='Stahlfläche', einheit=MM2, ueber=0.0)` – Bei Art «Fläche» die ganze Stahlflaeche der Linie in mm² – von Hand.
+- `verschmiert: str = einer_von(VERSCHMIERT, 'flaeche')` – Bei Art «Fläche», wie die Stahlflaeche angegeben ist: `flaeche` von Hand – oder `staebe`: Staebe `durchmesser` im Abstand `teilung` ueber `laenge`, verschmiert (Benutzer, 2026-10-24).
+- `laenge: Optional[float] = bereich(None, heisst='Länge', einheit=MM, ueber=0.0)` – Bei verschmierten Staeben die Laenge in mm, ueber die sie liegen – leer: die der Linie.
 - `anzahl: float = bereich(5.0, heisst='Stabzahl', ab=1.0)`
-- `teilung: float = bereich(150.0, heisst='Teilung', einheit=MM, ueber=0.0)` – Bei Art «Teilung» der Wunschabstand in mm -- gerundet auf einen, der aufgeht; bei verschmierten Staeben ihr Abstand, wie er ist.
+- `teilung: float = bereich(150.0, heisst='Teilung', einheit=MM, ueber=0.0)` – Bei Art «Teilung» der Wunschabstand in mm – gerundet auf einen, der aufgeht; bei verschmierten Staeben ihr Abstand, wie er ist.
 - `starteisen: bool = True`
 - `endeisen: bool = True`
 - `stahl: str = materialfeld('betonstahl')`
@@ -151,7 +151,7 @@ class SchubwandEintrag(Beschreibung)
 
 Eine Schubwand: eine Linie ueber dem Querschnitt, mit Dicke und Buegeln.
 
-Ihre Laenge ist der Hebelarm des Fachwerks -- gezeichnet wird sie darum
+Ihre Laenge ist der Hebelarm des Fachwerks – gezeichnet wird sie darum
 von Gurt zu Gurt. Die Teilung `s` gilt in Laengsrichtung des Bauteils;
 im Schnitt ist sie nicht zu sehen.
 
@@ -188,7 +188,7 @@ Zeichenfenster zu einer Flaeche machen.
 class QALastfallEintrag(Beschreibung)
 ```
 
-Ein Lastfall der Querschnittsanalyse -- kN und kNm, Vorzeichen siehe oben.
+Ein Lastfall der Querschnittsanalyse – kN und kNm, Vorzeichen siehe oben.
 
 - `IM_ORT = 'Lastfall'`
 - `name: str`
@@ -198,8 +198,8 @@ Ein Lastfall der Querschnittsanalyse -- kN und kNm, Vorzeichen siehe oben.
 - `V_y_Ed: float = bereich(0.0, heisst='Querkraft V_y,Ed', einheit=KN)`
 - `V_z_Ed: float = bereich(0.0, heisst='Querkraft V_z,Ed', einheit=KN)`
 - `T_Ed: float = bereich(0.0, heisst='Torsion T_Ed', einheit=KNM)`
-- `stossartig: bool = False` – Nur beim Holz: ob die Einwirkung stossartig ist -- dann vergroessert η_t = 1.4 seine Bemessungswerte (SIA 265:2012, 2.2.6). Stahlbeton und Stahl kennen das nicht; ihr Lastfall rechnet ohne.
-- `duebelzahl: Optional[int] = bereich(None, heisst='Dübel bis zum Momentennullpunkt', ab=0)` – Nur im Verbund mit Kopfbolzenduebeln: wie viele Duebel zwischen diesem Schnitt und dem naechsten Momentennullpunkt sitzen -- `N` in (29), SIA 264:2014. Leer: noch keine Zahl.
+- `stossartig: bool = False` – Nur beim Holz: ob die Einwirkung stossartig ist – dann vergroessert η_t = 1.4 seine Bemessungswerte (SIA 265:2012, 2.2.6). Stahlbeton und Stahl kennen das nicht; ihr Lastfall rechnet ohne.
+- `duebelzahl: Optional[int] = bereich(None, heisst='Dübel bis zum Momentennullpunkt', ab=0)` – Nur im Verbund mit Kopfbolzenduebeln: wie viele Duebel zwischen diesem Schnitt und dem naechsten Momentennullpunkt sitzen – `N` in (29), SIA 264:2014. Leer: noch keine Zahl.
 - `L_e: Optional[float] = bereich(None, heisst='Länge L_e', einheit=M, ueber=0.0)` – Nur im Verbund mit Kopfbolzenduebeln: der Abstand der Momentennullpunkte in m, fuer (29). Leer: noch keiner.
 - `aktiv: bool = True`
 
@@ -210,7 +210,7 @@ Ein Lastfall der Querschnittsanalyse -- kN und kNm, Vorzeichen siehe oben.
 class QAGebrauchsfallEintrag(Beschreibung)
 ```
 
-Ein Lastfall unter Gebrauchslast -- wie ein Lastfall der Tragsicherheit,
+Ein Lastfall unter Gebrauchslast – wie ein Lastfall der Tragsicherheit,
 ohne Querkraft und Torsion: begrenzt wird die Stahlspannung, und dafuer
 zaehlen N und die Momente. kN und kNm, Vorzeichen siehe oben.
 
@@ -241,7 +241,7 @@ class QAGebrauchsliste(Gebrauchsliste)
 
 Die Lastfaelle einer Stahlspannung am gezeichneten Querschnitt: dieselbe
 Liste wie bei der Platte, mit N, M_y und M_z je Fall, abgeleitet aus den
-Lastfaellen der Tragsicherheit. Gerechnet wird ueber die Fasern -- eine
+Lastfaellen der Tragsicherheit. Gerechnet wird ueber die Fasern – eine
 Handrechnung gibt es hier nicht.
 
 - `FALL = QAGebrauchsfallEintrag`
@@ -256,7 +256,7 @@ Handrechnung gibt es hier nicht.
 class QAKnickEintrag(KnickEintrag)
 ```
 
-Ein Knicknachweis des gezeichneten Querschnitts -- wie bei der Platte,
+Ein Knicknachweis des gezeichneten Querschnitts – wie bei der Platte,
 dazu die Zugseite: die Seite, zu der sich der Stab biegt und die das
 Moment 1. Ordnung zieht ([[opencivil.querschnitt.zugseite#Zugseite|Zugseite]]).
 
@@ -269,7 +269,7 @@ Moment 1. Ordnung zieht ([[opencivil.querschnitt.zugseite#Zugseite|Zugseite]]).
 class QASpannungsfallEintrag(SpannungsfallEintrag)
 ```
 
-Eine Spannung-Dehnung-Analyse des gezeichneten Querschnitts -- dieselben
+Eine Spannung-Dehnung-Analyse des gezeichneten Querschnitts – dieselben
 Felder wie bei der Platte. Die Richtung ist hier die Zugseite: die Seite,
 die ein positives Moment zieht ([[opencivil.querschnitt.zugseite#Zugseite|Zugseite]]).
 
@@ -285,11 +285,11 @@ class Elemente
 Die Elemente einer Analyse, so wie der Kern sie prueft und rechnet:
 Koordinaten in mm, und je Element `name` und `kennung`.
 
-Der Name zaehlt je Art ab 1 -- «Polygon 1», «Aussparung 2», «Profil 1»,
-«Stab 1», «Linie 1», «Wand 3» -- und steht so in Berichten und Meldungen. Die
+Der Name zaehlt je Art ab 1 – «Polygon 1», «Aussparung 2», «Profil 1»,
+«Stab 1», «Linie 1», «Wand 3» – und steht so in Berichten und Meldungen. Die
 Kennung ist die des Elements (`F1`, `L4`); an ihr erkennt die
 Oberflaeche, welches gemeint ist. Die Namen werden hier vergeben und
-nirgends sonst -- vorher entstanden sie an fuenf Stellen.
+nirgends sonst – vorher entstanden sie an fuenf Stellen.
 
 Ein Element, das auf einen Knoten verweist, den es nicht gibt, steht in
 keiner Liste, sondern in `fehler`. Sein Name bleibt reserviert: die
@@ -300,9 +300,9 @@ Elemente danach heissen weiter so wie vorher.
 - `linien: List[dict]` – Je Stablinie die Felder der Beschreibung, `von` und `bis` als Punkte.
 - `waende: List[dict]` – Je Schubwand die Felder der Beschreibung, `von` und `bis` als Punkte.
 - `spannglieder: List[dict] = field(default_factory=list)` – Je Spannglied die Felder der Beschreibung, `lage` als Punkt.
-- `hilfslinien: List[dict] = field(default_factory=list)` – Je Hilfslinie `von` und `bis` -- gerechnet wird mit ihnen nichts.
-- `profile: List[dict] = field(default_factory=list)` – Je Stahlprofil die Felder der Beschreibung, `lage` als Punkt -- die Mitte --, dazu `umrisse` in der Zeichnung (der erste aussen, dann die Loecher), `beschreibung`: «HEB 300, um 90° gedreht», und all das in einem: `profillage` ([[opencivil.stahlprofile.lage#Profillage|Profillage]]).
-- `blechdecken: List[dict] = field(default_factory=list)` – Je Blechverbunddecke `beton`, `blech`, `lage` als Punkt -- die Ecke links unten -- und `form` ([[opencivil.querschnitt.profilblech#Blechform|Blechform]]), dazu `namen`: je Materialfeld, wie Meldungen und Bericht den Teil nennen, «Blechverbunddecke 1, Beton» -- die Decke hat zwei Materialien, und «Blechverbunddecke 1: noch kein Material gewählt» sagte nicht, welches.
+- `hilfslinien: List[dict] = field(default_factory=list)` – Je Hilfslinie `von` und `bis` – gerechnet wird mit ihnen nichts.
+- `profile: List[dict] = field(default_factory=list)` – Je Stahlprofil die Felder der Beschreibung, `lage` als Punkt – die Mitte –, dazu `umrisse` in der Zeichnung (der erste aussen, dann die Loecher), `beschreibung`: «HEB 300, um 90° gedreht», und all das in einem: `profillage` ([[opencivil.stahlprofile.lage#Profillage|Profillage]]).
+- `blechdecken: List[dict] = field(default_factory=list)` – Je Blechverbunddecke `beton`, `blech`, `lage` als Punkt – die Ecke links unten – und `form` ([[opencivil.querschnitt.profilblech#Blechform|Blechform]]), dazu `namen`: je Materialfeld, wie Meldungen und Bericht den Teil nennen, «Blechverbunddecke 1, Beton» – die Decke hat zwei Materialien, und «Blechverbunddecke 1: noch kein Material gewählt» sagte nicht, welches.
 - `fehler: List[dict] = field(default_factory=list)` – Was sich nicht aufloesen liess: `text` und `elemente` (Kennungen), wie eine Meldung.
 
 #### Elemente.flaechen
@@ -317,8 +317,8 @@ in ihrer Folge, dann je Profil sein Umriss aus Baustahl und seine
 Loecher als Aussparungen, «Profil 1, innen», dann je
 Blechverbunddecke ihr Beton ueber dem Blech. Je Flaeche `name`,
 `kennung` (beim Profil auch die des Lochs), `punkte`,
-`aussparung`, `material`, `stoffe` -- die Arten von Material,
-die das Element nimmt --, `ueberdeckung` (beim Profil null) und
+`aussparung`, `material`, `stoffe` – die Arten von Material,
+die das Element nimmt –, `ueberdeckung` (beim Profil null) und
 `profil`: beim Umriss eines Profils seine Lage, sonst `None`. Ein
 Polygon ohne Material ist eine Aussparung, ein Profil ohne Baustahl
 nicht: ihm fehlt die Wahl. Gerechnet wird mit Flaechen; ein Profil ist
@@ -346,33 +346,33 @@ Was er mit der Platte gleich angibt, steht in der Grundlage
 - `spannglieder: List[SpanngliedEintrag] = field(default_factory=list)`
 - `schubwaende: List[SchubwandEintrag] = field(default_factory=list)`
 - `hilfslinien: List[HilfslinieEintrag] = field(default_factory=list)`
-- `werkstoffsaetze: Dict[str, Werkstoffsatz] = je_material(Werkstoffsatz.BEMESSUNG)` – Je Material die Werte der Tragsicherheit: Bemessungs- oder charakteristische -- das legt fest, wo die Plateaus liegen (`f_cd` oder `f_ck`, `f_yd` oder `f_yk`). Duktilitaet und sproedes Versagen rechnen am selben Querschnitt.
+- `werkstoffsaetze: Dict[str, Werkstoffsatz] = je_material(Werkstoffsatz.BEMESSUNG)` – Je Material die Werte der Tragsicherheit: Bemessungs- oder charakteristische – das legt fest, wo die Plateaus liegen (`f_cd` oder `f_ck`, `f_yd` oder `f_yk`). Duktilitaet und sproedes Versagen rechnen am selben Querschnitt.
 - `rechenarten: Dict[str, Rechenart] = je_material(Rechenart.PARABEL, FASERARTEN)` – Je Beton die Rechenart der Tragsicherheit: praezise mit der Parabel-Rechteck-Beziehung oder mit dem vereinfachten Spannungsblock 0.85·x. Bis 2026-11-25 hiess das Feld `betongesetze`, als einziges je Beton.
 - `kriechzahl: ClassVar[float] = 0.0` – Die Tragsicherheit rechnet ohne Kriechen ([[opencivil.projekt.eintraege#JeMaterial.wahl|JeMaterial.wahl]]).
 - `lastfaelle: List[QALastfallEintrag] = field(default_factory=list)`
-- `einachsig: bool = False` – Nur Biegung um y: die Nulllinie bleibt waagrecht, M_z und V_y zaehlen nicht, und Duktilitaet und sproedes Versagen gibt es nur in y. Torsion bleibt. Bei einem unsymmetrischen Querschnitt ist das eine Naeherung -- dasselbe, was die Platte immer tut.
+- `einachsig: bool = False` – Nur Biegung um y: die Nulllinie bleibt waagrecht, M_z und V_y zaehlen nicht, und Duktilitaet und sproedes Versagen gibt es nur in y. Torsion bleibt. Bei einem unsymmetrischen Querschnitt ist das eine Naeherung – dasselbe, was die Platte immer tut.
 - `alpha_min: int = kleinste_neigung()`
-- `alpha_max: int = groesste_neigung()` – Die Grenzen der Druckfeldneigung in den Schubwaenden -- wie bei den Buegeln der Platte.
+- `alpha_max: int = groesste_neigung()` – Die Grenzen der Druckfeldneigung in den Schubwaenden – wie bei den Buegeln der Platte.
 - `laengszugkraft: bool = False` – Ob die Laengszugkraft aus Querkraft und Torsion in den M-N-Nachweis eingeht: das Druckfeld jeder Schubwand braucht in Laengsrichtung Zug.
-- `quasistaendig: QAGebrauchsliste = teil(lambda: QAGebrauchsliste(anteil=QUASISTAENDIG_ANTEIL), heisst='S…` – Die quasi-staendigen Lastfaelle -- fuer die Rissbreite.
-- `haeufig: QAGebrauchsliste = teil(lambda: QAGebrauchsliste(anteil=HAEUFIG_ANTEIL), heisst='Fliesse…` – Die haeufigen Lastfaelle -- gegen das Fliessen, bei erhoehter und hoher Anforderung.
+- `quasistaendig: QAGebrauchsliste = teil(lambda: QAGebrauchsliste(anteil=QUASISTAENDIG_ANTEIL), heisst='S…` – Die quasi-staendigen Lastfaelle – fuer die Rissbreite.
+- `haeufig: QAGebrauchsliste = teil(lambda: QAGebrauchsliste(anteil=HAEUFIG_ANTEIL), heisst='Fliesse…` – Die haeufigen Lastfaelle – gegen das Fliessen, bei erhoehter und hoher Anforderung.
 - `knickfaelle: List[QAKnickEintrag] = field(default_factory=list)` – Knicknachweise, je in einer Richtung; leer heisst: keiner.
 - `stabilitaetsfaelle: List[QAStabilitaetEintrag] = field(default_factory=list)` – Knicken und Kippen eines Stabs aus Stahl (SIA 263) oder Holz (SIA 265); leer: keiner.
 - `knickkurve_y: Knickkurve = Knickkurve.PROFIL`
-- `knickkurve_z: Knickkurve = Knickkurve.PROFIL` – Die Knickspannungskurven um y und um z: die, die Figur 7 dem Profil zuweist -- nur fuer einen Querschnitt aus einem einzigen Profil -- oder eine gewaehlte. Sie gelten fuer alle Faelle: die Kurve gehoert zum Querschnitt, nicht zum Fall.
-- `feuchteklasse: Feuchteklasse = Feuchteklasse.EINS` – Beim Holz: wie feucht es im Bauwerk ist (SIA 265:2012, 3.2.1.2) -- einmal fuer die ganze Analyse. Ihr η_w mindert jeden Nachweis; die Spannung-Dehnung-Analysen rechnen ohne (nach Vorgabe, nicht nachgeschlagen).
-- `verduebelung: vd.Verduebelung = vd.Verduebelung.VOLL` – Im Verbund: ob Stahl und Beton voll verduebelt angenommen sind oder mit Kopfbolzenduebeln gerechnet wird ([[opencivil.verbund.duebel]]) -- der Duebel einmal fuer die ganze Analyse, seine Zahl je Lastfall.
-- `duebel_d: float = bereich(19.0, heisst='Durchmesser d', einheit=MM, ab=vd.D_AB, bis=vd.…` – Der Schaftdurchmesser der Kopfbolzenduebel in mm -- hoechstens ein Viertel ihrer Laenge.
+- `knickkurve_z: Knickkurve = Knickkurve.PROFIL` – Die Knickspannungskurven um y und um z: die, die Figur 7 dem Profil zuweist – nur fuer einen Querschnitt aus einem einzigen Profil – oder eine gewaehlte. Sie gelten fuer alle Faelle: die Kurve gehoert zum Querschnitt, nicht zum Fall.
+- `feuchteklasse: Feuchteklasse = Feuchteklasse.EINS` – Beim Holz: wie feucht es im Bauwerk ist (SIA 265:2012, 3.2.1.2) – einmal fuer die ganze Analyse. Ihr η_w mindert jeden Nachweis; die Spannung-Dehnung-Analysen rechnen ohne (nach Vorgabe, nicht nachgeschlagen).
+- `verduebelung: vd.Verduebelung = vd.Verduebelung.VOLL` – Im Verbund: ob Stahl und Beton voll verduebelt angenommen sind oder mit Kopfbolzenduebeln gerechnet wird ([[opencivil.verbund.duebel]]) – der Duebel einmal fuer die ganze Analyse, seine Zahl je Lastfall.
+- `duebel_d: float = bereich(19.0, heisst='Durchmesser d', einheit=MM, ab=vd.D_AB, bis=vd.…` – Der Schaftdurchmesser der Kopfbolzenduebel in mm – hoechstens ein Viertel ihrer Laenge.
 - `duebel_h: float = bereich(100.0, heisst='Länge h_D', einheit=MM, ueber=0.0)`
-- `duebel_f_u: float = bereich(vd.F_U_VORGABE, heisst='Zugfestigkeit f_u', einheit=N_PRO_MM2…` – Ueber 500 N/mm² zaehlt sie in (31) mit 500 -- die Zahl bleibt, wie eingegeben.
-- `stuetze_kriechzahl: float = bereich(0.0, heisst='Kriechzahl φ', ab=0.0)` – Im Verbund: `φ(t,t_0)` des Betons fuer die Verbundstuetze (SIA 264:2014, (19)) -- einmal fuer die Analyse, der staendige Anteil je Fall. Null rechnet ohne Kriechen.
+- `duebel_f_u: float = bereich(vd.F_U_VORGABE, heisst='Zugfestigkeit f_u', einheit=N_PRO_MM2…` – Ueber 500 N/mm² zaehlt sie in (31) mit 500 – die Zahl bleibt, wie eingegeben.
+- `stuetze_kriechzahl: float = bereich(0.0, heisst='Kriechzahl φ', ab=0.0)` – Im Verbund: `φ(t,t_0)` des Betons fuer die Verbundstuetze (SIA 264:2014, (19)) – einmal fuer die Analyse, der staendige Anteil je Fall. Null rechnet ohne Kriechen.
 - `blech_m: Optional[float] = bereich(None, heisst='Beiwert m', einheit=N_PRO_MM2, ueber=0.0)`
-- `blech_k: Optional[float] = bereich(None, heisst='Beiwert k', einheit=N_PRO_MM2)` – Bei einer Blechverbunddecke: `m` und `k` der m-k-Methode aus dem Datenblatt des Blechs (SIA 264:2014, (28)) -- `k` darf negativ sein. Leer: noch keine Zahl, der Laengsschub fehlt grau.
-- `blech_L: Optional[float] = bereich(None, heisst='Spannweite L', einheit=M, ueber=0.0)` – Bei einer Blechverbunddecke: die Spannweite ihres Felds in m -- fuer (28) und `L/d_p`.
+- `blech_k: Optional[float] = bereich(None, heisst='Beiwert k', einheit=N_PRO_MM2)` – Bei einer Blechverbunddecke: `m` und `k` der m-k-Methode aus dem Datenblatt des Blechs (SIA 264:2014, (28)) – `k` darf negativ sein. Leer: noch keine Zahl, der Laengsschub fehlt grau.
+- `blech_L: Optional[float] = bereich(None, heisst='Spannweite L', einheit=M, ueber=0.0)` – Bei einer Blechverbunddecke: die Spannweite ihres Felds in m – fuer (28) und `L/d_p`.
 - `blech_feld: bd.Feld = bd.Feld.EINFELD`
 - `blech_last: bd.Belastung = bd.Belastung.GLEICHMAESSIG`
 - `blech_a: Optional[float] = bereich(None, heisst='Abstand a', einheit=M, ueber=0.0, bis_feld='ble…` – Mit zwei Einzellasten: ihr Abstand vom naechsten Auflager in m, hoechstens L/2.
-- `spannungsfaelle: List[QASpannungsfallEintrag] = field(default_factory=list)` – Die Spannung-Dehnung-Analysen -- kein Nachweis, ein Blick in den Querschnitt.
+- `spannungsfaelle: List[QASpannungsfallEintrag] = field(default_factory=list)` – Die Spannung-Dehnung-Analysen – kein Nachweis, ein Blick in den Querschnitt.
 
 #### QuerschnittsanalyseEintrag.laengsschub
 
@@ -404,7 +404,7 @@ def leer(self) -> bool
 Ob noch nichts gezeichnet ist, was traegt: keine Flaeche, kein Profil,
 keine Decke, kein Stab, keine Stablinie, kein Spannglied, keine Schubwand. Knoten
 und Hilfslinien allein sind Bauhilfen. So beginnt eine neue Analyse
-(Benutzer, 2026-10-19), und so gibt es nichts zu rechnen -- aber auch
+(Benutzer, 2026-10-19), und so gibt es nichts zu rechnen – aber auch
 keinen Fehler.
 
 #### QuerschnittsanalyseEintrag.elemente
@@ -413,7 +413,7 @@ keinen Fehler.
 def elemente(self) -> Elemente
 ```
 
-Die Elemente mit Name und Kennung, Koordinaten in mm -- siehe [[opencivil.projekt.querschnittsanalyse#Elemente|Elemente]].
+Die Elemente mit Name und Kennung, Koordinaten in mm – siehe [[opencivil.projekt.querschnittsanalyse#Elemente|Elemente]].
 
 #### QuerschnittsanalyseEintrag.netz
 
@@ -429,7 +429,7 @@ Die Knoten zum Weiterzeichnen: gleiche Koordinaten sind ein Knoten.
 def _knoten(self, netz: Netz, ort: Ort) -> str
 ```
 
-Ein Knoten aus einem Punkt `[y, z]` -- oder die Kennung, wenn schon eine dasteht.
+Ein Knoten aus einem Punkt `[y, z]` – oder die Kennung, wenn schon eine dasteht.
 
 #### QuerschnittsanalyseEintrag._kennung
 
@@ -437,7 +437,7 @@ Ein Knoten aus einem Punkt `[y, z]` -- oder die Kennung, wenn schon eine dasteht
 def _kennung(self, vorsilbe: str) -> str
 ```
 
-Die naechste Kennung -- alle Linien zaehlen gemeinsam, ob Bewehrung, Wand oder Hilfslinie.
+Die naechste Kennung – alle Linien zaehlen gemeinsam, ob Bewehrung, Wand oder Hilfslinie.
 
 #### QuerschnittsanalyseEintrag.polygon
 
@@ -455,7 +455,7 @@ def profil(self, y: float, z: float, profil: str, **felder: Any) -> ProfilEintra
 
 Ein Stahlprofil, «HEB 300» oder aus Vollstahl «FL 100 x 10», die Mitte
 bei `(y, z)`; die Felder wie [[opencivil.projekt.profile#ProfilEintrag|ProfilEintrag]]. Einen Namen, der
-nicht geht, sagt ein [[opencivil.projekt.lesen#ProjektFehler|ProjektFehler]] -- wie im Balkensystem.
+nicht geht, sagt ein [[opencivil.projekt.lesen#ProjektFehler|ProjektFehler]] – wie im Balkensystem.
 
 #### QuerschnittsanalyseEintrag.blechdecke
 
@@ -472,7 +472,7 @@ Felder wie [[opencivil.projekt.blechdecken#BlechdeckeEintrag|BlechdeckeEintrag]]
 def stab(self, y: float, z: float, **felder: Any) -> StabEintrag
 ```
 
-Ein einzelner Stab bei `(y, z)` -- `durchmesser`, `stahl`.
+Ein einzelner Stab bei `(y, z)` – `durchmesser`, `stahl`.
 
 #### QuerschnittsanalyseEintrag.spannglied
 
@@ -504,7 +504,7 @@ Eine Schubwand; die Felder wie [[opencivil.projekt.querschnittsanalyse#Schubwand
 def hilfslinie(self, von: Ort, bis: Ort) -> HilfslinieEintrag
 ```
 
-Eine Hilfslinie -- nur zum Konstruieren, gerechnet wird mit ihr nicht.
+Eine Hilfslinie – nur zum Konstruieren, gerechnet wird mit ihr nicht.
 
 #### QuerschnittsanalyseEintrag.lage
 
@@ -512,7 +512,7 @@ Eine Hilfslinie -- nur zum Konstruieren, gerechnet wird mit ihr nicht.
 def lage(self, kennung: str) -> Optional[Tuple[float, float]]
 ```
 
-Wo ein Knoten liegt, in mm -- `None`, wenn es ihn nicht gibt.
+Wo ein Knoten liegt, in mm – `None`, wenn es ihn nicht gibt.
 
 #### QuerschnittsanalyseEintrag.vorlage_einsetzen
 
@@ -520,14 +520,14 @@ Wo ein Knoten liegt, in mm -- `None`, wenn es ihn nicht gibt.
 def vorlage_einsetzen(self, schluessel: str, *, material: str, stahl: str, masse: Optional[Mapping[str, float]]=None, randabstand: float=vorlagen.RANDABSTAND.vorgabe, bewehrung: bool=True, schubwaende: bool=True, ursprung: Tuple[float, float]=(0.0, 0.0)) -> List[str]
 ```
 
-Setzt eine Vorlage ein ([[opencivil.querschnitt.vorlagen]]) -- dazu,
+Setzt eine Vorlage ein ([[opencivil.querschnitt.vorlagen]]) – dazu,
 nicht anstatt: was schon gezeichnet ist, bleibt, und wo ein Punkt der
 Vorlage genau auf einem Knoten liegt, haengt sie an ihm. `ursprung`
 ist, wohin ihre Ecke unten links kommt; die Lagen auf einen
 Millionstel Millimeter wie im Zeichenfenster, damit die Summe keinen
 Rundungsrest behaelt. Gibt die Kennungen der neuen Elemente zurueck.
 Passen die Masse nicht zueinander, ein `ValueError` mit dem Grund.
-`material` ist das der Flaechen -- Beton, Baustahl oder Holz --,
+`material` ist das der Flaechen – Beton, Baustahl oder Holz –,
 `stahl` der der Bewehrung; bis 2026-11-26 hiess `material`
 `beton`.
 
@@ -537,7 +537,7 @@ Passen die Masse nicht zueinander, ein `ValueError` mit dem Grund.
 def fallnamen(self) -> List[Fallnamen]
 ```
 
-Die Listen, deren Namen sich unterscheiden muessen -- wie bei der Platte.
+Die Listen, deren Namen sich unterscheiden muessen – wie bei der Platte.
 
 #### QuerschnittsanalyseEintrag.lastfall
 
@@ -545,7 +545,7 @@ Die Listen, deren Namen sich unterscheiden muessen -- wie bei der Platte.
 def lastfall(self, name: str, **werte: float) -> QALastfallEintrag
 ```
 
-Einen Lastfall anfuegen, ohne Oberflaeche -- kN und kNm.
+Einen Lastfall anfuegen, ohne Oberflaeche – kN und kNm.
 
 #### QuerschnittsanalyseEintrag.knickfall
 
@@ -553,7 +553,7 @@ Einen Lastfall anfuegen, ohne Oberflaeche -- kN und kNm.
 def knickfall(self, name: str, *, N_Ed: float, M_Ed_1: float=0.0, laenge: float=3.0, knicklaenge: Optional[float]=None, richtung: str=Zugseite.UNTEN.value) -> QAKnickEintrag
 ```
 
-Ein Knicknachweis -- N_Ed in kN (Druck negativ), Längen in m, die Zugseite.
+Ein Knicknachweis – N_Ed in kN (Druck negativ), Längen in m, die Zugseite.
 
 #### QuerschnittsanalyseEintrag.knickkurven
 
@@ -578,7 +578,7 @@ Die eingeschalteten Faelle von Knicken und Kippen, in SI.
 def stabilitaetsfall(self, name: str, **werte: float) -> QAStabilitaetEintrag
 ```
 
-Ein Fall von Knicken und Kippen -- N_Ed in kN (Druck negativ), die
+Ein Fall von Knicken und Kippen – N_Ed in kN (Druck negativ), die
 Momente in kNm, die Laengen in m; die Felder wie
 [[opencivil.projekt.stabilitaet#QAStabilitaetEintrag|QAStabilitaetEintrag]].
 
@@ -588,7 +588,7 @@ Momente in kNm, die Laengen in m; die Felder wie
 def spannungsfall(self, name: str, *, art: str='schnittgroessen', **felder: Any) -> QASpannungsfallEintrag
 ```
 
-Eine Spannung-Dehnung-Analyse -- Felder wie bei der Platte, die
+Eine Spannung-Dehnung-Analyse – Felder wie bei der Platte, die
 Richtung als Zugseite (`unten`, `oben`, `links`, `rechts`).
 Gelesen wie aus einer Datei, also mit denselben Pruefungen.
 
@@ -608,7 +608,7 @@ Feldmoment; das Rechteck gibt es als Vorlage im Zeichenfenster.
 ## Konstanten
 
 - `SCHNITTE = range(1, 9)` – Schnitte eines Buegels durch eine Schubwand: so viele Schenkel kreuzen sie.
-- `Ort = Union[str, Sequence[float]]` – Ein Punkt in mm -- oder die Kennung eines Knotens, der dort liegt.
+- `Ort = Union[str, Sequence[float]]` – Ein Punkt in mm – oder die Kennung eines Knotens, der dort liegt.
 
 ## Braucht
 

@@ -57,7 +57,7 @@ $$
 
 Wo mehrere Stäbe als einer zählen, liegt ihre gemeinsame Kraft im
 Schwerpunkt der Flächen: jede Tiefe gewichtet mit ihrer Fläche. Fliessen alle
-Teile, ist das genau der Angriffspunkt ihrer Zugkraft -- sie stehen unter
+Teile, ist das genau der Angriffspunkt ihrer Zugkraft – sie stehen unter
 derselben Spannung. Haben die Teile verschiedene Tiefen, ist es eine
 Näherung, die bei nahe beieinander liegenden Stäben kaum etwas ändert.
 

@@ -35,5 +35,5 @@ Das Verfahren selbst. Begonnen wird ohne Verformung, $e_{2d} = 0$. Dann:
 
 Ändert sie sich nicht mehr, steht der Stab: das ist die Gleichgewichtslage.
 Wächst sie, bis der Querschnitt das Moment nicht mehr tragen kann, gibt es
-keine -- der Stab knickt. Die Herleitung zeigt die Folge Durchlauf für
+keine – der Stab knickt. Die Herleitung zeigt die Folge Durchlauf für
 Durchlauf, weil ihr Einlaufen die Aussage des Nachweises ist.

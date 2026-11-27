@@ -38,6 +38,6 @@ $$
 ## Theorie
 
 Nachgewiesen wird nicht die Suche nach der Dehnungsebene, sondern ihr
-Ergebnis. Die Summe der Kräfte aller Teile -- Betonstreifen und Stäbe --
+Ergebnis. Die Summe der Kräfte aller Teile – Betonstreifen und Stäbe –
 muss die verlangte Normalkraft treffen. Steht sie in der Herleitung, ist die
 Ebene im Gleichgewicht, gleich wie sie gefunden wurde.

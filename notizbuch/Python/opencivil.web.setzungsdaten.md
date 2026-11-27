@@ -1,5 +1,5 @@
 ---
-erzeugt: 89f8a2273d56
+erzeugt: cf5cfc900852
 art: modul
 tags: [modul]
 ---
@@ -10,7 +10,7 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Je Fundament die Zahlen der Situationszeichnung, in den Einheiten der
-Anzeige -- m und mm: wo gerechnet wurde, wie die Zusatzspannung mit der
+Anzeige – m und mm: wo gerechnet wurde, wie die Zusatzspannung mit der
 Tiefe abnimmt und was jede Schicht zur Setzung beitraegt. Dazu die Legende
 unter dem Bild ([[opencivil.web.anzeige]]): der Punkt, die Setzung gegen
 die zulaessige mit dem Urteil, was die Linie zeigt, und die Laenge. Die
@@ -30,7 +30,7 @@ def situation(aufbau: Aufbau, kennung: str, loesung: Loesung) -> Dict[str, Any]
 ```
 
 Was die Zeichnung eines Fundaments braucht. Ohne Schicht gibt es keinen
-Nachweis und keinen Befund -- dann zeichnet sie nur das Fundament.
+Nachweis und keinen Befund – dann zeichnet sie nur das Fundament.
 
 ### _legende
 

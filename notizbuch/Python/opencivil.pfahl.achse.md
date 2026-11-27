@@ -1,5 +1,5 @@
 ---
-erzeugt: a648cd82c565
+erzeugt: 2e4dc95d978a
 art: modul
 tags: [modul]
 ---
@@ -10,7 +10,7 @@ tags: [modul]
 ## VERANTWORTUNG
 
 [[opencivil.pfahl.achse#Achsnachweis|Achsnachweis]]: je Kombination ein Erfüllungsgrad, und wie ein Fall
-ausgeht -- N_Ed ≥ 0 drückt und steht gegen den Widerstand auf Druck,
+ausgeht – N_Ed ≥ 0 drückt und steht gegen den Widerstand auf Druck,
 N_Ed \< 0 zieht und steht als Z_Ed = −N_Ed gegen den auf Zug
 ([[opencivil.pfahl.achse#Achsnachweis.faelle|Achsnachweis.faelle]]). Äusserer und innerer Widerstand
 unterscheiden sich nur darin, woher die beiden Widerstände kommen.

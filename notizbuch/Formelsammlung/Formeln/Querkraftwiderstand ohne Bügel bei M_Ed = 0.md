@@ -47,7 +47,7 @@ $$
 Ohne Moment und ohne Normalkraft ist die
 [[Nominelle Dehnung der Zugbewehrung|nominelle Dehnung der Zugbewehrung]]
 null und der [[Beiwert für den Querkraftwiderstand]] $k_d = 1$. Der
-Widerstand ist dann $\tau_{cd} \cdot d_v$ -- der grösste, den die Platte ohne
+Widerstand ist dann $\tau_{cd} \cdot d_v$ – der grösste, den die Platte ohne
 Bügel hat. Mit wachsendem Moment öffnet sich der Schubriss, und der
 Widerstand sinkt.
 

@@ -56,7 +56,7 @@ $$
 Ohne Bügel begrenzt der kritische Schubriss die Querkraft: über ihn muss die
 Kraft durch die Verzahnung der Rissufer, und die trägt umso weniger, je
 weiter sich der Riss öffnet. Die Rissöffnung wächst mit der Dehnung der
-Platte und mit ihrer Höhe -- das fasst der
+Platte und mit ihrer Höhe – das fasst der
 [[Beiwert für den Querkraftwiderstand]] $k_d$ zusammen. Der Widerstand ist dann
 $k_d \cdot \tau_{cd}$ über die wirksame Höhe $d_v$.
 

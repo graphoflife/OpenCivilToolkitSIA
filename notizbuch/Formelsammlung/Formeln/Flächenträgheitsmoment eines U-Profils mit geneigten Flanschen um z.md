@@ -52,8 +52,8 @@ $$
 
 Um die senkrechte Achse durch den Schwerpunkt. Gerechnet wird zuerst um den
 Rücken: das Rechteck mit $b^3 h/3$, weniger die Lücke zwischen den
-Flanschen -- mit ihrer linear veränderlichen Höhe das Integral von
-$x^2\,(h - 2t(x))$ von $t_w$ bis $b$ --, dazu die Zwickel. Dann hin zum
+Flanschen – mit ihrer linear veränderlichen Höhe das Integral von
+$x^2\,(h - 2t(x))$ von $t_w$ bis $b$ –, dazu die Zwickel. Dann hin zum
 Schwerpunkt: weniger $A\,e_y^2$, der Satz von Steiner rückwärts.
 
 Diesen Wert trifft die Rechnung am wenigsten genau, auf 1.4 % der Tabelle

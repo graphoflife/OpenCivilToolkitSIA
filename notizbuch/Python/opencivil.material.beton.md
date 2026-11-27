@@ -1,5 +1,5 @@
 ---
-erzeugt: 87ea940f5c9e
+erzeugt: 02accb5c7326
 art: modul
 tags: [modul]
 ---
@@ -16,7 +16,7 @@ einzeln ueberschreibbar.
 
 ## ZU DEN EMPIRISCHEN FORMELN
 
-`tau_cd` und `E_cm` sind dimensionell inhomogen -- die Norm setzt dort
+`tau_cd` und `E_cm` sind dimensionell inhomogen – die Norm setzt dort
 stillschweigend voraus, dass in N/mm^2 gerechnet wird. Sie laufen deshalb ueber
 [[opencivil.core.einheiten#empirisch|opencivil.core.einheiten.empirisch]], das diese Voraussetzung erzwingt und
 die Einheitenkonvention erzwingt. Alle uebrigen Formeln sind einheitenrein und
@@ -44,7 +44,7 @@ print(loesung.wert(c30.id_von("f_cd")))
 def betonsorten_zum_anlegen() -> List[str]
 ```
 
-Die Betonsorten in der Reihenfolge, in der neue angelegt werden -- siehe [[opencivil.material.beton#Konstanten|ERSTER_BETON]].
+Die Betonsorten in der Reihenfolge, in der neue angelegt werden – siehe [[opencivil.material.beton#Konstanten|ERSTER_BETON]].
 
 ### _tau_cd
 
@@ -52,7 +52,7 @@ Die Betonsorten in der Reihenfolge, in der neue angelegt werden -- siehe [[openc
 def _tau_cd(f_ck: Groesse, gamma_c: Groesse)
 ```
 
-SIA 262:2025, 2.4.2.4, (3) -- empirisch, f_ck in N/mm^2.
+SIA 262:2025, 2.4.2.4, (3) – empirisch, f_ck in N/mm^2.
 
 ### _e_cm
 
@@ -60,7 +60,7 @@ SIA 262:2025, 2.4.2.4, (3) -- empirisch, f_ck in N/mm^2.
 def _e_cm(k_e: Groesse, f_cm: Groesse)
 ```
 
-SIA 262:2025, 3.1.2.3.3, (10) -- empirisch, f_cm in N/mm^2.
+SIA 262:2025, 3.1.2.3.3, (10) – empirisch, f_cm in N/mm^2.
 
 ### _eta_fc
 
@@ -68,7 +68,7 @@ SIA 262:2025, 3.1.2.3.3, (10) -- empirisch, f_cm in N/mm^2.
 def _eta_fc(f_ck: Groesse) -> Groesse
 ```
 
-SIA 262:2025, 4.2.1.2, (26) -- einheitenrein, da nur ein Verhaeltnis eingeht.
+SIA 262:2025, 4.2.1.2, (26) – einheitenrein, da nur ein Verhaeltnis eingeht.
 
 ### beton
 
@@ -82,7 +82,7 @@ Erzeugt einen Beton aus der Sortentabelle.
 :param name: abweichender Anzeigename, sonst die Sorte.
 :param praefix: eigener Namensraum, falls mehrere Betone derselben Sorte
 im Modell vorkommen sollen.
-:param abweichungen: Zahlenwerte, die von der Sortentabelle abweichen --
+:param abweichungen: Zahlenwerte, die von der Sortentabelle abweichen –
 fuer selbst definierte Materialien.
 
 ### sortenwerte
@@ -93,7 +93,7 @@ def sortenwerte(sorte: str, kurznamen: Sequence[str]) -> Dict[str, float]
 
 Kennwerte einer Sorte als Zahlen, aus ihrer Vorlage gerechnet: in der
 Einheit der Vorlage und so gerundet, wie der Bericht sie zeigt
-(`stellen`) -- `{"E_cm": 32075.0}` bei C25/30. Fuer Vorgaben, die mit
+(`stellen`) – `{"E_cm": 32075.0}` bei C25/30. Fuer Vorgaben, die mit
 den Werten einer Sorte anfangen: das eigene Material eines
 Balkensystems.
 
@@ -111,7 +111,7 @@ werden, um Normvorgaben zu ersetzen.
 
 ## Konstanten
 
-- `BETONSORTEN = {'C12/15': (12.0, 1.6), 'C16/20': (16.0, 1.9), 'C20/25': (20.0, 2.2),…` – Betonsorten nach SIA 262:2025, Tabelle 3 -- (f_ck, f_ctm) in N/mm^2. Am 2026-11-14 gegen die gedruckte Tabelle geprueft: alle neun stimmen.
+- `BETONSORTEN = {'C12/15': (12.0, 1.6), 'C16/20': (16.0, 1.9), 'C20/25': (20.0, 2.2),…` – Betonsorten nach SIA 262:2025, Tabelle 3 – (f_ck, f_ctm) in N/mm^2. Am 2026-11-14 gegen die gedruckte Tabelle geprueft: alle neun stimmen.
 - `ERSTER_BETON = 'C25/30'` – Womit ein neuer Beton anfängt, wenn man in der Oberfläche einen anlegt: C25/30; gibt es den schon, der nächstfestere, und so weiter (Benutzer, 2026-10-15). Nach dem festesten kommen die schwächeren, von unten.
 - `BETON_VORLAGEN = (KennwertVorlage(kurzname='f_ck', symbol='f_{ck}', einheit=N_PRO_MM2,…` – Alle Betonkennwerte in der Reihenfolge, in der sie im Bericht erscheinen.
 

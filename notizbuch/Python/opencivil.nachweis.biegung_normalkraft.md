@@ -1,5 +1,5 @@
 ---
-erzeugt: ff82ec493c0a
+erzeugt: 2f9f89a67e6f
 art: modul
 tags: [modul]
 ---
@@ -17,10 +17,10 @@ eines Querschnitts.
 
 Welche massgebend ist, waehlt das Kapitel ([[opencivil.querschnitt.gesetzwahl#Rechenwahl|Rechenwahl]]):
 
-* **Handrechnung Block 0.85·x** -- das Polygon aus wenigen Eckpunkten in
+* **Handrechnung Block 0.85·x** – das Polygon aus wenigen Eckpunkten in
   [[opencivil.nachweis.handrechnung]]. Seine Herleitung steht
   vollstaendig in der Mitschrift.
-* **Block 0.85·x genau** oder **Parabel** -- der Rand des Dehnungsfaechers,
+* **Block 0.85·x genau** oder **Parabel** – der Rand des Dehnungsfaechers,
   mit der gedrueckten Bewehrung. Den Widerstand bei der Einwirkung sucht er
   genau; in die Mitschrift kommt die Probe dieses Bruchzustands, nicht die
   Suche.
@@ -53,7 +53,7 @@ unmittelbar die Werte pro Laufmeter.
 
 Ob ein Punkt drin liegt oder nicht, entscheidet die massgebende Linie
 ([[opencivil.nachweis.resistenzlinie#Widerstandslinie.innerhalb|Widerstandslinie.innerhalb]]). Nur *wie weit* er von ihr entfernt ist,
-haengt vom gewaehlten Massstab ab -- siehe [[opencivil.nachweis.biegung_normalkraft#Erfuellungsart|Erfuellungsart]] und
+haengt vom gewaehlten Massstab ab – siehe [[opencivil.nachweis.biegung_normalkraft#Erfuellungsart|Erfuellungsart]] und
 [[opencivil.nachweis.biegung_normalkraft#BiegungNormalkraft._auswerten|BiegungNormalkraft._auswerten]].
 
 ## Inhalt
@@ -66,7 +66,7 @@ class Erfuellungsart(Wahl)
 
 Massstab, in dem der Abstand zur Resistenzlinie gemessen wird.
 
-- `AUTOMATISCH = 'automatisch'` – Beide Wege werden gerechnet, massgebend ist der kleinere Erfuellungsgrad -- siehe [[opencivil.nachweis.biegung_normalkraft#BiegungNormalkraft._auswerten|BiegungNormalkraft._auswerten]]. Der Regelfall.
+- `AUTOMATISCH = 'automatisch'` – Beide Wege werden gerechnet, massgebend ist der kleinere Erfuellungsgrad – siehe [[opencivil.nachweis.biegung_normalkraft#BiegungNormalkraft._auswerten|BiegungNormalkraft._auswerten]]. Der Regelfall.
 - `NORMALKRAFT_KONSTANT = 'N_konstant'` – Bei festgehaltener Normalkraft waagrecht bis zur Momentengrenze. Der Regelfall: die Normalkraft ist meist vorgegeben, aufnehmen muss der Querschnitt das Moment.
 - `MOMENT_KONSTANT = 'M_konstant'` – Bei festgehaltenem Moment senkrecht bis zur Normalkraftgrenze.
 - `NAECHSTER_PUNKT = 'naechster_Punkt'` – Kuerzester Weg zur Linie, gemessen im auf die Groesstwerte normierten Diagramm (sonst waere der Abstand von der Wahl der Einheiten abhaengig).
@@ -106,19 +106,19 @@ def kennung(self) -> str
 class Normierung
 ```
 
-Der kuerzeste Abstand im normierten Diagramm -- alles, was die Mitschrift
+Der kuerzeste Abstand im normierten Diagramm – alles, was die Mitschrift
 davon braucht.
 
 Normiert wird auf die groesste Normalkraft und das groesste Moment der
 Linie; ohne das haenge der Abstand von der Wahl der Einheiten ab. Der
-Grad ist `rand / laenge` -- ein Verhaeltnis von Laengen im Diagramm,
+Grad ist `rand / laenge` – ein Verhaeltnis von Laengen im Diagramm,
 nicht von Momenten.
 
 - `N_ref: float`
 - `M_ref: float`
 - `laenge: float` – Die Einwirkung als Abstand vom Ursprung.
 - `abstand: float` – Kuerzester Abstand zur Resistenzlinie.
-- `rand: float` – `laenge + abstand` innerhalb, `laenge - abstand` ausserhalb, nicht unter null -- der Widerstand im normierten Diagramm.
+- `rand: float` – `laenge + abstand` innerhalb, `laenge - abstand` ausserhalb, nicht unter null – der Widerstand im normierten Diagramm.
 
 ### Auswertung
 
@@ -128,18 +128,18 @@ class Auswertung(Fallausgang)
 ```
 
 Ergebnis der Prüfung einer Kombination. Sein Ausgang: Einwirkung gegen
-Widerstand im gewaehlten Massstab -- nicht fuehrbar ohne Schnitt mit der
+Widerstand im gewaehlten Massstab – nicht fuehrbar ohne Schnitt mit der
 Linie. Das Urteil sagt [[opencivil.nachweis.biegung_normalkraft#Auswertung|innerhalb]].
 
 - `schnittgroessen: Schnittgroessen`
-- `innerhalb: bool` – Ob die Einwirkung innerhalb der massgebenden Linie liegt -- das Urteil.
+- `innerhalb: bool` – Ob die Einwirkung innerhalb der massgebenden Linie liegt – das Urteil.
 - `widerstand: Optional[Tuple[float, float]]` – Der massgebende Punkt auf der Linie als (N, M) in N bzw. Nm.
 - `achse: geo.Achse = geo.MOMENT` – Auf welcher Achse verglichen wird. Haengt vom Massstab ab.
 - `ed: float = 0.0` – Einwirkung in der verglichenen Groesse, in SI (N bzw. Nm).
 - `rd: float = 0.0` – Widerstand in derselben Groesse, in SI.
 - `massstab: Erfuellungsart = Erfuellungsart.NORMALKRAFT_KONSTANT` – Welcher Massstab tatsaechlich gegriffen hat.
-- `treffer: Optional[Treffer] = None` – Wo auf der Linie der Widerstand liegt -- zwischen welchen Stuetzpunkten, bei der Ebenenlinie auch auf welcher Ebene. Fuer die Mitschrift, damit dort nicht bloss das Ergebnis steht.
-- `linie: Optional[Widerstandslinie] = None` – Die Linie, die ihn geliefert hat -- sie schreibt, wie.
+- `treffer: Optional[Treffer] = None` – Wo auf der Linie der Widerstand liegt – zwischen welchen Stuetzpunkten, bei der Ebenenlinie auch auf welcher Ebene. Fuer die Mitschrift, damit dort nicht bloss das Ergebnis steht.
+- `linie: Optional[Widerstandslinie] = None` – Die Linie, die ihn geliefert hat – sie schreibt, wie.
 - `normierung: Optional[Normierung] = None` – Nur beim kuerzesten Abstand: dort ist der Grad kein Verhaeltnis von Momenten, sondern von Laengen im normierten Diagramm.
 
 ### MNBefund
@@ -153,10 +153,10 @@ Was der M-N-Nachweis festhaelt: seine Linien und je Kombination die
 Auswertung. Steht nach dem Lauf in der Loesung
 ([[opencivil.core.rechenwerk#Loesung.befund|befund]]), nicht am Nachweis.
 
-- `massgebend: Widerstandslinie` – Die Linie der Wahl -- gegen sie faellt das Urteil.
-- `vergleich: Optional[Widerstandslinie] = None` – Die andere Linie, fuer das Diagramm -- ohne Mitschrift.
+- `massgebend: Widerstandslinie` – Die Linie der Wahl – gegen sie faellt das Urteil.
+- `vergleich: Optional[Widerstandslinie] = None` – Die andere Linie, fuer das Diagramm – ohne Mitschrift.
 - `auswertungen: List[Auswertung] = field(default_factory=list)`
-- `bei_normalkraft: Dict[str, Optional[Auswertung]] = field(default_factory=dict)` – Je Kombination der Momentenwiderstand bei der wirkenden Normalkraft -- samt der Interpolation, aus der er stammt. Der Querkraftnachweis rechnet mit genau dieser Groesse und soll sie herleiten, statt eine Zahl hinzuschreiben. Er holt sie ueber [[opencivil.nachweis.biegung_normalkraft#MNBefund.widerstand_bei_n|widerstand_bei_n]].
+- `bei_normalkraft: Dict[str, Optional[Auswertung]] = field(default_factory=dict)` – Je Kombination der Momentenwiderstand bei der wirkenden Normalkraft – samt der Interpolation, aus der er stammt. Der Querkraftnachweis rechnet mit genau dieser Groesse und soll sie herleiten, statt eine Zahl hinzuschreiben. Er holt sie ueber [[opencivil.nachweis.biegung_normalkraft#MNBefund.widerstand_bei_n|widerstand_bei_n]].
 
 #### MNBefund.handlinie
 
@@ -165,7 +165,7 @@ Auswertung. Steht nach dem Lauf in der Loesung
 def handlinie(self) -> List[Eckpunkt]
 ```
 
-Die Eckpunkte der Handrechnung, ob massgebend oder Vergleich -- sonst leer.
+Die Eckpunkte der Handrechnung, ob massgebend oder Vergleich – sonst leer.
 
 #### MNBefund.linie
 
@@ -186,7 +186,7 @@ Der Momentenwiderstand bei dieser Normalkraft, auf der gewaehlten Seite.
 
 Fuer beliebige Normalkraefte, nicht nur die der Kombinationen: die
 Querkraftkurve laesst den Benutzer ein N_Ed einstellen und braucht dann
-den passenden Widerstand. Beide Seiten der Linie sind moeglich --
+den passenden Widerstand. Beide Seiten der Linie sind moeglich –
 positiv (Zug unten) und negativ (Zug oben).
 
 `None`, wenn die Normalkraft ausserhalb der Resistenzlinie liegt.
@@ -229,7 +229,7 @@ def pruefe(self, e: Eingaben, p: Protokoll)
 def _linie(self, wahl: Rechenwahl, e: Eingaben, p: Protokoll) -> Widerstandslinie
 ```
 
-Die Resistenzlinie einer Wahl -- und ihre Herleitung in `p`.
+Die Resistenzlinie einer Wahl – und ihre Herleitung in `p`.
 
 #### BiegungNormalkraft._verglichen
 
@@ -237,7 +237,7 @@ Die Resistenzlinie einer Wahl -- und ihre Herleitung in `p`.
 def _verglichen(self, auswertung: Auswertung) -> Auswertung
 ```
 
-Die Auswertung samt ihrem Vergleich -- fuer Tabelle und Herleitung
+Die Auswertung samt ihrem Vergleich – fuer Tabelle und Herleitung
 derselbe. Ob erfuellt, sagt die Linie ([[opencivil.nachweis.biegung_normalkraft#Auswertung|Auswertung.innerhalb]]).
 
 #### BiegungNormalkraft._als_wert
@@ -248,10 +248,10 @@ def _als_wert(self, auswertung: Auswertung, seite: str)
 
 Verpackt Einwirkung bzw. Widerstand als darstellbaren Wert.
 
-Welche Groesse verglichen wird, haengt vom Massstab ab -- bei
+Welche Groesse verglichen wird, haengt vom Massstab ab – bei
 'Normalkraft konstant' das Moment, bei 'Moment konstant' die Normalkraft.
 Das Urteil traegt deshalb Symbol und Einheit selbst mit sich. Beim
-kuerzesten Abstand sind es Laengen im normierten Diagramm -- sonst
+kuerzesten Abstand sind es Laengen im normierten Diagramm – sonst
 stuenden zwei Momente da, deren Quotient nicht der Grad ist.
 
 Beide mit ihrem Vorzeichen, in Tabelle und Herleitung: es sagt die
@@ -267,12 +267,12 @@ def _auswerten(self, linie: Widerstandslinie, kombination: Schnittgroessen, eckw
 
 Bestimmt den Erfuellungsgrad einer Kombination.
 
-Gemessen wird gegen die massgebende Linie -- damit die Zahl im Urteil
+Gemessen wird gegen die massgebende Linie – damit die Zahl im Urteil
 dieselbe ist, die in der Herleitung steht.
 
-Bei `AUTOMATISCH` werden **beide** Wege gerechnet -- der
+Bei `AUTOMATISCH` werden **beide** Wege gerechnet – der
 Momentenwiderstand bei festgehaltener Normalkraft und der
-Normalkraftwiderstand bei festgehaltenem Moment -- und der kleinere
+Normalkraftwiderstand bei festgehaltenem Moment – und der kleinere
 Erfuellungsgrad gilt. Vorher entschied eine Schwelle am Anteil der
 Grenznormalkraft, in welcher Richtung gemessen wird; das war eine
 Faustregel, die nahe den Spitzen der Linie den groesseren der beiden
@@ -290,7 +290,7 @@ def _messen(self, linie: Widerstandslinie, kombination: Schnittgroessen, achse: 
 
 Widerstand auf einer Achse, bei festgehaltener Gegenachse.
 
-Waagrecht und senkrecht sind derselbe Vorgang mit vertauschten Achsen --
+Waagrecht und senkrecht sind derselbe Vorgang mit vertauschten Achsen –
 deshalb eine Methode. Die Einwirkung wird dafuer als Punkt derselben
 Ebene gelesen; damit fallen die Sonderfaelle weg.
 
@@ -300,7 +300,7 @@ Ebene gelesen; damit fallen die Sonderfaelle weg.
 def _naechster(self, linie: Widerstandslinie, kombination: Schnittgroessen, eckwerte: Mapping[str, float], innerhalb: bool) -> Auswertung
 ```
 
-Kuerzester Abstand, im auf die Eckwerte normierten Diagramm -- zum
+Kuerzester Abstand, im auf die Eckwerte normierten Diagramm – zum
 Polygon der massgebenden Linie. Bei der Linie aus Dehnungsebenen ist
 das ihr gezeichneter Rand: der naechste Punkt ist eine Frage der
 Geometrie, nicht eines Bruchzustands.
@@ -311,7 +311,7 @@ Geometrie, nicht eines Bruchzustands.
 def _normiert(self, auswertung: Auswertung) -> Tuple[Wert, Wert]
 ```
 
-Einwirkung und Widerstand im normierten Diagramm -- fuer Tabelle und Herleitung.
+Einwirkung und Widerstand im normierten Diagramm – fuer Tabelle und Herleitung.
 
 #### BiegungNormalkraft._protokoll_naechster
 
@@ -319,7 +319,7 @@ Einwirkung und Widerstand im normierten Diagramm -- fuer Tabelle und Herleitung.
 def _protokoll_naechster(self, p: Protokoll, auswertung: Auswertung, eckwerte: Mapping[str, float], basis: str) -> None
 ```
 
-Der kuerzeste Abstand, Schritt fuer Schritt -- und daraus Einwirkung und
+Der kuerzeste Abstand, Schritt fuer Schritt – und daraus Einwirkung und
 Widerstand im normierten Diagramm, deren Quotient der Grad ist.
 
 ### linienbezuege
@@ -328,7 +328,7 @@ Widerstand im normierten Diagramm, deren Quotient der Grad ist.
 def linienbezuege(querschnitt: Plattenquerschnitt, posten, richtung: Richtung, wahl: Rechenwahl) -> List[Eingabebezug]
 ```
 
-Was eine Resistenzlinie dieser Richtung braucht -- unter den Namen, die
+Was eine Resistenzlinie dieser Richtung braucht – unter den Namen, die
 [[opencivil.nachweis.biegung_normalkraft#resistenzlinie|resistenzlinie]] liest: die Festigkeiten der Wertesaetze, `f_cd`
 oder `f_ck` des Betons, `f_yd` oder `f_yk` jedes Stahls, `E_cm`
 fuer die Parabel, die Bewehrung dieser Richtung und je Stahlsorte ihre
@@ -341,7 +341,7 @@ def resistenzlinie(wahl: Rechenwahl, e: Eingaben, p: Protokoll, *, querschnitt: 
 ```
 
 Die Resistenzlinie einer Wahl aus den Eingaben von [[opencivil.nachweis.biegung_normalkraft#linienbezuege|linienbezuege]]
--- und ihre Herleitung in `p`: unter ihrem Titel zuerst, womit sie
+– und ihre Herleitung in `p`: unter ihrem Titel zuerst, womit sie
 rechnet, dann wie sie entsteht. Die Tragsicherheit baut so ihre Linie,
 das Knicken seine, wenn es anders waehlt.
 
@@ -352,7 +352,7 @@ das Knicken seine, wenn es anders waehlt.
 class Linienquelle
 ```
 
-Woher ein Kapitel neben der Tragsicherheit seine Resistenzlinie nimmt --
+Woher ein Kapitel neben der Tragsicherheit seine Resistenzlinie nimmt –
 das Knicken fuer seinen Widerstand, die Kennzahlen fuer ihre Eckwerte.
 Waehlt es wie die Tragsicherheit ([[opencivil.querschnitt.gesetzwahl#Rechenwahl.gleiche_linie|Rechenwahl.gleiche_linie]]), ist
 es deren Linie, einmal gerechnet und einmal hergeleitet; sonst baut es
@@ -381,7 +381,7 @@ Ob das Kapitel seine eigene Linie baut.
 def bezuege(self, bezuege: List[Eingabebezug]) -> List[Eingabebezug]
 ```
 
-Die Eingaenge des Kapitels -- mit denen der eigenen Linie ([[opencivil.nachweis.biegung_normalkraft#linienbezuege|linienbezuege]]), wo es eine baut.
+Die Eingaenge des Kapitels – mit denen der eigenen Linie ([[opencivil.nachweis.biegung_normalkraft#linienbezuege|linienbezuege]]), wo es eine baut.
 
 #### Linienquelle.befunde
 
@@ -401,7 +401,7 @@ def linie(self, e: Eingaben, p: Protokoll, *, basis: str, vorsatz: str, wahltite
 ```
 
 Die eigene Linie, hergeleitet eine Ebene unter dem Kapitel
-([[opencivil.nachweis.biegung_normalkraft#resistenzlinie|resistenzlinie]]) -- oder die der Tragsicherheit, und
+([[opencivil.nachweis.biegung_normalkraft#resistenzlinie|resistenzlinie]]) – oder die der Tragsicherheit, und
 `wenn_geteilt` sagt es an derselben Stelle im Protokoll.
 
 ### protokoll_widerstand
@@ -410,7 +410,7 @@ Die eigene Linie, hergeleitet eine Ebene unter dem Kapitel
 def protokoll_widerstand(p: Protokoll, auswertung: Auswertung, titel: str='', *, basis: str) -> None
 ```
 
-Schreibt, wie der Widerstand auf der Linie gefunden wurde -- die Linie,
+Schreibt, wie der Widerstand auf der Linie gefunden wurde – die Linie,
 die ihn geliefert hat, weiss wie: das Polygon zeigt seine Interpolation,
 die Linie aus Dehnungsebenen die Probe ihres Bruchzustands.
 
@@ -430,7 +430,7 @@ Ein SI-Wert in der Einheit seiner Achse, mit Einheitenzeichen.
 
 ## Konstanten
 
-- `ACHSE_ZU = {Erfuellungsart.NORMALKRAFT_KONSTANT: geo.MOMENT, Erfuellungsart.MOME…` – Welche Achse ein Massstab sucht. Die einzige Stelle, an der die beiden Begriffe zusammenkommen -- Erfuellungsart ist fuer die Oberflaeche da, Achse fuer die Geometrie.
+- `ACHSE_ZU = {Erfuellungsart.NORMALKRAFT_KONSTANT: geo.MOMENT, Erfuellungsart.MOME…` – Welche Achse ein Massstab sucht. Die einzige Stelle, an der die beiden Begriffe zusammenkommen – Erfuellungsart ist fuer die Oberflaeche da, Achse fuer die Geometrie.
 - `MASSSTAB = {a.name: m for m, a in ACHSE_ZU.items()}`
 
 ## Braucht

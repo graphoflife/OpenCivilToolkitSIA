@@ -1,5 +1,5 @@
 ---
-erzeugt: d829f70ef371
+erzeugt: 9330a9283dec
 art: modul
 tags: [modul]
 ---
@@ -15,7 +15,7 @@ und der Name eines eigenen beginnen, und worauf die Kennwerte stehen. Die
 Oberflaeche liest dasselbe aus dem Katalog (`materialarten`).
 
 Bis 2026-11-15 stand das an sieben Stellen je von Hand, als Zuordnung von
-«beton» und «betonstahl» -- der Baustahl haette an jeder dazukommen muessen,
+«beton» und «betonstahl» – der Baustahl haette an jeder dazukommen muessen,
 und eine vergessene fiele erst beim Anlegen auf.
 
 ## Inhalt
@@ -34,10 +34,10 @@ class Materialart
 - `anlegen: Tuple[str, ...]` – Die Sorten in der Folge, in der das Fenster «Neues Material» sie anbietet.
 - `kennung: str` – Womit die Kennung beginnt: b1, s1, st1, sp1, h1, pb1.
 - `eigene: str` – Womit der Name eines eigenen Materials beginnt: BE1, S1, ST1 (Benutzer, 2026-10-16), SP1 beim Spannstahl, H1 beim Holz, PB1 beim Profilblechstahl.
-- `grundlage: str` – Worauf die Kennwerte einer Normsorte stehen -- so steht es in der Oberflaeche.
-- `erzeugnisse: Mapping[str, Tuple[Erzeugnis, ...]] = field(default_factory=dict)` – Je Sorte, in welchen Erzeugnissen es sie gibt -- beim Spannstahl Draehte, Litzen und Staebe nach Tabelle 7; die anderen Arten haben keine Liste.
+- `grundlage: str` – Worauf die Kennwerte einer Normsorte stehen – so steht es in der Oberflaeche.
+- `erzeugnisse: Mapping[str, Tuple[Erzeugnis, ...]] = field(default_factory=dict)` – Je Sorte, in welchen Erzeugnissen es sie gibt – beim Spannstahl Draehte, Litzen und Staebe nach Tabelle 7; die anderen Arten haben keine Liste.
 - `erzeugnisquelle: str = ''` – Wo die Erzeugnisse stehen.
-- `saechlich: bool = False` – Ob die Art «das» heisst: «Neues Holz», «ein Holz» -- die anderen sind maennlich. Bis 2026-11-26 stand «Neuer» und «einen» fest im Text.
+- `saechlich: bool = False` – Ob die Art «das» heisst: «Neues Holz», «ein Holz» – die anderen sind maennlich. Bis 2026-11-26 stand «Neuer» und «einen» fest im Text.
 
 #### Materialart.titel
 

@@ -36,7 +36,7 @@ $$
 
 Das Moment der Geschosskräfte um die Einspannung: jede Kraft mal ihre Höhe.
 Mit den Kräften aus dem Spektrum bei $q$ gehört es zur Bemessung der Wände
-am Fuss -- jede Wand trägt ihren Anteil an der Biegesteifigkeit. Liegt $q$
+am Fuss – jede Wand trägt ihren Anteil an der Biegesteifigkeit. Liegt $q$
 über 2.0, ist das Tragwerk duktil bemessen; für schlanke Tragwände gelten
 dann die Bemessungswerte von SIA 262:2025, 4.3.9.4, die hier nicht
 gerechnet werden. Für

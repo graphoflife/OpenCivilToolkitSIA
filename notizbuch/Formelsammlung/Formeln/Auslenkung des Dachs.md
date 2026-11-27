@@ -53,5 +53,5 @@ Für einen Kragarm der Höhe $H$ unter einer Kraft $F$ auf der Höhe $z$
 ist die Auslenkung der Spitze $F \cdot z^2 \cdot (3H - z) / (6\,EI)$; die
 Summe über alle Geschosse gibt $u$. Gerechnet wird nur mit der Biegung und
 mit Wänden, die am Fuss starr eingespannt sind. Gibt der Baugrund merklich
-nach, gehört das dazu (16.5.1.8) -- es macht $u$ grösser und
+nach, gehört das dazu (16.5.1.8) – es macht $u$ grösser und
 [[Grundschwingzeit|T₁]] länger und wird hier nicht gerechnet.

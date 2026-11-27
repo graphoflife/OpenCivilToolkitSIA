@@ -1,5 +1,5 @@
 ---
-erzeugt: b0431e11e556
+erzeugt: 799a57283b44
 art: modul
 tags: [modul]
 ---
@@ -10,8 +10,8 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Je Lastfall `(V_y, V_z, T)` auf die Schubwaende verteilt und jede Wand mit
-dem Fachwerk nachgewiesen. Die Verteilung -- Federn nach `b_w · l`, Versatz,
-Zellen nach Bredt -- steht in [[opencivil.querschnitt.schubwaende]]; hier
+dem Fachwerk nachgewiesen. Die Verteilung – Federn nach `b_w · l`, Versatz,
+Zellen nach Bredt – steht in [[opencivil.querschnitt.schubwaende]]; hier
 wird sie aufgeschrieben und geurteilt.
 
 Liefert zudem je Lastfall die Laengszugkraft `ΔN, ΔM_y, ΔM_z`, wenn sie
@@ -38,11 +38,11 @@ Ein geneigtes Glied mit Vordehnung traegt mit seiner lotrechten Kraft
 dieser Kraefte um den Schwerpunkt. Jede Wand vergleicht diesen Rest mit
 ihrem Widerstand. Gleichung (50) schreibt den mitgetragenen Teil dem
 Widerstand zu; an der Grenze ist das dasselbe, und nur so verteilt er sich
-auf mehrere Waende -- nach Vorgabe, nicht nachgeschlagen. `F` ist
+auf mehrere Waende – nach Vorgabe, nicht nachgeschlagen. `F` ist
 `P_inf`, wo die lotrechte Kraft wie `V_z` wirkt (4.3.3.4.8); wirkt sie
 entgegen, die groesste Kraft im Glied (4.3.3.4.9): mit Verbund `A_p`
-mal die Fliessgrenze seines Wertesatzes -- so weit kann es im Bruch
-tragen --, ohne Verbund `A_p · sigma_p0`, die Kraft nach dem Spannen.
+mal die Fliessgrenze seines Wertesatzes – so weit kann es im Bruch
+tragen –, ohne Verbund `A_p · sigma_p0`, die Kraft nach dem Spannen.
 Welche Kraft die groesste ist, sagt die Norm nicht: nach Vorgabe, nicht
 nachgeschlagen.
 
@@ -54,7 +54,7 @@ nachgeschlagen.
 def schub_belastet(biegung: Biegung, fall: Lastfall) -> bool
 ```
 
-Ob ein Lastfall die Schubwaende belastet -- einachsig zaehlt `V_y`
+Ob ein Lastfall die Schubwaende belastet – einachsig zaehlt `V_y`
 nicht. Fuer den Nachweis und fuer den Aufbau, der fragt, ob es ihn
 braucht.
 
@@ -67,7 +67,7 @@ class Schubbefund
 
 Was der Nachweis im Lauf fand: die Waende einzeln und ihre Zellen, je
 Lastfall die Verteilung des Schubflusses und je Wand den Widerstand bei
-der gewaehlten Neigung und ihren Vergleich -- fuer die Diagramme. Ein
+der gewaehlten Neigung und ihren Vergleich – fuer die Diagramme. Ein
 Lastfall ohne Verteilung (keine Last, keine Wand) fehlt in diesen dreien;
 war er belastet, sagt `ohne` warum.
 
@@ -75,8 +75,8 @@ war er belastet, sagt `ohne` warum.
 - `verteilungen: Dict[str, sw.Verteilung] = field(default_factory=dict)`
 - `widerstaende: Dict[str, List[Buegelpunkt]] = field(default_factory=dict)`
 - `vergleiche: Dict[str, List[Vergleich]] = field(default_factory=dict)` – Je Wand ihre Kraft gegen ihren Widerstand, beide fuer die ganze Wand.
-- `ohne: Dict[str, str] = field(default_factory=dict)` – Je belasteter Lastfall ohne Verteilung der Grund -- es gibt keine Wand, oder die Waende tragen nicht. Derselbe Satz wie im Urteil.
-- `glieder: Dict[str, float] = field(default_factory=dict)` – Je Lastfall, was die geneigten Spannglieder von `V_z` tragen, in N -- ohne sie leer.
+- `ohne: Dict[str, str] = field(default_factory=dict)` – Je belasteter Lastfall ohne Verteilung der Grund – es gibt keine Wand, oder die Waende tragen nicht. Derselbe Satz wie im Urteil.
+- `glieder: Dict[str, float] = field(default_factory=dict)` – Je Lastfall, was die geneigten Spannglieder von `V_z` tragen, in N – ohne sie leer.
 
 #### Schubbefund.waende
 
@@ -106,7 +106,7 @@ Ein geneigtes Glied, wie der Nachweis es liest: seine zwei Kraefte, seine Neigun
 def kraft(self, V_z: float) -> Wert
 ```
 
-`P_inf`, wo es `V_z` mittraegt -- sonst `P_max`.
+`P_inf`, wo es `V_z` mittraegt – sonst `P_max`.
 
 #### GeneigtesGlied.lotrecht
 
@@ -139,7 +139,7 @@ def pruefe(self, e: Eingaben, p: Protokoll)
 def _protokoll_glieder(self, p: Protokoll, e: Eingaben, bezug) -> List[GeneigtesGlied]
 ```
 
-Die Regel, und je geneigtes Glied seine grösste Kraft -- ohne Glied nichts.
+Die Regel, und je geneigtes Glied seine grösste Kraft – ohne Glied nichts.
 
 #### Schubwandnachweis._ohne_glieder
 
@@ -159,7 +159,7 @@ geneigten Glieder und ihr Moment um den Schwerpunkt.
 - `MOMENT_DER_GLIEDER = 'Torsion aus der lotrechten Kraft der Spannglieder'`
 - `TORSION_DER_WAENDE = 'Torsion der Wände neben geneigten Spanngliedern'`
 - `REFERENZ_GLIEDER = f'{REFERENZ_GUENSTIG}; {REFERENZ_UNGUENSTIG}'` – Wo die lotrechte Kraft der Glieder steht: mittragend und entgegen.
-- `OHNE_SCHUB = 'Keine Querkraft und keine Torsion → kein Schubfluss.'` – Warum ein Lastfall ohne Querkraft und Torsion keinen Schubfluss hat -- das Diagramm zeigt den Satz an Stelle des Bildes.
+- `OHNE_SCHUB = 'Keine Querkraft und keine Torsion → kein Schubfluss.'` – Warum ein Lastfall ohne Querkraft und Torsion keinen Schubfluss hat – das Diagramm zeigt den Satz an Stelle des Bildes.
 
 ## Braucht
 

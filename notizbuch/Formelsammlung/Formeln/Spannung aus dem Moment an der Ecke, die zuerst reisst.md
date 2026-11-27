@@ -49,6 +49,6 @@ Deviationsmoment ([[Spannung im ungerissenen Querschnitt]]), als $|M|/W$ mit
 dem [[Widerstandsmoment zum gezogensten Betonpunkt]] in der Richtung, in die
 das Moment zieht. Ein negatives Moment zieht eine andere Ecke.
 
-So rechnet die Spannung-Dehnung-Analyse, wenn die Nulllinie kippt -- abgeleitet
+So rechnet die Spannung-Dehnung-Analyse, wenn die Nulllinie kippt – abgeleitet
 aus der Entscheidung des Benutzers vom 2026-10-17, unter reiner Biegung
 gelte, wo $f_{ct}$ zuerst erreicht wird; nicht nachgeschlagen.

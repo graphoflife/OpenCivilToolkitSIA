@@ -1,5 +1,5 @@
 ---
-erzeugt: 03cabd758143
+erzeugt: 92472c55caa4
 art: modul
 tags: [modul]
 ---
@@ -10,13 +10,13 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Die Momenten-Kruemmungs- und die Normalkraft-Dehnungs-Linie eines Paars von
-Loesern, gerissen und ungerissen -- und was ein solches Paar dafuer bieten
+Loesern, gerissen und ungerissen – und was ein solches Paar dafuer bieten
 muss ([[opencivil.spannungsanalyse.linie#Paar|Paar]]). Die Platte bietet es je Tragrichtung
 ([[opencivil.spannungsanalyse.platte#Loeserpaar|Loeserpaar]]), der gezeichnete
 Querschnitt je Zugseite
 ([[opencivil.spannungsanalyse.schnitt#Schnittpaar|Schnittpaar]]); bis 2026-10-17
 hiess es an den Funktionen dafuer `paar: Any`. Ein Querschnitt ohne Beton
--- aus Stahl oder Holz -- reisst nicht: sein Paar hat einen Zustand, und
+– aus Stahl oder Holz – reisst nicht: sein Paar hat einen Zustand, und
 seine Linie laeuft ganz ueber die Verformung
 ([[opencivil.spannungsanalyse.rissfrei#RissfreiesPaar|RissfreiesPaar]], seit 2026-11-26).
 
@@ -41,7 +41,7 @@ selbst weiss davon nichts: sie liest Kraft und Verformung der Ebene.
 class Dehnungsebene
 ```
 
-Eine Dehnungsebene eines Paars -- in der Richtung ihres Loesers, also
+Eine Dehnungsebene eines Paars – in der Richtung ihres Loesers, also
 senkrecht zu ihrer Nulllinie. Kippt die Nulllinie um [[opencivil.spannungsanalyse.linie#Dehnungsebene|neigung]],
 zaehlen Moment und Kruemmung, wie sie zur Achse der Biegung stehen: das
 Moment um diese Achse und die Kruemmung senkrecht zu ihr.
@@ -49,7 +49,7 @@ Moment um diese Achse und die Kruemmung senkrecht zu ihr.
 - `loeser: Faserloeser` – Der Querschnitt in der Richtung der Ebene.
 - `eps_m: float`
 - `chi: float` – Dehnung am Arm null und Kruemmung senkrecht zur Nulllinie.
-- `neigung: float = 0.0` – Wie weit die Nulllinie gegen die Achse der Biegung gedreht ist, rad -- gegen den Uhrzeiger.
+- `neigung: float = 0.0` – Wie weit die Nulllinie gegen die Achse der Biegung gedreht ist, rad – gegen den Uhrzeiger.
 - `verfehlt: bool = False` – Ob die Suche an einem Sprung des Spannungsblocks haengen blieb ([[opencivil.nachweis.querschnittsloeser#Ebene|verfehlt]]). Eine Linie nimmt eine solche Ebene: sie fragt nach der Verformung, bei der ihre Kraft einen Wert durchlaeuft, und am Sprung ist das seine Stelle, auch wenn dort keine Ebene die Kraft genau erzeugt. Ein Bild dagegen braucht die Ebene selbst.
 
 #### Dehnungsebene.kraefte
@@ -75,7 +75,7 @@ def N(self) -> float
 def M(self) -> float
 ```
 
-Das Moment um die Achse der Biegung -- bei gekippter Nulllinie aus beiden Anteilen.
+Das Moment um die Achse der Biegung – bei gekippter Nulllinie aus beiden Anteilen.
 
 #### Dehnungsebene.M_quer
 
@@ -84,7 +84,7 @@ Das Moment um die Achse der Biegung -- bei gekippter Nulllinie aus beiden Anteil
 def M_quer(self) -> float
 ```
 
-Das Moment um die andere Achse -- unter reiner Biegung null.
+Das Moment um die andere Achse – unter reiner Biegung null.
 
 #### Dehnungsebene.kruemmung
 
@@ -93,7 +93,7 @@ Das Moment um die andere Achse -- unter reiner Biegung null.
 def kruemmung(self) -> float
 ```
 
-Die Kruemmung senkrecht zur Achse der Biegung -- ueber sie laeuft die M-χ-Linie.
+Die Kruemmung senkrecht zur Achse der Biegung – ueber sie laeuft die M-χ-Linie.
 
 #### Dehnungsebene.eps_oben
 
@@ -119,7 +119,7 @@ def fliesst(self) -> bool
 ```
 
 Ob der Querschnitt fliesst: eine Lage, die auf Zug die Fliessdehnung
-ihres eigenen Stahls erreicht -- so beim Stahlbeton --, oder eine
+ihres eigenen Stahls erreicht – so beim Stahlbeton –, oder eine
 Flaeche, die ihren elastischen Bereich verlaesst, Baustahl auf Zug
 und Druck, Holz auf Druck
 ([[opencivil.querschnitt.interaktion#Richtung|fliessgrenzen]]).
@@ -131,7 +131,7 @@ und Druck, Holz auf Druck
 def massgebend(self) -> str
 ```
 
-Welche Grenzdehnung die Ebene erreicht -- die mit dem kleinsten Abstand.
+Welche Grenzdehnung die Ebene erreicht – die mit dem kleinsten Abstand.
 
 ### Ebenensuche
 
@@ -139,7 +139,7 @@ Welche Grenzdehnung die Ebene erreicht -- die mit dem kleinsten Abstand.
 class Ebenensuche(Protocol)
 ```
 
-Wie ein Zustand eines Paars -- gerissen oder ungerissen -- zu seinen
+Wie ein Zustand eines Paars – gerissen oder ungerissen – zu seinen
 Ebenen kommt. Jede Frage hat ihre Ebene oder `None`, wo es kein
 Gleichgewicht gibt; `M` ist das Moment um die Achse der Biegung,
 `chi` die Kruemmung senkrecht zu ihr.
@@ -150,7 +150,7 @@ Gleichgewicht gibt; `M` ist das Moment um die Achse der Biegung,
 def zu_kraeften(self, N: float, M: float) -> Optional[Dehnungsebene]
 ```
 
-Die Ebene, die `N` und `M` traegt -- auch eine verfehlte (siehe dort).
+Die Ebene, die `N` und `M` traegt – auch eine verfehlte (siehe dort).
 
 #### Ebenensuche.zur_kruemmung
 
@@ -219,10 +219,10 @@ class Modulbezug
 
 Woran sich der aequivalente Modul misst: `I` um die Achse der Biegung
 und `A` eines Querschnitts, dazu der Modul `E`, mit dem er sich
-elastisch verformte -- beim Stahlbeton der reine Betonquerschnitt mit
+elastisch verformte – beim Stahlbeton der reine Betonquerschnitt mit
 `E_cm`, ohne Beton der Querschnitt selbst mit dem Modul seines
-Werkstoffs. Dazu, wie das Zeichen von `E` heisst -- als Formel und als
-Text -- und was der Bezug ist: fuer die Herleitung (`erklaerung`) und
+Werkstoffs. Dazu, wie das Zeichen von `E` heisst – als Formel und als
+Text – und was der Bezug ist: fuer die Herleitung (`erklaerung`) und
 unter dem Bild (`hinweis`). Seit 2026-11-26; bis dahin hiess er immer
 `E_cm` und der reine Betonquerschnitt.
 
@@ -231,7 +231,7 @@ unter dem Bild (`hinweis`). Seit 2026-11-26; bis dahin hiess er immer
 - `E: float` – Pa.
 - `zeichen: str` – Das Zeichen als Formel: `E_{cm}`.
 - `text: str` – Dasselbe als Text: «E_cm».
-- `erklaerung: str` – Was der Bezug ist -- der erste Satz, mit dem die Herleitung den Modul erklaert.
+- `erklaerung: str` – Was der Bezug ist – der erste Satz, mit dem die Herleitung den Modul erklaert.
 - `hinweis: str` – Dasselbe unter dem Bild einer Linie des Moduls.
 
 ### Paar
@@ -247,14 +247,14 @@ rechnen und schreiben Platte und gezeichneter Querschnitt gleich
 ([[opencivil.spannungsanalyse.riss#Bruttoriss|Bruttoriss]]). Einer ohne Beton
 reisst nicht, seine beiden Loeser sind derselbe, und Riss gibt es keinen
 (`None`, [[opencivil.spannungsanalyse.rissfrei#RissfreiesPaar|RissfreiesPaar]]).
-Was nur die Art des Bauteils weiss -- die Tiefe, die Dehnung am Ende --,
+Was nur die Art des Bauteils weiss – die Tiefe, die Dehnung am Ende –,
 schreibt das Paar selbst in die Herleitung.
 
 - `gerissen: Faserloeser`
-- `ungerissen: Faserloeser` – Die beiden Loeser in der Richtung des Paars -- fuer das Bild aus Randdehnungen.
-- `wahl: Rechenwahl` – Womit gerechnet wird -- Kriechzahl, Wertesatz, Rechenart, Gesetz des Holzes.
+- `ungerissen: Faserloeser` – Die beiden Loeser in der Richtung des Paars – fuer das Bild aus Randdehnungen.
+- `wahl: Rechenwahl` – Womit gerechnet wird – Kriechzahl, Wertesatz, Rechenart, Gesetz des Holzes.
 - `ids: Mapping[str, str]` – Kurzname -> Wert-ID der Eingaben, fuer die Herleitung.
-- `bezugsort: str` – Wo die Mitteldehnung gilt -- dort greift N an.
+- `bezugsort: str` – Wo die Mitteldehnung gilt – dort greift N an.
 - `flaeche: str` – Woraus die Flaeche ist, fuer das Bild: «Beton», «Holz», «Baustahl».
 - `OHNE_FLIESSEN: str` – Was eine Linie sagt, die bis zu ihrem Ende nicht fliesst.
 
@@ -265,7 +265,7 @@ schreibt das Paar selbst in die Herleitung.
 def rechenart(self) -> str
 ```
 
-Wie die Werkstoffe rechnen, in Worten -- leer, wo es nichts zu waehlen gibt, beim Stahl.
+Wie die Werkstoffe rechnen, in Worten – leer, wo es nichts zu waehlen gibt, beim Stahl.
 
 #### Paar.mit_kriechzahl
 
@@ -274,7 +274,7 @@ Wie die Werkstoffe rechnen, in Worten -- leer, wo es nichts zu waehlen gibt, bei
 def mit_kriechzahl(self) -> bool
 ```
 
-Ob die Kriechzahl wirkt -- nur am Beton.
+Ob die Kriechzahl wirkt – nur am Beton.
 
 #### Paar.beschriftung
 
@@ -307,7 +307,7 @@ def vorgespannt(self) -> bool
 def ebenen(self) -> Zustaende
 ```
 
-Wie die beiden Zustaende ihre Ebenen finden -- fuer jede Linie und
+Wie die beiden Zustaende ihre Ebenen finden – fuer jede Linie und
 jedes Bild neu: eine Suche, die bei der zuletzt gefundenen Neigung
 anfaengt, hinge sonst an dem, was vorher gerechnet wurde.
 
@@ -359,15 +359,15 @@ def herleitung_flaeche(self, p: 'Protokoll', w: 'Zwischenwerte', A: 'Wert') -> '
 class Linienpunkt
 ```
 
-Ein Punkt einer Linie: die Kraft -- `M` bzw. `N` --, die Verformung,
-die dort gilt -- `chi` bzw. `eps_m` --, und beide Zustaende zum
+Ein Punkt einer Linie: die Kraft – `M` bzw. `N` –, die Verformung,
+die dort gilt – `chi` bzw. `eps_m` –, und beide Zustaende zum
 Vergleich.
 
 - `kraft: float`
-- `verformung: float` – Was gilt: ungerissen bis zum Riss, darueber gerissen -- ohne Riss der eine Zustand.
+- `verformung: float` – Was gilt: ungerissen bis zum Riss, darueber gerissen – ohne Riss der eine Zustand.
 - `gerissen: bool`
-- `verformung_I: Optional[float]` – Ungerissen -- `None` ueber dem Riss, wo der Beton dafuer Zug ohne Grenze braeuchte, und wo der Zustand keine Loesung hat. Ohne Riss immer `None`: es gibt nichts zu vergleichen.
-- `verformung_II: Optional[float]` – Gerissen, ohne Zugfestigkeit des Betons -- ohne Riss `None`.
+- `verformung_I: Optional[float]` – Ungerissen – `None` ueber dem Riss, wo der Beton dafuer Zug ohne Grenze braeuchte, und wo der Zustand keine Loesung hat. Ohne Riss immer `None`: es gibt nichts zu vergleichen.
+- `verformung_II: Optional[float]` – Gerissen, ohne Zugfestigkeit des Betons – ohne Riss `None`.
 
 ### Eckpunkt
 
@@ -388,12 +388,12 @@ Ein benannter Punkt einer Linie.
 class Grenzzustand(Eckpunkt)
 ```
 
-Das Ende einer Linie -- und welche Grenzdehnung es bestimmt.
+Das Ende einer Linie – und welche Grenzdehnung es bestimmt.
 
 - `eps_oben: float = 0.0`
 - `eps_unten: float = 0.0`
 - `massgebend: str = ''`
-- `ebene: Optional[Dehnungsebene] = field(default=None, compare=False, repr=False)` – Die Ebene am Ende -- mit ihrer Richtung, fuer die Herleitung.
+- `ebene: Optional[Dehnungsebene] = field(default=None, compare=False, repr=False)` – Die Ebene am Ende – mit ihrer Richtung, fuer die Herleitung.
 
 ### Linie
 
@@ -403,11 +403,11 @@ class Linie
 ```
 
 `M(chi)` bei festgehaltener Normalkraft oder `N(eps_m)` bei
-festgehaltenem Moment -- welche, sagt [[opencivil.spannungsanalyse.linie#Linie|art]].
+festgehaltenem Moment – welche, sagt [[opencivil.spannungsanalyse.linie#Linie|art]].
 
 - `art: Analyseart`
 - `fest: float` – Was festgehalten wird: `N` in N oder `M` in Nm.
-- `riss: Optional[float]` – Die Kraft, bei der der Querschnitt reisst: `M_Riss(N)` oder `N_Riss(M)` -- `None` bei einem, der nicht reisst, ohne Beton.
+- `riss: Optional[float]` – Die Kraft, bei der der Querschnitt reisst: `M_Riss(N)` oder `N_Riss(M)` – `None` bei einem, der nicht reisst, ohne Beton.
 - `punkte: List[Linienpunkt] = field(default_factory=list)`
 - `bruch: Optional[Grenzzustand] = None`
 - `fliessen: Optional[Eckpunkt] = None` – Wo der Stahl der am staerksten gezogenen Lage zu fliessen beginnt.
@@ -436,7 +436,7 @@ def am_bruch(self) -> bool
 ```
 
 Ob ihr letzter Punkt das Ende ist, bis zu dem der Querschnitt traegt:
-gerissen -- oder ohne Riss immer. Endet sie ungerissen, traegt er den
+gerissen – oder ohne Riss immer. Endet sie ungerissen, traegt er den
 Riss nicht, und dort gilt ihre letzte Verformung.
 
 #### Linie.sprung
@@ -455,7 +455,7 @@ Die beiden Punkte des Risses: vor und nach dem Reissen, bei derselben Kraft.
 class _Weg
 ```
 
-Wie eine Linie laeuft -- der einzige Unterschied zwischen M-chi und N-eps.
+Wie eine Linie laeuft – der einzige Unterschied zwischen M-chi und N-eps.
 
 `ebene` fuehrt von einer Verformung zur gerissenen Ebene oder zu
 `None`, wo es kein Gleichgewicht gibt; `kraft` liest aus der Ebene die
@@ -474,7 +474,7 @@ Kraft die Verformung, ungerissen und gerissen.
 def _grenze(gut: Callable[[float], bool], unten: float, oben: float) -> float
 ```
 
-Wo `gut` endet, zwischen `unten` (gut) und `oben` -- durch Halbieren.
+Wo `gut` endet, zwischen `unten` (gut) und `oben` – durch Halbieren.
 
 ### _linie
 
@@ -483,7 +483,7 @@ def _linie(paar: Paar, weg: _Weg, art: Analyseart, fest: float, riss: Optional[f
 ```
 
 Die Linie von null bis zum Bruch: ungerissen bis `riss`, dort der
-Sprung, darueber gerissen -- ueber die Verformung gerechnet, mit dem
+Sprung, darueber gerissen – ueber die Verformung gerechnet, mit dem
 Fliessbeginn als Punkt der Linie. Ohne Riss (`None`) laeuft sie ganz
 ueber die Verformung, in dem einen Zustand, den der Querschnitt hat.
 
@@ -505,14 +505,14 @@ def normalkraft_dehnung(paar: Paar, *, M: float) -> Linie
 
 Die Normalkraft-Dehnungs-Linie beim Moment `M`, auf Zug: ungerissen
 bis `N_Riss(M)`, dort der Sprung, darueber gerissen bis zum Bruch.
-Die Dehnung ist die am Arm null -- dort greift `N` an: bei der Platte
+Die Dehnung ist die am Arm null – dort greift `N` an: bei der Platte
 auf halber Hoehe, beim gezeichneten Querschnitt im Schwerpunkt.
 
 
 ## Konstanten
 
-- `SUCHE_DER_ANALYSEN = ILLINOIS_VON_VORN` – Wie die Loeser der Analysen suchen, bei der Platte wie am gezeichneten Querschnitt: mit Illinois, jede Frage im ganzen Fenster -- eine Linie fragt ihre Punkte in einer Reihenfolge, und keiner soll an ihr haengen. Wo ein Gesetz springt, halbierend ([[opencivil.nachweis.querschnittsloeser#Faserloeser|Faserloeser]]): dort faende Illinois auf einem flachen Stueck einen anderen Punkt. Bis 2026-10-18 halbierten alle; so rechnen alle Analysen des Pruefprojekts in 4.0 statt 5.2 s, die der Platte etwa fuenfmal schneller, und ihre Zahlen bewegen sich erst ab der siebten Stelle (Benutzer, 2026-10-18).
-- `KURVENPUNKTE = 40` – Punkte des gerissenen Teils einer Linie -- vor dem Fliessen ein Drittel, danach der Rest, denn dort waechst die Verformung am staerksten.
+- `SUCHE_DER_ANALYSEN = ILLINOIS_VON_VORN` – Wie die Loeser der Analysen suchen, bei der Platte wie am gezeichneten Querschnitt: mit Illinois, jede Frage im ganzen Fenster – eine Linie fragt ihre Punkte in einer Reihenfolge, und keiner soll an ihr haengen. Wo ein Gesetz springt, halbierend ([[opencivil.nachweis.querschnittsloeser#Faserloeser|Faserloeser]]): dort faende Illinois auf einem flachen Stueck einen anderen Punkt. Bis 2026-10-18 halbierten alle; so rechnen alle Analysen des Pruefprojekts in 4.0 statt 5.2 s, die der Platte etwa fuenfmal schneller, und ihre Zahlen bewegen sich erst ab der siebten Stelle (Benutzer, 2026-10-18).
+- `KURVENPUNKTE = 40` – Punkte des gerissenen Teils einer Linie – vor dem Fliessen ein Drittel, danach der Rest, denn dort waechst die Verformung am staerksten.
 - `PUNKTE_UNGERISSEN = 10` – Punkte des ungerissenen Teils. Er ist beinahe gerade.
 
 ## Braucht

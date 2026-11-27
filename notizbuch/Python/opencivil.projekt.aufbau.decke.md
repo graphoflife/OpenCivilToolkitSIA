@@ -1,5 +1,5 @@
 ---
-erzeugt: be77b47a6965
+erzeugt: 8633cc793add
 art: modul
 tags: [modul]
 ---
@@ -12,8 +12,8 @@ tags: [modul]
 Aus einem [[opencivil.projekt.decke#DeckeEintrag|DeckeEintrag]] das Modell der
 Streifenmethode in SI ([[opencivil.projekt.aufbau.decke#modell_von|modell_von]]) und das Bauteil im Rechenwerk
 ([[opencivil.projekt.aufbau.decke#bauen|bauen]]). Hart scheitert nur ein Verweis auf einen Beton, den es im
-Projekt nicht gibt -- wie im Balkensystem. Was der Decke selbst fehlt --
-ein Knoten, eine Platte ohne Beton, ein Lastfall --, steht in ihren
+Projekt nicht gibt – wie im Balkensystem. Was der Decke selbst fehlt –
+ein Knoten, eine Platte ohne Beton, ein Lastfall –, steht in ihren
 Meldungen, und der Rest des Projekts rechnet. Die Regeln der Lastfaelle
 teilt sie mit dem Balkensystem ([[opencivil.projekt.aufbau.faelle]]).
 
@@ -25,9 +25,9 @@ teilt sie mit dem Balkensystem ([[opencivil.projekt.aufbau.faelle]]).
 def modell_von(eintrag: DeckeEintrag) -> Tuple[Decke, List[Meldung]]
 ```
 
-Die Decke der Beschreibung in SI -- E und Gewicht der Platten null, die
+Die Decke der Beschreibung in SI – E und Gewicht der Platten null, die
 kommen beim Rechnen von ihrem Beton. Ein Teil, das auf einen Knoten
-zeigt, den es nicht gibt, fehlt im Modell; die Meldung sagt es -- auch
+zeigt, den es nicht gibt, fehlt im Modell; die Meldung sagt es – auch
 bei einem Schnitt, der sonst in keine Rechnung eingeht. Eine
 Last heisst im Modell nach ihrer Kennung, eine auf der ganzen Platte
 nach dieser; eine Last, deren Lastfall es nicht gibt, und ein Beiwert
@@ -39,10 +39,10 @@ dafuer bleiben mit einem Hinweis weg.
 def _betone(eintrag: DeckeEintrag, aufbau: Aufbau) -> Tuple[Dict[str, Baustoff], List[Meldung]]
 ```
 
-Je Platte ihr Beton -- und eine Meldung an jeder Platte, deren Wahl nicht
+Je Platte ihr Beton – und eine Meldung an jeder Platte, deren Wahl nicht
 stimmt, nach derselben Regel wie bei jedem Bauteil ([[opencivil.projekt.aufbau.kern#materialgrund|materialgrund]]).
 Bis 2026-11-19 hielt ein geloeschter Beton die ganze Decke an, ohne zu
-sagen, an welcher Platte -- und das Zeichenfenster zeigte nichts mehr.
+sagen, an welcher Platte – und das Zeichenfenster zeigte nichts mehr.
 
 ### bauen
 

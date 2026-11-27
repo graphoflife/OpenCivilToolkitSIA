@@ -1,5 +1,5 @@
 ---
-erzeugt: 63db69d22814
+erzeugt: b134df8afd57
 art: modul
 tags: [modul]
 ---
@@ -13,7 +13,7 @@ Was die Streifenmethode an Geometrie braucht, und nur das: Fläche,
 Schwerpunkt und Umlaufsinn eines Vielecks, ob ein Punkt darin liegt, die
 Zerlegung in Dreiecke, das Abschneiden an einer Halbebene und an einem
 konvexen Vieleck, und die Breite eines konvexen Vielecks quer zu einer
-Richtung -- das Stück einer Last, das ein Streifen trägt.
+Richtung – das Stück einer Last, das ein Streifen trägt.
 
 
 ## PUNKTE UND VIELECKE
@@ -59,7 +59,7 @@ Die Fläche mit Vorzeichen: im Gegenuhrzeigersinn positiv.
 def schwerpunkt(v: Vieleck) -> Punkt
 ```
 
-Der Flächenschwerpunkt -- bei einem entarteten Vieleck das Mittel der Ecken.
+Der Flächenschwerpunkt – bei einem entarteten Vieleck das Mittel der Ecken.
 
 ### gegen_uhrzeiger
 
@@ -81,7 +81,7 @@ Ohne doppelte Ecken und ohne Ecken auf einer Geraden mit ihren Nachbarn.
 def ist_konvex(v: Vieleck) -> bool
 ```
 
-Ob alle Ecken in dieselbe Richtung abbiegen -- `v` bereinigt.
+Ob alle Ecken in dieselbe Richtung abbiegen – `v` bereinigt.
 
 ### innen
 
@@ -89,7 +89,7 @@ Ob alle Ecken in dieselbe Richtung abbiegen -- `v` bereinigt.
 def innen(p: Punkt, v: Vieleck) -> bool
 ```
 
-Ob `p` im Vieleck liegt -- auf dem Rand zählt als innen.
+Ob `p` im Vieleck liegt – auf dem Rand zählt als innen.
 
 ### dreiecke
 
@@ -115,7 +115,7 @@ Was von `v` in `p·r <= c` liegt (Sutherland-Hodgman).
 def schnitt(v: Vieleck, konvex: Vieleck) -> List[Punkt]
 ```
 
-`v` geschnitten mit dem konvexen Vieleck `konvex` (Gegenuhrzeigersinn) -- leer, wenn nichts bleibt.
+`v` geschnitten mit dem konvexen Vieleck `konvex` (Gegenuhrzeigersinn) – leer, wenn nichts bleibt.
 
 ### im_band
 
@@ -141,7 +141,7 @@ def breite(v: Vieleck, n: Punkt) -> List[Tuple[float, float]]
 
 Wie breit das konvexe Vieleck quer zu `n` ist, längs `s = p·n`: die
 Paare `(s, b)` an jeder Ecke, aufsteigend in `s`. Dazwischen ist die
-Breite linear -- die Ränder eines konvexen Vielecks sind dort Geraden.
+Breite linear – die Ränder eines konvexen Vielecks sind dort Geraden.
 Eine Kante quer zu `n` am Anfang oder Ende zählt dort mit ihrer Länge.
 
 ### strecke_in_konvex
@@ -151,7 +151,7 @@ def strecke_in_konvex(a: Punkt, b: Punkt, konvex: Vieleck) -> Optional[Tuple[flo
 ```
 
 Welcher Teil der Strecke `a → b` im konvexen Vieleck liegt, als
-Parameter `(u0, u1)` mit `p = a + u·(b - a)` -- `None`, wenn keiner
+Parameter `(u0, u1)` mit `p = a + u·(b - a)` – `None`, wenn keiner
 (Cyrus-Beck).
 
 ### strecke_im_vieleck
@@ -160,8 +160,8 @@ Parameter `(u0, u1)` mit `p = a + u·(b - a)` -- `None`, wenn keiner
 def strecke_im_vieleck(a: Punkt, b: Punkt, v: Vieleck) -> List[Tuple[float, float]]
 ```
 
-Welche Teile der Strecke `a → b` im Vieleck liegen -- auch einem nicht
-konvexen --, als Parameter `(u0, u1)`. Ein Stück auf dem Rand zählt.
+Welche Teile der Strecke `a → b` im Vieleck liegen – auch einem nicht
+konvexen –, als Parameter `(u0, u1)`. Ein Stück auf dem Rand zählt.
 
 ### schnittstellen
 
@@ -170,7 +170,7 @@ def schnittstellen(a: Punkt, b: Punkt, v: Vieleck) -> List[float]
 ```
 
 Wo die Strecke `a → b` den Rand des Vielecks trifft oder an einer Ecke
-vorbeigeht, als Parameter in `[0, 1]` -- mit 0 und 1, aufsteigend.
+vorbeigeht, als Parameter in `[0, 1]` – mit 0 und 1, aufsteigend.
 Zwischen zwei Stellen liegt sie ganz innen, ganz aussen oder ganz auf dem Rand.
 
 ### kreuzung
@@ -180,7 +180,7 @@ def kreuzung(a: Punkt, b: Punkt, p: Punkt, q: Punkt) -> Optional[Tuple[float, fl
 ```
 
 Wo sich die Geraden durch `a → b` und `p → q` schneiden, als
-Parameter `(u, k)` mit `a + u·(b − a) = p + k·(q − p)` -- `None`,
+Parameter `(u, k)` mit `a + u·(b − a) = p + k·(q − p)` – `None`,
 wenn sie parallel sind. Ob der Schnitt auf den Strecken liegt, sagen
 `u` und `k` in `[0, 1]`.
 
@@ -191,7 +191,7 @@ def deckung(k: Tuple[Punkt, Punkt], m: Tuple[Punkt, Punkt], nah: float) -> Optio
 ```
 
 Welches Stück der Strecke `k` die Strecke `m` deckt, wenn beide auf
-einer Geraden liegen -- bis `nah` daneben --, in m ab dem Anfang von
+einer Geraden liegen – bis `nah` daneben –, in m ab dem Anfang von
 `k`. `None`, wenn sie sich nur kreuzen, an einer Ecke treffen oder
 das Stück nicht länger als `nah` ist.
 
@@ -201,7 +201,7 @@ das Stück nicht länger als `nah` ist.
 def rechteck(a: Punkt, b: Punkt, breite_: float) -> List[Punkt]
 ```
 
-Das Rechteck um die Strecke `a → b`, je `breite_/2` zu beiden Seiten -- im Gegenuhrzeigersinn.
+Das Rechteck um die Strecke `a → b`, je `breite_/2` zu beiden Seiten – im Gegenuhrzeigersinn.
 
 ### achsrechteck
 
@@ -222,7 +222,7 @@ Intervalle, die sich berühren oder überlappen, zu einem.
 
 ## Konstanten
 
-- `TOLERANZ = 1e-07` – Was in m als gleich gilt -- das Zeichenfenster rundet auf ein Millionstel.
+- `TOLERANZ = 1e-07` – Was in m als gleich gilt – das Zeichenfenster rundet auf ein Millionstel.
 
 ## Gebraucht von
 

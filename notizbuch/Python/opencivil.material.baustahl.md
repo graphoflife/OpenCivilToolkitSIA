@@ -1,5 +1,5 @@
 ---
-erzeugt: 00cf8b5abaa4
+erzeugt: 10ef27bc6eef
 art: modul
 tags: [modul]
 ---
@@ -37,7 +37,7 @@ Fuer die Spannung-Dehnung-Linie ([[opencivil.querschnitt.werkstoffgesetz#Baustah
 kommen der Bemessungswert der Streckgrenze `f_yd = f_y / gamma_M1` (4.1.1,
 Gleichung (1), mit 4.1.3) und eine Grenzdehnung dazu. Die Norm nennt keine
 Linie und keine Grenzdehnung; nach Vorgabe, nicht nachgeschlagen, endet sie
-bei [[opencivil.material.baustahl#Konstanten|DUKTILITAET]] mal der Fliessdehnung -- so viel verlangt 3.2.2.4
+bei [[opencivil.material.baustahl#Konstanten|DUKTILITAET]] mal der Fliessdehnung – so viel verlangt 3.2.2.4
 mindestens, wo plastisch gerechnet wird, und die Sorten der Tabelle 1
 erfuellen es.
 
@@ -63,7 +63,7 @@ print(werk.loese(s355.id_von("eps_y")).wert(s355.id_von("eps_y")))
 class Baustahlsorte
 ```
 
-Eine Zeile von Tabelle 1, in N/mm² -- links bis 40 mm Dicke, rechts darueber.
+Eine Zeile von Tabelle 1, in N/mm² – links bis 40 mm Dicke, rechts darueber.
 
 - `f_y: float`
 - `tau_y: float`
@@ -78,7 +78,7 @@ Eine Zeile von Tabelle 1, in N/mm² -- links bis 40 mm Dicke, rechts darueber.
 def baustahlsorten_zum_anlegen() -> List[str]
 ```
 
-Die Sorten in der Reihenfolge, in der neue angelegt werden -- wie in Tabelle 1.
+Die Sorten in der Reihenfolge, in der neue angelegt werden – wie in Tabelle 1.
 
 ### baustahl
 
@@ -94,11 +94,11 @@ Erzeugt einen Baustahl aus der Sortentabelle.
 
 ## Konstanten
 
-- `TABELLE_1 = 'SIA 263:2013, 3.2.2.3, Tabelle 1'` – Wo die Sortentabelle steht -- jeder Wert aus ihr nennt diese Stelle.
+- `TABELLE_1 = 'SIA 263:2013, 3.2.2.3, Tabelle 1'` – Wo die Sortentabelle steht – jeder Wert aus ihr nennt diese Stelle.
 - `BAUSTAHLSORTEN = {'S235': Baustahlsorte(235.0, 135.0, 360.0, 215.0, 124.0, 340.0), 'S2…` – Baustahlsorten nach SIA 263:2013, Tabelle 1.
 - `ERSTER_BAUSTAHL = 'S235'` – Womit ein neuer Baustahl anfaengt: die Folge der Tabelle.
 - `DICK = 'für 40 mm < t ≤ 100 mm'` – Was ueber 40 mm Dicke gilt, steht unter demselben Zeichen mit `t>40` oben.
-- `DUKTILITAET = 15.0` – Wie viele Fliessdehnungen weit die Linie reicht: das Verhaeltnis von Bruch- zu Fliessdehnung, das SIA 263:2013, 3.2.2.4 fuer die plastischen Verfahren mindestens verlangt -- als Grenzdehnung nach Vorgabe, nicht nachgeschlagen.
+- `DUKTILITAET = 15.0` – Wie viele Fliessdehnungen weit die Linie reicht: das Verhaeltnis von Bruch- zu Fliessdehnung, das SIA 263:2013, 3.2.2.4 fuer die plastischen Verfahren mindestens verlangt – als Grenzdehnung nach Vorgabe, nicht nachgeschlagen.
 - `BAUSTAHL_VORLAGEN = (_tabellenwert('f_y', 'f_y', 'Streckgrenze'), _tabellenwert('tau_y', …`
 
 ## Braucht

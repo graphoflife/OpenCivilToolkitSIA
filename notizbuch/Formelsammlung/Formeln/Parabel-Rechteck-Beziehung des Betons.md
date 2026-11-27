@@ -40,7 +40,7 @@ $$
 
 Wie der Beton auf Druck antwortet, wirklichkeitsnah: erst eine Parabel bis
 zur Festigkeit bei $\varepsilon_{c1d}$, dann ein Plateau bis zur
-Bruchstauchung $\varepsilon_{c2d}$. Auf Zug trägt er nichts -- gerechnet wird
+Bruchstauchung $\varepsilon_{c2d}$. Auf Zug trägt er nichts – gerechnet wird
 der gerissene Querschnitt. Druck ist negativ.
 
 Die Form der Parabel bestimmt der
@@ -63,5 +63,5 @@ Benutzer hat sie gestrichen; die Stahlspannungen rechnen seither präzise.
 
 Jenseits der Bruchstauchung trägt der Beton nichts mehr: die Faser ist
 zerdrückt, und eine Suche bleibt so im gültigen Bereich. Auf der Grenze
-selbst gilt noch das Plateau, auch um eine Rundung darüber -- sonst kippte
+selbst gilt noch das Plateau, auch um eine Rundung darüber – sonst kippte
 eine Faser, die genau auf ihr liegt, an der letzten Stelle auf null.

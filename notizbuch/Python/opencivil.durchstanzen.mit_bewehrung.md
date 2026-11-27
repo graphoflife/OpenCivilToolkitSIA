@@ -1,5 +1,5 @@
 ---
-erzeugt: f68b822edc8e
+erzeugt: fbd16f84bb5b
 art: modul
 tags: [modul]
 ---
@@ -10,9 +10,9 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Was der Durchstanznachweis tut, wenn der Beton allein nicht reicht: die
-kleinste Bewehrung des gewählten Systems suchen -- ancoPLUS, HALFEN HDB
-oder Bügel ([[opencivil.durchstanzen.systeme|.systeme]], [[opencivil.durchstanzen.bewehrung#bemessen|.bewehrung.bemessen]]) -- und mit ihr die drei
-Nachweise nach SIA 262:2025, 4.3.6.5.1, schreiben -- den ersten geteilt in
+kleinste Bewehrung des gewählten Systems suchen – ancoPLUS, HALFEN HDB
+oder Bügel ([[opencivil.durchstanzen.systeme|.systeme]], [[opencivil.durchstanzen.bewehrung#bemessen|.bewehrung.bemessen]]) – und mit ihr die drei
+Nachweise nach SIA 262:2025, 4.3.6.5.1, schreiben – den ersten geteilt in
 den Beitrag der Bewehrung (66), (68), (69) und das Verformungsvermögen (67),
 dazu die erste Betondruckdiagonale (70) und ausserhalb der Bewehrung
 (4.3.6.5.10, Figur 26). Gerechnet wird jede Bedingung einmal, in
@@ -32,9 +32,9 @@ aus dem Gutachten, wie 4.3.6.5.9 es zulässt, bei HDB und Bügeln die 2 selbst.
 d_v,out reicht von der Zugbewehrung bis zur Verankerung der Anker auf der
 Druckseite: d − c_v (Figur 26). k_e gilt je Schnitt (4.3.6.5.10 verweist
 auf 4.3.6.2.3): die Näherung der gestützten Fläche oder (57) mit der Fläche
-und dem Schwerpunkt des äusseren Schnitts -- wie die Regel der Stelle es sagt
+und dem Schwerpunkt des äusseren Schnitts – wie die Regel der Stelle es sagt
 ([[opencivil.durchstanzen.pruefung#KeRegel|.pruefung.KeRegel]]). Bis 2026-11-14 galt aussen das
-k_e von innen -- an Rand- und Eckstützen bis 20 % zu günstig. Abgezogen
+k_e von innen – an Rand- und Eckstützen bis 20 % zu günstig. Abgezogen
 wird die Flächenlast innerhalb des äusseren Schnitts (4.3.6.2.6).
 
 
@@ -43,7 +43,7 @@ wird die Flächenlast innerhalb des äusseren Schnitts (4.3.6.2.6).
 Bricht an einer Innenstütze die erste Betondruckdiagonale, hilft mehr
 Bewehrung nicht. Dann wird der kleinste ZEUS gewählt, der zwischen die
 Überdeckungen passt und mit dem die Platte ausserhalb seiner Stege hält:
-ohne Leisten, sonst mit Leisten um ihn -- dieselben Schritte wie an der
+ohne Leisten, sonst mit Leisten um ihn – dieselben Schritte wie an der
 Stütze, mit dem Pilz als gestützter Fläche (4.3.6.6.2). Seine Fläche reicht
 bis an die Enden der Stege; die wirksame Höhe reicht von der Zugbewehrung bis
 zur Unterkante des Pilzes, d_v = d − 20 mm: 4.3.6.6.2 verweist für d_v auf
@@ -65,7 +65,7 @@ SI-Basis; Kräfte in N.
 class Grundlage
 ```
 
-Was der Nachweis ohne Bewehrung schon gerechnet hat -- als Prüfung des
+Was der Nachweis ohne Bewehrung schon gerechnet hat – als Prüfung des
 Schnitts um die Stütze und als die Werte, mit denen seine Herleitung sie
 zeigt.
 
@@ -89,7 +89,7 @@ zeigt.
 class Ort
 ```
 
-Wo die Leisten ansetzen: an der Stütze oder um den Stahlpilz (4.3.6.6.2) --
+Wo die Leisten ansetzen: an der Stütze oder um den Stahlpilz (4.3.6.6.2) –
 die gestützte Fläche, der Schnitt um sie und die Werte, mit denen die
 Herleitung ihn zeigt.
 
@@ -98,13 +98,13 @@ Herleitung ihn zeigt.
 - `umriss: Tuple[Punkt, ...]`
 - `r_zu: Callable[[float], Sequence[Stueck]]` – Der geschlossene Schnitt im Abstand r um die gestützte Fläche.
 - `pruefung: Schnittpruefung`
-- `ausnahme: bool` – Ob der Faktor des Gutachtens erhöht ist -- Innenstütze und Wandende.
+- `ausnahme: bool` – Ob der Faktor des Gutachtens erhöht ist – Innenstütze und Wandende.
 - `schatten: Tuple[Schatten, ...]` – Die Schatten der Aussparungen am Schnitt um diese Fläche: dort liegt keine Leiste.
 - `d_v: Optional[Wert] = None`
 - `k_e: Optional[Wert] = None`
 - `u: Optional[Wert] = None`
 - `V_d: Optional[Wert] = None`
-- `V_Rd_c: Optional[Wert] = None` – Wie die Herleitung den Schnitt zeigt -- fehlt nur in der stummen Suche nach dem Pilz.
+- `V_Rd_c: Optional[Wert] = None` – Wie die Herleitung den Schnitt zeigt – fehlt nur in der stummen Suche nach dem Pilz.
 
 ### _Werte
 
@@ -131,7 +131,7 @@ Herleitung. f_yd und E_s sind die des Stahls der Anker.
 def nachweisen(n: 'Durchstanzen', e: Eingaben, p: Protokoll, w: Zwischenwerte, g: Grundlage) -> Tuple[List[NachweisUrteil], Optional[Leistenpruefung], Optional[Pilzbefund]]
 ```
 
-Die Durchstanzbewehrung suchen und mit ihr nachweisen -- und wo die erste
+Die Durchstanzbewehrung suchen und mit ihr nachweisen – und wo die erste
 Druckdiagonale an einer Innenstütze bricht, einen Stahlpilz. Zurück kommen
 die Urteile, die Leisten und der Pilz, so weit es sie gibt.
 
@@ -141,7 +141,7 @@ die Urteile, die Leisten und der Pilz, so weit es sie gibt.
 def _verankerung_schreiben(p: Protokoll, c_v: float, d_v: float, eta: float, system: System) -> str
 ```
 
-Ob die Elemente auf der Druckseite genügend verankert sind (5.5.3.11) --
+Ob die Elemente auf der Druckseite genügend verankert sind (5.5.3.11) –
 und was dann vor (68) und (70) steht: nichts, oder der Faktor 0.7.
 
 ### _tabelle_21_pruefen
@@ -150,7 +150,7 @@ und was dann vor (68) und (70) steht: nichts, oder der Faktor 0.7.
 def _tabelle_21_pruefen(p: Protokoll, d: float, vorschlag: Vorschlag) -> None
 ```
 
-Ein Hinweis, wo das Produkt Tabelle 21 überschreitet -- im Durchmesser
+Ein Hinweis, wo das Produkt Tabelle 21 überschreitet – im Durchmesser
 oder im Abstand s_1 der Reihen (5.5.3.8, 5.5.3.12). Ob das Gutachten das
 nach 4.3.6.5.6 deckt, ist offen; die Prüfung hält es darum nicht fest.
 
@@ -160,7 +160,7 @@ nach 4.3.6.5.6 deckt, ist offen; die Prüfung hält es darum nicht fest.
 def _suchen(n: 'Durchstanzen', werte: _Werte, ort: Ort) -> Optional[Leistenpruefung]
 ```
 
-Die kleinste Bewehrung des Systems für diesen Ort, mit ihrer Prüfung -- siehe [[opencivil.durchstanzen.bewehrung#bemessen|.bewehrung.bemessen]].
+Die kleinste Bewehrung des Systems für diesen Ort, mit ihrer Prüfung – siehe [[opencivil.durchstanzen.bewehrung#bemessen|.bewehrung.bemessen]].
 
 ### _leisten_schreiben
 
@@ -193,12 +193,12 @@ def _pilz_suchen(n: 'Durchstanzen', werte: _Werte) -> Optional[Tuple[Pilzbefund,
 ```
 
 Der kleinste ZEUS, der zwischen die Überdeckungen passt, über die Stütze
-hinausreicht und mit dem die Platte ausserhalb hält -- ohne Leisten oder
+hinausreicht und mit dem die Platte ausserhalb hält – ohne Leisten oder
 mit Leisten um ihn, die alle Nachweise erfüllen.
 
 Ein Pilz, dessen Druckdiagonale nicht einmal mit dem ganzen Umfang um ihn
-hielte -- der Hülle samt dem Bogen d_v/2 rundum, ohne Abzüge, und mit dem
-grössten k_e der Regel, 1 nach (57) --, fällt weg, bevor sein Schnitt gerechnet wird: so
+hielte – der Hülle samt dem Bogen d_v/2 rundum, ohne Abzüge, und mit dem
+grössten k_e der Regel, 1 nach (57) –, fällt weg, bevor sein Schnitt gerechnet wird: so
 bleibt die Suche schnell.
 
 ### _mit_pilz

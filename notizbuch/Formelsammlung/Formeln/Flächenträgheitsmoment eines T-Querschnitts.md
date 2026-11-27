@@ -50,7 +50,7 @@ $$
 
 ## Theorie
 
-Je Teil -- Flansch und Steg -- das eigene Trägheitsmoment $b h^3 / 12$ und
+Je Teil – Flansch und Steg – das eigene Trägheitsmoment $b h^3 / 12$ und
 dazu $A_i \cdot a_i^2$, mit $a_i$ dem Abstand seines Schwerpunkts vom
 [[Schwerpunkt eines T-Querschnitts|Schwerpunkt des ganzen Querschnitts]]: der
 Satz von Steiner. Der zweite Anteil ist beim Flansch meist der grössere.

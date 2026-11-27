@@ -38,4 +38,4 @@ $$
 
 ## Theorie
 
-Die Fläche eines Vollkreises mit dem Durchmesser $d$ -- etwa einer Rundstütze.
+Die Fläche eines Vollkreises mit dem Durchmesser $d$ – etwa einer Rundstütze.

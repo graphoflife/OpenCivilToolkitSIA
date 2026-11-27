@@ -49,4 +49,4 @@ für die Auflast.
 
 Im Text des Kapitels steht hier $\tan\alpha$; seine Tabelle 9.2.18 und die
 Formel für [[Sohlneigungsfaktor b_q|b_q]] rechnen mit $\tan\varphi$. Das
-Werkzeug folgt der Tabelle -- eine Annahme, im TODO vermerkt.
+Werkzeug folgt der Tabelle – eine Annahme, im TODO vermerkt.

@@ -57,7 +57,7 @@ $$
 ## Theorie
 
 Fällt das Gelände neben dem Fundament ab, ist der Weg des Gleitkörpers an
-die Oberfläche kürzer, und über ihm liegt weniger Boden -- die Tragfähigkeit
+die Oberfläche kürzer, und über ihm liegt weniger Boden – die Tragfähigkeit
 sinkt. $\beta$ ist positiv, wenn das Gelände auf der Seite abfällt, zu der
 $T$ zeigt (Bild 9.2.15).
 

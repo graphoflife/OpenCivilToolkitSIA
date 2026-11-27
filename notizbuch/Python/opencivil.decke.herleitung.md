@@ -1,5 +1,5 @@
 ---
-erzeugt: f7e5b29d5726
+erzeugt: e68a3dfea840
 art: modul
 tags: [modul]
 ---
@@ -10,12 +10,12 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Die Herleitung der Streifenmethode, so dass man sie von Hand nachvollziehen
-kann: die Decke in Tabellen -- Platten, Linienlager, Stützen, Unterzüge,
-Lasten je Lastfall und die Kombinationen --, die Streifen je Richtung, in
+kann: die Decke in Tabellen – Platten, Linienlager, Stützen, Unterzüge,
+Lasten je Lastfall und die Kombinationen –, die Streifen je Richtung, in
 welcher Reihenfolge die Träger rechnen, wie die Last auf die Richtungen
 geht, je Fall die Last und was die Lager davon tragen, und die Meldungen.
-Dann die Ansätze -- trägt eine Platte schief zu x und y, mit einem Hinweis
-zur Fliessbedingung -- und je Lastfall und Kombination: jeder Träger mit Last,
+Dann die Ansätze – trägt eine Platte schief zu x und y, mit einem Hinweis
+zur Fliessbedingung – und je Lastfall und Kombination: jeder Träger mit Last,
 Lagerkräften und Momenten, was jedes Lager trägt, die grössten
 Schnittkräfte der Platte, die Biegewiderstände, die sie verlangt, und die
 Lastverteilelemente.
@@ -29,8 +29,8 @@ Falls ([[opencivil.decke.feld#proben|proben]]), wie in den Bildern.
 
 ## GLEICHE TRÄGER IN EINER ZEILE
 
-Tragen nebeneinander liegende Träger dasselbe -- im Kolloquium 4 achtzehn
-Feldstreifen in x --, stehen sie in einer Zeile, «x1 … x18». Was sie
+Tragen nebeneinander liegende Träger dasselbe – im Kolloquium 4 achtzehn
+Feldstreifen in x –, stehen sie in einer Zeile, «x1 … x18». Was sie
 unterscheidet, ist nur ihr Ort quer; `s` misst längs.
 
 
@@ -49,7 +49,7 @@ in kNm/m, wie die Schnittkräfte der Platte.
 def schreiben(p: Protokoll, system: 'Deckensystem', befund: 'Deckenbefund') -> None
 ```
 
-Die ganze Herleitung einer Decke -- nichts davon geht in den Befund ein, also still gar keine.
+Die ganze Herleitung einer Decke – nichts davon geht in den Befund ein, also still gar keine.
 
 ### _lasten
 
@@ -73,7 +73,7 @@ Name, Ort und Wert einer Last für die Tabelle.
 def _stufe(u: Unterzug) -> str
 ```
 
-Die Stufe eines Unterzugs -- ein Band sagt stattdessen, wo es liegt.
+Die Stufe eines Unterzugs – ein Band sagt stattdessen, wo es liegt.
 
 ### _faelle
 
@@ -81,7 +81,7 @@ Die Stufe eines Unterzugs -- ein Band sagt stattdessen, wo es liegt.
 def _faelle(p: Protokoll, e: Ergebnis) -> None
 ```
 
-Je Lastfall und Kombination die Last und was die Lager tragen -- die Probe --, und die Meldungen der Fälle.
+Je Lastfall und Kombination die Last und was die Lager tragen – die Probe –, und die Meldungen der Fälle.
 
 ### _ansaetze
 
@@ -89,7 +89,7 @@ Je Lastfall und Kombination die Last und was die Lager tragen -- die Probe --, u
 def _ansaetze(p: Protokoll, e: Ergebnis) -> None
 ```
 
-Wie aus den Trägern die Platte wird -- je einmal, was die Decke braucht.
+Wie aus den Trägern die Platte wird – je einmal, was die Decke braucht.
 
 ### _fall
 
@@ -105,7 +105,7 @@ Ein Lastfall oder eine Kombination: Träger, Lager, Platte, Biegewiderstände, L
 def _traeger(p: Protokoll, e: Ergebnis, f: Fallergebnis) -> None
 ```
 
-Jeder Träger, je Meter seiner Breite -- gleiche Feldstreifen nebeneinander in einer Zeile.
+Jeder Träger, je Meter seiner Breite – gleiche Feldstreifen nebeneinander in einer Zeile.
 
 ### _reihe
 
@@ -114,7 +114,7 @@ def _reihe(z: Zerlegung) -> List[Tuple[Streifen, int, Traeger]]
 ```
 
 Die Träger in der Reihe der Zerlegung, je mit der Nummer ihres Stücks
-im Streifen -- nur je Richtung der Feldstreifen erst alle ersten Stücke,
+im Streifen – nur je Richtung der Feldstreifen erst alle ersten Stücke,
 dann alle zweiten: so steht x1.2 neben x2.2 statt hinter x1.1.
 
 ### _mit_stelle
@@ -123,7 +123,7 @@ dann alle zweiten: so steht x1.2 neben x2.2 statt hinter x1.1.
 def _mit_stelle(m: float, s: float) -> Tuple[str, str]
 ```
 
-Ein Moment in kNm/m und wo es liegt -- ausser es steht als null da.
+Ein Moment in kNm/m und wo es liegt – ausser es steht als null da.
 
 ### _zahl
 
@@ -163,7 +163,7 @@ Die grössten erforderlichen Biegewiderstände, mit Ort.
 def _ort_von(ort: geo.Punkt, wert: float) -> str
 ```
 
-Wo ein Wert liegt -- ausser er steht als null da: das ist er an vielen Orten.
+Wo ein Wert liegt – ausser er steht als null da: das ist er an vielen Orten.
 
 ### _lastverteilelemente
 
@@ -177,14 +177,14 @@ Je Stütze und Einzellast, was ihr Bereich zusätzlich braucht.
 ## Konstanten
 
 - `ANNAHME = 'Streifenmethode (Stahlbeton II, 7.2 Platten, Folien 27 bis 39): jede…` – Was die Streifenmethode annimmt.
-- `AUTOMATISCH = f'Automatisch, nach Folie 31 verallgemeinert: je Zelle zweier Feldstr…` – Die automatische Aufteilung in Worten -- die Regel steht in [[opencivil.decke.aufteilung|aufteilung]].
-- `VON_SELBST = 'Die Richtungen {platten} wählt die Rechnung selbst, entlang der Ränd…` – Wie eine Platte ihre Richtungen selbst wählt -- die Regel steht in [[opencivil.decke.richtungen|richtungen]].
-- `BAENDER = 'Die Bänder legt die Rechnung selbst, weil sie automatisch aufteilt: …` – Wo die Rechnung Bänder legt -- die Regel steht in [[opencivil.decke.baender|baender]].
+- `AUTOMATISCH = f'Automatisch, nach Folie 31 verallgemeinert: je Zelle zweier Feldstr…` – Die automatische Aufteilung in Worten – die Regel steht in [[opencivil.decke.aufteilung|aufteilung]].
+- `VON_SELBST = 'Die Richtungen {platten} wählt die Rechnung selbst, entlang der Ränd…` – Wie eine Platte ihre Richtungen selbst wählt – die Regel steht in [[opencivil.decke.richtungen|richtungen]].
+- `BAENDER = 'Die Bänder legt die Rechnung selbst, weil sie automatisch aufteilt: …` – Wo die Rechnung Bänder legt – die Regel steht in [[opencivil.decke.baender|baender]].
 - `MITTE = '\\alpha_{\\mathrm{kurz}} = \\min\\left(1;\\ \\frac{1}{2} + \\frac{1}…` – Der Anteil in die kürzere Spannweite fern der Lager ([[opencivil.decke.aufteilung#in_der_mitte|in_der_mitte]]).
-- `STREIFEN_IN_XY = '\\begin{aligned} & m = \\frac{M}{b} \\qquad m_x = m \\cdot \\cos^2\\…` – Vom Streifen zur Platte -- die Transformation der Folie 14, rückwärts gelesen ([[opencivil.decke.feld|feld]]).
+- `STREIFEN_IN_XY = '\\begin{aligned} & m = \\frac{M}{b} \\qquad m_x = m \\cdot \\cos^2\\…` – Vom Streifen zur Platte – die Transformation der Folie 14, rückwärts gelesen ([[opencivil.decke.feld|feld]]).
 - `FLAECHENLAGER = 'p_{\\mathrm{Lager}} = \\frac{R}{l}'` – Ein Flächenlager drückt gleichmässig über seine Breite (Folie 33).
 - `FLIESSBEDINGUNG = "\\begin{aligned} & m_{xu} \\ge m_x + |m_{xy}| \\qquad m_{yu} \\ge m_…` – Die linearisierte Fliessbedingung, `k = k' = 1` ([[opencivil.decke.feld#widerstaende|widerstaende]]).
-- `SCHIEF = '{platten} schief zu x und y: ihre Streifen geben Drillmomente m_xy, …` – Trägt eine Platte schief zu x und y -- nach den Platten, die es tun.
+- `SCHIEF = '{platten} schief zu x und y: ihre Streifen geben Drillmomente m_xy, …` – Trägt eine Platte schief zu x und y – nach den Platten, die es tun.
 - `LASTVERTEILELEMENT = "\\begin{aligned} & m'_{xu} \\ge \\frac{Q}{8} \\cdot \\frac{l_x}{l_y}…` – Was ein Lastverteilelement zusätzlich braucht ([[opencivil.decke.feld#Lastverteilelement|Lastverteilelement]]).
 - `SCHNITTKRAEFTE = (('m_x', 'm_x', 'kNm/m'), ('m_y', 'm_y', 'kNm/m'), ('m_xy', 'm_{xy}',…` – Die Schnittkräfte der Platte im Bericht: je Grösse ihr Zeichen und ihre Einheit.
 - `WIDERSTAENDE = (('mxu', 'm_{xu}', 'unten, in x'), ('myu', 'm_{yu}', 'unten, in y'), …` – Die Biegewiderstände: Feld von [[opencivil.decke.feld#Widerstaende|Widerstaende]], Zeichen, Bedeutung.

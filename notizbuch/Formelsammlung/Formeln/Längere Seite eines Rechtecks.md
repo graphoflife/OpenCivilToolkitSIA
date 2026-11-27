@@ -46,5 +46,5 @@ $$
 Das Gegenstück zur [[Kürzere Seite eines Rechtecks|kürzeren Seite]]: $s$ ist
 die längere Seite eines Rechtecks, für die Näherung des
 [[Torsionsträgheitsmoment eines Rechtecks|Torsionsträgheitsmoments]]. Sie geht
-nur einfach ein -- ein doppelt so langes Brett ist doppelt so steif gegen
+nur einfach ein – ein doppelt so langes Brett ist doppelt so steif gegen
 Verdrillen, ein doppelt so dickes achtmal.

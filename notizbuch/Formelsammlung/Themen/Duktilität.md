@@ -33,7 +33,7 @@ d wird von der gedrückten Randfaser aus gemessen: bei den unteren Lagen von der
 Ein Querschnitt soll sein Versagen ankündigen: erst fliesst der Stahl, die
 Platte verformt sich sichtbar, dann erst bricht der Beton. Dafür muss die
 Druckzone klein bleiben. Bei grosser Druckzone erreicht der Beton seine
-Bruchstauchung, bevor der Stahl weit genug gedehnt ist -- der Querschnitt
+Bruchstauchung, bevor der Stahl weit genug gedehnt ist – der Querschnitt
 versagt spröde, ohne Vorwarnung.
 
 Gemessen wird das an der [[Bezogene Druckzonenhöhe|bezogenen Druckzonenhöhe]]

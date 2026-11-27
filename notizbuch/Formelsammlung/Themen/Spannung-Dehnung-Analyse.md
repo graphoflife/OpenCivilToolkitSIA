@@ -93,5 +93,5 @@ Die Linie hat drei Abschnitte:
    (siehe [[Grenzdehnungen am Ende der Linie]]).
 
 Dazu zeigt der äquivalente E-Modul, wie steif der Querschnitt in jedem
-Zustand ist -- gemessen an einem reinen Betonquerschnitt (siehe
+Zustand ist – gemessen an einem reinen Betonquerschnitt (siehe
 [[Äquivalenter E-Modul über dem Moment]]).

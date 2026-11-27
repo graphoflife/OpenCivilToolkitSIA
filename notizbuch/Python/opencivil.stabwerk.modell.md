@@ -1,5 +1,5 @@
 ---
-erzeugt: 1e74cc9af912
+erzeugt: 8ecacbd4a22c
 art: modul
 tags: [modul]
 ---
@@ -30,14 +30,14 @@ Eine Kraftlast traegt ihre Richtung und ist positiv in Pfeilrichtung
 ([[opencivil.stabwerk.modell#Lastrichtung|Lastrichtung]]): «senkrecht» nach unten, wie die Schwerkraft,
 «waagrecht» nach rechts, «quer» zur gestrichelten Faser des Stabs, «laengs»
 vom Anfang zum Ende. Momentlasten drehen im Gegenuhrzeigersinn. Senkrechte und
-waagrechte Lasten gelten je Meter Stab -- oder, mit `projiziert`, je Meter
+waagrechte Lasten gelten je Meter Stab – oder, mit `projiziert`, je Meter
 der Projektion, wie Schnee auf einem geneigten Dach.
 
 
 ## HALT
 
 Ein Lager haelt je Richtung fest ([[opencivil.stabwerk.modell#Konstanten|FEST]]), federnd ([[opencivil.stabwerk.modell#feder|feder]])
-oder gar nicht ([[opencivil.stabwerk.modell#Konstanten|FREI]]) -- dieselbe Wahl fuer die Linienlager eines
+oder gar nicht ([[opencivil.stabwerk.modell#Konstanten|FREI]]) – dieselbe Wahl fuer die Linienlager eines
 Stabs, quer und laengs ([[opencivil.stabwerk.modell#Halt|Halt]]). Eine Feder in N/m bzw. Nm/rad, eine
 Bettung in N/m je m Stab. Bis 2026-10-25 war «fest» eine unendliche
 Federzahl und «frei» `None`, und das System uebersetzte beides an 17
@@ -52,10 +52,10 @@ Stellen zurueck.
 class Halt
 ```
 
-Wie eine Richtung gehalten ist: frei, fest oder mit einer Feder -- siehe Dateikopf.
+Wie eine Richtung gehalten ist: frei, fest oder mit einer Feder – siehe Dateikopf.
 
 - `fest: bool = False` – Ob sie sich nicht verschiebt.
-- `feder: float = 0.0` – Die Steifigkeit der Feder, die sie haelt -- frei und fest null.
+- `feder: float = 0.0` – Die Steifigkeit der Feder, die sie haelt – frei und fest null.
 
 #### Halt.frei
 
@@ -99,7 +99,7 @@ def beschriftung(self) -> str
 def stabachse(self) -> Optional[str]
 ```
 
-In welcher Achse des Stabs sie liegt: `x` laengs, `z` quer -- zur
+In welcher Achse des Stabs sie liegt: `x` laengs, `z` quer – zur
 gestrichelten Faser. Keine, wenn sie im System liegt.
 
 #### Lastrichtung.im_system
@@ -109,7 +109,7 @@ gestrichelten Faser. Keine, wenn sie im System liegt.
 def im_system(self) -> bool
 ```
 
-Ob sie in den Achsen des Systems liegt -- und nicht in denen des Stabs.
+Ob sie in den Achsen des Systems liegt – und nicht in denen des Stabs.
 
 #### Lastrichtung.systemvektor
 
@@ -128,7 +128,7 @@ class Lastart(Wahl)
 
 Was fuer eine Last auf einem Stab liegt.
 
-- `LINIENLAST = 'linienlast'` – Kraft je Laenge, von `wert_a` nach `wert_b` linear -- gleichmaessig oder als Dreieck.
+- `LINIENLAST = 'linienlast'` – Kraft je Laenge, von `wert_a` nach `wert_b` linear – gleichmaessig oder als Dreieck.
 - `EINZELLAST = 'einzellast'`
 - `MOMENT = 'moment'` – Ein Einzelmoment, im Gegenuhrzeigersinn.
 - `LINIENMOMENT = 'linienmoment'` – Moment je Laenge, linear.
@@ -172,7 +172,7 @@ class Knoten
 class Lager
 ```
 
-Ein Lager an einem Knoten -- je Richtung frei, fest oder Feder.
+Ein Lager an einem Knoten – je Richtung frei, fest oder Feder.
 
 - `name: str`
 - `knoten: str`
@@ -187,7 +187,7 @@ Ein Lager an einem Knoten -- je Richtung frei, fest oder Feder.
 class Stab
 ```
 
-Eine Linie des Systems -- ein Stab, der traegt, oder nur ein Linienlager.
+Eine Linie des Systems – ein Stab, der traegt, oder nur ein Linienlager.
 
 `quer` und `laengs` sind die Linienlager: frei, fest oder eine
 Bettung in N/m². Die Gelenke gelten fuer das Moment am Ende.
@@ -217,7 +217,7 @@ Werte in N/m, N, Nm oder Nm/m, positiv in ihrer Richtung.
 - `stab: str`
 - `art: Lastart`
 - `wert_a: float`
-- `wert_b: Optional[float] = None` – Am Ende des belasteten Bereichs -- `None`: wie am Anfang.
+- `wert_b: Optional[float] = None` – Am Ende des belasteten Bereichs – `None`: wie am Anfang.
 - `richtung: Lastrichtung = Lastrichtung.SENKRECHT`
 - `von: float = 0.0`
 - `bis: Optional[float] = None`
@@ -291,7 +291,7 @@ def kombiniert(lastfaelle: Sequence[Lastfall], kombination: Kombination) -> Last
 ```
 
 Eine Kombination als Lastfall: jede Last ihres Lastfalls mal dessen
-Beiwert. So laeuft sie durch dieselbe Rechnung wie ein Lastfall -- und
+Beiwert. So laeuft sie durch dieselbe Rechnung wie ein Lastfall – und
 weil alles linear ist, ist das Ergebnis die Summe der mit ihren Beiwerten
 gewichteten Lastfaelle. Eben wie raeumlich: eine Last kann `mal`.
 
@@ -299,7 +299,7 @@ gewichteten Lastfaelle. Eben wie raeumlich: eine Last kann `mal`.
 ## Konstanten
 
 - `FREI = Halt()` – Nicht gehalten.
-- `FEST = Halt(fest=True)` – Fest gehalten -- eine Richtung ohne Verschiebung.
+- `FEST = Halt(fest=True)` – Fest gehalten – eine Richtung ohne Verschiebung.
 
 ## Braucht
 

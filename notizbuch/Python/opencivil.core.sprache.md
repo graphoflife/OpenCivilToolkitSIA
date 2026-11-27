@@ -1,5 +1,5 @@
 ---
-erzeugt: 9135698f9f2e
+erzeugt: 6aea9ba560b2
 art: modul
 tags: [modul]
 ---
@@ -21,7 +21,7 @@ Stellen, zweimal als eigene Hilfe.
 def aufgezaehlt(teile: Sequence[str], wort: str='und') -> str
 ```
 
-«A», «A und B», «A, B und C» -- mit `wort` «oder»: «A, B oder C».
+«A», «A und B», «A, B und C» – mit `wort` «oder»: «A, B oder C».
 
 
 ## Gebraucht von

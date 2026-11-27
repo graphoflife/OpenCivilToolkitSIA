@@ -58,4 +58,4 @@ $f_{yd}$ kann sie nicht werden (4.3.6.5.4, Gleichung (69)).
 
 $f_{yd}$ und $E_s$ sind die des Stahls der Anker, B500B, nicht die der
 Biegebewehrung (4.3.6.5.4). Bis 2026-11-14 rechneten die Anker mit dem Stahl
-der Platte -- mit B700B um 40 % zu günstig.
+der Platte – mit B700B um 40 % zu günstig.

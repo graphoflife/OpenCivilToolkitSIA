@@ -1,5 +1,5 @@
 ---
-erzeugt: cab2942eacd2
+erzeugt: cdf46a6b6430
 art: modul
 tags: [modul]
 ---
@@ -15,7 +15,7 @@ Zahlen und Einheiten" wird daraus automatisch erzeugt, indem die Platzhalter
 durch die tatsaechlichen Werte ersetzt werden.
 
 Damit verschwindet die schlimmste Doppelspurigkeit des alten Codes, in dem
-jede Formel zweimal getippt wurde -- einmal symbolisch, einmal numerisch --
+jede Formel zweimal getippt wurde – einmal symbolisch, einmal numerisch –
 und beide Fassungen unbemerkt auseinanderlaufen konnten.
 
 
@@ -59,7 +59,7 @@ def text_latex(text: str) -> str
 
 Maskiert Sonderzeichen fuer den Fliesstext.
 
-Umlaute bleiben unangetastet -- die Praeambel des Berichts stellt UTF-8
+Umlaute bleiben unangetastet – die Praeambel des Berichts stellt UTF-8
 ein, damit 'Ueberdeckung' auch als 'Überdeckung' gesetzt werden kann.
 
 ### als_text
@@ -104,7 +104,7 @@ Ersetzt alle Platzhalter mittels `(name, hoch, nach_rechenzeichen) -> str`.
 
 `hoch` sagt, ob hinter dem Platzhalter ein Exponent steht: `@h^{2}`
 braucht mit Zahl und Einheit eine Klammer, `(300 mm)^2` und nicht
-`300 mm^2`. `nach_rechenzeichen`, ob davor ein Rechenzeichen steht --
+`300 mm^2`. `nach_rechenzeichen`, ob davor ein Rechenzeichen steht –
 dann braucht eine negative Zahl eine.
 
 ### platzhalter_symbol
@@ -133,7 +133,7 @@ def _blank(wert: Wert, einheit: Einheit) -> str
 Die Zahl eines Werts in einer anderen Einheit, ohne diese dazuzuschreiben.
 
 Die Stellen wandern mit: 248.1 mm auf eine Stelle sind in Metern 0.2481,
-nicht 0.2 -- sonst ginge in der Herleitung Genauigkeit verloren, die die
+nicht 0.2 – sonst ginge in der Herleitung Genauigkeit verloren, die die
 Rechnung hatte.
 
 ### platzhalter_zahl
@@ -162,7 +162,7 @@ Ersetzt die Platzhalter durch Zahlenwerte samt Einheit
 `empirisch` nennt die Eingaben einer dimensionell inhomogenen
 Normformel mit der Einheit, in der die Norm sie verlangt. Sie stehen als
 blanke Zahl in dieser Einheit da: `\sqrt{30}` und nicht
-`\sqrt{30\,\mathrm{N}/\mathrm{mm}^{2}}` -- die Wurzel einer
+`\sqrt{30\,\mathrm{N}/\mathrm{mm}^{2}}` – die Wurzel einer
 Spannung gibt es nicht, und so zu tun waere falsch.
 
 ### einheitenhinweis
@@ -173,7 +173,7 @@ def einheitenhinweis(paare: Iterable[Tuple[str, Einheit]]) -> str
 
 In welchen Einheiten die blanken Zahlen einer empirischen Formel stehen,
 je `(Symbol, Einheit)`: `\quad \left(d\ \text{in}\ \mathrm{mm}\right)`
--- am Ende ihrer Zeile, sonst liessen sie sich nicht lesen. Leer ohne.
+– am Ende ihrer Zeile, sonst liessen sie sich nicht lesen. Leer ohne.
 
 ### _gruppe
 
@@ -189,7 +189,7 @@ Das Argument ab `i`: eine `{...}`-Gruppe oder ein einzelnes Zeichen.
 def sichtbare_breite(latex: str) -> float
 ```
 
-Ungefaehr, wie breit eine Formel gesetzt wird -- in Zeichen.
+Ungefaehr, wie breit eine Formel gesetzt wird – in Zeichen.
 
 Gezaehlt wird, was man sieht: ein Bruch so breit wie sein breiterer Teil,
 Hoch- und Tiefgestelltes kleiner, `\alpha` oder `\cdot` als ein
@@ -204,7 +204,7 @@ def bruchtiefe(latex: str) -> int
 ```
 
 Wie tief Brueche ineinander stehen: 0 ohne Bruch, 1 fuer `\frac{a}{b}`,
-2, wenn in Zaehler oder Nenner wieder einer steht -- der wird dort klein
+2, wenn in Zaehler oder Nenner wieder einer steht – der wird dort klein
 gesetzt.
 
 ### Formelzeile
@@ -218,7 +218,7 @@ Die vier Bestandteile einer ausgeschriebenen Formel.
 
 Wird strukturiert gehalten statt als fertiger String, damit der Bericht
 selbst entscheiden kann, ob er ein- oder mehrzeilig setzt. Das alte
-Vorgehen -- den fertigen String an `" = "` wieder auseinanderzuschneiden --
+Vorgehen – den fertigen String an `" = "` wieder auseinanderzuschneiden –
 ging kaputt, sobald in einer Formel ein Gleichheitszeichen vorkam.
 
 - `symbol: str` – Linke Seite, z.B. `f_{cd}`.
@@ -226,11 +226,11 @@ ging kaputt, sobald in einer Formel ein Gleichheitszeichen vorkam.
 - `numerisch: Optional[str]` – Dieselbe Formel mit eingesetzten Zahlen und Einheiten.
 - `ergebnis: str` – Resultat mit Einheit, z.B. `18.7\,\mathrm{MPa}`.
 - `nachsatz: str = ''` – Was hinter dem Resultat steht: ein Vergleich mit Urteil, ein Hinweis.
-- `vorlage: Optional[str] = None` – Die Vorlage mit `@name` -- dieselbe Formel, gleich welche Zahlen.
+- `vorlage: Optional[str] = None` – Die Vorlage mit `@name` – dieselbe Formel, gleich welche Zahlen.
 - `einheiten: str = ''` – Bei empirischen Formeln: in welchen Einheiten die Zahlen eingehen.
-- `eingaben: Tuple[Tuple[str, Wert], ...] = field(default=(), compare=False, repr=False)` – Was die Vorlage einsetzt, je `(Platzhalter, Wert)` -- nur ihre Platzhalter, nicht jede Eingabe der Berechnung. Fuer das Notizbuch: welche Groessen eine Formel braucht, und welche Formel sie liefert.
+- `eingaben: Tuple[Tuple[str, Wert], ...] = field(default=(), compare=False, repr=False)` – Was die Vorlage einsetzt, je `(Platzhalter, Wert)` – nur ihre Platzhalter, nicht jede Eingabe der Berechnung. Fuer das Notizbuch: welche Groessen eine Formel braucht, und welche Formel sie liefert.
 - `empirisch: Tuple[Tuple[str, Einheit], ...] = field(default=(), compare=False, repr=False)` – Die Platzhalter einer empirischen Formel mit der Einheit, in der sie als blanke Zahl eingehen ([[opencivil.core.latex#einsetzen_numerisch|einsetzen_numerisch]]).
-- `resultat: Optional[Wert] = field(default=None, compare=False, repr=False)` – Der Wert, den die Zeile ausrechnet -- daran rechnet die Kurzform eines Nachweises ihre Formel nach ([[opencivil.core.kurzform]]). Fehlt nur einer Zeile, die nicht mit [[opencivil.core.latex#Formelzeile.bauen|bauen]] entsteht.
+- `resultat: Optional[Wert] = field(default=None, compare=False, repr=False)` – Der Wert, den die Zeile ausrechnet – daran rechnet die Kurzform eines Nachweises ihre Formel nach ([[opencivil.core.kurzform]]). Fehlt nur einer Zeile, die nicht mit [[opencivil.core.latex#Formelzeile.bauen|bauen]] entsteht.
 
 #### Formelzeile.bauen
 
@@ -241,7 +241,7 @@ def bauen(cls, ergebnis: Wert, vorlage: Optional[str]=None, eingaben: Optional[M
 
 Baut die Zeile aus Resultat, analytischer Vorlage und Eingaben.
 
-Ohne Vorlage entsteht die schlichte Form `symbol = wert` -- passend
+Ohne Vorlage entsteht die schlichte Form `symbol = wert` – passend
 fuer Eingaben und Vorgabewerte. Zu `empirisch` siehe
 [[opencivil.core.latex#einsetzen_numerisch|einsetzen_numerisch]]; welche Einheiten dort vorausgesetzt sind,
 steht am Ende der Zeile, sonst liessen sich die blanken Zahlen nicht
@@ -298,7 +298,7 @@ mitzaehlten.
 def fest(zahl: float, stellen: int) -> str
 ```
 
-Eine Zahl mit fester Stellenzahl, fuer Tabellenspalten -- ohne «-0.0».
+Eine Zahl mit fester Stellenzahl, fuer Tabellenspalten – ohne «-0.0».
 
 Was auf null rundet, hat kein Vorzeichen; ein Minus vor einer Null sieht
 nach etwas aus, das es nicht gibt.
@@ -309,7 +309,7 @@ nach etwas aus, das es nicht gibt.
 def urteil(erfuellt: bool) -> str
 ```
 
-Das Urteil hinter einem Nachweis -- ein Wortlaut fuer alle.
+Das Urteil hinter einem Nachweis – ein Wortlaut fuer alle.
 
 ### angabe
 
@@ -317,7 +317,7 @@ Das Urteil hinter einem Nachweis -- ein Wortlaut fuer alle.
 def angabe(wert: Wert) -> str
 ```
 
-`Symbol = Zahl Einheit` -- ein Wert, wie er in einem Vergleich steht.
+`Symbol = Zahl Einheit` – ein Wert, wie er in einem Vergleich steht.
 
 ### vergleichszeichen
 
@@ -333,7 +333,7 @@ Das Zeichen eines Vergleichs: `soll`, wenn er aufgeht, sonst sein Gegenteil.
 def folgerung(erfuellt: bool) -> str
 ```
 
-`⇒ erfüllt` am Ende einer Zeile -- ein Wortlaut fuer alle.
+`⇒ erfüllt` am Ende einer Zeile – ein Wortlaut fuer alle.
 
 ### vergleich
 
@@ -348,7 +348,7 @@ Der Nachsatz einer Formel, deren Resultat gegen etwas gehalten wird:
 ```
 
 `soll` ist das Zeichen, das gelten muss; geht der Vergleich nicht auf,
-steht sein Gegenteil da -- im Beispiel `<`. Das Urteil steht nicht hier,
+steht sein Gegenteil da – im Beispiel `<`. Das Urteil steht nicht hier,
 sondern hinter dem Erfüllungsgrad ([[opencivil.core.nachweis#Vergleich.zeile|.nachweis.Vergleich.zeile]]).
 
 ### bedingung
@@ -372,7 +372,7 @@ Das Urteil steht hinter dem Erfüllungsgrad, wie bei [[opencivil.core.latex#verg
 class Mathe
 ```
 
-Eine Tabellenzelle, die Mathematik ist -- Symbol, Einheit, Formel.
+Eine Tabellenzelle, die Mathematik ist – Symbol, Einheit, Formel.
 
 Nicht `Formel`: so heisst schon die deklarative Berechnung in
 [[opencivil.core.berechnung]], und die beiden sind verschiedene Dinge.
@@ -384,7 +384,7 @@ Jede andere Zelle ist Text: ein `str`. Vorher war jede Zelle LaTeX,
 und reiner Text stand als `\text{...}` darin. Die Konsole druckte das
 so ab, der Word-Knopf lieferte eine Formelmatrix statt einer Tabelle, und
 die Oberflaeche las den Text per regulaerem Ausdruck wieder heraus.
-Welche Art eine Zelle hat, weiss nur, wer sie schreibt -- also sagt sie
+Welche Art eine Zelle hat, weiss nur, wer sie schreibt – also sagt sie
 es.
 
 - `latex: str`
@@ -407,7 +407,7 @@ Eine Tabelle fuer ein LaTeX-Dokument.
 
 `ausrichtung` je Spalte `l`, `c` oder `r` wie in LaTeX, dazu
 `L`: links, und die Spalte darf umbrechen. Das braucht eine Textspalte,
-die sonst die Tabelle ueber den Rand schoebe -- welche das ist, weiss nur,
+die sonst die Tabelle ueber den Rand schoebe – welche das ist, weiss nur,
 wer die Tabelle schreibt.
 
 Ohne `lang` ein `tabular` mit `\hline`, fuer die Kopierknoepfe:
@@ -438,11 +438,11 @@ Leser sieht alle Zweige und erkennt, welcher gegriffen hat.
 
 ## Konstanten
 
-- `PLATZHALTER = re.compile('@\\{([A-Za-z_][A-Za-z0-9_]*)\\}|@([A-Za-z_][A-Za-z0-9_]*)…` – `@name` oder `@{name}` -- auch der Formelbaum liest damit.
+- `PLATZHALTER = re.compile('@\\{([A-Za-z_][A-Za-z0-9_]*)\\}|@([A-Za-z_][A-Za-z0-9_]*)…` – `@name` oder `@{name}` – auch der Formelbaum liest damit.
 - `_SONDERZEICHEN = {'\\': '\\textbackslash{}', '&': '\\&', '%': '\\%', '$': '\\$', '#': …`
 - `_NAME_IM_INDEX = re.compile(',\\\\text\\{[^{}]*\\}')` – Ein Name im Index: `\alpha_{eff,x,\text{Feld}}`, `f_{cd,\text{C30/37}}`.
-- `_RECHENZEICHEN = ('+', '-', '\\cdot', '\\times', '/', '\\sin', '\\cos', '\\tan', '\\co…` – Nach diesen Zeichen braucht eine negative Zahl eine Klammer: `a - (-5)`, `a \\cdot (-5)` -- und nach einer Winkelfunktion, `\\sin(-5°)`. Am Anfang eines Ausdrucks nicht: `-300 - (-1484.6)`.
-- `ZEILENBREITE = 60.0` – Wie breit eine Formel gesetzt hoechstens sein darf, damit sie auf einer Zeile steht -- in Zeichen, wie [[opencivil.core.latex#sichtbare_breite|sichtbare_breite]] sie zaehlt. Etwa das, was auf einer A4-Seite und in der rechten Tafel noch Platz hat.
+- `_RECHENZEICHEN = ('+', '-', '\\cdot', '\\times', '/', '\\sin', '\\cos', '\\tan', '\\co…` – Nach diesen Zeichen braucht eine negative Zahl eine Klammer: `a - (-5)`, `a \\cdot (-5)` – und nach einer Winkelfunktion, `\\sin(-5°)`. Am Anfang eines Ausdrucks nicht: `-300 - (-1484.6)`.
+- `ZEILENBREITE = 60.0` – Wie breit eine Formel gesetzt hoechstens sein darf, damit sie auf einer Zeile steht – in Zeichen, wie [[opencivil.core.latex#sichtbare_breite|sichtbare_breite]] sie zaehlt. Etwa das, was auf einer A4-Seite und in der rechten Tafel noch Platz hat.
 - `_OHNE_BREITE = {'left', 'right', 'mathrm', 'text', 'operatorname', 'mathbf', 'mathit…` – Befehle ohne eigene Breite: Formatierung, oder ihr Argument steht fuer sie.
 - `_WOERTER = {'min', 'max', 'sin', 'cos', 'tan', 'cot', 'log', 'ln', 'exp', 'lim',…` – Operatoren, die mit ihren Buchstaben dastehen.
 - `_RAEUME = {',': 0.2, ':': 0.25, ';': 0.3, '!': 0.0, ' ': 0.3, 'quad': 1.0, 'qqu…` – Zwischenraeume, in Zeichen.
@@ -451,7 +451,7 @@ Leser sieht alle Zweige und erkennt, welcher gegriffen hat.
 - `_BEFEHL = re.compile('\\\\([A-Za-z]+|.)')`
 - `_GEGENTEIL = {'\\le': '>', '\\ge': '<', '<': '\\ge', '>': '\\le'}` – Was statt des Sollzeichens dasteht, wenn der Vergleich nicht aufgeht.
 - `Zelle = Union[str, Mathe]` – Eine Tabellenzelle: Text oder [[opencivil.core.latex#Mathe|Mathe]].
-- `UMBRUCHSPALTE = '>{\\raggedright\\arraybackslash}X'` – Eine Spalte, die links steht und umbrechen darf -- `L` in der Ausrichtung.
+- `UMBRUCHSPALTE = '>{\\raggedright\\arraybackslash}X'` – Eine Spalte, die links steht und umbrechen darf – `L` in der Ausrichtung.
 
 ## Braucht
 

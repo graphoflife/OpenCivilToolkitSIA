@@ -41,6 +41,6 @@ $$
 ## Theorie
 
 Die Mantelfläche je Meter Pfahl: an ihr greift die Mantelreibung an.
-Massgebend ist der Durchmesser, an dem der Boden reibt -- beim Bohrpfahl der
+Massgebend ist der Durchmesser, an dem der Boden reibt – beim Bohrpfahl der
 des Bohrlochs, beim Mikropfahl der des Verpresskörpers, nicht der des
 Tragglieds darin. Bei D = 900 mm sind es 2.83 m² Mantel je Meter Länge.

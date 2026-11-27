@@ -1,5 +1,5 @@
 ---
-erzeugt: b0322b85c255
+erzeugt: 4baf439211e5
 art: modul
 tags: [modul]
 ---
@@ -11,14 +11,14 @@ tags: [modul]
 
 Die Geometrie des raeumlichen Stabwerks: Vektoren als Tupel `(x, y, z)`,
 Skalar- und Kreuzprodukt, orthonormale Basen aus Richtungen, Punkte auf
-Strecken -- und eine Kraft mit ihrem Moment um den Ursprung. Nur die
+Strecken – und eine Kraft mit ihrem Moment um den Ursprung. Nur die
 Standardbibliothek.
 
 
 ## GENAUIGKEIT
 
 Ein Punkt liegt auf einer Strecke, wenn er weniger als [[opencivil.stabwerk3d.raum#Konstanten|TOLERANZ]]
-daneben liegt -- so genau rundet das Zeichenfenster. Eine Richtung zaehlt in
+daneben liegt – so genau rundet das Zeichenfenster. Eine Richtung zaehlt in
 einer Basis, wenn von ihr nach Abzug der anderen mehr als 1e-9 bleibt.
 
 ## Inhalt
@@ -65,7 +65,7 @@ def betrag(a: Sequence[float]) -> float
 def punkt(p) -> Vektor
 ```
 
-Der Ort eines Knotens -- oder von allem, was `x`, `y` und `z` hat.
+Der Ort eines Knotens – oder von allem, was `x`, `y` und `z` hat.
 
 ### im_system
 
@@ -81,7 +81,7 @@ Ein Vektor in den Achsen eines Stabs, in denen des Systems: `Rᵀ · v`.
 def addiere(summe: List[float], ort: Sequence[float], kraft: Sequence[float], moment: Sequence[float]=NULL) -> None
 ```
 
-Eine Kraft an `ort` und ein Moment zur Summe `(F, M)` -- das Moment um den Ursprung.
+Eine Kraft an `ort` und ein Moment zur Summe `(F, M)` – das Moment um den Ursprung.
 
 ### orthonormal
 
@@ -98,7 +98,7 @@ def in_achsen(raum: Sequence[Vektor], achsen: Sequence[Vektor]=ACHSEN) -> List[V
 ```
 
 Eine orthonormale Basis des Raums, den die orthonormalen `raum`
-aufspannen -- aus den `achsen`, zuerst die, die am meisten darin
+aufspannen – aus den `achsen`, zuerst die, die am meisten darin
 liegt. Eine Rolle auf waagrechter Bahn ist so frei in x, nicht in -x und
 nicht schief.
 
@@ -108,7 +108,7 @@ nicht schief.
 def stelle_auf(a, b, p) -> Optional[float]
 ```
 
-Wo `p` auf der Strecke a-b liegt, in m ab a -- `None`, wenn daneben oder an einem Ende.
+Wo `p` auf der Strecke a-b liegt, in m ab a – `None`, wenn daneben oder an einem Ende.
 
 ### kreuzen
 
@@ -121,7 +121,7 @@ Ob sich die Strecken p1-p2 und q1-q2 im Innern beider treffen.
 
 ## Konstanten
 
-- `TOLERANZ = 1e-06` – Wie nahe ein Knoten an einem Stab liegen muss, um mit ihm verbunden zu sein -- in m. Das Zeichenfenster rundet auf ein Millionstel.
+- `TOLERANZ = 1e-06` – Wie nahe ein Knoten an einem Stab liegen muss, um mit ihm verbunden zu sein – in m. Das Zeichenfenster rundet auf ein Millionstel.
 - `ACHSEN = ((1.0, 0.0, 0.0), (0.0, 1.0, 0.0), (0.0, 0.0, 1.0))` – Die Achsen des Systems.
 - `NULL = (0.0, 0.0, 0.0)`
 

@@ -28,7 +28,7 @@ $$
 Wie stark der Boden am Mantel gegen eine Setzung hält, je Meter Pfahl: die
 Schubspannung je Setzung B mal dem Umfang. Für Bohrpfähle gibt Cassan
 B ≈ 0.42 · E_s (Kap. 12.8, Bild 12.9), für Rammpfähle rund dreimal mehr.
-Den Mikropfahl rechnet das Werkzeug mit dem Wert der Bohrpfähle -- nach
+Den Mikropfahl rechnet das Werkzeug mit dem Wert der Bohrpfähle – nach
 Vorgabe, nicht nachgeschlagen.
 
 Die Feder ist linear und kennt keine Grenze: sie gilt, solange die Last

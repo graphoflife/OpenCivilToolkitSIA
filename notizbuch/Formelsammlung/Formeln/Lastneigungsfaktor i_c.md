@@ -62,7 +62,7 @@ $$
 ## Theorie
 
 Für die Kohäsion folgt der Faktor aus [[Lastneigungsfaktor i_q|i_q]], wieder
-über den Satz von Caquot -- eine übliche Herleitung, die nicht im Buch
+über den Satz von Caquot – eine übliche Herleitung, die nicht im Buch
 steht; es gibt die Formel allein (Kap. 9.2.14). Bei sehr schräger Last kann er leicht negativ
 werden; gerechnet wird mit dem Wert, wie ihn die Formel ergibt.
 

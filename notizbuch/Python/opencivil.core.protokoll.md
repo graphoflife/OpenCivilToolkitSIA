@@ -1,5 +1,5 @@
 ---
-erzeugt: 489f183613d1
+erzeugt: 5ea2f531d737
 art: modul
 tags: [modul]
 ---
@@ -11,15 +11,15 @@ tags: [modul]
 
 Eine Berechnung schreibt waehrend des Rechnens in ein Protokoll. Rechenschritt
 und seine Darstellung entstehen dadurch am selben Ort und koennen nicht
-auseinanderlaufen -- man kann nicht das eine rechnen und das andere aufschreiben.
+auseinanderlaufen – man kann nicht das eine rechnen und das andere aufschreiben.
 
 Genau das braucht eine Prozedur: eine Iteration soll nicht nur ihr Resultat
-liefern, sondern auch ihren Ablauf zeigen -- Startwerte, Zwischenschritte in
+liefern, sondern auch ihren Ablauf zeigen – Startwerte, Zwischenschritte in
 einer Tabelle, Abbruchkriterium. Ein Leser muss die Rechnung von Hand
 nachvollziehen koennen.
 
 Das Protokoll ist reine Datenstruktur. Ob daraus Konsolentext, ein LaTeX-
-Dokument oder HTML wird, entscheidet erst der Bericht -- jede Darstellung mit
+Dokument oder HTML wird, entscheidet erst der Bericht – jede Darstellung mit
 einer Tafel, die fuer jede Blockart sagt, wie sie gesetzt wird (siehe
 [[opencivil.core.protokoll#darstellen|darstellen]]).
 
@@ -28,7 +28,7 @@ einer Tafel, die fuer jede Blockart sagt, wie sie gesetzt wird (siehe
 
 In heissen Schleifen (z.B. beim punktweisen Aufbau einer M-N-Interaktionslinie
 mit hunderten Dehnungsebenen) will man nichts mitschreiben. Dafuer gibt es
-[[opencivil.core.protokoll#StillesProtokoll|StillesProtokoll]] -- dieselbe Schnittstelle, verwirft aber alles.
+[[opencivil.core.protokoll#StillesProtokoll|StillesProtokoll]] – dieselbe Schnittstelle, verwirft aber alles.
 
 ## Inhalt
 
@@ -55,12 +55,12 @@ def beschriftung(self) -> str
 class Kurz(str, Enum)
 ```
 
-Was eine Formel in der Kurzform eines Nachweises ist -- der Fassung in
+Was eine Formel in der Kurzform eines Nachweises ist – der Fassung in
 zwei, drei Zeilen, die das Auge in der Zusammenfassung oben zeigt
 ([[opencivil.core.kurzform]]). Eine Formel ohne Angabe ist dort ein
 Symbol mit seiner Zahl.
 
-- `EINSETZEN = 'einsetzen'` – Geht in die Formel ein, die ihren Wert braucht -- solange diese schmal genug bleibt; sonst steht sie als eigene Zeile davor.
+- `EINSETZEN = 'einsetzen'` – Geht in die Formel ein, die ihren Wert braucht – solange diese schmal genug bleibt; sonst steht sie als eigene Zeile davor.
 - `ZEILE = 'zeile'` – Steht als eigene Zeile vor der Formel, die ihren Wert braucht.
 
 ### Block
@@ -86,7 +86,7 @@ die Oberflaeche, die danach filtert.
 
 - `titel: str`
 - `raum: str`
-- `thema: str = ''` – Unter welchem Thema die Formeln des Abschnitts in der Formelsammlung stehen, sofern die Berechnung keines mitbringt -- «Beton», «Querschnitt».
+- `thema: str = ''` – Unter welchem Thema die Formeln des Abschnitts in der Formelsammlung stehen, sofern die Berechnung keines mitbringt – «Beton», «Querschnitt».
 
 ### TitelBlock
 
@@ -97,7 +97,7 @@ class TitelBlock(Block)
 
 - `text: str`
 - `ebene: int = 2`
-- `raum: str = ''` – Namensraum des Abschnitts, den dieser Titel eroeffnet -- leer, wenn er keinen eroeffnet. Die Oberflaeche grenzt die Herleitung damit auf den gewaehlten Bestandteil ein. Ueber den Anzeigetext ginge das auch, aber ein Vergleich ueber Beschriftungen ist immer eine Falle: er bricht, sobald jemand den Text aendert, und er bricht stumm.
+- `raum: str = ''` – Namensraum des Abschnitts, den dieser Titel eroeffnet – leer, wenn er keinen eroeffnet. Die Oberflaeche grenzt die Herleitung damit auf den gewaehlten Bestandteil ein. Ueber den Anzeigetext ginge das auch, aber ein Vergleich ueber Beschriftungen ist immer eine Falle: er bricht, sobald jemand den Text aendert, und er bricht stumm.
 
 #### TitelBlock.abschnitt
 
@@ -116,8 +116,8 @@ class TextBlock(Block)
 Fliesstext zwischen den Formeln.
 
 - `text: str`
-- `erklaerung: bool = False` – Ob der Text erklaert, statt ein Ergebnis zu nennen -- das 'Warum'. Erklaerungen stehen nicht in der Herleitung (siehe [[opencivil.core.protokoll#darstellen|darstellen]]), sondern in der Formelsammlung unter den Formeln ihres Themas. Die Herleitung zeigt Formeln, Zahlen und Stichworte.
-- `thema: str = ''` – Thema der Berechnung, die den Block schrieb -- vom Rechenwerk gestempelt.
+- `erklaerung: bool = False` – Ob der Text erklaert, statt ein Ergebnis zu nennen – das 'Warum'. Erklaerungen stehen nicht in der Herleitung (siehe [[opencivil.core.protokoll#darstellen|darstellen]]), sondern in der Formelsammlung unter den Formeln ihres Themas. Die Herleitung zeigt Formeln, Zahlen und Stichworte.
+- `thema: str = ''` – Thema der Berechnung, die den Block schrieb – vom Rechenwerk gestempelt.
 
 ### GleichungBlock
 
@@ -132,12 +132,12 @@ Eine gesetzte Formel.
 - `titel: str = ''`
 - `referenz: str = ''`
 - `wert_id: str = ''` – ID des erzeugten Wertes, falls die Gleichung einen Wert liefert.
-- `gruppe: str = ''` – Name eines Kastens, in dem mehrere Angaben zusammenstehen sollen. Vier Zeilen der Form `h = 300 mm` untereinander sind kein Nachweis, sondern eine Liste. Zusammengelegt liest sie sich besser -- aber nur fuer die Darstellung: jede Angabe bleibt ihr eigener Block mit eigener `wert_id`. Das ist der Punkt. Wer die vier zu *einem* Block verschmelzen wollte, verloere die Rueckverfolgung: wird nur `h` gebraucht, laeuft auch nur dessen Vorgabe, und im Kasten steht dann eben nur `h`. Ein verschmolzener Block wuesste nichts davon und zeigte alle vier.
-- `formelzeile: Optional[tex.Formelzeile] = None` – Strukturierte Fassung, sofern vorhanden -- erlaubt spaeteren Umbruch.
-- `ansatz: bool = False` – Ob die Gleichung rein symbolisch ist -- ein Ansatz ohne Zahlen, etwa das Werkstoffgesetz oder die Formel, nach der gleich gerechnet wird. Die Formelsammlung nimmt sie so, wie sie dasteht.
-- `thema: str = ''` – Thema der Berechnung, die den Block schrieb -- vom Rechenwerk gestempelt.
-- `name: str = field(default='', compare=False)` – Name der Formel im Notizbuch -- nie Fall, Sorte, Lage oder Richtung. Leer heisst: ihr Titel ohne Zahlenangabe (siehe [[opencivil.bericht.formelsammlung#formelname|opencivil.bericht.formelsammlung.formelname]]). Gesetzt wird er, wo der Titel je nach Fall wechselt oder fuer sich nichts sagt («Ansatz»).
-- `codestelle: str = field(default='', compare=False)` – Wo im Code die Gleichung geschrieben wird, als `modul:Funktion` -- das Notizbuch verlinkt damit Formel und Modul. Selbst ermittelt (siehe [[opencivil.core.protokoll#codestelle_aus|codestelle_aus]]), nur die allgemeine Formel gibt sie mit.
+- `gruppe: str = ''` – Name eines Kastens, in dem mehrere Angaben zusammenstehen sollen. Vier Zeilen der Form `h = 300 mm` untereinander sind kein Nachweis, sondern eine Liste. Zusammengelegt liest sie sich besser – aber nur fuer die Darstellung: jede Angabe bleibt ihr eigener Block mit eigener `wert_id`. Das ist der Punkt. Wer die vier zu *einem* Block verschmelzen wollte, verloere die Rueckverfolgung: wird nur `h` gebraucht, laeuft auch nur dessen Vorgabe, und im Kasten steht dann eben nur `h`. Ein verschmolzener Block wuesste nichts davon und zeigte alle vier.
+- `formelzeile: Optional[tex.Formelzeile] = None` – Strukturierte Fassung, sofern vorhanden – erlaubt spaeteren Umbruch.
+- `ansatz: bool = False` – Ob die Gleichung rein symbolisch ist – ein Ansatz ohne Zahlen, etwa das Werkstoffgesetz oder die Formel, nach der gleich gerechnet wird. Die Formelsammlung nimmt sie so, wie sie dasteht.
+- `thema: str = ''` – Thema der Berechnung, die den Block schrieb – vom Rechenwerk gestempelt.
+- `name: str = field(default='', compare=False)` – Name der Formel im Notizbuch – nie Fall, Sorte, Lage oder Richtung. Leer heisst: ihr Titel ohne Zahlenangabe (siehe [[opencivil.bericht.formelsammlung#formelname|opencivil.bericht.formelsammlung.formelname]]). Gesetzt wird er, wo der Titel je nach Fall wechselt oder fuer sich nichts sagt («Ansatz»).
+- `codestelle: str = field(default='', compare=False)` – Wo im Code die Gleichung geschrieben wird, als `modul:Funktion` – das Notizbuch verlinkt damit Formel und Modul. Selbst ermittelt (siehe [[opencivil.core.protokoll#codestelle_aus|codestelle_aus]]), nur die allgemeine Formel gibt sie mit.
 - `kurz: Optional[Kurz] = None` – Was die Formel in der Kurzform des Nachweises ist ([[opencivil.core.protokoll#Kurz|Kurz]]).
 
 ### TabellenBlock
@@ -149,7 +149,7 @@ class TabellenBlock(Block)
 
 Tabelle, typischerweise ein Iterationsprotokoll.
 
-Jede Zelle ist Text (`str`) oder [[opencivil.core.protokoll#TabellenBlock|latex.Mathe]] -- die
+Jede Zelle ist Text (`str`) oder [[opencivil.core.protokoll#TabellenBlock|latex.Mathe]] – die
 Darstellung entscheidet, wie sie beides setzt.
 
 - `kopf: Sequence[tex.Zelle]`
@@ -198,7 +198,7 @@ p.hinweis("Massgebend ist der abgeminderte Wert.")
 def anfuegen(self, *bloecke: Block) -> None
 ```
 
-Fertige Bloecke uebernehmen -- etwa die Tabelle einer Zusammenfassung.
+Fertige Bloecke uebernehmen – etwa die Tabelle einer Zusammenfassung.
 
 #### Protokoll.titel
 
@@ -212,7 +212,7 @@ def titel(self, text: str, ebene: int=2, raum: str='') -> None
 def text(self, text: str) -> None
 ```
 
-Ein Ergebnis in Worten -- knapp, es steht in der Herleitung.
+Ein Ergebnis in Worten – knapp, es steht in der Herleitung.
 
 #### Protokoll.erklaerung
 
@@ -220,7 +220,7 @@ Ein Ergebnis in Worten -- knapp, es steht in der Herleitung.
 def erklaerung(self, text: str) -> None
 ```
 
-Das Warum -- steht in der Formelsammlung, nicht in der Herleitung.
+Das Warum – steht in der Formelsammlung, nicht in der Herleitung.
 
 #### Protokoll.gleichung
 
@@ -236,7 +236,7 @@ Setzt beliebiges, bereits fertiges LaTeX.
 def ansatz(self, latex: str, titel: str='', referenz: str='', *, name: str='') -> None
 ```
 
-Eine Gleichung ohne Zahlen -- sie kommt auch in die Formelsammlung.
+Eine Gleichung ohne Zahlen – sie kommt auch in die Formelsammlung.
 
 #### Protokoll.formel
 
@@ -266,7 +266,7 @@ Resultat, etwa ein Vergleich ([[opencivil.core.protokoll#Protokoll|latex.verglei
 def wert(self, ergebnis: Wert, titel: str='', referenz: Optional[str]=None, gruppe: str='', *, name: str='', codestelle: str='') -> None
 ```
 
-Schlichte Form `Symbol = Wert` -- fuer Eingaben und Vorgaben.
+Schlichte Form `Symbol = Wert` – fuer Eingaben und Vorgaben.
 
 #### Protokoll.tabelle
 
@@ -323,11 +323,11 @@ def ist_leer(self) -> bool
 def alle_bloecke(self) -> List[Block]
 ```
 
-Alle Bloecke -- als Liste.
+Alle Bloecke – als Liste.
 
 Als Liste und nicht als Generator: der Name verspricht eine Sammlung,
 und wer eine Sammlung zweimal durchlaeuft, erwartet zweimal dasselbe.
-Ein Generator gab beim zweiten Mal nichts zurueck, lautlos -- eine
+Ein Generator gab beim zweiten Mal nichts zurueck, lautlos – eine
 Pruefung, die danach «nicht gefunden» meldete, obwohl es dastand.
 Die Blockzahl ist die eines Berichts; sie in eine Liste zu legen
 kostet nichts.
@@ -348,7 +348,7 @@ zweimal, mit der anderen Platte dazwischen.
 
 Wer liest, erwartet alles zu einem Bauteil beieinander. Die Reihenfolge
 der Abschnitte bleibt die ihres ersten Auftretens, innerhalb eines
-Abschnitts bleibt die Rechenreihenfolge unangetastet -- verschoben wird
+Abschnitts bleibt die Rechenreihenfolge unangetastet – verschoben wird
 also nur, was ohnehin nur der Darstellung dient.
 
 Eroeffnet wird ein Abschnitt von einem Titel mit Namensraum; alles
@@ -366,7 +366,7 @@ def gleichungen(self) -> List[GleichungBlock]
 def codestelle_aus(modul: str, qualname: str) -> str
 ```
 
-`modul:Klasse.methode` -- so nennt das Notizbuch eine Stelle im Code.
+`modul:Klasse.methode` – so nennt das Notizbuch eine Stelle im Code.
 
 Ohne das, was nur in einer Funktion lebt (`<locals>`, `<lambda>`):
 gemeint ist die Funktion, in der es steht. Eine Lambda auf Modulebene
@@ -384,7 +384,7 @@ Aufrufer ausserhalb dieses Moduls.
 Gefragt wird den Aufrufstapel und nicht die Berechnung, die laeuft: viele
 Formeln schreibt eine Hilfsfunktion in einem anderen Modul, und die
 Spannung-Dehnung-Analyse laeuft ganz ohne Rechenwerk. Das stille Protokoll
-fragt gar nicht -- es schreibt ja nichts.
+fragt gar nicht – es schreibt ja nichts.
 
 ### StillesProtokoll
 
@@ -395,7 +395,7 @@ class StillesProtokoll(Protokoll)
 Verwirft alles. Fuer Laeufe, deren Herleitung niemand liest.
 
 Die Schnittstelle bleibt identisch, damit derselbe Rechencode einmal
-protokollierend und einmal still laufen kann -- ohne Verzweigung im Code
+protokollierend und einmal still laufen kann – ohne Verzweigung im Code
 und ohne dass die beiden Pfade auseinanderlaufen koennen.
 
 Gebaut wird gar nichts, nicht erst gebaut und dann verworfen: eine Formel
@@ -403,7 +403,7 @@ setzt ihre Vorlage zweimal ein und misst ihre Breite, und die
 Bewehrungssuche rechnet hundertfach, ohne je eine Zeile zu zeigen.
 
 Eine Herleitung, die erst nach der Rechnung für sich sucht, was sie
-zeigt -- die der Decke ihre grössten Werte --, fragt nach [[opencivil.core.protokoll#StillesProtokoll|still]]
+zeigt – die der Decke ihre grössten Werte –, fragt nach [[opencivil.core.protokoll#StillesProtokoll|still]]
 und lässt es: in die Rechnung geht davon nichts ein.
 
 - `still = True`
@@ -473,7 +473,7 @@ Benannte Zwischenwerte fuer [[opencivil.core.protokoll#Protokoll.formel|Protokol
 
 Eine Vorlage wird zweimal eingesetzt, mit Symbolen und mit Zahlen samt
 Einheit. Dafuer braucht jede Groesse ein Symbol, eine Einheit und eine
-Stellenzahl -- auch ein Zwischenergebnis, das kein Wert des Rechenwerks
+Stellenzahl – auch ein Zwischenergebnis, das kein Wert des Rechenwerks
 ist. Hier entstehen solche Werte, mit festen Gewohnheiten je Groessenart:
 Laengen in mm auf eine Stelle, Flaechen in mm² und Spannungen in N/mm²
 ganz, Kraefte in kN und Momente in kNm auf eine Stelle, Dehnungen in
@@ -482,7 +482,7 @@ Betons auf zwei Stellen), sagt es `stellen`. Jede Stelle, die das von
 Hand tat, rechnete dafuer selbst um und schrieb die Einheit selbst dazu.
 
 Die Kennung ist `{basis}.{name}`: eindeutig in der Mitschrift, aber nie
-im Rechenwerk angemeldet -- diese Werte zeigen eine Rechnung, sie gehen in
+im Rechenwerk angemeldet – diese Werte zeigen eine Rechnung, sie gehen in
 keine ein.
 
 #### Zwischenwerte.wert
@@ -555,7 +555,7 @@ liess eine unbekannte Art stillschweigend weg. Jetzt wirft eine Blockart
 ohne Eintrag: eine neue fehlt nicht still in der Darstellung, die sie
 noch nicht kennt.
 
-Gesucht wird die genaue Art, nicht eine Oberklasse -- auch eine
+Gesucht wird die genaue Art, nicht eine Oberklasse – auch eine
 abgeleitete Blockart braucht ihren eigenen Eintrag.
 
 Erklaerungen ([[opencivil.core.protokoll#TextBlock|TextBlock.erklaerung]]) laesst jede Darstellung weg:
@@ -566,7 +566,7 @@ Oberflaeche und alle Berichte gehen.
 ## Konstanten
 
 - `T = TypeVar('T')`
-- `Tafel = Mapping[Type[Block], Callable[[Any], T]]` – Wie eine Darstellung die Bloecke setzt: je Blockart eine Funktion, die den Block bekommt. Bis 2026-10-25 bekam sie auch seine Tiefe -- die Zahl der eingeschachtelten Mitschriften, in denen er stand; die schrieb da keine Rechnung mehr.
+- `Tafel = Mapping[Type[Block], Callable[[Any], T]]` – Wie eine Darstellung die Bloecke setzt: je Blockart eine Funktion, die den Block bekommt. Bis 2026-10-25 bekam sie auch seine Tiefe – die Zahl der eingeschachtelten Mitschriften, in denen er stand; die schrieb da keine Rechnung mehr.
 
 ## Braucht
 

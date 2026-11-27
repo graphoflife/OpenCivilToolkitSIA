@@ -67,7 +67,7 @@ Dieselbe Rissbedingung wie beim Rissmoment, nach der Normalkraft aufgelöst:
 beim Moment $M$ reisst der Querschnitt, wenn die Zugkraft $N_{Riss}$
 erreicht. Unter Zug reisst die ganze Dicke, darum gilt der
 [[Beiwert für die Dicke]] mit der ganzen Höhe und nicht mit einem Drittel wie
-beim Rissmoment -- nach Vorgabe, nicht nachgeschlagen. Bei der Platte zählt
+beim Rissmoment – nach Vorgabe, nicht nachgeschlagen. Bei der Platte zählt
 das Vorzeichen des Moments nicht: sie ist oben wie unten dieselbe.
 
 Beim gezeichneten Querschnitt gilt die kleinere Abmessung $\min(h; b)$ als

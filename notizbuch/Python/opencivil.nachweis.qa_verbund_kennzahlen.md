@@ -1,5 +1,5 @@
 ---
-erzeugt: 39336caddf13
+erzeugt: 440e1b1a983c
 art: modul
 tags: [modul]
 ---
@@ -10,7 +10,7 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Die Kennzahlen eines Querschnitts aus Baustahl und Beton nach SIA 264:2014,
-wie die des Stahls ([[opencivil.nachweis.qa_stahl_kennzahlen]]) --
+wie die des Stahls ([[opencivil.nachweis.qa_stahl_kennzahlen]]) –
 gerechnet immer, ob es Lastfaelle gibt oder nicht:
 
 * die Festigkeiten je Werkstoff
@@ -20,21 +20,21 @@ gerechnet immer, ob es Lastfaelle gibt oder nicht:
 * der Druckwiderstand ohne Knicken wie (14), wo jedes Blech bei Druck in
   Klasse 1 oder 2 liegt;
 * je Zugseite der plastische Momentenwiderstand bei `N = 0` mit voller
-  Verduebelung (5.1.2.1), mit `β` nach 5.1.2.2 -- gerechnet in
+  Verduebelung (5.1.2.1), mit `β` nach 5.1.2.2 – gerechnet in
   [[opencivil.verbund.widerstand]];
 * mit Profilen der Querkraftwiderstand: ihn traegt der Stahl allein
   (4.3.2.2), wie im Stahlquerschnitt;
-* mit Kopfbolzenduebeln ihr Schubwiderstand `P_Rd` (6.1.2.1) -- gerechnet
+* mit Kopfbolzenduebeln ihr Schubwiderstand `P_Rd` (6.1.2.1) – gerechnet
   in [[opencivil.verbund.duebel]]. Mehrere Betone: (30) mit dem, der am
   wenigsten traegt (nach Vorgabe, nicht nachgeschlagen). Wie viele Duebel
   ein Lastfall braucht, sagt sein Nachweis.
 
 
-## WAS FEHLT -- GRAU IN DER HERLEITUNG
+## WAS FEHLT – GRAU IN DER HERLEITUNG
 
-Wo ein Widerstand plastisch nicht gilt -- ein Blech ueber Klasse 2,
+Wo ein Widerstand plastisch nicht gilt – ein Blech ueber Klasse 2,
 gezogener Betonstahl ohne Duktilitaetsklasse B oder C, `x_p/h` ueber 0.4
---, steht er auf null, und ein Satz sagt, warum: elastisch nach 5.1.2.4
+–, steht er auf null, und ein Satz sagt, warum: elastisch nach 5.1.2.4
 rechnet das Werkzeug noch nicht. Die Momentenwiderstaende gelten mit
 voller Verduebelung; was die Duebel eines Lastfalls erlauben, rechnet sein
 Nachweis. Knicken und Kippen gehoeren dem Traeger.
@@ -63,7 +63,7 @@ Der Verbundquerschnitt einer Analyse: ihre Flaechen und ihre Bewehrung.
 class KennzahlenVerbundQA(Kennzahlprozedur)
 ```
 
-Die Kennzahlen eines Verbundquerschnitts -- siehe Dateikopf.
+Die Kennzahlen eines Verbundquerschnitts – siehe Dateikopf.
 
 - `THEMA = 'Kennzahlen'`
 
@@ -79,7 +79,7 @@ def rechne(self, e: Eingaben, p: Protokoll) -> Dict[str, Groesse]
 def _duebel(self, p: Protokoll, e: Eingaben, ergebnis: Dict[str, Groesse], k: vd.Kopfbolzen) -> None
 ```
 
-`P_Rd` nach (30) und (31) -- siehe Dateikopf.
+`P_Rd` nach (30) und (31) – siehe Dateikopf.
 
 #### KennzahlenVerbundQA._summe
 
@@ -94,10 +94,10 @@ def _summe(self, p: Protokoll, werte: Verbundwerte, ergebnis: Dict[str, Groesse]
 
 - `REFERENZ_ZUG = 'SIA 264:2014, 4.3.2.1; 5.1.2.1'`
 - `REFERENZ_14 = 'SIA 264:2014, 5.3.2.4, (14)'`
-- `ANSATZ_14 = 'N_{pl,Rd} = A_a\\, f_{yd} + A_c\\, 0.85\\, f_{cd} + A_s\\, f_{sd}'` – (14) als Ansatz und sein Name -- die Verbundstuetze schreibt ihn auch.
+- `ANSATZ_14 = 'N_{pl,Rd} = A_a\\, f_{yd} + A_c\\, 0.85\\, f_{cd} + A_s\\, f_{sd}'` – (14) als Ansatz und sein Name – die Verbundstuetze schreibt ihn auch.
 - `NAME_14 = 'Plastischer Normalkraftwiderstand im Verbund'`
-- `AUF_NULL = 'Der Widerstand steht darum auf null.'` – Was in den Kennzahlen fehlt, wo ein Widerstand plastisch nicht gilt -- siehe Dateikopf.
-- `VOLLE_VERDUEBELUNG = 'Gerechnet mit voller Verdübelung, wie 5.1.2.1 es annimmt: Stahl und …` – Die Annahme hinter den Momentenwiderstaenden der Kennzahlen -- und mit Duebeln der Satz dazu.
+- `AUF_NULL = 'Der Widerstand steht darum auf null.'` – Was in den Kennzahlen fehlt, wo ein Widerstand plastisch nicht gilt – siehe Dateikopf.
+- `VOLLE_VERDUEBELUNG = 'Gerechnet mit voller Verdübelung, wie 5.1.2.1 es annimmt: Stahl und …` – Die Annahme hinter den Momentenwiderstaenden der Kennzahlen – und mit Duebeln der Satz dazu.
 - `MIT_DUEBELN = 'Was die Dübel eines Lastfalls erlauben, rechnet sein Nachweis.'`
 
 ## Braucht

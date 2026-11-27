@@ -1,5 +1,5 @@
 ---
-erzeugt: edbe55cd8c0d
+erzeugt: 1c2c322062c5
 art: modul
 tags: [modul]
 ---
@@ -9,7 +9,7 @@ tags: [modul]
 
 ## VERANTWORTUNG
 
-Wie eine Anfrage ankommt und ihre Antwort hinausgeht -- eine Nachricht je
+Wie eine Anfrage ankommt und ihre Antwort hinausgeht – eine Nachricht je
 Zeile, wie MCP es fuer stdio vorsieht. Der Server kennt `initialize`,
 `ping`, `tools/list` und `tools/call`; eine Mitteilung (ohne `id`)
 beantwortet er nicht. Was ein Werkzeug tut, steht in
@@ -29,7 +29,7 @@ ein Baustein des Kerns ausgibt, zerbraeche sonst die naechste Nachricht.
 class Protokollfehler(Exception)
 ```
 
-Ein Fehler von JSON-RPC, mit seinem Code -- anders als der Fehler eines Werkzeugs.
+Ein Fehler von JSON-RPC, mit seinem Code – anders als der Fehler eines Werkzeugs.
 
 ### Server
 
@@ -45,7 +45,7 @@ Beantwortet die Nachrichten einer Verbindung, mit einer Sitzung fuer alle Werkze
 def antwort(self, nachricht: Any) -> Optional[Any]
 ```
 
-Die Antwort auf eine Nachricht -- auf einen Stapel die Liste der Antworten, auf eine Mitteilung keine.
+Die Antwort auf eine Nachricht – auf einen Stapel die Liste der Antworten, auf eine Mitteilung keine.
 
 #### Server._beginnen
 
@@ -76,7 +76,7 @@ def main() -> None
 
 - `FASSUNGEN = ('2025-06-18', '2025-03-26', '2024-11-05')` – Die Fassungen des Protokolls, die der Server spricht, die neueste zuerst.
 - `SERVER = {'name': 'opencivil', 'title': 'OpenCivilToolkitSIA', 'version': '1'}` – Was `initialize` ueber den Server sagt.
-- `ANLEITUNG = 'OpenCivilToolkitSIA rechnet Bauteile nach SIA 262:2025 und SIA 267:2…` – Was eine KI vor dem ersten Werkzeug wissen sollte -- `instructions` von `initialize`.
+- `ANLEITUNG = 'OpenCivilToolkitSIA rechnet Bauteile nach SIA 262:2025 und SIA 267:2…` – Was eine KI vor dem ersten Werkzeug wissen sollte – `instructions` von `initialize`.
 
 ## Braucht
 

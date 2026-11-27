@@ -61,4 +61,4 @@ Wasser in ihm steht oder über ihm, sonst $\gamma$.
 
 Liegt der Spiegel unter der Sohle, aber höher als die
 [[Tiefe des Gleitkörpers]], rechnet das Werkzeug mit $\gamma'$ wie in
-Lage 2 -- auf der sicheren Seite.
+Lage 2 – auf der sicheren Seite.

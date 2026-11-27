@@ -1,5 +1,5 @@
 ---
-erzeugt: 914602a7f51c
+erzeugt: 6fe9ed7d4fc1
 art: modul
 tags: [modul]
 ---
@@ -10,11 +10,11 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Je Bauteilart ([[opencivil.projekt.aufbau#Konstanten|BAUTEILE]]) die Funktion,
-die aus Aufbau und Loesung die Zeichendaten eines Eintrags macht -- oder
+die aus Aufbau und Loesung die Zeichendaten eines Eintrags macht – oder
 keine, wo die Bilder anders kommen: bei Platte und Querschnittsanalyse aus
 den Linien und Kurven der Antwort und aus eigenen Anfragen. Die
 Schnittstelle legt sie unter einem Schluessel ab, `zeichendaten[kennung]`
-([[opencivil.web.zeichendaten#zeichendaten|zeichendaten]]). Fehlt hier eine Art, meldet sich das beim Laden --
+([[opencivil.web.zeichendaten#zeichendaten|zeichendaten]]). Fehlt hier eine Art, meldet sich das beim Laden –
 nicht erst als leeres Bild. Bis 2026-11-10 stand je Art ein eigener
 Schluessel in der Antwort.
 
@@ -27,7 +27,7 @@ def _balkensystem(aufbau: Aufbau, kennung: str, loesung: Loesung) -> Dict[str, A
 ```
 
 Eben wie im Raum: die knappe Uebersicht, je Querschnitt sein Umriss und
-je Linie ihre Achsen, die die Oberflaeche nicht selbst legt -- auch wenn
+je Linie ihre Achsen, die die Oberflaeche nicht selbst legt – auch wenn
 das System nicht rechnet.
 
 ### zeichendaten
@@ -36,12 +36,12 @@ das System nicht rechnet.
 def zeichendaten(aufbau: Aufbau, loesung: Loesung) -> Dict[str, Any]
 ```
 
-Je Bauteil, nach Kennung, seine Zeichendaten -- nur fuer die Arten, die welche haben.
+Je Bauteil, nach Kennung, seine Zeichendaten – nur fuer die Arten, die welche haben.
 
 
 ## Konstanten
 
-- `ZEICHENDATEN = {PLATTE.name: None, ANALYSE.name: None, BALKENSYSTEM.name: _balkensys…` – Je Bauteilart, nach ihrem Namen, was die Oberflaeche von einem Eintrag zeichnet -- `None`: ihre Bilder kommen anders.
+- `ZEICHENDATEN = {PLATTE.name: None, ANALYSE.name: None, BALKENSYSTEM.name: _balkensys…` – Je Bauteilart, nach ihrem Namen, was die Oberflaeche von einem Eintrag zeichnet – `None`: ihre Bilder kommen anders.
 
 ## Braucht
 

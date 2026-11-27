@@ -50,7 +50,7 @@ Wird ein gesättigter Ton schnell belastet, kann das Porenwasser nicht entweiche
 Ein Fundament versagt durch Grundbruch, wenn sich unter ihm ein Gleitkörper
 bildet und der Boden seitlich ausweicht. Gerechnet wird nach der
 [[Erweiterte Tragfähigkeitsformel|erweiterten Tragfähigkeitsformel]]: drei
-Anteile -- Kohäsion, Auflast, Eigengewicht des Gleitkörpers --, jeder mit
+Anteile – Kohäsion, Auflast, Eigengewicht des Gleitkörpers –, jeder mit
 einem Tragfähigkeitsfaktor $N$ und den Beiwerten $s$ für die Form, $d$ für
 die Tiefe, $i$ für die Lastneigung, $g$ für die Geländeneigung und $b$ für
 die Sohlneigung. Die Zusammenfassung zeigt sie als Tabelle.

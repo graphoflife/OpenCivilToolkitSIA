@@ -1,5 +1,5 @@
 ---
-erzeugt: f1700a23a7aa
+erzeugt: 7d3ad94aa470
 art: modul
 tags: [modul]
 ---
@@ -12,8 +12,8 @@ tags: [modul]
 Eine Schubwand ist eine Linie im Querschnitt mit einer Dicke `b_w` und
 Buegeln. Sie traegt eine Kraft entlang ihrer Achse; ihre Laenge ist der
 Hebelarm `z` des Fachwerks. Hier wird `(V_y, V_z, T)` auf die Waende
-verteilt, die Kraft und der Widerstand jeder Wand bestimmt und -- auf
-Wunsch -- die Laengszugkraft, die das Druckfeld der Waende im Querschnitt
+verteilt, die Kraft und der Widerstand jeder Wand bestimmt und – auf
+Wunsch – die Laengszugkraft, die das Druckfeld der Waende im Querschnitt
 weckt.
 
 
@@ -25,10 +25,10 @@ alle Waende aus demselben Beton sind.
 
 1. **Querkraft.** Der Querschnitt verschiebt sich um `u`, jede Wand wehrt
    sich mit `V_i = k_i · (e_i · u)`. Aus `Σ V_i · e_i = (V_y, V_z)` folgt
-   `u` -- zwei Gleichungen, `K = Σ k_i · e_i · e_iᵀ`. Zwei gleiche Stege
+   `u` – zwei Gleichungen, `K = Σ k_i · e_i · e_iᵀ`. Zwei gleiche Stege
    eines Kastens tragen so je die Haelfte.
 2. **Versatz.** Die Wandkraefte aus 1 haben ein Moment `ΔT` um den
-   Schwerpunkt -- die Querkraft greift im Schwerpunkt an, ihre Wirkungslinie
+   Schwerpunkt – die Querkraft greift im Schwerpunkt an, ihre Wirkungslinie
    in den Waenden liegt anderswo. Den Rest `T - ΔT` tragen die Zellen.
 3. **Zellen nach Bredt.** Wo Waende eine geschlossene Flaeche umranden, laeuft
    ein Schubfluss rundum. Je Zelle ein unbekannter Fluss `q_k`, dazu die
@@ -56,12 +56,12 @@ Moment um den Schwerpunkt ist `T`.
 Eine gezeichnete Wand, auf der eine andere endet oder die eine andere
 kreuzt, zerfaellt dort in Waende von Knoten zu Knoten ([[opencivil.querschnitt.schubwaende#einzeln|einzeln]]):
 «Wand 1.1», «Wand 1.2». Jede traegt so ueberall denselben Fluss `q` und
-wird fuer sich nachgewiesen -- der Deckel ueber zwei Zellen als zwei Waende.
+wird fuer sich nachgewiesen – der Deckel ueber zwei Zellen als zwei Waende.
 Ihre Kraft ist `V_Ed = |q| · l` ([[opencivil.querschnitt.schubwaende#wandkraefte|wandkraefte]]), bei einer Zelle die
 Kraft aus der Querkraft und die aus der Torsion zusammen, wie die Norm sie
 je Wand rechnet ([[opencivil.querschnitt.schubwaende#Konstanten|REFERENZ_KRAFT]]). Ihr Widerstand ist das Fachwerk aus
 [[opencivil.querschnitt.fachwerk#fachwerk|opencivil.querschnitt.fachwerk.fachwerk]] mit ihrer Laenge `l` als
-Hebelarm -- SIA 262:2025, Gl. (45) und (47):
+Hebelarm – SIA 262:2025, Gl. (45) und (47):
 
 ```
 V_Rd,s = A_sw/s · l · f_yd · cot α      V_Rd,c = b_w · l · k_c · f_cd · sin α · cos α
@@ -94,7 +94,7 @@ Anfangs- zum Endpunkt. Einheiten in SI-Basis.
   Verdrillung und die Torsion ohne Zelle ueber Federn mit Drehung sind nach
   Vorgabe eingebaut, in SIA 262:2025 nicht gefunden
   (`notizbuch/Notizen/TODO.md`). Die Norm legt auch einem Vollquerschnitt
-  einen Hohlquerschnitt zugrunde (4.3.5.1) -- wer ihn rechnet, zeichnet ihn
+  einen Hohlquerschnitt zugrunde (4.3.5.1) – wer ihn rechnet, zeichnet ihn
   als Zelle.
 
 ## Inhalt
@@ -105,7 +105,7 @@ Anfangs- zum Endpunkt. Einheiten in SI-Basis.
 class WandFehler(ValueError)
 ```
 
-Eine Last, die die Waende nicht aufnehmen koennen -- mit dem Grund.
+Eine Last, die die Waende nicht aufnehmen koennen – mit dem Grund.
 
 ### Wand
 
@@ -162,7 +162,7 @@ class Zelle
 
 Eine geschlossene Flaeche, umrandet von Waenden.
 
-- `flaeche: float` – `A_k`, umschlossen von den Wandachsen -- die Norm meint die Laengsbewehrung.
+- `flaeche: float` – `A_k`, umschlossen von den Wandachsen – die Norm meint die Laengsbewehrung.
 - `rand: Tuple[Tuple[int, int], ...]` – Je Randwand: (Index, +1 wenn die Zelle sie in ihrer Richtung umlaeuft).
 
 ### Zellenmodell
@@ -191,7 +191,7 @@ Wo `p` auf der Strecke `a`–`b` liegt (0..1), oder nichts.
 def _kreuzung(a1: Punkt, a2: Punkt, b1: Punkt, b2: Punkt) -> Optional[Tuple[float, float]]
 ```
 
-Wo sich zwei Strecken im Innern beider kreuzen -- als Anteile auf beiden.
+Wo sich zwei Strecken im Innern beider kreuzen – als Anteile auf beiden.
 
 ### einzeln
 
@@ -201,7 +201,7 @@ def einzeln(gezeichnet: Sequence[Wand]) -> List[Wand]
 
 Jede Schubwand fuer sich (Benutzer, 2026-11-18): eine gezeichnete Wand,
 auf der eine andere endet oder die eine andere kreuzt, zerfaellt dort in
-Waende von Knoten zu Knoten. Jede traegt dann ueberall denselben Fluss --
+Waende von Knoten zu Knoten. Jede traegt dann ueberall denselben Fluss –
 der Deckel ueber zwei Zellen ist zwei Waende, jede mit ihrer Kraft und
 ihrem Widerstand. Die Teile heissen nach ihrer Wand, gezaehlt von deren
 Anfang: «Wand 1.1», «Wand 1.2». Eine Wand ohne Knoten behaelt ihren Namen.
@@ -216,8 +216,8 @@ Die Schubwaende einzeln ([[opencivil.querschnitt.schubwaende#einzeln|einzeln]]) 
 Zellen darin.
 
 Knoten sind die Wandenden; dazwischen liegt je eine Wand. Eine Wand, die
-zu keinem Kreis gehoert -- eine freie Wand, eine Bruecke zwischen zwei
-Kaesten --, gehoert zu keiner Zelle. Die Zellen sind die beschraenkten
+zu keinem Kreis gehoert – eine freie Wand, eine Bruecke zwischen zwei
+Kaesten –, gehoert zu keiner Zelle. Die Zellen sind die beschraenkten
 Flaechen des Graphen; gefunden, indem jeder Rand so umlaufen wird, dass die
 Flaeche links liegt.
 
@@ -229,11 +229,11 @@ def _loese(matrix: List[List[float]], rechts: List[float]) -> List[float]
 
 Gauss mit Spaltenpivot; regularisiert nur, wo es noetig ist.
 
-Eine Wandanordnung, die eine Richtung gar nicht steift -- nur parallele
-Waende --, gibt eine singulaere Matrix. Dann macht ein Hauch auf der
+Eine Wandanordnung, die eine Richtung gar nicht steift – nur parallele
+Waende –, gibt eine singulaere Matrix. Dann macht ein Hauch auf der
 Diagonale daraus die Loesung kleinster Laenge; ob sie die Last wirklich
 traegt, prueft der Aufrufer an der Probe. Sonst bleibt die Matrix, wie
-sie ist -- der Hauch verschoebe auch eine eindeutige Loesung.
+sie ist – der Hauch verschoebe auch eine eindeutige Loesung.
 
 ### _gauss
 
@@ -253,7 +253,7 @@ class Verteilung
 Wie `(V_y, V_z, T)` auf die Waende faellt.
 
 - `aus_querkraft: Tuple[float, ...]` – Je Wand die Kraft entlang ihrer Achse aus der Verschiebung, in N.
-- `fluss: Tuple[float, ...]` – Je Wand der Schubfluss entlang ihrer Achse, in N/m -- alles zusammen.
+- `fluss: Tuple[float, ...]` – Je Wand der Schubfluss entlang ihrer Achse, in N/m – alles zusammen.
 - `versatz: float` – `ΔT`: das Moment der Querkraftanteile um den Schwerpunkt, in Nm.
 - `zellenfluss: Tuple[float, ...]` – Je Zelle ihr Umlauf-Schubfluss `q_k`, in N/m.
 - `mit_drehung: bool` – Ob die Torsion ueber die Federn lief (keine Zelle).
@@ -275,7 +275,7 @@ def verteilen(modell: Zellenmodell, *, V_y: float, V_z: float, T: float, bezug: 
 `(V_y, V_z, T)` auf die Waende, nach dem Modell im Kopf dieser Datei.
 
 Wirft [[opencivil.querschnitt.schubwaende#WandFehler|WandFehler]], wenn die Waende eine Komponente nicht tragen
-koennen -- etwa V_y bei lauter senkrechten Waenden, oder Torsion bei einer
+koennen – etwa V_y bei lauter senkrechten Waenden, oder Torsion bei einer
 einzigen Wand.
 
 ### _verschieben
@@ -329,8 +329,8 @@ null; sonst stuende beim Erfuellungsgrad 8·10¹⁶ statt ∞.
 def schwaechste(grade: Sequence[float]) -> int
 ```
 
-Die Wand mit dem kleinsten Grad. Bei Gleichstand -- bis auf die letzten
-Stellen der Rechnung, etwa alle Waende einer Zelle unter Torsion -- die
+Die Wand mit dem kleinsten Grad. Bei Gleichstand – bis auf die letzten
+Stellen der Rechnung, etwa alle Waende einer Zelle unter Torsion – die
 erste, damit nicht Rundung entscheidet, welche Wand massgebend heisst.
 
 ### widerstand
@@ -342,7 +342,7 @@ def widerstand(w: Wand, *, alpha_min: int, alpha_max: int, zugkraft: bool) -> Bu
 Was eine Wand ueber ihre ganze Laenge aufnimmt, in N: das Fachwerk mit
 ihrer Laenge als Hebelarm, bei der guenstigsten Neigung
 ([[opencivil.querschnitt.fachwerk#guenstigste|guenstigste]], [[opencivil.querschnitt.schubwaende#Konstanten|REFERENZ_WAND]])
--- bei Normalzug zwischen den gehobenen Grenzen, wie bei der Platte. Bis
+– bei Normalzug zwischen den gehobenen Grenzen, wie bei der Platte. Bis
 2026-11-21 kam das als `Wandwiderstand`, Feld fuer Feld ein
 [[opencivil.querschnitt.fachwerk#Buegelpunkt|Buegelpunkt]].
 
@@ -370,7 +370,7 @@ def laengszug(modell: Zellenmodell, verteilung: Verteilung, neigungen: Sequence[
 
 Das Druckfeld einer Wand mit dem Fluss q braucht je Laenge den Zug
 `q · cot α`, gleichmaessig ueber die Wand verteilt; seine Resultierende
-liegt in der Mitte -- dasselbe wie `V · cot α / 2` in jedem Gurt. Liegen
+liegt in der Mitte – dasselbe wie `V · cot α / 2` in jedem Gurt. Liegen
 die Mitten nicht im Schwerpunkt, gibt das auch Momente:
 
 ```

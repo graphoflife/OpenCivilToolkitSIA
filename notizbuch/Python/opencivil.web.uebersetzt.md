@@ -1,5 +1,5 @@
 ---
-erzeugt: 9568e52b23b3
+erzeugt: c2a25e1c54e1
 art: modul
 tags: [modul]
 ---
@@ -26,8 +26,8 @@ Pyodide selbst, einmal je Stand der Quellen.
 ## AM INHALT GEPRUEFT
 
 Ob ein `.pyc` noch zu seiner Quelle passt, prueft Python sonst an deren
-Zeit und Groesse. Die Zeit hilft hier nicht -- jeder Start legt die Quellen
-neu an --, und auf die Groesse allein ist kein Verlass: eine geaenderte
+Zeit und Groesse. Die Zeit hilft hier nicht – jeder Start legt die Quellen
+neu an –, und auf die Groesse allein ist kein Verlass: eine geaenderte
 Ziffer laesst sie gleich, und still liefe der alte Code. Darum legt
 [[opencivil.web.uebersetzt#packen|packen]] jedes `.pyc` als eines ab, das Python am Inhalt der Quelle
 prueft (hash-basiert, PEP 552): beim Einbinden vergleicht es diesen mit dem,
@@ -55,7 +55,7 @@ def packen(stueck: str | os.PathLike, wurzel: str | os.PathLike) -> bool
 ```
 
 Schreibt jedes `.pyc` unter `wurzel`, das zu seiner Quelle passt, in
-ein Stueck nach `stueck` -- jedes am Inhalt der Quelle geprueft.
+ein Stueck nach `stueck` – jedes am Inhalt der Quelle geprueft.
 
 Gibt zurueck, ob das Stueck neu ist. Liegt dort schon dasselbe, etwa weil
 es so eingesetzt wurde und nichts neu zu uebersetzen war, bleibt es
@@ -68,7 +68,7 @@ def _am_inhalt_geprueft(pyc: Path) -> Optional[bytes]
 ```
 
 Das `.pyc` mit einem Kopf, der Python am Inhalt der Quelle pruefen
-laesst -- oder `None`, wenn es nicht zu ihr passt, sie fehlt oder es
+laesst – oder `None`, wenn es nicht zu ihr passt, sie fehlt oder es
 fuer eine andere Fassung von Python uebersetzt ist.
 
 ### _zeit_und_groesse

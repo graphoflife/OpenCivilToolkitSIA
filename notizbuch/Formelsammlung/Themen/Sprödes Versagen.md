@@ -24,7 +24,7 @@ Ein zu schwach bewehrter Querschnitt reisst und versagt im selben Augenblick. Na
 ## Theorie
 
 Ein zu schwach bewehrter Querschnitt trägt ungerissen mehr als gerissen.
-Reisst er, fällt die Last auf eine Bewehrung, die sie nicht tragen kann --
+Reisst er, fällt die Last auf eine Bewehrung, die sie nicht tragen kann –
 er versagt ohne Vorwarnung.
 
 Nachgewiesen wird darum, dass der Biegewiderstand ohne Normalkraft das

@@ -1,5 +1,5 @@
 ---
-erzeugt: f4bd6d5df43f
+erzeugt: abafee8c7f00
 art: modul
 tags: [modul]
 ---
@@ -9,13 +9,13 @@ tags: [modul]
 
 ## VERANTWORTUNG
 
-Je Gebaeude die Zahlen der Ansicht, in den Einheiten der Anzeige -- m, kN
+Je Gebaeude die Zahlen der Ansicht, in den Einheiten der Anzeige – m, kN
 und kNm: Hoehe und Gewicht jedes Geschosses, je Richtung die Kraefte
 F_d,i, Querkraft und Moment unter jedem Geschoss und was jede Wand am Fuss
 traegt. Dazu je Wand, warum sie nicht rechnet, oder ihr Umriss im
 Grundriss, in mm um ihren Schwerpunkt und gedreht nach ihrer Lage; die
-Meldungen -- rot, was falsch ist, grau, was fehlt oder hier nicht gerechnet
-wird -- und die Legenden unter den Bildern ([[opencivil.web.anzeige]]).
+Meldungen – rot, was falsch ist, grau, was fehlt oder hier nicht gerechnet
+wird – und die Legenden unter den Bildern ([[opencivil.web.anzeige]]).
 Namen und Hoehen der Geschosse liest die Oberflaeche aus dem Eintrag; was
 der Kern daraus macht, kommt von hier.
 
@@ -35,8 +35,8 @@ und ihr Umriss aus derselben Zeichnung wie das Bild ihrer Analyse
 def ansicht(aufbau: Aufbau, kennung: str, loesung: Loesung) -> Dict[str, Any]
 ```
 
-Was die Ansicht eines Gebaeudes braucht. Ohne Nachweis -- es fehlt ein
-Geschoss, eine Wand oder ihr Querschnitt -- nur, was fehlt.
+Was die Ansicht eines Gebaeudes braucht. Ohne Nachweis – es fehlt ein
+Geschoss, eine Wand oder ihr Querschnitt – nur, was fehlt.
 
 ### _grundriss
 
@@ -45,7 +45,7 @@ def _grundriss(nummer: int, wand: TragwandEintrag, analyse: Any) -> Dict[str, An
 ```
 
 Eine Wand im Grundriss, in mm: die Flaechen ihrer Analyse um deren
-Schwerpunkt, gedreht nach ihrer Lage -- x nach rechts, y nach oben.
+Schwerpunkt, gedreht nach ihrer Lage – x nach rechts, y nach oben.
 `nummer` ist ihr Platz in der Liste, ab 1, wie in der Herleitung.
 
 ### _verlaufslegende
@@ -54,7 +54,7 @@ Schwerpunkt, gedreht nach ihrer Lage -- x nach rechts, y nach oben.
 def _verlaufslegende(grundrisse: List[Optional[dict]], befund: Erdbebenbefund) -> List[list]
 ```
 
-Was das Bild der Waende, Querkraefte und Momente zeigt -- die Waende mit Namen.
+Was das Bild der Waende, Querkraefte und Momente zeigt – die Waende mit Namen.
 
 ### _richtung
 
@@ -71,7 +71,7 @@ Momente von unten, die Waende. `z` sind die Hoehen der Decken, m.
 def _legende(b: Richtungsbefund, nachweis, loesung: Loesung) -> List[list]
 ```
 
-Je Richtung: T_1 gegen 4 T_C mit dem Urteil (39), dann F_d und M_0 -- mit q und mit q = 1.
+Je Richtung: T_1 gegen 4 T_C mit dem Urteil (39), dann F_d und M_0 – mit q und mit q = 1.
 
 
 ## Braucht

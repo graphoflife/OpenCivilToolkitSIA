@@ -128,7 +128,7 @@ innerhalb des Schnitts wird abgezogen; eine ungleich verteilte Querkraft
 mindert den Umfang mit $k_e$.
 
 Reicht der Beton allein nicht, schlägt das Werkzeug eine Durchstanzbewehrung
-vor -- ancoPLUS von AncoTech -- und weist sie mit den drei Nachweisen von
+vor – ancoPLUS von AncoTech – und weist sie mit den drei Nachweisen von
 4.3.6.5.1 nach, den ersten in zwei Teilen, also mit vier Urteilen: die
 Bewehrung trägt, was der Beton nicht trägt
 ([[Querkraft für die Durchstanzbewehrung]]), und sie trägt fliessend
@@ -147,7 +147,7 @@ Schnitts ([[Beiwert der Momentenübertragung]]).
 
 Bricht an einer Innenstütze die erste Druckdiagonale, wählt das Werkzeug den
 kleinsten ZEUS-Stahlpilz, der in die Platte passt und mit dem die Platte
-ausserhalb hält (4.3.6.6.2) -- wo nötig mit Leisten um ihn. Um den Pilz
+ausserhalb hält (4.3.6.6.2) – wo nötig mit Leisten um ihn. Um den Pilz
 gelten dieselben Schritte wie um die Stütze
 ([[Nachweisschnitt ohne das, was nicht zählt]]). Den Widerstand des Pilzes
 selbst bestätigt der Hersteller.

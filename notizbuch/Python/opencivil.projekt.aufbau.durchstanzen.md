@@ -1,5 +1,5 @@
 ---
-erzeugt: beb4b4de6584
+erzeugt: 279aef6de11d
 art: modul
 tags: [modul]
 ---
@@ -23,7 +23,7 @@ Aussparung braucht drei Ecken, darf sich nicht selbst schneiden und nicht
 def aussparungen(eintrag: DurchstanzEintrag) -> List[List[Tuple[float, float]]]
 ```
 
-Die Aussparungen als Ecken in m -- geprüft, sonst ein Satz, was nicht stimmt.
+Die Aussparungen als Ecken in m – geprüft, sonst ein Satz, was nicht stimmt.
 
 ### bauen
 

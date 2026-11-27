@@ -46,11 +46,11 @@ $$
 ## Theorie
 
 Der Faktor, der aus dem Spitzendruck eines langen Streifens an der Oberfläche
-den eines runden Fusses in der Tiefe macht -- im Buch als Kurven über h/D,
+den eines runden Fusses in der Tiefe macht – im Buch als Kurven über h/D,
 eine je Reibungswinkel (Kap. 12.5, Bild 12.4). Hier abgelesen auf etwa ±0.02
 und dazwischen linear. Ausserhalb von 15° bis 40° und von h/D = 2.5 bis 30
-gilt der Wert am Rand, mit einer Warnung -- nach Vorgabe, nicht
+gilt der Wert am Rand, mit einer Warnung – nach Vorgabe, nicht
 nachgeschlagen. Bei 30° und h/D = 10 ist X = 2.24.
 
-Abgelesen wird mit φ'_k, auch wenn der Fuss örtlich abschert -- nach Vorgabe,
+Abgelesen wird mit φ'_k, auch wenn der Fuss örtlich abschert – nach Vorgabe,
 nicht nachgeschlagen.

@@ -1,5 +1,5 @@
 ---
-erzeugt: c797b0f0b619
+erzeugt: 7918708ff308
 art: modul
 tags: [modul]
 ---
@@ -9,8 +9,8 @@ tags: [modul]
 
 ## VERANTWORTUNG
 
-Buendelt, was [[opencivil.projekt.projekt#Projekt.rechnen|Projekt.rechnen]] liefert -- die Beschreibung, den Aufbau
-und die Loesung -- und die drei Arten, sie anzusehen: die Zusammenfassung,
+Buendelt, was [[opencivil.projekt.projekt#Projekt.rechnen|Projekt.rechnen]] liefert – die Beschreibung, den Aufbau
+und die Loesung – und die drei Arten, sie anzusehen: die Zusammenfassung,
 den vollstaendigen Bericht und das LaTeX-Dokument.
 
 
@@ -53,7 +53,7 @@ Ein gerechnetes Projekt.
 def erfuellt(self) -> bool
 ```
 
-Ob alle gefuehrten Nachweise aufgehen -- die ausgeschalteten zaehlen nicht.
+Ob alle gefuehrten Nachweise aufgehen – die ausgeschalteten zaehlen nicht.
 
 #### Ergebnis.urteile
 
@@ -80,7 +80,7 @@ Was ausgeschaltet ist und trotzdem nicht aufgeht.
 def warnungen(self) -> List[str]
 ```
 
-Was beim Aufbau aufgefallen ist -- etwa eine Platte ohne Einwirkung.
+Was beim Aufbau aufgefallen ist – etwa eine Platte ohne Einwirkung.
 
 #### Ergebnis.urteile_von
 
@@ -88,7 +88,7 @@ Was beim Aufbau aufgefallen ist -- etwa eine Platte ohne Einwirkung.
 def urteile_von(self, bauteil: str) -> List[NachweisUrteil]
 ```
 
-Die gefuehrten Urteile einer Platte oder Analyse -- nach Name oder Kennung.
+Die gefuehrten Urteile einer Platte oder Analyse – nach Name oder Kennung.
 
 #### Ergebnis.wert
 
@@ -104,7 +104,7 @@ Ein einzelner gerechneter Wert, mit Einheit, Herkunft und Norm.
 def balkensystem(self, bauteil: str) -> 'Systembefund'
 ```
 
-Ein gerechnetes Balkensystem, eben oder im Raum -- nach Name oder
+Ein gerechnetes Balkensystem, eben oder im Raum – nach Name oder
 Kennung: sein Ergebnis (`ergebnis`: Meldungen, Faelle mit
 Verschiebungen und Lagerkraeften) und je Fall die Verlaeufe der
 Schnittgroessen (`verlaeufe("Eigengewicht")`), in SI.
@@ -115,7 +115,7 @@ Schnittgroessen (`verlaeufe("Eigengewicht")`), in SI.
 def analysen(self) -> Dict[str, List[Analyse]]
 ```
 
-Die Spannung-Dehnung-Analysen je Platte -- Bilder, keine Nachweise.
+Die Spannung-Dehnung-Analysen je Platte – Bilder, keine Nachweise.
 
 Dieselben, die die Oberflaeche zeichnet: je Fall das Querschnittsbild
 (Dehnungsebene, Spannungen, Schnittgroessen) oder die
@@ -127,7 +127,7 @@ Momenten-Kruemmungs-Linie, in SI.
 def zusammenfassung(self) -> str
 ```
 
-Je Platte eine Tabelle der Nachweise -- wie in der Oberflaeche.
+Je Platte eine Tabelle der Nachweise – wie in der Oberflaeche.
 
 #### Ergebnis.bericht
 

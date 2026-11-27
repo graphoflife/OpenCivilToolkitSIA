@@ -41,7 +41,7 @@ $$
 ## Theorie
 
 Der Benutzer rechnet $w$ selbst, an seinem System und mit der Steifigkeit
-$E_{cm}$ des ungerissenen Querschnitts -- das ist $w_c$ der Norm. Mal den
+$E_{cm}$ des ungerissenen Querschnitts – das ist $w_c$ der Norm. Mal den
 [[Vergrösserungsfaktor der Durchbiegung]] der gezogenen Seite wird daraus die
 Durchbiegung der gerissenen Platte unter Dauerlast, die gegen den
 [[Grenzwert der Durchbiegung]] gehalten wird.

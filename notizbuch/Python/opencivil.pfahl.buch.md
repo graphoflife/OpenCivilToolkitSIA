@@ -1,5 +1,5 @@
 ---
-erzeugt: 6daafc272c9d
+erzeugt: 3057a82c9b4b
 art: modul
 tags: [modul]
 ---
@@ -21,7 +21,7 @@ abgelesen, nicht nachgerechnet: auf etwa ±0.02 genau.
 ## AUSSERHALB DER BILDER
 
 Bild 12.4 reicht von h/D = 2.5 bis 30 und von φ' = 15° bis 40°, Bild 12.5 bis
-L/D = 12. Ausserhalb gilt der Wert am Rand des Bildes -- nach Vorgabe, nicht
+L/D = 12. Ausserhalb gilt der Wert am Rand des Bildes – nach Vorgabe, nicht
 nachgeschlagen; [[opencivil.pfahl.buch#ausserhalb|ausserhalb]] sagt, wo das greift. Bild 12.5 endet bei
 N_c = 9: höchstens so viel, sagt der Text dazu.
 
@@ -68,7 +68,7 @@ N_c aus Bild 12.5.
 def ruhedruckbeiwert(phi: float) -> float
 ```
 
-K_0 ≈ 1 − sin φ (Kap. 2.7) -- `phi` in rad.
+K_0 ≈ 1 − sin φ (Kap. 2.7) – `phi` in rad.
 
 ### ausserhalb
 
@@ -101,7 +101,7 @@ Unter den Grenzen ist der Wert am Rand zu gross, über ihnen zu klein.
 - `ABSCHEREN = 2.0 / 3.0` – Auf diesen Teil sinken φ und c, wenn der Boden am Fuss nur örtlich abschert.
 - `CASSAN_MANTEL = 0.42` – Die Feder am Mantel, B ≈ 0.42 · E: Schubspannung je Setzung, in kN/m³ bei E in kN/m².
 - `CASSAN_FUSS = 4.5` – Die Feder am Fuss, R ≈ 4.5 · E: Spannung mal D je Setzung, σ_F = R · s / D.
-- `BREITE_SCHMAL = 3.0` – Der Erdwiderstand vor einem schmalen Körper wirkt auf einer breiteren Fläche als dieser -- grob genähert auf der dreifachen Breite.
+- `BREITE_SCHMAL = 3.0` – Der Erdwiderstand vor einem schmalen Körper wirkt auf einer breiteren Fläche als dieser – grob genähert auf der dreifachen Breite.
 
 ## Gebraucht von
 

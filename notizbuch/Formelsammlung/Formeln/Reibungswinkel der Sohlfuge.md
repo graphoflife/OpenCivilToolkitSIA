@@ -47,8 +47,8 @@ $$
 Die Sohlfuge reibt höchstens so gut wie der Boden selbst. SIA 267:2013
 setzt den charakteristischen Sohlreibungswinkel $\delta_k$ darum als Teil
 von $\varphi_k$ an (8.4.1.1): ganz bei einer rauen Sohle, unter der der
-Bruch im Boden verläuft -- etwa bei einem auf den Boden betonierten
-Fundament --, ½ bis ⅔ bei einer glatten, wo er in der Fuge selbst liegt. In
+Bruch im Boden verläuft – etwa bei einem auf den Boden betonierten
+Fundament –, ½ bis ⅔ bei einer glatten, wo er in der Fuge selbst liegt. In
 jedem Fall höchstens 35°. Das Buch nennt für $\delta^{*}$ etwa ⅔ bis
 1 · φ, ohne Grenze (Kap. 9.2.18).
 

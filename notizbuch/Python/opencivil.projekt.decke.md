@@ -1,5 +1,5 @@
 ---
-erzeugt: 922087579338
+erzeugt: c6c90f0a989c
 art: modul
 tags: [modul]
 ---
@@ -11,7 +11,7 @@ tags: [modul]
 
 Der [[opencivil.projekt.decke#DeckeEintrag|DeckeEintrag]]: Platten, Linienlager, Stuetzen, versteckte
 Unterzuege und Zonen der Lastaufteilung, gezeichnet aus Knoten im Grundriss
--- als speicherbare Datenklasse wie das Balkensystem
+– als speicherbare Datenklasse wie das Balkensystem
 ([[opencivil.projekt.balkensystem]]). Dazu der Baukasten, der ohne
 Oberflaeche zeichnet. Gerechnet wird nach der Streifenmethode, in
 [[opencivil.decke]].
@@ -22,15 +22,15 @@ Oberflaeche zeichnet. Gerechnet wird nach der Streifenmethode, in
 Eine Platte und eine Zone sind Umrisse aus Knoten, ein Linienlager und ein
 Unterzug laufen von einem Knoten zum anderen, eine Stuetze steht an einem.
 Wo zwei Platten oder eine Platte und eine Wand sich eine Ecke teilen,
-teilen sie den Knoten -- wer ihn verschiebt, verschiebt sie beide, und es
+teilen sie den Knoten – wer ihn verschiebt, verschiebt sie beide, und es
 entsteht keine Fuge, die niemand gezeichnet hat.
 
 
 ## LASTEN
 
 Jede Last gehoert zu einem Lastfall ([[opencivil.projekt.faelle]], wie
-im Balkensystem). Eine Flaechenlast ist gezeichnet -- ein Umriss aus
-Knoten -- oder liegt auf der ganzen Platte: dann steht sie an der Platte
+im Balkensystem). Eine Flaechenlast ist gezeichnet – ein Umriss aus
+Knoten – oder liegt auf der ganzen Platte: dann steht sie an der Platte
 (`lasten`) und geht mit ihr, wenn sie kopiert oder geloescht wird. Eine
 Linienlast laeuft von Knoten zu Knoten, eine Punktlast steht an einem und
 verteilt sich ueber `l_x × l_y`. Nach unten positiv.
@@ -38,7 +38,7 @@ verteilt sich ueber `l_x × l_y`. Nach unten positiv.
 
 ## ERGEBNISBILDER
 
-Welche Bilder rechts stehen, sagt die Liste `diagramme` -- wie die
+Welche Bilder rechts stehen, sagt die Liste `diagramme` – wie die
 Statik-Analyse des Balkensystems je Zeile ein Fall und eine Groesse. Eine
 frische Decke hat m_x, m_y, v_0 und die Lagerkraefte der GZT. Ein Bild
 zeigt die ganze Platte oder einen Schnitt: eine Linie von Knoten zu
@@ -49,7 +49,7 @@ ein.
 
 ## KOORDINATEN UND EINHEITEN
 
-x nach rechts, y nach oben, in m -- ebenso die Breite eines Unterzugs, der
+x nach rechts, y nach oben, in m – ebenso die Breite eines Unterzugs, der
 Stuetzenbereich und die Streifenbreite. Die Dicke einer Platte und der
 Querschnitt einer Stuetze in mm, Anteile in %, die Richtungen der Streifen
 in Grad gegen x, im Gegenuhrzeigersinn. Lasten in kN/m², kN/m und kN.
@@ -90,11 +90,11 @@ Eine Flaechenlast auf der ganzen Platte, an der sie steht, in einem Lastfall.
 class DeckenplatteEintrag(Beschreibung)
 ```
 
-Eine Platte: ihr Umriss, ihre Dicke und ihr Beton -- E_cm und die Dichte
-des Stahlbetons von ihm, wie bei einem Stab des Balkensystems -- und die
+Eine Platte: ihr Umriss, ihre Dicke und ihr Beton – E_cm und die Dichte
+des Stahlbetons von ihm, wie bei einem Stab des Balkensystems – und die
 zwei Richtungen, in denen ihre Streifen tragen: von selbst entlang ihrer
 Ränder ([[opencivil.decke.richtungen]]) oder von Hand. Von Hand liegen
-sie mindestens 5° auseinander, sonst trügen sie kaum anders als eine --
+sie mindestens 5° auseinander, sonst trügen sie kaum anders als eine –
 das weist schon das Feld ab.
 
 - `kennung: str = ''`
@@ -114,7 +114,7 @@ def ergaenzt(cls, roh: Mapping[str, Any], basis: Optional[DeckenplatteEintrag]) 
 ```
 
 `roh` mit `richtungen_von_hand`, wo es fehlt, aber ein Winkel
-dasteht -- in einer Datei von vor dem 2026-11-26 stehen beide: mit
+dasteht – in einer Datei von vor dem 2026-11-26 stehen beide: mit
 0° und 90°, der Vorgabe von damals, wählt die Platte ihre Richtungen
 nun selbst, mit anderen Winkeln bleiben es die des Benutzers. Ebenso,
 wer ohne Maske schreibt: wer einen anderen Winkel angibt, meint ihn.
@@ -126,7 +126,7 @@ wer ohne Maske schreibt: wer einen anderen Winkel angibt, meint ihn.
 class LinienlagerEintrag(Beschreibung)
 ```
 
-Ein Linienlager -- eine Wand, ein Rand auf einem Träger: vertikal
+Ein Linienlager – eine Wand, ein Rand auf einem Träger: vertikal
 gehalten oder nicht, eingespannt oder nicht. Eingespannt ohne vertikalen
 Halt hält es nur die Drehung, wie an einer Symmetrieachse.
 
@@ -144,7 +144,7 @@ class StuetzeEintrag(Beschreibung)
 ```
 
 Eine Stütze unter der Decke, `b_x × b_y`. Die Streifen geben ihre
-Last über den Stützenbereich `l_x × l_y` ab (Folie 39) -- von Hand
+Last über den Stützenbereich `l_x × l_y` ab (Folie 39) – von Hand
 oder, ohne Angabe, so gross wie die Stütze oder der breiteste Unterzug
 über ihr ([[opencivil.decke.streifen#stuetzenbereich|opencivil.decke.streifen.stuetzenbereich]]).
 
@@ -181,7 +181,7 @@ class ZoneEintrag(Beschreibung)
 ```
 
 Eine Zone der Lastaufteilung: in ihrem Umriss geht `anteil` der Last
-in die Richtung 1 der Platte, der Rest in die Richtung 2 -- statt der
+in die Richtung 1 der Platte, der Rest in die Richtung 2 – statt der
 Aufteilung der Decke.
 
 - `kennung: str = ''`
@@ -209,7 +209,7 @@ Eine gleichmaessige Flaechenlast auf einem gezeichneten Umriss, in einem Lastfal
 class LinienlastEintrag(Beschreibung)
 ```
 
-Eine gleichmaessige Linienlast von Knoten zu Knoten, in einem Lastfall -- eine Wand darauf etwa.
+Eine gleichmaessige Linienlast von Knoten zu Knoten, in einem Lastfall – eine Wand darauf etwa.
 
 - `kennung: str = ''`
 - `lastfall: str = ''`
@@ -259,16 +259,16 @@ Schnittkraft wie an einem Balken, mit den Lagern, die er kreuzt
 class DeckendiagrammEintrag(Beschreibung)
 ```
 
-Ein Ergebnisbild der Decke: ein Fall und was es von ihm zeigt -- über
+Ein Ergebnisbild der Decke: ein Fall und was es von ihm zeigt – über
 die ganze Platte, längs eines Schnitts oder in einem Unterzug, dort M
 und V über seine ganze Breite. Gerechnet wird damit nichts
--- die Decke rechnet jeden Fall; die Liste sagt nur, welche Bilder
+– die Decke rechnet jeden Fall; die Liste sagt nur, welche Bilder
 rechts stehen.
 
 - `IM_ORT = 'Diagramm'`
 - `fall: str = ''` – Die Kennung eines Lastfalls (`LF1`) oder einer Kombination (`LK1`).
 - `groesse: str = einer_von(DIAGRAMMGROESSEN, 'm_x')`
-- `schnitt: str = ''` – Wo das Bild schneidet: die Kennung eines Schnitts (`SN1`) oder eines Unterzugs (`U1`) -- leer: die ganze Platte. Die Lagerkräfte zeigen immer die ganze; M und V gibt es nur in einem Unterzug, die Grössen der Platte nur ausserhalb. Der Name blieb, als der Unterzug dazukam: ein neuer machte heute gespeicherte Stände unlesbar.
+- `schnitt: str = ''` – Wo das Bild schneidet: die Kennung eines Schnitts (`SN1`) oder eines Unterzugs (`U1`) – leer: die ganze Platte. Die Lagerkräfte zeigen immer die ganze; M und V gibt es nur in einem Unterzug, die Grössen der Platte nur ausserhalb. Der Name blieb, als der Unterzug dazukam: ein neuer machte heute gespeicherte Stände unlesbar.
 
 ### DeckeEintrag
 
@@ -280,7 +280,7 @@ class DeckeEintrag(MitFaellen, BauteilEintrag)
 Eine Decke aus Platten auf Linienlagern und Stützen, mit versteckten
 Unterzügen und Zonen, und ihren Lasten, Lastfällen und Kombinationen.
 Wie die Last aufgeteilt wird, gilt für die ganze Decke: automatisch
-nach Folie 31 oder `anteil` in die Richtung 1 -- in einer Zone deren
+nach Folie 31 oder `anteil` in die Richtung 1 – in einer Zone deren
 Anteil.
 
 Ohne Regeln, die das ganze Projekt aufhielten: was an einer Decke nicht
@@ -307,7 +307,7 @@ stimmt, steht in ihren Meldungen, und die anderen Bauteile rechnen weiter.
 - `aufteilung: Aufteilung = Aufteilung.AUTOMATISCH`
 - `anteil: float = bereich(50.0, heisst='Anteil in Richtung 1', einheit=PROZENT, ab=0.0,…` – Nur bei fester Aufteilung.
 - `bandbreite: float = bereich(BANDBREITE, heisst='Breite der Bänder', einheit=M, ueber=0.0)` – Nur bei automatischer Aufteilung ([[opencivil.decke.baender|baender]]).
-- `beschreibung: str = ''` – Freier Text -- geht in keine Rechnung ein.
+- `beschreibung: str = ''` – Freier Text – geht in keine Rechnung ein.
 
 #### DeckeEintrag.materialien
 
@@ -315,7 +315,7 @@ stimmt, steht in ihren Meldungen, und die anderen Bauteile rechnen weiter.
 def materialien(self) -> List[str]
 ```
 
-Jeder Beton des Projekts, auf den eine Platte zeigt -- jeder einmal.
+Jeder Beton des Projekts, auf den eine Platte zeigt – jeder einmal.
 
 #### DeckeEintrag.lagen
 
@@ -331,7 +331,7 @@ Kennung -> `(x, y)` jedes Knotens, in m.
 def schnittlinien(self) -> List[Tuple[str, Punkt, Punkt]]
 ```
 
-Je Schnitt seine Kennung und seine Enden, in m -- einer, dem ein Knoten fehlt, nicht.
+Je Schnitt seine Kennung und seine Enden, in m – einer, dem ein Knoten fehlt, nicht.
 
 #### DeckeEintrag.netz
 
@@ -353,7 +353,7 @@ Eine Platte mit diesen Ecken und dem Beton `beton` (Eintrag oder Kennung).
 def lager(self, von: Ort, bis: Ort, **felder: Any) -> LinienlagerEintrag
 ```
 
-Ein Linienlager von `von` nach `bis` -- heisst so, weil die Liste `linienlager` heisst.
+Ein Linienlager von `von` nach `bis` – heisst so, weil die Liste `linienlager` heisst.
 
 #### DeckeEintrag.stuetze
 
@@ -399,7 +399,7 @@ def punktlast(self, lastfall: Any, ort: Ort, **felder: Any) -> PunktlastEintrag
 def schnitt(self, von: Ort, bis: Ort) -> DeckenschnittEintrag
 ```
 
-Ein Schnitt von `von` nach `bis` -- längs ihm zeigt ein Ergebnisbild eine Schnittkraft.
+Ein Schnitt von `von` nach `bis` – längs ihm zeigt ein Ergebnisbild eine Schnittkraft.
 
 #### DeckeEintrag.plattenlast
 
@@ -408,7 +408,7 @@ def plattenlast(self, lastfall: Any, platte: Any, wert: float) -> PlattenlastEin
 ```
 
 Die Flächenlast auf der ganzen Platte `platte` (Eintrag oder
-Kennung) im Lastfall `lastfall`, in kN/m² -- je Platte und Lastfall
+Kennung) im Lastfall `lastfall`, in kN/m² – je Platte und Lastfall
 eine, wie in der Oberfläche: eine zweite ersetzt die erste.
 
 #### DeckeEintrag.diagramm
@@ -417,7 +417,7 @@ eine, wie in der Oberfläche: eine zweite ersetzt die erste.
 def diagramm(self, fall: Any, groesse: str='m_x', schnitt: Any='') -> DeckendiagrammEintrag
 ```
 
-Ein Ergebnisbild -- `fall` ein Lastfall oder eine Kombination,
+Ein Ergebnisbild – `fall` ein Lastfall oder eine Kombination,
 `schnitt` einer der Schnitte oder Unterzüge (Eintrag oder
 Kennung), ohne ihn die ganze Platte.
 
@@ -429,8 +429,8 @@ def neu(cls, kennung: str, name: str) -> 'DeckeEintrag'
 ```
 
 Eine frische Decke, wie der Benutzer sie angelegt bekommt: ohne
-Platte, aber mit den Lastfällen eines frischen Balkensystems -- das
-Eigengewicht kommt von selbst -- und nur der Kombination GZT, ohne
+Platte, aber mit den Lastfällen eines frischen Balkensystems – das
+Eigengewicht kommt von selbst – und nur der Kombination GZT, ohne
 GZG: die Streifenmethode gilt für die Tragsicherheit (Benutzer,
 2026-11-14). Dazu die Bilder m_x, m_y, v_0 und die Lagerkräfte der GZT.
 
@@ -438,7 +438,7 @@ GZG: die Streifenmethode gilt für die Tragsicherheit (Benutzer,
 ## Konstanten
 
 - `Ort = Union[str, Sequence[float]]` – Ein Ort im Baukasten: die Kennung eines Knotens oder `(x, y)` in m.
-- `PLATTENGROESSEN = (*GROESSEN, 'lager')` – Was ein Ergebnisbild zeigt: eine Schnittkraft der Platte, die Lagerkraefte -- oder Moment und Querkraft eines ganzen Unterzugs.
+- `PLATTENGROESSEN = (*GROESSEN, 'lager')` – Was ein Ergebnisbild zeigt: eine Schnittkraft der Platte, die Lagerkraefte – oder Moment und Querkraft eines ganzen Unterzugs.
 - `DIAGRAMMGROESSEN = (*PLATTENGROESSEN, *BALKENGROESSEN)`
 - `VORSILBEN = {'platten': 'P', 'linienlager': 'L', 'stuetzen': 'S', 'unterzuege': '…` – Womit die Kennungen der Teile einer Decke beginnen.
 

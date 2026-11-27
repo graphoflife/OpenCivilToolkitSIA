@@ -57,5 +57,5 @@ Quer zur Achse gilt dieselbe Formel. Die Norm will R_tr,d für das Objekt
 festgelegt, in der Regel mit γ_M,a mindestens 1.4 (9.5.2.3.1, (49)); das
 Werkzeug nimmt 1.4. Für η_a gelten quer dieselben Grenzen wie längs
 (9.5.2.3.2), und R_tr,k ist immer gerechnet: höchstens 0.7. Mit
-R_tr,k = 678 kN wird R_tr,d = 0.7 · 678 kN / 1.4 = 339 kN -- zusammen ein
+R_tr,k = 678 kN wird R_tr,d = 0.7 · 678 kN / 1.4 = 339 kN – zusammen ein
 Faktor 2.

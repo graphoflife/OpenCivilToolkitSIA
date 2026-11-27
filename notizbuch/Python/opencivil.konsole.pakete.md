@@ -1,5 +1,5 @@
 ---
-erzeugt: 3140663d9025
+erzeugt: 930fedbddc4a
 art: modul
 tags: [modul]
 ---
@@ -13,7 +13,7 @@ Mitgeliefert ist, was unter `web/vendor/pyodide/` liegt: numpy und pandas
 samt dem, was pandas braucht (Benutzer, 2026-10-15; geholt mit
 `werkzeug/pyodide_holen.py`). Welche das sind, schreibt die Brücke aus den
 Dateien, die dort liegen, nach `web/kern/dateien.json` (Eintrag
-`pakete`: Importname -> Paketname). Hier wird nur gelesen -- eine zweite
+`pakete`: Importname -> Paketname). Hier wird nur gelesen – eine zweite
 Liste gäbe es nicht, die veralten könnte.
 
 
@@ -41,7 +41,7 @@ Importname -> Paketname, für jedes Paket, das beiliegt.
 def importe(code: str) -> List[str]
 ```
 
-Die Module, die `code` einbindet -- nur der erste Teil des Namens: `numpy` für `numpy.linalg`.
+Die Module, die `code` einbindet – nur der erste Teil des Namens: `numpy` für `numpy.linalg`.
 
 ### gebraucht
 
@@ -49,7 +49,7 @@ Die Module, die `code` einbindet -- nur der erste Teil des Namens: `numpy` für 
 def gebraucht(code: str) -> List[str]
 ```
 
-Die beiliegenden Pakete, die `code` einbindet -- ihre Abhängigkeiten lädt Pyodide selbst.
+Die beiliegenden Pakete, die `code` einbindet – ihre Abhängigkeiten lädt Pyodide selbst.
 
 ### laden
 
@@ -70,7 +70,7 @@ Was zu einem Modul gesagt wird, das sich nicht einbinden liess.
 
 ## Konstanten
 
-- `VERZEICHNIS = Path(__file__).resolve().parents[2] / 'web' / 'kern' / 'dateien.json'` – Das Verzeichnis des Kerns -- im Faden liegt es an derselben Stelle neben `opencivil/` wie im Repo (`web/js/kern_arbeiter.js`).
+- `VERZEICHNIS = Path(__file__).resolve().parents[2] / 'web' / 'kern' / 'dateien.json'` – Das Verzeichnis des Kerns – im Faden liegt es an derselben Stelle neben `opencivil/` wie im Repo (`web/js/kern_arbeiter.js`).
 
 ## Gebraucht von
 

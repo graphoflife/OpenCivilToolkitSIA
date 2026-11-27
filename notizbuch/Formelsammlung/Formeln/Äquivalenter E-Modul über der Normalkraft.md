@@ -26,5 +26,5 @@ Wie beim [[Äquivalenter E-Modul über dem Moment|Moment]], für die
 Längsdehnung: der Modul, mit dem ein reiner Betonquerschnitt sich unter
 derselben Normalkraft gleich stark dehnte, $N = E_{eq} \cdot A_c \cdot
 (\varepsilon_m - \varepsilon_0)$. $\varepsilon_0$ ist die Dehnung, die das
-feste Moment allein schon erzeugt. Gerechnet wird nur auf Zug -- dort, wo
+feste Moment allein schon erzeugt. Gerechnet wird nur auf Zug – dort, wo
 Reissen die Steifigkeit verändert.

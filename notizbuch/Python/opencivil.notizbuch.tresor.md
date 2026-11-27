@@ -1,5 +1,5 @@
 ---
-erzeugt: a51297bde14b
+erzeugt: 15b15ad824d0
 art: modul
 tags: [modul]
 ---
@@ -9,7 +9,7 @@ tags: [modul]
 
 ## VERANTWORTUNG
 
-Schreibt die Seiten, die aus dem Code entstehen, in den Tresor -- so, dass
+Schreibt die Seiten, die aus dem Code entstehen, in den Tresor – so, dass
 nichts verloren geht, was von Hand dazukam. Und fuehrt das Verzeichnis, aus
 dem die Oberflaeche erfaehrt, welche Seiten es gibt.
 
@@ -30,16 +30,16 @@ der eigene Teil, von Hand
 
 `erzeugt` ist die Pruefsumme ueber alles bis und mit der Linie, ohne die
 eigene Zeile. Beim Neuerzeugen wird nur dieser Teil ersetzt; der eigene Teil
-bleibt Zeichen fuer Zeichen. Seiten ohne eigenen Teil -- Modul- und
-Verzeichnisseiten -- haben keine Linie: sie sind ganz erzeugt.
+bleibt Zeichen fuer Zeichen. Seiten ohne eigenen Teil – Modul- und
+Verzeichnisseiten – haben keine Linie: sie sind ganz erzeugt.
 
 
 ## WER WAS ANFASSEN DARF
 
 Dem Generator gehoeren nur Dateien mit `erzeugt:`. Eine Notiz ohne, wo
 immer sie liegt, bleibt unberuehrt. Hat jemand oben in einer erzeugten Seite
-etwas geaendert -- getippt, oder in Obsidian umbenannt, das die Links
-nachfuehrt --, stimmt die Pruefsumme nicht mehr: dann schreibt der Generator
+etwas geaendert – getippt, oder in Obsidian umbenannt, das die Links
+nachfuehrt –, stimmt die Pruefsumme nicht mehr: dann schreibt der Generator
 gar nichts und nennt die Dateien. Raten, was davon bleiben soll, waere
 schlimmer.
 
@@ -53,7 +53,7 @@ neue und eine alte zurueck.
 
 ## VERWAIST
 
-Gibt es eine Formel nicht mehr, gibt es ihre Seite nicht mehr -- es sei denn,
+Gibt es eine Formel nicht mehr, gibt es ihre Seite nicht mehr – es sei denn,
 unter der Linie steht etwas. Dann bleibt die Seite stehen, oben mit einem
 Hinweis, bis der Text an der richtigen Seite steht; ein Test haelt das fest.
 
@@ -79,7 +79,7 @@ Eine erzeugte Seite, bevor sie geschrieben ist.
 - `pfad: str` – Im Tresor, mit `/` getrennt: `Formelsammlung/Formeln/Statische Höhe.md`.
 - `art: str` – `formel`, `thema`, `verzeichnis` oder `modul`.
 - `rumpf: str` – Der erzeugte Teil, ohne Kopf und ohne Linie.
-- `eigenschaften: Tuple[Tuple[str, Any], ...] = ()` – Weitere Eintraege des Kopfs, in dieser Folge -- Text oder Liste von Texten.
+- `eigenschaften: Tuple[Tuple[str, Any], ...] = ()` – Weitere Eintraege des Kopfs, in dieser Folge – Text oder Liste von Texten.
 - `eigener_teil: bool = False` – Ob unter einer Linie von Hand weitergeschrieben wird.
 - `rang: int = 0` – Wo die Seite im Verzeichnis steht, innerhalb ihres Ordners.
 - `verzeichnis: Tuple[Tuple[str, Any], ...] = ()` – Was das Verzeichnis zusaetzlich ueber die Seite weiss: Zeichen, Themen ...
@@ -100,7 +100,7 @@ class Datei
 
 Eine Seite, wie sie im Tresor liegt.
 
-- `erzeugt: Optional[str]` – Die abgelegte Pruefsumme -- `None` bei einer Notiz von Hand.
+- `erzeugt: Optional[str]` – Die abgelegte Pruefsumme – `None` bei einer Notiz von Hand.
 - `stimmt: bool` – Ob die Pruefsumme zum Inhalt passt.
 - `eigen: Optional[str]` – Alles nach der Linie, oder `None`, wenn es keine gibt.
 - `eigenschaften: Dict[str, str] = field(default_factory=dict)`
@@ -151,7 +151,7 @@ Leerzeichen danach oder ein `#` hiesse sonst etwas anderes.
 def text_der_seite(seite: Seite, eigen: str='') -> str
 ```
 
-Die Datei, wie sie geschrieben wird -- mit dem eigenen Teil, wo es einen
+Die Datei, wie sie geschrieben wird – mit dem eigenen Teil, wo es einen
 gibt. Die Linie darf sonst nirgends stehen, auch nicht in einem
 Codeblock: wer die Datei liest, hielte sie fuer die Grenze.
 
@@ -177,7 +177,7 @@ Jede Markdown-Datei im Tresor, ohne die Arbeitsdateien von Obsidian.
 def planen(seiten: Sequence[Seite], wurzel: Path) -> Plan
 ```
 
-Was zu schreiben, zu loeschen und zu beanstanden waere -- ohne etwas anzufassen.
+Was zu schreiben, zu loeschen und zu beanstanden waere – ohne etwas anzufassen.
 
 ### ausfuehren
 
@@ -185,7 +185,7 @@ Was zu schreiben, zu loeschen und zu beanstanden waere -- ohne etwas anzufassen.
 def ausfuehren(plan: Plan, wurzel: Path) -> None
 ```
 
-Schreibt und loescht, was der Plan sagt -- nur, wenn er nichts beanstandet.
+Schreibt und loescht, was der Plan sagt – nur, wenn er nichts beanstandet.
 
 ### verzeichnis
 
@@ -195,8 +195,8 @@ def verzeichnis(seiten: Sequence[Seite], wurzel: Path) -> List[Dict[str, Any]]
 
 Jede Seite des Tresors, erzeugt oder von Hand, in der Folge des Baums:
 Start, Formelsammlung (Uebersicht, Themen in Rechenfolge, Formeln von A
-bis Z), Python, Notizen, dann alles andere. Eine Ordnerseite -- sie heisst
-wie ihr Ordner -- steht vor den uebrigen.
+bis Z), Python, Notizen, dann alles andere. Eine Ordnerseite – sie heisst
+wie ihr Ordner – steht vor den uebrigen.
 
 ### anhaenge
 
@@ -204,12 +204,12 @@ wie ihr Ordner -- steht vor den uebrigen.
 def anhaenge(wurzel: Path) -> List[str]
 ```
 
-Was ausser Seiten im Tresor liegt -- Bilder, die eine Seite einbettet.
+Was ausser Seiten im Tresor liegt – Bilder, die eine Seite einbettet.
 
 
 ## Konstanten
 
-- `LINIE = '<!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->'` – Die Linie zwischen erzeugtem und eigenem Teil -- in Obsidian und auf der Seite unsichtbar, im Quelltext unuebersehbar.
+- `LINIE = '<!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->'` – Die Linie zwischen erzeugtem und eigenem Teil – in Obsidian und auf der Seite unsichtbar, im Quelltext unuebersehbar.
 - `ORDNER = ('', 'Anleitungen', 'Formelsammlung', 'Formelsammlung/Themen', 'Forme…` – Die Ordner in der Reihenfolge, in der das Verzeichnis sie fuehrt.
 - `_VERBORGEN = re.compile('(^|/)\\.')` – Was im Tresor kein Inhalt ist: die Arbeitsdateien von Obsidian.
 

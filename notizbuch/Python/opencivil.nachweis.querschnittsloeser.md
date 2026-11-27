@@ -1,5 +1,5 @@
 ---
-erzeugt: 071357bb866a
+erzeugt: cce57cede404
 art: modul
 tags: [modul]
 ---
@@ -10,7 +10,7 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Sucht zu `(N_Ed, M_Ed)` die Dehnungsebene `(eps_m, chi)`, die den
-Querschnitt ins Gleichgewicht bringt -- und liefert damit die Spannungen in
+Querschnitt ins Gleichgewicht bringt – und liefert damit die Spannungen in
 jeder Lage.
 
 
@@ -25,21 +25,21 @@ Browser ueber Pyodide, ohne Abhaengigkeiten.
 ## DAS VERFAHREN
 
 Zwei ineinandergeschachtelte Suchen. Bei festem `chi` waechst
-`N(eps_m)` monoton -- mehr Dehnung heisst mehr Zug --, also laesst sich
+`N(eps_m)` monoton – mehr Dehnung heisst mehr Zug –, also laesst sich
 `eps_m` eindeutig so waehlen, dass `N = N_Ed`. Damit wird `M` eine
 Funktion von `chi` allein, und die waechst ebenfalls monoton. Die aeussere
-Suche findet darin die Kruemmung. Wie beide suchen -- halbiert oder mit
-Illinois --, bekommt der Loeser mit ([[opencivil.core.suche]]), und so
+Suche findet darin die Kruemmung. Wie beide suchen – halbiert oder mit
+Illinois –, bekommt der Loeser mit ([[opencivil.core.suche]]), und so
 schreibt er es auch in die Mitschrift ([[opencivil.nachweis.querschnittsloeser#verfahren|verfahren]]).
 
 **Beide Suchen brauchen einen gueltigen Dehnungsbereich.** Jenseits der
 Bruchdehnungen geben die Werkstoffgesetze null zurueck; dort ist nichts mehr
 monoton, und die Suche findet Scheinloesungen. Das Fenster fuer `eps_m`
-haengt darum von `chi` ab -- siehe [[opencivil.nachweis.querschnittsloeser#Faserloeser._fenster|Faserloeser._fenster]].
+haengt darum von `chi` ab – siehe [[opencivil.nachweis.querschnittsloeser#Faserloeser._fenster|Faserloeser._fenster]].
 
 Beide Suchen sind robust: sie bleiben eingegrenzt, kein Startwert kann
 danebenliegen, kein Newton-Schritt kann davonlaufen. Halbiert kosten sie
-mehr Auswertungen als ein Newton-Verfahren -- bei rund 60 Fasern und 60
+mehr Auswertungen als ein Newton-Verfahren – bei rund 60 Fasern und 60
 Halbierungen ist das unbedeutend; mit Illinois ein Viertel davon.
 
 
@@ -47,14 +47,14 @@ Halbierungen ist das unbedeutend; mit Illinois ein Viertel davon.
 
 Nicht die Suche, sondern die **Probe**. Geschrieben wird die gefundene Ebene
 und der Nachweis, dass mit ihr `N_int = N_Ed` und `M_int = M_Ed`
-herauskommt. Wer das nachrechnen will, integriert zwei Mal ueber die Hoehe --
+herauskommt. Wer das nachrechnen will, integriert zwei Mal ueber die Hoehe –
 das geht von Hand. Den Weg dorthin muss er nicht nachvollziehen. Dasselbe
 Vorgehen wie bei der Neigungssuche des Querkraftnachweises.
 
 Die Probe rechnet der Loeser auch selbst ([[opencivil.nachweis.querschnittsloeser#Faserloeser._mit_probe|Faserloeser._mit_probe]]):
 die Suchen enden, wo ihr Fenster eng genug ist, und erst die Probe sagt, ob
-dort `N_Ed` und `M_Ed` herauskommen. Springt ein Gesetz -- der
-Spannungsblock --, endet eine Suche auch an einem Sprung, wo es keine Ebene
+dort `N_Ed` und `M_Ed` herauskommen. Springt ein Gesetz – der
+Spannungsblock –, endet eine Suche auch an einem Sprung, wo es keine Ebene
 gibt. Dann ist sie verfehlt ([[opencivil.nachweis.querschnittsloeser#Ebene|Ebene.verfehlt]]), und der Nachweis sagt
 das statt der Probe. Bis 2026-10-15 stand die Probe dort trotzdem, mit
 Haekchen: an einer Platte h = 250 mm, ⌀12 oben und unten, unter
@@ -82,7 +82,7 @@ Beides kommt aus der Interaktion
 Zugrichtung zerlegt: bei der Platte ein Rechteck mit je Lage einem Stab
 ([[opencivil.nachweis.rechenwahl#Gesetze.loeser|loeser]]), beim gezeichneten
 Querschnitt seine Polygone ([[opencivil.spannungsanalyse.schnitt]]).
-`eps_m` ist die Dehnung im Bezugspunkt -- bei der Platte auf halber Hoehe,
+`eps_m` ist die Dehnung im Bezugspunkt – bei der Platte auf halber Hoehe,
 beim gezeichneten Querschnitt im Schwerpunkt; `oben` und `unten` sagen,
 wo die Raender liegen. Bis 2026-11-20 baute die Platte ihre Fasern und
 Grenzen selbst, als Rechteck ein zweites Mal.
@@ -101,7 +101,7 @@ Alles in SI-Basis.
 class Stahllage
 ```
 
-Eine Bewehrungslage samt ihrem Stahl -- die eine Gestalt, in der jede
+Eine Bewehrungslage samt ihrem Stahl – die eine Gestalt, in der jede
 Rechnung am Plattenquerschnitt eine Lage sieht: der Loeser, die genaue
 Resistenzlinie, die Handrechnung, die Spannung-Dehnung-Analyse. Gebaut
 wird sie an einer Stelle,
@@ -109,15 +109,15 @@ wird sie an einer Stelle,
 
 - `a_s: float` – Querschnitt in m^2, bezogen auf die betrachtete Breite.
 - `z: float` – Tiefenlage ab Oberkante, in m.
-- `stahl: Stahlgesetz` – Der Stahl dieser Lage, mit den Festigkeiten des Wertesatzes -- `f_yd` oder `f_yk` im Feld `f_yd`. Jede Lage traegt ihren eigenen: der Editor laesst je Seite einen anderen Stahl waehlen. Bis 2026-10-12 bekam der Loeser einen einzigen, den der ersten Lage, und unten B700B mit oben B500B rechnete die obere Lage mit f_yd = 609 statt 435 N/mm².
-- `sorte: str = ''` – Die Kennung des Stahls (`s1`) -- unter ihr heissen seine Eingaben.
-- `stahlname: str = ''` – Der Name des Stahls («B500B») -- so heisst die Grenze seiner Dehnung.
+- `stahl: Stahlgesetz` – Der Stahl dieser Lage, mit den Festigkeiten des Wertesatzes – `f_yd` oder `f_yk` im Feld `f_yd`. Jede Lage traegt ihren eigenen: der Editor laesst je Seite einen anderen Stahl waehlen. Bis 2026-10-12 bekam der Loeser einen einzigen, den der ersten Lage, und unten B700B mit oben B500B rechnete die obere Lage mit f_yd = 609 statt 435 N/mm².
+- `sorte: str = ''` – Die Kennung des Stahls (`s1`) – unter ihr heissen seine Eingaben.
+- `stahlname: str = ''` – Der Name des Stahls («B500B») – so heisst die Grenze seiner Dehnung.
 - `nummer: int = 0` – Nur zur Zuordnung in der Mitschrift.
-- `seite: Optional[Zugseite] = None` – Die Seite, an der die Lage liegt -- bei der Platte unten die 1. und 2. Lage ([[opencivil.querschnitt.platte#Bewehrungslage.seite|seite]]). Ohne Angabe laesst sie sich nicht je Seite zusammenfassen ([[opencivil.nachweis.querschnittsloeser#je_seite|je_seite]]).
-- `text: str = ''` – Wie die Lage in Tabellen heisst -- «2. Lage Grundbewehrung».
-- `index: str = ''` – Ihr Index in den Symbolen -- `1,x,g` ([[opencivil.querschnitt.lagenaufbau#Postenbezug|index]]), die zusammengefasste Lage den ihrer Teile, `1,x` ([[opencivil.nachweis.querschnittsloeser#gemeinsamer_index|gemeinsamer_index]]).
-- `teile: Tuple['Stahllage', ...] = ()` – Woraus sie zusammengefasst ist ([[opencivil.nachweis.querschnittsloeser#je_seite|je_seite]]) -- fuer die Herleitung ihres Schwerpunkts.
-- `vorgespannt: bool = False` – Ob die Lage ein Spannglied ist -- ihr Stahl ist anders gedehnt als der Beton dort.
+- `seite: Optional[Zugseite] = None` – Die Seite, an der die Lage liegt – bei der Platte unten die 1. und 2. Lage ([[opencivil.querschnitt.platte#Bewehrungslage.seite|seite]]). Ohne Angabe laesst sie sich nicht je Seite zusammenfassen ([[opencivil.nachweis.querschnittsloeser#je_seite|je_seite]]).
+- `text: str = ''` – Wie die Lage in Tabellen heisst – «2. Lage Grundbewehrung».
+- `index: str = ''` – Ihr Index in den Symbolen – `1,x,g` ([[opencivil.querschnitt.lagenaufbau#Postenbezug|index]]), die zusammengefasste Lage den ihrer Teile, `1,x` ([[opencivil.nachweis.querschnittsloeser#gemeinsamer_index|gemeinsamer_index]]).
+- `teile: Tuple['Stahllage', ...] = ()` – Woraus sie zusammengefasst ist ([[opencivil.nachweis.querschnittsloeser#je_seite|je_seite]]) – fuer die Herleitung ihres Schwerpunkts.
+- `vorgespannt: bool = False` – Ob die Lage ein Spannglied ist – ihr Stahl ist anders gedehnt als der Beton dort.
 
 ### gemeinsamer_index
 
@@ -127,7 +127,7 @@ def gemeinsamer_index(teile: Sequence[Stahllage]) -> str
 
 Der Index der zusammengefassten Lage: das, was ihre Teile gemein haben.
 
-Grundbewehrung und Zulage einer Lage heissen `1,x,g` und `1,x,z` --
+Grundbewehrung und Zulage einer Lage heissen `1,x,g` und `1,x,z` –
 zusammengefasst also `1,x`. Gehen die Teile auseinander, bleibt der Index
 leer; eine erfundene Bezeichnung waere schlimmer als gar keine.
 
@@ -138,7 +138,7 @@ def je_seite(lagen: Sequence[Stahllage]) -> Dict[Zugseite, Stahllage]
 ```
 
 Je Seite eine Lage im Schwerpunkt ihrer Flaechen, unter
-[[opencivil.nachweis.querschnittsloeser#Stahllage|Stahllage.seite]] -- die eine Regel fuer den Loeser in der
+[[opencivil.nachweis.querschnittsloeser#Stahllage|Stahllage.seite]] – die eine Regel fuer den Loeser in der
 Handrechnung ([[opencivil.nachweis.rechenwahl#Gesetze.lagen|lagen]]) und die
 Resistenzlinie aus Handrechnung ([[opencivil.nachweis.handrechnung#seiten|seiten]]).
 So rechnen beide «derselbe Querschnitt», wie
@@ -171,11 +171,11 @@ Die gefundene Dehnungsebene samt Proberechnung.
 - `eps_m: float` – Dehnung auf halber Hoehe.
 - `chi: float` – Kruemmung in 1/m.
 - `N_int: float`
-- `M_int: float` – Was die Ebene tatsaechlich erzeugt -- die Probe.
+- `M_int: float` – Was die Ebene tatsaechlich erzeugt – die Probe.
 - `sigma_s: Tuple[float, ...]` – Stahlspannung je Lage, in Pa.
 - `eps_s: Tuple[float, ...]` – Stahldehnung je Lage.
 - `konvergiert: bool = True`
-- `verfehlt: bool = False` – Die Suche lief zu Ende, aber ihre Ebene erzeugt die Einwirkung nicht: sie blieb an einem Sprung haengen, wie ihn der Spannungsblock hat. Bei viel Druck und wenig Moment liegt der Block immer ganz an einem Rand und gibt mehr Moment, als einwirkt -- dazwischen gibt es keine Ebene. Dann ist `konvergiert` falsch, und `eps_m` und `chi` sind die Stelle des Sprungs, durch die eine Linie laeuft ([[opencivil.spannungsanalyse.linie#moment_kruemmung|moment_kruemmung]]).
+- `verfehlt: bool = False` – Die Suche lief zu Ende, aber ihre Ebene erzeugt die Einwirkung nicht: sie blieb an einem Sprung haengen, wie ihn der Spannungsblock hat. Bei viel Druck und wenig Moment liegt der Block immer ganz an einem Rand und gibt mehr Moment, als einwirkt – dazwischen gibt es keine Ebene. Dann ist `konvergiert` falsch, und `eps_m` und `chi` sind die Stelle des Sprungs, durch die eine Linie laeuft ([[opencivil.spannungsanalyse.linie#moment_kruemmung|moment_kruemmung]]).
 
 #### Ebene.bei
 
@@ -200,7 +200,7 @@ def protokoll_wirksamer_modul(p, E_cm, phi, basis: str, *, titel: str, nachsatz:
 ```
 
 Die Zeile zu [[opencivil.querschnitt.gesetzwahl#wirksamer_modul|wirksamer_modul]], aus den Werten `E_cm` und
-`phi` -- fuer jeden Nachweis, der mit dem aufgeweichten Beton rechnet.
+`phi` – fuer jeden Nachweis, der mit dem aufgeweichten Beton rechnet.
 
 ### protokoll_verfahren
 
@@ -216,9 +216,9 @@ das Verfahren aendert man eine davon.
 
 Beschrieben wird der *Ablauf*, nicht jeder Zwischenwert. Die Halbierungen
 abzudrucken hiesse, hundert Zeilen zu zeigen, von denen nur die letzte
-etwas behauptet -- und die wird ohnehin durch die Probe belegt. Wie
+etwas behauptet – und die wird ohnehin durch die Probe belegt. Wie
 gesucht wird, sagt die Suche des Loesers (`suche`, sein
-[[opencivil.nachweis.querschnittsloeser#Faserloeser|Faserloeser.suche]]) -- vorher stand dort immer das Halbieren,
+[[opencivil.nachweis.querschnittsloeser#Faserloeser|Faserloeser.suche]]) – vorher stand dort immer das Halbieren,
 auch wo mit Illinois gesucht wurde.
 
 ### probenschranken
@@ -231,7 +231,7 @@ Wie weit `N_int` und `M_int` einer gefundenen Ebene neben dem Ziel
 liegen duerfen ([[opencivil.nachweis.querschnittsloeser#Konstanten|PROBE_SCHRANKE]]): gemessen an der Druckkraft des
 ganzen Querschnitts bei seiner Grenzstauchung, das Moment dazu mal seiner
 Hoehe. Am Querschnitt, nicht an der Einwirkung: wie genau eine Suche
-trifft, haengt an ihm -- eine kleine Last auf einem grossen Querschnitt
+trifft, haengt an ihm – eine kleine Last auf einem grossen Querschnitt
 trifft sie nicht genauer.
 
 ### wie_gesucht
@@ -241,7 +241,7 @@ def wie_gesucht(suche: Suche) -> str
 ```
 
 Wie die beiden geschachtelten Suchen die Stelle finden, als Teil eines
-Satzes: «beide durch Halbieren» -- mit Illinois dazu, dass sie bei der
+Satzes: «beide durch Halbieren» – mit Illinois dazu, dass sie bei der
 zuletzt gefundenen Ebene beginnen.
 
 ### verfahren
@@ -250,7 +250,7 @@ zuletzt gefundenen Ebene beginnen.
 def verfahren(suche: Suche) -> str
 ```
 
-Wie ein Loeser mit dieser Suche die Ebene findet, in Worten -- fuer die Mitschrift.
+Wie ein Loeser mit dieser Suche die Ebene findet, in Worten – fuer die Mitschrift.
 
 ### Faserloeser
 
@@ -261,12 +261,12 @@ class Faserloeser
 Ein Querschnitt aus Fasern, mit Suche nach der Dehnungsebene.
 
 `querschnitt` sind die Fasern samt Staeben, `grenzen` die
-Dehnungsgrenzen, innerhalb derer jedes Gesetz gilt -- mehr braucht die
+Dehnungsgrenzen, innerhalb derer jedes Gesetz gilt – mehr braucht die
 Suche nicht. Dazu, was Bilder und Linien vom Querschnitt wissen muessen:
-die Arme der Raender `oben` und `unten` -- oben ist gedrueckt, wenn
-ein positives Moment wirkt --, die Lagen mit ihrem Stahl, eine je Stab
+die Arme der Raender `oben` und `unten` – oben ist gedrueckt, wenn
+ein positives Moment wirkt –, die Lagen mit ihrem Stahl, eine je Stab
 der Fasern, die Spannung der Flaeche an einer Stelle
-(`flaeche(arm, eps)`) -- beim Stahlbeton die des Betons -- und wo eine
+(`flaeche(arm, eps)`) – beim Stahlbeton die des Betons – und wo eine
 Flaeche zu fliessen beginnt (`fliessgrenzen`, beim Stahlbeton keine:
 dort fliesst eine Lage). Wo die Gesetze gelten, sagen allein die Grenzen,
 jede mit ihrem Namen: bis 2026-10-18 trug der Loeser dazu `eps_druck`
@@ -287,18 +287,18 @@ Eingrenzen von der groessten Kruemmung her kostete jede von ihnen mehr als
 die Suche selbst. Halbiert braucht eine Suche rund vierzig Schritte, mit
 Illinois ein Viertel davon.
 
-**Illinois nur, wo die Ebene eindeutig ist.** Springt ein Gesetz -- der
-Spannungsblock --, hat das Moment ueber der Kruemmung flache Stuecke: dort
+**Illinois nur, wo die Ebene eindeutig ist.** Springt ein Gesetz – der
+Spannungsblock –, hat das Moment ueber der Kruemmung flache Stuecke: dort
 traegt jede Kruemmung dasselbe Moment, und welche gefunden wird, haengt am
 Weg der Suche. Mit dem Gedaechtnis hinge das Ergebnis dann an der
-Reihenfolge der Rechnungen -- an der Stuetze des Pruefprojekts war die
+Reihenfolge der Rechnungen – an der Stuetze des Pruefprojekts war die
 Grenzkraft so 4200 statt 4099.5 kN. Mit springendem Gesetz halbiert er
-darum von vorn, gleich welche Suche er bekommt -- ausser sie taugt dort
+darum von vorn, gleich welche Suche er bekommt – ausser sie taugt dort
 ([[opencivil.core.suche#Suche|auch_bei_sprung]]): wer den Loeser fuer
 eine einzige Frage baut, hat kein Gedaechtnis, an dem das Ergebnis haengen
-koennte -- so die kippende Nulllinie der Spannung-Dehnung-Analyse
+koennte – so die kippende Nulllinie der Spannung-Dehnung-Analyse
 ([[opencivil.spannungsanalyse.schnitt#KippendeNulllinie|KippendeNulllinie]]). Gesetze
-ohne Sprung -- Parabel, elastisch -- haben flache Stuecke erst am
+ohne Sprung – Parabel, elastisch – haben flache Stuecke erst am
 vollplastischen Querschnitt; an den Pruefprojekten bleibt dort jede Zahl,
 wie sie war.
 
@@ -309,7 +309,7 @@ def _fenster(self, chi: float) -> Optional[Tuple[float, float]]
 ```
 
 In welchem Bereich `eps_m` liegen darf, damit keine Faser aus dem
-gueltigen Dehnungsbereich faellt -- siehe [[opencivil.querschnitt.fasern#Dehnungsgrenzen.fenster|Dehnungsgrenzen.fenster]].
+gueltigen Dehnungsbereich faellt – siehe [[opencivil.querschnitt.fasern#Dehnungsgrenzen.fenster|Dehnungsgrenzen.fenster]].
 
 #### Faserloeser._eps_zu_normalkraft
 
@@ -317,7 +317,7 @@ gueltigen Dehnungsbereich faellt -- siehe [[opencivil.querschnitt.fasern#Dehnung
 def _eps_zu_normalkraft(self, chi: float, N_ziel: float) -> Optional[float]
 ```
 
-Die mittlere Dehnung, bei der `N = N_ziel` gilt -- bei festem `chi`.
+Die mittlere Dehnung, bei der `N = N_ziel` gilt – bei festem `chi`.
 
 Faengt die Suche bei der zuletzt gefundenen an, wird von dort
 eingegrenzt ([[opencivil.nachweis.querschnittsloeser#Faserloeser._eps_von|_eps_von]]): die Kruemmungen einer Suche liegen
@@ -343,7 +343,7 @@ def mitteldehnung(self, chi: float, N: float) -> Optional[float]
 ```
 
 Die Dehnung auf halber Hoehe, bei der die Ebene mit der Kruemmung
-`chi` die Normalkraft `N` traegt -- `None`, wo es keine gibt.
+`chi` die Normalkraft `N` traegt – `None`, wo es keine gibt.
 Fuer Linien, die ueber die Kruemmung laufen statt ueber das Moment.
 
 #### Faserloeser.kruemmung
@@ -353,7 +353,7 @@ def kruemmung(self, eps_m: float, M: float) -> Optional[float]
 ```
 
 Die Kruemmung, bei der die Ebene mit der Dehnung `eps_m` auf halber
-Hoehe das Moment `M` traegt -- `None`, wo es keine gibt.
+Hoehe das Moment `M` traegt – `None`, wo es keine gibt.
 
 Bei fester Dehnung waechst das Moment mit der Kruemmung: die eine
 Seite wird mehr gedehnt, die andere mehr gestaucht. Gesucht wird darum
@@ -366,7 +366,7 @@ dessen, was die Grenzen bei dieser Dehnung zulassen.
 def loese(self, *, N_Ed: float, M_Ed: float) -> Ebene
 ```
 
-Die Dehnungsebene zu diesen Schnittgroessen -- von der zuletzt
+Die Dehnungsebene zu diesen Schnittgroessen – von der zuletzt
 gefundenen Kruemmung aus eingegrenzt, wo die Suche dort anfaengt und es
 eine gibt ([[opencivil.nachweis.querschnittsloeser#Faserloeser._von_zuletzt|_von_zuletzt]]), sonst von vorn ([[opencivil.nachweis.querschnittsloeser#Faserloeser._von_vorn|_von_vorn]]).
 Was die naechste Suche nicht eingrenzen kann oder verfehlt, sucht sie
@@ -382,8 +382,8 @@ Die Dehnungsebene, gesucht ueber die ganze Kruemmung.
 
 Aeussere Suche ueber `chi`: zu jedem `chi` wird `eps_m` so
 bestimmt, dass die Normalkraft stimmt, und das uebrig bleibende Moment
-gegen `M_Ed` gehalten. `M(chi)` waechst monoton -- mehr Kruemmung
-heisst mehr Moment --, solange der Querschnitt nicht versagt.
+gegen `M_Ed` gehalten. `M(chi)` waechst monoton – mehr Kruemmung
+heisst mehr Moment –, solange der Querschnitt nicht versagt.
 
 #### Faserloeser._null_im_gleichgewicht
 
@@ -392,7 +392,7 @@ heisst mehr Moment --, solange der Querschnitt nicht versagt.
 def _null_im_gleichgewicht(self) -> bool
 ```
 
-Ob die Ebene null ohne Last im Gleichgewicht ist -- nicht mit einer Vordehnung.
+Ob die Ebene null ohne Last im Gleichgewicht ist – nicht mit einer Vordehnung.
 
 #### Faserloeser._probenschranken
 
@@ -401,7 +401,7 @@ Ob die Ebene null ohne Last im Gleichgewicht ist -- nicht mit einer Vordehnung.
 def _probenschranken(self) -> Tuple[float, float]
 ```
 
-[[opencivil.nachweis.querschnittsloeser#probenschranken|probenschranken]] dieses Querschnitts -- einmal gerechnet.
+[[opencivil.nachweis.querschnittsloeser#probenschranken|probenschranken]] dieses Querschnitts – einmal gerechnet.
 
 #### Faserloeser._mit_probe
 
@@ -418,7 +418,7 @@ Die gefundene Ebene, mit ihrer Probe: erzeugt sie `N_Ed` und
 def _suchen(self, f: Callable[[float], Optional[float]], unten: float, oben: float, schranke: float, f_unten: Optional[float]=None, f_oben: Optional[float]=None) -> Optional[float]
 ```
 
-Wo `f` zwischen `unten` und `oben` null wird -- mit der Suche
+Wo `f` zwischen `unten` und `oben` null wird – mit der Suche
 dieses Loesers. `f_unten` und `f_oben` sind fuer eine Suche, die
 mit ihnen schneller ist ([[opencivil.core.suche#Illinois|Illinois]]).
 
@@ -429,20 +429,20 @@ def _rand(self, start: float, N_Ed: float, moment: Callable[[float], Optional[fl
 ```
 
 Eine Kruemmung, bei der das Moment `M_Ed` sicher ueber- bzw.
-unterschreitet -- der Startpunkt der aeusseren Bisektion.
+unterschreitet – der Startpunkt der aeusseren Bisektion.
 
 Von der theoretischen Grenze aus wird herangetastet: dort ist das
 Fenster leer oder die Normalkraft nicht erreichbar. Zwanzig
 Halbierungen genuegen, um auf eine loesbare Stelle zu kommen.
 
 Nahe am Widerstand genuegen sie nicht. Zwischen der letzten Stufe
-ohne Gleichgewicht und der ersten mit -- an der Platte des Beispiels
-0.08 und 0.04 1/m -- liegen Kruemmungen, die das Moment noch
+ohne Gleichgewicht und der ersten mit – an der Platte des Beispiels
+0.08 und 0.04 1/m – liegen Kruemmungen, die das Moment noch
 erreichen, und das Halbieren springt ueber sie hinweg: 234.9 kNm
 hiessen dort «kein Gleichgewicht», obwohl der Querschnitt bis
 235.4 kNm traegt. Trifft das Halbieren nicht, wird darum die Grenze
-zwischen den beiden Stufen gesucht -- die groesste Kruemmung mit
-Gleichgewicht -- und dort noch einmal gefragt. Wo das Halbieren
+zwischen den beiden Stufen gesucht – die groesste Kruemmung mit
+Gleichgewicht – und dort noch einmal gefragt. Wo das Halbieren
 trifft, bleibt alles, wie es war.
 
 #### Faserloeser._eps_von
@@ -451,7 +451,7 @@ trifft, bleibt alles, wie es war.
 def _eps_von(self, chi: float, N_ziel: float, eps: float) -> Optional[float]
 ```
 
-Von `eps` aus mit wachsenden Schritten eingrenzen, im Fenster -- dann die Suche.
+Von `eps` aus mit wachsenden Schritten eingrenzen, im Fenster – dann die Suche.
 
 #### Faserloeser._von_zuletzt
 
@@ -460,18 +460,18 @@ def _von_zuletzt(self, N_Ed: float, M_Ed: float, chi: float) -> Optional[Ebene]
 ```
 
 Von `chi` aus mit wachsenden Schritten, bis das Moment die Seite
-wechselt -- das Moment waechst mit der Kruemmung --, dann die Suche.
+wechselt – das Moment waechst mit der Kruemmung –, dann die Suche.
 `None`, wo unterwegs keine Ebene die Normalkraft traegt; die Ebene
 mit ihrer Probe, die auch verfehlt sein kann ([[opencivil.nachweis.querschnittsloeser#Faserloeser._mit_probe|_mit_probe]]).
 
 
 ## Konstanten
 
-- `SCHRITTE = 60` – Obergrenze der Schritte, mit denen [[opencivil.nachweis.querschnittsloeser#Faserloeser._rand|Faserloeser._rand]] den Rand des Gleichgewichts sucht; die Suchen nach der Ebene haben ihre eigene ([[opencivil.core.suche#Konstanten|opencivil.core.suche.SCHRITTE]]). Erreicht wird sie fast nie -- abgebrochen wird ueber [[opencivil.nachweis.querschnittsloeser#Konstanten|CHI_SCHRANKE]], sobald das Fenster eng genug ist. Die Zahl steht nur da, damit keine Schleife ewig laeuft.
-- `EPS_SCHRANKE = 1e-11` – Wann das Dehnungsfenster eng genug ist. Der Startbereich ist rund 0.05 breit; 1e-11 ist ein Zehntausendstel eines Promille und liegt weit unter allem, was eine Eingabe hergibt. Ohne diese Schranke lief die Bisektion stur sechzig Mal -- die letzten zehn Durchlaeufe aendern in doppelter Genauigkeit nichts mehr und kosten doch jedesmal einen Faserdurchgang.
+- `SCHRITTE = 60` – Obergrenze der Schritte, mit denen [[opencivil.nachweis.querschnittsloeser#Faserloeser._rand|Faserloeser._rand]] den Rand des Gleichgewichts sucht; die Suchen nach der Ebene haben ihre eigene ([[opencivil.core.suche#Konstanten|opencivil.core.suche.SCHRITTE]]). Erreicht wird sie fast nie – abgebrochen wird ueber [[opencivil.nachweis.querschnittsloeser#Konstanten|CHI_SCHRANKE]], sobald das Fenster eng genug ist. Die Zahl steht nur da, damit keine Schleife ewig laeuft.
+- `EPS_SCHRANKE = 1e-11` – Wann das Dehnungsfenster eng genug ist. Der Startbereich ist rund 0.05 breit; 1e-11 ist ein Zehntausendstel eines Promille und liegt weit unter allem, was eine Eingabe hergibt. Ohne diese Schranke lief die Bisektion stur sechzig Mal – die letzten zehn Durchlaeufe aendern in doppelter Genauigkeit nichts mehr und kosten doch jedesmal einen Faserdurchgang.
 - `CHI_SCHRANKE = 1e-10` – Dasselbe fuer die Kruemmung, in 1/m.
-- `PROBE_SCHRANKE = 1e-06` – Wie genau die gefundene Ebene ihre Schnittgroessen treffen muss -- als Teil der Druckkraft des ganzen Querschnitts bei seiner Grenzstauchung, beim Moment mal seiner Hoehe ([[opencivil.nachweis.querschnittsloeser#probenschranken|probenschranken]]). Die Suchen treffen weit genauer: in den beiden Pruefprojekten bleiben 1684 Ebenen unter 0.4 % der Schranke (2026-10-15). Eine Ebene, die an einem Sprung des Spannungsblocks haengen bleibt, liegt um Hunderte Kilonewton daneben.
-- `VERFEHLTE_EBENE = 'Erzeugt die gefundene Ebene die Einwirkung nicht, gibt es zu ihr kei…` – Was die Mitschrift ueber eine verfehlte Ebene sagt ([[opencivil.nachweis.querschnittsloeser#Ebene|Ebene.verfehlt]]) -- bei der Platte wie am gezeichneten Querschnitt.
+- `PROBE_SCHRANKE = 1e-06` – Wie genau die gefundene Ebene ihre Schnittgroessen treffen muss – als Teil der Druckkraft des ganzen Querschnitts bei seiner Grenzstauchung, beim Moment mal seiner Hoehe ([[opencivil.nachweis.querschnittsloeser#probenschranken|probenschranken]]). Die Suchen treffen weit genauer: in den beiden Pruefprojekten bleiben 1684 Ebenen unter 0.4 % der Schranke (2026-10-15). Eine Ebene, die an einem Sprung des Spannungsblocks haengen bleibt, liegt um Hunderte Kilonewton daneben.
+- `VERFEHLTE_EBENE = 'Erzeugt die gefundene Ebene die Einwirkung nicht, gibt es zu ihr kei…` – Was die Mitschrift ueber eine verfehlte Ebene sagt ([[opencivil.nachweis.querschnittsloeser#Ebene|Ebene.verfehlt]]) – bei der Platte wie am gezeichneten Querschnitt.
 
 ## Braucht
 

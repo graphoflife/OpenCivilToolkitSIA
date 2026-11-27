@@ -44,5 +44,5 @@ Richtung zeigt wie die Einwirkung; ihr Betrag ist der
 [[Widerstand in der Richtung der Einwirkung]].
 
 Integriert wird über Streifen quer zur Zugrichtung, deren Grenzen auf jede
-Polygonecke fallen -- so ist die Summe für Polygone genau. Nachgewiesen wird
+Polygonecke fallen – so ist die Summe für Polygone genau. Nachgewiesen wird
 nicht die Suche, sondern ihre Probe: die Kraft jedes Teils und die Summen.

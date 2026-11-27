@@ -37,7 +37,7 @@ $$
 ## Theorie
 
 Der Querschnitt bleibt eben (Bernoulli): die Dehnung ist eine lineare
-Funktion der Lage. Bei der Platte hängt sie nur von der Tiefe $z$ ab -- zwei
+Funktion der Lage. Bei der Platte hängt sie nur von der Tiefe $z$ ab – zwei
 Unbekannte, die Dehnung $\varepsilon_m$ auf halber Höhe und die Krümmung
 $\chi$. Beim gezeichneten Querschnitt ist es eine schräge Ebene, mit der
 Richtung $n$ der Nulllinie als drittem Parameter.

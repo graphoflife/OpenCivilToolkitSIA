@@ -1,5 +1,5 @@
 ---
-erzeugt: 69d984e57254
+erzeugt: 700725c9e84c
 art: modul
 tags: [modul]
 ---
@@ -25,7 +25,7 @@ plt.show()
 
 ## GEZEICHNET WIRD NICHT HIER
 
-Ein Bild ist eine Beschreibung -- Reihen, Achsen, Titel --, und die
+Ein Bild ist eine Beschreibung – Reihen, Achsen, Titel –, und die
 Oberfläche zeichnet sie wie ihre übrigen Diagramme (`web/js/zeichnen.js`).
 Darum braucht es keinen Download und kaum Speicher; matplotlib brächte rund
 10 MB mit (Benutzer, 2026-10-15: lieber ein eigenes Modul).
@@ -75,7 +75,7 @@ Beginnt ein neues Bild; ein angefangenes kommt vorher heraus. Grösse und Nummer
 def show(*_args: Any, **_kwargs: Any) -> None
 ```
 
-Gibt das Bild heraus und beginnt ein neues -- ein leeres bleibt ungezeigt.
+Gibt das Bild heraus und beginnt ein neues – ein leeres bleibt ungezeigt.
 
 ### clf
 
@@ -91,7 +91,7 @@ Verwirft das angefangene Bild.
 def abholen() -> List[Dict[str, Any]]
 ```
 
-Die Bilder, die ausserhalb einer Sitzung herauskamen -- und dazu das offene.
+Die Bilder, die ausserhalb einer Sitzung herauskamen – und dazu das offene.
 
 ### savefig
 
@@ -105,7 +105,7 @@ def savefig(*_args: Any, **_kwargs: Any) -> None
 def plot(*args: Any, label: Optional[str]=None, color: Optional[str]=None, c: Optional[str]=None, linestyle: Optional[str]=None, ls: Optional[str]=None, marker: Optional[str]=None, linewidth: Optional[float]=None, lw: Optional[float]=None, markersize: Optional[float]=None, ms: Optional[float]=None, alpha: Optional[float]=None) -> None
 ```
 
-Eine Linie: `plot(y)`, `plot(x, y)` oder `plot(x, y, "r--o")` --
+Eine Linie: `plot(y)`, `plot(x, y)` oder `plot(x, y, "r--o")` –
 mehrere Paare hintereinander geben mehrere Linien.
 
 ### scatter
@@ -114,7 +114,7 @@ mehrere Paare hintereinander geben mehrere Linien.
 def scatter(x: Any, y: Any, s: Optional[float]=None, c: Optional[str]=None, *, label: Optional[str]=None, color: Optional[str]=None, marker: Optional[str]=None, alpha: Optional[float]=None) -> None
 ```
 
-Punkte: `scatter(x, y)` -- `s` ist die Fläche der Marke wie bei matplotlib.
+Punkte: `scatter(x, y)` – `s` ist die Fläche der Marke wie bei matplotlib.
 
 ### bar
 
@@ -122,7 +122,7 @@ Punkte: `scatter(x, y)` -- `s` ist die Fläche der Marke wie bei matplotlib.
 def bar(x: Any, height: Any, width: float=0.8, *, label: Optional[str]=None, color: Optional[str]=None, alpha: Optional[float]=None) -> None
 ```
 
-Balken: `bar(["A", "B"], [3, 5])` -- die Stellen dürfen auch Namen sein.
+Balken: `bar(["A", "B"], [3, 5])` – die Stellen dürfen auch Namen sein.
 
 ### axhline
 
@@ -164,7 +164,7 @@ def ylabel(text: str, **_kwargs: Any) -> None
 def legend(*_args: Any, **_kwargs: Any) -> None
 ```
 
-Zeigt die Legende -- mit den Namen aus `label=`.
+Zeigt die Legende – mit den Namen aus `label=`.
 
 ### grid
 
@@ -172,7 +172,7 @@ Zeigt die Legende -- mit den Namen aus `label=`.
 def grid(sichtbar: bool=True, **_kwargs: Any) -> None
 ```
 
-Das Gitter über dem Feld -- ohne es stehen nur Striche am Rand, wie bei matplotlib.
+Das Gitter über dem Feld – ohne es stehen nur Striche am Rand, wie bei matplotlib.
 
 ### xlim
 
@@ -180,7 +180,7 @@ Das Gitter über dem Feld -- ohne es stehen nur Striche am Rand, wie bei matplot
 def xlim(*grenzen: Any, left: Any=None, right: Any=None) -> None
 ```
 
-`xlim(0, 10)` oder `xlim((0, 10))` -- eine Grenze `None` bleibt frei.
+`xlim(0, 10)` oder `xlim((0, 10))` – eine Grenze `None` bleibt frei.
 
 ### ylim
 
@@ -202,7 +202,7 @@ Die Argumente von `plot` in Paare (x, y, Format) zerlegt.
 def _format(fmt: str) -> tuple
 ```
 
-`"r--o"` → (rot, `--`, `o`) -- wie die Formatkürzel von matplotlib.
+`"r--o"` → (rot, `--`, `o`) – wie die Formatkürzel von matplotlib.
 
 ### _als_kategorien
 
@@ -226,7 +226,7 @@ Eine Liste aus dem, was kommt: Liste, Tupel, range, numpy, pandas, Generator.
 def _zahl(v: Any, befehl: str, name: str) -> float
 ```
 
-Eine endliche Zahl -- unendlich liesse sich nicht zeichnen.
+Eine endliche Zahl – unendlich liesse sich nicht zeichnen.
 
 ### _angegeben
 
@@ -234,7 +234,7 @@ Eine endliche Zahl -- unendlich liesse sich nicht zeichnen.
 def _angegeben(*werte: Any) -> Any
 ```
 
-Der erste angegebene Wert -- `0` ist angegeben, `None` nicht (`lw=0` ist keine Linie).
+Der erste angegebene Wert – `0` ist angegeben, `None` nicht (`lw=0` ist keine Linie).
 
 ### _eigenschaft
 
@@ -252,7 +252,7 @@ ein `nan` hielt die Konsole an ([[opencivil.web.umschlag]]).
 def _name(label: Any) -> Optional[str]
 ```
 
-Der Name einer Reihe für die Legende -- als Text, wie matplotlib ihn schreibt.
+Der Name einer Reihe für die Legende – als Text, wie matplotlib ihn schreibt.
 
 ### _zahl_oder_luecke
 
@@ -260,7 +260,7 @@ Der Name einer Reihe für die Legende -- als Text, wie matplotlib ihn schreibt.
 def _zahl_oder_luecke(v: Any, befehl: str, name: str) -> Optional[float]
 ```
 
-Eine Zahl -- `None`, `nan` und unendlich werden eine Lücke, wie bei matplotlib.
+Eine Zahl – `None`, `nan` und unendlich werden eine Lücke, wie bei matplotlib.
 
 ### _farbe
 
@@ -274,9 +274,9 @@ Eine Farbe für SVG: Name oder `#rrggbb` bleiben, `(r, g, b)` in Anteilen wird `
 ## Konstanten
 
 - `FARBKUERZEL = {'b': 'blue', 'g': 'green', 'r': 'red', 'c': '#00bfbf', 'm': '#bf00bf…` – Die Farben der Formatkürzel von matplotlib, als Farben für SVG: `"r--"` ist rot gestrichelt. Dieselben Töne wie dort.
-- `STRICHE = {'-': '-', '--': '--', ':': ':', '-.': '-.', 'solid': '-', 'dashed': …` – Linienarten, wie matplotlib sie schreibt -- auch ausgeschrieben.
+- `STRICHE = {'-': '-', '--': '--', ':': ':', '-.': '-.', 'solid': '-', 'dashed': …` – Linienarten, wie matplotlib sie schreibt – auch ausgeschrieben.
 - `MARKEN = ('o', 's', '^', '.', 'x', '+', 'D')` – Marken: Kreis, Quadrat, Dreieck, Punkt, Kreuz, Plus, Raute.
-- `_ziel = None` – Wohin ein fertiges Bild geht -- die Sitzung setzt es für die Dauer eines Laufs.
+- `_ziel = None` – Wohin ein fertiges Bild geht – die Sitzung setzt es für die Dauer eines Laufs.
 
 ## Gebraucht von
 

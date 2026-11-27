@@ -43,5 +43,5 @@ $$
 
 Die obere Bewehrung liegt beim Betonieren auf Distanzhaltern, die auf der
 unteren stehen. Ihre Höhe ist der lichte Abstand zwischen der Oberkante der
-inneren unteren Lage und der Unterkante der inneren oberen Lage -- eine
+inneren unteren Lage und der Unterkante der inneren oberen Lage – eine
 Angabe für die Baustelle, die aus dem Lagenaufbau folgt.

@@ -43,7 +43,7 @@ $$
 ## Theorie
 
 Was ein Beton an Schub ohne Bügel aufnimmt, wächst nicht mit der
-Druckfestigkeit, sondern etwa mit ihrer Wurzel -- es hängt an der
+Druckfestigkeit, sondern etwa mit ihrer Wurzel – es hängt an der
 Zugfestigkeit, und die folgt demselben Gesetz. Daher $\sqrt{f_{ck}}$. Die
 Formel ist empirisch: $f_{ck}$ geht als blosse Zahl in N/mm² ein, und das
 Ergebnis ist eine Spannung in N/mm².

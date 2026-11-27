@@ -1,5 +1,5 @@
 ---
-erzeugt: 15926225845c
+erzeugt: 0afb40fb3a37
 art: modul
 tags: [modul]
 ---
@@ -22,15 +22,15 @@ Knick- und Kipplaengen ([[opencivil.stahlbau.stabilitaet#Stabfall|Stabfall]]).
 Die Klasse im Fall wie in der Tragsicherheit
 ([[opencivil.stahlbau.widerstand#rechnen|rechnen]]), bei `N_Ed` und den
 Momenten 1. Ordnung. Dann je Achse plastisch in den Klassen 1 und 2,
-elastisch in Klasse 3 (5.2.9) und am wirksamen Querschnitt in Klasse 4 --
+elastisch in Klasse 3 (5.2.9) und am wirksamen Querschnitt in Klasse 4 –
 je einmal mit der Festigkeit, mit der gerechnet wird, und einmal mit
 `f_y` fuer die Schlankheiten.
 
 
 ## KNICKEN (4.5.1, 5.3.8)
 
-Je Achse `N_cr = π² E I/L_K²`, `λ̄_K = √(f_y A/N_cr)` -- mit einem
-Baustahl genau `√(f_y/σ_cr,K)` -- und `χ_K` nach (8) mit der Kurve aus
+Je Achse `N_cr = π² E I/L_K²`, `λ̄_K = √(f_y A/N_cr)` – mit einem
+Baustahl genau `√(f_y/σ_cr,K)` – und `χ_K` nach (8) mit der Kurve aus
 Figur 7 ([[opencivil.stahlbau.stabilitaet#kurve|kurve]]): `N_K,Rd = χ_K f_y A/γ_M1` (7). In Klasse 4 mit
 `A_eff` statt `A`, `N_cr` am ganzen Querschnitt (5.3.8). Eine
 Knicklaenge null heisst: gehalten, `N_cr` unendlich.
@@ -53,7 +53,7 @@ gekippt wird, gilt (9) immer auch allein.
 * Klassen 1 und 2, I-Walzprofil, Knicken aus der Ebene und Kippen nicht
   verhindert: auch (51) (5.1.10.2, 5.1.10.4).
 * Klasse 4: (62) und (63), mit den Ersatzimperfektionen der Spalte EE von
-  Figur 3 -- ohne Moment und ohne Versatz des wirksamen Schwerpunkts nur
+  Figur 3 – ohne Moment und ohne Versatz des wirksamen Schwerpunkts nur
   5.3.8.
 
 
@@ -65,9 +65,9 @@ wachsen in ihrer Richtung, bis die Gleichung aufgeht. (50) ist in den
 Momenten linear, `α = (1 - N_Ed/N_K,Rd)/Σ m`; (51) mit der Potenz β,
 `α = (a^β + b^β)^(-1/β)`. Ohne Moment `N_K,Rd/|N_Ed|`. Wo schon die
 Normalkraft allein nicht traegt, misst `α` sie ([[opencivil.stahlbau.stabilitaet#Ergebnis|Ergebnis.alpha_N]]).
-Wo zwei Gleichungen gelten duerfen -- (50) und (51) --, zaehlt die
-guenstigere; wo beide gelten muessen -- (62) und (63), oder das
-Zusammenwirken und (9) --, die unguenstigere.
+Wo zwei Gleichungen gelten duerfen – (50) und (51) –, zaehlt die
+guenstigere; wo beide gelten muessen – (62) und (63), oder das
+Zusammenwirken und (9) –, die unguenstigere.
 
 
 ## WAS DAS WERKZEUG NICHT KANN
@@ -85,19 +85,19 @@ der Fall sagt es grau ([[opencivil.stahlbau.stabilitaet#Ergebnis|Ergebnis.fehlt]
 
 ## NACH VORGABE, NICHT NACHGESCHLAGEN
 
-* Das Rundrohr gilt als warmgefertigt, Kurve a -- wie in den Excel-Dateien
+* Das Rundrohr gilt als warmgefertigt, Kurve a – wie in den Excel-Dateien
   des Benutzers. Fuer ein kaltgefertigtes waehlt er c.
 * Unter ψ = -0.5 bleibt η bei 2.35, dem Wert bei -0.5: (94) gilt erst ab
   dort, und darunter waere η groesser.
 * Der Druckgurt ohne Ausrundungen, die gedrueckte Steghoehe die Haelfte der
-  Hoehe zwischen den Flanschen -- unter Biegung allein; beim Rechteckrohr
+  Hoehe zwischen den Flanschen – unter Biegung allein; beim Rechteckrohr
   mit beiden Stegen: Figur 40 zeigt nur das I.
 * Rohre kippen mit dem `α_D` der Walzprofile.
 * Mit mehreren Baustaehlen `λ̄_K = √(Σ f_y A/N_cr)`.
 * `w_0` nach Figur 3 mit der Knicklaenge als Stablaenge.
 * In Klasse 4 mindert `χ_D` in (62) und (63) den Widerstand um die starke
   Achse: (67) nennt das Kippen nur fuer die Biegung allein.
-* ψ gilt fuer `ω` und fuer `η` -- dieselben Endmomente.
+* ψ gilt fuer `ω` und fuer `η` – dieselben Endmomente.
 
 
 ## AUF DER SICHEREN SEITE
@@ -105,8 +105,8 @@ der Fall sagt es grau ([[opencivil.stahlbau.stabilitaet#Ergebnis|Ergebnis.fehlt]
 In Klasse 4 zaehlt der ganze Druckgurt, obwohl B.5 und 5.6.2.3 nur die
 mitwirkenden Teile zulassen. Ohne die uebrigen waere sein
 Traegheitsradius groesser: im Flansch eines I-Walzprofils wirkt alles mit,
-und was fehlte -- ein Stegstreifen, die Mitte des Flanschs eines
-Rechteckrohrs --, liegt nahe seiner Achse.
+und was fehlte – ein Stegstreifen, die Mitte des Flanschs eines
+Rechteckrohrs –, liegt nahe seiner Achse.
 
 ## Inhalt
 
@@ -144,7 +144,7 @@ def erklaerung(self) -> str
 def abminderung(lam: float, alpha: float, lam_0: float) -> Tuple[float, float]
 ```
 
-`Φ` und `χ` nach (8) mit `λ̄_0 = 0.2` oder (10) mit 0.4 -- `χ` hoechstens eins.
+`Φ` und `χ` nach (8) mit `λ̄_0 = 0.2` oder (10) mit 0.4 – `χ` hoechstens eins.
 
 ### eta
 
@@ -169,7 +169,7 @@ def kurve(profil: tabelle.Profil, stark: bool) -> Tuple[str, str]
 ```
 
 Die Kurve eines Profils nach Figur 7 fuer das Knicken um seine starke oder
-schwache Achse -- und in Worten, warum.
+schwache Achse – und in Worten, warum.
 
 ### Druckgurt
 
@@ -179,7 +179,7 @@ class Druckgurt
 ```
 
 Der Druckgurt nach Figur 40, in mm: der Flansch `b × t_f` und je Steg
-ein Drittel seiner gedrueckten Hoehe `h_c` -- beim Rechteckrohr zwei
+ein Drittel seiner gedrueckten Hoehe `h_c` – beim Rechteckrohr zwei
 Stege im Abstand `e` von der Mitte.
 
 - `b: float`
@@ -219,7 +219,7 @@ def druckgurt(profil: tabelle.Profil) -> Optional[Druckgurt]
 ```
 
 Der Druckgurt eines doppelsymmetrischen Profils mit starker Achse: beim
-I und beim Rechteckrohr -- sonst `None`. Die gedrueckte Steghoehe ist
+I und beim Rechteckrohr – sonst `None`. Die gedrueckte Steghoehe ist
 bei reiner Biegung die Haelfte der Hoehe zwischen den Flanschen.
 
 ### einzelprofil
@@ -228,11 +228,11 @@ bei reiner Biegung die Haelfte der Hoehe zwischen den Flanschen.
 def einzelprofil(teile: Iterable[Tuple[str, Optional[Profillage]]]) -> Optional[tabelle.Profil]
 ```
 
-Das Profil, wenn der Querschnitt nur aus ihm besteht -- mit seinen
+Das Profil, wenn der Querschnitt nur aus ihm besteht – mit seinen
 Loechern, die seine Kennung tragen, ohne jede andere Flaeche; sonst
 `None`. `teile` je Flaeche ihre Kennung und, beim Umriss eines
 Profils, seine Lage: aus der Analyse wie aus der Zeichnung
-([[opencivil.web.zeichengeometrie]]) -- eine Regel fuer beide.
+([[opencivil.web.zeichengeometrie]]) – eine Regel fuer beide.
 
 ### starke_achse
 
@@ -240,7 +240,7 @@ Profils, seine Lage: aus der Analyse wie aus der Zeichnung
 def starke_achse(I: Mapping[str, float]) -> Optional[str]
 ```
 
-Die Achse mit dem groesseren Traegheitsmoment -- `None`, wo beide gleich sind.
+Die Achse mit dem groesseren Traegheitsmoment – `None`, wo beide gleich sind.
 
 ### kurven_des_profils
 
@@ -248,7 +248,7 @@ Die Achse mit dem groesseren Traegheitsmoment -- `None`, wo beide gleich sind.
 def kurven_des_profils(profil: tabelle.Profil, I: Mapping[str, float]) -> Dict[str, Tuple[str, str]]
 ```
 
-Je Achse die Kurve, die Figur 7 dem Profil zuweist, und warum -- `I` je Achse.
+Je Achse die Kurve, die Figur 7 dem Profil zuweist, und warum – `I` je Achse.
 
 ### rechenkurven
 
@@ -257,7 +257,7 @@ def rechenkurven(wahl: Mapping[str, Knickkurve], profil: Optional[tabelle.Profil
 ```
 
 Je Achse die Kurve, mit der gerechnet wird, und warum: die gewaehlte, sonst
-die des einzigen Profils ([[opencivil.stahlbau.stabilitaet#einzelprofil|einzelprofil]]) -- `None`, wo es keines
+die des einzigen Profils ([[opencivil.stahlbau.stabilitaet#einzelprofil|einzelprofil]]) – `None`, wo es keines
 gibt.
 
 ### fehlende_kurven
@@ -267,7 +267,7 @@ def fehlende_kurven(kurven: Mapping[str, Optional[Tuple[str, str]]], faelle: Ite
 ```
 
 Welche Kurve den `faelle` fehlt, als Satz: um eine Achse, um die einer
-von ihnen knickt, ohne Kurve ([[opencivil.stahlbau.stabilitaet#rechenkurven|rechenkurven]]) -- leer, wo keine
+von ihnen knickt, ohne Kurve ([[opencivil.stahlbau.stabilitaet#rechenkurven|rechenkurven]]) – leer, wo keine
 fehlt. Eine Regel fuer den Fall und die Kachel davor
 ([[opencivil.web.zeichengeometrie]]).
 
@@ -292,20 +292,20 @@ def quer(achse: str) -> str
 class Stab
 ```
 
-Was jeder Fall vom Querschnitt braucht -- in mm, mm⁴ und N/mm².
+Was jeder Fall vom Querschnitt braucht – in mm, mm⁴ und N/mm².
 
 - `stahl: Stahlquerschnitt`
-- `f: Sequence[float]` – Je Gruppe die Fliessgrenze, mit der gerechnet wird -- `f_y/γ_M1` oder `f_y`.
-- `f_k: Sequence[float]` – Je Gruppe `f_y` -- fuer die Schlankheiten.
+- `f: Sequence[float]` – Je Gruppe die Fliessgrenze, mit der gerechnet wird – `f_y/γ_M1` oder `f_y`.
+- `f_k: Sequence[float]` – Je Gruppe `f_y` – fuer die Schlankheiten.
 - `eps: Sequence[float]`
 - `E: float`
 - `G: float`
 - `I: Dict[str, float]`
 - `I_T: float`
-- `bezug: Punkt` – Der Schwerpunkt -- um ihn wirken die Momente.
+- `bezug: Punkt` – Der Schwerpunkt – um ihn wirken die Momente.
 - `biegung: Biegung`
 - `kurven: Dict[str, Knickkurve]`
-- `profil: Optional[tabelle.Profil]` – Das einzige Profil des Querschnitts -- `None`, wo er mehr hat ([[opencivil.stahlbau.stabilitaet#einzelprofil|einzelprofil]]).
+- `profil: Optional[tabelle.Profil]` – Das einzige Profil des Querschnitts – `None`, wo er mehr hat ([[opencivil.stahlbau.stabilitaet#einzelprofil|einzelprofil]]).
 
 #### Stab.stark
 
@@ -333,7 +333,7 @@ def i(self, achse: str) -> float
 def kurve(self, achse: str) -> Optional[Tuple[str, str]]
 ```
 
-Die Kurve um `achse` und warum -- `None`, wo sie fehlt ([[opencivil.stahlbau.stabilitaet#rechenkurven|rechenkurven]]).
+Die Kurve um `achse` und warum – `None`, wo sie fehlt ([[opencivil.stahlbau.stabilitaet#rechenkurven|rechenkurven]]).
 
 ### Stabfall
 
@@ -343,7 +343,7 @@ class Stabfall
 ```
 
 Ein Fall des Stabs, in SI wie ein Lastfall der Analyse: `N` in N,
-negativ Druck, die Momente in Nm um den Schwerpunkt, die Laengen in m --
+negativ Druck, die Momente in Nm um den Schwerpunkt, die Laengen in m –
 eine Laenge null heisst gehalten. Nur im Verbund zaehlen `staendig`
 und `L` ([[opencivil.verbund.stuetze]]).
 
@@ -387,7 +387,7 @@ In mm.
 class Knicken
 ```
 
-Das Knicken um eine Achse, in N und mm -- ohne Kurve, wo der Stab gehalten ist.
+Das Knicken um eine Achse, in N und mm – ohne Kurve, wo der Stab gehalten ist.
 
 - `achse: str`
 - `L_K: float`
@@ -470,7 +470,7 @@ def m(self) -> float
 class Gleichung51
 ```
 
-(51) mit ihren Teilen, in N und N·mm -- `s` die starke Achse, `w` die schwache.
+(51) mit ihren Teilen, in N und N·mm – `s` die starke Achse, `w` die schwache.
 
 - `s: str`
 - `w: str`
@@ -500,13 +500,13 @@ class Gleichung62
 ```
 
 (62) oder (63): `n = |N_Ed|/(f_y A_eff)` und die Glieder des wirksamen
-Querschnitts, das der Achse `verstaerkt` mit `1/(1 - N/N_cr)` --
+Querschnitts, das der Achse `verstaerkt` mit `1/(1 - N/N_cr)` –
 leer, wo schon `N_cr` erreicht ist.
 
 - `verstaerkt: str`
 - `n: float`
 - `glieder: List[wd.Glied]`
-- `alpha: Optional[float]` – Der Faktor auf die Momente -- ohne Moment auf die Normalkraft; `None`, wo schon die Normalkraft nicht traegt: dann [[opencivil.stahlbau.stabilitaet#Gleichung62|alpha_N]].
+- `alpha: Optional[float]` – Der Faktor auf die Momente – ohne Moment auf die Normalkraft; `None`, wo schon die Normalkraft nicht traegt: dann [[opencivil.stahlbau.stabilitaet#Gleichung62|alpha_N]].
 - `alpha_N: Optional[float]`
 
 ### Ergebnis
@@ -516,19 +516,19 @@ leer, wo schon `N_cr` erreicht ist.
 class Ergebnis
 ```
 
-Was ein Fall am Stab ergibt -- siehe Dateikopf. Kraefte in N, Momente in N·mm.
+Was ein Fall am Stab ergibt – siehe Dateikopf. Kraefte in N, Momente in N·mm.
 
 - `fall: Stabfall`
 - `N: float`
 - `M: Dict[str, float]`
 - `x: wd.Fall` – Der Fall am Querschnitt: seine Klasse und die Bleche.
-- `fehlt: str = ''` – Warum der Fall nicht fuehrbar ist -- leer, wo er es ist.
+- `fehlt: str = ''` – Warum der Fall nicht fuehrbar ist – leer, wo er es ist.
 - `rd: Optional[wd.Widerstaende] = None`
-- `rk: Optional[wd.Widerstaende] = None` – Dieselben Widerstaende mit `f_y` -- fuer die Schlankheiten.
+- `rk: Optional[wd.Widerstaende] = None` – Dieselben Widerstaende mit `f_y` – fuer die Schlankheiten.
 - `wirksam: Optional[wd.Wirksame] = None` – In Klasse 4 der wirksame Querschnitt, mit dem gerechnet wird.
 - `knicken: Dict[str, Knicken] = field(default_factory=dict)`
 - `kippen: Optional[Kippen] = None`
-- `kippen_min: Optional[Kippen] = None` – Mit `η = 1` -- fuer (51) bei zweiachsiger Biegung, wo `η` nicht schon eins ist.
+- `kippen_min: Optional[Kippen] = None` – Mit `η = 1` – fuer (51) bei zweiachsiger Biegung, wo `η` nicht schon eins ist.
 - `glieder: List[Glied50] = field(default_factory=list)`
 - `alpha_50: Optional[float] = None`
 - `g51: Optional[Gleichung51] = None`
@@ -590,7 +590,7 @@ def mit_versatz(self) -> bool
 def rechnen(stab: Stab, fall: Stabfall) -> Ergebnis
 ```
 
-Ein Fall am Stab -- siehe Dateikopf.
+Ein Fall am Stab – siehe Dateikopf.
 
 ### _widerstaende
 
@@ -606,7 +606,7 @@ Die Widerstaende nach der Klasse des Falls: mit der Festigkeit der Rechnung, mit
 def _M_Rd(e: Ergebnis, achse: str, kippen: Optional[Kippen]) -> float
 ```
 
-Der Biegewiderstand um `achse` zur Seite des Moments -- um die starke mit dem Kippen.
+Der Biegewiderstand um `achse` zur Seite des Moments – um die starke mit dem Kippen.
 
 ### _gleichung_50
 
@@ -631,7 +631,7 @@ weder das Knicken aus der Ebene noch das Kippen verhindert.
 def _gleichung_51(stab: Stab, e: Ergebnis) -> None
 ```
 
-(51) mit den Achsen des Profils -- die starke heisst dort y.
+(51) mit den Achsen des Profils – die starke heisst dort y.
 
 ### _gleichungen_62
 
@@ -647,7 +647,7 @@ def _gleichungen_62(e: Ergebnis) -> None
 def _faktor(nutzung: Callable[[float], float]) -> float
 ```
 
-Das `μ` mit `nutzung(μ) = 1` -- die linke Seite waechst mit `μ` und
+Das `μ` mit `nutzung(μ) = 1` – die linke Seite waechst mit `μ` und
 ist bei null kleiner als eins. Durch Halbieren, bis auf 1e-12 genau.
 
 
@@ -667,15 +667,15 @@ ist bei null kleiner als eins. Durch Halbieren, bis auf 1e-12 genau.
 - `ALPHA_K = {'a': 0.21, 'b': 0.34, 'c': 0.49, 'd': 0.76}` – Tabelle 8: der Imperfektionsbeiwert je Kurve.
 - `LAMBDA_0_KNICKEN = 0.2` – Bis wohin nichts gemindert wird: λ̄_0 in (8) und in (10).
 - `LAMBDA_0_KIPPEN = 0.4`
-- `ALPHA_D_GEWALZT = 0.21` – 4.5.2.3: α_D der Walzprofile -- geschweisste haben 0.49, die kippen hier nicht.
+- `ALPHA_D_GEWALZT = 0.21` – 4.5.2.3: α_D der Walzprofile – geschweisste haben 0.49, die kippen hier nicht.
 - `SCHLANKHEIT = 200.0` – 4.5.1.7: die Schlankheit, die ein Haupttragelement in der Regel nicht ueberschreitet.
 - `W0_NENNER = {'a': 300.0, 'b': 250.0, 'c': 200.0, 'd': 150.0}` – Figur 3, Spalte EE: `w_0 = L/Nenner` je Kurve.
 - `OMEGA_MIN = 0.4` – 5.1.9.1: das kleinste ω.
-- `PSI_ETA_MIN = -0.5` – Ab wo (94) gilt -- darunter bleibt η beim Wert dort (Dateikopf).
+- `PSI_ETA_MIN = -0.5` – Ab wo (94) gilt – darunter bleibt η beim Wert dort (Dateikopf).
 - `STARK = 1.0 + 1e-06` – Um so viel muss ein Traegheitsmoment groesser sein, damit seine Achse die starke ist.
 - `VERSATZ = 1e-06` – Ab welchem Versatz in mm der wirksame Schwerpunkt neben dem ganzen liegt.
-- `_KURVE_DER_REIHE = {'ROR': ('a', 'warmgefertigtes Hohlprofil'), 'RRW': ('a', 'warmgefert…` – Figur 7 ohne die I-Walzprofile: je Reihe die Kurve um beide Achsen und warum -- nach der Reihe, nicht nach der Form: RRK und RRW haben dieselbe Form, das eine kalt-, das andere warmgefertigt.
-- `KURVE_FEHLT = '{was}: Figur 7 kennt das Werkzeug nur für einen Querschnitt aus eine…` – Was fehlt -- Saetze fuer die Herleitung und die Zusammenfassung.
+- `_KURVE_DER_REIHE = {'ROR': ('a', 'warmgefertigtes Hohlprofil'), 'RRW': ('a', 'warmgefert…` – Figur 7 ohne die I-Walzprofile: je Reihe die Kurve um beide Achsen und warum – nach der Reihe, nicht nach der Form: RRK und RRW haben dieselbe Form, das eine kalt-, das andere warmgefertigt.
+- `KURVE_FEHLT = '{was}: Figur 7 kennt das Werkzeug nur für einen Querschnitt aus eine…` – Was fehlt – Saetze fuer die Herleitung und die Zusammenfassung.
 - `KIPPEN_FEHLT = 'Kippen rechnet das Werkzeug nur für einen Querschnitt aus einem einz…`
 
 ## Braucht

@@ -1,5 +1,5 @@
 ---
-erzeugt: dabb87284717
+erzeugt: 481608540131
 art: modul
 tags: [modul]
 ---
@@ -10,7 +10,7 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Je Stabilitaetsfall der Querschnittsanalyse ein Nachweis mit seiner
-Herleitung, je Hauptachse fuer sich (4.2.8.5) -- gerechnet wird in
+Herleitung, je Hauptachse fuer sich (4.2.8.5) – gerechnet wird in
 [[opencivil.holzbau.gleichungen]]:
 
 * Knicken um eine Achse, wo der Stab gedrueckt ist und um sie eine
@@ -57,7 +57,7 @@ Betraege.
 class HolzStabilitaetQA(Nachweis)
 ```
 
-Knicken und Kippen eines Holzstabs, je Fall -- siehe Dateikopf.
+Knicken und Kippen eines Holzstabs, je Fall – siehe Dateikopf.
 
 - `THEMA = 'Knicken und Kippen eines Holzstabs'`
 - `LANGNAME = 'Knicken und Kippen'`
@@ -75,7 +75,7 @@ def pruefe(self, e: Eingaben, p: Protokoll)
 def _gleichungen(self, e: Eingaben) -> set
 ```
 
-Welche Gleichungen die Faelle brauchen -- fuer die Ansaetze vorweg.
+Welche Gleichungen die Faelle brauchen – fuer die Ansaetze vorweg.
 
 #### HolzStabilitaetQA._kippachse
 
@@ -91,7 +91,7 @@ Um welche Achse der Stab kippen kann: die starke.
 def _momente(self, fall: Stabfall) -> Dict[str, float]
 ```
 
-Je Achse das Moment in Nm, das zaehlt -- einachsig ohne M_z.
+Je Achse das Moment in Nm, das zaehlt – einachsig ohne M_z.
 
 #### HolzStabilitaetQA._urteil
 
@@ -107,7 +107,7 @@ Der Vergleich der massgebenden Achse: die Momente gegen ihren Widerstand, ohne D
 def _einwirkung(p: Protokoll, biegung: Biegung, fall: Stabfall) -> None
 ```
 
-Die Einwirkung und der Stab als Tabelle -- einachsig ohne M_z.
+Die Einwirkung und der Stab als Tabelle – einachsig ohne M_z.
 
 ### _Herleitung
 
@@ -115,7 +115,7 @@ Die Einwirkung und der Stab als Tabelle -- einachsig ohne M_z.
 class _Herleitung
 ```
 
-Die Herleitung eines Falls, Achse fuer Achse -- mit den Werten, die die Achsen teilen.
+Die Herleitung eines Falls, Achse fuer Achse – mit den Werten, die die Achsen teilen.
 
 #### _Herleitung.kennwert
 
@@ -137,7 +137,7 @@ Ein Kennwert des Holzes in N/mm².
 def achse(self, a: str, knickt: bool, kippt: bool) -> Tuple[str, gl.Stabachse]
 ```
 
-Knicken, Kippen und die Gleichung um `a` -- ihr Ergebnis mit der Achse.
+Knicken, Kippen und die Gleichung um `a` – ihr Ergebnis mit der Achse.
 
 #### _Herleitung._biegespannung
 
@@ -145,7 +145,7 @@ Knicken, Kippen und die Gleichung um `a` -- ihr Ergebnis mit der Achse.
 def _biegespannung(self, a: str) -> float
 ```
 
-σ_m um `a` in N/mm², in die Herleitung -- null ohne Moment.
+σ_m um `a` in N/mm², in die Herleitung – null ohne Moment.
 
 #### _Herleitung._gleichung
 
@@ -153,7 +153,7 @@ def _biegespannung(self, a: str) -> float
 def _gleichung(self, a: str, x: gl.Stabachse, sigma_c: float, sigma_m: float, k_c: float, k_m: float) -> None
 ```
 
-(37) oder (38) um `a` mit Zahlen -- und wie weit die Momente wachsen duerfen.
+(37) oder (38) um `a` mit Zahlen – und wie weit die Momente wachsen duerfen.
 
 #### _Herleitung.knickwiderstand
 
@@ -162,7 +162,7 @@ def knickwiderstand(self, a: str, si: float) -> Wert
 ```
 
 `N_K,Rd = -k_c η f_c,0,d A` um `a`, mit dem Zeichen der Druckkraft
--- `si` ist dasselbe, aus dem Erfuellungsgrad der Achse.
+– `si` ist dasselbe, aus dem Erfuellungsgrad der Achse.
 
 
 ## Konstanten

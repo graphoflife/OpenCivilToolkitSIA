@@ -46,7 +46,7 @@ $$
 
 Im undrainierten Ton bricht der Boden am Fuss mit seiner Scherfestigkeit:
 q_b = s_u · N_c, mit dem N_c nach Skempton, in dem Form und Tiefe schon
-stecken (Kap. 12.5, Bild 12.5). Die Überlagerung am Fuss zählt hier nicht --
+stecken (Kap. 12.5, Bild 12.5). Die Überlagerung am Fuss zählt hier nicht –
 sie hebt sich etwa mit dem Gewicht des Pfahls auf, das ebenso wenig unter den
 Einwirkungen steht; nach Vorgabe, nicht nachgeschlagen. Bei s_u = 110 kN/m²
 und N_c = 9 sind es 990 kN/m².

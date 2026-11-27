@@ -1,5 +1,5 @@
 ---
-erzeugt: dca5205a79ab
+erzeugt: cf3ee7e46e45
 art: modul
 tags: [modul]
 ---
@@ -45,7 +45,7 @@ def traeger_mit_duebeln(kennung: str) -> QuerschnittsanalyseEintrag
 
 Ein IPE 400 aus S355 unter einer Platte 2000 × 150 mm aus C30/37 mit
 Betonstahl B500B, einachsig, mit Kopfbolzendübeln ⌀19 × 125 mm (SIA
-264:2014, 6.1). Im Feld teilverdübelt, (29) gehalten -- mit zu wenig
+264:2014, 6.1). Im Feld teilverdübelt, (29) gehalten – mit zu wenig
 Dübeln nicht; an der Stütze verlangt das negative Moment volle
 Verdübelung; ohne Zahl der Dübel und ohne L_e grau; L_e über 25 m
 verlangt volle Verdübelung; ohne Moment prüft er die Dübel nicht. Als
@@ -79,11 +79,11 @@ einachsig (SIA 264:2014, 5.3): der Beton mit 1.0 statt 0.85 (5.3.2.5),
 def blechdecke(kennung: str) -> QuerschnittsanalyseEintrag
 ```
 
-Eine Blechverbunddecke nach Vorgabe -- fuenf offene Rippen aus SE 350 G
-unter 140 mm C30/37, ohne Betonstahl --, das Endfeld einer durchlaufenden
+Eine Blechverbunddecke nach Vorgabe – fuenf offene Rippen aus SE 350 G
+unter 140 mm C30/37, ohne Betonstahl –, das Endfeld einer durchlaufenden
 Decke unter gleichmaessiger Last (SIA 264:2014, 5.4). Im Feld Biegung,
 Querkraft und Laengsschub, mit L/d_p ueber 26; an der Stuetze traegt
-nichts Zug -- das Blech zaehlt dort nicht --, der Widerstand ist null;
+nichts Zug – das Blech zaehlt dort nicht –, der Widerstand ist null;
 Druck mit kleinem Moment und reiner Zug, bei dem das Blech zaehlt.
 
 ### hinterschnittene_blechdecke
@@ -95,7 +95,7 @@ def hinterschnittene_blechdecke(kennung: str) -> QuerschnittsanalyseEintrag
 Eine Decke von 200 mm auf hinterschnittenen Rippen, oben ⌀10 @ 150 aus
 B500B, ein Innenfeld unter zwei Einzellasten (SIA 264:2014, 5.4): `b_0`
 ist dann `b_o`, die Schublaenge der Abstand `a`, und `d_p` liegt
-ueber 150 mm -- fuer die Querkraft gaelte SIA 262, das sagt ihr Urteil
+ueber 150 mm – fuer die Querkraft gaelte SIA 262, das sagt ihr Urteil
 mit einem Hinweis. An der Stuetze traegt der
 Betonstahl; ein Fall mit `M_z` sagt, dass die Decke nur in einer
 Richtung traegt.

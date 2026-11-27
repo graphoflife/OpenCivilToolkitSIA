@@ -41,7 +41,7 @@ Bis der Boden unter dem Fuss ganz bricht, müsste sich der Pfahl stark setzen;
 vorher schert der Boden nur rings um den Fuss ab. Das Buch rechnet dafür mit
 zwei Dritteln von Reibungswinkel und Kohäsion und empfiehlt diese Werte für
 den Spitzendruck von Pfählen (Kap. 9.2.7, 12.5). Aus 36° werden 24°, und N_q
-sinkt von 37.8 auf 9.6 -- auf ein Viertel.
+sinkt von 37.8 auf 9.6 – auf ein Viertel.
 
 Das Buch sieht dann keine weitere Sicherheit am Spitzendruck vor. Hier gelten
-η_a und γ_M,a der Norm trotzdem -- nach Vorgabe, nicht nachgeschlagen.
+η_a und γ_M,a der Norm trotzdem – nach Vorgabe, nicht nachgeschlagen.

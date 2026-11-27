@@ -1,5 +1,5 @@
 ---
-erzeugt: 5dd04af5b62a
+erzeugt: 41cd6f8d6093
 art: modul
 tags: [modul]
 ---
@@ -12,15 +12,15 @@ tags: [modul]
 Aus der [[opencivil.decke.modell#Decke|Decke]] die Streifen der
 Streifenmethode: je Richtung der Lastabtragung ein Satz paralleler
 Feldstreifen, dazu die versteckten Unterzüge als Streifen eigener Breite.
-Jeder Streifen zerfällt in Träger -- Stücke, die über Platten
-durchlaufen -- und jeder Träger weiss, worauf er liegt.
+Jeder Streifen zerfällt in Träger – Stücke, die über Platten
+durchlaufen – und jeder Träger weiss, worauf er liegt.
 
 
 ## DIE STREIFEN EINER RICHTUNG
 
 Alle Platten, die in einer Richtung tragen, bilden ihre Familie; über sie
 hinweg laufen die Streifen dieser Richtung durch. Quer zur Richtung wird
-die Familie an festen Stellen geteilt -- an den Ecken der Platten, an den
+die Familie an festen Stellen geteilt – an den Ecken der Platten, an den
 Rändern paralleler Unterzüge, an den Enden der Lager, an den Rändern der
 Stützenbereiche und der Unterzüge, die quer liegen. Was dazwischen liegt,
 wird in gleich breite Streifen von höchstens
@@ -31,17 +31,17 @@ Stützenbereich überdeckt einen Streifen ganz oder gar nicht.
 
 ## WORAUF EIN TRÄGER LIEGT
 
-* Auf einem **Linienlager**, das ihn quer schneidet -- als Punkt; es hält
+* Auf einem **Linienlager**, das ihn quer schneidet – als Punkt; es hält
   die Höhe, die Drehung oder beides.
 * Auf einem **Unterzug höherer Stufe**, den seine Achse quer kreuzt; die
   Feldstreifen haben Stufe 0. Ein Flächenlager mit gleichmässiger Pressung
   über die Fläche, die beide teilen (Stahlbeton II, 7.2 Platten, Folie 33).
-* Auf einer **Stütze**, deren Stützenbereich seine Achse kreuzt -- ebenso
+* Auf einer **Stütze**, deren Stützenbereich seine Achse kreuzt – ebenso
   ein Flächenlager (Folie 36: «Lastverteilelemente als Flächenlager mit
   gleichmässiger Pressung»).
 
-Liegen zwei davon an derselben Stelle -- die eine in der Fläche der
-anderen --, trägt das erste in dieser Folge: Linienlager, Unterzug (höhere
+Liegen zwei davon an derselben Stelle – die eine in der Fläche der
+anderen –, trägt das erste in dieser Folge: Linienlager, Unterzug (höhere
 Stufe zuerst), Stütze. So liegt in der Musterlösung des Kolloquiums 4 der
 Unterzug in x-Richtung über der Stütze auf den Unterzügen in y-Richtung,
 und erst diese auf der Stütze.
@@ -79,7 +79,7 @@ def parallel(self, andere: 'Richtung') -> bool
 def schief(self) -> bool
 ```
 
-Ob sie schief zu x und y liegt -- ihre Streifen tragen dann in x und y auch mit Drillmoment.
+Ob sie schief zu x und y liegt – ihre Streifen tragen dann in x und y auch mit Drillmoment.
 
 #### Richtung.punkt
 
@@ -95,7 +95,7 @@ Der Punkt mit `p·n = s` und `p·t = τ`.
 def richtung(winkel: float) -> Richtung
 ```
 
-Die Richtung zu einem Winkel -- auf [0, π) gebracht; `x` und `y` heissen so.
+Die Richtung zu einem Winkel – auf [0, π) gebracht; `x` und `y` heissen so.
 
 ### richtung_der_strecke
 
@@ -111,7 +111,7 @@ class Auflager
 ```
 
 Worauf ein Träger an einer Stelle liegt. `s` in m ab dem Anfang des
-Trägers -- bei einem Flächenlager der Schwerpunkt der Fläche, die beide
+Trägers – bei einem Flächenlager der Schwerpunkt der Fläche, die beide
 teilen (`kontakt`). Dort drückt das Lager mit `pressung`, je Kraft
 eins: ein Verlauf über `s`, dessen Integral eins ist.
 
@@ -140,12 +140,12 @@ Von wo bis wo das Lager drückt, in `s` des Trägers.
 class Lage
 ```
 
-Wo eine Stelle auf ihrem Träger liegt -- für die Aufteilung der Last.
+Wo eine Stelle auf ihrem Träger liegt – für die Aufteilung der Last.
 
 - `traegt: bool`
 - `spannweite: float` – Die Spannweite des Felds, in dem sie liegt; bei einer Kragplatte das Doppelte ihrer Länge.
-- `abstand: float` – Bis zum nächsten Lager, das die Höhe hält -- null in seiner Fläche.
-- `warum: Optional['Warum'] = None` – Warum ihr Träger nicht trägt -- `None`, wenn er trägt.
+- `abstand: float` – Bis zum nächsten Lager, das die Höhe hält – null in seiner Fläche.
+- `warum: Optional['Warum'] = None` – Warum ihr Träger nicht trägt – `None`, wenn er trägt.
 
 ### Warum
 
@@ -216,7 +216,7 @@ class Streifen
 
 Ein Streifen: quer von `von` bis `bis` in `τ = p·t`. Ein
 Feldstreifen hat Stufe 0; ein Unterzug seine Stufe, seinen Eintrag und
-sein Gebiet -- das Rechteck, das er belegt.
+sein Gebiet – das Rechteck, das er belegt.
 
 - `name: str`
 - `richtung: Richtung`
@@ -248,7 +248,7 @@ def mitte(self) -> float
 def laengs(self) -> Tuple[float, float]
 ```
 
-Wie weit der Streifen längs reicht -- ein Unterzug über sein Gebiet, ein Feldstreifen unbegrenzt.
+Wie weit der Streifen längs reicht – ein Unterzug über sein Gebiet, ein Feldstreifen unbegrenzt.
 
 #### Streifen.band
 
@@ -264,7 +264,7 @@ Das Rechteck des Streifens von `s_von` bis `s_bis`, im Gegenuhrzeigersinn.
 def traeger_bei(self, s: float) -> Optional[Traeger]
 ```
 
-Der Träger, auf dem `s = p·n` liegt -- sonst der nächste.
+Der Träger, auf dem `s = p·n` liegt – sonst der nächste.
 
 ### Gruppe
 
@@ -273,7 +273,7 @@ Der Träger, auf dem `s = p·n` liegt -- sonst der nächste.
 class Gruppe
 ```
 
-Platten mit denselben zwei Richtungen -- für sie gilt eine Aufteilung der Last.
+Platten mit denselben zwei Richtungen – für sie gilt eine Aufteilung der Last.
 
 - `richtungen: Tuple[Richtung, Richtung]`
 - `platten: List[Platte]`
@@ -299,7 +299,7 @@ class Zerlegung
 def feldstreifen(self, r: Richtung) -> List[Streifen]
 ```
 
-Die Feldstreifen in Richtung `r` -- je Richtung einmal gesucht: Bilder und Bericht fragen an jeder Stelle.
+Die Feldstreifen in Richtung `r` – je Richtung einmal gesucht: Bilder und Bericht fragen an jeder Stelle.
 
 #### Zerlegung.unterzuege
 
@@ -337,7 +337,7 @@ def stuetzenbereich(stuetze: Stuetze, unterzuege: Sequence[Unterzug]) -> List[Pu
 
 Die Fläche `lx × ly`, über die die Stütze trägt. Ohne Angabe ein
 Quadrat, so breit wie der breiteste Unterzug über ihr und mindestens so
-gross wie die Stütze -- in der Musterlösung des Kolloquiums 4 die
+gross wie die Stütze – in der Musterlösung des Kolloquiums 4 die
 1 m × 1 m, wo sich die Unterzüge kreuzen. Nach Vorgabe, nicht
 nachgeschlagen: Folie 39 lässt die Grösse frei.
 
@@ -347,7 +347,7 @@ nachgeschlagen: Folie 39 lässt die Grösse frei.
 def zerlegen(decke: Decke) -> Zerlegung
 ```
 
-Die Streifen, ihre Träger und deren Lager -- oder, was dem im Weg steht.
+Die Streifen, ihre Träger und deren Lager – oder, was dem im Weg steht.
 
 ### traeger_eines_unterzugs
 
@@ -356,7 +356,7 @@ def traeger_eines_unterzugs(u: Unterzug, decke: Decke, stuecke: Dict[str, List[L
 ```
 
 Die Träger, die `u` in `decke` wäre, mit den Lagern, die
-[[opencivil.decke.streifen#zerlegen|zerlegen]] ihnen gäbe -- für die Bänder, die sich ihre Lager
+[[opencivil.decke.streifen#zerlegen|zerlegen]] ihnen gäbe – für die Bänder, die sich ihre Lager
 suchen ([[opencivil.decke.baender|baender]]). `u` gehört nicht zu
 `decke`; `stuecke` sind ihre Platten in Dreiecken.
 
@@ -374,7 +374,7 @@ Die Feldstreifen einer Richtung, nach ihrer Lage quer geordnet und nummeriert.
 def _traeger(streifen: Streifen, platten: Sequence[Platte], decke: Decke, unterzuege: Sequence[Streifen], bereiche: Dict[str, List[Punkt]], stuecke: Dict[str, List[List[Punkt]]]) -> List[Traeger]
 ```
 
-Wo der Streifen über Platten läuft, ein Träger je zusammenhängendes Stück -- mit Steifigkeit und Lagern.
+Wo der Streifen über Platten läuft, ein Träger je zusammenhängendes Stück – mit Steifigkeit und Lagern.
 
 ### _abschnitte
 
@@ -383,8 +383,8 @@ def _abschnitte(streifen: Streifen, s0: float, s1: float, teile: Sequence[Tuple[
 ```
 
 Die Biegesteifigkeit `E · b · h³/12` längs der Achse: je Platte, über
-die die Achse läuft. Wo sie neben den Platten läuft -- an einem schiefen
-Rand --, gilt die der nächsten.
+die die Achse läuft. Wo sie neben den Platten läuft – an einem schiefen
+Rand –, gilt die der nächsten.
 
 ### _flaechenlager
 
@@ -392,7 +392,7 @@ Rand --, gilt die der nächsten.
 def _flaechenlager(streifen: Streifen, s0: float, L: float, achse: Tuple[Punkt, Punkt], gebiet: Sequence[Punkt], art: str, name: str) -> Optional[Auflager]
 ```
 
-Ein Flächenlager, wenn die Achse des Streifens das Gebiet kreuzt -- mit
+Ein Flächenlager, wenn die Achse des Streifens das Gebiet kreuzt – mit
 Pressung über die Fläche, die beide auf dem Träger teilen, und dort, wo
 ihr Schwerpunkt liegt. Liegt die Fläche ganz hinter seinem Ende, ein
 Punkt dort.
@@ -413,7 +413,7 @@ eins, ihr Schwerpunkt der des Kontakts.
 def _an_derselben_stelle(a: Auflager, b: Auflager) -> bool
 ```
 
-Ob zwei Lager an derselben Stelle liegen -- das eine in der Fläche des anderen.
+Ob zwei Lager an derselben Stelle liegen – das eine in der Fläche des anderen.
 
 ### pruefen
 
@@ -421,11 +421,11 @@ Ob zwei Lager an derselben Stelle liegen -- das eine in der Fläche des anderen.
 def pruefen(decke: Decke) -> List[Meldung]
 ```
 
-Was die Zerlegung aufhält -- Fehler -- und was auffällt -- Hinweise.
+Was die Zerlegung aufhält – Fehler – und was auffällt – Hinweise.
 
 Nur, was kein Feld sagen kann: wie die Teile liegen und zueinander
 stehen, und der Elastizitätsmodul, der vom Beton kommt. Wo eine Zahl
-liegen muss -- eine Dicke, eine Breite, ein Anteil --, prüft ihr Feld
+liegen muss – eine Dicke, eine Breite, ein Anteil –, prüft ihr Feld
 vor dem Rechnen ([[opencivil.projekt.decke]]). Bis 2026-11-20 stand
 das hier ein zweites Mal, mit anderen Sätzen, und griff nie. Ebenso,
 dass die zwei Richtungen einer Platte mindestens 5° auseinander liegen:
@@ -442,9 +442,9 @@ Ob sich zwei Flächen aus konvexen Stücken mehr als berühren.
 
 ## Konstanten
 
-- `TEILUNG = 0.001` – Wie nahe zwei Teilungsstellen quer liegen dürfen, in m -- näher gelten sie als eine.
+- `TEILUNG = 0.001` – Wie nahe zwei Teilungsstellen quer liegen dürfen, in m – näher gelten sie als eine.
 - `RAND = 0.0001` – So weit über sein Ende hinaus sucht ein Träger seine Lager, in m.
-- `STREIFEN_HOECHSTENS = 4000` – Mehr Streifen rechnet die Decke nicht -- sonst warten Benutzer und Browser zu lange.
+- `STREIFEN_HOECHSTENS = 4000` – Mehr Streifen rechnet die Decke nicht – sonst warten Benutzer und Browser zu lange.
 - `PARALLEL = 1e-06` – Unter diesem Winkel gelten zwei Richtungen als parallel, in rad.
 - `AUF_NICHTS = Warum('er liegt auf nichts.', 'sie liegen auf nichts.', 'liegt sie au…` – Wo an einer Stelle kein Träger ist.
 

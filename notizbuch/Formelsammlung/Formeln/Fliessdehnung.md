@@ -137,7 +137,7 @@ Beim Betonstahl wird sie an vier Stellen gebraucht:
 - in der Spannung-Dehnung-Analyse als Fliessbeginn: erreicht die am stärksten
   gezogene Lage diese Dehnung, knickt die Linie ab;
 - in der Stahlspannungsbegrenzung: fliesst der Stahl unter der Einwirkung,
-  bliebe seine Spannung am Plateau stehen und sagte nichts mehr -- verglichen
+  bliebe seine Spannung am Plateau stehen und sagte nichts mehr – verglichen
   wird dann über die Dehnung (siehe [[Zulässige Dehnung]]);
 - in den [[Kennzahlen]] als
   [[Nominelle Dehnung der Zugbewehrung|nominelle Dehnung der Zugbewehrung]]
@@ -148,5 +148,5 @@ Beim Baustahl ist sie Kennwert, aus Streckgrenze und $E_a$: für S355
 1.69 ‰. Plastisch rechnen darf nach SIA 263:2013, 3.2.2.4, wessen
 Bruchdehnung über 15 % liegt und mindestens 15-mal so gross ist wie die
 Fliessdehnung, und wessen Zugfestigkeit mindestens das 1.1-Fache der
-Streckgrenze ist -- die Sorten der Tabelle 1 erfüllen das. Das 15-Fache ist
+Streckgrenze ist – die Sorten der Tabelle 1 erfüllen das. Das 15-Fache ist
 darum die [[Grenzdehnung des Baustahls]].

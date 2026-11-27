@@ -41,6 +41,6 @@ $$
 
 Wie viel Stahl im Beton steckt, als Masse je Kubikmeter: die Stahlfläche
 aller Bewehrung des gezeichneten Querschnitts, mal der Dichte des Stahls von
-7850 kg/m³, geteilt durch die Fläche des Querschnitts -- die Länge des
+7850 kg/m³, geteilt durch die Fläche des Querschnitts – die Länge des
 Bauteils kürzt sich heraus. Wie bei der Platte ohne Bügel. Eine Kennzahl für
 Menge und Kosten, kein Nachweis.

@@ -63,5 +63,5 @@ glimmerhaltiges Gestein 6 000 bis 8 000. Das Werkzeug nimmt 10 000. Wie bei $\ta
 geht die Festigkeit als blosse Zahl in N/mm² ein.
 
 $E_{cm}$ ist der Modul des ungerissenen Betons unter kurzer Last. Unter Dauerlast
-kriecht der Beton und wird weicher -- siehe [[Wirksamer Elastizitätsmodul]].
+kriecht der Beton und wird weicher – siehe [[Wirksamer Elastizitätsmodul]].
 Für die Tragsicherheit wird er zum [[Bemessungswert des Elastizitätsmoduls]].

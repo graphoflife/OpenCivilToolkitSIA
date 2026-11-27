@@ -43,10 +43,10 @@ $$
 Wie stark der Boden unter dem Fuss gegen eine Setzung hält: der Druck je
 Setzung R mal der Fläche des Fusses, durch den Durchmesser. Für Bohrpfähle
 gibt Cassan R ≈ 4.5 · E_s (Kap. 12.8, Bild 12.9). Massgebend ist die
-Schicht, auf der der Fuss steht -- an einer Grenze die untere.
+Schicht, auf der der Fuss steht – an einer Grenze die untere.
 
 Der Fuss drückt nur: auf Zug hebt er ab und hat keine Feder. Wo er nicht
 trägt, weil die Spitze ausgeschaltet ist, fehlt die Feder ganz. Kommt R_a,k
-aus einem Versuch, zählt der Fuss immer mit -- nach Vorgabe, nicht
+aus einem Versuch, zählt der Fuss immer mit – nach Vorgabe, nicht
 nachgeschlagen. ⌀ 900 mm auf E_s,k = 30 MN/m²: π · 0.9 · 4.5 · 30 / 4
 ≈ 95 MN/m.

@@ -47,4 +47,4 @@ $$
 
 Wie beim [[Formfaktor s_c]]: beim räumlichen Bruch ist der Gleitkörper
 grösser, und mehr Auflast liegt auf ihm. Der Zuwachs hängt an $\tan\varphi$
--- ohne Reibung trägt die Auflast nichts dazu bei.
+– ohne Reibung trägt die Auflast nichts dazu bei.

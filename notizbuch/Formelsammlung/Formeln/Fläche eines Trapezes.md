@@ -40,5 +40,5 @@ $$
 
 ## Theorie
 
-Die mittlere Breite mal die Höhe -- etwa ein Fundamentbalken mit schrägen
+Die mittlere Breite mal die Höhe – etwa ein Fundamentbalken mit schrägen
 Seiten.

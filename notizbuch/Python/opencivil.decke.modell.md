@@ -1,5 +1,5 @@
 ---
-erzeugt: 142af413eba6
+erzeugt: 056b2483f3cc
 art: modul
 tags: [modul]
 ---
@@ -11,7 +11,7 @@ tags: [modul]
 
 Die Eingabe des Rechenkerns, ohne Oberfläche und ohne Projekt: Platten,
 Lager, Stützen, versteckte Unterzüge, Zonen der Lastaufteilung, Lasten,
-Lastfälle und Kombinationen -- alles in N, m und rad. Gerechnet wird in
+Lastfälle und Kombinationen – alles in N, m und rad. Gerechnet wird in
 [[opencivil.decke.rechnung|rechnung]].
 
 
@@ -23,7 +23,7 @@ und sind dann positiv; eine Lagerkraft nach oben ist positiv.
 
 ## RICHTUNGEN DER LASTABTRAGUNG
 
-Jede Platte trägt in zwei Richtungen, Winkel gegen die x-Achse -- im
+Jede Platte trägt in zwei Richtungen, Winkel gegen die x-Achse – im
 Rechteck `0` und `π/2`, in einer schiefen Platte etwa parallel zu ihren
 Rändern. Die erste heisst «Richtung 1», die zweite «Richtung 2»; ein Anteil
 gilt immer für Richtung 1, der Rest geht in Richtung 2. Grenzen zwei Platten
@@ -39,7 +39,7 @@ class Aufteilung(Wahl)
 
 Wie die Last ausserhalb der gezeichneten Zonen auf die beiden Richtungen geht.
 
-- `AUTOMATISCH = 'automatisch'` – Nach dem Muster der randnahen Lastabtragung -- siehe [[opencivil.decke.aufteilung|aufteilung]].
+- `AUTOMATISCH = 'automatisch'` – Nach dem Muster der randnahen Lastabtragung – siehe [[opencivil.decke.aufteilung|aufteilung]].
 - `FEST = 'fest'` – Überall derselbe Anteil in Richtung 1.
 
 ### Platte
@@ -52,10 +52,10 @@ class Platte
 - `name: str`
 - `ecken: Tuple[Punkt, ...]`
 - `h: float` – Dicke in m.
-- `E: float` – Elastizitätsmodul in N/m² -- er zählt nur, wo Platten verschieden steif sind.
+- `E: float` – Elastizitätsmodul in N/m² – er zählt nur, wo Platten verschieden steif sind.
 - `wichte: float` – Gewicht je Volumen in N/m³, für das Eigengewicht.
 - `richtungen: Tuple[float, float] = (0.0, math.pi / 2.0)` – Richtung 1 und 2 der Lastabtragung, rad gegen die x-Achse.
-- `von_selbst: bool = False` – Ob die Platte ihre Richtungen selbst wählt, entlang ihrer Ränder ([[opencivil.decke.richtungen|richtungen]]) -- dann gilt `richtungen` erst, wenn die Rechnung sie gewählt hat ([[opencivil.decke.rechnung#Ergebnis|decke]]).
+- `von_selbst: bool = False` – Ob die Platte ihre Richtungen selbst wählt, entlang ihrer Ränder ([[opencivil.decke.richtungen|richtungen]]) – dann gilt `richtungen` erst, wenn die Rechnung sie gewählt hat ([[opencivil.decke.rechnung#Ergebnis|decke]]).
 
 ### Linienlager
 
@@ -83,7 +83,7 @@ class Stuetze
 ```
 
 Eine Stütze, `bx × by` gross. Die Streifen und Unterzüge über ihr
-liegen auf dem Stützenbereich `lx × ly` mit gleichmässiger Pressung --
+liegen auf dem Stützenbereich `lx × ly` mit gleichmässiger Pressung –
 ohne Angabe so breit wie die Unterzüge über ihr, mindestens so gross wie
 die Stütze ([[opencivil.decke.streifen#stuetzenbereich|stuetzenbereich]]).
 
@@ -110,8 +110,8 @@ Stützen und Unterzügen höherer Stufe.
 - `a: Punkt`
 - `b: Punkt`
 - `breite: float`
-- `stufe: float = 1` – Ganz, ab 1 -- nur die Bänder liegen darunter ([[opencivil.decke.baender|STUFE_RAND]]).
-- `von_selbst: bool = False` – Ein Band, das die Rechnung selbst legt ([[opencivil.decke.baender|baender]]) -- kein Eintrag im Projekt.
+- `stufe: float = 1` – Ganz, ab 1 – nur die Bänder liegen darunter ([[opencivil.decke.baender|STUFE_RAND]]).
+- `von_selbst: bool = False` – Ein Band, das die Rechnung selbst legt ([[opencivil.decke.baender|baender]]) – kein Eintrag im Projekt.
 
 ### Zone
 
@@ -133,7 +133,7 @@ Ein Gebiet mit eigener Lastaufteilung: `anteil` geht in Richtung 1, der Rest in 
 class Flaechenlast
 ```
 
-Eine gleichmässige Flächenlast in N/m², nach unten positiv -- auf dem
+Eine gleichmässige Flächenlast in N/m², nach unten positiv – auf dem
 gezeichneten Vieleck `ecken` oder auf der ganzen Platte `platte`.
 
 - `name: str`
@@ -236,9 +236,9 @@ class Decke
 
 ## Konstanten
 
-- `STREIFENBREITE = 0.25` – Die Breite eines Streifens höchstens, in m -- ein Vorschlag.
-- `VERTEILBREITE = 1.0` – Die Seiten der Fläche, über die eine Einzellast verteilt wird, in m -- ein Vorschlag.
-- `BANDBREITE = 1.0` – Wie breit die Bänder sind, die die Rechnung selbst legt, in m -- ein Vorschlag.
+- `STREIFENBREITE = 0.25` – Die Breite eines Streifens höchstens, in m – ein Vorschlag.
+- `VERTEILBREITE = 1.0` – Die Seiten der Fläche, über die eine Einzellast verteilt wird, in m – ein Vorschlag.
+- `BANDBREITE = 1.0` – Wie breit die Bänder sind, die die Rechnung selbst legt, in m – ein Vorschlag.
 
 ## Braucht
 

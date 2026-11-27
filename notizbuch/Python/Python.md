@@ -1,5 +1,5 @@
 ---
-erzeugt: fd594519c548
+erzeugt: 7964ac019a7f
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -180,7 +180,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.projekt.eintraege]] – die Teile einer Projektbeschreibung.
     - [[opencivil.projekt.erdbeben]] – ein Gebaeude im Erdbeben, wie die Oberflaeche es beschreibt.
     - [[opencivil.projekt.faelle]] – Lastfaelle und Kombinationen eines Bauteils.
-    - [[opencivil.projekt.fallnamen]] – Die Namen der Faelle eines Bauteils -- je Liste verschieden, auch als Kennung.
+    - [[opencivil.projekt.fallnamen]] – Die Namen der Faelle eines Bauteils – je Liste verschieden, auch als Kennung.
     - [[opencivil.projekt.grundbruch]] – ein Grundbruchnachweis, wie die Oberflaeche ihn beschreibt.
     - [[opencivil.projekt.lesen]] – was in einer Projektdatei stehen darf, und wie es gelesen wird.
     - [[opencivil.projekt.mappe]] – mehrere Projekte in einer Datei.

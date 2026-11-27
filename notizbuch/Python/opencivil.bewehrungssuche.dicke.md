@@ -1,5 +1,5 @@
 ---
-erzeugt: 9a18082975fa
+erzeugt: af6132d42e24
 art: modul
 tags: [modul]
 ---
@@ -23,7 +23,7 @@ gesucht wird die duennste Platte, bei der sie eine Loesung findet.
 class Dickenversuch
 ```
 
-Eine gepruefte Dicke -- fuer die Meldung, welche es waren.
+Eine gepruefte Dicke – fuer die Meldung, welche es waren.
 
 - `h: float` – Plattendicke in mm.
 - `geht: bool`
@@ -35,10 +35,10 @@ Eine gepruefte Dicke -- fuer die Meldung, welche es waren.
 class Dickenergebnis
 ```
 
-Die duennste Platte -- und die Bewehrungssuche bei ihr.
+Die duennste Platte – und die Bewehrungssuche bei ihr.
 
 - `modus: Suchmodus`
-- `h: Optional[float] = None` – Gefundene Dicke in mm -- `None`: keine gefunden.
+- `h: Optional[float] = None` – Gefundene Dicke in mm – `None`: keine gefunden.
 - `suche: Optional[Suchergebnis] = None` – Die Bewehrungssuche bei der gefundenen Dicke, sonst bei der letzten.
 - `versuche: List[Dickenversuch] = field(default_factory=list)`
 - `begruendung: str = ''`
@@ -57,13 +57,13 @@ def dicke_suchen(projekt, kennung: str, *, modus: Suchmodus, **wie) -> Dickenerg
 ```
 
 Die duennste Platte auf dem Zentimeter, bei der die Bewehrungssuche eine
-Loesung findet -- mit allen eingeschalteten Nachweisen, innerhalb der
+Loesung findet – mit allen eingeschalteten Nachweisen, innerhalb der
 Obergrenze, und mit Duktilitaet, wenn sie eingeschaltet ist.
 
 Von der eingegebenen Dicke aus: geht es, wird halbiert, bis es nicht mehr
-geht -- nie unter die Mindestdicke der Platte (`automatik_mindestdicke`);
+geht – nie unter die Mindestdicke der Platte (`automatik_mindestdicke`);
 geht schon sie, ist sie das Ergebnis. Geht es nicht, wird verdoppelt, bis
-es geht -- hoechstens bis [[opencivil.bewehrungssuche.dicke#Konstanten|DICKE_HOECHSTENS]]. Eine Platte, die
+es geht – hoechstens bis [[opencivil.bewehrungssuche.dicke#Konstanten|DICKE_HOECHSTENS]]. Eine Platte, die
 duenner eingegeben ist als die Mindestdicke, beginnt bei ihr. Dazwischen
 Bisektion auf dem Raster. Das setzt
 voraus, dass es innerhalb einer Verdopplung nur einmal von «geht nicht»
@@ -81,12 +81,12 @@ vorab, mit ihrer eingegebenen Dicke ([[opencivil.bewehrungssuche.bewertung#vorab
 def _versuche_text(ergebnis: Dickenergebnis) -> str
 ```
 
-«300 ✓, 150 ✗, 220 ✓» -- die geprueften Dicken in mm, der Reihe nach.
+«300 ✓, 150 ✗, 220 ✓» – die geprueften Dicken in mm, der Reihe nach.
 
 
 ## Konstanten
 
-- `DICKENRASTER = 10.0` – Das Raster der Plattendicke in mm. Gefunden wird die kleinste Dicke auf diesem Raster, bei der alles aufgeht -- also auf den Zentimeter aufgerundet.
+- `DICKENRASTER = 10.0` – Das Raster der Plattendicke in mm. Gefunden wird die kleinste Dicke auf diesem Raster, bei der alles aufgeht – also auf den Zentimeter aufgerundet.
 - `DICKE_HOECHSTENS = 2000.0` – Bis wohin beim Verdoppeln gesucht wird, in mm. Dicker ist nicht immer leichter: die Mindestbewehrung waechst mit der Dicke, und mit einer Obergrenze kann eine sehr dicke Platte wieder durchfallen.
 
 ## Braucht

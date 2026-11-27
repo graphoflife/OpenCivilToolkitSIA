@@ -1,5 +1,5 @@
 ---
-erzeugt: 2f5a52e7c80f
+erzeugt: f72e77bcd930
 art: modul
 tags: [modul]
 ---
@@ -16,19 +16,19 @@ Zahl an Platte 2 aendert, soll nicht Platte 1 mitrechnen.
 
 ## WARUM DAS NICHT DAS RECHENWERK MACHT
 
-Innerhalb eines Laufs ist es schon sparsam -- es rechnet nur, was die Ziele
+Innerhalb eines Laufs ist es schon sparsam – es rechnet nur, was die Ziele
 brauchen, und jeden Wert einmal. Was ihm fehlt, ist das Gedaechtnis *zwischen*
 zwei Laeufen, und das kann es sich nicht selbst geben: es sieht nur einen
 fertigen Graphen und weiss nicht, welche Eingabe der Benutzer angefasst hat.
 Das weiss nur, wer die Beschreibung entgegennimmt.
 
 
-## WORAN DIE GUELTIGKEIT HAENGT -- UND WARUM SO GROB
+## WORAN DIE GUELTIGKEIT HAENGT – UND WARUM SO GROB
 
 Am **Abdruck** eines Bauteils: der JSON-Teil, aus dem es gebaut wird, plus die
 Materialien, die es verwendet. Nicht feiner. Es waere verlockend, je Nachweis
 zu pruefen und beim Aendern einer Einwirkung den Duktilitaetsnachweis stehen
-zu lassen -- aber die Nachweise tragen ihre Lastfaelle im Bauch, nicht in
+zu lassen – aber die Nachweise tragen ihre Lastfaelle im Bauch, nicht in
 ihren Bezuegen. Ein Knickfall mit geaenderter Normalkraft haette denselben
 Bezugsgraphen und dieselben Ausgabekennungen wie vorher; ein feiner Abdruck
 saehe keinen Unterschied und gaebe ein falsches Ergebnis heraus, ohne dass
@@ -42,7 +42,7 @@ verwirft, kostet Zeit. Von beiden Fehlern ist nur einer hinnehmbar.
 ## WAS AUFBEWAHRT WIRD
 
 Die ganze [[opencivil.core.rechenwerk#Loesung|Loesung]] des Bauteils: Werte,
-Herleitung, Urteile und die Befunde -- Interaktionslinien, Fallergebnisse,
+Herleitung, Urteile und die Befunde – Interaktionslinien, Fallergebnisse,
 das Ergebnis eines Balkensystems. Die Bilder lesen dort, nicht an den
 Rechenobjekten; die eines frischen Aufbaus taugen darum so gut wie die von
 damals.
@@ -50,14 +50,14 @@ damals.
 Daneben, in einem zweiten Speicher derselben Art, die Zeichendaten seiner
 Spannung-Dehnung-Analysen, unter demselben Abdruck: sie lesen nur seinen
 Eintrag, die Materialien und die Werte, die daraus folgen. Bis 2026-10-18
-rechnete jede Rechnung alle Analysen neu, auch die unveraenderter Bauteile --
+rechnete jede Rechnung alle Analysen neu, auch die unveraenderter Bauteile –
 am Pruefprojekt «jeder Nachweis» zwei Drittel jeder Rechnung.
 
 
 ## JE PROJEKT
 
 Ein Platz gehoert einem Bauteil eines Projekts, nach dem Namen des Projekts
-und der Kennung -- in einer Mappe heisst jedes Projekt anders
+und der Kennung – in einer Mappe heisst jedes Projekt anders
 ([[opencivil.projekt.mappe#Mappe|Mappe]]). Nur nach der Kennung verwechselte
 der Speicher nie etwas, das verhindert der Abdruck; aber zwei Projekte haben
 oft dieselben Kennungen, jedes zaehlt von `q1` an, und jeder Wechsel
@@ -95,8 +95,8 @@ Das Gedaechtnis zwischen zwei Anfragen.
 
 Ein Eintrag je Bauteil, geschluesselt nach Projekt und Kennung und nur
 gueltig, solange der Abdruck stimmt. Was darin liegt, sagt, wer ihn anlegt: die
-Loesung eines Laufs, der die Baustoffe mitgebracht bekam -- sie enthaelt
-nur, was das Bauteil selbst gerechnet hat --, oder die Zeichendaten
+Loesung eines Laufs, der die Baustoffe mitgebracht bekam – sie enthaelt
+nur, was das Bauteil selbst gerechnet hat –, oder die Zeichendaten
 seiner Analysen. Der Speicher liegt im Modul und damit im Prozess: beim
 Server ist das die laufende Sitzung, im Browser der offene Reiter. Eine
 Ablage auf der Platte waere ein zweiter Ort fuer dieselbe Wahrheit.
@@ -119,7 +119,7 @@ def merken(self, projekt: str, kennung: str, stempel: str, teil: T) -> None
 def aufraeumen(self, projekt: str, kennungen) -> None
 ```
 
-Eintraege zu geloeschten Bauteilen des Projekts wegwerfen -- die anderer Projekte bleiben.
+Eintraege zu geloeschten Bauteilen des Projekts wegwerfen – die anderer Projekte bleiben.
 
 #### Ergebnisspeicher.leeren
 
@@ -137,8 +137,8 @@ def belegt(self) -> int
 
 ## Konstanten
 
-- `T = TypeVar('T')` – Was ein Speicher je Bauteil aufbewahrt -- eine Loesung oder Zeichendaten.
-- `PLAETZE = 32` – Wie viele Bauteile hoechstens aufbewahrt werden. Ein Projekt mit mehr Platten als das laeuft nicht langsamer als ohne Speicher -- es gewinnt nur nichts mehr. Die Grenze ist gegen ein Gedaechtnis, das nie kleiner wird.
+- `T = TypeVar('T')` – Was ein Speicher je Bauteil aufbewahrt – eine Loesung oder Zeichendaten.
+- `PLAETZE = 32` – Wie viele Bauteile hoechstens aufbewahrt werden. Ein Projekt mit mehr Platten als das laeuft nicht langsamer als ohne Speicher – es gewinnt nur nichts mehr. Die Grenze ist gegen ein Gedaechtnis, das nie kleiner wird.
 
 ## Braucht
 

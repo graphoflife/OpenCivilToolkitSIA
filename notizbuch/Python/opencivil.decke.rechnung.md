@@ -1,5 +1,5 @@
 ---
-erzeugt: 0e0424ea5391
+erzeugt: 7fffef217bc2
 art: modul
 tags: [modul]
 ---
@@ -14,11 +14,11 @@ wählt ([[opencivil.decke.richtungen|richtungen]]), die Bänder, die sie bei
 automatischer Aufteilung selbst legt ([[opencivil.decke.baender|baender]]), zerlegen
 ([[opencivil.decke.streifen|streifen]]), die Last aufteilen ([[opencivil.decke.aufteilung|aufteilung]]), je Lastfall auf die
 Streifen legen ([[opencivil.decke.lasten|lasten]]), und dann je Lastfall und
-Kombination die Träger rechnen -- von unten nach oben:
+Kombination die Träger rechnen – von unten nach oben:
 
 1. die Feldstreifen (Stufe 0),
 2. die Unterzüge, nach Stufe aufsteigend. Was ein Streifen in einen
-   Unterzug gibt, liegt auf diesem als Last -- mit umgekehrtem Vorzeichen
+   Unterzug gibt, liegt auf diesem als Last – mit umgekehrtem Vorzeichen
    die Pressung, mit der dieser ihn trägt, über die Fläche, die beide
    teilen (Stahlbeton II, 7.2 Platten, Folie 33: die Pressung des
    Flächenlagers wird zur Last des versteckten Unterzugs).
@@ -31,8 +31,8 @@ dessen, was neben den Platten liegt oder auf einem Streifen, der nicht trägt.
 ## DIE LAGERKRÄFTE
 
 Eine Stütze bekommt die Summe der Kräfte aller Träger auf ihr. Ein
-Linienlager bekommt von jedem Träger, der es kreuzt, dessen Kraft --
-gleichmässig verteilt über das Stück des Lagers, über das der Träger geht --
+Linienlager bekommt von jedem Träger, der es kreuzt, dessen Kraft –
+gleichmässig verteilt über das Stück des Lagers, über das der Träger geht –
 und bei Einspannung dessen Moment ebenso: ein Verlauf in kN/m und kNm/m
 längs des Lagers, das Moment mit dem Vorzeichen der Platte
 ([[opencivil.decke.rechnung#lagerverlauf|lagerverlauf]]).
@@ -60,9 +60,9 @@ class Traegerergebnis
 ```
 
 - `traeger: Traeger`
-- `lasten: List[Teillast]` – Was auf ihm liegt, ohne seine Lagerkräfte -- in m ab seinem Anfang.
+- `lasten: List[Teillast]` – Was auf ihm liegt, ohne seine Lagerkräfte – in m ab seinem Anfang.
 - `lagerkraefte: List[Lagerkraft]`
-- `stuecke: List[EbenesIntervall]` – Querkraft und Moment längs des Trägers, für den ganzen Streifen (N, Nm) -- aus [[opencivil.decke.traeger#statik|statik]].
+- `stuecke: List[EbenesIntervall]` – Querkraft und Moment längs des Trägers, für den ganzen Streifen (N, Nm) – aus [[opencivil.decke.traeger#statik|statik]].
 
 #### Traegerergebnis.last
 
@@ -79,7 +79,7 @@ Was auf ihm liegt, zusammen, in N.
 def beidseits(self, s: float) -> Tuple[float, float]
 ```
 
-`M` knapp vor und knapp nach der Stelle `s`, in Nm -- vor seinem Anfang und nach seinem Ende null.
+`M` knapp vor und knapp nach der Stelle `s`, in Nm – vor seinem Anfang und nach seinem Ende null.
 
 ### Wandkraft
 
@@ -88,14 +88,14 @@ def beidseits(self, s: float) -> Tuple[float, float]
 class Wandkraft
 ```
 
-Was ein Träger in ein Linienlager gibt -- gleichmässig über das Stück `a → b`.
+Was ein Träger in ein Linienlager gibt – gleichmässig über das Stück `a → b`.
 
 - `traeger: str`
 - `a: Punkt`
 - `b: Punkt`
 - `F: float` – Nach unten auf das Lager, in N.
 - `vor: float`
-- `nach: float` – Hält das Lager die Drehung, das Moment des Trägers knapp vor und knapp nach ihm, in Nm, `M > 0` zieht unten -- vor seinem Anfang und nach seinem Ende null. Was das Lager hält, ist der Unterschied. Ein Lager, das die Drehung nicht hält, hält kein Moment: dann beide null.
+- `nach: float` – Hält das Lager die Drehung, das Moment des Trägers knapp vor und knapp nach ihm, in Nm, `M > 0` zieht unten – vor seinem Anfang und nach seinem Ende null. Was das Lager hält, ist der Unterschied. Ein Lager, das die Drehung nicht hält, hält kein Moment: dann beide null.
 - `n: Punkt` – Die Richtung des Trägers: in ihr liegt `nach` hinter dem Lager.
 
 #### Wandkraft.laenge
@@ -122,7 +122,7 @@ class Ausfall(Meldung)
 ```
 
 Was in einem Fall ausfaellt, weil Streifen nicht tragen: der ganze Satz
-in `text` -- «… 80 kN fallen aus.» --, dazu `grund` ohne die Kraft
+in `text` – «… 80 kN fallen aus.» –, dazu `grund` ohne die Kraft
 und die Kraft `F` in N. Ueber die Faelle gesammelt
 ([[opencivil.decke.rechnung#Ergebnis.fallmeldungen|Ergebnis.fallmeldungen]]), steht der Grund einmal und die Kraft
 je Fall dahinter. Grau: es fehlt ein Lager oder ein Unterzug, und der
@@ -176,7 +176,7 @@ Alle Kräfte in Linienlager und Stützen zusammen.
 def fehlbetrag(self) -> float
 ```
 
-Was die Lager weniger tragen, als auf den Trägern liegt -- null bis auf Rundung.
+Was die Lager weniger tragen, als auf den Trägern liegt – null bis auf Rundung.
 
 ### Ergebnis
 
@@ -185,7 +185,7 @@ Was die Lager weniger tragen, als auf den Trägern liegt -- null bis auf Rundung
 class Ergebnis
 ```
 
-- `decke: Decke` – Wie sie gerechnet ist -- mit den Richtungen, die ihre Platten selbst wählten, und den Bändern, die sie selbst legte.
+- `decke: Decke` – Wie sie gerechnet ist – mit den Richtungen, die ihre Platten selbst wählten, und den Bändern, die sie selbst legte.
 - `zerlegung: Zerlegung`
 - `aufteilungen: Optional[Aufteilungen]`
 - `faelle: List[Fallergebnis]`
@@ -207,7 +207,7 @@ Was die Faelle melden, jede Meldung einmal, vorn die Faelle, in denen
 sie steht: «In allen Fällen: …», sonst ««LF 1», «GZT»: …». Ein
 [[opencivil.decke.rechnung#Ausfall|Ausfall]] aus demselben Grund in mehreren Faellen steht einmal,
 die Kraft je Fall dahinter: «… Es fallen aus: «g» 80 kN, «GZT»
-228 kN.» Bis 2026-11-20 stand jede Meldung je Fall -- in vier
+228 kN.» Bis 2026-11-20 stand jede Meldung je Fall – in vier
 Lastfaellen und drei Kombinationen siebenmal derselbe Satz (Benutzer).
 
 ### rechnen
@@ -216,7 +216,7 @@ Lastfaellen und drei Kombinationen siebenmal derselbe Satz (Benutzer).
 def rechnen(decke: Decke) -> Ergebnis
 ```
 
-Die Decke nach der Streifenmethode, je Lastfall und Kombination -- vorher
+Die Decke nach der Streifenmethode, je Lastfall und Kombination – vorher
 wählt jede Platte mit `von_selbst` ihre Richtungen ([[opencivil.decke.richtungen#festgelegt|festgelegt]]),
 und dann legt die Decke ihre Bänder ([[opencivil.decke.baender#gelegt|gelegt]]).
 
@@ -228,7 +228,7 @@ def fall(name: str, belastung: Belastung, zerlegung: Zerlegung) -> Fallergebnis
 
 Ein Lastfall oder eine Kombination: alle Träger, von den Feldstreifen zu
 den Unterzügen. Was auf Trägern liegt, die nicht tragen, sagt eine
-Meldung je Grund -- bis 2026-11-19 eine je Träger, und eine Platte ohne
+Meldung je Grund – bis 2026-11-19 eine je Träger, und eine Platte ohne
 Lager gab je Fall vierzig gleiche Zeilen. Ebenso eine für alle Streifen
 mit Last, die auf keiner Platte liegen (bis 2026-11-20 eine je Streifen).
 
@@ -239,8 +239,8 @@ def auf_traeger(streifen: Streifen, lasten: Sequence[Teillast]) -> List[Tuple[Tr
 ```
 
 Die Lasten eines Streifens (in `s` seiner Richtung) auf seine Träger,
-in m ab deren Anfang. Was zwischen oder hinter den Trägern liegt -- an
-einem schiefen Rand ein Zwickel --, kommt als Einzellast an das nächste
+in m ab deren Anfang. Was zwischen oder hinter den Trägern liegt – an
+einem schiefen Rand ein Zwickel –, kommt als Einzellast an das nächste
 Ende.
 
 ### gegenkraefte
@@ -250,7 +250,7 @@ def gegenkraefte(kraefte: Sequence[Lagerkraft]) -> List[Teillast]
 ```
 
 Die Lagerkräfte als Lasten auf den Träger: ein Linienlager als Punkt, ein
-Flächenlager als gleichmässige Pressung über seine Fläche -- nach oben,
+Flächenlager als gleichmässige Pressung über seine Fläche – nach oben,
 also negativ.
 
 ### _weitergeben
@@ -270,7 +270,7 @@ def lagerverlauf(lager: Linienlager, kraefte: Sequence[Wandkraft]) -> List[Tuple
 Längs eines Linienlagers, was die Träger in es geben: Stufen
 `(u_a, u_b, r, m)` von seinem Anfang bis zu seinem Ende, `u` in m ab
 `lager.a`, `r` nach unten in N/m und `m` in Nm/m: das Moment, das
-es hält, mit dem Vorzeichen der Platte -- negativ, wo es oben zieht, wie
+es hält, mit dem Vorzeichen der Platte – negativ, wo es oben zieht, wie
 herum das Lager auch gezeichnet ist ([[opencivil.decke.rechnung#_gehalten|_gehalten]]). Wo zwei Träger
 dasselbe Stück tragen, zählen beide; ein schiefer gibt quer zum Lager
 cos² seines Winkels weiter, wie die Platte (Folie 14).
@@ -284,7 +284,7 @@ def _gehalten(links: float, rechts: float) -> float
 Was ein Lager an Moment hält, je Meter, wenn die Platte links von ihm
 mit `links` an ihm zieht und rechts mit `rechts`: den Unterschied,
 mit dem Vorzeichen der Seite, die stärker zieht. An einem Rand ist die
-andere Seite null -- dann ist es das Moment der Platte dort.
+andere Seite null – dann ist es das Moment der Platte dort.
 
 ### spitzen
 

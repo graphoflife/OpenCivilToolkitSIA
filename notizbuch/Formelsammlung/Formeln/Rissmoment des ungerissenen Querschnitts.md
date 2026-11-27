@@ -62,7 +62,7 @@ Zugfestigkeit mal dem Widerstandsmoment des ungerissenen Bruttoquerschnitts,
 ohne Bewehrung. Bei der Platte ist das $b h^2/6$; beim gezeichneten
 Querschnitt das [[Widerstandsmoment zum gezogensten Betonpunkt]].
 
-Gerechnet wird mit dem Bruttoquerschnitt ohne Bewehrung -- es geht um den
+Gerechnet wird mit dem Bruttoquerschnitt ohne Bewehrung – es geht um den
 Zustand vor dem Riss. Mit der Bewehrung wäre der Querschnitt etwas steifer
 und risse etwas später; das bleibt hier unberücksichtigt. Beim spröden
 Versagen liegt das auf der sicheren Seite, bei der Zwängung auf der

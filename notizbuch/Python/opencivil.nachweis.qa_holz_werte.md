@@ -1,5 +1,5 @@
 ---
-erzeugt: ee3af9da6e2f
+erzeugt: 053fc5d3c4d2
 art: modul
 tags: [modul]
 ---
@@ -30,7 +30,7 @@ Dazu, was die drei sonst teilen: die Kennwerte des Holzes als Eingaben
 ## EIN HOLZ
 
 Gerechnet wird ein Querschnitt aus einem einzigen Holz. Aus mehreren
-Hoelzern -- etwa C24 neben GL24h -- verteilten sich die Spannungen nach
+Hoelzern – etwa C24 neben GL24h – verteilten sich die Spannungen nach
 ihren Moduln; das rechnet das Werkzeug noch nicht, und die Analyse sagt es
 grau ([[opencivil.projekt.aufbau.querschnittsanalyse#ohne_nachweise|ohne_nachweise]]).
 
@@ -49,7 +49,7 @@ gilt es nicht (3.4.2.2), und `k_sys` (5.7.2.2) nimmt das Werkzeug nicht.
 def holzstoff(analyse: Querschnittsanalyse) -> Baustoff
 ```
 
-Das Holz der Analyse -- es gibt nur eines (siehe Dateikopf).
+Das Holz der Analyse – es gibt nur eines (siehe Dateikopf).
 
 ### holzart
 
@@ -57,7 +57,7 @@ Das Holz der Analyse -- es gibt nur eines (siehe Dateikopf).
 def holzart(stoff: Baustoff) -> Holzart
 ```
 
-Woraus das Holz ist -- Vollholz oder Brettschichtholz, nach seiner Sorte.
+Woraus das Holz ist – Vollholz oder Brettschichtholz, nach seiner Sorte.
 
 ### stoffbezuege
 
@@ -65,7 +65,7 @@ Woraus das Holz ist -- Vollholz oder Brettschichtholz, nach seiner Sorte.
 def stoffbezuege(stoff: Baustoff, *kennwerte: str) -> List[Eingabebezug]
 ```
 
-Die Kennwerte als Eingaben -- ohne Angabe die der Nachweise, [[opencivil.nachweis.qa_holz_werte#Konstanten|KENNWERTE]].
+Die Kennwerte als Eingaben – ohne Angabe die der Nachweise, [[opencivil.nachweis.qa_holz_werte#Konstanten|KENNWERTE]].
 
 ### kennwert
 
@@ -81,7 +81,7 @@ Ein Kennwert des Holzes, wie die Nachweise ihn lesen.
 def beiwert(p: Protokoll, werte: Zwischenwerte, eta_w: Wert, stossartig: bool) -> Wert
 ```
 
-`η = η_w·η_t` eines Falls -- ohne stossartige Einwirkung ist `η_t`
+`η = η_w·η_t` eines Falls – ohne stossartige Einwirkung ist `η_t`
 eins, und `η` ist `η_w`.
 
 ### HolzwerteQA
@@ -90,7 +90,7 @@ eins, und `η` ist `η_w`.
 class HolzwerteQA(Prozedur)
 ```
 
-Die Werte eines Holzquerschnitts, die seine Nachweise lesen -- siehe Dateikopf.
+Die Werte eines Holzquerschnitts, die seine Nachweise lesen – siehe Dateikopf.
 
 - `THEMA = 'Holzquerschnitt'`
 
@@ -118,9 +118,9 @@ def rechne(self, e: Eingaben, p: Protokoll) -> Dict[str, Groesse]
 
 ## Konstanten
 
-- `KENNWERTE = ('f_m_d', 'f_t_0_d', 'f_c_0_d', 'f_v_d')` – Was die Nachweise je Holz lesen -- die Bemessungswerte der Tabellen 6 und 7.
-- `KENNWERTE_STAB = ('f_m_k', 'f_c_0_k', 'E_0_05')` – Was der Stab dazu liest -- Anhang B und die Biegefestigkeit.
-- `TORSION_NUR_RECHTECK = 'Torsion weist das Werkzeug beim Holz nur für ein Rechteck nach, die …` – Warum Torsion nur beim Rechteck nachgewiesen wird -- siehe [[opencivil.holzbau.querschnitt]].
+- `KENNWERTE = ('f_m_d', 'f_t_0_d', 'f_c_0_d', 'f_v_d')` – Was die Nachweise je Holz lesen – die Bemessungswerte der Tabellen 6 und 7.
+- `KENNWERTE_STAB = ('f_m_k', 'f_c_0_k', 'E_0_05')` – Was der Stab dazu liest – Anhang B und die Biegefestigkeit.
+- `TORSION_NUR_RECHTECK = 'Torsion weist das Werkzeug beim Holz nur für ein Rechteck nach, die …` – Warum Torsion nur beim Rechteck nachgewiesen wird – siehe [[opencivil.holzbau.querschnitt]].
 - `ZUG = ('@eta \\cdot @f_t \\cdot @A', 'Zugwiderstand eines Holzquerschnitts')` – Die Widerstaende gegen Normalkraft, die Kennzahlen und Nachweise beide schreiben: je Vorlage ein Name in der Formelsammlung. `@eta` ist η_w oder, stossartig, η_w·η_t.
 - `DRUCK = ('-@eta \\cdot @f_c \\cdot @A', 'Druckwiderstand eines Holzquerschnit…`
 - `K_2 = '\\frac{1 - \\frac{192}{\\pi^5} \\cdot \\frac{@b}{@h} \\sum_{n = 1, 3…` – Die Reihen von Saint-Venant fuer k_2 = β/c, b die kurze Seite.

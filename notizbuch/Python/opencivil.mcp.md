@@ -1,5 +1,5 @@
 ---
-erzeugt: 63091ae0f072
+erzeugt: e0a4a977dfa5
 art: modul
 tags: [modul]
 ---
@@ -9,7 +9,7 @@ tags: [modul]
 
 ## WOZU
 
-Eine KI -- Claude Code, ein anderes Programm, das MCP spricht -- arbeitet mit
+Eine KI – Claude Code, ein anderes Programm, das MCP spricht – arbeitet mit
 dem Werkzeug wie jemand an der Seite: sie oeffnet eine Projektdatei, legt
 Eintraege an und aendert sie, rechnet und holt den Bericht. Die Werkzeuge
 dafuer stehen in [[opencivil.mcp.werkzeuge]], je eines mit Beschreibung
@@ -37,7 +37,7 @@ seine Meldung geht unveraendert zurueck ([[opencivil.mcp.sitzung]]).
 
 * Python-Skripte ausfuehren: die Konsole der Seite fuehrt beliebigen Code
   aus, und das soll eine KI nicht auf diesem Weg tun.
-* Die ganze Antwort einer Rechnung zurueckgeben -- beim Beispiel rund
+* Die ganze Antwort einer Rechnung zurueckgeben – beim Beispiel rund
   870 kB. `rechnen` fasst sie je Bauteil zusammen
   ([[opencivil.mcp.ausgabe#rechnung|opencivil.mcp.ausgabe.rechnung]]); `herleitung` und `bericht`
   geben die Herleitung als Text.

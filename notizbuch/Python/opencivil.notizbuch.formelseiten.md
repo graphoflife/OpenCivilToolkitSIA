@@ -1,5 +1,5 @@
 ---
-erzeugt: 465d6557ea47
+erzeugt: 7f8922faef81
 art: modul
 tags: [modul]
 ---
@@ -9,7 +9,7 @@ tags: [modul]
 
 ## VERANTWORTUNG
 
-Je Formel eine Seite, je Thema eine, dazu die Uebersicht -- aus denselben
+Je Formel eine Seite, je Thema eine, dazu die Uebersicht – aus denselben
 Laeufen wie die Formelsammlung ([[opencivil.bericht.formelsammlung#laeufe|opencivil.bericht.formelsammlung.laeufe]]),
 die zusammen jede Formel des Werkzeugs schreiben. Welche Formel hineingehoert
 und wie sie heisst, sagt die Formelsammlung; hier wird nur gesetzt.
@@ -17,7 +17,7 @@ und wie sie heisst, sagt die Formelsammlung; hier wird nur gesetzt.
 
 ## WAS EINE FORMELSEITE ZEIGT
 
-Die Formel ohne Zahlen -- in jeder Fassung, wenn es mehrere gibt --, ihre
+Die Formel ohne Zahlen – in jeder Fassung, wenn es mehrere gibt –, ihre
 Normstelle oder dass sie fehlt, die Groessen samt Herkunft, dieselbe Formel
 mit den Zahlen eines Projekts, welche Formeln sie brauchen, wo sie im Code
 steht und zu welchen Themen sie gehoert. Darunter, von Hand, die Theorie.
@@ -27,7 +27,7 @@ steht und zu welchen Themen sie gehoert. Darunter, von Hand, die Theorie.
 
 Aus der Rechnung selbst: je Lauf merkt sich [[opencivil.notizbuch.formelseiten#sammeln|sammeln]], welche Formel
 einen Wert zuletzt geschrieben hat. Braucht eine spaetere Formel ihn, ist
-das ihre Herkunft -- als Link. Schrieb ihn keine Formel der Sammlung, sagt
+das ihre Herkunft – als Link. Schrieb ihn keine Formel der Sammlung, sagt
 der Wert selbst, woher er kommt: Eingabe, Vorgabe oder Zwischenwert.
 Die Laeufe bleiben getrennt: `querschnitt.q1` meint in jedem Projekt eine
 andere Platte.
@@ -55,7 +55,7 @@ Eine Zeile der Tabelle «Groessen».
 class Fassung
 ```
 
-Eine Formel, wie sie zum ersten Mal dasteht -- mit allem, was ihre Vorkommen sagen.
+Eine Formel, wie sie zum ersten Mal dasteht – mit allem, was ihre Vorkommen sagen.
 
 - `block: GleichungBlock`
 - `projekt: str`
@@ -75,7 +75,7 @@ Alles zu einem Formelnamen, ueber alle Laeufe.
 - `themen: Dict[str, None] = field(default_factory=dict)`
 - `codestellen: Dict[str, None] = field(default_factory=dict)`
 - `gebraucht_von: Dict[str, None] = field(default_factory=dict)`
-- `normstellen: Dict[str, None] = field(default_factory=dict)` – Jede Normstelle, unter der die Formel vorkommt -- nicht nur die ihrer ersten Fassung: dieselbe Formel kann in zwei Abschnitten stehen, etwa die Überlagerung beim Grundwasser und in der undrainierten Formel.
+- `normstellen: Dict[str, None] = field(default_factory=dict)` – Jede Normstelle, unter der die Formel vorkommt – nicht nur die ihrer ersten Fassung: dieselbe Formel kann in zwei Abschnitten stehen, etwa die Überlagerung beim Grundwasser und in der undrainierten Formel.
 
 #### Formel.referenzen
 
@@ -118,7 +118,7 @@ def seiten(formeln: Optional[Dict[str, Formel]]=None, themen: Optional[Dict[str,
 ```
 
 Die Uebersicht, je Thema eine Seite und je Formel eine. `codestelle`
-macht aus `modul:Funktion` einen Link auf die Seite des Moduls -- ohne
+macht aus `modul:Funktion` einen Link auf die Seite des Moduls – ohne
 steht die Stelle als Code da.
 
 ### _groessen
@@ -127,7 +127,7 @@ steht die Stelle als Code da.
 def _groessen(fassungen: List[Fassung]) -> List[str]
 ```
 
-Die Zeilen der Tabelle -- dieselbe Groessenzeile in mehreren Fassungen einmal.
+Die Zeilen der Tabelle – dieselbe Groessenzeile in mehreren Fassungen einmal.
 
 
 ## Konstanten
@@ -135,7 +135,7 @@ Die Zeilen der Tabelle -- dieselbe Groessenzeile in mehreren Fassungen einmal.
 - `FORMELN = 'Formelsammlung/Formeln'`
 - `THEMEN = 'Formelsammlung/Themen'`
 - `UEBERSICHT = 'Formelsammlung/Formelsammlung.md'`
-- `BEREICHE = {**{art: 'Baustoffe' for art in MATERIALARTEN}, **{art.raum: art.bere…` – Wie die Uebersicht die Themen gruppiert -- nach dem Bestandteil, zu dem sie gehoeren (`Thema.art` der Formelsammlung: der Anfang des Namensraums). Die Bauteile nennen ihren Abschnitt im Steckbrief.
+- `BEREICHE = {**{art: 'Baustoffe' for art in MATERIALARTEN}, **{art.raum: art.bere…` – Wie die Uebersicht die Themen gruppiert – nach dem Bestandteil, zu dem sie gehoeren (`Thema.art` der Formelsammlung: der Anfang des Namensraums). Die Bauteile nennen ihren Abschnitt im Steckbrief.
 - `ANGABEN = {Quelle.EINGABE: 'Eingabe', Quelle.UEBERSCHRIEBEN: 'Eingabe', Quelle.…` – Woher ein Wert kommt, den keine Formel der Sammlung geschrieben hat.
 
 ## Braucht

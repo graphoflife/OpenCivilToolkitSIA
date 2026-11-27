@@ -1,5 +1,5 @@
 ---
-erzeugt: b141fe8c75d3
+erzeugt: c5fc4b04c893
 art: modul
 tags: [modul]
 ---
@@ -7,10 +7,10 @@ tags: [modul]
 > ein gezeichneter Querschnitt aus Holz nach SIA 265:2012.
 > Paket [[opencivil]] · [Quelltext](../../opencivil/holzbau/__init__.py)
 
-* [[opencivil.holzbau.querschnitt|querschnitt]] -- was die Nachweise aus der
+* [[opencivil.holzbau.querschnitt|querschnitt]] – was die Nachweise aus der
   Zeichnung brauchen: weiteste Faser, Schub nach Jourawski, Torsion des
   Rechtecks;
-* [[opencivil.holzbau.gleichungen|gleichungen]] -- die Gleichungen von 4.2, des
+* [[opencivil.holzbau.gleichungen|gleichungen]] – die Gleichungen von 4.2, des
   Knickens und des Kippens, ohne Rechenwerk.
 
 Die Herleitungen schreiben [[opencivil.nachweis.qa_holz]],

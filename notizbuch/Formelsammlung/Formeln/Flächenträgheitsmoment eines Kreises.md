@@ -43,5 +43,5 @@ $$
 ## Theorie
 
 Um jede Achse durch den Mittelpunkt dasselbe: ein Kreis biegt sich in jeder
-Richtung gleich. Es wächst mit der vierten Potenz des Durchmessers -- eine
+Richtung gleich. Es wächst mit der vierten Potenz des Durchmessers – eine
 Rundstütze mit doppeltem Durchmesser ist sechzehnmal so steif.

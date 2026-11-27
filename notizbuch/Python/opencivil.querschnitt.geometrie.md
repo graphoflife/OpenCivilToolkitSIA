@@ -1,5 +1,5 @@
 ---
-erzeugt: f0e4ef927b8f
+erzeugt: f5e4e0235ff8
 art: modul
 tags: [modul]
 ---
@@ -27,8 +27,8 @@ oder spaeter auseinander.
 
 ## EINHEITEN
 
-Keine. Gerechnet wird in der Einheit der Punkte -- in der Beschreibung sind
-das Millimeter --, Flaechen kommen im Quadrat dieser Einheit zurueck.
+Keine. Gerechnet wird in der Einheit der Punkte – in der Beschreibung sind
+das Millimeter –, Flaechen kommen im Quadrat dieser Einheit zurueck.
 Umgerechnet wird einmal am Rand, dort wo die Fasern entstehen.
 
 
@@ -40,7 +40,7 @@ wird am Ende nicht wiederholt. Ob es links- oder rechtsherum laeuft, ist gleich.
 
 ## INEINANDER LIEGEN
 
-Liegt ein Polygon ganz in einem anderen, ersetzt es dieses dort -- so entsteht
+Liegt ein Polygon ganz in einem anderen, ersetzt es dieses dort – so entsteht
 eine Aussparung, spaeter ein Stahlprofil im Beton. Beruehren duerfen sich
 Polygone, auch entlang einer ganzen Kante. Teilweise ueberlappen duerfen sie
 nicht: welches Material dort gilt, waere eine Willkuer.
@@ -53,7 +53,7 @@ nicht: welches Material dort gilt, waere eine Willkuer.
 class GeometrieFehler(ValueError)
 ```
 
-Eine Zeichnung, aus der sich nichts rechnen laesst -- mit dem Grund und
+Eine Zeichnung, aus der sich nichts rechnen laesst – mit dem Grund und
 den Elementen, die er betrifft. Das Zeichenfenster faerbt sie ein.
 
 ### Flaechenwerte
@@ -116,7 +116,7 @@ def summe(teile: Sequence[Tuple[float, Flaechenwerte]]) -> Flaechenwerte
 Die Werte eines zusammengesetzten Querschnitts.
 
 `teile` sind Paare aus Gewicht und Werten. Das Gewicht ist +1 fuer eine
-Flaeche, die zaehlt, und -1 fuer eine, die herausgenommen wird -- eine
+Flaeche, die zaehlt, und -1 fuer eine, die herausgenommen wird – eine
 Aussparung. Ueber die Momente um den Ursprung summiert und dann wieder auf
 den gemeinsamen Schwerpunkt bezogen (Steiner hin und zurueck).
 
@@ -179,7 +179,7 @@ zaehlt.
 def abstand_strecke_polygon(a: Punkt, b: Punkt, punkte: Sequence[Punkt]) -> float
 ```
 
-Der kuerzeste Abstand der Strecke `a`–`b` vom Polygon -- null, wo sie
+Der kuerzeste Abstand der Strecke `a`–`b` vom Polygon – null, wo sie
 es kreuzt, beruehrt oder in ihm liegt.
 
 ### echt_geschnitten
@@ -190,8 +190,8 @@ def echt_geschnitten(a1: Punkt, a2: Punkt, b1: Punkt, b2: Punkt) -> bool
 
 Ob sich zwei Strecken im Innern beider kreuzen.
 
-Beruehren -- ein Endpunkt auf der anderen Strecke, gemeinsame Ecke,
-deckungsgleiches Stueck -- zaehlt nicht. Das ist gewollt: Polygone duerfen
+Beruehren – ein Endpunkt auf der anderen Strecke, gemeinsame Ecke,
+deckungsgleiches Stueck – zaehlt nicht. Das ist gewollt: Polygone duerfen
 sich beruehren, und eine Aussparung darf am Rand ansetzen.
 
 ### selbstschnitt
@@ -200,7 +200,7 @@ sich beruehren, und eine Aussparung darf am Rand ansetzen.
 def selbstschnitt(punkte: Sequence[Punkt]) -> Optional[Tuple[int, int]]
 ```
 
-Das erste Paar nicht benachbarter Kanten, die sich kreuzen -- oder nichts.
+Das erste Paar nicht benachbarter Kanten, die sich kreuzen – oder nichts.
 
 ### polygon_pruefen
 
@@ -217,14 +217,14 @@ mit einem Satz, der sagt, was nicht stimmt.
 def schnitt_mit_gerade(punkte: Sequence[Punkt], normale: Tuple[float, float], v: float) -> List[Tuple[float, float]]
 ```
 
-Wo die Gerade `n·p = v` im Polygon liegt -- als Abschnitte auf ihr.
+Wo die Gerade `n·p = v` im Polygon liegt – als Abschnitte auf ihr.
 
 Gemessen wird entlang der Tangente `t = (-n_z, n_y)`, also `u = t·p`.
 `normale` muss ein Einheitsvektor sein. Zurueck kommen die Paare
 `(u_von, u_bis)` in aufsteigender Folge; ihre Laengen ergeben die Breite
 des Polygons auf dieser Hoehe.
 
-Gedacht fuer Geraden, die keine Ecke treffen -- die Fasern legen ihre
+Gedacht fuer Geraden, die keine Ecke treffen – die Fasern legen ihre
 Mitten zwischen die Ecken. Trifft eine trotzdem eine Ecke, zaehlt die
 halb offene Regel aus [[opencivil.querschnitt.geometrie#lage|lage]] sie genau einmal.
 
@@ -235,7 +235,7 @@ def jenseits(punkte: Sequence[Punkt], normale: Tuple[float, float], v: float) ->
 ```
 
 Der Teil des Polygons mit `n·p ≥ v`: seine Flaeche und ihre statischen
-Momente um den Ursprung, `(A, ∫y dA, ∫z dA)` -- null, wo nichts davon
+Momente um den Ursprung, `(A, ∫y dA, ∫z dA)` – null, wo nichts davon
 liegt. So teilt die plastische Nulllinie eines Stahlquerschnitts
 ([[opencivil.stahlbau.querschnitt]]) jedes Polygon in Zug und Druck.
 
@@ -248,7 +248,7 @@ def abgeschnitten(punkte: Sequence[Punkt], normale: Tuple[float, float], v: floa
 ```
 
 Der Teil des Polygons mit `n·p ≥ v`, als Polygon im selben Umlaufsinn
--- leer, wo nichts davon liegt. Abgeschnitten wird Kante fuer Kante an
+– leer, wo nichts davon liegt. Abgeschnitten wird Kante fuer Kante an
 der Geraden (Sutherland-Hodgman). Das gilt auch fuer ein Polygon, das
 nicht konvex ist: zerfaellt der Teil in Stuecke, verbinden sie Kanten auf
 der Geraden, die hin und zurueck laufen und sich in Flaeche und
@@ -260,7 +260,7 @@ statischen Momenten aufheben.
 def konvexe_huelle(punkte: Sequence[Punkt]) -> Tuple[Punkt, ...]
 ```
 
-Die konvexe Hülle gegen den Uhrzeigersinn -- bei weniger als drei Ecken die Punkte selbst.
+Die konvexe Hülle gegen den Uhrzeigersinn – bei weniger als drei Ecken die Punkte selbst.
 
 ### in_huelle
 
@@ -269,7 +269,7 @@ def in_huelle(punkte: Sequence[Punkt], huelle: Sequence[Punkt]) -> List[Punkt]
 ```
 
 Der Teil des Polygons in der konvexen `huelle` (gegen den
-Uhrzeigersinn, [[opencivil.querschnitt.geometrie#konvexe_huelle|konvexe_huelle]]) -- je Seite der Huelle
+Uhrzeigersinn, [[opencivil.querschnitt.geometrie#konvexe_huelle|konvexe_huelle]]) – je Seite der Huelle
 [[opencivil.querschnitt.geometrie#abgeschnitten|abgeschnitten]]; leer, wo nichts darin liegt.
 
 ### Beziehung
@@ -296,7 +296,7 @@ noch: `None`.
 
 Gezaehlt werden die Ecken von `p` und die Mitten seiner Kanten. Eine
 Ecke auf dem Rand von `q` sagt nichts; liegt alles auf dem Rand,
-entscheiden die Kantenmitten -- so wird eine Aussparung, die am Rand
+entscheiden die Kantenmitten – so wird eine Aussparung, die am Rand
 ansetzt, als innen erkannt.
 
 ### beziehung
@@ -307,7 +307,7 @@ def beziehung(p: Sequence[Punkt], q: Sequence[Punkt]) -> Beziehung
 
 Wie `p` zu `q` liegt.
 
-Zuerst echte Kreuzungen von Kanten -- die bedeuten immer Ueberlappung.
+Zuerst echte Kreuzungen von Kanten – die bedeuten immer Ueberlappung.
 Ohne sie entscheiden die Proben aus [[opencivil.querschnitt.geometrie#_ganz_in|_ganz_in]] in beide Richtungen.
 Deckungsgleiche Polygone ueberlappen.
 
@@ -317,7 +317,7 @@ Deckungsgleiche Polygone ueberlappen.
 def verschachteln(polygone: Sequence[Sequence[Punkt]], namen: Sequence[str]) -> Tuple[Optional[int], ...]
 ```
 
-Je Polygon das, in dem es liegt -- das kleinste, das es ganz enthaelt.
+Je Polygon das, in dem es liegt – das kleinste, das es ganz enthaelt.
 
 Wirft [[opencivil.querschnitt.geometrie#GeometrieFehler|GeometrieFehler]], wenn zwei Polygone teilweise ueberlappen.
 
@@ -327,7 +327,7 @@ Wirft [[opencivil.querschnitt.geometrie#GeometrieFehler|GeometrieFehler]], wenn 
 def innerstes(p: Punkt, polygone: Sequence[Sequence[Punkt]]) -> Optional[int]
 ```
 
-Das kleinste Polygon, in dessen Innern `p` liegt -- oder nichts.
+Das kleinste Polygon, in dessen Innern `p` liegt – oder nichts.
 
 Bei verschachtelten Polygonen ist das das innerste, also das, dessen
 Material an dieser Stelle gilt.
@@ -340,7 +340,7 @@ def stab_liegt_in(p: Punkt, radius: float, polygone: Sequence[Sequence[Punkt]], 
 
 Ob ein runder Stab ganz in einem tragenden Polygon liegt.
 
-`traegt` sagt je Polygon, ob sein Material Bewehrung aufnimmt -- beim
+`traegt` sagt je Polygon, ob sein Material Bewehrung aufnimmt – beim
 Stahlbeton: ob es Beton ist. Die Mitte muss im innersten Polygon liegen
 und dieses muss tragen; dazu darf der Stab keinen Rand schneiden, weder
 den aeusseren noch den einer Aussparung.
@@ -351,11 +351,11 @@ den aeusseren noch den einer Aussparung.
 def strecke_liegt_in(a: Punkt, b: Punkt, polygone: Sequence[Sequence[Punkt]], traegt: Sequence[bool]) -> bool
 ```
 
-Ob eine Strecke -- eine Schubwand -- ganz in tragenden Polygonen verlaeuft.
+Ob eine Strecke – eine Schubwand – ganz in tragenden Polygonen verlaeuft.
 
 Geprueft wird an Proben alle [[opencivil.querschnitt.geometrie#Konstanten|WANDPROBE]] entlang der Strecke, ohne
 die beiden Enden: eine Wand darf bis an den Rand reichen. Eine Aussparung,
-schmaler als der Probenabstand, faellt dabei durch -- fuenf Millimeter
+schmaler als der Probenabstand, faellt dabei durch – fuenf Millimeter
 liegen unter allem, was als Aussparung gezeichnet wird.
 
 ### Linienart
@@ -368,7 +368,7 @@ Wie die Menge einer Stablinie angegeben ist.
 
 - `FLAECHE = 'flaeche'` – Eine Stahlflaeche, gleichmaessig ueber die Linie verteilt.
 - `ANZAHL = 'anzahl'` – So viele Staebe, gleich weit voneinander.
-- `TEILUNG = 'teilung'` – Ein Wunschabstand -- gerundet auf den naechsten, der aufgeht.
+- `TEILUNG = 'teilung'` – Ein Wunschabstand – gerundet auf den naechsten, der aufgeht.
 
 ### Stablinie
 
@@ -421,7 +421,7 @@ def verschmierte_flaeche(durchmesser: float, teilung: float, laenge: float) -> f
 ```
 
 Staebe `durchmesser` im Abstand `teilung` ueber `laenge`, verschmiert
--- in mm²: `A_s = L/s · π⌀²/4`. Bei ⌀12 @ 150 auf 1000 mm sind das 754 mm².
+– in mm²: `A_s = L/s · π⌀²/4`. Bei ⌀12 @ 150 auf 1000 mm sind das 754 mm².
 
 ### buegelgehalt
 
@@ -430,7 +430,7 @@ def buegelgehalt(schnitte: int, durchmesser: float, teilung: float) -> float
 ```
 
 Der Buegelquerschnitt einer Schubwand je Laenge, `n · π⌀²/4 / s`, in
-mm²/mm -- ohne Buegel null. Fuer den Nachweis und fuer die Liste unter
+mm²/mm – ohne Buegel null. Fuer den Nachweis und fuer die Liste unter
 der Zeichnung.
 
 ### linienflaeche
@@ -439,7 +439,7 @@ der Zeichnung.
 def linienflaeche(linie: Mapping[str, Any], laenge: float, staebe: int) -> float
 ```
 
-Die ganze Stahlflaeche einer Stablinie in mm² -- die eine Stelle dafuer.
+Die ganze Stahlflaeche einer Stablinie in mm² – die eine Stelle dafuer.
 Verschmiert die Flaeche von Hand oder aus Staeben
 ([[opencivil.querschnitt.geometrie#verschmierte_flaeche|verschmierte_flaeche]], ohne eigene Laenge ueber `laenge`, die
 der Linie); sonst ihre `staebe` Staebe. `linie` ist die Beschreibung,
@@ -466,7 +466,7 @@ bei 150 mm Teilung 150 mm² je Stab, also ⌀13.8:
 def _schnitt_der_geraden(p: Punkt, r: Punkt, q: Punkt, s: Punkt) -> Optional[Punkt]
 ```
 
-Wo sich die Geraden `p + t·r` und `q + u·s` schneiden -- nichts, wenn sie parallel sind.
+Wo sich die Geraden `p + t·r` und `q + u·s` schneiden – nichts, wenn sie parallel sind.
 
 ### versetzt
 
@@ -474,13 +474,13 @@ Wo sich die Geraden `p + t·r` und `q + u·s` schneiden -- nichts, wenn sie para
 def versetzt(punkte: Sequence[Punkt], abstand: float) -> Optional[Tuple[Punkt, ...]]
 ```
 
-Das Polygon, jede Kante um `abstand` nach innen gerueckt -- bei einem
+Das Polygon, jede Kante um `abstand` nach innen gerueckt – bei einem
 negativen Abstand nach aussen. Die neuen Ecken liegen, wo sich die
 gerueckten Kanten schneiden, auch an einer einspringenden Ecke: so
 zeichnet man eine Ueberdeckung. Ein Rechteck 300 × 600 um 30 gerueckt
 ist das Rechteck 240 × 540 in seiner Mitte.
 
-Kehrt sich eine Kante dabei um -- eine kurze Fase bei grossem Abstand --,
+Kehrt sich eine Kante dabei um – eine kurze Fase bei grossem Abstand –,
 faellt sie weg, und ihre Nachbarn schneiden sich. Bleibt nichts, oder
 schnitte sich das Ergebnis selbst, kommt nichts zurueck.
 
@@ -500,7 +500,7 @@ def naechster_randpunkt(p: Punkt, punkte: Sequence[Punkt], laengs: Optional[Punk
 ```
 
 Der Punkt auf dem Rand des Polygons, der `p` am naechsten liegt. Sind
-zwei gleich nahe -- an einer einspringenden Ecke --, gilt der, zu dem der
+zwei gleich nahe – an einer einspringenden Ecke –, gilt der, zu dem der
 Weg am wenigsten in Richtung `laengs` geht: eine Linie wird so quer zu
 sich verschoben, nicht laengs.
 
@@ -510,15 +510,15 @@ sich verschoben, nicht laengs.
 def ueberdeckung_von(p: Punkt, polygone: Sequence[Sequence[Punkt]], traegt: Sequence[bool], ueberdeckungen: Sequence[float]) -> Optional[int]
 ```
 
-Das Polygon, dessen Ueberdeckung fuer Bewehrung bei `p` gilt -- oder
+Das Polygon, dessen Ueberdeckung fuer Bewehrung bei `p` gilt – oder
 nichts, wenn keines eine hat.
 
 Ein Polygon mit Beton gilt nur fuer das, was in ihm liegt: so zieht der
 Nachbar in einem Querschnitt aus mehreren Polygonen nichts zu sich
-hinueber. Gerueckt wird aber jede Kante, auch die Fuge zum Nachbarn --
+hinueber. Gerueckt wird aber jede Kante, auch die Fuge zum Nachbarn –
 die Ueberdeckung gehoert darum dem Polygon, an dessen Rand sie gilt.
-Liegt `p` in keinem Beton -- daneben, auf dem Rand oder in einer
-Aussparung --, kommt jedes mit Beton in Frage; eine Aussparung mit
+Liegt `p` in keinem Beton – daneben, auf dem Rand oder in einer
+Aussparung –, kommt jedes mit Beton in Frage; eine Aussparung mit
 Ueberdeckung immer. Von diesen gilt das, dessen Rand am naechsten liegt.
 
 ### _in_ueberdeckung
@@ -529,7 +529,7 @@ def _in_ueberdeckung(p: Punkt, radius: float, punkte: Sequence[Punkt], ueberdeck
 
 Wo ein Stab mit `radius` liegen muss, damit er ganz in der Ueberdeckung
 dieses Polygons liegt: `p` selbst, wenn er es schon tut, sonst der
-naechste Punkt, an dem er es gerade tut -- im Beton innerhalb des um
+naechste Punkt, an dem er es gerade tut – im Beton innerhalb des um
 `ueberdeckung + radius` gerueckten Polygons, bei einer Aussparung
 ausserhalb des so weit vergroesserten. Nichts, wenn dafuer nichts bleibt.
 
@@ -550,14 +550,14 @@ der schon weit genug innen liegt, bleibt. Nichts ohne Ueberdeckung.
 def linie_in_ueberdeckung(von: Punkt, bis: Punkt, radius_bei: Callable[[float], float], polygone: Sequence[Sequence[Punkt]], traegt: Sequence[bool], ueberdeckungen: Sequence[float]) -> Optional[Tuple[Punkt, Punkt]]
 ```
 
-Anfang und Ende einer Stablinie in der Ueberdeckung -- jedes Ende wie ein
+Anfang und Ende einer Stablinie in der Ueberdeckung – jedes Ende wie ein
 Stab, mit der Ueberdeckung, die an ihrer Mitte gilt. Sind zwei Raender
 gleich nah, verschiebt sich das Ende quer zur Linie.
 
 `radius_bei(laenge)` ist der Radius ihrer Staebe. Bei einer
 verschmierten Linie haengt er an ihrer Laenge
 ([[opencivil.querschnitt.geometrie#aequivalenter_durchmesser|aequivalenter_durchmesser]]), und die aendert sich mit dem
-Verschieben: gerechnet wird darum, bis beide zueinander passen -- ein
+Verschieben: gerechnet wird darum, bis beide zueinander passen – ein
 zweites Mal verschoben, bleibt die Linie stehen. Nichts ohne
 Ueberdeckung, oder wenn die Linie dabei keine Laenge behielte.
 
@@ -565,10 +565,10 @@ Ueberdeckung, oder wenn die Linie dabei keine Laenge behielte.
 ## Konstanten
 
 - `TOLERANZ = 1e-06` – Wie nahe zwei Lagen beieinander liegen duerfen, um als gleich zu gelten, in der Einheit der Punkte. Ein Millionstel Millimeter liegt weit unter allem, was jemand zeichnet, und weit ueber dem Rauschen gerechneter Kreispunkte.
-- `NULL = Flaechenwerte(A=0.0, y_S=0.0, z_S=0.0, I_y=0.0, I_z=0.0, I_yz=0.0)` – Ein Querschnitt ohne Flaeche -- der Anfang jeder Summe.
+- `NULL = Flaechenwerte(A=0.0, y_S=0.0, z_S=0.0, I_y=0.0, I_z=0.0, I_yz=0.0)` – Ein Querschnitt ohne Flaeche – der Anfang jeder Summe.
 - `WANDPROBE = 5.0` – Abstand der Proben entlang einer Wandlinie, in der Einheit der Punkte.
 - `TEILUNG_VERSCHMIERT = 150.0` – Mit welcher Teilung eine verschmierte Stablinie als Staebe gilt, wo sie einen Durchmesser braucht: fuer die Grenze der Stahlspannung je Stab ([[opencivil.nachweis.stabgrenzen]], Annahme des Benutzers, 2026-10-15) und fuer die Ueberdeckung (Benutzer, 2026-10-23). In mm.
-- `VERSCHMIERT = ('flaeche', 'staebe')` – Wie die Flaeche einer verschmierten Stablinie angegeben ist: die Flaeche selbst -- oder Staebe mit Durchmesser und Teilung ueber eine Laenge, verschmiert (Benutzer, 2026-10-24).
+- `VERSCHMIERT = ('flaeche', 'staebe')` – Wie die Flaeche einer verschmierten Stablinie angegeben ist: die Flaeche selbst – oder Staebe mit Durchmesser und Teilung ueber eine Laenge, verschmiert (Benutzer, 2026-10-24).
 
 ## Braucht
 

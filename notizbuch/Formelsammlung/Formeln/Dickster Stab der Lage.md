@@ -45,4 +45,4 @@ $$
 Die zulässige Stahlspannung bei begrenzter Rissbreite hängt am
 Stabdurchmesser: dicke Stäbe geben bei gleicher Fläche weniger Umfang für den
 Verbund und breitere Risse. Liegen Grundbewehrung und Zulage verschieden dick,
-zählt der dickere -- auf der sicheren Seite.
+zählt der dickere – auf der sicheren Seite.

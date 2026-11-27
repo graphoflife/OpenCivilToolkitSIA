@@ -53,6 +53,6 @@ Quadrat $r \times r$ ohne den Viertelkreis, $(1 - \pi/4)\,r^2 \approx
 0.2146\,r^2$.
 
 Die Formel ist die der Tabelle des Benutzers, mit demselben gerundeten
-Beiwert -- nach Vorgabe, nicht nachgeschlagen. Sie gilt für IPE, HEA, HEB
+Beiwert – nach Vorgabe, nicht nachgeschlagen. Sie gilt für IPE, HEA, HEB
 und HEM. Mit der Dichte des Materials gibt die Fläche das Eigengewicht des
 Stabs.

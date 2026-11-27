@@ -55,7 +55,7 @@ $$
 ## Theorie
 
 Wie stark sich der Pfahl unter einem Moment krümmt: Elastizitätsmodul mal
-Trägheitsmoment, mit denselben Annahmen wie bei der Dehnsteifigkeit -- der
+Trägheitsmoment, mit denselben Annahmen wie bei der Dehnsteifigkeit – der
 Beton ungerissen und ohne Bewehrung, beim Mikropfahl nur der Stahl.
 ⌀ 900 mm aus C30/37: 33 620 N/mm² · 0.0322 m⁴ ≈ 1080 MNm².
 

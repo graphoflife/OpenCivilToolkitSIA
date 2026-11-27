@@ -1,5 +1,5 @@
 ---
-erzeugt: 4233fdd613b6
+erzeugt: 49904065d1dd
 art: modul
 tags: [modul]
 ---
@@ -10,10 +10,10 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Fuehrt Buch darueber, aus welchen Quelldateien der Rechenkern besteht, und
-schreibt diese Liste nach `web/kern/dateien.json` -- dazu alle Dateien in
+schreibt diese Liste nach `web/kern/dateien.json` – dazu alle Dateien in
 einem Stueck nach `web/kern/quellen.json`. Der Faden in
 `web/js/kern_arbeiter.js` holt das Paket und legt jede Datei darin ins
-Dateisystem von Pyodide -- danach ist `import opencivil` im Browser
+Dateisystem von Pyodide – danach ist `import opencivil` im Browser
 dasselbe wie auf dem Rechner.
 
 
@@ -22,12 +22,12 @@ dasselbe wie auf dem Rechner.
 Bis 2026-11-20 holte der Browser jede Datei fuer sich, nach der Liste. Auf
 GitHub Pages kostet jede Anfrage ihre Zeit, und ein paar hundert laufen
 nicht alle zugleich; jetzt ist es eine. Das Paket ist ein zweites, erzeugtes
-Abbild des Quellcodes im Repo -- und damit etwas, das unbemerkt veralten
+Abbild des Quellcodes im Repo – und damit etwas, das unbemerkt veralten
 kann: [[opencivil.web.bruecke#quellen_stimmen|quellen_stimmen]] prueft im Test, dass es zu den vorhandenen
 Dateien passt. Veraltet es, schlaegt der Test an, nicht erst die
 veroeffentlichte Seite. Es ist Text und kein Archiv, JSON von Pfad zu
 Inhalt: Git speichert davon nur, was sich aendert, und GitHub komprimiert
-es beim Senden. Im Diff zeigt Git es nicht (`.gitattributes`) -- was sich
+es beim Senden. Im Diff zeigt Git es nicht (`.gitattributes`) – was sich
 darin aendert, steht schon im Diff der Quelle.
 
 
@@ -39,21 +39,21 @@ aenderte, und der Test merkt, wenn das Neuschreiben vergessen ging. Das
 Paket hat seine eigene Marke, in der Importtafel der Seite (unten): ein
 geaenderter Kern hat damit eine neue Adresse, und aus dem Zwischenspeicher
 kommt kein alter mehr. Ein schlichter statischer Server ohne Cache-Angabe
-laesst den Browser nach Gefuehl zwischenspeichern -- so kam einmal
+laesst den Browser nach Gefuehl zwischenspeichern – so kam einmal
 `blatt.py` nach einer Aenderung noch alt.
 
 
 ## UND DAS NOTIZBUCH
 
 Die ganze Formelsammlung ([[opencivil.bericht.formelsammlung#laeufe|opencivil.bericht.formelsammlung.laeufe]])
-haengt an keinem Projekt -- rechnen muss man sie trotzdem: zwei Projekte, die
+haengt an keinem Projekt – rechnen muss man sie trotzdem: zwei Projekte, die
 zusammen jeden Nachweis fuehren. Unter Pyodide dauerte das Sekunden. Darum
 rechnet sie die Bruecke und legt sie fertig ab, als Seiten des Notizbuchs: je
-Formel, je Thema, je Modul eine, im Ordner `notizbuch/` -- ohne
+Formel, je Thema, je Modul eine, im Ordner `notizbuch/` – ohne
 anzufassen, was dort von Hand steht ([[opencivil.notizbuch.tresor]]). Dazu das
 Verzeichnis aller Seiten, `web/kern/notizbuch.json`: GitHub Pages zeigt
 keinen Ordnerinhalt, die Oberflaeche erfaehrt nur so, welche Seiten es gibt.
-Die Seiten selbst holt sie ohne Marke und ohne Zwischenspeicher -- eine in
+Die Seiten selbst holt sie ohne Marke und ohne Zwischenspeicher – eine in
 Obsidian geaenderte Notiz steht damit nach dem Hochladen gleich da; eine neue
 erst, wenn die Bruecke sie ins Verzeichnis geschrieben hat.
 
@@ -65,7 +65,7 @@ altes `nachweise.js` zum neuen Kern. Darum schreibt die Bruecke in
 `web/index.html` eine Importtafel (`<script type="importmap">`): je Modul
 unter `web/js/`, fuer das Paket und fuer das Verzeichnis des Notizbuchs
 die Adresse mit Marke, dazu die Stilblaetter mit Marke. Die Module selbst bleiben, wie sie sind
--- `import './dom.js'` fuehrt ueber die Tafel auf `./dom.js?v=Marke`.
+– `import './dom.js'` fuehrt ueber die Tafel auf `./dom.js?v=Marke`.
 So haengt alles an der Seite: wer sie neu laedt, bekommt den Rest im selben
 Stand. Ohne Marke bleiben nur die Fremdbibliotheken unter `web/vendor/`;
 die aendern sich nur, wenn jemand bewusst eine neue Fassung einlegt.
@@ -81,7 +81,7 @@ die Marken in die Seite ([[opencivil.web.bruecke#vorrat|vorrat]]): alles mit Mar
 unter `web/vendor/` dessen Dateien, mit einer Marke ueber den ganzen
 Ordner ([[opencivil.web.bruecke#fremdmarke|fremdmarke]]). Aendert sich etwas, aendert sich `sw.js`,
 und der Browser installiert ihn neu. Ohne diese Liste muesste er raten, was
-die Seite gleich braucht -- und ohne Netz fehlte, was er beim ersten Besuch
+die Seite gleich braucht – und ohne Netz fehlte, was er beim ersten Besuch
 nicht gesehen hat.
 
 
@@ -132,7 +132,7 @@ def marke(pfad: Path) -> str
 ```
 
 Die Versionsmarke einer Datei: die ersten zwoelf Zeichen von SHA-256 ueber
-ihren Inhalt. Windows-Zeilenenden zaehlen nicht -- sonst stimmte das
+ihren Inhalt. Windows-Zeilenenden zaehlen nicht – sonst stimmte das
 Manifest nach einem Auschecken mit CRLF nicht mehr.
 
 ### manifest
@@ -148,7 +148,7 @@ def quellen() -> dict
 ```
 
 Das Paket fuer den Browser: Pfad -> Inhalt, fuer jede Datei von
-[[opencivil.web.bruecke#kerndateien|kerndateien]] und fuer das Manifest -- was der Faden ins
+[[opencivil.web.bruecke#kerndateien|kerndateien]] und fuer das Manifest – was der Faden ins
 Dateisystem von Pyodide legt, so wie es im Repo liegt.
 
 ### mitgelieferte_pakete
@@ -157,7 +157,7 @@ Dateisystem von Pyodide legt, so wie es im Repo liegt.
 def mitgelieferte_pakete() -> Dict[str, str]
 ```
 
-Importname -> Paketname, fuer jedes Fremdpaket, dessen Datei beiliegt --
+Importname -> Paketname, fuer jedes Fremdpaket, dessen Datei beiliegt –
 `dateutil` -> `python-dateutil`. Sortiert, damit das Manifest bei
 gleichem Stand gleich herauskommt.
 
@@ -175,7 +175,7 @@ Pfad -> Marke, in der Reihenfolge von [[opencivil.web.bruecke#kerndateien|kernda
 def stimmt_ueberein() -> bool
 ```
 
-Ob das abgelegte Manifest den vorhandenen Dateien entspricht -- samt Marken.
+Ob das abgelegte Manifest den vorhandenen Dateien entspricht – samt Marken.
 
 ### schreiben
 
@@ -197,7 +197,7 @@ Ob das abgelegte Paket den vorhandenen Dateien entspricht, Zeichen fuer Zeichen.
 def quellen_schreiben(pfad: Path | None=None) -> Path
 ```
 
-Schreibt das Paket -- nach dem Manifest, das darin liegt.
+Schreibt das Paket – nach dem Manifest, das darin liegt.
 
 ### notizbuch_seiten
 
@@ -206,7 +206,7 @@ Schreibt das Paket -- nach dem Manifest, das darin liegt.
 def notizbuch_seiten() -> Tuple[tresor.Seite, ...]
 ```
 
-Was der Code zum Notizbuch beitraegt -- einmal je Lauf gerechnet.
+Was der Code zum Notizbuch beitraegt – einmal je Lauf gerechnet.
 
 ### notizbuch_plan
 
@@ -247,7 +247,7 @@ Ob Seiten und Verzeichnis dem entsprechen, was der Code heute ergibt.
 def stilblaetter() -> List[Path]
 ```
 
-Die Blaetter des Stils in der Reihenfolge ihrer Nummern -- so bindet die
+Die Blaetter des Stils in der Reihenfolge ihrer Nummern – so bindet die
 Seite sie ein, und so gelten sie: bei gleicher Spezifitaet gewinnt die
 Regel im spaeteren Blatt.
 
@@ -275,7 +275,7 @@ Stilblaetter und die Importtafel, jede Adresse mit der Marke ihrer Datei.
 def _adresse(pfad: Path, *, mit_marke: bool=False, von: Path | None=None) -> str
 ```
 
-Die Adresse einer Datei von der Seite aus, auf Wunsch mit ihrer Marke --
+Die Adresse einer Datei von der Seite aus, auf Wunsch mit ihrer Marke –
 oder mit `von` vom Service Worker aus, ohne `./`.
 
 ### versionsmarken_stimmen
@@ -301,12 +301,12 @@ def vorrat() -> dict
 ```
 
 Was der Service Worker in seinen Speicher legt, damit die Seite auch ohne
-Netz startet -- Pfade von der Wurzel aus:
+Netz startet – Pfade von der Wurzel aus:
 
 - `seiten`: [[opencivil.web.bruecke#Konstanten|SEITEN]], die er zuerst aus dem Netz holt;
 - `dateien`: die Stilblaetter und alles ueber die Importtafel, mit Marke;
 - `fremd`: je Ordner unter `web/vendor/` seine Marke und seine
-  Dateien -- ohne die Pakete der Konsole (`.whl`): numpy und pandas
+  Dateien – ohne die Pakete der Konsole (`.whl`): numpy und pandas
   holt er erst, wenn ein Skript sie braucht.
 
 ### fremdmarke
@@ -352,7 +352,7 @@ def _zerlegen(datei: Path, anfang: str, ende: str) -> Tuple[str, str, str]
 ```
 
 Die Datei in drei Stuecke: bis und mit dem Anfangskommentar, die Marken,
-ab dem Endkommentar. Fehlt ein Kommentar, bricht es ab -- still nichts zu
+ab dem Endkommentar. Fehlt ein Kommentar, bricht es ab – still nichts zu
 schreiben hiesse, die alten Marken blieben stehen.
 
 

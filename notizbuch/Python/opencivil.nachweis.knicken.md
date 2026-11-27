@@ -1,5 +1,5 @@
 ---
-erzeugt: 07b9e492be3c
+erzeugt: b5579ae78312
 art: modul
 tags: [modul]
 ---
@@ -10,7 +10,7 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Prueft je Knickfall, ob sich unter der Druckkraft ueberhaupt eine
-Gleichgewichtslage einstellt -- und wenn ja, ob der Querschnitt das dabei
+Gleichgewichtslage einstellt – und wenn ja, ob der Querschnitt das dabei
 entstehende Moment aufnimmt.
 
 
@@ -33,7 +33,7 @@ bis M_ziel sich nicht mehr aendert
 Die Kruemmung haengt am Moment, das Moment an der Ausmitte und die Ausmitte
 wieder an der Kruemmung. Es gibt dafuer keine geschlossene Loesung; gesucht
 wird der Fixpunkt. Laeuft die Folge ein, gibt es eine Gleichgewichtslage.
-Waechst sie, kippt das System -- und zwar nicht wegen einer ueberschrittenen
+Waechst sie, kippt das System – und zwar nicht wegen einer ueberschrittenen
 Spannung, sondern weil es gar kein Gleichgewicht gibt. Genau das ist Knicken.
 
 
@@ -48,14 +48,14 @@ alpha_eff = N_Rd / |N_Ed|
 Gesucht wird `N_Rd` durch Halbieren: zu jeder Probekraft laeuft das
 Verfahren oben, und getragen ist sie, wenn die Folge einlaeuft *und* der
 Querschnitt das dabei entstehende Moment aufnimmt. Die gewollte Ausmitte
-`e_1d` bleibt dabei fest -- sie ist eine Eigenschaft des Systems, nicht der
+`e_1d` bleibt dabei fest – sie ist eine Eigenschaft des Systems, nicht der
 Last; `M_Ed,1` waechst also mit. `e_0d` ist rein geometrisch und aendert
 sich ohnehin nicht.
 
 Ueber `M_Rd` zu vergleichen waere das naechstliegende gewesen und ist
 trotzdem falsch: beim Knicken gibt es Faelle, in denen gar kein Moment mehr
 herauskommt, weil die Folge davonlaeuft. Dann steht da kein Widerstand,
-sondern nichts -- und ein Nachweis ohne Zahl sagt nicht, wie weit er daneben
+sondern nichts – und ein Nachweis ohne Zahl sagt nicht, wie weit er daneben
 liegt. Die Normalkraft dagegen hat immer einen Grenzwert.
 
 
@@ -63,14 +63,14 @@ liegt. Die Normalkraft dagegen hat immer einen Grenzwert.
 
 Womit gerechnet wird, waehlt das Kapitel zweimal ([[opencivil.querschnitt.gesetzwahl#Rechenwahl|Rechenwahl]]):
 
-* **Verformung (e_2d)** -- die Gesetze des Loesers, der zu jedem Moment die
+* **Verformung (e_2d)** – die Gesetze des Loesers, der zu jedem Moment die
   Kruemmung sucht. Immer praezise ohne Vereinfachung, gewaehlt werden
   Kriechzahl und Werte (Vorgabe Bemessungswerte); die Kriechzahl weicht den
   Beton auf, und ein weicher Beton verformt sich mehr. Den Spannungsblock
   gibt es hier nicht mehr ([[opencivil.nachweis.rechenwahl#Konstanten|VERFORMUNGSARTEN]],
   Benutzer, 2026-10-15): mit ihm hat das Moment ueber der Kruemmung flache
   Stuecke, und die Ausmitte ist nahe der Grenzkraft nicht eindeutig.
-* **Widerstand (N_Rd)** -- die Resistenzlinie, die sagt, ob der Querschnitt
+* **Widerstand (N_Rd)** – die Resistenzlinie, die sagt, ob der Querschnitt
   das Moment am verformten System aufnimmt. Vorgabe die
   0.85·x-Vereinfachung mit Bemessungswerten. Waehlt das Kapitel dasselbe wie
   die Tragsicherheit, ist es deren Linie; sonst baut es eine eigene, mit
@@ -86,7 +86,7 @@ Vorgabe des Widerstands.
 ## NUR IN X-RICHTUNG
 
 Ein Knicknachweis braucht eine Knicklaenge, und die gehoert zu einer
-Tragrichtung. Gerechnet wird darum nur mit der Bewehrung in x -- in y waere
+Tragrichtung. Gerechnet wird darum nur mit der Bewehrung in x – in y waere
 die Breite der Platte die Laenge, und die ist keine Stuetze.
 
 
@@ -99,7 +99,7 @@ von der zuletzt gefundenen Ebene aus
 [[opencivil.core.suche#Konstanten|ILLINOIS]]):
 an den Pruefprojekten ein Drittel der Faserdurchlaeufe, dieselben
 Grenzkraefte auf 0.01 kN. Wo ein Gesetz springt, halbiert der Loeser wie
-vorher -- dort ist die Ebene nicht eindeutig; die Verformung rechnet seit
+vorher – dort ist die Ebene nicht eindeutig; die Verformung rechnet seit
 2026-10-15 ohnehin nur noch praezise.
 
 
@@ -115,7 +115,7 @@ kommen.
 
 ## WAS IN DIE MITSCHRIFT GEHOERT
 
-Die Iteration Durchlauf fuer Durchlauf -- sie *ist* hier das Verfahren und
+Die Iteration Durchlauf fuer Durchlauf – sie *ist* hier das Verfahren und
 nicht bloss eine Nullstellensuche, die man auch anders haette machen koennen.
 Dazu die Probe, dass die gefundene Dehnungsebene genau diese Schnittgroessen
 erzeugt, und die Suche nach `N_Rd` als Verfahren beschrieben: von der
@@ -144,7 +144,7 @@ class Knickfall
 Eine zu pruefende Kombination aus Druckkraft und Moment 1. Ordnung.
 
 - `name: str`
-- `N_Ed: Groesse` – Druck negativ -- wie ueberall in diesem Werkzeug.
+- `N_Ed: Groesse` – Druck negativ – wie ueberall in diesem Werkzeug.
 - `M_Ed_1: Groesse`
 - `laenge: Groesse`
 - `knicklaenge: Groesse`
@@ -163,13 +163,13 @@ def kennung(self) -> str
 class Durchlauf
 ```
 
-Ein Schritt der Ausmitten-Iteration -- eine Zeile der Mitschrift.
+Ein Schritt der Ausmitten-Iteration – eine Zeile der Mitschrift.
 
 - `nummer: int`
-- `e_2d_vorher: float` – Ausmitte, mit der dieser Durchlauf begonnen hat -- im ersten null.
+- `e_2d_vorher: float` – Ausmitte, mit der dieser Durchlauf begonnen hat – im ersten null.
 - `M_ziel: float` – Moment am verformten System, aus `e_2d_vorher`.
 - `chi: float` – Kruemmung im Gleichgewicht dazu. `nan`, wenn es keine gibt.
-- `e_2d: float` – Ausmitte, die aus `chi` folgt -- der Start des naechsten Durchlaufs.
+- `e_2d: float` – Ausmitte, die aus `chi` folgt – der Start des naechsten Durchlaufs.
 
 ### Gleichgewicht
 
@@ -198,12 +198,12 @@ Was bei einer Probekraft herauskommt.
 class Knickergebnis(Fallausgang)
 ```
 
-Alle Zwischenwerte eines Knickfalls. Sein Ausgang: \|N_Ed\| gegen N_Rd --
+Alle Zwischenwerte eines Knickfalls. Sein Ausgang: \|N_Ed\| gegen N_Rd –
 ohne Druck gibt es nichts zu begrenzen.
 
 - `fall: Knickfall`
 - `alpha_i: float = 0.0`
-- `d: float = 0.0` – Statische Hoehe der untersten x-Lage, in m -- fuer die Mindestausmitte.
+- `d: float = 0.0` – Statische Hoehe der untersten x-Lage, in m – fuer die Mindestausmitte.
 - `e_0d: float = 0.0`
 - `e_1d: float = 0.0`
 - `e_2d: float = 0.0`
@@ -215,8 +215,8 @@ ohne Druck gibt es nichts zu begrenzen.
 - `stabil: bool = False`
 - `M_Rd: float = 0.0` – Momentenwiderstand bei dieser Normalkraft, in Nm.
 - `N_Rd: float = 0.0` – Groesste Druckkraft mit Gleichgewicht, als Betrag in N.
-- `M_bei_N_Rd: float = 0.0` – Das Moment am verformten System bei `N_Rd`, in Nm. Dort liegt der Stab an seiner Grenze, also ist es zugleich sein Momentenwiderstand bei dieser Normalkraft -- der Punkt sitzt damit auf der Interaktionslinie. Im M-N-Diagramm ist das der Widerstandspunkt des Knicknachweises.
-- `schritte: List[Durchlauf] = field(default_factory=list)` – Die Ausmitten-Iteration bei N_Ed -- Zeile fuer Zeile.
+- `M_bei_N_Rd: float = 0.0` – Das Moment am verformten System bei `N_Rd`, in Nm. Dort liegt der Stab an seiner Grenze, also ist es zugleich sein Momentenwiderstand bei dieser Normalkraft – der Punkt sitzt damit auf der Interaktionslinie. Im M-N-Diagramm ist das der Widerstandspunkt des Knicknachweises.
+- `schritte: List[Durchlauf] = field(default_factory=list)` – Die Ausmitten-Iteration bei N_Ed – Zeile fuer Zeile.
 - `hinweis: str = ''`
 
 ### Knickbefund
@@ -227,11 +227,11 @@ class Knickbefund
 ```
 
 Was der Knicknachweis festhaelt: die Linie seines Widerstands, je Fall
-die Zwischenwerte und den Loeser -- wer nachrechnen will, was bei einer
+die Zwischenwerte und den Loeser – wer nachrechnen will, was bei einer
 anderen Druckkraft herauskaeme, braucht denselben. Steht nach dem Lauf in
 der Loesung, nicht am Nachweis.
 
-- `linie: Widerstandslinie` – Die Linie des Widerstands: die eigene, oder mit derselben Wahl die der Tragsicherheit -- dasselbe Objekt, einmal gerechnet.
+- `linie: Widerstandslinie` – Die Linie des Widerstands: die eigene, oder mit derselben Wahl die der Tragsicherheit – dasselbe Objekt, einmal gerechnet.
 - `loeser: Faserloeser`
 - `ergebnisse: List[Knickergebnis] = field(default_factory=list)`
 
@@ -250,10 +250,10 @@ def schiefstellung(laenge: float) -> float
 class Knickstab
 ```
 
-Was das Verfahren vom Stab wissen muss -- siehe Dateikopf.
+Was das Verfahren vom Stab wissen muss – siehe Dateikopf.
 
 - `loeser: Faserloeser` – Die Ebene zu einer Normalkraft und einem Moment, fuer die Verformung.
-- `moment_bei: Callable[[float, bool], Optional[float]]` – Der Momentenwiderstand bei der Druckkraft `N` (Betrag) -- auf der Seite des positiven Moments oder der anderen. `None`, wo es keinen gibt.
+- `moment_bei: Callable[[float, bool], Optional[float]]` – Der Momentenwiderstand bei der Druckkraft `N` (Betrag) – auf der Seite des positiven Moments oder der anderen. `None`, wo es keinen gibt.
 - `d: float` – Die statische Hoehe in m, fuer die Mindestausmitte.
 
 ### Knickverfahren
@@ -262,7 +262,7 @@ Was das Verfahren vom Stab wissen muss -- siehe Dateikopf.
 class Knickverfahren(Teilnachweis)
 ```
 
-Nachweis am verformten System, je Knickfall -- das Verfahren, ohne zu
+Nachweis am verformten System, je Knickfall – das Verfahren, ohne zu
 sagen, woher der Stab kommt ([[opencivil.nachweis.knicken#Knickstab|Knickstab]]).
 
 Der Nachweis ist erfüllt, wenn die Ausmitten-Iteration einläuft **und**
@@ -302,7 +302,7 @@ Die groesste getragene Druckkraft, durch Halbieren.
 
 Bei `N = 0` traegt der Stab immer: mit der Last verschwindet auch
 das Moment, denn `e_1d` ist fest. Das ist die untere Schranke, die
-das Halbieren braucht -- sie muss nicht gesucht werden.
+das Halbieren braucht – sie muss nicht gesucht werden.
 
 #### Knickverfahren._faelle
 
@@ -310,7 +310,7 @@ das Halbieren braucht -- sie muss nicht gesucht werden.
 def _faelle(self, p: Protokoll, stab: Callable[[Knickfall], Knickstab], *, befund: Optional[Knickbefund]=None) -> Ausfuehrung
 ```
 
-Je Fall der Nachweis am Stab, den `stab` fuer ihn gibt -- samt Herleitung.
+Je Fall der Nachweis am Stab, den `stab` fuer ihn gibt – samt Herleitung.
 
 #### Knickverfahren.urteil_des_teils
 
@@ -324,11 +324,11 @@ def urteil_des_teils(self, fall: Knickfall, erg: Knickergebnis) -> NachweisUrtei
 def _n_ed(self, erg: Knickergebnis) -> Wert
 ```
 
-Die Druckkraft -- die Einwirkung in Tabelle und Herleitung.
+Die Druckkraft – die Einwirkung in Tabelle und Herleitung.
 
 Verglichen werden Normalkraefte: N_Rd ist die groesste Druckkraft, die
 noch eine Gleichgewichtslage hat. Das Moment zweiter Ordnung steht in
-der Herleitung -- in der Tabelle waere es die Groesse, die beim Knicken
+der Herleitung – in der Tabelle waere es die Groesse, die beim Knicken
 gerade verschwindet. Beide als Betrag: ein Widerstand mit umgekehrtem
 Vorzeichen neben seiner Einwirkung liest sich wie ein Fehler.
 
@@ -338,7 +338,7 @@ Vorzeichen neben seiner Einwirkung liest sich wie ein Fehler.
 def _n_rd(self, erg: Knickergebnis) -> Wert
 ```
 
-Die Grenzkraft -- der Widerstand in Tabelle und Herleitung.
+Die Grenzkraft – der Widerstand in Tabelle und Herleitung.
 
 #### Knickverfahren._protokoll_verfahren
 
@@ -359,7 +359,7 @@ Die Ausmitten-Iteration, Durchlauf fuer Durchlauf.
 Anders als bei den Nullstellensuchen im Faserloeser steht sie hier
 vollstaendig da: sie ist nicht ein Weg zum Ergebnis, sondern das
 Verfahren selbst. Dass die Folge einlaeuft, *ist* die Aussage des
-Nachweises -- und das sieht man nur, wenn man die Folge sieht.
+Nachweises – und das sieht man nur, wenn man die Folge sieht.
 
 #### Knickverfahren._protokoll_grenzkraft
 
@@ -367,7 +367,7 @@ Nachweises -- und das sieht man nur, wenn man die Folge sieht.
 def _protokoll_grenzkraft(self, p: Protokoll, erg: Knickergebnis) -> None
 ```
 
-Der Erfuellungsgrad -- und wie N_Rd gefunden wurde.
+Der Erfuellungsgrad – und wie N_Rd gefunden wurde.
 
 Von der Halbierung steht nur das Verfahren da. Jede Probekraft zieht
 eine eigene Ausmitten-Iteration nach sich; die alle abzudrucken hiesse,
@@ -379,7 +379,7 @@ dreissig Tabellen fuer eine einzige Zahl zu zeigen.
 class Knicken(Knickverfahren)
 ```
 
-Nachweis am verformten System, je Knickfall -- an der Platte, nur in
+Nachweis am verformten System, je Knickfall – an der Platte, nur in
 x-Richtung: die Iteration rechnet mit ihrem Loeser, der Widerstand kommt
 aus ihrer Resistenzlinie.
 
@@ -411,16 +411,16 @@ Mit der Linie der Tragsicherheit: was das Knicken waehlt und woher sein Widersta
 
 ## Konstanten
 
-- `REFERENZ = 'SIA 262:2025, 4.3.7'` – Wo der Nachweis am verformten System steht -- fuer ihn als Ganzes und fuer den Erfuellungsgrad jedes Falls.
-- `VERFORMUNG = Rechenwahl(arten=Rechenarten.alle(Rechenart.PARABEL))` – Die Vorgaben der beiden Wahlen -- siehe Dateikopf.
+- `REFERENZ = 'SIA 262:2025, 4.3.7'` – Wo der Nachweis am verformten System steht – fuer ihn als Ganzes und fuer den Erfuellungsgrad jedes Falls.
+- `VERFORMUNG = Rechenwahl(arten=Rechenarten.alle(Rechenart.PARABEL))` – Die Vorgaben der beiden Wahlen – siehe Dateikopf.
 - `WIDERSTAND = Rechenwahl(arten=Rechenarten.alle(Rechenart.BLOCK))`
 - `DURCHLAEUFE = 40` – Groesste Zahl an Durchlaeufen der Ausmitten-Iteration.
-- `SCHRANKE = 0.0001` – Wann die Iteration als eingelaufen gilt -- Aenderung des Moments.
+- `SCHRANKE = 0.0001` – Wann die Iteration als eingelaufen gilt – Aenderung des Moments.
 - `HALBIERUNGEN = 14` – Durchlaeufe der Halbierung, die N_Rd sucht. Das Fenster ist so breit wie die getragene Kraft selbst; 14 Schritte bringen es auf deren Sechzehntausendstel, bei 2000 kN also auf ein Zehntel Kilonewton. Jeder weitere Schritt kostet eine vollstaendige Ausmitten-Iteration und aendert nichts mehr an der Zahl, die in der Tabelle steht.
 - `OBERGRENZE = 64.0` – Wie weit die Suche nach oben gehen darf, als Vielfaches von \|N_Ed\|. Wer einen Stab mit alpha_eff > 64 baut, hat kein Knickproblem.
 - `ALPHA_UNTEN = 1.0 / 300.0` – Riegel der Schiefstellung, SIA 262:2025, 4.1.3.2.3, (17).
 - `ALPHA_OBEN = 1.0 / 200.0`
-- `VERFORMUNG_NACH_WAHL = 'Die Verformung rechnet präzise, mit der Parabel und mit dem Bemessun…` – Warum die Wahl der Verformung zaehlt -- fuer jeden Knicknachweis derselbe Satz.
+- `VERFORMUNG_NACH_WAHL = 'Die Verformung rechnet präzise, mit der Parabel und mit dem Bemessun…` – Warum die Wahl der Verformung zaehlt – fuer jeden Knicknachweis derselbe Satz.
 
 ## Braucht
 

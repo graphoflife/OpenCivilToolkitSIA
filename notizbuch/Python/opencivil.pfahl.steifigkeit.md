@@ -1,5 +1,5 @@
 ---
-erzeugt: d5f82b43bd79
+erzeugt: dff81c23695c
 art: modul
 tags: [modul]
 ---
@@ -14,21 +14,21 @@ Die Prozedur [[opencivil.pfahl.steifigkeit#Pfahlsteifigkeit|Pfahlsteifigkeit]]: 
 
 * die Federn am Kopf mit dem charakteristischen Verformungsmodul E_s,k
   (SIA 267:2013, 5.3.2.8): längs auf Druck k_v und auf Zug k_v,Z, quer bei
-  frei drehbarem Kopf k_h, dazu die Steifigkeitsmatrix des Kopfs -- K_HH,
-  K_HM, K_MM -- für ein Modell des Tragwerks darüber. Sie hängen an keiner
+  frei drehbarem Kopf k_h, dazu die Steifigkeitsmatrix des Kopfs – K_HH,
+  K_HM, K_MM – für ein Modell des Tragwerks darüber. Sie hängen an keiner
   Kombination und stehen als Kennzahlen unter dem Pfahl;
 * je Kombination die Verläufe über die Tiefe, mit E_s,d = E_s,k / γ_E
   (5.3.2.5): Setzung und Normalkraft, Verschiebung, Verdrehung, Moment,
-  Querkraft und Bettungsdruck -- im Befund ([[opencivil.pfahl.steifigkeit#Steifigkeitsbefund|Steifigkeitsbefund]]).
+  Querkraft und Bettungsdruck – im Befund ([[opencivil.pfahl.steifigkeit#Steifigkeitsbefund|Steifigkeitsbefund]]).
 
 
 ## DIE FEDERN DES BODENS
 
 * am Mantel je Meter Pfahl k_l = B · π · D mit B ≈ 0.42 · E_s (Cassan,
-  Kap. 12.8) -- null in einer Schicht, deren Mantelreibung als null
+  Kap. 12.8) – null in einer Schicht, deren Mantelreibung als null
   eingegeben ist: Cassan zählt nur die Schicht, in der der Pfahl trägt;
 * am Fuss K_b = A_b · R / D = π · D · R / 4 mit R ≈ 4.5 · E_s der Schicht am
-  Fuss: Cassan setzt dort σ_F = R · s / D -- nur auf Druck, und nur, wo der
+  Fuss: Cassan setzt dort σ_F = R · s / D – nur auf Druck, und nur, wo der
   Fuss trägt ([[opencivil.pfahl.pfahl#Pfahl.fuss_traegt|fuss_traegt]]);
 * quer k_s = E_s / D (SIA 267:2013, 9.5.4.5, (53)), je Meter Pfahl also
   k_s · D = E_s, vom Terrain bis in die Tiefe t_red von null an linear
@@ -71,11 +71,11 @@ SI-Basis.
 class Baugrund
 ```
 
-Was die Bettung aus den Eingaben braucht, in SI -- z ab Terrain.
+Was die Bettung aus den Eingaben braucht, in SI – z ab Terrain.
 
 - `grenzen: Tuple[Tuple[float, float], ...]`
 - `E_s: Tuple[float, ...]`
-- `mantel: Tuple[bool, ...]` – Je Schicht, ob der Mantel in ihr trägt -- sonst hat er längs keine Feder.
+- `mantel: Tuple[bool, ...]` – Je Schicht, ob der Mantel in ihr trägt – sonst hat er längs keine Feder.
 - `t_K: float`
 - `L: float`
 - `D: float`
@@ -102,7 +102,7 @@ Je Schicht das Stück des Pfahls in ihr: Schicht, Ober- und Unterkante.
 def schicht_am_fuss(self) -> int
 ```
 
-Die Schicht, auf der der Fuss steht -- an einer Grenze die untere.
+Die Schicht, auf der der Fuss steht – an einer Grenze die untere.
 
 #### Baugrund.abminderung
 
@@ -119,7 +119,7 @@ def strecken(self, gamma: float) -> List[Strecke]
 ```
 
 Die Strecken des Pfahls, z ab Kopf, mit E_s / `gamma`: je Schicht
-eine, an t_red geteilt -- darüber wächst die Bettung quer linear.
+eine, an t_red geteilt – darüber wächst die Bettung quer linear.
 
 #### Baugrund.fussfeder
 
@@ -197,7 +197,7 @@ Siehe Dateikopf.
 def kennung(pfahl: Pfahl) -> str
 ```
 
-Unter welcher Kennung die Steifigkeit eines Pfahls rechnet -- und ihr Befund steht.
+Unter welcher Kennung die Steifigkeit eines Pfahls rechnet – und ihr Befund steht.
 
 #### Pfahlsteifigkeit.rechne
 
@@ -240,7 +240,7 @@ Je Kombination die Werte am Kopf und die grössten über die Tiefe.
 
 ## Konstanten
 
-- `GAMMA_E = 1.5` – Der Widerstandsbeiwert des Verformungsmoduls, wo eine zu kleine Steifigkeit zum Versagen führt -- der kleinste, den die Norm zulässt.
+- `GAMMA_E = 1.5` – Der Widerstandsbeiwert des Verformungsmoduls, wo eine zu kleine Steifigkeit zum Versagen führt – der kleinste, den die Norm zulässt.
 - `GAMMA_E_REFERENZ = 'SIA 267:2013, 5.3.2.5'`
 - `PROBE = 1000000.0` – Die Probelast am Kopf, an der die Federn abgelesen werden, in N und Nm.
 - `FEDERN = (('k_v', 'k_v', MN_PRO_M, 0, 'Längsfeder auf Druck', 'N/w am Kopf, mi…` – Die Federn am Kopf, als Kennzahlen: Kurzname, Zeichen, Einheit, Stellen, Beschriftung, Erklärung. Quer zwei Stellen: ein Mikropfahl ist dort rund tausendmal weicher als ein Bohrpfahl, seine Drehfeder etwa 0.15 MNm/rad.

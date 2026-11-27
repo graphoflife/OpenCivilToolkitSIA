@@ -1,5 +1,5 @@
 ---
-erzeugt: 2e8ae11ebc01
+erzeugt: 2fd449b61d40
 art: modul
 tags: [modul]
 ---
@@ -10,7 +10,7 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Ein Lastfall traegt N, M_y und M_z; gesucht ist die Ebene, die alle drei
-haelt -- am Querschnitt mit den Gesetzen einer Rechenwahl, fuer die
+haelt – am Querschnitt mit den Gesetzen einer Rechenwahl, fuer die
 Stahlspannungen und die Zwaengung auf Biegung
 ([[opencivil.nachweis.qa_gebrauch]]).
 
@@ -25,7 +25,7 @@ es stimmt ([[opencivil.nachweis.gebrauchsebene#gebrauchsebene|gebrauchsebene]]):
 die Sekante wegliefe, mit wachsenden Schritten nach beiden Seiten
 eingegrenzt ([[opencivil.nachweis.gebrauchsebene#neigung_suchen|neigung_suchen]]). Bei einem symmetrischen Querschnitt
 trifft schon die Neigung, die zum Moment gehoert. Einachsig bleibt die
-Nulllinie waagrecht, und M_z zaehlt nicht -- wie in der Tragsicherheit.
+Nulllinie waagrecht, und M_z zaehlt nicht – wie in der Tragsicherheit.
 
 Dieselbe Suche dreht die Nulllinie in der Spannung-Dehnung-Analyse des
 gezeichneten Querschnitts ([[opencivil.spannungsanalyse.schnitt#KippendeNulllinie|KippendeNulllinie]]);
@@ -52,18 +52,18 @@ SI-Basis.
 class Gebrauchsebene
 ```
 
-Die Dehnungsebene zu einem Lastfall -- und was sie erzeugt.
+Die Dehnungsebene zu einem Lastfall – und was sie erzeugt.
 
 - `psi: float` – Neigung der Zugrichtung, wie [[opencivil.querschnitt.interaktion#Querschnitt|Querschnitt]] sie nimmt.
 - `eps_m: float` – Dehnung im Schwerpunkt.
 - `chi: float` – Kruemmung in Zugrichtung, 1/m.
 - `N: float`
 - `M_y: float`
-- `M_z: float` – Was die Ebene erzeugt -- die Probe.
+- `M_z: float` – Was die Ebene erzeugt – die Probe.
 - `eps_s: Tuple[float, ...]`
 - `sigma_s: Tuple[float, ...]` – Dehnung und Spannung je Bewehrung des Querschnitts.
 - `konvergiert: bool = True`
-- `verfehlt: bool = False` – Ob die Suche an einem Sprung haengen blieb, statt eine Ebene zu finden -- wie [[opencivil.nachweis.querschnittsloeser#Ebene|verfehlt]].
+- `verfehlt: bool = False` – Ob die Suche an einem Sprung haengen blieb, statt eine Ebene zu finden – wie [[opencivil.nachweis.querschnittsloeser#Ebene|verfehlt]].
 
 ### _loeser
 
@@ -71,7 +71,7 @@ Die Dehnungsebene zu einem Lastfall -- und was sie erzeugt.
 def _loeser(r: Richtung) -> Faserloeser
 ```
 
-Der Loeser in einer Zugrichtung -- mit Illinois, wo kein Gesetz springt.
+Der Loeser in einer Zugrichtung – mit Illinois, wo kein Gesetz springt.
 Die Ebene sucht er, [[opencivil.nachweis.gebrauchsebene#suche_der_ebene|suche_der_ebene]] liest von ihm, wie.
 
 ### _bei_neigung
@@ -81,7 +81,7 @@ def _bei_neigung(q: Querschnitt, psi: float, N: float, M_y: float, M_z: float) -
 ```
 
 Die Ebene bei dieser Neigung, die N und das Moment in Zugrichtung traegt
--- und was ihr am Moment entlang der Nulllinie noch fehlt. Mit
+– und was ihr am Moment entlang der Nulllinie noch fehlt. Mit
 `M = -(n_z·M_y + n_y·M_z)` und `M_quer = -(n_y·M_y - n_z·M_z)`, den
 Umkehrungen von [[opencivil.querschnitt.interaktion#Richtung.momente|momente]].
 Ohne Ebene [[opencivil.nachweis.gebrauchsebene#Konstanten|KEINE]] oder [[opencivil.nachweis.gebrauchsebene#Konstanten|VERFEHLT]], und es fehlt `nan`.
@@ -92,7 +92,7 @@ Ohne Ebene [[opencivil.nachweis.gebrauchsebene#Konstanten|KEINE]] oder [[openciv
 def neigung_suchen(abweichung: Callable[[float], Tuple[float, Optional[E]]], mitte: float, schranke: float, *, geprueft: Callable[[E], E]=lambda e: e) -> Optional[E]
 ```
 
-Die Neigung ψ, bei der `abweichung` null wird -- und was sie dort ergibt.
+Die Neigung ψ, bei der `abweichung` null wird – und was sie dort ergibt.
 
 `abweichung(ψ)` loest die Aufgabe bei dieser Neigung und gibt zurueck,
 was am Moment entlang der Nulllinie noch fehlt, mit der Ebene; ohne Ebene
@@ -104,7 +104,7 @@ eingegrenzt ([[opencivil.nachweis.gebrauchsebene#Konstanten|NEIGUNGSSCHRITTE]]).
 hat oder sich keine Neigung findet.
 
 Hat ein Schritt keine Ebene, liegt zwischen ihm und dem letzten mit Ebene
-der Rand des Gleichgewichts -- und dort kann das Vorzeichen schon
+der Rand des Gleichgewichts – und dort kann das Vorzeichen schon
 gewechselt haben. Darum wird der Rand gesucht ([[opencivil.nachweis.gebrauchsebene#Konstanten|RANDSCHRITTE]]) und
 an ihm gefragt; danach geht es auf dieser Seite nicht weiter. Bis
 2026-10-17 sprang die Suche ueber ihn hinweg: an der kippenden Nulllinie
@@ -119,7 +119,7 @@ def _rand(abweichung: Callable[[float], Tuple[float, Optional[E]]], mit: float, 
 ```
 
 Die letzte Neigung mit Ebene zwischen `mit` (hat eine) und `ohne`
-(hat keine) -- durch Halbieren, mit ihrer Abweichung und Ebene. `None`
+(hat keine) – durch Halbieren, mit ihrer Abweichung und Ebene. `None`
 als Ebene, wo sich ausser `mit` selbst keine findet.
 
 ### gebrauchsebene
@@ -130,15 +130,15 @@ def gebrauchsebene(q: Querschnitt, *, N: float, M_y: float, M_z: float, biegung:
 
 Die Dehnungsebene, die `N`, `M_y` und `M_z` im Gleichgewicht haelt.
 
-Steht die Zugrichtung fest -- einachsig, mit waagrechter Nulllinie
-([[opencivil.querschnitt.biegung#Biegung.neigung|neigung]]) --, auf ihr, und
+Steht die Zugrichtung fest – einachsig, mit waagrechter Nulllinie
+([[opencivil.querschnitt.biegung#Biegung.neigung|neigung]]) –, auf ihr, und
 was nicht zaehlt, ist null. Sonst wird die
 Neigung gesucht, bei der auch das Moment entlang der Nulllinie stimmt
-([[opencivil.nachweis.gebrauchsebene#neigung_suchen|neigung_suchen]]) -- von `start` aus oder von der, die bei
+([[opencivil.nachweis.gebrauchsebene#neigung_suchen|neigung_suchen]]) – von `start` aus oder von der, die bei
 Symmetrie gaelte; bei einem symmetrischen Querschnitt trifft schon sie.
 Eingegrenzt wird wie beim Widerstand in einer Momentenrichtung
 ([[opencivil.querschnitt.interaktion#Querschnitt.in_richtung|in_richtung]]).
-Ohne Ebene [[opencivil.nachweis.gebrauchsebene#Konstanten|KEINE]] -- oder [[opencivil.nachweis.gebrauchsebene#Konstanten|VERFEHLT]], wo die Suche an einem
+Ohne Ebene [[opencivil.nachweis.gebrauchsebene#Konstanten|KEINE]] – oder [[opencivil.nachweis.gebrauchsebene#Konstanten|VERFEHLT]], wo die Suche an einem
 Sprung haengen blieb.
 
 ### suche_der_ebene
@@ -147,7 +147,7 @@ Sprung haengen blieb.
 def suche_der_ebene(q: Querschnitt) -> str
 ```
 
-Wie die Ebene unter Gebrauchslast gefunden wird -- bei schiefer Biegung,
+Wie die Ebene unter Gebrauchslast gefunden wird – bei schiefer Biegung,
 mit der Suche, mit der [[opencivil.nachweis.gebrauchsebene#_bei_neigung|_bei_neigung]] an diesem Querschnitt
 wirklich sucht: der Loeser sagt sie selbst. Bis 2026-10-17 stand hier
 «zwei geschachtelte Halbierungen», auch wo mit Illinois gesucht wurde.
@@ -158,7 +158,7 @@ wirklich sucht: der Loeser sagt sie selbst. Bis 2026-10-17 stand hier
 def verfahren_der_ebene(q: Querschnitt, biegung: Biegung) -> str
 ```
 
-Wie die Ebene unter Gebrauchslast gefunden wird -- einachsig ohne Suche der Zugrichtung.
+Wie die Ebene unter Gebrauchslast gefunden wird – einachsig ohne Suche der Zugrichtung.
 
 ### protokoll_ebene
 
@@ -171,12 +171,12 @@ Die gefundene Ebene und ihre Probe.
 
 ## Konstanten
 
-- `NEIGUNGSSCHRITTE = (2.0, 5.0, 10.0, 20.0, 35.0, 55.0, 75.0, 90.0)` – Wie weit sich die Neigung ψ der Ebene unter Gebrauchslast von der entfernen darf, die bei Symmetrie gaelte -- nach jeder Seite, in Grad. Weiter als 90° laege die Gegenrichtung, und die gehoert zur negativen Kruemmung.
-- `QUER_SCHRANKE = 1e-07` – Wann das Moment entlang der Nulllinie als getroffen gilt, als Teil der groessten Schnittgroesse -- N mit einem Hebel von einem Meter gezaehlt.
-- `E = TypeVar('E')` – Was eine Neigung ergibt -- die Ebene, wie der Fragende sie braucht.
-- `RANDSCHRITTE = 20` – Wie oft zwischen einer Neigung mit Ebene und einer ohne halbiert wird, um den Rand des Gleichgewichts zu finden -- auf ein Millionstel des Schritts.
+- `NEIGUNGSSCHRITTE = (2.0, 5.0, 10.0, 20.0, 35.0, 55.0, 75.0, 90.0)` – Wie weit sich die Neigung ψ der Ebene unter Gebrauchslast von der entfernen darf, die bei Symmetrie gaelte – nach jeder Seite, in Grad. Weiter als 90° laege die Gegenrichtung, und die gehoert zur negativen Kruemmung.
+- `QUER_SCHRANKE = 1e-07` – Wann das Moment entlang der Nulllinie als getroffen gilt, als Teil der groessten Schnittgroesse – N mit einem Hebel von einem Meter gezaehlt.
+- `E = TypeVar('E')` – Was eine Neigung ergibt – die Ebene, wie der Fragende sie braucht.
+- `RANDSCHRITTE = 20` – Wie oft zwischen einer Neigung mit Ebene und einer ohne halbiert wird, um den Rand des Gleichgewichts zu finden – auf ein Millionstel des Schritts.
 - `KEINE = Gebrauchsebene(psi=0.0, eps_m=0.0, chi=0.0, N=0.0, M_y=0.0, M_z=0.0, …` – Wenn sich keine Ebene findet.
-- `VERFEHLT = replace(KEINE, verfehlt=True)` – Wenn die Suche ihre Ebene verfehlt -- mit dem Spannungsblock bei viel Druck und wenig Moment.
+- `VERFEHLT = replace(KEINE, verfehlt=True)` – Wenn die Suche ihre Ebene verfehlt – mit dem Spannungsblock bei viel Druck und wenig Moment.
 
 ## Braucht
 

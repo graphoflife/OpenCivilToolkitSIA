@@ -39,7 +39,7 @@ $$
 
 Liegen Grundbewehrung und Zulage in derselben Lage, wirken sie wie ein
 gemeinsamer Querschnitt: ihre Flächen addieren sich. Wo die Rechnung nur
-eine Lage je Seite kennt -- in der Handrechnung --, steht die Summe in ihrem
+eine Lage je Seite kennt – in der Handrechnung –, steht die Summe in ihrem
 [[Schwerpunkt der zusammengefassten Lage|Schwerpunkt]]. Dieselbe Summe
 schreiben die Nachweise der Lagen und der
 [[Vergrösserungsfaktor der Durchbiegung]] als [[Bewehrung der Lage]].

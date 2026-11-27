@@ -50,7 +50,7 @@ sie verweist auf SN EN 1993-1-1, die hier nicht vorliegt.
 Ein dünner Ring, in dem der Schub überall gleich stark längs der Wand
 fliesst: auf jeder Hälfte summiert sich dieser Fluss zu einer Kraft in
 Richtung der Querkraft, 2·r·t·τ. Beide Hälften tragen 4·r·t·τ, bei einer
-Fläche von 2·π·r·t -- also A_v = 2·A/π. Ein Vollstab ist ein Bündel solcher
+Fläche von 2·π·r·t – also A_v = 2·A/π. Ein Vollstab ist ein Bündel solcher
 Ringe; jeder trägt seine 2/π, zusammen wieder 2·A/π, für den Stab eher
 wenig.
 

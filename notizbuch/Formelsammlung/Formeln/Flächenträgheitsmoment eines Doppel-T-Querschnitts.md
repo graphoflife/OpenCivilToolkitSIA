@@ -46,6 +46,6 @@ $$
 ## Theorie
 
 Das volle Rechteck $b \times h$ minus die beiden Aussparungen neben dem Steg,
-die zusammen ein Rechteck $(b - t_w) \times (h - 2 t_f)$ bilden -- beide
+die zusammen ein Rechteck $(b - t_w) \times (h - 2 t_f)$ bilden – beide
 symmetrisch zur selben Achse. Fast alles kommt von den Flanschen, weit weg
 von der Achse: darum ist das Doppel-T das Profil für Biegung.

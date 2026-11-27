@@ -53,4 +53,4 @@ $$
 Der Steg über die ganze Höhe, $h \times t_w$, daneben zwei Flansche
 $(b - t_w) \times t_f$ und in den beiden inneren Ecken je eine Ausrundung
 mit Radius $r$, ein Zwickel mit $0.2146\,r^2$. Die Formel des UPE aus der
-Tabelle des Benutzers -- nach Vorgabe, nicht nachgeschlagen.
+Tabelle des Benutzers – nach Vorgabe, nicht nachgeschlagen.

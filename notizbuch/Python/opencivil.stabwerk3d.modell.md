@@ -1,5 +1,5 @@
 ---
-erzeugt: 5801bc3c1261
+erzeugt: cc3313d1c518
 art: modul
 tags: [modul]
 ---
@@ -22,7 +22,7 @@ Kombination.
 `x` und `y` waagrecht, `z` nach oben, ein Rechtssystem; Drehungen im
 Rechtssinn um ihre Achse. Verschiebungen und Lagerkraefte sind positiv
 entlang dieser Achsen. Liegt ein Rahmen in der x-z-Ebene, sieht man ihn wie
-im 2D-Balkensystem: x nach rechts, z nach oben -- `y` zeigt dann vom
+im 2D-Balkensystem: x nach rechts, z nach oben – `y` zeigt dann vom
 Betrachter weg, und eine Drehung im Gegenuhrzeigersinn ist eine um `-y`.
 
 
@@ -32,8 +32,8 @@ Eine Kraftlast ist positiv in ihrer Richtung ([[opencivil.stabwerk3d.modell#Rich
 «senkrecht» nach unten, wie die Schwerkraft, in x, y oder z des Systems,
 oder laengs, quer y oder quer z in den Achsen des Stabs
 ([[opencivil.stabwerk3d.stab|stab]]). Eine Momentlast dreht im Rechtssinn um
-ihre Richtung -- laengs ist sie ein Torsionsmoment. Lasten in Richtungen des
-Systems gelten je Meter Stab -- oder, mit `projiziert`, je Meter seiner
+ihre Richtung – laengs ist sie ein Torsionsmoment. Lasten in Richtungen des
+Systems gelten je Meter Stab – oder, mit `projiziert`, je Meter seiner
 Projektion auf die Ebene senkrecht zur Richtung, wie Schnee auf einem
 geneigten Dach.
 
@@ -45,7 +45,7 @@ geneigten Dach.
 class Richtung(Wahl)
 ```
 
-Wohin eine Kraftlast zeigt -- oder um welche Achse eine Momentlast dreht --, wenn ihr Wert positiv ist.
+Wohin eine Kraftlast zeigt – oder um welche Achse eine Momentlast dreht –, wenn ihr Wert positiv ist.
 
 - `SENKRECHT = 'senkrecht'`
 - `X = 'x'`
@@ -69,7 +69,7 @@ def beschriftung(self) -> str
 def stabachse(self) -> Optional[str]
 ```
 
-In welcher Achse des Stabs sie liegt -- keine, wenn sie im System liegt.
+In welcher Achse des Stabs sie liegt – keine, wenn sie im System liegt.
 
 #### Richtung.im_system
 
@@ -78,7 +78,7 @@ In welcher Achse des Stabs sie liegt -- keine, wenn sie im System liegt.
 def im_system(self) -> bool
 ```
 
-Ob sie in den Achsen des Systems liegt -- und nicht in denen des Stabs.
+Ob sie in den Achsen des Systems liegt – und nicht in denen des Stabs.
 
 #### Richtung.systemvektor
 
@@ -104,7 +104,7 @@ def projektion(self, achsen: Sequence[Vektor]) -> float
 ```
 
 Laenge der Projektion je Meter Stab, auf die Ebene senkrecht zu dieser
-Richtung -- in der Ebene `|cos α|` fuer senkrecht, `|sin α|` fuer
+Richtung – in der Ebene `|cos α|` fuer senkrecht, `|sin α|` fuer
 waagrecht.
 
 ### Knoten
@@ -126,7 +126,7 @@ class Knoten
 class Lager
 ```
 
-Ein Lager an einem Knoten -- je Richtung des Systems frei, fest oder Feder.
+Ein Lager an einem Knoten – je Richtung des Systems frei, fest oder Feder.
 
 - `name: str`
 - `knoten: str`
@@ -158,7 +158,7 @@ def drehungen(self) -> Tuple[Halt, Halt, Halt]
 class Stab
 ```
 
-Eine Linie des Systems -- ein Stab, der traegt, oder nur ein Linienlager.
+Eine Linie des Systems – ein Stab, der traegt, oder nur ein Linienlager.
 
 `drehung` ist der Drehwinkel β seiner Achsen um x, in rad. Die
 Linienlager halten laengs und quer in y und z des Stabs: frei, fest oder
@@ -170,9 +170,9 @@ Torsion ([[opencivil.stabwerk.system|system]]).
 - `a: str`
 - `b: str`
 - `EA: float = 0.0` – N.
-- `EI_y: float = 0.0` – Nm² -- Biegung um y, in der x-z-Ebene des Stabs.
-- `EI_z: float = 0.0` – Nm² -- Biegung um z, in der x-y-Ebene des Stabs.
-- `GI_T: float = 0.0` – Nm² -- Torsion.
+- `EI_y: float = 0.0` – Nm² – Biegung um y, in der x-z-Ebene des Stabs.
+- `EI_z: float = 0.0` – Nm² – Biegung um z, in der x-y-Ebene des Stabs.
+- `GI_T: float = 0.0` – Nm² – Torsion.
 - `drehung: float = 0.0`
 - `traegt: bool = True`
 - `gelenk_a: bool = False`
@@ -195,7 +195,7 @@ Werte in N/m, N, Nm oder Nm/m, positiv in ihrer Richtung.
 - `stab: str`
 - `art: Lastart`
 - `wert_a: float`
-- `wert_b: Optional[float] = None` – Am Ende des belasteten Bereichs -- `None`: wie am Anfang.
+- `wert_b: Optional[float] = None` – Am Ende des belasteten Bereichs – `None`: wie am Anfang.
 - `richtung: Richtung = Richtung.SENKRECHT`
 - `von: float = 0.0`
 - `bis: Optional[float] = None`

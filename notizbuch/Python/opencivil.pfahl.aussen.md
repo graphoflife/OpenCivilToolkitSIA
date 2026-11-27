@@ -1,5 +1,5 @@
 ---
-erzeugt: 34e416bb71cf
+erzeugt: ad674cc1048d
 art: modul
 tags: [modul]
 ---
@@ -25,8 +25,8 @@ R_a,k kommt aus einem Versuch oder aus den Schichten ([[opencivil.pfahl.pfahl#Gr
 ## DER MANTEL (Kap. 12.5)
 
 Je Stück des Mantels ([[opencivil.pfahl.boden#Profil.stuecke|stuecke]]) die Mantelreibung
-q_s,k -- drainiert K · σ'_v · tan δ mit δ = k_δ · φ'_k, undrainiert
-α · s_u,k, oder eingegeben -- und R_s,k = U · Σ h · q_s,k.
+q_s,k – drainiert K · σ'_v · tan δ mit δ = k_δ · φ'_k, undrainiert
+α · s_u,k, oder eingegeben – und R_s,k = U · Σ h · q_s,k.
 
 
 ## DER FUSS (Kap. 12.5)
@@ -62,11 +62,11 @@ SI-Basis.
 class Mantelstueck
 ```
 
-Was ein Stück des Mantels trägt -- Spannungen in Pa.
+Was ein Stück des Mantels trägt – Spannungen in Pa.
 
 - `stueck: Stueck`
 - `q_s: float`
-- `sigma: Optional[float] = None` – σ'_v in seiner Mitte -- nur, wo die Mantelreibung daraus gerechnet ist.
+- `sigma: Optional[float] = None` – σ'_v in seiner Mitte – nur, wo die Mantelreibung daraus gerechnet ist.
 
 ### Aussenbefund
 
@@ -75,12 +75,12 @@ Was ein Stück des Mantels trägt -- Spannungen in Pa.
 class Aussenbefund
 ```
 
-Was ausser den Erfüllungsgraden bleibt -- für Zusammenfassung und Bild, in SI.
+Was ausser den Erfüllungsgraden bleibt – für Zusammenfassung und Bild, in SI.
 
 - `aus_versuch: bool`
 - `stuecke: List[Mantelstueck] = field(default_factory=list)`
 - `R_s: float = 0.0`
-- `q_b: Optional[float] = None` – Der Spitzendruck -- `None`, wo der Fuss nicht trägt.
+- `q_b: Optional[float] = None` – Der Spitzendruck – `None`, wo der Fuss nicht trägt.
 - `R_b: float = 0.0`
 - `R_ak: float = 0.0`
 - `R_ak_zug: float = 0.0`
@@ -113,7 +113,7 @@ def pruefe(self, e: Eingaben, p: Protokoll) -> Ausfuehrung
 def _mantel(self, e: Eingaben, p: Protokoll, werte: Zwischenwerte, profil: Profil, befund: Aussenbefund) -> Wert
 ```
 
-Je Stück die Mantelreibung, als Tabelle -- und daraus R_s,k.
+Je Stück die Mantelreibung, als Tabelle – und daraus R_s,k.
 
 #### AeussererWiderstand._erddruck_pruefen
 
@@ -129,13 +129,13 @@ K über K_0: das Buch sieht für Bohrpfähle höchstens etwa K_0 (Kap. 12.5).
 def _bemessung(self, e: Eingaben, p: Protokoll, werte: Zwischenwerte, R_ak: Wert, *, druck: bool) -> Wert
 ```
 
-R_a,d = η_a · R_a,k / γ_M,a (42) -- auf Druck oder auf Zug.
+R_a,d = η_a · R_a,k / γ_M,a (42) – auf Druck oder auf Zug.
 
 
 ## Konstanten
 
 - `GAMMA_M = {True: (1.3, 'SIA 267:2013, 9.5.2.2.4, (43)'), False: (1.6, 'SIA 267:…` – Die Widerstandsbeiwerte des äusseren axialen Widerstands, auf Druck und auf Zug, mit ihrer Stelle (SIA 267:2013, 9.5.2.2.4).
-- `ZUG_WIE_DRUCK = 'Auf Zug trägt nur der Mantel, mit derselben Mantelreibung wie auf Dr…` – Was beide Richtungen annehmen -- siehe Dateikopf.
+- `ZUG_WIE_DRUCK = 'Auf Zug trägt nur der Mantel, mit derselben Mantelreibung wie auf Dr…` – Was beide Richtungen annehmen – siehe Dateikopf.
 
 ## Braucht
 

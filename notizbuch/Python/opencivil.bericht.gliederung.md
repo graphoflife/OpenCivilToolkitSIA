@@ -1,5 +1,5 @@
 ---
-erzeugt: 980dac40f1b9
+erzeugt: 683d8d100cba
 art: modul
 tags: [modul]
 ---
@@ -46,7 +46,7 @@ def bericht(loesung: Loesung, *, titel: str='Berechnung', aufbau: Optional['Aufb
 Der vollstaendige Bericht einer Loesung; `titel` wird sein Kopftitel.
 
 Mit `aufbau` stehen die Nachweise je Platte da, samt Angaben und
-Bewehrung -- wie auf dem Bildschirm. Ohne (ein Rechenwerk, das keine
+Bewehrung – wie auf dem Bildschirm. Ohne (ein Rechenwerk, das keine
 Platten kennt) in einer Tabelle ohne Plattenueberschrift.
 
 ### _abschnitt
@@ -59,7 +59,7 @@ Ein Abschnitt des Berichts, als oberste Ueberschrift.
 
 Mit eigenem Namensraum: jede Darstellung ordnet die Bloecke nach
 Abschnitten ([[opencivil.core.protokoll#Protokoll.nach_abschnitten|Protokoll.nach_abschnitten]]), und ein Titel ohne
-Namensraum gehoerte zum letzten Bauteil der Herleitung -- die Werte
+Namensraum gehoerte zum letzten Bauteil der Herleitung – die Werte
 stuenden dann mitten in dessen Abschnitt, sobald es darin zweimal
 vorkommt.
 
@@ -71,10 +71,10 @@ def _nachweise(p: Protokoll, zusammenfassung: Zusammenfassung, aufbau: Optional[
 
 Je Platte dasselbe wie auf dem Bildschirm: Angaben, Bewehrung,
 Nachweistabelle, darunter Hinweise und stille Maengel, zuletzt die
-Kennzahlen -- die auch ohne Lastfall.
+Kennzahlen – die auch ohne Lastfall.
 
 Eines kommt dazu. Auf dem Bildschirm ist ein nicht erfuellter Nachweis
-rot hinterlegt und traegt seine Begruendung im Tooltip -- auf Papier
+rot hinterlegt und traegt seine Begruendung im Tooltip – auf Papier
 gibt es beides nicht. Darum steht jeder unter der Tabelle mit seiner
 Begruendung, sofern ihn nicht schon ein gebuendelter Hinweis erklaert.
 
@@ -85,11 +85,11 @@ def _ohne_aussage(wert: Wert) -> bool
 ```
 
 Ein unbeschraenkter Erfuellungsgrad: nichts wirkt ein, oder sein Fall kam
-in dieser Rechnung nicht vor -- eine Seite ohne Bewehrung, die
+in dieser Rechnung nicht vor – eine Seite ohne Bewehrung, die
 Regelmaessigkeit eines regelmaessigen Gebaeudes. Was er sagt, steht bei
 den Nachweisen in Worten («Keine Einwirkung → kein Nachweis.»), oder er
 traegt gar kein Urteil ([[opencivil.core.nachweis#Nachweis.rechne|rechne]]).
-In der Werteliste stuende nur «∞» -- bis 2026-11-21 etwa «Erfuellungsgrad
+In der Werteliste stuende nur «∞» – bis 2026-11-21 etwa «Erfuellungsgrad
 Regelmaessigkeit ∞» beim regelmaessigen Gebaeude.
 
 

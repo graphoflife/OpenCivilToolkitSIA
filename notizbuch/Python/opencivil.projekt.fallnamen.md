@@ -1,13 +1,13 @@
 ---
-erzeugt: 2a5fc787d514
+erzeugt: f6c9fcb64139
 art: modul
 tags: [modul]
 ---
 > [!abstract] opencivil/projekt/fallnamen.py
-> Die Namen der Faelle eines Bauteils -- je Liste verschieden, auch als Kennung.
+> Die Namen der Faelle eines Bauteils – je Liste verschieden, auch als Kennung.
 > Paket [[opencivil.projekt]] · [Quelltext](../../opencivil/projekt/fallnamen.py)
 
-Die Nachweise legen ihre Ergebniswerte unter dem Fallnamen ab -- M-N,
+Die Nachweise legen ihre Ergebniswerte unter dem Fallnamen ab – M-N,
 Querkraft und Stahlspannung alle drei. Zwei Kombinationen gleichen Namens
 fielen darum auf einen Eintrag zusammen: der zweite ueberschrieb den ersten,
 und in der Tabelle fehlte eine Zeile. Kein Fehler, keine Warnung, eine Zahl
@@ -25,7 +25,7 @@ Bericht. Eine Regel, an zwei Orten gefragt:
 
 * am Namensfeld, bevor es einen Namen uebernimmt ([[opencivil.projekt.fallnamen#Fallnamen.grund|Fallnamen.grund]],
   `fallname` im Dienst). Bis 2026-11-19 nahm das Feld jeden Namen, und erst
-  das Bauteil sagte oben im Fenster, dass er doppelt ist -- die sechs Fenster
+  das Bauteil sagte oben im Fenster, dass er doppelt ist – die sechs Fenster
   der Spannung-Dehnung-Analysen teilen sich aber eine Liste, und der
   Doppelgaenger stand oft in einem, das nicht offen war. Darum sagt die
   Meldung, wo der andere steht (Benutzer, 2026-11-19);
@@ -50,7 +50,7 @@ Eine Liste von Faellen eines Bauteils, deren Namen sich unterscheiden muessen.
 - `pfad: str` – Wo die Liste im Bauteil steht, mit Punkten: `knickfaelle`, `verformung.faelle`.
 - `was: str` – Wie ein Fall der Liste in der Meldung heisst: «Knicknachweis».
 - `namen: Tuple[Benannt, ...]` – Je Fall der Liste Name und Ort, in ihrer Reihenfolge.
-- `vergeben: Tuple[Benannt, ...] = ()` – Namen, die in der Liste schon gelten, ohne dass ein Fall darin sie traegt -- die aus der Tragsicherheit abgeleiteten Lastfaelle.
+- `vergeben: Tuple[Benannt, ...] = ()` – Namen, die in der Liste schon gelten, ohne dass ein Fall darin sie traegt – die aus der Tragsicherheit abgeleiteten Lastfaelle.
 
 #### Fallnamen.aus
 
@@ -67,7 +67,7 @@ Aus den Faellen selbst; `ort` sagt je Fall, wo er steht.
 def grund(self, index: int, name: str) -> str
 ```
 
-Warum der Fall an `index` nicht `name` heissen darf -- leer, wenn
+Warum der Fall an `index` nicht `name` heissen darf – leer, wenn
 er darf. Fuer das Namensfeld: der Name gegen jeden anderen der Liste.
 
 #### Fallnamen.pruefen
@@ -84,12 +84,12 @@ Vor dem Rechnen: jeder Name gegen die vor ihm. `wo` nennt das Bauteil.
 def _grund(self, name: str, andere: Iterable[Benannt]) -> str
 ```
 
-«Feld» ist als Verformungsfall schon vergeben -- oder leer.
+«Feld» ist als Verformungsfall schon vergeben – oder leer.
 
 
 ## Konstanten
 
-- `Benannt = Tuple[str, str]` – Ein Name und was die Meldung ueber seinen Ort sagt -- leer, wo alle Faelle der Liste in einem Fenster stehen: «, im Fenster «Momenten-Krümmungs-Linie»».
+- `Benannt = Tuple[str, str]` – Ein Name und was die Meldung ueber seinen Ort sagt – leer, wo alle Faelle der Liste in einem Fenster stehen: «, im Fenster «Momenten-Krümmungs-Linie»».
 
 ## Braucht
 

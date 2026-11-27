@@ -1,5 +1,5 @@
 ---
-erzeugt: 0852ec159c81
+erzeugt: dc9dff11b6ab
 art: modul
 tags: [modul]
 ---
@@ -11,10 +11,10 @@ tags: [modul]
 
 Der [[opencivil.projekt.blechdecken#BlechdeckeEintrag|BlechdeckeEintrag]] einer Querschnittsanalyse
 ([[opencivil.projekt.querschnittsanalyse#QuerschnittsanalyseEintrag|QuerschnittsanalyseEintrag]]):
-ein Streifen Blechverbunddecke an einem Knoten -- ihr Beton und ihr
+ein Streifen Blechverbunddecke an einem Knoten – ihr Beton und ihr
 Profilblech aus Materialien des Projekts, dazu die Masse des Blechs aus
 seinem Datenblatt (Plan vom 2026-11-25: einen Katalog der Bleche gibt es
-nicht). Was daraus folgt -- die Linie des Blechs, seine Dicke, `d_p` --,
+nicht). Was daraus folgt – die Linie des Blechs, seine Dicke, `d_p` –,
 rechnet [[opencivil.querschnitt.profilblech]].
 
 
@@ -29,7 +29,7 @@ wie in jedes Polygon aus Beton.
 ## DIE GRENZEN
 
 Die Rippe ist niedriger als die Decke (`h_p < h`), oben nicht breiter als
-ihr Abstand und unten schmaler -- sonst stiessen die Rippen unten
+ihr Abstand und unten schmaler – sonst stiessen die Rippen unten
 aneinander, und der Beton beruehrte sich selbst. Das weisen schon die
 Felder ab. Ob die Rippe oben oder unten breiter ist, ist frei: unten
 breiter ist das Blech hinterschnitten.
@@ -50,7 +50,7 @@ unter einer Decke von 140 mm.
 class BlechdeckeEintrag(Beschreibung)
 ```
 
-Eine Blechverbunddecke an einem Knoten -- siehe Dateikopf.
+Eine Blechverbunddecke an einem Knoten – siehe Dateikopf.
 
 - `IM_ORT = 'Blechverbunddecke'`
 - `kennung: str = ''`
@@ -76,7 +76,7 @@ Die Form des Blechs mit der Ecke links unten bei `ursprung`, in mm.
 
 ## Konstanten
 
-- `RIPPEN_BIS = 100` – Wie viele Rippen eine Decke hoechstens hat -- 20 m bei 200 mm Abstand; so zeichnet ein Tippfehler keine tausend (nach Vorgabe, nicht nachgeschlagen).
+- `RIPPEN_BIS = 100` – Wie viele Rippen eine Decke hoechstens hat – 20 m bei 200 mm Abstand; so zeichnet ein Tippfehler keine tausend (nach Vorgabe, nicht nachgeschlagen).
 
 ## Braucht
 

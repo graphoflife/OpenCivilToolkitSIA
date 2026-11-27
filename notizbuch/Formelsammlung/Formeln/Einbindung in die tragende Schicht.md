@@ -46,6 +46,6 @@ $$
 
 Wie tief der Fuss in die Schicht reicht, in der er steht: von ihrer Oberkante
 bis zum Fuss. Zusammen mit dem Durchmesser bestimmt sie den Form- und
-Tiefenfaktor X -- je tiefer im Verhältnis zum Durchmesser, desto mehr hilft
+Tiefenfaktor X – je tiefer im Verhältnis zum Durchmesser, desto mehr hilft
 der Boden darüber mit (Kap. 12.4, Bild 12.3; Kap. 12.5, Bild 12.4). Ein
 Pfahl ⌀ 800, der 4 m in den Silt reicht, hat h/D = 5.

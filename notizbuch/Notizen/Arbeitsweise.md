@@ -70,7 +70,7 @@ Kopie der Datei mit der Endung `.mjs`.
 
 ## Grundsätze der Oberfläche
 
-- Keine Auswahllisten (Dropdowns) -- ausser für die Wahl eines Materials
+- Keine Auswahllisten (Dropdowns) – ausser für die Wahl eines Materials
   und eines Eintrags aus dem Projekt, etwa eines Lastfalls oder
   Querschnitts: deren Zahl wächst mit dem Projekt (Benutzer, 2026-10-23).
   Ausdrücklich gewünscht auch für die Vorlage eines Stabquerschnitts im
@@ -82,7 +82,7 @@ Kopie der Datei mit der Endung `.mjs`.
 - **Die Bedienung erklärt sich selbst** (Benutzer, 2026-11-19). Wer ein
   Fenster öffnet, soll ohne Hilfe sehen, was eine Wahl bewirkt und was noch
   fehlt:
-  - eine Wahl mit Bild, wo Wörter nicht reichen -- etwa die Rechenart als
+  - eine Wahl mit Bild, wo Wörter nicht reichen – etwa die Rechenart als
     Spannung über Dehnung;
   - ein unfertiger Zustand ist kein Fehler des Projekts: er sagt am Ort,
     was fehlt («noch keine Querschnittsanalyse gewählt»), und der Rest
@@ -151,7 +151,7 @@ Kopie der Datei mit der Endung `.mjs`.
   Feldern im Zeichenfenster steht «m», im Querschnitt «mm».
 - **Steifigkeit im Raum** (Benutzer, 2026-11-19): ein E_eq gilt für EA,
   EI_y und EI_z, GI_T behält G_cm; I_T gilt ungerissen. y und z gelten als
-  Hauptachsen -- ist |I_yz| grösser als 5 % von min(I_y; I_z), sagt es ein
+  Hauptachsen – ist |I_yz| grösser als 5 % von min(I_y; I_z), sagt es ein
   Hinweis; der Querschnitt wird nicht von selbst auf seine Hauptachsen
   gedreht. Die 5 % bleiben.
 

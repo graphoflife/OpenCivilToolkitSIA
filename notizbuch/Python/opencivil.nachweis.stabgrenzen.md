@@ -1,5 +1,5 @@
 ---
-erzeugt: b6636dafc11b
+erzeugt: 149d49bc2a01
 art: modul
 tags: [modul]
 ---
@@ -21,7 +21,7 @@ gleich ([[opencivil.nachweis.spannungsgrenzen#gegen_fliessen|gegen_fliessen]]).
 ## JE STAB
 
 Die Platte haelt je Lage den dicksten Stab gegen die Rissbreite. Hier hat
-jeder Stab seine Grenze -- mit seinem Durchmesser und dem `f_ctm` des
+jeder Stab seine Grenze – mit seinem Durchmesser und dem `f_ctm` des
 Betons, in dem er liegt (Benutzer, 2026-10-15). Staebe mit derselben Grenze
 bilden eine Gruppe, die einmal hergeleitet wird
 ([[opencivil.nachweis.spannungsgrenzen#Grenzgruppe|Grenzgruppe]]).
@@ -32,7 +32,7 @@ bilden eine Gruppe, die einmal hergeleitet wird
 Eine verschmierte Linie mit der Flaeche von Hand hat keinen Durchmesser:
 sie bekommt einen fiktiven, als laegen ihre Staebe 150 mm auseinander
 (Annahme des Benutzers, 2026-10-15). Die Regel steht in
-[[opencivil.querschnitt.geometrie#aequivalenter_durchmesser|aequivalenter_durchmesser]] -- die
+[[opencivil.querschnitt.geometrie#aequivalenter_durchmesser|aequivalenter_durchmesser]] – die
 Ueberdeckung braucht dieselbe:
 
 ```
@@ -42,7 +42,7 @@ Ueberdeckung braucht dieselbe:
 Kommt ihre Flaeche aus ⌀ und Teilung, gilt dieser ⌀ (Benutzer, 2026-10-24).
 
 Nach Vorgabe, in SIA 262:2025 nicht gefunden: die Grenze je Stab und der
-fiktive Durchmesser -- Gl. (102) kennt nur den Durchmesser eines Stabs.
+fiktive Durchmesser – Gl. (102) kennt nur den Durchmesser eines Stabs.
 Siehe `notizbuch/Notizen/TODO.md`.
 
 
@@ -59,13 +59,13 @@ SI-Basis; die Zeichnung in mm.
 class Stabangabe
 ```
 
-Ein Stab -- oder ein Stueck einer verschmierten Linie --, wie die Nachweise ihn sehen.
+Ein Stab – oder ein Stueck einer verschmierten Linie –, wie die Nachweise ihn sehen.
 
 - `element: Bewehrungselement` – Das Element der Zeichnung, aus dem er stammt.
 - `lage: Punkt` – in m.
 - `flaeche: float` – in m².
 - `beton: Baustoff` – Der Beton, in dem er liegt: er gibt `f_ctm` fuer die Rissbreite.
-- `durchmesser: float` – in m -- der seines Elements ([[opencivil.querschnitt.bewehrungselemente#Bewehrungselement.rissdurchmesser|rissdurchmesser]]), bei einer verschmierten Linie mit Flaeche von Hand der fiktive.
+- `durchmesser: float` – in m – der seines Elements ([[opencivil.querschnitt.bewehrungselemente#Bewehrungselement.rissdurchmesser|rissdurchmesser]]), bei einer verschmierten Linie mit Flaeche von Hand der fiktive.
 
 #### Stabangabe.stahl
 
@@ -81,7 +81,7 @@ def stahl(self) -> Baustoff
 def fiktiv(self) -> bool
 ```
 
-Ob sein Durchmesser fiktiv ist: verschmiert, die Flaeche von Hand -- nicht aus ⌀ und s.
+Ob sein Durchmesser fiktiv ist: verschmiert, die Flaeche von Hand – nicht aus ⌀ und s.
 
 #### Stabangabe.ort
 
@@ -98,7 +98,7 @@ Wie er in einem Satz heisst: Element und Lage, in mm.
 def stabangaben(analyse: Querschnittsanalyse, q: Querschnitt, herkunft: Sequence[Bewehrungselement]) -> List[Stabangabe]
 ```
 
-Je Bewehrung aus Betonstahl ihre Angaben -- in derselben Reihenfolge wie
+Je Bewehrung aus Betonstahl ihre Angaben – in derselben Reihenfolge wie
 im Querschnitt. Die Spannglieder fehlen: ihnen gelten diese Grenzen
 nicht. Sie stehen dort zuletzt
 ([[opencivil.querschnitt.analyse#Querschnittsanalyse.geometrie|geometrie]]),
@@ -110,7 +110,7 @@ so bleibt jede Stelle die ihres Stabs.
 def _gruppieren(staebe: Sequence[Stabangabe], schluessel: Callable[[Stabangabe], tuple], bilden: Callable[[Stabangabe], Grenzgruppe]) -> Grenzen
 ```
 
-Je Schluessel eine Gruppe, in der Reihenfolge ihres ersten Stabs -- jeder Stab eine Stelle.
+Je Schluessel eine Gruppe, in der Reihenfolge ihres ersten Stabs – jeder Stab eine Stelle.
 
 ### grenzen_aus_rissbreite
 
@@ -129,7 +129,7 @@ def protokoll_rissbreitengrenzen(p: Protokoll, e: Eingaben, analyse: Querschnitt
 ```
 
 `sigma_s,adm` aus der Rissbreite, je Gruppe gleicher Staebe einmal
-hergeleitet -- vorher der fiktive Durchmesser jeder verschmierten Linie,
+hergeleitet – vorher der fiktive Durchmesser jeder verschmierten Linie,
 die ihn braucht. Bei mehreren Gruppen danach eine Tabelle, welche Elemente
 zu welcher gehoeren. Setzt [[opencivil.nachweis.spannungsgrenzen#Grenzgruppe|Grenzgruppe.wert]].
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: 0d6171762c41
+erzeugt: c374da43aeda
 art: modul
 tags: [modul]
 ---
@@ -10,7 +10,7 @@ tags: [modul]
 Jedes Werkzeug ist eine Funktion mit Titel, Beschreibung und Eingaben
 ([[opencivil.mcp.werkzeuge#werkzeug|werkzeug]]). Was es annimmt, sagt seine Unterschrift: ein Argument
 ohne Vorgabe ist Pflicht, und die Eingaben muessen in Namen und Folge zu ihr
-passen -- so laufen Beschreibung und Funktion nicht auseinander. Jedes gibt
+passen – so laufen Beschreibung und Funktion nicht auseinander. Jedes gibt
 Text zurueck. Was es nicht kann, meldet es als Fehler des Werkzeugs
 (`isError`), mit dem Satz des Kerns; ein Werkzeug, das aendert, aendert
 dann nichts ([[opencivil.mcp.sitzung#Sitzung.aendern|aendern]]).
@@ -31,7 +31,7 @@ Ein Werkzeug, wie `tools/list` es nennt und `tools/call` es ruft.
 - `beschreibung: str`
 - `eingaben: Mapping[str, Mapping[str, Any]]`
 - `pflicht: Tuple[str, ...]`
-- `lesend: bool` – Ob es nur liest -- dann aendert es weder die Mappe noch eine Datei.
+- `lesend: bool` – Ob es nur liest – dann aendert es weder die Mappe noch eine Datei.
 - `tun: Callable[..., str]`
 
 #### Werkzeug.verzeichnis
@@ -48,7 +48,7 @@ Wie `tools/list` es nennt, mit dem JSON-Schema seiner Eingaben.
 def aufrufen(self, sitzung: Sitzung, argumente: Any) -> Dict[str, Any]
 ```
 
-`tools/call`: sein Ergebnis als Text -- ein Fehler mit `isError`, wie MCP es will.
+`tools/call`: sein Ergebnis als Text – ein Fehler mit `isError`, wie MCP es will.
 
 ### werkzeug
 
@@ -122,7 +122,7 @@ def felder(sitzung: Sitzung, art: str) -> str
 def _klasse(art: str) -> type
 ```
 
-Die Klasse von Eintraegen, die `art` nennt -- ueber ihren Namen im Katalog oder ihre App.
+Die Klasse von Eintraegen, die `art` nennt – ueber ihren Namen im Katalog oder ihre App.
 
 ### eintraege
 
@@ -222,7 +222,7 @@ def bericht(sitzung: Sitzung, als: str='markdown', pfad: str='', ueberschreiben:
 def _bauteil(sitzung: Sitzung, eintrag: str, app: str) -> str
 ```
 
-Die Kennung des Bauteils, das `eintrag` nennt -- ein Material oder Skript rechnet nicht fuer sich.
+Die Kennung des Bauteils, das `eintrag` nennt – ein Material oder Skript rechnet nicht fuer sich.
 
 ### _ausgeben
 
@@ -230,7 +230,7 @@ Die Kennung des Bauteils, das `eintrag` nennt -- ein Material oder Skript rechne
 def _ausgeben(text: str, pfad: str, ueberschreiben: bool) -> str
 ```
 
-`text` zurueck -- oder mit `pfad` in diese Datei, und zurueck, wohin.
+`text` zurueck – oder mit `pfad` in diese Datei, und zurueck, wohin.
 
 ### _pruefen
 
@@ -238,7 +238,7 @@ def _ausgeben(text: str, pfad: str, ueberschreiben: bool) -> str
 def _pruefen(w: Werkzeug, argumente: Any) -> None
 ```
 
-Die Argumente gegen die Eingaben des Werkzeugs -- vor dem Aufruf, mit Satz statt Ausnahme.
+Die Argumente gegen die Eingaben des Werkzeugs – vor dem Aufruf, mit Satz statt Ausnahme.
 
 
 ## Konstanten
