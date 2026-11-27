@@ -69,8 +69,9 @@ ausserhalb des Rechtecks, Verbund ohne Zahl der Dübel oder über Figur 1,
 eine Verbundstütze über λ̄ = 2, Schubwände, die eine Richtung nicht
 halten, Durchstanzen ohne passendes Produkt – und das Erdbeben, wenn das
 Bauwerk nicht regelmässig ist: dort gilt das Ersatzkraftverfahren nicht,
-ein anderes rechnet das Werkzeug nicht. Im Schnappschuss werden darum 13
-Zellen von «0.00» zu «–».
+ein anderes rechnet das Werkzeug nicht. Dass die Regelmässigkeit dort grau
+steht und nicht rot, hat der Benutzer am 2026-11-27 bestätigt. Im
+Schnappschuss werden darum 13 Zellen von «0.00» zu «–».
 
 ## 2026-11-27 · Durchstanzen: HALFEN HDB
 
