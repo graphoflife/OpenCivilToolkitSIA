@@ -38,7 +38,13 @@ from opencivil.stahlbau.stabilitaet import Stabfall
 
 
 def _psi(achse: str) -> Any:
-    """Das Verhaeltnis der Endmomente um ``achse``: -1 bis 1, Vorgabe 1 -- das konstante Moment."""
+    """
+    Das Verhaeltnis der Endmomente um ``achse``: -1 bis 1, Vorgabe 1 -- das
+    konstante Moment und der unguenstigste Wert: mit ihm ist ω (49) am
+    groessten, η (94) am kleinsten und im Verbund k (24) am groessten. So
+    liegt ein Fall, an dessen ψ niemand denkt, auf der sicheren Seite
+    (Benutzer, 2026-11-27).
+    """
     return bereich(1.0, heisst=f"Verhältnis der Endmomente ψ_{achse}", ab=-1.0, bis=1.0)
 
 

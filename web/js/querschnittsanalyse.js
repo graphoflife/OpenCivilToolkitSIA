@@ -382,11 +382,11 @@ function richtungstext(analyse) {
  * Ein Lastfall: Schalter, Name, die Schnittgrössen, Entfernen. Alle sechs
  * stehen auf einer Zeile, N bis T; das Fenster ist dafür breit (Benutzer,
  * 2026-11-20 -- bis dahin drei je Zeile). Reicht der Platz nicht, brechen sie
- * nach drei um (`ist-lastreihe` im Stilblatt). Der Kopf trägt nur ihre
- * Symbole; die Einheiten stehen in der Überschrift des Kapitels.
+ * nach drei um (`schmal`). Der Kopf trägt nur ihre Symbole; die Einheiten
+ * stehen in der Überschrift des Kapitels.
  */
 function lastfallKopf(analyse) {
-  return fallkopf(spalten(analyse).map((s) => span(s.symbol)), { klasse: '.ist-lastreihe' });
+  return fallkopf(spalten(analyse).map((s) => span(s.symbol)), { schmal: 3 });
 }
 
 function lastfallZeile(analyse, index) {
@@ -402,7 +402,7 @@ function lastfallZeile(analyse, index) {
       wert: fall[s.feld], schritt: s.schritt, titel: s.titel, leer: 0,
       beiAenderung: (v) => aendern((x) => { x[s.feld] = v; }),
     })),
-    klasse: '.ist-lastreihe',
+    schmal: 3,
     entfernenTitel: 'Lastfall entfernen',
     entfernen: () => eintragAendern(analyse.kennung, (a) => {
       a.lastfaelle.splice(index, 1);
@@ -493,7 +493,7 @@ function drehsinn(sx, sy, text) {
 const TRAGSICHERHEIT = {
   schluessel: 'tragsicherheit',
   name: 'Trag\u00adsicherheit', titel: 'Tragsicherheitsnachweise',
-  breit: true,
+  breit: 6,
   bezug: () => 'N, V in kN · M, T in kNm',
   hilfe: HILFE.tragsicherheit,
   inhalt: (analyse) => [...lastfallAngaben(analyse), schubwandAngaben(analyse)],

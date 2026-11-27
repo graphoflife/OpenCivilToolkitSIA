@@ -60,14 +60,16 @@ export function fensterZeigen(grund, karte) {
 /**
  * Die Karte: Kopf mit Zeichen, Titel und Schliessen, darunter die Eingaben.
  * `zusatz` steht klein unter dem Titel, `hilfe` (ein «?») rechts davon.
- * `breit` ist sie, wo eine Zeile mehr Zahlen trägt als ein Panel fasst --
- * die Mitte wird dann so lange breiter (Stilblatt, `.fenster.ist-breit`).
+ * `breit` ist sie, wo eine Zeile mehr Zahlen trägt als ein Panel fasst: so
+ * viele sind es, sechs oder acht. Die Mitte wird dann so lange breiter
+ * (Stilblatt, `.fenster.ist-breit`).
  */
 export function fenster({
-  titel, zeichen, zusatz, hilfe, inhalt, breit = false,
+  titel, zeichen, zusatz, hilfe, inhalt, breit = 0,
 }) {
   return el('div.fenster', {
-    class: breit ? 'ist-breit' : '', role: 'dialog', 'aria-label': titel, tabIndex: -1,
+    class: breit ? 'ist-breit' : '', dataset: breit ? { felder: breit } : null,
+    role: 'dialog', 'aria-label': titel, tabIndex: -1,
   }, [
     fensterkopf({ titel, zeichen, zusatz, hilfe, schliessen: fensterSchliessen }),
     el('div.fenster-inhalt', {}, inhalt),

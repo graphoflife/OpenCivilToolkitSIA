@@ -9,7 +9,8 @@
  * Was eine Liste mehr hat, steht an fester Stelle: neben dem Namen (`oben`,
  * die Zugseite beim Knicken) oder in einer Zeile darunter (`unten`, Werte und
  * Rechenart einer Analyse). Stehen mehr Zahlen da als Spalten (`spalten`),
- * brechen sie um. Unter der Liste steht der Knopf, der sie verlängert
+ * brechen sie um; `schmal` sind die Spalten in einem schmalen Fenster.
+ * Unter der Liste steht der Knopf, der sie verlängert
  * (`anfuegenKnopf`), und was er anlegt, heisst wie er.
  *
  * Jede Zelle trägt ihre Klasse, und danach setzt das Stilblatt sie. Bis
@@ -37,17 +38,23 @@ import { naechsterName, zustand } from './zustand.js';
  * Dann weist das Namensfeld einen Namen ab, der dort schon vergeben ist, und
  * sagt, wo der andere steht (`nameFrei`). Ohne `liste` darf jeder Name
  * doppelt stehen: die Schichten einer Setzung.
+ *
+ * `spalten` Zahlen stehen nebeneinander, die übrigen darunter. Mit `schmal`
+ * sind es in einem Fenster unter 600 px nur so viele (`.bricht-um` im
+ * Stilblatt): die sechs Lasten des gezeichneten Querschnitts stehen dann zu
+ * dritt, ein Fall von Knicken und Kippen bricht vor den Momenten um.
  */
 export function fallzeile({
   fall, aendern, was, nameTitel, zahlen, entfernen, entfernenTitel, liste = null,
-  oben = null, unten = null, spalten = zahlen.length, klasse = '', vorn = null,
+  oben = null, unten = null, spalten = zahlen.length, schmal = null, klasse = '', vorn = null,
 }) {
   const an = vorn !== null || fall.aktiv !== false;
   const schalter = vorn
     || hakenSchalter(an, (wert) => aendern((x) => { x.aktiv = wert; }), was);
   schalter.classList.add('fall-schalter');
   return el(`div.fallzeile${klasse}`, {
-    class: `${an ? '' : 'ist-aus'} ${oben ? 'mit-oben' : ''}`, style: { '--felder': spalten },
+    class: `${an ? '' : 'ist-aus'} ${oben ? 'mit-oben' : ''} ${schmal ? 'bricht-um' : ''}`,
+    style: spaltenstil(spalten, schmal),
   }, [
     schalter,
     namensfeld({
@@ -80,15 +87,21 @@ async function nameFrei({ kennung, pfad, index }, name) {
  * als Formelzeichen (ein Knoten) oder als Formelzeichen mit Einheit
  * (`['M_{Ed}', 'kNm']`). Ein Formelzeichen bleibt, wie es ist: gross
  * geschrieben würde aus M_y ein M_Y, aus ε ein E und aus l ein L. Dieselben
- * Spalten wie die Zeilen darunter -- und dieselbe `klasse`, wo das Stilblatt
- * sie umbrechen lässt.
+ * Spalten wie die Zeilen darunter, auch im schmalen Fenster (`schmal`).
  */
-export function fallkopf(koepfe, { spalten = koepfe.length, klasse = '' } = {}) {
-  return el(`div.fallzeile.fallkopf${klasse}`, { style: { '--felder': spalten } }, [
+export function fallkopf(koepfe, { spalten = koepfe.length, schmal = null } = {}) {
+  return el('div.fallzeile.fallkopf', {
+    class: schmal ? 'bricht-um' : '', style: spaltenstil(spalten, schmal),
+  }, [
     el('div.fall-zahlen', {}, koepfe.map((kopf) => (typeof kopf === 'string'
       ? el('span', { text: kopf })
       : el('span.ist-formel', {}, [Array.isArray(kopf) ? formelkopf(...kopf) : kopf])))),
   ]);
+}
+
+/** Wie viele Zahlen nebeneinander stehen -- und im schmalen Fenster, wo es eines gibt. */
+function spaltenstil(spalten, schmal) {
+  return schmal ? { '--felder': spalten, '--felder-schmal': schmal } : { '--felder': spalten };
 }
 
 /**

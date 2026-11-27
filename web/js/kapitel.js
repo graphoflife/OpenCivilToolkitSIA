@@ -173,6 +173,6 @@ export function kapitelFenster(eintrag, gruppen, schluessel) {
     zusatz: [eintrag.name, kapitel.bezug?.(eintrag)].filter(Boolean).join(' · '),
     hilfe: hilfe ? erklaerung(hilfe.zeilen, hilfe.formel) : null,
     inhalt: kapitel.inhalt(eintrag),
-    breit: !!kapitel.breit,
+    breit: kapitel.breit || 0,
   });
 }

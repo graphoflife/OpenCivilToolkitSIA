@@ -49,6 +49,15 @@
 .vorzeichenbild .vz-drehung { fill: none; stroke: var(--beide); stroke-width: 1.5; }
 .vorzeichenbild .vz-drehspitze { fill: var(--beide); }
 .vorzeichenbild .vz-schwerpunkt { fill: var(--schrift); }
+/* Was ψ heisst, über den Fällen von Knicken und Kippen: das Bild und daneben
+   der Satz dazu; wird es eng, steht der Satz darunter. Die Momente in der
+   Farbe des Balkensystems (`bs-d-m`), der Stab wie die Achsen der Vorzeichen. */
+.psi-schema { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; margin: 6px 0 8px; }
+.psi-schema > .psibild { flex: none; display: block; max-width: 100%; height: auto; }
+.psi-schema > .qa-erlaeuterung { flex: 1 1 200px; min-width: 0; margin: 0; }
+.psibild .ps-text { font-size: 9.5px; fill: var(--schrift-matt); font-family: inherit; }
+.psibild .ps-vorgabe { font-size: 9.5px; fill: var(--schrift); font-weight: 700; font-family: inherit; }
+.psibild .ps-stab { stroke: var(--schrift); stroke-width: 1.6; }
 
 /* ------------------------------------------------------- Zeichenfenster -- */
 

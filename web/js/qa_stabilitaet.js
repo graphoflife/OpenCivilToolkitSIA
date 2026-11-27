@@ -15,7 +15,8 @@
  */
 
 import { feld, mitBild, wahlBlock, wahlSchalter } from './bausteine.js';
-import { el, zahlfeld } from './dom.js';
+import { text } from './cad_ansicht.js';
+import { el, svgEl, zahlfeld } from './dom.js';
 import { anfuegenKnopf, fallkopf, fallzeile } from './faelle.js';
 import { standOhne, zeilenstand } from './kapitel.js';
 import { span } from './mathe.js';
@@ -36,7 +37,7 @@ const HILFE = {
       ['Kippen', 'um die starke Achse, wo ein Moment um sie wirkt: M_cr nach Anhang B, η aus ψ; M_D,Rd = χ_D · W · f_y / γ_M1 (9)'],
       ['M-N', 'Klassen 1 bis 3 nach (50), ein I-Walzprofil auch nach (51) – es gilt die günstigere; Klasse 4 nach (62) und (63)'],
       ['L = 0', 'gehalten: um diese Achse knickt der Stab nicht, oder er kippt nicht'],
-      ['ψ', 'Verhältnis der Endmomente, −1 bis 1: konstantes Moment 1; mit Querlast oder verschieblich ebenfalls 1'],
+      ['ψ', 'Verhältnis der Endmomente, −1 bis 1, im Bild über den Fällen: konstantes Moment 1; mit Querlast oder verschieblich ebenfalls 1. Die Vorgabe 1 ist der ungünstigste Wert'],
       ['α_eff', 'N_Ed bleibt, die Momente wachsen, bis die Gleichung aufgeht'],
     ],
     formel: 'N_Ed / N_K,Rd + Σ ω · M_Ed / ((1 − N_Ed / N_cr) · M_Rd) ≤ 1   (50)',
@@ -72,10 +73,12 @@ const VERBUND_RECHNET = 'Als Verbundstütze rechnet ein einziges I-Profil oder R
   + 'Tragsicherheit, der Beton im gefüllten Rohr mit 1.0 · f_cd.';
 
 /**
- * Die Spalten eines Falls, in zwei Zeilen: oben die Druckkraft und die
- * Längen, unten die Momente mit ihrem ψ -- einachsig ohne M_z und ψ_z, beim
- * Holz ohne ψ (`ohneHolz`) und mit dem Titel `titelHolz`; im Verbund mit dem
- * ständigen Anteil und der Länge der Stütze (`nurVerbund`), ohne Kipplänge
+ * Die Spalten eines Falls, auf einer Zeile von N bis ψ (Benutzer,
+ * 2026-11-27; bis dahin in zwei Zeilen). Im schmalen Fenster brechen sie vor
+ * den Momenten um: oben die Druckkraft und die Längen, unten die Momente mit
+ * ihrem ψ (`obenSpalten`). Einachsig ohne M_z und ψ_z, beim Holz ohne ψ
+ * (`ohneHolz`) und mit dem Titel `titelHolz`; im Verbund mit dem ständigen
+ * Anteil und der Länge der Stütze (`nurVerbund`), ohne Kipplänge
  * (`ohneVerbund`). Eine Last, die man leert, ist keine Last; eine Länge, ein
  * Anteil oder ein ψ behält den bisherigen Wert, denn null heisst dort
  * etwas: gehalten, nichts ständig, ein dreieckiges Moment.
@@ -103,7 +106,8 @@ const STABSPALTEN = [
   },
   {
     feld: 'psi_y', kopf: [String.raw`\psi_y`], schritt: 0.25, ohneHolz: true,
-    titel: 'Verhältnis der Endmomente um y, −1 bis 1 – konstantes Moment, Querlast oder verschieblich: 1',
+    titel: 'Verhältnis der Endmomente um y, −1 bis 1 – konstantes Moment, Querlast oder verschieblich: 1. '
+      + 'Die Vorgabe 1 ist der ungünstigste Wert',
   },
   {
     feld: 'M_z_Ed', kopf: ['M_{z,Ed}', 'kNm'], schritt: 10, leer: 0, zweiachsig: true,
@@ -111,9 +115,17 @@ const STABSPALTEN = [
   },
   {
     feld: 'psi_z', kopf: [String.raw`\psi_z`], schritt: 0.25, zweiachsig: true, ohneHolz: true,
-    titel: 'Verhältnis der Endmomente um z, −1 bis 1 – konstantes Moment, Querlast oder verschieblich: 1',
+    titel: 'Verhältnis der Endmomente um z, −1 bis 1 – konstantes Moment, Querlast oder verschieblich: 1. '
+      + 'Die Vorgabe 1 ist der ungünstigste Wert',
   },
 ];
+
+/**
+ * So viele Zahlen fasst ein Fall auf einer Zeile -- das breite Fenster ist
+ * dafür gebaut (`breit`). Zweiachsig im Verbund sind es neun: dort bricht er
+ * auch im breiten Fenster vor den Momenten um.
+ */
+const IN_EINER_ZEILE = 8;
 
 function stabspalten(analyse) {
   const holz = ausHolz(analyse);
@@ -124,7 +136,7 @@ function stabspalten(analyse) {
     .map((s) => (holz && s.titelHolz ? { ...s, titel: s.titelHolz } : s));
 }
 
-/** Wie viele Spalten die obere Zeile hat: die Druckkraft und die Längen, bis zu den Momenten. */
+/** Wie viele Spalten im schmalen Fenster nebeneinander stehen: die Druckkraft und die Längen. */
 function obenSpalten(analyse) {
   return stabspalten(analyse).findIndex((s) => s.feld === 'M_y_Ed');
 }
@@ -136,6 +148,7 @@ function obenSpalten(analyse) {
  * (`knickkurvenVon`). Das Holz knickt nach einer festen Kurve: dort steht
  * statt der Kurven, wie es rechnet. Die Verbundstütze nimmt ihre Kurven aus
  * Tabelle 7: dort steht die Kriechzahl und welche Querschnitte sie rechnet.
+ * Wo ein Fall ψ hat, zeigt ein Bild über den Fällen, was es heisst.
  */
 function stabilitaetsAngaben(analyse) {
   const aendern = (veraenderer) => eintragAendern(analyse.kennung, veraenderer);
@@ -144,7 +157,9 @@ function stabilitaetsAngaben(analyse) {
   const verbund = imVerbund(analyse);
   const stahl = !holz && !verbund;
   const { eigene, fehlen } = knickkurvenVon(analyse.kennung);
-  const spalten = obenSpalten(analyse);
+  const spalten = stabspalten(analyse);
+  const schmal = obenSpalten(analyse);
+  const nebeneinander = spalten.length > IN_EINER_ZEILE ? schmal : spalten.length;
   return [
     biegungsWahl(analyse),
     ...(stahl ? ['y', 'z'].map((achse) => kurvenwahl(analyse, achse, eigene)) : []),
@@ -154,9 +169,13 @@ function stabilitaetsAngaben(analyse) {
       text: (holz && HOLZ_RECHNET) || (verbund && VERBUND_RECHNET)
         || 'Gerechnet mit den Rechenwerten der Tragsicherheit.',
     }),
-    faelle.length ? fallkopf(stabspalten(analyse).map((s) => s.kopf), { spalten }) : null,
+    spalten.some((s) => s.feld.startsWith('psi'))
+      ? psiSchema(verbund ? 'SIA 264, (24), mit ω nach SIA 263, 5.1.9.1'
+        : 'SIA 263, 5.1.9.1 und Anhang B.6')
+      : null,
+    faelle.length ? fallkopf(spalten.map((s) => s.kopf), { spalten: nebeneinander, schmal }) : null,
     ...(faelle.length
-      ? faelle.map((_, i) => stabilitaetsZeile(analyse, i, spalten))
+      ? faelle.map((_, i) => stabilitaetsZeile(analyse, i, nebeneinander, schmal))
       : [el('div.leer', { text: 'Ohne Fall kein Nachweis.' })]),
     anfuegenKnopf('Stabilitätsnachweis', (name) => aendern((a) => {
       a.stabilitaetsfaelle = a.stabilitaetsfaelle || [];
@@ -200,7 +219,54 @@ function kriechzahl(analyse) {
   }), angabe.einheit, titel);
 }
 
-function stabilitaetsZeile(analyse, index, spalten) {
+/**
+ * Was ψ heisst, als Bild und in Worten (Benutzer, 2026-11-27): links ein
+ * Stab mit den Endmomenten ψ·M und M und dem Verlauf dazwischen, rechts
+ * ψ = 1, 0 und −1. Die Momente stehen auf der gezogenen Seite, positive
+ * unten -- wie im Bild der Vorzeichen --, in der Farbe der Momente im
+ * Balkensystem. Die Vorgabe 1 ist der ungünstigste Wert: mit ihr ist ω (49)
+ * am grössten, η (94) am kleinsten und im Verbund k (24) am grössten.
+ * `referenz` nennt die Stellen, an denen ψ eingeht.
+ */
+function psiSchema(referenz) {
+  const bild = svgEl('svg', {
+    viewBox: '0 0 290 74', width: 290, height: 74, class: 'psibild', role: 'img',
+    'aria-label': 'ψ: das kleinere Endmoment durch das grössere. ψ = 1: konstantes Moment, '
+      + 'die Vorgabe; ψ = 0: dreieckig; ψ = −1: gegenläufig',
+  });
+  const achse = 24;
+  // Ein Stab von x0 bis x1 mit dem Moment links und rechts, in Bildpunkten nach unten.
+  const verlauf = (x0, x1, links, rechts) => {
+    const null0 = links * rechts < 0 ? x0 + ((x1 - x0) * links) / (links - rechts) : null;
+    const umriss = [[x0, achse], [x0, achse + links],
+      ...(null0 === null ? [] : [[null0, achse]]), [x1, achse + rechts], [x1, achse]];
+    const punkte = umriss.map(([x, y]) => `${x},${y}`).join(' ');
+    const g = svgEl('g', { class: 'bs-d-m' });
+    g.append(
+      svgEl('polygon', { points: punkte, class: 'bs-d-flaeche' }),
+      svgEl('polyline', { points: punkte, class: 'bs-d-kurve' }),
+      svgEl('line', { x1: x0, y1: achse, x2: x1, y2: achse, class: 'ps-stab' }),
+    );
+    return g;
+  };
+  bild.append(
+    verlauf(30, 110, 11, 22),
+    text(26, achse + 9, 'ψ·M', 'ps-text', 'end'),
+    text(114, achse + 15, 'M', 'ps-text', 'start'),
+    text(70, 62, '|ψ·M| ≤ |M|', 'ps-text'),
+  );
+  [[140, 1, 'ψ = 1'], [192, 0, 'ψ = 0'], [244, -1, 'ψ = −1']].forEach(([x, psi, name]) => {
+    bild.append(verlauf(x, x + 40, 16 * psi, 16), text(x + 20, 56, name, 'ps-text'));
+  });
+  bild.append(text(160, 67, 'Vorgabe', 'ps-vorgabe'));
+  return el('div.psi-schema', {}, [bild, el('p.qa-erlaeuterung', {
+    text: 'ψ ist das Verhältnis der Endmomente: das kleinere durch das grössere, mit '
+      + 'Vorzeichen – von −1 bis 1. Die Vorgabe ψ = 1, ein konstantes Moment, ist der '
+      + `ungünstigste Fall; mit Querlast oder verschieblich gilt ebenfalls 1 (${referenz}).`,
+  })]);
+}
+
+function stabilitaetsZeile(analyse, index, spalten, schmal) {
   const fall = analyse.stabilitaetsfaelle[index];
   const aendern = (veraenderer) => eintragAendern(analyse.kennung,
     (a) => veraenderer(a.stabilitaetsfaelle[index]));
@@ -214,6 +280,7 @@ function stabilitaetsZeile(analyse, index, spalten) {
       beiAenderung: (v) => aendern((x) => { x[s.feld] = v; }),
     })),
     spalten,
+    schmal,
     entfernenTitel: 'Fall entfernen',
     entfernen: () => eintragAendern(analyse.kennung, (a) => {
       a.stabilitaetsfaelle.splice(index, 1);
@@ -233,6 +300,7 @@ function faellestand(analyse) {
 export const STABILITAET = {
   schluessel: 'stabilitaet',
   name: 'Knicken und Kippen', titel: 'Knicken und Kippen nach SIA 263',
+  breit: IN_EINER_ZEILE,
   bezug: () => 'N negativ: Druck · eine Länge null heisst gehalten',
   hilfe: HILFE.stahl,
   inhalt: stabilitaetsAngaben,
@@ -242,6 +310,7 @@ export const STABILITAET = {
 /** Dieselbe Kachel für einen Querschnitt aus Holz, nach SIA 265. */
 export const STABILITAET_HOLZ = {
   ...STABILITAET, titel: 'Knicken und Kippen nach SIA 265', hilfe: HILFE.holz, stand: faellestand,
+  breit: 6,
 };
 
 /** Dieselbe Kachel für einen Querschnitt im Verbund: die Verbundstütze nach SIA 264. */

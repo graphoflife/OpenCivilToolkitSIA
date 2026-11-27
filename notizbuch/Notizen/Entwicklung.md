@@ -7,6 +7,41 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-27 · Knicken und Kippen: eine Zeile je Fall, ein Bild zu ψ
+
+Drei Wünsche des Benutzers zur Kachel «Knicken und Kippen nach SIA 263».
+
+**Eine Zeile.** Vorher standen die Zahlen eines Falls in zwei Zeilen: oben
+N und die Längen, unten die Momente mit ψ. Nachher stehen alle acht auf
+einer Zeile, wie die sechs Lasten der Tragsicherheit. Dafür ist das
+Fenster breiter, 712 statt 628 px: jedes Feld bleibt knapp 6 Zeichen breit,
+«-10000» passt. Bei 628 px wäre schon «-1000» angeschnitten gewesen. Die
+Mitte wird nur so breit, wenn der rechten Tafel 300 px bleiben, also ab
+einem Bildschirm von 1366 px; sonst, im schmalen Fenster und auf dem Handy
+bricht der Fall wie bisher vor den Momenten um.
+
+- Wie viele Zahlen ein breites Fenster trägt, sagt die Kachel (`breit: 6`
+  oder `breit: 8`); das Stilblatt hat je Zahl eine Breite. Die Lastfälle
+  bleiben bei 628 px und rücken schon ab 1282 px auf eine Zeile.
+- Den Umbruch im schmalen Fenster haben jetzt beide Listen gemeinsam
+  (`schmal` in `fallzeile` und `fallkopf`). Vorher hatte nur die Lastreihe
+  eine eigene Regel, mit fest drei Spalten.
+- Holz hat sechs Zahlen und das Fenster der Lasten. Im Verbund sind es
+  zweiachsig neun: die passen auch in 712 px nicht, dort bleibt der Umbruch
+  (5 + 4). Einachsig sind es sieben, sie stehen auf einer Zeile.
+
+**Ein Bild zu ψ.** Über den Fällen zeigt ein Bild, was ψ heisst: ein Stab
+mit den Endmomenten ψ·M und M, dazu ψ = 1, 0 und −1. Daneben steht in
+Worten: das kleinere Endmoment durch das grössere, mit Vorzeichen. Beim
+Holz fehlt es, denn dort gibt es kein ψ.
+
+**Eine sichere Vorgabe.** ψ = 1 war schon die Vorgabe und ist der
+ungünstigste Wert: ω (49) ist damit am grössten, η (94) am kleinsten, und
+im Verbund ist k (24) am grössten. Das steht jetzt im Bild, im Titel des
+Felds und in der Hilfe.
+
+---
+
 ## 2026-11-27 · Startbeispiel mit 35 mm Überdeckung
 
 Eine Frage aus dem TODO, vom Benutzer am 2026-11-27 beantwortet: das
