@@ -1,5 +1,5 @@
 ---
-erzeugt: 13ddf0e73c78
+erzeugt: 3587d5fe60bc
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.6.2.4"
@@ -22,7 +22,7 @@ $$
 Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
-b = \sqrt{\frac{4 \cdot A_u}{\pi}} = \sqrt{\frac{4 \cdot 0.423\,\mathrm{m}^{2}}{\pi}} = 734\,\mathrm{mm}
+b = \sqrt{\frac{4 \cdot A_u}{\pi}} = \sqrt{\frac{4 \cdot 0.419\,\mathrm{m}^{2}}{\pi}} = 730\,\mathrm{mm}
 $$
 
 ## Gebraucht von

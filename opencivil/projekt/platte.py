@@ -25,7 +25,7 @@ from opencivil.core.einheiten import KN, MM, MM2, Groesse
 from opencivil.material.basis import Baustoff
 from opencivil.querschnitt.geometrie import Linienart
 from opencivil.querschnitt.platte import (
-    LAGENZAHL, Bewehrungsposten, Querkraftbewehrung, Richtung,
+    LAGENZAHL, UEBERDECKUNG, Bewehrungsposten, Querkraftbewehrung, Richtung,
 )
 from opencivil.querschnitt.zugseite import Zugseite
 from opencivil.projekt.eintraege import (
@@ -225,8 +225,10 @@ class QuerschnittEintrag(Querschnittsangaben):
 
     h: float = bereich(300.0, heisst="Dicke h", einheit=MM, ueber=0.0)
     b: float = bereich(1000.0, heisst="Breite b", einheit=MM, ueber=0.0)
-    ueberdeckung_unten: float = bereich(30.0, heisst="Überdeckung unten", einheit=MM, ab=0.0)
-    ueberdeckung_oben: float = bereich(30.0, heisst="Überdeckung oben", einheit=MM, ab=0.0)
+    ueberdeckung_unten: float = bereich(UEBERDECKUNG, heisst="Überdeckung unten", einheit=MM,
+                                        ab=0.0)
+    ueberdeckung_oben: float = bereich(UEBERDECKUNG, heisst="Überdeckung oben", einheit=MM,
+                                       ab=0.0)
     d_max: float = bereich(32.0, heisst="Grösstkorn D_max", einheit=MM, ueber=0.0)
     """Grösstkorndurchmesser in mm."""
 

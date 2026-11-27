@@ -1,5 +1,5 @@
 ---
-erzeugt: 2e5ec437f627
+erzeugt: 1e970998ad7c
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.6.2.3"
@@ -23,7 +23,7 @@ $$
 Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
-u = k_e \cdot u_{red} = 0.9 \cdot 2335\,\mathrm{mm} = 2102\,\mathrm{mm}
+u = k_e \cdot u_{red} = 0.9 \cdot 2319\,\mathrm{mm} = 2087\,\mathrm{mm}
 $$
 
 ## Gebraucht von

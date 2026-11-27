@@ -1,5 +1,5 @@
 ---
-erzeugt: 4b4b158a2132
+erzeugt: 627becf73f45
 art: formel
 tags: [formel]
 ---
@@ -22,7 +22,7 @@ $$
 Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
-\bar{R}_{d,x} = \bar{E}_{d,x} + a = 0.195 + 0.141 = 0.336
+\bar{R}_{d,x} = \bar{E}_{d,x} + a = 0.198 + 0.139 = 0.336
 $$
 
 ## Im Code

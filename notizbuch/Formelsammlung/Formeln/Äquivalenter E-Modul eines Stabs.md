@@ -1,5 +1,5 @@
 ---
-erzeugt: c2cef0f407bd
+erzeugt: eab9882efb03
 art: formel
 tags: [formel]
 ---
@@ -26,7 +26,7 @@ $$
 Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
-E_{eq} = \frac{M}{I_c \cdot \left(\chi - \chi_0\right)} = \frac{20\,\mathrm{kNm}}{2250\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot \left(0.00025\,\mathrm{m}^{-1} - 0\,\mathrm{m}^{-1}\right)} = 35903\,\mathrm{N}/\mathrm{mm}^{2}
+E_{eq} = \frac{M}{I_c \cdot \left(\chi - \chi_0\right)} = \frac{20\,\mathrm{kNm}}{2250\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot \left(0.00025\,\mathrm{m}^{-1} - 0\,\mathrm{m}^{-1}\right)} = 35677\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 ## Im Code

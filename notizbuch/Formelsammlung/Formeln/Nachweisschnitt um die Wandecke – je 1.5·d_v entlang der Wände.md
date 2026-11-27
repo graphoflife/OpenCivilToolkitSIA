@@ -1,5 +1,5 @@
 ---
-erzeugt: d7ce05a96ad9
+erzeugt: cbacdef349de
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.6.2.3, Figur 23c"
@@ -24,7 +24,7 @@ $$
 Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
-u_0 = 3 \cdot d_v + \frac{\pi \cdot d_v}{4} = 3 \cdot 234\,\mathrm{mm} + \frac{\pi \cdot 234\,\mathrm{mm}}{4} = 886\,\mathrm{mm}
+u_0 = 3 \cdot d_v + \frac{\pi \cdot d_v}{4} = 3 \cdot 229\,\mathrm{mm} + \frac{\pi \cdot 229\,\mathrm{mm}}{4} = 867\,\mathrm{mm}
 $$
 
 ## Gebraucht von

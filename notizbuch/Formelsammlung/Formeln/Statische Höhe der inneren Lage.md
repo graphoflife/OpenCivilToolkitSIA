@@ -1,5 +1,5 @@
 ---
-erzeugt: 85f5e1569d49
+erzeugt: f027f927bdba
 art: formel
 tags: [formel]
 ---
@@ -26,7 +26,7 @@ $$
 Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
-d_y = h - c_{nom} - \varnothing_x - \frac{\varnothing_y}{2} = 280\,\mathrm{mm} - 30\,\mathrm{mm} - 16\,\mathrm{mm} - \frac{16\,\mathrm{mm}}{2} = 226\,\mathrm{mm}
+d_y = h - c_{nom} - \varnothing_x - \frac{\varnothing_y}{2} = 280\,\mathrm{mm} - 35\,\mathrm{mm} - 16\,\mathrm{mm} - \frac{16\,\mathrm{mm}}{2} = 221\,\mathrm{mm}
 $$
 
 ## Gebraucht von

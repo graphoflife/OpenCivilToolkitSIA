@@ -87,11 +87,11 @@ Kräften je Geschoss und Wand, ohne Verbindung ins Balkensystem.
       (−60.1 statt −58.5 kNm/m, Stützen 115.0/276.4 statt 115.5/275.1 kN),
       weil die App die Last aus C-C dort ablegt, wo sie aufliegt, statt mit
       dem Faktor 8.0 über die ganze Länge. Dem Benutzer so vorlegen.
-- [ ] **Vorgabe der Überdeckung.** c_nom = 30 mm liegt unter dem Grösstkorn
-      D_max = 32 mm, und SIA 262:2025, 5.2.2.2 will bei stark beanspruchten
-      Bauteilen mehr; Tabelle 18 verlangt schon für XC2 und XC3 35 mm.
-      Vorschlag: Vorgabe 35 mm, oder ein Hinweis im Bericht, wenn c_nom
-      kleiner ist als D_max oder der Stab. Entscheid des Benutzers.
+- [ ] **Startbeispiel mit 35 mm?** Neue Platten beginnen seit 2026-11-27
+      mit c_nom = 35 mm; das Startbeispiel behält 30 mm, weil an seinen
+      Zahlen Bericht, Formelsammlung und Handrechnungen der Tests hängen.
+      Mit 35 mm verschöbe sich jede seiner Zahlen um wenige Prozent.
+      Entscheid des Benutzers.
 - [ ] **Konstruktive Regeln der Bewehrungssuche.** Die Suche kennt nicht:
       Stäbe über ⌀30 nur ausnahmsweise (SIA 262:2025, 5.2.1); den lichten
       Abstand von mindestens D_max, dem Nachbarstab und 20 mm (5.2.3.2); die

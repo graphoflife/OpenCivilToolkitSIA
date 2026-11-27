@@ -1,5 +1,5 @@
 ---
-erzeugt: 6e9fa549f766
+erzeugt: 2540cad14ec9
 art: formel
 tags: [formel]
 ---
@@ -25,7 +25,7 @@ $$
 Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
-h_{frei} = h - c_{nom} - c_v = 280\,\mathrm{mm} - 30\,\mathrm{mm} - 30\,\mathrm{mm} = 220\,\mathrm{mm}
+h_{frei} = h - c_{nom} - c_v = 280\,\mathrm{mm} - 35\,\mathrm{mm} - 30\,\mathrm{mm} = 215\,\mathrm{mm}
 $$
 
 ## Im Code

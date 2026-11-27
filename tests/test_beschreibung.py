@@ -86,7 +86,7 @@ class TestVollstaendigeAblage(unittest.TestCase):
             querschnitte=[
                 QuerschnittEintrag(
                     "q1", "Decke", "b1", stahl="s2", h=280.0, b=900.0,
-                    ueberdeckung_unten=25.0, ueberdeckung_oben=35.0,
+                    ueberdeckung_unten=25.0, ueberdeckung_oben=40.0,
                     d_max=16.0, einlagenhoehe=40.0, k_c=0.6,
                     rissanforderung="hoch", beschreibung="Unter dem Dach",
                     zwaengung=True, zwaengung_begrenzt=True,

@@ -40,10 +40,14 @@ E_S = 200000.0
 
 
 def projekt(**felder):
-    """Ein Projekt mit einer Durchstanzstelle -- C30/37, B500B, sonst die Vorgaben."""
+    """
+    Ein Projekt mit einer Durchstanzstelle -- C30/37, B500B, c = 30 mm, sonst
+    die Vorgaben. Die Handrechnungen hier gelten für 30 mm, die Vorgabe bis
+    2026-11-27.
+    """
     p = Projekt(name="Probe")
     beton, stahl = p.beton("C30/37"), p.stahl("B500B")
-    p.durchstanzen("S", beton.kennung, stahl.kennung, **felder)
+    p.durchstanzen("S", beton.kennung, stahl.kennung, **{"c": 30.0, **felder})
     return p
 
 
@@ -702,6 +706,21 @@ class TestWasDieOberflaecheSieht(unittest.TestCase):
                           ["Durchstanzen", "Betondruckdiagonale"],
                           ["Durchstanzen", "ausserhalb der Durchstanzbewehrung"]])
         self.assertIn("Durchstanzbewehrung", [z[0] for z in tabelle.zeilen])
+
+
+class TestVorgabeDerUeberdeckung(unittest.TestCase):
+    """
+    Neue Platten und Durchstanzstellen beginnen mit c_nom = 35 mm, dem Wert
+    für XC2 und XC3 nach Tabelle 18 (Benutzer, 2026-11-27); bis dahin 30 mm.
+    """
+
+    def test_neue_eintraege_beginnen_mit_35_mm(self):
+        p = Projekt(name="Probe")
+        beton, stahl = p.beton("C30/37"), p.stahl("B500B")
+        platte = p.platte("Platte")
+        stelle = p.durchstanzen("S", beton.kennung, stahl.kennung)
+        self.assertEqual((platte.ueberdeckung_unten, platte.ueberdeckung_oben), (35.0, 35.0))
+        self.assertEqual(stelle.c, 35.0)
 
 
 if __name__ == "__main__":

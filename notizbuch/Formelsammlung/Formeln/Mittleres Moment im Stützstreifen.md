@@ -1,5 +1,5 @@
 ---
-erzeugt: bad4feec57d0
+erzeugt: efd13edf7fe5
 art: formel
 tags: [formel]
 normstelle: ["SIA 262:2025, 4.3.6.4.7, (62)", "SIA 262:2025, 4.3.6.4.7, (63)", "SIA 262:2025, 4.3.6.4.7, (64)", "SIA 262:2025, 4.3.6.4.7, (65)"]
@@ -63,7 +63,7 @@ $$
 Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
-m_{sd,y} = V_d \cdot \left(\frac{1}{8} + \frac{e_{u,y}}{b_{s,y}}\right) = 500\,\mathrm{kN} \cdot \left(\frac{1}{8} + \frac{1\,\mathrm{mm}}{1550\,\mathrm{mm}}\right) = 62.8\,\mathrm{kNm}/\mathrm{m}
+m_{sd,y} = V_d \cdot \left(\frac{1}{8} + \frac{e_{u,y}}{b_{s,y}}\right) = 500\,\mathrm{kN} \cdot \left(\frac{1}{8} + \frac{1\,\mathrm{mm}}{1550\,\mathrm{mm}}\right) = 62.7\,\mathrm{kNm}/\mathrm{m}
 $$
 
 Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
@@ -71,7 +71,7 @@ Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 $$
 \begin{aligned}
   m_{sd,x} &= \max\left[V_d \cdot \left(\frac{1}{8} + \frac{e_{u,x}}{b_{s,x}}\right);\ 0.5 \cdot V_d\right] \\
-  &= \max\left[80\,\mathrm{kN} \cdot \left(\frac{1}{8} + \frac{155\,\mathrm{mm}}{600\,\mathrm{mm}}\right);\ 0.5 \cdot 80\,\mathrm{kN}\right] \\
+  &= \max\left[80\,\mathrm{kN} \cdot \left(\frac{1}{8} + \frac{153\,\mathrm{mm}}{600\,\mathrm{mm}}\right);\ 0.5 \cdot 80\,\mathrm{kN}\right] \\
   &= 40\,\mathrm{kNm}/\mathrm{m}
 \end{aligned}
 $$

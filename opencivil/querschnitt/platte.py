@@ -231,9 +231,17 @@ class Bewehrungslage:
 
 
 #: Was die Ueberdeckung c_nom ist und welche sie mindestens sein muss: die
-#: Werte je Expositionsklasse stehen in Tabelle 18. Die Vorgabe 30 mm ist
-#: keiner davon -- die Klasse kennt nur der Ingenieur.
+#: Werte je Expositionsklasse stehen in Tabelle 18. Die Vorgabe
+#: :data:`UEBERDECKUNG` ist der Wert fuer XC2 und XC3 -- die Klasse kennt nur
+#: der Ingenieur.
 REFERENZ_UEBERDECKUNG = "SIA 262:2025, 5.2.2.1; 5.2.2.4, Tabelle 18"
+
+#: Womit die Ueberdeckung c_nom beginnt, in mm: in der Platte oben und unten
+#: wie im Durchstanzen. 35 mm verlangt Tabelle 18 fuer Betonstahl in XC2 und
+#: XC3, und sie liegt ueber dem Groesstkorn 32 mm der Vorgabe, wie 5.2.2.2 es
+#: bei stark beanspruchten Bauteilen will. Bis 2026-11-27 waren es 30 mm, auf
+#: Wunsch des Benutzers seither 35; gespeicherte Eintraege behalten ihre Zahl.
+UEBERDECKUNG = 35.0
 
 
 @dataclass
@@ -331,8 +339,8 @@ class Plattenquerschnitt(Rechenobjekt):
     b: Groesse
     beton: Baustoff
     lagen: List[Bewehrungslage] = field(default_factory=list)
-    ueberdeckung_unten: Groesse = field(default_factory=lambda: Groesse(30, MM))
-    ueberdeckung_oben: Groesse = field(default_factory=lambda: Groesse(30, MM))
+    ueberdeckung_unten: Groesse = field(default_factory=lambda: Groesse(UEBERDECKUNG, MM))
+    ueberdeckung_oben: Groesse = field(default_factory=lambda: Groesse(UEBERDECKUNG, MM))
     d_max: Groesse = field(default_factory=lambda: Groesse(32, MM))
     """Grösstkorndurchmesser -- geht in den Querkraftwiderstand ein."""
 

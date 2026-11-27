@@ -1,5 +1,5 @@
 ---
-erzeugt: e763a493a7b5
+erzeugt: b96b6dc00f38
 art: modul
 tags: [modul]
 ---
@@ -318,8 +318,8 @@ alle Schnittgroessen Werte pro Laufmeter.
 - `b: Groesse`
 - `beton: Baustoff`
 - `lagen: List[Bewehrungslage] = field(default_factory=list)`
-- `ueberdeckung_unten: Groesse = field(default_factory=lambda: Groesse(30, MM))`
-- `ueberdeckung_oben: Groesse = field(default_factory=lambda: Groesse(30, MM))`
+- `ueberdeckung_unten: Groesse = field(default_factory=lambda: Groesse(UEBERDECKUNG, MM))`
+- `ueberdeckung_oben: Groesse = field(default_factory=lambda: Groesse(UEBERDECKUNG, MM))`
 - `d_max: Groesse = field(default_factory=lambda: Groesse(32, MM))` – Grösstkorndurchmesser – geht in den Querkraftwiderstand ein.
 - `einlagenhoehe: Groesse = field(default_factory=lambda: Groesse(0, MM))` – Grösstes Mass einer Einlage, Breite oder Höhe. Übersteigt es d/6, vermindert es die wirksame statische Höhe d_v (SIA 262:2025, 4.3.3.2.9). Der Name stammt von früher, als nur die Höhe zählte.
 - `k_c: Groesse = field(default_factory=lambda: Groesse(K_C, EINHEITSLOS))` – Abminderung der Betondruckfestigkeit in der Druckdiagonalen.
@@ -422,7 +422,8 @@ Rechnung sehen statt nur die Zahl.
 
 - `LAGENZAHL = 4` – Anzahl Lagen einer Platte. Bewusst fest – eine Platte hat unten und oben je eine Haupt- und eine Querlage, mehr braucht es nicht, weniger waere ein Sonderfall mit leeren Lagen.
 - `BREITE_Y_MM = 1000.0` – Breite, auf die sich eine y-Lage bezieht: in y wird immer je Laufmeter gerechnet, `b` ist der Streifen in x.
-- `REFERENZ_UEBERDECKUNG = 'SIA 262:2025, 5.2.2.1; 5.2.2.4, Tabelle 18'` – Was die Ueberdeckung c_nom ist und welche sie mindestens sein muss: die Werte je Expositionsklasse stehen in Tabelle 18. Die Vorgabe 30 mm ist keiner davon – die Klasse kennt nur der Ingenieur.
+- `REFERENZ_UEBERDECKUNG = 'SIA 262:2025, 5.2.2.1; 5.2.2.4, Tabelle 18'` – Was die Ueberdeckung c_nom ist und welche sie mindestens sein muss: die Werte je Expositionsklasse stehen in Tabelle 18. Die Vorgabe [[opencivil.querschnitt.platte#Konstanten|UEBERDECKUNG]] ist der Wert fuer XC2 und XC3 – die Klasse kennt nur der Ingenieur.
+- `UEBERDECKUNG = 35.0` – Womit die Ueberdeckung c_nom beginnt, in mm: in der Platte oben und unten wie im Durchstanzen. 35 mm verlangt Tabelle 18 fuer Betonstahl in XC2 und XC3, und sie liegt ueber dem Groesstkorn 32 mm der Vorgabe, wie 5.2.2.2 es bei stark beanspruchten Bauteilen will. Bis 2026-11-27 waren es 30 mm, auf Wunsch des Benutzers seither 35; gespeicherte Eintraege behalten ihre Zahl.
 - `UEBERDECKUNGEN = 'Überdeckungen'` – Die beiden Kaesten, in denen die Plattenangaben zusammenstehen. Der erste traegt die Betonsorte im Namen: sie ist keine gerechnete Groesse und hat darum keine eigene Kette, an der sie haengen koennte – als Aufschrift des Kastens gilt sie dagegen immer, denn eine Platte hat genau einen Beton.
 
 ## Braucht

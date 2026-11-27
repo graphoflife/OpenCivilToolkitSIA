@@ -1,5 +1,5 @@
 ---
-erzeugt: 1fa5898654e2
+erzeugt: eab3afc31740
 art: formel
 tags: [formel]
 normstelle: ["SIA 262:2025, 4.3.3.2.3, (41)", "SIA 262:2025, 4.3.3.2.2, (39); 4.3.3.2.6"]
@@ -42,8 +42,8 @@ Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 $$
 \begin{aligned}
   \varepsilon_v &= \frac{f_{yd} \cdot \left(\left|m_{Ed}\right| - m_{Dd}\right)}{E_s \cdot \left(\left|m_{Rd}(N_{Ed})\right| - m_{Dd}\right)} \\
-  &= \frac{435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(\left|10\,\mathrm{kNm}\right| - 0\,\mathrm{kNm}\right)}{200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(\left|18.1\,\mathrm{kNm}\right| - 0\,\mathrm{kNm}\right)} \\
-  &= 1.199\,\text{‰}
+  &= \frac{435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(\left|10\,\mathrm{kNm}\right| - 0\,\mathrm{kNm}\right)}{200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(\left|17.6\,\mathrm{kNm}\right| - 0\,\mathrm{kNm}\right)} \\
+  &= 1.238\,\text{‰}
 \end{aligned}
 $$
 

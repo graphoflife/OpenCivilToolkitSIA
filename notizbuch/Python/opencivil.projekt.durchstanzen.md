@@ -1,5 +1,5 @@
 ---
-erzeugt: d04c1fa68376
+erzeugt: 6c8c02dc812e
 art: modul
 tags: [modul]
 ---
@@ -77,7 +77,7 @@ Eine Durchstanzstelle – siehe Dateikopf.
 - `beton: str = ''` – Kennung des Betons.
 - `stahl: str = ''` – Kennung des Betonstahls der Biegebewehrung.
 - `h: float = bereich(280.0, heisst='Plattendicke h', einheit=MM, ueber=0.0)`
-- `c: float = bereich(30.0, heisst='Überdeckung c_nom', einheit=MM, ab=0.0)` – Die Überdeckung auf der Zugseite: oben bei der Decke, unten bei der Bodenplatte.
+- `c: float = bereich(UEBERDECKUNG, heisst='Überdeckung c_nom', einheit=MM, ab=0.0)` – Die Überdeckung auf der Zugseite: oben bei der Decke, unten bei der Bodenplatte.
 - `c_v: float = bereich(30.0, heisst='Abstand der Verankerung c_v', einheit=MM, ab=0.…` – Der Abstand der Verankerung der Durchstanzbewehrung – der Köpfe der Anker, der Biegung der Bügel – von der Oberfläche der Druckseite (SIA 262:2025, Figur 26).
 - `system: Durchstanzsystem = Durchstanzsystem.ANCOPLUS` – Woraus die Durchstanzbewehrung besteht, wo es eine braucht: ancoPLUS, HALFEN HDB oder Bügel.
 - `D_max: float = bereich(32.0, heisst='Grösstkorn D_max', einheit=MM, ueber=0.0)`

@@ -1,5 +1,5 @@
 ---
-erzeugt: ee8d0d725ee6
+erzeugt: 4ac0aa8f4179
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.6.2.1"
@@ -23,7 +23,7 @@ $$
 Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
-d = \frac{d_x + d_y}{2} = \frac{242\,\mathrm{mm} + 226\,\mathrm{mm}}{2} = 234\,\mathrm{mm}
+d = \frac{d_x + d_y}{2} = \frac{237\,\mathrm{mm} + 221\,\mathrm{mm}}{2} = 229\,\mathrm{mm}
 $$
 
 ## Gebraucht von

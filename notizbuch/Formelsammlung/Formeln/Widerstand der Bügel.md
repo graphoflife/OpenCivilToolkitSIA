@@ -1,5 +1,5 @@
 ---
-erzeugt: 10a6fd8eee24
+erzeugt: e7338a2cf75c
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.3.4.3, (45)"
@@ -29,8 +29,8 @@ Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 $$
 \begin{aligned}
   V_{Rd,s} &= \frac{A_{\varnothing,V}}{s_{V,x} \cdot s_{V,y}} \cdot 0.9 \cdot d \cdot f_{yd} \cdot \cot \alpha \\
-  &= \frac{50.3\,\mathrm{mm}^{2}}{200\,\mathrm{mm} \cdot 200\,\mathrm{mm}} \cdot 0.9 \cdot 248.1\,\mathrm{mm} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \cot 30{}^{\circ} \\
-  &= 211.3\,\mathrm{kN}/\mathrm{m}
+  &= \frac{50.3\,\mathrm{mm}^{2}}{200\,\mathrm{mm} \cdot 200\,\mathrm{mm}} \cdot 0.9 \cdot 243.1\,\mathrm{mm} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \cot 30{}^{\circ} \\
+  &= 207\,\mathrm{kN}/\mathrm{m}
 \end{aligned}
 $$
 

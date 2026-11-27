@@ -1,5 +1,5 @@
 ---
-erzeugt: 62941c728ce9
+erzeugt: afe9caabbd4d
 art: formel
 tags: [formel]
 ---
@@ -22,7 +22,7 @@ $$
 Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
-\varepsilon_{s,adm} = \frac{\sigma_{s,adm}}{E_s} = \frac{500\,\mathrm{N}/\mathrm{mm}^{2}}{200000\,\mathrm{N}/\mathrm{mm}^{2}} = 2.5\,\text{‰} \quad < \quad \varepsilon_{s,x} = 3.47\,\text{‰}
+\varepsilon_{s,adm} = \frac{\sigma_{s,adm}}{E_s} = \frac{500\,\mathrm{N}/\mathrm{mm}^{2}}{200000\,\mathrm{N}/\mathrm{mm}^{2}} = 2.5\,\text{‰} \quad < \quad \varepsilon_{s,x} = 4.86\,\text{‰}
 $$
 
 ## Im Code

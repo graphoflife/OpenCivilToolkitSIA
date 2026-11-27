@@ -1,5 +1,5 @@
 ---
-erzeugt: 9a0254003401
+erzeugt: 3f9c5207156d
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.6.4.5; 4.2.1.5, Figur 12"
@@ -29,8 +29,8 @@ Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 $$
 \begin{aligned}
   m_{Rd,x} &= a_{s,x} \cdot f_{yd} \cdot \left(d_x - \frac{0.85 \cdot x_x}{2}\right) \\
-  &= 1340\,\mathrm{mm}^{2}/\mathrm{m} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(242\,\mathrm{mm} - \frac{0.85 \cdot 34.3\,\mathrm{mm}}{2}\right) \\
-  &= 132.5\,\mathrm{kNm}/\mathrm{m}
+  &= 1340\,\mathrm{mm}^{2}/\mathrm{m} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(237\,\mathrm{mm} - \frac{0.85 \cdot 34.3\,\mathrm{mm}}{2}\right) \\
+  &= 129.6\,\mathrm{kNm}/\mathrm{m}
 \end{aligned}
 $$
 

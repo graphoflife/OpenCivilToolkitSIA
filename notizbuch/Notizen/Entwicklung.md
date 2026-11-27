@@ -7,6 +7,31 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-27 · Überdeckung: neu 35 mm
+
+Eine Frage aus dem TODO, vom Benutzer am 2026-11-27 beantwortet: «Vorgabe
+35 mm».
+
+Vorher begannen Platte und Durchstanzen mit c_nom = 30 mm, oben wie unten –
+weniger als das Grösstkorn D_max = 32 mm der Vorgabe, und weniger, als
+SIA 262:2025, Tabelle 18, schon für Betonstahl in XC2 und XC3 verlangt.
+Nachher beginnt jede neue Platte und jede neue Durchstanzstelle mit 35 mm.
+Ein Beispiel aus dem Prüfprojekt: die Decke mit h = 300 mm und ⌀18 + ⌀12 in
+der 2. Lage verliert 5 mm statische Höhe, ihr M_Rd sinkt von 235.9 auf
+230.6 kNm.
+
+- Die Zahl steht an einer Stelle, `UEBERDECKUNG` in
+  `querschnitt/platte.py`; Platte und Durchstanzen lesen sie dort.
+- Gespeicherte Projekte behalten ihre Zahl. Das Startbeispiel auch: es
+  setzt 30 mm ausdrücklich, denn an seinen Zahlen hängen Bericht,
+  Formelsammlung und viele Handrechnungen der Tests. Ebenso rechnen die
+  Handrechnungen des Durchstanzens in den Tests mit 30 mm.
+- Im Prüfprojekt «Jeder Nachweis» gilt die neue Vorgabe. Kein Urteil
+  kippt; der Stahlpilz der zweiten Innenstütze wird grösser, 850 statt
+  730 mm.
+
+---
+
 ## 2026-11-27 · Stahl II aus SIA 269/2; f_cd bleibt gerechnet
 
 Zwei Fragen aus dem TODO, vom Benutzer am 2026-11-27 beantwortet.

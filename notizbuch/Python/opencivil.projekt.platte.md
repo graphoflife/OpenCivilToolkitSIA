@@ -1,5 +1,5 @@
 ---
-erzeugt: 0257a6195645
+erzeugt: e360363fb581
 art: modul
 tags: [modul]
 ---
@@ -188,8 +188,8 @@ gezeichneten Querschnitt gleich angibt, steht in der Grundlage
 - `stahl: str = ''` – Der Betonstahl der Platte: aller vier Lagen und der Bügel – einer für alle (Benutzer, 2026-10-24).
 - `h: float = bereich(300.0, heisst='Dicke h', einheit=MM, ueber=0.0)`
 - `b: float = bereich(1000.0, heisst='Breite b', einheit=MM, ueber=0.0)`
-- `ueberdeckung_unten: float = bereich(30.0, heisst='Überdeckung unten', einheit=MM, ab=0.0)`
-- `ueberdeckung_oben: float = bereich(30.0, heisst='Überdeckung oben', einheit=MM, ab=0.0)`
+- `ueberdeckung_unten: float = bereich(UEBERDECKUNG, heisst='Überdeckung unten', einheit=MM, ab=0.0)`
+- `ueberdeckung_oben: float = bereich(UEBERDECKUNG, heisst='Überdeckung oben', einheit=MM, ab=0.0)`
 - `d_max: float = bereich(32.0, heisst='Grösstkorn D_max', einheit=MM, ueber=0.0)` – Grösstkorndurchmesser in mm.
 - `einlagenhoehe: float = bereich(0.0, heisst='Grösstes Mass der Einlage', einheit=MM, ab=0.0)` – Grösstes Mass einer Einlage in mm, Breite oder Höhe – der Name ist von früher.
 - `querkraftbewehrung: QuerkraftbewehrungEintrag = teil(QuerkraftbewehrungEintrag, heisst='Bügel')` – Bügel; ohne Durchmesser heisst: keine.

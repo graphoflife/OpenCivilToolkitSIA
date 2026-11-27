@@ -1,5 +1,5 @@
 ---
-erzeugt: d39d864c7c5b
+erzeugt: 7da512ed1faf
 art: formel
 tags: [formel]
 ---
@@ -24,8 +24,8 @@ Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 $$
 \begin{aligned}
   M_{ref} &= \max\left(\left|M_{Rd,x}^{+}\right|;\ \left|M_{Rd,x}^{-}\right|\right) \\
-  &= \max\left(\left|162.9\,\mathrm{kNm}\right|;\ \left|-178.6\,\mathrm{kNm}\right|\right) \\
-  &= 178.6\,\mathrm{kNm}
+  &= \max\left(\left|160.9\,\mathrm{kNm}\right|;\ \left|-175.9\,\mathrm{kNm}\right|\right) \\
+  &= 175.9\,\mathrm{kNm}
 \end{aligned}
 $$
 

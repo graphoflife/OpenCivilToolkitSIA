@@ -1,5 +1,5 @@
 ---
-erzeugt: d88504eae0a8
+erzeugt: ca47ba565ed9
 art: formel
 tags: [formel]
 ---
@@ -24,7 +24,7 @@ $$
 Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
-\bar{E}_{d,x} = \sqrt{\left(\frac{N_{Ed}}{N_{ref}}\right)^{2} + \left(\frac{M_{Ed}}{M_{ref}}\right)^{2}} = \sqrt{\left(\frac{-500\,\mathrm{kN}}{5000\,\mathrm{kN}}\right)^{2} + \left(\frac{30\,\mathrm{kNm}}{178.6\,\mathrm{kNm}}\right)^{2}} = 0.195
+\bar{E}_{d,x} = \sqrt{\left(\frac{N_{Ed}}{N_{ref}}\right)^{2} + \left(\frac{M_{Ed}}{M_{ref}}\right)^{2}} = \sqrt{\left(\frac{-500\,\mathrm{kN}}{5000\,\mathrm{kN}}\right)^{2} + \left(\frac{30\,\mathrm{kNm}}{175.9\,\mathrm{kNm}}\right)^{2}} = 0.198
 $$
 
 ## Gebraucht von

@@ -1,5 +1,5 @@
 ---
-erzeugt: 53bde295c8f5
+erzeugt: 1f1d3427472f
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.6.4.1, (60)"
@@ -43,8 +43,8 @@ Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 $$
 \begin{aligned}
   \psi_x &= 1.5 \cdot \frac{r_{sx}}{d} \cdot \frac{f_{yd}}{E_s} \cdot \left(\frac{m_{sd,x}}{m_{Rd,x}}\right)^{3/2} \\
-  &= 1.5 \cdot \frac{1540\,\mathrm{mm}}{234\,\mathrm{mm}} \cdot \frac{435\,\mathrm{N}/\mathrm{mm}^{2}}{200000\,\mathrm{N}/\mathrm{mm}^{2}} \cdot \left(\frac{112.5\,\mathrm{kNm}/\mathrm{m}}{132.5\,\mathrm{kNm}/\mathrm{m}}\right)^{3/2} \\
-  &= 0.0168
+  &= 1.5 \cdot \frac{1540\,\mathrm{mm}}{229\,\mathrm{mm}} \cdot \frac{435\,\mathrm{N}/\mathrm{mm}^{2}}{200000\,\mathrm{N}/\mathrm{mm}^{2}} \cdot \left(\frac{112.5\,\mathrm{kNm}/\mathrm{m}}{129.6\,\mathrm{kNm}/\mathrm{m}}\right)^{3/2} \\
+  &= 0.0177
 \end{aligned}
 $$
 
@@ -53,15 +53,15 @@ Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 $$
 \begin{aligned}
   \psi_x &= 1.2 \cdot \frac{r_{sx}}{d} \cdot \frac{f_{yd}}{E_s} \cdot \left(\frac{m_{sd,x}}{m_{Rd,x}}\right)^{3/2} \\
-  &= 1.2 \cdot \frac{0.8\,\mathrm{m}}{234\,\mathrm{mm}} \cdot \frac{435\,\mathrm{N}/\mathrm{mm}^{2}}{200000\,\mathrm{N}/\mathrm{mm}^{2}} \cdot \left(\frac{40\,\mathrm{kNm}/\mathrm{m}}{132.5\,\mathrm{kNm}/\mathrm{m}}\right)^{3/2} \\
-  &= 0.0015
+  &= 1.2 \cdot \frac{0.8\,\mathrm{m}}{229\,\mathrm{mm}} \cdot \frac{435\,\mathrm{N}/\mathrm{mm}^{2}}{200000\,\mathrm{N}/\mathrm{mm}^{2}} \cdot \left(\frac{40\,\mathrm{kNm}/\mathrm{m}}{129.6\,\mathrm{kNm}/\mathrm{m}}\right)^{3/2} \\
+  &= 0.0016
 \end{aligned}
 $$
 
 Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
-\psi_x = 1.5 \cdot \frac{r_{sx}}{d} \cdot \frac{f_{yd}}{E_s} = 1.5 \cdot \frac{1540\,\mathrm{mm}}{234\,\mathrm{mm}} \cdot \frac{435\,\mathrm{N}/\mathrm{mm}^{2}}{200000\,\mathrm{N}/\mathrm{mm}^{2}} = 0.0215
+\psi_x = 1.5 \cdot \frac{r_{sx}}{d} \cdot \frac{f_{yd}}{E_s} = 1.5 \cdot \frac{1540\,\mathrm{mm}}{229\,\mathrm{mm}} \cdot \frac{435\,\mathrm{N}/\mathrm{mm}^{2}}{200000\,\mathrm{N}/\mathrm{mm}^{2}} = 0.0219
 $$
 
 ## Gebraucht von

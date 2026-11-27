@@ -34,7 +34,7 @@ from opencivil.durchstanzen.systeme import Durchstanzsystem
 from opencivil.projekt.eintraege import BauteilEintrag, Beschreibung
 from opencivil.projekt.lesen import bereich
 from opencivil.projekt.netz import Netz, neue_kennung
-from opencivil.querschnitt.platte import Richtung
+from opencivil.querschnitt.platte import UEBERDECKUNG, Richtung
 
 
 @dataclass
@@ -75,7 +75,7 @@ class DurchstanzEintrag(BauteilEintrag):
     """Kennung des Betonstahls der Biegebewehrung."""
 
     h: float = bereich(280.0, heisst="Plattendicke h", einheit=MM, ueber=0.0)
-    c: float = bereich(30.0, heisst="Überdeckung c_nom", einheit=MM, ab=0.0)
+    c: float = bereich(UEBERDECKUNG, heisst="Überdeckung c_nom", einheit=MM, ab=0.0)
     """Die Überdeckung auf der Zugseite: oben bei der Decke, unten bei der Bodenplatte."""
 
     c_v: float = bereich(30.0, heisst="Abstand der Verankerung c_v", einheit=MM, ab=0.0)

@@ -1,5 +1,5 @@
 ---
-erzeugt: d075b8b30da3
+erzeugt: bda9c4bf2aac
 art: formel
 tags: [formel]
 ---
@@ -35,7 +35,7 @@ $$
 Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
-\chi_{u} = \frac{\varepsilon_{unten} - \varepsilon_{oben}}{h} = \frac{10.21\,\text{‰} - \left(-3.5\,\text{‰}\right)}{300\,\mathrm{mm}} = 0.04571\,\mathrm{m}^{-1}
+\chi_{u} = \frac{\varepsilon_{unten} - \varepsilon_{oben}}{h} = \frac{9.92\,\text{‰} - \left(-3.5\,\text{‰}\right)}{300\,\mathrm{mm}} = 0.04474\,\mathrm{m}^{-1}
 $$
 
 Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:

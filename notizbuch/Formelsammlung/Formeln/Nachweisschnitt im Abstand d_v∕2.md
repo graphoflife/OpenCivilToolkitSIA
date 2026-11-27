@@ -1,5 +1,5 @@
 ---
-erzeugt: 2c2a3efe886b
+erzeugt: b7f978fd2f7e
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.6.2.2, Figur 22b"
@@ -26,7 +26,7 @@ $$
 Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
-u_0 = 2 \cdot \left(b_x + b_y\right) + \pi \cdot d_v = 2 \cdot \left(400\,\mathrm{mm} + 400\,\mathrm{mm}\right) + \pi \cdot 234\,\mathrm{mm} = 2335\,\mathrm{mm}
+u_0 = 2 \cdot \left(b_x + b_y\right) + \pi \cdot d_v = 2 \cdot \left(400\,\mathrm{mm} + 400\,\mathrm{mm}\right) + \pi \cdot 229\,\mathrm{mm} = 2319\,\mathrm{mm}
 $$
 
 ## Gebraucht von

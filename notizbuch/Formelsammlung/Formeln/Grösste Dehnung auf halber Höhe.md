@@ -1,5 +1,5 @@
 ---
-erzeugt: dd3425ad1fb0
+erzeugt: 4777238fbd86
 art: formel
 tags: [formel]
 ---
@@ -22,7 +22,7 @@ $$
 Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
-\varepsilon_{m,u} = \frac{\varepsilon_{oben} + \varepsilon_{unten}}{2} = \frac{54.1\,\text{‰} + \left(-2.8\,\text{‰}\right)}{2} = 25.65\,\text{‰}
+\varepsilon_{m,u} = \frac{\varepsilon_{oben} + \varepsilon_{unten}}{2} = \frac{55.22\,\text{‰} + \left(-2.64\,\text{‰}\right)}{2} = 26.29\,\text{‰}
 $$
 
 ## Im Code

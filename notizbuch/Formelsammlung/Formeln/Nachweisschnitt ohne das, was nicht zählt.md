@@ -1,5 +1,5 @@
 ---
-erzeugt: af92a5493bb6
+erzeugt: 7bb6a4b47f89
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.6.2.3"
@@ -39,13 +39,13 @@ $$
 Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
-u_{red} = u_0 = 2335\,\mathrm{mm}
+u_{red} = u_0 = 2319\,\mathrm{mm}
 $$
 
 Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
-u_{red,out} = u_{0,out} - \Delta u_{E,out} = 10905\,\mathrm{mm} - 3768\,\mathrm{mm} = 7137\,\mathrm{mm}
+u_{red,out} = u_{0,out} - \Delta u_{E,out} = 10644\,\mathrm{mm} - 3638\,\mathrm{mm} = 7006\,\mathrm{mm}
 $$
 
 Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:

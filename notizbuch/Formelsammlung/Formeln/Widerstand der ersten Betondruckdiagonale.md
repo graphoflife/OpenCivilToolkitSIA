@@ -1,5 +1,5 @@
 ---
-erzeugt: f0c6061a893e
+erzeugt: be1004a7ecbd
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.6.5.8, (70)"
@@ -30,8 +30,8 @@ Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 $$
 \begin{aligned}
   V_{Rd,max} &= \min\left[k_{sys} \cdot k_r;\ 3.5\right] \cdot \tau_{cd} \cdot d_v \cdot u \\
-  &= \min\left[2.58 \cdot 0.716;\ 3.5\right] \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 234\,\mathrm{mm} \cdot 2102\,\mathrm{mm} \\
-  &= 994.2\,\mathrm{kN}
+  &= \min\left[2.53 \cdot 0.699;\ 3.5\right] \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 229\,\mathrm{mm} \cdot 2087\,\mathrm{mm} \\
+  &= 927.7\,\mathrm{kN}
 \end{aligned}
 $$
 

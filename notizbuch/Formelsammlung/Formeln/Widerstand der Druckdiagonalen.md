@@ -1,5 +1,5 @@
 ---
-erzeugt: 19f1de1b4bc8
+erzeugt: 9905db2a4ac3
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.3.4.6, (47)"
@@ -27,8 +27,8 @@ Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 $$
 \begin{aligned}
   V_{Rd,c} &= 0.9 \cdot d \cdot k_c \cdot f_{cd} \cdot \sin \alpha \cdot \cos \alpha \\
-  &= 0.9 \cdot 248.1\,\mathrm{mm} \cdot 0.55 \cdot 20\,\mathrm{N}/\mathrm{mm}^{2} \cdot \sin 30{}^{\circ} \cdot \cos 30{}^{\circ} \\
-  &= 1063.5\,\mathrm{kN}/\mathrm{m}
+  &= 0.9 \cdot 243.1\,\mathrm{mm} \cdot 0.55 \cdot 20\,\mathrm{N}/\mathrm{mm}^{2} \cdot \sin 30{}^{\circ} \cdot \cos 30{}^{\circ} \\
+  &= 1042\,\mathrm{kN}/\mathrm{m}
 \end{aligned}
 $$
 

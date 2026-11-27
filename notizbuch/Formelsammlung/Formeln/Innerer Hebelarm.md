@@ -1,5 +1,5 @@
 ---
-erzeugt: b8c77c4aa348
+erzeugt: b5551b6f963d
 art: formel
 tags: [formel]
 ---
@@ -22,7 +22,7 @@ $$
 Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
-z = d_{2,x} - \frac{x}{3} = 248.1\,\mathrm{mm} - \frac{109.9\,\mathrm{mm}}{3} = 211.4\,\mathrm{mm}
+z = d_{2,x} - \frac{x}{3} = 243.1\,\mathrm{mm} - \frac{108.5\,\mathrm{mm}}{3} = 206.9\,\mathrm{mm}
 $$
 
 ## Gebraucht von

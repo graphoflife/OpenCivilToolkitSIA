@@ -1,5 +1,5 @@
 ---
-erzeugt: 0bb5faa650f9
+erzeugt: b7b047e8d849
 art: formel
 tags: [formel]
 ---
@@ -24,8 +24,8 @@ Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 $$
 \begin{aligned}
   x &= \sqrt{\rho^{2} + 2 \cdot d_{2,x} \cdot \rho} - \rho \\
-  &= \sqrt{\left(43.73\,\mathrm{mm}\right)^{2} + 2 \cdot 248.1\,\mathrm{mm} \cdot 43.73\,\mathrm{mm}} - 43.73\,\mathrm{mm} \\
-  &= 109.9\,\mathrm{mm}
+  &= \sqrt{\left(43.73\,\mathrm{mm}\right)^{2} + 2 \cdot 243.1\,\mathrm{mm} \cdot 43.73\,\mathrm{mm}} - 43.73\,\mathrm{mm} \\
+  &= 108.5\,\mathrm{mm}
 \end{aligned}
 $$
 

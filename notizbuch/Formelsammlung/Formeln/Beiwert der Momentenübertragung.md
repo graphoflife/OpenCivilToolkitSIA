@@ -1,5 +1,5 @@
 ---
-erzeugt: 3bb8114bb757
+erzeugt: b47fbbb0eacd
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.6.2.4, (57)"
@@ -23,7 +23,7 @@ $$
 Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
-k_e = \frac{1}{1 + \frac{e_u}{b}} = \frac{1}{1 + \frac{1\,\mathrm{mm}}{734\,\mathrm{mm}}} = 0.999
+k_e = \frac{1}{1 + \frac{e_u}{b}} = \frac{1}{1 + \frac{1\,\mathrm{mm}}{730\,\mathrm{mm}}} = 0.999
 $$
 
 ## Gebraucht von

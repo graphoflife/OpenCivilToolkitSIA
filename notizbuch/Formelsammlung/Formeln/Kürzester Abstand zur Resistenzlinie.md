@@ -1,5 +1,5 @@
 ---
-erzeugt: ea65f1227a86
+erzeugt: 1c63f112ccb0
 art: formel
 tags: [formel]
 ---
@@ -28,8 +28,8 @@ Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 $$
 \begin{aligned}
   a &= \sqrt{\left(\frac{N_{Ed} - N_P}{N_{ref}}\right)^{2} + \left(\frac{M_{Ed} - M_P}{M_{ref}}\right)^{2}} \\
-  &= \sqrt{\left(\frac{-500\,\mathrm{kN} - 160.8\,\mathrm{kN}}{5000\,\mathrm{kN}}\right)^{2} + \left(\frac{30\,\mathrm{kNm} - 38.6\,\mathrm{kNm}}{178.6\,\mathrm{kNm}}\right)^{2}} \\
-  &= 0.141
+  &= \sqrt{\left(\frac{-500\,\mathrm{kN} - 149.8\,\mathrm{kN}}{5000\,\mathrm{kN}}\right)^{2} + \left(\frac{30\,\mathrm{kNm} - 38.4\,\mathrm{kNm}}{175.9\,\mathrm{kNm}}\right)^{2}} \\
+  &= 0.139
 \end{aligned}
 $$
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: a623bc27841d
+erzeugt: c36b8e9a592c
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.6.6.2"
@@ -25,7 +25,7 @@ $$
 Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
-d_{v,P} = d - c_P = 234\,\mathrm{mm} - 20\,\mathrm{mm} = 214\,\mathrm{mm}
+d_{v,P} = d - c_P = 229\,\mathrm{mm} - 20\,\mathrm{mm} = 209\,\mathrm{mm}
 $$
 
 ## Im Code

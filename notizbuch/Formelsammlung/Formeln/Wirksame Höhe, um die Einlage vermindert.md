@@ -1,5 +1,5 @@
 ---
-erzeugt: fba49d28473e
+erzeugt: 3a64aed61480
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.3.2.9"
@@ -23,7 +23,7 @@ $$
 Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
-d_v = d - e_{Einlage} = 165\,\mathrm{mm} - 40\,\mathrm{mm} = 125\,\mathrm{mm}
+d_v = d - e_{Einlage} = 160\,\mathrm{mm} - 40\,\mathrm{mm} = 120\,\mathrm{mm}
 $$
 
 ## Gebraucht von

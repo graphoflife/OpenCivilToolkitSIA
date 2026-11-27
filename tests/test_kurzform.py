@@ -125,13 +125,13 @@ class TestKurzformDerPlatte(unittest.TestCase):
         self.assertEqual(m.analytisch, (
             r"A_{s,2,x} \cdot f_{yd} \cdot \left(d_{2,x} - "
             r"\frac{A_{s,2,x} \cdot f_{yd}}{2 \cdot b \cdot f_{cd}}\right)"))
-        self.assertEqual(m.ergebnis, r"235.9\,\mathrm{kNm}")
+        self.assertEqual(m.ergebnis, r"230.6\,\mathrm{kNm}")
         self.assertIn(r"\Rightarrow", zeilen[1].latex)
 
     def test_negatives_moment(self):
         zeilen = self.kurz("querschnitt.q1.nachweis.mn.x.Stütze.erfuellungsgrad")
         self.assertTrue(zeilen[0].formelzeile.analytisch.startswith("-A_{s,3,x}"))
-        self.assertEqual(zeilen[0].formelzeile.ergebnis, r"-79.9\,\mathrm{kNm}")
+        self.assertEqual(zeilen[0].formelzeile.ergebnis, r"-78.3\,\mathrm{kNm}")
 
     def test_querkraft_mit_buegeln_in_drei_formeln(self):
         zeilen = self.kurz("querschnitt.q1.nachweis.querkraft.x.Feld.erfuellungsgrad")
@@ -143,8 +143,8 @@ class TestKurzformDerPlatte(unittest.TestCase):
     def test_plattenquerkraft_in_drei_formeln(self):
         """Die Dehnung, der Widerstand mit k_d darin, der Erfüllungsgrad --
         plastisch (Feld) wie elastisch (Rand) gleich gebaut."""
-        for ziel, ergebnis in (("Feld", r"83.2\,\mathrm{kN}/\mathrm{m}"),
-                               ("Rand", r"110.7\,\mathrm{kN}/\mathrm{m}")):
+        for ziel, ergebnis in (("Feld", r"80.8\,\mathrm{kN}/\mathrm{m}"),
+                               ("Rand", r"106.2\,\mathrm{kN}/\mathrm{m}")):
             with self.subTest(ziel=ziel):
                 zeilen = self.kurz(f"querschnitt.q2.nachweis.querkraft.x.{ziel}.erfuellungsgrad")
                 self.assertEqual(len(zeilen), 3)
