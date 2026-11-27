@@ -1,5 +1,5 @@
 ---
-erzeugt: a7c49701cc20
+erzeugt: 7be9fc68e2ef
 art: modul
 tags: [modul]
 ---
@@ -93,6 +93,8 @@ Bewehrung der Vergleich mit seinem Urteil, sonst was ohne sie fehlt, der
 Pilz und die Leisten mit ihren Schnitten – und das Urteil über alle. Passt
 kein Produkt, sagt die letzte Zeile das statt eines Grads: die Nachweise
 mit Bewehrung sind dann nicht geführt ([[opencivil.core.nachweis#NachweisUrteil|NachweisUrteil.offen]]).
+Ohne Stützenkraft steht statt des Vergleichs der Satz aller Nachweise ohne
+Einwirkung.
 
 ### _gesamt
 

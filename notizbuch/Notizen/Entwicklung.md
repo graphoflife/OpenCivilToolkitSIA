@@ -7,6 +7,17 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-27 · Durchstanzen ohne Last: der Grundriss sagt es auch
+
+Aufräumen A2 des Plans vom 2026-11-27. Die Zusammenfassung sagte ohne
+Stützenkraft schon seit dem 2026-11-19 «Keine Einwirkung → kein Nachweis.»;
+unter dem Grundriss stand noch «V_d = 0 ≤ V_Rd,c = 866.7 kN – erfüllt,
+α = ∞». Jetzt steht dort derselbe Satz.
+
+Ob die Stütze nichts trägt, sagt der Befund (`ohne_einwirkung` in
+`durchstanzen/nachweis.py`); Nachweis und Legende fragen beide ihn, damit die
+Regel an einer Stelle steht.
+
 ## 2026-11-27 · Pfahl: η_a aus der Grundlage, Spitzendruck eingegeben
 
 Schritt 6 des Plans vom 2026-11-27.

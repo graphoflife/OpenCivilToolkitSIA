@@ -1,5 +1,5 @@
 ---
-erzeugt: 7692fecee701
+erzeugt: 291c02bd5da3
 art: modul
 tags: [modul]
 ---
@@ -609,7 +609,7 @@ Ein Projekt aus der Datei, gelesen und geprueft. Was eine Datei von
 frueher anders schreibt, bringt [[opencivil.projekt.frueher|frueher]] in
 die neue Form: die Zahl γ_w von Grundbruch und Pfahl wird ein Wasser,
 die Spannungen eines Spannglieds werden Faktoren, und ein Pfahl
-bekommt den Schalter für η_a.
+bekommt den Schalter fuer η_a.
 
 #### Projekt.neu
 

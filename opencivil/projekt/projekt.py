@@ -850,7 +850,7 @@ class Projekt(Beschreibung):
         frueher anders schreibt, bringt :mod:`~opencivil.projekt.frueher` in
         die neue Form: die Zahl γ_w von Grundbruch und Pfahl wird ein Wasser,
         die Spannungen eines Spannglieds werden Faktoren, und ein Pfahl
-        bekommt den Schalter für η_a.
+        bekommt den Schalter fuer η_a.
         """
         roh, alte = gamma_w_heraus(spannungen_als_faktoren(umrechnung_setzen(roh)))
         projekt = super().aus_dict(roh, wo)

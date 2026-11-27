@@ -31,6 +31,7 @@ from opencivil.querschnitt.geometrie import abstand_strecke_polygon
 from opencivil.projekt import DurchstanzEintrag, Projekt, ProjektFehler
 from opencivil.web import dienst
 from opencivil.web.api import katalog
+from opencivil.web.durchstanzdaten import situation
 from tests.unfertig import meldung
 
 #: C30/37 und B500B nach SIA 262 -- τ_cd = 0.3·√f_ck / γ_c, f_yd = f_sk / γ_s.
@@ -86,6 +87,17 @@ class TestOhneEinwirkung(unittest.TestCase):
         self.assertEqual(urteil.hinweis, OHNE_EINWIRKUNG)
         self.assertIn(OHNE_EINWIRKUNG, texte(loesung))
         self.assertTrue(befund.umriss)
+
+    def test_der_grundriss_sagt_es_auch(self):
+        """
+        Unter dem Bild steht derselbe Satz -- bis 2026-11-27 stand dort
+        «V_d = 0 ≤ V_Rd,c = 866.7 kN – erfüllt, α = ∞».
+        """
+        p = projekt(V_d=0.0)
+        aufbau, loesung, _, _ = rechnen(p)
+        legende = situation(aufbau, p.durchstanzstellen[0].kennung, loesung)["legende"]
+        self.assertEqual(legende[-1], [{"text": OHNE_EINWIRKUNG}])
+        self.assertNotIn("infty", str(legende))
 
 
 class TestInnenstuetzeVonHand(unittest.TestCase):

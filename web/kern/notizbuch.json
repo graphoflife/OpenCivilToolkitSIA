@@ -6587,6 +6587,7 @@
         "Rotation",
         "Biegelage",
         "Durchstanzbefund",
+        "Durchstanzbefund.ohne_einwirkung",
         "Durchstanzen",
         "Durchstanzen.mit_graden",
         "Durchstanzen.nicht_fuehrbar",

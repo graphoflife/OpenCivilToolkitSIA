@@ -1,5 +1,5 @@
 ---
-erzeugt: 986c1758bc8b
+erzeugt: 6ce0b7b15478
 art: modul
 tags: [modul]
 ---
@@ -128,6 +128,17 @@ braucht; jedes mit seinen eigenen Zahlen.
 - `lagen: Tuple[Biegelage, ...] = ()` – Die beiden Lagen der Zugbewehrung, die äussere zuerst.
 - `leisten: Optional[Leistenpruefung] = None` – Die vorgeschlagene Durchstanzbewehrung mit ihren Nachweisen (4.3.6.5.1).
 - `pilz: Optional[Pilzbefund] = None` – Der gewählte Stahlpilz; mit `leisten` stehen die Leisten um ihn.
+
+#### Durchstanzbefund.ohne_einwirkung
+
+```python
+@property
+def ohne_einwirkung(self) -> bool
+```
+
+Ob die Stütze nichts trägt – dann ist nichts durchzustanzen. Die eine
+Stelle für Nachweis und Grundriss: dort stand bis 2026-11-27
+«V_d = 0 ≤ V_Rd,c – erfüllt, α = ∞».
 
 ### Durchstanzen
 

@@ -157,6 +157,15 @@ class Durchstanzbefund:
     pilz: Optional[Pilzbefund] = None
     """Der gewählte Stahlpilz; mit ``leisten`` stehen die Leisten um ihn."""
 
+    @property
+    def ohne_einwirkung(self) -> bool:
+        """
+        Ob die Stütze nichts trägt -- dann ist nichts durchzustanzen. Die eine
+        Stelle für Nachweis und Grundriss: dort stand bis 2026-11-27
+        «V_d = 0 ≤ V_Rd,c – erfüllt, α = ∞».
+        """
+        return self.innen.V_d == 0.0
+
 
 class Durchstanzen(Nachweis):
     """Der Durchstanznachweis an einer Durchstanzstelle -- siehe Dateikopf."""
@@ -258,7 +267,7 @@ class Durchstanzen(Nachweis):
                           for h in f.raender(masse)),
             lagen=tuple(Biegelage(r, e.g("h").si - hoehen[r].groesse.si, e.g(f"phi_{r.value}").si,
                                   e.g(f"s_{r.value}").si) for r in (s.aussen, s.aussen.gegenrichtung)))
-        if e.g("V_d").si == 0.0:
+        if befund.ohne_einwirkung:
             # Ohne Stützenkraft ist nichts durchzustanzen -- bis 2026-11-19 stand
             # eine frische Stelle als «erfüllt, ∞» in der Zusammenfassung.
             p.text(OHNE_EINWIRKUNG)

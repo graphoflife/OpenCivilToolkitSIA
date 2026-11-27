@@ -29,7 +29,7 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 from opencivil.core.einheiten import EINHEITSLOS, KN, MM, Groesse
 from opencivil.core.latex import Mathe
-from opencivil.core.nachweis import NachweisUrteil
+from opencivil.core.nachweis import OHNE_EINWIRKUNG, NachweisUrteil
 from opencivil.core.rechenwerk import Loesung
 from opencivil.core.wert import Wert
 from opencivil.durchstanzen.bewehrung import BEREICH_VON
@@ -195,6 +195,8 @@ def _legende(befund: Durchstanzbefund, urteile: Sequence[NachweisUrteil]) -> Lis
     Pilz und die Leisten mit ihren Schnitten -- und das Urteil über alle. Passt
     kein Produkt, sagt die letzte Zeile das statt eines Grads: die Nachweise
     mit Bewehrung sind dann nicht geführt (:attr:`NachweisUrteil.offen`).
+    Ohne Stützenkraft steht statt des Vergleichs der Satz aller Nachweise ohne
+    Einwirkung.
     """
     innen, b, pilz = befund.innen, befund.leisten, befund.pilz
     gefuehrt = [u for u in urteile if not u.offen]
@@ -207,6 +209,9 @@ def _legende(befund: Durchstanzbefund, urteile: Sequence[NachweisUrteil]) -> Lis
               " von den Ecken grosser Stützen und entlang von Wänden, und was hinter "
               "Aussparungen liegt."),
     ]
+    if befund.ohne_einwirkung:
+        zeilen.append(zeile(OHNE_EINWIRKUNG))
+        return zeilen
     if b is None and pilz is None and gefuehrt:
         zeilen.append(zeile(*urteil(f"V_d = {_kraft(innen.V_d_red)}", r"\le",
                                     f"V_{{Rd,c}} = {_kraft(befund.V_Rd_c)}", *_gesamt(gefuehrt)),
