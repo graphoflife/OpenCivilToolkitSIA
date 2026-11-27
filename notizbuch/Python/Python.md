@@ -1,5 +1,5 @@
 ---
-erzeugt: c0ea47ed1b6c
+erzeugt: a6e0bd27f860
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -39,6 +39,16 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.decke.baender]] – die Bänder, die eine Decke selbst legt.
     - [[opencivil.decke.durchlauftraeger]] – ein Streifen als Durchlaufträger.
     - [[opencivil.decke.feld]] – die Schnittkräfte der Platte an einer Stelle.
+  - [[opencivil.decke.fem]] – die Decke nach der Methode der finiten Elemente.
+      - [[opencivil.decke.fem.auswertung]] – die FEM an einer Stelle, längs eines Schnitts, im Träger.
+      - [[opencivil.decke.fem.belastung]] – die Lasten eines Falls auf den Knoten.
+      - [[opencivil.decke.fem.delaunay]] – eine Delaunay-Triangulierung, Punkt für Punkt.
+      - [[opencivil.decke.fem.element]] – das Dreieck der Platte und der Balken in ihr.
+      - [[opencivil.decke.fem.glaetten]] – die Schnittkräfte an den Knoten.
+      - [[opencivil.decke.fem.herleitung]] – wie die FEM einer Decke ihre Rechnung aufschreibt.
+      - [[opencivil.decke.fem.netz]] – das Dreiecksnetz einer Decke.
+      - [[opencivil.decke.fem.rechnung]] – die FEM der Decke, Fall für Fall.
+      - [[opencivil.decke.fem.system]] – das Gleichungssystem der Platte.
     - [[opencivil.decke.geometrie]] – Vielecke in der Ebene der Decke.
     - [[opencivil.decke.herleitung]] – wie eine Decke ihre Rechnung aufschreibt.
     - [[opencivil.decke.lasten]] – die Lasten eines Lastfalls auf den Streifen.

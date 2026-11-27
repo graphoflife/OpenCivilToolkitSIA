@@ -40,8 +40,9 @@ from opencivil.decke import feld
 from opencivil.decke import geometrie as geo
 from opencivil.decke.aufteilung import GANZ_AB
 from opencivil.decke.baender import art
+from opencivil.decke.lasten import stege
 from opencivil.decke.modell import Aufteilung, Decke, Flaechenlast, Last, Linienlast, Punktlast, Traeger
-from opencivil.decke.rechnung import Ergebnis, Fallergebnis, lagerverlauf, spitzen
+from opencivil.decke.rechnung import Ergebnis, Fallergebnis, spitzen
 from opencivil.decke.streifen import Streifen, Durchlauftraeger, Zerlegung, richtungen_der_platte
 from opencivil.stabwerk.verlauf import extremwerte
 
@@ -120,9 +121,20 @@ LASTVERTEILELEMENT = (
     r"& m'_{yu} \ge \frac{Q}{8} \cdot \frac{l_y}{l_x} \qquad "
     r"m_{yu} \ge \left(\frac{1}{2\pi} - \frac{1}{8}\right) \cdot Q \cdot \frac{l_y}{l_x} \end{aligned}")
 
-#: Die Schnittkräfte der Platte im Bericht: je Grösse ihr Zeichen und ihre Einheit.
-SCHNITTKRAEFTE = (("m_x", "m_x", "kNm/m"), ("m_y", "m_y", "kNm/m"), ("m_xy", "m_{xy}", "kNm/m"),
-                  ("v_x", "v_x", "kN/m"), ("v_y", "v_y", "kN/m"), ("v_0", "v_0", "kN/m"))
+#: Die Schnittkräfte der Platte im Bericht: je Grösse ihr Zeichen, ihre Einheit und ihr Faktor aus SI.
+SCHNITTKRAEFTE = (("m_x", "m_x", "kNm/m", 1e-3), ("m_y", "m_y", "kNm/m", 1e-3),
+                  ("m_xy", "m_{xy}", "kNm/m", 1e-3), ("v_x", "v_x", "kN/m", 1e-3),
+                  ("v_y", "v_y", "kN/m", 1e-3), ("v_0", "v_0", "kN/m", 1e-3))
+
+#: Wie die Kraft längs eines Linienlagers verteilt ist, in der Streifenmethode.
+LAENGS = ("Längs eines Linienlagers gibt jeder Durchlaufträger seine Kraft gleichmässig über das "
+          "Stück ab, über das er geht; wo zwei dasselbe Stück tragen, zählen beide.")
+
+#: Was ein eingespanntes Linienlager im Bericht über sein Moment sagt -- in beiden Verfahren.
+EINGESPANNT = (
+    " Ebenso m_max, das Moment, das ein eingespanntes Lager hält, mit dem Vorzeichen der Platte: "
+    "negativ, wo es oben zieht. Liegt Platte zu beiden Seiten, hält es nur den Unterschied "
+    "ihrer Momente; dann gilt das Vorzeichen der Seite, die stärker zieht.")
 
 #: Die Biegewiderstände: Feld von :class:`~opencivil.decke.feld.Widerstaende`, Zeichen, Bedeutung.
 WIDERSTAENDE = (("mxu", "m_{xu}", "unten, in x"), ("myu", "m_{yu}", "unten, in y"),
@@ -135,8 +147,9 @@ def schreiben(p: Protokoll, system: "Deckensystem", befund: "Deckenbefund") -> N
         return
     p.annahme(ANNAHME)
     _platten(p, system, befund.gerechnet)
+    linienlager(p, befund.gerechnet)
     _lager(p, befund.gerechnet, befund.ergebnis)
-    _lasten(p, befund.gerechnet)
+    lasten(p, befund.gerechnet)
     for m in befund.meldungen:
         (p.warnung if m.fehler else p.hinweis)(m.text)
     e = befund.ergebnis
@@ -144,7 +157,7 @@ def schreiben(p: Protokoll, system: "Deckensystem", befund: "Deckenbefund") -> N
         return
     _streifen(p, e)
     _aufteilung(p, befund.gerechnet)
-    _faelle(p, e)
+    faelle(p, e)
     if not e.faelle:
         return
     _ansaetze(p, e)
@@ -153,7 +166,7 @@ def schreiben(p: Protokoll, system: "Deckensystem", befund: "Deckenbefund") -> N
         _fall(p, e, f, zellen)
 
 
-def _ort(punkt: geo.Punkt) -> str:
+def als_ort(punkt: geo.Punkt) -> str:
     return f"({fest(punkt[0], 2)}, {fest(punkt[1], 2)})"
 
 
@@ -181,13 +194,18 @@ def _platten(p: Protokoll, system: "Deckensystem", decke: Decke) -> None:
                                           else f"der Platten {', '.join(selbst)}")))
 
 
-def _lager(p: Protokoll, decke: Decke, e: Optional[Ergebnis]) -> None:
+def linienlager(p: Protokoll, decke: Decke) -> None:
+    """Die Linienlager, wie sie gezeichnet sind -- in beiden Verfahren gleich."""
     ja = {True: "ja", False: "nein"}
     if decke.linienlager:
         p.tabelle(["Linienlager", "von", "bis", Mathe(r"L\ [\mathrm{m}]"), "vertikal", "eingespannt"],
-                  [[l.name, _ort(l.a), _ort(l.b), Mathe(fest(math.dist(l.a, l.b), 2)),
+                  [[l.name, als_ort(l.a), als_ort(l.b), Mathe(fest(math.dist(l.a, l.b), 2)),
                     ja[l.vertikal], ja[l.eingespannt]] for l in decke.linienlager],
                   titel="Linienlager")
+
+
+def _lager(p: Protokoll, decke: Decke, e: Optional[Ergebnis]) -> None:
+    """Stützen mit ihren Bereichen, Träger mit ihrer Stufe und die Bänder."""
     if decke.stuetzen:
         bereiche = e.zerlegung.stuetzenbereiche if e is not None and e.zerlegung else {}
         zeilen = []
@@ -199,29 +217,33 @@ def _lager(p: Protokoll, decke: Decke, e: Optional[Ergebnis]) -> None:
                 masse = f"{fest(lx[1] - lx[0], 2)} × {fest(ly[1] - ly[0], 2)}"
             else:
                 masse = "–"
-            zeilen.append([s.name, _ort(s.ort), f"{fest(s.bx * 1e3, 0)} × {fest(s.by * 1e3, 0)}",
+            zeilen.append([s.name, als_ort(s.ort), f"{fest(s.bx * 1e3, 0)} × {fest(s.by * 1e3, 0)}",
                            masse, "von Hand" if s.lx is not None else "von selbst"])
         p.tabelle(["Stütze", "Ort", Mathe(r"b_x \times b_y\ [\mathrm{mm}]"),
                    Mathe(r"l_x \times l_y\ [\mathrm{m}]"), "Stützenbereich"], zeilen, titel="Stützen")
     eigene = [u for u in decke.traeger if not u.von_selbst]
     if eigene:
         p.tabelle(["Träger", "von", "bis", Mathe(r"b\ [\mathrm{m}]"), "Stufe"],
-                  [[u.name, _ort(u.a), _ort(u.b), Mathe(fest(u.breite, 2)), f"{u.stufe:g}"]
+                  [[u.name, als_ort(u.a), als_ort(u.b), Mathe(fest(u.breite, 2)), f"{u.stufe:g}"]
                    for u in eigene], titel="Träger")
     baender = [u for u in decke.traeger if u.von_selbst]
     if baender:
         p.tabelle(["Band", "von", "bis", Mathe(r"b\ [\mathrm{m}]"), "wo"],
-                  [[u.name, _ort(u.a), _ort(u.b), Mathe(fest(u.breite, 2)), art(u)] for u in baender],
+                  [[u.name, als_ort(u.a), als_ort(u.b), Mathe(fest(u.breite, 2)), art(u)] for u in baender],
                   titel="Bänder, von der Rechnung gelegt")
         p.text(BAENDER)
 
 
-def _lasten(p: Protokoll, decke: Decke) -> None:
-    """Die Lasten je Lastfall, wie sie beschrieben sind, und die Beiwerte der Kombinationen."""
+def lasten(p: Protokoll, decke: Decke) -> None:
+    """
+    Die Lasten je Lastfall, wie sie beschrieben sind, und die Beiwerte der
+    Kombinationen -- im Eigengewicht auch die Stege der Träger mit Höhe.
+    """
     zeilen = []
     for lf in decke.lastfaelle:
         if lf.eigengewicht:
             zeilen.append([lf.name, "Eigengewicht", "jede Platte", Mathe(r"\rho \cdot g \cdot h")])
+            zeilen.extend([lf.name, *_last(steg)] for steg in stege(decke))
         zeilen.extend([lf.name, *_last(last)] for last in lf.lasten)
     if zeilen:
         p.tabelle(["Lastfall", "Last", "wo", "Wert"], zeilen, titel="Lasten, nach unten positiv")
@@ -241,9 +263,9 @@ def _last(last: Last) -> list:
               else f"A = {fest(abs(geo.flaeche(list(last.ecken))), 2)} m²")
         return [last.name, wo, Mathe(f"{fest(last.wert / 1e3, 2)}" + r"\ \mathrm{kN/m^{2}}")]
     if isinstance(last, Linienlast):
-        return [last.name, f"{_ort(last.a)} – {_ort(last.b)}",
+        return [last.name, f"{als_ort(last.a)} – {als_ort(last.b)}",
                 Mathe(f"{fest(last.wert / 1e3, 2)}" + r"\ \mathrm{kN/m}")]
-    return [last.name, f"{_ort(last.ort)}, verteilt über {fest(last.lx, 2)} × {fest(last.ly, 2)} m",
+    return [last.name, f"{als_ort(last.ort)}, verteilt über {fest(last.lx, 2)} × {fest(last.ly, 2)} m",
             Mathe(f"{fest(last.wert / 1e3, 1)}" + r"\ \mathrm{kN}")]
 
 
@@ -296,16 +318,19 @@ def _aufteilung(p: Protokoll, decke: Decke) -> None:
                + "; ".join(sorted(richtungen)) + ". Die Aufteilung gilt je Platte in ihren zwei Richtungen.")
 
 
-def _faelle(p: Protokoll, e: Ergebnis) -> None:
-    """Je Lastfall und Kombination die Last und was die Lager tragen -- die Probe --, und die Meldungen der Fälle."""
+def faelle(p: Protokoll, e, ausser: str = "auf einem Streifen, der nicht trägt") -> None:
+    """
+    Je Lastfall und Kombination die Last und was die Lager tragen -- die
+    Probe --, und die Meldungen der Fälle. ``ausser``: wo, ausser neben den
+    Platten, Last liegt, die nicht getragen wird.
+    """
     if not e.faelle:
         return
     p.tabelle(["Fall", Mathe(r"Q\ [\mathrm{kN}]"), Mathe(r"Q_{\mathrm{daneben}}\ [\mathrm{kN}]"),
                Mathe(r"Q_{\mathrm{nicht\ getragen}}\ [\mathrm{kN}]"), Mathe(r"\sum R\ [\mathrm{kN}]")],
               [[f.name, *(Mathe(fest(w / 1e3, 1)) for w in (f.summe, f.daneben, f.nicht_getragen, f.lagerkraft))]
                for f in e.faelle], titel="Last und Lagerkräfte je Fall")
-    p.text("Die Lager tragen die ganze Last ausser dem, was neben den Platten liegt oder auf einem "
-           "Streifen, der nicht trägt.")
+    p.text(f"Die Lager tragen die ganze Last ausser dem, was neben den Platten liegt oder {ausser}.")
     for m in e.fallmeldungen():
         (p.warnung if m.fehler else p.hinweis)(m.text)
 
@@ -354,11 +379,11 @@ def _fall(p: Protokoll, e: Ergebnis, f: Fallergebnis, zellen: Sequence[Sequence[
         p.text("Nichts trägt in diesem Fall.")
         return
     _durchlauftraeger(p, e, f)
-    _lagerkraefte(p, e, f)
+    lagerkraefte(p, e, f, LAENGS)
     proben = feld.proben(e, f, zellen)
     if proben:
-        _schnittkraefte(p, proben)
-        _widerstaende(p, proben)
+        schnittkraefte(p, proben)
+        widerstaende(p, proben)
     _lastverteilelemente(p, e, f)
 
 
@@ -387,8 +412,8 @@ def _durchlauftraeger(p: Protokoll, e: Ergebnis, f: Fallergebnis) -> None:
     p.tabelle(["Durchlaufträger", Mathe(r"b\ [\mathrm{m}]"), Mathe(r"L\ [\mathrm{m}]"),
                Mathe(r"Q/b\ [\mathrm{kN/m}]"), "Lager [kN/m]", Mathe(r"m_{\min}\ [\mathrm{kNm/m}]"),
                Mathe(r"s\ [\mathrm{m}]"), Mathe(r"m_{\max}\ [\mathrm{kNm/m}]"), Mathe(r"s\ [\mathrm{m}]")],
-              [[namen[0] if len(namen) == 1 else f"{namen[0]} … {namen[-1]}", *map(_zahl, werte[:3]),
-                werte[3], *map(_zahl, werte[4:])] for namen, werte, _ in zeilen],
+              [[namen[0] if len(namen) == 1 else f"{namen[0]} … {namen[-1]}", *map(zahl, werte[:3]),
+                werte[3], *map(zahl, werte[4:])] for namen, werte, _ in zeilen],
               titel="Durchlaufträger, je Meter ihrer Breite")
     p.text("Q ist die Last auf dem Durchlaufträger, mit dem, was tiefere Durchlaufträger in ihn geben. "
            "s misst längs der Richtung φ des Durchlaufträgers, s = x · cos φ + y · sin φ: in x ist "
@@ -417,20 +442,24 @@ def _mit_stelle(m: float, s: float) -> Tuple[str, str]:
     return wert, fest(s, 2) if wert != "0.0" else "–"
 
 
-def _zahl(text: str):
+def zahl(text: str):
     """Eine Zahl als Formel, damit ihr Minus eines ist; der Strich bleibt Text."""
     return text if text == "–" else Mathe(text)
 
 
-def _lagerkraefte(p: Protokoll, e: Ergebnis, f: Fallergebnis) -> None:
-    """Was jedes Lager trägt; längs eines Linienlagers die Spitze und, eingespannt, die des Moments."""
+def lagerkraefte(p: Protokoll, e, f, wie: str) -> None:
+    """
+    Was jedes Lager trägt; längs eines Linienlagers die Spitze und,
+    eingespannt, die des Moments -- ``wie`` sagt, wie die Kraft längs eines
+    Linienlagers verteilt ist.
+    """
     eingespannt = any(l.eingespannt for l in e.decke.linienlager)
     zeilen = []
     for s in e.decke.stuetzen:
         zeilen.append([f"{s.name} · Stütze", Mathe(fest(f.stuetzenkraft(s.name) / 1e3, 1)), "–"]
                       + (["–"] if eingespannt else []))
     for l in e.decke.linienlager:
-        r_max, m_max = spitzen(lagerverlauf(l, f.linienlager.get(l.name, ())))
+        r_max, m_max = spitzen(f.lagerstufen(l))
         zeilen.append([f"{l.name} · Linienlager", Mathe(fest(f.wandkraft(l.name) / 1e3, 1)),
                        Mathe(fest(r_max / 1e3, 1))]
                       + ([Mathe(fest(m_max / 1e3, 1)) if l.eingespannt else "–"] if eingespannt else []))
@@ -439,40 +468,38 @@ def _lagerkraefte(p: Protokoll, e: Ergebnis, f: Fallergebnis) -> None:
     p.tabelle(["Lager", Mathe(r"F\ [\mathrm{kN}]"), Mathe(r"r_{\max}\ [\mathrm{kN/m}]")]
               + ([Mathe(r"m_{\max}\ [\mathrm{kNm/m}]")] if eingespannt else []),
               zeilen, titel="Lagerkräfte")
-    p.text("Längs eines Linienlagers gibt jeder Durchlaufträger seine Kraft gleichmässig über das "
-           "Stück ab, über das er geht; wo zwei dasselbe Stück tragen, zählen beide. r_max ist der Wert "
-           "mit dem grössten Betrag."
-           + (" Ebenso m_max, das Moment, das ein eingespanntes Lager hält, mit dem Vorzeichen der Platte: "
-              "negativ, wo es oben zieht. Liegt Platte zu beiden Seiten, hält es nur den Unterschied "
-              "ihrer Momente; dann gilt das Vorzeichen der Seite, die stärker zieht." if eingespannt else ""))
+    p.text(f"{wie} r_max ist der Wert mit dem grössten Betrag." + (EINGESPANNT if eingespannt else ""))
 
 
-def _schnittkraefte(p: Protokoll, proben: Sequence[feld.Probe]) -> None:
-    """Die grössten und kleinsten Schnittkräfte der Platte, mit Ort."""
+def schnittkraefte(p: Protokoll, proben: Sequence[feld.Probe], groessen=SCHNITTKRAEFTE,
+                   wo: str = "Gesucht am Schwerpunkt jeder Zelle der Bilder und an den Stellen, an denen "
+                             "ein Durchlaufträger springt oder Querkraft oder Last null werden.") -> None:
+    """Die grössten und kleinsten Schnittkräfte der Platte, mit Ort -- ``wo`` sagt, wo gesucht ist."""
     zeilen = []
-    for groesse, zeichen, einheit in SCHNITTKRAEFTE:
+    for groesse, zeichen, einheit, faktor in groessen:
         (ort_klein, klein), (ort_gross, gross) = feld.extrem(proben, lambda k, g=groesse: k.groesse(g))
-        zeilen.append([Mathe(zeichen), Mathe(f"{fest(klein / 1e3, 1)}\\ \\mathrm{{{einheit}}}"),
-                       _ort_von(ort_klein, klein), Mathe(f"{fest(gross / 1e3, 1)}\\ \\mathrm{{{einheit}}}"),
-                       _ort_von(ort_gross, gross)])
+        zeilen.append([Mathe(zeichen), Mathe(f"{fest(klein * faktor, 1)}\\ \\mathrm{{{einheit}}}"),
+                       ort_von(ort_klein, klein * faktor),
+                       Mathe(f"{fest(gross * faktor, 1)}\\ \\mathrm{{{einheit}}}"),
+                       ort_von(ort_gross, gross * faktor)])
     p.tabelle(["Grösse", "kleinst", "Ort", "grösst", "Ort"], zeilen, titel="Schnittkräfte der Platte, je Meter")
-    p.text("Gesucht am Schwerpunkt jeder Zelle der Bilder und an den Stellen, an denen ein Durchlaufträger "
-           "springt oder Querkraft oder Last null werden. Momente positiv mit Zug unten.")
+    p.text(f"{wo} Momente positiv mit Zug unten.")
 
 
-def _widerstaende(p: Protokoll, proben: Sequence[feld.Probe]) -> None:
+def widerstaende(p: Protokoll, proben: Sequence[feld.Probe],
+                 titel: str = "Erforderliche Biegewiderstände, ohne Lastverteilelemente") -> None:
     """Die grössten erforderlichen Biegewiderstände, mit Ort."""
     zeilen = []
     for feldname, zeichen, wo in WIDERSTAENDE:
-        _, (ort, wert) = feld.extrem(proben, lambda k, n=feldname: getattr(feld.widerstaende(k), n))
-        zeilen.append([Mathe(zeichen), wo, Mathe(fest(wert / 1e3, 1) + r"\ \mathrm{kNm/m}"), _ort_von(ort, wert)])
-    p.tabelle(["Widerstand", "Seite", "erforderlich", "Ort"], zeilen,
-              titel="Erforderliche Biegewiderstände, ohne Lastverteilelemente")
+        _, (stelle, wert) = feld.extrem(proben, lambda k, n=feldname: getattr(feld.widerstaende(k), n))
+        zeilen.append([Mathe(zeichen), wo, Mathe(fest(wert / 1e3, 1) + r"\ \mathrm{kNm/m}"),
+                       ort_von(stelle, wert / 1e3)])
+    p.tabelle(["Widerstand", "Seite", "erforderlich", "Ort"], zeilen, titel=titel)
 
 
-def _ort_von(ort: geo.Punkt, wert: float) -> str:
-    """Wo ein Wert liegt -- ausser er steht als null da: das ist er an vielen Orten."""
-    return _ort(ort) if fest(wert / 1e3, 1) != "0.0" else "–"
+def ort_von(stelle: geo.Punkt, wert: float) -> str:
+    """Wo ein Wert liegt, in der Einheit des Berichts -- ausser er steht als null da: das ist er an vielen Orten."""
+    return als_ort(stelle) if fest(wert, 1) != "0.0" else "–"
 
 
 def _lastverteilelemente(p: Protokoll, e: Ergebnis, f: Fallergebnis) -> None:

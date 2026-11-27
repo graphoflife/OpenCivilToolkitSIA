@@ -79,6 +79,57 @@ sammeln sie sich hier, je mit dem, was vorläufig gebaut ist.
       zählt nie zum abgetrennten Teil. Sie bestimmt, welcher Teil getönt
       ist und welche Fläche A′ dasteht. Vorschlag: so lassen. Vorläufig:
       links.
+- [ ] **FEM: Netzweite 0.5 m als Vorgabe?** Gemessen auf der Seite
+      (Python im Browser), je Rechnung der Decke: das Beispiel «Kolloquium 4
+      nach FEM», 9 × 5.5 m, 0.3 s bei 0.5 m; eine Decke von 20 × 15 m 3 s
+      bei 0.5 m (1394 Knoten) und 0.4 s bei 1 m. Nach jeder Änderung rechnet
+      die Seite die Decke heute zwei- bis dreimal (Zeichnung,
+      Zusammenfassung, Bilder), bei 20 × 15 m also 6 bis 10 s. Mit 1 m
+      wird es ungenau: die gelenkige Platte 6 × 4 m biegt sich nach Navier
+      um 10 % weniger als richtig (bei 0.5 m 2.6 %, bei 0.25 m 0.6 %), die
+      Momente um 2 % (0.7 %). Vorschlag: 0.5 m lassen; für grosse Decken
+      beim Zeichnen 1 m und für den Bericht 0.5 m. Vorläufig: 0.5 m. Die
+      Grenze von 3000 Knoten (`KNOTEN_HOECHSTENS`, nach Vorgabe) heisst auf
+      der Seite etwa 9 s je Rechnung.
+- [ ] **FEM: schneller rechnen?** Zwei Wege, unabhängig vom Plan:
+      (a) Zeichnung und Bilder fragen nacheinander nach derselben Decke, und
+      jede rechnet sie neu (`_bauteil_rechnen` in `web/dienst.py` merkt
+      sich nichts) – ein kleiner Speicher dafür spart eine der zwei oder drei
+      Rechnungen, in jeder App. (b) Der Gleichungslöser
+      (`stabwerk/matrix.py`) mit `math.sumprod` statt `sum(map(mul, …))`:
+      die Zerlegung der Decke 20 × 15 m 0.48 statt 0.75 s, die Ergebnisse
+      gleich bis auf 10⁻¹². Vorschlag: beides, je als eigener Commit.
+      Vorläufig: nichts davon.
+- [ ] **FEM: die Querkraft eines Trägers am Lager?** Der Balken hat je Stück
+      zwischen zwei Knoten eine feste Querkraft; am Lager steht darum die
+      des ersten Stücks, und die liegt zu tief: um 7 % bei 0.2 m, 12 % bei
+      0.4 m (Träger 4 m, gleichmässige Last). Auch der Ort im Bericht ist
+      der Anfang des Stücks: T4 im Beispiel hat V = −116.1 kN bei u = 4.00 m,
+      die Stütze steht bei 4.50 m. Vorschlag: die Querkraft am Lager aus den
+      zwei Stücken daneben linear bis zum Lager verlängern – bei
+      gleichmässiger Last ist das genau. Vorläufig: das erste Stück.
+- [ ] **FEM: die Stütze als Punkt?** Sie hält die Platte nur in ihrer Mitte;
+      b_x und b_y rechnen nicht mit. Über ihr wachsen die Momente mit
+      feinerem Netz ohne Grenze – der Bericht sagt es in einem Hinweis.
+      Anders ginge es mit allen Knoten in b_x × b_y festgehalten; das braucht
+      aber ein Netz, das feiner ist als die Stütze. Vorschlag: so lassen.
+      Vorläufig: Punkt.
+- [ ] **FEM: die nötigen Biegewiderstände auch als Bild?** Heute stehen sie
+      in beiden Verfahren nur im Bericht, als grösster Wert mit Ort. Als
+      Bild wären es vier mehr: m_xu, m_yu, m'_xu, m'_yu. Vorschlag: ja, als
+      kleiner Schritt nach dem Plan. Vorläufig: nur im Bericht.
+- [ ] **FEM: was nach Vorgabe gebaut ist, nicht nachgeschlagen.** Je mit dem
+      Vorschlag «so lassen»:
+      - eine Einzellast über l_x × l_y verteilt, wie in der Streifenmethode,
+        statt im Punkt;
+      - der Steg eines Trägers (b × h_T) wiegt mit, in beiden Verfahren,
+        wenn der Lastfall das Eigengewicht hat;
+      - eine Last geht an die Ecken ihres Dreiecks, als wäre w dort linear;
+      - die Kraft längs eines Linienlagers mit den Nachbarn ausgeglichen
+        (1-2-1), an Enden, Ecken und Stössen im Punkt;
+      - ein Träger auf der Fuge zweier Platten nimmt h der ersten;
+      - Zonen gelten nur in der Streifenmethode; in der FEM sagt es eine
+        graue Meldung.
 
 ## Wünsche vom 2026-11-20
 

@@ -112,6 +112,7 @@ class TestSinnbilder(unittest.TestCase):
             "verduebelung": k["querschnittsanalyse"]["verduebelungen"],
             "blechfeld": k["querschnittsanalyse"]["blechfelder"],
             "blechlast": k["querschnittsanalyse"]["blechlasten"],
+            "verfahren": k["decke"]["verfahren"],
             # Grund und Zulage, je in den unteren und den oberen Lagen (platte.js).
             "zulage": [{"wert": f"{seite}-{gunst}"} for seite in ("unten", "oben")
                        for gunst in ("unguenstig", "guenstig")],

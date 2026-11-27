@@ -8,7 +8,10 @@
  * zugleich; was sie gemeinsam haben, steht da, sonst «Var» -- wie im
  * Balkensystem. Eine Stütze und eine Punktlast wählt man nicht für sich:
  * sie stehen im Fenster ihres Knotens, wie ein Lager im Balkensystem. Die
- * Lasten gelten dem Lastfall, den das Fenster zeigt (lastfaelle.js).
+ * Lasten gelten dem Lastfall, den das Fenster zeigt (lastfaelle.js). Was
+ * nur die Streifenmethode liest -- die Richtungen einer Platte, die Stufe
+ * eines Trägers, der Stützenbereich --, steht nur, wenn die Decke nach ihr
+ * rechnet.
  *
  * Vom Zeichenfenster kennt es nur `a`: was die Werkzeuge vorgeben
  * (`a.dk.vorgaben`) und das Modell. Was jedes Fenster mit Zeichnung gleich
@@ -98,19 +101,24 @@ function gewaehlteRichtungen(richtungen) {
 
 /**
  * Die Felder je Art -- für die Vorgabe eines Werkzeugs wie für gewählte
- * Teile; `wert` und `setzen` wie bei `feldzeile`.
+ * Teile; `wert` und `setzen` wie bei `feldzeile`, `streifen`, ob die Decke
+ * nach der Streifenmethode rechnet.
  */
 const FELDER = {
   // `richtungen`: was die Rechnung je gewählte Platte als Richtungen wählt (`richtungenVonSelbst`).
-  platten: (wert, setzen, richtungen = null) => {
+  platten: (wert, setzen, { streifen, richtungen = null }) => {
     const vonHand = wert('richtungen_von_hand');
+    const stoff = feldzeile('deckenplatte', 'h', 'Dicke h', wert, setzen, { schritt: 10 });
+    const beton = cadZeile('Beton', materialliste({
+      art: 'beton', gewaehlt: wert('beton'), setzen: setzen('beton'),
+      titel: streifen ? 'E_cm und das Gewicht der Platte kommen von ihm'
+        : 'E_cm, ν_c und das Gewicht der Platte kommen von ihm',
+    }));
+    if (!streifen) return [stoff, beton];
     const neben = { richtung_1: wert('richtung_1'), richtung_2: wert('richtung_2') };
     return [
-      feldzeile('deckenplatte', 'h', 'Dicke h', wert, setzen, { schritt: 10 }),
-      cadZeile('Beton', materialliste({
-        art: 'beton', gewaehlt: wert('beton'), setzen: setzen('beton'),
-        titel: 'E_cm und das Gewicht der Platte kommen von ihm',
-      })),
+      stoff,
+      beton,
       wahlBlock('Richtungen', wahlSchalter({
         werte: mitVar([
           {
@@ -139,17 +147,22 @@ const FELDER = {
     schalterzeile('eingespannt', jaNein(wert('eingespannt'), setzen('eingespannt'),
       'Hält die Drehung – ohne vertikalen Halt wie an einer Symmetrieachse')),
   ],
-  traeger: (wert, setzen) => [
+  traeger: (wert, setzen, { streifen }) => [
     feldzeile('traeger', 'breite', 'Breite b', wert, setzen, {
-      schritt: 0.1, titel: 'So breit trägt der Träger als Streifen in der Platte',
+      schritt: 0.1, titel: streifen ? 'So breit trägt der Träger als Streifen in der Platte'
+        : 'So breit ist der Träger: so breit zählen Balken und Platte zu seinem M und V',
     }),
-    feldzeile('traeger', 'stufe', 'Stufe', wert, setzen, {
+    feldzeile('traeger', 'h_T', 'Höhe h_T', wert, setzen, {
+      schritt: 50, titel: 'So weit reicht der Träger über oder unter die Platte – 0: er steckt in ihr. '
+        + 'Sein Steg wiegt mit; in der FEM ist er ein Balken in der Platte',
+    }),
+    streifen ? feldzeile('traeger', 'stufe', 'Stufe', wert, setzen, {
       titel: 'Ein Träger liegt auf denen höherer Stufe, die ihn kreuzen',
-    }),
+    }) : null,
     el('p.cad-hinweis-klein', {
       text: 'Sein M und V: unter «Ergebnisse» mit «+ Diagramm», dann statt «ganze Platte» den Träger wählen.',
     }),
-  ],
+  ].filter(Boolean),
   zonen: (wert, setzen) => [
     feldzeile('zone', 'anteil', 'Richtung 1', wert, setzen, {
       schritt: 10, titel: 'Dieser Anteil der Last geht in Richtung 1 der Platte, der Rest in Richtung 2',
@@ -164,18 +177,24 @@ const FELDER = {
   punktlasten: (wert, setzen) => [
     feldzeile('punktlast', 'wert', 'Q', wert, setzen, { schritt: 5, titel: 'Nach unten positiv' }),
     feldzeile('punktlast', 'l_x', 'l_x', wert, setzen, {
-      schritt: 0.1, titel: 'Über l_x × l_y verteilt tragen die Streifen die Last',
+      schritt: 0.1, titel: 'Über l_x × l_y verteilt trägt die Platte die Last',
     }),
     feldzeile('punktlast', 'l_y', 'l_y', wert, setzen, { schritt: 0.1 }),
   ],
   schnitte: () => [el('p.cad-hinweis-klein', {
     text: 'Sein Bild: unter «Ergebnisse» mit «+ Diagramm», dann statt «ganze Platte» den Schnitt wählen.',
   })],
-  stuetzen: (wert, setzen) => {
+  stuetzen: (wert, setzen, { streifen }) => {
     const vonHand = wert('bereich_von_hand');
+    const masse = [feldzeile('stuetze', 'b_x', 'b_x', wert, setzen, { schritt: 50 }),
+      feldzeile('stuetze', 'b_y', 'b_y', wert, setzen, { schritt: 50 })];
+    if (!streifen) {
+      return [...masse, el('p.cad-hinweis-klein', {
+        text: 'In der FEM hält die Stütze die Platte als Punkt – b_x und b_y rechnen nicht mit.',
+      })];
+    }
     return [
-      feldzeile('stuetze', 'b_x', 'b_x', wert, setzen, { schritt: 50 }),
-      feldzeile('stuetze', 'b_y', 'b_y', wert, setzen, { schritt: 50 }),
+      ...masse,
       wahlBlock('Stützenbereich', wahlSchalter({
         werte: mitVar([
           { wert: false, beschriftung: 'von selbst', titel: 'So gross wie die Stütze oder der breiteste Träger über ihr' },
@@ -214,11 +233,18 @@ function lastfallText(a) {
     : ohneLastfall();
 }
 
-/** Was am Lastfall die Felder ändert: welcher gezeigt ist, wie er heisst, ob es einen gibt. */
-function lastfallStand(a) {
-  return [aktiverLastfall(a.dk), gezeigterLastfall(a)?.name ?? null,
-    Boolean(eintragVon(a.dk.kennung)?.lastfaelle.length)];
+/**
+ * Was ausser der Auswahl die Felder ändert: am Lastfall, welcher gezeigt
+ * ist, wie er heisst, ob es einen gibt -- und das Verfahren der Decke.
+ */
+function felderStand(a) {
+  const z = eintragVon(a.dk.kennung);
+  return [aktiverLastfall(a.dk), gezeigterLastfall(a)?.name ?? null, Boolean(z?.lastfaelle.length),
+    z?.verfahren ?? null];
 }
+
+/** Ob die Decke des Fensters nach der Streifenmethode rechnet -- dann zählen auch ihre eigenen Felder. */
+const nachStreifen = (a) => eintragVon(a.dk.kennung)?.verfahren !== 'fem';
 
 /** Die Felder für das, was ein Werkzeug als Nächstes anlegt. */
 export function neuEigenschaften(a, werkzeug) {
@@ -228,14 +254,15 @@ export function neuEigenschaften(a, werkzeug) {
   const { setzen } = vorgabe(a, v);
   const wert = (feld) => (feld === 'beton' ? vorgabeBeton(a) : v[feld]);
   return {
-    inhalt: [...(LASTLISTEN.includes(liste) ? [lastfallText(a)] : []), ...FELDER[liste](wert, setzen)],
-    schluessel: JSON.stringify([werkzeug, v, vorgabeBeton(a), lastfallStand(a)]),
+    inhalt: [...(LASTLISTEN.includes(liste) ? [lastfallText(a)] : []),
+      ...FELDER[liste](wert, setzen, { streifen: nachStreifen(a) })],
+    schluessel: JSON.stringify([werkzeug, v, vorgabeBeton(a), felderStand(a)]),
   };
 }
 
 /** Was gewählt ist (cad_app.js): Knoten oder Teile einer Liste -- neu auch, wenn der gezeigte Lastfall wechselt. */
 export function eigenschaften(a) {
-  return auswahlEigenschaften(a, { knoten: knotenEigenschaften, sonst: teilEigenschaften }, lastfallStand(a));
+  return auswahlEigenschaften(a, { knoten: knotenEigenschaften, sonst: teilEigenschaften }, felderStand(a));
 }
 
 // -- Knoten und ihre Stützen -------------------------------------------------
@@ -277,7 +304,7 @@ function punktlastFelder(a, z, knoten) {
   if (lasten.some((e) => !e)) return zeilen;
   const kennungen = lasten.map((e) => e.kennung);
   const { wert, setzen } = zugleich(a, z, 'punktlasten', kennungen);
-  return [...zeilen, ...FELDER.punktlasten(wert, setzen), ...meldungszeilen(a, kennungen)];
+  return [...zeilen, ...FELDER.punktlasten(wert, setzen, {}), ...meldungszeilen(a, kennungen)];
 }
 
 function stuetzeFelder(a, z, knoten) {
@@ -290,7 +317,7 @@ function stuetzeFelder(a, z, knoten) {
   if (stuetzen.some((s) => !s)) return zeilen;
   const kennungen = stuetzen.map((s) => s.kennung);
   const { wert, setzen } = zugleich(a, z, 'stuetzen', kennungen);
-  return [...zeilen, ...FELDER.stuetzen(wert, setzen), ...meldungszeilen(a, kennungen)];
+  return [...zeilen, ...FELDER.stuetzen(wert, setzen, { streifen: nachStreifen(a) }), ...meldungszeilen(a, kennungen)];
 }
 
 /** Gewählte Knoten: ihre Lage (cad_app.js), ihre Stütze und ihre Punktlast im gezeigten Lastfall. */
@@ -353,7 +380,9 @@ function teilEigenschaften(a, z, kennungen, liste) {
       setzen('lastfall')(w);
       lastfallWaehlen(a, a.dk, w);
     }, 'Zu welchem Lastfall die Lasten gehören')] : []),
-    ...FELDER[liste](wert, setzen, platten ? richtungenVonSelbst(a, gewaehlt) : undefined),
+    ...FELDER[liste](wert, setzen, {
+      streifen: nachStreifen(a), richtungen: platten ? richtungenVonSelbst(a, gewaehlt) : null,
+    }),
     ...(platten ? plattenlastFelder(a, gewaehlt) : []),
   ];
   const art = a.adapter.arten.find((x) => x.liste === liste);

@@ -68,7 +68,7 @@ def modell_von(eintrag: DeckeEintrag) -> Tuple[Decke, List[Meldung]]:
     stuetzen = [Stuetze(s.kennung, ort[0], s.si("b_x"), s.si("b_y"),
                         *((s.si("l_x"), s.si("l_y")) if s.bereich_von_hand else (None, None)))
                 for s in eintrag.stuetzen if (ort := orte(s, (s.knoten,))) is not None]
-    traeger = [Traeger(u.kennung, *ab, u.si("breite"), u.stufe)
+    traeger = [Traeger(u.kennung, *ab, u.si("breite"), u.stufe, hoehe=u.si("h_T"))
                for u in eintrag.traeger if (ab := orte(u, (u.von, u.bis))) is not None]
     zonen = [Zone(z.kennung, ecken, z.si("anteil"))
              for z in eintrag.zonen if (ecken := orte(z, z.knoten)) is not None]
@@ -98,7 +98,8 @@ def modell_von(eintrag: DeckeEintrag) -> Tuple[Decke, List[Meldung]]:
                               for lf in eintrag.lastfaelle],
                   kombinationen=[Kombination(name, je_fall) for name, je_fall in faktoren],
                   streifenbreite=eintrag.si("streifenbreite"), aufteilung=eintrag.aufteilung,
-                  anteil=eintrag.si("anteil"), bandbreite=eintrag.si("bandbreite"))
+                  anteil=eintrag.si("anteil"), bandbreite=eintrag.si("bandbreite"),
+                  verfahren=eintrag.verfahren, netzweite=eintrag.si("netzweite"))
     return decke, meldungen
 
 

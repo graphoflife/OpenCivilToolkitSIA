@@ -1,5 +1,5 @@
 ---
-erzeugt: 0b9fa764541f
+erzeugt: 45528de55cbb
 art: modul
 tags: [modul]
 ---
@@ -18,9 +18,11 @@ liegt die Stelle in einem Träger derselben Richtung, in diesen.
 ## FLÄCHEN
 
 Alles wird zu Flächen mit gleichmässiger Last: eine Flächenlast auf ihrem
-Vieleck oder ihrer Platte, das Eigengewicht auf jeder Platte, eine
-Einzellast auf ihrer Verteilfläche `lx × ly` und eine Linienlast auf einem
-Band von [[opencivil.decke.lasten#Konstanten|LINIENBREITE]]. Eine Fläche wird in konvexe Stücke zerlegt,
+Vieleck oder ihrer Platte, das Eigengewicht auf jeder Platte
+([[opencivil.decke.lasten#flaechen|flaechen]], auch für die FEM), eine Einzellast auf ihrer
+Verteilfläche `lx × ly` und eine Linienlast auf einem Band von
+[[opencivil.decke.lasten#Konstanten|LINIENBREITE]] – ebenso der Steg eines Trägers mit Höhe im
+Eigengewicht ([[opencivil.decke.lasten#stege|stege]]). Eine Fläche wird in konvexe Stücke zerlegt,
 mit den Stücken der Platten geschnitten, mit dem Band jedes Streifens und
 seinen Anteilen. Ein konvexes Stück ist quer zur Achse linear breit
 ([[opencivil.decke.geometrie#breite|breite]]): die Last darauf ist eine
@@ -89,13 +91,37 @@ def belasten(decke: Decke, zerlegung: Zerlegung, aufteilungen: Aufteilungen, las
 
 Die Lasten des Lastfalls auf den Streifen.
 
+### Flaeche
+
+```python
+class Flaeche(NamedTuple)
+```
+
+Eine Fläche mit gleichmässiger Last `q` in N/m² – `platte`: sie ist die ganze Platte dieses Namens.
+
+- `name: str`
+- `ecken: List[Punkt]`
+- `q: float`
+- `platte: str = ''`
+
 ### flaechen
 
 ```python
-def flaechen(decke: Decke, lastfall: Lastfall, meldungen: List[Meldung]) -> List[Tuple[str, List[Punkt], float]]
+def flaechen(decke: Decke, lastfall: Lastfall, meldungen: List[Meldung]) -> List[Flaeche]
 ```
 
 Die Flächen des Lastfalls mit ihrer Last in N/m² – ohne die Linienlasten.
+
+### stege
+
+```python
+def stege(decke: Decke) -> List[Linienlast]
+```
+
+Das Gewicht der Stege im Eigengewicht: je Träger mit Höhe `h_T` eine
+Linienlast `ρ·g·b·h_T` längs seiner Achse – mit der Wichte der Platte,
+in der das Stück liegt; auf der Fuge zweier Platten die erste. Neben den
+Platten wiegt er nichts: dort gibt es keinen Beton, dessen Wichte zählte.
 
 ### linienband
 
@@ -140,4 +166,7 @@ In den Feldstreifen – oder, wo er in einem Träger seiner Richtung liegt, in d
 
 ## Gebraucht von
 
+- [[opencivil.decke.fem.belastung]]
+- [[opencivil.decke.fem.rechnung]]
+- [[opencivil.decke.herleitung]]
 - [[opencivil.decke.rechnung]]

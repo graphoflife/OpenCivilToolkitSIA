@@ -302,6 +302,30 @@ def extrem(proben: Sequence[Probe],
     return vorderste_extreme([(p, aus(k)) for p, k in proben])
 
 
+@dataclass(frozen=True)
+class Bild:
+    """
+    Was ein Bild der Platte von einem Fall zeigt, in beiden Verfahren gleich:
+    ``zellen``, je Zelle ihre Ecken; ``mitten``, je Zelle ihr Schwerpunkt mit
+    den Schnittkräften dort; ``gefaelle``, je Zelle und Grösse
+    ``(∂/∂x, ∂/∂y)`` in ihrer Einheit je m; ``proben``, wo der grösste und
+    der kleinste Wert gesucht werden.
+    """
+
+    zellen: List[List[Punkt]]
+    mitten: List[Probe]
+    gefaelle: List[Dict[str, Tuple[float, float]]]
+    proben: List[Probe]
+
+
+def bild(ergebnis: Ergebnis, fall: Fallergebnis) -> Bild:
+    """Das Bild der Streifenmethode: ihre Zellen (:func:`zellen_von`) und die Proben des Falls (:func:`proben`)."""
+    zellen = zellen_von(ergebnis)
+    alle = proben(ergebnis, fall, zellen)
+    mitten = alle[:len(zellen)]
+    return Bild(zellen, mitten, [gefaelle(ergebnis, fall, z, p) for z, p in zip(zellen, mitten)], alle)
+
+
 # ===========================================================================
 # Lastverteilelemente
 # ===========================================================================

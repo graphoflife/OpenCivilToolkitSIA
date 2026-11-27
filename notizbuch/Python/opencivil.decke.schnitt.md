@@ -1,5 +1,5 @@
 ---
-erzeugt: d4908aca3f21
+erzeugt: 1c8994ad3aae
 art: modul
 tags: [modul]
 ---
@@ -119,6 +119,14 @@ def verlauf(ergebnis: Ergebnis, fall: Fallergebnis, a: Punkt, b: Punkt) -> Verla
 
 Der Verlauf längs des Schnitts von `a` nach `b` im Fall `fall` – ohne Länge leer.
 
+### in_platten
+
+```python
+def in_platten(decke: Decke, a: Punkt, b: Punkt, L: float) -> List[Tuple[float, float]]
+```
+
+Wo die Strecke von `a` nach `b` der Länge `L` in einer Platte liegt: von – bis, in m ab `a`.
+
 ### traeger
 
 ```python
@@ -174,10 +182,10 @@ Die Stellen zwischen zwei Grenzen `p` und `q`: knapp innen an beiden
 Enden, dazwischen höchstens `schritt` auseinander und an jeder Spitze
 – keine, wenn das Stück dafür zu kurz ist.
 
-### _lager
+### lagerstellen
 
 ```python
-def _lager(decke: Decke, a: Punkt, b: Punkt, e: Punkt, L: float) -> List[Lagerstelle]
+def lagerstellen(decke: Decke, a: Punkt, b: Punkt, e: Punkt, L: float) -> List[Lagerstelle]
 ```
 
 Die Lager, die der Schnitt kreuzt, nach ihrer Stelle: ein Linienlager,
@@ -203,6 +211,7 @@ Mitte am nächsten ist.
 
 ## Gebraucht von
 
+- [[opencivil.decke.fem.auswertung]]
 - [[opencivil.projekt.beispiele]]
 - [[opencivil.projekt.decke]]
 - [[opencivil.web.api]]

@@ -1,5 +1,5 @@
 ---
-erzeugt: 096a4f74386b
+erzeugt: aa43793a8d98
 art: modul
 tags: [modul]
 ---
@@ -125,7 +125,7 @@ class Ausfall(Meldung)
 Was in einem Fall ausfaellt, weil Streifen nicht tragen: der ganze Satz
 in `text` – «… 80 kN fallen aus.» –, dazu `grund` ohne die Kraft
 und die Kraft `F` in N. Ueber die Faelle gesammelt
-([[opencivil.decke.rechnung#Ergebnis.fallmeldungen|Ergebnis.fallmeldungen]]), steht der Grund einmal und die Kraft
+([[opencivil.decke.rechnung#Ergebnis|Ergebnis.fallmeldungen]]), steht der Grund einmal und die Kraft
 je Fall dahinter. Grau: es fehlt ein Lager oder ein Traeger, und der
 Rest rechnet (Benutzer, 2026-11-19).
 
@@ -133,11 +133,79 @@ Rest rechnet (Benutzer, 2026-11-19).
 - `grund: str = ''`
 - `F: float = 0.0`
 
+### Faelle
+
+```python
+class Faelle
+```
+
+Was die Ergebnisse beider Verfahren gleich haben – der Streifenmethode
+und der FEM ([[opencivil.decke.fem.rechnung#Femergebnis|Femergebnis]]): ihre
+Fälle, je mit `name` und `meldungen`.
+
+- `faelle: list`
+
+#### Faelle.fall
+
+```python
+def fall(self, name: str)
+```
+
+#### Faelle.fallmeldungen
+
+```python
+def fallmeldungen(self) -> List[Meldung]
+```
+
+Was die Faelle melden, jede Meldung einmal, vorn die Faelle, in denen
+sie steht: «In allen Fällen: …», sonst ««LF 1», «GZT»: …». Ein
+[[opencivil.decke.rechnung#Ausfall|Ausfall]] aus demselben Grund in mehreren Faellen steht einmal,
+die Kraft je Fall dahinter: «… Es fallen aus: «g» 80 kN, «GZT»
+228 kN.» Bis 2026-11-20 stand jede Meldung je Fall – in vier
+Lastfaellen und drei Kombinationen siebenmal derselbe Satz (Benutzer).
+
+### Fall
+
+```python
+class Fall
+```
+
+Was ein Fall beider Verfahren gleich hat: `summe`, `daneben` und
+`nicht_getragen` in N, `stuetzen` und `linienlager` nach Namen, was
+jedes trägt (`stuetzenkraft`, `wandkraft`), längs eines Linienlagers
+seine Stufen (`lagerstufen`) und seine `meldungen`.
+
+#### Fall.lagerkraft
+
+```python
+@property
+def lagerkraft(self) -> float
+```
+
+Alle Kräfte in Linienlager und Stützen zusammen.
+
+#### Fall.fehlbetrag
+
+```python
+@property
+def fehlbetrag(self) -> float
+```
+
+Was die Lager weniger tragen, als getragen werden muss – null bis auf Rundung.
+
+#### Fall.probe
+
+```python
+def probe(self, worauf: str) -> None
+```
+
+Geht die Probe nicht auf, sagt es eine Meldung – `worauf` liegt, was getragen werden muss.
+
 ### Fallergebnis
 
 ```python
 @dataclass
-class Fallergebnis
+class Fallergebnis(Fall)
 ```
 
 - `name: str`
@@ -161,29 +229,19 @@ def stuetzenkraft(self, name: str) -> float
 def wandkraft(self, name: str) -> float
 ```
 
-#### Fallergebnis.lagerkraft
+#### Fallergebnis.lagerstufen
 
 ```python
-@property
-def lagerkraft(self) -> float
+def lagerstufen(self, lager: Linienlager) -> List[Tuple[float, float, float, float]]
 ```
 
-Alle Kräfte in Linienlager und Stützen zusammen.
-
-#### Fallergebnis.fehlbetrag
-
-```python
-@property
-def fehlbetrag(self) -> float
-```
-
-Was die Lager weniger tragen, als auf den Durchlaufträgern liegt – null bis auf Rundung.
+Längs des Linienlagers `lager` die Stufen `(u_a, u_b, r, m)` ([[opencivil.decke.rechnung#lagerverlauf|lagerverlauf]]).
 
 ### Ergebnis
 
 ```python
 @dataclass
-class Ergebnis
+class Ergebnis(Faelle)
 ```
 
 - `decke: Decke` – Wie sie gerechnet ist – mit den Richtungen, die ihre Platten selbst wählten, und den Bändern, die sie selbst legte.
@@ -191,25 +249,6 @@ class Ergebnis
 - `aufteilungen: Optional[Aufteilungen]`
 - `faelle: List[Fallergebnis]`
 - `meldungen: List[Meldung]`
-
-#### Ergebnis.fall
-
-```python
-def fall(self, name: str) -> Fallergebnis
-```
-
-#### Ergebnis.fallmeldungen
-
-```python
-def fallmeldungen(self) -> List[Meldung]
-```
-
-Was die Faelle melden, jede Meldung einmal, vorn die Faelle, in denen
-sie steht: «In allen Fällen: …», sonst ««LF 1», «GZT»: …». Ein
-[[opencivil.decke.rechnung#Ausfall|Ausfall]] aus demselben Grund in mehreren Faellen steht einmal,
-die Kraft je Fall dahinter: «… Es fallen aus: «g» 80 kN, «GZT»
-228 kN.» Bis 2026-11-20 stand jede Meldung je Fall – in vier
-Lastfaellen und drei Kombinationen siebenmal derselbe Satz (Benutzer).
 
 ### rechnen
 
@@ -272,14 +311,14 @@ Längs eines Linienlagers, was die Durchlaufträger in es geben: Stufen
 `(u_a, u_b, r, m)` von seinem Anfang bis zu seinem Ende, `u` in m ab
 `lager.a`, `r` nach unten in N/m und `m` in Nm/m: das Moment, das
 es hält, mit dem Vorzeichen der Platte – negativ, wo es oben zieht, wie
-herum das Lager auch gezeichnet ist ([[opencivil.decke.rechnung#_gehalten|_gehalten]]). Wo zwei Durchlaufträger
+herum das Lager auch gezeichnet ist ([[opencivil.decke.rechnung#gehalten|gehalten]]). Wo zwei Durchlaufträger
 dasselbe Stück tragen, zählen beide; ein schiefer gibt quer zum Lager
 cos² seines Winkels weiter, wie die Platte (Folie 14).
 
-### _gehalten
+### gehalten
 
 ```python
-def _gehalten(links: float, rechts: float) -> float
+def gehalten(links: float, rechts: float) -> float
 ```
 
 Was ein Lager an Moment hält, je Meter, wenn die Platte links von ihm
@@ -324,6 +363,7 @@ Wo die Resultierende einer Streckenlast liegt, ab ihrem Anfang.
 ## Gebraucht von
 
 - [[opencivil.decke.feld]]
+- [[opencivil.decke.fem.rechnung]]
 - [[opencivil.decke.herleitung]]
 - [[opencivil.decke.schnitt]]
 - [[opencivil.decke.werk]]

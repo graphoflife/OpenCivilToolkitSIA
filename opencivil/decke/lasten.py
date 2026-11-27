@@ -9,9 +9,11 @@ liegt die Stelle in einem Träger derselben Richtung, in diesen.
 
 FLÄCHEN:
 Alles wird zu Flächen mit gleichmässiger Last: eine Flächenlast auf ihrem
-Vieleck oder ihrer Platte, das Eigengewicht auf jeder Platte, eine
-Einzellast auf ihrer Verteilfläche ``lx × ly`` und eine Linienlast auf einem
-Band von :data:`LINIENBREITE`. Eine Fläche wird in konvexe Stücke zerlegt,
+Vieleck oder ihrer Platte, das Eigengewicht auf jeder Platte
+(:func:`flaechen`, auch für die FEM), eine Einzellast auf ihrer
+Verteilfläche ``lx × ly`` und eine Linienlast auf einem Band von
+:data:`LINIENBREITE` -- ebenso der Steg eines Trägers mit Höhe im
+Eigengewicht (:func:`stege`). Eine Fläche wird in konvexe Stücke zerlegt,
 mit den Stücken der Platten geschnitten, mit dem Band jedes Streifens und
 seinen Anteilen. Ein konvexes Stück ist quer zur Achse linear breit
 (:func:`~opencivil.decke.geometrie.breite`): die Last darauf ist eine
@@ -33,7 +35,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass, field
-from typing import Dict, List, Sequence, Tuple
+from typing import Dict, List, NamedTuple, Sequence, Tuple
 
 from opencivil.decke import geometrie as geo
 from opencivil.decke.aufteilung import Aufteilungen
@@ -95,7 +97,7 @@ def belasten(decke: Decke, zerlegung: Zerlegung, aufteilungen: Aufteilungen, las
     """Die Lasten des Lastfalls auf den Streifen."""
     heraus = Belastung()
     platten = [p.ecken for p in decke.platten]
-    for name, vieleck, q in flaechen(decke, lastfall, heraus.meldungen):
+    for name, vieleck, q, _ in flaechen(decke, lastfall, heraus.meldungen):
         if not q:
             continue
         stuecke = geo.dreiecke(vieleck)
@@ -114,7 +116,7 @@ def belasten(decke: Decke, zerlegung: Zerlegung, aufteilungen: Aufteilungen, las
             heraus.meldungen.append(Meldung(
                 f"Die Last «{name}» liegt zum Teil neben den Platten: {kn(abs(gesamt - getragen))} kN "
                 "trägt niemand.", (name,), fehler=False))
-    for last in lastfall.lasten:
+    for last in [*lastfall.lasten, *(stege(decke) if lastfall.eigengewicht else ())]:
         if isinstance(last, Linienlast) and last.wert:
             for vieleck in linienband(last.a, last.b, platten):
                 q = last.wert / LINIENBREITE
@@ -135,9 +137,18 @@ def belasten(decke: Decke, zerlegung: Zerlegung, aufteilungen: Aufteilungen, las
     return heraus
 
 
-def flaechen(decke: Decke, lastfall: Lastfall, meldungen: List[Meldung]) -> List[Tuple[str, List[Punkt], float]]:
+class Flaeche(NamedTuple):
+    """Eine Fläche mit gleichmässiger Last ``q`` in N/m² -- ``platte``: sie ist die ganze Platte dieses Namens."""
+
+    name: str
+    ecken: List[Punkt]
+    q: float
+    platte: str = ""
+
+
+def flaechen(decke: Decke, lastfall: Lastfall, meldungen: List[Meldung]) -> List[Flaeche]:
     """Die Flächen des Lastfalls mit ihrer Last in N/m² -- ohne die Linienlasten."""
-    heraus: List[Tuple[str, List[Punkt], float]] = []
+    heraus: List[Flaeche] = []
     nach_name = {p.name: p for p in decke.platten}
     for last in lastfall.lasten:
         if isinstance(last, Flaechenlast):
@@ -147,22 +158,56 @@ def flaechen(decke: Decke, lastfall: Lastfall, meldungen: List[Meldung]) -> List
                     meldungen.append(Meldung(f"Die Last «{last.name}» liegt auf der Platte «{last.platte}», "
                                              "die es nicht gibt.", (last.name,)))
                     continue
-                heraus.append((last.name, list(platte.ecken), last.wert))
+                heraus.append(Flaeche(last.name, list(platte.ecken), last.wert, platte.name))
             elif len(geo.bereinigt(last.ecken)) >= 3:
-                heraus.append((last.name, list(last.ecken), last.wert))
+                heraus.append(Flaeche(last.name, list(last.ecken), last.wert))
             else:
                 meldungen.append(Meldung(f"Die Flächenlast «{last.name}» hat keine Fläche.", (last.name,),
                                          fehler=False))
         elif isinstance(last, Punktlast):
             if last.lx > 0.0 and last.ly > 0.0:
-                heraus.append((last.name, geo.achsrechteck(last.ort, last.lx, last.ly),
-                               last.wert / (last.lx * last.ly)))
+                heraus.append(Flaeche(last.name, geo.achsrechteck(last.ort, last.lx, last.ly),
+                                      last.wert / (last.lx * last.ly)))
             else:
                 meldungen.append(Meldung(f"Die Einzellast «{last.name}» braucht eine Verteilfläche.",
                                          (last.name,)))
     if lastfall.eigengewicht:
         for p in decke.platten:
-            heraus.append((f"Eigengewicht {p.name}", list(p.ecken), p.wichte * p.h))
+            heraus.append(Flaeche(f"Eigengewicht {p.name}", list(p.ecken), p.wichte * p.h, p.name))
+    return heraus
+
+
+def stege(decke: Decke) -> List[Linienlast]:
+    """
+    Das Gewicht der Stege im Eigengewicht: je Träger mit Höhe ``h_T`` eine
+    Linienlast ``ρ·g·b·h_T`` längs seiner Achse -- mit der Wichte der Platte,
+    in der das Stück liegt; auf der Fuge zweier Platten die erste. Neben den
+    Platten wiegt er nichts: dort gibt es keinen Beton, dessen Wichte zählte.
+    """
+    heraus: List[Linienlast] = []
+    for u in decke.traeger:
+        if u.hoehe <= 0.0 or u.von_selbst:
+            continue
+        laenge = math.dist(u.a, u.b)
+        stellen = sorted({s for p in decke.platten for s in geo.schnittstellen(u.a, u.b, list(p.ecken))})
+        stuecke: List[Tuple[float, float, float]] = []
+        for s0, s1 in zip(stellen, stellen[1:]):
+            if (s1 - s0) * laenge <= geo.TOLERANZ:
+                continue
+            m = 0.5 * (s0 + s1)
+            mitte = (u.a[0] + m * (u.b[0] - u.a[0]), u.a[1] + m * (u.b[1] - u.a[1]))
+            platte = next((p for p in decke.platten if geo.innen(mitte, list(p.ecken))), None)
+            if platte is None:
+                continue
+            q = platte.wichte * u.breite * u.hoehe
+            if stuecke and stuecke[-1][2] == q and abs(stuecke[-1][1] - s0) * laenge <= geo.TOLERANZ:
+                stuecke[-1] = (stuecke[-1][0], s1, q)
+            else:
+                stuecke.append((s0, s1, q))
+        for s0, s1, q in stuecke:
+            heraus.append(Linienlast(f"Eigengewicht {u.name}",
+                                     (u.a[0] + s0 * (u.b[0] - u.a[0]), u.a[1] + s0 * (u.b[1] - u.a[1])),
+                                     (u.a[0] + s1 * (u.b[0] - u.a[0]), u.a[1] + s1 * (u.b[1] - u.a[1])), q))
     return heraus
 
 

@@ -112,8 +112,7 @@ def verlauf(ergebnis: Ergebnis, fall: Fallergebnis, a: Punkt, b: Punkt) -> Verla
         return Verlauf(0.0, [], [], [], [])
     e = ((b[0] - a[0]) / L, (b[1] - a[1]) / L)
     z = ergebnis.zerlegung
-    stuecke = geo.vereinigt([(u0 * L, u1 * L) for p in ergebnis.decke.platten
-                             for u0, u1 in geo.strecke_im_vieleck(a, b, list(p.ecken))])
+    stuecke = in_platten(ergebnis.decke, a, b, L)
     traeger = [(u0 * L, u1 * L, s.name) for s in z.traeger
                for u0, u1 in geo.strecke_im_vieleck(a, b, list(s.gebiet))]
     grenzen, spitzen = _stellen(z, fall, a, e)
@@ -124,7 +123,13 @@ def verlauf(ergebnis: Ergebnis, fall: Fallergebnis, a: Punkt, b: Punkt) -> Verla
         for p, q in zip(teile, teile[1:]):
             orte += _im_teil(p, q, L / SCHRITTE, spitzen)
     proben = [(u, an_stelle(ergebnis, fall, (a[0] + u * e[0], a[1] + u * e[1]))) for u in orte]
-    return Verlauf(L, stuecke, proben, _lager(ergebnis.decke, a, b, e, L), traeger)
+    return Verlauf(L, stuecke, proben, lagerstellen(ergebnis.decke, a, b, e, L), traeger)
+
+
+def in_platten(decke: Decke, a: Punkt, b: Punkt, L: float) -> List[Tuple[float, float]]:
+    """Wo die Strecke von ``a`` nach ``b`` der Länge ``L`` in einer Platte liegt: von -- bis, in m ab ``a``."""
+    return geo.vereinigt([(u0 * L, u1 * L) for p in decke.platten
+                          for u0, u1 in geo.strecke_im_vieleck(a, b, list(p.ecken))])
 
 
 def traeger(fall: Fallergebnis, streifen: Streifen) -> Verlauf:
@@ -240,7 +245,7 @@ def _im_teil(p: float, q: float, schritt: float, spitzen: List[float]) -> List[f
     return [p + INNEN, *sorted(set(innen)), q - INNEN]
 
 
-def _lager(decke: Decke, a: Punkt, b: Punkt, e: Punkt, L: float) -> List[Lagerstelle]:
+def lagerstellen(decke: Decke, a: Punkt, b: Punkt, e: Punkt, L: float) -> List[Lagerstelle]:
     """
     Die Lager, die der Schnitt kreuzt, nach ihrer Stelle: ein Linienlager,
     wo er es schneidet -- wer längs eines Lagers schneidet, kreuzt es nicht

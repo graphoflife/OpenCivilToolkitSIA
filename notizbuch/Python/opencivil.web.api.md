@@ -1,5 +1,5 @@
 ---
-erzeugt: 5feb258604e0
+erzeugt: e2b8c46b55f7
 art: modul
 tags: [modul]
 ---
@@ -211,8 +211,9 @@ Je Querschnitt eines Systems, wo A und I stehen – und je Paar aus Querschnitt 
 
 - `_WERKSTOFFSAETZE = [{'wert': s.value, 'beschriftung': s.beschriftung, 'kurz': s.kurz} fo…` – Die Wertesaetze und Betongesetze mit Beschriftung – dieselben in der Querschnittsanalyse und in jeder Spannung-Dehnung-Analyse. `kurz` fuer die Karte einer Analyse, in der die lange nicht Platz hat. Die Woerter stehen beim Wertesatz selbst.
 - `_VERSCHMIERUNGEN = {'flaeche': ('Stahlfläche', 'Die Stahlfläche der ganzen Linie, von Ha…` – Wie die Angaben einer verschmierten Stablinie heissen: kurz im Schalter, lang in seinem Titel – je Angabe, die die Beschreibung kennt.
-- `_DECKENGROESSEN = {'m_x': ('m_x', 'Moment m_x'), 'm_y': ('m_y', 'Moment m_y'), 'm_xy': …` – Wie die Aufteilungen einer Decke heissen: kurz im Schalter, lang in seinem Titel. Die Regel dahinter steht in [[opencivil.decke.aufteilung]]. Wie die Ergebnisbilder einer Decke heissen: kurz im Schalter, lang ueber dem Bild – je Groesse, die die Beschreibung kennt. M und V sind die eines ganzen Trägers.
-- `_AUFTEILUNGEN = {Aufteilung.AUTOMATISCH: ('automatisch', 'Je Stelle nach ihren Lagern…`
+- `_DECKENGROESSEN = {'m_x': ('m_x', 'Moment m_x'), 'm_y': ('m_y', 'Moment m_y'), 'm_xy': …` – Wie die Ergebnisbilder einer Decke heissen: kurz im Schalter, lang ueber dem Bild – je Groesse, die die Beschreibung kennt. M und V sind die eines ganzen Trägers.
+- `_VERFAHREN = {Verfahren.STREIFEN: ('Streifenmethode', 'Jede Last in Streifen zweie…` – Wie die Verfahren einer Decke heissen: kurz im Schalter, lang in seinem Titel. Gerechnet wird in [[opencivil.decke]].
+- `_AUFTEILUNGEN = {Aufteilung.AUTOMATISCH: ('automatisch', 'Je Stelle nach ihren Lagern…` – Wie die Aufteilungen einer Decke heissen: kurz im Schalter, lang in seinem Titel. Die Regel dahinter steht in [[opencivil.decke.aufteilung]].
 - `TAFEL = {TitelBlock: _titel_dict, TextBlock: _text_dict, GleichungBlock: _gle…` – Je Blockart, wie die Oberflaeche sie bekommt – jede als JSON-Objekt.
 - `_ZUORDNUNG = {'platte': _plattenzuordnung, 'balkensystem': _systemzuordnung, 'balk…` – Was eine Bauteilart in der Zuordnung mehr hat als Namensraum und Name – ohne Eintrag ihre Werte ([[opencivil.web.api#_werte|_werte]]). Bis 2026-10-25 stand die Zuordnung je Art von Hand da, zwei Bloecke wortgleich.
 
@@ -276,6 +277,7 @@ Je Querschnitt eines Systems, wo A und I stehen – und je Paar aus Querschnitt 
 - [[opencivil.verbund.duebel]]
 - [[opencivil.web.anzeige]]
 - [[opencivil.web.balkendaten]]
+- [[opencivil.web.deckendaten]]
 - [[opencivil.web.diagrammdaten]]
 - [[opencivil.web.durchstanzdaten]]
 - [[opencivil.web.systemkatalog]]

@@ -6,8 +6,8 @@ Der :class:`DeckeEintrag`: Platten, Linienlager, Stuetzen, Traeger -- ein
 Unterzug oder ein Ueberzug -- und Zonen der Lastaufteilung, gezeichnet aus
 Knoten im Grundriss -- als speicherbare Datenklasse wie das Balkensystem
 (:mod:`opencivil.projekt.balkensystem`). Dazu der Baukasten, der ohne
-Oberflaeche zeichnet. Gerechnet wird nach der Streifenmethode, in
-:mod:`opencivil.decke`.
+Oberflaeche zeichnet. Gerechnet wird nach der Streifenmethode oder der FEM,
+in :mod:`opencivil.decke`.
 
 ALLES HAENGT AN KNOTEN:
 Eine Platte und eine Zone sind Umrisse aus Knoten, ein Linienlager und ein
@@ -47,10 +47,10 @@ from dataclasses import dataclass, field
 from typing import Any, List, Mapping, Optional, Sequence, Tuple, Union
 
 from opencivil.core.einheiten import GRAD, KN, KN_PRO_M, KN_PRO_M2, M, MM, PROZENT
-from opencivil.decke.feld import GROESSEN
+from opencivil.decke.fem.rechnung import GROESSEN
 from opencivil.decke.geometrie import Punkt
 from opencivil.decke.schnitt import BALKENGROESSEN
-from opencivil.decke.modell import BANDBREITE, VERTEILBREITE, Aufteilung
+from opencivil.decke.modell import BANDBREITE, NETZWEITE, VERTEILBREITE, Aufteilung, Verfahren
 from opencivil.projekt.eintraege import BauteilEintrag, Beschreibung
 from opencivil.projekt.faelle import LastfallEintrag, LastkombinationEintrag, MitFaellen, kennung_von
 from opencivil.projekt.lesen import ProjektFehler, bereich, einer_von, lesen
@@ -59,8 +59,9 @@ from opencivil.projekt.netz import Netz, neue_kennung
 #: Ein Ort im Baukasten: die Kennung eines Knotens oder ``(x, y)`` in m.
 Ort = Union[str, Sequence[float]]
 
-#: Was ein Ergebnisbild zeigt: eine Schnittkraft der Platte, die Lagerkraefte
-#: -- oder Moment und Querkraft eines ganzen Trägers.
+#: Was ein Ergebnisbild zeigt: eine Schnittkraft der Platte, in der FEM auch
+#: die Durchbiegung, die Lagerkraefte -- oder Moment und Querkraft eines
+#: ganzen Trägers.
 PLATTENGROESSEN = (*GROESSEN, "lager")
 DIAGRAMMGROESSEN = (*PLATTENGROESSEN, *BALKENGROESSEN)
 
@@ -171,7 +172,9 @@ class TraegerEintrag(Beschreibung):
     Ein Träger, ein Unterzug oder ein Überzug: in der Streifenmethode ein
     starker Streifen in der Platte (Folie 33), so breit wie ``breite``,
     liegend auf Linienlagern, Stützen und den Trägern höherer ``stufe``,
-    die ihn kreuzen.
+    die ihn kreuzen. In der FEM ein Balken in der Platte, der ``h_T`` über
+    oder unter sie reicht -- null: er steckt in ihr. Sein Steg wiegt im
+    Eigengewicht mit, in beiden Verfahren.
     """
 
     kennung: str = ""
@@ -179,6 +182,7 @@ class TraegerEintrag(Beschreibung):
     bis: str = ""
     breite: float = bereich(1.0, heisst="Breite b", einheit=M, ueber=0.0)
     stufe: int = bereich(1, heisst="Stufe", ab=1)
+    h_T: float = bereich(0.0, heisst="Höhe h_T", einheit=MM, ab=0.0)
 
 
 @dataclass
@@ -276,10 +280,11 @@ class DeckendiagrammEintrag(Beschreibung):
 class DeckeEintrag(MitFaellen, BauteilEintrag):
     """
     Eine Decke aus Platten auf Linienlagern und Stützen, mit Trägern und
-    Zonen, und ihren Lasten, Lastfällen und Kombinationen.
-    Wie die Last aufgeteilt wird, gilt für die ganze Decke: automatisch
-    nach Folie 31 oder ``anteil`` in die Richtung 1 -- in einer Zone deren
-    Anteil.
+    Zonen, und ihren Lasten, Lastfällen und Kombinationen, gerechnet nach
+    ihrem ``verfahren``: der Streifenmethode oder der FEM mit der
+    ``netzweite``. Wie die Streifenmethode die Last aufteilt, gilt für die
+    ganze Decke: automatisch nach Folie 31 oder ``anteil`` in die Richtung
+    1 -- in einer Zone deren Anteil.
 
     Ohne Regeln, die das ganze Projekt aufhielten: was an einer Decke nicht
     stimmt, steht in ihren Meldungen, und die anderen Bauteile rechnen weiter.
@@ -303,6 +308,10 @@ class DeckeEintrag(MitFaellen, BauteilEintrag):
     lastfaelle: List[LastfallEintrag] = field(default_factory=list)
     kombinationen: List[LastkombinationEintrag] = field(default_factory=list)
     diagramme: List[DeckendiagrammEintrag] = field(default_factory=list)
+    verfahren: Verfahren = Verfahren.STREIFEN
+    netzweite: float = bereich(NETZWEITE, heisst="Netzweite", einheit=M, ueber=0.0)
+    """Nur in der FEM: so weit liegen die Knoten ihres Netzes höchstens auseinander."""
+
     streifenbreite: float = bereich(0.25, heisst="Streifenbreite", einheit=M, ueber=0.0)
     aufteilung: Aufteilung = Aufteilung.AUTOMATISCH
     anteil: float = bereich(50.0, heisst="Anteil in Richtung 1", einheit=PROZENT, ab=0.0, bis=100.0)

@@ -1,5 +1,5 @@
 ---
-erzeugt: 05140fe7e487
+erzeugt: 3fb3b7f6b560
 art: modul
 tags: [modul]
 ---
@@ -395,6 +395,9 @@ Wie u, v, w und θx, θy, θz eines Stabendes an den Unbekannten haengen.
 ## Gebraucht von
 
 - [[opencivil.decke.aufteilung]]
+- [[opencivil.decke.fem.belastung]]
+- [[opencivil.decke.fem.netz]]
+- [[opencivil.decke.fem.rechnung]]
 - [[opencivil.decke.lasten]]
 - [[opencivil.decke.rechnung]]
 - [[opencivil.decke.streifen]]

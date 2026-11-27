@@ -138,54 +138,16 @@ class Ausfall(Meldung):
     F: float = 0.0
 
 
-@dataclass
-class Fallergebnis:
-    name: str
-    summe: float
-    """Die ganze Last, in N."""
+class Faelle:
+    """
+    Was die Ergebnisse beider Verfahren gleich haben -- der Streifenmethode
+    und der FEM (:class:`~opencivil.decke.fem.rechnung.Femergebnis`): ihre
+    Fälle, je mit ``name`` und ``meldungen``.
+    """
 
-    daneben: float
-    """Was davon neben den Platten liegt."""
+    faelle: list
 
-    durchlauftraeger: Dict[str, Durchlauftraegerergebnis] = field(default_factory=dict)
-    stuetzen: Dict[str, List[Tuple[str, float]]] = field(default_factory=dict)
-    """Je Stütze, was jeder Durchlaufträger auf ihr in sie gibt, in N."""
-
-    linienlager: Dict[str, List[Wandkraft]] = field(default_factory=dict)
-    nicht_getragen: float = 0.0
-    """Was auf Durchlaufträgern liegt, die nicht tragen."""
-
-    meldungen: List[Meldung] = field(default_factory=list)
-
-    def stuetzenkraft(self, name: str) -> float:
-        return sum(F for _, F in self.stuetzen.get(name, ()))
-
-    def wandkraft(self, name: str) -> float:
-        return sum(w.F for w in self.linienlager.get(name, ()))
-
-    @property
-    def lagerkraft(self) -> float:
-        """Alle Kräfte in Linienlager und Stützen zusammen."""
-        return (sum(self.stuetzenkraft(n) for n in self.stuetzen)
-                + sum(self.wandkraft(n) for n in self.linienlager))
-
-    @property
-    def fehlbetrag(self) -> float:
-        """Was die Lager weniger tragen, als auf den Durchlaufträgern liegt -- null bis auf Rundung."""
-        return self.summe - self.daneben - self.nicht_getragen - self.lagerkraft
-
-
-@dataclass
-class Ergebnis:
-    decke: Decke
-    """Wie sie gerechnet ist -- mit den Richtungen, die ihre Platten selbst wählten, und den Bändern, die sie selbst legte."""
-
-    zerlegung: Zerlegung
-    aufteilungen: Optional[Aufteilungen]
-    faelle: List[Fallergebnis]
-    meldungen: List[Meldung]
-
-    def fall(self, name: str) -> Fallergebnis:
+    def fall(self, name: str):
         for f in self.faelle:
             if f.name == name:
                 return f
@@ -219,6 +181,74 @@ class Ergebnis:
         return heraus
 
 
+class Fall:
+    """
+    Was ein Fall beider Verfahren gleich hat: ``summe``, ``daneben`` und
+    ``nicht_getragen`` in N, ``stuetzen`` und ``linienlager`` nach Namen, was
+    jedes trägt (``stuetzenkraft``, ``wandkraft``), längs eines Linienlagers
+    seine Stufen (``lagerstufen``) und seine ``meldungen``.
+    """
+
+    @property
+    def lagerkraft(self) -> float:
+        """Alle Kräfte in Linienlager und Stützen zusammen."""
+        return (sum(self.stuetzenkraft(n) for n in self.stuetzen)
+                + sum(self.wandkraft(n) for n in self.linienlager))
+
+    @property
+    def fehlbetrag(self) -> float:
+        """Was die Lager weniger tragen, als getragen werden muss -- null bis auf Rundung."""
+        return self.summe - self.daneben - self.nicht_getragen - self.lagerkraft
+
+    def probe(self, worauf: str) -> None:
+        """Geht die Probe nicht auf, sagt es eine Meldung -- ``worauf`` liegt, was getragen werden muss."""
+        if abs(self.fehlbetrag) > PROBE * max(abs(self.summe), 1.0):
+            self.meldungen.append(Meldung(
+                f"Die Probe geht nicht auf: die Lager tragen {self.lagerkraft / 1e3:.6g} kN, "
+                f"{worauf} liegen {(self.summe - self.daneben - self.nicht_getragen) / 1e3:.6g} kN."))
+
+
+@dataclass
+class Fallergebnis(Fall):
+    name: str
+    summe: float
+    """Die ganze Last, in N."""
+
+    daneben: float
+    """Was davon neben den Platten liegt."""
+
+    durchlauftraeger: Dict[str, Durchlauftraegerergebnis] = field(default_factory=dict)
+    stuetzen: Dict[str, List[Tuple[str, float]]] = field(default_factory=dict)
+    """Je Stütze, was jeder Durchlaufträger auf ihr in sie gibt, in N."""
+
+    linienlager: Dict[str, List[Wandkraft]] = field(default_factory=dict)
+    nicht_getragen: float = 0.0
+    """Was auf Durchlaufträgern liegt, die nicht tragen."""
+
+    meldungen: List[Meldung] = field(default_factory=list)
+
+    def stuetzenkraft(self, name: str) -> float:
+        return sum(F for _, F in self.stuetzen.get(name, ()))
+
+    def wandkraft(self, name: str) -> float:
+        return sum(w.F for w in self.linienlager.get(name, ()))
+
+    def lagerstufen(self, lager: Linienlager) -> List[Tuple[float, float, float, float]]:
+        """Längs des Linienlagers ``lager`` die Stufen ``(u_a, u_b, r, m)`` (:func:`lagerverlauf`)."""
+        return lagerverlauf(lager, self.linienlager.get(lager.name, ()))
+
+
+@dataclass
+class Ergebnis(Faelle):
+    decke: Decke
+    """Wie sie gerechnet ist -- mit den Richtungen, die ihre Platten selbst wählten, und den Bändern, die sie selbst legte."""
+
+    zerlegung: Zerlegung
+    aufteilungen: Optional[Aufteilungen]
+    faelle: List[Fallergebnis]
+    meldungen: List[Meldung]
+
+
 def rechnen(decke: Decke) -> Ergebnis:
     """
     Die Decke nach der Streifenmethode, je Lastfall und Kombination -- vorher
@@ -237,10 +267,7 @@ def rechnen(decke: Decke) -> Ergebnis:
     faelle = [fall(name, b, zerlegung) for name, b in belastungen.items()]
     faelle.extend(fall(k.name, kombiniert(belastungen, k), zerlegung) for k in decke.kombinationen)
     for f in faelle:
-        if abs(f.fehlbetrag) > PROBE * max(abs(f.summe), 1.0):
-            f.meldungen.append(Meldung(
-                f"Die Probe geht nicht auf: die Lager tragen {f.lagerkraft / 1e3:.6g} kN, "
-                f"auf den Durchlaufträgern liegen {(f.summe - f.daneben - f.nicht_getragen) / 1e3:.6g} kN."))
+        f.probe("auf den Durchlaufträgern")
     return Ergebnis(decke, zerlegung, aufteilungen, faelle, meldungen)
 
 
@@ -372,7 +399,7 @@ def lagerverlauf(lager: Linienlager, kraefte: Sequence[Wandkraft]) -> List[Tuple
     ``(u_a, u_b, r, m)`` von seinem Anfang bis zu seinem Ende, ``u`` in m ab
     ``lager.a``, ``r`` nach unten in N/m und ``m`` in Nm/m: das Moment, das
     es hält, mit dem Vorzeichen der Platte -- negativ, wo es oben zieht, wie
-    herum das Lager auch gezeichnet ist (:func:`_gehalten`). Wo zwei Durchlaufträger
+    herum das Lager auch gezeichnet ist (:func:`gehalten`). Wo zwei Durchlaufträger
     dasselbe Stück tragen, zählen beide; ein schiefer gibt quer zum Lager
     cos² seines Winkels weiter, wie die Platte (Folie 14).
     """
@@ -400,11 +427,11 @@ def lagerverlauf(lager: Linienlager, kraefte: Sequence[Wandkraft]) -> List[Tuple
         mitte = 0.5 * (ua + ub)
         auf = [s for s in stuecke if s[0] <= mitte <= s[1]]
         heraus.append((ua, ub, sum(s[2] for s in auf),
-                       _gehalten(sum(s[3] for s in auf), sum(s[4] for s in auf))))
+                       gehalten(sum(s[3] for s in auf), sum(s[4] for s in auf))))
     return heraus
 
 
-def _gehalten(links: float, rechts: float) -> float:
+def gehalten(links: float, rechts: float) -> float:
     """
     Was ein Lager an Moment hält, je Meter, wenn die Platte links von ihm
     mit ``links`` an ihm zieht und rechts mit ``rechts``: den Unterschied,

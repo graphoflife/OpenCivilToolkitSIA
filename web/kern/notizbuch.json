@@ -295,6 +295,12 @@
       "bereich": "Decken"
     },
     {
+      "name": "FEM der Decke",
+      "pfad": "Formelsammlung/Themen/FEM der Decke.md",
+      "art": "thema",
+      "bereich": "Decken"
+    },
+    {
       "name": "Durchstanzen",
       "pfad": "Formelsammlung/Themen/Durchstanzen.md",
       "art": "thema",
@@ -3113,7 +3119,8 @@
       "art": "formel",
       "zeichen": [],
       "themen": [
-        "Streifenmethode"
+        "Streifenmethode",
+        "FEM der Decke"
       ]
     },
     {
@@ -3299,6 +3306,15 @@
       "zeichen": [],
       "themen": [
         "Zwängung auf Biegung"
+      ]
+    },
+    {
+      "name": "Momente der Platte nach Kirchhoff",
+      "pfad": "Formelsammlung/Formeln/Momente der Platte nach Kirchhoff.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "FEM der Decke"
       ]
     },
     {
@@ -3675,6 +3691,15 @@
       "zeichen": [],
       "themen": [
         "Querkraft und Torsion"
+      ]
+    },
+    {
+      "name": "Querkräfte aus den Momenten der Platte",
+      "pfad": "Formelsammlung/Formeln/Querkräfte aus den Momenten der Platte.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "FEM der Decke"
       ]
     },
     {
@@ -4855,6 +4880,15 @@
       ],
       "themen": [
         "Holzquerschnitt"
+      ]
+    },
+    {
+      "name": "Träger in der Platte",
+      "pfad": "Formelsammlung/Formeln/Träger in der Platte.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "FEM der Decke"
       ]
     },
     {
@@ -6270,11 +6304,193 @@
         "gefaelle",
         "_nach_innen",
         "extrem",
+        "Bild",
+        "bild",
         "Lastverteilelement",
         "Lastverteilelement.ecken",
         "Lastverteilelement.zusatz",
         "lastverteilelemente",
         "_einzellasten"
+      ]
+    },
+    {
+      "name": "opencivil.decke.fem",
+      "pfad": "Python/opencivil.decke.fem.md",
+      "art": "modul",
+      "kurz": "die Decke nach der Methode der finiten Elemente.",
+      "stichworte": []
+    },
+    {
+      "name": "opencivil.decke.fem.auswertung",
+      "pfad": "Python/opencivil.decke.fem.auswertung.md",
+      "art": "modul",
+      "kurz": "die FEM an einer Stelle, längs eines Schnitts, im Träger.",
+      "stichworte": [
+        "gemischt",
+        "an_stelle",
+        "proben",
+        "bild",
+        "verlauf",
+        "traeger"
+      ]
+    },
+    {
+      "name": "opencivil.decke.fem.belastung",
+      "pfad": "Python/opencivil.decke.fem.belastung.md",
+      "art": "modul",
+      "kurz": "die Lasten eines Falls auf den Knoten.",
+      "stichworte": [
+        "Knotenlasten",
+        "Knotenlasten.mal",
+        "Knotenlasten.plus",
+        "Raster",
+        "Raster.nahe",
+        "Raster.bei",
+        "schwerpunktkoordinaten",
+        "belasten",
+        "_flaeche_verteilen",
+        "_summe"
+      ]
+    },
+    {
+      "name": "opencivil.decke.fem.delaunay",
+      "pfad": "Python/opencivil.decke.fem.delaunay.md",
+      "art": "modul",
+      "kurz": "eine Delaunay-Triangulierung, Punkt für Punkt.",
+      "stichworte": [
+        "orientierung",
+        "im_umkreis",
+        "Triangulierung",
+        "Triangulierung.einfuegen",
+        "Triangulierung._suche",
+        "Triangulierung._loch",
+        "Triangulierung._rand",
+        "Triangulierung._umhaengen",
+        "Triangulierung.dreiecke",
+        "Triangulierung.kanten",
+        "Triangulierung.gefunden"
+      ]
+    },
+    {
+      "name": "opencivil.decke.fem.element",
+      "pfad": "Python/opencivil.decke.fem.element.md",
+      "art": "modul",
+      "kurz": "das Dreieck der Platte und der Balken in ihr.",
+      "stichworte": [
+        "steifigkeit_der_platte",
+        "steifigkeit_des_traegers",
+        "Dreieck",
+        "Dreieck._b",
+        "Dreieck.momente",
+        "Dreieck.gefaelle",
+        "_neigungen",
+        "balken",
+        "balken_in_der_platte",
+        "balkenkraefte"
+      ]
+    },
+    {
+      "name": "opencivil.decke.fem.glaetten",
+      "pfad": "Python/opencivil.decke.fem.glaetten.md",
+      "art": "modul",
+      "kurz": "die Schnittkräfte an den Knoten.",
+      "stichworte": [
+        "Glaettung",
+        "Glaettung._sektoren",
+        "Glaettung.mitteln"
+      ]
+    },
+    {
+      "name": "opencivil.decke.fem.herleitung",
+      "pfad": "Python/opencivil.decke.fem.herleitung.md",
+      "art": "modul",
+      "kurz": "wie die FEM einer Decke ihre Rechnung aufschreibt.",
+      "stichworte": [
+        "schreiben",
+        "_lager",
+        "_ansaetze",
+        "_fall",
+        "_traeger",
+        "_stelle"
+      ]
+    },
+    {
+      "name": "opencivil.decke.fem.netz",
+      "pfad": "Python/opencivil.decke.fem.netz.md",
+      "art": "modul",
+      "kurz": "das Dreiecksnetz einer Decke.",
+      "stichworte": [
+        "Linie",
+        "Linie.laenge",
+        "Linie.richtung",
+        "Netz",
+        "Netz.flaeche",
+        "Netz.linie",
+        "Netz.kanten",
+        "Netz.auf_strecke",
+        "kante",
+        "schaetzung",
+        "vernetzen",
+        "_linien",
+        "_geteilt",
+        "_auf",
+        "_Raster",
+        "_Raster.strecke",
+        "_Raster.frei",
+        "_gitter",
+        "_erzwingen",
+        "_uebernehmen",
+        "_glaetten",
+        "_linien_finden",
+        "_trennkanten"
+      ]
+    },
+    {
+      "name": "opencivil.decke.fem.rechnung",
+      "pfad": "Python/opencivil.decke.fem.rechnung.md",
+      "art": "modul",
+      "kurz": "die FEM der Decke, Fall für Fall.",
+      "stichworte": [
+        "Femwerte",
+        "Femwerte.groesse",
+        "Balkenwerte",
+        "Femfall",
+        "Femfall.stuetzenkraft",
+        "Femfall.wandkraft",
+        "Femfall.lagerstufen",
+        "Femergebnis",
+        "rechnen",
+        "_weite_fuer",
+        "_daneben",
+        "_teile",
+        "_querkraft",
+        "_stuetzen",
+        "_linienlager",
+        "_ausgleichen",
+        "_seiten",
+        "_luecken",
+        "_balken"
+      ]
+    },
+    {
+      "name": "opencivil.decke.fem.system",
+      "pfad": "Python/opencivil.decke.fem.system.md",
+      "art": "modul",
+      "kurz": "das Gleichungssystem der Platte.",
+      "stichworte": [
+        "Halt",
+        "Halt.neigung",
+        "Balkenstueck",
+        "System",
+        "System.unbekannte",
+        "System.gedreht",
+        "System.elemente",
+        "System._beweglich",
+        "System.loesen",
+        "System.reste",
+        "_halt",
+        "_achsen",
+        "_balken"
       ]
     },
     {
@@ -6314,20 +6530,23 @@
       "kurz": "wie eine Decke ihre Rechnung aufschreibt.",
       "stichworte": [
         "schreiben",
-        "_lasten",
+        "als_ort",
+        "linienlager",
+        "_lager",
+        "lasten",
         "_last",
         "_stufe",
-        "_faelle",
+        "faelle",
         "_ansaetze",
         "_fall",
         "_durchlauftraeger",
         "_reihe",
         "_mit_stelle",
-        "_zahl",
-        "_lagerkraefte",
-        "_schnittkraefte",
-        "_widerstaende",
-        "_ort_von",
+        "zahl",
+        "lagerkraefte",
+        "schnittkraefte",
+        "widerstaende",
+        "ort_von",
         "_lastverteilelemente"
       ]
     },
@@ -6342,7 +6561,9 @@
         "Belastung.hinzu",
         "kombiniert",
         "belasten",
+        "Flaeche",
         "flaechen",
+        "stege",
         "linienband",
         "_verteilen",
         "_zuordnen"
@@ -6354,6 +6575,7 @@
       "art": "modul",
       "kurz": "was gerechnet wird: die Decke in SI.",
       "stichworte": [
+        "Verfahren",
         "Aufteilung",
         "Platte",
         "Linienlager",
@@ -6385,21 +6607,25 @@
         "Wandkraft.laenge",
         "Wandkraft.r",
         "Ausfall",
+        "Faelle",
+        "Faelle.fall",
+        "Faelle.fallmeldungen",
+        "Fall",
+        "Fall.lagerkraft",
+        "Fall.fehlbetrag",
+        "Fall.probe",
         "Fallergebnis",
         "Fallergebnis.stuetzenkraft",
         "Fallergebnis.wandkraft",
-        "Fallergebnis.lagerkraft",
-        "Fallergebnis.fehlbetrag",
+        "Fallergebnis.lagerstufen",
         "Ergebnis",
-        "Ergebnis.fall",
-        "Ergebnis.fallmeldungen",
         "rechnen",
         "fall",
         "auf_durchlauftraeger",
         "gegenkraefte",
         "_weitergeben",
         "lagerverlauf",
-        "_gehalten",
+        "gehalten",
         "spitzen",
         "_schwerpunkt"
       ]
@@ -6431,12 +6657,13 @@
         "Verlauf",
         "Verlauf.extreme",
         "verlauf",
+        "in_platten",
         "traeger",
         "_stellen",
         "_im_streifen",
         "_gerastert",
         "_im_teil",
-        "_lager"
+        "lagerstellen"
       ]
     },
     {
@@ -6492,9 +6719,10 @@
       "art": "modul",
       "kurz": "die Decke im Rechenwerk.",
       "stichworte": [
+        "Art",
         "Deckenbefund",
-        "StreifenmethodeProzedur",
-        "StreifenmethodeProzedur.rechne",
+        "DeckenProzedur",
+        "DeckenProzedur.rechne",
         "Deckensystem",
         "Deckensystem.abschnitt",
         "Deckensystem.baustoffe",
@@ -11680,9 +11908,13 @@
       "stichworte": [
         "zeichnung",
         "uebersicht",
+        "_streifen",
+        "_fem",
+        "verfahren_von",
         "faelle",
         "_je_lager",
         "ergebnis",
+        "_Verfahren",
         "_verlauf",
         "_linienlager",
         "_extreme",

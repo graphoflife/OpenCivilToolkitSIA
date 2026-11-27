@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import math
 
+from opencivil.decke.feld import GROESSEN as STREIFENGROESSEN
 from opencivil.decke.schnitt import BALKENGROESSEN
 from opencivil.material.holz import Feuchteklasse
 from opencivil.projekt import beispiele_verbund as verbund
@@ -320,7 +321,7 @@ def jeder_nachweis() -> Projekt:
 
 def _decken(p: Projekt) -> None:
     """
-    Zwei Decken. Die des Kolloquiums 4 (Stahlbeton II): eine Platte auf
+    Drei Decken. Die des Kolloquiums 4 (Stahlbeton II): eine Platte auf
     einer Wand und drei Stützen, Träger in zwei Stufen, fest
     30 % in x, und als einziger Lastfall q_d = 18.6 kN/m² auf der ganzen
     Platte, das Eigengewicht darin. Und eine, die jede Wahl einmal braucht:
@@ -331,7 +332,11 @@ def _decken(p: Projekt) -> None:
     Kombinationen einer frischen Decke und jede Art Last: auf einer ganzen
     Platte, gezeichnet, längs einer Linie und an einem Punkt. Die erste
     zeigt m_x, m_y, die Lager und M und V des Trägers T4, der auf den drei
-    anderen liegt; die zweite jedes Bild der Platte einmal.
+    anderen liegt; die zweite jedes Bild der Streifenmethode einmal. Die
+    dritte ist die erste nach der FEM, T4 als Unterzug 300 mm unter der
+    Platte, mit einem Schnitt quer durch die Felder: sie zeigt jedes Bild
+    der Platte einmal, auch die Durchbiegung, das längs des Schnitts und M
+    und V von T4.
     """
     beton = _erstes(p, "beton")
     k4 = p.decke("Kolloquium 4", aufteilung="fest", anteil=30.0)
@@ -364,13 +369,29 @@ def _decken(p: Projekt) -> None:
     for a, b in zip(schief, schief[1:] + schief[:1]):
         el.lager(a, b)
     gzt = el.standardfaelle()
-    for groesse in PLATTENGROESSEN:
+    for groesse in (*STREIFENGROESSEN, "lager"):
         el.diagramm(gzt, groesse)
     _, auflast, nutzlast = el.lastfaelle
     el.plattenlast(auflast, "P2", 1.5)
     el.linienlast(auflast, (1, 6.5), (5, 6.5), wert=8.0)
     el.flaechenlast(nutzlast, [(3, 1), (5, 1), (5, 3), (3, 3)], wert=5.0)
     el.punktlast(nutzlast, (12.5, 2.0), wert=30.0)
+
+    fem = p.decke("Kolloquium 4 nach FEM", verfahren="fem", netzweite=0.5)
+    fem.platte([(0, 0), (9, 0), (9, 5.5), (0, 5.5)], beton=beton, h=240)
+    fem.lager((0, 0), (9, 0))
+    for x in (0.5, 4.5, 8.5):
+        fem.stuetze((x, 5.0))
+        fem.traeger_legen((x, 0), (x, 5.5))
+    fem.traeger_legen((0, 5.0), (9, 5.0), h_T=300.0)
+    schnitt = fem.schnitt((0, 2.5), (9, 2.5))
+    q_d = fem.lastfall("q_d")
+    fem.plattenlast(q_d, "P1", 18.6)
+    for groesse in PLATTENGROESSEN:
+        fem.diagramm(q_d, groesse)
+    fem.diagramm(q_d, "m_x", schnitt)
+    for groesse in BALKENGROESSEN:
+        fem.diagramm(q_d, groesse, "T4")
 
 
 def _durchstanzstellen(p: Projekt) -> None:

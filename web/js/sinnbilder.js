@@ -333,10 +333,22 @@ const ZEICHEN = {
 
   // -- Die Knöpfe der Decke ---------------------------------------------------
 
-  // Die Streifen: eine Platte, gestrichelt in beide Richtungen geteilt.
-  streifen: {
+  // Das Verfahren: eine Platte, links in Streifen geteilt (gestrichelt),
+  // rechts in Dreiecke -- die zwei Wege, sie zu rechnen.
+  verfahren: {
+    pfade: ['M3.5 3.5h17v17h-17z', 'M12 3.5v17', 'M12 12h8.5 M12 3.5l8.5 8.5 M12 12l8.5 8.5'],
+    strich: ['M7.75 3.5v17 M3.5 7.75h8.5 M3.5 16.25h8.5'],
+  },
+  // Die Stellungen des Schalters: die Streifenmethode -- die Platte
+  // gestrichelt in beide Richtungen geteilt -- und die FEM, ein Netz aus
+  // Dreiecken.
+  'verfahren-streifen': {
     pfade: ['M3.5 3.5h17v17h-17z'],
     strich: ['M9 3.5v17 M15 3.5v17 M3.5 9h17 M3.5 15h17'],
+  },
+  'verfahren-fem': {
+    pfade: ['M3.5 3.5h17v17h-17z', 'M12 3.5v17 M3.5 12h17',
+      'M3.5 3.5L20.5 20.5 M12 3.5L20.5 12 M3.5 12L12 20.5'],
   },
   // Die Ergebnisse: die Platte, gestrichelt ein Schnitt durch sie und
   // darüber der Verlauf längs ihm -- wie beim Werkzeug, das ihn zeichnet.

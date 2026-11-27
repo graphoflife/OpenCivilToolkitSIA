@@ -1,5 +1,5 @@
 ---
-erzeugt: f0c2613b98be
+erzeugt: 435a59890b9e
 art: modul
 tags: [modul]
 ---
@@ -13,8 +13,8 @@ Der [[opencivil.projekt.decke#DeckeEintrag|DeckeEintrag]]: Platten, Linienlager,
 Unterzug oder ein Ueberzug – und Zonen der Lastaufteilung, gezeichnet aus
 Knoten im Grundriss – als speicherbare Datenklasse wie das Balkensystem
 ([[opencivil.projekt.balkensystem]]). Dazu der Baukasten, der ohne
-Oberflaeche zeichnet. Gerechnet wird nach der Streifenmethode, in
-[[opencivil.decke]].
+Oberflaeche zeichnet. Gerechnet wird nach der Streifenmethode oder der FEM,
+in [[opencivil.decke]].
 
 
 ## ALLES HAENGT AN KNOTEN
@@ -166,13 +166,16 @@ class TraegerEintrag(Beschreibung)
 Ein Träger, ein Unterzug oder ein Überzug: in der Streifenmethode ein
 starker Streifen in der Platte (Folie 33), so breit wie `breite`,
 liegend auf Linienlagern, Stützen und den Trägern höherer `stufe`,
-die ihn kreuzen.
+die ihn kreuzen. In der FEM ein Balken in der Platte, der `h_T` über
+oder unter sie reicht – null: er steckt in ihr. Sein Steg wiegt im
+Eigengewicht mit, in beiden Verfahren.
 
 - `kennung: str = ''`
 - `von: str = ''`
 - `bis: str = ''`
 - `breite: float = bereich(1.0, heisst='Breite b', einheit=M, ueber=0.0)`
 - `stufe: int = bereich(1, heisst='Stufe', ab=1)`
+- `h_T: float = bereich(0.0, heisst='Höhe h_T', einheit=MM, ab=0.0)`
 
 ### ZoneEintrag
 
@@ -279,10 +282,11 @@ class DeckeEintrag(MitFaellen, BauteilEintrag)
 ```
 
 Eine Decke aus Platten auf Linienlagern und Stützen, mit Trägern und
-Zonen, und ihren Lasten, Lastfällen und Kombinationen.
-Wie die Last aufgeteilt wird, gilt für die ganze Decke: automatisch
-nach Folie 31 oder `anteil` in die Richtung 1 – in einer Zone deren
-Anteil.
+Zonen, und ihren Lasten, Lastfällen und Kombinationen, gerechnet nach
+ihrem `verfahren`: der Streifenmethode oder der FEM mit der
+`netzweite`. Wie die Streifenmethode die Last aufteilt, gilt für die
+ganze Decke: automatisch nach Folie 31 oder `anteil` in die Richtung
+1 – in einer Zone deren Anteil.
 
 Ohne Regeln, die das ganze Projekt aufhielten: was an einer Decke nicht
 stimmt, steht in ihren Meldungen, und die anderen Bauteile rechnen weiter.
@@ -304,6 +308,8 @@ stimmt, steht in ihren Meldungen, und die anderen Bauteile rechnen weiter.
 - `lastfaelle: List[LastfallEintrag] = field(default_factory=list)`
 - `kombinationen: List[LastkombinationEintrag] = field(default_factory=list)`
 - `diagramme: List[DeckendiagrammEintrag] = field(default_factory=list)`
+- `verfahren: Verfahren = Verfahren.STREIFEN`
+- `netzweite: float = bereich(NETZWEITE, heisst='Netzweite', einheit=M, ueber=0.0)` – Nur in der FEM: so weit liegen die Knoten ihres Netzes höchstens auseinander.
 - `streifenbreite: float = bereich(0.25, heisst='Streifenbreite', einheit=M, ueber=0.0)`
 - `aufteilung: Aufteilung = Aufteilung.AUTOMATISCH`
 - `anteil: float = bereich(50.0, heisst='Anteil in Richtung 1', einheit=PROZENT, ab=0.0,…` – Nur bei fester Aufteilung.
@@ -442,14 +448,14 @@ m_x, m_y, v_0 und die Lagerkräfte der GZT.
 ## Konstanten
 
 - `Ort = Union[str, Sequence[float]]` – Ein Ort im Baukasten: die Kennung eines Knotens oder `(x, y)` in m.
-- `PLATTENGROESSEN = (*GROESSEN, 'lager')` – Was ein Ergebnisbild zeigt: eine Schnittkraft der Platte, die Lagerkraefte – oder Moment und Querkraft eines ganzen Trägers.
+- `PLATTENGROESSEN = (*GROESSEN, 'lager')` – Was ein Ergebnisbild zeigt: eine Schnittkraft der Platte, in der FEM auch die Durchbiegung, die Lagerkraefte – oder Moment und Querkraft eines ganzen Trägers.
 - `DIAGRAMMGROESSEN = (*PLATTENGROESSEN, *BALKENGROESSEN)`
 - `VORSILBEN = {'platten': 'P', 'linienlager': 'L', 'stuetzen': 'S', 'traeger': 'T',…` – Womit die Kennungen der Teile einer Decke beginnen.
 
 ## Braucht
 
 - [[opencivil.core.einheiten]]
-- [[opencivil.decke.feld]]
+- [[opencivil.decke.fem.rechnung]]
 - [[opencivil.decke.geometrie]]
 - [[opencivil.decke.modell]]
 - [[opencivil.decke.schnitt]]

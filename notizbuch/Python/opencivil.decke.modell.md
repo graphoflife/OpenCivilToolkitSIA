@@ -1,5 +1,5 @@
 ---
-erzeugt: 4b3808a530a8
+erzeugt: 3cbd8112fd1b
 art: modul
 tags: [modul]
 ---
@@ -11,8 +11,9 @@ tags: [modul]
 
 Die Eingabe des Rechenkerns, ohne Oberfläche und ohne Projekt: Platten,
 Lager, Stützen, Träger, Zonen der Lastaufteilung, Lasten,
-Lastfälle und Kombinationen – alles in N, m und rad. Gerechnet wird in
-[[opencivil.decke.rechnung|rechnung]].
+Lastfälle und Kombinationen – alles in N, m und rad. Gerechnet wird nach
+der Streifenmethode in [[opencivil.decke.rechnung|rechnung]], mit finiten
+Elementen in [[opencivil.decke.fem|fem]] ([[opencivil.decke.modell#Verfahren|Verfahren]]).
 
 
 ## DIE ACHSEN
@@ -30,6 +31,17 @@ gilt immer für Richtung 1, der Rest geht in Richtung 2. Grenzen zwei Platten
 mit derselben Richtung aneinander, laufen ihre Streifen durch.
 
 ## Inhalt
+
+### Verfahren
+
+```python
+class Verfahren(Wahl)
+```
+
+Wie die Decke gerechnet wird.
+
+- `STREIFEN = 'streifen'` – Nach der Streifenmethode, für die Tragsicherheit – [[opencivil.decke.rechnung|rechnung]].
+- `FEM = 'fem'` – Linear elastisch mit finiten Elementen – [[opencivil.decke.fem|fem]].
 
 ### Aufteilung
 
@@ -56,6 +68,7 @@ class Platte
 - `wichte: float` – Gewicht je Volumen in N/m³, für das Eigengewicht.
 - `richtungen: Tuple[float, float] = (0.0, math.pi / 2.0)` – Richtung 1 und 2 der Lastabtragung, rad gegen die x-Achse.
 - `von_selbst: bool = False` – Ob die Platte ihre Richtungen selbst wählt, entlang ihrer Ränder ([[opencivil.decke.richtungen|richtungen]]) – dann gilt `richtungen` erst, wenn die Rechnung sie gewählt hat ([[opencivil.decke.rechnung#Ergebnis|decke]]).
+- `nu: float = 0.0` – Die Querdehnungszahl – nur die FEM braucht sie; sie kommt wie E vom Beton.
 
 ### Linienlager
 
@@ -105,7 +118,9 @@ Ein Träger – ein Unterzug oder ein Überzug –, in der Streifenmethode
 ein Streifen der Breite `breite` von `a` nach `b`, so dick wie
 die Platte. Streifen quer dazu liegen auf ihm,
 ein Träger mit kleinerer `stufe` ebenso; er selbst liegt auf Lagern,
-Stützen und Trägern höherer Stufe.
+Stützen und Trägern höherer Stufe. In der FEM ein Balken in der Platte
+([[opencivil.decke.fem.element|element]]), so steif wie das Rechteck
+`breite × (h + hoehe)` ohne den Teil der Platte.
 
 - `name: str`
 - `a: Punkt`
@@ -113,6 +128,7 @@ Stützen und Trägern höherer Stufe.
 - `breite: float`
 - `stufe: float = 1` – Ganz, ab 1 – nur die Bänder liegen darunter ([[opencivil.decke.baender|STUFE_RAND]]).
 - `von_selbst: bool = False` – Ein Band, das die Rechnung selbst legt ([[opencivil.decke.baender|baender]]) – kein Eintrag im Projekt.
+- `hoehe: float = 0.0` – So weit reicht er über oder unter die Platte, in m – null: er steckt in ihr. Sein Steg wiegt mit, wenn ein Lastfall das Eigengewicht hat ([[opencivil.decke.lasten#stege|stege]]).
 
 ### Zone
 
@@ -233,6 +249,8 @@ class Decke
 - `aufteilung: Aufteilung = Aufteilung.AUTOMATISCH`
 - `anteil: float = 0.5` – Bei fester Aufteilung: der Anteil in Richtung 1.
 - `bandbreite: float = BANDBREITE` – Nur bei automatischer Aufteilung: dann legt die Rechnung Bänder so breit ([[opencivil.decke.baender|baender]]).
+- `verfahren: Verfahren = Verfahren.STREIFEN`
+- `netzweite: float = NETZWEITE` – Nur in der FEM: so weit liegen die Knoten ihres Netzes höchstens auseinander ([[opencivil.decke.fem.netz|netz]]).
 
 
 ## Konstanten
@@ -240,6 +258,7 @@ class Decke
 - `STREIFENBREITE = 0.25` – Die Breite eines Streifens höchstens, in m – ein Vorschlag.
 - `VERTEILBREITE = 1.0` – Die Seiten der Fläche, über die eine Einzellast verteilt wird, in m – ein Vorschlag.
 - `BANDBREITE = 1.0` – Wie breit die Bänder sind, die die Rechnung selbst legt, in m – ein Vorschlag.
+- `NETZWEITE = 0.5` – Wie weit die Knoten des Netzes der FEM höchstens auseinander liegen, in m – ein Vorschlag.
 
 ## Braucht
 
@@ -251,6 +270,12 @@ class Decke
 - [[opencivil.decke.aufteilung]]
 - [[opencivil.decke.baender]]
 - [[opencivil.decke.feld]]
+- [[opencivil.decke.fem.auswertung]]
+- [[opencivil.decke.fem.belastung]]
+- [[opencivil.decke.fem.herleitung]]
+- [[opencivil.decke.fem.netz]]
+- [[opencivil.decke.fem.rechnung]]
+- [[opencivil.decke.fem.system]]
 - [[opencivil.decke.herleitung]]
 - [[opencivil.decke.lasten]]
 - [[opencivil.decke.rechnung]]

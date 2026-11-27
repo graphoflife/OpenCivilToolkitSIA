@@ -1,6 +1,6 @@
 # Voll
 
-992 Berechnungen ausgeführt, 1614 Werte bestimmt.
+994 Berechnungen ausgeführt, 1615 Werte bestimmt.
 
 ## Herleitung
 
@@ -31884,6 +31884,144 @@ Gesucht am Schwerpunkt jeder Zelle der Bilder und an den Stellen, an denen ein D
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | S1 · Stütze | $6.7$ | $1.20 \times 0.80$ | $1.3$ | $0.3$ | $0.6$ | $0.2$ |
 
+### Decke: Kolloquium 4 nach FEM
+
+**Erdbeschleunigung für das Eigengewicht (nach Vorgabe des Benutzers)**
+
+$$
+g = 10\,\mathrm{m}/\mathrm{s}^{2}
+$$
+
+> **Annahme:** FEM: die ganze Platte linear elastisch und ungerissen, mit E\_cm und ν\_c ihres Betons (SIA 262:2025, 4.1.4.1.1 und 4.1.4.1.3; ν\_c nach 3.1.2.3.5), als dünne Platte nach Kirchhoff aus Dreiecken DKT (Batoz, Bathe und Ho 1980). Die Lager halten, wie sie gezeichnet sind: ein Linienlager die Höhe und, eingespannt, die Drehung quer zu ihm; eine Stütze nur ihren Punkt. Ein Träger mit Höhe ist ein Balken in der Mittelebene der Platte, ohne Torsionssteifigkeit; ohne Höhe trägt an seiner Stelle nur die Platte. Umgelagert wird nichts.
+
+**Platten**
+
+| Platte | $A\ [\mathrm{m}^{2}]$ | $h\ [\mathrm{mm}]$ | Beton | $E_{cm}\ [\mathrm{N/mm}^{2}]$ | $\nu_c$ | $D\ [\mathrm{MNm}]$ | $g_k\ [\mathrm{kN/m}^{2}]$ |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| P1 | $49.50$ | $240$ | C30/37 | $33620$ | $0.20$ | $40.3$ | $6.00$ |
+
+Das Eigengewicht je m² ist ρ · g · h, mit der Dichte des Stahlbetons und g = 10 m/s².
+
+**Linienlager**
+
+| Linienlager | von | bis | $L\ [\mathrm{m}]$ | vertikal | eingespannt |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| L1 | (0.00, 0.00) | (9.00, 0.00) | $9.00$ | ja | nein |
+
+**Stützen**
+
+| Stütze | Ort | $b_x \times b_y\ [\mathrm{mm}]$ |
+| ---: | ---: | ---: |
+| S1 | (0.50, 5.00) | 300 × 300 |
+| S2 | (4.50, 5.00) | 300 × 300 |
+| S3 | (8.50, 5.00) | 300 × 300 |
+
+Eine Stütze hält die Platte in ihrer Mitte, als Punkt; ihr Querschnitt zählt dabei nicht.
+
+**Träger**
+
+| Träger | von | bis | $b\ [\mathrm{m}]$ | $h_T\ [\mathrm{mm}]$ | $EI\ [\mathrm{MNm}^{2}]$ |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| T1 | (0.50, 0.00) | (0.50, 5.50) | $1.00$ | $0$ | in der Platte |
+| T2 | (4.50, 0.00) | (4.50, 5.50) | $1.00$ | $0$ | in der Platte |
+| T3 | (8.50, 0.00) | (8.50, 5.50) | $1.00$ | $0$ | in der Platte |
+| T4 | (0.00, 5.00) | (9.00, 5.00) | $1.00$ | $300$ | $402.4$ |
+
+**Lasten, nach unten positiv**
+
+| Lastfall | Last | wo | Wert |
+| ---: | ---: | ---: | ---: |
+| q\_d | P1 | die ganze Platte | $18.60\ \mathrm{kN/m^{2}}$ |
+
+Das Netz hat 232 Knoten und 404 Dreiecke, ihre Seiten höchstens 0.50 m lang. Es folgt den Rändern der Platten, den Linienlagern, den Trägern und den Linienlasten; jede Stütze ist einer seiner Knoten.
+
+**Last und Lagerkräfte je Fall**
+
+| Fall | $Q\ [\mathrm{kN}]$ | $Q_{\mathrm{daneben}}\ [\mathrm{kN}]$ | $Q_{\mathrm{nicht\ getragen}}\ [\mathrm{kN}]$ | $\sum R\ [\mathrm{kN}]$ |
+| ---: | ---: | ---: | ---: | ---: |
+| q\_d | $920.7$ | $0.0$ | $0.0$ | $920.7$ |
+
+Die Lager tragen die ganze Last ausser dem, was neben den Platten liegt oder auf einem Teil, der sich frei bewegen könnte.
+
+**Die Momente der Platte aus ihrer Krümmung, nach Kirchhoff**
+
+$$
+\begin{aligned} & D = \frac{E_{cm} \cdot h^3}{12 \cdot (1 - \nu_c^2)} \\ & m_x = -D \cdot \left(\frac{\partial^2 w}{\partial x^2} + \nu_c \cdot \frac{\partial^2 w}{\partial y^2}\right) \qquad m_y = -D \cdot \left(\frac{\partial^2 w}{\partial y^2} + \nu_c \cdot \frac{\partial^2 w}{\partial x^2}\right) \\ & m_{xy} = -D \cdot (1 - \nu_c) \cdot \frac{\partial^2 w}{\partial x \, \partial y} \end{aligned}
+$$
+
+w ist die Durchbiegung, nach unten positiv; m\_x \> 0 zieht unten. Im Dreieck DKT ändern sich die Neigungen von w quadratisch, die Krümmungen und Momente also linear. An jedem Knoten gilt das Mittel der Dreiecke um ihn, nach ihrer Fläche – ausser über ein Lager, einen Träger, eine Linienlast oder die Fuge zweier verschieden steifer Platten hinweg: dort behält jede Seite ihren Wert (nach Vorgabe, nicht nachgeschlagen).
+
+**Die Querkräfte aus dem Gefälle der Momente**
+
+$$
+v_x = \frac{\partial m_x}{\partial x} + \frac{\partial m_{xy}}{\partial y} \qquad v_y = \frac{\partial m_{xy}}{\partial x} + \frac{\partial m_y}{\partial y} \qquad v_0 = \sqrt{v_x^2 + v_y^2}
+$$
+
+Das Gefälle der gemittelten Momente je Dreieck gibt die Querkräfte, an den Knoten ebenso gemittelt. An einem Rand, einem Lager und einer Stütze sind sie mit einem groben Netz ungenauer als im Feld.
+
+**Ein Träger: Balken in der Mittelebene und Platte über seine Breite b**
+
+$$
+\begin{aligned} & EI = E_{cm} \cdot b \cdot \frac{(h + h_T)^3 - h^3}{12} \\ & M = M_{\mathrm{Balken}} + b \cdot \bar{m}_t \qquad V = V_{\mathrm{Balken}} + b \cdot \bar{v}_t \end{aligned}
+$$
+
+Der Balken ist so steif wie das Rechteck b × (h + h\_T) ohne den Teil, den die Platte schon trägt. M und V des Trägers sind die des Balkens und die der Platte über seine Breite: b mal das Mittel von m\_t und v\_t quer zu ihm, in seiner Richtung (nach Vorgabe, nicht nachgeschlagen).
+
+**Erforderliche Biegewiderstände, linearisierte Fliessbedingung** *(SIA 262:2025, 4.3.2.6, (34))*
+
+$$
+\begin{aligned} & m_{xu} \ge m_x + |m_{xy}| \qquad m_{yu} \ge m_y + |m_{xy}| \\ & m'_{xu} \ge -m_x + |m_{xy}| \qquad m'_{yu} \ge -m_y + |m_{xy}| \end{aligned}
+$$
+
+> **Hinweis:** Eine Stütze hält als Punkt: über ihr wachsen die Momente mit feinerem Netz ohne Grenze, und ihre Werte dort hängen von der Netzweite ab.
+
+#### Lastfall «q\_d»
+
+**Lagerkräfte**
+
+| Lager | $F\ [\mathrm{kN}]$ | $r_{\max}\ [\mathrm{kN/m}]$ |
+| ---: | ---: | ---: |
+| S1 · Stütze | $122.9$ | – |
+| S2 · Stütze | $260.4$ | – |
+| S3 · Stütze | $123.0$ | – |
+| L1 · Linienlager | $414.3$ | $93.5$ |
+
+Längs eines Linienlagers gehört zu jedem Knoten das Stück bis zur Mitte der Kanten daneben; was er trägt, verteilt sich gleichmässig darüber, ausgeglichen mit seinen Nachbarn mitten im Lager. An den Enden, an einer Ecke und wo ein anderes Lager anstösst, greift die Kraft im Punkt an. r\_max ist der Wert mit dem grössten Betrag.
+
+**Schnittkräfte der Platte, je Meter**
+
+| Grösse | kleinst | Ort | grösst | Ort |
+| ---: | ---: | ---: | ---: | ---: |
+| $m_x$ | $-10.5\ \mathrm{kNm/m}$ | (4.50, 5.00) | $11.3\ \mathrm{kNm/m}$ | (5.99, 2.60) |
+| $m_y$ | $-10.7\ \mathrm{kNm/m}$ | (4.50, 5.00) | $59.3\ \mathrm{kNm/m}$ | (0.00, 2.50) |
+| $m_{xy}$ | $-6.8\ \mathrm{kNm/m}$ | (0.00, 4.50) | $6.6\ \mathrm{kNm/m}$ | (9.00, 4.50) |
+| $v_x$ | $-11.4\ \mathrm{kN/m}$ | (4.50, 5.00) | $9.7\ \mathrm{kN/m}$ | (4.50, 5.00) |
+| $v_y$ | $-60.0\ \mathrm{kN/m}$ | (4.50, 5.00) | $49.6\ \mathrm{kN/m}$ | (4.50, 0.00) |
+| $v_0$ | $0.9\ \mathrm{kN/m}$ | (9.00, 2.50) | $61.1\ \mathrm{kN/m}$ | (4.50, 5.00) |
+| $w$ | $-1.2\ \mathrm{mm}$ | (0.00, 5.50) | $3.9\ \mathrm{mm}$ | (0.00, 2.50) |
+
+Gesucht an jedem Knoten des Netzes: über ein Dreieck ist jede Grösse linear, das Grösste liegt also an einer Ecke. Momente positiv mit Zug unten.
+
+**Erforderliche Biegewiderstände**
+
+| Widerstand | Seite | erforderlich | Ort |
+| ---: | ---: | ---: | ---: |
+| $m_{xu}$ | unten, in x | $11.6\ \mathrm{kNm/m}$ | (5.99, 2.60) |
+| $m_{yu}$ | unten, in y | $60.1\ \mathrm{kNm/m}$ | (0.00, 2.50) |
+| $m'_{xu}$ | oben, in x | $11.5\ \mathrm{kNm/m}$ | (9.00, 5.00) |
+| $m'_{yu}$ | oben, in y | $14.7\ \mathrm{kNm/m}$ | (9.00, 5.00) |
+
+**Träger, über ihre ganze Breite**
+
+| Träger | $M_{\min}\ [\mathrm{kNm}]$ | $u\ [\mathrm{m}]$ | $M_{\max}\ [\mathrm{kNm}]$ | $u\ [\mathrm{m}]$ | $V\ [\mathrm{kN}]$ | $u\ [\mathrm{m}]$ |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| T1 | $-5.7$ | $5.00$ | $58.3$ | $2.50$ | $-45.0$ | $5.00$ |
+| T2 | $-6.9$ | $5.00$ | $56.5$ | $2.50$ | $-52.6$ | $5.00$ |
+| T3 | $-5.4$ | $5.00$ | $58.2$ | $2.50$ | $-45.1$ | $5.00$ |
+| T4 | $-94.3$ | $4.50$ | $50.2$ | $7.00$ | $-116.1$ | $4.00$ |
+
+u misst längs des Trägers ab seinem Anfang. V ist die Querkraft mit dem grössten Betrag, positiv, wo das Moment längs u wächst.
+
 ## Verwendete Formeln
 
 ### Querschnitt
@@ -35356,6 +35494,26 @@ $$
 \begin{aligned} & m'_{xu} \ge \frac{Q}{8} \cdot \frac{l_x}{l_y} \qquad m_{xu} \ge \left(\frac{1}{2\pi} - \frac{1}{8}\right) \cdot Q \cdot \frac{l_x}{l_y} \\ & m'_{yu} \ge \frac{Q}{8} \cdot \frac{l_y}{l_x} \qquad m_{yu} \ge \left(\frac{1}{2\pi} - \frac{1}{8}\right) \cdot Q \cdot \frac{l_y}{l_x} \end{aligned}
 $$
 
+### FEM der Decke
+
+**Die Momente der Platte aus ihrer Krümmung, nach Kirchhoff**
+
+$$
+\begin{aligned} & D = \frac{E_{cm} \cdot h^3}{12 \cdot (1 - \nu_c^2)} \\ & m_x = -D \cdot \left(\frac{\partial^2 w}{\partial x^2} + \nu_c \cdot \frac{\partial^2 w}{\partial y^2}\right) \qquad m_y = -D \cdot \left(\frac{\partial^2 w}{\partial y^2} + \nu_c \cdot \frac{\partial^2 w}{\partial x^2}\right) \\ & m_{xy} = -D \cdot (1 - \nu_c) \cdot \frac{\partial^2 w}{\partial x \, \partial y} \end{aligned}
+$$
+
+**Die Querkräfte aus dem Gefälle der Momente**
+
+$$
+v_x = \frac{\partial m_x}{\partial x} + \frac{\partial m_{xy}}{\partial y} \qquad v_y = \frac{\partial m_{xy}}{\partial x} + \frac{\partial m_y}{\partial y} \qquad v_0 = \sqrt{v_x^2 + v_y^2}
+$$
+
+**Ein Träger: Balken in der Mittelebene und Platte über seine Breite b**
+
+$$
+\begin{aligned} & EI = E_{cm} \cdot b \cdot \frac{(h + h_T)^3 - h^3}{12} \\ & M = M_{\mathrm{Balken}} + b \cdot \bar{m}_t \qquad V = V_{\mathrm{Balken}} + b \cdot \bar{v}_t \end{aligned}
+$$
+
 ## Nachweise
 
 ### Decke
@@ -37178,6 +37336,7 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Charakteristische Fliessgrenze | $f_{yk}$ | $500$ | N/mm² | Vorgabe |
 | Charakteristische Fliessgrenze auf Druck | $f_{yk}^{-}$ | $500$ | N/mm² | Vorgabe |
 | Teilsicherheitsbeiwert für Betonstahl | $\gamma_s$ | $1.15$ |  | Vorgabe |
+| Erdbeschleunigung | $g$ | $10$ | m/s² | Vorgabe |
 | Erdbeschleunigung | $g$ | $10$ | m/s² | Vorgabe |
 | Erdbeschleunigung | $g$ | $10$ | m/s² | Vorgabe |
 | Grösstkorndurchmesser | $D_{max}$ | $32$ | mm | Vorgabe |

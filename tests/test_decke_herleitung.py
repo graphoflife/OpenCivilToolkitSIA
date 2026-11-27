@@ -92,8 +92,8 @@ class TestKolloquium4(unittest.TestCase):
         bild = dienst.bearbeite("decke_ergebnis", {"projekt": PROJEKT.als_dict(), "kennung": kennung("Kolloquium 4"),
                                                    "fall": "q_d"}).daten["ergebnis"]["extreme"]
         zeilen = self.zeilen("Schnittkräfte der Platte, je Meter")
-        self.assertEqual([g for g, _, _ in SCHNITTKRAEFTE], list(GROESSEN))
-        for (groesse, _, _), zeile in zip(SCHNITTKRAEFTE, zeilen):
+        self.assertEqual([g for g, *_ in SCHNITTKRAEFTE], list(GROESSEN))
+        for (groesse, *_), zeile in zip(SCHNITTKRAEFTE, zeilen):
             for art, spalte in (("kleinst", 1), ("groesst", 3)):
                 wert, ort = zeile[spalte].split("\\")[0], zeile[spalte + 1]
                 self.assertAlmostEqual(float(wert), bild[groesse][art]["wert"], delta=0.051, msg=groesse)

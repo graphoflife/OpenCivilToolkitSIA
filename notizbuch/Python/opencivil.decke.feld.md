@@ -1,5 +1,5 @@
 ---
-erzeugt: 26123eb7a9ab
+erzeugt: 2d656f0ab031
 art: modul
 tags: [modul]
 ---
@@ -229,6 +229,32 @@ def extrem(proben: Sequence[Probe], aus: Callable[[Schnittkraefte], float]) -> T
 `((Ort, kleinster), (Ort, grösster))` dessen, was `aus` aus den
 Schnittkräften liest – bei gleichen Werten die vordere Probe.
 
+### Bild
+
+```python
+@dataclass(frozen=True)
+class Bild
+```
+
+Was ein Bild der Platte von einem Fall zeigt, in beiden Verfahren gleich:
+`zellen`, je Zelle ihre Ecken; `mitten`, je Zelle ihr Schwerpunkt mit
+den Schnittkräften dort; `gefaelle`, je Zelle und Grösse
+`(∂/∂x, ∂/∂y)` in ihrer Einheit je m; `proben`, wo der grösste und
+der kleinste Wert gesucht werden.
+
+- `zellen: List[List[Punkt]]`
+- `mitten: List[Probe]`
+- `gefaelle: List[Dict[str, Tuple[float, float]]]`
+- `proben: List[Probe]`
+
+### bild
+
+```python
+def bild(ergebnis: Ergebnis, fall: Fallergebnis) -> Bild
+```
+
+Das Bild der Streifenmethode: ihre Zellen ([[opencivil.decke.feld#zellen_von|zellen_von]]) und die Proben des Falls ([[opencivil.decke.feld#proben|proben]]).
+
 ### Lastverteilelement
 
 ```python
@@ -300,7 +326,9 @@ Die Einzellasten eines Lastfalls oder einer Kombination, mit ihrem Beiwert.
 
 ## Gebraucht von
 
+- [[opencivil.decke.fem.auswertung]]
+- [[opencivil.decke.fem.rechnung]]
 - [[opencivil.decke.herleitung]]
 - [[opencivil.decke.schnitt]]
-- [[opencivil.projekt.decke]]
+- [[opencivil.projekt.beispiele]]
 - [[opencivil.web.deckendaten]]

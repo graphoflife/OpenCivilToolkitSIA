@@ -33,7 +33,7 @@ from opencivil.core.protokoll import (
 )
 from opencivil.core.rechenwerk import Loesung
 from opencivil.core.wert import Wert
-from opencivil.decke.modell import Aufteilung
+from opencivil.decke.modell import Aufteilung, Verfahren
 from opencivil.material.arten import MATERIALARTEN
 from opencivil.material.beton import BETONSORTEN
 from opencivil.material.holz import REFERENZ_ETA_T, STOSSARTIG, TABELLE_4, Feuchteklasse, eta_t
@@ -88,7 +88,7 @@ from opencivil.pfahl.pfahl import (
 )
 from opencivil.projekt.pfahl import PfahlEintrag, PfahlschichtEintrag
 from opencivil.web import (
-    balkendaten, diagrammdaten, durchstanzdaten, systemkatalog, werkstoffkurven,
+    balkendaten, deckendaten, diagrammdaten, durchstanzdaten, systemkatalog, werkstoffkurven,
 )
 from opencivil.web.anzeige import zelle_dict
 from opencivil.web.umschlag import endlich
@@ -108,17 +108,24 @@ _VERSCHMIERUNGEN = {
     "flaeche": ("Stahlfläche", "Die Stahlfläche der ganzen Linie, von Hand"),
     "staebe": ("⌀ und Teilung", "Stäbe ⌀ im Abstand s über die Länge L, verschmiert: L/s · π⌀²/4"),
 }
-#: Wie die Aufteilungen einer Decke heissen: kurz im Schalter, lang in seinem
-#: Titel. Die Regel dahinter steht in :mod:`opencivil.decke.aufteilung`.
 #: Wie die Ergebnisbilder einer Decke heissen: kurz im Schalter, lang ueber
 #: dem Bild -- je Groesse, die die Beschreibung kennt. M und V sind die eines
 #: ganzen Trägers.
 _DECKENGROESSEN = {
     "m_x": ("m_x", "Moment m_x"), "m_y": ("m_y", "Moment m_y"), "m_xy": ("m_xy", "Drillmoment m_xy"),
     "v_x": ("v_x", "Querkraft v_x"), "v_y": ("v_y", "Querkraft v_y"),
-    "v_0": ("v_0", "Hauptquerkraft v_0"), "lager": ("Lager", "Lagerkräfte"),
+    "v_0": ("v_0", "Hauptquerkraft v_0"), "w": ("w", "Durchbiegung w"), "lager": ("Lager", "Lagerkräfte"),
     "M": ("M", "Moment M"), "V": ("V", "Querkraft V"),
 }
+#: Wie die Verfahren einer Decke heissen: kurz im Schalter, lang in seinem
+#: Titel. Gerechnet wird in :mod:`opencivil.decke`.
+_VERFAHREN = {
+    Verfahren.STREIFEN: ("Streifenmethode", "Jede Last in Streifen zweier Richtungen, für die Tragsicherheit"),
+    Verfahren.FEM: ("FEM", "Die Platte linear elastisch und ungerissen, mit finiten Elementen – "
+                           "auch die Durchbiegung"),
+}
+#: Wie die Aufteilungen einer Decke heissen: kurz im Schalter, lang in seinem
+#: Titel. Die Regel dahinter steht in :mod:`opencivil.decke.aufteilung`.
 _AUFTEILUNGEN = {
     Aufteilung.AUTOMATISCH: ("automatisch", "Je Stelle nach ihren Lagern: zum nahen Rand, sonst mehr "
                                             "in die kürzere Spannweite (Folie 31) – mit Bändern durch "
@@ -296,13 +303,17 @@ def katalog() -> dict:
         # womit die Kennungen ihrer Teile beginnen, je Liste.
         "decke": {
             "vorsilben": dict(DECKENVORSILBEN),
+            "verfahren": [{"wert": v.value, "beschriftung": _VERFAHREN[v][0],
+                           "titel": _VERFAHREN[v][1]} for v in Verfahren],
             "aufteilungen": [{"wert": a.value, "beschriftung": _AUFTEILUNGEN[a][0],
                               "titel": _AUFTEILUNGEN[a][1]} for a in Aufteilung],
             # Was ein Ergebnisbild zeigt -- kurz im Schalter, lang ueber dem
-            # Bild; ``traeger``, ob es das eines Trägers ist.
+            # Bild; ``traeger``, ob es das eines Trägers ist, ``verfahren``,
+            # in welchen Verfahren es das gibt.
             "diagrammgroessen": [{"wert": wert, "beschriftung": _DECKENGROESSEN[wert][0],
                                   "titel": _DECKENGROESSEN[wert][1],
-                                  "traeger": wert in BALKENGROESSEN} for wert in DECKENGROESSEN],
+                                  "traeger": wert in BALKENGROESSEN,
+                                  "verfahren": deckendaten.verfahren_von(wert)} for wert in DECKENGROESSEN],
         },
         # Wie ein Fundament der Setzung folgt -- und wo darum gerechnet wird.
         "setzung": {

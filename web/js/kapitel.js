@@ -18,7 +18,8 @@
  *                breiter ist als der Knopf
  *   titel        über dem Fenster
  *   bezug(e)     worauf sich die Eingaben beziehen, unter dem Titel (nicht jedes)
- *   hilfe        was hinter dem Fragezeichen steht: {zeilen, formel} (nicht jedes)
+ *   hilfe        was hinter dem Fragezeichen steht: {zeilen, formel} -- oder
+ *                eine Funktion des Eintrags, die das gibt (nicht jedes)
  *   inhalt(e)    die Knoten des Fensters
  *   stand(e)     die kleine Zeile des Knopfs: {an, text}
  *
@@ -166,7 +167,7 @@ export function kapitelPanel(eintrag, gruppen, { schluessel, titel }) {
 export function kapitelFenster(eintrag, gruppen, schluessel) {
   const kapitel = gruppen.flatMap((g) => g.kapitel).find((k) => k.schluessel === schluessel);
   if (!kapitel) return null;
-  const { hilfe } = kapitel;
+  const hilfe = typeof kapitel.hilfe === 'function' ? kapitel.hilfe(eintrag) : kapitel.hilfe;
   return fenster({
     titel: kapitel.titel,
     zeichen: kapitel.schluessel,

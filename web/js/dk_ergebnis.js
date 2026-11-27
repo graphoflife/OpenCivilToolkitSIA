@@ -7,6 +7,7 @@
  *   m_x, m_y, m_xy   die Momente je Meter in den Achsen x und y, auch wo
  *                    ein Streifen schief trägt (Benutzer, 2026-11-13);
  *   v_x, v_y, v_0    die Querkräfte je Meter und die Hauptquerkraft;
+ *   w                nur in der FEM: die Durchbiegung;
  *   Lager            je Linienlager der Verlauf seiner Kraft über die
  *                    Länge; darunter je Lager die Summe, eingespannt auch
  *                    sein Moment, mit dem Vorzeichen der Platte.
@@ -16,9 +17,10 @@
  * Betrag. In jeder Zelle verläuft die Farbe: durch den Wert in ihrer Mitte,
  * mit dem Gefälle, das der Kern aus den Werten an ihren Ecken ausgleicht
  * (Benutzer, 2026-11-16) -- längs eines Streifens so glatt wie sein Verlauf.
- * Quer springt das Bild an den Grenzen der Streifen: jeder trägt seinen
- * eigenen Teil der Last. Angeschrieben sind der grösste und der kleinste
- * Wert, mit Punkt an ihrer Stelle; über einer Zelle steht der Wert in ihrer
+ * In der Streifenmethode springt das Bild quer an den Grenzen der Streifen:
+ * jeder trägt seinen eigenen Teil der Last. In der FEM ist jede Zelle ein
+ * Dreieck des Netzes. Angeschrieben sind der grösste und der kleinste Wert,
+ * mit Punkt an ihrer Stelle; über einer Zelle steht der Wert in ihrer
  * Mitte.
  *
  * Wählt eine Zeile einen Schnitt, zeigt ihr Bild die Grösse längs ihm wie
@@ -175,6 +177,8 @@ const zeichenVon = (groesse) => katalog('decke', 'diagrammgroessen').find((g) =>
   || groesse;
 
 function feldInhalt(decke, daten, ergebnis, groesse) {
+  // Eine alte Antwort aus dem anderen Verfahren hat die Grösse vielleicht nicht -- die neue kommt.
+  if (!ergebnis.werte[groesse]) return { teile: [leerzustand('Bild wird gerechnet …')] };
   const einheit = ergebnis.einheiten[groesse];
   const zeichen = zeichenVon(groesse);
   const s = skala(ergebnis.werte[groesse], ergebnis.extreme[groesse]);
@@ -305,6 +309,13 @@ function lagertabelle(ergebnis) {
   ]);
 }
 
+/** Wie das Bild der Lager entsteht, je Verfahren -- davor, was es zeigt. */
+const LAGERHINWEIS = {
+  streifen: 'was zwei Streifen auf dasselbe Stück geben, zählt zusammen.',
+  fem: 'aus den Kräften an den Knoten des Netzes, je über die halben Stücke daneben. An einer Ecke der Platte '
+    + 'ist sie oft negativ: dort hält das Lager die Platte nieder.',
+};
+
 function lagerInhalt(decke, daten, ergebnis) {
   const bild = grundrissBild(decke, daten, 'nichts', {
     rand: RAND.lager,
@@ -314,9 +325,8 @@ function lagerInhalt(decke, daten, ergebnis) {
     el('div.gb-bildhuelle', {}, [bild]),
     lagertabelle(ergebnis),
     el('p.karte-hinweis', {
-      text: 'Im Bild je Linienlager die Kraft r über seine Länge: was zwei Streifen auf dasselbe Stück geben, '
-        + 'zählt zusammen. Das Moment eines eingespannten Lagers steht mit dem Vorzeichen der Platte da: '
-        + 'negativ, wo es oben zieht.',
+      text: `Im Bild je Linienlager die Kraft r über seine Länge: ${LAGERHINWEIS[daten.verfahren] || LAGERHINWEIS.streifen} `
+        + 'Das Moment eines eingespannten Lagers steht mit dem Vorzeichen der Platte da: negativ, wo es oben zieht.',
     }),
   ];
   return { teile, bild };
@@ -349,6 +359,13 @@ function ergebnisKarte(kennung, decke, daten, zeile) {
   if (Boolean(groesse?.traeger) !== (ort?.art === LAENGS.traeger)) {
     return karte(titel, [leerzustand(groesse?.traeger ? `${groesse.titel} gibt es nur in einem Träger.`
       : `Im Träger ${zeile.schnitt} gibt es nur M und V.`, 'Unter «Ergebnisse» wählen, was das Bild zeigt.')]);
+  }
+  if (groesse && !groesse.verfahren.includes(decke.verfahren)) {
+    // «die Streifenmethode», «die FEM»: beide weiblich.
+    const namen = katalog('decke', 'verfahren').filter((v) => groesse.verfahren.includes(v.wert))
+      .map((v) => v.beschriftung);
+    return karte(titel, [leerzustand(`${groesse.titel} gibt es nur in der ${namen.join(' und der ')}.`,
+      `Unter «Verfahren» die ${namen[0]} wählen oder unter «Ergebnisse», was das Bild zeigt.`)]);
   }
   const eintrag = antwortZu(kennung, fall, (f) => api.deckeErgebnis(zustand.projekt, kennung, f));
   if (eintrag.fehler) return karte(`${titel} – ${fall}`, [el('p.hinweis.hinweis-warnung', { text: eintrag.fehler })]);

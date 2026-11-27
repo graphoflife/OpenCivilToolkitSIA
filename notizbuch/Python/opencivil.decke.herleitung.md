@@ -1,5 +1,5 @@
 ---
-erzeugt: 02fa84191958
+erzeugt: 304056abb4e6
 art: modul
 tags: [modul]
 ---
@@ -51,13 +51,36 @@ def schreiben(p: Protokoll, system: 'Deckensystem', befund: 'Deckenbefund') -> N
 
 Die ganze Herleitung einer Decke – nichts davon geht in den Befund ein, also still gar keine.
 
-### _lasten
+### als_ort
 
 ```python
-def _lasten(p: Protokoll, decke: Decke) -> None
+def als_ort(punkt: geo.Punkt) -> str
 ```
 
-Die Lasten je Lastfall, wie sie beschrieben sind, und die Beiwerte der Kombinationen.
+### linienlager
+
+```python
+def linienlager(p: Protokoll, decke: Decke) -> None
+```
+
+Die Linienlager, wie sie gezeichnet sind – in beiden Verfahren gleich.
+
+### _lager
+
+```python
+def _lager(p: Protokoll, decke: Decke, e: Optional[Ergebnis]) -> None
+```
+
+Stützen mit ihren Bereichen, Träger mit ihrer Stufe und die Bänder.
+
+### lasten
+
+```python
+def lasten(p: Protokoll, decke: Decke) -> None
+```
+
+Die Lasten je Lastfall, wie sie beschrieben sind, und die Beiwerte der
+Kombinationen – im Eigengewicht auch die Stege der Träger mit Höhe.
 
 ### _last
 
@@ -75,13 +98,15 @@ def _stufe(u: Traeger) -> str
 
 Die Stufe eines Trägers – ein Band sagt stattdessen, wo es liegt.
 
-### _faelle
+### faelle
 
 ```python
-def _faelle(p: Protokoll, e: Ergebnis) -> None
+def faelle(p: Protokoll, e, ausser: str='auf einem Streifen, der nicht trägt') -> None
 ```
 
-Je Lastfall und Kombination die Last und was die Lager tragen – die Probe –, und die Meldungen der Fälle.
+Je Lastfall und Kombination die Last und was die Lager tragen – die
+Probe –, und die Meldungen der Fälle. `ausser`: wo, ausser neben den
+Platten, Last liegt, die nicht getragen wird.
 
 ### _ansaetze
 
@@ -126,45 +151,47 @@ def _mit_stelle(m: float, s: float) -> Tuple[str, str]
 
 Ein Moment in kNm/m und wo es liegt – ausser es steht als null da.
 
-### _zahl
+### zahl
 
 ```python
-def _zahl(text: str)
+def zahl(text: str)
 ```
 
 Eine Zahl als Formel, damit ihr Minus eines ist; der Strich bleibt Text.
 
-### _lagerkraefte
+### lagerkraefte
 
 ```python
-def _lagerkraefte(p: Protokoll, e: Ergebnis, f: Fallergebnis) -> None
+def lagerkraefte(p: Protokoll, e, f, wie: str) -> None
 ```
 
-Was jedes Lager trägt; längs eines Linienlagers die Spitze und, eingespannt, die des Moments.
+Was jedes Lager trägt; längs eines Linienlagers die Spitze und,
+eingespannt, die des Moments – `wie` sagt, wie die Kraft längs eines
+Linienlagers verteilt ist.
 
-### _schnittkraefte
+### schnittkraefte
 
 ```python
-def _schnittkraefte(p: Protokoll, proben: Sequence[feld.Probe]) -> None
+def schnittkraefte(p: Protokoll, proben: Sequence[feld.Probe], groessen=SCHNITTKRAEFTE, wo: str='Gesucht am Schwerpunkt jeder Zelle der Bilder und an den Stellen, an denen ein Durchlaufträger springt oder Querkraft oder Last null werden.') -> None
 ```
 
-Die grössten und kleinsten Schnittkräfte der Platte, mit Ort.
+Die grössten und kleinsten Schnittkräfte der Platte, mit Ort – `wo` sagt, wo gesucht ist.
 
-### _widerstaende
+### widerstaende
 
 ```python
-def _widerstaende(p: Protokoll, proben: Sequence[feld.Probe]) -> None
+def widerstaende(p: Protokoll, proben: Sequence[feld.Probe], titel: str='Erforderliche Biegewiderstände, ohne Lastverteilelemente') -> None
 ```
 
 Die grössten erforderlichen Biegewiderstände, mit Ort.
 
-### _ort_von
+### ort_von
 
 ```python
-def _ort_von(ort: geo.Punkt, wert: float) -> str
+def ort_von(stelle: geo.Punkt, wert: float) -> str
 ```
 
-Wo ein Wert liegt – ausser er steht als null da: das ist er an vielen Orten.
+Wo ein Wert liegt, in der Einheit des Berichts – ausser er steht als null da: das ist er an vielen Orten.
 
 ### _lastverteilelemente
 
@@ -187,7 +214,9 @@ Je Stütze und Einzellast, was ihr Bereich zusätzlich braucht.
 - `FLIESSBEDINGUNG = "\\begin{aligned} & m_{xu} \\ge m_x + |m_{xy}| \\qquad m_{yu} \\ge m_…` – Die linearisierte Fliessbedingung, `k = k' = 1` ([[opencivil.decke.feld#widerstaende|widerstaende]]).
 - `SCHIEF = '{platten} schief zu x und y: ihre Streifen geben Drillmomente m_xy, …` – Trägt eine Platte schief zu x und y – nach den Platten, die es tun.
 - `LASTVERTEILELEMENT = "\\begin{aligned} & m'_{xu} \\ge \\frac{Q}{8} \\cdot \\frac{l_x}{l_y}…` – Was ein Lastverteilelement zusätzlich braucht ([[opencivil.decke.feld#Lastverteilelement|Lastverteilelement]]).
-- `SCHNITTKRAEFTE = (('m_x', 'm_x', 'kNm/m'), ('m_y', 'm_y', 'kNm/m'), ('m_xy', 'm_{xy}',…` – Die Schnittkräfte der Platte im Bericht: je Grösse ihr Zeichen und ihre Einheit.
+- `SCHNITTKRAEFTE = (('m_x', 'm_x', 'kNm/m', 0.001), ('m_y', 'm_y', 'kNm/m', 0.001), ('m_…` – Die Schnittkräfte der Platte im Bericht: je Grösse ihr Zeichen, ihre Einheit und ihr Faktor aus SI.
+- `LAENGS = 'Längs eines Linienlagers gibt jeder Durchlaufträger seine Kraft glei…` – Wie die Kraft längs eines Linienlagers verteilt ist, in der Streifenmethode.
+- `EINGESPANNT = ' Ebenso m_max, das Moment, das ein eingespanntes Lager hält, mit dem…` – Was ein eingespanntes Linienlager im Bericht über sein Moment sagt – in beiden Verfahren.
 - `WIDERSTAENDE = (('mxu', 'm_{xu}', 'unten, in x'), ('myu', 'm_{yu}', 'unten, in y'), …` – Die Biegewiderstände: Feld von [[opencivil.decke.feld#Widerstaende|Widerstaende]], Zeichen, Bedeutung.
 
 ## Braucht
@@ -198,6 +227,7 @@ Je Stütze und Einzellast, was ihr Bereich zusätzlich braucht.
 - [[opencivil.decke.baender]]
 - [[opencivil.decke.feld]]
 - [[opencivil.decke.geometrie]]
+- [[opencivil.decke.lasten]]
 - [[opencivil.decke.modell]]
 - [[opencivil.decke.rechnung]]
 - [[opencivil.decke.streifen]]
@@ -206,6 +236,7 @@ Je Stütze und Einzellast, was ihr Bereich zusätzlich braucht.
 
 ## Gebraucht von
 
+- [[opencivil.decke.fem.herleitung]]
 - [[opencivil.decke.werk]]
 
 ## Formeln aus diesem Modul

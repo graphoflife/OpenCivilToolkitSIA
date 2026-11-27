@@ -4,8 +4,9 @@ opencivil/decke/modell.py -- was gerechnet wird: die Decke in SI.
 VERANTWORTUNG:
 Die Eingabe des Rechenkerns, ohne Oberfläche und ohne Projekt: Platten,
 Lager, Stützen, Träger, Zonen der Lastaufteilung, Lasten,
-Lastfälle und Kombinationen -- alles in N, m und rad. Gerechnet wird in
-:mod:`~opencivil.decke.rechnung`.
+Lastfälle und Kombinationen -- alles in N, m und rad. Gerechnet wird nach
+der Streifenmethode in :mod:`~opencivil.decke.rechnung`, mit finiten
+Elementen in :mod:`~opencivil.decke.fem` (:class:`Verfahren`).
 
 DIE ACHSEN:
 ``x`` nach rechts, ``y`` nach oben, im Grundriss. Lasten wirken nach unten
@@ -36,6 +37,19 @@ VERTEILBREITE = 1.0
 
 #: Wie breit die Bänder sind, die die Rechnung selbst legt, in m -- ein Vorschlag.
 BANDBREITE = 1.0
+
+#: Wie weit die Knoten des Netzes der FEM höchstens auseinander liegen, in m -- ein Vorschlag.
+NETZWEITE = 0.5
+
+
+class Verfahren(Wahl):
+    """Wie die Decke gerechnet wird."""
+
+    STREIFEN = "streifen"
+    """Nach der Streifenmethode, für die Tragsicherheit -- :mod:`~opencivil.decke.rechnung`."""
+
+    FEM = "fem"
+    """Linear elastisch mit finiten Elementen -- :mod:`~opencivil.decke.fem`."""
 
 
 class Aufteilung(Wahl):
@@ -70,6 +84,9 @@ class Platte:
     (:mod:`~opencivil.decke.richtungen`) -- dann gilt ``richtungen`` erst,
     wenn die Rechnung sie gewählt hat (:attr:`~opencivil.decke.rechnung.Ergebnis.decke`).
     """
+
+    nu: float = 0.0
+    """Die Querdehnungszahl -- nur die FEM braucht sie; sie kommt wie E vom Beton."""
 
 
 @dataclass(frozen=True)
@@ -112,7 +129,9 @@ class Traeger:
     ein Streifen der Breite ``breite`` von ``a`` nach ``b``, so dick wie
     die Platte. Streifen quer dazu liegen auf ihm,
     ein Träger mit kleinerer ``stufe`` ebenso; er selbst liegt auf Lagern,
-    Stützen und Trägern höherer Stufe.
+    Stützen und Trägern höherer Stufe. In der FEM ein Balken in der Platte
+    (:mod:`~opencivil.decke.fem.element`), so steif wie das Rechteck
+    ``breite × (h + hoehe)`` ohne den Teil der Platte.
     """
 
     name: str
@@ -124,6 +143,13 @@ class Traeger:
 
     von_selbst: bool = False
     """Ein Band, das die Rechnung selbst legt (:mod:`~opencivil.decke.baender`) -- kein Eintrag im Projekt."""
+
+    hoehe: float = 0.0
+    """
+    So weit reicht er über oder unter die Platte, in m -- null: er steckt in
+    ihr. Sein Steg wiegt mit, wenn ein Lastfall das Eigengewicht hat
+    (:func:`~opencivil.decke.lasten.stege`).
+    """
 
 
 @dataclass(frozen=True)
@@ -218,3 +244,7 @@ class Decke:
 
     bandbreite: float = BANDBREITE
     """Nur bei automatischer Aufteilung: dann legt die Rechnung Bänder so breit (:mod:`~opencivil.decke.baender`)."""
+
+    verfahren: Verfahren = Verfahren.STREIFEN
+    netzweite: float = NETZWEITE
+    """Nur in der FEM: so weit liegen die Knoten ihres Netzes höchstens auseinander (:mod:`~opencivil.decke.fem.netz`)."""

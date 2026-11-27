@@ -1,5 +1,5 @@
 ---
-erzeugt: fef040b60095
+erzeugt: 56529003b746
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.2.6, (34)"
@@ -15,11 +15,13 @@ $$
 
 ## Im Code
 
+- [[opencivil.decke.fem.herleitung#_ansaetze|_ansaetze]]
 - [[opencivil.decke.herleitung#_ansaetze|_ansaetze]]
 
 ## Themen
 
 - [[Streifenmethode]]
+- [[FEM der Decke]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 
@@ -46,6 +48,11 @@ Trägt eine Platte schief dazu, geben ihre Streifen ein Drillmoment, bei 45°
 halb so gross wie ihr Moment: ein Streifen mit $m = 100\,\mathrm{kNm/m}$
 hat dann $m_x = m_y = m_{xy} = 50$ und verlangt unten in x und in y je 100.
 Der Bericht sagt in einem Hinweis, welche Platten schief tragen.
+
+In der [[FEM der Decke]] kommt $m_{xy}$ aus der elastischen Platte und ist
+fast überall da. Am grössten ist es in den Ecken einer gelenkig gelagerten
+Platte: dort sind $m_x$ und $m_y$ null, und das Drillmoment allein verlangt
+oben und unten Bewehrung in beiden Richtungen, je $|m_{xy}|$.
 
 Gesucht werden die grössten Werte an denselben Stellen wie in den Bildern.
 Über Stützen und unter Einzellasten kommt das [[Lastverteilelement]] dazu.

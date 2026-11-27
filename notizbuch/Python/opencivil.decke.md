@@ -1,5 +1,5 @@
 ---
-erzeugt: 78ce54dcffc8
+erzeugt: 725c645d310a
 art: modul
 tags: [modul]
 ---
@@ -41,6 +41,7 @@ Nur die Standardbibliothek: das Werkzeug rechnet auch im Browser.
 - [[opencivil.decke.baender]] – die Bänder, die eine Decke selbst legt.
 - [[opencivil.decke.durchlauftraeger]] – ein Streifen als Durchlaufträger.
 - [[opencivil.decke.feld]] – die Schnittkräfte der Platte an einer Stelle.
+- [[opencivil.decke.fem]] – die Decke nach der Methode der finiten Elemente.
 - [[opencivil.decke.geometrie]] – Vielecke in der Ebene der Decke.
 - [[opencivil.decke.herleitung]] – wie eine Decke ihre Rechnung aufschreibt.
 - [[opencivil.decke.lasten]] – die Lasten eines Lastfalls auf den Streifen.

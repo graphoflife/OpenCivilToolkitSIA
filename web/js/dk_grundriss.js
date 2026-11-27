@@ -6,9 +6,10 @@
  * Linienlager mit ihrem Zeichen, die Stützen und die Schnitte -- wie im
  * Plan strichpunktiert, an den Enden ein Strich quer und ihr Name -- und
  * darunter, was der
- * Kern dazu sagt (`daten`, die Antwort auf `decke_zeichnung`): wie die Last
- * auf die zwei Richtungen geht oder wo die Streifen verlaufen. Beide Bilder
- * rufen dieselbe Funktion, jedes mit seiner Ansicht `v` (cad_ansicht.js).
+ * Kern dazu sagt (`daten`, die Antwort auf `decke_zeichnung`): in der
+ * Streifenmethode, wie die Last auf die zwei Richtungen geht oder wo die
+ * Streifen verlaufen, in der FEM das Netz. Beide Bilder rufen dieselbe
+ * Funktion, jedes mit seiner Ansicht `v` (cad_ansicht.js).
  * Das Zeichenfenster zeigt darüber die Lasten eines Lastfalls.
  *
  * ZEICHEN DER LASTEN, in der Farbe der Lasten:
@@ -31,8 +32,8 @@
  * nach dem Anteil; eine Zone in ihrem eigenen.
  *
  * Gerechnet wird hier nichts, was in die Rechnung geht: die Flächen der
- * Aufteilung, die Grenzen der Streifen, die Bänder der Träger und die
- * Stützenbereiche kommen vom Kern. Hier stehen nur Lagen fürs Auge -- wo
+ * Aufteilung, die Grenzen der Streifen, die Bänder der Träger, die
+ * Stützenbereiche und das Netz kommen vom Kern. Hier stehen nur Lagen fürs Auge -- wo
  * eine Beschriftung steht, wie gross eine Stütze im Bild ist.
  */
 
@@ -68,7 +69,7 @@ export function legende(daten) {
   const eintrag = (anteil, text) => el('span.dk-legende-eintrag', {}, [
     el('span.dk-legende-farbe', { style: { background: mischung(anteil) } }), text,
   ]);
-  const traegtNicht = daten?.gerechnet && daten.anteile.some((f) => f.anteil == null);
+  const traegtNicht = daten?.gerechnet && (daten.anteile || []).some((f) => f.anteil == null);
   return el('div.dk-legende', {}, [
     eintrag(100, 'ganz in Richtung 1'), eintrag(50, 'je zur Hälfte'), eintrag(0, 'ganz in Richtung 2'),
     traegtNicht ? eintrag(null, 'trägt nicht – es fehlt ein Lager') : null,
@@ -162,22 +163,27 @@ function lagerKlasse(l) {
 /**
  * Was der Kern unter die Teile legt. `was`: 'aufteilung' -- die Flächen
  * mit ihrem Anteil in Richtung 1 --, 'streifen' -- die Grenzen der
- * Streifen, die Stützenbereiche -- oder 'nichts'.
+ * Streifen, die Stützenbereiche --, in der FEM 'netz' -- seine Dreiecke --
+ * oder 'nichts'. Was die Antwort nicht hat, etwa das Netz einer, die noch
+ * nach der Streifenmethode rechnete, bleibt leer.
  */
 function unterlage(v, daten, was) {
   const g = svgEl('g', { class: daten?.veraltet ? 'dk-unterlage ist-veraltet' : 'dk-unterlage' });
   if (!daten?.gerechnet) return g;
-  if (was === 'aufteilung') {
-    for (const f of daten.anteile) {
+  if (was === 'netz' && daten.netz) {
+    const { knoten, dreiecke } = daten.netz;
+    g.append(svgEl('path', { d: dreiecke.map((d) => pfad(v, d.map((k) => knoten[k]))).join(' '), class: 'dk-netz' }));
+  } else if (was === 'aufteilung') {
+    for (const f of daten.anteile || []) {
       g.append(mitTitel(svgEl('path', { d: pfad(v, f.ecken), class: 'dk-anteil', style: anteilFarbe(f.anteil) }),
         [f.anteil == null ? 'Hier trägt keine Richtung – es fehlt ein Lager oder ein Träger.'
           : `Richtung 1 / 2: ${anteilText(f.anteil)}`]));
     }
   } else if (was === 'streifen') {
-    for (const s of daten.grenzen) {
+    for (const s of daten.grenzen || []) {
       g.append(svgEl('path', { d: pfad(v, s.punkte, false), class: `dk-grenze ist-richtung-${s.richtung}` }));
     }
-    for (const b of daten.stuetzenbereiche) {
+    for (const b of daten.stuetzenbereiche || []) {
       g.append(mitTitel(svgEl('path', { d: pfad(v, b.ecken), class: 'dk-stuetzenbereich' }),
         [`Stützenbereich ${b.name}`]));
     }
@@ -300,12 +306,14 @@ export function grundriss(v, decke, daten, {
     if (!punkte) continue;
     const band = baender.get(u.kennung);
     if (band) traeger.append(svgEl('path', { d: pfad(v, band), class: 'dk-traeger-band' }));
+    const masse = [`b = ${zahlText(u.breite, 2)} m`, u.h_T > 0 ? `h_T = ${zahlText(u.h_T, 0)} mm` : '',
+      decke.verfahren === 'fem' ? '' : `Stufe ${u.stufe}`].filter(Boolean).join(', ');
     traeger.append(mitTitel(svgEl('path', { d: pfad(v, punkte, false), class: klasse('dk-traeger', u.kennung) }),
-      [`Träger ${u.kennung}: b = ${zahlText(u.breite, 2)} m, Stufe ${u.stufe}`, ...texte(u.kennung)]));
+      [`Träger ${u.kennung}: ${masse}`, ...texte(u.kennung)]));
     namen.append(text(viertel(v, punkte), u.kennung, 'dk-name ist-klein'));
   }
   // Die Bänder, die die Rechnung selbst legte: fein gestrichelt, ohne Eintrag im Projekt.
-  for (const b of daten?.gerechnet ? daten.baender : []) {
+  for (const b of daten?.gerechnet ? daten.baender || [] : []) {
     traeger.append(mitTitel(svgEl('path', { d: pfad(v, b.ecken), class: 'dk-band' }),
       [`Band ${b.name} ${b.art}: b = ${zahlText(b.breite, 2)} m – von der Rechnung gelegt`]));
     namen.append(text(viertel(v, b.achse), b.name, 'dk-name ist-klein ist-band'));

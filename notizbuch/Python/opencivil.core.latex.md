@@ -1,5 +1,5 @@
 ---
-erzeugt: 91dd7393c88e
+erzeugt: e1e2131ba23d
 art: modul
 tags: [modul]
 ---
@@ -471,6 +471,7 @@ Leser sieht alle Zweige und erkennt, welcher gegriffen hat.
 - [[opencivil.core.nachweis]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.decke.aufteilung]]
+- [[opencivil.decke.fem.herleitung]]
 - [[opencivil.decke.herleitung]]
 - [[opencivil.durchstanzen.nachweis]]
 - [[opencivil.erdbeben.ersatzkraft]]

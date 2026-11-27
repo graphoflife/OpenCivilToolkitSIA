@@ -111,14 +111,33 @@ const EINSTELLUNG = {
   verbunden: true,
 };
 
-/** Was unter den Teilen liegen kann -- die Wahl in der Leiste. */
-const UNTERLAGEN = [
-  { wert: 'aufteilung', beschriftung: 'Aufteilung',
-    titel: 'Wie die Last auf die zwei Richtungen geht: orange Richtung 1, gelb Richtung 2' },
-  { wert: 'streifen', beschriftung: 'Streifen',
-    titel: 'Die Grenzen der Streifen beider Richtungen und die Stützenbereiche' },
-  { wert: 'nichts', beschriftung: 'nichts', titel: 'Nur die gezeichneten Teile' },
-];
+/** Nur die gezeichneten Teile -- in jedem Verfahren. */
+const NICHTS = { wert: 'nichts', beschriftung: 'nichts', titel: 'Nur die gezeichneten Teile' };
+
+/** Was unter den Teilen liegen kann, je Verfahren der Decke -- die Wahl in der Leiste. */
+const UNTERLAGEN = {
+  streifen: [
+    { wert: 'aufteilung', beschriftung: 'Aufteilung',
+      titel: 'Wie die Last auf die zwei Richtungen geht: orange Richtung 1, gelb Richtung 2' },
+    { wert: 'streifen', beschriftung: 'Streifen',
+      titel: 'Die Grenzen der Streifen beider Richtungen und die Stützenbereiche' },
+    NICHTS,
+  ],
+  fem: [{ wert: 'netz', beschriftung: 'Netz', titel: 'Die Dreiecke, mit denen die FEM rechnet' }, NICHTS],
+};
+
+/** Die Wahlen der Leiste im Verfahren der Decke des Fensters. */
+const unterlagen = (a) => UNTERLAGEN[eintragVon(a.dk.kennung)?.verfahren] || UNTERLAGEN.streifen;
+
+/**
+ * Was unter den Teilen liegt: die Wahl -- gibt es sie im Verfahren der
+ * Decke nicht, dessen erste. Die Wahl bleibt: zurück im Verfahren, gilt sie
+ * wieder.
+ */
+export function unterlageVon(a) {
+  const werte = unterlagen(a);
+  return werte.some((w) => w.wert === a.dk.unterlage) ? a.dk.unterlage : werte[0].wert;
+}
 
 // ===========================================================================
 // Das Fenster einer Decke
@@ -139,7 +158,7 @@ export function zeichenbereich(decke, listeBauen) {
 /** Die Wahl, was unter den Teilen liegt -- neben den Werkzeugen. */
 function unterlageLeiste(a) {
   a.dk.leiste?.replaceChildren(wahlSchalter({
-    werte: UNTERLAGEN, gewaehlt: a.dk.unterlage, titel: 'Was unter den Teilen liegt',
+    werte: unterlagen(a), gewaehlt: unterlageVon(a), titel: 'Was unter den Teilen liegt',
     setzen: (w) => {
       a.dk.unterlage = w;
       unterlageLeiste(a);
@@ -274,6 +293,6 @@ function zeichnen(a, g) {
   const letzte = a.adapter.kern.antwort;
   const daten = letzte && { ...letzte, veraltet: !frischeAntwort(a) };
   g.append(grundriss(a.v, z, daten, {
-    was: a.dk.unterlage, fehler, texte, lastfall: aktiverLastfall(a.dk),
+    was: unterlageVon(a), fehler, texte, lastfall: aktiverLastfall(a.dk),
   }));
 }

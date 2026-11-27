@@ -1,5 +1,5 @@
 ---
-erzeugt: 857e8187c971
+erzeugt: 3390ff9b5d6c
 art: modul
 tags: [modul]
 ---
@@ -64,7 +64,7 @@ täte.
 def _decken(p: Projekt) -> None
 ```
 
-Zwei Decken. Die des Kolloquiums 4 (Stahlbeton II): eine Platte auf
+Drei Decken. Die des Kolloquiums 4 (Stahlbeton II): eine Platte auf
 einer Wand und drei Stützen, Träger in zwei Stufen, fest
 30 % in x, und als einziger Lastfall q_d = 18.6 kN/m² auf der ganzen
 Platte, das Eigengewicht darin. Und eine, die jede Wahl einmal braucht:
@@ -75,7 +75,11 @@ Platte, deren Streifen ihren Rändern folgen. Sie hat die Lastfälle und
 Kombinationen einer frischen Decke und jede Art Last: auf einer ganzen
 Platte, gezeichnet, längs einer Linie und an einem Punkt. Die erste
 zeigt m_x, m_y, die Lager und M und V des Trägers T4, der auf den drei
-anderen liegt; die zweite jedes Bild der Platte einmal.
+anderen liegt; die zweite jedes Bild der Streifenmethode einmal. Die
+dritte ist die erste nach der FEM, T4 als Unterzug 300 mm unter der
+Platte, mit einem Schnitt quer durch die Felder: sie zeigt jedes Bild
+der Platte einmal, auch die Durchbiegung, das längs des Schnitts und M
+und V von T4.
 
 ### _durchstanzstellen
 
@@ -283,6 +287,7 @@ allein nach (29), stossartig Biegung allein nach (38), mit k_m \< 1.
 
 ## Braucht
 
+- [[opencivil.decke.feld]]
 - [[opencivil.decke.schnitt]]
 - [[opencivil.material.holz]]
 - [[opencivil.projekt.balkensystem]]

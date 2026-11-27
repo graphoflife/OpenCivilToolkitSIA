@@ -7,6 +7,53 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-27 · Decke: FEM als zweites Verfahren
+
+Schritt 10b des Plans vom 2026-11-27. Die erste Kachel einer Decke heisst
+«Verfahren» und hat einen Schalter [Streifenmethode | FEM], je mit Bild;
+mit FEM steht darunter die Netzweite, Vorgabe 0.5 m. Die FEM rechnet die
+ganze Platte linear elastisch und ungerissen, mit E_cm und ν_c = 0.2 ihres
+Betons (SIA 262:2025, 3.1.2.3.5), als dünne Platte nach Kirchhoff aus
+Dreiecken DKT. Die Ergebnisse sind dieselben wie in der Streifenmethode –
+m_x bis v_0, die Lagerkräfte, Schnitte, M und V der Träger, die nötigen
+Biegewiderstände –, dazu die Durchbiegung w. Neues Beispiel «Kolloquium 4
+nach FEM»: die Decke von Kolloquium 4 mit einem Träger T4 von
+h_T = 300 mm; von 920.7 kN tragen S1 122.9, S2 260.4, S3 123.0 und L1
+414.3 kN, w ist höchstens 3.9 mm, T4 hat über S2 M = −94.3 kNm.
+
+- Das Paket `decke/fem/` schreibt alles selbst, ohne fremde Pakete: das
+  Netz (eine eigene Delaunay-Triangulierung, die den Rändern, Lagern,
+  Trägern und Linienlasten folgt, jede Stütze ein Knoten), das Dreieck DKT,
+  das System mit dem Löser der Stabwerke (Profil, Cuthill-McKee), die
+  Lasten auf den Knoten, das Glätten und die Auswertung.
+- Warum DKT: es hat je Ecke nur w und die zwei Neigungen, kommt ohne
+  Schubverformung aus und gibt eine gleichmässige Krümmung genau wieder
+  (Patch-Test im Test).
+- Geglättet wird je Sektor: an einem Lager, Träger, einer Linienlast oder
+  Fuge behält jede Seite ihre Momente; nur wo die Platte durchläuft, gilt
+  das Mittel der Dreiecke um einen Knoten. Die Querkräfte kommen aus dem
+  Gefälle der geglätteten Momente.
+- Ein Träger hat neu eine Höhe h_T (0 heisst in der Platte). In der FEM
+  ist er ein Balken in der Mittelebene mit
+  EI = E_cm·b·((h + h_T)³ − h³)/12, ohne Torsion; M und V sind die des
+  Balkens und der Platte über b (Entscheid 10 des Plans). Sein Steg wiegt
+  in beiden Verfahren mit. Liegt er auf der Fuge zweier Platten, nimmt er
+  h der ersten – wie das Gewicht des Stegs.
+- Was nur ein Verfahren kennt, zeigt nur dieses: Richtungen, Stufe,
+  Streifenbreite, Bänder und Zonen die Streifenmethode, w die FEM. Ein
+  Diagramm der anderen sagt grau «gibt es nur in der …».
+- Beide Verfahren geben ihre Fälle in derselben Form (`Faelle`, `Fall` in
+  `decke/rechnung.py`) und ihr Bild als `feld.Bild`; welches gilt, steht
+  einmal fest (`werk.VERFAHREN`, `deckendaten._BILDER`). Bilder und Bericht
+  lesen beide gleich.
+- Geprüft gegen Navier (6 × 4 m, 0.25 m: w −0.6 %, m −0.1 %), die
+  eingespannte Quadratplatte nach Timoshenko, die Kragplatte, einen
+  Träger und Σ Lagerkräfte = Σ Lasten (`tests/test_decke_fem.py`).
+- Gemessen auf der Seite: Kolloquium 4 je Rechnung 0.3 s bei 0.5 m; eine
+  Decke 20 × 15 m 3 s bei 0.5 m, 0.4 s bei 1 m. Bei 1 m biegt sich die
+  Navier-Platte um 10 % zu wenig. Darum bleibt 0.5 m die Vorgabe; die
+  Frage steht in [[TODO]].
+
 ## 2026-11-27 · Decke: Unterzug heisst Träger
 
 Schritt 10a des Plans vom 2026-11-27. Was in der Decke «Unterzug» hiess,

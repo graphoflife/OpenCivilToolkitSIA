@@ -1,5 +1,5 @@
 ---
-erzeugt: a50eefb342da
+erzeugt: 11fcd8842def
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -83,6 +83,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 **Decken**
 
 - [[Streifenmethode]] · 4
+- [[FEM der Decke]] · 4
 
 **Durchstanzen**
 
@@ -363,6 +364,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Moment 2. Ordnung einer Verbundstütze]] · $M_{y,Ed,II}$
 - [[Moment aus der Vorspannung]] · $M_{p,y}$
 - [[Moment der Bewehrung bei zulässiger Stahlspannung]]
+- [[Momente der Platte nach Kirchhoff]]
 - [[Momentengleichgewicht um die halbe Höhe]] · $M_{Rd}^{+}$
 - [[Momentenwiderstand bei reiner Biegung]] · $M_{Rd}(N_{Ed}=0)^{+}$
 - [[Nachweisschnitt im Abstand d_v∕2]] · $u_0$
@@ -396,6 +398,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Querkraft der Wände neben geneigten Spanngliedern]] · $V_{z,w}$
 - [[Querkraft für die Durchstanzbewehrung]] · $V_{d,s}$
 - [[Querkraft über die Federn der Wände]]
+- [[Querkräfte aus den Momenten der Platte]]
 - [[Querkraftwiderstand des Pfahls]] · $V_{Rd}$
 - [[Querkraftwiderstand des Tragglieds]] · $V_{Rd}$
 - [[Querkraftwiderstand einer Blechverbunddecke]] · $V_{Rd}$
@@ -504,6 +507,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Torsionsträgheitsmoment, nach Richardson aus beiden Gittern]] · $I_T$
 - [[Torsionswiderstand eines Rechtecks aus Holz]] · $T_{Rd}$
 - [[Torsionswiderstandsmoment des Rechtecks]] · $W_T$
+- [[Träger in der Platte]]
 - [[Tragfähigkeitsfaktor des Pfahlfusses undrainiert]] · $N_c$
 - [[Tragfähigkeitsfaktor N_c]] · $N_c$
 - [[Tragfähigkeitsfaktor N_q]] · $N_q$
@@ -566,7 +570,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 ## Normstelle fehlt noch
 
-145 von 473 Formeln haben im Code keine Normstelle – meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle – von dort kommt sie in Bericht und Notizbuch.
+148 von 476 Formeln haben im Code keine Normstelle – meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle – von dort kommt sie in Bericht und Notizbuch.
 
 - [[Achsen eines Stabs im Raum]] · [[opencivil.stabwerk3d.herleitung|_ansaetze]]
 - [[Äquivalenter E-Modul eines Stabs]] · [[opencivil.spannungsanalyse.modul#ModulProzedur|ModulProzedur._schreiben]]
@@ -651,6 +655,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Kürzester Abstand zur Resistenzlinie]] · [[opencivil.nachweis.biegung_normalkraft#BiegungNormalkraft._protokoll_naechster|BiegungNormalkraft._protokoll_naechster]]
 - [[Längere Seite eines Rechtecks]] · [[opencivil.stabwerk.querschnitte#_seiten|_seiten]]
 - [[Mittelwert des Schubmoduls]] · [[opencivil.material.beton]]
+- [[Momente der Platte nach Kirchhoff]] · [[opencivil.decke.fem.herleitung#_ansaetze|_ansaetze]]
 - [[Momentengleichgewicht um die halbe Höhe]] · [[opencivil.nachweis.handrechnung#Handrechnung._halbe_hoehe|Handrechnung._halbe_hoehe]]
 - [[Momentenwiderstand bei reiner Biegung]] · [[opencivil.nachweis.handrechnung#Handrechnung._bei_n_null|Handrechnung._bei_n_null]]
 - [[Normalkraft mit der Längszugkraft aus der Querkraft]] · [[opencivil.pfahl.innen_quer#InnererQuerwiderstand._biegung|InnererQuerwiderstand._biegung]]
@@ -662,6 +667,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Probe – Moment um z]] · [[opencivil.nachweis.qa_stahl#probe|probe]], [[opencivil.nachweis.qa_verbund_kennzahlen#KennzahlenVerbundQA|KennzahlenVerbundQA._biegung]], [[opencivil.nachweis.schiefe_biegung#SchiefeBiegung|SchiefeBiegung._protokoll_bruchzustand]]
 - [[Probe – Normalkraft]] · [[opencivil.nachweis.qa_stahl#krafttabelle|krafttabelle]], [[opencivil.nachweis.schiefe_biegung#SchiefeBiegung|SchiefeBiegung._protokoll_bruchzustand]]
 - [[Querkraft über die Federn der Wände]] · [[opencivil.nachweis.schubwandnachweis#Schubwandnachweis|Schubwandnachweis._protokoll_ansatz]]
+- [[Querkräfte aus den Momenten der Platte]] · [[opencivil.decke.fem.herleitung#_ansaetze|_ansaetze]]
 - [[Querschnitt der Wendel]] · [[opencivil.pfahl.innen_quer#InnererQuerwiderstand._fachwerk|InnererQuerwiderstand._fachwerk]]
 - [[Radius des Bewehrungskreises]] · [[opencivil.pfahl.innen#InnererWiderstand|InnererWiderstand._bohrpfahl]]
 - [[Raumlast der Flüssigkeit]] · [[opencivil.material.fluessigkeit]]
@@ -700,6 +706,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Torsionsträgheitsmoment eines Rechtecks]] · [[opencivil.stabwerk.querschnitte#_torsion|_torsion]]
 - [[Torsionsträgheitsmoment, nach Richardson aus beiden Gittern]] · [[opencivil.querschnitt.analyse#Querschnittsanalyse.torsion_protokollieren|Querschnittsanalyse.torsion_protokollieren]]
 - [[Torsionswiderstandsmoment des Rechtecks]] · [[opencivil.nachweis.qa_holz_werte#HolzwerteQA|HolzwerteQA._torsion]]
+- [[Träger in der Platte]] · [[opencivil.decke.fem.herleitung#_ansaetze|_ansaetze]]
 - [[Trägheitsmomente eines Polygons, bezogen auf den Schwerpunkt]] · [[opencivil.querschnitt.analyse#Querschnittsanalyse.aufbau_protokollieren|Querschnittsanalyse.aufbau_protokollieren]]
 - [[Umfang des Pfahls]] · [[opencivil.pfahl.aussen#AeussererWiderstand._mantel|AeussererWiderstand._mantel]]
 - [[Versatz – Moment der Querkraftanteile um den Schwerpunkt]] · [[opencivil.nachweis.schubwandnachweis#Schubwandnachweis|Schubwandnachweis._ein_fall]]

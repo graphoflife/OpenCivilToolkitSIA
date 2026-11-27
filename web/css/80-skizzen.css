@@ -179,6 +179,8 @@
 .dk-grenze.ist-richtung-1 { stroke: var(--richtung-x-tief); opacity: .55; }
 .dk-grenze.ist-richtung-2 { stroke: var(--richtung-y-tief); opacity: .55; }
 .dk-stuetzenbereich { fill: none; stroke: var(--schrift-matt); stroke-width: 1; stroke-dasharray: 3 2; }
+/* Das Netz der FEM: fein, damit die Teile darüber lesbar bleiben. */
+.dk-netz { fill: none; stroke: var(--schrift-zart); stroke-width: .6; stroke-linejoin: round; opacity: .7; }
 .dk-zone-grund { fill: var(--flaeche); stroke: none; }
 .dk-zone { fill: none; stroke: var(--beide); stroke-width: 1.4; stroke-dasharray: 6 3; }
 .dk-traeger-band { fill: var(--system); fill-opacity: .1; stroke: var(--system); stroke-width: .8; stroke-dasharray: 4 3; }

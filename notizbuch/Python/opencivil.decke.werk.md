@@ -1,5 +1,5 @@
 ---
-erzeugt: 9bda44a18bbe
+erzeugt: d2681c58dd67
 art: modul
 tags: [modul]
 ---
@@ -9,10 +9,12 @@ tags: [modul]
 
 ## VERANTWORTUNG
 
-Was eine Decke im Rechenwerk anmeldet: eine Prozedur, die sie nach der
-Streifenmethode rechnet ([[opencivil.decke.rechnung#rechnen|rechnen]]) und ihre
-Herleitung schreibt ([[opencivil.decke.herleitung|herleitung]]), samt dem, was sie
-von aussen liest.
+Was eine Decke im Rechenwerk anmeldet: eine Prozedur, die sie nach ihrem
+Verfahren rechnet und ihre Herleitung schreibt – nach der Streifenmethode
+([[opencivil.decke.rechnung|rechnung]], [[opencivil.decke.herleitung|herleitung]]) oder
+der FEM ([[opencivil.decke.fem|fem]]) –, samt dem, was sie von aussen
+liest. Welches Verfahren, steht einmal fest, wenn die Decke angemeldet
+wird ([[opencivil.decke.werk#Konstanten|VERFAHREN]]).
 
 
 ## E UND GEWICHT
@@ -23,7 +25,7 @@ ungerissenen Querschnitt (SIA 262:2025, 4.1.4.1.3) und die Dichte des
 Stahlbetons, mit
 `g = 10 m/s²` ([[opencivil.material.basis#Konstanten|ERDBESCHLEUNIGUNG]],
 Benutzer, 2026-10-23) ihr Gewicht je m³. Die Regel steht dort; hier wird
-sie nur gelesen.
+sie nur gelesen. Die FEM nimmt dazu `ν_c` (SIA 262:2025, 3.1.2.3.5).
 
 
 ## DAS ERGEBNIS
@@ -34,6 +36,22 @@ Befund mit Meldung und keine Ausnahme: der Rest des Projekts rechnet weiter.
 
 ## Inhalt
 
+### Art
+
+```python
+@dataclass(frozen=True)
+class Art
+```
+
+Ein Verfahren, eine Decke zu rechnen: Thema der Formelsammlung, Titel,
+Rechnung und Herleitung – und ob es die Querdehnungszahl des Betons braucht.
+
+- `thema: str`
+- `titel: str`
+- `rechnen: Callable[[Decke], Any]`
+- `schreiben: Callable[..., None]`
+- `querdehnung: bool = False`
+
 ### Deckenbefund
 
 ```python
@@ -41,25 +59,23 @@ Befund mit Meldung und keine Ausnahme: der Rest des Projekts rechnet weiter.
 class Deckenbefund
 ```
 
-Was die Streifenmethode im Lauf fand: die Decke, wie sie gerechnet wurde
-– mit E und Gewicht jeder Platte und den Richtungen, die sie selbst
-wählt –, die Meldungen und das Ergebnis.
+Was die Rechnung im Lauf fand: die Decke, wie sie gerechnet wurde –
+mit E, ν und Gewicht jeder Platte und in der Streifenmethode den
+Richtungen, die sie selbst wählt –, die Meldungen und das Ergebnis.
 
 - `gerechnet: Decke`
 - `meldungen: List[Meldung]` – Die der Beschreibung und die der Rechnung, in dieser Reihenfolge.
-- `ergebnis: Optional[Ergebnis] = None` – `None`, wenn eine Meldung der Beschreibung die Rechnung aufhielt.
+- `ergebnis: Optional[Union[Ergebnis, Femergebnis]] = None` – `None`, wenn eine Meldung der Beschreibung die Rechnung aufhielt.
 
-### StreifenmethodeProzedur
+### DeckenProzedur
 
 ```python
-class StreifenmethodeProzedur(Prozedur)
+class DeckenProzedur(Prozedur)
 ```
 
-Die ganze Decke, gerechnet und aufgeschrieben.
+Die ganze Decke, gerechnet und aufgeschrieben – ihr Thema ist das ihres Verfahrens.
 
-- `THEMA = STREIFENMETHODE`
-
-#### StreifenmethodeProzedur.rechne
+#### DeckenProzedur.rechne
 
 ```python
 def rechne(self, e: Eingaben, p: Protokoll) -> Ausfuehrung
@@ -104,14 +120,14 @@ Was ein Lauf rechnen muss: die Decke.
 def rechnen_und_schreiben(self, e: Eingaben, p: Protokoll) -> Ausfuehrung
 ```
 
-E und Gewicht in die Platten, die Decke gerechnet, die Herleitung
+E, ν und Gewicht in die Platten, die Decke gerechnet, die Herleitung
 geschrieben. Hält eine Meldung der Beschreibung die Rechnung auf,
 bleibt es bei ihr.
 
 
 ## Konstanten
 
-- `STREIFENMETHODE = 'Streifenmethode'` – Das Thema der Formelsammlung.
+- `VERFAHREN = {Verfahren.STREIFEN: Art('Streifenmethode', 'Streifenmethode', rechnu…` – Je Verfahren, wie es rechnet und schreibt.
 
 ## Braucht
 
@@ -120,6 +136,8 @@ bleibt es bei ihr.
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.rechenobjekt]]
 - [[opencivil.core.wert]]
+- [[opencivil.decke.fem.herleitung]]
+- [[opencivil.decke.fem.rechnung]]
 - [[opencivil.decke.herleitung]]
 - [[opencivil.decke.modell]]
 - [[opencivil.decke.rechnung]]
@@ -129,6 +147,7 @@ bleibt es bei ihr.
 
 ## Gebraucht von
 
+- [[opencivil.decke.fem.herleitung]]
 - [[opencivil.decke.herleitung]]
 - [[opencivil.projekt.aufbau.decke]]
 - [[opencivil.projekt.aufbau.kern]]
