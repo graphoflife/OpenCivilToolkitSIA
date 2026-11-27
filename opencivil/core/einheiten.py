@@ -310,6 +310,10 @@ MIO_MM4 = Einheit("10^6 mm^4", LAENGE**4, 1e-6,
 #: Dasselbe in cm⁴ -- so stehen die Stahlprofile in ihren Tabellen.
 CM4 = Einheit("cm^4", LAENGE**4, 1e-8)
 
+#: Und in m⁴ -- so steht der Kern eines Gebaeudes im Erdbeben: 2.6 m⁴ statt
+#: 2 604 167 · 10⁶ mm⁴.
+M4 = Einheit("m^4", LAENGE**4, 1.0)
+
 #: Ein Widerstandsmoment in cm³, wie in denselben Tabellen.
 CM3 = Einheit("cm^3", LAENGE**3, 1e-6)
 
@@ -385,7 +389,7 @@ EINHEITEN: Dict[str, Einheit] = {
     for e in (
         EINHEITSLOS, PROZENT, PROMILLE,
         M, DM, CM, MM, KM,
-        M2, CM2, MM2, M3, CM3, CM4,
+        M2, CM2, MM2, M3, CM3, CM4, M4,
         N, KN, MN,
         PA, KPA, MPA, GPA, N_PRO_MM2, KN_PRO_M2, MN_PRO_M2,
         NM, KNM, MNM,

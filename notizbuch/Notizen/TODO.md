@@ -47,6 +47,23 @@ sammeln sie sich hier, je mit dem, was vorläufig gebaut ist.
       - Pfahl (Schritt 6): wer nach einem statischen Versuch η_a «aus der
         Grundlage» hat (1.0) und auf «von Hand» schaltet, sieht dort 0.7,
         die Vorgabe, oder was er früher eingab – nicht 1.0.
+- [ ] **Erdbeben: die Tabellen der Herleitung von unten nach oben?** Die
+      Listen der Eingabe stehen jetzt von oben nach unten wie das Gebäude
+      (Schritt 8), die Tabellen der Herleitung – Gewichte, Steifigkeit,
+      Auslenkung, Kräfte – weiter von unten, «1: EG» zuerst. Vorschlag: so
+      lassen; die Formeln zählen von unten (z_i = Σ h_j, j ≤ i), und die
+      Summen lesen sich von der Einspannung her. Sonst umdrehen wie die
+      Eingabe. Vorläufig: von unten.
+- [ ] **Erdbeben: «+ Geschoss» über der Liste?** Ein neues Geschoss kommt
+      oben dazu, mit Kern und η_EI des obersten; der Knopf steht darum über
+      der Liste, wo es erscheint, nicht darunter wie in den anderen Listen.
+      Vorschlag: so lassen. Vorläufig: oben.
+- [ ] **Erdbeben: mit T₁ von Hand braucht jedes Geschoss einen Kern, sobald
+      eines einen hat?** Hat ein Geschoss einen Kern, rechnet das Gebäude
+      erst, wenn jedes einen hat – auch mit T₁ von Hand, wo nur der Kern am
+      Fuss die Kräfte verteilt. Vorschlag: so lassen; ein Geschoss ohne Kern
+      ist meist vergessen, und die Meldung sagt, welches. Sonst genügte mit
+      T₁ von Hand der Kern am Fuss. Vorläufig: jedes braucht einen.
 
 ## Wünsche vom 2026-11-20
 
@@ -64,6 +81,11 @@ Kräften je Geschoss und Wand, ohne Verbindung ins Balkensystem.
 
 ## Offen
 
+- [ ] **Erdbeben: der Name eines neuen Geschosses.** «+ Geschoss» nennt es
+      «Geschoss n» mit der ersten freien Zahl, wie einen Lastfall. Heissen
+      die übrigen «1. OG» bis «8. OG», heisst das neunte darum
+      «Geschoss 1». Besser die Zahl seiner Stelle, «Geschoss 9»
+      (`aufstocken` in `web/js/erdbeben.js`). Gesehen am 2026-11-27.
 - [ ] **Decke: «Der Träger steht nicht im Gleichgewicht».** In der Konsole
       des Browsers stand am 2026-11-27 aus einem älteren Test ein Abbruch
       der Rechnung `decke.e2.rechnung`: am Ende eines Streifens blieben
@@ -1041,10 +1063,14 @@ Norm dazu sagt.
       reine Zug zu viel. Empfehlung: so lassen – die Linie zeigt das
       Gesetz, die Tragsicherheit den Nachweis nach (14) und (21); die
       Legende sagt, dass eine Faser ihre Grenzdehnung erreicht.
-- [ ] **Erdbeben, nach Vorgabe eingebaut** (`opencivil/erdbeben/ersatzkraft.py`).
-      Jede Wand trägt nach ihrem Anteil an der Biegesteifigkeit; verformt
-      werden die Wände nur durch Biegung, weder durch Schub noch im
-      Fundament; η_EI = 0.5 als Anteil der ungerissenen Steifigkeit –
+- [ ] **Erdbeben, nach Vorgabe eingebaut** (`opencivil/erdbeben/ersatzkraft.py`,
+      `kern.py`). Getrennte Teile eines Kerns – Polygone, die kein Stück
+      Kante teilen – zählen je um ihren eigenen Schwerpunkt, ohne
+      Steiner-Anteil zwischen ihnen (Benutzer, 2026-11-27), und tragen am
+      Fuss nach ihrem Anteil an I; eine Aussparung trennt ein Polygon nie,
+      auch wo sie es ganz durchschneidet. Verformt wird der Kern nur durch
+      Biegung, weder durch Schub noch im Fundament; η_EI = 0.5 als Anteil
+      der ungerissenen Steifigkeit –
       16.5.5.2 verlangt eine mittlere Steifigkeit bis zum Fliessbeginn;
       g = 10 m/s² wie beim Eigengewicht. Nicht gerechnet, und das Ergebnis
       sagt es grau: die Torsion (16.5.2.7), die vertikale Komponente

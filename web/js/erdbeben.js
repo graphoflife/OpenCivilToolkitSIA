@@ -7,23 +7,28 @@
  *     Eingaben   je eine Kachel mit Sinnbild und dem Wichtigsten
  *                (Benutzer, 2026-11-25), ein Klick öffnet ihr Fenster:
  *                Standort und Bauwerk, Verhaltensbeiwert, Grundschwingzeit,
- *                Regelmässigkeit, die Geschosse von unten nach oben --
- *                Höhe, G_k, Q_k und ψ₂ -- und die Wände, je eine oder
- *                mehrere gleiche: Querschnittsanalyse, Lage im Grundriss,
- *                Anzahl und η_EI
+ *                Regelmässigkeit, die Geschosse -- Höhe, G_k, Q_k und ψ₂ --
+ *                und je Geschoss sein Kern: eine Querschnittsanalyse mit
+ *                allen Wänden in x und in y, dazu η_EI
+ *
+ * Beide Listen stehen von oben nach unten, wie das Gebäude: das Dach oben,
+ * das unterste Geschoss zuunterst (Benutzer, 2026-11-27; bis dahin von unten
+ * nach oben). Gezählt wird weiter ab der Einspannung, das unterste ist 1.
+ * Ein neues Geschoss kommt oben dazu und übernimmt Kern und η_EI des
+ * obersten: wer aufstockt, baut meist auf demselben Kern weiter.
  *
  * Gerechnet wird nichts: die Kräfte stehen rechts in der Zusammenfassung und
  * im Bild unter «Diagramme». Felder, Zeichen, Einheiten und Grenzen kommen
  * aus dem Katalog (`katalog.vorgaben`, `katalog.felder`), die Stellungen der
  * Schalter und die Kriterien der Regelmässigkeit ebenso
- * (`katalog.erdbeben`, opencivil/erdbeben/ersatzkraft.py). Warum eine Wand
- * nicht rechnet, sagt der Kern an ihr (`zeichendaten`,
- * opencivil/web/erdbebendaten.py).
+ * (`katalog.erdbeben`, opencivil/erdbeben/ersatzkraft.py). Warum der Kern
+ * eines Geschosses nicht rechnet, sagt der Kern der Software an ihm
+ * (`zeichendaten`, opencivil/web/erdbebendaten.py).
  */
 
 import {
-  bauteilliste, beschreibung, bezeichnung, eingabegruppen, karte, mitBild, panel,
-  vorgabefelder, vorgabetitel, wahlBlock, wahlSchalter,
+  bauteilliste, beschreibung, bezeichnung, eingabegruppen, karte, panel, vorgabefelder,
+  vorgabetitel, wahlBlock, wahlSchalter,
 } from './bausteine.js';
 import { el, zahlfeld } from './dom.js';
 import { anfuegenKnopf, fallkopf, fallzeile } from './faelle.js';
@@ -48,7 +53,7 @@ const HILFE = {
     zeilen: [['q', 'der Verhaltensbeiwert je Richtung: wie duktil das Tragwerk ist']],
   },
   schwingzeit: {
-    zeilen: [['T₁', 'aus der Auslenkung der Wände (40) oder von Hand']],
+    zeilen: [['T₁', 'aus der Auslenkung des Kerns (40) oder von Hand']],
   },
   regelmaessigkeit: {
     zeilen: [['regelmässig', 'nur dann gilt das Ersatzkraftverfahren (16.5.2.1), sonst das '
@@ -56,20 +61,25 @@ const HILFE = {
   },
   geschosse: {
     zeilen: [
-      ['Folge', 'von unten nach oben, ab der Einspannung – bei steifen Untergeschossen darf sie '
-        + 'auf dem Erdgeschoss liegen (16.5.1.7)'],
+      ['Folge', 'von oben nach unten, wie das Gebäude; gezählt ab der Einspannung – bei steifen '
+        + 'Untergeschossen darf sie auf dem Erdgeschoss liegen (16.5.1.7)'],
       ['W', 'das Gewicht des Geschosses, G_k + ψ₂·Q_k: es wirkt auf der Höhe seiner Decke'],
+      ['Neu', 'ein neues Geschoss kommt oben dazu, mit Kern und η_EI des obersten'],
     ],
     formel: 'F_d,i = z_i·W_i / Σ z_j·W_j · F_d',
   },
-  waende: {
+  kern: {
     zeilen: [
-      ['Querschnitt', 'aus einer Querschnittsanalyse des Projekts: I_y, I_z und E_cm ihres Betons'],
-      ['Lage', '0°: y der Analyse liegt in x des Gebäudes, 90°: in y'],
+      ['Kern', 'je Geschoss eine Querschnittsanalyse des Projekts: der ganze Kern mit allen '
+        + 'Wänden in x und in y, gezeichnet, wie er im Grundriss liegt – y der Analyse in x des '
+        + 'Gebäudes, z in y; der Beton gibt E_cm'],
+      ['Teile', 'Wände, die keine Kante teilen, biegen sich je um ihren eigenen Schwerpunkt: '
+        + 'ihre I zählen ohne Steiner-Anteil – nach Vorgabe, nicht nachgeschlagen'],
       ['η_EI', 'der Anteil der ungerissenen Biegesteifigkeit, der gilt'],
-      ['Verteilung', 'jede Wand trägt nach ihrem Anteil an EI – nach Vorgabe, nicht nachgeschlagen'],
+      ['Verteilung', 'am Fuss trägt jeder Teil nach seinem Anteil an I – nach Vorgabe, nicht '
+        + 'nachgeschlagen'],
     ],
-    formel: 'EI = n·η_EI·E_cm·I',
+    formel: 'EI_i = η_EI,i·E_cm,i·I_i',
   },
 };
 
@@ -101,7 +111,7 @@ function kopfPanel(h) {
   ]);
 }
 
-/** Das Wort einer Stellung, wie der Katalog es nennt: «Z2», «aus den Wänden». */
+/** Das Wort einer Stellung, wie der Katalog es nennt: «Z2», «aus dem Kern». */
 function wortVon(liste, wert) {
   return katalog('erdbeben', liste).find((w) => w.wert === wert)?.beschriftung || '';
 }
@@ -148,121 +158,154 @@ const REGELMAESSIGKEIT = {
   },
 };
 
-/** Die Zahlen einer Zeile, je ein Feld der Vorgaben von `klasse`. */
-function zahlen(klasse, teil, aendern) {
-  return vorgabefelder(klasse, teil).map((f) => zahlfeld({
+/** Die Titel der beiden Gruppen eines Geschosses, wie im Katalog: Lasten und Kern. */
+const GESCHOSS = 'Geschoss';
+const KERN = 'Kern';
+
+/** Die Zahlen einer Zeile, je ein Feld der Vorgaben von `klasse` in `gruppe`. */
+function zahlen(klasse, teil, aendern, gruppe) {
+  return vorgabefelder(klasse, teil, gruppe).map((f) => zahlfeld({
     wert: teil[f.feld], schritt: f.schritt, angabe: feldangabe(klasse, f.feld),
     titel: vorgabetitel(f), beiAenderung: (v) => aendern((x) => { x[f.feld] = v; }),
   }));
 }
 
 /** Die Köpfe der Spalten: je Feld der Vorgaben sein Zeichen und die Einheit des Kerns. */
-function koepfe(klasse, teil) {
-  return vorgabefelder(klasse, teil).map((f) => [f.zeichen, feldangabe(klasse, f.feld).einheit]);
+function koepfe(klasse, teil, gruppe) {
+  return vorgabefelder(klasse, teil, gruppe)
+    .map((f) => [f.zeichen, feldangabe(klasse, f.feld).einheit]);
+}
+
+/** Die Stellen der Geschosse von oben nach unten, wie das Gebäude: das Dach zuerst. */
+function vonOben(h) {
+  return h.geschosse.map((_, i) => i).reverse();
+}
+
+/** Die Nummer eines Geschosses, gezählt ab der Einspannung -- wie in der Herleitung. */
+function nummer(i) {
+  return el('span.schicht-nummer', {
+    text: String(i + 1), title: `${i + 1}. Geschoss über der Einspannung`,
+  });
 }
 
 function geschossZeile(h, i) {
   const geschoss = h.geschosse[i];
   const aendern = (veraenderer) => eintragAendern(h.kennung, (x) => veraenderer(x.geschosse[i]));
   return fallzeile({
-    fall: geschoss, aendern, nameTitel: 'Bezeichnung des Geschosses',
-    vorn: el('span.schicht-nummer', { text: String(i + 1), title: `${i + 1}. Geschoss über der Einspannung` }),
-    zahlen: zahlen('geschoss', geschoss, aendern),
+    fall: geschoss, aendern, nameTitel: 'Bezeichnung des Geschosses', vorn: nummer(i),
+    zahlen: zahlen('geschoss', geschoss, aendern, GESCHOSS),
     entfernenTitel: 'Geschoss entfernen',
     entfernen: () => eintragAendern(h.kennung, (x) => { x.geschosse.splice(i, 1); }),
   });
 }
 
-/** Die Geschosse: je eine Zeile, von unten nach oben. */
+/**
+ * Ein neues Geschoss, oben auf das Gebäude: mit Kern und η_EI des obersten,
+ * die Lasten aus der Vorlage.
+ */
+function aufstocken(h) {
+  return anfuegenKnopf('Geschoss', (name) => eintragAendern(h.kennung, (x) => {
+    const oben = x.geschosse[x.geschosse.length - 1];
+    x.geschosse.push(ausVorlage('geschoss', {
+      name: name(x.geschosse), ...(oben ? { kern: oben.kern, eta_EI: oben.eta_EI } : {}),
+    }));
+  }), { titel: 'Ein Geschoss oben anfügen – mit Kern und η_EI des obersten' });
+}
+
+/** Die Geschosse: je eine Zeile, von oben nach unten wie das Gebäude. */
 const GESCHOSSE = {
   schluessel: 'geschosse',
   name: 'Geschosse', titel: 'Geschosse',
   hilfe: HILFE.geschosse,
   inhalt: (h) => [el('div.unterkapitel', {}, [
     h.geschosse.length
-      ? [el('div.eb-folge', { text: 'Von unten nach oben, ab der Einspannung' }),
-        fallkopf(koepfe('geschoss', h.geschosse[0]))]
+      ? el('div.eb-folge', { text: 'Von oben nach unten, wie das Gebäude – gezählt ab der Einspannung' })
       : el('div.leer', { text: 'Noch kein Geschoss – ohne Geschoss keine Ersatzkraft.' }),
-    ...h.geschosse.map((_, i) => geschossZeile(h, i)),
-    anfuegenKnopf('Geschoss', (name) => eintragAendern(h.kennung, (x) => {
-      x.geschosse.push(ausVorlage('geschoss', { name: name(x.geschosse) }));
-    })),
-  ].flat())],
+    aufstocken(h),
+    h.geschosse.length ? fallkopf(koepfe('geschoss', h.geschosse[0], GESCHOSS)) : null,
+    ...vonOben(h).map((i) => geschossZeile(h, i)),
+  ].filter(Boolean))],
   stand: (h) => zeilenstand(h.geschosse, 'Geschoss', 'Geschosse', 'kein Geschoss'),
 };
 
 /**
- * Was der Kern zu einer Wand sagt -- nur, wenn es zu ihrer jetzigen
- * Querschnittsanalyse gehört: nach einer anderen Wahl gilt es nicht mehr.
+ * Was der Kern der Software zum Kern eines Geschosses sagt -- nur, wenn es
+ * zu dessen jetziger Querschnittsanalyse gehört: nach einer anderen Wahl
+ * gilt es nicht mehr.
  */
-function wandbefund(h, i) {
-  const m = zustand.loesung?.zeichendaten?.[h.kennung]?.waende?.[i];
-  return m && m.analyse === h.waende[i].analyse ? m : null;
+function kernbefund(h, i) {
+  const m = zustand.loesung?.zeichendaten?.[h.kennung]?.kerne?.[i];
+  return m && m.analyse === h.geschosse[i].kern ? m : null;
 }
 
-/** Die Meldung an der Wand: rot, was falsch ist, grau, was nur fehlt. */
-function wandmeldung(h, i) {
-  const m = wandbefund(h, i);
+/** Die Meldung am Geschoss: rot, was falsch ist, grau, was nur fehlt. */
+function kernmeldung(h, i) {
+  const m = kernbefund(h, i);
   if (!m) return null;
-  return el('div.qa-meldung', { text: `${m.grund[0].toUpperCase()}${m.grund.slice(1)}.`, class: m.fehler ? '' : 'ist-hinweis' });
-}
-
-/** Dieselbe Meldung kurz für die Kachel: «Wand 2: …» -- oder nichts. */
-function wandmeldungstext(h, i) {
-  const m = wandbefund(h, i);
-  return m ? `${h.waende[i].name}: ${m.grund}` : '';
-}
-
-function wandZeile(h, i) {
-  const wand = h.waende[i];
-  const aendern = (veraenderer) => eintragAendern(h.kennung, (x) => veraenderer(x.waende[i]));
-  return fallzeile({
-    fall: wand, aendern, nameTitel: 'Bezeichnung der Wand', spalten: 4,
-    vorn: el('span.schicht-nummer', { text: String(i + 1), title: `Wand ${i + 1}` }),
-    zahlen: zahlen('tragwand', wand, aendern),
-    unten: [
-      wahlBlock('Querschnittsanalyse', bauteilliste({
-        alle: zustand.projekt.querschnittsanalysen || [], gewaehlt: wand.analyse,
-        inSandbox: istSandbox(h.kennung),
-        titel: 'Die Querschnittsanalyse der Wand: I_y, I_z und E_cm ihres Betons',
-        setzen: (v) => aendern((x) => { x.analyse = v; }),
-      })),
-      wahlBlock('Lage im Grundriss', wahlSchalter({
-        werte: mitBild(katalog('erdbeben', 'lagen'), 'wandlage'), gewaehlt: wand.lage,
-        titel: 'Wie die Wand im Grundriss liegt – y und z ihrer Querschnittsanalyse gegen x und y',
-        setzen: (v) => aendern((x) => { x.lage = v; }),
-      })),
-      wandmeldung(h, i),
-    ].filter(Boolean),
-    entfernenTitel: 'Wand entfernen',
-    entfernen: () => eintragAendern(h.kennung, (x) => { x.waende.splice(i, 1); }),
+  return el('div.qa-meldung', {
+    text: `${m.grund[0].toUpperCase()}${m.grund.slice(1)}.`, class: m.fehler ? '' : 'ist-hinweis',
   });
 }
 
 /**
- * Die Wände: je eine Zeile mit ihrer Querschnittsanalyse. Was der Kern zu
- * einer Wand sagt, steht an ihr -- und das erste davon grau auf der Kachel.
+ * Je Geschoss sein Kern: die Querschnittsanalyse und η_EI. Name und Folge
+ * gehören den Geschossen -- hier stehen sie nur da, ohne Kreuz.
  */
-const WAENDE = {
-  schluessel: 'waende',
-  name: 'Wände', titel: 'Wände',
-  hilfe: HILFE.waende,
-  inhalt: (h) => [el('div.unterkapitel', {}, [
-    h.waende.length
-      ? fallkopf(koepfe('tragwand', h.waende[0]), { spalten: 4 })
-      : el('div.leer', { text: 'Noch keine Wand – ohne Wand gilt nur T₁ von Hand, und die Kräfte bleiben ohne Verteilung.' }),
-    ...h.waende.map((_, i) => wandZeile(h, i)),
-    anfuegenKnopf('Wand', (name) => eintragAendern(h.kennung, (x) => {
-      x.waende.push(ausVorlage('tragwand', { name: name(x.waende) }));
-    })),
-  ])],
+function kernZeile(h, i) {
+  const geschoss = h.geschosse[i];
+  const aendern = (veraenderer) => eintragAendern(h.kennung, (x) => veraenderer(x.geschosse[i]));
+  return fallzeile({
+    fall: geschoss, aendern, nameFest: true, spalten: 3, vorn: nummer(i),
+    nameTitel: 'Das Geschoss – Name und Folge unter «Geschosse»',
+    zahlen: zahlen('geschoss', geschoss, aendern, KERN),
+    unten: [
+      wahlBlock('Querschnittsanalyse', bauteilliste({
+        alle: zustand.projekt.querschnittsanalysen || [], gewaehlt: geschoss.kern,
+        inSandbox: istSandbox(h.kennung),
+        titel: 'Der Kern des Geschosses: alle Wände in x und in y, wie im Grundriss – y der '
+          + 'Analyse in x des Gebäudes',
+        setzen: (v) => aendern((x) => { x.kern = v; }),
+      })),
+      kernmeldung(h, i),
+    ].filter(Boolean),
+  });
+}
+
+/** Was auf der Kachel steht: der Name des Kerns, wo alle denselben haben, sonst wie viele. */
+function kernstand(h) {
+  const gewaehlt = [...new Set(h.geschosse.map((g) => g.kern).filter(Boolean))];
+  if (!h.geschosse.length) return { an: false, text: 'kein Geschoss' };
+  if (!gewaehlt.length) return { an: false, text: 'ohne Kern' };
+  const analyse = (zustand.projekt.querschnittsanalysen || []).find((a) => a.kennung === gewaehlt[0]);
+  return {
+    an: true,
+    text: gewaehlt.length > 1 ? `${gewaehlt.length} Querschnitte` : analyse?.name || 'gelöscht',
+  };
+}
+
+/**
+ * Der Kern: je Geschoss, von oben nach unten, seine Querschnittsanalyse
+ * und η_EI. Was der Kern der Software dazu sagt, steht am Geschoss -- und
+ * das erste davon grau auf der Kachel.
+ */
+const KERNE = {
+  schluessel: 'kern',
+  name: 'Kern', titel: 'Kern',
+  hilfe: HILFE.kern,
+  inhalt: (h) => [el('div.unterkapitel', {}, h.geschosse.length ? [
+    el('div.eb-folge', { text: 'Je Geschoss sein Kern, von oben nach unten – ohne Kern in allen '
+      + 'gilt nur T₁ von Hand, und die Kräfte bleiben ohne Verteilung' }),
+    fallkopf(koepfe('geschoss', h.geschosse[0], KERN), { spalten: 3 }),
+    ...vonOben(h).map((i) => kernZeile(h, i)),
+  ] : [el('div.leer', { text: 'Noch kein Geschoss – erst unter «Geschosse» eines anlegen.' })])],
   stand: (h) => {
-    const meldung = h.waende.map((_, i) => wandmeldungstext(h, i)).find(Boolean);
-    return standOhne(zeilenstand(h.waende, 'Wand', 'Wände', 'keine Wand'), meldung);
+    const i = vonOben(h).find((j) => kernbefund(h, j));
+    return standOhne(kernstand(h), i === undefined ? ''
+      : `${h.geschosse[i].name}: ${kernbefund(h, i).grund}`);
   },
 };
 
-/** Die Kacheln: Standort, je Gruppe der Vorgaben eine, Regelmässigkeit, Geschosse, Wände. */
+/** Die Kacheln: Standort, je Gruppe der Vorgaben eine, Regelmässigkeit, Geschosse, Kern. */
 function kapitel(h) {
   const aendern = (veraenderer) => eintragAendern(h.kennung, veraenderer);
   const vorgaben = eingabegruppen('erdbeben', h, aendern);
@@ -280,7 +323,7 @@ function kapitel(h) {
     }),
     REGELMAESSIGKEIT,
     GESCHOSSE,
-    WAENDE,
+    KERNE,
   ];
   vorgaben.vollstaendig();
   return [{ titel: '', kapitel: kacheln.filter(Boolean) }];

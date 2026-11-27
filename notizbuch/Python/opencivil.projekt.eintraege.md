@@ -1,5 +1,5 @@
 ---
-erzeugt: 033801016ba9
+erzeugt: 16d8372c7999
 art: modul
 tags: [modul]
 ---
@@ -71,7 +71,7 @@ vorbei: ein «festt» aus Python wurde still zur Feder (2026-10-16).
 
 `BEZEICHNUNG`, wo es sie gibt, nennt den Eintrag in Meldungen so wie
 die Oberflaeche: «Platte 'Decke'». `IM_ORT` nennt ein Element einer
-Liste mit dem Wort der Maske: mit Namen «Wand 'W1'», ohne mit seiner
+Liste mit dem Wort der Maske: mit Namen «Geschoss 'EG'», ohne mit seiner
 Nummer, «Lage 2».
 
 Ein Wahlfeld haelt das Mitglied seiner Wahl; wer Text zuweist – die

@@ -2,23 +2,29 @@
  * eb_zeichnung.js -- ein Gebäude im Erdbeben als Bild.
  *
  * Je Hauptrichtung eine Ansicht: die Geschosse als Decken über der
- * Einspannung, die Wände als Kragarm, links an jeder Decke ihre Kraft F_d,i
+ * Einspannung, der Kern als Kragarm, links an jeder Decke ihre Kraft F_d,i
  * als Pfeil, rechts in jedem Geschoss die Querkraft darunter, am Fuss die
  * Ersatzkraft und das Kippmoment. Beide Richtungen im selben Massstab der
- * Kräfte -- man sieht, wo das Beben stärker angreift. Darunter, was jede Wand
- * am Fuss trägt, die Meldungen des Kerns -- rot, was falsch ist, grau, was
- * fehlt oder nicht gerechnet wird -- und die Legende.
+ * Kräfte -- man sieht, wo das Beben stärker angreift. Auf jeder Decke sitzt
+ * ihre Masse als Kreis, seine Fläche so gross wie sie, daneben der Name des
+ * Geschosses und die Masse: «EG 274 t» (Benutzer, 2026-11-27) -- so sieht
+ * man, wo die Massen sind, die man in den Geschossen eingibt. Darunter, was
+ * jeder getrennte Teil des Kerns am Fuss trägt, die Meldungen des Kerns --
+ * rot, was falsch ist, grau, was fehlt oder nicht gerechnet wird -- und die
+ * Legende.
  *
  * Namen und Höhen der Geschosse kommen aus dem Eintrag, wie eingegeben; was
- * der Kern daraus macht -- Kräfte, Querkräfte, die Anteile der Wände --, aus
- * der Lösung (opencivil/web/erdbebendaten.py). Gerechnet wird hier nur, wo
+ * der Kern daraus macht -- Massen, Kräfte, Querkräfte, die Anteile der
+ * Teile --, aus der Lösung (opencivil/web/erdbebendaten.py), die Massen
+ * auch, solange das Gebäude noch nicht rechnet. Gerechnet wird hier nur, wo
  * etwas im Bild steht.
  *
- * Dazu in derselben Höhe die Wände je Geschoss mit Querkraft und Moment
+ * Dazu in derselben Höhe der Kern je Geschoss mit Querkraft und Moment
  * (eb_verlauf.js).
  */
 
 import { karte } from './bausteine.js';
+import { mitTitel } from './cad_app.js';
 import { el, svgEl } from './dom.js';
 import { verlaufKarte } from './eb_verlauf.js';
 import {
@@ -39,6 +45,15 @@ const JE_METER = 25;
 const NIEDRIG = 60;
 /** Wie breit das Gebäude gezeichnet wird, in px -- seine Breite ist keine Eingabe. */
 const GEBAEUDE = 46;
+/** Rechts davon Platz für Name und Masse jedes Geschosses, «2. OG 274 t», in px. */
+const NAMENSRAUM = 100;
+/**
+ * So gross ist der Kreis der schwersten Masse höchstens, Halbmesser in px --
+ * und höchstens so viel des niedrigsten Geschosses: zwei Kreise berühren
+ * sich nie.
+ */
+const KUGEL = 15;
+const KUGEL_ANTEIL = 0.45;
 
 /**
  * Wie das Gebäude dasteht: `z` die Höhe jeder Decke über der Einspannung,
@@ -53,13 +68,31 @@ function aufriss(geschosse) {
 }
 
 /**
- * Eine Ansicht: links ab `x0`, `breite` breit. `r` ist die Richtung aus dem
- * Kern oder nichts; `k` der Massstab der Kräfte, px je kN.
+ * Die Masse jeder Decke als Kreis auf ihr, mitten im Gebäude: seine Fläche
+ * wie die Masse, der schwerste so gross, wie das niedrigste Geschoss es
+ * zulässt. `massen` sind je Geschoss `{ W, m }` aus dem Kern, in kN und t.
  */
-function ansicht(h, { z, m, hoch }, r, x0, breite, k, titel) {
+function kugeln(h, z, y, mitte, massen, m) {
+  const unten = [0, ...z.slice(0, -1)];
+  const niedrig = Math.min(...z.map((zi, i) => (zi - unten[i]) * m));
+  const R = Math.min(KUGEL, KUGEL_ANTEIL * niedrig);
+  const schwerste = Math.max(1e-9, ...massen.map((g) => g.m));
+  return massen.map((g, i) => (g.m > 0 && R > 0 ? mitTitel(svgEl('circle', {
+    cx: mitte.toFixed(1), cy: y(z[i]).toFixed(1),
+    r: (R * Math.sqrt(g.m / schwerste)).toFixed(1), class: 'eb-masse',
+  }), [`${h.geschosse[i].name}: W = ${zahl(g.W, 0)} kN, m = ${zahl(g.m, 0)} t`]) : null));
+}
+
+/**
+ * Eine Ansicht: links ab `x0`, `breite` breit. `r` ist die Richtung aus dem
+ * Kern oder nichts; `k` der Massstab der Kräfte, px je kN; `massen` je
+ * Geschoss W und m aus dem Kern -- oder nichts, solange seine Antwort zu
+ * anderen Geschossen gehört.
+ */
+function ansicht(h, { z, m, hoch }, r, x0, breite, k, titel, massen) {
   const H = z.length ? z[z.length - 1] : 0;
   const fuss = RAND + OBEN + hoch;
-  const links = x0 + breite - GEBAEUDE - 78;
+  const links = x0 + breite - GEBAEUDE - NAMENSRAUM;
   const rechts = links + GEBAEUDE;
   const y = (hoehe) => fuss - hoehe * m;
   const teile = [
@@ -69,11 +102,11 @@ function ansicht(h, { z, m, hoch }, r, x0, breite, k, titel) {
       class: 'eb-gebaeude',
     }),
   ];
+  h.geschosse.forEach((_, i) => teile.push(linie([[links, y(z[i])], [rechts, y(z[i])]], 'eb-decke')));
+  if (massen) teile.push(...kugeln(h, z, y, (links + rechts) / 2, massen, m));
   h.geschosse.forEach((g, i) => {
-    teile.push(
-      linie([[links, y(z[i])], [rechts, y(z[i])]], 'eb-decke'),
-      text(rechts + 6, y(z[i]) + 4, [g.name], { klasse: 'eb-name' }),
-    );
+    const name = massen ? `${g.name} ${zahl(massen[i].m, 0)} t` : g.name;
+    teile.push(text(rechts + 6, y(z[i]) + 4, [name], { klasse: 'eb-name' }));
     if (!r) return;
     const F = r.kraefte[i];
     teile.push(
@@ -81,10 +114,11 @@ function ansicht(h, { z, m, hoch }, r, x0, breite, k, titel) {
       text(links - 8 - Math.max(F * k, 6), y(z[i]) + 4, [`${zahl(F, 0)} kN`],
         { anker: 'end', klasse: 'gb-krafttext' }),
     );
-    // Die Querkraft unter der Decke, mitten im Geschoss -- wo Platz ist.
+    // Die Querkraft unter der Decke, mitten im Geschoss -- wo Platz ist:
+    // so weit von beiden Decken wie möglich, auch von deren Namen.
     const unten = i ? z[i - 1] : 0;
     if ((z[i] - unten) * m >= 30) {
-      teile.push(text(rechts + 6, y((z[i] + unten) / 2) + 14, ['V = ', `${zahl(r.querkraefte[i], 0)} kN`],
+      teile.push(text(rechts + 6, y((z[i] + unten) / 2) + 4, ['V = ', `${zahl(r.querkraefte[i], 0)} kN`],
         { klasse: 'gb-zart' }));
     }
   });
@@ -104,6 +138,7 @@ function ansicht(h, { z, m, hoch }, r, x0, breite, k, titel) {
  * sonst das Gebäude allein. `a` ist der Aufriss.
  */
 function bild(h, d, a) {
+  const massen = d?.geschosse?.length === h.geschosse.length ? d.geschosse : null;
   const richtungen = d?.richtungen?.length ? d.richtungen : [null];
   const groesste = Math.max(1e-9, ...richtungen.flatMap((r) => r?.kraefte || []));
   const k = PFEIL / groesste;
@@ -115,29 +150,32 @@ function bild(h, d, a) {
   });
   richtungen.forEach((r, i) => {
     const titel = r ? `Richtung ${r.richtung}` : 'Ansicht';
-    svg.append(...ansicht(h, a, r, RAND + i * (breite + RAND), breite, k, titel).filter(Boolean));
+    svg.append(...ansicht(h, a, r, RAND + i * (breite + RAND), breite, k, titel, massen)
+      .filter(Boolean));
   });
   return svg;
 }
 
 /**
- * Was jede Wand am Fuss trägt, je Richtung: Anteil an EI, Querkraft und
- * Moment -- je eine der n gleichen, wie im Kern (`Wandanteil`).
+ * Was jeder getrennte Teil des Kerns am Fuss trägt, je Richtung: sein
+ * Anteil an I, Querkraft und Moment, wie in der Herleitung (`Kernanteil`)
+ * -- nur, wo der Kern am Fuss aus mehr als einem Teil besteht. Die Nummern
+ * stehen im Bild des Kerns daneben.
  */
-function wandtabelle(d) {
-  const richtungen = (d?.richtungen || []).filter((r) => r.waende.length);
+function teiltabelle(d) {
+  const richtungen = (d?.richtungen || []).filter((r) => r.teile.length);
   if (!richtungen.length) return null;
-  const kopf = ['Wand', 'n', ...richtungen.flatMap((r) => [`Anteil ${r.richtung}`,
+  const kopf = ['Teil', ...richtungen.flatMap((r) => [`Anteil ${r.richtung}`,
     `V_${r.richtung} [kN]`, `M_${r.richtung} [kNm]`])];
-  return el('table.eb-waende', {}, [
-    el('caption', { text: 'Am Fuss, je eine der n gleichen Wände: ihr Anteil an EI, Querkraft und Moment' }),
+  return el('table.eb-teile', {}, [
+    el('caption', { text: 'Am Fuss, je Teil des Kerns: sein Anteil an I, Querkraft und Moment' }),
     el('thead', {}, [el('tr', {}, kopf.map((t) => el('th', { text: t })))]),
-    el('tbody', {}, richtungen[0].waende.map((w, i) => el('tr', {}, [
-      el('td', { text: w.name }), el('td', { text: String(w.n) }),
+    el('tbody', {}, richtungen[0].teile.map((t, i) => el('tr', {}, [
+      el('td', { text: String(t.nummer) }),
       ...richtungen.flatMap((r) => [
-        el('td', { text: `${zahl(100 * r.waende[i].anteil, 1)} %` }),
-        el('td', { text: zahl(r.waende[i].V, 0) }),
-        el('td', { text: zahl(r.waende[i].M, 0) }),
+        el('td', { text: `${zahl(100 * r.teile[i].anteil, 1)} %` }),
+        el('td', { text: zahl(r.teile[i].V, 0) }),
+        el('td', { text: zahl(r.teile[i].M, 0) }),
       ]),
     ]))),
   ]);
@@ -153,7 +191,7 @@ function meldungen(d) {
 
 /**
  * Die Karten eines Gebäudes im Reiter «Diagramme»: die Ersatzkräfte, dann
- * Wände, Querkraft und Moment. Das Panel darum baut bericht.js.
+ * Kern, Querkraft und Moment. Das Panel darum baut bericht.js.
  */
 export function erdbebenKarten(kennung) {
   const h = eintragVon(kennung);
@@ -165,7 +203,7 @@ export function erdbebenKarten(kennung) {
   const abbild = bild(h, d, a);
   return [karte('Ersatzkräfte', [
     el('div.gb-bildhuelle', {}, [abbild]),
-    wandtabelle(d),
+    teiltabelle(d),
     meldungen(d),
     legende(d ? d.legende : [textzeile('Noch nicht gerechnet.')]),
   ].filter(Boolean), { bild: abbild, klasse: 'ist-breit' }), verlaufKarte(h, d, a)].filter(Boolean);

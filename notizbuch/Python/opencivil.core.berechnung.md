@@ -1,5 +1,5 @@
 ---
-erzeugt: 3ec576ab945e
+erzeugt: 547e05ad73d3
 art: modul
 tags: [modul]
 ---
@@ -465,6 +465,7 @@ Die Kennzahl `kurz` mit dem Wert `si` in SI-Basis – auch in `ergebnis`.
 - [[opencivil.durchstanzen.nachweis]]
 - [[opencivil.durchstanzen.stelle]]
 - [[opencivil.erdbeben.ersatzkraft]]
+- [[opencivil.erdbeben.kern]]
 - [[opencivil.geotechnik.fundament]]
 - [[opencivil.geotechnik.gleiten]]
 - [[opencivil.geotechnik.grundbruch]]

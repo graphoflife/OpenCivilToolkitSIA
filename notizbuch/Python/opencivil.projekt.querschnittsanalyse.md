@@ -1,5 +1,5 @@
 ---
-erzeugt: e89b4252180d
+erzeugt: 9b85072c8112
 art: modul
 tags: [modul]
 ---
@@ -650,6 +650,7 @@ Feldmoment; das Rechteck gibt es als Vorlage im Zeichenfenster.
 - [[opencivil.projekt.aufbau.querschnittsanalyse]]
 - [[opencivil.projekt.beispiele]]
 - [[opencivil.projekt.beispiele_verbund]]
+- [[opencivil.projekt.frueher]]
 - [[opencivil.projekt.projekt]]
 - [[opencivil.web.api]]
 - [[opencivil.web.zeichengeometrie]]

@@ -292,15 +292,14 @@ class TestBezuege(unittest.TestCase):
                                  "einen Stahlbetonquerschnitt, und «Holzbalken» ist ein "
                                  "Holzquerschnitt."])
 
-    def test_keine_wand_aus_holz(self):
+    def test_kein_kern_aus_holz(self):
         p = projekt()
         a = analyse(p, "Holzwand", ([[0, 0], [5000, 0], [5000, 250], [0, 250]], "h1"))
         h = p.gebaeude("Haus", zone="Z2")
-        h.geschoss("Dach", h=3.0, G_k=2500.0)
-        h.wand("W1", a.kennung)
+        h.geschoss("Dach", h=3.0, G_k=2500.0, kern=a.kennung)
         self.assertIn("Erdbeben 'Haus': die Querschnittsanalyse «Holzwand» ist ein "
-                      "Holzquerschnitt – eine Wand rechnet das Werkzeug nur aus Stahlbeton "
-                      "(«W1») → kein Nachweis.", [w.text for w in p.rechnen().aufbau.warnungen])
+                      "Holzquerschnitt – einen Kern rechnet das Werkzeug nur aus Stahlbeton "
+                      "(«Dach») → kein Nachweis.", [w.text for w in p.rechnen().aufbau.warnungen])
 
 
 class TestVorlage(unittest.TestCase):

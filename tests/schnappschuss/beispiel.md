@@ -1,6 +1,6 @@
 # Beispiel
 
-186 Berechnungen ausgeführt, 287 Werte bestimmt.
+187 Berechnungen ausgeführt, 298 Werte bestimmt.
 
 ## Herleitung
 
@@ -1174,7 +1174,7 @@ $$
 T_{Rd} = 78.9\,\mathrm{kNm}
 $$
 
-### Querschnittsanalyse: Tragwand 5000 × 250
+### Querschnittsanalyse: Kern aus vier Wänden
 
 **Fläche und Schwerpunkt eines Polygons (Satz von Gauss)**
 
@@ -1192,36 +1192,39 @@ $$
 
 | Polygon | Material | liegt in | Ecken | $\pm A\ [\mathrm{mm}^2]$ | $y_S\ [\mathrm{mm}]$ | $z_S\ [\mathrm{mm}]$ |
 | :--- | :--- | :--- | ---: | ---: | ---: | ---: |
-| Polygon 1 | C30/37 | – | $4$ | $1250000$ | $2500.0$ | $125.0$ |
+| Polygon 1 | C30/37 | – | $4$ | $1250000$ | $6000.0$ | $125.0$ |
+| Polygon 2 | C30/37 | – | $4$ | $1250000$ | $6000.0$ | $9875.0$ |
+| Polygon 3 | C30/37 | – | $4$ | $1250000$ | $125.0$ | $5000.0$ |
+| Polygon 4 | C30/37 | – | $4$ | $1250000$ | $11875.0$ | $5000.0$ |
 
 **Fläche des Bruttoquerschnitts**
 
 $$
-A = 1250000\,\mathrm{mm}^{2}
+A = 5000000\,\mathrm{mm}^{2}
 $$
 
 **Schwerpunkt, y**
 
 $$
-y_S = 2500\,\mathrm{mm}
+y_S = 6000\,\mathrm{mm}
 $$
 
 **Schwerpunkt, z**
 
 $$
-z_S = 125\,\mathrm{mm}
+z_S = 5000\,\mathrm{mm}
 $$
 
 **Trägheitsmoment um y**
 
 $$
-I_y = 6510.4\,\cdot 10^{6}\,\mathrm{mm}^{4}
+I_y = 64635416.7\,\cdot 10^{6}\,\mathrm{mm}^{4}
 $$
 
 **Trägheitsmoment um z**
 
 $$
-I_z = 2604166.7\,\cdot 10^{6}\,\mathrm{mm}^{4}
+I_z = 91510416.7\,\cdot 10^{6}\,\mathrm{mm}^{4}
 $$
 
 **Deviationsmoment**
@@ -1240,13 +1243,19 @@ $$
 
 | Element | $\text{Lage}\ [\mathrm{mm}]$ | Bewehrung | Stahl | $A_s\ [\mathrm{mm}^2]$ |
 | :--- | :--- | :--- | ---: | ---: |
-| Linie 1 | $(50;\ 50) \rightarrow (4950;\ 50)$ | $34 \varnothing 12\ @\ 148.5\ (\text{gewählt } 150)$ | B500B | $3845$ |
-| Linie 2 | $(50;\ 200) \rightarrow (4950;\ 200)$ | $34 \varnothing 12\ @\ 148.5\ (\text{gewählt } 150)$ | B500B | $3845$ |
+| Linie 1 | $(3550;\ 50) \rightarrow (8450;\ 50)$ | $34 \varnothing 12\ @\ 148.5\ (\text{gewählt } 150)$ | B500B | $3845$ |
+| Linie 2 | $(3550;\ 200) \rightarrow (8450;\ 200)$ | $34 \varnothing 12\ @\ 148.5\ (\text{gewählt } 150)$ | B500B | $3845$ |
+| Linie 3 | $(3550;\ 9800) \rightarrow (8450;\ 9800)$ | $34 \varnothing 12\ @\ 148.5\ (\text{gewählt } 150)$ | B500B | $3845$ |
+| Linie 4 | $(3550;\ 9950) \rightarrow (8450;\ 9950)$ | $34 \varnothing 12\ @\ 148.5\ (\text{gewählt } 150)$ | B500B | $3845$ |
+| Linie 5 | $(50;\ 2550) \rightarrow (50;\ 7450)$ | $34 \varnothing 12\ @\ 148.5\ (\text{gewählt } 150)$ | B500B | $3845$ |
+| Linie 6 | $(200;\ 2550) \rightarrow (200;\ 7450)$ | $34 \varnothing 12\ @\ 148.5\ (\text{gewählt } 150)$ | B500B | $3845$ |
+| Linie 7 | $(11800;\ 2550) \rightarrow (11800;\ 7450)$ | $34 \varnothing 12\ @\ 148.5\ (\text{gewählt } 150)$ | B500B | $3845$ |
+| Linie 8 | $(11950;\ 2550) \rightarrow (11950;\ 7450)$ | $34 \varnothing 12\ @\ 148.5\ (\text{gewählt } 150)$ | B500B | $3845$ |
 
 **Stahlfläche der Bewehrung**
 
 $$
-A_{s,tot} = 7691\,\mathrm{mm}^{2}
+A_{s,tot} = 30762\,\mathrm{mm}^{2}
 $$
 
 **Dehnungsebene und innere Kräfte** *(SIA 262:2025, 4.3.2.3)*
@@ -1295,15 +1304,15 @@ $$
 
 | Grenze | Wert |
 | :--- | ---: |
-| reiner Zug, gleichmässig | $N_{Rd}^{+} = 3343.7\,\mathrm{kN}$ |
-| reiner Druck, gleichmässig | $N_{Rd}^{-} = -27922.4\,\mathrm{kN}$ |
+| reiner Zug, gleichmässig | $N_{Rd}^{+} = 13375.0\,\mathrm{kN}$ |
+| reiner Druck, gleichmässig | $N_{Rd}^{-} = -111689.7\,\mathrm{kN}$ |
 
 ### Kennzahlen
 
 **Bewehrungsmass je Kubikmeter Beton, ohne Bügel**
 
 $$
-\mu_s = \frac{A_{s,tot} \cdot 7850\,\mathrm{kg}/\mathrm{m}^{3}}{A} = \frac{7691\,\mathrm{mm}^{2} \cdot 7850\,\mathrm{kg}/\mathrm{m}^{3}}{1250000\,\mathrm{mm}^{2}} = 48\,\mathrm{kg}/\mathrm{m}^{3}
+\mu_s = \frac{A_{s,tot} \cdot 7850\,\mathrm{kg}/\mathrm{m}^{3}}{A} = \frac{30762\,\mathrm{mm}^{2} \cdot 7850\,\mathrm{kg}/\mathrm{m}^{3}}{5000000\,\mathrm{mm}^{2}} = 48\,\mathrm{kg}/\mathrm{m}^{3}
 $$
 
 #### Biegung und Normalkraft
@@ -1311,61 +1320,61 @@ $$
 **Momentenwiderstand bei N\_Ed = 0, Zug unten**
 
 $$
-M_{y,Rd}^{+}(N_{Ed} = 0) = 353.9\,\mathrm{kNm}
+M_{y,Rd}^{+}(N_{Ed} = 0) = 65766.6\,\mathrm{kNm}
 $$
 
 **Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug unten**
 
 $$
-\left(x/d\right)_{y}^{+} = \frac{x}{d} = \frac{33.9\,\mathrm{mm}}{200\,\mathrm{mm}} = 0.17
+\left(x/d\right)_{y}^{+} = \frac{x}{d} = \frac{184.4\,\mathrm{mm}}{8068.6\,\mathrm{mm}} = 0.023
 $$
 
 **Momentenwiderstand bei N\_Ed = 0, Zug oben**
 
 $$
-M_{y,Rd}^{-}(N_{Ed} = 0) = -353.9\,\mathrm{kNm}
+M_{y,Rd}^{-}(N_{Ed} = 0) = -65766.6\,\mathrm{kNm}
 $$
 
 **Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug oben**
 
 $$
-\left(x/d\right)_{y}^{-} = \frac{x}{d} = \frac{33.9\,\mathrm{mm}}{200\,\mathrm{mm}} = 0.17
+\left(x/d\right)_{y}^{-} = \frac{x}{d} = \frac{184.4\,\mathrm{mm}}{8068.6\,\mathrm{mm}} = 0.023
 $$
 
 **Momentenwiderstand bei N\_Ed = 0, Zug links**
 
 $$
-M_{z,Rd}^{+}(N_{Ed} = 0) = 7444\,\mathrm{kNm}
+M_{z,Rd}^{+}(N_{Ed} = 0) = 79089.7\,\mathrm{kNm}
 $$
 
 **Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug links**
 
 $$
-\left(x/d\right)_{z}^{+} = \frac{x}{d} = \frac{588\,\mathrm{mm}}{3762.1\,\mathrm{mm}} = 0.156
+\left(x/d\right)_{z}^{+} = \frac{x}{d} = \frac{196.5\,\mathrm{mm}}{9568.6\,\mathrm{mm}} = 0.021
 $$
 
 **Momentenwiderstand bei N\_Ed = 0, Zug rechts**
 
 $$
-M_{z,Rd}^{-}(N_{Ed} = 0) = -7444\,\mathrm{kNm}
+M_{z,Rd}^{-}(N_{Ed} = 0) = -79089.7\,\mathrm{kNm}
 $$
 
 **Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug rechts**
 
 $$
-\left(x/d\right)_{z}^{-} = \frac{x}{d} = \frac{588\,\mathrm{mm}}{3762.1\,\mathrm{mm}} = 0.156
+\left(x/d\right)_{z}^{-} = \frac{x}{d} = \frac{196.5\,\mathrm{mm}}{9568.6\,\mathrm{mm}} = 0.021
 $$
 
 **Reiner Zug, gleichmässig gedehnt**
 
 $$
-N_{Rd}^{+} = 3343.7\,\mathrm{kN}
+N_{Rd}^{+} = 13375\,\mathrm{kN}
 $$
 
 **Reiner Druck, gleichmässig gedehnt**
 
 $$
-N_{Rd}^{-} = -27922.4\,\mathrm{kN}
+N_{Rd}^{-} = -111689.7\,\mathrm{kN}
 $$
 
 ### Grundbruch: Fundament Stütze
@@ -2962,6 +2971,12 @@ $$
 \psi_{2,1} = 0.3
 $$
 
+**Anteil der ungerissenen Biegesteifigkeit** *(SIA 261:2020, 16.5.5.2)*
+
+$$
+\eta_{EI,1} = 0.5
+$$
+
 **Höhe des Geschosses**
 
 $$
@@ -2984,6 +2999,12 @@ $$
 
 $$
 \psi_{2,2} = 0.3
+$$
+
+**Anteil der ungerissenen Biegesteifigkeit** *(SIA 261:2020, 16.5.5.2)*
+
+$$
+\eta_{EI,2} = 0.5
 $$
 
 **Höhe des Geschosses**
@@ -3010,6 +3031,12 @@ $$
 \psi_{2,3} = 0.3
 $$
 
+**Anteil der ungerissenen Biegesteifigkeit** *(SIA 261:2020, 16.5.5.2)*
+
+$$
+\eta_{EI,3} = 0.5
+$$
+
 **Höhe des Geschosses**
 
 $$
@@ -3034,28 +3061,47 @@ $$
 \psi_{2,4} = 0.3
 $$
 
-**Anzahl gleicher Wände**
-
-$$
-n_{1} = 2
-$$
-
 **Anteil der ungerissenen Biegesteifigkeit** *(SIA 261:2020, 16.5.5.2)*
 
 $$
-\eta_{EI,1} = 0.5
+\eta_{EI,4} = 0.5
 $$
 
-**Anzahl gleicher Wände**
+#### Kern «Kern aus vier Wänden»
+
+4 getrennte Teile – Polygone, die keine Kante teilen: jeder zählt um seinen eigenen Schwerpunkt.
+
+**Trägheitsmomente des Kerns, je Teil um seinen Schwerpunkt** *(nach Vorgabe, nicht nachgeschlagen)*
 
 $$
-n_{2} = 2
+I_y = \sum_k I_{y,k} \qquad I_z = \sum_k I_{z,k} \qquad I_{yz} = \sum_k I_{yz,k}
 $$
 
-**Anteil der ungerissenen Biegesteifigkeit** *(SIA 261:2020, 16.5.5.2)*
+**Teile des Kerns – Fläche und Schwerpunkt in der Zeichnung, die Trägheitsmomente um den eigenen Schwerpunkt**
+
+| Teil | Polygone | $A\ [\mathrm{m}^2]$ | $y_S\ [\mathrm{m}]$ | $z_S\ [\mathrm{m}]$ | $I_y\ [\mathrm{m}^4]$ | $I_z\ [\mathrm{m}^4]$ | $I_{yz}\ [\mathrm{m}^4]$ |
+| :--- | :--- | ---: | ---: | ---: | ---: | ---: | ---: |
+| 1 | Polygon 1 | $1.250$ | $6.000$ | $0.125$ | $0.0065$ | $2.6042$ | $0.0000$ |
+| 2 | Polygon 2 | $1.250$ | $6.000$ | $9.875$ | $0.0065$ | $2.6042$ | $0.0000$ |
+| 3 | Polygon 3 | $1.250$ | $0.125$ | $5.000$ | $2.6042$ | $0.0065$ | $0.0000$ |
+| 4 | Polygon 4 | $1.250$ | $11.875$ | $5.000$ | $2.6042$ | $0.0065$ | $0.0000$ |
+
+**Trägheitsmoment um y des Kerns «Kern aus vier Wänden»**
 
 $$
-\eta_{EI,2} = 0.5
+I_y = 5.2214\,\mathrm{m}^{4}
+$$
+
+**Trägheitsmoment um z des Kerns «Kern aus vier Wänden»**
+
+$$
+I_z = 5.2214\,\mathrm{m}^{4}
+$$
+
+**Deviationsmoment des Kerns «Kern aus vier Wänden»**
+
+$$
+I_{yz} = 0\,\mathrm{m}^{4}
 $$
 
 ### Ersatzkraftverfahren
@@ -3131,23 +3177,40 @@ $$
 
 #### Richtung x
 
-**Biegesteifigkeit der Wände in x**
-
-| Wand | Querschnittsanalyse | Lage | $I\ [\mathrm{m}^4]$ | $E_{cm}\ [\mathrm{N/mm^2}]$ | $\eta_{EI}$ | $n$ | $n \cdot \eta_{EI} \cdot E_{cm} \cdot I\ [\mathrm{MNm^2}]$ |
-| :--- | :--- | :--- | ---: | ---: | ---: | ---: | ---: |
-| 1: Wände in x | Tragwand 5000 × 250 | 0° | $I_z = 2.6042$ | $33620$ | $0.50$ | $2$ | $87551$ |
-| 2: Wände in y | Tragwand 5000 × 250 | 90° | $I_y = 0.0065$ | $33620$ | $0.50$ | $2$ | $219$ |
-
-**Biegesteifigkeit der Wände in x** *(SIA 261:2020, 16.5.5.2; nach Vorgabe, nicht nachgeschlagen)*
+**Biegesteifigkeit des Kerns in einem Geschoss** *(SIA 261:2020, 16.5.5.2; nach Vorgabe, nicht nachgeschlagen)*
 
 $$
-EI_x = \sum n \cdot \eta_{EI} \cdot E_{cm} \cdot I = 87770\,\mathrm{MNm}^{2}
+EI_i = \eta_{EI,i} \cdot E_{cm,i} \cdot I_i
 $$
 
-**Auslenkung des Dachs, die Gewichte waagrecht in x auf den Kragarm** *(SIA 261:2020, 16.5.2.3, (40); nach Vorgabe, nicht nachgeschlagen)*
+**Biegesteifigkeit des Kerns in x, von unten – eine Kraft in x biegt ihn um z, mit I\_z**
+
+| Geschoss | Kern | $I_z\ [\mathrm{m}^4]$ | $E_{cm}\ [\mathrm{N/mm^2}]$ | $\eta_{EI}$ | $EI\ [\mathrm{MNm^2}]$ |
+| :--- | :--- | ---: | ---: | ---: | ---: |
+| 1: EG | Kern aus vier Wänden | $5.2214$ | $33620$ | $0.50$ | $87770$ |
+| 2: 1. OG | Kern aus vier Wänden | $5.2214$ | $33620$ | $0.50$ | $87770$ |
+| 3: 2. OG | Kern aus vier Wänden | $5.2214$ | $33620$ | $0.50$ | $87770$ |
+| 4: Dach | Kern aus vier Wänden | $5.2214$ | $33620$ | $0.50$ | $87770$ |
+
+**Auslenkung des Dachs aus einem Geschoss – nach dem Arbeitssatz, M aus den Gewichten, a aus einer Kraft 1 am Dach** *(SIA 261:2020, 16.5.2.3, (40); nach Vorgabe, nicht nachgeschlagen)*
 
 $$
-u_x = \sum_i \frac{W_i \cdot z_i^2 \cdot (3 \cdot H - z_i)}{6 \cdot EI_x} = \sum_i \frac{W_i \cdot z_i^2 \cdot (3 \cdot 12\,\mathrm{m} - z_i)}{6 \cdot 87770\,\mathrm{MNm}^{2}} = 31.7\,\mathrm{mm}
+\Delta u_i = \frac{h_i}{6 \cdot EI_i} \cdot \left(M_{u,i} \cdot (2 \cdot a_{u,i} + a_{o,i}) + M_{o,i} \cdot (a_{u,i} + 2 \cdot a_{o,i})\right) \qquad a = H - z
+$$
+
+**Auslenkung je Geschoss in x, von unten – u: an der Decke darunter, o: an seiner**
+
+| Geschoss | $h\ [\mathrm{m}]$ | $EI\ [\mathrm{MNm^2}]$ | $M_u\ [\mathrm{kNm}]$ | $M_o\ [\mathrm{kNm}]$ | $a_u\ [\mathrm{m}]$ | $a_o\ [\mathrm{m}]$ | $\Delta u\ [\mathrm{mm}]$ |
+| :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 1: EG | $3.00$ | $87770$ | $73320$ | $42660$ | $12.00$ | $9.00$ | $21.07$ |
+| 2: 1. OG | $3.00$ | $87770$ | $42660$ | $20220$ | $9.00$ | $6.00$ | $8.25$ |
+| 3: 2. OG | $3.00$ | $87770$ | $20220$ | $6000$ | $6.00$ | $3.00$ | $2.14$ |
+| 4: Dach | $3.00$ | $87770$ | $6000$ | $0$ | $3.00$ | $0.00$ | $0.21$ |
+
+**Auslenkung des Dachs, die Gewichte waagrecht in x auf den Kern** *(SIA 261:2020, 16.5.2.3, (40); nach Vorgabe, nicht nachgeschlagen)*
+
+$$
+u_x = \sum_i \Delta u_i = 31.7\,\mathrm{mm}
 $$
 
 **Grundschwingzeit in x** *(SIA 261:2020, 16.5.2.3, (40))*
@@ -3189,12 +3252,14 @@ $$
 M_{0,x} = \sum_i F_{d,i} \cdot z_i = 17065\,\mathrm{kNm}
 $$
 
-**Je Wand in x, am Fuss – nach ihrem Anteil an der Biegesteifigkeit (nach Vorgabe, nicht nachgeschlagen)**
+**Je Teil des Kerns am Fuss in x – nach seinem Anteil an der Biegesteifigkeit; E\_cm und η\_EI gelten für alle gleich (nach Vorgabe, nicht nachgeschlagen)**
 
-| Wand | $n$ | $EI / \sum EI$ | $V\ [\mathrm{kN}]$ | $M\ [\mathrm{kNm}]$ |
+| Teil | $I_z\ [\mathrm{m}^4]$ | $I_z / \sum I_z$ | $V\ [\mathrm{kN}]$ | $M\ [\mathrm{kNm}]$ |
 | :--- | ---: | ---: | ---: | ---: |
-| 1: Wände in x | $2$ | $0.499$ | $985.5$ | $8511$ |
-| 2: Wände in y | $2$ | $0.001$ | $2.5$ | $21$ |
+| 1 | $2.6042$ | $0.499$ | $985.5$ | $8511$ |
+| 2 | $2.6042$ | $0.499$ | $985.5$ | $8511$ |
+| 3 | $0.0065$ | $0.001$ | $2.5$ | $21$ |
+| 4 | $0.0065$ | $0.001$ | $2.5$ | $21$ |
 
 ##### Abheben und Kippen in x, mit q = 1.0
 
@@ -3218,23 +3283,40 @@ $$
 
 #### Richtung y
 
-**Biegesteifigkeit der Wände in y**
-
-| Wand | Querschnittsanalyse | Lage | $I\ [\mathrm{m}^4]$ | $E_{cm}\ [\mathrm{N/mm^2}]$ | $\eta_{EI}$ | $n$ | $n \cdot \eta_{EI} \cdot E_{cm} \cdot I\ [\mathrm{MNm^2}]$ |
-| :--- | :--- | :--- | ---: | ---: | ---: | ---: | ---: |
-| 1: Wände in x | Tragwand 5000 × 250 | 0° | $I_y = 0.0065$ | $33620$ | $0.50$ | $2$ | $219$ |
-| 2: Wände in y | Tragwand 5000 × 250 | 90° | $I_z = 2.6042$ | $33620$ | $0.50$ | $2$ | $87551$ |
-
-**Biegesteifigkeit der Wände in y** *(SIA 261:2020, 16.5.5.2; nach Vorgabe, nicht nachgeschlagen)*
+**Biegesteifigkeit des Kerns in einem Geschoss** *(SIA 261:2020, 16.5.5.2; nach Vorgabe, nicht nachgeschlagen)*
 
 $$
-EI_y = \sum n \cdot \eta_{EI} \cdot E_{cm} \cdot I = 87770\,\mathrm{MNm}^{2}
+EI_i = \eta_{EI,i} \cdot E_{cm,i} \cdot I_i
 $$
 
-**Auslenkung des Dachs, die Gewichte waagrecht in y auf den Kragarm** *(SIA 261:2020, 16.5.2.3, (40); nach Vorgabe, nicht nachgeschlagen)*
+**Biegesteifigkeit des Kerns in y, von unten – eine Kraft in y biegt ihn um y, mit I\_y**
+
+| Geschoss | Kern | $I_y\ [\mathrm{m}^4]$ | $E_{cm}\ [\mathrm{N/mm^2}]$ | $\eta_{EI}$ | $EI\ [\mathrm{MNm^2}]$ |
+| :--- | :--- | ---: | ---: | ---: | ---: |
+| 1: EG | Kern aus vier Wänden | $5.2214$ | $33620$ | $0.50$ | $87770$ |
+| 2: 1. OG | Kern aus vier Wänden | $5.2214$ | $33620$ | $0.50$ | $87770$ |
+| 3: 2. OG | Kern aus vier Wänden | $5.2214$ | $33620$ | $0.50$ | $87770$ |
+| 4: Dach | Kern aus vier Wänden | $5.2214$ | $33620$ | $0.50$ | $87770$ |
+
+**Auslenkung des Dachs aus einem Geschoss – nach dem Arbeitssatz, M aus den Gewichten, a aus einer Kraft 1 am Dach** *(SIA 261:2020, 16.5.2.3, (40); nach Vorgabe, nicht nachgeschlagen)*
 
 $$
-u_y = \sum_i \frac{W_i \cdot z_i^2 \cdot (3 \cdot H - z_i)}{6 \cdot EI_y} = \sum_i \frac{W_i \cdot z_i^2 \cdot (3 \cdot 12\,\mathrm{m} - z_i)}{6 \cdot 87770\,\mathrm{MNm}^{2}} = 31.7\,\mathrm{mm}
+\Delta u_i = \frac{h_i}{6 \cdot EI_i} \cdot \left(M_{u,i} \cdot (2 \cdot a_{u,i} + a_{o,i}) + M_{o,i} \cdot (a_{u,i} + 2 \cdot a_{o,i})\right) \qquad a = H - z
+$$
+
+**Auslenkung je Geschoss in y, von unten – u: an der Decke darunter, o: an seiner**
+
+| Geschoss | $h\ [\mathrm{m}]$ | $EI\ [\mathrm{MNm^2}]$ | $M_u\ [\mathrm{kNm}]$ | $M_o\ [\mathrm{kNm}]$ | $a_u\ [\mathrm{m}]$ | $a_o\ [\mathrm{m}]$ | $\Delta u\ [\mathrm{mm}]$ |
+| :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 1: EG | $3.00$ | $87770$ | $73320$ | $42660$ | $12.00$ | $9.00$ | $21.07$ |
+| 2: 1. OG | $3.00$ | $87770$ | $42660$ | $20220$ | $9.00$ | $6.00$ | $8.25$ |
+| 3: 2. OG | $3.00$ | $87770$ | $20220$ | $6000$ | $6.00$ | $3.00$ | $2.14$ |
+| 4: Dach | $3.00$ | $87770$ | $6000$ | $0$ | $3.00$ | $0.00$ | $0.21$ |
+
+**Auslenkung des Dachs, die Gewichte waagrecht in y auf den Kern** *(SIA 261:2020, 16.5.2.3, (40); nach Vorgabe, nicht nachgeschlagen)*
+
+$$
+u_y = \sum_i \Delta u_i = 31.7\,\mathrm{mm}
 $$
 
 **Grundschwingzeit in y** *(SIA 261:2020, 16.5.2.3, (40))*
@@ -3276,12 +3358,14 @@ $$
 M_{0,y} = \sum_i F_{d,i} \cdot z_i = 17065\,\mathrm{kNm}
 $$
 
-**Je Wand in y, am Fuss – nach ihrem Anteil an der Biegesteifigkeit (nach Vorgabe, nicht nachgeschlagen)**
+**Je Teil des Kerns am Fuss in y – nach seinem Anteil an der Biegesteifigkeit; E\_cm und η\_EI gelten für alle gleich (nach Vorgabe, nicht nachgeschlagen)**
 
-| Wand | $n$ | $EI / \sum EI$ | $V\ [\mathrm{kN}]$ | $M\ [\mathrm{kNm}]$ |
+| Teil | $I_y\ [\mathrm{m}^4]$ | $I_y / \sum I_y$ | $V\ [\mathrm{kN}]$ | $M\ [\mathrm{kNm}]$ |
 | :--- | ---: | ---: | ---: | ---: |
-| 1: Wände in x | $2$ | $0.001$ | $2.5$ | $21$ |
-| 2: Wände in y | $2$ | $0.499$ | $985.5$ | $8511$ |
+| 1 | $0.0065$ | $0.001$ | $2.5$ | $21$ |
+| 2 | $0.0065$ | $0.001$ | $2.5$ | $21$ |
+| 3 | $2.6042$ | $0.499$ | $985.5$ | $8511$ |
+| 4 | $2.6042$ | $0.499$ | $985.5$ | $8511$ |
 
 ##### Abheben und Kippen in y, mit q = 1.0
 
@@ -4705,7 +4789,15 @@ $$
 
 ### Erdbeben
 
-Das Beben wird durch waagrechte Kräfte ersetzt: je Hauptrichtung eine Ersatzkraft aus dem Bemessungsspektrum bei der Grundschwingzeit, verteilt auf die Geschosse nach Höhe und Gewicht. Die Wände tragen sie als Kragarme, eingespannt am Fuss – jede nach ihrem Anteil an der Biegesteifigkeit.
+Getrennte Teile des Kerns verbinden nur die Decken: jeder biegt sich um seinen eigenen Schwerpunkt, und ihre Trägheitsmomente werden addiert, ohne Steiner-Anteil zwischen ihnen. Innerhalb eines Teils bleibt er – seine Wände sind fest verbunden und biegen sich gemeinsam.
+
+Das Beben wird durch waagrechte Kräfte ersetzt: je Hauptrichtung eine Ersatzkraft aus dem Bemessungsspektrum bei der Grundschwingzeit, verteilt auf die Geschosse nach Höhe und Gewicht. Der Kern trägt sie als Kragarm, eingespannt am Fuss, in jedem Geschoss mit dessen Biegesteifigkeit; getrennte Teile am Fuss je nach ihrem Anteil daran.
+
+**Trägheitsmomente des Kerns, je Teil um seinen Schwerpunkt** *(nach Vorgabe, nicht nachgeschlagen)*
+
+$$
+I_y = \sum_k I_{y,k} \qquad I_z = \sum_k I_{z,k} \qquad I_{yz} = \sum_k I_{yz,k}
+$$
 
 **Gewicht und Höhe eines Geschosses** *(SIA 261:2020, 16.5.2.3)*
 
@@ -4719,16 +4811,22 @@ $$
 \sum W = \sum_i W_i
 $$
 
-**Biegesteifigkeit der Wände in x** *(SIA 261:2020, 16.5.5.2; nach Vorgabe, nicht nachgeschlagen)*
+**Biegesteifigkeit des Kerns in einem Geschoss** *(SIA 261:2020, 16.5.5.2; nach Vorgabe, nicht nachgeschlagen)*
 
 $$
-EI_x = \sum n \cdot \eta_{EI} \cdot E_{cm} \cdot I
+EI_i = \eta_{EI,i} \cdot E_{cm,i} \cdot I_i
 $$
 
-**Auslenkung des Dachs, die Gewichte waagrecht in x auf den Kragarm** *(SIA 261:2020, 16.5.2.3, (40); nach Vorgabe, nicht nachgeschlagen)*
+**Auslenkung des Dachs aus einem Geschoss – nach dem Arbeitssatz, M aus den Gewichten, a aus einer Kraft 1 am Dach** *(SIA 261:2020, 16.5.2.3, (40); nach Vorgabe, nicht nachgeschlagen)*
 
 $$
-u_x = \sum_i \frac{W_i \cdot z_i^2 \cdot (3 \cdot H - z_i)}{6 \cdot EI_x}
+\Delta u_i = \frac{h_i}{6 \cdot EI_i} \cdot \left(M_{u,i} \cdot (2 \cdot a_{u,i} + a_{o,i}) + M_{o,i} \cdot (a_{u,i} + 2 \cdot a_{o,i})\right) \qquad a = H - z
+$$
+
+**Auslenkung des Dachs, die Gewichte waagrecht in x auf den Kern** *(SIA 261:2020, 16.5.2.3, (40); nach Vorgabe, nicht nachgeschlagen)*
+
+$$
+u_x = \sum_i \Delta u_i
 $$
 
 **Grundschwingzeit in x** *(SIA 261:2020, 16.5.2.3, (40))*
@@ -5003,7 +5101,7 @@ $$
 | Querkraftwiderstand in y | $V_{y,Rd}$ | $157.7\,\mathrm{kN}$ |
 | Torsionswiderstand | $T_{Rd}$ | $78.9\,\mathrm{kNm}$ |
 
-### Tragwand 5000 × 250
+### Kern aus vier Wänden
 
 Kein Nachweis geführt.
 
@@ -5012,16 +5110,16 @@ Kein Nachweis geführt.
 | Kennzahl | Zeichen | Wert |
 | :--- | :--- | ---: |
 | Bewehrungsmass | $\mu_s$ | $48\,\mathrm{kg}/\mathrm{m}^{3}$ |
-| Momentenwiderstand, Zug unten | $M_{y,Rd}^{+}(N_{Ed} = 0)$ | $353.9\,\mathrm{kNm}$ |
-| Momentenwiderstand, Zug oben | $M_{y,Rd}^{-}(N_{Ed} = 0)$ | $-353.9\,\mathrm{kNm}$ |
-| Momentenwiderstand, Zug links | $M_{z,Rd}^{+}(N_{Ed} = 0)$ | $7444\,\mathrm{kNm}$ |
-| Momentenwiderstand, Zug rechts | $M_{z,Rd}^{-}(N_{Ed} = 0)$ | $-7444\,\mathrm{kNm}$ |
-| Zugwiderstand | $N_{Rd}^{+}$ | $3343.7\,\mathrm{kN}$ |
-| Druckwiderstand | $N_{Rd}^{-}$ | $-27922.4\,\mathrm{kN}$ |
-| Bezogene Druckzonenhöhe, Zug unten | $\left(x/d\right)_{y}^{+}$ | $0.17$ |
-| Bezogene Druckzonenhöhe, Zug oben | $\left(x/d\right)_{y}^{-}$ | $0.17$ |
-| Bezogene Druckzonenhöhe, Zug links | $\left(x/d\right)_{z}^{+}$ | $0.156$ |
-| Bezogene Druckzonenhöhe, Zug rechts | $\left(x/d\right)_{z}^{-}$ | $0.156$ |
+| Momentenwiderstand, Zug unten | $M_{y,Rd}^{+}(N_{Ed} = 0)$ | $65766.6\,\mathrm{kNm}$ |
+| Momentenwiderstand, Zug oben | $M_{y,Rd}^{-}(N_{Ed} = 0)$ | $-65766.6\,\mathrm{kNm}$ |
+| Momentenwiderstand, Zug links | $M_{z,Rd}^{+}(N_{Ed} = 0)$ | $79089.7\,\mathrm{kNm}$ |
+| Momentenwiderstand, Zug rechts | $M_{z,Rd}^{-}(N_{Ed} = 0)$ | $-79089.7\,\mathrm{kNm}$ |
+| Zugwiderstand | $N_{Rd}^{+}$ | $13375\,\mathrm{kN}$ |
+| Druckwiderstand | $N_{Rd}^{-}$ | $-111689.7\,\mathrm{kN}$ |
+| Bezogene Druckzonenhöhe, Zug unten | $\left(x/d\right)_{y}^{+}$ | $0.023$ |
+| Bezogene Druckzonenhöhe, Zug oben | $\left(x/d\right)_{y}^{-}$ | $0.023$ |
+| Bezogene Druckzonenhöhe, Zug links | $\left(x/d\right)_{z}^{+}$ | $0.021$ |
+| Bezogene Druckzonenhöhe, Zug rechts | $\left(x/d\right)_{z}^{-}$ | $0.021$ |
 
 ### Fundament Stütze
 
@@ -5177,12 +5275,23 @@ Alle geführten Nachweise sind erfüllt.
 | Nutzlast des Geschosses | $Q_{k,4}$ | $0$ | kN | Vorgabe |
 | Anteil der ungerissenen Biegesteifigkeit | $\eta_{EI,1}$ | $0.5$ |  | Vorgabe |
 | Anteil der ungerissenen Biegesteifigkeit | $\eta_{EI,2}$ | $0.5$ |  | Vorgabe |
+| Anteil der ungerissenen Biegesteifigkeit | $\eta_{EI,3}$ | $0.5$ |  | Vorgabe |
+| Anteil der ungerissenen Biegesteifigkeit | $\eta_{EI,4}$ | $0.5$ |  | Vorgabe |
 | Höhe des Geschosses | $h_{1}$ | $3$ | m | Vorgabe |
 | Höhe des Geschosses | $h_{2}$ | $3$ | m | Vorgabe |
 | Höhe des Geschosses | $h_{3}$ | $3$ | m | Vorgabe |
 | Höhe des Geschosses | $h_{4}$ | $3$ | m | Vorgabe |
-| Anzahl gleicher Wände | $n_{1}$ | $2$ |  | Vorgabe |
-| Anzahl gleicher Wände | $n_{2}$ | $2$ |  | Vorgabe |
+| Trägheitsmoment um y des Kerns «Kern aus vier Wänden» | $I_y$ | $5.2214$ | m⁴ | berechnet |
+| Trägheitsmoment um y von Teil 1 des Kerns «Kern aus vier Wänden» | $I_{y,1}$ | $0.0065$ | m⁴ | berechnet |
+| Trägheitsmoment um y von Teil 2 des Kerns «Kern aus vier Wänden» | $I_{y,2}$ | $0.0065$ | m⁴ | berechnet |
+| Trägheitsmoment um y von Teil 3 des Kerns «Kern aus vier Wänden» | $I_{y,3}$ | $2.6042$ | m⁴ | berechnet |
+| Trägheitsmoment um y von Teil 4 des Kerns «Kern aus vier Wänden» | $I_{y,4}$ | $2.6042$ | m⁴ | berechnet |
+| Deviationsmoment des Kerns «Kern aus vier Wänden» | $I_{yz}$ | $0$ | m⁴ | berechnet |
+| Trägheitsmoment um z des Kerns «Kern aus vier Wänden» | $I_z$ | $5.2214$ | m⁴ | berechnet |
+| Trägheitsmoment um z von Teil 1 des Kerns «Kern aus vier Wänden» | $I_{z,1}$ | $2.6042$ | m⁴ | berechnet |
+| Trägheitsmoment um z von Teil 2 des Kerns «Kern aus vier Wänden» | $I_{z,2}$ | $2.6042$ | m⁴ | berechnet |
+| Trägheitsmoment um z von Teil 3 des Kerns «Kern aus vier Wänden» | $I_{z,3}$ | $0.0065$ | m⁴ | berechnet |
+| Trägheitsmoment um z von Teil 4 des Kerns «Kern aus vier Wänden» | $I_{z,4}$ | $0.0065$ | m⁴ | berechnet |
 | Erfüllungsgrad Ersatzkraftverfahren in x | $\alpha_{eff,x}$ | $4.50$ |  | berechnet |
 | Erfüllungsgrad Ersatzkraftverfahren in y | $\alpha_{eff,y}$ | $4.50$ |  | berechnet |
 | Beiwert der Nutzlast, quasi-ständig | $\psi_{2,1}$ | $0.3$ |  | Vorgabe |
@@ -5366,42 +5475,42 @@ Alle geführten Nachweise sind erfüllt.
 | Erfüllungsgrad Zwängung auf Biegung – Zug unten | $\alpha_{eff,ZB,\text{Zug unten}}$ | $5.07$ |  | berechnet |
 | Schwerpunkt, y | $y_S$ | $150$ | mm | berechnet |
 | Schwerpunkt, z | $z_S$ | $300$ | mm | berechnet |
-| Fläche des Bruttoquerschnitts | $A$ | $1250000$ | mm² | berechnet |
-| Stahlfläche der Bewehrung | $A_{s,tot}$ | $7691$ | mm² | berechnet |
-| Trägheitsmoment um y | $I_y$ | $6510.4$ | ·10⁶ mm⁴ | berechnet |
+| Fläche des Bruttoquerschnitts | $A$ | $5000000$ | mm² | berechnet |
+| Stahlfläche der Bewehrung | $A_{s,tot}$ | $30762$ | mm² | berechnet |
+| Trägheitsmoment um y | $I_y$ | $64635416.7$ | ·10⁶ mm⁴ | berechnet |
 | Deviationsmoment | $I_{yz}$ | $0$ | ·10⁶ mm⁴ | berechnet |
-| Trägheitsmoment um z | $I_z$ | $2604166.7$ | ·10⁶ mm⁴ | berechnet |
+| Trägheitsmoment um z | $I_z$ | $91510416.7$ | ·10⁶ mm⁴ | berechnet |
 | Grösste Neigung der Druckdiagonalen | $\alpha_{max}$ | $45$ | ° | Vorgabe |
 | Kleinste Neigung der Druckdiagonalen | $\alpha_{min}$ | $30$ | ° | Vorgabe |
 | Abminderung der Betondruckfestigkeit in der Druckdiagonalen | $k_c$ | $0.55$ |  | Vorgabe |
-| Momentenwiderstand bei N\_Ed = 0, Zug links | $M_{z,Rd}^{+}(N_{Ed} = 0)$ | $7444$ | kNm | berechnet |
-| Momentenwiderstand bei N\_Ed = 0, Zug oben | $M_{y,Rd}^{-}(N_{Ed} = 0)$ | $-353.9$ | kNm | berechnet |
-| Momentenwiderstand bei N\_Ed = 0, Zug rechts | $M_{z,Rd}^{-}(N_{Ed} = 0)$ | $-7444$ | kNm | berechnet |
-| Momentenwiderstand bei N\_Ed = 0, Zug unten | $M_{y,Rd}^{+}(N_{Ed} = 0)$ | $353.9$ | kNm | berechnet |
-| Druckwiderstand bei gleichmässiger Dehnung | $N_{Rd}^{-}$ | $-27922.4$ | kN | berechnet |
-| Zugwiderstand bei gleichmässiger Dehnung | $N_{Rd}^{+}$ | $3343.7$ | kN | berechnet |
+| Momentenwiderstand bei N\_Ed = 0, Zug links | $M_{z,Rd}^{+}(N_{Ed} = 0)$ | $79089.7$ | kNm | berechnet |
+| Momentenwiderstand bei N\_Ed = 0, Zug oben | $M_{y,Rd}^{-}(N_{Ed} = 0)$ | $-65766.6$ | kNm | berechnet |
+| Momentenwiderstand bei N\_Ed = 0, Zug rechts | $M_{z,Rd}^{-}(N_{Ed} = 0)$ | $-79089.7$ | kNm | berechnet |
+| Momentenwiderstand bei N\_Ed = 0, Zug unten | $M_{y,Rd}^{+}(N_{Ed} = 0)$ | $65766.6$ | kNm | berechnet |
+| Druckwiderstand bei gleichmässiger Dehnung | $N_{Rd}^{-}$ | $-111689.7$ | kN | berechnet |
+| Zugwiderstand bei gleichmässiger Dehnung | $N_{Rd}^{+}$ | $13375$ | kN | berechnet |
 | Bewehrungsmass je Kubikmeter Beton | $\mu_s$ | $48$ | kg/m³ | berechnet |
-| Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug links | $\left(x/d\right)_{z}^{+}$ | $0.156$ |  | berechnet |
-| Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug oben | $\left(x/d\right)_{y}^{-}$ | $0.17$ |  | berechnet |
-| Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug rechts | $\left(x/d\right)_{z}^{-}$ | $0.156$ |  | berechnet |
-| Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug unten | $\left(x/d\right)_{y}^{+}$ | $0.17$ |  | berechnet |
-| Erfüllungsgrad Duktilität – Zug links | $\alpha_{eff,x/d,\text{Zug links}}$ | $2.24$ |  | berechnet |
-| Erfüllungsgrad Duktilität – Zug oben | $\alpha_{eff,x/d,\text{Zug oben}}$ | $2.06$ |  | berechnet |
-| Erfüllungsgrad Duktilität – Zug rechts | $\alpha_{eff,x/d,\text{Zug rechts}}$ | $2.24$ |  | berechnet |
-| Erfüllungsgrad Duktilität – Zug unten | $\alpha_{eff,x/d,\text{Zug unten}}$ | $2.06$ |  | berechnet |
-| Grösste aufnehmbare Druckkraft | $N_{Rd}^{-}$ | $-27922.4$ | kN | berechnet |
-| Grösste aufnehmbare Zugkraft | $N_{Rd}^{+}$ | $3343.7$ | kN | berechnet |
-| Erfüllungsgrad Rissnormalkraft – ganzer Querschnitt | $\alpha_{eff,NR}$ | $1.19$ |  | berechnet |
-| Erfüllungsgrad sprödes Versagen – Zug links | $\alpha_{eff,Riss,\text{Zug links}}$ | $4.52$ |  | berechnet |
-| Erfüllungsgrad sprödes Versagen – Zug oben | $\alpha_{eff,Riss,\text{Zug oben}}$ | $2.44$ |  | berechnet |
-| Erfüllungsgrad sprödes Versagen – Zug rechts | $\alpha_{eff,Riss,\text{Zug rechts}}$ | $4.52$ |  | berechnet |
-| Erfüllungsgrad sprödes Versagen – Zug unten | $\alpha_{eff,Riss,\text{Zug unten}}$ | $2.44$ |  | berechnet |
-| Erfüllungsgrad Zwängung auf Biegung – Zug links | $\alpha_{eff,ZB,\text{Zug links}}$ | $3.37$ |  | berechnet |
-| Erfüllungsgrad Zwängung auf Biegung – Zug oben | $\alpha_{eff,ZB,\text{Zug oben}}$ | $2.52$ |  | berechnet |
-| Erfüllungsgrad Zwängung auf Biegung – Zug rechts | $\alpha_{eff,ZB,\text{Zug rechts}}$ | $3.37$ |  | berechnet |
-| Erfüllungsgrad Zwängung auf Biegung – Zug unten | $\alpha_{eff,ZB,\text{Zug unten}}$ | $2.52$ |  | berechnet |
-| Schwerpunkt, y | $y_S$ | $2500$ | mm | berechnet |
-| Schwerpunkt, z | $z_S$ | $125$ | mm | berechnet |
+| Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug links | $\left(x/d\right)_{z}^{+}$ | $0.021$ |  | berechnet |
+| Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug oben | $\left(x/d\right)_{y}^{-}$ | $0.023$ |  | berechnet |
+| Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug rechts | $\left(x/d\right)_{z}^{-}$ | $0.021$ |  | berechnet |
+| Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug unten | $\left(x/d\right)_{y}^{+}$ | $0.023$ |  | berechnet |
+| Erfüllungsgrad Duktilität – Zug links | $\alpha_{eff,x/d,\text{Zug links}}$ | $17.06$ |  | berechnet |
+| Erfüllungsgrad Duktilität – Zug oben | $\alpha_{eff,x/d,\text{Zug oben}}$ | $15.32$ |  | berechnet |
+| Erfüllungsgrad Duktilität – Zug rechts | $\alpha_{eff,x/d,\text{Zug rechts}}$ | $17.06$ |  | berechnet |
+| Erfüllungsgrad Duktilität – Zug unten | $\alpha_{eff,x/d,\text{Zug unten}}$ | $15.32$ |  | berechnet |
+| Grösste aufnehmbare Druckkraft | $N_{Rd}^{-}$ | $-111689.7$ | kN | berechnet |
+| Grösste aufnehmbare Zugkraft | $N_{Rd}^{+}$ | $13375$ | kN | berechnet |
+| Erfüllungsgrad Rissnormalkraft – ganzer Querschnitt | $\alpha_{eff,NR}$ | $6.36$ |  | berechnet |
+| Erfüllungsgrad sprödes Versagen – Zug links | $\alpha_{eff,Riss,\text{Zug links}}$ | $5.36$ |  | berechnet |
+| Erfüllungsgrad sprödes Versagen – Zug oben | $\alpha_{eff,Riss,\text{Zug oben}}$ | $4.68$ |  | berechnet |
+| Erfüllungsgrad sprödes Versagen – Zug rechts | $\alpha_{eff,Riss,\text{Zug rechts}}$ | $5.36$ |  | berechnet |
+| Erfüllungsgrad sprödes Versagen – Zug unten | $\alpha_{eff,Riss,\text{Zug unten}}$ | $4.68$ |  | berechnet |
+| Erfüllungsgrad Zwängung auf Biegung – Zug links | $\alpha_{eff,ZB,\text{Zug links}}$ | $4.58$ |  | berechnet |
+| Erfüllungsgrad Zwängung auf Biegung – Zug oben | $\alpha_{eff,ZB,\text{Zug oben}}$ | $4.02$ |  | berechnet |
+| Erfüllungsgrad Zwängung auf Biegung – Zug rechts | $\alpha_{eff,ZB,\text{Zug rechts}}$ | $4.58$ |  | berechnet |
+| Erfüllungsgrad Zwängung auf Biegung – Zug unten | $\alpha_{eff,ZB,\text{Zug unten}}$ | $4.02$ |  | berechnet |
+| Schwerpunkt, y | $y_S$ | $6000$ | mm | berechnet |
+| Schwerpunkt, z | $z_S$ | $5000$ | mm | berechnet |
 | Breite des Fundaments | $B$ | $2$ | m | Vorgabe |
 | Länge des Fundaments | $L$ | $2.5$ | m | Vorgabe |
 | M\_E-Wert der Schicht 1, Erstbelastung | $M_{E,1}$ | $60$ | MN/m² | Vorgabe |

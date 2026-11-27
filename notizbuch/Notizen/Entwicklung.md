@@ -7,6 +7,57 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-27 · Erdbeben: ein Kern je Geschoss, Massen im Bild
+
+Schritt 8 des Plans vom 2026-11-27. Vorher wählte man unter «Wände» jede
+Wand mit ihrer eigenen Querschnittsanalyse, dazu Anzahl n, Lage 0° oder 90°
+und η_EI, und jede galt über die ganze Höhe. Jetzt heisst die Kachel
+«Kern»: je Geschoss eine Querschnittsanalyse mit dem ganzen Kern, allen
+Wänden in x und in y, gezeichnet, wie er im Grundriss liegt (y der Analyse
+ist x des Gebäudes), dazu η_EI, Vorgabe 0.5. So darf der Kern oben dünner
+werden: im Turm des Prüfprojekts trägt die Winkelwand unten 250 mm, ab dem
+5. OG 200 mm, und EI sinkt in x von 32 400 auf 26 400 MNm².
+
+- Getrennte Teile eines Kerns zählen je um ihren eigenen Schwerpunkt, ohne
+  Steiner-Anteil zwischen ihnen; innerhalb eines Teils bleibt er
+  (`erdbeben/kern.py`, eigene Prozedur mit Herleitung). Zusammen hängt, was
+  ein Stück Kante teilt (`geometrie.beruehren`); eine Ecke allein genügt
+  nicht. Am Fuss trägt jeder Teil nach seinem Anteil an I, wie früher jede
+  Wand. Das Wohnhaus des Beispiels steht jetzt auf einem Kern aus vier
+  getrennten Wänden, jede an beiden Seiten mit ⌀12 alle 150 mm wie die
+  alte Wand, und rechnet dieselben Zahlen wie vorher: T₁ = 0.356 s,
+  F_d = 1975.9 kN, je Richtung tragen zwei Wände 49.9 %.
+- T₁ nimmt die Auslenkung des Dachs aus dem Arbeitssatz, Geschoss für
+  Geschoss mit dessen EI, genau (`erdbeben/kragarm.py`). Mit einem EI über
+  die ganze Höhe gibt das die alte Formel Σ W·z²·(3H − z)/(6EI) (Test).
+  Querkräfte und Momente sind mit nach `kragarm.py` umgezogen; sonst wäre
+  `ersatzkraft.py` über 1000 Zeilen gewachsen.
+- Auf jeder Decke sitzt ihre Masse als Kreis, die Fläche so gross wie sie,
+  daneben «EG 274 t» – aus W = 2500 + 0.3 · 800 = 2740 kN. Die Massen
+  stehen schon da, wenn das Gebäude noch nicht rechnet, etwa ohne Kern:
+  dieselbe Regel W = G_k + ψ₂·Q_k gibt sie (`ersatzkraft.gewicht`).
+- Das Bild daneben zeigt in jedem Geschoss seinen Kern, alle im selben
+  Massstab, im untersten mit den Nummern der Teile; die Tabelle darunter
+  nennt je Teil Anteil, V und M am Fuss – nur, wo es mehr als einen gibt.
+- Die Geschosse stehen von oben nach unten wie das Gebäude, gezählt weiter
+  ab der Einspannung; «+ Geschoss» steht über der Liste, wo das neue
+  erscheint, und übernimmt Kern und η_EI des obersten.
+- Hat ein Geschoss einen Kern, braucht jedes einen; ohne Kern in allen
+  rechnet das Gebäude nur mit T₁ von Hand, wie früher ohne Wand.
+- Die Einheit m⁴ ist neu: so steht der Kern in der Herleitung, 2.6042 m⁴
+  statt 2 604 167 · 10⁶ mm⁴.
+- Eine Datei von früher öffnet sich weiter (`projekt/frueher.py`): ihre
+  Wände werden ein Kern, eine neue Analyse «Kern Wohnhaus» mit jeder Wand
+  n-mal, die in 90° gedreht, nebeneinander und 1 m auseinander – getrennte
+  Teile, also dieselben Zahlen; «aus den Wänden» wird «aus dem Kern».
+  Ohne das hätte sich das Projekt des Benutzers im Browser nicht mehr
+  geöffnet: sein Wohnhaus trug noch die Wände des alten Beispiels. Wände
+  ohne Analyse fallen weg; verschiedene η_EI oder eine gelöschte Analyse
+  gehen nicht ohne Rückfrage in einen Kern, die Datei meldet sich dann.
+- Nebenbei: die Querkraft V steht jetzt mitten im Geschoss. Vorher stand
+  sie 14 px tiefer und lag bei Geschossen um 33 px Höhe, etwa im Turm mit
+  neun Geschossen, auf dem Namen der Decke darunter.
+
 ## 2026-11-27 · Durchstanzen: der Widerstand am Schnittpunkt als Kennzahl
 
 Schritt 7 des Plans vom 2026-11-27. Vorher stand bei V_d = 0 in den Angaben

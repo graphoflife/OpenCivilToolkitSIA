@@ -322,18 +322,25 @@
 .sz-punkt { fill: var(--system); stroke: #fff; stroke-width: 1.2; }
 .sz-punkttext { fill: var(--system); font-weight: 700; }
 
-/* Erdbeben: je Richtung die Ansicht mit den Kräften, darunter die Wände; in
-   der Maske die Kriterien unter den Schaltern der Regelmässigkeit. */
+/* Erdbeben: je Richtung die Ansicht mit den Kräften, auf jeder Decke ihre
+   Masse als Kreis, darunter die Teile des Kerns am Fuss; daneben der Kern
+   je Geschoss mit den Nummern seiner Teile. In der Maske die Kriterien
+   unter den Schaltern der Regelmässigkeit. */
 .eb-titel { font-weight: 700; }
 .eb-gebaeude { fill: var(--flaeche-2); stroke: var(--schrift); stroke-width: 1.6; }
 .eb-decke { fill: none; stroke: var(--schrift); stroke-width: 1.2; }
+.eb-masse { fill: var(--schrift-matt); fill-opacity: .45; stroke: var(--schrift); stroke-width: 1; }
 .eb-name { font-size: 12px; }
 .eb-fuss { fill: var(--last); font-weight: 600; }
-.eb-waende { border-collapse: collapse; font-size: 12px; margin-top: 6px; }
-.eb-waende th, .eb-waende td { padding: 2px 8px; text-align: right; white-space: nowrap; }
-.eb-waende th:first-child, .eb-waende td:first-child { text-align: left; }
-.eb-waende th { color: var(--schrift-matt); font-weight: 600; border-bottom: 1px solid var(--rand); }
-.eb-waende caption { caption-side: top; text-align: left; color: var(--schrift-matt); padding: 0 8px 2px; }
+.eb-teilnummer {
+  font-size: 11px; font-weight: 700;
+  paint-order: stroke; stroke: #fff; stroke-width: 3px; stroke-linejoin: round;
+}
+.eb-teile { border-collapse: collapse; font-size: 12px; margin-top: 6px; }
+.eb-teile th, .eb-teile td { padding: 2px 8px; text-align: right; white-space: nowrap; }
+.eb-teile th:first-child, .eb-teile td:first-child { text-align: left; }
+.eb-teile th { color: var(--schrift-matt); font-weight: 600; border-bottom: 1px solid var(--rand); }
+.eb-teile caption { caption-side: top; text-align: left; color: var(--schrift-matt); padding: 0 8px 2px; }
 .eb-regel + .eb-regel { margin-top: 8px; }
 .eb-kriterien { margin: 3px 0 0 18px; padding: 0; font-size: 12px; color: var(--schrift-matt); }
 .eb-folge { font-size: 12px; color: var(--schrift-zart); margin-bottom: 2px; }

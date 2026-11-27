@@ -116,22 +116,23 @@ def beispiel() -> Projekt:
     pfahl.schicht("Kies, sandig", d=6.0, gamma=21.0, phi_k=34.0, K=0.44, E_s=60.0)
     pfahl.schicht("Moräne", d=15.0, gamma=22.0, phi_k=36.0, c_k=5.0, K=0.41, E_s=120.0)
     pfahl.kombination("Tragsicherheit", N_Ed=2000.0, H_Ed=100.0)
-    # Und das Haus im Erdbeben: vier Geschosse auf je zwei Wänden in x und
-    # in y, alle aus einer Querschnittsanalyse 5000 × 250 mm, an beiden
-    # Seiten ⌀ 12 alle 150 mm -- die in y um 90° gedreht. Grund- und Aufriss
-    # regelmässig, T₁ weit unter 4·T_C -- grün, wie der Rest.
-    wand = _tragwand(projekt.freie_kennung("a"), "Tragwand 5000 × 250",
-                     [[0, 0], [5000, 0], [5000, 250], [0, 250]], _erstes(projekt, "beton"))
-    for z in (50.0, 200.0):
-        wand.stablinie([50.0, z], [4950.0, z], art="teilung", durchmesser=12, teilung=150,
-                       stahl=_erstes(projekt, "betonstahl"))
-    projekt.querschnittsanalysen.append(wand)
+    # Und das Haus im Erdbeben: vier Geschosse auf einem Kern aus vier
+    # getrennten Wänden 5000 × 250 mm, zwei in x an den Längsseiten, zwei
+    # in y an den Stirnseiten, gezeichnet wie im Grundriss, jede an beiden
+    # Seiten mit ⌀ 12 alle 150 mm. Jede zählt um ihren eigenen Schwerpunkt;
+    # am Fuss trägt jede nach ihrem Anteil. Grund- und Aufriss regelmässig,
+    # T₁ weit unter 4·T_C -- grün, wie der Rest.
+    kern = QuerschnittsanalyseEintrag.neu(kennung=projekt.freie_kennung("a"),
+                                          name="Kern aus vier Wänden")
+    for wand in ((3500, 0, 8500, 250), (3500, 9750, 8500, 10000), (0, 2500, 250, 7500),
+                 (11750, 2500, 12000, 7500)):
+        _wand(kern, *wand, beton=_erstes(projekt, "beton"),
+              stahl=_erstes(projekt, "betonstahl"))
+    projekt.querschnittsanalysen.append(kern)
     haus = projekt.gebaeude("Wohnhaus")
     for name in ("EG", "1. OG", "2. OG"):
-        haus.geschoss(name, h=3.0, G_k=2500.0, Q_k=800.0)
-    haus.geschoss("Dach", h=3.0, G_k=2000.0)
-    haus.wand("Wände in x", wand.kennung, n=2)
-    haus.wand("Wände in y", wand.kennung, lage="90", n=2)
+        haus.geschoss(name, h=3.0, G_k=2500.0, Q_k=800.0, kern=kern.kennung)
+    haus.geschoss("Dach", h=3.0, G_k=2000.0, kern=kern.kennung)
 
     # Ein Skript für die App «Python», mit einem Diagramm -- ohne Download.
     projekt.skript("Skript 1", VORLAGE)
@@ -499,39 +500,54 @@ def _pfaehle(p: Projekt) -> None:
 def _gebaeude(p: Projekt) -> None:
     """
     Was das Wohnhaus des Beispiels nie zeigt. Ein Lager mit T_1 von Hand und
-    ohne Wand -- die Kraefte je Geschoss bleiben ohne Verteilung --, in
+    ohne Kern -- die Kraefte je Geschoss bleiben ohne Verteilung --, in
     Zone Z3b auf Baugrund E, Bauwerksklasse III: in x liegt T_1 unter T_B
     (31), in y zwischen T_C und T_D (33) und ueber 4 T_C, (39) geht dort
     nicht auf. Sein Grundriss ist nicht regelmaessig und das Dach schwerer
     als das Erdgeschoss: das Verfahren gilt nicht. Ein schlanker Turm auf
-    einer Winkelwand, deren y und z keine Hauptachsen sind -- in y schwingt
-    er langsamer als T_D (34) --, duktil bemessen mit q = 3.0: dafuer steht
-    der graue Satz zu den Waenden. Und ein Gebaeude, dessen Wand noch keinen
-    Querschnitt hat: es rechnet nicht.
+    einem Kern aus einer Winkelwand, deren y und z keine Hauptachsen sind,
+    oben duenner als unten -- in y schwingt er langsamer als T_D (34) --,
+    duktil bemessen mit q = 3.0: dafuer steht der graue Satz zu den Waenden.
+    Und ein Gebaeude, dessen Dach noch keinen Kern hat: es rechnet nicht.
     """
     lager = p.gebaeude("Lager, von Hand", zone="Z3b", baugrund="E", bauwerksklasse="III",
                        q_x=2.0, schwingzeit="hand", T1_x=0.05, T1_y=1.2,
                        grundriss_regelmaessig=False)
     lager.geschoss("Halle", h=5.0, G_k=1200.0, Q_k=2000.0, psi_2=0.8)
     lager.geschoss("Dach", h=4.0, G_k=3000.0)
-    winkel = _tragwand(p.freie_kennung("a"), "Winkelwand",
-                       [[0, 0], [4000, 0], [4000, 250], [250, 250], [250, 2000], [0, 2000]],
-                       _erstes(p, "beton"))
-    p.querschnittsanalysen.append(winkel)
+    winkel, duenn = (_tragwand(p.freie_kennung("a"), name,
+                               [[0, 0], [4000, 0], [4000, t], [t, t], [t, 2000], [0, 2000]],
+                               _erstes(p, "beton"))
+                     for name, t in (("Winkelwand", 250), ("Winkelwand, oben", 200)))
+    p.querschnittsanalysen += [winkel, duenn]
     turm = p.gebaeude("Turm", zone="Z2", baugrund="D", q_x=3.0, q_y=3.0)
     for i in range(1, 9):
-        turm.geschoss(f"{i}. OG", h=3.0, G_k=600.0, Q_k=200.0)
-    turm.wand("Kern", winkel.kennung, eta_EI=0.4)
-    ohne = p.gebaeude("Wand ohne Querschnitt")
-    ohne.geschoss("EG", h=3.0, G_k=1000.0)
-    ohne.wand("Wand 1", "")
+        turm.geschoss(f"{i}. OG", h=3.0, G_k=600.0, Q_k=200.0,
+                      kern=(winkel if i <= 4 else duenn).kennung, eta_EI=0.4)
+    ohne = p.gebaeude("Kern ohne Querschnitt")
+    ohne.geschoss("EG", h=3.0, G_k=1000.0, kern=winkel.kennung)
+    ohne.geschoss("Dach", h=3.0, G_k=800.0)
 
 
 def _tragwand(kennung: str, name: str, ecken: list, beton: str) -> QuerschnittsanalyseEintrag:
-    """Eine Wand fuer das Erdbeben: ein Polygon aus Beton, ohne Lastfall."""
+    """Ein Kern fuer das Erdbeben: ein Polygon aus Beton, ohne Bewehrung und ohne Lastfall."""
     a = QuerschnittsanalyseEintrag.neu(kennung=kennung, name=name)
     a.polygon(ecken, material=beton)
     return a
+
+
+def _wand(a: QuerschnittsanalyseEintrag, y1: float, z1: float, y2: float, z2: float, *,
+          beton: str, stahl: str) -> None:
+    """
+    Eine Wand eines Kerns: ein Rechteck von (y1, z1) bis (y2, z2) in mm, an
+    beiden langen Seiten Staebe ⌀ 12 alle 150 mm, die Achsen 50 mm vom Rand.
+    """
+    a.polygon([[y1, z1], [y2, z1], [y2, z2], [y1, z2]], material=beton)
+    in_y = y2 - y1 >= z2 - z1
+    for lage in ((z1 + 50, z2 - 50) if in_y else (y1 + 50, y2 - 50)):
+        anfang, ende = (([y1 + 50, lage], [y2 - 50, lage]) if in_y
+                        else ([lage, z1 + 50], [lage, z2 - 50]))
+        a.stablinie(anfang, ende, art="teilung", durchmesser=12, teilung=150, stahl=stahl)
 
 
 def _erstes(p: Projekt, art: str) -> str:

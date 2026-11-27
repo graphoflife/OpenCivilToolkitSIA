@@ -32,7 +32,7 @@ der Höhe wächst – und die Annahme, dass höhere Formen wenig beitragen
 wirkt als Querkraft die Summe der Kräfte darüber, am Fuss die ganze
 [[Ersatzkraft]].
 
-Die Wände teilen sich jede Kraft nach ihrem Anteil an der
-[[Biegesteifigkeit der Wände|Biegesteifigkeit]] – nach Vorgabe, nicht
-nachgeschlagen. Die Torsion aus einer Exzentrizität der Massen (16.5.2.7)
+Besteht der Kern aus getrennten Teilen, teilen sie sich am Fuss jede Kraft
+nach ihrem Anteil an den [[Trägheitsmomente des Kerns|Trägheitsmomenten]] –
+nach Vorgabe, nicht nachgeschlagen. Die Torsion aus einer Exzentrizität der Massen (16.5.2.7)
 gehört dazu und wird nicht gerechnet.

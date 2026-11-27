@@ -112,7 +112,7 @@ def keine_hauptachsen(wer: str, I_y: float, I_z: float, I_yz: float,
     «Querschnitt «Q1»», ``was`` kruemmt sich mit, ``folge`` sagt, was darum
     nur genaehert ist; Traegheitsmomente in m⁴. Im Raum fuer jeden
     Querschnitt eines Stabs (:mod:`opencivil.stabwerk.rechnung`), im Erdbeben
-    fuer jede Wand (:mod:`opencivil.erdbeben.ersatzkraft`), in den Kennzahlen
+    fuer jeden Kern (:mod:`opencivil.erdbeben.ersatzkraft`), in den Kennzahlen
     eines Stahlquerschnitts (:mod:`opencivil.nachweis.qa_stahl_kennzahlen`)
     -- derselbe Satz.
     """

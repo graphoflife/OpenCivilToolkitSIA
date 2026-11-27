@@ -1,5 +1,5 @@
 ---
-erzeugt: 291c02bd5da3
+erzeugt: 279cf7b184aa
 art: modul
 tags: [modul]
 ---
@@ -64,7 +64,7 @@ Die vollstaendige, speicherbare Beschreibung eines Projekts.
 - `grundbrueche: List[GrundbruchEintrag] = field(default_factory=list)` – Flachfundamente mit Grundbruch und Gleiten.
 - `setzungen: List[SetzungEintrag] = field(default_factory=list)` – Flachfundamente auf geschichtetem Baugrund, mit ihrer Setzung.
 - `pfaehle: List[PfahlEintrag] = field(default_factory=list)` – Einzelpfähle: Bohr- und Mikropfähle mit äusserem und innerem Widerstand.
-- `erdbeben: List[ErdbebenEintrag] = field(default_factory=list)` – Gebäude im Erdbeben, nach dem Ersatzkraftverfahren – Geschosse und Tragwände.
+- `erdbeben: List[ErdbebenEintrag] = field(default_factory=list)` – Gebäude im Erdbeben, nach dem Ersatzkraftverfahren – Geschosse, jedes mit seinem Kern.
 - `skripte: List[SkriptEintrag] = field(default_factory=list)` – Die Python-Skripte der App «Python» – gespeichert, nicht gerechnet.
 - `sandboxen: Dict[str, str] = field(default_factory=dict)` – Je Liste einer App ([[opencivil.projekt.projekt#Konstanten|APPLISTEN]]) die Kennung ihrer Sandbox, des Eintrags zum Ausprobieren – siehe [[opencivil.projekt.projekt#Projekt.sandbox_zuruecksetzen|sandbox_zuruecksetzen]]. Hier und nicht an den Eintraegen: so steht die Regel an einer Stelle, und eine Kopie der Sandbox ist von selbst ein gewoehnlicher Eintrag.
 - `vergeben: Dict[str, int] = field(default_factory=dict)` – Je Vorsilbe die hoechste Nummer, die das Projekt je vergeben hat – an Materialien, Bauteile, Skripte: eine Kennung kommt nie wieder ([[opencivil.projekt.netz#neue_kennung|neue_kennung]]).
@@ -608,8 +608,8 @@ def aus_dict(cls, roh: Mapping[str, Any], wo: Optional[str]=None) -> 'Projekt'
 Ein Projekt aus der Datei, gelesen und geprueft. Was eine Datei von
 frueher anders schreibt, bringt [[opencivil.projekt.frueher|frueher]] in
 die neue Form: die Zahl γ_w von Grundbruch und Pfahl wird ein Wasser,
-die Spannungen eines Spannglieds werden Faktoren, und ein Pfahl
-bekommt den Schalter fuer η_a.
+die Spannungen eines Spannglieds werden Faktoren, ein Pfahl bekommt
+den Schalter fuer η_a, und die Waende eines Gebaeudes werden ein Kern.
 
 #### Projekt.neu
 

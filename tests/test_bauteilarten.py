@@ -105,7 +105,6 @@ class TestSinnbilder(unittest.TestCase):
             "kopf": k["pfahl"]["koepfe"],
             "tragglied": k["pfahl"]["tragglieder"],
             "setzung": k["setzung"]["steifigkeiten"],
-            "wandlage": k["erdbeben"]["lagen"],
             "linie": k["querschnittsanalyse"]["linienarten"],
             "wirkung": k["querschnittsanalyse"]["spannglied"]["wirkungen"],
             "knickkurve": k["querschnittsanalyse"]["knickkurven"],

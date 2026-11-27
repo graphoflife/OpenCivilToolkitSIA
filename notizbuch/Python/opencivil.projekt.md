@@ -1,5 +1,5 @@
 ---
-erzeugt: cc32d60f3170
+erzeugt: 21d5c1a54c29
 art: modul
 tags: [modul]
 ---
@@ -41,7 +41,8 @@ setzung.py     ein Flachfundament auf geschichtetem Baugrund: Pressungen
 pfahl.py       ein Einzelpfahl: Art, Masse, Querschnitt, Schichten,
                Grundwasser, Grundlage des äusseren Widerstands, Kombinationen
 erdbeben.py    ein Gebaeude im Erdbeben: Standort, Verhaltensbeiwerte,
-               Geschosse und Tragwaende aus Querschnittsanalysen
+               Geschosse, jedes mit seinem Kern aus einer
+               Querschnittsanalyse
 netz.py        Knoten mit Kennungen, fuer beide Zeichnungen
 skript.py      ein Python-Skript der App «Python»: gespeichert, nicht
                gerechnet

@@ -1,5 +1,5 @@
 ---
-erzeugt: 298ab9a95efa
+erzeugt: bb8e863e5247
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -62,6 +62,8 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.durchstanzen.systeme]] – woraus die Durchstanzbewehrung besteht.
 - [[opencivil.erdbeben]] – Erdbeben nach SIA 261:2020, Kapitel 16.
     - [[opencivil.erdbeben.ersatzkraft]] – das Ersatzkraftverfahren nach SIA 261:2020, 16.5.2.
+    - [[opencivil.erdbeben.kern]] – der Kern eines Geschosses: seine Teile, je um ihren Schwerpunkt.
+    - [[opencivil.erdbeben.kragarm]] – der Kern als Kragarm: Querkraft, Moment und Auslenkung.
   - [[opencivil.ergebnis]] – ein gerechnetes Projekt, wie man es ohne Oberflaeche braucht.
 - [[opencivil.geotechnik]] – Nachweise im Baugrund.
     - [[opencivil.geotechnik.fundament]] – ein Flachfundament auf seinem Baugrund.

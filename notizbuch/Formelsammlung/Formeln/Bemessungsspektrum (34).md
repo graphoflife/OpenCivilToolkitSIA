@@ -1,5 +1,5 @@
 ---
-erzeugt: 0020553414b1
+erzeugt: d34e744961cc
 art: formel
 tags: [formel]
 normstelle: "SIA 261:2020, 16.2.4.1, (34)"
@@ -33,8 +33,8 @@ Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 $$
 \begin{aligned}
   S_{d,y} &= \max\left(2.5 \cdot \gamma_f \cdot \frac{a_{gd}}{g} \cdot S \cdot \frac{T_C \cdot T_D}{T_{1,y}^2 \cdot q_y};\ 0.1 \cdot \gamma_f \cdot \frac{a_{gd}}{g}\right) \\
-  &= \max\left(2.5 \cdot 1 \cdot \frac{1\,\mathrm{m}/\mathrm{s}^{2}}{10\,\mathrm{m}/\mathrm{s}^{2}} \cdot 1.7 \cdot \frac{0.5\,\mathrm{s} \cdot 2\,\mathrm{s}}{\left(2.748\,\mathrm{s}\right)^2 \cdot 3};\ 0.1 \cdot 1 \cdot \frac{1\,\mathrm{m}/\mathrm{s}^{2}}{10\,\mathrm{m}/\mathrm{s}^{2}}\right) \\
-  &= 0.019
+  &= \max\left(2.5 \cdot 1 \cdot \frac{1\,\mathrm{m}/\mathrm{s}^{2}}{10\,\mathrm{m}/\mathrm{s}^{2}} \cdot 1.7 \cdot \frac{0.5\,\mathrm{s} \cdot 2\,\mathrm{s}}{\left(2.769\,\mathrm{s}\right)^2 \cdot 3};\ 0.1 \cdot 1 \cdot \frac{1\,\mathrm{m}/\mathrm{s}^{2}}{10\,\mathrm{m}/\mathrm{s}^{2}}\right) \\
+  &= 0.018
 \end{aligned}
 $$
 

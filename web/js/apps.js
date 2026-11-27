@@ -380,13 +380,17 @@ const PFAHL = bauteil('pfahl', {
 });
 
 /**
- * Ein Gebäude mit den Vorgaben des Kerns, einem Geschoss ohne Last und einer
- * Wand ohne Querschnittsanalyse -- ohne Material: das nimmt die Wand aus ihrer
- * Analyse. Die Liste nennt, wie viele: «4 Geschosse, 2 Wände».
+ * Ein Gebäude mit den Vorgaben des Kerns und einem Geschoss ohne Last und
+ * ohne Kern -- ohne Material: das nimmt der Kern aus seiner Analyse. Die
+ * Liste nennt, wie viele Geschosse und wie viele Querschnitte ihre Kerne
+ * haben: «4 Geschosse, 1 Kernquerschnitt», oder «ohne Kern».
  */
 const ERDBEBEN = bauteil('erdbeben', {
-  kurztext: (h) => `${h.geschosse.length} ${h.geschosse.length === 1 ? 'Geschoss' : 'Geschosse'}, `
-    + `${h.waende.length} ${h.waende.length === 1 ? 'Wand' : 'Wände'}`,
+  kurztext: (h) => {
+    const n = new Set(h.geschosse.map((g) => g.kern).filter(Boolean)).size;
+    return `${h.geschosse.length} ${h.geschosse.length === 1 ? 'Geschoss' : 'Geschosse'}, `
+      + `${n ? `${n} ${n === 1 ? 'Kernquerschnitt' : 'Kernquerschnitte'}` : 'ohne Kern'}`;
+  },
   editor: erdbebenEditor,
   karten: erdbebenKarten,
   fenster: erdbebenFenster,

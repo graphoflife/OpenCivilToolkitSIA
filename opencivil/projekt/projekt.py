@@ -37,7 +37,8 @@ from opencivil.projekt.balkensystem import BalkensystemEintrag
 from opencivil.projekt.balkensystem3d import Balkensystem3dEintrag
 from opencivil.projekt.erdbeben import ErdbebenEintrag
 from opencivil.projekt.frueher import (
-    gamma_w_heraus, spannungen_als_faktoren, umrechnung_setzen, wasser_einsetzen,
+    gamma_w_heraus, kern_einsetzen, spannungen_als_faktoren, umrechnung_setzen, waende_heraus,
+    wasser_einsetzen,
 )
 from opencivil.projekt.grundbruch import GrundbruchEintrag
 from opencivil.projekt.pfahl import PfahlEintrag
@@ -146,7 +147,7 @@ class Projekt(Beschreibung):
     """Einzelpfähle: Bohr- und Mikropfähle mit äusserem und innerem Widerstand."""
 
     erdbeben: List[ErdbebenEintrag] = field(default_factory=list)
-    """Gebäude im Erdbeben, nach dem Ersatzkraftverfahren -- Geschosse und Tragwände."""
+    """Gebäude im Erdbeben, nach dem Ersatzkraftverfahren -- Geschosse, jedes mit seinem Kern."""
 
     skripte: List[SkriptEintrag] = field(default_factory=list)
     """Die Python-Skripte der App «Python» -- gespeichert, nicht gerechnet."""
@@ -849,12 +850,14 @@ class Projekt(Beschreibung):
         Ein Projekt aus der Datei, gelesen und geprueft. Was eine Datei von
         frueher anders schreibt, bringt :mod:`~opencivil.projekt.frueher` in
         die neue Form: die Zahl γ_w von Grundbruch und Pfahl wird ein Wasser,
-        die Spannungen eines Spannglieds werden Faktoren, und ein Pfahl
-        bekommt den Schalter fuer η_a.
+        die Spannungen eines Spannglieds werden Faktoren, ein Pfahl bekommt
+        den Schalter fuer η_a, und die Waende eines Gebaeudes werden ein Kern.
         """
         roh, alte = gamma_w_heraus(spannungen_als_faktoren(umrechnung_setzen(roh)))
+        roh, waende = waende_heraus(roh)
         projekt = super().aus_dict(roh, wo)
         wasser_einsetzen(projekt, alte)
+        kern_einsetzen(projekt, waende)
         return projekt
 
     # -- Startpunkt ---------------------------------------------------------

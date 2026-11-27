@@ -465,6 +465,27 @@ def beziehung(p: Sequence[Punkt], q: Sequence[Punkt]) -> Beziehung:
     return Beziehung.UEBERLAPPEND
 
 
+def beruehren(p: Sequence[Punkt], q: Sequence[Punkt]) -> bool:
+    """
+    Ob zwei Polygone ein Stueck Kante gemeinsam haben -- laenger als
+    :data:`TOLERANZ`. Ein Punkt allein genuegt nicht: zwei Waende, die sich nur
+    an einer Ecke treffen, sind nicht verbunden.
+    """
+    return any(_gemeinsam(a1, a2, b1, b2) > TOLERANZ
+               for a1, a2 in _kanten(p) for b1, b2 in _kanten(q))
+
+
+def _gemeinsam(a1: Punkt, a2: Punkt, b1: Punkt, b2: Punkt) -> float:
+    """Wie lang zwei Strecken auf derselben Geraden uebereinander liegen -- null, wo nicht."""
+    laenge = math.hypot(a2[0] - a1[0], a2[1] - a1[1])
+    if laenge <= TOLERANZ or max(abs(_kreuz(a1, a2, b1)), abs(_kreuz(a1, a2, b2))) \
+            > TOLERANZ * laenge:
+        return 0.0
+    u1, u2 = sorted(((b[0] - a1[0]) * (a2[0] - a1[0]) + (b[1] - a1[1]) * (a2[1] - a1[1]))
+                    / laenge for b in (b1, b2))
+    return max(0.0, min(laenge, u2) - max(0.0, u1))
+
+
 def verschachteln(
     polygone: Sequence[Sequence[Punkt]], namen: Sequence[str],
 ) -> Tuple[Optional[int], ...]:

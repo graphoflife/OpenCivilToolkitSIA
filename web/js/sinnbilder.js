@@ -303,10 +303,12 @@ const ZEICHEN = {
   geschosse: {
     pfade: ['M4 4.5h16 M4 10h16 M4 15.5h16', 'M6 4.5V21 M18 4.5V21', 'M2.5 21h19'],
   },
-  // Wände im Grundriss, gestrichelt der Umriss des Geschosses.
-  waende: {
+  // Ein Kern im Grundriss: ein U aus drei Wänden und daneben eine Wand für
+  // sich -- ein Teil, der sich um seinen eigenen Schwerpunkt biegt.
+  // Gestrichelt der Umriss des Geschosses.
+  kern: {
     strich: ['M3 3h18v18H3z'],
-    flaechen: ['M5 5h10v2.5H5z', 'M16.5 9H19v10h-2.5z', 'M5 14.5h2.5V19H5z'],
+    flaechen: ['M5.5 5.5h8v2.3H7.8v6.4h5.7v2.3h-8z', 'M16.5 9H19v10h-2.5z'],
   },
 
   // -- Die Knöpfe des Balkensystems -------------------------------------------
@@ -563,16 +565,6 @@ const ZEICHEN = {
   'setzung-schlaff': {
     pfade: ['M3 6h18v12H3z'],
     voll: [[12, 12, 1.9]],
-  },
-  // Eine Wand im Grundriss, unten links die Achse x: wie in ihrer
-  // Querschnittsanalyse gezeichnet, y längs x -- oder um 90° gedreht, längs y.
-  'wandlage-0': {
-    pfade: ['M3 21h5 M6.3 19.3l1.7 1.7-1.7 1.7'],
-    flaechen: ['M5 9.5h15v3.5H5z'],
-  },
-  'wandlage-90': {
-    pfade: ['M3 21h5 M6.3 19.3l1.7 1.7-1.7 1.7'],
-    flaechen: ['M12 3h3.5v15H12z'],
   },
   // Grund und Zulage einer Lage im Schnitt: ausgezogen die Seite der Platte,
   // gestrichelt die Kante, an der beide Stäbe bündig liegen. Ungünstig rückt

@@ -1,5 +1,5 @@
 ---
-erzeugt: fd0bca2e9adf
+erzeugt: b8cebc4b640e
 art: modul
 tags: [modul]
 ---
@@ -291,5 +291,6 @@ Giesst aus den Vorlagen ein Material mit eigenem Namensraum.
 - [[opencivil.verbund.querschnitt]]
 - [[opencivil.verbund.stuetze]]
 - [[opencivil.verbund.widerstand]]
+- [[opencivil.web.erdbebendaten]]
 - [[opencivil.web.werkstoffkurven]]
 - [[opencivil.web.zeichengeometrie]]

@@ -2,12 +2,12 @@
 opencivil/erdbeben/ersatzkraft.py -- das Ersatzkraftverfahren nach SIA 261:2020, 16.5.2.
 
 VERANTWORTUNG:
-Das :class:`Gebaeude` -- Standort, Verhaltensbeiwerte, Geschosse und
-Tragwaende als Vorgaben im Rechenwerk -- und seine Rechnung
+Das :class:`Gebaeude` -- Standort, Verhaltensbeiwerte und Geschosse mit
+ihrem Kern als Vorgaben im Rechenwerk -- und seine Rechnung
 :class:`Ersatzkraft`: je Hauptrichtung x und y die Grundschwingzeit, der
 Wert des Bemessungsspektrums, die Ersatzkraft und ihre Verteilung auf die
-Geschosse und auf die Waende. Ob das Verfahren gilt (16.5.2.1), sagen die
-Urteile: je Richtung T_1 <= 4 T_C (39), mit seinem Erfuellungsgrad, und --
+Geschosse und, am Fuss, auf die Teile des Kerns. Ob das Verfahren gilt
+(16.5.2.1), sagen die Urteile: je Richtung T_1 <= 4 T_C (39), mit seinem Erfuellungsgrad, und --
 nur wo Grund- oder Aufriss nicht regelmaessig sind -- eines dazu, rot. Was
 eines davon verfehlt, gilt fuer das ganze Gebaeude: die Norm verlangt (39) in
 beiden Richtungen.
@@ -15,8 +15,8 @@ beiden Richtungen.
 DAS VERFAHREN, je Richtung::
 
     W_i  = G_k,i + psi_2,i * Q_k,i                    Gewicht des Geschosses i
-    EI   = Summe n * eta_EI * E_cm * I                die Waende dieser Richtung
-    u    = Summe W_i * z_i^2 * (3 H - z_i) / (6 EI)   Kopf des Kragarms unter den W_i
+    EI_i = eta_EI,i * E_cm,i * I_i                    sein Kern in dieser Richtung
+    u    = Summe Delta u_i (:mod:`.kragarm`)          Kopf des Kragarms unter den W_i
     T_1  = 2 * sqrt(u)                                (40), u in m, T_1 in s
     S_d  = (31) bis (34)
     F_d  = S_d * Summe W_i                            (41)
@@ -24,20 +24,24 @@ DAS VERFAHREN, je Richtung::
     V_i  = Summe_(j >= i) F_dj                        unter dem Geschoss i
     M_i  = Summe_(j >= i) F_dj * (z_j - z_(i-1))      ebenda; M_1 = M_0 am Fuss
 
-Die Waende einer Richtung stehen als ein Kragarm da, eingespannt am Fuss und
-so hoch wie das Gebaeude; das Gewicht eines Geschosses wirkt waagrecht auf
-der Hoehe seiner Decke, z_i ueber der Einspannung (16.5.2.3). Jede Wand
-traegt von Querkraft und Moment am Fuss ihren Anteil an EI.
+Der Kern steht je Richtung als ein Kragarm da, eingespannt am Fuss und so
+hoch wie das Gebaeude, in jedem Geschoss mit dessen EI; das Gewicht eines
+Geschosses wirkt waagrecht auf der Hoehe seiner Decke, z_i ueber der
+Einspannung (16.5.2.3). Besteht der Kern am Fuss aus getrennten Teilen,
+traegt jeder von Querkraft und Moment dort seinen Anteil an EI.
 
-DIE WAND IM GRUNDRISS:
-Ihr Querschnitt kommt aus einer Querschnittsanalyse, gezeichnet in y und z.
-Bei 0 Grad liegt y in x des Gebaeudes: eine Kraft in x biegt sie um z, mit
-I_z, eine in y mit I_y. Bei 90 Grad ist es umgekehrt (:meth:`Wandlage.traegheit`),
-und im Bild liegt sie um 90 Grad gedreht (:meth:`Wandlage.im_grundriss`).
+DER KERN IM GRUNDRISS:
+Je Geschoss eine Querschnittsanalyse: der ganze Kern mit allen Waenden in x
+und in y, gezeichnet, wie er im Grundriss liegt -- y der Analyse liegt in x
+des Gebaeudes, z in y (Benutzer, 2026-11-27). Eine Kraft in x biegt ihn um
+z, mit I_z, eine in y um y, mit I_y (:func:`traegheit`). Getrennte Teile
+zaehlen je um ihren eigenen Schwerpunkt (:mod:`.kern`).
 
 NACH VORGABE, NICHT NACHGESCHLAGEN (auch in TODO):
-- die Verteilung auf die Waende nach ihrer Biegesteifigkeit;
-- nur die Biegung der Waende verformt, weder Schub noch Fundament;
+- getrennte Teile des Kerns je um ihren eigenen Schwerpunkt, ohne
+  Steiner-Anteil zwischen ihnen (:mod:`.kern`);
+- die Verteilung auf die Teile am Fuss nach ihrer Biegesteifigkeit;
+- nur die Biegung des Kerns verformt, weder Schub noch Fundament;
 - eta_EI = 0.5 als Anteil der ungerissenen Steifigkeit -- verlangt ist nur
   eine mittlere Steifigkeit bis zum Fliessbeginn (16.5.5.2). Nicht kappa:
   das ist in der Querschnittsanalyse die Kruemmung und in SIA 262:2025 die
@@ -59,10 +63,10 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Sequence, Tuple
+from typing import Dict, List, Mapping, Optional, Sequence, Tuple
 
 from opencivil.core.berechnung import Ausfuehrung, Berechnung, Eingabebezug, Eingaben
-from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, M, MM, MNM2, M_PRO_S2, S, Groesse
+from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, M, MM, M_PRO_S2, S, Groesse
 from opencivil.core.latex import Mathe, Zelle, als_text, fest
 from opencivil.core.nachweis import (
     NICHT_FUEHRBAR, OHNE_EINWIRKUNG, UNBESCHRAENKT, Nachweis, NachweisUrteil, Vergleich, grad_def,
@@ -74,6 +78,8 @@ from opencivil.core.rechenobjekt import Rechenobjekt
 from opencivil.core.vorgaben import Feld, Gruppe
 from opencivil.core.wahl import Wahl
 from opencivil.core.wert import Wert, WertDef
+from opencivil.erdbeben.kern import Kern, Kerndaten
+from opencivil.erdbeben.kragarm import beitraege, momente, querkraefte
 from opencivil.material.basis import ERDBESCHLEUNIGUNG
 from opencivil.stabwerk.stabquerschnitt import keine_hauptachsen
 
@@ -114,14 +120,23 @@ def duktile_waende(richtungen: Sequence[str]) -> str:
     """
     Der Hinweis, wo q duktiles Verhalten heisst: fuer schlanke Tragwaende
     gelten dann eigene Bemessungswerte (SIA 262:2025, 4.3.9.4), die diese
-    Rechnung nicht kennt -- die Kraefte je Wand sind nicht schon die der
-    Bemessung.
+    Rechnung nicht kennt -- die Kraefte am Kern und an seinen Teilen sind
+    nicht schon die der Bemessung.
     """
     return (f"In {' und '.join(richtungen)} ist q grösser als {fest(Q_NICHT_DUKTIL, 1)}, "
             "das Tragwerk also duktil bemessen (SIA 262:2025, 4.3.9.3, Tabelle 15). Für "
             "schlanke Tragwände (h_w/l_w > 2) gilt dann 4.3.9.4: das Moment linear zwischen "
             "Fuss und Kopf, die Querkraft vergrössert für Überfestigkeit und höhere "
             "Eigenformen (95) – hier nicht gerechnet.")
+
+
+def gewicht(G_k: float, Q_k: float, psi_2: float) -> float:
+    """
+    Was von einem Geschoss im Beben mitschwingt: W = G_k + psi_2 Q_k
+    (16.5.2.3) -- SI. Die Rechnung nimmt es von hier, das Bild eines
+    Gebaeudes, das noch nicht rechnet, auch (:mod:`opencivil.web.erdbebendaten`).
+    """
+    return G_k + psi_2 * Q_k
 
 
 # ===========================================================================
@@ -219,46 +234,29 @@ class Bauwerksklasse(Wahl):
         }[self]
 
 
-class Wandlage(Wahl):
-    """Wie eine Wand im Grundriss liegt: wie in ihrer Querschnittsanalyse gezeichnet oder gedreht."""
-
-    NULL = "0"
-    NEUNZIG = "90"
-
-    @property
-    def beschriftung(self) -> str:
-        return f"{self.value}°"
-
-    @property
-    def erklaerung(self) -> str:
-        return {Wandlage.NULL: "wie gezeichnet: y der Querschnittsanalyse liegt in x",
-                Wandlage.NEUNZIG: "um 90° gedreht: y der Querschnittsanalyse liegt in y"}[self]
-
-    def traegheit(self, richtung: str) -> str:
-        """Welches Traegheitsmoment eine Kraft in ``richtung`` biegt: ``I_z`` oder ``I_y``."""
-        um_z = (self is Wandlage.NULL) == (richtung == "x")
-        return "I_z" if um_z else "I_y"
-
-    def im_grundriss(self, y: float, z: float) -> Tuple[float, float]:
-        """Wo der Punkt (y, z) der Querschnittsanalyse im Grundriss liegt, als (x, y)."""
-        return (y, z) if self is Wandlage.NULL else (-z, y)
+def traegheit(richtung: str) -> str:
+    """
+    Welches Traegheitsmoment des Kerns eine Kraft in ``richtung`` biegt: in x
+    ``I_z``, in y ``I_y`` -- y der Querschnittsanalyse liegt in x des Gebaeudes.
+    """
+    return "I_z" if richtung == "x" else "I_y"
 
 
 class Schwingzeit(Wahl):
     """Woher die Grundschwingzeit kommt."""
 
-    WAENDE = "waende"
+    KERN = "kern"
     HAND = "hand"
 
     @property
     def beschriftung(self) -> str:
-        return {Schwingzeit.WAENDE: "aus den Wänden", Schwingzeit.HAND: "von Hand"}[self]
+        return {Schwingzeit.KERN: "aus dem Kern", Schwingzeit.HAND: "von Hand"}[self]
 
     @property
     def erklaerung(self) -> str:
         return {
-            Schwingzeit.WAENDE: "T₁ = 2·√u: u ist die Auslenkung des Dachs, wenn die Gewichte "
-                                "der Geschosse waagrecht auf die Wände wirken (40)",
+            Schwingzeit.KERN: "T₁ = 2·√u: u ist die Auslenkung des Dachs, wenn die Gewichte "
+                              "der Geschosse waagrecht auf den Kern wirken (40)",
             Schwingzeit.HAND: "T₁ je Richtung selbst angeben, etwa nach Rayleigh (16.5.2.3)",
         }[self]
 
@@ -322,9 +320,10 @@ VORGABEN = (
 )
 
 GESCHOSS = "Geschoss"
-WAND = "Wand"
+KERN = "Kern"
 
-#: Die Vorgaben jedes Geschosses, je mit seiner Nummer von unten.
+#: Die Vorgaben jedes Geschosses, je mit seiner Nummer von unten: Hoehe und
+#: Lasten, dann was von seinem Kern gilt -- je eine Kachel der Maske.
 JE_GESCHOSS = (Gruppe(GESCHOSS, lambda: (
     Feld("h", "h", M, "Höhe des Geschosses", 2, schritt=0.1,
          hinweis="von Decke zu Decke, das unterste ab der Einspannung"),
@@ -334,16 +333,12 @@ JE_GESCHOSS = (Gruppe(GESCHOSS, lambda: (
     Feld("psi_2", r"\psi_2", EINHEITSLOS, "Beiwert der Nutzlast, quasi-ständig", 1,
          "SIA 260:2013, Anhang A, Tabelle 2", schritt=0.1,
          hinweis="Wohn- und Büroflächen 0.3; Versammlung und Verkauf 0.6; Lager 0.8; Dächer 0"),
-)),)
-
-#: Die Vorgaben jeder Wand, je mit ihrer Nummer in der Liste.
-JE_WAND = (Gruppe(WAND, lambda: (
-    Feld("n", "n", EINHEITSLOS, "Anzahl gleicher Wände", 0, schritt=1),
+)), Gruppe(KERN, lambda: (
     Feld("eta_EI", r"\eta_{EI}", EINHEITSLOS, "Anteil der ungerissenen Biegesteifigkeit", 2,
          ZIFFER_STEIFIGKEIT, schritt=0.05,
          hinweis="0.5 nach Vorgabe – verlangt ist eine mittlere Steifigkeit bis zum "
                  "Fliessbeginn"),
-)),)
+)))
 
 
 # ===========================================================================
@@ -353,49 +348,25 @@ JE_WAND = (Gruppe(WAND, lambda: (
 
 @dataclass(frozen=True)
 class Geschoss:
-    """Ein Geschoss, von unten gezaehlt: Hoehe und Lasten."""
+    """Ein Geschoss, von unten gezaehlt: Hoehe, Lasten und sein Kern."""
 
     name: str
     h: Groesse
     G_k: Groesse
     Q_k: Groesse
     psi_2: Groesse
-
-
-@dataclass(frozen=True)
-class Wandquerschnitt:
-    """Was eine Wand aus ihrer Querschnittsanalyse nimmt: Namen und die Wert-IDs."""
-
-    analyse: str
-    """Der Name der Querschnittsanalyse."""
-
-    beton: str
-    """Der Name ihres Betons."""
-
-    I_y: str
-    I_z: str
-    I_yz: str
-    E_cm: str
-
-
-@dataclass(frozen=True)
-class Wand:
-    """Eine oder mehrere gleiche Tragwaende -- ``nummer`` ist ihr Platz in der Liste, ab 1."""
-
-    nummer: int
-    name: str
-    lage: Wandlage
-    n: Groesse
     eta_EI: Groesse
-    querschnitt: Wandquerschnitt
+    kern: Optional[str] = None
+    """Die Kennung der Querschnittsanalyse seines Kerns -- ``None`` ohne Kern."""
 
 
 @dataclass
 class Gebaeude(Rechenobjekt):
     """
-    Ein Gebaeude im Erdbeben: die Eingaben als Vorgaben im Rechenwerk. Die
-    Geschosse liegen von unten nach oben; ``waende`` sind nur die, die
-    rechnen -- ihre Querschnittsanalyse rechnet und hat einen Beton.
+    Ein Gebaeude im Erdbeben: die Eingaben als Vorgaben im Rechenwerk, dazu
+    je Kern seine Traegheitsmomente (:class:`~.kern.Kern`). Die Geschosse
+    liegen von unten nach oben; ``kerne`` sind nur die, die rechnen -- ihre
+    Querschnittsanalyse rechnet und hat einen Beton.
     """
 
     WAS = "Gebäude"
@@ -412,11 +383,15 @@ class Gebaeude(Rechenobjekt):
     T1_x: Groesse
     T1_y: Groesse
     geschosse: Sequence[Geschoss]
-    waende: Sequence[Wand]
+    kerne: Mapping[str, Kerndaten]
+    """Je Kennung einer Querschnittsanalyse, die ein Geschoss als Kern nimmt, was sie gibt."""
+
     praefix: str
 
     definitionen: Dict[str, WertDef] = field(default_factory=dict, init=False)
     berechnungen: List[Berechnung] = field(default_factory=list, init=False)
+    kernrechnungen: Dict[str, Kern] = field(default_factory=dict, init=False)
+    """Je Kern seine Traegheitsmomente -- unter dem Gebaeude, in seiner Herleitung."""
 
     def __post_init__(self) -> None:
         self.id = self.praefix
@@ -424,13 +399,25 @@ class Gebaeude(Rechenobjekt):
             for f in gruppe.fuer(self):
                 self._vorgabe(f, gruppe.titel, getattr(self, f.kurz))
         for i, geschoss in enumerate(self.geschosse, start=1):
-            for f in JE_GESCHOSS[0].fuer(geschoss):
-                self._vorgabe(f.nummeriert(i), f"{GESCHOSS} {i}: {geschoss.name}",
-                              getattr(geschoss, f.kurz))
-        for wand in self.waende:
-            for f in JE_WAND[0].fuer(wand):
-                self._vorgabe(f.nummeriert(wand.nummer), f"{WAND} {wand.nummer}: {wand.name}",
-                              getattr(wand, f.kurz))
+            for gruppe in JE_GESCHOSS:
+                for f in gruppe.fuer(geschoss):
+                    self._vorgabe(f.nummeriert(i), f"{GESCHOSS} {i}: {geschoss.name}",
+                                  getattr(geschoss, f.kurz))
+        for kennung, daten in self.kerne.items():
+            self.kernrechnungen[kennung] = Kern(f"{self.id}.kern.{kennung}", daten,
+                                                self.abschnitt)
+            self.berechnungen.append(self.kernrechnungen[kennung])
+
+    @property
+    def mit_kern(self) -> bool:
+        """Ob die Geschosse einen Kern haben -- dann jedes, sonst rechnet das Gebaeude nicht."""
+        return any(g.kern is not None for g in self.geschosse)
+
+    @property
+    def fusskern(self) -> Optional[Kern]:
+        """Der Kern des untersten Geschosses -- auf ihn verteilen sich die Kraefte am Fuss."""
+        kern = self.geschosse[0].kern if self.geschosse else None
+        return None if kern is None else self.kernrechnungen[kern]
 
     @property
     def abschnitt(self) -> Abschnitt:
@@ -449,39 +436,23 @@ class Gebaeude(Rechenobjekt):
 
 
 @dataclass(frozen=True)
-class Wandanteil:
-    """Was eine Wand einer Richtung traegt -- je eine von ``n`` gleichen; SI-Einheiten."""
+class Kernanteil:
+    """Was ein getrennter Teil des Kerns am Fuss in einer Richtung traegt; SI-Einheiten."""
 
     nummer: int
-    name: str
-    n: int
-    EI: float
-    """Die Biegesteifigkeit einer Wand in dieser Richtung, N m²."""
+    """Sein Platz unter den Teilen, ab 1 (:class:`~.kern.Kernteil`)."""
+
+    I: float  # noqa: E741 -- so heisst das Traegheitsmoment
+    """Sein Traegheitsmoment in dieser Richtung, um seinen eigenen Schwerpunkt, m⁴."""
 
     anteil: float
-    """Ihr Anteil an EI der Richtung -- einer Wand, nicht aller n."""
+    """Sein Anteil an EI am Fuss -- E_cm und eta_EI gelten fuer alle Teile gleich."""
 
     V: float
     """Die Querkraft am Fuss, N."""
 
     M: float
     """Das Moment am Fuss, N m."""
-
-
-def querkraefte(kraefte: Sequence[float]) -> Tuple[float, ...]:
-    """Je Geschoss, von unten, die Querkraft unter ihm: die Kraefte von dort bis oben."""
-    return tuple(sum(kraefte[i:]) for i in range(len(kraefte)))
-
-
-def momente(kraefte: Sequence[float], z: Sequence[float]) -> Tuple[float, ...]:
-    """
-    Je Geschoss, von unten, das Moment unter ihm, auf der Hoehe der Decke
-    darunter: die Kraefte von dort bis oben, je mal ihr Abstand. Am Fuss ist
-    es das Kippmoment M_0 -- der Kragarm ist dort eingespannt.
-    """
-    unten = (0.0, *z[:-1])
-    return tuple(sum(F * (zj - unten[i]) for F, zj in zip(kraefte[i:], z[i:]))
-                 for i in range(len(kraefte)))
 
 
 @dataclass(frozen=True)
@@ -504,10 +475,11 @@ class Richtungsbefund:
     M_0_1: float
     """Dasselbe mit q = 1.0, fuer Abheben und Kippen (16.5.1.9)."""
 
-    EI: float
-    """Die Biegesteifigkeit aller Waende dieser Richtung, N m² -- null ohne Wand."""
+    EI: Tuple[float, ...]
+    """Je Geschoss, von unten, die Biegesteifigkeit seines Kerns, N m² -- leer ohne Kern."""
 
-    waende: Tuple[Wandanteil, ...]
+    teile: Tuple[Kernanteil, ...]
+    """Je getrenntem Teil des Kerns am Fuss, was er traegt -- leer, wo er zusammenhaengt."""
 
 
 @dataclass(frozen=True)
@@ -528,9 +500,9 @@ class Erdbebenbefund:
 
     hinweise: Tuple[str, ...] = ()
     """
-    Was die Rechnung grau dazu sagt: je Querschnittsanalyse, deren y und z
-    keine Hauptachsen sind, ein Satz -- und wo q duktiles Verhalten heisst,
-    was das fuer die Waende bedeutet.
+    Was die Rechnung grau dazu sagt: je Kern, dessen y und z keine
+    Hauptachsen sind, ein Satz -- und wo q duktiles Verhalten heisst, was das
+    fuer die Waende bedeutet.
     """
 
     @property
@@ -570,10 +542,14 @@ class Ersatzkraft(Nachweis):
             f"{basis}.erfuellungsgrad_regelmaessig", r"\alpha_{eff,R}",
             "Erfüllungsgrad Regelmässigkeit", f"{SIA}, 16.5.1.3; 16.5.1.4")
         bezuege = [Eingabebezug(k, d.id) for k, d in gebaeude.definitionen.items()]
-        for wand in gebaeude.waende:
-            q = wand.querschnitt
-            bezuege += [Eingabebezug(f"{k}_{wand.nummer}", getattr(q, k))
-                        for k in ("I_y", "I_z", "I_yz", "E_cm")]
+        for i, g in enumerate(gebaeude.geschosse, start=1):
+            if g.kern is not None:
+                kern = gebaeude.kernrechnungen[g.kern]
+                bezuege += [Eingabebezug(f"{k}_{i}", d.id) for k, d in kern.d.items()]
+                bezuege.append(Eingabebezug(f"E_cm_{i}", gebaeude.kerne[g.kern].E_cm))
+        fuss = gebaeude.fusskern
+        for k, teil in enumerate(fuss.je_teil if fuss is not None else (), start=1):
+            bezuege += [Eingabebezug(f"{n}_teil_{k}", d.id) for n, d in teil.items()]
         super().__init__(basis, ausgaben=list(self.d_grad.values()), bezuege=bezuege,
                          titel=f"Ersatzkraftverfahren – {gebaeude.name}",
                          abschnitt=gebaeude.abschnitt)
@@ -583,8 +559,9 @@ class Ersatzkraft(Nachweis):
         p.erklaerung(
             "Das Beben wird durch waagrechte Kräfte ersetzt: je Hauptrichtung eine "
             "Ersatzkraft aus dem Bemessungsspektrum bei der Grundschwingzeit, verteilt auf "
-            "die Geschosse nach Höhe und Gewicht. Die Wände tragen sie als Kragarme, "
-            "eingespannt am Fuss – jede nach ihrem Anteil an der Biegesteifigkeit."
+            "die Geschosse nach Höhe und Gewicht. Der Kern trägt sie als Kragarm, eingespannt "
+            "am Fuss, in jedem Geschoss mit dessen Biegesteifigkeit; getrennte Teile am Fuss "
+            "je nach ihrem Anteil daran."
         )
         lauf = Lauf(self, e, p)
         p.hinweis(NICHT_GERECHNET)
@@ -678,7 +655,7 @@ class Lauf:
         W: List[float] = []
         for i in range(1, len(geschosse) + 1):
             z.append((z[-1] if z else 0.0) + e.g(f"h_{i}").si)
-            W.append(e.g(f"G_k_{i}").si + e.g(f"psi_2_{i}").si * e.g(f"Q_k_{i}").si)
+            W.append(gewicht(e.g(f"G_k_{i}").si, e.g(f"Q_k_{i}").si, e.g(f"psi_2_{i}").si))
         p.tabelle(
             kopf=[GESCHOSS, Mathe(r"h\ [\mathrm{m}]"), Mathe(r"z\ [\mathrm{m}]"),
                   Mathe(r"G_k\ [\mathrm{kN}]"), Mathe(r"Q_k\ [\mathrm{kN}]"), Mathe(r"\psi_2"),
@@ -693,28 +670,30 @@ class Lauf:
 
     def hauptachsen(self) -> Tuple[str, ...]:
         """
-        Je Querschnittsanalyse einer Wand, deren y und z merklich keine
-        Hauptachsen sind, der Hinweis -- derselbe wie im Raum
-        (:func:`~opencivil.stabwerk.stabquerschnitt.keine_hauptachsen`).
+        Je Kern, dessen y und z merklich keine Hauptachsen sind, der Hinweis --
+        derselbe wie im Raum
+        (:func:`~opencivil.stabwerk.stabquerschnitt.keine_hauptachsen`), mit den
+        Summen ueber seine Teile.
         """
-        saetze: Dict[str, str] = {}
-        for w in self.gebaeude.waende:
-            name = w.querschnitt.analyse
-            text = keine_hauptachsen(f"Querschnittsanalyse «{name}»", *(
-                self.e.g(f"{k}_{w.nummer}").si for k in ("I_y", "I_z", "I_yz")), was="die Wand")
-            if text is not None and name not in saetze:
-                saetze[name] = text
+        saetze: Dict[str, Optional[str]] = {}
+        for i, g in enumerate(self.gebaeude.geschosse, start=1):
+            if g.kern is None or g.kern in saetze:
+                continue
+            saetze[g.kern] = text = keine_hauptachsen(
+                f"Querschnittsanalyse «{self.gebaeude.kerne[g.kern].analyse}»",
+                *(self.e.g(f"{k}_{i}").si for k in ("I_y", "I_z", "I_yz")), was="den Kern")
+            if text is not None:
                 self.p.hinweis(text)
-        return tuple(saetze.values())
+        return tuple(text for text in saetze.values() if text is not None)
 
     def duktil(self) -> Tuple[str, ...]:
         """
         Der Hinweis zu duktil bemessenen Waenden (:func:`duktile_waende`) --
-        nur mit Wand, und in der Herleitung mit dem q, das ihn ausloest.
+        nur mit Kern, und in der Herleitung mit dem q, das ihn ausloest.
         """
         q = {r: self.e[f"q_{r}"].groesse.si for r in RICHTUNGEN}
         duktil = [r for r in RICHTUNGEN if q[r] > Q_NICHT_DUKTIL]
-        if not duktil or not self.gebaeude.waende:
+        if not duktil or not self.gebaeude.mit_kern:
             return ()
         self.p.gleichung(r" \qquad ".join(rf"q_{r} = {fest(q[r], 1)} > {fest(Q_NICHT_DUKTIL, 1)}"
                                           for r in duktil),
@@ -728,72 +707,83 @@ class Lauf:
     def richtung(self, r: str) -> Optional[Richtungsbefund]:
         """Der Befund einer Richtung -- ``None``, wo sich T_1 nicht rechnen laesst."""
         self.p.titel(f"Richtung {r}", ebene=3)
-        EI, je_wand = self._steifigkeit(r)
+        EI = self._steifigkeit(r)
         T1, u = self._schwingzeit(r, EI)
         if T1 is None:
             return None
         self.T1[r] = T1
         S_d = self._spektrum(r, T1, self.e[f"q_{r}"], "")
         F_d, kraefte, M_0 = self._kraefte(r, S_d)
-        EI_si = EI.groesse.si if EI is not None else 0.0
-        anteile = self._waende(r, EI_si, je_wand, F_d.groesse.si, M_0.groesse.si)
+        anteile = self._teile(r, F_d.groesse.si, M_0.groesse.si)
         F_d_1, M_0_1, S_d_1 = self._kippen(r, T1, F_d.groesse.si, M_0.groesse.si)
         return Richtungsbefund(
             richtung=r, T1=T1.groesse.si, u=u, S_d=S_d.groesse.si, F_d=F_d.groesse.si,
             kraefte=tuple(kraefte), M_0=M_0.groesse.si, S_d_1=S_d_1, F_d_1=F_d_1, M_0_1=M_0_1,
-            EI=EI_si, waende=anteile)
+            EI=tuple(EI or ()), teile=anteile)
 
-    def _steifigkeit(self, r: str) -> Tuple[Optional[Wert], Dict[int, float]]:
-        """EI aller Waende in ``r`` -- ``None`` ohne Wand --, je Wand das EI einer von ihnen in N m²."""
-        e, p = self.e, self.p
-        waende = self.gebaeude.waende
-        je_wand: Dict[int, float] = {}
-        if not waende:
-            return None, je_wand
+    def _steifigkeit(self, r: str) -> Optional[List[float]]:
+        """Je Geschoss, von unten, EI seines Kerns in ``r``, in N m² -- ``None`` ohne Kern."""
+        e, p, g = self.e, self.p, self.gebaeude
+        if not g.mit_kern:
+            return None
+        I = traegheit(r)  # noqa: E741 -- so heisst das Traegheitsmoment
+        EI: List[float] = []
         zeilen: List[List[Zelle]] = []
-        for w in waende:
-            k, traegheit = w.nummer, w.lage.traegheit(r)
-            I, E_cm = e.g(f"{traegheit}_{k}").si, e.g(f"E_cm_{k}").si
-            n, eta = e.g(f"n_{k}").si, e.g(f"eta_EI_{k}").si
-            je_wand[k] = eta * E_cm * I
-            zeilen.append([f"{k}: {w.name}", w.querschnitt.analyse, w.lage.beschriftung,
-                           Mathe(f"{traegheit} = {fest(I, 4)}"), Mathe(fest(E_cm / 1e6, 0)),
-                           Mathe(fest(eta, 2)), Mathe(fest(n, 0)),
-                           Mathe(fest(n * je_wand[k] / 1e6, 0))])
-        p.tabelle(
-            kopf=[WAND, "Querschnittsanalyse", "Lage", Mathe(r"I\ [\mathrm{m}^4]"),
-                  Mathe(r"E_{cm}\ [\mathrm{N/mm^2}]"), Mathe(r"\eta_{EI}"), Mathe("n"),
-                  Mathe(r"n \cdot \eta_{EI} \cdot E_{cm} \cdot I\ [\mathrm{MNm^2}]")],
-            zeilen=zeilen, titel=f"Biegesteifigkeit der Wände in {r}", ausrichtung="lllrrrrr")
-        EI = self.werte.wert(f"EI_{r}", f"EI_{r}", Groesse.aus_si(
-            sum(e.g(f"n_{w.nummer}").si * je_wand[w.nummer] for w in waende), MNM2), 0,
-            f"Biegesteifigkeit der Wände in {r}")
-        p.formel(EI, r"\sum n \cdot \eta_{EI} \cdot E_{cm} \cdot I", {},
-                 titel=f"Biegesteifigkeit der Wände in {r}",
+        for i, s in enumerate(g.geschosse, start=1):
+            werte = [e.g(f"{n}_{i}").si for n in (I, "E_cm", "eta_EI")]
+            EI.append(math.prod(werte))
+            zeilen.append([f"{i}: {s.name}", g.kerne[s.kern].analyse, Mathe(fest(werte[0], 4)),
+                           Mathe(fest(werte[1] / 1e6, 0)), Mathe(fest(werte[2], 2)),
+                           Mathe(fest(EI[-1] / 1e6, 0))])
+        p.ansatz(r"EI_i = \eta_{EI,i} \cdot E_{cm,i} \cdot I_i",
+                 titel="Biegesteifigkeit des Kerns in einem Geschoss",
                  referenz=f"{ZIFFER_STEIFIGKEIT}; {NACH_VORGABE}",
-                 name="Biegesteifigkeit der Wände")
-        return EI, je_wand
+                 name="Biegesteifigkeit des Kerns")
+        zeichen = f"{I[0]}_{I[2:]}"
+        p.tabelle(
+            kopf=[GESCHOSS, KERN, Mathe(rf"{zeichen}\ [\mathrm{{m}}^4]"),
+                  Mathe(r"E_{cm}\ [\mathrm{N/mm^2}]"), Mathe(r"\eta_{EI}"),
+                  Mathe(r"EI\ [\mathrm{MNm^2}]")],
+            zeilen=zeilen, ausrichtung="llrrrr",
+            titel=f"Biegesteifigkeit des Kerns in {r}, von unten – eine Kraft in {r} biegt ihn "
+                  f"um {I[2:]}, mit {zeichen}")
+        return EI
 
-    def _schwingzeit(self, r: str, EI: Optional[Wert]) -> Tuple[Optional[Wert], Optional[float]]:
-        """T_1 von Hand oder aus den Waenden (40) -- ohne Wand keine; dazu u in m."""
+    def _schwingzeit(self, r: str,
+                     EI: Optional[List[float]]) -> Tuple[Optional[Wert], Optional[float]]:
+        """T_1 von Hand oder aus dem Kern (40) -- ohne Kern keine; dazu u in m."""
         p, werte = self.p, self.werte
         if self.gebaeude.schwingzeit is Schwingzeit.HAND:
             T1 = self.e[f"T1_{r}"]
             p.wert(T1, titel=f"Grundschwingzeit in {r}, von Hand", referenz=f"{SIA}, 16.5.2.2")
             return T1, None
-        if EI is None or EI.groesse.si <= 0.0:
-            p.text(f"In {r} trägt keine Wand: ohne Steifigkeit keine Grundschwingzeit und "
+        if EI is None:
+            p.text(f"In {r} trägt kein Kern: ohne Steifigkeit keine Grundschwingzeit und "
                    f"keine Ersatzkraft.")
             return None, None
-        H = self.z[-1]
-        u_si = sum(Wi * zi * zi * (3.0 * H - zi)
-                   for Wi, zi in zip(self.W, self.z)) / (6.0 * EI.groesse.si)
-        hoehe = werte.wert(f"H_{r}", "H", Groesse.aus_si(H, M), 2, "Höhe des Gebäudes")
+        teile = beitraege(self.z, self.W, EI)
+        p.ansatz(r"\Delta u_i = \frac{h_i}{6 \cdot EI_i} \cdot \left(M_{u,i} \cdot "
+                 r"(2 \cdot a_{u,i} + a_{o,i}) + M_{o,i} \cdot (a_{u,i} + 2 \cdot a_{o,i})"
+                 r"\right) \qquad a = H - z",
+                 titel="Auslenkung des Dachs aus einem Geschoss – nach dem Arbeitssatz, M aus "
+                       "den Gewichten, a aus einer Kraft 1 am Dach",
+                 referenz=f"{ZIFFER_T1}; {NACH_VORGABE}", name="Auslenkung aus einem Geschoss")
+        p.tabelle(
+            kopf=[GESCHOSS, Mathe(r"h\ [\mathrm{m}]"), Mathe(r"EI\ [\mathrm{MNm^2}]"),
+                  Mathe(r"M_u\ [\mathrm{kNm}]"), Mathe(r"M_o\ [\mathrm{kNm}]"),
+                  Mathe(r"a_u\ [\mathrm{m}]"), Mathe(r"a_o\ [\mathrm{m}]"),
+                  Mathe(r"\Delta u\ [\mathrm{mm}]")],
+            zeilen=[[f"{i}: {s.name}", Mathe(fest(b.h, 2)), Mathe(fest(b.EI / 1e6, 0)),
+                     Mathe(fest(b.M_u / 1e3, 0)), Mathe(fest(b.M_o / 1e3, 0)),
+                     Mathe(fest(b.a_u, 2)), Mathe(fest(b.a_o, 2)), Mathe(fest(b.du * 1e3, 2))]
+                    for i, (s, b) in enumerate(zip(self.gebaeude.geschosse, teile), start=1)],
+            titel=f"Auslenkung je Geschoss in {r}, von unten – u: an der Decke darunter, o: an "
+                  f"seiner", ausrichtung="lrrrrrrr")
+        u_si = sum(b.du for b in teile)
         u = werte.wert(f"u_{r}", f"u_{r}", Groesse.aus_si(u_si, MM), 1,
                        f"Auslenkung des Dachs in {r}")
-        p.formel(u, r"\sum_i \frac{W_i \cdot z_i^2 \cdot (3 \cdot @H - z_i)}{6 \cdot @EI}",
-                 {"H": hoehe, "EI": EI},
-                 titel=f"Auslenkung des Dachs, die Gewichte waagrecht in {r} auf den Kragarm",
+        p.formel(u, r"\sum_i \Delta u_i", {},
+                 titel=f"Auslenkung des Dachs, die Gewichte waagrecht in {r} auf den Kern",
                  referenz=f"{ZIFFER_T1}; {NACH_VORGABE}", name="Auslenkung des Dachs")
         T1 = werte.wert(f"T1_{r}", f"T_{{1,{r}}}", Groesse(2.0 * math.sqrt(u_si), S), 3,
                         f"Grundschwingzeit in {r}")
@@ -863,25 +853,32 @@ class Lauf:
                  referenz="", name="Kippmoment am Fuss")
         return F_d, kraefte, M_0
 
-    def _waende(self, r: str, EI: float, je_wand: Dict[int, float], F_d: float,
-                M_0: float) -> Tuple[Wandanteil, ...]:
-        """Je Wand ihr Anteil an EI -- und so viel von Querkraft und Moment am Fuss."""
-        if EI <= 0.0:
-            self.p.text(f"In {r} trägt keine Wand: die Kräfte bleiben ohne Verteilung.")
+    def _teile(self, r: str, F_d: float, M_0: float) -> Tuple[Kernanteil, ...]:
+        """
+        Je getrenntem Teil des Kerns am Fuss sein Anteil an EI -- und so viel
+        von Querkraft und Moment dort. Leer, wo der Kern am Fuss
+        zusammenhaengt; ohne Kern bleiben die Kraefte ohne Verteilung.
+        """
+        kern = self.gebaeude.fusskern
+        if kern is None:
+            self.p.text(f"In {r} trägt kein Kern: die Kräfte bleiben ohne Verteilung.")
             return ()
-        anteile = tuple(
-            Wandanteil(nummer=w.nummer, name=w.name, n=round(self.e.g(f"n_{w.nummer}").si),
-                       EI=je_wand[w.nummer], anteil=je_wand[w.nummer] / EI,
-                       V=je_wand[w.nummer] / EI * F_d, M=je_wand[w.nummer] / EI * M_0)
-            for w in self.gebaeude.waende)
-        self.p.tabelle(
-            kopf=[WAND, Mathe("n"), Mathe(r"EI / \sum EI"), Mathe(r"V\ [\mathrm{kN}]"),
-                  Mathe(r"M\ [\mathrm{kNm}]")],
-            zeilen=[[f"{a.nummer}: {a.name}", Mathe(str(a.n)), Mathe(fest(a.anteil, 3)),
-                     Mathe(fest(a.V / 1e3, 1)), Mathe(fest(a.M / 1e3, 0))] for a in anteile],
-            titel=f"Je Wand in {r}, am Fuss – nach ihrem Anteil an der Biegesteifigkeit "
-                  f"({NACH_VORGABE})",
-            ausrichtung="lrrrr")
+        I = [self.e.g(f"{traegheit(r)}_teil_{k}").si  # noqa: E741
+             for k in range(1, len(kern.je_teil) + 1)]
+        anteile = tuple(Kernanteil(nummer=k, I=I_k, anteil=I_k / sum(I), V=I_k / sum(I) * F_d,
+                                   M=I_k / sum(I) * M_0)
+                        for k, I_k in enumerate(I, start=1))
+        if anteile:
+            zeichen = f"I_{traegheit(r)[2:]}"
+            self.p.tabelle(
+                kopf=["Teil", Mathe(rf"{zeichen}\ [\mathrm{{m}}^4]"),
+                      Mathe(rf"{zeichen} / \sum {zeichen}"), Mathe(r"V\ [\mathrm{kN}]"),
+                      Mathe(r"M\ [\mathrm{kNm}]")],
+                zeilen=[[str(a.nummer), Mathe(fest(a.I, 4)), Mathe(fest(a.anteil, 3)),
+                         Mathe(fest(a.V / 1e3, 1)), Mathe(fest(a.M / 1e3, 0))] for a in anteile],
+                titel=f"Je Teil des Kerns am Fuss in {r} – nach seinem Anteil an der "
+                      f"Biegesteifigkeit; E_cm und η_EI gelten für alle gleich ({NACH_VORGABE})",
+                ausrichtung="lrrrr")
         return anteile
 
     def _kippen(self, r: str, T1: Wert, F_d: float, M_0: float) -> Tuple[float, float, float]:

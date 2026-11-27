@@ -470,6 +470,15 @@
       ]
     },
     {
+      "name": "Auslenkung aus einem Geschoss",
+      "pfad": "Formelsammlung/Formeln/Auslenkung aus einem Geschoss.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Erdbeben"
+      ]
+    },
+    {
       "name": "Auslenkung des Dachs",
       "pfad": "Formelsammlung/Formeln/Auslenkung des Dachs.md",
       "art": "formel",
@@ -1158,12 +1167,10 @@
       ]
     },
     {
-      "name": "Biegesteifigkeit der Wände",
-      "pfad": "Formelsammlung/Formeln/Biegesteifigkeit der Wände.md",
+      "name": "Biegesteifigkeit des Kerns",
+      "pfad": "Formelsammlung/Formeln/Biegesteifigkeit des Kerns.md",
       "art": "formel",
-      "zeichen": [
-        "EI_x"
-      ],
+      "zeichen": [],
       "themen": [
         "Erdbeben"
       ]
@@ -4878,6 +4885,15 @@
       ]
     },
     {
+      "name": "Trägheitsmomente des Kerns",
+      "pfad": "Formelsammlung/Formeln/Trägheitsmomente des Kerns.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Erdbeben"
+      ]
+    },
+    {
       "name": "Trägheitsmomente eines Polygons, bezogen auf den Schwerpunkt",
       "pfad": "Formelsammlung/Formeln/Trägheitsmomente eines Polygons, bezogen auf den Schwerpunkt.md",
       "art": "formel",
@@ -6839,6 +6855,7 @@
       "kurz": "das Ersatzkraftverfahren nach SIA 261:2020, 16.5.2.",
       "stichworte": [
         "duktile_waende",
+        "gewicht",
         "Erdbebenzone",
         "Erdbebenzone.a_gd",
         "Spektrumwerte",
@@ -6848,24 +6865,18 @@
         "Bauwerksklasse",
         "Bauwerksklasse.gamma_f",
         "Bauwerksklasse.erklaerung",
-        "Wandlage",
-        "Wandlage.beschriftung",
-        "Wandlage.erklaerung",
-        "Wandlage.traegheit",
-        "Wandlage.im_grundriss",
+        "traegheit",
         "Schwingzeit",
         "Schwingzeit.beschriftung",
         "Schwingzeit.erklaerung",
         "Regelmaessigkeit",
         "Regelmaessigkeit.als_dict",
         "Geschoss",
-        "Wandquerschnitt",
-        "Wand",
         "Gebaeude",
+        "Gebaeude.mit_kern",
+        "Gebaeude.fusskern",
         "Gebaeude.abschnitt",
-        "Wandanteil",
-        "querkraefte",
-        "momente",
+        "Kernanteil",
         "Richtungsbefund",
         "Erdbebenbefund",
         "Erdbebenbefund.zulaessig",
@@ -6883,11 +6894,37 @@
         "Lauf._schwingzeit",
         "Lauf._spektrum",
         "Lauf._kraefte",
-        "Lauf._waende",
+        "Lauf._teile",
         "Lauf._kippen",
         "Lauf.zulaessigkeit",
         "angaben",
         "kraefte"
+      ]
+    },
+    {
+      "name": "opencivil.erdbeben.kern",
+      "pfad": "Python/opencivil.erdbeben.kern.md",
+      "art": "modul",
+      "kurz": "der Kern eines Geschosses: seine Teile, je um ihren Schwerpunkt.",
+      "stichworte": [
+        "Kernteil",
+        "teile",
+        "Kerndaten",
+        "Kern",
+        "Kern.rechne"
+      ]
+    },
+    {
+      "name": "opencivil.erdbeben.kragarm",
+      "pfad": "Python/opencivil.erdbeben.kragarm.md",
+      "art": "modul",
+      "kurz": "der Kern als Kragarm: Querkraft, Moment und Auslenkung.",
+      "stichworte": [
+        "querkraefte",
+        "momente",
+        "Geschossbeitrag",
+        "Geschossbeitrag.du",
+        "beitraege"
       ]
     },
     {
@@ -8856,7 +8893,8 @@
       "kurz": "ein Gebaeude im Erdbeben wird Rechnung.",
       "stichworte": [
         "bauen",
-        "wandquerschnitt"
+        "kerne",
+        "kernquerschnitt"
       ]
     },
     {
@@ -9060,6 +9098,7 @@
         "_pfaehle",
         "_gebaeude",
         "_tragwand",
+        "_wand",
         "_erstes",
         "charakteristisch",
         "_alles_einmal",
@@ -9204,12 +9243,10 @@
       "kurz": "ein Gebaeude im Erdbeben, wie die Oberflaeche es beschreibt.",
       "stichworte": [
         "GeschossEintrag",
-        "TragwandEintrag",
         "ErdbebenEintrag",
         "ErdbebenEintrag.neu",
         "ErdbebenEintrag.bezuege",
-        "ErdbebenEintrag.geschoss",
-        "ErdbebenEintrag.wand"
+        "ErdbebenEintrag.geschoss"
       ]
     },
     {
@@ -9254,7 +9291,12 @@
         "_umrechnung",
         "spannungen_als_faktoren",
         "_zugfestigkeiten",
-        "_faktoren"
+        "_faktoren",
+        "waende_heraus",
+        "_waende",
+        "kern_einsetzen",
+        "_kopieren",
+        "_ohne"
       ]
     },
     {
@@ -9834,6 +9876,8 @@
         "Beziehung",
         "_ganz_in",
         "beziehung",
+        "beruehren",
+        "_gemeinsam",
         "verschachteln",
         "innerstes",
         "stab_liegt_in",
@@ -11638,6 +11682,8 @@
       "kurz": "was die Oberflaeche von einem Gebaeude im Erdbeben zeichnet.",
       "stichworte": [
         "ansicht",
+        "_geschosse",
+        "_kernmeldungen",
         "_grundriss",
         "_verlaufslegende",
         "_richtung",

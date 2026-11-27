@@ -504,7 +504,7 @@ def _ort(cls: type, name: Any, kennung: Any, wo: str, feld: str, i: int) -> str:
     """
     Ein Bauteil oder Material heisst wie in der Oberflaeche -- «Platte 'Decke'»,
     und dort beginnt der Ort neu; alles darin mit seinem Namen, davor das
-    Wort seiner Klasse (``IM_ORT``: «Wand 'W1'» im Erdbeben, «Kombination
+    Wort seiner Klasse (``IM_ORT``: «Geschoss 'EG'» im Erdbeben, «Kombination
     'GZT'»). Bis 2026-11-21 stand ohne Wort das Feld der Datei davor,
     «kombinationen 'GZT'»; ein Test wacht, dass jede Klasse eines hat. Nur
     Leerzeichen sind kein Name.

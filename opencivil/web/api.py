@@ -80,10 +80,8 @@ from opencivil.projekt.grundbruch import GrundbruchEintrag
 from opencivil.projekt.setzung import SchichtEintrag, SetzungEintrag
 from opencivil.durchstanzen import stelle
 from opencivil.erdbeben import ersatzkraft
-from opencivil.erdbeben.ersatzkraft import (
-    Baugrundklasse, Bauwerksklasse, Erdbebenzone, Schwingzeit, Wandlage,
-)
-from opencivil.projekt.erdbeben import ErdbebenEintrag, GeschossEintrag, TragwandEintrag
+from opencivil.erdbeben.ersatzkraft import Baugrundklasse, Bauwerksklasse, Erdbebenzone, Schwingzeit
+from opencivil.projekt.erdbeben import ErdbebenEintrag, GeschossEintrag
 from opencivil.pfahl import pfahl
 from opencivil.pfahl.boden import Mantel
 from opencivil.pfahl.pfahl import (
@@ -209,8 +207,7 @@ def _vorgaben() -> Dict[str, List[dict]]:
                                  (PfahlEintrag, pfahl.VORGABEN),
                                  (PfahlschichtEintrag, pfahl.JE_SCHICHT),
                                  (ErdbebenEintrag, ersatzkraft.VORGABEN),
-                                 (GeschossEintrag, ersatzkraft.JE_GESCHOSS),
-                                 (TragwandEintrag, ersatzkraft.JE_WAND))}
+                                 (GeschossEintrag, ersatzkraft.JE_GESCHOSS))}
 
 
 def katalog() -> dict:
@@ -343,8 +340,6 @@ def katalog() -> dict:
                                 for b in Bauwerksklasse],
             "schwingzeiten": [{"wert": s.value, "beschriftung": s.beschriftung,
                                "titel": s.erklaerung} for s in Schwingzeit],
-            "lagen": [{"wert": l.value, "beschriftung": l.beschriftung, "titel": l.erklaerung}
-                      for l in Wandlage],
             "regelmaessigkeit": [r.als_dict() for r in ersatzkraft.REGELMAESSIG],
         },
         # Die Wahlmoeglichkeiten der Querschnittsanalyse, mit Beschriftung.

@@ -357,21 +357,21 @@ class TestAngabengruppen(unittest.TestCase):
     def test_zwei_kaesten_statt_vier_zeilen(self):
         gruppen = self.gruppen()
         # Zwei Kästen der Platte, einer des Unterzugs, vier des Fundaments,
-        # sechs seiner Setzung, acht des Pfahls und sieben des Wohnhauses --
-        # das «Fundament» der Setzung heisst wie das des Grundbruchs, die
-        # dritte Schicht des Pfahls wie die der Setzung, der Querschnitt der
-        # Wand des Hauses wie der des Unterzugs; sie stehen hier je in einer
-        # Liste.
+        # sechs seiner Setzung, acht des Pfahls und fünf des Wohnhauses,
+        # dazu einer seines Kerns -- das «Fundament» der Setzung heisst wie
+        # das des Grundbruchs, die dritte Schicht des Pfahls wie die der
+        # Setzung, der Querschnitt des Kerns wie der des Unterzugs; sie
+        # stehen hier je in einer Liste.
         self.assertEqual(sorted(gruppen),
                          ["Abmessungen – Beton C30/37", "Boden", "Bruttoquerschnitt",
                           "Fundament", "Gelände und Grundwasser", "Geschoss 1: EG",
                           "Geschoss 2: 1. OG", "Geschoss 3: 2. OG", "Geschoss 4: Dach",
-                          "Grundwasser", "Nachweis", "Pfahl", "Pressung in der Sohle",
+                          "Grundwasser", "Kern «Kern aus vier Wänden»", "Nachweis", "Pfahl",
+                          "Pressung in der Sohle",
                           "Querlast", "Querschnitt", "Schicht 1: Auffüllung",
                           "Schicht 1: Kies, sandig", "Schicht 2: Kies, sandig",
                           "Schicht 2: Silt, tonig", "Schicht 3: Moräne", "Sohlreibung",
-                          "Verhaltensbeiwert", "Wand 1: Wände in x", "Wand 2: Wände in y",
-                          "Äusserer Widerstand", "Überdeckungen"])
+                          "Verhaltensbeiwert", "Äusserer Widerstand", "Überdeckungen"])
         self.assertEqual(gruppen["Fundament"],
                          ["Breite des Fundaments", "Länge des Fundaments",
                           "Tiefe der Sohle unter Terrain", "Neigung der Sohle",
@@ -384,7 +384,11 @@ class TestAngabengruppen(unittest.TestCase):
                           "Trägheitsmoment um y", "Trägheitsmoment um z", "Deviationsmoment"] * 2)
         self.assertEqual(gruppen["Geschoss 4: Dach"],
                          ["Höhe des Geschosses", "Ständige Last des Geschosses",
-                          "Nutzlast des Geschosses", "Beiwert der Nutzlast, quasi-ständig"])
+                          "Nutzlast des Geschosses", "Beiwert der Nutzlast, quasi-ständig",
+                          "Anteil der ungerissenen Biegesteifigkeit"])
+        self.assertEqual(gruppen["Kern «Kern aus vier Wänden»"],
+                         [f"{was} des Kerns «Kern aus vier Wänden»" for was in (
+                             "Trägheitsmoment um y", "Trägheitsmoment um z", "Deviationsmoment")])
         self.assertEqual(gruppen["Abmessungen – Beton C30/37"],
                          ["Plattendicke", "Betrachtete Breite (x)",
                           "Betrachtete Breite (y)"])
@@ -586,8 +590,9 @@ class TestAngabengruppen(unittest.TestCase):
             "pfahl.t1.q_s_1",
             *(f"pfahl.t1.{n}_{i}" for i in (2, 3) for n in ("K", "delta_faktor")),
             "erdbeben.h1.q_x", "erdbeben.h1.q_y",
-            *(f"erdbeben.h1.{n}_{i}" for i in (1, 2, 3, 4) for n in ("h", "G_k", "Q_k", "psi_2")),
-            *(f"erdbeben.h1.{n}_{i}" for i in (1, 2) for n in ("n", "eta_EI")),
+            *(f"erdbeben.h1.{n}_{i}" for i in (1, 2, 3, 4)
+              for n in ("h", "G_k", "Q_k", "psi_2", "eta_EI")),
+            *(f"erdbeben.h1.kern.a2.{n}" for n in ("I_y", "I_z", "I_yz")),
         })
 
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: 7e06288d8425
+erzeugt: e47b44ee512a
 art: modul
 tags: [modul]
 ---
@@ -76,7 +76,7 @@ Der Hinweis, wenn y und z merklich keine Hauptachsen sind
 «Querschnitt «Q1»», `was` kruemmt sich mit, `folge` sagt, was darum
 nur genaehert ist; Traegheitsmomente in m⁴. Im Raum fuer jeden
 Querschnitt eines Stabs ([[opencivil.stabwerk.rechnung]]), im Erdbeben
-fuer jede Wand ([[opencivil.erdbeben.ersatzkraft]]), in den Kennzahlen
+fuer jeden Kern ([[opencivil.erdbeben.ersatzkraft]]), in den Kennzahlen
 eines Stahlquerschnitts ([[opencivil.nachweis.qa_stahl_kennzahlen]])
 – derselbe Satz.
 

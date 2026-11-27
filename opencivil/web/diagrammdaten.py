@@ -635,8 +635,8 @@ def zeichnung(bauteil) -> dict:
     Was im Schnitt zu sehen ist, in mm -- die Stäbe der Linien schon
     aufgeloest. Je Polygon die Art seines Baustoffs (``material``, ohne eine
     Aussparung) und dessen Name, je Stab und Linie Name und Stahl: daraus
-    das Bild «Querschnitt» seine Farben und seine Legende. Auch die Wände
-    eines Gebäudes im Erdbeben zeichnen sich daraus
+    das Bild «Querschnitt» seine Farben und seine Legende. Auch die Kerne
+    eines Gebäudes im Erdbeben zeichnen sich daraus, im Grundriss
     (:mod:`opencivil.web.erdbebendaten`).
     """
     return {

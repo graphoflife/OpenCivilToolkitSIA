@@ -1,5 +1,5 @@
 ---
-erzeugt: 038a486ebfd1
+erzeugt: 1aa6dbe83f5d
 art: modul
 tags: [modul]
 ---
@@ -311,6 +311,24 @@ Zuerst echte Kreuzungen von Kanten – die bedeuten immer Ueberlappung.
 Ohne sie entscheiden die Proben aus [[opencivil.querschnitt.geometrie#_ganz_in|_ganz_in]] in beide Richtungen.
 Deckungsgleiche Polygone ueberlappen.
 
+### beruehren
+
+```python
+def beruehren(p: Sequence[Punkt], q: Sequence[Punkt]) -> bool
+```
+
+Ob zwei Polygone ein Stueck Kante gemeinsam haben – laenger als
+[[opencivil.querschnitt.geometrie#Konstanten|TOLERANZ]]. Ein Punkt allein genuegt nicht: zwei Waende, die sich nur
+an einer Ecke treffen, sind nicht verbunden.
+
+### _gemeinsam
+
+```python
+def _gemeinsam(a1: Punkt, a2: Punkt, b1: Punkt, b2: Punkt) -> float
+```
+
+Wie lang zwei Strecken auf derselben Geraden uebereinander liegen – null, wo nicht.
+
 ### verschachteln
 
 ```python
@@ -581,6 +599,7 @@ Ueberdeckung, oder wenn die Linie dabei keine Laenge behielte.
 - [[opencivil.durchstanzen.bewehrung]]
 - [[opencivil.durchstanzen.mit_bewehrung]]
 - [[opencivil.durchstanzen.schnitt]]
+- [[opencivil.erdbeben.kern]]
 - [[opencivil.holzbau.querschnitt]]
 - [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.stabgrenzen]]

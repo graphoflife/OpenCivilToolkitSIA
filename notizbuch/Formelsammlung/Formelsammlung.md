@@ -1,5 +1,5 @@
 ---
-erzeugt: ce0dd70fc0e9
+erzeugt: 9264d7a18325
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -77,7 +77,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 **Erdbeben**
 
-- [[Erdbeben]] · 14
+- [[Erdbeben]] · 16
 
 **Decken**
 
@@ -105,6 +105,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Arbeitsgleiche Knotenkräfte]]
 - [[Aufnehmbare Risskraft]] · $N_{s,adm,2,x}$
 - [[Aufnehmbares Moment der Bewehrung]] · $M_{s,adm,2,x}$
+- [[Auslenkung aus einem Geschoss]]
 - [[Auslenkung des Dachs]] · $u_x$
 - [[Äusserer Widerstand auf Druck]] · $R_{a,k}$
 - [[Äusserer Widerstand auf Zug]] · $R_{a,k,Z}$
@@ -167,7 +168,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Biegelinie eines Stabs im Raum]]
 - [[Biegespannung im Holz]] · $\sigma_{m,y,d}$
 - [[Biegesteifigkeit]] · $EI_{\text{Q1}}$
-- [[Biegesteifigkeit der Wände]] · $EI_x$
+- [[Biegesteifigkeit des Kerns]]
 - [[Biegesteifigkeit des Pfahls]] · $EI$
 - [[Biegesteifigkeit einer Verbundstütze für die Schlankheit]] · $(EI)_{eff,\lambda,z}$
 - [[Biegesteifigkeit um y]] · $EI_{y}$
@@ -505,6 +506,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Tragfähigkeitsfaktor N_q]] · $N_q$
 - [[Tragfähigkeitsfaktor N_γ]] · $N_{\gamma}$
 - [[Tragfähigkeitsformel undrainiert]]
+- [[Trägheitsmomente des Kerns]]
 - [[Trägheitsmomente eines Polygons, bezogen auf den Schwerpunkt]]
 - [[Trägheitsradius]] · $i_{g}$
 - [[Überlagerung auf Höhe der Sohle]] · $\sigma_{v,0}$
@@ -560,7 +562,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 ## Normstelle fehlt noch
 
-145 von 468 Formeln haben im Code keine Normstelle – meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle – von dort kommt sie in Bericht und Notizbuch.
+145 von 470 Formeln haben im Code keine Normstelle – meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle – von dort kommt sie in Bericht und Notizbuch.
 
 - [[Achsen eines Stabs im Raum]] · [[opencivil.stabwerk3d.herleitung|_ansaetze]]
 - [[Äquivalenter E-Modul eines Stabs]] · [[opencivil.spannungsanalyse.modul#ModulProzedur|ModulProzedur._schreiben]]

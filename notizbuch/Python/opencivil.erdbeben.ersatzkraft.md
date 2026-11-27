@@ -1,5 +1,5 @@
 ---
-erzeugt: a785d2504ee4
+erzeugt: fc1c6fc66a58
 art: modul
 tags: [modul]
 ---
@@ -9,12 +9,12 @@ tags: [modul]
 
 ## VERANTWORTUNG
 
-Das [[opencivil.erdbeben.ersatzkraft#Gebaeude|Gebaeude]] – Standort, Verhaltensbeiwerte, Geschosse und
-Tragwaende als Vorgaben im Rechenwerk – und seine Rechnung
+Das [[opencivil.erdbeben.ersatzkraft#Gebaeude|Gebaeude]] – Standort, Verhaltensbeiwerte und Geschosse mit
+ihrem Kern als Vorgaben im Rechenwerk – und seine Rechnung
 [[opencivil.erdbeben.ersatzkraft#Ersatzkraft|Ersatzkraft]]: je Hauptrichtung x und y die Grundschwingzeit, der
 Wert des Bemessungsspektrums, die Ersatzkraft und ihre Verteilung auf die
-Geschosse und auf die Waende. Ob das Verfahren gilt (16.5.2.1), sagen die
-Urteile: je Richtung T_1 \<= 4 T_C (39), mit seinem Erfuellungsgrad, und –
+Geschosse und, am Fuss, auf die Teile des Kerns. Ob das Verfahren gilt
+(16.5.2.1), sagen die Urteile: je Richtung T_1 \<= 4 T_C (39), mit seinem Erfuellungsgrad, und –
 nur wo Grund- oder Aufriss nicht regelmaessig sind – eines dazu, rot. Was
 eines davon verfehlt, gilt fuer das ganze Gebaeude: die Norm verlangt (39) in
 beiden Richtungen.
@@ -23,8 +23,8 @@ DAS VERFAHREN, je Richtung:
 
 ```
 W_i  = G_k,i + psi_2,i * Q_k,i                    Gewicht des Geschosses i
-EI   = Summe n * eta_EI * E_cm * I                die Waende dieser Richtung
-u    = Summe W_i * z_i^2 * (3 H - z_i) / (6 EI)   Kopf des Kragarms unter den W_i
+EI_i = eta_EI,i * E_cm,i * I_i                    sein Kern in dieser Richtung
+u    = Summe Delta u_i (:mod:`.kragarm`)          Kopf des Kragarms unter den W_i
 T_1  = 2 * sqrt(u)                                (40), u in m, T_1 in s
 S_d  = (31) bis (34)
 F_d  = S_d * Summe W_i                            (41)
@@ -33,24 +33,28 @@ V_i  = Summe_(j >= i) F_dj                        unter dem Geschoss i
 M_i  = Summe_(j >= i) F_dj * (z_j - z_(i-1))      ebenda; M_1 = M_0 am Fuss
 ```
 
-Die Waende einer Richtung stehen als ein Kragarm da, eingespannt am Fuss und
-so hoch wie das Gebaeude; das Gewicht eines Geschosses wirkt waagrecht auf
-der Hoehe seiner Decke, z_i ueber der Einspannung (16.5.2.3). Jede Wand
-traegt von Querkraft und Moment am Fuss ihren Anteil an EI.
+Der Kern steht je Richtung als ein Kragarm da, eingespannt am Fuss und so
+hoch wie das Gebaeude, in jedem Geschoss mit dessen EI; das Gewicht eines
+Geschosses wirkt waagrecht auf der Hoehe seiner Decke, z_i ueber der
+Einspannung (16.5.2.3). Besteht der Kern am Fuss aus getrennten Teilen,
+traegt jeder von Querkraft und Moment dort seinen Anteil an EI.
 
 
-## DIE WAND IM GRUNDRISS
+## DER KERN IM GRUNDRISS
 
-Ihr Querschnitt kommt aus einer Querschnittsanalyse, gezeichnet in y und z.
-Bei 0 Grad liegt y in x des Gebaeudes: eine Kraft in x biegt sie um z, mit
-I_z, eine in y mit I_y. Bei 90 Grad ist es umgekehrt ([[opencivil.erdbeben.ersatzkraft#Wandlage.traegheit|Wandlage.traegheit]]),
-und im Bild liegt sie um 90 Grad gedreht ([[opencivil.erdbeben.ersatzkraft#Wandlage.im_grundriss|Wandlage.im_grundriss]]).
+Je Geschoss eine Querschnittsanalyse: der ganze Kern mit allen Waenden in x
+und in y, gezeichnet, wie er im Grundriss liegt – y der Analyse liegt in x
+des Gebaeudes, z in y (Benutzer, 2026-11-27). Eine Kraft in x biegt ihn um
+z, mit I_z, eine in y um y, mit I_y ([[opencivil.erdbeben.ersatzkraft#traegheit|traegheit]]). Getrennte Teile
+zaehlen je um ihren eigenen Schwerpunkt ([[opencivil.erdbeben.kern|.kern]]).
 
 
 ## NACH VORGABE, NICHT NACHGESCHLAGEN (auch in TODO)
 
-- die Verteilung auf die Waende nach ihrer Biegesteifigkeit;
-- nur die Biegung der Waende verformt, weder Schub noch Fundament;
+- getrennte Teile des Kerns je um ihren eigenen Schwerpunkt, ohne
+  Steiner-Anteil zwischen ihnen ([[opencivil.erdbeben.kern|.kern]]);
+- die Verteilung auf die Teile am Fuss nach ihrer Biegesteifigkeit;
+- nur die Biegung des Kerns verformt, weder Schub noch Fundament;
 - eta_EI = 0.5 als Anteil der ungerissenen Steifigkeit – verlangt ist nur
   eine mittlere Steifigkeit bis zum Fliessbeginn (16.5.5.2). Nicht kappa:
   das ist in der Querschnittsanalyse die Kruemmung und in SIA 262:2025 die
@@ -81,8 +85,18 @@ def duktile_waende(richtungen: Sequence[str]) -> str
 
 Der Hinweis, wo q duktiles Verhalten heisst: fuer schlanke Tragwaende
 gelten dann eigene Bemessungswerte (SIA 262:2025, 4.3.9.4), die diese
-Rechnung nicht kennt – die Kraefte je Wand sind nicht schon die der
-Bemessung.
+Rechnung nicht kennt – die Kraefte am Kern und an seinen Teilen sind
+nicht schon die der Bemessung.
+
+### gewicht
+
+```python
+def gewicht(G_k: float, Q_k: float, psi_2: float) -> float
+```
+
+Was von einem Geschoss im Beben mitschwingt: W = G_k + psi_2 Q_k
+(16.5.2.3) – SI. Die Rechnung nimmt es von hier, das Bild eines
+Gebaeudes, das noch nicht rechnet, auch ([[opencivil.web.erdbebendaten]]).
 
 ### Erdbebenzone
 
@@ -180,46 +194,14 @@ Der Bedeutungsbeiwert fuer die Tragsicherheit.
 def erklaerung(self) -> str
 ```
 
-### Wandlage
+### traegheit
 
 ```python
-class Wandlage(Wahl)
+def traegheit(richtung: str) -> str
 ```
 
-Wie eine Wand im Grundriss liegt: wie in ihrer Querschnittsanalyse gezeichnet oder gedreht.
-
-- `NULL = '0'`
-- `NEUNZIG = '90'`
-
-#### Wandlage.beschriftung
-
-```python
-@property
-def beschriftung(self) -> str
-```
-
-#### Wandlage.erklaerung
-
-```python
-@property
-def erklaerung(self) -> str
-```
-
-#### Wandlage.traegheit
-
-```python
-def traegheit(self, richtung: str) -> str
-```
-
-Welches Traegheitsmoment eine Kraft in `richtung` biegt: `I_z` oder `I_y`.
-
-#### Wandlage.im_grundriss
-
-```python
-def im_grundriss(self, y: float, z: float) -> Tuple[float, float]
-```
-
-Wo der Punkt (y, z) der Querschnittsanalyse im Grundriss liegt, als (x, y).
+Welches Traegheitsmoment des Kerns eine Kraft in `richtung` biegt: in x
+`I_z`, in y `I_y` – y der Querschnittsanalyse liegt in x des Gebaeudes.
 
 ### Schwingzeit
 
@@ -229,7 +211,7 @@ class Schwingzeit(Wahl)
 
 Woher die Grundschwingzeit kommt.
 
-- `WAENDE = 'waende'`
+- `KERN = 'kern'`
 - `HAND = 'hand'`
 
 #### Schwingzeit.beschriftung
@@ -274,45 +256,15 @@ def als_dict(self) -> dict
 class Geschoss
 ```
 
-Ein Geschoss, von unten gezaehlt: Hoehe und Lasten.
+Ein Geschoss, von unten gezaehlt: Hoehe, Lasten und sein Kern.
 
 - `name: str`
 - `h: Groesse`
 - `G_k: Groesse`
 - `Q_k: Groesse`
 - `psi_2: Groesse`
-
-### Wandquerschnitt
-
-```python
-@dataclass(frozen=True)
-class Wandquerschnitt
-```
-
-Was eine Wand aus ihrer Querschnittsanalyse nimmt: Namen und die Wert-IDs.
-
-- `analyse: str` – Der Name der Querschnittsanalyse.
-- `beton: str` – Der Name ihres Betons.
-- `I_y: str`
-- `I_z: str`
-- `I_yz: str`
-- `E_cm: str`
-
-### Wand
-
-```python
-@dataclass(frozen=True)
-class Wand
-```
-
-Eine oder mehrere gleiche Tragwaende – `nummer` ist ihr Platz in der Liste, ab 1.
-
-- `nummer: int`
-- `name: str`
-- `lage: Wandlage`
-- `n: Groesse`
 - `eta_EI: Groesse`
-- `querschnitt: Wandquerschnitt`
+- `kern: Optional[str] = None` – Die Kennung der Querschnittsanalyse seines Kerns – `None` ohne Kern.
 
 ### Gebaeude
 
@@ -321,9 +273,10 @@ Eine oder mehrere gleiche Tragwaende – `nummer` ist ihr Platz in der Liste, ab
 class Gebaeude(Rechenobjekt)
 ```
 
-Ein Gebaeude im Erdbeben: die Eingaben als Vorgaben im Rechenwerk. Die
-Geschosse liegen von unten nach oben; `waende` sind nur die, die
-rechnen – ihre Querschnittsanalyse rechnet und hat einen Beton.
+Ein Gebaeude im Erdbeben: die Eingaben als Vorgaben im Rechenwerk, dazu
+je Kern seine Traegheitsmomente ([[opencivil.erdbeben.kern#Kern|Kern]]). Die Geschosse
+liegen von unten nach oben; `kerne` sind nur die, die rechnen – ihre
+Querschnittsanalyse rechnet und hat einen Beton.
 
 - `WAS = 'Gebäude'`
 - `name: str`
@@ -338,10 +291,29 @@ rechnen – ihre Querschnittsanalyse rechnet und hat einen Beton.
 - `T1_x: Groesse`
 - `T1_y: Groesse`
 - `geschosse: Sequence[Geschoss]`
-- `waende: Sequence[Wand]`
+- `kerne: Mapping[str, Kerndaten]` – Je Kennung einer Querschnittsanalyse, die ein Geschoss als Kern nimmt, was sie gibt.
 - `praefix: str`
 - `definitionen: Dict[str, WertDef] = field(default_factory=dict, init=False)`
 - `berechnungen: List[Berechnung] = field(default_factory=list, init=False)`
+- `kernrechnungen: Dict[str, Kern] = field(default_factory=dict, init=False)` – Je Kern seine Traegheitsmomente – unter dem Gebaeude, in seiner Herleitung.
+
+#### Gebaeude.mit_kern
+
+```python
+@property
+def mit_kern(self) -> bool
+```
+
+Ob die Geschosse einen Kern haben – dann jedes, sonst rechnet das Gebaeude nicht.
+
+#### Gebaeude.fusskern
+
+```python
+@property
+def fusskern(self) -> Optional[Kern]
+```
+
+Der Kern des untersten Geschosses – auf ihn verteilen sich die Kraefte am Fuss.
 
 #### Gebaeude.abschnitt
 
@@ -352,40 +324,20 @@ def abschnitt(self) -> Abschnitt
 
 Ueberschrift, unter der das Gebaeude in der Herleitung steht.
 
-### Wandanteil
+### Kernanteil
 
 ```python
 @dataclass(frozen=True)
-class Wandanteil
+class Kernanteil
 ```
 
-Was eine Wand einer Richtung traegt – je eine von `n` gleichen; SI-Einheiten.
+Was ein getrennter Teil des Kerns am Fuss in einer Richtung traegt; SI-Einheiten.
 
-- `nummer: int`
-- `name: str`
-- `n: int`
-- `EI: float` – Die Biegesteifigkeit einer Wand in dieser Richtung, N m².
-- `anteil: float` – Ihr Anteil an EI der Richtung – einer Wand, nicht aller n.
+- `nummer: int` – Sein Platz unter den Teilen, ab 1 ([[opencivil.erdbeben.kern#Kernteil|Kernteil]]).
+- `I: float` – Sein Traegheitsmoment in dieser Richtung, um seinen eigenen Schwerpunkt, m⁴.
+- `anteil: float` – Sein Anteil an EI am Fuss – E_cm und eta_EI gelten fuer alle Teile gleich.
 - `V: float` – Die Querkraft am Fuss, N.
 - `M: float` – Das Moment am Fuss, N m.
-
-### querkraefte
-
-```python
-def querkraefte(kraefte: Sequence[float]) -> Tuple[float, ...]
-```
-
-Je Geschoss, von unten, die Querkraft unter ihm: die Kraefte von dort bis oben.
-
-### momente
-
-```python
-def momente(kraefte: Sequence[float], z: Sequence[float]) -> Tuple[float, ...]
-```
-
-Je Geschoss, von unten, das Moment unter ihm, auf der Hoehe der Decke
-darunter: die Kraefte von dort bis oben, je mal ihr Abstand. Am Fuss ist
-es das Kippmoment M_0 – der Kragarm ist dort eingespannt.
 
 ### Richtungsbefund
 
@@ -406,8 +358,8 @@ Was eine Hauptrichtung ergab, in SI-Einheiten. Die Kraefte je Geschoss von unten
 - `S_d_1: float`
 - `F_d_1: float`
 - `M_0_1: float` – Dasselbe mit q = 1.0, fuer Abheben und Kippen (16.5.1.9).
-- `EI: float` – Die Biegesteifigkeit aller Waende dieser Richtung, N m² – null ohne Wand.
-- `waende: Tuple[Wandanteil, ...]`
+- `EI: Tuple[float, ...]` – Je Geschoss, von unten, die Biegesteifigkeit seines Kerns, N m² – leer ohne Kern.
+- `teile: Tuple[Kernanteil, ...]` – Je getrenntem Teil des Kerns am Fuss, was er traegt – leer, wo er zusammenhaengt.
 
 ### Erdbebenbefund
 
@@ -422,7 +374,7 @@ Was die Rechnung ergab: Hoehen und Gewichte der Geschosse und je Richtung, was g
 - `W: Tuple[float, ...]` – Die Gewichte, N.
 - `richtungen: Tuple[Richtungsbefund, ...]` – Je Richtung, die sich rechnen liess.
 - `gruende: Tuple[str, ...] = ()` – Warum das Verfahren nicht gilt – leer, wo es gilt (16.5.2.1).
-- `hinweise: Tuple[str, ...] = ()` – Was die Rechnung grau dazu sagt: je Querschnittsanalyse, deren y und z keine Hauptachsen sind, ein Satz – und wo q duktiles Verhalten heisst, was das fuer die Waende bedeutet.
+- `hinweise: Tuple[str, ...] = ()` – Was die Rechnung grau dazu sagt: je Kern, dessen y und z keine Hauptachsen sind, ein Satz – und wo q duktiles Verhalten heisst, was das fuer die Waende bedeutet.
 
 #### Erdbebenbefund.zulaessig
 
@@ -501,9 +453,10 @@ Je Geschoss seine Hoehe ueber der Einspannung und sein Gewicht, von unten – SI
 def hauptachsen(self) -> Tuple[str, ...]
 ```
 
-Je Querschnittsanalyse einer Wand, deren y und z merklich keine
-Hauptachsen sind, der Hinweis – derselbe wie im Raum
-([[opencivil.stabwerk.stabquerschnitt#keine_hauptachsen|keine_hauptachsen]]).
+Je Kern, dessen y und z merklich keine Hauptachsen sind, der Hinweis –
+derselbe wie im Raum
+([[opencivil.stabwerk.stabquerschnitt#keine_hauptachsen|keine_hauptachsen]]), mit den
+Summen ueber seine Teile.
 
 #### Lauf.duktil
 
@@ -512,7 +465,7 @@ def duktil(self) -> Tuple[str, ...]
 ```
 
 Der Hinweis zu duktil bemessenen Waenden ([[opencivil.erdbeben.ersatzkraft#duktile_waende|duktile_waende]]) –
-nur mit Wand, und in der Herleitung mit dem q, das ihn ausloest.
+nur mit Kern, und in der Herleitung mit dem q, das ihn ausloest.
 
 #### Lauf.richtung
 
@@ -525,18 +478,18 @@ Der Befund einer Richtung – `None`, wo sich T_1 nicht rechnen laesst.
 #### Lauf._steifigkeit
 
 ```python
-def _steifigkeit(self, r: str) -> Tuple[Optional[Wert], Dict[int, float]]
+def _steifigkeit(self, r: str) -> Optional[List[float]]
 ```
 
-EI aller Waende in `r` – `None` ohne Wand –, je Wand das EI einer von ihnen in N m².
+Je Geschoss, von unten, EI seines Kerns in `r`, in N m² – `None` ohne Kern.
 
 #### Lauf._schwingzeit
 
 ```python
-def _schwingzeit(self, r: str, EI: Optional[Wert]) -> Tuple[Optional[Wert], Optional[float]]
+def _schwingzeit(self, r: str, EI: Optional[List[float]]) -> Tuple[Optional[Wert], Optional[float]]
 ```
 
-T_1 von Hand oder aus den Waenden (40) – ohne Wand keine; dazu u in m.
+T_1 von Hand oder aus dem Kern (40) – ohne Kern keine; dazu u in m.
 
 #### Lauf._spektrum
 
@@ -554,13 +507,15 @@ def _kraefte(self, r: str, S_d: Wert) -> Tuple[Wert, List[float], Wert]
 
 F_d (41), die Kraefte je Geschoss (42) und das Kippmoment am Fuss.
 
-#### Lauf._waende
+#### Lauf._teile
 
 ```python
-def _waende(self, r: str, EI: float, je_wand: Dict[int, float], F_d: float, M_0: float) -> Tuple[Wandanteil, ...]
+def _teile(self, r: str, F_d: float, M_0: float) -> Tuple[Kernanteil, ...]
 ```
 
-Je Wand ihr Anteil an EI – und so viel von Querkraft und Moment am Fuss.
+Je getrenntem Teil des Kerns am Fuss sein Anteil an EI – und so viel
+von Querkraft und Moment dort. Leer, wo der Kern am Fuss
+zusammenhaengt; ohne Kern bleiben die Kraefte ohne Verteilung.
 
 #### Lauf._kippen
 
@@ -627,9 +582,8 @@ Je Richtung T_1, S_d, F_d und das Kippmoment – mit q und mit q = 1.0.
 - `_Q_HINWEIS = 'Stahlbeton nicht duktil: 1.5 mit Betonstahl A, 2.0 mit B oder C (SIA…` – Was ueber dem Verhaltensbeiwert steht – die Werte der Normen, in eigenen Worten.
 - `VORGABEN = (Gruppe('Verhaltensbeiwert', lambda: tuple((Feld(f'q_{r}', f'q_{r}', …` – Die Vorgaben des Gebaeudes, je Kasten der Herleitung und Karte der Maske ([[opencivil.core.vorgaben]]).
 - `GESCHOSS = 'Geschoss'`
-- `WAND = 'Wand'`
-- `JE_GESCHOSS = (Gruppe(GESCHOSS, lambda: (Feld('h', 'h', M, 'Höhe des Geschosses', 2…` – Die Vorgaben jedes Geschosses, je mit seiner Nummer von unten.
-- `JE_WAND = (Gruppe(WAND, lambda: (Feld('n', 'n', EINHEITSLOS, 'Anzahl gleicher W…` – Die Vorgaben jeder Wand, je mit ihrer Nummer in der Liste.
+- `KERN = 'Kern'`
+- `JE_GESCHOSS = (Gruppe(GESCHOSS, lambda: (Feld('h', 'h', M, 'Höhe des Geschosses', 2…` – Die Vorgaben jedes Geschosses, je mit seiner Nummer von unten: Hoehe und Lasten, dann was von seinem Kern gilt – je eine Kachel der Maske.
 
 ## Braucht
 
@@ -642,6 +596,8 @@ Je Richtung T_1, S_d, F_d und das Kippmoment – mit q und mit q = 1.0.
 - [[opencivil.core.vorgaben]]
 - [[opencivil.core.wahl]]
 - [[opencivil.core.wert]]
+- [[opencivil.erdbeben.kern]]
+- [[opencivil.erdbeben.kragarm]]
 - [[opencivil.material.basis]]
 - [[opencivil.stabwerk.stabquerschnitt]]
 
@@ -655,12 +611,13 @@ Je Richtung T_1, S_d, F_d und das Kippmoment – mit q und mit q = 1.0.
 
 ## Formeln aus diesem Modul
 
+- [[Auslenkung aus einem Geschoss]] · `Lauf._schwingzeit`
 - [[Auslenkung des Dachs]] · `Lauf._schwingzeit`
 - [[Bemessungsspektrum (31)]] · `Lauf._spektrum`
 - [[Bemessungsspektrum (32)]] · `Lauf._spektrum`
 - [[Bemessungsspektrum (33)]] · `Lauf._spektrum`
 - [[Bemessungsspektrum (34)]] · `Lauf._spektrum`
-- [[Biegesteifigkeit der Wände]] · `Lauf._steifigkeit`
+- [[Biegesteifigkeit des Kerns]] · `Lauf._steifigkeit`
 - [[Ersatzkraft]] · `Lauf._kippen`
 - [[Ersatzkraft]] · `Lauf._kraefte`
 - [[Ersatzkraft eines Geschosses]] · `Lauf._kraefte`

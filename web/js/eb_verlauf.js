@@ -1,18 +1,21 @@
 /**
- * eb_verlauf.js -- die Wände je Geschoss, Querkraft und Moment über die Höhe.
+ * eb_verlauf.js -- der Kern je Geschoss, Querkraft und Moment über die Höhe.
  *
- * Ein Bild in der Höhe der Ansicht (eb_zeichnung.js): links je Geschoss die
- * Wände im Grundriss, nebeneinander und alle im selben Massstab -- sie haben
- * keinen Ort im Grundriss, und sie gehen über die ganze Höhe. Daneben je
- * Richtung, die der Kern gerechnet hat, die Querkraft V als Treppe und das
- * Moment M des Kragarms, unten eingespannt: beide Richtungen im selben
- * Massstab je Grösse, in den Farben von V und M wie in allen Verläufen.
- * Angeschrieben ist je Geschoss der Wert unter ihm, wo Platz ist, sonst nur
- * der am Fuss.
+ * Ein Bild in der Höhe der Ansicht (eb_zeichnung.js): links in jedem
+ * Geschoss sein Kern im Grundriss, x nach rechts und y nach oben, alle im
+ * selben Massstab -- man sieht, wo er dünner wird oder ein Geschoss einen
+ * anderen hat (Benutzer, 2026-11-27; bis dahin standen die Wände
+ * nebeneinander, über die ganze Höhe dieselben). Im untersten stehen die
+ * Nummern seiner getrennten Teile, wo er aus mehreren besteht: so heissen
+ * sie in der Tabelle am Fuss und in der Herleitung. Daneben je Richtung,
+ * die der Kern gerechnet hat, die Querkraft V als Treppe und das Moment M
+ * des Kragarms, unten eingespannt: beide Richtungen im selben Massstab je
+ * Grösse, in den Farben von V und M wie in allen Verläufen. Angeschrieben
+ * ist je Geschoss der Wert unter ihm, wo Platz ist, sonst nur der am Fuss.
  *
- * Umrisse, Querkräfte und Momente kommen fertig aus dem Kern
- * (opencivil/web/erdbebendaten.py), die Umrisse schon gedreht nach der Lage
- * der Wand. Hier wird nur gezeichnet.
+ * Umrisse, Teile, Querkräfte und Momente kommen fertig aus dem Kern
+ * (opencivil/web/erdbebendaten.py), die Umrisse um den Schwerpunkt ihrer
+ * Analyse, wie gezeichnet. Hier wird nur gezeichnet.
  */
 
 import { karte } from './bausteine.js';
@@ -26,14 +29,14 @@ const RAND = 16;
 /** Oben Platz für die Titel der Spalten, unten für die Schraffur, in px. */
 const OBEN = 40;
 const UNTEN = 22;
-/** Die Spalten in px: die Namen der Geschosse, die Wände, die Lücke zwischen zwei Streifen. */
+/** Die Spalten in px: die Namen der Geschosse, der Kern, die Lücke zwischen zwei Streifen. */
 const NAMEN = 84;
-const WAENDE = 170;
+const KERN = 170;
 const LUECKE = 14;
 /** So breit steht ein Streifen höchstens da, in px -- und so weit reicht sein grösster Wert. */
 const STREIFEN = 140;
 const REICHWEITE = 0.8;
-/** So viel Platz bleibt in einem Geschoss über und unter den Wänden, in px. */
+/** So viel Platz bleibt in einem Geschoss über und unter dem Kern, in px. */
 const LUFT = 6;
 /** Ab dieser Höhe eines Geschosses steht sein Wert im Streifen, in px. */
 const MIT_WERT = 24;
@@ -45,44 +48,43 @@ function flaeche(punkte, klasse) {
 }
 
 /** Die Grenzen eines Umrisses, in mm: [x links, x rechts, y unten, y oben]. */
-function grenzen(wand) {
-  const punkte = wand.polygone.flatMap((p) => p.punkte);
+function grenzen(kern) {
+  const punkte = kern.polygone.flatMap((p) => p.punkte);
   const xs = punkte.map((p) => p[0]);
   const ys = punkte.map((p) => p[1]);
   return [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)];
 }
 
 /**
- * Die Wände in jedem Geschoss, nebeneinander ab `x0` und alle im selben
- * Massstab -- so gross, wie das niedrigste Geschoss und die Spalte es
- * zulassen. `baender` sind je Geschoss [oben, unten] in px. Dazu die Mitte
- * jeder Wand, für ihre Nummer über der Spalte.
+ * Der Kern jedes Geschosses in seinem Band, in der Spalte ab `x0` und alle
+ * im selben Massstab -- so gross, wie der grösste Kern, das niedrigste
+ * Geschoss mit Kern und die Spalte es zulassen. `kerne` sind je Geschoss
+ * sein Grundriss aus dem Kern der Software oder nichts, `baender` je
+ * Geschoss [oben, unten] in px. Im untersten stehen die Nummern der Teile.
  */
-function waende(grundrisse, baender, x0) {
-  const rahmen = grundrisse.map(grenzen);
-  const breit = rahmen.reduce((summe, [a, b]) => summe + (b - a), 0);
-  const hoch = Math.max(...rahmen.map(([, , c, d]) => d - c));
-  const niedrig = Math.min(...baender.map(([oben, unten]) => unten - oben));
-  const luecken = LUECKE * (grundrisse.length - 1);
-  const s = Math.min((niedrig - 2 * LUFT) / (hoch || 1), (WAENDE - luecken) / (breit || 1));
-  if (!(s > 0)) return { teile: [], mitten: [] };
-  let x = x0 + (WAENDE - breit * s - luecken) / 2;
-  const mitten = rahmen.map(([a, b]) => {
-    const mitte = x + ((b - a) * s) / 2;
-    x += (b - a) * s + LUECKE;
-    return mitte;
-  });
-  const teile = baender.flatMap(([oben, unten]) => grundrisse.flatMap((wand, k) => {
-    const [a, b, c, d] = rahmen[k];
-    const [mx, my] = [mitten[k], (oben + unten) / 2];
+function kernbilder(kerne, baender, x0) {
+  const mit = kerne.map((k, i) => [k, i]).filter(([k]) => k);
+  const rahmen = new Map(mit.map(([k]) => [k, grenzen(k)]));
+  const breit = Math.max(...[...rahmen.values()].map(([a, b]) => b - a));
+  const hoch = Math.max(...[...rahmen.values()].map(([, , c, d]) => d - c));
+  const niedrig = Math.min(...mit.map(([, i]) => baender[i][1] - baender[i][0]));
+  const s = Math.min((niedrig - 2 * LUFT) / (hoch || 1), KERN / (breit || 1));
+  if (!(s > 0)) return [];
+  return mit.flatMap(([kern, i]) => {
+    const [a, b, c, d] = rahmen.get(kern);
+    const [oben, unten] = baender[i];
+    const [mx, my] = [x0 + KERN / 2, (oben + unten) / 2];
     const punkt = ([X, Y]) => [mx + (X - (a + b) / 2) * s, my - (Y - (c + d) / 2) * s];
-    const name = `${wand.name}${wand.n > 1 ? ` (${wand.n}×)` : ''}`;
-    return [...wand.polygone].sort((p, q) => p.tiefe - q.tiefe).map((p) => mitTitel(
+    const flaechen = [...kern.polygone].sort((p, q) => p.tiefe - q.tiefe).map((p) => mitTitel(
       flaeche(p.punkte.map(punkt), p.material ? `cad-${p.material}` : 'cad-loch'),
-      [`${name}: ${p.stoff || 'Aussparung'}`],
+      [`${kern.name}: ${p.stoff || 'Aussparung'}`],
     ));
-  }));
-  return { teile, mitten };
+    const nummern = i === 0 ? kern.teile.map((t) => {
+      const [x, y] = punkt(t.mitte);
+      return text(x, y + 4, [String(t.nummer)], { anker: 'middle', klasse: 'eb-teilnummer' });
+    }) : [];
+    return [...flaechen, ...nummern];
+  });
 }
 
 /**
@@ -120,41 +122,39 @@ function streifen(x0, breite, werte, z, y, k, { treppe, klasse, stellen }) {
 }
 
 /**
- * Die Karte «Wände, Querkraft und Moment» eines Gebäudes -- oder nichts,
+ * Die Karte «Kern, Querkraft und Moment» eines Gebäudes -- oder nichts,
  * solange es nichts zu zeigen gibt. `d` ist, was der Kern zeichnet, `a`
- * der Aufriss der Ansicht: dieselben Höhen im selben Massstab.
+ * der Aufriss der Ansicht: dieselben Höhen im selben Massstab. Den Kern
+ * eines Geschosses nennt der Eintrag, seinen Grundriss der Kern der
+ * Software -- nur, wo er rechnet.
  */
 export function verlaufKarte(h, d, a) {
-  const grundrisse = (d?.grundrisse || []).filter(Boolean);
+  const kerne = h.geschosse.map((g) => d?.grundrisse?.[g.kern] || null);
+  const mitKern = kerne.some(Boolean);
   const richtungen = d?.richtungen || [];
-  if (!h.geschosse.length || (!grundrisse.length && !richtungen.length)) return null;
+  if (!h.geschosse.length || (!mitKern && !richtungen.length)) return null;
   const { z, m, hoch } = a;
   const fuss = RAND + OBEN + hoch;
   const y = (hoehe) => fuss - hoehe * m;
   const baender = z.map((zi, i) => [y(zi), y(i ? z[i - 1] : 0)]);
-  const xWaende = RAND + NAMEN;
-  const xStreifen = xWaende + (grundrisse.length ? WAENDE + 2 * LUECKE : 0);
+  const xKern = RAND + NAMEN;
+  const xStreifen = xKern + (mitKern ? KERN + 2 * LUECKE : 0);
   const anzahl = 2 * richtungen.length;
   const breite = Math.min(STREIFEN, (BREITE - RAND - xStreifen - LUECKE * (anzahl - 1)) / (anzahl || 1));
   const svg = svgEl('svg', {
     viewBox: `0 0 ${BREITE} ${fuss + UNTEN + RAND}`, class: 'gb-bild', role: 'img',
-    'aria-label': `Wände, Querkraft und Moment des Gebäudes ${h.name}`,
+    'aria-label': `Kern, Querkraft und Moment des Gebäudes ${h.name}`,
   });
   const rechtsAussen = xStreifen + anzahl * (breite + LUECKE);
   // Die Decken als zarte Linien über alles: ein Geschoss liest sich quer.
-  svg.append(...z.map((zi) => linie([[xWaende, y(zi)], [rechtsAussen, y(zi)]], 'gb-hilfslinie')));
+  svg.append(...z.map((zi) => linie([[xKern, y(zi)], [rechtsAussen, y(zi)]], 'gb-hilfslinie')));
   h.geschosse.forEach((g, i) => {
     const [oben, unten] = baender[i];
     svg.append(text(RAND, (oben + unten) / 2 + 4, [g.name], { klasse: 'eb-name' }));
   });
-  if (grundrisse.length) {
-    const { teile, mitten } = waende(grundrisse, baender, xWaende);
-    svg.append(
-      text(xWaende, RAND + 12, ['Wände'], { klasse: 'eb-titel' }),
-      ...mitten.map((x, k) => text(x, RAND + OBEN - 8, [String(grundrisse[k].nummer)],
-        { anker: 'middle', klasse: 'gb-masstext' })),
-      ...teile,
-    );
+  if (mitKern) {
+    svg.append(text(xKern, RAND + 12, ['Kern'], { klasse: 'eb-titel' }),
+      ...kernbilder(kerne, baender, xKern));
   }
   // Je Grösse ein Massstab für beide Richtungen: man sieht, wo das Beben stärker angreift.
   const k = (feld) => (REICHWEITE * breite) / Math.max(1e-9, ...richtungen.flatMap((r) => r[feld]));
@@ -170,10 +170,10 @@ export function verlaufKarte(h, d, a) {
     );
   });
   svg.append(
-    schraffur([[[xWaende, fuss + 1], [rechtsAussen, fuss + 1]]]),
-    linie([[xWaende, fuss], [rechtsAussen, fuss]], 'gb-gelaende'),
+    schraffur([[[xKern, fuss + 1], [rechtsAussen, fuss + 1]]]),
+    linie([[xKern, fuss], [rechtsAussen, fuss]], 'gb-gelaende'),
   );
-  return karte('Wände, Querkraft und Moment', [
+  return karte('Kern, Querkraft und Moment', [
     el('div.gb-bildhuelle', {}, [svg]),
     legende(d.verlaufslegende || []),
   ], { bild: svg, klasse: 'ist-breit' });

@@ -93,7 +93,7 @@ class Beschreibung:
 
     ``BEZEICHNUNG``, wo es sie gibt, nennt den Eintrag in Meldungen so wie
     die Oberflaeche: «Platte 'Decke'». ``IM_ORT`` nennt ein Element einer
-    Liste mit dem Wort der Maske: mit Namen «Wand 'W1'», ohne mit seiner
+    Liste mit dem Wort der Maske: mit Namen «Geschoss 'EG'», ohne mit seiner
     Nummer, «Lage 2».
 
     Ein Wahlfeld haelt das Mitglied seiner Wahl; wer Text zuweist -- die

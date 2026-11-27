@@ -1,5 +1,5 @@
 ---
-erzeugt: cdf46a6b6430
+erzeugt: 1aed4cd7fe0a
 art: modul
 tags: [modul]
 ---
@@ -474,6 +474,7 @@ Leser sieht alle Zweige und erkennt, welcher gegriffen hat.
 - [[opencivil.decke.herleitung]]
 - [[opencivil.durchstanzen.nachweis]]
 - [[opencivil.erdbeben.ersatzkraft]]
+- [[opencivil.erdbeben.kern]]
 - [[opencivil.geotechnik.fundament]]
 - [[opencivil.geotechnik.grundbruch]]
 - [[opencivil.geotechnik.setzung]]

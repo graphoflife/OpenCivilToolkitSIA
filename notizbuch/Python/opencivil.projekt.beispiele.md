@@ -1,5 +1,5 @@
 ---
-erzeugt: e0bd66e7cc1e
+erzeugt: b49b617fe845
 art: modul
 tags: [modul]
 ---
@@ -146,15 +146,15 @@ def _gebaeude(p: Projekt) -> None
 ```
 
 Was das Wohnhaus des Beispiels nie zeigt. Ein Lager mit T_1 von Hand und
-ohne Wand – die Kraefte je Geschoss bleiben ohne Verteilung –, in
+ohne Kern – die Kraefte je Geschoss bleiben ohne Verteilung –, in
 Zone Z3b auf Baugrund E, Bauwerksklasse III: in x liegt T_1 unter T_B
 (31), in y zwischen T_C und T_D (33) und ueber 4 T_C, (39) geht dort
 nicht auf. Sein Grundriss ist nicht regelmaessig und das Dach schwerer
 als das Erdgeschoss: das Verfahren gilt nicht. Ein schlanker Turm auf
-einer Winkelwand, deren y und z keine Hauptachsen sind – in y schwingt
-er langsamer als T_D (34) –, duktil bemessen mit q = 3.0: dafuer steht
-der graue Satz zu den Waenden. Und ein Gebaeude, dessen Wand noch keinen
-Querschnitt hat: es rechnet nicht.
+einem Kern aus einer Winkelwand, deren y und z keine Hauptachsen sind,
+oben duenner als unten – in y schwingt er langsamer als T_D (34) –,
+duktil bemessen mit q = 3.0: dafuer steht der graue Satz zu den Waenden.
+Und ein Gebaeude, dessen Dach noch keinen Kern hat: es rechnet nicht.
 
 ### _tragwand
 
@@ -162,7 +162,16 @@ Querschnitt hat: es rechnet nicht.
 def _tragwand(kennung: str, name: str, ecken: list, beton: str) -> QuerschnittsanalyseEintrag
 ```
 
-Eine Wand fuer das Erdbeben: ein Polygon aus Beton, ohne Lastfall.
+Ein Kern fuer das Erdbeben: ein Polygon aus Beton, ohne Bewehrung und ohne Lastfall.
+
+### _wand
+
+```python
+def _wand(a: QuerschnittsanalyseEintrag, y1: float, z1: float, y2: float, z2: float, *, beton: str, stahl: str) -> None
+```
+
+Eine Wand eines Kerns: ein Rechteck von (y1, z1) bis (y2, z2) in mm, an
+beiden langen Seiten Staebe ⌀ 12 alle 150 mm, die Achsen 50 mm vom Rand.
 
 ### _erstes
 

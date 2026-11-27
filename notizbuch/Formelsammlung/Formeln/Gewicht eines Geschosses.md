@@ -29,7 +29,7 @@ Was im Beben mitschwingt: das ständige Gewicht des Geschosses und der
 quasi-ständige Teil seiner Nutzlast, $\psi_2 \cdot Q_k$ – dieselbe Summe
 nimmt die Norm für die Auslenkung (16.5.2.3) und für die Verteilung (42).
 Das Gewicht sitzt auf der Höhe seiner Decke, $z_i$, gezählt ab der Ebene, in
-der das Beben angreift: der Einspannung der Wände. Bei steifen
+der das Beben angreift: der Einspannung des Kerns. Bei steifen
 Untergeschossen darf sie auf dem Erdgeschoss liegen (16.5.1.7); dann gehören
 die Untergeschosse nicht in die Liste, die Kräfte sind aber bis in den
 Baugrund zu verfolgen.

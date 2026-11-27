@@ -411,10 +411,13 @@ function felderDer(g, eintrag) {
 
 /**
  * Alle Felder der Vorgaben eines Eintrags, über die Gruppen hinweg -- für
- * eine Maske ohne Karten, etwa eine Zeile je Schicht.
+ * eine Maske ohne Karten, etwa eine Zeile je Schicht. Mit `gruppe` nur die
+ * Felder dieser Gruppe: ein Geschoss hat seine Lasten unter «Geschosse» und
+ * sein η_EI unter «Kern».
  */
-export function vorgabefelder(klasse, eintrag) {
-  return katalog('vorgaben', klasse).flatMap((g) => felderDer(g, eintrag));
+export function vorgabefelder(klasse, eintrag, gruppe = null) {
+  return katalog('vorgaben', klasse).filter((g) => gruppe === null || g.titel === gruppe)
+    .flatMap((g) => felderDer(g, eintrag));
 }
 
 /** Der Titel über einem Feld der Vorgaben: Beschreibung und Hinweis, dahinter die Normstelle. */

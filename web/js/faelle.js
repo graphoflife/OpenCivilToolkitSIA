@@ -33,6 +33,10 @@ import { naechsterName, zustand } from './zustand.js';
  * Schalters da, wo es keinen gibt: die Nummer einer Schicht -- eine Schicht
  * lässt sich nicht ausschalten, ohne dass die darunter nach oben rückten.
  *
+ * Mit `nameFest` steht der Name nur da, ohne Feld, und ohne `entfernen`
+ * fehlt das Kreuz: die Geschosse eines Gebäudes in der Kachel «Kern» --
+ * Name und Folge gehören dort den Geschossen, der Kern wählt nur je eines.
+ *
  * `liste` sagt, wo der Fall steht -- `{ kennung, pfad, index }`, das Bauteil,
  * seine Liste («knickfaelle», «verformung.faelle») und die Stelle darin.
  * Dann weist das Namensfeld einen Namen ab, der dort schon vergeben ist, und
@@ -45,8 +49,9 @@ import { naechsterName, zustand } from './zustand.js';
  * dritt, ein Fall von Knicken und Kippen bricht vor den Momenten um.
  */
 export function fallzeile({
-  fall, aendern, was, nameTitel, zahlen, entfernen, entfernenTitel, liste = null,
+  fall, aendern, was, nameTitel, zahlen, entfernen = null, entfernenTitel = '', liste = null,
   oben = null, unten = null, spalten = zahlen.length, schmal = null, klasse = '', vorn = null,
+  nameFest = false,
 }) {
   const an = vorn !== null || fall.aktiv !== false;
   const schalter = vorn
@@ -57,7 +62,7 @@ export function fallzeile({
     style: spaltenstil(spalten, schmal),
   }, [
     schalter,
-    namensfeld({
+    nameFest ? el('span.fall-name', { text: fall.name, title: nameTitel }) : namensfeld({
       wert: fall.name, titel: nameTitel, klasse: '.fall-name',
       pruefen: liste ? (name) => nameFrei(liste, name) : undefined,
       setzen: (name) => aendern((x) => { x.name = name; }),
@@ -65,7 +70,8 @@ export function fallzeile({
     oben ? el('div.fall-oben', {}, [oben]) : null,
     el('div.fall-zahlen', {}, zahlen),
     unten ? el('div.fall-unten', {}, unten) : null,
-    el('button.weg.fall-weg', { text: '×', title: entfernenTitel, on: { click: entfernen } }),
+    entfernen ? el('button.weg.fall-weg', { text: '×', title: entfernenTitel, on: { click: entfernen } })
+      : null,
   ]);
 }
 
@@ -118,8 +124,10 @@ export function formelkopf(zeichen, einheit = '') {
  *
  * Steht unter der Liste und nicht in der Überschrift: dort ist die Stelle,
  * an der die nächste Zeile erscheint, und ein Knopf gehört dorthin, wo seine
- * Wirkung sichtbar wird. Über die ganze Breite und mit gestricheltem Rand --
- * man sieht, dass dort noch etwas hinkommt.
+ * Wirkung sichtbar wird. Wächst eine Liste nach oben -- die Geschosse eines
+ * Gebäudes, von oben nach unten wie das Gebäude --, steht er darum über ihr.
+ * Über die ganze Breite und mit gestricheltem Rand -- man sieht, dass dort
+ * noch etwas hinkommt; `titel` sagt, was er mitbringt.
  *
  * Was er anlegt, heisst wie er, mit der kleinsten freien Nummer: «+ Schicht»
  * gibt «Schicht 1», dann «Schicht 2» (Benutzer, 2026-11-20 -- bis dahin gab
@@ -127,7 +135,9 @@ export function formelkopf(zeichen, einheit = '') {
  * `name(liste)`. Nur ein Gebrauchsfall heisst nach seiner Art, «Häufig 1»:
  * so will es der Benutzer.
  */
-export function anfuegenKnopf(text, tun) {
+export function anfuegenKnopf(text, tun, { titel = null } = {}) {
   const name = (liste) => naechsterName(text, liste);
-  return el('button.knopf-anfuegen', { type: 'button', text: `+ ${text}`, on: { click: () => tun(name) } });
+  return el('button.knopf-anfuegen', {
+    type: 'button', text: `+ ${text}`, title: titel, on: { click: () => tun(name) },
+  });
 }
