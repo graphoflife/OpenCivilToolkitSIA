@@ -20,6 +20,18 @@ sammeln sie sich hier, je mit dem, was vorläufig gebaut ist.
       «Querschnittsanalyse» drei Zeilen («Quer-schnitts-analyse»), die
       anderen höchstens zwei. Vorschlag: so lassen, die Reihe ist nur so
       hoch wie nötig. Sonst etwa «Querschnitt». Vorläufig mit Trennstellen.
+- [ ] **Seitenleiste: ab welcher Breite neben der Zeichnung?** Die Felder
+      eines Werkzeugs stehen rechts der Zeichnung, sobald das Zeichenfenster
+      mindestens 640 px breit ist, sonst darunter. Bei einem Bildschirm von
+      1366 px ist es in der Mitte nur 465 px breit: die Leiste steht unter
+      der Zeichnung, man rollt zu ihr. Neben der Zeichnung steht sie ab
+      etwa 1715 px Bildschirmbreite, im Vollbild (bei 1366 px: Zeichnung
+      595, Leiste 360 px) oder wenn man die Mitte breiter zieht. Die
+      andere Möglichkeit wäre die Regel des Fensters «Knicken und Kippen»:
+      die Mitte wird breiter, solange der rechten Tafel 300 px bleiben –
+      bei 1366 px stünde die Leiste dann neben der Zeichnung, aber der
+      Bericht hätte nur noch 300 statt 519 px. Vorschlag: so lassen, für
+      langes Zeichnen das Vollbild. Vorläufig: 640 px.
 
 ## Wünsche vom 2026-11-20
 
@@ -37,6 +49,14 @@ Kräften je Geschoss und Wand, ohne Verbindung ins Balkensystem.
 
 ## Offen
 
+- [ ] **Decke: «Der Träger steht nicht im Gleichgewicht».** In der Konsole
+      des Browsers stand am 2026-11-27 aus einem älteren Test ein Abbruch
+      der Rechnung `decke.e2.rechnung`: am Ende eines Streifens blieben
+      V = 6.0 N und M = 12.0 Nm übrig (`statik` in `decke/traeger.py`,
+      Schranke 10⁻⁶ der Lastsumme). Nicht nachgestellt; das Projekt des
+      Benutzers rechnet fehlerfrei. Kommt es wieder: den Stand sichern und
+      die Lasten am Ende des Streifens prüfen, etwa eine, die nur um die
+      Rundung `GLEICH` neben dem Ende liegt.
 - [ ] Kurzform hinter dem Auge: weitere Nachweise kennzeichnen. Heute die
       Platte – Biegung bei N = 0, Querkraft mit und ohne Bügel – und seit
       2026-11-18 die Querkraft im Bohrpfahl (Wendel, Druckdiagonalen, das
@@ -247,9 +267,6 @@ Kräften je Geschoss und Wand, ohne Verbindung ins Balkensystem.
       Dazu jetzt das Modell des Zeichenfensters (`cad_modell.js`: Knoten
       anlegen, löschen, kopieren, je Element verschieben, zusammenführen),
       das Fangen und welche Ecke ein Klick nimmt.
-- [ ] Balkensystem im schmalen Fenster: das schwebende Fenster eines Knotens
-      oder Stabs deckt die halbe Zeichnung. Zuklappen geht, aber bei Lasten
-      mit vielen Feldern wird es lang.
 - [ ] Keine Testumgebung für die Zeichenhilfen des Balkensystems
       (`bs_symbole.js`, die verbundene Zeichnung in `cad_modell.js`) –
       geprüft von Hand im Browser.
@@ -1938,8 +1955,8 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       Stahlspannungen und die Zwängung auf Biegung rechnen mit dem φ ihres
       Kapitels, wie bei der Platte – für jeden Beton dasselbe. Ein φ je
       Fläche bräuchte es erst, wenn zwei Betone verschieden kriechen sollen.
-      Die Eigenschaften einer Fläche stehen im schwebenden Fenster; φ käme
-      dort ohne Umbau dazu.
+      Die Eigenschaften einer Fläche stehen in der Seitenleiste des
+      Zeichenfensters; φ käme dort ohne Umbau dazu.
 - [ ] **Ein Kreis ist ein 48-Eck.** Die Ecken liegen auf dem Kreis, die
       Fläche ist darum 0.3 % kleiner als π·D²/4. Steht so in der Zeichnung;
       wer es genauer will, zeichnet mehr Ecken.

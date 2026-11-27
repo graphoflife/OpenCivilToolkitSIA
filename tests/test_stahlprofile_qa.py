@@ -320,7 +320,7 @@ class TestVorlage(unittest.TestCase):
                          [("b", "Breite", 100.0, 1.0), ("h", "Dicke", 10.0, 1.0)])
         self.assertEqual(fl["frei"][0]["angabe"]["ueber"], 0.0)
         vorlage = k["querschnittsanalyse"]["profil"]
-        self.assertEqual((vorlage["schluessel"], vorlage["name"]), ("stahlprofil", "Stahlprofil"))
+        self.assertEqual(vorlage["schluessel"], "stahlprofil")
         self.assertEqual([d["wert"] for d in vorlage["drehungen"]], [0, 90, 180, 270])
 
 

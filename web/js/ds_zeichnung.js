@@ -5,7 +5,7 @@
  * rechts, y nach oben, die Achse der Stütze im Ursprung -- wie im Kern
  * (opencivil/projekt/durchstanzen.py). Ein Werkzeug zeichnet sie, ein
  * zweites setzt Hilfspunkte zum Fangen. Ecken und Knoten verschiebt man wie
- * im Querschnitt: wählen, dann V oder die Felder im schwebenden Fenster.
+ * im Querschnitt: wählen, dann V oder die Felder in der Seitenleiste.
  *
  * Darunter liegt, was der Kern zuletzt gerechnet hat: Stütze oder Wand,
  * Plattenrand und Nachweisschnitt (ds_grundriss.js). Die Ecken der Stütze
@@ -114,7 +114,7 @@ function umriss(kennung) {
 }
 
 /**
- * Das schwebende Fenster zur Auswahl (cad_app.js): Ecken und Knoten mit
+ * Die Seitenleiste zur Auswahl (cad_app.js): Ecken und Knoten mit
  * ihrer Lage, Aussparungen mit dem, was man mit ihnen tun kann.
  */
 function eigenschaften(a) {

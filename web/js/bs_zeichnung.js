@@ -11,7 +11,7 @@
  * Knoten -- so überstehen sie das Zusammenführen von Knoten --, gewählt wird
  * aber der Knoten.
  *
- * Das schwebende Fenster mit den Feldern des Gewählten steht in
+ * Die Seitenleiste mit den Feldern des Gewählten steht in
  * `bs_eigenschaften.js`, was beide brauchen in `bs_teile.js`: auch der
  * Lastfall, den das Fenster zeigt, und die Antwort des Kerns.
  *

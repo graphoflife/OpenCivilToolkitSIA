@@ -20,7 +20,7 @@
  *   flaeche        wie ihre Fläche aussieht: `klasse`, beim Profil mit
  *                  `fill-rule`, damit sein Loch ausgespart bleibt
  *   darueber(...)  was über allen Flächen zu ihr gehört, oder nichts
- *   felder(...)    ihre Felder im schwebenden Fenster, wie `felderVon`
+ *   felder(...)    ihre Felder in der Seitenleiste, wie `felderVon`
  *   info(info)     was der Kern zu einer gewählten weiss, als Zeilen
  *   titel(e)       was sie ist, für den Titel des Fensters -- ohne e: mehrere
  *   lage           was ihr Knoten ist, vor «y» und «z»: «Mitte », «Ecke »

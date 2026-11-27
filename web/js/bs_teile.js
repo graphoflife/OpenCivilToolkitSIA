@@ -1,5 +1,5 @@
 /**
- * bs_teile.js -- was Zeichnung, schwebendes Fenster und Panels eines
+ * bs_teile.js -- was Zeichnung, Seitenleiste und Panels eines
  * Balkensystems gemeinsam brauchen.
  *
  * Ein Balkensystem ist eben (2D) oder räumlich (3D); beide nutzen dieselben

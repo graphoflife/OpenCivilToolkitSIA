@@ -4,8 +4,8 @@
  * Ein Profil bleibt ein Profil (Benutzer, 2026-11-25): eine Grösse einer
  * Reihe der Tabelle, an einem Knoten -- seiner Mitte --, aus einem Baustahl
  * des Projekts, gedreht und gespiegelt. Eingesetzt wird es mit der Vorlage
- * «Stahlprofil» (qa_vorlagen.js), verschoben wie ein Stab, geändert im
- * schwebenden Fenster. Freie Bleche zeichnet man als Polygon aus Baustahl.
+ * «Stahlprofil» (qa_vorlagen.js), verschoben wie ein Stab, geändert in der
+ * Seitenleiste. Freie Bleche zeichnet man als Polygon aus Baustahl.
  *
  * Reihe und Grösse wählt man wie beim Stahlprofil im Balkensystem
  * (profilwahl.js). Drehung und Spiegeln stehen nur da, wo sie das Profil
@@ -49,7 +49,7 @@ export const PROFIL = {
  * vom Kern (`drehbar`, `spiegelbar`). Ohne `info` -- bei mehreren gewählten
  * -- stehen beide da. Beim U ist gespiegelt dasselbe wie um 180° gedreht;
  * beides bleibt, wie man es denkt. Die vier Drehungen stehen unter ihrem
- * Namen, wie jede Wahl mit mehr als zwei Stellungen im schwebenden Fenster:
+ * Namen, wie jede Wahl mit mehr als zwei Stellungen in der Seitenleiste:
  * neben ihm hätten sie dort keinen Platz.
  */
 export function drehZeilen(wert, setzen, info = null) {

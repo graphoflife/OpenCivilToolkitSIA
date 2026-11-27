@@ -9,8 +9,8 @@
  * stehen daneben: das Modell ohne Bild in cad_modell.js, die Ansicht in
  * cad_ansicht.js, Fangen und Punkteingabe in cad_eingabe.js, Treffen, Wählen
  * und Hervorheben in cad_auswahl.js, die Befehle in cad_befehle.js, Ändern
- * und Rückgängig in cad_verlauf.js, das schwebende Fenster in
- * cad_palette.js.
+ * und Rückgängig in cad_verlauf.js, die Seitenleiste neben der Zeichnung
+ * in cad_palette.js.
  *
  * WAS DER ADAPTER EINSTELLT (mit Vorgabe, siehe `EINSTELLUNG`):
  * die Werkzeuge -- je eines mit Namen, Zeichen, Taste und der Form, die es
@@ -37,13 +37,13 @@
  *
  * WENIGE KNÖPFE:
  * Oben stehen die Werkzeuge der App, je mit Zeichen (sinnbilder.js) -- im
- * Querschnitt Polygon, Bewehrung, Schubwand, Hilfslinie und Hilfspunkt, im
- * Rahmen Linie und Knoten -- und, wenn die App welche hat, Vorlagen T. Dazu
- * Rückgängig, Wiederholen, «Alles zeigen» F und Vollbild. Ein Werkzeug legt
- * genau eine Art an; was es anlegt, stellt das schwebende Fenster ein, und
- * eine andere Art ist ein anderes Werkzeug. Einen Knopf zum Wählen gibt es
- * nicht: Wählen ist der Grundzustand, Esc führt dorthin zurück. Alles Weitere
- * steht neben der Auswahl oder im schwebenden Fenster.
+ * Querschnitt etwa «Querschnitt zeichnen», Bewehrung, Stahlprofil und
+ * Vorlage, im Rahmen Linie und Knoten. Dazu Rückgängig, Wiederholen, «Alles
+ * zeigen» F und Vollbild. Ein Werkzeug legt genau eine Art an; was es
+ * anlegt, stellt die Seitenleiste neben der Zeichnung ein, und eine andere
+ * Art ist ein anderes Werkzeug. Einen Knopf zum Wählen gibt es nicht: Wählen
+ * ist der Grundzustand, Esc führt dorthin zurück. Alles Weitere steht neben
+ * der Auswahl oder in der Seitenleiste.
  *
  * ALLES ZEIGEN:
  * Was ins Bild gehört, sagt der Adapter (`umriss`). Kennt er einen Teil
@@ -59,9 +59,9 @@
  *
  * IM RAUM:
  * Hat der Adapter drei Achsen, sieht man die Zeichnung parallel projiziert
- * (cad_raum.js): die rechte Maustaste dreht sie, die Leiste hat die
- * Ansichten, das schwebende Fenster die Arbeitsebene, und E legt diese
- * durch den gefangenen Punkt. Auf dem Handy wird nur mit den Knöpfen
+ * (cad_raum.js): die rechte Maustaste dreht sie, die Knöpfe oben haben die
+ * Ansichten, die Seitenleiste die Arbeitsebene, und E legt diese durch
+ * den gefangenen Punkt. Auf dem Handy wird nur mit den Knöpfen
  * gedreht.
  *
  * ZWEI EBENEN:
@@ -100,9 +100,11 @@ import { sinnbild } from './sinnbilder.js';
  *
  * Ein Werkzeug ist `{name, text, zeichen, taste, form, titel?, bereit?}`:
  * `zeichen` ein Sinnbild, `form` was es zeichnet -- 'knoten', 'linie' oder
- * 'polygon', oder `(a) => form`, wo das Fenster es umstellt (die Bewehrung
- * als Linie oder als Punkt). Gibt `bereit(a)` falsch, startet es nicht und
- * sagt selbst, warum -- eine Last ohne Lastfall. Was es anlegt, weiss nur seine App.
+ * 'polygon', oder `(a) => form`, wo die Seitenleiste es umstellt (die Bewehrung
+ * als Linie oder als Punkt). Statt der Form kann es seinen Befehl selbst
+ * bauen, `befehl(a)` -- die Vorlagen des Querschnitts, die an einem Punkt
+ * eingesetzt werden. Gibt `bereit(a)` falsch, startet es nicht und sagt
+ * selbst, warum -- eine Last ohne Lastfall. Was es anlegt, weiss nur seine App.
  */
 const EINSTELLUNG = {
   werkzeuge: [],
@@ -190,7 +192,6 @@ function neu(adapter) {
     knoten: null,
     teile: null,
     bildUhr: null,
-    dialog: null,        // ein Fenster der App in der Zeichnung, etwa die Vorlagen: {schliessen}
   };
   a.aendern = (veraenderer, optionen) => aendern(a, veraenderer, optionen);
   a.ende = () => befehlEnde(a);
@@ -211,7 +212,6 @@ function neu(adapter) {
 // ===========================================================================
 
 function starten(a, befehl) {
-  a.dialog?.schliessen();
   a.befehl = befehl;
   eingabeLeeren(a.eingabe);
   a.eingabe.bezug = null;
@@ -227,13 +227,14 @@ function befehlEnde(a) {
 }
 
 /**
- * Startet ein Werkzeug der App -- mit dem Befehl seiner Form, die es gerade
- * hat. Wer im schwebenden Fenster die Form umstellt, startet es neu.
+ * Startet ein Werkzeug der App -- mit seinem eigenen Befehl oder dem Befehl
+ * seiner Form, die es gerade hat. Wer in der Seitenleiste die Form
+ * umstellt, startet es neu.
  */
 function werkzeugStarten(a, name) {
   const w = a.einstellung.werkzeuge.find((x) => x.name === name);
   if (!w || w.bereit?.(a) === false) return;
-  starten(a, BEFEHLE[typeof w.form === 'function' ? w.form(a) : w.form](w.name));
+  starten(a, w.befehl ? w.befehl(a) : BEFEHLE[typeof w.form === 'function' ? w.form(a) : w.form](w.name));
 }
 
 /** Ein fertiger Punkt geht an den Befehl; danach sind die Hilfen wieder frei. */
@@ -332,26 +333,11 @@ function aktionen(a) {
 // ===========================================================================
 
 /**
- * Passt alles ins Bild -- und lässt dabei die Ecke frei, in der das
- * schwebende Fenster steht: daneben oder darüber bzw. darunter, je nachdem,
- * was weniger Massstab kostet. So liegt nach «Alles zeigen» nichts darunter.
+ * Passt alles ins Bild. Bis 2026-11-27 liess es die Ecke frei, in der das
+ * schwebende Fenster stand; die Seitenleiste steht neben der Zeichnung.
  */
 function allesZeigen(a) {
-  const umriss = a.adapter.umriss(a);
-  const pal = a.teile.palette.knoten;
-  let frei = {};
-  if (pal.offsetWidth && a.v.breite) {
-    const seitlich = { rechts: a.v.breite - pal.offsetLeft };
-    // Steht das Fenster in der unteren Hälfte, bleibt unten frei, sonst oben.
-    const quer = pal.offsetTop + pal.offsetHeight / 2 > a.v.hoehe / 2
-      ? { unten: a.v.hoehe - pal.offsetTop } : { oben: pal.offsetTop + pal.offsetHeight };
-    const massstab = (f) => {
-      einpassen(a.v, umriss, { frei: f });
-      return a.v.massstab;
-    };
-    frei = massstab(seitlich) >= massstab(quer) ? seitlich : quer;
-  }
-  einpassen(a.v, umriss, { frei });
+  einpassen(a.v, a.adapter.umriss(a));
   a.nachfassen = a.adapter.umrissVollstaendig?.(a) === false ? ansichtStand(a.v) : null;
   zeichnen(a);
 }
@@ -402,7 +388,6 @@ function zeichnen(a) {
     hervorheben(a, a.auswahl, 'cad-auswahl'),
   );
   obenZeichnen(a);
-  // Erst das schwebende Fenster: die Leiste weicht ihm aus, in seiner neuen Grösse.
   paletteZeichnen(a);
   leisteZeichnen(a);
   statusZeichnen(a);
@@ -468,7 +453,7 @@ function kurzMelden(a, satz) {
   statusZeichnen(a);
 }
 
-/** Ein Knopf der Leiste: sein Sinnbild und, wo Platz ist, ein Wort. */
+/** Ein Knopf oben im Fenster: sein Sinnbild und, wo Platz ist, ein Wort. */
 function knopf(zeichen, beschriftung, titel, tun, klasse = '') {
   return el('button.cad-knopf', {
     type: 'button', title: titel, 'aria-label': titel, class: klasse,
@@ -491,10 +476,6 @@ function leisteBauen(a) {
     k.dataset.werkzeug = w.name;
     return k;
   });
-  const vorlage = a.adapter.vorlageOeffnen
-    ? knopf('cad-vorlage', 'Vorlage', 'Querschnitt aus einer Vorlage (T)',
-      () => a.adapter.vorlageOeffnen(a), 'ist-gross')
-    : null;
   // Rückgängig und die Ansicht nur als Zeichen, zu zweit übereinander: so
   // stehen die Werkzeuge mit ihren Wörtern in einer Zeile.
   const rueck = knopf('cad-rueckgaengig', '', 'Rückgängig (Strg+Z)', () => zurueck(a));
@@ -508,7 +489,7 @@ function leisteBauen(a) {
   // Wahl des Lastfalls. Sie füllt es selbst, so oft sich etwas ändert.
   const zusatz = a.adapter.leisteZusatz?.(a) || null;
   return [
-    ...werkzeuge, zusatz, vorlage, ansichten?.knoten, el('span.cad-luecke'),
+    ...werkzeuge, zusatz, ansichten?.knoten, el('span.cad-luecke'),
     el('div.cad-ansicht', {}, [rueck, vor, alles, gross]),
   ];
 }
@@ -578,7 +559,7 @@ function druecken(a, e) {
     ? { um: drehpunkt(a), zuletzt: bild, klick: e.button === 0 } : null;
   if (e.button !== 0 && !schieben && !dreht) return;
   if (e.button === 1) e.preventDefault();
-  // Ein Feld im schwebenden Fenster gibt seinen Fokus ab: der Klick gehört der Zeichnung.
+  // Ein Feld in der Seitenleiste gibt seinen Fokus ab: der Klick gehört der Zeichnung.
   if (document.activeElement?.closest?.('.cad-palette')) document.activeElement.blur();
   a.druck = {
     id: e.pointerId, start: bild, ursprung: [...a.v.ursprung], schieben, dreht, bewegt: false,
@@ -674,11 +655,6 @@ function rad(a, e) {
 function taste(e) {
   const a = aktive;
   if (!a || !a.knoten?.isConnected) return;
-  if (e.key === 'Escape' && a.dialog) {
-    e.preventDefault();
-    a.dialog.schliessen();
-    return;
-  }
   const imFeld = e.target.closest?.('input, select, textarea, [contenteditable]');
   const inPalette = e.target.closest?.('.cad-palette');
   if (imFeld && !inPalette) return;
@@ -725,10 +701,8 @@ function taste(e) {
       zeichnen(a);
       return;
     }
-    // Ziffern gehen ins erste Feld -- das Zeichen selbst landet dort. Ist
-    // das schwebende Fenster zu, geht es dafür auf.
+    // Ziffern gehen ins erste Feld -- das Zeichen selbst landet dort.
     if (/^[0-9.,-]$/.test(e.key)) {
-      a.teile.palette.aufklappen();
       a.teile.palette.koerper.querySelector('input[data-feld="0"]')?.focus();
       return;
     }
@@ -772,10 +746,6 @@ function taste(e) {
       if (!kopierbar(a) || !ohneAnhaenge(a)) return;
       starten(a, kopierenBefehl());
       break;
-    case 't':
-      if (!a.adapter.vorlageOeffnen) return;
-      a.adapter.vorlageOeffnen(a);
-      break;
     default: {
       const w = a.einstellung.werkzeuge.find((x) => x.taste === k);
       if (!w) return;
@@ -811,7 +781,6 @@ function groesseMessen(a) {
   a.v.breite = b;
   a.v.hoehe = h;
   a.teile.bild.setAttribute('viewBox', `0 0 ${b} ${h}`);
-  a.teile.palette.halten();
   if (!a.v.massstab || a.einpassen) {
     a.einpassen = false;
     allesZeigen(a);
@@ -862,12 +831,16 @@ function bauen(a) {
   const flaeche = el('div.cad-flaeche', {}, [bild, leiste]);
   const hinweis = el('span.cad-hinweis');
   a.teile = {
-    bild, modell, oben, flaeche, leiste, hinweis, lage: null,
+    bild, modell, oben, flaeche, leiste, hinweis, lage: null, palette: paletteBauen(),
   };
-  a.teile.palette = paletteBauen(flaeche);
   const knoepfe = el('div.cad-knoepfe', {}, leisteBauen(a));
   const hoehengriff = el('div.cad-hoehengriff', { title: 'Höhe der Zeichnung ziehen' });
-  a.knoten = el('div.cad', {}, [knoepfe, flaeche, hoehengriff, el('div.cad-status', {}, [hinweis])]);
+  // Die Zeichnung mit ihrem Griff, daneben -- oder im schmalen Fenster
+  // darunter -- die Seitenleiste (cad_palette.js).
+  const mitte = el('div.cad-mitte', {}, [
+    el('div.cad-zeichnung', {}, [flaeche, hoehengriff]), a.teile.palette.knoten,
+  ]);
+  a.knoten = el('div.cad', {}, [knoepfe, mitte, el('div.cad-status', {}, [hinweis])]);
   hoeheEinrichten(flaeche, hoehengriff);
   a.knoten.addEventListener('pointerdown', () => { aktive = a; });
 

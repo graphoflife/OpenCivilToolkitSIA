@@ -46,7 +46,6 @@ from opencivil.nachweis.qa_blechverbund import EINE_RICHTUNG
 from opencivil.nachweis.rissanforderung import Rissanforderung
 from opencivil.projekt import BAUTEILE, Aufbau
 from opencivil.projekt.balkensystem import BalkensystemEintrag
-from opencivil.projekt.blechdecken import BlechdeckeEintrag
 from opencivil.projekt.balkensystem3d import Balkensystem3dEintrag
 from opencivil.projekt.durchstanzen import DurchstanzEintrag
 from opencivil.decke.schnitt import BALKENGROESSEN
@@ -55,7 +54,6 @@ from opencivil.projekt.decke import VORSILBEN as DECKENVORSILBEN
 from opencivil.projekt.aufbau.kern import kennwertbereich
 from opencivil.projekt.lesen import eintragsklassen, feldangaben, katalogname, wahl_von
 from opencivil.projekt.projekt import APPLISTEN, Projekt
-from opencivil.projekt.profile import ProfilEintrag
 from opencivil.projekt.querschnittsanalyse import SCHNITTE
 from opencivil.querschnitt.bauweise import BEWEHRT
 from opencivil.querschnitt import profilblech
@@ -371,20 +369,15 @@ def katalog() -> dict:
                                 "titel": v.erklaerung} for v in Verduebelung],
             # Bei der Blechverbunddecke: wo ihr Feld liegt und wie die Last
             # steht -- danach die Schublaenge in (28); ``mit_abstand``, ob sie
-            # dann der Abstand a ist. Dazu die Vorlage, die eine Decke
-            # einsetzt: ihr Knopf mit dem Bild der Decke nach Vorgabe -- sein
-            # Name mit weichen Trennstrichen, sonst passt er nicht auf den
-            # Knopf --, und was die Decke nachweist.
+            # dann der Abstand a ist. Dazu der Schluessel, unter dem die
+            # Anfrage ``vorlage`` eine Decke skizziert, und was die Decke
+            # nachweist.
             "blechfelder": [{"wert": f.value, "beschriftung": f.beschriftung,
                              "titel": f.erklaerung} for f in blechdecke.Feld],
             "blechlasten": [{"wert": b.value, "beschriftung": b.beschriftung,
                              "titel": b.erklaerung, "mit_abstand": b.mit_abstand}
                             for b in blechdecke.Belastung],
-            "blechdecke": {
-                "schluessel": profilblech.VORLAGE, "name": "Blech\u00adverbund\u00addecke",
-                "skizze": profilblech.skizze(BlechdeckeEintrag().form((0.0, 0.0))).als_dict(),
-                "richtung": EINE_RICHTUNG,
-            },
+            "blechdecke": {"schluessel": profilblech.VORLAGE, "richtung": EINE_RICHTUNG},
             # Beim Holz: die Feuchteklassen, je wo das Holz so feucht ist und
             # ihr η_w, und je Fall die Dauer der Einwirkung, mit ihrem η_t.
             "feuchteklassen": [{"wert": k.value, "beschriftung": k.beschriftung,
@@ -397,17 +390,16 @@ def katalog() -> dict:
                 {"wert": True, "beschriftung": "stossartig",
                  "titel": f"η_t = {eta_t(True):g}: stossartig, {STOSSARTIG} ({REFERENZ_ETA_T})"},
             ],
-            # Die Vorlage, die ein Stahlprofil einsetzt: ihr Knopf mit dem
-            # Bild des ersten Profils und die Stellungen der Drehung.
+            # Das Stahlprofil: der Schluessel, unter dem die Anfrage
+            # ``vorlage`` es skizziert, und die Stellungen der Drehung.
             "profil": {
-                "schluessel": profillage.VORLAGE, "name": "Stahlprofil",
-                "skizze": profillage.skizze(ProfilEintrag().profil).als_dict(),
+                "schluessel": profillage.VORLAGE,
                 "drehungen": [{"wert": d, "beschriftung": f"{d}°",
                                "titel": f"Um {d}° gegen den Uhrzeigersinn gedreht"}
                               for d in profillage.DREHUNGEN],
             },
-            # Die Vorlagen mit ihren Massen -- und je eine Skizze nach
-            # Vorgabe fuer das Bildchen auf ihrem Knopf. Der Achsabstand der
+            # Die Vorlagen aus Flaechen mit ihren Massen -- und je eine Skizze
+            # nach Vorgabe fuer das Bildchen auf ihrem Knopf. Der Achsabstand der
             # Staebe ist ein Mass aller Vorlagen.
             "vorlagen": [
                 {"schluessel": v.schluessel, "name": v.name, "hat_waende": v.hat_waende,

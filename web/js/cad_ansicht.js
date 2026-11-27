@@ -101,21 +101,20 @@ function imBildUmriss(v, [klein, gross]) {
 
 /**
  * Passt den Umriss `[[kleinste...], [grösste...]]` ins Bild -- mit Rand für
- * Masslinien. `frei` hält zusätzlich einen Streifen frei, in px: `rechts`,
- * `oben` oder `unten`, dort, wo das schwebende Fenster steht.
+ * Masslinien. Bis 2026-11-27 hielt es dazu einen Streifen frei, wo das
+ * schwebende Fenster stand; die Seitenleiste steht neben dem Bild.
  */
-export function einpassen(v, umriss, { rand = 46, frei = {} } = {}) {
+export function einpassen(v, umriss, { rand = 46 } = {}) {
   if (!v.breite || !v.hoehe) return;
   const [[a0, b0], [a1, b1]] = imBildUmriss(v, umriss);
-  const { rechts = 0, oben = 0, unten = 0 } = frei;
   const b = Math.max(a1 - a0, 1);
   const h = Math.max(b1 - b0, 1);
-  const nutzbreite = Math.max(40, v.breite - 2 * rand - rechts);
-  const nutzhoehe = Math.max(40, v.hoehe - 2 * rand - oben - unten);
+  const nutzbreite = Math.max(40, v.breite - 2 * rand);
+  const nutzhoehe = Math.max(40, v.hoehe - 2 * rand);
   v.massstab = Math.min(v.grenzen[1], Math.max(v.grenzen[0], Math.min(nutzbreite / b, nutzhoehe / h)));
   v.ursprung = [
     rand + nutzbreite / 2 - v.massstab * (a0 + a1) / 2,
-    oben + rand + nutzhoehe / 2 + v.massstab * (b0 + b1) / 2,
+    rand + nutzhoehe / 2 + v.massstab * (b0 + b1) / 2,
   ];
 }
 

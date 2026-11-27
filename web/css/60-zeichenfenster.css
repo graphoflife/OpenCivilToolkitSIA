@@ -1,8 +1,8 @@
 /* ==========================================================================
    Das Zeichenfenster
 
-   Querschnittsanalyse, Balkensystem und Decke: Knöpfe, schwebende
-   Fenster, die Zeichnung und die Liste darunter -- dazu die Zeilen der
+   Querschnittsanalyse, Balkensystem, Decke und Durchstanzen: Knöpfe, die
+   Zeichnung mit ihrer Seitenleiste und die Liste darunter -- dazu die Zeilen der
    Rechenwahl je Material und die Diagramme der Querschnittsanalyse.
    ========================================================================== */
 
@@ -68,6 +68,7 @@
   display: flex; flex-direction: column; min-height: 0;
   border: 1px solid var(--rand-stark); border-radius: var(--radius);
   background: var(--flaeche); overflow: hidden; user-select: none;
+  container: cad / inline-size;
 }
 
 /* Oben wenige Knöpfe: zeichnen, zurück, alles zeigen, Vollbild. */
@@ -92,13 +93,18 @@
   flex-direction: column; gap: 1px; min-width: 60px; padding: 3px 5px 2px; font-size: 10.5px;
 }
 .cad-knopf.ist-gross .sinnbild { width: 20px; height: 20px; }
+/* Ein langer Name bricht in zwei Zeilen, an einem Leerzeichen oder einem
+   weichen Trennstrich: «Querschnitt zeichnen», «Blech­verbund­decke». */
+.cad-knopf.ist-gross .cad-text {
+  max-width: 13ch; white-space: normal; text-align: center; hyphens: manual; line-height: 1.15;
+}
 .cad-luecke { flex: 1; }
 /* Im Raum die Ansichten: 3D, x-y, x-z, y-z. */
 .cad-ansichten { display: inline-flex; align-self: center; margin-left: 4px; }
 .cad-ansichten .schalter { min-height: 24px; }
 .cad-ansichten .schalter-halb { padding: 0 7px; }
 /* «x-y» bricht sonst am Bindestrich um, wo es eng wird -- auch in der
-   Wahl der Arbeitsebene im schwebenden Fenster. */
+   Wahl der Arbeitsebene in der Seitenleiste. */
 .cad-wahl .schalter-halb { white-space: nowrap; }
 /* Rückgängig, Wiederholen, Alles zeigen und Vollbild: klein, zu zweit
    übereinander -- was sie tun, sagt ihr Titel. */
@@ -106,6 +112,19 @@
 .cad-ansicht .cad-knopf { padding: 1px 4px; }
 .cad-ansicht .sinnbild { width: 15px; height: 15px; }
 
+/* Die Zeichnung und daneben die Seitenleiste mit den Feldern des
+   Werkzeugs, der Auswahl oder des Zeigers (Benutzer, 2026-11-27; bis dahin
+   ein schwebendes Fenster in der Zeichnung). Ist das Zeichenfenster
+   schmaler als 640 px, etwa auf dem Handy, steht sie unter der Zeichnung.
+   Sonst ist sie 280 bis 360 px breit und so hoch wie die Zeichnung:
+   `contain: size` lässt ihren Inhalt die Zeile nicht höher machen, er
+   rollt. */
+.cad-mitte { display: flex; flex-direction: column; min-height: 0; }
+.cad-zeichnung { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+@container cad (min-width: 640px) {
+  .cad-mitte { display: grid; grid-template-columns: minmax(0, 1fr) clamp(280px, 40%, 360px); }
+  .cad-palette { contain: size; border-top: 0; border-left: 1px solid var(--rand-stark); }
+}
 .cad-flaeche {
   position: relative; height: var(--cad-hoehe, 440px);
   background: #fff; touch-action: none; overflow: hidden;
@@ -129,34 +148,18 @@
 }
 .cad-hinweis { text-align: right; }
 
-/* Das schwebende Fenster: oben rechts in der Zeichnung, am Kopf zu
-   verschieben. Was darin steht, hängt davon ab, was gerade geschieht. */
+/* Die Seitenleiste: oben, was gerade geschieht, darunter die Felder dazu. */
 .cad-palette {
-  position: absolute; z-index: 3; width: 224px; max-height: calc(100% - 4px);
-  display: flex; flex-direction: column;
-  border: 1px solid var(--rand-stark); border-radius: var(--radius);
-  background: var(--flaeche); box-shadow: 0 6px 18px rgba(20, 32, 48, .16);
+  display: flex; flex-direction: column; min-width: 0; min-height: 0;
+  border-top: 1px solid var(--rand-stark); background: var(--flaeche);
   font-size: 12px; user-select: auto;
 }
-.cad-palette-kopf {
-  display: flex; align-items: flex-start; gap: 6px; padding: 4px 4px 4px 6px;
-  background: var(--flaeche-2); border-bottom: 1px solid var(--rand);
-  border-radius: var(--radius) var(--radius) 0 0;
-  cursor: move; touch-action: none; user-select: none;
-}
-.cad-palette.ist-zu .cad-palette-kopf { border-bottom: 0; border-radius: var(--radius); }
-.cad-palette-griff { color: var(--schrift-zart); line-height: 18px; }
-.cad-palette-titel { flex: 1; min-width: 0; font-weight: 700; line-height: 18px; color: var(--schrift); }
-.cad-palette-zu {
-  width: 18px; height: 18px; padding: 0; border: none; border-radius: 4px;
-  background: transparent; color: var(--schrift-matt); font-weight: 700; cursor: pointer;
-}
-.cad-palette-zu:hover { background: var(--blau-hell); color: var(--blau-tief); }
+.cad-palette-kopf { padding: 5px 8px; background: var(--flaeche-2); border-bottom: 1px solid var(--rand); }
+.cad-palette-titel { font-weight: 700; line-height: 18px; color: var(--schrift); }
 .cad-palette-koerper {
-  display: flex; flex-direction: column; gap: 5px; padding: 6px 8px 8px;
+  flex: 1 1 auto; display: flex; flex-direction: column; gap: 5px; padding: 6px 8px 8px;
   overflow-y: auto; min-height: 0;
 }
-.cad-palette.ist-zu .cad-palette-koerper { display: none; }
 
 .cad-lage { min-height: 1.3em; white-space: pre; font-variant-numeric: tabular-nums; }
 .cad-ruhe {
@@ -200,8 +203,8 @@
 /* Eine Richtung des Lagers: nur ein Zeichen vor dem Schalter, eingerückt
    unter «Lager». */
 .cad-zeile.ist-richtung { grid-template-columns: 22px auto; padding-left: 8px; }
-.cad-palette .wahlblock, .cad-dialog .wahlblock { margin-bottom: 0; }
-.cad-palette .wahlblock-titel, .cad-dialog .wahlblock-titel { font-size: 12px; color: var(--schrift-matt); }
+.cad-palette .wahlblock { margin-bottom: 0; }
+.cad-palette .wahlblock-titel { font-size: 12px; color: var(--schrift-matt); }
 .cad-zeile > span:first-child {
   color: var(--schrift-matt); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
@@ -238,20 +241,14 @@
   background: var(--schlecht-hell); color: var(--schlecht);
 }
 
-/* Ein Fenster der App in der Zeichnung, oben links -- etwa die Vorlagen. */
-.cad-dialog {
-  position: absolute; left: 8px; top: 8px; z-index: 4; width: 300px;
-  max-width: calc(100% - 16px); max-height: calc(100% - 16px); overflow-y: auto;
-  display: flex; flex-direction: column; gap: 6px; padding: 6px 10px 10px;
-  border: 1px solid var(--rand-stark); border-radius: var(--radius);
-  background: var(--flaeche); box-shadow: 0 6px 18px rgba(20, 32, 48, .16);
-  font-size: 12px; user-select: auto;
-}
-.cad-dialog-kopf { display: flex; align-items: center; justify-content: space-between; font-weight: 700; }
-.cad-dialog-fuss { display: flex; justify-content: flex-end; gap: 6px; }
+/* Was eine Vorlage, ein Stahlprofil oder eine Blechverbunddecke einsetzt:
+   die Wahl der Vorlage, die Skizze, darunter die Felder -- ihre Namen sind
+   länger als die der anderen Werkzeuge. */
+.cad-vorlage { display: flex; flex-direction: column; gap: 6px; }
+.cad-vorlage .cad-zeile { grid-template-columns: 112px minmax(0, auto) minmax(0, 1fr); }
 /* Zeilen, die sich zusammen neu bauen -- Drehung und Spiegeln eines
-   Profils --, im Fenster wie jede andere Zeile. */
-.cad-dialog-gruppe { display: contents; }
+   Profils --, in der Seitenleiste wie jede andere Zeile. */
+.cad-gruppe { display: contents; }
 .cad-vorlagen { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; }
 .cad-vorlagenknopf {
   display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 4px 2px 3px;
@@ -259,11 +256,10 @@
   font: inherit; font-size: 10.5px; color: var(--schrift-matt); cursor: pointer;
   white-space: nowrap; overflow: hidden;
 }
-/* Ein langer Name bricht an seinen weichen Trennstrichen, «Blech­verbund­decke». */
+/* Die vier Vorlagen aus Flächen, ein Name bricht, wo der Knopf zu schmal ist. */
 .cad-vorlagenknopf span { white-space: normal; text-align: center; hyphens: manual; }
 .cad-vorlagenknopf:hover { border-color: var(--blau); background: var(--blau-hell); }
 .cad-vorlagenknopf.ist-an { border-color: var(--blau); background: var(--blau-hell); color: var(--blau-tief); font-weight: 700; }
-.cad-dialog .cad-zeile { grid-template-columns: 112px minmax(0, auto) minmax(0, 1fr); }
 .cad-vorlagenskizze {
   display: flex; justify-content: center; min-height: 140px;
   border: 1px solid var(--rand); border-radius: 5px; background: #fff;
@@ -275,7 +271,7 @@
 .cad-skizze-wand { stroke: var(--mat-wand-linie); stroke-opacity: .5; }
 .cad-wahl { display: inline-flex; align-items: center; gap: 5px; }
 
-/* Die Leiste neben der Auswahl: nur, was für sie geht. */
+/* Die kleine Leiste neben der Auswahl: nur, was für sie geht. */
 .cad-leiste {
   position: absolute; z-index: 2; display: flex; flex-wrap: wrap; gap: 2px; padding: 3px;
   max-width: calc(100% - 8px);
@@ -384,7 +380,12 @@
   display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, 380px); gap: 10px;
 }
 .zeichenbereich.ist-vollbild .cad { height: 100%; }
+.zeichenbereich.ist-vollbild .cad-mitte, .zeichenbereich.ist-vollbild .cad-zeichnung,
 .zeichenbereich.ist-vollbild .cad-flaeche { flex: 1 1 auto; height: auto; min-height: 0; }
+/* Im Vollbild auf dem Handy teilen sich Zeichnung und Seitenleiste die Höhe. */
+@container cad (max-width: 639px) {
+  .zeichenbereich.ist-vollbild .cad-palette { flex: none; max-height: 45%; }
+}
 .zeichenbereich.ist-vollbild .cad-seite {
   overflow-y: auto; min-height: 0; padding: 8px 10px;
   background: var(--flaeche); border: 1px solid var(--rand); border-radius: var(--radius);

@@ -123,7 +123,7 @@ function ansichtJetzt(a) {
  * Die Knöpfe der Ansichten für die Leiste über der Zeichnung: ein Schalter,
  * an ist die Ansicht, die gerade gilt -- keine, wenn gedreht wurde. Neu
  * gebaut wird er nur, wenn sich das ändert (`zeichnen`, nach jedem Bild).
- * Die Arbeitsebene stellt das schwebende Fenster ein (cad_palette.js).
+ * Die Arbeitsebene stellt die Seitenleiste ein (cad_palette.js).
  */
 export function ansichtsleiste(a, allesZeigen) {
   const knoten = el('span.cad-ansichten');

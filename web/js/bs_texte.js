@@ -1,8 +1,8 @@
 /**
  * bs_texte.js -- was ein Balkensystem erklärt, eben und im Raum.
  *
- * Die Hilfen der Eingaben (`HILFE`), die Titel einiger Felder des
- * schwebenden Fensters und das kleine Bild der Vorzeichen -- je Art eines
+ * Die Hilfen der Eingaben (`HILFE`), die Titel einiger Felder der
+ * Seitenleiste und das kleine Bild der Vorzeichen -- je Art eines
  * Balkensystems, unter ihrem Namen (`texte(art)`). Was beide gleich haben,
  * steht einmal da. Alles andere -- welche Felder, Richtungen und Grössen es
  * gibt -- sagt der Katalog des Kerns; hier stehen nur Worte und ein Bild.

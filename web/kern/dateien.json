@@ -260,7 +260,7 @@
     "opencivil/verbund/widerstand.py": "f13e38796dab",
     "opencivil/web/__init__.py": "fe0264cdd7ac",
     "opencivil/web/anzeige.py": "00234b95ece2",
-    "opencivil/web/api.py": "26da0c08e0de",
+    "opencivil/web/api.py": "c3d8a1a4e12a",
     "opencivil/web/balkendaten.py": "d8d9f96f3490",
     "opencivil/web/bruecke.py": "9f787b297de7",
     "opencivil/web/deckendaten.py": "28b9f27703e9",

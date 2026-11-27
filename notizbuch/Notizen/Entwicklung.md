@@ -7,6 +7,52 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-27 · Zeichenfenster: Seitenleiste, eigene Knöpfe für Profil, Blechdecke, Vorlage
+
+Schritt 2 des Plans vom 2026-11-27.
+
+**Seitenleiste.** Vorher lagen die Felder eines Werkzeugs in einem
+schwebenden Kästchen von 224 px in der Zeichnung, das man ziehen und
+zuklappen konnte; die Vorlagen hatten ein eigenes Fenster von 300 px.
+Nachher stehen sie in einer Leiste rechts neben der Zeichnung, so hoch wie
+sie und 280 bis 360 px breit – in allen Zeichenfenstern, auch im
+Balkensystem, in der Decke und beim Durchstanzen.
+
+- Ob die Leiste neben oder unter der Zeichnung steht, entscheidet die
+  Breite des Zeichenfensters selbst, nicht die des Bildschirms: `.cad` ist
+  ein Container, ab 640 px wird `.cad-mitte` ein Raster aus Zeichnung und
+  Leiste. Darunter steht sie unter der Zeichnung, auf dem Handy ohnehin.
+  Bei 1366 px Bildschirmbreite ist das Fenster 465 px breit, die Leiste
+  also darunter; daneben im Vollbild oder ab etwa 1715 px. Die Frage
+  dazu steht im [[TODO]].
+- Neben der Zeichnung bekommt die Leiste `contain: size`: sie ist so hoch
+  wie die Zeichnung und rollt, statt sie zu strecken.
+- Heisst «Seitenleiste», nicht «Leiste»: «Leiste» sind schon die Knöpfe
+  oben und die kleine Leiste neben einer Auswahl.
+- Was fällt: Ziehen, Zuklappen, die gemerkte Lage (`opencivil.cad.palette`
+  bleibt ungenutzt im Browser liegen), das Fenster «Vorlage» und
+  `einpassen(…, frei)`, das beim Einpassen Platz für das Kästchen liess.
+- `setzen(titel, bauen, schluessel)` baut den Inhalt nur, wenn sich der
+  Schlüssel ändert. Vorher wurde er bei jedem Zeichnen gebaut und gleich
+  wieder verworfen; dabei wanderten die zwischengespeicherten Felder einer
+  Vorlage in ein Element, das nie angezeigt wurde, und fehlten nach dem
+  Vollbild in der Leiste.
+
+**Eigene Knöpfe.** «Polygon» heisst «Querschnitt zeichnen», mit einem
+T-Träger mit offenem Umriss als Bild (`cad-querschnitt`; `cad-polygon`
+bleibt, Decke und Durchstanzen brauchen es). Neben «Bewehrung» stehen
+«Stahlprofil» (I) und «Blechverbunddecke» (D); vorher steckten beide im
+Fenster «Vorlage». «Vorlage» (T) ist jetzt ein Werkzeug wie die anderen.
+
+- Alle drei setzen an einem Punkt ein: die Masse und die Skizze stehen in
+  der Leiste, der Zeiger zeigt die Teile, ein Klick setzt sie, Enter ohne
+  Zahlen am Ursprung. Ein Werkzeug bringt dafür seinen Befehl selbst mit
+  (`befehl(a)` neben `form`).
+- Tippen ändert nur die Skizze; die Felder bleiben, der Cursor bleibt im
+  Feld. Erst eine andere Wahl baut die Leiste neu.
+- Der Katalog sagt für Profil und Blechdecke nur noch den Schlüssel ihrer
+  Vorlage; Name und Skizze des Fensters fallen weg.
+
 ## 2026-11-27 · Oberfläche: kleinere App-Kacheln, kompakte Tabellen, das Handy
 
 Schritt 1 des Plans vom 2026-11-27: die Seite soll kleiner und kompakter

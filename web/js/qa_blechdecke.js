@@ -6,11 +6,11 @@
  * und ihr Profilblech aus Materialien des Projekts, die Masse des Blechs aus
  * seinem Datenblatt. Eingesetzt wird sie mit der Vorlage
  * «Blechverbunddecke» (qa_vorlagen.js), verschoben wie ein Profil, geändert
- * im schwebenden Fenster. Bewehrung zeichnet man in ihren Beton wie in jedes
+ * in der Seitenleiste. Bewehrung zeichnet man in ihren Beton wie in jedes
  * Polygon. Eine Analyse rechnet höchstens eine Decke; eine zweite meldet
  * der Kern rot.
  *
- * Im schwebenden Fenster stehen die Masse unter ihrem Zeichen, «h_p»; ihr
+ * In der Seitenleiste stehen die Masse unter ihrem Zeichen, «h_p»; ihr
  * Name ist der Titel des Feldes, und darüber zeigt eine Rippe, was jedes
  * Zeichen meint -- beides vom Kern.
  *
@@ -62,7 +62,7 @@ function blechlinie(a, e, klassen) {
 }
 
 /**
- * Das Feld eines Masses unter seinem Zeichen, im schwebenden Fenster.
+ * Das Feld eines Masses unter seinem Zeichen, in der Seitenleiste.
  * `neben` sind die Masse der Decke: ein Mass, das
  * ein anderes begrenzt, weist schon das Feld ab -- bei mehreren gewählten
  * nur gegen ein Mass, das alle gemeinsam haben.

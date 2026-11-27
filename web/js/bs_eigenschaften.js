@@ -1,5 +1,5 @@
 /**
- * bs_eigenschaften.js -- das schwebende Fenster im Zeichenfenster eines
+ * bs_eigenschaften.js -- die Seitenleiste im Zeichenfenster eines
  * Balkensystems.
  *
  * Was ein Werkzeug als Nächstes anlegt (`neuEigenschaften`) und was gewählt

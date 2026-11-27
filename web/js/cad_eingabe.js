@@ -11,7 +11,7 @@
  *              gedrückt: nicht fangen.
  *   R          setzt den Bezugspunkt auf den gefangenen Punkt. Nach jedem
  *              gesetzten Punkt springt er von selbst dorthin.
- *   Ziffern    gehen ins schwebende Fenster: relativ zum Bezugspunkt,
+ *   Ziffern    gehen in die Seitenleiste: relativ zum Bezugspunkt,
  *              absolut, oder Länge und Winkel. Enter setzt den Punkt genau
  *              dorthin -- getippte Werte werden nicht gefangen.
  *   Y / Z      binden an die Achse durch den Bezugspunkt (die Buchstaben
@@ -70,7 +70,7 @@ export function eingabeNeu(achsen = 2) {
   };
 }
 
-/** Leert die Felder -- auch die im schwebenden Fenster, das daran sieht, dass `runde` weiterzählt. */
+/** Leert die Felder -- auch die in der Seitenleiste, die daran sieht, dass `runde` weiterzählt. */
 export function felderLeeren(pe) {
   pe.felder = pe.felder.map(() => '');
   pe.runde += 1;
@@ -479,7 +479,7 @@ export function taste(a, e) {
   }
 }
 
-/** Was die Hilfen gerade sagen -- für die Frage im schwebenden Fenster. */
+/** Was die Hilfen gerade sagen -- für die Frage in der Seitenleiste. */
 export function hilfstext(a) {
   const w = a.eingabe.warten;
   if (w === 'parallel') return 'Linie anklicken, zu der parallel.';

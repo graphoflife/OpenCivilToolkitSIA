@@ -1,5 +1,5 @@
 /**
- * dk_eigenschaften.js -- das schwebende Fenster im Zeichenfenster einer Decke.
+ * dk_eigenschaften.js -- die Seitenleiste im Zeichenfenster einer Decke.
  *
  * Was ein Werkzeug als Nächstes anlegt (`neuEigenschaften`) und was gewählt
  * ist (`eigenschaften`): je Knoten -- mit seiner Stütze und Punktlast --,

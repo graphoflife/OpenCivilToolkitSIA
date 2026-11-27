@@ -1,18 +1,19 @@
 /**
- * cad_palette.js -- das schwebende Fenster im Zeichenfenster.
+ * cad_palette.js -- die Seitenleiste des Zeichenfensters.
  *
- * Steht anfangs oben rechts in der Zeichnung und lässt sich an seinem Kopf
- * verschieben. Wohin man es gestellt hat, merkt sich der Browser -- als
- * Abstand von oben rechts: wechselt der Inhalt, bleibt die obere Kante
- * stehen und nur die untere wandert (Benutzer, 2026-10-23; bis dahin war es
- * umgekehrt). Es bleibt immer ganz im Bild und lässt sich auf seinen Kopf
- * zuklappen.
+ * Sie steht rechts neben der Zeichnung und ist so hoch wie diese; ist das
+ * Zeichenfenster schmaler als 640 px, etwa auf dem Handy, steht sie
+ * darunter (Benutzer, 2026-11-27). Bis dahin schwebte ein Fenster von
+ * 224 px in der Zeichnung, das man verschieben und zuklappen konnte, und
+ * die Vorlagen hatten ein eigenes von 300 px. Wo die Seitenleiste steht und wie
+ * breit sie ist, sagt das Stilblatt (60-zeichenfenster.css).
  *
  * Was darin steht, setzt `paletteZeichnen` je nach Lage: in Ruhe die
  * Koordinaten des Zeigers, Raster und Fang; während eines Befehls seine
- * Frage, die Eingabefelder -- je Achse eines -- und die Hilfen; bei einer
- * Auswahl, was die App zu ihr zeigt. Im Raum steht in Ruhe und während
- * eines Befehls dazu die Arbeitsebene (cad_raum.js). Die Zeilen darin (`cadZeile`,
+ * Frage, die Eingabefelder -- je Achse eines -- und die Hilfen, darunter
+ * die Felder dessen, was das Werkzeug anlegt; bei einer Auswahl, was die
+ * App zu ihr zeigt. Im Raum steht in Ruhe und während eines Befehls dazu
+ * die Arbeitsebene (cad_raum.js). Die Zeilen darin (`cadZeile`,
  * `schalterzeile`) sind dieselben, aus denen die Apps ihre Eigenschaften
  * bauen.
  */
@@ -25,93 +26,24 @@ import {
 import { EBENEN, ebeneSetzen } from './cad_raum.js';
 import { el, zahlfeld } from './dom.js';
 
-const ABLAGE = 'opencivil.cad.palette';
-
-function gemerkt() {
-  try {
-    return { rechts: 10, oben: 10, zu: false, ...JSON.parse(localStorage.getItem(ABLAGE) || '{}') };
-  } catch {
-    return { rechts: 10, oben: 10, zu: false };
-  }
-}
-
-function merken(lage) {
-  try {
-    localStorage.setItem(ABLAGE, JSON.stringify(lage));
-  } catch {
-    // Privater Modus: dann gilt es bis zum Neuladen.
-  }
-}
-
-/** Das schwebende Fenster, eingehängt in `flaeche`. */
-export function paletteBauen(flaeche) {
-  const lage = gemerkt();
+/** Die Seitenleiste: oben ihr Titel, darunter, was gerade gilt -- es rollt, wenn es länger ist. */
+export function paletteBauen() {
   const titel = el('span.cad-palette-titel');
-  const zu = el('button.cad-palette-zu', {
-    type: 'button', title: 'Zuklappen', text: '–',
-  });
-  const griff = el('span.cad-palette-griff', { text: '⠿', title: 'Verschieben' });
-  const kopf = el('div.cad-palette-kopf', {}, [griff, titel, zu]);
   const koerper = el('div.cad-palette-koerper');
-  const knoten = el('div.cad-palette', {}, [kopf, koerper]);
-  flaeche.append(knoten);
-
-  // Reicht das Fenster über den unteren Rand, rückt es hinauf, bis es ganz zu
-  // sehen ist. Gemerkt bleibt die gewählte Lage: schrumpft der Inhalt wieder,
-  // kehrt es dorthin zurück.
-  const unterstes = () => Math.max(2, flaeche.clientHeight - knoten.offsetHeight - 2);
-  const halten = () => {
-    const b = flaeche.clientWidth;
-    if (!b || !flaeche.clientHeight) return;
-    lage.rechts = Math.min(Math.max(2, lage.rechts), Math.max(2, b - knoten.offsetWidth - 2));
-    knoten.style.right = `${lage.rechts}px`;
-    knoten.style.top = `${Math.min(Math.max(2, lage.oben), unterstes())}px`;
-  };
-
-  const zuklappen = (wert) => {
-    lage.zu = wert;
-    knoten.classList.toggle('ist-zu', wert);
-    zu.textContent = wert ? '+' : '–';
-    zu.title = wert ? 'Aufklappen' : 'Zuklappen';
-    merken(lage);
-    halten();
-  };
-  zu.addEventListener('click', () => zuklappen(!lage.zu));
-  zuklappen(lage.zu);
-
-  kopf.addEventListener('pointerdown', (start) => {
-    if (start.target === zu || start.button !== 0) return;
-    start.preventDefault();
-    // Von dort, wo es steht -- auch wenn es gerade hinaufgerückt ist.
-    const anfang = { ...lage, oben: knoten.offsetTop };
-    const bewegen = (e) => {
-      lage.rechts = anfang.rechts - (e.clientX - start.clientX);
-      lage.oben = Math.min(Math.max(2, anfang.oben + (e.clientY - start.clientY)), unterstes());
-      halten();
-    };
-    const los = () => {
-      window.removeEventListener('pointermove', bewegen);
-      window.removeEventListener('pointerup', los);
-      merken(lage);
-    };
-    window.addEventListener('pointermove', bewegen);
-    window.addEventListener('pointerup', los);
-  });
-
+  const knoten = el('div.cad-palette', {}, [el('div.cad-palette-kopf', {}, [titel]), koerper]);
   return {
     knoten,
-    halten,
-    /** Auf, wenn es zu ist -- etwa, weil jemand Zahlen tippt, die hineingehören. */
-    aufklappen() {
-      if (lage.zu) zuklappen(false);
-    },
-    /** Titel und Inhalt setzen -- Felder mit Fokus bleiben, wenn `schluessel` gleich ist. */
-    setzen(text, inhalt, schluessel = null) {
+    /**
+     * Titel und Inhalt setzen. Gebaut wird der Inhalt (`bauen()`) nur, wenn
+     * `schluessel` ein anderer ist: Felder mit Fokus bleiben, und was eine
+     * App aufhebt und wieder einsetzt -- die Felder einer Vorlage --, bleibt,
+     * wo es steht.
+     */
+    setzen(text, bauen, schluessel = null) {
       titel.textContent = text;
       if (schluessel !== null && koerper.dataset.schluessel === schluessel) return;
       koerper.dataset.schluessel = schluessel ?? '';
-      koerper.replaceChildren(...inhalt.filter(Boolean));
-      halten();
+      koerper.replaceChildren(...bauen().filter(Boolean));
     },
     koerper,
   };
@@ -121,7 +53,7 @@ export function paletteBauen(flaeche) {
 // Zeilen
 // ===========================================================================
 
-/** Eine Zeile im schwebenden Fenster: Beschriftung, Feld, Einheit. */
+/** Eine Zeile in der Seitenleiste: Beschriftung, Feld, Einheit. */
 export function cadZeile(beschriftung, eingabe, einheit = '') {
   return el('label.cad-zeile', {}, [
     el('span', { text: beschriftung }), eingabe, einheit ? el('span.einheit', { text: einheit }) : el('span'),
@@ -139,7 +71,7 @@ export function schalterzeile(beschriftung, schalter, zusatz = '') {
 // Inhalt
 // ===========================================================================
 
-/** Die Koordinaten des Zeigers, mit Einheit -- in der Ruhe oben im schwebenden Fenster. */
+/** Die Koordinaten des Zeigers, mit Einheit -- in der Ruhe oben in der Seitenleiste. */
 export function lageZeichnen(a) {
   const ziel = a.teile.lage;
   if (!ziel) return;
@@ -169,7 +101,7 @@ function ebenenzeilen(a) {
   ];
 }
 
-/** Was die Arbeitsebene im schwebenden Fenster ausmacht -- ändert es sich, baut es sich neu. */
+/** Was die Arbeitsebene in der Seitenleiste ausmacht -- ändert es sich, baut sie sich neu. */
 const ebenenschluessel = (a) => (a.v.ebene ? [a.v.ebene.achse, a.v.ebene.lage] : null);
 
 /** Ein Feld der Punkteingabe: schmal, rechtsbündig, ohne Pfeile. */
@@ -201,7 +133,7 @@ function hilfsknopf(a, zeichen, titel, tun, an = false) {
   }, [zeichen]);
 }
 
-/** Der Teil des Fensters, der während eines Befehls nach dem Punkt fragt -- je Achse ein Feld und eine Taste. */
+/** Der Teil der Seitenleiste, der während eines Befehls nach dem Punkt fragt -- je Achse ein Feld und eine Taste. */
 function punkteingabe(a) {
   const pe = a.eingabe;
   const einheiten = feldeinheiten(a);
@@ -258,9 +190,9 @@ function punkteingabe(a) {
 }
 
 /**
- * Füllt das schwebende Fenster. Neu gebaut wird sein Inhalt nur, wenn sich
- * die Lage ändert -- nicht bei jeder Zeigerbewegung, sonst verlöre ein Feld
- * beim Tippen den Fokus.
+ * Füllt die Seitenleiste. Neu gebaut wird ihr Inhalt nur, wenn sich die
+ * Lage ändert -- nicht bei jeder Zeigerbewegung, sonst verlöre ein Feld beim
+ * Tippen den Fokus.
  */
 export function paletteZeichnen(a) {
   const pal = a.teile.palette;
@@ -272,7 +204,7 @@ export function paletteZeichnen(a) {
       a.befehl.kopie ? a.befehl.anzahl : null, neuTeil?.schluessel ?? null,
       (a.befehl.tasten || []).map((t) => !!t.an?.(a.befehl)), ebenenschluessel(a),
     ]);
-    pal.setzen(hilfstext(a) || a.befehl.frage(a), [
+    pal.setzen(hilfstext(a) || a.befehl.frage(a), () => [
       ...punkteingabe(a),
       ...ebenenzeilen(a),
       neuTeil?.inhalt.length ? el('div.cad-neu', {}, [el('div.cad-neu-titel', { text: 'Neu' }), ...neuTeil.inhalt]) : null,
@@ -281,29 +213,36 @@ export function paletteZeichnen(a) {
   }
   if (a.auswahl.size) {
     const teil = a.adapter.eigenschaften(a);
-    pal.setzen(teil.titel, teil.inhalt, JSON.stringify(['auswahl', a.version, [...a.auswahl], teil.schluessel ?? null]));
+    pal.setzen(teil.titel, () => teil.inhalt,
+      JSON.stringify(['auswahl', a.version, [...a.auswahl], teil.schluessel ?? null]));
     return;
   }
-  // Das Raster als Schalter mit seinen Stufen: Auswahllisten gibt es nur für
-  // die Wahl eines Materials (Benutzer, 2026-10-23).
+  pal.setzen('Zeiger', () => ruhe(a), JSON.stringify(['ruhe', a.raster, a.fang, ebenenschluessel(a)]));
+  a.teile.lage = pal.koerper.querySelector('.cad-lage');
+  lageZeichnen(a);
+}
+
+/**
+ * Die Seitenleiste in Ruhe: wo der Zeiger steht, das Raster als Schalter
+ * mit seinen Stufen -- Auswahllisten gibt es nur für die Wahl eines
+ * Materials (Benutzer, 2026-10-23) -- und der Fang, ein Schalter, kein Haken
+ * (Benutzer, 2026-11-19). Sie baut sich neu, wenn Raster oder Fang
+ * wechseln: beide stehen in ihrem Schlüssel.
+ */
+function ruhe(a) {
   const raster = wahlSchalter({
     werte: a.einstellung.raster.stufen.map((r) => ({ wert: r, beschriftung: String(r) })),
     gewaehlt: a.raster, setzen: (w) => { a.raster = w; a.neuZeichnen(); },
     titel: `Raster in ${a.einstellung.einheit}: daran fängt der Zeiger`, klasse: '.cad-wahl.cad-rasterwahl',
   });
-  // Ein Schalter, kein Haken (Benutzer, 2026-11-19). Die Palette baut sich
-  // neu, wenn der Fang wechselt: er steht in ihrem Schlüssel.
   const fang = hakenSchalter(a.fang, (w) => { a.fang = w; a.neuZeichnen(); },
     'Fang an Knoten, Linien und Raster (Alt hält ihn an)');
-  a.teile.lage = el('span.cad-lage');
-  pal.setzen('Zeiger', [
-    a.teile.lage,
+  return [
+    el('span.cad-lage'),
     el('div.cad-ruhe', {}, [
       el('span', { text: `Raster in ${a.einstellung.einheit}` }), el('span.cad-fang', {}, ['Fang', fang]),
     ]),
     raster,
     ...ebenenzeilen(a),
-  ], JSON.stringify(['ruhe', a.raster, a.fang, ebenenschluessel(a)]));
-  if (!a.teile.lage.isConnected) a.teile.lage = pal.koerper.querySelector('.cad-lage');
-  lageZeichnen(a);
+  ];
 }

@@ -12,7 +12,7 @@
  * Jeder Befehl hat dieselbe Gestalt:
  *
  *   start(a)          beim Start, wenn er schon etwas weiss (nicht jeder)
- *   frage(a)          was er gerade braucht -- steht im schwebenden Fenster
+ *   frage(a)          was er gerade braucht -- steht in der Seitenleiste
  *   hinweis           was er sonst kann -- steht in der Statuszeile (nicht jeder)
  *   tasten            eigene Tasten, je {taste, zeichen, titel, tun(a, befehl),
  *                     an(befehl)} -- auch als Knopf im Fenster (nicht jeder)

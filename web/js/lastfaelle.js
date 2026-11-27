@@ -196,7 +196,7 @@ export function ohneLastfall() {
 }
 
 /**
- * Der Lastfall gewählter Lasten im schwebenden Fenster -- mit «Var», wenn
+ * Der Lastfall gewählter Lasten in der Seitenleiste -- mit «Var», wenn
  * sie sich unterscheiden. `eintrag` ist das Bauteil, `setzen(lastfall)`
  * schreibt.
  */

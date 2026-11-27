@@ -330,13 +330,13 @@ Fertig und getestet (am 2026-11-21: 2145 Tests):
 | `sw.js`, `web/js/offline.js`, `web/manifest.webmanifest` | die Seite ohne Netz und als App: der Service Worker, wo er angemeldet wird, was ein installiertes Fenster zeigt |
 | `web/js/` | Oberfläche in reinem JavaScript, ohne Bauschritt |
 | `web/js/kapitel.js`, `fenster.js`, `sinnbilder.js`, `nachweise.js` | die Kapitel der Platte als Knöpfe mit Zeichen, ihre Eingaben in einem Fenster über der Tafel |
-| `web/js/cad_*.js` | das Zeichenfenster, allgemein: Ansicht, Knoten und Elemente, Punkteingabe, Befehle, Auswahl, schwebendes Fenster; im Raum die Ansichten, das Drehen und die Arbeitsebene (`cad_raum.js`) |
-| `web/js/qa_zeichnung.js`, `qa_uebersicht.js`, `qa_vorlagen.js` | was es in der Querschnittsanalyse zeichnet, die Liste darunter und die Vorlagen |
+| `web/js/cad_*.js` | das Zeichenfenster, allgemein: Ansicht, Knoten und Elemente, Punkteingabe, Befehle, Auswahl, die Seitenleiste neben der Zeichnung; im Raum die Ansichten, das Drehen und die Arbeitsebene (`cad_raum.js`) |
+| `web/js/qa_zeichnung.js`, `qa_uebersicht.js`, `qa_vorlagen.js` | was es in der Querschnittsanalyse zeichnet, die Liste darunter und die Werkzeuge, die an einem Punkt einsetzen: Stahlprofil, Blechverbunddecke, Vorlage |
 | `web/js/querschnittsanalyse.js`, `qa_diagramme.js` | ihre übrige Eingabe und ihre Diagramme |
 | `web/js/bs_zeichnung.js`, `bs_symbole.js` | was es im Balkensystem zeichnet: Stäbe, Lager, Federn, Gelenke, Lasten |
-| `web/js/bs_eigenschaften.js`, `bs_teile.js` | das schwebende Fenster des Balkensystems -- die Felder des Gewählten, mehrere zugleich mit «Var» -- und was Zeichnung, Fenster und Panels gemeinsam brauchen |
+| `web/js/bs_eigenschaften.js`, `bs_teile.js` | die Seitenleiste des Balkensystems -- die Felder des Gewählten, mehrere zugleich mit «Var» -- und was Zeichnung, Fenster und Panels gemeinsam brauchen |
 | `web/js/balkensystem.js`, `bs_texte.js`, `bs_diagramme.js` | die übrige Eingabe des Balkensystems, eben und im Raum, ihre Texte je Art und seine Ergebnisse |
-| `web/js/decke.js`, `dk_zeichnung.js`, `dk_eigenschaften.js` | die Eingabe einer Decke, was das Zeichenfenster von ihr zeichnet und sein schwebendes Fenster |
+| `web/js/decke.js`, `dk_zeichnung.js`, `dk_eigenschaften.js` | die Eingabe einer Decke, was das Zeichenfenster von ihr zeichnet und seine Seitenleiste |
 | `web/js/dk_grundriss.js`, `dk_ergebnis.js` | ihr Grundriss mit Aufteilung und Streifen, und ihre Ergebnisbilder |
 | `web/js/grundbruch.js`, `gb_zeichnung.js` | die Eingabe eines Grundbruchs und das Bild seiner Situation |
 | `web/js/setzung.js`, `sz_zeichnung.js`, `gb_skizze.js` | die Eingabe einer Setzung, das Bild ihrer Situation und die Bausteine, die die Bilder des Grundbaus teilen |
@@ -452,14 +452,22 @@ Projekt fest.
 **Querschnittsanalyse:** unter den Platten ein zweites Kapitel. Der
 Querschnitt wird gezeichnet wie in einem kleinen CAD, und oben steht je Art
 ein Knopf mit Zeichen:
-* *Polygon* P -- eine Fläche aus Beton oder eine Aussparung;
+* *Querschnitt zeichnen* P -- Ecke um Ecke eine Fläche aus Beton, Baustahl
+  oder Holz, ohne Material eine Aussparung;
 * *Bewehrung* B -- als Linie (nach Anzahl, Teilung oder verschmiert) oder als
-  einzelner Stab, umgestellt mit dem Schalter «Linie | Punkt» im Fenster; die
+  einzelner Stab, umgestellt mit dem Schalter «Linie | Punkt» in der
+  Seitenleiste; die
   Fläche einer verschmierten Linie von Hand oder aus ⌀, Teilung s und Länge
   L (leer: die der Linie) als L/s · π⌀²/4 -- sie steht dann grau darunter;
+* *Stahlprofil* I und *Blechverbunddecke* D -- ein Walzprofil aus dem
+  Katalog oder eine Betonplatte auf einem Profilblech, an einem Punkt
+  eingesetzt;
+* *Spannstahl* S -- ein Spannglied je Klick;
 * *Schubwand* W -- eine Wand mit Bügeln;
 * *Hilfspunkt* K und *Hilfslinie* H -- zum Konstruieren, sie rechnen nicht
-  mit; geschlossene Hilfslinien werden auf Wunsch eine Fläche.
+  mit; geschlossene Hilfslinien werden auf Wunsch eine Fläche;
+* *Vorlage* T -- Rechteck, T-Balken, Hohlkasten oder Kreis samt Bewehrung,
+  an einem Punkt eingesetzt.
 
 Ein Polygon kann eine Überdeckung c tragen. Dann steht es grün gepunktet so
 weit nach innen gerückt da -- eine Aussparung nach aussen --, und an seinen
@@ -469,7 +477,8 @@ als Ganzes, eine Linie Ende für Ende. Eine verschmierte Linie gilt dafür als
 Stäbe im Abstand von 150 mm mit gleicher Fläche -- eine aus ⌀ und Teilung
 mit ihrem ⌀. Mitgerechnet wird c nicht.
 
-Das schwebende Fenster zeigt immer nur eine Art: beim Zeichnen die des
+Die Seitenleiste rechts der Zeichnung -- in einem schmalen Fenster
+darunter -- zeigt immer nur eine Art: beim Zeichnen die des
 Werkzeugs, bei der Auswahl die des Gewählten. Eine andere Art ist ein anderes
 Werkzeug -- eine gezeichnete Linie wechselt ihre Art nicht.
 
@@ -485,10 +494,10 @@ Achse projiziert: sein Fangzeichen steht an ihm, eine gestrichelte Spur führt
 zur Stelle auf der Achse. Eine Linie entsteht aus zwei Punkten, danach
 beginnt die nächste mit einem eigenen Anfangspunkt. Esc nimmt wie die
 Rücktaste den letzten gesetzten Punkt zurück, beim Polygon wie bei der Linie;
-erst ohne Punkt endet das Werkzeug. Alle Eigenschaften stehen im
-schwebenden Fenster in der Zeichnung. Mit T kommt eine Vorlage dazu --
-Rechteck, T-Balken, Hohlkasten oder Kreis, die Skizze ändert sich beim
-Tippen der Masse. Rückgängig mit Strg+Z, Vollbild.
+erst ohne Punkt endet das Werkzeug. Alle Eigenschaften stehen in der
+Seitenleiste. Bei Stahlprofil, Blechverbunddecke und Vorlage stehen dort
+die Masse und eine Skizze, die sich beim Tippen ändert; ein Klick setzt
+sie ein, Enter ohne Zahlen am Ursprung. Rückgängig mit Strg+Z, Vollbild.
 Darunter eine Liste: Meldungen, Querschnittswerte, je Element eine Zeile --
 je Art eine Gruppe, die auf- und zuklappt, zu Beginn zu.
 Was die Rechnung braucht -- die Stäbe einer Linie samt tatsächlicher
@@ -579,9 +588,9 @@ ohne Bewehrung und Schubverformung; das Gleichgewicht nach Theorie
 **3D Balkensysteme:** dieselbe App für einen Rahmen im Raum, mit sechs
 Unbekannten je Knoten: drei Verschiebungen und drei Drehungen. Gezeichnet
 wird im selben Fenster, schräg von oben, im Grundriss x-y oder in den
-Ansichten x-z und y-z -- Knöpfe in der Leiste --, und die rechte Maustaste
+Ansichten x-z und y-z -- Knöpfe über der Zeichnung --, und die rechte Maustaste
 dreht die Ansicht. Ein Klick trifft die Arbeitsebene: x-y in einer Höhe z,
-x-z bei einem y oder y-z bei einem x, gewählt im schwebenden Fenster; die
+x-z bei einem y oder y-z bei einem x, gewählt in der Seitenleiste; die
 Taste E legt sie durch den Punkt unter dem Zeiger. Eine Linie hat dazu
 ihren Drehwinkel β, der den Querschnitt um die Stabachse dreht. Ein Lager
 hält je Verschiebung in x, y, z und je Drehung um x, y, z frei, fest oder

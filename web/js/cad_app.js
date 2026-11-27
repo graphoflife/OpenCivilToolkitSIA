@@ -17,19 +17,19 @@
  *   unter der Zeichnung     die Meldungen und die Liste der Teile: je Art
  *                           eine Gruppe, je Teil eine Zeile; markiert, was
  *                           gewählt ist
- *   das schwebende Fenster  die Auswahl nach Listen (`auswahlEigenschaften`),
+ *   die Seitenleiste        die Auswahl nach Listen (`auswahlEigenschaften`),
  *                           Felder für mehrere zugleich («Var»), die Lage
  *                           der Punkte, die Länge einer Linie und die
  *                           Meldungen zu den gewählten
  *
  * Was ein Klick unter der Zeichnung wählt, sagt `waehlbarVon` -- dieselbe
  * Regel wie in der Zeichnung: ein Lager, eine Stütze wählt man über ihren
- * Knoten. Die Zeilen des schwebenden Fensters -- mit Feld und Einheit, mit
- * Schalter -- stehen bei ihm (cad_palette.js).
+ * Knoten. Die Zeilen der Seitenleiste -- mit Feld und Einheit, mit
+ * Schalter -- stehen bei ihr (cad_palette.js).
  *
  * Bis 2026-11-10 stand das Fenster dreimal da, je mit eigenem Leser des
  * Eintrags und eigenem Vergessen; bis 2026-11-20 die Antwort des Kerns, die
- * Liste und das schwebende Fenster.
+ * Liste und das schwebende Fenster, die heutige Seitenleiste.
  */
 
 import {
@@ -50,7 +50,7 @@ import {
 /**
  * Die Zeichenfenster einer App. `praefix` trennt sie von denen anderer
  * Apps, `teile(kennung)` liefert, was der Adapter darüber hinaus weiss --
- * Einstellung, Arten, Zeichnen, schwebendes Fenster (cad_fenster.js) und
+ * Einstellung, Arten, Zeichnen, Seitenleiste (cad_fenster.js) und
  * was sie den Kern fragt, wenn sie fragt (`fragen`, siehe `kernFragen`).
  * `einrichten(a)`
  * hängt an das Fenster, was die App an ihm braucht. Wer eine Kennung
@@ -165,7 +165,7 @@ export function meldungenJe(a) {
   };
 }
 
-/** Die Meldungen zu diesen Teilen, im schwebenden Fenster: rot, was falsch ist, grau, was nur fehlt. */
+/** Die Meldungen zu diesen Teilen, in der Seitenleiste: rot, was falsch ist, grau, was nur fehlt. */
 export function meldungszeilen(a, kennungen) {
   return kernmeldungen(a).filter((m) => m.elemente.some((k) => kennungen.includes(k)))
     .map((m) => el(m.fehler ? 'p.cad-meldung' : 'p.cad-hinweis-klein', { text: m.text }));
@@ -290,17 +290,15 @@ export function listengruppen(a, gruppen) {
   if (da.length) return da.map(([titel, zeilen]) => klappgruppe(titel, zeilen, a.adapter.aufgeklappt, 'cad-elemente'));
   if (!nichtsGezeichnet(a.adapter.zeichnung())) return [];
   const werkzeuge = a.einstellung.werkzeuge.map((w) => `${w.text} ${w.taste.toUpperCase()}`).join(', ');
-  return [el('p.leer-zeile', {
-    text: `Noch nichts gezeichnet: ${werkzeuge}${a.adapter.vorlageOeffnen ? ' – oder eine Vorlage T' : ''}.`,
-  })];
+  return [el('p.leer-zeile', { text: `Noch nichts gezeichnet: ${werkzeuge}.` })];
 }
 
 // ===========================================================================
-// Das schwebende Fenster
+// Die Seitenleiste
 // ===========================================================================
 
 /**
- * Das schwebende Fenster zur Auswahl. Sie zerfällt nach Listen -- Knoten
+ * Die Seitenleiste zur Auswahl. Die Auswahl zerfällt nach Listen -- Knoten
  * unter 'knoten', Anhänge unter 'anhaenge', Ecken für sich --, und ist
  * alles aus einer, baut `je[liste](a, z, kennungen)` -- sonst
  * `je.sonst(a, z, kennungen, liste)` -- Titel und Inhalt; gewählte Ecken

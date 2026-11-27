@@ -1,5 +1,5 @@
 ---
-erzeugt: fd55a276e73e
+erzeugt: f419ef421824
 art: modul
 tags: [modul]
 ---
@@ -59,4 +59,3 @@ Ein Stahlprofil an einem Knoten – siehe Dateikopf.
 ## Gebraucht von
 
 - [[opencivil.projekt.querschnittsanalyse]]
-- [[opencivil.web.api]]

@@ -3,7 +3,7 @@
  *
  * Gezogen wird nichts: ein Element wählt man aus und verschiebt es danach
  * mit einem Befehl, mit Startpunkt und Ziel. Wer eine Ecke an eine bestimmte
- * Stelle will, tippt sie ins schwebende Fenster.
+ * Stelle will, tippt sie in die Seitenleiste.
  *
  *   Klick              wählt, was unter dem Zeiger liegt: eine Ecke vor
  *                      Punkten vor Linien vor Flächen, die kleinste zuerst.
@@ -334,8 +334,7 @@ function auswahlRahmen(a) {
 
 /**
  * Die kleine Leiste neben der Auswahl: nur, was für sie geht. Steht oben
- * rechts an der Auswahl, im Bild gehalten, und weicht dem schwebenden
- * Fenster aus.
+ * rechts an der Auswahl, im Bild gehalten.
  */
 export function leisteZeichnen(a) {
   const ziel = a.teile.leiste;
@@ -363,13 +362,6 @@ export function leisteZeichnen(a) {
   if (y < 4) y = r[3] + 10;
   if (x + breite > a.v.breite - 4) x = Math.max(4, r[0] - breite - 12);
   y = Math.min(Math.max(4, y), a.v.hoehe - hoehe - 4);
-  // Dem schwebenden Fenster ausweichen.
-  const pal = a.teile.palette.knoten;
-  if (!pal.hidden) {
-    const p = [pal.offsetLeft, pal.offsetTop, pal.offsetLeft + pal.offsetWidth, pal.offsetTop + pal.offsetHeight];
-    const ueberlappt = x < p[2] && x + breite > p[0] && y < p[3] && y + hoehe > p[1];
-    if (ueberlappt) y = Math.max(4, p[1] - hoehe - 6);
-  }
   ziel.style.left = `${Math.round(x)}px`;
   ziel.style.top = `${Math.round(y)}px`;
 }

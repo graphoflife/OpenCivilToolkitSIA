@@ -3,22 +3,27 @@
  *
  * Das allgemeine Fenster (`cad_fenster.js`) kennt nur Knoten und Elemente
  * in drei Formen. Was sie im Querschnitt sind, steht hier -- je Art ein
- * Werkzeug mit eigenem Knopf (Benutzer, 2026-10-23):
+ * Werkzeug mit eigenem Knopf (Benutzer, 2026-10-23 und 2026-11-27):
  *
- *   Polygon      eine Fläche mit Beton -- oder ohne Material eine Aussparung
+ *   Querschnitt zeichnen
+ *                eine Fläche aus Beton, Baustahl oder Holz, Ecke um Ecke --
+ *                ohne Material eine Aussparung; bis 2026-11-27 «Polygon»
  *   Bewehrung    eine Linie mit Stäben (nach Anzahl, Teilung oder verschmiert)
- *                oder ein einzelner Stab -- wie, sagt der Schalter in ihrem
- *                Fenster
+ *                oder ein einzelner Stab -- wie, sagt der Schalter in der
+ *                Seitenleiste
+ *   Stahlprofil  ein Stahlprofil der Tabelle, an seiner Mitte eingesetzt
+ *                (qa_vorlagen.js, qa_profile.js)
+ *   Blechverbunddecke
+ *                eine Decke mit ihrem Beton und Blech, ebenso eingesetzt
+ *                (qa_vorlagen.js, qa_blechdecke.js)
  *   Spannstahl   ein Spannglied je Klick (qa_spannglied.js)
- *   (Profil)     ein Stahlprofil der Tabelle -- ohne Werkzeug: eingesetzt
- *                wird es mit der Vorlage «Stahlprofil» (qa_profile.js)
- *   (Decke)      eine Blechverbunddecke mit ihrem Beton und Blech -- ebenso
- *                mit der Vorlage «Blechverbunddecke» (qa_blechdecke.js)
  *   Schubwand    eine Linie mit Dicke und Bügeln
- *   Hilfslinie   eine Linie, die nicht mitrechnet
  *   Hilfspunkt   ein Knoten ohne Element, zum Fangen
+ *   Hilfslinie   eine Linie, die nicht mitrechnet
+ *   Vorlage      Rechteck, T-Balken, Hohlkasten oder Kreis, an einem Punkt
+ *                eingesetzt (qa_vorlagen.js)
  *
- * Im schwebenden Fenster steht immer nur eine Art: beim Zeichnen die des
+ * In der Seitenleiste steht immer nur eine Art: beim Zeichnen die des
  * Werkzeugs, bei der Auswahl die des Gewählten. Eine gezeichnete Linie
  * wechselt ihre Art nicht -- bis 2026-10-23 tat sie das über ein
  * Auswahlfeld «Art», und die Linie hiess im Knopf nur «Linie».
@@ -58,7 +63,7 @@ import {
 import {
   aussenVon, fangVon, umrissVon,
 } from './qa_umriss.js';
-import { vorlageOeffnen } from './qa_vorlagen.js';
+import { VORLAGEN, vorlagenInhalt, vorlagenText } from './qa_vorlagen.js';
 import { sinnbild } from './sinnbilder.js';
 import {
   el, svgEl, zahlfeld,
@@ -146,15 +151,19 @@ const LINIENLISTEN = ARTEN.filter((x) => x.form === 'linie').map((x) => x.liste)
 
 /**
  * Die Werkzeuge, in der Folge ihrer Knöpfe. Die Bewehrung zeichnet als
- * Linie oder als Punkt, je nach dem Schalter in ihrem Fenster
- * (`vorgaben.bewehrung`).
+ * Linie oder als Punkt, je nach dem Schalter in der Seitenleiste
+ * (`vorgaben.bewehrung`). Stahlprofil, Blechverbunddecke und Vorlage setzen
+ * etwas Fertiges an einem Punkt ein, mit ihrem eigenen Befehl.
  */
 const WERKZEUGE = [
-  { name: 'polygon', text: 'Polygon', zeichen: 'cad-polygon', taste: 'p', form: 'polygon',
-    titel: 'Polygon: eine Fläche aus Beton, Baustahl oder Holz – oder eine Aussparung' },
+  { name: 'polygon', text: 'Querschnitt zeichnen', zeichen: 'cad-querschnitt', taste: 'p', form: 'polygon',
+    titel: 'Querschnitt zeichnen: Ecke um Ecke eine Fläche aus Beton, Baustahl oder Holz – '
+      + 'ohne Material eine Aussparung' },
   { name: 'bewehrung', text: 'Bewehrung', zeichen: 'cad-bewehrung', taste: 'b',
     form: (a) => (a.qa.vorgaben.bewehrung === 'punkt' ? 'knoten' : 'linie'),
     titel: 'Bewehrung: eine Linie mit Stäben oder einzelne Stäbe' },
+  VORLAGEN.stahlprofil,
+  VORLAGEN.blechdecke,
   SPANNSTAHL,
   { name: 'schubwand', text: 'Schubwand', zeichen: 'cad-schubwand', taste: 'w', form: 'linie',
     titel: 'Schubwand: eine Wand mit Bügeln, für Querkraft und Torsion' },
@@ -162,6 +171,7 @@ const WERKZEUGE = [
     titel: 'Hilfspunkt: ein Knoten ohne Element, zum Fangen' },
   { name: 'hilfslinie', text: 'Hilfslinie', zeichen: 'cad-hilfslinie', taste: 'h', form: 'linie',
     titel: 'Hilfslinie: rechnet nicht mit – geschlossen wird sie zur Fläche' },
+  VORLAGEN.vorlage,
 ];
 
 /** Welche Liste eine Linie des Werkzeugs füllt. */
@@ -368,8 +378,6 @@ function adapter(kennung) {
     eigenschaften,
     neuEigenschaften,
     aktionen,
-    // Woraus die Vorlage ist und wie ihre Flächen aussehen, sagt die Zeichnung.
-    vorlageOeffnen: (a) => vorlageOeffnen(a, vorgaben(a), flaechenklasse),
   };
 }
 
@@ -385,8 +393,8 @@ export function stoffname(kennung) {
 }
 
 /**
- * Was das Werkzeug als Nächstes anlegt, in Worten -- für die Frage im
- * schwebenden Fenster. Mit den geprüften Vorgaben: es nennt das Material,
+ * Was das Werkzeug als Nächstes anlegt, in Worten -- für die Frage in der
+ * Seitenleiste. Mit den geprüften Vorgaben: es nennt das Material,
  * das das neue Element wirklich bekommt.
  */
 function neuText(a, werkzeug) {
@@ -398,11 +406,12 @@ function neuText(a, werkzeug) {
     return v.bewehrung === 'punkt' ? `Stab ⌀${zahlText(v.staebe.durchmesser)}` : 'Linienbewehrung';
   }
   if (werkzeug === 'spannstahl') return `Spannglied ${gliedText(v.spannglieder)}`;
+  if (VORLAGEN[werkzeug]) return vorlagenText(a, werkzeug);
   return WERKZEUGE.find((w) => w.name === werkzeug)?.text || '';
 }
 
 // ===========================================================================
-// Anlegen -- nach den Vorgaben im schwebenden Fenster
+// Anlegen -- nach den Vorgaben in der Seitenleiste
 // ===========================================================================
 
 /** Ein Stab der Bewehrung oder ein Spannglied -- ein Hilfspunkt ist der Knoten selbst und legt nichts an. */
@@ -673,7 +682,7 @@ function linienVorschau(a, g, p, q, werkzeug) {
 }
 
 // ===========================================================================
-// Felder im schwebenden Fenster
+// Felder in der Seitenleiste
 // ===========================================================================
 
 /**
@@ -807,9 +816,14 @@ function formWahl(a) {
   });
 }
 
-/** Die Vorgaben für das, was ein Werkzeug als Nächstes anlegt -- nur die seiner Art. */
+/**
+ * Die Vorgaben für das, was ein Werkzeug als Nächstes anlegt -- nur die
+ * seiner Art. Was eines einsetzt, das eine Vorlage ist, zeigt qa_vorlagen.js:
+ * woraus die Flächen sind und wie sie aussehen, sagt die Zeichnung.
+ */
 function neuEigenschaften(a, werkzeug) {
   const v = vorgaben(a);
+  if (VORLAGEN[werkzeug]) return vorlagenInhalt(a, werkzeug, { vorgaben: v, flaechenklasse });
   const felder = (liste) => {
     const { wert, setzen } = vorgabe(a, v[liste]);
     return felderVon(liste, wert, setzen);

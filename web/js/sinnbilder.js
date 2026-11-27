@@ -349,6 +349,21 @@ const ZEICHEN = {
   'cad-polygon': {
     pfade: ['M5 19L3.5 7.5l9-4 8 6.5-4.5 9z'],
   },
+  // Ein T-Balken, dessen Umriss noch offen ist: der Querschnitt, wie man ihn
+  // zeichnet -- Ecke um Ecke, der Stift unten rechts am Steg.
+  'cad-querschnitt': {
+    pfade: ['M9.5 20V9H3V4h18v5h-4.5v6'],
+    voll: [[9.5, 20, 1.3], [16.5, 15, 1.7]],
+  },
+  // Ein Walzprofil im Schnitt -- ein I.
+  'cad-stahlprofil': {
+    pfade: ['M5.5 4h13v3h-5v10h5v3h-13v-3h5V7h-5z'],
+  },
+  // Eine Blechverbunddecke im Schnitt: der Beton über seinem Trapezblech.
+  'cad-blechdecke': {
+    pfade: ['M2.5 5.5h19 M2.5 5.5v12 M21.5 5.5v6',
+      'M2.5 17.5h3l2.5-6h4l2.5 6h3l2.5-6h1.5'],
+  },
   // Ein Balken im Schnitt, unten seine Stäbe.
   'cad-bewehrung': {
     pfade: ['M6 3h12v18H6z'],

@@ -1,5 +1,5 @@
 ---
-erzeugt: dc9dff11b6ab
+erzeugt: 605b07d2b38f
 art: modul
 tags: [modul]
 ---
@@ -89,6 +89,5 @@ Die Form des Blechs mit der Ecke links unten bei `ursprung`, in mm.
 
 - [[opencivil.projekt.aufbau.querschnittsanalyse]]
 - [[opencivil.projekt.querschnittsanalyse]]
-- [[opencivil.web.api]]
 - [[opencivil.web.dienst]]
 - [[opencivil.web.zeichengeometrie]]

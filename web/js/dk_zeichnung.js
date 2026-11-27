@@ -25,7 +25,7 @@
  * vorige blass stehen, statt bei jedem Strich zu flackern. Die Meldungen
  * gelten nur, solange die Zeichnung dieselbe ist, nach der gefragt wurde.
  *
- * Das schwebende Fenster steht in `dk_eigenschaften.js`, das Bild in
+ * Die Seitenleiste steht in `dk_eigenschaften.js`, das Bild in
  * `dk_grundriss.js`. Gerechnet wird hier nichts.
  */
 
@@ -217,7 +217,7 @@ function elementname(a, kennung) {
   return knotenname(kennung) ?? (art ? `${art.heisst} ${kennung}` : kennung);
 }
 
-/** Was das Werkzeug als Nächstes anlegt, in Worten -- für die Frage im schwebenden Fenster. */
+/** Was das Werkzeug als Nächstes anlegt, in Worten -- für die Frage in der Seitenleiste. */
 function neuText(a, werkzeug) {
   const v = a.dk.vorgaben;
   if (werkzeug === 'platte') return `Platte ${v.platten.h} mm`;
