@@ -21,6 +21,9 @@ daten/
 # Ist-Fassung eines abweichenden Berichts, zum Ansehen neben der Soll-Fassung.
 tests/schnappschuss/*.ist
 
+# Wie lange jede Testdatei zuletzt brauchte -- nur für die Reihenfolge in tests/alle.py.
+tests/.dauern.json
+
 # Obsidian: die Einstellungen des Notizbuchs gehören dazu, seine
 # Arbeitsdateien (Fenster, Plugins, Papierkorb) nicht.
 notizbuch/.obsidian/*

@@ -30,10 +30,15 @@ Vor jedem Commit:
 
 ```bash
 python3 -m opencivil.web.bruecke        # Verzeichnis und Versionsmarken der Seite
-python3 -m unittest discover -s tests -t .
+python3 -m tests.alle                   # alle Tests, verteilt auf die Kerne
 python3 -m tests.test_schnappschuss     # Abweichungen lesen – erst dann:
 python3 -m tests.test_schnappschuss --uebernehmen
 ```
+
+Vor jedem Commit alle Tests, nicht nur die der geänderten App (Benutzer,
+2026-11-27). `tests.alle` ist dasselbe wie `python3 -m unittest discover
+-s tests -t .`, nur auf alle Kerne verteilt: knapp zwei statt sechs
+Minuten.
 
 JavaScript hat keinen Bauschritt. Seine Syntax prüft `node --check` über eine
 Kopie der Datei mit der Endung `.mjs`.

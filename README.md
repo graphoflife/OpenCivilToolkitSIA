@@ -30,7 +30,7 @@ CPython rund 25 ms; im Browser ist es etwa das Anderthalbfache.
 python3 start_ui.py          # Oberfläche auf http://127.0.0.1:8080
 python3 demo_material.py     # Kern allein: Kennwerte, Rückverfolgung, Überschreiben
 python3 demo_nachweis.py     # Kern allein: Platte beschreiben, rechnen, Bericht
-python3 -m unittest discover -s tests -t .
+python3 -m tests.alle        # alle Tests, verteilt auf die Kerne des Rechners
 ```
 
 Der lokale Server startet ohne Ladezeit. Sonst ist er dasselbe: beide Wege rufen

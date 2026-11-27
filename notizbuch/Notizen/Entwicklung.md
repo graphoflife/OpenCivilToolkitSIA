@@ -7,6 +7,30 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-27 · Alle Tests in knapp zwei Minuten
+
+Dem Benutzer war die Wartezeit vor jedem Commit zu lang: alle Tests
+nacheinander brauchten rund sechs Minuten. Weniger Tests je Commit wollte
+er nicht – jeder Push veröffentlicht die Seite, und die Commits sind sein
+Rückfallnetz.
+
+Vorher lief `unittest discover` auf einem der acht Kerne. Nachher
+verteilt `python3 -m tests.alle` die 111 Testdateien auf alle acht, jede
+in einem eigenen Prozess, die längste zuerst: 2633 Tests in 102 statt
+355 s, mit vier Prozessen 135 s. Viel schneller wird es nicht. Unter
+Last brauchen alle Dateien zusammen 748 s Rechenzeit, gut 90 s je Kern;
+die Hälfte der Kerne ist sparsam und langsamer, und die längste Datei
+allein braucht 67 s.
+
+- Kein fremdes Paket: `subprocess` und ein Pool von Fäden, die je auf
+  einen Prozess warten.
+- Wie lange eine Datei zuletzt brauchte, merkt sich `tests/.dauern.json`,
+  nicht im Repo – nur für die Reihenfolge.
+- Ein Test prüft, dass das Programm einen Fehlschlag, einen Absturz beim
+  Import und einen Lauf ohne Tests nie als «OK» liest.
+
+---
+
 ## 2026-11-27 · Erdbeben: rechnet neu, wenn sich eine Wand ändert
 
 Ein Fehler, gefunden beim Planen der Wünsche vom 2026-11-27.
