@@ -529,7 +529,7 @@ class TestRechnen(unittest.TestCase):
                          1.0 * 0.25)
         self.assertEqual(e.wert(f"balkensystem.r1.{aus_analyse.kennung}.I").groesse.si,
                          e.wert("querschnittsanalyse.a1.I_y").groesse.si)
-        self.assertEqual(e.aufbau.balkensysteme["r1"].bezuege, ["a1", "q1"])
+        self.assertEqual(e.aufbau.bauteil("r1").bezuege, ("a1", "q1"))
 
     def test_ein_fremder_verweis_haelt_das_system_an(self):
         p = traeger()

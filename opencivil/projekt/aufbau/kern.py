@@ -417,11 +417,21 @@ class Bauteil:
     Zusammenfassung -- jede so, wie ihr Erzeuger sie nennt.
     """
 
-    bezuege: Tuple[str, ...] = ()
-    """Die Bauteile, deren Werte es liest: Platten und Analysen, aus denen ein System Querschnitte nimmt."""
-
     ohne_nachweis: str = ""
     """Warum es keinen seiner Nachweise fuehrt -- leer, wenn nichts fehlt (:meth:`Aufbau.ohne_nachweis`)."""
+
+    @property
+    def bezuege(self) -> Tuple[str, ...]:
+        """
+        Die Bauteile, deren Werte es liest -- so, wie sein Eintrag sie nennt:
+        die Platten und Analysen, aus denen ein System Querschnitte nimmt,
+        die Analysen der Waende eines Gebaeudes.
+
+        Bis 2026-11-27 setzte jede Baufunktion sie selbst, und das Erdbeben
+        vergass es: aenderte sich nur die Analyse einer Wand, blieb im
+        Zwischenspeicher das alte Ergebnis stehen.
+        """
+        return tuple(self.eintrag.bezuege())
 
     @property
     def kennung(self) -> str:

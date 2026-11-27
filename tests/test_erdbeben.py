@@ -9,6 +9,7 @@ der Wände und dasselbe mit q = 1.0
 Gebäude fehlt, die Prüfungen der Eingabe und was die Oberfläche sieht.
 """
 
+import json
 import math
 import unittest
 
@@ -399,6 +400,37 @@ class TestEingaben(unittest.TestCase):
     def test_die_analysen_der_waende_sind_bezuege(self):
         p, h = haus()
         self.assertEqual(h.bezuege(), [h.waende[0].analyse])
+
+
+class TestZwischenspeicher(unittest.TestCase):
+    """
+    Ändert sich nur die Analyse einer Wand, rechnet das Gebäude neu. Bis
+    2026-11-27 blieb sein altes Ergebnis im Zwischenspeicher stehen: die
+    Analyse war kein Bezug des Gebäudes.
+    """
+
+    def rechnen(self, d, frisch):
+        if frisch:
+            dienst.SPEICHER.leeren()
+        return dienst.bearbeite("rechnen", {"projekt": d})
+
+    def F_d(self, antwort, h):
+        richtungen = antwort.daten["zeichendaten"][h.kennung]["richtungen"]
+        return next(r["F_d"] for r in richtungen if r["richtung"] == "x")
+
+    def test_eine_kuerzere_wand_rechnet_das_gebaeude_neu(self):
+        p, h = haus()
+        d = p.als_dict()
+        vorher = self.rechnen(d, frisch=True)
+        dienst.SPEICHER.treffer = dienst.SPEICHER.fehlgriffe = 0
+        for knoten in d["querschnittsanalysen"][0]["knoten"][1:3]:
+            knoten["y"] = 2500.0
+        mit = self.rechnen(d, frisch=False)
+        self.assertEqual((dienst.SPEICHER.treffer, dienst.SPEICHER.fehlgriffe), (0, 2))
+        ohne = self.rechnen(d, frisch=True)
+        self.assertEqual(json.dumps(mit.daten, sort_keys=True, default=str),
+                         json.dumps(ohne.daten, sort_keys=True, default=str))
+        self.assertNotAlmostEqual(self.F_d(mit, h), self.F_d(vorher, h), delta=1.0)
 
 
 class TestWasDieOberflaecheSieht(unittest.TestCase):

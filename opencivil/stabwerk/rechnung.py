@@ -341,11 +341,6 @@ class Stabwerksrechnung(Rechenobjekt):
         self.definitionen[kurzname] = d
         return d
 
-    @property
-    def bezuege(self) -> List[str]:
-        """Die Platten und Analysen, deren Werte das System liest."""
-        return sorted({q.bauteil for q in self.querschnitte if q.bauteil})
-
     def _aufbauen(self) -> None:
         index = len(self.querschnitte) > 1
         for q in self.querschnitte:

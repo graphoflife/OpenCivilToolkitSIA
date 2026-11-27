@@ -1,5 +1,5 @@
 ---
-erzeugt: c93a5025937b
+erzeugt: ededaf2e9fb2
 art: modul
 tags: [modul]
 ---
@@ -374,8 +374,22 @@ steht hier – niemand muss es aus einer Kennung wie «q1.x» zurueckgewinnen.
 - `nachweise: List[Tuple[str, str, Nachweis]] = field(default_factory=list)` – Feld, Schluessel und Nachweis, angemeldet ueber [[opencivil.projekt.aufbau.kern#Aufbau.eintragen|Aufbau.eintragen]].
 - `weitere_ziele: List[str] = field(default_factory=list)` – Was es ausser seinen Nachweisen rechnet – ein Balkensystem seine Querschnitte und sich.
 - `kennzahlen: List[Kennzahl] = field(default_factory=list)` – Was es beschreibt, gleich welche Lastfaelle es gibt, in der Folge der Zusammenfassung – jede so, wie ihr Erzeuger sie nennt.
-- `bezuege: Tuple[str, ...] = ()` – Die Bauteile, deren Werte es liest: Platten und Analysen, aus denen ein System Querschnitte nimmt.
 - `ohne_nachweis: str = ''` – Warum es keinen seiner Nachweise fuehrt – leer, wenn nichts fehlt ([[opencivil.projekt.aufbau.kern#Aufbau.ohne_nachweis|Aufbau.ohne_nachweis]]).
+
+#### Bauteil.bezuege
+
+```python
+@property
+def bezuege(self) -> Tuple[str, ...]
+```
+
+Die Bauteile, deren Werte es liest – so, wie sein Eintrag sie nennt:
+die Platten und Analysen, aus denen ein System Querschnitte nimmt,
+die Analysen der Waende eines Gebaeudes.
+
+Bis 2026-11-27 setzte jede Baufunktion sie selbst, und das Erdbeben
+vergass es: aenderte sich nur die Analyse einer Wand, blieb im
+Zwischenspeicher das alte Ergebnis stehen.
 
 #### Bauteil.kennung
 

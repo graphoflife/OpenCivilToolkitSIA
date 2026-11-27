@@ -7,6 +7,26 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-27 · Erdbeben: rechnet neu, wenn sich eine Wand ändert
+
+Ein Fehler, gefunden beim Planen der Wünsche vom 2026-11-27.
+
+Vorher: Kürzte man im Haus der Tests die Analyse seiner beiden Wände von
+5 m auf 2.5 m, stand beim Gebäude weiter F_d = 2970.5 kN in x statt
+1050.2 kN – bis sich am Gebäude selbst etwas änderte oder die Seite neu
+lud. Der Zwischenspeicher
+entscheidet nach einem Abdruck, ob ein Ergebnis noch gilt: der Eintrag
+selbst, alle Materialien und die Einträge, deren Werte er liest. Diese
+Bezüge setzte jede App beim Bauen selbst; das Balkensystem tat es, das
+Erdbeben vergass es.
+
+Nachher nimmt jedes Bauteil seine Bezüge aus seinem Eintrag – derselben
+Liste, die schon beim Löschen sagt, wer auf eine Analyse zeigt. Eine neue
+App kann sie nicht mehr vergessen. Ein Test ändert die Länge einer Wand
+und vergleicht das Ergebnis aus dem Speicher mit einem frisch gerechneten.
+
+---
+
 ## 2026-11-27 · Neue Systeme und Decken: auch «GZT günstig»
 
 Eine Frage aus dem TODO, vom Benutzer am 2026-11-27 beantwortet: eine

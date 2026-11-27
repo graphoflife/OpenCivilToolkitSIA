@@ -1,5 +1,5 @@
 ---
-erzeugt: 09c78ea61a16
+erzeugt: 1667b1f3ba74
 art: modul
 tags: [modul]
 ---
@@ -239,15 +239,6 @@ def abschnitt(self, thema: str=STEIFIGKEITSMETHODE) -> Abschnitt
 ```
 
 Ein Abschnitt fuer alles – das Thema sagt nur, wo die Formeln gesammelt stehen.
-
-#### Stabwerksrechnung.bezuege
-
-```python
-@property
-def bezuege(self) -> List[str]
-```
-
-Die Platten und Analysen, deren Werte das System liest.
 
 #### Stabwerksrechnung._kennwerte
 

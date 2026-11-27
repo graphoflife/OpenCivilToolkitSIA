@@ -260,8 +260,7 @@ def stabwerk_bauen(klasse: type, art: "Bauteilart", eintrag: Any, aufbau: Aufbau
         system=modell.system, paare=paare, meldungen=meldungen, querschnitte=querschnitte,
         eigengewicht=modell.eigengewicht)
     system.ins_rechenwerk(aufbau.werk)
-    return Bauteil(eintrag, art, system,
-                   weitere_ziele=system.ziele(), bezuege=tuple(system.bezuege))
+    return Bauteil(eintrag, art, system, weitere_ziele=system.ziele())
 
 
 def form_von(q: StabquerschnittBasis, wo: str) -> Stabquerschnitt:
