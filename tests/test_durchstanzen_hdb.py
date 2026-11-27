@@ -5,7 +5,8 @@ Die Durchmesser des Herstellers bis zur Grenze der Tabelle 21, angeordnet
 wie die Bügel nach SIA 262:2025, 5.5.3.8 und 5.5.3.9, mit der 2 der Norm in
 Gleichung (70) statt der 3.5 des Herstellers (4.3.6.5.9: dessen Gutachten
 liegt nicht vor); eine Innenstütze durch den ganzen Nachweis, von Hand
-nachgerechnet; das Bild der Leiste und die Datei.
+nachgerechnet; das Bild der Leiste und die Datei; eine Platte, in die kein
+HDB passt.
 """
 
 import math
@@ -117,6 +118,34 @@ class TestInnenstuetzeMitHdb(unittest.TestCase):
         wieder = Projekt.aus_dict(self.p.als_dict())
         self.assertEqual(wieder.als_dict(), self.p.als_dict())
         self.assertIs(wieder.durchstanzstellen[0].system, Durchstanzsystem.HDB)
+
+
+
+class TestKeinHdbPasst(unittest.TestCase):
+    """h = 180 mm: d unter 150 mm, und Tabelle 21 lässt dort keinen Anker von 12 mm zu."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.p = projekt(h=180, b_x=300, b_y=300, V_d=400.0, system="hdb")
+        cls.aufbau, cls.loesung, cls.befund, _ = rechnen(cls.p)
+
+    def test_nicht_gefuehrt_statt_nicht_erfuellt(self):
+        """Grau mit Strich statt rot mit 0.00 (Benutzer, 2026-11-27) -- nachgewiesen ist nichts."""
+        self.assertEqual(len(self.loesung.urteile), 4)
+        for u in self.loesung.urteile:
+            with self.subTest(fall=u.fall):
+                self.assertEqual((u.offen, u.gradtext(), u.hinweis),
+                                 (True, "–", "Kein HALFEN HDB passt in diese Platte."))
+        self.assertFalse(self.loesung.alle_nachweise_erfuellt)
+
+    def test_die_legende_sagt_warum(self):
+        """Statt «nicht erfüllt, α = 0.00» der Grund, ohne Grad."""
+        zeilen = situation(self.aufbau, self.p.durchstanzstellen[0].kennung,
+                           self.loesung)["legende"]
+        self.assertEqual("".join(z.get("text", "") for z in zeilen[-1]),
+                         "Kein HALFEN HDB passt in diese Platte. Die Nachweise mit "
+                         "Durchstanzbewehrung sind darum nicht geführt.")
+        self.assertNotIn(r"\alpha", str(zeilen))
 
 
 if __name__ == "__main__":

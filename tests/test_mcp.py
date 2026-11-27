@@ -15,6 +15,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from opencivil.mcp.ausgabe import _stand
 from opencivil.mcp.server import FASSUNGEN, Server
 from opencivil.mcp.werkzeuge import WERKZEUGE
 
@@ -304,6 +305,23 @@ class TestWerkzeuge(unittest.TestCase):
         self.assertTrue(self.gut("bericht", als="latex", pfad=str(ziel)).startswith(f"Geschrieben: {ziel}"))
         self.assertIn(r"\documentclass", ziel.read_text(encoding="utf-8"))
         self.assertIn("gibt es schon", self.schlecht("bericht", pfad=str(ziel)))
+
+
+
+class TestStand(unittest.TestCase):
+    """Der Stand in der Kopfzeile: was sich nicht führen liess, zählt für sich."""
+
+    def test_nicht_erfuellt_und_nicht_gefuehrt_getrennt(self):
+        ja, nein = {"erfuellt": True, "offen": False}, {"erfuellt": False, "offen": False}
+        offen = {"erfuellt": False, "offen": True}
+        for urteile, text in (([], "kein Nachweis"), ([ja], "1 Nachweis, erfüllt"),
+                              ([ja, ja], "2 Nachweise, alle erfüllt"),
+                              ([nein, ja], "1 von 2 Nachweisen nicht erfüllt"),
+                              ([offen, ja], "1 von 2 Nachweisen nicht geführt"),
+                              ([nein, offen, offen, ja],
+                               "1 von 4 Nachweisen nicht erfüllt, 2 nicht geführt")):
+            with self.subTest(text=text):
+                self.assertEqual(_stand(urteile), text)
 
 
 if __name__ == "__main__":

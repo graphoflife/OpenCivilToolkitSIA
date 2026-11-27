@@ -120,7 +120,7 @@ def _nachweise(p: Protokoll, zusammenfassung: Zusammenfassung,
         for text in hinweise(bauteil):
             p.hinweis(text)
         for zeile in bauteil.zeilen:
-            if not zeile.urteil.erfuellt and not zeile.urteil.hinweis:
+            if zeile.urteil.verfehlt and not zeile.urteil.hinweis:
                 p.warnung(f"{zeile.bezeichnung}: nicht erfüllt. "
                           f"{zeile.urteil.begruendung}".rstrip())
         for zeile in bauteil.stille:
@@ -129,9 +129,7 @@ def _nachweise(p: Protokoll, zusammenfassung: Zusammenfassung,
             p.anfuegen(kennzahlentabelle(zahlen[bauteil.kennung]))
 
     if zusammenfassung.gefuehrt:
-        p.text("Alle geführten Nachweise sind erfüllt."
-               if zusammenfassung.erfuellt
-               else "Mindestens ein Nachweis ist nicht erfüllt.")
+        p.text(zusammenfassung.satz)
     for warnung in zusammenfassung.warnungen:
         p.warnung(warnung)
 

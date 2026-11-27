@@ -14,7 +14,7 @@ from opencivil.core.berechnung import (
     Prozedur, Vorgabe,
 )
 from opencivil.core.nachweis import (
-    NICHT_FUEHRBAR, UNBESCHRAENKT, Nachweis, Vergleich, grad_def,
+    NICHT_FUEHRBAR, UNBESCHRAENKT, Nachweis, NachweisUrteil, Vergleich, gesamturteil, grad_def,
 )
 from opencivil.core.einheiten import (
     EINHEITSLOS, KN, KNM, M, MM, MM2, MPA, N_PRO_MM2, DimensionsFehler, Groesse,
@@ -871,6 +871,49 @@ class TestNachweis(unittest.TestCase):
         self.assertEqual(urteil.hinweis, "Ohne Bewehrung → kein Nachweis.")
         self.assertIsNone(urteil.einwirkung)
         self.assertEqual(loesung.groesse(d_ausn.id).si, 0.0)
+
+    def test_nicht_fuehrbar_ist_offen_nicht_verfehlt(self):
+        """
+        Grau mit Strich statt rot mit 0.00 (Benutzer, 2026-11-27): wo etwas
+        fehlt, ist nichts falsch -- nachgewiesen ist es aber auch nicht. Ohne
+        Einwirkung (unbeschränkt) ist ein Nachweis erfüllt, nicht offen.
+        """
+        d_leer = grad_def("n.leer.grad", r"\alpha_{eff}", "Erfüllungsgrad")
+        d_frei = grad_def("n.frei.grad", r"\alpha_{eff}", "Erfüllungsgrad")
+
+        class Leer(Nachweis):
+            def pruefe(self, e, p):
+                return Ausfuehrung({}, [
+                    self.urteil(d_leer, "Lage", NICHT_FUEHRBAR, "Ohne Bewehrung → kein Nachweis."),
+                    self.urteil(d_frei, "frei", UNBESCHRAENKT, "Keine Einwirkung → kein Nachweis.")])
+
+        werk = Rechenwerk()
+        werk.registriere(Leer("n.leer", ausgaben=[d_leer, d_frei], bezuege=[]))
+        loesung = werk.loese(d_leer.id, d_frei.id)
+        leer, frei = loesung.urteile
+        self.assertEqual((leer.offen, leer.verfehlt, leer.erfuellt), (True, False, False))
+        self.assertEqual((leer.gradtext(), leer.gradtext(latex=True), leer.urteilswort),
+                         ("–", r"\text{–}", "nicht geführt"))
+        self.assertEqual((frei.offen, frei.erfuellt, frei.urteilswort), (False, True, "erfüllt"))
+        self.assertFalse(loesung.alle_nachweise_erfuellt)
+        self.assertEqual(gesamturteil(loesung.gefuehrte_urteile),
+                         "Nicht alle Nachweise liessen sich führen; die übrigen sind erfüllt.")
+
+    def test_gesamturteil(self):
+        """Ein verfehlter macht «nicht erfüllt», ein offener nur «nicht alle geführt»."""
+        erfuellt = NachweisUrteil(True, Groesse(1.2, EINHEITSLOS))
+        verfehlt = NachweisUrteil(False, Groesse(0.8, EINHEITSLOS))
+        offen = NachweisUrteil(False, Groesse(0.0, EINHEITSLOS), offen=True)
+        self.assertEqual((verfehlt.urteilswort, str(verfehlt)),
+                         ("nicht erfüllt", ": NICHT erfüllt (Erfüllungsgrad 0.80)"))
+        for urteile, satz in (
+                ([erfuellt], "Alle geführten Nachweise sind erfüllt."),
+                ([erfuellt, offen], "Nicht alle Nachweise liessen sich führen; die übrigen sind "
+                                    "erfüllt."),
+                ([verfehlt, offen, erfuellt], "Mindestens ein Nachweis ist nicht erfüllt."),
+                ([offen, offen], "Kein Nachweis liess sich führen.")):
+            with self.subTest(satz=satz):
+                self.assertEqual(gesamturteil(urteile), satz)
 
 
 class TestHinweisReihenfolge(unittest.TestCase):

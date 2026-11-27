@@ -164,9 +164,9 @@ class TestRechnen(unittest.TestCase):
         text = self.ergebnis.zusammenfassung()
         self.assertTrue(text.startswith("Decke über EG\n"))
         self.assertIn("Biegung und Normalkraft  Feld mit Druck", text)
-        self.assertIn("Alle geführten Nachweise erfüllt.", text)
+        self.assertIn("Alle geführten Nachweise sind erfüllt.", text)
         # Der still verfehlte Nachweis steht darunter, knapp unter eins.
-        self.assertIn("Nicht geführt, geht aber nicht auf", text)
+        self.assertIn("Ausgeschaltet, geht aber nicht auf", text)
         self.assertIn("0.996", text)
         self.assertEqual(str(self.ergebnis), text)
 
@@ -179,7 +179,7 @@ class TestRechnen(unittest.TestCase):
         dachteil = text[text.index("Dach\n"):]
         self.assertIn("NICHT ERFÜLLT", dachteil)
         self.assertNotIn("NICHT ERFÜLLT", text[:text.index("Dach\n")])
-        self.assertIn("Mindestens ein Nachweis ist NICHT erfüllt.", text)
+        self.assertIn("Mindestens ein Nachweis ist nicht erfüllt.", text)
         self.assertFalse(ergebnis.erfuellt)
 
     def test_oberflaeche_und_konsole_fuehren_dieselben_zeilen(self):

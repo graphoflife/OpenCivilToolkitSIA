@@ -215,7 +215,9 @@ class Loesung:
         Ohne die stillen: sie sind ausgeschaltet und zaehlen nicht mit.
 
         Sonst staende oben rechts «nicht erfuellt» wegen eines Nachweises,
-        den niemand fuehrt -- und man faende in der Tabelle nichts dazu.
+        den niemand fuehrt -- und man faende in der Tabelle nichts dazu. Ein
+        offener (:attr:`~opencivil.core.nachweis.NachweisUrteil.offen`) ist
+        nicht erfuellt: was sich nicht fuehren liess, ist nicht nachgewiesen.
         """
         return all(u.erfuellt for u in self.gefuehrte_urteile)
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: e4d4d0135fed
+erzeugt: 12b60297e744
 art: modul
 tags: [modul]
 ---
@@ -95,7 +95,7 @@ class Zusammenfassung
 Alle Bauteile, das Gesamturteil und was beim Aufbau auffiel.
 
 - `bauteile: List[Bauteil]`
-- `erfuellt: bool` – Ob alle gefuehrten Nachweise aufgehen.
+- `satz: str` – Das Gesamturteil als Satz ([[opencivil.core.nachweis#gesamturteil|gesamturteil]]): Bericht und Konsole sagen dasselbe, auch wenn sich ein Nachweis nicht fuehren liess.
 - `gefuehrt: bool` – Ob ueberhaupt einer gefuehrt wurde -- sonst gibt es kein Gesamturteil.
 - `warnungen: List[str]`
 
@@ -124,6 +124,14 @@ def _groesse(wert: Optional[Wert]) -> Zelle
 ```
 
 Feste Stellenzahl -- in einer Spalte steht immer dieselbe Groesse.
+
+### _grad
+
+```python
+def _grad(urteil: NachweisUrteil) -> Zelle
+```
+
+Der Erfuellungsgrad -- liess sich der Nachweis nicht fuehren, ein Strich wie in _groesse.
 
 ### nachweistabelle
 

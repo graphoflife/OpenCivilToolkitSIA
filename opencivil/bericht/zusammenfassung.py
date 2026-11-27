@@ -27,7 +27,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Sequence, Tuple
 
-from opencivil.core.nachweis import NachweisUrteil
+from opencivil.core.nachweis import NachweisUrteil, gesamturteil
 from opencivil.core.einheiten import MM, MM2, Groesse
 from opencivil.core.latex import Mathe, Zelle, als_text
 from opencivil.core.protokoll import GleichungBlock, TabellenBlock
@@ -101,8 +101,12 @@ class Zusammenfassung:
     """Alle Bauteile, das Gesamturteil und was beim Aufbau auffiel."""
 
     bauteile: List[Bauteil]
-    erfuellt: bool
-    """Ob alle gefuehrten Nachweise aufgehen."""
+    satz: str
+    """
+    Das Gesamturteil als Satz (:func:`~opencivil.core.nachweis.gesamturteil`):
+    Bericht und Konsole sagen dasselbe, auch wenn sich ein Nachweis nicht
+    fuehren liess.
+    """
 
     gefuehrt: bool
     """Ob ueberhaupt einer gefuehrt wurde -- sonst gibt es kein Gesamturteil."""
@@ -145,7 +149,7 @@ def zusammenfassen(aufbau: Optional["Aufbau"], loesung: Loesung) -> Zusammenfass
         ]
     return Zusammenfassung(
         bauteile=bauteile,
-        erfuellt=loesung.alle_nachweise_erfuellt,
+        satz=gesamturteil(loesung.gefuehrte_urteile),
         gefuehrt=bool(loesung.gefuehrte_urteile),
         warnungen=[w.text for w in aufbau.warnungen] if aufbau is not None else [],
     )
@@ -186,12 +190,17 @@ def _groesse(wert: Optional[Wert]) -> Zelle:
                  rf"{wert.einheit.als_latex()}")
 
 
+def _grad(urteil: NachweisUrteil) -> Zelle:
+    """Der Erfuellungsgrad -- liess sich der Nachweis nicht fuehren, ein Strich wie in _groesse."""
+    return urteil.gradtext() if urteil.offen else Mathe(urteil.gradtext(latex=True))
+
+
 def nachweistabelle(bauteil: Bauteil) -> TabellenBlock:
     """Je gefuehrtes Urteil eine Zeile, in der Folge von :attr:`Bauteil.zeilen`."""
     return TabellenBlock(
         kopf=NACHWEISKOPF,
         zeilen=[[z.nachweis, z.fall or "–", _groesse(z.widerstand),
-                 _groesse(z.einwirkung), Mathe(z.urteil.gradtext(latex=True))]
+                 _groesse(z.einwirkung), _grad(z.urteil)]
                 for z in bauteil.zeilen],
         ausrichtung=AUSRICHTUNG,
     )

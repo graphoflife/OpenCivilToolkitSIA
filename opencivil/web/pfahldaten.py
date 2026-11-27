@@ -202,7 +202,6 @@ def _legende(aussen: Aussenbefund, innen: Innenbefund, quer: Optional[Querbefund
         zeilen.append(zeile(*teile, "."))
     if urteile:
         u = min(urteile, key=lambda x: x.erfuellungsgrad.si)
-        zeilen.append(zeile(f"Massgebend: {u.langname}, {u.fall} – "
-                            f"{'erfüllt' if u.erfuellt else 'nicht erfüllt'}, ",
+        zeilen.append(zeile(f"Massgebend: {u.langname}, {u.fall} – {u.urteilswort}, ",
                             Mathe(rf"\alpha = {u.gradtext(latex=True)}"), "."))
     return zeilen

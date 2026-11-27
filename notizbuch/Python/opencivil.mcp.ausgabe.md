@@ -1,5 +1,5 @@
 ---
-erzeugt: acf612b97528
+erzeugt: 088dba2d3119
 art: modul
 tags: [modul]
 ---
@@ -57,7 +57,9 @@ Bauteil, das es nimmt, nur «warum, steht bei ihm».
 def _stand(urteile: List[dict]) -> str
 ```
 
-«3 Nachweise, alle erfüllt», «1 von 4 Nachweisen nicht erfüllt», «kein Nachweis».
+«3 Nachweise, alle erfüllt», «1 von 4 Nachweisen nicht erfüllt, 1 nicht
+geführt», «kein Nachweis» -- was sich nicht fuehren liess, zaehlt fuer
+sich (`offen`).
 
 ### _je_eintrag
 

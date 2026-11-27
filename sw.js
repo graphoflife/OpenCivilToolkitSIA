@@ -47,7 +47,7 @@ const VORRAT = {
     "web/css/10-grundlage.css?v=0eaa33c76f82",
     "web/css/20-seite.css?v=19d8f278cf18",
     "web/css/30-eingaben.css?v=4df9340d1a13",
-    "web/css/40-bericht.css?v=516a6b56cf3a",
+    "web/css/40-bericht.css?v=08fb170b5771",
     "web/css/50-schmal.css?v=231ea1be6ff4",
     "web/css/60-zeichenfenster.css?v=7678a26b747d",
     "web/css/70-notizbuch.css?v=5c29ff90c1e1",
@@ -56,13 +56,13 @@ const VORRAT = {
     "web/js/ablage.js?v=84cbb1c2e67e",
     "web/js/achsen.js?v=aced8f358043",
     "web/js/api.js?v=c5b0fd2d5e7b",
-    "web/js/app.js?v=0a8046287bab",
+    "web/js/app.js?v=b0a9990a1352",
     "web/js/apps.js?v=eb96de56e594",
     "web/js/arten.js?v=901a5bbbd1ab",
     "web/js/balkensystem.js?v=6e7c0ee5c854",
     "web/js/baum.js?v=97b983cbbf34",
     "web/js/bausteine.js?v=c7d470595059",
-    "web/js/bericht.js?v=1b32087bacb7",
+    "web/js/bericht.js?v=2d9f33efce48",
     "web/js/bewehrungssuche.js?v=2582eafd0f54",
     "web/js/bs_diagramme.js?v=b94694de6703",
     "web/js/bs_eigenschaften.js?v=a234c29f8f4d",
@@ -149,8 +149,8 @@ const VORRAT = {
     "web/js/variablen.js?v=7d43b6f38cd9",
     "web/js/zeichnen.js?v=da6e8eec5dc8",
     "web/js/zustand.js?v=3385a39c0f84",
-    "web/kern/notizbuch.json?v=a91a81350d50",
-    "web/kern/quellen.json?v=0becd8753998"
+    "web/kern/notizbuch.json?v=ff9aef21b22e",
+    "web/kern/quellen.json?v=eab109c0a230"
   ],
   "fremd": {
     "web/vendor/jetbrains-mono/": {

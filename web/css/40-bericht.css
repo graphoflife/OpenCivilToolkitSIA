@@ -183,6 +183,8 @@ table.gitter td:first-child, table.gitter th:first-child { text-align: left; }
 .augen-tabelle td.zahl { font-variant-numeric: tabular-nums; }
 .augen-tabelle tr.ist-gut td:first-child      { box-shadow: inset 4px 0 0 var(--gut); }
 .augen-tabelle tr.ist-schlecht td:first-child { box-shadow: inset 4px 0 0 var(--schlecht); }
+/* Nicht geführt: es fehlt etwas, falsch ist nichts -- grau, nicht rot. */
+.augen-tabelle tr.ist-offen td:first-child    { box-shadow: inset 4px 0 0 var(--schrift-zart); }
 
 /* Der Erfüllungsgrad trägt das Urteil allein -- die Spalte daneben, die
    „erfüllt" ausschrieb, sagte dasselbe ein zweites Mal. Hinterlegt wird
@@ -190,6 +192,7 @@ table.gitter td:first-child, table.gitter th:first-child { text-align: left; }
 .augen-tabelle td.grad { font-weight: 700; font-size: 13.5px; }
 .augen-tabelle .ist-gut      td.grad { background: var(--gut-hell);      color: var(--gut); }
 .augen-tabelle .ist-schlecht td.grad { background: var(--schlecht-hell); color: var(--schlecht); }
+.augen-tabelle .ist-offen    td.grad { color: var(--schrift-zart); }
 
 .luecke { padding: 9px 12px; margin-bottom: 6px; border-radius: var(--radius);
           border: 1px solid var(--warn); border-left-width: 4px; background: var(--warn-hell); }

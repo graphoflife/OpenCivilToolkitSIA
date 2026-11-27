@@ -7,6 +7,51 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-27 · Nachweise, die sich nicht führen lassen: grau statt rot
+
+Aus der Durchsicht nach HALFEN HDB; der Benutzer hat es am 2026-11-27
+gewählt.
+
+**Vorher und nachher.** Platte 180 mm, Innenstütze 300 × 300 mm,
+V_d = 400 kN, System HALFEN HDB: kein Anker passt in die Platte. Vorher
+standen die vier Nachweise mit Durchstanzbewehrung rot mit 0.00 in der
+Zusammenfassung, oben stand «4 Nachweise nicht erfüllt», und die Legende
+unter dem Grundriss sagte «nicht erfüllt, α = 0.00». Nachher stehen sie
+grau mit «–», oben steht «4 Nachweise nicht geführt», ohne Rot, und die
+Legende nennt den Grund: «Kein HALFEN HDB passt in diese Platte. Die
+Nachweise mit Durchstanzbewehrung sind darum nicht geführt.»
+
+**Was «nicht geführt» heisst.** Damit der Nachweis überhaupt geht, fehlt
+etwas: Bewehrung auf der gezogenen Seite, ein Produkt, das passt, eine
+Wand in einer Richtung, ein Verfahren, das das Werkzeug rechnet. Falsch
+ist dabei nichts – darum grau, nach der Regel «was nur fehlt, steht
+grau». Ein Nachweis, der gerechnet wurde und nicht aufgeht, bleibt rot.
+
+**Nachgewiesen ist es trotzdem nicht.** «Alle Nachweise erfüllt» bleibt
+streng: ein nicht geführter Nachweis zählt nicht als erfüllt. Der Satz
+unter den Nachweisen im Bericht unterscheidet die Fälle: «Mindestens ein
+Nachweis ist nicht erfüllt.», «Nicht alle Nachweise liessen sich führen;
+die übrigen sind erfüllt.» und «Kein Nachweis liess sich führen.» Die
+Konsole schreibt denselben Satz.
+
+**Eine Stelle.** Ob ein Urteil offen ist, setzt der Kern selbst: wo nichts
+gegeneinander steht und der Nachweis nicht aufgeht (`NICHT_FUEHRBAR`).
+Das Wort dazu – «erfüllt», «nicht erfüllt», «nicht geführt» – und der Satz
+über alle stehen in `opencivil/core/nachweis.py`; Tabelle, Bericht,
+Konsole, MCP und die Anzeige oben lesen sie nur. Für ausgeschaltete
+Nachweise schrieb die Konsole bisher «Nicht geführt, geht aber nicht auf»;
+das heisst nun «Ausgeschaltet, …», damit ein Wort nicht zwei Dinge sagt.
+
+**Wo es sich zeigt.** Überall, wo ein Nachweis bisher als nicht führbar
+endete: eine Platte ohne Bewehrung in einer Richtung, Duktilität mit
+Stahl der Klasse A, ein Rundrohr der Klasse 4, Kippen und Torsion von Holz
+ausserhalb des Rechtecks, Verbund ohne Zahl der Dübel oder über Figur 1,
+eine Verbundstütze über λ̄ = 2, Schubwände, die eine Richtung nicht
+halten, Durchstanzen ohne passendes Produkt – und das Erdbeben, wenn das
+Bauwerk nicht regelmässig ist: dort gilt das Ersatzkraftverfahren nicht,
+ein anderes rechnet das Werkzeug nicht. Im Schnappschuss werden darum 13
+Zellen von «0.00» zu «–».
+
 ## 2026-11-27 · Durchstanzen: HALFEN HDB
 
 Aus dem Plan vom 2026-11-25, Schritt 8, letzter Teil. Der Benutzer hat am

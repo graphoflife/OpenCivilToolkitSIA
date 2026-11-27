@@ -5535,6 +5535,7 @@
         "Zusammenfassung",
         "zusammenfassen",
         "_groesse",
+        "_grad",
         "nachweistabelle",
         "hinweise",
         "stiller_hinweis",
@@ -5841,7 +5842,10 @@
         "Fallausgang.erfuellungsgrad",
         "NachweisUrteil",
         "NachweisUrteil.meldenswert",
+        "NachweisUrteil.verfehlt",
+        "NachweisUrteil.urteilswort",
         "NachweisUrteil.gradtext",
+        "gesamturteil",
         "Nachweis",
         "Nachweis.langname",
         "Nachweis.urteilsname",
@@ -11470,6 +11474,7 @@
         "_bis_zum_umriss",
         "_linien",
         "_legende",
+        "_gesamt",
         "_kraft"
       ]
     },

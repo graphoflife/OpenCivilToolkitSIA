@@ -139,7 +139,8 @@ class KeinVergleich:
     liess sich nicht fuehren (:data:`NICHT_FUEHRBAR`) -- es fehlt der
     Widerstand, etwa an einer Lage ohne Bewehrung --, oder es gibt nichts zu
     begrenzen (:data:`UNBESCHRAENKT`), etwa ohne Druck beim Knicken. Was sich
-    trotzdem zeigen laesst, darf mitkommen.
+    trotzdem zeigen laesst, darf mitkommen. Ein nicht fuehrbarer Fall ist
+    offen, nicht verfehlt (:attr:`NachweisUrteil.offen`).
     """
 
     grad: float
@@ -311,29 +312,69 @@ class NachweisUrteil:
     Richtungen tragen.
     """
 
+    offen: bool = False
+    """
+    Ob sich der Nachweis nicht fuehren liess: nichts steht gegeneinander, weil
+    etwas fehlt (:data:`NICHT_FUEHRBAR`) -- kein Produkt passt in die Platte,
+    auf der gezogenen Seite liegt keine Bewehrung. Ein offenes Urteil ist
+    nicht erfuellt, aber auch nicht verfehlt: es steht grau, mit «–» statt des
+    Grads, und zaehlt nicht zu den nicht erfuellten (Benutzer, 2026-11-27;
+    bis dahin rot mit 0.00). Gesetzt von :meth:`Nachweis.urteil`.
+    """
+
     @property
     def meldenswert(self) -> bool:
         """
         Ob dieses stille Urteil einen Hinweis wert ist.
 
-        Nur was still ist und nicht aufgeht -- und nur, wenn es ueberhaupt
-        einen Widerstand gibt. Ohne ihn liess sich der Nachweis gar nicht
-        fuehren (etwa an einer unbewehrten Lage); das ist keine Auskunft
-        ueber die Bewehrung, sondern darueber, dass es keine gibt.
+        Nur was still ist und nicht aufgeht -- und nur, wenn sich der Nachweis
+        fuehren liess (:attr:`verfehlt`). Ein offener (etwa an einer
+        unbewehrten Lage) gibt keine Auskunft ueber die Bewehrung, sondern
+        darueber, dass es keine gibt.
 
         Die Regel steht hier und nicht in der Schnittstelle: Tabelle,
         Konsolenbericht und LaTeX-Dokument stellen dieselbe Frage, und drei
         Antworten darauf waeren drei Gelegenheiten, auseinanderzulaufen.
         """
-        return self.still and not self.erfuellt and self.widerstand is not None
+        return self.still and self.verfehlt
+
+    @property
+    def verfehlt(self) -> bool:
+        """Ob der Nachweis gefuehrt wurde und nicht aufgeht -- rot; ein offener ist es nicht."""
+        return not self.erfuellt and not self.offen
+
+    @property
+    def urteilswort(self) -> str:
+        """«erfüllt», «nicht erfüllt» oder «nicht geführt» -- an jeder Stelle dasselbe Wort."""
+        if self.offen:
+            return "nicht geführt"
+        return "erfüllt" if self.erfuellt else "nicht erfüllt"
 
     def gradtext(self, *, latex: bool = False) -> str:
-        """Der Erfuellungsgrad als Text -- siehe :func:`grad_als_text`."""
+        """Der Erfuellungsgrad als Text -- siehe :func:`grad_als_text`; offen ein Strich."""
+        if self.offen:
+            return r"\text{–}" if latex else "–"
         return grad_als_text(self.erfuellungsgrad.si, self.erfuellt, latex=latex)
 
     def __str__(self) -> str:
-        urteil = "erfüllt" if self.erfuellt else "NICHT erfüllt"
+        urteil = "NICHT erfüllt" if self.verfehlt else self.urteilswort
         return f"{self.name}: {urteil} (Erfüllungsgrad {self.gradtext()})"
+
+
+def gesamturteil(urteile: Sequence[NachweisUrteil]) -> str:
+    """
+    Das Urteil ueber mehrere Nachweise als Satz -- in Bericht und Konsole
+    derselbe: ein verfehlter macht «nicht erfüllt»; offene
+    (:attr:`NachweisUrteil.offen`) sagen, dass sich nicht alle fuehren liessen.
+    """
+    offen = sum(u.offen for u in urteile)
+    if any(u.verfehlt for u in urteile):
+        return "Mindestens ein Nachweis ist nicht erfüllt."
+    if urteile and offen == len(urteile):
+        return "Kein Nachweis liess sich führen."
+    if offen:
+        return "Nicht alle Nachweise liessen sich führen; die übrigen sind erfüllt."
+    return "Alle geführten Nachweise sind erfüllt."
 
 
 class Nachweis(Berechnung):
@@ -443,13 +484,15 @@ class Nachweis(Berechnung):
         erklaert sich nicht von selbst. Bis 2026-10-25 baute jeder Nachweis
         sein Urteil selbst, und «nicht fuehrbar» stand auf vier Arten da.
         """
-        if not hinweis and isinstance(ausgang, KeinVergleich):
+        ohne_vergleich = isinstance(ausgang, KeinVergleich)
+        if not hinweis and ohne_vergleich:
             hinweis = begruendung
         return NachweisUrteil(
             erfuellt=ausgang.erfuellt, erfuellungsgrad=Groesse(ausgang.grad, EINHEITSLOS),
             ziel=ziel.id, fall=fall, art=art or self.ART, langname=langname,
             begruendung=begruendung, hinweis=hinweis,
-            einwirkung=ausgang.einwirkung, widerstand=ausgang.widerstand, still=still)
+            einwirkung=ausgang.einwirkung, widerstand=ausgang.widerstand, still=still,
+            offen=ohne_vergleich and not ausgang.erfuellt)
 
     @staticmethod
     def teilurteile(

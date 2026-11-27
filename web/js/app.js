@@ -85,10 +85,15 @@ function stand(antwort) {
   }
   const urteile = antwort.urteile.filter((u) => !inSandbox(u.raum));
   if (urteile.length) {
-    const durchgefallen = urteile.filter((u) => !u.erfuellt).length;
-    const text = durchgefallen === 0 ? 'alle Nachweise erfüllt'
-      : durchgefallen === 1 ? 'ein Nachweis nicht erfüllt' : `${durchgefallen} Nachweise nicht erfüllt`;
-    return [`${text}${dazu}`, durchgefallen ? 'ist-fehler' : gut];
+    // Was sich nicht führen liess, zählt für sich und ohne Rot: es fehlt
+    // etwas, falsch ist nichts (NachweisUrteil.offen im Kern).
+    const offen = urteile.filter((u) => u.offen).length;
+    const durchgefallen = urteile.filter((u) => !u.erfuellt && !u.offen).length;
+    const anzahl = (n, wort) => `${n === 1 ? 'ein Nachweis' : `${n} Nachweise`} ${wort}`;
+    const text = [durchgefallen && anzahl(durchgefallen, 'nicht erfüllt'),
+      offen && anzahl(offen, 'nicht geführt')].filter(Boolean).join(', ')
+      || 'alle Nachweise erfüllt';
+    return [`${text}${dazu}`, durchgefallen ? 'ist-fehler' : offen ? '' : gut];
   }
   const werte = Object.keys(antwort.werte).filter((w) => !inSandbox(w)).length;
   return [`${werte} Werte bestimmt${dazu}`, gut];

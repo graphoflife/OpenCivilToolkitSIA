@@ -1,5 +1,5 @@
 ---
-erzeugt: e235340105e2
+erzeugt: 2f9dd5e7d0fa
 art: modul
 tags: [modul]
 ---
@@ -210,7 +210,9 @@ def alle_nachweise_erfuellt(self) -> bool
 Ohne die stillen: sie sind ausgeschaltet und zaehlen nicht mit.
 
 Sonst staende oben rechts «nicht erfuellt» wegen eines Nachweises,
-den niemand fuehrt -- und man faende in der Tabelle nichts dazu.
+den niemand fuehrt -- und man faende in der Tabelle nichts dazu. Ein
+offener ([[opencivil.core.nachweis#NachweisUrteil|offen]]) ist
+nicht erfuellt: was sich nicht fuehren liess, ist nicht nachgewiesen.
 
 #### Loesung.kette
 

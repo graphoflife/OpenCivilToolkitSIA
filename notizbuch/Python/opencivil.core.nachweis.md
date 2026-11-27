@@ -1,5 +1,5 @@
 ---
-erzeugt: 885700105e5e
+erzeugt: 3bf992fef101
 art: modul
 tags: [modul]
 ---
@@ -131,7 +131,8 @@ Der Ausgang eines Falls, in dem nichts gegeneinander steht: der Nachweis
 liess sich nicht fuehren ([[opencivil.core.nachweis#Konstanten|NICHT_FUEHRBAR]]) -- es fehlt der
 Widerstand, etwa an einer Lage ohne Bewehrung --, oder es gibt nichts zu
 begrenzen ([[opencivil.core.nachweis#Konstanten|UNBESCHRAENKT]]), etwa ohne Druck beim Knicken. Was sich
-trotzdem zeigen laesst, darf mitkommen.
+trotzdem zeigen laesst, darf mitkommen. Ein nicht fuehrbarer Fall ist
+offen, nicht verfehlt ([[opencivil.core.nachweis#NachweisUrteil|NachweisUrteil.offen]]).
 
 - `grad: float`
 - `erfuellt: bool`
@@ -206,6 +207,7 @@ und mitgelesen werden.
 - `sammel: bool = False` – Ob dieses Urteil eines von mehreren zur selben Frage ist. Die Nachweise, die je Bewehrungslage rechnen, faellen ein Urteil je Lage. Beantwortet ist die Frage aber von der schlechtesten: geht die auf, gehen die anderen erst recht auf. In Tabelle und Bericht steht darum nur sie -- siehe [[opencivil.core.nachweis#NachweisUrteil|Loesung.gefuehrte_urteile]]. Gerechnet und *gezaehlt* werden trotzdem alle. Die Bewehrungssuche misst ihren Fortschritt an der Summe der Rueckstaende; saehe sie nur das Minimum, stuende sie, sobald zwei Lagen gleich schlecht sind -- kein einzelner Schritt hebt dann das Minimum, und die Suche gaebe auf, obwohl der naechste Durchmesser offensichtlich hilft.
 - `still: bool = False` – Ob dieses Urteil aus einem ausgeschalteten Nachweis stammt. Es zaehlt dann nicht in der Zusammenfassung und nicht im Gesamturteil -- sichtbar wird es nur als Hinweis darunter, und auch nur, wenn es nicht aufgeht.
 - `raum: str = ''` – Namensraum des Nachweises, der dieses Urteil gefaellt hat. Wird von [[opencivil.core.nachweis#Nachweis.rechne|Nachweis.rechne]] gesetzt, nicht beim Erzeugen -- so kann kein Nachweis ihn vergessen oder falsch angeben. Die Oberflaeche gruppiert danach; ohne ihn muesste sie aus dem Anzeigetext zurueckschliessen, welche Platte gemeint ist, und das geht schief, sobald zwei Platten dieselben Richtungen tragen.
+- `offen: bool = False` – Ob sich der Nachweis nicht fuehren liess: nichts steht gegeneinander, weil etwas fehlt ([[opencivil.core.nachweis#Konstanten|NICHT_FUEHRBAR]]) -- kein Produkt passt in die Platte, auf der gezogenen Seite liegt keine Bewehrung. Ein offenes Urteil ist nicht erfuellt, aber auch nicht verfehlt: es steht grau, mit «–» statt des Grads, und zaehlt nicht zu den nicht erfuellten (Benutzer, 2026-11-27; bis dahin rot mit 0.00). Gesetzt von [[opencivil.core.nachweis#Nachweis.urteil|Nachweis.urteil]].
 
 #### NachweisUrteil.meldenswert
 
@@ -216,14 +218,32 @@ def meldenswert(self) -> bool
 
 Ob dieses stille Urteil einen Hinweis wert ist.
 
-Nur was still ist und nicht aufgeht -- und nur, wenn es ueberhaupt
-einen Widerstand gibt. Ohne ihn liess sich der Nachweis gar nicht
-fuehren (etwa an einer unbewehrten Lage); das ist keine Auskunft
-ueber die Bewehrung, sondern darueber, dass es keine gibt.
+Nur was still ist und nicht aufgeht -- und nur, wenn sich der Nachweis
+fuehren liess ([[opencivil.core.nachweis#NachweisUrteil.verfehlt|verfehlt]]). Ein offener (etwa an einer
+unbewehrten Lage) gibt keine Auskunft ueber die Bewehrung, sondern
+darueber, dass es keine gibt.
 
 Die Regel steht hier und nicht in der Schnittstelle: Tabelle,
 Konsolenbericht und LaTeX-Dokument stellen dieselbe Frage, und drei
 Antworten darauf waeren drei Gelegenheiten, auseinanderzulaufen.
+
+#### NachweisUrteil.verfehlt
+
+```python
+@property
+def verfehlt(self) -> bool
+```
+
+Ob der Nachweis gefuehrt wurde und nicht aufgeht -- rot; ein offener ist es nicht.
+
+#### NachweisUrteil.urteilswort
+
+```python
+@property
+def urteilswort(self) -> str
+```
+
+«erfüllt», «nicht erfüllt» oder «nicht geführt» -- an jeder Stelle dasselbe Wort.
 
 #### NachweisUrteil.gradtext
 
@@ -231,7 +251,17 @@ Antworten darauf waeren drei Gelegenheiten, auseinanderzulaufen.
 def gradtext(self, *, latex: bool=False) -> str
 ```
 
-Der Erfuellungsgrad als Text -- siehe [[opencivil.core.wert#grad_als_text|grad_als_text]].
+Der Erfuellungsgrad als Text -- siehe [[opencivil.core.wert#grad_als_text|grad_als_text]]; offen ein Strich.
+
+### gesamturteil
+
+```python
+def gesamturteil(urteile: Sequence[NachweisUrteil]) -> str
+```
+
+Das Urteil ueber mehrere Nachweise als Satz -- in Bericht und Konsole
+derselbe: ein verfehlter macht «nicht erfüllt»; offene
+([[opencivil.core.nachweis#NachweisUrteil|NachweisUrteil.offen]]) sagen, dass sich nicht alle fuehren liessen.
 
 ### Nachweis
 
@@ -485,6 +515,7 @@ Das Urteil eines Teils: sein Grad, sein Name, Ausgang und Begruendung.
 - [[opencivil.pfahl.innen_quer]]
 - [[opencivil.pfahl.quer]]
 - [[opencivil.projekt.aufbau.kern]]
+- [[opencivil.web.durchstanzdaten]]
 - [[opencivil.web.erdbebendaten]]
 
 ## Formeln aus diesem Modul

@@ -666,6 +666,9 @@ def loesung_dict(loesung: Loesung, aufbau: Optional[Aufbau] = None, *,
                 "art": u.art,
                 "fall": u.fall,
                 "erfuellt": u.erfuellt,
+                # Liess sich nicht fuehren: grau, zaehlt nicht als «nicht
+                # erfuellt» -- siehe NachweisUrteil.offen.
+                "offen": u.offen,
                 # Einzige Kennzahl: Widerstand/Einwirkung, ab 1 erfuellt.
                 "erfuellungsgrad": u.gradtext(),
                 "erfuellungsgrad_zahl": u.erfuellungsgrad.si,
@@ -763,6 +766,7 @@ def zusammenfassungen(loesung: Loesung, aufbau: Aufbau) -> dict:
                 {
                     "zellen": [zelle_dict(c) for c in zellen],
                     "erfuellt": z.urteil.erfuellt,
+                    "offen": z.urteil.offen,
                     "begruendung": z.urteil.begruendung,
                     # Nur was die Pruefung ausdruecklich meldet -- siehe
                     # NachweisUrteil.hinweis.

@@ -1,5 +1,5 @@
 ---
-erzeugt: 0a7f03f9c382
+erzeugt: 0bb451dfc74b
 art: modul
 tags: [modul]
 ---
@@ -85,12 +85,22 @@ Die Stücke eines Schnitts fürs Bild, je mit der Angabe, ob es zählt.
 ### _legende
 
 ```python
-def _legende(befund: Durchstanzbefund, urteile) -> List[list]
+def _legende(befund: Durchstanzbefund, urteile: Sequence[NachweisUrteil]) -> List[list]
 ```
 
 Die Zeilen unter dem Bild: der Schnitt und was von ihm nicht zählt; ohne
 Bewehrung der Vergleich mit seinem Urteil, sonst was ohne sie fehlt, der
-Pilz und die Leisten mit ihren Schnitten -- und das Urteil über alle.
+Pilz und die Leisten mit ihren Schnitten -- und das Urteil über alle. Passt
+kein Produkt, sagt die letzte Zeile das statt eines Grads: die Nachweise
+mit Bewehrung sind dann nicht geführt ([[opencivil.core.nachweis#NachweisUrteil|NachweisUrteil.offen]]).
+
+### _gesamt
+
+```python
+def _gesamt(urteile: Sequence[NachweisUrteil]) -> Tuple[bool, str]
+```
+
+Ob alle geführten Urteile aufgehen, und ihr kleinster Grad in LaTeX.
 
 ### _kraft
 
@@ -105,6 +115,7 @@ Eine Kraft der Legende: kN mit einer Stelle.
 
 - [[opencivil.core.einheiten]]
 - [[opencivil.core.latex]]
+- [[opencivil.core.nachweis]]
 - [[opencivil.core.rechenwerk]]
 - [[opencivil.core.wert]]
 - [[opencivil.durchstanzen.bewehrung]]

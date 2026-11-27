@@ -479,7 +479,8 @@ function augenblock(tabelle, verfolgen, augenTitel) {
  *
  * Zuletzt je Zeile ein Auge: genau dieser Nachweis oder dieser Wert in der
  * Herleitung. Nur eine Zeile mit Urteil (`erfuellt`) bekommt die Farbe von
- * erfüllt oder nicht; eine Kennzahl hat keines.
+ * erfüllt oder nicht, grau, wenn er sich nicht führen liess (`offen`); eine
+ * Kennzahl hat keines.
  */
 function augentabelle(tabelle, verfolgen, augenTitel) {
   const [oben, unten] = tabelle.stapel_spalten || [];
@@ -510,6 +511,7 @@ function augentabelle(tabelle, verfolgen, augenTitel) {
 
   const urteil = (zeile) => {
     if (zeile.erfuellt === undefined) return '';
+    if (zeile.offen) return 'ist-offen';
     return zeile.erfuellt ? 'ist-gut' : 'ist-schlecht';
   };
   return el('table.augen-tabelle', {}, [

@@ -25,10 +25,11 @@ Die Maske zeigt die Vereinigung, so baut sie die Regel nicht nach
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional, Sequence
+from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 from opencivil.core.einheiten import EINHEITSLOS, KN, MM, Groesse
 from opencivil.core.latex import Mathe
+from opencivil.core.nachweis import NachweisUrteil
 from opencivil.core.rechenwerk import Loesung
 from opencivil.core.wert import Wert
 from opencivil.durchstanzen.bewehrung import BEREICH_VON
@@ -187,15 +188,16 @@ def _linien(schnitt: Nachweisschnitt) -> list:
             for l in schnitt.massgebend.linien]
 
 
-def _legende(befund: Durchstanzbefund, urteile) -> List[list]:
+def _legende(befund: Durchstanzbefund, urteile: Sequence[NachweisUrteil]) -> List[list]:
     """
     Die Zeilen unter dem Bild: der Schnitt und was von ihm nicht zählt; ohne
     Bewehrung der Vergleich mit seinem Urteil, sonst was ohne sie fehlt, der
-    Pilz und die Leisten mit ihren Schnitten -- und das Urteil über alle.
+    Pilz und die Leisten mit ihren Schnitten -- und das Urteil über alle. Passt
+    kein Produkt, sagt die letzte Zeile das statt eines Grads: die Nachweise
+    mit Bewehrung sind dann nicht geführt (:attr:`NachweisUrteil.offen`).
     """
     innen, b, pilz = befund.innen, befund.leisten, befund.pilz
-    erfuellt = all(u.erfuellt for u in urteile)
-    grad = min(urteile, key=lambda u: u.erfuellungsgrad.si).gradtext(latex=True)
+    gefuehrt = [u for u in urteile if not u.offen]
     zeilen = [
         zeile("Nachweisschnitt im Abstand ", zahlformel("d_v/2", innen.d_v / 2, MM, 0),
               " um die gestützte Fläche; wirksam ",
@@ -205,9 +207,10 @@ def _legende(befund: Durchstanzbefund, urteile) -> List[list]:
               " von den Ecken grosser Stützen und entlang von Wänden, und was hinter "
               "Aussparungen liegt."),
     ]
-    if b is None and pilz is None:
+    if b is None and pilz is None and gefuehrt:
         zeilen.append(zeile(*urteil(f"V_d = {_kraft(innen.V_d_red)}", r"\le",
-                                    f"V_{{Rd,c}} = {_kraft(befund.V_Rd_c)}", erfuellt, grad), "."))
+                                    f"V_{{Rd,c}} = {_kraft(befund.V_Rd_c)}", *_gesamt(gefuehrt)),
+                            "."))
         return zeilen
     zeilen.append(zeile("Ohne Bewehrung ",
                         Mathe(f"V_{{Rd,c}} = {_kraft(befund.V_Rd_c)} < V_d = {_kraft(innen.V_d_red)}"),
@@ -237,9 +240,20 @@ def _legende(befund: Durchstanzbefund, urteile) -> List[list]:
             zeile(Mathe(f"V_{{Rd,s}} = {_kraft(b.V_Rd_s)}"), ", ",
                   Mathe(f"V_{{Rd,max}} = {_kraft(b.V_Rd_max)}"), "."),
         ]
+    if not gefuehrt:
+        zeilen.append(zeile(f"{urteile[0].hinweis} Die Nachweise mit Durchstanzbewehrung "
+                            "sind darum nicht geführt."))
+        return zeilen
+    erfuellt, grad = _gesamt(gefuehrt)
     zeilen.append(zeile(f"{'Alle Nachweise erfüllt' if erfuellt else 'Nicht alle Nachweise erfüllt'}"
                         ", kleinstes ", Mathe(rf"\alpha = {grad}"), "."))
     return zeilen
+
+
+def _gesamt(urteile: Sequence[NachweisUrteil]) -> Tuple[bool, str]:
+    """Ob alle geführten Urteile aufgehen, und ihr kleinster Grad in LaTeX."""
+    return (all(u.erfuellt for u in urteile),
+            min(urteile, key=lambda u: u.erfuellungsgrad.si).gradtext(latex=True))
 
 
 def _kraft(si_wert: float) -> str:

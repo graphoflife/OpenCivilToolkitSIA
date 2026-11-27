@@ -175,22 +175,20 @@ def zusammenfassung(zusammenfassung: "Zusammenfassung") -> str:
                 zeilen=[[z.nachweis, z.fall or "–",
                          _wert_text(z.widerstand), _wert_text(z.einwirkung),
                          z.urteil.gradtext(),
-                         "erfüllt" if z.urteil.erfuellt else "NICHT ERFÜLLT"]
+                         "NICHT ERFÜLLT" if z.urteil.verfehlt else z.urteil.urteilswort]
                         for z in bauteil.zeilen],
                 ausrichtung="llrrrl")
             zeilen += _tabelle_zeilen(tabelle, 2)
         else:
             zeilen.append("  Kein Nachweis geführt.")
         if bauteil.stille:
-            zeilen += ["", "  Nicht geführt, geht aber nicht auf:"]
+            zeilen += ["", "  Ausgeschaltet, geht aber nicht auf:"]
             zeilen += [f"    {z.nachweis}{f' – {z.fall}' if z.fall else ''}: "
                        f"α_eff = {z.urteil.gradtext()}" for z in bauteil.stille]
         zeilen.append("")
 
     if zusammenfassung.gefuehrt:
-        zeilen.append("Alle geführten Nachweise erfüllt."
-                      if zusammenfassung.erfuellt
-                      else "Mindestens ein Nachweis ist NICHT erfüllt.")
+        zeilen.append(zusammenfassung.satz)
     if zusammenfassung.warnungen:
         zeilen += ["", "Hinweise:"] + [f"  - {w}" for w in zusammenfassung.warnungen]
     return "\n".join(zeilen).rstrip() + "\n"

@@ -737,13 +737,14 @@ class TestOhneBewehrungInX(unittest.TestCase):
         self.assertEqual(antwort.status, 200)
         return antwort.daten["zusammenfassungen"]["q1"]["zeilen"]
 
-    def test_der_nachweis_steht_da_und_ist_nicht_erfuellt(self):
+    def test_der_nachweis_steht_da_und_ist_nicht_gefuehrt(self):
+        """Grau mit Strich statt rot mit 0.00 (Benutzer, 2026-11-27): es fehlt die Bewehrung."""
         zeilen = [z for z in self.zeilen(self.projekt())
                   if "Rd,x" in z["zellen"][2]["mathe"]]
         self.assertEqual(len(zeilen), 3)          # drei Kombinationen
         for zeile in zeilen:
-            self.assertFalse(zeile["erfuellt"])
-            self.assertEqual(zeile["zellen"][4], {"mathe": "0.00"})
+            self.assertEqual((zeile["erfuellt"], zeile["offen"]), (False, True))
+            self.assertEqual(zeile["zellen"][4], {"text": "–"})
             self.assertIn("0.0", zeile["zellen"][2]["mathe"])    # M_Rd = 0
             self.assertIn("Keine Bewehrung in x-Richtung", zeile["hinweis"])
 
@@ -763,7 +764,7 @@ class TestOhneBewehrungInX(unittest.TestCase):
         zeilen = self.zeilen(self.projekt(mit_querkraft=True))
         quer = [z for z in zeilen if "V_{Rd,x}" in z["zellen"][2]["mathe"]]
         self.assertEqual(len(quer), 1)
-        self.assertEqual(quer[0]["zellen"][4], {"mathe": "0.00"})
+        self.assertEqual(quer[0]["zellen"][4], {"text": "–"})
         self.assertIn("V_{Ed,x}", quer[0]["zellen"][3]["mathe"])
 
     def test_erst_alle_m_n_dann_die_querkraft(self):

@@ -98,14 +98,22 @@ def _bauteil(e: Any, zusammenfassung: Any, urteile: List[dict], hinweise: List[d
 
 
 def _stand(urteile: List[dict]) -> str:
-    """«3 Nachweise, alle erfüllt», «1 von 4 Nachweisen nicht erfüllt», «kein Nachweis»."""
+    """
+    «3 Nachweise, alle erfüllt», «1 von 4 Nachweisen nicht erfüllt, 1 nicht
+    geführt», «kein Nachweis» -- was sich nicht fuehren liess, zaehlt fuer
+    sich (``offen``).
+    """
     if not urteile:
         return "kein Nachweis"
-    nicht = sum(not u["erfuellt"] for u in urteile)
-    if not nicht:
+    offen = sum(u["offen"] for u in urteile)
+    teile = [(n, wort) for n, wort in ((sum(not u["erfuellt"] for u in urteile) - offen,
+                                        "nicht erfüllt"), (offen, "nicht geführt")) if n]
+    if not teile:
         return f"{_zahl(len(urteile), 'Nachweis', 'Nachweise')}, " + (
             "erfüllt" if len(urteile) == 1 else "alle erfüllt")
-    return f"{nicht} von {_zahl(len(urteile), 'Nachweis', 'Nachweisen')} nicht erfüllt"
+    (n, wort), *rest = teile
+    return ", ".join([f"{n} von {_zahl(len(urteile), 'Nachweis', 'Nachweisen')} {wort}",
+                      *(f"{m} {w}" for m, w in rest)])
 
 
 def _je_eintrag(stuecke: Iterable[dict]) -> Dict[str, List[dict]]:
