@@ -17,7 +17,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Dict, Iterable, List, Mapping, Tuple
 
-from opencivil.core.berechnung import Kennzahlprozedur
 from opencivil.material.basis import Baustoff, Baustoffart
 from opencivil.projekt.lesen import ProjektFehler, als_groesse, ort_von, stoffe_des_felds
 from opencivil.projekt.querschnittsanalyse import (
@@ -158,7 +157,7 @@ def bauen(art: "Bauteilart", eintrag: QuerschnittsanalyseEintrag,
 
     # Was der Querschnitt aufnimmt, ohne Einwirkung -- immer, wie bei der
     # Platte (Benutzer, 2026-10-23). Am Ende, nach seinen Nachweisen.
-    _kennzahlen(KennzahlenQA(analyse), teil, aufbau)
+    aufbau.kennzahlen_eintragen(teil, KennzahlenQA(analyse))
     spannungsfaelle(eintrag, stoffe, aufbau)
     return teil
 
@@ -195,7 +194,7 @@ def _stahl(eintrag: QuerschnittsanalyseEintrag, analyse: Querschnittsanalyse, te
     if stabfaelle:
         aufbau.eintragen(teil, "qa_stahl_stabilitaet", eintrag.kennung,
                          StahlStabilitaetQA(analyse, stabfaelle, eintrag.knickkurven))
-    _kennzahlen(kennzahlen, teil, aufbau)
+    aufbau.kennzahlen_eintragen(teil, kennzahlen)
     spannungsfaelle(eintrag, stoffe_von(aufbau, analyse.baustoffe), aufbau)
     return teil
 
@@ -237,7 +236,7 @@ def _verbund(eintrag: QuerschnittsanalyseEintrag, analyse: Querschnittsanalyse, 
     if stabfaelle:
         aufbau.eintragen(teil, "qa_verbund_stuetze", eintrag.kennung,
                          VerbundStuetzeQA(analyse, stabfaelle, eintrag.stuetze_kriechzahl))
-    _kennzahlen(kennzahlen, teil, aufbau)
+    aufbau.kennzahlen_eintragen(teil, kennzahlen)
     return teil
 
 
@@ -263,7 +262,7 @@ def _blechverbund(eintrag: QuerschnittsanalyseEintrag, analyse: Querschnittsanal
     quer = [l.name for l in lastfaelle if l.M_z or l.V_y or l.T]
     if quer:
         aufbau.warnen(teil.raum, f"{ort_von(eintrag)}, {', '.join(quer)}: {EINE_RICHTUNG}")
-    _kennzahlen(kennzahlen, teil, aufbau)
+    aufbau.kennzahlen_eintragen(teil, kennzahlen)
     return teil
 
 
@@ -292,7 +291,7 @@ def _holz(eintrag: QuerschnittsanalyseEintrag, analyse: Querschnittsanalyse, tei
     if stabfaelle:
         aufbau.eintragen(teil, "qa_holz_stabilitaet", eintrag.kennung, HolzStabilitaetQA(
             analyse, stabfaelle, werte, _stossartig(eintrag.stabilitaetsfaelle)))
-    _kennzahlen(KennzahlenHolzQA(analyse, werte), teil, aufbau)
+    aufbau.kennzahlen_eintragen(teil, KennzahlenHolzQA(analyse, werte))
     spannungsfaelle(eintrag, stoffe_von(aufbau, analyse.baustoffe), aufbau)
     return teil
 
@@ -300,13 +299,6 @@ def _holz(eintrag: QuerschnittsanalyseEintrag, analyse: Querschnittsanalyse, tei
 def _stossartig(faelle: Iterable[Any]) -> frozenset:
     """Die Namen der eingeschalteten Faelle, die stossartig sind."""
     return frozenset(f.name for f in faelle if f.aktiv and f.stossartig)
-
-
-def _kennzahlen(kennzahlen: Kennzahlprozedur, teil: Bauteil, aufbau: Aufbau) -> None:
-    """Die Kennzahlen ins Rechenwerk und unter das Bauteil."""
-    aufbau.werk.registriere(kennzahlen)
-    teil.weitere_ziele.append(kennzahlen.id)
-    teil.kennzahlen += kennzahlen.kennzahlen
 
 
 def ohne_nachweise(bauweise: Bauweise, stoffe: Iterable[Tuple[Baustoffart, str]]) -> str:

@@ -27,7 +27,7 @@ from typing import Optional
 from opencivil.core.berechnung import Eingaben
 from opencivil.core.einheiten import M2, Groesse
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
-from opencivil.core.wert import Wert
+from opencivil.core.wert import Wert, WertDef
 from opencivil.durchstanzen.pruefung import KeNaeherung, Schnittpruefung, kreisdurchmesser
 from opencivil.durchstanzen.schnitt import Auswertung
 
@@ -153,15 +153,17 @@ def wirksam(p: Protokoll, w: Zwischenwerte, k_e: Wert, u_red: Wert, *, ix: Index
 
 
 def querkraft(p: Protokoll, w: Zwischenwerte, e: Eingaben, s: Schnittpruefung, *, ix: Index,
-              titel_last: str, titel: str) -> Wert:
+              titel_last: str, titel: str, V_d: Optional[Wert] = None) -> Wert:
     """
     Die Querkraft, die den Schnitt kreuzt: V_d ohne die Flächenlast darin
-    (4.3.6.2.6). ``titel_last`` sagt, was die Flächenlast ist.
+    (4.3.6.2.6), gerechnet aus den Zahlen, die dastehen. ``titel_last`` sagt,
+    was die Flächenlast ist; ``V_d`` die Stützenkraft, wo es nicht die
+    eingegebene ist -- die gesuchte der Kennzahl (:mod:`.kennzahl`).
     """
-    V_d, q_d = e["V_d"], e["q_d"]
+    V_d, q_d = (e["V_d"] if V_d is None else V_d), e["q_d"]
     symbol = ix.symbol("V", "d") if ix.zeichen else "V_{d,red}"
     if q_d.groesse.si <= 0.0:
-        ergebnis = w.kraft(ix.name("V_d_red"), symbol, s.V_d_red)
+        ergebnis = w.kraft(ix.name("V_d_red"), symbol, V_d.groesse.si)
         p.formel(ergebnis, "@V_d", {"V_d": V_d}, titel=f"{titel}: keine Flächenlast abgezogen",
                  referenz="SIA 262:2025, 4.3.6.2.6",
                  name="Bemessungswert der Querkraft im Nachweisschnitt")
@@ -169,20 +171,26 @@ def querkraft(p: Protokoll, w: Zwischenwerte, e: Eingaben, s: Schnittpruefung, *
     A = w.wert(ix.name("A_q"), ix.symbol("A", "q"), Groesse.aus_si(s.flaeche, M2), 3,
                "Fläche innerhalb des Schnitts, ohne Aussparungen")
     p.wert(A, titel="Fläche innerhalb des Schnitts, ohne Aussparungen")
-    dV = w.kraft(ix.name("dV"), rf"\Delta {ix.symbol('V', 'd')}", q_d.groesse.si * s.flaeche)
+    dV = w.kraft(ix.name("dV"), rf"\Delta {ix.symbol('V', 'd')}", s.abzug)
     p.formel(dV, r"@q_d \cdot @A_q", {"q_d": q_d, "A_q": A}, titel=titel_last,
              referenz="SIA 262:2025, 4.3.6.2.6", name="Flächenlast innerhalb des Nachweisschnitts")
-    ergebnis = w.kraft(ix.name("V_d_red"), symbol, s.V_d_red)
+    ergebnis = w.kraft(ix.name("V_d_red"), symbol, V_d.groesse.si - s.abzug)
     p.formel(ergebnis, r"@V_d - @dV", {"V_d": V_d, "dV": dV}, titel=titel,
              referenz="SIA 262:2025, 4.3.6.2.6", name="Bemessungswert der Querkraft im Nachweisschnitt")
     return ergebnis
 
 
 def widerstand(p: Protokoll, w: Zwischenwerte, s: Schnittpruefung, *, ix: Index, k_r: Wert,
-               tau_cd: Wert, d_v: Wert, u: Wert, titel: str, referenz: str) -> Wert:
-    """V_Rd,c nach (58) an diesem Schnitt."""
-    V_Rd_c = w.kraft(ix.name("V_Rd_c"), ix.symbol("V", "Rd", "c"),
-                     s.V_Rd_c(k_r.groesse.si, tau_cd.groesse.si), titel)
+               tau_cd: Wert, d_v: Wert, u: Wert, titel: str, referenz: str,
+               ergebnis: Optional[WertDef] = None) -> Wert:
+    """
+    V_Rd,c nach (58) an diesem Schnitt -- ein Zwischenwert, oder ``ergebnis``
+    belegt, wo V_Rd,c selbst ein Wert des Rechenwerks ist: die Kennzahl
+    (:mod:`.kennzahl`).
+    """
+    si = s.V_Rd_c(k_r.groesse.si, tau_cd.groesse.si)
+    V_Rd_c = (w.kraft(ix.name("V_Rd_c"), ix.symbol("V", "Rd", "c"), si, titel) if ergebnis is None
+              else ergebnis.belegen(Groesse.aus_si(si, ergebnis.einheit)))
     p.formel(V_Rd_c, r"@k_r \cdot @tau_cd \cdot @d_v \cdot @u",
              {"k_r": k_r, "tau_cd": tau_cd, "d_v": d_v, "u": u}, titel=titel, referenz=referenz,
              name="Durchstanzwiderstand ohne Durchstanzbewehrung")

@@ -82,9 +82,7 @@ def bauen(art: "Bauteilart", eintrag: PfahlEintrag, aufbau: Aufbau) -> Bauteil:
         aufbau.ohne_nachweis(teil, wo, ohne_kombination(eintrag.kombinationen))
     if eintrag.boden_unter_dem_fuss:
         steifigkeit = Pfahlsteifigkeit(pfahl, kombinationen)
-        aufbau.werk.registriere(steifigkeit)
-        teil.weitere_ziele.append(steifigkeit.id)
-        teil.kennzahlen += steifigkeit.kennzahlen
+        aufbau.kennzahlen_eintragen(teil, steifigkeit)
         if innen is not None and any(pfahl.quer_belastet(k) for k in kombinationen):
             befunde = {"steifigkeit": steifigkeit.id, "innen": innen.id}
             aufbau.eintragen(teil, "pfahl_quer", eintrag.kennung,

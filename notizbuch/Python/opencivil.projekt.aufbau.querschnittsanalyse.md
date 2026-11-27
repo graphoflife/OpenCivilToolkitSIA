@@ -1,5 +1,5 @@
 ---
-erzeugt: 48be7d00443f
+erzeugt: fef7862dbdf3
 art: modul
 tags: [modul]
 ---
@@ -128,14 +128,6 @@ def _stossartig(faelle: Iterable[Any]) -> frozenset
 
 Die Namen der eingeschalteten Faelle, die stossartig sind.
 
-### _kennzahlen
-
-```python
-def _kennzahlen(kennzahlen: Kennzahlprozedur, teil: Bauteil, aufbau: Aufbau) -> None
-```
-
-Die Kennzahlen ins Rechenwerk und unter das Bauteil.
-
 ### ohne_nachweise
 
 ```python
@@ -207,7 +199,6 @@ seine Art fuer die Sorte nicht, fehlt die Wahl noch ([[opencivil.querschnitt.spa
 
 ## Braucht
 
-- [[opencivil.core.berechnung]]
 - [[opencivil.material.basis]]
 - [[opencivil.nachweis.qa_blechverbund]]
 - [[opencivil.nachweis.qa_gebrauch]]

@@ -1,5 +1,5 @@
 ---
-erzeugt: 199c73c8c577
+erzeugt: 3ec576ab945e
 art: modul
 tags: [modul]
 ---
@@ -460,6 +460,7 @@ Die Kennzahl `kurz` mit dem Wert `si` in SI-Basis – auch in `ergebnis`.
 - [[opencivil.decke.werk]]
 - [[opencivil.durchstanzen.flaeche]]
 - [[opencivil.durchstanzen.herleitung]]
+- [[opencivil.durchstanzen.kennzahl]]
 - [[opencivil.durchstanzen.mit_bewehrung]]
 - [[opencivil.durchstanzen.nachweis]]
 - [[opencivil.durchstanzen.stelle]]
@@ -514,7 +515,7 @@ Die Kennzahl `kurz` mit dem Wert `si` in SI-Basis – auch in `ergebnis`.
 - [[opencivil.pfahl.pfahl]]
 - [[opencivil.pfahl.quer]]
 - [[opencivil.pfahl.steifigkeit]]
-- [[opencivil.projekt.aufbau.querschnittsanalyse]]
+- [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.lagenaufbau]]
 - [[opencivil.querschnitt.platte]]

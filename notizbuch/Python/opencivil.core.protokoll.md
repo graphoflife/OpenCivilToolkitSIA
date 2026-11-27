@@ -1,5 +1,5 @@
 ---
-erzeugt: 3a0f66e13527
+erzeugt: 2681f9056032
 art: modul
 tags: [modul]
 ---
@@ -590,6 +590,7 @@ Oberflaeche und alle Berichte gehen.
 - [[opencivil.decke.herleitung]]
 - [[opencivil.decke.werk]]
 - [[opencivil.durchstanzen.herleitung]]
+- [[opencivil.durchstanzen.kennzahl]]
 - [[opencivil.durchstanzen.mit_bewehrung]]
 - [[opencivil.durchstanzen.nachweis]]
 - [[opencivil.durchstanzen.stelle]]

@@ -1,5 +1,5 @@
 ---
-erzeugt: cbacdef349de
+erzeugt: c03d3d0ee878
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.6.2.3, Figur 23c"
@@ -33,7 +33,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.durchstanzen.nachweis#Durchstanzen._nachweisschnitt|Durchstanzen._nachweisschnitt]]
+- [[opencivil.durchstanzen.nachweis#Stuetzenrechnung._nachweisschnitt|Stuetzenrechnung._nachweisschnitt]]
 
 ## Themen
 

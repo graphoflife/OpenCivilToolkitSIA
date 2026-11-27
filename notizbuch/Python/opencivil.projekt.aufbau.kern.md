@@ -1,5 +1,5 @@
 ---
-erzeugt: c7632ea106ff
+erzeugt: 34c0b21e7883
 art: modul
 tags: [modul]
 ---
@@ -233,6 +233,17 @@ genaehert: gezaehlt wird dasselbe wie vorher.
 
 Jeder Nachweis geht hier durch, auch die, die nie still sind – ein
 Weg zum Anmelden, nicht zwei.
+
+#### Aufbau.kennzahlen_eintragen
+
+```python
+def kennzahlen_eintragen(self, teil: 'Bauteil', prozedur: Kennzahlprozedur) -> None
+```
+
+Kennzahlen anmelden: im Rechenwerk, als Ziel ihres Bauteils und unter
+ihm in der Zusammenfassung – ein Weg wie für die Nachweise
+([[opencivil.projekt.aufbau.kern#Aufbau.eintragen|eintragen]]). Bis 2026-11-27 schrieben Querschnittsanalyse und
+Pfahl dieselben drei Zeilen je selbst.
 
 #### Aufbau.bauteile
 
@@ -640,6 +651,7 @@ Feldes; `mehr` fuer die Analyse.
 
 ## Braucht
 
+- [[opencivil.core.berechnung]]
 - [[opencivil.core.bereich]]
 - [[opencivil.core.einheiten]]
 - [[opencivil.core.nachweis]]

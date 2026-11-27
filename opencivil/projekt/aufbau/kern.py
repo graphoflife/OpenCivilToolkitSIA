@@ -27,6 +27,7 @@ from typing import (
     Tuple, Union,
 )
 
+from opencivil.core.berechnung import Kennzahlprozedur
 from opencivil.core.bereich import Bereich
 from opencivil.core.einheiten import KN_PRO_M3, Groesse
 from opencivil.core.nachweis import Nachweis, NachweisUrteil
@@ -275,6 +276,17 @@ class Aufbau:
             return
         self.werk.registriere(nachweis)
         teil.nachweise.append((feld, schluessel, nachweis))
+
+    def kennzahlen_eintragen(self, teil: "Bauteil", prozedur: Kennzahlprozedur) -> None:
+        """
+        Kennzahlen anmelden: im Rechenwerk, als Ziel ihres Bauteils und unter
+        ihm in der Zusammenfassung -- ein Weg wie für die Nachweise
+        (:meth:`eintragen`). Bis 2026-11-27 schrieben Querschnittsanalyse und
+        Pfahl dieselben drei Zeilen je selbst.
+        """
+        self.werk.registriere(prozedur)
+        teil.weitere_ziele.append(prozedur.id)
+        teil.kennzahlen += prozedur.kennzahlen
 
     def bauteile(self) -> List["Bauteil"]:
         """

@@ -1,5 +1,5 @@
 ---
-erzeugt: 279aef6de11d
+erzeugt: cffceba65abd
 art: modul
 tags: [modul]
 ---
@@ -41,6 +41,7 @@ Feldes ([[opencivil.projekt.lesen#als_groesse|als_groesse]]).
 
 ## Braucht
 
+- [[opencivil.durchstanzen.kennzahl]]
 - [[opencivil.durchstanzen.nachweis]]
 - [[opencivil.durchstanzen.stelle]]
 - [[opencivil.projekt.aufbau]]

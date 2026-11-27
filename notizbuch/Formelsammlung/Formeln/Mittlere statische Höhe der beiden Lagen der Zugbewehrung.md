@@ -1,5 +1,5 @@
 ---
-erzeugt: 4ac0aa8f4179
+erzeugt: 67f97b39678e
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.6.2.1"
@@ -36,7 +36,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.durchstanzen.nachweis#Durchstanzen._statische_hoehe|Durchstanzen._statische_hoehe]]
+- [[opencivil.durchstanzen.nachweis#Stuetzenrechnung._statische_hoehe|Stuetzenrechnung._statische_hoehe]]
 
 ## Themen
 

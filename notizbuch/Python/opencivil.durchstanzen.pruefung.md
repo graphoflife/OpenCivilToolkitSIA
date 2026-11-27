@@ -1,5 +1,5 @@
 ---
-erzeugt: ae444b9e5975
+erzeugt: b482e97686d2
 art: modul
 tags: [modul]
 ---
@@ -285,6 +285,15 @@ def flaeche(self) -> float
 ```
 
 Die Fläche innerhalb des Schnitts, ohne Aussparungen.
+
+#### Schnittpruefung.abzug
+
+```python
+@property
+def abzug(self) -> float
+```
+
+Die Flächenlast innerhalb des Schnitts – ΔV (4.3.6.2.6).
 
 #### Schnittpruefung.V_d_red
 

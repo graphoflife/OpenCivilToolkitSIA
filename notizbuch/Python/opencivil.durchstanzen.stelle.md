@@ -1,5 +1,5 @@
 ---
-erzeugt: d4f692220a3e
+erzeugt: f6d4fc0087b3
 art: modul
 tags: [modul]
 ---
@@ -312,6 +312,7 @@ Die Kurznamen, die der Nachweis liest – siehe [[opencivil.durchstanzen.stelle#
 
 ## Gebraucht von
 
+- [[opencivil.durchstanzen.kennzahl]]
 - [[opencivil.durchstanzen.nachweis]]
 - [[opencivil.projekt.aufbau.durchstanzen]]
 - [[opencivil.projekt.durchstanzen]]

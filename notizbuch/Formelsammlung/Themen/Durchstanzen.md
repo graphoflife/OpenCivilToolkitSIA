@@ -1,5 +1,5 @@
 ---
-erzeugt: 4c3106814e4c
+erzeugt: 6c410c52d963
 art: thema
 tags: [thema]
 ---
@@ -27,6 +27,8 @@ Mehr als 2·k\_r und 3.5 in Gleichung (70) lässt 4.3.6.5.9 nur für Systeme zu,
 Der äussere Schnitt läuft im Abstand 0.5·d\_v,out um die äussersten Anker.
 
 Die Näherung für k\_e gilt für die gestützte Fläche, an jedem ihrer Schnitte (4.3.6.2.5).
+
+Wie viel Querkraft der Schnitt um die Stütze ohne Durchstanzbewehrung trägt, gleich welche Einwirkung es gibt: dort, wo die Querkraft so gross ist wie der Widerstand, den sie selbst zulässt. Geht die Querkraft eines Nachweises nicht darüber, braucht er keine Durchstanzbewehrung.
 
 Vorgeschlagen wird ancoPLUS von AncoTech: 20 × ancoPLUS DC9-0215 – Anker ⌀16 aus B500B mit h\_A = 215 mm, vom Rand der gestützten Fläche 85 / 135 / 135 / 170 / 170 / 170 / 170 / 170 / 170 mm. Die Abstände sind die der Typen «D» nach dem Gutachten des Herstellers: 0.375·d zum ersten Anker, bis zum dritten 0.60·d, danach 0.75·d (AncoTech, Gutachten Muttoni / Fernández Ruiz 2007 (07-A05-R1c) und Preisliste ancoPLUS, nach Vorgabe, nicht nachgeschlagen). Zwei Leisten stehen beim zweiten Anker höchstens 1.5·d\_v auseinander (5.5.3.9).
 

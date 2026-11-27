@@ -1,5 +1,5 @@
 ---
-erzeugt: 131f2ed476ae
+erzeugt: 39d231833bbb
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.6.2.6"
@@ -23,7 +23,7 @@ $$
 
 | Zeichen | Bedeutung | Einheit | Woher |
 | --- | --- | --- | --- |
-| $V_d$ | Bemessungswert der Auflagerkraft | kN | Vorgabe |
+| $V_d$ | Bemessungswert der Auflagerkraft | kN | Vorgabe, Zwischenwert |
 | $\Delta V_d$ | – | kN | [[Flächenlast innerhalb des Nachweisschnitts]] |
 
 ## Beispiel

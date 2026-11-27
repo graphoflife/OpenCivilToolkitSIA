@@ -1,5 +1,5 @@
 ---
-erzeugt: 206c9a098fb6
+erzeugt: 8c7b21b21149
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.2.1.5, Figur 12"
@@ -35,7 +35,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.durchstanzen.nachweis#Durchstanzen._m_Rd|Durchstanzen._m_Rd]]
+- [[opencivil.durchstanzen.nachweis#Stuetzenrechnung._m_Rd|Stuetzenrechnung._m_Rd]]
 
 ## Themen
 

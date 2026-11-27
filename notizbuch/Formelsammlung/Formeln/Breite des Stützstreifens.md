@@ -1,5 +1,5 @@
 ---
-erzeugt: 2350d906a5b7
+erzeugt: 8e035957f6c0
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.6.4.6, (61)"
@@ -39,7 +39,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.durchstanzen.nachweis#Durchstanzen._m_sd|Durchstanzen._m_sd]]
+- [[opencivil.durchstanzen.nachweis#Stuetzenrechnung._m_sd|Stuetzenrechnung._m_sd]]
 
 ## Themen
 

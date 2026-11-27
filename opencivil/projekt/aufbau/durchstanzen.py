@@ -14,6 +14,7 @@ from __future__ import annotations
 from functools import partial
 from typing import TYPE_CHECKING, Dict, List, Tuple
 
+from opencivil.durchstanzen.kennzahl import Durchstanzkennzahl
 from opencivil.durchstanzen.nachweis import Durchstanzen
 from opencivil.durchstanzen.stelle import Durchstanzstelle
 from opencivil.projekt.durchstanzen import DurchstanzEintrag
@@ -69,4 +70,6 @@ def bauen(art: "Bauteilart", eintrag: DurchstanzEintrag, aufbau: Aufbau) -> Baut
     stelle.ins_rechenwerk(aufbau.werk)
     teil = Bauteil(eintrag, art, stelle)
     aufbau.eintragen(teil, "durchstanzen", eintrag.kennung, Durchstanzen(stelle))
+    # Der Widerstand am Schnittpunkt, auch ohne Einwirkung (Benutzer, 2026-11-27).
+    aufbau.kennzahlen_eintragen(teil, Durchstanzkennzahl(stelle))
     return teil

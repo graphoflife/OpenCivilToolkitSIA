@@ -1,5 +1,5 @@
 ---
-erzeugt: 6ce0b7b15478
+erzeugt: 1f84ccfadcff
 art: modul
 tags: [modul]
 ---
@@ -140,10 +140,166 @@ Ob die Stütze nichts trägt – dann ist nichts durchzustanzen. Die eine
 Stelle für Nachweis und Grundriss: dort stand bis 2026-11-27
 «V_d = 0 ≤ V_Rd,c – erfüllt, α = ∞».
 
+### Stuetzenschnitt
+
+```python
+@dataclass(frozen=True)
+class Stuetzenschnitt
+```
+
+Der Schnitt um die gestützte Fläche mit allem, was nicht von der
+Stützenkraft abhängt – für Nachweis und Kennzahl derselbe.
+
+- `masse: Dict[str, float]`
+- `d: Wert`
+- `d_v: Wert`
+- `hoehen: Dict[Richtung, Wert]`
+- `innen: Schnittpruefung`
+- `k_e: Wert`
+- `u: Wert`
+- `e_u: Tuple[float, float]` – Die Exzentrizität der Resultierenden zum Schwerpunkt des Schnitts, je Richtung.
+
+### Widerstand
+
+```python
+@dataclass(frozen=True)
+class Widerstand
+```
+
+Was an der Stütze von der Stützenkraft abhängt: ψ, k_r und V_Rd,c.
+
+- `rotationen: Tuple[Rotation, ...]`
+- `psi: Wert`
+- `k_r: Wert`
+- `tau_cd: Wert`
+- `V_Rd_c: Wert`
+
+### Stuetzenrechnung
+
+```python
+class Stuetzenrechnung
+```
+
+Was der Nachweis ([[opencivil.durchstanzen.nachweis#Durchstanzen|Durchstanzen]]) und die Kennzahl
+([[opencivil.durchstanzen.kennzahl#Durchstanzkennzahl|Durchstanzkennzahl]]) an der
+Stütze gleich rechnen, je mit seiner Herleitung: den Schnitt um sie
+([[opencivil.durchstanzen.nachweis#Stuetzenrechnung._schnitt|_schnitt]]) und ihren Widerstand ohne Durchstanzbewehrung bei einer
+Stützenkraft ([[opencivil.durchstanzen.nachweis#Stuetzenrechnung._widerstand|_widerstand]]). Beide sind Berechnungen einer
+`stelle`; die Kennzahl rechnet den Widerstand still bei vielen Kräften
+und schreibt nur den letzten.
+
+- `stelle: Durchstanzstelle`
+- `id: str`
+
+#### Stuetzenrechnung._schnitt
+
+```python
+def _schnitt(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, V_d: float) -> Stuetzenschnitt
+```
+
+Statische Höhe, Nachweisschnitt, k_e und wirksamer Umfang – `V_d` in N.
+
+#### Stuetzenrechnung._widerstand
+
+```python
+def _widerstand(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, g: Stuetzenschnitt, V_d: Wert, ergebnis: Optional[WertDef]=None) -> Widerstand
+```
+
+ψ, k_r und V_Rd,c bei der Stützenkraft `V_d`: in Näherungsstufe 2
+wachsen die Momente im Stützstreifen mit ihr. `ergebnis` ist die
+Definition, die V_Rd,c belegt – sonst ein Zwischenwert.
+
+#### Stuetzenrechnung._statische_hoehe
+
+```python
+def _statische_hoehe(self, e: Eingaben, p: Protokoll, w: Zwischenwerte) -> Tuple[Wert, Wert, Dict[Richtung, Wert]]
+```
+
+Die statischen Höhen der beiden Lagen, ihr Mittel d und die wirksame d_v (4.3.6.2.1).
+
+#### Stuetzenrechnung._nachweisschnitt
+
+```python
+def _nachweisschnitt(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, a: Auswertung, d_v: Wert) -> Wert
+```
+
+Der Nachweisschnitt und was von ihm nicht zählt: `u_red`, noch ohne
+k_e. Wo die gestützte Fläche eine Formel für u_0 kennt, steht sie da,
+sonst die Länge in der Platte; die Abzüge schreibt [[opencivil.durchstanzen.herleitung|.herleitung]],
+wie an jedem Schnitt.
+
+#### Stuetzenrechnung._resultierende
+
+```python
+def _resultierende(self, e: Eingaben, masse: Masse) -> Punkt
+```
+
+Wo die Auflagerkraft angreift: in der Stützenachse, verschoben um die
+Exzentrizität e_x, e_y, wo k_e nach (57) sie liest. Von hier misst e_u
+an jedem Schnitt – um die Stütze, um die äussersten Anker und um den Pilz.
+
+#### Stuetzenrechnung._rotation
+
+```python
+def _rotation(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, d: Wert, hoehen: Dict[Richtung, Wert], e_u: Tuple[float, float], masse: Dict[str, float], V_d: Wert) -> Tuple[Tuple[Rotation, ...], Wert]
+```
+
+ψ je Richtung und die massgebende, die grössere (4.3.6.4.1) – bei der Kraft `V_d`.
+
+#### Stuetzenrechnung._m_Rd
+
+```python
+def _m_Rd(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, r: Richtung, d_r: Wert) -> Wert
+```
+
+Der Biegewiderstand je Meter im Stützstreifen, aus dem Kräftegleichgewicht (Spannungsblock).
+
+#### Stuetzenrechnung._m_sd
+
+```python
+def _m_sd(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, r_s: Dict[Richtung, Wert], e_u: Tuple[float, float], masse: Dict[str, float], V_d: Wert) -> Dict[Richtung, Optional[Wert]]
+```
+
+Die mittleren Momente im Stützstreifen in Näherungsstufe 2 (4.3.6.4.7),
+aus der ganzen Auflagerkraft `V_d` – siehe Dateikopf.
+
+#### Stuetzenrechnung._b_sr
+
+```python
+def _b_sr(self, p: Protokoll, w: Zwischenwerte, r: Richtung, rand: Randbreite) -> Wert
+```
+
+b_sr des Streifens in `r`: zwischen den Linien unter 45° (Figur 25) – siehe Kopf.
+
+#### Stuetzenrechnung._breite_am_rand
+
+```python
+def _breite_am_rand(self, p: Protokoll, w: Zwischenwerte, r: Richtung, b_s: Wert, rand: Randbreite) -> Wert
+```
+
+Die Breite eines Streifens, den der Plattenrand begrenzt: höchstens
+b_sr, an der Ecke vom zweiten Rand abgeschnitten – siehe Dateikopf.
+
+#### Stuetzenrechnung._r_s_am_rand
+
+```python
+def _r_s_am_rand(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, r: Richtung, rand: Randbreite) -> Wert
+```
+
+In Stufe 3 an Rand- und Eckstützen: r_s mindestens 2/3 · b_sr (4.3.6.4.8).
+
+#### Stuetzenrechnung._k_r
+
+```python
+def _k_r(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, psi: Wert, d: Wert) -> Wert
+```
+
+Der Beiwert k_r (59), mit k_g nach 4.3.3.2.1.
+
 ### Durchstanzen
 
 ```python
-class Durchstanzen(Nachweis)
+class Durchstanzen(Stuetzenrechnung, Nachweis)
 ```
 
 Der Durchstanznachweis an einer Durchstanzstelle – siehe Dateikopf.
@@ -177,93 +333,6 @@ Die vier Urteile mit Durchstanzbewehrung, wo sich keine finden liess.
 def pruefe(self, e: Eingaben, p: Protokoll) -> Ausfuehrung
 ```
 
-#### Durchstanzen._statische_hoehe
-
-```python
-def _statische_hoehe(self, e: Eingaben, p: Protokoll, w: Zwischenwerte) -> Tuple[Wert, Wert, Dict[Richtung, Wert]]
-```
-
-Die statischen Höhen der beiden Lagen, ihr Mittel d und die wirksame d_v (4.3.6.2.1).
-
-#### Durchstanzen._nachweisschnitt
-
-```python
-def _nachweisschnitt(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, a: Auswertung, d_v: Wert) -> Wert
-```
-
-Der Nachweisschnitt und was von ihm nicht zählt: `u_red`, noch ohne
-k_e. Wo die gestützte Fläche eine Formel für u_0 kennt, steht sie da,
-sonst die Länge in der Platte; die Abzüge schreibt [[opencivil.durchstanzen.herleitung|.herleitung]],
-wie an jedem Schnitt.
-
-#### Durchstanzen._resultierende
-
-```python
-def _resultierende(self, e: Eingaben, masse: Masse) -> Punkt
-```
-
-Wo die Auflagerkraft angreift: in der Stützenachse, verschoben um die
-Exzentrizität e_x, e_y, wo k_e nach (57) sie liest. Von hier misst e_u
-an jedem Schnitt – um die Stütze, um die äussersten Anker und um den Pilz.
-
-#### Durchstanzen._rotation
-
-```python
-def _rotation(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, d: Wert, hoehen: Dict[Richtung, Wert], e_u: Tuple[float, float], masse: Dict[str, float]) -> Tuple[Tuple[Rotation, ...], Wert]
-```
-
-ψ je Richtung und die massgebende – die grössere (4.3.6.4.1).
-
-#### Durchstanzen._m_Rd
-
-```python
-def _m_Rd(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, r: Richtung, d_r: Wert) -> Wert
-```
-
-Der Biegewiderstand je Meter im Stützstreifen, aus dem Kräftegleichgewicht (Spannungsblock).
-
-#### Durchstanzen._m_sd
-
-```python
-def _m_sd(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, r_s: Dict[Richtung, Wert], e_u: Tuple[float, float], masse: Dict[str, float]) -> Dict[Richtung, Optional[Wert]]
-```
-
-Die mittleren Momente im Stützstreifen in Näherungsstufe 2 (4.3.6.4.7),
-aus der ganzen Auflagerkraft – siehe Dateikopf.
-
-#### Durchstanzen._b_sr
-
-```python
-def _b_sr(self, p: Protokoll, w: Zwischenwerte, r: Richtung, rand: Randbreite) -> Wert
-```
-
-b_sr des Streifens in `r`: zwischen den Linien unter 45° (Figur 25) – siehe Kopf.
-
-#### Durchstanzen._breite_am_rand
-
-```python
-def _breite_am_rand(self, p: Protokoll, w: Zwischenwerte, r: Richtung, b_s: Wert, rand: Randbreite) -> Wert
-```
-
-Die Breite eines Streifens, den der Plattenrand begrenzt: höchstens
-b_sr, an der Ecke vom zweiten Rand abgeschnitten – siehe Dateikopf.
-
-#### Durchstanzen._r_s_am_rand
-
-```python
-def _r_s_am_rand(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, r: Richtung, rand: Randbreite) -> Wert
-```
-
-In Stufe 3 an Rand- und Eckstützen: r_s mindestens 2/3 · b_sr (4.3.6.4.8).
-
-#### Durchstanzen._k_r
-
-```python
-def _k_r(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, psi: Wert, d: Wert) -> Wert
-```
-
-Der Beiwert k_r (59), mit k_g nach 4.3.3.2.1.
-
 ### angaben
 
 ```python
@@ -280,6 +349,9 @@ def kennwerttabelle(befund: Durchstanzbefund) -> TabellenBlock
 
 Die Grössen, aus denen der Widerstand entsteht – eine Zeile je Grösse. Mit
 Stahlpilz und Durchstanzbewehrung dazu, was sie sind und was sie tragen.
+Ohne Einwirkung nur der Schnitt: ψ = 0 und k_r = 2 gälten nur ohne Last;
+was die Stelle trägt, sagt die Kennzahl ([[opencivil.durchstanzen.kennzahl|.kennzahl]]). Bis 2026-11-27
+stand dort V_Rd,c = 866.7 kN, wo die Kennzahl 503.6 kN sagt.
 
 
 ## Konstanten
@@ -310,29 +382,30 @@ Stahlpilz und Durchstanzbewehrung dazu, was sie sind und was sie tragen.
 ## Gebraucht von
 
 - [[opencivil.bericht.zusammenfassung]]
+- [[opencivil.durchstanzen.kennzahl]]
 - [[opencivil.durchstanzen.mit_bewehrung]]
 - [[opencivil.projekt.aufbau.durchstanzen]]
 - [[opencivil.web.durchstanzdaten]]
 
 ## Formeln aus diesem Modul
 
-- [[Abstand zum Momentennullpunkt]] · `Durchstanzen._rotation`
-- [[Abstand zum Momentennullpunkt am Plattenrand]] · `Durchstanzen._r_s_am_rand`
-- [[Beiwert k_r]] · `Durchstanzen._k_r`
-- [[Biegebewehrung im Stützstreifen je Meter]] · `Durchstanzen._m_Rd`
-- [[Biegewiderstand im Stützstreifen]] · `Durchstanzen._m_Rd`
-- [[Breite des Randstreifens an der Eckstütze]] · `Durchstanzen._breite_am_rand`
-- [[Breite des Stützstreifens]] · `Durchstanzen._m_sd`
-- [[Breite des Stützstreifens am Plattenrand]] · `Durchstanzen._b_sr`
-- [[Breite des Stützstreifens senkrecht zum Rand]] · `Durchstanzen._breite_am_rand`
-- [[Druckzonenhöhe im Stützstreifen]] · `Durchstanzen._m_Rd`
-- [[Massgebende Plattenrotation – die grössere]] · `Durchstanzen._rotation`
-- [[Mittlere statische Höhe der beiden Lagen der Zugbewehrung]] · `Durchstanzen._statische_hoehe`
-- [[Mittleres Moment im Stützstreifen]] · `Durchstanzen._m_sd`
-- [[Nachweisschnitt im Abstand d_v∕2]] · `Durchstanzen._nachweisschnitt`
-- [[Nachweisschnitt um das Wandende – 1.5·d_v entlang der Wand]] · `Durchstanzen._nachweisschnitt`
-- [[Nachweisschnitt um die Wandecke – je 1.5·d_v entlang der Wände]] · `Durchstanzen._nachweisschnitt`
-- [[Plattenrotation]] · `Durchstanzen._rotation`
-- [[Statische Höhe der äusseren Lage]] · `Durchstanzen._statische_hoehe`
-- [[Statische Höhe der inneren Lage]] · `Durchstanzen._statische_hoehe`
-- [[Wirksame Höhe ohne Abzug]] · `Durchstanzen._statische_hoehe`
+- [[Abstand zum Momentennullpunkt]] · `Stuetzenrechnung._rotation`
+- [[Abstand zum Momentennullpunkt am Plattenrand]] · `Stuetzenrechnung._r_s_am_rand`
+- [[Beiwert k_r]] · `Stuetzenrechnung._k_r`
+- [[Biegebewehrung im Stützstreifen je Meter]] · `Stuetzenrechnung._m_Rd`
+- [[Biegewiderstand im Stützstreifen]] · `Stuetzenrechnung._m_Rd`
+- [[Breite des Randstreifens an der Eckstütze]] · `Stuetzenrechnung._breite_am_rand`
+- [[Breite des Stützstreifens]] · `Stuetzenrechnung._m_sd`
+- [[Breite des Stützstreifens am Plattenrand]] · `Stuetzenrechnung._b_sr`
+- [[Breite des Stützstreifens senkrecht zum Rand]] · `Stuetzenrechnung._breite_am_rand`
+- [[Druckzonenhöhe im Stützstreifen]] · `Stuetzenrechnung._m_Rd`
+- [[Massgebende Plattenrotation – die grössere]] · `Stuetzenrechnung._rotation`
+- [[Mittlere statische Höhe der beiden Lagen der Zugbewehrung]] · `Stuetzenrechnung._statische_hoehe`
+- [[Mittleres Moment im Stützstreifen]] · `Stuetzenrechnung._m_sd`
+- [[Nachweisschnitt im Abstand d_v∕2]] · `Stuetzenrechnung._nachweisschnitt`
+- [[Nachweisschnitt um das Wandende – 1.5·d_v entlang der Wand]] · `Stuetzenrechnung._nachweisschnitt`
+- [[Nachweisschnitt um die Wandecke – je 1.5·d_v entlang der Wände]] · `Stuetzenrechnung._nachweisschnitt`
+- [[Plattenrotation]] · `Stuetzenrechnung._rotation`
+- [[Statische Höhe der äusseren Lage]] · `Stuetzenrechnung._statische_hoehe`
+- [[Statische Höhe der inneren Lage]] · `Stuetzenrechnung._statische_hoehe`
+- [[Wirksame Höhe ohne Abzug]] · `Stuetzenrechnung._statische_hoehe`

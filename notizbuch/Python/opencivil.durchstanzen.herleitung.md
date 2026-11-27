@@ -1,5 +1,5 @@
 ---
-erzeugt: bfde951aada5
+erzeugt: e2771c53793e
 art: modul
 tags: [modul]
 ---
@@ -108,19 +108,23 @@ Der wirksame Umfang u = k_e · u_red.
 ### querkraft
 
 ```python
-def querkraft(p: Protokoll, w: Zwischenwerte, e: Eingaben, s: Schnittpruefung, *, ix: Index, titel_last: str, titel: str) -> Wert
+def querkraft(p: Protokoll, w: Zwischenwerte, e: Eingaben, s: Schnittpruefung, *, ix: Index, titel_last: str, titel: str, V_d: Optional[Wert]=None) -> Wert
 ```
 
 Die Querkraft, die den Schnitt kreuzt: V_d ohne die Flächenlast darin
-(4.3.6.2.6). `titel_last` sagt, was die Flächenlast ist.
+(4.3.6.2.6), gerechnet aus den Zahlen, die dastehen. `titel_last` sagt,
+was die Flächenlast ist; `V_d` die Stützenkraft, wo es nicht die
+eingegebene ist – die gesuchte der Kennzahl ([[opencivil.durchstanzen.kennzahl|.kennzahl]]).
 
 ### widerstand
 
 ```python
-def widerstand(p: Protokoll, w: Zwischenwerte, s: Schnittpruefung, *, ix: Index, k_r: Wert, tau_cd: Wert, d_v: Wert, u: Wert, titel: str, referenz: str) -> Wert
+def widerstand(p: Protokoll, w: Zwischenwerte, s: Schnittpruefung, *, ix: Index, k_r: Wert, tau_cd: Wert, d_v: Wert, u: Wert, titel: str, referenz: str, ergebnis: Optional[WertDef]=None) -> Wert
 ```
 
-V_Rd,c nach (58) an diesem Schnitt.
+V_Rd,c nach (58) an diesem Schnitt – ein Zwischenwert, oder `ergebnis`
+belegt, wo V_Rd,c selbst ein Wert des Rechenwerks ist: die Kennzahl
+([[opencivil.durchstanzen.kennzahl|.kennzahl]]).
 
 
 ## Konstanten
@@ -138,6 +142,7 @@ V_Rd,c nach (58) an diesem Schnitt.
 
 ## Gebraucht von
 
+- [[opencivil.durchstanzen.kennzahl]]
 - [[opencivil.durchstanzen.mit_bewehrung]]
 - [[opencivil.durchstanzen.nachweis]]
 

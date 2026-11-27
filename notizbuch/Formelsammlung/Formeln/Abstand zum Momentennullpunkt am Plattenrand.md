@@ -1,5 +1,5 @@
 ---
-erzeugt: 4f567e74b473
+erzeugt: 4c56720d8bcd
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.6.4.8"
@@ -30,7 +30,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.durchstanzen.nachweis#Durchstanzen._r_s_am_rand|Durchstanzen._r_s_am_rand]]
+- [[opencivil.durchstanzen.nachweis#Stuetzenrechnung._r_s_am_rand|Stuetzenrechnung._r_s_am_rand]]
 
 ## Themen
 

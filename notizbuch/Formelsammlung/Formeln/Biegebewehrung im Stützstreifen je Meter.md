@@ -1,5 +1,5 @@
 ---
-erzeugt: 3f1103c7112c
+erzeugt: 27f4c938a929
 art: formel
 tags: [formel]
 ---
@@ -34,7 +34,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.durchstanzen.nachweis#Durchstanzen._m_Rd|Durchstanzen._m_Rd]]
+- [[opencivil.durchstanzen.nachweis#Stuetzenrechnung._m_Rd|Stuetzenrechnung._m_Rd]]
 
 ## Themen
 

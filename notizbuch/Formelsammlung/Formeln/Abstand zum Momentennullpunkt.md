@@ -1,5 +1,5 @@
 ---
-erzeugt: 3916bb185ceb
+erzeugt: d0d7faedb188
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.6.4.4"
@@ -34,7 +34,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.durchstanzen.nachweis#Durchstanzen._rotation|Durchstanzen._rotation]]
+- [[opencivil.durchstanzen.nachweis#Stuetzenrechnung._rotation|Stuetzenrechnung._rotation]]
 
 ## Themen
 

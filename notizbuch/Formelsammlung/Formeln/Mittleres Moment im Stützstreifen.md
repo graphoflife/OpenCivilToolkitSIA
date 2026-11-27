@@ -1,5 +1,5 @@
 ---
-erzeugt: efd13edf7fe5
+erzeugt: 8ede032498ee
 art: formel
 tags: [formel]
 normstelle: ["SIA 262:2025, 4.3.6.4.7, (62)", "SIA 262:2025, 4.3.6.4.7, (63)", "SIA 262:2025, 4.3.6.4.7, (64)", "SIA 262:2025, 4.3.6.4.7, (65)"]
@@ -35,7 +35,7 @@ $$
 
 | Zeichen | Bedeutung | Einheit | Woher |
 | --- | --- | --- | --- |
-| $V_d$ | Bemessungswert der Auflagerkraft | kN | Vorgabe |
+| $V_d$ | Bemessungswert der Auflagerkraft | kN | Vorgabe, Zwischenwert |
 | $e_{u,x}$ | – | mm | Zwischenwert |
 | $b_s$ | Breite des Stützstreifens | mm | [[Breite des Stützstreifens]] |
 | $e_{u,y}$ | – | mm | Zwischenwert |
@@ -82,7 +82,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.durchstanzen.nachweis#Durchstanzen._m_sd|Durchstanzen._m_sd]]
+- [[opencivil.durchstanzen.nachweis#Stuetzenrechnung._m_sd|Stuetzenrechnung._m_sd]]
 
 ## Themen
 

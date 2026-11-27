@@ -228,9 +228,14 @@ class Schnittpruefung:
         return self.auswertung.flaeche_ohne_aussparungen
 
     @property
+    def abzug(self) -> float:
+        """Die Flächenlast innerhalb des Schnitts -- ΔV (4.3.6.2.6)."""
+        return self.q_d * self.flaeche
+
+    @property
     def V_d_red(self) -> float:
         """Die Querkraft, die den Schnitt kreuzt."""
-        return self.V_d - self.q_d * self.flaeche
+        return self.V_d - self.abzug
 
     def V_Rd_c(self, k_r: float, tau_cd: float) -> float:
         return widerstand(k_r, tau_cd, self.d_v, self.u)

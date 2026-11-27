@@ -1,5 +1,5 @@
 ---
-erzeugt: cc5a1510cd54
+erzeugt: 92213f0f29a0
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.6.4.6, Figur 25"
@@ -36,7 +36,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.durchstanzen.nachweis#Durchstanzen._b_sr|Durchstanzen._b_sr]]
+- [[opencivil.durchstanzen.nachweis#Stuetzenrechnung._b_sr|Stuetzenrechnung._b_sr]]
 
 ## Themen
 

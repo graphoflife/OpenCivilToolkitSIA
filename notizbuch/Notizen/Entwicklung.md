@@ -7,6 +7,38 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-27 · Durchstanzen: der Widerstand am Schnittpunkt als Kennzahl
+
+Schritt 7 des Plans vom 2026-11-27. Vorher stand bei V_d = 0 in den Angaben
+V_Rd,c = 866.7 kN (C30/37, B500B, Vorgaben, Näherungsstufe 2): mit ψ = 0 und
+k_r = 2, ein Widerstand, der nur ohne Last gilt. Jetzt hat jede
+Durchstanzstelle die Kennzahl «Durchstanzwiderstand am Schnittpunkt»,
+im Beispiel V_Rd,c = 503.6 kN: die grösste Querkraft im Nachweisschnitt ohne
+Durchstanzbewehrung, mit ψ aus derselben Stützenkraft. Sie steht in der
+Karte «Kennzahlen» unter der Zusammenfassung, mit Auge und Kopierknöpfen,
+auch mit Einwirkung. Der Nachweis bleibt, wie er ist; er zeigt daneben sein
+eigenes V_Rd,c, mit ψ aus der eingegebenen Kraft -- darum heisst die
+Kennzahl «am Schnittpunkt».
+
+- Gesucht wird V_d mit V_d − ΔV = V_Rd,c(ψ(V_d)), durch Halbieren auf 1 N
+  genau (`durchstanzen/kennzahl.py`). Links wächst mit V_d, rechts sinkt:
+  es gibt genau einen Schnittpunkt. Die Herleitung zeigt V_d, m_sd, ψ, k_r
+  und V_Rd,c an dieser Stelle und darunter V_d,red, gleich gross. Mit
+  q_d = 10 kN/m²: V_d = 505.1 kN, ΔV = 2.7 kN, V_Rd,c = 502.5 kN.
+- Geht V_d,red eines Nachweises nicht über die Kennzahl, braucht er keine
+  Durchstanzbewehrung, sonst schon (Test).
+- Gerechnet wird mit den Schritten des Nachweises: Schnitt, Plattenrotation
+  und Widerstand stehen jetzt in `Stuetzenrechnung` (`durchstanzen/nachweis.py`),
+  und die Kennzahl ruft sie bei jedem Halbieren still (`StillesProtokoll`);
+  geschrieben wird nur der letzte. So können Nachweis und Kennzahl nicht
+  auseinanderlaufen.
+- In den Stufen 1 und 3 hängt ψ nicht von V_d ab; die Kennzahl ist dort das
+  V_Rd,c des Nachweises, und die Herleitung sagt es.
+- Ohne Last zeigt die Tabelle «Durchstanzen» in den Angaben nur noch d_v, u
+  und k_e: ψ = 0, k_r = 2 und 866.7 kN fallen weg.
+- Kennzahlen meldet ein Weg an, `Aufbau.kennzahlen_eintragen`; bis dahin
+  schrieben Querschnittsanalyse und Pfahl dieselben drei Zeilen je selbst.
+
 ## 2026-11-27 · Durchstanzen ohne Last: der Grundriss sagt es auch
 
 Aufräumen A2 des Plans vom 2026-11-27. Die Zusammenfassung sagte ohne

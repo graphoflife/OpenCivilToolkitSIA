@@ -1,5 +1,5 @@
 ---
-erzeugt: f027f927bdba
+erzeugt: ef64d29991b5
 art: formel
 tags: [formel]
 ---
@@ -35,7 +35,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.durchstanzen.nachweis#Durchstanzen._statische_hoehe|Durchstanzen._statische_hoehe]]
+- [[opencivil.durchstanzen.nachweis#Stuetzenrechnung._statische_hoehe|Stuetzenrechnung._statische_hoehe]]
 
 ## Themen
 

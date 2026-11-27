@@ -1,5 +1,5 @@
 ---
-erzeugt: 5390cfc7da77
+erzeugt: 84d965243b95
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.6.4.6, Figur 25"
@@ -34,7 +34,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.durchstanzen.nachweis#Durchstanzen._breite_am_rand|Durchstanzen._breite_am_rand]]
+- [[opencivil.durchstanzen.nachweis#Stuetzenrechnung._breite_am_rand|Stuetzenrechnung._breite_am_rand]]
 
 ## Themen
 

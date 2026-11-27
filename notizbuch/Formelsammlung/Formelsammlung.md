@@ -1,5 +1,5 @@
 ---
-erzeugt: 58c1cb51de62
+erzeugt: ce0dd70fc0e9
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -576,7 +576,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Bezogene Druckzonenhöhe bei reiner Biegung]] · [[opencivil.nachweis.richtungsnachweise#DuktilitaetQA.pruefe|DuktilitaetQA.pruefe]]
 - [[Bezugsgrösse der Normalkraft]] · [[opencivil.nachweis.biegung_normalkraft#BiegungNormalkraft._protokoll_naechster|BiegungNormalkraft._protokoll_naechster]]
 - [[Bezugsgrösse des Moments]] · [[opencivil.nachweis.biegung_normalkraft#BiegungNormalkraft._protokoll_naechster|BiegungNormalkraft._protokoll_naechster]]
-- [[Biegebewehrung im Stützstreifen je Meter]] · [[opencivil.durchstanzen.nachweis#Durchstanzen._m_Rd|Durchstanzen._m_Rd]]
+- [[Biegebewehrung im Stützstreifen je Meter]] · [[opencivil.durchstanzen.nachweis#Stuetzenrechnung._m_Rd|Stuetzenrechnung._m_Rd]]
 - [[Biegelinie eines Stabs]] · [[opencivil.stabwerk.herleitung|_ansaetze]]
 - [[Biegelinie eines Stabs im Raum]] · [[opencivil.stabwerk3d.herleitung|_ansaetze]]
 - [[Biegespannung im Holz]] · [[opencivil.nachweis.qa_holz#HolzBiegungQA._biegespannung|HolzBiegungQA._biegespannung]], [[opencivil.nachweis.qa_holz_stabilitaet#_Herleitung._biegespannung|_Herleitung._biegespannung]]
@@ -678,8 +678,8 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Spannung im ungerissenen Querschnitt]] · [[opencivil.nachweis.rissgroessen#protokoll_spannung_ungerissen|protokoll_spannung_ungerissen]]
 - [[Spannungsfunktion von Prandtl]] · [[opencivil.querschnitt.analyse#Querschnittsanalyse.torsion_protokollieren|Querschnittsanalyse.torsion_protokollieren]]
 - [[Statische Höhe]] · [[opencivil.querschnitt.lagenaufbau#protokoll_statische_hoehe|protokoll_statische_hoehe]]
-- [[Statische Höhe der äusseren Lage]] · [[opencivil.durchstanzen.nachweis#Durchstanzen._statische_hoehe|Durchstanzen._statische_hoehe]]
-- [[Statische Höhe der inneren Lage]] · [[opencivil.durchstanzen.nachweis#Durchstanzen._statische_hoehe|Durchstanzen._statische_hoehe]]
+- [[Statische Höhe der äusseren Lage]] · [[opencivil.durchstanzen.nachweis#Stuetzenrechnung._statische_hoehe|Stuetzenrechnung._statische_hoehe]]
+- [[Statische Höhe der inneren Lage]] · [[opencivil.durchstanzen.nachweis#Stuetzenrechnung._statische_hoehe|Stuetzenrechnung._statische_hoehe]]
 - [[Stegbreite des Kreisquerschnitts]] · [[opencivil.pfahl.innen_quer#InnererQuerwiderstand._fachwerk|InnererQuerwiderstand._fachwerk]]
 - [[Steifigkeitsmatrix eines Stabs]] · [[opencivil.stabwerk.herleitung|_ansaetze]], [[opencivil.stabwerk3d.herleitung|_ansaetze]]
 - [[Teilung einer Stablinie – gleiche Felder, auf die Länge gerundet]] · [[opencivil.querschnitt.analyse#Querschnittsanalyse._bewehrung_protokollieren|Querschnittsanalyse._bewehrung_protokollieren]]
