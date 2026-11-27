@@ -1,6 +1,6 @@
 # Beispiel
 
-183 Berechnungen ausgeführt, 284 Werte bestimmt.
+186 Berechnungen ausgeführt, 287 Werte bestimmt.
 
 ## Herleitung
 
@@ -1412,10 +1412,10 @@ $$
 \gamma = 21\,\mathrm{kN}/\mathrm{m}^{3}
 $$
 
-**Raumlast des Wassers**
+**Raumlast des Grundwassers, «Wasser»**
 
 $$
-\gamma_w = 10\,\mathrm{kN}/\mathrm{m}^{3}
+\gamma_w = \gamma_{fl} = 10\,\mathrm{kN}/\mathrm{m}^{3}
 $$
 
 **Raumlast des Bodens unter Auftrieb**
@@ -1728,6 +1728,26 @@ $$
 \alpha_{eff,GL,\text{Tragsicherheit}} = \frac{T_{Rd}}{T_{Ed}} = \frac{781.1\,\mathrm{kN}}{150\,\mathrm{kN}} = 5.21 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
+### Flüssigkeit: Wasser
+
+**Dichte der Flüssigkeit**
+
+$$
+\rho_{fl} = 1000\,\mathrm{kg}/\mathrm{m}^{3}
+$$
+
+**Erdbeschleunigung**
+
+$$
+g = 10\,\mathrm{m}/\mathrm{s}^{2}
+$$
+
+**Raumlast der Flüssigkeit**
+
+$$
+\gamma_{fl} = \rho_{fl} \cdot g = 1000\,\mathrm{kg}/\mathrm{m}^{3} \cdot 10\,\mathrm{m}/\mathrm{s}^{2} = 10\,\mathrm{kN}/\mathrm{m}^{3}
+$$
+
 ### Setzung: Fundament Stütze
 
 **Breite des Fundaments**
@@ -1945,12 +1965,6 @@ $$
 t_w = 3\,\mathrm{m}
 $$
 
-**Raumlast des Wassers**
-
-$$
-\gamma_w = 10\,\mathrm{kN}/\mathrm{m}^{3}
-$$
-
 **Umrechnungsfaktor des äusseren Widerstands** *(SIA 267:2013, 9.5.2.2.5, (48))*
 
 $$
@@ -2075,6 +2089,12 @@ $$
 
 $$
 E_{s,k,3} = 120\,\mathrm{MN}/\mathrm{m}^{2}
+$$
+
+**Raumlast des Grundwassers, «Wasser»**
+
+$$
+\gamma_w = \gamma_{fl} = 10\,\mathrm{kN}/\mathrm{m}^{3}
 $$
 
 ### Äusserer Widerstand
@@ -4131,10 +4151,24 @@ $$
 c_{eff} = \frac{c_k}{\gamma_c}
 $$
 
+**Raumlast des Grundwassers, «Wasser»**
+
+$$
+\gamma_w = \gamma_{fl}
+$$
+
 **Raumlast des Bodens unter Auftrieb**
 
 $$
 \gamma' = \gamma - \gamma_w
+$$
+
+### Flüssigkeit
+
+**Raumlast der Flüssigkeit**
+
+$$
+\gamma_{fl} = \rho_{fl} \cdot g
 $$
 
 ### Grundbruch
@@ -5155,6 +5189,9 @@ Alle geführten Nachweise sind erfüllt.
 | Beiwert der Nutzlast, quasi-ständig | $\psi_{2,4}$ | $0.3$ |  | Vorgabe |
 | Verhaltensbeiwert in x | $q_x$ | $1.5$ |  | Vorgabe |
 | Verhaltensbeiwert in y | $q_y$ | $1.5$ |  | Vorgabe |
+| Erdbeschleunigung | $g$ | $10$ | m/s² | Vorgabe |
+| Raumlast der Flüssigkeit | $\gamma_{fl}$ | $10$ | kN/m³ | berechnet |
+| Dichte der Flüssigkeit | $\rho_{fl}$ | $1000$ | kg/m³ | Vorgabe |
 | Länge des Fundaments | $L$ | $2.5$ | m | Vorgabe |
 | Neigung der Sohle | $\alpha$ | $0$ | ° | Vorgabe |
 | Breite des Fundaments | $b$ | $2$ | m | Vorgabe |
@@ -5166,7 +5203,7 @@ Alle geführten Nachweise sind erfüllt.
 | Raumlast des Bodens unter Auftrieb | $\gamma'$ | $11$ | kN/m³ | berechnet |
 | Partialfaktor der Kohäsion | $\gamma_c$ | $1.5$ |  | Vorgabe |
 | Partialfaktor des Reibungswinkels | $\gamma_{\varphi}$ | $1.2$ |  | Vorgabe |
-| Raumlast des Wassers | $\gamma_w$ | $10$ | kN/m³ | Vorgabe |
+| Raumlast des Grundwassers | $\gamma_w$ | $10$ | kN/m³ | berechnet |
 | Erfüllungsgrad Gleiten – Tragsicherheit | $\alpha_{eff,GL,\text{Tragsicherheit}}$ | $5.21$ |  | berechnet |
 | Erfüllungsgrad Grundbruch – Tragsicherheit | $\alpha_{eff,GB,\text{Tragsicherheit}}$ | $1.90$ |  | berechnet |
 | Reibungswinkel, Bemessungswert | $\varphi_{eff}$ | $27.51$ | ° | berechnet |
@@ -5196,7 +5233,7 @@ Alle geführten Nachweise sind erfüllt.
 | Raumlast der Schicht 1 | $\gamma_{1}$ | $19$ | kN/m³ | Vorgabe |
 | Raumlast der Schicht 2 | $\gamma_{2}$ | $21$ | kN/m³ | Vorgabe |
 | Raumlast der Schicht 3 | $\gamma_{3}$ | $22$ | kN/m³ | Vorgabe |
-| Raumlast des Wassers | $\gamma_w$ | $10$ | kN/m³ | Vorgabe |
+| Raumlast des Grundwassers | $\gamma_w$ | $10$ | kN/m³ | berechnet |
 | Zahl der Längsstäbe | $n$ | $12$ |  | Vorgabe |
 | Erfüllungsgrad äusserer Widerstand – Tragsicherheit | $\alpha_{eff,a,\text{Tragsicherheit}}$ | $1.10$ |  | berechnet |
 | Erfüllungsgrad innerer Widerstand – Tragsicherheit | $\alpha_{eff,i,\text{Tragsicherheit}}$ | $5.66$ |  | berechnet |

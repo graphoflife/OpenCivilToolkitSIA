@@ -1,5 +1,5 @@
 ---
-erzeugt: cec1b48c850c
+erzeugt: 9adf1c7bd754
 art: modul
 tags: [modul]
 ---
@@ -333,7 +333,7 @@ Siehe Dateikopf.
 - `L: Groesse`
 - `t_K: Groesse` – Die Tiefe des Pfahlkopfs unter Terrain.
 - `t_w: Groesse` – Die Tiefe des höchsten Grundwasserspiegels unter Terrain.
-- `gamma_w: Groesse`
+- `wasser: Baustoff` – Das Grundwasser, eine Flüssigkeit: seine Raumlast γ_w rechnet der Pfahl aus ihr ([[opencivil.geotechnik.wasser]]). Bis 2026-11-27 eine Zahl.
 - `schichten: Sequence[Pfahlschicht]`
 - `grundlage: Grundlage`
 - `eta_a: Groesse`
@@ -459,6 +459,7 @@ Angabe aus allen. Die Schichten heissen zusammen «Schicht».
 - [[opencivil.core.wahl]]
 - [[opencivil.core.wert]]
 - [[opencivil.geotechnik.verhalten]]
+- [[opencivil.geotechnik.wasser]]
 - [[opencivil.material.basis]]
 - [[opencivil.pfahl.boden]]
 - [[opencivil.pfahl.buch]]

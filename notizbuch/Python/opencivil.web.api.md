@@ -1,5 +1,5 @@
 ---
-erzeugt: d8769328b57a
+erzeugt: 64fe8c4c8291
 art: modul
 tags: [modul]
 ---
@@ -36,10 +36,12 @@ def _satztitel() -> Dict[str, str]
 ```
 
 Je Art mit Wertesatz der Titel seines Schalters, mit den Zeichen ihrer
-Festigkeit: «Bemessungswert f_cd oder charakteristischer f_ck». Das Holz
-steht nicht da – es hat keinen Satz, und so hat es keinen Schalter. Bis
-2026-11-26 standen zwei Titel in der Oberflaeche, und jeder Stahl hiess
-«f_yd oder f_yk», auch der Baustahl und der Spannstahl.
+Festigkeit: «Bemessungswert f_cd oder charakteristischer f_ck». Holz und
+Fluessigkeit stehen nicht da – sie haben keinen Satz
+([[opencivil.material.arten#Materialart|mit_satz]]), und so haben
+sie keinen Schalter. Bis 2026-11-26 standen zwei Titel in der
+Oberflaeche, und jeder Stahl hiess «f_yd oder f_yk», auch der Baustahl
+und der Spannstahl.
 
 ### _vorlage
 
@@ -221,7 +223,6 @@ Je Querschnitt eines Systems, wo A und I stehen – und je Paar aus Querschnitt 
 - [[opencivil.geotechnik.setzung]]
 - [[opencivil.geotechnik.verhalten]]
 - [[opencivil.material.arten]]
-- [[opencivil.material.basis]]
 - [[opencivil.material.beton]]
 - [[opencivil.material.betonstahl]]
 - [[opencivil.material.holz]]

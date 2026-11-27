@@ -102,11 +102,12 @@ class AeussererWiderstand(Achsnachweis):
     WORT = "äusserer Widerstand"
 
     def __init__(self, pfahl: Pfahl, kombinationen: Sequence[Kombination]) -> None:
-        gruppen = (("Äusserer Widerstand",) if pfahl.grundlage.aus_versuch else
-                   ("Pfahl", "Grundwasser", "Äusserer Widerstand", "Fuss", "Schicht"))
+        # γ_w ist keine Vorgabe des Pfahls: sie kommt aus seinem Wasser.
+        namen = (pfahl.kurznamen("Äusserer Widerstand") if pfahl.grundlage.aus_versuch else
+                 pfahl.kurznamen("Pfahl", "Grundwasser", "Äusserer Widerstand", "Fuss", "Schicht")
+                 + ["gamma_w"])
         super().__init__(pfahl, kombinationen, basis=f"{pfahl.id}.nachweis.aussen",
-                         bezuege=[Eingabebezug(n, pfahl.id_von(n))
-                                  for n in pfahl.kurznamen(*gruppen)])
+                         bezuege=[Eingabebezug(n, pfahl.id_von(n)) for n in namen])
 
     def pruefe(self, e: Eingaben, p: Protokoll) -> Ausfuehrung:
         p.titel("Äusserer Widerstand")

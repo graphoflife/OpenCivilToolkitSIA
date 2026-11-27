@@ -78,5 +78,5 @@ export function lastVon(z, kennung) {
 export function materialname(m) {
   if (m.art === 'eigen') return m.name || m.kennung;
   const stoff = eintragVon(m.stoff);
-  return stoff ? stoff.name || stoff.sorte : `– kein ${katalog('materialarten', m.art, 'titel')} –`;
+  return stoff ? stoff.name || stoff.sorte : `– ${katalog('materialarten', m.art, 'kein')} –`;
 }

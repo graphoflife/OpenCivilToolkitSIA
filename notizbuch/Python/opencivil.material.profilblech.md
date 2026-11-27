@@ -1,5 +1,5 @@
 ---
-erzeugt: 8e60ce1fdcd8
+erzeugt: 10e89d40ffb9
 art: modul
 tags: [modul]
 ---
@@ -100,6 +100,7 @@ Erzeugt einen Profilblechstahl aus der Sortentabelle.
 ## Gebraucht von
 
 - [[opencivil.material.arten]]
+- [[opencivil.projekt.projekt]]
 
 ## Formeln aus diesem Modul
 

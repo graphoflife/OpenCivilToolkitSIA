@@ -1,5 +1,5 @@
 ---
-erzeugt: c33a57ae33e9
+erzeugt: e18ee51b29ec
 art: modul
 tags: [modul]
 ---
@@ -170,7 +170,7 @@ Eine Wand fuer das Erdbeben: ein Polygon aus Beton, ohne Lastfall.
 def _erstes(p: Projekt, art: str) -> str
 ```
 
-Die Kennung des ersten Materials dieser Art im Projekt.
+Die Kennung des ersten Materials dieser Art im Projekt – kurz, weil oft gebraucht.
 
 ### charakteristisch
 

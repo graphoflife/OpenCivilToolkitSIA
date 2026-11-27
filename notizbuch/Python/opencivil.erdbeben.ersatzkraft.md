@@ -1,5 +1,5 @@
 ---
-erzeugt: ded3043226f7
+erzeugt: a785d2504ee4
 art: modul
 tags: [modul]
 ---
@@ -57,7 +57,7 @@ und im Bild liegt sie um 90 Grad gedreht ([[opencivil.erdbeben.ersatzkraft#Wandl
   Vergroesserung der Querkraft fuer hoehere Eigenformen (97) (Benutzer,
   2026-11-21);
 - g = 10 m/s^2 wie beim Eigengewicht
-  ([[opencivil.stabwerk.rechnung#Konstanten|ERDBESCHLEUNIGUNG]]).
+  ([[opencivil.material.basis#Konstanten|ERDBESCHLEUNIGUNG]]).
 
 
 ## QUELLE
@@ -642,7 +642,7 @@ Je Richtung T_1, S_d, F_d und das Kippmoment – mit q und mit q = 1.0.
 - [[opencivil.core.vorgaben]]
 - [[opencivil.core.wahl]]
 - [[opencivil.core.wert]]
-- [[opencivil.stabwerk.rechnung]]
+- [[opencivil.material.basis]]
 - [[opencivil.stabwerk.stabquerschnitt]]
 
 ## Gebraucht von

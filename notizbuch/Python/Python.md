@@ -1,5 +1,5 @@
 ---
-erzeugt: 7964ac019a7f
+erzeugt: bd003c80c4ce
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -69,6 +69,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.geotechnik.setzung]] – die Setzung eines Flachfundaments auf geschichtetem Baugrund.
     - [[opencivil.geotechnik.tragfaehigkeit]] – die Tragfähigkeitsfaktoren N_q und N_c.
     - [[opencivil.geotechnik.verhalten]] – wie ein Boden traegt.
+    - [[opencivil.geotechnik.wasser]] – die Raumlast des Grundwassers, aus seiner Flüssigkeit.
 - [[opencivil.holzbau]] – ein gezeichneter Querschnitt aus Holz nach SIA 265:2012.
     - [[opencivil.holzbau.gleichungen]] – die Gleichungen von SIA 265:2012, 4.2, ohne Rechenwerk.
     - [[opencivil.holzbau.querschnitt]] – ein gezeichneter Querschnitt aus Holz.
@@ -83,6 +84,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.material.baustahl]] – Baustahl nach SIA 263:2013.
     - [[opencivil.material.beton]] – Beton nach SIA 262:2025.
     - [[opencivil.material.betonstahl]] – Betonstahl nach SIA 262:2025.
+    - [[opencivil.material.fluessigkeit]] – Fluessigkeiten: das Wasser und eigene.
     - [[opencivil.material.holz]] – Holz nach SIA 265:2012.
     - [[opencivil.material.profilblech]] – Profilblechstahl nach SIA 264:2014.
     - [[opencivil.material.spannstahl]] – Spannstahl nach SIA 262:2025.
@@ -181,6 +183,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.projekt.erdbeben]] – ein Gebaeude im Erdbeben, wie die Oberflaeche es beschreibt.
     - [[opencivil.projekt.faelle]] – Lastfaelle und Kombinationen eines Bauteils.
     - [[opencivil.projekt.fallnamen]] – Die Namen der Faelle eines Bauteils – je Liste verschieden, auch als Kennung.
+    - [[opencivil.projekt.frueher]] – was eine Projektdatei von frueher anders schreibt.
     - [[opencivil.projekt.grundbruch]] – ein Grundbruchnachweis, wie die Oberflaeche ihn beschreibt.
     - [[opencivil.projekt.lesen]] – was in einer Projektdatei stehen darf, und wie es gelesen wird.
     - [[opencivil.projekt.mappe]] – mehrere Projekte in einer Datei.

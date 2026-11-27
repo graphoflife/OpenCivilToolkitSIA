@@ -137,9 +137,11 @@ system.verlaeufe("GZT")["L2"].extrem("M")     # in SI: Stelle, Wert
 ```
 
 Ein Flachfundament mit Grundbruch und Gleiten -- Winkel in Grad, Masse in m,
-Spannungen in kPa, Kräfte in kN:
+Spannungen in kPa, Kräfte in kN. Das Grundwasser ist eine Flüssigkeit des
+Projekts, wie ein Beton: ohne Angabe die erste, hier das Wasser mit 10 kN/m³:
 
 ```python
+p.fluessigkeit()                    # fl1, das Wasser; eine andere: eigene_fluessigkeit()
 f = p.grundbruch("Fundament Stütze", phi_k=32, b=2.0, L=2.5, t=1.2, t1=5.0,
                  alpha=0, beta=0, q_Ed=0)    # dazu gamma_phi, c_k, gamma_c, gamma, ...
 f.kombination("Tragsicherheit", N_Ed=1500, T_Ed=150)  # N normal zur Sohle, T in ihr
@@ -161,7 +163,7 @@ unten, N_Ed am Kopf, Druck positiv:
 
 ```python
 t = p.pfahl("Pfahl Stütze", stahl="s1", beton="b1", D=900, L=12, t_K=1.5,
-            t_w=3.0)       # art="mikropfahl", kopf="eingespannt", t_red=2.0, eta_tr=0.7, ...
+            t_w=3.0)       # wasser="fl1", art="mikropfahl", kopf="eingespannt", t_red=2.0, ...
 t.schicht("Auffüllung", d=2.0, gamma=19, mantel="eingeben", q_s=0, E_s=10)  # trägt nicht
 t.schicht("Kies, sandig", d=6.0, gamma=21, phi_k=34, K=0.44, E_s=60)        # K·σ'_v·tan δ
 t.schicht("Ton", d=15.0, gamma=19, verhalten="undrainiert", s_u=80, alpha=0.6, E_s=40)
@@ -269,7 +271,7 @@ Fertig und getestet (am 2026-11-21: 2145 Tests):
 | `core/protokoll` | Mitschrift als Datenstruktur, `Zwischenwerte` für Vorlagen, ein Durchlauf mit einer Tafel je Darstellung, `StillesProtokoll` |
 | `core/rechenwerk` | Rückwärtsauflösung, Variantenwahl, fehlende Eingaben, Zyklen |
 | `core/suche` | Nullstellen: Halbieren, Illinois, Eingrenzen mit wachsenden Schritten, die Neigung der Nulllinie (`winkel_suchen`) – im Beton wie im Stahl |
-| `material/` | Beton und Betonstahl nach SIA 262:2025, Baustahl nach SIA 263:2013 |
+| `material/` | Beton, Betonstahl und Spannstahl nach SIA 262:2025, Baustahl nach SIA 263:2013, Profilblechstahl nach SIA 264:2014, Holz nach SIA 265:2012, Flüssigkeiten (das Wasser); das Register der Arten (`arten`) |
 | `querschnitt/` | Plattenquerschnitt, Lagenaufbau, Werkstoffgesetze (dazu der Spannungsblock als Gesetz) |
 | `querschnitt/geometrie` | Polygone, Verschachtelung, Stablinien, Prüfungen der Zeichnung |
 | `querschnitt/fasern` | Fasern und Dehnungsgrenzen -- auch der Löser der Platte rechnet darüber |
@@ -288,6 +290,7 @@ Fertig und getestet (am 2026-11-21: 2145 Tests):
 | `stabwerk3d/` | das Balkensystem im Raum: Vektoren (`raum`), die Beschreibung in SI (`modell`), der Stab als drei ebene (`stab`), das System mit sechs Unbekannten je Knoten (`system`), die Verläufe (`verlauf`), im Rechenwerk (`rechnung`) und wie es seine Rechnung aufschreibt (`herleitung`) |
 | `decke/` | eine Decke nach der Streifenmethode: die Beschreibung in SI (`modell`), die Streifen und ihre Träger (`streifen`), wie die Last auf die Richtungen und Streifen geht (`aufteilung`, `lasten`), jeder Streifen als Durchlaufträger (`traeger`), Fall für Fall von unten nach oben (`rechnung`), die Schnittkräfte der Platte an einer Stelle und wo Bilder und Bericht hinsehen (`feld`), im Rechenwerk (`werk`) und wie sie ihre Rechnung aufschreibt (`herleitung`) |
 | `geotechnik/grundbruch` | ein Flachfundament: Bemessungswerte des Bodens, Grundbruch nach der erweiterten Tragfähigkeitsformel (drainiert und undrainiert), Gleiten in der Sohle, der Gleitkörper nach Prandtl |
+| `geotechnik/wasser` | die Raumlast des Grundwassers, aus der Flüssigkeit, die Grundbruch oder Pfahl wählt |
 | `geotechnik/setzung` | ein Flachfundament auf geschichtetem Baugrund: der Einflussfaktor nach Boussinesq im Punkt K oder in der Mitte, die Setzung je Teilschicht aus Wieder- und Erstbelastung, s gegen s_zul |
 | `erdbeben/ersatzkraft` | ein Gebäude im Erdbeben nach dem Ersatzkraftverfahren, SIA 261:2020, 16.5.2: je Richtung T_1 aus der Auslenkung der Wände (40), S_d, F_d und die Kräfte je Geschoss (41), (42), die Anteile der Wände, dasselbe mit q = 1.0; ob das Verfahren gilt, als Urteil |
 | `pfahl/` | ein Einzelpfahl nach SIA 267:2013, Kapitel 9: Bohr- oder Mikropfahl in seinen Schichten, der äussere Widerstand aus Mantel und Fuss oder aus Versuchen, der innere aus dem Querschnitt, je auf Druck und Zug; die Steifigkeit als gebetteter Stab (`steifigkeit`, `bettung`): Federn am Kopf und Verläufe über die Tiefe; der äussere Widerstand quer (`quer`, `erdwiderstand`): Erdwiderstand, Bruchmechanismen und die Bettungskraft |
@@ -308,7 +311,7 @@ Fertig und getestet (am 2026-11-21: 2145 Tests):
 | `spannungsanalyse.py` | sechs Fragen an den Querschnitt: Bild aus N und M oder aus Dehnungen, M-χ- und N-ε-Linie, äquivalenter E-Modul über M und über N — kein Nachweis |
 | `bewehrungssuche/` | die kleinste Bewehrung suchen, die alle Nachweise erfüllt – Längsbewehrung, dünnste Platte, Bügel |
 | `bericht/` | der Bericht als Blöcke (`gliederung`), gesetzt als Konsolentext, LaTeX-Dokument (PDF, sobald eine TeX-Maschine da ist) und Markdown; die Zusammenfassung je Platte |
-| `projekt/` | speicherbare Projektbeschreibung (`eintraege`, `platte`, `querschnittsanalyse`, `balkensystem`, `balkensystem3d`, `grundbruch`, `setzung`, `pfahl`, `erdbeben`, `skript`, `projekt`) und was daraus gebaut wird (`aufbau`) |
+| `projekt/` | speicherbare Projektbeschreibung (`eintraege`, `platte`, `querschnittsanalyse`, `balkensystem`, `balkensystem3d`, `grundbruch`, `setzung`, `pfahl`, `erdbeben`, `skript`, `projekt`), was eine Datei von früher anders schreibt (`frueher`), und was daraus gebaut wird (`aufbau`) |
 | `ergebnis.py` | ein gerechnetes Projekt: Zusammenfassung, Bericht, LaTeX, Markdown, Analysen |
 | `notizbuch/` | das Notizbuch: Formel-, Themen- und Python-Seiten für Obsidian und die Dokumentation der Seite (`formelseiten`, `bibliothek`), geschrieben ohne Handgeschriebenes anzufassen (`tresor`) |
 | `web/bruecke.py` | was der Browser lädt: das Verzeichnis und das Paket des Kerns, die Seiten des Notizbuchs, die Versionsmarken |
@@ -368,7 +371,11 @@ Deshalb kann am Bildschirm gar nichts anderes stehen als im Bericht.
 Normsorte nach SIA -- sie heisst wie die Sorte, trägt links ein rotes «SIA»
 und lässt sich nicht ändern, auch ihre Sorte nicht -- oder ein eigenes
 Material mit einer Sorte als Vorlage: es heisst BE1, BE2 … (Betonstahl S1 …),
-trägt «eigen», und seine Kennwerte sind änderbar.
+trägt «eigen», und seine Kennwerte sind änderbar. Ein neues Projekt hat von
+jeder Art eine Sorte: C25/30, B500B, S235, Y1860, GL24h, SE 350 G und das
+Wasser. Eine Flüssigkeit hat nur ihre Dichte; Grundbruch und Pfahl nehmen
+aus ihr die Raumlast des Grundwassers. Das Wasser, 1000 kg/m³, ist eine
+feste Sorte, aber aus keiner Norm: es trägt «fest» statt «SIA».
 
 **Platte:** drei Panels -- die Platte selbst mit Beton und dem einen Stahl
 für Lagen und Bügel, die Bewehrung (vier Lagen mit Grund und Zulage,
@@ -634,7 +641,7 @@ Biegewiderstände nach der linearisierten Fliessbedingung (SIA 262:2025,
 
 **Grundbruch:** ein Flachfundament auf seinem Baugrund, nach dem Kapitel 9.2
 «Tragfähigkeit», das der Benutzer geliefert hat. Oben das Panel «Grundbruch
-Situation» mit Boden (φ_k, γ_φ, c_k, γ_c, γ, γ_w), Fundament (b, L, t, α),
+Situation» mit Boden (φ_k, γ_φ, c_k, γ_c, γ und das Wasser), Fundament (b, L, t, α),
 Gelände und Grundwasser (β, t_1, q_Ed) und Sohlreibung (δ*/φ), darunter die
 Einwirkungen: beliebig viele Kombinationen aus N_Ed und T_Ed. Gerechnet wird
 mit Bemessungswerten, φ_eff = arctan(tan φ_k / γ_φ) nach SIA 267:2013, 5.3.2.1,
@@ -667,7 +674,7 @@ Grundriss mit dem Punkt.
 Kapitel 12 des Buches von Lang, Huder, Amann und Puzrin. Oben das Panel
 «Pfahl Situation»: Bohrpfahl aus Stahlbeton oder Mikropfahl mit einem
 Tragglied aus Stahl (Rohr oder Vollstab, mit Abrostung), Durchmesser, Länge
-und Tiefe des Kopfs, Grundwasser, der Querschnitt mit η_i und worauf der
+und Tiefe des Kopfs, Grundwasser mit Tiefe und Wasser, der Querschnitt mit η_i und worauf der
 äussere Widerstand beruht -- Berechnung, Erfahrung oder ein Versuch, danach
 richtet sich, wie gross η_a sein darf. Darunter die Schichten vom Terrain an,
 je drainiert mit φ'_k und c'_k oder undrainiert mit s_u,k, die Mantelreibung

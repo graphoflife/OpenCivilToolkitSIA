@@ -25,8 +25,9 @@ E_S = 200000.0
 
 
 def projekt(**felder):
-    """Ein Projekt mit C30/37 und B500B und einem Pfahl «P» mit diesen Feldern."""
+    """Ein Projekt mit C30/37, B500B, dem Wasser und einem Pfahl «P» mit diesen Feldern."""
     p = Projekt(name="Probe")
+    p.fluessigkeit()
     beton, stahl = p.beton("C30/37").kennung, p.stahl("B500B").kennung
     return p, p.pfahl("P", stahl=stahl, beton=beton, **felder)
 
@@ -245,10 +246,11 @@ class TestInnererWiderstand(unittest.TestCase):
 
     def test_ein_mikropfahl_braucht_keinen_beton(self):
         p = Projekt(name="Probe")
+        p.fluessigkeit()
         stahl = p.stahl("B500B").kennung
         t = p.pfahl("P", stahl=stahl, art="mikropfahl", D=200.0, grundlage="statisch")
         t.kombination("K", N_Ed=100.0)
-        self.assertEqual(t.materialien(), [stahl])
+        self.assertEqual(t.materialien(), [stahl, "fl1"])
         _, loesung, _, innen = rechnen(p)
         self.assertGreater(innen.R_id, 0.0)
 

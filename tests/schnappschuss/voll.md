@@ -1,6 +1,6 @@
 # Voll
 
-957 Berechnungen ausgeführt, 1547 Werte bestimmt.
+960 Berechnungen ausgeführt, 1550 Werte bestimmt.
 
 ## Herleitung
 
@@ -21654,10 +21654,10 @@ $$
 \gamma = 21\,\mathrm{kN}/\mathrm{m}^{3}
 $$
 
-**Raumlast des Wassers**
+**Raumlast des Grundwassers, «Wasser»**
 
 $$
-\gamma_w = 10\,\mathrm{kN}/\mathrm{m}^{3}
+\gamma_w = \gamma_{fl} = 10\,\mathrm{kN}/\mathrm{m}^{3}
 $$
 
 **Raumlast des Bodens unter Auftrieb**
@@ -22060,6 +22060,26 @@ $$
 \alpha_{eff,GL,\text{Steil}} = \frac{T_{Rd}}{T_{Ed}} = \frac{50.8\,\mathrm{kN}}{300\,\mathrm{kN}} = 0.17 \quad \Rightarrow \quad \text{NICHT erfüllt}
 $$
 
+### Flüssigkeit: Wasser
+
+**Dichte der Flüssigkeit**
+
+$$
+\rho_{fl} = 1000\,\mathrm{kg}/\mathrm{m}^{3}
+$$
+
+**Erdbeschleunigung**
+
+$$
+g = 10\,\mathrm{m}/\mathrm{s}^{2}
+$$
+
+**Raumlast der Flüssigkeit**
+
+$$
+\gamma_{fl} = \rho_{fl} \cdot g = 1000\,\mathrm{kg}/\mathrm{m}^{3} \cdot 10\,\mathrm{m}/\mathrm{s}^{2} = 10\,\mathrm{kN}/\mathrm{m}^{3}
+$$
+
 ### Grundbruch: Ufer
 
 **Reibungswinkel, charakteristisch**
@@ -22104,10 +22124,10 @@ $$
 \gamma = 21\,\mathrm{kN}/\mathrm{m}^{3}
 $$
 
-**Raumlast des Wassers**
+**Raumlast des Grundwassers, «Wasser»**
 
 $$
-\gamma_w = 10\,\mathrm{kN}/\mathrm{m}^{3}
+\gamma_w = \gamma_{fl} = 10\,\mathrm{kN}/\mathrm{m}^{3}
 $$
 
 **Raumlast des Bodens unter Auftrieb**
@@ -22456,10 +22476,10 @@ $$
 \gamma = 21\,\mathrm{kN}/\mathrm{m}^{3}
 $$
 
-**Raumlast des Wassers**
+**Raumlast des Grundwassers, «Wasser»**
 
 $$
-\gamma_w = 10\,\mathrm{kN}/\mathrm{m}^{3}
+\gamma_w = \gamma_{fl} = 10\,\mathrm{kN}/\mathrm{m}^{3}
 $$
 
 **Raumlast des Bodens unter Auftrieb**
@@ -23513,12 +23533,6 @@ $$
 t_w = 4\,\mathrm{m}
 $$
 
-**Raumlast des Wassers**
-
-$$
-\gamma_w = 10\,\mathrm{kN}/\mathrm{m}^{3}
-$$
-
 **Umrechnungsfaktor des äusseren Widerstands** *(SIA 267:2013, 9.5.2.2.5, (48))*
 
 $$
@@ -23643,6 +23657,12 @@ $$
 
 $$
 E_{s,k,3} = 100\,\mathrm{MN}/\mathrm{m}^{2}
+$$
+
+**Raumlast des Grundwassers, «Wasser»**
+
+$$
+\gamma_w = \gamma_{fl} = 10\,\mathrm{kN}/\mathrm{m}^{3}
 $$
 
 ### Äusserer Widerstand
@@ -24537,12 +24557,6 @@ $$
 t_w = 1\,\mathrm{m}
 $$
 
-**Raumlast des Wassers**
-
-$$
-\gamma_w = 10\,\mathrm{kN}/\mathrm{m}^{3}
-$$
-
 **Umrechnungsfaktor des äusseren Widerstands** *(SIA 267:2013, 9.5.2.2.5, (48))*
 
 $$
@@ -24607,6 +24621,12 @@ $$
 
 $$
 E_{s,k,2} = 40\,\mathrm{MN}/\mathrm{m}^{2}
+$$
+
+**Raumlast des Grundwassers, «Wasser»**
+
+$$
+\gamma_w = \gamma_{fl} = 10\,\mathrm{kN}/\mathrm{m}^{3}
 $$
 
 ### Äusserer Widerstand
@@ -25639,12 +25659,6 @@ $$
 t_w = 10\,\mathrm{m}
 $$
 
-**Raumlast des Wassers**
-
-$$
-\gamma_w = 10\,\mathrm{kN}/\mathrm{m}^{3}
-$$
-
 **Umrechnungsfaktor des äusseren Widerstands** *(SIA 267:2013, 9.5.2.2.5, (46))*
 
 $$
@@ -25691,6 +25705,12 @@ $$
 
 $$
 E_{s,k,1} = 80\,\mathrm{MN}/\mathrm{m}^{2}
+$$
+
+**Raumlast des Grundwassers, «Wasser»**
+
+$$
+\gamma_w = \gamma_{fl} = 10\,\mathrm{kN}/\mathrm{m}^{3}
 $$
 
 ### Äusserer Widerstand
@@ -32121,6 +32141,12 @@ $$
 c_{eff} = \frac{c_k}{\gamma_c}
 $$
 
+**Raumlast des Grundwassers, «Wasser»**
+
+$$
+\gamma_w = \gamma_{fl}
+$$
+
 **Raumlast des Bodens unter Auftrieb**
 
 $$
@@ -32131,6 +32157,14 @@ $$
 
 $$
 s_{u,d} = \frac{s_{u,k}}{\gamma_{cu}}
+$$
+
+### Flüssigkeit
+
+**Raumlast der Flüssigkeit**
+
+$$
+\gamma_{fl} = \rho_{fl} \cdot g
 $$
 
 ### Grundbruch
@@ -35206,6 +35240,9 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Beiwert der Nutzlast, quasi-ständig | $\psi_{2,8}$ | $0.3$ |  | Vorgabe |
 | Verhaltensbeiwert in x | $q_x$ | $3$ |  | Vorgabe |
 | Verhaltensbeiwert in y | $q_y$ | $3$ |  | Vorgabe |
+| Erdbeschleunigung | $g$ | $10$ | m/s² | Vorgabe |
+| Raumlast der Flüssigkeit | $\gamma_{fl}$ | $10$ | kN/m³ | berechnet |
+| Dichte der Flüssigkeit | $\rho_{fl}$ | $1000$ | kg/m³ | Vorgabe |
 | Länge des Fundaments | $L$ | $4$ | m | Vorgabe |
 | Neigung der Sohle | $\alpha$ | $5$ | ° | Vorgabe |
 | Breite des Fundaments | $b$ | $1.6$ | m | Vorgabe |
@@ -35217,7 +35254,7 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Raumlast des Bodens unter Auftrieb | $\gamma'$ | $11$ | kN/m³ | berechnet |
 | Partialfaktor der Kohäsion | $\gamma_c$ | $1.5$ |  | Vorgabe |
 | Partialfaktor des Reibungswinkels | $\gamma_{\varphi}$ | $1.2$ |  | Vorgabe |
-| Raumlast des Wassers | $\gamma_w$ | $10$ | kN/m³ | Vorgabe |
+| Raumlast des Grundwassers | $\gamma_w$ | $10$ | kN/m³ | berechnet |
 | Erfüllungsgrad Gleiten – Normal | $\alpha_{eff,GL,\text{Normal}}$ | $2.54$ |  | berechnet |
 | Erfüllungsgrad Gleiten – Steil | $\alpha_{eff,GL,\text{Steil}}$ | $0.17$ |  | berechnet |
 | Erfüllungsgrad Grundbruch – Normal | $\alpha_{eff,GB,\text{Normal}}$ | $2.17$ |  | berechnet |
@@ -35238,7 +35275,7 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Raumlast des Bodens unter Auftrieb | $\gamma'$ | $11$ | kN/m³ | berechnet |
 | Partialfaktor der Kohäsion | $\gamma_c$ | $1.5$ |  | Vorgabe |
 | Partialfaktor des Reibungswinkels | $\gamma_{\varphi}$ | $1.2$ |  | Vorgabe |
-| Raumlast des Wassers | $\gamma_w$ | $10$ | kN/m³ | Vorgabe |
+| Raumlast des Grundwassers | $\gamma_w$ | $10$ | kN/m³ | berechnet |
 | Erfüllungsgrad Gleiten – Tragsicherheit | $\alpha_{eff,GL,\text{Tragsicherheit}}$ | $5.77$ |  | berechnet |
 | Erfüllungsgrad Grundbruch – Tragsicherheit | $\alpha_{eff,GB,\text{Tragsicherheit}}$ | $0.52$ |  | berechnet |
 | Reibungswinkel, Bemessungswert | $\varphi_{eff}$ | $25.69$ | ° | berechnet |
@@ -35257,7 +35294,7 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Raumlast des Bodens unter Auftrieb | $\gamma'$ | $11$ | kN/m³ | berechnet |
 | Partialfaktor der Kohäsion | $\gamma_c$ | $1.5$ |  | Vorgabe |
 | Partialfaktor des Reibungswinkels | $\gamma_{\varphi}$ | $1.2$ |  | Vorgabe |
-| Raumlast des Wassers | $\gamma_w$ | $10$ | kN/m³ | Vorgabe |
+| Raumlast des Grundwassers | $\gamma_w$ | $10$ | kN/m³ | berechnet |
 | Erfüllungsgrad Gleiten – Tragsicherheit | $\alpha_{eff,GL,\text{Tragsicherheit}}$ | $11.08$ |  | berechnet |
 | Erfüllungsgrad Grundbruch – Tragsicherheit | $\alpha_{eff,GB,\text{Tragsicherheit}}$ | $9.02$ |  | berechnet |
 | Reibungswinkel, Bemessungswert | $\varphi_{eff}$ | $23.9$ | ° | berechnet |
@@ -35322,7 +35359,7 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Raumlast der Schicht 1 | $\gamma_{1}$ | $19$ | kN/m³ | Vorgabe |
 | Raumlast der Schicht 2 | $\gamma_{2}$ | $21$ | kN/m³ | Vorgabe |
 | Raumlast der Schicht 3 | $\gamma_{3}$ | $22$ | kN/m³ | Vorgabe |
-| Raumlast des Wassers | $\gamma_w$ | $10$ | kN/m³ | Vorgabe |
+| Raumlast des Grundwassers | $\gamma_w$ | $10$ | kN/m³ | berechnet |
 | Zahl der Längsstäbe | $n$ | $12$ |  | Vorgabe |
 | Erfüllungsgrad äusserer Widerstand – Druck | $\alpha_{eff,a,\text{Druck}}$ | $1.03$ |  | berechnet |
 | Erfüllungsgrad äusserer Widerstand – Zug | $\alpha_{eff,a,\text{Zug}}$ | $1.62$ |  | berechnet |
@@ -35362,7 +35399,7 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Umrechnungsfaktor des äusseren Widerstands quer | $\eta_{a,tr}$ | $0.7$ |  | Vorgabe |
 | Raumlast der Schicht 1 | $\gamma_{1}$ | $18$ | kN/m³ | Vorgabe |
 | Raumlast der Schicht 2 | $\gamma_{2}$ | $20$ | kN/m³ | Vorgabe |
-| Raumlast des Wassers | $\gamma_w$ | $10$ | kN/m³ | Vorgabe |
+| Raumlast des Grundwassers | $\gamma_w$ | $10$ | kN/m³ | berechnet |
 | Zahl der Längsstäbe | $n$ | $16$ |  | Vorgabe |
 | Erfüllungsgrad äusserer Widerstand – Druck | $\alpha_{eff,a,\text{Druck}}$ | $0.39$ |  | berechnet |
 | Erfüllungsgrad innerer Widerstand – Druck | $\alpha_{eff,i,\text{Druck}}$ | $3.45$ |  | berechnet |
@@ -35406,7 +35443,7 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Umrechnungsfaktor des inneren Widerstands | $\eta_i$ | $0.8$ |  | Vorgabe |
 | Umrechnungsfaktor des äusseren Widerstands quer | $\eta_{a,tr}$ | $0.7$ |  | Vorgabe |
 | Raumlast der Schicht 1 | $\gamma_{1}$ | $21$ | kN/m³ | Vorgabe |
-| Raumlast des Wassers | $\gamma_w$ | $10$ | kN/m³ | Vorgabe |
+| Raumlast des Grundwassers | $\gamma_w$ | $10$ | kN/m³ | berechnet |
 | Erfüllungsgrad äusserer Widerstand – Zug | $\alpha_{eff,a,\text{Zug}}$ | $1.27$ |  | berechnet |
 | Erfüllungsgrad innerer Widerstand – Zug | $\alpha_{eff,i,\text{Zug}}$ | $2.36$ |  | berechnet |
 | Erfüllungsgrad Biegung im Pfahl – Zug | $\alpha_{eff,M,\text{Zug}}$ | $2.62$ |  | berechnet |

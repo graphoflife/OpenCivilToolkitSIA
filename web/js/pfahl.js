@@ -18,7 +18,8 @@
  * Grundbruch (`katalog.vorgaben`, opencivil/pfahl/pfahl.py): nur die Felder,
  * die er mit den gewählten Stellungen liest, beim Umrechnungsfaktor η_a mit
  * dem Grenzwert seiner Grundlage. Hier stehen nur die Schalter und die
- * Materialien, je bei ihrer Gruppe. Bis 2026-11-20 standen die Felder hier
+ * Materialien, je bei ihrer Gruppe -- das Wasser seit 2026-11-27 beim
+ * Grundwasser, statt der Zahl γ_w. Bis 2026-11-20 standen die Felder hier
  * ein zweites Mal. Gerechnet wird nichts: die Widerstände und die Federn am
  * Kopf stehen rechts in der Zusammenfassung, die Situation und die Verläufe
  * über die Tiefe unter «Diagramme». Einheiten und Grenzen kommen aus dem
@@ -58,6 +59,7 @@ const HILFE = {
   grundwasser: {
     zeilen: [
       ['t_w', 'ab Oberkante Terrain bis zum höchsten Grundwasserspiegel; darunter zählt in den Schichten γ − γ_w'],
+      ['Wasser', 'eine Flüssigkeit aus den Materialien; γ_w ist ihre Raumlast, beim Wasser 10 kN/m³'],
     ],
   },
   aussen: {
@@ -262,6 +264,8 @@ function kapitel(t) {
     SCHICHTEN,
     gruppenkapitel(vorgaben, 'Grundwasser', {
       zeichen: 'grundwasser', werte: ['t_w'], hilfe: HILFE.grundwasser,
+      nach: [material('wasser', 'fluessigkeit', 'Wasser')],
+      fehlt: fehlendesMaterial('fluessigkeit', t.wasser),
     }),
     gruppenkapitel(vorgaben, 'Äusserer Widerstand', {
       zeichen: 'widerstand', wort: wortVon('grundlagen', t.grundlage), werte: ['eta_a'],

@@ -22,7 +22,9 @@ from opencivil.pfahl.steifigkeit import Pfahlsteifigkeit
 from opencivil.projekt.lesen import als_groesse, ort_von
 from opencivil.projekt.pfahl import PfahlEintrag
 
-from opencivil.projekt.aufbau.kern import Aufbau, Bauteil, material, ohne_kombination
+from opencivil.projekt.aufbau.kern import (
+    Aufbau, Bauteil, material, ohne_kombination, schwerer_als_wasser,
+)
 
 if TYPE_CHECKING:
     from opencivil.projekt.aufbau import Bauteilart
@@ -41,6 +43,10 @@ def bauen(art: "Bauteilart", eintrag: PfahlEintrag, aufbau: Aufbau) -> Bauteil:
     """
     g = partial(als_groesse, eintrag)
     wo = ort_von(eintrag)
+    wasser = material(aufbau.baustoffe, eintrag.wasser, "fluessigkeit", wo, "Wasser")
+    if eintrag.schichten_tragen:
+        for i, s in enumerate(eintrag.schichten, start=1):
+            schwerer_als_wasser(s.gamma, wasser, aufbau, f"{wo}, Schicht {i}", "die Raumlast")
     schichten = [Pfahlschicht(name=s.name, verhalten=s.verhalten, mantel=s.mantel,
                               **{k: als_groesse(s, k) for k in (
                                   "d", "gamma", "phi_k", "c_k", "s_u", "q_s", "K",
@@ -48,7 +54,7 @@ def bauen(art: "Bauteilart", eintrag: PfahlEintrag, aufbau: Aufbau) -> Bauteil:
                  for s in eintrag.schichten]
     pfahl = Pfahl(
         name=eintrag.name, praefix=f"{art.raum}.{eintrag.kennung}", art=eintrag.art,
-        D=g("D"), L=g("L"), t_K=g("t_K"), t_w=g("t_w"), gamma_w=g("gamma_w"),
+        D=g("D"), L=g("L"), t_K=g("t_K"), t_w=g("t_w"), wasser=wasser,
         schichten=schichten, grundlage=eintrag.grundlage, eta_a=g("eta_a"), R_ak=g("R_ak"),
         R_ak_zug=g("R_ak_zug"), spitze=eintrag.spitze, abscheren=eintrag.abscheren,
         q_b=g("q_b"), eta_i=g("eta_i"),

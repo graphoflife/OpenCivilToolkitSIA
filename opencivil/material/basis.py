@@ -26,7 +26,7 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Mapping, Optional, Sequence, Tuple
 
 from opencivil.core.berechnung import Berechnung, Eingabebezug, Formel, FormelFunktion, Vorgabe
-from opencivil.core.einheiten import EINHEITSLOS, Einheit, Groesse
+from opencivil.core.einheiten import EINHEITSLOS, M_PRO_S2, Einheit, Groesse
 from opencivil.core.latex import text_latex
 from opencivil.core.protokoll import Abschnitt
 from opencivil.core.rechenobjekt import Rechenobjekt
@@ -84,6 +84,7 @@ class Baustoffart(Wahl):
     SPANNSTAHL = "spannstahl"
     HOLZ = "holz"
     PROFILBLECH = "profilblech"
+    FLUESSIGKEIT = "fluessigkeit"
 
     @property
     def beschriftung(self) -> str:
@@ -94,7 +95,15 @@ class Baustoffart(Wahl):
             Baustoffart.SPANNSTAHL: "Spannstahl",
             Baustoffart.HOLZ: "Holz",
             Baustoffart.PROFILBLECH: "Profilblechstahl",
+            Baustoffart.FLUESSIGKEIT: "Flüssigkeit",
         }[self]
+
+
+#: Die Erdbeschleunigung, die aus einer Dichte ein Gewicht macht -- 10 m/s²
+#: nach Vorgabe des Benutzers (2026-10-23): so wiegt Stahlbeton 25 kN/m³ und
+#: Wasser 10 kN/m³. Bis 2026-11-27 stand sie bei den Stabwerken; seither
+#: braucht sie auch die Fluessigkeit (:mod:`opencivil.material.fluessigkeit`).
+ERDBESCHLEUNIGUNG = Groesse(10.0, M_PRO_S2)
 
 
 # ===========================================================================

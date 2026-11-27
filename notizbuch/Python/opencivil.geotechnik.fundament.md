@@ -1,5 +1,5 @@
 ---
-erzeugt: 3210f471a624
+erzeugt: 7cd1d43f3ea1
 art: modul
 tags: [modul]
 ---
@@ -46,8 +46,9 @@ def _boden(verhalten: Verhalten) -> Tuple[Feld, ...]
 ```
 
 Je Verhalten seine Festigkeit; was nicht gilt, steht weder in der
-Herleitung noch in der Maske (Benutzer, 2026-11-19). Das Wasser zählt nur
-drainiert, über γ' – undrainiert gelten totale Spannungen.
+Herleitung noch in der Maske (Benutzer, 2026-11-19). Das Wasser ist keine
+Zahl hier, sondern ein Material ([[opencivil.geotechnik.wasser]]); es
+zählt nur drainiert, über γ' – undrainiert gelten totale Spannungen.
 
 ### Fundament
 
@@ -61,7 +62,8 @@ Rechenwerk, dazu die Bemessungswerte – drainiert phi_eff, c_eff und
 gamma', undrainiert s_u,d.
 
 `b` ist die Breite, die kürzere Seite, `L` die Länge; ein
-Streifenfundament ist ein sehr langes.
+Streifenfundament ist ein sehr langes. `wasser` ist das Grundwasser,
+eine Flüssigkeit – nur drainiert, sonst `None`.
 
 - `WAS = 'Grundbruch'`
 - `name: str`
@@ -73,7 +75,7 @@ Streifenfundament ist ein sehr langes.
 - `s_u: Groesse`
 - `gamma_cu: Groesse`
 - `gamma: Groesse`
-- `gamma_w: Groesse`
+- `wasser: Optional[Baustoff]`
 - `q_Ed: Groesse`
 - `b: Groesse`
 - `L: Groesse`
@@ -170,6 +172,8 @@ Zeile wären es acht Angaben – breiter als die Spalte.
 - [[opencivil.core.vorgaben]]
 - [[opencivil.core.wert]]
 - [[opencivil.geotechnik.verhalten]]
+- [[opencivil.geotechnik.wasser]]
+- [[opencivil.material.basis]]
 
 ## Gebraucht von
 

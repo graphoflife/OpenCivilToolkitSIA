@@ -1,5 +1,5 @@
 ---
-erzeugt: fe9fbd320e61
+erzeugt: 43a791b3e94a
 art: modul
 tags: [modul]
 ---
@@ -64,6 +64,7 @@ class Baustoffart(Wahl)
 - `SPANNSTAHL = 'spannstahl'`
 - `HOLZ = 'holz'`
 - `PROFILBLECH = 'profilblech'`
+- `FLUESSIGKEIT = 'fluessigkeit'`
 
 #### Baustoffart.beschriftung
 
@@ -221,6 +222,7 @@ Giesst aus den Vorlagen ein Material mit eigenem Namensraum.
 
 - `_SYMBOL = re.compile('^(?P<basis>.+?)(?:_\\{(?P<tief_lang>[^{}]*)\\}|_(?P<tief_…` – Symbol mit optionalem Index und optionalem Hochgestellten, z.B. `f_{yk}^{-}`.
 - `text_maskieren = text_latex` – Maskierung fuer `\text{...}`. Liegt in core.latex, weil es nichts mit Baustoffen zu tun hat – der Name bleibt hier als gewohnter Zugang stehen.
+- `ERDBESCHLEUNIGUNG = Groesse(10.0, M_PRO_S2)` – Die Erdbeschleunigung, die aus einer Dichte ein Gewicht macht – 10 m/s² nach Vorgabe des Benutzers (2026-10-23): so wiegt Stahlbeton 25 kN/m³ und Wasser 10 kN/m³. Bis 2026-11-27 stand sie bei den Stabwerken; seither braucht sie auch die Fluessigkeit ([[opencivil.material.fluessigkeit]]).
 
 ## Braucht
 
@@ -236,10 +238,14 @@ Giesst aus den Vorlagen ein Material mit eigenem Namensraum.
 
 - [[opencivil.decke.werk]]
 - [[opencivil.durchstanzen.stelle]]
+- [[opencivil.erdbeben.ersatzkraft]]
+- [[opencivil.geotechnik.fundament]]
+- [[opencivil.geotechnik.wasser]]
 - [[opencivil.material.arten]]
 - [[opencivil.material.baustahl]]
 - [[opencivil.material.beton]]
 - [[opencivil.material.betonstahl]]
+- [[opencivil.material.fluessigkeit]]
 - [[opencivil.material.holz]]
 - [[opencivil.material.profilblech]]
 - [[opencivil.material.spannstahl]]
@@ -265,6 +271,7 @@ Giesst aus den Vorlagen ein Material mit eigenem Namensraum.
 - [[opencivil.projekt.aufbau.querschnittsanalyse]]
 - [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.eintraege]]
+- [[opencivil.projekt.frueher]]
 - [[opencivil.projekt.platte]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.bauweise]]
@@ -283,6 +290,5 @@ Giesst aus den Vorlagen ein Material mit eigenem Namensraum.
 - [[opencivil.verbund.querschnitt]]
 - [[opencivil.verbund.stuetze]]
 - [[opencivil.verbund.widerstand]]
-- [[opencivil.web.api]]
 - [[opencivil.web.werkstoffkurven]]
 - [[opencivil.web.zeichengeometrie]]

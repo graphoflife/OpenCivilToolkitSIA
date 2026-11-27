@@ -1,5 +1,5 @@
 ---
-erzeugt: ededaf2e9fb2
+erzeugt: c7632ea106ff
 art: modul
 tags: [modul]
 ---
@@ -469,6 +469,30 @@ Projekt» – bis 2026-10-16 bekamen Buegel und Staebe ohne Stahl still den
 ersten. `feld` heisst wie in der Oberflaeche: was nicht stimmt, steht
 am Bauteil ([[opencivil.projekt.aufbau.kern#Aufbau.unfertig|Aufbau.unfertig]]), dort genuegt das Feld.
 
+### kennwert
+
+```python
+def kennwert(aufbau: Aufbau, stoff: Baustoff, kurzname: str) -> Groesse
+```
+
+Ein Kennwert eines Materials, wie das Projekt ihn rechnet: mit
+Abweichungen und Ueberschreibungen. Fuer eine Regel, die ein Bauteil
+schon beim Bauen gegen ein Material prueft – den Boden gegen das Gewicht
+seines Wassers. Dafuer stehen die Materialien vor den Bauteilen im Werk
+([[opencivil.projekt.aufbau#aufbauen|aufbauen]]).
+
+### schwerer_als_wasser
+
+```python
+def schwerer_als_wasser(gamma: float, wasser: Baustoff, aufbau: Aufbau, wo: str, was: str='die Raumlast des Bodens') -> None
+```
+
+Haelt auf, wenn ein Boden mit der Raumlast `gamma` in kN/m³ nicht
+schwerer ist als sein Wasser: unter dem Spiegel zaehlt gamma - gamma_w,
+und ohne Gewicht gibt es dort weder Reibung noch Widerstand. Fuer
+Grundbruch und Pfahl – bis 2026-11-27 je in den Regeln ihres Eintrags,
+als gamma_w noch eine Zahl dort war.
+
 ### ohne_kombination
 
 ```python
@@ -500,7 +524,8 @@ def materialgrund(kennung: str, gefunden: Optional[Tuple[str, str]], art: Union[
 Was an der Wahl eines Materials nicht stimmt, ohne Ort – `None`, wenn
 sie stimmt. `gefunden` sind Art und Name des gewaehlten, `None`, wenn
 es das nicht gibt; `art` eine Art oder mehrere, die passen. Falsch ist
-nur die falsche Art – «ist kein Beton, Baustahl oder Holz»; ein geloeschtes oder
+nur die falsche Art – «ist kein Beton, Baustahl oder Holz», «ist keine
+Fluessigkeit» ([[opencivil.material.arten#keines|keines]]); ein geloeschtes oder
 noch nicht gewaehltes fehlt nur. Das geloeschte nennt der Satz nicht beim
 Namen: den kennt das Projekt nicht mehr, und die Kennung steht nirgends,
 wo der Benutzer sie saehe – bis 2026-11-19 hiess es «das Material 'b9'».
@@ -619,7 +644,6 @@ Feldes; `mehr` fuer die Analyse.
 - [[opencivil.core.einheiten]]
 - [[opencivil.core.nachweis]]
 - [[opencivil.core.rechenwerk]]
-- [[opencivil.core.sprache]]
 - [[opencivil.core.wert]]
 - [[opencivil.decke.werk]]
 - [[opencivil.geotechnik.fundament]]

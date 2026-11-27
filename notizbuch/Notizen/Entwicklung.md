@@ -7,6 +7,58 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-27 · Materialien: Flüssigkeit, das Wasser, ein volles neues Projekt
+
+Schritt 3 des Plans vom 2026-11-27.
+
+**Flüssigkeit.** Eine neue Materialart mit nur einem Kennwert, der Dichte
+ρ_fl; die Raumlast γ_fl = ρ_fl · g ist ein gewöhnlicher, überschreibbarer
+Kennwert. Die feste Sorte «Wasser» hat 1000 kg/m³, mit g = 10 m/s² also
+10 kN/m³ – nach Vorgabe, nicht nachgeschlagen: SIA 261:2020 nennt für γ_w,k
+keine Zahl (Frage im [[TODO]]). Eigene heissen FL1, FL2 …
+
+- g steht jetzt an einer Stelle, `ERDBESCHLEUNIGUNG` in `material/basis.py`;
+  Eigengewicht der Stäbe, Erdbeben und Decke nehmen es von dort.
+- Das Register der Arten sagt neu, ob eine Art einen Wertesatz hat
+  (`mit_satz`), ob ihre festen Sorten aus einer Norm stammen (`aus_norm`)
+  und ihr Geschlecht (`geschlecht`: «Neue Flüssigkeit», «keine
+  Flüssigkeit»). Vorher nahmen zwei Stellen das Holz von Hand aus, und
+  «saechlich» kannte nur zwei Geschlechter.
+- Das Wasser steht in keiner Norm: in der Oberfläche heisst es «Feste
+  Sorte» mit der Marke «fest», nicht «Normsorte nach SIA» mit «SIA»
+  (`festeSorte` in `material.js`). Sonst hätte das Werkzeug eine Normstelle
+  erfunden.
+- «kein …» für mehrere Arten kommt aus einer Regel, `keines` in
+  `material/arten.py` und gleich in `bausteine.js`: verschiedene
+  Geschlechter je mit dem eigenen Wort. Gefunden beim Bauen: der rote Satz
+  hiess ««C30/37» ist kein Flüssigkeit».
+
+**Grundbruch und Pfahl.** Statt der Zahl γ_w = 10 kN/m³ wählen sie ihr
+Wasser aus den Materialien: der Grundbruch im Fenster «Boden», nur
+drainiert, der Pfahl im Fenster «Grundwasser». Die Herleitung hat dafür
+eine Zeile «Raumlast des Grundwassers, «Wasser»: γ_w = γ_fl = 10 kN/m³»
+(`geotechnik/wasser.py`); so rechnet auch ein überschriebenes γ_fl mit.
+
+- Dass der Boden schwerer sein muss als sein Wasser, prüfte bisher der
+  Eintrag gegen seine Zahl. Jetzt prüft es der Aufbau mit dem Kennwert,
+  wie das Projekt ihn rechnet (`kennwert`, `schwerer_als_wasser` in
+  `aufbau/kern.py`). Dafür stehen die Materialien samt Überschreibungen
+  jetzt vor den Bauteilen im Rechenwerk. Der Schnappschuss zeigt, dass
+  sich dadurch sonst nichts verschiebt.
+- Ein undrainierter Grundbruch braucht kein Wasser, auch nicht beim
+  Löschen eines Materials (`materialien()`).
+
+**Dateien von früher.** Alte Speicherstände müssen nicht weiter gehen
+(2026-10-11), aber hier geht es ohne Rückfrage: `projekt/frueher.py` nimmt
+die Zahl γ_w vor dem strengen Lesen heraus und setzt danach ein Wasser ein,
+mit denselben Methoden wie in Python. Aus 10 kN/m³ wird das Wasser, aus
+einer anderen Zahl eine eigene Flüssigkeit mit der Dichte dazu; gleiche
+Zahlen teilen sich eine. Das Projekt «OCT Projekt» im Browser des Benutzers
+bekam so sein Wasser und rechnet wie vorher.
+
+**Neues Projekt.** Es hat von jeder Art eine Sorte: C25/30, B500B, S235,
+Y1860, GL24h, SE 350 G und das Wasser. Vorher nur C25/30 und B500B.
+
 ## 2026-11-27 · Zeichenfenster: Seitenleiste, eigene Knöpfe für Profil, Blechdecke, Vorlage
 
 Schritt 2 des Plans vom 2026-11-27.

@@ -1,17 +1,18 @@
 ---
-erzeugt: 1e6244e23ff7
+erzeugt: b6360ed7d17c
 art: thema
 tags: [thema]
 ---
 > [!abstract] Grundbruch
-> 4 Formeln, in der Folge, in der gerechnet wird.
+> 5 Formeln, in der Folge, in der gerechnet wird.
 
 ## Formeln
 
 1. [[Bemessungswert des Reibungswinkels]]
 2. [[Bemessungswert der Kohäsion]]
-3. [[Raumlast unter Auftrieb]]
-4. [[Bemessungswert der undrainierten Scherfestigkeit]]
+3. [[Raumlast des Grundwassers]]
+4. [[Raumlast unter Auftrieb]]
+5. [[Bemessungswert der undrainierten Scherfestigkeit]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

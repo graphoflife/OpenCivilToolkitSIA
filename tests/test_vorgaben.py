@@ -82,6 +82,7 @@ class TestMaskeWieHerleitung(unittest.TestCase):
         for verhalten in Verhalten:
             with self.subTest(verhalten=verhalten):
                 p = Projekt(name="Probe")
+                p.fluessigkeit()
                 g = p.grundbruch("F", verhalten=verhalten.value)
                 aufbau = p.aufbauen()
                 self.assertEqual(maske("grundbruch", g.als_dict()),
@@ -106,6 +107,7 @@ class TestMaskeWieHerleitung(unittest.TestCase):
                 Pfahlart, Tragglied, Grundlage, Spitze):
             with self.subTest(art=art, tragglied=tragglied, grundlage=grundlage, spitze=spitze):
                 p = Projekt(name="Probe")
+                p.fluessigkeit()
                 beton = p.beton().kennung if art is Pfahlart.BOHRPFAHL else ""
                 t = p.pfahl("P", stahl=p.stahl().kennung, beton=beton, art=art.value,
                             tragglied=tragglied.value, grundlage=grundlage.value,

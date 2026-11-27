@@ -22,12 +22,19 @@ from opencivil.web.api import katalog
 from tests.unfertig import meldung
 
 
+def probe():
+    """Ein Projekt mit dem Wasser, γ_w = 10 kN/m³ -- ohne es rechnet drainiert kein Grundbruch."""
+    p = Projekt(name="Probe")
+    p.fluessigkeit()
+    return p
+
+
 def rechnen(kombinationen=(("K", 1000.0, 0.0),), **felder):
     """
     Ein Fundament mit Partialfaktoren 1, wo nicht anders gesagt: phi_eff ist
     dann phi_k, s_u,d ist s_u,k.
     """
-    p = Projekt(name="Probe")
+    p = probe()
     g = p.grundbruch("F", **{"gamma_phi": 1.0, "gamma_c": 1.0, "gamma_cu": 1.0, **felder})
     for name, N, T in kombinationen:
         g.kombination(name, N_Ed=N, T_Ed=T)
@@ -185,12 +192,13 @@ class TestTabellenDesKapitels(unittest.TestCase):
 class TestGrundwasser(unittest.TestCase):
     """Bild 9.2.10: wo das Wasser steht, entscheidet über sigma_v0 und gamma_G."""
 
+    #: γ_w ist die Raumlast des Wassers im Projekt (:func:`probe`).
     GAMMA, GAMMA_W, Q = 21.0, 10.0, 5.0
 
     def bruchspannung(self, t, t1, **felder):
         """sigma_f von Hand aus dem Befund: c = 0, alpha = beta = 0, ohne T -- i = 1."""
         aufbau, loesung, befund = rechnen(phi_k=30.0, b=2.0, L=3.0, t=t, t1=t1, q_Ed=self.Q,
-                                          gamma=self.GAMMA, gamma_w=self.GAMMA_W, **felder)
+                                          gamma=self.GAMMA, **felder)
         return befund, befund.ergebnisse[0].sigma_f / 1e3, loesung
 
     def anteile(self, befund, sigma0, gamma_G):
@@ -221,6 +229,71 @@ class TestGrundwasser(unittest.TestCase):
         self.assertEqual(befund.grundwasser, "Grundwasser im Gleitkörper, unter der Sohle")
         self.assertAlmostEqual(sigma_f, self.anteile(befund, 21.0 + self.Q, 11.0), places=6)
         self.assertTrue(any("Stabilitätsberechnung" in a for a in annahmen(loesung)))
+
+
+class TestDasWasser(unittest.TestCase):
+    """
+    γ_w ist seit 2026-11-27 die Raumlast einer Flüssigkeit des Projekts, nicht
+    mehr eine Zahl am Grundbruch.
+    """
+
+    def loesen(self, p):
+        aufbau = p.aufbauen()
+        self.assertEqual(dict(aufbau.unfertige), {})
+        loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
+        f = aufbau.grundbrueche["g1"]
+        return loesung, (lambda kurz: loesung.werte[f.id_von(kurz)].groesse.si / 1e3)
+
+    def test_eine_eigene_fluessigkeit_mit_ihrer_dichte(self):
+        """
+        ρ = 1100 kg/m³: γ_w = 11 kN/m³ und γ' = 21 − 11 = 10 kN/m³. Die
+        Herleitung sagt, aus welcher Flüssigkeit γ_w kommt.
+        """
+        p = Projekt(name="Probe")
+        sole = p.eigene_fluessigkeit()
+        sole.abweichungen["rho_fl"] = 1100.0
+        p.grundbruch("F", wasser=sole.kennung, gamma=21.0).kombination("K", N_Ed=500.0)
+        loesung, wert = self.loesen(p)
+        self.assertAlmostEqual(wert("gamma_w"), 11.0)
+        self.assertAlmostEqual(wert("gamma_auftrieb"), 10.0)
+        zeile = next(b for b in loesung.protokoll.alle_bloecke()
+                     if getattr(b, "titel", "") == "Raumlast des Grundwassers, «FL1»")
+        self.assertEqual(zeile.latex, r"\gamma_w = \gamma_{fl} = 11\,\mathrm{kN}/\mathrm{m}^{3}")
+
+    def test_ein_ueberschriebenes_gamma_fl_gilt_auch_hier(self):
+        """Wer γ_fl überschreibt, rechnet im Grundbruch damit -- auch die Prüfung des Bodens."""
+        p = Projekt(name="Probe")
+        eigen = p.eigene_fluessigkeit()
+        eigen.ueberschreibungen["gamma_fl"] = 12.0
+        p.grundbruch("F", wasser=eigen.kennung, gamma=11.0).kombination("K", N_Ed=500.0)
+        self.assertEqual(meldung(p), "Grundbruch 'F': die Raumlast des Bodens γ = 11 kN/m³ muss "
+                                     "grösser sein als die des Wassers «FL1», γ_w = 12 kN/m³ – "
+                                     "sonst ist γ' nicht positiv.")
+        eigen.ueberschreibungen["gamma_fl"] = 10.5
+        _, wert = self.loesen(p)
+        self.assertAlmostEqual(wert("gamma_auftrieb"), 0.5)
+
+    def test_ohne_wasser_sagt_es_das_feld(self):
+        """Drainiert ohne Flüssigkeit fehlt sie nur; ein Beton dort ist die falsche Art."""
+        p = Projekt(name="Probe")
+        g = p.grundbruch("F")
+        g.kombination("K", N_Ed=100.0)
+        self.assertEqual(g.wasser, "")
+        aufbau = p.aufbauen()
+        self.assertEqual(aufbau.unfertige["g1"].meldung,
+                         "Grundbruch 'F': Wasser: noch kein Material gewählt.")
+        g.wasser = p.beton("C30/37").kennung
+        aufbau = p.aufbauen()
+        self.assertEqual(aufbau.unfertige["g1"].meldung,
+                         "Grundbruch 'F': Wasser: «C30/37» ist keine Flüssigkeit.")
+
+    def test_das_wasser_laesst_sich_nicht_loeschen(self):
+        """Solange ein drainierter Grundbruch es wählt, braucht er es -- undrainiert nicht."""
+        p = probe()
+        g = p.grundbruch("F")
+        self.assertEqual(g.materialien(), ["fl1"])
+        g.verhalten = "undrainiert"
+        self.assertEqual(g.materialien(), [])
 
 
 class TestLastneigung(unittest.TestCase):
@@ -294,13 +367,23 @@ class TestUndrainiert(unittest.TestCase):
 
     def test_undrainiert_haelt_das_wasser_nicht_an(self):
         """
-        γ ≤ γ_w hiesse ein γ' unter null -- undrainiert gibt es keines, und das
-        Feld γ_w ist ausgeblendet: es hält die Rechnung nicht an.
+        γ ≤ γ_w hiesse ein γ' unter null -- undrainiert gibt es keines, und die
+        Wahl des Wassers ist ausgeblendet: es hält die Rechnung nicht an.
         """
-        aufbau, _, befund = rechnen(verhalten="undrainiert", s_u=40.0, gamma=10.0,
-                                    gamma_w=10.0)
+        aufbau, _, befund = rechnen(verhalten="undrainiert", s_u=40.0, gamma=10.0)
         self.assertEqual(dict(aufbau.unfertige), {})
         self.assertTrue(befund.undrainiert)
+
+    def test_undrainiert_braucht_kein_wasser(self):
+        """Ohne Flüssigkeit im Projekt rechnet ein undrainierter Grundbruch trotzdem."""
+        p = Projekt(name="Probe")
+        g = p.grundbruch("F", verhalten="undrainiert", s_u=40.0)
+        g.kombination("K", N_Ed=100.0)
+        self.assertEqual(g.wasser, "")
+        self.assertEqual(g.materialien(), [])
+        aufbau = p.aufbauen()
+        self.assertEqual(dict(aufbau.unfertige), {})
+        self.assertIn("g1", aufbau.feld("grundbruch"))
 
     def test_flach_eingebunden(self):
         s_u, b, L, t, T = 40.0, 2.0, 4.0, 1.0, 100.0
@@ -415,7 +498,7 @@ class TestEinheitenAmFeld(unittest.TestCase):
         (dom.js) -- derselbe Satz, den das Bauteil beim Rechnen sagte.
         """
         angabe = katalog()["felder"]["grundbruch"]["phi_k"]
-        p = Projekt(name="Probe")
+        p = probe()
         p.grundbruch("F", phi_k=95.0).kombination("K", N_Ed=100.0)
         self.assertIn(f"{angabe['heisst']} {angabe['verlangt']}, angegeben ist 95°",
                       meldung(p))
@@ -456,14 +539,14 @@ class TestEintrag(unittest.TestCase):
     def test_vorgaben_des_benutzers(self):
         g = GrundbruchEintrag.neu("g1", "Fundament 1")
         self.assertEqual(
-            (g.phi_k, g.gamma_phi, g.c_k, g.gamma_c, g.gamma, g.gamma_w, g.q_Ed, g.b, g.L,
+            (g.phi_k, g.gamma_phi, g.c_k, g.gamma_c, g.gamma, g.q_Ed, g.b, g.L,
              g.t1, g.t, g.alpha, g.beta),
-            (30.0, 1.2, 0.0, 1.5, 21.0, 10.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0))
+            (30.0, 1.2, 0.0, 1.5, 21.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0))
         self.assertEqual([(k.name, k.N_Ed, k.T_Ed) for k in g.kombinationen],
                          [("Kombination 1", 1000.0, 200.0)])
 
     def test_hin_und_zurueck(self):
-        p = Projekt(name="Probe")
+        p = probe()
         g = p.grundbruch("Hang", phi_k=33.0, c_k=5.0, b=1.6, L=4.0, t=0.8, t1=2.0,
                          alpha=5.0, beta=15.0, q_Ed=10.0, delta_faktor=0.67,
                          beschreibung="am Bach")
@@ -475,7 +558,7 @@ class TestEintrag(unittest.TestCase):
         self.assertEqual(p.grundbruch("Zweiter").kennung, "g2")
 
     def test_ohne_eingeschaltete_kombination_kein_nachweis(self):
-        p = Projekt(name="Probe")
+        p = probe()
         g = p.grundbruch("F")
         g.kombination("A", N_Ed=500.0).aktiv = False
         aufbau = p.aufbauen()
@@ -506,7 +589,8 @@ class TestEintrag(unittest.TestCase):
         faelle = {
             "Breite b": {"b": 0.0},
             "kürzere Seite": {"b": 2.0, "L": 1.0},
-            "Raumlast": {"gamma": 10.0, "gamma_w": 10.0},
+            "Raumlast des Bodens γ = 10 kN/m³ muss grösser sein als die des Wassers «Wasser»":
+                {"gamma": 10.0},
             "φ_k": {"phi_k": 90.0},
             "α": {"alpha": -1.0},
             "β": {"beta": 95.0},
@@ -516,14 +600,14 @@ class TestEintrag(unittest.TestCase):
             "δ_k/φ_k": {"delta_faktor": 0.0},
         }
         for wort, felder in faelle.items():
-            p = Projekt(name="Probe")
+            p = probe()
             p.grundbruch("F", **felder).kombination("K", N_Ed=100.0)
             with self.subTest(wort=wort):
                 self.assertIn(wort, meldung(p))
         for N, T, satz in (
                 (0.0, 0.0, "Druckkraft N_Ed muss grösser als null sein, angegeben ist 0 kN"),
                 (100.0, -1.0, "T_Ed, in Richtung von Bild 9.2.15, kann nicht negativ sein")):
-            p = Projekt(name="Probe")
+            p = probe()
             p.grundbruch("F").kombination("K", N_Ed=N, T_Ed=T)
             with self.subTest(N=N, T=T):
                 self.assertIn(f"Kombination 'K': {satz}", meldung(p))
@@ -535,7 +619,7 @@ class TestEintrag(unittest.TestCase):
                                   "angegeben ist 95°."),
                 ({"c_k": -5.0}, "Kohäsion c kann nicht negativ sein, angegeben ist -5 kPa."),
                 ({"t": -0.5}, "Tiefe t kann nicht negativ sein, angegeben ist -0.5 m.")):
-            p = Projekt(name="Probe")
+            p = probe()
             p.grundbruch("F", **felder).kombination("K", N_Ed=100.0)
             with self.subTest(text=text):
                 self.assertEqual(meldung(p), f"Grundbruch 'F': {text}")
@@ -570,7 +654,7 @@ class TestZusammenfassung(unittest.TestCase):
             self.assertEqual(zeile[2:], ["–", "–", "–", "–"])
 
     def test_ohne_kombination_kein_gleitkoerper(self):
-        p = Projekt(name="Probe")
+        p = probe()
         p.grundbruch("F")
         s = dienst.rechnen({"projekt": p.als_dict()})["zeichendaten"]["g1"]
         self.assertEqual((s["umriss"], s["faelle"], s["H_gl"], s["massgebend"]),
@@ -579,7 +663,7 @@ class TestZusammenfassung(unittest.TestCase):
         self.assertEqual(len(s["legende"]), 1)
 
     def test_der_dienst_liefert_die_situation(self):
-        p = Projekt(name="Probe")
+        p = probe()
         g = p.grundbruch("F", phi_k=32.0, b=2.0, L=2.5, t=1.0, t1=0.5)
         g.kombination("Leicht", N_Ed=500.0, T_Ed=20.0)
         g.kombination("Schwer", N_Ed=3000.0, T_Ed=400.0)

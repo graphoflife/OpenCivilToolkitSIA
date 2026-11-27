@@ -83,7 +83,7 @@ class TestFormelsammlung(unittest.TestCase):
                 self.assertEqual(art[name], "pfahl")
         self.assertEqual({t.art for t in self.alle},
                          {"beton", "betonstahl", "baustahl", "spannstahl", "holz", "profilblech",
-                          "querschnitt", "querschnittsanalyse",
+                          "fluessigkeit", "querschnitt", "querschnittsanalyse",
                           "balkensystem", "decke", "durchstanzen", "grundbruch", "setzung", "pfahl",
                           "erdbeben"})
 

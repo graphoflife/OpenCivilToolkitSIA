@@ -1,5 +1,5 @@
 ---
-erzeugt: 10ef27bc6eef
+erzeugt: 6b39e86f5344
 art: modul
 tags: [modul]
 ---
@@ -111,6 +111,7 @@ Erzeugt einen Baustahl aus der Sortentabelle.
 
 - [[opencivil.material.arten]]
 - [[opencivil.material.profilblech]]
+- [[opencivil.projekt.projekt]]
 
 ## Formeln aus diesem Modul
 

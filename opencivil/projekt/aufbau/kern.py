@@ -28,13 +28,12 @@ from typing import (
 )
 
 from opencivil.core.bereich import Bereich
-from opencivil.core.einheiten import Groesse
+from opencivil.core.einheiten import KN_PRO_M3, Groesse
 from opencivil.core.nachweis import Nachweis, NachweisUrteil
 from opencivil.core.rechenwerk import Rechenwerk
-from opencivil.core.sprache import aufgezaehlt
 from opencivil.core.wert import Kennzahl
-from opencivil.material.arten import MATERIALARTEN
-from opencivil.material.basis import Baustoff, Baustoffart, KennwertVorlage
+from opencivil.material.arten import MATERIALARTEN, keines
+from opencivil.material.basis import Baustoff, KennwertVorlage
 from opencivil.nachweis.knicken import Knickfall
 from opencivil.nachweis.spannungsbegrenzung import Spannungsbegrenzung, Stahlspannungsort
 from opencivil.nachweis.spannungsgrenzen import GrenzeAusRissbreite, GrenzeGegenFliessen
@@ -529,6 +528,34 @@ def material(baustoffe: Mapping[str, Baustoff], kennung: str, art: Union[str, Se
     return gefunden
 
 
+def kennwert(aufbau: Aufbau, stoff: Baustoff, kurzname: str) -> Groesse:
+    """
+    Ein Kennwert eines Materials, wie das Projekt ihn rechnet: mit
+    Abweichungen und Ueberschreibungen. Fuer eine Regel, die ein Bauteil
+    schon beim Bauen gegen ein Material prueft -- den Boden gegen das Gewicht
+    seines Wassers. Dafuer stehen die Materialien vor den Bauteilen im Werk
+    (:func:`~opencivil.projekt.aufbau.aufbauen`).
+    """
+    ziel = stoff.id_von(kurzname)
+    return aufbau.werk.loese(ziel, ohne_herleitung=True).werte[ziel].groesse
+
+
+def schwerer_als_wasser(gamma: float, wasser: Baustoff, aufbau: Aufbau, wo: str,
+                        was: str = "die Raumlast des Bodens") -> None:
+    """
+    Haelt auf, wenn ein Boden mit der Raumlast ``gamma`` in kN/m³ nicht
+    schwerer ist als sein Wasser: unter dem Spiegel zaehlt gamma - gamma_w,
+    und ohne Gewicht gibt es dort weder Reibung noch Widerstand. Fuer
+    Grundbruch und Pfahl -- bis 2026-11-27 je in den Regeln ihres Eintrags,
+    als gamma_w noch eine Zahl dort war.
+    """
+    gamma_w = kennwert(aufbau, wasser, "gamma_fl").in_einheit(KN_PRO_M3)
+    if gamma <= gamma_w:
+        raise ProjektFehler(f"{was} γ = {gamma:g} kN/m³ muss grösser sein als die des "
+                            f"Wassers «{wasser.name}», γ_w = {gamma_w:g} kN/m³ – sonst ist "
+                            f"γ' nicht positiv.", wo=wo)
+
+
 def ohne_kombination(kombinationen: Sequence[Any]) -> str:
     """Warum ein Bauteil mit Einwirkungen keinen Nachweis fuehrt: es hat noch keine, oder jede ist aus."""
     return ("jede Kombination ist ausgeschaltet" if kombinationen
@@ -553,7 +580,8 @@ def materialgrund(kennung: str, gefunden: Optional[Tuple[str, str]],
     Was an der Wahl eines Materials nicht stimmt, ohne Ort -- ``None``, wenn
     sie stimmt. ``gefunden`` sind Art und Name des gewaehlten, ``None``, wenn
     es das nicht gibt; ``art`` eine Art oder mehrere, die passen. Falsch ist
-    nur die falsche Art -- «ist kein Beton, Baustahl oder Holz»; ein geloeschtes oder
+    nur die falsche Art -- «ist kein Beton, Baustahl oder Holz», «ist keine
+    Fluessigkeit» (:func:`~opencivil.material.arten.keines`); ein geloeschtes oder
     noch nicht gewaehltes fehlt nur. Das geloeschte nennt der Satz nicht beim
     Namen: den kennt das Projekt nicht mehr, und die Kennung steht nirgends,
     wo der Benutzer sie saehe -- bis 2026-11-19 hiess es «das Material 'b9'».
@@ -565,8 +593,7 @@ def materialgrund(kennung: str, gefunden: Optional[Tuple[str, str]],
                      else "noch kein Material gewählt")
     arten = (art,) if isinstance(art, str) else tuple(art)
     if gefunden[0] not in arten:
-        namen = [Baustoffart(a).beschriftung for a in arten]
-        return Grund(f"«{gefunden[1]}» ist kein {aufgezaehlt(namen, 'oder')}", falsch=True)
+        return Grund(f"«{gefunden[1]}» ist {keines(arten)}", falsch=True)
     return None
 
 

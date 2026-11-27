@@ -12,7 +12,7 @@ nimmt jede Platte von ihrem Beton, wie ein Stab des Balkensystems
 (:data:`~opencivil.stabwerk.rechnung.STABKENNWERTE`): ``E_cm`` am
 ungerissenen Querschnitt (SIA 262:2025, 4.1.4.1.3) und die Dichte des
 Stahlbetons, mit
-``g = 10 m/s²`` (:data:`~opencivil.stabwerk.rechnung.ERDBESCHLEUNIGUNG`,
+``g = 10 m/s²`` (:data:`~opencivil.material.basis.ERDBESCHLEUNIGUNG`,
 Benutzer, 2026-10-23) ihr Gewicht je m³. Die Regel steht dort; hier wird
 sie nur gelesen.
 
@@ -35,8 +35,8 @@ from opencivil.core.wert import WertDef
 from opencivil.decke import herleitung
 from opencivil.decke.modell import Decke
 from opencivil.decke.rechnung import Ergebnis, rechnen
-from opencivil.material.basis import Baustoff
-from opencivil.stabwerk.rechnung import ERDBESCHLEUNIGUNG, STABKENNWERTE
+from opencivil.material.basis import ERDBESCHLEUNIGUNG, Baustoff
+from opencivil.stabwerk.rechnung import STABKENNWERTE
 from opencivil.stabwerk.system import Meldung
 
 #: Das Thema der Formelsammlung.

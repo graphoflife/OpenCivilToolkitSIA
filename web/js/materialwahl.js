@@ -13,12 +13,14 @@
  *
  * Wie eine Art heisst, womit Kennungen und Namen eigener Materialien
  * beginnen und in welcher Folge die Sorten stehen, sagt der Katalog des
- * Kerns (`materialarten`).
+ * Kerns (`materialarten`). Das Wasser steht in keiner Norm: dort heisst die
+ * Sorte, die bleibt, wie sie ist, eine feste Sorte (`festeSorte`).
  */
 
 import { karte } from './bausteine.js';
 import { auswahl, el, melden } from './dom.js';
 import { dialogFenster } from './fenster.js';
+import { festeSorte } from './material.js';
 import { ausVorlage, freieKennung, katalog, projektAendern, waehlen, zustand } from './zustand.js';
 
 /** Was der Katalog über eine Materialart sagt. */
@@ -43,7 +45,7 @@ function anlegen(schliessen, art, sorte, eigen) {
   });
   schliessen();
   waehlen({ art: 'material', kennung });
-  melden(eigen ? `«${name}» angelegt, nach ${sorte}.` : `Normsorte ${sorte} angelegt.`);
+  melden(eigen ? `«${name}» angelegt, nach ${sorte}.` : `${festeSorte(art).gross} ${sorte} angelegt.`);
 }
 
 /**
@@ -68,6 +70,7 @@ export function materialKopieren(material) {
 /** Öffnet das Fenster für ein neues Material dieser Art: 'beton', 'betonstahl', 'baustahl' … */
 export function materialAnlegen(art) {
   const { neu, eigen, grundlagen, anlegen: sorten } = artVon(art);
+  const fest = festeSorte(art);
   const vergeben = new Set(zustand.projekt.materialien.map((m) => m.name || m.sorte));
   const frei = sorten.filter((s) => !vergeben.has(s));
   let norm = frei[0];
@@ -79,10 +82,10 @@ export function materialAnlegen(art) {
   dialogFenster({
     titel: neu,
     zeichen: 'material',
-    zusatz: 'Normsorte nach SIA oder eigenes Material',
+    zusatz: `${fest.lang} oder eigenes Material`,
     klasse: '.materialwahl',
     inhalt: (schliessen) => [
-      karte('Normsorte nach SIA', frei.length ? [
+      karte(fest.lang, frei.length ? [
         // Worauf die Kennwerte stehen, gilt für die gewählte Sorte: beim
         // Stahl II ist es eine andere Norm als bei B500B.
         grundlageText,
@@ -93,12 +96,12 @@ export function materialAnlegen(art) {
             beiAenderung: (s) => { norm = s; grundlageText.textContent = grundlageSatz(s); },
           }),
           el('button.knopf.knopf-haupt', {
-            type: 'button', text: 'Normsorte anlegen',
+            type: 'button', text: `${fest.gross} anlegen`,
             on: { click: () => anlegen(schliessen, art, norm, false) },
           }),
         ]),
       ] : [el('p.materialwahl-text', {
-        text: 'Alle Normsorten stehen schon im Projekt – jede braucht es nur einmal.',
+        text: `Jede ${fest.klein} steht schon im Projekt – es braucht sie nur einmal.`,
       })]),
       karte(eigen, [
         el('p.materialwahl-text', {

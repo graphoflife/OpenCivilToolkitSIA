@@ -36,7 +36,6 @@ from opencivil.core.rechenwerk import Loesung
 from opencivil.core.wert import Wert
 from opencivil.decke.modell import Aufteilung
 from opencivil.material.arten import MATERIALARTEN
-from opencivil.material.basis import Baustoffart
 from opencivil.material.beton import BETONSORTEN
 from opencivil.material.holz import REFERENZ_ETA_T, STOSSARTIG, TABELLE_4, Feuchteklasse, eta_t
 from opencivil.material.betonstahl import STAHLSORTEN
@@ -138,14 +137,16 @@ def _rechenarten(arten) -> list:
 def _satztitel() -> Dict[str, str]:
     """
     Je Art mit Wertesatz der Titel seines Schalters, mit den Zeichen ihrer
-    Festigkeit: «Bemessungswert f_cd oder charakteristischer f_ck». Das Holz
-    steht nicht da -- es hat keinen Satz, und so hat es keinen Schalter. Bis
-    2026-11-26 standen zwei Titel in der Oberflaeche, und jeder Stahl hiess
-    «f_yd oder f_yk», auch der Baustahl und der Spannstahl.
+    Festigkeit: «Bemessungswert f_cd oder charakteristischer f_ck». Holz und
+    Fluessigkeit stehen nicht da -- sie haben keinen Satz
+    (:attr:`~opencivil.material.arten.Materialart.mit_satz`), und so haben
+    sie keinen Schalter. Bis 2026-11-26 standen zwei Titel in der
+    Oberflaeche, und jeder Stahl hiess «f_yd oder f_yk», auch der Baustahl
+    und der Spannstahl.
     """
     titel = {}
     for name, art in MATERIALARTEN.items():
-        if art.art is Baustoffart.HOLZ:
+        if not art.mit_satz:
             continue
         zeichen = {v.kurzname: v.symbol.replace("{", "").replace("}", "") for v in art.vorlagen}
         d, k = (zeichen[satz.festigkeit(art.art)] for satz in Werkstoffsatz)
@@ -232,10 +233,12 @@ def katalog() -> dict:
         # womit Kennungen und Namen eigener Materialien beginnen, worauf die
         # Kennwerte stehen -- die Kennwerte selbst und, wo es sie gibt, die
         # Erzeugnisse je Sorte. Dazu, wie ein Satz die Art nennt: «Neues Holz»,
-        # und je Sorte, worauf ihre Kennwerte stehen -- beim Stahl II nicht
-        # auf SIA 262:2025.
+        # «keine Flüssigkeit», ob ihre festen Sorten in einer Norm stehen, und
+        # je Sorte, worauf ihre Kennwerte stehen -- beim Stahl II nicht auf
+        # SIA 262:2025.
         "materialarten": {
             name: {"titel": a.titel, "neu": a.neu, "eigen": a.eigen, "keinen": a.keinen,
+                   "kein": a.kein, "kein_wort": a.kein_wort, "aus_norm": a.aus_norm,
                    "kennung": a.kennung, "eigene": a.eigene,
                    "grundlage": a.grundlage, "anlegen": list(a.anlegen),
                    "grundlagen": {sorte: a.grundlage_von(sorte) for sorte in a.sorten},

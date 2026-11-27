@@ -22,7 +22,7 @@ import { api } from './api.js';
 import { sandboxHinweis, unfertigHinweis } from './bausteine.js';
 import { nichtsGezeichnet } from './cad_app.js';
 import { materialAnlegen, materialKopieren } from './materialwahl.js';
-import { materialEditor, materialHinweis } from './material.js';
+import { festeSorte, materialEditor, materialHinweis } from './material.js';
 import { plattenEditor, plattenFenster } from './platte.js';
 import { analyseEditor, analyseFenster } from './querschnittsanalyse.js';
 import { balkensystemEditor, balkensystemFenster } from './balkensystem.js';
@@ -239,14 +239,16 @@ function mitHinweis(liste, editor, leer = () => false) {
 const MATERIAL = {
   app: 'material', liste: 'materialien', knopf: 'Mate\u00ADrialien', zeichen: 'material',
   gruppen: (p) => Object.entries(katalog('materialarten'))
-    .map(([art, { titel }]) => ({
-      titel, leer: `kein ${titel}`, eintraege: p.materialien.filter((m) => m.art === art),
+    .map(([art, { titel, kein }]) => ({
+      titel, leer: kein, eintraege: p.materialien.filter((m) => m.art === art),
       plus: { titel: `${titel} hinzufügen`, tun: () => materialAnlegen(art) },
     })),
   name: (m) => m.name || m.sorte,
   marke: (m) => (m.eigenstaendig
     ? el('span.eigen', { text: 'eigen' })
-    : el('span.sia', { text: 'SIA', title: 'Normsorte nach SIA – nicht änderbar' })),
+    : el('span.sia', {
+      text: festeSorte(m.art).marke, title: `${festeSorte(m.art).lang} – nicht änderbar`,
+    })),
   kurztext: () => '',
   loeschen: (m) => loeschenWennFrei('materialien', m, `„${m.name || m.sorte}" verwendet von`),
   kopieren: materialKopieren,

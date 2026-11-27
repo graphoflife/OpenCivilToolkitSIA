@@ -51,6 +51,7 @@ from opencivil.core.vorgaben import SCHICHT, Feld, Gruppe
 from opencivil.core.wahl import Wahl
 from opencivil.core.wert import WertDef, kennung_aus
 from opencivil.geotechnik.verhalten import Verhalten
+from opencivil.geotechnik.wasser import raumlast
 from opencivil.material.basis import Baustoff
 from opencivil.pfahl import buch
 from opencivil.pfahl.boden import Mantel, Pfahlschicht, Profil
@@ -320,8 +321,6 @@ VORGABEN = (
     Gruppe("Grundwasser", lambda: (
         Feld("t_w", "t_w", M, "Tiefe des höchsten Grundwasserspiegels unter Terrain", 2,
              "SIA 267:2013, 4.2.2.3", beschriftung="Tiefe des Grundwassers", schritt=0.5),
-        Feld("gamma_w", r"\gamma_w", KN_PRO_M3, "Raumlast des Wassers", 1,
-             beschriftung="Raumlast Wasser", schritt=0.5),
     )),
     Gruppe("Äusserer Widerstand", _aussen, nach=("grundlage",)),
     Gruppe("Fuss", _fuss, nach=("grundlage", "spitze")),
@@ -410,7 +409,12 @@ class Pfahl(Rechenobjekt):
     t_w: Groesse
     """Die Tiefe des höchsten Grundwasserspiegels unter Terrain."""
 
-    gamma_w: Groesse
+    wasser: Baustoff
+    """
+    Das Grundwasser, eine Flüssigkeit: seine Raumlast γ_w rechnet der Pfahl
+    aus ihr (:mod:`opencivil.geotechnik.wasser`). Bis 2026-11-27 eine Zahl.
+    """
+
     schichten: Sequence[Pfahlschicht]
     grundlage: Grundlage
     eta_a: Groesse
@@ -521,6 +525,9 @@ class Pfahl(Rechenobjekt):
             d, vorgabe = f.vorgabe(self.id, self.abschnitt, kasten, groesse)
             self.definitionen[f.kurz] = d
             self.berechnungen.append(vorgabe)
+        d_w, gamma_w = raumlast(self.id, self.abschnitt, self.wasser)
+        self.definitionen["gamma_w"] = d_w
+        self.berechnungen.append(gamma_w)
 
     def kurznamen(self, *gruppen: str) -> List[str]:
         """

@@ -20,17 +20,22 @@ import copy
 import json
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Sequence, Tuple, Union
+from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple, Union
 
 from opencivil.querschnitt.platte import LAGENZAHL, Richtung
 from opencivil.ergebnis import Ergebnis
 from opencivil.material.arten import MATERIALARTEN
+from opencivil.material.baustahl import ERSTER_BAUSTAHL
 from opencivil.material.beton import ERSTER_BETON
 from opencivil.material.betonstahl import ERSTER_STAHL
-from opencivil.projekt.eintraege import Beschreibung, MaterialEintrag
+from opencivil.material.fluessigkeit import ERSTE_FLUESSIGKEIT
+from opencivil.material.profilblech import ERSTES_PROFILBLECH
+from opencivil.material.spannstahl import ERSTER_SPANNSTAHL
+from opencivil.projekt.eintraege import Beschreibung, MaterialEintrag, erstes_material
 from opencivil.projekt.balkensystem import BalkensystemEintrag
 from opencivil.projekt.balkensystem3d import Balkensystem3dEintrag
 from opencivil.projekt.erdbeben import ErdbebenEintrag
+from opencivil.projekt.frueher import gamma_w_heraus, wasser_einsetzen
 from opencivil.projekt.grundbruch import GrundbruchEintrag
 from opencivil.projekt.pfahl import PfahlEintrag
 from opencivil.projekt.lesen import (
@@ -61,6 +66,16 @@ APPLISTEN: Dict[str, Tuple[type, str]] = {
 
 #: Wie die Sandbox jeder App heisst (Benutzer, 2026-11-20).
 SANDBOX = "Sandbox"
+
+#: Womit ein neues Projekt anfaengt: je Materialart eine Sorte, damit jede App
+#: gleich rechnet (Plan vom 2026-11-27; bis dahin nur Beton und Betonstahl).
+#: Das Holz ist GL24h, wie im Plan -- nicht C24, das erste Holz des Fensters
+#: «Neues Material».
+NEUES_PROJEKT: Dict[str, str] = {
+    "beton": ERSTER_BETON, "betonstahl": ERSTER_STAHL, "baustahl": ERSTER_BAUSTAHL,
+    "spannstahl": ERSTER_SPANNSTAHL, "holz": "GL24h", "profilblech": ERSTES_PROFILBLECH,
+    "fluessigkeit": ERSTE_FLUESSIGKEIT,
+}
 
 
 def naechster_name(stamm: str, namen: Iterable[str]) -> str:
@@ -229,7 +244,7 @@ class Projekt(Beschreibung):
     def eigener_name(self, art: str) -> str:
         """
         Der erste freie Name eines eigenen Materials: BE1, BE2 ..., S1 ..., ST1 ...,
-        SP1 ..., H1 ... oder PB1 ...
+        SP1 ..., H1 ..., PB1 ... oder FL1 ...
         """
         vorsilbe = MATERIALARTEN[art].eigene
         vergeben = {m.anzeigename for m in self.materialien}
@@ -270,6 +285,10 @@ class Projekt(Beschreibung):
         """Ein Profilblechstahl nach SIA 264 -- Kennung ``pb1``, ``pb2`` ..."""
         return self._normsorte("profilblech", sorte)
 
+    def fluessigkeit(self, sorte: str = ERSTE_FLUESSIGKEIT) -> MaterialEintrag:
+        """Eine Fluessigkeit, das Wasser -- Kennung ``fl1``, ``fl2`` ..."""
+        return self._normsorte("fluessigkeit", sorte)
+
     def eigener_beton(self, vorlage: str = "C30/37") -> MaterialEintrag:
         """
         Ein eigener Beton, ``BE1``, ``BE2`` ... -- mit den Kennwerten der Sorte
@@ -293,6 +312,13 @@ class Projekt(Beschreibung):
     def eigenes_holz(self, vorlage: str = "C24") -> MaterialEintrag:
         """Ein eigenes Holz, ``H1``, ``H2`` ... -- siehe :meth:`eigener_beton`."""
         return self._eigenes("holz", vorlage)
+
+    def eigene_fluessigkeit(self, vorlage: str = ERSTE_FLUESSIGKEIT) -> MaterialEintrag:
+        """
+        Eine eigene Fluessigkeit, ``FL1``, ``FL2`` ... -- eine Bentonitsuspension
+        etwa, ihre Dichte in ``abweichungen["rho_fl"]``; siehe :meth:`eigener_beton`.
+        """
+        return self._eigenes("fluessigkeit", vorlage)
 
     def material_anlegen(self, art: str, sorte: str, *, eigen: bool = False) -> MaterialEintrag:
         """
@@ -480,13 +506,15 @@ class Projekt(Beschreibung):
         """
         Ein Grundbruchnachweis mit den Vorgaben der Oberflaeche, aber ohne
         ihre Startkombination: wer rechnet, gibt seine Einwirkungen mit
-        ``kombination`` selbst an. Alles Weitere -- ``phi_k``, ``b``, ``t`` ...
+        ``kombination`` selbst an. Das Wasser ist wie dort die erste
+        Fluessigkeit des Projekts. Alles Weitere -- ``phi_k``, ``b``, ``t`` ...
         -- geht als Stichwort an den Eintrag; Winkel in Grad, Masse in m,
         Spannungen in kPa.
         """
         eintrag = lesen(GrundbruchEintrag, felder, f"Grundbruch '{name}'",
                         GrundbruchEintrag(kennung=self.freie_kennung(GRUNDBRUCH.vorsilbe),
-                                          name=name))
+                                          name=name,
+                                          wasser=erstes_material(self.materialien, "fluessigkeit")))
         self.grundbrueche.append(eintrag)
         return eintrag
 
@@ -509,13 +537,15 @@ class Projekt(Beschreibung):
         Ein Pfahl mit den Vorgaben der Oberflaeche, aber ohne ihre Startschicht
         und Startkombination: wer rechnet, gibt sie mit ``schicht`` und
         ``kombination`` selbst an. ``stahl`` und ``beton`` sind Kennungen von
-        Materialien, der Beton nur beim Bohrpfahl. Alles Weitere -- ``art``,
-        ``D``, ``grundlage`` ... -- geht als Stichwort an den Eintrag; Masse
-        des Querschnitts in mm, Tiefen in m, Spannungen in kPa.
+        Materialien, der Beton nur beim Bohrpfahl; das Wasser ist wie in der
+        Oberflaeche die erste Fluessigkeit des Projekts. Alles Weitere --
+        ``art``, ``D``, ``grundlage`` ... -- geht als Stichwort an den Eintrag;
+        Masse des Querschnitts in mm, Tiefen in m, Spannungen in kPa.
         """
         eintrag = lesen(PfahlEintrag, {"stahl": stahl, "beton": beton, **felder},
                         f"Pfahl '{name}'",
-                        PfahlEintrag(kennung=self.freie_kennung(PFAHL.vorsilbe), name=name))
+                        PfahlEintrag(kennung=self.freie_kennung(PFAHL.vorsilbe), name=name,
+                                     wasser=erstes_material(self.materialien, "fluessigkeit")))
         self.pfaehle.append(eintrag)
         return eintrag
 
@@ -810,22 +840,32 @@ class Projekt(Beschreibung):
     def laden(cls, pfad: str | Path) -> "Projekt":
         return cls.aus_dict(json.loads(Path(pfad).read_text(encoding="utf-8")))
 
+    @classmethod
+    def aus_dict(cls, roh: Mapping[str, Any], wo: Optional[str] = None) -> "Projekt":
+        """
+        Ein Projekt aus der Datei, gelesen und geprueft. Was eine Datei von
+        frueher anders schreibt, bringt :mod:`~opencivil.projekt.frueher` in
+        die neue Form: die Zahl γ_w von Grundbruch und Pfahl wird ein Wasser.
+        """
+        roh, alte = gamma_w_heraus(roh)
+        projekt = super().aus_dict(roh, wo)
+        wasser_einsetzen(projekt, alte)
+        return projekt
+
     # -- Startpunkt ---------------------------------------------------------
 
     @classmethod
     def neu(cls, name: str = "Neues Projekt") -> "Projekt":
         """
-        Ein neues Projekt, wie es «+» in der Oberflaeche anlegt: mit dem
-        ersten Beton und dem ersten Betonstahl, den ein neues Material
-        vorschlaegt (:data:`~opencivil.material.beton.ERSTER_BETON`,
-        :data:`~opencivil.material.betonstahl.ERSTER_STAHL`), und ohne
-        Bauteile. So rechnet die erste Platte gleich. Die Sandboxen legt die
+        Ein neues Projekt, wie es «+» in der Oberflaeche anlegt: je
+        Materialart eine Sorte (:data:`NEUES_PROJEKT`) und ohne Bauteile. So
+        rechnet das erste Bauteil jeder App gleich. Die Sandboxen legt die
         Oberflaeche dazu an (:meth:`sandboxen_anlegen`); wer in Python
         rechnet, braucht sie nicht.
         """
         projekt = cls(name=name)
-        projekt.beton(ERSTER_BETON)
-        projekt.stahl(ERSTER_STAHL)
+        for art, sorte in NEUES_PROJEKT.items():
+            projekt.material_anlegen(art, sorte)
         return projekt
 
     @classmethod

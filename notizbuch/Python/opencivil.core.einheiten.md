@@ -1,5 +1,5 @@
 ---
-erzeugt: 1342fe47bc10
+erzeugt: 48370b326604
 art: modul
 tags: [modul]
 ---
@@ -461,10 +461,12 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - [[opencivil.geotechnik.gleiten]]
 - [[opencivil.geotechnik.grundbruch]]
 - [[opencivil.geotechnik.setzung]]
+- [[opencivil.geotechnik.wasser]]
 - [[opencivil.material.basis]]
 - [[opencivil.material.baustahl]]
 - [[opencivil.material.beton]]
 - [[opencivil.material.betonstahl]]
+- [[opencivil.material.fluessigkeit]]
 - [[opencivil.material.holz]]
 - [[opencivil.material.profilblech]]
 - [[opencivil.material.spannstahl]]

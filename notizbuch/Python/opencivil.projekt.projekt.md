@@ -1,5 +1,5 @@
 ---
-erzeugt: 86733e5813ab
+erzeugt: ab5a54c24247
 art: modul
 tags: [modul]
 ---
@@ -149,7 +149,7 @@ def eigener_name(self, art: str) -> str
 ```
 
 Der erste freie Name eines eigenen Materials: BE1, BE2 ..., S1 ..., ST1 ...,
-SP1 ..., H1 ... oder PB1 ...
+SP1 ..., H1 ..., PB1 ... oder FL1 ...
 
 #### Projekt.beton
 
@@ -199,6 +199,14 @@ def profilblech(self, sorte: str='SE 350 G') -> MaterialEintrag
 
 Ein Profilblechstahl nach SIA 264 – Kennung `pb1`, `pb2` ...
 
+#### Projekt.fluessigkeit
+
+```python
+def fluessigkeit(self, sorte: str=ERSTE_FLUESSIGKEIT) -> MaterialEintrag
+```
+
+Eine Fluessigkeit, das Wasser – Kennung `fl1`, `fl2` ...
+
 #### Projekt.eigener_beton
 
 ```python
@@ -240,6 +248,15 @@ def eigenes_holz(self, vorlage: str='C24') -> MaterialEintrag
 ```
 
 Ein eigenes Holz, `H1`, `H2` ... – siehe [[opencivil.projekt.projekt#Projekt.eigener_beton|eigener_beton]].
+
+#### Projekt.eigene_fluessigkeit
+
+```python
+def eigene_fluessigkeit(self, vorlage: str=ERSTE_FLUESSIGKEIT) -> MaterialEintrag
+```
+
+Eine eigene Fluessigkeit, `FL1`, `FL2` ... – eine Bentonitsuspension
+etwa, ihre Dichte in `abweichungen["rho_fl"]`; siehe [[opencivil.projekt.projekt#Projekt.eigener_beton|eigener_beton]].
 
 #### Projekt.material_anlegen
 
@@ -357,7 +374,8 @@ def grundbruch(self, name: str, **felder: Any) -> GrundbruchEintrag
 
 Ein Grundbruchnachweis mit den Vorgaben der Oberflaeche, aber ohne
 ihre Startkombination: wer rechnet, gibt seine Einwirkungen mit
-`kombination` selbst an. Alles Weitere – `phi_k`, `b`, `t` ...
+`kombination` selbst an. Das Wasser ist wie dort die erste
+Fluessigkeit des Projekts. Alles Weitere – `phi_k`, `b`, `t` ...
 – geht als Stichwort an den Eintrag; Winkel in Grad, Masse in m,
 Spannungen in kPa.
 
@@ -382,9 +400,10 @@ def pfahl(self, name: str, stahl: str, beton: str='', **felder: Any) -> PfahlEin
 Ein Pfahl mit den Vorgaben der Oberflaeche, aber ohne ihre Startschicht
 und Startkombination: wer rechnet, gibt sie mit `schicht` und
 `kombination` selbst an. `stahl` und `beton` sind Kennungen von
-Materialien, der Beton nur beim Bohrpfahl. Alles Weitere – `art`,
-`D`, `grundlage` ... – geht als Stichwort an den Eintrag; Masse
-des Querschnitts in mm, Tiefen in m, Spannungen in kPa.
+Materialien, der Beton nur beim Bohrpfahl; das Wasser ist wie in der
+Oberflaeche die erste Fluessigkeit des Projekts. Alles Weitere –
+`art`, `D`, `grundlage` ... – geht als Stichwort an den Eintrag;
+Masse des Querschnitts in mm, Tiefen in m, Spannungen in kPa.
 
 #### Projekt.gebaeude
 
@@ -579,6 +598,17 @@ def speichern(self, pfad: str | Path) -> Path
 def laden(cls, pfad: str | Path) -> 'Projekt'
 ```
 
+#### Projekt.aus_dict
+
+```python
+@classmethod
+def aus_dict(cls, roh: Mapping[str, Any], wo: Optional[str]=None) -> 'Projekt'
+```
+
+Ein Projekt aus der Datei, gelesen und geprueft. Was eine Datei von
+frueher anders schreibt, bringt [[opencivil.projekt.frueher|frueher]] in
+die neue Form: die Zahl γ_w von Grundbruch und Pfahl wird ein Wasser.
+
 #### Projekt.neu
 
 ```python
@@ -586,11 +616,9 @@ def laden(cls, pfad: str | Path) -> 'Projekt'
 def neu(cls, name: str='Neues Projekt') -> 'Projekt'
 ```
 
-Ein neues Projekt, wie es «+» in der Oberflaeche anlegt: mit dem
-ersten Beton und dem ersten Betonstahl, den ein neues Material
-vorschlaegt ([[opencivil.material.beton#Konstanten|ERSTER_BETON]],
-[[opencivil.material.betonstahl#Konstanten|ERSTER_STAHL]]), und ohne
-Bauteile. So rechnet die erste Platte gleich. Die Sandboxen legt die
+Ein neues Projekt, wie es «+» in der Oberflaeche anlegt: je
+Materialart eine Sorte ([[opencivil.projekt.projekt#Konstanten|NEUES_PROJEKT]]) und ohne Bauteile. So
+rechnet das erste Bauteil jeder App gleich. Die Sandboxen legt die
 Oberflaeche dazu an ([[opencivil.projekt.projekt#Projekt.sandboxen_anlegen|sandboxen_anlegen]]); wer in Python
 rechnet, braucht sie nicht.
 
@@ -617,13 +645,18 @@ Jeder Nachweis einmal laut – gebaut in [[opencivil.projekt.beispiele|.beispiel
 
 - `APPLISTEN = {**{art.liste: (art.eintrag, art.vorsilbe) for art in BAUTEILE}, 'skr…` – Die Listen der Apps ausser den Materialien, je mit der Klasse ihrer Eintraege und der Vorsilbe ihrer Kennungen: die Bauteilarten ([[opencivil.projekt.aufbau#Konstanten|BAUTEILE]]) und die Skripte der App «Python». Was «+» in ihnen anlegt, steht im Katalog (`neu`); jede hat eine Sandbox.
 - `SANDBOX = 'Sandbox'` – Wie die Sandbox jeder App heisst (Benutzer, 2026-11-20).
+- `NEUES_PROJEKT = {'beton': ERSTER_BETON, 'betonstahl': ERSTER_STAHL, 'baustahl': ERSTE…` – Womit ein neues Projekt anfaengt: je Materialart eine Sorte, damit jede App gleich rechnet (Plan vom 2026-11-27; bis dahin nur Beton und Betonstahl). Das Holz ist GL24h, wie im Plan – nicht C24, das erste Holz des Fensters «Neues Material».
 
 ## Braucht
 
 - [[opencivil.ergebnis]]
 - [[opencivil.material.arten]]
+- [[opencivil.material.baustahl]]
 - [[opencivil.material.beton]]
 - [[opencivil.material.betonstahl]]
+- [[opencivil.material.fluessigkeit]]
+- [[opencivil.material.profilblech]]
+- [[opencivil.material.spannstahl]]
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.balkensystem3d]]
@@ -632,6 +665,7 @@ Jeder Nachweis einmal laut – gebaut in [[opencivil.projekt.beispiele|.beispiel
 - [[opencivil.projekt.durchstanzen]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.erdbeben]]
+- [[opencivil.projekt.frueher]]
 - [[opencivil.projekt.grundbruch]]
 - [[opencivil.projekt.lesen]]
 - [[opencivil.projekt.netz]]
@@ -650,5 +684,6 @@ Jeder Nachweis einmal laut – gebaut in [[opencivil.projekt.beispiele|.beispiel
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.beispiele]]
+- [[opencivil.projekt.frueher]]
 - [[opencivil.projekt.mappe]]
 - [[opencivil.web.api]]

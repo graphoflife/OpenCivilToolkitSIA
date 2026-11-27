@@ -1,5 +1,5 @@
 ---
-erzeugt: 18fc2580a224
+erzeugt: cc32d60f3170
 art: modul
 tags: [modul]
 ---
@@ -88,6 +88,7 @@ geschieht erst beim Aufbau, ueber die [[opencivil.core.einheiten#Groesse|Groesse
 - [[opencivil.projekt.erdbeben]] – ein Gebaeude im Erdbeben, wie die Oberflaeche es beschreibt.
 - [[opencivil.projekt.faelle]] – Lastfaelle und Kombinationen eines Bauteils.
 - [[opencivil.projekt.fallnamen]] – Die Namen der Faelle eines Bauteils – je Liste verschieden, auch als Kennung.
+- [[opencivil.projekt.frueher]] – was eine Projektdatei von frueher anders schreibt.
 - [[opencivil.projekt.grundbruch]] – ein Grundbruchnachweis, wie die Oberflaeche ihn beschreibt.
 - [[opencivil.projekt.lesen]] – was in einer Projektdatei stehen darf, und wie es gelesen wird.
 - [[opencivil.projekt.mappe]] – mehrere Projekte in einer Datei.

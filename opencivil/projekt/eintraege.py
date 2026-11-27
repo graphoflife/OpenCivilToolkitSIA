@@ -51,6 +51,15 @@ from opencivil.spannungsanalyse import Analyseart
 # ===========================================================================
 
 
+def erstes_material(materialien: Iterable[Any], art: str) -> str:
+    """
+    Die Kennung des ersten Materials der Art ``art`` unter ``materialien`` --
+    leer ohne eines. Damit fuellt ein neuer Eintrag ein Materialfeld, in der
+    Oberflaeche (:meth:`Beschreibung.frisch`) wie in Python.
+    """
+    return next((m.kennung for m in materialien if m.art == art), "")
+
+
 @functools.lru_cache(maxsize=None)
 def _feldnamen(klasse: type) -> frozenset:
     """Die Namen der Felder einer Beschreibungsklasse -- je Klasse einmal gesucht."""
@@ -169,7 +178,7 @@ class Beschreibung:
             ziel = eintrag
             for schritt in weg:
                 ziel = ziel[int(schritt)] if isinstance(ziel, list) else getattr(ziel, schritt)
-            setattr(ziel, feld, next((m.kennung for m in vorhanden if m.art == art), ""))
+            setattr(ziel, feld, erstes_material(vorhanden, art))
         return eintrag
 
     @classmethod
@@ -442,12 +451,13 @@ class JeMaterial:
         je Beton seine Rechenart; ein Stahl hat keine. Das Holz hat keinen
         Wertesatz -- SIA 265:2012 nennt nur Bemessungswerte
         (:data:`~opencivil.querschnitt.gesetzwahl.HOLZKENNWERTE`) --, und
-        ohne das Feld ``holzrechnungen`` rechnet es linear.
+        ohne das Feld ``holzrechnungen`` rechnet es linear. Welche Arten einen
+        Satz haben, sagt das Register (:attr:`~opencivil.material.arten.Materialart.mit_satz`).
         """
         def je(art, feld: str, *arten: Baustoffart):
             return art.je({b.id: self.von(feld, kennung) for kennung, b in stoffe.items()
                            if b.art in arten}, vorgabe_je_material(type(self), feld))
-        mit_satz = tuple(a for a in Baustoffart if a is not Baustoffart.HOLZ)
+        mit_satz = tuple(a.art for a in MATERIALARTEN.values() if a.mit_satz)
         return Rechenwahl(kriechzahl=self.kriechzahl,
                           saetze=je(Wertesaetze, "werkstoffsaetze", *mit_satz),
                           arten=je(Rechenarten, "rechenarten", Baustoffart.BETON),

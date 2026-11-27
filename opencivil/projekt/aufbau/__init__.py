@@ -121,6 +121,12 @@ def aufbauen(projekt: "Projekt", *, schnell: bool = False) -> Aufbau:
         except ProjektFehler as fehler:
             aufbau.unfertig("materialien", eintrag, wo, fehler.grund_bei(wo),
                             raum=f"{eintrag.art}.{eintrag.kennung}")
+    # Vor den Bauteilen, mit den Ueberschreibungen: so kann ein Bauteil schon
+    # beim Bauen nach einem Kennwert fragen (:func:`~.kern.kennwert`) -- der
+    # Grundbruch nach dem Gewicht seines Wassers.
+    for baustoff in aufbau.baustoffe.values():
+        baustoff.ins_rechenwerk(werk)
+    ueberschreibungen_setzen(projekt, werk, aufbau)
 
     # Auch im schnellen Aufbau jedes Bauteil: die Formelsammlung entsteht aus
     # ihm. Die Bewehrungssuche loest nur Nachweisziele, ein System kostet sie
@@ -135,11 +141,6 @@ def aufbauen(projekt: "Projekt", *, schnell: bool = False) -> Aufbau:
             except ProjektFehler as fehler:
                 aufbau.unfertig(art.liste, eintrag, wo, fehler.grund_bei(wo),
                                 raum=f"{art.raum}.{eintrag.kennung}")
-
-    for baustoff in aufbau.baustoffe.values():
-        baustoff.ins_rechenwerk(werk)
-
-    ueberschreibungen_setzen(projekt, werk, aufbau)
     return aufbau
 
 

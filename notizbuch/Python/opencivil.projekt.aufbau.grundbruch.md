@@ -1,5 +1,5 @@
 ---
-erzeugt: 1ac2866fdd0d
+erzeugt: 9f525d877708
 art: modul
 tags: [modul]
 ---
@@ -25,7 +25,8 @@ sobald eine Kombination eingeschaltet ist. Ohne sie steht das Fundament
 allein da, wie eine Platte ohne Einwirkung.
 
 Jede Zahl in der Einheit ihres Feldes ([[opencivil.projekt.lesen#als_groesse|als_groesse]])
-– bis 2026-10-18 stand sie hier ein zweites Mal.
+– bis 2026-10-18 stand sie hier ein zweites Mal. Das Wasser nur
+drainiert: undrainiert wirkt es nicht.
 
 
 ## Braucht

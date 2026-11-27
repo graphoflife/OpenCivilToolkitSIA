@@ -1,5 +1,5 @@
 ---
-erzeugt: ebb96f206790
+erzeugt: e2ca2d73d56b
 art: formel
 tags: [formel]
 ---
@@ -17,7 +17,7 @@ $$
 | Zeichen | Bedeutung | Einheit | Woher |
 | --- | --- | --- | --- |
 | $\gamma$ | Raumlast des Bodens, ohne Partialfaktor | kN/m³ | Vorgabe |
-| $\gamma_w$ | Raumlast des Wassers | kN/m³ | Vorgabe |
+| $\gamma_w$ | Raumlast des Grundwassers | kN/m³ | [[Raumlast des Grundwassers]] |
 
 ## Beispiel
 

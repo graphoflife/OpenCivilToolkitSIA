@@ -11,8 +11,12 @@
  *                  die Einwirkungen: N_Ed normal zur Sohle, T_Ed in ihrer
  *                  Richtung, je Kombination mit Schalter
  *
- * Gerechnet wird nichts: φ_eff, c_eff und γ' – undrainiert s_u,d – unter den
- * Feldern des Bodens kommen aus der Lösung, die Widerstände rechts ebenso.
+ * Gerechnet wird nichts: φ_eff, c_eff, γ_w und γ' – undrainiert s_u,d – unter
+ * den Feldern des Bodens kommen aus der Lösung, die Widerstände rechts ebenso.
+ *
+ * DAS WASSER ist seit 2026-11-27 ein Material des Projekts, eine Flüssigkeit:
+ * drainiert wählt der Boden sie aus der Liste, γ_w ist ihre Raumlast. Bis
+ * dahin stand γ_w = 10 kN/m³ als Zahl unter den Feldern.
  *
  * WINKEL wie in Bild 9.2.15 des Kapitels: T zeigt zur Seite, auf der das
  * Gelände um β abfällt, und die Sohle steigt um α in Richtung von T an. Das
@@ -28,7 +32,8 @@
  */
 
 import {
-  beschreibung, bezeichnung, eingabegruppen, feld, panel, verhaltenSchalter,
+  beschreibung, bezeichnung, eingabegruppen, feld, fehlendesMaterial, materialliste, panel,
+  verhaltenSchalter,
 } from './bausteine.js';
 import { el, zahlfeld } from './dom.js';
 import { anfuegenKnopf, fallkopf, fallzeile } from './faelle.js';
@@ -46,6 +51,7 @@ const HILFE = {
       ['s_u,d', 's_u,k / γ_cu, undrainiert; γ_cu nach SIA 267:2013, 5.3.2.2, Tabelle 1'],
       ['Feinkörnig', 'kurzzeitig undrainiert, langfristig drainiert: je ein Grundbruch für beide (SIA 267:2013, 8.5.1.5, 8.5.1.6)'],
       ['γ', 'eine Raumlast über und unter dem Wasser; das Buch nimmt unter ihm die gesättigte (Kap. 1.4), mit der feuchten wird γ\' etwas kleiner, auf der sicheren Seite'],
+      ['Wasser', 'drainiert: das Grundwasser, eine Flüssigkeit aus den Materialien; γ_w ist ihre Raumlast, beim Wasser 10 kN/m³'],
     ],
     formel: "γ' = γ − γ_w",
   },
@@ -88,7 +94,8 @@ const HILFE = {
 function bemessungswerte(g) {
   const ids = zustand.loesung?.zuordnung?.grundbrueche?.[g.kennung]?.werte;
   const werte = zustand.loesung?.werte || {};
-  const gerechnet = ['phi_eff', 'c_eff', 's_u_d', 'gamma_auftrieb'].map((k) => werte[ids?.[k]]).filter(Boolean);
+  const gerechnet = ['phi_eff', 'c_eff', 's_u_d', 'gamma_w', 'gamma_auftrieb']
+    .map((k) => werte[ids?.[k]]).filter(Boolean);
   if (!gerechnet.length) return null;
   const alt = Boolean(zustand.rechenfehler);
   return el(alt ? 'p.gb-bemessung.ist-ohne-wirkung' : 'p.gb-bemessung', {}, [
@@ -146,17 +153,26 @@ const EINWIRKUNGEN = {
  * Die Kacheln: je Gruppe der Vorgaben eine, dazu die Einwirkungen. Welche
  * Felder das Verhalten liest, sagt der Kern (Benutzer, 2026-11-19: was
  * nicht gilt, steht nicht da) -- bis dahin hiess φ = 0 undrainiert.
- * Undrainiert hat die Sohlreibung nichts zu zeigen und keine Kachel.
+ * Undrainiert hat die Sohlreibung nichts zu zeigen und keine Kachel, und
+ * der Boden braucht kein Wasser: dort gelten totale Spannungen.
  */
 function kapitel(g) {
   const aendern = (veraenderer) => eintragAendern(g.kennung, veraenderer);
   const vorgaben = eingabegruppen('grundbruch', g, aendern);
+  const drainiert = g.verhalten === 'drainiert';
+  const wasser = drainiert
+    ? feld('Wasser', materialliste({
+      art: 'fluessigkeit', gewaehlt: g.wasser, titel: 'Das Grundwasser: seine Raumlast ist γ_w',
+      setzen: (w) => aendern((x) => { x.wasser = w; }),
+    }), '')
+    : null;
   const kacheln = [
     gruppenkapitel(vorgaben, 'Boden', {
       zeichen: 'boden', werte: ['phi_k', 'c_k', 's_u'], hilfe: HILFE.boden,
       vor: [feld('Verhalten', verhaltenSchalter(g.verhalten,
         (w) => aendern((x) => { x.verhalten = w; })), '')],
-      nach: [bemessungswerte(g)],
+      nach: [wasser, bemessungswerte(g)],
+      fehlt: drainiert ? fehlendesMaterial('fluessigkeit', g.wasser) : '',
     }),
     gruppenkapitel(vorgaben, 'Fundament', {
       zeichen: 'fundament', werte: ['b', 'L'], hilfe: HILFE.fundament,

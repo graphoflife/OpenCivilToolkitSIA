@@ -1,5 +1,5 @@
 ---
-erzeugt: 3ceba1799d53
+erzeugt: b5a4752f0ef8
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -11,6 +11,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 - [[Beton]] · 8
 - [[Betonstahl]] · 3
+- [[Flüssigkeit]] · 1
 - [[Baustahl]] · 3
 - [[Spannstahl]] · 2
 - [[Holz]] · 3
@@ -54,13 +55,17 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 **Grundbruch**
 
-- [[Fundament]] · 4
+- [[Fundament]] · 5
 - [[Grundbruch]] · 28
 - [[Gleiten]] · 4
 
 **Setzung**
 
 - [[Setzung]] · 8
+
+**Weitere**
+
+- [[Pfahl]] · 1
 
 **Pfähle**
 
@@ -402,6 +407,8 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Querschnitt eines Spannglieds]] · $A_{p,1}$
 - [[Querschnittsparameter einer Verbundstütze]] · $\delta$
 - [[Radius des Bewehrungskreises]] · $r_s$
+- [[Raumlast der Flüssigkeit]] · $\gamma_{fl}$
+- [[Raumlast des Grundwassers]] · $\gamma_w$
 - [[Raumlast im Gleitkörper]] · $\gamma_G$
 - [[Raumlast unter Auftrieb]] · $\gamma'$
 - [[Reduzierte Kipplänge]] · $L_{K}$
@@ -553,7 +560,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 ## Normstelle fehlt noch
 
-143 von 466 Formeln haben im Code keine Normstelle – meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle – von dort kommt sie in Bericht und Notizbuch.
+145 von 468 Formeln haben im Code keine Normstelle – meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle – von dort kommt sie in Bericht und Notizbuch.
 
 - [[Achsen eines Stabs im Raum]] · [[opencivil.stabwerk3d.herleitung|_ansaetze]]
 - [[Äquivalenter E-Modul eines Stabs]] · [[opencivil.spannungsanalyse.modul#ModulProzedur|ModulProzedur._schreiben]]
@@ -651,6 +658,8 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Querkraft über die Federn der Wände]] · [[opencivil.nachweis.schubwandnachweis#Schubwandnachweis|Schubwandnachweis._protokoll_ansatz]]
 - [[Querschnitt der Wendel]] · [[opencivil.pfahl.innen_quer#InnererQuerwiderstand._fachwerk|InnererQuerwiderstand._fachwerk]]
 - [[Radius des Bewehrungskreises]] · [[opencivil.pfahl.innen#InnererWiderstand|InnererWiderstand._bohrpfahl]]
+- [[Raumlast der Flüssigkeit]] · [[opencivil.material.fluessigkeit]]
+- [[Raumlast des Grundwassers]] · [[opencivil.geotechnik.wasser|_raumlast]]
 - [[Raumlast unter Auftrieb]] · [[opencivil.geotechnik.fundament|_gamma_auftrieb]]
 - [[Rissnormalkraft beim Moment]] · [[opencivil.spannungsanalyse.riss#Bruttoriss._herleitung_rissnormalkraft|Bruttoriss._herleitung_rissnormalkraft]]
 - [[Schnittgrössen eines Stabs im Raum]] · [[opencivil.stabwerk3d.herleitung|_ansaetze]]

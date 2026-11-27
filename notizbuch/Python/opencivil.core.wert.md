@@ -1,5 +1,5 @@
 ---
-erzeugt: 9efb1a25a438
+erzeugt: f326e009120f
 art: modul
 tags: [modul]
 ---
@@ -320,6 +320,7 @@ def beschreibung(self) -> str
 - [[opencivil.geotechnik.grundbruch]]
 - [[opencivil.geotechnik.setzung]]
 - [[opencivil.geotechnik.tragfaehigkeit]]
+- [[opencivil.geotechnik.wasser]]
 - [[opencivil.material.basis]]
 - [[opencivil.nachweis.biegung_normalkraft]]
 - [[opencivil.nachweis.duktilitaet]]

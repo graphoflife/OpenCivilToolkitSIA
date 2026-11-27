@@ -19,6 +19,12 @@ bis 1 (Kap. 9.2.18).
 Am 2026-11-19 der Schalter drainiert/undrainiert, wie beim Pfahl (Benutzer):
 undrainiert mit s_u = 50 kPa, der Vorgabe des Pfahls, und gamma_cu = 1.5
 nach SIA 267:2013, 5.3.2.2, Tabelle 1.
+
+Seit 2026-11-27 ist das Wasser ein Material, eine Fluessigkeit
+(:mod:`opencivil.material.fluessigkeit`): statt gamma_w = 10 kN/m³ waehlt der
+Grundbruch das Wasser des Projekts. Ob der Boden schwerer ist als es, prueft
+der Aufbau (:mod:`opencivil.projekt.aufbau.grundbruch`) -- nur er kennt das
+Gewicht des Wassers.
 """
 
 from __future__ import annotations
@@ -30,7 +36,7 @@ from opencivil.core.einheiten import GRAD, KN, KN_PRO_M3, KPA, M
 from opencivil.geotechnik.verhalten import Verhalten
 from opencivil.projekt.eintraege import BauteilEintrag, Beschreibung
 from opencivil.projekt.fallnamen import Fallnamen
-from opencivil.projekt.lesen import ProjektFehler, bereich
+from opencivil.projekt.lesen import ProjektFehler, bereich, materialfeld
 
 
 @dataclass
@@ -53,6 +59,7 @@ class GrundbruchEintrag(BauteilEintrag):
 
     BEZEICHNUNG = "Grundbruch"
     STAMM = "Fundament"
+    ERSTE_MATERIALIEN = {"wasser": "fluessigkeit"}
 
     kennung: str
     name: str
@@ -96,10 +103,11 @@ class GrundbruchEintrag(BauteilEintrag):
     Seite.
     """
 
-    gamma_w: float = bereich(10.0, heisst="γ_w", einheit=KN_PRO_M3, ab=0.0)
+    wasser: str = materialfeld("fluessigkeit")
     """
-    Raumlast des Wassers in kN/m³ -- nur drainiert, fuer gamma': undrainiert
-    gelten totale Spannungen, das Wasser wirkt dort nicht.
+    Die Kennung des Grundwassers, einer Fluessigkeit -- nur drainiert, fuer
+    gamma': undrainiert gelten totale Spannungen, das Wasser wirkt dort
+    nicht. Bis 2026-11-27 stand hier die Zahl gamma_w = 10 kN/m³.
     """
 
     q_Ed: float = bereich(0.0, heisst="Auflast q_Ed", einheit=KPA, ab=0.0)
@@ -151,6 +159,14 @@ class GrundbruchEintrag(BauteilEintrag):
         self.kombinationen.append(eintrag)
         return eintrag
 
+    def materialien(self) -> List[str]:
+        """Das Wasser nur drainiert: undrainiert wirkt es nicht, wie der Beton nur am Bohrpfahl."""
+        return [self.wasser] if self.drainiert and self.wasser else []
+
+    @property
+    def drainiert(self) -> bool:
+        return self.verhalten is Verhalten.DRAINIERT
+
     def fallnamen(self) -> List[Fallnamen]:
         """Die Namen der Kombinationen muessen sich unterscheiden."""
         return [Fallnamen.aus("kombinationen", "Kombination", self.kombinationen)]
@@ -167,14 +183,8 @@ class GrundbruchEintrag(BauteilEintrag):
             raise ProjektFehler(
                 f"b ist die kürzere Seite des Fundaments – die Länge L = {self.L:g} m "
                 f"muss mindestens so gross sein wie die Breite b = {self.b:g} m.", wo=wo)
-        # Nur drainiert: undrainiert gibt es kein gamma', und gamma_w ist ausgeblendet.
-        if self.verhalten is Verhalten.DRAINIERT and self.gamma <= self.gamma_w:
-            raise ProjektFehler(
-                f"die Raumlast des Bodens γ = {self.gamma:g} kN/m³ muss grösser sein "
-                f"als die des Wassers, γ_w = {self.gamma_w:g} kN/m³ – sonst ist γ' nicht "
-                f"positiv.", wo=wo)
         # Wie beim Pfahl, je Schicht (``PfahlEintrag._festigkeiten``).
-        if self.verhalten is Verhalten.DRAINIERT and self.phi_k <= 0.0:
+        if self.drainiert and self.phi_k <= 0.0:
             raise ProjektFehler(f"drainiert braucht φ_k über null; ohne Reibung "
                                 f"undrainiert rechnen, mit s_u,k.", wo=wo)
         if self.verhalten is Verhalten.UNDRAINIERT and self.s_u <= 0.0:

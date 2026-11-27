@@ -1,5 +1,5 @@
 ---
-erzeugt: 1667b1f3ba74
+erzeugt: 4d95eed927d6
 art: modul
 tags: [modul]
 ---
@@ -380,7 +380,6 @@ Modul mal Kennwert ([[opencivil.stabwerk.rechnung#Steifigkeitsformel|Steifigkeit
 - `DICHTE = Materialkennwert('rho', '\\rho', KG_PRO_M3, 'Dichte', {Baustoffart.BE…` – Fuer das Eigengewicht: beim Beton die Dichte des Stahlbetons (Benutzer, 2026-10-23), beim Holz die aus der mittleren Raumlast nach SIA 261.
 - `SCHUBMODUL = Materialkennwert('G', 'G', N_PRO_MM2, 'Schubmodul', {Baustoffart.BETO…` – Fuer die Torsion, nur im Raum: `G_cm` des Betons, `G_a` des Baustahls, der Mittelwert `G_mean` des Holzes.
 - `STABKENNWERTE = stoffkennwerte((E_MODUL, DICHTE))` – Welche Kennwerte eines Baustoffs ein Stab in der Ebene aus ihm nimmt.
-- `ERDBESCHLEUNIGUNG = Groesse(10.0, M_PRO_S2)` – Die Erdbeschleunigung des Eigengewichts – 10 m/s² nach Vorgabe des Benutzers (2026-10-23): so wiegt Stahlbeton 25 kN/m³.
 - `QUERSCHNITTE = 'Stabquerschnitte'` – Die Themen der Formelsammlung: was am Querschnitt haengt, und die Rechnung.
 - `STEIFIGKEITSMETHODE = 'Steifigkeitsmethode'`
 - `DEHNSTEIFIGKEIT = Steifigkeitsformel('EA', MN, 'Dehnsteifigkeit', 'E', 'A')`
@@ -403,7 +402,6 @@ Modul mal Kennwert ([[opencivil.stabwerk.rechnung#Steifigkeitsformel|Steifigkeit
 ## Gebraucht von
 
 - [[opencivil.decke.werk]]
-- [[opencivil.erdbeben.ersatzkraft]]
 - [[opencivil.ergebnis]]
 - [[opencivil.projekt.aufbau.balkensystem]]
 - [[opencivil.projekt.aufbau.kern]]

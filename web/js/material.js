@@ -6,6 +6,8 @@
  * die Sorte nicht. Wer abweichen will, legt ein eigenes Material an
  * (materialwahl.js): es heisst BE1, S1, ST1 oder SP1 und ist änderbar. So kann keine
  * abgewandelte Festigkeit unter einer Normbezeichnung im Bericht landen.
+ * Das Wasser ist ebenso gesperrt, steht aber in keiner Norm: es heisst eine
+ * feste Sorte (`festeSorte`).
  *
  * Angezeigt wird immer der Wert aus der letzten Lösung, nie ein in der
  * Oberfläche nachgerechneter. Bis 2026-10-18 stand der Editor in editor.js,
@@ -21,6 +23,24 @@ import { eintragAendern, katalog, kennwertId, zustand } from './zustand.js';
 
 function gerechnet(id) {
   return zustand.loesung?.werte?.[id] || null;
+}
+
+/**
+ * Wie eine Sorte der Art `art` heisst, die bleibt, wie sie ist: nach SIA eine
+ * «Normsorte» mit der Marke «SIA». Das Wasser steht in keiner Norm und ist
+ * eine «feste Sorte», Marke «fest» -- ob eine Art aus einer Norm kommt, sagt
+ * der Kern (`aus_norm`). `gross` beginnt einen Satz, `klein` steht in ihm.
+ */
+export function festeSorte(art) {
+  return katalog('materialarten', art, 'aus_norm')
+    ? {
+      marke: 'SIA', lang: 'Normsorte nach SIA', gross: 'Normsorte', klein: 'Normsorte',
+      grundwerte: 'Sortentabelle, Norm',
+    }
+    : {
+      marke: 'fest', lang: 'Feste Sorte', gross: 'Feste Sorte', klein: 'feste Sorte',
+      grundwerte: 'Sorte, nach Vorgabe',
+    };
 }
 
 /**
@@ -47,7 +67,7 @@ function kennwertZeile(material, vorlage) {
     // Pfeile bis 0, und das Material rechnete nicht mehr.
     angabe: vorlage.angabe,
     readonly: !schreibbar,
-    titel: gesperrt ? 'Normsorte nach SIA – nicht änderbar'
+    titel: gesperrt ? `${festeSorte(material.art).lang} – nicht änderbar`
       : (vorlage.berechnet && !istUeberschrieben ? 'Wird gerechnet – zum Überschreiben daneben «von Hand» wählen' : ''),
     // Leer: die eigene Zahl weg, der Wert der Sorte gilt wieder.
     leer: null,
@@ -126,6 +146,7 @@ function erzeugnisPanel(material) {
 export function materialEditor(material) {
   const vorlagen = katalog('materialarten', material.art, 'kennwerte');
   const gesperrt = !material.eigenstaendig;
+  const fest = festeSorte(material.art);
   const anzahlUeberschrieben = Object.keys(material.ueberschreibungen).length;
 
   // Eine Normsorte bleibt, wie sie ist -- es gibt keinen Weg, sie zu ändern,
@@ -133,9 +154,9 @@ export function materialEditor(material) {
   // keine Sorte; seine Vorlage zählt nur beim Anlegen.
   const kopf = gesperrt
     ? el('div.gesperrt-hinweis', {}, [
-      el('span.sia', { text: 'SIA' }),
+      el('span.sia', { text: fest.marke }),
       el('div', { style: { flex: '1 1 220px' } }, [
-        el('b', { text: `Normsorte ${material.sorte}` }),
+        el('b', { text: `${fest.gross} ${material.sorte}` }),
         ` · ${katalog('materialarten', material.art, 'grundlagen', material.sorte)}; nicht `
         + 'änderbar. Abweichen: links «+» → eigenes Material.',
       ]),
@@ -154,10 +175,10 @@ export function materialEditor(material) {
     panel({ schluessel: 'material/Material', titel: 'Material' }, [
       feld('Bezeichnung', namensfeld({
         wert: material.name || material.sorte, gesperrt,
-        titel: gesperrt ? 'Eine Normsorte trägt zwingend ihre Sortenbezeichnung' : '',
+        titel: gesperrt ? `Eine ${fest.klein} trägt zwingend ihre Sortenbezeichnung` : '',
         pruefen: (name) => {
           if (katalog('materialarten', material.art, 'anlegen').includes(name)) {
-            return `Den Namen «${name}» trägt eine Normsorte`;
+            return `Den Namen «${name}» trägt eine ${fest.klein}`;
           }
           return vergeben(material, name) ? `Den Namen «${name}» trägt schon ein anderes Material` : '';
         },
@@ -165,7 +186,7 @@ export function materialEditor(material) {
       })),
     ]),
 
-    panel({ schluessel: 'material/Grundwerte', titel: 'Grundwerte', zusatz: 'Sortentabelle, Norm' },
+    panel({ schluessel: 'material/Grundwerte', titel: 'Grundwerte', zusatz: fest.grundwerte },
       vorlagen.filter((v) => !v.berechnet).map((v) => kennwertZeile(material, v))),
 
     panel({
@@ -198,8 +219,8 @@ function vergeben(material, name) {
     .some((m) => m.kennung !== material.kennung && (m.name || m.sorte) === name);
 }
 
-/** Was über dem Editor steht: die Art, und ob es eine Normsorte ist. */
+/** Was über dem Editor steht: die Art, und ob es eine Normsorte ist -- oder eine feste Sorte. */
 export function materialHinweis(material) {
   return katalog('materialarten', material.art, 'titel')
-    + (material.eigenstaendig ? ' · eigenes Material' : ' · Normsorte SIA');
+    + (material.eigenstaendig ? ' · eigenes Material' : ` · ${festeSorte(material.art).lang}`);
 }

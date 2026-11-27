@@ -32,6 +32,10 @@ sammeln sie sich hier, je mit dem, was vorläufig gebaut ist.
       bei 1366 px stünde die Leiste dann neben der Zeichnung, aber der
       Bericht hätte nur noch 300 statt 519 px. Vorschlag: so lassen, für
       langes Zeichnen das Vollbild. Vorläufig: 640 px.
+- [ ] **Wasser: «fest» statt «SIA»?** Das Wasser bleibt wie eine Normsorte,
+      wie es ist, steht aber in keiner Norm. Es heisst darum «Feste Sorte»
+      und trägt die Marke «fest», wo Normsorten «SIA» tragen. Vorschlag: so
+      lassen. Sonst etwa «Vorgabe». Vorläufig: «fest».
 
 ## Wünsche vom 2026-11-20
 
@@ -967,6 +971,13 @@ Norm dazu sagt.
       zu Fliessdehnung, das 3.2.2.4 für die plastischen Verfahren verlangt.
       Bestätigen oder eine andere Zahl nennen. Wirkt seit 2026-11-26 in den
       Spannung-Dehnung-Analysen: dort endet die Linie eines Stahlquerschnitts.
+- [ ] **Wasser, 1000 kg/m³ nach Vorgabe** (`opencivil/material/fluessigkeit.py`,
+      seit 2026-11-27). SIA 261:2020 rechnet den Wasserdruck mit der
+      Raumlast γ_w,k (4.4.2.1, Gl. (8)), nennt aber keine Zahl; die
+      Flüssigkeiten in Anhang A, Tabelle 30, sind Lagergüter, das Wasser
+      steht nicht darunter. Mit g = 10 m/s² gibt das γ_w = 10 kN/m³, die
+      Vorgabe des Feldes γ_w von früher. Bestätigen oder eine Normstelle
+      nennen.
 - [ ] **Profilblechstahl, nach Vorgabe** (`opencivil/material/profilblech.py`,
       seit 2026-11-27).
       - Die Linie endet wie beim Baustahl bei ε_ud = 15·ε_yp, für SE 350 G

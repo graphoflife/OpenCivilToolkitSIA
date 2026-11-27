@@ -44,7 +44,7 @@ NACH VORGABE, NICHT NACHGESCHLAGEN (auch in TODO):
   Vergroesserung der Querkraft fuer hoehere Eigenformen (97) (Benutzer,
   2026-11-21);
 - g = 10 m/s^2 wie beim Eigengewicht
-  (:data:`~opencivil.stabwerk.rechnung.ERDBESCHLEUNIGUNG`).
+  (:data:`~opencivil.material.basis.ERDBESCHLEUNIGUNG`).
 
 QUELLE:
 SIA 261:2020: 16.2 (Einwirkung), 16.3 (Bauwerksklassen), 16.5.1 und 16.5.2.
@@ -74,7 +74,7 @@ from opencivil.core.rechenobjekt import Rechenobjekt
 from opencivil.core.vorgaben import Feld, Gruppe
 from opencivil.core.wahl import Wahl
 from opencivil.core.wert import Wert, WertDef
-from opencivil.stabwerk.rechnung import ERDBESCHLEUNIGUNG
+from opencivil.material.basis import ERDBESCHLEUNIGUNG
 from opencivil.stabwerk.stabquerschnitt import keine_hauptachsen
 
 SIA = "SIA 261:2020"

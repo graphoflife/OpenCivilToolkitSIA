@@ -220,7 +220,7 @@ class TestApiAbbildung(unittest.TestCase):
         self.assertEqual(len(k["erfuellungsarten"]), 4)
         self.assertEqual(list(k["materialarten"]),
                          ["beton", "betonstahl", "baustahl", "spannstahl", "holz",
-                          "profilblech"])
+                          "profilblech", "fluessigkeit"])
         for art, angaben in k["materialarten"].items():
             with self.subTest(art=art):
                 self.assertTrue(any(v["berechnet"] for v in angaben["kennwerte"]))
@@ -232,7 +232,14 @@ class TestApiAbbildung(unittest.TestCase):
         self.assertEqual(k["materialarten"]["profilblech"]["anlegen"][0], "SE 350 G")
         self.assertEqual(k["materialarten"]["profilblech"]["neu"], "Neuer Profilblechstahl")
         self.assertEqual({a["eigene"] for a in k["materialarten"].values()},
-                         {"BE", "S", "ST", "SP", "H", "PB"})
+                         {"BE", "S", "ST", "SP", "H", "PB", "FL"})
+        # Das Wasser ist eine feste Sorte, aber aus keiner Norm, und weiblich.
+        wasser = k["materialarten"]["fluessigkeit"]
+        self.assertEqual((wasser["neu"], wasser["eigen"], wasser["kein"], wasser["kein_wort"],
+                          wasser["aus_norm"]),
+                         ("Neue Flüssigkeit", "Eigene Flüssigkeit", "keine Flüssigkeit", "keine",
+                          False))
+        self.assertTrue(k["materialarten"]["beton"]["aus_norm"])
 
     def test_werte_tragen_ihre_herkunft(self):
         d = self.d
@@ -567,12 +574,12 @@ class TestAngabengruppen(unittest.TestCase):
             *(f"querschnittsanalyse.{a}.{n}" for a in ("a1", "a2")
               for n in ("A", "y_S", "z_S", "I_y", "I_z", "I_yz")),
             *(f"grundbruch.g1.{n}" for n in (
-                "phi_k", "gamma_phi", "c_k", "gamma_c", "gamma", "gamma_w", "b", "L", "t",
+                "phi_k", "gamma_phi", "c_k", "gamma_c", "gamma", "b", "L", "t",
                 "alpha", "t1", "beta", "q_Ed", "delta_faktor")),
             *(f"setzung.w1.{n}" for n in ("B", "L", "q_W", "q_E", "s_zul", "dz")),
             *(f"setzung.w1.{n}_{i}" for i in (1, 2, 3) for n in ("d", "M_E", "M_E_strich")),
             *(f"pfahl.t1.{n}" for n in (
-                "D", "L", "t_K", "t_w", "gamma_w", "n", "phi_l", "c", "phi_w", "s_w", "eta_i",
+                "D", "L", "t_K", "t_w", "n", "phi_l", "c", "phi_w", "s_w", "eta_i",
                 "eta_a", "t_red", "eta_tr")),
             *(f"pfahl.t1.{n}_{i}" for i in (1, 2, 3)
               for n in ("d", "gamma", "phi_k", "c_k", "E_s")),

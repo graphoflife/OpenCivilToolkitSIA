@@ -1,5 +1,5 @@
 ---
-erzeugt: 2271bcb4790a
+erzeugt: 5bce30096ba3
 art: modul
 tags: [modul]
 ---
@@ -195,6 +195,7 @@ Erzeugt einen Spannstahl aus der Sortentabelle.
 
 - [[opencivil.material.arten]]
 - [[opencivil.projekt.aufbau.querschnittsanalyse]]
+- [[opencivil.projekt.projekt]]
 - [[opencivil.querschnitt.spannglieder]]
 - [[opencivil.web.api]]
 - [[opencivil.web.werkstoffkurven]]

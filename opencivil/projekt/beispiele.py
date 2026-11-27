@@ -23,7 +23,7 @@ from opencivil.projekt.balkensystem import DIAGRAMMGROESSEN
 from opencivil.projekt.balkensystem3d import DIAGRAMMGROESSEN as DIAGRAMMGROESSEN3D
 from opencivil.projekt.decke import PLATTENGROESSEN
 from opencivil.projekt.eintraege import (
-    Gebrauchswahl, KnickVerformungswahl, KnickWiderstandswahl, RechenwahlEintrag,
+    Gebrauchswahl, KnickVerformungswahl, KnickWiderstandswahl, RechenwahlEintrag, erstes_material,
 )
 from opencivil.projekt.platte import QuerschnittEintrag
 from opencivil.projekt.projekt import Projekt
@@ -46,6 +46,7 @@ def beispiel() -> Projekt:
     projekt = Projekt(name="OCT Projekt")
     projekt.beton("C30/37")
     projekt.stahl("B500B")
+    projekt.fluessigkeit()
     # Aussen y, innen x -- der übliche Fall: die Querrichtung läuft unten
     # und oben durch, die Tragrichtung liegt dazwischen und verliert
     # dadurch statische Höhe. Die 2. Lage trägt eine Zulage.
@@ -166,6 +167,7 @@ def jeder_nachweis() -> Projekt:
     p.spannstahl("Y1860")
     p.holz("GL24h")
     p.profilblech("SE 350 G")
+    p.fluessigkeit()
     decke = p.platte("Decke", h=300, x=[18, 12], x_zulage=[12, 0], y=[12, 12],
                      rissanforderung="erhoeht", duktilitaet=True, sproede=True,
                      zwaengung=True, zwaengung_begrenzt=True,
@@ -532,8 +534,8 @@ def _tragwand(kennung: str, name: str, ecken: list, beton: str) -> Querschnittsa
 
 
 def _erstes(p: Projekt, art: str) -> str:
-    """Die Kennung des ersten Materials dieser Art im Projekt."""
-    return next(m.kennung for m in p.materialien if m.art == art)
+    """Die Kennung des ersten Materials dieser Art im Projekt -- kurz, weil oft gebraucht."""
+    return erstes_material(p.materialien, art)
 
 
 def charakteristisch(eintrag) -> dict:

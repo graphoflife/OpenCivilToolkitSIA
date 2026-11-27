@@ -28,7 +28,7 @@
 \date{\today}
 \begin{document}
 \maketitle
-957 Berechnungen ausgeführt, 1547 Werte bestimmt.
+960 Berechnungen ausgeführt, 1550 Werte bestimmt.
 
 \section{Herleitung}
 \subsection{Plattenanalyse: Decke}
@@ -16559,9 +16559,9 @@ c_{eff} = \frac{c_k}{\gamma_c} = \frac{6\,\mathrm{kPa}}{1.5} = 4\,\mathrm{kPa}
 \begin{equation*}
 \gamma = 21\,\mathrm{kN}/\mathrm{m}^{3}
 \end{equation*}
-\noindent\textbf{Raumlast des Wassers}
+\noindent\textbf{Raumlast des Grundwassers, «Wasser»}
 \begin{equation*}
-\gamma_w = 10\,\mathrm{kN}/\mathrm{m}^{3}
+\gamma_w = \gamma_{fl} = 10\,\mathrm{kN}/\mathrm{m}^{3}
 \end{equation*}
 \noindent\textbf{Raumlast des Bodens unter Auftrieb}
 \begin{equation*}
@@ -16839,6 +16839,19 @@ T_{Ed} = 300\,\mathrm{kN} \quad > \quad T_{Rd} = 50.8\,\mathrm{kN}
 \begin{equation*}
 \alpha_{eff,GL,\text{Steil}} = \frac{T_{Rd}}{T_{Ed}} = \frac{50.8\,\mathrm{kN}}{300\,\mathrm{kN}} = 0.17 \quad \Rightarrow \quad \text{NICHT erfüllt}
 \end{equation*}
+\subsection{Flüssigkeit: Wasser}
+\noindent\textbf{Dichte der Flüssigkeit}
+\begin{equation*}
+\rho_{fl} = 1000\,\mathrm{kg}/\mathrm{m}^{3}
+\end{equation*}
+\noindent\textbf{Erdbeschleunigung}
+\begin{equation*}
+g = 10\,\mathrm{m}/\mathrm{s}^{2}
+\end{equation*}
+\noindent\textbf{Raumlast der Flüssigkeit}
+\begin{equation*}
+\gamma_{fl} = \rho_{fl} \cdot g = 1000\,\mathrm{kg}/\mathrm{m}^{3} \cdot 10\,\mathrm{m}/\mathrm{s}^{2} = 10\,\mathrm{kN}/\mathrm{m}^{3}
+\end{equation*}
 \subsection{Grundbruch: Ufer}
 \noindent\textbf{Reibungswinkel, charakteristisch}
 \begin{equation*}
@@ -16868,9 +16881,9 @@ c_{eff} = \frac{c_k}{\gamma_c} = \frac{0\,\mathrm{kPa}}{1.5} = 0\,\mathrm{kPa}
 \begin{equation*}
 \gamma = 21\,\mathrm{kN}/\mathrm{m}^{3}
 \end{equation*}
-\noindent\textbf{Raumlast des Wassers}
+\noindent\textbf{Raumlast des Grundwassers, «Wasser»}
 \begin{equation*}
-\gamma_w = 10\,\mathrm{kN}/\mathrm{m}^{3}
+\gamma_w = \gamma_{fl} = 10\,\mathrm{kN}/\mathrm{m}^{3}
 \end{equation*}
 \noindent\textbf{Raumlast des Bodens unter Auftrieb}
 \begin{equation*}
@@ -17109,9 +17122,9 @@ c_{eff} = \frac{c_k}{\gamma_c} = \frac{3\,\mathrm{kPa}}{1.5} = 2\,\mathrm{kPa}
 \begin{equation*}
 \gamma = 21\,\mathrm{kN}/\mathrm{m}^{3}
 \end{equation*}
-\noindent\textbf{Raumlast des Wassers}
+\noindent\textbf{Raumlast des Grundwassers, «Wasser»}
 \begin{equation*}
-\gamma_w = 10\,\mathrm{kN}/\mathrm{m}^{3}
+\gamma_w = \gamma_{fl} = 10\,\mathrm{kN}/\mathrm{m}^{3}
 \end{equation*}
 \noindent\textbf{Raumlast des Bodens unter Auftrieb}
 \begin{equation*}
@@ -17851,10 +17864,6 @@ t_K = 1\,\mathrm{m}
 \begin{equation*}
 t_w = 4\,\mathrm{m}
 \end{equation*}
-\noindent\textbf{Raumlast des Wassers}
-\begin{equation*}
-\gamma_w = 10\,\mathrm{kN}/\mathrm{m}^{3}
-\end{equation*}
 \noindent\textbf{Umrechnungsfaktor des äusseren Widerstands} \hfill \normref{SIA 267:2013, 9.5.2.2.5, (48)}
 \begin{equation*}
 \eta_a = 0.7
@@ -17938,6 +17947,10 @@ k_{\delta,3} = 0.8
 \noindent\textbf{Verformungsmodul der Schicht 3, charakteristisch}
 \begin{equation*}
 E_{s,k,3} = 100\,\mathrm{MN}/\mathrm{m}^{2}
+\end{equation*}
+\noindent\textbf{Raumlast des Grundwassers, «Wasser»}
+\begin{equation*}
+\gamma_w = \gamma_{fl} = 10\,\mathrm{kN}/\mathrm{m}^{3}
 \end{equation*}
 \subsection{Äusserer Widerstand}
 \subsubsection{Mantel}
@@ -18582,10 +18595,6 @@ t_K = 0.5\,\mathrm{m}
 \begin{equation*}
 t_w = 1\,\mathrm{m}
 \end{equation*}
-\noindent\textbf{Raumlast des Wassers}
-\begin{equation*}
-\gamma_w = 10\,\mathrm{kN}/\mathrm{m}^{3}
-\end{equation*}
 \noindent\textbf{Umrechnungsfaktor des äusseren Widerstands} \hfill \normref{SIA 267:2013, 9.5.2.2.5, (48)}
 \begin{equation*}
 \eta_a = 0.7
@@ -18629,6 +18638,10 @@ s_{u,k,2} = 110\,\mathrm{kPa}
 \noindent\textbf{Verformungsmodul der Schicht 2, charakteristisch}
 \begin{equation*}
 E_{s,k,2} = 40\,\mathrm{MN}/\mathrm{m}^{2}
+\end{equation*}
+\noindent\textbf{Raumlast des Grundwassers, «Wasser»}
+\begin{equation*}
+\gamma_w = \gamma_{fl} = 10\,\mathrm{kN}/\mathrm{m}^{3}
 \end{equation*}
 \subsection{Äusserer Widerstand}
 \subsubsection{Mantel}
@@ -19360,10 +19373,6 @@ t_K = 0\,\mathrm{m}
 \begin{equation*}
 t_w = 10\,\mathrm{m}
 \end{equation*}
-\noindent\textbf{Raumlast des Wassers}
-\begin{equation*}
-\gamma_w = 10\,\mathrm{kN}/\mathrm{m}^{3}
-\end{equation*}
 \noindent\textbf{Umrechnungsfaktor des äusseren Widerstands} \hfill \normref{SIA 267:2013, 9.5.2.2.5, (46)}
 \begin{equation*}
 \eta_a = 0.9
@@ -19395,6 +19404,10 @@ q_{s,k,1} = 120\,\mathrm{kPa}
 \noindent\textbf{Verformungsmodul der Schicht 1, charakteristisch}
 \begin{equation*}
 E_{s,k,1} = 80\,\mathrm{MN}/\mathrm{m}^{2}
+\end{equation*}
+\noindent\textbf{Raumlast des Grundwassers, «Wasser»}
+\begin{equation*}
+\gamma_w = \gamma_{fl} = 10\,\mathrm{kN}/\mathrm{m}^{3}
 \end{equation*}
 \subsection{Äusserer Widerstand}
 \subsubsection{Mantel}
@@ -24598,6 +24611,10 @@ u_0 = 3 \cdot d_v + \frac{\pi \cdot d_v}{4}
 \begin{equation*}
 c_{eff} = \frac{c_k}{\gamma_c}
 \end{equation*}
+\noindent\textbf{Raumlast des Grundwassers, «Wasser»}
+\begin{equation*}
+\gamma_w = \gamma_{fl}
+\end{equation*}
 \noindent\textbf{Raumlast des Bodens unter Auftrieb}
 \begin{equation*}
 \gamma' = \gamma - \gamma_w
@@ -24605,6 +24622,11 @@ c_{eff} = \frac{c_k}{\gamma_c}
 \noindent\textbf{Undrainierte Scherfestigkeit, Bemessungswert} \hfill \normref{SIA 267:2013, 5.3.2.1, (5)}
 \begin{equation*}
 s_{u,d} = \frac{s_{u,k}}{\gamma_{cu}}
+\end{equation*}
+\subsection{Flüssigkeit}
+\noindent\textbf{Raumlast der Flüssigkeit}
+\begin{equation*}
+\gamma_{fl} = \rho_{fl} \cdot g
 \end{equation*}
 \subsection{Grundbruch}
 Unter der Sohle bildet sich beim Grundbruch ein Gleitkörper, der den Boden seitlich hinaus und nach oben drückt. Die erweiterte Tragfähigkeitsformel setzt seinen Widerstand aus drei Teilen zusammen: der Kohäsion, der seitlichen Auflast neben dem Fundament und dem Gewicht des Gleitkörpers – je mit einem Tragfähigkeitsfaktor und den Korrekturen für Form, Tiefe, Lastneigung, Geländeneigung und Sohlneigung.
@@ -27472,6 +27494,9 @@ Beiwert der Nutzlast, quasi-ständig & $\psi_{2,7}$ & $0.3$ &  & Vorgabe \\
 Beiwert der Nutzlast, quasi-ständig & $\psi_{2,8}$ & $0.3$ &  & Vorgabe \\
 Verhaltensbeiwert in x & $q_x$ & $3$ &  & Vorgabe \\
 Verhaltensbeiwert in y & $q_y$ & $3$ &  & Vorgabe \\
+Erdbeschleunigung & $g$ & $10$ & m/s² & Vorgabe \\
+Raumlast der Flüssigkeit & $\gamma_{fl}$ & $10$ & kN/m³ & berechnet \\
+Dichte der Flüssigkeit & $\rho_{fl}$ & $1000$ & kg/m³ & Vorgabe \\
 Länge des Fundaments & $L$ & $4$ & m & Vorgabe \\
 Neigung der Sohle & $\alpha$ & $5$ & ° & Vorgabe \\
 Breite des Fundaments & $b$ & $1.6$ & m & Vorgabe \\
@@ -27483,7 +27508,7 @@ Raumlast des Bodens, ohne Partialfaktor & $\gamma$ & $21$ & kN/m³ & Vorgabe \\
 Raumlast des Bodens unter Auftrieb & $\gamma'$ & $11$ & kN/m³ & berechnet \\
 Partialfaktor der Kohäsion & $\gamma_c$ & $1.5$ &  & Vorgabe \\
 Partialfaktor des Reibungswinkels & $\gamma_{\varphi}$ & $1.2$ &  & Vorgabe \\
-Raumlast des Wassers & $\gamma_w$ & $10$ & kN/m³ & Vorgabe \\
+Raumlast des Grundwassers & $\gamma_w$ & $10$ & kN/m³ & berechnet \\
 Erfüllungsgrad Gleiten – Normal & $\alpha_{eff,GL,\text{Normal}}$ & $2.54$ &  & berechnet \\
 Erfüllungsgrad Gleiten – Steil & $\alpha_{eff,GL,\text{Steil}}$ & $0.17$ &  & berechnet \\
 Erfüllungsgrad Grundbruch – Normal & $\alpha_{eff,GB,\text{Normal}}$ & $2.17$ &  & berechnet \\
@@ -27504,7 +27529,7 @@ Raumlast des Bodens, ohne Partialfaktor & $\gamma$ & $21$ & kN/m³ & Vorgabe \\
 Raumlast des Bodens unter Auftrieb & $\gamma'$ & $11$ & kN/m³ & berechnet \\
 Partialfaktor der Kohäsion & $\gamma_c$ & $1.5$ &  & Vorgabe \\
 Partialfaktor des Reibungswinkels & $\gamma_{\varphi}$ & $1.2$ &  & Vorgabe \\
-Raumlast des Wassers & $\gamma_w$ & $10$ & kN/m³ & Vorgabe \\
+Raumlast des Grundwassers & $\gamma_w$ & $10$ & kN/m³ & berechnet \\
 Erfüllungsgrad Gleiten – Tragsicherheit & $\alpha_{eff,GL,\text{Tragsicherheit}}$ & $5.77$ &  & berechnet \\
 Erfüllungsgrad Grundbruch – Tragsicherheit & $\alpha_{eff,GB,\text{Tragsicherheit}}$ & $0.52$ &  & berechnet \\
 Reibungswinkel, Bemessungswert & $\varphi_{eff}$ & $25.69$ & ° & berechnet \\
@@ -27523,7 +27548,7 @@ Raumlast des Bodens, ohne Partialfaktor & $\gamma$ & $21$ & kN/m³ & Vorgabe \\
 Raumlast des Bodens unter Auftrieb & $\gamma'$ & $11$ & kN/m³ & berechnet \\
 Partialfaktor der Kohäsion & $\gamma_c$ & $1.5$ &  & Vorgabe \\
 Partialfaktor des Reibungswinkels & $\gamma_{\varphi}$ & $1.2$ &  & Vorgabe \\
-Raumlast des Wassers & $\gamma_w$ & $10$ & kN/m³ & Vorgabe \\
+Raumlast des Grundwassers & $\gamma_w$ & $10$ & kN/m³ & berechnet \\
 Erfüllungsgrad Gleiten – Tragsicherheit & $\alpha_{eff,GL,\text{Tragsicherheit}}$ & $11.08$ &  & berechnet \\
 Erfüllungsgrad Grundbruch – Tragsicherheit & $\alpha_{eff,GB,\text{Tragsicherheit}}$ & $9.02$ &  & berechnet \\
 Reibungswinkel, Bemessungswert & $\varphi_{eff}$ & $23.9$ & ° & berechnet \\
@@ -27588,7 +27613,7 @@ Umrechnungsfaktor des äusseren Widerstands quer & $\eta_{a,tr}$ & $0.7$ &  & Vo
 Raumlast der Schicht 1 & $\gamma_{1}$ & $19$ & kN/m³ & Vorgabe \\
 Raumlast der Schicht 2 & $\gamma_{2}$ & $21$ & kN/m³ & Vorgabe \\
 Raumlast der Schicht 3 & $\gamma_{3}$ & $22$ & kN/m³ & Vorgabe \\
-Raumlast des Wassers & $\gamma_w$ & $10$ & kN/m³ & Vorgabe \\
+Raumlast des Grundwassers & $\gamma_w$ & $10$ & kN/m³ & berechnet \\
 Zahl der Längsstäbe & $n$ & $12$ &  & Vorgabe \\
 Erfüllungsgrad äusserer Widerstand – Druck & $\alpha_{eff,a,\text{Druck}}$ & $1.03$ &  & berechnet \\
 Erfüllungsgrad äusserer Widerstand – Zug & $\alpha_{eff,a,\text{Zug}}$ & $1.62$ &  & berechnet \\
@@ -27628,7 +27653,7 @@ Umrechnungsfaktor des inneren Widerstands & $\eta_i$ & $0.8$ &  & Vorgabe \\
 Umrechnungsfaktor des äusseren Widerstands quer & $\eta_{a,tr}$ & $0.7$ &  & Vorgabe \\
 Raumlast der Schicht 1 & $\gamma_{1}$ & $18$ & kN/m³ & Vorgabe \\
 Raumlast der Schicht 2 & $\gamma_{2}$ & $20$ & kN/m³ & Vorgabe \\
-Raumlast des Wassers & $\gamma_w$ & $10$ & kN/m³ & Vorgabe \\
+Raumlast des Grundwassers & $\gamma_w$ & $10$ & kN/m³ & berechnet \\
 Zahl der Längsstäbe & $n$ & $16$ &  & Vorgabe \\
 Erfüllungsgrad äusserer Widerstand – Druck & $\alpha_{eff,a,\text{Druck}}$ & $0.39$ &  & berechnet \\
 Erfüllungsgrad innerer Widerstand – Druck & $\alpha_{eff,i,\text{Druck}}$ & $3.45$ &  & berechnet \\
@@ -27672,7 +27697,7 @@ Umrechnungsfaktor des äusseren Widerstands & $\eta_a$ & $0.9$ &  & Vorgabe \\
 Umrechnungsfaktor des inneren Widerstands & $\eta_i$ & $0.8$ &  & Vorgabe \\
 Umrechnungsfaktor des äusseren Widerstands quer & $\eta_{a,tr}$ & $0.7$ &  & Vorgabe \\
 Raumlast der Schicht 1 & $\gamma_{1}$ & $21$ & kN/m³ & Vorgabe \\
-Raumlast des Wassers & $\gamma_w$ & $10$ & kN/m³ & Vorgabe \\
+Raumlast des Grundwassers & $\gamma_w$ & $10$ & kN/m³ & berechnet \\
 Erfüllungsgrad äusserer Widerstand – Zug & $\alpha_{eff,a,\text{Zug}}$ & $1.27$ &  & berechnet \\
 Erfüllungsgrad innerer Widerstand – Zug & $\alpha_{eff,i,\text{Zug}}$ & $2.36$ &  & berechnet \\
 Erfüllungsgrad Biegung im Pfahl – Zug & $\alpha_{eff,M,\text{Zug}}$ & $2.62$ &  & berechnet \\

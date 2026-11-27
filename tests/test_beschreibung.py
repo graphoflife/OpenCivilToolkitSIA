@@ -27,7 +27,7 @@ from tests.unfertig import meldung
 class TestProjektBeschreibung(unittest.TestCase):
     def test_beispiel_baut_durch(self):
         aufbau = Projekt.beispiel().aufbauen()
-        self.assertEqual(len(aufbau.baustoffe), 2)
+        self.assertEqual(len(aufbau.baustoffe), 3)              # C30/37, B500B und das Wasser
         self.assertEqual(len(aufbau.querschnitte), 1)
         self.assertEqual(len(aufbau.querschnittsanalysen), 2)   # Unterzug und Wand des Hauses
         self.assertEqual(sorted(aufbau.feld("nachweise")), ["q1.x"])

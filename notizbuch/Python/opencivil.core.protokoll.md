@@ -1,5 +1,5 @@
 ---
-erzeugt: 5ea2f531d737
+erzeugt: 3a0f66e13527
 art: modul
 tags: [modul]
 ---
@@ -599,6 +599,7 @@ Oberflaeche und alle Berichte gehen.
 - [[opencivil.geotechnik.grundbruch]]
 - [[opencivil.geotechnik.setzung]]
 - [[opencivil.geotechnik.tragfaehigkeit]]
+- [[opencivil.geotechnik.wasser]]
 - [[opencivil.material.basis]]
 - [[opencivil.nachweis.biegung_normalkraft]]
 - [[opencivil.nachweis.duktilitaet]]

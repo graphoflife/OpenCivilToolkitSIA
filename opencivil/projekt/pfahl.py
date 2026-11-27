@@ -25,6 +25,11 @@ bis 2 m unter Terrain von null an.
 
 Die Namen der Schichten müssen nicht verschieden sein, wie bei der Setzung:
 die Werte tragen die Nummer der Schicht.
+
+Seit 2026-11-27 ist das Grundwasser ein Material, eine Flüssigkeit, wie beim
+Grundbruch: statt γ_w = 10 kN/m³ wählt der Pfahl das Wasser des Projekts.
+Ob jede Schicht schwerer ist als es, prüft der Aufbau
+(:mod:`opencivil.projekt.aufbau.pfahl`) -- nur er kennt sein Gewicht.
 """
 
 from __future__ import annotations
@@ -41,7 +46,7 @@ from opencivil.pfahl.pfahl import (
 )
 from opencivil.projekt.eintraege import BauteilEintrag, Beschreibung
 from opencivil.projekt.fallnamen import Fallnamen
-from opencivil.projekt.lesen import ProjektFehler, bereich, lesen
+from opencivil.projekt.lesen import ProjektFehler, bereich, lesen, materialfeld
 
 
 @dataclass
@@ -100,7 +105,7 @@ class PfahlEintrag(BauteilEintrag):
     BEZEICHNUNG = "Pfahl"
     STAMM = "Pfahl"
     #: Angelegt wird ein Bohrpfahl, und er braucht den Beton.
-    ERSTE_MATERIALIEN = {"beton": "beton", "stahl": "betonstahl"}
+    ERSTE_MATERIALIEN = {"beton": "beton", "stahl": "betonstahl", "wasser": "fluessigkeit"}
 
     kennung: str
     name: str
@@ -116,7 +121,8 @@ class PfahlEintrag(BauteilEintrag):
     L: float = bereich(10.0, heisst="Länge L", einheit=M, ueber=0.0)
     t_K: float = bereich(1.0, heisst="Tiefe des Kopfs t_K", einheit=M, ab=0.0)
     t_w: float = bereich(0.0, heisst="Tiefe des Grundwassers t_w", einheit=M, ab=0.0)
-    gamma_w: float = bereich(10.0, heisst="γ_w", einheit=KN_PRO_M3, ab=0.0)
+    wasser: str = materialfeld("fluessigkeit")
+    """Kennung des Grundwassers, einer Flüssigkeit -- bis 2026-11-27 die Zahl γ_w."""
 
     grundlage: Grundlage = Grundlage.BERECHNUNG
     eta_a: float = bereich(0.7, heisst="η_a", ueber=0.0, bis=1.0)
@@ -164,7 +170,17 @@ class PfahlEintrag(BauteilEintrag):
 
     def materialien(self) -> List[str]:
         """Die Materialien, die der Pfahl braucht: der Beton nur beim Bohrpfahl."""
-        return [k for k in ((self.beton if self.bohrpfahl else ""), self.stahl) if k]
+        return [k for k in ((self.beton if self.bohrpfahl else ""), self.stahl, self.wasser) if k]
+
+    @property
+    def schichten_tragen(self) -> bool:
+        """
+        Ob die Festigkeit der Schichten in eine Rechnung eingeht: ohne R_a,k
+        aus einem Versuch immer, mit ihm nur, wenn eine Kombination den Pfahl
+        quer belastet -- der Erdwiderstand quer kommt aus den Schichten.
+        """
+        return not self.grundlage.aus_versuch or any(
+            quer_belastet(k.H_Ed, k.M_Ed, self.kopf) for k in self.kombinationen if k.aktiv)
 
     @property
     def bohrpfahl(self) -> bool:
@@ -216,9 +232,7 @@ class PfahlEintrag(BauteilEintrag):
                 f"η_a,tr = {self.eta_tr:g} liegt über {berechnung.eta_grenze:g}, dem "
                 f"Grenzwert für einen gerechneten Widerstand ({berechnung.referenz}); quer "
                 f"wird er immer gerechnet.", wo=wo)
-        if not self.grundlage.aus_versuch or any(
-                quer_belastet(k.H_Ed, k.M_Ed, self.kopf) for k in self.kombinationen if k.aktiv):
-            # Auch mit R_a,k aus dem Versuch: der Erdwiderstand quer kommt aus den Schichten.
+        if self.schichten_tragen:
             self._festigkeiten(wo)
         if self.bohrpfahl:
             self._bewehrung(wo)
@@ -247,11 +261,6 @@ class PfahlEintrag(BauteilEintrag):
     def _festigkeiten(self, wo: str) -> None:
         """Was jede Schicht haben muss, damit ihr Widerstand eine Zahl wird."""
         for i, s in enumerate(self.schichten, start=1):
-            if s.gamma <= self.gamma_w:
-                raise ProjektFehler(
-                    f"die Raumlast γ = {s.gamma:g} kN/m³ muss grösser sein "
-                    f"als die des Wassers, γ_w = {self.gamma_w:g} kN/m³ – sonst ist γ' nicht "
-                    f"positiv.", wo=f"{wo}, Schicht {i}")
             if s.verhalten is Verhalten.DRAINIERT and s.phi_k <= 0.0:
                 raise ProjektFehler(f"drainiert braucht φ'_k über null; "
                                     f"ohne Reibung die Schicht undrainiert rechnen.",

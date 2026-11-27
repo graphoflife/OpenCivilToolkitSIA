@@ -66,7 +66,8 @@ class TestAnlegen(unittest.TestCase):
         self.assertEqual(projekt.material_anlegen("baustahl", "S355").name, "S355")
         eigen = projekt.material_anlegen("beton", "C30/37", eigen=True)
         self.assertEqual((eigen.name, eigen.sorte, eigen.eigenstaendig), ("BE1", "C30/37", True))
-        self.assertEqual(projekt.material_anlegen("holz", "GL24h").kennung, "h1")
+        # GL24h steht schon im neuen Projekt, als h1.
+        self.assertEqual(projekt.material_anlegen("holz", "C24").kennung, "h2")
         with self.assertRaisesRegex(ProjektFehler, "Eine Materialart 'mauerwerk' gibt es nicht"):
             projekt.material_anlegen("mauerwerk", "MB")
 

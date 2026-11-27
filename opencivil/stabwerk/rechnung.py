@@ -68,7 +68,7 @@ from opencivil.core.einheiten import (
 from opencivil.core.protokoll import Abschnitt, Protokoll
 from opencivil.core.rechenobjekt import Rechenobjekt
 from opencivil.core.wert import Quelle, WertDef
-from opencivil.material.basis import Baustoff, Baustoffart, mit_index
+from opencivil.material.basis import ERDBESCHLEUNIGUNG, Baustoff, Baustoffart, mit_index
 from opencivil.stabwerk import herleitung
 from opencivil.stabwerk.modell import Lastart, Lastrichtung, Stablast, System
 from opencivil.stabwerk.stabquerschnitt import (
@@ -122,10 +122,6 @@ def stoffkennwerte(kennwerte: Sequence[Materialkennwert]) -> Dict[Baustoffart, D
 
 #: Welche Kennwerte eines Baustoffs ein Stab in der Ebene aus ihm nimmt.
 STABKENNWERTE = stoffkennwerte((E_MODUL, DICHTE))
-
-#: Die Erdbeschleunigung des Eigengewichts -- 10 m/s² nach Vorgabe des
-#: Benutzers (2026-10-23): so wiegt Stahlbeton 25 kN/m³.
-ERDBESCHLEUNIGUNG = Groesse(10.0, M_PRO_S2)
 
 #: Die Themen der Formelsammlung: was am Querschnitt haengt, und die Rechnung.
 QUERSCHNITTE = "Stabquerschnitte"

@@ -1,5 +1,5 @@
 ---
-erzeugt: b1c39bf9a08a
+erzeugt: 3dfb610a3482
 art: modul
 tags: [modul]
 ---
@@ -34,6 +34,11 @@ bis 2 m unter Terrain von null an.
 
 Die Namen der Schichten müssen nicht verschieden sein, wie bei der Setzung:
 die Werte tragen die Nummer der Schicht.
+
+Seit 2026-11-27 ist das Grundwasser ein Material, eine Flüssigkeit, wie beim
+Grundbruch: statt γ_w = 10 kN/m³ wählt der Pfahl das Wasser des Projekts.
+Ob jede Schicht schwerer ist als es, prüft der Aufbau
+([[opencivil.projekt.aufbau.pfahl]]) – nur er kennt sein Gewicht.
 
 ## Inhalt
 
@@ -90,7 +95,7 @@ Ein Einzelpfahl in seinem Baugrund, mit seinen Einwirkungen – siehe Dateikopf.
 
 - `BEZEICHNUNG = 'Pfahl'`
 - `STAMM = 'Pfahl'`
-- `ERSTE_MATERIALIEN = {'beton': 'beton', 'stahl': 'betonstahl'}` – Angelegt wird ein Bohrpfahl, und er braucht den Beton.
+- `ERSTE_MATERIALIEN = {'beton': 'beton', 'stahl': 'betonstahl', 'wasser': 'fluessigkeit'}` – Angelegt wird ein Bohrpfahl, und er braucht den Beton.
 - `kennung: str`
 - `name: str`
 - `art: Pfahlart = Pfahlart.BOHRPFAHL`
@@ -100,7 +105,7 @@ Ein Einzelpfahl in seinem Baugrund, mit seinen Einwirkungen – siehe Dateikopf.
 - `L: float = bereich(10.0, heisst='Länge L', einheit=M, ueber=0.0)`
 - `t_K: float = bereich(1.0, heisst='Tiefe des Kopfs t_K', einheit=M, ab=0.0)`
 - `t_w: float = bereich(0.0, heisst='Tiefe des Grundwassers t_w', einheit=M, ab=0.0)`
-- `gamma_w: float = bereich(10.0, heisst='γ_w', einheit=KN_PRO_M3, ab=0.0)`
+- `wasser: str = materialfeld('fluessigkeit')` – Kennung des Grundwassers, einer Flüssigkeit – bis 2026-11-27 die Zahl γ_w.
 - `grundlage: Grundlage = Grundlage.BERECHNUNG`
 - `eta_a: float = bereich(0.7, heisst='η_a', ueber=0.0, bis=1.0)` – Höchstens der Grenzwert der Grundlage – das prüft [[opencivil.projekt.pfahl#PfahlEintrag.regeln|regeln]].
 - `R_ak: float = bereich(1000.0, heisst='R_a,k auf Druck', einheit=KN, ab=0.0)`
@@ -141,6 +146,17 @@ def materialien(self) -> List[str]
 ```
 
 Die Materialien, die der Pfahl braucht: der Beton nur beim Bohrpfahl.
+
+#### PfahlEintrag.schichten_tragen
+
+```python
+@property
+def schichten_tragen(self) -> bool
+```
+
+Ob die Festigkeit der Schichten in eine Rechnung eingeht: ohne R_a,k
+aus einem Versuch immer, mit ihm nur, wenn eine Kombination den Pfahl
+quer belastet – der Erdwiderstand quer kommt aus den Schichten.
 
 #### PfahlEintrag.bohrpfahl
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: 5d4cd72b9c7a
+erzeugt: 9058fe186889
 art: modul
 tags: [modul]
 ---
@@ -30,3 +30,4 @@ tags: [modul]
 - [[opencivil.geotechnik.setzung]] – die Setzung eines Flachfundaments auf geschichtetem Baugrund.
 - [[opencivil.geotechnik.tragfaehigkeit]] – die Tragfähigkeitsfaktoren N_q und N_c.
 - [[opencivil.geotechnik.verhalten]] – wie ein Boden traegt.
+- [[opencivil.geotechnik.wasser]] – die Raumlast des Grundwassers, aus seiner Flüssigkeit.

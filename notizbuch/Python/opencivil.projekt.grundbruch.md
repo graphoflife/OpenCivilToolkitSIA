@@ -1,5 +1,5 @@
 ---
-erzeugt: a6bdb194ec64
+erzeugt: 3b2870c73b29
 art: modul
 tags: [modul]
 ---
@@ -26,6 +26,12 @@ bis 1 (Kap. 9.2.18).
 Am 2026-11-19 der Schalter drainiert/undrainiert, wie beim Pfahl (Benutzer):
 undrainiert mit s_u = 50 kPa, der Vorgabe des Pfahls, und gamma_cu = 1.5
 nach SIA 267:2013, 5.3.2.2, Tabelle 1.
+
+Seit 2026-11-27 ist das Wasser ein Material, eine Fluessigkeit
+([[opencivil.material.fluessigkeit]]): statt gamma_w = 10 kN/m³ waehlt der
+Grundbruch das Wasser des Projekts. Ob der Boden schwerer ist als es, prueft
+der Aufbau ([[opencivil.projekt.aufbau.grundbruch]]) – nur er kennt das
+Gewicht des Wassers.
 
 ## Inhalt
 
@@ -55,6 +61,7 @@ Ein Flachfundament auf seinem Baugrund, mit seinen Einwirkungen.
 
 - `BEZEICHNUNG = 'Grundbruch'`
 - `STAMM = 'Fundament'`
+- `ERSTE_MATERIALIEN = {'wasser': 'fluessigkeit'}`
 - `kennung: str`
 - `name: str`
 - `verhalten: Verhalten = Verhalten.DRAINIERT` – Womit der Boden trägt: drainiert mit phi_k und c_k, undrainiert mit s_u – derselbe Schalter wie beim Pfahl (Benutzer, 2026-11-19). Bis dahin hiess phi = 0 undrainiert, und c galt dann als s_u.
@@ -65,7 +72,7 @@ Ein Flachfundament auf seinem Baugrund, mit seinen Einwirkungen.
 - `s_u: float = bereich(50.0, heisst='s_u,k', einheit=KPA, ab=0.0)` – Undrainierte Scherfestigkeit, charakteristisch, in kPa – undrainiert.
 - `gamma_cu: float = bereich(1.5, heisst='Partialfaktor γ_cu', ueber=0.0)` – Partialfaktor der undrainierten Scherfestigkeit – SIA 267:2013, 5.3.2.2, Tabelle 1. Bis 2026-11-19 galt dafür gamma_c, mit demselben Wert.
 - `gamma: float = bereich(21.0, heisst='Raumlast γ', einheit=KN_PRO_M3, ueber=0.0)` – Raumlast des Bodens in kN/m³, über und unter dem Wasser dieselbe: unter ihm zählt gamma - gamma_w. Das Buch nimmt dort die gesättigte Raumlast (Kap. 1.4); mit der feuchten wird gamma' etwas kleiner, auf der sicheren Seite.
-- `gamma_w: float = bereich(10.0, heisst='γ_w', einheit=KN_PRO_M3, ab=0.0)` – Raumlast des Wassers in kN/m³ – nur drainiert, fuer gamma': undrainiert gelten totale Spannungen, das Wasser wirkt dort nicht.
+- `wasser: str = materialfeld('fluessigkeit')` – Die Kennung des Grundwassers, einer Fluessigkeit – nur drainiert, fuer gamma': undrainiert gelten totale Spannungen, das Wasser wirkt dort nicht. Bis 2026-11-27 stand hier die Zahl gamma_w = 10 kN/m³.
 - `q_Ed: float = bereich(0.0, heisst='Auflast q_Ed', einheit=KPA, ab=0.0)` – Auflast neben dem Fundament in kPa. Sie zählt nur, wenn sie dauernd und auf beiden Seiten mindestens über L_Gl liegt (Kap. 9.2.5); sie wirkt günstig.
 - `b: float = bereich(1.0, heisst='Breite b', einheit=M, ueber=0.0)` – Breite des Fundaments in m – die kürzere Seite.
 - `L: float = bereich(1.0, heisst='Länge L', einheit=M, ueber=0.0)` – Länge des Fundaments in m.
@@ -93,6 +100,21 @@ def kombination(self, name: str, *, N_Ed: float, T_Ed: float=0.0) -> Grundbruchk
 ```
 
 Eine Kombination anfügen – N normal zur Sohle, T in ihrer Richtung, in kN.
+
+#### GrundbruchEintrag.materialien
+
+```python
+def materialien(self) -> List[str]
+```
+
+Das Wasser nur drainiert: undrainiert wirkt es nicht, wie der Beton nur am Bohrpfahl.
+
+#### GrundbruchEintrag.drainiert
+
+```python
+@property
+def drainiert(self) -> bool
+```
 
 #### GrundbruchEintrag.fallnamen
 

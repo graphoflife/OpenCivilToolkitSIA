@@ -30,7 +30,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass, field
-from typing import Dict, List, Sequence, Tuple
+from typing import Dict, List, Optional, Sequence, Tuple
 
 from opencivil.core.berechnung import Berechnung, Eingabebezug, Formel
 from opencivil.core.einheiten import EINHEITSLOS, GRAD, KN_PRO_M3, KPA, M, Groesse
@@ -40,7 +40,9 @@ from opencivil.core.protokoll import Abschnitt, GleichungBlock, Protokoll
 from opencivil.core.rechenobjekt import Rechenobjekt
 from opencivil.core.vorgaben import Feld, Gruppe
 from opencivil.core.wert import Wert, WertDef, kennung_aus
+from opencivil.geotechnik.wasser import raumlast
 from opencivil.geotechnik.verhalten import Verhalten
+from opencivil.material.basis import Baustoff
 
 #: Die dauernde Auflast neben dem Fundament, Kap. 9.2.5 des Buches.
 KAP_AUFLAST = "Kap. 9.2.5"
@@ -52,8 +54,9 @@ _TABELLE_1 = "SIA 267:2013, 5.3.2.2, Tabelle 1"
 def _boden(verhalten: Verhalten) -> Tuple[Feld, ...]:
     """
     Je Verhalten seine Festigkeit; was nicht gilt, steht weder in der
-    Herleitung noch in der Maske (Benutzer, 2026-11-19). Das Wasser zählt nur
-    drainiert, über γ' -- undrainiert gelten totale Spannungen.
+    Herleitung noch in der Maske (Benutzer, 2026-11-19). Das Wasser ist keine
+    Zahl hier, sondern ein Material (:mod:`opencivil.geotechnik.wasser`); es
+    zählt nur drainiert, über γ' -- undrainiert gelten totale Spannungen.
     """
     if verhalten is Verhalten.DRAINIERT:
         festigkeit = (
@@ -67,8 +70,6 @@ def _boden(verhalten: Verhalten) -> Tuple[Feld, ...]:
             Feld("gamma_c", r"\gamma_c", EINHEITSLOS, "Partialfaktor der Kohäsion", 2, _TABELLE_1,
                  beschriftung="Partialfaktor", schritt=0.05),
         )
-        wasser = (Feld("gamma_w", r"\gamma_w", KN_PRO_M3, "Raumlast des Wassers", 1,
-                       beschriftung="Raumlast Wasser", schritt=0.5),)
     else:
         festigkeit = (
             Feld("s_u", "s_{u,k}", KPA, "Undrainierte Scherfestigkeit, charakteristisch", 1,
@@ -77,11 +78,9 @@ def _boden(verhalten: Verhalten) -> Tuple[Feld, ...]:
                  "Partialfaktor der undrainierten Scherfestigkeit", 2, _TABELLE_1,
                  beschriftung="Partialfaktor", schritt=0.05),
         )
-        wasser = ()
     return (*festigkeit,
             Feld("gamma", r"\gamma", KN_PRO_M3, "Raumlast des Bodens, ohne Partialfaktor", 1,
-                 _TABELLE_1, beschriftung="Raumlast Boden", schritt=0.5),
-            *wasser)
+                 _TABELLE_1, beschriftung="Raumlast Boden", schritt=0.5))
 
 
 #: Die Vorgaben des Grundbruchs, je Kasten der Herleitung und Karte der Maske
@@ -132,7 +131,8 @@ class Fundament(Rechenobjekt):
     gamma', undrainiert s_u,d.
 
     ``b`` ist die Breite, die kürzere Seite, ``L`` die Länge; ein
-    Streifenfundament ist ein sehr langes.
+    Streifenfundament ist ein sehr langes. ``wasser`` ist das Grundwasser,
+    eine Flüssigkeit -- nur drainiert, sonst ``None``.
     """
 
     WAS = "Grundbruch"
@@ -146,7 +146,7 @@ class Fundament(Rechenobjekt):
     s_u: Groesse
     gamma_cu: Groesse
     gamma: Groesse
-    gamma_w: Groesse
+    wasser: Optional[Baustoff]
     q_Ed: Groesse
     b: Groesse
     L: Groesse
@@ -195,6 +195,10 @@ class Fundament(Rechenobjekt):
                 vorlage=r"\frac{@s_u}{@gamma_cu}", funktion=_s_u_d,
                 name="Bemessungswert der undrainierten Scherfestigkeit"))
             return
+        assert self.wasser is not None, "Drainiert braucht das Fundament sein Grundwasser."
+        d_w, gamma_w = raumlast(self.id, abschnitt, self.wasser)
+        self.definitionen["gamma_w"] = d_w
+        self.berechnungen.append(gamma_w)
         d_phi = self._def("phi_eff", r"\varphi_{eff}", GRAD,
                           "Reibungswinkel, Bemessungswert", 2, "SIA 267:2013, 5.3.2.1, (5)")
         d_c = self._def("c_eff", "c_{eff}", KPA, "Kohäsion, Bemessungswert", 1,

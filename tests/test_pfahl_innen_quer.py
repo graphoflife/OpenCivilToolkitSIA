@@ -21,8 +21,9 @@ from opencivil.web import dienst
 
 
 def projekt(**felder):
-    """Ein Projekt mit C30/37 und B500B und einem Pfahl «P» mit diesen Feldern."""
+    """Ein Projekt mit C30/37, B500B, dem Wasser und einem Pfahl «P» mit diesen Feldern."""
     p = Projekt(name="Probe")
+    p.fluessigkeit()
     beton, stahl = p.beton("C30/37").kennung, p.stahl("B500B").kennung
     return p, p.pfahl("P", stahl=stahl, beton=beton, **felder)
 

@@ -61,7 +61,7 @@ export function materialliste({
   })));
   const werte = [...stoffe, ...zusatz];
   const name = arten.length > 1 ? 'Material' : namen[0];
-  const fehlt = stoffe.length ? `– ${name} wählen –` : `– noch kein ${undListe(namen, 'oder')} im Projekt –`;
+  const fehlt = stoffe.length ? `– ${name} wählen –` : `– noch ${keines(arten)} im Projekt –`;
   return auswahl({
     werte: gewaehlt === VAR || werte.some((x) => x.wert === gewaehlt) ? mitVar(werte, gewaehlt)
       : [{ wert: gewaehlt, beschriftung: fehlt }, ...werte],
@@ -69,6 +69,20 @@ export function materialliste({
     titel,
     beiAenderung: setzen,
   });
+}
+
+/**
+ * Was fehlt, im Nominativ: «keine Flüssigkeit», «kein Beton, Baustahl oder
+ * Holz», bei verschiedenen Geschlechtern je mit dem eigenen Wort: «kein Beton
+ * oder keine Flüssigkeit». Dieselbe Regel wie `keines` im Kern
+ * (opencivil/material/arten.py), mit dem Wort der Art aus dem Katalog.
+ */
+function keines(arten) {
+  const wort = (a) => katalog('materialarten', a, 'kein_wort');
+  const woerter = new Set(arten.map(wort));
+  return woerter.size === 1
+    ? `${wort(arten[0])} ${undListe(arten.map((a) => katalog('materialarten', a, 'titel')), 'oder')}`
+    : undListe(arten.map((a) => katalog('materialarten', a, 'kein')), 'oder');
 }
 
 /**
@@ -147,13 +161,12 @@ export function beschreibung(eintrag, aendern, { zeilen = 2, stil = {} } = {}) {
 
 /**
  * Was der Kachel fehlt, wenn ein Eintrag ein Material der Art `art` wählen
- * muss: «kein Beton», solange es das gewählte im Projekt nicht gibt -- sonst
- * nichts. Dieselbe Frage wie die Materialliste, wenn sie «– Beton wählen –»
- * zeigt.
+ * muss: «kein Beton», «keine Flüssigkeit», solange es das gewählte im
+ * Projekt nicht gibt -- sonst nichts. Dieselbe Frage wie die Materialliste,
+ * wenn sie «– Beton wählen –» zeigt.
  */
 export function fehlendesMaterial(art, gewaehlt) {
-  return materialien(art).some((m) => m.kennung === gewaehlt)
-    ? '' : `kein ${katalog('materialarten', art, 'titel')}`;
+  return materialien(art).some((m) => m.kennung === gewaehlt) ? '' : keines([art]);
 }
 
 /**

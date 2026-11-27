@@ -1,5 +1,5 @@
 ---
-erzeugt: 33188e6615aa
+erzeugt: 033801016ba9
 art: modul
 tags: [modul]
 ---
@@ -20,6 +20,16 @@ Was nur die Platte hat – Posten, Lagen, Buegel –, steht bei ihr in
 Projekt steht in [[opencivil.projekt.projekt]].
 
 ## Inhalt
+
+### erstes_material
+
+```python
+def erstes_material(materialien: Iterable[Any], art: str) -> str
+```
+
+Die Kennung des ersten Materials der Art `art` unter `materialien` –
+leer ohne eines. Damit fuellt ein neuer Eintrag ein Materialfeld, in der
+Oberflaeche ([[opencivil.projekt.eintraege#Beschreibung.frisch|Beschreibung.frisch]]) wie in Python.
 
 ### _feldnamen
 
@@ -380,7 +390,8 @@ Womit an einem Bauteil aus diesen Baustoffen gerechnet wird –
 je Beton seine Rechenart; ein Stahl hat keine. Das Holz hat keinen
 Wertesatz – SIA 265:2012 nennt nur Bemessungswerte
 ([[opencivil.querschnitt.gesetzwahl#Konstanten|HOLZKENNWERTE]]) –, und
-ohne das Feld `holzrechnungen` rechnet es linear.
+ohne das Feld `holzrechnungen` rechnet es linear. Welche Arten einen
+Satz haben, sagt das Register ([[opencivil.material.arten#Materialart|mit_satz]]).
 
 ### SpannungsfallEintrag
 
