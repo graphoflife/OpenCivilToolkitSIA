@@ -1,11 +1,11 @@
 ---
-erzeugt: 22f20401afc0
+erzeugt: 2e94ce788a22
 art: modul
 tags: [modul]
 ---
-> [!abstract] opencivil/decke/traeger.py
+> [!abstract] opencivil/decke/durchlauftraeger.py
 > ein Streifen als Durchlaufträger.
-> Paket [[opencivil.decke]] · [Quelltext](../../opencivil/decke/traeger.py)
+> Paket [[opencivil.decke]] · [Quelltext](../../opencivil/decke/durchlauftraeger.py)
 
 ## VERANTWORTUNG
 
@@ -21,8 +21,8 @@ gerechnet, in zwei Schritten:
    bestimmt, und seine Last geht als Kraft und Moment an das Lager.
 2. **Statik**: mit diesen Lagerkräften laufen Querkraft und Moment vom
    Anfang des Streifens bis zu seinem Ende, gerechnet wie in einem ebenen
-   Stab des Stabwerks, starr ([[opencivil.decke.traeger#statik|statik]]). Ein Flächenlager – ein
-   versteckter Unterzug, eine Stütze – drückt dabei nicht in einem Punkt,
+   Stab des Stabwerks, starr ([[opencivil.decke.durchlauftraeger#statik|statik]]). Ein Flächenlager – ein
+   Träger, eine Stütze – drückt dabei nicht in einem Punkt,
    sondern gleichmässig über seine Breite; so steht es in der Vorlesung
    («Flächenlager mit gleichmässiger Pressung», Stahlbeton II, 7.2 Platten,
    Folie 33), und so rechnet die Musterlösung des Kolloquiums 4 ihr
@@ -31,7 +31,7 @@ gerechnet, in zwei Schritten:
 
 ## VORZEICHEN
 
-`s` läuft vom Anfang des Trägers, in m. Lasten wirken nach unten und
+`s` läuft vom Anfang des Durchlaufträgers, in m. Lasten wirken nach unten und
 sind dann positiv, Lagerkräfte nach oben, Lagermomente im
 Gegenuhrzeigersinn. `M > 0` zieht unten (Feldmoment), `V = dM/ds`:
 
@@ -39,8 +39,8 @@ Gegenuhrzeigersinn. `M > 0` zieht unten (Feldmoment), `V = dM/ds`:
 M(s) = Σ_links [F_k · (s − s_k) − C_k] − ∫_links p(σ) · (s − σ) dσ
 ```
 
-Am Ende eines Trägers sind V und M null – eine Probe, die
-[[opencivil.decke.traeger#statik|statik]] macht.
+Am Ende eines Durchlaufträgers sind V und M null – eine Probe, die
+[[opencivil.decke.durchlauftraeger#statik|statik]] macht.
 
 ## Inhalt
 
@@ -115,7 +115,7 @@ def verschoben(self, um: float) -> 'Einzellast'
 class Halt
 ```
 
-Ein Lager am Träger, als Punkt: `vertikal` hält die Höhe, `eingespannt` die Drehung.
+Ein Lager am Durchlaufträger, als Punkt: `vertikal` hält die Höhe, `eingespannt` die Drehung.
 
 - `s: float`
 - `vertikal: bool`
@@ -127,7 +127,7 @@ Ein Lager am Träger, als Punkt: `vertikal` hält die Höhe, `eingespannt` die D
 def stabil(halte: Sequence[Halt]) -> bool
 ```
 
-Ob die Lager den Träger halten: zwei Höhenlager an verschiedenen
+Ob die Lager den Durchlaufträger halten: zwei Höhenlager an verschiedenen
 Stellen – oder eines und eine Einspannung.
 
 ### Balken
@@ -160,7 +160,7 @@ def lagerkraefte(self, lasten: Sequence[Teillast]) -> List[Tuple[float, float]]
 ```
 
 Je Lager die Kraft nach oben `F` und das Moment `C` im
-Gegenuhrzeigersinn, die es auf den Träger ausübt – elastisch, mit
+Gegenuhrzeigersinn, die es auf den Durchlaufträger ausübt – elastisch, mit
 den Lagern als Punkten.
 
 ### _resultante
@@ -178,14 +178,14 @@ eines ebenen Stabs – der Lasten eines freien Endes.
 def statik(L: float, lasten: Sequence[Teillast]) -> List[EbenesIntervall]
 ```
 
-Querkraft und Moment längs des Trägers, von links: aus allen Kräften auf
+Querkraft und Moment längs des Durchlaufträgers, von links: aus allen Kräften auf
 ihn – Lasten nach unten, Lagerkräfte als Einzellasten oder Pressungen
 nach oben (negativ). Gerechnet wie ein ebener Stab des Stabwerks, starr
 ([[opencivil.stabwerk.verlauf#ebener_verlauf|ebener_verlauf]] mit `EI = ∞`): die
 Biegelinie braucht hier niemand. Bis 2026-11-20 integrierte die Decke
 Querkraft und Moment ein zweites Mal selbst.
 
-Was näher als [[opencivil.decke.traeger#Konstanten|GLEICH]] beieinanderliegt, gilt als eine Stelle –
+Was näher als [[opencivil.decke.durchlauftraeger#Konstanten|GLEICH]] beieinanderliegt, gilt als eine Stelle –
 der Rand eines Lagers und die Grenze eines Streifens unterscheiden sich
 oft nur in der Rundung. Wirft, wenn am Ende etwas übrig bleibt: dann
 stehen die Kräfte nicht im Gleichgewicht.

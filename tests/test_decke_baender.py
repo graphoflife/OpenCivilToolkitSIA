@@ -11,7 +11,7 @@ from opencivil.core.protokoll import TabellenBlock, TextBlock
 from opencivil.decke.baender import STUFE_RAND, STUFE_STUETZE
 from opencivil.decke.herleitung import BAENDER
 from opencivil.decke.modell import (
-    Aufteilung, Decke, Flaechenlast, Lastfall, Linienlager, Platte, Stuetze, Unterzug,
+    Aufteilung, Decke, Flaechenlast, Lastfall, Linienlager, Platte, Stuetze, Traeger,
 )
 from opencivil.decke.rechnung import rechnen
 from opencivil.projekt import Projekt
@@ -43,7 +43,7 @@ def frei_oben(**k):
 def baender(e):
     """Die Bänder der gerechneten Decke, je ``(name, a, b, breite, stufe)``, auf den mm gerundet."""
     return [(u.name, tuple(round(c, 3) for c in u.a), tuple(round(c, 3) for c in u.b), u.breite, u.stufe)
-            for u in e.decke.unterzuege if u.von_selbst]
+            for u in e.decke.traeger if u.von_selbst]
 
 
 class Fall(unittest.TestCase):
@@ -71,8 +71,8 @@ class TestAmRand(Fall):
         e, _ = self.getragen(frei_oben(bandbreite=0.5))
         self.assertEqual(baender(e), [("B1", (0.0, 4.75), (6.0, 4.75), 0.5, STUFE_RAND)])
 
-    def test_ein_eigener_unterzug_ersetzt_es(self):
-        e, _ = self.getragen(frei_oben(unterzuege=[Unterzug("U1", (0, 4.75), (6, 4.75), 0.5)]))
+    def test_ein_eigener_traeger_ersetzt_es(self):
+        e, _ = self.getragen(frei_oben(traeger=[Traeger("T1", (0, 4.75), (6, 4.75), 0.5)]))
         self.assertEqual(baender(e), [])
 
     def test_fest_legt_keines(self):
@@ -176,20 +176,20 @@ class TestUeberStuetzen(Fall):
         self.assertEqual({(a, b) for _, a, b, _, _ in baender(e)},
                          {((4.0, 0.5), (16.0, 0.5)), ((8.0, 0.0), (8.0, 6.0)), ((12.0, 0.0), (12.0, 6.0))})
 
-    def test_unter_einem_eigenen_unterzug(self):
+    def test_unter_einem_eigenen_traeger(self):
         """
-        Ein Band liegt auf einem Unterzug des Benutzers, nie trägt es einen:
-        B1 reicht von U1 bis zur Wand rechts und liegt auf U1, U1 nicht auf B1.
+        Ein Band liegt auf einem Träger des Benutzers, nie trägt es einen:
+        B1 reicht von T1 bis zur Wand rechts und liegt auf T1, T1 nicht auf B1.
         """
         ecken = [(0, 0), (8, 0), (8, 3), (0, 3)]
         e, _ = self.getragen(Decke(
             platten=[platte("P1", [(0, 0), (4, 0), (4, 3), (0, 3)]), platte("P2", [(4, 0), (8, 0), (8, 3), (4, 3)])],
-            linienlager=rand(ecken), unterzuege=[Unterzug("U1", (4, 0), (4, 3), 0.5)],
+            linienlager=rand(ecken), traeger=[Traeger("T1", (4, 0), (4, 3), 0.5)],
             stuetzen=[Stuetze("S1", (6, 1.5), 0.3, 0.3)], lastfaelle=last("P1", "P2")))
         self.assertEqual(baender(e)[0][:3], ("B1", (3.75, 1.5), (8.0, 1.5)))
-        lager = {u.name: {a.name for t in u.traeger for a in t.auflager} for u in e.zerlegung.unterzuege}
-        self.assertIn("U1", lager["B1"])
-        self.assertFalse(lager["U1"] & {"B1", "B2"})
+        lager = {u.name: {a.name for t in u.durchlauftraeger for a in t.auflager} for u in e.zerlegung.traeger}
+        self.assertIn("T1", lager["B1"])
+        self.assertFalse(lager["T1"] & {"B1", "B2"})
 
     def test_namen_neben_denen_der_decke(self):
         """Heisst schon ein Teil der Decke B1, heisst das erste Band B2."""
@@ -223,7 +223,7 @@ class TestImProjekt(unittest.TestCase):
     def test_herleitung_und_bild(self):
         """
         Die Herleitung zeigt die Bänder in einer eigenen Tabelle, mit der
-        Regel; das Bild bekommt sie getrennt von den Unterzügen.
+        Regel; das Bild bekommt sie getrennt von den Trägern.
         """
         p, d = projekt_frei_oben()
         aufbau = p.aufbauen()
@@ -234,12 +234,12 @@ class TestImProjekt(unittest.TestCase):
                          [["B1", "(0.00, 4.50)", "(6.00, 4.50)", "1.00", "am Rand"]])
         texte = [b.text for b in bloecke if isinstance(b, TextBlock)]
         self.assertIn(BAENDER, texte)
-        self.assertTrue(any("dann die Bänder, jeder Träger nach denen tieferer Stufe: B1 (Band am Rand)." in t
+        self.assertTrue(any("dann die Bänder, die tiefere Stufe zuerst: B1 (Band am Rand)." in t
                             for t in texte), texte)
-        self.assertFalse([b for b in bloecke if isinstance(b, TabellenBlock) and b.titel == "Versteckte Unterzüge"])
+        self.assertFalse([b for b in bloecke if isinstance(b, TabellenBlock) and b.titel == "Träger"])
 
         bild = dienst.bearbeite("rechnen", {"projekt": p.als_dict()}).daten["zeichendaten"][d.kennung]
-        self.assertEqual(bild["unterzuege"], [])
+        self.assertEqual(bild["traeger"], [])
         (band,) = bild["baender"]
         self.assertEqual({k: band[k] for k in ("name", "achse", "art", "breite")},
                          {"name": "B1", "achse": [[0.0, 4.5], [6.0, 4.5]], "art": "am Rand", "breite": 1.0})

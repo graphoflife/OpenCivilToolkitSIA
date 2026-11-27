@@ -47,11 +47,22 @@ Kern. Jedes Geschoss nimmt ihn mit dem η_EI der Waende. Waende ohne Analyse
 fallen weg: sie trugen nichts bei. Verschiedene η_EI, eine Analyse, die es
 nicht gibt, oder eine Wand, die sich nicht lesen laesst, gehen nicht ohne
 Rueckfrage in einen Kern: die Datei meldet sich dann beim Lesen.
+
+DIE TRAEGER EINER DECKE (2026-11-27):
+Bis dahin hiessen sie Unterzuege: die Liste ``unterzuege``, die Kennungen
+``U1``, ``U2`` … Seither heissen sie ``traeger`` und ``T1``, ``T2`` …, denn
+ein Traeger kann auch ein Ueberzug sein (:mod:`opencivil.projekt.decke`).
+Jede Decke bekommt die neuen Namen, auch ein Bild, das in einem Traeger
+schneidet, und die Zaehlung ihrer Kennungen: ein geloeschter ``U5`` heisst
+danach ``T5`` und kommt so wenig wieder wie zuvor
+(:func:`traeger_umbenennen`). Eine Kennung, die es in der Decke schon gibt,
+nimmt keiner: der Traeger behaelt dann seine alte.
 """
 
 from __future__ import annotations
 
 import itertools
+import re
 from typing import TYPE_CHECKING, AbstractSet, Any, Dict, List, Mapping, Optional, Tuple
 
 from opencivil.material.basis import ERDBESCHLEUNIGUNG, Baustoffart
@@ -210,6 +221,48 @@ def _faktoren(glied: Any, f_pk: Mapping[str, float]) -> Any:
     if pinf is not None:
         neu["anteil_pinf"] = pinf / (ANTEIL_SPANNEN * zug if p0 is None else p0)
     return neu
+
+
+#: Wie die Liste der Traeger einer Decke und die Vorsilbe ihrer Kennungen
+#: bis 2026-11-27 hiessen -- und wie seither.
+_UNTERZUEGE, _TRAEGER = ("unterzuege", "U"), ("traeger", "T")
+
+
+def traeger_umbenennen(roh: Any) -> Any:
+    """``roh`` mit Traegern statt Unterzuegen in jeder Decke -- siehe Dateikopf."""
+    if not isinstance(roh, Mapping) or not isinstance(roh.get("decken"), list):
+        return roh
+    return {**roh, "decken": [_traeger(d) for d in roh["decken"]]}
+
+
+def _traeger(decke: Any) -> Any:
+    """
+    Eine Decke mit ``traeger`` statt ``unterzuege`` -- ``decke`` selbst, wo
+    sie keine solche Liste hat oder schon beide: das meldet dann das Lesen.
+    """
+    (alt, u), (neu, t) = _UNTERZUEGE, _TRAEGER
+    if not isinstance(decke, Mapping) or not isinstance(decke.get(alt), list) or neu in decke:
+        return decke
+    kennungen = {e.get("kennung") for liste in decke.values() if isinstance(liste, list)
+                 for e in liste if isinstance(e, Mapping) and isinstance(e.get("kennung"), str)}
+    alte = [e.get("kennung") for e in decke[alt] if isinstance(e, Mapping)]
+    namen = {k: t + k[len(u):] for k in alte if isinstance(k, str) and re.fullmatch(rf"{u}\d+", k)
+             and t + k[len(u):] not in kennungen}
+
+    def umbenannt(e: Any, feld: str) -> Any:
+        if isinstance(e, Mapping) and isinstance(e.get(feld), str) and e[feld] in namen:
+            return {**e, feld: namen[e[feld]]}
+        return e
+
+    heraus = {k: v for k, v in decke.items() if k != alt}
+    heraus[neu] = [umbenannt(e, "kennung") for e in decke[alt]]
+    if isinstance(decke.get("diagramme"), list):
+        heraus["diagramme"] = [umbenannt(d, "schnitt") for d in decke["diagramme"]]
+    zaehlung = decke.get("vergeben")
+    if isinstance(zaehlung, Mapping) and _zahl(zaehlung.get(u)):
+        bisher = zaehlung[t] if _zahl(zaehlung.get(t)) else 0
+        heraus["vergeben"] = {**{k: v for k, v in zaehlung.items() if k != u}, t: max(zaehlung[u], bisher)}
+    return heraus
 
 
 #: So weit liegen die Waende von frueher im Kern auseinander, in mm: sie

@@ -7,23 +7,23 @@ wählt (:mod:`~opencivil.decke.richtungen`), die Bänder, die sie bei
 automatischer Aufteilung selbst legt (:mod:`~opencivil.decke.baender`), zerlegen
 (:mod:`~opencivil.decke.streifen`), die Last aufteilen (:mod:`~opencivil.decke.aufteilung`), je Lastfall auf die
 Streifen legen (:mod:`~opencivil.decke.lasten`), und dann je Lastfall und
-Kombination die Träger rechnen -- von unten nach oben:
+Kombination die Durchlaufträger rechnen -- von unten nach oben:
 
 1. die Feldstreifen (Stufe 0),
-2. die Unterzüge, nach Stufe aufsteigend. Was ein Streifen in einen
-   Unterzug gibt, liegt auf diesem als Last -- mit umgekehrtem Vorzeichen
+2. die Träger, nach Stufe aufsteigend. Was ein Streifen in einen
+   Träger gibt, liegt auf diesem als Last -- mit umgekehrtem Vorzeichen
    die Pressung, mit der dieser ihn trägt, über die Fläche, die beide
    teilen (Stahlbeton II, 7.2 Platten, Folie 33: die Pressung des
-   Flächenlagers wird zur Last des versteckten Unterzugs).
+   Flächenlagers wird zur Last des Trägers).
 3. Was in Linienlager und Stützen geht, sind die Lagerkräfte der Decke.
 
 Am Ende eine Probe: alle Lagerkräfte zusammen sind die Last, abzüglich
 dessen, was neben den Platten liegt oder auf einem Streifen, der nicht trägt.
 
 DIE LAGERKRÄFTE:
-Eine Stütze bekommt die Summe der Kräfte aller Träger auf ihr. Ein
-Linienlager bekommt von jedem Träger, der es kreuzt, dessen Kraft --
-gleichmässig verteilt über das Stück des Lagers, über das der Träger geht --
+Eine Stütze bekommt die Summe der Kräfte aller Durchlaufträger auf ihr. Ein
+Linienlager bekommt von jedem Durchlaufträger, der es kreuzt, dessen Kraft --
+gleichmässig verteilt über das Stück des Lagers, über das der Durchlaufträger geht --
 und bei Einspannung dessen Moment ebenso: ein Verlauf in kN/m und kNm/m
 längs des Lagers, das Moment mit dem Vorzeichen der Platte
 (:func:`lagerverlauf`).
@@ -43,9 +43,9 @@ from opencivil.decke.lasten import Belastung, belasten, kn, kombiniert
 from opencivil.decke.modell import Decke, Linienlager
 from opencivil.decke.richtungen import festgelegt
 from opencivil.decke.streifen import (
-    LINIENLAGER, STUETZE, UNTERZUG, Auflager, Streifen, Traeger, Warum, Zerlegung, pressung, zerlegen,
+    LINIENLAGER, STUETZE, TRAEGER, Auflager, Streifen, Durchlauftraeger, Warum, Zerlegung, pressung, zerlegen,
 )
-from opencivil.decke.traeger import GLEICH, Einzellast, Streckenlast, Teillast, statik, wert
+from opencivil.decke.durchlauftraeger import GLEICH, Einzellast, Streckenlast, Teillast, statik, wert
 from opencivil.stabwerk.system import Meldung
 from opencivil.stabwerk.verlauf import EbenesIntervall
 
@@ -55,7 +55,10 @@ PROBE = 1e-6
 
 @dataclass(frozen=True)
 class Lagerkraft:
-    """Was ein Lager auf einen Träger ausübt: ``F`` nach oben in N, ``C`` im Gegenuhrzeigersinn in Nm."""
+    """
+    Was ein Lager auf einen Durchlaufträger ausübt: ``F`` nach oben in N,
+    ``C`` im Gegenuhrzeigersinn in Nm.
+    """
 
     auflager: Auflager
     F: float
@@ -63,14 +66,17 @@ class Lagerkraft:
 
 
 @dataclass
-class Traegerergebnis:
-    traeger: Traeger
+class Durchlauftraegerergebnis:
+    durchlauftraeger: Durchlauftraeger
     lasten: List[Teillast]
     """Was auf ihm liegt, ohne seine Lagerkräfte -- in m ab seinem Anfang."""
 
     lagerkraefte: List[Lagerkraft]
     stuecke: List[EbenesIntervall]
-    """Querkraft und Moment längs des Trägers, für den ganzen Streifen (N, Nm) -- aus :func:`statik`."""
+    """
+    Querkraft und Moment längs des Durchlaufträgers, für den ganzen Streifen
+    (N, Nm) -- aus :func:`statik`.
+    """
 
     @property
     def last(self) -> float:
@@ -80,15 +86,15 @@ class Traegerergebnis:
     def beidseits(self, s: float) -> Tuple[float, float]:
         """``M`` knapp vor und knapp nach der Stelle ``s``, in Nm -- vor seinem Anfang und nach seinem Ende null."""
         vor = wert(self.stuecke, "M", s, links=True) if s > GLEICH else 0.0
-        nach = wert(self.stuecke, "M", s) if s < self.traeger.L - GLEICH else 0.0
+        nach = wert(self.stuecke, "M", s) if s < self.durchlauftraeger.L - GLEICH else 0.0
         return vor, nach
 
 
 @dataclass(frozen=True)
 class Wandkraft:
-    """Was ein Träger in ein Linienlager gibt -- gleichmässig über das Stück ``a → b``."""
+    """Was ein Durchlaufträger in ein Linienlager gibt -- gleichmässig über das Stück ``a → b``."""
 
-    traeger: str
+    durchlauftraeger: str
     a: Punkt
     b: Punkt
     F: float
@@ -97,14 +103,14 @@ class Wandkraft:
     vor: float
     nach: float
     """
-    Hält das Lager die Drehung, das Moment des Trägers knapp vor und knapp
+    Hält das Lager die Drehung, das Moment des Durchlaufträgers knapp vor und knapp
     nach ihm, in Nm, ``M > 0`` zieht unten -- vor seinem Anfang und nach
     seinem Ende null. Was das Lager hält, ist der Unterschied. Ein Lager,
     das die Drehung nicht hält, hält kein Moment: dann beide null.
     """
 
     n: Punkt
-    """Die Richtung des Trägers: in ihr liegt ``nach`` hinter dem Lager."""
+    """Die Richtung des Durchlaufträgers: in ihr liegt ``nach`` hinter dem Lager."""
 
     @property
     def laenge(self) -> float:
@@ -123,7 +129,7 @@ class Ausfall(Meldung):
     in ``text`` -- «… 80 kN fallen aus.» --, dazu ``grund`` ohne die Kraft
     und die Kraft ``F`` in N. Ueber die Faelle gesammelt
     (:meth:`Ergebnis.fallmeldungen`), steht der Grund einmal und die Kraft
-    je Fall dahinter. Grau: es fehlt ein Lager oder ein Unterzug, und der
+    je Fall dahinter. Grau: es fehlt ein Lager oder ein Traeger, und der
     Rest rechnet (Benutzer, 2026-11-19).
     """
 
@@ -141,13 +147,13 @@ class Fallergebnis:
     daneben: float
     """Was davon neben den Platten liegt."""
 
-    traeger: Dict[str, Traegerergebnis] = field(default_factory=dict)
+    durchlauftraeger: Dict[str, Durchlauftraegerergebnis] = field(default_factory=dict)
     stuetzen: Dict[str, List[Tuple[str, float]]] = field(default_factory=dict)
-    """Je Stütze, was jeder Träger auf ihr in sie gibt, in N."""
+    """Je Stütze, was jeder Durchlaufträger auf ihr in sie gibt, in N."""
 
     linienlager: Dict[str, List[Wandkraft]] = field(default_factory=dict)
     nicht_getragen: float = 0.0
-    """Was auf Trägern liegt, die nicht tragen."""
+    """Was auf Durchlaufträgern liegt, die nicht tragen."""
 
     meldungen: List[Meldung] = field(default_factory=list)
 
@@ -165,7 +171,7 @@ class Fallergebnis:
 
     @property
     def fehlbetrag(self) -> float:
-        """Was die Lager weniger tragen, als auf den Trägern liegt -- null bis auf Rundung."""
+        """Was die Lager weniger tragen, als auf den Durchlaufträgern liegt -- null bis auf Rundung."""
         return self.summe - self.daneben - self.nicht_getragen - self.lagerkraft
 
 
@@ -234,15 +240,15 @@ def rechnen(decke: Decke) -> Ergebnis:
         if abs(f.fehlbetrag) > PROBE * max(abs(f.summe), 1.0):
             f.meldungen.append(Meldung(
                 f"Die Probe geht nicht auf: die Lager tragen {f.lagerkraft / 1e3:.6g} kN, "
-                f"auf den Trägern liegen {(f.summe - f.daneben - f.nicht_getragen) / 1e3:.6g} kN."))
+                f"auf den Durchlaufträgern liegen {(f.summe - f.daneben - f.nicht_getragen) / 1e3:.6g} kN."))
     return Ergebnis(decke, zerlegung, aufteilungen, faelle, meldungen)
 
 
 def fall(name: str, belastung: Belastung, zerlegung: Zerlegung) -> Fallergebnis:
     """
-    Ein Lastfall oder eine Kombination: alle Träger, von den Feldstreifen zu
-    den Unterzügen. Was auf Trägern liegt, die nicht tragen, sagt eine
-    Meldung je Grund -- bis 2026-11-19 eine je Träger, und eine Platte ohne
+    Ein Lastfall oder eine Kombination: alle Durchlaufträger, von den Feldstreifen zu
+    den Trägern. Was auf Durchlaufträgern liegt, die nicht tragen, sagt eine
+    Meldung je Grund -- bis 2026-11-19 eine je Durchlaufträger, und eine Platte ohne
     Lager gab je Fall vierzig gleiche Zeilen. Ebenso eine für alle Streifen
     mit Last, die auf keiner Platte liegen (bis 2026-11-20 eine je Streifen).
     """
@@ -254,57 +260,59 @@ def fall(name: str, belastung: Belastung, zerlegung: Zerlegung) -> Fallergebnis:
         lasten = belastung.je_streifen.get(streifen.name, []) + uebertragen.get(streifen.name, [])
         if not lasten:
             continue
-        if not streifen.traeger:
+        if not streifen.durchlauftraeger:
             heraus.nicht_getragen += sum(_summe(l) for l in lasten)
             ohne_platte.append(streifen.name)
             continue
-        for traeger, lokal in auf_traeger(streifen, lasten):
+        for durchlauftraeger, lokal in auf_durchlauftraeger(streifen, lasten):
             gesamt = sum(_summe(l) for l in lokal)
             if not lokal or not any(_summe(l) or (isinstance(l, Einzellast) and l.C) for l in lokal):
                 continue
-            if not traeger.balken.stabil:
+            if not durchlauftraeger.balken.stabil:
                 heraus.nicht_getragen += gesamt
-                ausfall.setdefault(traeger.warum_nicht(), []).append((traeger.name, gesamt))
+                ausfall.setdefault(durchlauftraeger.warum_nicht(), []).append((durchlauftraeger.name, gesamt))
                 continue
             kraefte = [Lagerkraft(a, F, C) for a, (F, C) in
-                       zip(traeger.auflager, traeger.balken.lagerkraefte(lokal))]
-            ergebnis = Traegerergebnis(traeger, lokal, kraefte, statik(traeger.L, lokal + gegenkraefte(kraefte)))
-            heraus.traeger[traeger.name] = ergebnis
+                       zip(durchlauftraeger.auflager, durchlauftraeger.balken.lagerkraefte(lokal))]
+            verlauf = statik(durchlauftraeger.L, lokal + gegenkraefte(kraefte))
+            ergebnis = Durchlauftraegerergebnis(durchlauftraeger, lokal, kraefte, verlauf)
+            heraus.durchlauftraeger[durchlauftraeger.name] = ergebnis
             for k in kraefte:
                 _weitergeben(k, ergebnis, zerlegung, heraus, uebertragen)
     if ohne_platte:
         wer = (f"Auf «{ohne_platte[0]}» liegt Last, aber er liegt" if len(ohne_platte) == 1
                else f"Auf {len(ohne_platte)} Streifen liegt Last, aber sie liegen")
         heraus.meldungen.append(Meldung(f"{wer} auf keiner Platte.", tuple(ohne_platte)))
-    for warum, traeger in ausfall.items():
-        namen = tuple(n for n, _ in traeger)
+    for warum, betroffen in ausfall.items():
+        namen = tuple(n for n, _ in betroffen)
         grund = (f"Der Streifen «{namen[0]}» trägt nicht – {warum.einer}" if len(namen) == 1
                  else f"{len(namen)} Streifen tragen nicht – {warum.mehrere}")
-        F = sum(F for _, F in traeger)
+        F = sum(F for _, F in betroffen)
         heraus.meldungen.append(Ausfall(f"{grund} {kn(F)} kN fallen aus.", namen, grund=grund, F=F))
     return heraus
 
 
-def auf_traeger(streifen: Streifen, lasten: Sequence[Teillast]) -> List[Tuple[Traeger, List[Teillast]]]:
+def auf_durchlauftraeger(streifen: Streifen,
+                         lasten: Sequence[Teillast]) -> List[Tuple[Durchlauftraeger, List[Teillast]]]:
     """
-    Die Lasten eines Streifens (in ``s`` seiner Richtung) auf seine Träger,
-    in m ab deren Anfang. Was zwischen oder hinter den Trägern liegt -- an
+    Die Lasten eines Streifens (in ``s`` seiner Richtung) auf seine Durchlaufträger,
+    in m ab deren Anfang. Was zwischen oder hinter den Durchlaufträgern liegt -- an
     einem schiefen Rand ein Zwickel --, kommt als Einzellast an das nächste
     Ende.
     """
-    je: Dict[str, List[Teillast]] = {t.name: [] for t in streifen.traeger}
+    je: Dict[str, List[Teillast]] = {t.name: [] for t in streifen.durchlauftraeger}
 
     def ans_naechste_ende(s: float, P: float) -> None:
-        t = streifen.traeger_bei(s)
+        t = streifen.durchlauftraeger_bei(s)
         je[t.name].append(Einzellast(min(max(s - t.s0, 0.0), t.L), P))
 
     for l in lasten:
         if isinstance(l, Einzellast):
-            t = streifen.traeger_bei(l.a)
+            t = streifen.durchlauftraeger_bei(l.a)
             je[t.name].append(Einzellast(min(max(l.a - t.s0, 0.0), t.L), l.P, l.C))
             continue
         frei = [(l.a, l.b)]
-        for t in streifen.traeger:
+        for t in streifen.durchlauftraeger:
             a, b = max(l.a, t.s0), min(l.b, t.s1)
             if b > a:
                 je[t.name].append(Streckenlast(a - t.s0, b - t.s0, l.bei(a), l.bei(b)))
@@ -314,12 +322,12 @@ def auf_traeger(streifen: Streifen, lasten: Sequence[Teillast]) -> List[Tuple[Tr
                 teil = Streckenlast(a, b, l.bei(a), l.bei(b))
                 if teil.summe:
                     ans_naechste_ende(a + _schwerpunkt(teil), teil.summe)
-    return [(t, je[t.name]) for t in streifen.traeger]
+    return [(t, je[t.name]) for t in streifen.durchlauftraeger]
 
 
 def gegenkraefte(kraefte: Sequence[Lagerkraft]) -> List[Teillast]:
     """
-    Die Lagerkräfte als Lasten auf den Träger: ein Linienlager als Punkt, ein
+    Die Lagerkräfte als Lasten auf den Durchlaufträger: ein Linienlager als Punkt, ein
     Flächenlager als gleichmässige Pressung über seine Fläche -- nach oben,
     also negativ.
     """
@@ -334,36 +342,37 @@ def gegenkraefte(kraefte: Sequence[Lagerkraft]) -> List[Teillast]:
     return heraus
 
 
-def _weitergeben(k: Lagerkraft, ergebnis: Traegerergebnis, zerlegung: Zerlegung, heraus: Fallergebnis,
+def _weitergeben(k: Lagerkraft, ergebnis: Durchlauftraegerergebnis, zerlegung: Zerlegung, heraus: Fallergebnis,
                  uebertragen: Dict[str, List[Teillast]]) -> None:
-    """Die Kraft eines Lagers auf den Träger geht, umgekehrt, in das, worauf er liegt."""
-    a, traeger = k.auflager, ergebnis.traeger
+    """Die Kraft eines Lagers auf den Durchlaufträger geht, umgekehrt, in das, worauf er liegt."""
+    a, durchlauftraeger = k.auflager, ergebnis.durchlauftraeger
     if not (k.F or k.C):
         return
     if a.art == LINIENLAGER:
         vor, nach = ergebnis.beidseits(a.s) if a.eingespannt else (0.0, 0.0)
+        n = zerlegung[durchlauftraeger.streifen].richtung.n
         heraus.linienlager.setdefault(a.name, []).append(Wandkraft(
-            traeger.name, a.strecke[0], a.strecke[1], k.F, vor, nach, zerlegung[traeger.streifen].richtung.n))
+            durchlauftraeger.name, a.strecke[0], a.strecke[1], k.F, vor, nach, n))
     elif a.art == STUETZE:
-        heraus.stuetzen.setdefault(a.name, []).append((traeger.name, k.F))
-    elif a.art == UNTERZUG:
-        unterzug = zerlegung[a.name]
+        heraus.stuetzen.setdefault(a.name, []).append((durchlauftraeger.name, k.F))
+    elif a.art == TRAEGER:
+        traeger = zerlegung[a.name]
         if a.kontakt:
-            lasten = [p.mal(k.F) for p in pressung(a.kontakt, unterzug.richtung.n)]
+            lasten = [p.mal(k.F) for p in pressung(a.kontakt, traeger.richtung.n)]
         else:
-            streifen = zerlegung[traeger.streifen]
-            punkt = streifen.richtung.punkt(traeger.s0 + a.s, streifen.mitte)
-            lasten = [Einzellast(geo.skalar(punkt, unterzug.richtung.n), k.F)]
+            streifen = zerlegung[durchlauftraeger.streifen]
+            punkt = streifen.richtung.punkt(durchlauftraeger.s0 + a.s, streifen.mitte)
+            lasten = [Einzellast(geo.skalar(punkt, traeger.richtung.n), k.F)]
         uebertragen.setdefault(a.name, []).extend(lasten)
 
 
 def lagerverlauf(lager: Linienlager, kraefte: Sequence[Wandkraft]) -> List[Tuple[float, float, float, float]]:
     """
-    Längs eines Linienlagers, was die Träger in es geben: Stufen
+    Längs eines Linienlagers, was die Durchlaufträger in es geben: Stufen
     ``(u_a, u_b, r, m)`` von seinem Anfang bis zu seinem Ende, ``u`` in m ab
     ``lager.a``, ``r`` nach unten in N/m und ``m`` in Nm/m: das Moment, das
     es hält, mit dem Vorzeichen der Platte -- negativ, wo es oben zieht, wie
-    herum das Lager auch gezeichnet ist (:func:`_gehalten`). Wo zwei Träger
+    herum das Lager auch gezeichnet ist (:func:`_gehalten`). Wo zwei Durchlaufträger
     dasselbe Stück tragen, zählen beide; ein schiefer gibt quer zum Lager
     cos² seines Winkels weiter, wie die Platte (Folie 14).
     """
@@ -378,7 +387,8 @@ def lagerverlauf(lager: Linienlager, kraefte: Sequence[Wandkraft]) -> List[Tuple
     for w in kraefte:
         cos = geo.skalar(w.n, links)
         vor, nach = (M * abs(cos) / w.laenge for M in (w.vor, w.nach))
-        # Was hinter dem Lager liegt, «nach», liegt links von a → b, wenn der Träger nach links läuft.
+        # Was hinter dem Lager liegt, «nach», liegt links von a → b, wenn der Durchlaufträger
+        # nach links läuft.
         seiten = (nach, vor) if cos > 0.0 else (vor, nach)
         stuecke.append((*sorted((u(w.a), u(w.b))), w.r, *seiten))
     stellen: List[float] = []

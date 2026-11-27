@@ -112,7 +112,7 @@ _VERSCHMIERUNGEN = {
 #: Titel. Die Regel dahinter steht in :mod:`opencivil.decke.aufteilung`.
 #: Wie die Ergebnisbilder einer Decke heissen: kurz im Schalter, lang ueber
 #: dem Bild -- je Groesse, die die Beschreibung kennt. M und V sind die eines
-#: ganzen Unterzugs.
+#: ganzen Trägers.
 _DECKENGROESSEN = {
     "m_x": ("m_x", "Moment m_x"), "m_y": ("m_y", "Moment m_y"), "m_xy": ("m_xy", "Drillmoment m_xy"),
     "v_x": ("v_x", "Querkraft v_x"), "v_y": ("v_y", "Querkraft v_y"),
@@ -299,10 +299,10 @@ def katalog() -> dict:
             "aufteilungen": [{"wert": a.value, "beschriftung": _AUFTEILUNGEN[a][0],
                               "titel": _AUFTEILUNGEN[a][1]} for a in Aufteilung],
             # Was ein Ergebnisbild zeigt -- kurz im Schalter, lang ueber dem
-            # Bild; ``unterzug``, ob es das eines Unterzugs ist.
+            # Bild; ``traeger``, ob es das eines Trägers ist.
             "diagrammgroessen": [{"wert": wert, "beschriftung": _DECKENGROESSEN[wert][0],
                                   "titel": _DECKENGROESSEN[wert][1],
-                                  "unterzug": wert in BALKENGROESSEN} for wert in DECKENGROESSEN],
+                                  "traeger": wert in BALKENGROESSEN} for wert in DECKENGROESSEN],
         },
         # Wie ein Fundament der Setzung folgt -- und wo darum gerechnet wird.
         "setzung": {

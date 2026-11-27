@@ -2,16 +2,16 @@
 opencivil/projekt/decke.py -- eine Stahlbetondecke, wie die Oberflaeche sie beschreibt.
 
 VERANTWORTUNG:
-Der :class:`DeckeEintrag`: Platten, Linienlager, Stuetzen, versteckte
-Unterzuege und Zonen der Lastaufteilung, gezeichnet aus Knoten im Grundriss
--- als speicherbare Datenklasse wie das Balkensystem
+Der :class:`DeckeEintrag`: Platten, Linienlager, Stuetzen, Traeger -- ein
+Unterzug oder ein Ueberzug -- und Zonen der Lastaufteilung, gezeichnet aus
+Knoten im Grundriss -- als speicherbare Datenklasse wie das Balkensystem
 (:mod:`opencivil.projekt.balkensystem`). Dazu der Baukasten, der ohne
 Oberflaeche zeichnet. Gerechnet wird nach der Streifenmethode, in
 :mod:`opencivil.decke`.
 
 ALLES HAENGT AN KNOTEN:
 Eine Platte und eine Zone sind Umrisse aus Knoten, ein Linienlager und ein
-Unterzug laufen von einem Knoten zum anderen, eine Stuetze steht an einem.
+Traeger laufen von einem Knoten zum anderen, eine Stuetze steht an einem.
 Wo zwei Platten oder eine Platte und eine Wand sich eine Ecke teilen,
 teilen sie den Knoten -- wer ihn verschiebt, verschiebt sie beide, und es
 entsteht keine Fuge, die niemand gezeichnet hat.
@@ -34,7 +34,7 @@ die sie kreuzt (Benutzer, 2026-11-16). Ein Schnitt geht in keine Rechnung
 ein.
 
 KOORDINATEN UND EINHEITEN:
-x nach rechts, y nach oben, in m -- ebenso die Breite eines Unterzugs, der
+x nach rechts, y nach oben, in m -- ebenso die Breite eines Traegers, der
 Stuetzenbereich und die Streifenbreite. Die Dicke einer Platte und der
 Querschnitt einer Stuetze in mm, Anteile in %, die Richtungen der Streifen
 in Grad gegen x, im Gegenuhrzeigersinn. Lasten in kN/m², kN/m und kN.
@@ -60,12 +60,12 @@ from opencivil.projekt.netz import Netz, neue_kennung
 Ort = Union[str, Sequence[float]]
 
 #: Was ein Ergebnisbild zeigt: eine Schnittkraft der Platte, die Lagerkraefte
-#: -- oder Moment und Querkraft eines ganzen Unterzugs.
+#: -- oder Moment und Querkraft eines ganzen Trägers.
 PLATTENGROESSEN = (*GROESSEN, "lager")
 DIAGRAMMGROESSEN = (*PLATTENGROESSEN, *BALKENGROESSEN)
 
 #: Womit die Kennungen der Teile einer Decke beginnen.
-VORSILBEN = {"platten": "P", "linienlager": "L", "stuetzen": "S", "unterzuege": "U",
+VORSILBEN = {"platten": "P", "linienlager": "L", "stuetzen": "S", "traeger": "T",
              "zonen": "Z", "flaechenlasten": "FL", "linienlasten": "LL", "punktlasten": "PL",
              "schnitte": "SN"}
 
@@ -150,7 +150,7 @@ class StuetzeEintrag(Beschreibung):
     """
     Eine Stütze unter der Decke, ``b_x × b_y``. Die Streifen geben ihre
     Last über den Stützenbereich ``l_x × l_y`` ab (Folie 39) -- von Hand
-    oder, ohne Angabe, so gross wie die Stütze oder der breiteste Unterzug
+    oder, ohne Angabe, so gross wie die Stütze oder der breiteste Träger
     über ihr (:func:`opencivil.decke.streifen.stuetzenbereich`).
     """
 
@@ -166,11 +166,12 @@ class StuetzeEintrag(Beschreibung):
 
 
 @dataclass
-class UnterzugEintrag(Beschreibung):
+class TraegerEintrag(Beschreibung):
     """
-    Ein versteckter Unterzug, ein starker Streifen in der Platte (Folie 33):
-    so breit wie ``breite``, liegend auf Linienlagern, Stützen und den
-    Unterzügen höherer ``stufe``, die ihn kreuzen.
+    Ein Träger, ein Unterzug oder ein Überzug: in der Streifenmethode ein
+    starker Streifen in der Platte (Folie 33), so breit wie ``breite``,
+    liegend auf Linienlagern, Stützen und den Trägern höherer ``stufe``,
+    die ihn kreuzen.
     """
 
     kennung: str = ""
@@ -249,7 +250,7 @@ class DeckenschnittEintrag(Beschreibung):
 class DeckendiagrammEintrag(Beschreibung):
     """
     Ein Ergebnisbild der Decke: ein Fall und was es von ihm zeigt -- über
-    die ganze Platte, längs eines Schnitts oder in einem Unterzug, dort M
+    die ganze Platte, längs eines Schnitts oder in einem Träger, dort M
     und V über seine ganze Breite. Gerechnet wird damit nichts
     -- die Decke rechnet jeden Fall; die Liste sagt nur, welche Bilder
     rechts stehen.
@@ -264,9 +265,9 @@ class DeckendiagrammEintrag(Beschreibung):
     schnitt: str = ""
     """
     Wo das Bild schneidet: die Kennung eines Schnitts (``SN1``) oder eines
-    Unterzugs (``U1``) -- leer: die ganze Platte. Die Lagerkräfte zeigen
-    immer die ganze; M und V gibt es nur in einem Unterzug, die Grössen der
-    Platte nur ausserhalb. Der Name blieb, als der Unterzug dazukam: ein
+    Trägers (``T1``) -- leer: die ganze Platte. Die Lagerkräfte zeigen
+    immer die ganze; M und V gibt es nur in einem Träger, die Grössen der
+    Platte nur ausserhalb. Der Name blieb, als der Träger dazukam: ein
     neuer machte heute gespeicherte Stände unlesbar.
     """
 
@@ -274,8 +275,8 @@ class DeckendiagrammEintrag(Beschreibung):
 @dataclass
 class DeckeEintrag(MitFaellen, BauteilEintrag):
     """
-    Eine Decke aus Platten auf Linienlagern und Stützen, mit versteckten
-    Unterzügen und Zonen, und ihren Lasten, Lastfällen und Kombinationen.
+    Eine Decke aus Platten auf Linienlagern und Stützen, mit Trägern und
+    Zonen, und ihren Lasten, Lastfällen und Kombinationen.
     Wie die Last aufgeteilt wird, gilt für die ganze Decke: automatisch
     nach Folie 31 oder ``anteil`` in die Richtung 1 -- in einer Zone deren
     Anteil.
@@ -293,7 +294,7 @@ class DeckeEintrag(MitFaellen, BauteilEintrag):
     platten: List[DeckenplatteEintrag] = field(default_factory=list)
     linienlager: List[LinienlagerEintrag] = field(default_factory=list)
     stuetzen: List[StuetzeEintrag] = field(default_factory=list)
-    unterzuege: List[UnterzugEintrag] = field(default_factory=list)
+    traeger: List[TraegerEintrag] = field(default_factory=list)
     zonen: List[ZoneEintrag] = field(default_factory=list)
     flaechenlasten: List[FlaechenlastEintrag] = field(default_factory=list)
     linienlasten: List[LinienlastEintrag] = field(default_factory=list)
@@ -362,11 +363,12 @@ class DeckeEintrag(MitFaellen, BauteilEintrag):
         return self._anlegen("stuetzen", StuetzeEintrag,
                              {"knoten": self._knoten(self.netz(), ort), **felder}, "Stütze")
 
-    def unterzug(self, von: Ort, bis: Ort, **felder: Any) -> UnterzugEintrag:
+    def traeger_legen(self, von: Ort, bis: Ort, **felder: Any) -> TraegerEintrag:
+        """Ein Träger von ``von`` nach ``bis`` -- heisst nicht ``traeger``, weil die Liste so heisst."""
         netz = self.netz()
-        return self._anlegen("unterzuege", UnterzugEintrag,
+        return self._anlegen("traeger", TraegerEintrag,
                              {"von": self._knoten(netz, von), "bis": self._knoten(netz, bis), **felder},
-                             "Unterzug")
+                             "Träger")
 
     def zone(self, ecken: Sequence[Ort], **felder: Any) -> ZoneEintrag:
         netz = self.netz()
@@ -415,7 +417,7 @@ class DeckeEintrag(MitFaellen, BauteilEintrag):
     def diagramm(self, fall: Any, groesse: str = "m_x", schnitt: Any = "") -> DeckendiagrammEintrag:
         """
         Ein Ergebnisbild -- ``fall`` ein Lastfall oder eine Kombination,
-        ``schnitt`` einer der Schnitte oder Unterzüge (Eintrag oder
+        ``schnitt`` einer der Schnitte oder Träger (Eintrag oder
         Kennung), ohne ihn die ganze Platte.
         """
         eintrag = lesen(DeckendiagrammEintrag,

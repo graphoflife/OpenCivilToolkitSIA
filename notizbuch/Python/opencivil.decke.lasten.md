@@ -1,5 +1,5 @@
 ---
-erzeugt: 68e4d2cfdde7
+erzeugt: 0b9fa764541f
 art: modul
 tags: [modul]
 ---
@@ -12,7 +12,7 @@ tags: [modul]
 Aus den Lasten eines Lastfalls, was jeder Streifen trägt: eine Last je
 Länge längs seiner Achse, genau integriert über seine Breite. Je Stelle geht
 der Anteil seiner Richtung in ihn ([[opencivil.decke.aufteilung|aufteilung]]) –
-liegt die Stelle in einem Unterzug derselben Richtung, in diesen.
+liegt die Stelle in einem Träger derselben Richtung, in diesen.
 
 
 ## FLÄCHEN
@@ -121,7 +121,7 @@ Ein konvexes Stück mit `q` in N/m², auf einer Platte der Gruppe `g`, auf die S
 def _zuordnen(heraus: Belastung, zerlegung: Zerlegung, streifen: Streifen, last: Streckenlast) -> None
 ```
 
-In den Feldstreifen – oder, wo er in einem Unterzug seiner Richtung liegt, in diesen.
+In den Feldstreifen – oder, wo er in einem Träger seiner Richtung liegt, in diesen.
 
 
 ## Konstanten
@@ -132,10 +132,10 @@ In den Feldstreifen – oder, wo er in einem Unterzug seiner Richtung liegt, in 
 ## Braucht
 
 - [[opencivil.decke.aufteilung]]
+- [[opencivil.decke.durchlauftraeger]]
 - [[opencivil.decke.geometrie]]
 - [[opencivil.decke.modell]]
 - [[opencivil.decke.streifen]]
-- [[opencivil.decke.traeger]]
 - [[opencivil.stabwerk.system]]
 
 ## Gebraucht von

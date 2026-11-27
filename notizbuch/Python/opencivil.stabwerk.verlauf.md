@@ -1,5 +1,5 @@
 ---
-erzeugt: 426f64c0d4ad
+erzeugt: 226c0f836af7
 art: modul
 tags: [modul]
 ---
@@ -241,7 +241,7 @@ def extremwerte(teile: Sequence[Any], polynom: Callable[[Any], Polynom]) -> Extr
 
 Kleinster und groesster Wert eines Polynoms je Stueck `x0` bis `x1`,
 bei gleichen Werten an der vordersten Stelle ([[opencivil.stabwerk.verlauf#vorderste_extreme|vorderste_extreme]])
-– fuer die Staebe und die Traeger der Decke. Bis 2026-11-20 hatte nur
+– fuer die Staebe und die Durchlauftraeger der Decke. Bis 2026-11-20 hatte nur
 die Decke diese Regel, und ein Stab, der sich nirgends biegt, nannte fuer
 seine Durchbiegung 0.00 mm eine Stelle, die vom Rauschen abhing.
 
@@ -420,7 +420,7 @@ def _schieben(p: Polynom, um: float) -> Polynom
 - `POLYNOME = SCHNITTGROESSEN + ('u', 'v', 'w', 'theta_x', 'theta_y', 'theta_z')` – Was ein Intervall als Polynom traegt, ausser den Lasten.
 - `IN_DER_EBENE = {'N': 'N', 'V': 'V_z', 'M': 'M_y', 'w': 'f_z', 'phi': 'theta_y'}` – In der Ebene heissen die Groessen eines Stabs wie von Hand – je Zeichen sein Feld im Verlauf: z liegt auf der gestrichelten Faser, y steht senkrecht auf der Ebene.
 - `NULL = Polynom((0.0,))`
-- `Ort = TypeVar('Ort')` – Wo ein Wert liegt: `x` laengs eines Stabs, ein Stab ueber alle, `s` laengs eines Traegers der Decke, ein Punkt ihrer Platte.
+- `Ort = TypeVar('Ort')` – Wo ein Wert liegt: `x` laengs eines Stabs, ein Stab ueber alle, `s` laengs eines Durchlauftraegers der Decke, ein Punkt ihrer Platte.
 
 ## Braucht
 
@@ -430,11 +430,11 @@ def _schieben(p: Polynom, um: float) -> Polynom
 
 ## Gebraucht von
 
+- [[opencivil.decke.durchlauftraeger]]
 - [[opencivil.decke.feld]]
 - [[opencivil.decke.herleitung]]
 - [[opencivil.decke.rechnung]]
 - [[opencivil.decke.schnitt]]
-- [[opencivil.decke.traeger]]
 - [[opencivil.pfahl.bettung]]
 - [[opencivil.stabwerk.herleitung]]
 - [[opencivil.stabwerk.rechnung]]

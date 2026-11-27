@@ -5,14 +5,14 @@ VERANTWORTUNG:
 Aus dem Befund einer Decke die Daten ihrer Bilder, in m: wie die Last auf
 die zwei Richtungen geht -- je Zelle der automatischen Aufteilung, je
 Platte bei fester, und in den Zonen --, wo die Grenzen der Streifen
-verlaufen, die Flaechen der Unterzuege und die Stuetzenbereiche, dazu die
+verlaufen, die Flaechen der Traeger und die Stuetzenbereiche, dazu die
 Meldungen -- die der Decke und je Lastfall und Kombination die eigenen,
 samt Last und Lagerkraft, auch je Lager.
 
 Auf Anfrage die Bilder eines Falls (:func:`ergebnis`): die Momente und
 Querkraefte in Zellen ueber die Platten, je Zelle mit ihrem Gefaelle, ihre
 groessten Werte mit Ort, die Kraft jeder Stuetze, der Verlauf laengs
-jedes Linienlagers, der laengs jedes Schnitts und der jedes Unterzugs --
+jedes Linienlagers, der laengs jedes Schnitts und der jedes Traegers --
 dieser ganz, nicht je Meter. Die Zellen sind gross;
 mit jeder Rechnung mitgeliefert, machten sie jede Eingabe langsamer --
 dasselbe wie beim Verlauf des Balkensystems.
@@ -45,7 +45,7 @@ from opencivil.web.anzeige import zahl
 STELLEN = 4
 
 #: Die Einheit der Anzeige je Groesse: Momente der Platte in kNm/m, Querkraefte
-#: in kN/m -- die eines ganzen Unterzugs in kNm und kN.
+#: in kN/m -- die eines ganzen Trägers in kNm und kN.
 EINHEITEN = {**{g: KNM_PRO_M if g.startswith("m") else KN_PRO_M for g in feld.GROESSEN},
              "M": KNM, "V": KN}
 
@@ -67,7 +67,7 @@ def uebersicht(befund: Optional[Deckenbefund]) -> Dict[str, Any]:
     dazu ``richtungen``, ``anteile``
     (Vieleck und Anteil in Richtung 1, in % -- ``None``, wo keine Richtung
     trägt), ``grenzen`` (je Grenze
-    zweier Streifen eine Strecke), ``unterzuege`` -- die des Benutzers --,
+    zweier Streifen eine Strecke), ``traeger`` -- die des Benutzers --,
     ``baender`` -- die die Rechnung selbst legte, mit ``achse``, ``art`` und
     ``breite`` in m --, ``stuetzenbereiche`` und
     ``faelle``: je Lastfall und Kombination ``name``, die Last ``summe``,
@@ -96,11 +96,11 @@ def uebersicht(befund: Optional[Deckenbefund]) -> Dict[str, Any]:
         "anteile": [{"ecken": _punkte(ecken), "anteil": None if wert is None else round(100.0 * wert, 6)}
                     for ecken, wert in _anteile(e)],
         "grenzen": _grenzen(e),
-        "unterzuege": [{"name": u.name, "ecken": _punkte(u.gebiet)} for u in z.unterzuege
-                       if not u.unterzug.von_selbst],
-        "baender": [{"name": u.name, "ecken": _punkte(u.gebiet), "achse": _punkte([u.unterzug.a, u.unterzug.b]),
-                     "art": art(u.unterzug), "breite": round(u.unterzug.breite, STELLEN)}
-                    for u in z.unterzuege if u.unterzug.von_selbst],
+        "traeger": [{"name": u.name, "ecken": _punkte(u.gebiet)} for u in z.traeger
+                    if not u.traeger.von_selbst],
+        "baender": [{"name": u.name, "ecken": _punkte(u.gebiet), "achse": _punkte([u.traeger.a, u.traeger.b]),
+                     "art": art(u.traeger), "breite": round(u.traeger.breite, STELLEN)}
+                    for u in z.traeger if u.traeger.von_selbst],
         "stuetzenbereiche": [{"name": name, "ecken": _punkte(ecken)}
                              for name, ecken in z.stuetzenbereiche.items()],
         "faelle": [{"name": f.name, "summe": zahl(f.summe, KN), "daneben": zahl(f.daneben, KN),
@@ -138,8 +138,8 @@ def ergebnis(befund: Deckenbefund, name: str,
     (:func:`~opencivil.decke.feld.proben`).
     Dazu je Stuetze ihre Kraft ``F``, je Linienlager, was
     :func:`_linienlager` sagt, je der ``schnitte`` -- ``(Kennung, a, b)`` --
-    und je Unterzug, was :func:`_verlauf` sagt. Momente in kNm/m,
-    Querkraefte und ``r`` in kN/m, Kraefte in kN, die eines Unterzugs in kNm
+    und je Traeger, was :func:`_verlauf` sagt. Momente in kNm/m,
+    Querkraefte und ``r`` in kN/m, Kraefte in kN, die eines Traegers in kNm
     und kN -- wie ``einheiten`` sagt.
     """
     e = befund.ergebnis
@@ -164,20 +164,20 @@ def ergebnis(befund: Deckenbefund, name: str,
         "linienlager": [_linienlager(l, fall) for l in e.decke.linienlager],
         "schnitte": [_verlauf(schnitt.verlauf(e, fall, a, b), kennung, a, b, feld.GROESSEN)
                      for kennung, a, b in schnitte],
-        "unterzuege": [_verlauf(schnitt.unterzug(fall, u), u.name, u.unterzug.a, u.unterzug.b,
-                                schnitt.BALKENGROESSEN) for u in e.zerlegung.unterzuege],
+        "traeger": [_verlauf(schnitt.traeger(fall, u), u.name, u.traeger.a, u.traeger.b,
+                             schnitt.BALKENGROESSEN) for u in e.zerlegung.traeger],
     }
 
 
 def _verlauf(v: schnitt.Verlauf, kennung: str, a: Punkt, b: Punkt,
              groessen: Sequence[str]) -> Dict[str, Any]:
     """
-    Ein Schnitt oder ein Unterzug im Bild eines Falls, alles in m ab ``a``:
+    Ein Schnitt oder ein Traeger im Bild eines Falls, alles in m ab ``a``:
     seine Enden ``a`` und ``b``, seine Laenge ``L``, wo er in einer Platte
     liegt (``stuecke``), die ``stellen``, an denen er hinsieht, und je der
     ``groessen`` die ``werte`` dort und die ``extreme`` mit Stelle ``u``;
     die ``lager``, die er kreuzt oder auf denen er liegt, und die
-    ``unterzuege``. Zwei Stellen eines Sprungs fallen in der Rundung
+    ``traeger``. Zwei Stellen eines Sprungs fallen in der Rundung
     zusammen -- im Bild steht er senkrecht.
     """
     return {
@@ -190,8 +190,8 @@ def _verlauf(v: schnitt.Verlauf, kennung: str, a: Punkt, b: Punkt,
                     for g in groessen} if v.proben else {},
         "lager": [{"u": round(l.u, STELLEN), "art": l.art, "name": l.name, "vertikal": l.vertikal,
                    "eingespannt": l.eingespannt} for l in v.lager],
-        "unterzuege": [{"von": round(u0, STELLEN), "bis": round(u1, STELLEN), "name": name}
-                       for u0, u1, name in v.unterzuege],
+        "traeger": [{"von": round(u0, STELLEN), "bis": round(u1, STELLEN), "name": name}
+                    for u0, u1, name in v.traeger],
     }
 
 

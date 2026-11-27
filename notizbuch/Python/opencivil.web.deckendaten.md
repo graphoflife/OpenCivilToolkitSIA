@@ -1,5 +1,5 @@
 ---
-erzeugt: 439a1eb88a9e
+erzeugt: 2fe2a14af60e
 art: modul
 tags: [modul]
 ---
@@ -12,14 +12,14 @@ tags: [modul]
 Aus dem Befund einer Decke die Daten ihrer Bilder, in m: wie die Last auf
 die zwei Richtungen geht – je Zelle der automatischen Aufteilung, je
 Platte bei fester, und in den Zonen –, wo die Grenzen der Streifen
-verlaufen, die Flaechen der Unterzuege und die Stuetzenbereiche, dazu die
+verlaufen, die Flaechen der Traeger und die Stuetzenbereiche, dazu die
 Meldungen – die der Decke und je Lastfall und Kombination die eigenen,
 samt Last und Lagerkraft, auch je Lager.
 
 Auf Anfrage die Bilder eines Falls ([[opencivil.web.deckendaten#ergebnis|ergebnis]]): die Momente und
 Querkraefte in Zellen ueber die Platten, je Zelle mit ihrem Gefaelle, ihre
 groessten Werte mit Ort, die Kraft jeder Stuetze, der Verlauf laengs
-jedes Linienlagers, der laengs jedes Schnitts und der jedes Unterzugs –
+jedes Linienlagers, der laengs jedes Schnitts und der jedes Traegers –
 dieser ganz, nicht je Meter. Die Zellen sind gross;
 mit jeder Rechnung mitgeliefert, machten sie jede Eingabe langsamer –
 dasselbe wie beim Verlauf des Balkensystems.
@@ -51,7 +51,7 @@ wählt, die zwei in Grad gegen x; wenn die Decke in Streifen zerfiel,
 dazu `richtungen`, `anteile`
 (Vieleck und Anteil in Richtung 1, in % – `None`, wo keine Richtung
 trägt), `grenzen` (je Grenze
-zweier Streifen eine Strecke), `unterzuege` – die des Benutzers –,
+zweier Streifen eine Strecke), `traeger` – die des Benutzers –,
 `baender` – die die Rechnung selbst legte, mit `achse`, `art` und
 `breite` in m –, `stuetzenbereiche` und
 `faelle`: je Lastfall und Kombination `name`, die Last `summe`,
@@ -93,8 +93,8 @@ Wert mit seinem Ort – gesucht an den Proben des Falls
 ([[opencivil.decke.feld#proben|proben]]).
 Dazu je Stuetze ihre Kraft `F`, je Linienlager, was
 [[opencivil.web.deckendaten#_linienlager|_linienlager]] sagt, je der `schnitte` – `(Kennung, a, b)` –
-und je Unterzug, was [[opencivil.web.deckendaten#_verlauf|_verlauf]] sagt. Momente in kNm/m,
-Querkraefte und `r` in kN/m, Kraefte in kN, die eines Unterzugs in kNm
+und je Traeger, was [[opencivil.web.deckendaten#_verlauf|_verlauf]] sagt. Momente in kNm/m,
+Querkraefte und `r` in kN/m, Kraefte in kN, die eines Traegers in kNm
 und kN – wie `einheiten` sagt.
 
 ### _verlauf
@@ -103,12 +103,12 @@ und kN – wie `einheiten` sagt.
 def _verlauf(v: schnitt.Verlauf, kennung: str, a: Punkt, b: Punkt, groessen: Sequence[str]) -> Dict[str, Any]
 ```
 
-Ein Schnitt oder ein Unterzug im Bild eines Falls, alles in m ab `a`:
+Ein Schnitt oder ein Traeger im Bild eines Falls, alles in m ab `a`:
 seine Enden `a` und `b`, seine Laenge `L`, wo er in einer Platte
 liegt (`stuecke`), die `stellen`, an denen er hinsieht, und je der
 `groessen` die `werte` dort und die `extreme` mit Stelle `u`;
 die `lager`, die er kreuzt oder auf denen er liegt, und die
-`unterzuege`. Zwei Stellen eines Sprungs fallen in der Rundung
+`traeger`. Zwei Stellen eines Sprungs fallen in der Rundung
 zusammen – im Bild steht er senkrecht.
 
 ### _linienlager
@@ -150,7 +150,7 @@ in der Platte – in einem L zwei, wo die Grenze die Ecke quert.
 ## Konstanten
 
 - `STELLEN = 4` – Auf einen Zehntelmillimeter – fuers Bild genug, und die Antwort bleibt klein.
-- `EINHEITEN = {**{g: KNM_PRO_M if g.startswith('m') else KN_PRO_M for g in feld.GRO…` – Die Einheit der Anzeige je Groesse: Momente der Platte in kNm/m, Querkraefte in kN/m – die eines ganzen Unterzugs in kNm und kN.
+- `EINHEITEN = {**{g: KNM_PRO_M if g.startswith('m') else KN_PRO_M for g in feld.GRO…` – Die Einheit der Anzeige je Groesse: Momente der Platte in kNm/m, Querkraefte in kN/m – die eines ganzen Trägers in kNm und kN.
 
 ## Braucht
 

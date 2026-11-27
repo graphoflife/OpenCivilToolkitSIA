@@ -3,7 +3,7 @@
  *
  * Was ein Werkzeug als Nächstes anlegt (`neuEigenschaften`) und was gewählt
  * ist (`eigenschaften`): je Knoten -- mit seiner Stütze und Punktlast --,
- * Platte -- mit der Last auf ihr --, Linienlager, Unterzug, Zone oder Last
+ * Platte -- mit der Last auf ihr --, Linienlager, Träger, Zone oder Last
  * seine Felder; ein Schnitt hat keine, nur wo sein Bild zu holen ist. Sind mehrere derselben Art gewählt, ändert das Fenster alle
  * zugleich; was sie gemeinsam haben, steht da, sonst «Var» -- wie im
  * Balkensystem. Eine Stütze und eine Punktlast wählt man nicht für sich:
@@ -139,15 +139,15 @@ const FELDER = {
     schalterzeile('eingespannt', jaNein(wert('eingespannt'), setzen('eingespannt'),
       'Hält die Drehung – ohne vertikalen Halt wie an einer Symmetrieachse')),
   ],
-  unterzuege: (wert, setzen) => [
-    feldzeile('unterzug', 'breite', 'Breite b', wert, setzen, {
-      schritt: 0.1, titel: 'So breit trägt der Unterzug als Streifen in der Platte',
+  traeger: (wert, setzen) => [
+    feldzeile('traeger', 'breite', 'Breite b', wert, setzen, {
+      schritt: 0.1, titel: 'So breit trägt der Träger als Streifen in der Platte',
     }),
-    feldzeile('unterzug', 'stufe', 'Stufe', wert, setzen, {
-      titel: 'Ein Unterzug liegt auf denen höherer Stufe, die ihn kreuzen',
+    feldzeile('traeger', 'stufe', 'Stufe', wert, setzen, {
+      titel: 'Ein Träger liegt auf denen höherer Stufe, die ihn kreuzen',
     }),
     el('p.cad-hinweis-klein', {
-      text: 'Sein M und V: unter «Ergebnisse» mit «+ Diagramm», dann statt «ganze Platte» den Unterzug wählen.',
+      text: 'Sein M und V: unter «Ergebnisse» mit «+ Diagramm», dann statt «ganze Platte» den Träger wählen.',
     }),
   ],
   zonen: (wert, setzen) => [
@@ -178,7 +178,7 @@ const FELDER = {
       feldzeile('stuetze', 'b_y', 'b_y', wert, setzen, { schritt: 50 }),
       wahlBlock('Stützenbereich', wahlSchalter({
         werte: mitVar([
-          { wert: false, beschriftung: 'von selbst', titel: 'So gross wie die Stütze oder der breiteste Unterzug über ihr' },
+          { wert: false, beschriftung: 'von selbst', titel: 'So gross wie die Stütze oder der breiteste Träger über ihr' },
           { wert: true, beschriftung: 'von Hand', titel: 'l_x × l_y von Hand' },
         ], vonHand),
         gewaehlt: vonHand, setzen: setzen('bereich_von_hand'),
@@ -194,7 +194,7 @@ const FELDER = {
 
 /** Welche Liste ein Werkzeug füllt -- der Knoten keine. */
 const LISTE_VON = {
-  platte: 'platten', lager: 'linienlager', stuetze: 'stuetzen', unterzug: 'unterzuege', zone: 'zonen',
+  platte: 'platten', lager: 'linienlager', stuetze: 'stuetzen', traeger: 'traeger', zone: 'zonen',
   flaechenlast: 'flaechenlasten', linienlast: 'linienlasten', punktlast: 'punktlasten', schnitt: 'schnitte',
 };
 
@@ -306,7 +306,7 @@ function knotenEigenschaften(a, z, knoten) {
   };
 }
 
-// -- Platten, Linienlager, Unterzüge, Zonen, Lasten ---------------------------
+// -- Platten, Linienlager, Träger, Zonen, Lasten ---------------------------
 
 /**
  * Die Last auf den ganzen gewählten Platten im gezeigten Lastfall -- leer

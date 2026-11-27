@@ -321,7 +321,7 @@ def jeder_nachweis() -> Projekt:
 def _decken(p: Projekt) -> None:
     """
     Zwei Decken. Die des Kolloquiums 4 (Stahlbeton II): eine Platte auf
-    einer Wand und drei Stützen, versteckte Unterzüge in zwei Stufen, fest
+    einer Wand und drei Stützen, Träger in zwei Stufen, fest
     30 % in x, und als einziger Lastfall q_d = 18.6 kN/m² auf der ganzen
     Platte, das Eigengewicht darin. Und eine, die jede Wahl einmal braucht:
     zwei Platten verschiedener Dicke in einem L, automatisch aufgeteilt, mit
@@ -330,7 +330,7 @@ def _decken(p: Projekt) -> None:
     Platte, deren Streifen ihren Rändern folgen. Sie hat die Lastfälle und
     Kombinationen einer frischen Decke und jede Art Last: auf einer ganzen
     Platte, gezeichnet, längs einer Linie und an einem Punkt. Die erste
-    zeigt m_x, m_y, die Lager und M und V des Unterzugs U4, der auf den drei
+    zeigt m_x, m_y, die Lager und M und V des Trägers T4, der auf den drei
     anderen liegt; die zweite jedes Bild der Platte einmal.
     """
     beton = _erstes(p, "beton")
@@ -339,14 +339,14 @@ def _decken(p: Projekt) -> None:
     k4.lager((0, 0), (9, 0))
     for x in (0.5, 4.5, 8.5):
         k4.stuetze((x, 5.0))
-        k4.unterzug((x, 0), (x, 5.5), stufe=2)
-    k4.unterzug((0, 5.0), (9, 5.0))
+        k4.traeger_legen((x, 0), (x, 5.5), stufe=2)
+    k4.traeger_legen((0, 5.0), (9, 5.0))
     q_d = k4.lastfall("q_d")
     k4.plattenlast(q_d, "P1", 18.6)
     for groesse in ("m_x", "m_y", "lager"):
         k4.diagramm(q_d, groesse)
     for groesse in BALKENGROESSEN:
-        k4.diagramm(q_d, groesse, "U4")
+        k4.diagramm(q_d, groesse, "T4")
 
     el = p.decke("Jede Wahl", streifenbreite=0.5)
     el.platte([(0, 0), (6, 0), (6, 4), (0, 4)], beton=beton, h=220)

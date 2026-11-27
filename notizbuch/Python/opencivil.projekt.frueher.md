@@ -1,5 +1,5 @@
 ---
-erzeugt: 18576f6b8640
+erzeugt: b82cadd8fed2
 art: modul
 tags: [modul]
 ---
@@ -62,6 +62,18 @@ Kern. Jedes Geschoss nimmt ihn mit dem η_EI der Waende. Waende ohne Analyse
 fallen weg: sie trugen nichts bei. Verschiedene η_EI, eine Analyse, die es
 nicht gibt, oder eine Wand, die sich nicht lesen laesst, gehen nicht ohne
 Rueckfrage in einen Kern: die Datei meldet sich dann beim Lesen.
+
+
+## DIE TRAEGER EINER DECKE (2026-11-27)
+
+Bis dahin hiessen sie Unterzuege: die Liste `unterzuege`, die Kennungen
+`U1`, `U2` … Seither heissen sie `traeger` und `T1`, `T2` …, denn
+ein Traeger kann auch ein Ueberzug sein ([[opencivil.projekt.decke]]).
+Jede Decke bekommt die neuen Namen, auch ein Bild, das in einem Traeger
+schneidet, und die Zaehlung ihrer Kennungen: ein geloeschter `U5` heisst
+danach `T5` und kommt so wenig wieder wie zuvor
+([[opencivil.projekt.frueher#traeger_umbenennen|traeger_umbenennen]]). Eine Kennung, die es in der Decke schon gibt,
+nimmt keiner: der Traeger behaelt dann seine alte.
 
 ## Inhalt
 
@@ -137,6 +149,23 @@ def _faktoren(glied: Any, f_pk: Mapping[str, float]) -> Any
 ```
 
 Ein Glied mit Faktoren statt Spannungen – `glied` selbst, wo das nicht geht.
+
+### traeger_umbenennen
+
+```python
+def traeger_umbenennen(roh: Any) -> Any
+```
+
+`roh` mit Traegern statt Unterzuegen in jeder Decke – siehe Dateikopf.
+
+### _traeger
+
+```python
+def _traeger(decke: Any) -> Any
+```
+
+Eine Decke mit `traeger` statt `unterzuege` – `decke` selbst, wo
+sie keine solche Liste hat oder schon beide: das meldet dann das Lesen.
 
 ### waende_heraus
 

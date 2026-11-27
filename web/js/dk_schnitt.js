@@ -3,12 +3,12 @@
  *
  * Ein Schnitt ist eine Linie im Grundriss (dk_zeichnung.js). Sein Bild
  * zeigt eine Grösse der Platte längs ihm wie an einem Balken des
- * Balkensystems (Benutzer, 2026-11-16) -- ebenso das Bild eines Unterzugs
+ * Balkensystems (Benutzer, 2026-11-16) -- ebenso das Bild eines Trägers
  * sein M oder V, auf den Lagern, auf denen er liegt --, in zwei Zeilen:
  *
  *   oben    die Achse mit den Lagern, die er kreuzt -- Linienlager und
  *           Stützen ein Dreieck, eingespannt ein Balken mit Schraffur, eine
- *           Symmetrieachse strichpunktiert --, die Unterzüge als Band;
+ *           Symmetrieachse strichpunktiert --, die Träger als Band;
  *           neben den Platten ist die Achse gestrichelt;
  *   unten   der Verlauf, positive Werte unten: das Moment auf der Zugseite,
  *           wie im Balkensystem an der gestrichelten Faser. Neben den
@@ -40,13 +40,13 @@ const AUSSCHLAG = 64;
 const ZAHLEN = 32;
 /** Unter der Achse des Systems Platz für die Lager und ihre Namen, in Bildpunkten. */
 const SYSTEM_UNTEN = 44;
-/** Ein Unterzug ist ein Band so hoch, in Bildpunkten -- darüber je Zeile ein Name. */
+/** Ein Träger ist ein Band so hoch, in Bildpunkten -- darüber je Zeile ein Name. */
 const BAND = 12;
 const NAMENSZEILE = 12;
 /** Stellen der angeschriebenen Werte. */
 const STELLEN = 1;
 
-/** Die Farbe eines Verlaufs: Momente -- m_x der Platte, M eines Unterzugs -- wie M, Querkräfte wie V im Balkensystem. */
+/** Die Farbe eines Verlaufs: Momente -- m_x der Platte, M eines Trägers -- wie M, Querkräfte wie V im Balkensystem. */
 const familie = (groesse) => (/^m/i.test(groesse) ? 'bs-d-m' : 'bs-d-v');
 
 function schrift([x, y], inhalt, klasse, anker = 'middle') {
@@ -75,15 +75,15 @@ function lagerstellen(lager) {
 }
 
 /**
- * Je Unterzug die Zeile seines Namens über den Bändern, von unten gezählt:
+ * Je Träger die Zeile seines Namens über den Bändern, von unten gezählt:
  * die erste, in der er keinen anderen deckt -- die schmalen zuerst, nahe
- * ihrem Band. Läuft der Schnitt in einem Unterzug, stünde dessen Name
+ * ihrem Band. Läuft der Schnitt in einem Träger, stünde dessen Name
  * sonst auf dem eines kreuzenden.
  */
-function namenszeilen(unterzuege, X) {
+function namenszeilen(traeger, X) {
   const belegt = [];
   const zeile = new Map();
-  for (const u of [...unterzuege].sort((a, b) => (a.bis - a.von) - (b.bis - b.von))) {
+  for (const u of [...traeger].sort((a, b) => (a.bis - a.von) - (b.bis - b.von))) {
     const mitte = (X(u.von) + X(u.bis)) / 2;
     const halb = u.name.length * 3.5 + 4;
     let i = belegt.findIndex((z) => z.every(([l, r]) => mitte + halb < l || mitte - halb > r));
@@ -94,14 +94,14 @@ function namenszeilen(unterzuege, X) {
   return zeile;
 }
 
-/** Die Zeile des Systems: die Achse, die Unterzüge und die Lager mit ihren Namen. */
+/** Die Zeile des Systems: die Achse, die Träger und die Lager mit ihren Namen. */
 function system(svg, s, X, y, yVerlauf, zeilen) {
   svg.append(strich([X(0), y], [X(s.L), y], 'dk-s-achse ist-daneben'));
   for (const [u0, u1] of s.stuecke) svg.append(strich([X(u0), y], [X(u1), y], 'dk-s-achse'));
-  for (const u of s.unterzuege) {
+  for (const u of s.traeger) {
     svg.append(svgEl('rect', {
       x: X(u.von).toFixed(1), y: (y - BAND / 2).toFixed(1), width: (X(u.bis) - X(u.von)).toFixed(1),
-      height: BAND, class: 'dk-s-unterzug',
+      height: BAND, class: 'dk-s-traeger',
     }), schrift([(X(u.von) + X(u.bis)) / 2, y - BAND / 2 - 4 - NAMENSZEILE * zeilen.get(u)], u.name, 'dk-s-name'));
   }
   for (const l of lagerstellen(s.lager)) {
@@ -149,7 +149,7 @@ export function schnittbild(s, groesse, { zeichen, einheit }) {
   const k = weit > 0 ? AUSSCHLAG / weit : 0;
   const kx = (BREITE - 2 * SEITE) / s.L;
   const X = (u) => SEITE + u * kx;
-  const zeilen = namenszeilen(s.unterzuege, X);
+  const zeilen = namenszeilen(s.traeger, X);
   const ySystem = 12 + (zeilen.size ? BAND / 2 + 4 + NAMENSZEILE * Math.max(...zeilen.values()) + 10 : 0);
   const yVerlauf = ySystem + SYSTEM_UNTEN + (tief < 0 ? ZAHLEN - tief * k : 12);
   const Y = (w) => yVerlauf + w * k;

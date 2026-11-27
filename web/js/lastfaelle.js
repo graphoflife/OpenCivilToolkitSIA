@@ -234,7 +234,7 @@ export function ohneFall(zeile) {
  * wird damit nichts, das Bauteil rechnet jeden Fall. Ein Fall, den es nicht
  * mehr gibt, steht als «– gelöscht, einen Fall wählen –» da. `groessen(zeile)` gibt die
  * Stellungen des Schalters aus dem Katalog -- je Zeile, denn in der Decke
- * hat ein Unterzug andere als die Platte --, `vorlage` die Art einer neuen
+ * hat ein Träger andere als die Platte --, `vorlage` die Art einer neuen
  * Zeile.
  * `zusatz(zeile, aendern)` gibt, was ein Bauteil unter dem Fall mehr
  * wählen lässt -- die Decke, wo das Bild hinsieht --, oder null.

@@ -5,7 +5,7 @@ VERANTWORTUNG:
 Aus den Lasten eines Lastfalls, was jeder Streifen trägt: eine Last je
 Länge längs seiner Achse, genau integriert über seine Breite. Je Stelle geht
 der Anteil seiner Richtung in ihn (:mod:`~opencivil.decke.aufteilung`) --
-liegt die Stelle in einem Unterzug derselben Richtung, in diesen.
+liegt die Stelle in einem Träger derselben Richtung, in diesen.
 
 FLÄCHEN:
 Alles wird zu Flächen mit gleichmässiger Last: eine Flächenlast auf ihrem
@@ -40,7 +40,7 @@ from opencivil.decke.aufteilung import Aufteilungen
 from opencivil.decke.geometrie import Punkt
 from opencivil.decke.modell import Decke, Flaechenlast, Kombination, Lastfall, Linienlast, Punktlast
 from opencivil.decke.streifen import Streifen, Zerlegung
-from opencivil.decke.traeger import Streckenlast, Teillast
+from opencivil.decke.durchlauftraeger import Streckenlast, Teillast
 from opencivil.stabwerk.system import Meldung
 
 #: Wie breit das Band einer Linienlast ist, in m.
@@ -221,7 +221,7 @@ def _verteilen(heraus: Belastung, zerlegung: Zerlegung, aufteilungen: Aufteilung
 
 
 def _zuordnen(heraus: Belastung, zerlegung: Zerlegung, streifen: Streifen, last: Streckenlast) -> None:
-    """In den Feldstreifen -- oder, wo er in einem Unterzug seiner Richtung liegt, in diesen."""
+    """In den Feldstreifen -- oder, wo er in einem Träger seiner Richtung liegt, in diesen."""
     rest = [last]
     for u in zerlegung.parallele.get(streifen.name, ()):
         lo, hi = u.laengs

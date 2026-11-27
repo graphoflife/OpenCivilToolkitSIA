@@ -1,5 +1,5 @@
 ---
-erzeugt: 363e9f5246aa
+erzeugt: c0ea47ed1b6c
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -37,6 +37,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
 - [[opencivil.decke]] – Stahlbetondecken nach der Streifenmethode.
     - [[opencivil.decke.aufteilung]] – welcher Teil der Last in welche Richtung geht.
     - [[opencivil.decke.baender]] – die Bänder, die eine Decke selbst legt.
+    - [[opencivil.decke.durchlauftraeger]] – ein Streifen als Durchlaufträger.
     - [[opencivil.decke.feld]] – die Schnittkräfte der Platte an einer Stelle.
     - [[opencivil.decke.geometrie]] – Vielecke in der Ebene der Decke.
     - [[opencivil.decke.herleitung]] – wie eine Decke ihre Rechnung aufschreibt.
@@ -46,7 +47,6 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.decke.richtungen]] – die zwei Richtungen, die eine Platte selbst wählt.
     - [[opencivil.decke.schnitt]] – die Schnittkräfte längs eines Schnitts.
     - [[opencivil.decke.streifen]] – die Decke in Streifen zerlegt.
-    - [[opencivil.decke.traeger]] – ein Streifen als Durchlaufträger.
     - [[opencivil.decke.werk]] – die Decke im Rechenwerk.
 - [[opencivil.durchstanzen]] – der Durchstanznachweis nach SIA 262:2025, 4.3.6.
     - [[opencivil.durchstanzen.bewehrung]] – wo die Durchstanzbewehrung liegt, und welche reicht.

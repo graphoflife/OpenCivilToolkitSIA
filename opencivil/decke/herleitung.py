@@ -3,12 +3,12 @@ opencivil/decke/herleitung.py -- wie eine Decke ihre Rechnung aufschreibt.
 
 VERANTWORTUNG:
 Die Herleitung der Streifenmethode, so dass man sie von Hand nachvollziehen
-kann: die Decke in Tabellen -- Platten, Linienlager, Stützen, Unterzüge,
+kann: die Decke in Tabellen -- Platten, Linienlager, Stützen, Träger,
 Lasten je Lastfall und die Kombinationen --, die Streifen je Richtung, in
-welcher Reihenfolge die Träger rechnen, wie die Last auf die Richtungen
+welcher Reihenfolge die Durchlaufträger rechnen, wie die Last auf die Richtungen
 geht, je Fall die Last und was die Lager davon tragen, und die Meldungen.
 Dann die Ansätze -- trägt eine Platte schief zu x und y, mit einem Hinweis
-zur Fliessbedingung -- und je Lastfall und Kombination: jeder Träger mit Last,
+zur Fliessbedingung -- und je Lastfall und Kombination: jeder Durchlaufträger mit Last,
 Lagerkräften und Momenten, was jedes Lager trägt, die grössten
 Schnittkräfte der Platte, die Biegewiderstände, die sie verlangt, und die
 Lastverteilelemente.
@@ -17,15 +17,15 @@ DIESELBEN ZAHLEN WIE IM BILD:
 Die grössten Schnittkräfte und Biegewiderstände kommen von den Proben des
 Falls (:func:`~opencivil.decke.feld.proben`), wie in den Bildern.
 
-GLEICHE TRÄGER IN EINER ZEILE:
-Tragen nebeneinander liegende Träger dasselbe -- im Kolloquium 4 achtzehn
+GLEICHE DURCHLAUFTRÄGER IN EINER ZEILE:
+Tragen nebeneinander liegende Durchlaufträger dasselbe -- im Kolloquium 4 achtzehn
 Feldstreifen in x --, stehen sie in einer Zeile, «x1 … x18». Was sie
 unterscheidet, ist nur ihr Ort quer; ``s`` misst längs.
 
 EINHEITEN:
 Längen in m, Dicken und Stützen in mm, Winkel in Grad gegen x, E in N/mm²,
 Gewichte und Flächenlasten in kN/m², Linienlasten in kN/m, Kräfte in kN.
-Die Träger je Meter ihrer Breite: Lasten und Lagerkräfte in kN/m, Momente
+Die Durchlaufträger je Meter ihrer Breite: Lasten und Lagerkräfte in kN/m, Momente
 in kNm/m, wie die Schnittkräfte der Platte.
 """
 
@@ -40,9 +40,9 @@ from opencivil.decke import feld
 from opencivil.decke import geometrie as geo
 from opencivil.decke.aufteilung import GANZ_AB
 from opencivil.decke.baender import art
-from opencivil.decke.modell import Aufteilung, Decke, Flaechenlast, Last, Linienlast, Punktlast, Unterzug
+from opencivil.decke.modell import Aufteilung, Decke, Flaechenlast, Last, Linienlast, Punktlast, Traeger
 from opencivil.decke.rechnung import Ergebnis, Fallergebnis, lagerverlauf, spitzen
-from opencivil.decke.streifen import Streifen, Traeger, Zerlegung, richtungen_der_platte
+from opencivil.decke.streifen import Streifen, Durchlauftraeger, Zerlegung, richtungen_der_platte
 from opencivil.stabwerk.verlauf import extremwerte
 
 if TYPE_CHECKING:
@@ -55,7 +55,7 @@ ANNAHME = (
     "Gleichgewichtslösung nach der statischen Methode und damit ein unterer Grenzwert der "
     "Traglast (SIA 262:2025, 4.1.4.2.2) – für die Tragsicherheit (4.1.4.2.1), und nur, wenn das "
     "Verformungsvermögen gesichert ist (4.1.4.2.4). Statisch unbestimmte Streifen sind elastisch "
-    "gelöst, mit E_cm · h³/12 je Meter der ungerissenen Platte (4.1.4.1.3); ein Unterzug trägt "
+    "gelöst, mit E_cm · h³/12 je Meter der ungerissenen Platte (4.1.4.1.3); ein Träger trägt "
     "als Flächenlager mit gleichmässiger Pressung über seine Breite (Folie 33).")
 
 #: Die automatische Aufteilung in Worten -- die Regel steht in :mod:`~opencivil.decke.aufteilung`.
@@ -81,8 +81,8 @@ BAENDER = (
     "Die Bänder legt die Rechnung selbst, weil sie automatisch aufteilt: durch jede Stütze in den "
     "Richtungen der Platte, von Lager zu Lager, und innen an jedem offenen Rand – einem freien "
     "Rand, einem Lochrand, einer Fuge zu einer Platte mit anderen Richtungen –, wo die Streifen "
-    "quer dazu schon ein Lager haben. Jedes Band liegt auf mindestens zwei Lagern; ein Unterzug "
-    "oder eine Wand längs ersetzt es. Ein Band liegt auf den Unterzügen, die es kreuzt, und ein "
+    "quer dazu schon ein Lager haben. Jedes Band liegt auf mindestens zwei Lagern; ein Träger "
+    "oder eine Wand längs ersetzt es. Ein Band liegt auf den Trägern, die es kreuzt, und ein "
     "Band am Rand auf einem über Stützen (nach Vorgabe; die Norm lässt jede Aufteilung zu, die im "
     "Gleichgewicht ist, SIA 262:2025, 4.1.4.2.2).")
 
@@ -203,12 +203,12 @@ def _lager(p: Protokoll, decke: Decke, e: Optional[Ergebnis]) -> None:
                            masse, "von Hand" if s.lx is not None else "von selbst"])
         p.tabelle(["Stütze", "Ort", Mathe(r"b_x \times b_y\ [\mathrm{mm}]"),
                    Mathe(r"l_x \times l_y\ [\mathrm{m}]"), "Stützenbereich"], zeilen, titel="Stützen")
-    eigene = [u for u in decke.unterzuege if not u.von_selbst]
+    eigene = [u for u in decke.traeger if not u.von_selbst]
     if eigene:
-        p.tabelle(["Unterzug", "von", "bis", Mathe(r"b\ [\mathrm{m}]"), "Stufe"],
+        p.tabelle(["Träger", "von", "bis", Mathe(r"b\ [\mathrm{m}]"), "Stufe"],
                   [[u.name, _ort(u.a), _ort(u.b), Mathe(fest(u.breite, 2)), f"{u.stufe:g}"]
-                   for u in eigene], titel="Versteckte Unterzüge")
-    baender = [u for u in decke.unterzuege if u.von_selbst]
+                   for u in eigene], titel="Träger")
+    baender = [u for u in decke.traeger if u.von_selbst]
     if baender:
         p.tabelle(["Band", "von", "bis", Mathe(r"b\ [\mathrm{m}]"), "wo"],
                   [[u.name, _ort(u.a), _ort(u.b), Mathe(fest(u.breite, 2)), art(u)] for u in baender],
@@ -261,19 +261,19 @@ def _streifen(p: Protokoll, e: Ergebnis) -> None:
     p.tabelle(["Richtung", Mathe(r"\varphi\ [°]"), "Feldstreifen", Mathe(r"b\ [\mathrm{m}]"), "Namen"],
               zeilen, titel="Streifen")
     p.text(f"Je Richtung sind die Streifen höchstens {fest(e.decke.streifenbreite, 2)} m breit; "
-           "geteilt wird an jeder Ecke einer Platte, jedem Rand eines Unterzugs und Stützenbereichs "
+           "geteilt wird an jeder Ecke einer Platte, jedem Rand eines Trägers und Stützenbereichs "
            "und jedem Ende eines Linienlagers.")
-    if z.unterzuege:
-        reihe = [f"{u.name} ({_stufe(u.unterzug)})" for u in sorted(z.unterzuege, key=lambda s: s.stufe)]
-        was = " und ".join(x for x, da in (("die Bänder", True), ("die Unterzüge", False))
-                           if any(u.unterzug.von_selbst is da for u in z.unterzuege))
-        p.text(f"Gerechnet wird von unten nach oben: zuerst die Feldstreifen, dann {was}, jeder "
-               "Träger nach denen tieferer Stufe: " + ", ".join(reihe) + ". Was ein Träger an "
+    if z.traeger:
+        reihe = [f"{u.name} ({_stufe(u.traeger)})" for u in sorted(z.traeger, key=lambda s: s.stufe)]
+        was = " und ".join(x for x, da in (("die Bänder", True), ("die Träger", False))
+                           if any(u.traeger.von_selbst is da for u in z.traeger))
+        p.text(f"Gerechnet wird von unten nach oben: zuerst die Feldstreifen, dann {was}, die "
+               "tiefere Stufe zuerst: " + ", ".join(reihe) + ". Was ein Durchlaufträger an "
                "Lagerkraft abgibt, ist die Last dessen, auf dem er liegt.")
 
 
-def _stufe(u: Unterzug) -> str:
-    """Die Stufe eines Unterzugs -- ein Band sagt stattdessen, wo es liegt."""
+def _stufe(u: Traeger) -> str:
+    """Die Stufe eines Trägers -- ein Band sagt stattdessen, wo es liegt."""
     return f"Band {art(u)}" if u.von_selbst else f"Stufe {u.stufe:g}"
 
 
@@ -316,18 +316,18 @@ def _faelle(p: Protokoll, e: Ergebnis) -> None:
 
 
 def _ansaetze(p: Protokoll, e: Ergebnis) -> None:
-    """Wie aus den Trägern die Platte wird -- je einmal, was die Decke braucht."""
+    """Wie aus den Durchlaufträgern die Platte wird -- je einmal, was die Decke braucht."""
     decke = e.decke
     p.ansatz(STREIFEN_IN_XY, titel="Vom Streifen zur Platte: je Meter, in den Achsen x und y",
              referenz="Stahlbeton II, 7.2 Platten, Folie 14", name="Schnittkräfte eines Streifens in x und y")
     p.text("Ein Streifen der Breite b in der Richtung φ gegen x trägt mit M und V; je Meter sind das "
            "m und v. An einer Stelle zählen alle Streifen über ihr: je Richtung ein Feldstreifen und "
-           "jeder Unterzug, in dessen Fläche sie liegt.")
-    if decke.unterzuege or decke.stuetzen:
+           "jeder Träger, in dessen Fläche sie liegt.")
+    if decke.traeger or decke.stuetzen:
         p.ansatz(FLAECHENLAGER, titel="Ein Flächenlager drückt gleichmässig über seine Breite l",
                  referenz="Stahlbeton II, 7.2 Platten, Folie 33", name="Pressung eines Flächenlagers")
-        p.text("Ein Unterzug oder Stützenbereich trägt einen Streifen nicht in einem Punkt: seine "
-               "Lagerkraft R drückt gleichmässig über die Breite l, die beide teilen. Beim Unterzug "
+        p.text("Ein Träger oder Stützenbereich trägt einen Streifen nicht in einem Punkt: seine "
+               "Lagerkraft R drückt gleichmässig über die Breite l, die beide teilen. Beim Träger "
                "wird diese Pressung zu seiner Last.")
     p.ansatz(FLIESSBEDINGUNG, titel="Erforderliche Biegewiderstände, linearisierte Fliessbedingung",
              referenz="SIA 262:2025, 4.3.2.6, (34)", name="Linearisierte Fliessbedingung")
@@ -344,13 +344,16 @@ def _ansaetze(p: Protokoll, e: Ergebnis) -> None:
 
 
 def _fall(p: Protokoll, e: Ergebnis, f: Fallergebnis, zellen: Sequence[Sequence[geo.Punkt]]) -> None:
-    """Ein Lastfall oder eine Kombination: Träger, Lager, Platte, Biegewiderstände, Lastverteilelemente."""
+    """
+    Ein Lastfall oder eine Kombination: Durchlaufträger, Lager, Platte,
+    Biegewiderstände, Lastverteilelemente.
+    """
     kombination = any(k.name == f.name for k in e.decke.kombinationen)
     p.titel(f"{'Kombination' if kombination else 'Lastfall'} «{f.name}»", ebene=3)
-    if not f.traeger:
+    if not f.durchlauftraeger:
         p.text("Nichts trägt in diesem Fall.")
         return
-    _traeger(p, e, f)
+    _durchlauftraeger(p, e, f)
     _lagerkraefte(p, e, f)
     proben = feld.proben(e, f, zellen)
     if proben:
@@ -359,13 +362,13 @@ def _fall(p: Protokoll, e: Ergebnis, f: Fallergebnis, zellen: Sequence[Sequence[
     _lastverteilelemente(p, e, f)
 
 
-def _traeger(p: Protokoll, e: Ergebnis, f: Fallergebnis) -> None:
-    """Jeder Träger, je Meter seiner Breite -- gleiche Feldstreifen nebeneinander in einer Zeile."""
+def _durchlauftraeger(p: Protokoll, e: Ergebnis, f: Fallergebnis) -> None:
+    """Jeder Durchlaufträger, je Meter seiner Breite -- gleiche Feldstreifen nebeneinander in einer Zeile."""
     zeilen: List[Tuple[List[str], Tuple[str, ...], Optional[Tuple[str, int]]]] = []
     for streifen, stueck, t in _reihe(e.zerlegung):
-        r = f.traeger.get(t.name)
+        r = f.durchlauftraeger.get(t.name)
         if r is None:
-            # Ein Träger ohne Last steht nicht da -- und trennt seine Nachbarn.
+            # Ein Durchlaufträger ohne Last steht nicht da -- und trennt seine Nachbarn.
             if zeilen:
                 zeilen[-1] = (*zeilen[-1][:2], None)
             continue
@@ -375,35 +378,37 @@ def _traeger(p: Protokoll, e: Ergebnis, f: Fallergebnis) -> None:
         lager = " · ".join(f"{k.auflager.name} {fest(k.F / b / 1e3, 1)}" for k in r.lagerkraefte)
         werte = (fest(b, 3), fest(t.L, 2), fest(r.last / b / 1e3, 1), lager,
                  *_mit_stelle(m_klein / b, t.s0 + s_klein), *_mit_stelle(m_gross / b, t.s0 + s_gross))
-        # Zusammen nur gleich gezählte Stücke von Feldstreifen derselben Richtung; ein Unterzug steht für sich.
+        # Zusammen nur gleich gezählte Stücke von Feldstreifen derselben Richtung; ein Träger steht für sich.
         gruppe = (streifen.richtung.name, stueck) if streifen.stufe == 0 else None
         if zeilen and gruppe is not None and zeilen[-1][1:] == (werte, gruppe):
             zeilen[-1][0].append(t.name)
         else:
             zeilen.append(([t.name], werte, gruppe))
-    p.tabelle(["Träger", Mathe(r"b\ [\mathrm{m}]"), Mathe(r"L\ [\mathrm{m}]"),
+    p.tabelle(["Durchlaufträger", Mathe(r"b\ [\mathrm{m}]"), Mathe(r"L\ [\mathrm{m}]"),
                Mathe(r"Q/b\ [\mathrm{kN/m}]"), "Lager [kN/m]", Mathe(r"m_{\min}\ [\mathrm{kNm/m}]"),
                Mathe(r"s\ [\mathrm{m}]"), Mathe(r"m_{\max}\ [\mathrm{kNm/m}]"), Mathe(r"s\ [\mathrm{m}]")],
               [[namen[0] if len(namen) == 1 else f"{namen[0]} … {namen[-1]}", *map(_zahl, werte[:3]),
                 werte[3], *map(_zahl, werte[4:])] for namen, werte, _ in zeilen],
-              titel="Träger, je Meter ihrer Breite")
-    p.text("Q ist die Last auf dem Träger, mit dem, was tiefere Träger in ihn geben. s misst längs der "
-           "Richtung φ des Trägers, s = x · cos φ + y · sin φ: in x ist s = x, in y ist s = y. "
-           "Nebeneinander liegende Träger, die dasselbe tragen, stehen in einer Zeile.")
+              titel="Durchlaufträger, je Meter ihrer Breite")
+    p.text("Q ist die Last auf dem Durchlaufträger, mit dem, was tiefere Durchlaufträger in ihn geben. "
+           "s misst längs der Richtung φ des Durchlaufträgers, s = x · cos φ + y · sin φ: in x ist "
+           "s = x, in y ist s = y. Nebeneinander liegende Durchlaufträger, die dasselbe tragen, stehen "
+           "in einer Zeile.")
 
 
-def _reihe(z: Zerlegung) -> List[Tuple[Streifen, int, Traeger]]:
+def _reihe(z: Zerlegung) -> List[Tuple[Streifen, int, Durchlauftraeger]]:
     """
-    Die Träger in der Reihe der Zerlegung, je mit der Nummer ihres Stücks
+    Die Durchlaufträger in der Reihe der Zerlegung, je mit der Nummer ihres Stücks
     im Streifen -- nur je Richtung der Feldstreifen erst alle ersten Stücke,
     dann alle zweiten: so steht x1.2 neben x2.2 statt hinter x1.1.
     """
-    reihe: List[Tuple[Streifen, int, Traeger]] = []
+    reihe: List[Tuple[Streifen, int, Durchlauftraeger]] = []
     for r in z.richtungen:
         feldstreifen = z.feldstreifen(r)
-        for stueck in range(max((len(s.traeger) for s in feldstreifen), default=0)):
-            reihe += [(s, stueck, s.traeger[stueck]) for s in feldstreifen if stueck < len(s.traeger)]
-    return reihe + [(u, stueck, t) for u in z.unterzuege for stueck, t in enumerate(u.traeger)]
+        for stueck in range(max((len(s.durchlauftraeger) for s in feldstreifen), default=0)):
+            reihe += [(s, stueck, s.durchlauftraeger[stueck]) for s in feldstreifen
+                      if stueck < len(s.durchlauftraeger)]
+    return reihe + [(u, stueck, t) for u in z.traeger for stueck, t in enumerate(u.durchlauftraeger)]
 
 
 def _mit_stelle(m: float, s: float) -> Tuple[str, str]:
@@ -434,9 +439,9 @@ def _lagerkraefte(p: Protokoll, e: Ergebnis, f: Fallergebnis) -> None:
     p.tabelle(["Lager", Mathe(r"F\ [\mathrm{kN}]"), Mathe(r"r_{\max}\ [\mathrm{kN/m}]")]
               + ([Mathe(r"m_{\max}\ [\mathrm{kNm/m}]")] if eingespannt else []),
               zeilen, titel="Lagerkräfte")
-    p.text("Längs eines Linienlagers gibt jeder Träger seine Kraft gleichmässig über das Stück ab, über "
-           "das er geht; wo zwei dasselbe Stück tragen, zählen beide. r_max ist der Wert mit dem grössten "
-           "Betrag."
+    p.text("Längs eines Linienlagers gibt jeder Durchlaufträger seine Kraft gleichmässig über das "
+           "Stück ab, über das er geht; wo zwei dasselbe Stück tragen, zählen beide. r_max ist der Wert "
+           "mit dem grössten Betrag."
            + (" Ebenso m_max, das Moment, das ein eingespanntes Lager hält, mit dem Vorzeichen der Platte: "
               "negativ, wo es oben zieht. Liegt Platte zu beiden Seiten, hält es nur den Unterschied "
               "ihrer Momente; dann gilt das Vorzeichen der Seite, die stärker zieht." if eingespannt else ""))
@@ -451,7 +456,7 @@ def _schnittkraefte(p: Protokoll, proben: Sequence[feld.Probe]) -> None:
                        _ort_von(ort_klein, klein), Mathe(f"{fest(gross / 1e3, 1)}\\ \\mathrm{{{einheit}}}"),
                        _ort_von(ort_gross, gross)])
     p.tabelle(["Grösse", "kleinst", "Ort", "grösst", "Ort"], zeilen, titel="Schnittkräfte der Platte, je Meter")
-    p.text("Gesucht am Schwerpunkt jeder Zelle der Bilder und an den Stellen, an denen ein Träger "
+    p.text("Gesucht am Schwerpunkt jeder Zelle der Bilder und an den Stellen, an denen ein Durchlaufträger "
            "springt oder Querkraft oder Last null werden. Momente positiv mit Zug unten.")
 
 

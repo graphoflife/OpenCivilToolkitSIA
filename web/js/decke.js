@@ -44,7 +44,7 @@ const HILFE = {
       ['Platte', 'ein Umriss mit Dicke und Beton – E_cm und Gewicht vom Beton, mit g = 10 m/s²; ihre Streifen tragen in Richtung 1 und 2, in Grad gegen x'],
       ['Linienlager', 'eine Wand oder ein Rand: vertikal gehalten, eingespannt oder beides – eingespannt allein wie eine Symmetrieachse'],
       ['Stütze', 'an einem Knoten, b_x × b_y; die Streifen geben ihre Last über den Stützenbereich ab'],
-      ['Unterzug', 'versteckt in der Platte, ein starker Streifen der Breite b – er liegt auf Lagern, Stützen und Unterzügen höherer Stufe. Sein M und V unter «Ergebnisse»'],
+      ['Träger', 'ein Unterzug oder ein Überzug: die Streifenmethode rechnet ihn als starken Streifen der Breite b in der Platte – er liegt auf Lagern, Stützen und Trägern höherer Stufe. Sein M und V unter «Ergebnisse»'],
       ['Zone', 'dort geht ihr Anteil der Last in Richtung 1, der Rest in Richtung 2'],
       ['Schnitt', 'eine Linie, längs der ein Ergebnisbild die Schnittkraft wie an einem Balken zeigt – er rechnet nicht mit'],
     ],
@@ -52,19 +52,19 @@ const HILFE = {
   },
   streifen: {
     zeilen: [
-      ['Breite', 'höchstens so breit; geteilt wird zudem an jeder Ecke, jedem Rand eines Unterzugs und Stützenbereichs und jedem Ende eines Linienlagers'],
+      ['Breite', 'höchstens so breit; geteilt wird zudem an jeder Ecke, jedem Rand eines Trägers und Stützenbereichs und jedem Ende eines Linienlagers'],
       ['automatisch', 'je Stelle die Richtung, die Lager hat – trägt keine, fällt die Last dort aus; tragen beide, nahe einem Rand (ein Viertel der kürzeren Spannweite) zu ihm, in den Ecken je zur Hälfte, sonst mehr in die kürzere Spannweite – je ungleicher die Spannweiten, desto mehr; Folie 31, verallgemeinert nach Vorgabe'],
       ['fest', 'überall derselbe Anteil in Richtung 1'],
       ['Zonen', 'gehen beidem vor: dort gilt ihr Anteil – zu zeichnen im Fenster mit «Zone»'],
-      ['Bänder', 'nur bei «automatisch»: die Rechnung legt sie selbst – durch jede Stütze, von Lager zu Lager, und an freien Rändern und Lochrändern, wo die Streifen quer dazu schon ein Lager haben. Ein Band liegt auf zwei Lagern oder mehr; ein eigener Unterzug oder eine Wand längs ersetzt es. Im Grundriss fein gestrichelt, nach Vorgabe'],
+      ['Bänder', 'nur bei «automatisch»: die Rechnung legt sie selbst – durch jede Stütze, von Lager zu Lager, und an freien Rändern und Lochrändern, wo die Streifen quer dazu schon ein Lager haben. Ein Band liegt auf zwei Lagern oder mehr; ein eigener Träger oder eine Wand längs ersetzt es. Im Grundriss fein gestrichelt, nach Vorgabe'],
     ],
     formel: 'q₁ = α · q   q₂ = (1 − α) · q',
   },
   ergebnisse: {
     zeilen: [
       ['Fall', 'ein Lastfall oder eine Kombination – gerechnet wird jeder Fall'],
-      ['Wo', 'über die ganze Platte, längs eines Schnitts oder in einem Unterzug – längs wie an einem Balken, positive Werte unten, die Stelle s ab seinem Anfang. Ein Schnitt zeigt die Lager, die er kreuzt, und die Unterzüge und Bänder, durch die er läuft, als Fläche'],
-      ['M, V', 'Moment und Querkraft eines Unterzugs über seine ganze Breite, in kNm und kN – wie er als Träger gerechnet ist, auf seinen Lagern'],
+      ['Wo', 'über die ganze Platte, längs eines Schnitts oder in einem Träger – längs wie an einem Balken, positive Werte unten, die Stelle s ab seinem Anfang. Ein Schnitt zeigt die Lager, die er kreuzt, und die Träger und Bänder, durch die er läuft, als Fläche'],
+      ['M, V', 'Moment und Querkraft eines Trägers über seine ganze Breite, in kNm und kN – wie er als Durchlaufträger gerechnet ist, auf seinen Lagern'],
       ['m_x, m_y', 'die Momente je Meter in x und y, positiv mit Zug unten – bei schiefen Streifen aus m_η umgerechnet'],
       ['m_xy', 'das Drillmoment je Meter: nur, wo ein Streifen schief zu x und y trägt'],
       ['v_x, v_y, v_0', 'die Querkräfte je Meter und die Hauptquerkraft v_0 = √(v_x² + v_y²)'],
@@ -112,7 +112,7 @@ function liste(a) {
     ['Linienlager', z.linienlager.map((l) => zeile(l.kennung, `${l.von} → ${l.bis}`, halt(l)))],
     ['Stützen', z.stuetzen.map((s) => zeile(s.kennung, `an ${s.knoten}`,
       `${zahlText(s.b_x, 0)} × ${zahlText(s.b_y, 0)} mm${s.bereich_von_hand ? ` · Bereich ${zahlText(s.l_x, 2)} × ${zahlText(s.l_y, 2)} m` : ''}`))],
-    ['Unterzüge', z.unterzuege.map((u) => zeile(u.kennung, `${u.von} → ${u.bis}`,
+    ['Träger', z.traeger.map((u) => zeile(u.kennung, `${u.von} → ${u.bis}`,
       `b = ${zahlText(u.breite, 2)} m · Stufe ${u.stufe}`))],
     ['Zonen', z.zonen.map((x) => zeile(x.kennung, anteilText(x.anteil), `${x.knoten.length} Ecken`))],
     ['Lasten', [
@@ -191,32 +191,32 @@ function streifenInhalt(decke) {
   ].filter(Boolean);
 }
 
-/** Ob die Zeile das Bild eines Unterzugs zeigt -- dann gelten M und V statt der Grössen der Platte. */
-const imUnterzug = (decke, zeile) => decke.unterzuege.some((u) => u.kennung === zeile.schnitt);
+/** Ob die Zeile das Bild eines Trägers zeigt -- dann gelten M und V statt der Grössen der Platte. */
+const imTraeger = (decke, zeile) => decke.traeger.some((u) => u.kennung === zeile.schnitt);
 
-/** Die Grössen, die eine Zeile zeigen kann: die eines Unterzugs oder die der Platte. */
+/** Die Grössen, die eine Zeile zeigen kann: die eines Trägers oder die der Platte. */
 const groessenDer = (decke, zeile) => katalog('decke', 'diagrammgroessen')
-  .filter((g) => g.unterzug === imUnterzug(decke, zeile));
+  .filter((g) => g.traeger === imTraeger(decke, zeile));
 
 /**
  * Wo ein Ergebnisbild hinsieht: über die ganze Platte, längs eines Schnitts
- * oder in einem Unterzug -- eine Wahl aus dem Projekt, darum eine Liste.
- * Nur, wenn es Schnitte oder Unterzüge gibt; die Lagerkräfte zeigen immer
+ * oder in einem Träger -- eine Wahl aus dem Projekt, darum eine Liste.
+ * Nur, wenn es Schnitte oder Träger gibt; die Lagerkräfte zeigen immer
  * die ganze Decke. Was es nicht mehr gibt, steht als «– gelöscht, neu wählen –» da. Wer
- * zwischen Platte und Unterzug wechselt, bekommt dort die erste Grösse:
- * m_x hat ein Unterzug nicht, M die Platte nicht.
+ * zwischen Platte und Träger wechselt, bekommt dort die erste Grösse:
+ * m_x hat ein Träger nicht, M die Platte nicht.
  */
 function ortWahl(decke, zeile, aendern) {
-  if (zeile.groesse === 'lager' || !(decke.schnitte.length || decke.unterzuege.length || zeile.schnitt)) return null;
+  if (zeile.groesse === 'lager' || !(decke.schnitte.length || decke.traeger.length || zeile.schnitt)) return null;
   const werte = [{ wert: '', beschriftung: 'ganze Platte' },
     ...decke.schnitte.map((s) => ({ wert: s.kennung, beschriftung: `längs Schnitt ${s.kennung}` })),
-    ...decke.unterzuege.map((u) => ({ wert: u.kennung, beschriftung: `Unterzug ${u.kennung}` }))];
+    ...decke.traeger.map((u) => ({ wert: u.kennung, beschriftung: `Träger ${u.kennung}` }))];
   return auswahl({
     werte: werte.some((x) => x.wert === zeile.schnitt) ? werte
       : [{ wert: zeile.schnitt, beschriftung: '– gelöscht, neu wählen –' }, ...werte],
     gewaehlt: zeile.schnitt,
     titel: 'Über die ganze Platte, längs eines Schnitts – zu zeichnen im Fenster mit «Schnitt» – '
-      + 'oder in einem Unterzug: M und V über seine ganze Breite',
+      + 'oder in einem Träger: M und V über seine ganze Breite',
     beiAenderung: (w) => aendern((z) => {
       z.schnitt = w;
       const moeglich = groessenDer(decke, z);

@@ -7,6 +7,28 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-27 · Decke: Unterzug heisst Träger
+
+Schritt 10a des Plans vom 2026-11-27. Was in der Decke «Unterzug» hiess,
+heisst jetzt «Träger» – in Oberfläche, Meldungen, Bericht und Code –, denn
+er kann auch ein Überzug sein (Benutzer). Die Streifenmethode rechnet wie
+bisher; im Bericht ändern nur Namen, keine Zahl.
+
+- Damit es nicht zweierlei Träger gibt, heissen die Stücke, in die die
+  Rechnung jeden Streifen zwischen seinen Lagern teilt, «Durchlaufträger»:
+  `decke/traeger.py` heisst `decke/durchlauftraeger.py`, die Klasse
+  `Durchlauftraeger`. Im Bericht steht «Durchlaufträger, je Meter ihrer
+  Breite», die Tabelle der gezeichneten heisst «Träger» statt «Versteckte
+  Unterzüge».
+- Kennungen T1, T2 … statt U1, U2 …; das Werkzeug hat die Taste T statt U.
+- Alte Dateien öffnen weiter: `frueher.traeger_umbenennen` macht beim Lesen
+  aus der Liste `unterzuege` die Liste `traeger`, aus U1 T1 – auch dort, wo
+  ein Diagramm den Träger nennt – und aus dem Zähler U den Zähler T, so dass
+  keine Kennung zweimal vergeben wird. Wäre ein T1 schon vergeben, behält
+  der Träger sein U1.
+- Das Beispiel «Unterzug» der Querschnittsanalyse heisst weiter so: dort ist
+  es die Form eines Querschnitts, kein Bauteil der Decke.
+
 ## 2026-11-27 · Bericht: Kennzahlen auch ohne Nachweis
 
 Gefunden beim Schubfluss. Eine Querschnittsanalyse aus Stahl oder Holz ohne

@@ -23,7 +23,7 @@
  *
  * Wählt eine Zeile einen Schnitt, zeigt ihr Bild die Grösse längs ihm wie
  * an einem Balken, mit den Lagern, die er kreuzt (dk_schnitt.js). Wählt sie
- * einen Unterzug, zeigt sie sein M oder V über seine ganze Breite, auf den
+ * einen Träger, zeigt sie sein M oder V über seine ganze Breite, auf den
  * Lagern, auf denen er liegt (Benutzer, 2026-11-16) -- im selben Bild. Die
  * Lagerkräfte zeigen immer die ganze Decke.
  *
@@ -187,22 +187,22 @@ function feldInhalt(decke, daten, ergebnis, groesse) {
 }
 
 /**
- * Was ein Bild längs zeigt: einen Schnitt oder einen Unterzug -- je wie er
+ * Was ein Bild längs zeigt: einen Schnitt oder einen Träger -- je wie er
  * heisst, seine Liste in der Decke und in der Antwort (beide gleich
  * benannt), wie der Titel ihn nennt und was der Hinweis unter dem Bild
  * dazu sagt.
  */
 const LAENGS = {
   schnitt: { wort: 'Schnitt', liste: 'schnitte', titel: (k) => ` längs ${k}`, zusatz: () => '' },
-  unterzug: {
-    wort: 'Unterzug', liste: 'unterzuege', titel: (k) => ` im Unterzug ${k}`,
+  traeger: {
+    wort: 'Träger', liste: 'traeger', titel: (k) => ` im Träger ${k}`,
     zusatz: (u) => ` über seine ganze Breite von ${zahlText(u.breite, 2)} m`,
   },
 };
 
 /**
  * Wo das Bild einer Zeile längs hinsieht: `{art, eintrag}`, ein Schnitt
- * oder ein Unterzug der Decke; `eintrag` fehlt, wenn es ihn nicht mehr
+ * oder ein Träger der Decke; `eintrag` fehlt, wenn es ihn nicht mehr
  * gibt. `null` über die ganze Platte -- die Lagerkräfte zeigen immer sie.
  */
 function laengsOrt(decke, zeile) {
@@ -215,7 +215,7 @@ function laengsOrt(decke, zeile) {
 }
 
 /**
- * Das Bild längs eines Schnitts oder in einem Unterzug, darunter, wie es zu
+ * Das Bild längs eines Schnitts oder in einem Träger, darunter, wie es zu
  * lesen ist. Fehlt er in der Antwort, ist sie von vor ihm -- `frisch`
  * nicht, die neue kommt -- oder ihm fehlt ein Knoten.
  */
@@ -329,7 +329,7 @@ function lagerInhalt(decke, daten, ergebnis) {
 /**
  * Ein Bild der Ergebnisse als Karte: der Fall der Zeile, die Grösse der
  * Zeile -- über die ganze Decke, längs ihres Schnitts oder in ihrem
- * Unterzug. M und V hat nur ein Unterzug, die Grössen der Platte nur sie:
+ * Träger. M und V hat nur ein Träger, die Grössen der Platte nur sie:
  * passt beides nicht zusammen, sagt es die Karte, statt etwas anderes zu
  * zeigen. Jeder Inhalt gibt die Teile der Karte und ihr Bild (`karte`).
  */
@@ -344,11 +344,11 @@ function ergebnisKarte(kennung, decke, daten, zeile) {
   }
   if (ort && !ort.eintrag) {
     return karte(titel, [leerzustand(`${zeile.schnitt} gibt es nicht mehr.`,
-      'Unter «Ergebnisse» einen anderen Schnitt oder Unterzug wählen oder die ganze Platte.')]);
+      'Unter «Ergebnisse» einen anderen Schnitt oder Träger wählen oder die ganze Platte.')]);
   }
-  if (Boolean(groesse?.unterzug) !== (ort?.art === LAENGS.unterzug)) {
-    return karte(titel, [leerzustand(groesse?.unterzug ? `${groesse.titel} gibt es nur in einem Unterzug.`
-      : `Im Unterzug ${zeile.schnitt} gibt es nur M und V.`, 'Unter «Ergebnisse» wählen, was das Bild zeigt.')]);
+  if (Boolean(groesse?.traeger) !== (ort?.art === LAENGS.traeger)) {
+    return karte(titel, [leerzustand(groesse?.traeger ? `${groesse.titel} gibt es nur in einem Träger.`
+      : `Im Träger ${zeile.schnitt} gibt es nur M und V.`, 'Unter «Ergebnisse» wählen, was das Bild zeigt.')]);
   }
   const eintrag = antwortZu(kennung, fall, (f) => api.deckeErgebnis(zustand.projekt, kennung, f));
   if (eintrag.fehler) return karte(`${titel} – ${fall}`, [el('p.hinweis.hinweis-warnung', { text: eintrag.fehler })]);
@@ -365,7 +365,7 @@ function ergebnisKarte(kennung, decke, daten, zeile) {
 /**
  * Die Ergebnisbilder einer Decke -- je Zeile der Ergebnisse eine Karte.
  * `daten` ist, was der Kern mit jeder Rechnung zu ihr zeichnet: die Bänder
- * der Unterzüge kommen von dort.
+ * der Träger kommen von dort.
  */
 export function ergebnisKarten(kennung, decke, daten) {
   if (!decke.diagramme?.length) {

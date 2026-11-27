@@ -168,7 +168,7 @@
 
 /* Ein Grundriss: die Platten hell mit kräftigem Rand, darunter die Aufteilung
    -- Richtung 1 orange, Richtung 2 gelb, wie x und y --, die Zonen violett
-   gestrichelt, die Unterzüge in der Farbe der Systeme. Ein Linienlager
+   gestrichelt, die Träger in der Farbe der Systeme. Ein Linienlager
    kräftig, eingespannt schraffiert, ohne vertikalen Halt strichpunktiert
    wie eine Symmetrieachse; eines, das nichts hält, fein gepunktet. */
 .dk-platte-flaeche { fill: #f6f7f9; stroke: none; }
@@ -181,9 +181,9 @@
 .dk-stuetzenbereich { fill: none; stroke: var(--schrift-matt); stroke-width: 1; stroke-dasharray: 3 2; }
 .dk-zone-grund { fill: var(--flaeche); stroke: none; }
 .dk-zone { fill: none; stroke: var(--beide); stroke-width: 1.4; stroke-dasharray: 6 3; }
-.dk-unterzug-band { fill: var(--system); fill-opacity: .1; stroke: var(--system); stroke-width: .8; stroke-dasharray: 4 3; }
-.dk-unterzug { fill: none; stroke: var(--system); stroke-width: 2; stroke-dasharray: 10 4; }
-/* Ein Band legt die Rechnung selbst: feiner als ein Unterzug, ohne Achse. */
+.dk-traeger-band { fill: var(--system); fill-opacity: .1; stroke: var(--system); stroke-width: .8; stroke-dasharray: 4 3; }
+.dk-traeger { fill: none; stroke: var(--system); stroke-width: 2; stroke-dasharray: 10 4; }
+/* Ein Band legt die Rechnung selbst: feiner als ein Träger, ohne Achse. */
 .dk-band { fill: var(--system); fill-opacity: .06; stroke: var(--system); stroke-width: 1; stroke-dasharray: 2 3; }
 .dk-name.ist-band { fill: var(--system); }
 .dk-lager { fill: none; stroke: var(--schrift); stroke-width: 4; stroke-linecap: round; }
@@ -200,7 +200,7 @@
    der Farbe der Analyse, nicht im Blau der Auswahl. */
 .dk-schnitt { fill: none; stroke: var(--analyse); stroke-width: 1.6; stroke-dasharray: 14 3 2 3; }
 .dk-schnitt-ende { fill: none; stroke: var(--analyse); stroke-width: 3.2; stroke-linecap: round; pointer-events: none; }
-.dk-platte.ist-fehler, .dk-zone.ist-fehler, .dk-unterzug.ist-fehler, .dk-lager.ist-fehler,
+.dk-platte.ist-fehler, .dk-zone.ist-fehler, .dk-traeger.ist-fehler, .dk-lager.ist-fehler,
 .dk-flaechenlast.ist-fehler, .dk-linienlast.ist-fehler, .dk-punktlast.ist-fehler,
 .dk-schnitt.ist-fehler { stroke: var(--schlecht); }
 .dk-stuetze.ist-fehler { fill: var(--schlecht); }
@@ -229,11 +229,11 @@
   fill: var(--schrift); fill-opacity: .12; stroke: var(--schrift); stroke-width: 1.2; stroke-linejoin: round;
 }
 /* Das Bild längs eines Schnitts: oben die Achse -- neben den Platten
-   gestrichelt -- mit den Lagern und den Unterzügen als Band, darunter der
+   gestrichelt -- mit den Lagern und den Trägern als Band, darunter der
    Verlauf, über dessen Achse ein Strich, wo ein Lager steht. */
 .dk-s-achse { fill: none; stroke: var(--schrift); stroke-width: 2; }
 .dk-s-achse.ist-daneben { stroke: var(--rand-stark); stroke-width: 1; stroke-dasharray: 4 3; }
-.dk-s-unterzug { fill: var(--system); fill-opacity: .12; stroke: var(--system); stroke-width: .8; stroke-dasharray: 4 3; }
+.dk-s-traeger { fill: var(--system); fill-opacity: .12; stroke: var(--system); stroke-width: .8; stroke-dasharray: 4 3; }
 .dk-s-marke { fill: none; stroke: var(--schrift); stroke-width: 1.2; }
 .dk-s-symmetrie { fill: none; stroke: var(--schrift); stroke-width: 1.4; stroke-dasharray: 8 3 2 3; }
 .dk-s-name { font-size: 10.5px; fill: var(--schrift-matt); }

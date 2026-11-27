@@ -34,7 +34,7 @@ zerfällt in $v_x$ und $v_y$. $v_0$ ist ihr Betrag: die Querkraft in der
 Richtung, in der sie am grössten ist.
 
 An einer Stelle zählen alle Streifen über ihr zusammen: je Richtung der
-Feldstreifen, in dem sie liegt, und jeder Unterzug, in dessen Fläche sie
+Feldstreifen, in dem sie liegt, und jeder Träger, in dessen Fläche sie
 liegt. Streifen in x geben nur $m_x$ und $v_x$, Streifen in y nur $m_y$
 und $v_y$; ein Drillmoment gibt es erst mit schiefen Streifen.
 
@@ -42,5 +42,5 @@ Beispiel: ein Streifen unter $\varphi = 30°$ mit $m = 20\,\mathrm{kNm/m}$
 gibt $m_x = 15$, $m_y = 5$ und $m_{xy} = 8.7\,\mathrm{kNm/m}$.
 
 Momente sind positiv, wenn sie unten ziehen. Der Bericht nennt je Fall jeden
-Träger mit seinem kleinsten und grössten Moment je Meter, die Bilder zeigen
+Durchlaufträger mit seinem kleinsten und grössten Moment je Meter, die Bilder zeigen
 $m_x$ bis $v_0$ über der ganzen Decke.

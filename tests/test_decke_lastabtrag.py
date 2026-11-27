@@ -87,7 +87,7 @@ class TestWoLastAusfaellt(Rechnung):
         self.assertEqual(self.ausfall(e), [
             "Platte P: auf 30.00 m² trägt keine Richtung – in x liegt sie nur auf «W3», und nichts "
             "hält ihre Drehung; in y liegt sie nur auf «W0», und nichts hält ihre Drehung. Dort fällt "
-            "die Last aus; es fehlt ein Lager oder ein Unterzug."])
+            "die Last aus; es fehlt ein Lager oder ein Träger."])
         self.assertAlmostEqual(f.nicht_getragen, f.summe)
         self.assertFalse(any(m.fehler for m in f.meldungen), "auch der Ausfall je Fall ist grau")
 
@@ -96,7 +96,7 @@ class TestWoLastAusfaellt(Rechnung):
         e, _ = self.gerechnet_ohne_probe(rechteck(0, 0, 4, 2), [])
         self.assertEqual(self.ausfall(e), [
             "Platte P: auf 8.00 m² trägt keine Richtung – in x und y liegt sie auf nichts. Dort fällt "
-            "die Last aus; es fehlt ein Lager oder ein Unterzug."])
+            "die Last aus; es fehlt ein Lager oder ein Träger."])
 
     def test_die_feste_aufteilung_gibt_last_wohin_nichts_traegt(self):
         """Zwischen zwei Wänden in x trägt nur x; fest 30 % in x verliert die übrigen 70 %."""

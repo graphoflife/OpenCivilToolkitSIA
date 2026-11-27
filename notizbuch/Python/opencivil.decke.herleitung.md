@@ -1,5 +1,5 @@
 ---
-erzeugt: e68a3dfea840
+erzeugt: 02fa84191958
 art: modul
 tags: [modul]
 ---
@@ -10,12 +10,12 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Die Herleitung der Streifenmethode, so dass man sie von Hand nachvollziehen
-kann: die Decke in Tabellen – Platten, Linienlager, Stützen, Unterzüge,
+kann: die Decke in Tabellen – Platten, Linienlager, Stützen, Träger,
 Lasten je Lastfall und die Kombinationen –, die Streifen je Richtung, in
-welcher Reihenfolge die Träger rechnen, wie die Last auf die Richtungen
+welcher Reihenfolge die Durchlaufträger rechnen, wie die Last auf die Richtungen
 geht, je Fall die Last und was die Lager davon tragen, und die Meldungen.
 Dann die Ansätze – trägt eine Platte schief zu x und y, mit einem Hinweis
-zur Fliessbedingung – und je Lastfall und Kombination: jeder Träger mit Last,
+zur Fliessbedingung – und je Lastfall und Kombination: jeder Durchlaufträger mit Last,
 Lagerkräften und Momenten, was jedes Lager trägt, die grössten
 Schnittkräfte der Platte, die Biegewiderstände, die sie verlangt, und die
 Lastverteilelemente.
@@ -27,9 +27,9 @@ Die grössten Schnittkräfte und Biegewiderstände kommen von den Proben des
 Falls ([[opencivil.decke.feld#proben|proben]]), wie in den Bildern.
 
 
-## GLEICHE TRÄGER IN EINER ZEILE
+## GLEICHE DURCHLAUFTRÄGER IN EINER ZEILE
 
-Tragen nebeneinander liegende Träger dasselbe – im Kolloquium 4 achtzehn
+Tragen nebeneinander liegende Durchlaufträger dasselbe – im Kolloquium 4 achtzehn
 Feldstreifen in x –, stehen sie in einer Zeile, «x1 … x18». Was sie
 unterscheidet, ist nur ihr Ort quer; `s` misst längs.
 
@@ -38,7 +38,7 @@ unterscheidet, ist nur ihr Ort quer; `s` misst längs.
 
 Längen in m, Dicken und Stützen in mm, Winkel in Grad gegen x, E in N/mm²,
 Gewichte und Flächenlasten in kN/m², Linienlasten in kN/m, Kräfte in kN.
-Die Träger je Meter ihrer Breite: Lasten und Lagerkräfte in kN/m, Momente
+Die Durchlaufträger je Meter ihrer Breite: Lasten und Lagerkräfte in kN/m, Momente
 in kNm/m, wie die Schnittkräfte der Platte.
 
 ## Inhalt
@@ -70,10 +70,10 @@ Name, Ort und Wert einer Last für die Tabelle.
 ### _stufe
 
 ```python
-def _stufe(u: Unterzug) -> str
+def _stufe(u: Traeger) -> str
 ```
 
-Die Stufe eines Unterzugs – ein Band sagt stattdessen, wo es liegt.
+Die Stufe eines Trägers – ein Band sagt stattdessen, wo es liegt.
 
 ### _faelle
 
@@ -89,7 +89,7 @@ Je Lastfall und Kombination die Last und was die Lager tragen – die Probe –,
 def _ansaetze(p: Protokoll, e: Ergebnis) -> None
 ```
 
-Wie aus den Trägern die Platte wird – je einmal, was die Decke braucht.
+Wie aus den Durchlaufträgern die Platte wird – je einmal, was die Decke braucht.
 
 ### _fall
 
@@ -97,23 +97,24 @@ Wie aus den Trägern die Platte wird – je einmal, was die Decke braucht.
 def _fall(p: Protokoll, e: Ergebnis, f: Fallergebnis, zellen: Sequence[Sequence[geo.Punkt]]) -> None
 ```
 
-Ein Lastfall oder eine Kombination: Träger, Lager, Platte, Biegewiderstände, Lastverteilelemente.
+Ein Lastfall oder eine Kombination: Durchlaufträger, Lager, Platte,
+Biegewiderstände, Lastverteilelemente.
 
-### _traeger
+### _durchlauftraeger
 
 ```python
-def _traeger(p: Protokoll, e: Ergebnis, f: Fallergebnis) -> None
+def _durchlauftraeger(p: Protokoll, e: Ergebnis, f: Fallergebnis) -> None
 ```
 
-Jeder Träger, je Meter seiner Breite – gleiche Feldstreifen nebeneinander in einer Zeile.
+Jeder Durchlaufträger, je Meter seiner Breite – gleiche Feldstreifen nebeneinander in einer Zeile.
 
 ### _reihe
 
 ```python
-def _reihe(z: Zerlegung) -> List[Tuple[Streifen, int, Traeger]]
+def _reihe(z: Zerlegung) -> List[Tuple[Streifen, int, Durchlauftraeger]]
 ```
 
-Die Träger in der Reihe der Zerlegung, je mit der Nummer ihres Stücks
+Die Durchlaufträger in der Reihe der Zerlegung, je mit der Nummer ihres Stücks
 im Streifen – nur je Richtung der Feldstreifen erst alle ersten Stücke,
 dann alle zweiten: so steht x1.2 neben x2.2 statt hinter x1.1.
 

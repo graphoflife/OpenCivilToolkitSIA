@@ -1,7 +1,7 @@
 """
 Schnitte durch eine Decke: gespeichert wie jedes Teil, und längs jedes die
 Schnittkräfte der Platte wie an einem Balken -- mit den Lagern, die er
-kreuzt, und den Sprüngen an den Grenzen der Streifen. Ebenso je Unterzug
+kreuzt, und den Sprüngen an den Grenzen der Streifen. Ebenso je Träger
 sein M und V über die ganze Breite, auf den Lagern, auf denen er liegt.
 """
 
@@ -9,7 +9,7 @@ import unittest
 
 from opencivil.decke import schnitt
 from opencivil.projekt import beispiele
-from opencivil.decke.modell import Decke, Flaechenlast, Lastfall, Linienlager, Platte, Unterzug
+from opencivil.decke.modell import Decke, Flaechenlast, Lastfall, Linienlager, Platte, Traeger
 from opencivil.decke.rechnung import rechnen
 from opencivil.projekt import Projekt
 from opencivil.projekt.aufbau.decke import modell_von
@@ -38,19 +38,19 @@ def schnitte(p: Projekt, fall: str = "q"):
     return bild(p, fall)["schnitte"]
 
 
-def mit_unterzug(von=(0, 1), bis=(4, 1)) -> Projekt:
+def mit_traeger(von=(0, 1), bis=(4, 1)) -> Projekt:
     """
     Platte 4 × 2 m auf zwei Wänden in y, fest ganz in x, q = 10 kN/m²; längs
-    ihrer Mitte ein Unterzug der Breite 0.5 m: ein Einfeldträger der
+    ihrer Mitte ein Träger der Breite 0.5 m: ein Einfeldträger der
     Spannweite 4 m mit q·b = 5 kN/m, also M = 2.5·u·(4 − u) und
     V = 5·(2 − u) -- daneben trägt die Platte wie zuvor.
     """
-    p = Projekt(name="Unterzug")
-    d = p.decke("Unterzug", aufteilung="fest", anteil=100.0)
+    p = Projekt(name="Träger")
+    d = p.decke("Träger", aufteilung="fest", anteil=100.0)
     d.platte([(0, 0), (4, 0), (4, 2), (0, 2)], beton=p.beton("C30/37"), h=200)
     d.lager((0, 0), (0, 2))
     d.lager((4, 0), (4, 2))
-    d.unterzug(von, bis, breite=0.5)
+    d.traeger_legen(von, bis, breite=0.5)
     d.plattenlast(d.lastfall("q"), "P1", 10.0)
     return p
 
@@ -100,7 +100,7 @@ class TestVerlauf(unittest.TestCase):
             self.assertAlmostEqual(m, 5.0 * x * (4.0 - x), delta=2e-3)
             self.assertAlmostEqual(v, 10.0 * (2.0 - x), delta=2e-3)
         self.assertEqual(s["extreme"]["m_x"]["groesst"], {"wert": 20.0, "u": 3.0})
-        self.assertEqual(s["unterzuege"], [])
+        self.assertEqual(s["traeger"], [])
 
     def test_quer_zur_spannweite_gleich(self):
         """Quer zu den Streifen ändert sich m_x nicht, und eine Wand kreuzt er nicht."""
@@ -114,7 +114,7 @@ class TestVerlauf(unittest.TestCase):
         """
         Platte 4 × 2 m auf vier Wänden, fest ganz in x -- in der unteren
         Hälfte eine Zone ganz in y. Bei x = 2.1 trägt dort nur der Streifen
-        in y, ein Träger der Spannweite 2 m mit Last auf seiner ersten
+        in y, ein Durchlaufträger der Spannweite 2 m mit Last auf seiner ersten
         Hälfte: m_y = 7.5·y − 5·y², dahinter 2.5·(2 − y), am grössten 2.8125
         bei y = 0.75. m_x ist unten null und oben 5·2.1·1.9 = 19.95 -- bei
         y = 1 springt es, zwei Werte an derselben Stelle.
@@ -137,11 +137,11 @@ class TestVerlauf(unittest.TestCase):
         self.assertEqual(sorted(m_x for y, m_x, _ in werte if y == 1.0), [0.0, 19.95])
         self.assertEqual(s["extreme"]["m_y"]["groesst"], {"wert": 2.812, "u": 0.75})
 
-    def test_lager_und_unterzug(self):
+    def test_lager_und_traeger(self):
         """
         Durch die zwei Felder: die Wände an beiden Enden, die Stütze im
-        zweiten Feld, die Fläche des Unterzugs über der gemeinsamen Kante --
-        und die zwei Bänder über der Stütze: B1 längs, vom Unterzug bis zur
+        zweiten Feld, die Fläche des Trägers über der gemeinsamen Kante --
+        und die zwei Bänder über der Stütze: B1 längs, vom Träger bis zur
         Wand rechts, B2 quer.
         """
         p = Projekt(name="Decke")
@@ -151,7 +151,7 @@ class TestVerlauf(unittest.TestCase):
         d.platte([(4, 0), (8, 0), (8, 3), (4, 3)], beton=beton, h=250)
         for a, b in [((0, 0), (8, 0)), ((8, 0), (8, 3)), ((8, 3), (0, 3)), ((0, 3), (0, 0))]:
             d.lager(a, b)
-        d.unterzug((4, 0), (4, 3), breite=0.5)
+        d.traeger_legen((4, 0), (4, 3), breite=0.5)
         d.stuetze((6, 1.5))
         d.plattenlast(d.lastfall("q"), "P1", 10.0)
         d.schnitt((0, 1.5), (8, 1.5))
@@ -159,13 +159,13 @@ class TestVerlauf(unittest.TestCase):
         self.assertEqual(s["stuecke"], [[0.0, 8.0]])
         self.assertEqual([(l["u"], l["art"], l["name"]) for l in s["lager"]],
                          [(0.0, "linienlager", "L4"), (6.0, "stuetze", "S1"), (8.0, "linienlager", "L2")])
-        self.assertEqual(s["unterzuege"], [{"von": 3.75, "bis": 8.0, "name": "B1"},
-                                           {"von": 5.5, "bis": 6.5, "name": "B2"},
-                                           {"von": 3.75, "bis": 4.25, "name": "U1"}])
+        self.assertEqual(s["traeger"], [{"von": 3.75, "bis": 8.0, "name": "B1"},
+                                        {"von": 5.5, "bis": 6.5, "name": "B2"},
+                                        {"von": 3.75, "bis": 4.25, "name": "T1"}])
 
-    def test_nie_auf_dem_rand_eines_unterzugs(self):
+    def test_nie_auf_dem_rand_eines_traegers(self):
         """
-        Auf dem Rand eines Unterzugs zählten er und der Feldstreifen daneben
+        Auf dem Rand eines Trägers zählten er und der Feldstreifen daneben
         zugleich: dort sieht der Schnitt nicht hin -- auch schief nicht, wo
         der Rand und die Grenze zweier Feldstreifen nur in der Rundung
         verschieden sind. Er sieht knapp davor und knapp danach hin.
@@ -173,11 +173,11 @@ class TestVerlauf(unittest.TestCase):
         ecken = ((0.0, 0.0), (6.0, 0.0), (6.0, 4.0), (0.0, 4.0))
         decke = Decke(platten=[Platte("P1", ecken, 0.22, 30e9, 25e3)],
                       linienlager=[Linienlager(f"W{i}", ecken[i], ecken[(i + 1) % 4]) for i in range(4)],
-                      unterzuege=[Unterzug("U1", (3.0, 0.0), (3.0, 4.0), 1.0)],
+                      traeger=[Traeger("T1", (3.0, 0.0), (3.0, 4.0), 1.0)],
                       lastfaelle=[Lastfall("q", [Flaechenlast("q", 10e3, platte="P1")])])
         e = rechnen(decke)
         v = schnitt.verlauf(e, e.fall("q"), (0.0, 1.0), (6.0, 3.0))
-        self.assertEqual([round(u0 * 6.0 / v.L, 9) for u0, _, _ in v.unterzuege], [2.5])
+        self.assertEqual([round(u0 * 6.0 / v.L, 9) for u0, _, _ in v.traeger], [2.5])
         orte = [(6.0 * u / v.L, 1.0 + 2.0 * u / v.L) for u, _ in v.proben]
         for x, _ in orte:
             self.assertGreater(min(abs(x - 2.5), abs(x - 3.5)), 1e-7)
@@ -185,18 +185,18 @@ class TestVerlauf(unittest.TestCase):
             self.assertEqual(sum(1 for x, _ in orte if abs(x - kante) < 2e-6), 2)
 
 
-class TestUnterzug(unittest.TestCase):
+class TestTraeger(unittest.TestCase):
     def test_einfeldtraeger(self):
         """
         M und V über seine ganze Breite, in kNm und kN, die Wände an seinen
         Enden. Längs seiner Achse zeigt ein Schnitt dasselbe je Meter:
         m_x = M/b, in der Mitte 10/0.5 = 20 kNm/m.
         """
-        p = mit_unterzug()
+        p = mit_traeger()
         p.decken[0].schnitt((0, 1), (4, 1))
         e = bild(p)
-        (u,) = e["unterzuege"]
-        self.assertEqual((u["kennung"], u["L"], u["stuecke"], u["unterzuege"]), ("U1", 4.0, [[0.0, 4.0]], []))
+        (u,) = e["traeger"]
+        self.assertEqual((u["kennung"], u["L"], u["stuecke"], u["traeger"]), ("T1", 4.0, [[0.0, 4.0]], []))
         self.assertEqual([(l["u"], l["art"], l["name"]) for l in u["lager"]],
                          [(0.0, "linienlager", "L1"), (4.0, "linienlager", "L2")])
         for s, m, v in zip(u["stellen"], u["werte"]["M"], u["werte"]["V"]):
@@ -213,7 +213,7 @@ class TestUnterzug(unittest.TestCase):
         Anfang, die Wände kommen umgekehrt, und V bleibt dM/ds -- an seinem
         Anfang positiv.
         """
-        (u,) = bild(mit_unterzug((4, 1), (0, 1)))["unterzuege"]
+        (u,) = bild(mit_traeger((4, 1), (0, 1)))["traeger"]
         self.assertEqual([(l["u"], l["name"]) for l in u["lager"]], [(0.0, "L2"), (4.0, "L1")])
         self.assertEqual(u["stellen"], sorted(u["stellen"]))
         for s, m, v in zip(u["stellen"], u["werte"]["M"], u["werte"]["V"]):
@@ -222,38 +222,38 @@ class TestUnterzug(unittest.TestCase):
 
     def test_ohne_last_null(self):
         """Liegt die Last neben ihm, rechnet der Fall ihn nicht: M und V sind null, seine Lager bleiben."""
-        p = mit_unterzug()
+        p = mit_traeger()
         d = p.decken[0]
         d.platten[0].lasten.clear()
         d.flaechenlast(d.lastfaelle[0], [(0, 0), (4, 0), (4, 0.5), (0, 0.5)], wert=10.0)
-        (u,) = bild(p)["unterzuege"]
+        (u,) = bild(p)["traeger"]
         self.assertEqual((u["stuecke"], len(u["lager"])), ([[0.0, 4.0]], 2))
         self.assertEqual((set(u["werte"]["M"]), set(u["werte"]["V"])), ({0.0}, {0.0}))
 
-    def test_auf_unterzuegen(self):
+    def test_auf_traegern(self):
         """
-        Im Kolloquium 4 liegt U4 auf den drei Unterzügen höherer Stufe -- sie
+        Im Kolloquium 4 liegt T4 auf den drei Trägern höherer Stufe -- sie
         sind seine Lager; das Beispiel zeigt sein M und V.
         """
         p = beispiele.jeder_nachweis()
         d = next(d for d in p.decken if d.name == "Kolloquium 4")
-        self.assertEqual([(z.groesse, z.schnitt) for z in d.diagramme if z.schnitt], [("M", "U4"), ("V", "U4")])
-        u4 = next(u for u in bild(p, "q_d", d.kennung)["unterzuege"] if u["kennung"] == "U4")
+        self.assertEqual([(z.groesse, z.schnitt) for z in d.diagramme if z.schnitt], [("M", "T4"), ("V", "T4")])
+        u4 = next(u for u in bild(p, "q_d", d.kennung)["traeger"] if u["kennung"] == "T4")
         self.assertEqual([(l["u"], l["art"], l["name"]) for l in u4["lager"]],
-                         [(0.5, "unterzug", "U1"), (4.5, "unterzug", "U2"), (8.5, "unterzug", "U3")])
+                         [(0.5, "traeger", "T1"), (4.5, "traeger", "T2"), (8.5, "traeger", "T3")])
         # Über dem mittleren Lager zieht es oben.
         self.assertEqual(u4["extreme"]["M"]["kleinst"]["u"], 4.5)
         self.assertLess(u4["extreme"]["M"]["kleinst"]["wert"], 0.0)
 
     def test_ein_bild_zeigt_auf_ihn(self):
-        """Wie auf einen Schnitt -- der Katalog sagt, welche Grössen einem Unterzug gehören."""
-        p = mit_unterzug()
+        """Wie auf einen Schnitt -- der Katalog sagt, welche Grössen einem Träger gehören."""
+        p = mit_traeger()
         d = p.decken[0]
-        d.diagramm(d.lastfaelle[0], "M", d.unterzuege[0])
-        self.assertEqual((d.diagramme[-1].groesse, d.diagramme[-1].schnitt), ("M", "U1"))
+        d.diagramm(d.lastfaelle[0], "M", d.traeger[0])
+        self.assertEqual((d.diagramme[-1].groesse, d.diagramme[-1].schnitt), ("M", "T1"))
         self.assertEqual(Projekt.aus_dict(p.als_dict()), p)
         katalog = dienst.bearbeite("katalog", {}).daten["decke"]["diagrammgroessen"]
-        self.assertEqual([g["wert"] for g in katalog if g["unterzug"]], ["M", "V"])
+        self.assertEqual([g["wert"] for g in katalog if g["traeger"]], ["M", "V"])
 
 
 if __name__ == "__main__":

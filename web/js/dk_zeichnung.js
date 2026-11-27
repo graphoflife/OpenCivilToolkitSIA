@@ -3,7 +3,7 @@
  *
  * Gezeichnet wird ein Grundriss in Metern, x nach rechts und y nach oben
  * (Benutzer, 2026-10-23): Platten und Zonen als Umrisse, Linienlager und
- * versteckte Unterzüge als Linien, Stützen an einem Knoten -- dazu Schnitte,
+ * Träger als Linien, Stützen an einem Knoten -- dazu Schnitte,
  * Linien, längs denen ein Ergebnisbild die Schnittkraft wie an einem Balken
  * zeigt (Benutzer, 2026-11-16); sie rechnen nicht mit. Alles hängt an
  * Knoten (`verbunden`): wo zwei Platten sich eine Ecke teilen oder eine Wand
@@ -50,7 +50,7 @@ const NAMEN = {
   punktlasten: ['Punktlast', 'Punktlasten'],
   linienlasten: ['Linienlast', 'Linienlasten'],
   linienlager: ['Linienlager', 'Linienlager'],
-  unterzuege: ['Unterzug', 'Unterzüge'],
+  traeger: ['Träger', 'Träger'],
   flaechenlasten: ['Flächenlast', 'Flächenlasten'],
   zonen: ['Zone', 'Zonen'],
   platten: ['Platte', 'Platten'],
@@ -68,7 +68,7 @@ function arten() {
   const vorsilben = katalog('decke', 'vorsilben');
   return [
     ['stuetzen', 'punkt'], ['punktlasten', 'punkt'], ['schnitte', 'linie'], ['linienlasten', 'linie'],
-    ['linienlager', 'linie'], ['unterzuege', 'linie'], ['flaechenlasten', 'flaeche'], ['zonen', 'flaeche'],
+    ['linienlager', 'linie'], ['traeger', 'linie'], ['flaechenlasten', 'flaeche'], ['zonen', 'flaeche'],
     ['platten', 'flaeche'],
   ].map(([liste, form], rang) => ({
     liste, form, rang, vorsilbe: vorsilben[liste], heisst: NAMEN[liste][0], mehrzahl: NAMEN[liste][1],
@@ -89,8 +89,8 @@ const EINSTELLUNG = {
       titel: 'Linienlager – eine Wand oder ein Rand: vertikal gehalten, eingespannt oder beides' },
     { name: 'stuetze', text: 'Stütze', zeichen: 'cad-stuetze', taste: 's', form: 'knoten',
       titel: 'Stütze – an einen Knoten oder eine freie Stelle klicken' },
-    { name: 'unterzug', text: 'Unterzug', zeichen: 'cad-unterzug', taste: 'u', form: 'linie',
-      titel: 'Versteckter Unterzug – ein starker Streifen in der Platte' },
+    { name: 'traeger', text: 'Träger', zeichen: 'cad-traeger', taste: 't', form: 'linie',
+      titel: 'Träger – ein Unterzug oder ein Überzug, in der Streifenmethode ein starker Streifen in der Platte' },
     { name: 'zone', text: 'Zone', zeichen: 'cad-zone', taste: 'z', form: 'polygon',
       titel: 'Zone – dort geht ein eigener Anteil der Last in Richtung 1' },
     { name: 'flaechenlast', text: 'Flächenlast', zeichen: 'cad-flaechenlast', taste: 'q', form: 'polygon',
@@ -161,7 +161,7 @@ function vorgabenNeu() {
     platten: vorlage('deckenplatte'),
     linienlager: vorlage('linienlager'),
     stuetzen: vorlage('stuetze'),
-    unterzuege: vorlage('unterzug'),
+    traeger: vorlage('traeger'),
     zonen: vorlage('zone'),
     flaechenlasten: vorlage('flaechenlast'),
     linienlasten: vorlage('linienlast'),
@@ -250,7 +250,7 @@ function anlegen(a, z, liste, felder) {
 }
 
 function linieAnlegen(a, z, von, bis, werkzeug) {
-  const liste = { unterzug: 'unterzuege', linienlast: 'linienlasten', schnitt: 'schnitte' }[werkzeug] || 'linienlager';
+  const liste = { traeger: 'traeger', linienlast: 'linienlasten', schnitt: 'schnitte' }[werkzeug] || 'linienlager';
   return anlegen(a, z, liste, { von, bis });
 }
 

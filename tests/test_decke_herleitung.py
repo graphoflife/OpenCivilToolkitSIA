@@ -1,5 +1,5 @@
 """
-Der Bericht einer Decke je Fall: die Träger, was die Lager tragen, die
+Der Bericht einer Decke je Fall: die Durchlaufträger, was die Lager tragen, die
 grössten Schnittkräfte der Platte, die Biegewiderstände, die sie verlangt,
 und die Lastverteilelemente -- gegen das Kolloquium 4 und die Bilder
 desselben Falls.
@@ -73,12 +73,12 @@ class TestKolloquium4(unittest.TestCase):
     def test_gleiche_feldstreifen_in_einer_zeile(self):
         """
         Die 18 Feldstreifen in x tragen dasselbe: eine Zeile. Die in y trennt
-        der mittlere Unterzug -- in seiner Breite tragen sie nichts.
+        der mittlere Träger -- in seiner Breite tragen sie nichts.
         """
-        zeilen = self.zeilen("Träger, je Meter ihrer Breite")
-        self.assertEqual([z[0] for z in zeilen], ["x1 … x18", "y5 … y16", "y21 … y32", "U4", "U1", "U2", "U3"])
-        self.assertEqual(zeilen[0][3:], ["50.2", "U1 11.4 · U2 27.4 · U3 11.4", "-7.4", "4.50", "6.0", "2.05"])
-        # Das grösste Moment von U2 liegt genau bei 2.475 m: ob es als 2.47
+        zeilen = self.zeilen("Durchlaufträger, je Meter ihrer Breite")
+        self.assertEqual([z[0] for z in zeilen], ["x1 … x18", "y5 … y16", "y21 … y32", "T4", "T1", "T2", "T3"])
+        self.assertEqual(zeilen[0][3:], ["50.2", "T1 11.4 · T2 27.4 · T3 11.4", "-7.4", "4.50", "6.0", "2.05"])
+        # Das grösste Moment von T2 liegt genau bei 2.475 m: ob es als 2.47
         # oder 2.48 dasteht, entscheidet das Rauschen der Rechnung (2026-11-26).
         self.assertEqual(zeilen[5][4:], ["L1 100.0 · S2 276.4", "0.0", "–", "123.7", "2.48"])
 
@@ -104,7 +104,7 @@ class TestKolloquium4(unittest.TestCase):
                     self.assertAlmostEqual(float(im_bericht), im_bild, delta=0.006, msg=groesse)
 
     def test_die_biegewiderstaende(self):
-        """Oben in x über der mittleren Stütze 60.1 kNm/m, unten in y im mittleren Unterzug 123.7."""
+        """Oben in x über der mittleren Stütze 60.1 kNm/m, unten in y im mittleren Träger 123.7."""
         zeilen = {z[0]: z[2:] for z in self.zeilen("Erforderliche Biegewiderstände, ohne Lastverteilelemente")}
         self.assertEqual(zeilen["m'_{xu}"], ["60.1\\ \\mathrm{kNm/m}", "(4.50, 5.00)"])
         self.assertEqual(zeilen["m_{yu}"], ["123.7\\ \\mathrm{kNm/m}", "(4.50, 2.48)"])  # genau 2.475
@@ -161,7 +161,7 @@ class TestJedeWahl(unittest.TestCase):
         Zeile, auch mit ungeteilten. x9 bis x14 enden am freien Rand, tragen
         nichts und fehlen.
         """
-        namen = [z[0] for z in tabelle(self.loesung, "Eigengewicht", "Träger, je Meter ihrer Breite")]
+        namen = [z[0] for z in tabelle(self.loesung, "Eigengewicht", "Durchlaufträger, je Meter ihrer Breite")]
         self.assertEqual(namen[:4], ["x1.1 … x3.1", "x4.1 … x8", "x15", "x1.2"])
         self.assertEqual(namen[9:12], ["y1 … y3", "y4", "y5 … y6"])
 

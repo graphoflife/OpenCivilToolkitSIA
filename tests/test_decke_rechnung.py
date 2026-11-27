@@ -2,9 +2,9 @@
 Die Decke nach der Streifenmethode -- gegen die Vorlesung und das Kolloquium 4.
 
 * Kolloquium 4 (Musterlösung Stahlbeton II, FS 2023): Platte 9 × 5.5 m,
-  oben auf einer Wand, unten auf drei Stützen, mit versteckten Unterzügen von
+  oben auf einer Wand, unten auf drei Stützen, mit versteckten Trägern von
   1 m; 30 % der Last in x, 70 % in y. Die Schnitte A-A und C-C rechnet die
-  App wie die Musterlösung. Den Unterzug B-B rechnet die Musterlösung mit
+  App wie die Musterlösung. Den Träger B-B rechnet die Musterlösung mit
   einem Faktor aus A-A, als läge die Last aus C-C über seine ganze Länge;
   die App legt sie dorthin, wo C-C aufliegt. Daher weichen B-B, D-D, E-E und
   die Stützenkräfte um wenige Prozent ab -- hier gegen die Handrechnung mit
@@ -13,7 +13,7 @@ Die Decke nach der Streifenmethode -- gegen die Vorlesung und das Kolloquium 4.
   die automatische Aufteilung trifft ihre Momente genau.
 * Dieselbe Platte gedreht: schiefe Streifen tragen ``m_η``, und ``m_x``,
   ``m_y``, ``m_xy`` sind dessen Transformation.
-* Längs eines Linienlagers: was die Träger in es geben, als Stufen -- und wo
+* Längs eines Linienlagers: was die Durchlaufträger in es geben, als Stufen -- und wo
   die Bilder ihre grössten Werte suchen.
 """
 
@@ -24,11 +24,11 @@ from opencivil.decke import geometrie as geo
 from opencivil.decke.feld import INNEN, POSITIV_JE_LAST, an_stelle, lastverteilelemente, stellen, widerstaende
 from opencivil.decke.modell import (
     Aufteilung, Decke, Flaechenlast, Kombination, Lastfall, Linienlager, Linienlast, Platte, Punktlast,
-    Stuetze, Unterzug, Zone,
+    Stuetze, Traeger, Zone,
 )
 from opencivil.decke.lasten import kn
 from opencivil.decke.rechnung import Ergebnis, Fallergebnis, Wandkraft, lagerverlauf, rechnen, spitzen
-from opencivil.decke.traeger import wert
+from opencivil.decke.durchlauftraeger import wert
 from opencivil.stabwerk.system import Meldung
 from opencivil.stabwerk.verlauf import extremwerte
 
@@ -54,13 +54,13 @@ class Rechnung(unittest.TestCase):
         return e
 
     def je_meter(self, fall, streifen, groesse, s, links=False):
-        r = fall.traeger[streifen]
-        return wert(r.stuecke, groesse, s, links) / self.zerlegung[r.traeger.streifen].breite
+        r = fall.durchlauftraeger[streifen]
+        return wert(r.stuecke, groesse, s, links) / self.zerlegung[r.durchlauftraeger.streifen].breite
 
     def kraefte(self, fall, streifen):
-        """Je Lager des Trägers ``(Name, Kraft je Meter Streifen)``."""
-        r = fall.traeger[streifen]
-        b = self.zerlegung[r.traeger.streifen].breite
+        """Je Lager des Durchlaufträgers ``(Name, Kraft je Meter Streifen)``."""
+        r = fall.durchlauftraeger[streifen]
+        b = self.zerlegung[r.durchlauftraeger.streifen].breite
         return [(k.auflager.name, k.F / b) for k in r.lagerkraefte]
 
 
@@ -73,8 +73,8 @@ class TestKolloquium4(Rechnung):
             platten=[Platte("P", rechteck(0, 0, 9, 5.5), 0.24, E, WICHTE)],
             linienlager=[Linienlager("Wand", (0, 0), (9, 0))],
             stuetzen=[Stuetze(n, (x, 5.0), 0.3, 0.3) for n, x in (("S1", 0.5), ("S2", 4.5), ("S3", 8.5))],
-            unterzuege=[Unterzug("SB1", (0.5, 0), (0.5, 5.5), 1.0, 2), Unterzug("SB2", (4.5, 0), (4.5, 5.5), 1.0, 2),
-                        Unterzug("SB1r", (8.5, 0), (8.5, 5.5), 1.0, 2), Unterzug("SB3", (0, 5.0), (9, 5.0), 1.0, 1)],
+            traeger=[Traeger("SB1", (0.5, 0), (0.5, 5.5), 1.0, 2), Traeger("SB2", (4.5, 0), (4.5, 5.5), 1.0, 2),
+                     Traeger("SB1r", (8.5, 0), (8.5, 5.5), 1.0, 2), Traeger("SB3", (0, 5.0), (9, 5.0), 1.0, 1)],
             lastfaelle=[Lastfall("qd", [Flaechenlast("q_d", cls.qd, platte="P")])],
             aufteilung=Aufteilung.FEST, anteil=0.3)
 
@@ -99,15 +99,15 @@ class TestKolloquium4(Rechnung):
 
     def test_a_a_momente_mit_pressung(self):
         """
-        Über dem Mittelunterzug −7.3 kNm/m statt −10.9 mit Punktlager, im
-        Feld 6.1, an den Rändern der Unterzüge 3.0 und −4.6 -- die
+        Über dem Mittelträger −7.3 kNm/m statt −10.9 mit Punktlager, im
+        Feld 6.1, an den Rändern der Träger 3.0 und −4.6 -- die
         Musterlösung rundet 0.3·q_d auf 5.6 und q_A,r auf 11.5.
         """
         p = 0.3 * self.qd
         soll = self.RA * 4.0 - p * 4.5 ** 2 / 2.0 + self.RB * 0.5 ** 2 / 2.0
         self.assertAlmostEqual(self.je_meter(self.f, "x1", "M", 4.5), soll, places=3)
         self.assertAlmostEqual(soll / 1e3, -7.3, delta=0.1)
-        _, feld = extremwerte(self.f.traeger["x1"].stuecke, lambda t: t.M).groesst
+        _, feld = extremwerte(self.f.durchlauftraeger["x1"].stuecke, lambda t: t.M).groesst
         feld_soll = (self.RA - p * 0.5) ** 2 / (2.0 * p) + self.MA
         self.assertAlmostEqual(feld / 0.25, feld_soll, places=3)
         self.assertAlmostEqual(feld_soll / 1e3, 6.1, delta=0.15)
@@ -119,7 +119,7 @@ class TestKolloquium4(Rechnung):
     def test_c_c(self):
         """
         Wie in der Musterlösung: q_C = 39.3 kN/m², M = 39.9 kNm/m, am Rand
-        des Unterzugs 13.2; die Querkraft 32.2 an der Wand, −26.3 am Unterzug.
+        des Trägers 13.2; die Querkraft 32.2 an der Wand, −26.3 am Träger.
         """
         p = 0.7 * self.qd
         qC = p * 5.5 ** 2 / 2.0 / 5.0
@@ -127,7 +127,7 @@ class TestKolloquium4(Rechnung):
         self.assertEqual((wand, sb3), ("Wand", "SB3"))
         self.assertAlmostEqual(C, qC, places=3)
         self.assertAlmostEqual(qC / 1e3, 39.3, delta=0.1)
-        _, M = extremwerte(self.f.traeger["y5"].stuecke, lambda t: t.M).groesst
+        _, M = extremwerte(self.f.durchlauftraeger["y5"].stuecke, lambda t: t.M).groesst
         self.assertAlmostEqual(M / 0.25, A ** 2 / (2.0 * p), places=3)
         self.assertAlmostEqual(M / 0.25 / 1e3, 39.9, delta=0.05)
         self.assertAlmostEqual(self.je_meter(self.f, "y5", "M", 4.5) / 1e3, 13.2, delta=0.05)
@@ -135,9 +135,9 @@ class TestKolloquium4(Rechnung):
         self.assertAlmostEqual(self.je_meter(self.f, "y5", "V", 4.5), A - p * 4.5, places=3)
         self.assertAlmostEqual((A - p * 4.5) / 1e3, -26.3, delta=0.1)
 
-    def test_im_unterzug_tragen_die_feldstreifen_seiner_richtung_nichts(self):
-        self.assertNotIn("x20", self.f.traeger)
-        self.assertNotIn("y2", self.f.traeger)
+    def test_im_traeger_tragen_die_feldstreifen_seiner_richtung_nichts(self):
+        self.assertNotIn("x20", self.f.durchlauftraeger)
+        self.assertNotIn("y2", self.f.durchlauftraeger)
 
     def test_b_b_mit_der_last_dort_wo_c_c_aufliegt(self):
         """
@@ -154,7 +154,7 @@ class TestKolloquium4(Rechnung):
         RA = p * 0.5 + W / 2.0 + (MB - MA) / 4.0
         RB = 2.0 * (W / 2.0 - (MB - MA) / 4.0)
         kraefte = self.kraefte(self.f, "SB3")
-        self.assertEqual([n for n, _ in kraefte], ["SB1", "SB2", "SB1r"], "auf den Unterzügen, nicht den Stützen")
+        self.assertEqual([n for n, _ in kraefte], ["SB1", "SB2", "SB1r"], "auf den Trägern, nicht den Stützen")
         self.assertAlmostEqual(kraefte[0][1], RA, places=2)
         self.assertAlmostEqual(kraefte[1][1], RB, places=2)
         self.assertAlmostEqual(RA / 1e3, 52.9, delta=0.6)
@@ -183,7 +183,7 @@ class TestKolloquium4(Rechnung):
 
     def test_wand_je_meter(self):
         """Unter den Feldstreifen von C-C trägt die Wand 32.2 kN/m."""
-        stueck = next(w for w in self.f.linienlager["Wand"] if w.traeger == "y5")
+        stueck = next(w for w in self.f.linienlager["Wand"] if w.durchlauftraeger == "y5")
         self.assertAlmostEqual(stueck.laenge, 0.25)
         self.assertAlmostEqual(stueck.r / 1e3, 32.2, delta=0.05)
 
@@ -193,7 +193,7 @@ class TestKolloquium4(Rechnung):
         self.assertEqual((stufen[0][0], stufen[-1][1]), (0.0, 9.0))
         self.assertTrue(all(a[1] == b[0] for a, b in zip(stufen, stufen[1:])), "lückenlos")
         self.assertAlmostEqual(sum((ub - ua) * r for ua, ub, r, _ in stufen), self.f.wandkraft("Wand"), places=3)
-        stueck = next(w for w in self.f.linienlager["Wand"] if w.traeger == "y5")
+        stueck = next(w for w in self.f.linienlager["Wand"] if w.durchlauftraeger == "y5")
         mitte = 0.5 * (stueck.a[0] + stueck.b[0])
         self.assertEqual([r for ua, ub, r, _ in stufen if ua < mitte < ub], [stueck.r])
 
@@ -275,7 +275,7 @@ class TestKnappDaneben(Rechnung):
     """
     Ränder, die knapp schief zu den Streifen liegen: eine Ecke 0.01 mm
     daneben, eine gedrehte Platte mit Ecken auf 0.1 mm. Bis 2026-11-26 hielt
-    das die ganze Decke an: «Der Träger steht nicht im Gleichgewicht».
+    das die ganze Decke an: «Der Durchlaufträger steht nicht im Gleichgewicht».
     """
 
     def gerechnet_mit(self, ecken, richtungen=(0.0, math.pi / 2.0)):
@@ -316,14 +316,14 @@ class TestEinachsig(Rechnung):
         f = e.faelle[0]
         self.assertAlmostEqual(f.daneben, 0.0)
         self.assertAlmostEqual(f.summe, 4.0 * q, places=6)
-        self.assertAlmostEqual(wert(f.traeger["x1"].stuecke, "M", 2.0), q * 16.0 / 8.0, places=3)
-        self.assertNotIn("x2", f.traeger)
+        self.assertAlmostEqual(wert(f.durchlauftraeger["x1"].stuecke, "M", 2.0), q * 16.0 / 8.0, places=3)
+        self.assertNotIn("x2", f.durchlauftraeger)
 
     def test_linienlast_auf_einer_streifengrenze_je_zur_haelfte(self):
         e = self.gerechnet(self.decke(Linienlast("Wand oben", (0, 1.0), (4, 1.0), q)))
         f = e.faelle[0]
         for streifen in ("x4", "x5"):
-            self.assertAlmostEqual(wert(f.traeger[streifen].stuecke, "M", 2.0), q * 16.0 / 16.0, places=3)
+            self.assertAlmostEqual(wert(f.durchlauftraeger[streifen].stuecke, "M", 2.0), q * 16.0 / 16.0, places=3)
 
     def test_einzellast_und_ihr_lastverteilelement(self):
         Q = 40e3
@@ -331,7 +331,7 @@ class TestEinachsig(Rechnung):
         f = e.faelle[0]
         # Je Streifen 0.25 m der Fläche: W = Q/4 über 1 m in der Mitte des Felds.
         W = Q / 4.0
-        self.assertAlmostEqual(wert(f.traeger["x3"].stuecke, "M", 2.0), W * 4.0 / 4.0 - W * 1.0 / 8.0, places=3)
+        self.assertAlmostEqual(wert(f.durchlauftraeger["x3"].stuecke, "M", 2.0), W * 4.0 / 4.0 - W * 1.0 / 8.0, places=3)
         element, = lastverteilelemente(e, f)
         (oben, unten), _ = element.zusatz()
         self.assertAlmostEqual(unten, Q / 8.0)
@@ -385,7 +385,7 @@ class TestEinachsig(Rechnung):
         k = (0.3 / 0.2) ** 3
         MB = -q / 4.0 * (4.0 ** 3 + 6.0 ** 3 / k) / (2.0 * (4.0 + 6.0 / k))
         self.assertAlmostEqual(an_stelle(e, f, (4.0, 0.5)).mx, MB, places=3)
-        self.assertEqual(len(e.zerlegung["x1"].traeger), 1, "über die Plattengrenze ein Träger")
+        self.assertEqual(len(e.zerlegung["x1"].durchlauftraeger), 1, "über die Plattengrenze ein Durchlaufträger")
 
     def test_eingespannt(self):
         """Kragplatte 2 m, an der Wand eingespannt: −qL²/2 an der Wand, die Wand trägt qL je Meter."""
@@ -519,12 +519,12 @@ class TestLagerverlauf(unittest.TestCase):
     """Längs eines Linienlagers, Stück um Stück -- von Hand gegeben."""
 
     def test_was_sich_deckt_zaehlt_zusammen(self):
-        """Zwei Feldstreifen und quer über ihre Grenze ein Unterzug: wo sie sich decken, tragen beide."""
+        """Zwei Feldstreifen und quer über ihre Grenze ein Träger: wo sie sich decken, tragen beide."""
         lager = Linienlager("W", (0, 0), (4, 0))
         y = (0.0, 1.0)
         stufen = lagerverlauf(lager, [Wandkraft("y1", (0, 0), (2, 0), F=4e3, vor=0.0, nach=0.0, n=y),
                                       Wandkraft("y2", (2, 0), (4, 0), F=2e3, vor=0.0, nach=0.0, n=y),
-                                      Wandkraft("U1", (3, 0), (1, 0), F=6e3, vor=0.0, nach=0.0, n=y)])
+                                      Wandkraft("T1", (3, 0), (1, 0), F=6e3, vor=0.0, nach=0.0, n=y)])
         self.assertEqual([(ua, ub, r) for ua, ub, r, _ in stufen],
                          [(0.0, 1.0, 2e3), (1.0, 2.0, 5e3), (2.0, 3.0, 4e3), (3.0, 4.0, 1e3)])
 
@@ -560,9 +560,9 @@ class TestPruefen(unittest.TestCase):
         self.assertTrue(any("überlappen" in m.text for m in e.meldungen))
         self.assertEqual(e.faelle, [])
 
-    def test_parallele_unterzuege_uebereinander(self):
+    def test_parallele_traeger_uebereinander(self):
         e = rechnen(Decke(platten=[Platte("A", rechteck(0, 0, 4, 4), 0.2, E, WICHTE)],
-                          unterzuege=[Unterzug("U1", (0, 2), (4, 2), 1.0), Unterzug("U2", (1, 2.5), (3, 2.5), 0.5)]))
+                          traeger=[Traeger("T1", (0, 2), (4, 2), 1.0), Traeger("T2", (1, 2.5), (3, 2.5), 0.5)]))
         self.assertTrue(any("parallel" in m.text for m in e.meldungen))
 
 

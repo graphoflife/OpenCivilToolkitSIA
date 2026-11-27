@@ -31244,7 +31244,7 @@ $$
 g = 10\,\mathrm{m}/\mathrm{s}^{2}
 $$
 
-> **Annahme:** Streifenmethode (Stahlbeton II, 7.2 Platten, Folien 27 bis 39): jede Last geht in Streifen zweier Richtungen zu den Lagern; die Streifen selbst tragen ohne Drillmoment. Das ist eine Gleichgewichtslösung nach der statischen Methode und damit ein unterer Grenzwert der Traglast (SIA 262:2025, 4.1.4.2.2) – für die Tragsicherheit (4.1.4.2.1), und nur, wenn das Verformungsvermögen gesichert ist (4.1.4.2.4). Statisch unbestimmte Streifen sind elastisch gelöst, mit E\_cm · h³/12 je Meter der ungerissenen Platte (4.1.4.1.3); ein Unterzug trägt als Flächenlager mit gleichmässiger Pressung über seine Breite (Folie 33).
+> **Annahme:** Streifenmethode (Stahlbeton II, 7.2 Platten, Folien 27 bis 39): jede Last geht in Streifen zweier Richtungen zu den Lagern; die Streifen selbst tragen ohne Drillmoment. Das ist eine Gleichgewichtslösung nach der statischen Methode und damit ein unterer Grenzwert der Traglast (SIA 262:2025, 4.1.4.2.2) – für die Tragsicherheit (4.1.4.2.1), und nur, wenn das Verformungsvermögen gesichert ist (4.1.4.2.4). Statisch unbestimmte Streifen sind elastisch gelöst, mit E\_cm · h³/12 je Meter der ungerissenen Platte (4.1.4.1.3); ein Träger trägt als Flächenlager mit gleichmässiger Pressung über seine Breite (Folie 33).
 
 **Platten**
 
@@ -31270,14 +31270,14 @@ Die Richtungen der Platte «P1» wählt die Rechnung selbst, entlang der Ränder
 | S2 | (4.50, 5.00) | 300 × 300 | 1.00 × 1.00 | von selbst |
 | S3 | (8.50, 5.00) | 300 × 300 | 1.00 × 1.00 | von selbst |
 
-**Versteckte Unterzüge**
+**Träger**
 
-| Unterzug | von | bis | $b\ [\mathrm{m}]$ | Stufe |
+| Träger | von | bis | $b\ [\mathrm{m}]$ | Stufe |
 | ---: | ---: | ---: | ---: | ---: |
-| U1 | (0.50, 0.00) | (0.50, 5.50) | $1.00$ | 2 |
-| U2 | (4.50, 0.00) | (4.50, 5.50) | $1.00$ | 2 |
-| U3 | (8.50, 0.00) | (8.50, 5.50) | $1.00$ | 2 |
-| U4 | (0.00, 5.00) | (9.00, 5.00) | $1.00$ | 1 |
+| T1 | (0.50, 0.00) | (0.50, 5.50) | $1.00$ | 2 |
+| T2 | (4.50, 0.00) | (4.50, 5.50) | $1.00$ | 2 |
+| T3 | (8.50, 0.00) | (8.50, 5.50) | $1.00$ | 2 |
+| T4 | (0.00, 5.00) | (9.00, 5.00) | $1.00$ | 1 |
 
 **Lasten, nach unten positiv**
 
@@ -31292,9 +31292,9 @@ Die Richtungen der Platte «P1» wählt die Rechnung selbst, entlang der Ränder
 | x | $0.0$ | 22 | $0.250 \ldots 0.250$ | x1 … x22 |
 | y | $90.0$ | 36 | $0.250 \ldots 0.250$ | y1 … y36 |
 
-Je Richtung sind die Streifen höchstens 0.25 m breit; geteilt wird an jeder Ecke einer Platte, jedem Rand eines Unterzugs und Stützenbereichs und jedem Ende eines Linienlagers.
+Je Richtung sind die Streifen höchstens 0.25 m breit; geteilt wird an jeder Ecke einer Platte, jedem Rand eines Trägers und Stützenbereichs und jedem Ende eines Linienlagers.
 
-Gerechnet wird von unten nach oben: zuerst die Feldstreifen, dann die Unterzüge, jeder Träger nach denen tieferer Stufe: U4 (Stufe 1), U1 (Stufe 2), U2 (Stufe 2), U3 (Stufe 2). Was ein Träger an Lagerkraft abgibt, ist die Last dessen, auf dem er liegt.
+Gerechnet wird von unten nach oben: zuerst die Feldstreifen, dann die Träger, die tiefere Stufe zuerst: T4 (Stufe 1), T1 (Stufe 2), T2 (Stufe 2), T3 (Stufe 2). Was ein Durchlaufträger an Lagerkraft abgibt, ist die Last dessen, auf dem er liegt.
 
 Aufteilung fest: 30 % der Last in Richtung 1, 70 % in Richtung 2.
 
@@ -31312,7 +31312,7 @@ $$
 \begin{aligned} & m = \frac{M}{b} \qquad m_x = m \cdot \cos^2\varphi \qquad m_y = m \cdot \sin^2\varphi \qquad m_{xy} = m \cdot \sin\varphi \cdot \cos\varphi \\ & v = \frac{V}{b} \qquad v_x = v \cdot \cos\varphi \qquad v_y = v \cdot \sin\varphi \qquad v_0 = \sqrt{v_x^2 + v_y^2} \end{aligned}
 $$
 
-Ein Streifen der Breite b in der Richtung φ gegen x trägt mit M und V; je Meter sind das m und v. An einer Stelle zählen alle Streifen über ihr: je Richtung ein Feldstreifen und jeder Unterzug, in dessen Fläche sie liegt.
+Ein Streifen der Breite b in der Richtung φ gegen x trägt mit M und V; je Meter sind das m und v. An einer Stelle zählen alle Streifen über ihr: je Richtung ein Feldstreifen und jeder Träger, in dessen Fläche sie liegt.
 
 **Ein Flächenlager drückt gleichmässig über seine Breite l** *(Stahlbeton II, 7.2 Platten, Folie 33)*
 
@@ -31320,7 +31320,7 @@ $$
 p_{\mathrm{Lager}} = \frac{R}{l}
 $$
 
-Ein Unterzug oder Stützenbereich trägt einen Streifen nicht in einem Punkt: seine Lagerkraft R drückt gleichmässig über die Breite l, die beide teilen. Beim Unterzug wird diese Pressung zu seiner Last.
+Ein Träger oder Stützenbereich trägt einen Streifen nicht in einem Punkt: seine Lagerkraft R drückt gleichmässig über die Breite l, die beide teilen. Beim Träger wird diese Pressung zu seiner Last.
 
 **Erforderliche Biegewiderstände, linearisierte Fliessbedingung** *(SIA 262:2025, 4.3.2.6, (34))*
 
@@ -31338,19 +31338,19 @@ $$
 
 #### Lastfall «q\_d»
 
-**Träger, je Meter ihrer Breite**
+**Durchlaufträger, je Meter ihrer Breite**
 
-| Träger | $b\ [\mathrm{m}]$ | $L\ [\mathrm{m}]$ | $Q/b\ [\mathrm{kN/m}]$ | Lager [kN/m] | $m_{\min}\ [\mathrm{kNm/m}]$ | $s\ [\mathrm{m}]$ | $m_{\max}\ [\mathrm{kNm/m}]$ | $s\ [\mathrm{m}]$ |
+| Durchlaufträger | $b\ [\mathrm{m}]$ | $L\ [\mathrm{m}]$ | $Q/b\ [\mathrm{kN/m}]$ | Lager [kN/m] | $m_{\min}\ [\mathrm{kNm/m}]$ | $s\ [\mathrm{m}]$ | $m_{\max}\ [\mathrm{kNm/m}]$ | $s\ [\mathrm{m}]$ |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| x1 … x18 | $0.250$ | $9.00$ | $50.2$ | U1 11.4 · U2 27.4 · U3 11.4 | $-7.4$ | $4.50$ | $6.0$ | $2.05$ |
-| y5 … y16 | $0.250$ | $5.50$ | $71.6$ | L1 32.2 · U4 39.4 | $0.0$ | – | $39.9$ | $2.47$ |
-| y21 … y32 | $0.250$ | $5.50$ | $71.6$ | L1 32.2 · U4 39.4 | $0.0$ | – | $39.9$ | $2.47$ |
-| U4 | $1.000$ | $9.00$ | $286.5$ | U1 52.5 · U2 181.5 · U3 52.5 | $-60.1$ | $4.50$ | $47.9$ | $2.04$ |
-| U1 | $1.000$ | $5.50$ | $175.5$ | L1 60.5 · S1 115.0 | $0.0$ | – | $74.9$ | $2.47$ |
-| U2 | $1.000$ | $5.50$ | $376.3$ | L1 100.0 · S2 276.4 | $0.0$ | – | $123.7$ | $2.48$ |
-| U3 | $1.000$ | $5.50$ | $175.5$ | L1 60.5 · S3 115.0 | $0.0$ | – | $74.9$ | $2.47$ |
+| x1 … x18 | $0.250$ | $9.00$ | $50.2$ | T1 11.4 · T2 27.4 · T3 11.4 | $-7.4$ | $4.50$ | $6.0$ | $2.05$ |
+| y5 … y16 | $0.250$ | $5.50$ | $71.6$ | L1 32.2 · T4 39.4 | $0.0$ | – | $39.9$ | $2.47$ |
+| y21 … y32 | $0.250$ | $5.50$ | $71.6$ | L1 32.2 · T4 39.4 | $0.0$ | – | $39.9$ | $2.47$ |
+| T4 | $1.000$ | $9.00$ | $286.5$ | T1 52.5 · T2 181.5 · T3 52.5 | $-60.1$ | $4.50$ | $47.9$ | $2.04$ |
+| T1 | $1.000$ | $5.50$ | $175.5$ | L1 60.5 · S1 115.0 | $0.0$ | – | $74.9$ | $2.47$ |
+| T2 | $1.000$ | $5.50$ | $376.3$ | L1 100.0 · S2 276.4 | $0.0$ | – | $123.7$ | $2.48$ |
+| T3 | $1.000$ | $5.50$ | $175.5$ | L1 60.5 · S3 115.0 | $0.0$ | – | $74.9$ | $2.47$ |
 
-Q ist die Last auf dem Träger, mit dem, was tiefere Träger in ihn geben. s misst längs der Richtung φ des Trägers, s = x · cos φ + y · sin φ: in x ist s = x, in y ist s = y. Nebeneinander liegende Träger, die dasselbe tragen, stehen in einer Zeile.
+Q ist die Last auf dem Durchlaufträger, mit dem, was tiefere Durchlaufträger in ihn geben. s misst längs der Richtung φ des Durchlaufträgers, s = x · cos φ + y · sin φ: in x ist s = x, in y ist s = y. Nebeneinander liegende Durchlaufträger, die dasselbe tragen, stehen in einer Zeile.
 
 **Lagerkräfte**
 
@@ -31361,7 +31361,7 @@ Q ist die Last auf dem Träger, mit dem, was tiefere Träger in ihn geben. s mis
 | S3 · Stütze | $115.0$ | – |
 | L1 · Linienlager | $414.3$ | $100.0$ |
 
-Längs eines Linienlagers gibt jeder Träger seine Kraft gleichmässig über das Stück ab, über das er geht; wo zwei dasselbe Stück tragen, zählen beide. r\_max ist der Wert mit dem grössten Betrag.
+Längs eines Linienlagers gibt jeder Durchlaufträger seine Kraft gleichmässig über das Stück ab, über das er geht; wo zwei dasselbe Stück tragen, zählen beide. r\_max ist der Wert mit dem grössten Betrag.
 
 **Schnittkräfte der Platte, je Meter**
 
@@ -31374,7 +31374,7 @@ Längs eines Linienlagers gibt jeder Träger seine Kraft gleichmässig über das
 | $v_y$ | $-81.8\ \mathrm{kN/m}$ | (4.50, 4.50) | $100.0\ \mathrm{kN/m}$ | (4.50, 0.00) |
 | $v_0$ | $0.0\ \mathrm{kN/m}$ | – | $100.0\ \mathrm{kN/m}$ | (4.50, 0.00) |
 
-Gesucht am Schwerpunkt jeder Zelle der Bilder und an den Stellen, an denen ein Träger springt oder Querkraft oder Last null werden. Momente positiv mit Zug unten.
+Gesucht am Schwerpunkt jeder Zelle der Bilder und an den Stellen, an denen ein Durchlaufträger springt oder Querkraft oder Last null werden. Momente positiv mit Zug unten.
 
 **Erforderliche Biegewiderstände, ohne Lastverteilelemente**
 
@@ -31401,7 +31401,7 @@ $$
 g = 10\,\mathrm{m}/\mathrm{s}^{2}
 $$
 
-> **Annahme:** Streifenmethode (Stahlbeton II, 7.2 Platten, Folien 27 bis 39): jede Last geht in Streifen zweier Richtungen zu den Lagern; die Streifen selbst tragen ohne Drillmoment. Das ist eine Gleichgewichtslösung nach der statischen Methode und damit ein unterer Grenzwert der Traglast (SIA 262:2025, 4.1.4.2.2) – für die Tragsicherheit (4.1.4.2.1), und nur, wenn das Verformungsvermögen gesichert ist (4.1.4.2.4). Statisch unbestimmte Streifen sind elastisch gelöst, mit E\_cm · h³/12 je Meter der ungerissenen Platte (4.1.4.1.3); ein Unterzug trägt als Flächenlager mit gleichmässiger Pressung über seine Breite (Folie 33).
+> **Annahme:** Streifenmethode (Stahlbeton II, 7.2 Platten, Folien 27 bis 39): jede Last geht in Streifen zweier Richtungen zu den Lagern; die Streifen selbst tragen ohne Drillmoment. Das ist eine Gleichgewichtslösung nach der statischen Methode und damit ein unterer Grenzwert der Traglast (SIA 262:2025, 4.1.4.2.2) – für die Tragsicherheit (4.1.4.2.1), und nur, wenn das Verformungsvermögen gesichert ist (4.1.4.2.4). Statisch unbestimmte Streifen sind elastisch gelöst, mit E\_cm · h³/12 je Meter der ungerissenen Platte (4.1.4.1.3); ein Träger trägt als Flächenlager mit gleichmässiger Pressung über seine Breite (Folie 33).
 
 **Platten**
 
@@ -31457,7 +31457,7 @@ Kombination «GZT günstig»: 0.8 · «Eigengewicht» + 0.8 · «Auflast»
 | y | $90.0$ | 13 | $0.300 \ldots 0.500$ | y1 … y13 |
 | 71.57° | $71.6$ | 8 | $0.474 \ldots 0.474$ | 71.57° 1 … 71.57° 8 |
 
-Je Richtung sind die Streifen höchstens 0.50 m breit; geteilt wird an jeder Ecke einer Platte, jedem Rand eines Unterzugs und Stützenbereichs und jedem Ende eines Linienlagers.
+Je Richtung sind die Streifen höchstens 0.50 m breit; geteilt wird an jeder Ecke einer Platte, jedem Rand eines Trägers und Stützenbereichs und jedem Ende eines Linienlagers.
 
 Automatisch, nach Folie 31 verallgemeinert: je Zelle zweier Feldstreifen trägt die Richtung, die Lager hat; trägt keine, fällt die Last dort aus. Tragen beide, geht die Last zum nahen Rand, wenn sie näher als ein Viertel der kürzeren Spannweite an einem Lager liegt, nahe zweier Ränder je zur Hälfte. Sonst geht sie mehr in die kürzere Spannweite: bei gleichen je zur Hälfte, ab dem Verhältnis 1.5 ganz, dazwischen geradlinig. Ein Kragarm zählt doppelt (nach Vorgabe; die Norm lässt jede Aufteilung zu, die im Gleichgewicht ist, SIA 262:2025, 4.1.4.2.2).
 
@@ -31493,7 +31493,7 @@ $$
 \begin{aligned} & m = \frac{M}{b} \qquad m_x = m \cdot \cos^2\varphi \qquad m_y = m \cdot \sin^2\varphi \qquad m_{xy} = m \cdot \sin\varphi \cdot \cos\varphi \\ & v = \frac{V}{b} \qquad v_x = v \cdot \cos\varphi \qquad v_y = v \cdot \sin\varphi \qquad v_0 = \sqrt{v_x^2 + v_y^2} \end{aligned}
 $$
 
-Ein Streifen der Breite b in der Richtung φ gegen x trägt mit M und V; je Meter sind das m und v. An einer Stelle zählen alle Streifen über ihr: je Richtung ein Feldstreifen und jeder Unterzug, in dessen Fläche sie liegt.
+Ein Streifen der Breite b in der Richtung φ gegen x trägt mit M und V; je Meter sind das m und v. An einer Stelle zählen alle Streifen über ihr: je Richtung ein Feldstreifen und jeder Träger, in dessen Fläche sie liegt.
 
 **Ein Flächenlager drückt gleichmässig über seine Breite l** *(Stahlbeton II, 7.2 Platten, Folie 33)*
 
@@ -31501,7 +31501,7 @@ $$
 p_{\mathrm{Lager}} = \frac{R}{l}
 $$
 
-Ein Unterzug oder Stützenbereich trägt einen Streifen nicht in einem Punkt: seine Lagerkraft R drückt gleichmässig über die Breite l, die beide teilen. Beim Unterzug wird diese Pressung zu seiner Last.
+Ein Träger oder Stützenbereich trägt einen Streifen nicht in einem Punkt: seine Lagerkraft R drückt gleichmässig über die Breite l, die beide teilen. Beim Träger wird diese Pressung zu seiner Last.
 
 **Erforderliche Biegewiderstände, linearisierte Fliessbedingung** *(SIA 262:2025, 4.3.2.6, (34))*
 
@@ -31521,9 +31521,9 @@ $$
 
 #### Lastfall «Eigengewicht»
 
-**Träger, je Meter ihrer Breite**
+**Durchlaufträger, je Meter ihrer Breite**
 
-| Träger | $b\ [\mathrm{m}]$ | $L\ [\mathrm{m}]$ | $Q/b\ [\mathrm{kN/m}]$ | Lager [kN/m] | $m_{\min}\ [\mathrm{kNm/m}]$ | $s\ [\mathrm{m}]$ | $m_{\max}\ [\mathrm{kNm/m}]$ | $s\ [\mathrm{m}]$ |
+| Durchlaufträger | $b\ [\mathrm{m}]$ | $L\ [\mathrm{m}]$ | $Q/b\ [\mathrm{kN/m}]$ | Lager [kN/m] | $m_{\min}\ [\mathrm{kNm/m}]$ | $s\ [\mathrm{m}]$ | $m_{\max}\ [\mathrm{kNm/m}]$ | $s\ [\mathrm{m}]$ |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | x1.1 … x3.1 | $0.500$ | $6.00$ | $15.3$ | L3 8.4 · L2 6.9 | $-7.7$ | $6.00$ | $6.5$ | $1.53$ |
 | x4.1 … x8 | $0.500$ | $6.00$ | $31.2$ | L3 11.6 · L2 19.5 | $-22.9$ | $6.00$ | $12.3$ | $2.17$ |
@@ -31551,7 +31551,7 @@ $$
 | 71.57° 7 | $0.474$ | $3.32$ | $5.3$ | L6 2.6 · L8 2.6 | $0.0$ | – | $1.4$ | $5.01$ |
 | 71.57° 8 | $0.474$ | $3.32$ | $5.3$ | L6 2.6 · L8 2.6 | $0.0$ | – | $1.4$ | $5.17$ |
 
-Q ist die Last auf dem Träger, mit dem, was tiefere Träger in ihn geben. s misst längs der Richtung φ des Trägers, s = x · cos φ + y · sin φ: in x ist s = x, in y ist s = y. Nebeneinander liegende Träger, die dasselbe tragen, stehen in einer Zeile.
+Q ist die Last auf dem Durchlaufträger, mit dem, was tiefere Durchlaufträger in ihn geben. s misst längs der Richtung φ des Durchlaufträgers, s = x · cos φ + y · sin φ: in x ist s = x, in y ist s = y. Nebeneinander liegende Durchlaufträger, die dasselbe tragen, stehen in einer Zeile.
 
 **Lagerkräfte**
 
@@ -31568,7 +31568,7 @@ Q ist die Last auf dem Träger, mit dem, was tiefere Träger in ihn geben. s mis
 | L8 · Linienlager | $18.8$ | $6.9$ | – |
 | L9 · Linienlager | $11.2$ | $5.9$ | – |
 
-Längs eines Linienlagers gibt jeder Träger seine Kraft gleichmässig über das Stück ab, über das er geht; wo zwei dasselbe Stück tragen, zählen beide. r\_max ist der Wert mit dem grössten Betrag. Ebenso m\_max, das Moment, das ein eingespanntes Lager hält, mit dem Vorzeichen der Platte: negativ, wo es oben zieht. Liegt Platte zu beiden Seiten, hält es nur den Unterschied ihrer Momente; dann gilt das Vorzeichen der Seite, die stärker zieht.
+Längs eines Linienlagers gibt jeder Durchlaufträger seine Kraft gleichmässig über das Stück ab, über das er geht; wo zwei dasselbe Stück tragen, zählen beide. r\_max ist der Wert mit dem grössten Betrag. Ebenso m\_max, das Moment, das ein eingespanntes Lager hält, mit dem Vorzeichen der Platte: negativ, wo es oben zieht. Liegt Platte zu beiden Seiten, hält es nur den Unterschied ihrer Momente; dann gilt das Vorzeichen der Seite, die stärker zieht.
 
 **Schnittkräfte der Platte, je Meter**
 
@@ -31581,7 +31581,7 @@ Längs eines Linienlagers gibt jeder Träger seine Kraft gleichmässig über das
 | $v_y$ | $-19.2\ \mathrm{kN/m}$ | (2.25, 7.00) | $26.4\ \mathrm{kN/m}$ | (3.24, 0.00) |
 | $v_0$ | $0.0\ \mathrm{kN/m}$ | – | $26.7\ \mathrm{kN/m}$ | (6.00, 1.75) |
 
-Gesucht am Schwerpunkt jeder Zelle der Bilder und an den Stellen, an denen ein Träger springt oder Querkraft oder Last null werden. Momente positiv mit Zug unten.
+Gesucht am Schwerpunkt jeder Zelle der Bilder und an den Stellen, an denen ein Durchlaufträger springt oder Querkraft oder Last null werden. Momente positiv mit Zug unten.
 
 **Erforderliche Biegewiderstände, ohne Lastverteilelemente**
 
@@ -31600,9 +31600,9 @@ Gesucht am Schwerpunkt jeder Zelle der Bilder und an den Stellen, an denen ein T
 
 #### Lastfall «Auflast»
 
-**Träger, je Meter ihrer Breite**
+**Durchlaufträger, je Meter ihrer Breite**
 
-| Träger | $b\ [\mathrm{m}]$ | $L\ [\mathrm{m}]$ | $Q/b\ [\mathrm{kN/m}]$ | Lager [kN/m] | $m_{\min}\ [\mathrm{kNm/m}]$ | $s\ [\mathrm{m}]$ | $m_{\max}\ [\mathrm{kNm/m}]$ | $s\ [\mathrm{m}]$ |
+| Durchlaufträger | $b\ [\mathrm{m}]$ | $L\ [\mathrm{m}]$ | $Q/b\ [\mathrm{kN/m}]$ | Lager [kN/m] | $m_{\min}\ [\mathrm{kNm/m}]$ | $s\ [\mathrm{m}]$ | $m_{\max}\ [\mathrm{kNm/m}]$ | $s\ [\mathrm{m}]$ |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | x15 | $0.400$ | $6.00$ | $5.6$ | L3 1.9 · S1 3.7 | $0.0$ | – | $3.5$ | $3.53$ |
 | y1 … y2 | $0.500$ | $7.00$ | $4.2$ | L1 1.0 · L4 3.2 | $0.0$ | – | $4.1$ | $4.64$ |
@@ -31612,7 +31612,7 @@ Gesucht am Schwerpunkt jeder Zelle der Bilder und an den Stellen, an denen ein T
 | y11 | $0.480$ | $7.00$ | $5.2$ | L1 5.2 · L5 0.0 | $0.0$ | – | $29.3$ | $6.60$ |
 | y12 … y13 | $0.300$ | $7.00$ | $3.9$ | L1 3.9 · L5 0.0 | $0.0$ | – | $20.7$ | $6.60$ |
 
-Q ist die Last auf dem Träger, mit dem, was tiefere Träger in ihn geben. s misst längs der Richtung φ des Trägers, s = x · cos φ + y · sin φ: in x ist s = x, in y ist s = y. Nebeneinander liegende Träger, die dasselbe tragen, stehen in einer Zeile.
+Q ist die Last auf dem Durchlaufträger, mit dem, was tiefere Durchlaufträger in ihn geben. s misst längs der Richtung φ des Durchlaufträgers, s = x · cos φ + y · sin φ: in x ist s = x, in y ist s = y. Nebeneinander liegende Durchlaufträger, die dasselbe tragen, stehen in einer Zeile.
 
 **Lagerkräfte**
 
@@ -31629,7 +31629,7 @@ Q ist die Last auf dem Träger, mit dem, was tiefere Träger in ihn geben. s mis
 | L8 · Linienlager | $0.0$ | $0.0$ | – |
 | L9 · Linienlager | $0.0$ | $0.0$ | – |
 
-Längs eines Linienlagers gibt jeder Träger seine Kraft gleichmässig über das Stück ab, über das er geht; wo zwei dasselbe Stück tragen, zählen beide. r\_max ist der Wert mit dem grössten Betrag. Ebenso m\_max, das Moment, das ein eingespanntes Lager hält, mit dem Vorzeichen der Platte: negativ, wo es oben zieht. Liegt Platte zu beiden Seiten, hält es nur den Unterschied ihrer Momente; dann gilt das Vorzeichen der Seite, die stärker zieht.
+Längs eines Linienlagers gibt jeder Durchlaufträger seine Kraft gleichmässig über das Stück ab, über das er geht; wo zwei dasselbe Stück tragen, zählen beide. r\_max ist der Wert mit dem grössten Betrag. Ebenso m\_max, das Moment, das ein eingespanntes Lager hält, mit dem Vorzeichen der Platte: negativ, wo es oben zieht. Liegt Platte zu beiden Seiten, hält es nur den Unterschied ihrer Momente; dann gilt das Vorzeichen der Seite, die stärker zieht.
 
 **Schnittkräfte der Platte, je Meter**
 
@@ -31642,7 +31642,7 @@ Längs eines Linienlagers gibt jeder Träger seine Kraft gleichmässig über das
 | $v_y$ | $-11.0\ \mathrm{kN/m}$ | (1.75, 7.00) | $11.9\ \mathrm{kN/m}$ | (3.24, 0.25) |
 | $v_0$ | $0.0\ \mathrm{kN/m}$ | – | $11.9\ \mathrm{kN/m}$ | (3.24, 0.25) |
 
-Gesucht am Schwerpunkt jeder Zelle der Bilder und an den Stellen, an denen ein Träger springt oder Querkraft oder Last null werden. Momente positiv mit Zug unten.
+Gesucht am Schwerpunkt jeder Zelle der Bilder und an den Stellen, an denen ein Durchlaufträger springt oder Querkraft oder Last null werden. Momente positiv mit Zug unten.
 
 **Erforderliche Biegewiderstände, ohne Lastverteilelemente**
 
@@ -31661,9 +31661,9 @@ Gesucht am Schwerpunkt jeder Zelle der Bilder und an den Stellen, an denen ein T
 
 #### Lastfall «Nutzlast»
 
-**Träger, je Meter ihrer Breite**
+**Durchlaufträger, je Meter ihrer Breite**
 
-| Träger | $b\ [\mathrm{m}]$ | $L\ [\mathrm{m}]$ | $Q/b\ [\mathrm{kN/m}]$ | Lager [kN/m] | $m_{\min}\ [\mathrm{kNm/m}]$ | $s\ [\mathrm{m}]$ | $m_{\max}\ [\mathrm{kNm/m}]$ | $s\ [\mathrm{m}]$ |
+| Durchlaufträger | $b\ [\mathrm{m}]$ | $L\ [\mathrm{m}]$ | $Q/b\ [\mathrm{kN/m}]$ | Lager [kN/m] | $m_{\min}\ [\mathrm{kNm/m}]$ | $s\ [\mathrm{m}]$ | $m_{\max}\ [\mathrm{kNm/m}]$ | $s\ [\mathrm{m}]$ |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | x3.1 | $0.500$ | $6.00$ | $1.4$ | L3 0.1 · L2 1.3 | $-1.3$ | $6.00$ | $0.4$ | $4.48$ |
 | x4.1 … x6.1 | $0.500$ | $6.00$ | $10.0$ | L3 1.6 · L2 8.4 | $-10.6$ | $6.00$ | $5.0$ | $3.31$ |
@@ -31676,7 +31676,7 @@ Gesucht am Schwerpunkt jeder Zelle der Bilder und an den Stellen, an denen ein T
 | 71.57° 6 | $0.474$ | $3.32$ | $27.9$ | L6 9.0 · L8 18.9 | $0.0$ | – | $16.0$ | $5.69$ |
 | 71.57° 7 | $0.474$ | $3.32$ | $4.0$ | L6 1.1 · L8 2.9 | $0.0$ | – | $2.3$ | $6.06$ |
 
-Q ist die Last auf dem Träger, mit dem, was tiefere Träger in ihn geben. s misst längs der Richtung φ des Trägers, s = x · cos φ + y · sin φ: in x ist s = x, in y ist s = y. Nebeneinander liegende Träger, die dasselbe tragen, stehen in einer Zeile.
+Q ist die Last auf dem Durchlaufträger, mit dem, was tiefere Durchlaufträger in ihn geben. s misst längs der Richtung φ des Durchlaufträgers, s = x · cos φ + y · sin φ: in x ist s = x, in y ist s = y. Nebeneinander liegende Durchlaufträger, die dasselbe tragen, stehen in einer Zeile.
 
 **Lagerkräfte**
 
@@ -31693,7 +31693,7 @@ Q ist die Last auf dem Träger, mit dem, was tiefere Träger in ihn geben. s mis
 | L8 · Linienlager | $13.8$ | $17.9$ | – |
 | L9 · Linienlager | $2.3$ | $3.6$ | – |
 
-Längs eines Linienlagers gibt jeder Träger seine Kraft gleichmässig über das Stück ab, über das er geht; wo zwei dasselbe Stück tragen, zählen beide. r\_max ist der Wert mit dem grössten Betrag. Ebenso m\_max, das Moment, das ein eingespanntes Lager hält, mit dem Vorzeichen der Platte: negativ, wo es oben zieht. Liegt Platte zu beiden Seiten, hält es nur den Unterschied ihrer Momente; dann gilt das Vorzeichen der Seite, die stärker zieht.
+Längs eines Linienlagers gibt jeder Durchlaufträger seine Kraft gleichmässig über das Stück ab, über das er geht; wo zwei dasselbe Stück tragen, zählen beide. r\_max ist der Wert mit dem grössten Betrag. Ebenso m\_max, das Moment, das ein eingespanntes Lager hält, mit dem Vorzeichen der Platte: negativ, wo es oben zieht. Liegt Platte zu beiden Seiten, hält es nur den Unterschied ihrer Momente; dann gilt das Vorzeichen der Seite, die stärker zieht.
 
 **Schnittkräfte der Platte, je Meter**
 
@@ -31706,7 +31706,7 @@ Längs eines Linienlagers gibt jeder Träger seine Kraft gleichmässig über das
 | $v_y$ | $-17.9\ \mathrm{kN/m}$ | (12.67, 2.75) | $8.5\ \mathrm{kN/m}$ | (11.83, 0.25) |
 | $v_0$ | $0.0\ \mathrm{kN/m}$ | – | $18.9\ \mathrm{kN/m}$ | (12.67, 2.75) |
 
-Gesucht am Schwerpunkt jeder Zelle der Bilder und an den Stellen, an denen ein Träger springt oder Querkraft oder Last null werden. Momente positiv mit Zug unten.
+Gesucht am Schwerpunkt jeder Zelle der Bilder und an den Stellen, an denen ein Durchlaufträger springt oder Querkraft oder Last null werden. Momente positiv mit Zug unten.
 
 **Erforderliche Biegewiderstände, ohne Lastverteilelemente**
 
@@ -31725,9 +31725,9 @@ Gesucht am Schwerpunkt jeder Zelle der Bilder und an den Stellen, an denen ein T
 
 #### Kombination «GZT»
 
-**Träger, je Meter ihrer Breite**
+**Durchlaufträger, je Meter ihrer Breite**
 
-| Träger | $b\ [\mathrm{m}]$ | $L\ [\mathrm{m}]$ | $Q/b\ [\mathrm{kN/m}]$ | Lager [kN/m] | $m_{\min}\ [\mathrm{kNm/m}]$ | $s\ [\mathrm{m}]$ | $m_{\max}\ [\mathrm{kNm/m}]$ | $s\ [\mathrm{m}]$ |
+| Durchlaufträger | $b\ [\mathrm{m}]$ | $L\ [\mathrm{m}]$ | $Q/b\ [\mathrm{kN/m}]$ | Lager [kN/m] | $m_{\min}\ [\mathrm{kNm/m}]$ | $s\ [\mathrm{m}]$ | $m_{\max}\ [\mathrm{kNm/m}]$ | $s\ [\mathrm{m}]$ |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | x1.1 … x2.1 | $0.500$ | $6.00$ | $20.6$ | L3 11.4 · L2 9.3 | $-10.4$ | $6.00$ | $8.7$ | $1.53$ |
 | x3.1 | $0.500$ | $6.00$ | $22.7$ | L3 11.5 · L2 11.2 | $-12.3$ | $6.00$ | $8.9$ | $1.55$ |
@@ -31757,7 +31757,7 @@ Gesucht am Schwerpunkt jeder Zelle der Bilder und an den Stellen, an denen ein T
 | 71.57° 7 | $0.474$ | $3.32$ | $13.0$ | L6 5.2 · L8 7.9 | $0.0$ | – | $5.3$ | $6.05$ |
 | 71.57° 8 | $0.474$ | $3.32$ | $7.1$ | L6 3.6 · L8 3.6 | $0.0$ | – | $1.9$ | $5.17$ |
 
-Q ist die Last auf dem Träger, mit dem, was tiefere Träger in ihn geben. s misst längs der Richtung φ des Trägers, s = x · cos φ + y · sin φ: in x ist s = x, in y ist s = y. Nebeneinander liegende Träger, die dasselbe tragen, stehen in einer Zeile.
+Q ist die Last auf dem Durchlaufträger, mit dem, was tiefere Durchlaufträger in ihn geben. s misst längs der Richtung φ des Durchlaufträgers, s = x · cos φ + y · sin φ: in x ist s = x, in y ist s = y. Nebeneinander liegende Durchlaufträger, die dasselbe tragen, stehen in einer Zeile.
 
 **Lagerkräfte**
 
@@ -31774,7 +31774,7 @@ Q ist die Last auf dem Träger, mit dem, was tiefere Träger in ihn geben. s mis
 | L8 · Linienlager | $46.2$ | $36.2$ | – |
 | L9 · Linienlager | $18.6$ | $13.3$ | – |
 
-Längs eines Linienlagers gibt jeder Träger seine Kraft gleichmässig über das Stück ab, über das er geht; wo zwei dasselbe Stück tragen, zählen beide. r\_max ist der Wert mit dem grössten Betrag. Ebenso m\_max, das Moment, das ein eingespanntes Lager hält, mit dem Vorzeichen der Platte: negativ, wo es oben zieht. Liegt Platte zu beiden Seiten, hält es nur den Unterschied ihrer Momente; dann gilt das Vorzeichen der Seite, die stärker zieht.
+Längs eines Linienlagers gibt jeder Durchlaufträger seine Kraft gleichmässig über das Stück ab, über das er geht; wo zwei dasselbe Stück tragen, zählen beide. r\_max ist der Wert mit dem grössten Betrag. Ebenso m\_max, das Moment, das ein eingespanntes Lager hält, mit dem Vorzeichen der Platte: negativ, wo es oben zieht. Liegt Platte zu beiden Seiten, hält es nur den Unterschied ihrer Momente; dann gilt das Vorzeichen der Seite, die stärker zieht.
 
 **Schnittkräfte der Platte, je Meter**
 
@@ -31787,7 +31787,7 @@ Längs eines Linienlagers gibt jeder Träger seine Kraft gleichmässig über das
 | $v_y$ | $-40.7\ \mathrm{kN/m}$ | (2.25, 7.00) | $55.5\ \mathrm{kN/m}$ | (3.24, 0.00) |
 | $v_0$ | $0.0\ \mathrm{kN/m}$ | – | $55.6\ \mathrm{kN/m}$ | (3.24, 0.00) |
 
-Gesucht am Schwerpunkt jeder Zelle der Bilder und an den Stellen, an denen ein Träger springt oder Querkraft oder Last null werden. Momente positiv mit Zug unten.
+Gesucht am Schwerpunkt jeder Zelle der Bilder und an den Stellen, an denen ein Durchlaufträger springt oder Querkraft oder Last null werden. Momente positiv mit Zug unten.
 
 **Erforderliche Biegewiderstände, ohne Lastverteilelemente**
 
@@ -31807,9 +31807,9 @@ Gesucht am Schwerpunkt jeder Zelle der Bilder und an den Stellen, an denen ein T
 
 #### Kombination «GZT günstig»
 
-**Träger, je Meter ihrer Breite**
+**Durchlaufträger, je Meter ihrer Breite**
 
-| Träger | $b\ [\mathrm{m}]$ | $L\ [\mathrm{m}]$ | $Q/b\ [\mathrm{kN/m}]$ | Lager [kN/m] | $m_{\min}\ [\mathrm{kNm/m}]$ | $s\ [\mathrm{m}]$ | $m_{\max}\ [\mathrm{kNm/m}]$ | $s\ [\mathrm{m}]$ |
+| Durchlaufträger | $b\ [\mathrm{m}]$ | $L\ [\mathrm{m}]$ | $Q/b\ [\mathrm{kN/m}]$ | Lager [kN/m] | $m_{\min}\ [\mathrm{kNm/m}]$ | $s\ [\mathrm{m}]$ | $m_{\max}\ [\mathrm{kNm/m}]$ | $s\ [\mathrm{m}]$ |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | x1.1 … x3.1 | $0.500$ | $6.00$ | $12.2$ | L3 6.7 · L2 5.5 | $-6.2$ | $6.00$ | $5.2$ | $1.53$ |
 | x4.1 … x8 | $0.500$ | $6.00$ | $24.9$ | L3 9.3 · L2 15.6 | $-18.3$ | $6.00$ | $9.8$ | $2.17$ |
@@ -31837,7 +31837,7 @@ Gesucht am Schwerpunkt jeder Zelle der Bilder und an den Stellen, an denen ein T
 | 71.57° 7 | $0.474$ | $3.32$ | $4.2$ | L6 2.1 · L8 2.1 | $0.0$ | – | $1.1$ | $5.01$ |
 | 71.57° 8 | $0.474$ | $3.32$ | $4.2$ | L6 2.1 · L8 2.1 | $0.0$ | – | $1.1$ | $5.17$ |
 
-Q ist die Last auf dem Träger, mit dem, was tiefere Träger in ihn geben. s misst längs der Richtung φ des Trägers, s = x · cos φ + y · sin φ: in x ist s = x, in y ist s = y. Nebeneinander liegende Träger, die dasselbe tragen, stehen in einer Zeile.
+Q ist die Last auf dem Durchlaufträger, mit dem, was tiefere Durchlaufträger in ihn geben. s misst längs der Richtung φ des Durchlaufträgers, s = x · cos φ + y · sin φ: in x ist s = x, in y ist s = y. Nebeneinander liegende Durchlaufträger, die dasselbe tragen, stehen in einer Zeile.
 
 **Lagerkräfte**
 
@@ -31854,7 +31854,7 @@ Q ist die Last auf dem Träger, mit dem, was tiefere Träger in ihn geben. s mis
 | L8 · Linienlager | $15.1$ | $5.5$ | – |
 | L9 · Linienlager | $8.9$ | $4.7$ | – |
 
-Längs eines Linienlagers gibt jeder Träger seine Kraft gleichmässig über das Stück ab, über das er geht; wo zwei dasselbe Stück tragen, zählen beide. r\_max ist der Wert mit dem grössten Betrag. Ebenso m\_max, das Moment, das ein eingespanntes Lager hält, mit dem Vorzeichen der Platte: negativ, wo es oben zieht. Liegt Platte zu beiden Seiten, hält es nur den Unterschied ihrer Momente; dann gilt das Vorzeichen der Seite, die stärker zieht.
+Längs eines Linienlagers gibt jeder Durchlaufträger seine Kraft gleichmässig über das Stück ab, über das er geht; wo zwei dasselbe Stück tragen, zählen beide. r\_max ist der Wert mit dem grössten Betrag. Ebenso m\_max, das Moment, das ein eingespanntes Lager hält, mit dem Vorzeichen der Platte: negativ, wo es oben zieht. Liegt Platte zu beiden Seiten, hält es nur den Unterschied ihrer Momente; dann gilt das Vorzeichen der Seite, die stärker zieht.
 
 **Schnittkräfte der Platte, je Meter**
 
@@ -31867,7 +31867,7 @@ Längs eines Linienlagers gibt jeder Träger seine Kraft gleichmässig über das
 | $v_y$ | $-24.1\ \mathrm{kN/m}$ | (2.25, 7.00) | $30.7\ \mathrm{kN/m}$ | (3.24, 0.00) |
 | $v_0$ | $0.0\ \mathrm{kN/m}$ | – | $30.7\ \mathrm{kN/m}$ | (3.24, 0.00) |
 
-Gesucht am Schwerpunkt jeder Zelle der Bilder und an den Stellen, an denen ein Träger springt oder Querkraft oder Last null werden. Momente positiv mit Zug unten.
+Gesucht am Schwerpunkt jeder Zelle der Bilder und an den Stellen, an denen ein Durchlaufträger springt oder Querkraft oder Last null werden. Momente positiv mit Zug unten.
 
 **Erforderliche Biegewiderstände, ohne Lastverteilelemente**
 

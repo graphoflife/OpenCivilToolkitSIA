@@ -426,8 +426,8 @@ const ZEICHEN = {
     pfade: ['M3 9h18', 'M5 9l-2 3 M9 9l-2 3 M13 9l-2 3 M17 9l-2 3 M21 9l-2 3'],
     voll: [[3, 9, 1.6], [21, 9, 1.6]],
   },
-  // Ein versteckter Unterzug: ein breites Band, gestrichelt seine Achse.
-  'cad-unterzug': {
+  // Ein Träger: ein breites Band, gestrichelt seine Achse.
+  'cad-traeger': {
     pfade: ['M3 8.5h18 M3 15.5h18'],
     strich: ['M3 12h18'],
   },

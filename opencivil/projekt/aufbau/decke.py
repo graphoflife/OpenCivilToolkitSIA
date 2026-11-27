@@ -18,7 +18,7 @@ from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Tuple
 from opencivil.decke.geometrie import Punkt
 from opencivil.decke.modell import (
     Decke, Flaechenlast, Kombination, Last, Lastfall, Linienlager, Linienlast, Platte, Punktlast,
-    Stuetze, Unterzug, Zone,
+    Stuetze, Traeger, Zone,
 )
 from opencivil.decke.werk import Deckensystem
 from opencivil.material.basis import Baustoff
@@ -46,7 +46,7 @@ def modell_von(eintrag: DeckeEintrag) -> Tuple[Decke, List[Meldung]]:
     meldungen = faelle_pruefen(eintrag.lastfaelle, eintrag.kombinationen)
     for was, liste in (("Knoten", eintrag.knoten), ("Platten", eintrag.platten),
                        ("Linienlager", eintrag.linienlager), ("Stützen", eintrag.stuetzen),
-                       ("Unterzüge", eintrag.unterzuege), ("Zonen", eintrag.zonen),
+                       ("Träger", eintrag.traeger), ("Zonen", eintrag.zonen),
                        ("Lasten", [*eintrag.flaechenlasten, *eintrag.linienlasten, *eintrag.punktlasten]),
                        ("Schnitte", eintrag.schnitte),
                        ("Lastfälle", eintrag.lastfaelle), ("Kombinationen", eintrag.kombinationen)):
@@ -68,8 +68,8 @@ def modell_von(eintrag: DeckeEintrag) -> Tuple[Decke, List[Meldung]]:
     stuetzen = [Stuetze(s.kennung, ort[0], s.si("b_x"), s.si("b_y"),
                         *((s.si("l_x"), s.si("l_y")) if s.bereich_von_hand else (None, None)))
                 for s in eintrag.stuetzen if (ort := orte(s, (s.knoten,))) is not None]
-    unterzuege = [Unterzug(u.kennung, *ab, u.si("breite"), u.stufe)
-                  for u in eintrag.unterzuege if (ab := orte(u, (u.von, u.bis))) is not None]
+    traeger = [Traeger(u.kennung, *ab, u.si("breite"), u.stufe)
+               for u in eintrag.traeger if (ab := orte(u, (u.von, u.bis))) is not None]
     zonen = [Zone(z.kennung, ecken, z.si("anteil"))
              for z in eintrag.zonen if (ecken := orte(z, z.knoten)) is not None]
     for s in eintrag.schnitte:
@@ -93,7 +93,7 @@ def modell_von(eintrag: DeckeEintrag) -> Tuple[Decke, List[Meldung]]:
     faktoren, hinweise = beiwerte(eintrag.kombinationen, eintrag.lastfaelle)
     meldungen.extend(hinweise)
     decke = Decke(platten=platten, linienlager=linienlager, stuetzen=stuetzen,
-                  unterzuege=unterzuege, zonen=zonen,
+                  traeger=traeger, zonen=zonen,
                   lastfaelle=[Lastfall(lf.name, je_fall[lf.kennung], lf.eigengewicht)
                               for lf in eintrag.lastfaelle],
                   kombinationen=[Kombination(name, je_fall) for name, je_fall in faktoren],

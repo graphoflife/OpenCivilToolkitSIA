@@ -1,5 +1,5 @@
 ---
-erzeugt: f8959a86a9e1
+erzeugt: 1c5692373df1
 art: modul
 tags: [modul]
 ---
@@ -52,8 +52,8 @@ statischen Methode gilt jede, die im Gleichgewicht ist (SIA 262:2025,
 
 ## WO LAST AUSFÄLLT
 
-Je Zelle, ob ihre Last auf einen Träger kommt, der nicht trägt: weil keine
-Richtung trägt – dann fehlt ein Lager oder ein Unterzug –, oder weil die
+Je Zelle, ob ihre Last auf einen Durchlaufträger kommt, der nicht trägt: weil keine
+Richtung trägt – dann fehlt ein Lager oder ein Träger –, oder weil die
 feste Aufteilung oder eine Zone Last in eine Richtung gibt, die nicht
 trägt. Je Platte und Ursache steht das in einer grauen Meldung an der
 Platte, mit der Fläche: es fehlt etwas, und der Rest rechnet (Benutzer,
@@ -91,7 +91,7 @@ class Zelle
 
 Wo sich der Streifen `i` der Richtung 1 und der Streifen `j` der
 Richtung 2 kreuzen: ihre Stücke in den Platten der Gruppe, deren
-Schwerpunkt und wo er auf den Trägern beider Richtungen liegt.
+Schwerpunkt und wo er auf den Durchlaufträgern beider Richtungen liegt.
 
 - `i: int`
 - `j: int`
@@ -208,7 +208,7 @@ def lage(zerlegung: Zerlegung, p: Punkt, streifen: Streifen, r: Richtung) -> Lag
 ```
 
 Wo `p` auf dem trägt, was dort die Last in Richtung `r` übernimmt:
-ein Unterzug in dieser Richtung, in dessen Fläche `p` liegt, sonst der
+ein Träger in dieser Richtung, in dessen Fläche `p` liegt, sonst der
 Feldstreifen.
 
 

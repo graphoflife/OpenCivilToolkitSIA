@@ -1,5 +1,5 @@
 ---
-erzeugt: 291e01066913
+erzeugt: f0c2613b98be
 art: modul
 tags: [modul]
 ---
@@ -9,9 +9,9 @@ tags: [modul]
 
 ## VERANTWORTUNG
 
-Der [[opencivil.projekt.decke#DeckeEintrag|DeckeEintrag]]: Platten, Linienlager, Stuetzen, versteckte
-Unterzuege und Zonen der Lastaufteilung, gezeichnet aus Knoten im Grundriss
-– als speicherbare Datenklasse wie das Balkensystem
+Der [[opencivil.projekt.decke#DeckeEintrag|DeckeEintrag]]: Platten, Linienlager, Stuetzen, Traeger – ein
+Unterzug oder ein Ueberzug – und Zonen der Lastaufteilung, gezeichnet aus
+Knoten im Grundriss – als speicherbare Datenklasse wie das Balkensystem
 ([[opencivil.projekt.balkensystem]]). Dazu der Baukasten, der ohne
 Oberflaeche zeichnet. Gerechnet wird nach der Streifenmethode, in
 [[opencivil.decke]].
@@ -20,7 +20,7 @@ Oberflaeche zeichnet. Gerechnet wird nach der Streifenmethode, in
 ## ALLES HAENGT AN KNOTEN
 
 Eine Platte und eine Zone sind Umrisse aus Knoten, ein Linienlager und ein
-Unterzug laufen von einem Knoten zum anderen, eine Stuetze steht an einem.
+Traeger laufen von einem Knoten zum anderen, eine Stuetze steht an einem.
 Wo zwei Platten oder eine Platte und eine Wand sich eine Ecke teilen,
 teilen sie den Knoten – wer ihn verschiebt, verschiebt sie beide, und es
 entsteht keine Fuge, die niemand gezeichnet hat.
@@ -49,7 +49,7 @@ ein.
 
 ## KOORDINATEN UND EINHEITEN
 
-x nach rechts, y nach oben, in m – ebenso die Breite eines Unterzugs, der
+x nach rechts, y nach oben, in m – ebenso die Breite eines Traegers, der
 Stuetzenbereich und die Streifenbreite. Die Dicke einer Platte und der
 Querschnitt einer Stuetze in mm, Anteile in %, die Richtungen der Streifen
 in Grad gegen x, im Gegenuhrzeigersinn. Lasten in kN/m², kN/m und kN.
@@ -145,7 +145,7 @@ class StuetzeEintrag(Beschreibung)
 
 Eine Stütze unter der Decke, `b_x × b_y`. Die Streifen geben ihre
 Last über den Stützenbereich `l_x × l_y` ab (Folie 39) – von Hand
-oder, ohne Angabe, so gross wie die Stütze oder der breiteste Unterzug
+oder, ohne Angabe, so gross wie die Stütze oder der breiteste Träger
 über ihr ([[opencivil.decke.streifen#stuetzenbereich|opencivil.decke.streifen.stuetzenbereich]]).
 
 - `kennung: str = ''`
@@ -156,16 +156,17 @@ oder, ohne Angabe, so gross wie die Stütze oder der breiteste Unterzug
 - `l_x: float = bereich(1.0, heisst='Stützenbereich l_x', einheit=M, ueber=0.0)` – Nur mit `bereich_von_hand`.
 - `l_y: float = bereich(1.0, heisst='Stützenbereich l_y', einheit=M, ueber=0.0)`
 
-### UnterzugEintrag
+### TraegerEintrag
 
 ```python
 @dataclass
-class UnterzugEintrag(Beschreibung)
+class TraegerEintrag(Beschreibung)
 ```
 
-Ein versteckter Unterzug, ein starker Streifen in der Platte (Folie 33):
-so breit wie `breite`, liegend auf Linienlagern, Stützen und den
-Unterzügen höherer `stufe`, die ihn kreuzen.
+Ein Träger, ein Unterzug oder ein Überzug: in der Streifenmethode ein
+starker Streifen in der Platte (Folie 33), so breit wie `breite`,
+liegend auf Linienlagern, Stützen und den Trägern höherer `stufe`,
+die ihn kreuzen.
 
 - `kennung: str = ''`
 - `von: str = ''`
@@ -260,7 +261,7 @@ class DeckendiagrammEintrag(Beschreibung)
 ```
 
 Ein Ergebnisbild der Decke: ein Fall und was es von ihm zeigt – über
-die ganze Platte, längs eines Schnitts oder in einem Unterzug, dort M
+die ganze Platte, längs eines Schnitts oder in einem Träger, dort M
 und V über seine ganze Breite. Gerechnet wird damit nichts
 – die Decke rechnet jeden Fall; die Liste sagt nur, welche Bilder
 rechts stehen.
@@ -268,7 +269,7 @@ rechts stehen.
 - `IM_ORT = 'Diagramm'`
 - `fall: str = ''` – Die Kennung eines Lastfalls (`LF1`) oder einer Kombination (`LK1`).
 - `groesse: str = einer_von(DIAGRAMMGROESSEN, 'm_x')`
-- `schnitt: str = ''` – Wo das Bild schneidet: die Kennung eines Schnitts (`SN1`) oder eines Unterzugs (`U1`) – leer: die ganze Platte. Die Lagerkräfte zeigen immer die ganze; M und V gibt es nur in einem Unterzug, die Grössen der Platte nur ausserhalb. Der Name blieb, als der Unterzug dazukam: ein neuer machte heute gespeicherte Stände unlesbar.
+- `schnitt: str = ''` – Wo das Bild schneidet: die Kennung eines Schnitts (`SN1`) oder eines Trägers (`T1`) – leer: die ganze Platte. Die Lagerkräfte zeigen immer die ganze; M und V gibt es nur in einem Träger, die Grössen der Platte nur ausserhalb. Der Name blieb, als der Träger dazukam: ein neuer machte heute gespeicherte Stände unlesbar.
 
 ### DeckeEintrag
 
@@ -277,8 +278,8 @@ rechts stehen.
 class DeckeEintrag(MitFaellen, BauteilEintrag)
 ```
 
-Eine Decke aus Platten auf Linienlagern und Stützen, mit versteckten
-Unterzügen und Zonen, und ihren Lasten, Lastfällen und Kombinationen.
+Eine Decke aus Platten auf Linienlagern und Stützen, mit Trägern und
+Zonen, und ihren Lasten, Lastfällen und Kombinationen.
 Wie die Last aufgeteilt wird, gilt für die ganze Decke: automatisch
 nach Folie 31 oder `anteil` in die Richtung 1 – in einer Zone deren
 Anteil.
@@ -294,7 +295,7 @@ stimmt, steht in ihren Meldungen, und die anderen Bauteile rechnen weiter.
 - `platten: List[DeckenplatteEintrag] = field(default_factory=list)`
 - `linienlager: List[LinienlagerEintrag] = field(default_factory=list)`
 - `stuetzen: List[StuetzeEintrag] = field(default_factory=list)`
-- `unterzuege: List[UnterzugEintrag] = field(default_factory=list)`
+- `traeger: List[TraegerEintrag] = field(default_factory=list)`
 - `zonen: List[ZoneEintrag] = field(default_factory=list)`
 - `flaechenlasten: List[FlaechenlastEintrag] = field(default_factory=list)`
 - `linienlasten: List[LinienlastEintrag] = field(default_factory=list)`
@@ -361,11 +362,13 @@ Ein Linienlager von `von` nach `bis` – heisst so, weil die Liste `linienlager`
 def stuetze(self, ort: Ort, **felder: Any) -> StuetzeEintrag
 ```
 
-#### DeckeEintrag.unterzug
+#### DeckeEintrag.traeger_legen
 
 ```python
-def unterzug(self, von: Ort, bis: Ort, **felder: Any) -> UnterzugEintrag
+def traeger_legen(self, von: Ort, bis: Ort, **felder: Any) -> TraegerEintrag
 ```
+
+Ein Träger von `von` nach `bis` – heisst nicht `traeger`, weil die Liste so heisst.
 
 #### DeckeEintrag.zone
 
@@ -418,7 +421,7 @@ def diagramm(self, fall: Any, groesse: str='m_x', schnitt: Any='') -> Deckendiag
 ```
 
 Ein Ergebnisbild – `fall` ein Lastfall oder eine Kombination,
-`schnitt` einer der Schnitte oder Unterzüge (Eintrag oder
+`schnitt` einer der Schnitte oder Träger (Eintrag oder
 Kennung), ohne ihn die ganze Platte.
 
 #### DeckeEintrag.neu
@@ -439,9 +442,9 @@ m_x, m_y, v_0 und die Lagerkräfte der GZT.
 ## Konstanten
 
 - `Ort = Union[str, Sequence[float]]` – Ein Ort im Baukasten: die Kennung eines Knotens oder `(x, y)` in m.
-- `PLATTENGROESSEN = (*GROESSEN, 'lager')` – Was ein Ergebnisbild zeigt: eine Schnittkraft der Platte, die Lagerkraefte – oder Moment und Querkraft eines ganzen Unterzugs.
+- `PLATTENGROESSEN = (*GROESSEN, 'lager')` – Was ein Ergebnisbild zeigt: eine Schnittkraft der Platte, die Lagerkraefte – oder Moment und Querkraft eines ganzen Trägers.
 - `DIAGRAMMGROESSEN = (*PLATTENGROESSEN, *BALKENGROESSEN)`
-- `VORSILBEN = {'platten': 'P', 'linienlager': 'L', 'stuetzen': 'S', 'unterzuege': '…` – Womit die Kennungen der Teile einer Decke beginnen.
+- `VORSILBEN = {'platten': 'P', 'linienlager': 'L', 'stuetzen': 'S', 'traeger': 'T',…` – Womit die Kennungen der Teile einer Decke beginnen.
 
 ## Braucht
 

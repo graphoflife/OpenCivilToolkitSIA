@@ -1,5 +1,5 @@
 ---
-erzeugt: b49b617fe845
+erzeugt: 857e8187c971
 art: modul
 tags: [modul]
 ---
@@ -65,7 +65,7 @@ def _decken(p: Projekt) -> None
 ```
 
 Zwei Decken. Die des Kolloquiums 4 (Stahlbeton II): eine Platte auf
-einer Wand und drei Stützen, versteckte Unterzüge in zwei Stufen, fest
+einer Wand und drei Stützen, Träger in zwei Stufen, fest
 30 % in x, und als einziger Lastfall q_d = 18.6 kN/m² auf der ganzen
 Platte, das Eigengewicht darin. Und eine, die jede Wahl einmal braucht:
 zwei Platten verschiedener Dicke in einem L, automatisch aufgeteilt, mit
@@ -74,7 +74,7 @@ und einer Stütze mit Stützenbereich von Hand – daneben eine schiefe
 Platte, deren Streifen ihren Rändern folgen. Sie hat die Lastfälle und
 Kombinationen einer frischen Decke und jede Art Last: auf einer ganzen
 Platte, gezeichnet, längs einer Linie und an einem Punkt. Die erste
-zeigt m_x, m_y, die Lager und M und V des Unterzugs U4, der auf den drei
+zeigt m_x, m_y, die Lager und M und V des Trägers T4, der auf den drei
 anderen liegt; die zweite jedes Bild der Platte einmal.
 
 ### _durchstanzstellen

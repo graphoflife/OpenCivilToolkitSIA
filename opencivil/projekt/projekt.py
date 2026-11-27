@@ -37,8 +37,8 @@ from opencivil.projekt.balkensystem import BalkensystemEintrag
 from opencivil.projekt.balkensystem3d import Balkensystem3dEintrag
 from opencivil.projekt.erdbeben import ErdbebenEintrag
 from opencivil.projekt.frueher import (
-    gamma_w_heraus, kern_einsetzen, spannungen_als_faktoren, umrechnung_setzen, waende_heraus,
-    wasser_einsetzen,
+    gamma_w_heraus, kern_einsetzen, spannungen_als_faktoren, traeger_umbenennen, umrechnung_setzen,
+    waende_heraus, wasser_einsetzen,
 )
 from opencivil.projekt.grundbruch import GrundbruchEintrag
 from opencivil.projekt.pfahl import PfahlEintrag
@@ -132,7 +132,7 @@ class Projekt(Beschreibung):
     """Rahmen im Raum: wie die ebenen, mit x, y und z und Torsion."""
 
     decken: List[DeckeEintrag] = field(default_factory=list)
-    """Stahlbetondecken nach der Streifenmethode: Platten, Lager, Stützen, Unterzüge."""
+    """Stahlbetondecken nach der Streifenmethode: Platten, Lager, Stützen, Träger."""
 
     durchstanzstellen: List[DurchstanzEintrag] = field(default_factory=list)
     """Stützen und Wände, an denen das Durchstanzen nachgewiesen wird."""
@@ -484,7 +484,7 @@ class Projekt(Beschreibung):
         """
         Eine leere Decke. Gezeichnet wird danach mit dem Baukasten des
         Eintrags -- ``platte``, ``lager`` (ein Linienlager), ``stuetze``,
-        ``unterzug``, ``zone`` --, Koordinaten in m.
+        ``traeger``, ``zone`` --, Koordinaten in m.
         """
         eintrag = lesen(DeckeEintrag, felder, f"Decke '{name}'",
                         DeckeEintrag(kennung=self.freie_kennung(DECKE.vorsilbe), name=name))
@@ -851,9 +851,11 @@ class Projekt(Beschreibung):
         frueher anders schreibt, bringt :mod:`~opencivil.projekt.frueher` in
         die neue Form: die Zahl γ_w von Grundbruch und Pfahl wird ein Wasser,
         die Spannungen eines Spannglieds werden Faktoren, ein Pfahl bekommt
-        den Schalter fuer η_a, und die Waende eines Gebaeudes werden ein Kern.
+        den Schalter fuer η_a, die Waende eines Gebaeudes werden ein Kern,
+        und die Unterzuege einer Decke heissen Traeger.
         """
-        roh, alte = gamma_w_heraus(spannungen_als_faktoren(umrechnung_setzen(roh)))
+        roh = traeger_umbenennen(umrechnung_setzen(roh))
+        roh, alte = gamma_w_heraus(spannungen_als_faktoren(roh))
         roh, waende = waende_heraus(roh)
         projekt = super().aus_dict(roh, wo)
         wasser_einsetzen(projekt, alte)

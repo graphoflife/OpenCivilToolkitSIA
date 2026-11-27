@@ -225,7 +225,7 @@ class Intervall:
 
 
 #: Wo ein Wert liegt: ``x`` laengs eines Stabs, ein Stab ueber alle, ``s``
-#: laengs eines Traegers der Decke, ein Punkt ihrer Platte.
+#: laengs eines Durchlauftraegers der Decke, ein Punkt ihrer Platte.
 Ort = TypeVar("Ort")
 
 
@@ -279,7 +279,7 @@ def extremwerte(teile: Sequence[Any], polynom: Callable[[Any], Polynom]) -> Extr
     """
     Kleinster und groesster Wert eines Polynoms je Stueck ``x0`` bis ``x1``,
     bei gleichen Werten an der vordersten Stelle (:func:`vorderste_extreme`)
-    -- fuer die Staebe und die Traeger der Decke. Bis 2026-11-20 hatte nur
+    -- fuer die Staebe und die Durchlauftraeger der Decke. Bis 2026-11-20 hatte nur
     die Decke diese Regel, und ein Stab, der sich nirgends biegt, nannte fuer
     seine Durchbiegung 0.00 mm eine Stelle, die vom Rauschen abhing.
     """

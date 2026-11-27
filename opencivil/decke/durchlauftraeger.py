@@ -1,5 +1,5 @@
 """
-opencivil/decke/traeger.py -- ein Streifen als Durchlaufträger.
+opencivil/decke/durchlauftraeger.py -- ein Streifen als Durchlaufträger.
 
 VERANTWORTUNG:
 Ein Streifen der Decke ist ein Balken über seine Lager. Hier wird er
@@ -15,20 +15,20 @@ gerechnet, in zwei Schritten:
 2. **Statik**: mit diesen Lagerkräften laufen Querkraft und Moment vom
    Anfang des Streifens bis zu seinem Ende, gerechnet wie in einem ebenen
    Stab des Stabwerks, starr (:func:`statik`). Ein Flächenlager -- ein
-   versteckter Unterzug, eine Stütze -- drückt dabei nicht in einem Punkt,
+   Träger, eine Stütze -- drückt dabei nicht in einem Punkt,
    sondern gleichmässig über seine Breite; so steht es in der Vorlesung
    («Flächenlager mit gleichmässiger Pressung», Stahlbeton II, 7.2 Platten,
    Folie 33), und so rechnet die Musterlösung des Kolloquiums 4 ihr
    Stützmoment von −10.9 auf −7.3 kNm/m herunter.
 
 VORZEICHEN:
-``s`` läuft vom Anfang des Trägers, in m. Lasten wirken nach unten und
+``s`` läuft vom Anfang des Durchlaufträgers, in m. Lasten wirken nach unten und
 sind dann positiv, Lagerkräfte nach oben, Lagermomente im
 Gegenuhrzeigersinn. ``M > 0`` zieht unten (Feldmoment), ``V = dM/ds``::
 
     M(s) = Σ_links [F_k · (s − s_k) − C_k] − ∫_links p(σ) · (s − σ) dσ
 
-Am Ende eines Trägers sind V und M null -- eine Probe, die
+Am Ende eines Durchlaufträgers sind V und M null -- eine Probe, die
 :func:`statik` macht.
 """
 
@@ -100,7 +100,7 @@ Teillast = Union[Streckenlast, Einzellast]
 
 @dataclass(frozen=True)
 class Halt:
-    """Ein Lager am Träger, als Punkt: ``vertikal`` hält die Höhe, ``eingespannt`` die Drehung."""
+    """Ein Lager am Durchlaufträger, als Punkt: ``vertikal`` hält die Höhe, ``eingespannt`` die Drehung."""
 
     s: float
     vertikal: bool
@@ -109,7 +109,7 @@ class Halt:
 
 def stabil(halte: Sequence[Halt]) -> bool:
     """
-    Ob die Lager den Träger halten: zwei Höhenlager an verschiedenen
+    Ob die Lager den Durchlaufträger halten: zwei Höhenlager an verschiedenen
     Stellen -- oder eines und eine Einspannung.
     """
     hoehen = sorted(h.s for h in halte if h.vertikal)
@@ -187,11 +187,11 @@ class Balken:
     def lagerkraefte(self, lasten: Sequence[Teillast]) -> List[Tuple[float, float]]:
         """
         Je Lager die Kraft nach oben ``F`` und das Moment ``C`` im
-        Gegenuhrzeigersinn, die es auf den Träger ausübt -- elastisch, mit
+        Gegenuhrzeigersinn, die es auf den Durchlaufträger ausübt -- elastisch, mit
         den Lagern als Punkten.
         """
         if not self.stabil:
-            raise ValueError("Der Träger ist beweglich.")
+            raise ValueError("Der Durchlaufträger ist beweglich.")
         stablasten = [st.Strecke(l.a, l.b, py_a=-l.p_a, py_b=-l.p_b) if isinstance(l, Streckenlast)
                       else st.Punkt(l.a, Py=-l.P, M=l.C) for l in lasten]
         # Die freien Enden: ihre Last als Kraft und Moment am ersten und am
@@ -254,7 +254,7 @@ def _resultante(lasten: Sequence[st.Teillast], x0: float) -> Tuple[float, float]
 
 def statik(L: float, lasten: Sequence[Teillast]) -> List[EbenesIntervall]:
     """
-    Querkraft und Moment längs des Trägers, von links: aus allen Kräften auf
+    Querkraft und Moment längs des Durchlaufträgers, von links: aus allen Kräften auf
     ihn -- Lasten nach unten, Lagerkräfte als Einzellasten oder Pressungen
     nach oben (negativ). Gerechnet wie ein ebener Stab des Stabwerks, starr
     (:func:`~opencivil.stabwerk.verlauf.ebener_verlauf` mit ``EI = ∞``): die
@@ -297,7 +297,7 @@ def statik(L: float, lasten: Sequence[Teillast]) -> List[EbenesIntervall]:
     M = teile[-1].M(L) - sum(l.M for l in am_ende)
     gesamt = sum(abs(l.summe) if isinstance(l, Streckenlast) else abs(l.P) for l in lasten)
     if abs(V) > 1e-6 * max(gesamt, 1.0) or abs(M) > 1e-6 * max(gesamt * max(L, 1.0), 1.0):
-        raise ArithmeticError(f"Der Träger steht nicht im Gleichgewicht: am Ende V = {V:.6g} N, "
+        raise ArithmeticError(f"Der Durchlaufträger steht nicht im Gleichgewicht: am Ende V = {V:.6g} N, "
                               f"M = {M:.6g} Nm.")
     return teile
 

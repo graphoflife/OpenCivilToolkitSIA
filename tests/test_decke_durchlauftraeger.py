@@ -7,7 +7,7 @@ Gegenuhrzeigersinn; ``M > 0`` zieht unten.
 
 import unittest
 
-from opencivil.decke.traeger import Balken, Einzellast, Halt, Streckenlast, statik, wert
+from opencivil.decke.durchlauftraeger import Balken, Einzellast, Halt, Streckenlast, statik, wert
 from opencivil.stabwerk.verlauf import extremwerte
 
 q = 10e3
@@ -95,7 +95,7 @@ class TestStatik(unittest.TestCase):
 
     def test_pressung_rundet_das_stuetzmoment_ab(self):
         """
-        Schnitt A-A des Kolloquiums 4: Kragarm 0.5 m, zwei Felder 4 m, Unterzüge
+        Schnitt A-A des Kolloquiums 4: Kragarm 0.5 m, zwei Felder 4 m, Träger
         1 m breit. Mit Punktlagern −10.8 kNm/m über der Mitte, mit gleichmässiger
         Pressung −7.4 kNm/m.
         """

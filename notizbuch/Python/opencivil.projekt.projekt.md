@@ -1,5 +1,5 @@
 ---
-erzeugt: 279cf7b184aa
+erzeugt: 181668a8a54c
 art: modul
 tags: [modul]
 ---
@@ -59,7 +59,7 @@ Die vollstaendige, speicherbare Beschreibung eines Projekts.
 - `querschnittsanalysen: List[QuerschnittsanalyseEintrag] = field(default_factory=list)` – Gezeichnete Querschnitte: Polygone, Bewehrung, Schubwände.
 - `balkensysteme: List[BalkensystemEintrag] = field(default_factory=list)` – Ebene Rahmen: Knoten, Stäbe, Lager, Lasten, Lastfälle.
 - `balkensysteme3d: List[Balkensystem3dEintrag] = field(default_factory=list)` – Rahmen im Raum: wie die ebenen, mit x, y und z und Torsion.
-- `decken: List[DeckeEintrag] = field(default_factory=list)` – Stahlbetondecken nach der Streifenmethode: Platten, Lager, Stützen, Unterzüge.
+- `decken: List[DeckeEintrag] = field(default_factory=list)` – Stahlbetondecken nach der Streifenmethode: Platten, Lager, Stützen, Träger.
 - `durchstanzstellen: List[DurchstanzEintrag] = field(default_factory=list)` – Stützen und Wände, an denen das Durchstanzen nachgewiesen wird.
 - `grundbrueche: List[GrundbruchEintrag] = field(default_factory=list)` – Flachfundamente mit Grundbruch und Gleiten.
 - `setzungen: List[SetzungEintrag] = field(default_factory=list)` – Flachfundamente auf geschichtetem Baugrund, mit ihrer Setzung.
@@ -352,7 +352,7 @@ def decke(self, name: str, **felder: Any) -> DeckeEintrag
 
 Eine leere Decke. Gezeichnet wird danach mit dem Baukasten des
 Eintrags – `platte`, `lager` (ein Linienlager), `stuetze`,
-`unterzug`, `zone` –, Koordinaten in m.
+`traeger`, `zone` –, Koordinaten in m.
 
 #### Projekt.durchstanzen
 
@@ -609,7 +609,8 @@ Ein Projekt aus der Datei, gelesen und geprueft. Was eine Datei von
 frueher anders schreibt, bringt [[opencivil.projekt.frueher|frueher]] in
 die neue Form: die Zahl γ_w von Grundbruch und Pfahl wird ein Wasser,
 die Spannungen eines Spannglieds werden Faktoren, ein Pfahl bekommt
-den Schalter fuer η_a, und die Waende eines Gebaeudes werden ein Kern.
+den Schalter fuer η_a, die Waende eines Gebaeudes werden ein Kern,
+und die Unterzuege einer Decke heissen Traeger.
 
 #### Projekt.neu
 

@@ -4,25 +4,25 @@ opencivil/decke/streifen.py -- die Decke in Streifen zerlegt.
 VERANTWORTUNG:
 Aus der :class:`~opencivil.decke.modell.Decke` die Streifen der
 Streifenmethode: je Richtung der Lastabtragung ein Satz paralleler
-Feldstreifen, dazu die versteckten Unterzüge als Streifen eigener Breite.
-Jeder Streifen zerfällt in Träger -- Stücke, die über Platten
-durchlaufen -- und jeder Träger weiss, worauf er liegt.
+Feldstreifen, dazu die Träger als Streifen eigener Breite.
+Jeder Streifen zerfällt in Durchlaufträger -- Stücke, die über Platten
+durchlaufen -- und jeder Durchlaufträger weiss, worauf er liegt.
 
 DIE STREIFEN EINER RICHTUNG:
 Alle Platten, die in einer Richtung tragen, bilden ihre Familie; über sie
 hinweg laufen die Streifen dieser Richtung durch. Quer zur Richtung wird
 die Familie an festen Stellen geteilt -- an den Ecken der Platten, an den
-Rändern paralleler Unterzüge, an den Enden der Lager, an den Rändern der
-Stützenbereiche und der Unterzüge, die quer liegen. Was dazwischen liegt,
+Rändern paralleler Träger, an den Enden der Lager, an den Rändern der
+Stützenbereiche und der Träger, die quer liegen. Was dazwischen liegt,
 wird in gleich breite Streifen von höchstens
 :attr:`~opencivil.decke.modell.Decke.streifenbreite` geteilt. So liegt
-keine Ecke im Innern eines Streifens, und ein Lager, ein Unterzug, ein
+keine Ecke im Innern eines Streifens, und ein Lager, ein Träger, ein
 Stützenbereich überdeckt einen Streifen ganz oder gar nicht.
 
-WORAUF EIN TRÄGER LIEGT:
+WORAUF EIN DURCHLAUFTRÄGER LIEGT:
 * Auf einem **Linienlager**, das ihn quer schneidet -- als Punkt; es hält
   die Höhe, die Drehung oder beides.
-* Auf einem **Unterzug höherer Stufe**, den seine Achse quer kreuzt; die
+* Auf einem **Träger höherer Stufe**, den seine Achse quer kreuzt; die
   Feldstreifen haben Stufe 0. Ein Flächenlager mit gleichmässiger Pressung
   über die Fläche, die beide teilen (Stahlbeton II, 7.2 Platten, Folie 33).
 * Auf einer **Stütze**, deren Stützenbereich seine Achse kreuzt -- ebenso
@@ -30,12 +30,12 @@ WORAUF EIN TRÄGER LIEGT:
   gleichmässiger Pressung»).
 
 Liegen zwei davon an derselben Stelle -- die eine in der Fläche der
-anderen --, trägt das erste in dieser Folge: Linienlager, Unterzug (höhere
+anderen --, trägt das erste in dieser Folge: Linienlager, Träger (höhere
 Stufe zuerst), Stütze. So liegt in der Musterlösung des Kolloquiums 4 der
-Unterzug in x-Richtung über der Stütze auf den Unterzügen in y-Richtung,
+Träger in x-Richtung über der Stütze auf den Trägern in y-Richtung,
 und erst diese auf der Stütze.
 
-Ein Unterzug parallel zu einer Richtung nimmt in seiner Fläche deren
+Ein Träger parallel zu einer Richtung nimmt in seiner Fläche deren
 Lastanteil auf; quer liegende Streifen laufen über ihn hinweg und legen
 ihren Anteil auf ihn (:mod:`~opencivil.decke.lasten`).
 """
@@ -49,14 +49,14 @@ from typing import Dict, List, NamedTuple, Optional, Sequence, Tuple
 
 from opencivil.decke import geometrie as geo
 from opencivil.decke.geometrie import Punkt
-from opencivil.decke.modell import Decke, Platte, Stuetze, Unterzug
-from opencivil.decke.traeger import Balken, Halt, Streckenlast
+from opencivil.decke.modell import Decke, Platte, Stuetze, Traeger
+from opencivil.decke.durchlauftraeger import Balken, Halt, Streckenlast
 from opencivil.stabwerk.system import Meldung
 
 #: Wie nahe zwei Teilungsstellen quer liegen dürfen, in m -- näher gelten sie als eine.
 TEILUNG = 1e-3
 
-#: So weit über sein Ende hinaus sucht ein Träger seine Lager, in m.
+#: So weit über sein Ende hinaus sucht ein Durchlaufträger seine Lager, in m.
 RAND = 1e-4
 
 #: Mehr Streifen rechnet die Decke nicht -- sonst warten Benutzer und Browser zu lange.
@@ -65,7 +65,7 @@ STREIFEN_HOECHSTENS = 4000
 #: Unter diesem Winkel gelten zwei Richtungen als parallel, in rad.
 PARALLEL = 1e-6
 
-LINIENLAGER, UNTERZUG, STUETZE = "linienlager", "unterzug", "stuetze"
+LINIENLAGER, TRAEGER, STUETZE = "linienlager", "traeger", "stuetze"
 
 
 # ===========================================================================
@@ -119,15 +119,15 @@ def richtung_der_strecke(a: Punkt, b: Punkt) -> Richtung:
 
 
 # ===========================================================================
-# Lager, Träger, Streifen
+# Lager, Durchlaufträger, Streifen
 # ===========================================================================
 
 
 @dataclass(frozen=True)
 class Auflager:
     """
-    Worauf ein Träger an einer Stelle liegt. ``s`` in m ab dem Anfang des
-    Trägers -- bei einem Flächenlager der Schwerpunkt der Fläche, die beide
+    Worauf ein Durchlaufträger an einer Stelle liegt. ``s`` in m ab dem Anfang des
+    Durchlaufträgers -- bei einem Flächenlager der Schwerpunkt der Fläche, die beide
     teilen (``kontakt``). Dort drückt das Lager mit ``pressung``, je Kraft
     eins: ein Verlauf über ``s``, dessen Integral eins ist.
     """
@@ -145,7 +145,7 @@ class Auflager:
 
     @property
     def bereich(self) -> Tuple[float, float]:
-        """Von wo bis wo das Lager drückt, in ``s`` des Trägers."""
+        """Von wo bis wo das Lager drückt, in ``s`` des Durchlaufträgers."""
         if not self.pressung:
             return (self.s, self.s)
         return (min(p.a for p in self.pressung), max(p.b for p in self.pressung))
@@ -153,7 +153,7 @@ class Auflager:
 
 @dataclass
 class Lage:
-    """Wo eine Stelle auf ihrem Träger liegt -- für die Aufteilung der Last."""
+    """Wo eine Stelle auf ihrem Durchlaufträger liegt -- für die Aufteilung der Last."""
 
     traegt: bool
     spannweite: float
@@ -163,7 +163,7 @@ class Lage:
     """Bis zum nächsten Lager, das die Höhe hält -- null in seiner Fläche."""
 
     warum: Optional["Warum"] = None
-    """Warum ihr Träger nicht trägt -- ``None``, wenn er trägt."""
+    """Warum ihr Durchlaufträger nicht trägt -- ``None``, wenn er trägt."""
 
 
 class Warum(NamedTuple):
@@ -177,12 +177,12 @@ class Warum(NamedTuple):
     platte: str
 
 
-#: Wo an einer Stelle kein Träger ist.
+#: Wo an einer Stelle kein Durchlaufträger ist.
 AUF_NICHTS = Warum("er liegt auf nichts.", "sie liegen auf nichts.", "liegt sie auf nichts")
 
 
 @dataclass
-class Traeger:
+class Durchlauftraeger:
     """Ein Stück eines Streifens, das von einem Ende zum anderen durchläuft."""
 
     name: str
@@ -248,7 +248,7 @@ class Traeger:
 class Streifen:
     """
     Ein Streifen: quer von ``von`` bis ``bis`` in ``τ = p·t``. Ein
-    Feldstreifen hat Stufe 0; ein Unterzug seine Stufe, seinen Eintrag und
+    Feldstreifen hat Stufe 0; ein Träger seine Stufe, seinen Eintrag und
     sein Gebiet -- das Rechteck, das er belegt.
     """
 
@@ -257,9 +257,9 @@ class Streifen:
     von: float
     bis: float
     stufe: float = 0
-    unterzug: Optional[Unterzug] = None
+    traeger: Optional[Traeger] = None
     gebiet: Tuple[Punkt, ...] = ()
-    traeger: List[Traeger] = field(default_factory=list)
+    durchlauftraeger: List[Durchlauftraeger] = field(default_factory=list)
 
     @property
     def breite(self) -> float:
@@ -271,7 +271,7 @@ class Streifen:
 
     @property
     def laengs(self) -> Tuple[float, float]:
-        """Wie weit der Streifen längs reicht -- ein Unterzug über sein Gebiet, ein Feldstreifen unbegrenzt."""
+        """Wie weit der Streifen längs reicht -- ein Träger über sein Gebiet, ein Feldstreifen unbegrenzt."""
         if self.gebiet:
             return geo.bereich(self.gebiet, self.richtung.n)
         return (-math.inf, math.inf)
@@ -282,11 +282,11 @@ class Streifen:
         return [r.punkt(s_von, self.von), r.punkt(s_bis, self.von),
                 r.punkt(s_bis, self.bis), r.punkt(s_von, self.bis)]
 
-    def traeger_bei(self, s: float) -> Optional[Traeger]:
-        """Der Träger, auf dem ``s = p·n`` liegt -- sonst der nächste."""
-        if not self.traeger:
+    def durchlauftraeger_bei(self, s: float) -> Optional[Durchlauftraeger]:
+        """Der Durchlaufträger, auf dem ``s = p·n`` liegt -- sonst der nächste."""
+        if not self.durchlauftraeger:
             return None
-        return min(self.traeger, key=lambda t: max(t.s0 - s, s - t.s1, 0.0))
+        return min(self.durchlauftraeger, key=lambda t: max(t.s0 - s, s - t.s1, 0.0))
 
 
 @dataclass
@@ -306,7 +306,7 @@ class Zerlegung:
     gruppen: List[Gruppe]
     stuetzenbereiche: Dict[str, List[Punkt]]
     parallele: Dict[str, List[Streifen]]
-    """Je Feldstreifen die Unterzüge in seiner Richtung, in deren Breite er liegt."""
+    """Je Feldstreifen die Träger in seiner Richtung, in deren Breite er liegt."""
 
     meldungen: List[Meldung]
 
@@ -324,12 +324,12 @@ class Zerlegung:
         return self._feld[r]
 
     @cached_property
-    def unterzuege(self) -> List[Streifen]:
+    def traeger(self) -> List[Streifen]:
         return [s for s in self.streifen if s.stufe > 0]
 
     @property
-    def traeger(self) -> List[Traeger]:
-        return [t for s in self.streifen for t in s.traeger]
+    def durchlauftraeger(self) -> List[Durchlauftraeger]:
+        return [t for s in self.streifen for t in s.durchlauftraeger]
 
 
 def richtungen_der_platte(p: Platte) -> Tuple[Richtung, Richtung]:
@@ -349,20 +349,20 @@ def nach_richtungen(platten: Sequence[Platte]) -> List[Tuple[Tuple[Richtung, Ric
     return heraus
 
 
-def stuetzenbereich(stuetze: Stuetze, unterzuege: Sequence[Unterzug]) -> List[Punkt]:
+def stuetzenbereich(stuetze: Stuetze, traeger: Sequence[Traeger]) -> List[Punkt]:
     """
     Die Fläche ``lx × ly``, über die die Stütze trägt. Ohne Angabe ein
-    Quadrat, so breit wie der breiteste Unterzug über ihr und mindestens so
+    Quadrat, so breit wie der breiteste Träger über ihr und mindestens so
     gross wie die Stütze -- in der Musterlösung des Kolloquiums 4 die
-    1 m × 1 m, wo sich die Unterzüge kreuzen. Nach Vorgabe, nicht
+    1 m × 1 m, wo sich die Träger kreuzen. Nach Vorgabe, nicht
     nachgeschlagen: Folie 39 lässt die Grösse frei.
     """
-    seite = max([stuetze.bx, stuetze.by] + [u.breite for u in unterzuege
+    seite = max([stuetze.bx, stuetze.by] + [u.breite for u in traeger
                                             if _lang(u) and geo.innen(stuetze.ort, geo.rechteck(u.a, u.b, u.breite))])
     return geo.achsrechteck(stuetze.ort, stuetze.lx or seite, stuetze.ly or seite)
 
 
-def _lang(u: Unterzug) -> bool:
+def _lang(u: Traeger) -> bool:
     return math.hypot(u.b[0] - u.a[0], u.b[1] - u.a[1]) > geo.TOLERANZ
 
 
@@ -372,7 +372,7 @@ def _lang(u: Unterzug) -> bool:
 
 
 def zerlegen(decke: Decke) -> Zerlegung:
-    """Die Streifen, ihre Träger und deren Lager -- oder, was dem im Weg steht."""
+    """Die Streifen, ihre Durchlaufträger und deren Lager -- oder, was dem im Weg steht."""
     meldungen = pruefen(decke)
     if any(m.haelt_an for m in meldungen):
         return Zerlegung([], [], [], {}, {}, meldungen)
@@ -384,58 +384,59 @@ def zerlegen(decke: Decke) -> Zerlegung:
         for r in g.richtungen:
             if not any(r.parallel(q) for q in richtungen):
                 richtungen.append(r)
-    bereiche = {s.name: stuetzenbereich(s, decke.unterzuege) for s in decke.stuetzen}
-    unterzuege = [_unterzug(u) for u in decke.unterzuege]
+    bereiche = {s.name: stuetzenbereich(s, decke.traeger) for s in decke.stuetzen}
+    traeger = [_traeger(u) for u in decke.traeger]
     feld: List[Streifen] = []
     for r in richtungen:
         platten = [p for p in decke.platten if any(r.parallel(q) for q in richtungen_der_platte(p))]
-        feld.extend(_feldstreifen(r, platten, decke, unterzuege, bereiche, stuecke))
+        feld.extend(_feldstreifen(r, platten, decke, traeger, bereiche, stuecke))
     if len(feld) > STREIFEN_HOECHSTENS:
         meldungen.append(Meldung(f"Das gäbe {len(feld)} Streifen – mehr als {STREIFEN_HOECHSTENS}. "
                                  "Bitte die Streifenbreite grösser wählen."))
         return Zerlegung(richtungen, [], gruppen, bereiche, {}, meldungen)
     namen = {s.name for s in feld}
-    for u in unterzuege:
+    for u in traeger:
         if u.name in namen:
-            meldungen.append(Meldung(f"Der Unterzug «{u.name}» heisst wie ein Feldstreifen – bitte umbenennen.",
+            meldungen.append(Meldung(f"Der Träger «{u.name}» heisst wie ein Feldstreifen – bitte umbenennen.",
                                      (u.name,)))
     if any(m.haelt_an for m in meldungen):
         return Zerlegung(richtungen, [], gruppen, bereiche, {}, meldungen)
     for s in feld:
         platten = [p for p in decke.platten if any(s.richtung.parallel(q) for q in richtungen_der_platte(p))]
-        s.traeger = _traeger(s, platten, decke, unterzuege, bereiche, stuecke)
-    for u in unterzuege:
-        u.traeger = _traeger(u, decke.platten, decke, unterzuege, bereiche, stuecke)
-        if not u.traeger:
-            meldungen.append(Meldung(f"Der Unterzug «{u.name}» liegt auf keiner Platte.", (u.name,), fehler=False))
-    parallele = {s.name: [u for u in unterzuege if u.richtung.parallel(s.richtung)
+        s.durchlauftraeger = _durchlauftraeger(s, platten, decke, traeger, bereiche, stuecke)
+    for u in traeger:
+        u.durchlauftraeger = _durchlauftraeger(u, decke.platten, decke, traeger, bereiche, stuecke)
+        if not u.durchlauftraeger:
+            meldungen.append(Meldung(f"Der Träger «{u.name}» liegt auf keiner Platte.", (u.name,),
+                                     fehler=False))
+    parallele = {s.name: [u for u in traeger if u.richtung.parallel(s.richtung)
                           and u.von - TEILUNG <= s.von and s.bis <= u.bis + TEILUNG] for s in feld}
-    return Zerlegung(richtungen, feld + sorted(unterzuege, key=lambda u: u.stufe), gruppen, bereiche,
+    return Zerlegung(richtungen, feld + sorted(traeger, key=lambda u: u.stufe), gruppen, bereiche,
                      parallele, meldungen)
 
 
-def traeger_eines_unterzugs(u: Unterzug, decke: Decke,
-                            stuecke: Dict[str, List[List[Punkt]]]) -> List[Traeger]:
+def durchlauftraeger_eines_traegers(u: Traeger, decke: Decke,
+                                    stuecke: Dict[str, List[List[Punkt]]]) -> List[Durchlauftraeger]:
     """
-    Die Träger, die ``u`` in ``decke`` wäre, mit den Lagern, die
+    Die Durchlaufträger, die ``u`` in ``decke`` wäre, mit den Lagern, die
     :func:`zerlegen` ihnen gäbe -- für die Bänder, die sich ihre Lager
     suchen (:mod:`~opencivil.decke.baender`). ``u`` gehört nicht zu
     ``decke``; ``stuecke`` sind ihre Platten in Dreiecken.
     """
-    alle = [*decke.unterzuege, u]
+    alle = [*decke.traeger, u]
     bereiche = {s.name: stuetzenbereich(s, alle) for s in decke.stuetzen}
-    return _traeger(_unterzug(u), decke.platten, decke, [_unterzug(x) for x in decke.unterzuege],
-                    bereiche, stuecke)
+    return _durchlauftraeger(_traeger(u), decke.platten, decke, [_traeger(x) for x in decke.traeger],
+                             bereiche, stuecke)
 
 
-def _unterzug(u: Unterzug) -> Streifen:
+def _traeger(u: Traeger) -> Streifen:
     r = richtung_der_strecke(u.a, u.b)
     tau = geo.skalar(u.a, r.t)
     return Streifen(u.name, r, tau - u.breite / 2.0, tau + u.breite / 2.0, u.stufe, u,
                     tuple(geo.rechteck(u.a, u.b, u.breite)))
 
 
-def _feldstreifen(r: Richtung, platten: Sequence[Platte], decke: Decke, unterzuege: Sequence[Streifen],
+def _feldstreifen(r: Richtung, platten: Sequence[Platte], decke: Decke, traeger: Sequence[Streifen],
                   bereiche: Dict[str, List[Punkt]], stuecke: Dict[str, List[List[Punkt]]]) -> List[Streifen]:
     """Die Feldstreifen einer Richtung, nach ihrer Lage quer geordnet und nummeriert."""
     unten, oben = math.inf, -math.inf
@@ -444,7 +445,7 @@ def _feldstreifen(r: Richtung, platten: Sequence[Platte], decke: Decke, unterzue
         lo, hi = geo.bereich(p.ecken, r.t)
         unten, oben = min(unten, lo), max(oben, hi)
         teilung.extend(geo.skalar(e, r.t) for e in p.ecken)
-    for u in unterzuege:
+    for u in traeger:
         if u.richtung.parallel(r):
             teilung.extend((u.von, u.bis))
         else:
@@ -469,9 +470,13 @@ def _feldstreifen(r: Richtung, platten: Sequence[Platte], decke: Decke, unterzue
     return [Streifen(f"{r.name}{trenner}{i + 1}", r, a, b) for i, (a, b) in enumerate(baender)]
 
 
-def _traeger(streifen: Streifen, platten: Sequence[Platte], decke: Decke, unterzuege: Sequence[Streifen],
-             bereiche: Dict[str, List[Punkt]], stuecke: Dict[str, List[List[Punkt]]]) -> List[Traeger]:
-    """Wo der Streifen über Platten läuft, ein Träger je zusammenhängendes Stück -- mit Steifigkeit und Lagern."""
+def _durchlauftraeger(streifen: Streifen, platten: Sequence[Platte], decke: Decke,
+                      traeger: Sequence[Streifen], bereiche: Dict[str, List[Punkt]],
+                      stuecke: Dict[str, List[List[Punkt]]]) -> List[Durchlauftraeger]:
+    """
+    Wo der Streifen über Platten läuft, ein Durchlaufträger je
+    zusammenhängendes Stück -- mit Steifigkeit und Lagern.
+    """
     r = streifen.richtung
     lo, hi = streifen.laengs
     teile: List[Tuple[float, float, Platte]] = []
@@ -483,13 +488,13 @@ def _traeger(streifen: Streifen, platten: Sequence[Platte], decke: Decke, unterz
             if c:
                 a, b = geo.bereich(c, r.n)
                 teile.append((max(a, lo), min(b, hi), p))
-    heraus: List[Traeger] = []
+    heraus: List[Durchlauftraeger] = []
     for s0, s1 in geo.vereinigt([(a, b) for a, b, _ in teile if b > a]):
         if s1 - s0 <= RAND:
             continue
-        heraus.append(Traeger("", streifen.name, s0, s1,
-                              _abschnitte(streifen, s0, s1, [t for t in teile if t[0] < s1 and t[1] > s0]),
-                              _auflager(streifen, s0, s1, decke, unterzuege, bereiche)))
+        abschnitte = _abschnitte(streifen, s0, s1, [t for t in teile if t[0] < s1 and t[1] > s0])
+        heraus.append(Durchlauftraeger("", streifen.name, s0, s1, abschnitte,
+                                       _auflager(streifen, s0, s1, decke, traeger, bereiche)))
     for i, t in enumerate(heraus):
         t.name = streifen.name if len(heraus) == 1 else f"{streifen.name}.{i + 1}"
     return heraus
@@ -521,7 +526,7 @@ def _abschnitte(streifen: Streifen, s0: float, s1: float,
     return tuple(heraus)
 
 
-def _auflager(streifen: Streifen, s0: float, s1: float, decke: Decke, unterzuege: Sequence[Streifen],
+def _auflager(streifen: Streifen, s0: float, s1: float, decke: Decke, traeger: Sequence[Streifen],
               bereiche: Dict[str, List[Punkt]]) -> List[Auflager]:
     r = streifen.richtung
     band = streifen.band(s0 - RAND, s1 + RAND)
@@ -540,9 +545,9 @@ def _auflager(streifen: Streifen, s0: float, s1: float, decke: Decke, unterzuege
         s = 0.5 * (geo.skalar(p0, r.n) + geo.skalar(p1, r.n)) - s0
         kandidaten.append(((0, 0), Auflager(min(max(s, 0.0), L), w.vertikal, w.eingespannt, LINIENLAGER,
                                             w.name, strecke=(p0, p1))))
-    for u in unterzuege:
+    for u in traeger:
         if u.stufe > streifen.stufe and not u.richtung.parallel(r):
-            lager = _flaechenlager(streifen, s0, L, achse, u.gebiet, UNTERZUG, u.name)
+            lager = _flaechenlager(streifen, s0, L, achse, u.gebiet, TRAEGER, u.name)
             if lager:
                 kandidaten.append(((1, -u.stufe), lager))
     for st in decke.stuetzen:
@@ -565,7 +570,7 @@ def _flaechenlager(streifen: Streifen, s0: float, L: float, achse: Tuple[Punkt, 
                    gebiet: Sequence[Punkt], art: str, name: str) -> Optional[Auflager]:
     """
     Ein Flächenlager, wenn die Achse des Streifens das Gebiet kreuzt -- mit
-    Pressung über die Fläche, die beide auf dem Träger teilen, und dort, wo
+    Pressung über die Fläche, die beide auf dem Durchlaufträger teilen, und dort, wo
     ihr Schwerpunkt liegt. Liegt die Fläche ganz hinter seinem Ende, ein
     Punkt dort.
     """
@@ -648,15 +653,15 @@ def pruefen(decke: Decke) -> List[Meldung]:
         elif not (w.vertikal or w.eingespannt):
             heraus.append(Meldung(f"Das Linienlager «{w.name}» hält weder Höhe noch Drehung – "
                                   "es trägt nichts.", (w.name,), fehler=False))
-    for u in decke.unterzuege:
+    for u in decke.traeger:
         if not _lang(u):
-            heraus.append(Meldung(f"Der Unterzug «{u.name}» hat keine Länge.", (u.name,)))
-    gueltig = [u for u in decke.unterzuege if _lang(u)]
+            heraus.append(Meldung(f"Der Träger «{u.name}» hat keine Länge.", (u.name,)))
+    gueltig = [u for u in decke.traeger if _lang(u)]
     for i, a in enumerate(gueltig):
         for b in gueltig[i + 1:]:
             if richtung_der_strecke(a.a, a.b).parallel(richtung_der_strecke(b.a, b.b)) and ueberlappen(
                     [geo.rechteck(a.a, a.b, a.breite)], [geo.rechteck(b.a, b.b, b.breite)]):
-                heraus.append(Meldung(f"Die Unterzüge «{a.name}» und «{b.name}» liegen parallel "
+                heraus.append(Meldung(f"Die Träger «{a.name}» und «{b.name}» liegen parallel "
                                       "übereinander.", (a.name, b.name)))
     zonen = {}
     for z in decke.zonen:

@@ -1,5 +1,5 @@
 ---
-erzeugt: 41cd6f8d6093
+erzeugt: 558be08f3ad2
 art: modul
 tags: [modul]
 ---
@@ -11,9 +11,9 @@ tags: [modul]
 
 Aus der [[opencivil.decke.modell#Decke|Decke]] die Streifen der
 Streifenmethode: je Richtung der Lastabtragung ein Satz paralleler
-Feldstreifen, dazu die versteckten Unterzüge als Streifen eigener Breite.
-Jeder Streifen zerfällt in Träger – Stücke, die über Platten
-durchlaufen – und jeder Träger weiss, worauf er liegt.
+Feldstreifen, dazu die Träger als Streifen eigener Breite.
+Jeder Streifen zerfällt in Durchlaufträger – Stücke, die über Platten
+durchlaufen – und jeder Durchlaufträger weiss, worauf er liegt.
 
 
 ## DIE STREIFEN EINER RICHTUNG
@@ -21,19 +21,19 @@ durchlaufen – und jeder Träger weiss, worauf er liegt.
 Alle Platten, die in einer Richtung tragen, bilden ihre Familie; über sie
 hinweg laufen die Streifen dieser Richtung durch. Quer zur Richtung wird
 die Familie an festen Stellen geteilt – an den Ecken der Platten, an den
-Rändern paralleler Unterzüge, an den Enden der Lager, an den Rändern der
-Stützenbereiche und der Unterzüge, die quer liegen. Was dazwischen liegt,
+Rändern paralleler Träger, an den Enden der Lager, an den Rändern der
+Stützenbereiche und der Träger, die quer liegen. Was dazwischen liegt,
 wird in gleich breite Streifen von höchstens
 [[opencivil.decke.modell#Decke|streifenbreite]] geteilt. So liegt
-keine Ecke im Innern eines Streifens, und ein Lager, ein Unterzug, ein
+keine Ecke im Innern eines Streifens, und ein Lager, ein Träger, ein
 Stützenbereich überdeckt einen Streifen ganz oder gar nicht.
 
 
-## WORAUF EIN TRÄGER LIEGT
+## WORAUF EIN DURCHLAUFTRÄGER LIEGT
 
 * Auf einem **Linienlager**, das ihn quer schneidet – als Punkt; es hält
   die Höhe, die Drehung oder beides.
-* Auf einem **Unterzug höherer Stufe**, den seine Achse quer kreuzt; die
+* Auf einem **Träger höherer Stufe**, den seine Achse quer kreuzt; die
   Feldstreifen haben Stufe 0. Ein Flächenlager mit gleichmässiger Pressung
   über die Fläche, die beide teilen (Stahlbeton II, 7.2 Platten, Folie 33).
 * Auf einer **Stütze**, deren Stützenbereich seine Achse kreuzt – ebenso
@@ -41,12 +41,12 @@ Stützenbereich überdeckt einen Streifen ganz oder gar nicht.
   gleichmässiger Pressung»).
 
 Liegen zwei davon an derselben Stelle – die eine in der Fläche der
-anderen –, trägt das erste in dieser Folge: Linienlager, Unterzug (höhere
+anderen –, trägt das erste in dieser Folge: Linienlager, Träger (höhere
 Stufe zuerst), Stütze. So liegt in der Musterlösung des Kolloquiums 4 der
-Unterzug in x-Richtung über der Stütze auf den Unterzügen in y-Richtung,
+Träger in x-Richtung über der Stütze auf den Trägern in y-Richtung,
 und erst diese auf der Stütze.
 
-Ein Unterzug parallel zu einer Richtung nimmt in seiner Fläche deren
+Ein Träger parallel zu einer Richtung nimmt in seiner Fläche deren
 Lastanteil auf; quer liegende Streifen laufen über ihn hinweg und legen
 ihren Anteil auf ihn ([[opencivil.decke.lasten|lasten]]).
 
@@ -110,8 +110,8 @@ def richtung_der_strecke(a: Punkt, b: Punkt) -> Richtung
 class Auflager
 ```
 
-Worauf ein Träger an einer Stelle liegt. `s` in m ab dem Anfang des
-Trägers – bei einem Flächenlager der Schwerpunkt der Fläche, die beide
+Worauf ein Durchlaufträger an einer Stelle liegt. `s` in m ab dem Anfang des
+Durchlaufträgers – bei einem Flächenlager der Schwerpunkt der Fläche, die beide
 teilen (`kontakt`). Dort drückt das Lager mit `pressung`, je Kraft
 eins: ein Verlauf über `s`, dessen Integral eins ist.
 
@@ -131,7 +131,7 @@ eins: ein Verlauf über `s`, dessen Integral eins ist.
 def bereich(self) -> Tuple[float, float]
 ```
 
-Von wo bis wo das Lager drückt, in `s` des Trägers.
+Von wo bis wo das Lager drückt, in `s` des Durchlaufträgers.
 
 ### Lage
 
@@ -140,12 +140,12 @@ Von wo bis wo das Lager drückt, in `s` des Trägers.
 class Lage
 ```
 
-Wo eine Stelle auf ihrem Träger liegt – für die Aufteilung der Last.
+Wo eine Stelle auf ihrem Durchlaufträger liegt – für die Aufteilung der Last.
 
 - `traegt: bool`
 - `spannweite: float` – Die Spannweite des Felds, in dem sie liegt; bei einer Kragplatte das Doppelte ihrer Länge.
 - `abstand: float` – Bis zum nächsten Lager, das die Höhe hält – null in seiner Fläche.
-- `warum: Optional['Warum'] = None` – Warum ihr Träger nicht trägt – `None`, wenn er trägt.
+- `warum: Optional['Warum'] = None` – Warum ihr Durchlaufträger nicht trägt – `None`, wenn er trägt.
 
 ### Warum
 
@@ -160,11 +160,11 @@ mehreren und von der Platte, in der sie liegen, nach «in x».
 - `mehrere: str`
 - `platte: str`
 
-### Traeger
+### Durchlauftraeger
 
 ```python
 @dataclass
-class Traeger
+class Durchlauftraeger
 ```
 
 Ein Stück eines Streifens, das von einem Ende zum anderen durchläuft.
@@ -177,21 +177,21 @@ Ein Stück eines Streifens, das von einem Ende zum anderen durchläuft.
 - `auflager: List[Auflager]`
 - `_balken: Optional[Balken] = field(default=None, repr=False)`
 
-#### Traeger.L
+#### Durchlauftraeger.L
 
 ```python
 @property
 def L(self) -> float
 ```
 
-#### Traeger.balken
+#### Durchlauftraeger.balken
 
 ```python
 @property
 def balken(self) -> Balken
 ```
 
-#### Traeger.lage
+#### Durchlauftraeger.lage
 
 ```python
 def lage(self, s: float) -> Lage
@@ -199,7 +199,7 @@ def lage(self, s: float) -> Lage
 
 Spannweite und Abstand zum Lager an der Stelle `s` (m ab dem Anfang).
 
-#### Traeger.warum_nicht
+#### Durchlauftraeger.warum_nicht
 
 ```python
 def warum_nicht(self) -> Warum
@@ -215,7 +215,7 @@ class Streifen
 ```
 
 Ein Streifen: quer von `von` bis `bis` in `τ = p·t`. Ein
-Feldstreifen hat Stufe 0; ein Unterzug seine Stufe, seinen Eintrag und
+Feldstreifen hat Stufe 0; ein Träger seine Stufe, seinen Eintrag und
 sein Gebiet – das Rechteck, das er belegt.
 
 - `name: str`
@@ -223,9 +223,9 @@ sein Gebiet – das Rechteck, das er belegt.
 - `von: float`
 - `bis: float`
 - `stufe: float = 0`
-- `unterzug: Optional[Unterzug] = None`
+- `traeger: Optional[Traeger] = None`
 - `gebiet: Tuple[Punkt, ...] = ()`
-- `traeger: List[Traeger] = field(default_factory=list)`
+- `durchlauftraeger: List[Durchlauftraeger] = field(default_factory=list)`
 
 #### Streifen.breite
 
@@ -248,7 +248,7 @@ def mitte(self) -> float
 def laengs(self) -> Tuple[float, float]
 ```
 
-Wie weit der Streifen längs reicht – ein Unterzug über sein Gebiet, ein Feldstreifen unbegrenzt.
+Wie weit der Streifen längs reicht – ein Träger über sein Gebiet, ein Feldstreifen unbegrenzt.
 
 #### Streifen.band
 
@@ -258,13 +258,13 @@ def band(self, s_von: float, s_bis: float) -> List[Punkt]
 
 Das Rechteck des Streifens von `s_von` bis `s_bis`, im Gegenuhrzeigersinn.
 
-#### Streifen.traeger_bei
+#### Streifen.durchlauftraeger_bei
 
 ```python
-def traeger_bei(self, s: float) -> Optional[Traeger]
+def durchlauftraeger_bei(self, s: float) -> Optional[Durchlauftraeger]
 ```
 
-Der Träger, auf dem `s = p·n` liegt – sonst der nächste.
+Der Durchlaufträger, auf dem `s = p·n` liegt – sonst der nächste.
 
 ### Gruppe
 
@@ -290,7 +290,7 @@ class Zerlegung
 - `streifen: List[Streifen]`
 - `gruppen: List[Gruppe]`
 - `stuetzenbereiche: Dict[str, List[Punkt]]`
-- `parallele: Dict[str, List[Streifen]]` – Je Feldstreifen die Unterzüge in seiner Richtung, in deren Breite er liegt.
+- `parallele: Dict[str, List[Streifen]]` – Je Feldstreifen die Träger in seiner Richtung, in deren Breite er liegt.
 - `meldungen: List[Meldung]`
 
 #### Zerlegung.feldstreifen
@@ -301,18 +301,18 @@ def feldstreifen(self, r: Richtung) -> List[Streifen]
 
 Die Feldstreifen in Richtung `r` – je Richtung einmal gesucht: Bilder und Bericht fragen an jeder Stelle.
 
-#### Zerlegung.unterzuege
-
-```python
-@cached_property
-def unterzuege(self) -> List[Streifen]
-```
-
 #### Zerlegung.traeger
 
 ```python
+@cached_property
+def traeger(self) -> List[Streifen]
+```
+
+#### Zerlegung.durchlauftraeger
+
+```python
 @property
-def traeger(self) -> List[Traeger]
+def durchlauftraeger(self) -> List[Durchlauftraeger]
 ```
 
 ### richtungen_der_platte
@@ -332,13 +332,13 @@ Die Platten nach ihren zwei Richtungen: je Paar die Platten, die in beiden paral
 ### stuetzenbereich
 
 ```python
-def stuetzenbereich(stuetze: Stuetze, unterzuege: Sequence[Unterzug]) -> List[Punkt]
+def stuetzenbereich(stuetze: Stuetze, traeger: Sequence[Traeger]) -> List[Punkt]
 ```
 
 Die Fläche `lx × ly`, über die die Stütze trägt. Ohne Angabe ein
-Quadrat, so breit wie der breiteste Unterzug über ihr und mindestens so
+Quadrat, so breit wie der breiteste Träger über ihr und mindestens so
 gross wie die Stütze – in der Musterlösung des Kolloquiums 4 die
-1 m × 1 m, wo sich die Unterzüge kreuzen. Nach Vorgabe, nicht
+1 m × 1 m, wo sich die Träger kreuzen. Nach Vorgabe, nicht
 nachgeschlagen: Folie 39 lässt die Grösse frei.
 
 ### zerlegen
@@ -347,15 +347,15 @@ nachgeschlagen: Folie 39 lässt die Grösse frei.
 def zerlegen(decke: Decke) -> Zerlegung
 ```
 
-Die Streifen, ihre Träger und deren Lager – oder, was dem im Weg steht.
+Die Streifen, ihre Durchlaufträger und deren Lager – oder, was dem im Weg steht.
 
-### traeger_eines_unterzugs
+### durchlauftraeger_eines_traegers
 
 ```python
-def traeger_eines_unterzugs(u: Unterzug, decke: Decke, stuecke: Dict[str, List[List[Punkt]]]) -> List[Traeger]
+def durchlauftraeger_eines_traegers(u: Traeger, decke: Decke, stuecke: Dict[str, List[List[Punkt]]]) -> List[Durchlauftraeger]
 ```
 
-Die Träger, die `u` in `decke` wäre, mit den Lagern, die
+Die Durchlaufträger, die `u` in `decke` wäre, mit den Lagern, die
 [[opencivil.decke.streifen#zerlegen|zerlegen]] ihnen gäbe – für die Bänder, die sich ihre Lager
 suchen ([[opencivil.decke.baender|baender]]). `u` gehört nicht zu
 `decke`; `stuecke` sind ihre Platten in Dreiecken.
@@ -363,18 +363,19 @@ suchen ([[opencivil.decke.baender|baender]]). `u` gehört nicht zu
 ### _feldstreifen
 
 ```python
-def _feldstreifen(r: Richtung, platten: Sequence[Platte], decke: Decke, unterzuege: Sequence[Streifen], bereiche: Dict[str, List[Punkt]], stuecke: Dict[str, List[List[Punkt]]]) -> List[Streifen]
+def _feldstreifen(r: Richtung, platten: Sequence[Platte], decke: Decke, traeger: Sequence[Streifen], bereiche: Dict[str, List[Punkt]], stuecke: Dict[str, List[List[Punkt]]]) -> List[Streifen]
 ```
 
 Die Feldstreifen einer Richtung, nach ihrer Lage quer geordnet und nummeriert.
 
-### _traeger
+### _durchlauftraeger
 
 ```python
-def _traeger(streifen: Streifen, platten: Sequence[Platte], decke: Decke, unterzuege: Sequence[Streifen], bereiche: Dict[str, List[Punkt]], stuecke: Dict[str, List[List[Punkt]]]) -> List[Traeger]
+def _durchlauftraeger(streifen: Streifen, platten: Sequence[Platte], decke: Decke, traeger: Sequence[Streifen], bereiche: Dict[str, List[Punkt]], stuecke: Dict[str, List[List[Punkt]]]) -> List[Durchlauftraeger]
 ```
 
-Wo der Streifen über Platten läuft, ein Träger je zusammenhängendes Stück – mit Steifigkeit und Lagern.
+Wo der Streifen über Platten läuft, ein Durchlaufträger je
+zusammenhängendes Stück – mit Steifigkeit und Lagern.
 
 ### _abschnitte
 
@@ -393,7 +394,7 @@ def _flaechenlager(streifen: Streifen, s0: float, L: float, achse: Tuple[Punkt, 
 ```
 
 Ein Flächenlager, wenn die Achse des Streifens das Gebiet kreuzt – mit
-Pressung über die Fläche, die beide auf dem Träger teilen, und dort, wo
+Pressung über die Fläche, die beide auf dem Durchlaufträger teilen, und dort, wo
 ihr Schwerpunkt liegt. Liegt die Fläche ganz hinter seinem Ende, ein
 Punkt dort.
 
@@ -443,16 +444,16 @@ Ob sich zwei Flächen aus konvexen Stücken mehr als berühren.
 ## Konstanten
 
 - `TEILUNG = 0.001` – Wie nahe zwei Teilungsstellen quer liegen dürfen, in m – näher gelten sie als eine.
-- `RAND = 0.0001` – So weit über sein Ende hinaus sucht ein Träger seine Lager, in m.
+- `RAND = 0.0001` – So weit über sein Ende hinaus sucht ein Durchlaufträger seine Lager, in m.
 - `STREIFEN_HOECHSTENS = 4000` – Mehr Streifen rechnet die Decke nicht – sonst warten Benutzer und Browser zu lange.
 - `PARALLEL = 1e-06` – Unter diesem Winkel gelten zwei Richtungen als parallel, in rad.
-- `AUF_NICHTS = Warum('er liegt auf nichts.', 'sie liegen auf nichts.', 'liegt sie au…` – Wo an einer Stelle kein Träger ist.
+- `AUF_NICHTS = Warum('er liegt auf nichts.', 'sie liegen auf nichts.', 'liegt sie au…` – Wo an einer Stelle kein Durchlaufträger ist.
 
 ## Braucht
 
+- [[opencivil.decke.durchlauftraeger]]
 - [[opencivil.decke.geometrie]]
 - [[opencivil.decke.modell]]
-- [[opencivil.decke.traeger]]
 - [[opencivil.stabwerk.system]]
 
 ## Gebraucht von

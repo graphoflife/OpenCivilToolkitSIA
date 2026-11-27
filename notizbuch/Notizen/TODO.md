@@ -101,10 +101,10 @@ Kräften je Geschoss und Wand, ohne Verbindung ins Balkensystem.
       die übrigen «1. OG» bis «8. OG», heisst das neunte darum
       «Geschoss 1». Besser die Zahl seiner Stelle, «Geschoss 9»
       (`aufstocken` in `web/js/erdbeben.js`). Gesehen am 2026-11-27.
-- [ ] **Decke: «Der Träger steht nicht im Gleichgewicht».** In der Konsole
+- [ ] **Decke: «Der Durchlaufträger steht nicht im Gleichgewicht».** In der Konsole
       des Browsers stand am 2026-11-27 aus einem älteren Test ein Abbruch
       der Rechnung `decke.e2.rechnung`: am Ende eines Streifens blieben
-      V = 6.0 N und M = 12.0 Nm übrig (`statik` in `decke/traeger.py`,
+      V = 6.0 N und M = 12.0 Nm übrig (`statik` in `decke/durchlauftraeger.py`,
       Schranke 10⁻⁶ der Lastsumme). Nicht nachgestellt; das Projekt des
       Benutzers rechnet fehlerfrei. Kommt es wieder: den Stand sichern und
       die Lasten am Ende des Streifens prüfen, etwa eine, die nur um die
@@ -140,7 +140,7 @@ Kräften je Geschoss und Wand, ohne Verbindung ins Balkensystem.
       dem Verhältnis 1.5 – so gewählt vom Benutzer am 2026-11-25, statt
       «innerhalb 1 % je zur Hälfte, sonst ganz»); die Grösse des
       Stützenbereichs, wenn sie fehlt (ein Quadrat, so breit wie die Stütze
-      oder der breiteste Unterzug über ihr – Folie 39 lässt sie offen);
+      oder der breiteste Träger über ihr – Folie 39 lässt sie offen);
       die Richtungen, die eine Platte selbst wählt (parallel zu den meisten
       Metern Rand, ein Rand quer dazu zählt mit; aneinanderstossende
       gemeinsam – seit 2026-11-26, `decke/richtungen.py`);
@@ -148,14 +148,14 @@ Kräften je Geschoss und Wand, ohne Verbindung ins Balkensystem.
       die Linienlast als Band von 1 mm, die Einzellast über 1 × 1 m verteilt;
       ein Wechsel der Steifigkeit eines Streifens, näher als 1 cm an einem
       Lager oder einem anderen Wechsel, gilt dort (seit 2026-11-26,
-      `decke/traeger.py`, `WECHSEL`); die Bänder, die die Rechnung bei
+      `decke/durchlauftraeger.py`, `WECHSEL`); die Bänder, die die Rechnung bei
       automatischer Aufteilung legt (seit 2026-11-26, `decke/baender.py`):
       durch jede Stütze in den Richtungen ihrer Platte, von Lager zu Lager,
       an einer Stütze am Rand ganz in der Platte,
       und innen an offenen Rändern, nur wo die Streifen quer dazu schon ein
       Lager haben; 1 m breit, als Vorgabe im Feld der Decke; auf zwei
       Lagern oder mehr, nie als Kragarm; nie längs über einer Wand; unter
-      jedem Unterzug des Benutzers, die am Rand unter denen über Stützen;
+      jedem Träger des Benutzers, die am Rand unter denen über Stützen;
       ein Rand bis 1e-3 rad neben einer Richtung der Platte legt das Band
       in diese Richtung.
       Die Norm sagt zu keinem etwas (geprüft am 2026-11-14): nach der

@@ -3,7 +3,7 @@ opencivil/decke/modell.py -- was gerechnet wird: die Decke in SI.
 
 VERANTWORTUNG:
 Die Eingabe des Rechenkerns, ohne Oberfläche und ohne Projekt: Platten,
-Lager, Stützen, versteckte Unterzüge, Zonen der Lastaufteilung, Lasten,
+Lager, Stützen, Träger, Zonen der Lastaufteilung, Lasten,
 Lastfälle und Kombinationen -- alles in N, m und rad. Gerechnet wird in
 :mod:`~opencivil.decke.rechnung`.
 
@@ -75,7 +75,7 @@ class Platte:
 @dataclass(frozen=True)
 class Linienlager:
     """
-    Eine Wand oder ein Unterzug unter der Platte, als Linie. ``vertikal``:
+    Eine Wand oder ein Träger unter der Platte, als Linie. ``vertikal``:
     sie hält die Platte in der Höhe; ``eingespannt``: sie hält ihre Drehung.
     Beides zusammen ist eine Einspannung, nur ``eingespannt`` eine
     Symmetrieachse.
@@ -91,9 +91,9 @@ class Linienlager:
 @dataclass(frozen=True)
 class Stuetze:
     """
-    Eine Stütze, ``bx × by`` gross. Die Streifen und Unterzüge über ihr
+    Eine Stütze, ``bx × by`` gross. Die Streifen und Träger über ihr
     liegen auf dem Stützenbereich ``lx × ly`` mit gleichmässiger Pressung --
-    ohne Angabe so breit wie die Unterzüge über ihr, mindestens so gross wie
+    ohne Angabe so breit wie die Träger über ihr, mindestens so gross wie
     die Stütze (:func:`~opencivil.decke.streifen.stuetzenbereich`).
     """
 
@@ -106,12 +106,13 @@ class Stuetze:
 
 
 @dataclass(frozen=True)
-class Unterzug:
+class Traeger:
     """
-    Ein versteckter Unterzug: ein Streifen der Breite ``breite`` von ``a``
-    nach ``b``, so dick wie die Platte. Streifen quer dazu liegen auf ihm,
-    ein Unterzug mit kleinerer ``stufe`` ebenso; er selbst liegt auf Lagern,
-    Stützen und Unterzügen höherer Stufe.
+    Ein Träger -- ein Unterzug oder ein Überzug --, in der Streifenmethode
+    ein Streifen der Breite ``breite`` von ``a`` nach ``b``, so dick wie
+    die Platte. Streifen quer dazu liegen auf ihm,
+    ein Träger mit kleinerer ``stufe`` ebenso; er selbst liegt auf Lagern,
+    Stützen und Trägern höherer Stufe.
     """
 
     name: str
@@ -206,7 +207,7 @@ class Decke:
     platten: List[Platte] = field(default_factory=list)
     linienlager: List[Linienlager] = field(default_factory=list)
     stuetzen: List[Stuetze] = field(default_factory=list)
-    unterzuege: List[Unterzug] = field(default_factory=list)
+    traeger: List[Traeger] = field(default_factory=list)
     zonen: List[Zone] = field(default_factory=list)
     lastfaelle: List[Lastfall] = field(default_factory=list)
     kombinationen: List[Kombination] = field(default_factory=list)

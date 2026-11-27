@@ -21,7 +21,7 @@ from tests.unfertig import meldung
 def zwei_felder() -> Projekt:
     """
     Zwei Platten verschiedener Dicke, die sich eine Kante teilen, ringsum auf
-    Wänden; ein Unterzug über die gemeinsame Kante, eine Stütze im zweiten
+    Wänden; ein Träger über die gemeinsame Kante, eine Stütze im zweiten
     Feld und eine Zone im ersten.
     """
     p = Projekt(name="Decke")
@@ -31,7 +31,7 @@ def zwei_felder() -> Projekt:
     d.platte([(4, 0), (8, 0), (8, 3), (4, 3)], beton=beton, h=250)
     for a, b in [((0, 0), (8, 0)), ((8, 0), (8, 3)), ((8, 3), (0, 3)), ((0, 3), (0, 0))]:
         d.lager(a, b)
-    d.unterzug((4, 0), (4, 3), breite=0.5)
+    d.traeger_legen((4, 0), (4, 3), breite=0.5)
     d.stuetze((6, 1.5))
     d.zone([(0, 0), (1, 0), (1, 3), (0, 3)], anteil=30.0)
     return p
@@ -68,11 +68,11 @@ class TestBeschreibung(unittest.TestCase):
         self.assertEqual(Projekt.aus_dict(p.als_dict()), p)
 
     def test_knoten_werden_geteilt(self):
-        """Die gemeinsame Kante ist ein Paar Knoten; der Unterzug läuft auf ihr."""
+        """Die gemeinsame Kante ist ein Paar Knoten; der Träger läuft auf ihr."""
         d = zwei_felder().decken[0]
         p1, p2 = d.platten
         self.assertEqual((p1.knoten[1], p1.knoten[2]), (p2.knoten[0], p2.knoten[3]))
-        self.assertEqual((d.unterzuege[0].von, d.unterzuege[0].bis), (p1.knoten[1], p1.knoten[2]))
+        self.assertEqual((d.traeger[0].von, d.traeger[0].bis), (p1.knoten[1], p1.knoten[2]))
         # Sechs Ecken der Platten, der Ort der Stütze und zwei Ecken der Zone.
         self.assertEqual(len(d.knoten), 9)
 
@@ -82,9 +82,43 @@ class TestBeschreibung(unittest.TestCase):
         self.assertEqual(d.kennung, "e1")
         self.assertIs(p.bauteil("e1"), d)
         self.assertEqual([[t.kennung for t in getattr(d, liste)]
-                          for liste in ("platten", "linienlager", "stuetzen", "unterzuege", "zonen")],
-                         [["P1", "P2"], ["L1", "L2", "L3", "L4"], ["S1"], ["U1"], ["Z1"]])
+                          for liste in ("platten", "linienlager", "stuetzen", "traeger", "zonen")],
+                         [["P1", "P2"], ["L1", "L2", "L3", "L4"], ["S1"], ["T1"], ["Z1"]])
         self.assertEqual(d.materialien(), ["b1"])
+
+    def test_eine_datei_mit_unterzuegen(self):
+        """
+        Bis 2026-11-27 hiessen die Träger Unterzüge: ``unterzuege`` und
+        ``U1`` werden ``traeger`` und ``T1`` -- auch im Bild, das in ihm
+        schneidet, und in der Zählung: auf einen gelöschten U3 folgt T4.
+        """
+        p = zwei_felder()
+        d = p.decken[0]
+        d.diagramm(d.standardfaelle(), "M", d.traeger[0])
+        roh = p.als_dict()
+        alt = roh["decken"][0]
+        alt["unterzuege"] = alt.pop("traeger")
+        alt["unterzuege"][0]["kennung"] = "U1"
+        alt["diagramme"][-1]["schnitt"] = "U1"
+        alt["vergeben"]["U"] = 3
+        del alt["vergeben"]["T"]
+        gelesen = Projekt.aus_dict(roh)
+        self.assertEqual(Projekt.aus_dict(gelesen.als_dict()), gelesen)
+        neu = gelesen.decken[0]
+        self.assertEqual([t.kennung for t in neu.traeger], ["T1"])
+        self.assertEqual(neu.diagramme[-1].schnitt, "T1")
+        self.assertNotIn("U", neu.vergeben)
+        self.assertEqual(neu.traeger_legen((0, 1), (4, 1)).kennung, "T4")
+
+    def test_eine_kennung_die_es_schon_gibt_nimmt_kein_traeger(self):
+        """Heisst schon etwas der Decke T1, behält der Unterzug U1 seine Kennung."""
+        roh = zwei_felder().als_dict()
+        alt = roh["decken"][0]
+        alt["unterzuege"] = alt.pop("traeger")
+        alt["unterzuege"][0]["kennung"] = "U1"
+        alt["zonen"][0]["kennung"] = "T1"
+        neu = Projekt.aus_dict(roh).decken[0]
+        self.assertEqual(([t.kennung for t in neu.traeger], [z.kennung for z in neu.zonen]), (["U1"], ["T1"]))
 
     def test_neu_hat_die_lastfaelle_eines_frischen_balkensystems_ohne_gzg(self):
         """
@@ -93,7 +127,7 @@ class TestBeschreibung(unittest.TestCase):
         mit 0.80, ohne Nutzlast.
         """
         d = DeckeEintrag.neu("e1", "Decke")
-        self.assertEqual((d.knoten, d.platten, d.linienlager, d.stuetzen, d.unterzuege, d.zonen),
+        self.assertEqual((d.knoten, d.platten, d.linienlager, d.stuetzen, d.traeger, d.zonen),
                          ([], [], [], [], [], []))
         self.assertEqual((d.streifenbreite, d.aufteilung.value), (0.25, "automatisch"))
         self.assertEqual([(lf.kennung, lf.name, lf.eigengewicht) for lf in d.lastfaelle],
@@ -128,7 +162,7 @@ class TestModell(unittest.TestCase):
         self.assertEqual([round(p.h, 9) for p in decke.platten], [0.2, 0.25])
         self.assertAlmostEqual(decke.platten[0].richtungen[1], math.pi / 2.0)
         self.assertAlmostEqual(decke.zonen[0].anteil, 0.3)
-        self.assertEqual(decke.unterzuege[0].breite, 0.5)
+        self.assertEqual(decke.traeger[0].breite, 0.5)
         s = decke.stuetzen[0]
         self.assertEqual((round(s.bx, 9), s.lx, s.ly), (0.3, None, None))
 
@@ -311,7 +345,7 @@ class TestZeichnung(unittest.TestCase):
         self.assertTrue(bild["gerechnet"])
         self.assertEqual([m for m in bild["meldungen"] if m["fehler"]], [])
         self.assertEqual([r["name"] for r in bild["richtungen"]], ["x", "y"])
-        self.assertEqual([u["name"] for u in bild["unterzuege"]], ["U1"])
+        self.assertEqual([u["name"] for u in bild["traeger"]], ["T1"])
         self.assertEqual([b["name"] for b in bild["stuetzenbereiche"]], ["S1"])
         self.assertTrue(bild["anteile"] and all(0.0 <= a["anteil"] <= 100.0 for a in bild["anteile"]))
         self.assertEqual({g["richtung"] for g in bild["grenzen"]}, {1, 2})
@@ -395,7 +429,7 @@ class TestBilder(unittest.TestCase):
         for g, extrem in self.e["extreme"].items():
             self.assertLessEqual(max(self.e["werte"][g]), extrem["groesst"]["wert"], g)
             self.assertGreaterEqual(min(self.e["werte"][g]), extrem["kleinst"]["wert"], g)
-        # Ohne Einspannung kein negatives Moment ausser über Unterzug und Stütze.
+        # Ohne Einspannung kein negatives Moment ausser über Träger und Stütze.
         self.assertLess(self.e["extreme"]["m_x"]["kleinst"]["wert"], 0.0)
 
     def test_die_lager_tragen_die_last(self):
@@ -447,8 +481,8 @@ class TestBilder(unittest.TestCase):
 
     def test_kolloquium_4(self):
         """
-        Die Beispieldecke: m_x bis −60.1 kNm/m im Unterzug über der mittleren
-        Stütze, m_y bis 123.7 im mittleren Unterzug quer dazu; die Stützen
+        Die Beispieldecke: m_x bis −60.1 kNm/m im Träger über der mittleren
+        Stütze, m_y bis 123.7 im mittleren Träger quer dazu; die Stützen
         tragen 115.0, 276.4 und 115.0 kN, die Wand den Rest der 920.7 kN.
         """
         p = beispiele.jeder_nachweis()

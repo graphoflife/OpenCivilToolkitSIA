@@ -291,7 +291,7 @@ Fertig und getestet (am 2026-11-21: 2145 Tests):
 | `stahlbau/` | ein Querschnitt aus Baustahl nach SIA 263:2013: die Grenzen der Querschnittsklasse, Beulwerte und mitwirkende Breite (`klasse`), der Querkraftwiderstand je Profil mit dem Schubbeulen (`schub`), der gezeichnete Querschnitt nach Stahl und Dicke, plastisch, elastisch und wirksam (`querschnitt`), der Widerstand je Lastfall: die Klasse im Lastfall, plastisch, nach (54) oder (60), mit dem, was eine grosse Querkraft den Blechen nimmt (`widerstand`) |
 | `stabwerk/rechnung`, `herleitung` | das Balkensystem im Rechenwerk und wie es seine Rechnung aufschreibt |
 | `stabwerk3d/` | das Balkensystem im Raum: Vektoren (`raum`), die Beschreibung in SI (`modell`), der Stab als drei ebene (`stab`), das System mit sechs Unbekannten je Knoten (`system`), die Verläufe (`verlauf`), im Rechenwerk (`rechnung`) und wie es seine Rechnung aufschreibt (`herleitung`) |
-| `decke/` | eine Decke nach der Streifenmethode: die Beschreibung in SI (`modell`), die Streifen und ihre Träger (`streifen`), wie die Last auf die Richtungen und Streifen geht (`aufteilung`, `lasten`), jeder Streifen als Durchlaufträger (`traeger`), Fall für Fall von unten nach oben (`rechnung`), die Schnittkräfte der Platte an einer Stelle und wo Bilder und Bericht hinsehen (`feld`), im Rechenwerk (`werk`) und wie sie ihre Rechnung aufschreibt (`herleitung`) |
+| `decke/` | eine Decke nach der Streifenmethode: die Beschreibung in SI (`modell`), die Streifen und ihre Durchlaufträger (`streifen`), wie die Last auf die Richtungen und Streifen geht (`aufteilung`, `lasten`), jeder Streifen als Durchlaufträger (`durchlauftraeger`), Fall für Fall von unten nach oben (`rechnung`), die Schnittkräfte der Platte an einer Stelle und wo Bilder und Bericht hinsehen (`feld`), im Rechenwerk (`werk`) und wie sie ihre Rechnung aufschreibt (`herleitung`) |
 | `geotechnik/grundbruch` | ein Flachfundament: Bemessungswerte des Bodens, Grundbruch nach der erweiterten Tragfähigkeitsformel (drainiert und undrainiert), Gleiten in der Sohle, der Gleitkörper nach Prandtl |
 | `geotechnik/wasser` | die Raumlast des Grundwassers, aus der Flüssigkeit, die Grundbruch oder Pfahl wählt |
 | `geotechnik/setzung` | ein Flachfundament auf geschichtetem Baugrund: der Einflussfaktor nach Boussinesq im Punkt K oder in der Mitte, die Setzung je Teilschicht aus Wieder- und Erstbelastung, s gegen s_zul |
@@ -621,9 +621,10 @@ Torsion rechnet nach St. Venant, ohne Wölbkrafttorsion.
 7.2 Platten). Gezeichnet wird mit demselben Fenster, in Metern: Platten als
 Umriss mit Dicke und Beton -- auch schief, mit Ecken, die nicht rechtwinklig
 sind --, je Platte zwei Richtungen der Streifen, Linienlager (vertikal
-gehalten, eingespannt oder beides), Stützen an Knoten, versteckte Unterzüge
-als Streifen eigener Breite, Zonen und je Lastfall die Lasten: auf eine
-ganze Platte, entlang einer Linie, auf einer Fläche oder an einem Punkt.
+gehalten, eingespannt oder beides), Stützen an Knoten, Träger -- Unterzüge
+oder Überzüge -- als Streifen eigener Breite, Zonen und je Lastfall die
+Lasten: auf eine ganze Platte, entlang einer Linie, auf einer Fläche oder
+an einem Punkt.
 Darunter Knöpfe wie im Balkensystem: «Streifen» -- wie breit sie höchstens
 sind und wie die Last auf die zwei Richtungen geht, automatisch zum nahen
 Rand und in die kürzere Spannweite oder überall derselbe Anteil; in einer
@@ -632,15 +633,15 @@ Eine neue Decke bringt die Lastfälle des Balkensystems mit, aber nur die
 Kombination GZT: die Streifenmethode gilt für die Tragsicherheit. Das
 Eigengewicht kommt von selbst, ρ · g · h mit g = 10 m/s².
 Jeder Streifen trägt als Balken auf seinen Lagern, statisch unbestimmt
-elastisch gelöst. Unterzüge und Stützenbereiche tragen als Fläche mit
-gleichmässiger Pressung, und ein Unterzug trägt weiter, was die Streifen
-auf ihn geben: erst rechnen die Feldstreifen, dann die Unterzüge, Stufe um
+elastisch gelöst. Träger und Stützenbereiche tragen als Fläche mit
+gleichmässiger Pressung, und ein Träger trägt weiter, was die Streifen
+auf ihn geben: erst rechnen die Feldstreifen, dann die Träger, Stufe um
 Stufe. Rechts im Reiter «Diagramme» je ein Grundriss mit der Aufteilung und
 mit den Streifen, dazu je Zeile der Ergebnisse ein Bild: m_x, m_y, m_xy, v_x, v_y
 oder v_0 in Farbe über dem Grundriss, mit dem grössten und dem kleinsten
 Wert an seiner Stelle, oder die Lager mit dem Verlauf ihrer Kraft. Ein
 schiefer Streifen gibt sein Moment in x und y umgerechnet weiter, samt
-Drillmoment. Die Herleitung nennt je Fall jeden Träger mit Last,
+Drillmoment. Die Herleitung nennt je Fall jeden Durchlaufträger mit Last,
 Lagerkräften und Momenten je Meter -- gleiche nebeneinander in einer
 Zeile --, was jedes Lager trägt, die grössten Schnittkräfte der Platte, die
 Biegewiderstände nach der linearisierten Fliessbedingung (SIA 262:2025,

@@ -2,8 +2,8 @@
 opencivil/decke/baender.py -- die Bänder, die eine Decke selbst legt.
 
 VERANTWORTUNG:
-Bei automatischer Aufteilung legt die Rechnung Bänder -- versteckte
-Unterzüge (:class:`~opencivil.decke.modell.Unterzug` mit ``von_selbst``),
+Bei automatischer Aufteilung legt die Rechnung Bänder -- starke Streifen
+wie ein Träger (:class:`~opencivil.decke.modell.Traeger` mit ``von_selbst``),
 so breit wie :attr:`~opencivil.decke.modell.Decke.bandbreite` --, wo
 Streifen sonst ohne Lager enden oder eine Stütze nur die Streifen fände,
 die über sie laufen. Das geschieht, bevor die Decke in Streifen zerfällt
@@ -13,7 +13,7 @@ keine: dort gilt, was der Benutzer gibt.
 WO BÄNDER LIEGEN:
 1. **Über Stützen**: durch die Mitte jeder Stütze, in den zwei Richtungen
    der Platte, auf der sie steht -- über alle Stützen auf dieser Linie bis
-   zum nächsten Lager quer dazu, einer Wand oder einem Unterzug, oder bis
+   zum nächsten Lager quer dazu, einer Wand oder einem Träger, oder bis
    zum Rand der Platte. Steht die Stütze näher am Rand als eine halbe
    Bandbreite, rückt das Band nach innen, bis es ganz in der Platte liegt;
    die Mitte der Stütze bleibt darin.
@@ -21,12 +21,12 @@ WO BÄNDER LIEGEN:
    ein Linienlager sie hält -- an einem freien Rand, am Rand eines Lochs, an
    einer Platte mit anderen Richtungen. Das Band liegt innen am Rand, längs
    dazu, und reicht beidseits bis zum nächsten Lager: einer Wand, einer
-   Stütze, einem Band über Stützen, einem Unterzug.
+   Stütze, einem Band über Stützen, einem Träger.
 
-Die Bänder liegen unter allen Unterzügen des Benutzers, mit den Stufen
+Die Bänder liegen unter allen Trägern des Benutzers, mit den Stufen
 :data:`~opencivil.decke.baender.STUFE_RAND` und
 :data:`~opencivil.decke.baender.STUFE_STUETZE` zwischen den Feldstreifen (0)
-und dessen Stufen (ab 1): ein Band liegt auf einem Unterzug, nie trägt es
+und dessen Stufen (ab 1): ein Band liegt auf einem Träger, nie trägt es
 einen -- und ein Band am Rand liegt auf einem über Stützen.
 
 Ein Band liegt auf mindestens zwei Lagern, die die Höhe halten. Als Kragarm
@@ -35,7 +35,7 @@ selbst als Kragplatte. Ein Band am Rand legt sie nur, wo die Streifen quer
 zum Rand sonst schon ein Lager haben -- das Band gibt ihnen das zweite. Eine
 Platte, die nur in einer Richtung trägt, bekommt an ihren freien Rändern
 darum keines; zwei Bänder dort nähmen ihr die ganze Last ab. Ein offener
-Rand, kürzer als ein Band breit, bekommt keines. Liegt schon ein Unterzug
+Rand, kürzer als ein Band breit, bekommt keines. Liegt schon ein Träger
 des Benutzers oder ein anderes Band längs auf dem Weg, ersetzt es das Band.
 Über eine Wand längs läuft keines: es endet, wo sie beginnt -- dort trägt
 die Wand selbst.
@@ -58,11 +58,11 @@ from typing import Dict, Iterator, List, Optional, Sequence, Tuple, Union
 
 from opencivil.decke import geometrie as geo
 from opencivil.decke.geometrie import Punkt
-from opencivil.decke.modell import Aufteilung, Decke, Linienlager, Platte, Stuetze, Unterzug
+from opencivil.decke.modell import Aufteilung, Decke, Linienlager, Platte, Stuetze, Traeger
 from opencivil.decke.richtungen import FUGE, Kante, kanten
 from opencivil.decke.streifen import (
     STUETZE, Richtung, nach_richtungen, pruefen, richtung, richtungen_der_platte,
-    traeger_eines_unterzugs, ueberlappen,
+    durchlauftraeger_eines_traegers, ueberlappen,
 )
 
 #: Die Stufe eines Bands an einem offenen Rand und die eines Bands über
@@ -71,7 +71,7 @@ STUFE_RAND, STUFE_STUETZE = 0.25, 0.5
 
 #: So nahe an einer Richtung der Platte, in rad, läuft ein Band am Rand in
 #: ihr: auf den Millimeter gerundete Ecken legen es nicht schief zu den
-#: Streifen. Ebenso nahe gilt ein Unterzug als längs zum Band.
+#: Streifen. Ebenso nahe gilt ein Träger als längs zum Band.
 WINKEL = 1e-3
 
 #: Was längs eines Bands als dieselbe Stelle gilt, in m.
@@ -99,10 +99,10 @@ def gelegt(decke: Decke) -> Decke:
         return decke
     stuecke = {p.name: geo.dreiecke(p.ecken) for p in decke.platten}
     namen = _namen(decke)
-    baender: List[Unterzug] = []
+    baender: List[Traeger] = []
 
     def mit_baendern() -> Decke:
-        return replace(decke, unterzuege=[*decke.unterzuege, *baender])
+        return replace(decke, traeger=[*decke.traeger, *baender])
 
     for stuetze in decke.stuetzen:
         for r in _richtungen_bei(stuetze, decke, stuecke):
@@ -120,7 +120,7 @@ def gelegt(decke: Decke) -> Decke:
     return mit_baendern() if baender else decke
 
 
-def art(band: Unterzug) -> str:
+def art(band: Traeger) -> str:
     """Wo ein Band liegt, in Worten: «über Stützen» oder «am Rand»."""
     return "über Stützen" if band.stufe == STUFE_STUETZE else "am Rand"
 
@@ -146,14 +146,14 @@ def offene_raender(platten: Sequence[Platte], decke: Decke) -> List[Kante]:
     return heraus
 
 
-def _ueber_stuetze(stuetze: Stuetze, r: Richtung, decke: Decke, stuecke: Stuecke) -> Optional[Unterzug]:
+def _ueber_stuetze(stuetze: Stuetze, r: Richtung, decke: Decke, stuecke: Stuecke) -> Optional[Traeger]:
     """
     Das Band über der Stütze in Richtung ``r``, über alle Stützen auf seinem
     Weg bis zum nächsten anderen Lager oder zum Rand der Platte -- ``None``,
     wo schon eines über ihr liegt oder es nicht zwei Lager fände.
     """
     if any(_laengs_zu(u, r.winkel) and geo.innen(stuetze.ort, geo.rechteck(u.a, u.b, u.breite))
-           for u in decke.unterzuege if _lang(u)):
+           for u in decke.traeger if _lang(u)):
         return None
     s = geo.skalar(stuetze.ort, r.n)
     tau = _in_der_platte(geo.skalar(stuetze.ort, r.t), s, r, decke.bandbreite, stuecke)
@@ -182,7 +182,7 @@ def _in_der_platte(tau: float, s: float, r: Richtung, breite: float, stuecke: St
 
 
 def _am_rand(a: Punkt, b: Punkt, richtungen: Tuple[Richtung, Richtung], decke: Decke,
-             stuecke: Stuecke) -> Optional[Unterzug]:
+             stuecke: Stuecke) -> Optional[Traeger]:
     """
     Das Band am offenen Rand ``a → b`` (die Platte links), innen an ihm und
     beidseits bis zum nächsten Lager -- ``None``, wo es nicht zwei fände.
@@ -248,25 +248,29 @@ def _quer_gehalten(a: Punkt, b: Punkt, richtungen: Tuple[Richtung, Richtung], de
         weit = _ueber_platten(r, tau, breite, eigene, geo.skalar(mitte, r.n))
         if weit is None:
             continue
-        streifen = Unterzug("", r.punkt(weit[0], tau), r.punkt(weit[1], tau), breite, 0)
-        if any(x.vertikal for t in traeger_eines_unterzugs(streifen, decke, stuecke) for x in t.auflager):
+        streifen = Traeger("", r.punkt(weit[0], tau), r.punkt(weit[1], tau), breite, 0)
+        stuecke_des_bands = durchlauftraeger_eines_traegers(streifen, decke, stuecke)
+        if any(x.vertikal for t in stuecke_des_bands for x in t.auflager):
             return True
     return False
 
 
-def _gepruft(band: Unterzug, decke: Decke, stuecke: Stuecke) -> Optional[Unterzug]:
-    """Das Band, wenn kein Unterzug längs auf seinem Weg liegt und jedes Stück auf zwei Lagern liegt -- sonst ``None``."""
-    if not _lang(band) or _ueberdeckt(band, decke.unterzuege):
+def _gepruft(band: Traeger, decke: Decke, stuecke: Stuecke) -> Optional[Traeger]:
+    """
+    Das Band, wenn kein Träger längs auf seinem Weg liegt und jedes Stück
+    auf zwei Lagern liegt -- sonst ``None``.
+    """
+    if not _lang(band) or _ueberdeckt(band, decke.traeger):
         return None
     lager = _lager(band, decke, stuecke)
     zwei = all(len(je) >= 2 and max(x[0] for x in je) - min(x[0] for x in je) > NAH for je in lager)
     return band if lager and zwei else None
 
 
-def _lager(band: Unterzug, decke: Decke, stuecke: Stuecke) -> List[List[Lager]]:
-    """Je Träger des Bands die Lager, die seine Höhe halten -- wie die Zerlegung sie fände."""
+def _lager(band: Traeger, decke: Decke, stuecke: Stuecke) -> List[List[Lager]]:
+    """Je Durchlaufträger des Bands die Lager, die seine Höhe halten -- wie die Zerlegung sie fände."""
     return [[(t.s0 + a.s, t.s0 + a.bereich[0], t.s0 + a.bereich[1], a.art) for a in t.auflager if a.vertikal]
-            for t in traeger_eines_unterzugs(band, decke, stuecke)]
+            for t in durchlauftraeger_eines_traegers(band, decke, stuecke)]
 
 
 def _ueber_platten(r: Richtung, tau: float, breite: float, stuecke: Stuecke,
@@ -291,22 +295,22 @@ def _richtungen_bei(stuetze: Stuetze, decke: Decke, stuecke: Stuecke) -> List[Ri
     return heraus
 
 
-def _ueberdeckt(band: Unterzug, andere: Sequence[Unterzug]) -> bool:
-    """Ob ein Unterzug längs auf dem Weg des Bands liegt -- dann ersetzt er es."""
+def _ueberdeckt(band: Traeger, andere: Sequence[Traeger]) -> bool:
+    """Ob ein Träger längs auf dem Weg des Bands liegt -- dann ersetzt er es."""
     flaeche = [geo.rechteck(band.a, band.b, band.breite)]
     w = _winkel(band)
     return any(_laengs_zu(u, w) and ueberlappen(flaeche, [geo.rechteck(u.a, u.b, u.breite)])
                for u in andere if _lang(u))
 
 
-def _band(r: Richtung, tau: float, laengs: Tuple[float, float], breite: float, stufe: float) -> Unterzug:
+def _band(r: Richtung, tau: float, laengs: Tuple[float, float], breite: float, stufe: float) -> Traeger:
     """Ein Band in Richtung ``r``, quer bei ``tau``, längs über ``laengs`` -- noch ohne Namen."""
-    return Unterzug("", r.punkt(laengs[0], tau), r.punkt(laengs[1], tau), breite, stufe, von_selbst=True)
+    return Traeger("", r.punkt(laengs[0], tau), r.punkt(laengs[1], tau), breite, stufe, von_selbst=True)
 
 
 def _namen(decke: Decke) -> Iterator[str]:
     """B1, B2, … -- ohne die Namen, die schon ein Teil der Decke trägt."""
-    vergeben = {x.name for liste in (decke.platten, decke.linienlager, decke.stuetzen, decke.unterzuege,
+    vergeben = {x.name for liste in (decke.platten, decke.linienlager, decke.stuetzen, decke.traeger,
                                      decke.zonen) for x in liste}
     vergeben |= {last.name for lf in decke.lastfaelle for last in lf.lasten}
     i = 0
@@ -322,14 +326,14 @@ def _auf(k: Kante, s: float) -> Punkt:
     return (a[0] + u * (b[0] - a[0]), a[1] + u * (b[1] - a[1]))
 
 
-def _winkel(u: Union[Unterzug, Linienlager]) -> float:
+def _winkel(u: Union[Traeger, Linienlager]) -> float:
     return math.atan2(u.b[1] - u.a[1], u.b[0] - u.a[0])
 
 
-def _laengs_zu(u: Union[Unterzug, Linienlager], winkel: float) -> bool:
+def _laengs_zu(u: Union[Traeger, Linienlager], winkel: float) -> bool:
     """Ob ``u`` in ``winkel`` läuft, bis auf :data:`WINKEL`."""
     return abs(math.sin(_winkel(u) - winkel)) < WINKEL
 
 
-def _lang(u: Unterzug) -> bool:
+def _lang(u: Traeger) -> bool:
     return math.dist(u.a, u.b) > geo.TOLERANZ

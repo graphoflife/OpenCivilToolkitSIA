@@ -2,14 +2,14 @@
 opencivil/decke/feld.py -- die Schnittkräfte der Platte an einer Stelle.
 
 VERANTWORTUNG:
-Aus den Trägern eines Falls, was an einer Stelle der Platte wirkt: die
+Aus den Durchlaufträgern eines Falls, was an einer Stelle der Platte wirkt: die
 Momente ``m_x``, ``m_y``, ``m_xy`` je Meter, die Querkräfte ``v_x``,
 ``v_y`` je Meter und daraus die erforderlichen Biegewiderstände. Dazu die
 Lastverteilelemente über Stützen und unter Einzellasten.
 
 WO BILDER UND BERICHT HINSEHEN:
 An den Proben eines Falls (:func:`proben`): dem Schwerpunkt jeder Zelle der
-Bilder (:func:`zellen_von`) und den Stellen, an denen ein Träger springt
+Bilder (:func:`zellen_von`) und den Stellen, an denen ein Durchlaufträger springt
 oder seine grössten Werte hat (:func:`stellen`). Dort sucht :func:`extrem`
 den grössten und den kleinsten Wert -- für das Bild und den Bericht
 derselbe. Wie sich die Werte über eine Zelle ändern, sagt
@@ -30,7 +30,7 @@ Folie 14, rückwärts gelesen, mit ``m_n = m`` und ``m_t = m_nt = 0``::
 Ein Streifen in x trägt also nur ``m_x``, einer in y nur ``m_y``; ein
 schiefer Streifen trägt mit ``m_η`` auch ein Drillmoment ``m_xy``. An einer
 Stelle zählen alle Streifen, die über sie gehen -- je Richtung ein
-Feldstreifen und jeder Unterzug, in dessen Fläche sie liegt.
+Feldstreifen und jeder Träger, in dessen Fläche sie liegt.
 
 BIEGEWIDERSTÄNDE:
 Nach der linearisierten Normalmomenten-Fliessbedingung, ``k = k' = 1``
@@ -68,7 +68,7 @@ from opencivil.decke.geometrie import Punkt
 from opencivil.decke.modell import Punktlast
 from opencivil.decke.rechnung import Ergebnis, Fallergebnis
 from opencivil.decke.streifen import Streifen
-from opencivil.decke.traeger import wert
+from opencivil.decke.durchlauftraeger import wert
 from opencivil.stabwerk.verlauf import vorderste_extreme
 
 #: Der positive Widerstand je Last eins im Lastverteilelement: ``1/(2π) − 1/8``, auf der Folie 0.034.
@@ -78,7 +78,7 @@ POSITIV_JE_LAST = 1.0 / (2.0 * math.pi) - 1.0 / 8.0
 GROESSEN = {"m_x": "mx", "m_y": "my", "m_xy": "mxy", "v_x": "vx", "v_y": "vy", "v_0": "v0"}
 
 #: So weit innerhalb eines Stücks liegt die Stelle an seinem Ende, in m: weiter als
-#: :data:`~opencivil.decke.traeger.GLEICH`, so dass links und rechts eines Sprungs beide zählen.
+#: :data:`~opencivil.decke.durchlauftraeger.GLEICH`, so dass links und rechts eines Sprungs beide zählen.
 INNEN = 1e-6
 
 #: So viele Zellen hat ein Bild über die längere Seite der Decke mindestens --
@@ -89,7 +89,7 @@ ZELLEN = 24
 
 #: So weit rückt eine Ecke einer Zelle zu ihrem Schwerpunkt, bevor dort gerechnet wird, in m:
 #: weiter als :data:`~opencivil.decke.geometrie.TOLERANZ`, so dass sie in der Zelle liegt und
-#: nicht auf dem Rand des Streifens oder Unterzugs daneben.
+#: nicht auf dem Rand des Streifens oder Trägers daneben.
 ECKE_INNEN = 1e-4
 
 #: Eine Stelle der Platte mit ihren Schnittkräften.
@@ -139,7 +139,7 @@ def in_xy(m: float, v: float, n: Punkt) -> Schnittkraefte:
 def an_stelle(ergebnis: Ergebnis, fall: Fallergebnis, p: Punkt) -> Schnittkraefte:
     """
     Die Schnittkräfte an der Stelle ``p``: je Richtung der Feldstreifen, in
-    dem sie liegt, und jeder Unterzug, in dessen Fläche sie liegt. An der
+    dem sie liegt, und jeder Träger, in dessen Fläche sie liegt. An der
     Grenze zweier Feldstreifen zählt der mit dem grösseren ``τ``.
     """
     heraus = Schnittkraefte()
@@ -152,7 +152,7 @@ def an_stelle(ergebnis: Ergebnis, fall: Fallergebnis, p: Punkt) -> Schnittkraeft
             streifen = max(feld, key=lambda s: s.bis)
         if streifen is not None:
             heraus = heraus + _beitrag(fall, streifen, p)
-    for u in zerlegung.unterzuege:
+    for u in zerlegung.traeger:
         if geo.innen(p, u.gebiet):
             heraus = heraus + _beitrag(fall, u, p)
     return heraus
@@ -160,9 +160,9 @@ def an_stelle(ergebnis: Ergebnis, fall: Fallergebnis, p: Punkt) -> Schnittkraeft
 
 def _beitrag(fall: Fallergebnis, streifen, p: Punkt) -> Schnittkraefte:
     s = geo.skalar(p, streifen.richtung.n)
-    for t in streifen.traeger:
+    for t in streifen.durchlauftraeger:
         if t.s0 - geo.TOLERANZ <= s <= t.s1 + geo.TOLERANZ:
-            ergebnis = fall.traeger.get(t.name)
+            ergebnis = fall.durchlauftraeger.get(t.name)
             if ergebnis is None:
                 return Schnittkraefte()
             lokal = min(max(s - t.s0, 0.0), t.L)
@@ -218,7 +218,7 @@ def _baender(streifen: Sequence[Streifen], weite: float) -> List[Tuple[float, fl
 
 def stellen(ergebnis: Ergebnis, fall: Fallergebnis) -> List[Punkt]:
     """
-    Wo ein Träger des Falls springt oder ein Extremum hat, auf der Mittellinie
+    Wo ein Durchlaufträger des Falls springt oder ein Extremum hat, auf der Mittellinie
     seines Streifens: an den Enden jedes Stücks -- knapp innerhalb
     (:data:`INNEN`) -- und wo die Querkraft oder die Last null wird. Wo nur
     ein Streifen trägt, liegen dort die grössten und kleinsten m und v genau;
@@ -226,9 +226,9 @@ def stellen(ergebnis: Ergebnis, fall: Fallergebnis) -> List[Punkt]:
     """
     heraus: List[Punkt] = []
     for streifen in ergebnis.zerlegung.streifen:
-        for t in streifen.traeger:
-            traeger = fall.traeger.get(t.name)
-            for stueck in traeger.stuecke if traeger is not None else ():
+        for t in streifen.durchlauftraeger:
+            durchlauftraeger = fall.durchlauftraeger.get(t.name)
+            for stueck in durchlauftraeger.stuecke if durchlauftraeger is not None else ():
                 orte = [stueck.x0 + INNEN, stueck.x1 - INNEN] if stueck.x1 - stueck.x0 > 2.0 * INNEN else []
                 orte += stueck.V.nullstellen(stueck.x0, stueck.x1) + stueck.p_y.nullstellen(stueck.x0, stueck.x1)
                 heraus.extend(streifen.richtung.punkt(t.s0 + s, streifen.mitte) for s in orte)
@@ -257,7 +257,7 @@ def gefaelle(ergebnis: Ergebnis, fall: Fallergebnis, zelle: Sequence[Punkt],
     knapp innen, :data:`ECKE_INNEN` -- nach den kleinsten Quadraten am
     besten trifft. Nur für das Bild.
 
-    In einer Zelle trägt je Richtung ein Streifen, und ein Unterzug deckt
+    In einer Zelle trägt je Richtung ein Streifen, und ein Träger deckt
     sie ganz oder gar nicht (:func:`zellen_von`): ihre Werte folgen dort je
     einem Polynom längs des Streifens. Auf einem Rechteck hat die Ebene
     dann das Gefälle der Sehne, bei einer Parabel gleich der Ableitung im

@@ -2,7 +2,7 @@
  * dk_grundriss.js -- der Grundriss einer Decke, gezeichnet.
  *
  * Was eine Decke im Bild zeigt, im Zeichenfenster wie auf ihrer Karte im
- * Reiter «Diagramme»: die Platten, die Zonen, die Unterzüge, die
+ * Reiter «Diagramme»: die Platten, die Zonen, die Träger, die
  * Linienlager mit ihrem Zeichen, die Stützen und die Schnitte -- wie im
  * Plan strichpunktiert, an den Enden ein Strich quer und ihr Name -- und
  * darunter, was der
@@ -31,7 +31,7 @@
  * nach dem Anteil; eine Zone in ihrem eigenen.
  *
  * Gerechnet wird hier nichts, was in die Rechnung geht: die Flächen der
- * Aufteilung, die Grenzen der Streifen, die Bänder der Unterzüge und die
+ * Aufteilung, die Grenzen der Streifen, die Bänder der Träger und die
  * Stützenbereiche kommen vom Kern. Hier stehen nur Lagen fürs Auge -- wo
  * eine Beschriftung steht, wie gross eine Stütze im Bild ist.
  */
@@ -105,7 +105,7 @@ function schwerpunkt(punkte) {
 }
 
 /**
- * Wo der Name eines Unterzugs oder Bands steht, im Bild: bei einem Viertel
+ * Wo der Name eines Trägers oder Bands steht, im Bild: bei einem Viertel
  * seiner Achse ``[a, b]`` -- in der Mitte stünde er oft auf dem der Platte
  * oder dem eines kreuzenden Bands, am Ende auf dem einer Stütze.
  */
@@ -170,7 +170,7 @@ function unterlage(v, daten, was) {
   if (was === 'aufteilung') {
     for (const f of daten.anteile) {
       g.append(mitTitel(svgEl('path', { d: pfad(v, f.ecken), class: 'dk-anteil', style: anteilFarbe(f.anteil) }),
-        [f.anteil == null ? 'Hier trägt keine Richtung – es fehlt ein Lager oder ein Unterzug.'
+        [f.anteil == null ? 'Hier trägt keine Richtung – es fehlt ein Lager oder ein Träger.'
           : `Richtung 1 / 2: ${anteilText(f.anteil)}`]));
     }
   } else if (was === 'streifen') {
@@ -250,7 +250,7 @@ function lasten(v, decke, lastfall, { orte, klasse, texte, namen }) {
 
 /**
  * Der ganze Grundriss: die Flächen der Platten, darüber die Unterlage des
- * Kerns, die Zonen, die Umrisse, die Unterzüge, die Linienlager, die
+ * Kerns, die Zonen, die Umrisse, die Träger, die Linienlager, die
  * Stützen, die Lasten des Lastfalls `lastfall` (Kennung -- ohne ihn keine)
  * und die Namen. `fehler(kennung)` und `texte(kennung)` sagen, was der Kern
  * an einem Teil meldet -- rot, und als Titel beim Darüberfahren.
@@ -294,14 +294,14 @@ export function grundriss(v, decke, daten, {
   }
 
   const traeger = svgEl('g');
-  const baender = new Map((daten?.gerechnet ? daten.unterzuege : []).map((u) => [u.name, u.ecken]));
-  for (const u of decke.unterzuege || []) {
+  const baender = new Map((daten?.gerechnet ? daten.traeger : []).map((u) => [u.name, u.ecken]));
+  for (const u of decke.traeger || []) {
     const punkte = orte([u.von, u.bis]);
     if (!punkte) continue;
     const band = baender.get(u.kennung);
-    if (band) traeger.append(svgEl('path', { d: pfad(v, band), class: 'dk-unterzug-band' }));
-    traeger.append(mitTitel(svgEl('path', { d: pfad(v, punkte, false), class: klasse('dk-unterzug', u.kennung) }),
-      [`Unterzug ${u.kennung}: b = ${zahlText(u.breite, 2)} m, Stufe ${u.stufe}`, ...texte(u.kennung)]));
+    if (band) traeger.append(svgEl('path', { d: pfad(v, band), class: 'dk-traeger-band' }));
+    traeger.append(mitTitel(svgEl('path', { d: pfad(v, punkte, false), class: klasse('dk-traeger', u.kennung) }),
+      [`Träger ${u.kennung}: b = ${zahlText(u.breite, 2)} m, Stufe ${u.stufe}`, ...texte(u.kennung)]));
     namen.append(text(viertel(v, punkte), u.kennung, 'dk-name ist-klein'));
   }
   // Die Bänder, die die Rechnung selbst legte: fein gestrichelt, ohne Eintrag im Projekt.
