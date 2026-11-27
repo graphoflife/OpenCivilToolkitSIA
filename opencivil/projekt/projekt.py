@@ -52,9 +52,10 @@ from opencivil.projekt.querschnittsanalyse import QuerschnittsanalyseEintrag
 from opencivil.projekt.setzung import SetzungEintrag
 from opencivil.projekt.durchstanzen import DurchstanzEintrag
 from opencivil.projekt.decke import DeckeEintrag
+from opencivil.projekt.fachwerkmodell import FachwerkmodellEintrag
 from opencivil.projekt.aufbau import (
-    ANALYSE, BALKENSYSTEM, BALKENSYSTEM3D, BAUTEILE, DECKE, DURCHSTANZEN, ERDBEBEN, GRUNDBRUCH,
-    PFAHL, PLATTE, SETZUNG, Aufbau, aufbauen,
+    ANALYSE, BALKENSYSTEM, BALKENSYSTEM3D, BAUTEILE, DECKE, DURCHSTANZEN, ERDBEBEN, FACHWERKMODELL,
+    GRUNDBRUCH, PFAHL, PLATTE, SETZUNG, Aufbau, aufbauen,
 )
 
 
@@ -136,6 +137,9 @@ class Projekt(Beschreibung):
 
     durchstanzstellen: List[DurchstanzEintrag] = field(default_factory=list)
     """Stützen und Wände, an denen das Durchstanzen nachgewiesen wird."""
+
+    fachwerkmodelle: List[FachwerkmodellEintrag] = field(default_factory=list)
+    """Scheiben mit Lagern und Lasten, für die ein Fachwerk gesucht wird -- eben, ohne Bemessung."""
 
     grundbrueche: List[GrundbruchEintrag] = field(default_factory=list)
     """Flachfundamente mit Grundbruch und Gleiten."""
@@ -489,6 +493,16 @@ class Projekt(Beschreibung):
         eintrag = lesen(DeckeEintrag, felder, f"Decke '{name}'",
                         DeckeEintrag(kennung=self.freie_kennung(DECKE.vorsilbe), name=name))
         self.decken.append(eintrag)
+        return eintrag
+
+    def fachwerkmodell(self, name: str) -> FachwerkmodellEintrag:
+        """
+        Ein leeres Fachwerkmodell. Gezeichnet wird danach mit dem Baukasten
+        des Eintrags -- ``scheibe``, ``loch``, ``lager_setzen``, ``last`` --,
+        Koordinaten in m.
+        """
+        eintrag = FachwerkmodellEintrag(kennung=self.freie_kennung(FACHWERKMODELL.vorsilbe), name=name)
+        self.fachwerkmodelle.append(eintrag)
         return eintrag
 
     def durchstanzen(self, name: str, beton: str, stahl: str, **felder: Any) -> DurchstanzEintrag:

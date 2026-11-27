@@ -1,5 +1,5 @@
 ---
-erzeugt: 3fb3b7f6b560
+erzeugt: dc25702bc167
 art: modul
 tags: [modul]
 ---
@@ -402,8 +402,11 @@ Wie u, v, w und θx, θy, θz eines Stabendes an den Unbekannten haengen.
 - [[opencivil.decke.rechnung]]
 - [[opencivil.decke.streifen]]
 - [[opencivil.decke.werk]]
+- [[opencivil.fachwerkmodell.pruefen]]
+- [[opencivil.fachwerkmodell.werk]]
 - [[opencivil.projekt.aufbau.balkensystem]]
 - [[opencivil.projekt.aufbau.decke]]
+- [[opencivil.projekt.aufbau.fachwerkmodell]]
 - [[opencivil.projekt.aufbau.faelle]]
 - [[opencivil.stabwerk.herleitung]]
 - [[opencivil.stabwerk.rechnung]]

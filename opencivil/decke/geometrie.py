@@ -3,10 +3,12 @@ opencivil/decke/geometrie.py -- Vielecke in der Ebene der Decke.
 
 VERANTWORTUNG:
 Was die Streifenmethode an Geometrie braucht, und nur das: Fläche,
-Schwerpunkt und Umlaufsinn eines Vielecks, ob ein Punkt darin liegt, die
-Zerlegung in Dreiecke, das Abschneiden an einer Halbebene und an einem
-konvexen Vieleck, und die Breite eines konvexen Vielecks quer zu einer
-Richtung -- das Stück einer Last, das ein Streifen trägt.
+Schwerpunkt und Umlaufsinn eines Vielecks, ob ein Punkt darin oder auf
+seinem Rand liegt, die Zerlegung in Dreiecke, das Abschneiden an einer
+Halbebene und an einem konvexen Vieleck, und die Breite eines konvexen
+Vielecks quer zu einer Richtung -- das Stück einer Last, das ein Streifen
+trägt. Das Fachwerkmodell (:mod:`opencivil.fachwerkmodell`) nimmt
+dieselben Vielecke: seine Scheiben liegen in einer Ebene wie die Decke, in m.
 
 PUNKTE UND VIELECKE:
 Ein Punkt ist ein Paar ``(x, y)`` in m, ``x`` nach rechts, ``y`` nach oben.
@@ -113,10 +115,8 @@ def ist_konvex(v: Vieleck) -> bool:
 def innen(p: Punkt, v: Vieleck) -> bool:
     """Ob ``p`` im Vieleck liegt -- auf dem Rand zählt als innen."""
     x, y = p
-    for i, a in enumerate(v):
-        b = v[(i + 1) % len(v)]
-        if _auf_strecke(p, a, b):
-            return True
+    if auf_rand(p, v):
+        return True
     drin = False
     for i, a in enumerate(v):
         b = v[(i + 1) % len(v)]
@@ -125,6 +125,11 @@ def innen(p: Punkt, v: Vieleck) -> bool:
             if xs > x:
                 drin = not drin
     return drin
+
+
+def auf_rand(p: Punkt, v: Vieleck) -> bool:
+    """Ob ``p`` auf dem Rand des Vielecks liegt."""
+    return any(_auf_strecke(p, a, v[(i + 1) % len(v)]) for i, a in enumerate(v))
 
 
 def _auf_strecke(p: Punkt, a: Punkt, b: Punkt) -> bool:

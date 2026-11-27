@@ -35,7 +35,7 @@ from opencivil import bewehrungssuche
 from opencivil.bericht.latex_dokument import als_tex
 from opencivil.bericht.markdown import als_markdown
 from opencivil.core.rechenwerk import Loesung, RechenwerkFehler
-from opencivil.projekt import DeckeEintrag, Mappe, Projekt, ProjektFehler
+from opencivil.projekt import DeckeEintrag, FachwerkmodellEintrag, Mappe, Projekt, ProjektFehler
 from opencivil.projekt.blechdecken import BlechdeckeEintrag
 from opencivil.projekt.lesen import inhalt_pruefen
 from opencivil.projekt.mappe import projekt_aus_datei
@@ -44,7 +44,7 @@ from opencivil.querschnitt import profilblech, vorlagen
 from opencivil.querschnitt.widerstandsflaeche import GROESSEN
 from opencivil.stahlprofile import lage as profillage
 from opencivil.web import (
-    api, balkendaten, deckendaten, diagrammdaten, speicher, zeichengeometrie,
+    api, balkendaten, deckendaten, diagrammdaten, fachwerkdaten, speicher, zeichengeometrie,
 )
 from opencivil.web.umschlag import endlich, fehlerdaten, umschlag
 from opencivil.web.zeichendaten import ZEICHENDATEN
@@ -529,6 +529,23 @@ def decke_zeichnung(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     return {"uebersicht": endlich(deckendaten.zeichnung(aufbau, kennung, loesung))}
 
 
+def fachwerk_zeichnung(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
+    """
+    Was das Zeichenfenster eines Fachwerkmodells unter seine Teile legt --
+    seine Meldungen (:func:`fachwerkdaten.uebersicht`). Wie bei der Decke
+    eine eigene Anfrage, gebraucht nach jeder Aenderung; gerechnet wird das
+    eine Modell, aus dem Zwischenspeicher, wenn er es zu dieser
+    Beschreibung noch hat.
+    """
+    projekt = _projekt(rumpf)
+    kennung = str(rumpf.get("kennung") or "")
+    if not isinstance(projekt.bauteil(kennung), FachwerkmodellEintrag):
+        raise DienstFehler(400, f"'{kennung}' ist kein Fachwerkmodell.")
+    aufbau = projekt.aufbauen()
+    loesung = _bauteil_rechnen(projekt, aufbau, kennung)
+    return {"uebersicht": endlich(fachwerkdaten.zeichnung(aufbau, kennung, loesung))}
+
+
 def decke_ergebnis(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     """
     Die Bilder einer Decke in einem Fall: Momente und Querkraefte in Zellen,
@@ -737,6 +754,7 @@ ANFRAGEN: Dict[str, Callable[[Mapping[str, Any]], Dict[str, Any]]] = {
     "balkensystem_bearbeiten": balkensystem_bearbeiten,
     "decke_zeichnung": decke_zeichnung,
     "decke_ergebnis": decke_ergebnis,
+    "fachwerk_zeichnung": fachwerk_zeichnung,
     "vorlage": vorlage,
     "vorlage_einsetzen": vorlage_einsetzen,
 }

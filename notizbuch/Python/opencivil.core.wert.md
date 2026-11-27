@@ -1,5 +1,5 @@
 ---
-erzeugt: 72353434f903
+erzeugt: 36f9caa98582
 art: modul
 tags: [modul]
 ---
@@ -316,6 +316,7 @@ def beschreibung(self) -> str
 - [[opencivil.erdbeben.ersatzkraft]]
 - [[opencivil.erdbeben.kern]]
 - [[opencivil.ergebnis]]
+- [[opencivil.fachwerkmodell.werk]]
 - [[opencivil.geotechnik.fundament]]
 - [[opencivil.geotechnik.gleiten]]
 - [[opencivil.geotechnik.grundbruch]]

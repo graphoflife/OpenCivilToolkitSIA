@@ -1,5 +1,5 @@
 ---
-erzeugt: 643066d7bcbe
+erzeugt: fe6695967596
 art: modul
 tags: [modul]
 ---
@@ -23,8 +23,8 @@ ohne Bewehrung.
 
 ## DIE BAUTEILARTEN
 
-Platte, Querschnittsanalyse, 2D- und 3D-Balkensystem, Decke, Durchstanzen, Grundbruch,
-Setzung, Pfahl und Erdbeben haben je einen Steckbrief
+Platte, Querschnittsanalyse, 2D- und 3D-Balkensystem, Decke, Durchstanzen,
+Fachwerkmodell, Grundbruch, Setzung, Pfahl und Erdbeben haben je einen Steckbrief
 ([[opencivil.projekt.aufbau#Bauteilart|Bauteilart]]) in [[opencivil.projekt.aufbau#Konstanten|BAUTEILE]] – Liste in der Datei, Klasse der
 Eintraege, Vorsilbe der Kennungen, Namensraum, Baufunktion. Wer alle
 Bauteile durchgeht, geht diese Liste durch. Gebaut wird je Eintrag ein
@@ -49,6 +49,7 @@ durchgeht. Je Art ein Modul mit ihrer Baufunktion `bauen`
 [[opencivil.projekt.aufbau.balkensystem3d|balkensystem3d]],
 [[opencivil.projekt.aufbau.decke|decke]],
 [[opencivil.projekt.aufbau.durchstanzen|durchstanzen]],
+[[opencivil.projekt.aufbau.fachwerkmodell|fachwerkmodell]],
 [[opencivil.projekt.aufbau.grundbruch|grundbruch]],
 [[opencivil.projekt.aufbau.setzung|setzung]],
 [[opencivil.projekt.aufbau.pfahl|pfahl]],
@@ -64,6 +65,7 @@ in einer Datei von ueber tausend Zeilen.
 - [[opencivil.projekt.aufbau.decke]] – eine Decke wird Rechnung.
 - [[opencivil.projekt.aufbau.durchstanzen]] – eine Durchstanzstelle wird Rechnung.
 - [[opencivil.projekt.aufbau.erdbeben]] – ein Gebaeude im Erdbeben wird Rechnung.
+- [[opencivil.projekt.aufbau.fachwerkmodell]] – ein Fachwerkmodell wird Rechnung.
 - [[opencivil.projekt.aufbau.faelle]] – was Balkensystem und Decke an Faellen gleich pruefen.
 - [[opencivil.projekt.aufbau.grundbruch]] – ein Fundament wird Rechnung.
 - [[opencivil.projekt.aufbau.kern]] – was alle Bauteilarten beim Bauen teilen.
@@ -147,9 +149,10 @@ Oberflaeche, siehe Dateikopf.
 - `GRUNDBRUCH = Bauteilart('grundbruch', 'grundbrueche', GrundbruchEintrag, 'g', 'gru…`
 - `SETZUNG = Bauteilart('setzung', 'setzungen', SetzungEintrag, 'w', 'setzung', 'S…` – Die Kennungen w1, w2 ...: «s» tragen schon die Betonstaehle.
 - `DURCHSTANZEN = Bauteilart('durchstanzen', 'durchstanzstellen', DurchstanzEintrag, 'd…`
+- `FACHWERKMODELL = Bauteilart('fachwerkmodell', 'fachwerkmodelle', FachwerkmodellEintrag…` – Die Kennungen f1, f2 ...: die Fluessigkeiten tragen «fl», das verwechselt sich nicht.
 - `PFAHL = Bauteilart('pfahl', 'pfaehle', PfahlEintrag, 't', 'pfahl', 'Pfähle', …` – Die Kennungen t1, t2 ...: «p» tragen schon die Skripte.
 - `ERDBEBEN = Bauteilart('erdbeben', 'erdbeben', ErdbebenEintrag, 'h', 'erdbeben', …` – Die Kennungen h1, h2 ...: «e» tragen schon die Decken – h wie Haus.
-- `BAUTEILE = (PLATTE, ANALYSE, BALKENSYSTEM, BALKENSYSTEM3D, DECKE, DURCHSTANZEN, …` – Die Bauteilarten, in der Reihenfolge von Baum, Bericht und Rechnung – ein Balkensystem liest Werte der Platten und Analysen, also kommt es nach ihnen, das Erdbeben ebenso; Decke, Durchstanzen, Grundbruch, Setzung und Pfahl lesen nichts von den anderen. Wer alle Bauteile durchgeht (Lesen, Kennungen, Aufbau, Zwischenspeicher, Erkennen einer Datei), geht diese Liste durch.
+- `BAUTEILE = (PLATTE, ANALYSE, BALKENSYSTEM, BALKENSYSTEM3D, DECKE, DURCHSTANZEN, …` – Die Bauteilarten, in der Reihenfolge von Baum, Bericht und Rechnung – ein Balkensystem liest Werte der Platten und Analysen, also kommt es nach ihnen, das Erdbeben ebenso; Decke, Durchstanzen, Fachwerkmodell, Grundbruch, Setzung und Pfahl lesen nichts von den anderen. Wer alle Bauteile durchgeht (Lesen, Kennungen, Aufbau, Zwischenspeicher, Erkennen einer Datei), geht diese Liste durch.
 
 ## Braucht
 
@@ -159,6 +162,7 @@ Oberflaeche, siehe Dateikopf.
 - [[opencivil.projekt.aufbau.decke]]
 - [[opencivil.projekt.aufbau.durchstanzen]]
 - [[opencivil.projekt.aufbau.erdbeben]]
+- [[opencivil.projekt.aufbau.fachwerkmodell]]
 - [[opencivil.projekt.aufbau.grundbruch]]
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.aufbau.pfahl]]
@@ -170,6 +174,7 @@ Oberflaeche, siehe Dateikopf.
 - [[opencivil.projekt.decke]]
 - [[opencivil.projekt.durchstanzen]]
 - [[opencivil.projekt.erdbeben]]
+- [[opencivil.projekt.fachwerkmodell]]
 - [[opencivil.projekt.grundbruch]]
 - [[opencivil.projekt.lesen]]
 - [[opencivil.projekt.pfahl]]
@@ -188,6 +193,7 @@ Oberflaeche, siehe Dateikopf.
 - [[opencivil.projekt.aufbau.decke]]
 - [[opencivil.projekt.aufbau.durchstanzen]]
 - [[opencivil.projekt.aufbau.erdbeben]]
+- [[opencivil.projekt.aufbau.fachwerkmodell]]
 - [[opencivil.projekt.aufbau.grundbruch]]
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.aufbau.pfahl]]

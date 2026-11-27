@@ -1,7 +1,7 @@
 /**
  * apps.js -- die Apps der linken Tafel, je eine Zeile.
  *
- * Eine App hat links einen Knopf: die Materialien, die neun Bauteilarten
+ * Eine App hat links einen Knopf: die Materialien, die zehn Bauteilarten
  * (ARTEN, arten.js) und Python. Was Baum, Editor und rechte Tafel von ihr
  * wissen müssen, steht in ihrer Zeile: ihre Liste im Projekt und die Gruppen
  * unter dem Knopf, wie ein Eintrag heisst und was rechts in ihm steht, wie er
@@ -30,6 +30,7 @@ import {
   deckeEditor, deckeFenster, deckenKarten, deckenZusammenfassung,
 } from './decke.js';
 import { durchstanzEditor, durchstanzFenster, stellenmass } from './durchstanzen.js';
+import { fachwerkEditor, fachwerkKarten, fachwerkZusammenfassung } from './fachwerkmodell.js';
 import { grundbruchEditor, grundbruchFenster } from './grundbruch.js';
 import { setzungEditor, setzungFenster } from './setzung.js';
 import { pfahlEditor, pfahlFenster } from './pfahl.js';
@@ -350,6 +351,18 @@ const DURCHSTANZEN = bauteil('durchstanzen', {
   fenster: durchstanzFenster,
 });
 
+/**
+ * Leer, aus dem Kern -- gezeichnet wird danach. Ohne Material: ohne
+ * Bemessung hängt ein Fachwerk nur von Form, Lagern und Lasten ab.
+ */
+const FACHWERKMODELL = bauteil('fachwerkmodell', {
+  kurztext: (f) => [[f.scheiben.length, 'Scheibe', 'Scheiben'], [f.lager.length, 'Lager', 'Lager'],
+    [f.lasten.length, 'Last', 'Lasten']].map(([n, eins, mehr]) => `${n} ${n === 1 ? eins : mehr}`).join(', '),
+  editor: fachwerkEditor,
+  karten: fachwerkKarten,
+  uebersicht: fachwerkZusammenfassung,
+});
+
 /** Ein Fundament mit den Vorgaben des Kerns und einer Kombination -- ohne Material. */
 const GRUNDBRUCH = bauteil('grundbruch', {
   kurztext: (g) => `${g.b}×${g.L} m`,
@@ -427,8 +440,8 @@ const SKRIPT = {
 
 /** Die Apps, in der Folge ihrer Knöpfe: das Material, die Bauteilarten wie ARTEN, Python. */
 export const APPS = [
-  MATERIAL, PLATTE, ANALYSE, SYSTEM, SYSTEM3D, DECKE, DURCHSTANZEN, GRUNDBRUCH, SETZUNG, PFAHL,
-  ERDBEBEN, SKRIPT,
+  MATERIAL, PLATTE, ANALYSE, SYSTEM, SYSTEM3D, DECKE, DURCHSTANZEN, FACHWERKMODELL, GRUNDBRUCH, SETZUNG,
+  PFAHL, ERDBEBEN, SKRIPT,
 ];
 
 /** Die App, wie die Auswahl sie nennt: 'material', 'skript' oder eine Bauteilart. */

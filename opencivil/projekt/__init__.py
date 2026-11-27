@@ -24,6 +24,9 @@ Aufgabe ein Modul::
     durchstanzen.py
                    eine Stütze oder Wand in einer Platte: Platte,
                    Biegebewehrung, gestützte Fläche, Einwirkung, Aussparungen
+    fachwerkmodell.py
+                   eine Scheibe aus Umrissen und Löchern, mit Lagern und
+                   Punktlasten, für ihr Fachwerkmodell
     grundbruch.py  ein Flachfundament: Boden, Masse, Gelaende, Grundwasser
                    und Einwirkungen fuer Grundbruch und Gleiten
     setzung.py     ein Flachfundament auf geschichtetem Baugrund: Pressungen
@@ -96,6 +99,10 @@ from opencivil.projekt.decke import (
     FlaechenlastEintrag, LinienlagerEintrag, LinienlastEintrag, PlattenlastEintrag, PunktlastEintrag,
     StuetzeEintrag, TraegerEintrag, ZoneEintrag,
 )
+from opencivil.projekt.fachwerkmodell import (
+    FachwerkmodellEintrag, LochEintrag, ScheibeEintrag, ScheibenknotenEintrag, ScheibenlagerEintrag,
+    ScheibenlastEintrag,
+)
 from opencivil.projekt.aufbau import BAUTEILE, Aufbau, Bauteil, Bauteilart, aufbauen
 from opencivil.projekt.projekt import Projekt
 from opencivil.projekt.mappe import Mappe
@@ -125,5 +132,7 @@ __all__ = [
     "DeckenschnittEintrag", "FlaechenlastEintrag",
     "LinienlagerEintrag", "LinienlastEintrag", "PlattenlastEintrag", "PunktlastEintrag",
     "StuetzeEintrag", "TraegerEintrag", "ZoneEintrag",
+    "FachwerkmodellEintrag", "LochEintrag", "ScheibeEintrag", "ScheibenknotenEintrag",
+    "ScheibenlagerEintrag", "ScheibenlastEintrag",
     "aufbauen",
 ]

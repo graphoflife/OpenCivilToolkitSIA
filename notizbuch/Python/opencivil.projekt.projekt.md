@@ -1,5 +1,5 @@
 ---
-erzeugt: 181668a8a54c
+erzeugt: f04b099ea5de
 art: modul
 tags: [modul]
 ---
@@ -61,6 +61,7 @@ Die vollstaendige, speicherbare Beschreibung eines Projekts.
 - `balkensysteme3d: List[Balkensystem3dEintrag] = field(default_factory=list)` – Rahmen im Raum: wie die ebenen, mit x, y und z und Torsion.
 - `decken: List[DeckeEintrag] = field(default_factory=list)` – Stahlbetondecken nach der Streifenmethode: Platten, Lager, Stützen, Träger.
 - `durchstanzstellen: List[DurchstanzEintrag] = field(default_factory=list)` – Stützen und Wände, an denen das Durchstanzen nachgewiesen wird.
+- `fachwerkmodelle: List[FachwerkmodellEintrag] = field(default_factory=list)` – Scheiben mit Lagern und Lasten, für die ein Fachwerk gesucht wird – eben, ohne Bemessung.
 - `grundbrueche: List[GrundbruchEintrag] = field(default_factory=list)` – Flachfundamente mit Grundbruch und Gleiten.
 - `setzungen: List[SetzungEintrag] = field(default_factory=list)` – Flachfundamente auf geschichtetem Baugrund, mit ihrer Setzung.
 - `pfaehle: List[PfahlEintrag] = field(default_factory=list)` – Einzelpfähle: Bohr- und Mikropfähle mit äusserem und innerem Widerstand.
@@ -353,6 +354,16 @@ def decke(self, name: str, **felder: Any) -> DeckeEintrag
 Eine leere Decke. Gezeichnet wird danach mit dem Baukasten des
 Eintrags – `platte`, `lager` (ein Linienlager), `stuetze`,
 `traeger`, `zone` –, Koordinaten in m.
+
+#### Projekt.fachwerkmodell
+
+```python
+def fachwerkmodell(self, name: str) -> FachwerkmodellEintrag
+```
+
+Ein leeres Fachwerkmodell. Gezeichnet wird danach mit dem Baukasten
+des Eintrags – `scheibe`, `loch`, `lager_setzen`, `last` –,
+Koordinaten in m.
 
 #### Projekt.durchstanzen
 
@@ -668,6 +679,7 @@ Jeder Nachweis einmal laut – gebaut in [[opencivil.projekt.beispiele|.beispiel
 - [[opencivil.projekt.durchstanzen]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.erdbeben]]
+- [[opencivil.projekt.fachwerkmodell]]
 - [[opencivil.projekt.frueher]]
 - [[opencivil.projekt.grundbruch]]
 - [[opencivil.projekt.lesen]]

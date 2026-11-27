@@ -1,5 +1,5 @@
 ---
-erzeugt: e2b8c46b55f7
+erzeugt: 13897f2e1d84
 art: modul
 tags: [modul]
 ---
@@ -280,6 +280,7 @@ Je Querschnitt eines Systems, wo A und I stehen – und je Paar aus Querschnitt 
 - [[opencivil.web.deckendaten]]
 - [[opencivil.web.diagrammdaten]]
 - [[opencivil.web.durchstanzdaten]]
+- [[opencivil.web.fachwerkdaten]]
 - [[opencivil.web.systemkatalog]]
 - [[opencivil.web.umschlag]]
 - [[opencivil.web.werkstoffkurven]]

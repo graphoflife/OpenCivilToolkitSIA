@@ -32,9 +32,8 @@
 import { api } from './api.js';
 import { wahlSchalter } from './bausteine.js';
 import {
-  cadApp, cadBereichMitListe, frischeAntwort, listeZeichnen, meldungenJe, umrissVon,
+  cadApp, cadBereichMitListe, frischeAntwort, listeZeichnen, meldungenJe, teilname, umrissVon,
 } from './cad_app.js';
-import { knotenname } from './cad_modell.js';
 import {
   LASTLISTEN, deckenmeldungen, eigenschaften, neuEigenschaften, punktlastSetzen, stuetzeSetzen, vorgabeBeton,
 } from './dk_eigenschaften.js';
@@ -211,7 +210,7 @@ function adapter(kennung) {
       dk.leiste = el('span.dk-unterlagewahl');
       return el('span.dk-leistenzusatz', {}, [dk.lastfallHuelle, dk.leiste]);
     },
-    name: elementname,
+    name: teilname,
     neuText,
     punktAnlegen,
     linieAnlegen,
@@ -227,13 +226,6 @@ function adapter(kennung) {
     eigenschaften,
     neuEigenschaften,
   };
-}
-
-/** Wie ein Teil heisst: nach seiner Kennung, mit der Art davor -- «Platte P2». */
-function elementname(a, kennung) {
-  if (!kennung) return '';
-  const art = a.adapter.arten.find((x) => new RegExp(`^${x.vorsilbe}\\d+$`).test(kennung));
-  return knotenname(kennung) ?? (art ? `${art.heisst} ${kennung}` : kennung);
 }
 
 /** Was das Werkzeug als Nächstes anlegt, in Worten -- für die Frage in der Seitenleiste. */

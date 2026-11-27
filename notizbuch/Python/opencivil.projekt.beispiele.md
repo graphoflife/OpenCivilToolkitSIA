@@ -1,5 +1,5 @@
 ---
-erzeugt: 3390ff9b5d6c
+erzeugt: 012cbf733f63
 art: modul
 tags: [modul]
 ---
@@ -80,6 +80,15 @@ dritte ist die erste nach der FEM, T4 als Unterzug 300 mm unter der
 Platte, mit einem Schnitt quer durch die Felder: sie zeigt jedes Bild
 der Platte einmal, auch die Durchbiegung, das längs des Schnitts und M
 und V von T4.
+
+### _fachwerkmodell
+
+```python
+def _fachwerkmodell(p: Projekt) -> None
+```
+
+Eine Wandscheibe 6 × 3 m mit einer Türe, links fest, rechts auf einem
+Rollenlager, oben zwei Lasten – eine schräg.
 
 ### _durchstanzstellen
 

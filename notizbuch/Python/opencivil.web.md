@@ -1,5 +1,5 @@
 ---
-erzeugt: 33b35d0226df
+erzeugt: e38e3bfe6cc7
 art: modul
 tags: [modul]
 ---
@@ -23,6 +23,7 @@ Browser laedt, samt dem Notizbuch.
 - [[opencivil.web.dienst]] – Der Rechendienst, unabhaengig vom Transportweg.
 - [[opencivil.web.durchstanzdaten]] – was die Oberflaeche von einer Durchstanzstelle zeichnet.
 - [[opencivil.web.erdbebendaten]] – was die Oberflaeche von einem Gebaeude im Erdbeben zeichnet.
+- [[opencivil.web.fachwerkdaten]] – was die Oberflaeche von einem Fachwerkmodell zeichnet.
 - [[opencivil.web.grundbruchdaten]] – was die Oberflaeche von einem Grundbruch zeichnet.
 - [[opencivil.web.pfahldaten]] – was die Oberflaeche von einem Pfahl zeichnet.
 - [[opencivil.web.server]] – Schlanker HTTP-Server fuer die Oberflaeche.

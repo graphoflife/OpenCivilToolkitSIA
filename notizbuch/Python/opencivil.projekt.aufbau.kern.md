@@ -1,5 +1,5 @@
 ---
-erzeugt: 61daf92f8387
+erzeugt: 24266fd9e21a
 art: modul
 tags: [modul]
 ---
@@ -152,6 +152,15 @@ def decken(self) -> Dict[str, Deckensystem]
 ```
 
 Die Decken, nach Kennung – Bauteile ohne Nachweise, mit ihrem Ergebnis.
+
+#### Aufbau.fachwerkmodelle
+
+```python
+@property
+def fachwerkmodelle(self) -> Dict[str, Fachwerksystem]
+```
+
+Die Fachwerkmodelle, nach Kennung – Bauteile ohne Nachweise, mit ihrem Befund.
 
 #### Aufbau.grundbrueche
 
@@ -659,6 +668,7 @@ Feldes; `mehr` fuer die Analyse.
 - [[opencivil.core.rechenwerk]]
 - [[opencivil.core.wert]]
 - [[opencivil.decke.werk]]
+- [[opencivil.fachwerkmodell.werk]]
 - [[opencivil.geotechnik.fundament]]
 - [[opencivil.geotechnik.setzung]]
 - [[opencivil.material.arten]]
@@ -685,6 +695,7 @@ Feldes; `mehr` fuer die Analyse.
 - [[opencivil.projekt.aufbau.decke]]
 - [[opencivil.projekt.aufbau.durchstanzen]]
 - [[opencivil.projekt.aufbau.erdbeben]]
+- [[opencivil.projekt.aufbau.fachwerkmodell]]
 - [[opencivil.projekt.aufbau.grundbruch]]
 - [[opencivil.projekt.aufbau.pfahl]]
 - [[opencivil.projekt.aufbau.platte]]

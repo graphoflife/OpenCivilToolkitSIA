@@ -221,6 +221,8 @@ export const api = {
   deckeZeichnung: (projekt, kennung) => ruf('decke_zeichnung', { projekt, kennung }),
   /** Die Bilder einer Decke in einem Fall: Momente und Querkräfte in Zellen, die grössten Werte, die Lager. */
   deckeErgebnis: (projekt, kennung, fall) => ruf('decke_ergebnis', { projekt, kennung, fall }),
+  /** Was das Zeichenfenster eines Fachwerkmodells unter seine Teile legt: die Meldungen, ob es bereit ist. */
+  fachwerkZeichnung: (projekt, kennung) => ruf('fachwerk_zeichnung', { projekt, kennung }),
 };
 
 export { KernFehler };

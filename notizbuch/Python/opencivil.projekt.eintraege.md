@@ -1,5 +1,5 @@
 ---
-erzeugt: 7ddd42feb7b3
+erzeugt: 65edd75a33b3
 art: modul
 tags: [modul]
 ---
@@ -658,6 +658,7 @@ Eine zu pruefende Schnittgroessenkombination.
 - [[opencivil.projekt.decke]]
 - [[opencivil.projekt.durchstanzen]]
 - [[opencivil.projekt.erdbeben]]
+- [[opencivil.projekt.fachwerkmodell]]
 - [[opencivil.projekt.faelle]]
 - [[opencivil.projekt.grundbruch]]
 - [[opencivil.projekt.pfahl]]

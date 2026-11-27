@@ -1,5 +1,5 @@
 ---
-erzeugt: 661402872763
+erzeugt: 3af5b9d3bdae
 art: modul
 tags: [modul]
 ---
@@ -521,6 +521,7 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - [[opencivil.projekt.durchstanzen]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.erdbeben]]
+- [[opencivil.projekt.fachwerkmodell]]
 - [[opencivil.projekt.grundbruch]]
 - [[opencivil.projekt.lesen]]
 - [[opencivil.projekt.pfahl]]

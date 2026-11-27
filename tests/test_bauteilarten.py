@@ -113,6 +113,7 @@ class TestSinnbilder(unittest.TestCase):
             "blechfeld": k["querschnittsanalyse"]["blechfelder"],
             "blechlast": k["querschnittsanalyse"]["blechlasten"],
             "verfahren": k["decke"]["verfahren"],
+            "halt": k["fachwerkmodell"]["halt"],
             # Grund und Zulage, je in den unteren und den oberen Lagen (platte.js).
             "zulage": [{"wert": f"{seite}-{gunst}"} for seite in ("unten", "oben")
                        for gunst in ("unguenstig", "guenstig")],

@@ -40,7 +40,7 @@ import { imSpiel } from './cad_auswahl.js';
 import {
   cadBereich, cadFenster, cadVergessen, cadWaehlen,
 } from './cad_fenster.js';
-import { abstand, auswahlTeil } from './cad_modell.js';
+import { abstand, auswahlTeil, knotenname } from './cad_modell.js';
 import { cadZeile } from './cad_palette.js';
 import { el, svgEl, zahlfeld } from './dom.js';
 import {
@@ -445,6 +445,17 @@ export function laengenzeile(a, z, e) {
   return el('p.cad-info', {
     text: `L = ${zahlText(abstand(p, q), a.einstellung.stellen)} ${a.einstellung.einheit} · ${e.von} → ${e.bis}`,
   });
+}
+
+/**
+ * Wie ein Teil heisst: nach seiner Kennung, mit dem Namen seiner Art davor
+ * -- «Platte P2», «Knoten K3». Die Art erkennt es an ihrer Vorsilbe
+ * (`arten` des Adapters).
+ */
+export function teilname(a, kennung) {
+  if (!kennung) return '';
+  const art = a.adapter.arten.find((x) => new RegExp(`^${x.vorsilbe}\\d+$`).test(kennung));
+  return knotenname(kennung) ?? (art ? `${art.heisst} ${kennung}` : kennung);
 }
 
 /** Ein Teil der Zeichnung mit den Meldungen des Kerns als Titel -- zu lesen beim Darüberfahren. */

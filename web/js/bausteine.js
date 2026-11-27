@@ -304,6 +304,13 @@ export function unfertigHinweis(unfertig) {
     : null;
 }
 
+/** Die Meldungen des Kerns (`{text, fehler}`) als Hinweise auf einer Karte: rot, was falsch ist, sonst grau. */
+export function meldungshinweise(meldungen) {
+  return (meldungen || []).map((m) => el('p', {
+    class: m.fehler ? 'hinweis hinweis-warnung' : 'hinweis', text: m.text,
+  }));
+}
+
 /**
  * Eine Zeile Beschriftung – Eingabe – Einheit.
  *

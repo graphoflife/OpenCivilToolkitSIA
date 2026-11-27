@@ -6507,6 +6507,7 @@
         "bereinigt",
         "ist_konvex",
         "innen",
+        "auf_rand",
         "dreiecke",
         "halbebene",
         "schnitt",
@@ -7214,6 +7215,73 @@
         "Ergebnis.bericht",
         "Ergebnis.markdown",
         "Ergebnis.latex"
+      ]
+    },
+    {
+      "name": "opencivil.fachwerkmodell",
+      "pfad": "Python/opencivil.fachwerkmodell.md",
+      "art": "modul",
+      "kurz": "Fachwerkmodelle einer Scheibe, eben.",
+      "stichworte": []
+    },
+    {
+      "name": "opencivil.fachwerkmodell.herleitung",
+      "pfad": "Python/opencivil.fachwerkmodell.herleitung.md",
+      "art": "modul",
+      "kurz": "wie ein Fachwerkmodell seine Rechnung aufschreibt.",
+      "stichworte": [
+        "schreiben"
+      ]
+    },
+    {
+      "name": "opencivil.fachwerkmodell.modell",
+      "pfad": "Python/opencivil.fachwerkmodell.modell.md",
+      "art": "modul",
+      "kurz": "die Scheibe eines Fachwerkmodells, in SI.",
+      "stichworte": [
+        "Halt",
+        "Halt.x",
+        "Halt.y",
+        "Halt.beschriftung",
+        "Halt.erklaerung",
+        "Umriss",
+        "Lager",
+        "Last",
+        "Modell",
+        "Modell.in_scheibe",
+        "Modell.loch_bei",
+        "Modell.im_material"
+      ]
+    },
+    {
+      "name": "opencivil.fachwerkmodell.pruefen",
+      "pfad": "Python/opencivil.fachwerkmodell.pruefen.md",
+      "art": "modul",
+      "kurz": "was einem Fachwerkmodell fehlt oder an ihm nicht stimmt.",
+      "stichworte": [
+        "pruefen",
+        "_umriss",
+        "_ohne_material",
+        "_ueberlappen",
+        "beweglich",
+        "_gleichungen",
+        "_rang"
+      ]
+    },
+    {
+      "name": "opencivil.fachwerkmodell.werk",
+      "pfad": "Python/opencivil.fachwerkmodell.werk.md",
+      "art": "modul",
+      "kurz": "das Fachwerkmodell im Rechenwerk.",
+      "stichworte": [
+        "Fachwerkbefund",
+        "Fachwerkbefund.haelt_an",
+        "FachwerkProzedur",
+        "FachwerkProzedur.rechne",
+        "Fachwerksystem",
+        "Fachwerksystem.abschnitt",
+        "Fachwerksystem.ziele",
+        "Fachwerksystem.rechnen_und_schreiben"
       ]
     },
     {
@@ -9184,6 +9252,16 @@
       ]
     },
     {
+      "name": "opencivil.projekt.aufbau.fachwerkmodell",
+      "pfad": "Python/opencivil.projekt.aufbau.fachwerkmodell.md",
+      "art": "modul",
+      "kurz": "ein Fachwerkmodell wird Rechnung.",
+      "stichworte": [
+        "modell_von",
+        "bauen"
+      ]
+    },
+    {
       "name": "opencivil.projekt.aufbau.faelle",
       "pfad": "Python/opencivil.projekt.aufbau.faelle.md",
       "art": "modul",
@@ -9221,6 +9299,7 @@
         "Aufbau.balkensysteme",
         "Aufbau.balkensysteme3d",
         "Aufbau.decken",
+        "Aufbau.fachwerkmodelle",
         "Aufbau.grundbrueche",
         "Aufbau.setzungen",
         "Aufbau.pfaehle",
@@ -9381,6 +9460,7 @@
         "beispiel",
         "jeder_nachweis",
         "_decken",
+        "_fachwerkmodell",
         "_durchstanzstellen",
         "_grundbrueche",
         "_setzungen",
@@ -9536,6 +9616,26 @@
         "ErdbebenEintrag.neu",
         "ErdbebenEintrag.bezuege",
         "ErdbebenEintrag.geschoss"
+      ]
+    },
+    {
+      "name": "opencivil.projekt.fachwerkmodell",
+      "pfad": "Python/opencivil.projekt.fachwerkmodell.md",
+      "art": "modul",
+      "kurz": "ein Fachwerkmodell, wie die Oberfläche es beschreibt.",
+      "stichworte": [
+        "ScheibenknotenEintrag",
+        "ScheibeEintrag",
+        "LochEintrag",
+        "ScheibenlagerEintrag",
+        "ScheibenlastEintrag",
+        "FachwerkmodellEintrag",
+        "FachwerkmodellEintrag.lagen",
+        "FachwerkmodellEintrag.netz",
+        "FachwerkmodellEintrag.scheibe",
+        "FachwerkmodellEintrag.loch",
+        "FachwerkmodellEintrag.lager_setzen",
+        "FachwerkmodellEintrag.last"
       ]
     },
     {
@@ -9791,6 +9891,7 @@
         "Projekt.balkensystem",
         "Projekt.balkensystem3d",
         "Projekt.decke",
+        "Projekt.fachwerkmodell",
         "Projekt.durchstanzen",
         "Projekt.grundbruch",
         "Projekt.setzung",
@@ -11983,6 +12084,7 @@
         "_balkensystem",
         "balkensystem_verlauf",
         "decke_zeichnung",
+        "fachwerk_zeichnung",
         "decke_ergebnis",
         "balkensystem_bearbeiten",
         "_vorlagenwahl",
@@ -12023,6 +12125,17 @@
         "_verlaufslegende",
         "_richtung",
         "_legende"
+      ]
+    },
+    {
+      "name": "opencivil.web.fachwerkdaten",
+      "pfad": "Python/opencivil.web.fachwerkdaten.md",
+      "art": "modul",
+      "kurz": "was die Oberflaeche von einem Fachwerkmodell zeichnet.",
+      "stichworte": [
+        "zeichnung",
+        "uebersicht",
+        "katalog"
       ]
     },
     {

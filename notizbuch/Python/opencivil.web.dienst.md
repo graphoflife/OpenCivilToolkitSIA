@@ -1,5 +1,5 @@
 ---
-erzeugt: 4f618013e09d
+erzeugt: 0065326194bc
 art: modul
 tags: [modul]
 ---
@@ -329,6 +329,18 @@ des Balkensystems: gebraucht nach jeder Aenderung, ohne auf die Rechnung
 des ganzen Projekts zu warten. Gerechnet wird die eine Decke, aus dem
 Zwischenspeicher, wenn er sie zu dieser Beschreibung noch hat.
 
+### fachwerk_zeichnung
+
+```python
+def fachwerk_zeichnung(rumpf: Mapping[str, Any]) -> Dict[str, Any]
+```
+
+Was das Zeichenfenster eines Fachwerkmodells unter seine Teile legt –
+seine Meldungen ([[opencivil.web.fachwerkdaten#uebersicht|fachwerkdaten.uebersicht]]). Wie bei der Decke
+eine eigene Anfrage, gebraucht nach jeder Aenderung; gerechnet wird das
+eine Modell, aus dem Zwischenspeicher, wenn er es zu dieser
+Beschreibung noch hat.
+
 ### decke_ergebnis
 
 ```python
@@ -477,6 +489,7 @@ entspricht dem, was der Server ueber HTTP melden wuerde.
 - [[opencivil.web.balkendaten]]
 - [[opencivil.web.deckendaten]]
 - [[opencivil.web.diagrammdaten]]
+- [[opencivil.web.fachwerkdaten]]
 - [[opencivil.web.speicher]]
 - [[opencivil.web.umschlag]]
 - [[opencivil.web.zeichendaten]]

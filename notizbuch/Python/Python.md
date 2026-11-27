@@ -1,5 +1,5 @@
 ---
-erzeugt: a6e0bd27f860
+erzeugt: 55ef1198f389
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -75,6 +75,11 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.erdbeben.kern]] – der Kern eines Geschosses: seine Teile, je um ihren Schwerpunkt.
     - [[opencivil.erdbeben.kragarm]] – der Kern als Kragarm: Querkraft, Moment und Auslenkung.
   - [[opencivil.ergebnis]] – ein gerechnetes Projekt, wie man es ohne Oberflaeche braucht.
+- [[opencivil.fachwerkmodell]] – Fachwerkmodelle einer Scheibe, eben.
+    - [[opencivil.fachwerkmodell.herleitung]] – wie ein Fachwerkmodell seine Rechnung aufschreibt.
+    - [[opencivil.fachwerkmodell.modell]] – die Scheibe eines Fachwerkmodells, in SI.
+    - [[opencivil.fachwerkmodell.pruefen]] – was einem Fachwerkmodell fehlt oder an ihm nicht stimmt.
+    - [[opencivil.fachwerkmodell.werk]] – das Fachwerkmodell im Rechenwerk.
 - [[opencivil.geotechnik]] – Nachweise im Baugrund.
     - [[opencivil.geotechnik.fundament]] – ein Flachfundament auf seinem Baugrund.
     - [[opencivil.geotechnik.gleiten]] – das Gleiten eines Flachfundaments in seiner Sohle.
@@ -179,6 +184,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
       - [[opencivil.projekt.aufbau.decke]] – eine Decke wird Rechnung.
       - [[opencivil.projekt.aufbau.durchstanzen]] – eine Durchstanzstelle wird Rechnung.
       - [[opencivil.projekt.aufbau.erdbeben]] – ein Gebaeude im Erdbeben wird Rechnung.
+      - [[opencivil.projekt.aufbau.fachwerkmodell]] – ein Fachwerkmodell wird Rechnung.
       - [[opencivil.projekt.aufbau.faelle]] – was Balkensystem und Decke an Faellen gleich pruefen.
       - [[opencivil.projekt.aufbau.grundbruch]] – ein Fundament wird Rechnung.
       - [[opencivil.projekt.aufbau.kern]] – was alle Bauteilarten beim Bauen teilen.
@@ -195,6 +201,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.projekt.durchstanzen]] – ein Durchstanznachweis, wie die Oberflaeche ihn beschreibt.
     - [[opencivil.projekt.eintraege]] – die Teile einer Projektbeschreibung.
     - [[opencivil.projekt.erdbeben]] – ein Gebaeude im Erdbeben, wie die Oberflaeche es beschreibt.
+    - [[opencivil.projekt.fachwerkmodell]] – ein Fachwerkmodell, wie die Oberfläche es beschreibt.
     - [[opencivil.projekt.faelle]] – Lastfaelle und Kombinationen eines Bauteils.
     - [[opencivil.projekt.fallnamen]] – Die Namen der Faelle eines Bauteils – je Liste verschieden, auch als Kennung.
     - [[opencivil.projekt.frueher]] – was eine Projektdatei von frueher anders schreibt.
@@ -291,6 +298,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.web.dienst]] – Der Rechendienst, unabhaengig vom Transportweg.
     - [[opencivil.web.durchstanzdaten]] – was die Oberflaeche von einer Durchstanzstelle zeichnet.
     - [[opencivil.web.erdbebendaten]] – was die Oberflaeche von einem Gebaeude im Erdbeben zeichnet.
+    - [[opencivil.web.fachwerkdaten]] – was die Oberflaeche von einem Fachwerkmodell zeichnet.
     - [[opencivil.web.grundbruchdaten]] – was die Oberflaeche von einem Grundbruch zeichnet.
     - [[opencivil.web.pfahldaten]] – was die Oberflaeche von einem Pfahl zeichnet.
     - [[opencivil.web.server]] – Schlanker HTTP-Server fuer die Oberflaeche.

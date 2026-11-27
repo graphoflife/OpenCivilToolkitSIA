@@ -1,5 +1,5 @@
 ---
-erzeugt: 34aa62df42f9
+erzeugt: c1a6f682abb1
 art: modul
 tags: [modul]
 ---
@@ -34,6 +34,9 @@ balkensystem.py
 durchstanzen.py
                eine Stütze oder Wand in einer Platte: Platte,
                Biegebewehrung, gestützte Fläche, Einwirkung, Aussparungen
+fachwerkmodell.py
+               eine Scheibe aus Umrissen und Löchern, mit Lagern und
+               Punktlasten, für ihr Fachwerkmodell
 grundbruch.py  ein Flachfundament: Boden, Masse, Gelaende, Grundwasser
                und Einwirkungen fuer Grundbruch und Gleiten
 setzung.py     ein Flachfundament auf geschichtetem Baugrund: Pressungen
@@ -87,6 +90,7 @@ geschieht erst beim Aufbau, ueber die [[opencivil.core.einheiten#Groesse|Groesse
 - [[opencivil.projekt.durchstanzen]] – ein Durchstanznachweis, wie die Oberflaeche ihn beschreibt.
 - [[opencivil.projekt.eintraege]] – die Teile einer Projektbeschreibung.
 - [[opencivil.projekt.erdbeben]] – ein Gebaeude im Erdbeben, wie die Oberflaeche es beschreibt.
+- [[opencivil.projekt.fachwerkmodell]] – ein Fachwerkmodell, wie die Oberfläche es beschreibt.
 - [[opencivil.projekt.faelle]] – Lastfaelle und Kombinationen eines Bauteils.
 - [[opencivil.projekt.fallnamen]] – Die Namen der Faelle eines Bauteils – je Liste verschieden, auch als Kennung.
 - [[opencivil.projekt.frueher]] – was eine Projektdatei von frueher anders schreibt.
@@ -115,6 +119,7 @@ geschieht erst beim Aufbau, ueber die [[opencivil.core.einheiten#Groesse|Groesse
 - [[opencivil.projekt.durchstanzen]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.erdbeben]]
+- [[opencivil.projekt.fachwerkmodell]]
 - [[opencivil.projekt.faelle]]
 - [[opencivil.projekt.grundbruch]]
 - [[opencivil.projekt.lesen]]
@@ -147,6 +152,7 @@ geschieht erst beim Aufbau, ueber die [[opencivil.core.einheiten#Groesse|Groesse
 - [[opencivil.web.dienst]]
 - [[opencivil.web.durchstanzdaten]]
 - [[opencivil.web.erdbebendaten]]
+- [[opencivil.web.fachwerkdaten]]
 - [[opencivil.web.grundbruchdaten]]
 - [[opencivil.web.pfahldaten]]
 - [[opencivil.web.setzungsdaten]]

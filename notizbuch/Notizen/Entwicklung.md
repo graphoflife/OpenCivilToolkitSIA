@@ -7,6 +7,43 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-27 · Fachwerkmodell: Scheibe, Lager und Lasten zeichnen
+
+Schritt 11a des Plans vom 2026-11-27: eine neue App «Fachwerkmodelle»,
+eben. Gezeichnet wird im Zeichenfenster wie bei der Decke, in Metern:
+Scheiben als Umrisse, Löcher, Lager und Punktlasten, alles an Knoten.
+Gesucht wird noch kein Fachwerk; das kommt mit den Verfahren in 11b bis
+11d. Beispiel «Wandscheibe mit Türe»: 6 × 3 m, eine Türe 1 × 2.2 m,
+links fest, rechts verschieblich in x, oben 300 kN und 50 → / 200 ↓ kN.
+
+- Ohne Material und ohne Dicke, ein Satz Lasten je Modell (Entscheid 11
+  des Plans): ohne Bemessung hängen Fachwerk und Kräfte nur von Form,
+  Lagern und Lasten ab.
+- Material ist, wo eine Scheibe ist und kein Loch – der Rand eines Lochs
+  zählt noch dazu (`Modell.im_material`, neu `geometrie.auf_rand`). So
+  darf eine Last auf dem Sturz einer Türe stehen.
+- Ob die Lager die Scheibe halten, prüft der Kern als starrer Körper:
+  jede Richtung, in der ein Lager hält, ist eine Gleichung in
+  Verschiebung und Drehung; drei unabhängige halten sie. Sonst nennt die
+  graue Meldung die Bewegung, die bleibt – «sie kann sich in x
+  verschieben», «… um das Lager A2 drehen», «… um den Punkt (0.00, 3.00)
+  drehen». Warum vor jedem Verfahren: über einem beweglichen Modell gibt
+  es kein Gleichgewicht, und die Optimierung in 11b fände nur eine
+  singuläre Matrix statt eines Grundes.
+- Was nur fehlt, steht grau (keine Scheibe, kein Lager, «Keine Last → kein
+  Fachwerk.»), was falsch ist, rot (eine Last neben der Scheibe oder im
+  Loch, ein Umriss ohne Fläche); ein Loch neben jeder Scheibe ist bloss ein
+  Hinweis. Solange nichts anhält, sagt ein Hinweis «Noch ohne Verfahren» –
+  im Kern als Meldung, so stehen Bericht und Seite gleich.
+- Lager und Last hängen am Knoten wie die Stütze der Decke: gewählt wird
+  der Knoten, seine Seitenleiste hat je einen Schalter «Lager» und
+  «Last». Das Lager hat drei Stellungen mit Bild, fest in x und y, nur in
+  x (gedreht gezeichnet, links vom Punkt) und nur in y.
+- Wie ein Teil heisst («Lager A1»), steht jetzt einmal in `cad_app.js`
+  (`teilname`), für Decke und Fachwerkmodell; die Meldungen als Hinweise
+  auf einer Karte in `bausteine.js` (`meldungshinweise`) – vier ältere
+  Kopien davon stehen noch in Balkensystem und Decke (TODO).
+
 ## 2026-11-27 · Decke: FEM als zweites Verfahren
 
 Schritt 10b des Plans vom 2026-11-27. Die erste Kachel einer Decke heisst

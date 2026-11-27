@@ -2,7 +2,7 @@
 Voll
 ====================================================================================================
 
-994 Berechnungen ausgeführt, 1615 Werte bestimmt.
+995 Berechnungen ausgeführt, 1615 Werte bestimmt.
 
 ====================================================================================================
 Herleitung
@@ -21119,6 +21119,37 @@ Träger, über ihre ganze Breite
 
 u misst längs des Trägers ab seinem Anfang. V ist die Querkraft mit dem grössten Betrag, positiv, wo
 das Moment längs u wächst.
+
+Fachwerkmodell: Wandscheibe mit Türe
+------------------------------------
+[*] Annahme: Ein Fachwerkmodell der Scheibe: Druckstreben und Zugglieder tragen die Lasten im
+Gleichgewicht zu den Lagern. Ohne Material und ohne Dicke – Fachwerk und Kräfte hängen nur von Form,
+Lagern und Lasten ab; bemessen wird hier nichts.
+
+Scheiben
+    Scheibe  Ecken  A\ [\mathrm{m}^{2}]
+    -------  -----  -------------------
+         S1      4                18.00
+
+Löcher
+    Loch  Ecken  A\ [\mathrm{m}^{2}]
+    ----  -----  -------------------
+      L1      4                 2.20
+
+Lager
+    Lager       Ort [m]     hält
+    -----  ------------  -------
+       A1  (0.00, 0.00)  x und y
+       A2  (6.00, 0.00)    nur y
+
+Lasten
+     Last       Ort [m]  F_h\ [\mathrm{kN}] \rightarrow  F_v\ [\mathrm{kN}] \downarrow
+    -----  ------------  ------------------------------  -----------------------------
+       F1  (2.00, 3.00)                             0.0                          300.0
+       F2  (5.00, 3.00)                            50.0                          200.0
+    Summe                                          50.0                          500.0
+[i] Hinweis: Noch ohne Verfahren: geprüft sind Scheibe, Lager und Lasten, ein Fachwerk sucht das
+Werkzeug noch nicht.
 
 ====================================================================================================
 Verwendete Formeln

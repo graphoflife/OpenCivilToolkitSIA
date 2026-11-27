@@ -88,7 +88,8 @@ from opencivil.pfahl.pfahl import (
 )
 from opencivil.projekt.pfahl import PfahlEintrag, PfahlschichtEintrag
 from opencivil.web import (
-    balkendaten, deckendaten, diagrammdaten, durchstanzdaten, systemkatalog, werkstoffkurven,
+    balkendaten, deckendaten, diagrammdaten, durchstanzdaten, fachwerkdaten, systemkatalog,
+    werkstoffkurven,
 )
 from opencivil.web.anzeige import zelle_dict
 from opencivil.web.umschlag import endlich
@@ -315,6 +316,8 @@ def katalog() -> dict:
                                   "traeger": wert in BALKENGROESSEN,
                                   "verfahren": deckendaten.verfahren_von(wert)} for wert in DECKENGROESSEN],
         },
+        # Was nur ein Fachwerkmodell braucht (:func:`fachwerkdaten.katalog`).
+        "fachwerkmodell": fachwerkdaten.katalog(),
         # Wie ein Fundament der Setzung folgt -- und wo darum gerechnet wird.
         "setzung": {
             "steifigkeiten": [{"wert": s.value, "beschriftung": s.beschriftung}

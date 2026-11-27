@@ -141,6 +141,12 @@ const ZEICHEN = {
     pfade: ['M2.5 7h19v5h-19z', 'M10 12h4v9h-4z'],
     strich: ['M6 7l4 5 M18 7l-4 5'],
   },
+  // Eine Wandscheibe, gestrichelt, darin ihr Fachwerk: zwei Streben, oben
+  // der Druckgurt, unten das Zugband -- auf zwei Lagern.
+  fachwerkmodell: {
+    strich: ['M3 3.5h18v13H3z'],
+    pfade: ['M5 16.5L9 7h6l4 9.5z', 'M5 16.5l-2 3.5h4z M19 16.5l-2 3.5h4z'],
+  },
   // Ein Fundament im Boden, darauf die Last, darunter gestrichelt der
   // Gleitkörper bis ins Gelände daneben.
   grundbruch: {
@@ -452,6 +458,17 @@ const ZEICHEN = {
   'cad-stuetze': {
     pfade: ['M7 7h10v10H7z', 'M7 7l10 10 M17 7L7 17'],
   },
+  // Eine Scheibe: ein Umriss aus vier Ecken.
+  'cad-scheibe': {
+    pfade: ['M3.5 20V4h17v16z'],
+    voll: [[3.5, 20, 1.5], [3.5, 4, 1.5], [20.5, 4, 1.5], [20.5, 20, 1.5]],
+  },
+  // Ein Loch in einer Scheibe: gestrichelt, mit seinen Ecken.
+  'cad-loch': {
+    pfade: ['M3.5 20V4h17v16z'],
+    strich: ['M8.5 8.5h7v7h-7z'],
+    voll: [[8.5, 8.5, 1.3], [15.5, 8.5, 1.3], [15.5, 15.5, 1.3], [8.5, 15.5, 1.3]],
+  },
   // Eine Zone: ein Umriss, darin die Last zu Teilen in die zwei Richtungen.
   'cad-zone': {
     pfade: ['M4 4.5h16v15H4z', 'M8 12h8 M14 10l2 2-2 2', 'M12 8v8 M10 14l2 2 2-2'],
@@ -564,6 +581,23 @@ const ZEICHEN = {
   'kopf-eingespannt': {
     pfade: ['M3 3h18v6H3z', 'M10 9v12.5h4V9'],
     strich: ['M10 9V5 M14 9V5'],
+  },
+  // Wie ein Lager eine Scheibe hält, im Punkt oben: fest in x und y ein
+  // Dreieck auf schraffiertem Grund, nur in y auf Rollen, nur in x dasselbe
+  // gedreht, links vom Punkt -- wie im Bild (fw_bild.js).
+  'halt-xy': {
+    pfade: ['M12 5l-5 9h10z', 'M4.5 14h15', 'M7 14l-2.5 4 M11 14l-2.5 4 M15 14l-2.5 4 M19 14l-2.5 4'],
+    voll: [[12, 5, 1.6]],
+  },
+  'halt-y': {
+    pfade: ['M12 4l-5 9h10z', 'M4.5 17.3h15', 'M7 17.3l-2.5 3.5 M11 17.3l-2.5 3.5 M15 17.3l-2.5 3.5 M19 17.3l-2.5 3.5'],
+    kreise: [[9.5, 15.1, 2], [14.5, 15.1, 2]],
+    voll: [[12, 4, 1.6]],
+  },
+  'halt-x': {
+    pfade: ['M20 12l-9-5v10z', 'M6.7 4.5v15', 'M6.7 7l-3.5-2.5 M6.7 11l-3.5-2.5 M6.7 15l-3.5-2.5 M6.7 19l-3.5-2.5'],
+    kreise: [[8.9, 9.5, 2], [8.9, 14.5, 2]],
+    voll: [[20, 12, 1.6]],
   },
   // Das Tragglied im Schnitt: das Rohr ein Ring, der Vollstab eine Scheibe.
   'tragglied-rohr': {

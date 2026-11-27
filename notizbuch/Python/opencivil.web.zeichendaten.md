@@ -1,5 +1,5 @@
 ---
-erzeugt: 3991a4f922da
+erzeugt: 4c57268bf912
 art: modul
 tags: [modul]
 ---
@@ -52,6 +52,7 @@ Je Bauteil, nach Kennung, seine Zeichendaten – nur fuer die Arten, die welche 
 - [[opencivil.web.deckendaten]]
 - [[opencivil.web.durchstanzdaten]]
 - [[opencivil.web.erdbebendaten]]
+- [[opencivil.web.fachwerkdaten]]
 - [[opencivil.web.grundbruchdaten]]
 - [[opencivil.web.pfahldaten]]
 - [[opencivil.web.setzungsdaten]]

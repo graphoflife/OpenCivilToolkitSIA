@@ -1,5 +1,5 @@
 ---
-erzeugt: 0cd943070a36
+erzeugt: f640801aa24c
 art: modul
 tags: [modul]
 ---
@@ -56,6 +56,7 @@ alldem die Formelsammlung und diese Seiten.
 - [[opencivil.durchstanzen]] – der Durchstanznachweis nach SIA 262:2025, 4.3.6.
 - [[opencivil.erdbeben]] – Erdbeben nach SIA 261:2020, Kapitel 16.
 - [[opencivil.ergebnis]] – ein gerechnetes Projekt, wie man es ohne Oberflaeche braucht.
+- [[opencivil.fachwerkmodell]] – Fachwerkmodelle einer Scheibe, eben.
 - [[opencivil.geotechnik]] – Nachweise im Baugrund.
 - [[opencivil.holzbau]] – ein gezeichneter Querschnitt aus Holz nach SIA 265:2012.
 - [[opencivil.konsole]] – Python im Browser, für die App «Python».

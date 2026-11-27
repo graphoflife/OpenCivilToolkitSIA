@@ -92,6 +92,18 @@ export const ARTEN = [
     nachweise: true,
   },
   {
+    art: 'fachwerkmodell',
+    liste: 'fachwerkmodelle',
+    vorsilbe: 'f',
+    zeichen: 'fachwerkmodell',
+    knopf: 'Fach\u00ADwerk\u00ADmodelle',
+    titel: 'Fachwerkmodelle',
+    bezeichnung: 'Fachwerkmodell einer Scheibe',
+    einzahl: 'Fachwerkmodell',
+    leer: 'kein Fachwerkmodell',
+    nachweise: false,
+  },
+  {
     art: 'grundbruch',
     liste: 'grundbrueche',
     vorsilbe: 'g',

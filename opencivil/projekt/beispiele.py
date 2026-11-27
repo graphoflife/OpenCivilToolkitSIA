@@ -300,12 +300,14 @@ def jeder_nachweis() -> Projekt:
 
     # Zwei Balkensysteme: eines, das alles einmal braucht, und eines, das
     # sich nicht rechnen lässt -- dazu ein Rahmen im Raum. Dazu jede Lage
-    # beim Durchstanzen und jede Spielart von Grundbruch, Setzung und Pfahl.
+    # beim Durchstanzen, eine Wandscheibe als Fachwerkmodell und jede
+    # Spielart von Grundbruch, Setzung und Pfahl.
     _alles_einmal(p, decke, p.querschnittsanalysen[0])
     _beweglich(p)
     _raumrahmen(p, decke, p.querschnittsanalysen[0])
     _decken(p)
     _durchstanzstellen(p)
+    _fachwerkmodell(p)
     _grundbrueche(p)
     _setzungen(p)
     _pfaehle(p)
@@ -392,6 +394,20 @@ def _decken(p: Projekt) -> None:
     fem.diagramm(q_d, "m_x", schnitt)
     for groesse in BALKENGROESSEN:
         fem.diagramm(q_d, groesse, "T4")
+
+
+def _fachwerkmodell(p: Projekt) -> None:
+    """
+    Eine Wandscheibe 6 × 3 m mit einer Türe, links fest, rechts auf einem
+    Rollenlager, oben zwei Lasten -- eine schräg.
+    """
+    f = p.fachwerkmodell("Wandscheibe mit Türe")
+    f.scheibe([(0, 0), (6, 0), (6, 3), (0, 3)])
+    f.loch([(3.5, 0), (4.5, 0), (4.5, 2.2), (3.5, 2.2)])
+    f.lager_setzen((0, 0))
+    f.lager_setzen((6, 0), "y")
+    f.last((2, 3), F_v=300)
+    f.last((5, 3), F_h=50, F_v=200)
 
 
 def _durchstanzstellen(p: Projekt) -> None:

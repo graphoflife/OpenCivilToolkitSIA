@@ -320,6 +320,7 @@ ANGABEN: Dict[str, Optional[Callable[[Any, Loesung], Angaben]]] = {
     "balkensystem3d": None,
     "decke": None,
     "durchstanzen": _durchstanzangaben,
+    "fachwerkmodell": None,
     "grundbruch": _grundbruchangaben,
     "setzung": _setzungsangaben,
     "pfahl": _pfahlangaben,

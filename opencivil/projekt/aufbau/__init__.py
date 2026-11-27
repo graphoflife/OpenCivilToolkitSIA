@@ -14,8 +14,8 @@ auffallen koennen -- ein Verweis auf ein geloeschtes Material, eine Platte
 ohne Bewehrung.
 
 DIE BAUTEILARTEN:
-Platte, Querschnittsanalyse, 2D- und 3D-Balkensystem, Decke, Durchstanzen, Grundbruch,
-Setzung, Pfahl und Erdbeben haben je einen Steckbrief
+Platte, Querschnittsanalyse, 2D- und 3D-Balkensystem, Decke, Durchstanzen,
+Fachwerkmodell, Grundbruch, Setzung, Pfahl und Erdbeben haben je einen Steckbrief
 (:class:`Bauteilart`) in :data:`BAUTEILE` -- Liste in der Datei, Klasse der
 Eintraege, Vorsilbe der Kennungen, Namensraum, Baufunktion. Wer alle
 Bauteile durchgeht, geht diese Liste durch. Gebaut wird je Eintrag ein
@@ -38,6 +38,7 @@ durchgeht. Je Art ein Modul mit ihrer Baufunktion ``bauen``
 :mod:`~opencivil.projekt.aufbau.balkensystem3d`,
 :mod:`~opencivil.projekt.aufbau.decke`,
 :mod:`~opencivil.projekt.aufbau.durchstanzen`,
+:mod:`~opencivil.projekt.aufbau.fachwerkmodell`,
 :mod:`~opencivil.projekt.aufbau.grundbruch`,
 :mod:`~opencivil.projekt.aufbau.setzung`,
 :mod:`~opencivil.projekt.aufbau.pfahl`,
@@ -58,6 +59,7 @@ from opencivil.projekt.balkensystem3d import Balkensystem3dEintrag
 from opencivil.projekt.decke import DeckeEintrag
 from opencivil.projekt.durchstanzen import DurchstanzEintrag
 from opencivil.projekt.erdbeben import ErdbebenEintrag
+from opencivil.projekt.fachwerkmodell import FachwerkmodellEintrag
 from opencivil.projekt.grundbruch import GrundbruchEintrag
 from opencivil.projekt.pfahl import PfahlEintrag
 from opencivil.projekt.platte import QuerschnittEintrag
@@ -65,8 +67,8 @@ from opencivil.projekt.querschnittsanalyse import QuerschnittsanalyseEintrag
 from opencivil.projekt.setzung import SetzungEintrag
 
 from opencivil.projekt.aufbau import (
-    balkensystem, balkensystem3d, decke, durchstanzen, erdbeben, grundbruch, pfahl, platte,
-    querschnittsanalyse, setzung,
+    balkensystem, balkensystem3d, decke, durchstanzen, erdbeben, fachwerkmodell, grundbruch, pfahl,
+    platte, querschnittsanalyse, setzung,
 )
 from opencivil.projekt.aufbau.kern import (
     Aufbau, Bauteil, baustoff_bauen, ueberschreibungen_setzen,
@@ -78,7 +80,7 @@ if TYPE_CHECKING:
 
 __all__ = [
     "ANALYSE", "Aufbau", "BALKENSYSTEM", "BALKENSYSTEM3D", "BAUTEILE", "Bauteil", "Bauteilart",
-    "DECKE", "DURCHSTANZEN", "ERDBEBEN",
+    "DECKE", "DURCHSTANZEN", "ERDBEBEN", "FACHWERKMODELL",
     "GRUNDBRUCH", "PFAHL", "PLATTE", "SETZUNG", "aufbauen",
 ]
 
@@ -235,6 +237,9 @@ SETZUNG = Bauteilart("setzung", "setzungen", SetzungEintrag, "w", "setzung", "Se
                      setzung.bauen)
 DURCHSTANZEN = Bauteilart("durchstanzen", "durchstanzstellen", DurchstanzEintrag, "d",
                           "durchstanzen", "Durchstanzen", durchstanzen.bauen)
+#: Die Kennungen f1, f2 ...: die Fluessigkeiten tragen «fl», das verwechselt sich nicht.
+FACHWERKMODELL = Bauteilart("fachwerkmodell", "fachwerkmodelle", FachwerkmodellEintrag, "f",
+                            "fachwerkmodell", "Fachwerkmodelle", fachwerkmodell.bauen)
 #: Die Kennungen t1, t2 ...: «p» tragen schon die Skripte.
 PFAHL = Bauteilart("pfahl", "pfaehle", PfahlEintrag, "t", "pfahl", "Pfähle", pfahl.bauen)
 #: Die Kennungen h1, h2 ...: «e» tragen schon die Decken -- h wie Haus.
@@ -243,9 +248,10 @@ ERDBEBEN = Bauteilart("erdbeben", "erdbeben", ErdbebenEintrag, "h", "erdbeben", 
 
 #: Die Bauteilarten, in der Reihenfolge von Baum, Bericht und Rechnung -- ein
 #: Balkensystem liest Werte der Platten und Analysen, also kommt es nach
-#: ihnen, das Erdbeben ebenso; Decke, Durchstanzen, Grundbruch, Setzung und
-#: Pfahl lesen nichts von den anderen.
+#: ihnen, das Erdbeben ebenso; Decke, Durchstanzen, Fachwerkmodell,
+#: Grundbruch, Setzung und Pfahl lesen nichts von den anderen.
 #: Wer alle Bauteile durchgeht (Lesen, Kennungen, Aufbau, Zwischenspeicher,
 #: Erkennen einer Datei), geht diese Liste durch.
 BAUTEILE: Tuple[Bauteilart, ...] = (PLATTE, ANALYSE, BALKENSYSTEM, BALKENSYSTEM3D, DECKE,
-                                     DURCHSTANZEN, GRUNDBRUCH, SETZUNG, PFAHL, ERDBEBEN)
+                                     DURCHSTANZEN, FACHWERKMODELL, GRUNDBRUCH, SETZUNG, PFAHL,
+                                     ERDBEBEN)

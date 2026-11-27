@@ -211,6 +211,7 @@
   paint-order: stroke; stroke: #fff; stroke-width: 3px; stroke-linejoin: round; pointer-events: none;
 }
 .dk-name.ist-klein { font-size: 10px; text-anchor: start; }
+.dk-name.ist-links { text-anchor: end; }
 .dk-name.ist-zone { fill: var(--beide); }
 .dk-name.ist-last { fill: var(--last); font-weight: 600; }
 .dk-name.ist-schnitt { fill: var(--analyse); font-weight: 700; }
@@ -254,6 +255,25 @@
   display: inline-block; width: 14px; height: 10px; border-radius: 2px; opacity: .75;
   box-shadow: inset 0 0 0 1px rgba(16, 24, 40, .15);
 }
+
+/* ------------------------------------------------------- Fachwerkmodelle -- */
+
+/* Eine Scheibe hell mit kräftigem Rand wie eine Platte der Decke, ihre
+   Löcher weiss und gestrichelt -- ihr Rand ist noch Material. Die Lager
+   mit Dreieck und Grund, die Lasten als Pfeile in der Farbe der Lasten.
+   Rot, was der Kern beanstandet. */
+.fw-scheibe-flaeche { fill: #f6f7f9; stroke: none; }
+.fw-scheibe { fill: none; stroke: var(--schrift); stroke-width: 1.6; stroke-linejoin: round; }
+.fw-loch-flaeche { fill: var(--flaeche); stroke: none; }
+.fw-loch { fill: none; stroke: var(--schrift); stroke-width: 1.2; stroke-dasharray: 6 3; stroke-linejoin: round; }
+.fw-lager { fill: var(--flaeche); stroke: var(--schrift); stroke-width: 1.4; stroke-linejoin: round; }
+.fw-grund { fill: none; stroke: var(--schrift); stroke-width: 1.1; }
+.fw-rolle { fill: var(--flaeche); stroke: var(--schrift); stroke-width: 1.1; }
+.fw-last { fill: var(--last); stroke: var(--last); stroke-width: 2; stroke-linejoin: round; }
+.fw-scheibe.ist-fehler, .fw-loch.ist-fehler, .fw-last.ist-fehler,
+.fw-lagergruppe.ist-fehler .fw-lager, .fw-lagergruppe.ist-fehler .fw-grund,
+.fw-lagergruppe.ist-fehler .fw-rolle { stroke: var(--schlecht); }
+.fw-last.ist-fehler { fill: var(--schlecht); }
 
 /* ----------------------------------------------------------- Grundbruch -- */
 

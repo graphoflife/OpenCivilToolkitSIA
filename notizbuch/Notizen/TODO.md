@@ -130,6 +130,12 @@ sammeln sie sich hier, je mit dem, was vorläufig gebaut ist.
       - ein Träger auf der Fuge zweier Platten nimmt h der ersten;
       - Zonen gelten nur in der Streifenmethode; in der FEM sagt es eine
         graue Meldung.
+- [ ] **Fachwerkmodell: das Lagerzeichen immer unter dem Punkt?** Ein
+      Lager fest in x und y oder nur in y steht mit seinem Dreieck unter
+      dem Punkt, eines nur in x links davon – auch wo es oben an der
+      Scheibe hängt; dann liegt das Zeichen auf ihr. Vorschlag: so lassen,
+      später nach aussen drehen, wo kein Material ist. Vorläufig: unten,
+      nur in x links.
 
 ## Wünsche vom 2026-11-20
 
@@ -147,6 +153,12 @@ Kräften je Geschoss und Wand, ohne Verbindung ins Balkensystem.
 
 ## Offen
 
+- [ ] **Meldungen als Hinweise: vier Kopien.** Seit 2026-11-27 macht
+      `meldungshinweise` in `web/js/bausteine.js` aus den Meldungen des
+      Kerns die Hinweise einer Karte (das Fachwerkmodell nimmt es). Dieselben
+      Zeilen stehen noch in `balkensystem.js`, `bs_diagramme.js` und zweimal
+      in `decke.js` (`meldungszeilen`, `fallmeldungen`). Aufräumen: alle auf
+      `meldungshinweise`.
 - [ ] **Erdbeben: der Name eines neuen Geschosses.** «+ Geschoss» nennt es
       «Geschoss n» mit der ersten freien Zahl, wie einen Lastfall. Heissen
       die übrigen «1. OG» bis «8. OG», heisst das neunte darum

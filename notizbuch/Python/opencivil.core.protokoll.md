@@ -1,5 +1,5 @@
 ---
-erzeugt: 5664675985a1
+erzeugt: 006a1793121a
 art: modul
 tags: [modul]
 ---
@@ -597,6 +597,8 @@ Oberflaeche und alle Berichte gehen.
 - [[opencivil.durchstanzen.stelle]]
 - [[opencivil.erdbeben.ersatzkraft]]
 - [[opencivil.erdbeben.kern]]
+- [[opencivil.fachwerkmodell.herleitung]]
+- [[opencivil.fachwerkmodell.werk]]
 - [[opencivil.geotechnik.fundament]]
 - [[opencivil.geotechnik.gleiten]]
 - [[opencivil.geotechnik.grundbruch]]

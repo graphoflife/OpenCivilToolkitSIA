@@ -51,6 +51,7 @@ from opencivil.projekt.lesen import ProjektFehler, als_groesse, anhalten, ort_vo
 from opencivil.stabwerk.rechnung import Balkensystem
 from opencivil.stabwerk3d.rechnung import Balkensystem3d
 from opencivil.decke.werk import Deckensystem
+from opencivil.fachwerkmodell.werk import Fachwerksystem
 
 if TYPE_CHECKING:
     from opencivil.projekt.aufbau import Bauteilart
@@ -209,6 +210,11 @@ class Aufbau:
     def decken(self) -> Dict[str, Deckensystem]:
         """Die Decken, nach Kennung -- Bauteile ohne Nachweise, mit ihrem Ergebnis."""
         return self.objekte("decke")
+
+    @property
+    def fachwerkmodelle(self) -> Dict[str, Fachwerksystem]:
+        """Die Fachwerkmodelle, nach Kennung -- Bauteile ohne Nachweise, mit ihrem Befund."""
+        return self.objekte("fachwerkmodell")
 
     @property
     def grundbrueche(self) -> Dict[str, Fundament]:
