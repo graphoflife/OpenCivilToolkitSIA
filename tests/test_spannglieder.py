@@ -27,6 +27,13 @@ Geneigt, mit einer Schubwand in der Mitte, die V_z = 300 kN ganz nimmt:
     β_p = +5°, trägt mit         300 − P∞ · sin 5°                = 242.13 kN
     β_p = −5°, mit Verbund       300 + A_p · f_pd · sin 5°        = 372.76 kN
     β_p = −5°, ohne Verbund      300 + A_p · σ_p0 · sin 5°        = 368.09 kN
+
+Im reinen Druck, gleichmässig gedehnt, ersetzt das Glied den Beton an seiner
+Stelle wie ein Stab -- A = 300 · 600 = 180 000 mm²:
+
+    ohne Glied                  N_Rd^- = −f_cd · A               = −3600 kN
+    schlaff, ohne Verbund       N_Rd^- = −f_cd · (A − A_p)       = −3588 kN
+    mit Vordehnung, ohne        N_Rd^- = −f_cd · (A − A_p) + P∞  = −2923.98 kN
 """
 
 import math
@@ -218,6 +225,35 @@ class TestBiegewiderstand(unittest.TestCase):
 
     def test_schlaff_ohne_verbund_traegt_nichts(self):
         self.assertEqual(self.grad("restfestigkeit", "ohne"), 0.0)
+
+
+class TestVerdraengt(unittest.TestCase):
+    """
+    Wo das Glied liegt, ist kein Beton: es verdrängt ihn wie ein Stab, gleich
+    welche Rechenart und ob es etwas trägt. Gezeigt am reinen Druck.
+    """
+
+    A = 0.3 * 0.6
+
+    def druck(self, p: Projekt) -> float:
+        return p.rechnen().wert("querschnittsanalyse.a1.kennzahlen.N_Rd_druck").groesse.si
+
+    def test_ohne_glied_der_ganze_beton(self):
+        p = projekt()
+        p.querschnittsanalysen[0].spannglieder.clear()
+        self.assertAlmostEqual(self.druck(p), -F_CD * self.A, delta=1.0)
+
+    def test_ein_glied_das_nichts_traegt_nimmt_dem_beton_seine_flaeche(self):
+        """Schlaff und ohne Verbund: −3588 kN statt −3600 kN, mit Block und Parabel."""
+        for rechenart in ("block", "parabel"):
+            with self.subTest(rechenart):
+                p = projekt("restfestigkeit", "ohne", rechenart=rechenart)
+                self.assertAlmostEqual(self.druck(p), -F_CD * (self.A - A_P), delta=1.0)
+
+    def test_auch_wenn_es_zieht(self):
+        """Mit P∞ ohne Verbund: −3588 + 664.02 kN, nicht −3600 + 664.02 kN."""
+        self.assertAlmostEqual(self.druck(projekt("vordehnung", "ohne")),
+                               -F_CD * (self.A - A_P) + A_P * SIGMA_PINF, delta=1.0)
 
 
 class TestRissmoment(unittest.TestCase):

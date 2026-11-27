@@ -7,6 +7,25 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-27 · Test: ein Spannglied verdrängt den Beton
+
+Aufräumen A3 des Plans vom 2026-11-27. Dass ein Stab den Beton an seiner
+Stelle ersetzt, prüften Tests schon; für das Spannglied fehlte einer. Am
+Rechteck 300 × 600 mm aus C30/37 mit vier Litzen (A_p = 600 mm²), im reinen
+Druck, gleichmässig gedehnt:
+
+- ohne Glied: N_Rd^- = −20 · 180 000 = −3600 kN;
+- schlaff und ohne Verbund, das Glied trägt nichts: −20 · 179 400 =
+  −3588 kN, mit dem Spannungsblock wie mit der Parabel;
+- mit Vordehnung ohne Verbund zieht es P∞ = 664.02 kN dazu: −2923.98 kN.
+
+Rechnet das Glied ohne Verdrängung, stehen −3600 kN da, und alle drei
+Fälle schlagen an (`TestVerdraengt` in `tests/test_spannglieder.py`). Am
+Code änderte sich nichts: das Glied gibt seine Stelle schon mit
+(`Spannglied.als_bewehrung`).
+
+---
+
 ## 2026-11-27 · Materialien: Flüssigkeit, das Wasser, ein volles neues Projekt
 
 Schritt 3 des Plans vom 2026-11-27.
