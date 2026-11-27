@@ -7,6 +7,16 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-27 · Bericht: Kennzahlen auch ohne Nachweis
+
+Gefunden beim Schubfluss. Eine Querschnittsanalyse aus Stahl oder Holz ohne
+Lastfall hat keinen Nachweis, aber Kennzahlen – ein IPE 300 aus S355 etwa
+N_Rd = 1820 kN und M_y,Rd = 212.5 kNm. Auf dem Bildschirm standen sie, im
+Bericht fehlte die Analyse ganz: die Zusammenfassung nahm nur Bauteile mit
+Nachweisen. Jetzt hat jedes Bauteil eine Gruppe, das Nachweise, Kennzahlen
+oder einen Schubfluss hat; der Bericht sagt «Kein Nachweis geführt.» und
+zeigt darunter die Kennzahlen.
+
 ## 2026-11-27 · Querschnittsanalyse: Schubfluss in Schnitten
 
 Schritt 9 des Plans vom 2026-11-27. Neu ist im Zeichenfenster der

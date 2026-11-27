@@ -8,7 +8,7 @@
     "opencivil/bericht/konsole.py": "56ab77801598",
     "opencivil/bericht/latex_dokument.py": "f90e20c77b01",
     "opencivil/bericht/markdown.py": "6e27cdea306e",
-    "opencivil/bericht/zusammenfassung.py": "851d17023f86",
+    "opencivil/bericht/zusammenfassung.py": "60c288d5b7dc",
     "opencivil/bewehrungssuche/__init__.py": "4aea6c041a45",
     "opencivil/bewehrungssuche/bewertung.py": "2b7c89b86158",
     "opencivil/bewehrungssuche/buegel.py": "d2966f9fe051",

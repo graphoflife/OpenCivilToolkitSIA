@@ -7,11 +7,13 @@ Querkraftwiderstand bei N_Ed = 0 und die Vergroesserungsfaktoren.
 import math
 import unittest
 
+from opencivil.bericht.konsole import als_text
 from opencivil.bericht.zusammenfassung import kennzahlen
 from opencivil.nachweis import linie as geo
 from opencivil.nachweis.querkraft_buegel import buegelwiderstand
 from opencivil.querschnitt.fachwerk import beste_neigung
 from opencivil.projekt import Projekt, RechenwahlEintrag
+from opencivil.projekt.querschnittsanalyse import QuerschnittsanalyseEintrag
 from opencivil.web import dienst
 
 
@@ -170,6 +172,24 @@ class TestImmer(unittest.TestCase):
         antwort = dienst.rechnen({"projekt": projekt.als_dict()})
         self.assertEqual(set(antwort["kennzahlen"]), {"q1", "a1", "a2", "t1"})
         self.assertTrue(all(t["zeilen"] for t in antwort["kennzahlen"].values()))
+
+    def test_ohne_nachweis_im_bericht(self):
+        """
+        Eine Analyse aus Stahl ohne Lastfall hat keinen Nachweis, aber
+        Kennzahlen: wie auf dem Bildschirm stehen sie auch im Bericht, unter
+        «Kein Nachweis geführt.». Bis 2026-11-27 fehlte sie dort ganz.
+        """
+        projekt = Projekt(name="Probe")
+        projekt.baustahl("S355")
+        traeger = QuerschnittsanalyseEintrag.neu(kennung="a1", name="Träger")
+        traeger.profil(0, 0, "IPE 300", stahl="st1")
+        projekt.querschnittsanalysen.append(traeger)
+        aufbau, loesung = rechnen(projekt)
+        self.assertFalse(aufbau.teile["a1"].nachweise)
+        text = " ".join(als_text(loesung, aufbau=aufbau).split())
+        self.assertIn("Träger ------ Kein Nachweis geführt.", text)
+        for kennzahl, _ in kennzahlen(aufbau, "a1", loesung):
+            self.assertIn(kennzahl.beschriftung, text)
 
     def test_ohne_x_bewehrung_nur_was_es_gibt(self):
         projekt = Projekt(name="Probe")
