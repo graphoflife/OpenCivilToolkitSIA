@@ -1,5 +1,5 @@
 ---
-erzeugt: 83edf99df788
+erzeugt: 90b321d5139e
 art: formel
 tags: [formel]
 normstelle: "SIA 264:2014, 5.3.2.4, (14)"
@@ -16,10 +16,12 @@ $$
 ## Im Code
 
 - [[opencivil.nachweis.qa_verbund_kennzahlen#KennzahlenVerbundQA|KennzahlenVerbundQA._normalkraft]]
+- [[opencivil.nachweis.qa_verbund_stuetze#_Querschnitt|_Querschnitt._normalkraft]]
 
 ## Themen
 
 - [[Kennzahlen]]
+- [[Verbundstütze]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 
@@ -32,9 +34,11 @@ des Querschnitts nach (14). Er gilt nur, wenn jedes gedrückte Blech in
 Klasse 1 oder 2 liegt; sonst steht er auf null, und ein Hinweis nennt das
 Blech.
 
-Ein ganz mit Beton gefülltes Rohr dürfte seinen Beton nach 5.3.2.5 mit 1.0
-statt 0.85 rechnen; das gehört zu den Verbundstützen und rechnet das
-Werkzeug noch nicht. Knicken gehört dem Stab und steht nicht hier.
+Ein ganz mit Beton gefülltes Rohr darf seinen Beton nach 5.3.2.5 mit 1.0
+statt 0.85 rechnen. Das tut die [[Verbundstütze]], siehe
+[[Plastischer Normalkraftwiderstand eines gefüllten Rohrs]]; die Kennzahlen
+bleiben bei 0.85, auf der sicheren Seite. Das Knicken gehört dem Stab und
+steht dort.
 
 Gezogen trägt der Beton nichts: der Zugwiderstand ist die Summe aus
 Baustahl und Betonstahl allein.

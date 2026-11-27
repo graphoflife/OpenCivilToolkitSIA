@@ -1,5 +1,5 @@
 ---
-erzeugt: ad061c5d61e0
+erzeugt: 91cc07e3136e
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -115,6 +115,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.nachweis.qa_stahl_werte]] – was Kennzahlen und Nachweise eines Stahlquerschnitts teilen.
     - [[opencivil.nachweis.qa_verbund]] – die Lastfaelle eines Verbundquerschnitts nach SIA 264:2014.
     - [[opencivil.nachweis.qa_verbund_kennzahlen]] – was ein Verbundquerschnitt aufnimmt, ohne Einwirkung.
+    - [[opencivil.nachweis.qa_verbund_stuetze]] – eine Verbundstuetze nach SIA 264:2014, 5.3.
     - [[opencivil.nachweis.qa_verbund_werte]] – was Kennzahlen und Nachweise im Verbund teilen.
     - [[opencivil.nachweis.querkraft]] – Querkraftnachweis, was beide Ansaetze teilen.
     - [[opencivil.nachweis.querkraft_buegel]] – Querkraft mit Querkraftbewehrung.
@@ -252,6 +253,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
 - [[opencivil.verbund]] – Verbundbau nach SIA 264:2014.
     - [[opencivil.verbund.duebel]] – Kopfbolzenduebel nach SIA 264:2014, 6.1.
     - [[opencivil.verbund.querschnitt]] – ein gezeichneter Querschnitt aus Baustahl und Beton.
+    - [[opencivil.verbund.stuetze]] – eine Verbundstuetze nach SIA 264:2014, 5.3.
     - [[opencivil.verbund.widerstand]] – was ein Verbundquerschnitt in einem Lastfall aufnimmt.
 - [[opencivil.web]] – die Oberflaeche, von der Seite des Rechenkerns.
     - [[opencivil.web.anzeige]] – Zahlen und Zeilen, wie die Oberflaeche sie zeigt.

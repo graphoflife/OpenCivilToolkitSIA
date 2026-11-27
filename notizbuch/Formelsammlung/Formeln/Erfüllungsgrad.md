@@ -1,5 +1,5 @@
 ---
-erzeugt: 4b89a31701c2
+erzeugt: 7d38f5eec226
 art: formel
 tags: [formel]
 ---
@@ -58,6 +58,7 @@ $$
 - [[Holzquerschnitt]]
 - [[Knicken und Kippen eines Holzstabs]]
 - [[Verbundquerschnitt]]
+- [[Verbundstütze]]
 - [[Durchstanzen]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->

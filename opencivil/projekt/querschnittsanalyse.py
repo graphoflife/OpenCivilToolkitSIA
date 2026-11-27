@@ -521,6 +521,13 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben, JeMaterial):
                                 ueber=0.0)
     """Ueber 500 N/mm² zaehlt sie in (31) mit 500 -- die Zahl bleibt, wie eingegeben."""
 
+    stuetze_kriechzahl: float = bereich(0.0, heisst="Kriechzahl φ", ab=0.0)
+    """
+    Im Verbund: ``φ(t,t_0)`` des Betons fuer die Verbundstuetze (SIA 264:2014,
+    (19)) -- einmal fuer die Analyse, der staendige Anteil je Fall. Null
+    rechnet ohne Kriechen.
+    """
+
     spannungsfaelle: List[QASpannungsfallEintrag] = field(default_factory=list)
     """Die Spannung-Dehnung-Analysen -- kein Nachweis, ein Blick in den Querschnitt."""
 

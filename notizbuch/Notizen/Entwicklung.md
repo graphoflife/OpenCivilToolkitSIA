@@ -7,6 +7,63 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-27 · Verbund nach SIA 264, Verbundstützen
+
+Aus dem Plan vom 2026-11-25, Schritt 14c: die Verbundstütze nach SIA
+264:2014, 5.3 – Knicken, Druck mit Biegung nach Theorie 2. Ordnung und
+zweiachsige Biegung.
+
+**Vorher und nachher.** Vorher hatte ein Querschnitt aus Baustahl und
+Beton keinen Nachweis als Stab. Nachher hat er die Kachel
+«Verbundstütze», wie «Knicken und Kippen» beim Stahl: die Kriechzahl φ für
+die ganze Analyse, je Fall N_Ed, die Momente, ψ, die Knicklängen, den
+ständigen Anteil der Normalkraft und die Länge der Stütze. Ein HEB 300
+aus S355, ganz einbetoniert in 500 × 500 mm aus C30/37 mit vier ⌀20, 6 m
+lang, unter N_Ed = −6000 kN, davon 60 % ständig, φ = 2, und
+M_y,Ed = 200 kNm: um z knickt sie mit N_K,Rd = 6557.5 kN; um y wächst das
+Moment mit k = 1.32 und der Ersatzimperfektion L/200 auf 501.4 kNm, gegen
+0.9 · 0.686 · 863.9 = 533.1 kNm – Erfüllungsgrad 1.06.
+
+**Die Art liest das Werkzeug an der Zeichnung.** Tabelle 7 kennt drei
+Arten, und an der Art hängen Knickkurve, Ersatzimperfektion, die Grenzen
+gegen das Beulen und der Faktor des Betons. Statt sie wählen zu lassen,
+erkennt das Werkzeug sie am Querschnitt: ein einziges Profil, ganz
+einbetoniert, kammerbetoniert oder als Rohr gefüllt, ohne Beton daneben.
+So kann keine Wahl der Zeichnung widersprechen. Ein Verbundträger unter
+seiner Platte ist keine der drei; sein Fall sagt grau, dass Tabelle 7 ihn
+nicht kennt.
+
+**Unfertig ist kein Fehler.** Ist eine Knicklänge um eine Achse mit
+Moment länger als die Stütze, bittet der Fall grau um die Länge der
+Stütze; liegt λ̄ über 2, sagt er grau, dass dort das vereinfachte
+Verfahren endet. Ohne Druck ist er kein Fall der Stütze. Erreicht N_Ed
+N_cr,eff, knickt sie aus: rot.
+
+**Das gefüllte Rohr** rechnet seinen Beton hier mit 1.0 statt 0.85
+(5.3.2.5, 5.3.4.4), unter eigenem Namen in der Formelsammlung; die
+Kennzahlen bleiben bei 0.85.
+
+**Beton auf der Wand eines Profils ist ein Fehler am Ort.** In der
+Zeichnung gilt das innerste Polygon. Ein Kreis aus Beton mit dem
+Aussendurchmesser eines ROR 219.1 x 8 lag darum im Umriss des Rohrs,
+ersetzte seinen Stahl bis auf 81 mm² und blieb im Loch leer – ohne
+Meldung. Nachher meldet die Zeichnung rot, dass das Polygon auf dem Stahl
+des Profils liegt; Beton, der ein Rohr füllt, liegt ganz in seinem Loch.
+Ist ein Rohr innen leer, sagt die Verbundstütze genau das, statt nur, dass
+Tabelle 7 den Querschnitt nicht kennt.
+
+**Die Oberfläche.** Mit der neuen Kachel wäre `querschnittsanalyse.js`
+über 900 Zeilen gewachsen: die Fälle von Knicken und Kippen zogen nach
+`qa_stabilitaet.js`, die Schalter der Fälle nach `qa_fallteile.js`.
+Ständiger Anteil und Länge der Stütze stehen nur beim Verbund, die
+Kipplänge dort nicht.
+
+**Formelsammlung.** 16 neue Seiten mit Theorie, verlinkt im Thema
+«Verbundstütze». Das Prüfprojekt hat dafür die «Verbundstütze» mit acht
+Fällen und das «Gefüllte Rohr»; der «Verbundträger mit Dübeln» hat einen
+Fall «Als Stütze», der grau sagt, dass Tabelle 7 ihn nicht kennt. Was nach
+Vorgabe eingebaut ist und was noch fehlt, steht im [[TODO]].
+
 ## 2026-11-27 · Verbund nach SIA 264, Verdübelung
 
 Aus dem Plan vom 2026-11-25, Schritt 14b: Kopfbolzendübel nach SIA

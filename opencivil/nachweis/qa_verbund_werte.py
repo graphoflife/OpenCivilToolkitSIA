@@ -6,7 +6,8 @@ Die Kennzahlen (:mod:`opencivil.nachweis.qa_verbund_kennzahlen`) und die
 Nachweise je Lastfall (:mod:`opencivil.nachweis.qa_verbund`) lesen dieselben
 Festigkeiten und schreiben dieselben Tabellen; beides steht hier, je einmal:
 
-* je Gruppe die Festigkeit gezogen und gedrueckt (:class:`Verbundwerte`);
+* je Gruppe die Festigkeit gezogen und gedrueckt (:class:`Verbundwerte`) --
+  fuer die Verbundstuetze auch charakteristisch und den Elastizitaetsmodul;
 * die Tabelle dieser Festigkeiten mit ihrem Ansatz (:func:`festigkeiten`);
 * die Tabelle der Bleche mit ihren Klassen (:func:`klassen`);
 * ``β`` nach 5.1.2.2 mit ``x_p`` und ``h`` (:func:`beta`).
@@ -56,6 +57,9 @@ _KENNWERTE = {
     Baustoffart.BETONSTAHL: ("f_yk", "f_yk_druck", "gamma_s", "f_yd", "f_yd_druck"),
 }
 
+#: Der Elastizitaetsmodul je Art.
+MODUL = {Baustoffart.BAUSTAHL: "E_a", Baustoffart.BETON: "E_cm", Baustoffart.BETONSTAHL: "E_s"}
+
 #: Der Beiwert je Art -- beim Baustahl ``γ_M1``, im Verbund ``γ_a`` genannt.
 _GAMMA = {Baustoffart.BAUSTAHL: "gamma_M1", Baustoffart.BETON: "gamma_c",
           Baustoffart.BETONSTAHL: "gamma_s"}
@@ -81,19 +85,32 @@ def stoffbezuege(verbund: Verbundquerschnitt) -> List[Eingabebezug]:
 
 
 class Verbundwerte:
-    """Die Festigkeiten der Gruppen eines Verbundquerschnitts -- siehe Dateikopf."""
+    """
+    Die Festigkeiten der Gruppen eines Verbundquerschnitts -- siehe
+    Dateikopf. ``beton_faktor`` rechnet die Druckfestigkeit des Betons um:
+    0.85, im gefuellten Rohr der Verbundstuetze 1.0.
+    """
 
-    def __init__(self, verbund: Verbundquerschnitt, e: Eingaben, wahl: Rechenwahl) -> None:
+    def __init__(self, verbund: Verbundquerschnitt, e: Eingaben, wahl: Rechenwahl,
+                 beton_faktor: float = BETON_FAKTOR) -> None:
         self.verbund = verbund
         self.e = e
+        self.beton_faktor = beton_faktor
         self.stahl = Stahlwerte(verbund.stahl, e, wahl)
         self.bemessung = [wahl.satz(g.stoff) is Werkstoffsatz.BEMESSUNG for g in verbund.gruppen]
 
+    def wert(self, g: int, kurz: str) -> Wert:
+        """Ein Kennwert des Materials der Gruppe ``g``, unter seinem Namen -- ohne die Dicke."""
+        return self.e[self.verbund.gruppen[g].stoff.eingabename(kurz)]
+
     def zahl(self, g: int, kurz: str) -> float:
-        """Ein Kennwert des Materials der Gruppe ``g``: Spannungen in N/mm², Beiwerte rein."""
-        stoff = self.verbund.gruppen[g].stoff
-        si = self.e[stoff.eingabename(kurz)].groesse.si
+        """Derselbe als Zahl: Spannungen in N/mm², Beiwerte rein."""
+        si = self.wert(g, kurz).groesse.si
         return si if kurz.startswith("gamma") else si / 1e6
+
+    def E(self, g: int) -> float:
+        """Der Elastizitaetsmodul der Gruppe ``g`` in N/mm²: ``E_a``, ``E_cm`` oder ``E_s``."""
+        return self.zahl(g, MODUL[self.verbund.art(g)])
 
     def gamma(self, g: int) -> float:
         """Der Beiwert der Gruppe ``g`` -- eins mit charakteristischen Werten."""
@@ -115,10 +132,21 @@ class Verbundwerte:
             if art is Baustoffart.BAUSTAHL:
                 werte.append((self.stahl.f[g], self.stahl.f[g]))
             elif art is Baustoffart.BETON:
-                werte.append((0.0, BETON_FAKTOR * self.zahl(g, "f_ck") / self.gamma(g)))
+                werte.append((0.0, self.beton_faktor * self.zahl(g, "f_ck") / self.gamma(g)))
             else:
                 zug, druck = ("f_yd", "f_yd_druck") if self.bemessung[g] else ("f_yk", "f_yk_druck")
                 werte.append((self.zahl(g, zug), self.zahl(g, druck)))
+        return werte
+
+    @cached_property
+    def druck_k(self) -> List[float]:
+        """Je Gruppe gedrueckt mit γ = 1, in N/mm²: ``f_y``, der Beton umgerechnet, ``f_sk``."""
+        werte = []
+        for g in range(len(self.verbund.gruppen)):
+            art = self.verbund.art(g)
+            werte.append(self.kennwert(g) if art is Baustoffart.BAUSTAHL else
+                         self.beton_faktor * self.zahl(g, "f_ck") if art is Baustoffart.BETON else
+                         self.zahl(g, "f_yk_druck"))
         return werte
 
     @property

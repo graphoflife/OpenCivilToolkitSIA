@@ -1,5 +1,5 @@
 ---
-erzeugt: 34e1a1ed4c6f
+erzeugt: b2151f9152f8
 art: modul
 tags: [modul]
 ---
@@ -180,6 +180,7 @@ def neigung(self, M_y: float) -> Optional[float]
 - [[opencivil.nachweis.qa_kennzahlen]]
 - [[opencivil.nachweis.qa_stahl]]
 - [[opencivil.nachweis.qa_stahl_stabilitaet]]
+- [[opencivil.nachweis.qa_verbund_stuetze]]
 - [[opencivil.nachweis.rissgroessen]]
 - [[opencivil.nachweis.schubwandnachweis]]
 - [[opencivil.projekt.aufbau.querschnittsanalyse]]

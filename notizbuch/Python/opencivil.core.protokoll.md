@@ -1,5 +1,5 @@
 ---
-erzeugt: 46340edf0395
+erzeugt: 506849e30f47
 art: modul
 tags: [modul]
 ---
@@ -622,6 +622,7 @@ Oberflaeche und alle Berichte gehen.
 - [[opencivil.nachweis.qa_stahl_werte]]
 - [[opencivil.nachweis.qa_verbund]]
 - [[opencivil.nachweis.qa_verbund_kennzahlen]]
+- [[opencivil.nachweis.qa_verbund_stuetze]]
 - [[opencivil.nachweis.qa_verbund_werte]]
 - [[opencivil.nachweis.querkraft]]
 - [[opencivil.nachweis.querkraft_buegel]]

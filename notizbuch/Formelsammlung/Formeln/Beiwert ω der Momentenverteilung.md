@@ -1,5 +1,5 @@
 ---
-erzeugt: 50f26f1a8037
+erzeugt: 9eb687f0046a
 art: formel
 tags: [formel]
 normstelle: "SIA 263:2013, 5.1.9.1; 5.1.10.3"
@@ -30,14 +30,17 @@ $$
 ## Gebraucht von
 
 - [[Abgeminderter Kippwiderstand im Stab]]
+- [[Vergrösserungsfaktor einer Verbundstütze]]
 
 ## Im Code
 
 - [[opencivil.nachweis.qa_stahl_stabilitaet#_Herleitung._omega|_Herleitung._omega]]
+- [[opencivil.nachweis.qa_verbund_stuetze#_Fall._zweite_ordnung|_Fall._zweite_ordnung]]
 
 ## Themen
 
 - [[Knicken und Kippen]]
+- [[Verbundstütze]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

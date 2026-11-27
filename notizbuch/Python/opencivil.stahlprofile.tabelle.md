@@ -1,5 +1,5 @@
 ---
-erzeugt: ece257b630ee
+erzeugt: 261180684506
 art: modul
 tags: [modul]
 ---
@@ -138,4 +138,5 @@ Das Profil dieses Namens -- ein unbekannter ist ein `KeyError`, der es sagt.
 - [[opencivil.stahlprofile.bleche]]
 - [[opencivil.stahlprofile.lage]]
 - [[opencivil.verbund.querschnitt]]
+- [[opencivil.verbund.stuetze]]
 - [[opencivil.web.api]]

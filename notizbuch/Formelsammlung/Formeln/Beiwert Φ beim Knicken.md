@@ -1,5 +1,5 @@
 ---
-erzeugt: 787fd00b7edd
+erzeugt: 71be77f86274
 art: formel
 tags: [formel]
 normstelle: "SIA 263:2013, 4.5.1.3, (7); 4.5.1.4, (8); Tabelle 8"
@@ -39,10 +39,12 @@ $$
 ## Im Code
 
 - [[opencivil.nachweis.qa_stahl_stabilitaet#_Herleitung.knicken|_Herleitung.knicken]]
+- [[opencivil.nachweis.qa_verbund_stuetze#_Fall|_Fall._knicken]]
 
 ## Themen
 
 - [[Knicken und Kippen]]
+- [[Verbundstütze]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

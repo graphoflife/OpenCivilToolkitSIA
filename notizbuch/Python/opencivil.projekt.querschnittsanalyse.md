@@ -1,5 +1,5 @@
 ---
-erzeugt: a060feb8a87f
+erzeugt: 664076e91bf5
 art: modul
 tags: [modul]
 ---
@@ -359,6 +359,7 @@ Was er mit der Platte gleich angibt, steht in der Grundlage
 - `duebel_d: float = bereich(19.0, heisst='Durchmesser d', einheit=MM, ab=vd.D_AB, bis=vd.…` – Der Schaftdurchmesser der Kopfbolzenduebel in mm -- hoechstens ein Viertel ihrer Laenge.
 - `duebel_h: float = bereich(100.0, heisst='Länge h_D', einheit=MM, ueber=0.0)`
 - `duebel_f_u: float = bereich(vd.F_U_VORGABE, heisst='Zugfestigkeit f_u', einheit=N_PRO_MM2…` – Ueber 500 N/mm² zaehlt sie in (31) mit 500 -- die Zahl bleibt, wie eingegeben.
+- `stuetze_kriechzahl: float = bereich(0.0, heisst='Kriechzahl φ', ab=0.0)` – Im Verbund: `φ(t,t_0)` des Betons fuer die Verbundstuetze (SIA 264:2014, (19)) -- einmal fuer die Analyse, der staendige Anteil je Fall. Null rechnet ohne Kriechen.
 - `spannungsfaelle: List[QASpannungsfallEintrag] = field(default_factory=list)` – Die Spannung-Dehnung-Analysen -- kein Nachweis, ein Blick in den Querschnitt.
 
 #### QuerschnittsanalyseEintrag.materialien

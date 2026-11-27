@@ -1,5 +1,5 @@
 ---
-erzeugt: f8c54e4f15b7
+erzeugt: 423ac38aee3d
 art: modul
 tags: [modul]
 ---
@@ -297,7 +297,30 @@ Betonstahl B500B, einachsig, mit Kopfbolzendübeln ⌀19 × 125 mm (SIA
 264:2014, 6.1). Im Feld teilverdübelt, (29) gehalten -- mit zu wenig
 Dübeln nicht; an der Stütze verlangt das negative Moment volle
 Verdübelung; ohne Zahl der Dübel und ohne L_e grau; L_e über 25 m
-verlangt volle Verdübelung; ohne Moment prüft er die Dübel nicht.
+verlangt volle Verdübelung; ohne Moment prüft er die Dübel nicht. Als
+Verbundstütze kennt ihn Tabelle 7 nicht: sein Stabilitätsfall steht grau.
+
+### _verbundstuetze
+
+```python
+def _verbundstuetze(kennung: str) -> QuerschnittsanalyseEintrag
+```
+
+Ein HEB 300 aus S355, ganz einbetoniert in 500 × 500 mm aus C30/37, mit
+vier ⌀20 aus B500B in den Ecken, zweiachsig, Kriechzahl 2 (SIA 264:2014,
+5.3). Einachsig gebogen um y, zweiachsig, zentrisch, um y gehalten und
+ohne Druck; grau, wo die Knicklänge die Stütze überragt und wo λ̄ über 2
+liegt; ausgeknickt, wo N_Ed N_cr,eff erreicht.
+
+### _verbundrohr
+
+```python
+def _verbundrohr(kennung: str) -> QuerschnittsanalyseEintrag
+```
+
+Ein ROR 219.1 x 8 aus S355, mit C30/37 gefüllt und vier ⌀16 aus B500B,
+einachsig (SIA 264:2014, 5.3): der Beton mit 1.0 statt 0.85 (5.3.2.5),
+ρ_s unter 3 % und darum Kurve a, ohne Kriechen.
 
 
 ## Braucht
@@ -315,6 +338,7 @@ verlangt volle Verdübelung; ohne Moment prüft er die Dübel nicht.
 - [[opencivil.projekt.staebe]]
 - [[opencivil.querschnitt.geometrie]]
 - [[opencivil.querschnitt.gesetzwahl]]
+- [[opencivil.querschnitt.vorlagen]]
 - [[opencivil.verbund.duebel]]
 
 ## Gebraucht von

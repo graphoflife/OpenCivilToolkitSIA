@@ -1,5 +1,5 @@
 ---
-erzeugt: a07a020183b7
+erzeugt: 6d1baf6cf148
 art: modul
 tags: [modul]
 ---
@@ -344,7 +344,8 @@ class Stabfall
 
 Ein Fall des Stabs, in SI wie ein Lastfall der Analyse: `N` in N,
 negativ Druck, die Momente in Nm um den Schwerpunkt, die Laengen in m --
-eine Laenge null heisst gehalten.
+eine Laenge null heisst gehalten. Nur im Verbund zaehlen `staendig`
+und `L` ([[opencivil.verbund.stuetze]]).
 
 - `name: str`
 - `N: float = 0.0`
@@ -355,6 +356,8 @@ eine Laenge null heisst gehalten.
 - `L_K_y: float = 0.0`
 - `L_K_z: float = 0.0`
 - `L_D: float = 0.0`
+- `staendig: float = 1.0` – Der staendige Anteil der Normalkraft, `N_G,Ed/N_Ed`: er kriecht.
+- `L: float = 0.0` – Die Laenge der Stuetze, fuer `k` (24) und die Ersatzimperfektion.
 
 #### Stabfall.kennung
 
@@ -692,7 +695,9 @@ ist bei null kleiner als eins. Durch Halbieren, bis auf 1e-12 genau.
 
 - [[opencivil.nachweis.qa_holz_stabilitaet]]
 - [[opencivil.nachweis.qa_stahl_stabilitaet]]
+- [[opencivil.nachweis.qa_verbund_stuetze]]
 - [[opencivil.projekt.querschnittsanalyse]]
 - [[opencivil.projekt.stabilitaet]]
+- [[opencivil.verbund.stuetze]]
 - [[opencivil.web.api]]
 - [[opencivil.web.zeichengeometrie]]

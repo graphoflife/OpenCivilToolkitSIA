@@ -1,5 +1,5 @@
 ---
-erzeugt: 7ca2bb69d292
+erzeugt: 2a6ccbffe101
 art: modul
 tags: [modul]
 ---
@@ -222,6 +222,7 @@ Die Vorlage zu einem Schluessel -- `ValueError`, wenn es sie nicht gibt.
 ## Gebraucht von
 
 - [[opencivil.pfahl.innen]]
+- [[opencivil.projekt.beispiele]]
 - [[opencivil.projekt.querschnittsanalyse]]
 - [[opencivil.stabwerk.querschnitte]]
 - [[opencivil.stahlprofile.formen]]

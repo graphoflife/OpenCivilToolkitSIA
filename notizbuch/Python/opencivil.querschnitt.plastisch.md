@@ -1,5 +1,5 @@
 ---
-erzeugt: 6796528671cd
+erzeugt: 8b639642b954
 art: modul
 tags: [modul]
 ---
@@ -281,4 +281,5 @@ Der Zustand bei `N` an der Nulllinie mit der Zugrichtung `n`.
 - [[opencivil.stahlbau.querschnitt]]
 - [[opencivil.stahlbau.widerstand]]
 - [[opencivil.verbund.querschnitt]]
+- [[opencivil.verbund.stuetze]]
 - [[opencivil.verbund.widerstand]]

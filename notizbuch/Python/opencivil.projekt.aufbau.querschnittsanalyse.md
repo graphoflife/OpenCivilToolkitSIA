@@ -1,5 +1,5 @@
 ---
-erzeugt: 6d41cb3fcfe9
+erzeugt: 64953b5bdca2
 art: modul
 tags: [modul]
 ---
@@ -86,7 +86,9 @@ der Stahl allein. Beide lesen den Widerstand gegen Querkraft aus den
 Kennzahlen. Mit Kopfbolzenduebeln steht ihr `P_Rd` in den Kennzahlen,
 und je Lastfall die Verduebelung bei Biegung und Normalkraft, mit seiner
 Zahl der Duebel. Torsion weist er nicht nach; ein Lastfall mit `T_Ed`
-sagt es. Knicken und Kippen fehlen noch, ebenso die
+sagt es. Sobald ein Stabilitaetsfall eingeschaltet ist, die
+Verbundstuetze ([[opencivil.nachweis.qa_verbund_stuetze|qa_verbund_stuetze]]); das
+Kippen des Verbundtraegers fehlt noch, ebenso die
 Spannung-Dehnung-Analysen ([[opencivil.projekt.aufbau.querschnittsanalyse#ohne_analysen|ohne_analysen]]).
 
 ### _holz
@@ -216,6 +218,7 @@ Staeben gibt.
 - [[opencivil.nachweis.qa_stahl_stabilitaet]]
 - [[opencivil.nachweis.qa_verbund]]
 - [[opencivil.nachweis.qa_verbund_kennzahlen]]
+- [[opencivil.nachweis.qa_verbund_stuetze]]
 - [[opencivil.nachweis.richtungsnachweise]]
 - [[opencivil.nachweis.schiefe_biegung]]
 - [[opencivil.nachweis.schubwandnachweis]]

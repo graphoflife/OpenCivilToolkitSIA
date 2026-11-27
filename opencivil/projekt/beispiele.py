@@ -31,6 +31,7 @@ from opencivil.projekt.skript import VORLAGE
 from opencivil.projekt.staebe import MATERIAL_DES_QUERSCHNITTS
 from opencivil.querschnitt.geometrie import Linienart
 from opencivil.querschnitt.gesetzwahl import Rechenart, Werkstoffsatz
+from opencivil.querschnitt.vorlagen import kreispunkte
 from opencivil.verbund.duebel import Verduebelung
 
 
@@ -305,6 +306,9 @@ def jeder_nachweis() -> Projekt:
     _setzungen(p)
     _pfaehle(p)
     _gebaeude(p)
+    # Zwei Verbundstützen zuletzt: so behalten die Analysen davor ihre Kennung.
+    p.querschnittsanalysen.append(_verbundstuetze(p.freie_kennung("a")))
+    p.querschnittsanalysen.append(_verbundrohr(p.freie_kennung("a")))
     return p
 
 
@@ -855,7 +859,8 @@ def _verbundduebel(kennung: str) -> QuerschnittsanalyseEintrag:
     264:2014, 6.1). Im Feld teilverdübelt, (29) gehalten -- mit zu wenig
     Dübeln nicht; an der Stütze verlangt das negative Moment volle
     Verdübelung; ohne Zahl der Dübel und ohne L_e grau; L_e über 25 m
-    verlangt volle Verdübelung; ohne Moment prüft er die Dübel nicht.
+    verlangt volle Verdübelung; ohne Moment prüft er die Dübel nicht. Als
+    Verbundstütze kennt ihn Tabelle 7 nicht: sein Stabilitätsfall steht grau.
     """
     a = QuerschnittsanalyseEintrag(kennung=kennung, name="Verbundträger mit Dübeln")
     a.einachsig = True
@@ -872,4 +877,50 @@ def _verbundduebel(kennung: str) -> QuerschnittsanalyseEintrag:
     a.lastfall("Ohne L_e", M_y_Ed=400.0, duebelzahl=30)
     a.lastfall("Weit gespannt", M_y_Ed=400.0, duebelzahl=40, L_e=30.0)
     a.lastfall("Zug", N_Ed=500.0, duebelzahl=10)
+    a.stabilitaetsfall("Als Stütze", N_Ed=-1000.0, L_K_y=4.0, L_K_z=4.0, L=4.0)
+    return a
+
+
+def _verbundstuetze(kennung: str) -> QuerschnittsanalyseEintrag:
+    """
+    Ein HEB 300 aus S355, ganz einbetoniert in 500 × 500 mm aus C30/37, mit
+    vier ⌀20 aus B500B in den Ecken, zweiachsig, Kriechzahl 2 (SIA 264:2014,
+    5.3). Einachsig gebogen um y, zweiachsig, zentrisch, um y gehalten und
+    ohne Druck; grau, wo die Knicklänge die Stütze überragt und wo λ̄ über 2
+    liegt; ausgeknickt, wo N_Ed N_cr,eff erreicht.
+    """
+    a = QuerschnittsanalyseEintrag(kennung=kennung, name="Verbundstütze")
+    a.polygon([(-250, -250), (250, -250), (250, 250), (-250, 250)], material="b1")
+    a.profil(0, 0, "HEB 300", stahl="st1")
+    for y, z in ((200, 200), (-200, 200), (200, -200), (-200, -200)):
+        a.stab(y, z, durchmesser=20, stahl="s1")
+    a.stuetze_kriechzahl = 2.0
+    stuetze = dict(L_K_y=6.0, L_K_z=6.0, L=6.0, staendig=60.0)
+    a.stabilitaetsfall("Einachsig", N_Ed=-6000.0, M_y_Ed=200.0, **stuetze)
+    a.stabilitaetsfall("Zweiachsig", N_Ed=-4000.0, M_y_Ed=150.0, psi_y=0.5, M_z_Ed=60.0,
+                       **stuetze)
+    a.stabilitaetsfall("Zentrisch", N_Ed=-5000.0, **{**stuetze, "L_K_z": 4.0})
+    a.stabilitaetsfall("Um y gehalten", N_Ed=-5000.0, M_y_Ed=100.0, **{**stuetze, "L_K_y": 0.0})
+    a.stabilitaetsfall("Ohne Druck", M_y_Ed=100.0, **stuetze)
+    a.stabilitaetsfall("Knicklänge zu lang", N_Ed=-3000.0, M_y_Ed=100.0,
+                       **{**stuetze, "L_K_y": 8.0})
+    a.stabilitaetsfall("Zu schlank", N_Ed=-500.0, L_K_y=30.0, L_K_z=30.0, L=30.0)
+    a.stabilitaetsfall("Knickt aus", N_Ed=-9000.0, M_y_Ed=100.0, L_K_y=12.0, L_K_z=1.0, L=12.0)
+    return a
+
+
+def _verbundrohr(kennung: str) -> QuerschnittsanalyseEintrag:
+    """
+    Ein ROR 219.1 x 8 aus S355, mit C30/37 gefüllt und vier ⌀16 aus B500B,
+    einachsig (SIA 264:2014, 5.3): der Beton mit 1.0 statt 0.85 (5.3.2.5),
+    ρ_s unter 3 % und darum Kurve a, ohne Kriechen.
+    """
+    a = QuerschnittsanalyseEintrag(kennung=kennung, name="Gefülltes Rohr")
+    a.einachsig = True
+    a.polygon(kreispunkte((0.0, 0.0), 101.55), material="b1")
+    a.profil(0, 0, "ROR 219.1 x 8", stahl="st1")
+    for y, z in ((60, 0), (-60, 0), (0, 60), (0, -60)):
+        a.stab(y, z, durchmesser=16, stahl="s1")
+    a.stabilitaetsfall("Druck und Biegung", N_Ed=-1500.0, M_y_Ed=30.0, psi_y=0.0, L_K_y=3.5,
+                       L_K_z=3.5, L=3.5, staendig=70.0)
     return a

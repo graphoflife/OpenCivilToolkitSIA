@@ -1,5 +1,5 @@
 ---
-erzeugt: f64ab5308c6c
+erzeugt: 7436708bb9f5
 art: modul
 tags: [modul]
 ---
@@ -183,6 +183,7 @@ def gleichungen_62(self) -> None
 
 ## Gebraucht von
 
+- [[opencivil.nachweis.qa_verbund_stuetze]]
 - [[opencivil.projekt.aufbau.querschnittsanalyse]]
 
 ## Formeln aus diesem Modul

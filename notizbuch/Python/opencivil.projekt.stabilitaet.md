@@ -1,5 +1,5 @@
 ---
-erzeugt: 42f4b99b5160
+erzeugt: d2ed86c93be9
 art: modul
 tags: [modul]
 ---
@@ -9,14 +9,19 @@ tags: [modul]
 
 ## VERANTWORTUNG
 
-Der [[opencivil.projekt.stabilitaet#QAStabilitaetEintrag|QAStabilitaetEintrag]] einer Querschnittsanalyse aus Stahl oder
-Holz ([[opencivil.projekt.querschnittsanalyse#QuerschnittsanalyseEintrag|QuerschnittsanalyseEintrag]]):
+Der [[opencivil.projekt.stabilitaet#QAStabilitaetEintrag|QAStabilitaetEintrag]] einer Querschnittsanalyse aus Stahl, Holz
+oder im Verbund
+([[opencivil.projekt.querschnittsanalyse#QuerschnittsanalyseEintrag|QuerschnittsanalyseEintrag]]):
 ein Stab mit dem gezeichneten Querschnitt, seine Druckkraft, die groessten
 Momente 1. Ordnung in ihm, je Achse das Verhaeltnis ψ seiner Endmomente und
 die Knick- und Kipplaengen. Gerechnet wird beim Stahl in
 [[opencivil.stahlbau.stabilitaet]], die Herleitung schreibt
 [[opencivil.nachweis.qa_stahl_stabilitaet]]; beim Holz beides
-[[opencivil.nachweis.qa_holz_stabilitaet]].
+[[opencivil.nachweis.qa_holz_stabilitaet]]; im Verbund rechnet
+[[opencivil.verbund.stuetze]], die Herleitung schreibt
+[[opencivil.nachweis.qa_verbund_stuetze]]. Der Verbund braucht dazu den
+staendigen Anteil der Normalkraft und die Laenge der Stuetze; die
+Kipplaenge braucht er nicht.
 
 EINE LAENGE NULL heisst gehalten: um diese Achse knickt der Stab nicht, oder
 er kippt nicht. So bleibt jede Laenge eine Zahl, und kein Schalter steht
@@ -43,7 +48,7 @@ Das Verhaeltnis der Endmomente um `achse`: -1 bis 1, Vorgabe 1 -- das konstante 
 def _laenge(heisst: str) -> Any
 ```
 
-Eine Knick- oder Kipplaenge in m, Vorgabe 3 m -- null heisst gehalten.
+Eine Laenge in m, Vorgabe 3 m -- als Knick- oder Kipplaenge heisst null gehalten.
 
 ### QAStabilitaetEintrag
 
@@ -65,6 +70,8 @@ Ein Fall von Knicken und Kippen -- siehe Dateikopf. kN, kNm und m.
 - `L_K_z: float = _laenge('Knicklänge L_K,z')`
 - `L_D: float = _laenge('Kipplänge L_D')` – Der Abstand der Punkte, an denen der Druckgurt seitlich gehalten ist -- beim Holz `a` in (41), der Abstand der seitlichen Halterungen.
 - `stossartig: bool = False` – Nur beim Holz: η_t = 1.4 bei stossartiger Einwirkung (SIA 265:2012, 2.2.6).
+- `staendig: float = bereich(100.0, heisst='Ständiger Anteil N_G,Ed/N_Ed', einheit=PROZENT…` – Nur im Verbund: welcher Teil der Normalkraft staendig wirkt und kriecht (SIA 264, (19)).
+- `L: float = _laenge('Stützenlänge L')` – Nur im Verbund: die Laenge der Stuetze zwischen ihren Enden -- fuer `k` (24) und die Ersatzimperfektion der Tabelle 7.
 - `aktiv: bool = True` – Ob der Fall gerechnet wird. Ausgeschaltet bleibt er stehen.
 
 #### QAStabilitaetEintrag.stabfall

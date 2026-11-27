@@ -253,6 +253,12 @@
       "bereich": "Querschnittsanalyse"
     },
     {
+      "name": "Verbundstütze",
+      "pfad": "Formelsammlung/Themen/Verbundstütze.md",
+      "art": "thema",
+      "bereich": "Querschnittsanalyse"
+    },
+    {
       "name": "Streifenmethode",
       "pfad": "Formelsammlung/Themen/Streifenmethode.md",
       "art": "thema",
@@ -321,7 +327,8 @@
         "\\chi_{K,y}"
       ],
       "themen": [
-        "Knicken und Kippen"
+        "Knicken und Kippen",
+        "Verbundstütze"
       ]
     },
     {
@@ -637,6 +644,17 @@
       ]
     },
     {
+      "name": "Beiwert μ_d einer Verbundstütze",
+      "pfad": "Formelsammlung/Formeln/Beiwert μ_d einer Verbundstütze.md",
+      "art": "formel",
+      "zeichen": [
+        "\\mu_{d,y}"
+      ],
+      "themen": [
+        "Verbundstütze"
+      ]
+    },
+    {
       "name": "Beiwert Φ beim Kippen",
       "pfad": "Formelsammlung/Formeln/Beiwert Φ beim Kippen.md",
       "art": "formel",
@@ -655,7 +673,8 @@
         "\\Phi_{K,y}"
       ],
       "themen": [
-        "Knicken und Kippen"
+        "Knicken und Kippen",
+        "Verbundstütze"
       ]
     },
     {
@@ -666,7 +685,8 @@
         "\\omega_{y}"
       ],
       "themen": [
-        "Knicken und Kippen"
+        "Knicken und Kippen",
+        "Verbundstütze"
       ]
     },
     {
@@ -711,6 +731,17 @@
       ],
       "themen": [
         "Erdbeben"
+      ]
+    },
+    {
+      "name": "Bemessungssteifigkeit einer Verbundstütze",
+      "pfad": "Formelsammlung/Formeln/Bemessungssteifigkeit einer Verbundstütze.md",
+      "art": "formel",
+      "zeichen": [
+        "(EI)_{eff,d,y}"
+      ],
+      "themen": [
+        "Verbundstütze"
       ]
     },
     {
@@ -1016,6 +1047,17 @@
       ]
     },
     {
+      "name": "Bezogene Schlankheit einer Verbundstütze",
+      "pfad": "Formelsammlung/Formeln/Bezogene Schlankheit einer Verbundstütze.md",
+      "art": "formel",
+      "zeichen": [
+        "\\bar{\\lambda}_{z}"
+      ],
+      "themen": [
+        "Verbundstütze"
+      ]
+    },
+    {
       "name": "Bezugsgrösse der Normalkraft",
       "pfad": "Formelsammlung/Formeln/Bezugsgrösse der Normalkraft.md",
       "art": "formel",
@@ -1109,6 +1151,17 @@
       ],
       "themen": [
         "Pfahlsteifigkeit"
+      ]
+    },
+    {
+      "name": "Biegesteifigkeit einer Verbundstütze für die Schlankheit",
+      "pfad": "Formelsammlung/Formeln/Biegesteifigkeit einer Verbundstütze für die Schlankheit.md",
+      "art": "formel",
+      "zeichen": [
+        "(EI)_{eff,\\lambda,z}"
+      ],
+      "themen": [
+        "Verbundstütze"
       ]
     },
     {
@@ -1636,6 +1689,7 @@
         "Holzquerschnitt",
         "Knicken und Kippen eines Holzstabs",
         "Verbundquerschnitt",
+        "Verbundstütze",
         "Durchstanzen"
       ]
     },
@@ -1662,6 +1716,18 @@
       ],
       "themen": [
         "Knicken und Kippen"
+      ]
+    },
+    {
+      "name": "Ersatzimperfektion einer Verbundstütze",
+      "pfad": "Formelsammlung/Formeln/Ersatzimperfektion einer Verbundstütze.md",
+      "art": "formel",
+      "zeichen": [
+        "e_{0,y}",
+        "e_{0,z}"
+      ],
+      "themen": [
+        "Verbundstütze"
       ]
     },
     {
@@ -2699,6 +2765,17 @@
       ]
     },
     {
+      "name": "Knickwiderstand einer Verbundstütze",
+      "pfad": "Formelsammlung/Formeln/Knickwiderstand einer Verbundstütze.md",
+      "art": "formel",
+      "zeichen": [
+        "N_{K,z,Rd}"
+      ],
+      "themen": [
+        "Verbundstütze"
+      ]
+    },
+    {
       "name": "Knickwiderstand eines Holzstabs",
       "pfad": "Formelsammlung/Formeln/Knickwiderstand eines Holzstabs.md",
       "art": "formel",
@@ -2793,6 +2870,17 @@
       ],
       "themen": [
         "Stabquerschnitte"
+      ]
+    },
+    {
+      "name": "Kritische Normalkraft einer Verbundstütze",
+      "pfad": "Formelsammlung/Formeln/Kritische Normalkraft einer Verbundstütze.md",
+      "art": "formel",
+      "zeichen": [
+        "N_{cr,z}"
+      ],
+      "themen": [
+        "Verbundstütze"
       ]
     },
     {
@@ -3098,6 +3186,17 @@
       ]
     },
     {
+      "name": "Moment 2. Ordnung einer Verbundstütze",
+      "pfad": "Formelsammlung/Formeln/Moment 2. Ordnung einer Verbundstütze.md",
+      "art": "formel",
+      "zeichen": [
+        "M_{y,Ed,II}"
+      ],
+      "themen": [
+        "Verbundstütze"
+      ]
+    },
+    {
       "name": "Moment aus der Vorspannung",
       "pfad": "Formelsammlung/Formeln/Moment aus der Vorspannung.md",
       "art": "formel",
@@ -3322,12 +3421,22 @@
       ]
     },
     {
+      "name": "Plastischer Normalkraftwiderstand eines gefüllten Rohrs",
+      "pfad": "Formelsammlung/Formeln/Plastischer Normalkraftwiderstand eines gefüllten Rohrs.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Verbundstütze"
+      ]
+    },
+    {
       "name": "Plastischer Normalkraftwiderstand im Verbund",
       "pfad": "Formelsammlung/Formeln/Plastischer Normalkraftwiderstand im Verbund.md",
       "art": "formel",
       "zeichen": [],
       "themen": [
-        "Kennzahlen"
+        "Kennzahlen",
+        "Verbundstütze"
       ]
     },
     {
@@ -3385,7 +3494,8 @@
       "themen": [
         "Schiefe Biegung",
         "Stahlquerschnitt",
-        "Verbundquerschnitt"
+        "Verbundquerschnitt",
+        "Kennzahlen"
       ]
     },
     {
@@ -3590,6 +3700,17 @@
       ],
       "themen": [
         "Querschnittsanalyse"
+      ]
+    },
+    {
+      "name": "Querschnittsparameter einer Verbundstütze",
+      "pfad": "Formelsammlung/Formeln/Querschnittsparameter einer Verbundstütze.md",
+      "art": "formel",
+      "zeichen": [
+        "\\delta"
+      ],
+      "themen": [
+        "Verbundstütze"
       ]
     },
     {
@@ -4681,6 +4802,28 @@
       ]
     },
     {
+      "name": "Vergrösserungsfaktor der Imperfektion einer Verbundstütze",
+      "pfad": "Formelsammlung/Formeln/Vergrösserungsfaktor der Imperfektion einer Verbundstütze.md",
+      "art": "formel",
+      "zeichen": [
+        "k_{0,y}"
+      ],
+      "themen": [
+        "Verbundstütze"
+      ]
+    },
+    {
+      "name": "Vergrösserungsfaktor einer Verbundstütze",
+      "pfad": "Formelsammlung/Formeln/Vergrösserungsfaktor einer Verbundstütze.md",
+      "art": "formel",
+      "zeichen": [
+        "k_{y}"
+      ],
+      "themen": [
+        "Verbundstütze"
+      ]
+    },
+    {
       "name": "Versatz – Moment der Querkraftanteile um den Schwerpunkt",
       "pfad": "Formelsammlung/Formeln/Versatz – Moment der Querkraftanteile um den Schwerpunkt.md",
       "art": "formel",
@@ -4824,6 +4967,17 @@
       ],
       "themen": [
         "Innerer Pfahlwiderstand quer"
+      ]
+    },
+    {
+      "name": "Widerstand einer Verbundstütze nach (25)",
+      "pfad": "Formelsammlung/Formeln/Widerstand einer Verbundstütze nach (25).md",
+      "art": "formel",
+      "zeichen": [
+        "M_{y,Rd}"
+      ],
+      "themen": [
+        "Verbundstütze"
       ]
     },
     {
@@ -5031,6 +5185,17 @@
       ]
     },
     {
+      "name": "Wirksamer Elastizitätsmodul des Betons einer Verbundstütze",
+      "pfad": "Formelsammlung/Formeln/Wirksamer Elastizitätsmodul des Betons einer Verbundstütze.md",
+      "art": "formel",
+      "zeichen": [
+        "E_{c,eff}"
+      ],
+      "themen": [
+        "Verbundstütze"
+      ]
+    },
+    {
       "name": "Wirksamer Umfang des Nachweisschnitts",
       "pfad": "Formelsammlung/Formeln/Wirksamer Umfang des Nachweisschnitts.md",
       "art": "formel",
@@ -5128,6 +5293,17 @@
         "Zwängung auf Normalkraft",
         "Zwängung auf Biegung",
         "Stahlspannung aus Rissbreite"
+      ]
+    },
+    {
+      "name": "Zweiachsige Biegung einer Verbundstütze",
+      "pfad": "Formelsammlung/Formeln/Zweiachsige Biegung einer Verbundstütze.md",
+      "art": "formel",
+      "zeichen": [
+        "\\sum \\frac{M_{Ed,II}}{\\mu_d\\, M_{pl,Rd}}"
+      ],
+      "themen": [
+        "Verbundstütze"
       ]
     },
     {
@@ -7516,6 +7692,28 @@
       ]
     },
     {
+      "name": "opencivil.nachweis.qa_verbund_stuetze",
+      "pfad": "Python/opencivil.nachweis.qa_verbund_stuetze.md",
+      "art": "modul",
+      "kurz": "eine Verbundstuetze nach SIA 264:2014, 5.3.",
+      "stichworte": [
+        "_nulllinie",
+        "VerbundStuetzeQA",
+        "VerbundStuetzeQA.pruefe",
+        "VerbundStuetzeQA._grau",
+        "_einwirkung",
+        "_Querschnitt",
+        "_Querschnitt.steifigkeit",
+        "_Fall",
+        "_Fall._kriechen",
+        "_Fall._steifigkeit",
+        "_Fall._biegung",
+        "_Fall._zweite_ordnung",
+        "_Fall._interaktion",
+        "_Fall._zweiachsig"
+      ]
+    },
+    {
       "name": "opencivil.nachweis.qa_verbund_werte",
       "pfad": "Python/opencivil.nachweis.qa_verbund_werte.md",
       "art": "modul",
@@ -7523,10 +7721,13 @@
       "stichworte": [
         "stoffbezuege",
         "Verbundwerte",
+        "Verbundwerte.wert",
         "Verbundwerte.zahl",
+        "Verbundwerte.E",
         "Verbundwerte.gamma",
         "Verbundwerte.kennwert",
         "Verbundwerte.festigkeiten",
+        "Verbundwerte.druck_k",
         "Verbundwerte.zug",
         "Verbundwerte.druck",
         "Verbundwerte.eps",
@@ -8603,7 +8804,9 @@
         "_stahltraeger",
         "_holztraeger",
         "_verbundtraeger",
-        "_verbundduebel"
+        "_verbundduebel",
+        "_verbundstuetze",
+        "_verbundrohr"
       ]
     },
     {
@@ -10719,6 +10922,55 @@
         "Verbundquerschnitt.zustaende",
         "Verbundquerschnitt.freie_gedrueckt",
         "Verbundquerschnitt.kammerbetoniert"
+      ]
+    },
+    {
+      "name": "opencivil.verbund.stuetze",
+      "pfad": "Python/opencivil.verbund.stuetze.md",
+      "art": "modul",
+      "kurz": "eine Verbundstuetze nach SIA 264:2014, 5.3.",
+      "stichworte": [
+        "Art",
+        "_art_bei",
+        "_rundum",
+        "querschnittsart",
+        "Werkstoff",
+        "Werkstoff.I",
+        "_werkstoffe",
+        "Festigkeiten",
+        "Stuetze",
+        "Stuetze.der_art",
+        "Stuetze.flaeche",
+        "Stuetze.rho_s",
+        "Stuetze.anteil_s",
+        "Stuetze.zaehlt",
+        "Stuetze.unsymmetrisch",
+        "Stuetze.masse",
+        "Stuetze.hb",
+        "Stuetze.beulen",
+        "Stuetze.N_a",
+        "Stuetze.N_pl",
+        "Stuetze.delta",
+        "Stuetze.fehlt",
+        "Stuetze.stark",
+        "Stuetze.kurve",
+        "Stuetze.EI",
+        "Stuetze.E_c_eff",
+        "Stuetze.starr",
+        "Stuetze.M_pl",
+        "Knicken",
+        "Knicken.gehalten",
+        "Biegeachse",
+        "Biegeachse.knickt_aus",
+        "Biegeachse.nutzung",
+        "Ergebnis",
+        "Ergebnis.N",
+        "Ergebnis.summe",
+        "Ergebnis.grade",
+        "Ergebnis.massgebend",
+        "rechnen",
+        "_zu_lang",
+        "momente"
       ]
     },
     {

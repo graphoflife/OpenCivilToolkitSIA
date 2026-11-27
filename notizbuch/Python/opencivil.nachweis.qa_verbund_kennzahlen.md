@@ -1,5 +1,5 @@
 ---
-erzeugt: d23074a3c01b
+erzeugt: 5350947cd223
 art: modul
 tags: [modul]
 ---
@@ -94,6 +94,8 @@ def _summe(self, p: Protokoll, werte: Verbundwerte, ergebnis: Dict[str, Groesse]
 
 - `REFERENZ_ZUG = 'SIA 264:2014, 4.3.2.1; 5.1.2.1'`
 - `REFERENZ_14 = 'SIA 264:2014, 5.3.2.4, (14)'`
+- `ANSATZ_14 = 'N_{pl,Rd} = A_a\\, f_{yd} + A_c\\, 0.85\\, f_{cd} + A_s\\, f_{sd}'` – (14) als Ansatz und sein Name -- die Verbundstuetze schreibt ihn auch.
+- `NAME_14 = 'Plastischer Normalkraftwiderstand im Verbund'`
 - `AUF_NULL = 'Der Widerstand steht darum auf null.'` – Was in den Kennzahlen fehlt, wo ein Widerstand plastisch nicht gilt -- siehe Dateikopf.
 - `VOLLE_VERDUEBELUNG = 'Gerechnet mit voller Verdübelung, wie 5.1.2.1 es annimmt: Stahl und …` – Die Annahme hinter den Momentenwiderstaenden der Kennzahlen -- und mit Duebeln der Satz dazu.
 - `MIT_DUEBELN = 'Was die Dübel eines Lastfalls erlauben, rechnet sein Nachweis.'`
@@ -120,6 +122,7 @@ def _summe(self, p: Protokoll, werte: Verbundwerte, ergebnis: Dict[str, Groesse]
 ## Gebraucht von
 
 - [[opencivil.nachweis.qa_verbund]]
+- [[opencivil.nachweis.qa_verbund_stuetze]]
 - [[opencivil.projekt.aufbau.querschnittsanalyse]]
 
 ## Formeln aus diesem Modul
@@ -127,6 +130,7 @@ def _summe(self, p: Protokoll, werte: Verbundwerte, ergebnis: Dict[str, Groesse]
 - [[Plastischer Biegewiderstand mit β]] · `KennzahlenVerbundQA._biegung`
 - [[Plastischer Normalkraftwiderstand im Verbund]] · `KennzahlenVerbundQA._normalkraft`
 - [[Probe – Moment um y]] · `KennzahlenVerbundQA._biegung`
+- [[Probe – Moment um z]] · `KennzahlenVerbundQA._biegung`
 - [[Schubwiderstand eines Kopfbolzendübels]] · `KennzahlenVerbundQA._duebel`
 - [[Schubwiderstand eines Kopfbolzendübels – Betonstauchung]] · `KennzahlenVerbundQA._duebel`
 - [[Schubwiderstand eines Kopfbolzendübels – Versagen des Dübels]] · `KennzahlenVerbundQA._duebel`

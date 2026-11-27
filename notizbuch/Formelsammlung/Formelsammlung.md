@@ -1,5 +1,5 @@
 ---
-erzeugt: 19dc63d1c67e
+erzeugt: 96e0454a98a9
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -20,7 +20,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Querschnitt]] · 4
 - [[Biegung und Normalkraft]] · 26
 - [[Verformung]] · 9
-- [[Kennzahlen]] · 50
+- [[Kennzahlen]] · 51
 - [[Querkraft]] · 16
 - [[Duktilität]] · 9
 - [[Zwängung auf Normalkraft]] · 13
@@ -43,6 +43,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Holzquerschnitt]] · 28
 - [[Knicken und Kippen eines Holzstabs]] · 19
 - [[Verbundquerschnitt]] · 14
+- [[Verbundstütze]] · 20
 
 **Balkensysteme**
 
@@ -114,6 +115,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Beiwert zur Berücksichtigung der Festigkeitsminderung]] · $\eta_{fc}$
 - [[Beiwert ε der Grenzschlankheiten]]
 - [[Beiwert η der Momentenverteilung beim Kippen]] · $\eta$
+- [[Beiwert μ_d einer Verbundstütze]] · $\mu_{d,y}$
 - [[Beiwert Φ beim Kippen]] · $\Phi_{D}$
 - [[Beiwert Φ beim Knicken]] · $\Phi_{K,y}$
 - [[Beiwert ω der Momentenverteilung]] · $\omega_{y}$
@@ -121,6 +123,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Bemessungsspektrum (32)]] · $S_{d,x}$
 - [[Bemessungsspektrum (33)]] · $S_{d,y}$
 - [[Bemessungsspektrum (34)]] · $S_{d,y}$
+- [[Bemessungssteifigkeit einer Verbundstütze]] · $(EI)_{eff,d,y}$
 - [[Bemessungswert der Betondruckfestigkeit]] · $f_{cd}$
 - [[Bemessungswert der Fliessgrenze]] · $f_{yd}$
 - [[Bemessungswert der Fliessgrenze auf Druck]] · $f_{yd}^{-}$
@@ -149,6 +152,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Bewehrungsquerschnitt über die Breite b]]
 - [[Bezogene Druckzonenhöhe]] · $\left(x/d\right)^{+}$
 - [[Bezogene Druckzonenhöhe bei reiner Biegung]] · $x/d$
+- [[Bezogene Schlankheit einer Verbundstütze]] · $\bar{\lambda}_{z}$
 - [[Bezugsgrösse der Normalkraft]] · $N_{ref}$
 - [[Bezugsgrösse des Moments]] · $M_{ref}$
 - [[Biegebewehrung im Stützstreifen je Meter]] · $a_{s,x}$
@@ -158,6 +162,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Biegesteifigkeit]] · $EI_{\text{Q1}}$
 - [[Biegesteifigkeit der Wände]] · $EI_x$
 - [[Biegesteifigkeit des Pfahls]] · $EI$
+- [[Biegesteifigkeit einer Verbundstütze für die Schlankheit]] · $(EI)_{eff,\lambda,z}$
 - [[Biegesteifigkeit um y]] · $EI_{y}$
 - [[Biegesteifigkeit um z]] · $EI_{z}$
 - [[Biegewiderstand bis zum ersten Fliessen]] · $M_{y,Rd}^{+}$
@@ -207,6 +212,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Erfüllungsgrad]] · $\alpha_{eff,x}$
 - [[Erfüllungsgrad bei fester Normalkraft und fester Richtung]]
 - [[Ersatzimperfektion des Stabs]] · $w_{0,y}$
+- [[Ersatzimperfektion einer Verbundstütze]] · $e_{0,y}$
 - [[Ersatzkraft]] · $F_{d,x}$
 - [[Ersatzkraft eines Geschosses]]
 - [[Erweiterte Tragfähigkeitsformel]]
@@ -302,6 +308,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Knicken und Biegung eines Holzstabs]]
 - [[Knicklast nach Euler]] · $N_{cr,y}$
 - [[Knickwiderstand]] · $N_{K,y,Rd}$
+- [[Knickwiderstand einer Verbundstütze]] · $N_{K,z,Rd}$
 - [[Knickwiderstand eines Holzstabs]] · $N_{K,z,Rd}$
 - [[Kohäsion für örtliches Abscheren]] · $c^{*}$
 - [[Kopplung am Pfahlkopf]] · $K_{HM}$
@@ -311,6 +318,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Kräftegleichgewicht]] · $N_{Rd}^{+}$
 - [[Kräftegleichgewicht bei M_Ed = 0]]
 - [[Kreis im Knoten eines I-Profils]] · $d_{K}$
+- [[Kritische Normalkraft einer Verbundstütze]] · $N_{cr,z}$
 - [[Krümmungsbeiwert der Spannungs-Dehnungs-Beziehung]] · $k_{\sigma}$
 - [[Kürzere Seite eines Rechtecks]] · $t_{\text{Q1}}$
 - [[Kürzester Abstand zur Resistenzlinie]] · $a$
@@ -339,6 +347,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Mittlere statische Höhe der beiden Lagen der Zugbewehrung]] · $d$
 - [[Mittleres Moment im Stützstreifen]] · $m_{sd,x}$
 - [[Mitwirkende Breite eines Blechs]]
+- [[Moment 2. Ordnung einer Verbundstütze]] · $M_{y,Ed,II}$
 - [[Moment aus der Vorspannung]] · $M_{p,y}$
 - [[Moment der Bewehrung bei zulässiger Stahlspannung]]
 - [[Momentengleichgewicht um die halbe Höhe]] · $M_{Rd}^{+}$
@@ -358,6 +367,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Parabel-Rechteck-Beziehung des Betons]]
 - [[Plastischer Biegewiderstand eines Stahlquerschnitts]] · $M_{y,Rd}^{+}$
 - [[Plastischer Biegewiderstand mit β]] · $M_{y,Rd}^{+}$
+- [[Plastischer Normalkraftwiderstand eines gefüllten Rohrs]]
 - [[Plastischer Normalkraftwiderstand im Verbund]]
 - [[Plattenrotation]] · $\psi_x$
 - [[Platz für die Durchstanzbewehrung]] · $h_{frei}$
@@ -383,6 +393,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Querschnitt der Wendel]] · $A_{sw}$
 - [[Querschnitt eines Bügelschenkels]] · $A_{\varnothing,V}$
 - [[Querschnitt eines Spannglieds]] · $A_{p,1}$
+- [[Querschnittsparameter einer Verbundstütze]] · $\delta$
 - [[Radius des Bewehrungskreises]] · $r_s$
 - [[Raumlast im Gleitkörper]] · $\gamma_G$
 - [[Raumlast unter Auftrieb]] · $\gamma'$
@@ -483,6 +494,8 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Ungewollte Ausmitte – allgemein]]
 - [[Verdübelungsgrad]] · $\eta$
 - [[Vergrösserungsfaktor der Durchbiegung]] · $\omega_w$
+- [[Vergrösserungsfaktor der Imperfektion einer Verbundstütze]] · $k_{0,y}$
+- [[Vergrösserungsfaktor einer Verbundstütze]] · $k_{y}$
 - [[Versatz – Moment der Querkraftanteile um den Schwerpunkt]] · $\Delta T$
 - [[Verschmierte Stahlfläche aus Stäben]]
 - [[Vordehnung eines Spannglieds]] · $\varepsilon_{p,1}$
@@ -496,6 +509,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Widerstand der Druckdiagonalen im Pfahl]] · $V_{Rd,c}$
 - [[Widerstand der ersten Betondruckdiagonale]] · $V_{Rd,max}$
 - [[Widerstand der Wendel]] · $V_{Rd,s}$
+- [[Widerstand einer Verbundstütze nach (25)]] · $M_{y,Rd}$
 - [[Widerstand einer Wand (Fachwerk, ihre Länge l als Hebelarm)]]
 - [[Widerstand im normierten Diagramm]] · $\bar{R}_{d,x}$
 - [[Widerstand in der Richtung der Einwirkung]] · $M_{Rd}$
@@ -513,6 +527,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Wirksame Überlagerungsspannung]]
 - [[Wirksame Zugfestigkeit]] · $f_{ct,eff}$
 - [[Wirksamer Elastizitätsmodul]] · $E_{c,eff}$
+- [[Wirksamer Elastizitätsmodul des Betons einer Verbundstütze]] · $E_{c,eff}$
 - [[Wirksamer Umfang des Nachweisschnitts]] · $u$
 - [[Wölbanteil der Kippspannung]] · $\sigma_{Dw}$
 - [[Zerlegung eines Stabs im Raum]]
@@ -522,10 +537,11 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Zulässige Stahlspannung]] · $\sigma_{s,adm}$
 - [[Zulässige Stahlspannung (normale Anforderung)]] · $\sigma_{s,adm}$
 - [[Zulässige Stahlspannung (Rissbreite w_nom)]] · $\sigma_{s,adm,2,x}$
+- [[Zweiachsige Biegung einer Verbundstütze]] · $\sum \frac{M_{Ed,II}}{\mu_d\, M_{pl,Rd}}$
 
 ## Normstelle fehlt noch
 
-141 von 441 Formeln haben im Code keine Normstelle – meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle – von dort kommt sie in Bericht und Notizbuch.
+141 von 456 Formeln haben im Code keine Normstelle – meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle – von dort kommt sie in Bericht und Notizbuch.
 
 - [[Achsen eines Stabs im Raum]] · [[opencivil.stabwerk3d.herleitung|_ansaetze]]
 - [[Äquivalenter E-Modul eines Stabs]] · [[opencivil.spannungsanalyse.modul#ModulProzedur|ModulProzedur._schreiben]]
@@ -617,7 +633,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Nulllinie des gerissenen Querschnitts]] · [[opencivil.nachweis.mindestbewehrung#ZwaengungBiegung.protokoll_lage|ZwaengungBiegung.protokoll_lage]]
 - [[Platz für die Durchstanzbewehrung]] · [[opencivil.durchstanzen.mit_bewehrung#nachweisen|nachweisen]]
 - [[Probe – Moment um y]] · [[opencivil.nachweis.qa_stahl#probe|probe]], [[opencivil.nachweis.qa_verbund_kennzahlen#KennzahlenVerbundQA|KennzahlenVerbundQA._biegung]], [[opencivil.nachweis.schiefe_biegung#SchiefeBiegung|SchiefeBiegung._protokoll_bruchzustand]]
-- [[Probe – Moment um z]] · [[opencivil.nachweis.qa_stahl#probe|probe]], [[opencivil.nachweis.schiefe_biegung#SchiefeBiegung|SchiefeBiegung._protokoll_bruchzustand]]
+- [[Probe – Moment um z]] · [[opencivil.nachweis.qa_stahl#probe|probe]], [[opencivil.nachweis.qa_verbund_kennzahlen#KennzahlenVerbundQA|KennzahlenVerbundQA._biegung]], [[opencivil.nachweis.schiefe_biegung#SchiefeBiegung|SchiefeBiegung._protokoll_bruchzustand]]
 - [[Probe – Normalkraft]] · [[opencivil.nachweis.qa_stahl#krafttabelle|krafttabelle]], [[opencivil.nachweis.schiefe_biegung#SchiefeBiegung|SchiefeBiegung._protokoll_bruchzustand]]
 - [[Querkraft über die Federn der Wände]] · [[opencivil.nachweis.schubwandnachweis#Schubwandnachweis|Schubwandnachweis._protokoll_ansatz]]
 - [[Querschnitt der Wendel]] · [[opencivil.pfahl.innen_quer#InnererQuerwiderstand._fachwerk|InnererQuerwiderstand._fachwerk]]

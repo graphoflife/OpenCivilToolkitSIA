@@ -1,5 +1,5 @@
 ---
-erzeugt: 4f2e29f36c2c
+erzeugt: 87567f148a46
 art: modul
 tags: [modul]
 ---
@@ -339,6 +339,7 @@ def beschreibung(self) -> str
 - [[opencivil.nachweis.qa_stahl_stabilitaet]]
 - [[opencivil.nachweis.qa_stahl_werte]]
 - [[opencivil.nachweis.qa_verbund]]
+- [[opencivil.nachweis.qa_verbund_stuetze]]
 - [[opencivil.nachweis.qa_verbund_werte]]
 - [[opencivil.nachweis.querkraft]]
 - [[opencivil.nachweis.querkraft_buegel]]

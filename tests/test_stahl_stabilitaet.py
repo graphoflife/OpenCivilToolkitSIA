@@ -417,7 +417,7 @@ class TestEintrag(unittest.TestCase):
         self.assertEqual(wieder.stabilitaetsfaelle, a.stabilitaetsfaelle)
         self.assertEqual(wieder.stabfaelle()[0],
                          st.Stabfall("Feld", N=-500e3, M_y=80e3, psi_y=-0.5, L_K_y=6.0,
-                                     L_K_z=3.0, L_D=3.0))
+                                     L_K_z=3.0, L_D=3.0, L=3.0))
 
 
 if __name__ == "__main__":

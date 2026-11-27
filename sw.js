@@ -129,12 +129,14 @@ const VORRAT = {
     "web/js/projekte.js?v=4cf72047989c",
     "web/js/python.js?v=e36b207b3ea6",
     "web/js/qa_diagramme.js?v=a2188b51b5aa",
+    "web/js/qa_fallteile.js?v=004b24b4cc2e",
     "web/js/qa_profile.js?v=01270e9df874",
     "web/js/qa_spannglied.js?v=85e13c8d90f9",
+    "web/js/qa_stabilitaet.js?v=a9d195d2cebf",
     "web/js/qa_uebersicht.js?v=73ae3989fa1b",
     "web/js/qa_vorlagen.js?v=d617741b20c0",
     "web/js/qa_zeichnung.js?v=cb9933c6959b",
-    "web/js/querschnittsanalyse.js?v=8c0377a2899f",
+    "web/js/querschnittsanalyse.js?v=dbd8018e25cd",
     "web/js/setzung.js?v=21db1c68db33",
     "web/js/sinnbilder.js?v=3e27e0239aa9",
     "web/js/spannungsbild.js?v=5bf6ce4eb080",
@@ -142,8 +144,8 @@ const VORRAT = {
     "web/js/variablen.js?v=7d43b6f38cd9",
     "web/js/zeichnen.js?v=da6e8eec5dc8",
     "web/js/zustand.js?v=3385a39c0f84",
-    "web/kern/notizbuch.json?v=fcb95f343463",
-    "web/kern/quellen.json?v=7d92e632ecf5"
+    "web/kern/notizbuch.json?v=966d978a3bea",
+    "web/kern/quellen.json?v=815bdb1ac556"
   ],
   "fremd": {
     "web/vendor/jetbrains-mono/": {

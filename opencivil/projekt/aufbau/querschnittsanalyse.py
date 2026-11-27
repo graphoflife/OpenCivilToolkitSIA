@@ -36,6 +36,7 @@ from opencivil.nachweis.qa_stahl_stabilitaet import StahlStabilitaetQA
 from opencivil.nachweis.qa_verbund import OHNE_TORSION as OHNE_TORSION_VERBUND
 from opencivil.nachweis.qa_verbund import VerbundBiegungQA, VerbundQuerkraftQA
 from opencivil.nachweis.qa_verbund_kennzahlen import KennzahlenVerbundQA
+from opencivil.nachweis.qa_verbund_stuetze import VerbundStuetzeQA
 from opencivil.nachweis.qa_knicken import KnickenQA, QAKnickfall
 from opencivil.nachweis.richtungsnachweise import DuktilitaetQA, SproedesVersagenQA
 from opencivil.nachweis.schiefe_biegung import SchiefeBiegung
@@ -201,7 +202,9 @@ def _verbund(eintrag: QuerschnittsanalyseEintrag, analyse: Querschnittsanalyse, 
     Kennzahlen. Mit Kopfbolzenduebeln steht ihr ``P_Rd`` in den Kennzahlen,
     und je Lastfall die Verduebelung bei Biegung und Normalkraft, mit seiner
     Zahl der Duebel. Torsion weist er nicht nach; ein Lastfall mit ``T_Ed``
-    sagt es. Knicken und Kippen fehlen noch, ebenso die
+    sagt es. Sobald ein Stabilitaetsfall eingeschaltet ist, die
+    Verbundstuetze (:mod:`~opencivil.nachweis.qa_verbund_stuetze`); das
+    Kippen des Verbundtraegers fehlt noch, ebenso die
     Spannung-Dehnung-Analysen (:func:`ohne_analysen`).
     """
     duebel = None
@@ -222,6 +225,10 @@ def _verbund(eintrag: QuerschnittsanalyseEintrag, analyse: Querschnittsanalyse, 
     if mit_torsion:
         aufbau.warnen(teil.raum,
                       f"{ort_von(eintrag)}, {', '.join(mit_torsion)}: {OHNE_TORSION_VERBUND}")
+    stabfaelle = eintrag.stabfaelle()
+    if stabfaelle:
+        aufbau.eintragen(teil, "qa_verbund_stuetze", eintrag.kennung,
+                         VerbundStuetzeQA(analyse, stabfaelle, eintrag.stuetze_kriechzahl))
     _kennzahlen(kennzahlen, teil, aufbau)
     return teil
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: 6ce3c3f3e16c
+erzeugt: 24a66f3b45c9
 art: modul
 tags: [modul]
 ---
@@ -13,7 +13,8 @@ Die Kennzahlen ([[opencivil.nachweis.qa_verbund_kennzahlen]]) und die
 Nachweise je Lastfall ([[opencivil.nachweis.qa_verbund]]) lesen dieselben
 Festigkeiten und schreiben dieselben Tabellen; beides steht hier, je einmal:
 
-* je Gruppe die Festigkeit gezogen und gedrueckt ([[opencivil.nachweis.qa_verbund_werte#Verbundwerte|Verbundwerte]]);
+* je Gruppe die Festigkeit gezogen und gedrueckt ([[opencivil.nachweis.qa_verbund_werte#Verbundwerte|Verbundwerte]]) --
+  fuer die Verbundstuetze auch charakteristisch und den Elastizitaetsmodul;
 * die Tabelle dieser Festigkeiten mit ihrem Ansatz ([[opencivil.nachweis.qa_verbund_werte#festigkeiten|festigkeiten]]);
 * die Tabelle der Bleche mit ihren Klassen ([[opencivil.nachweis.qa_verbund_werte#klassen|klassen]]);
 * `β` nach 5.1.2.2 mit `x_p` und `h` ([[opencivil.nachweis.qa_verbund_werte#beta|beta]]).
@@ -52,7 +53,17 @@ Die Kennwerte aller Materialien des Querschnitts, als Eingaben.
 class Verbundwerte
 ```
 
-Die Festigkeiten der Gruppen eines Verbundquerschnitts -- siehe Dateikopf.
+Die Festigkeiten der Gruppen eines Verbundquerschnitts -- siehe
+Dateikopf. `beton_faktor` rechnet die Druckfestigkeit des Betons um:
+0.85, im gefuellten Rohr der Verbundstuetze 1.0.
+
+#### Verbundwerte.wert
+
+```python
+def wert(self, g: int, kurz: str) -> Wert
+```
+
+Ein Kennwert des Materials der Gruppe `g`, unter seinem Namen -- ohne die Dicke.
 
 #### Verbundwerte.zahl
 
@@ -60,7 +71,15 @@ Die Festigkeiten der Gruppen eines Verbundquerschnitts -- siehe Dateikopf.
 def zahl(self, g: int, kurz: str) -> float
 ```
 
-Ein Kennwert des Materials der Gruppe `g`: Spannungen in N/mm², Beiwerte rein.
+Derselbe als Zahl: Spannungen in N/mm², Beiwerte rein.
+
+#### Verbundwerte.E
+
+```python
+def E(self, g: int) -> float
+```
+
+Der Elastizitaetsmodul der Gruppe `g` in N/mm²: `E_a`, `E_cm` oder `E_s`.
 
 #### Verbundwerte.gamma
 
@@ -86,6 +105,15 @@ def festigkeiten(self) -> List[Tuple[float, float]]
 ```
 
 Je Gruppe `(zug, druck)` in N/mm² -- siehe Dateikopf.
+
+#### Verbundwerte.druck_k
+
+```python
+@cached_property
+def druck_k(self) -> List[float]
+```
+
+Je Gruppe gedrueckt mit γ = 1, in N/mm²: `f_y`, der Beton umgerechnet, `f_sk`.
 
 #### Verbundwerte.zug
 
@@ -171,6 +199,7 @@ hierher.
 - `REFERENZ_FESTIGKEIT = 'SIA 264:2014, 4.1.3, (1); 4.1.5; 4.3.2.1; 5.1.2.1'`
 - `BETON_FAKTOR = 0.85` – Der Umrechnungsfaktor der Betondruckfestigkeit im plastischen Widerstand (5.1.2.1).
 - `_KENNWERTE = {Baustoffart.BAUSTAHL: KENNWERTE, Baustoffart.BETON: ('f_ck', 'gamma_…` – Was je Material gelesen wird, nach seiner Art.
+- `MODUL = {Baustoffart.BAUSTAHL: 'E_a', Baustoffart.BETON: 'E_cm', Baustoffart.…` – Der Elastizitaetsmodul je Art.
 - `_GAMMA = {Baustoffart.BAUSTAHL: 'gamma_M1', Baustoffart.BETON: 'gamma_c', Baus…` – Der Beiwert je Art -- beim Baustahl `γ_M1`, im Verbund `γ_a` genannt.
 - `_ANSATZ = {Baustoffart.BAUSTAHL: ('f_{yd} = \\frac{f_y}{\\gamma_a}', 'f_{yd} = …` – Je Art der Teil des Ansatzes, mit und ohne Beiwert.
 - `SPANNUNG = '\\ [\\mathrm{N}/\\mathrm{mm}^2]'`
@@ -194,6 +223,7 @@ hierher.
 
 - [[opencivil.nachweis.qa_verbund]]
 - [[opencivil.nachweis.qa_verbund_kennzahlen]]
+- [[opencivil.nachweis.qa_verbund_stuetze]]
 
 ## Formeln aus diesem Modul
 

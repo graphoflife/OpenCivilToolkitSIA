@@ -57,6 +57,10 @@ from opencivil.verbund.querschnitt import Verbundquerschnitt
 REFERENZ_ZUG = "SIA 264:2014, 4.3.2.1; 5.1.2.1"
 REFERENZ_14 = "SIA 264:2014, 5.3.2.4, (14)"
 
+#: (14) als Ansatz und sein Name -- die Verbundstuetze schreibt ihn auch.
+ANSATZ_14 = r"N_{pl,Rd} = A_a\, f_{yd} + A_c\, 0.85\, f_{cd} + A_s\, f_{sd}"
+NAME_14 = "Plastischer Normalkraftwiderstand im Verbund"
+
 #: Was in den Kennzahlen fehlt, wo ein Widerstand plastisch nicht gilt -- siehe Dateikopf.
 AUF_NULL = "Der Widerstand steht darum auf null."
 
@@ -243,9 +247,8 @@ class KennzahlenVerbundQA(Kennzahlprozedur):
             p.hinweis(f"{vw.UEBER_KLASSE_2} Massgebend: {wer}. {AUF_NULL}")
             p.wert(self._belegen(ergebnis, "N_Rd_druck", 0.0), titel="Druckwiderstand")
             return
-        p.ansatz(r"N_{pl,Rd} = A_a\, f_{yd} + A_c\, 0.85\, f_{cd} + A_s\, f_{sd}",
-                 titel="Plastischer Normalkraftwiderstand, Teil für Teil", referenz=REFERENZ_14,
-                 name="Plastischer Normalkraftwiderstand im Verbund")
+        p.ansatz(ANSATZ_14, titel="Plastischer Normalkraftwiderstand, Teil für Teil",
+                 referenz=REFERENZ_14, name=NAME_14)
         self._summe(p, werte, ergebnis, "N_Rd_druck", werte.druck, vorzeichen=-1.0,
                     titel=f"Druckwiderstand in Klasse {klasse}", referenz=REFERENZ_14)
 

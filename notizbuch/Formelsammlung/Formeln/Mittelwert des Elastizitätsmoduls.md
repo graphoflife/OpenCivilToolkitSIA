@@ -1,5 +1,5 @@
 ---
-erzeugt: fc83c284e313
+erzeugt: 2c5327459d8b
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 3.1.2.3.3, (10)"
@@ -40,6 +40,7 @@ $$
 - [[Schubwiderstand eines Kopfbolzendübels – Betonstauchung]]
 - [[Wertigkeit im gerissenen Zustand]]
 - [[Wirksamer Elastizitätsmodul]]
+- [[Wirksamer Elastizitätsmodul des Betons einer Verbundstütze]]
 
 ## Im Code
 

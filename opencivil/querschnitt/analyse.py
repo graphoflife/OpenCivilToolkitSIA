@@ -235,8 +235,11 @@ class Zeichnung:
     Jedes Element ist ein Woerterbuch mit ``name`` und ``kennung``, wie sie
     :meth:`QuerschnittsanalyseEintrag.elemente` vergibt -- benannt wird hier
     nichts. ``polygone`` tragen ``punkte``, ``traegt`` (ohne Material ist
-    es eine Aussparung) und ``beton``: ob Bewehrung in ihm liegen darf
-    (:data:`~opencivil.querschnitt.bauweise.BEWEHRT`). ``staebe`` ``lage``
+    es eine Aussparung), ``beton``: ob Bewehrung in ihm liegen darf
+    (:data:`~opencivil.querschnitt.bauweise.BEWEHRT`), und ``profil``: beim
+    Umriss eines Stahlprofils seine Lage, sonst ``None`` -- ein Polygon mit
+    Material darin ersetzte seinen Stahl und ist ein Fehler, im Loch eines
+    Rohrs dagegen fuellt es das Rohr. ``staebe`` ``lage``
     und ``durchmesser``, ``linien`` und ``waende`` die Felder der
     Beschreibung, ``spannglieder`` wie die Staebe, mit dem Durchmesser ihrer
     Flaeche.
@@ -250,6 +253,7 @@ class Zeichnung:
         self.beton = [bool(f["beton"]) for f in polygone]
         self.namen = [f["name"] for f in polygone]
         self.kennungen = [f["kennung"] for f in polygone]
+        self.profil = [f.get("profil") is not None for f in polygone]
         # Die Geometrie nennt ein Polygon beim Namen; gemeldet wird die Kennung.
         self._kennung_von = dict(zip(self.namen, self.kennungen))
         self.meldungen: List[Meldung] = []
@@ -299,6 +303,10 @@ class Zeichnung:
                 self._melden(f"{self.namen[i]} liegt in keinem Polygon mit Material. "
                              f"Eine Aussparung nimmt Fläche weg – sie muss in "
                              f"einer liegen.", self.kennungen[i])
+            elif self.traegt[i] and eltern is not None and self.profil[eltern]:
+                self._melden(f"{self.namen[i]} liegt auf dem Stahl von {self.namen[eltern]} und "
+                             f"ersetzte ihn dort. Beton, der ein Rohr füllt, liegt ganz in "
+                             f"seinem Loch.", self.kennungen[i], self.kennungen[eltern])
         if any(self.traegt) and not self.meldungen:
             self.brutto = geo.summe([(self.gewicht(i), geo.flaechenwerte(p))
                                      for i, p in enumerate(self.punkte)
@@ -475,7 +483,8 @@ class Querschnittsanalyse(Rechenobjekt):
         self.zeichnung = Zeichnung(
             polygone=[{"punkte": f.punkte, "traegt": f.stoff is not None,
                        "beton": f.stoff is not None and f.stoff.art is BEWEHRT,
-                       "name": f.name, "kennung": f.kennung} for f in self.flaechen],
+                       "name": f.name, "kennung": f.kennung, "profil": f.profil}
+                      for f in self.flaechen],
             staebe=staebe, linien=linien, waende=waende,
             spannglieder=[{"name": g.name, "kennung": g.kennung, "lage": g.von,
                            "durchmesser": g.durchmesser} for g in spannglieder])

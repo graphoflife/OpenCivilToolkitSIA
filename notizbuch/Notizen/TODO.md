@@ -1499,10 +1499,11 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
         x_p/h = 0.4, wo Figur 1 endet, steht der Fall grau. Beim HEA 300
         aus S460 unter einer Platte 1500 × 120 mm ist darum die Biegung
         um z grau: die Druckzone reicht über 0.4 der Breite.
-      - Der Beton mit 0.85·f_cd überall, auch im gefüllten Rohr: 1.0 nach
-        5.3.2.5 kommt mit den Verbundstützen. γ_a ist γ_M1 des Baustahls.
-      - Ein Rohr im Verbund mit den Grenzen der SIA 263 statt der
-        Tabelle 6 (kommt mit den Verbundstützen).
+      - Der Beton mit 0.85·f_cd überall, auch im gefüllten Rohr; nur die
+        Verbundstütze rechnet ihn dort mit 1.0 (5.3.2.5, 5.3.4.4), seit
+        2026-11-27. γ_a ist γ_M1 des Baustahls.
+      - Ein Rohr im Verbundquerschnitt mit den Grenzen der SIA 263; die
+        Tabelle 6 gilt der Verbundstütze, und dort prüft das Werkzeug sie.
       - Die Querkraft trägt der Stahl allein; einen Anteil des Betons nach
         5.2.2.2 rechnet das Werkzeug nicht.
       - Torsion nicht nachgewiesen; ein Hinweis nennt den Lastfall.
@@ -1548,6 +1549,61 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       - wie die Dübel bis zum Momentennullpunkt verteilt sind: gleichmässig
         nur unter den Bedingungen von 6.1.2.3; das Werkzeug fragt nur ihre
         Zahl.
+
+- [ ] **Verbundstütze, nach Vorgabe eingebaut** (`opencivil/verbund/stuetze.py`,
+      `opencivil/nachweis/qa_verbund_stuetze.py`, seit 2026-11-27). Jede
+      Annahme steht auch in der Herleitung.
+      - Doppelsymmetrisch heisst: je Werkstoff liegt der Schwerpunkt
+        höchstens 1 mm neben der Mitte des Profils, und |I_yz| erreicht
+        höchstens 1 % von √(I_y I_z).
+      - Die Art nach Tabelle 7 liest das Werkzeug an der Zeichnung: ganz
+        einbetoniert, wenn acht Punkte 1 mm ausserhalb des umschreibenden
+        Rechtecks des Profils – Ecken und Mitten der Seiten – im Beton
+        liegen; kammerbetoniert, wenn Beton den Steg beidseits und jeden
+        Flansch innen deckt und ausserhalb des Profils nichts liegt;
+        gefüllt, wenn in der Mitte des Rohrs Beton liegt und ausserhalb
+        nichts. Nur ein einziges Profil aus der Tabelle.
+      - Der Betonstahl über 6 % der Betonfläche zählt in jedem Stab
+        gleichmässig weniger, auch in M_pl und in der Steifigkeit; 5.3.2.2
+        sagt es für den Widerstand.
+      - Ein Rohr mit mehr als 6 % Betonstahl rechnet mit Kurve b: Tabelle 7
+        endet bei 6 %.
+      - Die Ersatzimperfektion wächst mit k_0 = 1/(1 − N_Ed/N_cr,eff), also
+        mit ω = 1 wie unter einer Querlast; zweiachsig wirkt sie in beiden
+        Achsen zugleich.
+      - Zweiachsig: Σ M_Ed,II/(μ_d M_pl,Rd) ≤ 0.9, bei S420 und S460 0.8.
+        5.3.5 nennt die lineare Interaktion, aber keine Grenze.
+      - μ_d höchstens 1: ob das Moment aus der Normalkraft selbst entsteht,
+        weiss das Werkzeug nicht (5.3.4.6).
+      - Die Theorie 2. Ordnung immer, auch wo (21) sie erliesse.
+      - Eine Achse mit Moment rechnet immer nach 5.3.4; 5.3.2.2 liesse den
+        zentrischen Nachweis bis zu einer Endexzentrizität von 0.1 h zu.
+      - Eine Knicklänge null heisst gehalten: um diese Achse knickt die
+        Stütze nicht, und ein Moment um sie wächst nicht.
+      - E_s ist der Wert des Betonstahls; 3.6.2 liesse vereinfacht
+        210 kN/mm² zu.
+
+      Vorschlag: so lassen. Entscheid des Benutzers.
+
+- [ ] **Verbundstütze, noch nicht nachgewiesen** (seit 2026-11-27):
+      - die Querkraft im Profil: ab V_a,Ed ≥ 0.5 V_pla,Rd mindert sie den
+        Biegewiderstand (5.3.4.5);
+      - die Einleitung der Lasten und der Schub zwischen Stahl und Beton
+        (5.3.6);
+      - die Steifigkeit aus Moment und Krümmung (18);
+      - ein Querschnitt ausserhalb der Tabelle 7 (5.3.5 verweist dafür auf
+        SN EN 1994-1-1).
+      Idee: die Kachel könnte die Art des Querschnitts schon nennen, bevor
+      ein Fall rechnet; heute steht sie in der Herleitung und, wo sie
+      fehlt, grau am Fall.
+
+- [ ] **Ein Rohr füllen – zu entscheiden** (seit 2026-11-27). Beton, der
+      ein Rohr füllt, muss ganz in seinem Loch liegen; das Loch eines RRK
+      hat runde Ecken, ein Rechteck mit den Innenmassen liegt darum auf dem
+      Stahl, und die Zeichnung meldet es rot. Von Hand geht es nur mit einem
+      Vieleck, das den Ecken ausweicht. Vorschlag: am Profil ein Feld
+      «Füllung» mit dem Beton – das Loch wird dann selbst zur Fläche aus
+      diesem Beton, genau, ohne Zeichnen. Entscheid des Benutzers.
 
 - [ ] **Holz: C16 unter Zug – zu entscheiden** (`opencivil/material/holz.py`,
       `zugglied_grund`, seit 2026-11-26). SIA 265 lässt C16 nicht als
@@ -1842,9 +1898,9 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
 - [ ] **Querschnittsanalyse, nächste Schritte:** Stahl (SIA 263) und Holz
       (SIA 265) haben seit 2026-11-26 ihre Nachweise, mit Knicken und
       Kippen, der Verbund (SIA 264) die Tragsicherheit des Querschnitts.
-      Seit 2026-11-27 auch die Verdübelung (6.1). Beim Verbund fehlen noch
-      die Verbundstützen mit Knicken (5.3, 14c), die Blechverbunddecken
-      (5.4, 14d), das Kippen (5.1.2.6), der elastische Widerstand der Klasse 3
+      Seit 2026-11-27 auch die Verdübelung (6.1) und die Verbundstützen
+      (5.3). Beim Verbund fehlen noch die Blechverbunddecken (5.4, 14d),
+      das Kippen (5.1.2.6), der elastische Widerstand der Klasse 3
       (5.1.2.4, 5.1.2.5) und die Spannung-Dehnung-Analysen: sein Riss
       braucht den ideellen Querschnitt. Ein E_eq im Balkensystem gibt es
       bis dahin nur beim Stahlbeton. Dazu weitere Nachweise (Wände ohne

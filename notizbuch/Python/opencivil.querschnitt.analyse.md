@@ -1,5 +1,5 @@
 ---
-erzeugt: 9956f2a66466
+erzeugt: aa5383c967c5
 art: modul
 tags: [modul]
 ---
@@ -203,8 +203,11 @@ gerechnet wird nur, was ganz stimmt. Dieselben Pruefungen an einer Stelle.
 Jedes Element ist ein Woerterbuch mit `name` und `kennung`, wie sie
 [[opencivil.querschnitt.analyse#Zeichnung|QuerschnittsanalyseEintrag.elemente]] vergibt -- benannt wird hier
 nichts. `polygone` tragen `punkte`, `traegt` (ohne Material ist
-es eine Aussparung) und `beton`: ob Bewehrung in ihm liegen darf
-([[opencivil.querschnitt.bauweise#Konstanten|BEWEHRT]]). `staebe` `lage`
+es eine Aussparung), `beton`: ob Bewehrung in ihm liegen darf
+([[opencivil.querschnitt.bauweise#Konstanten|BEWEHRT]]), und `profil`: beim
+Umriss eines Stahlprofils seine Lage, sonst `None` -- ein Polygon mit
+Material darin ersetzte seinen Stahl und ist ein Fehler, im Loch eines
+Rohrs dagegen fuellt es das Rohr. `staebe` `lage`
 und `durchmesser`, `linien` und `waende` die Felder der
 Beschreibung, `spannglieder` wie die Staebe, mit dem Durchmesser ihrer
 Flaeche.
@@ -531,6 +534,7 @@ Jede Ecke eines Polygons mit Material -- fuer das Rissmoment, in mm.
 - [[opencivil.nachweis.qa_stahl_stabilitaet]]
 - [[opencivil.nachweis.qa_verbund]]
 - [[opencivil.nachweis.qa_verbund_kennzahlen]]
+- [[opencivil.nachweis.qa_verbund_stuetze]]
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.nachweis.richtungsnachweise]]
 - [[opencivil.nachweis.rissgroessen]]

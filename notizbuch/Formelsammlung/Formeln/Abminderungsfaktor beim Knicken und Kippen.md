@@ -1,5 +1,5 @@
 ---
-erzeugt: 75f82c44c021
+erzeugt: 269d84e63d10
 art: formel
 tags: [formel]
 normstelle: ["SIA 263:2013, 4.5.1.3, (7); 4.5.1.4, (8); Tabelle 8", "SIA 263:2013, 4.5.2.2, (9); 4.5.2.3, (10)"]
@@ -36,15 +36,18 @@ $$
 
 - [[Kippwiderstand]]
 - [[Knickwiderstand]]
+- [[Knickwiderstand einer Verbundstütze]]
 
 ## Im Code
 
 - [[opencivil.nachweis.qa_stahl_stabilitaet#_Herleitung.kippen|_Herleitung.kippen]]
 - [[opencivil.nachweis.qa_stahl_stabilitaet#_Herleitung.knicken|_Herleitung.knicken]]
+- [[opencivil.nachweis.qa_verbund_stuetze#_Fall|_Fall._knicken]]
 
 ## Themen
 
 - [[Knicken und Kippen]]
+- [[Verbundstütze]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

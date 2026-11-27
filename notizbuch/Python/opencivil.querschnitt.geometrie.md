@@ -1,5 +1,5 @@
 ---
-erzeugt: 52106a3e58ae
+erzeugt: 70f0b91d075e
 art: modul
 tags: [modul]
 ---
@@ -600,6 +600,7 @@ Ueberdeckung, oder wenn die Linie dabei keine Laenge behielte.
 - [[opencivil.stahlbau.stabilitaet]]
 - [[opencivil.stahlbau.widerstand]]
 - [[opencivil.verbund.querschnitt]]
+- [[opencivil.verbund.stuetze]]
 - [[opencivil.verbund.widerstand]]
 - [[opencivil.web.api]]
 - [[opencivil.web.zeichengeometrie]]

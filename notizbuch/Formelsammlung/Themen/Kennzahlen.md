@@ -1,10 +1,10 @@
 ---
-erzeugt: 1958f262b352
+erzeugt: 9bb3b26cb785
 art: thema
 tags: [thema]
 ---
 > [!abstract] Platte
-> 50 Formeln, in der Folge, in der gerechnet wird.
+> 51 Formeln, in der Folge, in der gerechnet wird.
 
 ## Was die Rechnung dazu sagt
 
@@ -80,6 +80,7 @@ Was der Verbundquerschnitt aufnimmt, ohne Bezug auf einen Lastfall: die Widerst�
 48. [[Schubwiderstand eines Kopfbolzendübels – Betonstauchung]]
 49. [[Schubwiderstand eines Kopfbolzendübels – Versagen des Dübels]]
 50. [[Schubwiderstand eines Kopfbolzendübels]]
+51. [[Probe – Moment um z]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

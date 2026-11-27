@@ -1,5 +1,5 @@
 ---
-erzeugt: 2d799582dca4
+erzeugt: 11c50aab2a4f
 art: modul
 tags: [modul]
 ---
@@ -259,4 +259,5 @@ Ob Beton im I-Profil den Flansch innen, den Steg beidseits deckt -- siehe Dateik
 
 - [[opencivil.nachweis.qa_verbund_kennzahlen]]
 - [[opencivil.nachweis.qa_verbund_werte]]
+- [[opencivil.verbund.stuetze]]
 - [[opencivil.verbund.widerstand]]

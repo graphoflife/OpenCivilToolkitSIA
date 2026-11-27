@@ -1,5 +1,5 @@
 ---
-erzeugt: 51805742b16f
+erzeugt: a34d512c396e
 art: modul
 tags: [modul]
 ---
@@ -38,6 +38,7 @@ Kapitel waehlt, womit es rechnet.
 - [[opencivil.nachweis.qa_stahl_werte]] – was Kennzahlen und Nachweise eines Stahlquerschnitts teilen.
 - [[opencivil.nachweis.qa_verbund]] – die Lastfaelle eines Verbundquerschnitts nach SIA 264:2014.
 - [[opencivil.nachweis.qa_verbund_kennzahlen]] – was ein Verbundquerschnitt aufnimmt, ohne Einwirkung.
+- [[opencivil.nachweis.qa_verbund_stuetze]] – eine Verbundstuetze nach SIA 264:2014, 5.3.
 - [[opencivil.nachweis.qa_verbund_werte]] – was Kennzahlen und Nachweise im Verbund teilen.
 - [[opencivil.nachweis.querkraft]] – Querkraftnachweis, was beide Ansaetze teilen.
 - [[opencivil.nachweis.querkraft_buegel]] – Querkraft mit Querkraftbewehrung.

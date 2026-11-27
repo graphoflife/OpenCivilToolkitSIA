@@ -387,7 +387,8 @@ class Stabfall:
     """
     Ein Fall des Stabs, in SI wie ein Lastfall der Analyse: ``N`` in N,
     negativ Druck, die Momente in Nm um den Schwerpunkt, die Laengen in m --
-    eine Laenge null heisst gehalten.
+    eine Laenge null heisst gehalten. Nur im Verbund zaehlen ``staendig``
+    und ``L`` (:mod:`opencivil.verbund.stuetze`).
     """
 
     name: str
@@ -399,6 +400,11 @@ class Stabfall:
     L_K_y: float = 0.0
     L_K_z: float = 0.0
     L_D: float = 0.0
+    staendig: float = 1.0
+    """Der staendige Anteil der Normalkraft, ``N_G,Ed/N_Ed``: er kriecht."""
+
+    L: float = 0.0
+    """Die Laenge der Stuetze, fuer ``k`` (24) und die Ersatzimperfektion."""
 
     @property
     def kennung(self) -> str:
