@@ -1,5 +1,5 @@
 ---
-erzeugt: d8b1d715d493
+erzeugt: e7e9bbd82e62
 art: modul
 tags: [modul]
 ---
@@ -90,7 +90,8 @@ def _fachwerkmodell(p: Projekt) -> None
 Eine Wandscheibe 6 × 3 m mit einer Türe, links fest, rechts auf einem
 Rollenlager, oben zwei Lasten – eine schräg. Mit dem Fachwerk, das die
 Suche im Raster von 1 m findet, wie nach «Fachwerk suchen»; dieselbe
-Wand noch einmal mit «Zug nur waagrecht und senkrecht».
+Wand noch einmal mit «Zug nur waagrecht und senkrecht», im Raster von
+0.5 m: mit 1 m ginge so kein Fachwerk auf.
 
 ### _fachwerk_der_wandscheibe
 

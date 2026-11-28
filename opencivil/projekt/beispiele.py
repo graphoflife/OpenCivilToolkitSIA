@@ -404,7 +404,8 @@ def _fachwerkmodell(p: Projekt) -> None:
     Eine Wandscheibe 6 × 3 m mit einer Türe, links fest, rechts auf einem
     Rollenlager, oben zwei Lasten -- eine schräg. Mit dem Fachwerk, das die
     Suche im Raster von 1 m findet, wie nach «Fachwerk suchen»; dieselbe
-    Wand noch einmal mit «Zug nur waagrecht und senkrecht».
+    Wand noch einmal mit «Zug nur waagrecht und senkrecht», im Raster von
+    0.5 m: mit 1 m ginge so kein Fachwerk auf.
     """
     for name, zug_achsparallel in (("Wandscheibe mit Türe", False),
                                    ("Wandscheibe, Zug waagrecht und senkrecht", True)):
@@ -422,7 +423,7 @@ def _fachwerk_der_wandscheibe(zug_achsparallel: bool) -> GefundenesFachwerk:
 
 
 def _wandscheibe(f: FachwerkmodellEintrag, zug_achsparallel: bool = False) -> None:
-    f.rasterweite = 1.0
+    f.rasterweite = 0.5 if zug_achsparallel else 1.0
     f.zug_achsparallel = zug_achsparallel
     f.scheibe([(0, 0), (6, 0), (6, 3), (0, 3)])
     f.loch([(3.5, 0), (4.5, 0), (4.5, 2.2), (3.5, 2.2)])

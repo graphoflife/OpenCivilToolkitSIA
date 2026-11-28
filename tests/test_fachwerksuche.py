@@ -106,11 +106,11 @@ class TestWandscheibe(unittest.TestCase):
     """Die Wand 6 × 3 m mit Türe: das Fachwerk trägt die Lasten im Gleichgewicht zu den Lagern."""
 
     def test_raster_halber_meter(self):
-        """Wie im Browser gemessen: 20 Runden, 36 Stäbe, V = 3662.5 kNm."""
+        """12 Runden, 58 Stäbe, V = 6818.9 kNm."""
         antwort = gesucht(wandscheibe())
-        self.assertEqual(antwort["stand"], {"runde": 20, "im_modell": 360, "moeglich": 1528, "dazu": 0})
-        self.assertEqual(len(antwort["fachwerk"]["staebe"]), 36)
-        self.assertAlmostEqual(antwort["fachwerk"]["V"], 3662.47, places=1)
+        self.assertEqual(antwort["stand"], {"runde": 12, "im_modell": 333, "moeglich": 1526, "dazu": 0})
+        self.assertEqual(len(antwort["fachwerk"]["staebe"]), 58)
+        self.assertAlmostEqual(antwort["fachwerk"]["V"], 6818.91, places=1)
         self.assertEqual(antwort["meldungen"], [])
 
     def test_lagerkraefte_gegen_die_handrechnung(self):
@@ -126,17 +126,17 @@ class TestWandscheibe(unittest.TestCase):
         self.assertAlmostEqual(kraefte["A1"][0], -50.0, places=3)
         self.assertAlmostEqual(kraefte["A2"][0], 0.0, places=6)
 
-    def test_duenne_staebe_fallen_auch_bei_055_weg(self):
+    def test_duenne_staebe_fallen_auch_bei_04_weg(self):
         """
-        Im Raster von 0.55 m geht es ohne alle Stäbe unter 1 % nicht auf; die
-        halbe Schwelle reicht nicht, ein Viertel schon. Bis 2026-11-28 blieben
-        dann alle 102 Stäbe stehen.
+        Im Raster von 0.4 m geht es ohne alle Stäbe unter 1 % nicht auf; die
+        halbe Schwelle reicht nicht, ein Viertel schon: 74 Stäbe. Ohne das
+        Halbieren blieben alle 89 stehen, gleich leicht.
         """
         p = wandscheibe()
-        p.fachwerkmodelle[0].rasterweite = 0.55
+        p.fachwerkmodelle[0].rasterweite = 0.4
         fw = gesucht(p)["fachwerk"]
-        self.assertLess(len(fw["staebe"]), 60)
-        self.assertAlmostEqual(fw["V"], 3650.15, places=1)
+        self.assertEqual(len(fw["staebe"]), 74)
+        self.assertAlmostEqual(fw["V"], 6836.6, places=1)
 
     def test_jede_runde_im_gleichgewicht(self):
         """Auch wer nach der dritten Runde anhält, hat ein Fachwerk, das die Lasten trägt."""
@@ -224,6 +224,33 @@ class TestGrenzen(unittest.TestCase):
         self.assertEqual([(m["text"], m["fehler"], m["elemente"]) for m in antwort["meldungen"]], [
             ("Die Last F2 lässt sich nicht ganz zu den Lagern tragen: 20.0 kN bleiben offen.",
              True, ["F2"])])
+
+
+class TestRaender(unittest.TestCase):
+    """Ein Stab auf einem Rand braucht Material auf einer Seite."""
+
+    def setUp(self):
+        modell, _ = modell_von(wandscheibe().fachwerkmodelle[0])
+        gs = grundstruktur(modell, 1.0)
+        self.staebe = {(gs.knoten[a], gs.knoten[b]) for a, b in gs.staebe}
+        self.staebe |= {(b, a) for a, b in self.staebe}
+
+    def test_kein_stab_unter_der_tuere(self):
+        """
+        Die Schwelle der Türe liegt auf dem Rand der Scheibe: darunter ist
+        keine Scheibe, darüber die Türe. Bis 2026-11-28 trug dort ein Band,
+        im Beispiel mit 135 kN.
+        """
+        unten = [(a, b) for a, b in self.staebe if a[1] == 0.0 == b[1]]
+        self.assertIn(((3.0, 0.0), (3.5, 0.0)), unten)
+        self.assertFalse([(a, b) for a, b in unten if min(a[0], b[0]) < 4.5 and max(a[0], b[0]) > 3.5])
+
+    def test_auf_dem_rand_mit_material_daneben(self):
+        """Längs der Türe, über ihr und an den Rändern der Scheibe."""
+        for a, b in (((3.5, 0.0), (3.5, 2.2)), ((4.5, 0.0), (4.5, 2.2)), ((3.5, 2.2), (4.5, 2.2)),
+                     ((5.0, 0.0), (6.0, 0.0)), ((0.0, 0.0), (1.0, 0.0)), ((6.0, 2.0), (6.0, 3.0))):
+            with self.subTest(von=a, bis=b):
+                self.assertIn((a, b), self.staebe)
 
 
 class TestNachbearbeitung(unittest.TestCase):
@@ -318,7 +345,7 @@ class TestHerleitung(unittest.TestCase):
         self.assertEqual((befund.stand, befund.zum_fachwerk), ("gefunden", []))
         bloecke = loesung.protokoll.alle_bloecke()
         tabellen = {b.titel: b for b in bloecke if isinstance(b, TabellenBlock)}
-        self.assertIn("Stäbe – 27, nach der Grösse ihrer Kraft", tabellen)
+        self.assertIn("Stäbe – 22, nach der Grösse ihrer Kraft", tabellen)
         self.assertEqual([z[0] for z in tabellen["Lagerkräfte"].zeilen], ["A1", "A2"])
         formeln = [b for b in bloecke if isinstance(b, GleichungBlock)]
         self.assertIn("Leichtestes Fachwerk", [b.name for b in formeln])

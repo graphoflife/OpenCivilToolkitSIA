@@ -7,7 +7,9 @@ Die Grundstruktur des Verfahrens Ground Structure (He, Gilbert & Song
 dazu jeder Punkt eines Lagers und einer Last und jede Ecke eines Umrisses
 (:func:`grundstruktur`). Zwischen je zwei Knoten ein möglicher Stab, wenn
 er ganz im Material liegt -- auf dem Rand eines Lochs zählt, quer durch
-sein Inneres nicht. Liefe ein Stab über einen dritten Knoten, fällt er weg:
+sein Inneres nicht; ein Stück auf einem Rand nur, wo auf einer Seite
+Material ist: unter einer Türe, deren Schwelle auf dem Rand der Scheibe
+liegt, ist keines. Liefe ein Stab über einen dritten Knoten, fällt er weg:
 aus zwei kürzeren ist er schon da, und doppelt trüge er dieselbe Kraft auf
 zwei Wegen.
 
@@ -42,6 +44,10 @@ HOECHSTENS_KNOTEN = 600
 
 #: Ab wie vielen Punkten im Rechteck um die Scheibe das Raster gar nicht erst gelegt wird.
 HOECHSTENS_RASTERPUNKTE = 200_000
+
+#: Wie weit neben einem Stück auf einem Rand nach Material gesucht wird, in m:
+#: weit über der Rundung der Geometrie, weit unter jedem Mass einer Scheibe.
+NEBEN_DEM_RAND = 100 * geo.TOLERANZ
 
 #: Wie weit ein waagrechter oder senkrechter Stab von seiner Richtung abweichen
 #: darf, bezogen auf seine Länge -- nur so weit, wie Rundung reicht (nach Vorgabe).
@@ -260,16 +266,23 @@ def _im_material(modell: Modell, umrisse: Sequence[Sequence[Punkt]], a: Punkt, b
     """
     Ob die Strecke ``a → b`` ganz im Material liegt: geteilt, wo sie einen
     Rand trifft, liegt jedes Stück ganz innen, ganz aussen oder auf einem
-    Rand -- seine Mitte sagt, welches.
+    Rand -- seine Mitte sagt, welches. Ein Stück auf einem Rand braucht
+    Material auf einer Seite, :data:`NEBEN_DEM_RAND` daneben.
     """
     stellen = {0.0, 1.0}
     for ecken in umrisse:
         stellen.update(geo.schnittstellen(a, b, ecken))
     folge = sorted(stellen)
+    dx, dy = b[0] - a[0], b[1] - a[1]
+    quer = NEBEN_DEM_RAND / math.hypot(dx, dy)
     for t0, t1 in zip(folge, folge[1:]):
         if t1 - t0 < 1e-12:
             continue
         t = 0.5 * (t0 + t1)
-        if not modell.im_material((a[0] + t * (b[0] - a[0]), a[1] + t * (b[1] - a[1]))):
+        m = (a[0] + t * dx, a[1] + t * dy)
+        if not modell.im_material(m):
+            return False
+        if any(geo.auf_rand(m, ecken) for ecken in umrisse) and not any(
+                modell.im_material((m[0] - s * quer * dy, m[1] + s * quer * dx)) for s in (1, -1)):
             return False
     return True

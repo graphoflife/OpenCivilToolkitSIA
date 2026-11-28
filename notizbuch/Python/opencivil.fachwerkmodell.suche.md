@@ -1,5 +1,5 @@
 ---
-erzeugt: 3d105ed3825c
+erzeugt: 8f524c7dab64
 art: modul
 tags: [modul]
 ---
@@ -224,8 +224,8 @@ und die Optimierung sucht das Gleichgewicht ohne sie neu – mit N_min
 wieder von vorn, bis keiner mehr wegfällt. Geht es ohne sie nicht auf,
 gilt die halbe Schwelle. Höchstens `hoechstens` Mal neu gesucht.
 Beispiel: die Wandscheibe im Raster von
-0.55 m geht ohne die Stäbe unter 1 % nicht auf, ohne die unter 0.25 %
-schon – 62 statt 102 Stäbe, gleich leicht.
+0.4 m geht ohne die Stäbe unter 1 % nicht auf, ohne die unter 0.25 %
+schon – 74 statt 89 Stäbe, gleich leicht.
 
 ### _zusammengelegt
 

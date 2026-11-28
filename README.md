@@ -673,7 +673,7 @@ Bewehrung in x und y; geht so kein Fachwerk auf, sagt es die Last, die
 offen bleibt, rot. Danach ist es eine Eingabe wie jede andere: die
 Rechnung rechnet sein Gleichgewicht und die Lagerkräfte nach, und ändern
 sich Scheibe, Lager, Lasten oder Verfahren, sagt sie, dass neu zu suchen
-ist. Beispiel «Wandscheibe mit Türe» bei h = 1 m: 27 Stäbe, V = 3734.0 kNm.
+ist. Beispiel «Wandscheibe mit Türe» bei h = 1 m: 22 Stäbe, V = 7109.6 kNm.
 
 **Grundbruch:** ein Flachfundament auf seinem Baugrund, nach dem Kapitel 9.2
 «Tragfähigkeit», das der Benutzer geliefert hat. Oben das Panel «Grundbruch

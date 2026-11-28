@@ -302,8 +302,8 @@ def _ohne_duenne(gs: Grundstruktur, kraefte: Dict[int, float], einstellung: Eins
     wieder von vorn, bis keiner mehr wegfällt. Geht es ohne sie nicht auf,
     gilt die halbe Schwelle. Höchstens ``hoechstens`` Mal neu gesucht.
     Beispiel: die Wandscheibe im Raster von
-    0.55 m geht ohne die Stäbe unter 1 % nicht auf, ohne die unter 0.25 %
-    schon -- 62 statt 102 Stäbe, gleich leicht.
+    0.4 m geht ohne die Stäbe unter 1 % nicht auf, ohne die unter 0.25 %
+    schon -- 74 statt 89 Stäbe, gleich leicht.
     """
     schwelle = einstellung.N_min
     for _ in range(hoechstens):

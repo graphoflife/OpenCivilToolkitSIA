@@ -1,5 +1,5 @@
 ---
-erzeugt: d91bca223f02
+erzeugt: 9f55bb97e50a
 art: modul
 tags: [modul]
 ---
@@ -14,7 +14,9 @@ Die Grundstruktur des Verfahrens Ground Structure (He, Gilbert & Song
 dazu jeder Punkt eines Lagers und einer Last und jede Ecke eines Umrisses
 ([[opencivil.fachwerkmodell.grundstruktur#grundstruktur|grundstruktur]]). Zwischen je zwei Knoten ein möglicher Stab, wenn
 er ganz im Material liegt – auf dem Rand eines Lochs zählt, quer durch
-sein Inneres nicht. Liefe ein Stab über einen dritten Knoten, fällt er weg:
+sein Inneres nicht; ein Stück auf einem Rand nur, wo auf einer Seite
+Material ist: unter einer Türe, deren Schwelle auf dem Rand der Scheibe
+liegt, ist keines. Liefe ein Stab über einen dritten Knoten, fällt er weg:
 aus zwei kürzeren ist er schon da, und doppelt trüge er dieselbe Kraft auf
 zwei Wegen.
 
@@ -161,13 +163,15 @@ def _im_material(modell: Modell, umrisse: Sequence[Sequence[Punkt]], a: Punkt, b
 
 Ob die Strecke `a → b` ganz im Material liegt: geteilt, wo sie einen
 Rand trifft, liegt jedes Stück ganz innen, ganz aussen oder auf einem
-Rand – seine Mitte sagt, welches.
+Rand – seine Mitte sagt, welches. Ein Stück auf einem Rand braucht
+Material auf einer Seite, [[opencivil.fachwerkmodell.grundstruktur#Konstanten|NEBEN_DEM_RAND]] daneben.
 
 
 ## Konstanten
 
 - `HOECHSTENS_KNOTEN = 600` – Wie viele Knoten die Grundstruktur höchstens hat – nach Vorgabe, nicht nachgeschlagen.
 - `HOECHSTENS_RASTERPUNKTE = 200000` – Ab wie vielen Punkten im Rechteck um die Scheibe das Raster gar nicht erst gelegt wird.
+- `NEBEN_DEM_RAND = 100 * geo.TOLERANZ` – Wie weit neben einem Stück auf einem Rand nach Material gesucht wird, in m: weit über der Rundung der Geometrie, weit unter jedem Mass einer Scheibe.
 - `ACHSPARALLEL = 1e-09` – Wie weit ein waagrechter oder senkrechter Stab von seiner Richtung abweichen darf, bezogen auf seine Länge – nur so weit, wie Rundung reicht (nach Vorgabe).
 
 ## Braucht

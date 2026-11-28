@@ -138,23 +138,24 @@ sammeln sie sich hier, je mit dem, was vorläufig gebaut ist.
       nur in x links.
 - [ ] **Fachwerkmodell: die Suche von selbst starten?** Heute sucht sie nur
       auf Knopfdruck, «Fachwerk suchen» im Fenster «Verfahren»; nach einer
-      Änderung sagt die Kachel grau «neu zu suchen». Auf der Seite dauert
-      die Suche für die Wandscheibe mit Türe 4.5 s bei h = 0.55 m und 40 s
-      bei 0.25 m; von selbst liefe sie nach jedem Verschieben eines Knotens
-      an. Vorschlag: so lassen. Vorläufig: auf Knopfdruck.
+      Änderung sagt die Kachel grau «neu zu suchen». Auf der Seite dauerte
+      die Suche für die Wandscheibe mit Türe am 2026-11-27 4.5 s bei
+      h = 0.55 m und 40 s bei 0.25 m, seit dem 2026-11-28 eher weniger;
+      von selbst liefe sie nach jedem Verschieben eines Knotens an.
+      Vorschlag: so lassen. Vorläufig: auf Knopfdruck.
 - [ ] **Fachwerkmodell: unter gleich leichten Fachwerken das mit den
       wenigsten Stäben?** Tragen zwei Wege gleich leicht – etwa zwei
       Diagonalen –, endet die Optimierung in ihrer Mitte: beide mit halber
       Kraft. Danach fallen die Stäbe unter N_min der grössten Kraft weg
       (Vorgabe 1 %), und das Gleichgewicht wird ohne sie neu gesucht; was
-      darüber liegt, bleibt. Bei h = 0.55 m sind es so 49 statt 102 Stäbe,
+      darüber liegt, bleibt. Bei h = 0.4 m sind es so 74 statt 89 Stäbe,
       gleich leicht. Ein Schritt am Schluss, der unter den gleich leichten
       eines mit wenigen Stäben wählt, wäre eigene Arbeit. Ein höheres
       N_min hilft nur, wo das Gleichgewicht ohne die dünnen Stäbe aufgeht;
       sonst halbiert die Suche die Schwelle, bis es aufgeht, und ein grauer
-      Hinweis sagt, dass dünne bleiben. Bei h = 0.55 m geben N_min = 1, 5
-      und 10 % dieselben 49 Stäbe: ohne einen Stab mit weniger als 0.5 %
-      der grössten Kraft bliebe 0.2 % der Last offen. Vorschlag: so lassen.
+      Hinweis sagt, dass dünne bleiben. Bei h = 0.4 m geben N_min = 1, 5
+      und 10 % dieselben 74 Stäbe: ohne die Stäbe unter 0.5 % der grössten
+      Kraft blieben 0.8 % der grössten Last offen. Vorschlag: so lassen.
       Vorläufig: so.
 - [ ] **Fachwerkmodell: mit «Zug nur waagrecht und senkrecht» im feinen
       Raster viele Bänder?** Die Konsole 1 × 2 m hat mit dem Schalter im

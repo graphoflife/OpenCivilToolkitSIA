@@ -7,6 +7,30 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-28 · Fachwerkmodell: kein Stab unter der Türe
+
+Beim Lesen der SIMP-Form (Schritt 11d) fiel auf: Die Ground Structure
+legte Stäbe längs der Schwelle einer Türe, die auf dem Rand der Scheibe
+liegt – im Beispiel ein Zugband von (6, 0) nach (1, 0) mit 135 kN, quer
+durch die Türe. Ein Punkt auf dem Rand eines Lochs zählt als Material,
+und so galt auch die Schwelle, obwohl dort auf keiner Seite Material ist.
+
+- Neu braucht ein Stück eines Stabs auf einem Rand Material auf einer
+  Seite, 10⁻⁵ m daneben gesucht – hundertmal die Rundung der Geometrie.
+  Längs der Türe, über ihr und an den Rändern der Scheibe bleibt jeder
+  Stab möglich (Test).
+- Die Wandscheibe mit Türe trägt nun ohne das Band: bei h = 1 m 22 statt
+  27 Stäbe, V = 7109.6 statt 3734.0 kNm; bei 0.5 m 58 statt 36 Stäbe,
+  V = 6818.9 statt 3662.5 kNm.
+- Mit «Zug nur waagrecht und senkrecht» geht sie im Raster von 1 m nicht
+  mehr auf: bei (6, 0) bleiben 158.3 kN offen, genau die Kraft des Bands,
+  rot gemeldet. Im Prüfprojekt steht sie darum mit 0.5 m: 67 Stäbe,
+  V = 10175.0 kNm.
+- Das Beispiel für das Halbieren der Schwelle N_min ist neu die Wand bei
+  0.4 m: ohne die Stäbe unter 1 % und 0.5 % bleiben 0.8 % der grössten
+  Last offen, ohne die unter 0.25 % nicht – 74 statt 89 Stäbe, gleich
+  leicht. Bei 0.55 m geht es jetzt ohne Halbieren auf.
+
 ## 2026-11-28 · Fachwerkmodell: Zug nur waagrecht und senkrecht
 
 Schritt 11c des Plans vom 2026-11-27. Im Fenster «Verfahren» steht unter

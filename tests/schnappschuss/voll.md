@@ -32073,7 +32073,7 @@ $$
 
 #### Fachwerk
 
-Gesucht nach dem Verfahren Ground Structure (He, Gilbert & Song (2019), Abschnitt 3, Gl. (7)): Knoten im Raster der Weite h = 1 m, dazu die Punkte der Lager und Lasten und die Ecken der Umrisse; je zwei Knoten ein möglicher Stab, wenn er ganz im Material liegt – 188 Stäbe. Eine lineare Optimierung wählt die Kräfte im Gleichgewicht mit dem kleinsten V; Runde um Runde kommen die Stäbe dazu, die V noch senken – nach Runde 16 kam keiner mehr dazu, mit 93 Stäben im Modell. Danach fallen die Stäbe unter 1 % der grössten Kraft weg, und das Gleichgewicht wird ohne sie neu gesucht; zwei Stäbe in einer Flucht durch einen Knoten ohne Last und Lager werden einer.
+Gesucht nach dem Verfahren Ground Structure (He, Gilbert & Song (2019), Abschnitt 3, Gl. (7)): Knoten im Raster der Weite h = 1 m, dazu die Punkte der Lager und Lasten und die Ecken der Umrisse; je zwei Knoten ein möglicher Stab, wenn er ganz im Material liegt – 186 Stäbe. Eine lineare Optimierung wählt die Kräfte im Gleichgewicht mit dem kleinsten V; Runde um Runde kommen die Stäbe dazu, die V noch senken – nach Runde 8 kam keiner mehr dazu, mit 82 Stäben im Modell. Danach fallen die Stäbe unter 1 % der grössten Kraft weg, und das Gleichgewicht wird ohne sie neu gesucht; zwei Stäbe in einer Flucht durch einen Knoten ohne Last und Lager werden einer.
 
 **Ziel der Optimierung** *(He, Gilbert & Song (2019), Abschnitt 3, Gl. (7))*
 
@@ -32081,42 +32081,37 @@ $$
 V = \sum_i l_i \, \left( w_Z \, N_i^{+} + w_D \, N_i^{-} \right) \;\rightarrow\; \min
 $$
 
-**Stäbe – 27, nach der Grösse ihrer Kraft**
+**Stäbe – 22, nach der Grösse ihrer Kraft**
 
 | Stab | von [m] | bis [m] | $l\ [\mathrm{m}]$ | $N\ [\mathrm{kN}]$ |  |
 | ---: | ---: | ---: | ---: | ---: | ---: |
-| $1$ | (0.00, 0.00) | (2.00, 3.00) | $3.61$ | $-199.7$ | Druck |
-| $2$ | (0.00, 0.00) | (1.00, 0.00) | $1.00$ | $179.5$ | Zug |
-| $3$ | (6.00, 0.00) | (5.00, 3.00) | $3.16$ | $-163.9$ | Druck |
-| $4$ | (6.00, 0.00) | (1.00, 0.00) | $5.00$ | $135.2$ | Zug |
-| $5$ | (6.00, 0.00) | (4.50, 2.20) | $2.66$ | $-101.9$ | Druck |
-| $6$ | (2.00, 3.00) | (4.00, 3.00) | $2.00$ | $-100.6$ | Druck |
-| $7$ | (4.00, 3.00) | (4.50, 2.20) | $0.94$ | $-94.9$ | Druck |
-| $8$ | (4.00, 3.00) | (3.50, 2.20) | $0.94$ | $94.9$ | Zug |
-| $9$ | (3.00, 1.00) | (3.50, 2.20) | $1.30$ | $65.4$ | Zug |
-| $10$ | (6.00, 0.00) | (5.00, 2.00) | $2.24$ | $-58.1$ | Druck |
-| $11$ | (1.00, 0.00) | (3.00, 1.00) | $2.24$ | $49.5$ | Zug |
-| $12$ | (1.00, 2.00) | (2.00, 3.00) | $1.41$ | $-46.4$ | Druck |
-| $13$ | (3.00, 1.00) | (2.00, 3.00) | $2.24$ | $-42.7$ | Druck |
-| $14$ | (0.00, 0.00) | (1.00, 2.00) | $2.24$ | $-41.8$ | Druck |
-| $15$ | (5.00, 2.00) | (5.00, 3.00) | $1.00$ | $-41.6$ | Druck |
-| $16$ | (2.00, 3.00) | (4.50, 2.20) | $2.62$ | $-36.7$ | Druck |
-| $17$ | (2.00, 1.00) | (3.50, 2.20) | $1.92$ | $32.2$ | Zug |
-| $18$ | (2.00, 1.00) | (2.00, 3.00) | $2.00$ | $-29.5$ | Druck |
-| $19$ | (5.00, 2.00) | (4.50, 2.20) | $0.54$ | $-28.0$ | Druck |
-| $20$ | (1.00, 1.00) | (2.00, 3.00) | $2.24$ | $-24.7$ | Druck |
-| $21$ | (1.00, 0.00) | (1.00, 1.00) | $1.00$ | $-22.1$ | Druck |
-| $22$ | (1.00, 1.00) | (2.00, 1.00) | $1.00$ | $15.8$ | Zug |
-| $23$ | (2.00, 1.00) | (1.00, 2.00) | $1.41$ | $13.2$ | Zug |
-| $24$ | (0.00, 1.00) | (1.00, 2.00) | $1.41$ | $-6.7$ | Druck |
-| $25$ | (0.00, 1.00) | (1.00, 1.00) | $1.00$ | $4.7$ | Zug |
-| $26$ | (0.00, 0.00) | (0.00, 1.00) | $1.00$ | $-4.7$ | Druck |
-| $27$ | (5.00, 3.00) | (4.50, 2.20) | $0.94$ | $-3.5$ | Druck |
+| $1$ | (3.00, 3.00) | (4.00, 3.00) | $1.00$ | $-486.5$ | Druck |
+| $2$ | (4.50, 2.20) | (3.50, 2.20) | $1.00$ | $479.2$ | Zug |
+| $3$ | (6.00, 2.00) | (5.00, 3.00) | $1.41$ | $-475.9$ | Druck |
+| $4$ | (1.00, 2.00) | (2.00, 3.00) | $1.41$ | $-424.3$ | Druck |
+| $5$ | (2.00, 2.00) | (3.50, 2.20) | $1.51$ | $378.6$ | Zug |
+| $6$ | (4.00, 3.00) | (5.00, 3.00) | $1.00$ | $-371.9$ | Druck |
+| $7$ | (6.00, 2.00) | (4.50, 2.20) | $1.51$ | $339.5$ | Zug |
+| $8$ | (2.00, 3.00) | (3.00, 3.00) | $1.00$ | $-300.0$ | Druck |
+| $9$ | (6.00, 0.00) | (6.00, 2.00) | $2.00$ | $-291.7$ | Druck |
+| $10$ | (0.00, 0.00) | (1.00, 2.00) | $2.24$ | $-232.9$ | Druck |
+| $11$ | (1.00, 2.00) | (2.00, 2.00) | $1.00$ | $195.8$ | Zug |
+| $12$ | (2.00, 2.00) | (3.00, 3.00) | $1.41$ | $-162.3$ | Druck |
+| $13$ | (5.00, 3.00) | (4.50, 2.20) | $0.94$ | $161.0$ | Zug |
+| $14$ | (0.00, 0.00) | (1.00, 0.00) | $1.00$ | $154.2$ | Zug |
+| $15$ | (3.00, 3.00) | (3.50, 2.20) | $0.94$ | $135.3$ | Zug |
+| $16$ | (3.00, 1.00) | (3.50, 2.20) | $1.30$ | $132.8$ | Zug |
+| $17$ | (1.00, 0.00) | (3.00, 1.00) | $2.24$ | $129.5$ | Zug |
+| $18$ | (4.00, 3.00) | (4.50, 2.20) | $0.94$ | $-108.1$ | Druck |
+| $19$ | (4.00, 3.00) | (3.50, 2.20) | $0.94$ | $108.1$ | Zug |
+| $20$ | (1.00, 0.00) | (1.00, 2.00) | $2.00$ | $-91.7$ | Druck |
+| $21$ | (3.00, 1.00) | (2.00, 2.00) | $1.41$ | $-91.5$ | Druck |
+| $22$ | (1.00, 0.00) | (3.50, 2.20) | $3.33$ | $51.1$ | Zug |
 
 **Ziel des Fachwerks**
 
 $$
-V = 3734.0\ \mathrm{kNm} \qquad w_Z = 1.00,\ w_D = 1
+V = 7109.6\ \mathrm{kNm} \qquad w_Z = 1.00,\ w_D = 1
 $$
 
 **Lagerkräfte**
@@ -32133,7 +32128,7 @@ Nachgerechnet: an jedem Knoten heben sich Stabkräfte, Lasten und Lagerkräfte a
 **Abstand der Knoten im Raster**
 
 $$
-h = 1\,\mathrm{m}
+h = 0.5\,\mathrm{m}
 $$
 
 **Gewicht des Zugs gegenüber dem Druck**
@@ -32179,7 +32174,7 @@ $$
 
 #### Fachwerk
 
-Gesucht nach dem Verfahren Ground Structure (He, Gilbert & Song (2019), Abschnitt 3, Gl. (7)): Knoten im Raster der Weite h = 1 m, dazu die Punkte der Lager und Lasten und die Ecken der Umrisse; je zwei Knoten ein möglicher Stab, wenn er ganz im Material liegt – 188 Stäbe. Zug nur waagrecht und senkrecht: ein geneigter Stab trägt nur Druck. Eine lineare Optimierung wählt die Kräfte im Gleichgewicht mit dem kleinsten V; Runde um Runde kommen die Stäbe dazu, die V noch senken – nach Runde 8 kam keiner mehr dazu, mit 85 Stäben im Modell. Danach fallen die Stäbe unter 1 % der grössten Kraft weg, und das Gleichgewicht wird ohne sie neu gesucht; zwei Stäbe in einer Flucht durch einen Knoten ohne Last und Lager werden einer.
+Gesucht nach dem Verfahren Ground Structure (He, Gilbert & Song (2019), Abschnitt 3, Gl. (7)): Knoten im Raster der Weite h = 0.5 m, dazu die Punkte der Lager und Lasten und die Ecken der Umrisse; je zwei Knoten ein möglicher Stab, wenn er ganz im Material liegt – 1526 Stäbe. Zug nur waagrecht und senkrecht: ein geneigter Stab trägt nur Druck. Eine lineare Optimierung wählt die Kräfte im Gleichgewicht mit dem kleinsten V; Runde um Runde kommen die Stäbe dazu, die V noch senken – nach Runde 5 kam keiner mehr dazu, mit 295 Stäben im Modell. Danach fallen die Stäbe unter 1 % der grössten Kraft weg, und das Gleichgewicht wird ohne sie neu gesucht; zwei Stäbe in einer Flucht durch einen Knoten ohne Last und Lager werden einer.
 
 **Ziel der Optimierung** *(He, Gilbert & Song (2019), Abschnitt 3, Gl. (7))*
 
@@ -32187,30 +32182,82 @@ $$
 V = \sum_i l_i \, \left( w_Z \, N_i^{+} + w_D \, N_i^{-} \right) \;\rightarrow\; \min
 $$
 
-**Stäbe – 15, nach der Grösse ihrer Kraft**
+**Stäbe – 67, nach der Grösse ihrer Kraft**
 
 | Stab | von [m] | bis [m] | $l\ [\mathrm{m}]$ | $N\ [\mathrm{kN}]$ |  |
 | ---: | ---: | ---: | ---: | ---: | ---: |
-| $1$ | (1.00, 2.00) | (2.00, 3.00) | $1.41$ | $-259.3$ | Druck |
-| $2$ | (6.00, 0.00) | (5.00, 2.00) | $2.24$ | $-249.2$ | Druck |
-| $3$ | (0.00, 0.00) | (1.00, 2.00) | $2.24$ | $-205.0$ | Druck |
-| $4$ | (3.00, 3.00) | (4.50, 2.20) | $1.70$ | $-194.8$ | Druck |
-| $5$ | (5.00, 2.00) | (5.00, 3.00) | $1.00$ | $-178.3$ | Druck |
-| $6$ | (6.00, 0.00) | (0.00, 0.00) | $6.00$ | $158.3$ | Zug |
-| $7$ | (3.00, 2.00) | (2.00, 3.00) | $1.41$ | $-129.6$ | Druck |
-| $8$ | (5.00, 2.00) | (4.50, 2.20) | $0.54$ | $-120.0$ | Druck |
-| $9$ | (2.00, 3.00) | (3.00, 3.00) | $1.00$ | $-108.3$ | Druck |
-| $10$ | (3.00, 2.00) | (3.00, 3.00) | $1.00$ | $91.7$ | Zug |
-| $11$ | (1.00, 2.00) | (3.00, 2.00) | $2.00$ | $91.7$ | Zug |
-| $12$ | (6.00, 0.00) | (4.50, 2.20) | $2.66$ | $-83.2$ | Druck |
-| $13$ | (3.00, 3.00) | (5.00, 3.00) | $2.00$ | $63.5$ | Zug |
-| $14$ | (0.00, 0.00) | (2.00, 3.00) | $3.61$ | $-30.0$ | Druck |
-| $15$ | (5.00, 3.00) | (4.50, 2.20) | $0.94$ | $-25.6$ | Druck |
+| $1$ | (3.50, 2.50) | (4.00, 2.50) | $0.50$ | $858.3$ | Zug |
+| $2$ | (3.00, 2.50) | (3.50, 2.50) | $0.50$ | $858.3$ | Zug |
+| $3$ | (4.00, 2.50) | (4.50, 2.50) | $0.50$ | $766.7$ | Zug |
+| $4$ | (3.50, 3.00) | (4.00, 3.00) | $0.50$ | $-716.7$ | Druck |
+| $5$ | (4.50, 2.50) | (5.00, 2.50) | $0.50$ | $675.0$ | Zug |
+| $6$ | (4.00, 3.00) | (4.50, 3.00) | $0.50$ | $-625.0$ | Druck |
+| $7$ | (5.00, 2.50) | (5.50, 2.50) | $0.50$ | $583.3$ | Zug |
+| $8$ | (4.50, 3.00) | (5.00, 3.00) | $0.50$ | $-533.3$ | Druck |
+| $9$ | (3.00, 2.50) | (3.50, 3.00) | $0.71$ | $-501.1$ | Druck |
+| $10$ | (3.00, 3.00) | (3.50, 3.00) | $0.50$ | $-454.0$ | Druck |
+| $11$ | (3.50, 2.50) | (3.50, 3.00) | $0.50$ | $446.0$ | Zug |
+| $12$ | (3.50, 2.00) | (3.50, 2.50) | $0.50$ | $446.0$ | Zug |
+| $13$ | (5.50, 2.50) | (5.00, 3.00) | $0.71$ | $-412.5$ | Druck |
+| $14$ | (6.00, 2.50) | (5.50, 3.00) | $0.71$ | $-412.5$ | Druck |
+| $15$ | (2.00, 3.00) | (3.00, 3.00) | $1.00$ | $-333.3$ | Druck |
+| $16$ | (3.50, 2.00) | (3.00, 2.50) | $0.71$ | $-307.8$ | Druck |
+| $17$ | (6.00, 2.50) | (6.00, 0.00) | $2.50$ | $-291.7$ | Druck |
+| $18$ | (5.50, 2.50) | (6.00, 2.50) | $0.50$ | $291.7$ | Zug |
+| $19$ | (5.50, 2.50) | (5.50, 3.00) | $0.50$ | $291.7$ | Zug |
+| $20$ | (5.00, 3.00) | (5.50, 3.00) | $0.50$ | $-291.7$ | Druck |
+| $21$ | (2.50, 2.50) | (3.00, 2.50) | $0.50$ | $286.4$ | Zug |
+| $22$ | (1.50, 2.50) | (2.00, 3.00) | $0.71$ | $-255.1$ | Druck |
+| $23$ | (3.50, 1.50) | (3.50, 2.00) | $0.50$ | $228.3$ | Zug |
+| $24$ | (3.00, 2.00) | (3.50, 2.00) | $0.50$ | $217.7$ | Zug |
+| $25$ | (2.50, 2.00) | (3.00, 2.00) | $0.50$ | $201.7$ | Zug |
+| $26$ | (3.50, 1.00) | (3.50, 1.50) | $0.50$ | $200.0$ | Zug |
+| $27$ | (0.50, 2.00) | (1.00, 2.50) | $0.71$ | $-176.8$ | Druck |
+| $28$ | (2.50, 2.50) | (3.00, 3.00) | $0.71$ | $-170.7$ | Druck |
+| $29$ | (3.50, 1.00) | (3.00, 1.50) | $0.71$ | $-153.2$ | Druck |
+| $30$ | (2.00, 2.00) | (2.50, 2.00) | $0.50$ | $150.0$ | Zug |
+| $31$ | (0.00, 1.00) | (0.50, 2.00) | $1.12$ | $-139.8$ | Druck |
+| $32$ | (1.00, 2.50) | (1.50, 3.00) | $0.71$ | $-137.2$ | Druck |
+| $33$ | (3.50, 0.00) | (2.50, 1.00) | $1.41$ | $-129.6$ | Druck |
+| $34$ | (4.00, 2.50) | (3.50, 3.00) | $0.71$ | $-129.6$ | Druck |
+| $35$ | (5.00, 2.50) | (4.50, 3.00) | $0.71$ | $-129.6$ | Druck |
+| $36$ | (4.50, 2.50) | (4.00, 3.00) | $0.71$ | $-129.6$ | Druck |
+| $37$ | (2.00, 2.50) | (2.50, 2.50) | $0.50$ | $125.0$ | Zug |
+| $38$ | (1.50, 2.50) | (2.00, 2.50) | $0.50$ | $125.0$ | Zug |
+| $39$ | (0.00, 0.00) | (0.00, 1.00) | $1.00$ | $-125.0$ | Druck |
+| $40$ | (3.00, 2.50) | (3.00, 3.00) | $0.50$ | $120.7$ | Zug |
+| $41$ | (1.00, 2.00) | (1.50, 2.50) | $0.71$ | $-117.9$ | Druck |
+| $42$ | (2.50, 1.00) | (3.50, 1.00) | $1.00$ | $108.3$ | Zug |
+| $43$ | (1.00, 2.00) | (2.00, 2.00) | $1.00$ | $104.2$ | Zug |
+| $44$ | (2.50, 1.00) | (2.00, 2.00) | $1.12$ | $-102.5$ | Druck |
+| $45$ | (1.50, 2.50) | (1.50, 3.00) | $0.50$ | $97.0$ | Zug |
+| $46$ | (1.50, 3.00) | (2.00, 3.00) | $0.50$ | $-97.0$ | Druck |
+| $47$ | (0.50, 1.00) | (1.00, 2.00) | $1.12$ | $-93.2$ | Druck |
+| $48$ | (0.00, 0.00) | (0.50, 1.00) | $1.12$ | $-93.2$ | Druck |
+| $49$ | (3.50, 0.00) | (0.00, 0.00) | $3.50$ | $91.7$ | Zug |
+| $50$ | (3.50, 0.00) | (3.50, 1.00) | $1.00$ | $91.7$ | Zug |
+| $51$ | (5.00, 2.50) | (5.00, 3.00) | $0.50$ | $91.7$ | Zug |
+| $52$ | (4.00, 2.50) | (4.00, 3.00) | $0.50$ | $91.7$ | Zug |
+| $53$ | (2.00, 2.00) | (2.00, 2.50) | $0.50$ | $-91.7$ | Druck |
+| $54$ | (2.00, 2.50) | (2.00, 3.00) | $0.50$ | $-91.7$ | Druck |
+| $55$ | (4.50, 2.50) | (4.50, 3.00) | $0.50$ | $91.7$ | Zug |
+| $56$ | (3.00, 1.50) | (2.50, 2.00) | $0.71$ | $-73.1$ | Druck |
+| $57$ | (3.00, 1.50) | (2.50, 2.50) | $1.12$ | $-63.3$ | Druck |
+| $58$ | (1.00, 2.50) | (2.00, 3.00) | $1.12$ | $-62.6$ | Druck |
+| $59$ | (0.50, 2.00) | (1.00, 2.00) | $0.50$ | $62.5$ | Zug |
+| $60$ | (0.00, 1.00) | (0.50, 1.00) | $0.50$ | $62.5$ | Zug |
+| $61$ | (2.50, 1.00) | (0.50, 1.00) | $2.00$ | $62.5$ | Zug |
+| $62$ | (2.50, 2.00) | (2.50, 2.50) | $0.50$ | $-51.7$ | Druck |
+| $63$ | (3.50, 1.50) | (3.00, 2.00) | $0.71$ | $-40.0$ | Druck |
+| $64$ | (3.00, 1.50) | (3.50, 1.50) | $0.50$ | $28.3$ | Zug |
+| $65$ | (1.00, 2.50) | (1.50, 2.50) | $0.50$ | $28.0$ | Zug |
+| $66$ | (3.00, 2.00) | (2.50, 2.50) | $0.71$ | $-17.5$ | Druck |
+| $67$ | (3.00, 2.00) | (3.00, 2.50) | $0.50$ | $-16.0$ | Druck |
 
 **Ziel des Fachwerks**
 
 $$
-V = 3954.2\ \mathrm{kNm} \qquad w_Z = 1.00,\ w_D = 1
+V = 10175.0\ \mathrm{kNm} \qquad w_Z = 1.00,\ w_D = 1
 $$
 
 **Lagerkräfte**
@@ -37775,7 +37822,7 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Abstand der Knoten im Raster | $h$ | $1$ | m | Vorgabe |
 | Gewicht des Zugs gegenüber dem Druck | $w_Z$ | $1$ |  | Vorgabe |
 | Kleinste Stabkraft, bezogen auf die grösste | $N_{min}$ | $1$ | % | Vorgabe |
-| Abstand der Knoten im Raster | $h$ | $1$ | m | Vorgabe |
+| Abstand der Knoten im Raster | $h$ | $0.5$ | m | Vorgabe |
 | Gewicht des Zugs gegenüber dem Druck | $w_Z$ | $1$ |  | Vorgabe |
 | Erdbeschleunigung | $g$ | $10$ | m/s² | Vorgabe |
 | Raumlast der Flüssigkeit | $\gamma_{fl}$ | $10$ | kN/m³ | berechnet |

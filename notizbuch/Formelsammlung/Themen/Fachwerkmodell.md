@@ -47,7 +47,8 @@ leichteste Fachwerk ist ein guter Vorschlag für den Weg der Kräfte, weil
 es am wenigsten Material braucht – nicht der einzige.
 
 Beispiel: Die Wandscheibe 6 × 3 m mit Türe im Prüfprojekt hat im Raster
-von 1 m 188 mögliche Stäbe; nach 16 Runden stehen 93 im Modell, und das
-Fachwerk hat 27 Stäbe mit $V = 3734\,\mathrm{kNm}$. Im Raster von 0.5 m
-sind es 1528 mögliche Stäbe und 36 im Fachwerk mit $V = 3662\,\mathrm{kNm}$,
-2 % leichter.
+von 1 m 186 mögliche Stäbe; nach 8 Runden stehen 82 im Modell, und das
+Fachwerk hat 22 Stäbe mit $V = 7110\,\mathrm{kNm}$. Im Raster von 0.5 m
+sind es 1526 mögliche Stäbe und 58 im Fachwerk mit $V = 6819\,\mathrm{kNm}$,
+4 % leichter. Unter der Türe liegt kein Stab: ihre Schwelle ist ein Rand
+der Scheibe, und auf keiner Seite ist dort Material.
