@@ -1,5 +1,5 @@
 ---
-erzeugt: 1a7353b6301f
+erzeugt: d21a8d01d1ac
 art: modul
 tags: [modul]
 ---
@@ -12,8 +12,11 @@ tags: [modul]
 Die lotrechten Lasten einer Wand – Linien- und Punktlasten mit ihrer
 Ausmitte quer zur Wand, dazu ihr Eigengewicht – je Lastfall auf Pfeiler und
 Stürze verteilt ([[opencivil.mauerwerk.lasten#abtragen|abtragen]]): je Pfeiler die Normalkraft an seinem Fuss,
-die der Lasten allein und das Moment ihrer Ausmitten an seinem Kopf, je
-Sturzauflager seine Kraft.
+die der Lasten allein und das Moment ihrer Ausmitten an seinem Kopf; je
+Sturzauflager seine Kraft; und wie weit die Lasten in der Ebene der Wand
+neben den Mitten der Pfeiler stehen, als ein Moment. Was in der Ebene der
+Wand daraus wird und was die waagrechten Lasten dazugeben, rechnet
+[[opencivil.mauerwerk.scheibe|scheibe]] in denselben Abtrag.
 Eine Kombination summiert die Lastfälle mit ihren Beiwerten
 ([[opencivil.mauerwerk.lasten#kombinieren|kombinieren]]). Die Norm regelt das nicht; so rechnet das Werkzeug
 (nach Vorgabe, nicht nachgeschlagen):
@@ -32,6 +35,9 @@ Eine Kombination summiert die Lastfälle mit ihren Beiwerten
   wo sie auch liegt; das Eigengewicht mittig. Die Ausmitte am Kopf ist
   darum die der Lasten allein, M / N_L: das Eigengewicht, das erst darunter
   dazukommt, verkleinert sie nicht.
+- In der Ebene der Wand erreicht eine Last den Pfeiler, wo sie über ihm
+  liegt, von einem Sturz in der Mitte seines Auflagers: ihr Hebel zur
+  Mitte des Pfeilers, über alle Pfeiler summiert, ist das Moment M_v.
 
 Die Lasten selbst beschreibt [[opencivil.mauerwerk.modell|modell]].
 
@@ -52,13 +58,30 @@ class Abtrag
 Was ein Fall den Pfeilern und Stürzen gibt: je Pfeiler die Normalkraft
 am Fuss `N`, die der Lasten allein `N_L` und das Moment ihrer
 Ausmitten `M`; je Sturzauflager `(Öffnung, Seite)` die Kraft `R`,
-und was neben den Pfeilern in den Fuss geht (`unten`).
+und was neben den Pfeilern in den Fuss geht (`unten`). In der Ebene
+der Wand `M_v`, wie weit die Lasten neben den Mitten der Pfeiler
+stehen, und je Pfeiler die Querkraft `V`, nach rechts positiv, was die
+waagrechten Lasten zu seiner Normalkraft geben, `N_H` – schon in
+`N` und `N_L` –, und das Moment an seinem Fuss `M_z`. Beide
+Momente sind positiv, wenn sie die Resultierende nach rechts schieben.
 
 - `N: Dict[str, float] = field(default_factory=dict)`
 - `N_L: Dict[str, float] = field(default_factory=dict)`
 - `M: Dict[str, float] = field(default_factory=dict)`
 - `R: Dict[Tuple[str, str], float] = field(default_factory=dict)`
 - `unten: float = 0.0`
+- `M_v: float = 0.0`
+- `V: Dict[str, float] = field(default_factory=dict)`
+- `N_H: Dict[str, float] = field(default_factory=dict)`
+- `M_z: Dict[str, float] = field(default_factory=dict)`
+
+#### Abtrag.je_pfeiler
+
+```python
+def je_pfeiler(self) -> Tuple[Dict[str, float], ...]
+```
+
+Was je Pfeiler eine Zahl hat – die eine Liste, die [[opencivil.mauerwerk.lasten#kombinieren|kombinieren]] summiert.
 
 ### leer
 
@@ -137,5 +160,8 @@ N/m² der Wand, null ohne. Siehe Dateikopf.
 ## Gebraucht von
 
 - [[opencivil.mauerwerk.herleitung]]
+- [[opencivil.mauerwerk.nachweise]]
+- [[opencivil.mauerwerk.scheibe]]
+- [[opencivil.mauerwerk.schub]]
 - [[opencivil.mauerwerk.werk]]
 - [[opencivil.projekt.aufbau.mauerwerk]]

@@ -13,10 +13,11 @@ Lastfälle teilt sie mit Balkensystem und Decke
 
 DIE NACHWEISE:
 Je Pfeiler und Kombination die Normalkraft, je Sturzauflager und
-Kombination die Teilflächenpressung (:mod:`opencivil.mauerwerk.nachweise`).
-Wo sie stehen, hängt nur an der Zeichnung; darum werden sie hier gebaut,
-sobald die Zeichnung rechnet. Sonst sagt die Zusammenfassung, warum es noch
-keinen Nachweis gibt.
+Kombination die Teilflächenpressung (:mod:`opencivil.mauerwerk.nachweise`);
+je Pfeiler und Kombination, in der eine Last waagrecht schiebt, auch Schub
+und Gleiten (:mod:`opencivil.mauerwerk.schub`). Wo sie stehen, hängt nur an der
+Zeichnung; darum werden sie hier gebaut, sobald die Zeichnung rechnet. Sonst
+sagt die Zusammenfassung, warum es noch keinen Nachweis gibt.
 """
 
 from __future__ import annotations
@@ -29,6 +30,7 @@ from opencivil.mauerwerk.modell import (
     TOLERANZ, Kombination, Lastfall, Oeffnung, Umriss, Wand, Wandlast, pfeiler,
 )
 from opencivil.mauerwerk.nachweise import Normalkraft, Stelle, Teilflaechen
+from opencivil.mauerwerk.schub import Gleiten, Schub
 from opencivil.mauerwerk.pruefen import lasten_pruefen, pruefen
 from opencivil.mauerwerk.werk import VORGABEN, Mauerwerkswand
 from opencivil.projekt.lesen import als_groesse, ort_von
@@ -91,7 +93,7 @@ def wand_von(eintrag: MauerwerkEintrag) -> Tuple[Wand, List[Meldung]]:
     lasten = [(l.kennung, l.lastfall, last) for l in eintrag.linienlasten
               if (last := linie(l)) is not None]
     lasten += [(q.kennung, q.lastfall, Wandlast(q.kennung, ort[0][0], ort[0][0], ort[0][1],
-                                                q.si("wert"), q.si("e")))
+                                                q.si("wert"), q.si("e"), q.si("H")))
                for q in eintrag.punktlasten if (ort := orte(q, (q.knoten,))) is not None]
     je_fall = {lf.kennung: [] for lf in eintrag.lastfaelle}
     for kennung, lastfall, last in lasten:
@@ -142,12 +144,19 @@ def bauen(art: "Bauteilart", eintrag: MauerwerkEintrag, aufbau: Aufbau) -> Baute
 
 
 def _nachweise(teil: Bauteil, objekt: Mauerwerkswand, wand: Wand, aufbau: Aufbau) -> None:
-    """Je Pfeiler und Kombination die Normalkraft, je Sturzauflager die Teilflächen."""
+    """
+    Je Pfeiler und Kombination die Normalkraft -- wo eine Last waagrecht
+    schiebt, auch Schub und Gleiten --, je Sturzauflager die Teilflächen.
+    """
     kennung, namen = teil.eintrag.kennung, [k.name for k in wand.kombinationen]
-    aufbau.eintragen(teil, "mw_normalkraft", kennung, Normalkraft(
-        objekt, [Stelle(pf.name, k) for pf in pfeiler(wand.flaeche, wand.oeffnungen)
-                 for k in namen]))
+    alle = pfeiler(wand.flaeche, wand.oeffnungen)
+    aufbau.eintragen(teil, "mw_normalkraft", kennung,
+                     Normalkraft(objekt, [Stelle(pf.name, k) for pf in alle for k in namen]))
     auflager = [f"{o.name} {s}" for o in wand.oeffnungen for s in SEITEN]
     if auflager:
         aufbau.eintragen(teil, "mw_teilflaechen", kennung, Teilflaechen(
             objekt, [Stelle(ort, k) for ort in auflager for k in namen]))
+    schiebend = [Stelle(pf.name, k) for pf in alle for k in wand.schiebende()]
+    if schiebend:
+        aufbau.eintragen(teil, "mw_schub", kennung, Schub(objekt, schiebend))
+        aufbau.eintragen(teil, "mw_gleiten", kennung, Gleiten(objekt, schiebend))

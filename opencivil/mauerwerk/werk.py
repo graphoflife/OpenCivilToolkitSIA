@@ -9,8 +9,9 @@ Kasten -- und eine Prozedur, die ihre Zeichnung prüft
 den Mindestwerten misst und nach ihrer Wahl umrechnet
 (:mod:`~opencivil.mauerwerk.kennwerte`), die Pfeiler bestimmt
 (:func:`~opencivil.mauerwerk.modell.pfeiler`), ihre Lasten je Lastfall und
-Kombination auf Pfeiler und Stürze verteilt
-(:mod:`~opencivil.mauerwerk.lasten`) und die Herleitung schreibt
+Kombination auf Pfeiler und Stürze verteilt -- die lotrechten nach
+:mod:`~opencivil.mauerwerk.lasten`, die waagrechten nach
+:mod:`~opencivil.mauerwerk.scheibe` -- und die Herleitung schreibt
 (:mod:`~opencivil.mauerwerk.herleitung`).
 
 DAS ERGEBNIS:
@@ -32,7 +33,7 @@ from opencivil.core.rechenobjekt import Rechenobjekt
 from opencivil.core.vorgaben import Feld, Gruppe
 from opencivil.core.wert import WertDef
 from opencivil.material.basis import ERDBESCHLEUNIGUNG, Baustoff
-from opencivil.mauerwerk import herleitung
+from opencivil.mauerwerk import herleitung, scheibe
 from opencivil.mauerwerk.kennwerte import GELESEN, Wandwerte, unter_mindestwerten, wandwerte
 from opencivil.mauerwerk.lasten import Abtrag, abtragen, kombinieren
 from opencivil.mauerwerk.modell import Halterung, Pfeiler, Wand, pfeiler
@@ -207,8 +208,10 @@ class Mauerwerkswand(Rechenobjekt):
         """Je Lastfall und Kombination, was Pfeiler und Stürze tragen -- in den Befund."""
         w = self.wand
         for lf in w.lastfaelle:
-            befund.faelle[lf.name] = abtragen(w.flaeche, w.oeffnungen, befund.pfeiler, lf.lasten,
-                                              befund.g_k if lf.eigengewicht else 0.0)
+            a = befund.faelle[lf.name] = abtragen(w.flaeche, w.oeffnungen, befund.pfeiler,
+                                                  lf.lasten, befund.g_k if lf.eigengewicht else 0.0)
+            scheibe.abtragen(a, w.flaeche, w.oeffnungen, befund.pfeiler, lf.lasten,
+                             befund.werte.E_xd * 1e6, befund.werte.G_d * 1e6, befund.t)
         for k in w.kombinationen:
             befund.kombinationen[k.name] = kombinieren(k.faktoren, befund.faelle, befund.pfeiler,
                                                        w.oeffnungen)

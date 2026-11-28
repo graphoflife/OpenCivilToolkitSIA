@@ -119,8 +119,8 @@ const VORRAT = {
     "web/js/materialwahl.js?v=af7dafa5d791",
     "web/js/mathe.js?v=f218656b8dbb",
     "web/js/mauerwerk.js?v=0ae10873e14b",
-    "web/js/mw_bild.js?v=9c2f17096ce1",
-    "web/js/mw_zeichnung.js?v=7ad734721c5c",
+    "web/js/mw_bild.js?v=568e922ddbe4",
+    "web/js/mw_zeichnung.js?v=70348ef36425",
     "web/js/nachweise.js?v=d5b0dda71888",
     "web/js/notizbuch.js?v=5079698154ff",
     "web/js/notizbuch_seite.js?v=639209806e79",
@@ -160,8 +160,8 @@ const VORRAT = {
     "web/js/variablen.js?v=7d43b6f38cd9",
     "web/js/zeichnen.js?v=da6e8eec5dc8",
     "web/js/zustand.js?v=3385a39c0f84",
-    "web/kern/notizbuch.json?v=a0090c5d9a81",
-    "web/kern/quellen.json?v=1ce1fde17b8a"
+    "web/kern/notizbuch.json?v=8c637a34d69a",
+    "web/kern/quellen.json?v=c3a4c55293ab"
   ],
   "fremd": {
     "web/vendor/jetbrains-mono/": {

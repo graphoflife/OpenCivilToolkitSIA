@@ -136,10 +136,13 @@ def mit_lasten(p, **felder):
 
 
 def urteile(p, w):
-    """Je Stelle der Wand -- «P1 – GZT» -- ihr Urteil."""
+    """
+    Je Urteil der Wand, nach seinem Namen: «Normalkraft – P1 – GZT» -- an
+    einem Pfeiler stehen mehrere Nachweise.
+    """
     aufbau = p.aufbauen()
     loesung = aufbau.werk.loese(*aufbau.materialziele(), *aufbau.ziele_von(w.kennung))
-    return {u.fall: u for u in loesung.urteile}
+    return {u.name: u for u in loesung.urteile}
 
 
 class TestNachweise(unittest.TestCase):
@@ -156,7 +159,7 @@ class TestNachweise(unittest.TestCase):
         """
         p = Projekt(name="Probe")
         p.mauerwerk("MK")
-        u = urteile(p, mit_lasten(p))["P1 – GZT"]
+        u = urteile(p, mit_lasten(p))["Normalkraft – P1 – GZT"]
         self.assertAlmostEqual(u.einwirkung.groesse.si, 109.911e3, delta=5)
         k_N = 1 - 2 * 0.02 / 0.175
         self.assertAlmostEqual(u.widerstand.groesse.si, k_N * 0.8 * 0.175 * 2975e3, delta=50)
@@ -170,7 +173,7 @@ class TestNachweise(unittest.TestCase):
         """
         p = Projekt(name="Probe")
         p.mauerwerk("MK")
-        u = urteile(p, mit_lasten(p))["O1 links – GZT"]
+        u = urteile(p, mit_lasten(p))["Teilflächenpressung – O1 links – GZT"]
         self.assertAlmostEqual(u.einwirkung.groesse.si, 51.383e3, delta=5)
         self.assertAlmostEqual(u.widerstand.groesse.si, 78.094e3, delta=1)
 
@@ -182,7 +185,7 @@ class TestNachweise(unittest.TestCase):
         """
         p = Projekt.jeder_nachweis()
         w = next(x for x in p.mauerwerke if x.name == "Pfeiler aus Kalksandstein")
-        u = urteile(p, w)["P1 – GZT"]
+        u = urteile(p, w)["Normalkraft – P1 – GZT"]
         self.assertAlmostEqual(u.einwirkung.groesse.si, (1.35 * 60 + 1.5 * 20) * 1.5e3
                                + 1.35 * 2.7e3 * 1.5 * 2.6, delta=1)
         self.assertAlmostEqual(u.widerstand.groesse.si, 630e3, delta=50)
@@ -193,7 +196,7 @@ class TestNachweise(unittest.TestCase):
         p.mauerwerk("MK")
         w = mit_lasten(p)
         w.punktlast(w.lastfaelle[2], (0.4, 2.7), wert=-200)
-        u = urteile(p, w)["P1 – GZT"]
+        u = urteile(p, w)["Normalkraft – P1 – GZT"]
         self.assertTrue(u.offen)
         self.assertFalse(u.verfehlt)
         self.assertIn("Am Kopf des Pfeilers P1 drücken die Lasten nicht", u.begruendung)

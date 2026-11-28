@@ -1,5 +1,5 @@
 ---
-erzeugt: 8edc83dee17f
+erzeugt: 25eece1b1a6a
 art: modul
 tags: [modul]
 ---
@@ -195,6 +195,7 @@ Die volle Matrix – fuer die Herleitung kleiner Systeme und fuer Proben.
 - [[opencivil.decke.fem.system]]
 - [[opencivil.fachwerkmodell.optimierung]]
 - [[opencivil.fachwerkmodell.simp]]
+- [[opencivil.mauerwerk.scheibe]]
 - [[opencivil.pfahl.bettung]]
 - [[opencivil.stabwerk.herleitung]]
 - [[opencivil.stabwerk.system]]

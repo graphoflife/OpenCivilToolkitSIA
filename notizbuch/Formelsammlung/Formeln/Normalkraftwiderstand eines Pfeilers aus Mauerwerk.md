@@ -1,11 +1,11 @@
 ---
-erzeugt: a902e806ef1a
+erzeugt: 7a096cc40a7a
 art: formel
 tags: [formel]
-normstelle: "SIA 266:2015, 4.3.1.3, Gl. (11)"
+normstelle: ["SIA 266:2015, 4.3.1.3, Gl. (11)", "SIA 266:2015, 4.3.3.1, Gl. (17)"]
 ---
-> [!info] Normstelle
-> SIA 266:2015, 4.3.1.3, Gl. (11)
+> [!info] Normstellen
+> SIA 266:2015, 4.3.1.3, Gl. (11) · SIA 266:2015, 4.3.3.1, Gl. (17)
 
 *In der Herleitung: «Normalkraftwiderstand des Pfeilers»*
 
@@ -58,3 +58,10 @@ liegt fast doppelt so hoch, wie Figur 3 und 4 es zulassen; offen in
 
 Zieht ein Pfeiler, lässt sich der Nachweis nicht führen: unbewehrtes
 Mauerwerk trägt keinen Zug (4.1.2).
+
+Trägt der Pfeiler auch Schub und steht die Normalkraft quer zur Wand
+ausmittig, gilt Gl. (17) statt Gl. (11): dieselbe Formel mit der
+gedrückten Länge $l_2$ statt $l_w$ (4.3.3.1) – nur sie trägt. $k_N$ bleibt
+derselbe, er hängt von Schlankheit, Ausmitten und Steifigkeit ab, nicht
+von der Länge. Steht die Normalkraft mittig, prüft die Druckstrebe nach
+Gl. (13) die gedrückte Länge, und Gl. (11) bleibt mit $l_w$.

@@ -1,11 +1,11 @@
 ---
-erzeugt: ffb408c73d8f
+erzeugt: e1159b2964d6
 art: formel
 tags: [formel]
-normstelle: "SIA 266:2015, 4.3.1.2, Gl. (8)"
+normstelle: ["SIA 266:2015, 4.3.1.2, Gl. (8)", "SIA 266:2015, 4.3.3.1, Gl. (17)"]
 ---
-> [!info] Normstelle
-> SIA 266:2015, 4.3.1.2, Gl. (8)
+> [!info] Normstellen
+> SIA 266:2015, 4.3.1.2, Gl. (8) · SIA 266:2015, 4.3.3.1, Gl. (17)
 
 *In der Herleitung: «Bezugswert der Knicklänge»*
 
@@ -51,3 +51,7 @@ Der vereinfachte Nachweis nach 4.3.1.2 vergleicht die Höhe der Wand mit
 ihr. Hier bezieht sie die Krümmung der Figur 3 auf die Wand; das
 Verhältnis $h_w/h_{Ed}$ steht in der Herleitung zur Auskunft – nach ihm
 ordnet Figur 19 die Kurven von $k_N$.
+
+Trägt der Pfeiler auch Schub und steht die Normalkraft quer zur Wand
+ausmittig, steift nur seine gedrückte Länge $l_2$ ihn aus; sie steht dann
+statt $l_w$ (Gl. (17)).

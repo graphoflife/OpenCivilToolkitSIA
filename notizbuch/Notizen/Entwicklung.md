@@ -7,6 +7,35 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-28 · Mauerwerk: Schub in der Wandebene (Schritt 14c)
+
+Eine Punktlast schiebt die Wand mit H auch waagrecht in ihrer Ebene, etwa
+eine Decke unter Wind. Je Pfeiler kommen dann zwei Nachweise dazu: die
+Druckstrebe und das Gleiten (SIA 266:2015, 4.3.2.2).
+
+- **Die Scheibe** (`mauerwerk/scheibe.py`) regelt die Norm nicht: über der
+  höchsten Öffnung starr, darunter die Pfeiler als Balken mit
+  Schubverformung, unten eingespannt. Das Gleichgewicht des starren Teils
+  mit drei Bewegungen gibt je Pfeiler V, N und M_z am Fuss; mit einem
+  Pfeiler ist es der Kragarm. Darum steht eine waagrechte Last tiefer als
+  die höchste Öffnung rot: dort fehlt dem Modell der Weg.
+- **Das Moment der lotrechten Lasten** neben den Mitten der Pfeiler, M_v,
+  gibt der starre Teil nach b³ an die Füsse. Zuerst zählte es je Pfeiler:
+  das Auflager eines Türsturzes am Rand des Pfeilers machte dann aus 800
+  mm gedrückter Länge 239 mm – ein Pfeiler, den der Sturz kaum belastet,
+  verfehlte so den Schub. Die Normalkräfte des Lastabtrags bleiben, wie
+  sie sind; das Gleichgewicht stimmt.
+- **Die Druckstrebe** nach Gl. (13) mit l_2 = l_w − 2 M_z / N; steht die
+  Normalkraft quer zur Wand ausmittig, trägt nur t_nom = t_w − 2 e_z
+  (4.3.3.1), sonst ganz t_w. **Gleiten** nach Gl. (14), als V_Rd = μ_d · N.
+  Unter Schub und mit ausmittiger Normalkraft gilt für die Normalkraft
+  Gl. (17): l_2 statt l_w; k_N bleibt, es hängt nicht von der Länge ab.
+- **Nur mit H**: ohne waagrechte Last gibt es weder Schub noch Gleiten,
+  und alles rechnet wie in 14b. In einer Kombination ohne H steht «Keine
+  Einwirkung → kein Nachweis.».
+- Die Tests der Wand lesen die Urteile neu nach ihrem ganzen Namen
+  («Schub – P1 – GZT Wind»): an einem Pfeiler stehen jetzt mehrere.
+
 ## 2026-11-28 · Mauerwerk: Normalkraft und Teilflächen (Schritt 14b)
 
 Die Wand bekommt Lasten und ihre ersten beiden Nachweise: je Pfeiler die

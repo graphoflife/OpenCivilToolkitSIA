@@ -1,5 +1,5 @@
 ---
-erzeugt: 0dffa2f58bc1
+erzeugt: 554af80790f5
 art: modul
 tags: [modul]
 ---
@@ -105,9 +105,10 @@ frischen Wand. Die erste, 6 × 2.7 m und 175 mm dick, als Verbandmauerwerk
 vollfugig vermauert, am Fuss eingespannt und rechts gehalten: eine Türe
 mit Betonsturz und zwei Fenster, eines mit vorfabriziertem Sturz. Oben
 liegt die Decke 20 mm ausmittig auf, und über dem vorfabrizierten Sturz
-ein Träger. Die zweite, ein Pfeiler ohne Öffnung, 1.5 × 2.6 m und 150 mm
-dick, ist am Kopf eingespannt und steht am Fuss gelenkig 15 mm neben der
-Mitte.
+ein Träger; im Lastfall Wind schiebt die Decke die Wand mit 20 kN nach
+rechts, in «GZT Wind» 1.5-fach. Die zweite, ein Pfeiler ohne Öffnung,
+1.5 × 2.6 m und 150 mm dick, ist am Kopf eingespannt und steht am Fuss
+gelenkig 15 mm neben der Mitte.
 
 ### _fachwerk_der_wandscheibe
 

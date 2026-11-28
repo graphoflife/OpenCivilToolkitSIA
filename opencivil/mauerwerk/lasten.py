@@ -5,8 +5,11 @@ VERANTWORTUNG:
 Die lotrechten Lasten einer Wand -- Linien- und Punktlasten mit ihrer
 Ausmitte quer zur Wand, dazu ihr Eigengewicht -- je Lastfall auf Pfeiler und
 Stürze verteilt (:func:`abtragen`): je Pfeiler die Normalkraft an seinem Fuss,
-die der Lasten allein und das Moment ihrer Ausmitten an seinem Kopf, je
-Sturzauflager seine Kraft.
+die der Lasten allein und das Moment ihrer Ausmitten an seinem Kopf; je
+Sturzauflager seine Kraft; und wie weit die Lasten in der Ebene der Wand
+neben den Mitten der Pfeiler stehen, als ein Moment. Was in der Ebene der
+Wand daraus wird und was die waagrechten Lasten dazugeben, rechnet
+:mod:`~opencivil.mauerwerk.scheibe` in denselben Abtrag.
 Eine Kombination summiert die Lastfälle mit ihren Beiwerten
 (:func:`kombinieren`). Die Norm regelt das nicht; so rechnet das Werkzeug
 (nach Vorgabe, nicht nachgeschlagen):
@@ -25,6 +28,9 @@ Eine Kombination summiert die Lastfälle mit ihren Beiwerten
   wo sie auch liegt; das Eigengewicht mittig. Die Ausmitte am Kopf ist
   darum die der Lasten allein, M / N_L: das Eigengewicht, das erst darunter
   dazukommt, verkleinert sie nicht.
+- In der Ebene der Wand erreicht eine Last den Pfeiler, wo sie über ihm
+  liegt, von einem Sturz in der Mitte seines Auflagers: ihr Hebel zur
+  Mitte des Pfeilers, über alle Pfeiler summiert, ist das Moment M_v.
 
 Die Lasten selbst beschreibt :mod:`~opencivil.mauerwerk.modell`.
 
@@ -49,7 +55,12 @@ class Abtrag:
     Was ein Fall den Pfeilern und Stürzen gibt: je Pfeiler die Normalkraft
     am Fuss ``N``, die der Lasten allein ``N_L`` und das Moment ihrer
     Ausmitten ``M``; je Sturzauflager ``(Öffnung, Seite)`` die Kraft ``R``,
-    und was neben den Pfeilern in den Fuss geht (``unten``).
+    und was neben den Pfeilern in den Fuss geht (``unten``). In der Ebene
+    der Wand ``M_v``, wie weit die Lasten neben den Mitten der Pfeiler
+    stehen, und je Pfeiler die Querkraft ``V``, nach rechts positiv, was die
+    waagrechten Lasten zu seiner Normalkraft geben, ``N_H`` -- schon in
+    ``N`` und ``N_L`` --, und das Moment an seinem Fuss ``M_z``. Beide
+    Momente sind positiv, wenn sie die Resultierende nach rechts schieben.
     """
 
     N: Dict[str, float] = field(default_factory=dict)
@@ -57,14 +68,23 @@ class Abtrag:
     M: Dict[str, float] = field(default_factory=dict)
     R: Dict[Tuple[str, str], float] = field(default_factory=dict)
     unten: float = 0.0
+    M_v: float = 0.0
+    V: Dict[str, float] = field(default_factory=dict)
+    N_H: Dict[str, float] = field(default_factory=dict)
+    M_z: Dict[str, float] = field(default_factory=dict)
+
+    def je_pfeiler(self) -> Tuple[Dict[str, float], ...]:
+        """Was je Pfeiler eine Zahl hat -- die eine Liste, die :func:`kombinieren` summiert."""
+        return self.N, self.N_L, self.M, self.V, self.N_H, self.M_z
 
 
 def leer(pfeiler: Sequence[Pfeiler], oeffnungen: Sequence[Oeffnung]) -> Abtrag:
     """Ein Abtrag ohne Last: je Pfeiler und Auflager eine Null, damit jeder dasteht."""
-    return Abtrag(N={p.name: 0.0 for p in pfeiler}, N_L={p.name: 0.0 for p in pfeiler},
-                  M={p.name: 0.0 for p in pfeiler},
-                  R={(o.name, s): 0.0 for o in oeffnungen if o.rechteck is not None
-                     for s in SEITEN})
+    abtrag = Abtrag(R={(o.name, s): 0.0 for o in oeffnungen if o.rechteck is not None
+                       for s in SEITEN})
+    for je_pfeiler in abtrag.je_pfeiler():
+        je_pfeiler.update((p.name, 0.0) for p in pfeiler)
+    return abtrag
 
 
 def kombinieren(name_faktoren: Mapping[str, float], je_fall: Mapping[str, Abtrag],
@@ -75,12 +95,13 @@ def kombinieren(name_faktoren: Mapping[str, float], je_fall: Mapping[str, Abtrag
         a = je_fall.get(fall)
         if a is None or beiwert == 0.0:
             continue
-        for je_pfeiler, dazu in ((summe.N, a.N), (summe.N_L, a.N_L), (summe.M, a.M)):
+        for je_pfeiler, dazu in zip(summe.je_pfeiler(), a.je_pfeiler()):
             for k, v in dazu.items():
                 je_pfeiler[k] = je_pfeiler.get(k, 0.0) + beiwert * v
         for k, v in a.R.items():
             summe.R[k] = summe.R.get(k, 0.0) + beiwert * v
         summe.unten += beiwert * a.unten
+        summe.M_v += beiwert * a.M_v
     return summe
 
 
@@ -159,6 +180,7 @@ def abtragen(flaeche: Rechteck, oeffnungen: Sequence[Oeffnung], pfeiler: Sequenc
                 abtrag.unten += Q
             else:
                 abtrag.N[p.name] += Q
+                abtrag.M_v += Q * ((x0 + x1) - (p.x0 + p.x1)) / 2
                 if last:
                     abtrag.N_L[p.name] += Q
                     abtrag.M[p.name] += Q * e

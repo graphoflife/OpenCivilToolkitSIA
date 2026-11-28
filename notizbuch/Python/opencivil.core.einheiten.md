@@ -1,5 +1,5 @@
 ---
-erzeugt: 77fa97bc63a4
+erzeugt: b84a93a22a9e
 art: modul
 tags: [modul]
 ---
@@ -480,6 +480,7 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - [[opencivil.material.spannstahl]]
 - [[opencivil.mauerwerk.herleitung]]
 - [[opencivil.mauerwerk.nachweise]]
+- [[opencivil.mauerwerk.schub]]
 - [[opencivil.mauerwerk.uebersicht]]
 - [[opencivil.mauerwerk.werk]]
 - [[opencivil.nachweis.biegung_normalkraft]]

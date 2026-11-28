@@ -1,5 +1,5 @@
 ---
-erzeugt: 03b9af4cc3bf
+erzeugt: ac64e0910d29
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -82,7 +82,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 **Mauerwerk**
 
-- [[Mauerwerk]] · 18
+- [[Mauerwerk]] · 23
 
 **Decken**
 
@@ -214,6 +214,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Dekompressionsmoment und Dehnung]]
 - [[Dicke des geneigten Flanschs am Steg]] · $t_{1}$
 - [[Dicke des geneigten Flanschs an der Spitze]] · $t_{2}$
+- [[Dicke einer Schubwand mit ausmittiger Normalkraft]] · $t_{nom}$
 - [[Dickster Stab der Lage]] · $\varnothing_{2,x}$
 - [[Drehfeder des Pfahlkopfs]] · $K_{MM}$
 - [[Drehung in die Achsen des Stabs]]
@@ -291,6 +292,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Formfaktor s_q]] · $s_q$
 - [[Formfaktor s_γ]] · $s_{\gamma}$
 - [[Gebetteter Pfahl]]
+- [[Gedrückte Länge am Fuss eines Pfeilers]] · $l_2$
 - [[Geländeneigungsfaktor g_c]] · $g_c$
 - [[Geländeneigungsfaktor g_q]] · $g_q$
 - [[Gesamtsetzung]] · $s$
@@ -394,6 +396,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Nachweisschnitt ohne das, was nicht zählt]] · $u_{red}$
 - [[Nachweisschnitt um das Wandende – 1.5·d_v entlang der Wand]] · $u_0$
 - [[Nachweisschnitt um die Wandecke – je 1.5·d_v entlang der Wände]] · $u_0$
+- [[Neigung der Druckstrebe in einem Pfeiler]] · $\alpha$
 - [[Neigung der Last]] · $\delta_R$
 - [[Nominelle Dehnung der Zugbewehrung]] · $\varepsilon_v$
 - [[Normalkraft aus der Vorspannung]] · $N_p$
@@ -561,10 +564,12 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Widerstand der Bügel]] · $V_{Rd,s}$
 - [[Widerstand der Druckdiagonalen]] · $V_{Rd,c}$
 - [[Widerstand der Druckdiagonalen im Pfahl]] · $V_{Rd,c}$
+- [[Widerstand der Druckstrebe in einem Pfeiler]] · $N_{Rd}$
 - [[Widerstand der ersten Betondruckdiagonale]] · $V_{Rd,max}$
 - [[Widerstand der Wendel]] · $V_{Rd,s}$
 - [[Widerstand einer Verbundstütze nach (25)]] · $M_{y,Rd}$
 - [[Widerstand einer Wand (Fachwerk, ihre Länge l als Hebelarm)]]
+- [[Widerstand eines Pfeilers gegen Gleiten]] · $V_{Rd}$
 - [[Widerstand eines Sturzauflagers]] · $R_{Rd}$
 - [[Widerstand im normierten Diagramm]] · $\bar{R}_{d,x}$
 - [[Widerstand in der Richtung der Einwirkung]] · $M_{Rd}$
@@ -597,14 +602,14 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 ## Normstelle fehlt noch
 
-152 von 495 Formeln haben im Code keine Normstelle – meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle – von dort kommt sie in Bericht und Notizbuch.
+152 von 500 Formeln haben im Code keine Normstelle – meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle – von dort kommt sie in Bericht und Notizbuch.
 
 - [[Achsen eines Stabs im Raum]] · [[opencivil.stabwerk3d.herleitung|_ansaetze]]
 - [[Äquivalenter E-Modul eines Stabs]] · [[opencivil.spannungsanalyse.modul#ModulProzedur|ModulProzedur._schreiben]]
 - [[Äquivalenter E-Modul über dem Moment]] · [[opencivil.spannungsanalyse.herleitung#_herleitung_modul|_herleitung_modul]]
 - [[Äquivalenter E-Modul über der Normalkraft]] · [[opencivil.spannungsanalyse.herleitung#_herleitung_modul|_herleitung_modul]]
 - [[Arbeitsgleiche Knotenkräfte]] · [[opencivil.stabwerk.herleitung|_ansaetze]], [[opencivil.stabwerk3d.herleitung|_ansaetze]]
-- [[Ausmitte am Kopf – sie bleibt, wenn die Lasten wachsen]] · [[opencivil.mauerwerk.nachweise#Normalkraft._kopf|Normalkraft._kopf]]
+- [[Ausmitte am Kopf – sie bleibt, wenn die Lasten wachsen]] · [[opencivil.mauerwerk.nachweise#_kopf|_kopf]]
 - [[Betonstahl nur auf Zug]] · [[opencivil.querschnitt.werkstoffgesetz#Gesetz.protokoll|Gesetz.protokoll]]
 - [[Bettung eines Stabs]] · [[opencivil.stabwerk.herleitung|_ansaetze]], [[opencivil.stabwerk3d.herleitung|_ansaetze]]
 - [[Bewehrung der Lage]] · [[opencivil.querschnitt.lagenaufbau#protokoll_lage|protokoll_lage]]

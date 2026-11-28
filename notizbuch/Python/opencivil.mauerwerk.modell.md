@@ -1,5 +1,5 @@
 ---
-erzeugt: 34af97ff4c49
+erzeugt: 926aada139ba
 art: modul
 tags: [modul]
 ---
@@ -42,10 +42,13 @@ zusammen eine Lücke. Wo keine Öffnung ist, ist die ganze Wand ein Pfeiler.
 
 ## DIE LASTEN
 
-Lotrecht, je Lastfall ([[opencivil.mauerwerk.modell#Lastfall|Lastfall]]): waagrechte Linienlasten und
-Punktlasten in der Ansicht, nach unten positiv, mit ihrer Ausmitte quer zur
-Wand – positiv zur Seite, von der aus man die Ansicht sieht. Wie sie zu
-den Pfeilern kommen, sagt [[opencivil.mauerwerk.lasten|lasten]].
+Je Lastfall ([[opencivil.mauerwerk.modell#Lastfall|Lastfall]]): waagrechte Linienlasten und Punktlasten in
+der Ansicht, nach unten positiv, mit ihrer Ausmitte quer zur Wand –
+positiv zur Seite, von der aus man die Ansicht sieht. Eine Punktlast kann
+auch waagrecht in der Ebene der Wand schieben, nach rechts positiv. Wie die
+lotrechten Lasten zu den Pfeilern kommen, sagt
+[[opencivil.mauerwerk.lasten|lasten]], wie die waagrechten
+[[opencivil.mauerwerk.scheibe|scheibe]].
 
 ## Inhalt
 
@@ -311,6 +314,7 @@ Meldung.
 - `y: float`
 - `Q: float`
 - `e: float = 0.0`
+- `H: float = 0.0` – Was eine Punktlast waagrecht in der Ebene der Wand schiebt, in N, nach rechts positiv.
 
 ### Lastfall
 
@@ -380,6 +384,15 @@ def flaeche(self) -> Optional[Rechteck]
 
 Die Wand als Rechteck: `None` ohne genau einen rechteckigen Umriss.
 
+#### Wand.schiebende
+
+```python
+def schiebende(self) -> List[str]
+```
+
+Die Namen der Kombinationen, in denen eine Last die Wand waagrecht
+schiebt: ein Lastfall mit H hat dort einen Beiwert.
+
 ### pfeiler
 
 ```python
@@ -405,6 +418,8 @@ Gezählt werden nur Öffnungen, die Rechtecke sind.
 - [[opencivil.mauerwerk.lasten]]
 - [[opencivil.mauerwerk.nachweise]]
 - [[opencivil.mauerwerk.pruefen]]
+- [[opencivil.mauerwerk.scheibe]]
+- [[opencivil.mauerwerk.schub]]
 - [[opencivil.mauerwerk.werk]]
 - [[opencivil.projekt.aufbau.mauerwerk]]
 - [[opencivil.projekt.mauerwerk]]

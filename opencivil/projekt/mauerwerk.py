@@ -19,8 +19,10 @@ Ecken genau aufeinander, teilen sie einen Knoten
 KOORDINATEN UND EINHEITEN:
 x nach rechts, y nach oben, in m -- wie in der Decke. Die Dicke der Wand,
 die Masse eines Sturzes und die Ausmitten in mm, wie man sie auf dem Plan
-liest; Lasten in kN/m und kN, nach unten positiv. Eine Ausmitte ist positiv
-zur Seite, von der aus man die Ansicht sieht. Umgerechnet wird beim Bauen.
+liest; Lasten in kN/m und kN, nach unten positiv, eine Punktlast auch
+waagrecht in der Ebene der Wand, nach rechts positiv. Eine Ausmitte ist
+positiv zur Seite, von der aus man die Ansicht sieht. Umgerechnet wird beim
+Bauen.
 """
 
 from __future__ import annotations
@@ -87,13 +89,18 @@ class WandlinienlastEintrag(Beschreibung):
 
 @dataclass
 class WandpunktlastEintrag(Beschreibung):
-    """Eine Einzellast an einem Knoten, in einem Lastfall -- ein Träger, der aufliegt, etwa."""
+    """
+    Eine Einzellast an einem Knoten, in einem Lastfall -- ein Träger, der
+    aufliegt, etwa, oder eine Decke, die die Wand waagrecht schiebt.
+    """
 
     kennung: str = ""
     lastfall: str = ""
     knoten: str = ""
     wert: float = bereich(50.0, heisst="Q", einheit=KN)
     e: float = bereich(0.0, heisst="Ausmitte e", einheit=MM)
+    H: float = bereich(0.0, heisst="H", einheit=KN)
+    """Waagrecht in der Ebene der Wand, nach rechts positiv."""
 
 
 @dataclass
@@ -178,7 +185,10 @@ class MauerwerkEintrag(MitFaellen, BauteilEintrag):
                               "bis": self._knoten(netz, bis), **felder}, "Linienlast")
 
     def punktlast(self, lastfall: Any, ort: Ort, **felder: Any) -> WandpunktlastEintrag:
-        """Eine Punktlast im Lastfall ``lastfall``, ``wert`` in kN und ``e`` in mm als Stichwort."""
+        """
+        Eine Punktlast im Lastfall ``lastfall`` -- ``wert`` und ``H`` in kN,
+        ``e`` in mm als Stichwort.
+        """
         return self._anlegen("punktlasten", WandpunktlastEintrag,
                              {"lastfall": kennung_von(lastfall),
                               "knoten": self._knoten(self.netz(), ort), **felder}, "Punktlast")

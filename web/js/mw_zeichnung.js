@@ -13,7 +13,9 @@
  * Leiste gewählt ist (lastfaelle.js), wie in der Decke: das Fenster zeigt nur
  * dessen Lasten, und nur sie lassen sich wählen. Eine Linienlast liegt von
  * Knoten zu Knoten -- eine schräge meldet der Kern --, eine Punktlast steht
- * an ihrem Knoten und in dessen Fenster.
+ * an ihrem Knoten und in dessen Fenster. Eine Punktlast schiebt die Wand mit
+ * H auch waagrecht in ihrer Ebene, etwa eine Decke unter Wind; der Kern lässt
+ * das nur über den Öffnungen zu und sagt es sonst rot.
  *
  * WAS DER KERN SAGT:
  * Anfrage `mauerwerk_zeichnung`: die Meldungen, je Öffnung die Fläche ihres
@@ -241,7 +243,10 @@ function oeffnungFelder(wert, setzen) {
   ];
 }
 
-/** Die Felder einer Last der Liste `liste`: ihr Wert nach unten und ihre Ausmitte quer zur Wand. */
+/**
+ * Die Felder einer Last der Liste `liste`: ihr Wert nach unten und ihre
+ * Ausmitte quer zur Wand -- bei einer Punktlast auch H in der Ebene der Wand.
+ */
 function lastFelder(liste, wert, setzen) {
   const [klasse, zeichen] = LASTEN[liste];
   return [
@@ -254,7 +259,12 @@ function lastFelder(liste, wert, setzen) {
       titel: 'Ausmitte quer zur Wand, positiv zur Seite, von der aus man die Ansicht sieht – sie wirkt am Kopf '
         + 'der Pfeiler, die die Last tragen',
     }),
-  ];
+    liste === 'punktlasten' ? feldzeile(klasse, 'H', wert, setzen, {
+      beschriftung: 'H', schritt: 5,
+      titel: 'Waagrecht in der Ebene der Wand, nach rechts positiv – nur über den Öffnungen, wo die Wand '
+        + 'zusammenhält, etwa an der Decke',
+    }) : null,
+  ].filter(Boolean);
 }
 
 /**

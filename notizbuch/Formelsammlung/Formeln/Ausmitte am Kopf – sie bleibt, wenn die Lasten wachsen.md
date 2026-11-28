@@ -1,5 +1,5 @@
 ---
-erzeugt: 45e12a0f658b
+erzeugt: 96d39a978586
 art: formel
 tags: [formel]
 ---
@@ -27,7 +27,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.mauerwerk.nachweise#Normalkraft._kopf|Normalkraft._kopf]]
+- [[opencivil.mauerwerk.nachweise#_kopf|_kopf]]
 
 ## Themen
 

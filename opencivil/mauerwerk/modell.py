@@ -27,10 +27,13 @@ die sich in der Breite überdecken -- ein Fenster über einer Türe --, bilden
 zusammen eine Lücke. Wo keine Öffnung ist, ist die ganze Wand ein Pfeiler.
 
 DIE LASTEN:
-Lotrecht, je Lastfall (:class:`Lastfall`): waagrechte Linienlasten und
-Punktlasten in der Ansicht, nach unten positiv, mit ihrer Ausmitte quer zur
-Wand -- positiv zur Seite, von der aus man die Ansicht sieht. Wie sie zu
-den Pfeilern kommen, sagt :mod:`~opencivil.mauerwerk.lasten`.
+Je Lastfall (:class:`Lastfall`): waagrechte Linienlasten und Punktlasten in
+der Ansicht, nach unten positiv, mit ihrer Ausmitte quer zur Wand --
+positiv zur Seite, von der aus man die Ansicht sieht. Eine Punktlast kann
+auch waagrecht in der Ebene der Wand schieben, nach rechts positiv. Wie die
+lotrechten Lasten zu den Pfeilern kommen, sagt
+:mod:`~opencivil.mauerwerk.lasten`, wie die waagrechten
+:mod:`~opencivil.mauerwerk.scheibe`.
 """
 
 from __future__ import annotations
@@ -244,6 +247,8 @@ class Wandlast:
     y: float
     Q: float
     e: float = 0.0
+    H: float = 0.0
+    """Was eine Punktlast waagrecht in der Ebene der Wand schiebt, in N, nach rechts positiv."""
 
 
 @dataclass(frozen=True)
@@ -290,6 +295,14 @@ class Wand:
     def flaeche(self) -> Optional[Rechteck]:
         """Die Wand als Rechteck: ``None`` ohne genau einen rechteckigen Umriss."""
         return self.umrisse[0].rechteck if len(self.umrisse) == 1 else None
+
+    def schiebende(self) -> List[str]:
+        """
+        Die Namen der Kombinationen, in denen eine Last die Wand waagrecht
+        schiebt: ein Lastfall mit H hat dort einen Beiwert.
+        """
+        mit_H = [lf.name for lf in self.lastfaelle if any(last.H for last in lf.lasten)]
+        return [k.name for k in self.kombinationen if any(k.faktoren.get(n) for n in mit_H)]
 
 
 def pfeiler(wand: Rechteck, oeffnungen: Sequence[Oeffnung]) -> List[Pfeiler]:

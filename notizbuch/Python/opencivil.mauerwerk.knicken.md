@@ -1,5 +1,5 @@
 ---
-erzeugt: 769fc3298fc0
+erzeugt: e9241f318c08
 art: modul
 tags: [modul]
 ---
@@ -217,3 +217,4 @@ Die Rechnung hinter [[opencivil.mauerwerk.knicken#k_N|k_N]], je Fall einmal: die
 ## Gebraucht von
 
 - [[opencivil.mauerwerk.nachweise]]
+- [[opencivil.mauerwerk.schub]]

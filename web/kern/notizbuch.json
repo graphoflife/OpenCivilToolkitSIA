@@ -1583,6 +1583,17 @@
       ]
     },
     {
+      "name": "Dicke einer Schubwand mit ausmittiger Normalkraft",
+      "pfad": "Formelsammlung/Formeln/Dicke einer Schubwand mit ausmittiger Normalkraft.md",
+      "art": "formel",
+      "zeichen": [
+        "t_{nom}"
+      ],
+      "themen": [
+        "Mauerwerk"
+      ]
+    },
+    {
       "name": "Dickster Stab der Lage",
       "pfad": "Formelsammlung/Formeln/Dickster Stab der Lage.md",
       "art": "formel",
@@ -2450,6 +2461,17 @@
       "zeichen": [],
       "themen": [
         "Pfahlsteifigkeit"
+      ]
+    },
+    {
+      "name": "Gedrückte Länge am Fuss eines Pfeilers",
+      "pfad": "Formelsammlung/Formeln/Gedrückte Länge am Fuss eines Pfeilers.md",
+      "art": "formel",
+      "zeichen": [
+        "l_2"
+      ],
+      "themen": [
+        "Mauerwerk"
       ]
     },
     {
@@ -3554,6 +3576,17 @@
       ],
       "themen": [
         "Durchstanzen"
+      ]
+    },
+    {
+      "name": "Neigung der Druckstrebe in einem Pfeiler",
+      "pfad": "Formelsammlung/Formeln/Neigung der Druckstrebe in einem Pfeiler.md",
+      "art": "formel",
+      "zeichen": [
+        "\\alpha"
+      ],
+      "themen": [
+        "Mauerwerk"
       ]
     },
     {
@@ -5388,6 +5421,17 @@
       ]
     },
     {
+      "name": "Widerstand der Druckstrebe in einem Pfeiler",
+      "pfad": "Formelsammlung/Formeln/Widerstand der Druckstrebe in einem Pfeiler.md",
+      "art": "formel",
+      "zeichen": [
+        "N_{Rd}"
+      ],
+      "themen": [
+        "Mauerwerk"
+      ]
+    },
+    {
       "name": "Widerstand der ersten Betondruckdiagonale",
       "pfad": "Formelsammlung/Formeln/Widerstand der ersten Betondruckdiagonale.md",
       "art": "formel",
@@ -5427,6 +5471,17 @@
       "zeichen": [],
       "themen": [
         "Querkraft und Torsion"
+      ]
+    },
+    {
+      "name": "Widerstand eines Pfeilers gegen Gleiten",
+      "pfad": "Formelsammlung/Formeln/Widerstand eines Pfeilers gegen Gleiten.md",
+      "art": "formel",
+      "zeichen": [
+        "V_{Rd}"
+      ],
+      "themen": [
+        "Mauerwerk"
       ]
     },
     {
@@ -8236,6 +8291,7 @@
         "_von_bis",
         "_pfeiler",
         "_lasten",
+        "_scheibe",
         "_tabelle"
       ]
     },
@@ -8281,6 +8337,7 @@
       "kurz": "wie die Lasten einer Wand zu ihren Pfeilern kommen.",
       "stichworte": [
         "Abtrag",
+        "Abtrag.je_pfeiler",
         "leer",
         "kombinieren",
         "_Wand",
@@ -8331,6 +8388,7 @@
         "Wand.verband",
         "Wand.vollfugig",
         "Wand.flaeche",
+        "Wand.schiebende",
         "pfeiler"
       ]
     },
@@ -8350,12 +8408,19 @@
         "Wandnachweis.stelle",
         "Wandnachweis.vergleichen",
         "Wandnachweis.satz",
+        "ohne_einwirkung",
         "Normalkraft",
         "Normalkraft.ansatz",
         "Normalkraft.stelle",
-        "Normalkraft._kopf",
+        "zug",
+        "ausmitten",
+        "ausmittig",
+        "knicken_unter",
+        "gedrueckte_laenge",
+        "_kopf",
         "_wo",
         "_grenze_text",
+        "pfeiler_von",
         "Teilflaechen",
         "Teilflaechen.ansatz",
         "Teilflaechen.stelle"
@@ -8374,6 +8439,39 @@
         "_in_oeffnung",
         "_wohin",
         "dickenhinweis"
+      ]
+    },
+    {
+      "name": "opencivil.mauerwerk.scheibe",
+      "pfad": "Python/opencivil.mauerwerk.scheibe.md",
+      "art": "modul",
+      "kurz": "wie die waagrechten Lasten einer Wand zu ihren Pfeilern kommen.",
+      "stichworte": [
+        "starr_ab",
+        "koepfe",
+        "Steifigkeit",
+        "steifigkeit",
+        "antworten",
+        "anteile",
+        "abtragen"
+      ]
+    },
+    {
+      "name": "opencivil.mauerwerk.schub",
+      "pfad": "Python/opencivil.mauerwerk.schub.md",
+      "art": "modul",
+      "kurz": "die Nachweise des Schubs in der Ebene einer Wand.",
+      "stichworte": [
+        "Schubnachweis",
+        "Schubnachweis.stelle",
+        "Schubnachweis.gedrueckt",
+        "Schub",
+        "Schub.ansatz",
+        "Schub.gedrueckt",
+        "Schub._dicke",
+        "Gleiten",
+        "Gleiten.ansatz",
+        "Gleiten.gedrueckt"
       ]
     },
     {

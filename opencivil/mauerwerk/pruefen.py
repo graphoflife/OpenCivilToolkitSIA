@@ -15,7 +15,9 @@ Die Meldungen der Zeichnung einer Wand, in dieser Folge:
 - eine unübliche Dicke: ein Hinweis (:func:`dickenhinweis`).
 
 Wo die Lasten liegen, prüft :func:`lasten_pruefen`, sobald die Zeichnung
-rechnet: eine Last neben der Wand oder in einer Öffnung ist rot.
+rechnet: eine Last neben der Wand oder in einer Öffnung ist rot, ebenso eine,
+die waagrecht tiefer schiebt als bis zum oberen Rand der höchsten Öffnung --
+darunter rechnet das Werkzeug keine (:mod:`~opencivil.mauerwerk.scheibe`).
 
 Was nur fehlt, steht grau und hält die Rechnung an; was falsch ist, steht
 rot (Benutzer, 2026-11-19).
@@ -34,6 +36,7 @@ from typing import Dict, List, Optional, Tuple
 from opencivil.core.sprache import aufgezaehlt
 from opencivil.material.mauerwerk import MAUERWERKSSORTEN
 from opencivil.mauerwerk.modell import TOLERANZ, Oeffnung, Rechteck, Umriss, Wand, Wandlast
+from opencivil.mauerwerk.scheibe import starr_ab
 from opencivil.querschnitt.geometrie import GeometrieFehler, polygon_pruefen
 from opencivil.stabwerk.system import Meldung
 
@@ -112,10 +115,12 @@ def lasten_pruefen(wand: Wand) -> List[Meldung]:
     Je Last, die nicht ganz auf der Wand oder in einer Öffnung liegt, eine
     rote Meldung -- nur für eine Wand, deren Zeichnung rechnet. Auf dem Rand
     einer Öffnung zählt nicht: oben liegt die Last am Sturz, unten auf der
-    Brüstung.
+    Brüstung. Dazu je Last, die waagrecht unter dem oberen Rand der höchsten
+    Öffnung schiebt, eine rote.
     """
     flaeche = wand.flaeche
     meldungen: List[Meldung] = []
+    hoechste = max(wand.oeffnungen, key=lambda o: o.rechteck.y1, default=None)
     for last in (x for lf in wand.lastfaelle for x in lf.lasten):
         if not flaeche.enthaelt(Rechteck(last.x0, last.y, last.x1, last.y)):
             meldungen.append(Meldung(f"Die Last {last.name} liegt nicht ganz auf der Wand.",
@@ -124,6 +129,12 @@ def lasten_pruefen(wand: Wand) -> List[Meldung]:
         meldungen += [Meldung(f"Die Last {last.name} liegt in der Öffnung {o.name}.",
                               (last.name, o.name))
                       for o in wand.oeffnungen if _in_oeffnung(last, o.rechteck)]
+        if last.H and last.y < starr_ab(flaeche, wand.oeffnungen) - TOLERANZ:
+            meldungen.append(Meldung(
+                f"Die Last {last.name} schiebt waagrecht tiefer als der obere Rand der Öffnung "
+                f"{hoechste.name} – das Werkzeug rechnet waagrechte Lasten nur über den "
+                f"Öffnungen, wo die Wand zusammenhält, etwa an der Decke.",
+                (last.name, hoechste.name)))
     return meldungen
 
 

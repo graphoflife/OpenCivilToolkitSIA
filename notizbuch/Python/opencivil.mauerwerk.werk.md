@@ -1,5 +1,5 @@
 ---
-erzeugt: 74e51384a053
+erzeugt: 51ce3f10df00
 art: modul
 tags: [modul]
 ---
@@ -16,8 +16,9 @@ Kasten – und eine Prozedur, die ihre Zeichnung prüft
 den Mindestwerten misst und nach ihrer Wahl umrechnet
 ([[opencivil.mauerwerk.kennwerte|kennwerte]]), die Pfeiler bestimmt
 ([[opencivil.mauerwerk.modell#pfeiler|pfeiler]]), ihre Lasten je Lastfall und
-Kombination auf Pfeiler und Stürze verteilt
-([[opencivil.mauerwerk.lasten|lasten]]) und die Herleitung schreibt
+Kombination auf Pfeiler und Stürze verteilt – die lotrechten nach
+[[opencivil.mauerwerk.lasten|lasten]], die waagrechten nach
+[[opencivil.mauerwerk.scheibe|scheibe]] – und die Herleitung schreibt
 ([[opencivil.mauerwerk.herleitung|herleitung]]).
 
 
@@ -153,12 +154,14 @@ Je Lastfall und Kombination, was Pfeiler und Stürze tragen – in den Befund.
 - [[opencivil.mauerwerk.lasten]]
 - [[opencivil.mauerwerk.modell]]
 - [[opencivil.mauerwerk.pruefen]]
+- [[opencivil.mauerwerk.scheibe]]
 - [[opencivil.stabwerk.system]]
 
 ## Gebraucht von
 
 - [[opencivil.mauerwerk.herleitung]]
 - [[opencivil.mauerwerk.nachweise]]
+- [[opencivil.mauerwerk.schub]]
 - [[opencivil.mauerwerk.uebersicht]]
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.aufbau.mauerwerk]]

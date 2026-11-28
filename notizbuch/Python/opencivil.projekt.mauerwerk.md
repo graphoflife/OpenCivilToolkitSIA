@@ -1,5 +1,5 @@
 ---
-erzeugt: ff45dfa49ca0
+erzeugt: 031d7eab8c30
 art: modul
 tags: [modul]
 ---
@@ -30,8 +30,10 @@ Ecken genau aufeinander, teilen sie einen Knoten
 
 x nach rechts, y nach oben, in m – wie in der Decke. Die Dicke der Wand,
 die Masse eines Sturzes und die Ausmitten in mm, wie man sie auf dem Plan
-liest; Lasten in kN/m und kN, nach unten positiv. Eine Ausmitte ist positiv
-zur Seite, von der aus man die Ansicht sieht. Umgerechnet wird beim Bauen.
+liest; Lasten in kN/m und kN, nach unten positiv, eine Punktlast auch
+waagrecht in der Ebene der Wand, nach rechts positiv. Eine Ausmitte ist
+positiv zur Seite, von der aus man die Ansicht sieht. Umgerechnet wird beim
+Bauen.
 
 ## Inhalt
 
@@ -98,13 +100,15 @@ Eine waagrechte Linienlast von Knoten zu Knoten, in einem Lastfall: eine Decke d
 class WandpunktlastEintrag(Beschreibung)
 ```
 
-Eine Einzellast an einem Knoten, in einem Lastfall – ein Träger, der aufliegt, etwa.
+Eine Einzellast an einem Knoten, in einem Lastfall – ein Träger, der
+aufliegt, etwa, oder eine Decke, die die Wand waagrecht schiebt.
 
 - `kennung: str = ''`
 - `lastfall: str = ''`
 - `knoten: str = ''`
 - `wert: float = bereich(50.0, heisst='Q', einheit=KN)`
 - `e: float = bereich(0.0, heisst='Ausmitte e', einheit=MM)`
+- `H: float = bereich(0.0, heisst='H', einheit=KN)` – Waagrecht in der Ebene der Wand, nach rechts positiv.
 
 ### MauerwerkEintrag
 
@@ -191,7 +195,8 @@ Kennung) – `wert` in kN/m und `e` in mm als Stichwort.
 def punktlast(self, lastfall: Any, ort: Ort, **felder: Any) -> WandpunktlastEintrag
 ```
 
-Eine Punktlast im Lastfall `lastfall`, `wert` in kN und `e` in mm als Stichwort.
+Eine Punktlast im Lastfall `lastfall` – `wert` und `H` in kN,
+`e` in mm als Stichwort.
 
 #### MauerwerkEintrag.neu
 

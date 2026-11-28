@@ -17,6 +17,8 @@
  * DIE LASTEN, nur im Zeichenfenster: die des gezeigten Lastfalls, eine
  * Linienlast als Pfeile über ihrer Linie, eine Punktlast als Pfeil auf ihren
  * Knoten, beide mit Wert und Ausmitte -- wie im Balkensystem (bs_symbole.js).
+ * Schiebt eine Punktlast waagrecht, kommt ein Pfeil von der Seite dazu, mit H;
+ * den lotrechten zeigt sie dann nur, wenn auch Q nicht null ist.
  *
  * ZEICHEN DER RÄNDER, ausserhalb der Wand, um den Rahmen ihres Umrisses:
  *   eingespannt   Kopf oder Fuss: eine Kante mit Schraffur, an der die Wand sitzt
@@ -147,7 +149,7 @@ function lasttext(zeichen, einheit, e) {
 
 /**
  * Die Lasten des Lastfalls `lastfall`, in m an den Knoten `lagen`: Pfeile
- * nach unten -- rot, was der Kern an einer beanstandet.
+ * nach unten, für H zur Seite -- rot, was der Kern an einer beanstandet.
  */
 function lasten(v, modell, lagen, lastfall, { fehler, texte }) {
   const g = svgEl('g', { class: 'mw-lasten' });
@@ -161,8 +163,14 @@ function lasten(v, modell, lagen, lastfall, { fehler, texte }) {
   for (const e of (modell.punktlasten || []).filter((x) => x.lastfall === lastfall)) {
     const p = lagen.get(e.knoten);
     if (!p) continue;
-    g.append(mitTitel(kraftpfeil(nachBild(v, p), [0, 1], PFEIL.punkt, lasttext('Q', 'kN', e), klasse(e.kennung)),
-      [`Punktlast ${e.kennung}`, ...texte(e.kennung)]));
+    const [q, titel] = [nachBild(v, p), [`Punktlast ${e.kennung}`, ...texte(e.kennung)]];
+    if (e.wert || !e.H) {
+      g.append(mitTitel(kraftpfeil(q, [0, 1], PFEIL.punkt, lasttext('Q', 'kN', e), klasse(e.kennung)), titel));
+    }
+    if (e.H) {
+      g.append(mitTitel(kraftpfeil(q, [Math.sign(e.H), 0], PFEIL.punkt, `H = ${zahlText(e.H, 1)} kN`,
+        klasse(e.kennung)), titel));
+    }
   }
   return g;
 }

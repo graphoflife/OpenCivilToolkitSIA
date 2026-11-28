@@ -5,8 +5,10 @@ VERANTWORTUNG:
 Die Wand in Zahlen: ihre Masse und ihr Mauerwerk, wie sie gemauert und
 gehalten ist, die Bemessungswerte, mit denen sie rechnet, ihre Öffnungen
 mit den Stürzen darüber, die Pfeiler dazwischen und was die Lastfälle und
-Kombinationen ihnen geben (:mod:`~opencivil.mauerwerk.lasten`). Zuletzt die
-Meldungen: rot, was falsch ist, sonst als Hinweis.
+Kombinationen ihnen geben (:mod:`~opencivil.mauerwerk.lasten`) -- schiebt
+eine Last waagrecht, auch in der Ebene der Wand
+(:mod:`~opencivil.mauerwerk.scheibe`). Zuletzt die Meldungen: rot, was
+falsch ist, sonst als Hinweis.
 
 EINHEITEN:
 Masse der Wand und Orte in m, die Masse eines Sturzes in mm -- wie in der
@@ -26,6 +28,7 @@ from opencivil.core.sprache import aufgezaehlt
 from opencivil.mauerwerk.kennwerte import REFERENZ_VERBAND, Wandwerte, quelle
 from opencivil.mauerwerk.lasten import SEITEN, Abtrag
 from opencivil.mauerwerk.modell import Pfeiler, Wand
+from opencivil.mauerwerk.scheibe import anteile, koepfe
 
 if TYPE_CHECKING:
     from opencivil.mauerwerk.werk import Wandbefund
@@ -51,6 +54,22 @@ ABTRAG = (
 #: Woher die Regeln des Lastabtrags kommen.
 ABTRAG_ANNAHME = ("Den Lastabtrag in der Wand regelt die Norm nicht; so verteilt das Werkzeug "
                   "die Lasten nach Vorgabe, nicht nachgeschlagen.")
+
+#: Wie die waagrechten Lasten zu den Pfeilern kommen, in eigenen Worten (:mod:`.scheibe`).
+SCHEIBE = (
+    "Die waagrechten Lasten nimmt die Wand als Scheibe auf. Über den Öffnungen ist sie starr – "
+    "Stürze, Mauerwerk und Decke –, und dort greifen die Lasten an. Jeder Pfeiler ist am Fuss "
+    "der Wand eingespannt und oben an den starren Teil angeschlossen, am oberen Rand der "
+    "höchsten Öffnung neben ihm; Brüstungen zählen nicht. Er wirkt ungerissen, mit E_xd · I auf "
+    "Biegung, G_d · A / 1.2 auf Schub und E_xd · A längs. Steht nur ein Pfeiler da, ist er ein "
+    "Kragarm; mit mehreren kippt die Wand, und die Pfeiler bekommen dazu Normalkräfte – sie "
+    "stehen schon in der Normalkraft am Fuss. Die lotrechten Lasten stehen nicht immer über der "
+    "Mitte der Pfeiler, die sie tragen; ihr Moment M_v um diese Mitten gleicht der starre Teil "
+    "aus und gibt es den Pfeilern nach ihrer Biegesteifigkeit, je b³, an den Fuss.")
+
+#: Woher die Regeln der Scheibe kommen.
+SCHEIBE_ANNAHME = ("Wie die Wand als Scheibe trägt, regelt die Norm nicht; so verteilt das "
+                   "Werkzeug die waagrechten Lasten nach Vorgabe, nicht nachgeschlagen.")
 
 #: Je Wert der Tabelle: Kurzname, Zeichen, Stellen.
 ZEILEN = (("f_xd", "f_{xd}", 2), ("f_yd", "f_{yd}", 2), ("E_xd", "E_{xd}", 0), ("G_d", "G_d", 0),
@@ -194,6 +213,37 @@ def _lasten(p: Protokoll, befund: "Wandbefund", e: Eingaben, basis: str) -> None
     if auflager:
         _tabelle(p, kopf, faelle, [(f"{o} {s}", lambda a, k=(o, s): a.R[k]) for o, s in auflager],
                  1e-3, 1, "Kräfte der Sturzauflager, in kN")
+    if any(abs(v) > 1e-9 for a in faelle.values() for v in a.V.values()):
+        _scheibe(p, befund, kopf, faelle)
+
+
+def _scheibe(p: Protokoll, befund: "Wandbefund", kopf: List[str],
+             faelle: Dict[str, Abtrag]) -> None:
+    """Was die waagrechten Lasten den Pfeilern geben: Querkraft, Normalkraft und Moment am Fuss."""
+    w = befund.wand
+    p.titel("In der Ebene der Wand", ebene=3)
+    p.text(SCHEIBE)
+    p.annahme(SCHEIBE_ANNAHME)
+    oben, anteil = koepfe(w.flaeche, w.oeffnungen, befund.pfeiler), anteile(befund.pfeiler)
+    p.tabelle(["Pfeiler", Mathe(r"b\ [\mathrm{m}]"), Mathe(r"h_P\ [\mathrm{m}]"),
+               Mathe(r"b^3 / \Sigma b^3")],
+              [[e.name, Mathe(fest(e.b, 2)), Mathe(fest(oben[e.name] - w.flaeche.y0, 2)),
+                Mathe(fest(anteil[e.name], 3))] for e in befund.pfeiler],
+              titel="Pfeiler der Scheibe – h_P vom Fuss der Wand bis zum starren Teil, "
+                    "dazu ihr Anteil an M_v")
+    if any(abs(a.M_v) > 1e-9 for a in faelle.values()):
+        _tabelle(p, kopf, faelle, [("M_v", lambda a: a.M_v)], 1e-3, 2,
+                 "Moment der lotrechten Lasten um die Mitten der Pfeiler, die sie tragen, "
+                 "positiv, wenn sie rechts davon stehen, in kNm")
+    namen = [e.name for e in befund.pfeiler]
+    _tabelle(p, kopf, faelle, [(n, lambda a, n=n: a.V[n]) for n in namen], 1e-3, 1,
+             "Querkraft in der Wandebene, positiv nach rechts, in kN")
+    _tabelle(p, kopf, faelle, [(n, lambda a, n=n: a.N_H[n]) for n in namen], 1e-3, 1,
+             "Normalkraft aus den waagrechten Lasten, Druck positiv, in kN – schon in der "
+             "Normalkraft am Fuss")
+    _tabelle(p, kopf, faelle, [(n, lambda a, n=n: a.M_z[n]) for n in namen], 1e-3, 2,
+             "Moment in der Wandebene am Fuss der Pfeiler, positiv, wenn es die Resultierende "
+             "nach rechts schiebt, in kNm")
 
 
 def _tabelle(p: Protokoll, kopf: List[str], faelle: Dict[str, Abtrag],

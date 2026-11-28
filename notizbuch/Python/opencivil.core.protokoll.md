@@ -1,5 +1,5 @@
 ---
-erzeugt: 376ddbf10540
+erzeugt: 7a84a69de803
 art: modul
 tags: [modul]
 ---
@@ -612,6 +612,7 @@ Oberflaeche und alle Berichte gehen.
 - [[opencivil.material.basis]]
 - [[opencivil.mauerwerk.herleitung]]
 - [[opencivil.mauerwerk.nachweise]]
+- [[opencivil.mauerwerk.schub]]
 - [[opencivil.mauerwerk.uebersicht]]
 - [[opencivil.mauerwerk.werk]]
 - [[opencivil.nachweis.biegung_normalkraft]]

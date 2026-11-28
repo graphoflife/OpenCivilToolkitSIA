@@ -479,7 +479,56 @@ sammeln sie sich hier, je mit dem, was vorläufig gebaut ist.
       Mauerwerk keinen Zug trägt (4.1.2). Nach den Grundsätzen ist grau aber
       für das, was nur fehlt. Vorschlag: rot, «nicht erfüllt» mit
       Erfüllungsgrad 0 und demselben Satz – so übersieht man ihn nicht.
-      Vorläufig: grau.
+      Vorläufig: grau. Dasselbe gilt seit Schritt 14c für Schub und
+      Gleiten: ein Pfeiler ohne Druck, etwa weil die Wand kippt, steht dort
+      grau.
+- [ ] **Mauerwerk: die Wand als Scheibe.** Wie waagrechte Lasten zu den
+      Pfeilern kommen, regelt die Norm nicht; das Werkzeug rechnet nach
+      Vorgabe:
+      - über der höchsten Öffnung ist die Wand starr, dort greifen die
+        waagrechten Lasten an; tiefer steht eine rot;
+      - jeder Pfeiler ist am Fuss eingespannt und am oberen Rand der
+        höchsten Öffnung neben ihm an den starren Teil angeschlossen; eine
+        Brüstung zählt nicht;
+      - ein Pfeiler wirkt ungerissen, mit E_xd · I, G_d · A / 1.2 und
+        E_xd · A;
+      - waagrecht schieben nur Punktlasten, mit H; eine Decke, die Wind
+        abgibt, setzt man als Punktlast an die Krone;
+      - die Normalkraft aus dem Kippen wirkt am Kopf wie am Fuss, mittig
+        quer zur Wand: im entlasteten P1 des Prüfprojekts wird die
+        Ausmitte am Kopf so aus 20 mm 24 mm, in einem gedrückten Pfeiler
+        kleiner.
+      Beispiel: zwei Pfeiler, je 1 m breit und 2 m hoch, 3 m auseinander,
+      H = 100 kN – je 50 kN Querkraft, am Fuss je 51.8 kNm, dazu ±32.1 kN.
+      Vorschlag: so lassen. Vorläufig: so.
+- [ ] **Mauerwerk: das Moment der lotrechten Lasten in der Wandebene.**
+      Eine Last steht nicht immer über der Mitte des Pfeilers, der sie
+      trägt: der Sturz einer Türe legt sein Auflager an den Rand. Das
+      Moment aller dieser Lasten um die Mitten, M_v, verteilt der starre
+      Teil nach b³ auf die Pfeiler; ihre Normalkräfte aus dem Lastabtrag
+      bleiben. Zuerst zählte es je Pfeiler für sich: in einer Probe kam der
+      erste Pfeiler mit dem Türsturz an seinem Rand so auf l_2 = 239 statt
+      800 mm und verfehlte den Schub (0.79); jetzt erfüllt er ihn (1.63).
+      Vorschlag: so lassen. Vorläufig: so.
+- [ ] **Mauerwerk: Schub bei ausmittiger Normalkraft.** Steht die
+      Normalkraft quer zur Wand ausmittig, nennt die Norm Gl. (18) mit dem
+      Beiwert k_V der Figur 9 und der Dicke t_nom (4.3.3.1). Das Werkzeug
+      rechnet stattdessen die Druckstrebe nach Gl. (13) mit t_nom statt t_w;
+      e_z ist die grösste Ausmitte der verformten Wand unter N_xd. Den
+      erweiterten Nachweis nach 4.3.2.3 rechnet es nicht. Vorschlag: so
+      lassen; Figur 9 käme in einem eigenen Schritt. Vorläufig: so.
+- [ ] **Mauerwerk: Schub nur am Fuss der Pfeiler?** Druckstrebe, Gleiten
+      und die Normalkraft unter Schub rechnen am Fuss, wo das Moment eines
+      Kragarms am grössten ist. Im Rahmen mit dem starren Teil ist das
+      Moment am Kopf aber fast so gross (51.8 und 48.2 kNm im Beispiel
+      oben), und dort fehlt N das Gewicht des Pfeilers. Vorschlag: beide
+      Enden prüfen, je mit ihrem N und M. Vorläufig: nur der Fuss.
+- [ ] **Mauerwerk: Gl. (17) nur mit ausmittiger Normalkraft.** Steht die
+      Normalkraft quer zur Wand mittig, bleibt die Normalkraft bei Gl. (11)
+      mit der ganzen Länge l_w; das Moment in der Ebene prüft dann die
+      Druckstrebe nach Gl. (13) auf l_2. Kippt die Wand (l_2 ≤ 0), steht so
+      nur die Strebe rot. Vorschlag: so lassen – 4.3.2 ist der Fall mit
+      mittiger, 4.3.3 der mit ausmittiger Normalkraft. Vorläufig: so.
 - [ ] **Zur Kenntnis – Mauerwerk:** Die Zusammenfassung der Wand ist jetzt
       die gemeinsame aller Nachweise: oben die Angaben und die
       Bemessungswerte von Mauerwerk und Wand nebeneinander, darunter je

@@ -1,5 +1,5 @@
 ---
-erzeugt: 2351d183e26f
+erzeugt: e583180f9262
 art: modul
 tags: [modul]
 ---
@@ -28,6 +28,11 @@ kann, am Fuss mit der Vorgabe e_u; ein eingespannter Rand dreht sich nicht.
 Drücken die Lasten am Kopf nicht, lässt sich der Nachweis nicht führen:
 unbewehrtes Mauerwerk trägt keinen Zug (4.1.2). h_Ed nach Gl. (8)
 steht zur Auskunft daneben: nach h_w / h_Ed ordnet Figur 19.
+
+Trägt der Pfeiler in einer Kombination auch Schub, und steht die
+Normalkraft quer zur Wand ausmittig, gilt Gl. (17) (4.3.3.1): l_w wird zur
+gedrückten Länge l_2 = l_w − 2 · M_z2d / N_xd ([[opencivil.mauerwerk.nachweise#gedrueckte_laenge|gedrueckte_laenge]]).
+Den Schub selbst weist [[opencivil.mauerwerk.schub|schub]] nach.
 
 
 ## DIE TEILFLÄCHEN
@@ -134,6 +139,12 @@ def satz(v: Vergleich, namen: Sequence[str]) -> str
 
 «N_xRd = 812.3 kN ≥ N_xd = 600.0 kN.» – `namen` die von Einwirkung und Widerstand.
 
+### ohne_einwirkung
+
+```python
+def ohne_einwirkung(p: Protokoll, s: Stelle) -> Stellenausgang
+```
+
 ### Normalkraft
 
 ```python
@@ -158,10 +169,54 @@ def ansatz(self, p: Protokoll, befund: 'Wandbefund') -> None
 def stelle(self, p: Protokoll, befund: 'Wandbefund', s: Stelle) -> Stellenausgang
 ```
 
-#### Normalkraft._kopf
+### zug
 
 ```python
-@staticmethod
+def zug(p: Protokoll, s: Stelle, pf: Pfeiler, a: Abtrag) -> Optional[Stellenausgang]
+```
+
+Nicht führbar, wenn die Lasten am Kopf nicht drücken – sonst `None`.
+Mit dem Eigengewicht ist N nie kleiner als N_L: das schliesst einen Zug
+am Fuss ein.
+
+### ausmitten
+
+```python
+def ausmitten(p: Protokoll, zw: Zwischenwerte, befund: 'Wandbefund', a: Abtrag, pf: Pfeiler) -> Tuple[Optional[Wert], Optional[Wert]]
+```
+
+Die Ausmitten quer zur Wand am Kopf, M_d / N_Ld, und am Fuss, die
+Vorgabe e_u – je `None`, wo der Rand eingespannt ist.
+
+### ausmittig
+
+```python
+def ausmittig(e_o: Optional[Wert], e_u: Optional[Wert]) -> bool
+```
+
+Ob die Normalkraft quer zur Wand ausmittig steht, an einem Rand, der sich drehen kann.
+
+### knicken_unter
+
+```python
+def knicken_unter(befund: 'Wandbefund', l: float, N: float, e_o: Optional[Wert], e_u: Optional[Wert]) -> knicken.Knickergebnis
+```
+
+k_N der Wand und ihr Zustand unter `N` auf der Länge `l` in m ([[opencivil.mauerwerk.knicken|.knicken]]).
+
+### gedrueckte_laenge
+
+```python
+def gedrueckte_laenge(p: Protokoll, zw: Zwischenwerte, a: Abtrag, pf: Pfeiler, N: Wert, l_w: Wert) -> Wert
+```
+
+l_2 = l_w − 2 · M_z2d / N_xd: so lang ist der Pfeiler am Fuss gedrückt,
+wenn die Resultierende um M_z2d / N_xd neben seiner Mitte steht. Der
+Betrag von M_z2d, denn es zählt nicht, nach welcher Seite.
+
+### _kopf
+
+```python
 def _kopf(p: Protokoll, zw: Zwischenwerte, befund: 'Wandbefund', M_d: float, N_L: float) -> Optional[Wert]
 ```
 
@@ -182,6 +237,12 @@ def _grenze_text(erg: knicken.Knickergebnis, k: str, h: float, t: float) -> str
 ```
 
 Was k_N begrenzt, als Satz – `k` ist k_N, wie es dasteht.
+
+### pfeiler_von
+
+```python
+def pfeiler_von(befund: 'Wandbefund', name: str) -> Pfeiler
+```
 
 ### Teilflaechen
 
@@ -212,6 +273,8 @@ def stelle(self, p: Protokoll, befund: 'Wandbefund', s: Stelle) -> Stellenausgan
 
 - `REFERENZ_TEILFLAECHE = 'SIA 266:2015, 4.2.1.2, Gl. (4), Figur 2'` – Wo die Regeln der Teilflächen stehen.
 - `REFERENZ_H_ED = 'SIA 266:2015, 4.3.1.2, Gl. (8)'`
+- `REFERENZ_GL_17 = 'SIA 266:2015, 4.3.3.1, Gl. (17)'`
+- `NULL = 1e-09` – Unter diesem Betrag in SI ist eine Kraft, ein Moment oder eine Ausmitte null.
 
 ## Braucht
 
@@ -222,20 +285,23 @@ def stelle(self, p: Protokoll, befund: 'Wandbefund', s: Stelle) -> Stellenausgan
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wert]]
 - [[opencivil.mauerwerk.knicken]]
+- [[opencivil.mauerwerk.lasten]]
 - [[opencivil.mauerwerk.modell]]
 - [[opencivil.mauerwerk.werk]]
 
 ## Gebraucht von
 
+- [[opencivil.mauerwerk.schub]]
 - [[opencivil.projekt.aufbau.mauerwerk]]
 - [[opencivil.web.mauerwerkdaten]]
 
 ## Formeln aus diesem Modul
 
-- [[Ausmitte am Kopf – sie bleibt, wenn die Lasten wachsen]] · `Normalkraft._kopf`
+- [[Ausmitte am Kopf – sie bleibt, wenn die Lasten wachsen]] · `_kopf`
 - [[Beiwert der Teilflächenpressung im Mauerwerk]] · `Teilflaechen.stelle`
 - [[Bezugswert der Knicklänge einer Wand]] · `Normalkraft.stelle`
 - [[Fläche des Auflagers]] · `Teilflaechen.stelle`
+- [[Gedrückte Länge am Fuss eines Pfeilers]] · `gedrueckte_laenge`
 - [[Gleichgewicht der verformten Wand – Ausmitte der Last und Auslenkung w]] · `Normalkraft.ansatz`
 - [[Grenze der Ausmitte einer Wand aus Mauerwerk]] · `Normalkraft.ansatz`
 - [[Krümmung einer Wand aus Mauerwerk]] · `Normalkraft.ansatz`

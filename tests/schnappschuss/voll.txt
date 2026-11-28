@@ -2,7 +2,7 @@
 Voll
 ====================================================================================================
 
-1031 Berechnungen ausgeführt, 1686 Werte bestimmt.
+1033 Berechnungen ausgeführt, 1704 Werte bestimmt.
 
 ====================================================================================================
 Herleitung
@@ -19287,39 +19287,91 @@ Eigengewicht der Wand je m² Ansicht, aus der Dichte ihres Mauerwerks
 Die Lastfälle charakteristisch, die Kombinationen mit ihren Beiwerten.
 
 Normalkraft am Fuss der Pfeiler, Druck positiv, in kN
-                        Eigengewicht  Auflast  Nutzlast    GZT  GZT günstig
-    ------------------  ------------  -------  --------  -----  -----------
-    P1                           7.7     52.0      19.5  109.9         47.8
-    P2                          10.6     94.0      31.5  188.4         83.7
-    P3                           9.4     82.0      27.0  163.8         73.1
-    P4                           4.8     32.0      12.0   67.7         29.5
-    neben den Pfeilern           5.1      0.0       0.0    6.9          4.1
+                        Eigengewicht  Auflast  Nutzlast  Wind    GZT  GZT günstig  GZT Wind
+    ------------------  ------------  -------  --------  ----  -----  -----------  --------
+    P1                           7.7     52.0      19.5  -5.8  109.9         47.8      51.1
+    P2                          10.6     94.0      31.5  -1.9  188.4         83.7     101.8
+    P3                           9.4     82.0      27.0   3.7  163.8         73.1      97.0
+    P4                           4.8     32.0      12.0   3.9   67.7         29.5      42.7
+    neben den Pfeilern           5.1      0.0       0.0   0.0    6.9          4.1       5.1
 
 Normalkraft aus den Lasten am Kopf der Pfeiler, ohne Eigengewicht, in kN
-        Eigengewicht  Auflast  Nutzlast    GZT  GZT günstig
-    --  ------------  -------  --------  -----  -----------
-    P1           0.0     52.0      19.5   99.5         41.6
-    P2           0.0     94.0      31.5  174.2         75.2
-    P3           0.0     82.0      27.0  151.2         65.6
-    P4           0.0     32.0      12.0   61.2         25.6
+        Eigengewicht  Auflast  Nutzlast  Wind    GZT  GZT günstig  GZT Wind
+    --  ------------  -------  --------  ----  -----  -----------  --------
+    P1           0.0     52.0      19.5  -5.8   99.5         41.6      43.4
+    P2           0.0     94.0      31.5  -1.9  174.2         75.2      91.2
+    P3           0.0     82.0      27.0   3.7  151.2         65.6      87.6
+    P4           0.0     32.0      12.0   3.9   61.2         25.6      37.9
 
 Moment der Ausmitten am Kopf der Pfeiler, in kNm
-        Eigengewicht  Auflast  Nutzlast   GZT  GZT günstig
-    --  ------------  -------  --------  ----  -----------
-    P1          0.00     1.04      0.39  1.99         0.83
-    P2          0.00     1.68      0.63  3.21         1.34
-    P3          0.00     1.44      0.54  2.75         1.15
-    P4          0.00     0.64      0.24  1.22         0.51
+        Eigengewicht  Auflast  Nutzlast  Wind   GZT  GZT günstig  GZT Wind
+    --  ------------  -------  --------  ----  ----  -----------  --------
+    P1          0.00     1.04      0.39  0.00  1.99         0.83      1.04
+    P2          0.00     1.68      0.63  0.00  3.21         1.34      1.68
+    P3          0.00     1.44      0.54  0.00  2.75         1.15      1.44
+    P4          0.00     0.64      0.24  0.00  1.22         0.51      0.64
 
 Kräfte der Sturzauflager, in kN
-               Eigengewicht  Auflast  Nutzlast   GZT  GZT günstig
-    ---------  ------------  -------  --------  ----  -----------
-    O1 links            1.2     26.0       9.8  51.4         21.8
-    O1 rechts           1.2     26.0       9.7  51.4         21.8
-    O2 links            1.4     40.0      11.2  72.8         33.1
-    O2 rechts           1.4     40.0      11.3  72.8         33.1
-    O3 links            0.9     18.0       6.8  35.6         15.1
-    O3 rechts           0.9     18.0       6.8  35.6         15.1
+               Eigengewicht  Auflast  Nutzlast  Wind   GZT  GZT günstig  GZT Wind
+    ---------  ------------  -------  --------  ----  ----  -----------  --------
+    O1 links            1.2     26.0       9.8   0.0  51.4         21.8      27.2
+    O1 rechts           1.2     26.0       9.7   0.0  51.4         21.8      27.2
+    O2 links            1.4     40.0      11.2   0.0  72.8         33.1      41.4
+    O2 rechts           1.4     40.0      11.3   0.0  72.8         33.1      41.4
+    O3 links            0.9     18.0       6.8   0.0  35.6         15.1      18.9
+    O3 rechts           0.9     18.0       6.8   0.0  35.6         15.1      18.9
+
+In der Ebene der Wand
+---------------------
+
+Die waagrechten Lasten nimmt die Wand als Scheibe auf. Über den Öffnungen ist sie starr – Stürze,
+Mauerwerk und Decke –, und dort greifen die Lasten an. Jeder Pfeiler ist am Fuss der Wand
+eingespannt und oben an den starren Teil angeschlossen, am oberen Rand der höchsten Öffnung neben
+ihm; Brüstungen zählen nicht. Er wirkt ungerissen, mit E_xd · I auf Biegung, G_d · A / 1.2 auf Schub
+und E_xd · A längs. Steht nur ein Pfeiler da, ist er ein Kragarm; mit mehreren kippt die Wand, und
+die Pfeiler bekommen dazu Normalkräfte – sie stehen schon in der Normalkraft am Fuss. Die lotrechten
+Lasten stehen nicht immer über der Mitte der Pfeiler, die sie tragen; ihr Moment M_v um diese Mitten
+gleicht der starre Teil aus und gibt es den Pfeilern nach ihrer Biegesteifigkeit, je b³, an den
+Fuss.
+[*] Annahme: Wie die Wand als Scheibe trägt, regelt die Norm nicht; so verteilt das Werkzeug die
+waagrechten Lasten nach Vorgabe, nicht nachgeschlagen.
+
+Pfeiler der Scheibe – h_P vom Fuss der Wand bis zum starren Teil, dazu ihr Anteil an M_v
+    Pfeiler  b\ [\mathrm{m}]  h_P\ [\mathrm{m}]  b^3 / \Sigma b^3
+    -------  ---------------  -----------------  ----------------
+         P1             0.80               2.10             0.216
+         P2             1.00               2.10             0.423
+         P3             0.90               2.10             0.308
+         P4             0.50               2.10             0.053
+
+Moment der lotrechten Lasten um die Mitten der Pfeiler, die sie tragen, positiv, wenn sie rechts davon stehen, in kNm
+         Eigengewicht  Auflast  Nutzlast  Wind   GZT  GZT günstig  GZT Wind
+    ---  ------------  -------  --------  ----  ----  -----------  --------
+    M_v          0.08     2.10      0.60  0.00  3.84         1.74      2.18
+
+Querkraft in der Wandebene, positiv nach rechts, in kN
+        Eigengewicht  Auflast  Nutzlast  Wind  GZT  GZT günstig  GZT Wind
+    --  ------------  -------  --------  ----  ---  -----------  --------
+    P1           0.0      0.0       0.0   4.7  0.0          0.0       7.0
+    P2           0.0      0.0       0.0   7.8  0.0          0.0      11.7
+    P3           0.0      0.0       0.0   6.1  0.0          0.0       9.2
+    P4           0.0      0.0       0.0   1.4  0.0          0.0       2.1
+
+Normalkraft aus den waagrechten Lasten, Druck positiv, in kN – schon in der Normalkraft am Fuss
+        Eigengewicht  Auflast  Nutzlast  Wind  GZT  GZT günstig  GZT Wind
+    --  ------------  -------  --------  ----  ---  -----------  --------
+    P1           0.0      0.0       0.0  -5.8  0.0          0.0      -8.6
+    P2           0.0      0.0       0.0  -1.9  0.0          0.0      -2.8
+    P3           0.0      0.0       0.0   3.7  0.0          0.0       5.6
+    P4           0.0      0.0       0.0   3.9  0.0          0.0       5.9
+
+Moment in der Wandebene am Fuss der Pfeiler, positiv, wenn es die Resultierende nach rechts schiebt, in kNm
+        Eigengewicht  Auflast  Nutzlast  Wind   GZT  GZT günstig  GZT Wind
+    --  ------------  -------  --------  ----  ----  -----------  --------
+    P1          0.02     0.45      0.13  5.02  0.83         0.38      8.00
+    P2          0.03     0.89      0.25  8.41  1.62         0.74     13.53
+    P3          0.02     0.65      0.18  6.63  1.18         0.54     10.61
+    P4          0.00     0.11      0.03  1.50  0.20         0.09      2.36
 
 Normalkraft
 -----------
@@ -19414,6 +19466,51 @@ Einwirkung gegen Widerstand
 Erfüllungsgrad
     \alpha_{eff,N,\text{P1 – GZT günstig}} = \frac{N_{xRd}}{N_{xd}} = \frac{321.3\,\mathrm{kN}}{47.8\,\mathrm{kN}} = 6.72 \quad \Rightarrow \quad \text{erfüllt}
 
+Normalkraft – P1 – GZT Wind
+---------------------------
+
+Normalkraft am Fuss des Pfeilers, aus dem Lastabtrag
+    N_{xd} = 51.1\,\mathrm{kN}
+
+Moment der Ausmitten der Lasten am Kopf, aus dem Lastabtrag
+    M_d = 1.04\,\mathrm{kNm}
+
+Normalkraft aus den Lasten allein, ohne das Eigengewicht der Wand, aus dem Lastabtrag
+    N_{Ld} = 43.4\,\mathrm{kN}
+
+Ausmitte am Kopf – sie bleibt, wenn die Lasten wachsen
+    e_o = \frac{M_d}{N_{Ld}} = \frac{1.04\,\mathrm{kNm}}{43.4\,\mathrm{kN}} = 24\,\mathrm{mm}
+
+Der Pfeiler trägt auch Schub, und die Normalkraft steht quer zur Wand ausmittig: statt Gl. (11) gilt
+Gl. (17), mit der gedrückten Länge l_2 statt l_w (4.3.3.1).
+
+Moment in der Wandebene am Fuss des Pfeilers, aus dem Lastabtrag – sein Betrag
+    M_{z2d} = 8\,\mathrm{kNm}
+
+Gedrückte Länge am Fuss   [SIA 266:2015, 4.3.3.1, Gl. (17)]
+    l_2 = l_w - \frac{2 \cdot M_{z2d}}{N_{xd}} = 800\,\mathrm{mm} - \frac{2 \cdot 8\,\mathrm{kNm}}{51.1\,\mathrm{kN}} = 487\,\mathrm{mm}
+
+Bezugswert der Knicklänge   [SIA 266:2015, 4.3.3.1, Gl. (17)]
+    h_{Ed} = \pi \cdot \sqrt{\frac{E_{xd} \cdot l_2 \cdot t_w^{3}}{12 \cdot N_{xd}}} = \pi \cdot \sqrt{\frac{2975\,\mathrm{N}/\mathrm{mm}^{2} \cdot 487\,\mathrm{mm} \cdot \left(175\,\mathrm{mm}\right)^{3}}{12 \cdot 51.1\,\mathrm{kN}}} = 11.18\,\mathrm{m}
+
+h_w / h_Ed = 0.24 – die Schlankheit, nach der Figur 19 ordnet.
+
+Beiwert der Normalkraft, gerechnet nach Theorie 2. Ordnung   [SIA 266:2015, 4.3.1.1, Figur 3]
+    k_N = 0.726
+
+Bei k_N = 0.726 erreicht die Ausmitte am Kopf mit 24 mm die Grenze nach Gl. (6) und Figur 4.
+
+Normalkraftwiderstand des Pfeilers   [SIA 266:2015, 4.3.3.1, Gl. (17)]
+    N_{xRd} = k_N \cdot l_2 \cdot t_w \cdot f_{xd} = 0.726 \cdot 487\,\mathrm{mm} \cdot 175\,\mathrm{mm} \cdot 2.98\,\mathrm{N}/\mathrm{mm}^{2} = 184\,\mathrm{kN}
+
+Unter N_xd ist die Ausmitte am Kopf am grössten, 24 mm.
+
+Einwirkung gegen Widerstand
+    N_{xd} = 51.1\,\mathrm{kN} \quad \le \quad N_{xRd} = 184\,\mathrm{kN}
+
+Erfüllungsgrad
+    \alpha_{eff,N,\text{P1 – GZT Wind}} = \frac{N_{xRd}}{N_{xd}} = \frac{184\,\mathrm{kN}}{51.1\,\mathrm{kN}} = 3.60 \quad \Rightarrow \quad \text{erfüllt}
+
 Normalkraft – P2 – GZT
 ----------------------
 
@@ -19485,6 +19582,51 @@ Einwirkung gegen Widerstand
 
 Erfüllungsgrad
     \alpha_{eff,N,\text{P2 – GZT günstig}} = \frac{N_{xRd}}{N_{xd}} = \frac{414.3\,\mathrm{kN}}{83.7\,\mathrm{kN}} = 4.95 \quad \Rightarrow \quad \text{erfüllt}
+
+Normalkraft – P2 – GZT Wind
+---------------------------
+
+Normalkraft am Fuss des Pfeilers, aus dem Lastabtrag
+    N_{xd} = 101.8\,\mathrm{kN}
+
+Moment der Ausmitten der Lasten am Kopf, aus dem Lastabtrag
+    M_d = 1.68\,\mathrm{kNm}
+
+Normalkraft aus den Lasten allein, ohne das Eigengewicht der Wand, aus dem Lastabtrag
+    N_{Ld} = 91.2\,\mathrm{kN}
+
+Ausmitte am Kopf – sie bleibt, wenn die Lasten wachsen
+    e_o = \frac{M_d}{N_{Ld}} = \frac{1.68\,\mathrm{kNm}}{91.2\,\mathrm{kN}} = 18.4\,\mathrm{mm}
+
+Der Pfeiler trägt auch Schub, und die Normalkraft steht quer zur Wand ausmittig: statt Gl. (11) gilt
+Gl. (17), mit der gedrückten Länge l_2 statt l_w (4.3.3.1).
+
+Moment in der Wandebene am Fuss des Pfeilers, aus dem Lastabtrag – sein Betrag
+    M_{z2d} = 13.53\,\mathrm{kNm}
+
+Gedrückte Länge am Fuss   [SIA 266:2015, 4.3.3.1, Gl. (17)]
+    l_2 = l_w - \frac{2 \cdot M_{z2d}}{N_{xd}} = 1000\,\mathrm{mm} - \frac{2 \cdot 13.53\,\mathrm{kNm}}{101.8\,\mathrm{kN}} = 734\,\mathrm{mm}
+
+Bezugswert der Knicklänge   [SIA 266:2015, 4.3.3.1, Gl. (17)]
+    h_{Ed} = \pi \cdot \sqrt{\frac{E_{xd} \cdot l_2 \cdot t_w^{3}}{12 \cdot N_{xd}}} = \pi \cdot \sqrt{\frac{2975\,\mathrm{N}/\mathrm{mm}^{2} \cdot 734\,\mathrm{mm} \cdot \left(175\,\mathrm{mm}\right)^{3}}{12 \cdot 101.8\,\mathrm{kN}}} = 9.73\,\mathrm{m}
+
+h_w / h_Ed = 0.28 – die Schlankheit, nach der Figur 19 ordnet.
+
+Beiwert der Normalkraft, gerechnet nach Theorie 2. Ordnung   [SIA 266:2015, 4.3.1.1, Figur 3]
+    k_N = 0.789
+
+Bei k_N = 0.789 erreicht die Ausmitte am Kopf mit 18 mm die Grenze nach Gl. (6) und Figur 4.
+
+Normalkraftwiderstand des Pfeilers   [SIA 266:2015, 4.3.3.1, Gl. (17)]
+    N_{xRd} = k_N \cdot l_2 \cdot t_w \cdot f_{xd} = 0.789 \cdot 734\,\mathrm{mm} \cdot 175\,\mathrm{mm} \cdot 2.98\,\mathrm{N}/\mathrm{mm}^{2} = 301.7\,\mathrm{kN}
+
+Unter N_xd ist die Ausmitte am Kopf am grössten, 18 mm.
+
+Einwirkung gegen Widerstand
+    N_{xd} = 101.8\,\mathrm{kN} \quad \le \quad N_{xRd} = 301.7\,\mathrm{kN}
+
+Erfüllungsgrad
+    \alpha_{eff,N,\text{P2 – GZT Wind}} = \frac{N_{xRd}}{N_{xd}} = \frac{301.7\,\mathrm{kN}}{101.8\,\mathrm{kN}} = 2.96 \quad \Rightarrow \quad \text{erfüllt}
 
 Normalkraft – P3 – GZT
 ----------------------
@@ -19558,6 +19700,51 @@ Einwirkung gegen Widerstand
 Erfüllungsgrad
     \alpha_{eff,N,\text{P3 – GZT günstig}} = \frac{N_{xRd}}{N_{xd}} = \frac{374.5\,\mathrm{kN}}{73.1\,\mathrm{kN}} = 5.12 \quad \Rightarrow \quad \text{erfüllt}
 
+Normalkraft – P3 – GZT Wind
+---------------------------
+
+Normalkraft am Fuss des Pfeilers, aus dem Lastabtrag
+    N_{xd} = 97\,\mathrm{kN}
+
+Moment der Ausmitten der Lasten am Kopf, aus dem Lastabtrag
+    M_d = 1.44\,\mathrm{kNm}
+
+Normalkraft aus den Lasten allein, ohne das Eigengewicht der Wand, aus dem Lastabtrag
+    N_{Ld} = 87.6\,\mathrm{kN}
+
+Ausmitte am Kopf – sie bleibt, wenn die Lasten wachsen
+    e_o = \frac{M_d}{N_{Ld}} = \frac{1.44\,\mathrm{kNm}}{87.6\,\mathrm{kN}} = 16.4\,\mathrm{mm}
+
+Der Pfeiler trägt auch Schub, und die Normalkraft steht quer zur Wand ausmittig: statt Gl. (11) gilt
+Gl. (17), mit der gedrückten Länge l_2 statt l_w (4.3.3.1).
+
+Moment in der Wandebene am Fuss des Pfeilers, aus dem Lastabtrag – sein Betrag
+    M_{z2d} = 10.61\,\mathrm{kNm}
+
+Gedrückte Länge am Fuss   [SIA 266:2015, 4.3.3.1, Gl. (17)]
+    l_2 = l_w - \frac{2 \cdot M_{z2d}}{N_{xd}} = 900\,\mathrm{mm} - \frac{2 \cdot 10.61\,\mathrm{kNm}}{97\,\mathrm{kN}} = 681\,\mathrm{mm}
+
+Bezugswert der Knicklänge   [SIA 266:2015, 4.3.3.1, Gl. (17)]
+    h_{Ed} = \pi \cdot \sqrt{\frac{E_{xd} \cdot l_2 \cdot t_w^{3}}{12 \cdot N_{xd}}} = \pi \cdot \sqrt{\frac{2975\,\mathrm{N}/\mathrm{mm}^{2} \cdot 681\,\mathrm{mm} \cdot \left(175\,\mathrm{mm}\right)^{3}}{12 \cdot 97\,\mathrm{kN}}} = 9.6\,\mathrm{m}
+
+h_w / h_Ed = 0.28 – die Schlankheit, nach der Figur 19 ordnet.
+
+Beiwert der Normalkraft, gerechnet nach Theorie 2. Ordnung   [SIA 266:2015, 4.3.1.1, Figur 3]
+    k_N = 0.812
+
+Bei k_N = 0.812 erreicht die Ausmitte am Kopf mit 16 mm die Grenze nach Gl. (6) und Figur 4.
+
+Normalkraftwiderstand des Pfeilers   [SIA 266:2015, 4.3.3.1, Gl. (17)]
+    N_{xRd} = k_N \cdot l_2 \cdot t_w \cdot f_{xd} = 0.812 \cdot 681\,\mathrm{mm} \cdot 175\,\mathrm{mm} \cdot 2.98\,\mathrm{N}/\mathrm{mm}^{2} = 288\,\mathrm{kN}
+
+Unter N_xd ist die Ausmitte am Kopf am grössten, 16 mm.
+
+Einwirkung gegen Widerstand
+    N_{xd} = 97\,\mathrm{kN} \quad \le \quad N_{xRd} = 288\,\mathrm{kN}
+
+Erfüllungsgrad
+    \alpha_{eff,N,\text{P3 – GZT Wind}} = \frac{N_{xRd}}{N_{xd}} = \frac{288\,\mathrm{kN}}{97\,\mathrm{kN}} = 2.97 \quad \Rightarrow \quad \text{erfüllt}
+
 Normalkraft – P4 – GZT
 ----------------------
 
@@ -19630,6 +19817,51 @@ Einwirkung gegen Widerstand
 Erfüllungsgrad
     \alpha_{eff,N,\text{P4 – GZT günstig}} = \frac{N_{xRd}}{N_{xd}} = \frac{200.8\,\mathrm{kN}}{29.5\,\mathrm{kN}} = 6.82 \quad \Rightarrow \quad \text{erfüllt}
 
+Normalkraft – P4 – GZT Wind
+---------------------------
+
+Normalkraft am Fuss des Pfeilers, aus dem Lastabtrag
+    N_{xd} = 42.7\,\mathrm{kN}
+
+Moment der Ausmitten der Lasten am Kopf, aus dem Lastabtrag
+    M_d = 0.64\,\mathrm{kNm}
+
+Normalkraft aus den Lasten allein, ohne das Eigengewicht der Wand, aus dem Lastabtrag
+    N_{Ld} = 37.9\,\mathrm{kN}
+
+Ausmitte am Kopf – sie bleibt, wenn die Lasten wachsen
+    e_o = \frac{M_d}{N_{Ld}} = \frac{0.64\,\mathrm{kNm}}{37.9\,\mathrm{kN}} = 16.9\,\mathrm{mm}
+
+Der Pfeiler trägt auch Schub, und die Normalkraft steht quer zur Wand ausmittig: statt Gl. (11) gilt
+Gl. (17), mit der gedrückten Länge l_2 statt l_w (4.3.3.1).
+
+Moment in der Wandebene am Fuss des Pfeilers, aus dem Lastabtrag – sein Betrag
+    M_{z2d} = 2.36\,\mathrm{kNm}
+
+Gedrückte Länge am Fuss   [SIA 266:2015, 4.3.3.1, Gl. (17)]
+    l_2 = l_w - \frac{2 \cdot M_{z2d}}{N_{xd}} = 500\,\mathrm{mm} - \frac{2 \cdot 2.36\,\mathrm{kNm}}{42.7\,\mathrm{kN}} = 389\,\mathrm{mm}
+
+Bezugswert der Knicklänge   [SIA 266:2015, 4.3.3.1, Gl. (17)]
+    h_{Ed} = \pi \cdot \sqrt{\frac{E_{xd} \cdot l_2 \cdot t_w^{3}}{12 \cdot N_{xd}}} = \pi \cdot \sqrt{\frac{2975\,\mathrm{N}/\mathrm{mm}^{2} \cdot 389\,\mathrm{mm} \cdot \left(175\,\mathrm{mm}\right)^{3}}{12 \cdot 42.7\,\mathrm{kN}}} = 10.94\,\mathrm{m}
+
+h_w / h_Ed = 0.25 – die Schlankheit, nach der Figur 19 ordnet.
+
+Beiwert der Normalkraft, gerechnet nach Theorie 2. Ordnung   [SIA 266:2015, 4.3.1.1, Figur 3]
+    k_N = 0.807
+
+Bei k_N = 0.807 erreicht die Ausmitte am Kopf mit 17 mm die Grenze nach Gl. (6) und Figur 4.
+
+Normalkraftwiderstand des Pfeilers   [SIA 266:2015, 4.3.3.1, Gl. (17)]
+    N_{xRd} = k_N \cdot l_2 \cdot t_w \cdot f_{xd} = 0.807 \cdot 389\,\mathrm{mm} \cdot 175\,\mathrm{mm} \cdot 2.98\,\mathrm{N}/\mathrm{mm}^{2} = 163.5\,\mathrm{kN}
+
+Unter N_xd ist die Ausmitte am Kopf am grössten, 17 mm.
+
+Einwirkung gegen Widerstand
+    N_{xd} = 42.7\,\mathrm{kN} \quad \le \quad N_{xRd} = 163.5\,\mathrm{kN}
+
+Erfüllungsgrad
+    \alpha_{eff,N,\text{P4 – GZT Wind}} = \frac{N_{xRd}}{N_{xd}} = \frac{163.5\,\mathrm{kN}}{42.7\,\mathrm{kN}} = 3.83 \quad \Rightarrow \quad \text{erfüllt}
+
 Teilflächenpressung
 -------------------
 [*] Annahme: Der Sturz ist so breit wie die Wand, und sein Auflager endet am Rand der Öffnung: die
@@ -19683,6 +19915,30 @@ Einwirkung gegen Widerstand
 Erfüllungsgrad
     \alpha_{eff,TF,\text{O1 links – GZT günstig}} = \frac{R_{Rd}}{R_d} = \frac{78.1\,\mathrm{kN}}{21.8\,\mathrm{kN}} = 3.59 \quad \Rightarrow \quad \text{erfüllt}
 
+Teilflächenpressung – O1 links – GZT Wind
+-----------------------------------------
+
+Kraft des Sturzauflagers, aus dem Lastabtrag
+    R_d = 27.2\,\mathrm{kN}
+
+Fläche des Auflagers
+    A_0 = a \cdot t_w = 150\,\mathrm{mm} \cdot 175\,\mathrm{mm} = 26250\,\mathrm{mm}^{2}
+
+Fläche mit demselben Schwerpunkt: am Rand der Öffnung A_0 selbst
+    A_1 = 26250\,\mathrm{mm}^{2}
+
+Beiwert der Teilflächenpressung   [SIA 266:2015, 4.2.1.2, Gl. (4), Figur 2]
+    k_m = \min\left[0.5 \cdot \left(1 + \sqrt{\frac{A_1}{A_0}}\right);\ 1.5\right] = \min\left[0.5 \cdot \left(1 + \sqrt{\frac{26250\,\mathrm{mm}^{2}}{26250\,\mathrm{mm}^{2}}}\right);\ 1.5\right] = 1
+
+Widerstand des Auflagers   [SIA 266:2015, 4.2.1.2, Gl. (4), Figur 2]
+    R_{Rd} = k_m \cdot f_{xd} \cdot A_0 = 1 \cdot 2.98\,\mathrm{N}/\mathrm{mm}^{2} \cdot 26250\,\mathrm{mm}^{2} = 78.1\,\mathrm{kN}
+
+Einwirkung gegen Widerstand
+    R_d = 27.2\,\mathrm{kN} \quad \le \quad R_{Rd} = 78.1\,\mathrm{kN}
+
+Erfüllungsgrad
+    \alpha_{eff,TF,\text{O1 links – GZT Wind}} = \frac{R_{Rd}}{R_d} = \frac{78.1\,\mathrm{kN}}{27.2\,\mathrm{kN}} = 2.87 \quad \Rightarrow \quad \text{erfüllt}
+
 Teilflächenpressung – O1 rechts – GZT
 -------------------------------------
 
@@ -19730,6 +19986,30 @@ Einwirkung gegen Widerstand
 
 Erfüllungsgrad
     \alpha_{eff,TF,\text{O1 rechts – GZT günstig}} = \frac{R_{Rd}}{R_d} = \frac{78.1\,\mathrm{kN}}{21.8\,\mathrm{kN}} = 3.59 \quad \Rightarrow \quad \text{erfüllt}
+
+Teilflächenpressung – O1 rechts – GZT Wind
+------------------------------------------
+
+Kraft des Sturzauflagers, aus dem Lastabtrag
+    R_d = 27.2\,\mathrm{kN}
+
+Fläche des Auflagers
+    A_0 = a \cdot t_w = 150\,\mathrm{mm} \cdot 175\,\mathrm{mm} = 26250\,\mathrm{mm}^{2}
+
+Fläche mit demselben Schwerpunkt: am Rand der Öffnung A_0 selbst
+    A_1 = 26250\,\mathrm{mm}^{2}
+
+Beiwert der Teilflächenpressung   [SIA 266:2015, 4.2.1.2, Gl. (4), Figur 2]
+    k_m = \min\left[0.5 \cdot \left(1 + \sqrt{\frac{A_1}{A_0}}\right);\ 1.5\right] = \min\left[0.5 \cdot \left(1 + \sqrt{\frac{26250\,\mathrm{mm}^{2}}{26250\,\mathrm{mm}^{2}}}\right);\ 1.5\right] = 1
+
+Widerstand des Auflagers   [SIA 266:2015, 4.2.1.2, Gl. (4), Figur 2]
+    R_{Rd} = k_m \cdot f_{xd} \cdot A_0 = 1 \cdot 2.98\,\mathrm{N}/\mathrm{mm}^{2} \cdot 26250\,\mathrm{mm}^{2} = 78.1\,\mathrm{kN}
+
+Einwirkung gegen Widerstand
+    R_d = 27.2\,\mathrm{kN} \quad \le \quad R_{Rd} = 78.1\,\mathrm{kN}
+
+Erfüllungsgrad
+    \alpha_{eff,TF,\text{O1 rechts – GZT Wind}} = \frac{R_{Rd}}{R_d} = \frac{78.1\,\mathrm{kN}}{27.2\,\mathrm{kN}} = 2.87 \quad \Rightarrow \quad \text{erfüllt}
 
 Teilflächenpressung – O2 links – GZT
 ------------------------------------
@@ -19779,6 +20059,30 @@ Einwirkung gegen Widerstand
 Erfüllungsgrad
     \alpha_{eff,TF,\text{O2 links – GZT günstig}} = \frac{R_{Rd}}{R_d} = \frac{78.1\,\mathrm{kN}}{33.1\,\mathrm{kN}} = 2.36 \quad \Rightarrow \quad \text{erfüllt}
 
+Teilflächenpressung – O2 links – GZT Wind
+-----------------------------------------
+
+Kraft des Sturzauflagers, aus dem Lastabtrag
+    R_d = 41.4\,\mathrm{kN}
+
+Fläche des Auflagers
+    A_0 = a \cdot t_w = 150\,\mathrm{mm} \cdot 175\,\mathrm{mm} = 26250\,\mathrm{mm}^{2}
+
+Fläche mit demselben Schwerpunkt: am Rand der Öffnung A_0 selbst
+    A_1 = 26250\,\mathrm{mm}^{2}
+
+Beiwert der Teilflächenpressung   [SIA 266:2015, 4.2.1.2, Gl. (4), Figur 2]
+    k_m = \min\left[0.5 \cdot \left(1 + \sqrt{\frac{A_1}{A_0}}\right);\ 1.5\right] = \min\left[0.5 \cdot \left(1 + \sqrt{\frac{26250\,\mathrm{mm}^{2}}{26250\,\mathrm{mm}^{2}}}\right);\ 1.5\right] = 1
+
+Widerstand des Auflagers   [SIA 266:2015, 4.2.1.2, Gl. (4), Figur 2]
+    R_{Rd} = k_m \cdot f_{xd} \cdot A_0 = 1 \cdot 2.98\,\mathrm{N}/\mathrm{mm}^{2} \cdot 26250\,\mathrm{mm}^{2} = 78.1\,\mathrm{kN}
+
+Einwirkung gegen Widerstand
+    R_d = 41.4\,\mathrm{kN} \quad \le \quad R_{Rd} = 78.1\,\mathrm{kN}
+
+Erfüllungsgrad
+    \alpha_{eff,TF,\text{O2 links – GZT Wind}} = \frac{R_{Rd}}{R_d} = \frac{78.1\,\mathrm{kN}}{41.4\,\mathrm{kN}} = 1.89 \quad \Rightarrow \quad \text{erfüllt}
+
 Teilflächenpressung – O2 rechts – GZT
 -------------------------------------
 
@@ -19826,6 +20130,30 @@ Einwirkung gegen Widerstand
 
 Erfüllungsgrad
     \alpha_{eff,TF,\text{O2 rechts – GZT günstig}} = \frac{R_{Rd}}{R_d} = \frac{78.1\,\mathrm{kN}}{33.1\,\mathrm{kN}} = 2.36 \quad \Rightarrow \quad \text{erfüllt}
+
+Teilflächenpressung – O2 rechts – GZT Wind
+------------------------------------------
+
+Kraft des Sturzauflagers, aus dem Lastabtrag
+    R_d = 41.4\,\mathrm{kN}
+
+Fläche des Auflagers
+    A_0 = a \cdot t_w = 150\,\mathrm{mm} \cdot 175\,\mathrm{mm} = 26250\,\mathrm{mm}^{2}
+
+Fläche mit demselben Schwerpunkt: am Rand der Öffnung A_0 selbst
+    A_1 = 26250\,\mathrm{mm}^{2}
+
+Beiwert der Teilflächenpressung   [SIA 266:2015, 4.2.1.2, Gl. (4), Figur 2]
+    k_m = \min\left[0.5 \cdot \left(1 + \sqrt{\frac{A_1}{A_0}}\right);\ 1.5\right] = \min\left[0.5 \cdot \left(1 + \sqrt{\frac{26250\,\mathrm{mm}^{2}}{26250\,\mathrm{mm}^{2}}}\right);\ 1.5\right] = 1
+
+Widerstand des Auflagers   [SIA 266:2015, 4.2.1.2, Gl. (4), Figur 2]
+    R_{Rd} = k_m \cdot f_{xd} \cdot A_0 = 1 \cdot 2.98\,\mathrm{N}/\mathrm{mm}^{2} \cdot 26250\,\mathrm{mm}^{2} = 78.1\,\mathrm{kN}
+
+Einwirkung gegen Widerstand
+    R_d = 41.4\,\mathrm{kN} \quad \le \quad R_{Rd} = 78.1\,\mathrm{kN}
+
+Erfüllungsgrad
+    \alpha_{eff,TF,\text{O2 rechts – GZT Wind}} = \frac{R_{Rd}}{R_d} = \frac{78.1\,\mathrm{kN}}{41.4\,\mathrm{kN}} = 1.89 \quad \Rightarrow \quad \text{erfüllt}
 
 Teilflächenpressung – O3 links – GZT
 ------------------------------------
@@ -19875,6 +20203,30 @@ Einwirkung gegen Widerstand
 Erfüllungsgrad
     \alpha_{eff,TF,\text{O3 links – GZT günstig}} = \frac{R_{Rd}}{R_d} = \frac{78.1\,\mathrm{kN}}{15.1\,\mathrm{kN}} = 5.18 \quad \Rightarrow \quad \text{erfüllt}
 
+Teilflächenpressung – O3 links – GZT Wind
+-----------------------------------------
+
+Kraft des Sturzauflagers, aus dem Lastabtrag
+    R_d = 18.9\,\mathrm{kN}
+
+Fläche des Auflagers
+    A_0 = a \cdot t_w = 150\,\mathrm{mm} \cdot 175\,\mathrm{mm} = 26250\,\mathrm{mm}^{2}
+
+Fläche mit demselben Schwerpunkt: am Rand der Öffnung A_0 selbst
+    A_1 = 26250\,\mathrm{mm}^{2}
+
+Beiwert der Teilflächenpressung   [SIA 266:2015, 4.2.1.2, Gl. (4), Figur 2]
+    k_m = \min\left[0.5 \cdot \left(1 + \sqrt{\frac{A_1}{A_0}}\right);\ 1.5\right] = \min\left[0.5 \cdot \left(1 + \sqrt{\frac{26250\,\mathrm{mm}^{2}}{26250\,\mathrm{mm}^{2}}}\right);\ 1.5\right] = 1
+
+Widerstand des Auflagers   [SIA 266:2015, 4.2.1.2, Gl. (4), Figur 2]
+    R_{Rd} = k_m \cdot f_{xd} \cdot A_0 = 1 \cdot 2.98\,\mathrm{N}/\mathrm{mm}^{2} \cdot 26250\,\mathrm{mm}^{2} = 78.1\,\mathrm{kN}
+
+Einwirkung gegen Widerstand
+    R_d = 18.9\,\mathrm{kN} \quad \le \quad R_{Rd} = 78.1\,\mathrm{kN}
+
+Erfüllungsgrad
+    \alpha_{eff,TF,\text{O3 links – GZT Wind}} = \frac{R_{Rd}}{R_d} = \frac{78.1\,\mathrm{kN}}{18.9\,\mathrm{kN}} = 4.14 \quad \Rightarrow \quad \text{erfüllt}
+
 Teilflächenpressung – O3 rechts – GZT
 -------------------------------------
 
@@ -19922,6 +20274,308 @@ Einwirkung gegen Widerstand
 
 Erfüllungsgrad
     \alpha_{eff,TF,\text{O3 rechts – GZT günstig}} = \frac{R_{Rd}}{R_d} = \frac{78.1\,\mathrm{kN}}{15.1\,\mathrm{kN}} = 5.18 \quad \Rightarrow \quad \text{erfüllt}
+
+Teilflächenpressung – O3 rechts – GZT Wind
+------------------------------------------
+
+Kraft des Sturzauflagers, aus dem Lastabtrag
+    R_d = 18.9\,\mathrm{kN}
+
+Fläche des Auflagers
+    A_0 = a \cdot t_w = 150\,\mathrm{mm} \cdot 175\,\mathrm{mm} = 26250\,\mathrm{mm}^{2}
+
+Fläche mit demselben Schwerpunkt: am Rand der Öffnung A_0 selbst
+    A_1 = 26250\,\mathrm{mm}^{2}
+
+Beiwert der Teilflächenpressung   [SIA 266:2015, 4.2.1.2, Gl. (4), Figur 2]
+    k_m = \min\left[0.5 \cdot \left(1 + \sqrt{\frac{A_1}{A_0}}\right);\ 1.5\right] = \min\left[0.5 \cdot \left(1 + \sqrt{\frac{26250\,\mathrm{mm}^{2}}{26250\,\mathrm{mm}^{2}}}\right);\ 1.5\right] = 1
+
+Widerstand des Auflagers   [SIA 266:2015, 4.2.1.2, Gl. (4), Figur 2]
+    R_{Rd} = k_m \cdot f_{xd} \cdot A_0 = 1 \cdot 2.98\,\mathrm{N}/\mathrm{mm}^{2} \cdot 26250\,\mathrm{mm}^{2} = 78.1\,\mathrm{kN}
+
+Einwirkung gegen Widerstand
+    R_d = 18.9\,\mathrm{kN} \quad \le \quad R_{Rd} = 78.1\,\mathrm{kN}
+
+Erfüllungsgrad
+    \alpha_{eff,TF,\text{O3 rechts – GZT Wind}} = \frac{R_{Rd}}{R_d} = \frac{78.1\,\mathrm{kN}}{18.9\,\mathrm{kN}} = 4.14 \quad \Rightarrow \quad \text{erfüllt}
+
+Schub
+-----
+[*] Annahme: N_xd, V_d und M_z2d gelten am Fuss des Pfeilers. Steht die Normalkraft quer zur Wand
+ausmittig, rechnet das Werkzeug den einfachen Nachweis der Gl. (13) mit der Dicke t_nom nach 4.3.3.1
+statt mit Figur 9: der erweiterte Nachweis nach 4.3.2.3 legt der Strebe nur Druck zu – nach Vorgabe,
+nicht nachgeschlagen, auf der sicheren Seite.
+
+Schub – P1 – GZT Wind
+---------------------
+
+Querkraft des Pfeilers in der Wandebene, aus dem Lastabtrag – ihr Betrag
+    V_d = 7\,\mathrm{kN}
+
+Normalkraft am Fuss des Pfeilers, aus dem Lastabtrag
+    N_{xd} = 51.1\,\mathrm{kN}
+
+Neigung der Druckstrebe gegen die Lotrechte, in Grad   [SIA 266:2015, 4.3.2.2, Gl. (13), Figur 7 und 8]
+    \alpha = \arctan\frac{V_d}{N_{xd}} = \arctan\frac{7\,\mathrm{kN}}{51.1\,\mathrm{kN}} = 7.8{}^{\circ}
+
+Moment in der Wandebene am Fuss des Pfeilers, aus dem Lastabtrag – sein Betrag
+    M_{z2d} = 8\,\mathrm{kNm}
+
+Gedrückte Länge am Fuss   [SIA 266:2015, 4.3.3.1, Gl. (17)]
+    l_2 = l_w - \frac{2 \cdot M_{z2d}}{N_{xd}} = 800\,\mathrm{mm} - \frac{2 \cdot 8\,\mathrm{kNm}}{51.1\,\mathrm{kN}} = 487\,\mathrm{mm}
+
+Moment der Ausmitten der Lasten am Kopf, aus dem Lastabtrag
+    M_d = 1.04\,\mathrm{kNm}
+
+Normalkraft aus den Lasten allein, ohne das Eigengewicht der Wand, aus dem Lastabtrag
+    N_{Ld} = 43.4\,\mathrm{kN}
+
+Ausmitte am Kopf – sie bleibt, wenn die Lasten wachsen
+    e_o = \frac{M_d}{N_{Ld}} = \frac{1.04\,\mathrm{kNm}}{43.4\,\mathrm{kN}} = 24\,\mathrm{mm}
+
+Grösste Ausmitte der verformten Wand unter N_xd, auf der Länge l_2 nach Theorie 2. Ordnung gerechnet   [SIA 266:2015, 4.3.1.1, Figur 3]
+    e_z = 24\,\mathrm{mm}
+
+Dicke, auf der die Strebe trägt   [SIA 266:2015, 4.3.3.1]
+    t_{nom} = t_w - 2 \cdot e_z = 175\,\mathrm{mm} - 2 \cdot 24\,\mathrm{mm} = 127\,\mathrm{mm}
+
+Widerstand der Druckstrebe   [SIA 266:2015, 4.3.2.2, Gl. (13), Figur 7 und 8]
+    \begin{aligned}
+      N_{Rd} &= f_{yd} \cdot l_2 \cdot t_{nom} \cdot \cos^{2} \alpha \\
+      &= 1.36\,\mathrm{N}/\mathrm{mm}^{2} \cdot 487\,\mathrm{mm} \cdot 127\,\mathrm{mm} \cdot \cos^{2} 7.8{}^{\circ} \\
+      &= 82.6\,\mathrm{kN}
+    \end{aligned}
+
+Einwirkung gegen Widerstand
+    N_{xd} = 51.1\,\mathrm{kN} \quad \le \quad N_{Rd} = 82.6\,\mathrm{kN}
+
+Erfüllungsgrad
+    \alpha_{eff,V,\text{P1 – GZT Wind}} = \frac{N_{Rd}}{N_{xd}} = \frac{82.6\,\mathrm{kN}}{51.1\,\mathrm{kN}} = 1.62 \quad \Rightarrow \quad \text{erfüllt}
+
+Schub – P2 – GZT Wind
+---------------------
+
+Querkraft des Pfeilers in der Wandebene, aus dem Lastabtrag – ihr Betrag
+    V_d = 11.7\,\mathrm{kN}
+
+Normalkraft am Fuss des Pfeilers, aus dem Lastabtrag
+    N_{xd} = 101.8\,\mathrm{kN}
+
+Neigung der Druckstrebe gegen die Lotrechte, in Grad   [SIA 266:2015, 4.3.2.2, Gl. (13), Figur 7 und 8]
+    \alpha = \arctan\frac{V_d}{N_{xd}} = \arctan\frac{11.7\,\mathrm{kN}}{101.8\,\mathrm{kN}} = 6.5{}^{\circ}
+
+Moment in der Wandebene am Fuss des Pfeilers, aus dem Lastabtrag – sein Betrag
+    M_{z2d} = 13.53\,\mathrm{kNm}
+
+Gedrückte Länge am Fuss   [SIA 266:2015, 4.3.3.1, Gl. (17)]
+    l_2 = l_w - \frac{2 \cdot M_{z2d}}{N_{xd}} = 1000\,\mathrm{mm} - \frac{2 \cdot 13.53\,\mathrm{kNm}}{101.8\,\mathrm{kN}} = 734\,\mathrm{mm}
+
+Moment der Ausmitten der Lasten am Kopf, aus dem Lastabtrag
+    M_d = 1.68\,\mathrm{kNm}
+
+Normalkraft aus den Lasten allein, ohne das Eigengewicht der Wand, aus dem Lastabtrag
+    N_{Ld} = 91.2\,\mathrm{kN}
+
+Ausmitte am Kopf – sie bleibt, wenn die Lasten wachsen
+    e_o = \frac{M_d}{N_{Ld}} = \frac{1.68\,\mathrm{kNm}}{91.2\,\mathrm{kN}} = 18.4\,\mathrm{mm}
+
+Grösste Ausmitte der verformten Wand unter N_xd, auf der Länge l_2 nach Theorie 2. Ordnung gerechnet   [SIA 266:2015, 4.3.1.1, Figur 3]
+    e_z = 18.4\,\mathrm{mm}
+
+Dicke, auf der die Strebe trägt   [SIA 266:2015, 4.3.3.1]
+    t_{nom} = t_w - 2 \cdot e_z = 175\,\mathrm{mm} - 2 \cdot 18.4\,\mathrm{mm} = 138.2\,\mathrm{mm}
+
+Widerstand der Druckstrebe   [SIA 266:2015, 4.3.2.2, Gl. (13), Figur 7 und 8]
+    \begin{aligned}
+      N_{Rd} &= f_{yd} \cdot l_2 \cdot t_{nom} \cdot \cos^{2} \alpha \\
+      &= 1.36\,\mathrm{N}/\mathrm{mm}^{2} \cdot 734\,\mathrm{mm} \cdot 138.2\,\mathrm{mm} \cdot \cos^{2} 6.5{}^{\circ} \\
+      &= 136.1\,\mathrm{kN}
+    \end{aligned}
+
+Einwirkung gegen Widerstand
+    N_{xd} = 101.8\,\mathrm{kN} \quad \le \quad N_{Rd} = 136.1\,\mathrm{kN}
+
+Erfüllungsgrad
+    \alpha_{eff,V,\text{P2 – GZT Wind}} = \frac{N_{Rd}}{N_{xd}} = \frac{136.1\,\mathrm{kN}}{101.8\,\mathrm{kN}} = 1.34 \quad \Rightarrow \quad \text{erfüllt}
+
+Schub – P3 – GZT Wind
+---------------------
+
+Querkraft des Pfeilers in der Wandebene, aus dem Lastabtrag – ihr Betrag
+    V_d = 9.2\,\mathrm{kN}
+
+Normalkraft am Fuss des Pfeilers, aus dem Lastabtrag
+    N_{xd} = 97\,\mathrm{kN}
+
+Neigung der Druckstrebe gegen die Lotrechte, in Grad   [SIA 266:2015, 4.3.2.2, Gl. (13), Figur 7 und 8]
+    \alpha = \arctan\frac{V_d}{N_{xd}} = \arctan\frac{9.2\,\mathrm{kN}}{97\,\mathrm{kN}} = 5.4{}^{\circ}
+
+Moment in der Wandebene am Fuss des Pfeilers, aus dem Lastabtrag – sein Betrag
+    M_{z2d} = 10.61\,\mathrm{kNm}
+
+Gedrückte Länge am Fuss   [SIA 266:2015, 4.3.3.1, Gl. (17)]
+    l_2 = l_w - \frac{2 \cdot M_{z2d}}{N_{xd}} = 900\,\mathrm{mm} - \frac{2 \cdot 10.61\,\mathrm{kNm}}{97\,\mathrm{kN}} = 681\,\mathrm{mm}
+
+Moment der Ausmitten der Lasten am Kopf, aus dem Lastabtrag
+    M_d = 1.44\,\mathrm{kNm}
+
+Normalkraft aus den Lasten allein, ohne das Eigengewicht der Wand, aus dem Lastabtrag
+    N_{Ld} = 87.6\,\mathrm{kN}
+
+Ausmitte am Kopf – sie bleibt, wenn die Lasten wachsen
+    e_o = \frac{M_d}{N_{Ld}} = \frac{1.44\,\mathrm{kNm}}{87.6\,\mathrm{kN}} = 16.4\,\mathrm{mm}
+
+Grösste Ausmitte der verformten Wand unter N_xd, auf der Länge l_2 nach Theorie 2. Ordnung gerechnet   [SIA 266:2015, 4.3.1.1, Figur 3]
+    e_z = 16.4\,\mathrm{mm}
+
+Dicke, auf der die Strebe trägt   [SIA 266:2015, 4.3.3.1]
+    t_{nom} = t_w - 2 \cdot e_z = 175\,\mathrm{mm} - 2 \cdot 16.4\,\mathrm{mm} = 142.1\,\mathrm{mm}
+
+Widerstand der Druckstrebe   [SIA 266:2015, 4.3.2.2, Gl. (13), Figur 7 und 8]
+    \begin{aligned}
+      N_{Rd} &= f_{yd} \cdot l_2 \cdot t_{nom} \cdot \cos^{2} \alpha \\
+      &= 1.36\,\mathrm{N}/\mathrm{mm}^{2} \cdot 681\,\mathrm{mm} \cdot 142.1\,\mathrm{mm} \cdot \cos^{2} 5.4{}^{\circ} \\
+      &= 130.5\,\mathrm{kN}
+    \end{aligned}
+
+Einwirkung gegen Widerstand
+    N_{xd} = 97\,\mathrm{kN} \quad \le \quad N_{Rd} = 130.5\,\mathrm{kN}
+
+Erfüllungsgrad
+    \alpha_{eff,V,\text{P3 – GZT Wind}} = \frac{N_{Rd}}{N_{xd}} = \frac{130.5\,\mathrm{kN}}{97\,\mathrm{kN}} = 1.35 \quad \Rightarrow \quad \text{erfüllt}
+
+Schub – P4 – GZT Wind
+---------------------
+
+Querkraft des Pfeilers in der Wandebene, aus dem Lastabtrag – ihr Betrag
+    V_d = 2.1\,\mathrm{kN}
+
+Normalkraft am Fuss des Pfeilers, aus dem Lastabtrag
+    N_{xd} = 42.7\,\mathrm{kN}
+
+Neigung der Druckstrebe gegen die Lotrechte, in Grad   [SIA 266:2015, 4.3.2.2, Gl. (13), Figur 7 und 8]
+    \alpha = \arctan\frac{V_d}{N_{xd}} = \arctan\frac{2.1\,\mathrm{kN}}{42.7\,\mathrm{kN}} = 2.8{}^{\circ}
+
+Moment in der Wandebene am Fuss des Pfeilers, aus dem Lastabtrag – sein Betrag
+    M_{z2d} = 2.36\,\mathrm{kNm}
+
+Gedrückte Länge am Fuss   [SIA 266:2015, 4.3.3.1, Gl. (17)]
+    l_2 = l_w - \frac{2 \cdot M_{z2d}}{N_{xd}} = 500\,\mathrm{mm} - \frac{2 \cdot 2.36\,\mathrm{kNm}}{42.7\,\mathrm{kN}} = 389\,\mathrm{mm}
+
+Moment der Ausmitten der Lasten am Kopf, aus dem Lastabtrag
+    M_d = 0.64\,\mathrm{kNm}
+
+Normalkraft aus den Lasten allein, ohne das Eigengewicht der Wand, aus dem Lastabtrag
+    N_{Ld} = 37.9\,\mathrm{kN}
+
+Ausmitte am Kopf – sie bleibt, wenn die Lasten wachsen
+    e_o = \frac{M_d}{N_{Ld}} = \frac{0.64\,\mathrm{kNm}}{37.9\,\mathrm{kN}} = 16.9\,\mathrm{mm}
+
+Grösste Ausmitte der verformten Wand unter N_xd, auf der Länge l_2 nach Theorie 2. Ordnung gerechnet   [SIA 266:2015, 4.3.1.1, Figur 3]
+    e_z = 16.9\,\mathrm{mm}
+
+Dicke, auf der die Strebe trägt   [SIA 266:2015, 4.3.3.1]
+    t_{nom} = t_w - 2 \cdot e_z = 175\,\mathrm{mm} - 2 \cdot 16.9\,\mathrm{mm} = 141.2\,\mathrm{mm}
+
+Widerstand der Druckstrebe   [SIA 266:2015, 4.3.2.2, Gl. (13), Figur 7 und 8]
+    \begin{aligned}
+      N_{Rd} &= f_{yd} \cdot l_2 \cdot t_{nom} \cdot \cos^{2} \alpha \\
+      &= 1.36\,\mathrm{N}/\mathrm{mm}^{2} \cdot 389\,\mathrm{mm} \cdot 141.2\,\mathrm{mm} \cdot \cos^{2} 2.8{}^{\circ} \\
+      &= 74.6\,\mathrm{kN}
+    \end{aligned}
+
+Einwirkung gegen Widerstand
+    N_{xd} = 42.7\,\mathrm{kN} \quad \le \quad N_{Rd} = 74.6\,\mathrm{kN}
+
+Erfüllungsgrad
+    \alpha_{eff,V,\text{P4 – GZT Wind}} = \frac{N_{Rd}}{N_{xd}} = \frac{74.6\,\mathrm{kN}}{42.7\,\mathrm{kN}} = 1.75 \quad \Rightarrow \quad \text{erfüllt}
+
+Gleiten
+-------
+
+Gleiten – P1 – GZT Wind
+-----------------------
+
+Querkraft des Pfeilers in der Wandebene, aus dem Lastabtrag – ihr Betrag
+    V_d = 7\,\mathrm{kN}
+
+Normalkraft am Fuss des Pfeilers, aus dem Lastabtrag
+    N_{xd} = 51.1\,\mathrm{kN}
+
+Bemessungswert des Reibungsbeiwerts in den Lagerfugen, aus dem Mauerwerk   [SIA 266:2015, 4.2.1.3]
+    \mu_d = 0.6
+
+Widerstand gegen Gleiten: Gl. (14), V_d / N_xd ≤ μ_d, nach V_d aufgelöst   [SIA 266:2015, 4.3.2.2, Gl. (14)]
+    V_{Rd} = \mu_d \cdot N_{xd} = 0.6 \cdot 51.1\,\mathrm{kN} = 30.7\,\mathrm{kN}
+
+Einwirkung gegen Widerstand
+    V_d = 7\,\mathrm{kN} \quad \le \quad V_{Rd} = 30.7\,\mathrm{kN}
+
+Erfüllungsgrad
+    \alpha_{eff,G,\text{P1 – GZT Wind}} = \frac{V_{Rd}}{V_d} = \frac{30.7\,\mathrm{kN}}{7\,\mathrm{kN}} = 4.38 \quad \Rightarrow \quad \text{erfüllt}
+
+Gleiten – P2 – GZT Wind
+-----------------------
+
+Querkraft des Pfeilers in der Wandebene, aus dem Lastabtrag – ihr Betrag
+    V_d = 11.7\,\mathrm{kN}
+
+Normalkraft am Fuss des Pfeilers, aus dem Lastabtrag
+    N_{xd} = 101.8\,\mathrm{kN}
+
+Bemessungswert des Reibungsbeiwerts in den Lagerfugen, aus dem Mauerwerk   [SIA 266:2015, 4.2.1.3]
+    \mu_d = 0.6
+
+Widerstand gegen Gleiten: Gl. (14), V_d / N_xd ≤ μ_d, nach V_d aufgelöst   [SIA 266:2015, 4.3.2.2, Gl. (14)]
+    V_{Rd} = \mu_d \cdot N_{xd} = 0.6 \cdot 101.8\,\mathrm{kN} = 61.1\,\mathrm{kN}
+
+Einwirkung gegen Widerstand
+    V_d = 11.7\,\mathrm{kN} \quad \le \quad V_{Rd} = 61.1\,\mathrm{kN}
+
+Erfüllungsgrad
+    \alpha_{eff,G,\text{P2 – GZT Wind}} = \frac{V_{Rd}}{V_d} = \frac{61.1\,\mathrm{kN}}{11.7\,\mathrm{kN}} = 5.23 \quad \Rightarrow \quad \text{erfüllt}
+
+Gleiten – P3 – GZT Wind
+-----------------------
+
+Querkraft des Pfeilers in der Wandebene, aus dem Lastabtrag – ihr Betrag
+    V_d = 9.2\,\mathrm{kN}
+
+Normalkraft am Fuss des Pfeilers, aus dem Lastabtrag
+    N_{xd} = 97\,\mathrm{kN}
+
+Bemessungswert des Reibungsbeiwerts in den Lagerfugen, aus dem Mauerwerk   [SIA 266:2015, 4.2.1.3]
+    \mu_d = 0.6
+
+Widerstand gegen Gleiten: Gl. (14), V_d / N_xd ≤ μ_d, nach V_d aufgelöst   [SIA 266:2015, 4.3.2.2, Gl. (14)]
+    V_{Rd} = \mu_d \cdot N_{xd} = 0.6 \cdot 97\,\mathrm{kN} = 58.2\,\mathrm{kN}
+
+Einwirkung gegen Widerstand
+    V_d = 9.2\,\mathrm{kN} \quad \le \quad V_{Rd} = 58.2\,\mathrm{kN}
+
+Erfüllungsgrad
+    \alpha_{eff,G,\text{P3 – GZT Wind}} = \frac{V_{Rd}}{V_d} = \frac{58.2\,\mathrm{kN}}{9.2\,\mathrm{kN}} = 6.31 \quad \Rightarrow \quad \text{erfüllt}
+
+Gleiten – P4 – GZT Wind
+-----------------------
+
+Querkraft des Pfeilers in der Wandebene, aus dem Lastabtrag – ihr Betrag
+    V_d = 2.1\,\mathrm{kN}
+
+Normalkraft am Fuss des Pfeilers, aus dem Lastabtrag
+    N_{xd} = 42.7\,\mathrm{kN}
+
+Bemessungswert des Reibungsbeiwerts in den Lagerfugen, aus dem Mauerwerk   [SIA 266:2015, 4.2.1.3]
+    \mu_d = 0.6
+
+Widerstand gegen Gleiten: Gl. (14), V_d / N_xd ≤ μ_d, nach V_d aufgelöst   [SIA 266:2015, 4.3.2.2, Gl. (14)]
+    V_{Rd} = \mu_d \cdot N_{xd} = 0.6 \cdot 42.7\,\mathrm{kN} = 25.6\,\mathrm{kN}
+
+Einwirkung gegen Widerstand
+    V_d = 2.1\,\mathrm{kN} \quad \le \quad V_{Rd} = 25.6\,\mathrm{kN}
+
+Erfüllungsgrad
+    \alpha_{eff,G,\text{P4 – GZT Wind}} = \frac{V_{Rd}}{V_d} = \frac{25.6\,\mathrm{kN}}{2.1\,\mathrm{kN}} = 12.21 \quad \Rightarrow \quad \text{erfüllt}
 
 Mauerwerk: Pfeiler aus Kalksandstein
 ------------------------------------
@@ -24855,6 +25509,14 @@ Ein Sturz liegt an seinen Enden auf dem Mauerwerk auf und drückt es dort auf de
 t_w. Liegt die Fläche mitten in einer grösseren, verteilt sich der Druck, und das Mauerwerk trägt
 mehr; am Rand der Öffnung kann er das nicht.
 
+Die Querkraft geht mit der Normalkraft als geneigte Druckstrebe durch den Pfeiler. Geneigt trägt
+Mauerwerk nur f_yd (Figur 7), und am Fuss nur auf der gedrückten Länge l_2, wo die Resultierende
+hinkommt. Darum vergleicht der Nachweis Normalkräfte: je schräger die Strebe, desto weniger
+Normalkraft trägt sie.
+
+Steiler als arctan μ_d kann die Druckstrebe nicht stehen: sonst gleitet der Pfeiler in einer
+Lagerfuge. Die Reibung trägt μ_d · N_xd.
+
 Bemessungswert der Druckfestigkeit senkrecht zu den Lagerfugen   [SIA 266:2015, 4.2.1.1, Gl. (3)]
     f_{xd} = \frac{f_{xk}}{\gamma_M}
 
@@ -24897,6 +25559,9 @@ Bezugswert der Knicklänge   [SIA 266:2015, 4.3.1.2, Gl. (8)]
 Normalkraftwiderstand des Pfeilers   [SIA 266:2015, 4.3.1.3, Gl. (11)]
     N_{xRd} = k_N \cdot l_w \cdot t_w \cdot f_{xd}
 
+Gedrückte Länge am Fuss   [SIA 266:2015, 4.3.3.1, Gl. (17)]
+    l_2 = l_w - \frac{2 \cdot M_{z2d}}{N_{xd}}
+
 Fläche des Auflagers
     A_0 = a \cdot t_w
 
@@ -24905,6 +25570,18 @@ Beiwert der Teilflächenpressung   [SIA 266:2015, 4.2.1.2, Gl. (4), Figur 2]
 
 Widerstand des Auflagers   [SIA 266:2015, 4.2.1.2, Gl. (4), Figur 2]
     R_{Rd} = k_m \cdot f_{xd} \cdot A_0
+
+Neigung der Druckstrebe gegen die Lotrechte, in Grad   [SIA 266:2015, 4.3.2.2, Gl. (13), Figur 7 und 8]
+    \alpha = \arctan\frac{V_d}{N_{xd}}
+
+Dicke, auf der die Strebe trägt   [SIA 266:2015, 4.3.3.1]
+    t_{nom} = t_w - 2 \cdot e_z
+
+Widerstand der Druckstrebe   [SIA 266:2015, 4.3.2.2, Gl. (13), Figur 7 und 8]
+    N_{Rd} = f_{yd} \cdot l_2 \cdot t_{nom} \cdot \cos^{2} \alpha
+
+Widerstand gegen Gleiten: Gl. (14), V_d / N_xd ≤ μ_d, nach V_d aufgelöst   [SIA 266:2015, 4.3.2.2, Gl. (14)]
+    V_{Rd} = \mu_d \cdot N_{xd}
 
 Schubfluss
 ----------
@@ -26231,24 +26908,42 @@ Bemessungswerte
     -------------------  -----------------------  ----------------------------  ---------------------------  ------------
     Normalkraft          P1 – GZT                 N_{xRd} = 321.3\,\mathrm{kN}  N_{xd} = 109.9\,\mathrm{kN}          2.92
     Normalkraft          P1 – GZT günstig         N_{xRd} = 321.3\,\mathrm{kN}   N_{xd} = 47.8\,\mathrm{kN}          6.72
+    Normalkraft          P1 – GZT Wind            N_{xRd} = 184.0\,\mathrm{kN}   N_{xd} = 51.1\,\mathrm{kN}          3.60
     Normalkraft          P2 – GZT                 N_{xRd} = 410.8\,\mathrm{kN}  N_{xd} = 188.4\,\mathrm{kN}          2.18
     Normalkraft          P2 – GZT günstig         N_{xRd} = 414.3\,\mathrm{kN}   N_{xd} = 83.7\,\mathrm{kN}          4.95
+    Normalkraft          P2 – GZT Wind            N_{xRd} = 301.7\,\mathrm{kN}  N_{xd} = 101.8\,\mathrm{kN}          2.96
     Normalkraft          P3 – GZT                 N_{xRd} = 371.0\,\mathrm{kN}  N_{xd} = 163.8\,\mathrm{kN}          2.26
     Normalkraft          P3 – GZT günstig         N_{xRd} = 374.5\,\mathrm{kN}   N_{xd} = 73.1\,\mathrm{kN}          5.12
+    Normalkraft          P3 – GZT Wind            N_{xRd} = 288.0\,\mathrm{kN}   N_{xd} = 97.0\,\mathrm{kN}          2.97
     Normalkraft          P4 – GZT                 N_{xRd} = 200.8\,\mathrm{kN}   N_{xd} = 67.7\,\mathrm{kN}          2.97
     Normalkraft          P4 – GZT günstig         N_{xRd} = 200.8\,\mathrm{kN}   N_{xd} = 29.5\,\mathrm{kN}          6.82
+    Normalkraft          P4 – GZT Wind            N_{xRd} = 163.5\,\mathrm{kN}   N_{xd} = 42.7\,\mathrm{kN}          3.83
     Teilflächenpressung  O1 links – GZT             R_{Rd} = 78.1\,\mathrm{kN}      R_d = 51.4\,\mathrm{kN}          1.52
     Teilflächenpressung  O1 links – GZT günstig     R_{Rd} = 78.1\,\mathrm{kN}      R_d = 21.8\,\mathrm{kN}          3.59
+    Teilflächenpressung  O1 links – GZT Wind        R_{Rd} = 78.1\,\mathrm{kN}      R_d = 27.2\,\mathrm{kN}          2.87
     Teilflächenpressung  O1 rechts – GZT            R_{Rd} = 78.1\,\mathrm{kN}      R_d = 51.4\,\mathrm{kN}          1.52
     Teilflächenpressung  O1 rechts – GZT günstig    R_{Rd} = 78.1\,\mathrm{kN}      R_d = 21.8\,\mathrm{kN}          3.59
+    Teilflächenpressung  O1 rechts – GZT Wind       R_{Rd} = 78.1\,\mathrm{kN}      R_d = 27.2\,\mathrm{kN}          2.87
     Teilflächenpressung  O2 links – GZT             R_{Rd} = 78.1\,\mathrm{kN}      R_d = 72.8\,\mathrm{kN}          1.07
     Teilflächenpressung  O2 links – GZT günstig     R_{Rd} = 78.1\,\mathrm{kN}      R_d = 33.1\,\mathrm{kN}          2.36
+    Teilflächenpressung  O2 links – GZT Wind        R_{Rd} = 78.1\,\mathrm{kN}      R_d = 41.4\,\mathrm{kN}          1.89
     Teilflächenpressung  O2 rechts – GZT            R_{Rd} = 78.1\,\mathrm{kN}      R_d = 72.8\,\mathrm{kN}          1.07
     Teilflächenpressung  O2 rechts – GZT günstig    R_{Rd} = 78.1\,\mathrm{kN}      R_d = 33.1\,\mathrm{kN}          2.36
+    Teilflächenpressung  O2 rechts – GZT Wind       R_{Rd} = 78.1\,\mathrm{kN}      R_d = 41.4\,\mathrm{kN}          1.89
     Teilflächenpressung  O3 links – GZT             R_{Rd} = 78.1\,\mathrm{kN}      R_d = 35.6\,\mathrm{kN}          2.20
     Teilflächenpressung  O3 links – GZT günstig     R_{Rd} = 78.1\,\mathrm{kN}      R_d = 15.1\,\mathrm{kN}          5.18
+    Teilflächenpressung  O3 links – GZT Wind        R_{Rd} = 78.1\,\mathrm{kN}      R_d = 18.9\,\mathrm{kN}          4.14
     Teilflächenpressung  O3 rechts – GZT            R_{Rd} = 78.1\,\mathrm{kN}      R_d = 35.6\,\mathrm{kN}          2.20
     Teilflächenpressung  O3 rechts – GZT günstig    R_{Rd} = 78.1\,\mathrm{kN}      R_d = 15.1\,\mathrm{kN}          5.18
+    Teilflächenpressung  O3 rechts – GZT Wind       R_{Rd} = 78.1\,\mathrm{kN}      R_d = 18.9\,\mathrm{kN}          4.14
+    Schub                P1 – GZT Wind              N_{Rd} = 82.6\,\mathrm{kN}   N_{xd} = 51.1\,\mathrm{kN}          1.62
+    Schub                P2 – GZT Wind             N_{Rd} = 136.1\,\mathrm{kN}  N_{xd} = 101.8\,\mathrm{kN}          1.34
+    Schub                P3 – GZT Wind             N_{Rd} = 130.5\,\mathrm{kN}   N_{xd} = 97.0\,\mathrm{kN}          1.35
+    Schub                P4 – GZT Wind              N_{Rd} = 74.6\,\mathrm{kN}   N_{xd} = 42.7\,\mathrm{kN}          1.75
+    Gleiten              P1 – GZT Wind              V_{Rd} = 30.7\,\mathrm{kN}       V_d = 7.0\,\mathrm{kN}          4.38
+    Gleiten              P2 – GZT Wind              V_{Rd} = 61.1\,\mathrm{kN}      V_d = 11.7\,\mathrm{kN}          5.23
+    Gleiten              P3 – GZT Wind              V_{Rd} = 58.2\,\mathrm{kN}       V_d = 9.2\,\mathrm{kN}          6.31
+    Gleiten              P4 – GZT Wind              V_{Rd} = 25.6\,\mathrm{kN}       V_d = 2.1\,\mathrm{kN}         12.21
 
 Pfeiler aus Kalksandstein
 -------------------------
@@ -27222,25 +27917,43 @@ Werte
     Bemessungswert der Zugfestigkeit in Faserrichtung                                         f_{t,0,d}                                                                      12  N/mm²     Vorgabe
     Bemessungswert der Schubfestigkeit                                                        f_{v,d}                                                                       1.8  N/mm²     Vorgabe
     Erdbeschleunigung                                                                         g                                                                              10  m/s²      Vorgabe
+    Erfüllungsgrad Gleiten – P1 – GZT Wind                                                    \alpha_{eff,G,\text{P1 – GZT Wind}}                                          4.38            berechnet
+    Erfüllungsgrad Gleiten – P2 – GZT Wind                                                    \alpha_{eff,G,\text{P2 – GZT Wind}}                                          5.23            berechnet
+    Erfüllungsgrad Gleiten – P3 – GZT Wind                                                    \alpha_{eff,G,\text{P3 – GZT Wind}}                                          6.31            berechnet
+    Erfüllungsgrad Gleiten – P4 – GZT Wind                                                    \alpha_{eff,G,\text{P4 – GZT Wind}}                                         12.21            berechnet
     Erfüllungsgrad Normalkraft – P1 – GZT                                                     \alpha_{eff,N,\text{P1 – GZT}}                                               2.92            berechnet
+    Erfüllungsgrad Normalkraft – P1 – GZT Wind                                                \alpha_{eff,N,\text{P1 – GZT Wind}}                                          3.60            berechnet
     Erfüllungsgrad Normalkraft – P1 – GZT günstig                                             \alpha_{eff,N,\text{P1 – GZT günstig}}                                       6.72            berechnet
     Erfüllungsgrad Normalkraft – P2 – GZT                                                     \alpha_{eff,N,\text{P2 – GZT}}                                               2.18            berechnet
+    Erfüllungsgrad Normalkraft – P2 – GZT Wind                                                \alpha_{eff,N,\text{P2 – GZT Wind}}                                          2.96            berechnet
     Erfüllungsgrad Normalkraft – P2 – GZT günstig                                             \alpha_{eff,N,\text{P2 – GZT günstig}}                                       4.95            berechnet
     Erfüllungsgrad Normalkraft – P3 – GZT                                                     \alpha_{eff,N,\text{P3 – GZT}}                                               2.26            berechnet
+    Erfüllungsgrad Normalkraft – P3 – GZT Wind                                                \alpha_{eff,N,\text{P3 – GZT Wind}}                                          2.97            berechnet
     Erfüllungsgrad Normalkraft – P3 – GZT günstig                                             \alpha_{eff,N,\text{P3 – GZT günstig}}                                       5.12            berechnet
     Erfüllungsgrad Normalkraft – P4 – GZT                                                     \alpha_{eff,N,\text{P4 – GZT}}                                               2.97            berechnet
+    Erfüllungsgrad Normalkraft – P4 – GZT Wind                                                \alpha_{eff,N,\text{P4 – GZT Wind}}                                          3.83            berechnet
     Erfüllungsgrad Normalkraft – P4 – GZT günstig                                             \alpha_{eff,N,\text{P4 – GZT günstig}}                                       6.82            berechnet
+    Erfüllungsgrad Schub – P1 – GZT Wind                                                      \alpha_{eff,V,\text{P1 – GZT Wind}}                                          1.62            berechnet
+    Erfüllungsgrad Schub – P2 – GZT Wind                                                      \alpha_{eff,V,\text{P2 – GZT Wind}}                                          1.34            berechnet
+    Erfüllungsgrad Schub – P3 – GZT Wind                                                      \alpha_{eff,V,\text{P3 – GZT Wind}}                                          1.35            berechnet
+    Erfüllungsgrad Schub – P4 – GZT Wind                                                      \alpha_{eff,V,\text{P4 – GZT Wind}}                                          1.75            berechnet
     Erfüllungsgrad Teilflächenpressung – O1 links – GZT                                       \alpha_{eff,TF,\text{O1 links – GZT}}                                        1.52            berechnet
+    Erfüllungsgrad Teilflächenpressung – O1 links – GZT Wind                                  \alpha_{eff,TF,\text{O1 links – GZT Wind}}                                   2.87            berechnet
     Erfüllungsgrad Teilflächenpressung – O1 links – GZT günstig                               \alpha_{eff,TF,\text{O1 links – GZT günstig}}                                3.59            berechnet
     Erfüllungsgrad Teilflächenpressung – O1 rechts – GZT                                      \alpha_{eff,TF,\text{O1 rechts – GZT}}                                       1.52            berechnet
+    Erfüllungsgrad Teilflächenpressung – O1 rechts – GZT Wind                                 \alpha_{eff,TF,\text{O1 rechts – GZT Wind}}                                  2.87            berechnet
     Erfüllungsgrad Teilflächenpressung – O1 rechts – GZT günstig                              \alpha_{eff,TF,\text{O1 rechts – GZT günstig}}                               3.59            berechnet
     Erfüllungsgrad Teilflächenpressung – O2 links – GZT                                       \alpha_{eff,TF,\text{O2 links – GZT}}                                        1.07            berechnet
+    Erfüllungsgrad Teilflächenpressung – O2 links – GZT Wind                                  \alpha_{eff,TF,\text{O2 links – GZT Wind}}                                   1.89            berechnet
     Erfüllungsgrad Teilflächenpressung – O2 links – GZT günstig                               \alpha_{eff,TF,\text{O2 links – GZT günstig}}                                2.36            berechnet
     Erfüllungsgrad Teilflächenpressung – O2 rechts – GZT                                      \alpha_{eff,TF,\text{O2 rechts – GZT}}                                       1.07            berechnet
+    Erfüllungsgrad Teilflächenpressung – O2 rechts – GZT Wind                                 \alpha_{eff,TF,\text{O2 rechts – GZT Wind}}                                  1.89            berechnet
     Erfüllungsgrad Teilflächenpressung – O2 rechts – GZT günstig                              \alpha_{eff,TF,\text{O2 rechts – GZT günstig}}                               2.36            berechnet
     Erfüllungsgrad Teilflächenpressung – O3 links – GZT                                       \alpha_{eff,TF,\text{O3 links – GZT}}                                        2.20            berechnet
+    Erfüllungsgrad Teilflächenpressung – O3 links – GZT Wind                                  \alpha_{eff,TF,\text{O3 links – GZT Wind}}                                   4.14            berechnet
     Erfüllungsgrad Teilflächenpressung – O3 links – GZT günstig                               \alpha_{eff,TF,\text{O3 links – GZT günstig}}                                5.18            berechnet
     Erfüllungsgrad Teilflächenpressung – O3 rechts – GZT                                      \alpha_{eff,TF,\text{O3 rechts – GZT}}                                       2.20            berechnet
+    Erfüllungsgrad Teilflächenpressung – O3 rechts – GZT Wind                                 \alpha_{eff,TF,\text{O3 rechts – GZT Wind}}                                  4.14            berechnet
     Erfüllungsgrad Teilflächenpressung – O3 rechts – GZT günstig                              \alpha_{eff,TF,\text{O3 rechts – GZT günstig}}                               5.18            berechnet
     Dicke der Wand                                                                            t_w                                                                           175  mm        Vorgabe
     Ausmitte der Normalkraft am Fuss                                                          e_u                                                                            15  mm        Vorgabe

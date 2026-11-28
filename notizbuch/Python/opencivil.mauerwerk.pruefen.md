@@ -1,5 +1,5 @@
 ---
-erzeugt: 30dbb1cf8c6b
+erzeugt: 00eba589f375
 art: modul
 tags: [modul]
 ---
@@ -22,7 +22,9 @@ Die Meldungen der Zeichnung einer Wand, in dieser Folge:
 - eine unübliche Dicke: ein Hinweis ([[opencivil.mauerwerk.pruefen#dickenhinweis|dickenhinweis]]).
 
 Wo die Lasten liegen, prüft [[opencivil.mauerwerk.pruefen#lasten_pruefen|lasten_pruefen]], sobald die Zeichnung
-rechnet: eine Last neben der Wand oder in einer Öffnung ist rot.
+rechnet: eine Last neben der Wand oder in einer Öffnung ist rot, ebenso eine,
+die waagrecht tiefer schiebt als bis zum oberen Rand der höchsten Öffnung –
+darunter rechnet das Werkzeug keine ([[opencivil.mauerwerk.scheibe|scheibe]]).
 
 Was nur fehlt, steht grau und hält die Rechnung an; was falsch ist, steht
 rot (Benutzer, 2026-11-19).
@@ -69,7 +71,8 @@ def lasten_pruefen(wand: Wand) -> List[Meldung]
 Je Last, die nicht ganz auf der Wand oder in einer Öffnung liegt, eine
 rote Meldung – nur für eine Wand, deren Zeichnung rechnet. Auf dem Rand
 einer Öffnung zählt nicht: oben liegt die Last am Sturz, unten auf der
-Brüstung.
+Brüstung. Dazu je Last, die waagrecht unter dem oberen Rand der höchsten
+Öffnung schiebt, eine rote.
 
 ### _in_oeffnung
 
@@ -107,6 +110,7 @@ Ein Hinweis, wenn `t_mm` keine übliche Dicke der Steine der Sorte
 - [[opencivil.core.sprache]]
 - [[opencivil.material.mauerwerk]]
 - [[opencivil.mauerwerk.modell]]
+- [[opencivil.mauerwerk.scheibe]]
 - [[opencivil.querschnitt.geometrie]]
 - [[opencivil.stabwerk.system]]
 

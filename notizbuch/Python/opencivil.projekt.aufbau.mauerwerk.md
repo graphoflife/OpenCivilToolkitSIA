@@ -1,5 +1,5 @@
 ---
-erzeugt: 855406a94b39
+erzeugt: 5e25facdd519
 art: modul
 tags: [modul]
 ---
@@ -22,10 +22,11 @@ Lastfälle teilt sie mit Balkensystem und Decke
 ## DIE NACHWEISE
 
 Je Pfeiler und Kombination die Normalkraft, je Sturzauflager und
-Kombination die Teilflächenpressung ([[opencivil.mauerwerk.nachweise]]).
-Wo sie stehen, hängt nur an der Zeichnung; darum werden sie hier gebaut,
-sobald die Zeichnung rechnet. Sonst sagt die Zusammenfassung, warum es noch
-keinen Nachweis gibt.
+Kombination die Teilflächenpressung ([[opencivil.mauerwerk.nachweise]]);
+je Pfeiler und Kombination, in der eine Last waagrecht schiebt, auch Schub
+und Gleiten ([[opencivil.mauerwerk.schub]]). Wo sie stehen, hängt nur an der
+Zeichnung; darum werden sie hier gebaut, sobald die Zeichnung rechnet. Sonst
+sagt die Zusammenfassung, warum es noch keinen Nachweis gibt.
 
 ## Inhalt
 
@@ -56,7 +57,8 @@ Kombination hat.
 def _nachweise(teil: Bauteil, objekt: Mauerwerkswand, wand: Wand, aufbau: Aufbau) -> None
 ```
 
-Je Pfeiler und Kombination die Normalkraft, je Sturzauflager die Teilflächen.
+Je Pfeiler und Kombination die Normalkraft – wo eine Last waagrecht
+schiebt, auch Schub und Gleiten –, je Sturzauflager die Teilflächen.
 
 
 ## Konstanten
@@ -72,6 +74,7 @@ Je Pfeiler und Kombination die Normalkraft, je Sturzauflager die Teilflächen.
 - [[opencivil.mauerwerk.modell]]
 - [[opencivil.mauerwerk.nachweise]]
 - [[opencivil.mauerwerk.pruefen]]
+- [[opencivil.mauerwerk.schub]]
 - [[opencivil.mauerwerk.werk]]
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.aufbau.faelle]]
