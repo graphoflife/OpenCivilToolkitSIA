@@ -6147,9 +6147,10 @@
       "name": "opencivil.core.sprache",
       "pfad": "Python/opencivil.core.sprache.md",
       "art": "modul",
-      "kurz": "wie das Werkzeug eine Liste von Woertern in einen Satz setzt.",
+      "kurz": "wie das Werkzeug Woerter in einen Satz setzt.",
       "stichworte": [
-        "aufgezaehlt"
+        "aufgezaehlt",
+        "satzanfang"
       ]
     },
     {
@@ -6779,6 +6780,7 @@
         "Versatz",
         "Dicken",
         "Dicken.aussen",
+        "Dicken.vorfahren",
         "Dicken.h_von",
         "Dicken.d_von",
         "Dicken.versatz",
@@ -6901,7 +6903,10 @@
       "kurz": "was die Zusammenfassung einer",
       "stichworte": [
         "angaben",
-        "kennwerttabelle"
+        "kennwerttabelle",
+        "_leistenzeilen",
+        "_zeile",
+        "_kraft"
       ]
     },
     {
@@ -6927,8 +6932,12 @@
         "Platz",
         "Platz.mit_bereichen",
         "Ort",
+        "Ort.anhang",
         "_Werte",
         "nachweisen",
+        "am_ort",
+        "_werte",
+        "_am_ort",
         "_warum_keines",
         "_verankerung_schreiben",
         "_tabelle_21_pruefen",
@@ -6949,6 +6958,7 @@
         "Rotation",
         "Biegelage",
         "Stufenbefund",
+        "Stufenurteile",
         "Wegbefund",
         "Durchstanzbefund",
         "Durchstanzbefund.ohne_einwirkung",
@@ -6976,7 +6986,6 @@
         "Durchstanzen._weg_pruefen",
         "Durchstanzen._platz",
         "Durchstanzen._ohne_eigene",
-        "Durchstanzen.nicht_fuehrbar",
         "Durchstanzen.pruefe"
       ]
     },
@@ -7147,10 +7156,23 @@
         "stufen",
         "_innerhalb",
         "Bereichswerte",
+        "Stufenwerte",
         "bereiche_schreiben",
         "rotation_schreiben",
         "stufe_schreiben",
         "vergleich_schreiben"
+      ]
+    },
+    {
+      "name": "opencivil.durchstanzen.stufenleisten",
+      "pfad": "Python/opencivil.durchstanzen.stufenleisten.md",
+      "art": "modul",
+      "kurz": "Leisten an der Stufe eines Bereichs zur Stütze hin.",
+      "stichworte": [
+        "moeglich",
+        "grade",
+        "nachweisen",
+        "_platz"
       ]
     },
     {
@@ -12459,6 +12481,7 @@
       "stichworte": [
         "wahlen",
         "situation",
+        "_leisten",
         "_mit_schnitt",
         "_ansicht",
         "_stufe",
@@ -12466,6 +12489,7 @@
         "_bis_zum_umriss",
         "_linien",
         "_legende",
+        "_leistenzeilen",
         "_schnittzeilen",
         "_gesamtzeile",
         "_stufenzeilen",

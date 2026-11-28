@@ -86,7 +86,9 @@ export function grundrissTeile(s, bild, sicht, aussparungen = s.aussparungen,
   for (const a of aussparungen) teile.push(...aussparungTeile(px(a)));
   teile.push(svgEl('path', { d: pfadVon(px(s.umriss), true), class: 'ds-stuetze' }));
   if (s.pilz) teile.push(...pilzTeile(s.pilz, px));
-  if (s.leisten) teile.push(...leistenTeile(s.leisten, px));
+  for (const b of [s.leisten, ...s.stufen.map((st) => st.leisten)]) {
+    if (b) teile.push(...leistenTeile(b, px));
+  }
   for (const l of s.schnitt) {
     teile.push(linie(px(l.punkte), l.zaehlt ? 'ds-schnitt' : 'ds-schnitt-nicht'));
   }
@@ -127,9 +129,10 @@ function pilzTeile(pilz, px) {
 }
 
 /**
- * Die Durchstanzbewehrung: je Leiste eine Linie vom Rand der gestützten Fläche
- * bis zum letzten Anker, die Anker als Punkte, und der äussere Schnitt um sie
- * (Figur 26) -- was nicht zählt, gestrichelt.
+ * Eine Durchstanzbewehrung -- an der Stütze oder an der Stufe eines Bereichs:
+ * je Leiste eine Linie vom Rand der gestützten Fläche bis zum letzten Anker,
+ * die Anker als Punkte, und der äussere Schnitt um sie (Figur 26) -- was
+ * nicht zählt, gestrichelt.
  */
 function leistenTeile(b, px) {
   const teile = b.aussen.map((l) => linie(px(l.punkte), l.zaehlt ? 'ds-aussen' : 'ds-aussen-nicht'));
@@ -166,7 +169,8 @@ export function grundrissUmfang(s) {
   const linien = (schnitt) => schnitt.flatMap((l) => l.punkte);
   const punkte = [...s.umriss, ...linien(s.schnitt), ...s.aussparungen.flat(),
     ...s.bereiche.flatMap((b) => b.punkte), ...s.stufen.flatMap((st) => linien(st.schnitt)),
-    ...linien(s.weg), ...(s.leisten ? linien(s.leisten.aussen) : []),
+    ...linien(s.weg),
+    ...[s.leisten, ...s.stufen.map((st) => st.leisten)].flatMap((b) => (b ? linien(b.aussen) : [])),
     ...(s.pilz ? linien(s.pilz.schnitt) : [])];
   const xs = punkte.map((p) => p[0]);
   const ys = punkte.map((p) => p[1]);

@@ -7,6 +7,47 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-28 · Durchstanzen: Leisten an den Stufen (Schritt 13d, zweiter Teil)
+
+Hält der Schnitt an der Stufe eines Bereichs zur Stütze hin nicht (Figur
+24a), schlägt das Werkzeug dort eigene Leisten vor: ausserhalb des
+Bereichs, an seine Stufe gesetzt wie an eine Stütze, so hoch, wie die
+Platte jenseits dick ist. Sie haben dieselben vier Nachweise wie an der
+Stütze, mit eigenen Urteilen; der Schnitt an der Stufe urteilt dann nicht
+mehr, sein Grad bleibt ein Wert der Herleitung – wie an der Stütze. Nach
+Vorgabe, nicht nachgeschlagen: die Norm regelt Leisten an einer Stufe nicht.
+
+- **Vorher – nachher:** dasselbe Beispiel, V_d = 400 kN. Vorher stand an
+  der Stufe «nicht erfüllt» (366.1 kN) mit dem Hinweis, dort schlage das
+  Werkzeug noch keine Bewehrung vor. Jetzt: 24 ancoPLUS DX3-0175 um den
+  Kopf, 175 mm hoch, alle vier Nachweise an der Stufe erfüllt, der
+  kleinste Grad 1.10 ausserhalb. Die 8 Leisten im Kopf an der Stütze
+  bleiben.
+- **Nur an der Stufe:** ein Kopf 900 × 900 mm mit 400 mm hält bei
+  V_d = 380 kN um die Stütze ohne Bewehrung (389.6 kN), an der Stufe nicht
+  (366.1 kN): Leisten stehen nur an der Stufe.
+- **Kein Platz:** liegt der Kopf in einem Bereich, der nur 70 mm weiter
+  reicht, heisst es «Bereich B2 ist zu klein für Leisten an der Stufe von
+  Bereich B1»; mit dünneren Bereichen ringsum 50 mm vor dem Kopf «An der
+  Stufe von Bereich B1 ist zu wenig Platz für Leisten». Die Gründe nennen
+  jetzt den Ort, auch an der Stütze («… für Leisten an der Stütze»), und
+  unter dem Bild steht jeder Grund einmal.
+- **Werte:** d, d_v, k_e, u, k_r und die Querkraft des Schnitts an der
+  Stufe, ψ der Stütze; in (69) gilt d an der Stufe. k_sys wie an der
+  Stütze, an einer Innenstütze also erhöht.
+- **Nicht:** auf der Gegenseite (Figur 24c) und am Schnitt durch
+  verschiedene Dicken; dort bleibt der Hinweis.
+- **Bild und Tabelle:** der Grundriss zeigt die Leisten an der Stufe mit
+  ihrem äusseren Schnitt; Legende und Tabelle der Zusammenfassung haben
+  einen eigenen Block, die Zeichen mit «,B1». Die Ansicht zeigt weiter eine
+  Leiste an der Stütze.
+- **Nebenbei:** die letzte Zeile der Legende sagte «Alle Nachweise
+  erfüllt», auch wo sich einige nicht führen liessen; jetzt steht dort
+  «Die übrigen Nachweise erfüllt».
+- Gebaut: `durchstanzen/stufenleisten.py`. `mit_bewehrung.am_ort` rechnet
+  an einem Ort ausser der Stütze; ein `Ort` trägt seine vier Grade, und
+  `stufen.stufe_schreiben` gibt alle Werte des Schnitts zurück.
+
 ## 2026-11-28 · Durchstanzen: Leisten an der Stütze mit Plattenbereichen (Schritt 13d, erster Teil)
 
 Hält der Schnitt um die Stütze nicht, schlägt das Werkzeug jetzt auch mit

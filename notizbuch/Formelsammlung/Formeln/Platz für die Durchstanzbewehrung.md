@@ -1,5 +1,5 @@
 ---
-erzeugt: 2540cad14ec9
+erzeugt: f0e43be54284
 art: formel
 tags: [formel]
 ---
@@ -30,7 +30,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.durchstanzen.mit_bewehrung#nachweisen|nachweisen]]
+- [[opencivil.durchstanzen.mit_bewehrung#_werte|_werte]]
 
 ## Themen
 

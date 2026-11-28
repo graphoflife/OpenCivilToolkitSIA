@@ -1,5 +1,5 @@
 ---
-erzeugt: 65c8ac0008a7
+erzeugt: e0d3756ec3e4
 art: modul
 tags: [modul]
 ---
@@ -43,9 +43,10 @@ schwächste Schnitt durch verschiedene Dicken dazu, auch mit eigenem Urteil
 ([[opencivil.durchstanzen.weg|.weg]]); weiter draussen geht ein Bereich nicht ein. Bereiche an
 Wänden rechnet das Werkzeug noch nicht; die Herleitung sagt es. Leisten
 schlägt es an der Stütze vor, im innersten Bereich um sie und ausserhalb der
-übrigen ([[opencivil.durchstanzen.mit_bewehrung#Platz|.mit_bewehrung.Platz]]); an den Schnitten der Stufen und
-durch verschiedene Dicken zählen sie nicht, und dort schlägt es noch keine
-eigenen vor.
+übrigen ([[opencivil.durchstanzen.mit_bewehrung#Platz|.mit_bewehrung.Platz]]), und an jeder Stufe zur Stütze hin,
+deren Schnitt ohne sie nicht hält ([[opencivil.durchstanzen.stufenleisten|.stufenleisten]]). An den Stufen der
+Gegenseite und am Schnitt durch verschiedene Dicken zählen die Leisten an
+der Stütze nicht, und dort schlägt es keine eigenen vor.
 
 
 ## DIE PLATTENROTATION (4.3.6.4.2)
@@ -128,10 +129,28 @@ class Stufenbefund
 ```
 
 Eine Stufe mit ihrem Schnitt und seinem Widerstand – der fehlt ohne
-Einwirkung und wo die Stufe keinen eigenen Schnitt hat.
+Einwirkung und wo die Stufe keinen eigenen Schnitt hat – und die Leisten
+an ihr, wo der Schnitt ohne sie nicht hält ([[opencivil.durchstanzen.stufenleisten|.stufenleisten]]).
 
 - `stufe: Stufe`
 - `V_Rd_c: Optional[float] = None`
+- `leisten: Optional[Leistenpruefung] = None`
+
+### Stufenurteile
+
+```python
+@dataclass(frozen=True)
+class Stufenurteile
+```
+
+Was die Schnitte an den Stufen ergeben: die Urteile in der Reihe der
+Stufen, unter ihnen die der Schnitte ohne eigene Leisten, die Grade ohne
+Bewehrung, wo Leisten stehen, und die Befunde.
+
+- `urteile: Tuple[NachweisUrteil, ...]`
+- `ohne_eigene: Tuple[NachweisUrteil, ...]`
+- `werte: Dict[str, Groesse]`
+- `befunde: Tuple[Stufenbefund, ...]`
 
 ### Wegbefund
 
@@ -283,7 +302,7 @@ Definition, die V_Rd,c belegt – sonst ein Zwischenwert.
 #### Stuetzenrechnung._stufe_schreiben
 
 ```python
-def _stufe_schreiben(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, g: Stuetzenschnitt, r: Widerstand, st: Stufe, V_d: Optional[Wert]=None) -> Optional[Tuple[Wert, Wert]]
+def _stufe_schreiben(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, g: Stuetzenschnitt, r: Widerstand, st: Stufe, V_d: Optional[Wert]=None) -> Optional[Stufenwerte]
 ```
 
 Der Schnitt an einer Stufe ([[opencivil.durchstanzen.stufen#stufe_schreiben|.stufen.stufe_schreiben]]) mit ψ und k_g der Stütze.
@@ -401,10 +420,13 @@ und das Verformungsvermögen (67).
 #### Durchstanzen._stufen_pruefen
 
 ```python
-def _stufen_pruefen(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, g: Stuetzenschnitt, r: Widerstand) -> Tuple[List[NachweisUrteil], Tuple[Stufenbefund, ...]]
+def _stufen_pruefen(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, g: Stuetzenschnitt, r: Widerstand) -> Stufenurteile
 ```
 
-Die Schnitte an den Stufen, je mit eigenem Urteil (4.3.6.2.7).
+Die Schnitte an den Stufen, je mit eigenem Urteil (4.3.6.2.7). Hält
+einer zur Stütze hin nicht, kommen Leisten an seine Stufe
+([[opencivil.durchstanzen.stufenleisten|.stufenleisten]]): dann urteilen ihre vier Nachweise, und sein
+Grad bleibt ein Wert der Herleitung – wie an der Stütze.
 
 #### Durchstanzen._weg_pruefen
 
@@ -430,17 +452,10 @@ umschliessen. Ohne Bereiche, und an Wänden, in der ganzen Platte.
 def _ohne_eigene(self, p: Protokoll, weitere: List[NachweisUrteil], *, an_der_stuetze: bool) -> None
 ```
 
-Ein Hinweis, wo ein Schnitt an einer Stufe oder durch verschiedene
-Dicken nicht hält: dort schlägt das Werkzeug noch keine Bewehrung vor,
-und die Leisten an der Stütze, wo es welche gibt, zählen nicht.
-
-#### Durchstanzen.nicht_fuehrbar
-
-```python
-def nicht_fuehrbar(self, grund: str) -> List[NachweisUrteil]
-```
-
-Die vier Urteile mit Durchstanzbewehrung, wo sich keine finden liess.
+Ein Hinweis, wo ein Schnitt ohne eigene Leisten nicht hält – an einer
+Stufe auf der Gegenseite oder durch verschiedene Dicken: dort schlägt
+das Werkzeug noch keine Bewehrung vor, und die Leisten an der Stütze,
+wo es welche gibt, zählen nicht.
 
 #### Durchstanzen.pruefe
 
@@ -471,6 +486,7 @@ def pruefe(self, e: Eingaben, p: Protokoll) -> Ausfuehrung
 - [[opencivil.durchstanzen.schnitt]]
 - [[opencivil.durchstanzen.stelle]]
 - [[opencivil.durchstanzen.stufen]]
+- [[opencivil.durchstanzen.stufenleisten]]
 - [[opencivil.durchstanzen.weg]]
 - [[opencivil.nachweis.querkraft_ohne_buegel]]
 - [[opencivil.querschnitt.platte]]
@@ -481,6 +497,7 @@ def pruefe(self, e: Eingaben, p: Protokoll) -> Ausfuehrung
 - [[opencivil.durchstanzen.kennwerte]]
 - [[opencivil.durchstanzen.kennzahl]]
 - [[opencivil.durchstanzen.mit_bewehrung]]
+- [[opencivil.durchstanzen.stufenleisten]]
 - [[opencivil.projekt.aufbau.durchstanzen]]
 - [[opencivil.web.durchstanzdaten]]
 

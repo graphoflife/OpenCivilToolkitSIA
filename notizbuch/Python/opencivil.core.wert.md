@@ -1,5 +1,5 @@
 ---
-erzeugt: d4679c018f6a
+erzeugt: 914df59e3dcd
 art: modul
 tags: [modul]
 ---
@@ -315,6 +315,7 @@ def beschreibung(self) -> str
 - [[opencivil.durchstanzen.nachweis]]
 - [[opencivil.durchstanzen.stelle]]
 - [[opencivil.durchstanzen.stufen]]
+- [[opencivil.durchstanzen.stufenleisten]]
 - [[opencivil.durchstanzen.weg]]
 - [[opencivil.erdbeben.ersatzkraft]]
 - [[opencivil.erdbeben.kern]]

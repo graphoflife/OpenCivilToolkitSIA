@@ -1,5 +1,5 @@
 ---
-erzeugt: 04475c325f96
+erzeugt: 70ec58dc5818
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -29,7 +29,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.core.protokoll]] – Mitschrift einer Berechnung.
     - [[opencivil.core.rechenobjekt]] – was ein Bauteil im Rechenwerk ist.
     - [[opencivil.core.rechenwerk]] – Registrierung und Aufloesung von Berechnungen.
-    - [[opencivil.core.sprache]] – wie das Werkzeug eine Liste von Woertern in einen Satz setzt.
+    - [[opencivil.core.sprache]] – wie das Werkzeug Woerter in einen Satz setzt.
     - [[opencivil.core.suche]] – wo eine steigende Funktion null wird.
     - [[opencivil.core.vorgaben]] – die Zahlen, die ein Nachweis aus seiner Beschreibung liest.
     - [[opencivil.core.wahl]] – was ein Wahlfeld annehmen kann.
@@ -72,6 +72,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.durchstanzen.schnitt]] – der Nachweisschnitt um die gestützte Fläche.
     - [[opencivil.durchstanzen.stelle]] – die Durchstanzstelle: Platte, gestützte Fläche, Bewehrung, Last.
     - [[opencivil.durchstanzen.stufen]] – Plattenbereiche um die Stütze: d an ihr, Schnitte an den Stufen.
+    - [[opencivil.durchstanzen.stufenleisten]] – Leisten an der Stufe eines Bereichs zur Stütze hin.
     - [[opencivil.durchstanzen.systeme]] – woraus die Durchstanzbewehrung besteht.
     - [[opencivil.durchstanzen.weg]] – ein Schnitt um die Stütze durch verschiedene Dicken.
 - [[opencivil.erdbeben]] – Erdbeben nach SIA 261:2020, Kapitel 16.

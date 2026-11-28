@@ -2,9 +2,10 @@
 Durchstanzbewehrung mit Plattenbereichen (opencivil.durchstanzen.mit_bewehrung,
 Platz, und .bewehrung.setzen): die Leisten an der Stütze stehen im innersten
 Bereich um sie, so hoch, wie er dick ist, und bleiben c_nom vor seiner Stufe
-und ausserhalb der übrigen Bereiche; passt keine, sagt es die Herleitung. Die
-Schnitte an den Stufen und durch verschiedene Dicken behalten ihr Urteil, die
-Leisten zählen dort nicht. Dazu, was die Ansicht der Leiste zeigt.
+und ausserhalb der übrigen Bereiche; passt keine, sagt es die Herleitung. Der
+Schnitt durch verschiedene Dicken behält sein Urteil, die Leisten zählen dort
+nicht; die Leisten an den Stufen prüft tests.test_durchstanzen_stufenleisten.
+Dazu, was die Ansicht der Leiste zeigt.
 
 Das Beispiel des Plans vom 2026-11-27 (tests.test_durchstanzen_bereiche) mit
 V_d = 400 kN: um die Stütze hält es ohne Bewehrung nicht (335.4 kN), an der
@@ -23,7 +24,6 @@ from tests.test_durchstanzen_bereiche import mit_bereich, quadrat
 from tests.test_durchstanzen_weg import STREIFEN, WEG, mit_streifen
 
 C_NOM = 0.030
-STUFE = "an der Stufe von Bereich B1"
 
 #: Vier dünnere Bereiche rund um die Stütze 400 × 400 mm, je 50 mm vor ihr, in mm.
 RING = ([[-650, -650], [-250, -650], [-250, 650], [-650, 650]],
@@ -79,20 +79,17 @@ class TestImStuetzenkopf(unittest.TestCase):
         self.assertAlmostEqual(self.leisten.vorschlag.h_A, 0.255)
         self.assertAlmostEqual(rechnen(ohne_bereich(400.0))[2].leisten.vorschlag.h_A, 0.175)
 
-    def test_die_stufe_behaelt_ihr_urteil(self):
+    def test_urteile_an_der_stuetze(self):
         f = faelle(self.loesung)
         for fall in MIT:
             self.assertTrue(f[fall].erfuellt, fall)
-        self.assertFalse(f[STUFE].erfuellt)
-        self.assertAlmostEqual(f[STUFE].erfuellungsgrad.si, 366.1 / 400.0, delta=1e-3)
         self.assertNotIn("ohne Durchstanzbewehrung", f)
 
     def test_herleitung(self):
         t = texte(self.loesung)
         self.assertIn("über die Stufe eines Plattenbereichs", t)
-        self.assertIn("In (69) gilt dasselbe ψ wie für V_Rd,c", t)
-        self.assertIn("An der Stufe von Bereich B1 zählen die Leisten an der Stütze nicht, und "
-                      "eigene schlägt das Werkzeug dort noch nicht vor.", t)
+        self.assertIn("In (69) gilt dasselbe ψ wie für V_Rd,c: ψ ist die Drehung der Platte um "
+                      "die Stütze; d ist das an der Stütze", t)
 
     def test_sigma_sd_mit_psi_der_platte_und_d_an_der_stuetze(self):
         """
@@ -109,7 +106,10 @@ class TestImStuetzenkopf(unittest.TestCase):
 
 
 class TestZuKlein(unittest.TestCase):
-    """Ein Kopf 700 × 700 mm: 150 mm vor der Stütze die Stufe -- keine Leiste behält genug Anker."""
+    """
+    Ein Kopf 700 × 700 mm: 150 mm vor der Stütze die Stufe -- keine Leiste
+    behält genug Anker. An der Stufe stehen Leisten (tests.test_durchstanzen_stufenleisten).
+    """
 
     @classmethod
     def setUpClass(cls):
@@ -121,20 +121,21 @@ class TestZuKlein(unittest.TestCase):
         f = faelle(self.loesung)
         for fall in MIT:
             self.assertTrue(f[fall].offen, fall)
-            self.assertEqual(f[fall].begruendung, "Bereich B1 ist zu klein für Leisten.")
+            self.assertEqual(f[fall].begruendung,
+                             "Bereich B1 ist zu klein für Leisten an der Stütze.")
         t = texte(self.loesung)
-        self.assertIn("Bereich B1 ist zu klein für Leisten: mit c_nom Abstand zu seiner Stufe "
-                      "behält keine Leiste genug Anker.", t)
+        self.assertIn("Bereich B1 ist zu klein für Leisten an der Stütze: mit c_nom Abstand zu "
+                      "seiner Stufe behält keine Leiste genug Anker.", t)
         self.assertIn("Mit Plattenbereichen sucht das Werkzeug noch keinen Stahlpilz.", t)
-        self.assertIn("An der Stufe von Bereich B1 schlägt das Werkzeug noch keine "
-                      "Durchstanzbewehrung vor.", t)
 
     def test_legende(self):
+        """Wo sich nicht alle Nachweise führen liessen, stehen die übrigen für sich."""
         s = situation(self.aufbau, self.p.durchstanzstellen[0].kennung, self.loesung)
         self.assertIsNone(s["ansicht"])
-        self.assertIn("Bereich B1 ist zu klein für Leisten. Die Nachweise mit "
-                      "Durchstanzbewehrung sind darum nicht geführt.",
-                      [satz(z) for z in s["legende"]])
+        legende = [satz(z) for z in s["legende"]]
+        self.assertIn("Bereich B1 ist zu klein für Leisten an der Stütze. Die Nachweise mit "
+                      "Durchstanzbewehrung sind darum nicht geführt.", legende)
+        self.assertTrue(legende[-1].startswith("Die übrigen Nachweise erfüllt"))
 
     def test_kein_platz_rundum(self):
         """Vier dünnere Bereiche je 50 mm vor der Stütze: neben ihr ist zu wenig Platz."""
@@ -216,7 +217,7 @@ class TestAnsicht(unittest.TestCase):
                                               loesung)["legende"]]
         self.assertTrue(any(z.startswith("Durchstanzbewehrung: 8 × ancoPLUS") for z in legende))
         self.assertTrue(any(z.startswith("An der Stufe von Bereich B1") for z in legende))
-        self.assertTrue(legende[-1].startswith("Nicht alle Nachweise erfüllt"))
+        self.assertTrue(legende[-1].startswith("Alle Nachweise erfüllt"))
 
     def test_rechnet_auf_der_seite(self):
         """Wie die Seite rechnet, samt Formelsammlung."""

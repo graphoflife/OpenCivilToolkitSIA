@@ -1,5 +1,5 @@
 ---
-erzeugt: e73ff8a3898e
+erzeugt: 40eb4589b91a
 art: modul
 tags: [modul]
 ---
@@ -58,7 +58,9 @@ Die Leisten an der Stütze sind so hoch, wie die Platte dort dick ist, und
 bleiben c_nom vor jeder Stufe ([[opencivil.durchstanzen.bewehrung#setzen|.bewehrung.setzen]]). ψ ist in (69)
 dasselbe wie für V_Rd,c: die Drehung der Platte um die Stütze. Einen
 Stahlpilz sucht das Werkzeug mit Bereichen nicht – beides nach Vorgabe,
-nicht nachgeschlagen.
+nicht nachgeschlagen. Dieselben Schritte gelten an der Stufe eines Bereichs
+([[opencivil.durchstanzen.mit_bewehrung#am_ort|am_ort]], [[opencivil.durchstanzen.stufenleisten|.stufenleisten]]), mit eigenen Graden je Ort
+([[opencivil.durchstanzen.mit_bewehrung#Ort|Ort.ziele]]).
 
 
 ## EINHEITEN
@@ -99,7 +101,7 @@ class Platz
 ```
 
 Wo die Leisten liegen dürfen, wenn es Plattenbereiche gibt: `h` ist die
-Dicke an der Stütze, `innerhalb` der Bereich, in dem sie stehen, und
+Dicke, wo sie stehen, `innerhalb` der Bereich, in dem sie stehen, und
 `hindernisse` die übrigen – von jeder Stufe bleiben sie c_nom weg.
 
 - `h: Wert`
@@ -121,22 +123,34 @@ def mit_bereichen(self) -> bool
 class Ort
 ```
 
-Wo die Leisten ansetzen: an der Stütze oder um den Stahlpilz (4.3.6.6.2) –
-die gestützte Fläche, der Schnitt um sie und die Werte, mit denen die
-Herleitung ihn zeigt.
+Wo die Leisten ansetzen: an der Stütze, um den Stahlpilz (4.3.6.6.2) oder
+an der Stufe eines Bereichs ([[opencivil.durchstanzen.stufenleisten|.stufenleisten]]) – die gestützte
+Fläche, der Schnitt um sie, die Grade ihrer Nachweise und die Werte, mit
+denen die Herleitung ihn zeigt.
 
-- `zusatz: str` – Was hinter dem Namen eines Urteils steht: leer, oder «um den Stahlpilz».
-- `vorsilbe: str` – Die Vorsilbe der Zwischenwerte, damit Stütze und Pilz nebeneinander stehen können.
+- `zusatz: str` – Was hinter dem Namen eines Urteils steht: leer an der Stütze, sonst «um den Stahlpilz» oder «an der Stufe von Bereich B1».
+- `vorsilbe: str` – Die Vorsilbe der Zwischenwerte, damit die Orte nebeneinander stehen können.
 - `umriss: Tuple[Punkt, ...]`
 - `r_zu: Callable[[float], Sequence[Stueck]]` – Der geschlossene Schnitt im Abstand r um die gestützte Fläche.
 - `pruefung: Schnittpruefung`
 - `ausnahme: bool` – Ob der Faktor des Gutachtens erhöht ist – Innenstütze und Wandende.
 - `schatten: Tuple[Schatten, ...]` – Die Schatten der Aussparungen am Schnitt um diese Fläche: dort liegt keine Leiste.
+- `ziele: Tuple[WertDef, ...]` – Die Grade der vier Nachweise, in der Reihe von [[opencivil.durchstanzen.mit_bewehrung#Konstanten|FAELLE]].
+- `zu_69: str = ''` – Was die Herleitung zu ψ und d in (69) sagt – leer: nichts.
 - `d_v: Optional[Wert] = None`
 - `k_e: Optional[Wert] = None`
 - `u: Optional[Wert] = None`
 - `V_d: Optional[Wert] = None`
 - `V_Rd_c: Optional[Wert] = None` – Wie die Herleitung den Schnitt zeigt – fehlt nur in der stummen Suche nach dem Pilz.
+
+#### Ort.anhang
+
+```python
+@property
+def anhang(self) -> str
+```
+
+Was an den Namen eines Falls kommt: nichts an der Stütze, sonst « um den Stahlpilz».
 
 ### _Werte
 
@@ -164,11 +178,41 @@ Herleitung. f_yd und E_s sind die des Stahls der Anker.
 def nachweisen(n: 'Durchstanzen', e: Eingaben, p: Protokoll, w: Zwischenwerte, g: Grundlage, platz: Optional[Platz]=None) -> Tuple[List[NachweisUrteil], Optional[Leistenpruefung], Optional[Pilzbefund]]
 ```
 
-Die Durchstanzbewehrung suchen und mit ihr nachweisen – und wo die erste
-Druckdiagonale an einer Innenstütze bricht, einen Stahlpilz. Zurück kommen
-die Urteile, die Leisten und der Pilz, so weit es sie gibt. `platz`
-sagt, wo es Plattenbereiche gibt, wie dick die Platte an der Stütze ist
-und wo die Leisten liegen dürfen.
+Die Durchstanzbewehrung an der Stütze suchen und mit ihr nachweisen –
+und wo die erste Druckdiagonale an einer Innenstütze bricht, einen
+Stahlpilz. Zurück kommen die Urteile, die Leisten und der Pilz, so weit es
+sie gibt. `platz` sagt, wo es Plattenbereiche gibt, wie dick die Platte
+an der Stütze ist und wo die Leisten liegen dürfen.
+
+### am_ort
+
+```python
+def am_ort(n: 'Durchstanzen', e: Eingaben, p: Protokoll, w: Zwischenwerte, g: Grundlage, platz: Platz, ort: Ort) -> Tuple[List[NachweisUrteil], Optional[Leistenpruefung]]
+```
+
+Die Bewehrung an einem Ort ausser der Stütze – der Stufe eines Bereichs
+([[opencivil.durchstanzen.stufenleisten|.stufenleisten]]) –, mit denselben Schritten wie an der Stütze,
+aber ohne Stahlpilz. `g` ist, was der Schnitt dort ohne Bewehrung
+gerechnet hat.
+
+### _werte
+
+```python
+def _werte(n: 'Durchstanzen', e: Eingaben, p: Protokoll, w: Zwischenwerte, g: Grundlage, platz: Platz, k: str) -> _Werte
+```
+
+Was jede Rechnung mit Bewehrung an einem Ort braucht ([[opencivil.durchstanzen.mit_bewehrung#_Werte|_Werte]]),
+mit der Herleitung des Platzes für die Elemente – `k` ist die Vorsilbe
+des Orts.
+
+### _am_ort
+
+```python
+def _am_ort(n: 'Durchstanzen', p: Protokoll, w: Zwischenwerte, werte: _Werte, ort: Ort) -> Tuple[List[NachweisUrteil], Optional[Leistenpruefung]]
+```
+
+Die kleinste Bewehrung an `ort` mit ihren Nachweisen – oder, wo keine
+passt, der Grund am Ort und die vier Urteile offen.
 
 ### _warum_keines
 
@@ -179,7 +223,8 @@ def _warum_keines(n: 'Durchstanzen', werte: _Werte, ort: Ort) -> Tuple[str, str]
 Warum keine Leiste gesetzt ist, als Hinweis und als Grund der Urteile:
 das System passt nicht in die Platte – oder es fände Platz, liessen ihm
 die Stufen der Bereiche welchen. Das zweite prüft die Suche ohne die
-Bereiche; sie läuft nur hier, wo die erste nichts fand.
+Bereiche; sie läuft nur hier, wo die erste nichts fand. Ausser an der
+Stütze nennt der Grund den Ort, denn ein Urteil steht auch allein.
 
 ### _verankerung_schreiben
 
@@ -257,12 +302,18 @@ Die Herleitung mit dem gewählten Pilz: der Schnitt um ihn mit denselben
 Schritten wie um die Stütze, ohne Leisten oder mit Leisten um ihn.
 
 
+## Konstanten
+
+- `FAELLE = ('mit Durchstanzbewehrung', 'Verformungsvermögen', 'Betondruckdiagona…` – Die Fälle der vier Nachweise mit Durchstanzbewehrung (4.3.6.5.1), in der Reihe von [[opencivil.durchstanzen.mit_bewehrung#Ort|Ort.ziele]] – an einem anderen Ort als der Stütze folgt ihm sein [[opencivil.durchstanzen.mit_bewehrung#Ort|Ort.zusatz]].
+- `ZU_69_STUETZE = 'In (69) gilt dasselbe ψ wie für V_Rd,c: ψ ist die Drehung der Platte…` – Was die Herleitung zu ψ und d in (69) sagt, wo die Stütze in einem Bereich steht.
+
 ## Braucht
 
 - [[opencivil.core.berechnung]]
 - [[opencivil.core.einheiten]]
 - [[opencivil.core.nachweis]]
 - [[opencivil.core.protokoll]]
+- [[opencivil.core.sprache]]
 - [[opencivil.core.wert]]
 - [[opencivil.durchstanzen.bereiche]]
 - [[opencivil.durchstanzen.bewehrung]]
@@ -277,6 +328,7 @@ Schritten wie um die Stütze, ohne Leisten oder mit Leisten um ihn.
 ## Gebraucht von
 
 - [[opencivil.durchstanzen.nachweis]]
+- [[opencivil.durchstanzen.stufenleisten]]
 - [[opencivil.web.durchstanzdaten]]
 
 ## Formeln aus diesem Modul
@@ -285,7 +337,7 @@ Schritten wie um die Stütze, ohne Leisten oder mit Leisten um ihn.
 - [[Beitrag der Durchstanzbewehrung]] · `_leisten_schreiben`
 - [[Durchstanzbewehrung an der Fliessgrenze]] · `_leisten_schreiben`
 - [[Halbe Querkraft für das Verformungsvermögen]] · `_leisten_schreiben`
-- [[Platz für die Durchstanzbewehrung]] · `nachweisen`
+- [[Platz für die Durchstanzbewehrung]] · `_werte`
 - [[Querkraft für die Durchstanzbewehrung]] · `_leisten_schreiben`
 - [[Spannung in der Durchstanzbewehrung]] · `_leisten_schreiben`
 - [[Widerstand der ersten Betondruckdiagonale]] · `_leisten_schreiben`

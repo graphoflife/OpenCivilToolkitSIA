@@ -8,12 +8,13 @@ der Nachweisschnitt -- je Stück, ob es zählt --, und wo es sie braucht, die
 Leisten mit ihren Ankern und dem äusseren Schnitt und der Stahlpilz mit seinen
 Stegen und dem Schnitt um ihn, je für sich. Die Plattenbereiche mit ihrer
 Dicke, an jeder Stufe ihr Schnitt, je in seiner Farbe (:data:`STUFENFARBEN`),
-und der Schnitt durch verschiedene Dicken. Dazu die Legende unter dem Bild
+und wo er ohne sie nicht hält, die Leisten an ihr; dazu der Schnitt durch
+verschiedene Dicken. Dazu die Legende unter dem Bild
 (:mod:`opencivil.web.anzeige`): die Schnitte mit ihren Zahlen und das Urteil.
 Gezeichnet wird in der Oberflaeche, gerechnet nichts: die Linien kommen aus
 dem Befund des Nachweises (:mod:`opencivil.durchstanzen.nachweis`).
 
-Wo es Durchstanzbewehrung braucht, auch eine Leiste in der Ansicht
+Wo es an der Stütze Durchstanzbewehrung braucht, auch eine Leiste in der Ansicht
 (:func:`_ansicht`): längs geschnitten, mit Platte, Zugbewehrung, Stütze und
 Pilz, den Elementen und dem Bereich, in dem sie zählen -- in mm, x ab dem
 Rand der gestützten Fläche, z ab der Druckseite.
@@ -42,6 +43,7 @@ from opencivil.durchstanzen.bewehrung import BEREICH_VON, Leiste
 from opencivil.durchstanzen.flaeche import Lage, Stuetzenform
 from opencivil.durchstanzen.mit_bewehrung import Platz
 from opencivil.durchstanzen.nachweis import Durchstanzbefund, Stufenbefund
+from opencivil.durchstanzen.pruefung import Leistenpruefung
 from opencivil.durchstanzen.schnitt import Nachweisschnitt, Punkt
 from opencivil.durchstanzen.stelle import (
     NACH_DEN_MASSEN, VOR_DEN_MASSEN, Durchstanzstelle, KeArt, Naeherungsstufe, Plattenart,
@@ -108,7 +110,7 @@ def situation(aufbau: Aufbau, kennung: str, loesung: Loesung) -> Optional[Dict[s
     if befund is None:
         return None
     urteile = [u for u in loesung.urteile if u.raum == nachweis.id]
-    leisten, pilz = befund.leisten, befund.pilz
+    pilz = befund.pilz
     return {
         "umriss": punkte(befund.umriss, MM),
         "raender": [{"punkt": punkte([p], MM)[0], "richtung": richtung}
@@ -116,12 +118,7 @@ def situation(aufbau: Aufbau, kennung: str, loesung: Loesung) -> Optional[Dict[s
         "aussparungen": [punkte(x, MM) for x in befund.aussparungen],
         "schnitt": _linien(befund.innen.schnitt),
         "d_v": zahl(befund.innen.d_v, MM),
-        "leisten": None if leisten is None else {
-            "leisten": [{"wurzel": punkte([l.wurzel], MM)[0],
-                         "anker": punkte(l.anker(leisten.vorschlag.radien), MM)}
-                        for l in leisten.vorschlag.leisten],
-            "aussen": _linien(leisten.aussen.schnitt),
-        },
+        "leisten": _leisten(befund.leisten),
         "pilz": None if pilz is None else {
             "umriss": punkte(pilz.umriss, MM),
             "stege": [punkte(steg, MM) for steg in pilz.pilz.stege()],
@@ -130,12 +127,23 @@ def situation(aufbau: Aufbau, kennung: str, loesung: Loesung) -> Optional[Dict[s
         "bereiche": [{"name": b.name, "punkte": punkte(b.ecken, MM), "h": zahl(b.h, MM),
                       "seite": b.seite.value} for b in nachweis.stelle.bereiche],
         "stufen": [{"name": x.stufe.bereich.name, "farbe": i % len(STUFENFARBEN),
-                    "schnitt": _linien(x.stufe.pruefung.schnitt)}
+                    "schnitt": _linien(x.stufe.pruefung.schnitt), "leisten": _leisten(x.leisten)}
                    for i, x in enumerate(_mit_schnitt(befund))],
         "weg": [] if befund.weg is None else _linien(befund.weg.schnitt.last.schnitt),
-        "ansicht": None if leisten is None else _ansicht(befund, nachweis.stelle, loesung.werte),
+        "ansicht": (None if befund.leisten is None
+                    else _ansicht(befund, nachweis.stelle, loesung.werte)),
         "legende": _legende(befund, urteile, nachweis.stelle.bereiche),
     }
+
+
+def _leisten(pruefung: Optional[Leistenpruefung]) -> Optional[Dict[str, Any]]:
+    """Eine Durchstanzbewehrung im Grundriss: je Leiste Ansatz und Anker, der äussere Schnitt."""
+    if pruefung is None:
+        return None
+    v = pruefung.vorschlag
+    return {"leisten": [{"wurzel": punkte([l.wurzel], MM)[0],
+                         "anker": punkte(l.anker(v.radien), MM)} for l in v.leisten],
+            "aussen": _linien(pruefung.aussen.schnitt)}
 
 
 def _mit_schnitt(befund: Durchstanzbefund) -> List[Stufenbefund]:
@@ -261,10 +269,11 @@ def _legende(befund: Durchstanzbefund, urteile: Sequence[NachweisUrteil],
     Die Zeilen unter dem Bild: der Schnitt und was von ihm nicht zählt; ohne
     Bewehrung der Vergleich mit seinem Urteil, sonst was ohne sie fehlt, der
     Pilz und die Leisten mit ihren Schnitten -- und das Urteil über alle. Passt
-    kein Produkt, sagt die letzte Zeile das statt eines Grads: die Nachweise
-    mit Bewehrung sind dann nicht geführt (:attr:`NachweisUrteil.offen`).
-    Ohne Stützenkraft steht statt des Vergleichs der Satz aller Nachweise ohne
-    Einwirkung. Mit Plattenbereichen je Stufe ihr Schnitt, und die Zahlen
+    kein Produkt, sagt die letzte Zeile das statt eines Grads, mit jedem Grund
+    einmal: die Nachweise mit Bewehrung sind dann nicht geführt
+    (:attr:`NachweisUrteil.offen`). Ohne Stützenkraft steht statt des
+    Vergleichs der Satz aller Nachweise ohne Einwirkung. Mit Plattenbereichen
+    je Stufe ihr Schnitt und, wo sie welche hat, ihre Leisten, und die Zahlen
     stehen je Schnitt.
     """
     innen, b, pilz = befund.innen, befund.leisten, befund.pilz
@@ -307,25 +316,41 @@ def _legende(befund: Durchstanzbefund, urteile: Sequence[NachweisUrteil],
                   Mathe(f"V_{{Rd,c,P}} = {_kraft(pilz.V_Rd_c)}"), "."),
         ]
     if b is not None:
-        v = b.vorschlag
-        abstaende = r"\,/\,".join(Groesse.aus_si(x, MM).formatiert(0) for x in v.abstaende)
-        zeilen += [
-            zeile(f"Durchstanzbewehrung: {v.name} im Abstand ", Mathe(rf"{abstaende}\,\mathrm{{mm}}"),
-                  f" vom Rand {'des Pilzes' if pilz is not None else 'der Stütze'}."),
-            zeile("Äusserer Schnitt (orange) im Abstand ",
-                  zahlformel(r"0.5 \cdot d_{v,out}", b.aussen.d_v / 2, MM, 0),
-                  f" um die äussersten {v.system.ELEMENT}: ", zahlformel("u_{out}", b.aussen.u, MM, 0),
-                  ", ",
-                  Mathe(f"V_{{d,out}} = {_kraft(b.aussen.V_d_red)}"), ", ",
-                  Mathe(f"V_{{Rd,c,out}} = {_kraft(b.V_Rd_c_aussen)}"), "."),
-            zeile(Mathe(f"V_{{Rd,s}} = {_kraft(b.V_Rd_s)}"), ", ",
-                  Mathe(f"V_{{Rd,max}} = {_kraft(b.V_Rd_max)}"), "."),
-        ]
+        zeilen += _leistenzeilen(b, "Durchstanzbewehrung",
+                                 f"vom Rand {'des Pilzes' if pilz is not None else 'der Stütze'}")
+    for x in befund.stufen:
+        if x.leisten is not None:
+            bereich = x.stufe.bereich
+            zeilen += _leistenzeilen(
+                x.leisten, f"Durchstanzbewehrung an der Stufe von {bereich.titel}",
+                "von der Stufe", f",{bereich.name}")
     offen = [u for u in urteile if u.offen]
     if offen:
-        zeilen.append(zeile(f"{offen[0].hinweis} Die Nachweise mit Durchstanzbewehrung "
-                            "sind darum nicht geführt."))
-    return [*zeilen, _gesamtzeile(gefuehrt)] if gefuehrt else zeilen
+        gruende = " ".join(dict.fromkeys(u.hinweis for u in offen))
+        zeilen.append(zeile(f"{gruende} Die Nachweise mit Durchstanzbewehrung sind darum nicht "
+                            "geführt."))
+    return [*zeilen, _gesamtzeile(urteile)] if gefuehrt else zeilen
+
+
+def _leistenzeilen(b: Leistenpruefung, titel: str, vom: str, ix: str = "") -> List[list]:
+    """
+    Was die Legende von einer Durchstanzbewehrung sagt: Produkt und Abstände
+    ``vom`` Rand ihrer gestützten Fläche, der äussere Schnitt und was sie
+    trägt -- ``ix`` hängt an den Zeichen, «,B1» an der Stufe von Bereich B1.
+    """
+    v = b.vorschlag
+    abstaende = r"\,/\,".join(Groesse.aus_si(x, MM).formatiert(0) for x in v.abstaende)
+    return [
+        zeile(f"{titel}: {v.name} im Abstand ", Mathe(rf"{abstaende}\,\mathrm{{mm}}"), f" {vom}."),
+        zeile("Äusserer Schnitt (orange) im Abstand ",
+              zahlformel(rf"0.5 \cdot d_{{v,out{ix}}}", b.aussen.d_v / 2, MM, 0),
+              f" um die äussersten {v.system.ELEMENT}: ",
+              zahlformel(f"u_{{out{ix}}}", b.aussen.u, MM, 0), ", ",
+              Mathe(f"V_{{d,out{ix}}} = {_kraft(b.aussen.V_d_red)}"), ", ",
+              Mathe(f"V_{{Rd,c,out{ix}}} = {_kraft(b.V_Rd_c_aussen)}"), "."),
+        zeile(Mathe(f"V_{{Rd,s{ix}}} = {_kraft(b.V_Rd_s)}"), ", ",
+              Mathe(f"V_{{Rd,max{ix}}} = {_kraft(b.V_Rd_max)}"), "."),
+    ]
 
 
 def _schnittzeilen(befund: Durchstanzbefund) -> List[list]:
@@ -346,10 +371,17 @@ def _schnittzeilen(befund: Durchstanzbefund) -> List[list]:
 
 
 def _gesamtzeile(urteile: Sequence[NachweisUrteil]) -> list:
-    """Das Urteil über alle geführten Nachweise, mit dem kleinsten Grad."""
-    erfuellt, grad = _gesamt(urteile)
-    return zeile(f"{'Alle Nachweise erfüllt' if erfuellt else 'Nicht alle Nachweise erfüllt'}"
-                 ", kleinstes ", Mathe(rf"\alpha = {grad}"), ".")
+    """
+    Das Urteil über alle geführten Nachweise, mit dem kleinsten Grad. Liessen
+    sich nicht alle führen, sagt die Zeile davor warum, und hier steht «die
+    übrigen» -- bis 2026-11-28 stand dann «Alle Nachweise erfüllt».
+    """
+    gefuehrt = [u for u in urteile if not u.offen]
+    erfuellt, grad = _gesamt(gefuehrt)
+    text = ("Nicht alle Nachweise erfüllt" if not erfuellt
+            else "Die übrigen Nachweise erfüllt" if len(gefuehrt) < len(urteile)
+            else "Alle Nachweise erfüllt")
+    return zeile(f"{text}, kleinstes ", Mathe(rf"\alpha = {grad}"), ".")
 
 
 def _stufenzeilen(befund: Durchstanzbefund) -> List[list]:

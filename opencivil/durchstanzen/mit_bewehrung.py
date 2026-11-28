@@ -45,7 +45,9 @@ Die Leisten an der Stütze sind so hoch, wie die Platte dort dick ist, und
 bleiben c_nom vor jeder Stufe (:func:`.bewehrung.setzen`). ψ ist in (69)
 dasselbe wie für V_Rd,c: die Drehung der Platte um die Stütze. Einen
 Stahlpilz sucht das Werkzeug mit Bereichen nicht -- beides nach Vorgabe,
-nicht nachgeschlagen.
+nicht nachgeschlagen. Dieselben Schritte gelten an der Stufe eines Bereichs
+(:func:`am_ort`, :mod:`.stufenleisten`), mit eigenen Graden je Ort
+(:attr:`Ort.ziele`).
 
 EINHEITEN:
 SI-Basis; Kräfte in N.
@@ -58,10 +60,11 @@ from dataclasses import dataclass, replace
 from typing import TYPE_CHECKING, Callable, Dict, List, Optional, Sequence, Tuple
 
 from opencivil.core.berechnung import Eingaben
-from opencivil.core.nachweis import NachweisUrteil, Vergleich
+from opencivil.core.nachweis import NICHT_FUEHRBAR, NachweisUrteil, Vergleich
 from opencivil.core.einheiten import MM2, N_PRO_MM2, Groesse
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
-from opencivil.core.wert import Wert
+from opencivil.core.sprache import satzanfang
+from opencivil.core.wert import Wert, WertDef
 from opencivil.durchstanzen import herleitung, produkte
 from opencivil.durchstanzen.bereiche import Plattenbereich
 from opencivil.durchstanzen.bewehrung import Vorschlag, bemessen
@@ -80,6 +83,16 @@ from opencivil.querschnitt.geometrie import konvexe_huelle
 
 if TYPE_CHECKING:
     from opencivil.durchstanzen.nachweis import Durchstanzen
+
+#: Die Fälle der vier Nachweise mit Durchstanzbewehrung (4.3.6.5.1), in der
+#: Reihe von :attr:`Ort.ziele` -- an einem anderen Ort als der Stütze folgt ihm
+#: sein :attr:`Ort.zusatz`.
+FAELLE = ("mit Durchstanzbewehrung", "Verformungsvermögen", "Betondruckdiagonale",
+          "ausserhalb der Durchstanzbewehrung")
+
+#: Was die Herleitung zu ψ und d in (69) sagt, wo die Stütze in einem Bereich steht.
+ZU_69_STUETZE = ("In (69) gilt dasselbe ψ wie für V_Rd,c: ψ ist die Drehung der Platte um die "
+                 "Stütze; d ist das an der Stütze – nach Vorgabe, nicht nachgeschlagen.")
 
 
 @dataclass(frozen=True)
@@ -110,7 +123,7 @@ class Grundlage:
 class Platz:
     """
     Wo die Leisten liegen dürfen, wenn es Plattenbereiche gibt: ``h`` ist die
-    Dicke an der Stütze, ``innerhalb`` der Bereich, in dem sie stehen, und
+    Dicke, wo sie stehen, ``innerhalb`` der Bereich, in dem sie stehen, und
     ``hindernisse`` die übrigen -- von jeder Stufe bleiben sie c_nom weg.
     """
 
@@ -128,16 +141,20 @@ class Platz:
 @dataclass(frozen=True)
 class Ort:
     """
-    Wo die Leisten ansetzen: an der Stütze oder um den Stahlpilz (4.3.6.6.2) --
-    die gestützte Fläche, der Schnitt um sie und die Werte, mit denen die
-    Herleitung ihn zeigt.
+    Wo die Leisten ansetzen: an der Stütze, um den Stahlpilz (4.3.6.6.2) oder
+    an der Stufe eines Bereichs (:mod:`.stufenleisten`) -- die gestützte
+    Fläche, der Schnitt um sie, die Grade ihrer Nachweise und die Werte, mit
+    denen die Herleitung ihn zeigt.
     """
 
     zusatz: str
-    """Was hinter dem Namen eines Urteils steht: leer, oder «um den Stahlpilz»."""
+    """
+    Was hinter dem Namen eines Urteils steht: leer an der Stütze, sonst
+    «um den Stahlpilz» oder «an der Stufe von Bereich B1».
+    """
 
     vorsilbe: str
-    """Die Vorsilbe der Zwischenwerte, damit Stütze und Pilz nebeneinander stehen können."""
+    """Die Vorsilbe der Zwischenwerte, damit die Orte nebeneinander stehen können."""
 
     umriss: Tuple[Punkt, ...]
     r_zu: Callable[[float], Sequence[Stueck]]
@@ -150,12 +167,23 @@ class Ort:
     schatten: Tuple[Schatten, ...]
     """Die Schatten der Aussparungen am Schnitt um diese Fläche: dort liegt keine Leiste."""
 
+    ziele: Tuple[WertDef, ...]
+    """Die Grade der vier Nachweise, in der Reihe von :data:`FAELLE`."""
+
+    zu_69: str = ""
+    """Was die Herleitung zu ψ und d in (69) sagt -- leer: nichts."""
+
     d_v: Optional[Wert] = None
     k_e: Optional[Wert] = None
     u: Optional[Wert] = None
     V_d: Optional[Wert] = None
     V_Rd_c: Optional[Wert] = None
     """Wie die Herleitung den Schnitt zeigt -- fehlt nur in der stummen Suche nach dem Pilz."""
+
+    @property
+    def anhang(self) -> str:
+        """Was an den Namen eines Falls kommt: nichts an der Stütze, sonst « um den Stahlpilz»."""
+        return f" {self.zusatz}" if self.zusatz else ""
 
 
 @dataclass(frozen=True)
@@ -185,42 +213,25 @@ def nachweisen(n: "Durchstanzen", e: Eingaben, p: Protokoll, w: Zwischenwerte, g
                platz: Optional[Platz] = None
                ) -> Tuple[List[NachweisUrteil], Optional[Leistenpruefung], Optional[Pilzbefund]]:
     """
-    Die Durchstanzbewehrung suchen und mit ihr nachweisen -- und wo die erste
-    Druckdiagonale an einer Innenstütze bricht, einen Stahlpilz. Zurück kommen
-    die Urteile, die Leisten und der Pilz, so weit es sie gibt. ``platz``
-    sagt, wo es Plattenbereiche gibt, wie dick die Platte an der Stütze ist
-    und wo die Leisten liegen dürfen.
+    Die Durchstanzbewehrung an der Stütze suchen und mit ihr nachweisen --
+    und wo die erste Druckdiagonale an einer Innenstütze bricht, einen
+    Stahlpilz. Zurück kommen die Urteile, die Leisten und der Pilz, so weit es
+    sie gibt. ``platz`` sagt, wo es Plattenbereiche gibt, wie dick die Platte
+    an der Stütze ist und wo die Leisten liegen dürfen.
     """
-    s = n.stelle
-    system = s.system.regeln
+    s, f = n.stelle, n.stelle.flaeche
     platz = platz or Platz(e["h"])
-    h = platz.h.groesse.si
     p.titel("Durchstanzbewehrung", ebene=3)
-    c_v = e.g("c_v").si
-    h_frei = w.laenge("h_frei", r"h_{frei}", h - e.g("c").si - c_v)
-    p.formel(h_frei, "@h - @c - @c_v", {"h": platz.h, "c": e["c"], "c_v": e["c_v"]},
-             titel=f"Platz für die {system.ELEMENT} zwischen den Überdeckungen",
-             name="Platz für die Durchstanzbewehrung")
-    h_A = w.laenge("h_A", "h_A", system.hoehe(h, e.g("c").si, c_v))
-    p.wert(h_A, titel=system.hoehentext)
-    werte = _Werte(e, g, e[s.anker.eingabename("f_yd")], e[s.anker.eingabename("E_s")],
-                   e[s.beton.eingabename("f_ctm")], c_v, h_A,
-                   w.laenge("d_v_out", r"d_{v,out}", g.d.groesse.si - c_v), platz)
-    f = s.flaeche
+    werte = _werte(n, e, p, w, g, platz, "")
     stuetze = Ort("", "", g.umriss, lambda r: f.kandidaten(g.masse, r, g.d_v.groesse.si)[0].stuecke,
                   g.innen, f.k_sys_erhoeht,
                   tuple(schatten_am_schnitt(s.aussparungen, g.innen.auswertung.kandidat.stuecke,
                                             d_v=g.innen.d_v, achse=f.achse(g.masse))),
-                  g.d_v, g.k_e, g.u, g.V_d, g.V_Rd_c)
-    leisten = _suchen(n, werte, stuetze)
-    if leisten is not None:
-        urteile = _leisten_schreiben(n, p, w, werte, stuetze, leisten)
-        if leisten.diagonale_haelt:
-            return urteile, leisten, None
-    else:
-        hinweis, grund = _warum_keines(n, werte, stuetze)
-        p.hinweis(hinweis)
-        urteile = n.nicht_fuehrbar(grund)
+                  n.mit_graden, ZU_69_STUETZE if platz.innerhalb else "",
+                  d_v=g.d_v, k_e=g.k_e, u=g.u, V_d=g.V_d, V_Rd_c=g.V_Rd_c)
+    urteile, leisten = _am_ort(n, p, w, werte, stuetze)
+    if leisten is not None and leisten.diagonale_haelt:
+        return urteile, leisten, None
     if platz.mit_bereichen:
         p.hinweis("Mit Plattenbereichen sucht das Werkzeug noch keinen Stahlpilz. Eine grössere "
                   "Stütze, ein dickerer Bereich um sie oder ein besserer Beton.")
@@ -237,21 +248,73 @@ def nachweisen(n: "Durchstanzen", e: Eingaben, p: Protokoll, w: Zwischenwerte, g
     return _mit_pilz(n, p, w, werte, *gewaehlt)
 
 
+def am_ort(n: "Durchstanzen", e: Eingaben, p: Protokoll, w: Zwischenwerte, g: Grundlage,
+           platz: Platz, ort: Ort) -> Tuple[List[NachweisUrteil], Optional[Leistenpruefung]]:
+    """
+    Die Bewehrung an einem Ort ausser der Stütze -- der Stufe eines Bereichs
+    (:mod:`.stufenleisten`) --, mit denselben Schritten wie an der Stütze,
+    aber ohne Stahlpilz. ``g`` ist, was der Schnitt dort ohne Bewehrung
+    gerechnet hat.
+    """
+    return _am_ort(n, p, w, _werte(n, e, p, w, g, platz, ort.vorsilbe), ort)
+
+
+def _werte(n: "Durchstanzen", e: Eingaben, p: Protokoll, w: Zwischenwerte, g: Grundlage,
+           platz: Platz, k: str) -> _Werte:
+    """
+    Was jede Rechnung mit Bewehrung an einem Ort braucht (:class:`_Werte`),
+    mit der Herleitung des Platzes für die Elemente -- ``k`` ist die Vorsilbe
+    des Orts.
+    """
+    s = n.stelle
+    system = s.system.regeln
+    h, c, c_v = platz.h.groesse.si, e.g("c").si, e.g("c_v").si
+    h_frei = w.laenge(f"{k}h_frei", r"h_{frei}", h - c - c_v)
+    p.formel(h_frei, "@h - @c - @c_v", {"h": platz.h, "c": e["c"], "c_v": e["c_v"]},
+             titel=f"Platz für die {system.ELEMENT} zwischen den Überdeckungen",
+             name="Platz für die Durchstanzbewehrung")
+    h_A = w.laenge(f"{k}h_A", "h_A", system.hoehe(h, c, c_v))
+    p.wert(h_A, titel=system.hoehentext)
+    return _Werte(e, g, e[s.anker.eingabename("f_yd")], e[s.anker.eingabename("E_s")],
+                  e[s.beton.eingabename("f_ctm")], c_v, h_A,
+                  w.laenge(f"{k}d_v_out", r"d_{v,out}", g.d.groesse.si - c_v), platz)
+
+
+def _am_ort(n: "Durchstanzen", p: Protokoll, w: Zwischenwerte, werte: _Werte,
+            ort: Ort) -> Tuple[List[NachweisUrteil], Optional[Leistenpruefung]]:
+    """
+    Die kleinste Bewehrung an ``ort`` mit ihren Nachweisen -- oder, wo keine
+    passt, der Grund am Ort und die vier Urteile offen.
+    """
+    leisten = _suchen(n, werte, ort)
+    if leisten is not None:
+        return _leisten_schreiben(n, p, w, werte, ort, leisten), leisten
+    hinweis, grund = _warum_keines(n, werte, ort)
+    p.hinweis(hinweis)
+    return [n.urteil(ziel, f"{fall}{ort.anhang}", NICHT_FUEHRBAR, grund)
+            for ziel, fall in zip(ort.ziele, FAELLE)], None
+
+
 def _warum_keines(n: "Durchstanzen", werte: _Werte, ort: Ort) -> Tuple[str, str]:
     """
     Warum keine Leiste gesetzt ist, als Hinweis und als Grund der Urteile:
     das System passt nicht in die Platte -- oder es fände Platz, liessen ihm
     die Stufen der Bereiche welchen. Das zweite prüft die Suche ohne die
-    Bereiche; sie läuft nur hier, wo die erste nichts fand.
+    Bereiche; sie läuft nur hier, wo die erste nichts fand. Ausser an der
+    Stütze nennt der Grund den Ort, denn ein Urteil steht auch allein.
     """
     platz, system = werte.platz, n.stelle.system.regeln
     if not platz.mit_bereichen or _suchen(n, replace(werte, platz=Platz(platz.h)), ort) is None:
-        return system.warum_keines, system.KEINES
+        if not ort.zusatz:
+            return system.warum_keines, system.KEINES
+        return system.warum_keines, f"{satzanfang(ort.zusatz)}: {system.KEINES}"
     if platz.innerhalb:
-        grund = f"{platz.innerhalb[0].titel} ist zu klein für {system.LEISTEN}"
+        grund = (f"{platz.innerhalb[0].titel} ist zu klein für {system.LEISTEN} "
+                 f"{ort.zusatz or 'an der Stütze'}")
         stufe = "seiner Stufe"
     else:
-        grund = f"Neben der Stütze ist zu wenig Platz für {system.LEISTEN}"
+        grund = (f"{satzanfang(ort.zusatz or 'neben der Stütze')} ist zu wenig Platz für "
+                 f"{system.LEISTEN}")
         stufe = "den Stufen der Bereiche"
     return (f"{grund}: mit c_nom Abstand zu {stufe} behält keine {system.LEISTE} genug "
             f"{system.ELEMENT}.", f"{grund}.")
@@ -328,6 +391,7 @@ def _leisten_schreiben(n: "Durchstanzen", p: Protokoll, w: Zwischenwerte, werte:
                        pruefung: Leistenpruefung) -> List[NachweisUrteil]:
     """Die Nachweise mit diesen Leisten (4.3.6.5.1), wie die Prüfung sie gerechnet hat."""
     e, g, k = werte.e, werte.g, ort.vorsilbe
+    ziel_mit, ziel_verformung, ziel_diagonale, ziel_aussen = ort.ziele
     vorschlag = pruefung.vorschlag
     system, typ = vorschlag.system, vorschlag.typ
     p.erklaerung(system.regeln(vorschlag, werte.h_A.formatiert(), ort.zusatz))
@@ -351,9 +415,8 @@ def _leisten_schreiben(n: "Durchstanzen", p: Protokoll, w: Zwischenwerte, werte:
     gemindert = _verankerung_schreiben(p, werte.c_v, ort.pruefung.d_v, pruefung.eta, system)
     p.erklaerung(f"Die {system.ELEMENT} sind aus {system.STAHL}: in (67) und (69) gilt ihre "
                  f"Fliessgrenze, nicht die der Biegebewehrung (4.3.6.5.4).")
-    if werte.platz.innerhalb:
-        p.erklaerung("In (69) gilt dasselbe ψ wie für V_Rd,c: ψ ist die Drehung der Platte um "
-                     "die Stütze; d ist das an der Stütze – nach Vorgabe, nicht nachgeschlagen.")
+    if ort.zu_69:
+        p.erklaerung(ort.zu_69)
     phi = w.laenge(f"{k}phi_sw", r"\varnothing_{sw}", typ.durchmesser, stellen=0)
     sigma = w.wert(f"{k}sigma_sd", r"\sigma_{sd}", Groesse.aus_si(pruefung.sigma_sd, N_PRO_MM2), 0,
                    "Spannung in der Durchstanzbewehrung")
@@ -385,7 +448,7 @@ def _leisten_schreiben(n: "Durchstanzen", p: Protokoll, w: Zwischenwerte, werte:
              name="Querkraft für die Durchstanzbewehrung")
     v_s = Vergleich(V_d_s, V_Rd_s)
     v_s.bedingung(p, "Querkraft für die Bewehrung gegen ihren Beitrag")
-    v_s.zeile(p, n.d_mit)
+    v_s.zeile(p, ziel_mit)
 
     # -- Verformungsvermögen (67) ------------------------------------------
     V_halb = w.kraft(f"{k}V_d_halb", r"V_d / 2", pruefung.V_halb)
@@ -398,7 +461,7 @@ def _leisten_schreiben(n: "Durchstanzen", p: Protokoll, w: Zwischenwerte, werte:
              name="Durchstanzbewehrung an der Fliessgrenze")
     v_v = Vergleich(V_halb, V_Rd_v)
     v_v.bedingung(p, "Verformungsvermögen: die halbe Querkraft gegen die fliessende Bewehrung")
-    v_v.zeile(p, n.d_verformung)
+    v_v.zeile(p, ziel_verformung)
 
     # -- Betondruckdiagonale (70) ------------------------------------------
     d = g.d.groesse.si
@@ -416,7 +479,7 @@ def _leisten_schreiben(n: "Durchstanzen", p: Protokoll, w: Zwischenwerte, werte:
              name="Widerstand der ersten Betondruckdiagonale")
     v_m = Vergleich(ort.V_d, V_Rd_max)
     v_m.bedingung(p, "Querkraft gegen die erste Betondruckdiagonale")
-    v_m.zeile(p, n.d_diagonale)
+    v_m.zeile(p, ziel_diagonale)
     if not v_m.erfuellt:
         p.hinweis("Die erste Betondruckdiagonale an der gestützten Fläche bricht vor der "
                   "Bewehrung: mehr Durchstanzbewehrung hilft nicht.")
@@ -424,7 +487,7 @@ def _leisten_schreiben(n: "Durchstanzen", p: Protokoll, w: Zwischenwerte, werte:
     # -- Ausserhalb der Bewehrung (4.3.6.5.10) -----------------------------
     aussen = pruefung.aussen
     ix = Index("out", k)
-    p.titel(f"Ausserhalb der Durchstanzbewehrung{ort.zusatz and ' ' + ort.zusatz}", ebene=3)
+    p.titel(f"Ausserhalb der Durchstanzbewehrung{ort.anhang}", ebene=3)
     p.formel(werte.d_v_out, "@d - @c_v", {"d": g.d, "c_v": e["c_v"]},
              titel=f"Wirksame statische Höhe bis zur Verankerung der {system.ELEMENT}",
              referenz="SIA 262:2025, 4.3.6.5.10, Figur 26",
@@ -452,20 +515,20 @@ def _leisten_schreiben(n: "Durchstanzen", p: Protokoll, w: Zwischenwerte, werte:
         referenz="SIA 262:2025, 4.3.6.5.10, (58)")
     v_a = Vergleich(V_d_out, V_Rd_out)
     v_a.bedingung(p, "Querkraft gegen den Widerstand ausserhalb der Bewehrung")
-    v_a.zeile(p, n.d_aussen)
+    v_a.zeile(p, ziel_aussen)
 
-    z = f" {ort.zusatz}" if ort.zusatz else ""
+    mit, verformung, diagonale, ausserhalb = (f"{fall}{ort.anhang}" for fall in FAELLE)
     return [
-        n.urteil(n.d_mit, f"mit Durchstanzbewehrung{z}", v_s,
+        n.urteil(ziel_mit, mit, v_s,
                  f"{vorschlag.name}: V_d,s = {V_d_s.formatiert()} kN "
                  f"{'≤' if v_s.erfuellt else '>'} V_Rd,s = {V_Rd_s.formatiert()} kN."),
-        n.urteil(n.d_verformung, f"Verformungsvermögen{z}", v_v,
+        n.urteil(ziel_verformung, verformung, v_v,
                  f"V_d/2 = {V_halb.formatiert()} kN {'≤' if v_v.erfuellt else '>'} "
                  f"ΣA_sw·k_e·f_yd = {V_Rd_v.formatiert()} kN."),
-        n.urteil(n.d_diagonale, f"Betondruckdiagonale{z}", v_m,
+        n.urteil(ziel_diagonale, diagonale, v_m,
                  f"V_d = {ort.V_d.formatiert()} kN {'≤' if v_m.erfuellt else '>'} "
                  f"V_Rd,max = {V_Rd_max.formatiert()} kN."),
-        n.urteil(n.d_aussen, f"ausserhalb der Durchstanzbewehrung{z}", v_a,
+        n.urteil(ziel_aussen, ausserhalb, v_a,
                  f"V_d,out = {V_d_out.formatiert()} kN {'≤' if v_a.erfuellt else '>'} "
                  f"V_Rd,c,out = {V_Rd_out.formatiert()} kN."),
     ]
@@ -502,7 +565,7 @@ def _pilzort(n: "Durchstanzen", werte: _Werte, befund: Pilzbefund, d_v: Optional
                tuple(schatten_am_schnitt(s.aussparungen, befund.pruefung.auswertung.kandidat.stuecke,
                                          d_v=befund.pruefung.d_v,
                                          achse=s.flaeche.achse(werte.g.masse))),
-               d_v, k_e, u, V_d, V_Rd_c)
+               n.mit_graden, d_v=d_v, k_e=k_e, u=u, V_d=V_d, V_Rd_c=V_Rd_c)
 
 
 def _pilz_suchen(n: "Durchstanzen", werte: _Werte

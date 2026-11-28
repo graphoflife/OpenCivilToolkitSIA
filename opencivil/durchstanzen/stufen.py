@@ -196,6 +196,23 @@ class Bereichswerte:
     lagen_psi: Optional[Dict[Richtung, Wert]] = None
 
 
+@dataclass(frozen=True)
+class Stufenwerte:
+    """
+    Wie die Herleitung den Schnitt an einer Stufe zeigt: d und d_v dort, k_e,
+    der wirksame Umfang, k_r, die Querkraft im Schnitt und sein Widerstand --
+    für den Vergleich und für die Leisten an der Stufe (:mod:`.stufenleisten`).
+    """
+
+    d: Wert
+    d_v: Wert
+    k_e: Wert
+    u: Wert
+    k_r: Wert
+    V: Wert
+    V_Rd_c: Wert
+
+
 def bereiche_schreiben(p: Protokoll, w: Zwischenwerte, e: Eingaben, dicken: Dicken,
                        hoehe: Stuetzenhoehe, d: Wert, lagen: Dict[Richtung, Wert],
                        neben: Sequence[Plattenbereich] = ()) -> Bereichswerte:
@@ -255,12 +272,11 @@ def rotation_schreiben(p: Protokoll, hoehe: Stuetzenhoehe) -> None:
 
 def stufe_schreiben(p: Protokoll, w: Zwischenwerte, e: Eingaben, st: Stufe, *, d: Wert,
                     werte: Bereichswerte, psi: Wert, k_g: Wert, tau_cd: Wert, k_e_stuetze: Wert,
-                    last: str, V_d: Optional[Wert] = None) -> Optional[Tuple[Wert, Wert]]:
+                    last: str, V_d: Optional[Wert] = None) -> Optional[Stufenwerte]:
     """
-    Der Schnitt an einer Stufe mit denselben Schritten wie um die Stütze:
-    zurück kommen die Querkraft in ihm und sein Widerstand -- oder nichts,
-    wo er fehlt. ``d`` ist das d der Platte, ``V_d`` die Stützenkraft, wo es
-    nicht die eingegebene ist (die Kennzahl).
+    Der Schnitt an einer Stufe mit denselben Schritten wie um die Stütze --
+    nichts, wo er fehlt. ``d`` ist das d der Platte, ``V_d`` die
+    Stützenkraft, wo es nicht die eingegebene ist (die Kennzahl).
     """
     b, ix = st.bereich, st.index
     jenseits = "der Platte" if st.jenseits is None else f"im {st.jenseits.titel}"
@@ -315,7 +331,7 @@ def stufe_schreiben(p: Protokoll, w: Zwischenwerte, e: Eingaben, st: Stufe, *, d
     V_Rd_c = herleitung.widerstand(p, w, st.pruefung, ix=ix, k_r=k_r, tau_cd=tau_cd, d_v=d_v,
                                    u=u, titel="Durchstanzwiderstand an der Stufe",
                                    referenz="SIA 262:2025, 4.3.6.2.7, (58)")
-    return V, V_Rd_c
+    return Stufenwerte(d_st, d_v, k_e, u, k_r, V, V_Rd_c)
 
 
 def vergleich_schreiben(p: Protokoll, st: Stufe, V: Wert, V_Rd_c: Wert) -> Vergleich:

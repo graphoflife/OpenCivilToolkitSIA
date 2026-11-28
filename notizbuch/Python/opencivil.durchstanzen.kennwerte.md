@@ -1,5 +1,5 @@
 ---
-erzeugt: a7e27a359e4f
+erzeugt: c42930a0e3b5
 art: modul
 tags: [modul]
 ---
@@ -34,10 +34,35 @@ def kennwerttabelle(befund: Durchstanzbefund) -> TabellenBlock
 ```
 
 Die Grössen, aus denen der Widerstand entsteht – eine Zeile je Grösse. Mit
-Stahlpilz und Durchstanzbewehrung dazu, was sie sind und was sie tragen.
+Stahlpilz und Durchstanzbewehrung dazu, was sie sind und was sie tragen,
+auch die Leisten an den Stufen der Bereiche.
 Ohne Einwirkung nur der Schnitt: ψ = 0 und k_r = 2 gälten nur ohne Last;
 was die Stelle trägt, sagt die Kennzahl ([[opencivil.durchstanzen.kennzahl|.kennzahl]]). Bis 2026-11-27
 stand dort V_Rd,c = 866.7 kN, wo die Kennzahl 503.6 kN sagt.
+
+### _leistenzeilen
+
+```python
+def _leistenzeilen(leisten: Leistenpruefung, titel: str, abstaende: str, ix: str='') -> list
+```
+
+Die Zeilen einer Durchstanzbewehrung – `ix` hängt an den Zeichen, «,B1» an einer Stufe.
+
+### _zeile
+
+```python
+def _zeile(text: str, zeichen: str, wert: str, einheit: str) -> list
+```
+
+Eine Zeile der Tabelle: Text, Zeichen und Wert als Formel, Einheit.
+
+### _kraft
+
+```python
+def _kraft(x: float) -> str
+```
+
+Eine Kraft der Tabelle: kN mit einer Stelle.
 
 
 ## Braucht
@@ -46,6 +71,7 @@ stand dort V_Rd,c = 866.7 kN, wo die Kennzahl 503.6 kN sagt.
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wert]]
 - [[opencivil.durchstanzen.nachweis]]
+- [[opencivil.durchstanzen.pruefung]]
 - [[opencivil.durchstanzen.stelle]]
 - [[opencivil.durchstanzen.weg]]
 

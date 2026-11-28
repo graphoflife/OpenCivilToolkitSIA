@@ -1,5 +1,5 @@
 ---
-erzeugt: ce86ebaa3d5a
+erzeugt: 746a8f1879dd
 art: modul
 tags: [modul]
 ---
@@ -15,12 +15,13 @@ der Nachweisschnitt – je Stück, ob es zählt –, und wo es sie braucht, die
 Leisten mit ihren Ankern und dem äusseren Schnitt und der Stahlpilz mit seinen
 Stegen und dem Schnitt um ihn, je für sich. Die Plattenbereiche mit ihrer
 Dicke, an jeder Stufe ihr Schnitt, je in seiner Farbe ([[opencivil.web.durchstanzdaten#Konstanten|STUFENFARBEN]]),
-und der Schnitt durch verschiedene Dicken. Dazu die Legende unter dem Bild
+und wo er ohne sie nicht hält, die Leisten an ihr; dazu der Schnitt durch
+verschiedene Dicken. Dazu die Legende unter dem Bild
 ([[opencivil.web.anzeige]]): die Schnitte mit ihren Zahlen und das Urteil.
 Gezeichnet wird in der Oberflaeche, gerechnet nichts: die Linien kommen aus
 dem Befund des Nachweises ([[opencivil.durchstanzen.nachweis]]).
 
-Wo es Durchstanzbewehrung braucht, auch eine Leiste in der Ansicht
+Wo es an der Stütze Durchstanzbewehrung braucht, auch eine Leiste in der Ansicht
 ([[opencivil.web.durchstanzdaten#_ansicht|_ansicht]]): längs geschnitten, mit Platte, Zugbewehrung, Stütze und
 Pilz, den Elementen und dem Bereich, in dem sie zählen – in mm, x ab dem
 Rand der gestützten Fläche, z ab der Druckseite.
@@ -54,6 +55,14 @@ def situation(aufbau: Aufbau, kennung: str, loesung: Loesung) -> Optional[Dict[s
 ```
 
 Was der Grundriss einer Stelle braucht – `None`, wenn ihr Nachweis nicht gelaufen ist.
+
+### _leisten
+
+```python
+def _leisten(pruefung: Optional[Leistenpruefung]) -> Optional[Dict[str, Any]]
+```
+
+Eine Durchstanzbewehrung im Grundriss: je Leiste Ansatz und Anker, der äussere Schnitt.
 
 ### _mit_schnitt
 
@@ -126,11 +135,22 @@ def _legende(befund: Durchstanzbefund, urteile: Sequence[NachweisUrteil], bereic
 Die Zeilen unter dem Bild: der Schnitt und was von ihm nicht zählt; ohne
 Bewehrung der Vergleich mit seinem Urteil, sonst was ohne sie fehlt, der
 Pilz und die Leisten mit ihren Schnitten – und das Urteil über alle. Passt
-kein Produkt, sagt die letzte Zeile das statt eines Grads: die Nachweise
-mit Bewehrung sind dann nicht geführt ([[opencivil.core.nachweis#NachweisUrteil|NachweisUrteil.offen]]).
-Ohne Stützenkraft steht statt des Vergleichs der Satz aller Nachweise ohne
-Einwirkung. Mit Plattenbereichen je Stufe ihr Schnitt, und die Zahlen
+kein Produkt, sagt die letzte Zeile das statt eines Grads, mit jedem Grund
+einmal: die Nachweise mit Bewehrung sind dann nicht geführt
+([[opencivil.core.nachweis#NachweisUrteil|NachweisUrteil.offen]]). Ohne Stützenkraft steht statt des
+Vergleichs der Satz aller Nachweise ohne Einwirkung. Mit Plattenbereichen
+je Stufe ihr Schnitt und, wo sie welche hat, ihre Leisten, und die Zahlen
 stehen je Schnitt.
+
+### _leistenzeilen
+
+```python
+def _leistenzeilen(b: Leistenpruefung, titel: str, vom: str, ix: str='') -> List[list]
+```
+
+Was die Legende von einer Durchstanzbewehrung sagt: Produkt und Abstände
+`vom` Rand ihrer gestützten Fläche, der äussere Schnitt und was sie
+trägt – `ix` hängt an den Zeichen, «,B1» an der Stufe von Bereich B1.
 
 ### _schnittzeilen
 
@@ -146,7 +166,9 @@ Die Zahlen an den Stufen und am Schnitt durch verschiedene Dicken.
 def _gesamtzeile(urteile: Sequence[NachweisUrteil]) -> list
 ```
 
-Das Urteil über alle geführten Nachweise, mit dem kleinsten Grad.
+Das Urteil über alle geführten Nachweise, mit dem kleinsten Grad. Liessen
+sich nicht alle führen, sagt die Zeile davor warum, und hier steht «die
+übrigen» – bis 2026-11-28 stand dann «Alle Nachweise erfüllt».
 
 ### _stufenzeilen
 
@@ -192,6 +214,7 @@ Eine Kraft der Legende: kN mit einer Stelle.
 - [[opencivil.durchstanzen.flaeche]]
 - [[opencivil.durchstanzen.mit_bewehrung]]
 - [[opencivil.durchstanzen.nachweis]]
+- [[opencivil.durchstanzen.pruefung]]
 - [[opencivil.durchstanzen.schnitt]]
 - [[opencivil.durchstanzen.stelle]]
 - [[opencivil.durchstanzen.systeme]]

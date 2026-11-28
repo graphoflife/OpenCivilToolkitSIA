@@ -1,5 +1,5 @@
 ---
-erzeugt: 19d324bf0c7d
+erzeugt: 22e726d1b71b
 art: modul
 tags: [modul]
 ---
@@ -495,8 +495,11 @@ def reicht(self) -> bool
 - [[opencivil.durchstanzen.bewehrung]]
 - [[opencivil.durchstanzen.flaeche]]
 - [[opencivil.durchstanzen.herleitung]]
+- [[opencivil.durchstanzen.kennwerte]]
 - [[opencivil.durchstanzen.mit_bewehrung]]
 - [[opencivil.durchstanzen.nachweis]]
 - [[opencivil.durchstanzen.stufen]]
+- [[opencivil.durchstanzen.stufenleisten]]
 - [[opencivil.durchstanzen.systeme]]
 - [[opencivil.durchstanzen.weg]]
+- [[opencivil.web.durchstanzdaten]]

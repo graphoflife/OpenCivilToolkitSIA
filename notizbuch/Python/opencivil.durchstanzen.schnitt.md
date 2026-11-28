@@ -1,5 +1,5 @@
 ---
-erzeugt: 4d90c681efb5
+erzeugt: 5596fda41ccc
 art: modul
 tags: [modul]
 ---
@@ -493,5 +493,6 @@ er nach dem, der zum Rand läuft.
 - [[opencivil.durchstanzen.pruefung]]
 - [[opencivil.durchstanzen.stelle]]
 - [[opencivil.durchstanzen.stufen]]
+- [[opencivil.durchstanzen.stufenleisten]]
 - [[opencivil.durchstanzen.weg]]
 - [[opencivil.web.durchstanzdaten]]

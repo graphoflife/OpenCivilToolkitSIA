@@ -359,6 +359,27 @@ sammeln sie sich hier, je mit dem, was vorläufig gebaut ist.
       keinen Pilz; ein Hinweis sagt es. Der Pilz rechnet mit der Dicke der
       Platte und kennt keine Stufen. Vorschlag: so lassen, bis jemand
       einen Pilz in einem Stützenkopf braucht. Vorläufig: so.
+- [ ] **Leisten an der Stufe: wie sie stehen.** Hält der Schnitt an der
+      Stufe eines Kopfs nicht, setzen eigene Leisten am Rand des Bereichs
+      an wie an einer Stütze: der Kopf ist ihre gestützte Fläche, sie sind
+      so hoch, wie die Platte jenseits dick ist, und es gelten die Werte
+      des Schnitts an der Stufe, ψ der Stütze und k_sys wie an der Stütze.
+      Beispiel: Kopf 1200 × 1200 mm mit 320 mm, Platte 240 mm,
+      V_d = 400 kN – 24 ancoPLUS DX3-0175 um den Kopf, 175 mm hoch. Nach
+      Vorgabe, nicht nachgeschlagen. Vorschlag: so lassen. Vorläufig: so.
+- [ ] **Leisten an langen Seiten zählen ganz.** In (68) zählen alle
+      Leisten, auch die vor Teilen des inneren Schnitts, die nach Figur 23a
+      nicht zählen, weiter als 1.5·d_v von einer Ecke. Am Kopf oben stehen
+      16 der 24 Leisten vor zählenden Teilen; sie tragen 1475 kN, nötig
+      sind 33.9 kN. Die Norm begrenzt ΣA_sw nur im Abstand, 0.35·d_v bis
+      d_v (4.3.6.5.4); dasselbe gilt seit jeher an grossen Stützen.
+      Vorschlag: nur Leisten vor zählenden Teilen anrechnen, die übrigen
+      stehen trotzdem (5.5.3.9) – das liegt sicher. Vorläufig: alle zählen.
+- [ ] **Keine eigenen Leisten auf der Gegenseite und durch verschiedene
+      Dicken.** Dort liegt der Schnitt im Bereich oder läuft an keiner
+      Stufe entlang, an der eine Leiste ansetzen könnte; ein Hinweis sagt,
+      dass das Werkzeug dort keine vorschlägt. Vorschlag: so lassen, bis
+      jemand es braucht. Vorläufig: so.
 - [ ] **Aufräumen: eine Platte oder ein Bereich dünner als die
       Bewehrung tief liegt.** Gefunden beim Bau von Schritt 13c, nicht
       behoben. Heute nimmt das Werkzeug eine Platte mit h = 40 mm an,
@@ -1567,9 +1588,9 @@ Norm dazu sagt.
 - [ ] **Durchstanzen: was das Werkzeug nicht abbildet** (zur Kenntnis):
       Einzellasten über 0.2·V_d näher als 3·d_v am Schnitt (4.3.6.2.3);
       einbetonierte Leitungen (Figur 23e); bei Plattenbereichen mit eigener
-      Dicke (4.3.6.2.7, Figur 24) Leisten nur an der Stütze, an den Stufen
-      noch nicht (Schritt 13d des Plans vom 2026-11-27), und keine Bereiche
-      an Wänden; Vorspannung
+      Dicke (4.3.6.2.7, Figur 24) keine eigenen Leisten an Stufen der
+      Gegenseite und am Schnitt durch verschiedene Dicken, kein Stahlpilz
+      und keine Bereiche an Wänden; Vorspannung
       (4.3.6.4.3); an Rand- und Eckstützen die untere Bewehrung als
       gezogene (4.3.6.4.7); die Verankerung der Biegebewehrung (5.5.3.7);
       ein Schnitt, der an einer Aussparung nahe der Stütze endet

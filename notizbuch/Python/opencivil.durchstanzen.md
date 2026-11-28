@@ -1,5 +1,5 @@
 ---
-erzeugt: 9dc1c3653bc8
+erzeugt: 702243fb7077
 art: modul
 tags: [modul]
 ---
@@ -38,5 +38,6 @@ tags: [modul]
 - [[opencivil.durchstanzen.schnitt]] – der Nachweisschnitt um die gestützte Fläche.
 - [[opencivil.durchstanzen.stelle]] – die Durchstanzstelle: Platte, gestützte Fläche, Bewehrung, Last.
 - [[opencivil.durchstanzen.stufen]] – Plattenbereiche um die Stütze: d an ihr, Schnitte an den Stufen.
+- [[opencivil.durchstanzen.stufenleisten]] – Leisten an der Stufe eines Bereichs zur Stütze hin.
 - [[opencivil.durchstanzen.systeme]] – woraus die Durchstanzbewehrung besteht.
 - [[opencivil.durchstanzen.weg]] – ein Schnitt um die Stütze durch verschiedene Dicken.

@@ -30,9 +30,10 @@ schwächste Schnitt durch verschiedene Dicken dazu, auch mit eigenem Urteil
 (:mod:`.weg`); weiter draussen geht ein Bereich nicht ein. Bereiche an
 Wänden rechnet das Werkzeug noch nicht; die Herleitung sagt es. Leisten
 schlägt es an der Stütze vor, im innersten Bereich um sie und ausserhalb der
-übrigen (:class:`.mit_bewehrung.Platz`); an den Schnitten der Stufen und
-durch verschiedene Dicken zählen sie nicht, und dort schlägt es noch keine
-eigenen vor.
+übrigen (:class:`.mit_bewehrung.Platz`), und an jeder Stufe zur Stütze hin,
+deren Schnitt ohne sie nicht hält (:mod:`.stufenleisten`). An den Stufen der
+Gegenseite und am Schnitt durch verschiedene Dicken zählen die Leisten an
+der Stütze nicht, und dort schlägt es keine eigenen vor.
 
 DIE PLATTENROTATION (4.3.6.4.2):
 In Näherungsstufe 1 ist ``m_sd/m_Rd = 1``; in Stufe 2 kommen die Momente im
@@ -79,13 +80,13 @@ from typing import Dict, List, Optional, Tuple
 
 from opencivil.core.berechnung import Ausfuehrung, Eingabebezug, Eingaben
 from opencivil.core.nachweis import (
-    NICHT_FUEHRBAR, OHNE_EINWIRKUNG, UNBESCHRAENKT, Nachweis, NachweisUrteil, Vergleich, grad_def,
+    OHNE_EINWIRKUNG, UNBESCHRAENKT, Nachweis, NachweisUrteil, Vergleich, grad_def,
 )
 from opencivil.core.einheiten import EINHEITSLOS, KNM_PRO_M, MM2_PRO_M, Groesse
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert, WertDef
-from opencivil.core.sprache import aufgezaehlt
-from opencivil.durchstanzen import herleitung, mit_bewehrung, stufen, weg
+from opencivil.core.sprache import aufgezaehlt, satzanfang
+from opencivil.durchstanzen import herleitung, mit_bewehrung, stufen, stufenleisten, weg
 from opencivil.durchstanzen.bereiche import Dicken, Plattenbereich
 from opencivil.durchstanzen.herleitung import STUETZE
 from opencivil.durchstanzen.flaeche import Mass, Masse, Randbreite
@@ -99,7 +100,7 @@ from opencivil.durchstanzen.schnitt import (
 from opencivil.durchstanzen.stelle import (
     Durchstanzstelle, KeArt, Naeherungsstufe, wirksame_stufe,
 )
-from opencivil.durchstanzen.stufen import Bereichswerte, Stufe, Stuetzenhoehe
+from opencivil.durchstanzen.stufen import Bereichswerte, Stufe, Stufenwerte, Stuetzenhoehe
 from opencivil.nachweis.querkraft_ohne_buegel import beiwert_k_g
 from opencivil.querschnitt.platte import Richtung
 from opencivil.querschnitt.werkstoffgesetz import BLOCKANTEIL
@@ -145,11 +146,27 @@ class Biegelage:
 class Stufenbefund:
     """
     Eine Stufe mit ihrem Schnitt und seinem Widerstand -- der fehlt ohne
-    Einwirkung und wo die Stufe keinen eigenen Schnitt hat.
+    Einwirkung und wo die Stufe keinen eigenen Schnitt hat -- und die Leisten
+    an ihr, wo der Schnitt ohne sie nicht hält (:mod:`.stufenleisten`).
     """
 
     stufe: Stufe
     V_Rd_c: Optional[float] = None
+    leisten: Optional[Leistenpruefung] = None
+
+
+@dataclass(frozen=True)
+class Stufenurteile:
+    """
+    Was die Schnitte an den Stufen ergeben: die Urteile in der Reihe der
+    Stufen, unter ihnen die der Schnitte ohne eigene Leisten, die Grade ohne
+    Bewehrung, wo Leisten stehen, und die Befunde.
+    """
+
+    urteile: Tuple[NachweisUrteil, ...]
+    ohne_eigene: Tuple[NachweisUrteil, ...]
+    werte: Dict[str, Groesse]
+    befunde: Tuple[Stufenbefund, ...]
 
 
 @dataclass(frozen=True)
@@ -377,7 +394,7 @@ class Stuetzenrechnung:
 
     def _stufe_schreiben(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, g: Stuetzenschnitt,
                          r: Widerstand, st: Stufe,
-                         V_d: Optional[Wert] = None) -> Optional[Tuple[Wert, Wert]]:
+                         V_d: Optional[Wert] = None) -> Optional[Stufenwerte]:
         """Der Schnitt an einer Stufe (:func:`.stufen.stufe_schreiben`) mit ψ und k_g der Stütze."""
         return stufen.stufe_schreiben(p, w, e, st, d=g.d_platte, werte=g.bereiche, psi=r.psi,
                                       k_g=r.k_g, tau_cd=r.tau_cd, k_e_stuetze=g.k_e,
@@ -718,6 +735,10 @@ class Durchstanzen(Stuetzenrechnung, Nachweis):
             f"{basis}.stufe.{b.name}.erfuellungsgrad", rf"\alpha_{{eff,DS,{b.name}}}",
             f"Erfüllungsgrad an der Stufe von {b.titel}", stufen.REFERENZ)
             for b in stelle.bereiche}
+        # Je Bereich zur Stütze hin die vier Grade mit Leisten an seiner Stufe.
+        self.d_stufenleisten: Dict[str, Tuple[WertDef, ...]] = {
+            b.name: stufenleisten.grade(basis, b) for b in stelle.bereiche
+            if stufenleisten.moeglich(b)}
         # Am Schnitt durch verschiedene Dicken; ohne Bereich neben der Stütze kein Urteil.
         self.d_weg: WertDef = grad_def(
             f"{basis}.weg.erfuellungsgrad", r"\alpha_{eff,DS,W}",
@@ -727,6 +748,7 @@ class Durchstanzen(Stuetzenrechnung, Nachweis):
         bezuege += [stelle.stahl.bezug(k) for k in ("f_yd", "E_s")]
         bezuege += [stelle.anker.bezug(k) for k in ("f_yd", "E_s")]
         super().__init__(basis, ausgaben=[self.d_ohne, *self.mit_graden, *self.d_stufen.values(),
+                                          *(d for x in self.d_stufenleisten.values() for d in x),
                                           *([self.d_weg] if stelle.bereiche else [])],
                          bezuege=bezuege,
                          titel=f"Durchstanzen – {stelle.name}", referenz="SIA 262:2025, 4.3.6",
@@ -742,25 +764,38 @@ class Durchstanzen(Stuetzenrechnung, Nachweis):
         return (self.d_mit, self.d_verformung, self.d_diagonale, self.d_aussen)
 
     def _stufen_pruefen(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, g: Stuetzenschnitt,
-                        r: Widerstand) -> Tuple[List[NachweisUrteil], Tuple[Stufenbefund, ...]]:
-        """Die Schnitte an den Stufen, je mit eigenem Urteil (4.3.6.2.7)."""
+                        r: Widerstand) -> Stufenurteile:
+        """
+        Die Schnitte an den Stufen, je mit eigenem Urteil (4.3.6.2.7). Hält
+        einer zur Stütze hin nicht, kommen Leisten an seine Stufe
+        (:mod:`.stufenleisten`): dann urteilen ihre vier Nachweise, und sein
+        Grad bleibt ein Wert der Herleitung -- wie an der Stütze.
+        """
         urteile: List[NachweisUrteil] = []
+        ohne_eigene: List[NachweisUrteil] = []
+        werte: Dict[str, Groesse] = {}
         befunde: List[Stufenbefund] = []
         for st in g.stufen:
-            werte = self._stufe_schreiben(e, p, w, g, r, st)
-            if werte is None:
+            sw = self._stufe_schreiben(e, p, w, g, r, st)
+            if sw is None:
                 befunde.append(Stufenbefund(st))
                 continue
-            V, V_Rd_c = werte
-            v = stufen.vergleich_schreiben(p, st, V, V_Rd_c)
+            v = stufen.vergleich_schreiben(p, st, sw.V, sw.V_Rd_c)
             ziel = self.d_stufen[st.bereich.name]
             v.zeile(p, ziel)
-            urteile.append(self.urteil(
-                ziel, f"an der Stufe von {st.bereich.titel}", v,
-                f"V_d = {V.formatiert()} kN {'≤' if v.erfuellt else '>'} "
-                f"V_Rd,c = {V_Rd_c.formatiert()} kN an der Stufe."))
-            befunde.append(Stufenbefund(st, V_Rd_c.groesse.si))
-        return urteile, tuple(befunde)
+            leisten = None
+            if v.erfuellt or not stufenleisten.moeglich(st.bereich):
+                urteil = self.urteil(ziel, st.wo, v,
+                                     f"V_d = {sw.V.formatiert()} kN {'≤' if v.erfuellt else '>'} "
+                                     f"V_Rd,c = {sw.V_Rd_c.formatiert()} kN an der Stufe.")
+                urteile.append(urteil)
+                ohne_eigene.append(urteil)
+            else:
+                mit, leisten = stufenleisten.nachweisen(self, e, p, w, g, r, st, sw)
+                urteile += mit
+                werte[ziel.id] = Groesse(v.grad, EINHEITSLOS)
+            befunde.append(Stufenbefund(st, sw.V_Rd_c.groesse.si, leisten))
+        return Stufenurteile(tuple(urteile), tuple(ohne_eigene), werte, tuple(befunde))
 
     def _weg_pruefen(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, g: Stuetzenschnitt,
                      r: Widerstand) -> Tuple[List[NachweisUrteil], Optional[Wegbefund]]:
@@ -798,25 +833,19 @@ class Durchstanzen(Stuetzenrechnung, Nachweis):
     def _ohne_eigene(self, p: Protokoll, weitere: List[NachweisUrteil], *,
                      an_der_stuetze: bool) -> None:
         """
-        Ein Hinweis, wo ein Schnitt an einer Stufe oder durch verschiedene
-        Dicken nicht hält: dort schlägt das Werkzeug noch keine Bewehrung vor,
-        und die Leisten an der Stütze, wo es welche gibt, zählen nicht.
+        Ein Hinweis, wo ein Schnitt ohne eigene Leisten nicht hält -- an einer
+        Stufe auf der Gegenseite oder durch verschiedene Dicken: dort schlägt
+        das Werkzeug noch keine Bewehrung vor, und die Leisten an der Stütze,
+        wo es welche gibt, zählen nicht.
         """
         offen = [u.fall for u in weitere if not u.erfuellt]
         if not offen:
             return
-        wo = aufgezaehlt(offen)
-        wo = wo[0].upper() + wo[1:]
+        wo = satzanfang(aufgezaehlt(offen))
         system = self.stelle.system.regeln
         p.hinweis(f"{wo} zählen die {system.LEISTEN} an der Stütze nicht, und eigene schlägt das "
                   f"Werkzeug dort noch nicht vor." if an_der_stuetze else
                   f"{wo} schlägt das Werkzeug noch keine Durchstanzbewehrung vor.")
-
-    def nicht_fuehrbar(self, grund: str) -> List[NachweisUrteil]:
-        """Die vier Urteile mit Durchstanzbewehrung, wo sich keine finden liess."""
-        return [self.urteil(d, fall, NICHT_FUEHRBAR, grund) for d, fall in zip(
-            self.mit_graden, ("mit Durchstanzbewehrung", "Verformungsvermögen",
-                              "Betondruckdiagonale", "ausserhalb der Durchstanzbewehrung"))]
 
     # -- Rechnen ------------------------------------------------------------
 
@@ -858,18 +887,19 @@ class Durchstanzen(Stuetzenrechnung, Nachweis):
         v = Vergleich(V_d, V_Rd_c)
         v.bedingung(p, "Querkraft gegen Durchstanzwiderstand")
         v.zeile(p, self.d_ohne)
-        an_stufen, stufenbefunde = self._stufen_pruefen(e, p, w, g, r)
+        an_stufen = self._stufen_pruefen(e, p, w, g, r)
         an_weg, wegbefund = self._weg_pruefen(e, p, w, g, r)
-        weitere = [*an_stufen, *an_weg]
-        befund = replace(befund, stufen=stufenbefunde, weg=wegbefund)
+        weitere = [*an_stufen.urteile, *an_weg]
+        ohne_eigene = [*an_stufen.ohne_eigene, *an_weg]
+        befund = replace(befund, stufen=an_stufen.befunde, weg=wegbefund)
         if not v.erfuellt and f.vorschlag:
             platz = self._platz(e, g)
             urteile, leisten, pilz = mit_bewehrung.nachweisen(self, e, p, w, Grundlage(
                 innen=g.innen, d=g.d, d_v=g.d_v, k_e=g.k_e, k_r=r.k_r, tau_cd=r.tau_cd, u=g.u,
                 psi=psi, V_d=V_d, V_Rd_c=V_Rd_c, masse=g.masse, umriss=umriss), platz)
-            self._ohne_eigene(p, weitere, an_der_stuetze=leisten is not None)
+            self._ohne_eigene(p, ohne_eigene, an_der_stuetze=leisten is not None)
             # Der Grad ohne Bewehrung bleibt ein Wert der Herleitung, ohne Urteil.
-            return Ausfuehrung({self.d_ohne.id: Groesse(v.grad, EINHEITSLOS)},
+            return Ausfuehrung({self.d_ohne.id: Groesse(v.grad, EINHEITSLOS), **an_stufen.werte},
                                [*urteile, *weitere],
                                replace(befund, leisten=leisten, pilz=pilz, platz=platz))
         alle = v.erfuellt and all(u.erfuellt for u in weitere)
@@ -877,7 +907,7 @@ class Durchstanzen(Stuetzenrechnung, Nachweis):
             p.hinweis(f"Für {f.lage.mehrzahl} schlägt das Werkzeug noch keine "
                       f"Durchstanzbewehrung vor.")
         elif not alle:
-            self._ohne_eigene(p, weitere, an_der_stuetze=False)
+            self._ohne_eigene(p, ohne_eigene, an_der_stuetze=False)
         elif psi.groesse.si <= ROTATION_MINDEST:
             p.hinweis(
                 f"ψ = {psi.formatiert()} ≤ {ROTATION_MINDEST:.3f}: das Verformungsvermögen ist "
@@ -891,5 +921,5 @@ class Durchstanzen(Stuetzenrechnung, Nachweis):
             self.d_ohne, "ohne Durchstanzbewehrung", v,
             f"V_d = {V_d.formatiert()} kN {'≤' if v.erfuellt else '>'} "
             f"V_Rd,c = {V_Rd_c.formatiert()} kN.")
-        return Ausfuehrung({}, [urteil, *weitere], befund)
+        return Ausfuehrung(an_stufen.werte, [urteil, *weitere], befund)
 

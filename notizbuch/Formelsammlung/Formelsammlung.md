@@ -1,5 +1,5 @@
 ---
-erzeugt: 8b6522577367
+erzeugt: edaa664a9f19
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -668,7 +668,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Normalspannung im Holz]] · [[opencivil.nachweis.qa_holz#HolzBiegungQA._normalspannung|HolzBiegungQA._normalspannung]], [[opencivil.nachweis.qa_holz_stabilitaet#_Herleitung|_Herleitung.__init__]]
 - [[Nulllinie auf halber Höhe]] · [[opencivil.nachweis.handrechnung#Handrechnung._halbe_hoehe|Handrechnung._halbe_hoehe]]
 - [[Nulllinie des gerissenen Querschnitts]] · [[opencivil.nachweis.mindestbewehrung#ZwaengungBiegung.protokoll_lage|ZwaengungBiegung.protokoll_lage]]
-- [[Platz für die Durchstanzbewehrung]] · [[opencivil.durchstanzen.mit_bewehrung#nachweisen|nachweisen]]
+- [[Platz für die Durchstanzbewehrung]] · [[opencivil.durchstanzen.mit_bewehrung#_werte|_werte]]
 - [[Probe – Moment um y]] · [[opencivil.nachweis.qa_blechverbund#KennzahlenBlechQA|KennzahlenBlechQA._biegung]], [[opencivil.nachweis.qa_stahl#probe|probe]], [[opencivil.nachweis.qa_verbund_kennzahlen#KennzahlenVerbundQA|KennzahlenVerbundQA._biegung]], [[opencivil.nachweis.schiefe_biegung#SchiefeBiegung|SchiefeBiegung._protokoll_bruchzustand]]
 - [[Probe – Moment um z]] · [[opencivil.nachweis.qa_stahl#probe|probe]], [[opencivil.nachweis.qa_verbund_kennzahlen#KennzahlenVerbundQA|KennzahlenVerbundQA._biegung]], [[opencivil.nachweis.schiefe_biegung#SchiefeBiegung|SchiefeBiegung._protokoll_bruchzustand]]
 - [[Probe – Normalkraft]] · [[opencivil.nachweis.qa_stahl#krafttabelle|krafttabelle]], [[opencivil.nachweis.schiefe_biegung#SchiefeBiegung|SchiefeBiegung._protokoll_bruchzustand]]

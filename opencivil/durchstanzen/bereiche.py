@@ -137,6 +137,15 @@ class Dicken:
         """Was jenseits seiner Stufe liegt: der Bereich, in dem er liegt -- ``None``: die Platte."""
         return self.eltern[bereich.name]
 
+    def vorfahren(self, bereich: Plattenbereich) -> Tuple[Plattenbereich, ...]:
+        """Die Bereiche, in denen er liegt, der innerste zuerst."""
+        kette = []
+        aussen = self.aussen(bereich)
+        while aussen is not None:
+            kette.append(aussen)
+            aussen = self.aussen(aussen)
+        return tuple(kette)
+
     def h_von(self, bereich: Optional[Plattenbereich]) -> float:
         return self.h if bereich is None else bereich.h
 

@@ -40,8 +40,8 @@ class Index:
     """
     Wie die Werte eines Schnitts heissen: ``zeichen`` hängt am Symbol -- leer um
     die Stütze, «out» aussen um die Anker, «P» um den Pilz --, ``vorsilbe`` an
-    den Namen der Zwischenwerte, damit die Leisten um die Stütze und um den
-    Pilz nebeneinander stehen können.
+    den Namen der Zwischenwerte, damit die Leisten um die Stütze, um den Pilz
+    und an den Stufen der Bereiche nebeneinander stehen können.
     """
 
     zeichen: str = ""

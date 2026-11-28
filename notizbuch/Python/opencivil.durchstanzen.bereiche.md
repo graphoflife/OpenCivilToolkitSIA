@@ -1,5 +1,5 @@
 ---
-erzeugt: b7c647bb2a4a
+erzeugt: e79b6ac77366
 art: modul
 tags: [modul]
 ---
@@ -163,6 +163,14 @@ def aussen(self, bereich: Plattenbereich) -> Optional[Plattenbereich]
 
 Was jenseits seiner Stufe liegt: der Bereich, in dem er liegt – `None`: die Platte.
 
+#### Dicken.vorfahren
+
+```python
+def vorfahren(self, bereich: Plattenbereich) -> Tuple[Plattenbereich, ...]
+```
+
+Die Bereiche, in denen er liegt, der innerste zuerst.
+
 #### Dicken.h_von
 
 ```python
@@ -234,6 +242,7 @@ nachgeschlagen ([[opencivil.durchstanzen.stufen|.stufen]]).
 - [[opencivil.durchstanzen.nachweis]]
 - [[opencivil.durchstanzen.stelle]]
 - [[opencivil.durchstanzen.stufen]]
+- [[opencivil.durchstanzen.stufenleisten]]
 - [[opencivil.durchstanzen.weg]]
 - [[opencivil.projekt.aufbau.durchstanzen]]
 - [[opencivil.projekt.durchstanzen]]

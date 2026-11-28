@@ -1,5 +1,5 @@
 ---
-erzeugt: e88518949bd2
+erzeugt: a599fb9e0a9a
 art: modul
 tags: [modul]
 ---
@@ -164,6 +164,25 @@ ist, d für ψ mit den beiden Lagen.
 - `d_psi: Optional[Wert] = None`
 - `lagen_psi: Optional[Dict[Richtung, Wert]] = None`
 
+### Stufenwerte
+
+```python
+@dataclass(frozen=True)
+class Stufenwerte
+```
+
+Wie die Herleitung den Schnitt an einer Stufe zeigt: d und d_v dort, k_e,
+der wirksame Umfang, k_r, die Querkraft im Schnitt und sein Widerstand –
+für den Vergleich und für die Leisten an der Stufe ([[opencivil.durchstanzen.stufenleisten|.stufenleisten]]).
+
+- `d: Wert`
+- `d_v: Wert`
+- `k_e: Wert`
+- `u: Wert`
+- `k_r: Wert`
+- `V: Wert`
+- `V_Rd_c: Wert`
+
 ### bereiche_schreiben
 
 ```python
@@ -185,13 +204,12 @@ Der Satz, mit welchem d ψ rechnet – nur, wo die Stütze in Bereichen steht.
 ### stufe_schreiben
 
 ```python
-def stufe_schreiben(p: Protokoll, w: Zwischenwerte, e: Eingaben, st: Stufe, *, d: Wert, werte: Bereichswerte, psi: Wert, k_g: Wert, tau_cd: Wert, k_e_stuetze: Wert, last: str, V_d: Optional[Wert]=None) -> Optional[Tuple[Wert, Wert]]
+def stufe_schreiben(p: Protokoll, w: Zwischenwerte, e: Eingaben, st: Stufe, *, d: Wert, werte: Bereichswerte, psi: Wert, k_g: Wert, tau_cd: Wert, k_e_stuetze: Wert, last: str, V_d: Optional[Wert]=None) -> Optional[Stufenwerte]
 ```
 
-Der Schnitt an einer Stufe mit denselben Schritten wie um die Stütze:
-zurück kommen die Querkraft in ihm und sein Widerstand – oder nichts,
-wo er fehlt. `d` ist das d der Platte, `V_d` die Stützenkraft, wo es
-nicht die eingegebene ist (die Kennzahl).
+Der Schnitt an einer Stufe mit denselben Schritten wie um die Stütze –
+nichts, wo er fehlt. `d` ist das d der Platte, `V_d` die
+Stützenkraft, wo es nicht die eingegebene ist (die Kennzahl).
 
 ### vergleich_schreiben
 
@@ -223,3 +241,4 @@ Der Vergleich an der Stufe – sein Urteil gibt der Nachweis.
 
 - [[opencivil.durchstanzen.kennzahl]]
 - [[opencivil.durchstanzen.nachweis]]
+- [[opencivil.durchstanzen.stufenleisten]]
