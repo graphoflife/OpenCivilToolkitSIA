@@ -14,7 +14,7 @@ import time
 import unittest
 
 from opencivil.durchstanzen.bereiche import Seite
-from opencivil.durchstanzen.nachweis import kennwerttabelle
+from opencivil.durchstanzen.kennwerte import kennwerttabelle
 from opencivil.durchstanzen.schnitt import _ueberlappung
 from opencivil.web import dienst
 from opencivil.web.durchstanzdaten import situation

@@ -6895,6 +6895,16 @@
       ]
     },
     {
+      "name": "opencivil.durchstanzen.kennwerte",
+      "pfad": "Python/opencivil.durchstanzen.kennwerte.md",
+      "art": "modul",
+      "kurz": "was die Zusammenfassung einer",
+      "stichworte": [
+        "angaben",
+        "kennwerttabelle"
+      ]
+    },
+    {
       "name": "opencivil.durchstanzen.kennzahl",
       "pfad": "Python/opencivil.durchstanzen.kennzahl.md",
       "art": "modul",
@@ -6967,9 +6977,7 @@
         "Durchstanzen._platz",
         "Durchstanzen._ohne_eigene",
         "Durchstanzen.nicht_fuehrbar",
-        "Durchstanzen.pruefe",
-        "angaben",
-        "kennwerttabelle"
+        "Durchstanzen.pruefe"
       ]
     },
     {

@@ -34,7 +34,7 @@ from opencivil.core.latex import Mathe, Zelle, als_text
 from opencivil.core.protokoll import GleichungBlock, TabellenBlock
 from opencivil.core.rechenwerk import Loesung
 from opencivil.core.wert import Kennzahl, Wert, WertDef
-from opencivil.durchstanzen import nachweis as durchstanzen
+from opencivil.durchstanzen import kennwerte as durchstanzen
 from opencivil.erdbeben import ersatzkraft
 from opencivil.geotechnik import fundament, grundbruch, setzung
 from opencivil.pfahl import uebersicht as pfahluebersicht

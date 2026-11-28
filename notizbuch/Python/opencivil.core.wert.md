@@ -1,5 +1,5 @@
 ---
-erzeugt: 8752981b2d54
+erzeugt: d4679c018f6a
 art: modul
 tags: [modul]
 ---
@@ -310,6 +310,7 @@ def beschreibung(self) -> str
 - [[opencivil.decke.werk]]
 - [[opencivil.durchstanzen.flaeche]]
 - [[opencivil.durchstanzen.herleitung]]
+- [[opencivil.durchstanzen.kennwerte]]
 - [[opencivil.durchstanzen.mit_bewehrung]]
 - [[opencivil.durchstanzen.nachweis]]
 - [[opencivil.durchstanzen.stelle]]

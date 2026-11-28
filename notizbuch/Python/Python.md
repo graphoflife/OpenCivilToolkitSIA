@@ -1,5 +1,5 @@
 ---
-erzeugt: c58dee998765
+erzeugt: 04475c325f96
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -63,6 +63,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.durchstanzen.bewehrung]] – wo die Durchstanzbewehrung liegt, und welche reicht.
     - [[opencivil.durchstanzen.flaeche]] – die gestützte Fläche: was Lage und Form für den Nachweis heissen.
     - [[opencivil.durchstanzen.herleitung]] – wie ein Nachweisschnitt in der Herleitung steht.
+    - [[opencivil.durchstanzen.kennwerte]] – was die Zusammenfassung einer
     - [[opencivil.durchstanzen.kennzahl]] – was eine Durchstanzstelle ohne Durchstanzbewehrung trägt.
     - [[opencivil.durchstanzen.mit_bewehrung]] – der Nachweis mit Durchstanzbewehrung und Stahlpilz.
     - [[opencivil.durchstanzen.nachweis]] – der Durchstanznachweis nach SIA 262:2025, 4.3.6.

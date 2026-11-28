@@ -1,5 +1,5 @@
 ---
-erzeugt: 5073c23afff8
+erzeugt: 7ebe1354f576
 art: modul
 tags: [modul]
 ---
@@ -282,7 +282,7 @@ hoch, beide, getrennt durch `/`.
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.rechenwerk]]
 - [[opencivil.core.wert]]
-- [[opencivil.durchstanzen.nachweis]]
+- [[opencivil.durchstanzen.kennwerte]]
 - [[opencivil.erdbeben.ersatzkraft]]
 - [[opencivil.geotechnik.fundament]]
 - [[opencivil.geotechnik.grundbruch]]

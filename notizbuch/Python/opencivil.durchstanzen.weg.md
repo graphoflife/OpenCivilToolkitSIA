@@ -1,5 +1,5 @@
 ---
-erzeugt: f5e68dff29af
+erzeugt: 7d4b82019417
 art: modul
 tags: [modul]
 ---
@@ -345,6 +345,7 @@ Was der Schnitt an einer Stelle trägt: (58) mit ihrem d und ihrem Teil des Schn
 
 ## Gebraucht von
 
+- [[opencivil.durchstanzen.kennwerte]]
 - [[opencivil.durchstanzen.kennzahl]]
 - [[opencivil.durchstanzen.nachweis]]
 - [[opencivil.web.durchstanzdaten]]

@@ -1,5 +1,5 @@
 ---
-erzeugt: 88905663474b
+erzeugt: 65c8ac0008a7
 art: modul
 tags: [modul]
 ---
@@ -448,26 +448,6 @@ Die vier Urteile mit Durchstanzbewehrung, wo sich keine finden liess.
 def pruefe(self, e: Eingaben, p: Protokoll) -> Ausfuehrung
 ```
 
-### angaben
-
-```python
-def angaben(stelle: Durchstanzstelle, werte: Dict[str, Wert]) -> GleichungBlock
-```
-
-Was über der Tabelle steht: Lage, Platte, Beton und die Masse, wie gerechnet.
-
-### kennwerttabelle
-
-```python
-def kennwerttabelle(befund: Durchstanzbefund) -> TabellenBlock
-```
-
-Die Grössen, aus denen der Widerstand entsteht – eine Zeile je Grösse. Mit
-Stahlpilz und Durchstanzbewehrung dazu, was sie sind und was sie tragen.
-Ohne Einwirkung nur der Schnitt: ψ = 0 und k_r = 2 gälten nur ohne Last;
-was die Stelle trägt, sagt die Kennzahl ([[opencivil.durchstanzen.kennzahl|.kennzahl]]). Bis 2026-11-27
-stand dort V_Rd,c = 866.7 kN, wo die Kennzahl 503.6 kN sagt.
-
 
 ## Konstanten
 
@@ -479,7 +459,6 @@ stand dort V_Rd,c = 866.7 kN, wo die Kennzahl 503.6 kN sagt.
 
 - [[opencivil.core.berechnung]]
 - [[opencivil.core.einheiten]]
-- [[opencivil.core.latex]]
 - [[opencivil.core.nachweis]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.sprache]]
@@ -499,7 +478,7 @@ stand dort V_Rd,c = 866.7 kN, wo die Kennzahl 503.6 kN sagt.
 
 ## Gebraucht von
 
-- [[opencivil.bericht.zusammenfassung]]
+- [[opencivil.durchstanzen.kennwerte]]
 - [[opencivil.durchstanzen.kennzahl]]
 - [[opencivil.durchstanzen.mit_bewehrung]]
 - [[opencivil.projekt.aufbau.durchstanzen]]

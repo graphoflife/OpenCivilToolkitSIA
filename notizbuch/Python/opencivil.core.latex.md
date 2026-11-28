@@ -1,5 +1,5 @@
 ---
-erzeugt: 1e527fdfeb9b
+erzeugt: 3709d96dd1fb
 art: modul
 tags: [modul]
 ---
@@ -473,7 +473,7 @@ Leser sieht alle Zweige und erkennt, welcher gegriffen hat.
 - [[opencivil.decke.aufteilung]]
 - [[opencivil.decke.fem.herleitung]]
 - [[opencivil.decke.herleitung]]
-- [[opencivil.durchstanzen.nachweis]]
+- [[opencivil.durchstanzen.kennwerte]]
 - [[opencivil.erdbeben.ersatzkraft]]
 - [[opencivil.erdbeben.kern]]
 - [[opencivil.fachwerkmodell.herleitung]]
