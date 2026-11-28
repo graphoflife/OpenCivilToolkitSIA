@@ -1,5 +1,5 @@
 ---
-erzeugt: 7e16c54784bf
+erzeugt: ca981b02a7e1
 art: modul
 tags: [modul]
 ---
@@ -93,6 +93,17 @@ Suche im Raster von 1 m findet, wie nach «Fachwerk suchen»; dieselbe
 Wand noch einmal mit «Zug nur waagrecht und senkrecht», im Raster von
 0.5 m: mit 1 m ginge so kein Fachwerk auf. Und ein drittes Mal nach dem
 Verfahren SIMP, im Netz von 0.2 m.
+
+### _mauerwerk
+
+```python
+def _mauerwerk(p: Projekt) -> None
+```
+
+Eine Wand aus Kalksandstein, 6 × 2.7 m und 175 mm dick, als
+Verbandmauerwerk vollfugig vermauert, am Fuss eingespannt und rechts
+gehalten: eine Türe
+mit Betonsturz und zwei Fenster, eines mit vorfabriziertem Sturz.
 
 ### _fachwerk_der_wandscheibe
 
@@ -330,6 +341,7 @@ allein nach (29), stossartig Biegung allein nach (38), mit k_m \< 1.
 - [[opencivil.projekt.decke]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.fachwerkmodell]]
+- [[opencivil.projekt.mauerwerk]]
 - [[opencivil.projekt.platte]]
 - [[opencivil.projekt.projekt]]
 - [[opencivil.projekt.querschnittsanalyse]]

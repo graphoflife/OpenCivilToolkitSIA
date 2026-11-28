@@ -104,6 +104,18 @@ export const ARTEN = [
     nachweise: false,
   },
   {
+    art: 'mauerwerk',
+    liste: 'mauerwerke',
+    vorsilbe: 'm',
+    zeichen: 'mauerwerk',
+    knopf: 'Mauer\u00ADwerk',
+    titel: 'Mauerwerk',
+    bezeichnung: 'Wand aus Mauerwerk',
+    einzahl: 'Wand',
+    leer: 'keine Wand',
+    nachweise: false,
+  },
+  {
     art: 'grundbruch',
     liste: 'grundbrueche',
     vorsilbe: 'g',

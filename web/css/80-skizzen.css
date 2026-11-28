@@ -295,6 +295,29 @@
 .fw-suchleiste { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 6px; }
 .fw-suchstand { margin: 6px 0; font-size: 13px; color: var(--schrift); }
 
+/* ------------------------------------------------------------ Mauerwerk -- */
+
+/* Die Wand in der Ansicht hell mit kräftigem Rand, ihre Öffnungen ausgespart.
+   Ein Sturz aus Beton in der Farbe des Betons, ein vorfabrizierter heller und
+   gestrichelt umrandet -- blass, solange er zu einer früheren Zeichnung
+   gehört. An den Rändern Kante und Schraffur, gelenkig mit Gelenken; unter
+   der Wand die Masse der Pfeiler. Rot, was der Kern beanstandet. */
+.mw-wand-flaeche { fill: var(--flaeche-2); stroke: none; }
+.mw-wand { fill: none; stroke: var(--schrift); stroke-width: 1.6; stroke-linejoin: round; }
+.mw-oeffnung-flaeche { fill: var(--flaeche); stroke: none; }
+.mw-oeffnung { fill: none; stroke: var(--schrift); stroke-width: 1.2; stroke-linejoin: round; }
+.mw-sturz { stroke-width: 1.1; stroke-linejoin: round; }
+.mw-sturz.ist-beton { fill: var(--beton); fill-opacity: .45; stroke: var(--beton); }
+.mw-sturz.ist-vorfabriziert {
+  fill: var(--beton); fill-opacity: .18; stroke: var(--beton); stroke-dasharray: 4 2;
+}
+.mw-stuerze.ist-alt { opacity: .4; }
+.mw-rand-linie { fill: none; stroke: var(--schrift-matt); stroke-width: 1.1; }
+.mw-gelenk { fill: var(--flaeche); stroke: var(--schrift-matt); stroke-width: 1.1; }
+.mw-mass { fill: none; stroke: var(--schrift-matt); stroke-width: 1; }
+.dk-name.ist-pfeiler { font-size: 10px; }
+.mw-wand.ist-fehler, .mw-oeffnung.ist-fehler { stroke: var(--schlecht); }
+
 /* ----------------------------------------------------------- Grundbruch -- */
 
 /* Die Bemessungswerte des Bodens unter seinen Feldern, wie der Kern sie rechnet. */

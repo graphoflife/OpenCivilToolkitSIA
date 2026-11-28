@@ -230,6 +230,8 @@ export const api = {
   fachwerkSuchen: (projekt, kennung, zustand, abschliessen = false) => ruf('fachwerk_suchen', {
     projekt, kennung, zustand, abschliessen,
   }),
+  /** Was das Zeichenfenster einer Wand unter die Teile legt: Meldungen, Pfeiler, Stürze. */
+  mauerwerkZeichnung: (projekt, kennung) => ruf('mauerwerk_zeichnung', { projekt, kennung }),
 };
 
 export { KernFehler };

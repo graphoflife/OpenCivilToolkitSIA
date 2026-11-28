@@ -14,9 +14,14 @@
  * mit Loch nach der Regel evenodd) -- ein Stab ist ein voller Punkt, eine
  * Stütze im Grundriss eine volle Fläche, ein Rohr im Schnitt ein Ring.
  * Gestrichelt wird, was eine Grenze meint oder nicht mitrechnet.
+ *
+ * Die Zeichen einer App, die neu dazukommt, stehen in ihrer eigenen Datei,
+ * `sinnbilder_<app>.js`, gebaut wie die hier -- sonst wüchse diese über
+ * 1000 Zeilen. Keines darf eines von hier ersetzen.
  */
 
 import { svgEl } from './dom.js';
+import { ZEICHEN as MAUERWERK } from './sinnbilder_mauerwerk.js';
 
 const ACHSEN = 'M4 20h16 M4 20V4';
 
@@ -835,6 +840,11 @@ const ZEICHEN = {
       'M4 20h5 M4 18.8v2.4 M9 18.8v2.4'],
   },
 };
+
+for (const [name, zeichen] of Object.entries(MAUERWERK)) {
+  if (ZEICHEN[name]) throw new Error(`sinnbilder.js: das Zeichen «${name}» gibt es schon.`);
+  ZEICHEN[name] = zeichen;
+}
 
 /**
  * Ein Zeichen als SVG -- `name` aus der Liste oben. Einen unbekannten Namen

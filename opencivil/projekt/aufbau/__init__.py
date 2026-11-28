@@ -15,7 +15,7 @@ ohne Bewehrung.
 
 DIE BAUTEILARTEN:
 Platte, Querschnittsanalyse, 2D- und 3D-Balkensystem, Decke, Durchstanzen,
-Fachwerkmodell, Grundbruch, Setzung, Pfahl und Erdbeben haben je einen Steckbrief
+Fachwerkmodell, Mauerwerk, Grundbruch, Setzung, Pfahl und Erdbeben haben je einen Steckbrief
 (:class:`Bauteilart`) in :data:`BAUTEILE` -- Liste in der Datei, Klasse der
 Eintraege, Vorsilbe der Kennungen, Namensraum, Baufunktion. Wer alle
 Bauteile durchgeht, geht diese Liste durch. Gebaut wird je Eintrag ein
@@ -39,6 +39,7 @@ durchgeht. Je Art ein Modul mit ihrer Baufunktion ``bauen``
 :mod:`~opencivil.projekt.aufbau.decke`,
 :mod:`~opencivil.projekt.aufbau.durchstanzen`,
 :mod:`~opencivil.projekt.aufbau.fachwerkmodell`,
+:mod:`~opencivil.projekt.aufbau.mauerwerk`,
 :mod:`~opencivil.projekt.aufbau.grundbruch`,
 :mod:`~opencivil.projekt.aufbau.setzung`,
 :mod:`~opencivil.projekt.aufbau.pfahl`,
@@ -61,14 +62,15 @@ from opencivil.projekt.durchstanzen import DurchstanzEintrag
 from opencivil.projekt.erdbeben import ErdbebenEintrag
 from opencivil.projekt.fachwerkmodell import FachwerkmodellEintrag
 from opencivil.projekt.grundbruch import GrundbruchEintrag
+from opencivil.projekt.mauerwerk import MauerwerkEintrag
 from opencivil.projekt.pfahl import PfahlEintrag
 from opencivil.projekt.platte import QuerschnittEintrag
 from opencivil.projekt.querschnittsanalyse import QuerschnittsanalyseEintrag
 from opencivil.projekt.setzung import SetzungEintrag
 
 from opencivil.projekt.aufbau import (
-    balkensystem, balkensystem3d, decke, durchstanzen, erdbeben, fachwerkmodell, grundbruch, pfahl,
-    platte, querschnittsanalyse, setzung,
+    balkensystem, balkensystem3d, decke, durchstanzen, erdbeben, fachwerkmodell, grundbruch,
+    mauerwerk, pfahl, platte, querschnittsanalyse, setzung,
 )
 from opencivil.projekt.aufbau.kern import (
     Aufbau, Bauteil, baustoff_bauen, ueberschreibungen_setzen,
@@ -277,6 +279,10 @@ DURCHSTANZEN = Bauteilart("durchstanzen", "durchstanzstellen", DurchstanzEintrag
 #: Die Kennungen f1, f2 ...: die Fluessigkeiten tragen «fl», das verwechselt sich nicht.
 FACHWERKMODELL = Bauteilart("fachwerkmodell", "fachwerkmodelle", FachwerkmodellEintrag, "f",
                             "fachwerkmodell", "Fachwerkmodelle", fachwerkmodell.bauen)
+#: Die Kennungen m1, m2 ...: die Mauerwerke unter den Materialien tragen «mw», das
+#: verwechselt sich nicht (:func:`~opencivil.projekt.netz.nummer`).
+MAUERWERK = Bauteilart("mauerwerk", "mauerwerke", MauerwerkEintrag, "m", "mauerwerk",
+                       "Mauerwerk", mauerwerk.bauen)
 #: Die Kennungen t1, t2 ...: «p» tragen schon die Skripte.
 PFAHL = Bauteilart("pfahl", "pfaehle", PfahlEintrag, "t", "pfahl", "Pfähle", pfahl.bauen)
 #: Die Kennungen h1, h2 ...: «e» tragen schon die Decken -- h wie Haus.
@@ -288,9 +294,9 @@ ERDBEBEN = Bauteilart("erdbeben", "erdbeben", ErdbebenEintrag, "h", "erdbeben", 
 #: ihnen, das Erdbeben ebenso; die Nachweise einer Analyse koennen Stellen
 #: eines Balkensystems lesen, darum baut sie sie im zweiten Gang
 #: (:attr:`Bauteilart.danach`). Decke, Durchstanzen, Fachwerkmodell,
-#: Grundbruch, Setzung und Pfahl lesen nichts von den anderen.
+#: Mauerwerk, Grundbruch, Setzung und Pfahl lesen nichts von den anderen.
 #: Wer alle Bauteile durchgeht (Lesen, Kennungen, Aufbau, Zwischenspeicher,
 #: Erkennen einer Datei), geht diese Liste durch.
 BAUTEILE: Tuple[Bauteilart, ...] = (PLATTE, ANALYSE, BALKENSYSTEM, BALKENSYSTEM3D, DECKE,
-                                     DURCHSTANZEN, FACHWERKMODELL, GRUNDBRUCH, SETZUNG, PFAHL,
-                                     ERDBEBEN)
+                                     DURCHSTANZEN, FACHWERKMODELL, MAUERWERK, GRUNDBRUCH, SETZUNG,
+                                     PFAHL, ERDBEBEN)

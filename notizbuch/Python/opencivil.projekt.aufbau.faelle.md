@@ -1,5 +1,5 @@
 ---
-erzeugt: 67475afe64ae
+erzeugt: 24ace4823f76
 art: modul
 tags: [modul]
 ---
@@ -68,3 +68,4 @@ Hinweis sagt es.
 - [[opencivil.projekt.aufbau.balkensystem]]
 - [[opencivil.projekt.aufbau.decke]]
 - [[opencivil.projekt.aufbau.fachwerkmodell]]
+- [[opencivil.projekt.aufbau.mauerwerk]]

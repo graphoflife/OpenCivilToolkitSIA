@@ -7,6 +7,57 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-28 · Mauerwerk: Material, Wand, Öffnungen und Zeichnung (Schritt 14a)
+
+Eine neue App «Mauerwerk», die zwölfte Bauteilart: eine Wand aus
+unbewehrtem Mauerwerk nach SIA 266:2015, noch ohne Lasten und Nachweise.
+Sie rechnet schon, was alle späteren Nachweise brauchen: die Werte, mit
+denen die Wand rechnet, und wo ihre Pfeiler stehen.
+
+- **Das Material** ist eine eigene Art mit den sieben Sorten der
+  Tabellen 1 und 7 (MB, MBL, MC, MCL, MK, MP, MPL) und γ_M = 2.0. Die
+  Tabelle 7 nennt f_yd ohne kennzeichnenden Wert; f_yk ist darum γ_M ·
+  f_yd, so gibt Gl. (3) ihre Zahl wieder. E_xd und G_d aus 3.1.4.1 und
+  Gl. (5) treffen die Tabelle, die G_d auf eine Stelle rundet (MBL 0.36,
+  gedruckt 0.4 kN/mm²). Ein eigenes Mauerwerk ist ein deklariertes: die
+  Wand misst es an den Mindestwerten nach 3.1.3.1, rot mit Namen.
+- **Was die Wand wählt, nicht das Material:** Verband (alle Werte mal
+  0.85, μ_d nicht, 4.2.1.1) und vollfugige Stossfugen (die zweite Zeile
+  von f_yd). Beispiel MK im Verband, vollfugig: f_xd 3.5 → 2.98, f_yd 1.6
+  → 1.36 N/mm². Eine Regel entscheidet, welcher Wert des Materials gilt
+  (`kennwerte.quelle`); Werte, Herleitung und Zusammenfassung fragen sie.
+- **Die Dicke ist eine Vorgabe des Kerns** (`werk.VORGABEN`): Feld,
+  Zeichen und Kachel kommen von dort, die Herleitung zeigt sie im Kasten.
+  Ein Schalter bietet die üblichen Dicken der Sorte an; eine andere
+  rechnet gleich, ein grauer Hinweis sagt, dass sie unüblich ist
+  («… eine Wand von 180 mm ist unüblich»). Die Listen sind nach Vorgabe.
+- **Zeichnen** wie in der Decke, in Metern: die Werkzeuge «Wand» und
+  «Öffnung» beginnen mit einem Rechteck aus zwei Ecken, G wechselt zu
+  Ecke um Ecke. Wand und Öffnungen müssen Rechtecke mit waagrechten und
+  senkrechten Seiten sein; eine schräge Krone steht rot.
+- **Der Kern prüft am Ort:** eine Öffnung über den Rand, zwei, die sich
+  überschneiden, ein Sturz über die Wand hinaus («… hinaus: oben und
+  links») oder in eine andere Öffnung, zwei Stürze übereinander – rot mit
+  den Namen der Teile; ohne Wand grau.
+- **Pfeiler:** zwischen den Öffnungen und an den Enden, ein Fenster über
+  einer Türe ist mit ihr eine Lücke. Beispiel: Wand 6 m, Türe 0.8–1.8 m,
+  Fenster 2.8–4.0 und 4.9–5.5 m → P1 0.8, P2 1.0, P3 0.9, P4 0.5 m.
+- **Oberfläche:** die Kacheln «Mauerwerk» (Material, Dicke, wie gemauert,
+  Stossfugen) und «Ränder» (Kopf, Fuss, links, rechts) mit Bildern; die
+  Seitenleiste einer Öffnung mit dem Sturz und seinen Massen; unter
+  «Diagramme» die Ansicht mit Stürzen, Rändern und Pfeilern; in der
+  Zusammenfassung die Werte des Mauerwerks neben denen der Wand, die
+  Öffnungen und die Pfeiler.
+- **Nebenbei:** die Zeichen einer neuen App stehen in einer eigenen
+  Datei (`sinnbilder_mauerwerk.js`), damit `sinnbilder.js` unter 1000
+  Zeilen bleibt; ein doppelter Name bricht ab, und der Test der Zeichen
+  liest alle Dateien.
+- Gebaut: `material/mauerwerk.py`, das Paket `mauerwerk/` (`modell`,
+  `kennwerte`, `pruefen`, `werk`, `herleitung`), `projekt/mauerwerk.py`,
+  `projekt/aufbau/mauerwerk.py`, `web/mauerwerkdaten.py`; in der Seite
+  `mauerwerk.js`, `mw_zeichnung.js`, `mw_bild.js`. Tests:
+  `tests/test_mauerwerk.py`, die Maske in `tests/test_vorgaben.py`.
+
 ## 2026-11-28 · Durchstanzen: Leisten an den Stufen (Schritt 13d, zweiter Teil)
 
 Hält der Schnitt an der Stufe eines Bereichs zur Stütze hin nicht (Figur

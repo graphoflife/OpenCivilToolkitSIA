@@ -81,9 +81,11 @@ from opencivil.projekt.setzung import SchichtEintrag, SetzungEintrag
 from opencivil.durchstanzen import stelle
 from opencivil.erdbeben import ersatzkraft
 from opencivil.fachwerkmodell import verfahren as fachwerkverfahren
+from opencivil.mauerwerk import werk as mauerwerkswand
 from opencivil.erdbeben.ersatzkraft import Baugrundklasse, Bauwerksklasse, Erdbebenzone, Schwingzeit
 from opencivil.projekt.erdbeben import ErdbebenEintrag, GeschossEintrag
 from opencivil.projekt.fachwerkmodell import FachwerkmodellEintrag
+from opencivil.projekt.mauerwerk import MauerwerkEintrag
 from opencivil.pfahl import pfahl
 from opencivil.pfahl.boden import Mantel
 from opencivil.pfahl.pfahl import (
@@ -91,8 +93,8 @@ from opencivil.pfahl.pfahl import (
 )
 from opencivil.projekt.pfahl import PfahlEintrag, PfahlschichtEintrag
 from opencivil.web import (
-    balkendaten, deckendaten, diagrammdaten, durchstanzdaten, fachwerkdaten, systemkatalog,
-    werkstoffkurven,
+    balkendaten, deckendaten, diagrammdaten, durchstanzdaten, fachwerkdaten, mauerwerkdaten,
+    systemkatalog, werkstoffkurven,
 )
 from opencivil.web.anzeige import zelle_dict
 from opencivil.web.umschlag import endlich
@@ -218,7 +220,8 @@ def _vorgaben() -> Dict[str, List[dict]]:
                                  (PfahlschichtEintrag, pfahl.JE_SCHICHT),
                                  (ErdbebenEintrag, ersatzkraft.VORGABEN),
                                  (GeschossEintrag, ersatzkraft.JE_GESCHOSS),
-                                 (FachwerkmodellEintrag, fachwerkverfahren.VORGABEN))}
+                                 (FachwerkmodellEintrag, fachwerkverfahren.VORGABEN),
+                                 (MauerwerkEintrag, mauerwerkswand.VORGABEN))}
 
 
 def katalog() -> dict:
@@ -322,6 +325,8 @@ def katalog() -> dict:
         },
         # Was nur ein Fachwerkmodell braucht (:func:`fachwerkdaten.katalog`).
         "fachwerkmodell": fachwerkdaten.katalog(),
+        # Was nur eine Wand aus Mauerwerk braucht (:func:`mauerwerkdaten.katalog`).
+        "mauerwerk": mauerwerkdaten.katalog(),
         # Wie ein Fundament der Setzung folgt -- und wo darum gerechnet wird.
         "setzung": {
             "steifigkeiten": [{"wert": s.value, "beschriftung": s.beschriftung}

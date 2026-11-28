@@ -181,6 +181,12 @@
       "bereich": "Baustoffe"
     },
     {
+      "name": "Mauerwerk",
+      "pfad": "Formelsammlung/Themen/Mauerwerk.md",
+      "art": "thema",
+      "bereich": "Mauerwerk"
+    },
+    {
       "name": "Querkraft",
       "pfad": "Formelsammlung/Themen/Querkraft.md",
       "art": "thema",
@@ -807,6 +813,39 @@
       ]
     },
     {
+      "name": "Bemessungswert der Druckfestigkeit senkrecht zu den Lagerfugen",
+      "pfad": "Formelsammlung/Formeln/Bemessungswert der Druckfestigkeit senkrecht zu den Lagerfugen.md",
+      "art": "formel",
+      "zeichen": [
+        "f_{xd}"
+      ],
+      "themen": [
+        "Mauerwerk"
+      ]
+    },
+    {
+      "name": "Bemessungswert der Druckfestigkeit senkrecht zu den Stossfugen",
+      "pfad": "Formelsammlung/Formeln/Bemessungswert der Druckfestigkeit senkrecht zu den Stossfugen.md",
+      "art": "formel",
+      "zeichen": [
+        "f_{yd}"
+      ],
+      "themen": [
+        "Mauerwerk"
+      ]
+    },
+    {
+      "name": "Bemessungswert der Druckfestigkeit senkrecht zu den Stossfugen, vollfugig vermauert",
+      "pfad": "Formelsammlung/Formeln/Bemessungswert der Druckfestigkeit senkrecht zu den Stossfugen, vollfugig vermauert.md",
+      "art": "formel",
+      "zeichen": [
+        "f_{yd,v}"
+      ],
+      "themen": [
+        "Mauerwerk"
+      ]
+    },
+    {
       "name": "Bemessungswert der Fliessgrenze",
       "pfad": "Formelsammlung/Formeln/Bemessungswert der Fliessgrenze.md",
       "art": "formel",
@@ -911,6 +950,17 @@
       ]
     },
     {
+      "name": "Bemessungswert des Elastizitätsmoduls senkrecht zu den Lagerfugen",
+      "pfad": "Formelsammlung/Formeln/Bemessungswert des Elastizitätsmoduls senkrecht zu den Lagerfugen.md",
+      "art": "formel",
+      "zeichen": [
+        "E_{xd}"
+      ],
+      "themen": [
+        "Mauerwerk"
+      ]
+    },
+    {
       "name": "Bemessungswert des Erdwiderstands am Pfahl",
       "pfad": "Formelsammlung/Formeln/Bemessungswert des Erdwiderstands am Pfahl.md",
       "art": "formel",
@@ -930,6 +980,17 @@
       ],
       "themen": [
         "Fundament"
+      ]
+    },
+    {
+      "name": "Bemessungswert des Schubmoduls",
+      "pfad": "Formelsammlung/Formeln/Bemessungswert des Schubmoduls.md",
+      "art": "formel",
+      "zeichen": [
+        "G_d"
+      ],
+      "themen": [
+        "Mauerwerk"
       ]
     },
     {
@@ -1676,6 +1737,17 @@
       ],
       "themen": [
         "Biegung und Normalkraft"
+      ]
+    },
+    {
+      "name": "Elastizitätsmodul senkrecht zu den Lagerfugen, kennzeichnend",
+      "pfad": "Formelsammlung/Formeln/Elastizitätsmodul senkrecht zu den Lagerfugen, kennzeichnend.md",
+      "art": "formel",
+      "zeichen": [
+        "E_{xk}"
+      ],
+      "themen": [
+        "Mauerwerk"
       ]
     },
     {
@@ -4255,6 +4327,17 @@
       ],
       "themen": [
         "Blechverbunddecke"
+      ]
+    },
+    {
+      "name": "Schubmodul, kennzeichnend",
+      "pfad": "Formelsammlung/Formeln/Schubmodul, kennzeichnend.md",
+      "art": "formel",
+      "zeichen": [
+        "G_k"
+      ],
+      "themen": [
+        "Mauerwerk"
       ]
     },
     {
@@ -7861,7 +7944,7 @@
       "name": "opencivil.material",
       "pfad": "Python/opencivil.material.md",
       "art": "modul",
-      "kurz": "die Baustoffe: Beton, Betonstahl, Baustahl, Spannstahl, Holz und",
+      "kurz": "die Baustoffe: Beton, Betonstahl, Baustahl, Spannstahl, Holz,",
       "stichworte": []
     },
     {
@@ -7980,6 +8063,20 @@
       ]
     },
     {
+      "name": "opencivil.material.mauerwerk",
+      "pfad": "Python/opencivil.material.mauerwerk.md",
+      "art": "modul",
+      "kurz": "Mauerwerk nach SIA 266:2015.",
+      "stichworte": [
+        "Bindung",
+        "Bindung.phi",
+        "Mauerwerkssorte",
+        "mauerwerkssorten_zum_anlegen",
+        "_durch_gamma",
+        "mauerwerk"
+      ]
+    },
+    {
       "name": "opencivil.material.profilblech",
       "pfad": "Python/opencivil.material.profilblech.md",
       "art": "modul",
@@ -8010,6 +8107,112 @@
         "erzeugnisarten",
         "spannstahlsorten_zum_anlegen",
         "spannstahl"
+      ]
+    },
+    {
+      "name": "opencivil.mauerwerk",
+      "pfad": "Python/opencivil.mauerwerk.md",
+      "art": "modul",
+      "kurz": "Wände aus unbewehrtem Mauerwerk nach SIA 266:2015.",
+      "stichworte": []
+    },
+    {
+      "name": "opencivil.mauerwerk.herleitung",
+      "pfad": "Python/opencivil.mauerwerk.herleitung.md",
+      "art": "modul",
+      "kurz": "wie eine Mauerwerkswand ihre Rechnung aufschreibt.",
+      "stichworte": [
+        "schreiben",
+        "_gemauert",
+        "_gehalten",
+        "_werte",
+        "_wertzeile",
+        "_oeffnungen",
+        "_von_bis",
+        "_pfeiler"
+      ]
+    },
+    {
+      "name": "opencivil.mauerwerk.kennwerte",
+      "pfad": "Python/opencivil.mauerwerk.kennwerte.md",
+      "art": "modul",
+      "kurz": "mit welchen Werten ihres Mauerwerks eine Wand rechnet.",
+      "stichworte": [
+        "Wandwerte",
+        "quelle",
+        "wandwerte",
+        "unter_mindestwerten"
+      ]
+    },
+    {
+      "name": "opencivil.mauerwerk.modell",
+      "pfad": "Python/opencivil.mauerwerk.modell.md",
+      "art": "modul",
+      "kurz": "eine Mauerwerkswand in der Ansicht, in SI.",
+      "stichworte": [
+        "Mauerung",
+        "Mauerung.beschriftung",
+        "Mauerung.erklaerung",
+        "Stossfugen",
+        "Stossfugen.beschriftung",
+        "Stossfugen.erklaerung",
+        "Halterung",
+        "Halterung.beschriftung",
+        "Halterung.erklaerung",
+        "Seitenrand",
+        "Seitenrand.beschriftung",
+        "Seitenrand.erklaerung",
+        "Sturzart",
+        "Sturzart.beschriftung",
+        "Sturzart.erklaerung",
+        "Rechteck",
+        "Rechteck.breite",
+        "Rechteck.hoehe",
+        "Rechteck.enthaelt",
+        "Rechteck.ueberlappt",
+        "rechteck",
+        "Umriss",
+        "Umriss.rechteck",
+        "Oeffnung",
+        "Oeffnung.sturzflaeche",
+        "Pfeiler",
+        "Pfeiler.b",
+        "Wand",
+        "Wand.verband",
+        "Wand.vollfugig",
+        "Wand.flaeche",
+        "pfeiler"
+      ]
+    },
+    {
+      "name": "opencivil.mauerwerk.pruefen",
+      "pfad": "Python/opencivil.mauerwerk.pruefen.md",
+      "art": "modul",
+      "kurz": "was einer Wand fehlt oder an ihr nicht stimmt.",
+      "stichworte": [
+        "pruefen",
+        "_umriss",
+        "_oeffnungen",
+        "_wohin",
+        "dickenhinweis"
+      ]
+    },
+    {
+      "name": "opencivil.mauerwerk.werk",
+      "pfad": "Python/opencivil.mauerwerk.werk.md",
+      "art": "modul",
+      "kurz": "eine Mauerwerkswand im Rechenwerk.",
+      "stichworte": [
+        "Wandbefund",
+        "Wandbefund.alle_meldungen",
+        "Wandbefund.bereit",
+        "WandProzedur",
+        "WandProzedur.rechne",
+        "Mauerwerkswand",
+        "Mauerwerkswand.baustoffe",
+        "Mauerwerkswand.abschnitt",
+        "Mauerwerkswand.ziele",
+        "Mauerwerkswand.rechnen_und_schreiben"
       ]
     },
     {
@@ -9631,6 +9834,7 @@
         "Aufbau.balkensysteme3d",
         "Aufbau.decken",
         "Aufbau.fachwerkmodelle",
+        "Aufbau.mauerwerke",
         "Aufbau.grundbrueche",
         "Aufbau.setzungen",
         "Aufbau.pfaehle",
@@ -9672,6 +9876,16 @@
         "spannungsnachweise",
         "_gebrauchsfaelle",
         "knickfall"
+      ]
+    },
+    {
+      "name": "opencivil.projekt.aufbau.mauerwerk",
+      "pfad": "Python/opencivil.projekt.aufbau.mauerwerk.md",
+      "art": "modul",
+      "kurz": "eine Mauerwerkswand wird Rechnung.",
+      "stichworte": [
+        "wand_von",
+        "bauen"
       ]
     },
     {
@@ -9805,6 +10019,7 @@
         "jeder_nachweis",
         "_decken",
         "_fachwerkmodell",
+        "_mauerwerk",
         "_fachwerk_der_wandscheibe",
         "_wandscheibe",
         "_durchstanzstellen",
@@ -10125,6 +10340,24 @@
       ]
     },
     {
+      "name": "opencivil.projekt.mauerwerk",
+      "pfad": "Python/opencivil.projekt.mauerwerk.md",
+      "art": "modul",
+      "kurz": "eine Mauerwerkswand, wie die Oberfläche sie beschreibt.",
+      "stichworte": [
+        "WandknotenEintrag",
+        "WandEintrag",
+        "OeffnungEintrag",
+        "MauerwerkEintrag",
+        "MauerwerkEintrag.materialien",
+        "MauerwerkEintrag.lagen",
+        "MauerwerkEintrag.netz",
+        "MauerwerkEintrag.wand",
+        "MauerwerkEintrag.oeffnung",
+        "rechteck"
+      ]
+    },
+    {
       "name": "opencivil.projekt.netz",
       "pfad": "Python/opencivil.projekt.netz.md",
       "art": "modul",
@@ -10233,12 +10466,14 @@
         "Projekt.holz",
         "Projekt.profilblech",
         "Projekt.fluessigkeit",
+        "Projekt.mauerwerk",
         "Projekt.eigener_beton",
         "Projekt.eigener_stahl",
         "Projekt.eigener_baustahl",
         "Projekt.eigener_spannstahl",
         "Projekt.eigenes_holz",
         "Projekt.eigene_fluessigkeit",
+        "Projekt.eigenes_mauerwerk",
         "Projekt.material_anlegen",
         "Projekt._normsorte",
         "Projekt.platte",
@@ -10247,6 +10482,7 @@
         "Projekt.balkensystem3d",
         "Projekt.decke",
         "Projekt.fachwerkmodell",
+        "Projekt.wand",
         "Projekt.durchstanzen",
         "Projekt.grundbruch",
         "Projekt.setzung",
@@ -12462,6 +12698,7 @@
         "fachwerk_zeichnung",
         "fachwerk_suchen",
         "_fachwerkmodell",
+        "mauerwerk_zeichnung",
         "decke_ergebnis",
         "balkensystem_bearbeiten",
         "_vorlagenwahl",
@@ -12540,6 +12777,19 @@
       "stichworte": [
         "situation",
         "_legende"
+      ]
+    },
+    {
+      "name": "opencivil.web.mauerwerkdaten",
+      "pfad": "Python/opencivil.web.mauerwerkdaten.md",
+      "art": "modul",
+      "kurz": "was die Oberflaeche von einer Wand aus Mauerwerk zeichnet.",
+      "stichworte": [
+        "zeichnung",
+        "uebersicht",
+        "_werte",
+        "unfertig",
+        "katalog"
       ]
     },
     {

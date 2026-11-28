@@ -1,5 +1,5 @@
 ---
-erzeugt: b8cebc4b640e
+erzeugt: e14c23e84960
 art: modul
 tags: [modul]
 ---
@@ -65,6 +65,7 @@ class Baustoffart(Wahl)
 - `HOLZ = 'holz'`
 - `PROFILBLECH = 'profilblech'`
 - `FLUESSIGKEIT = 'fluessigkeit'`
+- `MAUERWERK = 'mauerwerk'`
 
 #### Baustoffart.beschriftung
 
@@ -247,8 +248,10 @@ Giesst aus den Vorlagen ein Material mit eigenem Namensraum.
 - [[opencivil.material.betonstahl]]
 - [[opencivil.material.fluessigkeit]]
 - [[opencivil.material.holz]]
+- [[opencivil.material.mauerwerk]]
 - [[opencivil.material.profilblech]]
 - [[opencivil.material.spannstahl]]
+- [[opencivil.mauerwerk.werk]]
 - [[opencivil.nachweis.duktilitaet]]
 - [[opencivil.nachweis.handrechnung]]
 - [[opencivil.nachweis.qa_blechverbund]]

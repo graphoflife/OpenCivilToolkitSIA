@@ -1,5 +1,5 @@
 ---
-erzeugt: d00d921f93f2
+erzeugt: 0915893f2392
 art: modul
 tags: [modul]
 ---
@@ -241,6 +241,7 @@ Je Querschnitt eines Systems, wo A und I stehen – und je Paar aus Querschnitt 
 - [[opencivil.material.betonstahl]]
 - [[opencivil.material.holz]]
 - [[opencivil.material.spannstahl]]
+- [[opencivil.mauerwerk.werk]]
 - [[opencivil.nachweis.biegung_normalkraft]]
 - [[opencivil.nachweis.qa_blechverbund]]
 - [[opencivil.nachweis.rechenwahl]]
@@ -258,6 +259,7 @@ Je Querschnitt eines Systems, wo A und I stehen – und je Paar aus Querschnitt 
 - [[opencivil.projekt.fachwerkmodell]]
 - [[opencivil.projekt.grundbruch]]
 - [[opencivil.projekt.lesen]]
+- [[opencivil.projekt.mauerwerk]]
 - [[opencivil.projekt.pfahl]]
 - [[opencivil.projekt.projekt]]
 - [[opencivil.projekt.querschnittsanalyse]]
@@ -284,6 +286,7 @@ Je Querschnitt eines Systems, wo A und I stehen – und je Paar aus Querschnitt 
 - [[opencivil.web.diagrammdaten]]
 - [[opencivil.web.durchstanzdaten]]
 - [[opencivil.web.fachwerkdaten]]
+- [[opencivil.web.mauerwerkdaten]]
 - [[opencivil.web.systemkatalog]]
 - [[opencivil.web.umschlag]]
 - [[opencivil.web.werkstoffkurven]]

@@ -27,6 +27,8 @@ Aufgabe ein Modul::
     fachwerkmodell.py
                    eine Scheibe aus Umrissen und Löchern, mit Lagern und
                    Punktlasten, für ihr Fachwerkmodell
+    mauerwerk.py   eine Wand aus Mauerwerk in der Ansicht: Umriss, Türen und
+                   Fenster mit Stürzen, Dicke, Ränder
     grundbruch.py  ein Flachfundament: Boden, Masse, Gelaende, Grundwasser
                    und Einwirkungen fuer Grundbruch und Gleiten
     setzung.py     ein Flachfundament auf geschichtetem Baugrund: Pressungen
@@ -103,6 +105,9 @@ from opencivil.projekt.fachwerkmodell import (
     FachwerkmodellEintrag, LochEintrag, ScheibeEintrag, ScheibenknotenEintrag, ScheibenlagerEintrag,
     ScheibenlastEintrag,
 )
+from opencivil.projekt.mauerwerk import (
+    MauerwerkEintrag, OeffnungEintrag, WandEintrag, WandknotenEintrag,
+)
 from opencivil.projekt.aufbau import BAUTEILE, Aufbau, Bauteil, Bauteilart, aufbauen
 from opencivil.projekt.projekt import Projekt
 from opencivil.projekt.mappe import Mappe
@@ -134,5 +139,6 @@ __all__ = [
     "StuetzeEintrag", "TraegerEintrag", "ZoneEintrag",
     "FachwerkmodellEintrag", "LochEintrag", "ScheibeEintrag", "ScheibenknotenEintrag",
     "ScheibenlagerEintrag", "ScheibenlastEintrag",
+    "MauerwerkEintrag", "OeffnungEintrag", "WandEintrag", "WandknotenEintrag",
     "aufbauen",
 ]

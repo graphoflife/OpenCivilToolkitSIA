@@ -68,8 +68,8 @@ class TestAnlegen(unittest.TestCase):
         self.assertEqual((eigen.name, eigen.sorte, eigen.eigenstaendig), ("BE1", "C30/37", True))
         # GL24h steht schon im neuen Projekt, als h1.
         self.assertEqual(projekt.material_anlegen("holz", "C24").kennung, "h2")
-        with self.assertRaisesRegex(ProjektFehler, "Eine Materialart 'mauerwerk' gibt es nicht"):
-            projekt.material_anlegen("mauerwerk", "MB")
+        with self.assertRaisesRegex(ProjektFehler, "Eine Materialart 'glas' gibt es nicht"):
+            projekt.material_anlegen("glas", "Floatglas")
 
 
 class TestKopieren(unittest.TestCase):

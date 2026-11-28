@@ -1,5 +1,5 @@
 ---
-erzeugt: 3e23a84466ec
+erzeugt: ca62e798d4aa
 art: modul
 tags: [modul]
 ---
@@ -33,8 +33,8 @@ class Materialart
 - `vorlagen: Tuple[KennwertVorlage, ...]`
 - `bauen: Callable[..., Baustoff]` – Wie [[opencivil.material.beton#beton|beton]]: Sorte, dann Name, Praefix, Abweichungen.
 - `anlegen: Tuple[str, ...]` – Die Sorten in der Folge, in der das Fenster «Neues Material» sie anbietet.
-- `kennung: str` – Womit die Kennung beginnt: b1, s1, st1, sp1, h1, pb1, fl1.
-- `eigene: str` – Womit der Name eines eigenen Materials beginnt: BE1, S1, ST1 (Benutzer, 2026-10-16), SP1 beim Spannstahl, H1 beim Holz, PB1 beim Profilblechstahl, FL1 bei einer Fluessigkeit.
+- `kennung: str` – Womit die Kennung beginnt: b1, s1, st1, sp1, h1, pb1, fl1, mw1.
+- `eigene: str` – Womit der Name eines eigenen Materials beginnt: BE1, S1, ST1 (Benutzer, 2026-10-16), SP1 beim Spannstahl, H1 beim Holz, PB1 beim Profilblechstahl, FL1 bei einer Fluessigkeit, MW1 beim Mauerwerk.
 - `grundlage: str` – Worauf die Kennwerte einer Normsorte stehen – so steht es in der Oberflaeche.
 - `grundlagen: Mapping[str, str] = field(default_factory=dict)` – Je Sorte, deren Kennwerte anderswo stehen, worauf – beim Betonstahl der «Stahl II» aus SIA 269/2:2011 ([[opencivil.material.betonstahl#Konstanten|STAHL_II]]).
 - `erzeugnisse: Mapping[str, Tuple[Erzeugnis, ...]] = field(default_factory=dict)` – Je Sorte, in welchen Erzeugnissen es sie gibt – beim Spannstahl Draehte, Litzen und Staebe nach Tabelle 7; die anderen Arten haben keine Liste.
@@ -146,6 +146,7 @@ beide nehmen das Wort der Art, `kein_wort` im Katalog.
 - [[opencivil.material.betonstahl]]
 - [[opencivil.material.fluessigkeit]]
 - [[opencivil.material.holz]]
+- [[opencivil.material.mauerwerk]]
 - [[opencivil.material.profilblech]]
 - [[opencivil.material.spannstahl]]
 

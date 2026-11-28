@@ -1,5 +1,5 @@
 ---
-erzeugt: f640801aa24c
+erzeugt: 311736add9b8
 art: modul
 tags: [modul]
 ---
@@ -60,7 +60,8 @@ alldem die Formelsammlung und diese Seiten.
 - [[opencivil.geotechnik]] – Nachweise im Baugrund.
 - [[opencivil.holzbau]] – ein gezeichneter Querschnitt aus Holz nach SIA 265:2012.
 - [[opencivil.konsole]] – Python im Browser, für die App «Python».
-- [[opencivil.material]] – die Baustoffe: Beton, Betonstahl, Baustahl, Spannstahl, Holz und
+- [[opencivil.material]] – die Baustoffe: Beton, Betonstahl, Baustahl, Spannstahl, Holz,
+- [[opencivil.mauerwerk]] – Wände aus unbewehrtem Mauerwerk nach SIA 266:2015.
 - [[opencivil.mcp]] – das Werkzeug fuer eine KI, ueber das Model Context Protocol.
 - [[opencivil.nachweis]] – die Nachweise der Platte und des gezeichneten Querschnitts.
 - [[opencivil.notizbuch]] – das Notizbuch: Formelsammlung und Python-Doku als Markdown.

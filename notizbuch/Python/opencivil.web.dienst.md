@@ -1,5 +1,5 @@
 ---
-erzeugt: 72acfdb368e2
+erzeugt: 9594acebe9b7
 art: modul
 tags: [modul]
 ---
@@ -366,6 +366,18 @@ def _fachwerkmodell(projekt: Projekt, rumpf: Mapping[str, Any]) -> Fachwerkmodel
 
 Das Fachwerkmodell, das `kennung` nennt – sonst ist die Anfrage falsch.
 
+### mauerwerk_zeichnung
+
+```python
+def mauerwerk_zeichnung(rumpf: Mapping[str, Any]) -> Dict[str, Any]
+```
+
+Was das Zeichenfenster einer Wand aus Mauerwerk unter ihre Teile legt –
+Meldungen, Pfeiler, Stuerze ([[opencivil.web.mauerwerkdaten#uebersicht|mauerwerkdaten.uebersicht]]). Wie beim
+Fachwerkmodell eine eigene Anfrage nach jeder Aenderung. Fehlt der Wand
+noch etwas, das sie gar nicht rechnen laesst – ihr Mauerwerk –, sagt es
+eine graue Meldung unter der Zeichnung ([[opencivil.web.mauerwerkdaten#unfertig|mauerwerkdaten.unfertig]]).
+
 ### decke_ergebnis
 
 ```python
@@ -515,6 +527,7 @@ entspricht dem, was der Server ueber HTTP melden wuerde.
 - [[opencivil.web.deckendaten]]
 - [[opencivil.web.diagrammdaten]]
 - [[opencivil.web.fachwerkdaten]]
+- [[opencivil.web.mauerwerkdaten]]
 - [[opencivil.web.speicher]]
 - [[opencivil.web.umschlag]]
 - [[opencivil.web.zeichendaten]]

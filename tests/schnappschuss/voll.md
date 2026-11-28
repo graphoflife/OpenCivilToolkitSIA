@@ -1,6 +1,6 @@
 # Voll
 
-1008 Berechnungen ausgeführt, 1646 Werte bestimmt.
+1022 Berechnungen ausgeführt, 1659 Werte bestimmt.
 
 ## Herleitung
 
@@ -32899,6 +32899,127 @@ $$
 
 Nachgerechnet: an jedem Knoten heben sich Stabkräfte, Lasten und Lagerkräfte auf.
 
+### Mauerwerk: MK
+
+**Druckfestigkeit senkrecht zu den Lagerfugen, kennzeichnend** *(SIA 266:2015, 3.1.3.3, Tabelle 1)*
+
+$$
+f_{xk} = 7\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Widerstandsbeiwert des Mauerwerks** *(SIA 266:2015, 4.2.1.1)*
+
+$$
+\gamma_M = 2
+$$
+
+**Bemessungswert der Druckfestigkeit senkrecht zu den Lagerfugen** *(SIA 266:2015, 4.2.1.1, Gl. (3))*
+
+$$
+f_{xd} = \frac{f_{xk}}{\gamma_M} = \frac{7\,\mathrm{N}/\mathrm{mm}^{2}}{2} = 3.5\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Druckfestigkeit senkrecht zu den Stossfugen, kennzeichnend** *(SIA 266:2015, 4.2.1.1, Tabelle 7; γ\_M · f\_yd)*
+
+$$
+f_{yk} = 2.2\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Bemessungswert der Druckfestigkeit senkrecht zu den Stossfugen** *(SIA 266:2015, 4.2.1.1, Gl. (3))*
+
+$$
+f_{yd} = \frac{f_{yk}}{\gamma_M} = \frac{2.2\,\mathrm{N}/\mathrm{mm}^{2}}{2} = 1.1\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Druckfestigkeit senkrecht zu den Stossfugen, vollfugig vermauert, kennzeichnend** *(SIA 266:2015, 4.2.1.1, Tabelle 7; γ\_M · f\_yd)*
+
+$$
+f_{yk,v} = 3.2\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Bemessungswert der Druckfestigkeit senkrecht zu den Stossfugen, vollfugig vermauert** *(SIA 266:2015, 4.2.1.1, Gl. (3))*
+
+$$
+f_{yd,v} = \frac{f_{yk,v}}{\gamma_M} = \frac{3.2\,\mathrm{N}/\mathrm{mm}^{2}}{2} = 1.6\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Elastizitätsmodul senkrecht zu den Lagerfugen, kennzeichnend** *(SIA 266:2015, 3.1.4.1)*
+
+$$
+E_{xk} = 1000 \cdot f_{xk} = 1000 \cdot 7\,\mathrm{N}/\mathrm{mm}^{2} = 7000\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Bemessungswert des Elastizitätsmoduls senkrecht zu den Lagerfugen** *(SIA 266:2015, 4.2.1.4, Gl. (5))*
+
+$$
+E_{xd} = \frac{E_{xk}}{\gamma_M} = \frac{7000\,\mathrm{N}/\mathrm{mm}^{2}}{2} = 3500\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Schubmodul, kennzeichnend** *(SIA 266:2015, 3.1.4.1, Gl. (2))*
+
+$$
+G_k = 0.4 \cdot E_{xk} = 0.4 \cdot 7000\,\mathrm{N}/\mathrm{mm}^{2} = 2800\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Bemessungswert des Schubmoduls** *(SIA 266:2015, Tabelle 7; Gl. (2) und (5))*
+
+$$
+G_d = \frac{G_k}{\gamma_M} = \frac{2800\,\mathrm{N}/\mathrm{mm}^{2}}{2} = 1400\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Bemessungswert des Reibungsbeiwerts in den Lagerfugen** *(SIA 266:2015, 4.2.1.3)*
+
+$$
+\mu_d = 0.6
+$$
+
+### Mauerwerk: Wand aus Kalksandstein
+
+**Dicke der Wand**
+
+$$
+t_w = 175\,\mathrm{mm}
+$$
+
+> **Annahme:** Eine Wand aus unbewehrtem Mauerwerk nach SIA 266:2015, gezeichnet in der Ansicht. Kohäsion und Zugfestigkeit des Mauerwerks zählen nicht (4.1.2), und quer zu ihrer Ebene ist die Wand gehalten (4.1.4). Die Zeichen der Norm: x steht senkrecht zu den Lagerfugen, also lotrecht, y längs der Wand (Figur 1).
+
+**Wand**
+
+| Wand | Mauerwerk | $l_w\ [\mathrm{m}]$ | $h_w\ [\mathrm{m}]$ |
+| ---: | ---: | ---: | ---: |
+| W1 | MK | $6.00$ | $2.70$ |
+
+Verbandmauerwerk, die Stossfugen vollfugig vermauert. Kopf gelenkig, Fuss eingespannt; links frei, rechts gehalten.
+
+Für Verbandmauerwerk gelten alle Werte der Tabelle 7 mal 0.85 (SIA 266:2015, 4.2.1.1); μ\_d bleibt. Vollfugig vermauert gilt das grössere f\_yd der Tabelle 7.
+
+**Bemessungswerte, Festigkeiten und Moduln in N/mm²**
+
+|  | Mauerwerk «MK» | Wand |
+| ---: | ---: | ---: |
+| $f_{xd}$ | $3.50$ | $0.85 \cdot 3.50 = 2.98$ |
+| $f_{yd},\ \mathrm{vollfugig}$ | $1.60$ | $0.85 \cdot 1.60 = 1.36$ |
+| $E_{xd}$ | $3500$ | $0.85 \cdot 3500 = 2975$ |
+| $G_d$ | $1400$ | $0.85 \cdot 1400 = 1190$ |
+| $\mu_d$ | $0.60$ | $0.60$ |
+
+**Öffnungen – über jeder ein Sturz, a ist seine Auflagerlänge**
+
+| Öffnung | links – rechts [m] | unten – oben [m] | $b\ [\mathrm{m}]$ | $h\ [\mathrm{m}]$ | Sturz | $h_{St}\ [\mathrm{mm}]$ | $a\ [\mathrm{mm}]$ |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| O1 | 0.80 – 1.80 | 0.00 – 2.10 | $1.00$ | $2.10$ | Betonsturz | $200$ | $150$ |
+| O2 | 2.80 – 4.00 | 0.90 – 2.10 | $1.20$ | $1.20$ | vorfabriziert | $250$ | $150$ |
+| O3 | 4.90 – 5.50 | 0.90 – 2.10 | $0.60$ | $1.20$ | Betonsturz | $200$ | $150$ |
+
+**Pfeiler – zwischen den Öffnungen und an den Enden der Wand**
+
+| Pfeiler | links – rechts [m] | $b\ [\mathrm{m}]$ | zwischen |
+| ---: | ---: | ---: | ---: |
+| P1 | 0.00 – 0.80 | $0.80$ | Wandende \| O1 |
+| P2 | 1.80 – 2.80 | $1.00$ | O1 \| O2 |
+| P3 | 4.00 – 4.90 | $0.90$ | O2 \| O3 |
+| P4 | 5.50 – 6.00 | $0.50$ | O3 \| Wandende |
+
 ## Verwendete Formeln
 
 ### Querschnitt
@@ -36405,6 +36526,50 @@ $$
 c = F^{T} U \;\rightarrow\; \min \qquad K(\tilde{\rho}) \, U = F \qquad \sum_e \tilde{\rho}_e \, A_e = \bar{\rho} \, A \qquad E_e = E_{min} + \tilde{\rho}_e^{\,p} \left( E_0 - E_{min} \right)
 $$
 
+### Mauerwerk
+
+**Bemessungswert der Druckfestigkeit senkrecht zu den Lagerfugen** *(SIA 266:2015, 4.2.1.1, Gl. (3))*
+
+$$
+f_{xd} = \frac{f_{xk}}{\gamma_M}
+$$
+
+**Bemessungswert der Druckfestigkeit senkrecht zu den Stossfugen** *(SIA 266:2015, 4.2.1.1, Gl. (3))*
+
+$$
+f_{yd} = \frac{f_{yk}}{\gamma_M}
+$$
+
+**Bemessungswert der Druckfestigkeit senkrecht zu den Stossfugen, vollfugig vermauert** *(SIA 266:2015, 4.2.1.1, Gl. (3))*
+
+$$
+f_{yd,v} = \frac{f_{yk,v}}{\gamma_M}
+$$
+
+**Elastizitätsmodul senkrecht zu den Lagerfugen, kennzeichnend** *(SIA 266:2015, 3.1.4.1)*
+
+$$
+E_{xk} = 1000 \cdot f_{xk}
+$$
+
+**Bemessungswert des Elastizitätsmoduls senkrecht zu den Lagerfugen** *(SIA 266:2015, 4.2.1.4, Gl. (5))*
+
+$$
+E_{xd} = \frac{E_{xk}}{\gamma_M}
+$$
+
+**Schubmodul, kennzeichnend** *(SIA 266:2015, 3.1.4.1, Gl. (2))*
+
+$$
+G_k = 0.4 \cdot E_{xk}
+$$
+
+**Bemessungswert des Schubmoduls** *(SIA 266:2015, Tabelle 7; Gl. (2) und (5))*
+
+$$
+G_d = \frac{G_k}{\gamma_M}
+$$
+
 ## Nachweise
 
 ### Decke
@@ -37957,6 +38122,8 @@ Mindestens ein Nachweis ist nicht erfüllt.
 
 > **Warnung:** Querschnittsanalyse 'Hinterschnittene Blechdecke', Schief: Eine Blechverbunddecke trägt in Richtung ihrer Rippen (5.4.1.1): nachgewiesen werden N, M\_y und V\_z über die ganze gezeichnete Breite b – M\_z, V\_y und T nicht.
 
+> **Warnung:** Mauerwerk 'Wand aus Kalksandstein': die Nachweise des Mauerwerks rechnet das Werkzeug noch nicht → kein Nachweis.
+
 > **Warnung:** Setzung 'Ohne Schicht': noch keine Schicht – unter «Schichten» eine anlegen → kein Nachweis.
 
 > **Warnung:** Pfahl 'Mikropfahl, Versuch': die Schichten reichen nicht bis unter den Fuss → keine Steifigkeit.
@@ -38570,6 +38737,19 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Biegefestigkeit, kennzeichnend | $f_{m,k}$ | $24$ | N/mm² | Vorgabe |
 | Bemessungswert der Zugfestigkeit in Faserrichtung | $f_{t,0,d}$ | $12$ | N/mm² | Vorgabe |
 | Bemessungswert der Schubfestigkeit | $f_{v,d}$ | $1.8$ | N/mm² | Vorgabe |
+| Dicke der Wand | $t_w$ | $175$ | mm | Vorgabe |
+| Bemessungswert des Elastizitätsmoduls senkrecht zu den Lagerfugen | $E_{xd}$ | $3500$ | N/mm² | berechnet |
+| Elastizitätsmodul senkrecht zu den Lagerfugen, kennzeichnend | $E_{xk}$ | $7000$ | N/mm² | berechnet |
+| Bemessungswert des Schubmoduls | $G_d$ | $1400$ | N/mm² | berechnet |
+| Schubmodul, kennzeichnend | $G_k$ | $2800$ | N/mm² | berechnet |
+| Bemessungswert der Druckfestigkeit senkrecht zu den Lagerfugen | $f_{xd}$ | $3.5$ | N/mm² | berechnet |
+| Druckfestigkeit senkrecht zu den Lagerfugen, kennzeichnend | $f_{xk}$ | $7$ | N/mm² | Vorgabe |
+| Bemessungswert der Druckfestigkeit senkrecht zu den Stossfugen | $f_{yd}$ | $1.1$ | N/mm² | berechnet |
+| Bemessungswert der Druckfestigkeit senkrecht zu den Stossfugen, vollfugig vermauert | $f_{yd,v}$ | $1.6$ | N/mm² | berechnet |
+| Druckfestigkeit senkrecht zu den Stossfugen, kennzeichnend | $f_{yk}$ | $2.2$ | N/mm² | Vorgabe |
+| Druckfestigkeit senkrecht zu den Stossfugen, vollfugig vermauert, kennzeichnend | $f_{yk,v}$ | $3.2$ | N/mm² | Vorgabe |
+| Widerstandsbeiwert des Mauerwerks | $\gamma_M$ | $2$ |  | Vorgabe |
+| Bemessungswert des Reibungsbeiwerts in den Lagerfugen | $\mu_d$ | $0.6$ |  | Vorgabe |
 | Durchmesser des Pfahls | $D$ | $900$ | mm | Vorgabe |
 | Verformungsmodul der Schicht 1, charakteristisch | $E_{s,k,1}$ | $8$ | MN/m² | Vorgabe |
 | Verformungsmodul der Schicht 2, charakteristisch | $E_{s,k,2}$ | $50$ | MN/m² | Vorgabe |

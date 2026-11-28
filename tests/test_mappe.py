@@ -80,11 +80,13 @@ class TestNeuesProjekt(unittest.TestCase):
     def test_je_materialart_eine_sorte_ohne_bauteile(self):
         """
         So rechnet das erste Bauteil jeder App gleich -- seit 2026-11-27 mit
-        jeder Materialart, auch dem Wasser; bis dahin nur C25/30 und B500B.
+        jeder Materialart, auch dem Wasser, seit 2026-11-28 mit dem Mauerwerk;
+        bis dahin nur C25/30 und B500B.
         """
         projekt = Projekt.neu("Halle")
         self.assertEqual([m.anzeigename for m in projekt.materialien],
-                         ["C25/30", "B500B", "S235", "Y1860", "GL24h", "SE 350 G", "Wasser"])
+                         ["C25/30", "B500B", "S235", "Y1860", "GL24h", "SE 350 G", "Wasser",
+                          "MB"])
         self.assertEqual({m.art.value for m in projekt.materialien}, set(MATERIALARTEN))
         self.assertTrue(all(m.ist_normsorte for m in projekt.materialien))
         self.assertEqual(projekt.bauteile(), [])

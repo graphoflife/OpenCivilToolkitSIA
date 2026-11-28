@@ -64,10 +64,13 @@ class TestSinnbilder(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        quelltext = (JS / "sinnbilder.js").read_text(encoding="utf-8")
-        tabelle = quelltext[quelltext.index("const ZEICHEN = {"):]
-        tabelle = tabelle[:tabelle.index("\n};\n")]
-        cls.vorhanden = set(re.findall(r"^  '?([a-z0-9_-]+)'?: \{", tabelle, flags=re.M))
+        """Die Zeichen aus sinnbilder.js und aus den Dateien der Apps daneben, sinnbilder_*.js."""
+        cls.vorhanden = set()
+        for pfad in sorted(JS.glob("sinnbilder*.js")):
+            quelltext = pfad.read_text(encoding="utf-8")
+            tabelle = quelltext[quelltext.index("const ZEICHEN = {"):]
+            tabelle = tabelle[:tabelle.index("\n};\n")]
+            cls.vorhanden |= set(re.findall(r"^  '?([a-z0-9_-]+)'?: \{", tabelle, flags=re.M))
 
     def test_jedes_genannte_zeichen_gibt_es(self):
         """
@@ -116,6 +119,11 @@ class TestSinnbilder(unittest.TestCase):
             "verfahren": k["decke"]["verfahren"],
             "halt": k["fachwerkmodell"]["halt"],
             "fw-verfahren": k["fachwerkmodell"]["verfahren"],
+            "mauerung": k["mauerwerk"]["mauerung"],
+            "stossfugen": k["mauerwerk"]["stossfugen"],
+            "halterung": k["mauerwerk"]["halterung"],
+            "seitenrand": k["mauerwerk"]["seitenrand"],
+            "sturz": k["mauerwerk"]["sturz"],
             # Grund und Zulage, je in den unteren und den oberen Lagen (platte.js).
             "zulage": [{"wert": f"{seite}-{gunst}"} for seite in ("unten", "oben")
                        for gunst in ("unguenstig", "guenstig")],

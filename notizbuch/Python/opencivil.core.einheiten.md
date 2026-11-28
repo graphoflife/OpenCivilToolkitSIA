@@ -1,5 +1,5 @@
 ---
-erzeugt: a6ddbe61bd65
+erzeugt: 81ced20ab5e6
 art: modul
 tags: [modul]
 ---
@@ -475,8 +475,10 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - [[opencivil.material.betonstahl]]
 - [[opencivil.material.fluessigkeit]]
 - [[opencivil.material.holz]]
+- [[opencivil.material.mauerwerk]]
 - [[opencivil.material.profilblech]]
 - [[opencivil.material.spannstahl]]
+- [[opencivil.mauerwerk.werk]]
 - [[opencivil.nachweis.biegung_normalkraft]]
 - [[opencivil.nachweis.duktilitaet]]
 - [[opencivil.nachweis.fehlende_bewehrung]]
@@ -526,6 +528,7 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - [[opencivil.projekt.fachwerkmodell]]
 - [[opencivil.projekt.grundbruch]]
 - [[opencivil.projekt.lesen]]
+- [[opencivil.projekt.mauerwerk]]
 - [[opencivil.projekt.pfahl]]
 - [[opencivil.projekt.platte]]
 - [[opencivil.projekt.querschnittsanalyse]]

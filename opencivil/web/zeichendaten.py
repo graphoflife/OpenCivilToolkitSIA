@@ -22,11 +22,11 @@ from opencivil.core.rechenwerk import Loesung
 from opencivil.projekt import Aufbau
 from opencivil.projekt.aufbau import (
     ANALYSE, BALKENSYSTEM, BALKENSYSTEM3D, BAUTEILE, DECKE, DURCHSTANZEN, ERDBEBEN, FACHWERKMODELL,
-    GRUNDBRUCH, PFAHL, PLATTE, SETZUNG,
+    GRUNDBRUCH, MAUERWERK, PFAHL, PLATTE, SETZUNG,
 )
 from opencivil.web import (
     balkendaten, deckendaten, durchstanzdaten, erdbebendaten, fachwerkdaten, grundbruchdaten,
-    pfahldaten, setzungsdaten,
+    mauerwerkdaten, pfahldaten, setzungsdaten,
 )
 
 
@@ -79,6 +79,7 @@ ZEICHENDATEN: Dict[str, Optional[Callable[[Aufbau, str, Loesung], Any]]] = {
     DECKE.name: deckendaten.zeichnung,
     DURCHSTANZEN.name: durchstanzdaten.situation,
     FACHWERKMODELL.name: fachwerkdaten.zeichnung,
+    MAUERWERK.name: mauerwerkdaten.zeichnung,
     GRUNDBRUCH.name: grundbruchdaten.situation,
     SETZUNG.name: setzungsdaten.situation,
     PFAHL.name: pfahldaten.situation,

@@ -31,6 +31,9 @@ from opencivil.material.fluessigkeit import (
     FLUESSIGKEIT_VORLAGEN, FLUESSIGKEITSSORTEN, fluessigkeit, fluessigkeitssorten_zum_anlegen,
 )
 from opencivil.material.holz import HOLZ_VORLAGEN, HOLZSORTEN, holz, holzsorten_zum_anlegen
+from opencivil.material.mauerwerk import (
+    MAUERWERK_VORLAGEN, MAUERWERKSSORTEN, mauerwerk, mauerwerkssorten_zum_anlegen,
+)
 from opencivil.material.profilblech import (
     PROFILBLECH_VORLAGEN, PROFILBLECHSORTEN, profilblech, profilblechsorten_zum_anlegen,
 )
@@ -52,13 +55,13 @@ class Materialart:
     """Die Sorten in der Folge, in der das Fenster «Neues Material» sie anbietet."""
 
     kennung: str
-    """Womit die Kennung beginnt: b1, s1, st1, sp1, h1, pb1, fl1."""
+    """Womit die Kennung beginnt: b1, s1, st1, sp1, h1, pb1, fl1, mw1."""
 
     eigene: str
     """
     Womit der Name eines eigenen Materials beginnt: BE1, S1, ST1 (Benutzer,
     2026-10-16), SP1 beim Spannstahl, H1 beim Holz, PB1 beim Profilblechstahl,
-    FL1 bei einer Fluessigkeit.
+    FL1 bei einer Fluessigkeit, MW1 beim Mauerwerk.
     """
 
     grundlage: str
@@ -174,6 +177,11 @@ MATERIALARTEN: Dict[str, Materialart] = {a.art.value: a for a in (
                 fluessigkeit, tuple(fluessigkeitssorten_zum_anlegen()), kennung="fl",
                 eigene="FL", grundlage="Dichte nach Vorgabe, die Raumlast mit g = 10 m/s²",
                 mit_satz=False, aus_norm=False, geschlecht="f"),
+    Materialart(Baustoffart.MAUERWERK, MAUERWERKSSORTEN, MAUERWERK_VORLAGEN, mauerwerk,
+                tuple(mauerwerkssorten_zum_anlegen()), kennung="mw", eigene="MW",
+                grundlage=("Kennwerte des Standardmauerwerks nach SIA 266:2015, die Dichte "
+                           "nach Vorgabe"),
+                mit_satz=False, geschlecht="n"),
 )}
 
 

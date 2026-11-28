@@ -244,7 +244,8 @@ def _holzkurve(wert, sorte: str) -> Optional[dict]:
 #: Je Materialart ihre Spannung-Dehnung-Linie, aus den Kennwerten einer
 #: Loesung -- wo es eines gibt, ein Gesetz des Querschnitts -- und der Sorte:
 #: beim Spannstahl sagt sie, ob es Litzen gibt. Eine Fluessigkeit traegt
-#: nichts und hat keine.
+#: nichts und hat keine; ein Mauerwerk auch nicht -- SIA 266:2015 nennt fuer
+#: seine Nachweise keine Linie.
 KURVEN: Dict[Baustoffart, Callable[[Callable[[str], Optional[float]], str], Optional[dict]]] = {
     Baustoffart.BETON: _betonkurve,
     Baustoffart.BETONSTAHL: _stahlkurve,
@@ -253,4 +254,5 @@ KURVEN: Dict[Baustoffart, Callable[[Callable[[str], Optional[float]], str], Opti
     Baustoffart.HOLZ: _holzkurve,
     Baustoffart.PROFILBLECH: _profilblechkurve,
     Baustoffart.FLUESSIGKEIT: lambda wert, sorte: None,
+    Baustoffart.MAUERWERK: lambda wert, sorte: None,
 }

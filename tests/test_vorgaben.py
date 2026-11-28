@@ -123,6 +123,15 @@ class TestMaskeWieHerleitung(unittest.TestCase):
                                  for _, feld in maske("pfahlschicht", schicht)]
                 self.assertEqual(erwartet, herleitung(p.aufbauen().pfaehle[t.kennung]))
 
+    def test_mauerwerk(self):
+        """Die Dicke der Wand: in der Kachel «Mauerwerk» wie im Kasten der Herleitung."""
+        p = Projekt(name="Probe")
+        p.mauerwerk("MK")
+        w = p.wand("Wand", t=175)
+        self.assertEqual(maske("mauerwerk", w.als_dict()), [("Mauerwerk", "t")])
+        self.assertEqual(maske("mauerwerk", w.als_dict()),
+                         herleitung(p.aufbauen().mauerwerke[w.kennung]))
+
 
 if __name__ == "__main__":
     unittest.main()

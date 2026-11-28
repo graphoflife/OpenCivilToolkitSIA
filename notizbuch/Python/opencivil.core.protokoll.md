@@ -1,5 +1,5 @@
 ---
-erzeugt: 30cabe8e7883
+erzeugt: 0e75c4ac2b01
 art: modul
 tags: [modul]
 ---
@@ -610,6 +610,8 @@ Oberflaeche und alle Berichte gehen.
 - [[opencivil.geotechnik.tragfaehigkeit]]
 - [[opencivil.geotechnik.wasser]]
 - [[opencivil.material.basis]]
+- [[opencivil.mauerwerk.herleitung]]
+- [[opencivil.mauerwerk.werk]]
 - [[opencivil.nachweis.biegung_normalkraft]]
 - [[opencivil.nachweis.duktilitaet]]
 - [[opencivil.nachweis.fehlende_bewehrung]]

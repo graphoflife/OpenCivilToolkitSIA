@@ -1,5 +1,5 @@
 ---
-erzeugt: 73874476684f
+erzeugt: 102f7155ba0e
 art: modul
 tags: [modul]
 ---
@@ -37,6 +37,8 @@ durchstanzen.py
 fachwerkmodell.py
                eine Scheibe aus Umrissen und Löchern, mit Lagern und
                Punktlasten, für ihr Fachwerkmodell
+mauerwerk.py   eine Wand aus Mauerwerk in der Ansicht: Umriss, Türen und
+               Fenster mit Stürzen, Dicke, Ränder
 grundbruch.py  ein Flachfundament: Boden, Masse, Gelaende, Grundwasser
                und Einwirkungen fuer Grundbruch und Gleiten
 setzung.py     ein Flachfundament auf geschichtetem Baugrund: Pressungen
@@ -98,6 +100,7 @@ geschieht erst beim Aufbau, ueber die [[opencivil.core.einheiten#Groesse|Groesse
 - [[opencivil.projekt.grundbruch]] – ein Grundbruchnachweis, wie die Oberflaeche ihn beschreibt.
 - [[opencivil.projekt.lesen]] – was in einer Projektdatei stehen darf, und wie es gelesen wird.
 - [[opencivil.projekt.mappe]] – mehrere Projekte in einer Datei.
+- [[opencivil.projekt.mauerwerk]] – eine Mauerwerkswand, wie die Oberfläche sie beschreibt.
 - [[opencivil.projekt.netz]] – Knoten mit Kennungen, und wie neue dazukommen.
 - [[opencivil.projekt.pfahl]] – ein Einzelpfahl, wie die Oberflaeche ihn beschreibt.
 - [[opencivil.projekt.platte]] – eine Platte, wie die Oberflaeche sie beschreibt.
@@ -125,6 +128,7 @@ geschieht erst beim Aufbau, ueber die [[opencivil.core.einheiten#Groesse|Groesse
 - [[opencivil.projekt.grundbruch]]
 - [[opencivil.projekt.lesen]]
 - [[opencivil.projekt.mappe]]
+- [[opencivil.projekt.mauerwerk]]
 - [[opencivil.projekt.pfahl]]
 - [[opencivil.projekt.platte]]
 - [[opencivil.projekt.projekt]]
@@ -155,6 +159,7 @@ geschieht erst beim Aufbau, ueber die [[opencivil.core.einheiten#Groesse|Groesse
 - [[opencivil.web.erdbebendaten]]
 - [[opencivil.web.fachwerkdaten]]
 - [[opencivil.web.grundbruchdaten]]
+- [[opencivil.web.mauerwerkdaten]]
 - [[opencivil.web.pfahldaten]]
 - [[opencivil.web.setzungsdaten]]
 - [[opencivil.web.speicher]]

@@ -30,6 +30,7 @@ from opencivil.material.baustahl import ERSTER_BAUSTAHL
 from opencivil.material.beton import ERSTER_BETON
 from opencivil.material.betonstahl import ERSTER_STAHL
 from opencivil.material.fluessigkeit import ERSTE_FLUESSIGKEIT
+from opencivil.material.mauerwerk import ERSTES_MAUERWERK
 from opencivil.material.profilblech import ERSTES_PROFILBLECH
 from opencivil.material.spannstahl import ERSTER_SPANNSTAHL
 from opencivil.projekt.eintraege import Beschreibung, MaterialEintrag, erstes_material
@@ -53,9 +54,10 @@ from opencivil.projekt.setzung import SetzungEintrag
 from opencivil.projekt.durchstanzen import DurchstanzEintrag
 from opencivil.projekt.decke import DeckeEintrag
 from opencivil.projekt.fachwerkmodell import FachwerkmodellEintrag
+from opencivil.projekt.mauerwerk import MauerwerkEintrag
 from opencivil.projekt.aufbau import (
     ANALYSE, BALKENSYSTEM, BALKENSYSTEM3D, BAUTEILE, DECKE, DURCHSTANZEN, ERDBEBEN, FACHWERKMODELL,
-    GRUNDBRUCH, PFAHL, PLATTE, SETZUNG, Aufbau, aufbauen,
+    GRUNDBRUCH, MAUERWERK, PFAHL, PLATTE, SETZUNG, Aufbau, aufbauen,
 )
 
 
@@ -79,7 +81,7 @@ SANDBOX = "Sandbox"
 NEUES_PROJEKT: Dict[str, str] = {
     "beton": ERSTER_BETON, "betonstahl": ERSTER_STAHL, "baustahl": ERSTER_BAUSTAHL,
     "spannstahl": ERSTER_SPANNSTAHL, "holz": "GL24h", "profilblech": ERSTES_PROFILBLECH,
-    "fluessigkeit": ERSTE_FLUESSIGKEIT,
+    "fluessigkeit": ERSTE_FLUESSIGKEIT, "mauerwerk": ERSTES_MAUERWERK,
 }
 
 
@@ -140,6 +142,9 @@ class Projekt(Beschreibung):
 
     fachwerkmodelle: List[FachwerkmodellEintrag] = field(default_factory=list)
     """Scheiben mit Lagern und Lasten, für die ein Fachwerk gesucht wird -- eben, ohne Bemessung."""
+
+    mauerwerke: List[MauerwerkEintrag] = field(default_factory=list)
+    """Wände aus unbewehrtem Mauerwerk, in der Ansicht mit Türen, Fenstern und Stürzen."""
 
     grundbrueche: List[GrundbruchEintrag] = field(default_factory=list)
     """Flachfundamente mit Grundbruch und Gleiten."""
@@ -311,6 +316,10 @@ class Projekt(Beschreibung):
         """Eine Fluessigkeit, das Wasser -- Kennung ``fl1``, ``fl2`` ..."""
         return self._normsorte("fluessigkeit", sorte)
 
+    def mauerwerk(self, sorte: str = ERSTES_MAUERWERK) -> MaterialEintrag:
+        """Ein Standardmauerwerk nach SIA 266 -- Kennung ``mw1``, ``mw2`` ..."""
+        return self._normsorte("mauerwerk", sorte)
+
     def eigener_beton(self, vorlage: str = "C30/37") -> MaterialEintrag:
         """
         Ein eigener Beton, ``BE1``, ``BE2`` ... -- mit den Kennwerten der Sorte
@@ -341,6 +350,13 @@ class Projekt(Beschreibung):
         etwa, ihre Dichte in ``abweichungen["rho_fl"]``; siehe :meth:`eigener_beton`.
         """
         return self._eigenes("fluessigkeit", vorlage)
+
+    def eigenes_mauerwerk(self, vorlage: str = ERSTES_MAUERWERK) -> MaterialEintrag:
+        """
+        Ein eigenes Mauerwerk, ``MW1``, ``MW2`` ... -- ein deklariertes etwa,
+        die Werte seiner Deklaration in ``abweichungen``; siehe :meth:`eigener_beton`.
+        """
+        return self._eigenes("mauerwerk", vorlage)
 
     def material_anlegen(self, art: str, sorte: str, *, eigen: bool = False) -> MaterialEintrag:
         """
@@ -517,6 +533,19 @@ class Projekt(Beschreibung):
         """
         eintrag = FachwerkmodellEintrag(kennung=self.freie_kennung(FACHWERKMODELL.vorsilbe), name=name)
         self.fachwerkmodelle.append(eintrag)
+        return eintrag
+
+    def wand(self, name: str, **felder: Any) -> MauerwerkEintrag:
+        """
+        Eine leere Wand aus Mauerwerk, mit dem ersten Mauerwerk des Projekts
+        wie in der Oberfläche. Alles Weitere -- ``t`` in mm, ``verband``,
+        ``kopf`` ... -- geht als Stichwort an den Eintrag; gezeichnet wird
+        danach mit seinem Baukasten -- ``wand``, ``oeffnung`` --, Koordinaten in m.
+        """
+        eintrag = lesen(MauerwerkEintrag, felder, f"Mauerwerk '{name}'",
+                        MauerwerkEintrag(kennung=self.freie_kennung(MAUERWERK.vorsilbe), name=name,
+                                         material=erstes_material(self.materialien, "mauerwerk")))
+        self.mauerwerke.append(eintrag)
         return eintrag
 
     def durchstanzen(self, name: str, beton: str, stahl: str, **felder: Any) -> DurchstanzEintrag:

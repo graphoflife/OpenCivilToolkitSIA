@@ -1,5 +1,5 @@
 ---
-erzeugt: 4a70443c24ed
+erzeugt: da008e05574f
 art: modul
 tags: [modul]
 ---
@@ -45,6 +45,7 @@ Eine Wahl: das Mitglied ist sein Text.
 - [[opencivil.material.basis]]
 - [[opencivil.material.holz]]
 - [[opencivil.material.spannstahl]]
+- [[opencivil.mauerwerk.modell]]
 - [[opencivil.nachweis.biegung_normalkraft]]
 - [[opencivil.nachweis.rissanforderung]]
 - [[opencivil.pfahl.boden]]

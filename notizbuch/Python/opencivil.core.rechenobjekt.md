@@ -1,5 +1,5 @@
 ---
-erzeugt: 2fda18a9946a
+erzeugt: 692c3bc32b50
 art: modul
 tags: [modul]
 ---
@@ -79,6 +79,7 @@ nicht, ob eine andere ihren Beton schon angemeldet hat.
 - [[opencivil.geotechnik.fundament]]
 - [[opencivil.geotechnik.setzung]]
 - [[opencivil.material.basis]]
+- [[opencivil.mauerwerk.werk]]
 - [[opencivil.pfahl.pfahl]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.platte]]

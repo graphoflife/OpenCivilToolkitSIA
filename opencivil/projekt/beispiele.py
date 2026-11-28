@@ -27,6 +27,7 @@ from opencivil.projekt.balkensystem import DIAGRAMMGROESSEN
 from opencivil.projekt.balkensystem3d import DIAGRAMMGROESSEN as DIAGRAMMGROESSEN3D
 from opencivil.projekt.decke import PLATTENGROESSEN
 from opencivil.projekt.fachwerkmodell import FachwerkmodellEintrag, GefundenesFachwerk
+from opencivil.projekt.mauerwerk import rechteck
 from opencivil.projekt.eintraege import (
     Gebrauchswahl, KnickVerformungswahl, KnickWiderstandswahl, RechenwahlEintrag, erstes_material,
 )
@@ -174,6 +175,7 @@ def jeder_nachweis() -> Projekt:
     p.holz("GL24h")
     p.profilblech("SE 350 G")
     p.fluessigkeit()
+    p.mauerwerk("MK")
     decke = p.platte("Decke", h=300, x=[18, 12], x_zulage=[12, 0], y=[12, 12],
                      rissanforderung="erhoeht", duktilitaet=True, sproede=True,
                      zwaengung=True, zwaengung_begrenzt=True,
@@ -304,14 +306,15 @@ def jeder_nachweis() -> Projekt:
 
     # Zwei Balkensysteme: eines, das alles einmal braucht, und eines, das
     # sich nicht rechnen lässt -- dazu ein Rahmen im Raum. Dazu jede Lage
-    # beim Durchstanzen, eine Wandscheibe als Fachwerkmodell und jede
-    # Spielart von Grundbruch, Setzung und Pfahl.
+    # beim Durchstanzen, eine Wandscheibe als Fachwerkmodell, eine Wand aus
+    # Mauerwerk und jede Spielart von Grundbruch, Setzung und Pfahl.
     _alles_einmal(p, decke, p.querschnittsanalysen[0])
     _beweglich(p)
     _raumrahmen(p, decke, p.querschnittsanalysen[0])
     _decken(p)
     _durchstanzstellen(p)
     _fachwerkmodell(p)
+    _mauerwerk(p)
     _grundbrueche(p)
     _setzungen(p)
     _pfaehle(p)
@@ -415,6 +418,21 @@ def _fachwerkmodell(p: Projekt) -> None:
         f = p.fachwerkmodell(name)
         _wandscheibe(f, art)
         f.fachwerk = copy.deepcopy(_fachwerk_der_wandscheibe(art))
+
+
+def _mauerwerk(p: Projekt) -> None:
+    """
+    Eine Wand aus Kalksandstein, 6 × 2.7 m und 175 mm dick, als
+    Verbandmauerwerk vollfugig vermauert, am Fuss eingespannt und rechts
+    gehalten: eine Türe
+    mit Betonsturz und zwei Fenster, eines mit vorfabriziertem Sturz.
+    """
+    w = p.wand("Wand aus Kalksandstein", t=175, mauerung="verband", stossfugen="vollfugig",
+               fuss="eingespannt", rechts="gehalten")
+    w.wand(rechteck(0, 0, 6, 2.7))
+    w.oeffnung(rechteck(0.8, 0, 1.8, 2.1))
+    w.oeffnung(rechteck(2.8, 0.9, 4.0, 2.1), sturz="vorfabriziert", h_St=250)
+    w.oeffnung(rechteck(4.9, 0.9, 5.5, 2.1))
 
 
 @lru_cache(maxsize=None)

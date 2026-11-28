@@ -220,7 +220,7 @@ class TestApiAbbildung(unittest.TestCase):
         self.assertEqual(len(k["erfuellungsarten"]), 4)
         self.assertEqual(list(k["materialarten"]),
                          ["beton", "betonstahl", "baustahl", "spannstahl", "holz",
-                          "profilblech", "fluessigkeit"])
+                          "profilblech", "fluessigkeit", "mauerwerk"])
         for art, angaben in k["materialarten"].items():
             with self.subTest(art=art):
                 self.assertTrue(any(v["berechnet"] for v in angaben["kennwerte"]))
@@ -232,7 +232,7 @@ class TestApiAbbildung(unittest.TestCase):
         self.assertEqual(k["materialarten"]["profilblech"]["anlegen"][0], "SE 350 G")
         self.assertEqual(k["materialarten"]["profilblech"]["neu"], "Neuer Profilblechstahl")
         self.assertEqual({a["eigene"] for a in k["materialarten"].values()},
-                         {"BE", "S", "ST", "SP", "H", "PB", "FL"})
+                         {"BE", "S", "ST", "SP", "H", "PB", "FL", "MW"})
         # Das Wasser ist eine feste Sorte, aber aus keiner Norm, und weiblich.
         wasser = k["materialarten"]["fluessigkeit"]
         self.assertEqual((wasser["neu"], wasser["eigen"], wasser["kein"], wasser["kein_wort"],

@@ -1,5 +1,5 @@
 ---
-erzeugt: d1d02feb035b
+erzeugt: cdfa9c174538
 art: modul
 tags: [modul]
 ---
@@ -20,6 +20,7 @@ Was nur eine Art braucht, steht bei ihr: [[opencivil.projekt.aufbau.platte|platt
 [[opencivil.projekt.aufbau.querschnittsanalyse|querschnittsanalyse]],
 [[opencivil.projekt.aufbau.balkensystem|balkensystem]],
 [[opencivil.projekt.aufbau.durchstanzen|durchstanzen]],
+[[opencivil.projekt.aufbau.mauerwerk|mauerwerk]],
 [[opencivil.projekt.aufbau.grundbruch|grundbruch]],
 [[opencivil.projekt.aufbau.setzung|setzung]] und
 [[opencivil.projekt.aufbau.pfahl|pfahl]]. Bis 2026-10-17 stand alles in
@@ -176,6 +177,15 @@ def fachwerkmodelle(self) -> Dict[str, Fachwerksystem]
 ```
 
 Die Fachwerkmodelle, nach Kennung – Bauteile ohne Nachweise, mit ihrem Befund.
+
+#### Aufbau.mauerwerke
+
+```python
+@property
+def mauerwerke(self) -> Dict[str, Mauerwerkswand]
+```
+
+Die Wände aus Mauerwerk, nach Kennung.
 
 #### Aufbau.grundbrueche
 
@@ -679,6 +689,7 @@ Feldes; `mehr` fuer die Analyse.
 - [[opencivil.geotechnik.setzung]]
 - [[opencivil.material.arten]]
 - [[opencivil.material.basis]]
+- [[opencivil.mauerwerk.werk]]
 - [[opencivil.nachweis.kennzahlen]]
 - [[opencivil.nachweis.knicken]]
 - [[opencivil.nachweis.spannungsbegrenzung]]
@@ -704,6 +715,7 @@ Feldes; `mehr` fuer die Analyse.
 - [[opencivil.projekt.aufbau.erdbeben]]
 - [[opencivil.projekt.aufbau.fachwerkmodell]]
 - [[opencivil.projekt.aufbau.grundbruch]]
+- [[opencivil.projekt.aufbau.mauerwerk]]
 - [[opencivil.projekt.aufbau.pfahl]]
 - [[opencivil.projekt.aufbau.platte]]
 - [[opencivil.projekt.aufbau.querschnittsanalyse]]

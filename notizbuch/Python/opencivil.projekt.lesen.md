@@ -1,5 +1,5 @@
 ---
-erzeugt: ab5fbc1cba66
+erzeugt: d2cf0822e356
 art: modul
 tags: [modul]
 ---
@@ -553,6 +553,7 @@ Ein Wert, wie er in einer Meldung steht – ein Text in Anfuehrungszeichen.
 - [[opencivil.projekt.aufbau.fachwerkmodell]]
 - [[opencivil.projekt.aufbau.grundbruch]]
 - [[opencivil.projekt.aufbau.kern]]
+- [[opencivil.projekt.aufbau.mauerwerk]]
 - [[opencivil.projekt.aufbau.pfahl]]
 - [[opencivil.projekt.aufbau.platte]]
 - [[opencivil.projekt.aufbau.querschnittsanalyse]]
@@ -568,6 +569,7 @@ Ein Wert, wie er in einer Meldung steht – ein Text in Anfuehrungszeichen.
 - [[opencivil.projekt.fallnamen]]
 - [[opencivil.projekt.grundbruch]]
 - [[opencivil.projekt.mappe]]
+- [[opencivil.projekt.mauerwerk]]
 - [[opencivil.projekt.netz]]
 - [[opencivil.projekt.pfahl]]
 - [[opencivil.projekt.platte]]

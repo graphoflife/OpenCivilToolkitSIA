@@ -1,5 +1,5 @@
 ---
-erzeugt: 3709d96dd1fb
+erzeugt: ad9888a331d4
 art: modul
 tags: [modul]
 ---
@@ -481,6 +481,7 @@ Leser sieht alle Zweige und erkennt, welcher gegriffen hat.
 - [[opencivil.geotechnik.grundbruch]]
 - [[opencivil.geotechnik.setzung]]
 - [[opencivil.material.basis]]
+- [[opencivil.mauerwerk.herleitung]]
 - [[opencivil.nachweis.biegung_normalkraft]]
 - [[opencivil.nachweis.duktilitaet]]
 - [[opencivil.nachweis.fehlende_bewehrung]]

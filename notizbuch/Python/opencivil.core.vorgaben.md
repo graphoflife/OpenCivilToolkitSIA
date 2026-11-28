@@ -1,5 +1,5 @@
 ---
-erzeugt: 3b9d2809c013
+erzeugt: a997f77f611c
 art: modul
 tags: [modul]
 ---
@@ -167,4 +167,5 @@ je Wahl, welche Werte sie annehmen kann.
 - [[opencivil.fachwerkmodell.verfahren]]
 - [[opencivil.geotechnik.fundament]]
 - [[opencivil.geotechnik.setzung]]
+- [[opencivil.mauerwerk.werk]]
 - [[opencivil.pfahl.pfahl]]

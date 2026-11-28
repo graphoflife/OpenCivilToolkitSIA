@@ -1,5 +1,5 @@
 ---
-erzeugt: 15487981c49a
+erzeugt: 72f8841c1230
 art: modul
 tags: [modul]
 ---
@@ -662,6 +662,7 @@ Eine zu pruefende Schnittgroessenkombination.
 - [[opencivil.projekt.fachwerkmodell]]
 - [[opencivil.projekt.faelle]]
 - [[opencivil.projekt.grundbruch]]
+- [[opencivil.projekt.mauerwerk]]
 - [[opencivil.projekt.pfahl]]
 - [[opencivil.projekt.platte]]
 - [[opencivil.projekt.profile]]

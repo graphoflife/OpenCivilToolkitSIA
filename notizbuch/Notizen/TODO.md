@@ -388,6 +388,40 @@ sammeln sie sich hier, je mit dem, was vorläufig gebaut ist.
       um die Stütze steht dann «erfüllt, ∞». Vorschlag: die Felder h der
       Platte und des Bereichs weisen eine Dicke ab, bei der d nicht über
       null liegt, rot und mit dem Namen. Vorläufig: nicht geprüft.
+- [ ] **Mauerwerk: die Dichte je Sorte.** Für das Eigengewicht nimmt jede
+      Sorte eine Zeile der SIA 261:2020, Anhang A, Tabelle 28 – die der
+      gelochten Steine ihrer Art: Backstein 13, Zementstein und
+      Kalksandstein 18, Porenbeton 7 (MP) und 6 kN/m³ (MPL).
+      Leichtsteine haben dort keine eigene Zeile und nehmen die ihrer Art –
+      ein Leichtbackstein wiegt also wie ein Backstein. Nach Vorgabe, nicht
+      nachgeschlagen. Vorschlag: so lassen; wer es genauer weiss, legt ein
+      eigenes Mauerwerk mit seiner Dichte an. Vorläufig: so.
+- [ ] **Mauerwerk: Porenbeton kriecht wie Kalksandstein.** Tabelle 2 der
+      SIA 266 nennt den Endkriechwert für gebrannte, zementgebundene und
+      hydrothermisch gebundene Steine; Porenbeton steht nicht dabei. Er
+      härtet im Dampf wie Kalksandstein und bekommt darum dessen φ = 1.5.
+      Nach Vorgabe. Vorschlag: so lassen. Vorläufig: φ = 1.5.
+- [ ] **Mauerwerk: die üblichen Dicken.** Der Schalter unter der Dicke
+      bietet je Sorte die Masse an, in denen die Steine meist gehandelt
+      werden, etwa Kalksandstein 100, 120, 150, 175, 200 und 250 mm;
+      Porenbeton bis 365 mm. Eine andere Dicke rechnet gleich, ein grauer
+      Hinweis sagt nur, dass sie unüblich ist – etwa 180 mm. Die Norm nennt
+      keine solche Liste. Vorschlag: die Listen mit dem vergleichen, was du
+      auf Baustellen siehst. Vorläufig: so.
+- [ ] **Mauerwerk: nur rechteckige Wände.** Eine Wand mit schräger Krone,
+      etwa ein Giebel, steht rot: «… rechnet das Werkzeug noch nicht». Ihre
+      Pfeiler wären verschieden hoch. Vorschlag: so lassen, bis du einen
+      Giebel brauchst. Vorläufig: nur Rechtecke.
+- [ ] **Mauerwerk: «nicht vollfugig».** Der Schalter der Stossfugen heisst
+      [nicht vollfugig | vollfugig]; Tabelle 7 nennt nur die zweite Zeile
+      eigens. «Knirsch» wäre enger: ganz ohne Mörtel in der Stossfuge.
+      Vorschlag: so lassen. Vorläufig: «nicht vollfugig».
+- [ ] **Mauerwerk im neuen Projekt.** Ein neues Projekt hat neu auch das
+      Mauerwerk MB, wie es je Materialart eine Sorte hat; so rechnet die
+      erste Wand gleich. Vorschlag: so lassen. Vorläufig: mit MB.
+- [ ] **Zur Kenntnis – der Plan war ungenau:** In MBL, MCL und MPL steht
+      das L für Leichtsteine (SIA 266:2015, 3.1.1.1), nicht für
+      Leichtmörtel, wie der Plan schrieb. Gebaut nach der Norm.
 
 ## Wünsche vom 2026-11-20
 

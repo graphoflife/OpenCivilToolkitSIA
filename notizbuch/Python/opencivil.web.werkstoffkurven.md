@@ -1,5 +1,5 @@
 ---
-erzeugt: 0099b667d4c8
+erzeugt: 3bf192524c45
 art: modul
 tags: [modul]
 ---
@@ -126,7 +126,7 @@ bis zur Grenzstauchung nach Vorgabe.
 
 ## Konstanten
 
-- `KURVEN = {Baustoffart.BETON: _betonkurve, Baustoffart.BETONSTAHL: _stahlkurve,…` – Je Materialart ihre Spannung-Dehnung-Linie, aus den Kennwerten einer Loesung – wo es eines gibt, ein Gesetz des Querschnitts – und der Sorte: beim Spannstahl sagt sie, ob es Litzen gibt. Eine Fluessigkeit traegt nichts und hat keine.
+- `KURVEN = {Baustoffart.BETON: _betonkurve, Baustoffart.BETONSTAHL: _stahlkurve,…` – Je Materialart ihre Spannung-Dehnung-Linie, aus den Kennwerten einer Loesung – wo es eines gibt, ein Gesetz des Querschnitts – und der Sorte: beim Spannstahl sagt sie, ob es Litzen gibt. Eine Fluessigkeit traegt nichts und hat keine; ein Mauerwerk auch nicht – SIA 266:2015 nennt fuer seine Nachweise keine Linie.
 
 ## Braucht
 

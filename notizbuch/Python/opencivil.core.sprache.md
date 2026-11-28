@@ -1,5 +1,5 @@
 ---
-erzeugt: c97a15bae549
+erzeugt: f232479482aa
 art: modul
 tags: [modul]
 ---
@@ -38,9 +38,12 @@ Der Satzteil mit grossem Anfang: «an der Stufe von …» – «An der Stufe von
 - [[opencivil.durchstanzen.mit_bewehrung]]
 - [[opencivil.durchstanzen.nachweis]]
 - [[opencivil.material.arten]]
+- [[opencivil.mauerwerk.herleitung]]
+- [[opencivil.mauerwerk.pruefen]]
 - [[opencivil.nachweis.qa_verbund_werte]]
 - [[opencivil.projekt.aufbau.aus_system]]
 - [[opencivil.projekt.aufbau.balkensystem]]
 - [[opencivil.querschnitt.bauweise]]
 - [[opencivil.stabwerk.stellen]]
 - [[opencivil.verbund.blechdecke]]
+- [[opencivil.web.mauerwerkdaten]]

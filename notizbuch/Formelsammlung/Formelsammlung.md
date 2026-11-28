@@ -1,5 +1,5 @@
 ---
-erzeugt: edaa664a9f19
+erzeugt: 6061b1589fd1
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -80,6 +80,10 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 - [[Erdbeben]] · 16
 
+**Mauerwerk**
+
+- [[Mauerwerk]] · 7
+
 **Decken**
 
 - [[Streifenmethode]] · 4
@@ -139,6 +143,9 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Bemessungsspektrum (34)]] · $S_{d,y}$
 - [[Bemessungssteifigkeit einer Verbundstütze]] · $(EI)_{eff,d,y}$
 - [[Bemessungswert der Betondruckfestigkeit]] · $f_{cd}$
+- [[Bemessungswert der Druckfestigkeit senkrecht zu den Lagerfugen]] · $f_{xd}$
+- [[Bemessungswert der Druckfestigkeit senkrecht zu den Stossfugen]] · $f_{yd}$
+- [[Bemessungswert der Druckfestigkeit senkrecht zu den Stossfugen, vollfugig vermauert]] · $f_{yd,v}$
 - [[Bemessungswert der Fliessgrenze]] · $f_{yd}$
 - [[Bemessungswert der Fliessgrenze auf Druck]] · $f_{yd}^{-}$
 - [[Bemessungswert der Kohäsion]] · $c_{eff}$
@@ -148,8 +155,10 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Bemessungswert der undrainierten Scherfestigkeit]] · $s_{u,d}$
 - [[Bemessungswert des äusseren Widerstands]] · $R_{a,d}$
 - [[Bemessungswert des Elastizitätsmoduls]] · $E_{cd}$
+- [[Bemessungswert des Elastizitätsmoduls senkrecht zu den Lagerfugen]] · $E_{xd}$
 - [[Bemessungswert des Erdwiderstands am Pfahl]] · $p_{E,d}$
 - [[Bemessungswert des Reibungswinkels]] · $\varphi_{eff}$
+- [[Bemessungswert des Schubmoduls]] · $G_d$
 - [[Bemessungswert des Sohlreibungswinkels]] · $\delta_d$
 - [[Bemessungswert des Verformungsmoduls]]
 - [[Bemessungswerte des Holzes]]
@@ -220,6 +229,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Einbindung in die tragende Schicht]] · $h$
 - [[Einflussfaktor der Rechtecklast]]
 - [[Einwirkung im normierten Diagramm]] · $\bar{E}_{d,x}$
+- [[Elastizitätsmodul senkrecht zu den Lagerfugen, kennzeichnend]] · $E_{xk}$
 - [[Erddruck am Pfahl drainiert]]
 - [[Erddruck am Pfahl undrainiert]]
 - [[Erdwiderstand je Meter Pfahl]]
@@ -454,6 +464,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Schubfläche nach Jourawski]] · $A_{V,z}$
 - [[Schubfluss im Schnitt]] · $v$
 - [[Schublänge einer Blechverbunddecke]] · $L_s$
+- [[Schubmodul, kennzeichnend]] · $G_k$
 - [[Schubspannung aus Querkraft im Holz]] · $\tau_{z,d}$
 - [[Schubspannung aus Querkraft nach Jourawski]]
 - [[Schubspannung aus Torsion im Holz]] · $\tau_{tor,d}$
@@ -576,7 +587,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 ## Normstelle fehlt noch
 
-148 von 478 Formeln haben im Code keine Normstelle – meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle – von dort kommt sie in Bericht und Notizbuch.
+148 von 485 Formeln haben im Code keine Normstelle – meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle – von dort kommt sie in Bericht und Notizbuch.
 
 - [[Achsen eines Stabs im Raum]] · [[opencivil.stabwerk3d.herleitung|_ansaetze]]
 - [[Äquivalenter E-Modul eines Stabs]] · [[opencivil.spannungsanalyse.modul#ModulProzedur|ModulProzedur._schreiben]]

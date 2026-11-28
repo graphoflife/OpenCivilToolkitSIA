@@ -274,7 +274,7 @@ Fertig und getestet (am 2026-11-21: 2145 Tests):
 | `core/protokoll` | Mitschrift als Datenstruktur, `Zwischenwerte` für Vorlagen, ein Durchlauf mit einer Tafel je Darstellung, `StillesProtokoll` |
 | `core/rechenwerk` | Rückwärtsauflösung, Variantenwahl, fehlende Eingaben, Zyklen |
 | `core/suche` | Nullstellen: Halbieren, Illinois, Eingrenzen mit wachsenden Schritten, die Neigung der Nulllinie (`winkel_suchen`) – im Beton wie im Stahl |
-| `material/` | Beton, Betonstahl und Spannstahl nach SIA 262:2025, Baustahl nach SIA 263:2013, Profilblechstahl nach SIA 264:2014, Holz nach SIA 265:2012, Flüssigkeiten (das Wasser); das Register der Arten (`arten`) |
+| `material/` | Beton, Betonstahl und Spannstahl nach SIA 262:2025, Baustahl nach SIA 263:2013, Profilblechstahl nach SIA 264:2014, Holz nach SIA 265:2012, Mauerwerk nach SIA 266:2015, Flüssigkeiten (das Wasser); das Register der Arten (`arten`) |
 | `querschnitt/` | Plattenquerschnitt, Lagenaufbau, Werkstoffgesetze (dazu der Spannungsblock als Gesetz) |
 | `querschnitt/geometrie` | Polygone, Verschachtelung, Stablinien, Prüfungen der Zeichnung |
 | `querschnitt/fasern` | Fasern und Dehnungsgrenzen -- auch der Löser der Platte rechnet darüber |
@@ -293,6 +293,7 @@ Fertig und getestet (am 2026-11-21: 2145 Tests):
 | `stabwerk3d/` | das Balkensystem im Raum: Vektoren (`raum`), die Beschreibung in SI (`modell`), der Stab als drei ebene (`stab`), das System mit sechs Unbekannten je Knoten (`system`), die Verläufe (`verlauf`), im Rechenwerk (`rechnung`) und wie es seine Rechnung aufschreibt (`herleitung`) |
 | `decke/` | eine Decke nach der Streifenmethode: die Beschreibung in SI (`modell`), die Streifen und ihre Durchlaufträger (`streifen`), wie die Last auf die Richtungen und Streifen geht (`aufteilung`, `lasten`), jeder Streifen als Durchlaufträger (`durchlauftraeger`), Fall für Fall von unten nach oben (`rechnung`), die Schnittkräfte der Platte an einer Stelle und wo Bilder und Bericht hinsehen (`feld`), im Rechenwerk (`werk`) und wie sie ihre Rechnung aufschreibt (`herleitung`) |
 | `fachwerkmodell/` | ein Fachwerkmodell einer Scheibe: Umrisse, Löcher, Lager und Lasten in SI (`modell`), was ihm fehlt oder an ihm nicht stimmt – auch, ob die Lager die Scheibe halten (`pruefen`) –, die beiden Verfahren und ihre Zahlen (`verfahren`), Ground Structure – Raster und mögliche Stäbe (`grundstruktur`), die lineare Optimierung als Innere-Punkte-Verfahren (`optimierung`), die Suche Runde um Runde mit der Nachbearbeitung (`suche`) –, SIMP – die steifste Form (`simp`), das Fachwerk aus ihr (`skelett`), die Schritte live (`form`) –, das Gleichgewicht des gefundenen Fachwerks nachgerechnet (`nachrechnung`), im Rechenwerk (`werk`) und wie es seine Rechnung aufschreibt (`herleitung`) |
+| `mauerwerk/` | eine Wand aus Mauerwerk nach SIA 266:2015: Umriss, Öffnungen mit Stürzen, wie sie gemauert ist, Ränder und wo die Pfeiler stehen (`modell`), mit welchen Werten ihres Mauerwerks sie rechnet – im Verband mal 0.85, vollfugig, die Mindestwerte deklarierten Mauerwerks (`kennwerte`) –, was ihrer Zeichnung fehlt oder an ihr nicht stimmt und ob die Dicke üblich ist (`pruefen`), im Rechenwerk (`werk`) und wie sie ihre Rechnung aufschreibt (`herleitung`) |
 | `geotechnik/grundbruch` | ein Flachfundament: Bemessungswerte des Bodens, Grundbruch nach der erweiterten Tragfähigkeitsformel (drainiert und undrainiert), Gleiten in der Sohle, der Gleitkörper nach Prandtl |
 | `geotechnik/wasser` | die Raumlast des Grundwassers, aus der Flüssigkeit, die Grundbruch oder Pfahl wählt |
 | `geotechnik/setzung` | ein Flachfundament auf geschichtetem Baugrund: der Einflussfaktor nach Boussinesq im Punkt K oder in der Mitte, die Setzung je Teilschicht aus Wieder- und Erstbelastung, s gegen s_zul |
@@ -325,6 +326,7 @@ Fertig und getestet (am 2026-11-21: 2145 Tests):
 | `web/systemkatalog.py` | was die Oberfläche an einem Balkensystem wählen lässt, eben und im Raum mit denselben Schlüsseln: Querschnitte, Materialien, Lasten, Lager, Diagramme |
 | `web/deckendaten.py` | was die Oberfläche von einer Decke zeigt: die Übersicht beim Zeichnen und die Bilder eines Falls |
 | `web/fachwerkdaten.py` | was die Oberfläche von einem Fachwerkmodell zeigt: die Meldungen, das gefundene Fachwerk nachgerechnet, seine Form bei SIMP, eine Runde der Suche, die Verfahren und wie ein Lager halten kann |
+| `web/mauerwerkdaten.py` | was die Oberfläche von einer Wand aus Mauerwerk zeigt: ihre Meldungen, die Werte, mit denen sie rechnet, Pfeiler und Stürze; die Stellungen ihrer Schalter und die üblichen Dicken |
 | `web/grundbruchdaten.py` | was die Situationszeichnung eines Grundbruchs vom Kern braucht: Gleitkörper, Grundwasser, Kräfte je Kombination |
 | `web/setzungsdaten.py` | was die Situationszeichnung einer Setzung vom Kern braucht: der Punkt, J über die Tiefe, die Setzung je Schicht |
 | `web/erdbebendaten.py` | was die Ansicht eines Gebäudes im Erdbeben vom Kern braucht: je Richtung die Kräfte, die Querkräfte und die Anteile der Wände; je Wand, was ihr fehlt |
@@ -347,6 +349,7 @@ Fertig und getestet (am 2026-11-21: 2145 Tests):
 | `web/js/decke.js`, `dk_zeichnung.js`, `dk_eigenschaften.js` | die Eingabe einer Decke, was das Zeichenfenster von ihr zeichnet und seine Seitenleiste |
 | `web/js/dk_grundriss.js`, `dk_ergebnis.js` | ihr Grundriss mit Aufteilung und Streifen, und ihre Ergebnisbilder |
 | `web/js/fachwerkmodell.js`, `fw_zeichnung.js`, `fw_bild.js`, `fw_suche.js` | die Eingabe eines Fachwerkmodells, sein Zeichenfenster mit der Seitenleiste, sein Bild mit dem Fachwerk und die Suche, die den Kern Runde um Runde fragt |
+| `web/js/mauerwerk.js`, `mw_zeichnung.js`, `mw_bild.js`, `sinnbilder_mauerwerk.js` | die Eingabe einer Wand aus Mauerwerk, ihr Zeichenfenster mit der Seitenleiste, ihr Bild mit Stürzen, Rändern und Pfeilern, und ihre Zeichen |
 | `web/js/grundbruch.js`, `gb_zeichnung.js` | die Eingabe eines Grundbruchs und das Bild seiner Situation |
 | `web/js/setzung.js`, `sz_zeichnung.js`, `gb_skizze.js` | die Eingabe einer Setzung, das Bild ihrer Situation und die Bausteine, die die Bilder des Grundbaus teilen |
 | `web/js/pfahl.js`, `pf_zeichnung.js`, `pf_verlauf.js` | die Eingabe eines Pfahls, das Bild seiner Situation und seine Verläufe über die Tiefe |
@@ -365,8 +368,8 @@ dieselbe Aufteilung, nur nacheinander.
 
 Links steht zuoberst der Name des Projekts, darunter je App ein Knopf mit
 Zeichen und Anzahl -- Materialien, Stahlbeton-Platten, Querschnittsanalyse, 2D
-und 3D Balkensysteme, Decken, Durchstanzen, Fachwerkmodelle, Grundbruch,
-Setzung, Pfähle, Erdbeben, Python -- und
+und 3D Balkensysteme, Decken, Durchstanzen, Fachwerkmodelle, Mauerwerk,
+Grundbruch, Setzung, Pfähle, Erdbeben, Python -- und
 unter den Knöpfen die Liste der gewählten App, mit «+» zum Anlegen.
 
 Die Oberfläche rechnet nichts. Sie schickt die Projektbeschreibung an den Kern
@@ -378,8 +381,8 @@ Normsorte nach SIA -- sie heisst wie die Sorte, trägt links ein rotes «SIA»
 und lässt sich nicht ändern, auch ihre Sorte nicht -- oder ein eigenes
 Material mit einer Sorte als Vorlage: es heisst BE1, BE2 … (Betonstahl S1 …),
 trägt «eigen», und seine Kennwerte sind änderbar. Ein neues Projekt hat von
-jeder Art eine Sorte: C25/30, B500B, S235, Y1860, GL24h, SE 350 G und das
-Wasser. Eine Flüssigkeit hat nur ihre Dichte; Grundbruch und Pfahl nehmen
+jeder Art eine Sorte: C25/30, B500B, S235, Y1860, GL24h, SE 350 G, das
+Mauerwerk MB und das Wasser. Eine Flüssigkeit hat nur ihre Dichte; Grundbruch und Pfahl nehmen
 aus ihr die Raumlast des Grundwassers. Das Wasser, 1000 kg/m³, ist eine
 feste Sorte, aber aus keiner Norm: es trägt «fest» statt «SIA».
 
@@ -691,6 +694,26 @@ jede andere: die Rechnung rechnet sein Gleichgewicht und die Lagerkräfte
 nach, und ändern sich Scheibe, Lager, Lasten oder Verfahren, sagt sie,
 dass neu zu suchen ist. Beispiel «Wandscheibe mit Türe» bei h = 1 m:
 22 Stäbe, V = 7109.6 kNm; mit SIMP bei h = 0.2 m 20 Stäbe, V = 8705.8 kNm.
+
+**Mauerwerk:** eine Wand aus unbewehrtem Mauerwerk nach SIA 266:2015, in
+der Ansicht gezeichnet, in Metern: ihr Umriss und Türen und Fenster, je
+ein Rechteck aus zwei Ecken (mit G Ecke um Ecke). Über jeder Öffnung
+liegt ein Sturz, ein Betonsturz oder ein vorfabrizierter, mit Höhe h_St
+und Auflagerlänge a. Das Material ist eine eigene Art: die sieben Sorten
+des Standardmauerwerks, MB bis MPL, mit den Werten der Tabellen 1 und 7
+und γ_M = 2.0, oder ein eigenes – deklariertes – Mauerwerk mit den Werten
+seiner Deklaration, das an den Mindestwerten nach 3.1.3.1 gemessen wird.
+In der Kachel «Mauerwerk» wählt man es, die Dicke t_w – ein Schalter
+bietet die üblichen Dicken der Sorte an, eine andere geht auch, mit einem
+grauen Hinweis –, Einstein- oder Verbandmauerwerk (dann alle Werte mal
+0.85, μ_d nicht) und ob die Stossfugen vollfugig sind. Die Kachel
+«Ränder» hält Kopf und Fuss gelenkig oder eingespannt, die Seiten frei
+oder gehalten. Der Kern sagt am Ort, was nicht stimmt – eine Öffnung über
+den Rand, zwei, die sich überschneiden, ein Sturz, der über die Wand oder
+in eine andere Öffnung reicht –, und bestimmt die Pfeiler zwischen den
+Öffnungen; die Zusammenfassung zeigt die Werte des Mauerwerks neben
+denen der Wand, die Öffnungen und die Pfeiler. Die Nachweise kommen
+Schritt um Schritt dazu.
 
 **Grundbruch:** ein Flachfundament auf seinem Baugrund, nach dem Kapitel 9.2
 «Tragfähigkeit», das der Benutzer geliefert hat. Oben das Panel «Grundbruch

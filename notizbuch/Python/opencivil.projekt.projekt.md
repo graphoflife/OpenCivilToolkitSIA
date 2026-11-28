@@ -1,5 +1,5 @@
 ---
-erzeugt: 3d7bc27e6bb0
+erzeugt: e1e20458eede
 art: modul
 tags: [modul]
 ---
@@ -62,6 +62,7 @@ Die vollstaendige, speicherbare Beschreibung eines Projekts.
 - `decken: List[DeckeEintrag] = field(default_factory=list)` – Stahlbetondecken nach der Streifenmethode: Platten, Lager, Stützen, Träger.
 - `durchstanzstellen: List[DurchstanzEintrag] = field(default_factory=list)` – Stützen und Wände, an denen das Durchstanzen nachgewiesen wird.
 - `fachwerkmodelle: List[FachwerkmodellEintrag] = field(default_factory=list)` – Scheiben mit Lagern und Lasten, für die ein Fachwerk gesucht wird – eben, ohne Bemessung.
+- `mauerwerke: List[MauerwerkEintrag] = field(default_factory=list)` – Wände aus unbewehrtem Mauerwerk, in der Ansicht mit Türen, Fenstern und Stürzen.
 - `grundbrueche: List[GrundbruchEintrag] = field(default_factory=list)` – Flachfundamente mit Grundbruch und Gleiten.
 - `setzungen: List[SetzungEintrag] = field(default_factory=list)` – Flachfundamente auf geschichtetem Baugrund, mit ihrer Setzung.
 - `pfaehle: List[PfahlEintrag] = field(default_factory=list)` – Einzelpfähle: Bohr- und Mikropfähle mit äusserem und innerem Widerstand.
@@ -224,6 +225,14 @@ def fluessigkeit(self, sorte: str=ERSTE_FLUESSIGKEIT) -> MaterialEintrag
 
 Eine Fluessigkeit, das Wasser – Kennung `fl1`, `fl2` ...
 
+#### Projekt.mauerwerk
+
+```python
+def mauerwerk(self, sorte: str=ERSTES_MAUERWERK) -> MaterialEintrag
+```
+
+Ein Standardmauerwerk nach SIA 266 – Kennung `mw1`, `mw2` ...
+
 #### Projekt.eigener_beton
 
 ```python
@@ -274,6 +283,15 @@ def eigene_fluessigkeit(self, vorlage: str=ERSTE_FLUESSIGKEIT) -> MaterialEintra
 
 Eine eigene Fluessigkeit, `FL1`, `FL2` ... – eine Bentonitsuspension
 etwa, ihre Dichte in `abweichungen["rho_fl"]`; siehe [[opencivil.projekt.projekt#Projekt.eigener_beton|eigener_beton]].
+
+#### Projekt.eigenes_mauerwerk
+
+```python
+def eigenes_mauerwerk(self, vorlage: str=ERSTES_MAUERWERK) -> MaterialEintrag
+```
+
+Ein eigenes Mauerwerk, `MW1`, `MW2` ... – ein deklariertes etwa,
+die Werte seiner Deklaration in `abweichungen`; siehe [[opencivil.projekt.projekt#Projekt.eigener_beton|eigener_beton]].
 
 #### Projekt.material_anlegen
 
@@ -380,6 +398,17 @@ def fachwerkmodell(self, name: str) -> FachwerkmodellEintrag
 Ein leeres Fachwerkmodell. Gezeichnet wird danach mit dem Baukasten
 des Eintrags – `scheibe`, `loch`, `lager_setzen`, `last` –,
 Koordinaten in m.
+
+#### Projekt.wand
+
+```python
+def wand(self, name: str, **felder: Any) -> MauerwerkEintrag
+```
+
+Eine leere Wand aus Mauerwerk, mit dem ersten Mauerwerk des Projekts
+wie in der Oberfläche. Alles Weitere – `t` in mm, `verband`,
+`kopf` ... – geht als Stichwort an den Eintrag; gezeichnet wird
+danach mit seinem Baukasten – `wand`, `oeffnung` –, Koordinaten in m.
 
 #### Projekt.durchstanzen
 
@@ -685,6 +714,7 @@ Jeder Nachweis einmal laut – gebaut in [[opencivil.projekt.beispiele|.beispiel
 - [[opencivil.material.beton]]
 - [[opencivil.material.betonstahl]]
 - [[opencivil.material.fluessigkeit]]
+- [[opencivil.material.mauerwerk]]
 - [[opencivil.material.profilblech]]
 - [[opencivil.material.spannstahl]]
 - [[opencivil.projekt.aufbau]]
@@ -699,6 +729,7 @@ Jeder Nachweis einmal laut – gebaut in [[opencivil.projekt.beispiele|.beispiel
 - [[opencivil.projekt.frueher]]
 - [[opencivil.projekt.grundbruch]]
 - [[opencivil.projekt.lesen]]
+- [[opencivil.projekt.mauerwerk]]
 - [[opencivil.projekt.netz]]
 - [[opencivil.projekt.pfahl]]
 - [[opencivil.projekt.platte]]

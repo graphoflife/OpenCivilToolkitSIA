@@ -85,6 +85,7 @@ class Baustoffart(Wahl):
     HOLZ = "holz"
     PROFILBLECH = "profilblech"
     FLUESSIGKEIT = "fluessigkeit"
+    MAUERWERK = "mauerwerk"
 
     @property
     def beschriftung(self) -> str:
@@ -96,6 +97,7 @@ class Baustoffart(Wahl):
             Baustoffart.HOLZ: "Holz",
             Baustoffart.PROFILBLECH: "Profilblechstahl",
             Baustoffart.FLUESSIGKEIT: "Flüssigkeit",
+            Baustoffart.MAUERWERK: "Mauerwerk",
         }[self]
 
 

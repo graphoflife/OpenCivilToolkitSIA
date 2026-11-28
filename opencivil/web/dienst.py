@@ -35,7 +35,9 @@ from opencivil import bewehrungssuche
 from opencivil.bericht.latex_dokument import als_tex
 from opencivil.bericht.markdown import als_markdown
 from opencivil.core.rechenwerk import Loesung, RechenwerkFehler
-from opencivil.projekt import DeckeEintrag, FachwerkmodellEintrag, Mappe, Projekt, ProjektFehler
+from opencivil.projekt import (
+    DeckeEintrag, FachwerkmodellEintrag, Mappe, MauerwerkEintrag, Projekt, ProjektFehler,
+)
 from opencivil.projekt.blechdecken import BlechdeckeEintrag
 from opencivil.projekt.lesen import inhalt_pruefen
 from opencivil.projekt.mappe import projekt_aus_datei
@@ -44,7 +46,8 @@ from opencivil.querschnitt import profilblech, vorlagen
 from opencivil.querschnitt.widerstandsflaeche import GROESSEN
 from opencivil.stahlprofile import lage as profillage
 from opencivil.web import (
-    api, balkendaten, deckendaten, diagrammdaten, fachwerkdaten, speicher, zeichengeometrie,
+    api, balkendaten, deckendaten, diagrammdaten, fachwerkdaten, mauerwerkdaten, speicher,
+    zeichengeometrie,
 )
 from opencivil.web.umschlag import endlich, fehlerdaten, umschlag
 from opencivil.web.zeichendaten import ZEICHENDATEN
@@ -575,6 +578,26 @@ def _fachwerkmodell(projekt: Projekt, rumpf: Mapping[str, Any]) -> Fachwerkmodel
     return eintrag
 
 
+def mauerwerk_zeichnung(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
+    """
+    Was das Zeichenfenster einer Wand aus Mauerwerk unter ihre Teile legt --
+    Meldungen, Pfeiler, Stuerze (:func:`mauerwerkdaten.uebersicht`). Wie beim
+    Fachwerkmodell eine eigene Anfrage nach jeder Aenderung. Fehlt der Wand
+    noch etwas, das sie gar nicht rechnen laesst -- ihr Mauerwerk --, sagt es
+    eine graue Meldung unter der Zeichnung (:func:`mauerwerkdaten.unfertig`).
+    """
+    projekt = _projekt(rumpf)
+    eintrag = projekt.bauteil(str(rumpf.get("kennung") or ""))
+    if not isinstance(eintrag, MauerwerkEintrag):
+        raise DienstFehler(400, f"'{eintrag.kennung}' ist kein Mauerwerk.")
+    aufbau = projekt.aufbauen()
+    unfertig = aufbau.unfertige.get(eintrag.kennung)
+    if unfertig is not None:
+        return {"uebersicht": mauerwerkdaten.unfertig(unfertig.grund)}
+    loesung = _bauteil_rechnen(projekt, aufbau, eintrag.kennung)
+    return {"uebersicht": endlich(mauerwerkdaten.zeichnung(aufbau, eintrag.kennung, loesung))}
+
+
 def decke_ergebnis(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     """
     Die Bilder einer Decke in einem Fall: Momente und Querkraefte in Zellen,
@@ -785,6 +808,7 @@ ANFRAGEN: Dict[str, Callable[[Mapping[str, Any]], Dict[str, Any]]] = {
     "decke_ergebnis": decke_ergebnis,
     "fachwerk_zeichnung": fachwerk_zeichnung,
     "fachwerk_suchen": fachwerk_suchen,
+    "mauerwerk_zeichnung": mauerwerk_zeichnung,
     "vorlage": vorlage,
     "vorlage_einsetzen": vorlage_einsetzen,
 }

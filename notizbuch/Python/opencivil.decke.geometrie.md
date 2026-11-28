@@ -1,5 +1,5 @@
 ---
-erzeugt: edaf23d8e391
+erzeugt: b2f57ffae7a6
 art: modul
 tags: [modul]
 ---
@@ -261,7 +261,9 @@ Intervalle, die sich berühren oder überlappen, zu einem.
 - [[opencivil.fachwerkmodell.simp]]
 - [[opencivil.fachwerkmodell.skelett]]
 - [[opencivil.fachwerkmodell.suche]]
+- [[opencivil.mauerwerk.modell]]
 - [[opencivil.projekt.aufbau.decke]]
 - [[opencivil.projekt.aufbau.fachwerkmodell]]
+- [[opencivil.projekt.aufbau.mauerwerk]]
 - [[opencivil.projekt.decke]]
 - [[opencivil.web.deckendaten]]

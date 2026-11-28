@@ -56,7 +56,7 @@ class TestDieArt(unittest.TestCase):
         art = MATERIALARTEN["fluessigkeit"]
         self.assertEqual((art.mit_satz, art.aus_norm), (False, False))
         self.assertEqual({a for a, m in MATERIALARTEN.items() if not m.mit_satz},
-                         {"holz", "fluessigkeit"})
+                         {"holz", "fluessigkeit", "mauerwerk"})
         self.assertEqual({a for a, m in MATERIALARTEN.items() if not m.aus_norm},
                          {"fluessigkeit"})
 

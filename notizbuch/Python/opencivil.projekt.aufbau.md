@@ -1,5 +1,5 @@
 ---
-erzeugt: a2901c3bf156
+erzeugt: 16a236ae8ca5
 art: modul
 tags: [modul]
 ---
@@ -24,7 +24,7 @@ ohne Bewehrung.
 ## DIE BAUTEILARTEN
 
 Platte, Querschnittsanalyse, 2D- und 3D-Balkensystem, Decke, Durchstanzen,
-Fachwerkmodell, Grundbruch, Setzung, Pfahl und Erdbeben haben je einen Steckbrief
+Fachwerkmodell, Mauerwerk, Grundbruch, Setzung, Pfahl und Erdbeben haben je einen Steckbrief
 ([[opencivil.projekt.aufbau#Bauteilart|Bauteilart]]) in [[opencivil.projekt.aufbau#Konstanten|BAUTEILE]] – Liste in der Datei, Klasse der
 Eintraege, Vorsilbe der Kennungen, Namensraum, Baufunktion. Wer alle
 Bauteile durchgeht, geht diese Liste durch. Gebaut wird je Eintrag ein
@@ -50,6 +50,7 @@ durchgeht. Je Art ein Modul mit ihrer Baufunktion `bauen`
 [[opencivil.projekt.aufbau.decke|decke]],
 [[opencivil.projekt.aufbau.durchstanzen|durchstanzen]],
 [[opencivil.projekt.aufbau.fachwerkmodell|fachwerkmodell]],
+[[opencivil.projekt.aufbau.mauerwerk|mauerwerk]],
 [[opencivil.projekt.aufbau.grundbruch|grundbruch]],
 [[opencivil.projekt.aufbau.setzung|setzung]],
 [[opencivil.projekt.aufbau.pfahl|pfahl]],
@@ -70,6 +71,7 @@ in einer Datei von ueber tausend Zeilen.
 - [[opencivil.projekt.aufbau.faelle]] – was Balkensystem und Decke an Faellen gleich pruefen.
 - [[opencivil.projekt.aufbau.grundbruch]] – ein Fundament wird Rechnung.
 - [[opencivil.projekt.aufbau.kern]] – was alle Bauteilarten beim Bauen teilen.
+- [[opencivil.projekt.aufbau.mauerwerk]] – eine Mauerwerkswand wird Rechnung.
 - [[opencivil.projekt.aufbau.pfahl]] – ein Pfahl wird Rechnung.
 - [[opencivil.projekt.aufbau.platte]] – eine Platte wird Rechnung.
 - [[opencivil.projekt.aufbau.querschnittsanalyse]] – ein gezeichneter Querschnitt wird Rechnung.
@@ -160,9 +162,10 @@ Oberflaeche, siehe Dateikopf.
 - `SETZUNG = Bauteilart('setzung', 'setzungen', SetzungEintrag, 'w', 'setzung', 'S…` – Die Kennungen w1, w2 ...: «s» tragen schon die Betonstaehle.
 - `DURCHSTANZEN = Bauteilart('durchstanzen', 'durchstanzstellen', DurchstanzEintrag, 'd…`
 - `FACHWERKMODELL = Bauteilart('fachwerkmodell', 'fachwerkmodelle', FachwerkmodellEintrag…` – Die Kennungen f1, f2 ...: die Fluessigkeiten tragen «fl», das verwechselt sich nicht.
+- `MAUERWERK = Bauteilart('mauerwerk', 'mauerwerke', MauerwerkEintrag, 'm', 'mauerwe…` – Die Kennungen m1, m2 ...: die Mauerwerke unter den Materialien tragen «mw», das verwechselt sich nicht ([[opencivil.projekt.netz#nummer|nummer]]).
 - `PFAHL = Bauteilart('pfahl', 'pfaehle', PfahlEintrag, 't', 'pfahl', 'Pfähle', …` – Die Kennungen t1, t2 ...: «p» tragen schon die Skripte.
 - `ERDBEBEN = Bauteilart('erdbeben', 'erdbeben', ErdbebenEintrag, 'h', 'erdbeben', …` – Die Kennungen h1, h2 ...: «e» tragen schon die Decken – h wie Haus.
-- `BAUTEILE = (PLATTE, ANALYSE, BALKENSYSTEM, BALKENSYSTEM3D, DECKE, DURCHSTANZEN, …` – Die Bauteilarten, in der Reihenfolge von Baum, Bericht und Rechnung – ein Balkensystem liest Werte der Platten und Analysen, also kommt es nach ihnen, das Erdbeben ebenso; die Nachweise einer Analyse koennen Stellen eines Balkensystems lesen, darum baut sie sie im zweiten Gang ([[opencivil.projekt.aufbau#Bauteilart|Bauteilart.danach]]). Decke, Durchstanzen, Fachwerkmodell, Grundbruch, Setzung und Pfahl lesen nichts von den anderen. Wer alle Bauteile durchgeht (Lesen, Kennungen, Aufbau, Zwischenspeicher, Erkennen einer Datei), geht diese Liste durch.
+- `BAUTEILE = (PLATTE, ANALYSE, BALKENSYSTEM, BALKENSYSTEM3D, DECKE, DURCHSTANZEN, …` – Die Bauteilarten, in der Reihenfolge von Baum, Bericht und Rechnung – ein Balkensystem liest Werte der Platten und Analysen, also kommt es nach ihnen, das Erdbeben ebenso; die Nachweise einer Analyse koennen Stellen eines Balkensystems lesen, darum baut sie sie im zweiten Gang ([[opencivil.projekt.aufbau#Bauteilart|Bauteilart.danach]]). Decke, Durchstanzen, Fachwerkmodell, Mauerwerk, Grundbruch, Setzung und Pfahl lesen nichts von den anderen. Wer alle Bauteile durchgeht (Lesen, Kennungen, Aufbau, Zwischenspeicher, Erkennen einer Datei), geht diese Liste durch.
 
 ## Braucht
 
@@ -175,6 +178,7 @@ Oberflaeche, siehe Dateikopf.
 - [[opencivil.projekt.aufbau.fachwerkmodell]]
 - [[opencivil.projekt.aufbau.grundbruch]]
 - [[opencivil.projekt.aufbau.kern]]
+- [[opencivil.projekt.aufbau.mauerwerk]]
 - [[opencivil.projekt.aufbau.pfahl]]
 - [[opencivil.projekt.aufbau.platte]]
 - [[opencivil.projekt.aufbau.querschnittsanalyse]]
@@ -187,6 +191,7 @@ Oberflaeche, siehe Dateikopf.
 - [[opencivil.projekt.fachwerkmodell]]
 - [[opencivil.projekt.grundbruch]]
 - [[opencivil.projekt.lesen]]
+- [[opencivil.projekt.mauerwerk]]
 - [[opencivil.projekt.pfahl]]
 - [[opencivil.projekt.platte]]
 - [[opencivil.projekt.projekt]]
@@ -206,6 +211,7 @@ Oberflaeche, siehe Dateikopf.
 - [[opencivil.projekt.aufbau.fachwerkmodell]]
 - [[opencivil.projekt.aufbau.grundbruch]]
 - [[opencivil.projekt.aufbau.kern]]
+- [[opencivil.projekt.aufbau.mauerwerk]]
 - [[opencivil.projekt.aufbau.pfahl]]
 - [[opencivil.projekt.aufbau.platte]]
 - [[opencivil.projekt.aufbau.querschnittsanalyse]]

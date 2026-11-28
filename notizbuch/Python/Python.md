@@ -1,5 +1,5 @@
 ---
-erzeugt: 70ec58dc5818
+erzeugt: 4a59e13c516f
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -109,7 +109,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.konsole.pakete]] – welche Fremdpakete ein Skript einbinden kann.
     - [[opencivil.konsole.sitzung]] – eine Python-Sitzung für die App «Python».
     - [[opencivil.konsole.zeichnen]] – Diagramme aus der App «Python», ohne matplotlib.
-- [[opencivil.material]] – die Baustoffe: Beton, Betonstahl, Baustahl, Spannstahl, Holz und
+- [[opencivil.material]] – die Baustoffe: Beton, Betonstahl, Baustahl, Spannstahl, Holz,
     - [[opencivil.material.arten]] – die Materialarten des Projekts, je eine Zeile.
     - [[opencivil.material.basis]] – Gemeinsames Geruest fuer Baustoffe.
     - [[opencivil.material.baustahl]] – Baustahl nach SIA 263:2013.
@@ -117,8 +117,15 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.material.betonstahl]] – Betonstahl nach SIA 262:2025.
     - [[opencivil.material.fluessigkeit]] – Fluessigkeiten: das Wasser und eigene.
     - [[opencivil.material.holz]] – Holz nach SIA 265:2012.
+    - [[opencivil.material.mauerwerk]] – Mauerwerk nach SIA 266:2015.
     - [[opencivil.material.profilblech]] – Profilblechstahl nach SIA 264:2014.
     - [[opencivil.material.spannstahl]] – Spannstahl nach SIA 262:2025.
+- [[opencivil.mauerwerk]] – Wände aus unbewehrtem Mauerwerk nach SIA 266:2015.
+    - [[opencivil.mauerwerk.herleitung]] – wie eine Mauerwerkswand ihre Rechnung aufschreibt.
+    - [[opencivil.mauerwerk.kennwerte]] – mit welchen Werten ihres Mauerwerks eine Wand rechnet.
+    - [[opencivil.mauerwerk.modell]] – eine Mauerwerkswand in der Ansicht, in SI.
+    - [[opencivil.mauerwerk.pruefen]] – was einer Wand fehlt oder an ihr nicht stimmt.
+    - [[opencivil.mauerwerk.werk]] – eine Mauerwerkswand im Rechenwerk.
 - [[opencivil.mcp]] – das Werkzeug fuer eine KI, ueber das Model Context Protocol.
     - [[opencivil.mcp.__main__]] – startet den Server: `python3 -m opencivil.mcp`.
     - [[opencivil.mcp.ausgabe]] – was die Werkzeuge als Text zurueckgeben.
@@ -202,6 +209,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
       - [[opencivil.projekt.aufbau.faelle]] – was Balkensystem und Decke an Faellen gleich pruefen.
       - [[opencivil.projekt.aufbau.grundbruch]] – ein Fundament wird Rechnung.
       - [[opencivil.projekt.aufbau.kern]] – was alle Bauteilarten beim Bauen teilen.
+      - [[opencivil.projekt.aufbau.mauerwerk]] – eine Mauerwerkswand wird Rechnung.
       - [[opencivil.projekt.aufbau.pfahl]] – ein Pfahl wird Rechnung.
       - [[opencivil.projekt.aufbau.platte]] – eine Platte wird Rechnung.
       - [[opencivil.projekt.aufbau.querschnittsanalyse]] – ein gezeichneter Querschnitt wird Rechnung.
@@ -223,6 +231,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.projekt.grundbruch]] – ein Grundbruchnachweis, wie die Oberflaeche ihn beschreibt.
     - [[opencivil.projekt.lesen]] – was in einer Projektdatei stehen darf, und wie es gelesen wird.
     - [[opencivil.projekt.mappe]] – mehrere Projekte in einer Datei.
+    - [[opencivil.projekt.mauerwerk]] – eine Mauerwerkswand, wie die Oberfläche sie beschreibt.
     - [[opencivil.projekt.netz]] – Knoten mit Kennungen, und wie neue dazukommen.
     - [[opencivil.projekt.pfahl]] – ein Einzelpfahl, wie die Oberflaeche ihn beschreibt.
     - [[opencivil.projekt.platte]] – eine Platte, wie die Oberflaeche sie beschreibt.
@@ -316,6 +325,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.web.erdbebendaten]] – was die Oberflaeche von einem Gebaeude im Erdbeben zeichnet.
     - [[opencivil.web.fachwerkdaten]] – was die Oberflaeche von einem Fachwerkmodell zeichnet.
     - [[opencivil.web.grundbruchdaten]] – was die Oberflaeche von einem Grundbruch zeichnet.
+    - [[opencivil.web.mauerwerkdaten]] – was die Oberflaeche von einer Wand aus Mauerwerk zeichnet.
     - [[opencivil.web.pfahldaten]] – was die Oberflaeche von einem Pfahl zeichnet.
     - [[opencivil.web.server]] – Schlanker HTTP-Server fuer die Oberflaeche.
     - [[opencivil.web.setzungsdaten]] – was die Oberflaeche von einer Setzung zeichnet.

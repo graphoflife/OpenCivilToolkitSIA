@@ -1,5 +1,5 @@
 ---
-erzeugt: e38e3bfe6cc7
+erzeugt: 8f24f2967679
 art: modul
 tags: [modul]
 ---
@@ -25,6 +25,7 @@ Browser laedt, samt dem Notizbuch.
 - [[opencivil.web.erdbebendaten]] – was die Oberflaeche von einem Gebaeude im Erdbeben zeichnet.
 - [[opencivil.web.fachwerkdaten]] – was die Oberflaeche von einem Fachwerkmodell zeichnet.
 - [[opencivil.web.grundbruchdaten]] – was die Oberflaeche von einem Grundbruch zeichnet.
+- [[opencivil.web.mauerwerkdaten]] – was die Oberflaeche von einer Wand aus Mauerwerk zeichnet.
 - [[opencivil.web.pfahldaten]] – was die Oberflaeche von einem Pfahl zeichnet.
 - [[opencivil.web.server]] – Schlanker HTTP-Server fuer die Oberflaeche.
 - [[opencivil.web.setzungsdaten]] – was die Oberflaeche von einer Setzung zeichnet.

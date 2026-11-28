@@ -1,5 +1,5 @@
 ---
-erzeugt: 7b6fbb0a280a
+erzeugt: b49c3dac9b05
 art: modul
 tags: [modul]
 ---
@@ -134,6 +134,7 @@ Wo der Knoten liegt – `None`, wenn es ihn nicht gibt.
 - [[opencivil.projekt.durchstanzen]]
 - [[opencivil.projekt.fachwerkmodell]]
 - [[opencivil.projekt.faelle]]
+- [[opencivil.projekt.mauerwerk]]
 - [[opencivil.projekt.projekt]]
 - [[opencivil.projekt.querschnittsanalyse]]
 - [[opencivil.projekt.staebe]]

@@ -13,6 +13,7 @@ Was nur eine Art braucht, steht bei ihr: :mod:`~opencivil.projekt.aufbau.platte`
 :mod:`~opencivil.projekt.aufbau.querschnittsanalyse`,
 :mod:`~opencivil.projekt.aufbau.balkensystem`,
 :mod:`~opencivil.projekt.aufbau.durchstanzen`,
+:mod:`~opencivil.projekt.aufbau.mauerwerk`,
 :mod:`~opencivil.projekt.aufbau.grundbruch`,
 :mod:`~opencivil.projekt.aufbau.setzung` und
 :mod:`~opencivil.projekt.aufbau.pfahl`. Bis 2026-10-17 stand alles in
@@ -52,6 +53,7 @@ from opencivil.stabwerk.rechnung import Balkensystem
 from opencivil.stabwerk3d.rechnung import Balkensystem3d
 from opencivil.decke.werk import Deckensystem
 from opencivil.fachwerkmodell.werk import Fachwerksystem
+from opencivil.mauerwerk.werk import Mauerwerkswand
 
 if TYPE_CHECKING:
     from opencivil.projekt.aufbau import Bauteilart
@@ -233,6 +235,11 @@ class Aufbau:
     def fachwerkmodelle(self) -> Dict[str, Fachwerksystem]:
         """Die Fachwerkmodelle, nach Kennung -- Bauteile ohne Nachweise, mit ihrem Befund."""
         return self.objekte("fachwerkmodell")
+
+    @property
+    def mauerwerke(self) -> Dict[str, Mauerwerkswand]:
+        """Die Wände aus Mauerwerk, nach Kennung."""
+        return self.objekte("mauerwerk")
 
     @property
     def grundbrueche(self) -> Dict[str, Fundament]:
