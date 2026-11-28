@@ -9,7 +9,9 @@
  * ist der Bereich, in dem sie zählen (0.35·d_v bis d_v, Gleichung (68)),
  * auf der Zugseite mit seinen Grenzen bemasst; auf der Druckseite stehen die
  * Abstände der Elemente ab dem Rand der gestützten Fläche, rechts c_v, h_A,
- * c und h.
+ * c und h. Steht die Leiste in einem Plattenbereich, ist h seine Dicke, und
+ * rechts springt an seiner Stufe die Druck- oder die Zugseite zurück, die
+ * Zugbewehrung mit ihr; dahinter steht die Dicke dort.
  *
  * Alle Zahlen kommen aus dem Kern (opencivil/web/durchstanzdaten.py), in mm:
  * x ab dem Rand der gestützten Fläche, z ab der Druckseite. Hier wird nur
@@ -66,7 +68,8 @@ function bruch([x0, y0], [x1, y1]) {
  */
 function abbildung(a) {
   const letzter = a.radien[a.radien.length - 1];
-  const rechts = Math.max(letzter, a.zaehlt[1]) + 0.45 * a.h;
+  const rechts = Math.max(Math.max(letzter, a.zaehlt[1]) + 0.45 * a.h,
+    a.stufe ? a.stufe.x + 0.45 * a.stufe.h : -Infinity);
   const kurz = a.stuetze.rand - 0.8 * a.h;
   const mitAchse = a.stuetze.achse >= kurz;
   const links = mitAchse ? a.stuetze.achse : kurz;
@@ -82,18 +85,50 @@ function abbildung(a) {
   };
 }
 
-/** Platte und Stütze aus Beton, ohne Fuge dazwischen; ein Pilz darin. */
+/**
+ * Druck- und Zugseite bei x, in mm ab der Druckseite an der Stütze: hinter
+ * der Stufe eines Plattenbereichs um so viel zurück, wie er dort dicker ist.
+ */
+function seiten(a, x) {
+  const s = a.stufe;
+  return s && x > s.x ? [s.druck, a.h - s.zug] : [0, a.h];
+}
+
+/** Der Beton der Platte von x = `von` bis `bis` (mm), an einer Stufe in zwei Teilen. */
+function platte(a, b, von, bis, klasse) {
+  const { X, Z } = b;
+  const grenze = a.stufe ? Math.min(Math.max(a.stufe.x, von), bis) : bis;
+  return [[von, grenze], [grenze, bis]].filter(([x0, x1]) => x1 > x0).map(([x0, x1]) => {
+    const [druck, zug] = seiten(a, (x0 + x1) / 2);
+    return rechteck(X(x0), Z(druck), X(x1), Z(zug), klasse);
+  });
+}
+
+/** Eine Seite der Platte von `von` bis zum rechten Rand, an der Stufe mit einem Sprung. */
+function kante(a, b, von, seite) {
+  const { X, Z } = b;
+  const z = (x) => seiten(a, x)[seite];
+  const punkte = [[X(von), Z(z(von))]];
+  if (a.stufe && a.stufe.x > von) {
+    punkte.push([X(a.stufe.x), Z(z(von))], [X(a.stufe.x), Z(z(b.rechts))]);
+  }
+  punkte.push([X(b.rechts), Z(z(b.rechts))]);
+  return linie(punkte, 'ds-kante');
+}
+
+/** Platte und Stütze aus Beton, ohne Fuge dazwischen; ein Pilz; hinter einer Stufe ihre Dicke. */
 function beton(a, b) {
   const { X, Z, aussen } = b;
   const [x0, x1, rand] = [X(b.links), X(b.rechts), X(a.stuetze.rand)];
   const fuss = Z(0) + aussen * STUMPF;
+  const [druck, zug] = seiten(a, b.rechts);
   const teile = [
-    rechteck(x0, Z(0), x1, Z(a.h), 'ds-beton'),
+    ...platte(a, b, b.links, b.rechts, 'ds-beton'),
     rechteck(x0, Z(0), rand, fuss, 'ds-beton'),
-    linie([[x0, Z(a.h)], [x1, Z(a.h)]], 'ds-kante'),
-    linie([[rand, Z(0)], [x1, Z(0)]], 'ds-kante'),
+    kante(a, b, b.links, 1),
+    kante(a, b, a.stuetze.rand, 0),
     linie([[rand, Z(0)], [rand, fuss]], 'ds-kante'),
-    bruch([x1, Z(a.h)], [x1, Z(0)]),
+    bruch([x1, Z(zug)], [x1, Z(druck)]),
     bruch([x0, fuss], [rand, fuss]),
     b.mitAchse
       ? linie([[x0, Z(a.h) - aussen * 10], [x0, fuss + aussen * 10]], 'ds-achslinie')
@@ -104,20 +139,30 @@ function beton(a, b) {
       { anker: 'middle', klasse: 'gb-zart' }));
   }
   if (a.pilz) teile.push(rechteck(x0, Z(0), X(0), Z(a.pilz.hoehe), 'ds-pilz'));
+  if (a.stufe) {
+    teile.push(text((X(a.stufe.x) + x1) / 2, Z((druck + zug) / 2) + 4, [`h = ${ganz(a.stufe.h)}`],
+      { anker: 'middle', klasse: 'gb-zart' }));
+  }
   return teile;
 }
 
-/** Die beiden Lagen der Zugbewehrung: längs eine Linie, quer Punkte im Abstand ihrer Stäbe. */
+/**
+ * Die beiden Lagen der Zugbewehrung: längs eine Linie, quer Punkte im
+ * Abstand ihrer Stäbe -- je in ihrer Tiefe unter der Zugseite, auch hinter
+ * einer Stufe; die Linie knickt so weit vor ihr, wie sie tief liegt.
+ */
 function biegebewehrung(a, b) {
   const { X, Z, m } = b;
   const teile = [];
   for (const l of a.lagen) {
-    const y = Z(a.h - l.tiefe);
+    const y = (x) => Z(seiten(a, x)[1] - l.tiefe);
     const r = Math.max((l.durchmesser * m) / 2, 1.3);
     if (l.laengs) {
+      const sprung = a.stufe
+        ? ` H${X(a.stufe.x - l.tiefe).toFixed(1)} V${y(b.rechts).toFixed(1)}` : '';
       teile.push(svgEl('path', {
-        d: `M${p(X(b.links), y)} H${X(b.rechts).toFixed(1)}`, class: 'ds-biegestab',
-        'stroke-width': (2 * r).toFixed(1),
+        d: `M${p(X(b.links), y(b.links))}${sprung} H${X(b.rechts).toFixed(1)}`,
+        class: 'ds-biegestab', 'stroke-width': (2 * r).toFixed(1),
       }));
       continue;
     }
@@ -126,7 +171,9 @@ function biegebewehrung(a, b) {
       - Math.ceil((a.stuetze.rand - b.links) / l.abstand) * l.abstand;
     for (let x = start; x < b.rechts; x += l.abstand) {
       if (x <= b.links) continue;
-      teile.push(svgEl('circle', { cx: X(x).toFixed(1), cy: y.toFixed(1), r: r.toFixed(1), class: 'ds-biegepunkt' }));
+      teile.push(svgEl('circle', {
+        cx: X(x).toFixed(1), cy: y(x).toFixed(1), r: r.toFixed(1), class: 'ds-biegepunkt',
+      }));
     }
   }
   return teile;
@@ -190,10 +237,13 @@ function abstandsmasse(a, b) {
   ]);
 }
 
-/** Rechts: c_v, h_A und c, daneben h -- mit Hilfslinien vom letzten Element und von der Platte. */
+/**
+ * Rechts: c_v, h_A und c, daneben h -- mit Hilfslinien vom letzten Element
+ * und von der Platte, hinter einer Stufe von ihr aus.
+ */
 function hoehenmasse(a, b) {
   const { X, Z } = b;
-  const [ende, xa] = [X(b.rechts), X(b.rechts) + 18];
+  const [ende, xa] = [X(a.stufe ? a.stufe.x : b.rechts), X(b.rechts) + 18];
   const xh = xa + 84;
   const oben = a.c_v + a.h_A;
   const hilfe = (z, von, bis) => linie([[von, Z(z)], [bis, Z(z)]], 'gb-masshilfe');
@@ -221,7 +271,7 @@ export function ansichtKarte(a) {
   });
   svg.append(
     ...beton(a, b),
-    rechteck(b.X(a.zaehlt[0]), b.Z(0), b.X(a.zaehlt[1]), b.Z(a.h), 'ds-zone'),
+    ...platte(a, b, a.zaehlt[0], a.zaehlt[1], 'ds-zone'),
     ...biegebewehrung(a, b),
     ...elemente(a, b),
     bereichsmasse(a, b),

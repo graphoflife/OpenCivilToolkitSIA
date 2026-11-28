@@ -38,8 +38,9 @@ from opencivil.core.rechenwerk import Loesung
 from opencivil.core.wert import Wert
 from opencivil.durchstanzen import weg
 from opencivil.durchstanzen.bereiche import Plattenbereich, Seite
-from opencivil.durchstanzen.bewehrung import BEREICH_VON
+from opencivil.durchstanzen.bewehrung import BEREICH_VON, Leiste
 from opencivil.durchstanzen.flaeche import Lage, Stuetzenform
+from opencivil.durchstanzen.mit_bewehrung import Platz
 from opencivil.durchstanzen.nachweis import Durchstanzbefund, Stufenbefund
 from opencivil.durchstanzen.schnitt import Nachweisschnitt, Punkt
 from opencivil.durchstanzen.stelle import (
@@ -150,16 +151,21 @@ def _ansicht(befund: Durchstanzbefund, stelle: Durchstanzstelle,
     steht, wo die Linie der Leiste ihren Rand trifft -- mit einem Stahlpilz
     vor dem Rand der gestützten Fläche --, ihre Achse, wo die Linie ihr am
     nächsten kommt. Eine Lage der Zugbewehrung läuft «längs», wenn sie eher
-    in Richtung der Leiste liegt; die andere steht im Bild als Punkte.
+    in Richtung der Leiste liegt; die andere steht im Bild als Punkte. Steht
+    die Leiste in einem Plattenbereich, ist ``h`` seine Dicke, und rechts
+    kommt seine Stufe ins Bild, wo sie nahe genug liegt (:func:`_stufe`).
     """
-    b = befund.leisten
+    b, platz = befund.leisten, befund.platz
     v, system = b.vorschlag, b.vorschlag.system
     leiste = max(v.leisten, key=lambda l: (len(l.anker(v.radien)), l.richtung[0]))
     radien = v.radien[:len(leiste.anker(v.radien))]
     (wx, wy), (ux, uy) = leiste.wurzel, leiste.richtung
-    eingabe = {n: zahl(werte[stelle.id_von(n)].groesse.si, MM) for n in ("h", "c", "c_v")}
+    eingabe = {n: zahl(werte[stelle.id_von(n)].groesse.si, MM) for n in ("c", "c_v")}
+    h = platz.h.groesse.si
     nach_x = abs(ux) >= abs(uy)
     d_v = b.innen.d_v
+    stufe = _stufe(platz, leiste, werte[stelle.id_von("h")].groesse.si,
+                   max(radien[-1], d_v) + h)
     zeilen = [
         zeile(f"Die {system.LEISTE} mit den meisten {system.ELEMENTEN}, längs geschnitten, "
               f"massstäblich bis auf die {system.ENDEN}: {system.ELEMENT} ",
@@ -174,9 +180,15 @@ def _ansicht(befund: Durchstanzbefund, stelle: Durchstanzstelle,
     if befund.pilz is not None:
         zeilen.append(zeile(f"Links der Stahlpilz {befund.pilz.pilz.name}: an ihm setzen die "
                             f"{system.LEISTEN} an."))
+    if platz.innerhalb:
+        bereich = platz.innerhalb[0]
+        wo = (f"rechts seine Stufe, dahinter {stufe['h']:.0f} mm" if stufe is not None
+              else "seine Stufe liegt weiter draussen")
+        zeilen.append(zeile(f"Die {system.LEISTE} steht in {bereich.titel}, {_mm(h)} mm dick; "
+                            f"{wo}. Von der Stufe bleibt sie c_nom weg."))
     return {
         "form": system.FORM, "druckseite": stelle.plattenart.druckseite,
-        **eingabe,
+        **eingabe, "h": zahl(h, MM), "stufe": stufe,
         "h_A": zahl(v.h_A, MM), "durchmesser": zahl(v.typ.durchmesser, MM),
         "radien": [zahl(r, MM) for r in radien],
         "zaehlt": [zahl(BEREICH_VON * d_v, MM), zahl(d_v, MM)],
@@ -188,6 +200,34 @@ def _ansicht(befund: Durchstanzbefund, stelle: Durchstanzstelle,
         "pilz": None if befund.pilz is None else {"hoehe": zahl(befund.pilz.pilz.h, MM)},
         "legende": zeilen,
     }
+
+
+def _stufe(platz: Platz, leiste: Leiste, h_platte: float,
+           sichtbar: float) -> Optional[Dict[str, Any]]:
+    """
+    Die Stufe des Bereichs, in dem die Leiste steht, in mm: wie weit sie
+    längs der Leiste vom Rand der gestützten Fläche liegt, wie dick die
+    Platte dahinter ist und um wie viel Druck- und Zugseite dort
+    zurückspringen -- die Seite des Bereichs (Figur 24a, 24c). ``None``, wo
+    die Leiste in keinem Bereich steht oder die Stufe weiter als
+    ``sichtbar`` (m) liegt. Nur fürs Bild.
+    """
+    if not platz.innerhalb:
+        return None
+    bereich = platz.innerhalb[0]
+    x = _bis_zum_umriss(leiste.wurzel, leiste.richtung, bereich.ecken)
+    if x > sichtbar:
+        return None
+    h = h_platte if platz.jenseits is None else platz.jenseits.h
+    mehr = bereich.h - h
+    druck = mehr if bereich.seite is Seite.STUETZE else 0.0
+    return {"x": zahl(x, MM), "h": zahl(h, MM), "druck": zahl(druck, MM),
+            "zug": zahl(mehr - druck, MM)}
+
+
+def _mm(laenge: float) -> str:
+    """Eine Länge in ganzen mm, für Sätze der Legende."""
+    return Groesse.aus_si(laenge, MM).formatiert(0)
 
 
 def _bis_zum_umriss(p: Punkt, r: Punkt, umriss: Sequence[Punkt]) -> float:
@@ -244,29 +284,18 @@ def _legende(befund: Durchstanzbefund, urteile: Sequence[NachweisUrteil],
         zeilen.append(zeile(OHNE_EINWIRKUNG))
         return zeilen
     if befund.stufen or befund.weg is not None:
-        # Mit Plattenbereichen schlägt das Werkzeug noch keine Bewehrung vor.
-        zeilen.append(zeile("Um die Stütze ", Mathe(f"V_d = {_kraft(innen.V_d_red)}"), ", ",
-                            Mathe(f"V_{{Rd,c}} = {_kraft(befund.V_Rd_c)}"), "."))
-        for x in _mit_schnitt(befund):
-            name = x.stufe.bereich.name
-            zeilen.append(zeile(
-                f"An der Stufe von {x.stufe.bereich.titel} ",
-                Mathe(f"V_{{d,{name}}} = {_kraft(x.stufe.pruefung.V_d_red)}"), ", ",
-                Mathe(f"V_{{Rd,c,{name}}} = {_kraft(x.V_Rd_c)}"), "."))
-        if befund.weg is not None:
-            zeilen.append(zeile(
-                f"Am Schnitt {weg.NAME} ",
-                Mathe(f"V_{{d,W}} = {_kraft(befund.weg.schnitt.last.V_d_red)}"), ", ",
-                Mathe(f"V_{{Rd,c,W}} = {_kraft(befund.weg.V_Rd_c)}"), "."))
-        return [*zeilen, _gesamtzeile(gefuehrt)]
-    if b is None and pilz is None and gefuehrt:
+        zeilen += [zeile("Um die Stütze ", Mathe(f"V_d = {_kraft(innen.V_d_red)}"), ", ",
+                         Mathe(f"V_{{Rd,c}} = {_kraft(befund.V_Rd_c)}"), "."),
+                   *_schnittzeilen(befund)]
+    elif b is None and pilz is None and gefuehrt:
         zeilen.append(zeile(*urteil(f"V_d = {_kraft(innen.V_d_red)}", r"\le",
                                     f"V_{{Rd,c}} = {_kraft(befund.V_Rd_c)}", *_gesamt(gefuehrt)),
                             "."))
         return zeilen
-    zeilen.append(zeile("Ohne Bewehrung ",
-                        Mathe(f"V_{{Rd,c}} = {_kraft(befund.V_Rd_c)} < V_d = {_kraft(innen.V_d_red)}"),
-                        "."))
+    else:
+        zeilen.append(zeile("Ohne Bewehrung ",
+                            Mathe(f"V_{{Rd,c}} = {_kraft(befund.V_Rd_c)} < "
+                                  f"V_d = {_kraft(innen.V_d_red)}"), "."))
     if pilz is not None:
         zeilen += [
             zeile(f"Stahlpilz: {pilz.pilz.name}. Seine gestützte Fläche reicht bis an die Enden "
@@ -292,11 +321,28 @@ def _legende(befund: Durchstanzbefund, urteile: Sequence[NachweisUrteil],
             zeile(Mathe(f"V_{{Rd,s}} = {_kraft(b.V_Rd_s)}"), ", ",
                   Mathe(f"V_{{Rd,max}} = {_kraft(b.V_Rd_max)}"), "."),
         ]
-    if not gefuehrt:
-        zeilen.append(zeile(f"{urteile[0].hinweis} Die Nachweise mit Durchstanzbewehrung "
+    offen = [u for u in urteile if u.offen]
+    if offen:
+        zeilen.append(zeile(f"{offen[0].hinweis} Die Nachweise mit Durchstanzbewehrung "
                             "sind darum nicht geführt."))
-        return zeilen
-    return [*zeilen, _gesamtzeile(gefuehrt)]
+    return [*zeilen, _gesamtzeile(gefuehrt)] if gefuehrt else zeilen
+
+
+def _schnittzeilen(befund: Durchstanzbefund) -> List[list]:
+    """Die Zahlen an den Stufen und am Schnitt durch verschiedene Dicken."""
+    zeilen = []
+    for x in _mit_schnitt(befund):
+        name = x.stufe.bereich.name
+        zeilen.append(zeile(
+            f"An der Stufe von {x.stufe.bereich.titel} ",
+            Mathe(f"V_{{d,{name}}} = {_kraft(x.stufe.pruefung.V_d_red)}"), ", ",
+            Mathe(f"V_{{Rd,c,{name}}} = {_kraft(x.V_Rd_c)}"), "."))
+    if befund.weg is not None:
+        zeilen.append(zeile(
+            f"Am Schnitt {weg.NAME} ",
+            Mathe(f"V_{{d,W}} = {_kraft(befund.weg.schnitt.last.V_d_red)}"), ", ",
+            Mathe(f"V_{{Rd,c,W}} = {_kraft(befund.weg.V_Rd_c)}"), "."))
+    return zeilen
 
 
 def _gesamtzeile(urteile: Sequence[NachweisUrteil]) -> list:

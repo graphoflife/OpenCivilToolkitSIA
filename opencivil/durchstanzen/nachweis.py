@@ -28,8 +28,11 @@ dicker ist als die Platte darum, liegt ein weiterer Schnitt mit eigenem
 Urteil (:mod:`.stufen`). Liegt ein Bereich neben der Stütze, kommt der
 schwächste Schnitt durch verschiedene Dicken dazu, auch mit eigenem Urteil
 (:mod:`.weg`); weiter draussen geht ein Bereich nicht ein. Bereiche an
-Wänden rechnet das Werkzeug noch nicht; die Herleitung sagt es. Mit
-Bereichen schlägt es noch keine Durchstanzbewehrung vor.
+Wänden rechnet das Werkzeug noch nicht; die Herleitung sagt es. Leisten
+schlägt es an der Stütze vor, im innersten Bereich um sie und ausserhalb der
+übrigen (:class:`.mit_bewehrung.Platz`); an den Schnitten der Stufen und
+durch verschiedene Dicken zählen sie nicht, und dort schlägt es noch keine
+eigenen vor.
 
 DIE PLATTENROTATION (4.3.6.4.2):
 In Näherungsstufe 1 ist ``m_sd/m_Rd = 1``; in Stufe 2 kommen die Momente im
@@ -194,6 +197,9 @@ class Durchstanzbefund:
     weg: Optional[Wegbefund] = None
     """Der Schnitt durch verschiedene Dicken -- wo ein Bereich neben der Stütze liegt."""
 
+    platz: Optional[mit_bewehrung.Platz] = None
+    """Wo die Leisten an der Stütze liegen dürfen -- mit ``leisten`` gesetzt."""
+
     @property
     def ohne_einwirkung(self) -> bool:
         """
@@ -237,6 +243,9 @@ class Stuetzenschnitt:
 
     netz: Optional[weg.Netz] = None
     """Wo die Schnitte durch verschiedene Dicken gesucht werden -- nur mit Bereichen neben ihr."""
+
+    dicken: Optional[Dicken] = None
+    """Die Platte und ihre Bereiche -- ohne Bereiche, und an Wänden, keine."""
 
     @property
     def rotation(self) -> Tuple[Wert, Dict[Richtung, Wert]]:
@@ -315,7 +324,7 @@ class Stuetzenrechnung:
                                 k_e=k_e.groesse.si, regel=regel, V_d=V_d, q_d=q_d)
         return Stuetzenschnitt(masse, d_S, d_v, hoehen, innen, k_e, u,
                                exzentrizitaet(resultierende, a), d, hoehe, bereiche, um_stufen,
-                               netz)
+                               netz, dicken if hoehe is not None else None)
 
     def _bereiche(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, masse: Masse, d: Wert,
                   hoehen: Dict[Richtung, Wert]
@@ -773,6 +782,37 @@ class Durchstanzen(Stuetzenrechnung, Nachweis):
                              f"V_Rd,c = {V_Rd_c.formatiert()} kN am Schnitt {weg.NAME}.")
         return [urteil], Wegbefund(ws, V_Rd_c.groesse.si)
 
+    def _platz(self, e: Eingaben, g: Stuetzenschnitt) -> mit_bewehrung.Platz:
+        """
+        Wo die Leisten an der Stütze liegen dürfen: im innersten Bereich um sie,
+        so hoch, wie er dick ist, und ausserhalb aller Bereiche, die sie nicht
+        umschliessen. Ohne Bereiche, und an Wänden, in der ganzen Platte.
+        """
+        if g.hoehe is None or g.bereiche is None or g.dicken is None:
+            return mit_bewehrung.Platz(e["h"])
+        um = g.hoehe.um[:1]
+        return mit_bewehrung.Platz(
+            g.bereiche.dicken[um[0].name] if um else e["h"], um,
+            tuple(b for b in self.stelle.bereiche if b not in g.hoehe.um),
+            g.dicken.aussen(um[0]) if um else None)
+
+    def _ohne_eigene(self, p: Protokoll, weitere: List[NachweisUrteil], *,
+                     an_der_stuetze: bool) -> None:
+        """
+        Ein Hinweis, wo ein Schnitt an einer Stufe oder durch verschiedene
+        Dicken nicht hält: dort schlägt das Werkzeug noch keine Bewehrung vor,
+        und die Leisten an der Stütze, wo es welche gibt, zählen nicht.
+        """
+        offen = [u.fall for u in weitere if not u.erfuellt]
+        if not offen:
+            return
+        wo = aufgezaehlt(offen)
+        wo = wo[0].upper() + wo[1:]
+        system = self.stelle.system.regeln
+        p.hinweis(f"{wo} zählen die {system.LEISTEN} an der Stütze nicht, und eigene schlägt das "
+                  f"Werkzeug dort noch nicht vor." if an_der_stuetze else
+                  f"{wo} schlägt das Werkzeug noch keine Durchstanzbewehrung vor.")
+
     def nicht_fuehrbar(self, grund: str) -> List[NachweisUrteil]:
         """Die vier Urteile mit Durchstanzbewehrung, wo sich keine finden liess."""
         return [self.urteil(d, fall, NICHT_FUEHRBAR, grund) for d, fall in zip(
@@ -823,20 +863,22 @@ class Durchstanzen(Stuetzenrechnung, Nachweis):
         an_weg, wegbefund = self._weg_pruefen(e, p, w, g, r)
         weitere = [*an_stufen, *an_weg]
         befund = replace(befund, stufen=stufenbefunde, weg=wegbefund)
-        if not v.erfuellt and f.vorschlag and not s.bereiche:
+        if not v.erfuellt and f.vorschlag:
+            platz = self._platz(e, g)
             urteile, leisten, pilz = mit_bewehrung.nachweisen(self, e, p, w, Grundlage(
                 innen=g.innen, d=g.d, d_v=g.d_v, k_e=g.k_e, k_r=r.k_r, tau_cd=r.tau_cd, u=g.u,
-                psi=psi, V_d=V_d, V_Rd_c=V_Rd_c, masse=g.masse, umriss=umriss))
+                psi=psi, V_d=V_d, V_Rd_c=V_Rd_c, masse=g.masse, umriss=umriss), platz)
+            self._ohne_eigene(p, weitere, an_der_stuetze=leisten is not None)
             # Der Grad ohne Bewehrung bleibt ein Wert der Herleitung, ohne Urteil.
-            return Ausfuehrung({self.d_ohne.id: Groesse(v.grad, EINHEITSLOS)}, urteile,
-                               replace(befund, leisten=leisten, pilz=pilz))
+            return Ausfuehrung({self.d_ohne.id: Groesse(v.grad, EINHEITSLOS)},
+                               [*urteile, *weitere],
+                               replace(befund, leisten=leisten, pilz=pilz, platz=platz))
         alle = v.erfuellt and all(u.erfuellt for u in weitere)
         if not alle and not f.vorschlag:
             p.hinweis(f"Für {f.lage.mehrzahl} schlägt das Werkzeug noch keine "
                       f"Durchstanzbewehrung vor.")
         elif not alle:
-            p.hinweis("Mit Plattenbereichen schlägt das Werkzeug noch keine Durchstanzbewehrung "
-                      "vor.")
+            self._ohne_eigene(p, weitere, an_der_stuetze=False)
         elif psi.groesse.si <= ROTATION_MINDEST:
             p.hinweis(
                 f"ψ = {psi.formatiert()} ≤ {ROTATION_MINDEST:.3f}: das Verformungsvermögen ist "

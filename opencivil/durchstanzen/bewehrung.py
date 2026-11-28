@@ -33,6 +33,12 @@ Bewehrung, die ihn quert, trägt nichts zur Stütze. Bis 2026-11-09 zählten nur
 die Anker selbst, und eine Leiste konnte durch eine Aussparung laufen
 (Benutzer).
 
+AN STUFEN VON PLATTENBEREICHEN (:mod:`.bereiche`):
+Eine Leiste hat eine Höhe; über eine Stufe kann sie nicht laufen. Sie bleibt
+in den Bereichen, in denen ihr Ansatz liegt, und ausserhalb der anderen, je
+mit c_nom von der Stufe -- wie von einer Aussparung (nach Vorgabe, nicht
+nachgeschlagen).
+
 DER ÄUSSERE SCHNITT (Figur 26):
 Er läuft im Abstand 0.5·d_v,out um die äussersten Anker; von einer geraden
 Strecke zwischen zwei äussersten Ankern zählen höchstens 1.5·d_v,out von
@@ -59,7 +65,9 @@ from opencivil.durchstanzen.schnitt import (
     Bogen, Halbebene, Kandidat, Nachweisschnitt, Punkt, Schatten, Strecke, Stuetzenflaeche,
     Stueck, kandidaten_stuetze, nachweisschnitt,
 )
-from opencivil.querschnitt.geometrie import abstand_strecke_polygon, konvexe_huelle
+from opencivil.querschnitt.geometrie import (
+    abstand_strecke_polygon, abstand_strecke_rand, konvexe_huelle, lage,
+)
 
 if TYPE_CHECKING:
     from opencivil.durchstanzen.pruefung import Leistenpruefung
@@ -133,18 +141,25 @@ def leisten_anordnen(stuecke: Sequence[Stueck], r_2: float, e_max: float) -> Lis
 
 def setzen(leisten: Sequence[Leiste], radien: Sequence[float], angerechnet: int, *,
            raender: Sequence[Halbebene], aussparungen: Sequence[Sequence[Punkt]],
-           schatten: Sequence[Schatten], achse: Punkt, ueberdeckung: float) -> List[Leiste]:
+           schatten: Sequence[Schatten], achse: Punkt, ueberdeckung: float,
+           hindernisse: Sequence[Sequence[Punkt]] = (),
+           innerhalb: Sequence[Sequence[Punkt]] = ()) -> List[Leiste]:
     """
     Die Leisten, wie sie liegen dürfen (siehe Dateikopf): jede so lang, wie sie
-    die Überdeckung zum Plattenrand und zu jeder Aussparung hält -- mit ihren
-    Ankern und mit dem Stahl dazwischen. Wer nicht wenigstens die ersten
-    ``angerechnet`` Anker behält oder mit ihnen im Schatten einer Aussparung
-    liegt (Figur 23d), fällt weg.
+    die Überdeckung zum Plattenrand, zu jeder Aussparung und zu jeder Stufe
+    hält -- mit ihren Ankern und mit dem Stahl dazwischen. ``hindernisse``
+    sind die Bereiche, ausserhalb derer sie bleibt, ``innerhalb`` die, in
+    denen sie bleibt. Wer nicht wenigstens die ersten ``angerechnet`` Anker
+    behält oder mit ihnen im Schatten einer Aussparung liegt (Figur 23d),
+    fällt weg.
     """
     def frei(p: Punkt, wurzel: Punkt) -> bool:
         return (all(h.n[0] * p[0] + h.n[1] * p[1] <= h.c - ueberdeckung for h in raender)
                 and all(abstand_strecke_polygon(wurzel, p, a) >= ueberdeckung - 1e-9
-                        for a in aussparungen))
+                        for a in (*aussparungen, *hindernisse))
+                and all(lage(p, b) > 0
+                        and abstand_strecke_rand(wurzel, p, b) >= ueberdeckung - 1e-9
+                        for b in innerhalb))
 
     def verdeckt(p: Punkt) -> bool:
         return any(s.enthaelt(math.atan2(p[1] - achse[1], p[0] - achse[0])) for s in schatten)
@@ -240,7 +255,9 @@ def bemessen(*, system: "System", d: float, d_v: float, d_v_out: float, h_A: flo
              r_2_zu: Callable[[float], Sequence[Stueck]], umriss: Sequence[Punkt],
              raender: Sequence[Halbebene], aussparungen: Sequence[Sequence[Punkt]],
              schatten: Sequence[Schatten], achse: Punkt, ueberdeckung: float,
-             pruefen: Callable[[Vorschlag], "Leistenpruefung"]) -> Optional["Leistenpruefung"]:
+             pruefen: Callable[[Vorschlag], "Leistenpruefung"],
+             hindernisse: Sequence[Sequence[Punkt]] = (),
+             innerhalb: Sequence[Sequence[Punkt]] = ()) -> Optional["Leistenpruefung"]:
     """
     Die kleinste Bewehrung des Systems, die reicht, mit ihrer Prüfung: der
     kleinste Durchmesser, mit dem die Bewehrung trägt (66, 67), und dazu die
@@ -249,7 +266,9 @@ def bemessen(*, system: "System", d: float, d_v: float, d_v_out: float, h_A: flo
     ``pruefen`` rechnet die Prüfung eines Vorschlags (:mod:`.mit_bewehrung`);
     ``r_2_zu(r)`` gibt den geschlossenen Schnitt im Abstand r um die gestützte
     Fläche; ``schatten`` sind die Schatten der Aussparungen am inneren Schnitt
-    (:func:`~.schnitt.schatten_am_schnitt`).
+    (:func:`~.schnitt.schatten_am_schnitt`); ``hindernisse`` und
+    ``innerhalb`` die Bereiche, ausserhalb und innerhalb derer die Leisten
+    bleiben (:func:`setzen`).
 
     Reicht nichts, kommt der stärkste Versuch zurück -- die dichtesten Leisten
     mit dem grössten Durchmesser und neun Ankern --, und seine Prüfung sagt,
@@ -279,7 +298,8 @@ def bemessen(*, system: "System", d: float, d_v: float, d_v_out: float, h_A: flo
         behalten = mindestens(radien, d_v, system.ANZAHLEN[0])
         leisten = tuple(setzen(alle, radien, behalten, raender=raender,
                                aussparungen=aussparungen, schatten=schatten, achse=achse,
-                               ueberdeckung=ueberdeckung))
+                               ueberdeckung=ueberdeckung, hindernisse=hindernisse,
+                               innerhalb=innerhalb))
         if not leisten:
             return None
         return pruefen(Vorschlag(system, typ, h_A, folge, leisten, anrechenbar(radien, d_v),

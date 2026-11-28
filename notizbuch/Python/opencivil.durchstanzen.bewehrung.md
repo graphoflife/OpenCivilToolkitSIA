@@ -1,5 +1,5 @@
 ---
-erzeugt: ee4d25a215d1
+erzeugt: fe61714de2a6
 art: modul
 tags: [modul]
 ---
@@ -43,6 +43,14 @@ am Nachweisschnitt ist: dort zählt der Schnitt nicht (Figur 23d), und
 Bewehrung, die ihn quert, trägt nichts zur Stütze. Bis 2026-11-09 zählten nur
 die Anker selbst, und eine Leiste konnte durch eine Aussparung laufen
 (Benutzer).
+
+
+## AN STUFEN VON PLATTENBEREICHEN ([[opencivil.durchstanzen.bereiche|.bereiche]])
+
+Eine Leiste hat eine Höhe; über eine Stufe kann sie nicht laufen. Sie bleibt
+in den Bereichen, in denen ihr Ansatz liegt, und ausserhalb der anderen, je
+mit c_nom von der Stufe – wie von einer Aussparung (nach Vorgabe, nicht
+nachgeschlagen).
 
 
 ## DER ÄUSSERE SCHNITT (Figur 26)
@@ -104,14 +112,16 @@ Schnitt im Abstand `r_2` um sie (siehe Dateikopf).
 ### setzen
 
 ```python
-def setzen(leisten: Sequence[Leiste], radien: Sequence[float], angerechnet: int, *, raender: Sequence[Halbebene], aussparungen: Sequence[Sequence[Punkt]], schatten: Sequence[Schatten], achse: Punkt, ueberdeckung: float) -> List[Leiste]
+def setzen(leisten: Sequence[Leiste], radien: Sequence[float], angerechnet: int, *, raender: Sequence[Halbebene], aussparungen: Sequence[Sequence[Punkt]], schatten: Sequence[Schatten], achse: Punkt, ueberdeckung: float, hindernisse: Sequence[Sequence[Punkt]]=(), innerhalb: Sequence[Sequence[Punkt]]=()) -> List[Leiste]
 ```
 
 Die Leisten, wie sie liegen dürfen (siehe Dateikopf): jede so lang, wie sie
-die Überdeckung zum Plattenrand und zu jeder Aussparung hält – mit ihren
-Ankern und mit dem Stahl dazwischen. Wer nicht wenigstens die ersten
-`angerechnet` Anker behält oder mit ihnen im Schatten einer Aussparung
-liegt (Figur 23d), fällt weg.
+die Überdeckung zum Plattenrand, zu jeder Aussparung und zu jeder Stufe
+hält – mit ihren Ankern und mit dem Stahl dazwischen. `hindernisse`
+sind die Bereiche, ausserhalb derer sie bleibt, `innerhalb` die, in
+denen sie bleibt. Wer nicht wenigstens die ersten `angerechnet` Anker
+behält oder mit ihnen im Schatten einer Aussparung liegt (Figur 23d),
+fällt weg.
 
 ### aeussere_kandidaten
 
@@ -197,7 +207,7 @@ und wenigstens so viele, wie die kürzeste Leiste des Systems hat.
 ### bemessen
 
 ```python
-def bemessen(*, system: 'System', d: float, d_v: float, d_v_out: float, h_A: float, r_2_zu: Callable[[float], Sequence[Stueck]], umriss: Sequence[Punkt], raender: Sequence[Halbebene], aussparungen: Sequence[Sequence[Punkt]], schatten: Sequence[Schatten], achse: Punkt, ueberdeckung: float, pruefen: Callable[[Vorschlag], 'Leistenpruefung']) -> Optional['Leistenpruefung']
+def bemessen(*, system: 'System', d: float, d_v: float, d_v_out: float, h_A: float, r_2_zu: Callable[[float], Sequence[Stueck]], umriss: Sequence[Punkt], raender: Sequence[Halbebene], aussparungen: Sequence[Sequence[Punkt]], schatten: Sequence[Schatten], achse: Punkt, ueberdeckung: float, pruefen: Callable[[Vorschlag], 'Leistenpruefung'], hindernisse: Sequence[Sequence[Punkt]]=(), innerhalb: Sequence[Sequence[Punkt]]=()) -> Optional['Leistenpruefung']
 ```
 
 Die kleinste Bewehrung des Systems, die reicht, mit ihrer Prüfung: der
@@ -207,7 +217,9 @@ kein Durchmesser trägt, stehen die Leisten dichter ([[opencivil.durchstanzen.be
 `pruefen` rechnet die Prüfung eines Vorschlags ([[opencivil.durchstanzen.mit_bewehrung|.mit_bewehrung]]);
 `r_2_zu(r)` gibt den geschlossenen Schnitt im Abstand r um die gestützte
 Fläche; `schatten` sind die Schatten der Aussparungen am inneren Schnitt
-([[opencivil.durchstanzen.schnitt#schatten_am_schnitt|schatten_am_schnitt]]).
+([[opencivil.durchstanzen.schnitt#schatten_am_schnitt|schatten_am_schnitt]]); `hindernisse` und
+`innerhalb` die Bereiche, ausserhalb und innerhalb derer die Leisten
+bleiben ([[opencivil.durchstanzen.bewehrung#setzen|setzen]]).
 
 Reicht nichts, kommt der stärkste Versuch zurück – die dichtesten Leisten
 mit dem grössten Durchmesser und neun Ankern –, und seine Prüfung sagt,

@@ -4,7 +4,8 @@ und .stufen): d an der Stütze, ψ aus der dünnsten Stelle, der Schnitt an jede
 Stufe nach SIA 262:2025, 4.3.6.2.7, Figur 24a und 24c, je mit eigenem Urteil,
 die Kennzahl über alle Schnitte, die Prüfungen beim Einlesen und was die
 Oberfläche davon zu sehen bekommt. Bereiche neben der Stütze prüft
-tests.test_durchstanzen_weg.
+tests.test_durchstanzen_weg, die Leisten mit Bereichen
+tests.test_durchstanzen_leisten_bereiche.
 
 Das Beispiel des Plans vom 2026-11-27: Innenstütze 400 × 400 mm, Platte
 240 mm, Bereich 1200 × 1200 mm mit 320 mm, C30/37, B500B, Näherungsstufe 1,
@@ -17,7 +18,7 @@ import unittest
 from opencivil.durchstanzen.bereiche import Dicken, Plattenbereich, Seite
 from opencivil.projekt import Projekt
 from opencivil.web.durchstanzdaten import situation
-from tests.test_durchstanzen import F_YD, E_S, TAU_CD, projekt, rechnen, texte
+from tests.test_durchstanzen import F_YD, E_S, MIT, TAU_CD, projekt, rechnen, texte
 from tests.test_durchstanzen_kennzahl import kennzahl
 from tests.unfertig import meldung
 
@@ -120,8 +121,7 @@ class TestGegenseite(unittest.TestCase):
         self.assertIsNone(stufe.stufe.pruefung)
         self.assertIsNone(stufe.V_Rd_c)
         self.assertIn("kein Platz für einen eigenen Schnitt", texte(loesung))
-        self.assertEqual([u.fall for u in loesung.urteile if u.raum == urteil.raum],
-                         ["ohne Durchstanzbewehrung"])
+        self.assertEqual([u.fall for u in loesung.urteile if u.raum == urteil.raum], list(MIT))
 
     def test_kennzahl_an_der_stufe(self):
         """Die Stufe hält weniger als die Stütze: dort liegt der Schnittpunkt, 290.1 kN."""
@@ -165,13 +165,6 @@ class TestWasNichtGeht(unittest.TestCase):
         befund = rechnen(mit_bereich(h_B=200.0))[2]
         self.assertAlmostEqual(befund.d, 0.154)
         self.assertEqual(befund.stufen, ())
-
-    def test_ohne_bewehrungsvorschlag(self):
-        _, loesung, befund, urteil = rechnen(mit_bereich(V_d=500.0))
-        self.assertFalse(urteil.erfuellt)
-        self.assertIsNone(befund.leisten)
-        self.assertIn("Mit Plattenbereichen schlägt das Werkzeug noch keine Durchstanzbewehrung "
-                      "vor.", texte(loesung))
 
     def test_an_der_wand_noch_nicht(self):
         p = projekt(lage="wandende", V_d=300.0)

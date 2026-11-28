@@ -1,5 +1,5 @@
 ---
-erzeugt: fbd16f84bb5b
+erzeugt: e73ff8a3898e
 art: modul
 tags: [modul]
 ---
@@ -52,6 +52,15 @@ sind eine Vorgabe des Herstellers. Den Widerstand des Pilzes selbst
 (4.3.6.6.1) bestätigt der Hersteller.
 
 
+## MIT PLATTENBEREICHEN ([[opencivil.durchstanzen.bereiche|.bereiche]], [[opencivil.durchstanzen.mit_bewehrung#Platz|Platz]])
+
+Die Leisten an der Stütze sind so hoch, wie die Platte dort dick ist, und
+bleiben c_nom vor jeder Stufe ([[opencivil.durchstanzen.bewehrung#setzen|.bewehrung.setzen]]). ψ ist in (69)
+dasselbe wie für V_Rd,c: die Drehung der Platte um die Stütze. Einen
+Stahlpilz sucht das Werkzeug mit Bereichen nicht – beides nach Vorgabe,
+nicht nachgeschlagen.
+
+
 ## EINHEITEN
 
 SI-Basis; Kräfte in N.
@@ -81,6 +90,29 @@ zeigt.
 - `V_Rd_c: Wert`
 - `masse: Dict[str, float]`
 - `umriss: Tuple[Punkt, ...]`
+
+### Platz
+
+```python
+@dataclass(frozen=True)
+class Platz
+```
+
+Wo die Leisten liegen dürfen, wenn es Plattenbereiche gibt: `h` ist die
+Dicke an der Stütze, `innerhalb` der Bereich, in dem sie stehen, und
+`hindernisse` die übrigen – von jeder Stufe bleiben sie c_nom weg.
+
+- `h: Wert`
+- `innerhalb: Tuple[Plattenbereich, ...] = ()`
+- `hindernisse: Tuple[Plattenbereich, ...] = ()`
+- `jenseits: Optional[Plattenbereich] = None` – Was jenseits der Stufe von `innerhalb` liegt – `None`: die Platte. Fürs Bild.
+
+#### Platz.mit_bereichen
+
+```python
+@property
+def mit_bereichen(self) -> bool
+```
 
 ### Ort
 
@@ -124,16 +156,30 @@ Herleitung. f_yd und E_s sind die des Stahls der Anker.
 - `c_v: float`
 - `h_A: Wert`
 - `d_v_out: Wert`
+- `platz: Platz`
 
 ### nachweisen
 
 ```python
-def nachweisen(n: 'Durchstanzen', e: Eingaben, p: Protokoll, w: Zwischenwerte, g: Grundlage) -> Tuple[List[NachweisUrteil], Optional[Leistenpruefung], Optional[Pilzbefund]]
+def nachweisen(n: 'Durchstanzen', e: Eingaben, p: Protokoll, w: Zwischenwerte, g: Grundlage, platz: Optional[Platz]=None) -> Tuple[List[NachweisUrteil], Optional[Leistenpruefung], Optional[Pilzbefund]]
 ```
 
 Die Durchstanzbewehrung suchen und mit ihr nachweisen – und wo die erste
 Druckdiagonale an einer Innenstütze bricht, einen Stahlpilz. Zurück kommen
-die Urteile, die Leisten und der Pilz, so weit es sie gibt.
+die Urteile, die Leisten und der Pilz, so weit es sie gibt. `platz`
+sagt, wo es Plattenbereiche gibt, wie dick die Platte an der Stütze ist
+und wo die Leisten liegen dürfen.
+
+### _warum_keines
+
+```python
+def _warum_keines(n: 'Durchstanzen', werte: _Werte, ort: Ort) -> Tuple[str, str]
+```
+
+Warum keine Leiste gesetzt ist, als Hinweis und als Grund der Urteile:
+das System passt nicht in die Platte – oder es fände Platz, liessen ihm
+die Stufen der Bereiche welchen. Das zweite prüft die Suche ohne die
+Bereiche; sie läuft nur hier, wo die erste nichts fand.
 
 ### _verankerung_schreiben
 
@@ -218,6 +264,7 @@ Schritten wie um die Stütze, ohne Leisten oder mit Leisten um ihn.
 - [[opencivil.core.nachweis]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wert]]
+- [[opencivil.durchstanzen.bereiche]]
 - [[opencivil.durchstanzen.bewehrung]]
 - [[opencivil.durchstanzen.herleitung]]
 - [[opencivil.durchstanzen.nachweis]]
@@ -230,6 +277,7 @@ Schritten wie um die Stütze, ohne Leisten oder mit Leisten um ihn.
 ## Gebraucht von
 
 - [[opencivil.durchstanzen.nachweis]]
+- [[opencivil.web.durchstanzdaten]]
 
 ## Formeln aus diesem Modul
 

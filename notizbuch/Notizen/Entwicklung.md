@@ -7,6 +7,37 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-28 · Durchstanzen: Leisten an der Stütze mit Plattenbereichen (Schritt 13d, erster Teil)
+
+Hält der Schnitt um die Stütze nicht, schlägt das Werkzeug jetzt auch mit
+Plattenbereichen Leisten vor. Sie stehen im innersten Bereich um die
+Stütze, so hoch, wie er dick ist, und bleiben c_nom vor seiner Stufe; von
+jedem anderen Bereich bleiben sie ausserhalb, auch mit c_nom – wie von
+einer Aussparung (nach Vorgabe, nicht nachgeschlagen).
+
+- **Vorher – nachher:** Innenstütze 400 × 400 mm, Platte 240 mm, Kopf
+  1200 × 1200 mm mit 320 mm, C30/37, Stufe 1, V_d = 400 kN. Vorher stand
+  um die Stütze «nicht erfüllt» (335.4 kN) mit dem Hinweis, mit Bereichen
+  gebe es noch keine Bewehrung. Jetzt: 8 ancoPLUS DX2-0255, 255 mm hoch –
+  in der Platte allein wären es 175 mm –, alle vier Nachweise mit
+  Bewehrung erfüllt. Die Stufe behält ihr eigenes Urteil (366.1 kN, nicht
+  erfüllt); ein Hinweis sagt, dass die Leisten dort nicht zählen.
+- **Zu klein:** ist der Kopf nur 700 × 700 mm, behält keine Leiste mit c_nom
+  vor der Stufe genug Anker. Herleitung, Urteile und Legende sagen «Bereich
+  B1 ist zu klein für Leisten». Ob es an den Bereichen liegt, prüft eine
+  zweite Suche ohne sie; sie läuft nur, wo die erste nichts fand.
+- **Daneben ein Hindernis:** neben einem dünneren Streifen 100 mm vor der
+  Stütze fällt die Leiste zum Streifen hin weg – 11 statt 12 Leisten, dafür
+  je fünf statt vier Anker.
+- **ψ in (69)** ist dasselbe wie für V_Rd,c, d das an der Stütze. Im Plan
+  stand das ψ des Bereichs; das ist eine Frage in [[TODO]]. Mit Bereichen
+  sucht das Werkzeug keinen Stahlpilz; ein Hinweis sagt es.
+- **Bild:** in der Ansicht der Leiste ist h die Dicke des Kopfs, und rechts
+  springt an seiner Stufe die Druckseite zurück (Figur 24a) oder die
+  Zugseite (Figur 24c), die Bewehrung mit ihr; dahinter steht die Dicke
+  dort. Liegt die Stufe weit draussen, sagt es die Legende.
+- Es folgt der zweite Teil: Leisten an den Stufen, die nicht halten.
+
 ## 2026-11-28 · Durchstanzen: Schnitt durch verschiedene Dicken (Schritt 13c)
 
 Liegt ein Plattenbereich neben der Stütze, ohne sie zu umschliessen, sucht

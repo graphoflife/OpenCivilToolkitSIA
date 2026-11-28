@@ -230,6 +230,14 @@ def abstand_strecke_polygon(a: Punkt, b: Punkt, punkte: Sequence[Punkt]) -> floa
     """
     if lage(a, punkte) >= 0 or lage(b, punkte) >= 0:
         return 0.0
+    return abstand_strecke_rand(a, b, punkte)
+
+
+def abstand_strecke_rand(a: Punkt, b: Punkt, punkte: Sequence[Punkt]) -> float:
+    """
+    Der kuerzeste Abstand der Strecke ``a``–``b`` vom Rand des Polygons, ob
+    sie in ihm liegt oder ausser ihm -- null, wo sie ihn kreuzt.
+    """
     if any(echt_geschnitten(a, b, p, q) for p, q in _kanten(punkte)):
         return 0.0
     return min(min(abstand_zur_strecke(a, p, q), abstand_zur_strecke(b, p, q),

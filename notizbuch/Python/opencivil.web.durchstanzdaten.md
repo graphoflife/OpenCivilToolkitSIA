@@ -1,5 +1,5 @@
 ---
-erzeugt: 4ded28bf55eb
+erzeugt: ce86ebaa3d5a
 art: modul
 tags: [modul]
 ---
@@ -74,7 +74,30 @@ Elementen, unter ihnen die, die am ehesten nach rechts läuft. Die Stütze
 steht, wo die Linie der Leiste ihren Rand trifft – mit einem Stahlpilz
 vor dem Rand der gestützten Fläche –, ihre Achse, wo die Linie ihr am
 nächsten kommt. Eine Lage der Zugbewehrung läuft «längs», wenn sie eher
-in Richtung der Leiste liegt; die andere steht im Bild als Punkte.
+in Richtung der Leiste liegt; die andere steht im Bild als Punkte. Steht
+die Leiste in einem Plattenbereich, ist `h` seine Dicke, und rechts
+kommt seine Stufe ins Bild, wo sie nahe genug liegt ([[opencivil.web.durchstanzdaten#_stufe|_stufe]]).
+
+### _stufe
+
+```python
+def _stufe(platz: Platz, leiste: Leiste, h_platte: float, sichtbar: float) -> Optional[Dict[str, Any]]
+```
+
+Die Stufe des Bereichs, in dem die Leiste steht, in mm: wie weit sie
+längs der Leiste vom Rand der gestützten Fläche liegt, wie dick die
+Platte dahinter ist und um wie viel Druck- und Zugseite dort
+zurückspringen – die Seite des Bereichs (Figur 24a, 24c). `None`, wo
+die Leiste in keinem Bereich steht oder die Stufe weiter als
+`sichtbar` (m) liegt. Nur fürs Bild.
+
+### _mm
+
+```python
+def _mm(laenge: float) -> str
+```
+
+Eine Länge in ganzen mm, für Sätze der Legende.
 
 ### _bis_zum_umriss
 
@@ -108,6 +131,14 @@ mit Bewehrung sind dann nicht geführt ([[opencivil.core.nachweis#NachweisUrteil
 Ohne Stützenkraft steht statt des Vergleichs der Satz aller Nachweise ohne
 Einwirkung. Mit Plattenbereichen je Stufe ihr Schnitt, und die Zahlen
 stehen je Schnitt.
+
+### _schnittzeilen
+
+```python
+def _schnittzeilen(befund: Durchstanzbefund) -> List[list]
+```
+
+Die Zahlen an den Stufen und am Schnitt durch verschiedene Dicken.
 
 ### _gesamtzeile
 
@@ -159,6 +190,7 @@ Eine Kraft der Legende: kN mit einer Stelle.
 - [[opencivil.durchstanzen.bereiche]]
 - [[opencivil.durchstanzen.bewehrung]]
 - [[opencivil.durchstanzen.flaeche]]
+- [[opencivil.durchstanzen.mit_bewehrung]]
 - [[opencivil.durchstanzen.nachweis]]
 - [[opencivil.durchstanzen.schnitt]]
 - [[opencivil.durchstanzen.stelle]]

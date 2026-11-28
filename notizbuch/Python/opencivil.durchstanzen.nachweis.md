@@ -1,5 +1,5 @@
 ---
-erzeugt: 8a000a180576
+erzeugt: 88905663474b
 art: modul
 tags: [modul]
 ---
@@ -41,8 +41,11 @@ dicker ist als die Platte darum, liegt ein weiterer Schnitt mit eigenem
 Urteil ([[opencivil.durchstanzen.stufen|.stufen]]). Liegt ein Bereich neben der Stütze, kommt der
 schwächste Schnitt durch verschiedene Dicken dazu, auch mit eigenem Urteil
 ([[opencivil.durchstanzen.weg|.weg]]); weiter draussen geht ein Bereich nicht ein. Bereiche an
-Wänden rechnet das Werkzeug noch nicht; die Herleitung sagt es. Mit
-Bereichen schlägt es noch keine Durchstanzbewehrung vor.
+Wänden rechnet das Werkzeug noch nicht; die Herleitung sagt es. Leisten
+schlägt es an der Stütze vor, im innersten Bereich um sie und ausserhalb der
+übrigen ([[opencivil.durchstanzen.mit_bewehrung#Platz|.mit_bewehrung.Platz]]); an den Schnitten der Stufen und
+durch verschiedene Dicken zählen sie nicht, und dort schlägt es noch keine
+eigenen vor.
 
 
 ## DIE PLATTENROTATION (4.3.6.4.2)
@@ -167,6 +170,7 @@ braucht; jedes mit seinen eigenen Zahlen.
 - `pilz: Optional[Pilzbefund] = None` – Der gewählte Stahlpilz; mit `leisten` stehen die Leisten um ihn.
 - `stufen: Tuple[Stufenbefund, ...] = ()` – Die Schnitte an den Stufen der Bereiche um die Stütze ([[opencivil.durchstanzen.stufen|.stufen]]).
 - `weg: Optional[Wegbefund] = None` – Der Schnitt durch verschiedene Dicken – wo ein Bereich neben der Stütze liegt.
+- `platz: Optional[mit_bewehrung.Platz] = None` – Wo die Leisten an der Stütze liegen dürfen – mit `leisten` gesetzt.
 
 #### Durchstanzbefund.ohne_einwirkung
 
@@ -204,6 +208,7 @@ mit ihm und `hoehen`.
 - `bereiche: Optional[Bereichswerte] = None`
 - `stufen: Tuple[Stufe, ...] = ()` – Die Stufen um die Stütze, je mit ihrem Schnitt – ohne Plattenbereiche keine.
 - `netz: Optional[weg.Netz] = None` – Wo die Schnitte durch verschiedene Dicken gesucht werden – nur mit Bereichen neben ihr.
+- `dicken: Optional[Dicken] = None` – Die Platte und ihre Bereiche – ohne Bereiche, und an Wänden, keine.
 
 #### Stuetzenschnitt.rotation
 
@@ -408,6 +413,26 @@ def _weg_pruefen(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, g: Stuetzens
 ```
 
 Der Schnitt durch verschiedene Dicken, mit eigenem Urteil ([[opencivil.durchstanzen.weg|.weg]]).
+
+#### Durchstanzen._platz
+
+```python
+def _platz(self, e: Eingaben, g: Stuetzenschnitt) -> mit_bewehrung.Platz
+```
+
+Wo die Leisten an der Stütze liegen dürfen: im innersten Bereich um sie,
+so hoch, wie er dick ist, und ausserhalb aller Bereiche, die sie nicht
+umschliessen. Ohne Bereiche, und an Wänden, in der ganzen Platte.
+
+#### Durchstanzen._ohne_eigene
+
+```python
+def _ohne_eigene(self, p: Protokoll, weitere: List[NachweisUrteil], *, an_der_stuetze: bool) -> None
+```
+
+Ein Hinweis, wo ein Schnitt an einer Stufe oder durch verschiedene
+Dicken nicht hält: dort schlägt das Werkzeug noch keine Bewehrung vor,
+und die Leisten an der Stütze, wo es welche gibt, zählen nicht.
 
 #### Durchstanzen.nicht_fuehrbar
 

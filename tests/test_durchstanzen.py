@@ -39,6 +39,10 @@ TAU_CD = 0.3 * math.sqrt(30.0) / 1.5
 F_YD = 500.0 / 1.15
 E_S = 200000.0
 
+#: Die vier Urteile mit Durchstanzbewehrung (4.3.6.5.1), wie sie heissen.
+MIT = ("mit Durchstanzbewehrung", "Verformungsvermögen", "Betondruckdiagonale",
+       "ausserhalb der Durchstanzbewehrung")
+
 
 def projekt(**felder):
     """

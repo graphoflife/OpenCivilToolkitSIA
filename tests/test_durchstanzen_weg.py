@@ -18,7 +18,7 @@ from opencivil.durchstanzen.nachweis import kennwerttabelle
 from opencivil.durchstanzen.schnitt import _ueberlappung
 from opencivil.web import dienst
 from opencivil.web.durchstanzdaten import situation
-from tests.test_durchstanzen import TAU_CD, projekt, rechnen, texte
+from tests.test_durchstanzen import MIT, TAU_CD, projekt, rechnen, texte
 from tests.test_durchstanzen_bereiche import k_r
 from tests.test_durchstanzen_kennzahl import kennzahl
 
@@ -74,10 +74,11 @@ class TestDuennerDaneben(unittest.TestCase):
         self.assertAlmostEqual(self.befund.V_Rd_c / 1e3, 275.4, delta=0.05)
 
     def test_eigenes_urteil(self):
+        """Nach den Urteilen der Leisten (tests.test_durchstanzen_leisten_bereiche)."""
         f = faelle(self.loesung, self.urteil)
-        self.assertEqual(list(f), ["ohne Durchstanzbewehrung", WEG])
+        self.assertEqual(list(f), [*MIT, WEG])
         self.assertAlmostEqual(f[WEG][1], 269.2 / 300.0, delta=1e-3)
-        self.assertLess(f[WEG][1], f["ohne Durchstanzbewehrung"][1])
+        self.assertLess(self.befund.weg.V_Rd_c, self.befund.V_Rd_c)
 
     def test_herleitung(self):
         t = texte(self.loesung)
@@ -88,7 +89,8 @@ class TestDuennerDaneben(unittest.TestCase):
         self.assertLessEqual({"W_Pl_k_r", "W_B1_d", "W_B1_k_r", "W_V_Rd_c", "W_V_d_red"}, namen)
 
     def test_kennwerte(self):
-        zeilen = {z[0]: str(z[2].latex) for z in kennwerttabelle(self.befund).zeilen}
+        zeilen = {z[0]: str(getattr(z[2], "latex", z[2]))
+                  for z in kennwerttabelle(self.befund).zeilen}
         self.assertEqual(zeilen["Widerstand am Schnitt durch verschiedene Dicken"], "269.2")
         self.assertEqual(zeilen["Querkraft im Schnitt durch verschiedene Dicken"], "300.0")
 
@@ -127,8 +129,8 @@ class TestWasNichtEingeht(unittest.TestCase):
         """
         _, loesung, befund, urteil = rechnen(mit_streifen(320.0))
         self.assertAlmostEqual(befund.weg.V_Rd_c / 1e3, 345.1, delta=0.05)
-        f = faelle(loesung, urteil)
-        self.assertGreater(f[WEG][1], f["ohne Durchstanzbewehrung"][1])
+        self.assertTrue(faelle(loesung, urteil)[WEG][0])
+        self.assertGreater(befund.weg.V_Rd_c, befund.V_Rd_c)
 
     def test_weiter_weg_derselbe_d(self):
         """400 mm neben der Stütze: der schwächste Schnitt ist der um die Stütze."""
@@ -137,7 +139,7 @@ class TestWasNichtEingeht(unittest.TestCase):
         self.assertIsNone(befund.weg)
         self.assertAlmostEqual(befund.V_Rd_c / 1e3, 275.4, delta=0.05)
         self.assertIn("rechnet überall mit demselben d", texte(loesung))
-        self.assertEqual(list(faelle(loesung, urteil)), ["ohne Durchstanzbewehrung"])
+        self.assertEqual(list(faelle(loesung, urteil)), list(MIT))
 
     def test_dicker_auf_der_gegenseite(self):
         """Dicker auf der Gegenseite: die Druckseite läuft durch, der Schnitt um die Stütze gilt."""
@@ -151,7 +153,7 @@ class TestWasNichtEingeht(unittest.TestCase):
         self.assertIsNone(befund.weg)
         self.assertIn("Bereich B1 liegt mehr als 4·d neben der Stütze", texte(loesung))
         self.assertNotIn("Schnitt durch verschiedene Dicken", texte(loesung))
-        self.assertEqual(list(faelle(loesung, urteil)), ["ohne Durchstanzbewehrung"])
+        self.assertEqual(list(faelle(loesung, urteil)), list(MIT))
 
 
 class TestRandUndAussparung(unittest.TestCase):

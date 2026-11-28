@@ -331,6 +331,34 @@ sammeln sie sich hier, je mit dem, was vorläufig gebaut ist.
 - [ ] **Schnitt durch verschiedene Dicken: blau.** Im Grundriss steht er
       blau, nicht orange wie im Plan – orange ist schon der äussere Schnitt
       der Leisten. Vorschlag: so lassen. Vorläufig: blau.
+- [ ] **Leisten im Stützenkopf: ψ in Gleichung (69).** Im Plan stand für
+      (69) das ψ des Bereichs, je Formel das Ungünstigere. Gebaut ist:
+      (69) rechnet mit demselben ψ wie V_Rd,c – ψ ist die Drehung der
+      Platte um die Stütze, eine Zahl –, d ist das an der Stütze. Beispiel:
+      Kopf 1200 × 1200 mm mit 320 mm in einer Platte von 240 mm,
+      Spannweite 2.5 m, V_d = 800 kN: σ_sd = 364 N/mm²; mit ψ aus dem d
+      des Kopfs wären es 258 N/mm². Bei 7 m Spannweite erreicht σ_sd mit
+      beiden f_yd. Vorschlag: so lassen. Vorläufig: so.
+- [ ] **Leisten mit Plattenbereichen: wo sie liegen.** Sie stehen im
+      innersten Bereich um die Stütze, so hoch, wie er dick ist, und
+      bleiben c_nom vor seiner Stufe; aus jedem anderen Bereich bleiben sie
+      draussen, auch mit c_nom – wie bei einer Aussparung. Beispiel: im
+      Kopf 1200 × 1200 mm mit 320 mm sind die Anker 255 mm hoch statt
+      175 mm in der Platte; neben einem dünneren Streifen 100 mm vor der
+      Stütze fällt die Leiste zum Streifen hin weg. Nach Vorgabe, nicht
+      nachgeschlagen. Vorschlag: so lassen. Vorläufig: so.
+- [ ] **Leisten im Stützenkopf: der äussere Schnitt.** Er rechnet mit
+      d_v,out = d an der Stütze − c_v, auch wo er über die Stufe hinaus in
+      die dünnere Platte reicht; dort prüft der Schnitt an der Stufe
+      (Figur 24a) die Platte. Im Beispiel liegt er ganz im Kopf: Anker bis
+      260 mm, der Schnitt 122 mm weiter, die Stufe bei 400 mm. Nach
+      Vorgabe, nicht nachgeschlagen. Vorschlag: mit dem kleinsten d entlang
+      des Schnitts rechnen, das liegt sicher. Vorläufig: d an der Stütze.
+- [ ] **Mit Plattenbereichen kein Stahlpilz.** Reicht die erste
+      Druckdiagonale mit Leisten nicht, sucht das Werkzeug mit Bereichen
+      keinen Pilz; ein Hinweis sagt es. Der Pilz rechnet mit der Dicke der
+      Platte und kennt keine Stufen. Vorschlag: so lassen, bis jemand
+      einen Pilz in einem Stützenkopf braucht. Vorläufig: so.
 - [ ] **Aufräumen: eine Platte oder ein Bereich dünner als die
       Bewehrung tief liegt.** Gefunden beim Bau von Schritt 13c, nicht
       behoben. Heute nimmt das Werkzeug eine Platte mit h = 40 mm an,
@@ -1538,9 +1566,10 @@ Norm dazu sagt.
       Stütze. Wo an den Stegen gemessen wird, zeigt Figur 21 nicht.
 - [ ] **Durchstanzen: was das Werkzeug nicht abbildet** (zur Kenntnis):
       Einzellasten über 0.2·V_d näher als 3·d_v am Schnitt (4.3.6.2.3);
-      einbetonierte Leitungen (Figur 23e); Plattenbereiche mit eigener
-      Dicke (4.3.6.2.7, Figur 24) noch ohne Durchstanzbewehrung (Schritt
-      13d des Plans vom 2026-11-27) und nicht an Wänden; Vorspannung
+      einbetonierte Leitungen (Figur 23e); bei Plattenbereichen mit eigener
+      Dicke (4.3.6.2.7, Figur 24) Leisten nur an der Stütze, an den Stufen
+      noch nicht (Schritt 13d des Plans vom 2026-11-27), und keine Bereiche
+      an Wänden; Vorspannung
       (4.3.6.4.3); an Rand- und Eckstützen die untere Bewehrung als
       gezogene (4.3.6.4.7); die Verankerung der Biegebewehrung (5.5.3.7);
       ein Schnitt, der an einer Aussparung nahe der Stütze endet

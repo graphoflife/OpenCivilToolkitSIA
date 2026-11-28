@@ -1,5 +1,5 @@
 ---
-erzeugt: 4d12309b6fe8
+erzeugt: 5c148c380ed3
 art: modul
 tags: [modul]
 ---
@@ -181,6 +181,15 @@ def abstand_strecke_polygon(a: Punkt, b: Punkt, punkte: Sequence[Punkt]) -> floa
 
 Der kuerzeste Abstand der Strecke `a`–`b` vom Polygon – null, wo sie
 es kreuzt, beruehrt oder in ihm liegt.
+
+### abstand_strecke_rand
+
+```python
+def abstand_strecke_rand(a: Punkt, b: Punkt, punkte: Sequence[Punkt]) -> float
+```
+
+Der kuerzeste Abstand der Strecke `a`–`b` vom Rand des Polygons, ob
+sie in ihm liegt oder ausser ihm – null, wo sie ihn kreuzt.
 
 ### echt_geschnitten
 
