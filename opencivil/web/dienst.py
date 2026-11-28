@@ -173,7 +173,7 @@ def rechnen(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
         loesung = aufbau.werk.loese_alles()
     else:
         loesung = _stromabwaerts(projekt, aufbau, beschreibung)
-    analysen = _analysen(projekt.name, beschreibung, aufbau, loesung)
+    analysen = _analysen(projekt, beschreibung, aufbau, loesung)
     return {**api.loesung_dict(loesung, aufbau, spannungsanalysen=analysen),
             "obergrenzen": api.obergrenzen(projekt)}
 
@@ -204,7 +204,7 @@ def _stromabwaerts(projekt: Projekt, aufbau, beschreibung: Mapping[str, Any]) ->
     for kennung, eigene in aufbau.ziele_je_bauteil():
         if not eigene:
             continue
-        stempel = _abdruck(beschreibung, aufbau, kennung)
+        stempel = _abdruck(projekt, beschreibung, aufbau, kennung)
         teil = SPEICHER.hole(projekt.name, kennung, stempel)
         if teil is None:
             teil = aufbau.werk.loese(*eigene, bekannt=bekannt)
@@ -214,7 +214,7 @@ def _stromabwaerts(projekt: Projekt, aufbau, beschreibung: Mapping[str, Any]) ->
     return gesamt
 
 
-def _analysen(projekt: str, beschreibung: Mapping[str, Any], aufbau,
+def _analysen(projekt: Projekt, beschreibung: Mapping[str, Any], aufbau,
               loesung: Loesung) -> Dict[str, list]:
     """
     Die Zeichendaten der Spannung-Dehnung-Analysen, je Bauteil -- aus dem
@@ -225,19 +225,25 @@ def _analysen(projekt: str, beschreibung: Mapping[str, Any], aufbau,
     unveraenderter Bauteile -- am Pruefprojekt «jeder Nachweis» zwei Drittel
     jeder Rechnung.
     """
-    ANALYSEN.aufraeumen(projekt, aufbau.spannungsfaelle)
-    stempel = {k: _abdruck(beschreibung, aufbau, k) for k in aufbau.spannungsfaelle}
-    daten = {k: ANALYSEN.hole(projekt, k, s) for k, s in stempel.items()}
+    ANALYSEN.aufraeumen(projekt.name, aufbau.spannungsfaelle)
+    stempel = {k: _abdruck(projekt, beschreibung, aufbau, k) for k in aufbau.spannungsfaelle}
+    daten = {k: ANALYSEN.hole(projekt.name, k, s) for k, s in stempel.items()}
     neu = diagrammdaten.spannungsanalysen(
         aufbau, loesung, nur={k for k, d in daten.items() if d is None})
     for kennung, d in neu.items():
-        ANALYSEN.merken(projekt, kennung, stempel[kennung], d)
+        ANALYSEN.merken(projekt.name, kennung, stempel[kennung], d)
     return {**daten, **neu}
 
 
-def _abdruck(beschreibung: Mapping[str, Any], aufbau, kennung: str) -> str:
-    """Der Fingerabdruck eines Bauteils -- mit den Bauteilen, deren Werte es liest."""
-    return speicher.abdruck(beschreibung, kennung, aufbau.bauteil(kennung).bezuege)
+def _abdruck(projekt: Projekt, beschreibung: Mapping[str, Any], aufbau, kennung: str) -> str:
+    """
+    Der Fingerabdruck eines Bauteils -- mit den Bauteilen, deren Werte es
+    liest, auch ueber mehrere Stufen (:meth:`~opencivil.projekt.projekt.Projekt.bezuege_von`).
+    ``beschreibung`` ist ``projekt.als_dict()``, einmal gebildet. Einem
+    Bauteil, dem noch etwas fehlt, sagt der Fehler, was (:meth:`Aufbau.bauteil`).
+    """
+    aufbau.bauteil(kennung)
+    return speicher.abdruck(beschreibung, kennung, projekt.bezuege_von(kennung))
 
 
 def _bauteil_rechnen(projekt: Projekt, aufbau, kennung: str) -> Loesung:
@@ -247,7 +253,8 @@ def _bauteil_rechnen(projekt: Projekt, aufbau, kennung: str) -> Loesung:
     sonst dieses eine, ohne Herleitung: wer hier fragt, will Werte und
     Bilder, und die Zeichnung fragt nach jeder Eingabe.
     """
-    teil = SPEICHER.hole(projekt.name, kennung, _abdruck(projekt.als_dict(), aufbau, kennung))
+    teil = SPEICHER.hole(projekt.name, kennung,
+                         _abdruck(projekt, projekt.als_dict(), aufbau, kennung))
     if teil is None:
         return aufbau.werk.loese(*aufbau.materialziele(), *aufbau.ziele_von(kennung), ohne_herleitung=True)
     return teil
@@ -456,7 +463,7 @@ def analysediagramme(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
         raise DienstFehler(400, f"Der Wert des Schnitts ist keine Zahl: {wahl.get('wert')!r}.") from None
     aufbau = projekt.aufbauen()
     # Einer unfertigen Analyse sagt schon der Abdruck, was fehlt (Aufbau.bauteil).
-    stempel = f"{_abdruck(projekt.als_dict(), aufbau, kennung)}|{fest}|{wert!r}"
+    stempel = f"{_abdruck(projekt, projekt.als_dict(), aufbau, kennung)}|{fest}|{wert!r}"
     daten = DIAGRAMME.hole(projekt.name, kennung, stempel)
     if daten is None:
         loesung = _bauteil_rechnen(projekt, aufbau, kennung)

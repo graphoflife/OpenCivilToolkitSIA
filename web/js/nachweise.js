@@ -110,7 +110,7 @@ export function nachweisKapitel(ort) {
         formel: 'σ_s ≤ σ_s,adm (Tab. 17)',
       },
       inhalt: (e) => quasistaendigInhalt(e, ort),
-      stand: (e) => gebrauchsstand(e.quasistaendig, e[ort.gebrauch.aus]),
+      stand: (e) => gebrauchsstand(e.quasistaendig, ort.gebrauch.aus(e)),
     },
     {
       schluessel: 'haeufig',
@@ -123,7 +123,7 @@ export function nachweisKapitel(ort) {
         formel: 'σ_s ≤ f_yd − 80 N/mm²',
       },
       inhalt: (e) => haeufigInhalt(e, ort),
-      stand: (e) => (fliessenGefordert(e) ? gebrauchsstand(e.haeufig, e[ort.gebrauch.aus])
+      stand: (e) => (fliessenGefordert(e) ? gebrauchsstand(e.haeufig, ort.gebrauch.aus(e))
         : { an: false, text: 'entfällt' }),
     },
   ];
@@ -439,7 +439,7 @@ function gebrauchsKapitel(eintrag, ort, {
       ? faelle.map((_, i) => gebrauchsfallZeile(eintrag, ort, spalten, feld, wort, i))
       : [el('div.leer', {
         text: !abgeleitet ? `Noch kein ${wort}er Lastfall.`
-          : eingeschaltet(eintrag[ort.gebrauch.aus]) ? 'Nur die abgeleiteten Fälle.'
+          : eingeschaltet(ort.gebrauch.aus(eintrag)) ? 'Nur die abgeleiteten Fälle.'
             : 'Noch keine eingeschaltete Einwirkung der Tragsicherheit – abgeleitet wird nichts.',
       })]),
     // Ein neuer Gebrauchsfall heisst nach seiner Art, «Häufig 1», nicht wie

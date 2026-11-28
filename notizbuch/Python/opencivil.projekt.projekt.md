@@ -1,5 +1,5 @@
 ---
-erzeugt: f04b099ea5de
+erzeugt: 3d7bc27e6bb0
 art: modul
 tags: [modul]
 ---
@@ -109,6 +109,22 @@ anderen Bauteile kann sie nicht beeinflussen, und ihre Urteile
 zaehlten sonst mit. Und so holt der MCP-Zugang die Herleitung eines
 Bauteils – ein Stab, dessen Querschnitt eine Analyse ist, rechnete
 ohne sie nicht.
+
+#### Projekt.bezuege_von
+
+```python
+def bezuege_von(self, kennung: str) -> List[str]
+```
+
+Die Bauteile, deren Werte dieses liest, auch ueber mehrere Stufen –
+ohne es selbst, in der Folge der Bauteile. Eine Analyse, die die
+Stellen eines Systems nimmt, liest auch die Analysen, die seine Staebe
+als Querschnitt haben: aendert sich eine davon, gilt ihr Ergebnis
+nicht mehr. Ein Kreis endet, wo er sich schliesst – eine Analyse kann
+die Stellen eines Systems nehmen, dessen Staebe sie selbst als
+Querschnitt haben. Die eine Stelle fuer diese Regel: fuer
+[[opencivil.projekt.projekt#Projekt.nur|nur]] und fuer den Zwischenspeicher
+([[opencivil.web.dienst#_abdruck|_abdruck]]).
 
 #### Projekt.bauteil
 

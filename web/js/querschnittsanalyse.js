@@ -44,6 +44,7 @@ import {
   HOLZ_RECHNET, ausHolz, biegungsWahl, dauerSchalter, imBlechverbund, imVerbund,
 } from './qa_fallteile.js';
 import { LAENGSSCHUB } from './qa_laengsschub.js';
+import { AUS_SYSTEM, stellenVon } from './qa_aus_system.js';
 import { SCHUBFLUSS } from './qa_schubfluss.js';
 import { STABILITAET, STABILITAET_HOLZ, STABILITAET_VERBUND } from './qa_stabilitaet.js';
 import { uebersicht } from './qa_uebersicht.js';
@@ -694,8 +695,9 @@ const ORT = {
   gebrauch: {
     liste: 'qagebrauchsliste',
     wahl: 'qagebrauchswahl',
-    // Woraus «aus der Tragsicherheit» ableitet: die Lastfälle der Analyse.
-    aus: 'lastfaelle',
+    // Woraus «aus der Tragsicherheit» ableitet: die Lastfälle der Analyse,
+    // auch die aus einem Balkensystem.
+    aus: (a) => [...a.lastfaelle, ...stellenVon(a)],
     vorlage: 'qagebrauchsfall',
     spalten: (a) => spalten(a).filter((s) => ['N_Ed', 'M_y_Ed', 'M_z_Ed'].includes(s.feld))
       .map((s) => ({
@@ -720,10 +722,13 @@ const ORT = {
 function kapitel(analyse) {
   const gruppe = (titel, ohne, kacheln) => (ohne ? { titel, hinweis: ohne, kapitel: [] }
     : { titel, kapitel: kacheln() });
+  // Gleich nach den eigenen Lastfällen die aus einem Balkensystem.
+  const mitSystem = (kacheln) => kacheln.flatMap((k) => (k.schluessel === TRAGSICHERHEIT.schluessel
+    ? [k, AUS_SYSTEM] : [k]));
   return [
     gruppe('Nachweise', ohneNachweiseVon(analyse.kennung),
-      () => EIGENE_NACHWEISE[bauweiseVon(analyse.kennung)]
-        || [TRAGSICHERHEIT, ...nachweisKapitel(ORT)]),
+      () => mitSystem(EIGENE_NACHWEISE[bauweiseVon(analyse.kennung)]
+        || [TRAGSICHERHEIT, ...nachweisKapitel(ORT)])),
     gruppe('Spannung-Dehnung-Analysen', ohneAnalysenVon(analyse.kennung),
       () => analysenKapitel(ORT)),
     gruppe('Schnitte', '', () => [SCHUBFLUSS]),

@@ -62,6 +62,7 @@ from opencivil.material.holz import Feuchteklasse
 from opencivil.projekt.lesen import (
     ProjektFehler, bereich, einer_von, je_material, materialfeld, ort_von, stoffe_des_felds, teil,
 )
+from opencivil.projekt.aus_system import AusSystemEintrag
 from opencivil.projekt.blechdecken import BlechdeckeEintrag
 from opencivil.projekt.netz import Netz, neue_kennung
 from opencivil.projekt.profile import ProfilEintrag
@@ -586,6 +587,12 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben, JeMaterial):
 
     schubflussfaelle: List[SchubflussfallEintrag] = field(default_factory=list)
     """Die Lastfaelle des Schubflusses -- je Schnitt v und τ, kein Nachweis."""
+
+    aus_system: AusSystemEintrag = teil(AusSystemEintrag, heisst="Aus dem Balkensystem")
+    """Das Balkensystem, dessen massgebende Stellen weitere Lastfaelle sind -- oder keines."""
+
+    def bezuege(self) -> List[str]:
+        return self.aus_system.bezuege()
 
     def materialien(self) -> List[str]:
         """

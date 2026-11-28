@@ -205,14 +205,7 @@ class Projekt(Beschreibung):
         Bauteils -- ein Stab, dessen Querschnitt eine Analyse ist, rechnete
         ohne sie nicht.
         """
-        self.bauteil(kennung)
-        alle = {e.kennung: e for e in self.bauteile()}
-        behalten, offen = set(), [kennung]
-        while offen:
-            k = offen.pop()
-            if k in alle and k not in behalten:
-                behalten.add(k)
-                offen.extend(alle[k].bezuege())
+        behalten = {kennung, *self.bezuege_von(kennung)}
         kopie = copy.deepcopy(self)
         for art in BAUTEILE:
             setattr(kopie, art.liste,
@@ -220,6 +213,27 @@ class Projekt(Beschreibung):
         kopie.sandboxen = {liste: k for liste, k in kopie.sandboxen.items()
                            if any(e.kennung == k for e in getattr(kopie, liste))}
         return kopie
+
+    def bezuege_von(self, kennung: str) -> List[str]:
+        """
+        Die Bauteile, deren Werte dieses liest, auch ueber mehrere Stufen --
+        ohne es selbst, in der Folge der Bauteile. Eine Analyse, die die
+        Stellen eines Systems nimmt, liest auch die Analysen, die seine Staebe
+        als Querschnitt haben: aendert sich eine davon, gilt ihr Ergebnis
+        nicht mehr. Ein Kreis endet, wo er sich schliesst -- eine Analyse kann
+        die Stellen eines Systems nehmen, dessen Staebe sie selbst als
+        Querschnitt haben. Die eine Stelle fuer diese Regel: fuer
+        :meth:`nur` und fuer den Zwischenspeicher
+        (:func:`~opencivil.web.dienst._abdruck`).
+        """
+        alle = {e.kennung: e for e in self.bauteile()}
+        gefunden, offen = {kennung}, list(self.bauteil(kennung).bezuege())
+        while offen:
+            k = offen.pop()
+            if k in alle and k not in gefunden:
+                gefunden.add(k)
+                offen.extend(alle[k].bezuege())
+        return [k for k in alle if k in gefunden and k != kennung]
 
     def bauteil(self, kennung: str) -> Any:
         """Ein Bauteil gleich welcher Art -- eine Platte, eine Analyse, ein System."""

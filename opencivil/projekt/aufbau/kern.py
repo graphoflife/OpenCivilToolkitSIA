@@ -116,6 +116,9 @@ class Aufbau:
     warnungen: List[Warnung] = field(default_factory=list)
     """Was beim Aufbau auffiel, je Eintrag (:meth:`warnen`)."""
 
+    befunde: Dict[str, Any] = field(default_factory=dict)
+    """Was :meth:`befund_im_aufbau` schon gerechnet hat, je Berechnung."""
+
 
     #: Die Felder, in denen die Nachweise stehen -- die eine Stelle, an der
     #: ein neuer Nachweis eingetragen wird. Alle sind nach Kennung
@@ -142,6 +145,21 @@ class Aufbau:
     #
     # Bis 2026-10-25 legte jede Baufunktion ihr Objekt ein zweites Mal ab, in
     # einem Woerterbuch je Art. Jetzt steht es nur im Bauteil.
+
+    def befund_im_aufbau(self, berechnung_id: str) -> Any:
+        """
+        Der Befund einer Berechnung, schon beim Bauen gerechnet -- ohne
+        Herleitung und einmal je Aufbau: fuer ein Bauteil, das aus dem
+        Ergebnis eines anderen seine Nachweise baut, eine Analyse aus den
+        Stellen eines Balkensystems (:mod:`~opencivil.projekt.aufbau.aus_system`).
+        ``None``, wenn sie keinen hinterlaesst. Die Herleitung schreibt der
+        Lauf, der das andere Bauteil rechnet; jeder Lauf ist frisch
+        (:meth:`~opencivil.core.rechenwerk.Rechenwerk.loese`).
+        """
+        if berechnung_id not in self.befunde:
+            loesung = self.werk.loese(berechnung_id, ohne_herleitung=True)
+            self.befunde[berechnung_id] = loesung.befunde.get(berechnung_id)
+        return self.befunde[berechnung_id]
 
     def warnen(self, raum: str, text: str) -> None:
         """Ein Hinweis zum Eintrag mit dem Namensraum ``raum`` (:class:`Warnung`)."""
@@ -352,9 +370,18 @@ class Aufbau:
     def berichtsziele(self) -> List[str]:
         """
         Was im Bericht steht: Nachweise und was die Bauteile sonst rechnen --
-        ohne die Baustoffkennwerte, die niemand braucht.
+        ohne die Baustoffkennwerte, die niemand braucht. Was ein Bauteil vor
+        seinen Nachweisen herleitet (:attr:`Bauteil.vorab`), steht vor dem
+        ersten davon: so oeffnet es seinen Abschnitt nicht vor den Bauteilen,
+        die vor ihm stehen (:meth:`~opencivil.core.protokoll.Protokoll.nach_abschnitten`).
         """
-        return (self.alle_nachweisziele()
+        besitzer = {n.id: teil.kennung for teil in self.bauteile() for _, _, n in teil.nachweise}
+        offen = {teil.kennung: teil.vorab for teil in self.bauteile()}
+        ziele: List[str] = []
+        for nachweis in self.alle_nachweise():
+            ziele += offen.pop(besitzer[nachweis.id], [])
+            ziele.append(nachweis.id)
+        return (ziele + [z for vorab in offen.values() for z in vorab]
                 + [z for teil in self.bauteile() for z in teil.weitere_ziele])
 
     def urteile_von(self, kennung: str, urteile: Iterable[NachweisUrteil],
@@ -422,6 +449,12 @@ class Bauteil:
     objekt: Any
     """Der Plattenquerschnitt, die Querschnittsanalyse oder das Balkensystem."""
 
+    vorab: List[str] = field(default_factory=list)
+    """
+    Was es vor seinen Nachweisen herleitet: bei einer Analyse die Stellen
+    eines Balkensystems, die ihre Lastfaelle sind (:attr:`aus_system`).
+    """
+
     nachweise: List[Tuple[str, str, Nachweis]] = field(default_factory=list)
     """Feld, Schluessel und Nachweis, angemeldet ueber :meth:`Aufbau.eintragen`."""
 
@@ -444,18 +477,11 @@ class Bauteil:
     stehen unter dem Bauteil wie die Kennzahlen. Sonst keiner.
     """
 
-    @property
-    def bezuege(self) -> Tuple[str, ...]:
-        """
-        Die Bauteile, deren Werte es liest -- so, wie sein Eintrag sie nennt:
-        die Platten und Analysen, aus denen ein System Querschnitte nimmt,
-        die Analysen der Waende eines Gebaeudes.
-
-        Bis 2026-11-27 setzte jede Baufunktion sie selbst, und das Erdbeben
-        vergass es: aenderte sich nur die Analyse einer Wand, blieb im
-        Zwischenspeicher das alte Ergebnis stehen.
-        """
-        return tuple(self.eintrag.bezuege())
+    aus_system: Any = None
+    """
+    Bei einer Querschnittsanalyse mit Balkensystem, was sie daraus nahm
+    (:class:`~opencivil.projekt.aufbau.aus_system.AusDemSystem`). Sonst nichts.
+    """
 
     @property
     def kennung(self) -> str:
@@ -476,11 +502,13 @@ class Bauteil:
 
     def ziele(self) -> List[str]:
         """
-        Was ein Lauf fuer dieses Bauteil rechnet: die Nachweise in der Folge
-        von :attr:`Aufbau.NACHWEISFELDER`, dann die weiteren Ziele.
+        Was ein Lauf fuer dieses Bauteil rechnet: was es vorab herleitet, die
+        Nachweise in der Folge von :attr:`Aufbau.NACHWEISFELDER`, dann die
+        weiteren Ziele.
         """
         folge = {feld: i for i, feld in enumerate(Aufbau.NACHWEISFELDER)}
-        return ([n.id for _, _, n in sorted(self.nachweise, key=lambda e: folge[e[0]])]
+        return (self.vorab
+                + [n.id for _, _, n in sorted(self.nachweise, key=lambda e: folge[e[0]])]
                 + self.weitere_ziele)
 
 

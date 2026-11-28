@@ -1,5 +1,5 @@
 ---
-erzeugt: d47a2d4fd20a
+erzeugt: d41bf4e67c76
 art: modul
 tags: [modul]
 ---
@@ -516,6 +516,7 @@ Ob eine Last ihr Vorzeichen wechselt, wenn ihre Linie umgekehrt wird.
 
 ## Gebraucht von
 
+- [[opencivil.projekt.aufbau.aus_system]]
 - [[opencivil.projekt.aufbau.balkensystem]]
 - [[opencivil.projekt.aufbau.balkensystem3d]]
 - [[opencivil.projekt.balkensystem]]

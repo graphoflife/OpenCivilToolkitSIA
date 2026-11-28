@@ -1,5 +1,5 @@
 ---
-erzeugt: 76c2d2dfaf62
+erzeugt: 1b4b3a991c35
 art: modul
 tags: [modul]
 ---
@@ -377,6 +377,7 @@ Was er mit der Platte gleich angibt, steht in der Grundlage
 - `blech_a: Optional[float] = bereich(None, heisst='Abstand a', einheit=M, ueber=0.0, bis_feld='ble…` – Mit zwei Einzellasten: ihr Abstand vom naechsten Auflager in m, hoechstens L/2.
 - `spannungsfaelle: List[QASpannungsfallEintrag] = field(default_factory=list)` – Die Spannung-Dehnung-Analysen – kein Nachweis, ein Blick in den Querschnitt.
 - `schubflussfaelle: List[SchubflussfallEintrag] = field(default_factory=list)` – Die Lastfaelle des Schubflusses – je Schnitt v und τ, kein Nachweis.
+- `aus_system: AusSystemEintrag = teil(AusSystemEintrag, heisst='Aus dem Balkensystem')` – Das Balkensystem, dessen massgebende Stellen weitere Lastfaelle sind – oder keines.
 
 #### QuerschnittsanalyseEintrag.laengsschub
 
@@ -386,6 +387,12 @@ def laengsschub(self) -> bd.Laengsschub
 ```
 
 Was der Laengsschub einer Blechverbunddecke ausser ihrem Querschnitt braucht.
+
+#### QuerschnittsanalyseEintrag.bezuege
+
+```python
+def bezuege(self) -> List[str]
+```
 
 #### QuerschnittsanalyseEintrag.materialien
 
@@ -645,6 +652,7 @@ Feldmoment; das Rechteck gibt es als Vorlage im Zeichenfenster.
 - [[opencivil.core.einheiten]]
 - [[opencivil.material.holz]]
 - [[opencivil.nachweis.rechenwahl]]
+- [[opencivil.projekt.aus_system]]
 - [[opencivil.projekt.blechdecken]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.fallnamen]]
@@ -668,6 +676,7 @@ Feldmoment; das Rechteck gibt es als Vorlage im Zeichenfenster.
 
 - [[opencivil.projekt]]
 - [[opencivil.projekt.aufbau]]
+- [[opencivil.projekt.aufbau.aus_system]]
 - [[opencivil.projekt.aufbau.querschnittsanalyse]]
 - [[opencivil.projekt.beispiele]]
 - [[opencivil.projekt.beispiele_verbund]]

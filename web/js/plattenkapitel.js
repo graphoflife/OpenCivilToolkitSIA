@@ -194,7 +194,7 @@ export const PLATTE = {
     liste: 'gebrauchsliste',
     wahl: 'gebrauchswahl',
     // Woraus «aus der Tragsicherheit» ableitet: die Einwirkungen der Platte.
-    aus: 'kombinationen',
+    aus: (q) => q.kombinationen,
     vorlage: 'gebrauchsfall',
     spalten: () => [
       {

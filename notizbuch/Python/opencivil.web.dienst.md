@@ -1,5 +1,5 @@
 ---
-erzeugt: 8ee5c5096d02
+erzeugt: 72acfdb368e2
 art: modul
 tags: [modul]
 ---
@@ -159,7 +159,7 @@ sondern eine andere Ausgabe.
 ### _analysen
 
 ```python
-def _analysen(projekt: str, beschreibung: Mapping[str, Any], aufbau, loesung: Loesung) -> Dict[str, list]
+def _analysen(projekt: Projekt, beschreibung: Mapping[str, Any], aufbau, loesung: Loesung) -> Dict[str, list]
 ```
 
 Die Zeichendaten der Spannung-Dehnung-Analysen, je Bauteil – aus dem
@@ -173,10 +173,13 @@ jeder Rechnung.
 ### _abdruck
 
 ```python
-def _abdruck(beschreibung: Mapping[str, Any], aufbau, kennung: str) -> str
+def _abdruck(projekt: Projekt, beschreibung: Mapping[str, Any], aufbau, kennung: str) -> str
 ```
 
-Der Fingerabdruck eines Bauteils – mit den Bauteilen, deren Werte es liest.
+Der Fingerabdruck eines Bauteils – mit den Bauteilen, deren Werte es
+liest, auch ueber mehrere Stufen ([[opencivil.projekt.projekt#Projekt.bezuege_von|bezuege_von]]).
+`beschreibung` ist `projekt.als_dict()`, einmal gebildet. Einem
+Bauteil, dem noch etwas fehlt, sagt der Fehler, was ([[opencivil.projekt.aufbau.kern#Aufbau.bauteil|Aufbau.bauteil]]).
 
 ### _bauteil_rechnen
 

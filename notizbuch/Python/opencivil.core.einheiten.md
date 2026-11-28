@@ -1,5 +1,5 @@
 ---
-erzeugt: d27770550606
+erzeugt: a6ddbe61bd65
 art: modul
 tags: [modul]
 ---
@@ -546,6 +546,7 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - [[opencivil.stabwerk.querschnitte]]
 - [[opencivil.stabwerk.rechnung]]
 - [[opencivil.stabwerk.stabquerschnitt]]
+- [[opencivil.stabwerk.stellen]]
 - [[opencivil.stabwerk3d.rechnung]]
 - [[opencivil.stahlprofile.formen]]
 - [[opencivil.web.anzeige]]

@@ -1,5 +1,5 @@
 ---
-erzeugt: cc62deeda116
+erzeugt: 9f17d310e511
 art: modul
 tags: [modul]
 ---
@@ -41,5 +41,6 @@ Nur die Standardbibliothek: das Werkzeug rechnet auch im Browser.
 - [[opencivil.stabwerk.rechnung]] – das Balkensystem im Rechenwerk.
 - [[opencivil.stabwerk.stab]] – der ebene Stab: Steifigkeit, Lasten, Bettung.
 - [[opencivil.stabwerk.stabquerschnitt]] – woher A und I eines Stabs kommen.
+- [[opencivil.stabwerk.stellen]] – die massgebenden Stellen eines Balkensystems fuer einen Querschnitt.
 - [[opencivil.stabwerk.system]] – das Stabwerk, eben und im Raum: Unbekannte, Zusammenbau, Loesen.
 - [[opencivil.stabwerk.verlauf]] – Schnittgroessen und Biegelinien laengs eines Stabs, eben und im Raum.

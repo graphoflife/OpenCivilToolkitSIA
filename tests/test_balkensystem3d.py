@@ -304,7 +304,6 @@ class TestAusEinerPlatte(unittest.TestCase):
         self.assertAlmostEqual(self.wert(e, s, q, f"{MATERIAL_DES_QUERSCHNITTS}.GI_T"),
                                G * I_T, delta=1e-9 * G * I_T)
         self.assertEqual(s.bezuege(), ["q1"])
-        self.assertEqual(e.aufbau.bauteil(s.kennung).bezuege, ("q1",))
 
     def test_e_eq_fuer_die_biegung_g_fuer_die_torsion(self):
         """Gerissen bei M = 40 kNm: E_eq in EA, EI_y und EI_z, G_cm bleibt in GI_T."""

@@ -719,7 +719,8 @@ def _raumrahmen(p: Projekt, decke: QuerschnittEintrag,
     mit I_z wie I_y --, von Hand, aus einer Platte mit E_eq und aus einer
     Querschnittsanalyse, deren I_T sie dafür rechnet -- beide mit dem
     Material gemäss Querschnitt --, ein eigenes Material mit G; Lasten in
-    jeder Richtung, Torsion, projiziert, an Knoten.
+    jeder Richtung, Torsion, projiziert, an Knoten. Die Analyse nimmt die
+    massgebenden Stellen ihres Stabs als Lastfälle zurück, mit M_z, V_y und T.
     """
     s = p.balkensystem3d("Raumrahmen")
     beton = s.beton("b1")
@@ -731,6 +732,8 @@ def _raumrahmen(p: Projekt, decke: QuerschnittEintrag,
                                         I_T=225.0)
     streifen = s.querschnitt_aus("Deckenstreifen", "platte", decke, E_eq={"M": 20.0})
     kasten = s.querschnitt_aus("Kasten", "analyse", analyse)
+    # Kein Kreis: das System liest die Werte der Analyse, ihre Nachweise seine Stellen.
+    analyse.aus_system.system = s.kennung
     s.stahlprofil("Rundrohr", "ROR 219.1 x 8")
     s.linie((0, 0, 0), (0, 0, 3), querschnitt=balken, material=beton)
     s.linie((6, 0, 0), (6, 0, 3), querschnitt=heb, material=stahl, drehung=90.0)

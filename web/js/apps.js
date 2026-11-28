@@ -208,7 +208,7 @@ function bauteil(name, {
     }],
     name: (e) => e.name,
     kurztext,
-    loeschen: (e) => loeschenWennFrei(a.liste, e, `„${e.name}" ist Querschnitt in`),
+    loeschen: (e) => loeschenWennFrei(a.liste, e, `„${e.name}" wird gebraucht von`),
     kopieren: (e) => kopieren(zeile, e),
     zuruecksetzen: (e) => zuruecksetzen(zeile, e),
     hinweis: () => a.bezeichnung,

@@ -1,5 +1,5 @@
 ---
-erzeugt: 226c0f836af7
+erzeugt: 552448dd3150
 art: modul
 tags: [modul]
 ---
@@ -438,5 +438,6 @@ def _schieben(p: Polynom, um: float) -> Polynom
 - [[opencivil.pfahl.bettung]]
 - [[opencivil.stabwerk.herleitung]]
 - [[opencivil.stabwerk.rechnung]]
+- [[opencivil.stabwerk.stellen]]
 - [[opencivil.stabwerk3d.herleitung]]
 - [[opencivil.web.balkendaten]]

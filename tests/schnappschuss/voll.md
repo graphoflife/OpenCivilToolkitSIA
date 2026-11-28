@@ -1,6 +1,6 @@
 # Voll
 
-1007 Berechnungen ausgeführt, 1625 Werte bestimmt.
+1008 Berechnungen ausgeführt, 1646 Werte bestimmt.
 
 ## Herleitung
 
@@ -6576,6 +6576,22 @@ $$
 | Wand 3 | $(725;\ 525) \rightarrow (75;\ 525)$ | $650$ | $150$ | $1 \times \varnothing 10\ @\ 150$ | $524$ |
 | Wand 4 | $(75;\ 525) \rightarrow (75;\ 75)$ | $450$ | $150$ | $1 \times \varnothing 10\ @\ 150$ | $524$ |
 
+### Stellen aus dem Balkensystem
+
+Aus dem Balkensystem «Raumrahmen»: die Stäbe mit dieser Querschnittsanalyse als Querschnitt, L7. Je Kombination über diese Stäbe zusammen die Stellen mit max M\_y, min M\_y, max M\_z, min M\_z, max N, min N, max \|V\_z\|, max \|V\_y\|, max \|T\| – was überall null ist, gibt keine –, je mit den übrigen Schnittgrössen an derselben Stelle. Jede ist ein Lastfall der Nachweise. Wo etwas springt, sagt ihr Name die Seite – links zum Anfang des Stabs hin, rechts zu seinem Ende –, und hat eine Grösse dort ihren Extremwert auf beiden Seiten, zählen beide.
+
+> **Annahme:** Die Achse des Stabs liegt im Schwerpunkt des Querschnitts, y\_S = 400 mm und z\_S = 300 mm: dort wirken die Schnittgrössen des Systems wie jeder Lastfall der Analyse.
+
+> **Annahme:** Der Querschnitt ist vom Anfang des Stabs her gesehen, seine Unterseite auf der gestrichelten Faser: N, V\_z, M\_y und T sind die des Systems, M\_z und V\_y haben das andere Vorzeichen (nach Vorgabe, nicht nachgeschlagen).
+
+**Die massgebenden Stellen**
+
+| Lastfall | massgebend für | $N\ [\mathrm{kN}]$ | $V_y\ [\mathrm{kN}]$ | $V_z\ [\mathrm{kN}]$ | $T\ [\mathrm{kNm}]$ | $M_y\ [\mathrm{kNm}]$ | $M_z\ [\mathrm{kNm}]$ |
+| :--- | :--- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Tragsicherheit, L7 bei x = 3.77 m | max M\_y | $-17.84$ | $-0.51$ | $0.00$ | $-28.61$ | $73.03$ | $1.76$ |
+| Tragsicherheit, L7 bei x = 0.00 m | min M\_y, max M\_z, max N, min N, max \|V\_z\|, max \|V\_y\|, max \|T\| | $-17.84$ | $-0.51$ | $41.94$ | $-28.61$ | $-5.92$ | $3.68$ |
+| Tragsicherheit, L7 bei x = 7.21 m | min M\_z | $-17.84$ | $-0.51$ | $-38.38$ | $-28.61$ | $6.92$ | $0.01$ |
+
 **Querkraft über die Federn der Wände**
 
 $$
@@ -6724,6 +6740,171 @@ $$
 | $\Delta N = \sum \vert q\vert \, l \cot\alpha$ | $173.2$ | kN |
 | $\Delta M_y = -\sum \Delta N_i (z_i - z_S)$ | $0.0$ | kNm |
 | $\Delta M_z = -\sum \Delta N_i (y_i - y_S)$ | $0.0$ | kNm |
+
+Je Wand ΔN\_i = \|q\|·l·cot α, halb in jedem Gurt (SIA 262:2025, 4.3.3.4.11, (51); 4.3.5.4).
+
+#### Tragsicherheit, L7 bei x = 3.77 m
+
+**Einwirkung**
+
+| Einwirkung | Wert |  |
+| :--- | ---: | :--- |
+| V\_y,Ed | $-0.5$ | kN |
+| V\_z,Ed | $0.0$ | kN |
+| T\_Ed | $-28.6$ | kNm |
+
+**Versatz: Moment der Querkraftanteile um den Schwerpunkt**
+
+$$
+\Delta T = \sum_i V_i \cdot r_i = 0\,\mathrm{kNm}
+$$
+
+**Was die Zellen tragen**
+
+$$
+T_{Zellen} = T_{Ed} - \Delta T = -28.6\,\mathrm{kNm} - 0\,\mathrm{kNm} = -28.6\,\mathrm{kNm}
+$$
+
+**Umlauf-Schubfluss der Zellen (Bredt)**
+
+| Zelle | $A_k\ [\mathrm{mm}^2]$ | $q_k\ [\mathrm{kN/m}]$ |
+| :--- | ---: | ---: |
+| Zelle 1 | $292500$ | $-48.9$ |
+
+**Je Wand: Kraft der Feder, ganze Kraft, Widerstand**
+
+| Wand | $V_i\ [\mathrm{kN}]$ | $V_{Ed}\ [\mathrm{kN}]$ | $\alpha\ [{}^{\circ}]$ | $V_{Rd,s}\ [\mathrm{kN}]$ | $V_{Rd,c}\ [\mathrm{kN}]$ | $V_{Rd}\ [\mathrm{kN}]$ | $\alpha_{eff}$ |
+| :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Wand 1 | $-0.3$ | $32.0$ | $30$ | $256.3$ | $464.4$ | $256.3$ | $8.00$ |
+| Wand 2 | $0.0$ | $22.0$ | $30$ | $177.4$ | $321.5$ | $177.4$ | $8.06$ |
+| Wand 3 | $0.3$ | $31.5$ | $30$ | $256.3$ | $464.4$ | $256.3$ | $8.13$ |
+| Wand 4 | $0.0$ | $22.0$ | $30$ | $177.4$ | $321.5$ | $177.4$ | $8.06$ |
+
+Massgebend: Wand 1.
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,V,\text{Tragsicherheit, L7 bei x = 3.77 m}} = \frac{V_{Rd}}{V_{Ed}} = \frac{256.3\,\mathrm{kN}}{32\,\mathrm{kN}} = 8.00 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+**Längszugkraft aus dem Druckfeld der Wände, je Wand in ihrer Mitte**
+
+| Längszugkraft | Wert |  |
+| :--- | ---: | :--- |
+| $\Delta N = \sum \vert q\vert \, l \cot\alpha$ | $186.4$ | kN |
+| $\Delta M_y = -\sum \Delta N_i (z_i - z_S)$ | $0.2$ | kNm |
+| $\Delta M_z = -\sum \Delta N_i (y_i - y_S)$ | $0.0$ | kNm |
+
+Je Wand ΔN\_i = \|q\|·l·cot α, halb in jedem Gurt (SIA 262:2025, 4.3.3.4.11, (51); 4.3.5.4).
+
+#### Tragsicherheit, L7 bei x = 0.00 m
+
+**Einwirkung**
+
+| Einwirkung | Wert |  |
+| :--- | ---: | :--- |
+| V\_y,Ed | $-0.5$ | kN |
+| V\_z,Ed | $41.9$ | kN |
+| T\_Ed | $-28.6$ | kNm |
+
+**Versatz: Moment der Querkraftanteile um den Schwerpunkt**
+
+$$
+\Delta T = \sum_i V_i \cdot r_i = 0\,\mathrm{kNm}
+$$
+
+**Was die Zellen tragen**
+
+$$
+T_{Zellen} = T_{Ed} - \Delta T = -28.6\,\mathrm{kNm} - \left(0\,\mathrm{kNm}\right) = -28.6\,\mathrm{kNm}
+$$
+
+**Umlauf-Schubfluss der Zellen (Bredt)**
+
+| Zelle | $A_k\ [\mathrm{mm}^2]$ | $q_k\ [\mathrm{kN/m}]$ |
+| :--- | ---: | ---: |
+| Zelle 1 | $292500$ | $-48.9$ |
+
+**Je Wand: Kraft der Feder, ganze Kraft, Widerstand**
+
+| Wand | $V_i\ [\mathrm{kN}]$ | $V_{Ed}\ [\mathrm{kN}]$ | $\alpha\ [{}^{\circ}]$ | $V_{Rd,s}\ [\mathrm{kN}]$ | $V_{Rd,c}\ [\mathrm{kN}]$ | $V_{Rd}\ [\mathrm{kN}]$ | $\alpha_{eff}$ |
+| :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Wand 1 | $-0.3$ | $32.0$ | $30$ | $256.3$ | $464.4$ | $256.3$ | $8.00$ |
+| Wand 2 | $21.0$ | $1.0$ | $30$ | $177.4$ | $321.5$ | $177.4$ | $170.87$ |
+| Wand 3 | $0.3$ | $31.5$ | $30$ | $256.3$ | $464.4$ | $256.3$ | $8.13$ |
+| Wand 4 | $-21.0$ | $43.0$ | $30$ | $177.4$ | $321.5$ | $177.4$ | $4.13$ |
+
+Massgebend: Wand 4.
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,V,\text{Tragsicherheit, L7 bei x = 0.00 m}} = \frac{V_{Rd}}{V_{Ed}} = \frac{177.4\,\mathrm{kN}}{43\,\mathrm{kN}} = 4.13 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+**Längszugkraft aus dem Druckfeld der Wände, je Wand in ihrer Mitte**
+
+| Längszugkraft | Wert |  |
+| :--- | ---: | :--- |
+| $\Delta N = \sum \vert q\vert \, l \cot\alpha$ | $186.4$ | kN |
+| $\Delta M_y = -\sum \Delta N_i (z_i - z_S)$ | $0.2$ | kNm |
+| $\Delta M_z = -\sum \Delta N_i (y_i - y_S)$ | $23.6$ | kNm |
+
+Je Wand ΔN\_i = \|q\|·l·cot α, halb in jedem Gurt (SIA 262:2025, 4.3.3.4.11, (51); 4.3.5.4).
+
+#### Tragsicherheit, L7 bei x = 7.21 m
+
+**Einwirkung**
+
+| Einwirkung | Wert |  |
+| :--- | ---: | :--- |
+| V\_y,Ed | $-0.5$ | kN |
+| V\_z,Ed | $-38.4$ | kN |
+| T\_Ed | $-28.6$ | kNm |
+
+**Versatz: Moment der Querkraftanteile um den Schwerpunkt**
+
+$$
+\Delta T = \sum_i V_i \cdot r_i = 0\,\mathrm{kNm}
+$$
+
+**Was die Zellen tragen**
+
+$$
+T_{Zellen} = T_{Ed} - \Delta T = -28.6\,\mathrm{kNm} - 0\,\mathrm{kNm} = -28.6\,\mathrm{kNm}
+$$
+
+**Umlauf-Schubfluss der Zellen (Bredt)**
+
+| Zelle | $A_k\ [\mathrm{mm}^2]$ | $q_k\ [\mathrm{kN/m}]$ |
+| :--- | ---: | ---: |
+| Zelle 1 | $292500$ | $-48.9$ |
+
+**Je Wand: Kraft der Feder, ganze Kraft, Widerstand**
+
+| Wand | $V_i\ [\mathrm{kN}]$ | $V_{Ed}\ [\mathrm{kN}]$ | $\alpha\ [{}^{\circ}]$ | $V_{Rd,s}\ [\mathrm{kN}]$ | $V_{Rd,c}\ [\mathrm{kN}]$ | $V_{Rd}\ [\mathrm{kN}]$ | $\alpha_{eff}$ |
+| :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Wand 1 | $-0.3$ | $32.0$ | $30$ | $256.3$ | $464.4$ | $256.3$ | $8.00$ |
+| Wand 2 | $-19.2$ | $41.2$ | $30$ | $177.4$ | $321.5$ | $177.4$ | $4.31$ |
+| Wand 3 | $0.3$ | $31.5$ | $30$ | $256.3$ | $464.4$ | $256.3$ | $8.13$ |
+| Wand 4 | $19.2$ | $2.8$ | $30$ | $177.4$ | $321.5$ | $177.4$ | $62.95$ |
+
+Massgebend: Wand 2.
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,V,\text{Tragsicherheit, L7 bei x = 7.21 m}} = \frac{V_{Rd}}{V_{Ed}} = \frac{177.4\,\mathrm{kN}}{41.2\,\mathrm{kN}} = 4.31 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+**Längszugkraft aus dem Druckfeld der Wände, je Wand in ihrer Mitte**
+
+| Längszugkraft | Wert |  |
+| :--- | ---: | :--- |
+| $\Delta N = \sum \vert q\vert \, l \cot\alpha$ | $186.4$ | kN |
+| $\Delta M_y = -\sum \Delta N_i (z_i - z_S)$ | $0.2$ | kNm |
+| $\Delta M_z = -\sum \Delta N_i (y_i - y_S)$ | $-21.6$ | kNm |
 
 Je Wand ΔN\_i = \|q\|·l·cot α, halb in jedem Gurt (SIA 262:2025, 4.3.3.4.11, (51); 4.3.5.4).
 
@@ -6898,6 +7079,201 @@ $$
 
 $$
 \alpha_{eff,\text{Schief}} = \frac{M_{Rd}}{M_{Ed}} = \frac{679\,\mathrm{kNm}}{291.5\,\mathrm{kNm}} = 2.33 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+#### Tragsicherheit, L7 bei x = 3.77 m
+
+**Einwirkung**
+
+| Einwirkung | Wert |  |
+| :--- | ---: | :--- |
+| N\_Ed | $-17.8$ | kN |
+| M\_y,Ed | $73.0$ | kNm |
+| M\_z,Ed | $1.8$ | kNm |
+| ΔN aus Querkraft und Torsion | $186.4$ | kN |
+| ΔM\_y | $0.2$ | kNm |
+| ΔM\_z | $0.0$ | kNm |
+| N (nachgewiesen) | $168.5$ | kN |
+| M\_y (nachgewiesen) | $73.2$ | kNm |
+| M\_z (nachgewiesen) | $1.8$ | kNm |
+
+Bruchzustand: Zugrichtung n = (0.021; -1.000), -88.8° gegen die y-Achse. Die Nulllinie steht senkrecht zur Zugrichtung, 246.8 mm auf der Druckseite des Schwerpunkts.
+
+**Dehnungsebene**
+
+| $\varepsilon_0\ [\text{‰}]$ | $\kappa\ [\mathrm{1/m}]$ |
+| ---: | ---: |
+| $14.060$ | $0.05697$ |
+
+**Kräfte im Bruchzustand – Beton als Resultierende, Bewehrung je Element**
+
+| Teil | $F\ [\mathrm{kN}]$ | $y\ [\mathrm{mm}]$ | $z\ [\mathrm{mm}]$ | $\varepsilon\ [\text{‰}]$ | $\sigma\ [\mathrm{N/mm^2}]$ |
+| :--- | ---: | ---: | ---: | ---: | ---: |
+| C30/37 | $-702.5$ | $374.4$ | $577.8$ | – | – |
+| Stab 1 | $136.6$ | $760.0$ | $300.0$ | $14.49$ | $435$ |
+| Linie 1 | $524.5$ | $400.0$ | $50.0$ | $27.88 \ldots 28.71$ | $435$ |
+| Linie 2 | $-15.2$ | $247.5$ | $550.0$ | $-0.42 \ldots 0.06$ | $-84 \ldots 13$ |
+| Linie 3 | $173.9$ | $40.0$ | $300.0$ | $5.62 \ldots 21.64$ | $435$ |
+| Linie 4 | $51.2$ | $110.0$ | $300.0$ | $5.71 \ldots 21.73$ | $435$ |
+
+**Probe: Normalkraft**
+
+$$
+N_{Rd} = \sum F_i = 168.5\,\mathrm{kN}
+$$
+
+**Probe: Moment um y**
+
+$$
+M_{y,Rd} = -\sum F_i \cdot (z_i - z_S) = 330.1\,\mathrm{kNm}
+$$
+
+**Probe: Moment um z**
+
+$$
+M_{z,Rd} = -\sum F_i \cdot (y_i - y_S) = 8\,\mathrm{kNm}
+$$
+
+**Widerstand in der Richtung der Einwirkung**
+
+$$
+M_{Rd} = \sqrt{M_{y,Rd}^{2} + M_{z,Rd}^{2}} = \sqrt{\left(330.1\,\mathrm{kNm}\right)^{2} + \left(8\,\mathrm{kNm}\right)^{2}} = 330.2\,\mathrm{kNm}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,\text{Tragsicherheit, L7 bei x = 3.77 m}} = \frac{M_{Rd}}{M_{Ed}} = \frac{330.2\,\mathrm{kNm}}{73.3\,\mathrm{kNm}} = 4.51 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+#### Tragsicherheit, L7 bei x = 0.00 m
+
+**Einwirkung**
+
+| Einwirkung | Wert |  |
+| :--- | ---: | :--- |
+| N\_Ed | $-17.8$ | kN |
+| M\_y,Ed | $-5.9$ | kNm |
+| M\_z,Ed | $3.7$ | kNm |
+| ΔN aus Querkraft und Torsion | $186.4$ | kN |
+| ΔM\_y | $0.2$ | kNm |
+| ΔM\_z | $23.6$ | kNm |
+| N (nachgewiesen) | $168.5$ | kN |
+| M\_y (nachgewiesen) | $-5.7$ | kNm |
+| M\_z (nachgewiesen) | $27.3$ | kNm |
+
+Bruchzustand: Zugrichtung n = (-0.923; 0.384), 157.4° gegen die y-Achse. Die Nulllinie steht senkrecht zur Zugrichtung, 322.2 mm auf der Druckseite des Schwerpunkts.
+
+**Dehnungsebene**
+
+| $\varepsilon_0\ [\text{‰}]$ | $\kappa\ [\mathrm{1/m}]$ |
+| ---: | ---: |
+| $6.943$ | $0.02155$ |
+
+**Kräfte im Bruchzustand – Beton als Resultierende, Bewehrung je Element**
+
+| Teil | $F\ [\mathrm{kN}]$ | $y\ [\mathrm{mm}]$ | $z\ [\mathrm{mm}]$ | $\varepsilon\ [\text{‰}]$ | $\sigma\ [\mathrm{N/mm^2}]$ |
+| :--- | ---: | ---: | ---: | ---: | ---: |
+| C30/37 | $-537.1$ | $750.2$ | $119.7$ | – | – |
+| Stab 1 | $-13.8$ | $760.0$ | $300.0$ | $-0.22$ | $-44$ |
+| Linie 1 | $297.5$ | $161.0$ | $50.0$ | $-2.09 \ldots 11.84$ | $-418 \ldots 435$ |
+| Linie 2 | $196.7$ | $400.0$ | $550.0$ | $4.96 \ldots 13.07$ | $435$ |
+| Linie 3 | $173.9$ | $40.0$ | $300.0$ | $12.94 \ldots 15.27$ | $435$ |
+| Linie 4 | $51.2$ | $110.0$ | $300.0$ | $11.55 \ldots 13.88$ | $435$ |
+
+**Probe: Normalkraft**
+
+$$
+N_{Rd} = \sum F_i = 168.5\,\mathrm{kN}
+$$
+
+**Probe: Moment um y**
+
+$$
+M_{y,Rd} = -\sum F_i \cdot (z_i - z_S) = -71.6\,\mathrm{kNm}
+$$
+
+**Probe: Moment um z**
+
+$$
+M_{z,Rd} = -\sum F_i \cdot (y_i - y_S) = 341.6\,\mathrm{kNm}
+$$
+
+**Widerstand in der Richtung der Einwirkung**
+
+$$
+M_{Rd} = \sqrt{M_{y,Rd}^{2} + M_{z,Rd}^{2}} = \sqrt{\left(-71.6\,\mathrm{kNm}\right)^{2} + \left(341.6\,\mathrm{kNm}\right)^{2}} = 349\,\mathrm{kNm}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,\text{Tragsicherheit, L7 bei x = 0.00 m}} = \frac{M_{Rd}}{M_{Ed}} = \frac{349\,\mathrm{kNm}}{27.9\,\mathrm{kNm}} = 12.52 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+#### Tragsicherheit, L7 bei x = 7.21 m
+
+**Einwirkung**
+
+| Einwirkung | Wert |  |
+| :--- | ---: | :--- |
+| N\_Ed | $-17.8$ | kN |
+| M\_y,Ed | $6.9$ | kNm |
+| M\_z,Ed | $0.0$ | kNm |
+| ΔN aus Querkraft und Torsion | $186.4$ | kN |
+| ΔM\_y | $0.2$ | kNm |
+| ΔM\_z | $-21.6$ | kNm |
+| N (nachgewiesen) | $168.5$ | kN |
+| M\_y (nachgewiesen) | $7.1$ | kNm |
+| M\_z (nachgewiesen) | $-21.6$ | kNm |
+
+Bruchzustand: Zugrichtung n = (0.995; -0.095), -5.4° gegen die y-Achse. Die Nulllinie steht senkrecht zur Zugrichtung, 335.1 mm auf der Druckseite des Schwerpunkts.
+
+**Dehnungsebene**
+
+| $\varepsilon_0\ [\text{‰}]$ | $\kappa\ [\mathrm{1/m}]$ |
+| ---: | ---: |
+| $12.807$ | $0.03822$ |
+
+**Kräfte im Bruchzustand – Beton als Resultierende, Bewehrung je Element**
+
+| Teil | $F\ [\mathrm{kN}]$ | $y\ [\mathrm{mm}]$ | $z\ [\mathrm{mm}]$ | $\varepsilon\ [\text{‰}]$ | $\sigma\ [\mathrm{N/mm^2}]$ |
+| :--- | ---: | ---: | ---: | ---: | ---: |
+| C30/37 | $-595.0$ | $27.5$ | $357.9$ | – | – |
+| Stab 1 | $136.6$ | $760.0$ | $300.0$ | $26.50$ | $435$ |
+| Linie 1 | $453.1$ | $455.2$ | $50.0$ | $0.40 \ldots 27.03$ | $80 \ldots 435$ |
+| Linie 2 | $196.7$ | $400.0$ | $550.0$ | $4.14 \ldots 19.66$ | $435$ |
+| Linie 3 | $-64.5$ | $40.0$ | $331.1$ | $-1.40 \ldots -0.38$ | $-280 \ldots -76$ |
+| Linie 4 | $41.6$ | $110.0$ | $285.4$ | $1.26 \ldots 2.28$ | $253 \ldots 435$ |
+
+**Probe: Normalkraft**
+
+$$
+N_{Rd} = \sum F_i = 168.5\,\mathrm{kN}
+$$
+
+**Probe: Moment um y**
+
+$$
+M_{y,Rd} = -\sum F_i \cdot (z_i - z_S) = 101.1\,\mathrm{kNm}
+$$
+
+**Probe: Moment um z**
+
+$$
+M_{z,Rd} = -\sum F_i \cdot (y_i - y_S) = -306.9\,\mathrm{kNm}
+$$
+
+**Widerstand in der Richtung der Einwirkung**
+
+$$
+M_{Rd} = \sqrt{M_{y,Rd}^{2} + M_{z,Rd}^{2}} = \sqrt{\left(101.1\,\mathrm{kNm}\right)^{2} + \left(-306.9\,\mathrm{kNm}\right)^{2}} = 323.2\,\mathrm{kNm}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,\text{Tragsicherheit, L7 bei x = 7.21 m}} = \frac{M_{Rd}}{M_{Ed}} = \frac{323.2\,\mathrm{kNm}}{22.7\,\mathrm{kNm}} = 14.22 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 **Bedingung** *(SIA 262:2025, 4.1.4.2.5)*
@@ -7893,6 +8269,147 @@ $$
 
 $$
 \alpha_{eff,\sigma,w,\text{Schief (60 \%)}} = \frac{\sigma_{s,adm,2}}{\sigma_s} = \frac{404\,\mathrm{N}/\mathrm{mm}^{2}}{14\,\mathrm{N}/\mathrm{mm}^{2}} = 28.29 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+#### Quasi-ständiger Lastfall – Tragsicherheit, L7 bei x = 3.77 m (60 %)
+
+**Einwirkung**
+
+$$
+N_{Ed,\text{quasi-ständig}} = -10.7\ \mathrm{kN} \qquad M_{y,Ed,\text{quasi-ständig}} = 43.8\ \mathrm{kNm} \qquad M_{z,Ed,\text{quasi-ständig}} = 1.1\ \mathrm{kNm}
+$$
+
+**Gefundene Dehnungsebene: Zugrichtung, Dehnung im Schwerpunkt, Krümmung**
+
+$$
+\psi = -89.8^\circ \qquad \varepsilon_0 = 0.1253\,\text{‰} \qquad \kappa = 0.00062\,\mathrm{m}^{-1}
+$$
+
+**Probe: die Ebene erzeugt die Einwirkung**
+
+$$
+N_{int} = -10.7\,\mathrm{kN} \;\checkmark \qquad M_{y,int} = 43.8\,\mathrm{kNm} \;\checkmark \qquad M_{z,int} = 1.1\,\mathrm{kNm} \;\checkmark
+$$
+
+**Gezogene Bewehrung, je Element der ungünstigste Stab**
+
+| Element | $\varepsilon_s\ [‰]$ | $\sigma_s\ [\mathrm{N/mm^2}]$ | $\sigma_{s,adm}\ [\mathrm{N/mm^2}]$ |
+| :--- | ---: | ---: | ---: |
+| Stab 1 | $0.126$ | $25$ | $361$ |
+| Linie 1 | $0.281$ | $56$ | $404$ |
+| Linie 3 | $0.212$ | $42$ | $404$ |
+| Linie 4 | $0.212$ | $42$ | $500$ |
+
+Massgebend: Linie 1 (y = 750 mm, z = 50 mm).
+
+**Grösste Zugspannung in der Bewehrung**
+
+$$
+\sigma_s = 56\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm,2} = 404\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\begin{aligned}
+  \alpha_{eff,\sigma,w,\text{Tragsicherheit, L7 bei x = 3.77 m (60 \%)}} &= \frac{\sigma_{s,adm,2}}{\sigma_s} \\
+  &= \frac{404\,\mathrm{N}/\mathrm{mm}^{2}}{56\,\mathrm{N}/\mathrm{mm}^{2}} \\
+  &= 7.19 \quad \Rightarrow \quad \text{erfüllt}
+\end{aligned}
+$$
+
+#### Quasi-ständiger Lastfall – Tragsicherheit, L7 bei x = 0.00 m (60 %)
+
+**Einwirkung**
+
+$$
+N_{Ed,\text{quasi-ständig}} = -10.7\ \mathrm{kN} \qquad M_{y,Ed,\text{quasi-ständig}} = -3.6\ \mathrm{kNm} \qquad M_{z,Ed,\text{quasi-ständig}} = 2.2\ \mathrm{kNm}
+$$
+
+**Gefundene Dehnungsebene: Zugrichtung, Dehnung im Schwerpunkt, Krümmung**
+
+$$
+\psi = 102.4^\circ \qquad \varepsilon_0 = 0.0057\,\text{‰} \qquad \kappa = 0.00004\,\mathrm{m}^{-1}
+$$
+
+**Probe: die Ebene erzeugt die Einwirkung**
+
+$$
+N_{int} = -10.7\,\mathrm{kN} \;\checkmark \qquad M_{y,int} = -3.6\,\mathrm{kNm} \;\checkmark \qquad M_{z,int} = 2.2\,\mathrm{kNm} \;\checkmark
+$$
+
+**Gezogene Bewehrung, je Element der ungünstigste Stab**
+
+| Element | $\varepsilon_s\ [‰]$ | $\sigma_s\ [\mathrm{N/mm^2}]$ | $\sigma_{s,adm}\ [\mathrm{N/mm^2}]$ |
+| :--- | ---: | ---: | ---: |
+| Stab 1 | $0.003$ | $1$ | $361$ |
+| Linie 2 | $0.016$ | $3$ | $466$ |
+| Linie 3 | $0.013$ | $3$ | $404$ |
+| Linie 4 | $0.013$ | $3$ | $500$ |
+
+Massgebend: Linie 2 (y = 196 mm, z = 550 mm).
+
+**Grösste Zugspannung in der Bewehrung**
+
+$$
+\sigma_s = 3\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm,3} = 466\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\begin{aligned}
+  \alpha_{eff,\sigma,w,\text{Tragsicherheit, L7 bei x = 0.00 m (60 \%)}} &= \frac{\sigma_{s,adm,3}}{\sigma_s} \\
+  &= \frac{466\,\mathrm{N}/\mathrm{mm}^{2}}{3\,\mathrm{N}/\mathrm{mm}^{2}} \\
+  &= 144.66 \quad \Rightarrow \quad \text{erfüllt}
+\end{aligned}
+$$
+
+#### Quasi-ständiger Lastfall – Tragsicherheit, L7 bei x = 7.21 m (60 %)
+
+**Einwirkung**
+
+$$
+N_{Ed,\text{quasi-ständig}} = -10.7\ \mathrm{kN} \qquad M_{y,Ed,\text{quasi-ständig}} = 4.2\ \mathrm{kNm} \qquad M_{z,Ed,\text{quasi-ständig}} = 0.0\ \mathrm{kNm}
+$$
+
+**Gefundene Dehnungsebene: Zugrichtung, Dehnung im Schwerpunkt, Krümmung**
+
+$$
+\psi = -89.8^\circ \qquad \varepsilon_0 = 0.0039\,\text{‰} \qquad \kappa = 0.00003\,\mathrm{m}^{-1}
+$$
+
+**Probe: die Ebene erzeugt die Einwirkung**
+
+$$
+N_{int} = -10.7\,\mathrm{kN} \;\checkmark \qquad M_{y,int} = 4.2\,\mathrm{kNm} \;\checkmark \qquad M_{z,int} = 0\,\mathrm{kNm} \;\checkmark
+$$
+
+**Gezogene Bewehrung, je Element der ungünstigste Stab**
+
+| Element | $\varepsilon_s\ [‰]$ | $\sigma_s\ [\mathrm{N/mm^2}]$ | $\sigma_{s,adm}\ [\mathrm{N/mm^2}]$ |
+| :--- | ---: | ---: | ---: |
+| Stab 1 | $0.004$ | $1$ | $361$ |
+| Linie 1 | $0.011$ | $2$ | $404$ |
+| Linie 3 | $0.008$ | $2$ | $404$ |
+| Linie 4 | $0.008$ | $2$ | $500$ |
+
+Massgebend: Linie 1 (y = 750 mm, z = 50 mm).
+
+**Grösste Zugspannung in der Bewehrung**
+
+$$
+\sigma_s = 2\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm,2} = 404\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\begin{aligned}
+  \alpha_{eff,\sigma,w,\text{Tragsicherheit, L7 bei x = 7.21 m (60 \%)}} &= \frac{\sigma_{s,adm,2}}{\sigma_s} \\
+  &= \frac{404\,\mathrm{N}/\mathrm{mm}^{2}}{2\,\mathrm{N}/\mathrm{mm}^{2}} \\
+  &= 178.27 \quad \Rightarrow \quad \text{erfüllt}
+\end{aligned}
 $$
 
 #### Quasi-ständiger Lastfall – Dauer
@@ -36242,14 +36759,23 @@ $$
 | :--- | :--- | ---: | ---: | ---: |
 | Querkraft und Torsion | Feld | $V_{Rd} = 177.4\,\mathrm{kN}$ | $V_{Ed} = 171.2\,\mathrm{kN}$ | $1.04$ |
 | Querkraft und Torsion | Schief | $V_{Rd} = 256.3\,\mathrm{kN}$ | $V_{Ed} = 50.0\,\mathrm{kN}$ | $5.13$ |
+| Querkraft und Torsion | Tragsicherheit, L7 bei x = 3.77 m | $V_{Rd} = 256.3\,\mathrm{kN}$ | $V_{Ed} = 32.0\,\mathrm{kN}$ | $8.00$ |
+| Querkraft und Torsion | Tragsicherheit, L7 bei x = 0.00 m | $V_{Rd} = 177.4\,\mathrm{kN}$ | $V_{Ed} = 43.0\,\mathrm{kN}$ | $4.13$ |
+| Querkraft und Torsion | Tragsicherheit, L7 bei x = 7.21 m | $V_{Rd} = 177.4\,\mathrm{kN}$ | $V_{Ed} = 41.2\,\mathrm{kN}$ | $4.31$ |
 | Biegung und Normalkraft | Feld | $M_{Rd} = 201.3\,\mathrm{kNm}$ | $M_{Ed} = 304.5\,\mathrm{kNm}$ | $0.66$ |
 | Biegung und Normalkraft | Schief | $M_{Rd} = 679.0\,\mathrm{kNm}$ | $M_{Ed} = 291.5\,\mathrm{kNm}$ | $2.33$ |
+| Biegung und Normalkraft | Tragsicherheit, L7 bei x = 3.77 m | $M_{Rd} = 330.2\,\mathrm{kNm}$ | $M_{Ed} = 73.3\,\mathrm{kNm}$ | $4.51$ |
+| Biegung und Normalkraft | Tragsicherheit, L7 bei x = 0.00 m | $M_{Rd} = 349.0\,\mathrm{kNm}$ | $M_{Ed} = 27.9\,\mathrm{kNm}$ | $12.52$ |
+| Biegung und Normalkraft | Tragsicherheit, L7 bei x = 7.21 m | $M_{Rd} = 323.2\,\mathrm{kNm}$ | $M_{Ed} = 22.7\,\mathrm{kNm}$ | $14.22$ |
 | Duktilität | Zug links | $\left(x/d\right)_{max} = 0.350$ | $x/d = 0.168$ | $2.09$ |
 | Sprödes Versagen | Zug oben | $M_{Rd} = 207.6\,\mathrm{kNm}$ | $M_{Riss} = 116.7\,\mathrm{kNm}$ | $1.78$ |
 | Risse: Zwängung Normalkraft | ganzer Querschnitt | $N_{s,adm} = 1032.4\,\mathrm{kN}$ | $N_{Riss} = 765.6\,\mathrm{kN}$ | $1.35$ |
 | Risse: Zwängung Biegung | Zug oben | $M_{s,adm} = 158.4\,\mathrm{kNm}$ | $M_{Riss} = 116.7\,\mathrm{kNm}$ | $1.36$ |
 | Risse: Quasi-ständige Lastfälle | Feld (60 %) | $\sigma_{s,adm,2} = 404\,\mathrm{N}/\mathrm{mm}^{2}$ | $\sigma_s = 249\,\mathrm{N}/\mathrm{mm}^{2}$ | $1.62$ |
 | Risse: Quasi-ständige Lastfälle | Schief (60 %) | $\sigma_{s,adm,2} = 404\,\mathrm{N}/\mathrm{mm}^{2}$ | $\sigma_s = 14\,\mathrm{N}/\mathrm{mm}^{2}$ | $28.29$ |
+| Risse: Quasi-ständige Lastfälle | Tragsicherheit, L7 bei x = 3.77 m (60 %) | $\sigma_{s,adm,2} = 404\,\mathrm{N}/\mathrm{mm}^{2}$ | $\sigma_s = 56\,\mathrm{N}/\mathrm{mm}^{2}$ | $7.19$ |
+| Risse: Quasi-ständige Lastfälle | Tragsicherheit, L7 bei x = 0.00 m (60 %) | $\sigma_{s,adm,3} = 466\,\mathrm{N}/\mathrm{mm}^{2}$ | $\sigma_s = 3\,\mathrm{N}/\mathrm{mm}^{2}$ | $144.66$ |
+| Risse: Quasi-ständige Lastfälle | Tragsicherheit, L7 bei x = 7.21 m (60 %) | $\sigma_{s,adm,2} = 404\,\mathrm{N}/\mathrm{mm}^{2}$ | $\sigma_s = 2\,\mathrm{N}/\mathrm{mm}^{2}$ | $178.27$ |
 | Risse: Quasi-ständige Lastfälle | Dauer | $\sigma_{s,adm,2} = 404\,\mathrm{N}/\mathrm{mm}^{2}$ | $\sigma_s = 85\,\mathrm{N}/\mathrm{mm}^{2}$ | $4.73$ |
 | Risse: Häufige Lastfälle | Häufig schief | $\sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2}$ | $\sigma_s = 145\,\mathrm{N}/\mathrm{mm}^{2}$ | $2.45$ |
 
@@ -38602,13 +39128,22 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Grösste aufnehmbare Druckkraft | $N_{Rd}^{-}$ | $-7546.5$ | kN | berechnet |
 | Grösste aufnehmbare Zugkraft | $N_{Rd}^{+}$ | $1082.9$ | kN | berechnet |
 | Erfüllungsgrad Biegung und Normalkraft – Schief | $\alpha_{eff,\text{Schief}}$ | $2.33$ |  | berechnet |
+| Erfüllungsgrad Biegung und Normalkraft – Tragsicherheit, L7 bei x = 0.00 m | $\alpha_{eff,\text{Tragsicherheit, L7 bei x = 0.00 m}}$ | $12.52$ |  | berechnet |
+| Erfüllungsgrad Biegung und Normalkraft – Tragsicherheit, L7 bei x = 3.77 m | $\alpha_{eff,\text{Tragsicherheit, L7 bei x = 3.77 m}}$ | $4.51$ |  | berechnet |
+| Erfüllungsgrad Biegung und Normalkraft – Tragsicherheit, L7 bei x = 7.21 m | $\alpha_{eff,\text{Tragsicherheit, L7 bei x = 7.21 m}}$ | $14.22$ |  | berechnet |
 | Erfüllungsgrad Rissnormalkraft – ganzer Querschnitt | $\alpha_{eff,NR}$ | $1.35$ |  | berechnet |
 | Erfüllungsgrad Stahlspannung gegen Fliessen – Feld (70 %) | $\alpha_{eff,\sigma,\text{Feld (70 \%)}}$ | $1.22$ |  | berechnet |
 | Erfüllungsgrad Stahlspannung gegen Fliessen – Häufig schief | $\alpha_{eff,\sigma,\text{Häufig schief}}$ | $2.45$ |  | berechnet |
 | Erfüllungsgrad Stahlspannung gegen Fliessen – Schief (70 %) | $\alpha_{eff,\sigma,\text{Schief (70 \%)}}$ | $20.79$ |  | berechnet |
+| Erfüllungsgrad Stahlspannung gegen Fliessen – Tragsicherheit, L7 bei x = 0.00 m (70 %) | $\alpha_{eff,\sigma,\text{Tragsicherheit, L7 bei x = 0.00 m (70 \%)}}$ | $94.31$ |  | berechnet |
+| Erfüllungsgrad Stahlspannung gegen Fliessen – Tragsicherheit, L7 bei x = 3.77 m (70 %) | $\alpha_{eff,\sigma,\text{Tragsicherheit, L7 bei x = 3.77 m (70 \%)}}$ | $5.41$ |  | berechnet |
+| Erfüllungsgrad Stahlspannung gegen Fliessen – Tragsicherheit, L7 bei x = 7.21 m (70 %) | $\alpha_{eff,\sigma,\text{Tragsicherheit, L7 bei x = 7.21 m (70 \%)}}$ | $134.21$ |  | berechnet |
 | Erfüllungsgrad Stahlspannung aus Rissbreite – Dauer | $\alpha_{eff,\sigma,w,\text{Dauer}}$ | $4.73$ |  | berechnet |
 | Erfüllungsgrad Stahlspannung aus Rissbreite – Feld (60 %) | $\alpha_{eff,\sigma,w,\text{Feld (60 \%)}}$ | $1.62$ |  | berechnet |
 | Erfüllungsgrad Stahlspannung aus Rissbreite – Schief (60 %) | $\alpha_{eff,\sigma,w,\text{Schief (60 \%)}}$ | $28.29$ |  | berechnet |
+| Erfüllungsgrad Stahlspannung aus Rissbreite – Tragsicherheit, L7 bei x = 0.00 m (60 %) | $\alpha_{eff,\sigma,w,\text{Tragsicherheit, L7 bei x = 0.00 m (60 \%)}}$ | $144.66$ |  | berechnet |
+| Erfüllungsgrad Stahlspannung aus Rissbreite – Tragsicherheit, L7 bei x = 3.77 m (60 %) | $\alpha_{eff,\sigma,w,\text{Tragsicherheit, L7 bei x = 3.77 m (60 \%)}}$ | $7.19$ |  | berechnet |
+| Erfüllungsgrad Stahlspannung aus Rissbreite – Tragsicherheit, L7 bei x = 7.21 m (60 %) | $\alpha_{eff,\sigma,w,\text{Tragsicherheit, L7 bei x = 7.21 m (60 \%)}}$ | $178.27$ |  | berechnet |
 | Erfüllungsgrad sprödes Versagen – Zug links | $\alpha_{eff,Riss,\text{Zug links}}$ | $2.93$ |  | berechnet |
 | Erfüllungsgrad sprödes Versagen – Zug oben | $\alpha_{eff,Riss,\text{Zug oben}}$ | $1.78$ |  | berechnet |
 | Erfüllungsgrad sprödes Versagen – Zug rechts | $\alpha_{eff,Riss,\text{Zug rechts}}$ | $2.53$ |  | berechnet |
@@ -38621,6 +39156,18 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Moment der Längszugkraft um z – Schief | $\Delta M_z$ | $0$ | kNm | berechnet |
 | Längszugkraft aus Querkraft und Torsion – Schief | $\Delta N$ | $173.2$ | kN | berechnet |
 | Erfüllungsgrad Querkraft und Torsion – Schief | $\alpha_{eff,V,\text{Schief}}$ | $5.13$ |  | berechnet |
+| Moment der Längszugkraft um y – Tragsicherheit, L7 bei x = 0.00 m | $\Delta M_y$ | $0.2$ | kNm | berechnet |
+| Moment der Längszugkraft um z – Tragsicherheit, L7 bei x = 0.00 m | $\Delta M_z$ | $23.6$ | kNm | berechnet |
+| Längszugkraft aus Querkraft und Torsion – Tragsicherheit, L7 bei x = 0.00 m | $\Delta N$ | $186.4$ | kN | berechnet |
+| Erfüllungsgrad Querkraft und Torsion – Tragsicherheit, L7 bei x = 0.00 m | $\alpha_{eff,V,\text{Tragsicherheit, L7 bei x = 0.00 m}}$ | $4.13$ |  | berechnet |
+| Moment der Längszugkraft um y – Tragsicherheit, L7 bei x = 3.77 m | $\Delta M_y$ | $0.2$ | kNm | berechnet |
+| Moment der Längszugkraft um z – Tragsicherheit, L7 bei x = 3.77 m | $\Delta M_z$ | $0$ | kNm | berechnet |
+| Längszugkraft aus Querkraft und Torsion – Tragsicherheit, L7 bei x = 3.77 m | $\Delta N$ | $186.4$ | kN | berechnet |
+| Erfüllungsgrad Querkraft und Torsion – Tragsicherheit, L7 bei x = 3.77 m | $\alpha_{eff,V,\text{Tragsicherheit, L7 bei x = 3.77 m}}$ | $8.00$ |  | berechnet |
+| Moment der Längszugkraft um y – Tragsicherheit, L7 bei x = 7.21 m | $\Delta M_y$ | $0.2$ | kNm | berechnet |
+| Moment der Längszugkraft um z – Tragsicherheit, L7 bei x = 7.21 m | $\Delta M_z$ | $-21.6$ | kNm | berechnet |
+| Längszugkraft aus Querkraft und Torsion – Tragsicherheit, L7 bei x = 7.21 m | $\Delta N$ | $186.4$ | kN | berechnet |
+| Erfüllungsgrad Querkraft und Torsion – Tragsicherheit, L7 bei x = 7.21 m | $\alpha_{eff,V,\text{Tragsicherheit, L7 bei x = 7.21 m}}$ | $4.31$ |  | berechnet |
 | Erfüllungsgrad Zwängung auf Biegung – Zug links | $\alpha_{eff,ZB,\text{Zug links}}$ | $1.93$ |  | berechnet |
 | Erfüllungsgrad Zwängung auf Biegung – Zug oben | $\alpha_{eff,ZB,\text{Zug oben}}$ | $1.36$ |  | berechnet |
 | Erfüllungsgrad Zwängung auf Biegung – Zug rechts | $\alpha_{eff,ZB,\text{Zug rechts}}$ | $1.47$ |  | berechnet |

@@ -639,10 +639,15 @@ export function erklaerung(zeilen, formel = '') {
   return zettel;
 }
 
-/** Eine Tabelle: Kopf und Zeilen, je Zelle ein Text -- ausser in der ersten Spalte rechtsbündig, für Zahlen. */
-export function tabelle(kopf, zeilen) {
+/**
+ * Eine Tabelle: Kopf und Zeilen, je Zelle ein Text. Die ersten
+ * `textspalten` Spalten -- Vorgabe eine -- stehen links, die übrigen
+ * rechtsbündig, für Zahlen.
+ */
+export function tabelle(kopf, zeilen, { textspalten = 1 } = {}) {
+  const text = (i) => i < textspalten;
   return el('div.tabelle-huelle', {}, [el('table.bs-tabelle', {}, [
-    el('thead', {}, [el('tr', {}, kopf.map((t) => el('th', { text: t })))]),
-    el('tbody', {}, zeilen.map((z) => el('tr', {}, z.map((t, i) => el(i ? 'td.bs-zahl' : 'td', { text: t }))))),
+    el('thead', {}, [el('tr', {}, kopf.map((t, i) => el(text(i) ? 'th.bs-text' : 'th', { text: t })))]),
+    el('tbody', {}, zeilen.map((z) => el('tr', {}, z.map((t, i) => el(text(i) ? 'td' : 'td.bs-zahl', { text: t }))))),
   ])]);
 }

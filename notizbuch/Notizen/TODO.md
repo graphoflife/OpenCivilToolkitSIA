@@ -241,6 +241,30 @@ sammeln sie sich hier, je mit dem, was vorläufig gebaut ist.
       - Netzweite 0.2 m und Anteil Material 30 %, wählbar von 5 bis 80 %;
       - beim Lesen der Form 1.5 Netzweiten, 10°, das Zehnfache, das
         Wegfallen freier Äste und die Paare (oben).
+- [ ] **Aus dem Balkensystem: Kombinationen des Gebrauchs?** Eine
+      Kombination des Systems hat keine Art. Jede wird Lastfall der
+      Tragsicherheit, und die Analyse leitet daraus ihre häufigen und
+      quasi-ständigen ab wie aus den eigenen – auch aus einer Kombination,
+      die im System schon quasi-ständig gemeint ist. Vorschlag: so lassen;
+      später bekommt eine Kombination des Systems eine Art [Tragsicherheit |
+      häufig | quasi-ständig] und geht nur in ihre Nachweise. Vorläufig:
+      jede als Tragsicherheit.
+- [ ] **Aus dem Balkensystem: System und Analyse lassen sich nicht
+      löschen?** Nimmt eine Analyse die Stellen eines Systems, zeigt sie auf
+      es; ist sie zugleich Querschnitt eines seiner Stäbe, zeigt auch das
+      System auf sie. Dann lässt sich keines löschen, bis man eine
+      Verbindung löst, etwa in der Kachel das System auf «– wählen –»
+      zurückstellt. Vorschlag: so lassen; die Meldung beim Löschen sagt,
+      wer zeigt («„Träger" wird gebraucht von: …»). Vorläufig: so.
+- [ ] **Aus dem Balkensystem: was nach Vorgabe gebaut ist, nicht
+      nachgeschlagen.** Je mit dem Vorschlag «so lassen»:
+      - die Vorzeichen: der Querschnitt vom Anfang des Stabs her gesehen,
+        M_z und V_y umgekehrt;
+      - V_z und V_y je ein Kriterium, nicht die Resultierende;
+      - unter 0.001 N oder Nm gilt eine Schnittgrösse als null;
+      - nur die Kombinationen, nicht die einzelnen Lastfälle des Systems;
+      - bei gleichen Werten die vorderste Stelle des ersten Stabs; ist der
+        Extremwert an einem Sprung auf beiden Seiten, beide.
 
 ## Wünsche vom 2026-11-20
 

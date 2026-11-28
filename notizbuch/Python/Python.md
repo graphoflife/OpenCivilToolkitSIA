@@ -1,5 +1,5 @@
 ---
-erzeugt: cbb6398b7afa
+erzeugt: 5c3a76aa90fd
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -187,6 +187,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.pfahl.uebersicht]] – was über der Nachweistabelle eines Pfahls steht.
 - [[opencivil.projekt]] – Serialisierbare Beschreibung eines ganzen Projekts.
   - [[opencivil.projekt.aufbau]] – aus der Beschreibung ein Rechenwerk.
+      - [[opencivil.projekt.aufbau.aus_system]] – die Lastfaelle einer Querschnittsanalyse aus einem Balkensystem.
       - [[opencivil.projekt.aufbau.balkensystem]] – ein Balkensystem wird Rechnung.
       - [[opencivil.projekt.aufbau.balkensystem3d]] – ein 3D-Balkensystem wird Rechnung.
       - [[opencivil.projekt.aufbau.decke]] – eine Decke wird Rechnung.
@@ -200,6 +201,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
       - [[opencivil.projekt.aufbau.platte]] – eine Platte wird Rechnung.
       - [[opencivil.projekt.aufbau.querschnittsanalyse]] – ein gezeichneter Querschnitt wird Rechnung.
       - [[opencivil.projekt.aufbau.setzung]] – eine Setzungsberechnung wird Rechnung.
+    - [[opencivil.projekt.aus_system]] – was eine Querschnittsanalyse aus einem Balkensystem nimmt.
     - [[opencivil.projekt.balkensystem]] – ein 2D-Balkensystem, wie die Oberflaeche es beschreibt.
     - [[opencivil.projekt.balkensystem3d]] – ein 3D-Balkensystem, wie die Oberflaeche es beschreibt.
     - [[opencivil.projekt.beispiele]] – die Prüfprojekte: das Beispiel und «Jeder Nachweis».
@@ -271,6 +273,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.stabwerk.rechnung]] – das Balkensystem im Rechenwerk.
     - [[opencivil.stabwerk.stab]] – der ebene Stab: Steifigkeit, Lasten, Bettung.
     - [[opencivil.stabwerk.stabquerschnitt]] – woher A und I eines Stabs kommen.
+    - [[opencivil.stabwerk.stellen]] – die massgebenden Stellen eines Balkensystems fuer einen Querschnitt.
     - [[opencivil.stabwerk.system]] – das Stabwerk, eben und im Raum: Unbekannte, Zusammenbau, Loesen.
     - [[opencivil.stabwerk.verlauf]] – Schnittgroessen und Biegelinien laengs eines Stabs, eben und im Raum.
 - [[opencivil.stabwerk3d]] – was ein Stabwerk im Raum braucht.

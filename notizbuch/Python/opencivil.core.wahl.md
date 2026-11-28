@@ -1,5 +1,5 @@
 ---
-erzeugt: 80b5d2b1909b
+erzeugt: f201f927f8c2
 art: modul
 tags: [modul]
 ---
@@ -48,6 +48,7 @@ Eine Wahl: das Mitglied ist sein Text.
 - [[opencivil.nachweis.rissanforderung]]
 - [[opencivil.pfahl.boden]]
 - [[opencivil.pfahl.pfahl]]
+- [[opencivil.projekt.aus_system]]
 - [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.schubfluss]]
 - [[opencivil.projekt.staebe]]

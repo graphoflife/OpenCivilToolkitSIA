@@ -1,5 +1,5 @@
 ---
-erzeugt: 48f87b4b6324
+erzeugt: d00d921f93f2
 art: modul
 tags: [modul]
 ---
@@ -249,6 +249,7 @@ Je Querschnitt eines Systems, wo A und I stehen – und je Paar aus Querschnitt 
 - [[opencivil.pfahl.pfahl]]
 - [[opencivil.projekt]]
 - [[opencivil.projekt.aufbau.kern]]
+- [[opencivil.projekt.aus_system]]
 - [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.balkensystem3d]]
 - [[opencivil.projekt.decke]]

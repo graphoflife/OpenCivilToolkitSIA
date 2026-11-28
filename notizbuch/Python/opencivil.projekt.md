@@ -1,5 +1,5 @@
 ---
-erzeugt: c1a6f682abb1
+erzeugt: 73874476684f
 art: modul
 tags: [modul]
 ---
@@ -81,6 +81,7 @@ geschieht erst beim Aufbau, ueber die [[opencivil.core.einheiten#Groesse|Groesse
 ## Module
 
 - [[opencivil.projekt.aufbau]] – aus der Beschreibung ein Rechenwerk.
+- [[opencivil.projekt.aus_system]] – was eine Querschnittsanalyse aus einem Balkensystem nimmt.
 - [[opencivil.projekt.balkensystem]] – ein 2D-Balkensystem, wie die Oberflaeche es beschreibt.
 - [[opencivil.projekt.balkensystem3d]] – ein 3D-Balkensystem, wie die Oberflaeche es beschreibt.
 - [[opencivil.projekt.beispiele]] – die Prüfprojekte: das Beispiel und «Jeder Nachweis».

@@ -50,6 +50,7 @@ from opencivil.decke.schnitt import BALKENGROESSEN
 from opencivil.projekt.decke import DIAGRAMMGROESSEN as DECKENGROESSEN
 from opencivil.projekt.decke import VORSILBEN as DECKENVORSILBEN
 from opencivil.projekt.aufbau.kern import kennwertbereich
+from opencivil.projekt.aus_system import Stabwahl
 from opencivil.projekt.lesen import eintragsklassen, feldangaben, katalogname, wahl_von
 from opencivil.projekt.projekt import APPLISTEN, Projekt
 from opencivil.projekt.querschnittsanalyse import SCHNITTE
@@ -372,6 +373,10 @@ def katalog() -> dict:
                                  "titel": _VERSCHMIERUNGEN[wert][1]} for wert in VERSCHMIERT],
             "werkstoffsaetze": _WERKSTOFFSAETZE,
             "schnitte": list(SCHNITTE),
+            # Welche Staebe eines Balkensystems ihre Stellen geben: alle mit
+            # dieser Analyse als Querschnitt, oder gewaehlte.
+            "stabwahlen": [{"wert": w.value, "beschriftung": w.beschriftung,
+                            "titel": w.erklaerung} for w in Stabwahl],
             # Die Seiten, die ein positives Moment einer Analyse zieht -- und
             # wie dann ihre Raender heissen: der gedrueckte, der gezogene.
             "zugseiten": [{"wert": z.value, "beschriftung": z.beschriftung,

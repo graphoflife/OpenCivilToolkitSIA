@@ -1,5 +1,5 @@
 ---
-erzeugt: 36f9caa98582
+erzeugt: 952a04c5550f
 art: modul
 tags: [modul]
 ---
@@ -369,6 +369,7 @@ def beschreibung(self) -> str
 - [[opencivil.pfahl.quer]]
 - [[opencivil.pfahl.steifigkeit]]
 - [[opencivil.pfahl.uebersicht]]
+- [[opencivil.projekt.aufbau.aus_system]]
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.fallnamen]]
 - [[opencivil.querschnitt.analyse]]

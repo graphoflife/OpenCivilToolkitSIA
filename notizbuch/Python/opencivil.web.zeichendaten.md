@@ -1,5 +1,5 @@
 ---
-erzeugt: 4c57268bf912
+erzeugt: e82dc0a71111
 art: modul
 tags: [modul]
 ---
@@ -11,8 +11,10 @@ tags: [modul]
 
 Je Bauteilart ([[opencivil.projekt.aufbau#Konstanten|BAUTEILE]]) die Funktion,
 die aus Aufbau und Loesung die Zeichendaten eines Eintrags macht – oder
-keine, wo die Bilder anders kommen: bei Platte und Querschnittsanalyse aus
-den Linien und Kurven der Antwort und aus eigenen Anfragen. Die
+keine, wo die Bilder anders kommen: bei der Platte aus den Linien und
+Kurven der Antwort und aus eigenen Anfragen, ebenso bei der
+Querschnittsanalyse – sie bekommt hier nur, was sie aus einem
+Balkensystem nimmt. Die
 Schnittstelle legt sie unter einem Schluessel ab, `zeichendaten[kennung]`
 ([[opencivil.web.zeichendaten#zeichendaten|zeichendaten]]). Fehlt hier eine Art, meldet sich das beim Laden –
 nicht erst als leeres Bild. Bis 2026-11-10 stand je Art ein eigener
@@ -30,6 +32,20 @@ Eben wie im Raum: die knappe Uebersicht, je Querschnitt sein Umriss und
 die Achse, um die sich sein Profil biegt, und je Linie ihre Achsen, die
 die Oberflaeche nicht selbst legt – auch wenn das System nicht rechnet.
 
+### _analyse
+
+```python
+def _analyse(aufbau: Aufbau, kennung: str, loesung: Loesung) -> Dict[str, Any]
+```
+
+Was die Kachel «Aus dem Balkensystem» vom Kern braucht – `None` ohne
+System: welches gerechnet ist (die Oberflaeche zeigt es nur, solange es
+das gewaehlte ist), welche Staebe sich waehlen lassen und welche zaehlen,
+die Saetze, die grau dastehen, und je Stelle ihr Name, wofuer sie
+massgebend ist und ihre Werte als Lastfall, in kN und kNm
+([[opencivil.projekt.aufbau.aus_system|aus_system]]). Ihre Bilder holt die
+Analyse anders.
+
 ### zeichendaten
 
 ```python
@@ -41,7 +57,7 @@ Je Bauteil, nach Kennung, seine Zeichendaten – nur fuer die Arten, die welche 
 
 ## Konstanten
 
-- `ZEICHENDATEN = {PLATTE.name: None, ANALYSE.name: None, BALKENSYSTEM.name: _balkensys…` – Je Bauteilart, nach ihrem Namen, was die Oberflaeche von einem Eintrag zeichnet – `None`: ihre Bilder kommen anders.
+- `ZEICHENDATEN = {PLATTE.name: None, ANALYSE.name: _analyse, BALKENSYSTEM.name: _balke…` – Je Bauteilart, nach ihrem Namen, was die Oberflaeche von einem Eintrag zeichnet – `None`: ihre Bilder kommen anders.
 
 ## Braucht
 

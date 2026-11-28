@@ -773,6 +773,13 @@ const ZEICHEN = {
       'M16.5 3.5v16.2', 'M19.5 3.5L15 8.9', 'M19 8.9L13.5 19.7'],
     strich: ['M15 8.9h4'],
   },
+  // Aus dem Balkensystem: ein Träger auf zwei Lagern, darauf eine Stelle
+  // -- ein Pfeil führt von ihr zum Querschnitt darunter.
+  aus_system: {
+    pfade: ['M3 6h18', 'M5 6l-2 3h4z M19 6l-2 3h4z', 'M12 8.5v5 M10.2 11.7l1.8 1.8 1.8-1.8',
+      'M9 16h6v6H9z'],
+    kreise: [[12, 6, 1.4]],
+  },
   // Der Schubfluss: ein Plattenbalken im Schnitt, gestrichelt die Schnitte
   // am Steg, aus ihnen die Pfeile in die Flanschen, die sie abtrennen.
   schubfluss: {

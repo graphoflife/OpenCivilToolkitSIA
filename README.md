@@ -541,6 +541,17 @@ Moment zieht. Die Nulllinie bleibt dabei parallel zur Achse; ε_m gilt im
 Schwerpunkt, der Riss und der äquivalente Modul am Bruttoquerschnitt. Die
 Diagramme stehen im Reiter Diagramme, im Panel des Querschnitts.
 
+Gleich nach der Tragsicherheit die Kachel «Aus dem Balkensystem»: ein
+ebenes oder räumliches System des Projekts und seine Stäbe -- alle, deren
+Querschnitt diese Analyse ist, oder gewählte. Je Kombination nimmt sie die
+massgebenden Stellen: grösstes und kleinstes M_y, M_z und N, grösstes |V_z|,
+|V_y| und |T|, je mit den übrigen Schnittgrössen dort. Jede ist ein Lastfall
+aller Nachweise der Analyse, neben den eigenen, und heisst nach Kombination,
+Stab und Ort, etwa «Tragsicherheit, L7 bei x = 3.77 m», wo etwas springt
+mit «links» oder «rechts»; wofür sie massgebend ist, steht daneben. Der
+Querschnitt gilt vom Anfang des Stabs her gesehen: M_z und V_y kehren sich
+um. Ändert sich das System, rechnen die Nachweise neu.
+
 **2D Balkensysteme:** unter der Querschnittsanalyse ein drittes Kapitel,
 ein ebener Rahmen nach der Steifigkeitsmethode. Gezeichnet wird mit
 demselben Fenster, in Metern: eine Linie ist ein Stab, sobald sie einen

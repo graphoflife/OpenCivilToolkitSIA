@@ -1,5 +1,5 @@
 ---
-erzeugt: 3a27a11f5ab8
+erzeugt: 7e16c54784bf
 art: modul
 tags: [modul]
 ---
@@ -262,7 +262,8 @@ Querschnitte nach Vorlage, als Profil – dazu ein Rundrohr ohne Stab,
 mit I_z wie I_y –, von Hand, aus einer Platte mit E_eq und aus einer
 Querschnittsanalyse, deren I_T sie dafür rechnet – beide mit dem
 Material gemäss Querschnitt –, ein eigenes Material mit G; Lasten in
-jeder Richtung, Torsion, projiziert, an Knoten.
+jeder Richtung, Torsion, projiziert, an Knoten. Die Analyse nimmt die
+massgebenden Stellen ihres Stabs als Lastfälle zurück, mit M_z, V_y und T.
 
 ### _spannbeton
 

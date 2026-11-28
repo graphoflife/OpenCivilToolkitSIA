@@ -1,5 +1,5 @@
 ---
-erzeugt: 65edd75a33b3
+erzeugt: 15487981c49a
 art: modul
 tags: [modul]
 ---
@@ -651,6 +651,7 @@ Eine zu pruefende Schnittgroessenkombination.
 - [[opencivil.projekt]]
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.aufbau.platte]]
+- [[opencivil.projekt.aus_system]]
 - [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.balkensystem3d]]
 - [[opencivil.projekt.beispiele]]

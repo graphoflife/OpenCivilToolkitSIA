@@ -51,7 +51,7 @@ in einer Datei von ueber tausend Zeilen.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Callable, Dict, Tuple
+from typing import TYPE_CHECKING, Any, Callable, Dict, Optional, Tuple
 
 from opencivil.core.rechenwerk import Rechenwerk
 from opencivil.projekt.balkensystem import BalkensystemEintrag
@@ -142,8 +142,35 @@ def aufbauen(projekt: "Projekt", *, schnell: bool = False) -> Aufbau:
                 aufbau.teile[eintrag.kennung] = art.bauen(art, eintrag, aufbau)
             except ProjektFehler as fehler:
                 aufbau.unfertig(art.liste, eintrag, wo, fehler.grund_bei(wo),
-                                raum=f"{art.raum}.{eintrag.kennung}")
+                                raum=_raum(art, eintrag))
+    # Der zweite Gang: was erst geht, wenn alle gebaut sind -- die Nachweise
+    # einer Analyse, deren Lastfaelle aus einem Balkensystem kommen.
+    for art in BAUTEILE:
+        if art.danach is None:
+            continue
+        for eintrag in getattr(projekt, art.liste):
+            teil = aufbau.teile.get(eintrag.kennung)
+            if teil is None:
+                continue
+            wo = ort_von(eintrag)
+            try:
+                art.danach(art, eintrag, teil, aufbau)
+            except ProjektFehler as fehler:
+                del aufbau.teile[eintrag.kennung]
+                aufbau.unfertig(art.liste, eintrag, wo, fehler.grund_bei(wo),
+                                raum=_raum(art, eintrag))
+    # Die Hinweise in der Folge des Projekts, wie ohne den zweiten Gang: die
+    # Materialien, dann die Bauteile, je Eintrag in der Folge ihres Entstehens.
+    folge = {raum: i for i, raum in enumerate(
+        [f"{m.art}.{m.kennung}" for m in projekt.materialien]
+        + [_raum(art, e) for art in BAUTEILE for e in getattr(projekt, art.liste)])}
+    aufbau.warnungen.sort(key=lambda w: folge.get(w.raum, len(folge)))
     return aufbau
+
+
+def _raum(art: "Bauteilart", eintrag: Any) -> str:
+    """Der Namensraum eines Bauteils: «querschnittsanalyse.a1»."""
+    return f"{art.raum}.{eintrag.kennung}"
 
 
 def _vorab_pruefen(eintrag: Any, wo: str, aufbau: Aufbau, sandboxen: Dict[str, Any]) -> None:
@@ -217,12 +244,22 @@ class Bauteilart:
     ist. Bis 2026-11-20 gaben drei Baufunktionen dafuer ``None`` zurueck.
     """
 
+    danach: Optional[Callable[["Bauteilart", Any, Bauteil, Aufbau], None]] = None
+    """
+    Was sie baut, wenn alle Bauteile gebaut sind -- oder nichts. Die
+    Querschnittsanalyse baut hier ihre Nachweise: ein Balkensystem liest ihre
+    Werte, und ihre Lastfaelle koennen aus ihm kommen
+    (:func:`~opencivil.projekt.aufbau.querschnittsanalyse.danach`). Wirft sie
+    einen :class:`ProjektFehler`, rechnet das Bauteil nicht, wie beim Bauen.
+    """
+
 
 PLATTE = Bauteilart("platte", "querschnitte", QuerschnittEintrag, "q",
                     "querschnitt", "Platte", platte.bauen)
 ANALYSE = Bauteilart("querschnittsanalyse", "querschnittsanalysen",
                      QuerschnittsanalyseEintrag, "a", "querschnittsanalyse",
-                     "Querschnittsanalyse", querschnittsanalyse.bauen)
+                     "Querschnittsanalyse", querschnittsanalyse.bauen,
+                     danach=querschnittsanalyse.danach)
 BALKENSYSTEM = Bauteilart("balkensystem", "balkensysteme", BalkensystemEintrag, "r",
                           "balkensystem", "Balkensysteme", balkensystem.bauen)
 #: Die Kennungen u1, u2 ...: «r» tragen die Rahmen in der Ebene.
@@ -248,7 +285,9 @@ ERDBEBEN = Bauteilart("erdbeben", "erdbeben", ErdbebenEintrag, "h", "erdbeben", 
 
 #: Die Bauteilarten, in der Reihenfolge von Baum, Bericht und Rechnung -- ein
 #: Balkensystem liest Werte der Platten und Analysen, also kommt es nach
-#: ihnen, das Erdbeben ebenso; Decke, Durchstanzen, Fachwerkmodell,
+#: ihnen, das Erdbeben ebenso; die Nachweise einer Analyse koennen Stellen
+#: eines Balkensystems lesen, darum baut sie sie im zweiten Gang
+#: (:attr:`Bauteilart.danach`). Decke, Durchstanzen, Fachwerkmodell,
 #: Grundbruch, Setzung und Pfahl lesen nichts von den anderen.
 #: Wer alle Bauteile durchgeht (Lesen, Kennungen, Aufbau, Zwischenspeicher,
 #: Erkennen einer Datei), geht diese Liste durch.

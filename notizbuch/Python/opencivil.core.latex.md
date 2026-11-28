@@ -1,5 +1,5 @@
 ---
-erzeugt: 6b83efcd8e0c
+erzeugt: 1e527fdfeb9b
 art: modul
 tags: [modul]
 ---
@@ -530,6 +530,7 @@ Leser sieht alle Zweige und erkennt, welcher gegriffen hat.
 - [[opencivil.stabwerk.herleitung]]
 - [[opencivil.stabwerk.querschnitte]]
 - [[opencivil.stabwerk.stabquerschnitt]]
+- [[opencivil.stabwerk.stellen]]
 - [[opencivil.stabwerk3d.herleitung]]
 - [[opencivil.web.anzeige]]
 - [[opencivil.web.durchstanzdaten]]

@@ -1,5 +1,5 @@
 ---
-erzeugt: 57de9ea65a82
+erzeugt: faa6a06138af
 art: modul
 tags: [modul]
 ---
@@ -526,3 +526,4 @@ Die Kennzahl `kurz` mit dem Wert `si` in SI-Basis – auch in `ergebnis`.
 - [[opencivil.spannungsanalyse.modul]]
 - [[opencivil.stabwerk.rechnung]]
 - [[opencivil.stabwerk.stabquerschnitt]]
+- [[opencivil.stabwerk.stellen]]

@@ -1,5 +1,5 @@
 ---
-erzeugt: 24266fd9e21a
+erzeugt: d1d02feb035b
 art: modul
 tags: [modul]
 ---
@@ -60,7 +60,22 @@ Was beim Zusammenbauen eines Projekts entsteht.
 - `spannungsfaelle: Dict[str, List[Tuple['SpannungsfallEintrag', Rechenwahl]]] = field(default_factory=dict)` – Je Platte die Auswertungen am Querschnitt – als Beschreibung, nicht als Nachweis, jede mit ihrer Wahl am Bauteil. Sie laufen nicht im Rechenwerk: sie haben kein Ziel, das jemand anderes brauchen koennte, und nichts haengt von ihnen ab.
 - `unfertige: Dict[str, 'Unfertiges'] = field(default_factory=dict)` – Je Bauteil oder Material, dem noch etwas fehlt, was: eine Querschnittsanalyse ohne Zeichnung, eine Platte ohne Bewehrung, ein Pfahl ohne Schicht, ein Wert, den der Kern abweist ([[opencivil.projekt.aufbau.kern#Aufbau.unfertig|unfertig]]). Es wird nicht gebaut, aber wer auf es zeigt, soll hoeren, was ihm fehlt, und nicht, es gebe es nicht.
 - `warnungen: List[Warnung] = field(default_factory=list)` – Was beim Aufbau auffiel, je Eintrag ([[opencivil.projekt.aufbau.kern#Aufbau.warnen|warnen]]).
+- `befunde: Dict[str, Any] = field(default_factory=dict)` – Was [[opencivil.projekt.aufbau.kern#Aufbau.befund_im_aufbau|befund_im_aufbau]] schon gerechnet hat, je Berechnung.
 - `NACHWEISFELDER = ('nachweise', 'querkraft', 'duktilitaet', 'fehlende', 'rissnormalkraf…` – Die Felder, in denen die Nachweise stehen – die eine Stelle, an der ein neuer Nachweis eingetragen wird. Alle sind nach Kennung geschluesselt (`q1` oder `q1.x` – die Richtung steht noch im Schluessel der Platte, damit Wert-IDs in abgelegten Berichten nicht wechseln) und alle tragen Nachweise mit `d_ausnutzung`. Ihre Reihenfolge ist die der Herleitung: in ihr rechnet ein Bauteil seine Nachweise ([[opencivil.projekt.aufbau.kern#Bauteil.ziele|Bauteil.ziele]]). `fehlende` rechnet nichts: eine Richtung ohne Bewehrung mit Einwirkungen bekommt so eine Zeile mit Erfuellungsgrad null statt gar keiner.
+
+#### Aufbau.befund_im_aufbau
+
+```python
+def befund_im_aufbau(self, berechnung_id: str) -> Any
+```
+
+Der Befund einer Berechnung, schon beim Bauen gerechnet – ohne
+Herleitung und einmal je Aufbau: fuer ein Bauteil, das aus dem
+Ergebnis eines anderen seine Nachweise baut, eine Analyse aus den
+Stellen eines Balkensystems ([[opencivil.projekt.aufbau.aus_system|aus_system]]).
+`None`, wenn sie keinen hinterlaesst. Die Herleitung schreibt der
+Lauf, der das andere Bauteil rechnet; jeder Lauf ist frisch
+([[opencivil.core.rechenwerk#Rechenwerk.loese|loese]]).
 
 #### Aufbau.warnen
 
@@ -322,7 +337,10 @@ def berichtsziele(self) -> List[str]
 ```
 
 Was im Bericht steht: Nachweise und was die Bauteile sonst rechnen –
-ohne die Baustoffkennwerte, die niemand braucht.
+ohne die Baustoffkennwerte, die niemand braucht. Was ein Bauteil vor
+seinen Nachweisen herleitet ([[opencivil.projekt.aufbau.kern#Bauteil|Bauteil.vorab]]), steht vor dem
+ersten davon: so oeffnet es seinen Abschnitt nicht vor den Bauteilen,
+die vor ihm stehen ([[opencivil.core.protokoll#Protokoll.nach_abschnitten|nach_abschnitten]]).
 
 #### Aufbau.urteile_von
 
@@ -391,26 +409,13 @@ steht hier – niemand muss es aus einer Kennung wie «q1.x» zurueckgewinnen.
 - `eintrag: Any` – Der Eintrag des Projekts, aus dem es gebaut ist – fuer ein Bild, das nach einem seiner Felder fragt, etwa der Normalkraft der M-V-Kurve.
 - `art: 'Bauteilart'`
 - `objekt: Any` – Der Plattenquerschnitt, die Querschnittsanalyse oder das Balkensystem.
+- `vorab: List[str] = field(default_factory=list)` – Was es vor seinen Nachweisen herleitet: bei einer Analyse die Stellen eines Balkensystems, die ihre Lastfaelle sind ([[opencivil.projekt.aufbau.kern#Bauteil|aus_system]]).
 - `nachweise: List[Tuple[str, str, Nachweis]] = field(default_factory=list)` – Feld, Schluessel und Nachweis, angemeldet ueber [[opencivil.projekt.aufbau.kern#Aufbau.eintragen|Aufbau.eintragen]].
 - `weitere_ziele: List[str] = field(default_factory=list)` – Was es ausser seinen Nachweisen rechnet – ein Balkensystem seine Querschnitte und sich.
 - `kennzahlen: List[Kennzahl] = field(default_factory=list)` – Was es beschreibt, gleich welche Lastfaelle es gibt, in der Folge der Zusammenfassung – jede so, wie ihr Erzeuger sie nennt.
 - `ohne_nachweis: str = ''` – Warum es keinen seiner Nachweise fuehrt – leer, wenn nichts fehlt ([[opencivil.projekt.aufbau.kern#Aufbau.ohne_nachweis|Aufbau.ohne_nachweis]]).
 - `schubfluss: Any = None` – Bei einer Querschnittsanalyse mit Schnitt und Fall ihr Schubfluss ([[opencivil.nachweis.qa_schubfluss#SchubflussQA|SchubflussQA]]): seine Zeilen stehen unter dem Bauteil wie die Kennzahlen. Sonst keiner.
-
-#### Bauteil.bezuege
-
-```python
-@property
-def bezuege(self) -> Tuple[str, ...]
-```
-
-Die Bauteile, deren Werte es liest – so, wie sein Eintrag sie nennt:
-die Platten und Analysen, aus denen ein System Querschnitte nimmt,
-die Analysen der Waende eines Gebaeudes.
-
-Bis 2026-11-27 setzte jede Baufunktion sie selbst, und das Erdbeben
-vergass es: aenderte sich nur die Analyse einer Wand, blieb im
-Zwischenspeicher das alte Ergebnis stehen.
+- `aus_system: Any = None` – Bei einer Querschnittsanalyse mit Balkensystem, was sie daraus nahm ([[opencivil.projekt.aufbau.aus_system#AusDemSystem|AusDemSystem]]). Sonst nichts.
 
 #### Bauteil.kennung
 
@@ -449,8 +454,9 @@ Seine Nachweise in einem Feld des [[opencivil.projekt.aufbau.kern#Aufbau|Aufbau]
 def ziele(self) -> List[str]
 ```
 
-Was ein Lauf fuer dieses Bauteil rechnet: die Nachweise in der Folge
-von [[opencivil.projekt.aufbau.kern#Aufbau|Aufbau.NACHWEISFELDER]], dann die weiteren Ziele.
+Was ein Lauf fuer dieses Bauteil rechnet: was es vorab herleitet, die
+Nachweise in der Folge von [[opencivil.projekt.aufbau.kern#Aufbau|Aufbau.NACHWEISFELDER]], dann die
+weiteren Ziele.
 
 ### kennwertbereich
 
@@ -690,6 +696,7 @@ Feldes; `mehr` fuer die Analyse.
 ## Gebraucht von
 
 - [[opencivil.projekt.aufbau]]
+- [[opencivil.projekt.aufbau.aus_system]]
 - [[opencivil.projekt.aufbau.balkensystem]]
 - [[opencivil.projekt.aufbau.balkensystem3d]]
 - [[opencivil.projekt.aufbau.decke]]

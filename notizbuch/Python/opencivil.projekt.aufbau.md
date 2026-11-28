@@ -1,5 +1,5 @@
 ---
-erzeugt: fe6695967596
+erzeugt: a2901c3bf156
 art: modul
 tags: [modul]
 ---
@@ -60,6 +60,7 @@ in einer Datei von ueber tausend Zeilen.
 
 ## Module
 
+- [[opencivil.projekt.aufbau.aus_system]] – die Lastfaelle einer Querschnittsanalyse aus einem Balkensystem.
 - [[opencivil.projekt.aufbau.balkensystem]] – ein Balkensystem wird Rechnung.
 - [[opencivil.projekt.aufbau.balkensystem3d]] – ein 3D-Balkensystem wird Rechnung.
 - [[opencivil.projekt.aufbau.decke]] – eine Decke wird Rechnung.
@@ -99,6 +100,14 @@ nicht erst. Gedacht fuer das Bewehrungswerkzeug, das hundertfach
 rechnet und nur wissen muss, ob es aufgeht. Fuer eine Herleitung ist
 das nichts: dort soll die Zahl stehen, die auch in der Tabelle steht.
 
+### _raum
+
+```python
+def _raum(art: 'Bauteilart', eintrag: Any) -> str
+```
+
+Der Namensraum eines Bauteils: «querschnittsanalyse.a1».
+
 ### _vorab_pruefen
 
 ```python
@@ -137,6 +146,7 @@ Oberflaeche, siehe Dateikopf.
 - `raum: str` – Womit ihre Namensraeume beginnen: `querschnitt` fuer querschnitt.q1.
 - `bereich: str` – Wie ihr Abschnitt in der Formelsammlung heisst.
 - `bauen: Callable[['Bauteilart', Any, Aufbau], Bauteil]` – Aus dem Eintrag das Bauteil – Objekt und Nachweise, angemeldet im Werk. Wo es nichts zu rechnen gibt, wirft sie einen [[opencivil.projekt.lesen#ProjektFehler|ProjektFehler]] mit dem Grund: eine Querschnittsanalyse, in der noch nichts gezeichnet ist. Bis 2026-11-20 gaben drei Baufunktionen dafuer `None` zurueck.
+- `danach: Optional[Callable[['Bauteilart', Any, Bauteil, Aufbau], None]] = None` – Was sie baut, wenn alle Bauteile gebaut sind – oder nichts. Die Querschnittsanalyse baut hier ihre Nachweise: ein Balkensystem liest ihre Werte, und ihre Lastfaelle koennen aus ihm kommen ([[opencivil.projekt.aufbau.querschnittsanalyse#danach|danach]]). Wirft sie einen [[opencivil.projekt.lesen#ProjektFehler|ProjektFehler]], rechnet das Bauteil nicht, wie beim Bauen.
 
 
 ## Konstanten
@@ -152,7 +162,7 @@ Oberflaeche, siehe Dateikopf.
 - `FACHWERKMODELL = Bauteilart('fachwerkmodell', 'fachwerkmodelle', FachwerkmodellEintrag…` – Die Kennungen f1, f2 ...: die Fluessigkeiten tragen «fl», das verwechselt sich nicht.
 - `PFAHL = Bauteilart('pfahl', 'pfaehle', PfahlEintrag, 't', 'pfahl', 'Pfähle', …` – Die Kennungen t1, t2 ...: «p» tragen schon die Skripte.
 - `ERDBEBEN = Bauteilart('erdbeben', 'erdbeben', ErdbebenEintrag, 'h', 'erdbeben', …` – Die Kennungen h1, h2 ...: «e» tragen schon die Decken – h wie Haus.
-- `BAUTEILE = (PLATTE, ANALYSE, BALKENSYSTEM, BALKENSYSTEM3D, DECKE, DURCHSTANZEN, …` – Die Bauteilarten, in der Reihenfolge von Baum, Bericht und Rechnung – ein Balkensystem liest Werte der Platten und Analysen, also kommt es nach ihnen, das Erdbeben ebenso; Decke, Durchstanzen, Fachwerkmodell, Grundbruch, Setzung und Pfahl lesen nichts von den anderen. Wer alle Bauteile durchgeht (Lesen, Kennungen, Aufbau, Zwischenspeicher, Erkennen einer Datei), geht diese Liste durch.
+- `BAUTEILE = (PLATTE, ANALYSE, BALKENSYSTEM, BALKENSYSTEM3D, DECKE, DURCHSTANZEN, …` – Die Bauteilarten, in der Reihenfolge von Baum, Bericht und Rechnung – ein Balkensystem liest Werte der Platten und Analysen, also kommt es nach ihnen, das Erdbeben ebenso; die Nachweise einer Analyse koennen Stellen eines Balkensystems lesen, darum baut sie sie im zweiten Gang ([[opencivil.projekt.aufbau#Bauteilart|Bauteilart.danach]]). Decke, Durchstanzen, Fachwerkmodell, Grundbruch, Setzung und Pfahl lesen nichts von den anderen. Wer alle Bauteile durchgeht (Lesen, Kennungen, Aufbau, Zwischenspeicher, Erkennen einer Datei), geht diese Liste durch.
 
 ## Braucht
 

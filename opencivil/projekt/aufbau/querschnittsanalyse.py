@@ -12,10 +12,17 @@ Blechverbunddecke (:func:`_blechverbund`) und einer aus Holz auch
 (:func:`_holz`). Jede Bauweise rechnet den Schubfluss in den Schnitten
 (:func:`_schubfluss`). Eine leere oder fehlerhafte Zeichnung wird kein
 Bauteil, nur ein Hinweis.
+
+ZWEI GAENGE:
+:func:`bauen` macht die Analyse und meldet ihre Werte an -- ein Balkensystem
+nimmt sie als Querschnitt. Ihre Nachweise baut :func:`danach`, wenn alle
+Bauteile gebaut sind: ihre Lastfaelle koennen Stellen eines Balkensystems
+sein (:mod:`~opencivil.projekt.aufbau.aus_system`).
 """
 
 from __future__ import annotations
 
+from dataclasses import replace
 from typing import TYPE_CHECKING, Any, Callable, Dict, Iterable, List, Mapping, Tuple
 
 from opencivil.material.basis import Baustoff, Baustoffart
@@ -55,6 +62,7 @@ from opencivil.querschnitt.profilblech import aus_form
 from opencivil.querschnitt.spannglieder import Spannglied, aus_glied, was_fehlt
 from opencivil.verbund import duebel as vd
 
+from opencivil.projekt.aufbau.aus_system import aus_dem_system
 from opencivil.projekt.aufbau.kern import (
     Aufbau, Bauteil, knickfall, material, spannungsfaelle, spannungsnachweise, stoffe_von,
 )
@@ -66,9 +74,8 @@ if TYPE_CHECKING:
 def bauen(art: "Bauteilart", eintrag: QuerschnittsanalyseEintrag,
           aufbau: Aufbau) -> Bauteil:
     """
-    Ein gezeichneter Querschnitt: das Bauteil, seine Nachweise und Kennzahlen
-    nach seiner Bauweise (:func:`_nachweise`) und der Schubfluss in seinen
-    Schnitten (:func:`_schubfluss`).
+    Ein gezeichneter Querschnitt: das Bauteil mit seinen Werten, angemeldet
+    im Werk. Nachweise, Kennzahlen und Schubfluss baut :func:`danach`.
 
     Ist noch nichts gezeichnet (:attr:`QuerschnittsanalyseEintrag.leer`), gibt
     es nichts zu rechnen und kein Bauteil -- aber auch keinen Fehler, der das
@@ -89,9 +96,32 @@ def bauen(art: "Bauteilart", eintrag: QuerschnittsanalyseEintrag,
         # Die Werte des Querschnitts rechnet jede Bauweise -- der Bericht
         # zeigt sie, ein Stab im Balkensystem nimmt sie.
         teil.weitere_ziele += [d.id for d in (*analyse.d_brutto.values(), analyse.d_torsion)]
+    return teil
+
+
+def danach(art: "Bauteilart", eintrag: QuerschnittsanalyseEintrag, teil: Bauteil,
+           aufbau: Aufbau) -> None:
+    """
+    Wenn alle Bauteile gebaut sind: die Nachweise und Kennzahlen nach der
+    Bauweise (:func:`_nachweise`) und der Schubfluss in den Schnitten
+    (:func:`_schubfluss`). Nimmt die Analyse Stellen eines Balkensystems
+    (:func:`~opencivil.projekt.aufbau.aus_system.aus_dem_system`), sind sie
+    Lastfaelle nach ihren eigenen -- fuer jeden Nachweis, wie von Hand
+    eingegeben --, und ihre Herleitung steht vor den Nachweisen.
+    """
+    analyse = teil.objekt
+    aus = aus_dem_system(eintrag, aufbau)
+    if aus is not None:
+        teil.aus_system = aus
+        herleitung = aus.herleitung(f"{analyse.id}.aus_system", abschnitt=analyse.abschnitt,
+                                    schwerpunkt=(analyse.id_von("y_S"), analyse.id_von("z_S")))
+        aufbau.werk.registriere(herleitung)
+        teil.vorab.append(herleitung.id)
+        for satz in aus.hinweise:
+            aufbau.warnen(teil.raum, f"{ort_von(eintrag)}: {satz}")
+        eintrag = replace(eintrag, lastfaelle=[*eintrag.lastfaelle, *aus.lastfaelle])
     _nachweise(eintrag, analyse, teil, aufbau)
     _schubfluss(eintrag, analyse, teil, aufbau)
-    return teil
 
 
 def _nachweise(eintrag: QuerschnittsanalyseEintrag, analyse: Querschnittsanalyse,

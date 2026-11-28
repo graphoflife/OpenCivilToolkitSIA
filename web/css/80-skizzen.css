@@ -158,7 +158,7 @@
 .bs-zettel div:first-child { font-weight: 700; }
 .bs-tabelle { border-collapse: collapse; font-size: 12px; width: 100%; }
 .bs-tabelle th { text-align: right; font-weight: 600; color: var(--schrift-matt); padding: 3px 6px; border-bottom: 1px solid var(--rand); }
-.bs-tabelle th:first-child { text-align: left; }
+.bs-tabelle th:first-child, .bs-tabelle th.bs-text { text-align: left; }
 .bs-tabelle td { padding: 3px 6px; border-bottom: 1px solid var(--rand); }
 .bs-zahl { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .bs-wo { font-size: 10px; color: var(--schrift-zart); }

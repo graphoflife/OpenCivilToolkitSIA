@@ -1,5 +1,5 @@
 ---
-erzeugt: 5684c0c1177e
+erzeugt: c370fefcaa58
 art: modul
 tags: [modul]
 ---
@@ -28,6 +28,8 @@ def aufgezaehlt(teile: Sequence[str], wort: str='und') -> str
 
 - [[opencivil.material.arten]]
 - [[opencivil.nachweis.qa_verbund_werte]]
+- [[opencivil.projekt.aufbau.aus_system]]
 - [[opencivil.projekt.aufbau.balkensystem]]
 - [[opencivil.querschnitt.bauweise]]
+- [[opencivil.stabwerk.stellen]]
 - [[opencivil.verbund.blechdecke]]

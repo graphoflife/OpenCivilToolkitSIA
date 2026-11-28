@@ -1,5 +1,5 @@
 ---
-erzeugt: d9b8918ff147
+erzeugt: 0b3cce0f4436
 art: modul
 tags: [modul]
 ---
@@ -20,6 +20,14 @@ Blechverbunddecke ([[opencivil.projekt.aufbau.querschnittsanalyse#_blechverbund|
 ([[opencivil.projekt.aufbau.querschnittsanalyse#_schubfluss|_schubfluss]]). Eine leere oder fehlerhafte Zeichnung wird kein
 Bauteil, nur ein Hinweis.
 
+
+## ZWEI GAENGE
+
+[[opencivil.projekt.aufbau.querschnittsanalyse#bauen|bauen]] macht die Analyse und meldet ihre Werte an – ein Balkensystem
+nimmt sie als Querschnitt. Ihre Nachweise baut [[opencivil.projekt.aufbau.querschnittsanalyse#danach|danach]], wenn alle
+Bauteile gebaut sind: ihre Lastfaelle koennen Stellen eines Balkensystems
+sein ([[opencivil.projekt.aufbau.aus_system|aus_system]]).
+
 ## Inhalt
 
 ### bauen
@@ -28,9 +36,8 @@ Bauteil, nur ein Hinweis.
 def bauen(art: 'Bauteilart', eintrag: QuerschnittsanalyseEintrag, aufbau: Aufbau) -> Bauteil
 ```
 
-Ein gezeichneter Querschnitt: das Bauteil, seine Nachweise und Kennzahlen
-nach seiner Bauweise ([[opencivil.projekt.aufbau.querschnittsanalyse#_nachweise|_nachweise]]) und der Schubfluss in seinen
-Schnitten ([[opencivil.projekt.aufbau.querschnittsanalyse#_schubfluss|_schubfluss]]).
+Ein gezeichneter Querschnitt: das Bauteil mit seinen Werten, angemeldet
+im Werk. Nachweise, Kennzahlen und Schubfluss baut [[opencivil.projekt.aufbau.querschnittsanalyse#danach|danach]].
 
 Ist noch nichts gezeichnet ([[opencivil.projekt.querschnittsanalyse#QuerschnittsanalyseEintrag.leer|QuerschnittsanalyseEintrag.leer]]), gibt
 es nichts zu rechnen und kein Bauteil – aber auch keinen Fehler, der das
@@ -38,6 +45,19 @@ ganze Projekt aufhielte: so beginnt jede neue Analyse (Benutzer,
 2026-10-19). Ebenso eine Zeichnung, die sich noch nicht rechnen laesst,
 etwa Bewehrung ohne Polygon darum: die Zeichnung sagt, was nicht
 stimmt, und der Rest rechnet weiter ([[opencivil.projekt.aufbau.kern#Aufbau.unfertig|Aufbau.unfertig]]).
+
+### danach
+
+```python
+def danach(art: 'Bauteilart', eintrag: QuerschnittsanalyseEintrag, teil: Bauteil, aufbau: Aufbau) -> None
+```
+
+Wenn alle Bauteile gebaut sind: die Nachweise und Kennzahlen nach der
+Bauweise ([[opencivil.projekt.aufbau.querschnittsanalyse#_nachweise|_nachweise]]) und der Schubfluss in den Schnitten
+([[opencivil.projekt.aufbau.querschnittsanalyse#_schubfluss|_schubfluss]]). Nimmt die Analyse Stellen eines Balkensystems
+([[opencivil.projekt.aufbau.aus_system#aus_dem_system|aus_dem_system]]), sind sie
+Lastfaelle nach ihren eigenen – fuer jeden Nachweis, wie von Hand
+eingegeben –, und ihre Herleitung steht vor den Nachweisen.
 
 ### _nachweise
 
@@ -250,6 +270,7 @@ seine Art fuer die Sorte nicht, fehlt die Wahl noch ([[opencivil.querschnitt.spa
 - [[opencivil.nachweis.schiefe_biegung]]
 - [[opencivil.nachweis.schubwandnachweis]]
 - [[opencivil.projekt.aufbau]]
+- [[opencivil.projekt.aufbau.aus_system]]
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.blechdecken]]
 - [[opencivil.projekt.lesen]]

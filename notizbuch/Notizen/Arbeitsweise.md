@@ -182,7 +182,9 @@ Kopie der Datei mit der Endung `.mjs`.
 ## Im Browser prüfen
 
 Nach jeder Prüfung im Browser den gespeicherten Projektstand des Benutzers
-wiederherstellen.
+wiederherstellen. Gesichert wird schon vor einem Neustart des Servers:
+`preview_start` öffnet die Seite mit dem Stand des Benutzers, und die legt
+ihn mit neuen Feldern gleich wieder ab (2026-11-28, mit `aus_system`).
 
 ## Wohin welche Notiz gehört
 

@@ -7,6 +7,60 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-28 · Querschnittsanalyse: Nachweise aus dem Balkensystem (Schritt 12)
+
+Eine neue Kachel «Aus dem Balkensystem» gleich nach der Tragsicherheit: ein
+ebenes oder räumliches System des Projekts und seine Stäbe, Vorgabe alle
+mit diesem Querschnitt. Je Kombination nimmt das Werkzeug die massgebenden
+Stellen, und jede ist ein Lastfall aller Nachweise der Analyse, neben den
+eigenen – auch für die häufigen und quasi-ständigen, die sie daraus
+ableitet.
+
+- **Vorher – nachher:** Wer einen Träger aus dem Balkensystem nachwies,
+  schrieb M und V von Hand ab, nach jeder Änderung des Systems wieder.
+  Jetzt, Einfeldträger 6 m mit 10 kN/m und GZT 1.35: «GZT, L1 bei
+  x = 3.00 m» mit M_y = 60.75 kNm und «GZT, L1 bei x = 0.00 m» mit
+  V_z = 40.5 kN, von selbst und nach jeder Änderung neu.
+- **Die Stellen** (`stabwerk/stellen.py`): grösstes und kleinstes M_y, M_z
+  und N, grösstes |V_z|, |V_y| und |T|, über die gewählten Stäbe zusammen,
+  je mit den übrigen Schnittgrössen dort. Was überall null ist, gibt keine;
+  eine Stelle, die mehreres zugleich ist, steht einmal da. Der Plan sagte
+  «grösstes |V|»: V_z und V_y sind je ein Kriterium, denn die Analyse weist
+  beide Richtungen nach.
+- **Der Name** sagt Kombination, Stab und Ort, wie im Plan; wofür die
+  Stelle massgebend ist, steht in einer eigenen Spalte. Zuerst standen die
+  Gründe im Namen: im Prüfprojekt hatte einer dann sieben, und jede Formel
+  der Nachweise trug sie im Index.
+- **Sprünge:** Wo etwas springt, sagt der Name die Seite, «links» zum
+  Anfang des Stabs hin, «rechts» zum Ende. Hat eine Grösse ihren
+  Extremwert auf beiden Seiten – das grösste Moment unter einer
+  Einzellast –, zählen beide; zuerst galt nur die rechte, und die grössere
+  Querkraft links fehlte. Beispiel: 40 kN bei 1.5 m eines Trägers von 6 m,
+  M = 45 kNm mit V = 30 kN links und −10 kN rechts.
+- **Kein Kreis:** Das System liest die Werte der Analyse, A und I, auch wenn
+  sein Stab genau sie als Querschnitt hat; ihre Nachweise lesen die
+  Stellen. Darum baut der Aufbau in zwei Gängen: erst alle Bauteile, dann
+  die Nachweise der Analysen (`Bauteilart.danach`). Dafür rechnet das
+  System ein zweites Mal, ohne Herleitung (`Aufbau.befund_im_aufbau`). Im
+  Prüfprojekt kostet der neue Teil 2.4 s, fast ganz für die drei neuen
+  Lastfälle in allen Nachweisen des Kastenträgers.
+- **Vorzeichen:** Der Querschnitt gilt vom Anfang des Stabs her gesehen,
+  seine Unterseite auf der gestrichelten Faser. N, V_z, M_y und T sind die
+  des Systems, M_z und V_y kehren sich um (nach Vorgabe; Test mit einem
+  Kragarm im Raum).
+- **Neu rechnen:** Die Bezüge gelten über mehrere Stufen
+  (`Projekt.bezuege_von`). Ändert man die Analyse, die Querschnitt eines
+  Systems ist, rechnet auch eine andere neu, die dessen Stellen nimmt.
+- **Grau am Ort:** kein System gewählt, ein gelöschtes, eines, das nicht
+  rechnet oder keine Kombination hat, kein Stab mit diesem Querschnitt, ein
+  gewählter Stab, den es nicht mehr gibt. Die Analyse rechnet mit ihren
+  eigenen Lastfällen weiter.
+- **Löschen:** Ein System, aus dem eine Analyse Stellen nimmt, lässt sich
+  nicht löschen. Die Meldung hiess für jede App «„Träger" ist Querschnitt
+  in: …» – für ein System falsch; jetzt «„Träger" wird gebraucht von: …».
+- **Prüfprojekt:** Der Kastenträger nimmt die Stellen seines Stabs im
+  Raumrahmen: drei, mit M_z, V_y und T.
+
 ## 2026-11-28 · Fachwerkmodell: das Verfahren SIMP (Schritt 11d)
 
 Die Kachel «Verfahren» hat einen Schalter [Ground Structure | SIMP], je
