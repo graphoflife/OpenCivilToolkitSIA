@@ -7,6 +7,38 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-28 · Mauerwerk: Normalkraft und Teilflächen (Schritt 14b)
+
+Die Wand bekommt Lasten und ihre ersten beiden Nachweise: je Pfeiler die
+Normalkraft mit Knicken und Ausmitte, je Sturzauflager die Pressung.
+
+- **Lasten im Zeichenfenster**, je Lastfall: waagrechte Linienlasten von
+  Knoten zu Knoten und Punktlasten an Knoten, je mit Ausmitte e quer zur
+  Wand. Die Leiste der Lastfälle und die Punktlast am Knoten teilt die Wand
+  mit der Decke (`lastfaelle.js`); vorher standen sie nur in der Decke.
+- **Der Lastabtrag** (`mauerwerk/lasten.py`) regelt die Norm nicht: über
+  einem Pfeiler in ihn, über einer Öffnung auf den Sturz, der als einfacher
+  Balken auf die Pfeiler daneben abgibt; das Eigengewicht ρ · g · t_w. Die
+  Ausmitte am Kopf ist die der Lasten allein, M / N_L. Zuerst war sie
+  M / N am Fuss: das Eigengewicht machte so aus 20 mm still 18 mm, nicht
+  auf der sicheren Seite.
+- **k_N rechnet das Werkzeug selbst** nach Theorie 2. Ordnung
+  (`mauerwerk/knicken.py`, Figur 3, Gl. (6), Figur 4), statt es in Figur 5
+  abzulesen: so gilt es für jedes E/f und jede Halterung, auch für eine
+  eingespannte. Es trifft Figur 5 bis e/t = 0.30 auf 0.006; die Kurve 0.35
+  liegt fast doppelt so hoch, offen im TODO. Ein Test fand dabei einen
+  Fehler: fiel die Last der Bemessung genau auf einen Rechenschritt, fehlte
+  in der Herleitung, wo die Wand am weitesten ausweicht.
+- **Teilflächen** nach Gl. (4) mit k_m = 1: der Sturz so breit wie die
+  Wand, das Auflager am Rand der Öffnung (nach Vorgabe).
+- **Das Bild** tönt jeden Pfeiler und jedes Sturzauflager nach seinem
+  ungünstigsten Urteil: nicht erfüllt vor offen vor dem kleinsten
+  Erfüllungsgrad (`web/mauerwerkdaten.urteile`). So zeigt eine Farbe, was
+  zuerst zu tun ist.
+- **Die Zusammenfassung** ist die gemeinsame aller Nachweise
+  (`nachweise: true` in `arten.js`), mit den Angaben und Bemessungswerten
+  der Wand darüber (`mauerwerk/uebersicht.py`); ihre eigene fiel weg.
+
 ## 2026-11-28 · Mauerwerk: Material, Wand, Öffnungen und Zeichnung (Schritt 14a)
 
 Eine neue App «Mauerwerk», die zwölfte Bauteilart: eine Wand aus

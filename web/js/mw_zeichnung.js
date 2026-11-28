@@ -8,11 +8,18 @@
  * Zeichenfenster. Alles hängt an Knoten (`verbunden`): wer die Ecke einer
  * Türe auf den Fuss der Wand setzt, verschiebt beide zusammen.
  *
+ * LASTEN:
+ * Linien- und Punktlasten zeichnen die Werkzeuge in den Lastfall, der in der
+ * Leiste gewählt ist (lastfaelle.js), wie in der Decke: das Fenster zeigt nur
+ * dessen Lasten, und nur sie lassen sich wählen. Eine Linienlast liegt von
+ * Knoten zu Knoten -- eine schräge meldet der Kern --, eine Punktlast steht
+ * an ihrem Knoten und in dessen Fenster.
+ *
  * WAS DER KERN SAGT:
- * Anfrage `mauerwerk_zeichnung`: die Meldungen und je Öffnung die Fläche
- * ihres Sturzes. Sie gelten nur, solange die Zeichnung dieselbe ist, nach
- * der gefragt wurde; bis die nächste Antwort da ist, stehen die Stürze der
- * letzten blass.
+ * Anfrage `mauerwerk_zeichnung`: die Meldungen, je Öffnung die Fläche ihres
+ * Sturzes, die Pfeiler und je Pfeiler und Sturzauflager das Urteil, das an
+ * ihm gilt. Sie gelten nur, solange die Zeichnung dieselbe ist, nach der
+ * gefragt wurde; bis die nächste Antwort da ist, steht die letzte blass.
  *
  * Das Bild steht in `mw_bild.js`. Gerechnet wird hier nichts; Einheiten und
  * Grenzen der Felder sagt der Kern (`katalog.felder`).
@@ -23,30 +30,48 @@ import {
   mitBild, mitVar, wahlBlock, wahlSchalter,
 } from './bausteine.js';
 import {
-  auswahlEigenschaften, cadApp, cadBereichMitListe, meldungenJe, meldungszeilen, teilname, umrissVon, vorgabe,
-  zahlfeldMitVar, zugleich,
+  auswahlEigenschaften, cadApp, cadBereichMitListe, laengenzeile, lagefelder, meldungenJe, meldungszeilen,
+  teilname, umrissVon, vorgabe, zahlfeldMitVar, zugleich,
 } from './cad_app.js';
 import { polygonBefehl } from './cad_befehle.js';
 import { cadZeile } from './cad_palette.js';
 import { el } from './dom.js';
-import { wand } from './mw_bild.js';
+import {
+  aktiverLastfall, gezeigterLastfall, lastfallFuerNeue, lastfallLeiste, lastfallText, lastfallWaehlen,
+  lastfallZeile, punktlastFelder, punktlastSetzen,
+} from './lastfaelle.js';
+import { PFEIL, wand } from './mw_bild.js';
 import {
   eintragVon, feldangabe, katalog, zustand,
 } from './zustand.js';
 
 /** Was die Arten heissen, je Liste -- einzeln und mehrere. */
-const NAMEN = { oeffnungen: ['Öffnung', 'Öffnungen'], waende: ['Wand', 'Wände'] };
+const NAMEN = {
+  punktlasten: ['Punktlast', 'Punktlasten'],
+  linienlasten: ['Linienlast', 'Linienlasten'],
+  oeffnungen: ['Öffnung', 'Öffnungen'],
+  waende: ['Wand', 'Wände'],
+};
+
+/** Je Liste der Lasten der Name ihrer Einträge im Katalog und das Zeichen ihres Werts. */
+const LASTEN = { linienlasten: ['wandlinienlast', 'q'], punktlasten: ['wandpunktlast', 'Q'] };
 
 /**
  * Die Arten der Wand, ihre Vorsilben vom Kern (`VORSILBEN` in
- * opencivil/projekt/mauerwerk.py). Eine Öffnung vor der Wand: sie liegt darauf.
+ * opencivil/projekt/mauerwerk.py). Eine Last vor dem, worauf sie liegt, und
+ * eine Öffnung vor der Wand. Eine Punktlast wählt man an ihrem Knoten
+ * (`waehlbar`), wie in der Decke.
  */
 function arten() {
   const vorsilben = katalog('mauerwerk', 'vorsilben');
-  return [['oeffnungen', 'flaeche'], ['waende', 'flaeche']].map(([liste, form], rang) => ({
-    liste, form, rang, vorsilbe: vorsilben[liste], heisst: NAMEN[liste][0], mehrzahl: NAMEN[liste][1],
-  }));
+  return [['punktlasten', 'punkt'], ['linienlasten', 'linie'], ['oeffnungen', 'flaeche'], ['waende', 'flaeche']]
+    .map(([liste, form], rang) => ({
+      liste, form, rang, vorsilbe: vorsilben[liste], heisst: NAMEN[liste][0], mehrzahl: NAMEN[liste][1],
+    }));
 }
+
+/** Eine Last braucht einen Lastfall -- ohne einen startet ihr Werkzeug nicht und sagt, wo er zu wählen ist. */
+const lastBereit = (a) => Boolean(lastfallFuerNeue(a.mw));
 
 /** Ein Umriss, der als Rechteck aus zwei Ecken beginnt -- G wechselt zu Ecke um Ecke (cad_befehle.js). */
 const rechteckBefehl = (werkzeug) => () => ({
@@ -62,6 +87,10 @@ const EINSTELLUNG = {
     { name: 'oeffnung', text: 'Öffnung', zeichen: 'cad-oeffnung', taste: 'o', form: 'polygon',
       befehl: rechteckBefehl('oeffnung'),
       titel: 'Öffnung – eine Türe oder ein Fenster, ein Rechteck aus zwei Ecken; darüber liegt ihr Sturz' },
+    { name: 'linienlast', text: 'Linienlast', zeichen: 'cad-linienlast', taste: 'l', form: 'linie', bereit: lastBereit,
+      titel: 'Linienlast – waagrecht von Punkt zu Punkt, im gewählten Lastfall, etwa eine Decke auf der Wand' },
+    { name: 'punktlast', text: 'Punktlast', zeichen: 'cad-punktlast', taste: 'e', form: 'knoten', bereit: lastBereit,
+      titel: 'Punktlast – an einen Knoten oder eine freie Stelle, im gewählten Lastfall, etwa ein Träger' },
     { name: 'knoten', text: 'Knoten', zeichen: 'cad-knoten', taste: 'k', form: 'knoten' },
   ],
   einheit: 'm',
@@ -72,7 +101,9 @@ const EINSTELLUNG = {
 };
 
 /** Welche Liste ein Werkzeug füllt -- der Knoten keine. */
-const LISTE_VON = { wand: 'waende', oeffnung: 'oeffnungen' };
+const LISTE_VON = {
+  wand: 'waende', oeffnung: 'oeffnungen', linienlast: 'linienlasten', punktlast: 'punktlasten',
+};
 
 // ===========================================================================
 // Das Fenster einer Wand
@@ -83,14 +114,20 @@ const fensterVon = cadApp('mw', adapter, (a) => { a.mw = a.adapter.mw; });
 
 /** Das Zeichenfenster einer Wand, samt der Liste darunter. Die Tafel ruft das bei jedem Neubau. */
 export function zeichenbereich(eintrag, listeBauen) {
-  return cadBereichMitListe(fensterVon(eintrag.kennung), listeBauen);
+  const a = fensterVon(eintrag.kennung);
+  const bereich = cadBereichMitListe(a, listeBauen);
+  lastfallLeiste(a, a.mw, a.mw.lastfallHuelle);
+  return bereich;
 }
 
 /** Was die Werkzeuge als Nächstes anlegen, je Liste: die Vorlage des Kerns. */
 function vorgabenNeu() {
+  const vorlage = (klasse) => structuredClone(katalog('vorlagen', klasse));
   return {
-    waende: structuredClone(katalog('vorlagen', 'wand')),
-    oeffnungen: structuredClone(katalog('vorlagen', 'oeffnung')),
+    waende: vorlage('wand'),
+    oeffnungen: vorlage('oeffnung'),
+    linienlasten: vorlage(LASTEN.linienlasten[0]),
+    punktlasten: vorlage(LASTEN.punktlasten[0]),
   };
 }
 
@@ -100,18 +137,30 @@ function vorgabenNeu() {
  * `mauerwerk_zeichnung`).
  */
 function adapter(kennung) {
-  const mw = { kennung, vorgaben: vorgabenNeu(), vorsilben: katalog('mauerwerk', 'vorsilben') };
+  const mw = {
+    kennung, vorgaben: vorgabenNeu(), vorsilben: katalog('mauerwerk', 'vorsilben'), lastfall: null,
+    lastfallHuelle: null,
+  };
   return {
     mw,
     einstellung: EINSTELLUNG,
     achsen: ['x', 'y'],
     arten: arten(),
+    // Der Lastfall gleich neben den Werkzeugen, wie in der Decke.
+    leisteZusatz: () => {
+      mw.lastfallHuelle = el('span.bs-lastfallwahl');
+      return mw.lastfallHuelle;
+    },
     name: teilname,
     neuText: (a, werkzeug) => EINSTELLUNG.werkzeuge.find((w) => w.name === werkzeug)?.text || '',
-    // Der Knoten ist er selbst -- sonst setzt kein Werkzeug einen Punkt.
-    punktAnlegen: () => null,
+    punktAnlegen,
+    linieAnlegen,
     flaecheAnlegen,
     zeichnen,
+    // Eine Last nur in dem Lastfall, den das Fenster zeigt; eine Punktlast an ihrem Knoten.
+    waehlbar: (art, e) => art.liste !== 'punktlasten' && (!LASTEN[art.liste] || e.lastfall === aktiverLastfall(mw)),
+    // Eine Linienlast trifft auch ein Klick auf ihre Pfeile, nicht nur auf die Linie darunter.
+    trefferradius: (a, art) => (art.liste === 'linienlasten' ? PFEIL.linie / a.v.massstab : 0),
     umriss: () => umrissVon(
       (eintragVon(kennung)?.knoten || []).map((k) => [k.x, k.y]), [[0, 0], [6, 3]]),
     fragen: () => api.mauerwerkZeichnung(zustand.projekt, kennung),
@@ -129,17 +178,38 @@ function flaecheAnlegen(a, z, knoten, werkzeug) {
 }
 
 /**
- * Die Wand, darüber rot, was der Kern an einem Teil beanstandet -- mit den
- * Stürzen seiner letzten Antwort, blass, solange sie zu einer früheren
- * Zeichnung gehört.
+ * Eine Punktlast an den Knoten, im gezeigten Lastfall -- gewählt bleibt der
+ * Knoten, sein Fenster zeigt sie. Ist keiner mehr gewählt, seit das Werkzeug
+ * lief, bleibt es beim Knoten.
+ */
+function punktAnlegen(a, z, knoten, werkzeug) {
+  const lf = werkzeug === 'punktlast' && lastfallFuerNeue(a.mw);
+  if (lf) punktlastSetzen(a, a.mw, z, knoten, true, lf);
+  return null;
+}
+
+/** Eine Linienlast im gezeigten Lastfall -- ohne einen keine. */
+function linieAnlegen(a, z, von, bis) {
+  const lastfall = lastfallFuerNeue(a.mw);
+  if (!lastfall) return null;
+  const kennung = a.modell.naechsteKennung(z, a.mw.vorsilben.linienlasten);
+  z.linienlasten.push({ ...structuredClone(a.mw.vorgaben.linienlasten), kennung, von, bis, lastfall });
+  return kennung;
+}
+
+/**
+ * Die Wand, darüber rot, was der Kern an einem Teil beanstandet, und die
+ * Lasten des gezeigten Lastfalls -- mit Stürzen, Pfeilern und Urteilen der
+ * letzten Antwort, blass, solange sie zu einer früheren Zeichnung gehört.
  */
 function zeichnen(a, g) {
   const z = eintragVon(a.mw.kennung);
   if (!z) return;
   const { antwort } = a.adapter.kern;
   g.append(wand(a.v, z, {
-    ...meldungenJe(a), stuerze: antwort?.stuerze || [], alt: antwort?.fassung !== zustand.fassung,
-    stellungen: katalog('mauerwerk'),
+    ...meldungenJe(a), stuerze: antwort?.stuerze || [], pfeiler: antwort?.pfeiler || [],
+    urteile: antwort?.urteile || {}, alt: antwort?.fassung !== zustand.fassung,
+    stellungen: katalog('mauerwerk'), lastfall: aktiverLastfall(a.mw),
   }));
 }
 
@@ -148,13 +218,14 @@ function zeichnen(a, g) {
 // ===========================================================================
 
 /**
- * Ein Zahlenfeld einer Öffnung mit Beschriftung und Einheit des Kerns --
- * `wert(feld)` das Gemeinsame der gewählten, `setzen(feld)` schreibt.
+ * Ein Zahlenfeld mit Beschriftung und Einheit des Kerns -- `klasse` ist der
+ * Name der Einträge im Katalog (`oeffnung`), `wert(feld)` das Gemeinsame der
+ * gewählten, `setzen(feld)` schreibt. Ohne `beschriftung` die des Kerns.
  */
-function feldzeile(feld, wert, setzen, titel) {
-  const angabe = feldangabe('oeffnung', feld);
-  return cadZeile(angabe.heisst, zahlfeldMitVar({
-    wert: wert(feld), schritt: 10, angabe, titel, beiAenderung: setzen(feld),
+function feldzeile(klasse, feld, wert, setzen, { beschriftung, schritt = 10, titel } = {}) {
+  const angabe = feldangabe(klasse, feld);
+  return cadZeile(beschriftung ?? angabe.heisst, zahlfeldMitVar({
+    wert: wert(feld), schritt, angabe, titel, beiAenderung: setzen(feld),
   }), angabe.einheit || '');
 }
 
@@ -165,22 +236,90 @@ function oeffnungFelder(wert, setzen) {
       werte: mitVar(mitBild(katalog('mauerwerk', 'sturz'), 'sturz'), wert('sturz')),
       gewaehlt: wert('sturz'), setzen: setzen('sturz'), titel: 'Was über der Öffnung trägt',
     })),
-    feldzeile('h_St', wert, setzen, 'Wie hoch der Sturz ist'),
-    feldzeile('a', wert, setzen, 'Wie weit der Sturz auf jeder Seite auf dem Mauerwerk liegt'),
+    feldzeile('oeffnung', 'h_St', wert, setzen, { titel: 'Wie hoch der Sturz ist' }),
+    feldzeile('oeffnung', 'a', wert, setzen, { titel: 'Wie weit der Sturz auf jeder Seite auf dem Mauerwerk liegt' }),
   ];
 }
 
-/** Die Felder für das, was ein Werkzeug als Nächstes anlegt -- nur die Öffnung hat welche. */
-function neuEigenschaften(a, werkzeug) {
-  if (werkzeug !== 'oeffnung') return { inhalt: [], schluessel: werkzeug };
-  const v = a.mw.vorgaben.oeffnungen;
-  const { wert, setzen } = vorgabe(a, v);
-  return { inhalt: oeffnungFelder(wert, setzen), schluessel: JSON.stringify([werkzeug, v]) };
+/** Die Felder einer Last der Liste `liste`: ihr Wert nach unten und ihre Ausmitte quer zur Wand. */
+function lastFelder(liste, wert, setzen) {
+  const [klasse, zeichen] = LASTEN[liste];
+  return [
+    feldzeile(klasse, 'wert', wert, setzen, {
+      beschriftung: zeichen, schritt: 5,
+      titel: liste === 'linienlasten' ? 'Je Meter Linie, nach unten positiv' : 'Nach unten positiv',
+    }),
+    feldzeile(klasse, 'e', wert, setzen, {
+      beschriftung: 'e', schritt: 5,
+      titel: 'Ausmitte quer zur Wand, positiv zur Seite, von der aus man die Ansicht sieht – sie wirkt am Kopf '
+        + 'der Pfeiler, die die Last tragen',
+    }),
+  ];
 }
 
-/** Was gewählt ist (cad_app.js): Knoten, Öffnungen mit ihrem Sturz -- oder der Umriss der Wand. */
+/**
+ * Was ausser der Auswahl die Felder ändert: welcher Lastfall gezeigt ist,
+ * wie er heisst und ob es einen gibt.
+ */
+function felderStand(a) {
+  return [aktiverLastfall(a.mw), gezeigterLastfall(a.mw)?.name ?? null,
+    Boolean(eintragVon(a.mw.kennung)?.lastfaelle.length)];
+}
+
+/** Die Felder für das, was ein Werkzeug als Nächstes anlegt: eine Öffnung oder eine Last. */
+function neuEigenschaften(a, werkzeug) {
+  const liste = LISTE_VON[werkzeug];
+  if (liste !== 'oeffnungen' && !LASTEN[liste]) return { inhalt: [], schluessel: werkzeug };
+  const v = a.mw.vorgaben[liste];
+  const { wert, setzen } = vorgabe(a, v);
+  return {
+    inhalt: LASTEN[liste] ? [lastfallText(a.mw), ...lastFelder(liste, wert, setzen)] : oeffnungFelder(wert, setzen),
+    schluessel: JSON.stringify([werkzeug, v, felderStand(a)]),
+  };
+}
+
+/**
+ * Was gewählt ist (cad_app.js): Knoten mit ihrer Punktlast, Öffnungen mit
+ * ihrem Sturz, Linienlasten -- oder der Umriss der Wand. Neu auch, wenn der
+ * gezeigte Lastfall wechselt.
+ */
 function eigenschaften(a) {
-  return auswahlEigenschaften(a, { oeffnungen: oeffnungEigenschaften, waende: wandEigenschaften });
+  return auswahlEigenschaften(a, {
+    knoten: knotenEigenschaften, oeffnungen: oeffnungEigenschaften, linienlasten: linienlastEigenschaften,
+    waende: wandEigenschaften,
+  }, felderStand(a));
+}
+
+/** Gewählte Knoten: ihre Lage und ihre Punktlast im gezeigten Lastfall. */
+function knotenEigenschaften(a, z, knoten) {
+  return {
+    titel: knoten.length === 1 ? a.adapter.name(a, knoten[0]) : `${knoten.length} Knoten`,
+    inhalt: [
+      ...lagefelder(a, z, knoten),
+      ...punktlastFelder(a, a.mw, z, knoten,
+        (wert, setzen) => lastFelder('punktlasten', wert, setzen)),
+      ...meldungszeilen(a, knoten),
+    ],
+  };
+}
+
+/** Gewählte Linienlasten: ihr Lastfall, q und e -- bei einer auch, wie lang sie ist. */
+function linienlastEigenschaften(a, z, kennungen) {
+  const { gewaehlt, wert, setzen } = zugleich(a, z, 'linienlasten', kennungen);
+  return {
+    titel: kennungen.length === 1 ? a.adapter.name(a, kennungen[0])
+      : `${kennungen.length} Linienlasten`,
+    inhalt: [
+      // Ändert man den Lastfall, zeigt das Fenster danach dessen Lasten -- sonst verschwände sie.
+      lastfallZeile(z, wert('lastfall'), (w) => {
+        setzen('lastfall')(w);
+        lastfallWaehlen(a, a.mw, w);
+      }, 'Zu welchem Lastfall die Lasten gehören'),
+      ...lastFelder('linienlasten', wert, setzen),
+      gewaehlt.length === 1 ? laengenzeile(a, z, gewaehlt[0]) : null,
+      ...meldungszeilen(a, kennungen),
+    ].filter(Boolean),
+  };
 }
 
 function oeffnungEigenschaften(a, z, kennungen) {

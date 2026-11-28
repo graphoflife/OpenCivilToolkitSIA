@@ -21,9 +21,13 @@ from opencivil.web.api import katalog
 
 
 def herleitung(rechnung):
-    """Die Vorgaben einer Rechnung, wie die Herleitung sie zeigt: Kasten und Kurzname."""
+    """
+    Die Vorgaben einer Rechnung, wie die Herleitung sie zeigt: Kasten und
+    Kurzname. Ohne die Vorgaben ohne Kasten, die keine Maske zeigt -- etwa
+    g = 10 m/s² für das Eigengewicht.
+    """
     return [(b.gruppe, b.ausgabe.kurzname) for b in rechnung.berechnungen
-            if isinstance(b, Vorgabe)]
+            if isinstance(b, Vorgabe) and b.gruppe]
 
 
 def maske(klasse, eintrag, gelesen=None):
@@ -124,13 +128,18 @@ class TestMaskeWieHerleitung(unittest.TestCase):
                 self.assertEqual(erwartet, herleitung(p.aufbauen().pfaehle[t.kennung]))
 
     def test_mauerwerk(self):
-        """Die Dicke der Wand: in der Kachel «Mauerwerk» wie im Kasten der Herleitung."""
-        p = Projekt(name="Probe")
-        p.mauerwerk("MK")
-        w = p.wand("Wand", t=175)
-        self.assertEqual(maske("mauerwerk", w.als_dict()), [("Mauerwerk", "t")])
-        self.assertEqual(maske("mauerwerk", w.als_dict()),
-                         herleitung(p.aufbauen().mauerwerke[w.kennung]))
+        """
+        Die Dicke der Wand in der Kachel «Mauerwerk», die Ausmitte am Fuss in
+        «Ränder», nur wenn er gelenkig ist -- wie in den Kästen der Herleitung.
+        """
+        for fuss, erwartet in (("gelenkig", [("Mauerwerk", "t"), ("Ränder", "e_u")]),
+                               ("eingespannt", [("Mauerwerk", "t")])):
+            with self.subTest(fuss=fuss):
+                p = Projekt(name="Probe")
+                p.mauerwerk("MK")
+                w = p.wand("Wand", t=175, fuss=fuss)
+                self.assertEqual(maske("mauerwerk", w.als_dict()), erwartet)
+                self.assertEqual(herleitung(p.aufbauen().mauerwerke[w.kennung]), erwartet)
 
 
 if __name__ == "__main__":

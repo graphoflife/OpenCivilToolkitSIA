@@ -1,23 +1,29 @@
 /**
- * lastfaelle.js -- Lastfälle und Kombinationen, für Balkensystem und Decke dieselben.
+ * lastfaelle.js -- Lastfälle und Kombinationen, für Balkensystem, Decke und Wand dieselben.
  *
  * Die Fenster «Lastfälle» und «Lastkombinationen» (`lastenKapitel`), und
  * was ein Zeichenfenster mit ihnen tut: welchen Lastfall es zeigt und in
  * welchen es zeichnet (`aktiverLastfall`) -- zu wählen neben den Werkzeugen
- * (`lastfallLeiste`) und im Fenster einer Last (`lastfallZeile`). Dazu die
- * Zeilen der Diagramme, je ein Fall und eine Grösse (`diagrammzeilen`), und
- * wie ein Fall heisst (`fallname`). Was beim Rechnen gilt -- verschiedene
- * Namen, ein Eigengewicht --, prüft der Kern
+ * (`lastfallLeiste`) und im Fenster einer Last (`lastfallZeile`) --, und die
+ * Punktlast an einem Knoten, die man in dessen Fenster setzt
+ * (`punktlastFelder`). Dazu die Zeilen der Diagramme, je ein Fall und eine
+ * Grösse (`diagrammzeilen`), und wie ein Fall heisst (`fallname`). Was beim
+ * Rechnen gilt -- verschiedene Namen, ein Eigengewicht --, prüft der Kern
  * (opencivil/projekt/aufbau/faelle.py). Bis 2026-11-13 stand das im
- * Balkensystem allein.
+ * Balkensystem allein, die Punktlast am Knoten bis 2026-11-28 in der Decke.
  *
  * Ein Zeichenfenster gibt dazu seinen Zustand `ansicht`: die Kennung seines
  * Bauteils und den gewählten Lastfall (`{kennung, lastfall}`) --
- * Ansichtssache, nicht Teil des Projekts.
+ * Ansichtssache, nicht Teil des Projekts --, für die Punktlast auch, was
+ * sein Werkzeug vorgibt (`vorgaben.punktlasten`) und womit die Kennungen
+ * beginnen (`vorsilben.punktlasten`).
  */
 
-import { mitVar, namensfeld, wahlSchalter } from './bausteine.js';
-import { cadZeile } from './cad_palette.js';
+import {
+  gemeinsam, mitVar, namensfeld, wahlSchalter,
+} from './bausteine.js';
+import { jaNein, meldungszeilen, zugleich } from './cad_app.js';
+import { cadZeile, schalterzeile } from './cad_palette.js';
 import {
   auswahl, el, melden, zahlfeld,
 } from './dom.js';
@@ -206,6 +212,64 @@ export function lastfallZeile(eintrag, gewaehlt, setzen, titel) {
     werte: mitVar(eintrag.lastfaelle.map((x) => ({ wert: x.kennung, beschriftung: x.name })), gewaehlt),
     gewaehlt, titel, beiAenderung: setzen,
   }));
+}
+
+/** Der Lastfall, den das Fenster zeigt, als Eintrag -- oder null. */
+export function gezeigterLastfall(ansicht) {
+  const lf = aktiverLastfall(ansicht);
+  return eintragVon(ansicht.kennung)?.lastfaelle.find((x) => x.kennung === lf) || null;
+}
+
+/**
+ * In welchen Lastfall die Lasten gehen -- eine Zeile über ihren Feldern --,
+ * oder was fehlt: keiner gewählt, oder es gibt noch keinen. Ohne Lastfall
+ * fehlten in der Decke «q überall» und die Punktlast bis 2026-11-19 ohne ein Wort.
+ */
+export function lastfallText(ansicht) {
+  const lf = gezeigterLastfall(ansicht);
+  if (lf) return el('p.cad-info', { text: `Lastfall «${lf.name}»` });
+  return eintragVon(ansicht.kennung)?.lastfaelle.length
+    ? el('p.cad-hinweis-klein', { text: 'Kein Lastfall gewählt – oben in der Leiste einen wählen.' })
+    : ohneLastfall();
+}
+
+// ===========================================================================
+// Die Punktlast an einem Knoten
+// ===========================================================================
+
+/**
+ * Setzt an einen Knoten eine Punktlast nach der Vorgabe des Werkzeugs, im
+ * Lastfall `lastfall` -- oder nimmt die dieses Lastfalls weg. Je Knoten und
+ * Lastfall höchstens eine.
+ */
+export function punktlastSetzen(a, ansicht, z, knoten, an, lastfall) {
+  const hier = (e) => e.knoten === knoten && e.lastfall === lastfall;
+  if (!an) z.punktlasten = z.punktlasten.filter((e) => !hier(e));
+  else if (!z.punktlasten.some(hier)) {
+    z.punktlasten.push({
+      ...structuredClone(ansicht.vorgaben.punktlasten),
+      kennung: a.modell.naechsteKennung(z, ansicht.vorsilben.punktlasten), knoten, lastfall,
+    });
+  }
+}
+
+/**
+ * Die Punktlast der gewählten Knoten im gezeigten Lastfall, im Fenster der
+ * Knoten: ein Schalter, dann -- hat jeder gewählte Knoten eine -- ihre Felder,
+ * `felder(wert, setzen)`. Man wählt sie nicht für sich, wie eine Stütze in
+ * der Decke oder ein Lager im Balkensystem.
+ */
+export function punktlastFelder(a, ansicht, z, knoten, felder) {
+  const lf = gezeigterLastfall(ansicht);
+  if (!lf) return [lastfallText(ansicht)];
+  const lasten = knoten.map((k) => z.punktlasten.find((e) => e.knoten === k && e.lastfall === lf.kennung) || null);
+  const zeilen = [lastfallText(ansicht), schalterzeile('Punktlast', jaNein(gemeinsam(lasten.map(Boolean)), (w) => a.aendern((zz) => {
+    for (const k of knoten) punktlastSetzen(a, ansicht, zz, k, w, lf.kennung);
+  }), `Eine Punktlast an diesem Knoten im Lastfall «${lf.name}»`))];
+  if (lasten.some((e) => !e)) return zeilen;
+  const kennungen = lasten.map((e) => e.kennung);
+  const { wert, setzen } = zugleich(a, z, 'punktlasten', kennungen);
+  return [...zeilen, ...felder(wert, setzen), ...meldungszeilen(a, kennungen)];
 }
 
 // ===========================================================================

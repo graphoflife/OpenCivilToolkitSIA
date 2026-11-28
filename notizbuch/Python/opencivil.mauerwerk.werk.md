@@ -1,5 +1,5 @@
 ---
-erzeugt: 69c6050a4e41
+erzeugt: 74e51384a053
 art: modul
 tags: [modul]
 ---
@@ -10,26 +10,23 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Was eine Wand im Rechenwerk anmeldet: ihre Vorgaben ([[opencivil.mauerwerk.werk#Konstanten|VORGABEN]]) –
-in der Maske die Kachel «Mauerwerk», in der Herleitung ein Kasten – und
-eine Prozedur, die ihre Zeichnung prüft ([[opencivil.mauerwerk.pruefen|pruefen]]),
-die Werte ihres Mauerwerks liest, an den Mindestwerten misst und nach ihrer Wahl umrechnet
+in der Maske die Kacheln «Mauerwerk» und «Ränder», in der Herleitung ein
+Kasten – und eine Prozedur, die ihre Zeichnung prüft
+([[opencivil.mauerwerk.pruefen|pruefen]]), die Werte ihres Mauerwerks liest, an
+den Mindestwerten misst und nach ihrer Wahl umrechnet
 ([[opencivil.mauerwerk.kennwerte|kennwerte]]), die Pfeiler bestimmt
-([[opencivil.mauerwerk.modell#pfeiler|pfeiler]]) und die Herleitung schreibt
+([[opencivil.mauerwerk.modell#pfeiler|pfeiler]]), ihre Lasten je Lastfall und
+Kombination auf Pfeiler und Stürze verteilt
+([[opencivil.mauerwerk.lasten|lasten]]) und die Herleitung schreibt
 ([[opencivil.mauerwerk.herleitung|herleitung]]).
 
 
 ## DAS ERGEBNIS
 
-kommt als Befund in die Lösung ([[opencivil.mauerwerk.werk#Wandbefund|Wandbefund]]); Zeichnung und
-Zusammenfassung lesen es dort. Eine Wand, der etwas fehlt, ist ein Befund
-mit Meldung und keine Ausnahme: der Rest des Projekts rechnet weiter.
-
-
-## NOCH OHNE LASTEN
-
-Lastfälle und Nachweise kommen in den nächsten Schritten (Plan vom
-2026-11-27, Schritt 14 b–e). Bis dahin rechnet die Wand ihre Form und ihre
-Werte.
+kommt als Befund in die Lösung ([[opencivil.mauerwerk.werk#Wandbefund|Wandbefund]]); Zeichnung,
+Zusammenfassung und Nachweise ([[opencivil.mauerwerk.nachweise|nachweise]]) lesen
+es dort. Eine Wand, der etwas fehlt, ist ein Befund mit Meldung und keine
+Ausnahme: der Rest des Projekts rechnet weiter.
 
 ## Inhalt
 
@@ -51,6 +48,10 @@ Was die Rechnung fand: die Wand, ihr Mauerwerk, ihre Meldungen, Werte und Pfeile
 - `zum_mauerwerk: List[Meldung] = field(default_factory=list)` – Was zu Mauerwerk und Dicke zu sagen ist: Werte unter den Mindestwerten deklarierten Mauerwerks, eine unübliche Dicke – in der Maske bei ihren Feldern.
 - `gezeichnet: bool = False` – Ob ihre Zeichnung rechnet: keine Meldung zu Umriss, Öffnungen oder Stürzen hält sie auf.
 - `pfeiler: List[Pfeiler] = field(default_factory=list)` – Leer, solange sie nicht [[opencivil.mauerwerk.werk#Wandbefund|gezeichnet]] ist.
+- `g_k: float = 0.0` – Ihr Eigengewicht je m² Ansicht, in N/m².
+- `e_u: Optional[float] = None` – Die Ausmitte am Fuss in m – `None`, wo er eingespannt ist.
+- `faelle: Dict[str, Abtrag] = field(default_factory=dict)` – Je Lastfall, nach seinem Namen, was er Pfeilern und Stürzen gibt; leer, wo nichts rechnet.
+- `kombinationen: Dict[str, Abtrag] = field(default_factory=dict)` – Dasselbe je Kombination: die Summe der Lastfälle mit ihren Beiwerten.
 
 #### Wandbefund.alle_meldungen
 
@@ -121,13 +122,22 @@ Was ein Lauf rechnen muss: die Wand.
 def rechnen_und_schreiben(self, e: Eingaben, p: Protokoll) -> Ausfuehrung
 ```
 
-Die Wand geprüft, ihre Werte umgerechnet, Pfeiler bestimmt, Herleitung geschrieben.
+Die Wand geprüft, ihre Werte umgerechnet, Pfeiler bestimmt, ihre
+Lasten verteilt, Herleitung geschrieben.
+
+#### Mauerwerkswand._abtragen
+
+```python
+def _abtragen(self, befund: Wandbefund) -> None
+```
+
+Je Lastfall und Kombination, was Pfeiler und Stürze tragen – in den Befund.
 
 
 ## Konstanten
 
 - `THEMA = 'Mauerwerk'` – Unter welchem Thema ihre Herleitung in der Formelsammlung steht.
-- `VORGABEN = (Gruppe('Mauerwerk', lambda: (Feld('t', 't_w', MM, 'Dicke der Wand', …` – Was die Wand aus ihrer Beschreibung liest ([[opencivil.core.vorgaben]]).
+- `VORGABEN = (Gruppe('Mauerwerk', lambda: (Feld('t', 't_w', MM, 'Dicke der Wand', …` – Was die Wand aus ihrer Beschreibung liest ([[opencivil.core.vorgaben]]) – die Ausmitte am Fuss nur, wo er sich drehen kann.
 
 ## Braucht
 
@@ -140,6 +150,7 @@ Die Wand geprüft, ihre Werte umgerechnet, Pfeiler bestimmt, Herleitung geschrie
 - [[opencivil.material.basis]]
 - [[opencivil.mauerwerk.herleitung]]
 - [[opencivil.mauerwerk.kennwerte]]
+- [[opencivil.mauerwerk.lasten]]
 - [[opencivil.mauerwerk.modell]]
 - [[opencivil.mauerwerk.pruefen]]
 - [[opencivil.stabwerk.system]]
@@ -147,6 +158,8 @@ Die Wand geprüft, ihre Werte umgerechnet, Pfeiler bestimmt, Herleitung geschrie
 ## Gebraucht von
 
 - [[opencivil.mauerwerk.herleitung]]
+- [[opencivil.mauerwerk.nachweise]]
+- [[opencivil.mauerwerk.uebersicht]]
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.aufbau.mauerwerk]]
 - [[opencivil.web.api]]

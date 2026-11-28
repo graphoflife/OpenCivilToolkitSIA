@@ -1,5 +1,5 @@
 ---
-erzeugt: 75d26476ae0c
+erzeugt: f0be7455ceb4
 art: modul
 tags: [modul]
 ---
@@ -11,25 +11,28 @@ tags: [modul]
 
 Die Wand in Zahlen: ihre Masse und ihr Mauerwerk, wie sie gemauert und
 gehalten ist, die Bemessungswerte, mit denen sie rechnet, ihre Öffnungen
-mit den Stürzen darüber und die Pfeiler dazwischen. Zuletzt die
+mit den Stürzen darüber, die Pfeiler dazwischen und was die Lastfälle und
+Kombinationen ihnen geben ([[opencivil.mauerwerk.lasten|lasten]]). Zuletzt die
 Meldungen: rot, was falsch ist, sonst als Hinweis.
 
 
 ## EINHEITEN
 
 Masse der Wand und Orte in m, die Masse eines Sturzes in mm – wie in der
-Maske; Festigkeiten und Moduln in N/mm², wie im Material. Die Dicke der
-Wand steht im Kasten ihrer Vorgaben.
+Maske; Festigkeiten und Moduln in N/mm², wie im Material; Kräfte in kN,
+Momente in kNm. Die Dicke der Wand steht im Kasten ihrer Vorgaben.
 
 ## Inhalt
 
 ### schreiben
 
 ```python
-def schreiben(p: Protokoll, befund: 'Wandbefund') -> None
+def schreiben(p: Protokoll, befund: 'Wandbefund', e: Eingaben, basis: str) -> None
 ```
 
-Die ganze Herleitung – nichts davon geht in den Befund ein, also still gar keine.
+Die ganze Herleitung – nichts davon geht in den Befund ein, also still
+gar keine. `e` sind die Eingaben der Wand, `basis` der Anfang der
+Kennungen ihrer Zwischenwerte.
 
 ### _gemauert
 
@@ -87,21 +90,49 @@ def _pfeiler(p: Protokoll, pfeiler: List[Pfeiler]) -> None
 
 Je Pfeiler, wo er steht, wie breit er ist und zwischen welchen Öffnungen.
 
+### _lasten
+
+```python
+def _lasten(p: Protokoll, befund: 'Wandbefund', e: Eingaben, basis: str) -> None
+```
+
+Das Eigengewicht je m², dann je Lastfall und Kombination, was Pfeiler
+und Stürze tragen: die Normalkraft am Fuss jedes Pfeilers, an seinem
+Kopf die der Lasten allein und das Moment ihrer Ausmitten, und die
+Kräfte der Sturzauflager.
+
+### _tabelle
+
+```python
+def _tabelle(p: Protokoll, kopf: List[str], faelle: Dict[str, Abtrag], zeilen: Sequence[Tuple[str, Callable[[Abtrag], float]]], faktor: float, stellen: int, titel: str) -> None
+```
+
+Je Zeile ihr Name und je Fall die Zahl, die `lesen` aus seinem Abtrag liest, in SI.
+
 
 ## Konstanten
 
 - `ANNAHME = 'Eine Wand aus unbewehrtem Mauerwerk nach SIA 266:2015, gezeichnet in…` – Was die Wand annimmt – in eigenen Worten nach SIA 266:2015, 4.1.2 und 4.1.4.
+- `ABTRAG = 'Die Lasten gehen lotrecht nach unten. Was über einem Pfeiler liegt, …` – Wie die Lasten zu den Pfeilern kommen, in eigenen Worten ([[opencivil.mauerwerk.lasten|.lasten]]).
+- `ABTRAG_ANNAHME = 'Den Lastabtrag in der Wand regelt die Norm nicht; so verteilt das We…` – Woher die Regeln des Lastabtrags kommen.
 - `ZEILEN = (('f_xd', 'f_{xd}', 2), ('f_yd', 'f_{yd}', 2), ('E_xd', 'E_{xd}', 0),…` – Je Wert der Tabelle: Kurzname, Zeichen, Stellen.
 
 ## Braucht
 
+- [[opencivil.core.berechnung]]
+- [[opencivil.core.einheiten]]
 - [[opencivil.core.latex]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.sprache]]
 - [[opencivil.mauerwerk.kennwerte]]
+- [[opencivil.mauerwerk.lasten]]
 - [[opencivil.mauerwerk.modell]]
 - [[opencivil.mauerwerk.werk]]
 
 ## Gebraucht von
 
 - [[opencivil.mauerwerk.werk]]
+
+## Formeln aus diesem Modul
+
+- [[Eigengewicht der Wand je m² Ansicht, aus der Dichte ihres Mauerwerks]] · `_lasten`

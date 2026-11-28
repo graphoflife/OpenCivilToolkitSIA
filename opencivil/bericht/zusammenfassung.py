@@ -37,6 +37,7 @@ from opencivil.core.wert import Kennzahl, Wert, WertDef
 from opencivil.durchstanzen import kennwerte as durchstanzen
 from opencivil.erdbeben import ersatzkraft
 from opencivil.geotechnik import fundament, grundbruch, setzung
+from opencivil.mauerwerk import uebersicht as mauerwerkuebersicht
 from opencivil.pfahl import uebersicht as pfahluebersicht
 from opencivil.querschnitt.platte import BREITE_Y_MM, Plattenquerschnitt
 
@@ -302,6 +303,13 @@ def _pfahlangaben(teil, loesung: Loesung) -> Angaben:
             if aussen is not None or innen is not None else None)
 
 
+def _mauerwerkangaben(teil, loesung: Loesung) -> Angaben:
+    # Ein Urteil der Wand setzt ihren Befund voraus: ihre Nachweise lesen ihn.
+    befund = loesung.befunde[teil.objekt.rechnung.id]
+    return (mauerwerkuebersicht.angaben(befund),
+            mauerwerkuebersicht.wertetabelle(teil.objekt, befund))
+
+
 def _erdbebenangaben(teil, loesung: Loesung) -> Angaben:
     befund = _befund(teil, "erdbeben", loesung)
     return (ersatzkraft.angaben(teil.objekt, loesung.werte),
@@ -321,7 +329,7 @@ ANGABEN: Dict[str, Optional[Callable[[Any, Loesung], Angaben]]] = {
     "decke": None,
     "durchstanzen": _durchstanzangaben,
     "fachwerkmodell": None,
-    "mauerwerk": None,
+    "mauerwerk": _mauerwerkangaben,
     "grundbruch": _grundbruchangaben,
     "setzung": _setzungsangaben,
     "pfahl": _pfahlangaben,

@@ -25,12 +25,18 @@ Zwischen zwei Öffnungen und zwischen einer Öffnung und dem Ende der Wand
 steht ein Pfeiler, so breit wie der Abstand (:func:`pfeiler`). Öffnungen,
 die sich in der Breite überdecken -- ein Fenster über einer Türe --, bilden
 zusammen eine Lücke. Wo keine Öffnung ist, ist die ganze Wand ein Pfeiler.
+
+DIE LASTEN:
+Lotrecht, je Lastfall (:class:`Lastfall`): waagrechte Linienlasten und
+Punktlasten in der Ansicht, nach unten positiv, mit ihrer Ausmitte quer zur
+Wand -- positiv zur Seite, von der aus man die Ansicht sieht. Wie sie zu
+den Pfeilern kommen, sagt :mod:`~opencivil.mauerwerk.lasten`.
 """
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import List, Optional, Sequence, Tuple
+from dataclasses import dataclass, field
+from typing import List, Mapping, Optional, Sequence, Tuple
 
 from opencivil.core.wahl import Wahl
 from opencivil.decke.geometrie import Punkt
@@ -224,6 +230,40 @@ class Pfeiler:
 
 
 @dataclass(frozen=True)
+class Wandlast:
+    """
+    Eine lotrechte Last, nach unten positiv: ``Q`` in N, gleichmässig von
+    ``x0`` bis ``x1`` in der Höhe ``y`` -- eine Punktlast mit ``x0 = x1``.
+    ``e`` ist ihre Ausmitte in m (Dateikopf). ``name`` nennt sie in einer
+    Meldung.
+    """
+
+    name: str
+    x0: float
+    x1: float
+    y: float
+    Q: float
+    e: float = 0.0
+
+
+@dataclass(frozen=True)
+class Lastfall:
+    """Ein Lastfall der Wand: seine Lasten, und ob er ihr Eigengewicht bekommt."""
+
+    name: str
+    lasten: Tuple[Wandlast, ...] = ()
+    eigengewicht: bool = False
+
+
+@dataclass(frozen=True)
+class Kombination:
+    """Je Lastfall, nach seinem Namen, ein Beiwert. Was nicht dasteht, zählt null."""
+
+    name: str
+    faktoren: Mapping[str, float] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
 class Wand:
     """Die ganze Wand -- jede Liste in der Folge der Beschreibung."""
 
@@ -235,6 +275,8 @@ class Wand:
     fuss: Halterung = Halterung.GELENKIG
     links: Seitenrand = Seitenrand.FREI
     rechts: Seitenrand = Seitenrand.FREI
+    lastfaelle: Tuple[Lastfall, ...] = ()
+    kombinationen: Tuple[Kombination, ...] = ()
 
     @property
     def verband(self) -> bool:

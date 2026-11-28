@@ -14,6 +14,9 @@ Die Meldungen der Zeichnung einer Wand, in dieser Folge:
   zwei Stürze, die sich überschneiden: rot;
 - eine unübliche Dicke: ein Hinweis (:func:`dickenhinweis`).
 
+Wo die Lasten liegen, prüft :func:`lasten_pruefen`, sobald die Zeichnung
+rechnet: eine Last neben der Wand oder in einer Öffnung ist rot.
+
 Was nur fehlt, steht grau und hält die Rechnung an; was falsch ist, steht
 rot (Benutzer, 2026-11-19).
 
@@ -30,7 +33,7 @@ from typing import Dict, List, Optional, Tuple
 
 from opencivil.core.sprache import aufgezaehlt
 from opencivil.material.mauerwerk import MAUERWERKSSORTEN
-from opencivil.mauerwerk.modell import Oeffnung, Rechteck, Umriss, Wand
+from opencivil.mauerwerk.modell import TOLERANZ, Oeffnung, Rechteck, Umriss, Wand, Wandlast
 from opencivil.querschnitt.geometrie import GeometrieFehler, polygon_pruefen
 from opencivil.stabwerk.system import Meldung
 
@@ -102,6 +105,35 @@ def _oeffnungen(wand: Rechteck, oeffnungen: Tuple[Oeffnung, ...]) -> List[Meldun
                   for a, b in combinations(oeffnungen, 2)
                   if a.sturzflaeche().ueberlappt(b.sturzflaeche())]
     return meldungen
+
+
+def lasten_pruefen(wand: Wand) -> List[Meldung]:
+    """
+    Je Last, die nicht ganz auf der Wand oder in einer Öffnung liegt, eine
+    rote Meldung -- nur für eine Wand, deren Zeichnung rechnet. Auf dem Rand
+    einer Öffnung zählt nicht: oben liegt die Last am Sturz, unten auf der
+    Brüstung.
+    """
+    flaeche = wand.flaeche
+    meldungen: List[Meldung] = []
+    for last in (x for lf in wand.lastfaelle for x in lf.lasten):
+        if not flaeche.enthaelt(Rechteck(last.x0, last.y, last.x1, last.y)):
+            meldungen.append(Meldung(f"Die Last {last.name} liegt nicht ganz auf der Wand.",
+                                     (last.name,)))
+            continue
+        meldungen += [Meldung(f"Die Last {last.name} liegt in der Öffnung {o.name}.",
+                              (last.name, o.name))
+                      for o in wand.oeffnungen if _in_oeffnung(last, o.rechteck)]
+    return meldungen
+
+
+def _in_oeffnung(last: Wandlast, r: Rechteck) -> bool:
+    """Ob eine Last ins Innere der Öffnung ``r`` reicht -- auf ihrem Rand nicht."""
+    if not r.y0 + TOLERANZ < last.y < r.y1 - TOLERANZ:
+        return False
+    if last.x1 - last.x0 <= TOLERANZ:
+        return r.x0 + TOLERANZ < last.x0 < r.x1 - TOLERANZ
+    return min(last.x1, r.x1) - max(last.x0, r.x0) > TOLERANZ
 
 
 def _wohin(wand: Rechteck, sturz: Rechteck) -> str:

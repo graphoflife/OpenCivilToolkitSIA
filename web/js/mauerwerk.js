@@ -2,34 +2,39 @@
  * mauerwerk.js -- Mittlere Tafel: Eingaben einer Wand aus Mauerwerk, und was rechts von ihr steht.
  *
  * Oben die Wand: Bezeichnung, Zeichnung samt Liste, Beschreibung. Darunter
- * zwei Kacheln:
+ * die Kacheln:
  *
- *     Mauerwerk   das Material und die Dicke -- mit den üblichen Dicken
- *                 seiner Sorte als Schalter (`katalog.mauerwerk.dicken`) --,
- *                 wie die Wand über die Dicke gemauert ist und wie die
- *                 Stossfugen, je mit Bild; darunter, was der Kern zu
- *                 Mauerwerk und Dicke sagt
- *     Ränder      Kopf und Fuss gelenkig oder eingespannt, links und rechts
- *                 frei oder gehalten, je mit Bild
+ *     Mauerwerk     das Material und die Dicke -- mit den üblichen Dicken
+ *                   seiner Sorte als Schalter (`katalog.mauerwerk.dicken`) --,
+ *                   wie die Wand über die Dicke gemauert ist und wie die
+ *                   Stossfugen, je mit Bild; darunter, was der Kern zu
+ *                   Mauerwerk und Dicke sagt
+ *     Ränder        Kopf und Fuss gelenkig oder eingespannt -- ein gelenkiger
+ *                   Fuss mit der Ausmitte e_u --, links und rechts frei oder
+ *                   gehalten, je mit Bild
+ *     Lastfälle,    wie in Balkensystem und Decke (lastfaelle.js); die Lasten
+ *     Kombinationen zeichnet man im Zeichenfenster
  *
- * Die Dicke ist eine Vorgabe der Rechnung: Feld, Zeichen und Kachel kommen
- * aus dem Kern (`katalog.vorgaben.mauerwerk`, opencivil/mauerwerk/werk.py).
+ * Dicke und Ausmitte sind Vorgaben der Rechnung: Felder, Zeichen und
+ * Kacheln kommen aus dem Kern (`katalog.vorgaben.mauerwerk`,
+ * opencivil/mauerwerk/werk.py).
  *
  * Rechts im Reiter «Diagramme» die Ansicht der Wand mit Öffnungen, Stürzen,
- * Rändern und Pfeilern; in der Zusammenfassung die Bemessungswerte, die
- * Öffnungen und die Pfeiler. Gerechnet wird im Kern (opencivil/mauerwerk);
- * hier stehen nur seine Zahlen. Lasten und Nachweise kommen mit den
- * nächsten Schritten.
+ * Rändern, Pfeilern und ihren Urteilen; die Zusammenfassung ist die jedes
+ * Bauteils mit Nachweisen, mit Angaben und Bemessungswerten der Wand
+ * darüber (opencivil/mauerwerk/uebersicht.py). Gerechnet wird im Kern
+ * (opencivil/mauerwerk); hier stehen nur seine Zahlen.
  */
 
 import {
   beschreibung, bezeichnung, eingabegruppen, erklaerung, feld, fehlendesMaterial, karte, materialliste,
-  meldungshinweise, mitBild, panel, tabelle, wahlBlock, wahlSchalter,
+  meldungshinweise, mitBild, panel, wahlBlock, wahlSchalter,
 } from './bausteine.js';
 import { zahlText } from './cad_ansicht.js';
 import { listengruppen, listenzeilen, meldungsliste } from './cad_app.js';
 import { el, leerzustand } from './dom.js';
 import { gruppenkapitel, kapitelFenster, kapitelPanel } from './kapitel.js';
+import { lastenKapitel, lastfallWaehlen } from './lastfaelle.js';
 import { wandBild, wandLegende } from './mw_bild.js';
 import { zeichenbereich } from './mw_zeichnung.js';
 import {
@@ -42,7 +47,10 @@ const HILFE = {
     ['Wand', 'ihr Umriss, ein Rechteck aus zwei Ecken – eine schräge Krone, etwa die eines Giebels, rechnet das Werkzeug noch nicht'],
     ['Öffnung', 'eine Türe oder ein Fenster, ebenso ein Rechteck; über jeder liegt ein Sturz, so breit wie sie und auf jeder Seite um a länger'],
     ['Pfeiler', 'das Mauerwerk zwischen zwei Öffnungen und zwischen einer Öffnung und dem Ende der Wand – Öffnungen übereinander bilden zusammen eine Lücke'],
-    ['Lasten', 'kommen mit den Nachweisen'],
+    ['Linienlast', 'waagrecht von Punkt zu Punkt, etwa eine Decke; mit ihrer Ausmitte e quer zur Wand'],
+    ['Punktlast', 'an einem Knoten, etwa ein Träger; ebenso mit Ausmitte'],
+    ['Lastfall', 'die Lasten gehören zu dem, der in der Leiste über der Zeichnung gewählt ist – wie sie zu den Pfeilern kommen, sagt die Herleitung'],
+    ['Farben', 'jeder Pfeiler und jedes Sturzauflager in der Farbe seines Urteils, mit dem Erfüllungsgrad der ungünstigsten Kombination'],
   ],
 };
 
@@ -67,6 +75,7 @@ const HILFE_MAUERWERK = hilfeMit([
 
 const HILFE_RAENDER = hilfeMit([
   ['Kopf und Fuss', 'gelenkig oder eingespannt'],
+  ['e_u', 'nur bei gelenkigem Fuss: so weit neben der Mitte der Wand steht die Normalkraft an ihm'],
   ['Links und rechts', 'frei oder gehalten – gehaltene Ränder tragen nur Querlast ab'],
 ], ['halterung', 'seitenrand']);
 
@@ -88,11 +97,19 @@ function masse(eintrag, knoten) {
 // Unter der Zeichnung
 // ===========================================================================
 
-/** Meldungen des Kerns und je Teil eine Zeile (cad_app.js): ein Klick wählt im Fenster. */
+/**
+ * Meldungen des Kerns und je Teil eine Zeile (cad_app.js): ein Klick wählt
+ * im Fenster -- eine Last zeigt es dazu in ihrem Lastfall.
+ */
 function liste(a) {
   const w = eintragVon(a.mw.kennung);
   if (!w) return [];
   const zeile = listenzeilen(a);
+  const fall = (lf) => w.lastfaelle.find((x) => x.kennung === lf)?.name || 'kein Lastfall';
+  const last = (e, was, wert) => zeile({
+    kennung: e.kennung, was, wert: `${wert} · ${fall(e.lastfall)}`, vorher: () => lastfallWaehlen(a, a.mw, e.lastfall),
+  });
+  const ausmitte = (e) => (e.e ? `, e = ${zahlText(e.e, 0)} mm` : '');
   return [
     meldungsliste(a),
     ...listengruppen(a, [
@@ -100,6 +117,10 @@ function liste(a) {
       ['Öffnungen', w.oeffnungen.map((o) => zeile({
         kennung: o.kennung, was: masse(w, o.knoten), wert: wortVon('sturz', o.sturz),
       }))],
+      ['Lasten', [
+        ...w.linienlasten.map((e) => last(e, `${e.von} → ${e.bis}`, `q = ${zahlText(e.wert, 1)} kN/m${ausmitte(e)}`)),
+        ...w.punktlasten.map((e) => last(e, `an ${e.knoten}`, `Q = ${zahlText(e.wert, 1)} kN${ausmitte(e)}`)),
+      ]],
     ]),
   ];
 }
@@ -147,30 +168,34 @@ function dickenWahl(w) {
   }));
 }
 
-/** Die Kachel «Ränder»: wie die Wand an ihren vier Rändern gehalten ist. */
-function raenderKapitel(w) {
-  return {
-    schluessel: 'mw-raender', name: 'Ränder', titel: 'Ränder', hilfe: HILFE_RAENDER,
-    inhalt: () => [karte('', [
+/**
+ * Die Kachel «Ränder» aus der Gruppe der Vorgaben des Kerns: wie die Wand an
+ * ihren vier Rändern gehalten ist -- die Ausmitte am Fuss steht gleich unter
+ * seinem Schalter, wo er gelenkig ist.
+ */
+function raenderKapitel(w, vorgaben) {
+  return gruppenkapitel(vorgaben, 'Ränder', {
+    zeichen: 'mw-raender', hilfe: HILFE_RAENDER, werte: ['e_u'],
+    wort: `Kopf ${wortVon('halterung', w.kopf)}, Fuss ${wortVon('halterung', w.fuss)}; `
+      + `links ${wortVon('seitenrand', w.links)}, rechts ${wortVon('seitenrand', w.rechts)}`,
+    vor: [
       wahlBlock('Kopf', schalter(w, 'kopf', 'halterung', 'Wie die Wand oben gehalten ist')),
       wahlBlock('Fuss', schalter(w, 'fuss', 'halterung', 'Wie die Wand unten gehalten ist')),
+    ],
+    nach: [
       wahlBlock('Links', schalter(w, 'links', 'seitenrand', 'Ob eine Querwand den linken Rand hält')),
       wahlBlock('Rechts', schalter(w, 'rechts', 'seitenrand', 'Ob eine Querwand den rechten Rand hält')),
       el('p.karte-hinweis', {
         text: 'Gehaltene Ränder links und rechts tragen nur Querlast ab, über ein waagrechtes Gewölbe.',
       }),
-    ])],
-    stand: () => ({
-      an: true,
-      text: `Kopf ${wortVon('halterung', w.kopf)}, Fuss ${wortVon('halterung', w.fuss)}; `
-        + `links ${wortVon('seitenrand', w.links)}, rechts ${wortVon('seitenrand', w.rechts)}`,
-    }),
-  };
+    ],
+  });
 }
 
 /**
- * Die Kacheln: «Mauerwerk» aus der Gruppe der Vorgaben des Kerns, mit
- * Material und Schaltern um die Dicke herum, und «Ränder».
+ * Die Kacheln: «Mauerwerk» und «Ränder» aus den Gruppen der Vorgaben des
+ * Kerns, mit Material und Schaltern um ihre Felder herum, dann Lastfälle
+ * und Kombinationen.
  */
 function kapitel(w) {
   const aendern = (veraenderer) => eintragAendern(w.kennung, veraenderer);
@@ -192,10 +217,13 @@ function kapitel(w) {
       ],
       fehlt: fehlendesMaterial('mauerwerk', w.material),
     }),
-    raenderKapitel(w),
+    raenderKapitel(w, vorgaben),
   ];
   vorgaben.vollstaendig();
-  return [{ titel: '', kapitel: kacheln.filter(Boolean) }];
+  return [{ titel: '', kapitel: kacheln.filter(Boolean) }, lastenKapitel({
+    lastenVon: (x, lf) => [...x.linienlasten, ...x.punktlasten].filter((e) => e.lastfall === lf).length,
+    eigengewicht: { text: 'ρ · g · t_w', titel: 'Die Dichte des Mauerwerks mal g = 10 m/s² mal die Dicke der Wand, je m² Ansicht' },
+  })];
 }
 
 export function mauerwerkEditor(w) {
@@ -211,15 +239,15 @@ export function mauerwerkFenster(w, schluessel) {
 // Rechts: Diagramme und Zusammenfassung
 // ===========================================================================
 
-/** Eine frische Wand, in Diagrammen und Zusammenfassung gleich. */
+/** Eine frische Wand, in den Diagrammen. */
 function ohneWand() {
   return karte(null, [leerzustand('Noch keine Wand.', 'Zeichnen im Fenster mit «Wand».')]);
 }
 
 /**
  * Die Karte einer Wand im Reiter «Diagramme»: die Ansicht mit Öffnungen,
- * Stürzen, Rändern und den Massen der Pfeiler -- darüber, was der Kern
- * meldet. Das Panel darum baut bericht.js.
+ * Stürzen, Rändern, den Massen der Pfeiler und den Urteilen -- darüber, was
+ * der Kern meldet. Das Panel darum baut bericht.js.
  */
 export function mauerwerkKarten(kennung) {
   const w = eintragVon(kennung);
@@ -229,48 +257,4 @@ export function mauerwerkKarten(kennung) {
   return [karte('Ansicht', [
     ...meldungshinweise(daten?.meldungen), el('div.gb-bildhuelle', {}, [bild]), wandLegende(katalog('mauerwerk')),
   ], { bild, klasse: 'ist-breit' })];
-}
-
-/** Die Bemessungswerte des Mauerwerks und die der Wand -- im Verband mit dem Faktor. */
-function werteKarte(werte) {
-  const verband = werte.faktor !== 1;
-  return karte('Bemessungswerte', [
-    tabelle(['', `${werte.mauerwerk} [N/mm²]`, 'Wand [N/mm²]'], werte.zeilen.map((z) => [
-      z.zeichen, zahlText(z.mauerwerk, z.stellen), zahlText(z.wand, z.stellen)])),
-    el('p.karte-hinweis', {
-      text: verband ? `Im Verband gelten die Werte des Mauerwerks mal ${zahlText(werte.faktor, 2)} – μ_d ohne Einheit und ohne Faktor.`
-        : 'μ_d ohne Einheit.',
-    }),
-  ]);
-}
-
-/** Die Öffnungen, wie sie gezeichnet sind, mit dem Sturz über jeder. */
-function oeffnungenKarte(w) {
-  return karte('Öffnungen', [tabelle(['Öffnung', 'b × h', 'Sturz', 'h_St [mm]', 'a [mm]'],
-    w.oeffnungen.map((o) => [o.kennung, masse(w, o.knoten), wortVon('sturz', o.sturz), zahlText(o.h_St, 0),
-      zahlText(o.a, 0)]))]);
-}
-
-/** Die Pfeiler, wie der Kern sie bestimmt: wo sie stehen und wie breit sie sind. */
-function pfeilerKarte(pfeiler) {
-  return karte('Pfeiler', [tabelle(['Pfeiler', 'links – rechts [m]', 'b [m]'],
-    pfeiler.map((e) => [e.name, `${zahlText(e.x0, 2)} – ${zahlText(e.x1, 2)}`, zahlText(e.b, 2)]))]);
-}
-
-/**
- * Die Zusammenfassung einer Wand: was der Kern meldet, die Bemessungswerte,
- * die Öffnungen und die Pfeiler. Das Panel darum baut bericht.js.
- */
-export function mauerwerkZusammenfassung(kennung) {
-  const w = eintragVon(kennung);
-  const daten = zeichendaten(kennung);
-  if (!w?.waende.length) return [ohneWand()];
-  if (!daten) return [karte(null, [leerzustand('Noch nicht gerechnet.')])];
-  const meldungen = meldungshinweise(daten.meldungen);
-  return [
-    meldungen.length ? karte('Wand', meldungen) : null,
-    daten.werte ? werteKarte(daten.werte) : null,
-    w.oeffnungen.length ? oeffnungenKarte(w) : null,
-    daten.pfeiler.length ? pfeilerKarte(daten.pfeiler) : null,
-  ].filter(Boolean);
 }

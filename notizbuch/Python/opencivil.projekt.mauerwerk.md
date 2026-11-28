@@ -1,5 +1,5 @@
 ---
-erzeugt: f8a1f0dd77be
+erzeugt: ff45dfa49ca0
 art: modul
 tags: [modul]
 ---
@@ -10,11 +10,13 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Der [[opencivil.projekt.mauerwerk#MauerwerkEintrag|MauerwerkEintrag]]: eine Wand in der Ansicht, gezeichnet aus
-Knoten – ihr Umriss, Türen und Fenster mit dem Sturz darüber –, dazu ihr
-Mauerwerk, ihre Dicke, wie sie gemauert ist und wie ihre Ränder gehalten
-sind. Als speicherbare Datenklasse wie das Fachwerkmodell
-([[opencivil.projekt.fachwerkmodell]]), mit dem Baukasten, der ohne
-Oberfläche zeichnet. Gerechnet wird in [[opencivil.mauerwerk]].
+Knoten – ihr Umriss, Türen und Fenster mit dem Sturz darüber, ihre Linien-
+und Punktlasten –, dazu ihr Mauerwerk, ihre Dicke, wie sie gemauert ist und
+wie ihre Ränder gehalten sind, und ihre Lastfälle und Kombinationen wie in
+der Decke ([[opencivil.projekt.faelle]]). Als speicherbare Datenklasse
+wie das Fachwerkmodell ([[opencivil.projekt.fachwerkmodell]]), mit dem
+Baukasten, der ohne Oberfläche zeichnet. Gerechnet wird in
+[[opencivil.mauerwerk]].
 
 
 ## ALLES HÄNGT AN KNOTEN
@@ -26,9 +28,10 @@ Ecken genau aufeinander, teilen sie einen Knoten
 
 ## KOORDINATEN UND EINHEITEN
 
-x nach rechts, y nach oben, in m – wie in der Decke. Die Dicke der Wand
-und die Masse eines Sturzes in mm, wie man sie auf dem Plan liest.
-Umgerechnet wird beim Bauen.
+x nach rechts, y nach oben, in m – wie in der Decke. Die Dicke der Wand,
+die Masse eines Sturzes und die Ausmitten in mm, wie man sie auf dem Plan
+liest; Lasten in kN/m und kN, nach unten positiv. Eine Ausmitte ist positiv
+zur Seite, von der aus man die Ansicht sieht. Umgerechnet wird beim Bauen.
 
 ## Inhalt
 
@@ -72,11 +75,42 @@ Eine Türe oder ein Fenster, mit dem Sturz darüber.
 - `h_St: float = bereich(200.0, heisst='Sturzhöhe h_St', einheit=MM, ueber=0.0)`
 - `a: float = bereich(150.0, heisst='Auflagerlänge a', einheit=MM, ueber=0.0)` – Wie weit der Sturz auf jeder Seite auf dem Mauerwerk liegt.
 
+### WandlinienlastEintrag
+
+```python
+@dataclass
+class WandlinienlastEintrag(Beschreibung)
+```
+
+Eine waagrechte Linienlast von Knoten zu Knoten, in einem Lastfall: eine Decke darauf.
+
+- `kennung: str = ''`
+- `lastfall: str = ''`
+- `von: str = ''`
+- `bis: str = ''`
+- `wert: float = bereich(10.0, heisst='q', einheit=KN_PRO_M)`
+- `e: float = bereich(0.0, heisst='Ausmitte e', einheit=MM)`
+
+### WandpunktlastEintrag
+
+```python
+@dataclass
+class WandpunktlastEintrag(Beschreibung)
+```
+
+Eine Einzellast an einem Knoten, in einem Lastfall – ein Träger, der aufliegt, etwa.
+
+- `kennung: str = ''`
+- `lastfall: str = ''`
+- `knoten: str = ''`
+- `wert: float = bereich(50.0, heisst='Q', einheit=KN)`
+- `e: float = bereich(0.0, heisst='Ausmitte e', einheit=MM)`
+
 ### MauerwerkEintrag
 
 ```python
 @dataclass
-class MauerwerkEintrag(BauteilEintrag)
+class MauerwerkEintrag(MitFaellen, BauteilEintrag)
 ```
 
 Eine Wand aus Mauerwerk. Ohne Regeln, die das ganze Projekt aufhielten:
@@ -96,9 +130,14 @@ Bauteile rechnen weiter.
 - `fuss: Halterung = Halterung.GELENKIG`
 - `links: Seitenrand = Seitenrand.FREI`
 - `rechts: Seitenrand = Seitenrand.FREI`
+- `e_u: float = bereich(0.0, heisst='Ausmitte am Fuss e_u', einheit=MM)` – Nur bei gelenkigem Fuss.
 - `knoten: List[WandknotenEintrag] = field(default_factory=list)`
 - `waende: List[WandEintrag] = field(default_factory=list)`
 - `oeffnungen: List[OeffnungEintrag] = field(default_factory=list)`
+- `linienlasten: List[WandlinienlastEintrag] = field(default_factory=list)`
+- `punktlasten: List[WandpunktlastEintrag] = field(default_factory=list)`
+- `lastfaelle: List[LastfallEintrag] = field(default_factory=list)`
+- `kombinationen: List[LastkombinationEintrag] = field(default_factory=list)`
 - `beschreibung: str = ''` – Freier Text – geht in keine Rechnung ein.
 
 #### MauerwerkEintrag.materialien
@@ -137,6 +176,34 @@ def oeffnung(self, ecken: Sequence[Ort], **felder: Any) -> OeffnungEintrag
 
 Eine Öffnung mit diesen Ecken – `sturz`, `h_St` und `a` in mm als Stichwort.
 
+#### MauerwerkEintrag.linienlast
+
+```python
+def linienlast(self, lastfall: Any, von: Ort, bis: Ort, **felder: Any) -> WandlinienlastEintrag
+```
+
+Eine waagrechte Linienlast im Lastfall `lastfall` (Eintrag oder
+Kennung) – `wert` in kN/m und `e` in mm als Stichwort.
+
+#### MauerwerkEintrag.punktlast
+
+```python
+def punktlast(self, lastfall: Any, ort: Ort, **felder: Any) -> WandpunktlastEintrag
+```
+
+Eine Punktlast im Lastfall `lastfall`, `wert` in kN und `e` in mm als Stichwort.
+
+#### MauerwerkEintrag.neu
+
+```python
+@classmethod
+def neu(cls, kennung: str, name: str) -> 'MauerwerkEintrag'
+```
+
+Eine frische Wand, wie der Benutzer sie angelegt bekommt: ohne
+Zeichnung, mit den Lastfällen und Kombinationen einer frischen Decke –
+das Eigengewicht kommt von selbst.
+
 ### rechteck
 
 ```python
@@ -149,13 +216,14 @@ Die vier Ecken eines Rechtecks, wie die Werkzeuge «Wand» und «Öffnung» sie 
 ## Konstanten
 
 - `Ort = Union[str, Sequence[float]]` – Ein Ort im Baukasten: die Kennung eines Knotens oder `(x, y)` in m.
-- `VORSILBEN = {'waende': 'W', 'oeffnungen': 'O'}` – Womit die Kennungen der Teile einer Wand beginnen.
+- `VORSILBEN = {'waende': 'W', 'oeffnungen': 'O', 'linienlasten': 'LL', 'punktlasten…` – Womit die Kennungen der Teile einer Wand beginnen – die Lasten wie in der Decke.
 
 ## Braucht
 
 - [[opencivil.core.einheiten]]
 - [[opencivil.mauerwerk.modell]]
 - [[opencivil.projekt.eintraege]]
+- [[opencivil.projekt.faelle]]
 - [[opencivil.projekt.lesen]]
 - [[opencivil.projekt.netz]]
 

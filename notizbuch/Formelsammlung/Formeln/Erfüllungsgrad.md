@@ -1,5 +1,5 @@
 ---
-erzeugt: 65349e1e833b
+erzeugt: 0bdc2fdfca1e
 art: formel
 tags: [formel]
 ---
@@ -61,6 +61,7 @@ $$
 - [[Verbundstütze]]
 - [[Blechverbunddecke]]
 - [[Durchstanzen]]
+- [[Mauerwerk]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

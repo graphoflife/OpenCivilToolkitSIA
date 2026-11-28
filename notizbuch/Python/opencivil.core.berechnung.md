@@ -1,5 +1,5 @@
 ---
-erzeugt: 3cf90547f228
+erzeugt: 62b420af1f42
 art: modul
 tags: [modul]
 ---
@@ -476,6 +476,8 @@ Die Kennzahl `kurz` mit dem Wert `si` in SI-Basis – auch in `ergebnis`.
 - [[opencivil.geotechnik.setzung]]
 - [[opencivil.geotechnik.wasser]]
 - [[opencivil.material.basis]]
+- [[opencivil.mauerwerk.herleitung]]
+- [[opencivil.mauerwerk.nachweise]]
 - [[opencivil.mauerwerk.werk]]
 - [[opencivil.nachweis.biegung_normalkraft]]
 - [[opencivil.nachweis.duktilitaet]]

@@ -113,7 +113,7 @@ export const ARTEN = [
     bezeichnung: 'Wand aus Mauerwerk',
     einzahl: 'Wand',
     leer: 'keine Wand',
-    nachweise: false,
+    nachweise: true,
   },
   {
     art: 'grundbruch',

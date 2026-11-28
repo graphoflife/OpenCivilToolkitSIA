@@ -1,5 +1,5 @@
 ---
-erzeugt: 863b3e9e40a9
+erzeugt: b7a919616225
 art: modul
 tags: [modul]
 ---
@@ -490,6 +490,7 @@ Das Urteil eines Teils: sein Grad, sein Name, Ausgang und Begruendung.
 - [[opencivil.geotechnik.gleiten]]
 - [[opencivil.geotechnik.grundbruch]]
 - [[opencivil.geotechnik.setzung]]
+- [[opencivil.mauerwerk.nachweise]]
 - [[opencivil.nachweis.biegung_normalkraft]]
 - [[opencivil.nachweis.duktilitaet]]
 - [[opencivil.nachweis.fehlende_bewehrung]]
@@ -519,6 +520,7 @@ Das Urteil eines Teils: sein Grad, sein Name, Ausgang und Begruendung.
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.web.durchstanzdaten]]
 - [[opencivil.web.erdbebendaten]]
+- [[opencivil.web.mauerwerkdaten]]
 
 ## Formeln aus diesem Modul
 

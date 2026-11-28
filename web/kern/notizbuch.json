@@ -514,6 +514,17 @@
       ]
     },
     {
+      "name": "Ausmitte am Kopf – sie bleibt, wenn die Lasten wachsen",
+      "pfad": "Formelsammlung/Formeln/Ausmitte am Kopf – sie bleibt, wenn die Lasten wachsen.md",
+      "art": "formel",
+      "zeichen": [
+        "e_o"
+      ],
+      "themen": [
+        "Mauerwerk"
+      ]
+    },
+    {
       "name": "Äusserer Widerstand auf Druck",
       "pfad": "Formelsammlung/Formeln/Äusserer Widerstand auf Druck.md",
       "art": "formel",
@@ -629,6 +640,17 @@
         "Biegung und Normalkraft",
         "Zwängung auf Biegung",
         "Spannung-Dehnung-Analyse"
+      ]
+    },
+    {
+      "name": "Beiwert der Teilflächenpressung im Mauerwerk",
+      "pfad": "Formelsammlung/Formeln/Beiwert der Teilflächenpressung im Mauerwerk.md",
+      "art": "formel",
+      "zeichen": [
+        "k_m"
+      ],
+      "themen": [
+        "Mauerwerk"
       ]
     },
     {
@@ -1194,6 +1216,17 @@
       ]
     },
     {
+      "name": "Bezugswert der Knicklänge einer Wand",
+      "pfad": "Formelsammlung/Formeln/Bezugswert der Knicklänge einer Wand.md",
+      "art": "formel",
+      "zeichen": [
+        "h_{Ed}"
+      ],
+      "themen": [
+        "Mauerwerk"
+      ]
+    },
+    {
       "name": "Biegebewehrung im Stützstreifen je Meter",
       "pfad": "Formelsammlung/Formeln/Biegebewehrung im Stützstreifen je Meter.md",
       "art": "formel",
@@ -1698,6 +1731,17 @@
       ]
     },
     {
+      "name": "Eigengewicht der Wand je m² Ansicht, aus der Dichte ihres Mauerwerks",
+      "pfad": "Formelsammlung/Formeln/Eigengewicht der Wand je m² Ansicht, aus der Dichte ihres Mauerwerks.md",
+      "art": "formel",
+      "zeichen": [
+        "g_k"
+      ],
+      "themen": [
+        "Mauerwerk"
+      ]
+    },
+    {
       "name": "Eigengewicht eines Stabs",
       "pfad": "Formelsammlung/Formeln/Eigengewicht eines Stabs.md",
       "art": "formel",
@@ -1814,7 +1858,8 @@
         "Verbundquerschnitt",
         "Verbundstütze",
         "Blechverbunddecke",
-        "Durchstanzen"
+        "Durchstanzen",
+        "Mauerwerk"
       ]
     },
     {
@@ -1955,6 +2000,17 @@
       ],
       "themen": [
         "Innerer Pfahlwiderstand"
+      ]
+    },
+    {
+      "name": "Fläche des Auflagers",
+      "pfad": "Formelsammlung/Formeln/Fläche des Auflagers.md",
+      "art": "formel",
+      "zeichen": [
+        "A_0"
+      ],
+      "themen": [
+        "Mauerwerk"
       ]
     },
     {
@@ -2470,6 +2526,15 @@
       ]
     },
     {
+      "name": "Gleichgewicht der verformten Wand – Ausmitte der Last und Auslenkung w",
+      "pfad": "Formelsammlung/Formeln/Gleichgewicht der verformten Wand – Ausmitte der Last und Auslenkung w.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Mauerwerk"
+      ]
+    },
+    {
       "name": "Gleichmässiger Druck, ohne Bewehrung",
       "pfad": "Formelsammlung/Formeln/Gleichmässiger Druck, ohne Bewehrung.md",
       "art": "formel",
@@ -2530,6 +2595,15 @@
       "zeichen": [],
       "themen": [
         "Spannung-Dehnung-Analyse"
+      ]
+    },
+    {
+      "name": "Grenze der Ausmitte einer Wand aus Mauerwerk",
+      "pfad": "Formelsammlung/Formeln/Grenze der Ausmitte einer Wand aus Mauerwerk.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Mauerwerk"
       ]
     },
     {
@@ -3040,6 +3114,15 @@
       ]
     },
     {
+      "name": "Krümmung einer Wand aus Mauerwerk",
+      "pfad": "Formelsammlung/Formeln/Krümmung einer Wand aus Mauerwerk.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Mauerwerk"
+      ]
+    },
+    {
       "name": "Krümmungsbeiwert der Spannungs-Dehnungs-Beziehung",
       "pfad": "Formelsammlung/Formeln/Krümmungsbeiwert der Spannungs-Dehnungs-Beziehung.md",
       "art": "formel",
@@ -3517,6 +3600,17 @@
       ],
       "themen": [
         "Innerer Pfahlwiderstand quer"
+      ]
+    },
+    {
+      "name": "Normalkraftwiderstand eines Pfeilers aus Mauerwerk",
+      "pfad": "Formelsammlung/Formeln/Normalkraftwiderstand eines Pfeilers aus Mauerwerk.md",
+      "art": "formel",
+      "zeichen": [
+        "N_{xRd}"
+      ],
+      "themen": [
+        "Mauerwerk"
       ]
     },
     {
@@ -5333,6 +5427,17 @@
       "zeichen": [],
       "themen": [
         "Querkraft und Torsion"
+      ]
+    },
+    {
+      "name": "Widerstand eines Sturzauflagers",
+      "pfad": "Formelsammlung/Formeln/Widerstand eines Sturzauflagers.md",
+      "art": "formel",
+      "zeichen": [
+        "R_{Rd}"
+      ],
+      "themen": [
+        "Mauerwerk"
       ]
     },
     {
@@ -8129,7 +8234,9 @@
         "_wertzeile",
         "_oeffnungen",
         "_von_bis",
-        "_pfeiler"
+        "_pfeiler",
+        "_lasten",
+        "_tabelle"
       ]
     },
     {
@@ -8142,6 +8249,46 @@
         "quelle",
         "wandwerte",
         "unter_mindestwerten"
+      ]
+    },
+    {
+      "name": "opencivil.mauerwerk.knicken",
+      "pfad": "Python/opencivil.mauerwerk.knicken.md",
+      "art": "modul",
+      "kurz": "ein Pfeiler unter Normalkraft nach Theorie 2. Ordnung.",
+      "stichworte": [
+        "g",
+        "_dg",
+        "grenze",
+        "Zustand",
+        "Zustand.stelle",
+        "Zustand.e_max",
+        "Zustand.hoehe",
+        "Zustand.e_u",
+        "Zustand.e_o",
+        "Knickergebnis",
+        "_Wand",
+        "_Wand.ausmitten",
+        "_Wand.loesen",
+        "k_N",
+        "_k_N"
+      ]
+    },
+    {
+      "name": "opencivil.mauerwerk.lasten",
+      "pfad": "Python/opencivil.mauerwerk.lasten.md",
+      "art": "modul",
+      "kurz": "wie die Lasten einer Wand zu ihren Pfeilern kommen.",
+      "stichworte": [
+        "Abtrag",
+        "leer",
+        "kombinieren",
+        "_Wand",
+        "_Wand.sturz_unter",
+        "_Wand.pfeiler_bei",
+        "_Wand.stuecke",
+        "_Wand.mauerwerk",
+        "abtragen"
       ]
     },
     {
@@ -8177,11 +8324,41 @@
         "Oeffnung.sturzflaeche",
         "Pfeiler",
         "Pfeiler.b",
+        "Wandlast",
+        "Lastfall",
+        "Kombination",
         "Wand",
         "Wand.verband",
         "Wand.vollfugig",
         "Wand.flaeche",
         "pfeiler"
+      ]
+    },
+    {
+      "name": "opencivil.mauerwerk.nachweise",
+      "pfad": "Python/opencivil.mauerwerk.nachweise.md",
+      "art": "modul",
+      "kurz": "die Nachweise einer Wand: Normalkraft und Teilflächen.",
+      "stichworte": [
+        "Stelle",
+        "Stelle.name",
+        "Stelle.kennung",
+        "Stellenausgang",
+        "Wandnachweis",
+        "Wandnachweis.pruefe",
+        "Wandnachweis.ansatz",
+        "Wandnachweis.stelle",
+        "Wandnachweis.vergleichen",
+        "Wandnachweis.satz",
+        "Normalkraft",
+        "Normalkraft.ansatz",
+        "Normalkraft.stelle",
+        "Normalkraft._kopf",
+        "_wo",
+        "_grenze_text",
+        "Teilflaechen",
+        "Teilflaechen.ansatz",
+        "Teilflaechen.stelle"
       ]
     },
     {
@@ -8193,8 +8370,20 @@
         "pruefen",
         "_umriss",
         "_oeffnungen",
+        "lasten_pruefen",
+        "_in_oeffnung",
         "_wohin",
         "dickenhinweis"
+      ]
+    },
+    {
+      "name": "opencivil.mauerwerk.uebersicht",
+      "pfad": "Python/opencivil.mauerwerk.uebersicht.md",
+      "art": "modul",
+      "kurz": "was die Zusammenfassung einer Wand über ihren Nachweisen zeigt.",
+      "stichworte": [
+        "angaben",
+        "wertetabelle"
       ]
     },
     {
@@ -8212,7 +8401,8 @@
         "Mauerwerkswand.baustoffe",
         "Mauerwerkswand.abschnitt",
         "Mauerwerkswand.ziele",
-        "Mauerwerkswand.rechnen_und_schreiben"
+        "Mauerwerkswand.rechnen_und_schreiben",
+        "Mauerwerkswand._abtragen"
       ]
     },
     {
@@ -9885,7 +10075,8 @@
       "kurz": "eine Mauerwerkswand wird Rechnung.",
       "stichworte": [
         "wand_von",
-        "bauen"
+        "bauen",
+        "_nachweise"
       ]
     },
     {
@@ -10348,12 +10539,17 @@
         "WandknotenEintrag",
         "WandEintrag",
         "OeffnungEintrag",
+        "WandlinienlastEintrag",
+        "WandpunktlastEintrag",
         "MauerwerkEintrag",
         "MauerwerkEintrag.materialien",
         "MauerwerkEintrag.lagen",
         "MauerwerkEintrag.netz",
         "MauerwerkEintrag.wand",
         "MauerwerkEintrag.oeffnung",
+        "MauerwerkEintrag.linienlast",
+        "MauerwerkEintrag.punktlast",
+        "MauerwerkEintrag.neu",
         "rechteck"
       ]
     },
@@ -12786,8 +12982,9 @@
       "kurz": "was die Oberflaeche von einer Wand aus Mauerwerk zeichnet.",
       "stichworte": [
         "zeichnung",
+        "urteile",
+        "_massgebend",
         "uebersicht",
-        "_werte",
         "unfertig",
         "katalog"
       ]

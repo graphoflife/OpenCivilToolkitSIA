@@ -1,5 +1,5 @@
 ---
-erzeugt: 4a59e13c516f
+erzeugt: 24de287a76e2
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -123,8 +123,12 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
 - [[opencivil.mauerwerk]] – Wände aus unbewehrtem Mauerwerk nach SIA 266:2015.
     - [[opencivil.mauerwerk.herleitung]] – wie eine Mauerwerkswand ihre Rechnung aufschreibt.
     - [[opencivil.mauerwerk.kennwerte]] – mit welchen Werten ihres Mauerwerks eine Wand rechnet.
+    - [[opencivil.mauerwerk.knicken]] – ein Pfeiler unter Normalkraft nach Theorie 2. Ordnung.
+    - [[opencivil.mauerwerk.lasten]] – wie die Lasten einer Wand zu ihren Pfeilern kommen.
     - [[opencivil.mauerwerk.modell]] – eine Mauerwerkswand in der Ansicht, in SI.
+    - [[opencivil.mauerwerk.nachweise]] – die Nachweise einer Wand: Normalkraft und Teilflächen.
     - [[opencivil.mauerwerk.pruefen]] – was einer Wand fehlt oder an ihr nicht stimmt.
+    - [[opencivil.mauerwerk.uebersicht]] – was die Zusammenfassung einer Wand über ihren Nachweisen zeigt.
     - [[opencivil.mauerwerk.werk]] – eine Mauerwerkswand im Rechenwerk.
 - [[opencivil.mcp]] – das Werkzeug fuer eine KI, ueber das Model Context Protocol.
     - [[opencivil.mcp.__main__]] – startet den Server: `python3 -m opencivil.mcp`.

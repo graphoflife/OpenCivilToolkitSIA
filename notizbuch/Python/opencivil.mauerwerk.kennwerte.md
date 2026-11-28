@@ -1,5 +1,5 @@
 ---
-erzeugt: c83fca693391
+erzeugt: 79d150c38162
 art: modul
 tags: [modul]
 ---
@@ -80,5 +80,5 @@ eine rote Meldung – `name` ist der des Mauerwerks.
 ## Gebraucht von
 
 - [[opencivil.mauerwerk.herleitung]]
+- [[opencivil.mauerwerk.uebersicht]]
 - [[opencivil.mauerwerk.werk]]
-- [[opencivil.web.mauerwerkdaten]]

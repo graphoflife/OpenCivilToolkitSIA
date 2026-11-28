@@ -141,7 +141,8 @@ class Aufbau:
                       "qa_verbund_stuetze", "qa_blech", "qa_blech_schub", "qa_holz",
                       "qa_holz_schub", "qa_holz_stabilitaet",
                       "durchstanzen", "grundbruch", "gleiten", "setzung", "pfahl_aussen",
-                      "pfahl_innen", "pfahl_quer", "pfahl_innen_quer", "erdbeben")
+                      "pfahl_innen", "pfahl_quer", "pfahl_innen_quer", "erdbeben",
+                      "mw_normalkraft", "mw_teilflaechen")
 
     # -- Die Objekte je Bauteilart: Sichten auf die Bauteile --------------
     #

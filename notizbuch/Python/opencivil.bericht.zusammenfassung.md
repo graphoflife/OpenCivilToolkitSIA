@@ -1,5 +1,5 @@
 ---
-erzeugt: 7ebe1354f576
+erzeugt: 8997f05c9e12
 art: modul
 tags: [modul]
 ---
@@ -287,6 +287,7 @@ hoch, beide, getrennt durch `/`.
 - [[opencivil.geotechnik.fundament]]
 - [[opencivil.geotechnik.grundbruch]]
 - [[opencivil.geotechnik.setzung]]
+- [[opencivil.mauerwerk.uebersicht]]
 - [[opencivil.pfahl.uebersicht]]
 - [[opencivil.projekt]]
 - [[opencivil.querschnitt.platte]]

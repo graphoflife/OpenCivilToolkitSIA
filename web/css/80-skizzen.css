@@ -317,6 +317,29 @@
 .mw-mass { fill: none; stroke: var(--schrift-matt); stroke-width: 1; }
 .dk-name.ist-pfeiler { font-size: 10px; }
 .mw-wand.ist-fehler, .mw-oeffnung.ist-fehler { stroke: var(--schlecht); }
+/* Die Urteile: jeder Pfeiler leicht getönt, unter jedem Sturzauflager ein
+   Strich -- grün erfüllt, rot nicht, grau nicht geführt oder ohne
+   Einwirkung; blass, solange sie zu einer früheren Zeichnung gehören. */
+.mw-urteil { stroke: none; fill-opacity: .16; }
+.mw-urteil.ist-erfuellt { fill: var(--gut); }
+.mw-urteil.ist-verfehlt { fill: var(--schlecht); fill-opacity: .22; }
+.mw-urteil.ist-offen, .mw-urteil.ist-ohne { fill: var(--schrift-matt); fill-opacity: .12; }
+.mw-auflager { fill: none; stroke-width: 4; }
+.mw-auflager.ist-erfuellt { stroke: var(--gut); }
+.mw-auflager.ist-verfehlt { stroke: var(--schlecht); }
+.mw-auflager.ist-offen, .mw-auflager.ist-ohne { stroke: var(--schrift-matt); }
+.mw-urteil-text {
+  font-size: 11px; font-weight: 600;
+  paint-order: stroke; stroke: var(--flaeche); stroke-width: 3px; stroke-linejoin: round;
+}
+.mw-urteil-text.ist-klein { font-size: 10px; }
+.mw-urteil-text.ist-erfuellt { fill: var(--gut); }
+.mw-urteil-text.ist-verfehlt { fill: var(--schlecht); }
+.mw-urteil-text.ist-offen, .mw-urteil-text.ist-ohne { fill: var(--schrift-matt); }
+.mw-urteile.ist-alt { opacity: .4; }
+/* Eine Last, die der Kern beanstandet, rot -- ihre Zahl behält den Rand. */
+.mw-lasten .bs-last.ist-fehler:not(text) { stroke: var(--schlecht); }
+.mw-lasten .bs-spitze.ist-fehler, .mw-lasten .bs-lasttext.ist-fehler { fill: var(--schlecht); }
 
 /* ----------------------------------------------------------- Grundbruch -- */
 

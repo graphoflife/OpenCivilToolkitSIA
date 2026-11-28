@@ -1,5 +1,5 @@
 ---
-erzeugt: ca981b02a7e1
+erzeugt: 0dffa2f58bc1
 art: modul
 tags: [modul]
 ---
@@ -100,10 +100,14 @@ Verfahren SIMP, im Netz von 0.2 m.
 def _mauerwerk(p: Projekt) -> None
 ```
 
-Eine Wand aus Kalksandstein, 6 × 2.7 m und 175 mm dick, als
-Verbandmauerwerk vollfugig vermauert, am Fuss eingespannt und rechts
-gehalten: eine Türe
-mit Betonsturz und zwei Fenster, eines mit vorfabriziertem Sturz.
+Zwei Wände aus Kalksandstein mit den Lastfällen und Kombinationen einer
+frischen Wand. Die erste, 6 × 2.7 m und 175 mm dick, als Verbandmauerwerk
+vollfugig vermauert, am Fuss eingespannt und rechts gehalten: eine Türe
+mit Betonsturz und zwei Fenster, eines mit vorfabriziertem Sturz. Oben
+liegt die Decke 20 mm ausmittig auf, und über dem vorfabrizierten Sturz
+ein Träger. Die zweite, ein Pfeiler ohne Öffnung, 1.5 × 2.6 m und 150 mm
+dick, ist am Kopf eingespannt und steht am Fuss gelenkig 15 mm neben der
+Mitte.
 
 ### _fachwerk_der_wandscheibe
 

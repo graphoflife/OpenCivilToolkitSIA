@@ -276,17 +276,6 @@ class TestDieZeichnung(unittest.TestCase):
                          [("O1", "beton", 0.65, 2.3), ("O2", "vorfabriziert", 2.65, 2.35),
                           ("O3", "beton", 4.75, 2.3)])
 
-    def test_die_werte_der_wand_neben_denen_des_mauerwerks(self):
-        """Im Verband mal 0.85; vollfugig heisst die Zeile f_yd, vollfugig."""
-        p = Projekt(name="Probe")
-        p.mauerwerk("MK")
-        werte = zeichnung(p, beispielwand(p))["werte"]
-        self.assertEqual((werte["mauerwerk"], werte["faktor"]), ("MK", 0.85))
-        self.assertEqual([(z["zeichen"], z["mauerwerk"], round(z["wand"], 6))
-                          for z in werte["zeilen"]],
-                         [("f_xd", 3.5, 2.975), ("f_yd, vollfugig", 1.6, 1.36),
-                          ("E_xd", 3500.0, 2975.0), ("G_d", 1400.0, 1190.0), ("μ_d", 0.6, 0.6)])
-
     def test_eine_falsche_zeichnung_ohne_pfeiler_und_stuerze(self):
         p = Projekt(name="Probe")
         p.mauerwerk("MK")
@@ -304,7 +293,7 @@ class TestDieZeichnung(unittest.TestCase):
         u = zeichnung(p, p.wand("Wand"))
         self.assertEqual([(m["text"], m["fehler"], m["unfertig"]) for m in u["meldungen"]],
                          [("Mauerwerk: noch kein Material gewählt.", False, True)])
-        self.assertIsNone(u["werte"])
+        self.assertEqual(u["urteile"], {})
 
 
 if __name__ == "__main__":

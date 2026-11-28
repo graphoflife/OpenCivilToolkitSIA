@@ -34,7 +34,7 @@ import {
   fachwerkEditor, fachwerkFenster, fachwerkKarten, fachwerkZusammenfassung,
 } from './fachwerkmodell.js';
 import {
-  mauerwerkEditor, mauerwerkFenster, mauerwerkKarten, mauerwerkZusammenfassung,
+  mauerwerkEditor, mauerwerkFenster, mauerwerkKarten,
 } from './mauerwerk.js';
 import { grundbruchEditor, grundbruchFenster } from './grundbruch.js';
 import { setzungEditor, setzungFenster } from './setzung.js';
@@ -377,7 +377,6 @@ const MAUERWERK = bauteil('mauerwerk', {
   kurztext: (w) => `${w.oeffnungen.length} ${w.oeffnungen.length === 1 ? 'Öffnung' : 'Öffnungen'}`,
   editor: mauerwerkEditor,
   karten: mauerwerkKarten,
-  uebersicht: mauerwerkZusammenfassung,
   fenster: mauerwerkFenster,
 });
 

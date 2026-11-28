@@ -1,5 +1,5 @@
 ---
-erzeugt: 227ccdae5d39
+erzeugt: 30dbb1cf8c6b
 art: modul
 tags: [modul]
 ---
@@ -20,6 +20,9 @@ Die Meldungen der Zeichnung einer Wand, in dieser Folge:
 - ein Sturz, der über die Wand hinaus oder in eine andere Öffnung reicht,
   zwei Stürze, die sich überschneiden: rot;
 - eine unübliche Dicke: ein Hinweis ([[opencivil.mauerwerk.pruefen#dickenhinweis|dickenhinweis]]).
+
+Wo die Lasten liegen, prüft [[opencivil.mauerwerk.pruefen#lasten_pruefen|lasten_pruefen]], sobald die Zeichnung
+rechnet: eine Last neben der Wand oder in einer Öffnung ist rot.
 
 Was nur fehlt, steht grau und hält die Rechnung an; was falsch ist, steht
 rot (Benutzer, 2026-11-19).
@@ -57,6 +60,25 @@ def _oeffnungen(wand: Rechteck, oeffnungen: Tuple[Oeffnung, ...]) -> List[Meldun
 
 Was an Öffnungen und Stürzen einer rechteckigen Wand nicht stimmt – alle sind Rechtecke.
 
+### lasten_pruefen
+
+```python
+def lasten_pruefen(wand: Wand) -> List[Meldung]
+```
+
+Je Last, die nicht ganz auf der Wand oder in einer Öffnung liegt, eine
+rote Meldung – nur für eine Wand, deren Zeichnung rechnet. Auf dem Rand
+einer Öffnung zählt nicht: oben liegt die Last am Sturz, unten auf der
+Brüstung.
+
+### _in_oeffnung
+
+```python
+def _in_oeffnung(last: Wandlast, r: Rechteck) -> bool
+```
+
+Ob eine Last ins Innere der Öffnung `r` reicht – auf ihrem Rand nicht.
+
 ### _wohin
 
 ```python
@@ -91,4 +113,5 @@ Ein Hinweis, wenn `t_mm` keine übliche Dicke der Steine der Sorte
 ## Gebraucht von
 
 - [[opencivil.mauerwerk.werk]]
+- [[opencivil.projekt.aufbau.mauerwerk]]
 - [[opencivil.web.mauerwerkdaten]]

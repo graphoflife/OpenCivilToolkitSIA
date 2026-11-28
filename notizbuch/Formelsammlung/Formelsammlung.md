@@ -1,5 +1,5 @@
 ---
-erzeugt: 6061b1589fd1
+erzeugt: 03b9af4cc3bf
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -82,7 +82,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 **Mauerwerk**
 
-- [[Mauerwerk]] · 7
+- [[Mauerwerk]] · 18
 
 **Decken**
 
@@ -117,6 +117,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Aufnehmbares Moment der Bewehrung]] · $M_{s,adm,2,x}$
 - [[Auslenkung aus einem Geschoss]]
 - [[Auslenkung des Dachs]] · $u_x$
+- [[Ausmitte am Kopf – sie bleibt, wenn die Lasten wachsen]] · $e_o$
 - [[Äusserer Widerstand auf Druck]] · $R_{a,k}$
 - [[Äusserer Widerstand auf Zug]] · $R_{a,k,Z}$
 - [[Bedingung der Duktilität]]
@@ -127,6 +128,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Beiwert der Gesteinskörnung]] · $k_g$
 - [[Beiwert der Momentenübertragung]] · $k_e$
 - [[Beiwert der Parabel]] · $k_{\sigma}$
+- [[Beiwert der Teilflächenpressung im Mauerwerk]] · $k_m$
 - [[Beiwert für den Querkraftwiderstand]] · $k_d^{+}$
 - [[Beiwert für die Dicke]] · $k_t$
 - [[Beiwert k_r]] · $k_r$
@@ -178,6 +180,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Bezogene Schlankheit einer Verbundstütze]] · $\bar{\lambda}_{z}$
 - [[Bezugsgrösse der Normalkraft]] · $N_{ref}$
 - [[Bezugsgrösse des Moments]] · $M_{ref}$
+- [[Bezugswert der Knicklänge einer Wand]] · $h_{Ed}$
 - [[Biegebewehrung im Stützstreifen je Meter]] · $a_{s,x}$
 - [[Biegelinie eines Stabs]]
 - [[Biegelinie eines Stabs im Raum]]
@@ -225,6 +228,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Durchmesser des flächengleichen Kreises]] · $b$
 - [[Durchstanzbewehrung an der Fliessgrenze]] · $V_{Rd,v}$
 - [[Durchstanzwiderstand ohne Durchstanzbewehrung]] · $V_{Rd,c}$
+- [[Eigengewicht der Wand je m² Ansicht, aus der Dichte ihres Mauerwerks]] · $g_k$
 - [[Eigengewicht eines Stabs]] · $g_{k}$
 - [[Einbindung in die tragende Schicht]] · $h$
 - [[Einflussfaktor der Rechtecklast]]
@@ -247,6 +251,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Festigkeiten im Verbundquerschnitt]]
 - [[Fiktiver Durchmesser einer verschmierten Linie]] · $\varnothing_{fikt}$
 - [[Fläche der Längsbewehrung]] · $A_s$
+- [[Fläche des Auflagers]] · $A_0$
 - [[Fläche des Pfahlquerschnitts]] · $A_b$
 - [[Fläche des Tragrohrs nach Abrostung]] · $A_s$
 - [[Fläche des Tragstabs nach Abrostung]] · $A_s$
@@ -293,12 +298,14 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Gewicht eines Geschosses]]
 - [[Gewollte Ausmitte]] · $e_{1d}$
 - [[Gewollte Ausmitte und Ausmitte 2. Ordnung – allgemein]]
+- [[Gleichgewicht der verformten Wand – Ausmitte der Last und Auslenkung w]]
 - [[Gleichmässiger Druck, ohne Bewehrung]] · $N_{Rd}^{-}$
 - [[Gleichungssystem der Steifigkeitsmethode]]
 - [[Gleitwiderstand]] · $T_{Rd}$
 - [[Grenzdehnung des Baustahls]] · $\varepsilon_{ud}$
 - [[Grenzdehnung des Profilblechstahls]] · $\varepsilon_{ud}$
 - [[Grenzdehnungen am Ende der Linie]]
+- [[Grenze der Ausmitte einer Wand aus Mauerwerk]]
 - [[Grenze der bezogenen Druckzonenhöhe]] · $\left(x/d\right)_{max}$
 - [[Grenze der Grundschwingzeit]] · $T_{1,max}$
 - [[Grenzen der Spannung im Spannstahl]] · $\sigma_{p,max}$
@@ -346,6 +353,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Kräftegleichgewicht bei M_Ed = 0]]
 - [[Kreis im Knoten eines I-Profils]] · $d_{K}$
 - [[Kritische Normalkraft einer Verbundstütze]] · $N_{cr,z}$
+- [[Krümmung einer Wand aus Mauerwerk]]
 - [[Krümmungsbeiwert der Spannungs-Dehnungs-Beziehung]] · $k_{\sigma}$
 - [[Kürzere Seite eines Rechtecks]] · $t_{\text{Q1}}$
 - [[Kürzester Abstand zur Resistenzlinie]] · $a$
@@ -390,6 +398,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Nominelle Dehnung der Zugbewehrung]] · $\varepsilon_v$
 - [[Normalkraft aus der Vorspannung]] · $N_p$
 - [[Normalkraft mit der Längszugkraft aus der Querkraft]] · $N_V$
+- [[Normalkraftwiderstand eines Pfeilers aus Mauerwerk]] · $N_{xRd}$
 - [[Normalkraftwiderstand eines Stahlquerschnitts]] · $N_{Rd}^{+}$
 - [[Normalspannung im Holz]] · $\sigma_{t,0,d}$
 - [[Nulllinie auf halber Höhe]] · $x^{+}$
@@ -556,6 +565,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Widerstand der Wendel]] · $V_{Rd,s}$
 - [[Widerstand einer Verbundstütze nach (25)]] · $M_{y,Rd}$
 - [[Widerstand einer Wand (Fachwerk, ihre Länge l als Hebelarm)]]
+- [[Widerstand eines Sturzauflagers]] · $R_{Rd}$
 - [[Widerstand im normierten Diagramm]] · $\bar{R}_{d,x}$
 - [[Widerstand in der Richtung der Einwirkung]] · $M_{Rd}$
 - [[Widerstandsmoment bis zur weitesten Faser]] · $W_{eff}$
@@ -587,13 +597,14 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 ## Normstelle fehlt noch
 
-148 von 485 Formeln haben im Code keine Normstelle – meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle – von dort kommt sie in Bericht und Notizbuch.
+152 von 495 Formeln haben im Code keine Normstelle – meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle – von dort kommt sie in Bericht und Notizbuch.
 
 - [[Achsen eines Stabs im Raum]] · [[opencivil.stabwerk3d.herleitung|_ansaetze]]
 - [[Äquivalenter E-Modul eines Stabs]] · [[opencivil.spannungsanalyse.modul#ModulProzedur|ModulProzedur._schreiben]]
 - [[Äquivalenter E-Modul über dem Moment]] · [[opencivil.spannungsanalyse.herleitung#_herleitung_modul|_herleitung_modul]]
 - [[Äquivalenter E-Modul über der Normalkraft]] · [[opencivil.spannungsanalyse.herleitung#_herleitung_modul|_herleitung_modul]]
 - [[Arbeitsgleiche Knotenkräfte]] · [[opencivil.stabwerk.herleitung|_ansaetze]], [[opencivil.stabwerk3d.herleitung|_ansaetze]]
+- [[Ausmitte am Kopf – sie bleibt, wenn die Lasten wachsen]] · [[opencivil.mauerwerk.nachweise#Normalkraft._kopf|Normalkraft._kopf]]
 - [[Betonstahl nur auf Zug]] · [[opencivil.querschnitt.werkstoffgesetz#Gesetz.protokoll|Gesetz.protokoll]]
 - [[Bettung eines Stabs]] · [[opencivil.stabwerk.herleitung|_ansaetze]], [[opencivil.stabwerk3d.herleitung|_ansaetze]]
 - [[Bewehrung der Lage]] · [[opencivil.querschnitt.lagenaufbau#protokoll_lage|protokoll_lage]]
@@ -619,12 +630,14 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Dickster Stab der Lage]] · [[opencivil.nachweis.mindestbewehrung#_protokoll_stahlspannung|_protokoll_stahlspannung]]
 - [[Drehfeder des Pfahlkopfs]] · [[opencivil.pfahl.steifigkeit#Pfahlsteifigkeit|Pfahlsteifigkeit._federn]]
 - [[Drehung in die Achsen des Stabs]] · [[opencivil.stabwerk.herleitung|_ansaetze]]
+- [[Eigengewicht der Wand je m² Ansicht, aus der Dichte ihres Mauerwerks]] · [[opencivil.mauerwerk.herleitung#_lasten|_lasten]]
 - [[Eigengewicht eines Stabs]] · [[opencivil.stabwerk.rechnung#_gewicht_je_meter|_gewicht_je_meter]]
 - [[Einwirkung im normierten Diagramm]] · [[opencivil.nachweis.biegung_normalkraft#BiegungNormalkraft._protokoll_naechster|BiegungNormalkraft._protokoll_naechster]]
 - [[Erfüllungsgrad]] · [[opencivil.core.nachweis#Vergleich.zeile|Vergleich.zeile]]
 - [[Erfüllungsgrad bei fester Normalkraft und fester Richtung]] · [[opencivil.nachweis.qa_holz#HolzBiegungQA.pruefe|HolzBiegungQA.pruefe]], [[opencivil.nachweis.qa_holz_stabilitaet#HolzStabilitaetQA.pruefe|HolzStabilitaetQA.pruefe]], [[opencivil.nachweis.qa_stahl#StahlBiegungQA|StahlBiegungQA._ansatz]], [[opencivil.nachweis.qa_stahl_stabilitaet#StahlStabilitaetQA.pruefe|StahlStabilitaetQA.pruefe]], [[opencivil.nachweis.qa_verbund#VerbundBiegungQA|VerbundBiegungQA._ansatz]], [[opencivil.nachweis.schiefe_biegung#SchiefeBiegung|SchiefeBiegung._protokoll_ansatz]]
 - [[Fiktiver Durchmesser einer verschmierten Linie]] · [[opencivil.nachweis.stabgrenzen#_protokoll_fiktiv|_protokoll_fiktiv]]
 - [[Fläche der Längsbewehrung]] · [[opencivil.pfahl.innen#InnererWiderstand|InnererWiderstand._bohrpfahl]]
+- [[Fläche des Auflagers]] · [[opencivil.mauerwerk.nachweise#Teilflaechen.stelle|Teilflaechen.stelle]]
 - [[Fläche eines Doppel-T-Querschnitts]] · [[opencivil.stabwerk.querschnitte]]
 - [[Fläche eines I-Profils]] · [[opencivil.stahlprofile.formen]]
 - [[Fläche eines Kreises]] · [[opencivil.stabwerk.querschnitte]]
@@ -654,6 +667,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Flächenträgheitsmoment eines U-Profils mit geneigten Flanschen um z]] · [[opencivil.stahlprofile.formen]]
 - [[Flächenträgheitsmoment eines U-Profils mit parallelen Flanschen um y]] · [[opencivil.stahlprofile.formen]]
 - [[Flächenträgheitsmoment eines U-Profils mit parallelen Flanschen um z]] · [[opencivil.stahlprofile.formen]]
+- [[Gleichgewicht der verformten Wand – Ausmitte der Last und Auslenkung w]] · [[opencivil.mauerwerk.nachweise#Normalkraft.ansatz|Normalkraft.ansatz]]
 - [[Gleichungssystem der Steifigkeitsmethode]] · [[opencivil.stabwerk.herleitung|_ansaetze]], [[opencivil.stabwerk3d.herleitung|_ansaetze]]
 - [[Grenzdehnungen am Ende der Linie]] · [[opencivil.spannungsanalyse.riss#Bruttoriss.herleitung_gesetze|Bruttoriss.herleitung_gesetze]]
 - [[Grösste Dehnung auf halber Höhe]] · [[opencivil.spannungsanalyse.platte#Loeserpaar.herleitung_dehnung_am_ende|Loeserpaar.herleitung_dehnung_am_ende]]

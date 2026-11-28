@@ -1,5 +1,5 @@
 ---
-erzeugt: 3f5e4c5c2e0c
+erzeugt: 34af97ff4c49
 art: modul
 tags: [modul]
 ---
@@ -38,6 +38,14 @@ Zwischen zwei Öffnungen und zwischen einer Öffnung und dem Ende der Wand
 steht ein Pfeiler, so breit wie der Abstand ([[opencivil.mauerwerk.modell#pfeiler|pfeiler]]). Öffnungen,
 die sich in der Breite überdecken – ein Fenster über einer Türe –, bilden
 zusammen eine Lücke. Wo keine Öffnung ist, ist die ganze Wand ein Pfeiler.
+
+
+## DIE LASTEN
+
+Lotrecht, je Lastfall ([[opencivil.mauerwerk.modell#Lastfall|Lastfall]]): waagrechte Linienlasten und
+Punktlasten in der Ansicht, nach unten positiv, mit ihrer Ausmitte quer zur
+Wand – positiv zur Seite, von der aus man die Ansicht sieht. Wie sie zu
+den Pfeilern kommen, sagt [[opencivil.mauerwerk.lasten|lasten]].
 
 ## Inhalt
 
@@ -285,6 +293,50 @@ def b(self) -> float
 
 Die Pfeilerbreite.
 
+### Wandlast
+
+```python
+@dataclass(frozen=True)
+class Wandlast
+```
+
+Eine lotrechte Last, nach unten positiv: `Q` in N, gleichmässig von
+`x0` bis `x1` in der Höhe `y` – eine Punktlast mit `x0 = x1`.
+`e` ist ihre Ausmitte in m (Dateikopf). `name` nennt sie in einer
+Meldung.
+
+- `name: str`
+- `x0: float`
+- `x1: float`
+- `y: float`
+- `Q: float`
+- `e: float = 0.0`
+
+### Lastfall
+
+```python
+@dataclass(frozen=True)
+class Lastfall
+```
+
+Ein Lastfall der Wand: seine Lasten, und ob er ihr Eigengewicht bekommt.
+
+- `name: str`
+- `lasten: Tuple[Wandlast, ...] = ()`
+- `eigengewicht: bool = False`
+
+### Kombination
+
+```python
+@dataclass(frozen=True)
+class Kombination
+```
+
+Je Lastfall, nach seinem Namen, ein Beiwert. Was nicht dasteht, zählt null.
+
+- `name: str`
+- `faktoren: Mapping[str, float] = field(default_factory=dict)`
+
 ### Wand
 
 ```python
@@ -302,6 +354,8 @@ Die ganze Wand – jede Liste in der Folge der Beschreibung.
 - `fuss: Halterung = Halterung.GELENKIG`
 - `links: Seitenrand = Seitenrand.FREI`
 - `rechts: Seitenrand = Seitenrand.FREI`
+- `lastfaelle: Tuple[Lastfall, ...] = ()`
+- `kombinationen: Tuple[Kombination, ...] = ()`
 
 #### Wand.verband
 
@@ -348,6 +402,8 @@ Gezählt werden nur Öffnungen, die Rechtecke sind.
 ## Gebraucht von
 
 - [[opencivil.mauerwerk.herleitung]]
+- [[opencivil.mauerwerk.lasten]]
+- [[opencivil.mauerwerk.nachweise]]
 - [[opencivil.mauerwerk.pruefen]]
 - [[opencivil.mauerwerk.werk]]
 - [[opencivil.projekt.aufbau.mauerwerk]]

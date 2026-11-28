@@ -1,5 +1,5 @@
 ---
-erzeugt: 3754ff42ec18
+erzeugt: c18cd1c9b428
 art: modul
 tags: [modul]
 ---
@@ -13,9 +13,11 @@ Aus dem Befund einer Wand die Daten ihrer Zeichnung ([[opencivil.web.mauerwerkda
 ihre Meldungen – die zu Mauerwerk und Dicke auch fuer sich, fuer die
 Kachel der Maske –, ob sie rechnet, ihre Pfeiler und je Oeffnung die
 Flaeche ihres Sturzes – der Kern weiss, wie weit er aufliegt; die Seite zeichnet
-ihn nur. Dazu der Teil des Katalogs, den nur die Wand braucht
-([[opencivil.web.mauerwerkdaten#katalog|katalog]]). Umriss und Oeffnungen zeichnet die Oberflaeche nach dem
-Projekt.
+ihn nur. Dazu je Pfeiler und Sturzauflager das Urteil, das an ihm gilt
+([[opencivil.web.mauerwerkdaten#urteile|urteile]]), fuer die Farbe im Bild, und der Teil des Katalogs, den
+nur die Wand braucht ([[opencivil.web.mauerwerkdaten#katalog|katalog]]). Umriss, Oeffnungen und Lasten
+zeichnet die Oberflaeche nach dem Projekt; die Bemessungswerte stehen in
+der Zusammenfassung ueber den Nachweisen ([[opencivil.mauerwerk.uebersicht]]).
 
 
 ## EINHEITEN
@@ -30,7 +32,29 @@ In m, wie im Zeichenfenster; die ueblichen Dicken in mm, wie das Feld.
 def zeichnung(aufbau: Aufbau, kennung: str, loesung: Loesung) -> Dict[str, Any]
 ```
 
-Was die Zeichnung einer Wand unter ihre Teile legt – auch wenn sie nicht rechnet.
+Was die Zeichnung einer Wand unter ihre Teile legt – auch wenn sie
+nicht rechnet: [[opencivil.web.mauerwerkdaten#uebersicht|uebersicht]] und die Urteile ([[opencivil.web.mauerwerkdaten#urteile|urteile]]).
+
+### urteile
+
+```python
+def urteile(nachweise: Sequence[Nachweis], alle: Sequence[NachweisUrteil]) -> Dict[str, Dict[str, str]]
+```
+
+Je Pfeiler und Sturzauflager («O1 links») das Urteil, das an ihm gilt:
+das ungünstigste über seine Nachweise und Kombinationen – ein
+verfehltes vor einem offenen, ein offenes vor dem kleinsten Grad. Je Ort
+`{zustand, grad, titel}`: `zustand` ist `verfehlt`, `offen`,
+`erfuellt` oder `ohne` – keine Kombination wirkt dort ein –,
+`titel` sagt in Worten, welcher Nachweis in welcher Kombination.
+
+### _massgebend
+
+```python
+def _massgebend(liste: Sequence[Tuple[NachweisUrteil, Stelle]]) -> Dict[str, str]
+```
+
+Das Urteil, das an einem Ort gilt – siehe [[opencivil.web.mauerwerkdaten#urteile|urteile]].
 
 ### uebersicht
 
@@ -38,22 +62,11 @@ Was die Zeichnung einer Wand unter ihre Teile legt – auch wenn sie nicht rechn
 def uebersicht(befund: Optional[Wandbefund]) -> Dict[str, Any]
 ```
 
-`bereit`: ob die Wand rechnet; `werte` ihre Bemessungswerte
-([[opencivil.web.mauerwerkdaten#_werte|_werte]]); `meldungen` alle je ``{text,
+`bereit`: ob die Wand rechnet; `meldungen` alle je ``{text,
 elemente, fehler, unfertig}`, `zum_mauerwerk`` die zu Mauerwerk und
 Dicke darunter noch einmal; `pfeiler` je `{name, x0, x1, y0, y1, b}`
 und `stuerze` je `{oeffnung, sturz, x0, y0, x1, y1}` in m – leer,
 solange die Zeichnung nicht rechnet. Ohne Befund ist alles leer.
-
-### _werte
-
-```python
-def _werte(befund: Wandbefund) -> Dict[str, Any]
-```
-
-Die Bemessungswerte: der Name des Mauerwerks, der Faktor des Verbands und
-je Wert `{zeichen, mauerwerk, wand, stellen}` – der des Mauerwerks und
-der, mit dem die Wand rechnet, in N/mm², `mu_d` ohne Einheit.
 
 ### unfertig
 
@@ -75,16 +88,13 @@ Schalter – wie gemauert, die Stossfugen, Kopf und Fuss, die Ränder links
 und rechts, die Art eines Sturzes – und je Sorte die üblichen Dicken in mm.
 
 
-## Konstanten
-
-- `WERTE = (('f_xd', 'f_xd', 2), ('f_yd', 'f_yd', 2), ('E_xd', 'E_xd', 0), ('G_d…` – Was die Zusammenfassung von den Bemessungswerten zeigt: Kurzname, Zeichen, Stellen.
-
 ## Braucht
 
+- [[opencivil.core.nachweis]]
 - [[opencivil.core.rechenwerk]]
 - [[opencivil.core.sprache]]
-- [[opencivil.mauerwerk.kennwerte]]
 - [[opencivil.mauerwerk.modell]]
+- [[opencivil.mauerwerk.nachweise]]
 - [[opencivil.mauerwerk.pruefen]]
 - [[opencivil.mauerwerk.werk]]
 - [[opencivil.projekt]]

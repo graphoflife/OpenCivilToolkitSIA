@@ -422,6 +422,71 @@ sammeln sie sich hier, je mit dem, was vorläufig gebaut ist.
 - [ ] **Zur Kenntnis – der Plan war ungenau:** In MBL, MCL und MPL steht
       das L für Leichtsteine (SIA 266:2015, 3.1.1.1), nicht für
       Leichtmörtel, wie der Plan schrieb. Gebaut nach der Norm.
+- [ ] **Mauerwerk: Knicken bei grosser Ausmitte.** Das Werkzeug rechnet
+      k_N selbst nach Figur 3 und 4 der SIA 266 und trifft so die Kurven
+      der Figur 5 bis e/t = 0.30 auf 0.006. Die Kurve e/t = 0.35 liegt
+      dagegen fast doppelt so hoch: bei h/t = 12 zeigt Figur 5 k_N = 0.155,
+      die Rechnung gibt 0.089. Vermutlich lässt Figur 5 die Wand dort, wo
+      die Ausmitte 0.375 t erreicht, als Gelenk weiterdrehen (4.3.1.1); das
+      Werkzeug hört dort auf. Vorschlag: so lassen – es liegt auf der
+      sicheren Seite, und so grosse Ausmitten sind selten. Sonst das Gelenk
+      mitrechnen. Vorläufig: nach Figur 3 und 4.
+- [ ] **Mauerwerk: drei Annahmen beim Knicken**, alle nach Vorgabe, nicht
+      nachgeschlagen:
+      - B_yd = E_xd · I_y wie in Gl. (8), ohne den Faktor √(1 − N/(2 A f))
+        der Figur 3: nur so treffen die Kurven der Figur 5, mit ihm lägen
+        sie bis 20 % tiefer.
+      - Die Normalkraft gilt über die ganze Höhe so gross wie am Fuss, samt
+        dem ganzen Eigengewicht: auf der sicheren Seite.
+      - Am Kopf greift sie mit der Ausmitte der Lasten an, ohne das
+        Eigengewicht: eine Decke 20 mm neben der Mitte gibt 20 mm, wie viel
+        die Wand auch wiegt. Zuerst teilte das Werkzeug durch die Normalkraft
+        am Fuss; das machte im Beispiel 18 mm daraus und lag nicht sicher.
+      Vorschlag: so lassen. Vorläufig: so.
+- [ ] **Mauerwerk: wie die Lasten zu den Pfeilern kommen.** Die Norm regelt
+      das nicht; das Werkzeug rechnet nach Vorgabe:
+      - was über einem Pfeiler liegt, trägt er; was über einem
+        Sturzauflager liegt, ganz dieses; was über der Öffnung liegt,
+        teilt der Sturz als einfacher Balken zwischen den Mitten seiner
+        Auflager. Beispiel: Türe 1 m, Auflager je 150 mm, oben 10 kN/m –
+        jedes Auflager trägt 1.5 + 5 = 6.5 kN;
+      - eine Brüstung unter einem Fenster geht neben den Pfeilern in den
+        Fuss;
+      - die Ausmitte einer Last wirkt am Kopf der Pfeiler, die sie tragen,
+        auch wenn sie über einen Sturz zu ihnen kommt;
+      - Linienlasten nur waagrecht, eine schräge steht rot;
+      - e ist positiv zur Seite, von der man die Ansicht sieht, wie e_u am
+        Fuss.
+      Vorschlag: so lassen. Vorläufig: so.
+- [ ] **Mauerwerk: k_m = 1 unter den Stürzen.** Die Teilflächenpressung nach
+      Gl. (4) dürfte bis 1.5 steigen, wenn die gedrückte Fläche kleiner ist
+      als die verteilende. Das Werkzeug nimmt den Sturz so breit wie die
+      Wand und das Auflager am Rand der Öffnung: dann sind beide gleich,
+      und k_m = 1 (nach Vorgabe). Beispiel MK im Verband, 150 · 175 mm:
+      R_Rd = 2.98 N/mm² · 26 250 mm² = 78.1 kN. Vorschlag: so lassen; ein
+      schmalerer Sturz bekäme später ein eigenes Feld. Vorläufig: k_m = 1.
+- [ ] **Mauerwerk: die Verdrehung der Decke rechnet das Werkzeug nicht.**
+      Eine Decke, die sich über der Wand dreht, zwingt ihr eine Verdrehung
+      auf (4.3.1.3, 4.3.1.4); teilweise eingebundene Decken haben eine
+      eigene Regel (4.3.1.5, Gl. (12), Figur 6). Beides fehlt: man gibt die
+      Ausmitte e der Last von Hand. Auch den einfachen Nachweis nach
+      Gl. (7) bis (10) rechnet es nicht, nur den erweiterten nach Theorie
+      2. Ordnung, der immer gilt. Vorschlag: so lassen, bis du die
+      Deckenverdrehung brauchst. Vorläufig: so.
+- [ ] **Mauerwerk: ein Pfeiler unter Zug – grau oder rot?** Drücken die
+      Lasten am Kopf eines Pfeilers nicht, etwa unter Windsog, steht sein
+      Nachweis grau, «nicht führbar», mit dem Satz, dass unbewehrtes
+      Mauerwerk keinen Zug trägt (4.1.2). Nach den Grundsätzen ist grau aber
+      für das, was nur fehlt. Vorschlag: rot, «nicht erfüllt» mit
+      Erfüllungsgrad 0 und demselben Satz – so übersieht man ihn nicht.
+      Vorläufig: grau.
+- [ ] **Zur Kenntnis – Mauerwerk:** Die Zusammenfassung der Wand ist jetzt
+      die gemeinsame aller Nachweise: oben die Angaben und die
+      Bemessungswerte von Mauerwerk und Wand nebeneinander, darunter je
+      Pfeiler und Auflager ein Urteil. Die eigenen Karten «Öffnungen» und
+      «Pfeiler» von Schritt 14a fallen weg; die Pfeiler stehen mit Lage und
+      Breite in der Herleitung. Getönt sind die Pfeiler nach ihrem Urteil
+      im Bild der Zusammenfassung und auch im Zeichenfenster.
 
 ## Wünsche vom 2026-11-20
 

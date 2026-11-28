@@ -35,11 +35,13 @@ import {
   cadApp, cadBereichMitListe, frischeAntwort, listeZeichnen, meldungenJe, teilname, umrissVon,
 } from './cad_app.js';
 import {
-  LASTLISTEN, deckenmeldungen, eigenschaften, neuEigenschaften, punktlastSetzen, stuetzeSetzen, vorgabeBeton,
+  LASTLISTEN, deckenmeldungen, eigenschaften, neuEigenschaften, stuetzeSetzen, vorgabeBeton,
 } from './dk_eigenschaften.js';
 import { anteilText, grundriss } from './dk_grundriss.js';
 import { el } from './dom.js';
-import { aktiverLastfall, lastfallFuerNeue, lastfallLeiste } from './lastfaelle.js';
+import {
+  aktiverLastfall, lastfallFuerNeue, lastfallLeiste, punktlastSetzen,
+} from './lastfaelle.js';
 import { eintragVon, katalog, zustand } from './zustand.js';
 
 /** Was die Arten heissen, je Liste -- einzeln und mehrere. */
@@ -244,7 +246,7 @@ function neuText(a, werkzeug) {
 function punktAnlegen(a, z, knoten, werkzeug) {
   if (werkzeug === 'stuetze') stuetzeSetzen(a, z, knoten, true);
   const lf = werkzeug === 'punktlast' && lastfallFuerNeue(a.dk);
-  if (lf) punktlastSetzen(a, z, knoten, true, lf);
+  if (lf) punktlastSetzen(a, a.dk, z, knoten, true, lf);
   return null;
 }
 

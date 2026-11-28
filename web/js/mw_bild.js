@@ -8,6 +8,16 @@
  * gehalten ist. Beide Bilder rufen dieselbe Funktion, jedes mit seiner
  * Ansicht `v` (cad_ansicht.js).
  *
+ * DIE URTEILE: jeder Pfeiler getönt in der Farbe des Urteils, das an ihm
+ * gilt, mit Name und Erfüllungsgrad an seinem Fuss; unter jedem Auflager
+ * eines Sturzes ein Strich in der Farbe des seinen -- grün erfüllt, rot
+ * nicht, grau, wo sich der Nachweis nicht führen liess oder nichts
+ * einwirkt (`urteile`, mauerwerkdaten.py).
+ *
+ * DIE LASTEN, nur im Zeichenfenster: die des gezeigten Lastfalls, eine
+ * Linienlast als Pfeile über ihrer Linie, eine Punktlast als Pfeil auf ihren
+ * Knoten, beide mit Wert und Ausmitte -- wie im Balkensystem (bs_symbole.js).
+ *
  * ZEICHEN DER RÄNDER, ausserhalb der Wand, um den Rahmen ihres Umrisses:
  *   eingespannt   Kopf oder Fuss: eine Kante mit Schraffur, an der die Wand sitzt
  *   gelenkig      dieselbe Kante, etwas abgerückt, dazwischen Gelenke
@@ -21,6 +31,7 @@
  * wie weit die Gelenke auseinander.
  */
 
+import { kraftpfeil, streckenlast } from './bs_symbole.js';
 import {
   ansichtNeu, einpassen, nachBild, pfad, text, zahlText,
 } from './cad_ansicht.js';
@@ -29,6 +40,16 @@ import { el, svgEl } from './dom.js';
 
 /** So weit stehen Schraffur und Gelenke von der Wand ab, in px. */
 const RAND = { gelenk: 2.6, abstand: 6, schraffur: 5, teilung: 7, gelenke: 24 };
+
+/**
+ * So lang sind die Pfeile der Lasten, px -- länger als die Schraffur am Kopf,
+ * die einer Punktlast so viel länger, dass ihre Beschriftung über der einer
+ * Linienlast steht, nicht darin.
+ */
+export const PFEIL = { linie: 26, punkt: 52 };
+
+/** So breit ist ein Zeichen der Urteile im Bild, px -- 11 px Schrift mit fester Breite. */
+const ZEICHEN = 6.6;
 
 /** Die Ecken eines Umrisses, in m -- null, wenn einer seiner Knoten fehlt. */
 function eckenVon(lagen, knoten) {
@@ -119,17 +140,87 @@ function pfeilermasse(v, pfeiler, y) {
   return g;
 }
 
+/** Wert und Ausmitte einer Last, wie sie am Pfeil stehen: «q = 40 kN/m, e = 20 mm». */
+function lasttext(zeichen, einheit, e) {
+  return `${zeichen} = ${zahlText(e.wert, 1)} ${einheit}${e.e ? `, e = ${zahlText(e.e, 0)} mm` : ''}`;
+}
+
 /**
- * Die ganze Wand: ihre Fläche, die Öffnungen ausgespart, die Stürze, die
- * Umrisse, die Ränder und die Namen -- auf der Karte auch die Pfeiler.
- * `fehler(kennung)` und `texte(kennung)` sagen, was der Kern an einem Teil
- * meldet -- rot, und als Titel beim Darüberfahren. `stuerze` und `pfeiler`
- * sind die des Kerns; `alt`, wenn sie zu einer früheren Zeichnung gehören --
- * dann stehen sie blass. `stellungen` sind die Wörter der Schalter
- * (`katalog.mauerwerk`).
+ * Die Lasten des Lastfalls `lastfall`, in m an den Knoten `lagen`: Pfeile
+ * nach unten -- rot, was der Kern an einer beanstandet.
+ */
+function lasten(v, modell, lagen, lastfall, { fehler, texte }) {
+  const g = svgEl('g', { class: 'mw-lasten' });
+  const klasse = (kennung) => (fehler(kennung) ? 'bs-last ist-fehler' : 'bs-last');
+  for (const e of (modell.linienlasten || []).filter((x) => x.lastfall === lastfall)) {
+    const [p, q] = [lagen.get(e.von), lagen.get(e.bis)];
+    if (!p || !q) continue;
+    g.append(mitTitel(streckenlast(nachBild(v, p), nachBild(v, q), [0, 1], PFEIL.linie, PFEIL.linie,
+      lasttext('q', 'kN/m', e), klasse(e.kennung)), [`Linienlast ${e.kennung}`, ...texte(e.kennung)]));
+  }
+  for (const e of (modell.punktlasten || []).filter((x) => x.lastfall === lastfall)) {
+    const p = lagen.get(e.knoten);
+    if (!p) continue;
+    g.append(mitTitel(kraftpfeil(nachBild(v, p), [0, 1], PFEIL.punkt, lasttext('Q', 'kN', e), klasse(e.kennung)),
+      [`Punktlast ${e.kennung}`, ...texte(e.kennung)]));
+  }
+  return g;
+}
+
+/**
+ * Die Urteile des Kerns, je Ort (`urteile`): die Pfeiler getönt, mit Name und
+ * Grad an ihrem Fuss, und unter den Auflagern der Stürze je ein Strich --
+ * von seinem Ende bis zur Kante der Öffnung, mit dem Grad darunter.
+ */
+function urteilsbild(v, { pfeiler, stuerze, urteile, oeffnungen, lagen }) {
+  const g = svgEl('g', { class: 'mw-urteile' });
+  for (const e of pfeiler) {
+    const u = urteile[e.name];
+    if (!u) continue;
+    const ecken = [[e.x0, e.y0], [e.x1, e.y0], [e.x1, e.y1], [e.x0, e.y1]];
+    g.append(mitTitel(svgEl('path', { d: pfad(v, ecken), class: `mw-urteil ist-${u.zustand}` }),
+      [`Pfeiler ${e.name}`, u.titel]));
+    const [a, b] = [nachBild(v, [e.x0, e.y0]), nachBild(v, [e.x1, e.y0])];
+    // Ein schmaler Pfeiler nennt nur seinen Grad, sonst liefe er in den Nachbarn: der Name steht im Titel.
+    const voll = u.grad ? `${e.name} · ${u.grad}` : e.name;
+    const passt = voll.length * ZEICHEN <= Math.abs(b[0] - a[0]) - 4;
+    g.append(text((a[0] + b[0]) / 2, a[1] - 6, passt ? voll : (u.grad || e.name), `mw-urteil-text ist-${u.zustand}`));
+  }
+  for (const s of stuerze) {
+    const o = oeffnungen.find((x) => x.kennung === s.oeffnung);
+    const ecken = o && eckenVon(lagen, o.knoten);
+    if (!ecken) continue;
+    const xs = ecken.map((p) => p[0]);
+    for (const [seite, von, bis] of [['links', s.x0, Math.min(...xs)], ['rechts', Math.max(...xs), s.x1]]) {
+      const u = urteile[`${s.oeffnung} ${seite}`];
+      if (!u) continue;
+      const [a, b] = [nachBild(v, [von, s.y0]), nachBild(v, [bis, s.y0])];
+      g.append(mitTitel(svgEl('path', {
+        d: `M${a[0].toFixed(1)} ${a[1].toFixed(1)} H${b[0].toFixed(1)}`, class: `mw-auflager ist-${u.zustand}`,
+      }), [`Auflager ${s.oeffnung} ${seite}`, u.titel]));
+      // Der Grad über dem Auflager, auf dem Mauerwerk über dem Sturz: darunter
+      // verdeckten ihn die Öffnung und ihr Name.
+      const oben = nachBild(v, [von, s.y1])[1] - 3;
+      if (u.grad) g.append(text((a[0] + b[0]) / 2, oben, u.grad, `mw-urteil-text ist-klein ist-${u.zustand}`));
+    }
+  }
+  return g;
+}
+
+/**
+ * Die ganze Wand: ihre Fläche, die Öffnungen ausgespart, die Urteile, die
+ * Stürze, die Umrisse, die Ränder, die Lasten und die Namen -- auf der Karte
+ * auch die Masse der Pfeiler. `fehler(kennung)` und `texte(kennung)` sagen,
+ * was der Kern an einem Teil meldet -- rot, und als Titel beim
+ * Darüberfahren. `stuerze`, `pfeiler` und `urteile` sind die des Kerns;
+ * `alt`, wenn sie zu einer früheren Zeichnung gehören -- dann stehen sie
+ * blass. `stellungen` sind die Wörter der Schalter (`katalog.mauerwerk`),
+ * `lastfall` der Lastfall, dessen Lasten zu sehen sind -- ohne einen keine;
+ * `masse`, ob unter der Wand die Masse der Pfeiler stehen.
  */
 export function wand(v, modell, {
-  fehler = () => false, texte = () => [], stuerze = [], pfeiler = [], alt = false, stellungen = {},
+  fehler = () => false, texte = () => [], stuerze = [], pfeiler = [], urteile = {}, alt = false, stellungen = {},
+  lastfall = null, masse = false,
 } = {}) {
   const g = svgEl('g', { class: 'mw-modell' });
   const lagen = new Map((modell.knoten || []).map((k) => [k.kennung, [k.x, k.y]]));
@@ -167,12 +258,15 @@ export function wand(v, modell, {
         + (o ? `, h_St = ${zahlText(o.h_St, 0)} mm, a = ${zahlText(o.a, 0)} mm` : ''),
     ]));
   }
-  g.append(flaechen, oeffnungen, stuerzeGruppe, umrisse);
+  const urteilsgruppe = urteilsbild(v, { pfeiler, stuerze, urteile, oeffnungen: modell.oeffnungen || [], lagen });
+  if (alt) urteilsgruppe.classList.add('ist-alt');
+  g.append(flaechen, urteilsgruppe, oeffnungen, stuerzeGruppe, umrisse);
   if (waende.length === 1) {
     const r = rahmen(v, waende[0][1]);
     g.append(raender(r, modell, stellungen));
-    if (pfeiler.length) g.append(pfeilermasse(v, pfeiler, r.u + 26));
+    if (masse && pfeiler.length) g.append(pfeilermasse(v, pfeiler, r.u + 26));
   }
+  if (lastfall) g.append(lasten(v, modell, lagen, lastfall, { fehler, texte }));
   g.append(namen);
   return g;
 }
@@ -192,11 +286,14 @@ export function wandBild(modell, daten, stellungen) {
   Object.assign(v, { breite: BILD.breite, hoehe });
   einpassen(v, umriss, { rand: BILD.rand });
   const svg = svgEl('svg', { viewBox: `0 0 ${BILD.breite} ${hoehe.toFixed(0)}`, class: 'gb-bild mw-bild' });
-  svg.append(wand(v, modell, { stuerze: daten?.stuerze || [], pfeiler: daten?.pfeiler || [], stellungen }));
+  svg.append(wand(v, modell, {
+    stuerze: daten?.stuerze || [], pfeiler: daten?.pfeiler || [], urteile: daten?.urteile || {}, stellungen,
+    masse: true,
+  }));
   return svg;
 }
 
-/** Was die Stürze und die Ränder im Bild heissen -- unter ihm. */
+/** Was die Stürze, die Farben der Urteile und die Ränder im Bild heissen -- unter ihm. */
 export function wandLegende(stellungen) {
   const probe = (inhalt, wort) => {
     const svg = svgEl('svg', { viewBox: '0 0 26 14', width: 26, height: 14, 'aria-hidden': 'true' });
@@ -205,8 +302,13 @@ export function wandLegende(stellungen) {
   };
   const sturz = (art) => probe(svgEl('rect', { x: 1, y: 3, width: 24, height: 8, class: `mw-sturz ist-${art}` }),
     `Sturz: ${wortVon(stellungen.sturz, art)}`);
+  const urteil = (zustand, wort) => probe(svgEl('rect', {
+    x: 1, y: 2, width: 24, height: 10, class: `mw-urteil ist-${zustand}`,
+  }), wort);
   return el('div.dk-legende', {}, [
     sturz('beton'), sturz('vorfabriziert'),
+    urteil('erfuellt', 'erfüllt'), urteil('verfehlt', 'nicht erfüllt'),
+    urteil('offen', 'nicht geführt oder ohne Einwirkung'),
     probe(kante([1, 4], [25, 4], [0, 1], false), wortVon(stellungen.halterung, 'eingespannt')),
     probe(kante([1, 2], [25, 2], [0, 1], true),
       `${wortVon(stellungen.halterung, 'gelenkig')} oder ${wortVon(stellungen.seitenrand, 'gehalten')}`),

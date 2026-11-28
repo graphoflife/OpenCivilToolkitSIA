@@ -1,6 +1,6 @@
 # Voll
 
-1022 Berechnungen ausgeführt, 1659 Werte bestimmt.
+1031 Berechnungen ausgeführt, 1686 Werte bestimmt.
 
 ## Herleitung
 
@@ -29698,6 +29698,1436 @@ Grund- und Aufriss sind regelmässig, wie angegeben, und das Gewicht nimmt nach 
 
 Nicht zulässig – Antwortspektrenverfahren (16.5.3.1): in y ist T₁ \> 4·T\_C (39).
 
+### Mauerwerk: MK
+
+**Druckfestigkeit senkrecht zu den Lagerfugen, kennzeichnend** *(SIA 266:2015, 3.1.3.3, Tabelle 1)*
+
+$$
+f_{xk} = 7\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Widerstandsbeiwert des Mauerwerks** *(SIA 266:2015, 4.2.1.1)*
+
+$$
+\gamma_M = 2
+$$
+
+**Bemessungswert der Druckfestigkeit senkrecht zu den Lagerfugen** *(SIA 266:2015, 4.2.1.1, Gl. (3))*
+
+$$
+f_{xd} = \frac{f_{xk}}{\gamma_M} = \frac{7\,\mathrm{N}/\mathrm{mm}^{2}}{2} = 3.5\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Druckfestigkeit senkrecht zu den Stossfugen, kennzeichnend** *(SIA 266:2015, 4.2.1.1, Tabelle 7; γ\_M · f\_yd)*
+
+$$
+f_{yk} = 2.2\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Bemessungswert der Druckfestigkeit senkrecht zu den Stossfugen** *(SIA 266:2015, 4.2.1.1, Gl. (3))*
+
+$$
+f_{yd} = \frac{f_{yk}}{\gamma_M} = \frac{2.2\,\mathrm{N}/\mathrm{mm}^{2}}{2} = 1.1\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Druckfestigkeit senkrecht zu den Stossfugen, vollfugig vermauert, kennzeichnend** *(SIA 266:2015, 4.2.1.1, Tabelle 7; γ\_M · f\_yd)*
+
+$$
+f_{yk,v} = 3.2\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Bemessungswert der Druckfestigkeit senkrecht zu den Stossfugen, vollfugig vermauert** *(SIA 266:2015, 4.2.1.1, Gl. (3))*
+
+$$
+f_{yd,v} = \frac{f_{yk,v}}{\gamma_M} = \frac{3.2\,\mathrm{N}/\mathrm{mm}^{2}}{2} = 1.6\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Elastizitätsmodul senkrecht zu den Lagerfugen, kennzeichnend** *(SIA 266:2015, 3.1.4.1)*
+
+$$
+E_{xk} = 1000 \cdot f_{xk} = 1000 \cdot 7\,\mathrm{N}/\mathrm{mm}^{2} = 7000\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Bemessungswert des Elastizitätsmoduls senkrecht zu den Lagerfugen** *(SIA 266:2015, 4.2.1.4, Gl. (5))*
+
+$$
+E_{xd} = \frac{E_{xk}}{\gamma_M} = \frac{7000\,\mathrm{N}/\mathrm{mm}^{2}}{2} = 3500\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Schubmodul, kennzeichnend** *(SIA 266:2015, 3.1.4.1, Gl. (2))*
+
+$$
+G_k = 0.4 \cdot E_{xk} = 0.4 \cdot 7000\,\mathrm{N}/\mathrm{mm}^{2} = 2800\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Bemessungswert des Schubmoduls** *(SIA 266:2015, Tabelle 7; Gl. (2) und (5))*
+
+$$
+G_d = \frac{G_k}{\gamma_M} = \frac{2800\,\mathrm{N}/\mathrm{mm}^{2}}{2} = 1400\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Bemessungswert des Reibungsbeiwerts in den Lagerfugen** *(SIA 266:2015, 4.2.1.3)*
+
+$$
+\mu_d = 0.6
+$$
+
+**Dichte für das Eigengewicht** *(SIA 261:2020, Anhang A, Tabelle 28; mit g = 10 m/s², nach Vorgabe)*
+
+$$
+\rho = 1800\,\mathrm{kg}/\mathrm{m}^{3}
+$$
+
+### Mauerwerk: Wand aus Kalksandstein
+
+**Dicke der Wand**
+
+$$
+t_w = 175\,\mathrm{mm}
+$$
+
+**Erdbeschleunigung für das Eigengewicht (nach Vorgabe des Benutzers)**
+
+$$
+g = 10\,\mathrm{m}/\mathrm{s}^{2}
+$$
+
+> **Annahme:** Eine Wand aus unbewehrtem Mauerwerk nach SIA 266:2015, gezeichnet in der Ansicht. Kohäsion und Zugfestigkeit des Mauerwerks zählen nicht (4.1.2), und quer zu ihrer Ebene ist die Wand gehalten (4.1.4). Die Zeichen der Norm: x steht senkrecht zu den Lagerfugen, also lotrecht, y längs der Wand (Figur 1).
+
+**Wand**
+
+| Wand | Mauerwerk | $l_w\ [\mathrm{m}]$ | $h_w\ [\mathrm{m}]$ |
+| ---: | ---: | ---: | ---: |
+| W1 | MK | $6.00$ | $2.70$ |
+
+Verbandmauerwerk, die Stossfugen vollfugig vermauert. Kopf gelenkig, Fuss eingespannt; links frei, rechts gehalten.
+
+Für Verbandmauerwerk gelten alle Werte der Tabelle 7 mal 0.85 (SIA 266:2015, 4.2.1.1); μ\_d bleibt. Vollfugig vermauert gilt das grössere f\_yd der Tabelle 7.
+
+**Bemessungswerte, Festigkeiten und Moduln in N/mm²**
+
+|  | Mauerwerk «MK» | Wand |
+| ---: | ---: | ---: |
+| $f_{xd}$ | $3.50$ | $0.85 \cdot 3.50 = 2.98$ |
+| $f_{yd},\ \mathrm{vollfugig}$ | $1.60$ | $0.85 \cdot 1.60 = 1.36$ |
+| $E_{xd}$ | $3500$ | $0.85 \cdot 3500 = 2975$ |
+| $G_d$ | $1400$ | $0.85 \cdot 1400 = 1190$ |
+| $\mu_d$ | $0.60$ | $0.60$ |
+
+**Öffnungen – über jeder ein Sturz, a ist seine Auflagerlänge**
+
+| Öffnung | links – rechts [m] | unten – oben [m] | $b\ [\mathrm{m}]$ | $h\ [\mathrm{m}]$ | Sturz | $h_{St}\ [\mathrm{mm}]$ | $a\ [\mathrm{mm}]$ |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| O1 | 0.80 – 1.80 | 0.00 – 2.10 | $1.00$ | $2.10$ | Betonsturz | $200$ | $150$ |
+| O2 | 2.80 – 4.00 | 0.90 – 2.10 | $1.20$ | $1.20$ | vorfabriziert | $250$ | $150$ |
+| O3 | 4.90 – 5.50 | 0.90 – 2.10 | $0.60$ | $1.20$ | Betonsturz | $200$ | $150$ |
+
+**Pfeiler – zwischen den Öffnungen und an den Enden der Wand**
+
+| Pfeiler | links – rechts [m] | $b\ [\mathrm{m}]$ | zwischen |
+| ---: | ---: | ---: | ---: |
+| P1 | 0.00 – 0.80 | $0.80$ | Wandende \| O1 |
+| P2 | 1.80 – 2.80 | $1.00$ | O1 \| O2 |
+| P3 | 4.00 – 4.90 | $0.90$ | O2 \| O3 |
+| P4 | 5.50 – 6.00 | $0.50$ | O3 \| Wandende |
+
+#### Lastabtrag
+
+Die Lasten gehen lotrecht nach unten. Was über einem Pfeiler liegt, trägt er, samt seinem eigenen Gewicht. Was über einer Öffnung liegt, trägt ihr Sturz: über einem seiner Auflager ganz dieses, über der Öffnung als einfacher Balken zwischen den Mitten der Auflager. Seine Auflagerkräfte gehen weiter nach unten, in den Pfeiler darunter oder auf den nächsten Sturz. Was unter einer Öffnung liegt, etwa eine Brüstung, geht neben den Pfeilern in den Fuss. Die Ausmitte einer Last wirkt am Kopf der Pfeiler, die sie tragen; ein Sturz wiegt wie Mauerwerk. Die Ausmitte am Kopf ist die der Lasten allein: das Eigengewicht kommt erst darunter dazu.
+
+> **Annahme:** Den Lastabtrag in der Wand regelt die Norm nicht; so verteilt das Werkzeug die Lasten nach Vorgabe, nicht nachgeschlagen.
+
+**Eigengewicht der Wand je m² Ansicht, aus der Dichte ihres Mauerwerks**
+
+$$
+g_k = \rho \cdot g \cdot t_w = 1800\,\mathrm{kg}/\mathrm{m}^{3} \cdot 10\,\mathrm{m}/\mathrm{s}^{2} \cdot 175\,\mathrm{mm} = 3.15\,\mathrm{kN}/\mathrm{m}^{2}
+$$
+
+Die Lastfälle charakteristisch, die Kombinationen mit ihren Beiwerten.
+
+**Normalkraft am Fuss der Pfeiler, Druck positiv, in kN**
+
+|  | Eigengewicht | Auflast | Nutzlast | GZT | GZT günstig |
+| :--- | ---: | ---: | ---: | ---: | ---: |
+| P1 | $7.7$ | $52.0$ | $19.5$ | $109.9$ | $47.8$ |
+| P2 | $10.6$ | $94.0$ | $31.5$ | $188.4$ | $83.7$ |
+| P3 | $9.4$ | $82.0$ | $27.0$ | $163.8$ | $73.1$ |
+| P4 | $4.8$ | $32.0$ | $12.0$ | $67.7$ | $29.5$ |
+| neben den Pfeilern | $5.1$ | $0.0$ | $0.0$ | $6.9$ | $4.1$ |
+
+**Normalkraft aus den Lasten am Kopf der Pfeiler, ohne Eigengewicht, in kN**
+
+|  | Eigengewicht | Auflast | Nutzlast | GZT | GZT günstig |
+| :--- | ---: | ---: | ---: | ---: | ---: |
+| P1 | $0.0$ | $52.0$ | $19.5$ | $99.5$ | $41.6$ |
+| P2 | $0.0$ | $94.0$ | $31.5$ | $174.2$ | $75.2$ |
+| P3 | $0.0$ | $82.0$ | $27.0$ | $151.2$ | $65.6$ |
+| P4 | $0.0$ | $32.0$ | $12.0$ | $61.2$ | $25.6$ |
+
+**Moment der Ausmitten am Kopf der Pfeiler, in kNm**
+
+|  | Eigengewicht | Auflast | Nutzlast | GZT | GZT günstig |
+| :--- | ---: | ---: | ---: | ---: | ---: |
+| P1 | $0.00$ | $1.04$ | $0.39$ | $1.99$ | $0.83$ |
+| P2 | $0.00$ | $1.68$ | $0.63$ | $3.21$ | $1.34$ |
+| P3 | $0.00$ | $1.44$ | $0.54$ | $2.75$ | $1.15$ |
+| P4 | $0.00$ | $0.64$ | $0.24$ | $1.22$ | $0.51$ |
+
+**Kräfte der Sturzauflager, in kN**
+
+|  | Eigengewicht | Auflast | Nutzlast | GZT | GZT günstig |
+| :--- | ---: | ---: | ---: | ---: | ---: |
+| O1 links | $1.2$ | $26.0$ | $9.8$ | $51.4$ | $21.8$ |
+| O1 rechts | $1.2$ | $26.0$ | $9.7$ | $51.4$ | $21.8$ |
+| O2 links | $1.4$ | $40.0$ | $11.2$ | $72.8$ | $33.1$ |
+| O2 rechts | $1.4$ | $40.0$ | $11.3$ | $72.8$ | $33.1$ |
+| O3 links | $0.9$ | $18.0$ | $6.8$ | $35.6$ | $15.1$ |
+| O3 rechts | $0.9$ | $18.0$ | $6.8$ | $35.6$ | $15.1$ |
+
+### Normalkraft
+
+**Krümmung der Wand unter der Ausmitte e\_z, bis e\_z = 0.375 · t\_w** *(SIA 266:2015, 4.3.1.1, Figur 3)*
+
+$$
+\chi_y \cdot \frac{h_{Ed}^{2}}{t_w} = 4.1 \cdot \tan\left(2.4 \cdot \frac{e_z}{t_w}\right) \cdot \left[1 + \tan^{2}\left(2.4 \cdot \frac{e_z}{t_w}\right)\right] \qquad h_{Ed} = \pi \cdot \sqrt{\frac{B_{yd}}{N_{xd}}} \qquad B_{yd} = E_{xd} \cdot \frac{l_w \cdot t_w^{3}}{12}
+$$
+
+**Die Ausmitte der verformten Wand, nirgends grösser** *(SIA 266:2015, 4.3.1.1, Gl. (6), Figur 4)*
+
+$$
+\left|e_z\right| \le \min\left[0.375 \cdot t_w;\ \frac{t_w}{2} \cdot \left(1 - \frac{N_{xd}}{l_w \cdot t_w \cdot f_{xd}}\right)\right]
+$$
+
+**Gleichgewicht der verformten Wand: Ausmitte der Last und Auslenkung w**
+
+$$
+e_z(x) = e_u + \left(e_o - e_u\right) \cdot \frac{x}{h_w} + w(x) \qquad w''(x) = -\chi_y\left(e_z(x)\right) \qquad w(0) = w(h_w) = 0
+$$
+
+Ein eingespannter Rand dreht sich nicht: dort ist w' = 0, und seine Ausmitte folgt aus dem Gleichgewicht. Die Wand ist in 40 gleiche Stücke geteilt; die Normalkraft wächst in Schritten, die Ausmitten der Lasten bleiben, bis die Wand kein Gleichgewicht mehr findet oder ihre Ausmitte die Grenze erreicht.
+
+> **Annahme:** B\_yd = E\_xd · I\_y wie in Gl. (8) und Figur 5, ohne den Faktor √(1 − N\_x/(2 · A\_x · f\_xk)) der Figur 3; die Normalkraft über die ganze Höhe so gross wie am Fuss; ein Gelenk, das sich bei e\_z = 0.375 · t\_w weiter drehen könnte, zählt nicht – nach Vorgabe, nicht nachgeschlagen, die beiden letzten auf der sicheren Seite.
+
+#### Normalkraft – P1 – GZT
+
+**Normalkraft am Fuss des Pfeilers, aus dem Lastabtrag**
+
+$$
+N_{xd} = 109.9\,\mathrm{kN}
+$$
+
+**Moment der Ausmitten der Lasten am Kopf, aus dem Lastabtrag**
+
+$$
+M_d = 1.99\,\mathrm{kNm}
+$$
+
+**Normalkraft aus den Lasten allein, ohne das Eigengewicht der Wand, aus dem Lastabtrag**
+
+$$
+N_{Ld} = 99.5\,\mathrm{kN}
+$$
+
+**Ausmitte am Kopf – sie bleibt, wenn die Lasten wachsen**
+
+$$
+e_o = \frac{M_d}{N_{Ld}} = \frac{1.99\,\mathrm{kNm}}{99.5\,\mathrm{kN}} = 20\,\mathrm{mm}
+$$
+
+**Bezugswert der Knicklänge** *(SIA 266:2015, 4.3.1.2, Gl. (8))*
+
+$$
+h_{Ed} = \pi \cdot \sqrt{\frac{E_{xd} \cdot l_w \cdot t_w^{3}}{12 \cdot N_{xd}}} = \pi \cdot \sqrt{\frac{2975\,\mathrm{N}/\mathrm{mm}^{2} \cdot 800\,\mathrm{mm} \cdot \left(175\,\mathrm{mm}\right)^{3}}{12 \cdot 109.9\,\mathrm{kN}}} = 9.77\,\mathrm{m}
+$$
+
+h\_w / h\_Ed = 0.28 – die Schlankheit, nach der Figur 19 ordnet.
+
+**Beiwert der Normalkraft, gerechnet nach Theorie 2. Ordnung** *(SIA 266:2015, 4.3.1.1, Figur 3)*
+
+$$
+k_N = 0.771
+$$
+
+Bei k\_N = 0.771 erreicht die Ausmitte am Kopf mit 20 mm die Grenze nach Gl. (6) und Figur 4.
+
+**Normalkraftwiderstand des Pfeilers** *(SIA 266:2015, 4.3.1.3, Gl. (11))*
+
+$$
+N_{xRd} = k_N \cdot l_w \cdot t_w \cdot f_{xd} = 0.771 \cdot 800\,\mathrm{mm} \cdot 175\,\mathrm{mm} \cdot 2.98\,\mathrm{N}/\mathrm{mm}^{2} = 321.3\,\mathrm{kN}
+$$
+
+Unter N\_xd ist die Ausmitte am Kopf am grössten, 20 mm.
+
+**Einwirkung gegen Widerstand**
+
+$$
+N_{xd} = 109.9\,\mathrm{kN} \quad \le \quad N_{xRd} = 321.3\,\mathrm{kN}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,N,\text{P1 – GZT}} = \frac{N_{xRd}}{N_{xd}} = \frac{321.3\,\mathrm{kN}}{109.9\,\mathrm{kN}} = 2.92 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+#### Normalkraft – P1 – GZT günstig
+
+**Normalkraft am Fuss des Pfeilers, aus dem Lastabtrag**
+
+$$
+N_{xd} = 47.8\,\mathrm{kN}
+$$
+
+**Moment der Ausmitten der Lasten am Kopf, aus dem Lastabtrag**
+
+$$
+M_d = 0.83\,\mathrm{kNm}
+$$
+
+**Normalkraft aus den Lasten allein, ohne das Eigengewicht der Wand, aus dem Lastabtrag**
+
+$$
+N_{Ld} = 41.6\,\mathrm{kN}
+$$
+
+**Ausmitte am Kopf – sie bleibt, wenn die Lasten wachsen**
+
+$$
+e_o = \frac{M_d}{N_{Ld}} = \frac{0.83\,\mathrm{kNm}}{41.6\,\mathrm{kN}} = 20\,\mathrm{mm}
+$$
+
+**Bezugswert der Knicklänge** *(SIA 266:2015, 4.3.1.2, Gl. (8))*
+
+$$
+h_{Ed} = \pi \cdot \sqrt{\frac{E_{xd} \cdot l_w \cdot t_w^{3}}{12 \cdot N_{xd}}} = \pi \cdot \sqrt{\frac{2975\,\mathrm{N}/\mathrm{mm}^{2} \cdot 800\,\mathrm{mm} \cdot \left(175\,\mathrm{mm}\right)^{3}}{12 \cdot 47.8\,\mathrm{kN}}} = 14.81\,\mathrm{m}
+$$
+
+h\_w / h\_Ed = 0.18 – die Schlankheit, nach der Figur 19 ordnet.
+
+**Beiwert der Normalkraft, gerechnet nach Theorie 2. Ordnung** *(SIA 266:2015, 4.3.1.1, Figur 3)*
+
+$$
+k_N = 0.771
+$$
+
+Bei k\_N = 0.771 erreicht die Ausmitte am Kopf mit 20 mm die Grenze nach Gl. (6) und Figur 4.
+
+**Normalkraftwiderstand des Pfeilers** *(SIA 266:2015, 4.3.1.3, Gl. (11))*
+
+$$
+N_{xRd} = k_N \cdot l_w \cdot t_w \cdot f_{xd} = 0.771 \cdot 800\,\mathrm{mm} \cdot 175\,\mathrm{mm} \cdot 2.98\,\mathrm{N}/\mathrm{mm}^{2} = 321.3\,\mathrm{kN}
+$$
+
+Unter N\_xd ist die Ausmitte am Kopf am grössten, 20 mm.
+
+**Einwirkung gegen Widerstand**
+
+$$
+N_{xd} = 47.8\,\mathrm{kN} \quad \le \quad N_{xRd} = 321.3\,\mathrm{kN}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,N,\text{P1 – GZT günstig}} = \frac{N_{xRd}}{N_{xd}} = \frac{321.3\,\mathrm{kN}}{47.8\,\mathrm{kN}} = 6.72 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+#### Normalkraft – P2 – GZT
+
+**Normalkraft am Fuss des Pfeilers, aus dem Lastabtrag**
+
+$$
+N_{xd} = 188.4\,\mathrm{kN}
+$$
+
+**Moment der Ausmitten der Lasten am Kopf, aus dem Lastabtrag**
+
+$$
+M_d = 3.21\,\mathrm{kNm}
+$$
+
+**Normalkraft aus den Lasten allein, ohne das Eigengewicht der Wand, aus dem Lastabtrag**
+
+$$
+N_{Ld} = 174.2\,\mathrm{kN}
+$$
+
+**Ausmitte am Kopf – sie bleibt, wenn die Lasten wachsen**
+
+$$
+e_o = \frac{M_d}{N_{Ld}} = \frac{3.21\,\mathrm{kNm}}{174.2\,\mathrm{kN}} = 18.4\,\mathrm{mm}
+$$
+
+**Bezugswert der Knicklänge** *(SIA 266:2015, 4.3.1.2, Gl. (8))*
+
+$$
+h_{Ed} = \pi \cdot \sqrt{\frac{E_{xd} \cdot l_w \cdot t_w^{3}}{12 \cdot N_{xd}}} = \pi \cdot \sqrt{\frac{2975\,\mathrm{N}/\mathrm{mm}^{2} \cdot 1000\,\mathrm{mm} \cdot \left(175\,\mathrm{mm}\right)^{3}}{12 \cdot 188.4\,\mathrm{kN}}} = 8.34\,\mathrm{m}
+$$
+
+h\_w / h\_Ed = 0.32 – die Schlankheit, nach der Figur 19 ordnet.
+
+**Beiwert der Normalkraft, gerechnet nach Theorie 2. Ordnung** *(SIA 266:2015, 4.3.1.1, Figur 3)*
+
+$$
+k_N = 0.789
+$$
+
+Bei k\_N = 0.789 erreicht die Ausmitte am Kopf mit 18 mm die Grenze nach Gl. (6) und Figur 4.
+
+**Normalkraftwiderstand des Pfeilers** *(SIA 266:2015, 4.3.1.3, Gl. (11))*
+
+$$
+N_{xRd} = k_N \cdot l_w \cdot t_w \cdot f_{xd} = 0.789 \cdot 1000\,\mathrm{mm} \cdot 175\,\mathrm{mm} \cdot 2.98\,\mathrm{N}/\mathrm{mm}^{2} = 410.8\,\mathrm{kN}
+$$
+
+Unter N\_xd ist die Ausmitte am Kopf am grössten, 18 mm.
+
+**Einwirkung gegen Widerstand**
+
+$$
+N_{xd} = 188.4\,\mathrm{kN} \quad \le \quad N_{xRd} = 410.8\,\mathrm{kN}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,N,\text{P2 – GZT}} = \frac{N_{xRd}}{N_{xd}} = \frac{410.8\,\mathrm{kN}}{188.4\,\mathrm{kN}} = 2.18 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+#### Normalkraft – P2 – GZT günstig
+
+**Normalkraft am Fuss des Pfeilers, aus dem Lastabtrag**
+
+$$
+N_{xd} = 83.7\,\mathrm{kN}
+$$
+
+**Moment der Ausmitten der Lasten am Kopf, aus dem Lastabtrag**
+
+$$
+M_d = 1.34\,\mathrm{kNm}
+$$
+
+**Normalkraft aus den Lasten allein, ohne das Eigengewicht der Wand, aus dem Lastabtrag**
+
+$$
+N_{Ld} = 75.2\,\mathrm{kN}
+$$
+
+**Ausmitte am Kopf – sie bleibt, wenn die Lasten wachsen**
+
+$$
+e_o = \frac{M_d}{N_{Ld}} = \frac{1.34\,\mathrm{kNm}}{75.2\,\mathrm{kN}} = 17.9\,\mathrm{mm}
+$$
+
+**Bezugswert der Knicklänge** *(SIA 266:2015, 4.3.1.2, Gl. (8))*
+
+$$
+h_{Ed} = \pi \cdot \sqrt{\frac{E_{xd} \cdot l_w \cdot t_w^{3}}{12 \cdot N_{xd}}} = \pi \cdot \sqrt{\frac{2975\,\mathrm{N}/\mathrm{mm}^{2} \cdot 1000\,\mathrm{mm} \cdot \left(175\,\mathrm{mm}\right)^{3}}{12 \cdot 83.7\,\mathrm{kN}}} = 12.52\,\mathrm{m}
+$$
+
+h\_w / h\_Ed = 0.22 – die Schlankheit, nach der Figur 19 ordnet.
+
+**Beiwert der Normalkraft, gerechnet nach Theorie 2. Ordnung** *(SIA 266:2015, 4.3.1.1, Figur 3)*
+
+$$
+k_N = 0.796
+$$
+
+Bei k\_N = 0.796 erreicht die Ausmitte am Kopf mit 18 mm die Grenze nach Gl. (6) und Figur 4.
+
+**Normalkraftwiderstand des Pfeilers** *(SIA 266:2015, 4.3.1.3, Gl. (11))*
+
+$$
+N_{xRd} = k_N \cdot l_w \cdot t_w \cdot f_{xd} = 0.796 \cdot 1000\,\mathrm{mm} \cdot 175\,\mathrm{mm} \cdot 2.98\,\mathrm{N}/\mathrm{mm}^{2} = 414.3\,\mathrm{kN}
+$$
+
+Unter N\_xd ist die Ausmitte am Kopf am grössten, 18 mm.
+
+**Einwirkung gegen Widerstand**
+
+$$
+N_{xd} = 83.7\,\mathrm{kN} \quad \le \quad N_{xRd} = 414.3\,\mathrm{kN}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,N,\text{P2 – GZT günstig}} = \frac{N_{xRd}}{N_{xd}} = \frac{414.3\,\mathrm{kN}}{83.7\,\mathrm{kN}} = 4.95 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+#### Normalkraft – P3 – GZT
+
+**Normalkraft am Fuss des Pfeilers, aus dem Lastabtrag**
+
+$$
+N_{xd} = 163.8\,\mathrm{kN}
+$$
+
+**Moment der Ausmitten der Lasten am Kopf, aus dem Lastabtrag**
+
+$$
+M_d = 2.75\,\mathrm{kNm}
+$$
+
+**Normalkraft aus den Lasten allein, ohne das Eigengewicht der Wand, aus dem Lastabtrag**
+
+$$
+N_{Ld} = 151.2\,\mathrm{kN}
+$$
+
+**Ausmitte am Kopf – sie bleibt, wenn die Lasten wachsen**
+
+$$
+e_o = \frac{M_d}{N_{Ld}} = \frac{2.75\,\mathrm{kNm}}{151.2\,\mathrm{kN}} = 18.2\,\mathrm{mm}
+$$
+
+**Bezugswert der Knicklänge** *(SIA 266:2015, 4.3.1.2, Gl. (8))*
+
+$$
+h_{Ed} = \pi \cdot \sqrt{\frac{E_{xd} \cdot l_w \cdot t_w^{3}}{12 \cdot N_{xd}}} = \pi \cdot \sqrt{\frac{2975\,\mathrm{N}/\mathrm{mm}^{2} \cdot 900\,\mathrm{mm} \cdot \left(175\,\mathrm{mm}\right)^{3}}{12 \cdot 163.8\,\mathrm{kN}}} = 8.49\,\mathrm{m}
+$$
+
+h\_w / h\_Ed = 0.32 – die Schlankheit, nach der Figur 19 ordnet.
+
+**Beiwert der Normalkraft, gerechnet nach Theorie 2. Ordnung** *(SIA 266:2015, 4.3.1.1, Figur 3)*
+
+$$
+k_N = 0.792
+$$
+
+Bei k\_N = 0.792 erreicht die Ausmitte am Kopf mit 18 mm die Grenze nach Gl. (6) und Figur 4.
+
+**Normalkraftwiderstand des Pfeilers** *(SIA 266:2015, 4.3.1.3, Gl. (11))*
+
+$$
+N_{xRd} = k_N \cdot l_w \cdot t_w \cdot f_{xd} = 0.792 \cdot 900\,\mathrm{mm} \cdot 175\,\mathrm{mm} \cdot 2.98\,\mathrm{N}/\mathrm{mm}^{2} = 371\,\mathrm{kN}
+$$
+
+Unter N\_xd ist die Ausmitte am Kopf am grössten, 18 mm.
+
+**Einwirkung gegen Widerstand**
+
+$$
+N_{xd} = 163.8\,\mathrm{kN} \quad \le \quad N_{xRd} = 371\,\mathrm{kN}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,N,\text{P3 – GZT}} = \frac{N_{xRd}}{N_{xd}} = \frac{371\,\mathrm{kN}}{163.8\,\mathrm{kN}} = 2.26 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+#### Normalkraft – P3 – GZT günstig
+
+**Normalkraft am Fuss des Pfeilers, aus dem Lastabtrag**
+
+$$
+N_{xd} = 73.1\,\mathrm{kN}
+$$
+
+**Moment der Ausmitten der Lasten am Kopf, aus dem Lastabtrag**
+
+$$
+M_d = 1.15\,\mathrm{kNm}
+$$
+
+**Normalkraft aus den Lasten allein, ohne das Eigengewicht der Wand, aus dem Lastabtrag**
+
+$$
+N_{Ld} = 65.6\,\mathrm{kN}
+$$
+
+**Ausmitte am Kopf – sie bleibt, wenn die Lasten wachsen**
+
+$$
+e_o = \frac{M_d}{N_{Ld}} = \frac{1.15\,\mathrm{kNm}}{65.6\,\mathrm{kN}} = 17.6\,\mathrm{mm}
+$$
+
+**Bezugswert der Knicklänge** *(SIA 266:2015, 4.3.1.2, Gl. (8))*
+
+$$
+h_{Ed} = \pi \cdot \sqrt{\frac{E_{xd} \cdot l_w \cdot t_w^{3}}{12 \cdot N_{xd}}} = \pi \cdot \sqrt{\frac{2975\,\mathrm{N}/\mathrm{mm}^{2} \cdot 900\,\mathrm{mm} \cdot \left(175\,\mathrm{mm}\right)^{3}}{12 \cdot 73.1\,\mathrm{kN}}} = 12.71\,\mathrm{m}
+$$
+
+h\_w / h\_Ed = 0.21 – die Schlankheit, nach der Figur 19 ordnet.
+
+**Beiwert der Normalkraft, gerechnet nach Theorie 2. Ordnung** *(SIA 266:2015, 4.3.1.1, Figur 3)*
+
+$$
+k_N = 0.799
+$$
+
+Bei k\_N = 0.799 erreicht die Ausmitte am Kopf mit 18 mm die Grenze nach Gl. (6) und Figur 4.
+
+**Normalkraftwiderstand des Pfeilers** *(SIA 266:2015, 4.3.1.3, Gl. (11))*
+
+$$
+N_{xRd} = k_N \cdot l_w \cdot t_w \cdot f_{xd} = 0.799 \cdot 900\,\mathrm{mm} \cdot 175\,\mathrm{mm} \cdot 2.98\,\mathrm{N}/\mathrm{mm}^{2} = 374.5\,\mathrm{kN}
+$$
+
+Unter N\_xd ist die Ausmitte am Kopf am grössten, 18 mm.
+
+**Einwirkung gegen Widerstand**
+
+$$
+N_{xd} = 73.1\,\mathrm{kN} \quad \le \quad N_{xRd} = 374.5\,\mathrm{kN}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,N,\text{P3 – GZT günstig}} = \frac{N_{xRd}}{N_{xd}} = \frac{374.5\,\mathrm{kN}}{73.1\,\mathrm{kN}} = 5.12 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+#### Normalkraft – P4 – GZT
+
+**Normalkraft am Fuss des Pfeilers, aus dem Lastabtrag**
+
+$$
+N_{xd} = 67.7\,\mathrm{kN}
+$$
+
+**Moment der Ausmitten der Lasten am Kopf, aus dem Lastabtrag**
+
+$$
+M_d = 1.22\,\mathrm{kNm}
+$$
+
+**Normalkraft aus den Lasten allein, ohne das Eigengewicht der Wand, aus dem Lastabtrag**
+
+$$
+N_{Ld} = 61.2\,\mathrm{kN}
+$$
+
+**Ausmitte am Kopf – sie bleibt, wenn die Lasten wachsen**
+
+$$
+e_o = \frac{M_d}{N_{Ld}} = \frac{1.22\,\mathrm{kNm}}{61.2\,\mathrm{kN}} = 20\,\mathrm{mm}
+$$
+
+**Bezugswert der Knicklänge** *(SIA 266:2015, 4.3.1.2, Gl. (8))*
+
+$$
+h_{Ed} = \pi \cdot \sqrt{\frac{E_{xd} \cdot l_w \cdot t_w^{3}}{12 \cdot N_{xd}}} = \pi \cdot \sqrt{\frac{2975\,\mathrm{N}/\mathrm{mm}^{2} \cdot 500\,\mathrm{mm} \cdot \left(175\,\mathrm{mm}\right)^{3}}{12 \cdot 67.7\,\mathrm{kN}}} = 9.84\,\mathrm{m}
+$$
+
+h\_w / h\_Ed = 0.27 – die Schlankheit, nach der Figur 19 ordnet.
+
+**Beiwert der Normalkraft, gerechnet nach Theorie 2. Ordnung** *(SIA 266:2015, 4.3.1.1, Figur 3)*
+
+$$
+k_N = 0.771
+$$
+
+Bei k\_N = 0.771 erreicht die Ausmitte am Kopf mit 20 mm die Grenze nach Gl. (6) und Figur 4.
+
+**Normalkraftwiderstand des Pfeilers** *(SIA 266:2015, 4.3.1.3, Gl. (11))*
+
+$$
+N_{xRd} = k_N \cdot l_w \cdot t_w \cdot f_{xd} = 0.771 \cdot 500\,\mathrm{mm} \cdot 175\,\mathrm{mm} \cdot 2.98\,\mathrm{N}/\mathrm{mm}^{2} = 200.8\,\mathrm{kN}
+$$
+
+Unter N\_xd ist die Ausmitte am Kopf am grössten, 20 mm.
+
+**Einwirkung gegen Widerstand**
+
+$$
+N_{xd} = 67.7\,\mathrm{kN} \quad \le \quad N_{xRd} = 200.8\,\mathrm{kN}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,N,\text{P4 – GZT}} = \frac{N_{xRd}}{N_{xd}} = \frac{200.8\,\mathrm{kN}}{67.7\,\mathrm{kN}} = 2.97 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+#### Normalkraft – P4 – GZT günstig
+
+**Normalkraft am Fuss des Pfeilers, aus dem Lastabtrag**
+
+$$
+N_{xd} = 29.5\,\mathrm{kN}
+$$
+
+**Moment der Ausmitten der Lasten am Kopf, aus dem Lastabtrag**
+
+$$
+M_d = 0.51\,\mathrm{kNm}
+$$
+
+**Normalkraft aus den Lasten allein, ohne das Eigengewicht der Wand, aus dem Lastabtrag**
+
+$$
+N_{Ld} = 25.6\,\mathrm{kN}
+$$
+
+**Ausmitte am Kopf – sie bleibt, wenn die Lasten wachsen**
+
+$$
+e_o = \frac{M_d}{N_{Ld}} = \frac{0.51\,\mathrm{kNm}}{25.6\,\mathrm{kN}} = 20\,\mathrm{mm}
+$$
+
+**Bezugswert der Knicklänge** *(SIA 266:2015, 4.3.1.2, Gl. (8))*
+
+$$
+h_{Ed} = \pi \cdot \sqrt{\frac{E_{xd} \cdot l_w \cdot t_w^{3}}{12 \cdot N_{xd}}} = \pi \cdot \sqrt{\frac{2975\,\mathrm{N}/\mathrm{mm}^{2} \cdot 500\,\mathrm{mm} \cdot \left(175\,\mathrm{mm}\right)^{3}}{12 \cdot 29.5\,\mathrm{kN}}} = 14.92\,\mathrm{m}
+$$
+
+h\_w / h\_Ed = 0.18 – die Schlankheit, nach der Figur 19 ordnet.
+
+**Beiwert der Normalkraft, gerechnet nach Theorie 2. Ordnung** *(SIA 266:2015, 4.3.1.1, Figur 3)*
+
+$$
+k_N = 0.771
+$$
+
+Bei k\_N = 0.771 erreicht die Ausmitte am Kopf mit 20 mm die Grenze nach Gl. (6) und Figur 4.
+
+**Normalkraftwiderstand des Pfeilers** *(SIA 266:2015, 4.3.1.3, Gl. (11))*
+
+$$
+N_{xRd} = k_N \cdot l_w \cdot t_w \cdot f_{xd} = 0.771 \cdot 500\,\mathrm{mm} \cdot 175\,\mathrm{mm} \cdot 2.98\,\mathrm{N}/\mathrm{mm}^{2} = 200.8\,\mathrm{kN}
+$$
+
+Unter N\_xd ist die Ausmitte am Kopf am grössten, 20 mm.
+
+**Einwirkung gegen Widerstand**
+
+$$
+N_{xd} = 29.5\,\mathrm{kN} \quad \le \quad N_{xRd} = 200.8\,\mathrm{kN}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,N,\text{P4 – GZT günstig}} = \frac{N_{xRd}}{N_{xd}} = \frac{200.8\,\mathrm{kN}}{29.5\,\mathrm{kN}} = 6.82 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+### Teilflächenpressung
+
+> **Annahme:** Der Sturz ist so breit wie die Wand, und sein Auflager endet am Rand der Öffnung: die Fläche A\_1 mit demselben Schwerpunkt ist A\_0 selbst – nach Vorgabe, nicht nachgeschlagen.
+
+#### Teilflächenpressung – O1 links – GZT
+
+**Kraft des Sturzauflagers, aus dem Lastabtrag**
+
+$$
+R_d = 51.4\,\mathrm{kN}
+$$
+
+**Fläche des Auflagers**
+
+$$
+A_0 = a \cdot t_w = 150\,\mathrm{mm} \cdot 175\,\mathrm{mm} = 26250\,\mathrm{mm}^{2}
+$$
+
+**Fläche mit demselben Schwerpunkt: am Rand der Öffnung A\_0 selbst**
+
+$$
+A_1 = 26250\,\mathrm{mm}^{2}
+$$
+
+**Beiwert der Teilflächenpressung** *(SIA 266:2015, 4.2.1.2, Gl. (4), Figur 2)*
+
+$$
+k_m = \min\left[0.5 \cdot \left(1 + \sqrt{\frac{A_1}{A_0}}\right);\ 1.5\right] = \min\left[0.5 \cdot \left(1 + \sqrt{\frac{26250\,\mathrm{mm}^{2}}{26250\,\mathrm{mm}^{2}}}\right);\ 1.5\right] = 1
+$$
+
+**Widerstand des Auflagers** *(SIA 266:2015, 4.2.1.2, Gl. (4), Figur 2)*
+
+$$
+R_{Rd} = k_m \cdot f_{xd} \cdot A_0 = 1 \cdot 2.98\,\mathrm{N}/\mathrm{mm}^{2} \cdot 26250\,\mathrm{mm}^{2} = 78.1\,\mathrm{kN}
+$$
+
+**Einwirkung gegen Widerstand**
+
+$$
+R_d = 51.4\,\mathrm{kN} \quad \le \quad R_{Rd} = 78.1\,\mathrm{kN}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,TF,\text{O1 links – GZT}} = \frac{R_{Rd}}{R_d} = \frac{78.1\,\mathrm{kN}}{51.4\,\mathrm{kN}} = 1.52 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+#### Teilflächenpressung – O1 links – GZT günstig
+
+**Kraft des Sturzauflagers, aus dem Lastabtrag**
+
+$$
+R_d = 21.8\,\mathrm{kN}
+$$
+
+**Fläche des Auflagers**
+
+$$
+A_0 = a \cdot t_w = 150\,\mathrm{mm} \cdot 175\,\mathrm{mm} = 26250\,\mathrm{mm}^{2}
+$$
+
+**Fläche mit demselben Schwerpunkt: am Rand der Öffnung A\_0 selbst**
+
+$$
+A_1 = 26250\,\mathrm{mm}^{2}
+$$
+
+**Beiwert der Teilflächenpressung** *(SIA 266:2015, 4.2.1.2, Gl. (4), Figur 2)*
+
+$$
+k_m = \min\left[0.5 \cdot \left(1 + \sqrt{\frac{A_1}{A_0}}\right);\ 1.5\right] = \min\left[0.5 \cdot \left(1 + \sqrt{\frac{26250\,\mathrm{mm}^{2}}{26250\,\mathrm{mm}^{2}}}\right);\ 1.5\right] = 1
+$$
+
+**Widerstand des Auflagers** *(SIA 266:2015, 4.2.1.2, Gl. (4), Figur 2)*
+
+$$
+R_{Rd} = k_m \cdot f_{xd} \cdot A_0 = 1 \cdot 2.98\,\mathrm{N}/\mathrm{mm}^{2} \cdot 26250\,\mathrm{mm}^{2} = 78.1\,\mathrm{kN}
+$$
+
+**Einwirkung gegen Widerstand**
+
+$$
+R_d = 21.8\,\mathrm{kN} \quad \le \quad R_{Rd} = 78.1\,\mathrm{kN}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,TF,\text{O1 links – GZT günstig}} = \frac{R_{Rd}}{R_d} = \frac{78.1\,\mathrm{kN}}{21.8\,\mathrm{kN}} = 3.59 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+#### Teilflächenpressung – O1 rechts – GZT
+
+**Kraft des Sturzauflagers, aus dem Lastabtrag**
+
+$$
+R_d = 51.4\,\mathrm{kN}
+$$
+
+**Fläche des Auflagers**
+
+$$
+A_0 = a \cdot t_w = 150\,\mathrm{mm} \cdot 175\,\mathrm{mm} = 26250\,\mathrm{mm}^{2}
+$$
+
+**Fläche mit demselben Schwerpunkt: am Rand der Öffnung A\_0 selbst**
+
+$$
+A_1 = 26250\,\mathrm{mm}^{2}
+$$
+
+**Beiwert der Teilflächenpressung** *(SIA 266:2015, 4.2.1.2, Gl. (4), Figur 2)*
+
+$$
+k_m = \min\left[0.5 \cdot \left(1 + \sqrt{\frac{A_1}{A_0}}\right);\ 1.5\right] = \min\left[0.5 \cdot \left(1 + \sqrt{\frac{26250\,\mathrm{mm}^{2}}{26250\,\mathrm{mm}^{2}}}\right);\ 1.5\right] = 1
+$$
+
+**Widerstand des Auflagers** *(SIA 266:2015, 4.2.1.2, Gl. (4), Figur 2)*
+
+$$
+R_{Rd} = k_m \cdot f_{xd} \cdot A_0 = 1 \cdot 2.98\,\mathrm{N}/\mathrm{mm}^{2} \cdot 26250\,\mathrm{mm}^{2} = 78.1\,\mathrm{kN}
+$$
+
+**Einwirkung gegen Widerstand**
+
+$$
+R_d = 51.4\,\mathrm{kN} \quad \le \quad R_{Rd} = 78.1\,\mathrm{kN}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,TF,\text{O1 rechts – GZT}} = \frac{R_{Rd}}{R_d} = \frac{78.1\,\mathrm{kN}}{51.4\,\mathrm{kN}} = 1.52 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+#### Teilflächenpressung – O1 rechts – GZT günstig
+
+**Kraft des Sturzauflagers, aus dem Lastabtrag**
+
+$$
+R_d = 21.8\,\mathrm{kN}
+$$
+
+**Fläche des Auflagers**
+
+$$
+A_0 = a \cdot t_w = 150\,\mathrm{mm} \cdot 175\,\mathrm{mm} = 26250\,\mathrm{mm}^{2}
+$$
+
+**Fläche mit demselben Schwerpunkt: am Rand der Öffnung A\_0 selbst**
+
+$$
+A_1 = 26250\,\mathrm{mm}^{2}
+$$
+
+**Beiwert der Teilflächenpressung** *(SIA 266:2015, 4.2.1.2, Gl. (4), Figur 2)*
+
+$$
+k_m = \min\left[0.5 \cdot \left(1 + \sqrt{\frac{A_1}{A_0}}\right);\ 1.5\right] = \min\left[0.5 \cdot \left(1 + \sqrt{\frac{26250\,\mathrm{mm}^{2}}{26250\,\mathrm{mm}^{2}}}\right);\ 1.5\right] = 1
+$$
+
+**Widerstand des Auflagers** *(SIA 266:2015, 4.2.1.2, Gl. (4), Figur 2)*
+
+$$
+R_{Rd} = k_m \cdot f_{xd} \cdot A_0 = 1 \cdot 2.98\,\mathrm{N}/\mathrm{mm}^{2} \cdot 26250\,\mathrm{mm}^{2} = 78.1\,\mathrm{kN}
+$$
+
+**Einwirkung gegen Widerstand**
+
+$$
+R_d = 21.8\,\mathrm{kN} \quad \le \quad R_{Rd} = 78.1\,\mathrm{kN}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,TF,\text{O1 rechts – GZT günstig}} = \frac{R_{Rd}}{R_d} = \frac{78.1\,\mathrm{kN}}{21.8\,\mathrm{kN}} = 3.59 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+#### Teilflächenpressung – O2 links – GZT
+
+**Kraft des Sturzauflagers, aus dem Lastabtrag**
+
+$$
+R_d = 72.8\,\mathrm{kN}
+$$
+
+**Fläche des Auflagers**
+
+$$
+A_0 = a \cdot t_w = 150\,\mathrm{mm} \cdot 175\,\mathrm{mm} = 26250\,\mathrm{mm}^{2}
+$$
+
+**Fläche mit demselben Schwerpunkt: am Rand der Öffnung A\_0 selbst**
+
+$$
+A_1 = 26250\,\mathrm{mm}^{2}
+$$
+
+**Beiwert der Teilflächenpressung** *(SIA 266:2015, 4.2.1.2, Gl. (4), Figur 2)*
+
+$$
+k_m = \min\left[0.5 \cdot \left(1 + \sqrt{\frac{A_1}{A_0}}\right);\ 1.5\right] = \min\left[0.5 \cdot \left(1 + \sqrt{\frac{26250\,\mathrm{mm}^{2}}{26250\,\mathrm{mm}^{2}}}\right);\ 1.5\right] = 1
+$$
+
+**Widerstand des Auflagers** *(SIA 266:2015, 4.2.1.2, Gl. (4), Figur 2)*
+
+$$
+R_{Rd} = k_m \cdot f_{xd} \cdot A_0 = 1 \cdot 2.98\,\mathrm{N}/\mathrm{mm}^{2} \cdot 26250\,\mathrm{mm}^{2} = 78.1\,\mathrm{kN}
+$$
+
+**Einwirkung gegen Widerstand**
+
+$$
+R_d = 72.8\,\mathrm{kN} \quad \le \quad R_{Rd} = 78.1\,\mathrm{kN}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,TF,\text{O2 links – GZT}} = \frac{R_{Rd}}{R_d} = \frac{78.1\,\mathrm{kN}}{72.8\,\mathrm{kN}} = 1.07 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+#### Teilflächenpressung – O2 links – GZT günstig
+
+**Kraft des Sturzauflagers, aus dem Lastabtrag**
+
+$$
+R_d = 33.1\,\mathrm{kN}
+$$
+
+**Fläche des Auflagers**
+
+$$
+A_0 = a \cdot t_w = 150\,\mathrm{mm} \cdot 175\,\mathrm{mm} = 26250\,\mathrm{mm}^{2}
+$$
+
+**Fläche mit demselben Schwerpunkt: am Rand der Öffnung A\_0 selbst**
+
+$$
+A_1 = 26250\,\mathrm{mm}^{2}
+$$
+
+**Beiwert der Teilflächenpressung** *(SIA 266:2015, 4.2.1.2, Gl. (4), Figur 2)*
+
+$$
+k_m = \min\left[0.5 \cdot \left(1 + \sqrt{\frac{A_1}{A_0}}\right);\ 1.5\right] = \min\left[0.5 \cdot \left(1 + \sqrt{\frac{26250\,\mathrm{mm}^{2}}{26250\,\mathrm{mm}^{2}}}\right);\ 1.5\right] = 1
+$$
+
+**Widerstand des Auflagers** *(SIA 266:2015, 4.2.1.2, Gl. (4), Figur 2)*
+
+$$
+R_{Rd} = k_m \cdot f_{xd} \cdot A_0 = 1 \cdot 2.98\,\mathrm{N}/\mathrm{mm}^{2} \cdot 26250\,\mathrm{mm}^{2} = 78.1\,\mathrm{kN}
+$$
+
+**Einwirkung gegen Widerstand**
+
+$$
+R_d = 33.1\,\mathrm{kN} \quad \le \quad R_{Rd} = 78.1\,\mathrm{kN}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,TF,\text{O2 links – GZT günstig}} = \frac{R_{Rd}}{R_d} = \frac{78.1\,\mathrm{kN}}{33.1\,\mathrm{kN}} = 2.36 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+#### Teilflächenpressung – O2 rechts – GZT
+
+**Kraft des Sturzauflagers, aus dem Lastabtrag**
+
+$$
+R_d = 72.8\,\mathrm{kN}
+$$
+
+**Fläche des Auflagers**
+
+$$
+A_0 = a \cdot t_w = 150\,\mathrm{mm} \cdot 175\,\mathrm{mm} = 26250\,\mathrm{mm}^{2}
+$$
+
+**Fläche mit demselben Schwerpunkt: am Rand der Öffnung A\_0 selbst**
+
+$$
+A_1 = 26250\,\mathrm{mm}^{2}
+$$
+
+**Beiwert der Teilflächenpressung** *(SIA 266:2015, 4.2.1.2, Gl. (4), Figur 2)*
+
+$$
+k_m = \min\left[0.5 \cdot \left(1 + \sqrt{\frac{A_1}{A_0}}\right);\ 1.5\right] = \min\left[0.5 \cdot \left(1 + \sqrt{\frac{26250\,\mathrm{mm}^{2}}{26250\,\mathrm{mm}^{2}}}\right);\ 1.5\right] = 1
+$$
+
+**Widerstand des Auflagers** *(SIA 266:2015, 4.2.1.2, Gl. (4), Figur 2)*
+
+$$
+R_{Rd} = k_m \cdot f_{xd} \cdot A_0 = 1 \cdot 2.98\,\mathrm{N}/\mathrm{mm}^{2} \cdot 26250\,\mathrm{mm}^{2} = 78.1\,\mathrm{kN}
+$$
+
+**Einwirkung gegen Widerstand**
+
+$$
+R_d = 72.8\,\mathrm{kN} \quad \le \quad R_{Rd} = 78.1\,\mathrm{kN}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,TF,\text{O2 rechts – GZT}} = \frac{R_{Rd}}{R_d} = \frac{78.1\,\mathrm{kN}}{72.8\,\mathrm{kN}} = 1.07 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+#### Teilflächenpressung – O2 rechts – GZT günstig
+
+**Kraft des Sturzauflagers, aus dem Lastabtrag**
+
+$$
+R_d = 33.1\,\mathrm{kN}
+$$
+
+**Fläche des Auflagers**
+
+$$
+A_0 = a \cdot t_w = 150\,\mathrm{mm} \cdot 175\,\mathrm{mm} = 26250\,\mathrm{mm}^{2}
+$$
+
+**Fläche mit demselben Schwerpunkt: am Rand der Öffnung A\_0 selbst**
+
+$$
+A_1 = 26250\,\mathrm{mm}^{2}
+$$
+
+**Beiwert der Teilflächenpressung** *(SIA 266:2015, 4.2.1.2, Gl. (4), Figur 2)*
+
+$$
+k_m = \min\left[0.5 \cdot \left(1 + \sqrt{\frac{A_1}{A_0}}\right);\ 1.5\right] = \min\left[0.5 \cdot \left(1 + \sqrt{\frac{26250\,\mathrm{mm}^{2}}{26250\,\mathrm{mm}^{2}}}\right);\ 1.5\right] = 1
+$$
+
+**Widerstand des Auflagers** *(SIA 266:2015, 4.2.1.2, Gl. (4), Figur 2)*
+
+$$
+R_{Rd} = k_m \cdot f_{xd} \cdot A_0 = 1 \cdot 2.98\,\mathrm{N}/\mathrm{mm}^{2} \cdot 26250\,\mathrm{mm}^{2} = 78.1\,\mathrm{kN}
+$$
+
+**Einwirkung gegen Widerstand**
+
+$$
+R_d = 33.1\,\mathrm{kN} \quad \le \quad R_{Rd} = 78.1\,\mathrm{kN}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,TF,\text{O2 rechts – GZT günstig}} = \frac{R_{Rd}}{R_d} = \frac{78.1\,\mathrm{kN}}{33.1\,\mathrm{kN}} = 2.36 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+#### Teilflächenpressung – O3 links – GZT
+
+**Kraft des Sturzauflagers, aus dem Lastabtrag**
+
+$$
+R_d = 35.6\,\mathrm{kN}
+$$
+
+**Fläche des Auflagers**
+
+$$
+A_0 = a \cdot t_w = 150\,\mathrm{mm} \cdot 175\,\mathrm{mm} = 26250\,\mathrm{mm}^{2}
+$$
+
+**Fläche mit demselben Schwerpunkt: am Rand der Öffnung A\_0 selbst**
+
+$$
+A_1 = 26250\,\mathrm{mm}^{2}
+$$
+
+**Beiwert der Teilflächenpressung** *(SIA 266:2015, 4.2.1.2, Gl. (4), Figur 2)*
+
+$$
+k_m = \min\left[0.5 \cdot \left(1 + \sqrt{\frac{A_1}{A_0}}\right);\ 1.5\right] = \min\left[0.5 \cdot \left(1 + \sqrt{\frac{26250\,\mathrm{mm}^{2}}{26250\,\mathrm{mm}^{2}}}\right);\ 1.5\right] = 1
+$$
+
+**Widerstand des Auflagers** *(SIA 266:2015, 4.2.1.2, Gl. (4), Figur 2)*
+
+$$
+R_{Rd} = k_m \cdot f_{xd} \cdot A_0 = 1 \cdot 2.98\,\mathrm{N}/\mathrm{mm}^{2} \cdot 26250\,\mathrm{mm}^{2} = 78.1\,\mathrm{kN}
+$$
+
+**Einwirkung gegen Widerstand**
+
+$$
+R_d = 35.6\,\mathrm{kN} \quad \le \quad R_{Rd} = 78.1\,\mathrm{kN}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,TF,\text{O3 links – GZT}} = \frac{R_{Rd}}{R_d} = \frac{78.1\,\mathrm{kN}}{35.6\,\mathrm{kN}} = 2.20 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+#### Teilflächenpressung – O3 links – GZT günstig
+
+**Kraft des Sturzauflagers, aus dem Lastabtrag**
+
+$$
+R_d = 15.1\,\mathrm{kN}
+$$
+
+**Fläche des Auflagers**
+
+$$
+A_0 = a \cdot t_w = 150\,\mathrm{mm} \cdot 175\,\mathrm{mm} = 26250\,\mathrm{mm}^{2}
+$$
+
+**Fläche mit demselben Schwerpunkt: am Rand der Öffnung A\_0 selbst**
+
+$$
+A_1 = 26250\,\mathrm{mm}^{2}
+$$
+
+**Beiwert der Teilflächenpressung** *(SIA 266:2015, 4.2.1.2, Gl. (4), Figur 2)*
+
+$$
+k_m = \min\left[0.5 \cdot \left(1 + \sqrt{\frac{A_1}{A_0}}\right);\ 1.5\right] = \min\left[0.5 \cdot \left(1 + \sqrt{\frac{26250\,\mathrm{mm}^{2}}{26250\,\mathrm{mm}^{2}}}\right);\ 1.5\right] = 1
+$$
+
+**Widerstand des Auflagers** *(SIA 266:2015, 4.2.1.2, Gl. (4), Figur 2)*
+
+$$
+R_{Rd} = k_m \cdot f_{xd} \cdot A_0 = 1 \cdot 2.98\,\mathrm{N}/\mathrm{mm}^{2} \cdot 26250\,\mathrm{mm}^{2} = 78.1\,\mathrm{kN}
+$$
+
+**Einwirkung gegen Widerstand**
+
+$$
+R_d = 15.1\,\mathrm{kN} \quad \le \quad R_{Rd} = 78.1\,\mathrm{kN}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,TF,\text{O3 links – GZT günstig}} = \frac{R_{Rd}}{R_d} = \frac{78.1\,\mathrm{kN}}{15.1\,\mathrm{kN}} = 5.18 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+#### Teilflächenpressung – O3 rechts – GZT
+
+**Kraft des Sturzauflagers, aus dem Lastabtrag**
+
+$$
+R_d = 35.6\,\mathrm{kN}
+$$
+
+**Fläche des Auflagers**
+
+$$
+A_0 = a \cdot t_w = 150\,\mathrm{mm} \cdot 175\,\mathrm{mm} = 26250\,\mathrm{mm}^{2}
+$$
+
+**Fläche mit demselben Schwerpunkt: am Rand der Öffnung A\_0 selbst**
+
+$$
+A_1 = 26250\,\mathrm{mm}^{2}
+$$
+
+**Beiwert der Teilflächenpressung** *(SIA 266:2015, 4.2.1.2, Gl. (4), Figur 2)*
+
+$$
+k_m = \min\left[0.5 \cdot \left(1 + \sqrt{\frac{A_1}{A_0}}\right);\ 1.5\right] = \min\left[0.5 \cdot \left(1 + \sqrt{\frac{26250\,\mathrm{mm}^{2}}{26250\,\mathrm{mm}^{2}}}\right);\ 1.5\right] = 1
+$$
+
+**Widerstand des Auflagers** *(SIA 266:2015, 4.2.1.2, Gl. (4), Figur 2)*
+
+$$
+R_{Rd} = k_m \cdot f_{xd} \cdot A_0 = 1 \cdot 2.98\,\mathrm{N}/\mathrm{mm}^{2} \cdot 26250\,\mathrm{mm}^{2} = 78.1\,\mathrm{kN}
+$$
+
+**Einwirkung gegen Widerstand**
+
+$$
+R_d = 35.6\,\mathrm{kN} \quad \le \quad R_{Rd} = 78.1\,\mathrm{kN}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,TF,\text{O3 rechts – GZT}} = \frac{R_{Rd}}{R_d} = \frac{78.1\,\mathrm{kN}}{35.6\,\mathrm{kN}} = 2.20 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+#### Teilflächenpressung – O3 rechts – GZT günstig
+
+**Kraft des Sturzauflagers, aus dem Lastabtrag**
+
+$$
+R_d = 15.1\,\mathrm{kN}
+$$
+
+**Fläche des Auflagers**
+
+$$
+A_0 = a \cdot t_w = 150\,\mathrm{mm} \cdot 175\,\mathrm{mm} = 26250\,\mathrm{mm}^{2}
+$$
+
+**Fläche mit demselben Schwerpunkt: am Rand der Öffnung A\_0 selbst**
+
+$$
+A_1 = 26250\,\mathrm{mm}^{2}
+$$
+
+**Beiwert der Teilflächenpressung** *(SIA 266:2015, 4.2.1.2, Gl. (4), Figur 2)*
+
+$$
+k_m = \min\left[0.5 \cdot \left(1 + \sqrt{\frac{A_1}{A_0}}\right);\ 1.5\right] = \min\left[0.5 \cdot \left(1 + \sqrt{\frac{26250\,\mathrm{mm}^{2}}{26250\,\mathrm{mm}^{2}}}\right);\ 1.5\right] = 1
+$$
+
+**Widerstand des Auflagers** *(SIA 266:2015, 4.2.1.2, Gl. (4), Figur 2)*
+
+$$
+R_{Rd} = k_m \cdot f_{xd} \cdot A_0 = 1 \cdot 2.98\,\mathrm{N}/\mathrm{mm}^{2} \cdot 26250\,\mathrm{mm}^{2} = 78.1\,\mathrm{kN}
+$$
+
+**Einwirkung gegen Widerstand**
+
+$$
+R_d = 15.1\,\mathrm{kN} \quad \le \quad R_{Rd} = 78.1\,\mathrm{kN}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,TF,\text{O3 rechts – GZT günstig}} = \frac{R_{Rd}}{R_d} = \frac{78.1\,\mathrm{kN}}{15.1\,\mathrm{kN}} = 5.18 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+### Mauerwerk: Pfeiler aus Kalksandstein
+
+**Dicke der Wand**
+
+$$
+t_w = 150\,\mathrm{mm}
+$$
+
+**Ausmitte der Normalkraft am Fuss**
+
+$$
+e_u = 15\,\mathrm{mm}
+$$
+
+**Erdbeschleunigung für das Eigengewicht (nach Vorgabe des Benutzers)**
+
+$$
+g = 10\,\mathrm{m}/\mathrm{s}^{2}
+$$
+
+> **Annahme:** Eine Wand aus unbewehrtem Mauerwerk nach SIA 266:2015, gezeichnet in der Ansicht. Kohäsion und Zugfestigkeit des Mauerwerks zählen nicht (4.1.2), und quer zu ihrer Ebene ist die Wand gehalten (4.1.4). Die Zeichen der Norm: x steht senkrecht zu den Lagerfugen, also lotrecht, y längs der Wand (Figur 1).
+
+**Wand**
+
+| Wand | Mauerwerk | $l_w\ [\mathrm{m}]$ | $h_w\ [\mathrm{m}]$ |
+| ---: | ---: | ---: | ---: |
+| W1 | MK | $1.50$ | $2.60$ |
+
+Einsteinmauerwerk, die Stossfugen nicht vollfugig vermauert. Kopf eingespannt, Fuss gelenkig; links frei, rechts frei.
+
+**Bemessungswerte, Festigkeiten und Moduln in N/mm²**
+
+|  | Mauerwerk «MK» | Wand |
+| ---: | ---: | ---: |
+| $f_{xd}$ | $3.50$ | $3.50$ |
+| $f_{yd}$ | $1.10$ | $1.10$ |
+| $E_{xd}$ | $3500$ | $3500$ |
+| $G_d$ | $1400$ | $1400$ |
+| $\mu_d$ | $0.60$ | $0.60$ |
+
+**Pfeiler – zwischen den Öffnungen und an den Enden der Wand**
+
+| Pfeiler | links – rechts [m] | $b\ [\mathrm{m}]$ | zwischen |
+| ---: | ---: | ---: | ---: |
+| P1 | 0.00 – 1.50 | $1.50$ | ganze Wand |
+
+#### Lastabtrag
+
+Die Lasten gehen lotrecht nach unten. Was über einem Pfeiler liegt, trägt er, samt seinem eigenen Gewicht. Was über einer Öffnung liegt, trägt ihr Sturz: über einem seiner Auflager ganz dieses, über der Öffnung als einfacher Balken zwischen den Mitten der Auflager. Seine Auflagerkräfte gehen weiter nach unten, in den Pfeiler darunter oder auf den nächsten Sturz. Was unter einer Öffnung liegt, etwa eine Brüstung, geht neben den Pfeilern in den Fuss. Die Ausmitte einer Last wirkt am Kopf der Pfeiler, die sie tragen; ein Sturz wiegt wie Mauerwerk. Die Ausmitte am Kopf ist die der Lasten allein: das Eigengewicht kommt erst darunter dazu.
+
+> **Annahme:** Den Lastabtrag in der Wand regelt die Norm nicht; so verteilt das Werkzeug die Lasten nach Vorgabe, nicht nachgeschlagen.
+
+**Eigengewicht der Wand je m² Ansicht, aus der Dichte ihres Mauerwerks**
+
+$$
+g_k = \rho \cdot g \cdot t_w = 1800\,\mathrm{kg}/\mathrm{m}^{3} \cdot 10\,\mathrm{m}/\mathrm{s}^{2} \cdot 150\,\mathrm{mm} = 2.7\,\mathrm{kN}/\mathrm{m}^{2}
+$$
+
+Die Lastfälle charakteristisch, die Kombinationen mit ihren Beiwerten.
+
+**Normalkraft am Fuss der Pfeiler, Druck positiv, in kN**
+
+|  | Eigengewicht | Auflast | Nutzlast | GZT | GZT günstig |
+| :--- | ---: | ---: | ---: | ---: | ---: |
+| P1 | $10.5$ | $90.0$ | $30.0$ | $180.7$ | $80.4$ |
+
+### Normalkraft
+
+**Krümmung der Wand unter der Ausmitte e\_z, bis e\_z = 0.375 · t\_w** *(SIA 266:2015, 4.3.1.1, Figur 3)*
+
+$$
+\chi_y \cdot \frac{h_{Ed}^{2}}{t_w} = 4.1 \cdot \tan\left(2.4 \cdot \frac{e_z}{t_w}\right) \cdot \left[1 + \tan^{2}\left(2.4 \cdot \frac{e_z}{t_w}\right)\right] \qquad h_{Ed} = \pi \cdot \sqrt{\frac{B_{yd}}{N_{xd}}} \qquad B_{yd} = E_{xd} \cdot \frac{l_w \cdot t_w^{3}}{12}
+$$
+
+**Die Ausmitte der verformten Wand, nirgends grösser** *(SIA 266:2015, 4.3.1.1, Gl. (6), Figur 4)*
+
+$$
+\left|e_z\right| \le \min\left[0.375 \cdot t_w;\ \frac{t_w}{2} \cdot \left(1 - \frac{N_{xd}}{l_w \cdot t_w \cdot f_{xd}}\right)\right]
+$$
+
+**Gleichgewicht der verformten Wand: Ausmitte der Last und Auslenkung w**
+
+$$
+e_z(x) = e_u + \left(e_o - e_u\right) \cdot \frac{x}{h_w} + w(x) \qquad w''(x) = -\chi_y\left(e_z(x)\right) \qquad w(0) = w(h_w) = 0
+$$
+
+Ein eingespannter Rand dreht sich nicht: dort ist w' = 0, und seine Ausmitte folgt aus dem Gleichgewicht. Die Wand ist in 40 gleiche Stücke geteilt; die Normalkraft wächst in Schritten, die Ausmitten der Lasten bleiben, bis die Wand kein Gleichgewicht mehr findet oder ihre Ausmitte die Grenze erreicht.
+
+> **Annahme:** B\_yd = E\_xd · I\_y wie in Gl. (8) und Figur 5, ohne den Faktor √(1 − N\_x/(2 · A\_x · f\_xk)) der Figur 3; die Normalkraft über die ganze Höhe so gross wie am Fuss; ein Gelenk, das sich bei e\_z = 0.375 · t\_w weiter drehen könnte, zählt nicht – nach Vorgabe, nicht nachgeschlagen, die beiden letzten auf der sicheren Seite.
+
+Der Kopf ist eingespannt: das Moment der Ausmitten der Lasten nimmt die Einspannung auf.
+
+#### Normalkraft – P1 – GZT
+
+**Normalkraft am Fuss des Pfeilers, aus dem Lastabtrag**
+
+$$
+N_{xd} = 180.7\,\mathrm{kN}
+$$
+
+**Ausmitte am Fuss, Vorgabe der Wand**
+
+$$
+e_u = 15\,\mathrm{mm}
+$$
+
+**Bezugswert der Knicklänge** *(SIA 266:2015, 4.3.1.2, Gl. (8))*
+
+$$
+h_{Ed} = \pi \cdot \sqrt{\frac{E_{xd} \cdot l_w \cdot t_w^{3}}{12 \cdot N_{xd}}} = \pi \cdot \sqrt{\frac{3500\,\mathrm{N}/\mathrm{mm}^{2} \cdot 1500\,\mathrm{mm} \cdot \left(150\,\mathrm{mm}\right)^{3}}{12 \cdot 180.7\,\mathrm{kN}}} = 8.98\,\mathrm{m}
+$$
+
+h\_w / h\_Ed = 0.29 – die Schlankheit, nach der Figur 19 ordnet.
+
+**Beiwert der Normalkraft, gerechnet nach Theorie 2. Ordnung** *(SIA 266:2015, 4.3.1.1, Figur 3)*
+
+$$
+k_N = 0.8
+$$
+
+Bei k\_N = 0.8 erreicht die Ausmitte am Fuss mit 15 mm die Grenze nach Gl. (6) und Figur 4.
+
+**Normalkraftwiderstand des Pfeilers** *(SIA 266:2015, 4.3.1.3, Gl. (11))*
+
+$$
+N_{xRd} = k_N \cdot l_w \cdot t_w \cdot f_{xd} = 0.8 \cdot 1500\,\mathrm{mm} \cdot 150\,\mathrm{mm} \cdot 3.5\,\mathrm{N}/\mathrm{mm}^{2} = 630\,\mathrm{kN}
+$$
+
+Unter N\_xd ist die Ausmitte am Fuss am grössten, 15 mm.
+
+**Einwirkung gegen Widerstand**
+
+$$
+N_{xd} = 180.7\,\mathrm{kN} \quad \le \quad N_{xRd} = 630\,\mathrm{kN}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,N,\text{P1 – GZT}} = \frac{N_{xRd}}{N_{xd}} = \frac{630\,\mathrm{kN}}{180.7\,\mathrm{kN}} = 3.49 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+#### Normalkraft – P1 – GZT günstig
+
+**Normalkraft am Fuss des Pfeilers, aus dem Lastabtrag**
+
+$$
+N_{xd} = 80.4\,\mathrm{kN}
+$$
+
+**Ausmitte am Fuss, Vorgabe der Wand**
+
+$$
+e_u = 15\,\mathrm{mm}
+$$
+
+**Bezugswert der Knicklänge** *(SIA 266:2015, 4.3.1.2, Gl. (8))*
+
+$$
+h_{Ed} = \pi \cdot \sqrt{\frac{E_{xd} \cdot l_w \cdot t_w^{3}}{12 \cdot N_{xd}}} = \pi \cdot \sqrt{\frac{3500\,\mathrm{N}/\mathrm{mm}^{2} \cdot 1500\,\mathrm{mm} \cdot \left(150\,\mathrm{mm}\right)^{3}}{12 \cdot 80.4\,\mathrm{kN}}} = 13.46\,\mathrm{m}
+$$
+
+h\_w / h\_Ed = 0.19 – die Schlankheit, nach der Figur 19 ordnet.
+
+**Beiwert der Normalkraft, gerechnet nach Theorie 2. Ordnung** *(SIA 266:2015, 4.3.1.1, Figur 3)*
+
+$$
+k_N = 0.8
+$$
+
+Bei k\_N = 0.8 erreicht die Ausmitte am Fuss mit 15 mm die Grenze nach Gl. (6) und Figur 4.
+
+**Normalkraftwiderstand des Pfeilers** *(SIA 266:2015, 4.3.1.3, Gl. (11))*
+
+$$
+N_{xRd} = k_N \cdot l_w \cdot t_w \cdot f_{xd} = 0.8 \cdot 1500\,\mathrm{mm} \cdot 150\,\mathrm{mm} \cdot 3.5\,\mathrm{N}/\mathrm{mm}^{2} = 630\,\mathrm{kN}
+$$
+
+Unter N\_xd ist die Ausmitte am Fuss am grössten, 15 mm.
+
+**Einwirkung gegen Widerstand**
+
+$$
+N_{xd} = 80.4\,\mathrm{kN} \quad \le \quad N_{xRd} = 630\,\mathrm{kN}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,N,\text{P1 – GZT günstig}} = \frac{N_{xRd}}{N_{xd}} = \frac{630\,\mathrm{kN}}{80.4\,\mathrm{kN}} = 7.83 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
 ### Balkensystem: Alles einmal
 
 **Querschnittsfläche, «Balken 300×500» (Rechteck)**
@@ -32899,127 +34329,6 @@ $$
 
 Nachgerechnet: an jedem Knoten heben sich Stabkräfte, Lasten und Lagerkräfte auf.
 
-### Mauerwerk: MK
-
-**Druckfestigkeit senkrecht zu den Lagerfugen, kennzeichnend** *(SIA 266:2015, 3.1.3.3, Tabelle 1)*
-
-$$
-f_{xk} = 7\,\mathrm{N}/\mathrm{mm}^{2}
-$$
-
-**Widerstandsbeiwert des Mauerwerks** *(SIA 266:2015, 4.2.1.1)*
-
-$$
-\gamma_M = 2
-$$
-
-**Bemessungswert der Druckfestigkeit senkrecht zu den Lagerfugen** *(SIA 266:2015, 4.2.1.1, Gl. (3))*
-
-$$
-f_{xd} = \frac{f_{xk}}{\gamma_M} = \frac{7\,\mathrm{N}/\mathrm{mm}^{2}}{2} = 3.5\,\mathrm{N}/\mathrm{mm}^{2}
-$$
-
-**Druckfestigkeit senkrecht zu den Stossfugen, kennzeichnend** *(SIA 266:2015, 4.2.1.1, Tabelle 7; γ\_M · f\_yd)*
-
-$$
-f_{yk} = 2.2\,\mathrm{N}/\mathrm{mm}^{2}
-$$
-
-**Bemessungswert der Druckfestigkeit senkrecht zu den Stossfugen** *(SIA 266:2015, 4.2.1.1, Gl. (3))*
-
-$$
-f_{yd} = \frac{f_{yk}}{\gamma_M} = \frac{2.2\,\mathrm{N}/\mathrm{mm}^{2}}{2} = 1.1\,\mathrm{N}/\mathrm{mm}^{2}
-$$
-
-**Druckfestigkeit senkrecht zu den Stossfugen, vollfugig vermauert, kennzeichnend** *(SIA 266:2015, 4.2.1.1, Tabelle 7; γ\_M · f\_yd)*
-
-$$
-f_{yk,v} = 3.2\,\mathrm{N}/\mathrm{mm}^{2}
-$$
-
-**Bemessungswert der Druckfestigkeit senkrecht zu den Stossfugen, vollfugig vermauert** *(SIA 266:2015, 4.2.1.1, Gl. (3))*
-
-$$
-f_{yd,v} = \frac{f_{yk,v}}{\gamma_M} = \frac{3.2\,\mathrm{N}/\mathrm{mm}^{2}}{2} = 1.6\,\mathrm{N}/\mathrm{mm}^{2}
-$$
-
-**Elastizitätsmodul senkrecht zu den Lagerfugen, kennzeichnend** *(SIA 266:2015, 3.1.4.1)*
-
-$$
-E_{xk} = 1000 \cdot f_{xk} = 1000 \cdot 7\,\mathrm{N}/\mathrm{mm}^{2} = 7000\,\mathrm{N}/\mathrm{mm}^{2}
-$$
-
-**Bemessungswert des Elastizitätsmoduls senkrecht zu den Lagerfugen** *(SIA 266:2015, 4.2.1.4, Gl. (5))*
-
-$$
-E_{xd} = \frac{E_{xk}}{\gamma_M} = \frac{7000\,\mathrm{N}/\mathrm{mm}^{2}}{2} = 3500\,\mathrm{N}/\mathrm{mm}^{2}
-$$
-
-**Schubmodul, kennzeichnend** *(SIA 266:2015, 3.1.4.1, Gl. (2))*
-
-$$
-G_k = 0.4 \cdot E_{xk} = 0.4 \cdot 7000\,\mathrm{N}/\mathrm{mm}^{2} = 2800\,\mathrm{N}/\mathrm{mm}^{2}
-$$
-
-**Bemessungswert des Schubmoduls** *(SIA 266:2015, Tabelle 7; Gl. (2) und (5))*
-
-$$
-G_d = \frac{G_k}{\gamma_M} = \frac{2800\,\mathrm{N}/\mathrm{mm}^{2}}{2} = 1400\,\mathrm{N}/\mathrm{mm}^{2}
-$$
-
-**Bemessungswert des Reibungsbeiwerts in den Lagerfugen** *(SIA 266:2015, 4.2.1.3)*
-
-$$
-\mu_d = 0.6
-$$
-
-### Mauerwerk: Wand aus Kalksandstein
-
-**Dicke der Wand**
-
-$$
-t_w = 175\,\mathrm{mm}
-$$
-
-> **Annahme:** Eine Wand aus unbewehrtem Mauerwerk nach SIA 266:2015, gezeichnet in der Ansicht. Kohäsion und Zugfestigkeit des Mauerwerks zählen nicht (4.1.2), und quer zu ihrer Ebene ist die Wand gehalten (4.1.4). Die Zeichen der Norm: x steht senkrecht zu den Lagerfugen, also lotrecht, y längs der Wand (Figur 1).
-
-**Wand**
-
-| Wand | Mauerwerk | $l_w\ [\mathrm{m}]$ | $h_w\ [\mathrm{m}]$ |
-| ---: | ---: | ---: | ---: |
-| W1 | MK | $6.00$ | $2.70$ |
-
-Verbandmauerwerk, die Stossfugen vollfugig vermauert. Kopf gelenkig, Fuss eingespannt; links frei, rechts gehalten.
-
-Für Verbandmauerwerk gelten alle Werte der Tabelle 7 mal 0.85 (SIA 266:2015, 4.2.1.1); μ\_d bleibt. Vollfugig vermauert gilt das grössere f\_yd der Tabelle 7.
-
-**Bemessungswerte, Festigkeiten und Moduln in N/mm²**
-
-|  | Mauerwerk «MK» | Wand |
-| ---: | ---: | ---: |
-| $f_{xd}$ | $3.50$ | $0.85 \cdot 3.50 = 2.98$ |
-| $f_{yd},\ \mathrm{vollfugig}$ | $1.60$ | $0.85 \cdot 1.60 = 1.36$ |
-| $E_{xd}$ | $3500$ | $0.85 \cdot 3500 = 2975$ |
-| $G_d$ | $1400$ | $0.85 \cdot 1400 = 1190$ |
-| $\mu_d$ | $0.60$ | $0.60$ |
-
-**Öffnungen – über jeder ein Sturz, a ist seine Auflagerlänge**
-
-| Öffnung | links – rechts [m] | unten – oben [m] | $b\ [\mathrm{m}]$ | $h\ [\mathrm{m}]$ | Sturz | $h_{St}\ [\mathrm{mm}]$ | $a\ [\mathrm{mm}]$ |
-| ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| O1 | 0.80 – 1.80 | 0.00 – 2.10 | $1.00$ | $2.10$ | Betonsturz | $200$ | $150$ |
-| O2 | 2.80 – 4.00 | 0.90 – 2.10 | $1.20$ | $1.20$ | vorfabriziert | $250$ | $150$ |
-| O3 | 4.90 – 5.50 | 0.90 – 2.10 | $0.60$ | $1.20$ | Betonsturz | $200$ | $150$ |
-
-**Pfeiler – zwischen den Öffnungen und an den Enden der Wand**
-
-| Pfeiler | links – rechts [m] | $b\ [\mathrm{m}]$ | zwischen |
-| ---: | ---: | ---: | ---: |
-| P1 | 0.00 – 0.80 | $0.80$ | Wandende \| O1 |
-| P2 | 1.80 – 2.80 | $1.00$ | O1 \| O2 |
-| P3 | 4.00 – 4.90 | $0.90$ | O2 \| O3 |
-| P4 | 5.50 – 6.00 | $0.50$ | O3 \| Wandende |
-
 ## Verwendete Formeln
 
 ### Querschnitt
@@ -36090,6 +37399,114 @@ $$
 S_{d,y} = \max\left(2.5 \cdot \gamma_f \cdot \frac{a_{gd}}{g} \cdot S \cdot \frac{T_C \cdot T_D}{T_{1,y}^2 \cdot q_y};\ 0.1 \cdot \gamma_f \cdot \frac{a_{gd}}{g}\right)
 $$
 
+### Mauerwerk
+
+Unter der Normalkraft biegt sich eine Wand aus, und die Ausmitte wächst. Der Pfeiler hält, solange er sich im Gleichgewicht verformen kann, ohne dass die Ausmitte irgendwo die Grenze der Figur 4 überschreitet. Die grösste Normalkraft, bei der das gerade noch gilt, ist k\_N · l\_w · t\_w · f\_xd.
+
+Ein Sturz liegt an seinen Enden auf dem Mauerwerk auf und drückt es dort auf der Fläche A\_0 = a · t\_w. Liegt die Fläche mitten in einer grösseren, verteilt sich der Druck, und das Mauerwerk trägt mehr; am Rand der Öffnung kann er das nicht.
+
+**Bemessungswert der Druckfestigkeit senkrecht zu den Lagerfugen** *(SIA 266:2015, 4.2.1.1, Gl. (3))*
+
+$$
+f_{xd} = \frac{f_{xk}}{\gamma_M}
+$$
+
+**Bemessungswert der Druckfestigkeit senkrecht zu den Stossfugen** *(SIA 266:2015, 4.2.1.1, Gl. (3))*
+
+$$
+f_{yd} = \frac{f_{yk}}{\gamma_M}
+$$
+
+**Bemessungswert der Druckfestigkeit senkrecht zu den Stossfugen, vollfugig vermauert** *(SIA 266:2015, 4.2.1.1, Gl. (3))*
+
+$$
+f_{yd,v} = \frac{f_{yk,v}}{\gamma_M}
+$$
+
+**Elastizitätsmodul senkrecht zu den Lagerfugen, kennzeichnend** *(SIA 266:2015, 3.1.4.1)*
+
+$$
+E_{xk} = 1000 \cdot f_{xk}
+$$
+
+**Bemessungswert des Elastizitätsmoduls senkrecht zu den Lagerfugen** *(SIA 266:2015, 4.2.1.4, Gl. (5))*
+
+$$
+E_{xd} = \frac{E_{xk}}{\gamma_M}
+$$
+
+**Schubmodul, kennzeichnend** *(SIA 266:2015, 3.1.4.1, Gl. (2))*
+
+$$
+G_k = 0.4 \cdot E_{xk}
+$$
+
+**Bemessungswert des Schubmoduls** *(SIA 266:2015, Tabelle 7; Gl. (2) und (5))*
+
+$$
+G_d = \frac{G_k}{\gamma_M}
+$$
+
+**Eigengewicht der Wand je m² Ansicht, aus der Dichte ihres Mauerwerks**
+
+$$
+g_k = \rho \cdot g \cdot t_w
+$$
+
+**Krümmung der Wand unter der Ausmitte e\_z, bis e\_z t\_w** *(SIA 266:2015, 4.3.1.1, Figur 3)*
+
+$$
+\chi_y \cdot \frac{h_{Ed}^{2}}{t_w} = 4.1 \cdot \tan\left(2.4 \cdot \frac{e_z}{t_w}\right) \cdot \left[1 + \tan^{2}\left(2.4 \cdot \frac{e_z}{t_w}\right)\right] \qquad h_{Ed} = \pi \cdot \sqrt{\frac{B_{yd}}{N_{xd}}} \qquad B_{yd} = E_{xd} \cdot \frac{l_w \cdot t_w^{3}}{12}
+$$
+
+**Die Ausmitte der verformten Wand, nirgends grösser** *(SIA 266:2015, 4.3.1.1, Gl. (6), Figur 4)*
+
+$$
+\left|e_z\right| \le \min\left[0.375 \cdot t_w;\ \frac{t_w}{2} \cdot \left(1 - \frac{N_{xd}}{l_w \cdot t_w \cdot f_{xd}}\right)\right]
+$$
+
+**Gleichgewicht der verformten Wand: Ausmitte der Last und Auslenkung w**
+
+$$
+e_z(x) = e_u + \left(e_o - e_u\right) \cdot \frac{x}{h_w} + w(x) \qquad w''(x) = -\chi_y\left(e_z(x)\right) \qquad w(0) = w(h_w) = 0
+$$
+
+**Ausmitte am Kopf – sie bleibt, wenn die Lasten wachsen**
+
+$$
+e_o = \frac{M_d}{N_{Ld}}
+$$
+
+**Bezugswert der Knicklänge** *(SIA 266:2015, 4.3.1.2, Gl. (8))*
+
+$$
+h_{Ed} = \pi \cdot \sqrt{\frac{E_{xd} \cdot l_w \cdot t_w^{3}}{12 \cdot N_{xd}}}
+$$
+
+**Normalkraftwiderstand des Pfeilers** *(SIA 266:2015, 4.3.1.3, Gl. (11))*
+
+$$
+N_{xRd} = k_N \cdot l_w \cdot t_w \cdot f_{xd}
+$$
+
+**Fläche des Auflagers**
+
+$$
+A_0 = a \cdot t_w
+$$
+
+**Beiwert der Teilflächenpressung** *(SIA 266:2015, 4.2.1.2, Gl. (4), Figur 2)*
+
+$$
+k_m = \min\left[0.5 \cdot \left(1 + \sqrt{\frac{A_1}{A_0}}\right);\ 1.5\right]
+$$
+
+**Widerstand des Auflagers** *(SIA 266:2015, 4.2.1.2, Gl. (4), Figur 2)*
+
+$$
+R_{Rd} = k_m \cdot f_{xd} \cdot A_0
+$$
+
 ### Schubfluss
 
 Wächst das Moment längs des Bauteils, wächst auch die Kraft im Teil, den ein Schnitt abtrennt. Was sie auf einer Länge Δx gewinnt, kommt durch den Schnitt: der Schubfluss v = ΔF′/Δx, mit ΔM = V·Δx. F′ ist die Kraft im abgetrennten Teil, aus zwei Dehnungsebenen des ganzen Querschnitts – gerissen, mit waagrechter Nulllinie und der Rechenwahl des Falls. Elastisch ist das V·S′/I.
@@ -36524,50 +37941,6 @@ $$
 
 $$
 c = F^{T} U \;\rightarrow\; \min \qquad K(\tilde{\rho}) \, U = F \qquad \sum_e \tilde{\rho}_e \, A_e = \bar{\rho} \, A \qquad E_e = E_{min} + \tilde{\rho}_e^{\,p} \left( E_0 - E_{min} \right)
-$$
-
-### Mauerwerk
-
-**Bemessungswert der Druckfestigkeit senkrecht zu den Lagerfugen** *(SIA 266:2015, 4.2.1.1, Gl. (3))*
-
-$$
-f_{xd} = \frac{f_{xk}}{\gamma_M}
-$$
-
-**Bemessungswert der Druckfestigkeit senkrecht zu den Stossfugen** *(SIA 266:2015, 4.2.1.1, Gl. (3))*
-
-$$
-f_{yd} = \frac{f_{yk}}{\gamma_M}
-$$
-
-**Bemessungswert der Druckfestigkeit senkrecht zu den Stossfugen, vollfugig vermauert** *(SIA 266:2015, 4.2.1.1, Gl. (3))*
-
-$$
-f_{yd,v} = \frac{f_{yk,v}}{\gamma_M}
-$$
-
-**Elastizitätsmodul senkrecht zu den Lagerfugen, kennzeichnend** *(SIA 266:2015, 3.1.4.1)*
-
-$$
-E_{xk} = 1000 \cdot f_{xk}
-$$
-
-**Bemessungswert des Elastizitätsmoduls senkrecht zu den Lagerfugen** *(SIA 266:2015, 4.2.1.4, Gl. (5))*
-
-$$
-E_{xd} = \frac{E_{xk}}{\gamma_M}
-$$
-
-**Schubmodul, kennzeichnend** *(SIA 266:2015, 3.1.4.1, Gl. (2))*
-
-$$
-G_k = 0.4 \cdot E_{xk}
-$$
-
-**Bemessungswert des Schubmoduls** *(SIA 266:2015, Tabelle 7; Gl. (2) und (5))*
-
-$$
-G_d = \frac{G_k}{\gamma_M}
 $$
 
 ## Nachweise
@@ -37739,6 +39112,70 @@ $$
 | :--- | :--- | ---: |
 | Durchstanzwiderstand am Schnittpunkt | $V_{Rd,c}$ | $106.3\,\mathrm{kN}$ |
 
+### Wand aus Kalksandstein
+
+**Angaben zur Wand**
+
+$$
+\text{Mauerwerk MK, Verbandmauerwerk – f, E und G mal 0.85, Stossfugen vollfugig} \qquad t_w = 175~\mathrm{mm}
+$$
+
+**Bemessungswerte**
+
+| Grösse | Zeichen | MK | Wand | Einheit |
+| :--- | :--- | ---: | ---: | :--- |
+| Bemessungswert der Druckfestigkeit senkrecht zu den Lagerfugen | $f_{xd}$ | 3.50 | 2.98 | N/mm² |
+| Bemessungswert der Druckfestigkeit senkrecht zu den Stossfugen, vollfugig vermauert | $f_{yd,v}$ | 1.60 | 1.36 | N/mm² |
+| Bemessungswert des Elastizitätsmoduls senkrecht zu den Lagerfugen | $E_{xd}$ | 3500 | 2975 | N/mm² |
+| Bemessungswert des Schubmoduls | $G_d$ | 1400 | 1190 | N/mm² |
+| Bemessungswert des Reibungsbeiwerts in den Lagerfugen | $\mu_d$ | 0.60 | 0.60 | – |
+
+| Nachweis | Bezeichnung | Widerstand | Einwirkung | $\alpha_{eff}$ |
+| :--- | :--- | ---: | ---: | ---: |
+| Normalkraft | P1 – GZT | $N_{xRd} = 321.3\,\mathrm{kN}$ | $N_{xd} = 109.9\,\mathrm{kN}$ | $2.92$ |
+| Normalkraft | P1 – GZT günstig | $N_{xRd} = 321.3\,\mathrm{kN}$ | $N_{xd} = 47.8\,\mathrm{kN}$ | $6.72$ |
+| Normalkraft | P2 – GZT | $N_{xRd} = 410.8\,\mathrm{kN}$ | $N_{xd} = 188.4\,\mathrm{kN}$ | $2.18$ |
+| Normalkraft | P2 – GZT günstig | $N_{xRd} = 414.3\,\mathrm{kN}$ | $N_{xd} = 83.7\,\mathrm{kN}$ | $4.95$ |
+| Normalkraft | P3 – GZT | $N_{xRd} = 371.0\,\mathrm{kN}$ | $N_{xd} = 163.8\,\mathrm{kN}$ | $2.26$ |
+| Normalkraft | P3 – GZT günstig | $N_{xRd} = 374.5\,\mathrm{kN}$ | $N_{xd} = 73.1\,\mathrm{kN}$ | $5.12$ |
+| Normalkraft | P4 – GZT | $N_{xRd} = 200.8\,\mathrm{kN}$ | $N_{xd} = 67.7\,\mathrm{kN}$ | $2.97$ |
+| Normalkraft | P4 – GZT günstig | $N_{xRd} = 200.8\,\mathrm{kN}$ | $N_{xd} = 29.5\,\mathrm{kN}$ | $6.82$ |
+| Teilflächenpressung | O1 links – GZT | $R_{Rd} = 78.1\,\mathrm{kN}$ | $R_d = 51.4\,\mathrm{kN}$ | $1.52$ |
+| Teilflächenpressung | O1 links – GZT günstig | $R_{Rd} = 78.1\,\mathrm{kN}$ | $R_d = 21.8\,\mathrm{kN}$ | $3.59$ |
+| Teilflächenpressung | O1 rechts – GZT | $R_{Rd} = 78.1\,\mathrm{kN}$ | $R_d = 51.4\,\mathrm{kN}$ | $1.52$ |
+| Teilflächenpressung | O1 rechts – GZT günstig | $R_{Rd} = 78.1\,\mathrm{kN}$ | $R_d = 21.8\,\mathrm{kN}$ | $3.59$ |
+| Teilflächenpressung | O2 links – GZT | $R_{Rd} = 78.1\,\mathrm{kN}$ | $R_d = 72.8\,\mathrm{kN}$ | $1.07$ |
+| Teilflächenpressung | O2 links – GZT günstig | $R_{Rd} = 78.1\,\mathrm{kN}$ | $R_d = 33.1\,\mathrm{kN}$ | $2.36$ |
+| Teilflächenpressung | O2 rechts – GZT | $R_{Rd} = 78.1\,\mathrm{kN}$ | $R_d = 72.8\,\mathrm{kN}$ | $1.07$ |
+| Teilflächenpressung | O2 rechts – GZT günstig | $R_{Rd} = 78.1\,\mathrm{kN}$ | $R_d = 33.1\,\mathrm{kN}$ | $2.36$ |
+| Teilflächenpressung | O3 links – GZT | $R_{Rd} = 78.1\,\mathrm{kN}$ | $R_d = 35.6\,\mathrm{kN}$ | $2.20$ |
+| Teilflächenpressung | O3 links – GZT günstig | $R_{Rd} = 78.1\,\mathrm{kN}$ | $R_d = 15.1\,\mathrm{kN}$ | $5.18$ |
+| Teilflächenpressung | O3 rechts – GZT | $R_{Rd} = 78.1\,\mathrm{kN}$ | $R_d = 35.6\,\mathrm{kN}$ | $2.20$ |
+| Teilflächenpressung | O3 rechts – GZT günstig | $R_{Rd} = 78.1\,\mathrm{kN}$ | $R_d = 15.1\,\mathrm{kN}$ | $5.18$ |
+
+### Pfeiler aus Kalksandstein
+
+**Angaben zur Wand**
+
+$$
+\text{Mauerwerk MK, Einsteinmauerwerk, Stossfugen nicht vollfugig} \qquad t_w = 150~\mathrm{mm}
+$$
+
+**Bemessungswerte**
+
+| Grösse | Zeichen | MK | Wand | Einheit |
+| :--- | :--- | ---: | ---: | :--- |
+| Bemessungswert der Druckfestigkeit senkrecht zu den Lagerfugen | $f_{xd}$ | 3.50 | 3.50 | N/mm² |
+| Bemessungswert der Druckfestigkeit senkrecht zu den Stossfugen | $f_{yd}$ | 1.10 | 1.10 | N/mm² |
+| Bemessungswert des Elastizitätsmoduls senkrecht zu den Lagerfugen | $E_{xd}$ | 3500 | 3500 | N/mm² |
+| Bemessungswert des Schubmoduls | $G_d$ | 1400 | 1400 | N/mm² |
+| Bemessungswert des Reibungsbeiwerts in den Lagerfugen | $\mu_d$ | 0.60 | 0.60 | – |
+
+| Nachweis | Bezeichnung | Widerstand | Einwirkung | $\alpha_{eff}$ |
+| :--- | :--- | ---: | ---: | ---: |
+| Normalkraft | P1 – GZT | $N_{xRd} = 630.0\,\mathrm{kN}$ | $N_{xd} = 180.7\,\mathrm{kN}$ | $3.49$ |
+| Normalkraft | P1 – GZT günstig | $N_{xRd} = 630.0\,\mathrm{kN}$ | $N_{xd} = 80.4\,\mathrm{kN}$ | $7.83$ |
+
 ### Hang
 
 **Angaben zum Fundament**
@@ -38121,8 +39558,6 @@ Mindestens ein Nachweis ist nicht erfüllt.
 > **Warnung:** Querschnittsanalyse 'Verbundträger', Stütze: Torsion weist das Werkzeug beim Verbundquerschnitt nicht nach (nach Vorgabe, nicht nachgeschlagen).
 
 > **Warnung:** Querschnittsanalyse 'Hinterschnittene Blechdecke', Schief: Eine Blechverbunddecke trägt in Richtung ihrer Rippen (5.4.1.1): nachgewiesen werden N, M\_y und V\_z über die ganze gezeichnete Breite b – M\_z, V\_y und T nicht.
-
-> **Warnung:** Mauerwerk 'Wand aus Kalksandstein': die Nachweise des Mauerwerks rechnet das Werkzeug noch nicht → kein Nachweis.
 
 > **Warnung:** Setzung 'Ohne Schicht': noch keine Schicht – unter «Schichten» eine anlegen → kein Nachweis.
 
@@ -38737,7 +40172,33 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Biegefestigkeit, kennzeichnend | $f_{m,k}$ | $24$ | N/mm² | Vorgabe |
 | Bemessungswert der Zugfestigkeit in Faserrichtung | $f_{t,0,d}$ | $12$ | N/mm² | Vorgabe |
 | Bemessungswert der Schubfestigkeit | $f_{v,d}$ | $1.8$ | N/mm² | Vorgabe |
+| Erdbeschleunigung | $g$ | $10$ | m/s² | Vorgabe |
+| Erfüllungsgrad Normalkraft – P1 – GZT | $\alpha_{eff,N,\text{P1 – GZT}}$ | $2.92$ |  | berechnet |
+| Erfüllungsgrad Normalkraft – P1 – GZT günstig | $\alpha_{eff,N,\text{P1 – GZT günstig}}$ | $6.72$ |  | berechnet |
+| Erfüllungsgrad Normalkraft – P2 – GZT | $\alpha_{eff,N,\text{P2 – GZT}}$ | $2.18$ |  | berechnet |
+| Erfüllungsgrad Normalkraft – P2 – GZT günstig | $\alpha_{eff,N,\text{P2 – GZT günstig}}$ | $4.95$ |  | berechnet |
+| Erfüllungsgrad Normalkraft – P3 – GZT | $\alpha_{eff,N,\text{P3 – GZT}}$ | $2.26$ |  | berechnet |
+| Erfüllungsgrad Normalkraft – P3 – GZT günstig | $\alpha_{eff,N,\text{P3 – GZT günstig}}$ | $5.12$ |  | berechnet |
+| Erfüllungsgrad Normalkraft – P4 – GZT | $\alpha_{eff,N,\text{P4 – GZT}}$ | $2.97$ |  | berechnet |
+| Erfüllungsgrad Normalkraft – P4 – GZT günstig | $\alpha_{eff,N,\text{P4 – GZT günstig}}$ | $6.82$ |  | berechnet |
+| Erfüllungsgrad Teilflächenpressung – O1 links – GZT | $\alpha_{eff,TF,\text{O1 links – GZT}}$ | $1.52$ |  | berechnet |
+| Erfüllungsgrad Teilflächenpressung – O1 links – GZT günstig | $\alpha_{eff,TF,\text{O1 links – GZT günstig}}$ | $3.59$ |  | berechnet |
+| Erfüllungsgrad Teilflächenpressung – O1 rechts – GZT | $\alpha_{eff,TF,\text{O1 rechts – GZT}}$ | $1.52$ |  | berechnet |
+| Erfüllungsgrad Teilflächenpressung – O1 rechts – GZT günstig | $\alpha_{eff,TF,\text{O1 rechts – GZT günstig}}$ | $3.59$ |  | berechnet |
+| Erfüllungsgrad Teilflächenpressung – O2 links – GZT | $\alpha_{eff,TF,\text{O2 links – GZT}}$ | $1.07$ |  | berechnet |
+| Erfüllungsgrad Teilflächenpressung – O2 links – GZT günstig | $\alpha_{eff,TF,\text{O2 links – GZT günstig}}$ | $2.36$ |  | berechnet |
+| Erfüllungsgrad Teilflächenpressung – O2 rechts – GZT | $\alpha_{eff,TF,\text{O2 rechts – GZT}}$ | $1.07$ |  | berechnet |
+| Erfüllungsgrad Teilflächenpressung – O2 rechts – GZT günstig | $\alpha_{eff,TF,\text{O2 rechts – GZT günstig}}$ | $2.36$ |  | berechnet |
+| Erfüllungsgrad Teilflächenpressung – O3 links – GZT | $\alpha_{eff,TF,\text{O3 links – GZT}}$ | $2.20$ |  | berechnet |
+| Erfüllungsgrad Teilflächenpressung – O3 links – GZT günstig | $\alpha_{eff,TF,\text{O3 links – GZT günstig}}$ | $5.18$ |  | berechnet |
+| Erfüllungsgrad Teilflächenpressung – O3 rechts – GZT | $\alpha_{eff,TF,\text{O3 rechts – GZT}}$ | $2.20$ |  | berechnet |
+| Erfüllungsgrad Teilflächenpressung – O3 rechts – GZT günstig | $\alpha_{eff,TF,\text{O3 rechts – GZT günstig}}$ | $5.18$ |  | berechnet |
 | Dicke der Wand | $t_w$ | $175$ | mm | Vorgabe |
+| Ausmitte der Normalkraft am Fuss | $e_u$ | $15$ | mm | Vorgabe |
+| Erdbeschleunigung | $g$ | $10$ | m/s² | Vorgabe |
+| Erfüllungsgrad Normalkraft – P1 – GZT | $\alpha_{eff,N,\text{P1 – GZT}}$ | $3.49$ |  | berechnet |
+| Erfüllungsgrad Normalkraft – P1 – GZT günstig | $\alpha_{eff,N,\text{P1 – GZT günstig}}$ | $7.83$ |  | berechnet |
+| Dicke der Wand | $t_w$ | $150$ | mm | Vorgabe |
 | Bemessungswert des Elastizitätsmoduls senkrecht zu den Lagerfugen | $E_{xd}$ | $3500$ | N/mm² | berechnet |
 | Elastizitätsmodul senkrecht zu den Lagerfugen, kennzeichnend | $E_{xk}$ | $7000$ | N/mm² | berechnet |
 | Bemessungswert des Schubmoduls | $G_d$ | $1400$ | N/mm² | berechnet |
@@ -38750,6 +40211,7 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Druckfestigkeit senkrecht zu den Stossfugen, vollfugig vermauert, kennzeichnend | $f_{yk,v}$ | $3.2$ | N/mm² | Vorgabe |
 | Widerstandsbeiwert des Mauerwerks | $\gamma_M$ | $2$ |  | Vorgabe |
 | Bemessungswert des Reibungsbeiwerts in den Lagerfugen | $\mu_d$ | $0.6$ |  | Vorgabe |
+| Dichte für das Eigengewicht | $\rho$ | $1800$ | kg/m³ | Vorgabe |
 | Durchmesser des Pfahls | $D$ | $900$ | mm | Vorgabe |
 | Verformungsmodul der Schicht 1, charakteristisch | $E_{s,k,1}$ | $8$ | MN/m² | Vorgabe |
 | Verformungsmodul der Schicht 2, charakteristisch | $E_{s,k,2}$ | $50$ | MN/m² | Vorgabe |

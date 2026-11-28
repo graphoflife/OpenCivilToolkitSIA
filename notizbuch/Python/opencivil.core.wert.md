@@ -1,5 +1,5 @@
 ---
-erzeugt: fbb86a975012
+erzeugt: 065494c9b489
 art: modul
 tags: [modul]
 ---
@@ -328,6 +328,7 @@ def beschreibung(self) -> str
 - [[opencivil.geotechnik.tragfaehigkeit]]
 - [[opencivil.geotechnik.wasser]]
 - [[opencivil.material.basis]]
+- [[opencivil.mauerwerk.nachweise]]
 - [[opencivil.mauerwerk.werk]]
 - [[opencivil.nachweis.biegung_normalkraft]]
 - [[opencivil.nachweis.duktilitaet]]

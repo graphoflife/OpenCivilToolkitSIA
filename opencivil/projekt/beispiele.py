@@ -422,10 +422,14 @@ def _fachwerkmodell(p: Projekt) -> None:
 
 def _mauerwerk(p: Projekt) -> None:
     """
-    Eine Wand aus Kalksandstein, 6 × 2.7 m und 175 mm dick, als
-    Verbandmauerwerk vollfugig vermauert, am Fuss eingespannt und rechts
-    gehalten: eine Türe
-    mit Betonsturz und zwei Fenster, eines mit vorfabriziertem Sturz.
+    Zwei Wände aus Kalksandstein mit den Lastfällen und Kombinationen einer
+    frischen Wand. Die erste, 6 × 2.7 m und 175 mm dick, als Verbandmauerwerk
+    vollfugig vermauert, am Fuss eingespannt und rechts gehalten: eine Türe
+    mit Betonsturz und zwei Fenster, eines mit vorfabriziertem Sturz. Oben
+    liegt die Decke 20 mm ausmittig auf, und über dem vorfabrizierten Sturz
+    ein Träger. Die zweite, ein Pfeiler ohne Öffnung, 1.5 × 2.6 m und 150 mm
+    dick, ist am Kopf eingespannt und steht am Fuss gelenkig 15 mm neben der
+    Mitte.
     """
     w = p.wand("Wand aus Kalksandstein", t=175, mauerung="verband", stossfugen="vollfugig",
                fuss="eingespannt", rechts="gehalten")
@@ -433,6 +437,17 @@ def _mauerwerk(p: Projekt) -> None:
     w.oeffnung(rechteck(0.8, 0, 1.8, 2.1))
     w.oeffnung(rechteck(2.8, 0.9, 4.0, 2.1), sturz="vorfabriziert", h_St=250)
     w.oeffnung(rechteck(4.9, 0.9, 5.5, 2.1))
+    w.standardfaelle()
+    _, auflast, nutzlast = w.lastfaelle
+    w.linienlast(auflast, (0, 2.7), (6, 2.7), wert=40, e=20)
+    w.linienlast(nutzlast, (0, 2.7), (6, 2.7), wert=15, e=20)
+    w.punktlast(auflast, (3.4, 2.7), wert=20)
+    s = p.wand("Pfeiler aus Kalksandstein", t=150, kopf="eingespannt", e_u=15)
+    s.wand(rechteck(0, 0, 1.5, 2.6))
+    s.standardfaelle()
+    _, auflast, nutzlast = s.lastfaelle
+    s.linienlast(auflast, (0, 2.6), (1.5, 2.6), wert=60)
+    s.linienlast(nutzlast, (0, 2.6), (1.5, 2.6), wert=20)
 
 
 @lru_cache(maxsize=None)
