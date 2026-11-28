@@ -1,5 +1,5 @@
 ---
-erzeugt: e7455c2e6a25
+erzeugt: c58dee998765
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -72,6 +72,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.durchstanzen.stelle]] – die Durchstanzstelle: Platte, gestützte Fläche, Bewehrung, Last.
     - [[opencivil.durchstanzen.stufen]] – Plattenbereiche um die Stütze: d an ihr, Schnitte an den Stufen.
     - [[opencivil.durchstanzen.systeme]] – woraus die Durchstanzbewehrung besteht.
+    - [[opencivil.durchstanzen.weg]] – ein Schnitt um die Stütze durch verschiedene Dicken.
 - [[opencivil.erdbeben]] – Erdbeben nach SIA 261:2020, Kapitel 16.
     - [[opencivil.erdbeben.ersatzkraft]] – das Ersatzkraftverfahren nach SIA 261:2020, 16.5.2.
     - [[opencivil.erdbeben.kern]] – der Kern eines Geschosses: seine Teile, je um ihren Schwerpunkt.

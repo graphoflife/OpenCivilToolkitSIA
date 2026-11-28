@@ -1,5 +1,5 @@
 ---
-erzeugt: 61281d536640
+erzeugt: b6f33384e581
 art: modul
 tags: [modul]
 ---
@@ -43,11 +43,14 @@ zu welcher Stützenkraft es ohne Durchstanzbewehrung geht.
 
 ## MIT PLATTENBEREICHEN (4.3.6.2.7)
 
-Derselbe Schnittpunkt an jedem Schnitt, um die Stütze und an jeder Stufe
-([[opencivil.durchstanzen.stufen|.stufen]]), je mit seinem ΔV; es gilt der kleinste. Die Kennzahl ist
-die Querkraft im Schnitt um die Stütze bei dieser Stützenkraft – so bleibt
-sie mit der Querkraft eines Nachweises vergleichbar. Liegt der Schnittpunkt
-an einer Stufe, ist sie kleiner als V_Rd,c um die Stütze.
+Derselbe Schnittpunkt an jedem Schnitt, um die Stütze, an jeder Stufe
+([[opencivil.durchstanzen.stufen|.stufen]]) und durch verschiedene Dicken ([[opencivil.durchstanzen.weg|.weg]]), je mit seinem
+ΔV; es gilt der kleinste. Der Schnitt durch verschiedene Dicken wird bei
+jeder Stützenkraft neu gesucht, mit ihrem ψ – wie im Nachweis. Die
+Kennzahl ist die Querkraft im Schnitt um die Stütze bei dieser Stützenkraft
+– so bleibt sie mit der Querkraft eines Nachweises vergleichbar. Liegt der
+Schnittpunkt an einem anderen Schnitt, ist sie kleiner als V_Rd,c um die
+Stütze.
 
 
 ## EINHEITEN
@@ -75,20 +78,32 @@ def rechne(self, e: Eingaben, p: Protokoll) -> Dict[str, Groesse]
 #### Durchstanzkennzahl._schnittpunkt
 
 ```python
-def _schnittpunkt(self, e: Eingaben, w: Zwischenwerte, g: Stuetzenschnitt) -> Tuple[float, Optional[Stufe]]
+def _schnittpunkt(self, e: Eingaben, w: Zwischenwerte, g: Stuetzenschnitt) -> Tuple[float, Schnittort]
 ```
 
 Die grösste Stützenkraft in N, bei der jeder Schnitt hält, und wo
-ihr Schnittpunkt liegt – `None`: um die Stütze. Je Schnitt still
-mit den Schritten des Nachweises.
+ihr Schnittpunkt liegt. Je Schnitt still mit den Schritten des
+Nachweises; der Schnitt durch verschiedene Dicken zuletzt, nur bis
+zur kleinsten Kraft der anderen.
+
+### _beiwerte
+
+```python
+def _beiwerte(r: Widerstand) -> Tuple[float, float, float]
+```
+
+ψ, k_g und τ_cd an der Stütze – was jeder Schnitt für seinen Widerstand braucht.
 
 ### _halbieren
 
 ```python
-def _halbieren(abzug: float, widerstand: Callable[[float], float]) -> float
+def _halbieren(rest: Callable[[float], float], oben: Optional[float]=None) -> float
 ```
 
-Die Stützenkraft in N mit V_d − ΔV = V_Rd,c(V_d) an einem Schnitt – durch Halbieren.
+Die Stützenkraft in N, bei der `rest(V)` null wird – der Widerstand
+eines Schnitts und ΔV, weniger V –, durch Halbieren zwischen 0 und
+`oben`. Ohne `oben` bis zum Rest bei V = 0: dort ist er sicher
+aufgebraucht, denn der Widerstand sinkt nie mit V (Dateikopf).
 
 
 ## Konstanten
@@ -101,10 +116,12 @@ Die Stützenkraft in N mit V_d − ΔV = V_Rd,c(V_d) an einem Schnitt – durch 
 - [[opencivil.core.berechnung]]
 - [[opencivil.core.einheiten]]
 - [[opencivil.core.protokoll]]
+- [[opencivil.core.sprache]]
 - [[opencivil.durchstanzen.herleitung]]
 - [[opencivil.durchstanzen.nachweis]]
 - [[opencivil.durchstanzen.stelle]]
 - [[opencivil.durchstanzen.stufen]]
+- [[opencivil.durchstanzen.weg]]
 
 ## Gebraucht von
 

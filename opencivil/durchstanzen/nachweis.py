@@ -25,9 +25,11 @@ PLATTENBEREICHE (4.3.6.2.7):
 Steht die Stütze in Bereichen mit eigener Dicke, gilt an ihr deren d, ψ
 rechnet mit dem kleinsten d um sie, und an jeder Stufe, wo der Bereich
 dicker ist als die Platte darum, liegt ein weiterer Schnitt mit eigenem
-Urteil (:mod:`.stufen`). Bereiche, die die Stütze nicht umschliessen, und
-Bereiche an Wänden rechnet das Werkzeug noch nicht; die Herleitung sagt es.
-Mit Bereichen schlägt es noch keine Durchstanzbewehrung vor.
+Urteil (:mod:`.stufen`). Liegt ein Bereich neben der Stütze, kommt der
+schwächste Schnitt durch verschiedene Dicken dazu, auch mit eigenem Urteil
+(:mod:`.weg`); weiter draussen geht ein Bereich nicht ein. Bereiche an
+Wänden rechnet das Werkzeug noch nicht; die Herleitung sagt es. Mit
+Bereichen schlägt es noch keine Durchstanzbewehrung vor.
 
 DIE PLATTENROTATION (4.3.6.4.2):
 In Näherungsstufe 1 ist ``m_sd/m_Rd = 1``; in Stufe 2 kommen die Momente im
@@ -81,15 +83,17 @@ from opencivil.core.latex import Mathe, als_text, angabe
 from opencivil.core.protokoll import GleichungBlock, Protokoll, TabellenBlock, Zwischenwerte
 from opencivil.core.wert import Wert, WertDef
 from opencivil.core.sprache import aufgezaehlt
-from opencivil.durchstanzen import herleitung, mit_bewehrung, stufen
-from opencivil.durchstanzen.bereiche import Dicken
+from opencivil.durchstanzen import herleitung, mit_bewehrung, stufen, weg
+from opencivil.durchstanzen.bereiche import Dicken, Plattenbereich
 from opencivil.durchstanzen.herleitung import STUETZE
 from opencivil.durchstanzen.flaeche import Mass, Masse, Randbreite
 from opencivil.durchstanzen.mit_bewehrung import Grundlage
 from opencivil.durchstanzen.pruefung import (
     KeExzentrizitaet, Leistenpruefung, Pilzbefund, Schnittpruefung, exzentrizitaet,
 )
-from opencivil.durchstanzen.schnitt import Auswertung, Punkt, nachweisschnitt
+from opencivil.durchstanzen.schnitt import (
+    Auswertung, Punkt, nachweisschnitt, schatten_am_schnitt,
+)
 from opencivil.durchstanzen.stelle import (
     Durchstanzstelle, KeArt, Naeherungsstufe, wirksame_stufe,
 )
@@ -147,6 +151,14 @@ class Stufenbefund:
 
 
 @dataclass(frozen=True)
+class Wegbefund:
+    """Der Schnitt durch verschiedene Dicken und sein Widerstand (:mod:`.weg`)."""
+
+    schnitt: weg.Wegschnitt
+    V_Rd_c: float
+
+
+@dataclass(frozen=True)
 class Durchstanzbefund:
     """
     Was der Nachweis gefunden hat -- für die Zusammenfassung und das Bild.
@@ -178,6 +190,9 @@ class Durchstanzbefund:
 
     stufen: Tuple[Stufenbefund, ...] = ()
     """Die Schnitte an den Stufen der Bereiche um die Stütze (:mod:`.stufen`)."""
+
+    weg: Optional[Wegbefund] = None
+    """Der Schnitt durch verschiedene Dicken -- wo ein Bereich neben der Stütze liegt."""
 
     @property
     def ohne_einwirkung(self) -> bool:
@@ -219,6 +234,9 @@ class Stuetzenschnitt:
     bereiche: Optional[Bereichswerte] = None
     stufen: Tuple[Stufe, ...] = ()
     """Die Stufen um die Stütze, je mit ihrem Schnitt -- ohne Plattenbereiche keine."""
+
+    netz: Optional[weg.Netz] = None
+    """Wo die Schnitte durch verschiedene Dicken gesucht werden -- nur mit Bereichen neben ihr."""
 
     @property
     def rotation(self) -> Tuple[Wert, Dict[Richtung, Wert]]:
@@ -263,7 +281,7 @@ class Stuetzenrechnung:
         s, f = self.stelle, self.stelle.flaeche
         masse = {k: e.g(k).si for k in f.masse}
         d, hoehen = self._statische_hoehe(e, p, w)
-        dicken, hoehe, bereiche = self._bereiche(e, p, w, masse, d, hoehen)
+        dicken, hoehe, bereiche, nah = self._bereiche(e, p, w, masse, d, hoehen)
         d_S = d if bereiche is None else bereiche.d_S
         d_v = w.laenge("d_v", "d_v", d_S.groesse.si)
         p.formel(d_v, "@d", {"d": d_S},
@@ -277,41 +295,57 @@ class Stuetzenrechnung:
         resultierende = self._resultierende(e, masse)
         regel = (f.k_e_naeherung(a) if s.ke is KeArt.NAEHERUNG
                  else KeExzentrizitaet(resultierende))
-        innen = Schnittpruefung(schnitt, dv, regel, V_d, e.g("q_d").si)
+        innen = Schnittpruefung(schnitt, regel, V_d, e.g("q_d").si, d_v=dv)
         p.titel("Momentenübertragung", ebene=3)
         k_e = herleitung.k_e(p, w, innen, ix=STUETZE)
         u = herleitung.wirksam(p, w, k_e, u_red, ix=STUETZE,
                                titel="Wirksamer Umfang des Nachweisschnitts")
         um_stufen: Tuple[Stufe, ...] = ()
+        netz: Optional[weg.Netz] = None
         if hoehe is not None:
-            um_stufen = stufen.stufen(dicken, hoehe, f.form.flaeche(masse),
-                                      raender=f.raender(masse), achse=f.achse(masse),
-                                      aussparungen=s.aussparungen, regel=regel, V_d=V_d,
-                                      q_d=e.g("q_d").si)
+            stuetze, achse, q_d = f.form.flaeche(masse), f.achse(masse), e.g("q_d").si
+            um_stufen = stufen.stufen(dicken, hoehe, stuetze, raender=f.raender(masse),
+                                      achse=achse, aussparungen=s.aussparungen, regel=regel,
+                                      V_d=V_d, q_d=q_d)
+            if nah:
+                schatten = schatten_am_schnitt(s.aussparungen, a.kandidat.stuecke, d_v=dv,
+                                               achse=achse)
+                netz = weg.Netz(dicken, hoehe.um, stuetze, raender=f.raender(masse),
+                                aussparungen=s.aussparungen, schatten=schatten, d_v=dv,
+                                k_e=k_e.groesse.si, regel=regel, V_d=V_d, q_d=q_d)
         return Stuetzenschnitt(masse, d_S, d_v, hoehen, innen, k_e, u,
-                               exzentrizitaet(resultierende, a), d, hoehe, bereiche, um_stufen)
+                               exzentrizitaet(resultierende, a), d, hoehe, bereiche, um_stufen,
+                               netz)
 
     def _bereiche(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, masse: Masse, d: Wert,
                   hoehen: Dict[Richtung, Wert]
-                  ) -> Tuple[Optional[Dicken], Optional[Stuetzenhoehe], Optional[Bereichswerte]]:
-        """Die Plattenbereiche um die Stütze -- nichts ohne Bereiche und an Wänden (Dateikopf)."""
+                  ) -> Tuple[Optional[Dicken], Optional[Stuetzenhoehe], Optional[Bereichswerte],
+                             Tuple[Plattenbereich, ...]]:
+        """
+        Die Plattenbereiche um die Stütze und die neben ihr, durch die ein
+        Schnitt laufen kann -- nichts ohne Bereiche und an Wänden (Dateikopf).
+        """
         s, f = self.stelle, self.stelle.flaeche
         if not s.bereiche:
-            return None, None, None
+            return None, None, None, ()
         if not f.hat_form:
             p.titel("Plattenbereiche", ebene=3)
             p.hinweis(f"An {f.lage.mehrzahl} rechnet das Werkzeug Plattenbereiche noch nicht: "
                       f"{aufgezaehlt([b.titel for b in s.bereiche])} gehen nicht ein.")
-            return None, None, None
+            return None, None, None, ()
         dicken = Dicken(e.g("h").si, d.groesse.si, tuple(s.bereiche))
-        hoehe = stufen.an_der_stuetze(dicken, f.form.flaeche(masse))
-        werte = stufen.bereiche_schreiben(p, w, e, dicken, hoehe, d, hoehen)
-        ausser = [b.titel for b in s.bereiche if b not in hoehe.um]
-        if ausser:
-            p.hinweis(f"{aufgezaehlt(ausser)} umschliess{'t' if len(ausser) == 1 else 'en'} die "
-                      f"Stütze nicht: solche Bereiche rechnet das Werkzeug noch nicht, sie gehen "
-                      f"nicht ein.")
-        return dicken, hoehe, werte
+        stuetze = f.form.flaeche(masse)
+        hoehe = stufen.an_der_stuetze(dicken, stuetze)
+        nah, fern = weg.neben(dicken, hoehe.um, stuetze)
+        werte = stufen.bereiche_schreiben(p, w, e, dicken, hoehe, d, hoehen, nah)
+        if fern:
+            einer = len(fern) == 1
+            p.hinweis(f"{aufgezaehlt([b.titel for b in fern])} lieg{'t' if einer else 'en'} mehr "
+                      f"als {weg.REICHWEITE:g}·d neben der Stütze"
+                      f"{' und den Bereichen um sie' if hoehe.um else ''}: so weit draussen wird "
+                      f"kein Schnitt um sie massgebend, {'er geht' if einer else 'sie gehen'} "
+                      f"nicht ein – nach Vorgabe, nicht nachgeschlagen.")
+        return dicken, hoehe, werte, nah
 
     def _widerstand(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, g: Stuetzenschnitt,
                     V_d: Wert, ergebnis: Optional[WertDef] = None) -> Widerstand:
@@ -340,6 +374,14 @@ class Stuetzenrechnung:
         return stufen.stufe_schreiben(p, w, e, st, d=g.d_platte, werte=g.bereiche, psi=r.psi,
                                       k_g=r.k_g, tau_cd=r.tau_cd, k_e_stuetze=g.k_e,
                                       last=self.stelle.plattenart.last, V_d=V_d)
+
+    def _weg_schreiben(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, g: Stuetzenschnitt,
+                       r: Widerstand, ws: weg.Wegschnitt,
+                       V_d: Optional[Wert] = None) -> Tuple[Wert, Wert]:
+        """Der Schnitt durch verschiedene Dicken (:func:`.weg.schreiben`), ψ und k_g der Stütze."""
+        return weg.schreiben(p, w, e, ws, d=g.d_platte, h_B=g.bereiche.dicken, psi=r.psi,
+                             k_g=r.k_g, tau_cd=r.tau_cd, k_e_stuetze=g.k_e,
+                             last=self.stelle.plattenart.last, V_d=V_d)
 
     # -- Statische Höhe -----------------------------------------------------
 
@@ -668,11 +710,16 @@ class Durchstanzen(Stuetzenrechnung, Nachweis):
             f"{basis}.stufe.{b.name}.erfuellungsgrad", rf"\alpha_{{eff,DS,{b.name}}}",
             f"Erfüllungsgrad an der Stufe von {b.titel}", stufen.REFERENZ)
             for b in stelle.bereiche}
+        # Am Schnitt durch verschiedene Dicken; ohne Bereich neben der Stütze kein Urteil.
+        self.d_weg: WertDef = grad_def(
+            f"{basis}.weg.erfuellungsgrad", r"\alpha_{eff,DS,W}",
+            f"Erfüllungsgrad am Schnitt {weg.NAME}", weg.REFERENZ)
         bezuege = [Eingabebezug(n, stelle.id_von(n)) for n in stelle.eingaben()]
         bezuege += [stelle.beton.bezug(k) for k in ("f_ck", "f_ctm", "f_cd", "tau_cd")]
         bezuege += [stelle.stahl.bezug(k) for k in ("f_yd", "E_s")]
         bezuege += [stelle.anker.bezug(k) for k in ("f_yd", "E_s")]
-        super().__init__(basis, ausgaben=[self.d_ohne, *self.mit_graden, *self.d_stufen.values()],
+        super().__init__(basis, ausgaben=[self.d_ohne, *self.mit_graden, *self.d_stufen.values(),
+                                          *([self.d_weg] if stelle.bereiche else [])],
                          bezuege=bezuege,
                          titel=f"Durchstanzen – {stelle.name}", referenz="SIA 262:2025, 4.3.6",
                          abschnitt=stelle.abschnitt)
@@ -706,6 +753,25 @@ class Durchstanzen(Stuetzenrechnung, Nachweis):
                 f"V_Rd,c = {V_Rd_c.formatiert()} kN an der Stufe."))
             befunde.append(Stufenbefund(st, V_Rd_c.groesse.si))
         return urteile, tuple(befunde)
+
+    def _weg_pruefen(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, g: Stuetzenschnitt,
+                     r: Widerstand) -> Tuple[List[NachweisUrteil], Optional[Wegbefund]]:
+        """Der Schnitt durch verschiedene Dicken, mit eigenem Urteil (:mod:`.weg`)."""
+        if g.netz is None:
+            return [], None
+        ws = g.netz.schnitt(r.psi.groesse.si, r.k_g.groesse.si, r.tau_cd.groesse.si)
+        if ws is None:
+            p.titel(f"Schnitt {weg.NAME}", ebene=3)
+            p.text(g.netz.warum_keiner)
+            return [], None
+        V, V_Rd_c = self._weg_schreiben(e, p, w, g, r, ws)
+        v = Vergleich(V, V_Rd_c)
+        v.bedingung(p, f"Querkraft gegen den Widerstand am Schnitt {weg.NAME}")
+        v.zeile(p, self.d_weg)
+        urteil = self.urteil(self.d_weg, f"am Schnitt {weg.NAME}", v,
+                             f"V_d = {V.formatiert()} kN {'≤' if v.erfuellt else '>'} "
+                             f"V_Rd,c = {V_Rd_c.formatiert()} kN am Schnitt {weg.NAME}.")
+        return [urteil], Wegbefund(ws, V_Rd_c.groesse.si)
 
     def nicht_fuehrbar(self, grund: str) -> List[NachweisUrteil]:
         """Die vier Urteile mit Durchstanzbewehrung, wo sich keine finden liess."""
@@ -754,7 +820,9 @@ class Durchstanzen(Stuetzenrechnung, Nachweis):
         v.bedingung(p, "Querkraft gegen Durchstanzwiderstand")
         v.zeile(p, self.d_ohne)
         an_stufen, stufenbefunde = self._stufen_pruefen(e, p, w, g, r)
-        befund = replace(befund, stufen=stufenbefunde)
+        an_weg, wegbefund = self._weg_pruefen(e, p, w, g, r)
+        weitere = [*an_stufen, *an_weg]
+        befund = replace(befund, stufen=stufenbefunde, weg=wegbefund)
         if not v.erfuellt and f.vorschlag and not s.bereiche:
             urteile, leisten, pilz = mit_bewehrung.nachweisen(self, e, p, w, Grundlage(
                 innen=g.innen, d=g.d, d_v=g.d_v, k_e=g.k_e, k_r=r.k_r, tau_cd=r.tau_cd, u=g.u,
@@ -762,7 +830,7 @@ class Durchstanzen(Stuetzenrechnung, Nachweis):
             # Der Grad ohne Bewehrung bleibt ein Wert der Herleitung, ohne Urteil.
             return Ausfuehrung({self.d_ohne.id: Groesse(v.grad, EINHEITSLOS)}, urteile,
                                replace(befund, leisten=leisten, pilz=pilz))
-        alle = v.erfuellt and all(u.erfuellt for u in an_stufen)
+        alle = v.erfuellt and all(u.erfuellt for u in weitere)
         if not alle and not f.vorschlag:
             p.hinweis(f"Für {f.lage.mehrzahl} schlägt das Werkzeug noch keine "
                       f"Durchstanzbewehrung vor.")
@@ -782,7 +850,7 @@ class Durchstanzen(Stuetzenrechnung, Nachweis):
             self.d_ohne, "ohne Durchstanzbewehrung", v,
             f"V_d = {V_d.formatiert()} kN {'≤' if v.erfuellt else '>'} "
             f"V_Rd,c = {V_Rd_c.formatiert()} kN.")
-        return Ausfuehrung({}, [urteil, *an_stufen], befund)
+        return Ausfuehrung({}, [urteil, *weitere], befund)
 
 
 # ===========================================================================
@@ -835,6 +903,13 @@ def kennwerttabelle(befund: Durchstanzbefund) -> TabellenBlock:
                       kraft(x.stufe.pruefung.V_d_red), "kN"),
                 zeile(f"Widerstand an der Stufe von {b.titel}", f"V_{{Rd,c,{b.name}}}",
                       kraft(x.V_Rd_c), "kN"),
+            ]
+        if befund.weg is not None:
+            zeilen += [
+                zeile(f"Querkraft im Schnitt {weg.NAME}", "V_{d,W}",
+                      kraft(befund.weg.schnitt.last.V_d_red), "kN"),
+                zeile(f"Widerstand am Schnitt {weg.NAME}", "V_{Rd,c,W}",
+                      kraft(befund.weg.V_Rd_c), "kN"),
             ]
     pilz, leisten = befund.pilz, befund.leisten
     if pilz is not None:

@@ -12,8 +12,8 @@
  * Seitenleiste.
  *
  * Darunter liegt, was der Kern zuletzt gerechnet hat: Stütze oder Wand,
- * Plattenrand, Nachweisschnitt und die Schnitte an den Stufen
- * (ds_grundriss.js). Die Ecken der Stütze fangen den Zeiger. Ändert sich
+ * Plattenrand, Nachweisschnitt, die Schnitte an den Stufen und der Schnitt
+ * durch verschiedene Dicken (ds_grundriss.js). Die Ecken der Stütze fangen den Zeiger. Ändert sich
  * eine Aussparung oder ein Bereich, rechnet die nächste Lösung die Schnitte
  * neu -- bis dahin stehen die alten da.
  *

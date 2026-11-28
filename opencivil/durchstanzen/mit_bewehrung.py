@@ -249,8 +249,8 @@ def _suchen(n: "Durchstanzen", werte: _Werte, ort: Ort) -> Optional[Leistenpruef
     def pruefen(vorschlag: Vorschlag) -> Leistenpruefung:
         return Leistenpruefung(
             vorschlag, ort.pruefung,
-            Schnittpruefung(vorschlag.aussen, werte.d_v_out.groesse.si, g.innen.regel,
-                            e.g("V_d").si, e.g("q_d").si),
+            Schnittpruefung(vorschlag.aussen, g.innen.regel, e.g("V_d").si, e.g("q_d").si,
+                            d_v=werte.d_v_out.groesse.si),
             k_r=g.k_r.groesse.si, tau_cd=g.tau_cd.groesse.si,
             sigma_sd=spannung(werte.E_s.groesse.si, g.psi.groesse.si, werte.f_ctm.groesse.si,
                               werte.f_yd.groesse.si, g.d.groesse.si, vorschlag.typ.durchmesser),
@@ -417,7 +417,7 @@ def _pilz_pruefen(n: "Durchstanzen", werte: _Werte, pilz: Stahlpilz) -> Pilzbefu
         kandidaten_stuetze(Stuetzenflaeche(umriss), d_v / 2.0, ECKENBEREICH * d_v,
                            s.flaeche.raender(g.masse)),
         d_v=d_v, achse=s.flaeche.achse(g.masse), aussparungen=s.aussparungen)
-    pruefung = Schnittpruefung(schnitt, d_v, g.innen.regel, e.g("V_d").si, e.g("q_d").si)
+    pruefung = Schnittpruefung(schnitt, g.innen.regel, e.g("V_d").si, e.g("q_d").si, d_v=d_v)
     return Pilzbefund(pilz, umriss, pruefung,
                       pruefung.V_Rd_c(g.k_r.groesse.si, g.tau_cd.groesse.si))
 

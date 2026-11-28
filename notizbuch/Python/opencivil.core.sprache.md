@@ -1,5 +1,5 @@
 ---
-erzeugt: afc90428d9f7
+erzeugt: 2307c01aa6d2
 art: modul
 tags: [modul]
 ---
@@ -26,6 +26,7 @@ def aufgezaehlt(teile: Sequence[str], wort: str='und') -> str
 
 ## Gebraucht von
 
+- [[opencivil.durchstanzen.kennzahl]]
 - [[opencivil.durchstanzen.nachweis]]
 - [[opencivil.material.arten]]
 - [[opencivil.nachweis.qa_verbund_werte]]

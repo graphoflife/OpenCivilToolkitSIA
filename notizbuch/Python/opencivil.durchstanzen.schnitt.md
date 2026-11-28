@@ -1,5 +1,5 @@
 ---
-erzeugt: 007ffc066a57
+erzeugt: 4d90c681efb5
 art: modul
 tags: [modul]
 ---
@@ -282,6 +282,17 @@ Der Schnitt um die äussere Ecke zweier Wände der Dicke `dicke` (Figur
 23c): die Ecke liegt im Ursprung, die Wände laufen nach +x und nach +y,
 die Platte liegt aussen. Entlang jeder Wand zählt er 1.5·d_v von der Ecke.
 
+### kandidat_ring
+
+```python
+def kandidat_ring(name: str, stuecke: Sequence[Strecke], raender: Sequence[Halbebene]=()) -> Kandidat
+```
+
+Ein Schnitt aus Strecken, die gegen den Uhrzeigersinn einen Ring um die
+Stützenachse schliessen – der Schnitt durch verschiedene Dicken
+([[opencivil.durchstanzen.weg|.weg]]). Er umschliesst, was in ihm liegt, soweit es in der Platte
+liegt; konvex ist er nicht.
+
 ### kandidat_polygon
 
 ```python
@@ -378,7 +389,8 @@ class Auswertung
 Was ein Kandidat ergibt. Längen in m: in der Platte, was davon an Ecken
 grosser Flächen und hinter Aussparungen nicht zählt, und die wirksame
 Länge `u`. Dazu die umschlossene Fläche, ohne Aussparungen, der
-Schwerpunkt der zählenden Teile und die Linien fürs Bild.
+Schwerpunkt der zählenden Teile, die Linien fürs Bild und je Stück, wie
+viel von ihm zählt – in der Reihe der Stücke.
 
 - `kandidat: Kandidat`
 - `in_der_platte: float`
@@ -388,6 +400,7 @@ Schwerpunkt der zählenden Teile und die Linien fürs Bild.
 - `flaeche_ohne_aussparungen: float`
 - `schwerpunkt: Punkt`
 - `linien: Tuple[Linienzug, ...]`
+- `je_stueck: Tuple[float, ...] = ()`
 
 #### Auswertung.u
 
@@ -422,7 +435,11 @@ nächsten Punkt verglichen, und ein Bogen wurde zum Vieleck.
 def _ueberlappung(aussparung: Sequence[Punkt], umschlossen: Sequence[Punkt]) -> float
 ```
 
-Wie viel der Aussparung in der umschlossenen Fläche liegt – die ist konvex.
+Wie viel der Aussparung in der umschlossenen Fläche liegt – für jedes
+einfache Polygon, auch ein nicht konvexes: ein Fächer von Dreiecken um
+seine erste Ecke, jedes mit dem Vorzeichen seines Umlaufs, deckt jeden
+Punkt darin genau einmal mehr, als es ihn abzieht. Bis 2026-11-28 galt
+das Polygon als konvex; um eine Wandecke ist es das nicht.
 
 ### Nachweisschnitt
 
@@ -476,4 +493,5 @@ er nach dem, der zum Rand läuft.
 - [[opencivil.durchstanzen.pruefung]]
 - [[opencivil.durchstanzen.stelle]]
 - [[opencivil.durchstanzen.stufen]]
+- [[opencivil.durchstanzen.weg]]
 - [[opencivil.web.durchstanzdaten]]

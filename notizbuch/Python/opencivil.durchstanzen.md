@@ -1,5 +1,5 @@
 ---
-erzeugt: 52bed1e4e129
+erzeugt: 7b78a62a5d6b
 art: modul
 tags: [modul]
 ---
@@ -38,3 +38,4 @@ tags: [modul]
 - [[opencivil.durchstanzen.stelle]] – die Durchstanzstelle: Platte, gestützte Fläche, Bewehrung, Last.
 - [[opencivil.durchstanzen.stufen]] – Plattenbereiche um die Stütze: d an ihr, Schnitte an den Stufen.
 - [[opencivil.durchstanzen.systeme]] – woraus die Durchstanzbewehrung besteht.
+- [[opencivil.durchstanzen.weg]] – ein Schnitt um die Stütze durch verschiedene Dicken.

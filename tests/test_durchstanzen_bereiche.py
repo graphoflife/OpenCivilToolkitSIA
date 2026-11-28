@@ -3,7 +3,8 @@ Plattenbereiche mit eigener Dicke beim Durchstanzen (opencivil.durchstanzen.bere
 und .stufen): d an der Stütze, ψ aus der dünnsten Stelle, der Schnitt an jeder
 Stufe nach SIA 262:2025, 4.3.6.2.7, Figur 24a und 24c, je mit eigenem Urteil,
 die Kennzahl über alle Schnitte, die Prüfungen beim Einlesen und was die
-Oberfläche davon zu sehen bekommt.
+Oberfläche davon zu sehen bekommt. Bereiche neben der Stütze prüft
+tests.test_durchstanzen_weg.
 
 Das Beispiel des Plans vom 2026-11-27: Innenstütze 400 × 400 mm, Platte
 240 mm, Bereich 1200 × 1200 mm mit 320 mm, C30/37, B500B, Näherungsstufe 1,
@@ -171,14 +172,6 @@ class TestWasNichtGeht(unittest.TestCase):
         self.assertIsNone(befund.leisten)
         self.assertIn("Mit Plattenbereichen schlägt das Werkzeug noch keine Durchstanzbewehrung "
                       "vor.", texte(loesung))
-
-    def test_neben_der_stuetze_noch_nicht(self):
-        p = projekt(b_x=400, b_y=400, stufe="1", V_d=300.0, h=240.0)
-        p.durchstanzstellen[0].plattenbereich([[600, -300], [1200, -300], [1200, 300], [600, 300]],
-                                              320.0)
-        _, loesung, befund, _ = rechnen(p)
-        self.assertAlmostEqual(befund.V_Rd_c / 1e3, 275.4, delta=0.05)
-        self.assertIn("Bereich B1 umschliesst die Stütze nicht", texte(loesung))
 
     def test_an_der_wand_noch_nicht(self):
         p = projekt(lage="wandende", V_d=300.0)

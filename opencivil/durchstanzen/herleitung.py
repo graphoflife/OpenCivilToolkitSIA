@@ -22,14 +22,15 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from typing import Optional
+from typing import Dict, Optional
 
 from opencivil.core.berechnung import Eingaben
 from opencivil.core.einheiten import M2, MM, Groesse
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert, WertDef
+from opencivil.durchstanzen.bereiche import Plattenbereich
 from opencivil.durchstanzen.pruefung import (
-    K_R_GRENZE, KeNaeherung, Schnittpruefung, beiwert_k_r, kreisdurchmesser,
+    K_R_GRENZE, KeNaeherung, Schnittlast, Schnittpruefung, beiwert_k_r, kreisdurchmesser,
 )
 from opencivil.durchstanzen.schnitt import Auswertung
 
@@ -47,7 +48,9 @@ class Index:
     vorsilbe: str = ""
 
     def name(self, grund: str) -> str:
-        return f"{self.vorsilbe}{self.zeichen}_{grund}" if self.zeichen else f"{self.vorsilbe}{grund}"
+        """Der Name eines Zwischenwerts -- ein Zeichen aus zwei Teilen, «W,B2», heisst «W_B2»."""
+        zeichen = self.zeichen.replace(",", "_")
+        return f"{self.vorsilbe}{zeichen}_{grund}" if zeichen else f"{self.vorsilbe}{grund}"
 
     def unten(self, *teile: str) -> str:
         """Der Index eines Symbols, der eigene zuletzt: ``unten("red")`` -- «red» oder «red,out»."""
@@ -62,6 +65,25 @@ class Index:
 
 
 STUETZE = Index()
+
+
+def d_im_bereich(p: Protokoll, w: Zwischenwerte, e: Eingaben, h_B: Dict[str, Wert], d: Wert,
+                 b: Optional[Plattenbereich], name: str, symbol: str, *, titel: str,
+                 referenz: str) -> Wert:
+    """
+    d im Bereich ``b``: d der Platte, um den Unterschied der Dicke verschoben
+    (:mod:`.bereiche`) -- ``None``: die Platte selbst. ``h_B`` sind die Dicken
+    der Bereiche, wie sie in der Herleitung stehen.
+    """
+    if b is None:
+        ergebnis = w.laenge(name, symbol, d.groesse.si)
+        p.formel(ergebnis, "@d", {"d": d}, titel=f"{titel}: die der Platte", referenz=referenz)
+        return ergebnis
+    ergebnis = w.laenge(name, symbol, d.groesse.si + b.h - e.g("h").si)
+    p.formel(ergebnis, "@d + @h_B - @h", {"d": d, "h_B": h_B[b.name], "h": e["h"]},
+             titel=f"{titel}, im {b.titel}: d der Platte, um den Unterschied der Dicke verschoben",
+             referenz=referenz, name="Statische Höhe in einem Plattenbereich")
+    return ergebnis
 
 
 def rand(p: Protokoll, w: Zwischenwerte, a: Auswertung, *, ix: Index, titel: str,
@@ -103,7 +125,7 @@ def abzuege(p: Protokoll, w: Zwischenwerte, a: Auswertung, u_0: Wert, *, ix: Ind
     return u_red
 
 
-def k_e(p: Protokoll, w: Zwischenwerte, s: Schnittpruefung, *, ix: Index,
+def k_e(p: Protokoll, w: Zwischenwerte, s: Schnittlast, *, ix: Index,
         an_der_stuetze: Optional[Wert] = None) -> Wert:
     """
     k_e an diesem Schnitt, wie die Regel der Stelle ihn gibt
@@ -154,7 +176,7 @@ def wirksam(p: Protokoll, w: Zwischenwerte, k_e: Wert, u_red: Wert, *, ix: Index
     return u
 
 
-def querkraft(p: Protokoll, w: Zwischenwerte, e: Eingaben, s: Schnittpruefung, *, ix: Index,
+def querkraft(p: Protokoll, w: Zwischenwerte, e: Eingaben, s: Schnittlast, *, ix: Index,
               titel_last: str, titel: str, V_d: Optional[Wert] = None) -> Wert:
     """
     Die Querkraft, die den Schnitt kreuzt: V_d ohne die Flächenlast darin

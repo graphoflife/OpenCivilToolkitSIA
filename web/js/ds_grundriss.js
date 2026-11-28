@@ -7,7 +7,8 @@
  * Nachweisschnitt im Abstand d_v/2. Was von ihm zählt, ist ausgezogen, was
  * nicht zählt, gestrichelt: neben den Ecken grosser Stützen und im Schatten
  * der Aussparungen. An jeder Stufe eines Bereichs ihr Schnitt, je in seiner
- * Farbe -- welche, sagt die Legende des Kerns. Braucht es
+ * Farbe -- welche, sagt die Legende des Kerns --, und der schwächste Schnitt
+ * durch verschiedene Dicken, wo ein Bereich neben der Stütze liegt. Braucht es
  * Durchstanzbewehrung, stehen ihre Leisten mit den Ankern da und der äussere
  * Schnitt um sie.
  *
@@ -95,6 +96,9 @@ export function grundrissTeile(s, bild, sicht, aussparungen = s.aussparungen,
       teile.push(linie(px(l.punkte), klasse));
     }
   }
+  for (const l of s.weg) {
+    teile.push(linie(px(l.punkte), `ds-weg${l.zaehlt ? '' : ' ds-weg-nicht'}`));
+  }
   return teile;
 }
 
@@ -162,7 +166,7 @@ export function grundrissUmfang(s) {
   const linien = (schnitt) => schnitt.flatMap((l) => l.punkte);
   const punkte = [...s.umriss, ...linien(s.schnitt), ...s.aussparungen.flat(),
     ...s.bereiche.flatMap((b) => b.punkte), ...s.stufen.flatMap((st) => linien(st.schnitt)),
-    ...(s.leisten ? linien(s.leisten.aussen) : []),
+    ...linien(s.weg), ...(s.leisten ? linien(s.leisten.aussen) : []),
     ...(s.pilz ? linien(s.pilz.schnitt) : [])];
   const xs = punkte.map((p) => p[0]);
   const ys = punkte.map((p) => p[1]);

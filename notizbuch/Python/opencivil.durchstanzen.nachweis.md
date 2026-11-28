@@ -1,5 +1,5 @@
 ---
-erzeugt: c69ba2766a35
+erzeugt: 8a000a180576
 art: modul
 tags: [modul]
 ---
@@ -38,9 +38,11 @@ Platte reicht (Figur 21).
 Steht die Stütze in Bereichen mit eigener Dicke, gilt an ihr deren d, ψ
 rechnet mit dem kleinsten d um sie, und an jeder Stufe, wo der Bereich
 dicker ist als die Platte darum, liegt ein weiterer Schnitt mit eigenem
-Urteil ([[opencivil.durchstanzen.stufen|.stufen]]). Bereiche, die die Stütze nicht umschliessen, und
-Bereiche an Wänden rechnet das Werkzeug noch nicht; die Herleitung sagt es.
-Mit Bereichen schlägt es noch keine Durchstanzbewehrung vor.
+Urteil ([[opencivil.durchstanzen.stufen|.stufen]]). Liegt ein Bereich neben der Stütze, kommt der
+schwächste Schnitt durch verschiedene Dicken dazu, auch mit eigenem Urteil
+([[opencivil.durchstanzen.weg|.weg]]); weiter draussen geht ein Bereich nicht ein. Bereiche an
+Wänden rechnet das Werkzeug noch nicht; die Herleitung sagt es. Mit
+Bereichen schlägt es noch keine Durchstanzbewehrung vor.
 
 
 ## DIE PLATTENROTATION (4.3.6.4.2)
@@ -128,6 +130,18 @@ Einwirkung und wo die Stufe keinen eigenen Schnitt hat.
 - `stufe: Stufe`
 - `V_Rd_c: Optional[float] = None`
 
+### Wegbefund
+
+```python
+@dataclass(frozen=True)
+class Wegbefund
+```
+
+Der Schnitt durch verschiedene Dicken und sein Widerstand ([[opencivil.durchstanzen.weg|.weg]]).
+
+- `schnitt: weg.Wegschnitt`
+- `V_Rd_c: float`
+
 ### Durchstanzbefund
 
 ```python
@@ -152,6 +166,7 @@ braucht; jedes mit seinen eigenen Zahlen.
 - `leisten: Optional[Leistenpruefung] = None` – Die vorgeschlagene Durchstanzbewehrung mit ihren Nachweisen (4.3.6.5.1).
 - `pilz: Optional[Pilzbefund] = None` – Der gewählte Stahlpilz; mit `leisten` stehen die Leisten um ihn.
 - `stufen: Tuple[Stufenbefund, ...] = ()` – Die Schnitte an den Stufen der Bereiche um die Stütze ([[opencivil.durchstanzen.stufen|.stufen]]).
+- `weg: Optional[Wegbefund] = None` – Der Schnitt durch verschiedene Dicken – wo ein Bereich neben der Stütze liegt.
 
 #### Durchstanzbefund.ohne_einwirkung
 
@@ -188,6 +203,7 @@ mit ihm und `hoehen`.
 - `hoehe: Optional[Stuetzenhoehe] = None`
 - `bereiche: Optional[Bereichswerte] = None`
 - `stufen: Tuple[Stufe, ...] = ()` – Die Stufen um die Stütze, je mit ihrem Schnitt – ohne Plattenbereiche keine.
+- `netz: Optional[weg.Netz] = None` – Wo die Schnitte durch verschiedene Dicken gesucht werden – nur mit Bereichen neben ihr.
 
 #### Stuetzenschnitt.rotation
 
@@ -243,10 +259,11 @@ Schnitte an den Stufen der Plattenbereiche. `V_d` in N.
 #### Stuetzenrechnung._bereiche
 
 ```python
-def _bereiche(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, masse: Masse, d: Wert, hoehen: Dict[Richtung, Wert]) -> Tuple[Optional[Dicken], Optional[Stuetzenhoehe], Optional[Bereichswerte]]
+def _bereiche(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, masse: Masse, d: Wert, hoehen: Dict[Richtung, Wert]) -> Tuple[Optional[Dicken], Optional[Stuetzenhoehe], Optional[Bereichswerte], Tuple[Plattenbereich, ...]]
 ```
 
-Die Plattenbereiche um die Stütze – nichts ohne Bereiche und an Wänden (Dateikopf).
+Die Plattenbereiche um die Stütze und die neben ihr, durch die ein
+Schnitt laufen kann – nichts ohne Bereiche und an Wänden (Dateikopf).
 
 #### Stuetzenrechnung._widerstand
 
@@ -265,6 +282,14 @@ def _stufe_schreiben(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, g: Stuet
 ```
 
 Der Schnitt an einer Stufe ([[opencivil.durchstanzen.stufen#stufe_schreiben|.stufen.stufe_schreiben]]) mit ψ und k_g der Stütze.
+
+#### Stuetzenrechnung._weg_schreiben
+
+```python
+def _weg_schreiben(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, g: Stuetzenschnitt, r: Widerstand, ws: weg.Wegschnitt, V_d: Optional[Wert]=None) -> Tuple[Wert, Wert]
+```
+
+Der Schnitt durch verschiedene Dicken ([[opencivil.durchstanzen.weg#schreiben|.weg.schreiben]]), ψ und k_g der Stütze.
 
 #### Stuetzenrechnung._statische_hoehe
 
@@ -376,6 +401,14 @@ def _stufen_pruefen(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, g: Stuetz
 
 Die Schnitte an den Stufen, je mit eigenem Urteil (4.3.6.2.7).
 
+#### Durchstanzen._weg_pruefen
+
+```python
+def _weg_pruefen(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, g: Stuetzenschnitt, r: Widerstand) -> Tuple[List[NachweisUrteil], Optional[Wegbefund]]
+```
+
+Der Schnitt durch verschiedene Dicken, mit eigenem Urteil ([[opencivil.durchstanzen.weg|.weg]]).
+
 #### Durchstanzen.nicht_fuehrbar
 
 ```python
@@ -434,6 +467,7 @@ stand dort V_Rd,c = 866.7 kN, wo die Kennzahl 503.6 kN sagt.
 - [[opencivil.durchstanzen.schnitt]]
 - [[opencivil.durchstanzen.stelle]]
 - [[opencivil.durchstanzen.stufen]]
+- [[opencivil.durchstanzen.weg]]
 - [[opencivil.nachweis.querkraft_ohne_buegel]]
 - [[opencivil.querschnitt.platte]]
 - [[opencivil.querschnitt.werkstoffgesetz]]

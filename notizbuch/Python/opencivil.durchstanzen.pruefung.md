@@ -1,5 +1,5 @@
 ---
-erzeugt: 1d8987aa66d8
+erzeugt: 19d324bf0c7d
 art: modul
 tags: [modul]
 ---
@@ -9,7 +9,8 @@ tags: [modul]
 
 ## VERANTWORTUNG
 
-Die Rechnung an einem Nachweisschnitt ([[opencivil.durchstanzen.pruefung#Schnittpruefung|Schnittpruefung]]) und mit einer
+Die Rechnung an einem Nachweisschnitt ([[opencivil.durchstanzen.pruefung#Schnittlast|Schnittlast]],
+[[opencivil.durchstanzen.pruefung#Schnittpruefung|Schnittpruefung]]) und mit einer
 Durchstanzbewehrung ([[opencivil.durchstanzen.pruefung#Leistenpruefung|Leistenpruefung]]), je einmal. Die Suche nach
 der Bewehrung und dem Stahlpilz fragt ihre Ergebnisse
 ([[opencivil.durchstanzen.mit_bewehrung|.mit_bewehrung]]), die Herleitung schreibt dieselben Zahlen
@@ -233,32 +234,32 @@ def spannung(E_s: float, psi: float, f_ctm: float, f_yd: float, d: float, phi: f
 
 σ_sd nach Gleichung (69).
 
-### Schnittpruefung
+### Schnittlast
 
 ```python
 @dataclass(frozen=True)
-class Schnittpruefung
+class Schnittlast
 ```
 
-Ein Nachweisschnitt und was aus ihm folgt: der wirksame Umfang, die
-Fläche darin, die Querkraft, die ihn kreuzt, und die Widerstände an ihm.
-Derselbe um die Stütze, um die äussersten Anker (Figur 26, mit d_v,out)
-und um einen Stahlpilz (4.3.6.6.2, mit seinem d_v).
+Ein Nachweisschnitt und die Querkraft, die ihn kreuzt: was von ihm zählt,
+k_e, der wirksame Umfang und die Fläche darin – alles, was nicht von d_v
+abhängt. Den Widerstand rechnet [[opencivil.durchstanzen.pruefung#Schnittpruefung|Schnittpruefung]] mit dem d_v des
+Schnitts; ein Schnitt durch verschiedene Dicken je Stelle mit ihrem
+([[opencivil.durchstanzen.weg|.weg]]).
 
 - `schnitt: Nachweisschnitt`
-- `d_v: float`
 - `regel: KeRegel`
 - `V_d: float` – Die Auflagerkraft.
 - `q_d: float` – Die Flächenlast, die innerhalb des Schnitts abgezogen wird.
 
-#### Schnittpruefung.auswertung
+#### Schnittlast.auswertung
 
 ```python
 @property
 def auswertung(self) -> Auswertung
 ```
 
-#### Schnittpruefung.k_e
+#### Schnittlast.k_e
 
 ```python
 @property
@@ -267,7 +268,7 @@ def k_e(self) -> float
 
 k_e an diesem Schnitt, nach der Regel der Stelle.
 
-#### Schnittpruefung.u_red
+#### Schnittlast.u_red
 
 ```python
 @property
@@ -276,7 +277,7 @@ def u_red(self) -> float
 
 Was vom Schnitt zählt (Figur 23).
 
-#### Schnittpruefung.u
+#### Schnittlast.u
 
 ```python
 @property
@@ -285,7 +286,7 @@ def u(self) -> float
 
 Der wirksame Umfang.
 
-#### Schnittpruefung.flaeche
+#### Schnittlast.flaeche
 
 ```python
 @property
@@ -294,7 +295,7 @@ def flaeche(self) -> float
 
 Die Fläche innerhalb des Schnitts, ohne Aussparungen.
 
-#### Schnittpruefung.abzug
+#### Schnittlast.abzug
 
 ```python
 @property
@@ -303,7 +304,7 @@ def abzug(self) -> float
 
 Die Flächenlast innerhalb des Schnitts – ΔV (4.3.6.2.6).
 
-#### Schnittpruefung.V_d_red
+#### Schnittlast.V_d_red
 
 ```python
 @property
@@ -311,6 +312,20 @@ def V_d_red(self) -> float
 ```
 
 Die Querkraft, die den Schnitt kreuzt.
+
+### Schnittpruefung
+
+```python
+@dataclass(frozen=True)
+class Schnittpruefung(Schnittlast)
+```
+
+Ein Nachweisschnitt mit einem d_v und den Widerständen an ihm – derselbe
+um die Stütze, an den Stufen der Plattenbereiche ([[opencivil.durchstanzen.stufen|.stufen]]), um die
+äussersten Anker (Figur 26, mit d_v,out) und um einen Stahlpilz
+(4.3.6.6.2, mit seinem d_v).
+
+- `d_v: float`
 
 #### Schnittpruefung.V_Rd_c
 
@@ -484,3 +499,4 @@ def reicht(self) -> bool
 - [[opencivil.durchstanzen.nachweis]]
 - [[opencivil.durchstanzen.stufen]]
 - [[opencivil.durchstanzen.systeme]]
+- [[opencivil.durchstanzen.weg]]

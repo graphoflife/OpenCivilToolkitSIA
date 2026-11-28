@@ -1,5 +1,5 @@
 ---
-erzeugt: cb9aa689a96c
+erzeugt: 98bacaf92374
 art: modul
 tags: [modul]
 ---
@@ -51,6 +51,8 @@ Pilz nebeneinander stehen können.
 def name(self, grund: str) -> str
 ```
 
+Der Name eines Zwischenwerts – ein Zeichen aus zwei Teilen, «W,B2», heisst «W_B2».
+
 #### Index.unten
 
 ```python
@@ -66,6 +68,16 @@ def symbol(self, grund: str, *teile: str) -> str
 ```
 
 `symbol("V", "d")` – «V_{d,out}»; ohne Index «V_d», «u».
+
+### d_im_bereich
+
+```python
+def d_im_bereich(p: Protokoll, w: Zwischenwerte, e: Eingaben, h_B: Dict[str, Wert], d: Wert, b: Optional[Plattenbereich], name: str, symbol: str, *, titel: str, referenz: str) -> Wert
+```
+
+d im Bereich `b`: d der Platte, um den Unterschied der Dicke verschoben
+([[opencivil.durchstanzen.bereiche|.bereiche]]) – `None`: die Platte selbst. `h_B` sind die Dicken
+der Bereiche, wie sie in der Herleitung stehen.
 
 ### rand
 
@@ -89,7 +101,7 @@ die der Auswertung, mit der auch die Prüfung rechnet.
 ### k_e
 
 ```python
-def k_e(p: Protokoll, w: Zwischenwerte, s: Schnittpruefung, *, ix: Index, an_der_stuetze: Optional[Wert]=None) -> Wert
+def k_e(p: Protokoll, w: Zwischenwerte, s: Schnittlast, *, ix: Index, an_der_stuetze: Optional[Wert]=None) -> Wert
 ```
 
 k_e an diesem Schnitt, wie die Regel der Stelle ihn gibt
@@ -108,7 +120,7 @@ Der wirksame Umfang u = k_e · u_red.
 ### querkraft
 
 ```python
-def querkraft(p: Protokoll, w: Zwischenwerte, e: Eingaben, s: Schnittpruefung, *, ix: Index, titel_last: str, titel: str, V_d: Optional[Wert]=None) -> Wert
+def querkraft(p: Protokoll, w: Zwischenwerte, e: Eingaben, s: Schnittlast, *, ix: Index, titel_last: str, titel: str, V_d: Optional[Wert]=None) -> Wert
 ```
 
 Die Querkraft, die den Schnitt kreuzt: V_d ohne die Flächenlast darin
@@ -147,6 +159,7 @@ belegt, wo V_Rd,c selbst ein Wert des Rechenwerks ist: die Kennzahl
 - [[opencivil.core.einheiten]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wert]]
+- [[opencivil.durchstanzen.bereiche]]
 - [[opencivil.durchstanzen.pruefung]]
 - [[opencivil.durchstanzen.schnitt]]
 
@@ -156,6 +169,7 @@ belegt, wo V_Rd,c selbst ein Wert des Rechenwerks ist: die Kennzahl
 - [[opencivil.durchstanzen.mit_bewehrung]]
 - [[opencivil.durchstanzen.nachweis]]
 - [[opencivil.durchstanzen.stufen]]
+- [[opencivil.durchstanzen.weg]]
 
 ## Formeln aus diesem Modul
 

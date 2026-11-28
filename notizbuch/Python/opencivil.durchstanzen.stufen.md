@@ -1,5 +1,5 @@
 ---
-erzeugt: a5c92e154cf3
+erzeugt: e88518949bd2
 art: modul
 tags: [modul]
 ---
@@ -113,6 +113,15 @@ def index(self) -> Index
 
 Wie ihre Werte heissen: u_{0,B1}, V_{Rd,c,B1}.
 
+#### Stufe.wo
+
+```python
+@property
+def wo(self) -> str
+```
+
+Wo der Schnitt liegt, für Sätze: «der Schnitt an der Stufe von Bereich B1».
+
 #### Stufe.V_Rd_c
 
 ```python
@@ -158,19 +167,12 @@ ist, d für ψ mit den beiden Lagen.
 ### bereiche_schreiben
 
 ```python
-def bereiche_schreiben(p: Protokoll, w: Zwischenwerte, e: Eingaben, dicken: Dicken, hoehe: Stuetzenhoehe, d: Wert, lagen: Dict[Richtung, Wert]) -> Bereichswerte
+def bereiche_schreiben(p: Protokoll, w: Zwischenwerte, e: Eingaben, dicken: Dicken, hoehe: Stuetzenhoehe, d: Wert, lagen: Dict[Richtung, Wert], neben: Sequence[Plattenbereich]=()) -> Bereichswerte
 ```
 
-Die Bereiche um die Stütze, die statische Höhe an ihr und die, mit der
-ψ rechnet. `d` und `lagen` sind die der Platte.
-
-### _d_im
-
-```python
-def _d_im(p: Protokoll, w: Zwischenwerte, e: Eingaben, werte: Dict[str, Wert], d: Wert, b: Optional[Plattenbereich], name: str, symbol: str, *, titel: str) -> Wert
-```
-
-d im Bereich `b`: d der Platte, um den Unterschied der Dicke verschoben.
+Die Bereiche um die Stütze und die `neben` ihr, durch die ein Schnitt
+laufen kann ([[opencivil.durchstanzen.weg|.weg]]), je mit ihrer Dicke; die statische Höhe an der
+Stütze und die, mit der ψ rechnet. `d` und `lagen` sind die der Platte.
 
 ### rotation_schreiben
 

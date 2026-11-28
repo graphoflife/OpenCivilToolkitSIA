@@ -7,6 +7,49 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-28 · Durchstanzen: Schnitt durch verschiedene Dicken (Schritt 13c)
+
+Liegt ein Plattenbereich neben der Stütze, ohne sie zu umschliessen, sucht
+das Werkzeug den schwächsten Schnitt um sie, auch einen, der durch
+verschiedene Dicken läuft (SIA 262:2025, 4.3.6.2.7). Jedes Stück zählt mit
+k_r·d_v seiner Stelle; der Schnitt hat sein eigenes Urteil.
+
+- **Vorher – nachher:** Innenstütze 400 × 400 mm, Platte 240 mm, C30/37,
+  Stufe 1, und 100 mm neben ihr ein Streifen 600 × 1200 mm mit 180 mm.
+  Vorher sagte ein grauer Hinweis, dass der Bereich nicht eingeht, und es
+  galten 275.4 kN um die Stütze. Jetzt läuft der schwächste Schnitt der
+  Seite der Stütze entlang im Streifen, mit d = 134 mm: 269.2 kN, und er
+  ist massgebend, auch für die Kennzahl.
+- **Die Suche** (`durchstanzen/weg.py`): 72 Strahlen von der Stützenachse;
+  auf jedem ein Knoten, wo eine neue Stelle beginnt – Platte oder ein
+  Bereich, und ob der Schnitt dort zählt. Ein kürzester Weg verbindet je
+  einen Knoten jedes Strahls zu dem Ring mit der kleinsten Reserve
+  V_Rd,c + q_d·A. Diesen Ring rechnet das Werkzeug dann genau wie jeden
+  Schnitt: Eckenregel, Plattenrand, Aussparungen, k_e und Abzug der Last.
+  Ein Nachweis braucht so 0.01 bis 0.1 s.
+- **Was nicht zählt:** ein Ring, der überall dasselbe d hat – er ist der
+  Schnitt um die Stütze, nur gröber gerechnet –, und Bereiche weiter als
+  4·d neben der Stütze, mit einem Hinweis. Ein dickerer Bereich daneben
+  hält meist mehr, der Schnitt um die Stütze bleibt dann massgebend.
+- Die Regeln, die die Norm nicht im Einzelnen nennt, stehen «nach Vorgabe,
+  nicht nachgeschlagen» im Kopf von `weg.py` und als Frage in [[TODO]].
+- **Bild:** der Schnitt blau im Grundriss, ausgezogen, was zählt; in der
+  Legende seine Zahlen. Orange ist schon der äussere Schnitt der Leisten.
+- Dafür geteilt: `pruefung.Schnittlast` ist, was an einem Schnitt von der
+  Last abhängt (k_e, Fläche, V_d,red); `Schnittpruefung` fügt d_v und den
+  Widerstand hinzu. Der Schnitt durch verschiedene Dicken hat kein d_v,
+  sondern eines je Stelle.
+- Nebenbei: wie viel einer Aussparung im umschlossenen Teil eines Schnitts
+  liegt, rechnete das Werkzeug, als wäre der Teil konvex. Um eine
+  Wandecke ist er es nicht: eine Aussparung in einem Arm des Schnitts zog
+  nichts von der Fläche ab, etwa 0.008 statt 0 m². Jetzt gilt es für jedes
+  einfache Polygon, auch für den Ring.
+- Gefunden im Browser, seit Schritt 13b: war für die Kennzahl eine Stufe
+  massgebend, rechnete die Seite nichts. Der Name der letzten Formel kam
+  aus ihrem Titel und war mit «an der Stufe von Bereich B1» 107 Zeichen
+  lang, erlaubt sind 100. Jetzt steht er fest; ein Test rechnet über
+  denselben Weg wie die Seite, samt Formelsammlung.
+
 ## 2026-11-28 · Durchstanzen: Plattenbereiche mit eigener Dicke um die Stütze (Schritt 13 a und b)
 
 Im Zeichenfenster des Durchstanzens eine neue Art «Plattenbereich»: ein

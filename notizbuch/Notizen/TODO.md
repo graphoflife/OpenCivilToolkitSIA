@@ -303,6 +303,42 @@ sammeln sie sich hier, je mit dem, was vorläufig gebaut ist.
       zeigt es im Feld, bevor man zeichnet. Vorschlag: so lassen. Sonst
       etwa die Dicke der Platte plus 80 mm, die der Kern vorgäbe.
       Vorläufig: 360 mm.
+- [ ] **Bereich neben der Stütze: wie der Schnitt durch verschiedene
+      Dicken gesucht wird.** Die Norm verlangt, jeden möglichen Schnitt zu
+      rechnen (4.3.6.2.7), sagt aber nicht, wie. Beispiel: Stütze
+      400 × 400 mm, Platte 240 mm, 100 mm neben der Stütze ein Streifen mit
+      180 mm – um die Stütze 275.4 kN, durch den Streifen 269.2 kN. Nach
+      Vorgabe, nicht nachgeschlagen, je mit dem Vorschlag «so lassen»:
+      - 72 Strahlen von der Stützenachse, je 5°, bis 4·d der Platte über
+        die Stütze und die Bereiche um sie hinaus, abgetastet alle 0.1·d
+        des dünnsten Teils; weiter draussen geht ein Bereich nicht ein, ein
+        Hinweis sagt es;
+      - der Schnitt hält an jeder Stelle 0.5·d_v ihres d von der Stütze und
+        von jedem Bereich, der auf der Druckseite weiter vorsteht;
+      - in einen dünneren Bereich darf er gleich an dessen Rand, wo dort
+        schon das kleinere d zählt – das ist streng, an der Stufe in
+        Schritt 13b lag der Schnitt 0.5·d_v daneben;
+      - von der Stütze zählt nur, was höchstens 1.5·d_v ihres d von ihren
+        Ecken liegt, mit d der Stelle; an Ecken der Bereiche zählt alles;
+      - gesucht wird mit k_e der Stütze, der gefundene Schnitt rechnet mit
+        seinem eigenen; die Schatten der Aussparungen nimmt die Suche vom
+        Schnitt um die Stütze, die genaue Rechnung von ihm selbst;
+      - ein Schnitt mit überall demselben d fällt weg, und ohne Last gibt
+        es keinen (ψ hängt von ihr ab) – die Kennzahl sucht ihn trotzdem;
+      - der Schnitt um die Stütze und die an den Stufen rechnen weiter mit
+        einem d, auch wo ein Bereich daneben in sie reicht.
+      Vorläufig: so.
+- [ ] **Schnitt durch verschiedene Dicken: blau.** Im Grundriss steht er
+      blau, nicht orange wie im Plan – orange ist schon der äussere Schnitt
+      der Leisten. Vorschlag: so lassen. Vorläufig: blau.
+- [ ] **Aufräumen: eine Platte oder ein Bereich dünner als die
+      Bewehrung tief liegt.** Gefunden beim Bau von Schritt 13c, nicht
+      behoben. Heute nimmt das Werkzeug eine Platte mit h = 40 mm an,
+      obwohl c und die Stäbe tiefer liegen: d wird −6 mm, und V_Rd,c ist
+      negativ. Ebenso einen Bereich mit 40 mm in einer Platte von 240 mm –
+      um die Stütze steht dann «erfüllt, ∞». Vorschlag: die Felder h der
+      Platte und des Bereichs weisen eine Dicke ab, bei der d nicht über
+      null liegt, rot und mit dem Namen. Vorläufig: nicht geprüft.
 
 ## Wünsche vom 2026-11-20
 
@@ -1503,14 +1539,14 @@ Norm dazu sagt.
 - [ ] **Durchstanzen: was das Werkzeug nicht abbildet** (zur Kenntnis):
       Einzellasten über 0.2·V_d näher als 3·d_v am Schnitt (4.3.6.2.3);
       einbetonierte Leitungen (Figur 23e); Plattenbereiche mit eigener
-      Dicke (4.3.6.2.7, Figur 24) nur, wo sie die Stütze umschliessen, noch
-      ohne Durchstanzbewehrung und nicht an Wänden (Schritt 13 c und d des
-      Plans vom 2026-11-27); Vorspannung (4.3.6.4.3); an Rand- und
-      Eckstützen die untere Bewehrung als gezogene (4.3.6.4.7); die
-      Verankerung der Biegebewehrung (5.5.3.7); ein Schnitt, der an einer
-      Aussparung nahe der Stütze endet (4.3.6.2.2). Die Bedingung
-      0.5 ≤ l_x/l_y ≤ 2 für Stufe 1 und 2 (4.3.6.4.2) prüft das Werkzeug nicht,
-      die Sicherung gegen Totaleinsturz (4.3.6.7) steht nur als Hinweis.
+      Dicke (4.3.6.2.7, Figur 24) noch ohne Durchstanzbewehrung (Schritt
+      13d des Plans vom 2026-11-27) und nicht an Wänden; Vorspannung
+      (4.3.6.4.3); an Rand- und Eckstützen die untere Bewehrung als
+      gezogene (4.3.6.4.7); die Verankerung der Biegebewehrung (5.5.3.7);
+      ein Schnitt, der an einer Aussparung nahe der Stütze endet
+      (4.3.6.2.2). Die Bedingung 0.5 ≤ l_x/l_y ≤ 2 für Stufe 1 und 2
+      (4.3.6.4.2) prüft das Werkzeug nicht, die Sicherung gegen
+      Totaleinsturz (4.3.6.7) steht nur als Hinweis.
 - [ ] **Sprödes Versagen unter Zug fehlt.** Wo ein Querschnitt für die
       Tragsicherheit zählt, muss sein Widerstand die Rissbeanspruchung
       übertreffen, auch die auf Normalkraft (SIA 262:2025, 4.3.1.2, mit

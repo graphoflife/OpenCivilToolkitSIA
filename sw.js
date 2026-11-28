@@ -44,14 +44,14 @@ const VORRAT = {
     "web/favicon.svg"
   ],
   "dateien": [
-    "web/css/10-grundlage.css?v=b213b7bf88b9",
+    "web/css/10-grundlage.css?v=b7c57d46424b",
     "web/css/20-seite.css?v=fffcb0bfe20c",
     "web/css/30-eingaben.css?v=5bc41d68e1d3",
     "web/css/40-bericht.css?v=9260c2489f98",
     "web/css/50-schmal.css?v=fd221b20ca93",
     "web/css/60-zeichenfenster.css?v=2e5cfb6ff54f",
     "web/css/70-notizbuch.css?v=5c29ff90c1e1",
-    "web/css/80-skizzen.css?v=e2baeca85de1",
+    "web/css/80-skizzen.css?v=fde9cb103008",
     "web/css/90-python.css?v=bec24d055c16",
     "web/js/ablage.js?v=84cbb1c2e67e",
     "web/js/achsen.js?v=aced8f358043",
@@ -89,8 +89,8 @@ const VORRAT = {
     "web/js/dk_zeichnung.js?v=534acad1acc4",
     "web/js/dom.js?v=171f61663900",
     "web/js/ds_ansicht.js?v=126bc2761415",
-    "web/js/ds_grundriss.js?v=19958af10fd3",
-    "web/js/ds_zeichnung.js?v=3aba289b27f7",
+    "web/js/ds_grundriss.js?v=c93fc45f251b",
+    "web/js/ds_zeichnung.js?v=45eecfdaee85",
     "web/js/durchstanzen.js?v=322d9c1d82fd",
     "web/js/eb_verlauf.js?v=4c06fa7eff09",
     "web/js/eb_zeichnung.js?v=ee4e558053b0",
@@ -156,8 +156,8 @@ const VORRAT = {
     "web/js/variablen.js?v=7d43b6f38cd9",
     "web/js/zeichnen.js?v=da6e8eec5dc8",
     "web/js/zustand.js?v=3385a39c0f84",
-    "web/kern/notizbuch.json?v=66c8662a72ca",
-    "web/kern/quellen.json?v=4b92fbdc0773"
+    "web/kern/notizbuch.json?v=9ac24cda8859",
+    "web/kern/quellen.json?v=2dba3d501183"
   ],
   "fremd": {
     "web/vendor/jetbrains-mono/": {

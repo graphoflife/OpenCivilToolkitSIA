@@ -1,5 +1,5 @@
 ---
-erzeugt: bbc3d6a76b65
+erzeugt: 8a3e220bfe90
 art: modul
 tags: [modul]
 ---
@@ -596,6 +596,7 @@ Oberflaeche und alle Berichte gehen.
 - [[opencivil.durchstanzen.nachweis]]
 - [[opencivil.durchstanzen.stelle]]
 - [[opencivil.durchstanzen.stufen]]
+- [[opencivil.durchstanzen.weg]]
 - [[opencivil.erdbeben.ersatzkraft]]
 - [[opencivil.erdbeben.kern]]
 - [[opencivil.fachwerkmodell.herleitung]]

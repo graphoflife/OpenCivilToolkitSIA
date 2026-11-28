@@ -7,8 +7,8 @@ der Umriss der gestützten Fläche, die Plattenränder, die Aussparungen und
 der Nachweisschnitt -- je Stück, ob es zählt --, und wo es sie braucht, die
 Leisten mit ihren Ankern und dem äusseren Schnitt und der Stahlpilz mit seinen
 Stegen und dem Schnitt um ihn, je für sich. Die Plattenbereiche mit ihrer
-Dicke und an jeder Stufe ihr Schnitt, je in seiner Farbe
-(:data:`STUFENFARBEN`). Dazu die Legende unter dem Bild
+Dicke, an jeder Stufe ihr Schnitt, je in seiner Farbe (:data:`STUFENFARBEN`),
+und der Schnitt durch verschiedene Dicken. Dazu die Legende unter dem Bild
 (:mod:`opencivil.web.anzeige`): die Schnitte mit ihren Zahlen und das Urteil.
 Gezeichnet wird in der Oberflaeche, gerechnet nichts: die Linien kommen aus
 dem Befund des Nachweises (:mod:`opencivil.durchstanzen.nachweis`).
@@ -36,6 +36,7 @@ from opencivil.core.latex import Mathe
 from opencivil.core.nachweis import OHNE_EINWIRKUNG, NachweisUrteil
 from opencivil.core.rechenwerk import Loesung
 from opencivil.core.wert import Wert
+from opencivil.durchstanzen import weg
 from opencivil.durchstanzen.bereiche import Plattenbereich, Seite
 from opencivil.durchstanzen.bewehrung import BEREICH_VON
 from opencivil.durchstanzen.flaeche import Lage, Stuetzenform
@@ -54,6 +55,9 @@ from opencivil.web.anzeige import masszahl, punkte, urteil, zahl, zahlformel, ze
 #: Die Farben der Schnitte an den Stufen, der Reihe nach -- im Bild die Klassen
 #: «ds-stufe-0» bis «ds-stufe-2» (web/css/80-skizzen.css).
 STUFENFARBEN = ("grün", "türkis", "braun")
+
+#: Die Farbe des Schnitts durch verschiedene Dicken -- im Bild «ds-weg».
+WEGFARBE = "blau"
 
 
 def wahlen() -> Dict[str, Any]:
@@ -127,6 +131,7 @@ def situation(aufbau: Aufbau, kennung: str, loesung: Loesung) -> Optional[Dict[s
         "stufen": [{"name": x.stufe.bereich.name, "farbe": i % len(STUFENFARBEN),
                     "schnitt": _linien(x.stufe.pruefung.schnitt)}
                    for i, x in enumerate(_mit_schnitt(befund))],
+        "weg": [] if befund.weg is None else _linien(befund.weg.schnitt.last.schnitt),
         "ansicht": None if leisten is None else _ansicht(befund, nachweis.stelle, loesung.werte),
         "legende": _legende(befund, urteile, nachweis.stelle.bereiche),
     }
@@ -238,7 +243,7 @@ def _legende(befund: Durchstanzbefund, urteile: Sequence[NachweisUrteil],
     if befund.ohne_einwirkung:
         zeilen.append(zeile(OHNE_EINWIRKUNG))
         return zeilen
-    if befund.stufen:
+    if befund.stufen or befund.weg is not None:
         # Mit Plattenbereichen schlägt das Werkzeug noch keine Bewehrung vor.
         zeilen.append(zeile("Um die Stütze ", Mathe(f"V_d = {_kraft(innen.V_d_red)}"), ", ",
                             Mathe(f"V_{{Rd,c}} = {_kraft(befund.V_Rd_c)}"), "."))
@@ -248,6 +253,11 @@ def _legende(befund: Durchstanzbefund, urteile: Sequence[NachweisUrteil],
                 f"An der Stufe von {x.stufe.bereich.titel} ",
                 Mathe(f"V_{{d,{name}}} = {_kraft(x.stufe.pruefung.V_d_red)}"), ", ",
                 Mathe(f"V_{{Rd,c,{name}}} = {_kraft(x.V_Rd_c)}"), "."))
+        if befund.weg is not None:
+            zeilen.append(zeile(
+                f"Am Schnitt {weg.NAME} ",
+                Mathe(f"V_{{d,W}} = {_kraft(befund.weg.schnitt.last.V_d_red)}"), ", ",
+                Mathe(f"V_{{Rd,c,W}} = {_kraft(befund.weg.V_Rd_c)}"), "."))
         return [*zeilen, _gesamtzeile(gefuehrt)]
     if b is None and pilz is None and gefuehrt:
         zeilen.append(zeile(*urteil(f"V_d = {_kraft(innen.V_d_red)}", r"\le",
@@ -298,8 +308,9 @@ def _gesamtzeile(urteile: Sequence[NachweisUrteil]) -> list:
 
 def _stufenzeilen(befund: Durchstanzbefund) -> List[list]:
     """
-    Was die Plattenbereiche im Bild sind: getönt mit ihrer Dicke, und an
-    jeder Stufe ihr Schnitt in seiner Farbe -- oder warum sie keinen hat.
+    Was die Plattenbereiche im Bild sind: getönt mit ihrer Dicke, an jeder
+    Stufe ihr Schnitt in seiner Farbe -- oder warum sie keinen hat -- und der
+    Schnitt durch verschiedene Dicken.
     """
     zeilen = [zeile("Getönt die Plattenbereiche mit ihrer Dicke; an der Stütze gilt ",
                     zahlformel("d", befund.d, MM, 0), ".")]
@@ -315,6 +326,9 @@ def _stufenzeilen(befund: Durchstanzbefund) -> List[list]:
         zeilen.append(zeile(f"Schnitt an der Stufe von {b.titel} ({farben[id(x)]}) im Abstand ",
                             zahlformel("d_v/2", st.d / 2, MM, 0), f" {wo} des Bereichs, mit ",
                             zahlformel("d_v", st.d, MM, 0), " der dünneren Platte."))
+    if befund.weg is not None:
+        zeilen.append(zeile(f"Schnitt {weg.NAME} ({WEGFARBE}): der schwächste um die Stütze; "
+                            "jedes Stück zählt mit ", Mathe(r"k_r \cdot d_v"), " seiner Stelle."))
     return zeilen
 
 

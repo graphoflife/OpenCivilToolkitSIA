@@ -366,6 +366,19 @@ def kandidat_wandecke(dicke: float, abstand: float, d_v: float) -> Kandidat:
     return Kandidat("um die Wandecke", stuecke, (), tuple(_rechtsrum(umschlossen)))
 
 
+def kandidat_ring(name: str, stuecke: Sequence[Strecke],
+                  raender: Sequence[Halbebene] = ()) -> Kandidat:
+    """
+    Ein Schnitt aus Strecken, die gegen den Uhrzeigersinn einen Ring um die
+    Stützenachse schliessen -- der Schnitt durch verschiedene Dicken
+    (:mod:`.weg`). Er umschliesst, was in ihm liegt, soweit es in der Platte
+    liegt; konvex ist er nicht.
+    """
+    stuecke = tuple(stuecke)
+    return Kandidat(name, stuecke, tuple(raender),
+                    tuple(_abschneiden([s.a for s in stuecke], raender)))
+
+
 def kandidat_polygon(name: str, ecken: Sequence[Punkt], eckenbereich: float,
                      raender: Sequence[Halbebene] = ()) -> Kandidat:
     """
@@ -486,7 +499,8 @@ class Auswertung:
     Was ein Kandidat ergibt. Längen in m: in der Platte, was davon an Ecken
     grosser Flächen und hinter Aussparungen nicht zählt, und die wirksame
     Länge ``u``. Dazu die umschlossene Fläche, ohne Aussparungen, der
-    Schwerpunkt der zählenden Teile und die Linien fürs Bild.
+    Schwerpunkt der zählenden Teile, die Linien fürs Bild und je Stück, wie
+    viel von ihm zählt -- in der Reihe der Stücke.
     """
 
     kandidat: Kandidat
@@ -497,6 +511,7 @@ class Auswertung:
     flaeche_ohne_aussparungen: float
     schwerpunkt: Punkt
     linien: Tuple[Linienzug, ...]
+    je_stueck: Tuple[float, ...] = ()
 
     @property
     def u(self) -> float:
@@ -513,9 +528,11 @@ def auswerten(kandidat: Kandidat, *, d_v: float, achse: Punkt,
     in_platte = an_ecken = hinter = 0.0
     sx = sy = s_l = 0.0
     linien: List[Linienzug] = []
+    je_stueck: List[float] = []
     for stueck in kandidat.stuecke:
         lauf: List[Punkt] = []
         zaehlt_lauf: Optional[bool] = None
+        gezaehlt = 0.0
         for p, q, neben_ecke in stueck.teile():
             m = (0.5 * (p[0] + q[0]), 0.5 * (p[1] + q[1]))
             l = math.dist(p, q)
@@ -533,6 +550,7 @@ def auswerten(kandidat: Kandidat, *, d_v: float, achse: Punkt,
                 sx += l * m[0]
                 sy += l * m[1]
                 s_l += l
+                gezaehlt += l
             if not drin:
                 if lauf:
                     linien.append(Linienzug(tuple(lauf), bool(zaehlt_lauf)))
@@ -545,11 +563,13 @@ def auswerten(kandidat: Kandidat, *, d_v: float, achse: Punkt,
             lauf.append(q)
         if lauf:
             linien.append(Linienzug(tuple(_vereinfacht(lauf)), bool(zaehlt_lauf)))
+        je_stueck.append(gezaehlt)
     A = abs(flaeche(kandidat.umschlossen)) if len(kandidat.umschlossen) >= 3 else 0.0
     ohne = A - sum(_ueberlappung(a, kandidat.umschlossen) for a in aussparungen)
     schwerpunkt = (sx / s_l, sy / s_l) if s_l > 0.0 else achse
     return Auswertung(kandidat, in_platte, an_ecken, hinter, A, max(0.0, ohne), schwerpunkt,
-                      tuple(Linienzug(tuple(_vereinfacht(l.punkte)), l.zaehlt) for l in linien))
+                      tuple(Linienzug(tuple(_vereinfacht(l.punkte)), l.zaehlt) for l in linien),
+                      tuple(je_stueck))
 
 
 def _vereinfacht(punkte: Sequence[Punkt], toleranz: float = 2e-4) -> List[Punkt]:
@@ -579,16 +599,31 @@ def _vereinfacht(punkte: Sequence[Punkt], toleranz: float = 2e-4) -> List[Punkt]
 
 
 def _ueberlappung(aussparung: Sequence[Punkt], umschlossen: Sequence[Punkt]) -> float:
-    """Wie viel der Aussparung in der umschlossenen Fläche liegt -- die ist konvex."""
+    """
+    Wie viel der Aussparung in der umschlossenen Fläche liegt -- für jedes
+    einfache Polygon, auch ein nicht konvexes: ein Fächer von Dreiecken um
+    seine erste Ecke, jedes mit dem Vorzeichen seines Umlaufs, deckt jeden
+    Punkt darin genau einmal mehr, als es ihn abzieht. Bis 2026-11-28 galt
+    das Polygon als konvex; um eine Wandecke ist es das nicht.
+    """
+    umschlossen = _rechtsrum(umschlossen)
     if len(umschlossen) < 3:
         return 0.0
-    umschlossen = _rechtsrum(umschlossen)
-    halbebenen = []
-    for p, q in zip(umschlossen, umschlossen[1:] + umschlossen[:1]):
-        nx, ny = _normale(p, q)
-        halbebenen.append(Halbebene((nx, ny), nx * p[0] + ny * p[1]))
-    teil = _abschneiden(list(aussparung), halbebenen)
-    return abs(flaeche(teil)) if len(teil) >= 3 else 0.0
+    o = umschlossen[0]
+    summe = 0.0
+    for p, q in zip(umschlossen[1:], umschlossen[2:]):
+        umlauf = (p[0] - o[0]) * (q[1] - o[1]) - (p[1] - o[1]) * (q[0] - o[0])
+        if abs(umlauf) <= 1e-18:
+            continue
+        dreieck = [o, p, q] if umlauf > 0.0 else [o, q, p]
+        halbebenen = []
+        for a, b in zip(dreieck, dreieck[1:] + dreieck[:1]):
+            nx, ny = _normale(a, b)
+            halbebenen.append(Halbebene((nx, ny), nx * a[0] + ny * a[1]))
+        teil = _abschneiden(list(aussparung), halbebenen)
+        flaeche_teil = abs(flaeche(teil)) if len(teil) >= 3 else 0.0
+        summe += flaeche_teil if umlauf > 0.0 else -flaeche_teil
+    return max(0.0, summe)
 
 
 @dataclass(frozen=True)

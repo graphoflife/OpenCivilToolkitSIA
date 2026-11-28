@@ -2,7 +2,8 @@
 opencivil/durchstanzen/pruefung.py -- was der Durchstanznachweis rechnet, ohne Herleitung.
 
 VERANTWORTUNG:
-Die Rechnung an einem Nachweisschnitt (:class:`Schnittpruefung`) und mit einer
+Die Rechnung an einem Nachweisschnitt (:class:`Schnittlast`,
+:class:`Schnittpruefung`) und mit einer
 Durchstanzbewehrung (:class:`Leistenpruefung`), je einmal. Die Suche nach
 der Bewehrung und dem Stahlpilz fragt ihre Ergebnisse
 (:mod:`.mit_bewehrung`), die Herleitung schreibt dieselben Zahlen
@@ -194,16 +195,16 @@ def spannung(E_s: float, psi: float, f_ctm: float, f_yd: float, d: float, phi: f
 
 
 @dataclass(frozen=True)
-class Schnittpruefung:
+class Schnittlast:
     """
-    Ein Nachweisschnitt und was aus ihm folgt: der wirksame Umfang, die
-    Fläche darin, die Querkraft, die ihn kreuzt, und die Widerstände an ihm.
-    Derselbe um die Stütze, um die äussersten Anker (Figur 26, mit d_v,out)
-    und um einen Stahlpilz (4.3.6.6.2, mit seinem d_v).
+    Ein Nachweisschnitt und die Querkraft, die ihn kreuzt: was von ihm zählt,
+    k_e, der wirksame Umfang und die Fläche darin -- alles, was nicht von d_v
+    abhängt. Den Widerstand rechnet :class:`Schnittpruefung` mit dem d_v des
+    Schnitts; ein Schnitt durch verschiedene Dicken je Stelle mit ihrem
+    (:mod:`.weg`).
     """
 
     schnitt: Nachweisschnitt
-    d_v: float
     regel: KeRegel
     V_d: float
     """Die Auflagerkraft."""
@@ -244,6 +245,18 @@ class Schnittpruefung:
     def V_d_red(self) -> float:
         """Die Querkraft, die den Schnitt kreuzt."""
         return self.V_d - self.abzug
+
+
+@dataclass(frozen=True)
+class Schnittpruefung(Schnittlast):
+    """
+    Ein Nachweisschnitt mit einem d_v und den Widerständen an ihm -- derselbe
+    um die Stütze, an den Stufen der Plattenbereiche (:mod:`.stufen`), um die
+    äussersten Anker (Figur 26, mit d_v,out) und um einen Stahlpilz
+    (4.3.6.6.2, mit seinem d_v).
+    """
+
+    d_v: float
 
     def V_Rd_c(self, k_r: float, tau_cd: float) -> float:
         return widerstand(k_r, tau_cd, self.d_v, self.u)

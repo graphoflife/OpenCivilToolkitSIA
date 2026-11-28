@@ -1,5 +1,5 @@
 ---
-erzeugt: bba0d14eeffd
+erzeugt: 4d12309b6fe8
 art: modul
 tags: [modul]
 ---
@@ -601,6 +601,7 @@ Ueberdeckung, oder wenn die Linie dabei keine Laenge behielte.
 - [[opencivil.durchstanzen.mit_bewehrung]]
 - [[opencivil.durchstanzen.schnitt]]
 - [[opencivil.durchstanzen.stufen]]
+- [[opencivil.durchstanzen.weg]]
 - [[opencivil.erdbeben.kern]]
 - [[opencivil.fachwerkmodell.pruefen]]
 - [[opencivil.holzbau.querschnitt]]

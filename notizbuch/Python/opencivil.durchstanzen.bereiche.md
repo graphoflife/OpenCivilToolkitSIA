@@ -1,5 +1,5 @@
 ---
-erzeugt: f8b48c53c4a0
+erzeugt: 191af614afc8
 art: modul
 tags: [modul]
 ---
@@ -229,9 +229,11 @@ nachgeschlagen ([[opencivil.durchstanzen.stufen|.stufen]]).
 
 ## Gebraucht von
 
+- [[opencivil.durchstanzen.herleitung]]
 - [[opencivil.durchstanzen.nachweis]]
 - [[opencivil.durchstanzen.stelle]]
 - [[opencivil.durchstanzen.stufen]]
+- [[opencivil.durchstanzen.weg]]
 - [[opencivil.projekt.aufbau.durchstanzen]]
 - [[opencivil.projekt.durchstanzen]]
 - [[opencivil.web.durchstanzdaten]]

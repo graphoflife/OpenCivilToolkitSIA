@@ -123,6 +123,11 @@ class Stufe:
         """Wie ihre Werte heissen: u_{0,B1}, V_{Rd,c,B1}."""
         return Index(self.bereich.name)
 
+    @property
+    def wo(self) -> str:
+        """Wo der Schnitt liegt, für Sätze: «der Schnitt an der Stufe von Bereich B1»."""
+        return f"an der Stufe von {self.bereich.titel}"
+
     def V_Rd_c(self, psi: float, k_g: float, tau_cd: float) -> float:
         """Der Widerstand an der Stufe, still: k_r (59) mit ihrem d -- für die Kennzahl."""
         return self.pruefung.V_Rd_c(beiwert_k_r(psi, self.d, k_g), tau_cd)
@@ -153,7 +158,7 @@ def stufen(dicken: Dicken, hoehe: Stuetzenhoehe, stuetze: Stuetzenflaeche, *,
                 continue
             kandidaten = [kandidat]
         schnitt = nachweisschnitt(kandidaten, d_v=d, achse=achse, aussparungen=aussparungen)
-        pruefung = Schnittpruefung(schnitt, d, regel, V_d, q_d)
+        pruefung = Schnittpruefung(schnitt, regel, V_d, q_d, d_v=d)
         ergebnis.append(Stufe(b, jenseits, wirksam, d, pruefung))
     return tuple(ergebnis)
 
@@ -192,18 +197,18 @@ class Bereichswerte:
 
 
 def bereiche_schreiben(p: Protokoll, w: Zwischenwerte, e: Eingaben, dicken: Dicken,
-                       hoehe: Stuetzenhoehe, d: Wert, lagen: Dict[Richtung, Wert]) -> Bereichswerte:
+                       hoehe: Stuetzenhoehe, d: Wert, lagen: Dict[Richtung, Wert],
+                       neben: Sequence[Plattenbereich] = ()) -> Bereichswerte:
     """
-    Die Bereiche um die Stütze, die statische Höhe an ihr und die, mit der
-    ψ rechnet. ``d`` und ``lagen`` sind die der Platte.
+    Die Bereiche um die Stütze und die ``neben`` ihr, durch die ein Schnitt
+    laufen kann (:mod:`.weg`), je mit ihrer Dicke; die statische Höhe an der
+    Stütze und die, mit der ψ rechnet. ``d`` und ``lagen`` sind die der Platte.
     """
     p.titel("Plattenbereiche", ebene=3)
-    if not hoehe.um:
-        p.text("Die Stütze steht in keinem Plattenbereich: an ihr gilt d der Platte.")
-        return Bereichswerte({}, d)
+    alle = (*hoehe.um, *neben)
     werte = {b.name: w.laenge(f"h_{b.name}", f"h_{{{b.name}}}", b.h, f"Dicke im {b.titel}",
-                              stellen=0) for b in hoehe.um}
-    for b in hoehe.um:
+                              stellen=0) for b in alle}
+    for b in alle:
         jenseits = dicken.aussen(b)
         wo = "die Platte" if jenseits is None else jenseits.titel
         p.wert(werte[b.name], titel=f"Dicke im {b.titel}, Stufe {b.seite.beschriftung}",
@@ -212,6 +217,9 @@ def bereiche_schreiben(p: Protokoll, w: Zwischenwerte, e: Eingaben, dicken: Dick
         if abs(mehr) > 1e-9:
             p.text(f"{b.titel} ist {abs(mehr) * 1e3:.0f} mm {'dicker' if mehr > 0 else 'dünner'} "
                    f"als {wo} um ihn.")
+    if not hoehe.um:
+        p.text("Die Stütze steht in keinem Plattenbereich: an ihr gilt d der Platte.")
+        return Bereichswerte(werte, d)
     innerster = hoehe.um[0]
     if hoehe.wirksam is not innerster:
         p.erklaerung(
@@ -220,32 +228,18 @@ def bereiche_schreiben(p: Protokoll, w: Zwischenwerte, e: Eingaben, dicken: Dick
             f"höher liegt. An der Stütze gilt darum d "
             f"{'der Platte' if hoehe.wirksam is None else 'im ' + hoehe.wirksam.titel} – nach "
             f"Vorgabe, nicht nachgeschlagen.")
-    d_S = _d_im(p, w, e, werte, d, hoehe.wirksam, "d_S", "d_S",
-                titel="Statische Höhe an der Stütze")
+    d_S = herleitung.d_im_bereich(p, w, e, werte, d, hoehe.wirksam, "d_S", "d_S",
+                                  titel="Statische Höhe an der Stütze", referenz=REFERENZ)
     if hoehe.rotation is None:
         return Bereichswerte(werte, d_S)
-    d_psi = d_S if hoehe.rotation is hoehe.wirksam else _d_im(
+    d_psi = d_S if hoehe.rotation is hoehe.wirksam else herleitung.d_im_bereich(
         p, w, e, werte, d, hoehe.rotation, "d_psi", r"d_{\psi}",
-        titel="Statische Höhe für die Plattenrotation")
-    lagen_psi = {r: _d_im(p, w, e, werte, lagen[r], hoehe.rotation, f"d_{r.value}_psi",
-                          rf"d_{{{r.value},\psi}}", titel=f"Statische Höhe der Lage in {r.value} "
-                                                          f"für die Plattenrotation")
-                 for r in (Richtung.X, Richtung.Y)}
+        titel="Statische Höhe für die Plattenrotation", referenz=REFERENZ)
+    lagen_psi = {r: herleitung.d_im_bereich(
+        p, w, e, werte, lagen[r], hoehe.rotation, f"d_{r.value}_psi", rf"d_{{{r.value},\psi}}",
+        titel=f"Statische Höhe der Lage in {r.value} für die Plattenrotation", referenz=REFERENZ)
+        for r in (Richtung.X, Richtung.Y)}
     return Bereichswerte(werte, d_S, d_psi, lagen_psi)
-
-
-def _d_im(p: Protokoll, w: Zwischenwerte, e: Eingaben, werte: Dict[str, Wert], d: Wert,
-          b: Optional[Plattenbereich], name: str, symbol: str, *, titel: str) -> Wert:
-    """d im Bereich ``b``: d der Platte, um den Unterschied der Dicke verschoben."""
-    if b is None:
-        ergebnis = w.laenge(name, symbol, d.groesse.si)
-        p.formel(ergebnis, "@d", {"d": d}, titel=f"{titel}: die der Platte", referenz=REFERENZ)
-        return ergebnis
-    ergebnis = w.laenge(name, symbol, d.groesse.si + b.h - e.g("h").si)
-    p.formel(ergebnis, "@d + @h_B - @h", {"d": d, "h_B": werte[b.name], "h": e["h"]},
-             titel=f"{titel}, im {b.titel}: d der Platte, um den Unterschied der Dicke verschoben",
-             referenz=REFERENZ, name="Statische Höhe in einem Plattenbereich")
-    return ergebnis
 
 
 def rotation_schreiben(p: Protokoll, hoehe: Stuetzenhoehe) -> None:
@@ -290,8 +284,9 @@ def stufe_schreiben(p: Protokoll, w: Zwischenwerte, e: Eingaben, st: Stufe, *, d
             f"liegt 0.5·d_v innerhalb des Bereichs, mit d_v der dünneren Platte; es gilt der "
             f"schwächere Schnitt (4.3.6.2.7).")
     d_st = (d if st.wirksam is None
-            else _d_im(p, w, e, werte.dicken, d, st.wirksam, ix.name("d"), ix.symbol("d"),
-                       titel="Statische Höhe an der Stufe"))
+            else herleitung.d_im_bereich(p, w, e, werte.dicken, d, st.wirksam, ix.name("d"),
+                                         ix.symbol("d"), titel="Statische Höhe an der Stufe",
+                                         referenz=REFERENZ))
     if st.wirksam is not st.jenseits:
         p.erklaerung(f"Jenseits reicht {st.jenseits.titel} nicht d_v über die Stufe hinaus: der "
                      f"Riss endet dort, wo die Zugbewehrung höher liegt – nach Vorgabe, nicht "

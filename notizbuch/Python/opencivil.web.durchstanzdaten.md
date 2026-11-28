@@ -1,5 +1,5 @@
 ---
-erzeugt: fb3573ea5bea
+erzeugt: 4ded28bf55eb
 art: modul
 tags: [modul]
 ---
@@ -14,8 +14,8 @@ der Umriss der gestützten Fläche, die Plattenränder, die Aussparungen und
 der Nachweisschnitt – je Stück, ob es zählt –, und wo es sie braucht, die
 Leisten mit ihren Ankern und dem äusseren Schnitt und der Stahlpilz mit seinen
 Stegen und dem Schnitt um ihn, je für sich. Die Plattenbereiche mit ihrer
-Dicke und an jeder Stufe ihr Schnitt, je in seiner Farbe
-([[opencivil.web.durchstanzdaten#Konstanten|STUFENFARBEN]]). Dazu die Legende unter dem Bild
+Dicke, an jeder Stufe ihr Schnitt, je in seiner Farbe ([[opencivil.web.durchstanzdaten#Konstanten|STUFENFARBEN]]),
+und der Schnitt durch verschiedene Dicken. Dazu die Legende unter dem Bild
 ([[opencivil.web.anzeige]]): die Schnitte mit ihren Zahlen und das Urteil.
 Gezeichnet wird in der Oberflaeche, gerechnet nichts: die Linien kommen aus
 dem Befund des Nachweises ([[opencivil.durchstanzen.nachweis]]).
@@ -123,8 +123,9 @@ Das Urteil über alle geführten Nachweise, mit dem kleinsten Grad.
 def _stufenzeilen(befund: Durchstanzbefund) -> List[list]
 ```
 
-Was die Plattenbereiche im Bild sind: getönt mit ihrer Dicke, und an
-jeder Stufe ihr Schnitt in seiner Farbe – oder warum sie keinen hat.
+Was die Plattenbereiche im Bild sind: getönt mit ihrer Dicke, an jeder
+Stufe ihr Schnitt in seiner Farbe – oder warum sie keinen hat – und der
+Schnitt durch verschiedene Dicken.
 
 ### _gesamt
 
@@ -146,6 +147,7 @@ Eine Kraft der Legende: kN mit einer Stelle.
 ## Konstanten
 
 - `STUFENFARBEN = ('grün', 'türkis', 'braun')` – Die Farben der Schnitte an den Stufen, der Reihe nach – im Bild die Klassen «ds-stufe-0» bis «ds-stufe-2» (web/css/80-skizzen.css).
+- `WEGFARBE = 'blau'` – Die Farbe des Schnitts durch verschiedene Dicken – im Bild «ds-weg».
 
 ## Braucht
 
@@ -161,6 +163,7 @@ Eine Kraft der Legende: kN mit einer Stelle.
 - [[opencivil.durchstanzen.schnitt]]
 - [[opencivil.durchstanzen.stelle]]
 - [[opencivil.durchstanzen.systeme]]
+- [[opencivil.durchstanzen.weg]]
 - [[opencivil.projekt]]
 - [[opencivil.projekt.durchstanzen]]
 - [[opencivil.querschnitt.platte]]
