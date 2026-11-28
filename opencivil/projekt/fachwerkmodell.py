@@ -23,13 +23,20 @@ x nach rechts, y nach oben, in m. Eine Last in kN, ``F_h`` nach rechts,
 ``F_v`` nach unten positiv -- wie im Balkensystem. Umgerechnet wird beim
 Bauen.
 
+DAS VERFAHREN:
+Ground Structure mit der ``rasterweite`` und dem Schalter
+``zug_achsparallel``, oder SIMP mit der ``netzweite`` und dem ``volumen``,
+dem Anteil Material (:mod:`opencivil.fachwerkmodell.verfahren`). Beide
+teilen ``w_Z`` und ``N_min``; die Zahlen des anderen Verfahrens bleiben
+stehen, für den Weg zurück.
+
 DAS GEFUNDENE FACHWERK:
 Was die Suche zuletzt fand, steht im Eintrag (:class:`GefundenesFachwerk`):
 die Seite fragt sie Runde um Runde an und legt hier ab, was die letzte
-gab -- fertig oder angehalten. Geschrieben vom Kern, nicht von Hand; die
-Rechnung glaubt ihm nur, was sie nicht nachrechnen kann, und erkennt am
-Abdruck, ob es noch zu Modell und Verfahren gehört
-(:mod:`opencivil.fachwerkmodell.suche`).
+gab -- fertig oder angehalten, beim Verfahren SIMP mit dem Bild seiner
+Form. Geschrieben vom Kern, nicht von Hand; die Rechnung glaubt ihm nur,
+was sie nicht nachrechnen kann, und erkennt am Abdruck, ob es noch zu
+Modell und Verfahren gehört (:mod:`opencivil.fachwerkmodell.suche`).
 """
 
 from __future__ import annotations
@@ -40,6 +47,7 @@ from typing import Any, List, Optional, Sequence, Union
 from opencivil.core.einheiten import KN, M, PROZENT
 from opencivil.fachwerkmodell.modell import Halt
 from opencivil.fachwerkmodell.suche import Fachwerk, Suchergebnis
+from opencivil.fachwerkmodell.verfahren import Verfahren
 from opencivil.projekt.eintraege import BauteilEintrag, Beschreibung
 from opencivil.projekt.lesen import ProjektFehler, bereich, lesen, teil
 from opencivil.projekt.netz import Netz, neue_kennung
@@ -128,6 +136,8 @@ class GefundenesFachwerk(Beschreibung):
     """Woran es Modell und Verfahren erkennt, zu denen es gehört."""
 
     runden: int = bereich(0, heisst="Runden", ab=0)
+    """Wie viele Runden die Ground Structure suchte -- beim Verfahren SIMP: wie viele Schritte."""
+
     fertig: bool = False
     """Ob die Suche zu Ende kam -- sonst wurde sie angehalten."""
 
@@ -139,6 +149,8 @@ class GefundenesFachwerk(Beschreibung):
 
     knoten: List[FachwerkpunktEintrag] = field(default_factory=list)
     staebe: List[FachwerkstabEintrag] = field(default_factory=list)
+    form: str = ""
+    """Beim Verfahren SIMP das Bild der Form (:func:`~opencivil.fachwerkmodell.form.formtext`)."""
 
     @classmethod
     def aus(cls, ergebnis: Suchergebnis) -> "GefundenesFachwerk":
@@ -147,7 +159,8 @@ class GefundenesFachwerk(Beschreibung):
         return cls(abdruck=ergebnis.abdruck, runden=ergebnis.runden, fertig=ergebnis.fertig,
                    moeglich=ergebnis.moeglich, im_modell=ergebnis.im_modell,
                    knoten=[FachwerkpunktEintrag(x, y) for x, y in fw.knoten],
-                   staebe=[FachwerkstabEintrag(a, b, N / 1e3) for a, b, N in fw.staebe])
+                   staebe=[FachwerkstabEintrag(a, b, N / 1e3) for a, b, N in fw.staebe],
+                   form=ergebnis.form)
 
     def ergebnis(self) -> Optional[Suchergebnis]:
         """
@@ -160,7 +173,8 @@ class GefundenesFachwerk(Beschreibung):
         fw = Fachwerk(knoten=tuple((k.x, k.y) for k in self.knoten),
                       staebe=tuple((s.von, s.bis, s.N * 1e3) for s in self.staebe))
         return Suchergebnis(fachwerk=fw, abdruck=self.abdruck, runden=self.runden,
-                            fertig=self.fertig, moeglich=self.moeglich, im_modell=self.im_modell)
+                            fertig=self.fertig, moeglich=self.moeglich, im_modell=self.im_modell,
+                            form=self.form)
 
 
 @dataclass
@@ -182,8 +196,15 @@ class FachwerkmodellEintrag(BauteilEintrag):
     loecher: List[LochEintrag] = field(default_factory=list)
     lager: List[ScheibenlagerEintrag] = field(default_factory=list)
     lasten: List[ScheibenlastEintrag] = field(default_factory=list)
+    verfahren: Verfahren = Verfahren.GROUND_STRUCTURE
     rasterweite: float = bereich(0.5, heisst="Rasterweite", einheit=M, ueber=0.0)
     """Wie weit die Knoten der Grundstruktur auseinander liegen."""
+
+    netzweite: float = bereich(0.2, heisst="Netzweite", einheit=M, ueber=0.0)
+    """Die Seite eines Elements im Verfahren SIMP."""
+
+    volumen: float = bereich(30.0, heisst="Anteil Material", einheit=PROZENT, ab=5.0, bis=80.0)
+    """Wie viel der Fläche die Form im Verfahren SIMP bekommt."""
 
     w_Z: float = bereich(1.0, heisst="w_Z", ab=0.1, bis=10.0)
     """Wie schwer Zug gegenüber Druck zählt -- 1: gleich (Plan vom 2026-11-27, Entscheid 11)."""
@@ -249,9 +270,11 @@ class FachwerkmodellEintrag(BauteilEintrag):
         Sucht das Fachwerk bis zum Ende, wie «Fachwerk suchen» auf der Seite,
         und legt es ab. Fehlt dem Modell etwas, sagt ein :class:`ProjektFehler`,
         was; ein zu feines Raster meldet
-        :class:`~opencivil.fachwerkmodell.grundstruktur.ZuVieleKnoten`.
+        :class:`~opencivil.fachwerkmodell.grundstruktur.ZuVieleKnoten`, ein zu
+        feines Netz :class:`~opencivil.fachwerkmodell.simp.NetzFehler`.
         """
         # Erst hier: der Aufbau liest diesen Eintrag.
+        from opencivil.fachwerkmodell.form import ganz_formen
         from opencivil.fachwerkmodell.pruefen import pruefen
         from opencivil.fachwerkmodell.suche import ganz_suchen
         from opencivil.projekt.aufbau.fachwerkmodell import einstellung_von, modell_von
@@ -259,5 +282,6 @@ class FachwerkmodellEintrag(BauteilEintrag):
         halt = [m.text for m in meldungen + pruefen(modell) if m.haelt_an]
         if halt:
             raise ProjektFehler(f"Fachwerkmodell '{self.name}': {' '.join(halt)}")
-        self.fachwerk = GefundenesFachwerk.aus(ganz_suchen(modell, einstellung_von(self)))
+        ganz = ganz_formen if self.verfahren is Verfahren.SIMP else ganz_suchen
+        self.fachwerk = GefundenesFachwerk.aus(ganz(modell, einstellung_von(self)))
         return self.fachwerk

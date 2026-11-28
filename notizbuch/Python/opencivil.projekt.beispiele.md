@@ -1,5 +1,5 @@
 ---
-erzeugt: e7e9bbd82e62
+erzeugt: 3a27a11f5ab8
 art: modul
 tags: [modul]
 ---
@@ -91,16 +91,27 @@ Eine Wandscheibe 6 × 3 m mit einer Türe, links fest, rechts auf einem
 Rollenlager, oben zwei Lasten – eine schräg. Mit dem Fachwerk, das die
 Suche im Raster von 1 m findet, wie nach «Fachwerk suchen»; dieselbe
 Wand noch einmal mit «Zug nur waagrecht und senkrecht», im Raster von
-0.5 m: mit 1 m ginge so kein Fachwerk auf.
+0.5 m: mit 1 m ginge so kein Fachwerk auf. Und ein drittes Mal nach dem
+Verfahren SIMP, im Netz von 0.2 m.
 
 ### _fachwerk_der_wandscheibe
 
 ```python
 @lru_cache(maxsize=None)
-def _fachwerk_der_wandscheibe(zug_achsparallel: bool) -> GefundenesFachwerk
+def _fachwerk_der_wandscheibe(art: str) -> GefundenesFachwerk
 ```
 
-Je Lauf einmal gesucht – eine Viertelsekunde, und das Beispiel entsteht oft.
+Je Lauf einmal gesucht – mit SIMP drei Sekunden, und das Beispiel entsteht oft.
+
+### _wandscheibe
+
+```python
+def _wandscheibe(f: FachwerkmodellEintrag, art: str='gs') -> None
+```
+
+Die Wand – `art` sagt, wie sie gesucht wird: `gs` mit der Ground
+Structure, `zug` ebenso mit «Zug nur waagrecht und senkrecht», `simp`
+nach dem Verfahren SIMP.
 
 ### _durchstanzstellen
 
@@ -310,6 +321,7 @@ allein nach (29), stossartig Biegung allein nach (38), mit k_m \< 1.
 
 - [[opencivil.decke.feld]]
 - [[opencivil.decke.schnitt]]
+- [[opencivil.fachwerkmodell.verfahren]]
 - [[opencivil.material.holz]]
 - [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.balkensystem3d]]

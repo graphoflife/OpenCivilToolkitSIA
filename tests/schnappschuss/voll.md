@@ -1,6 +1,6 @@
 # Voll
 
-1002 Berechnungen ausgeführt, 1621 Werte bestimmt.
+1007 Berechnungen ausgeführt, 1625 Werte bestimmt.
 
 ## Herleitung
 
@@ -32269,6 +32269,119 @@ $$
 
 Nachgerechnet: an jedem Knoten heben sich Stabkräfte, Lasten und Lagerkräfte auf.
 
+### Fachwerkmodell: Wandscheibe mit Türe, SIMP
+
+**Seite eines Elements**
+
+$$
+h = 0.2\,\mathrm{m}
+$$
+
+**Anteil des Materials an der Fläche der Scheibe**
+
+$$
+\bar{\rho} = 30\,\%
+$$
+
+**Gewicht des Zugs gegenüber dem Druck**
+
+$$
+w_Z = 1
+$$
+
+**Kleinste Stabkraft, bezogen auf die grösste**
+
+$$
+N_{min} = 1\,\%
+$$
+
+> **Annahme:** Ein Fachwerkmodell der Scheibe: Druckstreben und Zugglieder tragen die Lasten im Gleichgewicht zu den Lagern. Ohne Material und ohne Dicke – Fachwerk und Kräfte hängen nur von Form, Lagern und Lasten ab; bemessen wird hier nichts.
+
+**Scheiben**
+
+| Scheibe | Ecken | $A\ [\mathrm{m}^{2}]$ |
+| ---: | ---: | ---: |
+| S1 | $4$ | $18.00$ |
+
+**Löcher**
+
+| Loch | Ecken | $A\ [\mathrm{m}^{2}]$ |
+| ---: | ---: | ---: |
+| L1 | $4$ | $2.20$ |
+
+**Lager**
+
+| Lager | Ort [m] | hält |
+| ---: | ---: | ---: |
+| A1 | (0.00, 0.00) | x und y |
+| A2 | (6.00, 0.00) | nur y |
+
+**Lasten**
+
+| Last | Ort [m] | $F_h\ [\mathrm{kN}] \rightarrow$ | $F_v\ [\mathrm{kN}] \downarrow$ |
+| ---: | ---: | ---: | ---: |
+| F1 | (2.00, 3.00) | $0.0$ | $300.0$ |
+| F2 | (5.00, 3.00) | $50.0$ | $200.0$ |
+| Summe |  | $50.0$ | $500.0$ |
+
+#### Fachwerk
+
+Gesucht nach dem Verfahren SIMP (Andreassen et al. (2011)): die Scheibe in 406 quadratische Elemente der Seite h = 0.2 m geteilt, jedes mit einer Dichte zwischen 0 und 1, gemittelt über die Nachbarn bis 1.5 h. Die Steifigkeit eines Elements wächst mit der 3. Potenz seiner Dichte; so lohnt sich halbes Material nicht. Schritt um Schritt verteilen sich 30 % der Fläche so, dass die Scheibe unter den Lasten am steifsten ist – nach 93 Schritten änderte sich keine Dichte mehr um 0.01.
+
+**Ziel der Form** *(Andreassen et al. (2011), Gl. (1), (2) und (9))*
+
+$$
+c = F^{T} U \;\rightarrow\; \min \qquad K(\tilde{\rho}) \, U = F \qquad \sum_e \tilde{\rho}_e \, A_e = \bar{\rho} \, A \qquad E_e = E_{min} + \tilde{\rho}_e^{\,p} \left( E_0 - E_{min} \right)
+$$
+
+Aus der Form liest das Werkzeug das Fachwerk (Xia, Langelaar & Hendriks (2020), Abschnitt 2.3): ihre Mittellinien, mit Knoten, wo eine endet, sich verzweigt oder knickt, und an jedem Lager und jeder Last. Je zwei Knoten sind ein möglicher Stab, wenn er ganz im Material liegt – 44 Stäbe; einer neben der Form kostet in der Optimierung bis 10-mal so viel wie in ihr. Dieselbe lineare Optimierung wie bei der Ground Structure wählt die Kräfte im Gleichgewicht mit dem kleinsten V. Danach fallen die Stäbe unter 1 % der grössten Kraft weg, und das Gleichgewicht wird ohne sie neu gesucht; zwei Stäbe in einer Flucht durch einen Knoten ohne Last und Lager werden einer.
+
+**Ziel der Optimierung** *(He, Gilbert & Song (2019), Abschnitt 3, Gl. (7))*
+
+$$
+V = \sum_i l_i \, \left( w_Z \, N_i^{+} + w_D \, N_i^{-} \right) \;\rightarrow\; \min
+$$
+
+**Stäbe – 20, nach der Grösse ihrer Kraft**
+
+| Stab | von [m] | bis [m] | $l\ [\mathrm{m}]$ | $N\ [\mathrm{kN}]$ |  |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| $1$ | (5.00, 3.00) | (3.30, 3.00) | $1.70$ | $-688.4$ | Druck |
+| $2$ | (2.00, 3.00) | (1.10, 1.90) | $1.42$ | $-474.4$ | Druck |
+| $3$ | (5.00, 3.00) | (6.00, 1.90) | $1.49$ | $-458.3$ | Druck |
+| $4$ | (5.00, 3.00) | (4.30, 2.70) | $0.76$ | $441.1$ | Zug |
+| $5$ | (0.00, 0.00) | (1.10, 1.90) | $2.20$ | $-436.1$ | Druck |
+| $6$ | (4.30, 2.70) | (2.70, 1.70) | $1.89$ | $433.9$ | Zug |
+| $7$ | (2.00, 3.00) | (3.30, 3.00) | $1.30$ | $-430.7$ | Druck |
+| $8$ | (0.00, 0.00) | (2.70, 1.70) | $3.19$ | $317.3$ | Zug |
+| $9$ | (6.00, 1.90) | (4.70, 2.10) | $1.32$ | $311.9$ | Zug |
+| $10$ | (6.00, 0.00) | (6.00, 1.90) | $1.90$ | $-291.7$ | Druck |
+| $11$ | (4.70, 2.10) | (3.30, 3.00) | $1.66$ | $253.1$ | Zug |
+| $12$ | (3.32, 2.32) | (5.50, 2.30) | $2.18$ | $157.6$ | Zug |
+| $13$ | (2.00, 3.00) | (3.32, 2.32) | $1.48$ | $146.6$ | Zug |
+| $14$ | (5.50, 2.30) | (4.70, 2.10) | $0.82$ | $-136.9$ | Druck |
+| $15$ | (2.70, 1.70) | (3.30, 3.00) | $1.43$ | $-109.6$ | Druck |
+| $16$ | (1.10, 1.90) | (2.70, 1.70) | $1.61$ | $82.5$ | Zug |
+| $17$ | (4.30, 2.70) | (4.70, 2.10) | $0.72$ | $-67.6$ | Druck |
+| $18$ | (5.00, 3.00) | (5.50, 2.30) | $0.86$ | $-42.6$ | Druck |
+| $19$ | (3.32, 2.32) | (2.70, 1.70) | $0.88$ | $40.1$ | Zug |
+| $20$ | (3.32, 2.32) | (3.30, 3.00) | $0.68$ | $-37.3$ | Druck |
+
+**Ziel des Fachwerks**
+
+$$
+V = 8705.8\ \mathrm{kNm} \qquad w_Z = 1.00,\ w_D = 1
+$$
+
+**Lagerkräfte**
+
+| Lager | Ort [m] | $R_x\ [\mathrm{kN}] \rightarrow$ | $R_y\ [\mathrm{kN}] \uparrow$ |
+| ---: | ---: | ---: | ---: |
+| A1 | (0.00, 0.00) | $-50.0$ | $208.3$ |
+| A2 | (6.00, 0.00) | $0.0$ | $291.7$ |
+
+Nachgerechnet: an jedem Knoten heben sich Stabkräfte, Lasten und Lagerkräfte auf.
+
 ## Verwendete Formeln
 
 ### Querschnitt
@@ -35769,6 +35882,12 @@ $$
 V = \sum_i l_i \, \left( w_Z \, N_i^{+} + w_D \, N_i^{-} \right) \;\rightarrow\; \min
 $$
 
+**Ziel der Form** *(Andreassen et al. (2011), Gl. (1), (2) und (9))*
+
+$$
+c = F^{T} U \;\rightarrow\; \min \qquad K(\tilde{\rho}) \, U = F \qquad \sum_e \tilde{\rho}_e \, A_e = \bar{\rho} \, A \qquad E_e = E_{min} + \tilde{\rho}_e^{\,p} \left( E_0 - E_{min} \right)
+$$
+
 ## Nachweise
 
 ### Decke
@@ -37823,6 +37942,10 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Gewicht des Zugs gegenüber dem Druck | $w_Z$ | $1$ |  | Vorgabe |
 | Kleinste Stabkraft, bezogen auf die grösste | $N_{min}$ | $1$ | % | Vorgabe |
 | Abstand der Knoten im Raster | $h$ | $0.5$ | m | Vorgabe |
+| Gewicht des Zugs gegenüber dem Druck | $w_Z$ | $1$ |  | Vorgabe |
+| Kleinste Stabkraft, bezogen auf die grösste | $N_{min}$ | $1$ | % | Vorgabe |
+| Seite eines Elements | $h$ | $0.2$ | m | Vorgabe |
+| Anteil des Materials an der Fläche der Scheibe | $\bar{\rho}$ | $30$ | % | Vorgabe |
 | Gewicht des Zugs gegenüber dem Druck | $w_Z$ | $1$ |  | Vorgabe |
 | Erdbeschleunigung | $g$ | $10$ | m/s² | Vorgabe |
 | Raumlast der Flüssigkeit | $\gamma_{fl}$ | $10$ | kN/m³ | berechnet |

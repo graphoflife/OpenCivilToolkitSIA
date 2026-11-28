@@ -1,5 +1,5 @@
 ---
-erzeugt: 17e07a77efb8
+erzeugt: 48f87b4b6324
 art: modul
 tags: [modul]
 ---
@@ -232,7 +232,7 @@ Je Querschnitt eines Systems, wo A und I stehen – und je Paar aus Querschnitt 
 - [[opencivil.decke.schnitt]]
 - [[opencivil.durchstanzen.stelle]]
 - [[opencivil.erdbeben.ersatzkraft]]
-- [[opencivil.fachwerkmodell.suche]]
+- [[opencivil.fachwerkmodell.verfahren]]
 - [[opencivil.geotechnik.fundament]]
 - [[opencivil.geotechnik.setzung]]
 - [[opencivil.geotechnik.verhalten]]

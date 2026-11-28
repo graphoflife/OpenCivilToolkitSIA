@@ -20,6 +20,7 @@ from functools import lru_cache
 
 from opencivil.decke.feld import GROESSEN as STREIFENGROESSEN
 from opencivil.decke.schnitt import BALKENGROESSEN
+from opencivil.fachwerkmodell.verfahren import Verfahren
 from opencivil.material.holz import Feuchteklasse
 from opencivil.projekt import beispiele_verbund as verbund
 from opencivil.projekt.balkensystem import DIAGRAMMGROESSEN
@@ -405,26 +406,35 @@ def _fachwerkmodell(p: Projekt) -> None:
     Rollenlager, oben zwei Lasten -- eine schräg. Mit dem Fachwerk, das die
     Suche im Raster von 1 m findet, wie nach «Fachwerk suchen»; dieselbe
     Wand noch einmal mit «Zug nur waagrecht und senkrecht», im Raster von
-    0.5 m: mit 1 m ginge so kein Fachwerk auf.
+    0.5 m: mit 1 m ginge so kein Fachwerk auf. Und ein drittes Mal nach dem
+    Verfahren SIMP, im Netz von 0.2 m.
     """
-    for name, zug_achsparallel in (("Wandscheibe mit Türe", False),
-                                   ("Wandscheibe, Zug waagrecht und senkrecht", True)):
+    for name, art in (("Wandscheibe mit Türe", "gs"),
+                      ("Wandscheibe, Zug waagrecht und senkrecht", "zug"),
+                      ("Wandscheibe mit Türe, SIMP", "simp")):
         f = p.fachwerkmodell(name)
-        _wandscheibe(f, zug_achsparallel)
-        f.fachwerk = copy.deepcopy(_fachwerk_der_wandscheibe(zug_achsparallel))
+        _wandscheibe(f, art)
+        f.fachwerk = copy.deepcopy(_fachwerk_der_wandscheibe(art))
 
 
 @lru_cache(maxsize=None)
-def _fachwerk_der_wandscheibe(zug_achsparallel: bool) -> GefundenesFachwerk:
-    """Je Lauf einmal gesucht -- eine Viertelsekunde, und das Beispiel entsteht oft."""
+def _fachwerk_der_wandscheibe(art: str) -> GefundenesFachwerk:
+    """Je Lauf einmal gesucht -- mit SIMP drei Sekunden, und das Beispiel entsteht oft."""
     f = FachwerkmodellEintrag(kennung="f", name="Wandscheibe")
-    _wandscheibe(f, zug_achsparallel)
+    _wandscheibe(f, art)
     return f.suchen()
 
 
-def _wandscheibe(f: FachwerkmodellEintrag, zug_achsparallel: bool = False) -> None:
-    f.rasterweite = 0.5 if zug_achsparallel else 1.0
-    f.zug_achsparallel = zug_achsparallel
+def _wandscheibe(f: FachwerkmodellEintrag, art: str = "gs") -> None:
+    """
+    Die Wand -- ``art`` sagt, wie sie gesucht wird: ``gs`` mit der Ground
+    Structure, ``zug`` ebenso mit «Zug nur waagrecht und senkrecht», ``simp``
+    nach dem Verfahren SIMP.
+    """
+    f.rasterweite = 0.5 if art == "zug" else 1.0
+    f.zug_achsparallel = art == "zug"
+    if art == "simp":
+        f.verfahren, f.netzweite = Verfahren.SIMP, 0.2
     f.scheibe([(0, 0), (6, 0), (6, 3), (0, 3)])
     f.loch([(3.5, 0), (4.5, 0), (4.5, 2.2), (3.5, 2.2)])
     f.lager_setzen((0, 0))

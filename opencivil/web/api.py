@@ -79,7 +79,7 @@ from opencivil.projekt.grundbruch import GrundbruchEintrag
 from opencivil.projekt.setzung import SchichtEintrag, SetzungEintrag
 from opencivil.durchstanzen import stelle
 from opencivil.erdbeben import ersatzkraft
-from opencivil.fachwerkmodell import suche as fachwerksuche
+from opencivil.fachwerkmodell import verfahren as fachwerkverfahren
 from opencivil.erdbeben.ersatzkraft import Baugrundklasse, Bauwerksklasse, Erdbebenzone, Schwingzeit
 from opencivil.projekt.erdbeben import ErdbebenEintrag, GeschossEintrag
 from opencivil.projekt.fachwerkmodell import FachwerkmodellEintrag
@@ -217,7 +217,7 @@ def _vorgaben() -> Dict[str, List[dict]]:
                                  (PfahlschichtEintrag, pfahl.JE_SCHICHT),
                                  (ErdbebenEintrag, ersatzkraft.VORGABEN),
                                  (GeschossEintrag, ersatzkraft.JE_GESCHOSS),
-                                 (FachwerkmodellEintrag, fachwerksuche.VORGABEN))}
+                                 (FachwerkmodellEintrag, fachwerkverfahren.VORGABEN))}
 
 
 def katalog() -> dict:

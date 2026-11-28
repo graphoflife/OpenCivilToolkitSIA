@@ -1,5 +1,5 @@
 ---
-erzeugt: 156d70ab84e5
+erzeugt: 3b9d2809c013
 art: modul
 tags: [modul]
 ---
@@ -164,7 +164,7 @@ je Wahl, welche Werte sie annehmen kann.
 
 - [[opencivil.durchstanzen.stelle]]
 - [[opencivil.erdbeben.ersatzkraft]]
-- [[opencivil.fachwerkmodell.suche]]
+- [[opencivil.fachwerkmodell.verfahren]]
 - [[opencivil.geotechnik.fundament]]
 - [[opencivil.geotechnik.setzung]]
 - [[opencivil.pfahl.pfahl]]

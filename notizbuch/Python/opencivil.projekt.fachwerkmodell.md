@@ -1,5 +1,5 @@
 ---
-erzeugt: 04969b5fcc7e
+erzeugt: 10d0b7a06197
 art: modul
 tags: [modul]
 ---
@@ -37,14 +37,23 @@ x nach rechts, y nach oben, in m. Eine Last in kN, `F_h` nach rechts,
 Bauen.
 
 
+## DAS VERFAHREN
+
+Ground Structure mit der `rasterweite` und dem Schalter
+`zug_achsparallel`, oder SIMP mit der `netzweite` und dem `volumen`,
+dem Anteil Material ([[opencivil.fachwerkmodell.verfahren]]). Beide
+teilen `w_Z` und `N_min`; die Zahlen des anderen Verfahrens bleiben
+stehen, für den Weg zurück.
+
+
 ## DAS GEFUNDENE FACHWERK
 
 Was die Suche zuletzt fand, steht im Eintrag ([[opencivil.projekt.fachwerkmodell#GefundenesFachwerk|GefundenesFachwerk]]):
 die Seite fragt sie Runde um Runde an und legt hier ab, was die letzte
-gab – fertig oder angehalten. Geschrieben vom Kern, nicht von Hand; die
-Rechnung glaubt ihm nur, was sie nicht nachrechnen kann, und erkennt am
-Abdruck, ob es noch zu Modell und Verfahren gehört
-([[opencivil.fachwerkmodell.suche]]).
+gab – fertig oder angehalten, beim Verfahren SIMP mit dem Bild seiner
+Form. Geschrieben vom Kern, nicht von Hand; die Rechnung glaubt ihm nur,
+was sie nicht nachrechnen kann, und erkennt am Abdruck, ob es noch zu
+Modell und Verfahren gehört ([[opencivil.fachwerkmodell.suche]]).
 
 ## Inhalt
 
@@ -149,12 +158,13 @@ class GefundenesFachwerk(Beschreibung)
 Was die Suche zuletzt fand – siehe Dateikopf.
 
 - `abdruck: str = ''` – Woran es Modell und Verfahren erkennt, zu denen es gehört.
-- `runden: int = bereich(0, heisst='Runden', ab=0)`
+- `runden: int = bereich(0, heisst='Runden', ab=0)` – Wie viele Runden die Ground Structure suchte – beim Verfahren SIMP: wie viele Schritte.
 - `fertig: bool = False` – Ob die Suche zu Ende kam – sonst wurde sie angehalten.
 - `moeglich: int = bereich(0, heisst='Mögliche Stäbe', ab=0)` – Wie viele Stäbe die Grundstruktur hatte.
 - `im_modell: int = bereich(0, heisst='Stäbe im Modell', ab=0)` – Wie viele davon in der letzten Runde im Modell waren.
 - `knoten: List[FachwerkpunktEintrag] = field(default_factory=list)`
 - `staebe: List[FachwerkstabEintrag] = field(default_factory=list)`
+- `form: str = ''` – Beim Verfahren SIMP das Bild der Form ([[opencivil.fachwerkmodell.form#formtext|formtext]]).
 
 #### GefundenesFachwerk.aus
 
@@ -195,7 +205,10 @@ weiter.
 - `loecher: List[LochEintrag] = field(default_factory=list)`
 - `lager: List[ScheibenlagerEintrag] = field(default_factory=list)`
 - `lasten: List[ScheibenlastEintrag] = field(default_factory=list)`
+- `verfahren: Verfahren = Verfahren.GROUND_STRUCTURE`
 - `rasterweite: float = bereich(0.5, heisst='Rasterweite', einheit=M, ueber=0.0)` – Wie weit die Knoten der Grundstruktur auseinander liegen.
+- `netzweite: float = bereich(0.2, heisst='Netzweite', einheit=M, ueber=0.0)` – Die Seite eines Elements im Verfahren SIMP.
+- `volumen: float = bereich(30.0, heisst='Anteil Material', einheit=PROZENT, ab=5.0, bis=…` – Wie viel der Fläche die Form im Verfahren SIMP bekommt.
 - `w_Z: float = bereich(1.0, heisst='w_Z', ab=0.1, bis=10.0)` – Wie schwer Zug gegenüber Druck zählt – 1: gleich (Plan vom 2026-11-27, Entscheid 11).
 - `N_min: float = bereich(1.0, heisst='N_min', einheit=PROZENT, ab=0.0, bis=50.0)` – Die kleinste Stabkraft, die stehen bleibt, bezogen auf die grösste.
 - `zug_achsparallel: bool = False` – Ob nur waagrechte und senkrechte Stäbe Zug tragen – geneigte dann nur Druck ([[opencivil.fachwerkmodell.suche#Konstanten|ZUG_ACHSPARALLEL]]).
@@ -255,7 +268,8 @@ def suchen(self) -> GefundenesFachwerk
 Sucht das Fachwerk bis zum Ende, wie «Fachwerk suchen» auf der Seite,
 und legt es ab. Fehlt dem Modell etwas, sagt ein [[opencivil.projekt.lesen#ProjektFehler|ProjektFehler]],
 was; ein zu feines Raster meldet
-[[opencivil.fachwerkmodell.grundstruktur#ZuVieleKnoten|ZuVieleKnoten]].
+[[opencivil.fachwerkmodell.grundstruktur#ZuVieleKnoten|ZuVieleKnoten]], ein zu
+feines Netz [[opencivil.fachwerkmodell.simp#NetzFehler|NetzFehler]].
 
 
 ## Konstanten
@@ -266,9 +280,11 @@ was; ein zu feines Raster meldet
 ## Braucht
 
 - [[opencivil.core.einheiten]]
+- [[opencivil.fachwerkmodell.form]]
 - [[opencivil.fachwerkmodell.modell]]
 - [[opencivil.fachwerkmodell.pruefen]]
 - [[opencivil.fachwerkmodell.suche]]
+- [[opencivil.fachwerkmodell.verfahren]]
 - [[opencivil.projekt.aufbau.fachwerkmodell]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.lesen]]

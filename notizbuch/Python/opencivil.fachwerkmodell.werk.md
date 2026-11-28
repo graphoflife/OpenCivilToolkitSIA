@@ -1,5 +1,5 @@
 ---
-erzeugt: b4e709cc7f42
+erzeugt: 6e8c21e2abb6
 art: modul
 tags: [modul]
 ---
@@ -10,7 +10,7 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Was ein Fachwerkmodell im Rechenwerk anmeldet: die Zahlen seines
-Verfahrens als Vorgaben ([[opencivil.fachwerkmodell.suche#Konstanten|VORGABEN]])
+Verfahrens als Vorgaben ([[opencivil.fachwerkmodell.verfahren#Konstanten|VORGABEN]])
 und eine Prozedur, die sein Modell prüft
 ([[opencivil.fachwerkmodell.pruefen|pruefen]]), das gefundene Fachwerk
 nachrechnet ([[opencivil.fachwerkmodell.nachrechnung|nachrechnung]]) und die
@@ -22,8 +22,9 @@ Entscheid 11).
 ## GESUCHT WIRD DANEBEN
 
 Die Suche läuft nicht hier, sondern Runde um Runde auf Anfrage der Seite
-([[opencivil.fachwerkmodell.suche#runde|runde]]); was sie zuletzt fand,
-steht im Projekt. Hier zählt es nur, wenn sein Abdruck zu Modell und
+([[opencivil.fachwerkmodell.suche#runde|runde]], im Verfahren SIMP Schritt
+um Schritt, [[opencivil.fachwerkmodell.form#schritte|schritte]]); was sie
+zuletzt fand, steht im Projekt. Hier zählt es nur, wenn sein Abdruck zu Modell und
 Verfahren passt – sonst sagt eine Meldung, dass es zu einem früheren
 Stand gehört, und es steht nirgends.
 
@@ -46,6 +47,7 @@ class Fachwerkbefund
 Was die Rechnung fand: das Modell, seine Meldungen und das Fachwerk, mit dem, was dazu zu sagen ist.
 
 - `modell: Modell`
+- `einstellung: Verfahrenseinstellung`
 - `meldungen: List[Meldung]` – Was das Modell meldet – die Meldungen der Beschreibung zuerst.
 - `bereit: bool` – Ob sich ein Fachwerk suchen lässt: keine Meldung des Modells hält es auf.
 - `abdruck: str = ''` – Der Abdruck von Modell und Verfahren – leer, solange das Modell nicht bereit ist.
@@ -57,7 +59,7 @@ Was die Rechnung fand: das Modell, seine Meldungen und das Fachwerk, mit dem, wa
 ### offen_meldungen
 
 ```python
-def offen_meldungen(n: Nachrechnung, einstellung: Einstellung) -> List[Meldung]
+def offen_meldungen(n: Nachrechnung, einstellung: Verfahrenseinstellung) -> List[Meldung]
 ```
 
 Wo das Gleichgewicht nicht aufgeht, rot: je Last, die es nicht ganz
@@ -131,11 +133,13 @@ keinen, nur eine Datei von Hand –, wo die Suche anhielt, was dünn blieb.
 
 ## Konstanten
 
+- `Verfahrenseinstellung = Union[Einstellung, Formeinstellung]` – Die Zahlen eines der beiden Verfahren – Ground Structure oder SIMP.
 - `THEMA = 'Fachwerkmodell'` – Unter welchem Thema seine Herleitung in der Formelsammlung steht.
 - `IM_FENSTER = 'im Fenster «Verfahren» mit «Fachwerk suchen»'` – Wo die Suche beginnt – in den Meldungen genannt.
 - `NOCH_KEINES = f'Noch kein Fachwerk gesucht – {IM_FENSTER}.'`
 - `VERALTET = f'Das Fachwerk gehört zu einem früheren Stand: Scheibe, Lager, Lasten…`
 - `UNLESBAR = f'Das gespeicherte Fachwerk lässt sich nicht lesen – neu suchen {IM_F…`
+- `ANGEHALTEN = {Verfahren.GROUND_STRUCTURE: 'Die Suche wurde nach Runde {n} angehalt…` – Was ein angehaltenes Fachwerk ist, je Verfahren – `{n}` die letzte Runde oder der letzte Schritt.
 
 ## Braucht
 
@@ -145,12 +149,14 @@ keinen, nur eine Datei von Hand –, wo die Suche anhielt, was dünn blieb.
 - [[opencivil.core.rechenobjekt]]
 - [[opencivil.core.wert]]
 - [[opencivil.decke.herleitung]]
+- [[opencivil.fachwerkmodell.form]]
 - [[opencivil.fachwerkmodell.grundstruktur]]
 - [[opencivil.fachwerkmodell.herleitung]]
 - [[opencivil.fachwerkmodell.modell]]
 - [[opencivil.fachwerkmodell.nachrechnung]]
 - [[opencivil.fachwerkmodell.pruefen]]
 - [[opencivil.fachwerkmodell.suche]]
+- [[opencivil.fachwerkmodell.verfahren]]
 - [[opencivil.stabwerk.system]]
 
 ## Gebraucht von

@@ -1,5 +1,5 @@
 ---
-erzeugt: 7822f6be62d4
+erzeugt: 80b5d2b1909b
 art: modul
 tags: [modul]
 ---
@@ -38,6 +38,7 @@ Eine Wahl: das Mitglied ist sein Text.
 - [[opencivil.durchstanzen.systeme]]
 - [[opencivil.erdbeben.ersatzkraft]]
 - [[opencivil.fachwerkmodell.modell]]
+- [[opencivil.fachwerkmodell.verfahren]]
 - [[opencivil.geotechnik.setzung]]
 - [[opencivil.geotechnik.verhalten]]
 - [[opencivil.material.basis]]

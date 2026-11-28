@@ -1,5 +1,5 @@
 ---
-erzeugt: 8f524c7dab64
+erzeugt: d4829f4419c4
 art: modul
 tags: [modul]
 ---
@@ -63,9 +63,9 @@ Last und Lager liegt.
 ## DER ABDRUCK
 
 Woran ein gefundenes Fachwerk sein Modell erkennt ([[opencivil.fachwerkmodell.suche#abdruck|abdruck]]): die
-ganze Scheibe mit Lagern und Lasten, die drei Zahlen des Verfahrens und
-sein Schalter.
-Ändert sich eines, gehört das Fachwerk zu einem früheren Stand.
+ganze Scheibe mit Lagern und Lasten, das Verfahren mit seinen Zahlen und
+seinem Schalter. Ändert sich eines, gehört das Fachwerk zu einem früheren
+Stand – auch, wer von Ground Structure zu SIMP wechselt.
 
 ## Inhalt
 
@@ -76,8 +76,9 @@ sein Schalter.
 class Einstellung
 ```
 
-Das Verfahren: seine drei Zahlen in SI und sein Schalter.
+Das Verfahren Ground Structure: seine drei Zahlen in SI und sein Schalter.
 
+- `verfahren: ClassVar[Verfahren] = Verfahren.GROUND_STRUCTURE`
 - `weite: float` – Die Rasterweite h in m.
 - `w_Z: float` – Das Gewicht des Zugs; Druck zählt 1.
 - `N_min: float` – Die kleinste Stabkraft als Teil der grössten: 0.01 ist 1 %.
@@ -123,6 +124,7 @@ Das Fachwerk einer Runde und woher es kommt – so steht es im Projekt.
 - `fertig: bool` – Ob die Suche zu Ende kam – sonst wurde sie angehalten.
 - `moeglich: int` – Wie viele Stäbe die Grundstruktur hat.
 - `im_modell: int` – Wie viele Stäbe in dieser Runde im Modell waren.
+- `form: str = ''` – Mit SIMP das Bild der Form, aus der das Fachwerk kommt ([[opencivil.fachwerkmodell.form#formtext|formtext]]).
 
 ### Runde
 
@@ -165,13 +167,14 @@ def ganz_suchen(modell: Modell, einstellung: Einstellung) -> Suchergebnis
 
 Runde um Runde bis zum Ende, wie die Seite sucht – nur ohne Bild dazwischen.
 
-### _optimum
+### optimum
 
 ```python
-def _optimum(gs: Grundstruktur, aktiv: Sequence[int], einstellung: Einstellung, skala: float) -> Optimum
+def optimum(gs: Grundstruktur, aktiv: Sequence[int], einstellung: Einstellung, skala: float) -> Optimum
 ```
 
-Die Optimierung über die Stäbe `aktiv`, die Lasten bezogen auf die grösste.
+Die Optimierung über die Stäbe `aktiv`, die Lasten bezogen auf die
+grösste, `skala` – mit SIMP über die Stäbe aus der Form.
 
 ### _traegt_zug
 
@@ -265,7 +268,6 @@ Die Grundstruktur, aus dem Speicher, wenn sie zu Modell und Rasterweite schon ge
 ## Konstanten
 
 - `QUELLE = 'He, Gilbert & Song (2019), Abschnitt 3, Gl. (7)'` – Wo die Suche nachzulesen ist.
-- `VORGABEN = (Gruppe('Verfahren', lambda: (Feld('rasterweite', 'h', M, 'Abstand de…` – Die Zahlen des Verfahrens, in der Maske eine Kachel, in der Herleitung ein Kasten.
 - `KURZ = 1.5` – Wie lang die Stäbe der ersten Runde höchstens sind, in Rasterweiten – nach Vorgabe.
 - `ALPHA = 0.05` – α und β aus Gl. (7): wie viele der verletzenden Stäbe je Runde dazukommen.
 - `VERLETZT_AB = 0.0001` – Ab wann ein Stab die Bedingung verletzt: 1 + diese Zahl.
@@ -280,19 +282,18 @@ Die Grundstruktur, aus dem Speicher, wenn sie zu Modell und Rasterweite schon ge
 
 ## Braucht
 
-- [[opencivil.core.einheiten]]
-- [[opencivil.core.vorgaben]]
 - [[opencivil.decke.geometrie]]
 - [[opencivil.fachwerkmodell.grundstruktur]]
 - [[opencivil.fachwerkmodell.modell]]
 - [[opencivil.fachwerkmodell.optimierung]]
+- [[opencivil.fachwerkmodell.verfahren]]
 
 ## Gebraucht von
 
+- [[opencivil.fachwerkmodell.form]]
 - [[opencivil.fachwerkmodell.herleitung]]
 - [[opencivil.fachwerkmodell.nachrechnung]]
 - [[opencivil.fachwerkmodell.werk]]
 - [[opencivil.projekt.aufbau.fachwerkmodell]]
 - [[opencivil.projekt.fachwerkmodell]]
-- [[opencivil.web.api]]
 - [[opencivil.web.fachwerkdaten]]

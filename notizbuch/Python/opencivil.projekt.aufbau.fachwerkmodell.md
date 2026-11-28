@@ -1,5 +1,5 @@
 ---
-erzeugt: e62c31aa22b1
+erzeugt: aa8c30adeb5d
 art: modul
 tags: [modul]
 ---
@@ -30,10 +30,11 @@ fehlt im Modell; die Meldung sagt es.
 ### einstellung_von
 
 ```python
-def einstellung_von(eintrag: FachwerkmodellEintrag) -> Einstellung
+def einstellung_von(eintrag: FachwerkmodellEintrag) -> Verfahrenseinstellung
 ```
 
-Das Verfahren in SI: die Rasterweite in m, N_min als Teil der grössten Kraft, dazu sein Schalter.
+Das Verfahren in SI: die Raster- oder Netzweite in m, Anteile als Teil
+des Ganzen – N_min von der grössten Kraft, das Material von der Fläche.
 
 ### bauen
 
@@ -47,8 +48,10 @@ Ein Fachwerkmodell: sein Modell und sein Verfahren, angemeldet im Rechenwerk.
 ## Braucht
 
 - [[opencivil.decke.geometrie]]
+- [[opencivil.fachwerkmodell.form]]
 - [[opencivil.fachwerkmodell.modell]]
 - [[opencivil.fachwerkmodell.suche]]
+- [[opencivil.fachwerkmodell.verfahren]]
 - [[opencivil.fachwerkmodell.werk]]
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.aufbau.faelle]]

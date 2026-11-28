@@ -1,14 +1,15 @@
 ---
-erzeugt: 98b91a1ec388
+erzeugt: 3e27af649613
 art: thema
 tags: [thema]
 ---
 > [!abstract] Fachwerkmodelle
-> 1 Formel, in der Folge, in der gerechnet wird.
+> 2 Formeln, in der Folge, in der gerechnet wird.
 
 ## Formeln
 
 1. [[Leichtestes Fachwerk]]
+2. [[Steifste Form]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 
@@ -46,9 +47,22 @@ Wie fein das Raster ist und was als dünn gilt, ist eine Wahl: Das
 leichteste Fachwerk ist ein guter Vorschlag für den Weg der Kräfte, weil
 es am wenigsten Material braucht – nicht der einzige.
 
+Das zweite Verfahren, SIMP, geht vom Material aus statt von den Stäben.
+Es verteilt einen Anteil der Fläche so, dass die Scheibe unter ihren Lasten
+am steifsten ist ([[Steifste Form]]); Schritt um Schritt wächst eine Form
+aus Streben und Bändern. Aus ihren Mittellinien liest das Werkzeug Knoten
+und mögliche Stäbe, und dieselbe Optimierung wie bei der Ground Structure
+bestimmt die Kräfte. Die steifste Form ist nicht das leichteste Fachwerk:
+Sie zeigt, wie die Scheibe als Ganzes trägt, solange sie nicht reisst –
+ein Fachwerk aus ihr ist darum oft etwas schwerer, folgt aber dem Weg,
+den die Kräfte in der ungerissenen Scheibe nehmen.
+
 Beispiel: Die Wandscheibe 6 × 3 m mit Türe im Prüfprojekt hat im Raster
 von 1 m 186 mögliche Stäbe; nach 8 Runden stehen 82 im Modell, und das
 Fachwerk hat 22 Stäbe mit $V = 7110\,\mathrm{kNm}$. Im Raster von 0.5 m
 sind es 1526 mögliche Stäbe und 58 im Fachwerk mit $V = 6819\,\mathrm{kNm}$,
 4 % leichter. Unter der Türe liegt kein Stab: ihre Schwelle ist ein Rand
-der Scheibe, und auf keiner Seite ist dort Material.
+der Scheibe, und auf keiner Seite ist dort Material. Nach SIMP, im Netz
+von 0.2 m mit 30 % Material, ist die Form nach 93 Schritten fertig; das
+Fachwerk aus ihr hat 20 Stäbe mit $V = 8706\,\mathrm{kNm}$, im Netz von
+0.1 m 26 Stäbe mit $V = 7836\,\mathrm{kNm}$.

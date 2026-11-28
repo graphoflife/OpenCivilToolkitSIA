@@ -1,5 +1,5 @@
 ---
-erzeugt: de05dc4f9eb0
+erzeugt: 284058180348
 art: formel
 tags: [formel]
 normstelle: "He, Gilbert & Song (2019), Abschnitt 3, Gl. (7)"
@@ -15,7 +15,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.fachwerkmodell.herleitung#_fachwerk|_fachwerk]]
+- [[opencivil.fachwerkmodell.herleitung#_ziel|_ziel]]
 
 ## Themen
 

@@ -7,6 +7,53 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-28 · Fachwerkmodell: das Verfahren SIMP (Schritt 11d)
+
+Die Kachel «Verfahren» hat einen Schalter [Ground Structure | SIMP], je
+mit Bild. Bei SIMP verteilt sich das Material Schritt um Schritt zur
+steifsten Form, und das Bild rechts zeigt sie wachsen; ist sie fertig oder
+hält man an, liest das Werkzeug aus ihr ein Fachwerk.
+
+- **Die Form** nach Andreassen et al. (2011): quadratische Elemente mit
+  vier Knoten, je eine Dichte, die Steifigkeit mit der dritten Potenz,
+  ein Filter über die Nachbarn bis 1.5 Netzweiten und die Verteilung nach
+  Optimality Criteria (`simp.py`). Gelöst mit der Profilmatrix der
+  Stabwerke; das Netz bleibt zwischen den Anfragen im Speicher.
+- **Live wie die Ground Structure:** Eine Anfrage rechnet eine Sekunde
+  Schritte, der Zustand – die Dichten – geht an die Seite und zurück.
+  Was herauskommt, hängt nicht an der Sekunde: jeder Schritt folgt nur aus
+  den Dichten davor (Test: Schritt für Schritt wie in einem Zug).
+- **Anhalten** schickt eine letzte Anfrage mit `abschliessen`: dann liest
+  der Kern das Fachwerk aus der Form, wie sie ist, und die Meldung sagt,
+  dass sie womöglich noch nicht die steifste ist.
+- **Das Fachwerk aus der Form** (`skelett.py`) nach Xia, Langelaar &
+  Hendriks (2020): Schwelle 0.5, Mittellinien nach Zhang & Suen, Knoten an
+  Enden und Verzweigungen, nahe Knoten zusammen. Längs der Linien allein
+  war es oft beweglich oder schwer – eine gebogene Strebe wurde eine
+  Gerade quer durch die Scheibe. Darum knickt eine Linie, die mehr als
+  1.5 Netzweiten von der Geraden abbiegt (Douglas & Peucker), und jedes
+  Paar von Knoten ist ein möglicher Stab, neben der Form bis zehnmal
+  teurer. Die Kräfte bestimmt dieselbe Optimierung wie bei der Ground
+  Structure, danach ohne die dünnen Stäbe.
+- **Zahlen:** Die Konsole 1 × 2 m gibt bei 0.1 m nach 9 Schritten das
+  Fachwerk der Handrechnung, zwei Stäbe, V = 200 kNm. Die Wandscheibe mit
+  Türe: bei 0.1 m 26 Stäbe, V = 7836 kNm, bei 0.2 m 20 Stäbe,
+  V = 8706 kNm – schwerer als die Ground Structure (7110 kNm bei 1 m), weil
+  die Form die steifste ist, nicht die leichteste (Frage im [[TODO]]).
+- **Vorgabe 0.2 m:** Auf der Seite braucht die Wandscheibe bei 0.2 m 8 s,
+  bei 0.1 m 89 s (ohne Browser 3 und 36 s). Fertig wird sie in beiden mit
+  demselben Fachwerk wie ohne Browser.
+- **Die Form im Projekt:** je Feld des Rechtecks ein Zeichen, «-» ohne
+  Element, sonst die Dichte in Fünfzehnteln «0» bis «f» – kurz genug zum
+  Speichern, und die Seite zeichnet sie unter dem Fachwerk.
+- **Im Code:** `verfahren.py` hat die Wahl und die Felder beider
+  Verfahren, `form.py` die Schritte und das Fachwerk der Form. Welches
+  Verfahren gilt, sagt die Art der Einstellung (`Einstellung` oder
+  `Formeinstellung`); sie steckt im Abdruck, so wird ein Fachwerk beim
+  Wechsel des Verfahrens veraltet.
+- «Zug nur waagrecht und senkrecht» gibt es nur bei der Ground Structure;
+  die Form kennt keine Richtung des Zugs (Frage im [[TODO]]).
+
 ## 2026-11-28 · Fachwerkmodell: kein Stab unter der Türe
 
 Beim Lesen der SIMP-Form (Schritt 11d) fiel auf: Die Ground Structure

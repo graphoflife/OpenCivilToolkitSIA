@@ -2,21 +2,23 @@
  * fachwerkmodell.js -- Mittlere Tafel: Eingaben eines Fachwerkmodells, und was rechts von ihm steht.
  *
  * Oben die Scheibe: Bezeichnung, Zeichnung samt Liste, Beschreibung.
- * Darunter die Kachel «Verfahren»: ihre Felder kommen aus dem Kern
- * (`katalog.vorgaben`, opencivil/fachwerkmodell/suche.py), ebenso der
- * Schalter «Zug nur waagrecht und senkrecht» (`katalog.fachwerkmodell.zug`),
- * dazu der Knopf, der ein Fachwerk sucht, und wie weit die Suche ist
- * (fw_suche.js).
+ * Darunter die Kachel «Verfahren»: der Schalter [Ground Structure | SIMP]
+ * (`katalog.fachwerkmodell.verfahren`), die Felder des gewählten aus dem
+ * Kern (`katalog.vorgaben`, opencivil/fachwerkmodell/verfahren.py), bei der
+ * Ground Structure der Schalter «Zug nur waagrecht und senkrecht»
+ * (`katalog.fachwerkmodell.zug`), dazu der Knopf, der ein Fachwerk sucht,
+ * und wie weit die Suche ist (fw_suche.js).
  *
  * Rechts im Reiter «Diagramme» das Modell als Bild, darin das Fachwerk --
- * während der Suche das der letzten Runde --, in der Zusammenfassung seine
- * Stäbe, die Lager mit ihren Kräften und die Lasten. Gerechnet wird im Kern
- * (opencivil/fachwerkmodell); hier stehen nur seine Zahlen.
+ * während der Suche das der letzten Runde, beim Verfahren SIMP die Form --,
+ * in der Zusammenfassung seine Stäbe, die Lager mit ihren Kräften und die
+ * Lasten. Gerechnet wird im Kern (opencivil/fachwerkmodell); hier stehen nur
+ * seine Zahlen.
  */
 
 import {
-  beschreibung, bezeichnung, eingabegruppen, erklaerung, karte, meldungshinweise, panel, tabelle,
-  wahlBlock,
+  beschreibung, bezeichnung, eingabegruppen, erklaerung, karte, meldungshinweise, mitBild, panel, tabelle,
+  wahlBlock, wahlSchalter,
 } from './bausteine.js';
 import { zahlText } from './cad_ansicht.js';
 import {
@@ -42,7 +44,7 @@ const HILFE = {
     ['Last', 'eine Punktlast an einem Knoten, in jeder Richtung: F_h nach rechts, F_v nach unten positiv'],
     ['Material', 'keines und keine Dicke: ohne Bemessung hängen Fachwerk und Kräfte nur von Form, Lagern und Lasten ab'],
   ],
-  verfahren: {
+  ground_structure: {
     zeilen: [
       ['Ground Structure', 'Knoten in einem Raster über der Scheibe, dazu die Punkte der Lager und Lasten und die Ecken – je zwei Knoten ein möglicher Stab, wenn er ganz im Material liegt'],
       ['Optimierung', 'wählt unter den Fachwerken im Gleichgewicht das mit dem kleinsten V; Runde um Runde kommen die Stäbe dazu, die V noch senken'],
@@ -51,6 +53,16 @@ const HILFE = {
       ['Ergebnis', 'Zug rot, Druck blau und gestrichelt; zwei Stäbe in einer Flucht durch einen Knoten ohne Last und Lager werden einer'],
     ],
     formel: 'V = Σ l · (w_Z · N⁺ + w_D · N⁻) → min,  w_D = 1',
+  },
+  simp: {
+    zeilen: [
+      ['SIMP', 'die Scheibe in Quadrate der Netzweite geteilt, jedes mit einer Dichte zwischen 0 und 1 – Schritt um Schritt verteilt sich der Anteil Material zur steifsten Form'],
+      ['Fachwerk', 'aus den Mittellinien der Form gelesen: Knoten, wo eine Linie endet, sich verzweigt oder knickt, und an Lagern und Lasten – die Kräfte wählt dieselbe Optimierung wie bei der Ground Structure'],
+      ['Zug nur waagrecht und senkrecht', 'gibt es nur bei der Ground Structure: die Form kennt keine Richtung des Zugs'],
+      ['Live', 'nach jedem Schritt zeigt das Bild rechts die Form – «Anhalten» liest das Fachwerk aus ihr, so wie sie ist'],
+      ['Ergebnis', 'Zug rot, Druck blau und gestrichelt, die Form grau darunter'],
+    ],
+    formel: 'c = Fᵀ · U → min,  Σ ρ̃ · A_e = ρ̄ · A',
   },
 };
 
@@ -73,7 +85,13 @@ const punktText = (p) => `(${zahlText(p.x, 2)}, ${zahlText(p.y, 2)})`;
 const staebeText = (n) => `${n} ${n === 1 ? 'Stab' : 'Stäbe'}`;
 
 /** Das Fachwerk, das gilt (fw_suche.js), wenn ein Stab trägt -- sonst null: was offen bleibt, sagen die Meldungen. */
-const mitStaeben = (g) => (g?.fachwerk.staebe.length ? g.fachwerk : null);
+const mitStaeben = (g) => (g?.fachwerk?.staebe.length ? g.fachwerk : null);
+
+/** Ob ein Modell oder eine Suche nach dem Verfahren SIMP geht. */
+const nachSimp = (x) => x?.verfahren === 'simp';
+
+/** Wie das Verfahren heisst, in Worten des Kerns: «Ground Structure». */
+const verfahrenText = (wert) => katalog('fachwerkmodell', 'verfahren').find((v) => v.wert === wert)?.beschriftung ?? wert;
 
 /** Was die letzte Rechnung zu einem Fachwerkmodell zeichnet -- oder null. */
 const zeichendaten = (kennung) => zustand.loesung?.zeichendaten?.[kennung] || null;
@@ -127,17 +145,27 @@ const FEHLT = {
  * Wie weit die Suche ist oder was sie fand, in einer Zeile: «Runde 7: 320
  * von 1528 möglichen Stäben im Modell, 4 kommen dazu – 36 Stäbe, V = 3662.5
  * kNm.», danach «Gefunden nach 20 Runden: …» oder «Angehalten nach Runde 7: …».
- * Trägt kein Stab, sagt sie es; warum, sagen die Meldungen darunter.
+ * Beim Verfahren SIMP während der Schritte «Schritt 37: 1580 Elemente, die
+ * Dichten ändern sich noch um bis zu 0.08 – fertig unter 0.01.», danach
+ * ebenso mit Schritten. Trägt kein Stab, sagt sie es; warum, sagen die
+ * Meldungen darunter.
  */
 function standText(g) {
+  const simp = nachSimp(g);
+  const [eine, mehrere] = simp ? ['Schritt', 'Schritten'] : ['Runde', 'Runden'];
+  if (simp && g.liest) return `Schritt ${g.runden}: angehalten – das Fachwerk wird aus der Form gelesen …`;
+  if (simp && !g.fachwerk) {
+    return `Schritt ${g.runden}: ${g.elemente} Elemente, die Dichten ändern sich noch um bis zu `
+      + `${zahlText(g.aenderung, 2)} – fertig unter ${zahlText(g.genug, 2)}.`;
+  }
   const n = g.fachwerk.staebe.length;
   const was = n ? `${staebeText(n)}, V = ${zahlText(g.fachwerk.V, 1)} kNm` : 'kein Stab trägt';
-  const runden = `${g.runden} ${g.runden === 1 ? 'Runde' : 'Runden'}`;
-  if (g.laeuft) {
+  const runden = `${g.runden} ${g.runden === 1 ? eine : mehrere}`;
+  if (g.laeuft && !simp) {
     return `Runde ${g.runden}: ${g.im_modell} von ${g.moeglich} möglichen Stäben im Modell`
       + `${g.dazu ? `, ${g.dazu} kommen dazu` : ''} – ${was}.`;
   }
-  if (!g.fertig) return `Angehalten nach Runde ${g.runden}: ${was}.`;
+  if (!g.fertig) return `Angehalten nach ${eine} ${g.runden}: ${was}.`;
   return n ? `Gefunden nach ${runden}: ${was}.` : `Fertig nach ${runden}: kein Fachwerk trägt die Lasten.`;
 }
 
@@ -156,7 +184,12 @@ function suchzeilen(kennung, daten) {
   }
   const g = gezeigtesFachwerk(kennung, daten);
   if (g) return [el('p.fw-suchstand', { text: standText(g) }), ...meldungshinweise(g.meldungen)];
-  if (s?.laeuft) return [el('p.fw-suchstand', { text: 'Runde 1: Raster und mögliche Stäbe werden gelegt …' })];
+  if (s?.laeuft) {
+    return [el('p.fw-suchstand', {
+      text: nachSimp(eintragVon(kennung)) ? 'Schritt 1: das Netz wird gelegt …'
+        : 'Runde 1: Raster und mögliche Stäbe werden gelegt …',
+    })];
+  }
   return meldungshinweise(daten?.zum_fachwerk);
 }
 
@@ -166,10 +199,12 @@ function suchleiste(modell, daten) {
   const laeuft = Boolean(s?.laeuft);
   const anderes = sucheLaeuft() && !laeuft;
   const bereit = Boolean(daten?.bereit);
-  const titel = laeuft ? 'Sucht Runde um Runde, bis keine Stäbe mehr dazukommen'
+  const simp = nachSimp(modell);
+  const wie = simp ? 'Verteilt das Material Schritt um Schritt zur steifsten Form und liest aus ihr das Fachwerk'
+    : 'Sucht Runde um Runde, bis keine Stäbe mehr dazukommen';
+  const titel = laeuft || bereit ? wie
     : anderes ? 'Es sucht schon ein anderes Fachwerkmodell'
-      : bereit ? 'Sucht Runde um Runde, bis keine Stäbe mehr dazukommen'
-        : 'Erst, wenn das Modell vollständig ist – was fehlt, steht unter der Zeichnung';
+      : 'Erst, wenn das Modell vollständig ist – was fehlt, steht unter der Zeichnung';
   return el('div.fw-suchleiste', {}, [
     el('button.knopf.knopf-haupt', {
       type: 'button', class: laeuft ? 'ist-am-suchen' : '', title: titel,
@@ -179,25 +214,41 @@ function suchleiste(modell, daten) {
       : [el('span', { text: 'Fachwerk suchen' })]),
     laeuft ? el('button.knopf', {
       type: 'button', text: s.anhalten ? 'hält an …' : 'Anhalten', disabled: s.anhalten,
-      title: 'Nach dieser Runde anhalten – ihr Fachwerk wird übernommen', on: { click: anhalten },
+      title: simp ? 'Nach diesem Schritt anhalten – das Fachwerk wird aus der Form gelesen, wie sie ist'
+        : 'Nach dieser Runde anhalten – ihr Fachwerk wird übernommen',
+      on: { click: anhalten },
     }) : null,
   ]);
 }
 
-/** Die Kachel «Verfahren»: die Felder und der Schalter des Kerns, darunter Knopf und Stand der Suche. */
+/**
+ * Die Kachel «Verfahren»: der Schalter der Verfahren, die Felder des
+ * gewählten aus dem Kern, bei der Ground Structure ihr Schalter --
+ * darunter Knopf und Stand der Suche.
+ */
 function kapitel(modell) {
   const aendern = (veraenderer) => eintragAendern(modell.kennung, veraenderer);
   const vorgaben = eingabegruppen('fachwerkmodell', modell, aendern);
   const daten = zeichendaten(modell.kennung);
   const s = sucheVon(modell.kennung);
-  const runde = s?.laeuft ? `sucht, Runde ${s.antwort?.stand?.runde ?? 1}` : '';
+  const simp = nachSimp(modell);
+  const stand = s?.antwort?.stand;
+  const laeuft = s?.laeuft ? `sucht, ${simp ? `Schritt ${stand?.schritt ?? 1}` : `Runde ${stand?.runde ?? 1}`}` : '';
   const zug = katalog('fachwerkmodell', 'zug');
   const kacheln = [gruppenkapitel(vorgaben, 'Verfahren', {
-    zeichen: 'fw-verfahren', hilfe: HILFE.verfahren, werte: ['rasterweite'],
-    wort: runde || 'Ground Structure', fehlt: runde || !daten ? '' : FEHLT[daten.stand] ?? '',
+    zeichen: 'fw-verfahren', hilfe: HILFE[modell.verfahren] ?? HILFE.ground_structure,
+    werte: ['rasterweite', 'netzweite', 'volumen'],
+    wort: laeuft || verfahrenText(modell.verfahren), fehlt: laeuft || !daten ? '' : FEHLT[daten.stand] ?? '',
+    vor: [wahlBlock('Verfahren', wahlSchalter({
+      werte: mitBild(katalog('fachwerkmodell', 'verfahren'), 'fw-verfahren'), gewaehlt: modell.verfahren,
+      titel: 'Wie das Fachwerk gesucht wird', setzen: (w) => aendern((m) => { m.verfahren = w; }),
+    }))],
     nach: [
-      wahlBlock(zug.beschriftung, jaNein(Boolean(modell.zug_achsparallel),
+      simp ? null : wahlBlock(zug.beschriftung, jaNein(Boolean(modell.zug_achsparallel),
         (wert) => aendern((m) => { m.zug_achsparallel = wert; }), zug.titel)),
+      simp && modell.zug_achsparallel ? el('p.karte-hinweis', {
+        text: `«${zug.beschriftung}» gibt es nur bei der Ground Structure – die Form kennt keine Richtung des Zugs.`,
+      }) : null,
       el('div.fw-suche', {}, [suchleiste(modell, daten), ...suchzeilen(modell.kennung, daten)]),
     ],
   })];
@@ -233,11 +284,13 @@ export function fachwerkKarten(kennung) {
   const modell = eintragVon(kennung);
   if (!modell?.scheiben.length) return [ohneScheibe()];
   const daten = zeichendaten(kennung);
-  const fw = mitStaeben(gezeigtesFachwerk(kennung, daten));
-  const bild = scheibeBild(modell, fw);
-  return [karte(fw ? 'Fachwerk' : 'Scheibe', [
+  const g = gezeigtesFachwerk(kennung, daten);
+  const fw = mitStaeben(g);
+  const form = g?.form ?? null;
+  const bild = scheibeBild(modell, fw, form);
+  return [karte(fw ? 'Fachwerk' : form ? 'Form' : 'Scheibe', [
     ...meldungshinweise(daten?.meldungen), ...suchzeilen(kennung, daten),
-    el('div.gb-bildhuelle', {}, [bild]), fw ? fachwerkLegende() : null,
+    el('div.gb-bildhuelle', {}, [bild]), fw || form ? fachwerkLegende(fw, form) : null,
   ].filter(Boolean), { bild, klasse: 'ist-breit' })];
 }
 

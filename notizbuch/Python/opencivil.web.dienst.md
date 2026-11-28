@@ -1,5 +1,5 @@
 ---
-erzeugt: 70b6203389f5
+erzeugt: 8ee5c5096d02
 art: modul
 tags: [modul]
 ---
@@ -352,7 +352,8 @@ der Zustand der letzten Runde hinein, der naechste, das Fachwerk und der
 Stand heraus – gleich fuer Server und Pyodide. Die Seite fragt Runde um
 Runde an, bis die Suche fertig ist oder jemand anhaelt; sie rechnet
 dabei nichts. Ohne `zustand` beginnt die Suche von vorn, ebenso, wenn
-er zu einem anderen Stand des Modells gehoert.
+er zu einem anderen Stand des Modells gehoert. Mit `abschliessen`
+liest das Verfahren SIMP sein Fachwerk aus der Form, wie sie ist.
 
 ### _fachwerkmodell
 

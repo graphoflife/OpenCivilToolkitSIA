@@ -1,5 +1,5 @@
 ---
-erzeugt: 8b2d64df713f
+erzeugt: 8b6522577367
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -91,7 +91,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 **Fachwerkmodelle**
 
-- [[Fachwerkmodell]] · 1
+- [[Fachwerkmodell]] · 2
 
 ## Formeln von A bis Z
 
@@ -495,6 +495,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Steg ohne Schubbeulen]]
 - [[Stegbreite des Kreisquerschnitts]] · $b_w$
 - [[Steifigkeitsmatrix eines Stabs]]
+- [[Steifste Form]]
 - [[Teilung einer Stablinie – gleiche Felder, auf die Länge gerundet]]
 - [[Teilung in y aus der Stabzahl]] · $s_{V,y}$
 - [[Tiefe des Gleitkörpers]] · $H_{Gl}$
@@ -575,7 +576,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 ## Normstelle fehlt noch
 
-148 von 477 Formeln haben im Code keine Normstelle – meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle – von dort kommt sie in Bericht und Notizbuch.
+148 von 478 Formeln haben im Code keine Normstelle – meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle – von dort kommt sie in Bericht und Notizbuch.
 
 - [[Achsen eines Stabs im Raum]] · [[opencivil.stabwerk3d.herleitung|_ansaetze]]
 - [[Äquivalenter E-Modul eines Stabs]] · [[opencivil.spannungsanalyse.modul#ModulProzedur|ModulProzedur._schreiben]]

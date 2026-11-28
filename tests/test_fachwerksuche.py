@@ -178,7 +178,8 @@ class TestZustand(unittest.TestCase):
 
     def test_unlesbarer_zustand(self):
         antwort = dienst.bearbeite("fachwerk_suchen", {
-            "projekt": self.p.als_dict(), "kennung": "f1", "zustand": {"abdruck": 1}})
+            "projekt": self.p.als_dict(), "kennung": "f1",
+            "zustand": {"verfahren": "ground_structure", "abdruck": 1}})
         self.assertEqual(antwort.status, 400)
         self.assertIn("Der Zustand der Suche ist nicht lesbar.", str(antwort.daten))
 
@@ -356,8 +357,10 @@ class TestHerleitung(unittest.TestCase):
         katalog = dienst.bearbeite("katalog").daten
         gruppen = katalog["vorgaben"]["fachwerkmodell"]
         self.assertEqual([g["titel"] for g in gruppen], ["Verfahren"])
-        felder = [f["feld"] for f in next(iter(gruppen[0]["felder"].values()))]
-        self.assertEqual(felder, ["rasterweite", "w_Z", "N_min"])
+        self.assertEqual(gruppen[0]["nach"], ["verfahren"])
+        felder = {wert: [f["feld"] for f in liste] for wert, liste in gruppen[0]["felder"].items()}
+        self.assertEqual(felder, {"ground_structure": ["rasterweite", "w_Z", "N_min"],
+                                  "simp": ["netzweite", "volumen", "w_Z", "N_min"]})
 
 
 if __name__ == "__main__":

@@ -1,5 +1,5 @@
 ---
-erzeugt: 9f55bb97e50a
+erzeugt: 637eb96dc47e
 art: modul
 tags: [modul]
 ---
@@ -62,6 +62,16 @@ Knoten, mögliche Stäbe und die Zeilen des Gleichgewichts einer Scheibe.
 - `zeilen: Dict[Tuple[int, int], int]` – `(knoten, richtung)` -> Zeile des Gleichgewichts; Richtung 0 ist x, 1 ist y.
 - `last: Tuple[float, ...]` – Je Zeile die Last in N.
 - `weite: float`
+- `aufschlag: Tuple[float, ...] = ()` – Je Stab, wie viel mal mehr er in der Optimierung kostet, als seine Länge sagt – leer, wenn jeder nur seine Länge kostet. Das Verfahren SIMP verteuert so, was neben seiner Form liegt ([[opencivil.fachwerkmodell.skelett|skelett]]).
+
+#### Grundstruktur.kosten
+
+```python
+@cached_property
+def kosten(self) -> Tuple[float, ...]
+```
+
+Je Stab, was er je Einheit Kraft in der Optimierung kostet: seine Länge, mit dem Aufschlag.
 
 #### Grundstruktur.spalten
 
@@ -94,13 +104,29 @@ Der Knoten an `p` – ein Lager oder eine Last steht genau auf einem.
 ### grundstruktur
 
 ```python
-def grundstruktur(modell: Modell, weite: float) -> Grundstruktur
+def grundstruktur(modell: Modell, weite: float, drin: Optional[Callable[[Punkt], bool]]=None, liegt: Optional[Callable[[Punkt, Punkt], bool]]=None) -> Grundstruktur
 ```
 
 Die Grundstruktur der Scheibe mit der Rasterweite `weite` in m. Das
 Modell ist geprüft ([[opencivil.fachwerkmodell.pruefen#pruefen|pruefen]]):
 es hat eine Scheibe, Lager und Lasten, alle im Material.
 Wirft [[opencivil.fachwerkmodell.grundstruktur#ZuVieleKnoten|ZuVieleKnoten]], wenn das Raster zu fein ist.
+
+`drin` sagt, wo ein Knoten liegen darf, `liegt`, ob ein Stab von
+einem Punkt zum andern – ohne beide im Material. Das Verfahren SIMP
+gibt so nur, was in seiner Form liegt
+([[opencivil.fachwerkmodell.skelett|skelett]]).
+
+### aus_staeben
+
+```python
+def aus_staeben(modell: Modell, knoten: Sequence[Punkt], staebe: Sequence[Tuple[int, int]], weite: float, aufschlag: Sequence[float]=()) -> Grundstruktur
+```
+
+Eine Grundstruktur aus gegebenen Knoten und Stäben – so liest auch das
+Verfahren SIMP sein Fachwerk ([[opencivil.fachwerkmodell.skelett|skelett]]),
+mit einem `aufschlag` je Stab ([[opencivil.fachwerkmodell.grundstruktur#Grundstruktur|Grundstruktur.aufschlag]]).
+Jedes Lager und jede Last steht genau auf einem Knoten.
 
 ### liegt_achsparallel
 
@@ -113,7 +139,7 @@ Ob ein Stab von `p` nach `q` waagrecht oder senkrecht liegt – bis auf [[openci
 ### _knoten
 
 ```python
-def _knoten(modell: Modell, weite: float) -> Tuple[List[Punkt], List[Optional[Tuple[int, int]]], Punkt]
+def _knoten(modell: Modell, weite: float, drin: Callable[[Punkt], bool]) -> Tuple[List[Punkt], List[Optional[Tuple[int, int]]], Punkt]
 ```
 
 Die Knoten, je Knoten sein Platz im Raster `(i, j)` – `None` für
@@ -132,10 +158,10 @@ Der Satz, wenn das Raster zu fein ist – mit einer Rasterweite, die passt, auf 
 ### _staebe
 
 ```python
-def _staebe(modell: Modell, knoten: Sequence[Punkt], raster: Sequence[Optional[Tuple[int, int]]], ursprung: Punkt, weite: float) -> List[Tuple[int, int]]
+def _staebe(knoten: Sequence[Punkt], raster: Sequence[Optional[Tuple[int, int]]], ursprung: Punkt, weite: float, liegt: Callable[[Punkt, Punkt], bool]) -> List[Tuple[int, int]]
 ```
 
-Je zwei Knoten ein Stab, wenn kein dritter auf ihm liegt und er ganz im Material ist.
+Je zwei Knoten ein Stab, wenn kein dritter auf ihm liegt und er ganz im Material ist (`liegt`).
 
 ### _auf_innen
 
@@ -155,10 +181,10 @@ Ob ein Knoten des Rasters auf der Strecke von Knoten `ka` zu `kb`
 liegt, ausser den beiden selbst: geprüft, wo sie die Linien des Rasters
 quer zu ihrer längeren Richtung kreuzt.
 
-### _im_material
+### im_material
 
 ```python
-def _im_material(modell: Modell, umrisse: Sequence[Sequence[Punkt]], a: Punkt, b: Punkt) -> bool
+def im_material(modell: Modell, umrisse: Sequence[Sequence[Punkt]], a: Punkt, b: Punkt) -> bool
 ```
 
 Ob die Strecke `a → b` ganz im Material liegt: geteilt, wo sie einen
@@ -182,6 +208,8 @@ Material auf einer Seite, [[opencivil.fachwerkmodell.grundstruktur#Konstanten|NE
 
 ## Gebraucht von
 
+- [[opencivil.fachwerkmodell.skelett]]
 - [[opencivil.fachwerkmodell.suche]]
+- [[opencivil.fachwerkmodell.verfahren]]
 - [[opencivil.fachwerkmodell.werk]]
 - [[opencivil.web.fachwerkdaten]]

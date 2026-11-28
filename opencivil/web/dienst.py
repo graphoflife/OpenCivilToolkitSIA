@@ -551,10 +551,12 @@ def fachwerk_suchen(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     Stand heraus -- gleich fuer Server und Pyodide. Die Seite fragt Runde um
     Runde an, bis die Suche fertig ist oder jemand anhaelt; sie rechnet
     dabei nichts. Ohne ``zustand`` beginnt die Suche von vorn, ebenso, wenn
-    er zu einem anderen Stand des Modells gehoert.
+    er zu einem anderen Stand des Modells gehoert. Mit ``abschliessen``
+    liest das Verfahren SIMP sein Fachwerk aus der Form, wie sie ist.
     """
     projekt = _projekt(rumpf)
-    return endlich(fachwerkdaten.suchen(_fachwerkmodell(projekt, rumpf), rumpf.get("zustand")))
+    return endlich(fachwerkdaten.suchen(_fachwerkmodell(projekt, rumpf), rumpf.get("zustand"),
+                                        bool(rumpf.get("abschliessen"))))
 
 
 def _fachwerkmodell(projekt: Projekt, rumpf: Mapping[str, Any]) -> FachwerkmodellEintrag:

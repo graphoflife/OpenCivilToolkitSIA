@@ -235,7 +235,8 @@ class TestZeichnung(unittest.TestCase):
         uebersicht = antwort.daten["uebersicht"]
         self.assertEqual(len(uebersicht.pop("abdruck")), 16)
         self.assertEqual(uebersicht, {
-            "bereit": True, "stand": "keines", "fachwerk": None, "meldungen": [], "zum_fachwerk": [
+            "bereit": True, "verfahren": "ground_structure", "stand": "keines", "fachwerk": None,
+            "form": None, "meldungen": [], "zum_fachwerk": [
                 {"text": NOCH_KEINES, "elemente": [], "fehler": False, "unfertig": False}]})
 
     def test_unfertig(self):

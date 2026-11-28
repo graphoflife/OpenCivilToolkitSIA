@@ -1,5 +1,5 @@
 ---
-erzeugt: e1102bf27c5b
+erzeugt: cbb6398b7afa
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -76,13 +76,17 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.erdbeben.kragarm]] – der Kern als Kragarm: Querkraft, Moment und Auslenkung.
   - [[opencivil.ergebnis]] – ein gerechnetes Projekt, wie man es ohne Oberflaeche braucht.
 - [[opencivil.fachwerkmodell]] – Fachwerkmodelle einer Scheibe, eben.
+    - [[opencivil.fachwerkmodell.form]] – das Verfahren SIMP: die steifste Form, und aus ihr ein Fachwerk.
     - [[opencivil.fachwerkmodell.grundstruktur]] – die Knoten und die möglichen Stäbe einer Scheibe.
     - [[opencivil.fachwerkmodell.herleitung]] – wie ein Fachwerkmodell seine Rechnung aufschreibt.
     - [[opencivil.fachwerkmodell.modell]] – die Scheibe eines Fachwerkmodells, in SI.
     - [[opencivil.fachwerkmodell.nachrechnung]] – ein gefundenes Fachwerk, nachgerechnet.
     - [[opencivil.fachwerkmodell.optimierung]] – das leichteste Fachwerk im Gleichgewicht, als lineare Optimierung.
     - [[opencivil.fachwerkmodell.pruefen]] – was einem Fachwerkmodell fehlt oder an ihm nicht stimmt.
+    - [[opencivil.fachwerkmodell.simp]] – das Material einer Scheibe zur steifsten Form verteilt.
+    - [[opencivil.fachwerkmodell.skelett]] – aus der Form des SIMP die möglichen Stäbe eines Fachwerks.
     - [[opencivil.fachwerkmodell.suche]] – das leichteste Fachwerk, Runde um Runde.
+    - [[opencivil.fachwerkmodell.verfahren]] – wie ein Fachwerk gesucht wird.
     - [[opencivil.fachwerkmodell.werk]] – das Fachwerkmodell im Rechenwerk.
 - [[opencivil.geotechnik]] – Nachweise im Baugrund.
     - [[opencivil.geotechnik.fundament]] – ein Flachfundament auf seinem Baugrund.

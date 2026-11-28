@@ -186,6 +186,61 @@ sammeln sie sich hier, je mit dem, was vorläufig gebaut ist.
         Gleichgewicht 10⁻⁶ der grössten Last, und ein Rest kostet das
         Tausendfache dessen, was die Last über die Diagonale der Scheibe zu
         tragen kostete.
+- [ ] **SIMP: das Fachwerk schwerer als das der Ground Structure?** Die
+      Wandscheibe mit Türe hat mit der Ground Structure V = 7110 kNm im
+      Raster von 1 m und 6819 kNm bei 0.5 m. Aus der Form von SIMP kommen
+      bei der Netzweite 0.1 m 7836 kNm (26 Stäbe), bei 0.2 m 8706 kNm
+      (20 Stäbe) und bei 0.15 m 11970 kNm (22 Stäbe): dort bleibt an der
+      Ecke über der Türe ein kleines Dreieck stehen. Die Form ist die
+      steifste, nicht die mit dem kleinsten V; das Fachwerk folgt ihr und
+      nimmt einen Stab neben ihr nur, wo es ohne nicht geht. Vorschlag: so
+      lassen – SIMP zeigt, wie die steife Scheibe trägt, die Ground
+      Structure das leichteste Fachwerk; wer beides sehen will, kopiert
+      das Modell. Vorläufig: so.
+- [ ] **SIMP: die Netzweite 0.2 m als Vorgabe?** Gemessen an der
+      Wandscheibe mit Türe, 6 × 3 m:
+      - bei 0.2 m 406 Elemente und 93 Schritte: auf der Seite 8 s, ohne
+        Browser 3 s;
+      - bei 0.1 m 1580 Elemente und 114 Schritte: auf der Seite 89 s, ohne
+        Browser 36 s; auf einem Handy länger (nicht gemessen).
+      Feiner wird das Fachwerk leichter, 7836 statt 8706 kNm (oben). Eine
+      Wand von 10 × 5 m hätte bei 0.1 m 5000 Elemente, mehr als die 2500,
+      die das Werkzeug rechnet; bei 0.2 m sind es 1250. Die Form wächst im
+      Bild sichtbar, und «Anhalten» liest das Fachwerk jederzeit aus ihr.
+      Vorschlag: 0.2 m; wer es feiner will, stellt 0.1 m. Vorläufig: 0.2 m.
+- [ ] **SIMP: «Zug nur waagrecht und senkrecht» nur bei der Ground
+      Structure?** Die Form kennt keine Richtung des Zugs. Bei SIMP fehlt
+      der Schalter; war er an, sagt ein grauer Satz, dass er nur bei der
+      Ground Structure gilt. Man könnte beim Fachwerk aus der Form die
+      geneigten Stäbe auf Druck beschränken – nur folgen sie dann der Form
+      nicht mehr, und oft ginge das Gleichgewicht nicht auf. Vorschlag: so
+      lassen. Vorläufig: so.
+- [ ] **SIMP: wie das Werkzeug die Form liest – anders als die Quelle.**
+      Xia, Langelaar & Hendriks (2020) verbinden die Knoten längs der
+      Mittellinien. Das allein war oft beweglich oder schwer: eine
+      gebogene Strebe wurde eine Gerade quer durch die Scheibe. Darum:
+      - eine Linie, die mehr als 1.5 Netzweiten von der Geraden abbiegt,
+        bekommt dort einen Knoten (Douglas & Peucker);
+      - Äste, die frei enden, fallen weg, ebenso, was an keinem Lager und
+        keiner Last hängt;
+      - ein Stab weniger als 10° schief zur Senkrechten oder Waagrechten
+        durch ein Lager oder eine Last wird genau so gerückt;
+      - jedes Paar von Knoten ist ein möglicher Stab, wenn er im Material
+        liegt; neben der Form kostet er bis zum Zehnfachen.
+      Vorschlag: so lassen. Vorläufig: so.
+- [ ] **SIMP: was nach Vorgabe gebaut ist, nicht nachgeschlagen.** Aus der
+      Quelle (Andreassen et al. 2011) sind E_min = 10⁻⁹, p = 3, der Filter
+      bis 1.5 Netzweiten, die Änderung von höchstens 0.2 je Schritt, die
+      Halbierung bis 10⁻³ und das Ende bei einer Änderung unter 0.01; aus
+      Xia et al. (2020) die Schwelle 0.5 und die 5 %. Nach Vorgabe, je mit
+      dem Vorschlag «so lassen»:
+      - ν = 0.2 wie für Beton, die Quelle nimmt 0.3;
+      - höchstens 200 Schritte und 2500 Elemente;
+      - je Anfrage der Seite eine Sekunde Schritte;
+      - ein Lager und eine Last gehen an die nächste Ecke eines Elements;
+      - Netzweite 0.2 m und Anteil Material 30 %, wählbar von 5 bis 80 %;
+      - beim Lesen der Form 1.5 Netzweiten, 10°, das Zehnfache, das
+        Wegfallen freier Äste und die Paare (oben).
 
 ## Wünsche vom 2026-11-20
 

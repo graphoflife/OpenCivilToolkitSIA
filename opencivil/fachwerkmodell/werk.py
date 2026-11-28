@@ -3,7 +3,7 @@ opencivil/fachwerkmodell/werk.py -- das Fachwerkmodell im Rechenwerk.
 
 VERANTWORTUNG:
 Was ein Fachwerkmodell im Rechenwerk anmeldet: die Zahlen seines
-Verfahrens als Vorgaben (:data:`~opencivil.fachwerkmodell.suche.VORGABEN`)
+Verfahrens als Vorgaben (:data:`~opencivil.fachwerkmodell.verfahren.VORGABEN`)
 und eine Prozedur, die sein Modell prüft
 (:mod:`~opencivil.fachwerkmodell.pruefen`), das gefundene Fachwerk
 nachrechnet (:mod:`~opencivil.fachwerkmodell.nachrechnung`) und die
@@ -13,8 +13,9 @@ Entscheid 11).
 
 GESUCHT WIRD DANEBEN:
 Die Suche läuft nicht hier, sondern Runde um Runde auf Anfrage der Seite
-(:func:`~opencivil.fachwerkmodell.suche.runde`); was sie zuletzt fand,
-steht im Projekt. Hier zählt es nur, wenn sein Abdruck zu Modell und
+(:func:`~opencivil.fachwerkmodell.suche.runde`, im Verfahren SIMP Schritt
+um Schritt, :func:`~opencivil.fachwerkmodell.form.schritte`); was sie
+zuletzt fand, steht im Projekt. Hier zählt es nur, wenn sein Abdruck zu Modell und
 Verfahren passt -- sonst sagt eine Meldung, dass es zu einem früheren
 Stand gehört, und es steht nirgends.
 
@@ -27,7 +28,7 @@ mit Meldung und keine Ausnahme: der Rest des Projekts rechnet weiter.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Dict, List, Mapping, Optional, Sequence
+from typing import Dict, List, Mapping, Optional, Sequence, Union
 
 from opencivil.core.berechnung import Ausfuehrung, Eingabebezug, Eingaben, Prozedur
 from opencivil.core.einheiten import Groesse
@@ -36,13 +37,17 @@ from opencivil.core.rechenobjekt import Rechenobjekt
 from opencivil.core.wert import WertDef
 from opencivil.decke.herleitung import als_ort
 from opencivil.fachwerkmodell import herleitung
+from opencivil.fachwerkmodell.form import Formeinstellung
+from opencivil.fachwerkmodell.grundstruktur import liegt_achsparallel
 from opencivil.fachwerkmodell.modell import Modell
 from opencivil.fachwerkmodell.nachrechnung import Nachrechnung, nachrechnen
 from opencivil.fachwerkmodell.pruefen import pruefen
-from opencivil.fachwerkmodell.grundstruktur import liegt_achsparallel
-from opencivil.fachwerkmodell.suche import (VORGABEN, ZUG_ACHSPARALLEL, Einstellung, Suchergebnis,
-                                            abdruck)
+from opencivil.fachwerkmodell.suche import ZUG_ACHSPARALLEL, Einstellung, Suchergebnis, abdruck
+from opencivil.fachwerkmodell.verfahren import VORGABEN, Verfahren
 from opencivil.stabwerk.system import Meldung
+
+#: Die Zahlen eines der beiden Verfahren -- Ground Structure oder SIMP.
+Verfahrenseinstellung = Union[Einstellung, Formeinstellung]
 
 #: Unter welchem Thema seine Herleitung in der Formelsammlung steht.
 THEMA = "Fachwerkmodell"
@@ -55,12 +60,21 @@ VERALTET = (f"Das Fachwerk gehört zu einem früheren Stand: Scheibe, Lager, Las
             f"haben sich seither geändert – neu suchen {IM_FENSTER}.")
 UNLESBAR = f"Das gespeicherte Fachwerk lässt sich nicht lesen – neu suchen {IM_FENSTER}."
 
+#: Was ein angehaltenes Fachwerk ist, je Verfahren -- ``{n}`` die letzte Runde oder der letzte Schritt.
+ANGEHALTEN = {
+    Verfahren.GROUND_STRUCTURE: "Die Suche wurde nach Runde {n} angehalten: das Fachwerk trägt die "
+                                "Lasten, ist aber womöglich nicht das leichteste.",
+    Verfahren.SIMP: "Die Form wurde nach Schritt {n} angehalten: das Fachwerk aus ihr trägt die "
+                    "Lasten, sie ist aber womöglich noch nicht die steifste.",
+}
+
 
 @dataclass
 class Fachwerkbefund:
     """Was die Rechnung fand: das Modell, seine Meldungen und das Fachwerk, mit dem, was dazu zu sagen ist."""
 
     modell: Modell
+    einstellung: Verfahrenseinstellung
     meldungen: List[Meldung]
     """Was das Modell meldet -- die Meldungen der Beschreibung zuerst."""
 
@@ -89,7 +103,7 @@ class Fachwerkbefund:
     nachrechnung: Optional[Nachrechnung] = None
 
 
-def offen_meldungen(n: Nachrechnung, einstellung: Einstellung) -> List[Meldung]:
+def offen_meldungen(n: Nachrechnung, einstellung: Verfahrenseinstellung) -> List[Meldung]:
     """
     Wo das Gleichgewicht nicht aufgeht, rot: je Last, die es nicht ganz
     trägt, eine Meldung -- mit «Zug nur waagrecht und senkrecht» sagt sie
@@ -125,7 +139,7 @@ class Fachwerksystem(Rechenobjekt):
     WAS = "Fachwerkmodell"
 
     def __init__(self, *, name: str, kennung: str, praefix: str, modell: Modell,
-                 meldungen: Sequence[Meldung], einstellung: Einstellung,
+                 meldungen: Sequence[Meldung], einstellung: Verfahrenseinstellung,
                  vorgaben: Mapping[str, Groesse], gefunden: Optional[Suchergebnis],
                  unlesbar: bool = False) -> None:
         """
@@ -140,6 +154,8 @@ class Fachwerksystem(Rechenobjekt):
         self.modell = modell
         self.meldungen = list(meldungen)
         self.einstellung = einstellung
+        self.verfahren = einstellung.verfahren
+        """Unter dem Namen, nach dem sich die Vorgaben richten (:data:`VORGABEN`)."""
         self.abdruck = abdruck(modell, einstellung)
         self.gefunden = gefunden
         self.unlesbar = unlesbar
@@ -168,11 +184,11 @@ class Fachwerksystem(Rechenobjekt):
         """Das Modell geprüft, das Fachwerk nachgerechnet, die Herleitung geschrieben."""
         meldungen = self.meldungen + pruefen(self.modell)
         bereit = not any(m.haelt_an for m in meldungen)
-        befund = Fachwerkbefund(self.modell, meldungen, bereit)
+        befund = Fachwerkbefund(self.modell, self.einstellung, meldungen, bereit)
         if bereit:
             befund.abdruck = self.abdruck
             self._fachwerk(befund)
-        herleitung.schreiben(p, befund, self.einstellung)
+        herleitung.schreiben(p, befund)
         return Ausfuehrung({}, befund=befund)
 
     def _fachwerk(self, befund: Fachwerkbefund) -> None:
@@ -207,9 +223,7 @@ class Fachwerksystem(Rechenobjekt):
                           for i, (a, b, N) in enumerate(fw.staebe, start=1)
                           if N > 0.0 and not liegt_achsparallel(fw.knoten[a], fw.knoten[b])]
         if not gefunden.fertig:
-            meldungen.append(Meldung(
-                f"Die Suche wurde nach Runde {gefunden.runden} angehalten: das Fachwerk trägt die "
-                f"Lasten, ist aber womöglich nicht das leichteste.", fehler=False))
+            meldungen.append(Meldung(ANGEHALTEN[self.verfahren].format(n=gefunden.runden), fehler=False))
         kraefte = [abs(N) for _, _, N in fw.staebe]
         if kraefte and min(kraefte) < 0.999 * self.einstellung.N_min * max(kraefte):
             meldungen.append(Meldung(

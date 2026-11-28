@@ -32,7 +32,7 @@ import math
 from dataclasses import dataclass
 from functools import cached_property
 from math import gcd
-from typing import Dict, List, Optional, Sequence, Tuple
+from typing import Callable, Dict, List, Optional, Sequence, Tuple
 
 from opencivil.decke import geometrie as geo
 from opencivil.decke.geometrie import Punkt
@@ -77,6 +77,20 @@ class Grundstruktur:
     """Je Zeile die Last in N."""
 
     weite: float
+    aufschlag: Tuple[float, ...] = ()
+    """
+    Je Stab, wie viel mal mehr er in der Optimierung kostet, als seine Länge
+    sagt -- leer, wenn jeder nur seine Länge kostet. Das Verfahren SIMP
+    verteuert so, was neben seiner Form liegt
+    (:mod:`~opencivil.fachwerkmodell.skelett`).
+    """
+
+    @cached_property
+    def kosten(self) -> Tuple[float, ...]:
+        """Je Stab, was er je Einheit Kraft in der Optimierung kostet: seine Länge, mit dem Aufschlag."""
+        if not self.aufschlag:
+            return self.laengen
+        return tuple(l * a for l, a in zip(self.laengen, self.aufschlag))
 
     @cached_property
     def spalten(self) -> Tuple[Spalte, ...]:
@@ -105,15 +119,34 @@ class Grundstruktur:
         return next((k for k, q in enumerate(self.knoten) if _gleich(p, q)), None)
 
 
-def grundstruktur(modell: Modell, weite: float) -> Grundstruktur:
+def grundstruktur(modell: Modell, weite: float, drin: Optional[Callable[[Punkt], bool]] = None,
+                  liegt: Optional[Callable[[Punkt, Punkt], bool]] = None) -> Grundstruktur:
     """
     Die Grundstruktur der Scheibe mit der Rasterweite ``weite`` in m. Das
     Modell ist geprüft (:func:`~opencivil.fachwerkmodell.pruefen.pruefen`):
     es hat eine Scheibe, Lager und Lasten, alle im Material.
     Wirft :class:`ZuVieleKnoten`, wenn das Raster zu fein ist.
+
+    ``drin`` sagt, wo ein Knoten liegen darf, ``liegt``, ob ein Stab von
+    einem Punkt zum andern -- ohne beide im Material. Das Verfahren SIMP
+    gibt so nur, was in seiner Form liegt
+    (:mod:`~opencivil.fachwerkmodell.skelett`).
     """
-    knoten, raster, ursprung = _knoten(modell, weite)
-    staebe = _staebe(modell, knoten, raster, ursprung, weite)
+    umrisse = [u.ecken for u in (*modell.scheiben, *modell.loecher)]
+    knoten, raster, ursprung = _knoten(modell, weite, drin or modell.im_material)
+    staebe = _staebe(knoten, raster, ursprung, weite,
+                     liegt or (lambda a, b: im_material(modell, umrisse, a, b)))
+    return aus_staeben(modell, knoten, staebe, weite)
+
+
+def aus_staeben(modell: Modell, knoten: Sequence[Punkt], staebe: Sequence[Tuple[int, int]],
+                weite: float, aufschlag: Sequence[float] = ()) -> Grundstruktur:
+    """
+    Eine Grundstruktur aus gegebenen Knoten und Stäben -- so liest auch das
+    Verfahren SIMP sein Fachwerk (:mod:`~opencivil.fachwerkmodell.skelett`),
+    mit einem ``aufschlag`` je Stab (:attr:`Grundstruktur.aufschlag`).
+    Jedes Lager und jede Last steht genau auf einem Knoten.
+    """
     laengen = tuple(math.dist(knoten[a], knoten[b]) for a, b in staebe)
     halt: Dict[int, Tuple[bool, bool]] = {}
     for lager in modell.lager:
@@ -131,8 +164,9 @@ def grundstruktur(modell: Modell, weite: float) -> Grundstruktur:
         for r, wert in ((0, f.F_x), (1, f.F_y)):
             if (k, r) in zeilen:
                 last[zeilen[(k, r)]] += wert
-    return Grundstruktur(modell=modell, knoten=tuple(knoten), staebe=tuple(staebe), laengen=laengen,
-                         zeilen=zeilen, last=tuple(last), weite=weite)
+    return Grundstruktur(modell=modell, knoten=tuple(knoten), staebe=tuple(map(tuple, staebe)),
+                         laengen=laengen, zeilen=zeilen, last=tuple(last), weite=weite,
+                         aufschlag=tuple(aufschlag))
 
 
 def liegt_achsparallel(p: Punkt, q: Punkt) -> bool:
@@ -149,7 +183,7 @@ def _bei(knoten: Sequence[Punkt], p: Punkt) -> int:
     return next(k for k, q in enumerate(knoten) if _gleich(p, q))
 
 
-def _knoten(modell: Modell, weite: float
+def _knoten(modell: Modell, weite: float, drin: Callable[[Punkt], bool]
             ) -> Tuple[List[Punkt], List[Optional[Tuple[int, int]]], Punkt]:
     """
     Die Knoten, je Knoten sein Platz im Raster ``(i, j)`` -- ``None`` für
@@ -169,14 +203,14 @@ def _knoten(modell: Modell, weite: float
     for j in range(ny + 1):
         for i in range(nx + 1):
             p = (x0 + i * weite, y0 + j * weite)
-            if modell.im_material(p):
+            if drin(p):
                 knoten.append(p)
                 raster.append((i, j))
     platz = {r: k for k, r in enumerate(raster)}
     besondere = [l.ort for l in modell.lager] + [f.ort for f in modell.lasten]
     besondere += [p for u in (*modell.scheiben, *modell.loecher) for p in u.ecken]
     for p in besondere:
-        if len(knoten) > HOECHSTENS_KNOTEN or not modell.im_material(p):
+        if len(knoten) > HOECHSTENS_KNOTEN or not drin(p):
             continue
         auf = platz.get((round((p[0] - x0) / weite), round((p[1] - y0) / weite)))
         if auf is not None and _gleich(p, knoten[auf]):
@@ -199,13 +233,12 @@ def _zu_viele(modell: Modell, weite: float, anzahl: str) -> str:
             f"{passt:g} m wählen.")
 
 
-def _staebe(modell: Modell, knoten: Sequence[Punkt], raster: Sequence[Optional[Tuple[int, int]]],
-            ursprung: Punkt, weite: float) -> List[Tuple[int, int]]:
-    """Je zwei Knoten ein Stab, wenn kein dritter auf ihm liegt und er ganz im Material ist."""
+def _staebe(knoten: Sequence[Punkt], raster: Sequence[Optional[Tuple[int, int]]],
+            ursprung: Punkt, weite: float, liegt: Callable[[Punkt, Punkt], bool]) -> List[Tuple[int, int]]:
+    """Je zwei Knoten ein Stab, wenn kein dritter auf ihm liegt und er ganz im Material ist (``liegt``)."""
     n = len(knoten)
     besondere = [k for k in range(n) if raster[k] is None]
     im_raster = {r: k for k, r in enumerate(raster) if r is not None}
-    umrisse = [u.ecken for u in (*modell.scheiben, *modell.loecher)]
     staebe = []
     for a in range(n):
         for b in range(a + 1, n):
@@ -217,7 +250,7 @@ def _staebe(modell: Modell, knoten: Sequence[Punkt], raster: Sequence[Optional[T
                 continue
             if any(_auf_innen(knoten[k], knoten[a], knoten[b]) for k in besondere if k not in (a, b)):
                 continue
-            if _im_material(modell, umrisse, knoten[a], knoten[b]):
+            if liegt(knoten[a], knoten[b]):
                 staebe.append((a, b))
     return staebe
 
@@ -262,7 +295,7 @@ def _rasterknoten_auf(knoten: Sequence[Punkt], ka: int, kb: int,
     return False
 
 
-def _im_material(modell: Modell, umrisse: Sequence[Sequence[Punkt]], a: Punkt, b: Punkt) -> bool:
+def im_material(modell: Modell, umrisse: Sequence[Sequence[Punkt]], a: Punkt, b: Punkt) -> bool:
     """
     Ob die Strecke ``a → b`` ganz im Material liegt: geteilt, wo sie einen
     Rand trifft, liegt jedes Stück ganz innen, ganz aussen oder auf einem

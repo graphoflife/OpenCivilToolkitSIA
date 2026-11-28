@@ -227,7 +227,9 @@ export const api = {
    * Eine Runde der Suche nach einem Fachwerk: den Zustand der letzten hinein
    * -- null für die erste --, den nächsten, das Fachwerk und den Stand heraus.
    */
-  fachwerkSuchen: (projekt, kennung, zustand) => ruf('fachwerk_suchen', { projekt, kennung, zustand }),
+  fachwerkSuchen: (projekt, kennung, zustand, abschliessen = false) => ruf('fachwerk_suchen', {
+    projekt, kennung, zustand, abschliessen,
+  }),
 };
 
 export { KernFehler };

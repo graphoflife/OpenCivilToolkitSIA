@@ -359,13 +359,27 @@ const ZEICHEN = {
 
   // -- Die Knöpfe des Fachwerkmodells -----------------------------------------
 
-  // Das Verfahren Ground Structure: Knoten im Raster, gestrichelt Stäbe, die
-  // möglich sind, kräftig die gewählten -- ein Bogen mit Zugband.
+  // Das Verfahren: Knoten im Raster, gestrichelt Stäbe, die möglich sind,
+  // kräftig die gewählten -- ein Bogen mit Zugband.
   'fw-verfahren': {
     strich: ['M4.5 5h15 M4.5 5l7.5 7 M19.5 5l-7.5 7 M4.5 12h15'],
     pfade: ['M4.5 19L12 5l7.5 14z'],
     voll: [[4.5, 5, 1.3], [12, 5, 1.3], [19.5, 5, 1.3], [4.5, 12, 1.3], [12, 12, 1.3],
       [19.5, 12, 1.3], [4.5, 19, 1.3], [12, 19, 1.3], [19.5, 19, 1.3]],
+  },
+  // Die Stellungen des Schalters: Ground Structure -- das Raster der Knoten,
+  // gestrichelt, was möglich ist, kräftig der Bogen mit Zugband, den die
+  // Optimierung wählt --, und SIMP: in der Scheibe, gestrichelt, voll die
+  // Form, die das Material annimmt, ein Bogen auf einem Band.
+  'fw-verfahren-ground_structure': {
+    strich: ['M4.5 12h15 M4.5 5l15 14 M19.5 5l-15 14'],
+    pfade: ['M4.5 19L12 5l7.5 14z'],
+    voll: [[4.5, 5, 1.3], [12, 5, 1.3], [19.5, 5, 1.3], [4.5, 12, 1.3], [12, 12, 1.3],
+      [19.5, 12, 1.3], [4.5, 19, 1.3], [12, 19, 1.3], [19.5, 19, 1.3]],
+  },
+  'fw-verfahren-simp': {
+    strich: ['M3.5 4.5h17v15h-17z'],
+    flaechen: ['M3.5 19.5Q12 -1.5 20.5 19.5h-4Q12 7.5 7.5 19.5z', 'M3.5 17h17v2.5h-17z'],
   },
   // Die Ergebnisse: die Platte, gestrichelt ein Schnitt durch sie und
   // darüber der Verlauf längs ihm -- wie beim Werkzeug, das ihn zeichnet.

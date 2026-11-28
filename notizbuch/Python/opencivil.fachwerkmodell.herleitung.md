@@ -1,5 +1,5 @@
 ---
-erzeugt: f4a5ae65904b
+erzeugt: 050dd16b6fae
 art: modul
 tags: [modul]
 ---
@@ -11,9 +11,9 @@ tags: [modul]
 
 Die Scheibe in Tabellen – Scheiben und Löcher mit ihrer Fläche, die Lager
 mit dem, was sie halten, die Lasten mit ihrer Summe –, dann das gefundene
-Fachwerk: wie es gesucht wurde, seine Stäbe mit ihren Kräften, das Ziel V
-der Optimierung und was die Lager aufnehmen. Zuletzt die Meldungen: rot,
-was falsch ist, sonst als Hinweis.
+Fachwerk: wie es gesucht wurde, je nach Verfahren, seine Stäbe mit ihren
+Kräften, das Ziel V der Optimierung und was die Lager aufnehmen. Zuletzt
+die Meldungen: rot, was falsch ist, sonst als Hinweis.
 
 
 ## EINHEITEN
@@ -26,18 +26,50 @@ unten positiv, wie in der Maske; eine Stabkraft `N` mit Zug positiv.
 ### schreiben
 
 ```python
-def schreiben(p: Protokoll, befund: 'Fachwerkbefund', einstellung: Einstellung) -> None
+def schreiben(p: Protokoll, befund: 'Fachwerkbefund') -> None
 ```
 
 Die ganze Herleitung – nichts davon geht in den Befund ein, also still gar keine.
 
+### _gesucht
+
+```python
+def _gesucht(p: Protokoll, gefunden: Suchergebnis, einstellung: Einstellung) -> None
+```
+
+Wie die Ground Structure das Fachwerk suchte.
+
+### _aus_der_form
+
+```python
+def _aus_der_form(p: Protokoll, gefunden: Suchergebnis, einstellung: Formeinstellung) -> None
+```
+
+Wie SIMP die Form fand und das Werkzeug aus ihr das Fachwerk las.
+
+### _danach
+
+```python
+def _danach(einstellung: 'Verfahrenseinstellung') -> str
+```
+
+Was nach der Optimierung mit dem Fachwerk geschieht – in beiden Verfahren gleich.
+
+### _ziel
+
+```python
+def _ziel(p: Protokoll) -> None
+```
+
+Was die Optimierung der Kräfte klein macht – in beiden Verfahren dasselbe.
+
 ### _fachwerk
 
 ```python
-def _fachwerk(p: Protokoll, gefunden: Suchergebnis, n: Nachrechnung, einstellung: Einstellung) -> None
+def _fachwerk(p: Protokoll, n: Nachrechnung) -> None
 ```
 
-Wie das Fachwerk gesucht wurde, seine Stäbe, sein V und die Kräfte der Lager.
+Die Stäbe des Fachwerks, sein V und die Kräfte der Lager.
 
 
 ## Konstanten
@@ -50,8 +82,11 @@ Wie das Fachwerk gesucht wurde, seine Stäbe, sein V und die Kräfte der Lager.
 - [[opencivil.core.protokoll]]
 - [[opencivil.decke.geometrie]]
 - [[opencivil.decke.herleitung]]
+- [[opencivil.fachwerkmodell.form]]
 - [[opencivil.fachwerkmodell.modell]]
 - [[opencivil.fachwerkmodell.nachrechnung]]
+- [[opencivil.fachwerkmodell.simp]]
+- [[opencivil.fachwerkmodell.skelett]]
 - [[opencivil.fachwerkmodell.suche]]
 - [[opencivil.fachwerkmodell.werk]]
 
@@ -61,4 +96,5 @@ Wie das Fachwerk gesucht wurde, seine Stäbe, sein V und die Kräfte der Lager.
 
 ## Formeln aus diesem Modul
 
-- [[Leichtestes Fachwerk]] · `_fachwerk`
+- [[Leichtestes Fachwerk]] · `_ziel`
+- [[Steifste Form]] · `_aus_der_form`

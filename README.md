@@ -292,7 +292,7 @@ Fertig und getestet (am 2026-11-21: 2145 Tests):
 | `stabwerk/rechnung`, `herleitung` | das Balkensystem im Rechenwerk und wie es seine Rechnung aufschreibt |
 | `stabwerk3d/` | das Balkensystem im Raum: Vektoren (`raum`), die Beschreibung in SI (`modell`), der Stab als drei ebene (`stab`), das System mit sechs Unbekannten je Knoten (`system`), die Verläufe (`verlauf`), im Rechenwerk (`rechnung`) und wie es seine Rechnung aufschreibt (`herleitung`) |
 | `decke/` | eine Decke nach der Streifenmethode: die Beschreibung in SI (`modell`), die Streifen und ihre Durchlaufträger (`streifen`), wie die Last auf die Richtungen und Streifen geht (`aufteilung`, `lasten`), jeder Streifen als Durchlaufträger (`durchlauftraeger`), Fall für Fall von unten nach oben (`rechnung`), die Schnittkräfte der Platte an einer Stelle und wo Bilder und Bericht hinsehen (`feld`), im Rechenwerk (`werk`) und wie sie ihre Rechnung aufschreibt (`herleitung`) |
-| `fachwerkmodell/` | ein Fachwerkmodell einer Scheibe: Umrisse, Löcher, Lager und Lasten in SI (`modell`), was ihm fehlt oder an ihm nicht stimmt – auch, ob die Lager die Scheibe halten (`pruefen`) –, das Verfahren Ground Structure – Raster und mögliche Stäbe (`grundstruktur`), die lineare Optimierung als Innere-Punkte-Verfahren (`optimierung`), die Suche Runde um Runde mit der Nachbearbeitung (`suche`) –, das Gleichgewicht des gefundenen Fachwerks nachgerechnet (`nachrechnung`), im Rechenwerk (`werk`) und wie es seine Rechnung aufschreibt (`herleitung`) |
+| `fachwerkmodell/` | ein Fachwerkmodell einer Scheibe: Umrisse, Löcher, Lager und Lasten in SI (`modell`), was ihm fehlt oder an ihm nicht stimmt – auch, ob die Lager die Scheibe halten (`pruefen`) –, die beiden Verfahren und ihre Zahlen (`verfahren`), Ground Structure – Raster und mögliche Stäbe (`grundstruktur`), die lineare Optimierung als Innere-Punkte-Verfahren (`optimierung`), die Suche Runde um Runde mit der Nachbearbeitung (`suche`) –, SIMP – die steifste Form (`simp`), das Fachwerk aus ihr (`skelett`), die Schritte live (`form`) –, das Gleichgewicht des gefundenen Fachwerks nachgerechnet (`nachrechnung`), im Rechenwerk (`werk`) und wie es seine Rechnung aufschreibt (`herleitung`) |
 | `geotechnik/grundbruch` | ein Flachfundament: Bemessungswerte des Bodens, Grundbruch nach der erweiterten Tragfähigkeitsformel (drainiert und undrainiert), Gleiten in der Sohle, der Gleitkörper nach Prandtl |
 | `geotechnik/wasser` | die Raumlast des Grundwassers, aus der Flüssigkeit, die Grundbruch oder Pfahl wählt |
 | `geotechnik/setzung` | ein Flachfundament auf geschichtetem Baugrund: der Einflussfaktor nach Boussinesq im Punkt K oder in der Mitte, die Setzung je Teilschicht aus Wieder- und Erstbelastung, s gegen s_zul |
@@ -324,7 +324,7 @@ Fertig und getestet (am 2026-11-21: 2145 Tests):
 | `web/balkendaten.py` | was die Oberfläche von einem Balkensystem zeigt, eben oder im Raum: Übersicht und Verläufe |
 | `web/systemkatalog.py` | was die Oberfläche an einem Balkensystem wählen lässt, eben und im Raum mit denselben Schlüsseln: Querschnitte, Materialien, Lasten, Lager, Diagramme |
 | `web/deckendaten.py` | was die Oberfläche von einer Decke zeigt: die Übersicht beim Zeichnen und die Bilder eines Falls |
-| `web/fachwerkdaten.py` | was die Oberfläche von einem Fachwerkmodell zeigt: die Meldungen, das gefundene Fachwerk nachgerechnet, eine Runde der Suche und wie ein Lager halten kann |
+| `web/fachwerkdaten.py` | was die Oberfläche von einem Fachwerkmodell zeigt: die Meldungen, das gefundene Fachwerk nachgerechnet, seine Form bei SIMP, eine Runde der Suche, die Verfahren und wie ein Lager halten kann |
 | `web/grundbruchdaten.py` | was die Situationszeichnung eines Grundbruchs vom Kern braucht: Gleitkörper, Grundwasser, Kräfte je Kombination |
 | `web/setzungsdaten.py` | was die Situationszeichnung einer Setzung vom Kern braucht: der Punkt, J über die Tiefe, die Setzung je Schicht |
 | `web/erdbebendaten.py` | was die Ansicht eines Gebäudes im Erdbeben vom Kern braucht: je Richtung die Kräfte, die Querkräfte und die Anteile der Wände; je Wand, was ihr fehlt |
@@ -670,10 +670,16 @@ oder man «Anhalten» drückt: Zug rot, Druck blau gestrichelt, je dicker,
 desto grösser die Kraft. Mit dem Schalter «Zug nur waagrecht und
 senkrecht» tragen geneigte Stäbe nur Druck, wie in einer Wand mit
 Bewehrung in x und y; geht so kein Fachwerk auf, sagt es die Last, die
-offen bleibt, rot. Danach ist es eine Eingabe wie jede andere: die
-Rechnung rechnet sein Gleichgewicht und die Lagerkräfte nach, und ändern
-sich Scheibe, Lager, Lasten oder Verfahren, sagt sie, dass neu zu suchen
-ist. Beispiel «Wandscheibe mit Türe» bei h = 1 m: 22 Stäbe, V = 7109.6 kNm.
+offen bleibt, rot. Das zweite Verfahren, SIMP (Andreassen et al. 2011),
+verteilt den Anteil Material ρ̄ der Scheibe Schritt um Schritt zur
+steifsten Form, in quadratischen Elementen der Netzweite h; das Bild zeigt
+sie wachsen. Aus ihren Mittellinien liest das Werkzeug ein Fachwerk (nach
+Xia, Langelaar & Hendriks 2020), dessen Kräfte dieselbe Optimierung
+bestimmt – grau liegt die Form darunter. Danach ist es eine Eingabe wie
+jede andere: die Rechnung rechnet sein Gleichgewicht und die Lagerkräfte
+nach, und ändern sich Scheibe, Lager, Lasten oder Verfahren, sagt sie,
+dass neu zu suchen ist. Beispiel «Wandscheibe mit Türe» bei h = 1 m:
+22 Stäbe, V = 7109.6 kNm; mit SIMP bei h = 0.2 m 20 Stäbe, V = 8705.8 kNm.
 
 **Grundbruch:** ein Flachfundament auf seinem Baugrund, nach dem Kapitel 9.2
 «Tragfähigkeit», das der Benutzer geliefert hat. Oben das Panel «Grundbruch

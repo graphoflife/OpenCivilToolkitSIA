@@ -10,7 +10,7 @@ import unittest
 from opencivil.core.protokoll import HinweisArt, HinweisBlock, TabellenBlock, TextBlock
 from opencivil.fachwerkmodell.grundstruktur import liegt_achsparallel
 from opencivil.fachwerkmodell.optimierung import Gleichgewicht, optimieren
-from opencivil.fachwerkmodell.suche import ZUG_ACHSPARALLEL, _grundstruktur, _optimum, abdruck
+from opencivil.fachwerkmodell.suche import ZUG_ACHSPARALLEL, _grundstruktur, abdruck, optimum
 from opencivil.fachwerkmodell.werk import IM_FENSTER, VERALTET
 from opencivil.projekt import Projekt, beispiele
 from opencivil.projekt.aufbau.fachwerkmodell import einstellung_von, modell_von
@@ -95,7 +95,7 @@ class TestKonsole(unittest.TestCase):
         e = einstellung_von(f)
         gs = _grundstruktur(modell, e.weite)
         skala = max(map(abs, gs.last))
-        alle = _optimum(gs, range(len(gs.staebe)), e, skala)
+        alle = optimum(gs, range(len(gs.staebe)), e, skala)
         fw = gesucht(mit_schalter(konsole(0.5)))["fachwerk"]
         self.assertAlmostEqual(fw["V"], alle.ziel * skala / 1e3, places=3)
 

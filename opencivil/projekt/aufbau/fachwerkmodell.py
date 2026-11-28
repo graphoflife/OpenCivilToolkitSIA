@@ -14,9 +14,11 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, List, Optional, Sequence, Tuple
 
 from opencivil.decke.geometrie import Punkt
+from opencivil.fachwerkmodell.form import Formeinstellung
 from opencivil.fachwerkmodell.modell import Lager, Last, Modell, Umriss
-from opencivil.fachwerkmodell.suche import VORGABEN, Einstellung
-from opencivil.fachwerkmodell.werk import Fachwerksystem
+from opencivil.fachwerkmodell.suche import Einstellung
+from opencivil.fachwerkmodell.verfahren import VORGABEN, Verfahren
+from opencivil.fachwerkmodell.werk import Fachwerksystem, Verfahrenseinstellung
 from opencivil.projekt.fachwerkmodell import FachwerkmodellEintrag
 from opencivil.projekt.lesen import als_groesse
 from opencivil.stabwerk.system import Meldung
@@ -61,8 +63,14 @@ def modell_von(eintrag: FachwerkmodellEintrag) -> Tuple[Modell, List[Meldung]]:
     return modell, meldungen
 
 
-def einstellung_von(eintrag: FachwerkmodellEintrag) -> Einstellung:
-    """Das Verfahren in SI: die Rasterweite in m, N_min als Teil der grössten Kraft, dazu sein Schalter."""
+def einstellung_von(eintrag: FachwerkmodellEintrag) -> Verfahrenseinstellung:
+    """
+    Das Verfahren in SI: die Raster- oder Netzweite in m, Anteile als Teil
+    des Ganzen -- N_min von der grössten Kraft, das Material von der Fläche.
+    """
+    if eintrag.verfahren is Verfahren.SIMP:
+        return Formeinstellung(weite=eintrag.si("netzweite"), volumen=eintrag.si("volumen"),
+                               w_Z=eintrag.w_Z, N_min=eintrag.si("N_min"))
     return Einstellung(weite=eintrag.si("rasterweite"), w_Z=eintrag.w_Z, N_min=eintrag.si("N_min"),
                        zug_achsparallel=eintrag.zug_achsparallel)
 

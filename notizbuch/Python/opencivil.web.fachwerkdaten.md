@@ -1,5 +1,5 @@
 ---
-erzeugt: 8a17ee3ad0eb
+erzeugt: 6a58e9688178
 art: modul
 tags: [modul]
 ---
@@ -12,9 +12,10 @@ tags: [modul]
 Aus dem Befund eines Fachwerkmodells die Daten seiner Zeichnung: seine
 Meldungen, ob es bereit ist, ein Fachwerk zu suchen – keine Meldung des
 Modells haelt es auf –, und das gefundene Fachwerk, nachgerechnet
-([[opencivil.web.fachwerkdaten#uebersicht|uebersicht]]). Dazu eine Runde der Suche ([[opencivil.web.fachwerkdaten#suchen|suchen]]) und der
-Teil des Katalogs, den nur das Fachwerkmodell braucht ([[opencivil.web.fachwerkdaten#katalog|katalog]]).
-Scheiben, Lager und Lasten zeichnet die Oberflaeche nach dem Projekt.
+([[opencivil.web.fachwerkdaten#uebersicht|uebersicht]]). Dazu eine Runde der Suche ([[opencivil.web.fachwerkdaten#suchen|suchen]]), beim
+Verfahren SIMP Schritte, und der Teil des Katalogs, den nur das
+Fachwerkmodell braucht ([[opencivil.web.fachwerkdaten#katalog|katalog]]). Scheiben, Lager und Lasten
+zeichnet die Oberflaeche nach dem Projekt.
 
 
 ## EIN FACHWERK, ZWEI WEGE
@@ -22,7 +23,8 @@ Scheiben, Lager und Lasten zeichnet die Oberflaeche nach dem Projekt.
 Was eine Runde gibt und was die Rechnung nachgerechnet hat, hat dieselbe
 Form ([[opencivil.web.fachwerkdaten#_fachwerk|_fachwerk]]): Knoten `{x, y}` in m, Staebe ``{von, bis, N,
 l}`` mit N in kN, Zug positiv, und l in m – so zeichnet die Seite beide
-mit einem Bild, waehrend gesucht wird und danach.
+mit einem Bild, waehrend gesucht wird und danach. Ebenso die Form des
+Verfahrens SIMP ([[opencivil.web.fachwerkdaten#_formbild|_formbild]]).
 
 ## Inhalt
 
@@ -42,11 +44,12 @@ def uebersicht(befund: Optional[Fachwerkbefund]) -> Dict[str, Any]
 
 `bereit`; `meldungen` des Modells und `zum_fachwerk`, was zum
 Fachwerk zu sagen ist, je `{text, elemente, fehler, unfertig}`;
-`abdruck` von Modell und Verfahren und `stand` – `keines`,
-`veraltet`, `unlesbar`, `gefunden` oder leer
-([[opencivil.fachwerkmodell.werk#Fachwerkbefund|Fachwerkbefund]]); und `fachwerk`: nachgerechnet, mit `V`
-in kNm, den Kraeften der Lager, den Runden und wie viele Staebe es gab
-– oder `None`. Ohne Befund leer.
+`abdruck` von Modell und Verfahren, das `verfahren` und `stand` –
+`keines`, `veraltet`, `unlesbar`, `gefunden` oder leer
+([[opencivil.fachwerkmodell.werk#Fachwerkbefund|Fachwerkbefund]]); `fachwerk`: nachgerechnet, mit `V` in
+kNm, den Kraeften der Lager, den Runden und wie viele Staebe es gab –
+oder `None`; und `form`, aus der es beim Verfahren SIMP kommt
+([[opencivil.web.fachwerkdaten#_formbild|_formbild]]), sonst `None`. Ohne Befund leer.
 
 Am Abdruck erkennt die Seite, ob das Fachwerk, das eine Suche eben gab,
 zum Modell der letzten Rechnung gehoert – und zeigt es, bis die
@@ -63,12 +66,16 @@ Siehe Dateikopf – dazu `V` in kNm und je Lager `{lager, R_x, R_y}` in kN.
 ### suchen
 
 ```python
-def suchen(eintrag: FachwerkmodellEintrag, zustand: Optional[Mapping[str, Any]]) -> Dict[str, Any]
+def suchen(eintrag: FachwerkmodellEintrag, zustand: Optional[Mapping[str, Any]], abschliessen: bool=False) -> Dict[str, Any]
 ```
 
-Eine Runde der Suche ([[opencivil.fachwerkmodell.suche#runde|runde]]):
-der `zustand` der letzten hinein – `None` fuer die erste –, heraus
+Eine Runde der Suche ([[opencivil.fachwerkmodell.suche#runde|runde]]),
+beim Verfahren SIMP die Schritte einer Anfrage
+([[opencivil.fachwerkmodell.form#schritte|schritte]]): der `zustand` der
+letzten hinein – `None` fuer die erste; gehoert er zum anderen
+Verfahren, beginnt die Suche von vorn –, heraus
 
+- `verfahren`: welches suchte;
 - `fertig`: ob die Suche zu Ende ist – auch, wenn sie nicht beginnen kann;
 - `abdruck`: von Modell und Verfahren, wie in [[opencivil.web.fachwerkdaten#uebersicht|uebersicht]] –
   leer, wenn das Modell nicht bereit ist;
@@ -76,8 +83,41 @@ der `zustand` der letzten hinein – `None` fuer die erste –, heraus
 - `gefunden`: was die Seite im Eintrag ablegt, wenn sie aufhoert
   ([[opencivil.projekt.fachwerkmodell#GefundenesFachwerk|GefundenesFachwerk]]);
 - `fachwerk`: dasselbe zum Zeichnen, nachgerechnet ([[opencivil.web.fachwerkdaten#_fachwerk|_fachwerk]]);
-- `stand`: Runde, Staebe im Modell, moegliche, wie viele dazukommen;
+- `form`: beim Verfahren SIMP die Form ([[opencivil.web.fachwerkdaten#_formbild|_formbild]]), sonst `None`;
+- `stand`: Runde, Staebe im Modell, moegliche, wie viele dazukommen –
+  bei SIMP Schritt, wie stark sich die Dichten zuletzt aenderten, ab
+  wann es genug ist und wie viele Elemente es sind;
 - `meldungen`: was dem Suchen im Weg steht oder offen bleibt.
+
+SIMP gibt das Fachwerk erst, wenn die Form fertig ist – oder mit
+`abschliessen`: dann ohne weiteren Schritt aus der Form, wie sie ist.
+
+### _gesucht
+
+```python
+def _gesucht(modell: Modell, einstellung: Einstellung, zustand: Optional[Suchzustand]) -> Dict[str, Any]
+```
+
+Eine Runde der Ground Structure – siehe [[opencivil.web.fachwerkdaten#suchen|suchen]].
+
+### _formen
+
+```python
+def _formen(modell: Modell, einstellung: Formeinstellung, zustand: Optional[Formzustand], abschliessen: bool) -> Dict[str, Any]
+```
+
+Die Schritte einer Anfrage im Verfahren SIMP, mit dem Fachwerk, wenn es eines gibt – siehe [[opencivil.web.fachwerkdaten#suchen|suchen]].
+
+### _formbild
+
+```python
+def _formbild(modell: Modell, weite: float, werte: str) -> Optional[Dict[str, Any]]
+```
+
+Die Form zum Zeichnen: die Ecke unten links `x0`, `y0` und die
+Netzweite `h` in m, `spalten` und `zeilen` und je Feld sein
+Zeichen ([[opencivil.fachwerkmodell.form#formtext|formtext]]) – `None`,
+wenn die Zeichen nicht zum Raster passen.
 
 ### _ohne
 
@@ -87,6 +127,15 @@ def _ohne(meldungen, abdruck_: str='') -> Dict[str, Any]
 
 Die Antwort, wenn die Suche nicht beginnen kann: nur, warum.
 
+### _vom_verfahren
+
+```python
+def _vom_verfahren(roh: Any, verfahren: Verfahren) -> Optional[Mapping[str, Any]]
+```
+
+Der Zustand, wenn er zu `verfahren` gehoert – `None`, wenn er zum
+anderen gehoert: dann beginnt die Suche von vorn.
+
 ### _zustand
 
 ```python
@@ -95,6 +144,14 @@ def _zustand(roh: Optional[Mapping[str, Any]]) -> Optional[Suchzustand]
 
 Der Zustand, wie die Seite ihn zurueckschickt – streng gelesen: sie hat ihn so bekommen.
 
+### _formzustand
+
+```python
+def _formzustand(roh: Optional[Mapping[str, Any]]) -> Optional[Formzustand]
+```
+
+Der Zustand der Form, wie die Seite ihn zurueckschickt – ebenso streng gelesen.
+
 ### katalog
 
 ```python
@@ -102,18 +159,22 @@ def katalog() -> Dict[str, Any]
 ```
 
 Womit die Kennungen der Teile beginnen, je Liste, wie ein Lager halten
-kann und wie der Schalter des Verfahrens heisst.
+kann, welche Verfahren es gibt und wie der Schalter der Ground
+Structure heisst.
 
 
 ## Braucht
 
 - [[opencivil.core.einheiten]]
 - [[opencivil.core.rechenwerk]]
+- [[opencivil.fachwerkmodell.form]]
 - [[opencivil.fachwerkmodell.grundstruktur]]
 - [[opencivil.fachwerkmodell.modell]]
 - [[opencivil.fachwerkmodell.nachrechnung]]
 - [[opencivil.fachwerkmodell.pruefen]]
+- [[opencivil.fachwerkmodell.simp]]
 - [[opencivil.fachwerkmodell.suche]]
+- [[opencivil.fachwerkmodell.verfahren]]
 - [[opencivil.fachwerkmodell.werk]]
 - [[opencivil.projekt]]
 - [[opencivil.projekt.aufbau.fachwerkmodell]]

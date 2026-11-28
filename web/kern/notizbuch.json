@@ -4716,6 +4716,15 @@
       ]
     },
     {
+      "name": "Steifste Form",
+      "pfad": "Formelsammlung/Formeln/Steifste Form.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Fachwerkmodell"
+      ]
+    },
+    {
       "name": "Teilung einer Stablinie – gleiche Felder, auf die Länge gerundet",
       "pfad": "Formelsammlung/Formeln/Teilung einer Stablinie – gleiche Felder, auf die Länge gerundet.md",
       "art": "formel",
@@ -7240,6 +7249,22 @@
       "stichworte": []
     },
     {
+      "name": "opencivil.fachwerkmodell.form",
+      "pfad": "Python/opencivil.fachwerkmodell.form.md",
+      "art": "modul",
+      "kurz": "das Verfahren SIMP: die steifste Form, und aus ihr ein Fachwerk.",
+      "stichworte": [
+        "Formeinstellung",
+        "Formzustand",
+        "Formrunde",
+        "schritte",
+        "ganz_formen",
+        "_fachwerk",
+        "formtext",
+        "_netz"
+      ]
+    },
+    {
       "name": "opencivil.fachwerkmodell.grundstruktur",
       "pfad": "Python/opencivil.fachwerkmodell.grundstruktur.md",
       "art": "modul",
@@ -7247,17 +7272,19 @@
       "stichworte": [
         "ZuVieleKnoten",
         "Grundstruktur",
+        "Grundstruktur.kosten",
         "Grundstruktur.spalten",
         "Grundstruktur.achsparallel",
         "Grundstruktur.knoten_bei",
         "grundstruktur",
+        "aus_staeben",
         "liegt_achsparallel",
         "_knoten",
         "_zu_viele",
         "_staebe",
         "_auf_innen",
         "_rasterknoten_auf",
-        "_im_material"
+        "im_material"
       ]
     },
     {
@@ -7267,6 +7294,10 @@
       "kurz": "wie ein Fachwerkmodell seine Rechnung aufschreibt.",
       "stichworte": [
         "schreiben",
+        "_gesucht",
+        "_aus_der_form",
+        "_danach",
+        "_ziel",
         "_fachwerk"
       ]
     },
@@ -7333,6 +7364,51 @@
       ]
     },
     {
+      "name": "opencivil.fachwerkmodell.simp",
+      "pfad": "Python/opencivil.fachwerkmodell.simp.md",
+      "art": "modul",
+      "kurz": "das Material einer Scheibe zur steifsten Form verteilt.",
+      "stichworte": [
+        "NetzFehler",
+        "Netz",
+        "Netz.mitte",
+        "Schritt",
+        "elementsteifigkeit",
+        "netz",
+        "raster",
+        "_naechster",
+        "_zu_viele",
+        "_filter",
+        "gefiltert",
+        "schritt"
+      ]
+    },
+    {
+      "name": "opencivil.fachwerkmodell.skelett",
+      "pfad": "Python/opencivil.fachwerkmodell.skelett.md",
+      "art": "modul",
+      "kurz": "aus der Form des SIMP die möglichen Stäbe eines Fachwerks.",
+      "stichworte": [
+        "moegliche_staebe",
+        "_element_bei",
+        "ausgeduennt",
+        "mittellinien",
+        "_einfach",
+        "_kreuzungen",
+        "_knoten",
+        "_zusammenhang",
+        "_staebe_der_linien",
+        "_knicke",
+        "_abstand",
+        "_der_reihe_nach",
+        "_ausgerichtet",
+        "_zusammengefasst",
+        "_erweitert",
+        "_daneben",
+        "_auf"
+      ]
+    },
+    {
       "name": "opencivil.fachwerkmodell.suche",
       "pfad": "Python/opencivil.fachwerkmodell.suche.md",
       "art": "modul",
@@ -7346,7 +7422,7 @@
         "abdruck",
         "runde",
         "ganz_suchen",
-        "_optimum",
+        "optimum",
         "_traegt_zug",
         "_strafe",
         "_verletzt",
@@ -7356,6 +7432,18 @@
         "_in_flucht",
         "_gefasst",
         "_grundstruktur"
+      ]
+    },
+    {
+      "name": "opencivil.fachwerkmodell.verfahren",
+      "pfad": "Python/opencivil.fachwerkmodell.verfahren.md",
+      "art": "modul",
+      "kurz": "wie ein Fachwerk gesucht wird.",
+      "stichworte": [
+        "Verfahren",
+        "Verfahren.beschriftung",
+        "Verfahren.erklaerung",
+        "_felder"
       ]
     },
     {
@@ -9555,6 +9643,7 @@
         "_decken",
         "_fachwerkmodell",
         "_fachwerk_der_wandscheibe",
+        "_wandscheibe",
         "_durchstanzstellen",
         "_grundbrueche",
         "_setzungen",
@@ -12239,8 +12328,13 @@
         "uebersicht",
         "_fachwerk",
         "suchen",
+        "_gesucht",
+        "_formen",
+        "_formbild",
         "_ohne",
+        "_vom_verfahren",
         "_zustand",
+        "_formzustand",
         "katalog"
       ]
     },

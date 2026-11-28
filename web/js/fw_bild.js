@@ -22,6 +22,10 @@
  * Fachwerkmodellen üblich, jeder Stab so dick, wie seine Kraft gross ist --
  * bezogen auf die grösste. Beim Darüberfahren Kraft und Länge.
  *
+ * DIE FORM des Verfahrens SIMP, ebenso nur auf der Karte, auf der Scheibe
+ * unter dem Fachwerk: je Element ein graues Quadrat, so dunkel, wie es
+ * voll ist -- unter einem Fachwerk heller.
+ *
  * Gerechnet wird hier nichts: nur Lagen fürs Auge -- wie lang ein Pfeil im
  * Bild ist, wo ein Name steht, wie dick ein Stab.
  */
@@ -115,26 +119,64 @@ function fachwerkLinien(v, fachwerk) {
   return g;
 }
 
-/** Was die Linien des Fachwerks heissen -- unter dem Bild. */
-export function fachwerkLegende() {
+/**
+ * Die Form des Verfahrens SIMP (fachwerkdaten.py, `_formbild`): je Zeile die
+ * Stücke gleicher Dichte als ein Rechteck, so dunkel, wie sie voll sind --
+ * leere und Felder ohne Element bleiben frei.
+ */
+function formFelder(v, form, mitFachwerk) {
+  const g = svgEl('g', { class: mitFachwerk ? 'fw-form mit-fachwerk' : 'fw-form' });
+  const { x0, y0, h, spalten, zeilen, werte } = form;
+  for (let j = 0; j < zeilen; j += 1) {
+    for (let i = 0; i < spalten;) {
+      const zeichen = werte[j * spalten + i];
+      let k = i + 1;
+      while (k < spalten && werte[j * spalten + k] === zeichen) k += 1;
+      const stufe = zeichen === '-' ? 0 : parseInt(zeichen, 16);
+      if (stufe > 0) {
+        const [xa, ya] = nachBild(v, [x0 + i * h, y0 + (j + 1) * h]);
+        const [xb, yb] = nachBild(v, [x0 + k * h, y0 + j * h]);
+        g.append(svgEl('rect', {
+          x: xa.toFixed(1), y: ya.toFixed(1), width: (xb - xa).toFixed(1), height: (yb - ya).toFixed(1),
+          'fill-opacity': (stufe / 15).toFixed(2),
+        }));
+      }
+      i = k;
+    }
+  }
+  return g;
+}
+
+/** Was die Linien des Fachwerks heissen und, gibt es eine, was die Form -- unter dem Bild. */
+export function fachwerkLegende(fachwerk, form) {
   const probe = (klasse, text) => {
     const svg = svgEl('svg', { viewBox: '0 0 26 8', width: 26, height: 8, 'aria-hidden': 'true' });
     svg.append(svgEl('line', { x1: 1, y1: 4, x2: 25, y2: 4, class: klasse, 'stroke-width': 2.4 }));
     return el('span.dk-legende-eintrag', {}, [svg, text]);
   };
+  const formProbe = () => {
+    const svg = svgEl('svg', { viewBox: '0 0 26 8', width: 26, height: 8, 'aria-hidden': 'true' });
+    const g = svgEl('g', { class: 'fw-form' });
+    g.append(svgEl('rect', { x: 1, y: 0, width: 24, height: 8 }));
+    svg.append(g);
+    return el('span.dk-legende-eintrag', {}, [svg, 'die Form: je dunkler, desto voller']);
+  };
   return el('div.dk-legende', {}, [
-    probe('fw-stab ist-zug', 'Zug'), probe('fw-stab ist-druck', 'Druck'),
-    el('span.dk-legende-eintrag', { text: 'je dicker, desto grösser die Kraft' }),
-  ]);
+    ...(fachwerk ? [probe('fw-stab ist-zug', 'Zug'), probe('fw-stab ist-druck', 'Druck'),
+      el('span.dk-legende-eintrag', { text: 'je dicker, desto grösser die Kraft' })] : []),
+    form ? formProbe() : null,
+  ].filter(Boolean));
 }
 
 /**
- * Das ganze Modell: die Flächen der Scheiben, die Löcher, die Umrisse, das
- * Fachwerk, wenn eines da ist, die Lager, die Lasten und die Namen.
- * `fehler(kennung)` und `texte(kennung)` sagen, was der Kern an einem Teil
- * meldet -- rot, und als Titel beim Darüberfahren.
+ * Das ganze Modell: die Flächen der Scheiben, die Form, wenn eine da ist,
+ * die Löcher, die Umrisse, das Fachwerk, wenn eines da ist, die Lager, die
+ * Lasten und die Namen. `fehler(kennung)` und `texte(kennung)` sagen, was
+ * der Kern an einem Teil meldet -- rot, und als Titel beim Darüberfahren.
  */
-export function scheibe(v, modell, { fehler = () => false, texte = () => [], fachwerk = null } = {}) {
+export function scheibe(v, modell, {
+  fehler = () => false, texte = () => [], fachwerk = null, form = null,
+} = {}) {
   const g = svgEl('g', { class: 'fw-modell' });
   const lagen = new Map((modell.knoten || []).map((k) => [k.kennung, [k.x, k.y]]));
   const orte = (knoten) => {
@@ -182,7 +224,9 @@ export function scheibe(v, modell, { fehler = () => false, texte = () => [], fac
     namen.append(text(lage, `${f.kennung} · ${zahlText(betrag(f), 1)} kN`,
       `dk-name ist-klein ist-last${waagrecht && u[0] > 0 ? ' ist-links' : ''}`));
   }
-  g.append(flaechen, umrisse);
+  g.append(flaechen);
+  if (form) g.append(formFelder(v, form, Boolean(fachwerk)));
+  g.append(umrisse);
   if (fachwerk) g.append(fachwerkLinien(v, fachwerk));
   g.append(lager, lasten, namen);
   return g;
@@ -191,8 +235,11 @@ export function scheibe(v, modell, { fehler = () => false, texte = () => [], fac
 /** So breit ist ein Bild auf seiner Karte, und so hoch höchstens und mindestens -- px. */
 const BILD = { breite: 720, hoehe: [240, 520], rand: 48 };
 
-/** Das Modell als Bild, fest im Massstab -- mit Rand für Lager und Pfeile, darin das `fachwerk`, wenn eines da ist. */
-export function scheibeBild(modell, fachwerk = null) {
+/**
+ * Das Modell als Bild, fest im Massstab -- mit Rand für Lager und Pfeile,
+ * darin das `fachwerk` und die `form`, wenn sie da sind.
+ */
+export function scheibeBild(modell, fachwerk = null, form = null) {
   const umriss = umrissVon((modell.knoten || []).map((k) => [k.x, k.y]), [[0, 0], [6, 3]]);
   const [[x0, y0], [x1, y1]] = umriss;
   const breit = Math.max(x1 - x0, 1);
@@ -203,6 +250,6 @@ export function scheibeBild(modell, fachwerk = null) {
   Object.assign(v, { breite: BILD.breite, hoehe });
   einpassen(v, umriss, { rand: BILD.rand });
   const svg = svgEl('svg', { viewBox: `0 0 ${BILD.breite} ${hoehe.toFixed(0)}`, class: 'gb-bild fw-bild' });
-  svg.append(scheibe(v, modell, { fachwerk }));
+  svg.append(scheibe(v, modell, { fachwerk, form }));
   return svg;
 }

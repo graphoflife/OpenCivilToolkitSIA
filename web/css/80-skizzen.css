@@ -283,6 +283,12 @@
 .fw-stab.ist-druck { stroke: var(--feld-minus); stroke-dasharray: 7 4; stroke-linecap: butt; }
 .fw-knoten { fill: var(--schrift); stroke: none; }
 
+/* Die Form des Verfahrens SIMP: grau, so dunkel, wie das Material voll ist --
+   unter dem Fachwerk heller, damit es vorne steht. */
+.fw-form { fill: var(--schrift); opacity: .55; }
+.fw-form.mit-fachwerk { opacity: .22; }
+.fw-form rect { shape-rendering: crispEdges; }
+
 /* Die Suche im Fenster «Verfahren»: der Knopf und «Anhalten» nebeneinander,
    darunter, wie weit sie ist -- dieselbe Zeile auch über dem Bild rechts. */
 .fw-suche { margin-top: 10px; }

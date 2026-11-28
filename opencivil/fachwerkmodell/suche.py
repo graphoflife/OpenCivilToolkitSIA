@@ -46,9 +46,9 @@ Last und Lager liegt.
 
 DER ABDRUCK:
 Woran ein gefundenes Fachwerk sein Modell erkennt (:func:`abdruck`): die
-ganze Scheibe mit Lagern und Lasten, die drei Zahlen des Verfahrens und
-sein Schalter.
-Ändert sich eines, gehört das Fachwerk zu einem früheren Stand.
+ganze Scheibe mit Lagern und Lasten, das Verfahren mit seinen Zahlen und
+seinem Schalter. Ändert sich eines, gehört das Fachwerk zu einem früheren
+Stand -- auch, wer von Ground Structure zu SIMP wechselt.
 """
 
 from __future__ import annotations
@@ -57,31 +57,17 @@ import hashlib
 import math
 from collections import OrderedDict
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Sequence, Tuple
+from typing import ClassVar, Dict, List, Optional, Sequence, Tuple
 
-from opencivil.core.einheiten import EINHEITSLOS, M, PROZENT
-from opencivil.core.vorgaben import Feld, Gruppe
 from opencivil.decke import geometrie as geo
 from opencivil.decke.geometrie import Punkt
-from opencivil.fachwerkmodell.grundstruktur import HOECHSTENS_KNOTEN, Grundstruktur, grundstruktur
+from opencivil.fachwerkmodell.grundstruktur import Grundstruktur, grundstruktur
 from opencivil.fachwerkmodell.modell import Modell
 from opencivil.fachwerkmodell.optimierung import Gleichgewicht, Optimum, optimieren
+from opencivil.fachwerkmodell.verfahren import Verfahren
 
 #: Wo die Suche nachzulesen ist.
 QUELLE = "He, Gilbert & Song (2019), Abschnitt 3, Gl. (7)"
-
-#: Die Zahlen des Verfahrens, in der Maske eine Kachel, in der Herleitung ein Kasten.
-VORGABEN = (Gruppe("Verfahren", lambda: (
-    Feld("rasterweite", "h", M, "Abstand der Knoten im Raster", 2, beschriftung="Rasterweite",
-         schritt=0.05, hinweis=f"feiner sucht genauer und länger – mehr als {HOECHSTENS_KNOTEN} "
-                               f"Knoten sucht das Werkzeug nicht"),
-    Feld("w_Z", "w_Z", EINHEITSLOS, "Gewicht des Zugs gegenüber dem Druck", 2,
-         beschriftung="Zug : Druck", schritt=0.1,
-         hinweis="1: beide zählen gleich – grösser: das Fachwerk meidet Zug, kleiner: Druck"),
-    Feld("N_min", "N_{min}", PROZENT, "Kleinste Stabkraft, bezogen auf die grösste", 1,
-         beschriftung="Kleinste Stabkraft", schritt=0.5,
-         hinweis="dünnere Stäbe fallen weg, dann sucht die Optimierung das Gleichgewicht neu"),
-)),)
 
 #: Wie lang die Stäbe der ersten Runde höchstens sind, in Rasterweiten -- nach Vorgabe.
 KURZ = 1.5
@@ -114,7 +100,9 @@ NEU_HOECHSTENS = 30
 
 @dataclass(frozen=True)
 class Einstellung:
-    """Das Verfahren: seine drei Zahlen in SI und sein Schalter."""
+    """Das Verfahren Ground Structure: seine drei Zahlen in SI und sein Schalter."""
+
+    verfahren: ClassVar[Verfahren] = Verfahren.GROUND_STRUCTURE
 
     weite: float
     """Die Rasterweite h in m."""
@@ -167,6 +155,10 @@ class Suchergebnis:
     im_modell: int
     """Wie viele Stäbe in dieser Runde im Modell waren."""
 
+    form: str = ""
+    """Mit SIMP das Bild der Form, aus der das Fachwerk kommt
+    (:func:`~opencivil.fachwerkmodell.form.formtext`)."""
+
 
 @dataclass(frozen=True)
 class Runde:
@@ -204,7 +196,7 @@ def runde(modell: Modell, einstellung: Einstellung, zustand: Optional[Suchzustan
     else:
         aktiv, nummer = zustand.aktiv, zustand.runde + 1
     skala = max(map(abs, gs.last))
-    opt = _optimum(gs, aktiv, einstellung, skala)
+    opt = optimum(gs, aktiv, einstellung, skala)
     verletzt = _verletzt(gs, aktiv, opt.u, einstellung)
     rest = n - len(aktiv)
     m_v = len(verletzt)
@@ -231,14 +223,17 @@ def ganz_suchen(modell: Modell, einstellung: Einstellung) -> Suchergebnis:
         zustand = r.zustand
 
 
-def _optimum(gs: Grundstruktur, aktiv: Sequence[int], einstellung: Einstellung,
-             skala: float) -> Optimum:
-    """Die Optimierung über die Stäbe ``aktiv``, die Lasten bezogen auf die grösste."""
+def optimum(gs: Grundstruktur, aktiv: Sequence[int], einstellung: Einstellung,
+            skala: float) -> Optimum:
+    """
+    Die Optimierung über die Stäbe ``aktiv``, die Lasten bezogen auf die
+    grösste, ``skala`` -- mit SIMP über die Stäbe aus der Form.
+    """
     gl = Gleichgewicht(len(gs.zeilen), [gs.spalten[i] for i in aktiv])
     return optimieren(gl, [w / skala for w in gs.last],
-                      [einstellung.w_Z * gs.laengen[i] if _traegt_zug(gs, i, einstellung) else None
+                      [einstellung.w_Z * gs.kosten[i] if _traegt_zug(gs, i, einstellung) else None
                        for i in aktiv],
-                      [W_DRUCK * gs.laengen[i] for i in aktiv], _strafe(gs, einstellung))
+                      [W_DRUCK * gs.kosten[i] for i in aktiv], _strafe(gs, einstellung))
 
 
 def _traegt_zug(gs: Grundstruktur, i: int, einstellung: Einstellung) -> bool:
@@ -265,7 +260,7 @@ def _verletzt(gs: Grundstruktur, aktiv: Sequence[int], u: Sequence[float],
     for i, spalte in enumerate(gs.spalten):
         if i in drin:
             continue
-        dehnung = sum(w * u[k] for k, w in spalte) / gs.laengen[i]
+        dehnung = sum(w * u[k] for k, w in spalte) / gs.kosten[i]
         zug = dehnung / einstellung.w_Z if _traegt_zug(gs, i, einstellung) else -math.inf
         v = max(zug, -dehnung / W_DRUCK)
         if v > 1.0 + VERLETZT_AB:
@@ -311,7 +306,7 @@ def _ohne_duenne(gs: Grundstruktur, kraefte: Dict[int, float], einstellung: Eins
         bleiben = [i for i, q in kraefte.items() if abs(q) >= schwelle * gross]
         if gross == 0.0 or len(bleiben) == len(kraefte):
             break
-        neu = _optimum(gs, bleiben, einstellung, skala)
+        neu = optimum(gs, bleiben, einstellung, skala)
         if max(map(abs, neu.rest)) <= OFFEN_HOECHSTENS:
             kraefte, schwelle = dict(zip(bleiben, neu.q)), einstellung.N_min
         else:
