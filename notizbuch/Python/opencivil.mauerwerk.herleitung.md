@@ -1,5 +1,5 @@
 ---
-erzeugt: 8c3d0e613362
+erzeugt: f895f27fe3bf
 art: modul
 tags: [modul]
 ---
@@ -14,7 +14,9 @@ gehalten ist, die Bemessungswerte, mit denen sie rechnet, ihre Öffnungen
 mit den Stürzen darüber, die Pfeiler dazwischen und was die Lastfälle und
 Kombinationen ihnen geben ([[opencivil.mauerwerk.lasten|lasten]]) – schiebt
 eine Last waagrecht, auch in der Ebene der Wand
-([[opencivil.mauerwerk.scheibe|scheibe]]). Zuletzt die Meldungen: rot, was
+([[opencivil.mauerwerk.scheibe|scheibe]]), und mit Querlasten, was quer zu ihr
+wirkt, die Ersatzkraft des Erdbebens hergeleitet
+([[opencivil.mauerwerk.querlast|querlast]]). Zuletzt die Meldungen: rot, was
 falsch ist, sonst als Hinweis.
 
 
@@ -127,6 +129,7 @@ Je Zeile ihr Name und je Fall die Zahl, die `lesen` aus seinem Abtrag liest, in 
 - `ABTRAG_ANNAHME = 'Den Lastabtrag in der Wand regelt die Norm nicht; so verteilt das We…` – Woher die Regeln des Lastabtrags kommen.
 - `SCHEIBE = 'Die waagrechten Lasten nimmt die Wand als Scheibe auf. Über den Öffn…` – Wie die waagrechten Lasten zu den Pfeilern kommen, in eigenen Worten ([[opencivil.mauerwerk.scheibe|.scheibe]]).
 - `SCHEIBE_ANNAHME = 'Wie die Wand als Scheibe trägt, regelt die Norm nicht; so verteilt d…` – Woher die Regeln der Scheibe kommen.
+- `QUER = 'Eine Querlast wirkt gleichmässig über die ganze Wand, je m² Ansicht.…` – Wie die Querlasten wirken, in eigenen Worten.
 - `ZEILEN = (('f_xd', 'f_{xd}', 2), ('f_yd', 'f_{yd}', 2), ('E_xd', 'E_{xd}', 0),…` – Je Wert der Tabelle: Kurzname, Zeichen, Stellen.
 
 ## Braucht
@@ -139,6 +142,7 @@ Je Zeile ihr Name und je Fall die Zahl, die `lesen` aus seinem Abtrag liest, in 
 - [[opencivil.mauerwerk.kennwerte]]
 - [[opencivil.mauerwerk.lasten]]
 - [[opencivil.mauerwerk.modell]]
+- [[opencivil.mauerwerk.querlast]]
 - [[opencivil.mauerwerk.scheibe]]
 - [[opencivil.mauerwerk.werk]]
 

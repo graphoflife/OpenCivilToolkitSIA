@@ -146,10 +146,14 @@ class Wandnachweis(Teilnachweis):
         return v
 
     @staticmethod
-    def satz(v: Vergleich, namen: Sequence[str]) -> str:
-        """«N_xRd = 812.3 kN ≥ N_xd = 600.0 kN.» -- ``namen`` die von Einwirkung und Widerstand."""
-        return (f"{namen[1]} = {v.widerstand.formatiert()} kN {'≥' if v.erfuellt else '<'} "
-                f"{namen[0]} = {v.einwirkung.formatiert()} kN.")
+    def satz(v: Vergleich, namen: Sequence[str], einheit: str = "kN") -> str:
+        """
+        «N_xRd = 812.3 kN ≥ N_xd = 600.0 kN.» -- ``namen`` die von Einwirkung
+        und Widerstand, ``einheit`` hinter beiden, leer ohne.
+        """
+        e = f" {einheit}" if einheit else ""
+        return (f"{namen[1]} = {v.widerstand.formatiert()}{e} {'≥' if v.erfuellt else '<'} "
+                f"{namen[0]} = {v.einwirkung.formatiert()}{e}.")
 
 
 def ohne_einwirkung(p: Protokoll, s: Stelle) -> Stellenausgang:

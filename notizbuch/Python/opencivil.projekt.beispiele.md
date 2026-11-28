@@ -1,5 +1,5 @@
 ---
-erzeugt: 554af80790f5
+erzeugt: 12a06df2bea3
 art: modul
 tags: [modul]
 ---
@@ -106,9 +106,13 @@ vollfugig vermauert, am Fuss eingespannt und rechts gehalten: eine Türe
 mit Betonsturz und zwei Fenster, eines mit vorfabriziertem Sturz. Oben
 liegt die Decke 20 mm ausmittig auf, und über dem vorfabrizierten Sturz
 ein Träger; im Lastfall Wind schiebt die Decke die Wand mit 20 kN nach
-rechts, in «GZT Wind» 1.5-fach. Die zweite, ein Pfeiler ohne Öffnung,
+rechts und drückt der Wind mit 1 kN/m² quer zu ihr, in «GZT Wind»
+1.5-fach. Im Lastfall Erdbeben wirkt quer die Ersatzkraft nach Gl. (49),
+im Erdgeschoss eines 6 m hohen Gebäudes, das mit q = 2.0 rechnet – in
+«GZT Erdbeben» mit 0.3-mal der Nutzlast. Die zweite, ein Pfeiler ohne Öffnung,
 1.5 × 2.6 m und 150 mm dick, ist am Kopf eingespannt und steht am Fuss
-gelenkig 15 mm neben der Mitte.
+gelenkig 15 mm neben der Mitte. Die dritte, 2.4 × 2.7 m zwischen zwei
+Querwänden, trägt den Wind auch über ein waagrechtes Gewölbe.
 
 ### _fachwerk_der_wandscheibe
 

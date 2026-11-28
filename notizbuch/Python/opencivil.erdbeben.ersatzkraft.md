@@ -1,5 +1,5 @@
 ---
-erzeugt: fc1c6fc66a58
+erzeugt: b3a257b4a884
 art: modul
 tags: [modul]
 ---
@@ -604,8 +604,11 @@ Je Richtung T_1, S_d, F_d und das Kippmoment – mit q und mit q = 1.0.
 ## Gebraucht von
 
 - [[opencivil.bericht.zusammenfassung]]
+- [[opencivil.mauerwerk.modell]]
+- [[opencivil.mauerwerk.querlast]]
 - [[opencivil.projekt.aufbau.erdbeben]]
 - [[opencivil.projekt.erdbeben]]
+- [[opencivil.projekt.mauerwerk]]
 - [[opencivil.web.api]]
 - [[opencivil.web.erdbebendaten]]
 

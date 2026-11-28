@@ -1,5 +1,5 @@
 ---
-erzeugt: 031d7eab8c30
+erzeugt: 8feb9e2cccf1
 art: modul
 tags: [modul]
 ---
@@ -11,7 +11,8 @@ tags: [modul]
 
 Der [[opencivil.projekt.mauerwerk#MauerwerkEintrag|MauerwerkEintrag]]: eine Wand in der Ansicht, gezeichnet aus
 Knoten – ihr Umriss, Türen und Fenster mit dem Sturz darüber, ihre Linien-
-und Punktlasten –, dazu ihr Mauerwerk, ihre Dicke, wie sie gemauert ist und
+und Punktlasten –, ihre Querlasten, dazu ihr Mauerwerk, ihre Dicke, wie sie
+gemauert ist und
 wie ihre Ränder gehalten sind, und ihre Lastfälle und Kombinationen wie in
 der Decke ([[opencivil.projekt.faelle]]). Als speicherbare Datenklasse
 wie das Fachwerkmodell ([[opencivil.projekt.fachwerkmodell]]), mit dem
@@ -32,8 +33,8 @@ x nach rechts, y nach oben, in m – wie in der Decke. Die Dicke der Wand,
 die Masse eines Sturzes und die Ausmitten in mm, wie man sie auf dem Plan
 liest; Lasten in kN/m und kN, nach unten positiv, eine Punktlast auch
 waagrecht in der Ebene der Wand, nach rechts positiv. Eine Ausmitte ist
-positiv zur Seite, von der aus man die Ansicht sieht. Umgerechnet wird beim
-Bauen.
+positiv zur Seite, von der aus man die Ansicht sieht, ebenso eine Querlast
+von Hand, in kN/m². Umgerechnet wird beim Bauen.
 
 ## Inhalt
 
@@ -110,6 +111,28 @@ aufliegt, etwa, oder eine Decke, die die Wand waagrecht schiebt.
 - `e: float = bereich(0.0, heisst='Ausmitte e', einheit=MM)`
 - `H: float = bereich(0.0, heisst='H', einheit=KN)` – Waagrecht in der Ebene der Wand, nach rechts positiv.
 
+### WandquerlastEintrag
+
+```python
+@dataclass
+class WandquerlastEintrag(Beschreibung)
+```
+
+Eine Last quer zur Wand, gleichmässig über ihre ganze Ansicht, in einem
+Lastfall: von Hand je m², etwa Wind, oder die Ersatzkraft des Erdbebens
+– dann mit dem, was diese braucht.
+
+- `kennung: str = ''`
+- `lastfall: str = ''`
+- `art: Querlastart = Querlastart.VON_HAND`
+- `wert: float = bereich(1.0, heisst='Querlast p', einheit=KN_PRO_M2, zeichen='p')` – Von Hand: positiv zur Seite, von der aus man die Ansicht sieht.
+- `zone: Erdbebenzone = Erdbebenzone.Z1B`
+- `baugrund: Baugrundklasse = Baugrundklasse.C`
+- `bauwerksklasse: Bauwerksklasse = Bauwerksklasse.I`
+- `q: Verhaltensbeiwert = Verhaltensbeiwert.Q_15` – Mit welchem q das Gebäude im Erdbeben rechnet.
+- `z_a: float = bereich(1.5, heisst='Höhe über dem Fundament z_a', einheit=M, ab=0.0,…` – Bis zur Mitte der Wand, wo die Ersatzkraft angreift.
+- `h: float = bereich(3.0, heisst='Höhe des Gebäudes h', einheit=M, ueber=0.0, zeic…`
+
 ### MauerwerkEintrag
 
 ```python
@@ -140,6 +163,7 @@ Bauteile rechnen weiter.
 - `oeffnungen: List[OeffnungEintrag] = field(default_factory=list)`
 - `linienlasten: List[WandlinienlastEintrag] = field(default_factory=list)`
 - `punktlasten: List[WandpunktlastEintrag] = field(default_factory=list)`
+- `querlasten: List[WandquerlastEintrag] = field(default_factory=list)`
 - `lastfaelle: List[LastfallEintrag] = field(default_factory=list)`
 - `kombinationen: List[LastkombinationEintrag] = field(default_factory=list)`
 - `beschreibung: str = ''` – Freier Text – geht in keine Rechnung ein.
@@ -198,6 +222,16 @@ def punktlast(self, lastfall: Any, ort: Ort, **felder: Any) -> WandpunktlastEint
 Eine Punktlast im Lastfall `lastfall` – `wert` und `H` in kN,
 `e` in mm als Stichwort.
 
+#### MauerwerkEintrag.querlast
+
+```python
+def querlast(self, lastfall: Any, **felder: Any) -> WandquerlastEintrag
+```
+
+Eine Querlast im Lastfall `lastfall` – `art`, von Hand `wert`
+in kN/m², aus dem Erdbeben `zone`, `baugrund`,
+`bauwerksklasse`, `q`, `z_a` und `h` in m als Stichwort.
+
 #### MauerwerkEintrag.neu
 
 ```python
@@ -226,6 +260,7 @@ Die vier Ecken eines Rechtecks, wie die Werkzeuge «Wand» und «Öffnung» sie 
 ## Braucht
 
 - [[opencivil.core.einheiten]]
+- [[opencivil.erdbeben.ersatzkraft]]
 - [[opencivil.mauerwerk.modell]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.faelle]]

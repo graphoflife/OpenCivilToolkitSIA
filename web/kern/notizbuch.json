@@ -525,6 +525,15 @@
       ]
     },
     {
+      "name": "Ausmitte einer Wand unter Querlast",
+      "pfad": "Formelsammlung/Formeln/Ausmitte einer Wand unter Querlast.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Mauerwerk"
+      ]
+    },
+    {
       "name": "Äusserer Widerstand auf Druck",
       "pfad": "Formelsammlung/Formeln/Äusserer Widerstand auf Druck.md",
       "art": "formel",
@@ -1709,6 +1718,17 @@
       ]
     },
     {
+      "name": "Durchbiegung einer Wand als waagrechter Streifen",
+      "pfad": "Formelsammlung/Formeln/Durchbiegung einer Wand als waagrechter Streifen.md",
+      "art": "formel",
+      "zeichen": [
+        "w_d"
+      ],
+      "themen": [
+        "Mauerwerk"
+      ]
+    },
+    {
       "name": "Durchmesser des flächengleichen Kreises",
       "pfad": "Formelsammlung/Formeln/Durchmesser des flächengleichen Kreises.md",
       "art": "formel",
@@ -1928,6 +1948,17 @@
       ],
       "themen": [
         "Erdbeben"
+      ]
+    },
+    {
+      "name": "Ersatzkraft des Erdbebens quer zu einer Wand",
+      "pfad": "Formelsammlung/Formeln/Ersatzkraft des Erdbebens quer zu einer Wand.md",
+      "art": "formel",
+      "zeichen": [
+        "p_E"
+      ],
+      "themen": [
+        "Mauerwerk"
       ]
     },
     {
@@ -3625,6 +3656,17 @@
       ]
     },
     {
+      "name": "Normalkraft eines Pfeilers in halber Höhe",
+      "pfad": "Formelsammlung/Formeln/Normalkraft eines Pfeilers in halber Höhe.md",
+      "art": "formel",
+      "zeichen": [
+        "N_m"
+      ],
+      "themen": [
+        "Mauerwerk"
+      ]
+    },
+    {
       "name": "Normalkraft mit der Längszugkraft aus der Querkraft",
       "pfad": "Formelsammlung/Formeln/Normalkraft mit der Längszugkraft aus der Querkraft.md",
       "art": "formel",
@@ -3633,6 +3675,17 @@
       ],
       "themen": [
         "Innerer Pfahlwiderstand quer"
+      ]
+    },
+    {
+      "name": "Normalkraftniveau eines Pfeilers",
+      "pfad": "Formelsammlung/Formeln/Normalkraftniveau eines Pfeilers.md",
+      "art": "formel",
+      "zeichen": [
+        "n_d"
+      ],
+      "themen": [
+        "Mauerwerk"
       ]
     },
     {
@@ -4002,6 +4055,17 @@
       "themen": [
         "Kennzahlen",
         "Querkraft"
+      ]
+    },
+    {
+      "name": "Querlastwiderstand einer Wand aus Mauerwerk",
+      "pfad": "Formelsammlung/Formeln/Querlastwiderstand einer Wand aus Mauerwerk.md",
+      "art": "formel",
+      "zeichen": [
+        "p_{Rd}"
+      ],
+      "themen": [
+        "Mauerwerk"
       ]
     },
     {
@@ -5451,6 +5515,17 @@
       ],
       "themen": [
         "Innerer Pfahlwiderstand quer"
+      ]
+    },
+    {
+      "name": "Widerstand des waagrechten Druckgewölbes einer Wand",
+      "pfad": "Formelsammlung/Formeln/Widerstand des waagrechten Druckgewölbes einer Wand.md",
+      "art": "formel",
+      "zeichen": [
+        "p_{Rd,h}"
+      ],
+      "themen": [
+        "Mauerwerk"
       ]
     },
     {
@@ -8323,11 +8398,14 @@
         "Zustand.e_u",
         "Zustand.e_o",
         "Knickergebnis",
+        "Querergebnis",
         "_Wand",
         "_Wand.ausmitten",
         "_Wand.loesen",
         "k_N",
-        "_k_N"
+        "_k_N",
+        "querlast",
+        "_querlast"
       ]
     },
     {
@@ -8369,6 +8447,12 @@
         "Sturzart",
         "Sturzart.beschriftung",
         "Sturzart.erklaerung",
+        "Querlastart",
+        "Querlastart.beschriftung",
+        "Querlastart.erklaerung",
+        "Verhaltensbeiwert",
+        "Verhaltensbeiwert.beschriftung",
+        "Verhaltensbeiwert.erklaerung",
         "Rechteck",
         "Rechteck.breite",
         "Rechteck.hoehe",
@@ -8382,13 +8466,19 @@
         "Pfeiler",
         "Pfeiler.b",
         "Wandlast",
+        "Erdbebenquer",
+        "Querlast",
+        "Querlast.wirkt",
         "Lastfall",
         "Kombination",
         "Wand",
         "Wand.verband",
         "Wand.vollfugig",
         "Wand.flaeche",
+        "Wand.mit",
         "Wand.schiebende",
+        "Wand.quer_belastete",
+        "Wand.im_erdbeben",
         "pfeiler"
       ]
     },
@@ -8439,6 +8529,39 @@
         "_in_oeffnung",
         "_wohin",
         "dickenhinweis"
+      ]
+    },
+    {
+      "name": "opencivil.mauerwerk.querlast",
+      "pfad": "Python/opencivil.mauerwerk.querlast.md",
+      "art": "modul",
+      "kurz": "eine Wand quer zu ihrer Ebene belastet, auch im Erdbeben.",
+      "stichworte": [
+        "klammer",
+        "p_E",
+        "erdbeben_schreiben",
+        "erdbebenhinweise",
+        "_Richtung",
+        "_Richtung.p_Rd",
+        "_Richtung.grad",
+        "einwirkungen",
+        "einzugsbreite",
+        "waagrechtes_gewoelbe",
+        "Querlastnachweis",
+        "Querlastnachweis.ansatz",
+        "Querlastnachweis.stelle",
+        "Querlastnachweis._normalkraft",
+        "Querlastnachweis._richtung",
+        "Querlastnachweis._beide",
+        "Querlastnachweis._lotrecht",
+        "Querlastnachweis._waagrecht",
+        "_gewoelbe_haelt",
+        "_durchbiegung",
+        "_seite",
+        "_wo",
+        "Normalkraftniveau",
+        "Normalkraftniveau.ansatz",
+        "Normalkraftniveau.stelle"
       ]
     },
     {
@@ -10173,6 +10296,7 @@
       "kurz": "eine Mauerwerkswand wird Rechnung.",
       "stichworte": [
         "wand_von",
+        "querlast_von",
         "bauen",
         "_nachweise"
       ]
@@ -10639,6 +10763,7 @@
         "OeffnungEintrag",
         "WandlinienlastEintrag",
         "WandpunktlastEintrag",
+        "WandquerlastEintrag",
         "MauerwerkEintrag",
         "MauerwerkEintrag.materialien",
         "MauerwerkEintrag.lagen",
@@ -10647,6 +10772,7 @@
         "MauerwerkEintrag.oeffnung",
         "MauerwerkEintrag.linienlast",
         "MauerwerkEintrag.punktlast",
+        "MauerwerkEintrag.querlast",
         "MauerwerkEintrag.neu",
         "rechteck"
       ]

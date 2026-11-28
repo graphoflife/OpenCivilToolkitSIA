@@ -1,5 +1,5 @@
 ---
-erzeugt: 926aada139ba
+erzeugt: f49853dcef60
 art: modul
 tags: [modul]
 ---
@@ -45,10 +45,12 @@ zusammen eine Lücke. Wo keine Öffnung ist, ist die ganze Wand ein Pfeiler.
 Je Lastfall ([[opencivil.mauerwerk.modell#Lastfall|Lastfall]]): waagrechte Linienlasten und Punktlasten in
 der Ansicht, nach unten positiv, mit ihrer Ausmitte quer zur Wand –
 positiv zur Seite, von der aus man die Ansicht sieht. Eine Punktlast kann
-auch waagrecht in der Ebene der Wand schieben, nach rechts positiv. Wie die
-lotrechten Lasten zu den Pfeilern kommen, sagt
-[[opencivil.mauerwerk.lasten|lasten]], wie die waagrechten
-[[opencivil.mauerwerk.scheibe|scheibe]].
+auch waagrecht in der Ebene der Wand schieben, nach rechts positiv. Dazu
+Querlasten ([[opencivil.mauerwerk.modell#Querlast|Querlast]]), gleichmässig über die ganze Wand: von Hand
+oder aus dem Erdbeben. Wie die lotrechten Lasten zu den Pfeilern kommen,
+sagt [[opencivil.mauerwerk.lasten|lasten]], wie die waagrechten
+[[opencivil.mauerwerk.scheibe|scheibe]], was die Querlasten bewirken
+[[opencivil.mauerwerk.querlast|querlast]].
 
 ## Inhalt
 
@@ -171,6 +173,57 @@ def beschriftung(self) -> str
 ```
 
 #### Sturzart.erklaerung
+
+```python
+@property
+def erklaerung(self) -> str
+```
+
+### Querlastart
+
+```python
+class Querlastart(Wahl)
+```
+
+Woher eine Querlast kommt.
+
+- `VON_HAND = 'von_hand'`
+- `ERDBEBEN = 'erdbeben'`
+
+#### Querlastart.beschriftung
+
+```python
+@property
+def beschriftung(self) -> str
+```
+
+#### Querlastart.erklaerung
+
+```python
+@property
+def erklaerung(self) -> str
+```
+
+### Verhaltensbeiwert
+
+```python
+class Verhaltensbeiwert(Wahl)
+```
+
+Mit welchem Verhaltensbeiwert q das Gebäude im Erdbeben rechnet – SIA 266:2015, 4.7.1.5.
+
+- `Q_15 = '1.5'`
+- `Q_20 = '2.0'`
+- `Q_25 = '2.5'`
+
+#### Verhaltensbeiwert.beschriftung
+
+```python
+@property
+def beschriftung(self) -> str
+```
+
+#### Verhaltensbeiwert.erklaerung
 
 ```python
 @property
@@ -316,6 +369,45 @@ Meldung.
 - `e: float = 0.0`
 - `H: float = 0.0` – Was eine Punktlast waagrecht in der Ebene der Wand schiebt, in N, nach rechts positiv.
 
+### Erdbebenquer
+
+```python
+@dataclass(frozen=True)
+class Erdbebenquer
+```
+
+Was die Ersatzkraft des Erdbebens quer zur Wand braucht – `z_a` und `h` in m.
+
+- `zone: Erdbebenzone = Erdbebenzone.Z1B`
+- `baugrund: Baugrundklasse = Baugrundklasse.C`
+- `bauwerksklasse: Bauwerksklasse = Bauwerksklasse.I`
+- `q: Verhaltensbeiwert = Verhaltensbeiwert.Q_15` – Mit welchem q das Gebäude rechnet – nicht die Wand: sie rechnet mit q_a.
+- `z_a: float = 1.5` – Wie hoch die Wand über dem Fundament des Gebäudes steht, bis zu ihrer Mitte.
+- `h: float = 3.0` – Wie hoch das Gebäude über seinem Fundament ist.
+
+### Querlast
+
+```python
+@dataclass(frozen=True)
+class Querlast
+```
+
+Eine Last quer zur Wand, gleichmässig über ihre ganze Ansicht: von Hand
+`p` in N/m², positiv zur Seite, von der aus man die Ansicht sieht –
+oder aus dem Erdbeben (`erdbeben`), in beiden Richtungen. `name`
+nennt sie in einer Meldung.
+
+- `name: str`
+- `p: float = 0.0`
+- `erdbeben: Optional[Erdbebenquer] = None`
+
+#### Querlast.wirkt
+
+```python
+@property
+def wirkt(self) -> bool
+```
+
 ### Lastfall
 
 ```python
@@ -323,11 +415,12 @@ Meldung.
 class Lastfall
 ```
 
-Ein Lastfall der Wand: seine Lasten, und ob er ihr Eigengewicht bekommt.
+Ein Lastfall der Wand: seine Lasten und Querlasten, und ob er ihr Eigengewicht bekommt.
 
 - `name: str`
 - `lasten: Tuple[Wandlast, ...] = ()`
 - `eigengewicht: bool = False`
+- `querlasten: Tuple[Querlast, ...] = ()`
 
 ### Kombination
 
@@ -384,14 +477,37 @@ def flaeche(self) -> Optional[Rechteck]
 
 Die Wand als Rechteck: `None` ohne genau einen rechteckigen Umriss.
 
+#### Wand.mit
+
+```python
+def mit(self, hat: Callable[[Lastfall], bool]) -> List[str]
+```
+
+Die Namen der Kombinationen, in denen ein Lastfall, für den `hat` gilt, zählt.
+
 #### Wand.schiebende
 
 ```python
 def schiebende(self) -> List[str]
 ```
 
-Die Namen der Kombinationen, in denen eine Last die Wand waagrecht
-schiebt: ein Lastfall mit H hat dort einen Beiwert.
+Die Namen der Kombinationen, in denen eine Last die Wand waagrecht schiebt, mit H.
+
+#### Wand.quer_belastete
+
+```python
+def quer_belastete(self) -> List[str]
+```
+
+Die Namen der Kombinationen, in denen eine Querlast wirkt.
+
+#### Wand.im_erdbeben
+
+```python
+def im_erdbeben(self, q: Verhaltensbeiwert) -> List[str]
+```
+
+Die Namen der Kombinationen mit einem Erdbeben, in dem das Gebäude mit `q` rechnet.
 
 ### pfeiler
 
@@ -411,6 +527,7 @@ Gezählt werden nur Öffnungen, die Rechtecke sind.
 
 - [[opencivil.core.wahl]]
 - [[opencivil.decke.geometrie]]
+- [[opencivil.erdbeben.ersatzkraft]]
 
 ## Gebraucht von
 
@@ -418,6 +535,7 @@ Gezählt werden nur Öffnungen, die Rechtecke sind.
 - [[opencivil.mauerwerk.lasten]]
 - [[opencivil.mauerwerk.nachweise]]
 - [[opencivil.mauerwerk.pruefen]]
+- [[opencivil.mauerwerk.querlast]]
 - [[opencivil.mauerwerk.scheibe]]
 - [[opencivil.mauerwerk.schub]]
 - [[opencivil.mauerwerk.werk]]

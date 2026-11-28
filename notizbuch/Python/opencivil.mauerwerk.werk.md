@@ -1,5 +1,5 @@
 ---
-erzeugt: 51ce3f10df00
+erzeugt: bc30af6a8f1e
 art: modul
 tags: [modul]
 ---
@@ -18,8 +18,9 @@ den Mindestwerten misst und nach ihrer Wahl umrechnet
 ([[opencivil.mauerwerk.modell#pfeiler|pfeiler]]), ihre Lasten je Lastfall und
 Kombination auf Pfeiler und Stürze verteilt – die lotrechten nach
 [[opencivil.mauerwerk.lasten|lasten]], die waagrechten nach
-[[opencivil.mauerwerk.scheibe|scheibe]] – und die Herleitung schreibt
-([[opencivil.mauerwerk.herleitung|herleitung]]).
+[[opencivil.mauerwerk.scheibe|scheibe]], die Querlasten je m² Wand, die des
+Erdbebens nach [[opencivil.mauerwerk.querlast|querlast]] – und die Herleitung
+schreibt ([[opencivil.mauerwerk.herleitung|herleitung]]).
 
 
 ## DAS ERGEBNIS
@@ -47,10 +48,12 @@ Was die Rechnung fand: die Wand, ihr Mauerwerk, ihre Meldungen, Werte und Pfeile
 - `t: float` – Ihre Dicke, in m.
 - `meldungen: List[Meldung]` – Was an der Zeichnung falsch ist oder fehlt – die der Beschreibung zuerst.
 - `zum_mauerwerk: List[Meldung] = field(default_factory=list)` – Was zu Mauerwerk und Dicke zu sagen ist: Werte unter den Mindestwerten deklarierten Mauerwerks, eine unübliche Dicke – in der Maske bei ihren Feldern.
+- `zum_erdbeben: List[Meldung] = field(default_factory=list)` – Was zum Erdbeben am Mauerwerk zu sagen ist ([[opencivil.mauerwerk.querlast#erdbebenhinweise|.querlast.erdbebenhinweise]]) – in der Maske bei den Querlasten, wo man es einstellt.
 - `gezeichnet: bool = False` – Ob ihre Zeichnung rechnet: keine Meldung zu Umriss, Öffnungen oder Stürzen hält sie auf.
 - `pfeiler: List[Pfeiler] = field(default_factory=list)` – Leer, solange sie nicht [[opencivil.mauerwerk.werk#Wandbefund|gezeichnet]] ist.
 - `g_k: float = 0.0` – Ihr Eigengewicht je m² Ansicht, in N/m².
 - `e_u: Optional[float] = None` – Die Ausmitte am Fuss in m – `None`, wo er eingespannt ist.
+- `querlasten: Dict[str, float] = field(default_factory=dict)` – Je Querlast, nach ihrem Namen, ihre Zahl in N/m² – die des Erdbebens nach Gl. (49).
 - `faelle: Dict[str, Abtrag] = field(default_factory=dict)` – Je Lastfall, nach seinem Namen, was er Pfeilern und Stürzen gibt; leer, wo nichts rechnet.
 - `kombinationen: Dict[str, Abtrag] = field(default_factory=dict)` – Dasselbe je Kombination: die Summe der Lastfälle mit ihren Beiwerten.
 
@@ -61,7 +64,7 @@ Was die Rechnung fand: die Wand, ihr Mauerwerk, ihre Meldungen, Werte und Pfeile
 def alle_meldungen(self) -> List[Meldung]
 ```
 
-Was zur Zeichnung zu sagen ist, dann was zu Mauerwerk und Dicke.
+Was zur Zeichnung zu sagen ist, dann was zu Mauerwerk und Dicke, dann zum Erdbeben.
 
 #### Wandbefund.bereit
 
@@ -154,6 +157,7 @@ Je Lastfall und Kombination, was Pfeiler und Stürze tragen – in den Befund.
 - [[opencivil.mauerwerk.lasten]]
 - [[opencivil.mauerwerk.modell]]
 - [[opencivil.mauerwerk.pruefen]]
+- [[opencivil.mauerwerk.querlast]]
 - [[opencivil.mauerwerk.scheibe]]
 - [[opencivil.stabwerk.system]]
 
@@ -161,6 +165,7 @@ Je Lastfall und Kombination, was Pfeiler und Stürze tragen – in den Befund.
 
 - [[opencivil.mauerwerk.herleitung]]
 - [[opencivil.mauerwerk.nachweise]]
+- [[opencivil.mauerwerk.querlast]]
 - [[opencivil.mauerwerk.schub]]
 - [[opencivil.mauerwerk.uebersicht]]
 - [[opencivil.projekt.aufbau.kern]]

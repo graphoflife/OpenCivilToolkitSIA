@@ -428,9 +428,13 @@ def _mauerwerk(p: Projekt) -> None:
     mit Betonsturz und zwei Fenster, eines mit vorfabriziertem Sturz. Oben
     liegt die Decke 20 mm ausmittig auf, und über dem vorfabrizierten Sturz
     ein Träger; im Lastfall Wind schiebt die Decke die Wand mit 20 kN nach
-    rechts, in «GZT Wind» 1.5-fach. Die zweite, ein Pfeiler ohne Öffnung,
+    rechts und drückt der Wind mit 1 kN/m² quer zu ihr, in «GZT Wind»
+    1.5-fach. Im Lastfall Erdbeben wirkt quer die Ersatzkraft nach Gl. (49),
+    im Erdgeschoss eines 6 m hohen Gebäudes, das mit q = 2.0 rechnet -- in
+    «GZT Erdbeben» mit 0.3-mal der Nutzlast. Die zweite, ein Pfeiler ohne Öffnung,
     1.5 × 2.6 m und 150 mm dick, ist am Kopf eingespannt und steht am Fuss
-    gelenkig 15 mm neben der Mitte.
+    gelenkig 15 mm neben der Mitte. Die dritte, 2.4 × 2.7 m zwischen zwei
+    Querwänden, trägt den Wind auch über ein waagrechtes Gewölbe.
     """
     w = p.wand("Wand aus Kalksandstein", t=175, mauerung="verband", stossfugen="vollfugig",
                fuss="eingespannt", rechts="gehalten")
@@ -446,12 +450,25 @@ def _mauerwerk(p: Projekt) -> None:
     wind = w.lastfall("Wind")
     w.kombination("GZT Wind", (w.lastfaelle[0], 1.0), (auflast, 1.0), (wind, 1.5))
     w.punktlast(wind, (6, 2.7), wert=0, H=20)
+    w.querlast(wind, wert=1.0)
+    erdbeben = w.lastfall("Erdbeben")
+    w.querlast(erdbeben, art="erdbeben", zone="Z2", baugrund="C", q="2.0", z_a=1.35, h=6.0)
+    w.kombination("GZT Erdbeben", (w.lastfaelle[0], 1.0), (auflast, 1.0), (nutzlast, 0.3),
+                  (erdbeben, 1.0))
     s = p.wand("Pfeiler aus Kalksandstein", t=150, kopf="eingespannt", e_u=15)
     s.wand(rechteck(0, 0, 1.5, 2.6))
     s.standardfaelle()
     _, auflast, nutzlast = s.lastfaelle
     s.linienlast(auflast, (0, 2.6), (1.5, 2.6), wert=60)
     s.linienlast(nutzlast, (0, 2.6), (1.5, 2.6), wert=20)
+    q = p.wand("Wand zwischen Querwänden", t=175, mauerung="verband", stossfugen="vollfugig",
+               links="gehalten", rechts="gehalten")
+    q.wand(rechteck(0, 0, 2.4, 2.7))
+    q.standardfaelle()
+    q.linienlast(q.lastfaelle[1], (0, 2.7), (2.4, 2.7), wert=30)
+    wind = q.lastfall("Wind")
+    q.querlast(wind, wert=1.0)
+    q.kombination("GZT Wind", (q.lastfaelle[0], 1.0), (q.lastfaelle[1], 1.0), (wind, 1.5))
 
 
 @lru_cache(maxsize=None)

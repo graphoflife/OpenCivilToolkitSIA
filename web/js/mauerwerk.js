@@ -14,6 +14,8 @@
  *                   gehalten, je mit Bild
  *     Lastfälle,    wie in Balkensystem und Decke (lastfaelle.js); die Lasten
  *     Kombinationen zeichnet man im Zeichenfenster
+ *     Querlasten    zwischen beiden: was quer zur Wand wirkt, von Hand oder aus
+ *                   dem Erdbeben (mw_querlasten.js) -- man zeichnet sie nicht
  *
  * Dicke und Ausmitte sind Vorgaben der Rechnung: Felder, Zeichen und
  * Kacheln kommen aus dem Kern (`katalog.vorgaben.mauerwerk`,
@@ -36,6 +38,7 @@ import { el, leerzustand } from './dom.js';
 import { gruppenkapitel, kapitelFenster, kapitelPanel } from './kapitel.js';
 import { lastenKapitel, lastfallWaehlen } from './lastfaelle.js';
 import { wandBild, wandLegende } from './mw_bild.js';
+import { QUERLASTEN } from './mw_querlasten.js';
 import { zeichenbereich } from './mw_zeichnung.js';
 import {
   eintragAendern, eintragVon, katalog, zustand,
@@ -49,6 +52,7 @@ const HILFE = {
     ['Pfeiler', 'das Mauerwerk zwischen zwei Öffnungen und zwischen einer Öffnung und dem Ende der Wand – Öffnungen übereinander bilden zusammen eine Lücke'],
     ['Linienlast', 'waagrecht von Punkt zu Punkt, etwa eine Decke; mit ihrer Ausmitte e quer zur Wand'],
     ['Punktlast', 'an einem Knoten, etwa ein Träger; ebenso mit Ausmitte'],
+    ['Querlast', 'quer zur Wand über ihre ganze Ansicht, angelegt unter «Querlasten» – im Bild Kreise auf der Wand: mit Punkt, wo sie zum Betrachter drückt, mit Kreuz, wo von ihm weg, beides im Wechsel beim Erdbeben; ihre Werte stehen unter der Wand'],
     ['Lastfall', 'die Lasten gehören zu dem, der in der Leiste über der Zeichnung gewählt ist – wie sie zu den Pfeilern kommen, sagt die Herleitung'],
     ['Farben', 'jeder Pfeiler und jedes Sturzauflager in der Farbe seines Urteils, mit dem Erfüllungsgrad der ungünstigsten Kombination'],
   ],
@@ -194,8 +198,8 @@ function raenderKapitel(w, vorgaben) {
 
 /**
  * Die Kacheln: «Mauerwerk» und «Ränder» aus den Gruppen der Vorgaben des
- * Kerns, mit Material und Schaltern um ihre Felder herum, dann Lastfälle
- * und Kombinationen.
+ * Kerns, mit Material und Schaltern um ihre Felder herum, dann Lastfälle,
+ * Querlasten und Kombinationen.
  */
 function kapitel(w) {
   const aendern = (veraenderer) => eintragAendern(w.kennung, veraenderer);
@@ -221,8 +225,9 @@ function kapitel(w) {
   ];
   vorgaben.vollstaendig();
   return [{ titel: '', kapitel: kacheln.filter(Boolean) }, lastenKapitel({
-    lastenVon: (x, lf) => [...x.linienlasten, ...x.punktlasten].filter((e) => e.lastfall === lf).length,
+    lastenVon: (x, lf) => [...x.linienlasten, ...x.punktlasten, ...x.querlasten].filter((e) => e.lastfall === lf).length,
     eigengewicht: { text: 'ρ · g · t_w', titel: 'Die Dichte des Mauerwerks mal g = 10 m/s² mal die Dicke der Wand, je m² Ansicht' },
+    dazu: [QUERLASTEN],
   })];
 }
 

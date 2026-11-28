@@ -1,5 +1,5 @@
 ---
-erzeugt: c18cd1c9b428
+erzeugt: abf285ebe8c3
 art: modul
 tags: [modul]
 ---
@@ -13,7 +13,9 @@ Aus dem Befund einer Wand die Daten ihrer Zeichnung ([[opencivil.web.mauerwerkda
 ihre Meldungen – die zu Mauerwerk und Dicke auch fuer sich, fuer die
 Kachel der Maske –, ob sie rechnet, ihre Pfeiler und je Oeffnung die
 Flaeche ihres Sturzes – der Kern weiss, wie weit er aufliegt; die Seite zeichnet
-ihn nur. Dazu je Pfeiler und Sturzauflager das Urteil, das an ihm gilt
+ihn nur –, je Querlast des Erdbebens ihre Ersatzkraft nach Gl. (49) und was
+zum Erdbeben zu sagen ist, fuer die Kachel der Querlasten. Dazu je Pfeiler und
+Sturzauflager das Urteil, das an ihm gilt
 ([[opencivil.web.mauerwerkdaten#urteile|urteile]]), fuer die Farbe im Bild, und der Teil des Katalogs, den
 nur die Wand braucht ([[opencivil.web.mauerwerkdaten#katalog|katalog]]). Umriss, Oeffnungen und Lasten
 zeichnet die Oberflaeche nach dem Projekt; die Bemessungswerte stehen in
@@ -64,9 +66,12 @@ def uebersicht(befund: Optional[Wandbefund]) -> Dict[str, Any]
 
 `bereit`: ob die Wand rechnet; `meldungen` alle je ``{text,
 elemente, fehler, unfertig}`, `zum_mauerwerk`` die zu Mauerwerk und
-Dicke darunter noch einmal; `pfeiler` je `{name, x0, x1, y0, y1, b}`
-und `stuerze` je `{oeffnung, sturz, x0, y0, x1, y1}` in m – leer,
-solange die Zeichnung nicht rechnet. Ohne Befund ist alles leer.
+Dicke darunter noch einmal, `zum_erdbeben` die zum Erdbeben;
+`ersatzkraefte` je Querlast des Erdbebens, nach ihrer Kennung, p_E
+in kN/m² – eine von Hand fehlt, ihre Zahl steht im Projekt;
+`pfeiler` je `{name, x0, x1, y0, y1, b}` und `stuerze` je
+`{oeffnung, sturz, x0, y0, x1, y1}` in m – leer, solange die
+Zeichnung nicht rechnet. Ohne Befund ist alles leer.
 
 ### unfertig
 
@@ -85,7 +90,10 @@ def katalog() -> Dict[str, Any]
 
 Womit die Kennungen der Teile beginnen, je Liste, die Stellungen der
 Schalter – wie gemauert, die Stossfugen, Kopf und Fuss, die Ränder links
-und rechts, die Art eines Sturzes – und je Sorte die üblichen Dicken in mm.
+und rechts, die Art eines Sturzes, die Art einer Querlast und der
+Verhaltensbeiwert des Gebäudes im Erdbeben – und je Sorte die üblichen
+Dicken in mm. Zone, Baugrund und Bauwerksklasse stehen im Katalog des
+Erdbebens.
 
 
 ## Braucht

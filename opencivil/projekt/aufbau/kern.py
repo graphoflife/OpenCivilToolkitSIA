@@ -142,7 +142,8 @@ class Aufbau:
                       "qa_holz_schub", "qa_holz_stabilitaet",
                       "durchstanzen", "grundbruch", "gleiten", "setzung", "pfahl_aussen",
                       "pfahl_innen", "pfahl_quer", "pfahl_innen_quer", "erdbeben",
-                      "mw_normalkraft", "mw_teilflaechen", "mw_schub", "mw_gleiten")
+                      "mw_normalkraft", "mw_teilflaechen", "mw_schub", "mw_gleiten",
+                      "mw_querlast", "mw_normalkraftniveau")
 
     # -- Die Objekte je Bauteilart: Sichten auf die Bauteile --------------
     #

@@ -15,6 +15,7 @@ Schritt dazu (Plan vom 2026-11-27, Schritt 14).
     knicken.py     k_N eines Pfeilers nach Theorie 2. Ordnung
     nachweise.py   die Nachweise: Normalkraft je Pfeiler, Teilflächen je Sturzauflager
     schub.py       die Nachweise des Schubs je Pfeiler: Druckstrebe und Gleiten
+    querlast.py    die Querlast je Pfeiler, das Erdbeben quer zur Wand und Gl. (27)
     werk.py        die Wand im Rechenwerk und ihr Befund
     herleitung.py  wie sie ihre Rechnung aufschreibt
     uebersicht.py  ihre Angaben über den Nachweisen in der Zusammenfassung

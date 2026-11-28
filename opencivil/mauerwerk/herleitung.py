@@ -7,7 +7,9 @@ gehalten ist, die Bemessungswerte, mit denen sie rechnet, ihre Öffnungen
 mit den Stürzen darüber, die Pfeiler dazwischen und was die Lastfälle und
 Kombinationen ihnen geben (:mod:`~opencivil.mauerwerk.lasten`) -- schiebt
 eine Last waagrecht, auch in der Ebene der Wand
-(:mod:`~opencivil.mauerwerk.scheibe`). Zuletzt die Meldungen: rot, was
+(:mod:`~opencivil.mauerwerk.scheibe`), und mit Querlasten, was quer zu ihr
+wirkt, die Ersatzkraft des Erdbebens hergeleitet
+(:mod:`~opencivil.mauerwerk.querlast`). Zuletzt die Meldungen: rot, was
 falsch ist, sonst als Hinweis.
 
 EINHEITEN:
@@ -28,6 +30,7 @@ from opencivil.core.sprache import aufgezaehlt
 from opencivil.mauerwerk.kennwerte import REFERENZ_VERBAND, Wandwerte, quelle
 from opencivil.mauerwerk.lasten import SEITEN, Abtrag
 from opencivil.mauerwerk.modell import Pfeiler, Wand
+from opencivil.mauerwerk.querlast import erdbeben_schreiben
 from opencivil.mauerwerk.scheibe import anteile, koepfe
 
 if TYPE_CHECKING:
@@ -70,6 +73,12 @@ SCHEIBE = (
 #: Woher die Regeln der Scheibe kommen.
 SCHEIBE_ANNAHME = ("Wie die Wand als Scheibe trägt, regelt die Norm nicht; so verteilt das "
                    "Werkzeug die waagrechten Lasten nach Vorgabe, nicht nachgeschlagen.")
+
+#: Wie die Querlasten wirken, in eigenen Worten.
+QUER = (
+    "Eine Querlast wirkt gleichmässig über die ganze Wand, je m² Ansicht. Die von Hand ist "
+    "positiv zur Seite, von der aus man die Ansicht sieht; die des Erdbebens wirkt in beiden "
+    "Richtungen und steht als Betrag da. Was sie bewirkt, sagt der Nachweis «Querlast».")
 
 #: Je Wert der Tabelle: Kurzname, Zeichen, Stellen.
 ZEILEN = (("f_xd", "f_{xd}", 2), ("f_yd", "f_{yd}", 2), ("E_xd", "E_{xd}", 0), ("G_d", "G_d", 0),
@@ -189,9 +198,11 @@ def _lasten(p: Protokoll, befund: "Wandbefund", e: Eingaben, basis: str) -> None
     p.text(ABTRAG)
     p.annahme(ABTRAG_ANNAHME)
     w = befund.wand
-    if any(lf.eigengewicht for lf in w.lastfaelle):
-        g_k = Zwischenwerte(basis).wert("g_k", "g_k", Groesse.aus_si(befund.g_k, KN_PRO_M2), 2,
-                                        "Eigengewicht der Wand je m² Ansicht")
+    zw = Zwischenwerte(basis)
+    erdbeben = [q for lf in w.lastfaelle for q in lf.querlasten if q.erdbeben]
+    g_k = zw.wert("g_k", "g_k", Groesse.aus_si(befund.g_k, KN_PRO_M2), 2,
+                  "Eigengewicht der Wand je m² Ansicht")
+    if erdbeben or any(lf.eigengewicht for lf in w.lastfaelle):
         p.formel(g_k, r"@rho \cdot @g \cdot @t", {"rho": e["rho"], "g": e["g"], "t": e["t"]},
                  titel="Eigengewicht der Wand je m² Ansicht, aus der Dichte ihres Mauerwerks")
     faelle: Dict[str, Abtrag] = {**befund.faelle, **befund.kombinationen}
@@ -215,6 +226,15 @@ def _lasten(p: Protokoll, befund: "Wandbefund", e: Eingaben, basis: str) -> None
                  1e-3, 1, "Kräfte der Sturzauflager, in kN")
     if any(abs(v) > 1e-9 for a in faelle.values() for v in a.V.values()):
         _scheibe(p, befund, kopf, faelle)
+    if any(q.wirkt for lf in w.lastfaelle for q in lf.querlasten):
+        p.titel("Quer zur Wand", ebene=3)
+        p.text(QUER)
+        for q in erdbeben:
+            erdbeben_schreiben(p, zw, q, g_k, e["g"])
+        _tabelle(p, kopf, faelle, [(name, lesen) for name, lesen in (
+            ("von Hand", lambda a: a.p), ("Erdbeben", lambda a: a.p_E))
+            if any(abs(lesen(a)) > 1e-9 for a in faelle.values())], 1e-3, 2,
+                 "Querlast je m² Wand, in kN/m²")
 
 
 def _scheibe(p: Protokoll, befund: "Wandbefund", kopf: List[str],

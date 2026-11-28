@@ -1,5 +1,5 @@
 ---
-erzeugt: 911c8a2975fa
+erzeugt: 620c71dd0f6d
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -128,6 +128,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.mauerwerk.modell]] – eine Mauerwerkswand in der Ansicht, in SI.
     - [[opencivil.mauerwerk.nachweise]] – die Nachweise einer Wand: Normalkraft und Teilflächen.
     - [[opencivil.mauerwerk.pruefen]] – was einer Wand fehlt oder an ihr nicht stimmt.
+    - [[opencivil.mauerwerk.querlast]] – eine Wand quer zu ihrer Ebene belastet, auch im Erdbeben.
     - [[opencivil.mauerwerk.scheibe]] – wie die waagrechten Lasten einer Wand zu ihren Pfeilern kommen.
     - [[opencivil.mauerwerk.schub]] – die Nachweise des Schubs in der Ebene einer Wand.
     - [[opencivil.mauerwerk.uebersicht]] – was die Zusammenfassung einer Wand über ihren Nachweisen zeigt.

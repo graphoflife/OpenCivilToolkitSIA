@@ -1,5 +1,5 @@
 ---
-erzeugt: e9241f318c08
+erzeugt: e0ebe6257617
 art: modul
 tags: [modul]
 ---
@@ -13,7 +13,9 @@ Der Beiwert k_N eines Pfeilers (SIA 266:2015, 4.3.1.3, Gl. (11)): die
 grösste Normalkraft, bezogen auf l_w · t_w · f_xd, unter der die verformte
 Wand im Gleichgewicht steht (4.3.1.1) und ihre Ausmitte nirgends die Grenze
 der Figur 4 überschreitet ([[opencivil.mauerwerk.knicken#k_N|k_N]]). Dazu der Zustand unter der
-Normalkraft der Bemessung: wie weit die Wand ausweicht und wo.
+Normalkraft der Bemessung: wie weit die Wand ausweicht und wo. Und unter
+einer festen Normalkraft die grösste Querlast, die die Wand so trägt – das
+lotrechte Druckgewölbe (4.3.4.2, Figur 11, [[opencivil.mauerwerk.knicken#querlast|querlast]]).
 
 
 ## DAS MODELL
@@ -34,6 +36,12 @@ bis e = 0.375 t; dort ist das Moment am Ende (Figur 3), und mehr Ausmitte
 lässt Figur 4 nicht zu: höchstens 0.375 t und nach Gl. (6) höchstens
 (1 − N_xd/(l_w t_w f_xd)) · t/2.
 
+Eine Querlast q, gleichmässig über die Höhe, gibt dazu das Moment eines
+einfachen Balkens, q · x · (h − x)/2 je Meter, also die Ausmitte
+q · x · (h − x)/(2 N) je Meter Wand. Ein eingespannter Rand nimmt sein
+Moment wie ohne Querlast über seine Ausmitte auf, die das Gleichgewicht
+bestimmt.
+
 B_yd = E_xd · I_y, wie in Gl. (8) – nach Vorgabe, nicht nachgeschlagen:
 4.3.1.3 nennt B_yd, ohne es festzulegen. So sind auch die Kurven der Figur 5
 gerechnet: die Rechnung hier trifft sie bis e/t = 0.30 auf etwa 0.006
@@ -48,7 +56,9 @@ Figur 19 stimmen mit beiden überein. Gerechnet wird nach Figur 3 und 4.
 Alle Längen durch t_w, die Normalkraft als n = N/(l_w t_w f_xd). Dann hängt
 alles nur noch an h_w/t_w, den Ausmitten in t_w und E_xd/f_xd, für
 Standardmauerwerk 1000 (4.2.1.4) – k_N ist für jeden Pfeiler derselbe
-Beiwert, wie breit er auch ist.
+Beiwert, wie breit er auch ist. Die Querlast heisst dort
+λ = q · h_w²/(t_w² · f_xd), q je m² Wand; ihre Ausmitte in Dicken ist
+λ · ξ · (1 − ξ)/(2 n), ξ = x/h_w.
 
 
 ## DIE SUCHE (nach Vorgabe, nicht nachgeschlagen)
@@ -62,6 +72,12 @@ der Grenze liegt. Hält eine Stufe nicht, wird der Schritt halbiert, bis er
 kleiner ist als [[opencivil.mauerwerk.knicken#Konstanten|GENAU]]. Erreicht die Ausmitte 0.375 t, endet die
 Rechnung dort: ein Gelenk, das sich bei kleiner Normalkraft weiter drehen
 dürfte (4.3.1.1), zählt sie nicht – auf der sicheren Seite.
+
+Die Querlast sucht [[opencivil.mauerwerk.knicken#querlast|querlast]] ebenso: erst die Normalkraft bis n wie
+bei k_N, dann wächst λ in Schritten, die sich halbieren, bis die Wand kein
+Gleichgewicht mehr findet oder ihre Ausmitte die Grenze erreicht. Die
+Schritte messen sich an λ_1 = 8 · n · Grenze(n), der Querlast, die eine
+mittig belastete, gelenkig gehaltene Wand nach Theorie 1. Ordnung trägt.
 
 ## Inhalt
 
@@ -156,6 +172,19 @@ Was die Rechnung findet – `bei_n_d` der Zustand unter n_d, `None` darüber.
 - `grenzzustand: Optional[Zustand]` – Der letzte Zustand, der hielt – `None`, wenn schon keine Last hält.
 - `bei_n_d: Optional[Zustand] = None`
 
+### Querergebnis
+
+```python
+@dataclass(frozen=True)
+class Querergebnis
+```
+
+Was die Suche nach der Querlast findet – siehe [[opencivil.mauerwerk.knicken#querlast|querlast]].
+
+- `lam: float` – Die grösste Querlast als λ = q · h_w²/(t_w² · f_xd), null, wenn schon n allein nicht hält.
+- `grund: str` – [[opencivil.mauerwerk.knicken#Konstanten|AUSMITTE]] oder [[opencivil.mauerwerk.knicken#Konstanten|STABILITAET]]: was über ihr nicht mehr hielt.
+- `grenzzustand: Optional[Zustand]` – Der letzte Zustand, der hielt – `None`, wenn schon n allein nicht hält.
+
 ### _Wand
 
 ```python
@@ -167,17 +196,21 @@ Die Gleichungen einer Wand in Dicken: Höhe `ht`, Ränder unten und oben.
 #### _Wand.ausmitten
 
 ```python
-def ausmitten(self, w: Sequence[float], p_u: float, p_o: float) -> List[float]
+def ausmitten(self, w: Sequence[float], p_u: float, p_o: float, quer: float=0.0) -> List[float]
 ```
+
+Je Knoten die Ausmitte – `quer` ist λ/(2 n), die Querlast (Dateikopf).
 
 #### _Wand.loesen
 
 ```python
-def loesen(self, n: float, start: Optional[Tuple[List[float], float, float]]) -> Optional[Tuple[List[float], float, float, int]]
+def loesen(self, n: float, start: Optional[Tuple[List[float], float, float]], quer: float=0.0) -> Optional[Tuple[List[float], float, float, int]]
 ```
 
 Das Gleichgewicht unter n nach Newton, von `start` aus – ``(w, p_u,
 p_o, Vorzeichen der Determinante)` oder `None``, wenn es keines findet.
+`quer` wie bei [[opencivil.mauerwerk.knicken#_Wand.ausmitten|ausmitten]]: es hängt nicht an w, die Ableitung
+bleibt dieselbe.
 
 ### k_N
 
@@ -199,6 +232,26 @@ def _k_N(ht: float, e_u: Optional[float], e_o: Optional[float], E_f: float, n_d:
 
 Die Rechnung hinter [[opencivil.mauerwerk.knicken#k_N|k_N]], je Fall einmal: die Zeichnung fragt nach jeder Eingabe.
 
+### querlast
+
+```python
+def querlast(ht: float, e_u: Optional[float], e_o: Optional[float], E_f: float, n: float, richtung: int) -> Querergebnis
+```
+
+Die grösste Querlast der Wand von `ht` Dicken Höhe unter der festen
+Normalkraft `n` – Ausmitten und `E_f` wie bei [[opencivil.mauerwerk.knicken#k_N|k_N]],
+`richtung` +1, wenn die Querlast zur Seite positiver Ausmitten drückt,
+sonst −1. Siehe Dateikopf.
+
+### _querlast
+
+```python
+@lru_cache(maxsize=512)
+def _querlast(ht: float, e_u: Optional[float], e_o: Optional[float], E_f: float, n: float, richtung: int) -> Querergebnis
+```
+
+Die Rechnung hinter [[opencivil.mauerwerk.knicken#querlast|querlast]], je Fall einmal.
+
 
 ## Konstanten
 
@@ -207,9 +260,13 @@ Die Rechnung hinter [[opencivil.mauerwerk.knicken#k_N|k_N]], je Fall einmal: die
 - `FORMELGRENZE = 0.6` – Bis zu dieser Ausmitte gilt die Formel der Figur 3 in der Rechnung – darüber bricht ein Schritt ab, statt dem Tangens nahe π/2 zu folgen.
 - `SCHRITT = 0.02` – Der erste Schritt in n, und wie genau k_N am Ende ist.
 - `GENAU = 2e-05`
+- `QUER_SCHRITT = 0.1` – Der erste Schritt der Querlast und wie genau sie am Ende ist, beide in λ_1; weiter als bis zum Vielfachen [[opencivil.mauerwerk.knicken#Konstanten|QUER_HOECHSTENS]] sucht sie nicht.
+- `QUER_GENAU = 0.0001`
+- `QUER_HOECHSTENS = 20.0`
 - `REFERENZ_FIGUR_3 = 'SIA 266:2015, 4.3.1.1, Figur 3'` – Wo die Regeln stehen.
 - `REFERENZ_GRENZE = 'SIA 266:2015, 4.3.1.1, Gl. (6), Figur 4'`
 - `REFERENZ_K_N = 'SIA 266:2015, 4.3.1.3, Gl. (11)'`
+- `REFERENZ_GEWOELBE = 'SIA 266:2015, 4.3.4.2, Figur 11'`
 - `DRUCK = 'druck'` – Was k_N begrenzt.
 - `AUSMITTE = 'ausmitte'`
 - `STABILITAET = 'stabilitaet'`
@@ -217,4 +274,5 @@ Die Rechnung hinter [[opencivil.mauerwerk.knicken#k_N|k_N]], je Fall einmal: die
 ## Gebraucht von
 
 - [[opencivil.mauerwerk.nachweise]]
+- [[opencivil.mauerwerk.querlast]]
 - [[opencivil.mauerwerk.schub]]

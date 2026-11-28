@@ -211,7 +211,7 @@ function zeichnen(a, g) {
   g.append(wand(a.v, z, {
     ...meldungenJe(a), stuerze: antwort?.stuerze || [], pfeiler: antwort?.pfeiler || [],
     urteile: antwort?.urteile || {}, alt: antwort?.fassung !== zustand.fassung,
-    stellungen: katalog('mauerwerk'), lastfall: aktiverLastfall(a.mw),
+    stellungen: katalog('mauerwerk'), lastfall: aktiverLastfall(a.mw), ersatzkraefte: antwort?.ersatzkraefte || {},
   }));
 }
 

@@ -7,6 +7,43 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-28 · Mauerwerk: Querlast und Erdbeben (Schritt 14d)
+
+Quer zur Wand wirkt jetzt eine Querlast, von Hand oder aus dem Erdbeben,
+je Lastfall angelegt in der neuen Kachel «Querlasten». Je Pfeiler und
+Kombination kommt der Nachweis der Querlast dazu (SIA 266:2015, 4.3.4),
+und wo das Gebäude mit q = 2.0 rechnet, das Normalkraftniveau (Gl. (27)).
+
+- **Die Ersatzkraft** nach SIA 261:2020, Gl. (49), mit T_a = T_1, wie im
+  Plan: die Klammer am grössten, ihre untere Grenze gilt nie; q_a = 1.5.
+  Zone, Baugrund und Bauwerksklasse kommen aus dem Erdbeben. p_E wirkt in
+  beiden Richtungen: Der Nachweis rechnet beide und zeigt die massgebende.
+- **Das lotrechte Gewölbe** ist die verformte Wand des Knickens mit der
+  Querlast dazu (`knicken.querlast`), immer nach Theorie 2. Ordnung. Es
+  rechnet mit der Normalkraft in halber Höhe: Die am Fuss überschätzte es,
+  denn Druck hält das Gewölbe zusammen.
+- **Das waagrechte Gewölbe** zählt nur ohne Öffnung, mit beiden Rändern
+  gehalten und vollfugig, und nur, wo Gl. (19) und (20) mit L gelten. Es
+  braucht keine Normalkraft: Eine Wand ohne lotrechte Last trägt die
+  Querlast so allein, ohne es ist sie rot. Ein erster Test nahm an, sie
+  stehe dann grau – falsch, denn mit gehaltenen Rändern trägt sie ja.
+- **Es zählt das stärkere Gewölbe**, nicht die Summe – auf der sicheren
+  Seite, solange die Norm nichts dazu sagt.
+- **Gl. (27):** q stellt man bei der Querlast des Erdbebens ein; das
+  Normalkraftniveau prüft das Werkzeug in den Kombinationen mit q = 2.0.
+  Das erhöhte Verformungsvermögen (4.7.1.4) und q = 2.5 (4.7.2) prüft es
+  nicht; ein grauer Hinweis sagt es in der Kachel, mit dem Namen der
+  Querlast.
+- **Im Bild** stehen Kreise auf der Wand, ausser auf Öffnungen und
+  Stürzen: mit Punkt zum Betrachter, mit Kreuz von ihm weg, im Wechsel
+  beim Erdbeben. Die Werte stehen unter der Wand: Eine erste Fassung
+  schrieb sie unter den Kopf, und dort überdeckten sie bei kleinem
+  Massstab die Grade der Stürze.
+- **Die Kachel «Querlasten»** steht in der Gruppe «Lasten» neben den
+  Lastfällen; `lastenKapitel` nimmt dazu weitere Kacheln an.
+- Das Prüfprojekt bekommt Wind und Erdbeben quer zur ersten Wand und eine
+  dritte Wand zwischen Querwänden, die das waagrechte Gewölbe zeigt.
+
 ## 2026-11-28 · Mauerwerk: Schub in der Wandebene (Schritt 14c)
 
 Eine Punktlast schiebt die Wand mit H auch waagrecht in ihrer Ebene, etwa

@@ -4,7 +4,8 @@ opencivil/projekt/mauerwerk.py -- eine Mauerwerkswand, wie die Oberfläche sie b
 VERANTWORTUNG:
 Der :class:`MauerwerkEintrag`: eine Wand in der Ansicht, gezeichnet aus
 Knoten -- ihr Umriss, Türen und Fenster mit dem Sturz darüber, ihre Linien-
-und Punktlasten --, dazu ihr Mauerwerk, ihre Dicke, wie sie gemauert ist und
+und Punktlasten --, ihre Querlasten, dazu ihr Mauerwerk, ihre Dicke, wie sie
+gemauert ist und
 wie ihre Ränder gehalten sind, und ihre Lastfälle und Kombinationen wie in
 der Decke (:mod:`opencivil.projekt.faelle`). Als speicherbare Datenklasse
 wie das Fachwerkmodell (:mod:`opencivil.projekt.fachwerkmodell`), mit dem
@@ -21,8 +22,8 @@ x nach rechts, y nach oben, in m -- wie in der Decke. Die Dicke der Wand,
 die Masse eines Sturzes und die Ausmitten in mm, wie man sie auf dem Plan
 liest; Lasten in kN/m und kN, nach unten positiv, eine Punktlast auch
 waagrecht in der Ebene der Wand, nach rechts positiv. Eine Ausmitte ist
-positiv zur Seite, von der aus man die Ansicht sieht. Umgerechnet wird beim
-Bauen.
+positiv zur Seite, von der aus man die Ansicht sieht, ebenso eine Querlast
+von Hand, in kN/m². Umgerechnet wird beim Bauen.
 """
 
 from __future__ import annotations
@@ -30,8 +31,11 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, List, Sequence, Union
 
-from opencivil.core.einheiten import KN, KN_PRO_M, M, MM
-from opencivil.mauerwerk.modell import Halterung, Mauerung, Seitenrand, Stossfugen, Sturzart
+from opencivil.core.einheiten import KN, KN_PRO_M, KN_PRO_M2, M, MM
+from opencivil.erdbeben.ersatzkraft import Baugrundklasse, Bauwerksklasse, Erdbebenzone
+from opencivil.mauerwerk.modell import (
+    Halterung, Mauerung, Querlastart, Seitenrand, Stossfugen, Sturzart, Verhaltensbeiwert,
+)
 from opencivil.projekt.eintraege import BauteilEintrag, Beschreibung
 from opencivil.projekt.faelle import (
     LastfallEintrag, LastkombinationEintrag, MitFaellen, kennung_von,
@@ -43,7 +47,8 @@ from opencivil.projekt.netz import Netz, neue_kennung
 Ort = Union[str, Sequence[float]]
 
 #: Womit die Kennungen der Teile einer Wand beginnen -- die Lasten wie in der Decke.
-VORSILBEN = {"waende": "W", "oeffnungen": "O", "linienlasten": "LL", "punktlasten": "PL"}
+VORSILBEN = {"waende": "W", "oeffnungen": "O", "linienlasten": "LL", "punktlasten": "PL",
+             "querlasten": "QL"}
 
 
 @dataclass
@@ -104,6 +109,33 @@ class WandpunktlastEintrag(Beschreibung):
 
 
 @dataclass
+class WandquerlastEintrag(Beschreibung):
+    """
+    Eine Last quer zur Wand, gleichmässig über ihre ganze Ansicht, in einem
+    Lastfall: von Hand je m², etwa Wind, oder die Ersatzkraft des Erdbebens
+    -- dann mit dem, was diese braucht.
+    """
+
+    kennung: str = ""
+    lastfall: str = ""
+    art: Querlastart = Querlastart.VON_HAND
+    wert: float = bereich(1.0, heisst="Querlast p", einheit=KN_PRO_M2, zeichen="p")
+    """Von Hand: positiv zur Seite, von der aus man die Ansicht sieht."""
+
+    zone: Erdbebenzone = Erdbebenzone.Z1B
+    baugrund: Baugrundklasse = Baugrundklasse.C
+    bauwerksklasse: Bauwerksklasse = Bauwerksklasse.I
+    q: Verhaltensbeiwert = Verhaltensbeiwert.Q_15
+    """Mit welchem q das Gebäude im Erdbeben rechnet."""
+
+    z_a: float = bereich(1.5, heisst="Höhe über dem Fundament z_a", einheit=M, ab=0.0,
+                         bis_feld="h", zeichen="z_a")
+    """Bis zur Mitte der Wand, wo die Ersatzkraft angreift."""
+
+    h: float = bereich(3.0, heisst="Höhe des Gebäudes h", einheit=M, ueber=0.0, zeichen="h")
+
+
+@dataclass
 class MauerwerkEintrag(MitFaellen, BauteilEintrag):
     """
     Eine Wand aus Mauerwerk. Ohne Regeln, die das ganze Projekt aufhielten:
@@ -133,6 +165,7 @@ class MauerwerkEintrag(MitFaellen, BauteilEintrag):
     oeffnungen: List[OeffnungEintrag] = field(default_factory=list)
     linienlasten: List[WandlinienlastEintrag] = field(default_factory=list)
     punktlasten: List[WandpunktlastEintrag] = field(default_factory=list)
+    querlasten: List[WandquerlastEintrag] = field(default_factory=list)
     lastfaelle: List[LastfallEintrag] = field(default_factory=list)
     kombinationen: List[LastkombinationEintrag] = field(default_factory=list)
     beschreibung: str = ""
@@ -192,6 +225,15 @@ class MauerwerkEintrag(MitFaellen, BauteilEintrag):
         return self._anlegen("punktlasten", WandpunktlastEintrag,
                              {"lastfall": kennung_von(lastfall),
                               "knoten": self._knoten(self.netz(), ort), **felder}, "Punktlast")
+
+    def querlast(self, lastfall: Any, **felder: Any) -> WandquerlastEintrag:
+        """
+        Eine Querlast im Lastfall ``lastfall`` -- ``art``, von Hand ``wert``
+        in kN/m², aus dem Erdbeben ``zone``, ``baugrund``,
+        ``bauwerksklasse``, ``q``, ``z_a`` und ``h`` in m als Stichwort.
+        """
+        return self._anlegen("querlasten", WandquerlastEintrag,
+                             {"lastfall": kennung_von(lastfall), **felder}, "Querlast")
 
     # -- Die frische Anlage -------------------------------------------------------
 

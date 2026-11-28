@@ -1,5 +1,5 @@
 ---
-erzeugt: f232479482aa
+erzeugt: 091b4c0b449a
 art: modul
 tags: [modul]
 ---
@@ -40,6 +40,7 @@ Der Satzteil mit grossem Anfang: «an der Stufe von …» – «An der Stufe von
 - [[opencivil.material.arten]]
 - [[opencivil.mauerwerk.herleitung]]
 - [[opencivil.mauerwerk.pruefen]]
+- [[opencivil.mauerwerk.querlast]]
 - [[opencivil.nachweis.qa_verbund_werte]]
 - [[opencivil.projekt.aufbau.aus_system]]
 - [[opencivil.projekt.aufbau.balkensystem]]

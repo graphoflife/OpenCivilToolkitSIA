@@ -1,5 +1,5 @@
 ---
-erzeugt: d21a8d01d1ac
+erzeugt: 44c161d494a8
 art: modul
 tags: [modul]
 ---
@@ -16,7 +16,9 @@ die der Lasten allein und das Moment ihrer Ausmitten an seinem Kopf; je
 Sturzauflager seine Kraft; und wie weit die Lasten in der Ebene der Wand
 neben den Mitten der Pfeiler stehen, als ein Moment. Was in der Ebene der
 Wand daraus wird und was die waagrechten Lasten dazugeben, rechnet
-[[opencivil.mauerwerk.scheibe|scheibe]] in denselben Abtrag.
+[[opencivil.mauerwerk.scheibe|scheibe]] in denselben Abtrag. Die Querlasten
+stehen dort als zwei Zahlen je m² Wand: die von Hand mit ihrer Richtung, die
+des Erdbebens als Betrag, denn sie wirkt in beiden.
 Eine Kombination summiert die Lastfälle mit ihren Beiwerten
 ([[opencivil.mauerwerk.lasten#kombinieren|kombinieren]]). Die Norm regelt das nicht; so rechnet das Werkzeug
 (nach Vorgabe, nicht nachgeschlagen):
@@ -64,6 +66,8 @@ stehen, und je Pfeiler die Querkraft `V`, nach rechts positiv, was die
 waagrechten Lasten zu seiner Normalkraft geben, `N_H` – schon in
 `N` und `N_L` –, und das Moment an seinem Fuss `M_z`. Beide
 Momente sind positiv, wenn sie die Resultierende nach rechts schieben.
+Quer zur Wand je m² `p`, von Hand, positiv zur Seite, von der aus man
+die Ansicht sieht, und `p_E` aus dem Erdbeben, ein Betrag.
 
 - `N: Dict[str, float] = field(default_factory=dict)`
 - `N_L: Dict[str, float] = field(default_factory=dict)`
@@ -74,6 +78,8 @@ Momente sind positiv, wenn sie die Resultierende nach rechts schieben.
 - `V: Dict[str, float] = field(default_factory=dict)`
 - `N_H: Dict[str, float] = field(default_factory=dict)`
 - `M_z: Dict[str, float] = field(default_factory=dict)`
+- `p: float = 0.0`
+- `p_E: float = 0.0`
 
 #### Abtrag.je_pfeiler
 
@@ -161,6 +167,7 @@ N/m² der Wand, null ohne. Siehe Dateikopf.
 
 - [[opencivil.mauerwerk.herleitung]]
 - [[opencivil.mauerwerk.nachweise]]
+- [[opencivil.mauerwerk.querlast]]
 - [[opencivil.mauerwerk.scheibe]]
 - [[opencivil.mauerwerk.schub]]
 - [[opencivil.mauerwerk.werk]]

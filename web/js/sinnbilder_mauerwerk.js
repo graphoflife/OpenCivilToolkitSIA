@@ -44,6 +44,12 @@ export const ZEICHEN = {
       'M4 18h16 M6 21l2-3 M10 21l2-3 M14 21l2-3 M18 21l2-3'],
     strich: ['M4 8.5v7 M20 8.5v7'],
   },
+  // Die Wand im Schnitt, von der Seite gedrückt: Pfeile quer zu ihr.
+  'mw-querlasten': {
+    pfade: ['M14 3h5.5v18H14z', 'M14 7.5h5.5 M14 12h5.5 M14 16.5h5.5',
+      'M3 7h8.5 M9.2 4.9l2.3 2.1-2.3 2.1', 'M3 12h8.5 M9.2 9.9l2.3 2.1-2.3 2.1',
+      'M3 17h8.5 M9.2 14.9l2.3 2.1-2.3 2.1'],
+  },
 
   // -- Die Stellungen der Schalter -----------------------------------------
 

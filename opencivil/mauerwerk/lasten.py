@@ -9,7 +9,9 @@ die der Lasten allein und das Moment ihrer Ausmitten an seinem Kopf; je
 Sturzauflager seine Kraft; und wie weit die Lasten in der Ebene der Wand
 neben den Mitten der Pfeiler stehen, als ein Moment. Was in der Ebene der
 Wand daraus wird und was die waagrechten Lasten dazugeben, rechnet
-:mod:`~opencivil.mauerwerk.scheibe` in denselben Abtrag.
+:mod:`~opencivil.mauerwerk.scheibe` in denselben Abtrag. Die Querlasten
+stehen dort als zwei Zahlen je m² Wand: die von Hand mit ihrer Richtung, die
+des Erdbebens als Betrag, denn sie wirkt in beiden.
 Eine Kombination summiert die Lastfälle mit ihren Beiwerten
 (:func:`kombinieren`). Die Norm regelt das nicht; so rechnet das Werkzeug
 (nach Vorgabe, nicht nachgeschlagen):
@@ -61,6 +63,8 @@ class Abtrag:
     waagrechten Lasten zu seiner Normalkraft geben, ``N_H`` -- schon in
     ``N`` und ``N_L`` --, und das Moment an seinem Fuss ``M_z``. Beide
     Momente sind positiv, wenn sie die Resultierende nach rechts schieben.
+    Quer zur Wand je m² ``p``, von Hand, positiv zur Seite, von der aus man
+    die Ansicht sieht, und ``p_E`` aus dem Erdbeben, ein Betrag.
     """
 
     N: Dict[str, float] = field(default_factory=dict)
@@ -72,6 +76,8 @@ class Abtrag:
     V: Dict[str, float] = field(default_factory=dict)
     N_H: Dict[str, float] = field(default_factory=dict)
     M_z: Dict[str, float] = field(default_factory=dict)
+    p: float = 0.0
+    p_E: float = 0.0
 
     def je_pfeiler(self) -> Tuple[Dict[str, float], ...]:
         """Was je Pfeiler eine Zahl hat -- die eine Liste, die :func:`kombinieren` summiert."""
@@ -102,6 +108,9 @@ def kombinieren(name_faktoren: Mapping[str, float], je_fall: Mapping[str, Abtrag
             summe.R[k] = summe.R.get(k, 0.0) + beiwert * v
         summe.unten += beiwert * a.unten
         summe.M_v += beiwert * a.M_v
+        summe.p += beiwert * a.p
+        # Das Erdbeben wirkt in beiden Richtungen: ein negativer Beiwert dreht es nur.
+        summe.p_E += abs(beiwert) * a.p_E
     return summe
 
 

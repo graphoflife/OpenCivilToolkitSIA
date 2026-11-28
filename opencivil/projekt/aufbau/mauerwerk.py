@@ -15,7 +15,9 @@ DIE NACHWEISE:
 Je Pfeiler und Kombination die Normalkraft, je Sturzauflager und
 Kombination die Teilflächenpressung (:mod:`opencivil.mauerwerk.nachweise`);
 je Pfeiler und Kombination, in der eine Last waagrecht schiebt, auch Schub
-und Gleiten (:mod:`opencivil.mauerwerk.schub`). Wo sie stehen, hängt nur an der
+und Gleiten (:mod:`opencivil.mauerwerk.schub`), in der eine Querlast wirkt,
+die Querlast, und in der das Gebäude im Erdbeben mit q = 2.0 rechnet, das
+Normalkraftniveau (:mod:`opencivil.mauerwerk.querlast`). Wo sie stehen, hängt nur an der
 Zeichnung; darum werden sie hier gebaut, sobald die Zeichnung rechnet. Sonst
 sagt die Zusammenfassung, warum es noch keinen Nachweis gibt.
 """
@@ -27,14 +29,18 @@ from typing import TYPE_CHECKING, List, Optional, Sequence, Tuple
 from opencivil.decke.geometrie import Punkt
 from opencivil.mauerwerk.lasten import SEITEN
 from opencivil.mauerwerk.modell import (
-    TOLERANZ, Kombination, Lastfall, Oeffnung, Umriss, Wand, Wandlast, pfeiler,
+    TOLERANZ, Erdbebenquer, Kombination, Lastfall, Oeffnung, Querlast, Querlastart, Umriss,
+    Verhaltensbeiwert, Wand, Wandlast, pfeiler,
 )
 from opencivil.mauerwerk.nachweise import Normalkraft, Stelle, Teilflaechen
+from opencivil.mauerwerk.querlast import Normalkraftniveau, Querlastnachweis
 from opencivil.mauerwerk.schub import Gleiten, Schub
 from opencivil.mauerwerk.pruefen import lasten_pruefen, pruefen
 from opencivil.mauerwerk.werk import VORGABEN, Mauerwerkswand
 from opencivil.projekt.lesen import als_groesse, ort_von
-from opencivil.projekt.mauerwerk import MauerwerkEintrag, WandlinienlastEintrag
+from opencivil.projekt.mauerwerk import (
+    MauerwerkEintrag, WandlinienlastEintrag, WandquerlastEintrag,
+)
 from opencivil.stabwerk.system import Meldung
 
 from opencivil.projekt.aufbau.faelle import (
@@ -63,7 +69,8 @@ def wand_von(eintrag: MauerwerkEintrag) -> Tuple[Wand, List[Meldung]]:
     meldungen = faelle_pruefen(eintrag.lastfaelle, eintrag.kombinationen)
     for was, liste in (("Knoten", eintrag.knoten), ("Wände", eintrag.waende),
                        ("Öffnungen", eintrag.oeffnungen),
-                       ("Lasten", [*eintrag.linienlasten, *eintrag.punktlasten]),
+                       ("Lasten", [*eintrag.linienlasten, *eintrag.punktlasten,
+                                   *eintrag.querlasten]),
                        ("Lastfälle", eintrag.lastfaelle), ("Kombinationen", eintrag.kombinationen)):
         meldungen.extend(doppelte_kennungen(was, liste))
 
@@ -101,6 +108,12 @@ def wand_von(eintrag: MauerwerkEintrag) -> Tuple[Wand, List[Meldung]]:
             je_fall[lastfall].append(last)
         else:
             meldungen.append(ohne_lastfall(kennung))
+    quer = {lf.kennung: [] for lf in eintrag.lastfaelle}
+    for q in eintrag.querlasten:
+        if q.lastfall in quer:
+            quer[q.lastfall].append(querlast_von(q))
+        else:
+            meldungen.append(ohne_lastfall(q.kennung))
     faktoren, hinweise = beiwerte(eintrag.kombinationen, eintrag.lastfaelle)
     meldungen.extend(hinweise)
     wand = Wand(
@@ -110,10 +123,18 @@ def wand_von(eintrag: MauerwerkEintrag) -> Tuple[Wand, List[Meldung]]:
                          for o in eintrag.oeffnungen if (ecken := orte(o, o.knoten)) is not None),
         mauerung=eintrag.mauerung, stossfugen=eintrag.stossfugen,
         kopf=eintrag.kopf, fuss=eintrag.fuss, links=eintrag.links, rechts=eintrag.rechts,
-        lastfaelle=tuple(Lastfall(lf.name, tuple(je_fall[lf.kennung]), lf.eigengewicht)
-                         for lf in eintrag.lastfaelle),
+        lastfaelle=tuple(Lastfall(lf.name, tuple(je_fall[lf.kennung]), lf.eigengewicht,
+                                  tuple(quer[lf.kennung])) for lf in eintrag.lastfaelle),
         kombinationen=tuple(Kombination(name, f) for name, f in faktoren))
     return wand, meldungen
+
+
+def querlast_von(q: WandquerlastEintrag) -> Querlast:
+    """Eine Querlast in SI: von Hand in N/m², aus dem Erdbeben mit dem, was es braucht."""
+    if q.art is Querlastart.ERDBEBEN:
+        return Querlast(q.kennung, erdbeben=Erdbebenquer(q.zone, q.baugrund, q.bauwerksklasse,
+                                                         q.q, q.si("z_a"), q.si("h")))
+    return Querlast(q.kennung, p=q.si("wert"))
 
 
 def bauen(art: "Bauteilart", eintrag: MauerwerkEintrag, aufbau: Aufbau) -> Bauteil:
@@ -146,7 +167,9 @@ def bauen(art: "Bauteilart", eintrag: MauerwerkEintrag, aufbau: Aufbau) -> Baute
 def _nachweise(teil: Bauteil, objekt: Mauerwerkswand, wand: Wand, aufbau: Aufbau) -> None:
     """
     Je Pfeiler und Kombination die Normalkraft -- wo eine Last waagrecht
-    schiebt, auch Schub und Gleiten --, je Sturzauflager die Teilflächen.
+    schiebt, auch Schub und Gleiten, wo eine Querlast wirkt, die Querlast,
+    wo das Gebäude mit q = 2.0 rechnet, das Normalkraftniveau --, je
+    Sturzauflager die Teilflächen.
     """
     kennung, namen = teil.eintrag.kennung, [k.name for k in wand.kombinationen]
     alle = pfeiler(wand.flaeche, wand.oeffnungen)
@@ -160,3 +183,9 @@ def _nachweise(teil: Bauteil, objekt: Mauerwerkswand, wand: Wand, aufbau: Aufbau
     if schiebend:
         aufbau.eintragen(teil, "mw_schub", kennung, Schub(objekt, schiebend))
         aufbau.eintragen(teil, "mw_gleiten", kennung, Gleiten(objekt, schiebend))
+    quer = [Stelle(pf.name, k) for pf in alle for k in wand.quer_belastete()]
+    if quer:
+        aufbau.eintragen(teil, "mw_querlast", kennung, Querlastnachweis(objekt, quer))
+    niveau = [Stelle(pf.name, k) for pf in alle for k in wand.im_erdbeben(Verhaltensbeiwert.Q_20)]
+    if niveau:
+        aufbau.eintragen(teil, "mw_normalkraftniveau", kennung, Normalkraftniveau(objekt, niveau))

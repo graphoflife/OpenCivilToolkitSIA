@@ -1,5 +1,5 @@
 ---
-erzeugt: 5e25facdd519
+erzeugt: 62347974defe
 art: modul
 tags: [modul]
 ---
@@ -24,7 +24,9 @@ Lastfälle teilt sie mit Balkensystem und Decke
 Je Pfeiler und Kombination die Normalkraft, je Sturzauflager und
 Kombination die Teilflächenpressung ([[opencivil.mauerwerk.nachweise]]);
 je Pfeiler und Kombination, in der eine Last waagrecht schiebt, auch Schub
-und Gleiten ([[opencivil.mauerwerk.schub]]). Wo sie stehen, hängt nur an der
+und Gleiten ([[opencivil.mauerwerk.schub]]), in der eine Querlast wirkt,
+die Querlast, und in der das Gebäude im Erdbeben mit q = 2.0 rechnet, das
+Normalkraftniveau ([[opencivil.mauerwerk.querlast]]). Wo sie stehen, hängt nur an der
 Zeichnung; darum werden sie hier gebaut, sobald die Zeichnung rechnet. Sonst
 sagt die Zusammenfassung, warum es noch keinen Nachweis gibt.
 
@@ -40,6 +42,14 @@ Die Wand der Beschreibung in SI: Masse in m, Lasten in N. Ein Teil, das
 auf einen Knoten zeigt, den es nicht gibt, fehlt in der Wand; die Meldung
 sagt es. Eine Last heisst nach ihrer Kennung; eine, deren Lastfall es
 nicht gibt, und ein Beiwert dafür bleiben mit einem Hinweis weg.
+
+### querlast_von
+
+```python
+def querlast_von(q: WandquerlastEintrag) -> Querlast
+```
+
+Eine Querlast in SI: von Hand in N/m², aus dem Erdbeben mit dem, was es braucht.
 
 ### bauen
 
@@ -58,7 +68,9 @@ def _nachweise(teil: Bauteil, objekt: Mauerwerkswand, wand: Wand, aufbau: Aufbau
 ```
 
 Je Pfeiler und Kombination die Normalkraft – wo eine Last waagrecht
-schiebt, auch Schub und Gleiten –, je Sturzauflager die Teilflächen.
+schiebt, auch Schub und Gleiten, wo eine Querlast wirkt, die Querlast,
+wo das Gebäude mit q = 2.0 rechnet, das Normalkraftniveau –, je
+Sturzauflager die Teilflächen.
 
 
 ## Konstanten
@@ -74,6 +86,7 @@ schiebt, auch Schub und Gleiten –, je Sturzauflager die Teilflächen.
 - [[opencivil.mauerwerk.modell]]
 - [[opencivil.mauerwerk.nachweise]]
 - [[opencivil.mauerwerk.pruefen]]
+- [[opencivil.mauerwerk.querlast]]
 - [[opencivil.mauerwerk.schub]]
 - [[opencivil.mauerwerk.werk]]
 - [[opencivil.projekt.aufbau]]

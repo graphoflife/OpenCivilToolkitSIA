@@ -30,19 +30,22 @@ DIE LASTEN:
 Je Lastfall (:class:`Lastfall`): waagrechte Linienlasten und Punktlasten in
 der Ansicht, nach unten positiv, mit ihrer Ausmitte quer zur Wand --
 positiv zur Seite, von der aus man die Ansicht sieht. Eine Punktlast kann
-auch waagrecht in der Ebene der Wand schieben, nach rechts positiv. Wie die
-lotrechten Lasten zu den Pfeilern kommen, sagt
-:mod:`~opencivil.mauerwerk.lasten`, wie die waagrechten
-:mod:`~opencivil.mauerwerk.scheibe`.
+auch waagrecht in der Ebene der Wand schieben, nach rechts positiv. Dazu
+Querlasten (:class:`Querlast`), gleichmässig über die ganze Wand: von Hand
+oder aus dem Erdbeben. Wie die lotrechten Lasten zu den Pfeilern kommen,
+sagt :mod:`~opencivil.mauerwerk.lasten`, wie die waagrechten
+:mod:`~opencivil.mauerwerk.scheibe`, was die Querlasten bewirken
+:mod:`~opencivil.mauerwerk.querlast`.
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import List, Mapping, Optional, Sequence, Tuple
+from typing import Callable, List, Mapping, Optional, Sequence, Tuple
 
 from opencivil.core.wahl import Wahl
 from opencivil.decke.geometrie import Punkt
+from opencivil.erdbeben.ersatzkraft import Baugrundklasse, Bauwerksklasse, Erdbebenzone
 
 #: Unter dieser Länge in m sind zwei Koordinaten gleich.
 TOLERANZ = 1e-6
@@ -134,6 +137,47 @@ class Sturzart(Wahl):
         return {Sturzart.BETON: "Ein Sturz aus Stahlbeton, an Ort gegossen oder versetzt.",
                 Sturzart.VORFABRIZIERT: "Ein vorfabrizierter Sturz, etwa ein Sturzbrett "
                                         "mit Mauerwerk darüber."}[self]
+
+
+class Querlastart(Wahl):
+    """Woher eine Querlast kommt."""
+
+    VON_HAND = "von_hand"
+    ERDBEBEN = "erdbeben"
+
+    @property
+    def beschriftung(self) -> str:
+        return {Querlastart.VON_HAND: "von Hand", Querlastart.ERDBEBEN: "Erdbeben"}[self]
+
+    @property
+    def erklaerung(self) -> str:
+        return {Querlastart.VON_HAND: "Eine Last quer zur Wand, je m² Ansicht, etwa Wind – "
+                                      "positiv zur Seite, von der aus man die Ansicht sieht.",
+                Querlastart.ERDBEBEN: "Die Ersatzkraft des Erdbebens quer zur Wand aus ihrem "
+                                      "Eigengewicht, nach SIA 261:2020, Gl. (49) – in beiden "
+                                      "Richtungen."}[self]
+
+
+class Verhaltensbeiwert(Wahl):
+    """Mit welchem Verhaltensbeiwert q das Gebäude im Erdbeben rechnet -- SIA 266:2015, 4.7.1.5."""
+
+    Q_15 = "1.5"
+    Q_20 = "2.0"
+    Q_25 = "2.5"
+
+    @property
+    def beschriftung(self) -> str:
+        return self.value
+
+    @property
+    def erklaerung(self) -> str:
+        return {Verhaltensbeiwert.Q_15: "Im Allgemeinen.",
+                Verhaltensbeiwert.Q_20: "Das Gebäude ist regelmässig nach SIA 261, und jede Wand "
+                                        "erfüllt Gl. (27) – das Werkzeug prüft Gl. (27) an "
+                                        "jedem Pfeiler.",
+                Verhaltensbeiwert.Q_25: "Mauerwerk mit erhöhtem Verformungsvermögen, durch "
+                                        "Versuche nachgewiesen (4.7.2) – das prüft das Werkzeug "
+                                        "nicht."}[self]
 
 
 @dataclass(frozen=True)
@@ -252,12 +296,48 @@ class Wandlast:
 
 
 @dataclass(frozen=True)
+class Erdbebenquer:
+    """Was die Ersatzkraft des Erdbebens quer zur Wand braucht -- ``z_a`` und ``h`` in m."""
+
+    zone: Erdbebenzone = Erdbebenzone.Z1B
+    baugrund: Baugrundklasse = Baugrundklasse.C
+    bauwerksklasse: Bauwerksklasse = Bauwerksklasse.I
+    q: Verhaltensbeiwert = Verhaltensbeiwert.Q_15
+    """Mit welchem q das Gebäude rechnet -- nicht die Wand: sie rechnet mit q_a."""
+
+    z_a: float = 1.5
+    """Wie hoch die Wand über dem Fundament des Gebäudes steht, bis zu ihrer Mitte."""
+
+    h: float = 3.0
+    """Wie hoch das Gebäude über seinem Fundament ist."""
+
+
+@dataclass(frozen=True)
+class Querlast:
+    """
+    Eine Last quer zur Wand, gleichmässig über ihre ganze Ansicht: von Hand
+    ``p`` in N/m², positiv zur Seite, von der aus man die Ansicht sieht --
+    oder aus dem Erdbeben (``erdbeben``), in beiden Richtungen. ``name``
+    nennt sie in einer Meldung.
+    """
+
+    name: str
+    p: float = 0.0
+    erdbeben: Optional[Erdbebenquer] = None
+
+    @property
+    def wirkt(self) -> bool:
+        return self.erdbeben is not None or self.p != 0.0
+
+
+@dataclass(frozen=True)
 class Lastfall:
-    """Ein Lastfall der Wand: seine Lasten, und ob er ihr Eigengewicht bekommt."""
+    """Ein Lastfall der Wand: seine Lasten und Querlasten, und ob er ihr Eigengewicht bekommt."""
 
     name: str
     lasten: Tuple[Wandlast, ...] = ()
     eigengewicht: bool = False
+    querlasten: Tuple[Querlast, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -296,13 +376,23 @@ class Wand:
         """Die Wand als Rechteck: ``None`` ohne genau einen rechteckigen Umriss."""
         return self.umrisse[0].rechteck if len(self.umrisse) == 1 else None
 
+    def mit(self, hat: Callable[[Lastfall], bool]) -> List[str]:
+        """Die Namen der Kombinationen, in denen ein Lastfall, für den ``hat`` gilt, zählt."""
+        faelle = [lf.name for lf in self.lastfaelle if hat(lf)]
+        return [k.name for k in self.kombinationen if any(k.faktoren.get(n) for n in faelle)]
+
     def schiebende(self) -> List[str]:
-        """
-        Die Namen der Kombinationen, in denen eine Last die Wand waagrecht
-        schiebt: ein Lastfall mit H hat dort einen Beiwert.
-        """
-        mit_H = [lf.name for lf in self.lastfaelle if any(last.H for last in lf.lasten)]
-        return [k.name for k in self.kombinationen if any(k.faktoren.get(n) for n in mit_H)]
+        """Die Namen der Kombinationen, in denen eine Last die Wand waagrecht schiebt, mit H."""
+        return self.mit(lambda lf: any(last.H for last in lf.lasten))
+
+    def quer_belastete(self) -> List[str]:
+        """Die Namen der Kombinationen, in denen eine Querlast wirkt."""
+        return self.mit(lambda lf: any(q.wirkt for q in lf.querlasten))
+
+    def im_erdbeben(self, q: Verhaltensbeiwert) -> List[str]:
+        """Die Namen der Kombinationen mit einem Erdbeben, in dem das Gebäude mit ``q`` rechnet."""
+        return self.mit(lambda lf: any(e.erdbeben is not None and e.erdbeben.q is q
+                                       for e in lf.querlasten))
 
 
 def pfeiler(wand: Rechteck, oeffnungen: Sequence[Oeffnung]) -> List[Pfeiler]:

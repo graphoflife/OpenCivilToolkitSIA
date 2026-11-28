@@ -1,5 +1,5 @@
 ---
-erzeugt: 6c24e57eeb90
+erzeugt: 83293d9345d2
 art: modul
 tags: [modul]
 ---
@@ -22,6 +22,7 @@ scheibe.py     wie ihre waagrechten Lasten zu den Pfeilern kommen
 knicken.py     k_N eines Pfeilers nach Theorie 2. Ordnung
 nachweise.py   die Nachweise: Normalkraft je Pfeiler, Teilflächen je Sturzauflager
 schub.py       die Nachweise des Schubs je Pfeiler: Druckstrebe und Gleiten
+querlast.py    die Querlast je Pfeiler, das Erdbeben quer zur Wand und Gl. (27)
 werk.py        die Wand im Rechenwerk und ihr Befund
 herleitung.py  wie sie ihre Rechnung aufschreibt
 uebersicht.py  ihre Angaben über den Nachweisen in der Zusammenfassung
@@ -36,6 +37,7 @@ uebersicht.py  ihre Angaben über den Nachweisen in der Zusammenfassung
 - [[opencivil.mauerwerk.modell]] – eine Mauerwerkswand in der Ansicht, in SI.
 - [[opencivil.mauerwerk.nachweise]] – die Nachweise einer Wand: Normalkraft und Teilflächen.
 - [[opencivil.mauerwerk.pruefen]] – was einer Wand fehlt oder an ihr nicht stimmt.
+- [[opencivil.mauerwerk.querlast]] – eine Wand quer zu ihrer Ebene belastet, auch im Erdbeben.
 - [[opencivil.mauerwerk.scheibe]] – wie die waagrechten Lasten einer Wand zu ihren Pfeilern kommen.
 - [[opencivil.mauerwerk.schub]] – die Nachweise des Schubs in der Ebene einer Wand.
 - [[opencivil.mauerwerk.uebersicht]] – was die Zusammenfassung einer Wand über ihren Nachweisen zeigt.

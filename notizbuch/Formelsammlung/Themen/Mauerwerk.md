@@ -1,10 +1,10 @@
 ---
-erzeugt: fd2cb5fd805b
+erzeugt: 7fdd006df5ab
 art: thema
 tags: [thema]
 ---
 > [!abstract] Mauerwerk
-> 23 Formeln, in der Folge, in der gerechnet wird.
+> 30 Formeln, in der Folge, in der gerechnet wird.
 
 ## Was die Rechnung dazu sagt
 
@@ -16,6 +16,10 @@ Die Querkraft geht mit der Normalkraft als geneigte Druckstrebe durch den Pfeile
 
 Steiler als arctan μ\_d kann die Druckstrebe nicht stehen: sonst gleitet der Pfeiler in einer Lagerfuge. Die Reibung trägt μ\_d · N\_xd.
 
+Quer zu ihrer Ebene trägt eine Wand aus unbewehrtem Mauerwerk über Druckgewölbe: lotrecht zwischen Kopf und Fuss mit ihrer Normalkraft, und waagrecht zwischen gehaltenen Rändern (Figur 11). Das lotrechte Gewölbe ist die verformte Wand: die Querlast gibt ihr eine Ausmitte dazu, und wie bei der Normalkraft darf diese nirgends über die Grenze der Figur 4.
+
+Rechnet das Gebäude im Erdbeben mit q = 2.0, darf jede Wand, die zur Tragsicherheit zählt, nur mässig gedrückt sein. Dazu muss das Gebäude regelmässig sein nach SIA 261 – das prüft das Werkzeug hier nicht.
+
 ## Formeln
 
 1. [[Bemessungswert der Druckfestigkeit senkrecht zu den Lagerfugen]]
@@ -26,21 +30,28 @@ Steiler als arctan μ\_d kann die Druckstrebe nicht stehen: sonst gleitet der Pf
 6. [[Bemessungswert des Elastizitätsmoduls senkrecht zu den Lagerfugen]]
 7. [[Bemessungswert des Schubmoduls]]
 8. [[Eigengewicht der Wand je m² Ansicht, aus der Dichte ihres Mauerwerks]]
-9. [[Krümmung einer Wand aus Mauerwerk]]
-10. [[Grenze der Ausmitte einer Wand aus Mauerwerk]]
-11. [[Gleichgewicht der verformten Wand – Ausmitte der Last und Auslenkung w]]
-12. [[Ausmitte am Kopf – sie bleibt, wenn die Lasten wachsen]]
-13. [[Bezugswert der Knicklänge einer Wand]]
-14. [[Normalkraftwiderstand eines Pfeilers aus Mauerwerk]]
-15. [[Erfüllungsgrad]]
-16. [[Gedrückte Länge am Fuss eines Pfeilers]]
-17. [[Fläche des Auflagers]]
-18. [[Beiwert der Teilflächenpressung im Mauerwerk]]
-19. [[Widerstand eines Sturzauflagers]]
-20. [[Neigung der Druckstrebe in einem Pfeiler]]
-21. [[Dicke einer Schubwand mit ausmittiger Normalkraft]]
-22. [[Widerstand der Druckstrebe in einem Pfeiler]]
-23. [[Widerstand eines Pfeilers gegen Gleiten]]
+9. [[Ersatzkraft des Erdbebens quer zu einer Wand]]
+10. [[Krümmung einer Wand aus Mauerwerk]]
+11. [[Grenze der Ausmitte einer Wand aus Mauerwerk]]
+12. [[Gleichgewicht der verformten Wand – Ausmitte der Last und Auslenkung w]]
+13. [[Ausmitte am Kopf – sie bleibt, wenn die Lasten wachsen]]
+14. [[Bezugswert der Knicklänge einer Wand]]
+15. [[Normalkraftwiderstand eines Pfeilers aus Mauerwerk]]
+16. [[Erfüllungsgrad]]
+17. [[Gedrückte Länge am Fuss eines Pfeilers]]
+18. [[Fläche des Auflagers]]
+19. [[Beiwert der Teilflächenpressung im Mauerwerk]]
+20. [[Widerstand eines Sturzauflagers]]
+21. [[Neigung der Druckstrebe in einem Pfeiler]]
+22. [[Dicke einer Schubwand mit ausmittiger Normalkraft]]
+23. [[Widerstand der Druckstrebe in einem Pfeiler]]
+24. [[Widerstand eines Pfeilers gegen Gleiten]]
+25. [[Ausmitte einer Wand unter Querlast]]
+26. [[Normalkraft eines Pfeilers in halber Höhe]]
+27. [[Normalkraftniveau eines Pfeilers]]
+28. [[Durchbiegung einer Wand als waagrechter Streifen]]
+29. [[Widerstand des waagrechten Druckgewölbes einer Wand]]
+30. [[Querlastwiderstand einer Wand aus Mauerwerk]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 
@@ -81,3 +92,13 @@ folgen die Nachweise nach 4.3.2 und 4.3.3: die geneigte Druckstrebe auf
 der gedrückten Länge (Gl. (13)), das Gleiten der Lagerfugen (Gl. (14))
 und, steht die Normalkraft quer zur Wand ausmittig, die Normalkraft auf
 der gedrückten Länge (Gl. (17)).
+
+Quer zu ihrer Ebene – Wind von Hand oder das Erdbeben – trägt die Wand
+über Druckgewölbe (4.3.4): lotrecht zwischen Kopf und Fuss mit ihrer
+Normalkraft, gerechnet nach Theorie 2. Ordnung wie beim Knicken, und
+waagrecht zwischen gehaltenen Rändern als Bogen mit drei Gelenken. Es zählt
+das stärkere der beiden. Das Erdbeben quer zur Wand ist die Ersatzkraft
+eines sekundären Bauteils nach SIA 261:2020, Gl. (49), mit der Schwingzeit
+des Gebäudes – das Ungünstigste, nach Vorgabe, auch für eine tragende
+Wand. Rechnet das Gebäude mit $q = 2.0$, darf jeder Pfeiler nur mässig
+gedrückt sein, Gl. (27).

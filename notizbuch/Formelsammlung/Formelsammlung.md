@@ -1,5 +1,5 @@
 ---
-erzeugt: ac64e0910d29
+erzeugt: bd842a542d7b
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -82,7 +82,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 **Mauerwerk**
 
-- [[Mauerwerk]] · 23
+- [[Mauerwerk]] · 30
 
 **Decken**
 
@@ -118,6 +118,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Auslenkung aus einem Geschoss]]
 - [[Auslenkung des Dachs]] · $u_x$
 - [[Ausmitte am Kopf – sie bleibt, wenn die Lasten wachsen]] · $e_o$
+- [[Ausmitte einer Wand unter Querlast]]
 - [[Äusserer Widerstand auf Druck]] · $R_{a,k}$
 - [[Äusserer Widerstand auf Zug]] · $R_{a,k,Z}$
 - [[Bedingung der Duktilität]]
@@ -226,6 +227,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Druckzonenhöhe aus dem Kräftegleichgewicht]] · $x^{+}$
 - [[Druckzonenhöhe im Stützstreifen]] · $x_x$
 - [[Dübel für volle Verdübelung]] · $N_f$
+- [[Durchbiegung einer Wand als waagrechter Streifen]] · $w_d$
 - [[Durchmesser des flächengleichen Kreises]] · $b$
 - [[Durchstanzbewehrung an der Fliessgrenze]] · $V_{Rd,v}$
 - [[Durchstanzwiderstand ohne Durchstanzbewehrung]] · $V_{Rd,c}$
@@ -244,6 +246,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Ersatzimperfektion des Stabs]] · $w_{0,y}$
 - [[Ersatzimperfektion einer Verbundstütze]] · $e_{0,y}$
 - [[Ersatzkraft]] · $F_{d,x}$
+- [[Ersatzkraft des Erdbebens quer zu einer Wand]] · $p_E$
 - [[Ersatzkraft eines Geschosses]]
 - [[Erweiterte Tragfähigkeitsformel]]
 - [[Exponent β der Interaktion]] · $\beta$
@@ -400,7 +403,9 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Neigung der Last]] · $\delta_R$
 - [[Nominelle Dehnung der Zugbewehrung]] · $\varepsilon_v$
 - [[Normalkraft aus der Vorspannung]] · $N_p$
+- [[Normalkraft eines Pfeilers in halber Höhe]] · $N_m$
 - [[Normalkraft mit der Längszugkraft aus der Querkraft]] · $N_V$
+- [[Normalkraftniveau eines Pfeilers]] · $n_d$
 - [[Normalkraftwiderstand eines Pfeilers aus Mauerwerk]] · $N_{xRd}$
 - [[Normalkraftwiderstand eines Stahlquerschnitts]] · $N_{Rd}^{+}$
 - [[Normalspannung im Holz]] · $\sigma_{t,0,d}$
@@ -434,6 +439,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Querkraftwiderstand mit Querkraftbewehrung]] · $V_{Rd,x}$
 - [[Querkraftwiderstand ohne Bügel bei M_Ed = 0]] · $V_{Rd}^{+}(M_{Ed} = 0)$
 - [[Querkraftwiderstand ohne Querkraftbewehrung]] · $V_{Rd}^{+}(M_{Ed} = M_{Rd}^{+})$
+- [[Querlastwiderstand einer Wand aus Mauerwerk]] · $p_{Rd}$
 - [[Querschnitt der Wendel]] · $A_{sw}$
 - [[Querschnitt eines Bügelschenkels]] · $A_{\varnothing,V}$
 - [[Querschnitt eines Spannglieds]] · $A_{p,1}$
@@ -567,6 +573,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Widerstand der Druckstrebe in einem Pfeiler]] · $N_{Rd}$
 - [[Widerstand der ersten Betondruckdiagonale]] · $V_{Rd,max}$
 - [[Widerstand der Wendel]] · $V_{Rd,s}$
+- [[Widerstand des waagrechten Druckgewölbes einer Wand]] · $p_{Rd,h}$
 - [[Widerstand einer Verbundstütze nach (25)]] · $M_{y,Rd}$
 - [[Widerstand einer Wand (Fachwerk, ihre Länge l als Hebelarm)]]
 - [[Widerstand eines Pfeilers gegen Gleiten]] · $V_{Rd}$
@@ -602,7 +609,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 ## Normstelle fehlt noch
 
-152 von 500 Formeln haben im Code keine Normstelle – meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle – von dort kommt sie in Bericht und Notizbuch.
+154 von 507 Formeln haben im Code keine Normstelle – meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle – von dort kommt sie in Bericht und Notizbuch.
 
 - [[Achsen eines Stabs im Raum]] · [[opencivil.stabwerk3d.herleitung|_ansaetze]]
 - [[Äquivalenter E-Modul eines Stabs]] · [[opencivil.spannungsanalyse.modul#ModulProzedur|ModulProzedur._schreiben]]
@@ -694,6 +701,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Momente der Platte nach Kirchhoff]] · [[opencivil.decke.fem.herleitung#_ansaetze|_ansaetze]]
 - [[Momentengleichgewicht um die halbe Höhe]] · [[opencivil.nachweis.handrechnung#Handrechnung._halbe_hoehe|Handrechnung._halbe_hoehe]]
 - [[Momentenwiderstand bei reiner Biegung]] · [[opencivil.nachweis.handrechnung#Handrechnung._bei_n_null|Handrechnung._bei_n_null]]
+- [[Normalkraft eines Pfeilers in halber Höhe]] · [[opencivil.mauerwerk.querlast#Querlastnachweis._normalkraft|Querlastnachweis._normalkraft]]
 - [[Normalkraft mit der Längszugkraft aus der Querkraft]] · [[opencivil.pfahl.innen_quer#InnererQuerwiderstand._biegung|InnererQuerwiderstand._biegung]]
 - [[Normalspannung im Holz]] · [[opencivil.nachweis.qa_holz#HolzBiegungQA._normalspannung|HolzBiegungQA._normalspannung]], [[opencivil.nachweis.qa_holz_stabilitaet#_Herleitung|_Herleitung.__init__]]
 - [[Nulllinie auf halber Höhe]] · [[opencivil.nachweis.handrechnung#Handrechnung._halbe_hoehe|Handrechnung._halbe_hoehe]]
@@ -704,6 +712,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Probe – Normalkraft]] · [[opencivil.nachweis.qa_stahl#krafttabelle|krafttabelle]], [[opencivil.nachweis.schiefe_biegung#SchiefeBiegung|SchiefeBiegung._protokoll_bruchzustand]]
 - [[Querkraft über die Federn der Wände]] · [[opencivil.nachweis.schubwandnachweis#Schubwandnachweis|Schubwandnachweis._protokoll_ansatz]]
 - [[Querkräfte aus den Momenten der Platte]] · [[opencivil.decke.fem.herleitung#_ansaetze|_ansaetze]]
+- [[Querlastwiderstand einer Wand aus Mauerwerk]] · [[opencivil.mauerwerk.querlast#Querlastnachweis.stelle|Querlastnachweis.stelle]]
 - [[Querschnitt der Wendel]] · [[opencivil.pfahl.innen_quer#InnererQuerwiderstand._fachwerk|InnererQuerwiderstand._fachwerk]]
 - [[Radius des Bewehrungskreises]] · [[opencivil.pfahl.innen#InnererWiderstand|InnererWiderstand._bohrpfahl]]
 - [[Raumlast der Flüssigkeit]] · [[opencivil.material.fluessigkeit]]

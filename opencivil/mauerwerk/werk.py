@@ -11,8 +11,9 @@ den Mindestwerten misst und nach ihrer Wahl umrechnet
 (:func:`~opencivil.mauerwerk.modell.pfeiler`), ihre Lasten je Lastfall und
 Kombination auf Pfeiler und Stürze verteilt -- die lotrechten nach
 :mod:`~opencivil.mauerwerk.lasten`, die waagrechten nach
-:mod:`~opencivil.mauerwerk.scheibe` -- und die Herleitung schreibt
-(:mod:`~opencivil.mauerwerk.herleitung`).
+:mod:`~opencivil.mauerwerk.scheibe`, die Querlasten je m² Wand, die des
+Erdbebens nach :mod:`~opencivil.mauerwerk.querlast` -- und die Herleitung
+schreibt (:mod:`~opencivil.mauerwerk.herleitung`).
 
 DAS ERGEBNIS:
 kommt als Befund in die Lösung (:class:`Wandbefund`); Zeichnung,
@@ -33,7 +34,7 @@ from opencivil.core.rechenobjekt import Rechenobjekt
 from opencivil.core.vorgaben import Feld, Gruppe
 from opencivil.core.wert import WertDef
 from opencivil.material.basis import ERDBESCHLEUNIGUNG, Baustoff
-from opencivil.mauerwerk import herleitung, scheibe
+from opencivil.mauerwerk import herleitung, querlast, scheibe
 from opencivil.mauerwerk.kennwerte import GELESEN, Wandwerte, unter_mindestwerten, wandwerte
 from opencivil.mauerwerk.lasten import Abtrag, abtragen, kombinieren
 from opencivil.mauerwerk.modell import Halterung, Pfeiler, Wand, pfeiler
@@ -84,6 +85,12 @@ class Wandbefund:
     Feldern.
     """
 
+    zum_erdbeben: List[Meldung] = field(default_factory=list)
+    """
+    Was zum Erdbeben am Mauerwerk zu sagen ist (:func:`.querlast.erdbebenhinweise`)
+    -- in der Maske bei den Querlasten, wo man es einstellt.
+    """
+
     gezeichnet: bool = False
     """Ob ihre Zeichnung rechnet: keine Meldung zu Umriss, Öffnungen oder Stürzen hält sie auf."""
 
@@ -96,6 +103,9 @@ class Wandbefund:
     e_u: Optional[float] = None
     """Die Ausmitte am Fuss in m -- ``None``, wo er eingespannt ist."""
 
+    querlasten: Dict[str, float] = field(default_factory=dict)
+    """Je Querlast, nach ihrem Namen, ihre Zahl in N/m² -- die des Erdbebens nach Gl. (49)."""
+
     faelle: Dict[str, Abtrag] = field(default_factory=dict)
     """Je Lastfall, nach seinem Namen, was er Pfeilern und Stürzen gibt; leer, wo nichts rechnet."""
 
@@ -104,8 +114,8 @@ class Wandbefund:
 
     @property
     def alle_meldungen(self) -> List[Meldung]:
-        """Was zur Zeichnung zu sagen ist, dann was zu Mauerwerk und Dicke."""
-        return self.meldungen + self.zum_mauerwerk
+        """Was zur Zeichnung zu sagen ist, dann was zu Mauerwerk und Dicke, dann zum Erdbeben."""
+        return self.meldungen + self.zum_mauerwerk + self.zum_erdbeben
 
     @property
     def bereit(self) -> bool:
@@ -195,10 +205,12 @@ class Mauerwerkswand(Rechenobjekt):
             zum_mauerwerk.append(hinweis)
         befund = Wandbefund(w, self.mauerwerk.name, material,
                             wandwerte(material, w.verband, w.vollfugig), t_mm / 1e3, meldungen,
-                            zum_mauerwerk, gezeichnet,
+                            zum_mauerwerk, querlast.erdbebenhinweise(w), gezeichnet,
                             pfeiler(flaeche, w.oeffnungen) if gezeichnet else [],
                             g_k=e.g("rho").si * e.g("g").si * t_mm / 1e3,
                             e_u=e.g("e_u").si if "e_u" in self.definitionen else None)
+        befund.querlasten = {q.name: querlast.p_E(befund.g_k, e.g("g").si, q) if q.erdbeben
+                             else q.p for lf in w.lastfaelle for q in lf.querlasten}
         if gezeichnet and not any(m.haelt_an for m in meldungen):
             self._abtragen(befund)
         herleitung.schreiben(p, befund, e, self.rechnung.id)
@@ -212,6 +224,8 @@ class Mauerwerkswand(Rechenobjekt):
                                                   lf.lasten, befund.g_k if lf.eigengewicht else 0.0)
             scheibe.abtragen(a, w.flaeche, w.oeffnungen, befund.pfeiler, lf.lasten,
                              befund.werte.E_xd * 1e6, befund.werte.G_d * 1e6, befund.t)
+            a.p = sum(befund.querlasten[q.name] for q in lf.querlasten if q.erdbeben is None)
+            a.p_E = sum(befund.querlasten[q.name] for q in lf.querlasten if q.erdbeben)
         for k in w.kombinationen:
             befund.kombinationen[k.name] = kombinieren(k.faktoren, befund.faelle, befund.pfeiler,
                                                        w.oeffnungen)

@@ -536,6 +536,63 @@ sammeln sie sich hier, je mit dem, was vorläufig gebaut ist.
       «Pfeiler» von Schritt 14a fallen weg; die Pfeiler stehen mit Lage und
       Breite in der Herleitung. Getönt sind die Pfeiler nach ihrem Urteil
       im Bild der Zusammenfassung und auch im Zeichenfenster.
+- [ ] **Mauerwerk: die Normalkraft des lotrechten Gewölbes.** Unter
+      Querlast rechnet das lotrechte Gewölbe über die ganze Höhe mit der
+      Normalkraft in halber Höhe, N_m = N_Ld + (N_xd − N_Ld)/2. Welche
+      gilt, sagt die Norm nicht; die am Fuss wäre zu günstig, denn Druck
+      hält das Gewölbe zusammen. Beispiel: P1 im Prüfprojekt unter «GZT
+      Wind» – am Kopf 43.35 kN, am Fuss 51.10 kN, gerechnet mit 47.23 kN.
+      Vorschlag: so lassen. Vorläufig: so.
+- [ ] **Mauerwerk: woher ein Pfeiler Querlast bekommt.** Bis zur Mitte
+      der Öffnungen neben ihm, am Ende der Wand bis zu diesem: Brüstungen
+      und Stürze geben ihre Querlast an die Pfeiler daneben ab (nach
+      Vorgabe). Beispiel: In der ersten Wand des Prüfprojekts ist P2 1.0 m
+      breit und bekommt die Querlast von 2.1 m. Vorschlag: so lassen.
+      Vorläufig: so.
+- [ ] **Mauerwerk: das waagrechte Gewölbe.** Ein Bogen mit drei Gelenken,
+      an jedem über t_w/2 mit f_yd gedrückt: p_Rd,h = 2 · f_yd · t_w²/L².
+      Es zählt nur in einer Wand ohne Öffnung und nur, wo Gl. (19) und
+      (20) mit der Spannweite L gelten, L ≤ 15 · t_w und w_d ≤ 0.002 · L;
+      die Norm nennt dort die Höhe h_w und h_cr. Beispiel: eine Wand
+      2.4 × 2.7 m aus 175 mm Kalksandstein trägt waagrecht 14.46 kN/m²,
+      lotrecht 2.33 kN/m². Vorschlag: so lassen; Gewölbe zwischen
+      Öffnungen kämen in einem eigenen Schritt. Vorläufig: so.
+- [ ] **Mauerwerk: das stärkere Gewölbe, nicht beide zusammen.** Ob sich
+      die beiden Gewölbe die Last teilen dürfen, sagt die Norm nicht; es
+      zählt das stärkere. Im Beispiel oben gäbe die Summe 16.79 statt
+      14.46 kN/m². Vorschlag: so lassen, auf der sicheren Seite.
+      Vorläufig: so.
+- [ ] **Mauerwerk: das lotrechte Gewölbe immer nach Theorie 2. Ordnung.**
+      Gl. (19) und (20) erlaubten, die Effekte 2. Ordnung wegzulassen, wenn
+      h_w ≤ 15 · t_w und w_d ≤ 0.002 · h_cr. Das Werkzeug rechnet sie immer
+      mit, wie beim Knicken, auf der sicheren Seite. Vorschlag: so lassen.
+      Vorläufig: so.
+- [ ] **Mauerwerk: Erdbeben quer zur Wand – T_a und z_a.** Die Wand
+      schwingt wie das Gebäude, T_a = T_1, wie im Plan beschlossen, auch
+      eine tragende; die untere Grenze der Gl. (49) gilt damit nie. Die
+      Höhe z_a misst die Maske bis zur Mitte der Wand, wo die Kraft
+      angreift; bis wohin im Bauteil, sagt die Norm nicht. Beispiel: eine
+      Wand im Erdgeschoss, 2.7 m hoch, Gebäude 6 m: mit z_a = 1.35 m ist
+      die Klammer 3.18, bis zum Kopf der Wand (2.7 m) wäre sie 3.85, 21 %
+      mehr. Vorschlag: so lassen. Vorläufig: so.
+- [ ] **Mauerwerk: Gl. (27) nur mit einer Querlast des Erdbebens.** Das q
+      des Gebäudes stellt man bei der Querlast des Erdbebens ein; Gl. (27)
+      prüft das Werkzeug in jeder Kombination, die eine solche Querlast mit
+      q = 2.0 enthält. Trägt eine Wand das Erdbeben nur in ihrer Ebene,
+      als Punktlast mit H, prüft es Gl. (27) nicht. Vorschlag: so lassen,
+      bis Mauerwerkswände im Gebäude des Erdbebens stehen (später, nicht
+      in diesem Plan). Vorläufig: so.
+- [ ] **Mauerwerk: Querlast ohne Druck.** Trägt eine Wand nur Querlast,
+      ohne lotrechte Last, trägt das lotrechte Gewölbe nichts. Ohne
+      waagrechtes Gewölbe steht die Querlast dann rot «nicht erfüllt»: Das
+      ist kein fehlender Wert, die Wand trägt nicht. Mit gehaltenen Rändern
+      trägt das waagrechte Gewölbe auch ohne Druck. Vorschlag: so lassen.
+      Vorläufig: so.
+- [ ] **Zur Kenntnis – Mauerwerk:** Im Prüfprojekt rechnet das Gebäude der
+      ersten Wand mit q = 2.0. P2 und P3 verfehlen damit Gl. (27),
+      Erfüllungsgrad 0.91 und 0.94: Dort dürfte das Gebäude nur mit
+      q = 1.5 rechnen. Das bleibt so, das Prüfprojekt zeigt auch diesen
+      Fall.
 
 ## Wünsche vom 2026-11-20
 

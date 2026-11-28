@@ -6,7 +6,9 @@ Der Beiwert k_N eines Pfeilers (SIA 266:2015, 4.3.1.3, Gl. (11)): die
 grösste Normalkraft, bezogen auf l_w · t_w · f_xd, unter der die verformte
 Wand im Gleichgewicht steht (4.3.1.1) und ihre Ausmitte nirgends die Grenze
 der Figur 4 überschreitet (:func:`k_N`). Dazu der Zustand unter der
-Normalkraft der Bemessung: wie weit die Wand ausweicht und wo.
+Normalkraft der Bemessung: wie weit die Wand ausweicht und wo. Und unter
+einer festen Normalkraft die grösste Querlast, die die Wand so trägt -- das
+lotrechte Druckgewölbe (4.3.4.2, Figur 11, :func:`querlast`).
 
 DAS MODELL:
 Ein Streifen der Wand von Fuss bis Kopf, beide waagrecht gehalten (4.3), die
@@ -23,6 +25,12 @@ bis e = 0.375 t; dort ist das Moment am Ende (Figur 3), und mehr Ausmitte
 lässt Figur 4 nicht zu: höchstens 0.375 t und nach Gl. (6) höchstens
 (1 − N_xd/(l_w t_w f_xd)) · t/2.
 
+Eine Querlast q, gleichmässig über die Höhe, gibt dazu das Moment eines
+einfachen Balkens, q · x · (h − x)/2 je Meter, also die Ausmitte
+q · x · (h − x)/(2 N) je Meter Wand. Ein eingespannter Rand nimmt sein
+Moment wie ohne Querlast über seine Ausmitte auf, die das Gleichgewicht
+bestimmt.
+
 B_yd = E_xd · I_y, wie in Gl. (8) -- nach Vorgabe, nicht nachgeschlagen:
 4.3.1.3 nennt B_yd, ohne es festzulegen. So sind auch die Kurven der Figur 5
 gerechnet: die Rechnung hier trifft sie bis e/t = 0.30 auf etwa 0.006
@@ -35,7 +43,9 @@ GERECHNET WIRD IN TEILEN DER DICKE:
 Alle Längen durch t_w, die Normalkraft als n = N/(l_w t_w f_xd). Dann hängt
 alles nur noch an h_w/t_w, den Ausmitten in t_w und E_xd/f_xd, für
 Standardmauerwerk 1000 (4.2.1.4) -- k_N ist für jeden Pfeiler derselbe
-Beiwert, wie breit er auch ist.
+Beiwert, wie breit er auch ist. Die Querlast heisst dort
+λ = q · h_w²/(t_w² · f_xd), q je m² Wand; ihre Ausmitte in Dicken ist
+λ · ξ · (1 − ξ)/(2 n), ξ = x/h_w.
 
 DIE SUCHE (nach Vorgabe, nicht nachgeschlagen):
 Die Wand in :data:`TEILE` Stücke geteilt, je Knoten das Gleichgewicht w'' =
@@ -47,6 +57,12 @@ der Grenze liegt. Hält eine Stufe nicht, wird der Schritt halbiert, bis er
 kleiner ist als :data:`GENAU`. Erreicht die Ausmitte 0.375 t, endet die
 Rechnung dort: ein Gelenk, das sich bei kleiner Normalkraft weiter drehen
 dürfte (4.3.1.1), zählt sie nicht -- auf der sicheren Seite.
+
+Die Querlast sucht :func:`querlast` ebenso: erst die Normalkraft bis n wie
+bei k_N, dann wächst λ in Schritten, die sich halbieren, bis die Wand kein
+Gleichgewicht mehr findet oder ihre Ausmitte die Grenze erreicht. Die
+Schritte messen sich an λ_1 = 8 · n · Grenze(n), der Querlast, die eine
+mittig belastete, gelenkig gehaltene Wand nach Theorie 1. Ordnung trägt.
 """
 
 from __future__ import annotations
@@ -70,10 +86,17 @@ FORMELGRENZE = 0.6
 SCHRITT = 0.02
 GENAU = 2e-5
 
+#: Der erste Schritt der Querlast und wie genau sie am Ende ist, beide in λ_1;
+#: weiter als bis zum Vielfachen :data:`QUER_HOECHSTENS` sucht sie nicht.
+QUER_SCHRITT = 0.1
+QUER_GENAU = 1e-4
+QUER_HOECHSTENS = 20.0
+
 #: Wo die Regeln stehen.
 REFERENZ_FIGUR_3 = "SIA 266:2015, 4.3.1.1, Figur 3"
 REFERENZ_GRENZE = "SIA 266:2015, 4.3.1.1, Gl. (6), Figur 4"
 REFERENZ_K_N = "SIA 266:2015, 4.3.1.3, Gl. (11)"
+REFERENZ_GEWOELBE = "SIA 266:2015, 4.3.4.2, Figur 11"
 
 
 def g(u: float) -> float:
@@ -149,6 +172,20 @@ class Knickergebnis:
     bei_n_d: Optional[Zustand] = None
 
 
+@dataclass(frozen=True)
+class Querergebnis:
+    """Was die Suche nach der Querlast findet -- siehe :func:`querlast`."""
+
+    lam: float
+    """Die grösste Querlast als λ = q · h_w²/(t_w² · f_xd), null, wenn schon n allein nicht hält."""
+
+    grund: str
+    """:data:`AUSMITTE` oder :data:`STABILITAET`: was über ihr nicht mehr hielt."""
+
+    grenzzustand: Optional[Zustand]
+    """Der letzte Zustand, der hielt -- ``None``, wenn schon n allein nicht hält."""
+
+
 class _Wand:
     """Die Gleichungen einer Wand in Dicken: Höhe ``ht``, Ränder unten und oben."""
 
@@ -161,14 +198,19 @@ class _Wand:
         self.offen = [r for r, e in (("u", e_u), ("o", e_o)) if e is None]
         """Die eingespannten Ränder: ihre Ausmitte ist unbekannt."""
 
-    def ausmitten(self, w: Sequence[float], p_u: float, p_o: float) -> List[float]:
-        return [p_u + (p_o - p_u) * i / TEILE + w[i] for i in range(TEILE + 1)]
+    def ausmitten(self, w: Sequence[float], p_u: float, p_o: float,
+                  quer: float = 0.0) -> List[float]:
+        """Je Knoten die Ausmitte -- ``quer`` ist λ/(2 n), die Querlast (Dateikopf)."""
+        return [p_u + (p_o - p_u) * i / TEILE + quer * i * (TEILE - i) / TEILE ** 2 + w[i]
+                for i in range(TEILE + 1)]
 
-    def loesen(self, n: float, start: Optional[Tuple[List[float], float, float]]
-               ) -> Optional[Tuple[List[float], float, float, int]]:
+    def loesen(self, n: float, start: Optional[Tuple[List[float], float, float]],
+               quer: float = 0.0) -> Optional[Tuple[List[float], float, float, int]]:
         """
         Das Gleichgewicht unter n nach Newton, von ``start`` aus -- ``(w, p_u,
         p_o, Vorzeichen der Determinante)`` oder ``None``, wenn es keines findet.
+        ``quer`` wie bei :meth:`ausmitten`: es hängt nicht an w, die Ableitung
+        bleibt dieselbe.
         """
         m = TEILE - 1
         d2 = self.d * self.d
@@ -178,7 +220,7 @@ class _Wand:
         else:
             w, p_u, p_o = list(start[0]), start[1], start[2]
         for _ in range(40):
-            e = self.ausmitten(w, p_u, p_o)
+            e = self.ausmitten(w, p_u, p_o, quer)
             if any(abs(x) >= FORMELGRENZE for x in e):
                 return None
             chi = [c * g(x) for x in e]
@@ -310,3 +352,51 @@ def _k_N(ht: float, e_u: Optional[float], e_o: Optional[float], E_f: float,
         if n >= 1.0:
             return Knickergebnis(1.0, DRUCK, zustand_ok, bei_n_d)
     return Knickergebnis(n_ok, grund, zustand_ok, bei_n_d)
+
+
+def querlast(ht: float, e_u: Optional[float], e_o: Optional[float], E_f: float, n: float,
+             richtung: int) -> Querergebnis:
+    """
+    Die grösste Querlast der Wand von ``ht`` Dicken Höhe unter der festen
+    Normalkraft ``n`` -- Ausmitten und ``E_f`` wie bei :func:`k_N`,
+    ``richtung`` +1, wenn die Querlast zur Seite positiver Ausmitten drückt,
+    sonst −1. Siehe Dateikopf.
+    """
+    return _querlast(round(ht, 9), _gerundet(e_u), _gerundet(e_o), round(E_f, 9), round(n, 9),
+                     1 if richtung >= 0 else -1)
+
+
+@lru_cache(maxsize=512)
+def _querlast(ht: float, e_u: Optional[float], e_o: Optional[float], E_f: float, n: float,
+              richtung: int) -> Querergebnis:
+    """Die Rechnung hinter :func:`querlast`, je Fall einmal."""
+    if n <= 0.0:
+        return Querergebnis(0.0, STABILITAET, None)
+    ohne = _k_N(ht, e_u, e_o, E_f, n)
+    if ohne.bei_n_d is None:
+        return Querergebnis(0.0, ohne.grund, None)
+    wand = _Wand(ht, e_u, e_o, E_f)
+    anfang = wand.loesen(1e-6, None)
+    if anfang is None:
+        return Querergebnis(0.0, STABILITAET, None)
+    vorzeichen = anfang[3]
+    e = ohne.bei_n_d.e
+    p_u, p_o = e[0], e[-1]
+    stand = ([x - p_u - (p_o - p_u) * i / TEILE for i, x in enumerate(e)], p_u, p_o)
+    lam_1 = 8.0 * n * grenze(n)
+    mu_ok, zustand_ok, grund = 0.0, ohne.bei_n_d, STABILITAET
+    schritt = QUER_SCHRITT
+    while schritt >= QUER_GENAU:
+        mu = mu_ok + schritt
+        if mu > QUER_HOECHSTENS:
+            break
+        quer = richtung * mu * lam_1 / (2.0 * n)
+        loesung = wand.loesen(n, stand, quer)
+        zustand = None if loesung is None or loesung[3] != vorzeichen \
+            else Zustand(n, tuple(wand.ausmitten(*loesung[:3], quer)))
+        if zustand is None or abs(zustand.e_max) > grenze(n) + 1e-12:
+            grund = STABILITAET if zustand is None else AUSMITTE
+            schritt /= 2.0
+            continue
+        mu_ok, zustand_ok, stand = mu, zustand, loesung[:3]
+    return Querergebnis(mu_ok * lam_1, grund, zustand_ok)

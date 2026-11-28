@@ -18,7 +18,13 @@
  * Linienlast als Pfeile über ihrer Linie, eine Punktlast als Pfeil auf ihren
  * Knoten, beide mit Wert und Ausmitte -- wie im Balkensystem (bs_symbole.js).
  * Schiebt eine Punktlast waagrecht, kommt ein Pfeil von der Seite dazu, mit H;
- * den lotrechten zeigt sie dann nur, wenn auch Q nicht null ist.
+ * den lotrechten zeigt sie dann nur, wenn auch Q nicht null ist. Eine
+ * Querlast wirkt quer zur Wand, man sieht sie von vorne: Kreise über die
+ * ganze Wand, ausser auf Öffnungen und Stürzen -- mit Punkt, wo sie zum
+ * Betrachter drückt, mit Kreuz, wo von ihm weg, wechselnd, wo sie in beiden
+ * Richtungen wirkt wie die des Erdbebens. Ihre Werte stehen unter der Wand,
+ * je Querlast eine Zeile, p_E vom Kern (`ersatzkraefte`): in der Wand
+ * stünden sie auf den Graden der Stürze.
  *
  * ZEICHEN DER RÄNDER, ausserhalb der Wand, um den Rahmen ihres Umrisses:
  *   eingespannt   Kopf oder Fuss: eine Kante mit Schraffur, an der die Wand sitzt
@@ -33,7 +39,7 @@
  * wie weit die Gelenke auseinander.
  */
 
-import { kraftpfeil, streckenlast } from './bs_symbole.js';
+import { blickSymbol, kraftpfeil, streckenlast } from './bs_symbole.js';
 import {
   ansichtNeu, einpassen, nachBild, pfad, text, zahlText,
 } from './cad_ansicht.js';
@@ -49,6 +55,13 @@ const RAND = { gelenk: 2.6, abstand: 6, schraffur: 5, teilung: 7, gelenke: 24 };
  * Linienlast steht, nicht darin.
  */
 export const PFEIL = { linie: 26, punkt: 52 };
+
+/**
+ * Wie die Querlasten stehen, px: die Kreise etwa `abstand` auseinander, in
+ * jeder Richtung höchstens `je` -- weg von Öffnungen und Stürzen um `frei`;
+ * ihre Zeilen ab `unten` unter dem Fuss, `zeile` hoch.
+ */
+const QUER = { abstand: 64, je: [12, 8], frei: 9, unten: 30, zeile: 18 };
 
 /** So breit ist ein Zeichen der Urteile im Bild, px -- 11 px Schrift mit fester Breite. */
 const ZEICHEN = 6.6;
@@ -176,6 +189,46 @@ function lasten(v, modell, lagen, lastfall, { fehler, texte }) {
 }
 
 /**
+ * Wohin eine Querlast drückt: `true` zum Betrachter, `false` von ihm weg,
+ * `null` in beide Richtungen -- die des Erdbebens.
+ */
+const richtung = (q) => (q.art === 'erdbeben' ? null : q.wert >= 0);
+
+/**
+ * Die Querlasten des Lastfalls `lastfall` auf der Wand im Rahmen `r` (px)
+ * -- siehe Dateikopf. `frei` sind die Rahmen, auf denen kein Kreis steht:
+ * Öffnungen und Stürze.
+ */
+function querlasten(r, modell, lastfall, { frei, ersatzkraefte }) {
+  const liste = (modell.querlasten || []).filter((q) => q.lastfall === lastfall);
+  const g = svgEl('g', { class: 'mw-querlasten' });
+  if (!liste.length) return g;
+  const richtungen = new Set(liste.map(richtung));
+  const zuMir = richtungen.size === 1 ? [...richtungen][0] : null;
+  const [nx, ny] = [r.r - r.l, r.u - r.o].map((l, i) => Math.max(1, Math.min(QUER.je[i], Math.round(l / QUER.abstand))));
+  const aufFrei = (x, y) => frei.some((f) => x > f.l - QUER.frei && x < f.r + QUER.frei
+    && y > f.o - QUER.frei && y < f.u + QUER.frei);
+  const raster = svgEl('g');
+  for (let i = 0; i < nx; i += 1) {
+    for (let j = 0; j < ny; j += 1) {
+      const p = [r.l + ((i + 0.5) * (r.r - r.l)) / nx, r.o + ((j + 0.5) * (r.u - r.o)) / ny];
+      if (!aufFrei(...p)) raster.append(blickSymbol(p, zuMir ?? (i + j) % 2 === 0, ''));
+    }
+  }
+  g.append(mitTitel(raster, liste.map((q) => `Querlast ${q.kennung}`)));
+  liste.forEach((q, k) => {
+    const y = r.u + QUER.unten + k * QUER.zeile;
+    const p = q.art === 'erdbeben' ? ersatzkraefte[q.kennung] : q.wert;
+    const wert = q.art !== 'erdbeben' ? `p = ${zahlText(p, 2)} kN/m²`
+      : `Erdbeben${p === undefined ? '' : `, p_E = ±${zahlText(p, 2)} kN/m²`}`;
+    const zeichen = richtung(q) === null ? [true, false] : [richtung(q)];
+    zeichen.forEach((z, n) => g.append(blickSymbol([r.l + 6 + n * 15, y], z, '')));
+    g.append(text(r.l + 6 + zeichen.length * 15, y + 4, `Querlast ${q.kennung}: ${wert}`, 'bs-lasttext', 'start'));
+  });
+  return g;
+}
+
+/**
  * Die Urteile des Kerns, je Ort (`urteile`): die Pfeiler getönt, mit Name und
  * Grad an ihrem Fuss, und unter den Auflagern der Stürze je ein Strich --
  * von seinem Ende bis zur Kante der Öffnung, mit dem Grad darunter.
@@ -224,11 +277,12 @@ function urteilsbild(v, { pfeiler, stuerze, urteile, oeffnungen, lagen }) {
  * `alt`, wenn sie zu einer früheren Zeichnung gehören -- dann stehen sie
  * blass. `stellungen` sind die Wörter der Schalter (`katalog.mauerwerk`),
  * `lastfall` der Lastfall, dessen Lasten zu sehen sind -- ohne einen keine;
- * `masse`, ob unter der Wand die Masse der Pfeiler stehen.
+ * `ersatzkraefte` je Querlast des Erdbebens ihr p_E vom Kern; `masse`, ob
+ * unter der Wand die Masse der Pfeiler stehen.
  */
 export function wand(v, modell, {
   fehler = () => false, texte = () => [], stuerze = [], pfeiler = [], urteile = {}, alt = false, stellungen = {},
-  lastfall = null, masse = false,
+  lastfall = null, ersatzkraefte = {}, masse = false,
 } = {}) {
   const g = svgEl('g', { class: 'mw-modell' });
   const lagen = new Map((modell.knoten || []).map((k) => [k.kennung, [k.x, k.y]]));
@@ -273,6 +327,13 @@ export function wand(v, modell, {
     const r = rahmen(v, waende[0][1]);
     g.append(raender(r, modell, stellungen));
     if (masse && pfeiler.length) g.append(pfeilermasse(v, pfeiler, r.u + 26));
+    if (lastfall) {
+      const frei = [
+        ...(modell.oeffnungen || []).map((o) => eckenVon(lagen, o.knoten)).filter(Boolean),
+        ...stuerze.map((s) => [[s.x0, s.y0], [s.x1, s.y1]]),
+      ].map((punkte) => rahmen(v, punkte));
+      g.append(querlasten(r, modell, lastfall, { frei, ersatzkraefte }));
+    }
   }
   if (lastfall) g.append(lasten(v, modell, lagen, lastfall, { fehler, texte }));
   g.append(namen);

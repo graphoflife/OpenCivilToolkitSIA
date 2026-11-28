@@ -1,5 +1,5 @@
 ---
-erzeugt: d4a1596f77e3
+erzeugt: 30e8478eca40
 art: modul
 tags: [modul]
 ---
@@ -406,6 +406,7 @@ Wie u, v, w und θx, θy, θz eines Stabendes an den Unbekannten haengen.
 - [[opencivil.fachwerkmodell.werk]]
 - [[opencivil.mauerwerk.kennwerte]]
 - [[opencivil.mauerwerk.pruefen]]
+- [[opencivil.mauerwerk.querlast]]
 - [[opencivil.mauerwerk.werk]]
 - [[opencivil.projekt.aufbau.balkensystem]]
 - [[opencivil.projekt.aufbau.decke]]

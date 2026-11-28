@@ -6,7 +6,9 @@ Aus dem Befund einer Wand die Daten ihrer Zeichnung (:func:`uebersicht`):
 ihre Meldungen -- die zu Mauerwerk und Dicke auch fuer sich, fuer die
 Kachel der Maske --, ob sie rechnet, ihre Pfeiler und je Oeffnung die
 Flaeche ihres Sturzes -- der Kern weiss, wie weit er aufliegt; die Seite zeichnet
-ihn nur. Dazu je Pfeiler und Sturzauflager das Urteil, das an ihm gilt
+ihn nur --, je Querlast des Erdbebens ihre Ersatzkraft nach Gl. (49) und was
+zum Erdbeben zu sagen ist, fuer die Kachel der Querlasten. Dazu je Pfeiler und
+Sturzauflager das Urteil, das an ihm gilt
 (:func:`urteile`), fuer die Farbe im Bild, und der Teil des Katalogs, den
 nur die Wand braucht (:func:`katalog`). Umriss, Oeffnungen und Lasten
 zeichnet die Oberflaeche nach dem Projekt; die Bemessungswerte stehen in
@@ -24,7 +26,9 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple
 from opencivil.core.nachweis import OHNE_EINWIRKUNG, Nachweis, NachweisUrteil
 from opencivil.core.rechenwerk import Loesung
 from opencivil.core.sprache import satzanfang
-from opencivil.mauerwerk.modell import Halterung, Mauerung, Seitenrand, Stossfugen, Sturzart
+from opencivil.mauerwerk.modell import (
+    Halterung, Mauerung, Querlastart, Seitenrand, Stossfugen, Sturzart, Verhaltensbeiwert,
+)
 from opencivil.mauerwerk.nachweise import Stelle
 from opencivil.mauerwerk.pruefen import UEBLICHE_DICKEN
 from opencivil.mauerwerk.werk import Wandbefund
@@ -76,16 +80,23 @@ def uebersicht(befund: Optional[Wandbefund]) -> Dict[str, Any]:
     """
     ``bereit``: ob die Wand rechnet; ``meldungen`` alle je ``{text,
     elemente, fehler, unfertig}``, ``zum_mauerwerk`` die zu Mauerwerk und
-    Dicke darunter noch einmal; ``pfeiler`` je ``{name, x0, x1, y0, y1, b}``
-    und ``stuerze`` je ``{oeffnung, sturz, x0, y0, x1, y1}`` in m -- leer,
-    solange die Zeichnung nicht rechnet. Ohne Befund ist alles leer.
+    Dicke darunter noch einmal, ``zum_erdbeben`` die zum Erdbeben;
+    ``ersatzkraefte`` je Querlast des Erdbebens, nach ihrer Kennung, p_E
+    in kN/m² -- eine von Hand fehlt, ihre Zahl steht im Projekt;
+    ``pfeiler`` je ``{name, x0, x1, y0, y1, b}`` und ``stuerze`` je
+    ``{oeffnung, sturz, x0, y0, x1, y1}`` in m -- leer, solange die
+    Zeichnung nicht rechnet. Ohne Befund ist alles leer.
     """
     if befund is None:
-        return {"bereit": False, "meldungen": [], "zum_mauerwerk": [], "pfeiler": [], "stuerze": []}
+        return {"bereit": False, "meldungen": [], "zum_mauerwerk": [], "zum_erdbeben": [],
+                "ersatzkraefte": {}, "pfeiler": [], "stuerze": []}
     return {
         "bereit": befund.bereit,
         "meldungen": [m.als_dict() for m in befund.alle_meldungen],
         "zum_mauerwerk": [m.als_dict() for m in befund.zum_mauerwerk],
+        "zum_erdbeben": [m.als_dict() for m in befund.zum_erdbeben],
+        "ersatzkraefte": {q.name: befund.querlasten[q.name] / 1e3
+                          for lf in befund.wand.lastfaelle for q in lf.querlasten if q.erdbeben},
         "pfeiler": [{"name": e.name, "x0": e.x0, "x1": e.x1, "y0": e.y0, "y1": e.y1, "b": e.b}
                     for e in befund.pfeiler],
         "stuerze": [{"oeffnung": o.name, "sturz": o.sturz.value, "x0": s.x0, "y0": s.y0,
@@ -108,7 +119,10 @@ def katalog() -> Dict[str, Any]:
     """
     Womit die Kennungen der Teile beginnen, je Liste, die Stellungen der
     Schalter -- wie gemauert, die Stossfugen, Kopf und Fuss, die Ränder links
-    und rechts, die Art eines Sturzes -- und je Sorte die üblichen Dicken in mm.
+    und rechts, die Art eines Sturzes, die Art einer Querlast und der
+    Verhaltensbeiwert des Gebäudes im Erdbeben -- und je Sorte die üblichen
+    Dicken in mm. Zone, Baugrund und Bauwerksklasse stehen im Katalog des
+    Erdbebens.
     """
     def stellungen(wahl) -> list:
         return [{"wert": w.value, "beschriftung": w.beschriftung, "titel": w.erklaerung}
@@ -117,4 +131,6 @@ def katalog() -> Dict[str, Any]:
     return {"vorsilben": dict(VORSILBEN), "mauerung": stellungen(Mauerung),
             "stossfugen": stellungen(Stossfugen), "halterung": stellungen(Halterung),
             "seitenrand": stellungen(Seitenrand), "sturz": stellungen(Sturzart),
+            "querlastarten": stellungen(Querlastart),
+            "verhaltensbeiwerte": stellungen(Verhaltensbeiwert),
             "dicken": {sorte: list(dicken) for sorte, dicken in UEBLICHE_DICKEN.items()}}

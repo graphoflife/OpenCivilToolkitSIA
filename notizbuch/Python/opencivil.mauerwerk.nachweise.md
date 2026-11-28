@@ -1,5 +1,5 @@
 ---
-erzeugt: e583180f9262
+erzeugt: 30607145e61d
 art: modul
 tags: [modul]
 ---
@@ -134,10 +134,11 @@ Einwirkung `E` gegen Widerstand `R`, in die Herleitung geschrieben.
 
 ```python
 @staticmethod
-def satz(v: Vergleich, namen: Sequence[str]) -> str
+def satz(v: Vergleich, namen: Sequence[str], einheit: str='kN') -> str
 ```
 
-«N_xRd = 812.3 kN ≥ N_xd = 600.0 kN.» – `namen` die von Einwirkung und Widerstand.
+«N_xRd = 812.3 kN ≥ N_xd = 600.0 kN.» – `namen` die von Einwirkung
+und Widerstand, `einheit` hinter beiden, leer ohne.
 
 ### ohne_einwirkung
 
@@ -291,6 +292,7 @@ def stelle(self, p: Protokoll, befund: 'Wandbefund', s: Stelle) -> Stellenausgan
 
 ## Gebraucht von
 
+- [[opencivil.mauerwerk.querlast]]
 - [[opencivil.mauerwerk.schub]]
 - [[opencivil.projekt.aufbau.mauerwerk]]
 - [[opencivil.web.mauerwerkdaten]]

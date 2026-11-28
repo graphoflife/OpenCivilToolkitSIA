@@ -1,5 +1,5 @@
 ---
-erzeugt: 969012555901
+erzeugt: 9052e8e0598f
 art: formel
 tags: [formel]
 ---
@@ -25,6 +25,10 @@ Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 $$
 g_k = \rho \cdot g \cdot t_w = 1800\,\mathrm{kg}/\mathrm{m}^{3} \cdot 10\,\mathrm{m}/\mathrm{s}^{2} \cdot 175\,\mathrm{mm} = 3.15\,\mathrm{kN}/\mathrm{m}^{2}
 $$
+
+## Gebraucht von
+
+- [[Ersatzkraft des Erdbebens quer zu einer Wand]]
 
 ## Im Code
 

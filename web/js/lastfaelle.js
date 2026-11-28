@@ -127,9 +127,10 @@ function kombinationenInhalt(eintrag) {
 /**
  * Die Gruppe «Lasten» unter den Eingaben eines Bauteils: die Knöpfe
  * Lastfälle und Lastkombinationen (kapitel.js). `optionen` wie bei
- * `lastfaelleInhalt`.
+ * `lastfaelleInhalt`; `dazu` sind Kapitel, die ein Bauteil zwischen beiden
+ * mehr hat -- die Querlasten der Wand, die man nicht zeichnet.
  */
-export function lastenKapitel(optionen) {
+export function lastenKapitel({ dazu = [], ...optionen }) {
   return {
     titel: 'Lasten',
     kapitel: [
@@ -138,6 +139,7 @@ export function lastenKapitel(optionen) {
         inhalt: (e) => lastfaelleInhalt(e, optionen),
         stand: (e) => zeilenstand(e.lastfaelle, 'Lastfall', 'Lastfälle', 'kein Lastfall'),
       },
+      ...dazu,
       {
         schluessel: 'kombinationen', name: 'Lastkombi­nationen', titel: 'Lastkombinationen',
         inhalt: kombinationenInhalt,

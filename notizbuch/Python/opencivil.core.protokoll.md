@@ -1,5 +1,5 @@
 ---
-erzeugt: 7a84a69de803
+erzeugt: b6f933eb432d
 art: modul
 tags: [modul]
 ---
@@ -612,6 +612,7 @@ Oberflaeche und alle Berichte gehen.
 - [[opencivil.material.basis]]
 - [[opencivil.mauerwerk.herleitung]]
 - [[opencivil.mauerwerk.nachweise]]
+- [[opencivil.mauerwerk.querlast]]
 - [[opencivil.mauerwerk.schub]]
 - [[opencivil.mauerwerk.uebersicht]]
 - [[opencivil.mauerwerk.werk]]
