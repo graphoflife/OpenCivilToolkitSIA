@@ -1,5 +1,5 @@
 ---
-erzeugt: ab45ba91a33f
+erzeugt: ee22b14584ad
 art: modul
 tags: [modul]
 ---
@@ -482,6 +482,7 @@ Das Urteil eines Teils: sein Grad, sein Name, Ausgang und Begruendung.
 - [[opencivil.core.rechenwerk]]
 - [[opencivil.durchstanzen.mit_bewehrung]]
 - [[opencivil.durchstanzen.nachweis]]
+- [[opencivil.durchstanzen.stufen]]
 - [[opencivil.erdbeben.ersatzkraft]]
 - [[opencivil.ergebnis]]
 - [[opencivil.geotechnik.fundament]]

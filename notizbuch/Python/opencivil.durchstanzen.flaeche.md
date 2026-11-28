@@ -1,5 +1,5 @@
 ---
-erzeugt: d3c47c07f619
+erzeugt: c8476402bb65
 art: modul
 tags: [modul]
 ---
@@ -574,5 +574,6 @@ def umfang(self, e: Eingaben, d_v: Wert, a: Auswertung) -> Optional[Umfangsforme
 
 - [[opencivil.durchstanzen.nachweis]]
 - [[opencivil.durchstanzen.stelle]]
+- [[opencivil.projekt.aufbau.durchstanzen]]
 - [[opencivil.projekt.durchstanzen]]
 - [[opencivil.web.durchstanzdaten]]

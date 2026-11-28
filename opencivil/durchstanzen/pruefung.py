@@ -57,6 +57,9 @@ from opencivil.durchstanzen.produkte import Stahlpilz
 from opencivil.durchstanzen.schnitt import Auswertung, Nachweisschnitt, Punkt
 
 
+#: Obere Grenze von k_r (SIA 262:2025, Gleichung (59)).
+K_R_GRENZE = 2.0
+
 #: Höchstens so tief liegen die Köpfe der Durchstanzbewehrung auf der
 #: Druckseite, in Teilen von d_v; tiefer tragen (68) und (70) 30 % weniger
 #: (SIA 262:2025, 5.5.3.11).
@@ -94,6 +97,11 @@ def tabelle_21(d: float) -> Optional[Grenzen]:
 def minderung(c_v: float, d_v: float) -> float:
     """η auf (68) und (70): 1, solange c_v ≤ d_v/6, sonst 0.7 (5.5.3.11)."""
     return 1.0 if c_v <= C_V_GRENZE * d_v + 1e-12 else C_V_MINDERUNG
+
+
+def beiwert_k_r(psi: float, d: float, k_g: float) -> float:
+    """Gleichung (59): ``d`` in m, die Gleichung rechnet es in mm."""
+    return min(K_R_GRENZE, 1.0 / (0.45 + 0.18 * psi * d * 1e3 * k_g))
 
 
 def kreisdurchmesser(flaeche: float) -> float:

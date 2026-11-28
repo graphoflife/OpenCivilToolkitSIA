@@ -1,5 +1,5 @@
 ---
-erzeugt: b96b6dc00f38
+erzeugt: e60a3ec4f181
 art: modul
 tags: [modul]
 ---
@@ -448,6 +448,7 @@ Rechnung sehen statt nur die Zahl.
 - [[opencivil.durchstanzen.flaeche]]
 - [[opencivil.durchstanzen.nachweis]]
 - [[opencivil.durchstanzen.stelle]]
+- [[opencivil.durchstanzen.stufen]]
 - [[opencivil.nachweis.biegung_normalkraft]]
 - [[opencivil.nachweis.duktilitaet]]
 - [[opencivil.nachweis.fehlende_bewehrung]]

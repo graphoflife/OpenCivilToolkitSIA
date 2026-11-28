@@ -1,5 +1,5 @@
 ---
-erzeugt: 1f84ccfadcff
+erzeugt: c69ba2766a35
 art: modul
 tags: [modul]
 ---
@@ -31,6 +31,16 @@ u      = k_e · u_red
 `d` die mittlere statische Höhe der beiden Lagen der Zugbewehrung und
 `d_v` die wirksame – gleich `d`, solange die gestützte Fläche nicht in die
 Platte reicht (Figur 21).
+
+
+## PLATTENBEREICHE (4.3.6.2.7)
+
+Steht die Stütze in Bereichen mit eigener Dicke, gilt an ihr deren d, ψ
+rechnet mit dem kleinsten d um sie, und an jeder Stufe, wo der Bereich
+dicker ist als die Platte darum, liegt ein weiterer Schnitt mit eigenem
+Urteil ([[opencivil.durchstanzen.stufen|.stufen]]). Bereiche, die die Stütze nicht umschliessen, und
+Bereiche an Wänden rechnet das Werkzeug noch nicht; die Herleitung sagt es.
+Mit Bereichen schlägt es noch keine Durchstanzbewehrung vor.
 
 
 ## DIE PLATTENROTATION (4.3.6.4.2)
@@ -105,6 +115,19 @@ Eine Lage der Zugbewehrung über der Stütze, wie gerechnet – fürs Bild der L
 - `durchmesser: float`
 - `abstand: float`
 
+### Stufenbefund
+
+```python
+@dataclass(frozen=True)
+class Stufenbefund
+```
+
+Eine Stufe mit ihrem Schnitt und seinem Widerstand – der fehlt ohne
+Einwirkung und wo die Stufe keinen eigenen Schnitt hat.
+
+- `stufe: Stufe`
+- `V_Rd_c: Optional[float] = None`
+
 ### Durchstanzbefund
 
 ```python
@@ -128,6 +151,7 @@ braucht; jedes mit seinen eigenen Zahlen.
 - `lagen: Tuple[Biegelage, ...] = ()` – Die beiden Lagen der Zugbewehrung, die äussere zuerst.
 - `leisten: Optional[Leistenpruefung] = None` – Die vorgeschlagene Durchstanzbewehrung mit ihren Nachweisen (4.3.6.5.1).
 - `pilz: Optional[Pilzbefund] = None` – Der gewählte Stahlpilz; mit `leisten` stehen die Leisten um ihn.
+- `stufen: Tuple[Stufenbefund, ...] = ()` – Die Schnitte an den Stufen der Bereiche um die Stütze ([[opencivil.durchstanzen.stufen|.stufen]]).
 
 #### Durchstanzbefund.ohne_einwirkung
 
@@ -148,16 +172,31 @@ class Stuetzenschnitt
 ```
 
 Der Schnitt um die gestützte Fläche mit allem, was nicht von der
-Stützenkraft abhängt – für Nachweis und Kennzahl derselbe.
+Stützenkraft abhängt – für Nachweis und Kennzahl derselbe. Ohne
+Plattenbereiche sind `d` und `d_platte` derselbe Wert, und ψ rechnet
+mit ihm und `hoehen`.
 
 - `masse: Dict[str, float]`
-- `d: Wert`
+- `d: Wert` – Die statische Höhe an der Stütze – k_r und d_v rechnen mit ihr.
 - `d_v: Wert`
-- `hoehen: Dict[Richtung, Wert]`
+- `hoehen: Dict[Richtung, Wert]` – Die statischen Höhen der beiden Lagen in der Platte.
 - `innen: Schnittpruefung`
 - `k_e: Wert`
 - `u: Wert`
 - `e_u: Tuple[float, float]` – Die Exzentrizität der Resultierenden zum Schwerpunkt des Schnitts, je Richtung.
+- `d_platte: Wert` – d der Platte, ausserhalb aller Bereiche.
+- `hoehe: Optional[Stuetzenhoehe] = None`
+- `bereiche: Optional[Bereichswerte] = None`
+- `stufen: Tuple[Stufe, ...] = ()` – Die Stufen um die Stütze, je mit ihrem Schnitt – ohne Plattenbereiche keine.
+
+#### Stuetzenschnitt.rotation
+
+```python
+@property
+def rotation(self) -> Tuple[Wert, Dict[Richtung, Wert]]
+```
+
+d und die beiden Lagen, mit denen ψ rechnet: die kleinsten um die Stütze.
 
 ### Widerstand
 
@@ -170,6 +209,7 @@ Was an der Stütze von der Stützenkraft abhängt: ψ, k_r und V_Rd,c.
 
 - `rotationen: Tuple[Rotation, ...]`
 - `psi: Wert`
+- `k_g: Wert`
 - `k_r: Wert`
 - `tau_cd: Wert`
 - `V_Rd_c: Wert`
@@ -197,7 +237,16 @@ und schreibt nur den letzten.
 def _schnitt(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, V_d: float) -> Stuetzenschnitt
 ```
 
-Statische Höhe, Nachweisschnitt, k_e und wirksamer Umfang – `V_d` in N.
+Statische Höhe, Nachweisschnitt, k_e und wirksamer Umfang – und die
+Schnitte an den Stufen der Plattenbereiche. `V_d` in N.
+
+#### Stuetzenrechnung._bereiche
+
+```python
+def _bereiche(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, masse: Masse, d: Wert, hoehen: Dict[Richtung, Wert]) -> Tuple[Optional[Dicken], Optional[Stuetzenhoehe], Optional[Bereichswerte]]
+```
+
+Die Plattenbereiche um die Stütze – nichts ohne Bereiche und an Wänden (Dateikopf).
 
 #### Stuetzenrechnung._widerstand
 
@@ -209,13 +258,21 @@ def _widerstand(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, g: Stuetzensc
 wachsen die Momente im Stützstreifen mit ihr. `ergebnis` ist die
 Definition, die V_Rd,c belegt – sonst ein Zwischenwert.
 
+#### Stuetzenrechnung._stufe_schreiben
+
+```python
+def _stufe_schreiben(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, g: Stuetzenschnitt, r: Widerstand, st: Stufe, V_d: Optional[Wert]=None) -> Optional[Tuple[Wert, Wert]]
+```
+
+Der Schnitt an einer Stufe ([[opencivil.durchstanzen.stufen#stufe_schreiben|.stufen.stufe_schreiben]]) mit ψ und k_g der Stütze.
+
 #### Stuetzenrechnung._statische_hoehe
 
 ```python
-def _statische_hoehe(self, e: Eingaben, p: Protokoll, w: Zwischenwerte) -> Tuple[Wert, Wert, Dict[Richtung, Wert]]
+def _statische_hoehe(self, e: Eingaben, p: Protokoll, w: Zwischenwerte) -> Tuple[Wert, Dict[Richtung, Wert]]
 ```
 
-Die statischen Höhen der beiden Lagen, ihr Mittel d und die wirksame d_v (4.3.6.2.1).
+Die statischen Höhen der beiden Lagen in der Platte und ihr Mittel d (4.3.6.2.1).
 
 #### Stuetzenrechnung._nachweisschnitt
 
@@ -241,7 +298,7 @@ an jedem Schnitt – um die Stütze, um die äussersten Anker und um den Pilz.
 #### Stuetzenrechnung._rotation
 
 ```python
-def _rotation(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, d: Wert, hoehen: Dict[Richtung, Wert], e_u: Tuple[float, float], masse: Dict[str, float], V_d: Wert) -> Tuple[Tuple[Rotation, ...], Wert]
+def _rotation(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, g: Stuetzenschnitt, V_d: Wert) -> Tuple[Tuple[Rotation, ...], Wert]
 ```
 
 ψ je Richtung und die massgebende, die grössere (4.3.6.4.1) – bei der Kraft `V_d`.
@@ -288,14 +345,6 @@ def _r_s_am_rand(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, r: Richtung,
 
 In Stufe 3 an Rand- und Eckstützen: r_s mindestens 2/3 · b_sr (4.3.6.4.8).
 
-#### Stuetzenrechnung._k_r
-
-```python
-def _k_r(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, psi: Wert, d: Wert) -> Wert
-```
-
-Der Beiwert k_r (59), mit k_g nach 4.3.3.2.1.
-
 ### Durchstanzen
 
 ```python
@@ -318,6 +367,14 @@ def mit_graden(self) -> Tuple[WertDef, ...]
 Die vier Grade mit Durchstanzbewehrung: die drei Nachweise nach
 4.3.6.5.1, der erste geteilt in den Beitrag der Bewehrung (66), (68)
 und das Verformungsvermögen (67).
+
+#### Durchstanzen._stufen_pruefen
+
+```python
+def _stufen_pruefen(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, g: Stuetzenschnitt, r: Widerstand) -> Tuple[List[NachweisUrteil], Tuple[Stufenbefund, ...]]
+```
+
+Die Schnitte an den Stufen, je mit eigenem Urteil (4.3.6.2.7).
 
 #### Durchstanzen.nicht_fuehrbar
 
@@ -356,7 +413,6 @@ stand dort V_Rd,c = 866.7 kN, wo die Kennzahl 503.6 kN sagt.
 
 ## Konstanten
 
-- `K_R_GRENZE = 2.0` – Obere Grenze von k_r (SIA 262:2025, Gleichung (59)).
 - `R_S = 0.22` – `r_s = R_S · l` in den Näherungsstufen 1 und 2 (SIA 262:2025, 4.3.6.4.4).
 - `ROTATION_MINDEST = 0.02` – Unter dieser Plattenrotation fehlt Verformungsvermögen, wenn keine Durchstanzbewehrung nach (67) liegt (SIA 262:2025, 4.3.6.1.2).
 - `EINZELLASTEN = 'Nicht geprüft: Einzellasten über 0.2·V_d, die näher als 3·d_v am Nac…` – Was der Nachweis nicht prueft, weil er die Lasten um die Stuetze nicht kennt (SIA 262:2025, 4.3.6.2.3, vierter Fall).
@@ -368,13 +424,16 @@ stand dort V_Rd,c = 866.7 kN, wo die Kennzahl 503.6 kN sagt.
 - [[opencivil.core.latex]]
 - [[opencivil.core.nachweis]]
 - [[opencivil.core.protokoll]]
+- [[opencivil.core.sprache]]
 - [[opencivil.core.wert]]
+- [[opencivil.durchstanzen.bereiche]]
 - [[opencivil.durchstanzen.flaeche]]
 - [[opencivil.durchstanzen.herleitung]]
 - [[opencivil.durchstanzen.mit_bewehrung]]
 - [[opencivil.durchstanzen.pruefung]]
 - [[opencivil.durchstanzen.schnitt]]
 - [[opencivil.durchstanzen.stelle]]
+- [[opencivil.durchstanzen.stufen]]
 - [[opencivil.nachweis.querkraft_ohne_buegel]]
 - [[opencivil.querschnitt.platte]]
 - [[opencivil.querschnitt.werkstoffgesetz]]
@@ -391,7 +450,6 @@ stand dort V_Rd,c = 866.7 kN, wo die Kennzahl 503.6 kN sagt.
 
 - [[Abstand zum Momentennullpunkt]] · `Stuetzenrechnung._rotation`
 - [[Abstand zum Momentennullpunkt am Plattenrand]] · `Stuetzenrechnung._r_s_am_rand`
-- [[Beiwert k_r]] · `Stuetzenrechnung._k_r`
 - [[Biegebewehrung im Stützstreifen je Meter]] · `Stuetzenrechnung._m_Rd`
 - [[Biegewiderstand im Stützstreifen]] · `Stuetzenrechnung._m_Rd`
 - [[Breite des Randstreifens an der Eckstütze]] · `Stuetzenrechnung._breite_am_rand`
@@ -408,4 +466,4 @@ stand dort V_Rd,c = 866.7 kN, wo die Kennzahl 503.6 kN sagt.
 - [[Plattenrotation]] · `Stuetzenrechnung._rotation`
 - [[Statische Höhe der äusseren Lage]] · `Stuetzenrechnung._statische_hoehe`
 - [[Statische Höhe der inneren Lage]] · `Stuetzenrechnung._statische_hoehe`
-- [[Wirksame Höhe ohne Abzug]] · `Stuetzenrechnung._statische_hoehe`
+- [[Wirksame Höhe ohne Abzug]] · `Stuetzenrechnung._schnitt`

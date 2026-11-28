@@ -1,5 +1,5 @@
 ---
-erzeugt: a2774a19cc83
+erzeugt: 61281d536640
 art: modul
 tags: [modul]
 ---
@@ -41,6 +41,15 @@ Stützenkraft. Gesucht wird gleich: so steht in der Herleitung auch dort, bis
 zu welcher Stützenkraft es ohne Durchstanzbewehrung geht.
 
 
+## MIT PLATTENBEREICHEN (4.3.6.2.7)
+
+Derselbe Schnittpunkt an jedem Schnitt, um die Stütze und an jeder Stufe
+([[opencivil.durchstanzen.stufen|.stufen]]), je mit seinem ΔV; es gilt der kleinste. Die Kennzahl ist
+die Querkraft im Schnitt um die Stütze bei dieser Stützenkraft – so bleibt
+sie mit der Querkraft eines Nachweises vergleichbar. Liegt der Schnittpunkt
+an einer Stufe, ist sie kleiner als V_Rd,c um die Stütze.
+
+
 ## EINHEITEN
 
 SI-Basis.
@@ -66,11 +75,20 @@ def rechne(self, e: Eingaben, p: Protokoll) -> Dict[str, Groesse]
 #### Durchstanzkennzahl._schnittpunkt
 
 ```python
-def _schnittpunkt(self, e: Eingaben, w: Zwischenwerte, g: Stuetzenschnitt) -> float
+def _schnittpunkt(self, e: Eingaben, w: Zwischenwerte, g: Stuetzenschnitt) -> Tuple[float, Optional[Stufe]]
 ```
 
-Die Stützenkraft in N, bei der V_d − ΔV = V_Rd,c(ψ(V_d)) – durch
-Halbieren, still mit den Schritten des Nachweises.
+Die grösste Stützenkraft in N, bei der jeder Schnitt hält, und wo
+ihr Schnittpunkt liegt – `None`: um die Stütze. Je Schnitt still
+mit den Schritten des Nachweises.
+
+### _halbieren
+
+```python
+def _halbieren(abzug: float, widerstand: Callable[[float], float]) -> float
+```
+
+Die Stützenkraft in N mit V_d − ΔV = V_Rd,c(V_d) an einem Schnitt – durch Halbieren.
 
 
 ## Konstanten
@@ -86,6 +104,7 @@ Halbieren, still mit den Schritten des Nachweises.
 - [[opencivil.durchstanzen.herleitung]]
 - [[opencivil.durchstanzen.nachweis]]
 - [[opencivil.durchstanzen.stelle]]
+- [[opencivil.durchstanzen.stufen]]
 
 ## Gebraucht von
 

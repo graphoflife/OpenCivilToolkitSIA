@@ -29,13 +29,20 @@ In den Stufen 1 und 3 hängt ψ nicht von V_d ab, V_Rd,c gilt für jede
 Stützenkraft. Gesucht wird gleich: so steht in der Herleitung auch dort, bis
 zu welcher Stützenkraft es ohne Durchstanzbewehrung geht.
 
+MIT PLATTENBEREICHEN (4.3.6.2.7):
+Derselbe Schnittpunkt an jedem Schnitt, um die Stütze und an jeder Stufe
+(:mod:`.stufen`), je mit seinem ΔV; es gilt der kleinste. Die Kennzahl ist
+die Querkraft im Schnitt um die Stütze bei dieser Stützenkraft -- so bleibt
+sie mit der Querkraft eines Nachweises vergleichbar. Liegt der Schnittpunkt
+an einer Stufe, ist sie kleiner als V_Rd,c um die Stütze.
+
 EINHEITEN:
 SI-Basis.
 """
 
 from __future__ import annotations
 
-from typing import Dict
+from typing import Callable, Dict, Optional, Tuple
 
 from opencivil.core.berechnung import Eingabebezug, Eingaben, Kennzahlprozedur
 from opencivil.core.einheiten import KN, Groesse
@@ -44,6 +51,7 @@ from opencivil.durchstanzen import herleitung
 from opencivil.durchstanzen.herleitung import STUETZE
 from opencivil.durchstanzen.nachweis import Stuetzenrechnung, Stuetzenschnitt
 from opencivil.durchstanzen.stelle import Durchstanzstelle, Naeherungsstufe, wirksame_stufe
+from opencivil.durchstanzen.stufen import REFERENZ, Stufe
 
 #: Wie genau die Stützenkraft am Schnittpunkt feststeht, in N.
 GENAUIGKEIT = 1.0
@@ -102,33 +110,62 @@ class Durchstanzkennzahl(Stuetzenrechnung, Kennzahlprozedur):
                 f"In {self.stufe.beschriftung} hängt ψ nicht von der Stützenkraft ab, V_Rd,c "
                 f"gilt für jede. Hier steht, bis zu welcher Stützenkraft V_d es ohne "
                 f"Durchstanzbewehrung geht: V_d − ΔV = V_Rd,c.")
-        V_d = w.kraft("V_d", "V_d", self._schnittpunkt(e, w, g),
-                      "Stützenkraft am Schnittpunkt")
+        V_si, massgebend = self._schnittpunkt(e, w, g)
+        if g.stufen:
+            p.text("Dasselbe gilt an jedem Schnitt, um die Stütze und an jeder Stufe, je mit "
+                   "seinem ΔV; es gilt die kleinste Stützenkraft. Massgebend ist hier der Schnitt "
+                   + ("um die Stütze." if massgebend is None
+                      else f"an der Stufe von {massgebend.bereich.titel}."))
+        V_d = w.kraft("V_d", "V_d", V_si, "Stützenkraft am Schnittpunkt")
         p.wert(V_d, titel="Die grösste Stützenkraft ohne Durchstanzbewehrung", referenz="")
         definition = self.d["V_Rd_c"]
-        r = self._widerstand(e, p, w, g, V_d, ergebnis=definition)
+        r = self._widerstand(e, p, w, g, V_d, ergebnis=definition if massgebend is None else None)
         p.titel("Querkraft im Nachweisschnitt am Schnittpunkt", ebene=3)
-        herleitung.querkraft(
+        V = herleitung.querkraft(
             p, w, e, g.innen, ix=STUETZE, V_d=V_d,
             titel_last=f"{self.stelle.plattenart.last} innerhalb des Nachweisschnitts",
-            titel="Querkraft im Nachweisschnitt: so gross wie V_Rd,c")
-        return {definition.id: r.V_Rd_c.groesse}
+            titel="Querkraft im Nachweisschnitt, so gross wie V_Rd,c" if massgebend is None
+            else "Querkraft im Nachweisschnitt um die Stütze")
+        for st in g.stufen:
+            self._stufe_schreiben(e, p, w, g, r, st, V_d=V_d)
+        if massgebend is None:
+            return {definition.id: r.V_Rd_c.groesse}
+        p.titel("Durchstanzwiderstand am Schnittpunkt", ebene=3)
+        kennzahl = definition.belegen(Groesse.aus_si(V.groesse.si, definition.einheit))
+        p.formel(kennzahl, "@V", {"V": V},
+                 titel=f"Die Querkraft im Nachweisschnitt um die Stütze, bei der der Schnitt an "
+                       f"der Stufe von {massgebend.bereich.titel} gerade hält",
+                 referenz=REFERENZ)
+        return {definition.id: kennzahl.groesse}
 
-    def _schnittpunkt(self, e: Eingaben, w: Zwischenwerte, g: Stuetzenschnitt) -> float:
+    def _schnittpunkt(self, e: Eingaben, w: Zwischenwerte,
+                      g: Stuetzenschnitt) -> Tuple[float, Optional[Stufe]]:
         """
-        Die Stützenkraft in N, bei der V_d − ΔV = V_Rd,c(ψ(V_d)) -- durch
-        Halbieren, still mit den Schritten des Nachweises.
+        Die grösste Stützenkraft in N, bei der jeder Schnitt hält, und wo
+        ihr Schnittpunkt liegt -- ``None``: um die Stütze. Je Schnitt still
+        mit den Schritten des Nachweises.
         """
         still = StillesProtokoll()
 
-        def widerstand(V: float) -> float:
-            return self._widerstand(e, still, w, g, w.kraft("V_d", "V_d", V)).V_Rd_c.groesse.si
+        def widerstand(V: float, st: Optional[Stufe] = None) -> float:
+            r = self._widerstand(e, still, w, g, w.kraft("V_d", "V_d", V))
+            if st is None:
+                return r.V_Rd_c.groesse.si
+            return st.V_Rd_c(r.psi.groesse.si, r.k_g.groesse.si, r.tau_cd.groesse.si)
 
-        unten, oben = 0.0, widerstand(0.0) + g.innen.abzug
-        while oben - unten > GENAUIGKEIT:
-            mitte = (unten + oben) / 2.0
-            if mitte - g.innen.abzug < widerstand(mitte):
-                unten = mitte
-            else:
-                oben = mitte
-        return (unten + oben) / 2.0
+        punkte = [(_halbieren(g.innen.abzug, widerstand), None)]
+        punkte += [(_halbieren(st.pruefung.abzug, lambda V, st=st: widerstand(V, st)), st)
+                   for st in g.stufen if st.pruefung is not None]
+        return min(punkte, key=lambda x: (x[0], x[1] is not None))
+
+
+def _halbieren(abzug: float, widerstand: Callable[[float], float]) -> float:
+    """Die Stützenkraft in N mit V_d − ΔV = V_Rd,c(V_d) an einem Schnitt -- durch Halbieren."""
+    unten, oben = 0.0, widerstand(0.0) + abzug
+    while oben - unten > GENAUIGKEIT:
+        mitte = (unten + oben) / 2.0
+        if mitte - abzug < widerstand(mitte):
+            unten = mitte
+        else:
+            oben = mitte
+    return (unten + oben) / 2.0

@@ -1,5 +1,5 @@
 ---
-erzeugt: b482e97686d2
+erzeugt: 1d8987aa66d8
 art: modul
 tags: [modul]
 ---
@@ -87,6 +87,14 @@ def minderung(c_v: float, d_v: float) -> float
 ```
 
 η auf (68) und (70): 1, solange c_v ≤ d_v/6, sonst 0.7 (5.5.3.11).
+
+### beiwert_k_r
+
+```python
+def beiwert_k_r(psi: float, d: float, k_g: float) -> float
+```
+
+Gleichung (59): `d` in m, die Gleichung rechnet es in mm.
 
 ### kreisdurchmesser
 
@@ -455,6 +463,7 @@ def reicht(self) -> bool
 
 ## Konstanten
 
+- `K_R_GRENZE = 2.0` – Obere Grenze von k_r (SIA 262:2025, Gleichung (59)).
 - `C_V_GRENZE = 1.0 / 6.0` – Höchstens so tief liegen die Köpfe der Durchstanzbewehrung auf der Druckseite, in Teilen von d_v; tiefer tragen (68) und (70) 30 % weniger (SIA 262:2025, 5.5.3.11).
 - `C_V_MINDERUNG = 0.7`
 - `TABELLE_21 = ((160.0, 12.0, 0.6, 0.0), (180.0, 14.0, 0.66, 0.0), (220.0, 16.0, 0.7…` – SIA 262:2025, Tabelle 21: bis zu dieser statischen Höhe d in mm höchstens dieser Durchmesser in mm und der Abstand s_1 = Faktor · d + Zuschlag; unter 140 mm keine Durchstanzbewehrung.
@@ -473,4 +482,5 @@ def reicht(self) -> bool
 - [[opencivil.durchstanzen.herleitung]]
 - [[opencivil.durchstanzen.mit_bewehrung]]
 - [[opencivil.durchstanzen.nachweis]]
+- [[opencivil.durchstanzen.stufen]]
 - [[opencivil.durchstanzen.systeme]]

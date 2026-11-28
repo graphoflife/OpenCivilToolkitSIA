@@ -6763,6 +6763,31 @@
       "stichworte": []
     },
     {
+      "name": "opencivil.durchstanzen.bereiche",
+      "pfad": "Python/opencivil.durchstanzen.bereiche.md",
+      "art": "modul",
+      "kurz": "Bereiche der Platte mit eigener Dicke.",
+      "stichworte": [
+        "Seite",
+        "Seite.beschriftung",
+        "Seite.figur",
+        "Seite.titel",
+        "Plattenbereich",
+        "Plattenbereich.titel",
+        "Plattenbereich.huelle",
+        "Plattenbereich.enthaelt",
+        "Versatz",
+        "Dicken",
+        "Dicken.aussen",
+        "Dicken.h_von",
+        "Dicken.d_von",
+        "Dicken.versatz",
+        "Dicken.dicker",
+        "Dicken.um",
+        "Dicken.wirksam"
+      ]
+    },
+    {
       "name": "opencivil.durchstanzen.bewehrung",
       "pfad": "Python/opencivil.durchstanzen.bewehrung.md",
       "art": "modul",
@@ -6864,6 +6889,7 @@
         "k_e",
         "wirksam",
         "querkraft",
+        "k_r",
         "widerstand"
       ]
     },
@@ -6875,7 +6901,8 @@
       "stichworte": [
         "Durchstanzkennzahl",
         "Durchstanzkennzahl.rechne",
-        "Durchstanzkennzahl._schnittpunkt"
+        "Durchstanzkennzahl._schnittpunkt",
+        "_halbieren"
       ]
     },
     {
@@ -6906,13 +6933,17 @@
       "stichworte": [
         "Rotation",
         "Biegelage",
+        "Stufenbefund",
         "Durchstanzbefund",
         "Durchstanzbefund.ohne_einwirkung",
         "Stuetzenschnitt",
+        "Stuetzenschnitt.rotation",
         "Widerstand",
         "Stuetzenrechnung",
         "Stuetzenrechnung._schnitt",
+        "Stuetzenrechnung._bereiche",
         "Stuetzenrechnung._widerstand",
+        "Stuetzenrechnung._stufe_schreiben",
         "Stuetzenrechnung._statische_hoehe",
         "Stuetzenrechnung._nachweisschnitt",
         "Stuetzenrechnung._resultierende",
@@ -6922,9 +6953,9 @@
         "Stuetzenrechnung._b_sr",
         "Stuetzenrechnung._breite_am_rand",
         "Stuetzenrechnung._r_s_am_rand",
-        "Stuetzenrechnung._k_r",
         "Durchstanzen",
         "Durchstanzen.mit_graden",
+        "Durchstanzen._stufen_pruefen",
         "Durchstanzen.nicht_fuehrbar",
         "Durchstanzen.pruefe",
         "angaben",
@@ -6959,6 +6990,7 @@
         "Grenzen",
         "tabelle_21",
         "minderung",
+        "beiwert_k_r",
         "kreisdurchmesser",
         "beiwert_k_e",
         "exzentrizitaet",
@@ -7031,6 +7063,7 @@
         "_abstand_zum_rand",
         "kandidat_wandende",
         "kandidat_wandecke",
+        "kandidat_polygon",
         "_rechtsrum",
         "_abschneiden",
         "Schatten",
@@ -7077,6 +7110,27 @@
         "Durchstanzstelle.baustoffe",
         "Durchstanzstelle.abschnitt",
         "Durchstanzstelle.eingaben"
+      ]
+    },
+    {
+      "name": "opencivil.durchstanzen.stufen",
+      "pfad": "Python/opencivil.durchstanzen.stufen.md",
+      "art": "modul",
+      "kurz": "Plattenbereiche um die Stütze: d an ihr, Schnitte an den Stufen.",
+      "stichworte": [
+        "Stuetzenhoehe",
+        "an_der_stuetze",
+        "Stufe",
+        "Stufe.index",
+        "Stufe.V_Rd_c",
+        "stufen",
+        "_innerhalb",
+        "Bereichswerte",
+        "bereiche_schreiben",
+        "_d_im",
+        "rotation_schreiben",
+        "stufe_schreiben",
+        "vergleich_schreiben"
       ]
     },
     {
@@ -9432,7 +9486,9 @@
       "art": "modul",
       "kurz": "eine Durchstanzstelle wird Rechnung.",
       "stichworte": [
+        "_ecken",
         "aussparungen",
+        "bereiche",
         "bauen"
       ]
     },
@@ -9761,11 +9817,13 @@
       "stichworte": [
         "GrundrissknotenEintrag",
         "AussparungEintrag",
+        "PlattenbereichEintrag",
         "DurchstanzEintrag",
         "DurchstanzEintrag.neu",
         "DurchstanzEintrag.materialien",
         "DurchstanzEintrag.netz",
-        "DurchstanzEintrag.aussparung"
+        "DurchstanzEintrag.aussparung",
+        "DurchstanzEintrag.plattenbereich"
       ]
     },
     {
@@ -12345,10 +12403,13 @@
       "stichworte": [
         "wahlen",
         "situation",
+        "_mit_schnitt",
         "_ansicht",
         "_bis_zum_umriss",
         "_linien",
         "_legende",
+        "_gesamtzeile",
+        "_stufenzeilen",
         "_gesamt",
         "_kraft"
       ]

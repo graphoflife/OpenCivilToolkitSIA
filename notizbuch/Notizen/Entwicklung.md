@@ -7,6 +7,53 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-28 · Durchstanzen: Plattenbereiche mit eigener Dicke um die Stütze (Schritt 13 a und b)
+
+Im Zeichenfenster des Durchstanzens eine neue Art «Plattenbereich»: ein
+Polygon mit eigener Dicke h und einem Schalter [zur Stütze hin |
+Gegenseite] – ein Stützenkopf unter einer Decke (SIA 262:2025, Figur 24a)
+oder eine Vertiefung unter einer Bodenplatte (Figur 24c), je mit einem Bild
+im Schalter. Die Platte behält ihre Dicke; ein Bereich gilt in seinem
+Umriss statt ihr, und Bereiche dürfen ineinander liegen.
+
+- **Vorher – nachher:** Innenstütze 400 × 400 mm, Platte 240 mm, C30/37,
+  Stufe 1. Vorher ging nur die ganze Platte dicker oder dünner; mit 240 mm
+  trägt sie 275.4 kN. Jetzt mit einem Bereich 1200 × 1200 mm von 320 mm
+  zur Stütze hin: um die Stütze 335.4 kN mit d = 274 mm, an der Stufe
+  366.1 kN. Liegt der Bereich auf der Gegenseite, trägt der Schnitt innen
+  an der Stufe 290.1 kN und ist massgebend.
+- **Die Schnitte** (`durchstanzen/stufen.py`): um die Stütze mit d an ihr;
+  je Stufe 0.5·d_v daneben, mit d_v der dünneren Platte – zur Stütze hin
+  ausserhalb, um die konvexe Hülle des Bereichs, auf der Gegenseite
+  innerhalb und mindestens 0.5·d_v neben der Stütze. Ist dort kein Platz,
+  hat die Stufe keinen eigenen Schnitt, und die Herleitung sagt es. Jeder
+  Schnitt hat sein Urteil und seinen Erfüllungsgrad; die Kennzahl sucht den
+  Schnittpunkt an jedem, es gilt der kleinste.
+- **Die Dicken** (`durchstanzen/bereiche.py`): je Bereich, wie weit Druck-
+  und Zugseite gegen die Platte versetzt sind. Zur Stütze hin verschiebt
+  ein Bereich die Druckseite, auf der Gegenseite die Zugseite; d im Bereich
+  ist d der Platte plus der Unterschied der Dicke. Was die Norm dazu nicht
+  sagt, steht «nach Vorgabe, nicht nachgeschlagen» im Code und in [[TODO]].
+- **ψ** rechnet mit der kleinsten statischen Höhe um die Stütze, meist der
+  der Platte, wie am 2026-11-27 gewählt; k_r (59) je Schnitt mit dessen d.
+  Die Herleitung sagt beides in je einem Satz.
+- **Was nicht geht, sagt es am Ort:** ein Bereich, der die Stütze schneidet
+  oder einen anderen nur teilweise überlappt, ist ein Fehler mit seinem
+  Namen. Einen Bereich neben der Stütze und Bereiche an Wänden rechnet das
+  Werkzeug noch nicht, ein grauer Hinweis sagt es; mit Bereichen schlägt es
+  noch keine Durchstanzbewehrung vor. Beides kommt mit Schritt 13 c und d.
+- **Rechteck aus zwei Ecken:** das Polygon aller Zeichenfenster hat die
+  Taste G und den Knopf ▭; der Querschnitt, die Decke und das
+  Fachwerkmodell bekommen es mit. Wechselt man mitten im Umriss, ist der
+  letzte Punkt die erste Ecke.
+- **Bild:** die Bereiche getönt mit «B1 · h = 320 mm», jeder Schnitt an
+  einer Stufe in seiner Farbe (grün, türkis, braun), in der Legende die
+  Zahlen je Schnitt. Das Zeichenfenster heisst «Grundriss, Aussparungen und
+  Bereiche».
+- Nebenbei: der Titel «Querkraft im Nachweisschnitt, so gross wie V_Rd,c»
+  der Kennzahl hatte zwei Doppelpunkte; das Zeichenfenster nennt seine
+  Teile mit `teilname` wie die Decke statt mit einem eigenen Namen.
+
 ## 2026-11-28 · Querschnittsanalyse: Nachweise aus dem Balkensystem (Schritt 12)
 
 Eine neue Kachel «Aus dem Balkensystem» gleich nach der Tragsicherheit: ein

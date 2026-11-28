@@ -1,5 +1,5 @@
 ---
-erzeugt: 893b95d0d168
+erzeugt: 007ffc066a57
 art: modul
 tags: [modul]
 ---
@@ -282,6 +282,17 @@ Der Schnitt um die äussere Ecke zweier Wände der Dicke `dicke` (Figur
 23c): die Ecke liegt im Ursprung, die Wände laufen nach +x und nach +y,
 die Platte liegt aussen. Entlang jeder Wand zählt er 1.5·d_v von der Ecke.
 
+### kandidat_polygon
+
+```python
+def kandidat_polygon(name: str, ecken: Sequence[Punkt], eckenbereich: float, raender: Sequence[Halbebene]=()) -> Kandidat
+```
+
+Ein Schnitt längs eines konvexen Polygons gegen den Uhrzeigersinn, mit
+scharfen Ecken: jede Gerade zählt `eckenbereich` von ihren Ecken her
+(Figur 23a) – der Schnitt innerhalb einer Stufe auf der Gegenseite
+([[opencivil.durchstanzen.stufen|.stufen]]). Was jenseits eines Plattenrands liegt, zählt nicht.
+
 ### _rechtsrum
 
 ```python
@@ -456,6 +467,7 @@ er nach dem, der zum Rand läuft.
 
 ## Gebraucht von
 
+- [[opencivil.durchstanzen.bereiche]]
 - [[opencivil.durchstanzen.bewehrung]]
 - [[opencivil.durchstanzen.flaeche]]
 - [[opencivil.durchstanzen.herleitung]]
@@ -463,4 +475,5 @@ er nach dem, der zum Rand läuft.
 - [[opencivil.durchstanzen.nachweis]]
 - [[opencivil.durchstanzen.pruefung]]
 - [[opencivil.durchstanzen.stelle]]
+- [[opencivil.durchstanzen.stufen]]
 - [[opencivil.web.durchstanzdaten]]

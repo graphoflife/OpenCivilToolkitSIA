@@ -435,6 +435,19 @@
 .ds-steg { fill: none; stroke: #495057; stroke-width: 4; stroke-linecap: square; }
 .ds-pilzschnitt { fill: none; stroke: var(--system); stroke-width: 1.8; stroke-linejoin: round; }
 .ds-pilzschnitt-nicht { fill: none; stroke: var(--system); stroke-width: 1.1; stroke-dasharray: 5 4; opacity: .7; }
+/* Ein Plattenbereich: getönt, ineinander liegende dunkler; oben links Name und Dicke. */
+.ds-bereich {
+  fill: #868e96; fill-opacity: .13; stroke: #495057; stroke-width: 1.2; stroke-linejoin: round;
+}
+.ds-bereich-text { font-size: 11px; fill: var(--schrift-matt); pointer-events: none; }
+/* Der Schnitt an einer Stufe, je in seiner Farbe; gestrichelt, was nicht zählt. */
+.ds-stufe { fill: none; stroke-width: 2; stroke-linejoin: round; }
+.ds-stufe-0 { stroke: var(--stufe-0); }
+.ds-stufe-1 { stroke: var(--stufe-1); }
+.ds-stufe-2 { stroke: var(--stufe-2); }
+.ds-stufe-nicht { stroke-width: 1.1; stroke-dasharray: 5 4; opacity: .7; }
+/* Die Seite der Stufe bei einer Bodenplatte: dort steht die Stütze oben, das Bild auf dem Kopf. */
+.ds-seite-boden .sinnbild { transform: scaleY(-1); }
 
 /* Die Durchstanzbewehrung in der Ansicht (ds_ansicht.js): Platte und Stütze
    aus Beton ohne Fuge, die Zugbewehrung in der Farbe des Stahls, die

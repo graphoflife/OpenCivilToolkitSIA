@@ -46,6 +46,7 @@ from opencivil.core.rechenobjekt import Rechenobjekt
 from opencivil.core.vorgaben import Feld, Gruppe
 from opencivil.core.wahl import Wahl
 from opencivil.core.wert import WertDef
+from opencivil.durchstanzen.bereiche import Plattenbereich
 from opencivil.durchstanzen.flaeche import GestuetzteFlaeche
 from opencivil.durchstanzen.schnitt import Punkt
 from opencivil.durchstanzen.systeme import Durchstanzsystem
@@ -317,6 +318,9 @@ class Durchstanzstelle(Rechenobjekt):
     aussparungen: Sequence[Sequence[Punkt]] = ()
     """Je Aussparung ihre Ecken, in m."""
 
+    bereiche: Sequence[Plattenbereich] = ()
+    """Die Bereiche der Platte mit eigener Dicke (:mod:`.bereiche`)."""
+
     definitionen: Dict[str, WertDef] = field(default_factory=dict, init=False)
     berechnungen: List[Berechnung] = field(default_factory=list, init=False)
     anker: Baustoff = field(init=False)
@@ -325,6 +329,7 @@ class Durchstanzstelle(Rechenobjekt):
     def __post_init__(self) -> None:
         self.id = self.praefix
         self.aussparungen = tuple(tuple(map(tuple, a)) for a in self.aussparungen)
+        self.bereiche = tuple(self.bereiche)
         regeln = self.system.regeln
         self.anker = betonstahl(regeln.STAHL, name=f"{regeln.NAME}, {regeln.STAHL}",
                                 praefix=ANKERSTAHL.format(self.system.value), symbol_index="sw")

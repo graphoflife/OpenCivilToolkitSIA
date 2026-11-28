@@ -1,5 +1,5 @@
 ---
-erzeugt: 7e4f13ac0bf5
+erzeugt: 52bed1e4e129
 art: modul
 tags: [modul]
 ---
@@ -25,6 +25,7 @@ tags: [modul]
 
 ## Module
 
+- [[opencivil.durchstanzen.bereiche]] – Bereiche der Platte mit eigener Dicke.
 - [[opencivil.durchstanzen.bewehrung]] – wo die Durchstanzbewehrung liegt, und welche reicht.
 - [[opencivil.durchstanzen.flaeche]] – die gestützte Fläche: was Lage und Form für den Nachweis heissen.
 - [[opencivil.durchstanzen.herleitung]] – wie ein Nachweisschnitt in der Herleitung steht.
@@ -35,4 +36,5 @@ tags: [modul]
 - [[opencivil.durchstanzen.pruefung]] – was der Durchstanznachweis rechnet, ohne Herleitung.
 - [[opencivil.durchstanzen.schnitt]] – der Nachweisschnitt um die gestützte Fläche.
 - [[opencivil.durchstanzen.stelle]] – die Durchstanzstelle: Platte, gestützte Fläche, Bewehrung, Last.
+- [[opencivil.durchstanzen.stufen]] – Plattenbereiche um die Stütze: d an ihr, Schnitte an den Stufen.
 - [[opencivil.durchstanzen.systeme]] – woraus die Durchstanzbewehrung besteht.

@@ -366,6 +366,20 @@ def kandidat_wandecke(dicke: float, abstand: float, d_v: float) -> Kandidat:
     return Kandidat("um die Wandecke", stuecke, (), tuple(_rechtsrum(umschlossen)))
 
 
+def kandidat_polygon(name: str, ecken: Sequence[Punkt], eckenbereich: float,
+                     raender: Sequence[Halbebene] = ()) -> Kandidat:
+    """
+    Ein Schnitt längs eines konvexen Polygons gegen den Uhrzeigersinn, mit
+    scharfen Ecken: jede Gerade zählt ``eckenbereich`` von ihren Ecken her
+    (Figur 23a) -- der Schnitt innerhalb einer Stufe auf der Gegenseite
+    (:mod:`.stufen`). Was jenseits eines Plattenrands liegt, zählt nicht.
+    """
+    ecken = list(ecken)
+    stuecke = tuple(Strecke(a, b, eckenbereich, eckenbereich)
+                    for a, b in zip(ecken, ecken[1:] + ecken[:1]))
+    return Kandidat(name, stuecke, tuple(raender), tuple(_abschneiden(ecken, raender)))
+
+
 def _rechtsrum(punkte: Sequence[Punkt]) -> List[Punkt]:
     """Das Polygon gegen den Uhrzeigersinn."""
     punkte = list(punkte)

@@ -19750,7 +19750,7 @@ $$
 \Delta V_d = q_d \cdot A_q = 14\,\mathrm{kN}/\mathrm{m}^{2} \cdot 0.384\,\mathrm{m}^{2} = 5.4\,\mathrm{kN}
 $$
 
-**Querkraft im Nachweisschnitt: so gross wie V\_Rd,c** *(SIA 262:2025, 4.3.6.2.6)*
+**Querkraft im Nachweisschnitt, so gross wie V\_Rd,c** *(SIA 262:2025, 4.3.6.2.6)*
 
 $$
 V_{d,red} = V_d - \Delta V_d = 564.3\,\mathrm{kN} - 5.4\,\mathrm{kN} = 558.9\,\mathrm{kN}
@@ -20674,7 +20674,7 @@ $$
 
 #### Querkraft im Nachweisschnitt am Schnittpunkt
 
-**Querkraft im Nachweisschnitt: so gross wie V\_Rd,c: keine Flächenlast abgezogen** *(SIA 262:2025, 4.3.6.2.6)*
+**Querkraft im Nachweisschnitt, so gross wie V\_Rd,c: keine Flächenlast abgezogen** *(SIA 262:2025, 4.3.6.2.6)*
 
 $$
 V_{d,red} = V_d = 561.2\,\mathrm{kN}
@@ -21486,7 +21486,7 @@ $$
 \Delta V_d = q_d \cdot A_q = 12\,\mathrm{kN}/\mathrm{m}^{2} \cdot 0.419\,\mathrm{m}^{2} = 5\,\mathrm{kN}
 $$
 
-**Querkraft im Nachweisschnitt: so gross wie V\_Rd,c** *(SIA 262:2025, 4.3.6.2.6)*
+**Querkraft im Nachweisschnitt, so gross wie V\_Rd,c** *(SIA 262:2025, 4.3.6.2.6)*
 
 $$
 V_{d,red} = V_d - \Delta V_d = 420.6\,\mathrm{kN} - 5\,\mathrm{kN} = 415.5\,\mathrm{kN}
@@ -22096,7 +22096,7 @@ $$
 
 #### Querkraft im Nachweisschnitt am Schnittpunkt
 
-**Querkraft im Nachweisschnitt: so gross wie V\_Rd,c: keine Flächenlast abgezogen** *(SIA 262:2025, 4.3.6.2.6)*
+**Querkraft im Nachweisschnitt, so gross wie V\_Rd,c: keine Flächenlast abgezogen** *(SIA 262:2025, 4.3.6.2.6)*
 
 $$
 V_{d,red} = V_d = 138\,\mathrm{kN}
@@ -22576,7 +22576,7 @@ $$
 
 #### Querkraft im Nachweisschnitt am Schnittpunkt
 
-**Querkraft im Nachweisschnitt: so gross wie V\_Rd,c: keine Flächenlast abgezogen** *(SIA 262:2025, 4.3.6.2.6)*
+**Querkraft im Nachweisschnitt, so gross wie V\_Rd,c: keine Flächenlast abgezogen** *(SIA 262:2025, 4.3.6.2.6)*
 
 $$
 V_{d,red} = V_d = 388.6\,\mathrm{kN}
@@ -23246,7 +23246,7 @@ $$
 \Delta V_d = q_d \cdot A_q = 150\,\mathrm{kN}/\mathrm{m}^{2} \cdot 0.898\,\mathrm{m}^{2} = 134.7\,\mathrm{kN}
 $$
 
-**Querkraft im Nachweisschnitt: so gross wie V\_Rd,c** *(SIA 262:2025, 4.3.6.2.6)*
+**Querkraft im Nachweisschnitt, so gross wie V\_Rd,c** *(SIA 262:2025, 4.3.6.2.6)*
 
 $$
 V_{d,red} = V_d - \Delta V_d = 1055.4\,\mathrm{kN} - 134.7\,\mathrm{kN} = 920.8\,\mathrm{kN}
@@ -23600,7 +23600,7 @@ $$
 
 #### Querkraft im Nachweisschnitt am Schnittpunkt
 
-**Querkraft im Nachweisschnitt: so gross wie V\_Rd,c: keine Flächenlast abgezogen** *(SIA 262:2025, 4.3.6.2.6)*
+**Querkraft im Nachweisschnitt, so gross wie V\_Rd,c: keine Flächenlast abgezogen** *(SIA 262:2025, 4.3.6.2.6)*
 
 $$
 V_{d,red} = V_d = 159\,\mathrm{kN}
@@ -23954,7 +23954,7 @@ $$
 
 #### Querkraft im Nachweisschnitt am Schnittpunkt
 
-**Querkraft im Nachweisschnitt: so gross wie V\_Rd,c: keine Flächenlast abgezogen** *(SIA 262:2025, 4.3.6.2.6)*
+**Querkraft im Nachweisschnitt, so gross wie V\_Rd,c: keine Flächenlast abgezogen** *(SIA 262:2025, 4.3.6.2.6)*
 
 $$
 V_{d,red} = V_d = 106.3\,\mathrm{kN}

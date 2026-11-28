@@ -434,6 +434,20 @@ const ZEICHEN = {
     pfade: ['M3 7.5h18v9H3z'],
     strich: ['M5 12h14'],
   },
+  // Ein Plattenbereich im Grundriss: ein Umriss um die Stütze, die ein Quadrat mit Kreuz ist.
+  'cad-plattenbereich': {
+    pfade: ['M3.5 3.5h17v17h-17z', 'M9.5 9.5h5v5h-5z', 'M9.5 9.5l5 5 M14.5 9.5l-5 5'],
+  },
+  // Die Seite der Stufe eines Plattenbereichs, im Schnitt durch eine Decke,
+  // die Stütze unten: dicker zur Stütze hin, wie ein Stützenkopf (Figur 24a) …
+  'seite-stuetze': {
+    pfade: ['M2 8.5h20', 'M2 13h5.5v4h9v-4H22', 'M10 17v4.5 M14 17v4.5'],
+  },
+  // … oder auf der Gegenseite, oben (Figur 24c). Bei einer Bodenplatte steht
+  // das Bild auf dem Kopf (.ds-seite-boden).
+  'seite-gegenseite': {
+    pfade: ['M2 8.5h5.5v-4h9v4H22', 'M2 13h20', 'M10 13v8.5 M14 13v8.5'],
+  },
   // Ein Punkt zum Konstruieren: klein, gestrichelt umkreist -- er rechnet nicht mit.
   'cad-hilfspunkt': {
     strich: ['M12 5a7 7 0 1 1 0 14a7 7 0 1 1 0-14'],

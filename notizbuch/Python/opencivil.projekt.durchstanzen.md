@@ -1,5 +1,5 @@
 ---
-erzeugt: 6c8c02dc812e
+erzeugt: 8178862720b0
 art: modul
 tags: [modul]
 ---
@@ -12,17 +12,19 @@ tags: [modul]
 Der [[opencivil.projekt.durchstanzen#DurchstanzEintrag|DurchstanzEintrag]]: Decke oder Bodenplatte, Plattendicke,
 Überdeckung, Grösstkorn, die Biegebewehrung über der Stütze, Form, Masse und
 Lage der gestützten Fläche, die Spannweiten für die Plattenrotation, die
-Einwirkung und die Aussparungen – als speicherbare Datenklasse. Gerechnet
-wird in [[opencivil.durchstanzen]].
+Einwirkung, die Aussparungen und die Bereiche mit eigener Dicke – als
+speicherbare Datenklasse. Gerechnet wird in [[opencivil.durchstanzen]].
 
 
-## KNOTEN UND AUSSPARUNGEN
+## KNOTEN, AUSSPARUNGEN UND BEREICHE
 
-Wie im gezeichneten Querschnitt tragen die Aussparungen keine eigenen
-Koordinaten, sie verweisen auf Knoten ([[opencivil.projekt.durchstanzen#GrundrissknotenEintrag|GrundrissknotenEintrag]]). Im
-Grundriss, in mm, mit der Achse der Stütze im Ursprung: x nach rechts, y
-nach oben. Der Plattenrand einer Randstütze liegt unten, an der Ecke dazu
-links ([[opencivil.durchstanzen.flaeche]]).
+Wie im gezeichneten Querschnitt tragen Aussparungen und Plattenbereiche
+keine eigenen Koordinaten, sie verweisen auf Knoten
+([[opencivil.projekt.durchstanzen#GrundrissknotenEintrag|GrundrissknotenEintrag]]). Im Grundriss, in mm, mit der Achse der
+Stütze im Ursprung: x nach rechts, y nach oben. Der Plattenrand einer
+Randstütze liegt unten, an der Ecke dazu links
+([[opencivil.durchstanzen.flaeche]]). Ein Plattenbereich hat dazu seine
+Dicke und die Seite seiner Stufe ([[opencivil.durchstanzen.bereiche]]).
 
 
 ## DIE VORGABEN
@@ -58,6 +60,21 @@ Eine Aussparung in der Platte: ihre Ecken als Kennungen von Knoten, der Reihe na
 
 - `kennung: str = ''`
 - `knoten: List[str] = field(default_factory=list)`
+
+### PlattenbereichEintrag
+
+```python
+@dataclass
+class PlattenbereichEintrag(Beschreibung)
+```
+
+Ein Bereich der Platte mit eigener Dicke: seine Ecken als Kennungen von
+Knoten, seine Dicke und auf welcher Seite der Platte seine Stufe liegt.
+
+- `kennung: str = ''`
+- `knoten: List[str] = field(default_factory=list)`
+- `h: float = bereich(360.0, heisst='Dicke h', einheit=MM, ueber=0.0)`
+- `seite: Seite = Seite.STUETZE`
 
 ### DurchstanzEintrag
 
@@ -109,6 +126,7 @@ Eine Durchstanzstelle – siehe Dateikopf.
 - `beschreibung: str = ''` – Freier Text – geht in keine Rechnung ein.
 - `knoten: List[GrundrissknotenEintrag] = field(default_factory=list)`
 - `aussparungen: List[AussparungEintrag] = field(default_factory=list)`
+- `plattenbereiche: List[PlattenbereichEintrag] = field(default_factory=list)`
 
 #### DurchstanzEintrag.neu
 
@@ -143,10 +161,23 @@ def aussparung(self, punkte: Sequence[Sequence[float]]) -> AussparungEintrag
 
 Eine Aussparung aus ihren Ecken `[x, y]` in mm.
 
+#### DurchstanzEintrag.plattenbereich
+
+```python
+def plattenbereich(self, punkte: Sequence[Sequence[float]], h: float, seite: Seite=Seite.STUETZE) -> PlattenbereichEintrag
+```
+
+Ein Plattenbereich aus seinen Ecken `[x, y]` und seiner Dicke, in mm.
+
+
+## Konstanten
+
+- `VORSILBEN = {'aussparungen': 'A', 'plattenbereiche': 'B'}` – Wie die Kennungen der Polygone im Grundriss beginnen – die Oberflaeche liest sie aus dem Katalog ([[opencivil.web.durchstanzdaten#wahlen|opencivil.web.durchstanzdaten.wahlen]]).
 
 ## Braucht
 
 - [[opencivil.core.einheiten]]
+- [[opencivil.durchstanzen.bereiche]]
 - [[opencivil.durchstanzen.flaeche]]
 - [[opencivil.durchstanzen.stelle]]
 - [[opencivil.durchstanzen.systeme]]
@@ -162,3 +193,4 @@ Eine Aussparung aus ihren Ecken `[x, y]` in mm.
 - [[opencivil.projekt.aufbau.durchstanzen]]
 - [[opencivil.projekt.projekt]]
 - [[opencivil.web.api]]
+- [[opencivil.web.durchstanzdaten]]

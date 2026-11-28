@@ -25,10 +25,12 @@ from dataclasses import dataclass
 from typing import Optional
 
 from opencivil.core.berechnung import Eingaben
-from opencivil.core.einheiten import M2, Groesse
+from opencivil.core.einheiten import M2, MM, Groesse
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert, WertDef
-from opencivil.durchstanzen.pruefung import KeNaeherung, Schnittpruefung, kreisdurchmesser
+from opencivil.durchstanzen.pruefung import (
+    K_R_GRENZE, KeNaeherung, Schnittpruefung, beiwert_k_r, kreisdurchmesser,
+)
 from opencivil.durchstanzen.schnitt import Auswertung
 
 
@@ -177,6 +179,22 @@ def querkraft(p: Protokoll, w: Zwischenwerte, e: Eingaben, s: Schnittpruefung, *
     ergebnis = w.kraft(ix.name("V_d_red"), symbol, V_d.groesse.si - s.abzug)
     p.formel(ergebnis, r"@V_d - @dV", {"V_d": V_d, "dV": dV}, titel=titel,
              referenz="SIA 262:2025, 4.3.6.2.6", name="Bemessungswert der Querkraft im Nachweisschnitt")
+    return ergebnis
+
+
+def k_r(p: Protokoll, w: Zwischenwerte, psi: Wert, d: Wert, k_g: Wert, *, ix: Index,
+        titel: str) -> Wert:
+    """
+    Der Beiwert k_r (59) an diesem Schnitt, mit dem d seiner Stelle -- um die
+    Stütze und an den Stufen von Plattenbereichen (:mod:`.stufen`) je ein
+    eigenes.
+    """
+    ergebnis = w.zahl(ix.name("k_r"), ix.symbol("k", "r"),
+                      beiwert_k_r(psi.groesse.si, d.groesse.si, k_g.groesse.si), stellen=3)
+    p.formel(ergebnis, rf"\min\left[{K_R_GRENZE:g};\ \frac{{1}}{{0.45 + 0.18 \cdot @psi \cdot @d "
+                       r"\cdot @k_g}\right]",
+             {"psi": psi, "d": d, "k_g": k_g}, empirisch={"d": MM}, titel=titel,
+             referenz="SIA 262:2025, 4.3.6.3.2, (59)", name="Beiwert k_r")
     return ergebnis
 
 

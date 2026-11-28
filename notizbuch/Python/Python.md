@@ -1,5 +1,5 @@
 ---
-erzeugt: 5c3a76aa90fd
+erzeugt: e7455c2e6a25
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -59,6 +59,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.decke.streifen]] – die Decke in Streifen zerlegt.
     - [[opencivil.decke.werk]] – die Decke im Rechenwerk.
 - [[opencivil.durchstanzen]] – der Durchstanznachweis nach SIA 262:2025, 4.3.6.
+    - [[opencivil.durchstanzen.bereiche]] – Bereiche der Platte mit eigener Dicke.
     - [[opencivil.durchstanzen.bewehrung]] – wo die Durchstanzbewehrung liegt, und welche reicht.
     - [[opencivil.durchstanzen.flaeche]] – die gestützte Fläche: was Lage und Form für den Nachweis heissen.
     - [[opencivil.durchstanzen.herleitung]] – wie ein Nachweisschnitt in der Herleitung steht.
@@ -69,6 +70,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.durchstanzen.pruefung]] – was der Durchstanznachweis rechnet, ohne Herleitung.
     - [[opencivil.durchstanzen.schnitt]] – der Nachweisschnitt um die gestützte Fläche.
     - [[opencivil.durchstanzen.stelle]] – die Durchstanzstelle: Platte, gestützte Fläche, Bewehrung, Last.
+    - [[opencivil.durchstanzen.stufen]] – Plattenbereiche um die Stütze: d an ihr, Schnitte an den Stufen.
     - [[opencivil.durchstanzen.systeme]] – woraus die Durchstanzbewehrung besteht.
 - [[opencivil.erdbeben]] – Erdbeben nach SIA 261:2020, Kapitel 16.
     - [[opencivil.erdbeben.ersatzkraft]] – das Ersatzkraftverfahren nach SIA 261:2020, 16.5.2.

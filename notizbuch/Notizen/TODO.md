@@ -265,6 +265,44 @@ sammeln sie sich hier, je mit dem, was vorläufig gebaut ist.
       - nur die Kombinationen, nicht die einzelnen Lastfälle des Systems;
       - bei gleichen Werten die vorderste Stelle des ersten Stabs; ist der
         Extremwert an einem Sprung auf beiden Seiten, beide.
+- [ ] **Plattenbereiche: die Eckenregel an den Stufen.** Von einem Schnitt
+      an einer Stufe zählt nur, was höchstens 1.5·d_v von einer Ecke
+      entfernt liegt, wie um eine grosse Stütze (Figur 23a): zur Stütze hin
+      von den Ecken des Bereichs, auf der Gegenseite von den Ecken des
+      Schnitts selbst. Auf der Gegenseite ist das streng. Beispiel: Stütze
+      400 × 400 mm, Platte 240 mm, Bereich 1200 × 1200 mm mit 320 mm. Um die
+      Stütze trägt sie 335.4 kN, an der Stufe 290.1 kN – die Stufe ist
+      massgebend. Ohne die Regel zählte der ganze Schnitt innen, denn
+      gestützt ist die Platte nur an der Stütze, und die Stütze wäre
+      massgebend. Nach Vorgabe, nicht nachgeschlagen. Vorschlag: so lassen,
+      es liegt auf der sicheren Seite. Vorläufig: so.
+- [ ] **Plattenbereiche: wann an der Stütze d des Bereichs gilt.** Ist ein
+      Bereich auf der Gegenseite dicker, gilt sein d an der Stütze nur, wenn
+      er weiter als sein d_v über die Stütze hinausreicht. Sonst endete der
+      Riss jenseits der Stufe, wo die Zugbewehrung höher liegt, und es gilt
+      d der Platte. Beispiel: Stütze 400 × 400 mm, Bereich 800 × 800 mm mit
+      320 mm in einer Platte von 240 mm – er reicht 200 mm über die Stütze
+      hinaus, d_v im Bereich ist 274 mm: an der Stütze gilt d = 194 mm der
+      Platte. Dieselbe Regel gilt an jeder Stufe zur Stütze hin. Nach
+      Vorgabe, nicht nachgeschlagen. Vorschlag: so lassen. Vorläufig: so.
+- [ ] **Plattenbereiche: ψ mit dem kleinsten d um die Stütze.** Gewählt
+      war «ψ aus der Grundplatte, das Konservative». Gebaut ist: ψ rechnet
+      mit der kleinsten statischen Höhe der Platte und der Bereiche, die die
+      Stütze umschliessen. Meist ist das die Platte; ist ein Bereich um die
+      Stütze dünner, ist es seine – mit ihr dreht sich die Platte mehr, das
+      bleibt auf der sicheren Seite. Vorschlag: so lassen. Vorläufig: so.
+- [ ] **Plattenbereiche: die Kennzahl, wenn eine Stufe massgebend ist.**
+      Die Kennzahl «Durchstanzwiderstand am Schnittpunkt» ist die Querkraft
+      im Schnitt um die Stütze bei der grössten Stützenkraft, bei der jeder
+      Schnitt hält. Ist eine Stufe massgebend, ist sie kleiner als V_Rd,c um
+      die Stütze, im Beispiel oben 290.1 statt 335.4 kN, und die Herleitung
+      sagt, an welcher Stufe es liegt. So bleibt sie mit V_d eines Nachweises
+      vergleichbar. Vorschlag: so lassen. Vorläufig: so.
+- [ ] **Plattenbereiche: die Dicke eines neuen Bereichs.** Ein neuer
+      Bereich hat h = 360 mm, gleich wie dick die Platte ist; die Seite
+      zeigt es im Feld, bevor man zeichnet. Vorschlag: so lassen. Sonst
+      etwa die Dicke der Platte plus 80 mm, die der Kern vorgäbe.
+      Vorläufig: 360 mm.
 
 ## Wünsche vom 2026-11-20
 
@@ -1464,8 +1502,10 @@ Norm dazu sagt.
       Stütze. Wo an den Stegen gemessen wird, zeigt Figur 21 nicht.
 - [ ] **Durchstanzen: was das Werkzeug nicht abbildet** (zur Kenntnis):
       Einzellasten über 0.2·V_d näher als 3·d_v am Schnitt (4.3.6.2.3);
-      einbetonierte Leitungen (Figur 23e); Verstärkungen und Schwächungen der
-      Platte (4.3.6.2.7, Figur 24); Vorspannung (4.3.6.4.3); an Rand- und
+      einbetonierte Leitungen (Figur 23e); Plattenbereiche mit eigener
+      Dicke (4.3.6.2.7, Figur 24) nur, wo sie die Stütze umschliessen, noch
+      ohne Durchstanzbewehrung und nicht an Wänden (Schritt 13 c und d des
+      Plans vom 2026-11-27); Vorspannung (4.3.6.4.3); an Rand- und
       Eckstützen die untere Bewehrung als gezogene (4.3.6.4.7); die
       Verankerung der Biegebewehrung (5.5.3.7); ein Schnitt, der an einer
       Aussparung nahe der Stütze endet (4.3.6.2.2). Die Bedingung

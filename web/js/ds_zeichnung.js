@@ -1,38 +1,73 @@
 /**
  * ds_zeichnung.js -- das Zeichenfenster einer Durchstanzstelle: der Adapter.
  *
- * Gezeichnet werden Aussparungen: Polygone im Grundriss, in mm, x nach
- * rechts, y nach oben, die Achse der Stütze im Ursprung -- wie im Kern
- * (opencivil/projekt/durchstanzen.py). Ein Werkzeug zeichnet sie, ein
- * zweites setzt Hilfspunkte zum Fangen. Ecken und Knoten verschiebt man wie
- * im Querschnitt: wählen, dann V oder die Felder in der Seitenleiste.
+ * Gezeichnet werden Aussparungen und Plattenbereiche: Polygone im Grundriss,
+ * in mm, x nach rechts, y nach oben, die Achse der Stütze im Ursprung -- wie
+ * im Kern (opencivil/projekt/durchstanzen.py). Je ein Werkzeug zeichnet sie,
+ * Ecke um Ecke oder als Rechteck aus zwei Ecken (G); ein drittes setzt
+ * Hilfspunkte zum Fangen. Ein Plattenbereich hat seine Dicke und die Seite
+ * seiner Stufe: für den nächsten stehen sie in der Seitenleiste, solange
+ * sein Werkzeug läuft, für gewählte, wenn man sie wählt. Ecken und Knoten
+ * verschiebt man wie im Querschnitt: wählen, dann V oder die Felder in der
+ * Seitenleiste.
  *
  * Darunter liegt, was der Kern zuletzt gerechnet hat: Stütze oder Wand,
- * Plattenrand und Nachweisschnitt (ds_grundriss.js). Die Ecken der Stütze
- * fangen den Zeiger. Ändert sich eine Aussparung, rechnet die nächste Lösung
- * den Schnitt neu -- bis dahin steht der alte da.
+ * Plattenrand, Nachweisschnitt und die Schnitte an den Stufen
+ * (ds_grundriss.js). Die Ecken der Stütze fangen den Zeiger. Ändert sich
+ * eine Aussparung oder ein Bereich, rechnet die nächste Lösung die Schnitte
+ * neu -- bis dahin stehen die alten da.
  *
  * WAS HIER GERECHNET WIRD -- UND WAS NICHT:
  * Nichts, was in die Rechnung geht. Ob eine Aussparung den Schnitt mindert,
- * wie weit ihr Schatten reicht und ob sie gültig ist, sagt der Kern.
+ * wo die Schnitte an den Stufen liegen und ob alles gültig ist, sagt der Kern.
  */
 
-import { auswahlEigenschaften, cadApp, umrissVon } from './cad_app.js';
+import { mitBild, wahlSchalter } from './bausteine.js';
+import {
+  auswahlEigenschaften, cadApp, teilname, umrissVon, vorgabe, zahlfeldMitVar, zugleich,
+} from './cad_app.js';
 import { nachBild, nachWelt } from './cad_ansicht.js';
 import { cadBereich } from './cad_fenster.js';
-import { knotenname } from './cad_modell.js';
+import { cadZeile, schalterzeile } from './cad_palette.js';
 import { el } from './dom.js';
-import { aussparungTeile, grundrissTeile, grundrissUmfang } from './ds_grundriss.js';
-import { eintragVon, zustand } from './zustand.js';
+import {
+  aussparungTeile, bereichTeile, grundrissTeile, grundrissUmfang,
+} from './ds_grundriss.js';
+import {
+  eintragVon, feldangabe, katalog, zustand,
+} from './zustand.js';
 
-/** Eine Art: die Aussparung, eine Fläche aus Knoten. */
-const ARTEN = [{ liste: 'aussparungen', form: 'flaeche', vorsilbe: 'A', rang: 0 }];
+/** Welche Liste ein Werkzeug füllt. */
+const LISTE_VON = { aussparung: 'aussparungen', plattenbereich: 'plattenbereiche' };
+
+/** Wie ein Teil einer Liste heisst, einzeln und mehrere -- «Bereich B1» wie im Kern. */
+const NAMEN = {
+  aussparungen: ['Aussparung', 'Aussparungen'],
+  plattenbereiche: ['Bereich', 'Plattenbereiche'],
+};
+
+/**
+ * Die Arten: Aussparung und Plattenbereich, je eine Fläche aus Knoten, ihre
+ * Vorsilben vom Kern (`VORSILBEN` in opencivil/projekt/durchstanzen.py).
+ */
+function arten() {
+  const vorsilben = katalog('durchstanzen', 'vorsilben');
+  return ['aussparungen', 'plattenbereiche'].map((liste, rang) => ({
+    liste, form: 'flaeche', rang, vorsilbe: vorsilben[liste], heisst: NAMEN[liste][0],
+    mehrzahl: NAMEN[liste][1],
+  }));
+}
 
 /** In mm, wie der Querschnitt -- aber mit dem Raster eines Grundrisses. */
 const EINSTELLUNG = {
   werkzeuge: [
     { name: 'aussparung', text: 'Aussparung', zeichen: 'cad-polygon', taste: 'a', form: 'polygon',
-      titel: 'Aussparung: die Ecken der Reihe nach – Enter oder ein Klick auf die erste schliesst' },
+      titel: 'Aussparung: die Ecken der Reihe nach – Enter oder ein Klick auf die erste schliesst; '
+        + 'G für ein Rechteck aus zwei Ecken' },
+    { name: 'plattenbereich', text: 'Plattenbereich', zeichen: 'cad-plattenbereich', taste: 'b',
+      form: 'polygon',
+      titel: 'Plattenbereich mit eigener Dicke: die Ecken der Reihe nach – G für ein Rechteck aus '
+        + 'zwei Ecken' },
     { name: 'hilfspunkt', text: 'Hilfspunkt', zeichen: 'cad-hilfspunkt', taste: 'k', form: 'knoten',
       titel: 'Hilfspunkt: ein Knoten ohne Aussparung, zum Fangen' },
   ],
@@ -50,57 +85,73 @@ function situationVon(kennung) {
 /** Das Zeichenfenster einer Stelle, samt einer Zeile darunter. Die Tafel ruft das bei jedem Neubau. */
 export function zeichenbereich(stelle) {
   return cadBereich(fensterVon(stelle.kennung), [el('p.cad-hinweis-klein', {
-    text: 'Ausgezogen, was vom Nachweisschnitt zählt; gestrichelt, was nicht zählt. '
-      + 'Der Schnitt kommt aus der letzten Rechnung.',
+    text: 'Ausgezogen, was von den Schnitten zählt; gestrichelt, was nicht zählt. '
+      + 'Die Schnitte kommen aus der letzten Rechnung.',
   })]);
 }
 
-/** Was der Adapter einer Stelle über die gemeinsame Grundlage hinaus weiss (cad_app.js). */
+/**
+ * Was der Adapter einer Stelle über die gemeinsame Grundlage hinaus weiss
+ * (cad_app.js) -- dazu, was das Werkzeug als Nächstes anlegt (`ds.vorgabe`,
+ * die Vorlage des Kerns).
+ */
 function adapter(kennung) {
+  const ds = { kennung, vorgabe: structuredClone(katalog('vorlagen', 'plattenbereich')) };
+  const alle = arten();
   return {
+    ds,
     einstellung: EINSTELLUNG,
     achsen: ['x', 'y'],
-    arten: ARTEN,
-    name: elementname,
-    neuText: (a, werkzeug) => (werkzeug === 'aussparung' ? 'Aussparung' : 'Hilfspunkt'),
+    arten: alle,
+    name: teilname,
+    neuText: (a, werkzeug) => ({
+      aussparung: 'Aussparung', plattenbereich: `Plattenbereich, h = ${ds.vorgabe.h} mm`,
+    }[werkzeug] || 'Hilfspunkt'),
     // Ein Hilfspunkt ist der Knoten selbst und legt nichts an.
     punktAnlegen: () => null,
-    flaecheAnlegen: (a, z, knoten) => {
-      const neu = a.modell.naechsteKennung(z, 'A');
-      z.aussparungen.push({ kennung: neu, knoten });
+    flaecheAnlegen: (a, z, knoten, werkzeug) => {
+      const liste = LISTE_VON[werkzeug];
+      const neu = a.modell.naechsteKennung(z, alle.find((x) => x.liste === liste).vorsilbe);
+      z[liste] = z[liste] || [];
+      z[liste].push(liste === 'plattenbereiche'
+        ? { ...structuredClone(ds.vorgabe), kennung: neu, knoten } : { kennung: neu, knoten });
       return neu;
     },
     zeichnen: (a, g) => zeichnen(a, g, kennung),
     fangpunkte: () => (situationVon(kennung)?.umriss || []).map((p) => ({ p })),
     umriss: () => umriss(kennung),
     eigenschaften,
+    neuEigenschaften,
   };
 }
 
 /** Die Zeichenfenster der Durchstanzstellen, je Kennung eines. */
-const fensterVon = cadApp('ds', adapter);
+const fensterVon = cadApp('ds', adapter, (a) => { a.ds = a.adapter.ds; });
 
-/** «Aussparung A1», «Knoten K3». */
-function elementname(a, kennung) {
-  return knotenname(kennung) ?? (/^A\d+$/.test(kennung) ? `Aussparung ${kennung}` : kennung);
+/** Die Ecken der Polygone einer Liste, wie sie gerade gezeichnet sind -- mit dem Eintrag dazu. */
+function polygone(a, z, liste) {
+  const lagen = a.modell.lagen(z);
+  return (z[liste] || []).map((e) => ({ e, punkte: e.knoten.map((k) => lagen.get(k)) }))
+    .filter(({ punkte }) => punkte.length >= 2 && punkte.every(Boolean));
 }
 
 /**
- * Unten der Grundriss aus der letzten Lösung, darin die Aussparungen, wie sie
- * gerade gezeichnet sind -- auch die, die der Kern noch nicht kennt.
+ * Unten der Grundriss aus der letzten Lösung, darin die Aussparungen und
+ * Plattenbereiche, wie sie gerade gezeichnet sind -- auch die, die der Kern
+ * noch nicht kennt.
  */
 function zeichnen(a, g, kennung) {
   const z = eintragVon(kennung);
-  const lagen = a.modell.lagen(z);
-  const aussparungen = (z.aussparungen || [])
-    .map((f) => f.knoten.map((k) => lagen.get(k)))
-    .filter((punkte) => punkte.length >= 2 && punkte.every(Boolean));
+  const aussparungen = polygone(a, z, 'aussparungen').map((x) => x.punkte);
+  const bereiche = polygone(a, z, 'plattenbereiche')
+    .map(({ e, punkte }) => ({ name: e.kennung, h: e.h, punkte }));
   const bild = (p) => nachBild(a.v, p);
   const s = situationVon(kennung);
   if (s) {
     const sicht = [nachWelt(a.v, [0, a.v.hoehe]), nachWelt(a.v, [a.v.breite, 0])];
-    g.append(...grundrissTeile(s, bild, sicht, aussparungen));
+    g.append(...grundrissTeile(s, bild, sicht, aussparungen, bereiche));
   } else {
+    for (const b of bereiche) g.append(...bereichTeile(b, bild));
     for (const punkte of aussparungen) g.append(...aussparungTeile(punkte.map(bild)));
   }
 }
@@ -113,22 +164,67 @@ function umriss(kennung) {
   return umrissVon(punkte, [[-1000, -1000], [1000, 1000]]);
 }
 
+// ===========================================================================
+// Die Seitenleiste
+// ===========================================================================
+
 /**
- * Die Seitenleiste zur Auswahl (cad_app.js): Ecken und Knoten mit
- * ihrer Lage, Aussparungen mit dem, was man mit ihnen tun kann.
+ * Dicke und Seite der Stufe eines Plattenbereichs -- `wert(feld)` ist, was
+ * gilt, `setzen(feld)` schreibt: in die gewählten oder in die Vorgabe für
+ * den nächsten. Das Bild der Seite steht bei einer Bodenplatte auf dem Kopf:
+ * dort steht die Stütze oben.
  */
-function eigenschaften(a) {
-  return auswahlEigenschaften(a, { sonst: aussparungEigenschaften });
+function bereichFelder(a, wert, setzen) {
+  const angabe = feldangabe('plattenbereich', 'h');
+  const boden = eintragVon(a.ds.kennung)?.plattenart === 'bodenplatte';
+  return [
+    cadZeile('Dicke h', zahlfeldMitVar({
+      wert: wert('h'), angabe, titel: 'Die Dicke der Platte im Bereich', beiAenderung: setzen('h'),
+    }), angabe.einheit || ''),
+    schalterzeile('Stufe', wahlSchalter({
+      werte: mitBild(katalog('durchstanzen', 'seiten'), 'seite'), gewaehlt: wert('seite'),
+      setzen: setzen('seite'), titel: 'Auf welcher Seite der Platte die Stufe liegt',
+      klasse: boden ? '.ds-seite-boden' : '',
+    })),
+  ];
 }
 
-/** Gewählte Aussparungen: was man mit ihnen tun kann -- Felder haben sie keine. */
-function aussparungEigenschaften(a, z, kennungen) {
-  const einzeln = kennungen.length === 1;
+/** Die Felder für das, was ein Werkzeug als Nächstes anlegt: beim Bereich Dicke und Seite. */
+function neuEigenschaften(a, werkzeug) {
+  if (werkzeug !== 'plattenbereich') return { inhalt: [], schluessel: werkzeug };
+  const v = a.ds.vorgabe;
+  const { wert, setzen } = vorgabe(a, v);
   return {
-    titel: einzeln ? elementname(a, kennungen[0]) : `${kennungen.length} Aussparungen`,
-    inhalt: [el('p.cad-hinweis-klein', {
-      text: einzeln ? 'Eine Ecke verschiebt man, indem man auf sie klickt; die ganze Aussparung mit V. '
-        + 'Entf löscht sie.' : 'Verschieben mit V, kopieren mit C, löschen mit Entf.',
-    })],
+    inhalt: bereichFelder(a, wert, setzen),
+    schluessel: JSON.stringify([werkzeug, v, eintragVon(a.ds.kennung)?.plattenart]),
   };
+}
+
+/**
+ * Die Seitenleiste zur Auswahl (cad_app.js): Ecken und Knoten mit ihrer
+ * Lage, Aussparungen mit dem, was man mit ihnen tun kann, Plattenbereiche
+ * mit Dicke und Seite.
+ */
+function eigenschaften(a) {
+  return auswahlEigenschaften(a, { sonst: teilEigenschaften },
+    eintragVon(a.ds.kennung)?.plattenart ?? null);
+}
+
+/** Gewählte Aussparungen oder Plattenbereiche: ihre Felder und was man mit ihnen tun kann. */
+function teilEigenschaften(a, z, kennungen, liste) {
+  const einzeln = kennungen.length === 1;
+  const art = a.adapter.arten.find((x) => x.liste === liste);
+  const bereiche = liste === 'plattenbereiche';
+  const inhalt = [];
+  if (bereiche) {
+    const { wert, setzen } = zugleich(a, z, liste, kennungen);
+    inhalt.push(...bereichFelder(a, wert, setzen));
+  }
+  inhalt.push(el('p.cad-hinweis-klein', {
+    text: einzeln ? 'Eine Ecke verschiebt man, indem man auf sie klickt; '
+      + `${bereiche ? 'den ganzen Bereich' : 'die ganze Aussparung'} mit V. Entf löscht.`
+      : 'Verschieben mit V, kopieren mit C, löschen mit Entf.',
+  }));
+  const titel = einzeln ? teilname(a, kennungen[0]) : `${kennungen.length} ${art.mehrzahl}`;
+  return { titel, inhalt };
 }

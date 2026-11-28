@@ -1,5 +1,5 @@
 ---
-erzeugt: e2771c53793e
+erzeugt: cb9aa689a96c
 art: modul
 tags: [modul]
 ---
@@ -116,6 +116,16 @@ Die Querkraft, die den Schnitt kreuzt: V_d ohne die Flächenlast darin
 was die Flächenlast ist; `V_d` die Stützenkraft, wo es nicht die
 eingegebene ist – die gesuchte der Kennzahl ([[opencivil.durchstanzen.kennzahl|.kennzahl]]).
 
+### k_r
+
+```python
+def k_r(p: Protokoll, w: Zwischenwerte, psi: Wert, d: Wert, k_g: Wert, *, ix: Index, titel: str) -> Wert
+```
+
+Der Beiwert k_r (59) an diesem Schnitt, mit dem d seiner Stelle – um die
+Stütze und an den Stufen von Plattenbereichen ([[opencivil.durchstanzen.stufen|.stufen]]) je ein
+eigenes.
+
 ### widerstand
 
 ```python
@@ -145,10 +155,12 @@ belegt, wo V_Rd,c selbst ein Wert des Rechenwerks ist: die Kennzahl
 - [[opencivil.durchstanzen.kennzahl]]
 - [[opencivil.durchstanzen.mit_bewehrung]]
 - [[opencivil.durchstanzen.nachweis]]
+- [[opencivil.durchstanzen.stufen]]
 
 ## Formeln aus diesem Modul
 
 - [[Beiwert der Momentenübertragung]] · `k_e`
+- [[Beiwert k_r]] · `k_r`
 - [[Bemessungswert der Querkraft im Nachweisschnitt]] · `querkraft`
 - [[Durchmesser des flächengleichen Kreises]] · `k_e`
 - [[Durchstanzwiderstand ohne Durchstanzbewehrung]] · `widerstand`

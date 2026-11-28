@@ -1,5 +1,5 @@
 ---
-erzeugt: f201f927f8c2
+erzeugt: 4a70443c24ed
 art: modul
 tags: [modul]
 ---
@@ -33,6 +33,7 @@ Eine Wahl: das Mitglied ist sein Text.
 
 - [[opencivil.bewehrungssuche.laengs]]
 - [[opencivil.decke.modell]]
+- [[opencivil.durchstanzen.bereiche]]
 - [[opencivil.durchstanzen.flaeche]]
 - [[opencivil.durchstanzen.stelle]]
 - [[opencivil.durchstanzen.systeme]]

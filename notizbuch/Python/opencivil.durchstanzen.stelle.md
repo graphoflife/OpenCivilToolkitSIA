@@ -1,5 +1,5 @@
 ---
-erzeugt: f6d4fc0087b3
+erzeugt: 12941a6d671a
 art: modul
 tags: [modul]
 ---
@@ -258,6 +258,7 @@ b_x, eine Innenstütze keinen Randabstand.
 - `e_x: Groesse`
 - `e_y: Groesse` – Die Exzentrizität der Auflagerkraft gegenüber der Stützenachse.
 - `aussparungen: Sequence[Sequence[Punkt]] = ()` – Je Aussparung ihre Ecken, in m.
+- `bereiche: Sequence[Plattenbereich] = ()` – Die Bereiche der Platte mit eigener Dicke ([[opencivil.durchstanzen.bereiche|.bereiche]]).
 - `definitionen: Dict[str, WertDef] = field(default_factory=dict, init=False)`
 - `berechnungen: List[Berechnung] = field(default_factory=list, init=False)`
 - `anker: Baustoff = field(init=False)` – Der Stahl der Durchstanzbewehrung – siehe Dateikopf.
@@ -303,6 +304,7 @@ Die Kurznamen, die der Nachweis liest – siehe [[opencivil.durchstanzen.stelle#
 - [[opencivil.core.vorgaben]]
 - [[opencivil.core.wahl]]
 - [[opencivil.core.wert]]
+- [[opencivil.durchstanzen.bereiche]]
 - [[opencivil.durchstanzen.flaeche]]
 - [[opencivil.durchstanzen.schnitt]]
 - [[opencivil.durchstanzen.systeme]]

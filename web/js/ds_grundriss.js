@@ -3,18 +3,21 @@
  *
  * Von oben gesehen, x nach rechts, y nach oben, in mm: die Stütze oder Wand,
  * die Plattenränder -- was jenseits liegt, grau --, die Aussparungen mit
- * einem Kreuz und der Nachweisschnitt im Abstand d_v/2. Was von ihm zählt,
- * ist ausgezogen, was nicht zählt, gestrichelt: neben den Ecken grosser
- * Stützen und im Schatten der Aussparungen. Braucht es Durchstanzbewehrung,
- * stehen ihre Leisten mit den Ankern da und der äussere Schnitt um sie.
+ * einem Kreuz, die Plattenbereiche getönt mit ihrer Dicke und der
+ * Nachweisschnitt im Abstand d_v/2. Was von ihm zählt, ist ausgezogen, was
+ * nicht zählt, gestrichelt: neben den Ecken grosser Stützen und im Schatten
+ * der Aussparungen. An jeder Stufe eines Bereichs ihr Schnitt, je in seiner
+ * Farbe -- welche, sagt die Legende des Kerns. Braucht es
+ * Durchstanzbewehrung, stehen ihre Leisten mit den Ankern da und der äussere
+ * Schnitt um sie.
  *
  * Alles kommt aus der Lösung, wie der Kern es gerechnet hat
  * (opencivil/web/durchstanzdaten.py) -- auch der Umriss der Stütze. Steht im
  * Bild etwas anderes als in den Eingaben, ist die Rechnung noch nicht
  * zurück. Zwei Bilder zeichnen damit: die Karte im Reiter «Diagramme» und
- * das Zeichenfenster, in dem die Aussparungen entstehen (ds_zeichnung.js) --
- * beide über `grundrissTeile`; das Zeichenfenster gibt ihm die Aussparungen,
- * wie sie gerade gezeichnet sind.
+ * das Zeichenfenster, in dem Aussparungen und Bereiche entstehen
+ * (ds_zeichnung.js) -- beide über `grundrissTeile`; das Zeichenfenster gibt
+ * ihm Aussparungen und Bereiche, wie sie gerade gezeichnet sind.
  */
 
 import { karte } from './bausteine.js';
@@ -58,12 +61,15 @@ function jenseits([[x0, y0], [x1, y1]], { punkt, richtung }) {
 /**
  * Die Teile des Grundrisses als SVG, für ein Bild mit der Abbildung `bild`
  * (mm -> px) und dem sichtbaren Ausschnitt `sicht` in mm -- bis dorthin
- * reichen die Plattenränder. `aussparungen` in mm, unter Stütze und Schnitt:
- * die der Lösung, oder im Zeichenfenster die, wie sie gerade gezeichnet sind.
+ * reichen die Plattenränder. `aussparungen` in mm und `bereiche` -- je
+ * `{name, h, punkte}` --, unter Stütze und Schnitt: die der Lösung, oder im
+ * Zeichenfenster die, wie sie gerade gezeichnet sind.
  */
-export function grundrissTeile(s, bild, sicht, aussparungen = s.aussparungen) {
+export function grundrissTeile(s, bild, sicht, aussparungen = s.aussparungen,
+  bereiche = s.bereiche) {
   const px = (punkte) => punkte.map(bild);
   const teile = [];
+  for (const b of bereiche) teile.push(...bereichTeile(b, bild));
   for (const r of s.raender) {
     const aussen = jenseits(sicht, r);
     if (aussen.length >= 3) teile.push(svgEl('path', { d: pfadVon(px(aussen), true), class: 'ds-jenseits' }));
@@ -83,7 +89,28 @@ export function grundrissTeile(s, bild, sicht, aussparungen = s.aussparungen) {
   for (const l of s.schnitt) {
     teile.push(linie(px(l.punkte), l.zaehlt ? 'ds-schnitt' : 'ds-schnitt-nicht'));
   }
+  for (const st of s.stufen) {
+    for (const l of st.schnitt) {
+      const klasse = `ds-stufe ds-stufe-${st.farbe}${l.zaehlt ? '' : ' ds-stufe-nicht'}`;
+      teile.push(linie(px(l.punkte), klasse));
+    }
+  }
   return teile;
+}
+
+/**
+ * Ein Plattenbereich: getönt -- ineinander liegende dunkler --, oben links
+ * in ihm sein Name und seine Dicke.
+ */
+export function bereichTeile(b, bild) {
+  const punkte = b.punkte.map(bild);
+  const x = Math.min(...punkte.map((p) => p[0]));
+  const y = Math.min(...punkte.map((p) => p[1]));
+  const schrift = svgEl('text', {
+    x: (x + 5).toFixed(1), y: (y + 13).toFixed(1), class: 'ds-bereich-text',
+  });
+  schrift.textContent = `${b.name} · h = ${b.h} mm`;
+  return [svgEl('path', { d: pfadVon(punkte, true), class: 'ds-bereich' }), schrift];
 }
 
 /** Der Stahlpilz: seine Stege, seine gestützte Fläche und der Schnitt um sie. */
@@ -127,11 +154,16 @@ export function aussparungTeile(punkte, klasse = '') {
   ];
 }
 
-/** Was im Bild sein soll, in mm: Stütze, Schnitte, Bewehrung, Pilz und Aussparungen, mit Rand. */
+/**
+ * Was im Bild sein soll, in mm: Stütze, Schnitte, Bewehrung, Pilz,
+ * Aussparungen und Bereiche, mit Rand.
+ */
 export function grundrissUmfang(s) {
-  const punkte = [...s.umriss, ...s.schnitt.flatMap((l) => l.punkte), ...s.aussparungen.flat(),
-    ...(s.leisten ? s.leisten.aussen.flatMap((l) => l.punkte) : []),
-    ...(s.pilz ? s.pilz.schnitt.flatMap((l) => l.punkte) : [])];
+  const linien = (schnitt) => schnitt.flatMap((l) => l.punkte);
+  const punkte = [...s.umriss, ...linien(s.schnitt), ...s.aussparungen.flat(),
+    ...s.bereiche.flatMap((b) => b.punkte), ...s.stufen.flatMap((st) => linien(st.schnitt)),
+    ...(s.leisten ? linien(s.leisten.aussen) : []),
+    ...(s.pilz ? linien(s.pilz.schnitt) : [])];
   const xs = punkte.map((p) => p[0]);
   const ys = punkte.map((p) => p[1]);
   const rand = Math.max(s.d_v, 0.08 * Math.max(Math.max(...xs) - Math.min(...xs), Math.max(...ys) - Math.min(...ys)));

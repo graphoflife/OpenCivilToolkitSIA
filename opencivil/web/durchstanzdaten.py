@@ -6,7 +6,9 @@ Je Durchstanzstelle der Grundriss, wie der Kern ihn gerechnet hat, in mm:
 der Umriss der gestützten Fläche, die Plattenränder, die Aussparungen und
 der Nachweisschnitt -- je Stück, ob es zählt --, und wo es sie braucht, die
 Leisten mit ihren Ankern und dem äusseren Schnitt und der Stahlpilz mit seinen
-Stegen und dem Schnitt um ihn, je für sich. Dazu die Legende unter dem Bild
+Stegen und dem Schnitt um ihn, je für sich. Die Plattenbereiche mit ihrer
+Dicke und an jeder Stufe ihr Schnitt, je in seiner Farbe
+(:data:`STUFENFARBEN`). Dazu die Legende unter dem Bild
 (:mod:`opencivil.web.anzeige`): die Schnitte mit ihren Zahlen und das Urteil.
 Gezeichnet wird in der Oberflaeche, gerechnet nichts: die Linien kommen aus
 dem Befund des Nachweises (:mod:`opencivil.durchstanzen.nachweis`).
@@ -20,7 +22,9 @@ Für den Katalog die Wahlen der Maske (:func:`wahlen`): je Stellung ihre
 Beschriftung, und welche Felder der Nachweis mit ihr liest -- die festen, die
 Masse je Lage und Form, die Felder je Näherungsstufe und Lage, die von k_e.
 Die Maske zeigt die Vereinigung, so baut sie die Regel nicht nach
-(:func:`opencivil.durchstanzen.stelle.eingaben_fuer`).
+(:func:`opencivil.durchstanzen.stelle.eingaben_fuer`). Dazu die beiden
+Seiten, auf denen die Stufe eines Plattenbereichs liegen kann, und wie die
+Kennungen der Polygone im Grundriss beginnen.
 """
 
 from __future__ import annotations
@@ -32,9 +36,10 @@ from opencivil.core.latex import Mathe
 from opencivil.core.nachweis import OHNE_EINWIRKUNG, NachweisUrteil
 from opencivil.core.rechenwerk import Loesung
 from opencivil.core.wert import Wert
+from opencivil.durchstanzen.bereiche import Plattenbereich, Seite
 from opencivil.durchstanzen.bewehrung import BEREICH_VON
 from opencivil.durchstanzen.flaeche import Lage, Stuetzenform
-from opencivil.durchstanzen.nachweis import Durchstanzbefund
+from opencivil.durchstanzen.nachweis import Durchstanzbefund, Stufenbefund
 from opencivil.durchstanzen.schnitt import Nachweisschnitt, Punkt
 from opencivil.durchstanzen.stelle import (
     NACH_DEN_MASSEN, VOR_DEN_MASSEN, Durchstanzstelle, KeArt, Naeherungsstufe, Plattenart,
@@ -43,7 +48,12 @@ from opencivil.durchstanzen.stelle import (
 from opencivil.durchstanzen.systeme import Durchstanzsystem
 from opencivil.querschnitt.platte import Richtung
 from opencivil.projekt import Aufbau
+from opencivil.projekt.durchstanzen import VORSILBEN
 from opencivil.web.anzeige import masszahl, punkte, urteil, zahl, zahlformel, zeile
+
+#: Die Farben der Schnitte an den Stufen, der Reihe nach -- im Bild die Klassen
+#: «ds-stufe-0» bis «ds-stufe-2» (web/css/80-skizzen.css).
+STUFENFARBEN = ("grün", "türkis", "braun")
 
 
 def wahlen() -> Dict[str, Any]:
@@ -79,8 +89,10 @@ def wahlen() -> Dict[str, Any]:
         "systeme": stellungen(Durchstanzsystem),
         "ke": [{"wert": k.value, "beschriftung": k.beschriftung, "eingaben": list(k.eingaben)}
                for k in KeArt],
+        "seiten": [{"wert": s.value, "beschriftung": s.beschriftung,
+                    "titel": f"{s.titel} ({s.figur})"} for s in Seite],
+        "vorsilben": VORSILBEN,
     }
-
 
 
 def situation(aufbau: Aufbau, kennung: str, loesung: Loesung) -> Optional[Dict[str, Any]]:
@@ -110,9 +122,19 @@ def situation(aufbau: Aufbau, kennung: str, loesung: Loesung) -> Optional[Dict[s
             "stege": [punkte(steg, MM) for steg in pilz.pilz.stege()],
             "schnitt": _linien(pilz.pruefung.schnitt),
         },
+        "bereiche": [{"name": b.name, "punkte": punkte(b.ecken, MM), "h": zahl(b.h, MM),
+                      "seite": b.seite.value} for b in nachweis.stelle.bereiche],
+        "stufen": [{"name": x.stufe.bereich.name, "farbe": i % len(STUFENFARBEN),
+                    "schnitt": _linien(x.stufe.pruefung.schnitt)}
+                   for i, x in enumerate(_mit_schnitt(befund))],
         "ansicht": None if leisten is None else _ansicht(befund, nachweis.stelle, loesung.werte),
-        "legende": _legende(befund, urteile),
+        "legende": _legende(befund, urteile, nachweis.stelle.bereiche),
     }
+
+
+def _mit_schnitt(befund: Durchstanzbefund) -> List[Stufenbefund]:
+    """Die Stufen, die einen eigenen Schnitt haben -- in der Reihe ihrer Farben."""
+    return [x for x in befund.stufen if x.stufe.pruefung is not None]
 
 
 def _ansicht(befund: Durchstanzbefund, stelle: Durchstanzstelle,
@@ -188,7 +210,8 @@ def _linien(schnitt: Nachweisschnitt) -> list:
             for l in schnitt.massgebend.linien]
 
 
-def _legende(befund: Durchstanzbefund, urteile: Sequence[NachweisUrteil]) -> List[list]:
+def _legende(befund: Durchstanzbefund, urteile: Sequence[NachweisUrteil],
+             bereiche: Sequence[Plattenbereich] = ()) -> List[list]:
     """
     Die Zeilen unter dem Bild: der Schnitt und was von ihm nicht zählt; ohne
     Bewehrung der Vergleich mit seinem Urteil, sonst was ohne sie fehlt, der
@@ -196,7 +219,8 @@ def _legende(befund: Durchstanzbefund, urteile: Sequence[NachweisUrteil]) -> Lis
     kein Produkt, sagt die letzte Zeile das statt eines Grads: die Nachweise
     mit Bewehrung sind dann nicht geführt (:attr:`NachweisUrteil.offen`).
     Ohne Stützenkraft steht statt des Vergleichs der Satz aller Nachweise ohne
-    Einwirkung.
+    Einwirkung. Mit Plattenbereichen je Stufe ihr Schnitt, und die Zahlen
+    stehen je Schnitt.
     """
     innen, b, pilz = befund.innen, befund.leisten, befund.pilz
     gefuehrt = [u for u in urteile if not u.offen]
@@ -209,9 +233,22 @@ def _legende(befund: Durchstanzbefund, urteile: Sequence[NachweisUrteil]) -> Lis
               " von den Ecken grosser Stützen und entlang von Wänden, und was hinter "
               "Aussparungen liegt."),
     ]
+    if bereiche:
+        zeilen += _stufenzeilen(befund)
     if befund.ohne_einwirkung:
         zeilen.append(zeile(OHNE_EINWIRKUNG))
         return zeilen
+    if befund.stufen:
+        # Mit Plattenbereichen schlägt das Werkzeug noch keine Bewehrung vor.
+        zeilen.append(zeile("Um die Stütze ", Mathe(f"V_d = {_kraft(innen.V_d_red)}"), ", ",
+                            Mathe(f"V_{{Rd,c}} = {_kraft(befund.V_Rd_c)}"), "."))
+        for x in _mit_schnitt(befund):
+            name = x.stufe.bereich.name
+            zeilen.append(zeile(
+                f"An der Stufe von {x.stufe.bereich.titel} ",
+                Mathe(f"V_{{d,{name}}} = {_kraft(x.stufe.pruefung.V_d_red)}"), ", ",
+                Mathe(f"V_{{Rd,c,{name}}} = {_kraft(x.V_Rd_c)}"), "."))
+        return [*zeilen, _gesamtzeile(gefuehrt)]
     if b is None and pilz is None and gefuehrt:
         zeilen.append(zeile(*urteil(f"V_d = {_kraft(innen.V_d_red)}", r"\le",
                                     f"V_{{Rd,c}} = {_kraft(befund.V_Rd_c)}", *_gesamt(gefuehrt)),
@@ -249,9 +286,35 @@ def _legende(befund: Durchstanzbefund, urteile: Sequence[NachweisUrteil]) -> Lis
         zeilen.append(zeile(f"{urteile[0].hinweis} Die Nachweise mit Durchstanzbewehrung "
                             "sind darum nicht geführt."))
         return zeilen
-    erfuellt, grad = _gesamt(gefuehrt)
-    zeilen.append(zeile(f"{'Alle Nachweise erfüllt' if erfuellt else 'Nicht alle Nachweise erfüllt'}"
-                        ", kleinstes ", Mathe(rf"\alpha = {grad}"), "."))
+    return [*zeilen, _gesamtzeile(gefuehrt)]
+
+
+def _gesamtzeile(urteile: Sequence[NachweisUrteil]) -> list:
+    """Das Urteil über alle geführten Nachweise, mit dem kleinsten Grad."""
+    erfuellt, grad = _gesamt(urteile)
+    return zeile(f"{'Alle Nachweise erfüllt' if erfuellt else 'Nicht alle Nachweise erfüllt'}"
+                 ", kleinstes ", Mathe(rf"\alpha = {grad}"), ".")
+
+
+def _stufenzeilen(befund: Durchstanzbefund) -> List[list]:
+    """
+    Was die Plattenbereiche im Bild sind: getönt mit ihrer Dicke, und an
+    jeder Stufe ihr Schnitt in seiner Farbe -- oder warum sie keinen hat.
+    """
+    zeilen = [zeile("Getönt die Plattenbereiche mit ihrer Dicke; an der Stütze gilt ",
+                    zahlformel("d", befund.d, MM, 0), ".")]
+    farben = {id(x): STUFENFARBEN[i % len(STUFENFARBEN)]
+              for i, x in enumerate(_mit_schnitt(befund))}
+    for x in befund.stufen:
+        st, b = x.stufe, x.stufe.bereich
+        if st.pruefung is None:
+            zeilen.append(zeile(f"An der Stufe von {b.titel} kein eigener Schnitt: innerhalb ist "
+                                "kein Platz für ihn."))
+            continue
+        wo = "ausserhalb" if b.seite is Seite.STUETZE else "innerhalb"
+        zeilen.append(zeile(f"Schnitt an der Stufe von {b.titel} ({farben[id(x)]}) im Abstand ",
+                            zahlformel("d_v/2", st.d / 2, MM, 0), f" {wo} des Bereichs, mit ",
+                            zahlformel("d_v", st.d, MM, 0), " der dünneren Platte."))
     return zeilen
 
 

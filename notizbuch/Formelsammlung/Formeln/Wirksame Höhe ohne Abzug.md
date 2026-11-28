@@ -1,5 +1,5 @@
 ---
-erzeugt: e82184a2960d
+erzeugt: c3941e9e2903
 art: formel
 tags: [formel]
 normstelle: ["SIA 262:2025, 4.3.3.2.9", "SIA 262:2025, 4.3.6.2.1, Figur 21"]
@@ -39,7 +39,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.durchstanzen.nachweis#Stuetzenrechnung._statische_hoehe|Stuetzenrechnung._statische_hoehe]]
+- [[opencivil.durchstanzen.nachweis#Stuetzenrechnung._schnitt|Stuetzenrechnung._schnitt]]
 - [[opencivil.nachweis.querkraft#protokoll_hoehen|protokoll_hoehen]]
 
 ## Themen

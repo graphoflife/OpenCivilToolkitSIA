@@ -7,7 +7,7 @@ gleich welche Stützenkraft eingegeben ist (Benutzer, 2026-11-27).
 import unittest
 
 from opencivil.bericht.zusammenfassung import angaben, kennzahlen
-from opencivil.durchstanzen.nachweis import K_R_GRENZE
+from opencivil.durchstanzen.pruefung import K_R_GRENZE
 from opencivil.web.api import kennzahltabellen
 from tests.test_durchstanzen import TAU_CD, projekt, rechnen, texte
 

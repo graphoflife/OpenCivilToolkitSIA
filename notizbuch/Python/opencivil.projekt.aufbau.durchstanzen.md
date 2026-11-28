@@ -1,5 +1,5 @@
 ---
-erzeugt: cffceba65abd
+erzeugt: 4b2b52c1f922
 art: modul
 tags: [modul]
 ---
@@ -11,11 +11,20 @@ tags: [modul]
 
 Aus einem [[opencivil.projekt.durchstanzen#DurchstanzEintrag|DurchstanzEintrag]] die
 Durchstanzstelle mit ihren Vorgaben und ihr Nachweis ([[opencivil.projekt.aufbau.durchstanzen#bauen|bauen]]). Hier
-werden die Aussparungen aus ihren Knoten gelesen und geprüft: eine
-Aussparung braucht drei Ecken, darf sich nicht selbst schneiden und nicht
-über die gestützte Fläche reichen.
+werden Aussparungen und Plattenbereiche aus ihren Knoten gelesen und
+geprüft: jedes braucht drei Ecken und darf sich nicht selbst schneiden.
+Plattenbereiche dürfen ineinander liegen, sich aber nicht teilweise
+überdecken, und die Stütze liegt ganz in einem Bereich oder ganz neben ihm.
 
 ## Inhalt
+
+### _ecken
+
+```python
+def _ecken(eintrag: DurchstanzEintrag, knoten: List[str], name: str) -> List[Tuple[float, float]]
+```
+
+Die Ecken eines Polygons in m – geprüft, sonst ein Satz, was nicht stimmt.
 
 ### aussparungen
 
@@ -23,7 +32,17 @@ Aussparung braucht drei Ecken, darf sich nicht selbst schneiden und nicht
 def aussparungen(eintrag: DurchstanzEintrag) -> List[List[Tuple[float, float]]]
 ```
 
-Die Aussparungen als Ecken in m – geprüft, sonst ein Satz, was nicht stimmt.
+Die Aussparungen als Ecken in m.
+
+### bereiche
+
+```python
+def bereiche(eintrag: DurchstanzEintrag, flaeche: GestuetzteFlaeche, masse: Masse) -> List[Plattenbereich]
+```
+
+Die Plattenbereiche mit ihren Ecken und ihrer Dicke in m – geprüft wie
+im Dateikopf. An einer Wand prüft es nur die Bereiche selbst: dort
+rechnet der Nachweis sie noch nicht.
 
 ### bauen
 
@@ -41,6 +60,8 @@ Feldes ([[opencivil.projekt.lesen#als_groesse|als_groesse]]).
 
 ## Braucht
 
+- [[opencivil.durchstanzen.bereiche]]
+- [[opencivil.durchstanzen.flaeche]]
 - [[opencivil.durchstanzen.kennzahl]]
 - [[opencivil.durchstanzen.nachweis]]
 - [[opencivil.durchstanzen.stelle]]

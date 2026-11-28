@@ -181,10 +181,13 @@ function kopfPanel(d) {
   ]);
 }
 
-/** Das Zeichenfenster: Aussparungen zeichnen, darunter Stütze, Rand und Schnitt der letzten Rechnung. */
+/**
+ * Das Zeichenfenster: Aussparungen und Plattenbereiche zeichnen, darunter
+ * Stütze, Rand und Schnitte der letzten Rechnung.
+ */
 function grundrissPanel(d) {
   return panel({
-    schluessel: 'durchstanzen/Grundriss', titel: 'Grundriss und Aussparungen',
+    schluessel: 'durchstanzen/Grundriss', titel: 'Grundriss, Aussparungen und Bereiche',
     zusatz: 'x nach rechts, y nach oben, mm', breit: true,
   }, [zeichenbereich(d)]);
 }

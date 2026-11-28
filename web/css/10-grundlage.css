@@ -88,6 +88,12 @@
   --mat-profilblech-linie: #5b6b80;
   /* Ein Schnitt für den Schubfluss, in keiner Farbe eines Materials (2026-11-27). */
   --schnitt:            #0b7285;
+  /* Die Schnitte an den Stufen der Plattenbereiche beim Durchstanzen, der
+     Reihe nach grün, türkis, braun -- so nennt sie die Legende des Kerns
+     (STUFENFARBEN in opencivil/web/durchstanzdaten.py). */
+  --stufe-0:            #2f9e44;
+  --stufe-1:            #1098ad;
+  --stufe-2:            #a0522d;
   --platte:       var(--blau);
   --analyse:      #0d9488;
   --system:       #7048e8;

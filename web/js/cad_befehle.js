@@ -170,19 +170,53 @@ export function linienBefehl(werkzeug) {
 // Polygon -- ein Umriss, der eine Fläche wird
 // ===========================================================================
 
+/** Die vier Ecken eines Rechtecks aus zwei gegenüberliegenden, der Reihe nach. */
+function rechteckEcken(p, q) {
+  return [p, [q[0], p[1]], q, [p[0], q[1]]];
+}
+
+/**
+ * Ein Umriss Ecke um Ecke -- oder mit G ein Rechteck aus zwei
+ * gegenüberliegenden Ecken, in jedem Zeichenfenster gleich (Benutzer,
+ * 2026-11-27). Wechselt man mitten im Umriss zum Rechteck, ist der letzte
+ * Punkt seine erste Ecke.
+ */
 export function polygonBefehl(werkzeug) {
   return {
     name: werkzeug,
     neu: werkzeug,
-    hinweis: 'Esc oder Rücktaste nimmt den letzten Punkt zurück',
+    hinweis: 'Esc oder Rücktaste nimmt den letzten Punkt zurück · G Rechteck aus zwei Ecken',
     punkte: [],
+    rechteck: false,
+    tasten: [{
+      taste: 'g', zeichen: '▭', titel: 'Rechteck aus zwei Ecken (G)',
+      an: (befehl) => befehl.rechteck,
+      tun: (a, befehl) => {
+        befehl.rechteck = !befehl.rechteck;
+        if (befehl.rechteck) befehl.punkte = befehl.punkte.slice(-1);
+      },
+    }],
     frage(a) {
       const n = this.punkte.length;
+      if (this.rechteck) {
+        return n ? 'Gegenüberliegende Ecke des Rechtecks'
+          : `${a.adapter.neuText(a, werkzeug)}: erste Ecke des Rechtecks`;
+      }
       if (!n) return `${a.adapter.neuText(a, werkzeug)}: erster Punkt`;
       return n < 3 ? `Punkt ${n + 1}` : `Punkt ${n + 1} – oder Enter schliesst`;
     },
     punkt(a, erg) {
       const n = this.punkte.length;
+      if (this.rechteck && n) {
+        const p = this.punkte[0].p;
+        // Ohne Breite oder Höhe ist es kein Rechteck: der Punkt zählt nicht.
+        if (Math.abs(erg.p[0] - p[0]) > 1e-9 && Math.abs(erg.p[1] - p[1]) > 1e-9) {
+          const [, b, , d] = rechteckEcken(p, erg.p);
+          this.punkte = [this.punkte[0], { p: b }, erg, { p: d }];
+          this.schliessen(a);
+        }
+        return;
+      }
       if (n >= 3) {
         const erster = this.punkte[0];
         const zu = (erg.knoten && erg.knoten === erster.knoten)
@@ -207,6 +241,13 @@ export function polygonBefehl(werkzeug) {
       const f = a.zeiger?.fang;
       const punkte = this.punkte.map((x) => x.p);
       if (!punkte.length) return;
+      if (this.rechteck) {
+        if (!f) return;
+        const ecken = rechteckEcken(punkte[0], f.p);
+        g.append(svgEl('path', { d: pfad(a.v, ecken, true), class: 'cad-entwurf' }));
+        streckenzettel(a, g, punkte[0], f.p);
+        return;
+      }
       const bis = f ? [...punkte, f.p] : punkte;
       g.append(svgEl('path', { d: pfad(a.v, bis, false), class: 'cad-entwurf' }));
       if (f && punkte.length >= 2) {
@@ -219,7 +260,7 @@ export function polygonBefehl(werkzeug) {
       if (f) streckenzettel(a, g, punkte.at(-1), f.p);
     },
     enter(a) {
-      if (this.punkte.length < 3) return false;
+      if (this.rechteck || this.punkte.length < 3) return false;
       this.schliessen(a);
       return true;
     },

@@ -102,6 +102,7 @@ class TestSinnbilder(unittest.TestCase):
             "lage": k["durchstanzen"]["lagen"],
             "stuetzenform": k["durchstanzen"]["formen"],
             "system": k["durchstanzen"]["systeme"],
+            "seite": k["durchstanzen"]["seiten"],
             "kopf": k["pfahl"]["koepfe"],
             "tragglied": k["pfahl"]["tragglieder"],
             "setzung": k["setzung"]["steifigkeiten"],

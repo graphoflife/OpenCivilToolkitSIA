@@ -1,5 +1,5 @@
 ---
-erzeugt: 7be9fc68e2ef
+erzeugt: fb3573ea5bea
 art: modul
 tags: [modul]
 ---
@@ -13,7 +13,9 @@ Je Durchstanzstelle der Grundriss, wie der Kern ihn gerechnet hat, in mm:
 der Umriss der gestützten Fläche, die Plattenränder, die Aussparungen und
 der Nachweisschnitt – je Stück, ob es zählt –, und wo es sie braucht, die
 Leisten mit ihren Ankern und dem äusseren Schnitt und der Stahlpilz mit seinen
-Stegen und dem Schnitt um ihn, je für sich. Dazu die Legende unter dem Bild
+Stegen und dem Schnitt um ihn, je für sich. Die Plattenbereiche mit ihrer
+Dicke und an jeder Stufe ihr Schnitt, je in seiner Farbe
+([[opencivil.web.durchstanzdaten#Konstanten|STUFENFARBEN]]). Dazu die Legende unter dem Bild
 ([[opencivil.web.anzeige]]): die Schnitte mit ihren Zahlen und das Urteil.
 Gezeichnet wird in der Oberflaeche, gerechnet nichts: die Linien kommen aus
 dem Befund des Nachweises ([[opencivil.durchstanzen.nachweis]]).
@@ -27,7 +29,9 @@ Für den Katalog die Wahlen der Maske ([[opencivil.web.durchstanzdaten#wahlen|wa
 Beschriftung, und welche Felder der Nachweis mit ihr liest – die festen, die
 Masse je Lage und Form, die Felder je Näherungsstufe und Lage, die von k_e.
 Die Maske zeigt die Vereinigung, so baut sie die Regel nicht nach
-([[opencivil.durchstanzen.stelle#eingaben_fuer|opencivil.durchstanzen.stelle.eingaben_fuer]]).
+([[opencivil.durchstanzen.stelle#eingaben_fuer|opencivil.durchstanzen.stelle.eingaben_fuer]]). Dazu die beiden
+Seiten, auf denen die Stufe eines Plattenbereichs liegen kann, und wie die
+Kennungen der Polygone im Grundriss beginnen.
 
 ## Inhalt
 
@@ -50,6 +54,14 @@ def situation(aufbau: Aufbau, kennung: str, loesung: Loesung) -> Optional[Dict[s
 ```
 
 Was der Grundriss einer Stelle braucht – `None`, wenn ihr Nachweis nicht gelaufen ist.
+
+### _mit_schnitt
+
+```python
+def _mit_schnitt(befund: Durchstanzbefund) -> List[Stufenbefund]
+```
+
+Die Stufen, die einen eigenen Schnitt haben – in der Reihe ihrer Farben.
 
 ### _ansicht
 
@@ -85,7 +97,7 @@ Die Stücke eines Schnitts fürs Bild, je mit der Angabe, ob es zählt.
 ### _legende
 
 ```python
-def _legende(befund: Durchstanzbefund, urteile: Sequence[NachweisUrteil]) -> List[list]
+def _legende(befund: Durchstanzbefund, urteile: Sequence[NachweisUrteil], bereiche: Sequence[Plattenbereich]=()) -> List[list]
 ```
 
 Die Zeilen unter dem Bild: der Schnitt und was von ihm nicht zählt; ohne
@@ -94,7 +106,25 @@ Pilz und die Leisten mit ihren Schnitten – und das Urteil über alle. Passt
 kein Produkt, sagt die letzte Zeile das statt eines Grads: die Nachweise
 mit Bewehrung sind dann nicht geführt ([[opencivil.core.nachweis#NachweisUrteil|NachweisUrteil.offen]]).
 Ohne Stützenkraft steht statt des Vergleichs der Satz aller Nachweise ohne
-Einwirkung.
+Einwirkung. Mit Plattenbereichen je Stufe ihr Schnitt, und die Zahlen
+stehen je Schnitt.
+
+### _gesamtzeile
+
+```python
+def _gesamtzeile(urteile: Sequence[NachweisUrteil]) -> list
+```
+
+Das Urteil über alle geführten Nachweise, mit dem kleinsten Grad.
+
+### _stufenzeilen
+
+```python
+def _stufenzeilen(befund: Durchstanzbefund) -> List[list]
+```
+
+Was die Plattenbereiche im Bild sind: getönt mit ihrer Dicke, und an
+jeder Stufe ihr Schnitt in seiner Farbe – oder warum sie keinen hat.
 
 ### _gesamt
 
@@ -113,6 +143,10 @@ def _kraft(si_wert: float) -> str
 Eine Kraft der Legende: kN mit einer Stelle.
 
 
+## Konstanten
+
+- `STUFENFARBEN = ('grün', 'türkis', 'braun')` – Die Farben der Schnitte an den Stufen, der Reihe nach – im Bild die Klassen «ds-stufe-0» bis «ds-stufe-2» (web/css/80-skizzen.css).
+
 ## Braucht
 
 - [[opencivil.core.einheiten]]
@@ -120,6 +154,7 @@ Eine Kraft der Legende: kN mit einer Stelle.
 - [[opencivil.core.nachweis]]
 - [[opencivil.core.rechenwerk]]
 - [[opencivil.core.wert]]
+- [[opencivil.durchstanzen.bereiche]]
 - [[opencivil.durchstanzen.bewehrung]]
 - [[opencivil.durchstanzen.flaeche]]
 - [[opencivil.durchstanzen.nachweis]]
@@ -127,6 +162,7 @@ Eine Kraft der Legende: kN mit einer Stelle.
 - [[opencivil.durchstanzen.stelle]]
 - [[opencivil.durchstanzen.systeme]]
 - [[opencivil.projekt]]
+- [[opencivil.projekt.durchstanzen]]
 - [[opencivil.querschnitt.platte]]
 - [[opencivil.web.anzeige]]
 

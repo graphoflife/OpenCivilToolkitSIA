@@ -5,15 +5,17 @@ VERANTWORTUNG:
 Der :class:`DurchstanzEintrag`: Decke oder Bodenplatte, Plattendicke,
 Überdeckung, Grösstkorn, die Biegebewehrung über der Stütze, Form, Masse und
 Lage der gestützten Fläche, die Spannweiten für die Plattenrotation, die
-Einwirkung und die Aussparungen -- als speicherbare Datenklasse. Gerechnet
-wird in :mod:`opencivil.durchstanzen`.
+Einwirkung, die Aussparungen und die Bereiche mit eigener Dicke -- als
+speicherbare Datenklasse. Gerechnet wird in :mod:`opencivil.durchstanzen`.
 
-KNOTEN UND AUSSPARUNGEN:
-Wie im gezeichneten Querschnitt tragen die Aussparungen keine eigenen
-Koordinaten, sie verweisen auf Knoten (:class:`GrundrissknotenEintrag`). Im
-Grundriss, in mm, mit der Achse der Stütze im Ursprung: x nach rechts, y
-nach oben. Der Plattenrand einer Randstütze liegt unten, an der Ecke dazu
-links (:mod:`opencivil.durchstanzen.flaeche`).
+KNOTEN, AUSSPARUNGEN UND BEREICHE:
+Wie im gezeichneten Querschnitt tragen Aussparungen und Plattenbereiche
+keine eigenen Koordinaten, sie verweisen auf Knoten
+(:class:`GrundrissknotenEintrag`). Im Grundriss, in mm, mit der Achse der
+Stütze im Ursprung: x nach rechts, y nach oben. Der Plattenrand einer
+Randstütze liegt unten, an der Ecke dazu links
+(:mod:`opencivil.durchstanzen.flaeche`). Ein Plattenbereich hat dazu seine
+Dicke und die Seite seiner Stufe (:mod:`opencivil.durchstanzen.bereiche`).
 
 DIE VORGABEN:
 Eine neue Stelle bringt keine Einwirkung mit, wie ein neuer Lastfall
@@ -28,6 +30,7 @@ from dataclasses import dataclass, field
 from typing import List, Sequence
 
 from opencivil.core.einheiten import KN, KN_PRO_M2, KNM_PRO_M, M, MM
+from opencivil.durchstanzen.bereiche import Seite
 from opencivil.durchstanzen.flaeche import Lage, Stuetzenform
 from opencivil.durchstanzen.stelle import KeArt, Naeherungsstufe, Plattenart
 from opencivil.durchstanzen.systeme import Durchstanzsystem
@@ -35,6 +38,11 @@ from opencivil.projekt.eintraege import BauteilEintrag, Beschreibung
 from opencivil.projekt.lesen import bereich
 from opencivil.projekt.netz import Netz, neue_kennung
 from opencivil.querschnitt.platte import UEBERDECKUNG, Richtung
+
+
+#: Wie die Kennungen der Polygone im Grundriss beginnen -- die Oberflaeche
+#: liest sie aus dem Katalog (:func:`opencivil.web.durchstanzdaten.wahlen`).
+VORSILBEN = {"aussparungen": "A", "plattenbereiche": "B"}
 
 
 @dataclass
@@ -52,6 +60,19 @@ class AussparungEintrag(Beschreibung):
 
     kennung: str = ""
     knoten: List[str] = field(default_factory=list)
+
+
+@dataclass
+class PlattenbereichEintrag(Beschreibung):
+    """
+    Ein Bereich der Platte mit eigener Dicke: seine Ecken als Kennungen von
+    Knoten, seine Dicke und auf welcher Seite der Platte seine Stufe liegt.
+    """
+
+    kennung: str = ""
+    knoten: List[str] = field(default_factory=list)
+    h: float = bereich(360.0, heisst="Dicke h", einheit=MM, ueber=0.0)
+    seite: Seite = Seite.STUETZE
 
 
 @dataclass
@@ -138,6 +159,7 @@ class DurchstanzEintrag(BauteilEintrag):
 
     knoten: List[GrundrissknotenEintrag] = field(default_factory=list)
     aussparungen: List[AussparungEintrag] = field(default_factory=list)
+    plattenbereiche: List[PlattenbereichEintrag] = field(default_factory=list)
 
     @classmethod
     def neu(cls, kennung: str, name: str) -> "DurchstanzEintrag":
@@ -157,7 +179,19 @@ class DurchstanzEintrag(BauteilEintrag):
         """Eine Aussparung aus ihren Ecken ``[x, y]`` in mm."""
         netz = self.netz()
         eintrag = AussparungEintrag(
-            kennung=neue_kennung(self, "A", [a.kennung for a in self.aussparungen]),
+            kennung=neue_kennung(self, VORSILBEN["aussparungen"],
+                                 [a.kennung for a in self.aussparungen]),
             knoten=[netz.an(x, y) for x, y in punkte])
         self.aussparungen.append(eintrag)
+        return eintrag
+
+    def plattenbereich(self, punkte: Sequence[Sequence[float]], h: float,
+                       seite: Seite = Seite.STUETZE) -> PlattenbereichEintrag:
+        """Ein Plattenbereich aus seinen Ecken ``[x, y]`` und seiner Dicke, in mm."""
+        netz = self.netz()
+        eintrag = PlattenbereichEintrag(
+            kennung=neue_kennung(self, VORSILBEN["plattenbereiche"],
+                                 [b.kennung for b in self.plattenbereiche]),
+            knoten=[netz.an(x, y) for x, y in punkte], h=h, seite=seite)
+        self.plattenbereiche.append(eintrag)
         return eintrag
