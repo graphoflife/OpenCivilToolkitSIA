@@ -24,7 +24,7 @@ from opencivil.decke import geometrie as geo
 from opencivil.decke.herleitung import als_ort
 from opencivil.fachwerkmodell.modell import Umriss
 from opencivil.fachwerkmodell.nachrechnung import Nachrechnung
-from opencivil.fachwerkmodell.suche import QUELLE, Einstellung, Suchergebnis
+from opencivil.fachwerkmodell.suche import QUELLE, ZUG_ACHSPARALLEL, Einstellung, Suchergebnis
 
 if TYPE_CHECKING:
     from opencivil.fachwerkmodell.werk import Fachwerkbefund
@@ -67,11 +67,13 @@ def _fachwerk(p: Protokoll, gefunden: Suchergebnis, n: Nachrechnung,
     p.titel("Fachwerk", ebene=3)
     wie = (f"nach Runde {gefunden.runden} kam keiner mehr dazu" if gefunden.fertig
            else f"angehalten nach Runde {gefunden.runden}")
+    zug = (f" {ZUG_ACHSPARALLEL}: ein geneigter Stab trägt nur Druck." if einstellung.zug_achsparallel
+           else "")
     p.text(
         f"Gesucht nach dem Verfahren Ground Structure ({QUELLE}): Knoten im Raster der Weite "
         f"h = {einstellung.weite:g} m, dazu die Punkte der Lager und Lasten und die Ecken der "
         f"Umrisse; je zwei Knoten ein möglicher Stab, wenn er ganz im Material liegt – "
-        f"{gefunden.moeglich} Stäbe. Eine lineare Optimierung wählt die Kräfte im Gleichgewicht "
+        f"{gefunden.moeglich} Stäbe.{zug} Eine lineare Optimierung wählt die Kräfte im Gleichgewicht "
         f"mit dem kleinsten V; Runde um Runde kommen die Stäbe dazu, die V noch senken – "
         f"{wie}, mit {gefunden.im_modell} Stäben im Modell. Danach fallen die Stäbe unter "
         f"{einstellung.N_min * 100:g} % der grössten Kraft weg, und das Gleichgewicht wird ohne "
@@ -81,6 +83,10 @@ def _fachwerk(p: Protokoll, gefunden: Suchergebnis, n: Nachrechnung,
              r"\;\rightarrow\; \min", titel="Ziel der Optimierung", referenz=QUELLE,
              name="Leichtestes Fachwerk")
     fw = n.fachwerk
+    if not fw.staebe:
+        p.text("Kein Stab trägt: die Lasten lassen sich so nicht zu den Lagern tragen – welche "
+               "offen bleiben, sagen die Meldungen.")
+        return
     zeilen = [[Mathe(str(i)), als_ort(fw.knoten[a]), als_ort(fw.knoten[b]), Mathe(fest(l, 2)),
                Mathe(fest(N / 1e3, 1)), "Zug" if N > 0 else "Druck"]
               for i, ((a, b, N), l) in enumerate(zip(fw.staebe, n.laengen), start=1)]

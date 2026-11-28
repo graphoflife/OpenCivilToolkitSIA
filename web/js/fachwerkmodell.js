@@ -3,8 +3,10 @@
  *
  * Oben die Scheibe: Bezeichnung, Zeichnung samt Liste, Beschreibung.
  * Darunter die Kachel «Verfahren»: ihre Felder kommen aus dem Kern
- * (`katalog.vorgaben`, opencivil/fachwerkmodell/suche.py), dazu der Knopf,
- * der ein Fachwerk sucht, und wie weit die Suche ist (fw_suche.js).
+ * (`katalog.vorgaben`, opencivil/fachwerkmodell/suche.py), ebenso der
+ * Schalter «Zug nur waagrecht und senkrecht» (`katalog.fachwerkmodell.zug`),
+ * dazu der Knopf, der ein Fachwerk sucht, und wie weit die Suche ist
+ * (fw_suche.js).
  *
  * Rechts im Reiter «Diagramme» das Modell als Bild, darin das Fachwerk --
  * während der Suche das der letzten Runde --, in der Zusammenfassung seine
@@ -14,9 +16,12 @@
 
 import {
   beschreibung, bezeichnung, eingabegruppen, erklaerung, karte, meldungshinweise, panel, tabelle,
+  wahlBlock,
 } from './bausteine.js';
 import { zahlText } from './cad_ansicht.js';
-import { listengruppen, listenzeilen, meldungsliste } from './cad_app.js';
+import {
+  jaNein, listengruppen, listenzeilen, meldungsliste,
+} from './cad_app.js';
 import { el, leerzustand } from './dom.js';
 import { fachwerkLegende, scheibeBild } from './fw_bild.js';
 import {
@@ -41,6 +46,7 @@ const HILFE = {
     zeilen: [
       ['Ground Structure', 'Knoten in einem Raster über der Scheibe, dazu die Punkte der Lager und Lasten und die Ecken – je zwei Knoten ein möglicher Stab, wenn er ganz im Material liegt'],
       ['Optimierung', 'wählt unter den Fachwerken im Gleichgewicht das mit dem kleinsten V; Runde um Runde kommen die Stäbe dazu, die V noch senken'],
+      ['Zug nur waagrecht und senkrecht', 'ja: geneigte Stäbe tragen nur Druck, den Zug nehmen waagrechte und senkrechte auf – wie eine Bewehrung in x und y; geht so kein Fachwerk auf, sagt es die Meldung an der Last'],
       ['Live', 'nach jeder Runde zeigt das Bild rechts das Fachwerk dieser Runde – «Anhalten» übernimmt es, so wie es ist'],
       ['Ergebnis', 'Zug rot, Druck blau und gestrichelt; zwei Stäbe in einer Flucht durch einen Knoten ohne Last und Lager werden einer'],
     ],
@@ -65,6 +71,9 @@ const punktText = (p) => `(${zahlText(p.x, 2)}, ${zahlText(p.y, 2)})`;
 
 /** «1 Stab», «36 Stäbe». */
 const staebeText = (n) => `${n} ${n === 1 ? 'Stab' : 'Stäbe'}`;
+
+/** Das Fachwerk, das gilt (fw_suche.js), wenn ein Stab trägt -- sonst null: was offen bleibt, sagen die Meldungen. */
+const mitStaeben = (g) => (g?.fachwerk.staebe.length ? g.fachwerk : null);
 
 /** Was die letzte Rechnung zu einem Fachwerkmodell zeichnet -- oder null. */
 const zeichendaten = (kennung) => zustand.loesung?.zeichendaten?.[kennung] || null;
@@ -118,15 +127,18 @@ const FEHLT = {
  * Wie weit die Suche ist oder was sie fand, in einer Zeile: «Runde 7: 320
  * von 1528 möglichen Stäben im Modell, 4 kommen dazu – 36 Stäbe, V = 3662.5
  * kNm.», danach «Gefunden nach 20 Runden: …» oder «Angehalten nach Runde 7: …».
+ * Trägt kein Stab, sagt sie es; warum, sagen die Meldungen darunter.
  */
 function standText(g) {
-  const was = `${staebeText(g.fachwerk.staebe.length)}, V = ${zahlText(g.fachwerk.V, 1)} kNm`;
+  const n = g.fachwerk.staebe.length;
+  const was = n ? `${staebeText(n)}, V = ${zahlText(g.fachwerk.V, 1)} kNm` : 'kein Stab trägt';
+  const runden = `${g.runden} ${g.runden === 1 ? 'Runde' : 'Runden'}`;
   if (g.laeuft) {
     return `Runde ${g.runden}: ${g.im_modell} von ${g.moeglich} möglichen Stäben im Modell`
       + `${g.dazu ? `, ${g.dazu} kommen dazu` : ''} – ${was}.`;
   }
   if (!g.fertig) return `Angehalten nach Runde ${g.runden}: ${was}.`;
-  return `Gefunden nach ${g.runden} ${g.runden === 1 ? 'Runde' : 'Runden'}: ${was}.`;
+  return n ? `Gefunden nach ${runden}: ${was}.` : `Fertig nach ${runden}: kein Fachwerk trägt die Lasten.`;
 }
 
 /**
@@ -172,17 +184,22 @@ function suchleiste(modell, daten) {
   ]);
 }
 
-/** Die Kachel «Verfahren»: die Felder des Kerns, darunter Knopf und Stand der Suche. */
+/** Die Kachel «Verfahren»: die Felder und der Schalter des Kerns, darunter Knopf und Stand der Suche. */
 function kapitel(modell) {
   const aendern = (veraenderer) => eintragAendern(modell.kennung, veraenderer);
   const vorgaben = eingabegruppen('fachwerkmodell', modell, aendern);
   const daten = zeichendaten(modell.kennung);
   const s = sucheVon(modell.kennung);
   const runde = s?.laeuft ? `sucht, Runde ${s.antwort?.stand?.runde ?? 1}` : '';
+  const zug = katalog('fachwerkmodell', 'zug');
   const kacheln = [gruppenkapitel(vorgaben, 'Verfahren', {
     zeichen: 'fw-verfahren', hilfe: HILFE.verfahren, werte: ['rasterweite'],
     wort: runde || 'Ground Structure', fehlt: runde || !daten ? '' : FEHLT[daten.stand] ?? '',
-    nach: [el('div.fw-suche', {}, [suchleiste(modell, daten), ...suchzeilen(modell.kennung, daten)])],
+    nach: [
+      wahlBlock(zug.beschriftung, jaNein(Boolean(modell.zug_achsparallel),
+        (wert) => aendern((m) => { m.zug_achsparallel = wert; }), zug.titel)),
+      el('div.fw-suche', {}, [suchleiste(modell, daten), ...suchzeilen(modell.kennung, daten)]),
+    ],
   })];
   vorgaben.vollstaendig();
   return [{ titel: '', kapitel: kacheln.filter(Boolean) }];
@@ -216,11 +233,11 @@ export function fachwerkKarten(kennung) {
   const modell = eintragVon(kennung);
   if (!modell?.scheiben.length) return [ohneScheibe()];
   const daten = zeichendaten(kennung);
-  const g = gezeigtesFachwerk(kennung, daten);
-  const bild = scheibeBild(modell, g?.fachwerk);
-  return [karte(g ? 'Fachwerk' : 'Scheibe', [
+  const fw = mitStaeben(gezeigtesFachwerk(kennung, daten));
+  const bild = scheibeBild(modell, fw);
+  return [karte(fw ? 'Fachwerk' : 'Scheibe', [
     ...meldungshinweise(daten?.meldungen), ...suchzeilen(kennung, daten),
-    el('div.gb-bildhuelle', {}, [bild]), g ? fachwerkLegende() : null,
+    el('div.gb-bildhuelle', {}, [bild]), fw ? fachwerkLegende() : null,
   ].filter(Boolean), { bild, klasse: 'ist-breit' })];
 }
 
@@ -253,12 +270,12 @@ export function fachwerkZusammenfassung(kennung) {
   const daten = zeichendaten(kennung);
   if (!modell?.scheiben.length) return [ohneScheibe()];
   if (!daten) return [karte(null, [leerzustand('Noch nicht gerechnet.')])];
-  const g = gezeigtesFachwerk(kennung, daten);
+  const fw = mitStaeben(gezeigtesFachwerk(kennung, daten));
   const zeilen = [...meldungshinweise(daten.meldungen), ...suchzeilen(kennung, daten)];
   return [
     zeilen.length ? karte('Fachwerk', zeilen) : null,
-    g ? staebeKarte(g.fachwerk) : null,
-    modell.lager.length ? lagerKarte(modell, g?.fachwerk) : null,
+    fw ? staebeKarte(fw) : null,
+    modell.lager.length ? lagerKarte(modell, fw) : null,
     modell.lasten.length ? karte('Lasten', [tabelle(['Last', 'Ort [m]', 'F_h [kN] →', 'F_v [kN] ↓'],
       modell.lasten.map((f) => [f.kennung, ortText(modell, f.knoten), zahlText(f.F_h, 1), zahlText(f.F_v, 1)]))])
       : null,

@@ -1,6 +1,6 @@
 # Voll
 
-998 Berechnungen ausgeführt, 1618 Werte bestimmt.
+1002 Berechnungen ausgeführt, 1621 Werte bestimmt.
 
 ## Herleitung
 
@@ -32128,6 +32128,100 @@ $$
 
 Nachgerechnet: an jedem Knoten heben sich Stabkräfte, Lasten und Lagerkräfte auf.
 
+### Fachwerkmodell: Wandscheibe, Zug waagrecht und senkrecht
+
+**Abstand der Knoten im Raster**
+
+$$
+h = 1\,\mathrm{m}
+$$
+
+**Gewicht des Zugs gegenüber dem Druck**
+
+$$
+w_Z = 1
+$$
+
+**Kleinste Stabkraft, bezogen auf die grösste**
+
+$$
+N_{min} = 1\,\%
+$$
+
+> **Annahme:** Ein Fachwerkmodell der Scheibe: Druckstreben und Zugglieder tragen die Lasten im Gleichgewicht zu den Lagern. Ohne Material und ohne Dicke – Fachwerk und Kräfte hängen nur von Form, Lagern und Lasten ab; bemessen wird hier nichts.
+
+**Scheiben**
+
+| Scheibe | Ecken | $A\ [\mathrm{m}^{2}]$ |
+| ---: | ---: | ---: |
+| S1 | $4$ | $18.00$ |
+
+**Löcher**
+
+| Loch | Ecken | $A\ [\mathrm{m}^{2}]$ |
+| ---: | ---: | ---: |
+| L1 | $4$ | $2.20$ |
+
+**Lager**
+
+| Lager | Ort [m] | hält |
+| ---: | ---: | ---: |
+| A1 | (0.00, 0.00) | x und y |
+| A2 | (6.00, 0.00) | nur y |
+
+**Lasten**
+
+| Last | Ort [m] | $F_h\ [\mathrm{kN}] \rightarrow$ | $F_v\ [\mathrm{kN}] \downarrow$ |
+| ---: | ---: | ---: | ---: |
+| F1 | (2.00, 3.00) | $0.0$ | $300.0$ |
+| F2 | (5.00, 3.00) | $50.0$ | $200.0$ |
+| Summe |  | $50.0$ | $500.0$ |
+
+#### Fachwerk
+
+Gesucht nach dem Verfahren Ground Structure (He, Gilbert & Song (2019), Abschnitt 3, Gl. (7)): Knoten im Raster der Weite h = 1 m, dazu die Punkte der Lager und Lasten und die Ecken der Umrisse; je zwei Knoten ein möglicher Stab, wenn er ganz im Material liegt – 188 Stäbe. Zug nur waagrecht und senkrecht: ein geneigter Stab trägt nur Druck. Eine lineare Optimierung wählt die Kräfte im Gleichgewicht mit dem kleinsten V; Runde um Runde kommen die Stäbe dazu, die V noch senken – nach Runde 8 kam keiner mehr dazu, mit 85 Stäben im Modell. Danach fallen die Stäbe unter 1 % der grössten Kraft weg, und das Gleichgewicht wird ohne sie neu gesucht; zwei Stäbe in einer Flucht durch einen Knoten ohne Last und Lager werden einer.
+
+**Ziel der Optimierung** *(He, Gilbert & Song (2019), Abschnitt 3, Gl. (7))*
+
+$$
+V = \sum_i l_i \, \left( w_Z \, N_i^{+} + w_D \, N_i^{-} \right) \;\rightarrow\; \min
+$$
+
+**Stäbe – 15, nach der Grösse ihrer Kraft**
+
+| Stab | von [m] | bis [m] | $l\ [\mathrm{m}]$ | $N\ [\mathrm{kN}]$ |  |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| $1$ | (1.00, 2.00) | (2.00, 3.00) | $1.41$ | $-259.3$ | Druck |
+| $2$ | (6.00, 0.00) | (5.00, 2.00) | $2.24$ | $-249.2$ | Druck |
+| $3$ | (0.00, 0.00) | (1.00, 2.00) | $2.24$ | $-205.0$ | Druck |
+| $4$ | (3.00, 3.00) | (4.50, 2.20) | $1.70$ | $-194.8$ | Druck |
+| $5$ | (5.00, 2.00) | (5.00, 3.00) | $1.00$ | $-178.3$ | Druck |
+| $6$ | (6.00, 0.00) | (0.00, 0.00) | $6.00$ | $158.3$ | Zug |
+| $7$ | (3.00, 2.00) | (2.00, 3.00) | $1.41$ | $-129.6$ | Druck |
+| $8$ | (5.00, 2.00) | (4.50, 2.20) | $0.54$ | $-120.0$ | Druck |
+| $9$ | (2.00, 3.00) | (3.00, 3.00) | $1.00$ | $-108.3$ | Druck |
+| $10$ | (3.00, 2.00) | (3.00, 3.00) | $1.00$ | $91.7$ | Zug |
+| $11$ | (1.00, 2.00) | (3.00, 2.00) | $2.00$ | $91.7$ | Zug |
+| $12$ | (6.00, 0.00) | (4.50, 2.20) | $2.66$ | $-83.2$ | Druck |
+| $13$ | (3.00, 3.00) | (5.00, 3.00) | $2.00$ | $63.5$ | Zug |
+| $14$ | (0.00, 0.00) | (2.00, 3.00) | $3.61$ | $-30.0$ | Druck |
+| $15$ | (5.00, 3.00) | (4.50, 2.20) | $0.94$ | $-25.6$ | Druck |
+
+**Ziel des Fachwerks**
+
+$$
+V = 3954.2\ \mathrm{kNm} \qquad w_Z = 1.00,\ w_D = 1
+$$
+
+**Lagerkräfte**
+
+| Lager | Ort [m] | $R_x\ [\mathrm{kN}] \rightarrow$ | $R_y\ [\mathrm{kN}] \uparrow$ |
+| ---: | ---: | ---: | ---: |
+| A1 | (0.00, 0.00) | $-50.0$ | $208.3$ |
+| A2 | (6.00, 0.00) | $0.0$ | $291.7$ |
+
+Nachgerechnet: an jedem Knoten heben sich Stabkräfte, Lasten und Lagerkräfte auf.
+
 ## Verwendete Formeln
 
 ### Querschnitt
@@ -37677,6 +37771,9 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Beiwert der Nutzlast, quasi-ständig | $\psi_{2,8}$ | $0.3$ |  | Vorgabe |
 | Verhaltensbeiwert in x | $q_x$ | $3$ |  | Vorgabe |
 | Verhaltensbeiwert in y | $q_y$ | $3$ |  | Vorgabe |
+| Kleinste Stabkraft, bezogen auf die grösste | $N_{min}$ | $1$ | % | Vorgabe |
+| Abstand der Knoten im Raster | $h$ | $1$ | m | Vorgabe |
+| Gewicht des Zugs gegenüber dem Druck | $w_Z$ | $1$ |  | Vorgabe |
 | Kleinste Stabkraft, bezogen auf die grösste | $N_{min}$ | $1$ | % | Vorgabe |
 | Abstand der Knoten im Raster | $h$ | $1$ | m | Vorgabe |
 | Gewicht des Zugs gegenüber dem Druck | $w_Z$ | $1$ |  | Vorgabe |

@@ -7,6 +7,46 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-28 · Fachwerkmodell: Zug nur waagrecht und senkrecht
+
+Schritt 11c des Plans vom 2026-11-27. Im Fenster «Verfahren» steht unter
+den drei Zahlen der Schalter «Zug nur waagrecht und senkrecht» [ja | nein],
+Vorgabe nein. Mit ja tragen geneigte Stäbe nur Druck; den Zug nehmen
+waagrechte und senkrechte auf, wie eine Bewehrung in x und y. Beispiel
+Konsole 1 × 2 m, links oben und unten gehalten, 100 kN an der rechten
+Kante: ohne den Schalter ein Zugstab schräg zum oberen Lager, V = 200 kNm;
+mit ihm geht der Zug senkrecht hinauf und waagrecht zum Lager, V = 400 kNm
+im Raster von 1 m – von Hand mit virtuellen Verschiebungen bestätigt –,
+375 kNm bei 0.5 m. Die Wandscheibe mit Türe: 15 statt 27 Stäbe,
+V = 3954.2 statt 3734.0 kNm; sie steht so ein zweites Mal im Prüfprojekt.
+
+- In der Optimierung hat ein geneigter Stab keine Unbekannte für Zug,
+  seine Kraft kann nur Druck sein: `optimieren` nimmt `None` statt der
+  Kosten des Zugs. Die Unbekannten stehen dazu in einer Folge q⁺ (nur wo
+  Zug geht), q⁻, r⁺, r⁻. Eine Schranke statt hoher Kosten, weil hohe Kosten
+  nur fast null geben und, wo kein Fachwerk aufgeht, Zug statt einer
+  ehrlichen Meldung.
+- Die Suche fügt einen geneigten Stab nur dazu, wo er gestaucht würde; sie
+  kommt Runde um Runde dorthin, wo die Optimierung über alle Stäbe ist
+  (Test).
+- Waagrecht oder senkrecht heisst bis auf 10⁻⁹ der Länge – nur Rundung;
+  ein Stab mit 1 mm Gefälle auf 3 m ist geneigt.
+- Geht so kein Fachwerk auf, nennt die rote Meldung an der Last den
+  Schalter: «Die Last F1 lässt sich mit Zug nur waagrecht und senkrecht
+  nicht ganz zu den Lagern tragen: 10.0 kN bleiben offen.» Die Suche sagt
+  «Fertig nach 1 Runde: kein Fachwerk trägt die Lasten.», ohne leere
+  Stabtabelle; die Herleitung sagt es in einem Satz. Vorher blieben dort
+  Stäbe ohne Kraft stehen: was ein Stab mindestens tragen muss, galt gegen
+  die grösste Stabkraft, die selbst fast null war – jetzt gegen die
+  grösste Last.
+- Die Rechnung prüft auch das abgelegte Fachwerk: ein geneigter Stab auf
+  Zug steht rot. Die Suche gibt keinen; nur eine von Hand geänderte Datei
+  kann es.
+- Im feinen Raster verteilt sich der Zug oft auf viele Bänder – Konsole
+  bei 0.25 m: 39 Stäbe, V = 372.5 kNm. Das ist das Optimum; ohne seine
+  dünnen Stäbe ginge das Gleichgewicht nicht auf, auch mit N_min = 20 %
+  bleiben alle 39 (Frage im [[TODO]]).
+
 ## 2026-11-28 · Fachwerkmodell: Ground Structure live
 
 Schritt 11b des Plans vom 2026-11-27. Die Kachel «Verfahren» hat die

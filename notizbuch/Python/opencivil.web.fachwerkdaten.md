@@ -1,5 +1,5 @@
 ---
-erzeugt: a7bd60975918
+erzeugt: 8a17ee3ad0eb
 art: modul
 tags: [modul]
 ---
@@ -101,7 +101,8 @@ Der Zustand, wie die Seite ihn zurueckschickt – streng gelesen: sie hat ihn so
 def katalog() -> Dict[str, Any]
 ```
 
-Womit die Kennungen der Teile beginnen, je Liste, und wie ein Lager halten kann.
+Womit die Kennungen der Teile beginnen, je Liste, wie ein Lager halten
+kann und wie der Schalter des Verfahrens heisst.
 
 
 ## Braucht

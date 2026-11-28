@@ -16,7 +16,8 @@ DIE AUFGABE:
 
 Je Stab eine Spalte von B: an seinen zwei Knoten die Richtung von einem
 zum andern, wo kein Lager hält (:class:`Gleichgewicht`). ``q⁺ − q⁻`` ist
-seine Kraft, Zug positiv. ``r⁺ − r⁻`` ist der Rest: was sich mit diesen
+seine Kraft, Zug positiv. Ein Stab, der keinen Zug tragen darf, hat kein
+``q⁺``: seine Kraft ist ``−q⁻``. ``r⁺ − r⁻`` ist der Rest: was sich mit diesen
 Stäben nicht ins Gleichgewicht bringen lässt. Er kostet ``M`` je Einheit,
 mehr als jeder Weg durch die Stäbe, und ist null, wo ein Gleichgewicht
 geht. Wo keins geht, bleibt er stehen und sagt, wo -- statt dass das
@@ -41,7 +42,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from operator import mul
-from typing import Dict, List, Sequence, Set, Tuple
+from typing import Dict, List, Optional, Sequence, Set, Tuple
 
 from opencivil.stabwerk.matrix import Profilmatrix, Zerlegung, nummerierung
 
@@ -137,11 +138,12 @@ class Gleichgewicht:
         return K
 
 
-def optimieren(gl: Gleichgewicht, f: Sequence[float], kosten_zug: Sequence[float],
+def optimieren(gl: Gleichgewicht, f: Sequence[float], kosten_zug: Sequence[Optional[float]],
                kosten_druck: Sequence[float], strafe: float) -> Optimum:
     """
     Die Kräfte der Stäbe mit dem kleinsten Ziel. ``f`` je Zeile die Last,
-    ``kosten_zug`` und ``kosten_druck`` je Stab ``w_Z · l`` und ``w_D · l``,
+    ``kosten_zug`` und ``kosten_druck`` je Stab ``w_Z · l`` und ``w_D · l``
+    -- ``None`` statt ``w_Z · l``, wo ein Stab keinen Zug tragen darf --,
     ``strafe`` das ``M`` des Rests. Am besten ist ``f`` so bezogen, dass
     seine grösste Zahl um 1 liegt.
     """
@@ -149,25 +151,40 @@ def optimieren(gl: Gleichgewicht, f: Sequence[float], kosten_zug: Sequence[float
     fp = [0.0] * n
     for k, w in enumerate(f):
         fp[gl.platz[k]] = w
-    c = [*kosten_zug, *kosten_druck, *([strafe] * n), *([strafe] * n)]
-    N = 2 * m + 2 * n
+    # Die Unbekannten, eine nach der andern: q⁺ der Stäbe, die Zug tragen
+    # dürfen (``zug``), ab ``druck`` q⁻ jedes Stabs, ab ``plus`` r⁺ und ab
+    # ``minus`` r⁻ je Zeile -- ``alle`` zusammen.
+    zug = [i for i, k in enumerate(kosten_zug) if k is not None]
+    druck = len(zug)
+    plus = druck + m
+    minus = plus + n
+    alle = minus + n
+    c = [*(kosten_zug[i] for i in zug), *kosten_druck, *([strafe] * (2 * n))]
+
+    def je_stab(werte: Sequence[float]) -> List[float]:
+        """Die Werte der Unbekannten q⁺, je Stab -- null, wo er keine hat."""
+        v = [0.0] * m
+        for i, w in zip(zug, werte):
+            v[i] = w
+        return v
+
     # Der Start: alle Kräfte 1, die dualen Bedingungen erfüllt mit y = 0.
-    x = [1.0] * N
+    x = [1.0] * alle
     s = list(c)
     y = [0.0] * n
     norm_f = 1.0 + sum(map(abs, fp))
-    norm_c = 1.0 + sum(map(abs, c[:2 * m]))
+    norm_c = 1.0 + sum(map(abs, c[:plus]))
     geloest = False
     schritt = 0
     for schritt in range(HOECHSTENS + 1):
-        q = [a - b for a, b in zip(x[:m], x[m:2 * m])]
+        q = [a - b for a, b in zip(je_stab(x[:druck]), x[druck:plus])]
         Bq = gl.mal(q)
-        rp = [fk - bk - a + b for fk, bk, a, b in zip(fp, Bq, x[2 * m:2 * m + n], x[2 * m + n:])]
+        rp = [fk - bk - a + b for fk, bk, a, b in zip(fp, Bq, x[plus:minus], x[minus:])]
         Bty = gl.mal_transponiert(y)
-        rd = ([c[i] - Bty[i] - s[i] for i in range(m)]
-              + [c[m + i] + Bty[i] - s[m + i] for i in range(m)]
-              + [c[2 * m + k] - y[k] - s[2 * m + k] for k in range(n)]
-              + [c[2 * m + n + k] + y[k] - s[2 * m + n + k] for k in range(n)])
+        rd = ([c[j] - Bty[i] - s[j] for j, i in enumerate(zug)]
+              + [c[druck + i] + Bty[i] - s[druck + i] for i in range(m)]
+              + [c[plus + k] - y[k] - s[plus + k] for k in range(n)]
+              + [c[minus + k] + y[k] - s[minus + k] for k in range(n)])
         cx = sum(map(mul, c, x))
         fy = sum(map(mul, fp, y))
         if (sum(map(abs, rp)) / norm_f < GENAUIGKEIT and sum(map(abs, rd)) / norm_c < GENAUIGKEIT
@@ -176,39 +193,40 @@ def optimieren(gl: Gleichgewicht, f: Sequence[float], kosten_zug: Sequence[float
             break
         if schritt == HOECHSTENS:
             break
-        mu = sum(map(mul, x, s)) / N
+        mu = sum(map(mul, x, s)) / alle
         d = [a / b for a, b in zip(x, s)]
-        Z = Zerlegung(gl.normalmatrix([d[i] + d[m + i] for i in range(m)],
-                                      [d[2 * m + k] + d[2 * m + n + k] for k in range(n)]))
+        Z = Zerlegung(gl.normalmatrix([a + b for a, b in zip(je_stab(d[:druck]), d[druck:plus])],
+                                      [d[plus + k] + d[minus + k] for k in range(n)]))
 
         def richtung(rxs: List[float]) -> Tuple[List[float], List[float], List[float]]:
             # Aus A·D·Aᵀ·Δy = rp + A·(D·rd − S⁻¹·rxs), dann Δs und Δx.
-            t = [rxs[i] / s[i] - d[i] * rd[i] for i in range(N)]
-            At = gl.mal([t[i] - t[m + i] for i in range(m)])
-            dy = Z.loese([rp[k] - At[k] - t[2 * m + k] + t[2 * m + n + k] for k in range(n)])
+            t = [rxs[j] / s[j] - d[j] * rd[j] for j in range(alle)]
+            At = gl.mal([a - b for a, b in zip(je_stab(t[:druck]), t[druck:plus])])
+            dy = Z.loese([rp[k] - At[k] - t[plus + k] + t[minus + k] for k in range(n)])
             Btdy = gl.mal_transponiert(dy)
-            ds = ([rd[i] - Btdy[i] for i in range(m)] + [rd[m + i] + Btdy[i] for i in range(m)]
-                  + [rd[2 * m + k] - dy[k] for k in range(n)]
-                  + [rd[2 * m + n + k] + dy[k] for k in range(n)])
-            dx = [(rxs[i] - x[i] * ds[i]) / s[i] for i in range(N)]
+            ds = ([rd[j] - Btdy[i] for j, i in enumerate(zug)]
+                  + [rd[druck + i] + Btdy[i] for i in range(m)]
+                  + [rd[plus + k] - dy[k] for k in range(n)]
+                  + [rd[minus + k] + dy[k] for k in range(n)])
+            dx = [(rxs[j] - x[j] * ds[j]) / s[j] for j in range(alle)]
             return dx, dy, ds
 
         # Vorhersage ohne Zentrierung, dann die Korrektur nach Mehrotra.
         dxa, _, dsa = richtung([-a * b for a, b in zip(x, s)])
         ap, ad = _weite(x, dxa), _weite(s, dsa)
-        mu_a = sum((x[i] + ap * dxa[i]) * (s[i] + ad * dsa[i]) for i in range(N)) / N
+        mu_a = sum((x[j] + ap * dxa[j]) * (s[j] + ad * dsa[j]) for j in range(alle)) / alle
         sigma = (mu_a / mu) ** 3
-        dx, dy, ds = richtung([sigma * mu - x[i] * s[i] - dxa[i] * dsa[i] for i in range(N)])
+        dx, dy, ds = richtung([sigma * mu - x[j] * s[j] - dxa[j] * dsa[j] for j in range(alle)])
         ap = min(1.0, SCHRITTANTEIL * _weite(x, dx))
         ad = min(1.0, SCHRITTANTEIL * _weite(s, ds))
         x = [a + ap * b for a, b in zip(x, dx)]
         y = [a + ad * b for a, b in zip(y, dy)]
         s = [a + ad * b for a, b in zip(s, ds)]
-    q = tuple(a - b for a, b in zip(x[:m], x[m:2 * m]))
-    rest = [a - b for a, b in zip(x[2 * m:2 * m + n], x[2 * m + n:])]
+    q = tuple(a - b for a, b in zip(je_stab(x[:druck]), x[druck:plus]))
+    rest = [a - b for a, b in zip(x[plus:minus], x[minus:])]
     return Optimum(
         q=q, u=tuple(y[gl.platz[k]] for k in range(n)), rest=tuple(rest[gl.platz[k]] for k in range(n)),
-        ziel=sum(map(mul, c[:2 * m], x[:2 * m])), schritte=schritt, geloest=geloest)
+        ziel=sum(map(mul, c[:plus], x[:plus])), schritte=schritt, geloest=geloest)
 
 
 def _weite(v: Sequence[float], dv: Sequence[float]) -> float:

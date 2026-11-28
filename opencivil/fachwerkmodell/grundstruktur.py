@@ -43,6 +43,10 @@ HOECHSTENS_KNOTEN = 600
 #: Ab wie vielen Punkten im Rechteck um die Scheibe das Raster gar nicht erst gelegt wird.
 HOECHSTENS_RASTERPUNKTE = 200_000
 
+#: Wie weit ein waagrechter oder senkrechter Stab von seiner Richtung abweichen
+#: darf, bezogen auf seine Länge -- nur so weit, wie Rundung reicht (nach Vorgabe).
+ACHSPARALLEL = 1e-9
+
 
 class ZuVieleKnoten(Exception):
     """Das Raster ist zu fein: der Satz sagt, wie viele Knoten es gäbe und was zu tun ist."""
@@ -85,6 +89,11 @@ class Grundstruktur:
                 if (k, r) in self.zeilen))
         return tuple(spalten)
 
+    @cached_property
+    def achsparallel(self) -> Tuple[bool, ...]:
+        """Je Stab, ob er waagrecht oder senkrecht liegt (:func:`liegt_achsparallel`)."""
+        return tuple(liegt_achsparallel(self.knoten[a], self.knoten[b]) for a, b in self.staebe)
+
     def knoten_bei(self, p: Punkt) -> Optional[int]:
         """Der Knoten an ``p`` -- ein Lager oder eine Last steht genau auf einem."""
         return next((k for k, q in enumerate(self.knoten) if _gleich(p, q)), None)
@@ -118,6 +127,12 @@ def grundstruktur(modell: Modell, weite: float) -> Grundstruktur:
                 last[zeilen[(k, r)]] += wert
     return Grundstruktur(modell=modell, knoten=tuple(knoten), staebe=tuple(staebe), laengen=laengen,
                          zeilen=zeilen, last=tuple(last), weite=weite)
+
+
+def liegt_achsparallel(p: Punkt, q: Punkt) -> bool:
+    """Ob ein Stab von ``p`` nach ``q`` waagrecht oder senkrecht liegt -- bis auf :data:`ACHSPARALLEL`."""
+    dx, dy = abs(q[0] - p[0]), abs(q[1] - p[1])
+    return min(dx, dy) <= ACHSPARALLEL * math.hypot(dx, dy)
 
 
 def _gleich(p: Punkt, q: Punkt) -> bool:

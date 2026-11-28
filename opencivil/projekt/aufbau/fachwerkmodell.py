@@ -62,8 +62,9 @@ def modell_von(eintrag: FachwerkmodellEintrag) -> Tuple[Modell, List[Meldung]]:
 
 
 def einstellung_von(eintrag: FachwerkmodellEintrag) -> Einstellung:
-    """Die Zahlen des Verfahrens in SI: die Rasterweite in m, N_min als Teil der grössten Kraft."""
-    return Einstellung(weite=eintrag.si("rasterweite"), w_Z=eintrag.w_Z, N_min=eintrag.si("N_min"))
+    """Das Verfahren in SI: die Rasterweite in m, N_min als Teil der grössten Kraft, dazu sein Schalter."""
+    return Einstellung(weite=eintrag.si("rasterweite"), w_Z=eintrag.w_Z, N_min=eintrag.si("N_min"),
+                       zug_achsparallel=eintrag.zug_achsparallel)
 
 
 def bauen(art: "Bauteilart", eintrag: FachwerkmodellEintrag, aufbau: Aufbau) -> Bauteil:

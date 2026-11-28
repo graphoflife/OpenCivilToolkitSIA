@@ -149,11 +149,26 @@ sammeln sie sich hier, je mit dem, was vorläufig gebaut ist.
       (Vorgabe 1 %), und das Gleichgewicht wird ohne sie neu gesucht; was
       darüber liegt, bleibt. Bei h = 0.55 m sind es so 49 statt 102 Stäbe,
       gleich leicht. Ein Schritt am Schluss, der unter den gleich leichten
-      eines mit wenigen Stäben wählt, wäre eigene Arbeit. Vorschlag: so
-      lassen; wer weniger Stäbe will, hebt N_min. Vorläufig: so.
+      eines mit wenigen Stäben wählt, wäre eigene Arbeit. Ein höheres
+      N_min hilft nur, wo das Gleichgewicht ohne die dünnen Stäbe aufgeht;
+      sonst halbiert die Suche die Schwelle, bis es aufgeht, und ein grauer
+      Hinweis sagt, dass dünne bleiben. Bei h = 0.55 m geben N_min = 1, 5
+      und 10 % dieselben 49 Stäbe: ohne einen Stab mit weniger als 0.5 %
+      der grössten Kraft bliebe 0.2 % der Last offen. Vorschlag: so lassen.
+      Vorläufig: so.
+- [ ] **Fachwerkmodell: mit «Zug nur waagrecht und senkrecht» im feinen
+      Raster viele Bänder?** Die Konsole 1 × 2 m hat mit dem Schalter im
+      Raster von 1 m 7 Stäbe (V = 400 kNm), bei 0.5 m 14 (375 kNm), bei
+      0.25 m 39 (372.5 kNm): der Zug verteilt sich auf viele dünne Bänder,
+      wie eine verteilte Bewehrung. Das ist das Optimum dieser Aufgabe;
+      ohne die dünnen Bänder geht das Gleichgewicht nicht auf, auch ein
+      höheres N_min räumt nicht auf. Vorschlag: so lassen; für ein Modell
+      zum Lesen das gröbere Raster. Vorläufig: so.
 - [ ] **Fachwerkmodell: was nach Vorgabe gebaut ist, nicht nachgeschlagen.**
       Je mit dem Vorschlag «so lassen»:
       - die Rasterweite h = 0.5 m;
+      - waagrecht oder senkrecht heisst bis auf 10⁻⁹ der Länge, also nur
+        Rundung;
       - höchstens 600 Knoten; ein Raster mit mehr als 200 000 Punkten im
         Rechteck um die Scheibe wird gar nicht erst gelegt;
       - die erste Runde nur mit Stäben bis 1.5 h;

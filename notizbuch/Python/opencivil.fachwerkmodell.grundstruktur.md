@@ -1,5 +1,5 @@
 ---
-erzeugt: e92431a2ed00
+erzeugt: d91bca223f02
 art: modul
 tags: [modul]
 ---
@@ -72,6 +72,15 @@ Je Stab, was er mit der Kraft 1 (Zug) zu den Zeilen gibt: an seinem
 ersten Knoten seine Richtung zum zweiten negativ, am zweiten positiv –
 dort, wo kein Lager hält.
 
+#### Grundstruktur.achsparallel
+
+```python
+@cached_property
+def achsparallel(self) -> Tuple[bool, ...]
+```
+
+Je Stab, ob er waagrecht oder senkrecht liegt ([[opencivil.fachwerkmodell.grundstruktur#liegt_achsparallel|liegt_achsparallel]]).
+
 #### Grundstruktur.knoten_bei
 
 ```python
@@ -90,6 +99,14 @@ Die Grundstruktur der Scheibe mit der Rasterweite `weite` in m. Das
 Modell ist geprüft ([[opencivil.fachwerkmodell.pruefen#pruefen|pruefen]]):
 es hat eine Scheibe, Lager und Lasten, alle im Material.
 Wirft [[opencivil.fachwerkmodell.grundstruktur#ZuVieleKnoten|ZuVieleKnoten]], wenn das Raster zu fein ist.
+
+### liegt_achsparallel
+
+```python
+def liegt_achsparallel(p: Punkt, q: Punkt) -> bool
+```
+
+Ob ein Stab von `p` nach `q` waagrecht oder senkrecht liegt – bis auf [[opencivil.fachwerkmodell.grundstruktur#Konstanten|ACHSPARALLEL]].
 
 ### _knoten
 
@@ -151,6 +168,7 @@ Rand – seine Mitte sagt, welches.
 
 - `HOECHSTENS_KNOTEN = 600` – Wie viele Knoten die Grundstruktur höchstens hat – nach Vorgabe, nicht nachgeschlagen.
 - `HOECHSTENS_RASTERPUNKTE = 200000` – Ab wie vielen Punkten im Rechteck um die Scheibe das Raster gar nicht erst gelegt wird.
+- `ACHSPARALLEL = 1e-09` – Wie weit ein waagrechter oder senkrechter Stab von seiner Richtung abweichen darf, bezogen auf seine Länge – nur so weit, wie Rundung reicht (nach Vorgabe).
 
 ## Braucht
 
@@ -161,4 +179,5 @@ Rand – seine Mitte sagt, welches.
 ## Gebraucht von
 
 - [[opencivil.fachwerkmodell.suche]]
+- [[opencivil.fachwerkmodell.werk]]
 - [[opencivil.web.fachwerkdaten]]

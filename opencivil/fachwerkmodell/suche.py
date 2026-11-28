@@ -20,6 +20,14 @@ DIE RUNDEN:
   α = β = 0.05.
 - Fertig, wenn keiner mehr verletzt.
 
+ZUG NUR WAAGRECHT UND SENKRECHT:
+Ein Schalter des Verfahrens (:data:`ZUG_ACHSPARALLEL`): dann tragen nur
+waagrechte und senkrechte Stäbe Zug, wie eine Bewehrung in x und y, und
+ein geneigter nur Druck -- in der Optimierung hat er keine Kraft q⁺, und
+seine Dehnung verletzt die Bedingung nur, wo sie unter −w_D liegt. Geht so
+kein Fachwerk auf, bleibt ein Rest, und die Nachrechnung nennt die Last,
+die offen bleibt (:func:`~opencivil.fachwerkmodell.werk.offen_meldungen`).
+
 DER ZUSTAND:
 Zwischen zwei Runden: welche Stäbe im Modell sind, zu welchem Modell
 (:class:`Suchzustand`). Die Seite hält ihn und schickt ihn mit der nächsten
@@ -38,7 +46,8 @@ Last und Lager liegt.
 
 DER ABDRUCK:
 Woran ein gefundenes Fachwerk sein Modell erkennt (:func:`abdruck`): die
-ganze Scheibe mit Lagern und Lasten und die drei Zahlen des Verfahrens.
+ganze Scheibe mit Lagern und Lasten, die drei Zahlen des Verfahrens und
+sein Schalter.
 Ändert sich eines, gehört das Fachwerk zu einem früheren Stand.
 """
 
@@ -86,11 +95,17 @@ VERLETZT_AB = 1e-4
 #: Das Gewicht des Drucks: die Einheit, gegen die w_Z zählt.
 W_DRUCK = 1.0
 
+#: Der Schalter des Verfahrens, der Zug nur in waagrechten und senkrechten Stäben
+#: zulässt -- wie er heisst und was er bewirkt (Dateikopf).
+ZUG_ACHSPARALLEL = "Zug nur waagrecht und senkrecht"
+ZUG_ACHSPARALLEL_ERKLAERUNG = ("Geneigte Stäbe tragen nur Druck – den Zug nehmen waagrechte und "
+                               "senkrechte Stäbe auf, wie eine Bewehrung in x und y")
+
 #: Was vom Gleichgewicht offen bleiben darf, bezogen auf die grösste Last -- nach Vorgabe.
 #: Mit derselben Grenze prüft die Nachrechnung das gefundene Fachwerk.
 OFFEN_HOECHSTENS = 1e-6
 
-#: Unter diesem Teil der grössten Kraft trägt ein Stab nichts.
+#: Unter diesem Teil der grössten Kraft -- eines Stabs oder einer Last -- trägt ein Stab nichts.
 NULL = 1e-9
 
 #: Wie oft die Nachbearbeitung höchstens neu optimiert -- nach Vorgabe, nicht nachgeschlagen.
@@ -99,7 +114,7 @@ NEU_HOECHSTENS = 30
 
 @dataclass(frozen=True)
 class Einstellung:
-    """Die drei Zahlen des Verfahrens in SI."""
+    """Das Verfahren: seine drei Zahlen in SI und sein Schalter."""
 
     weite: float
     """Die Rasterweite h in m."""
@@ -109,6 +124,9 @@ class Einstellung:
 
     N_min: float
     """Die kleinste Stabkraft als Teil der grössten: 0.01 ist 1 %."""
+
+    zug_achsparallel: bool = False
+    """Ob nur waagrechte und senkrechte Stäbe Zug tragen (:data:`ZUG_ACHSPARALLEL`)."""
 
 
 @dataclass(frozen=True)
@@ -217,9 +235,15 @@ def _optimum(gs: Grundstruktur, aktiv: Sequence[int], einstellung: Einstellung,
              skala: float) -> Optimum:
     """Die Optimierung über die Stäbe ``aktiv``, die Lasten bezogen auf die grösste."""
     gl = Gleichgewicht(len(gs.zeilen), [gs.spalten[i] for i in aktiv])
-    laengen = [gs.laengen[i] for i in aktiv]
-    return optimieren(gl, [w / skala for w in gs.last], [einstellung.w_Z * l for l in laengen],
-                      [W_DRUCK * l for l in laengen], _strafe(gs, einstellung))
+    return optimieren(gl, [w / skala for w in gs.last],
+                      [einstellung.w_Z * gs.laengen[i] if _traegt_zug(gs, i, einstellung) else None
+                       for i in aktiv],
+                      [W_DRUCK * gs.laengen[i] for i in aktiv], _strafe(gs, einstellung))
+
+
+def _traegt_zug(gs: Grundstruktur, i: int, einstellung: Einstellung) -> bool:
+    """Ob der Stab ``i`` Zug tragen darf: jeder -- mit :data:`ZUG_ACHSPARALLEL` nur ein solcher."""
+    return not einstellung.zug_achsparallel or gs.achsparallel[i]
 
 
 def _strafe(gs: Grundstruktur, einstellung: Einstellung) -> float:
@@ -242,7 +266,8 @@ def _verletzt(gs: Grundstruktur, aktiv: Sequence[int], u: Sequence[float],
         if i in drin:
             continue
         dehnung = sum(w * u[k] for k, w in spalte) / gs.laengen[i]
-        v = max(dehnung / einstellung.w_Z, -dehnung / W_DRUCK)
+        zug = dehnung / einstellung.w_Z if _traegt_zug(gs, i, einstellung) else -math.inf
+        v = max(zug, -dehnung / W_DRUCK)
         if v > 1.0 + VERLETZT_AB:
             verletzt[i] = v
     return verletzt
@@ -262,7 +287,8 @@ def nachbearbeiten(gs: Grundstruktur, aktiv: Sequence[int], opt: Optimum, einste
     kraefte = dict(zip(aktiv, opt.q))
     if max(map(abs, opt.rest), default=0.0) <= OFFEN_HOECHSTENS:
         kraefte = _ohne_duenne(gs, kraefte, einstellung, skala, NEU_HOECHSTENS if gruendlich else 1)
-    gross = max(map(abs, kraefte.values()), default=0.0)
+    # Bezogen auf die grösste Last, die 1 ist: trägt kein Stab, bleibt keiner.
+    gross = max(1.0, max(map(abs, kraefte.values()), default=0.0))
     staebe = [(*gs.staebe[i], q * skala) for i, q in kraefte.items() if abs(q) > NULL * gross]
     fest = {gs.knoten_bei(l.ort) for l in gs.modell.lager} | {gs.knoten_bei(f.ort) for f in gs.modell.lasten}
     return _gefasst(gs.knoten, _zusammengelegt(gs.knoten, staebe, fest))
@@ -277,7 +303,7 @@ def _ohne_duenne(gs: Grundstruktur, kraefte: Dict[int, float], einstellung: Eins
     gilt die halbe Schwelle. Höchstens ``hoechstens`` Mal neu gesucht.
     Beispiel: die Wandscheibe im Raster von
     0.55 m geht ohne die Stäbe unter 1 % nicht auf, ohne die unter 0.25 %
-    schon -- 62 statt 111 Stäbe, gleich leicht.
+    schon -- 62 statt 102 Stäbe, gleich leicht.
     """
     schwelle = einstellung.N_min
     for _ in range(hoechstens):

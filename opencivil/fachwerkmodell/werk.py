@@ -39,7 +39,9 @@ from opencivil.fachwerkmodell import herleitung
 from opencivil.fachwerkmodell.modell import Modell
 from opencivil.fachwerkmodell.nachrechnung import Nachrechnung, nachrechnen
 from opencivil.fachwerkmodell.pruefen import pruefen
-from opencivil.fachwerkmodell.suche import VORGABEN, Einstellung, Suchergebnis, abdruck
+from opencivil.fachwerkmodell.grundstruktur import liegt_achsparallel
+from opencivil.fachwerkmodell.suche import (VORGABEN, ZUG_ACHSPARALLEL, Einstellung, Suchergebnis,
+                                            abdruck)
 from opencivil.stabwerk.system import Meldung
 
 #: Unter welchem Thema seine Herleitung in der Formelsammlung steht.
@@ -87,15 +89,21 @@ class Fachwerkbefund:
     nachrechnung: Optional[Nachrechnung] = None
 
 
-def offen_meldungen(n: Nachrechnung) -> List[Meldung]:
-    """Wo das Gleichgewicht nicht aufgeht, rot: je Last, die es nicht ganz trägt, eine Meldung."""
+def offen_meldungen(n: Nachrechnung, einstellung: Einstellung) -> List[Meldung]:
+    """
+    Wo das Gleichgewicht nicht aufgeht, rot: je Last, die es nicht ganz
+    trägt, eine Meldung -- mit «Zug nur waagrecht und senkrecht» sagt sie
+    es, denn ohne geht es oft.
+    """
+    mit = f" mit {ZUG_ACHSPARALLEL}" if einstellung.zug_achsparallel else ""
     meldungen = []
     for last, ort, betrag in n.offen:
         if last is not None:
-            meldungen.append(Meldung(f"Die Last {last.name} lässt sich nicht ganz zu den Lagern "
-                                     f"tragen: {betrag / 1e3:.1f} kN bleiben offen.", (last.name,)))
+            meldungen.append(Meldung(f"Die Last {last.name} lässt sich{mit} nicht ganz zu den "
+                                     f"Lagern tragen: {betrag / 1e3:.1f} kN bleiben offen.",
+                                     (last.name,)))
         else:
-            meldungen.append(Meldung(f"Bei {als_ort(ort)} geht das Gleichgewicht um "
+            meldungen.append(Meldung(f"Bei {als_ort(ort)} geht das Gleichgewicht{mit} um "
                                      f"{betrag / 1e3:.1f} kN nicht auf."))
     return meldungen
 
@@ -182,17 +190,27 @@ class Fachwerksystem(Rechenobjekt):
             befund.stand = "gefunden"
             befund.gefunden = self.gefunden
             befund.nachrechnung = nachrechnen(self.modell, self.gefunden.fachwerk, self.einstellung.w_Z)
-            befund.zum_fachwerk += offen_meldungen(befund.nachrechnung)
+            befund.zum_fachwerk += offen_meldungen(befund.nachrechnung, self.einstellung)
             befund.zum_fachwerk += self._zum_fachwerk(self.gefunden)
 
     def _zum_fachwerk(self, gefunden: Suchergebnis) -> List[Meldung]:
-        """Was sonst am gefundenen Fachwerk zu sagen ist: wo die Suche anhielt, was dünn blieb."""
+        """
+        Was sonst am gefundenen Fachwerk zu sagen ist: rot ein geneigter Stab
+        auf Zug, wo nur waagrechte und senkrechte Zug tragen -- die Suche gibt
+        keinen, nur eine Datei von Hand --, wo die Suche anhielt, was dünn blieb.
+        """
+        fw = gefunden.fachwerk
         meldungen = []
+        if self.einstellung.zug_achsparallel:
+            meldungen += [Meldung(f"Stab {i} ist geneigt und trägt Zug, obwohl {ZUG_ACHSPARALLEL} "
+                                  f"gilt – neu suchen {IM_FENSTER}.")
+                          for i, (a, b, N) in enumerate(fw.staebe, start=1)
+                          if N > 0.0 and not liegt_achsparallel(fw.knoten[a], fw.knoten[b])]
         if not gefunden.fertig:
             meldungen.append(Meldung(
                 f"Die Suche wurde nach Runde {gefunden.runden} angehalten: das Fachwerk trägt die "
                 f"Lasten, ist aber womöglich nicht das leichteste.", fehler=False))
-        kraefte = [abs(N) for _, _, N in gefunden.fachwerk.staebe]
+        kraefte = [abs(N) for _, _, N in fw.staebe]
         if kraefte and min(kraefte) < 0.999 * self.einstellung.N_min * max(kraefte):
             meldungen.append(Meldung(
                 "Ohne die Stäbe unter der kleinsten Stabkraft ginge das Gleichgewicht nicht auf – "

@@ -667,7 +667,10 @@ Gleichgewicht das leichteste, das mit dem kleinsten V = Σ l · (w_Z · N⁺ +
 N⁻). «Fachwerk suchen» im Fenster «Verfahren» fragt den Kern Runde um
 Runde und zeigt nach jeder das Fachwerk, bis keine Stäbe mehr dazukommen
 oder man «Anhalten» drückt: Zug rot, Druck blau gestrichelt, je dicker,
-desto grösser die Kraft. Danach ist es eine Eingabe wie jede andere: die
+desto grösser die Kraft. Mit dem Schalter «Zug nur waagrecht und
+senkrecht» tragen geneigte Stäbe nur Druck, wie in einer Wand mit
+Bewehrung in x und y; geht so kein Fachwerk auf, sagt es die Last, die
+offen bleibt, rot. Danach ist es eine Eingabe wie jede andere: die
 Rechnung rechnet sein Gleichgewicht und die Lagerkräfte nach, und ändern
 sich Scheibe, Lager, Lasten oder Verfahren, sagt sie, dass neu zu suchen
 ist. Beispiel «Wandscheibe mit Türe» bei h = 1 m: 27 Stäbe, V = 3734.0 kNm.

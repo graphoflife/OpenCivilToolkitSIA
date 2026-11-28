@@ -1,5 +1,5 @@
 ---
-erzeugt: 3da3b97af48c
+erzeugt: b4e709cc7f42
 art: modul
 tags: [modul]
 ---
@@ -57,10 +57,12 @@ Was die Rechnung fand: das Modell, seine Meldungen und das Fachwerk, mit dem, wa
 ### offen_meldungen
 
 ```python
-def offen_meldungen(n: Nachrechnung) -> List[Meldung]
+def offen_meldungen(n: Nachrechnung, einstellung: Einstellung) -> List[Meldung]
 ```
 
-Wo das Gleichgewicht nicht aufgeht, rot: je Last, die es nicht ganz trägt, eine Meldung.
+Wo das Gleichgewicht nicht aufgeht, rot: je Last, die es nicht ganz
+trägt, eine Meldung – mit «Zug nur waagrecht und senkrecht» sagt sie
+es, denn ohne geht es oft.
 
 ### FachwerkProzedur
 
@@ -122,7 +124,9 @@ Was im Projekt steht, wenn es zu Modell und Verfahren gehört, nachgerechnet –
 def _zum_fachwerk(self, gefunden: Suchergebnis) -> List[Meldung]
 ```
 
-Was sonst am gefundenen Fachwerk zu sagen ist: wo die Suche anhielt, was dünn blieb.
+Was sonst am gefundenen Fachwerk zu sagen ist: rot ein geneigter Stab
+auf Zug, wo nur waagrechte und senkrechte Zug tragen – die Suche gibt
+keinen, nur eine Datei von Hand –, wo die Suche anhielt, was dünn blieb.
 
 
 ## Konstanten
@@ -141,6 +145,7 @@ Was sonst am gefundenen Fachwerk zu sagen ist: wo die Suche anhielt, was dünn b
 - [[opencivil.core.rechenobjekt]]
 - [[opencivil.core.wert]]
 - [[opencivil.decke.herleitung]]
+- [[opencivil.fachwerkmodell.grundstruktur]]
 - [[opencivil.fachwerkmodell.herleitung]]
 - [[opencivil.fachwerkmodell.modell]]
 - [[opencivil.fachwerkmodell.nachrechnung]]

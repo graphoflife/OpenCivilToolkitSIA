@@ -1,5 +1,5 @@
 ---
-erzeugt: 701a706a4db8
+erzeugt: 0297755b7ae3
 art: modul
 tags: [modul]
 ---
@@ -27,7 +27,8 @@ mit  B · (q⁺ − q⁻) + r⁺ − r⁻ = f   und allen Unbekannten ≥ 0
 
 Je Stab eine Spalte von B: an seinen zwei Knoten die Richtung von einem
 zum andern, wo kein Lager hält ([[opencivil.fachwerkmodell.optimierung#Gleichgewicht|Gleichgewicht]]). `q⁺ − q⁻` ist
-seine Kraft, Zug positiv. `r⁺ − r⁻` ist der Rest: was sich mit diesen
+seine Kraft, Zug positiv. Ein Stab, der keinen Zug tragen darf, hat kein
+`q⁺`: seine Kraft ist `−q⁻`. `r⁺ − r⁻` ist der Rest: was sich mit diesen
 Stäben nicht ins Gleichgewicht bringen lässt. Er kostet `M` je Einheit,
 mehr als jeder Weg durch die Stäbe, und ist null, wo ein Gleichgewicht
 geht. Wo keins geht, bleibt er stehen und sagt, wo – statt dass das
@@ -106,11 +107,12 @@ def normalmatrix(self, d: Sequence[float], d_rest: Sequence[float]) -> Profilmat
 ### optimieren
 
 ```python
-def optimieren(gl: Gleichgewicht, f: Sequence[float], kosten_zug: Sequence[float], kosten_druck: Sequence[float], strafe: float) -> Optimum
+def optimieren(gl: Gleichgewicht, f: Sequence[float], kosten_zug: Sequence[Optional[float]], kosten_druck: Sequence[float], strafe: float) -> Optimum
 ```
 
 Die Kräfte der Stäbe mit dem kleinsten Ziel. `f` je Zeile die Last,
-`kosten_zug` und `kosten_druck` je Stab `w_Z · l` und `w_D · l`,
+`kosten_zug` und `kosten_druck` je Stab `w_Z · l` und `w_D · l`
+– `None` statt `w_Z · l`, wo ein Stab keinen Zug tragen darf –,
 `strafe` das `M` des Rests. Am besten ist `f` so bezogen, dass
 seine grösste Zahl um 1 liegt.
 

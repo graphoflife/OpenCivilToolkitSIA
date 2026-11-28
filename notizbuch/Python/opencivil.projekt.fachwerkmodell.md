@@ -1,5 +1,5 @@
 ---
-erzeugt: e9e7307c4bc1
+erzeugt: 04969b5fcc7e
 art: modul
 tags: [modul]
 ---
@@ -198,6 +198,7 @@ weiter.
 - `rasterweite: float = bereich(0.5, heisst='Rasterweite', einheit=M, ueber=0.0)` – Wie weit die Knoten der Grundstruktur auseinander liegen.
 - `w_Z: float = bereich(1.0, heisst='w_Z', ab=0.1, bis=10.0)` – Wie schwer Zug gegenüber Druck zählt – 1: gleich (Plan vom 2026-11-27, Entscheid 11).
 - `N_min: float = bereich(1.0, heisst='N_min', einheit=PROZENT, ab=0.0, bis=50.0)` – Die kleinste Stabkraft, die stehen bleibt, bezogen auf die grösste.
+- `zug_achsparallel: bool = False` – Ob nur waagrechte und senkrechte Stäbe Zug tragen – geneigte dann nur Druck ([[opencivil.fachwerkmodell.suche#Konstanten|ZUG_ACHSPARALLEL]]).
 - `fachwerk: Optional[GefundenesFachwerk] = teil(lambda: None, heisst='Gefundenes Fachwerk')` – Was die Suche zuletzt fand – siehe Dateikopf.
 - `beschreibung: str = ''` – Freier Text – geht in keine Rechnung ein.
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: a90da0107868
+erzeugt: 3d105ed3825c
 art: modul
 tags: [modul]
 ---
@@ -30,6 +30,16 @@ wer die Suche anhält, hat das der letzten.
 - Fertig, wenn keiner mehr verletzt.
 
 
+## ZUG NUR WAAGRECHT UND SENKRECHT
+
+Ein Schalter des Verfahrens ([[opencivil.fachwerkmodell.suche#Konstanten|ZUG_ACHSPARALLEL]]): dann tragen nur
+waagrechte und senkrechte Stäbe Zug, wie eine Bewehrung in x und y, und
+ein geneigter nur Druck – in der Optimierung hat er keine Kraft q⁺, und
+seine Dehnung verletzt die Bedingung nur, wo sie unter −w_D liegt. Geht so
+kein Fachwerk auf, bleibt ein Rest, und die Nachrechnung nennt die Last,
+die offen bleibt ([[opencivil.fachwerkmodell.werk#offen_meldungen|offen_meldungen]]).
+
+
 ## DER ZUSTAND
 
 Zwischen zwei Runden: welche Stäbe im Modell sind, zu welchem Modell
@@ -53,7 +63,8 @@ Last und Lager liegt.
 ## DER ABDRUCK
 
 Woran ein gefundenes Fachwerk sein Modell erkennt ([[opencivil.fachwerkmodell.suche#abdruck|abdruck]]): die
-ganze Scheibe mit Lagern und Lasten und die drei Zahlen des Verfahrens.
+ganze Scheibe mit Lagern und Lasten, die drei Zahlen des Verfahrens und
+sein Schalter.
 Ändert sich eines, gehört das Fachwerk zu einem früheren Stand.
 
 ## Inhalt
@@ -65,11 +76,12 @@ ganze Scheibe mit Lagern und Lasten und die drei Zahlen des Verfahrens.
 class Einstellung
 ```
 
-Die drei Zahlen des Verfahrens in SI.
+Das Verfahren: seine drei Zahlen in SI und sein Schalter.
 
 - `weite: float` – Die Rasterweite h in m.
 - `w_Z: float` – Das Gewicht des Zugs; Druck zählt 1.
 - `N_min: float` – Die kleinste Stabkraft als Teil der grössten: 0.01 ist 1 %.
+- `zug_achsparallel: bool = False` – Ob nur waagrechte und senkrechte Stäbe Zug tragen ([[opencivil.fachwerkmodell.suche#Konstanten|ZUG_ACHSPARALLEL]]).
 
 ### Suchzustand
 
@@ -161,6 +173,14 @@ def _optimum(gs: Grundstruktur, aktiv: Sequence[int], einstellung: Einstellung, 
 
 Die Optimierung über die Stäbe `aktiv`, die Lasten bezogen auf die grösste.
 
+### _traegt_zug
+
+```python
+def _traegt_zug(gs: Grundstruktur, i: int, einstellung: Einstellung) -> bool
+```
+
+Ob der Stab `i` Zug tragen darf: jeder – mit [[opencivil.fachwerkmodell.suche#Konstanten|ZUG_ACHSPARALLEL]] nur ein solcher.
+
 ### _strafe
 
 ```python
@@ -205,7 +225,7 @@ wieder von vorn, bis keiner mehr wegfällt. Geht es ohne sie nicht auf,
 gilt die halbe Schwelle. Höchstens `hoechstens` Mal neu gesucht.
 Beispiel: die Wandscheibe im Raster von
 0.55 m geht ohne die Stäbe unter 1 % nicht auf, ohne die unter 0.25 %
-schon – 62 statt 111 Stäbe, gleich leicht.
+schon – 62 statt 102 Stäbe, gleich leicht.
 
 ### _zusammengelegt
 
@@ -250,8 +270,10 @@ Die Grundstruktur, aus dem Speicher, wenn sie zu Modell und Rasterweite schon ge
 - `ALPHA = 0.05` – α und β aus Gl. (7): wie viele der verletzenden Stäbe je Runde dazukommen.
 - `VERLETZT_AB = 0.0001` – Ab wann ein Stab die Bedingung verletzt: 1 + diese Zahl.
 - `W_DRUCK = 1.0` – Das Gewicht des Drucks: die Einheit, gegen die w_Z zählt.
+- `ZUG_ACHSPARALLEL = 'Zug nur waagrecht und senkrecht'` – Der Schalter des Verfahrens, der Zug nur in waagrechten und senkrechten Stäben zulässt – wie er heisst und was er bewirkt (Dateikopf).
+- `ZUG_ACHSPARALLEL_ERKLAERUNG = 'Geneigte Stäbe tragen nur Druck – den Zug nehmen waagrechte und senk…`
 - `OFFEN_HOECHSTENS = 1e-06` – Was vom Gleichgewicht offen bleiben darf, bezogen auf die grösste Last – nach Vorgabe. Mit derselben Grenze prüft die Nachrechnung das gefundene Fachwerk.
-- `NULL = 1e-09` – Unter diesem Teil der grössten Kraft trägt ein Stab nichts.
+- `NULL = 1e-09` – Unter diesem Teil der grössten Kraft – eines Stabs oder einer Last – trägt ein Stab nichts.
 - `NEU_HOECHSTENS = 30` – Wie oft die Nachbearbeitung höchstens neu optimiert – nach Vorgabe, nicht nachgeschlagen.
 - `_GEBAUT = OrderedDict()` – Die zuletzt gebauten Grundstrukturen, nach Modell und Rasterweite.
 - `_PLAETZE = 2` – Wie viele es höchstens behält.

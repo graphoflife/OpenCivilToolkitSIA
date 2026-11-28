@@ -27,7 +27,8 @@ from opencivil.fachwerkmodell.grundstruktur import ZuVieleKnoten
 from opencivil.fachwerkmodell.modell import Halt
 from opencivil.fachwerkmodell.nachrechnung import Nachrechnung, nachrechnen
 from opencivil.fachwerkmodell.pruefen import pruefen
-from opencivil.fachwerkmodell.suche import Suchzustand, abdruck, runde
+from opencivil.fachwerkmodell.suche import (ZUG_ACHSPARALLEL, ZUG_ACHSPARALLEL_ERKLAERUNG,
+                                            Suchzustand, abdruck, runde)
 from opencivil.fachwerkmodell.werk import Fachwerkbefund, offen_meldungen
 from opencivil.projekt import Aufbau
 from opencivil.projekt.aufbau.fachwerkmodell import einstellung_von, modell_von
@@ -117,7 +118,7 @@ def suchen(eintrag: FachwerkmodellEintrag, zustand: Optional[Mapping[str, Any]])
         "fachwerk": _fachwerk(n),
         "stand": {"runde": e.runden, "im_modell": e.im_modell, "moeglich": e.moeglich,
                   "dazu": r.dazu},
-        "meldungen": [m.als_dict() for m in offen_meldungen(n)],
+        "meldungen": [m.als_dict() for m in offen_meldungen(n, einstellung)],
     }
 
 
@@ -142,7 +143,11 @@ def _zustand(roh: Optional[Mapping[str, Any]]) -> Optional[Suchzustand]:
 
 
 def katalog() -> Dict[str, Any]:
-    """Womit die Kennungen der Teile beginnen, je Liste, und wie ein Lager halten kann."""
+    """
+    Womit die Kennungen der Teile beginnen, je Liste, wie ein Lager halten
+    kann und wie der Schalter des Verfahrens heisst.
+    """
     return {"vorsilben": dict(VORSILBEN),
             "halt": [{"wert": h.value, "beschriftung": h.beschriftung, "titel": h.erklaerung}
-                     for h in Halt]}
+                     for h in Halt],
+            "zug": {"beschriftung": ZUG_ACHSPARALLEL, "titel": ZUG_ACHSPARALLEL_ERKLAERUNG}}

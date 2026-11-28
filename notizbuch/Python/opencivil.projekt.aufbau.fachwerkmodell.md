@@ -1,5 +1,5 @@
 ---
-erzeugt: 79138f0189c2
+erzeugt: e62c31aa22b1
 art: modul
 tags: [modul]
 ---
@@ -33,7 +33,7 @@ fehlt im Modell; die Meldung sagt es.
 def einstellung_von(eintrag: FachwerkmodellEintrag) -> Einstellung
 ```
 
-Die Zahlen des Verfahrens in SI: die Rasterweite in m, N_min als Teil der grössten Kraft.
+Das Verfahren in SI: die Rasterweite in m, N_min als Teil der grössten Kraft, dazu sein Schalter.
 
 ### bauen
 

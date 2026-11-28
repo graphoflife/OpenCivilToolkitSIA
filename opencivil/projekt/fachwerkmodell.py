@@ -191,6 +191,12 @@ class FachwerkmodellEintrag(BauteilEintrag):
     N_min: float = bereich(1.0, heisst="N_min", einheit=PROZENT, ab=0.0, bis=50.0)
     """Die kleinste Stabkraft, die stehen bleibt, bezogen auf die grösste."""
 
+    zug_achsparallel: bool = False
+    """
+    Ob nur waagrechte und senkrechte Stäbe Zug tragen -- geneigte dann nur
+    Druck (:data:`~opencivil.fachwerkmodell.suche.ZUG_ACHSPARALLEL`).
+    """
+
     fachwerk: Optional[GefundenesFachwerk] = teil(lambda: None, heisst="Gefundenes Fachwerk")
     """Was die Suche zuletzt fand -- siehe Dateikopf."""
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: 68810f9117d4
+erzeugt: d8b1d715d493
 art: modul
 tags: [modul]
 ---
@@ -89,13 +89,14 @@ def _fachwerkmodell(p: Projekt) -> None
 
 Eine Wandscheibe 6 × 3 m mit einer Türe, links fest, rechts auf einem
 Rollenlager, oben zwei Lasten – eine schräg. Mit dem Fachwerk, das die
-Suche im Raster von 1 m findet, wie nach «Fachwerk suchen».
+Suche im Raster von 1 m findet, wie nach «Fachwerk suchen»; dieselbe
+Wand noch einmal mit «Zug nur waagrecht und senkrecht».
 
 ### _fachwerk_der_wandscheibe
 
 ```python
 @lru_cache(maxsize=None)
-def _fachwerk_der_wandscheibe() -> GefundenesFachwerk
+def _fachwerk_der_wandscheibe(zug_achsparallel: bool) -> GefundenesFachwerk
 ```
 
 Je Lauf einmal gesucht – eine Viertelsekunde, und das Beispiel entsteht oft.
